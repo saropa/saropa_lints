@@ -12,9 +12,9 @@ import {
 
 describe('ci-generator', () => {
     const defaultThresholds: CiThresholds = {
-        maxStale: 3,
+        maxAbandoned: 3,
         maxEndOfLife: 2,
-        maxLegacyLocked: 5,
+        maxOutdated: 5,
         minAverageVibrancy: 60,
         failOnVulnerability: true,
     };
@@ -77,9 +77,9 @@ describe('ci-generator', () => {
 
         it('should handle zero thresholds', () => {
             const thresholds: CiThresholds = {
-                maxStale: 0,
+                maxAbandoned: 0,
                 maxEndOfLife: 0,
-                maxLegacyLocked: 0,
+                maxOutdated: 0,
                 minAverageVibrancy: 0,
                 failOnVulnerability: false,
             };
@@ -272,9 +272,9 @@ describe('ci-generator', () => {
     describe('threshold interpolation edge cases', () => {
         it('should handle large threshold values', () => {
             const thresholds: CiThresholds = {
-                maxStale: 50,
+                maxAbandoned: 50,
                 maxEndOfLife: 100,
-                maxLegacyLocked: 200,
+                maxOutdated: 200,
                 minAverageVibrancy: 95,
                 failOnVulnerability: true,
             };
@@ -290,9 +290,9 @@ describe('ci-generator', () => {
 
         it('should handle all-zero thresholds', () => {
             const thresholds: CiThresholds = {
-                maxStale: 0,
+                maxAbandoned: 0,
                 maxEndOfLife: 0,
-                maxLegacyLocked: 0,
+                maxOutdated: 0,
                 minAverageVibrancy: 0,
                 failOnVulnerability: false,
             };

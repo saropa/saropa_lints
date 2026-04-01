@@ -13,7 +13,7 @@ function makeUnhealthyProblem(name: string, score: number): UnhealthyPackageProb
         severity: score < 20 ? 'high' : 'medium',
         line: 10,
         score,
-        category: score < 20 ? 'end-of-life' : 'legacy-locked',
+        category: score < 20 ? 'end-of-life' : 'outdated',
     };
 }
 

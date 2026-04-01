@@ -14,20 +14,20 @@ describe('status-classifier', () => {
             assert.strictEqual(cat, 'vibrant');
         });
 
-        it('should classify 40-69 as quiet', () => {
+        it('should classify 40-69 as stable', () => {
             const cat = classifyStatus({ score: 50, knownIssue: null, pubDev: null });
-            assert.strictEqual(cat, 'quiet');
+            assert.strictEqual(cat, 'stable');
         });
 
-        it('should classify 10-39 as legacy-locked', () => {
+        it('should classify 20-39 as outdated', () => {
             const cat = classifyStatus({ score: 25, knownIssue: null, pubDev: null });
-            assert.strictEqual(cat, 'legacy-locked');
+            assert.strictEqual(cat, 'outdated');
         });
 
-        // Score < 10 is now 'stale' (low maintenance), not 'end-of-life'
-        it('should classify <10 as stale', () => {
+        // Score < 20 is now 'abandoned' (low maintenance), not 'end-of-life'
+        it('should classify <20 as abandoned', () => {
             const cat = classifyStatus({ score: 5, knownIssue: null, pubDev: null });
-            assert.strictEqual(cat, 'stale');
+            assert.strictEqual(cat, 'abandoned');
         });
 
         it('should override with known issue', () => {
@@ -67,18 +67,18 @@ describe('status-classifier', () => {
             );
             assert.strictEqual(
                 classifyStatus({ score: 69.9, knownIssue: null, pubDev: null }),
-                'quiet',
+                'stable',
             );
         });
 
-        it('should handle boundary at 10 (legacy-locked vs stale)', () => {
+        it('should handle boundary at 20 (outdated vs abandoned)', () => {
             assert.strictEqual(
-                classifyStatus({ score: 10, knownIssue: null, pubDev: null }),
-                'legacy-locked',
+                classifyStatus({ score: 20, knownIssue: null, pubDev: null }),
+                'outdated',
             );
             assert.strictEqual(
-                classifyStatus({ score: 9.9, knownIssue: null, pubDev: null }),
-                'stale',
+                classifyStatus({ score: 19.9, knownIssue: null, pubDev: null }),
+                'abandoned',
             );
         });
 
@@ -108,7 +108,7 @@ describe('status-classifier', () => {
             assert.strictEqual(cat, 'vibrant');
         });
 
-        it('should upgrade quiet to vibrant for firebase.google.com (trusted publisher)', () => {
+        it('should upgrade stable to vibrant for firebase.google.com (trusted publisher)', () => {
             const cat = classifyStatus({
                 score: 55,
                 knownIssue: null,
@@ -125,7 +125,7 @@ describe('status-classifier', () => {
             assert.strictEqual(cat, 'vibrant');
         });
 
-        it('should upgrade quiet to vibrant for dart.dev (trusted publisher)', () => {
+        it('should upgrade stable to vibrant for dart.dev (trusted publisher)', () => {
             const cat = classifyStatus({
                 score: 55,
                 knownIssue: null,
@@ -142,7 +142,7 @@ describe('status-classifier', () => {
             assert.strictEqual(cat, 'vibrant');
         });
 
-        it('should keep quiet when publisher is not trusted', () => {
+        it('should keep stable when publisher is not trusted', () => {
             const cat = classifyStatus({
                 score: 55,
                 knownIssue: null,
@@ -156,10 +156,10 @@ describe('status-classifier', () => {
                     topics: [],
                 },
             });
-            assert.strictEqual(cat, 'quiet');
+            assert.strictEqual(cat, 'stable');
         });
 
-        it('should not upgrade quiet when publisher id casing does not match (false positive guard)', () => {
+        it('should not upgrade stable when publisher id casing does not match (false positive guard)', () => {
             const cat = classifyStatus({
                 score: 55,
                 knownIssue: null,
@@ -173,7 +173,7 @@ describe('status-classifier', () => {
                     topics: [],
                 },
             });
-            assert.strictEqual(cat, 'quiet');
+            assert.strictEqual(cat, 'stable');
         });
 
         it('should not upgrade trusted publisher when package is discontinued (EOL wins)', () => {
@@ -204,7 +204,7 @@ describe('status-classifier', () => {
                 },
                 pubDev: null,
             });
-            assert.strictEqual(cat, 'quiet');
+            assert.strictEqual(cat, 'stable');
         });
 
         it('should not override when known issue status is active', () => {
@@ -218,12 +218,12 @@ describe('status-classifier', () => {
                 },
                 pubDev: null,
             });
-            assert.strictEqual(cat, 'quiet');
+            assert.strictEqual(cat, 'stable');
         });
 
-        it('should apply pub points floor: stale with high points becomes legacy-locked', () => {
-            // A package with 150/160 pub points should not classify as 'stale'
-            // even if its vibrancy score is very low (quiet GitHub repo)
+        it('should apply pub points floor: abandoned with high points becomes outdated', () => {
+            // A package with 150/160 pub points should not classify as 'abandoned'
+            // even if its vibrancy score is very low (stable GitHub repo)
             const cat = classifyStatus({
                 score: 5,
                 knownIssue: null,
@@ -237,7 +237,7 @@ describe('status-classifier', () => {
                     topics: [],
                 },
             });
-            assert.strictEqual(cat, 'legacy-locked');
+            assert.strictEqual(cat, 'outdated');
         });
 
         it('should not apply pub points floor below 140 threshold', () => {
@@ -255,7 +255,7 @@ describe('status-classifier', () => {
                     topics: [],
                 },
             });
-            assert.strictEqual(cat, 'stale');
+            assert.strictEqual(cat, 'abandoned');
         });
 
         it('should not apply pub points floor when discontinued (EOL overrides)', () => {
@@ -301,7 +301,7 @@ describe('status-classifier', () => {
     describe('categoryIcon', () => {
         it('should map categories to icon ids', () => {
             assert.strictEqual(categoryIcon('vibrant'), 'pass');
-            assert.strictEqual(categoryIcon('stale'), 'warning');
+            assert.strictEqual(categoryIcon('abandoned'), 'warning');
             assert.strictEqual(categoryIcon('end-of-life'), 'error');
         });
     });
@@ -311,8 +311,8 @@ describe('status-classifier', () => {
             assert.strictEqual(categoryToSeverity('end-of-life'), 1);
         });
 
-        it('should map stale to Information (2)', () => {
-            assert.strictEqual(categoryToSeverity('stale'), 2);
+        it('should map abandoned to Information (2)', () => {
+            assert.strictEqual(categoryToSeverity('abandoned'), 2);
         });
 
         it('should map vibrant to Hint (3)', () => {
@@ -322,17 +322,17 @@ describe('status-classifier', () => {
 
     describe('categoryLabel', () => {
         it('should return human-readable labels', () => {
-            assert.strictEqual(categoryLabel('legacy-locked'), 'Legacy-Locked');
-            assert.strictEqual(categoryLabel('stale'), 'Stale');
+            assert.strictEqual(categoryLabel('outdated'), 'Outdated');
+            assert.strictEqual(categoryLabel('abandoned'), 'Abandoned');
         });
     });
 
     describe('categoryToGrade', () => {
-        it('should map categories to A (best) … E (stale) … F (dangerous)', () => {
+        it('should map categories to A (best) … E (abandoned) … F (dangerous)', () => {
             assert.strictEqual(categoryToGrade('vibrant'), 'A');
-            assert.strictEqual(categoryToGrade('quiet'), 'B');
-            assert.strictEqual(categoryToGrade('legacy-locked'), 'C');
-            assert.strictEqual(categoryToGrade('stale'), 'E');
+            assert.strictEqual(categoryToGrade('stable'), 'B');
+            assert.strictEqual(categoryToGrade('outdated'), 'C');
+            assert.strictEqual(categoryToGrade('abandoned'), 'E');
             assert.strictEqual(categoryToGrade('end-of-life'), 'F');
         });
     });

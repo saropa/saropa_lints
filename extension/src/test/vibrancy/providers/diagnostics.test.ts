@@ -10,8 +10,8 @@ const PUBSPEC_CONTENT = `dependencies:
   old_pkg: ^0.1.0
 `;
 
-/** Category codes for the main vibrancy diagnostic (stale/legacy-locked/end-of-life/quiet). */
-const MAIN_VIBRANCY_CATEGORY_CODES = ['stale', 'legacy-locked', 'end-of-life', 'quiet'];
+/** Category codes for the main vibrancy diagnostic (abandoned/outdated/end-of-life/stable). */
+const MAIN_VIBRANCY_CATEGORY_CODES = ['abandoned', 'outdated', 'end-of-life', 'stable'];
 
 function makeResult(
     name: string,
@@ -62,7 +62,7 @@ describe('VibrancyDiagnostics', () => {
         setTestConfig('saropaLints.packageVibrancy', 'endOfLifeDiagnostics', 'hint');
         const results = [
             makeResult('http', 80, 'vibrant'),
-            makeResult('flutter_bloc', 35, 'legacy-locked'),
+            makeResult('flutter_bloc', 35, 'outdated'),
             makeResult('old_pkg', 5, 'end-of-life'),
         ];
         diagnostics.update(uri, PUBSPEC_CONTENT, results);
@@ -73,14 +73,14 @@ describe('VibrancyDiagnostics', () => {
 
     it('should skip end-of-life diagnostics when setting is none', () => {
         const results = [
-            makeResult('flutter_bloc', 35, 'legacy-locked'),
+            makeResult('flutter_bloc', 35, 'outdated'),
             makeResult('old_pkg', 5, 'end-of-life'),
         ];
         diagnostics.update(uri, PUBSPEC_CONTENT, results);
         const diags = collection.get(uri);
         assert.ok(diags);
         assert.strictEqual(diags!.length, 1);
-        assert.strictEqual(diags![0].code, 'legacy-locked');
+        assert.strictEqual(diags![0].code, 'outdated');
     });
 
     it('should skip vibrant packages', () => {
@@ -125,23 +125,23 @@ describe('VibrancyDiagnostics', () => {
         assert.strictEqual(diags[0].severity, vscode.DiagnosticSeverity.Hint);
     });
 
-    it('should set Information severity for legacy-locked', () => {
-        const results = [makeResult('flutter_bloc', 30, 'legacy-locked')];
+    it('should set Information severity for outdated', () => {
+        const results = [makeResult('flutter_bloc', 30, 'outdated')];
         diagnostics.update(uri, PUBSPEC_CONTENT, results);
         const diags = collection.get(uri)!;
         assert.strictEqual(diags[0].severity, vscode.DiagnosticSeverity.Information);
     });
 
-    // Stale packages (score < 10) use Information severity and "Review" verb
-    it('should set Information severity for stale packages', () => {
-        const results = [makeResult('old_pkg', 5, 'stale')];
+    // Abandoned packages use Information severity and "Review" verb
+    it('should set Information severity for abandoned packages', () => {
+        const results = [makeResult('old_pkg', 5, 'abandoned')];
         diagnostics.update(uri, PUBSPEC_CONTENT, results);
         const diags = collection.get(uri)!;
         assert.strictEqual(diags[0].severity, vscode.DiagnosticSeverity.Information);
     });
 
-    it('should use Review verb for stale messages', () => {
-        const results = [makeResult('old_pkg', 5, 'stale')];
+    it('should use Review verb for abandoned messages', () => {
+        const results = [makeResult('old_pkg', 5, 'abandoned')];
         diagnostics.update(uri, PUBSPEC_CONTENT, results);
         const diags = collection.get(uri)!;
         assert.strictEqual(diags[0].message, 'Review old_pkg (1/10)');
@@ -155,15 +155,15 @@ describe('VibrancyDiagnostics', () => {
         assert.strictEqual(diags[0].message, 'Deprecated: old_pkg (1/10)');
     });
 
-    it('should use Review verb for legacy-locked messages', () => {
-        const results = [makeResult('flutter_bloc', 35, 'legacy-locked')];
+    it('should use Review verb for outdated messages', () => {
+        const results = [makeResult('flutter_bloc', 35, 'outdated')];
         diagnostics.update(uri, PUBSPEC_CONTENT, results);
         const diags = collection.get(uri)!;
         assert.strictEqual(diags[0].message, 'Review flutter_bloc (4/10)');
     });
 
-    it('should use Monitor verb for quiet messages', () => {
-        const results = [makeResult('http', 55, 'quiet')];
+    it('should use Monitor verb for stable messages', () => {
+        const results = [makeResult('http', 55, 'stable')];
         diagnostics.update(uri, PUBSPEC_CONTENT, results);
         const diags = collection.get(uri)!;
         assert.strictEqual(diags[0].message, 'Monitor http (6/10)');
@@ -292,7 +292,7 @@ describe('VibrancyDiagnostics', () => {
     it('should not emit vibrancy diagnostic for path-overridden packages', () => {
         setTestConfig('saropaLints.packageVibrancy', 'endOfLifeDiagnostics', 'hint');
         const result: VibrancyResult = {
-            ...makeResult('old_pkg', 5, 'stale'),
+            ...makeResult('old_pkg', 5, 'abandoned'),
             package: {
                 name: 'old_pkg',
                 version: '1.0.0',
@@ -311,7 +311,7 @@ describe('VibrancyDiagnostics', () => {
     it('should not emit vibrancy diagnostic for git-overridden packages', () => {
         setTestConfig('saropaLints.packageVibrancy', 'endOfLifeDiagnostics', 'hint');
         const result: VibrancyResult = {
-            ...makeResult('old_pkg', 5, 'stale'),
+            ...makeResult('old_pkg', 5, 'abandoned'),
             package: {
                 name: 'old_pkg',
                 version: '1.0.0',
@@ -329,11 +329,11 @@ describe('VibrancyDiagnostics', () => {
 
     it('should still emit vibrancy diagnostic for hosted (non-overridden) packages', () => {
         setTestConfig('saropaLints.packageVibrancy', 'endOfLifeDiagnostics', 'hint');
-        const results = [makeResult('old_pkg', 5, 'stale')];
+        const results = [makeResult('old_pkg', 5, 'abandoned')];
         diagnostics.update(uri, PUBSPEC_CONTENT, results);
         const diags = collection.get(uri) ?? [];
-        const staleDiags = diags.filter(d => d.code === 'stale');
-        assert.strictEqual(staleDiags.length, 1, 'hosted package should still get stale diagnostic');
+        const abandonedDiags = diags.filter(d => d.code === 'abandoned');
+        assert.strictEqual(abandonedDiags.length, 1, 'hosted package should still get abandoned diagnostic');
     });
 
     describe('inlineDiagnostics mode', () => {
@@ -354,14 +354,14 @@ describe('VibrancyDiagnostics', () => {
             setTestConfig('saropaLints.packageVibrancy', 'endOfLifeDiagnostics', 'hint');
             const results = [
                 makeResult('old_pkg', 3, 'end-of-life'),
-                makeResult('flutter_bloc', 8, 'stale'),
+                makeResult('flutter_bloc', 8, 'abandoned'),
             ];
             diagnostics.update(uri, PUBSPEC_CONTENT, results);
             const diags = collection.get(uri) ?? [];
             const eolDiags = diags.filter(d => d.code === 'end-of-life');
-            const staleDiags = diags.filter(d => d.code === 'stale');
+            const abandonedDiags = diags.filter(d => d.code === 'abandoned');
             assert.strictEqual(eolDiags.length, 1, 'critical mode shows EOL per-line');
-            assert.strictEqual(staleDiags.length, 0, 'critical mode hides stale per-line');
+            assert.strictEqual(abandonedDiags.length, 0, 'critical mode hides abandoned per-line');
         });
 
         it('critical mode: still shows non-health diagnostics like unused', () => {

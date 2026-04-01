@@ -108,7 +108,7 @@ describe('VibrancyCodeActionProvider', () => {
                 github: null,
                 knownIssue: null,
                 score: 30,
-                category: 'legacy-locked',
+                category: 'outdated',
                 resolutionVelocity: 0,
                 engagementLevel: 0,
                 popularity: 0,

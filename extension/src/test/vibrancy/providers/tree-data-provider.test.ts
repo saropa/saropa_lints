@@ -21,7 +21,7 @@ function makeResult(
         github: null,
         knownIssue: null,
         score,
-        category: score >= 70 ? 'vibrant' : score >= 40 ? 'quiet' : 'legacy-locked',
+        category: score >= 70 ? 'vibrant' : score >= 40 ? 'stable' : 'outdated',
         resolutionVelocity: 0,
         engagementLevel: 0,
         popularity: 0,

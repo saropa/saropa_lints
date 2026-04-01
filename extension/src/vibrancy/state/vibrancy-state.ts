@@ -67,9 +67,9 @@ export class VibrancyStateManager implements vscode.Disposable {
             const status = r.updateInfo?.updateStatus;
             return status && status !== 'up-to-date' && status !== 'unknown';
         }).length;
-        // End-of-life, stale, and legacy-locked packages are all counted as problems
+        // End-of-life, abandoned, and outdated packages are all counted as problems
         this.problemCount.value = results.filter(
-            r => r.category === 'end-of-life' || r.category === 'stale' || r.category === 'legacy-locked',
+            r => r.category === 'end-of-life' || r.category === 'abandoned' || r.category === 'outdated',
         ).length;
         this._onDidChangeResults.fire();
     }

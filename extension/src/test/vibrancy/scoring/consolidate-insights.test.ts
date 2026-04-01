@@ -22,8 +22,8 @@ const makeResult = (
     github: null,
     knownIssue: null,
     score,
-    // Score < 10 is 'stale' (low maintenance), not 'end-of-life' (truly dead)
-    category: score >= 70 ? 'vibrant' : score >= 40 ? 'quiet' : score >= 10 ? 'legacy-locked' : 'stale',
+    // Score < 20 is 'abandoned' (low maintenance), not 'end-of-life' (truly dead)
+    category: score >= 70 ? 'vibrant' : score >= 40 ? 'stable' : score >= 20 ? 'outdated' : 'abandoned',
     resolutionVelocity: 0,
     engagementLevel: 0,
     popularity: 0,
@@ -79,8 +79,8 @@ describe('consolidate-insights', () => {
             assert.strictEqual(problems[0].severity, 'high');
         });
 
-        it('should collect unhealthy problem for stale package with medium severity', () => {
-            const result = makeResult('quiet_pkg', 5, { category: 'stale' });
+        it('should collect unhealthy problem for abandoned package with medium severity', () => {
+            const result = makeResult('quiet_pkg', 5, { category: 'abandoned' });
             const problems = collectProblems(result, new Map(), new Map());
 
             assert.strictEqual(problems.length, 1);
@@ -88,8 +88,8 @@ describe('consolidate-insights', () => {
             assert.strictEqual(problems[0].severity, 'medium');
         });
 
-        it('should collect unhealthy problem for legacy package', () => {
-            const result = makeResult('old', 25, { category: 'legacy-locked' });
+        it('should collect unhealthy problem for outdated package', () => {
+            const result = makeResult('old', 25, { category: 'outdated' });
             const problems = collectProblems(result, new Map(), new Map());
 
             assert.strictEqual(problems.length, 1);
@@ -114,7 +114,7 @@ describe('consolidate-insights', () => {
                     latestVersion: '2.0.0',
                     blockerPackage: 'meta',
                     blockerVibrancyScore: 50,
-                    blockerCategory: 'quiet',
+                    blockerCategory: 'stable',
                 },
             });
             const problems = collectProblems(result, new Map(), new Map());
@@ -199,7 +199,7 @@ describe('consolidate-insights', () => {
 
         it('should collect multiple problems for same package', () => {
             const result = makeResult('bad', 20, {
-                category: 'legacy-locked',
+                category: 'outdated',
                 isUnused: true,
             });
             const problems = collectProblems(result, new Map(), new Map());
@@ -213,7 +213,7 @@ describe('consolidate-insights', () => {
 
     describe('computeCombinedRisk', () => {
         it('should sum problem weights', () => {
-            const result = makeResult('pkg', 20, { category: 'legacy-locked' });
+            const result = makeResult('pkg', 20, { category: 'outdated' });
             const problems = [
                 { type: 'unhealthy' as const, severity: 'medium' as const, message: '' },
                 { type: 'unused' as const, severity: 'low' as const, message: '' },
@@ -233,21 +233,21 @@ describe('consolidate-insights', () => {
             assert.strictEqual(risk, 30);
         });
 
-        it('should use medium weight for stale (between EOL and legacy)', () => {
-            const result = makeResult('quiet_pkg', 5, { category: 'stale' });
+        it('should use medium weight for abandoned (between EOL and outdated)', () => {
+            const result = makeResult('quiet_pkg', 5, { category: 'abandoned' });
             const problems = [
                 { type: 'unhealthy' as const, severity: 'medium' as const, message: '' },
             ];
             const risk = computeCombinedRisk(problems, result);
 
-            // Stale weight (25) sits between EOL (30) and legacy-locked (20)
+            // Abandoned weight (25) sits between EOL (30) and outdated (20)
             assert.strictEqual(risk, 25);
         });
     });
 
     describe('determineSuggestedAction', () => {
         it('should suggest removal for unused + unhealthy', () => {
-            const result = makeResult('bad', 20, { category: 'legacy-locked' });
+            const result = makeResult('bad', 20, { category: 'outdated' });
             const problems = [
                 { type: 'unhealthy' as const, severity: 'medium' as const, message: '' },
                 { type: 'unused' as const, severity: 'low' as const, message: '' },
@@ -328,7 +328,7 @@ describe('consolidate-insights', () => {
                         latestVersion: '2.0.0',
                         blockerPackage: 'blocker',
                         blockerVibrancyScore: 50,
-                        blockerCategory: 'quiet',
+                        blockerCategory: 'stable',
                     },
                 }),
             ];
@@ -361,9 +361,9 @@ describe('consolidate-insights', () => {
 
         it('should return insights sorted by risk (highest first)', () => {
             const results = [
-                makeResult('low', 35, { category: 'legacy-locked' }),
+                makeResult('low', 35, { category: 'outdated' }),
                 makeResult('high', 5, { category: 'end-of-life', isUnused: true }),
-                makeResult('medium', 25, { category: 'legacy-locked' }),
+                makeResult('medium', 25, { category: 'outdated' }),
             ];
             const insights = consolidateInsights(results, [], []);
 

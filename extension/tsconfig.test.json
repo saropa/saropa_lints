@@ -18,6 +18,7 @@
     "src/test/vibrancy/vscode-mock.ts",
     "src/test/vibrancy/vscode-mock-classes.ts",
     "src/test/vibrancy/test-helpers.ts",
+    "src/test/vibrancy/category-dictionary.test.ts",
     "src/test/vibrancy/scan-helpers.test.ts",
     "src/test/vibrancy/services/package-code-analyzer.test.ts",
     "src/test/vibrancy/services/review-state.test.ts",

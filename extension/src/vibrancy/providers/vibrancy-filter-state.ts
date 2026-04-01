@@ -16,7 +16,7 @@ export const ALL_PROBLEM_TYPES: readonly ProblemType[] = [
 
 /** All known vibrancy categories for filter defaults. */
 export const ALL_CATEGORIES: readonly VibrancyCategory[] = [
-    'vibrant', 'quiet', 'legacy-locked', 'stale', 'end-of-life',
+    'vibrant', 'stable', 'outdated', 'abandoned', 'end-of-life',
 ];
 
 /** All known dependency sections for filter defaults. */

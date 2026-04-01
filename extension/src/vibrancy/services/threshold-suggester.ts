@@ -5,20 +5,20 @@ import { VibrancyResult, CiThresholds } from '../types';
  * 
  * Strategy:
  * - maxEndOfLife: current count (so existing ones don't fail; any new ones will)
- * - maxLegacyLocked: current count + 1 (small buffer)
+ * - maxOutdated: current count + 1 (small buffer)
  * - minAverageVibrancy: current average rounded down to nearest 5
  * - failOnVulnerability: always true for safety
  */
 export function suggestThresholds(results: readonly VibrancyResult[]): CiThresholds {
     const endOfLifeCount = countCategory(results, 'end-of-life');
-    const staleCount = countCategory(results, 'stale');
-    const legacyLockedCount = countCategory(results, 'legacy-locked');
+    const abandonedCount = countCategory(results, 'abandoned');
+    const outdatedCount = countCategory(results, 'outdated');
     const averageVibrancy = computeAverageVibrancy(results);
 
     return {
-        maxStale: staleCount,
+        maxAbandoned: abandonedCount,
         maxEndOfLife: endOfLifeCount,
-        maxLegacyLocked: legacyLockedCount + 1,
+        maxOutdated: outdatedCount + 1,
         minAverageVibrancy: roundDownToNearest5(averageVibrancy),
         failOnVulnerability: true,
     };
@@ -44,9 +44,9 @@ function roundDownToNearest5(value: number): number {
 /** Format thresholds for display in quick-pick. */
 export function formatThresholdsSummary(thresholds: CiThresholds): string {
     const parts = [
-        `Stale ≤ ${thresholds.maxStale}`,
+        `Abandoned ≤ ${thresholds.maxAbandoned}`,
         `EOL ≤ ${thresholds.maxEndOfLife}`,
-        `Legacy ≤ ${thresholds.maxLegacyLocked}`,
+        `Outdated ≤ ${thresholds.maxOutdated}`,
         `Avg ≥ ${thresholds.minAverageVibrancy}`,
     ];
     if (thresholds.failOnVulnerability) {

@@ -91,17 +91,17 @@ jobs:
             print('   Major updates available: \$majorUpdates');
             
             // Thresholds from configuration
-            const maxStale = ${thresholds.maxStale};
+            const maxAbandoned = ${thresholds.maxAbandoned};
             const maxEol = ${thresholds.maxEndOfLife};
-            const maxLegacy = ${thresholds.maxLegacyLocked};
+            const maxOutdated = ${thresholds.maxOutdated};
             const minAvgVibrancy = ${thresholds.minAverageVibrancy};
             const failOnVuln = ${failOnVuln};
 
             print('');
             print('   Thresholds:');
-            print('     Max Stale: \$maxStale');
+            print('     Max Abandoned: \$maxAbandoned');
             print('     Max EOL: \$maxEol');
-            print('     Max Legacy: \$maxLegacy');
+            print('     Max Outdated: \$maxOutdated');
             print('     Min Avg Vibrancy: \$minAvgVibrancy');
             print('     Fail on Vulnerability: \$failOnVuln');
             
@@ -138,9 +138,9 @@ jobs:
               report += '| Metric | Value | Threshold | Status |\\n';
               report += '|--------|-------|-----------|--------|\\n';
               report += \`| Outdated | \${outdatedCount} | — | \${outdatedCount === 0 ? '✅' : 'ℹ️'} |\\n\`;
-              report += \`| Stale Limit | — | ≤ ${thresholds.maxStale} | — |\\n\`;
+              report += \`| Abandoned Limit | — | ≤ ${thresholds.maxAbandoned} | — |\\n\`;
               report += \`| EOL Limit | — | ≤ ${thresholds.maxEndOfLife} | — |\\n\`;
-              report += \`| Legacy Limit | — | ≤ ${thresholds.maxLegacyLocked} | — |\\n\`;
+              report += \`| Outdated Limit | — | ≤ ${thresholds.maxOutdated} | — |\\n\`;
               report += \`| Min Avg Vibrancy | — | ≥ ${thresholds.minAverageVibrancy} | — |\\n\`;
               report += '\\n*Full vibrancy analysis requires saropa_vibrancy_cli*\\n';
             } catch (e) {
@@ -194,9 +194,9 @@ vibrancy-check:
         print('   Outdated packages: \$outdatedCount');
         
         // Thresholds
-        print('   Max Stale: ${thresholds.maxStale}');
+        print('   Max Abandoned: ${thresholds.maxAbandoned}');
         print('   Max EOL: ${thresholds.maxEndOfLife}');
-        print('   Max Legacy: ${thresholds.maxLegacyLocked}');
+        print('   Max Outdated: ${thresholds.maxOutdated}');
         print('   Min Avg Vibrancy: ${thresholds.minAverageVibrancy}');
         print('   Fail on Vulnerability: ${thresholds.failOnVulnerability}');
       }
@@ -220,9 +220,9 @@ export function generateShellScript(thresholds: CiThresholds): string {
 set -e
 
 # Configuration thresholds
-MAX_STALE=${thresholds.maxStale}
+MAX_ABANDONED=${thresholds.maxAbandoned}
 MAX_EOL=${thresholds.maxEndOfLife}
-MAX_LEGACY=${thresholds.maxLegacyLocked}
+MAX_OUTDATED=${thresholds.maxOutdated}
 MIN_AVG_VIBRANCY=${thresholds.minAverageVibrancy}
 FAIL_ON_VULN=${failOnVuln}
 
@@ -287,9 +287,9 @@ void main() {
   
   print('');
   print('Thresholds:');
-  print('  Max Stale: ${thresholds.maxStale}');
+  print('  Max Abandoned: ${thresholds.maxAbandoned}');
   print('  Max End-of-Life: ${thresholds.maxEndOfLife}');
-  print('  Max Legacy-Locked: ${thresholds.maxLegacyLocked}');
+  print('  Max Outdated: ${thresholds.maxOutdated}');
   print('  Min Average Vibrancy: ${thresholds.minAverageVibrancy}');
   print('  Fail on Vulnerability: ${failOnVuln}');
   

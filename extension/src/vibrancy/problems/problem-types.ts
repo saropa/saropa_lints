@@ -12,7 +12,7 @@ interface BaseProblem {
     readonly line: number;
 }
 
-/** Package is unhealthy (EOL, stale, or legacy-locked). */
+/** Package is unhealthy (EOL, abandoned, or outdated). */
 export interface UnhealthyPackageProblem extends BaseProblem {
     readonly type: 'unhealthy';
     readonly score: number;
@@ -103,12 +103,12 @@ export function generateProblemId(pkg: string, type: ProblemType, suffix?: strin
 export function problemMessage(problem: Problem): string {
     switch (problem.type) {
         case 'unhealthy':
-            // Label already shows the category (End of Life, Stale, etc.),
+            // Label already shows the category (End of Life, Abandoned, etc.),
             // so the message adds context: the vibrancy score
             if (problem.category === 'end-of-life') {
                 return `Score ${problem.score}/100 — discontinued or abandoned`;
             }
-            if (problem.category === 'stale') {
+            if (problem.category === 'abandoned') {
                 return `Score ${problem.score}/100 — low maintenance activity`;
             }
             return `Score ${problem.score}/100 — behind on updates`;

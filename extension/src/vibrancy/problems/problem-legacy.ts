@@ -45,7 +45,7 @@ export function convertLegacyProblem(
                 severity,
                 line,
                 score: 0,
-                category: 'legacy-locked',
+                category: 'outdated',
             };
         case 'stale-override':
             return {

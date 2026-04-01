@@ -7,7 +7,7 @@ import { VibrancyResult, BudgetConfig, VibrancyCategory, BudgetResult } from '..
 
 const NO_BUDGET: BudgetConfig = {
     maxDependencies: null, maxTotalSizeMB: null, minAverageVibrancy: null,
-    maxStale: null, maxEndOfLife: null, maxLegacyLocked: null, maxUnused: null,
+    maxAbandoned: null, maxEndOfLife: null, maxOutdated: null, maxUnused: null,
 };
 
 function makeResult(
@@ -33,9 +33,9 @@ describe('budget-checker', () => {
             assert.strictEqual(config.maxDependencies, null);
             assert.strictEqual(config.maxTotalSizeMB, null);
             assert.strictEqual(config.minAverageVibrancy, null);
-            assert.strictEqual(config.maxStale, null);
+            assert.strictEqual(config.maxAbandoned, null);
             assert.strictEqual(config.maxEndOfLife, null);
-            assert.strictEqual(config.maxLegacyLocked, null);
+            assert.strictEqual(config.maxOutdated, null);
             assert.strictEqual(config.maxUnused, null);
         });
 
@@ -44,18 +44,18 @@ describe('budget-checker', () => {
                 'budget.maxDependencies': 50,
                 'budget.maxTotalSizeMB': 100,
                 'budget.minAverageVibrancy': 60,
-                'budget.maxStale': 2,
+                'budget.maxAbandoned': 2,
                 'budget.maxEndOfLife': 0,
-                'budget.maxLegacyLocked': 5,
+                'budget.maxOutdated': 5,
                 'budget.maxUnused': 3,
             };
             const config = readBudgetConfig(<T>(key: string) => values[key] as T | undefined);
             assert.strictEqual(config.maxDependencies, 50);
             assert.strictEqual(config.maxTotalSizeMB, 100);
             assert.strictEqual(config.minAverageVibrancy, 60);
-            assert.strictEqual(config.maxStale, 2);
+            assert.strictEqual(config.maxAbandoned, 2);
             assert.strictEqual(config.maxEndOfLife, 0);
-            assert.strictEqual(config.maxLegacyLocked, 5);
+            assert.strictEqual(config.maxOutdated, 5);
             assert.strictEqual(config.maxUnused, 3);
         });
     });
@@ -74,9 +74,9 @@ describe('budget-checker', () => {
         it('should compute totals from results', () => {
             const results: VibrancyResult[] = [
                 makeResult('a', 80, 'vibrant', { archiveSizeBytes: 1024 * 1024 }),
-                makeResult('b', 50, 'quiet', { archiveSizeBytes: 2 * 1024 * 1024 }),
-                makeResult('c', 20, 'legacy-locked', { isUnused: true }),
-                makeResult('d', 5, 'stale'),
+                makeResult('b', 50, 'stable', { archiveSizeBytes: 2 * 1024 * 1024 }),
+                makeResult('c', 20, 'outdated', { isUnused: true }),
+                makeResult('d', 5, 'abandoned'),
                 makeResult('e', 0, 'end-of-life'),
             ];
 
@@ -85,9 +85,9 @@ describe('budget-checker', () => {
             assert.strictEqual(actuals.totalCount, 5);
             assert.strictEqual(actuals.totalSizeMB, 3);
             assert.strictEqual(actuals.averageVibrancy, 31);
-            assert.strictEqual(actuals.staleCount, 1);
+            assert.strictEqual(actuals.abandonedCount, 1);
             assert.strictEqual(actuals.endOfLifeCount, 1);
-            assert.strictEqual(actuals.legacyLockedCount, 1);
+            assert.strictEqual(actuals.outdatedCount, 1);
             assert.strictEqual(actuals.unusedCount, 1);
         });
 
@@ -97,9 +97,9 @@ describe('budget-checker', () => {
             assert.strictEqual(actuals.totalCount, 0);
             assert.strictEqual(actuals.totalSizeMB, 0);
             assert.strictEqual(actuals.averageVibrancy, 0);
-            assert.strictEqual(actuals.staleCount, 0);
+            assert.strictEqual(actuals.abandonedCount, 0);
             assert.strictEqual(actuals.endOfLifeCount, 0);
-            assert.strictEqual(actuals.legacyLockedCount, 0);
+            assert.strictEqual(actuals.outdatedCount, 0);
             assert.strictEqual(actuals.unusedCount, 0);
         });
     });
@@ -108,8 +108,8 @@ describe('budget-checker', () => {
         // EOL category is set directly — these represent discontinued packages, not score-based classification
         const results: VibrancyResult[] = [
             makeResult('a', 80, 'vibrant', { archiveSizeBytes: 10 * 1024 * 1024 }),
-            makeResult('b', 60, 'quiet', { archiveSizeBytes: 5 * 1024 * 1024 }),
-            makeResult('c', 20, 'legacy-locked', { isUnused: true }),
+            makeResult('b', 60, 'stable', { archiveSizeBytes: 5 * 1024 * 1024 }),
+            makeResult('c', 20, 'outdated', { isUnused: true }),
             makeResult('d', 5, 'end-of-life'),
             makeResult('e', 5, 'end-of-life'),
         ];
@@ -209,17 +209,17 @@ describe('budget-checker', () => {
     describe('getPackagesByCategory', () => {
         const results: VibrancyResult[] = [
             makeResult('a', 80, 'vibrant'), makeResult('b', 5, 'end-of-life'),
-            makeResult('c', 5, 'end-of-life'), makeResult('d', 20, 'legacy-locked', { isUnused: true }),
-            makeResult('e', 60, 'quiet', { isUnused: true }),
-            makeResult('f', 5, 'stale'),
+            makeResult('c', 5, 'end-of-life'), makeResult('d', 20, 'outdated', { isUnused: true }),
+            makeResult('e', 60, 'stable', { isUnused: true }),
+            makeResult('f', 5, 'abandoned'),
         ];
 
         it('should return end-of-life packages', () => {
             assert.deepStrictEqual(getPackagesByCategory(results, 'end-of-life'), ['b', 'c']);
         });
 
-        it('should return stale packages', () => {
-            assert.deepStrictEqual(getPackagesByCategory(results, 'stale'), ['f']);
+        it('should return abandoned packages', () => {
+            assert.deepStrictEqual(getPackagesByCategory(results, 'abandoned'), ['f']);
         });
 
         it('should return unused packages', () => {
@@ -231,7 +231,7 @@ describe('budget-checker', () => {
         // EOL category is set directly — these represent discontinued packages, not score-based classification
         const results: VibrancyResult[] = [
             makeResult('a', 5, 'end-of-life'), makeResult('b', 5, 'end-of-life'),
-            makeResult('c', 20, 'legacy-locked'),
+            makeResult('c', 20, 'outdated'),
         ];
 
         it('should build messages for exceeded budgets', () => {

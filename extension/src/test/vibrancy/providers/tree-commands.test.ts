@@ -19,7 +19,7 @@ function makeResult(
         github: null,
         knownIssue: null,
         score,
-        category: score >= 70 ? 'vibrant' : 'quiet',
+        category: score >= 70 ? 'vibrant' : 'stable',
         resolutionVelocity: 0,
         engagementLevel: 0,
         popularity: 0,

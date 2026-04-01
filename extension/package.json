@@ -1176,7 +1176,13 @@
           },
           "saropaLints.violationsGroupBy": {
             "type": "string",
-            "enum": ["impact", "severity", "file", "rule", "owasp"],
+            "enum": [
+              "impact",
+              "severity",
+              "file",
+              "rule",
+              "owasp"
+            ],
             "default": "impact",
             "description": "Default grouping for the Violations tree. \"impact\" lists Critical and High findings first; use the toolbar to change temporarily."
           },
@@ -1262,20 +1268,42 @@
           },
           "saropaLints.todosAndHacks.tags": {
             "type": "array",
-            "items": { "type": "string" },
-            "default": ["TODO", "FIXME", "HACK", "XXX", "BUG"],
+            "items": {
+              "type": "string"
+            },
+            "default": [
+              "TODO",
+              "FIXME",
+              "HACK",
+              "XXX",
+              "BUG"
+            ],
             "description": "Tags to search for in comments (case-sensitive in regex)."
           },
           "saropaLints.todosAndHacks.includeGlobs": {
             "type": "array",
-            "items": { "type": "string" },
-            "default": ["**/*.dart", "**/*.yaml", "**/*.ts", "**/*.js"],
+            "items": {
+              "type": "string"
+            },
+            "default": [
+              "**/*.dart",
+              "**/*.yaml",
+              "**/*.ts",
+              "**/*.js"
+            ],
             "description": "Glob patterns for files to scan (code and config by default). Add **/*.md to include Markdown docs."
           },
           "saropaLints.todosAndHacks.excludeGlobs": {
             "type": "array",
-            "items": { "type": "string" },
-            "default": ["**/node_modules/**", "**/.dart_tool/**", "**/build/**", "**/.git/**"],
+            "items": {
+              "type": "string"
+            },
+            "default": [
+              "**/node_modules/**",
+              "**/.dart_tool/**",
+              "**/build/**",
+              "**/.git/**"
+            ],
             "description": "Extra exclude patterns (merged with search.exclude)."
           },
           "saropaLints.todosAndHacks.maxFilesToScan": {
@@ -1311,8 +1339,13 @@
           },
           "saropaLints.driftAdvisor.portRange": {
             "type": "array",
-            "items": { "type": "number" },
-            "default": [8642, 8649],
+            "items": {
+              "type": "number"
+            },
+            "default": [
+              8642,
+              8649
+            ],
             "description": "Port range [min, max] to scan for Drift Advisor server (inclusive)."
           },
           "saropaLints.driftAdvisor.pollIntervalMs": {
@@ -1657,14 +1690,14 @@
             "maximum": 100,
             "description": "Minimum average vibrancy score required across all dependencies (null = no limit)"
           },
-          "saropaLints.packageVibrancy.budget.maxStale": {
+          "saropaLints.packageVibrancy.budget.maxAbandoned": {
             "type": [
               "number",
               "null"
             ],
             "default": null,
             "minimum": 0,
-            "description": "Maximum number of Stale packages allowed (null = no limit)"
+            "description": "Maximum number of Abandoned packages allowed (null = no limit)"
           },
           "saropaLints.packageVibrancy.budget.maxEndOfLife": {
             "type": [
@@ -1675,14 +1708,14 @@
             "minimum": 0,
             "description": "Maximum number of End-of-Life packages allowed (null = no limit)"
           },
-          "saropaLints.packageVibrancy.budget.maxLegacyLocked": {
+          "saropaLints.packageVibrancy.budget.maxOutdated": {
             "type": [
               "number",
               "null"
             ],
             "default": null,
             "minimum": 0,
-            "description": "Maximum number of Legacy-Locked packages allowed (null = no limit)"
+            "description": "Maximum number of Outdated packages allowed (null = no limit)"
           },
           "saropaLints.packageVibrancy.budget.maxUnused": {
             "type": [
@@ -1811,7 +1844,7 @@
     "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
     "package": "npm run precompile && npm run check-types && node esbuild.js --production",
     "lint": "tsc --noEmit -p ./",
-    "test": "tsc -p tsconfig.test.json && node node_modules/mocha/bin/mocha \"out-test/test/todosAndHacks/**/*.test.js\" \"out-test/test/driftAdvisor/**/*.test.js\" \"out-test/test/vibrancy/scan-helpers.test.js\" \"out-test/test/vibrancy/services/review-state.test.js\" \"out-test/test/vibrancy/scoring/status-classifier.test.js\" \"out-test/test/vibrancy/scoring/vibrancy-calculator.test.js\" \"out-test/test/vibrancy/scoring/bloat-calculator.test.js\" \"out-test/test/vibrancy/views/report-html.test.js\" \"out-test/test/rulePacks/**/*.test.js\" \"out-test/test/sidebarSectionVisibilityKeys.test.js\" \"out-test/test/sidebarToggleLabel.test.js\" \"out-test/test/overviewEmbeddedConfigKinds.test.js\" \"out-test/test/treeSerializers.test.js\" \"out-test/test/copyTreeAsJson.test.js\" \"out-test/test/suggestionCounts.test.js\" \"out-test/test/sidebarSectionCounts.test.js\" \"out-test/test/pathUtils.test.js\" \"out-test/test/violationsReader.test.js\" \"out-test/test/views/**/*.test.js\" --timeout 10000"
+    "test": "tsc -p tsconfig.test.json && node node_modules/mocha/bin/mocha \"out-test/test/todosAndHacks/**/*.test.js\" \"out-test/test/driftAdvisor/**/*.test.js\" \"out-test/test/vibrancy/category-dictionary.test.js\" \"out-test/test/vibrancy/scan-helpers.test.js\" \"out-test/test/vibrancy/services/review-state.test.js\" \"out-test/test/vibrancy/scoring/status-classifier.test.js\" \"out-test/test/vibrancy/scoring/vibrancy-calculator.test.js\" \"out-test/test/vibrancy/scoring/bloat-calculator.test.js\" \"out-test/test/vibrancy/views/report-html.test.js\" \"out-test/test/rulePacks/**/*.test.js\" \"out-test/test/sidebarSectionVisibilityKeys.test.js\" \"out-test/test/sidebarToggleLabel.test.js\" \"out-test/test/overviewEmbeddedConfigKinds.test.js\" \"out-test/test/treeSerializers.test.js\" \"out-test/test/copyTreeAsJson.test.js\" \"out-test/test/suggestionCounts.test.js\" \"out-test/test/sidebarSectionCounts.test.js\" \"out-test/test/pathUtils.test.js\" \"out-test/test/violationsReader.test.js\" \"out-test/test/views/**/*.test.js\" --timeout 10000"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.10",

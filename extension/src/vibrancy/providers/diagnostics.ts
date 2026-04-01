@@ -244,8 +244,8 @@ function buildMessage(result: VibrancyResult): string {
         msg = `Deprecated: ${name} — ${displayReplacement}`;
     } else if (result.category === 'end-of-life') {
         msg = `Deprecated: ${name}`;
-    } else if (result.category === 'stale' || result.category === 'legacy-locked') {
-        // Stale and legacy-locked both warrant review, not deprecation
+    } else if (result.category === 'abandoned' || result.category === 'outdated') {
+        // Abandoned and outdated both warrant review, not deprecation
         msg = `Review ${name}`;
     } else {
         msg = `Monitor ${name}`;
