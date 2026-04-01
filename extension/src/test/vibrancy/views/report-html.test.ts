@@ -4,7 +4,7 @@ import { VibrancyResult } from '../../../vibrancy/types';
 
 /** Default options with no overrides and no pubspec URI. */
 function opts(results: VibrancyResult[]): ReportOptions {
-    return { results, overrideCount: 0, pubspecUri: null };
+    return { results, overrideCount: 0, overrideNames: new Set(), pubspecUri: null };
 }
 
 function makeResult(
@@ -249,10 +249,78 @@ describe('report: summary card filters', () => {
 
     it('should show override count card', () => {
         const html = buildReportHtml({
-            results: [], overrideCount: 3, pubspecUri: null,
+            results: [], overrideCount: 3, overrideNames: new Set(), pubspecUri: null,
         });
         assert.ok(html.includes('>3<'));
         assert.ok(html.includes('Overrides'));
+    });
+
+    it('should add data-filter to overrides card', () => {
+        const html = buildReportHtml(opts([]));
+        assert.ok(html.includes('data-filter="overrides"'));
+    });
+});
+
+describe('report: override filter data attribute', () => {
+    it('should mark overridden packages with data-overridden=yes', () => {
+        const result = makeResult('http', 80);
+        const html = buildReportHtml({
+            results: [result],
+            overrideCount: 1,
+            overrideNames: new Set(['http']),
+            pubspecUri: null,
+        });
+        assert.ok(html.includes('data-overridden="yes"'));
+    });
+
+    it('should mark non-overridden packages with data-overridden=no', () => {
+        const result = makeResult('http', 80);
+        const html = buildReportHtml({
+            results: [result],
+            overrideCount: 0,
+            overrideNames: new Set(),
+            pubspecUri: null,
+        });
+        assert.ok(html.includes('data-overridden="no"'));
+    });
+
+    it('should distinguish overridden from non-overridden in same report', () => {
+        const results = [makeResult('http', 80), makeResult('bloc', 60)];
+        const html = buildReportHtml({
+            results,
+            overrideCount: 1,
+            overrideNames: new Set(['http']),
+            pubspecUri: null,
+        });
+        /* http row has yes, bloc row has no */
+        const httpRow = html.match(/<tr[^>]*data-name="http"[^>]*>/);
+        const blocRow = html.match(/<tr[^>]*data-name="bloc"[^>]*>/);
+        assert.ok(httpRow);
+        assert.ok(blocRow);
+        assert.ok(httpRow![0].includes('data-overridden="yes"'));
+        assert.ok(blocRow![0].includes('data-overridden="no"'));
+    });
+});
+
+describe('report: column heading tooltips', () => {
+    it('should include tooltip on Package column header', () => {
+        const html = buildReportHtml(opts([]));
+        assert.ok(html.includes('title="Package name on pub.dev"'));
+    });
+
+    it('should include tooltip on Published column header', () => {
+        const html = buildReportHtml(opts([]));
+        assert.ok(html.includes('title="Date the installed version was published to pub.dev"'));
+    });
+
+    it('should include tooltip on Size column header', () => {
+        const html = buildReportHtml(opts([]));
+        assert.ok(html.includes('title="Archive size on pub.dev (before tree shaking)"'));
+    });
+
+    it('should include tooltip on description icon column header', () => {
+        const html = buildReportHtml(opts([]));
+        assert.ok(html.includes('title="Package description from pub.dev"'));
     });
 });
 
@@ -265,7 +333,7 @@ describe('report: toolbar', () => {
 
     it('should include pubspec button when URI provided', () => {
         const html = buildReportHtml({
-            results: [], overrideCount: 0, pubspecUri: 'file:///project/pubspec.yaml',
+            results: [], overrideCount: 0, overrideNames: new Set(), pubspecUri: 'file:///project/pubspec.yaml',
         });
         assert.ok(html.includes('id="open-pubspec"'));
         assert.ok(html.includes('pubspec.yaml'));

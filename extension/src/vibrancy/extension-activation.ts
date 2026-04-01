@@ -24,7 +24,7 @@ import { registerTreeCommands } from './providers/tree-commands';
 import { registerUpgradeCommand } from './providers/upgrade-command';
 import { registerAnnotateCommand } from './providers/annotate-command';
 import { readScanConfig, scanPackages, buildScanMeta, ParsedDeps, findAndParseDeps } from './scan-helpers';
-import { scanDartImports } from './services/import-scanner';
+import { scanDartImportsDetailed } from './services/import-scanner';
 import { enrichReplacementComplexity } from './services/package-code-analyzer';
 import { detectUnused } from './scoring/unused-detector';
 import { fetchFlutterReleases } from './services/flutter-releases';
@@ -580,6 +580,7 @@ function registerCommands(
             () => VibrancyReportPanel.createOrShow({
                 results: latestResults,
                 overrideCount: lastOverrideAnalyses.length,
+                overrideNames: new Set(lastOverrideAnalyses.map(a => a.entry.name)),
                 pubspecUri: lastParsedDeps?.yamlUri?.toString() ?? null,
             }),
         ),
@@ -786,15 +787,21 @@ async function runScanInner(
             if (signal.aborted) { return; }
             progress.report({ message: 'Scanning imports...' });
             const workspaceRoot = vscode.Uri.joinPath(parsed.yamlUri, '..');
-            const imported = await scanDartImports(workspaceRoot);
+            const usageMap = await scanDartImportsDetailed(workspaceRoot);
+            const imported = new Set(usageMap.keys());
             const unusedNames = new Set(detectUnused(
                 deps.map(d => d.name), imported,
             ));
+            // Attach per-file usage data and mark unused packages.
             // Only mark as unused when eligible for removal; dev_dependencies are used by tooling.
-            const withUnused = rawResults.map(r =>
-                unusedNames.has(r.package.name) && isUnusedRemovalEligibleSection(r.package.section)
-                    ? { ...r, isUnused: true, alternatives: [] } : r,
-            );
+            const withUnused = rawResults.map(r => {
+                const fileUsages = usageMap.get(r.package.name) ?? [];
+                const isUnused = unusedNames.has(r.package.name)
+                    && isUnusedRemovalEligibleSection(r.package.section);
+                return isUnused
+                    ? { ...r, fileUsages, isUnused: true, alternatives: [] }
+                    : { ...r, fileUsages };
+            });
 
             if (signal.aborted) { return; }
             progress.report({ message: 'Analyzing source complexity...' });

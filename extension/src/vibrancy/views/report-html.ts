@@ -13,11 +13,13 @@ import { getChartScript } from './chart-script';
 export interface ReportOptions {
     readonly results: VibrancyResult[];
     readonly overrideCount: number;
+    /** Names of packages that have dependency_overrides entries. */
+    readonly overrideNames: ReadonlySet<string>;
     readonly pubspecUri: string | null;
 }
 
 /** Columns that can be auto-hidden when all values are empty. */
-type HidableColumn = 'transitives' | 'vulns' | 'status';
+type HidableColumn = 'transitives' | 'vulns' | 'status' | 'files';
 
 /** Build the full HTML for the vibrancy report webview. */
 export function buildReportHtml(options: ReportOptions): string {
@@ -35,8 +37,8 @@ export function buildReportHtml(options: ReportOptions): string {
     ${buildReportSummary(options)}
     ${buildChartSection(results)}
     ${buildToolbar(options)}
-    ${buildReportTable(results)}
-    <script>${getReportScript()}${getChartScript()}</script>
+    ${buildReportTable(results, options.overrideNames)}
+    <script>${buildPackageDataScript(results, options.overrideNames)}${getReportScript()}${getChartScript()}</script>
 </body>
 </html>`;
 }
@@ -55,6 +57,9 @@ function buildReportSummary(options: ReportOptions): string {
     );
     const totalSize = totalBytes > 0 ? formatSizeMB(totalBytes) : '\u2014';
     const vulnPackages = results.filter(r => r.vulnerabilities.length > 0).length;
+    const singleUse = results.filter(
+        r => r.fileUsages.filter(u => !u.isCommented).length === 1,
+    ).length;
 
     return `<div class="summary">
         <div class="summary-card"><div class="count">${results.length}</div><div class="label">Packages</div></div>
@@ -67,8 +72,9 @@ function buildReportSummary(options: ReportOptions): string {
         <div class="summary-card eol" data-filter="end-of-life"><div class="count">${counts.eol}</div><div class="label">End of Life</div></div>
         <div class="summary-card updates" data-filter="updates"><div class="count">${updates}</div><div class="label">Updates</div></div>
         <div class="summary-card unused" data-filter="unused"><div class="count">${results.filter(r => r.isUnused).length}</div><div class="label">Unused</div></div>
+        ${singleUse > 0 ? `<div class="summary-card single-use" data-filter="single-use"><div class="count">${singleUse}</div><div class="label">Single-use</div></div>` : ''}
         <div class="summary-card vulns" data-filter="vulns"><div class="count">${vulnPackages}</div><div class="label">Vulnerable</div></div>
-        <div class="summary-card overrides"><div class="count">${overrideCount}</div><div class="label">Overrides</div></div>
+        <div class="summary-card overrides" data-filter="overrides"><div class="count">${overrideCount}</div><div class="label">Overrides</div></div>
     </div>
     <p class="caveat">*Archive sizes before tree shaking. Actual app size will be smaller.</p>`;
 }
@@ -95,37 +101,46 @@ function getHiddenColumns(results: VibrancyResult[]): Set<HidableColumn> {
     if (!hasVulns) { hidden.add('vulns'); }
     const hasUnused = results.some(r => r.isUnused);
     if (!hasUnused) { hidden.add('status'); }
+    const hasFileUsages = results.some(r => r.fileUsages.length > 0);
+    if (!hasFileUsages) { hidden.add('files'); }
     return hidden;
 }
 
 const HEALTH_TOOLTIP = 'Vibrancy Score (0\u201310): overall package health based on '
     + 'maintainer activity, community engagement, and popularity.';
 
-function buildReportTable(results: VibrancyResult[]): string {
+function buildReportTable(
+    results: VibrancyResult[],
+    overrideNames: ReadonlySet<string>,
+): string {
     const hidden = getHiddenColumns(results);
-    const th = (col: string, label: string) =>
-        `<th data-col="${col}">${label}<span class="sort-arrow"></span></th>`;
-    const thOpt = (col: HidableColumn, label: string) =>
-        hidden.has(col) ? '' : th(col, label);
+    const th = (col: string, label: string, tooltip?: string) => {
+        const titleAttr = tooltip ? ` title="${escapeHtml(tooltip)}"` : '';
+        return `<th data-col="${col}"${titleAttr}>${label}<span class="sort-arrow"></span></th>`;
+    };
+    const thOpt = (col: HidableColumn, label: string, tooltip?: string) =>
+        hidden.has(col) ? '' : th(col, label, tooltip);
 
     return `<table>
         <thead><tr>
-            ${th('name', 'Package')}
-            ${th('version', 'Version')}
-            <th data-col="score">Health <span class="info-icon" title="${escapeHtml(HEALTH_TOOLTIP)}">&#9432;</span><span class="sort-arrow"></span></th>
-            ${th('category', 'Category')}
-            ${th('published', 'Published')}
-            ${th('stars', 'Stars')}
-            ${th('size', 'Size')}
-            ${thOpt('transitives', 'Transitives')}
-            ${thOpt('vulns', 'Vulns')}
-            ${th('license', 'License')}
-            ${th('update', 'Update')}
-            ${thOpt('status', 'Status')}
-            <th class="col-icon" title="Package description">&#8505;</th>
+            <th class="col-copy"></th>
+            ${th('name', 'Package', 'Package name on pub.dev')}
+            ${th('version', 'Version', 'Installed version from pubspec.lock')}
+            <th data-col="score" title="${escapeHtml(HEALTH_TOOLTIP)}">Health <span class="info-icon" title="${escapeHtml(HEALTH_TOOLTIP)}">&#9432;</span><span class="sort-arrow"></span></th>
+            ${th('category', 'Category', 'Vibrancy classification: Vibrant, Quiet, Legacy-Locked, Stale, or End-of-Life')}
+            ${th('published', 'Published', 'Date the installed version was published to pub.dev')}
+            ${th('stars', 'Stars', 'GitHub repository star count')}
+            ${th('size', 'Size', 'Archive size on pub.dev (before tree shaking)')}
+            ${thOpt('files', 'Files', 'Number of source files that import this package')}
+            ${thOpt('transitives', 'Transitives', 'Number of transitive (indirect) dependencies this package pulls in')}
+            ${thOpt('vulns', 'Vulns', 'Known security vulnerabilities from OSV and GitHub Advisory databases')}
+            ${th('license', 'License', 'SPDX license identifier from pub.dev')}
+            ${th('update', 'Update', 'Available version update: major, minor, or patch')}
+            ${thOpt('status', 'Status', 'Usage status: whether the package appears unused in your code')}
+            <th class="col-icon" title="Package description from pub.dev">&#8505;</th>
         </tr></thead>
         <tbody id="pkg-body">
-            ${results.map(r => buildRow(r, hidden)).join('\n')}
+            ${results.map(r => buildRow(r, hidden, overrideNames)).join('\n')}
         </tbody>
     </table>`;
 }
@@ -134,23 +149,32 @@ function buildReportTable(results: VibrancyResult[]): string {
 // Row builder + cell helpers
 // ---------------------------------------------------------------------------
 
-function buildRow(r: VibrancyResult, hidden: Set<HidableColumn>): string {
+function buildRow(
+    r: VibrancyResult,
+    hidden: Set<HidableColumn>,
+    overrideNames: ReadonlySet<string>,
+): string {
     const name = escapeHtml(r.package.name);
     const date = r.pubDev?.publishedDate.split('T')[0] ?? '';
     const stars = r.github?.stars ?? '';
+    const activeFileCount = r.fileUsages.filter(u => !u.isCommented).length;
     const transitiveCount = r.transitiveInfo?.transitiveCount ?? 0;
     const vulnCount = r.vulnerabilities.length;
+    const isOverridden = overrideNames.has(r.package.name) ? 'yes' : 'no';
 
     return `<tr data-name="${name}" data-version="${escapeHtml(r.package.version)}"
         data-score="${r.score}" data-category="${r.category}"
         data-published="${date}" data-stars="${stars}"
         data-size="${r.archiveSizeBytes ?? 0}"
+        data-files="${activeFileCount}"
         data-transitives="${transitiveCount}"
         data-vulns="${vulnCount}"
         data-license="${escapeHtml(r.license ?? '')}"
         data-update="${r.updateInfo?.updateStatus ?? 'unknown'}"
         data-status="${r.isUnused ? 'unused' : 'ok'}"
-        data-section="${r.package.section}">
+        data-section="${r.package.section}"
+        data-overridden="${isOverridden}">
+        <td class="copy-cell"><span class="copy-btn" data-pkg="${name}" title="Copy row as JSON">&#128203;</span></td>
         ${buildNameCell(r)}
         ${buildVersionCell(r)}
         ${buildHealthCell(r)}
@@ -158,6 +182,7 @@ function buildRow(r: VibrancyResult, hidden: Set<HidableColumn>): string {
         <td>${date}</td>
         ${buildStarsCell(r)}
         ${buildSizeCell(r)}
+        ${hidden.has('files') ? '' : buildFilesCell(r)}
         ${hidden.has('transitives') ? '' : buildTransitivesCell(r)}
         ${hidden.has('vulns') ? '' : buildVulnsCell(r)}
         ${buildLicenseCell(r)}
@@ -260,6 +285,18 @@ function buildSizeCell(r: VibrancyResult): string {
     return `<td class="cell-right">${text}</td>`;
 }
 
+function buildFilesCell(r: VibrancyResult): string {
+    const active = r.fileUsages.filter(u => !u.isCommented);
+    const count = active.length;
+    if (count === 0) { return '<td class="cell-right">\u2014</td>'; }
+    // Single-use = muted; 6+ = bold (deeply embedded)
+    const cls = count === 1 ? ' class="cell-right file-single"'
+        : count >= 6 ? ' class="cell-right file-deep"'
+        : ' class="cell-right"';
+    const tooltip = active.map(u => `${u.filePath}:${u.line}`).join('\n');
+    return `<td${cls} title="${escapeHtml(tooltip)}">${count}</td>`;
+}
+
 function buildTransitivesCell(r: VibrancyResult): string {
     const count = r.transitiveInfo?.transitiveCount ?? 0;
     const flagged = r.transitiveInfo?.flaggedCount ?? 0;
@@ -320,4 +357,81 @@ function buildDescCell(r: VibrancyResult): string {
     const desc = r.pubDev?.description;
     if (!desc) { return '<td class="col-icon"></td>'; }
     return `<td class="col-icon"><span class="desc-icon" title="${escapeHtml(desc)}">&#8505;</span></td>`;
+}
+
+// ---------------------------------------------------------------------------
+// Copy-as-JSON data map
+// ---------------------------------------------------------------------------
+
+/** Build a script block embedding per-package JSON for the copy button. */
+function buildPackageDataScript(
+    results: VibrancyResult[],
+    overrideNames: ReadonlySet<string>,
+): string {
+    const entries = results.map(r => {
+        const key = JSON.stringify(r.package.name);
+        const val = JSON.stringify(buildPackageJson(r, overrideNames));
+        return `${key}:${val}`;
+    });
+    return `var packageData={${entries.join(',')}};`;
+}
+
+/** Build a comprehensive JSON-safe object for one package row. */
+function buildPackageJson(
+    r: VibrancyResult,
+    overrideNames: ReadonlySet<string>,
+): Record<string, unknown> {
+    const name = r.package.name;
+    const encoded = encodeURIComponent(name);
+    const activeFiles = r.fileUsages.filter(u => !u.isCommented);
+    return {
+        name,
+        version: r.package.version,
+        constraint: r.package.constraint,
+        section: r.package.section,
+        isOverridden: overrideNames.has(name),
+        health: {
+            score: Math.round(r.score / 10),
+            resolutionVelocity: Math.round(r.resolutionVelocity),
+            engagementLevel: Math.round(r.engagementLevel),
+            popularity: Math.round(r.popularity),
+            publisherTrust: Math.round(r.publisherTrust),
+        },
+        category: categoryLabel(r.category),
+        published: r.pubDev?.publishedDate.split('T')[0] ?? null,
+        stars: r.github?.stars ?? null,
+        archiveSize: r.archiveSizeBytes !== null
+            ? formatSizeKB(r.archiveSizeBytes) : null,
+        license: r.license ?? null,
+        update: r.updateInfo ? {
+            status: r.updateInfo.updateStatus,
+            latestVersion: r.updateInfo.latestVersion,
+        } : null,
+        isUnused: r.isUnused,
+        fileCount: activeFiles.length,
+        files: activeFiles.map(u => `${u.filePath}:${u.line}`),
+        transitives: r.transitiveInfo ? {
+            count: r.transitiveInfo.transitiveCount,
+            flagged: r.transitiveInfo.flaggedCount,
+        } : null,
+        vulnerabilities: r.vulnerabilities.map(v => ({
+            id: v.id,
+            summary: v.summary,
+            severity: v.severity,
+            cvssScore: v.cvssScore,
+            fixedVersion: v.fixedVersion,
+            url: v.url,
+        })),
+        description: r.pubDev?.description ?? null,
+        platforms: r.platforms ?? null,
+        verifiedPublisher: r.verifiedPublisher,
+        wasmReady: r.wasmReady,
+        links: {
+            pubDev: `https://pub.dev/packages/${encoded}`,
+            versions: `https://pub.dev/packages/${encoded}/versions`,
+            license: `https://pub.dev/packages/${encoded}/license`,
+            changelog: `https://pub.dev/packages/${encoded}/changelog`,
+            repository: r.pubDev?.repositoryUrl ?? null,
+        },
+    };
 }
