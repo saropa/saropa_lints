@@ -101,6 +101,9 @@ export function readViolations(workspaceRoot: string): ViolationsData | null {
             stylisticRuleNames: Array.isArray(raw.config.stylisticRuleNames)
               ? raw.config.stylisticRuleNames
               : undefined,
+            rulesWithFixes: Array.isArray(raw.config.rulesWithFixes)
+              ? raw.config.rulesWithFixes
+              : undefined,
           }
         : undefined,
     };
