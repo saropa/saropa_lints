@@ -111,7 +111,7 @@ def _detect_stale_plugin_version(output: str) -> tuple[str, str] | None:
     return None
 
 
-def _get_latest_published_version(package_name: str) -> str | None:
+def get_latest_published_version(package_name: str) -> str | None:
     """Query pub.dev for the latest published version of *package_name*."""
     import json
     import urllib.request
@@ -124,6 +124,49 @@ def _get_latest_published_version(package_name: str) -> str | None:
             return data["latest"]["version"]
     except (urllib.error.URLError, KeyError, json.JSONDecodeError):
         return None
+
+
+def verify_pubdev_publication(
+    package_name: str,
+    expected_version: str,
+    interval_seconds: int = 30,
+    timeout_seconds: int = 300,
+) -> bool:
+    """Poll pub.dev API until the package reports the expected version.
+
+    Checks every *interval_seconds* for up to *timeout_seconds*.
+    Returns True when pub.dev reports *expected_version*, False on timeout.
+    """
+    print_header("PUB.DEV PUBLICATION VERIFICATION")
+    print_info(
+        f"Polling pub.dev every {interval_seconds}s for up to "
+        f"{timeout_seconds // 60} minutes..."
+    )
+    attempts = (timeout_seconds // interval_seconds) + 1
+
+    for attempt in range(1, attempts + 1):
+        latest = get_latest_published_version(package_name)
+        display = latest or "unavailable"
+
+        if latest == expected_version:
+            print_success(
+                f"pub.dev reports v{latest} — publication confirmed."
+            )
+            return True
+
+        print_info(
+            f"Attempt {attempt}/{attempts}: pub.dev latest = {display}"
+        )
+        if attempt < attempts:
+            time.sleep(interval_seconds)
+
+    print_warning(
+        f"pub.dev did not report v{expected_version} within "
+        f"{timeout_seconds // 60} minutes (last seen: {display}). "
+        "Check https://pub.dev/packages/"
+        f"{package_name} manually."
+    )
+    return False
 
 
 def _get_plugin_manager_dir() -> Path | None:
@@ -195,7 +238,7 @@ def _try_fix_stale_plugin_cache(
         f"{pkg_name} {stale_ver} which is not available."
     )
 
-    latest = _get_latest_published_version(pkg_name)
+    latest = get_latest_published_version(pkg_name)
     if latest is None:
         print_error(
             f"Could not query pub.dev for latest {pkg_name} version."
