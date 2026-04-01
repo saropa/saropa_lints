@@ -16,8 +16,6 @@ Developed by [Saropa](https://saropa.com) to make the world of Dart & Flutter be
 
 [![Saropa Lints Badge](https://img.shields.io/badge/saropa_lints-2134-blue?style=flat&logo=flutter&logoColor=white&color=435489)](https://pub.dev/packages/saropa_lints) [![Flutter Platform](https://img.shields.io/badge/platform-flutter-02569B.svg?style=flat-square&logo=flutter)](https://flutter.dev/) [![License: MIT](https://img.shields.io/badge/license-MIT-purple.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 
-[![Share on X](https://img.shields.io/badge/share%20on-X-000000?style=flat-square&logo=x&logoColor=white)](https://twitter.com/intent/tweet?text=Check%20out%20Saropa%20Lints%3A%20Catch%20memory%20leaks%2C%20security%20vulnerabilities%2C%20and%20runtime%20crashes%20in%20Flutter%21&url=https%3A%2F%2Fpub.dev%2Fpackages%2Fsaropa_lints) [![Share on Facebook](https://img.shields.io/badge/share%20on-facebook-1877F2?style=flat-square&logo=facebook&logoColor=white)](https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fpub.dev%2Fpackages%2Fsaropa_lints) [![Share on Bluesky](https://img.shields.io/badge/share%20on-bluesky-0285FF?style=flat-square&logo=bluesky&logoColor=white)](https://bsky.app/intent/compose?text=Check%20out%20Saropa%20Lints%3A%20Catch%20memory%20leaks%2C%20security%20vulnerabilities%2C%20and%20runtime%20crashes%20in%20Flutter%21%20https%3A%2F%2Fpub.dev%2Fpackages%2Fsaropa_lints) [![Share on LinkedIn](https://img.shields.io/badge/share%20on-linkedin-0077B5?style=flat-square&logo=linkedin&logoColor=white)](https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fpub.dev%2Fpackages%2Fsaropa_lints) [![Share on Reddit](https://img.shields.io/badge/share%20on-reddit-FF4500?style=flat-square&logo=reddit&logoColor=white)](https://www.reddit.com/submit?url=https%3A%2F%2Fpub.dev%2Fpackages%2Fsaropa_lints&title=Saropa%20Lints%20-%20Advanced%20Static%20Analysis)
-
 </div>
 <br>
 
@@ -42,6 +40,8 @@ The extension is the primary setup and configuration surface:
 - **TODOs & Hacks** — Sidebar scan for TODO/FIXME/HACK-style markers; full-workspace scan is **opt-in** (`saropaLints.todosAndHacks.workspaceScanEnabled`, default off) via **TODOs & Hacks: Enable workspace scan**
 - **File Risk** — Files ranked by violation density; focus on the riskiest first
 - **Trends** — Score progression over time with milestone celebrations
+
+![Package Vibrancy Report showing dependency health and version status](https://raw.githubusercontent.com/saropa/saropa_lints/main/assets/20260401_package_vibrancy_report.png)
 
 **Set Up Project** wires `pubspec.yaml`, `analysis_options.yaml`, and analysis. No terminal commands required for that path.
 
@@ -138,7 +138,7 @@ Your linter catches unused variables and formatting issues. It doesn't catch und
 
 In mature ecosystems, tools like [SonarQube](https://www.sonarsource.com/products/sonarqube/), [Coverity](https://www.synopsys.com/software-integrity/security-testing/static-analysis-sast.html), and [Checkmarx](https://checkmarx.com/) fill this gap. Flutter hasn't had an equivalent — until now.
 
-![Flutter memory leak detection in VS Code showing undisposed TextEditingController](https://raw.githubusercontent.com/saropa/saropa_lints/main/assets/20260502_problems_tab.png)
+![Flutter memory leak detection in VS Code showing undisposed TextEditingController](https://raw.githubusercontent.com/saropa/saropa_lints/main/assets/20260401_problems_tab.png)
 
 ### What it catches
 
@@ -192,7 +192,7 @@ If you use **GetX**, **Riverpod**, **Provider**, **Bloc**, **Isar**, **Hive**, o
 | **Hive**     | Missing init, unclosed boxes, hardcoded encryption keys, type adapter issues                     | [Using with Hive](doc/guides/using_with_hive.md)         |
 | **Firebase** | Unbounded queries, missing batch writes, invalid Analytics events, FCM token leaks               | [Using with Firebase](doc/guides/using_with_firebase.md) |
 
-![Screenshot of analysis_options_custom.yaml](https://raw.githubusercontent.com/saropa/saropa_lints/main/assets/20260502_analysis_options_custom_yaml.png)
+![Screenshot of analysis_options_custom.yaml](https://raw.githubusercontent.com/saropa/saropa_lints/main/assets/20260401_analysis_options_custom_yaml.png)
 
 Standard linters don't understand these libraries. They see valid Dart code. Saropa Lints has 50+ rules specifically for library-specific anti-patterns that cause crashes, memory leaks, cost overruns, and data corruption in production. Recent update: `require_camera_permission_check` no longer triggers on non-camera controllers (e.g., IsarStreamController), eliminating a key false positive for Isar users. The new `avoid_cached_isar_stream` rule (with quick fix) prevents a common Isar runtime error.
 
@@ -208,7 +208,7 @@ We build in public. We don't just show you what works; we explicitly document wh
 | 🐙     | Tracked as GitHub issue       | [Open Issues](https://github.com/saropa/saropa_lints/issues)                            |
 | 💭     | Announcements, Q&A, and Ideas | [Discussion: Diagnostic Statistics](https://github.com/saropa/saropa_lints/discussions) |
 
-![AI fixing Flutter security vulnerability automatically in Android Studio](https://raw.githubusercontent.com/saropa/saropa_lints/main/assets/20260502_build_report_terminal_tab.png)
+![AI fixing Flutter security vulnerability automatically in Android Studio](https://raw.githubusercontent.com/saropa/saropa_lints/main/assets/20260401_build_report_terminal_tab.png)
 
 ### Compliance: EAA & OWASP Security
 
@@ -282,7 +282,7 @@ Saropa Lints acts as the guardrails for your AI. By providing immediate, semanti
 **Optimized for AI Repair**
 The tool is also built to **fix**. Saropa Lints diagnostics are engineered to be "paste-ready," providing deep context and specific failure points. When you copy a problem report directly into your AI tool window, it acts as a perfect prompt—giving the AI exactly the info it needs to refactor the code and resolve the issue immediately, without you needing to explain the context.
 
-![AI fixing Flutter security vulnerability automatically in Android Studio](https://raw.githubusercontent.com/saropa/saropa_lints/main/assets/20260502_AI_solver_tab.png)
+![AI fixing Flutter security vulnerability automatically in Android Studio](https://raw.githubusercontent.com/saropa/saropa_lints/main/assets/20260401_AI_solver_tab.png)
 
 ---
 
@@ -1201,3 +1201,11 @@ Built with care by the Flutter community. Questions? Ideas? We'd love to hear fr
 
 - **Flutter Performance** — Performance best practices
   https://docs.flutter.dev/perf
+
+---
+
+<div align="center">
+
+[![Share on X](https://img.shields.io/badge/share%20on-X-000000?style=flat-square&logo=x&logoColor=white)](https://twitter.com/intent/tweet?text=Check%20out%20Saropa%20Lints%3A%20Catch%20memory%20leaks%2C%20security%20vulnerabilities%2C%20and%20runtime%20crashes%20in%20Flutter%21&url=https%3A%2F%2Fpub.dev%2Fpackages%2Fsaropa_lints) [![Share on Facebook](https://img.shields.io/badge/share%20on-facebook-1877F2?style=flat-square&logo=facebook&logoColor=white)](https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fpub.dev%2Fpackages%2Fsaropa_lints) [![Share on Bluesky](https://img.shields.io/badge/share%20on-bluesky-0285FF?style=flat-square&logo=bluesky&logoColor=white)](https://bsky.app/intent/compose?text=Check%20out%20Saropa%20Lints%3A%20Catch%20memory%20leaks%2C%20security%20vulnerabilities%2C%20and%20runtime%20crashes%20in%20Flutter%21%20https%3A%2F%2Fpub.dev%2Fpackages%2Fsaropa_lints) [![Share on LinkedIn](https://img.shields.io/badge/share%20on-linkedin-0077B5?style=flat-square&logo=linkedin&logoColor=white)](https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fpub.dev%2Fpackages%2Fsaropa_lints) [![Share on Reddit](https://img.shields.io/badge/share%20on-reddit-FF4500?style=flat-square&logo=reddit&logoColor=white)](https://www.reddit.com/submit?url=https%3A%2F%2Fpub.dev%2Fpackages%2Fsaropa_lints&title=Saropa%20Lints%20-%20Advanced%20Static%20Analysis)
+
+</div>

@@ -33,6 +33,14 @@
 
 ---
 
+## [10.6.1]
+
+### Changed
+
+Updated screenshots in [README.md](./README.md).
+
+---
+
 ## [10.6.0]
 
 Extension UX refinements — split workspace options into Settings and Issues sections, hide "Apply fix" for unfixable violations, and auto-expand violations tree on programmatic navigation. — [log](https://github.com/saropa/saropa_lints/blob/v10.6.0/CHANGELOG.md)
