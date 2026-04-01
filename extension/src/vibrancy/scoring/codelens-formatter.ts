@@ -88,5 +88,15 @@ export function formatCodeLensTitle(
         parts.push(`${getIndicator('unused')} Unused`);
     }
 
+    // Show replacement complexity for stale/end-of-life packages when migration is feasible
+    if (detail === 'full' && result.replacementComplexity) {
+        const rc = result.replacementComplexity;
+        const isUnhealthy = result.category === 'stale' || result.category === 'end-of-life';
+        const isFeasible = rc.level !== 'large' && rc.level !== 'native';
+        if (isUnhealthy && isFeasible) {
+            parts.push(`${rc.metrics.libCodeLines.toLocaleString('en-US')} LOC — ${rc.level} to replace`);
+        }
+    }
+
     return parts.join(' · ');
 }

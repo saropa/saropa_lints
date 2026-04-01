@@ -43,7 +43,7 @@ function makeResult(
         license: null,
         isUnused: false, platforms: null, verifiedPublisher: false, wasmReady: null, blocker: null, upgradeBlockStatus: 'up-to-date',
         transitiveInfo: null, alternatives: [], latestPrerelease: null, prereleaseTag: null, vulnerabilities: [],
-        versionGap: null, overrideGap: null,
+        versionGap: null, overrideGap: null, replacementComplexity: null,
     };
 }
 

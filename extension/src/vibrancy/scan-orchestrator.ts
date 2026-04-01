@@ -130,6 +130,7 @@ export async function analyzePackage(
         vulnerabilities: [],
         versionGap: null,
         overrideGap: null,
+        replacementComplexity: null,
     };
 }
 

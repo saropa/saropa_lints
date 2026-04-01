@@ -29,6 +29,15 @@ function bloatEmoji(rating: number): string {
     if (rating <= 6) { return '🟡'; }
     return '🔴';
 }
+function replacementEmoji(level: import('../services/package-code-analyzer').ReplacementLevel): string {
+    switch (level) {
+        case 'trivial': return '🟢';
+        case 'small': return '🟡';
+        case 'moderate': return '🟠';
+        case 'large': return '🔴';
+        case 'native': return '🔧';
+    }
+}
 
 /** Build grouped child items for a package node. */
 export function buildGroupItems(result: VibrancyResult): GroupItem[] {
@@ -211,12 +220,24 @@ function buildCommunityGroup(result: VibrancyResult): GroupItem | null {
 }
 
 function buildSizeGroup(result: VibrancyResult): GroupItem | null {
-    if (result.bloatRating === null || result.archiveSizeBytes === null) { return null; }
-    const emoji = bloatEmoji(result.bloatRating);
-    const sizeMB = formatSizeMB(result.archiveSizeBytes);
-    return new GroupItem('📏 Size', [
-        new DetailItem(`${emoji} Archive Size`, `${sizeMB} (${result.bloatRating}/10 bloat)`),
-    ]);
+    const items: DetailItem[] = [];
+
+    if (result.bloatRating !== null && result.archiveSizeBytes !== null) {
+        const emoji = bloatEmoji(result.bloatRating);
+        const sizeMB = formatSizeMB(result.archiveSizeBytes);
+        items.push(new DetailItem(
+            `${emoji} Archive Size`, `${sizeMB} (${result.bloatRating}/10 bloat)`,
+        ));
+    }
+
+    if (result.replacementComplexity) {
+        const rc = result.replacementComplexity;
+        const emoji = replacementEmoji(rc.level);
+        items.push(new DetailItem(`${emoji} Source`, rc.summary));
+    }
+
+    if (items.length === 0) { return null; }
+    return new GroupItem('📏 Size', items);
 }
 
 function buildAlertsGroup(result: VibrancyResult): GroupItem | null {

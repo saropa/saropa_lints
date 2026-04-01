@@ -35,10 +35,23 @@
 
 ## [Unreleased]
 
+### Added
+
+- **(Extension)** Package Vibrancy: replacement complexity metric — analyzes local pub cache to count source lines in each dependency's `lib/` directory and classifies how feasible it would be to inline, fork, or replace (trivial / small / moderate / large / native). Shown in Size tree group, detail sidebar, and CodeLens for stale/end-of-life packages with feasible migration
+
+---
+
+## [10.4.1]
+
+### Fixed
+
+- **(Extension)** Fixed VS Code Marketplace publishing blocked since v10.2.2 by TypeScript 5.9 bug — `tsc --noEmit` fails with "Unknown compiler option" because TS 5.9's `createOptionNameMap()` reads `option.lowerCaseName` (a property that doesn't exist on any option declaration), building an empty lookup map; pinned TypeScript to `~5.8.3` to restore extension compilation and Marketplace publishing
+
 ### Changed
 
 - Modularized `scripts/publish.py` (1,246 → 202 lines) into three focused modules: `_publish_workflow.py` (pipeline orchestration), version prompting/sync into `_version_changelog.py`, and store verification into `_extension_publish.py`
 - Added `scripts/README.md` with architecture diagram, module map, exit codes, and troubleshooting
+- Added pub.dev publication verification: polls the pub.dev API after publish to confirm the new version is live
 
 ---
 
