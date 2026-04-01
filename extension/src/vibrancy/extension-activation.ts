@@ -24,7 +24,7 @@ import { registerTreeCommands } from './providers/tree-commands';
 import { registerUpgradeCommand } from './providers/upgrade-command';
 import { registerAnnotateCommand } from './providers/annotate-command';
 import { readScanConfig, scanPackages, buildScanMeta, ParsedDeps, findAndParseDeps } from './scan-helpers';
-import { scanDartImportsDetailed } from './services/import-scanner';
+import { scanDartImportsDetailed, activePackageNames } from './services/import-scanner';
 import { enrichReplacementComplexity } from './services/package-code-analyzer';
 import { detectUnused } from './scoring/unused-detector';
 import { fetchFlutterReleases } from './services/flutter-releases';
@@ -788,7 +788,9 @@ async function runScanInner(
             progress.report({ message: 'Scanning imports...' });
             const workspaceRoot = vscode.Uri.joinPath(parsed.yamlUri, '..');
             const usageMap = await scanDartImportsDetailed(workspaceRoot);
-            const imported = new Set(usageMap.keys());
+            // Only active (non-commented) imports count for unused detection.
+            // Packages with only commented-out references are still unused.
+            const imported = activePackageNames(usageMap);
             const unusedNames = new Set(detectUnused(
                 deps.map(d => d.name), imported,
             ));

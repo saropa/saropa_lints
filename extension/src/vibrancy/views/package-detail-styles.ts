@@ -269,5 +269,21 @@ export function getPackageDetailStyles(): string {
         .vuln-severity-high { color: var(--vscode-editorError-foreground, #e65100); font-weight: 600; }
         .vuln-severity-medium { color: var(--vscode-editorWarning-foreground, #f9a825); }
         .vuln-severity-low { color: var(--vscode-descriptionForeground); }
+
+        /* ---- File usages section ---- */
+        .file-usage-item {
+            padding: 3px 8px;
+            font-family: var(--vscode-editor-font-family, monospace);
+            font-size: 0.9em;
+        }
+        .file-usage-item.commented {
+            opacity: 0.6;
+            font-style: italic;
+        }
+        .file-usage-commented {
+            padding: 6px 8px 2px;
+            font-size: 0.85em;
+            color: var(--vscode-descriptionForeground);
+        }
     `;
 }

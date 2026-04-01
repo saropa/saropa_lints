@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { VibrancyResult } from '../types';
+import { VibrancyResult, activeFileUsages } from '../types';
 import { categoryLabel, countByCategory } from '../scoring/status-classifier';
 import { formatSizeMB } from '../scoring/bloat-calculator';
 import { resolveReportFolder, formatTimestamp } from './report-utils';
@@ -95,18 +95,23 @@ function mdSummary(
 
 function mdPackageRows(results: VibrancyResult[]): string[] {
     const rows = ['', '## Packages', '',
-        '| Name | Version | Latest | Status | Score | License | Size |',
-        '|------|---------|--------|--------|-------|---------|------|',
+        '| Name | Version | Latest | Status | Score | Files | License | Size |',
+        '|------|---------|--------|--------|-------|-------|---------|------|',
     ];
     for (const r of results) {
         const latest = r.pubDev?.latestVersion ?? '';
         const label = categoryLabel(r.category);
         const displayScore = Math.round(r.score / 10);
+        const activeUsages = activeFileUsages(r.fileUsages);
+        const fileCount = activeUsages.length;
+        const fileLocations = activeUsages.length <= 3
+            ? activeUsages.map(u => `${u.filePath}:${u.line}`).join(', ')
+            : `${fileCount} files`;
         const size = r.archiveSizeBytes !== null
             ? formatSizeMB(r.archiveSizeBytes) : '—';
         const license = r.license ?? '—';
         rows.push(
-            `| ${r.package.name} | ${r.package.version} | ${latest} | ${label} | ${displayScore}/10 | ${license} | ${size} |`,
+            `| ${r.package.name} | ${r.package.version} | ${latest} | ${label} | ${displayScore}/10 | ${fileLocations || '—'} | ${license} | ${size} |`,
         );
     }
     return rows;
@@ -137,6 +142,7 @@ function buildJsonReport(
 }
 
 function mapPackageToJson(r: VibrancyResult) {
+    const activeUsages = activeFileUsages(r.fileUsages);
     return {
         name: r.package.name,
         installed_version: r.package.version,
@@ -152,5 +158,10 @@ function mapPackageToJson(r: VibrancyResult) {
         license: r.license,
         archive_size_bytes: r.archiveSizeBytes,
         bloat_rating: r.bloatRating,
+        file_usage_count: activeUsages.length,
+        file_usages: activeUsages.map(u => ({
+            file_path: u.filePath,
+            line: u.line,
+        })),
     };
 }

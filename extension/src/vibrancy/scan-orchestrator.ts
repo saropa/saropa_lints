@@ -117,7 +117,7 @@ export async function analyzePackage(
         package: dep, pubDev: pubDevWithPoints, github, knownIssue,
         ...scores, category, updateInfo,
         license: pubDevWithPoints?.license ?? github?.license ?? knownIssue?.license ?? null,
-        archiveSizeBytes, bloatRating, installedVersionDate, isUnused: false,
+        archiveSizeBytes, bloatRating, installedVersionDate, isUnused: false, fileUsages: [],
         platforms: merged.platforms,
         verifiedPublisher: merged.verifiedPublisher,
         wasmReady: merged.wasmReady,

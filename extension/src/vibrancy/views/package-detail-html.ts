@@ -1,5 +1,5 @@
 import {
-    VibrancyResult, VersionGapResult, ReviewEntry,
+    VibrancyResult, VersionGapResult, ReviewEntry, activeFileUsages,
 } from '../types';
 import { ReviewSummary } from '../services/review-state';
 import { categoryLabel } from '../scoring/status-classifier';
@@ -25,6 +25,7 @@ export function buildPackageDetailHtml(
         buildHeader(result),
         buildVersionSection(result),
         buildCommunitySection(result),
+        buildFileUsagesSection(result),
         buildAlertsSection(result),
         buildVersionGapSection(result.versionGap, 'Version Gap', reviews, reviewSummary),
         buildVersionGapSection(result.overrideGap, 'Override Gap', reviews, reviewSummary),
@@ -146,6 +147,37 @@ function buildCommunitySection(r: VibrancyResult): string {
     }
 
     return section('COMMUNITY', `<table class="metrics-table"><tbody>${rows.join('')}</tbody></table>`);
+}
+
+function buildFileUsagesSection(r: VibrancyResult): string {
+    const active = activeFileUsages(r.fileUsages);
+    const commented = r.fileUsages.filter(u => u.isCommented);
+    if (active.length === 0 && commented.length === 0) { return ''; }
+
+    const items: string[] = [];
+    for (const u of active) {
+        const display = escapeHtml(`${u.filePath}:${u.line}`);
+        items.push(
+            `<div class="file-usage-item">`
+            + `<a href="#" data-action="openFile" data-path="${escapeHtml(u.filePath)}" data-line="${u.line}">${display}</a>`
+            + `</div>`,
+        );
+    }
+    if (commented.length > 0) {
+        items.push(`<div class="file-usage-commented">Commented-out references:</div>`);
+        for (const u of commented) {
+            const display = escapeHtml(`${u.filePath}:${u.line}`);
+            items.push(
+                `<div class="file-usage-item commented">`
+                + `<a href="#" data-action="openFile" data-path="${escapeHtml(u.filePath)}" data-line="${u.line}">${display}</a>`
+                + `</div>`,
+            );
+        }
+    }
+
+    const count = active.length;
+    const label = count === 1 ? '1 file' : `${count} files`;
+    return section(`FILE USAGES (${label})`, items.join(''));
 }
 
 function buildAlertsSection(r: VibrancyResult): string {
