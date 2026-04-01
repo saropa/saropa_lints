@@ -33,6 +33,18 @@
 
 ---
 
+## [Unreleased]
+
+### Changed
+
+- **Extension:** "Apply fix" context menu item is now hidden for violations without a quick fix, instead of showing a dead-end "No quick fix available" message
+
+### Fixed
+
+- **Extension:** `rulesWithFixes` from `violations.json` was not extracted, causing all violations to appear fixable regardless of actual fix availability
+
+---
+
 ## [10.5.0]
 
 ### Added
