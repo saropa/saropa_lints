@@ -40,6 +40,7 @@ export function makeMinimalResult(options: MakeResultOptions = {}): VibrancyResu
         bloatRating: null,
         license: null,
         isUnused: false,
+        fileUsages: [],
         platforms: null,
         verifiedPublisher: false,
         wasmReady: null,

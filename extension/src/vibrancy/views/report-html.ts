@@ -1,4 +1,4 @@
-import { VibrancyResult } from '../types';
+import { VibrancyResult, activeFileUsages } from '../types';
 import { categoryLabel, countByCategory } from '../scoring/status-classifier';
 import { formatSizeMB, formatSizeKB } from '../scoring/bloat-calculator';
 import { worstSeverity, severityEmoji, severityLabel } from '../scoring/vuln-classifier';
@@ -58,7 +58,7 @@ function buildReportSummary(options: ReportOptions): string {
     const totalSize = totalBytes > 0 ? formatSizeMB(totalBytes) : '\u2014';
     const vulnPackages = results.filter(r => r.vulnerabilities.length > 0).length;
     const singleUse = results.filter(
-        r => r.fileUsages.filter(u => !u.isCommented).length === 1,
+        r => activeFileUsages(r.fileUsages).length === 1,
     ).length;
 
     return `<div class="summary">
@@ -157,7 +157,7 @@ function buildRow(
     const name = escapeHtml(r.package.name);
     const date = r.pubDev?.publishedDate.split('T')[0] ?? '';
     const stars = r.github?.stars ?? '';
-    const activeFileCount = r.fileUsages.filter(u => !u.isCommented).length;
+    const activeFileCount = activeFileUsages(r.fileUsages).length;
     const transitiveCount = r.transitiveInfo?.transitiveCount ?? 0;
     const vulnCount = r.vulnerabilities.length;
     const isOverridden = overrideNames.has(r.package.name) ? 'yes' : 'no';
@@ -286,7 +286,7 @@ function buildSizeCell(r: VibrancyResult): string {
 }
 
 function buildFilesCell(r: VibrancyResult): string {
-    const active = r.fileUsages.filter(u => !u.isCommented);
+    const active = activeFileUsages(r.fileUsages);
     const count = active.length;
     if (count === 0) { return '<td class="cell-right">\u2014</td>'; }
     // Single-use = muted; 6+ = bold (deeply embedded)
@@ -373,7 +373,9 @@ function buildPackageDataScript(
         const val = JSON.stringify(buildPackageJson(r, overrideNames));
         return `${key}:${val}`;
     });
-    return `var packageData={${entries.join(',')}};`;
+    /* Escape < to \u003c so embedded JSON cannot break out of the script tag */
+    const raw = `var packageData={${entries.join(',')}};`;
+    return raw.replace(/</g, '\\u003c');
 }
 
 /** Build a comprehensive JSON-safe object for one package row. */
@@ -383,7 +385,7 @@ function buildPackageJson(
 ): Record<string, unknown> {
     const name = r.package.name;
     const encoded = encodeURIComponent(name);
-    const activeFiles = r.fileUsages.filter(u => !u.isCommented);
+    const activeFiles = activeFileUsages(r.fileUsages);
     return {
         name,
         version: r.package.version,

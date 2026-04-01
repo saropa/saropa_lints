@@ -161,6 +161,29 @@ export function getReportScript(): string {
             searchInput.addEventListener('keyup', function() { applyFilters(); });
         }
 
+        /* ---- Copy row as JSON ---- */
+
+        document.querySelectorAll('.copy-btn').forEach(function(btn) {
+            var copyIcon = btn.textContent;
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                var pkg = btn.dataset.pkg;
+                var data = packageData[pkg];
+                if (!data) { return; }
+                /* Guard: ignore rapid re-clicks while feedback is showing */
+                if (btn.classList.contains('copied')) { return; }
+                var json = JSON.stringify(data, null, 2);
+                navigator.clipboard.writeText(json).then(function() {
+                    btn.textContent = '\\u2713';
+                    btn.classList.add('copied');
+                    setTimeout(function() {
+                        btn.textContent = copyIcon;
+                        btn.classList.remove('copied');
+                    }, 1500);
+                });
+            });
+        });
+
         /* ---- Open pubspec.yaml ---- */
 
         var pubspecBtn = document.getElementById('open-pubspec');

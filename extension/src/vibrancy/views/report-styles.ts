@@ -101,6 +101,10 @@ export function getReportStyles(): string {
         /* ---- Right-aligned numeric cells ---- */
         .cell-right { text-align: right; }
 
+        /* ---- File usage count styling ---- */
+        .file-single { color: var(--vscode-descriptionForeground); }
+        .file-deep { font-weight: bold; }
+
         /* ---- Version age suffix ---- */
         .version-age {
             color: var(--vscode-descriptionForeground);
@@ -140,6 +144,18 @@ export function getReportStyles(): string {
             cursor: help; opacity: 0.5; font-size: 0.85em; margin-left: 4px;
         }
         .info-icon:hover { opacity: 1; }
+
+        /* ---- Copy-row button ---- */
+        .col-copy { width: 28px; padding: 6px 4px; }
+        .copy-cell { text-align: center; padding: 6px 4px; width: 28px; }
+        .copy-btn {
+            cursor: pointer; opacity: 0; font-size: 0.9em;
+            transition: opacity 0.15s;
+            user-select: none;
+        }
+        tr:hover .copy-btn { opacity: 0.5; }
+        .copy-btn:hover { opacity: 1; }
+        .copy-btn.copied { color: var(--vscode-testing-iconPassed); opacity: 1; }
 
         /* ---- Chart filter indicator ---- */
         .chart-filter-indicator {
