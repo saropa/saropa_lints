@@ -35,6 +35,8 @@
 
 ## [10.6.0]
 
+Extension UX refinements — split workspace options into Settings and Issues sections, hide "Apply fix" for unfixable violations, and auto-expand violations tree on programmatic navigation. — [log](https://github.com/saropa/saropa_lints/blob/v10.6.0/CHANGELOG.md)
+
 ### Changed
 
 - **Extension:** Overview sidebar splits the former "Workspace options" section into two focused sections: **Settings** (lint integration, tier, detected packages, config actions) and **Issues** (triage groups by violation count); Issues hides when no analysis data exists
@@ -49,6 +51,8 @@
 
 ## [10.5.0]
 
+Replacement complexity metric — analyzes local pub cache to estimate feasibility of inlining, forking, or replacing each dependency; removed inline vibrancy summary diagnostic. — [log](https://github.com/saropa/saropa_lints/blob/v10.5.0/CHANGELOG.md)
+
 ### Added
 
 - **(Extension)** Package Vibrancy: replacement complexity metric — analyzes local pub cache to count source lines in each dependency's `lib/` directory and classifies how feasible it would be to inline, fork, or replace (trivial / small / moderate / large / native). Shown in Size tree group, detail sidebar, and CodeLens for stale/end-of-life packages with feasible migration
@@ -60,6 +64,8 @@
 ---
 
 ## [10.4.1]
+
+Fixed VS Code Marketplace publishing blocked by TypeScript 5.9 bug; modularized publish script into focused modules. — [log](https://github.com/saropa/saropa_lints/blob/v10.4.1/CHANGELOG.md)
 
 ### Fixed
 
