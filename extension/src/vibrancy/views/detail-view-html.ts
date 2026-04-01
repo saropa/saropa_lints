@@ -95,6 +95,13 @@ function buildVersionSection(r: VibrancyResult): string {
         parts.push(`<div class="detail-row muted">Size: ${formatSizeMB(r.archiveSizeBytes)}</div>`);
     }
 
+    if (r.replacementComplexity) {
+        const rc = r.replacementComplexity;
+        const m = rc.metrics;
+        parts.push(`<div class="detail-row muted">Source: ${m.libCodeLines.toLocaleString('en-US')} code · ${m.libCommentLines.toLocaleString('en-US')} comments · ${m.libFileCount} files</div>`);
+        parts.push(`<div class="detail-row">Replace: <span class="${rc.level}">${escapeHtml(rc.summary)}</span></div>`);
+    }
+
     return buildSection('📦 VERSION', parts);
 }
 

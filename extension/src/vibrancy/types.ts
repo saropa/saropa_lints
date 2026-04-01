@@ -1,4 +1,5 @@
 import type { VersionGapResult } from './types-extended';
+import type { ReplacementComplexity } from './services/package-code-analyzer';
 
 /** Status categories for package vibrancy. */
 export type VibrancyCategory = 'vibrant' | 'quiet' | 'legacy-locked' | 'stale' | 'end-of-life';
@@ -220,6 +221,8 @@ export interface VibrancyResult {
     readonly versionGap: VersionGapResult | null;
     /** For overridden packages: PRs/issues from override version to latest. */
     readonly overrideGap: VersionGapResult | null;
+    /** Replacement complexity based on local source analysis. Null when not yet analyzed. */
+    readonly replacementComplexity: ReplacementComplexity | null;
 }
 
 /** A single package entry from `dart pub outdated --json`. */
@@ -299,3 +302,4 @@ export interface RankedComparison {
 
 /* Re-export all extended types so existing imports from '../types' continue working. */
 export * from './types-extended';
+export type { ReplacementComplexity, ReplacementLevel, PackageCodeMetrics } from './services/package-code-analyzer';

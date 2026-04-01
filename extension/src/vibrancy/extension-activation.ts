@@ -25,6 +25,7 @@ import { registerUpgradeCommand } from './providers/upgrade-command';
 import { registerAnnotateCommand } from './providers/annotate-command';
 import { readScanConfig, scanPackages, buildScanMeta, ParsedDeps, findAndParseDeps } from './scan-helpers';
 import { scanDartImports } from './services/import-scanner';
+import { enrichReplacementComplexity } from './services/package-code-analyzer';
 import { detectUnused } from './scoring/unused-detector';
 import { fetchFlutterReleases } from './services/flutter-releases';
 import { snapshotVersions, notifyLockDiff } from './services/lock-diff-notifier';
@@ -796,9 +797,15 @@ async function runScanInner(
             );
 
             if (signal.aborted) { return; }
+            progress.report({ message: 'Analyzing source complexity...' });
+            const withComplexity = await enrichReplacementComplexity(
+                withUnused, workspaceRoot, targets.cache, logger,
+            );
+
+            if (signal.aborted) { return; }
             progress.report({ message: 'Analyzing upgrade blockers...' });
             const enrichResult = await enrichWithBlockers(
-                withUnused, workspaceRoot.fsPath, logger,
+                withComplexity, workspaceRoot.fsPath, logger,
             );
             let results = enrichResult.results;
             lastReverseDeps = enrichResult.reverseDeps;
