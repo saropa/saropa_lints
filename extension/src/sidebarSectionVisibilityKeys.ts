@@ -31,8 +31,8 @@ export function sidebarSectionContextKey(configKey: string): string {
 
 /** Default visibility when the setting is unset (matches package.json defaults). */
 export function defaultSidebarSectionVisible(configKey: string): boolean {
-    // Core workflow: Overview (includes workspace options) and Violations stay on.
-    // Standalone Config is off — the same settings live under Overview & options.
+    // Core workflow: Overview (includes settings and issues) and Violations stay on.
+    // Standalone Config is off — the same content lives under Overview & options.
     if (configKey === 'sidebar.showOverview' || configKey === 'sidebar.showIssues') {
         return true;
     }

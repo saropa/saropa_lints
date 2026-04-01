@@ -248,8 +248,11 @@ export function serializeOverviewNode(node: unknown): JsonNode | null {
         if (embedded) return embedded;
     }
     const cv = (node as { contextValue?: string }).contextValue;
-    if (cv === 'overviewOptionsSection') {
-        return { type: 'overviewOptionsSection', label: 'Workspace options' };
+    if (cv === 'overviewSettingsSection') {
+        return { type: 'overviewSettingsSection', label: 'Settings' };
+    }
+    if (cv === 'overviewIssuesSection') {
+        return { type: 'overviewIssuesSection', label: 'Issues' };
     }
     if (cv === 'overviewSidebarSection') {
         return { type: 'overviewSidebarSection', label: 'Sidebar' };
