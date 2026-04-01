@@ -41,7 +41,7 @@ function makeResult(
         archiveSizeBytes: null,
         bloatRating: null,
         license: null,
-        isUnused: false, platforms: null, verifiedPublisher: false, wasmReady: null, blocker: null, upgradeBlockStatus: 'up-to-date',
+        isUnused: false, fileUsages: [], platforms: null, verifiedPublisher: false, wasmReady: null, blocker: null, upgradeBlockStatus: 'up-to-date',
         transitiveInfo: null, alternatives: [], latestPrerelease: null, prereleaseTag: null, vulnerabilities: [],
         versionGap: null, overrideGap: null, replacementComplexity: null,
     };
@@ -443,6 +443,65 @@ describe('report: version tooltip', () => {
         assert.ok(html.includes('Created: 2020-03-15'));
     });
 
+});
+
+describe('report: copy-as-JSON button', () => {
+    it('should include a copy button in each row', () => {
+        const html = buildReportHtml(opts([makeResult('http', 80)]));
+        assert.ok(html.includes('copy-btn'));
+        assert.ok(html.includes('data-pkg="http"'));
+    });
+
+    it('should include copy column header', () => {
+        const html = buildReportHtml(opts([]));
+        assert.ok(html.includes('col-copy'));
+    });
+
+    it('should embed packageData script variable', () => {
+        const html = buildReportHtml(opts([makeResult('http', 80)]));
+        assert.ok(html.includes('var packageData='));
+    });
+
+    it('should include package name and links in JSON data', () => {
+        const html = buildReportHtml(opts([makeResult('http', 80)]));
+        /* The packageData JS object contains the package entry */
+        assert.ok(html.includes('"http"'));
+        assert.ok(html.includes('pub.dev/packages/http'));
+        assert.ok(html.includes('pub.dev/packages/http/versions'));
+        assert.ok(html.includes('pub.dev/packages/http/changelog'));
+    });
+
+    it('should include health breakdown in JSON data', () => {
+        const html = buildReportHtml(opts([makeResult('http', 80)]));
+        assert.ok(html.includes('"resolutionVelocity"'));
+        assert.ok(html.includes('"engagementLevel"'));
+        assert.ok(html.includes('"popularity"'));
+        assert.ok(html.includes('"publisherTrust"'));
+    });
+
+    it('should include isOverridden in JSON data', () => {
+        const result = makeResult('http', 80);
+        const html = buildReportHtml({
+            results: [result],
+            overrideCount: 1,
+            overrideNames: new Set(['http']),
+            pubspecUri: null,
+        });
+        assert.ok(html.includes('"isOverridden":true'));
+    });
+
+    it('should include vulnerability data in JSON', () => {
+        const result = {
+            ...makeResult('http', 80),
+            vulnerabilities: [{
+                id: 'GHSA-1234', summary: 'XSS vuln', severity: 'high' as const,
+                cvssScore: 8.5, fixedVersion: '2.0.0', url: 'https://example.com/vuln',
+            }],
+        };
+        const html = buildReportHtml(opts([result]));
+        assert.ok(html.includes('GHSA-1234'));
+        assert.ok(html.includes('XSS vuln'));
+    });
 });
 
 describe('report: health tooltip (score breakdown)', () => {
