@@ -678,6 +678,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     vscode.commands.registerCommand('saropaLints.focusIssues', () => {
       issuesProvider.clearFilters();
       updateIssuesViewMessage();
+      issuesProvider.expandAll();
       void vscode.commands.executeCommand('saropaLints.issues.focus');
     }),
     // Focus Violations view filtered to a single file (Code Lens, Problems view "Show in Saropa Lints").
@@ -686,6 +687,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       if (!normalized) return;
       issuesProvider.setTextFilter(normalized);
       updateIssuesViewMessage();
+      issuesProvider.expandAll();
       void vscode.commands.executeCommand('saropaLints.issues.focus');
     }),
     // Focus Violations view filtered to the active editor's file (e.g. from Problems view context menu).
@@ -699,6 +701,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       const relative = path.relative(root, editor.document.uri.fsPath).replaceAll('\\', '/');
       issuesProvider.setTextFilter(relative);
       updateIssuesViewMessage();
+      issuesProvider.expandAll();
       void vscode.commands.executeCommand('saropaLints.issues.focus');
     }),
     vscode.commands.registerCommand('saropaLints.focusIssuesWithImpactFilter', (impact: string) => {
@@ -706,6 +709,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         issuesProvider.setImpactFilter(new Set([impact]));
         issuesProvider.setSeverityFilter(new Set(['error', 'warning', 'info']));
         updateIssuesViewMessage();
+        issuesProvider.expandAll();
         void vscode.commands.executeCommand('saropaLints.issues.focus');
       }
     }),
@@ -714,6 +718,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         issuesProvider.setSeverityFilter(new Set([severity]));
         issuesProvider.setImpactFilter(new Set(['critical', 'high', 'medium', 'low', 'opinionated']));
         updateIssuesViewMessage();
+        issuesProvider.expandAll();
         void vscode.commands.executeCommand('saropaLints.issues.focus');
       }
     }),
@@ -871,6 +876,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         issuesProvider.setImpactFilter(new Set(['critical', 'high', 'medium', 'low', 'opinionated']));
         issuesProvider.setRulesToHide(toHide);
         updateIssuesViewMessage();
+        issuesProvider.expandAll();
         void vscode.commands.executeCommand('saropaLints.issues.focus');
       }),
     ),
