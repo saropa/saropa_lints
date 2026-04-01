@@ -1,13 +1,15 @@
 /**
  * # Overview & options — tree data provider
  *
- * Single sidebar view that combines onboarding copy, **workspace options** (embedded
- * {@link ConfigTreeProvider} root + triage children), **Sidebar** (per-section visibility),
- * and the **dashboard** (health, violations, trends) when `violations.json` exists.
+ * Single sidebar view that combines onboarding copy, **Settings** (embedded
+ * {@link ConfigTreeProvider} settings + actions), **Issues** (triage groups from
+ * {@link ConfigTreeProvider}), **Sidebar** (per-section visibility), and the
+ * **dashboard** (health, violations, trends) when `violations.json` exists.
  *
  * ## Behaviour contracts (for reviewers)
  *
- * - **Dart workspace:** always returns intro rows, **Workspace options** (embedded config),
+ * - **Dart workspace:** always returns intro rows, **Settings** (embedded config),
+ *   conditionally **Issues** (when triage data exists),
  *   and **Sidebar** section toggles so users are never stuck on a bare welcome with only
  *   a single “Enable” affordance. `saropaLints.enabled` defaults **true**; when a user turns
  *   lint integration **off**, a **Lint integration: Off** row (warning styling) still links
@@ -15,8 +17,8 @@
  * - **Non-Dart:** empty root so `viewsWelcome` can prompt to open a pubspec folder.
  * - **Embedded config:** delegates to the same `ConfigTreeProvider` instance as the
  *   standalone Config view — `refreshAll` clears triage cache once; no duplicate logic.
- * - **Recursion:** `getChildren` depth is bounded (root → options → triage groups → rules;
- *   root → sidebar → leaves). No cycles.
+ * - **Recursion:** `getChildren` depth is bounded (root → settings/issues → triage groups
+ *   → rules; root → sidebar → leaves). No cycles.
  * - **Type guard:** {@link isConfigTreeNode} only accepts known `ConfigTreeNode.kind`
  *   values so arbitrary objects with a `kind` property cannot reach `renderTreeItem`.
  */
@@ -40,13 +42,23 @@ const OVERVIEW_INTRO_TOOLTIP =
     'Saropa Lints provides 2050+ Dart and Flutter lint rules for security, accessibility, and performance. '
     + 'It has two components: a pub.dev package with the rules and a VS Code extension for visual analysis and configuration.';
 
-/** Collapsible group for tier, triage, and config actions (same content as the standalone Config view). */
-export class OverviewOptionsParent extends vscode.TreeItem {
+/** Collapsible group for lint settings and config actions. */
+export class OverviewSettingsParent extends vscode.TreeItem {
     constructor() {
-        super('Workspace options', vscode.TreeItemCollapsibleState.Expanded);
-        this.contextValue = 'overviewOptionsSection';
+        super('Settings', vscode.TreeItemCollapsibleState.Expanded);
+        this.contextValue = 'overviewSettingsSection';
         this.iconPath = new vscode.ThemeIcon('settings-gear');
-        this.tooltip = 'Lint integration, tier, analysis behavior, detected packages, triage, and config actions';
+        this.tooltip = 'Lint integration, tier, analysis behavior, detected packages, and config actions';
+    }
+}
+
+/** Collapsible group for issue triage (rules grouped by violation count). */
+export class OverviewIssuesParent extends vscode.TreeItem {
+    constructor() {
+        super('Issues', vscode.TreeItemCollapsibleState.Expanded);
+        this.contextValue = 'overviewIssuesSection';
+        this.iconPath = new vscode.ThemeIcon('list-filter');
+        this.tooltip = 'Rules grouped by violation count for triage';
     }
 }
 
@@ -237,7 +249,8 @@ function isConfigTreeNode(node: OverviewTreeNode): node is ConfigTreeNode {
 
 export type OverviewTreeNode =
     | OverviewItem
-    | OverviewOptionsParent
+    | OverviewSettingsParent
+    | OverviewIssuesParent
     | OverviewSidebarSectionParent
     | OverviewSidebarToggleItem
     | ConfigTreeNode;
@@ -268,8 +281,11 @@ export class OverviewTreeProvider implements vscode.TreeDataProvider<OverviewTre
     async getChildren(element?: OverviewTreeNode): Promise<OverviewTreeNode[]> {
         const cfg = vscode.workspace.getConfiguration('saropaLints');
 
-        if (element instanceof OverviewOptionsParent) {
-            return this.configProvider.getChildren();
+        if (element instanceof OverviewSettingsParent) {
+            return this.configProvider.getSettingAndActionNodes();
+        }
+        if (element instanceof OverviewIssuesParent) {
+            return this.configProvider.getTriageNodes();
         }
         if (element !== undefined && isConfigTreeNode(element)) {
             return this.configProvider.getChildren(element);
@@ -300,15 +316,22 @@ export class OverviewTreeProvider implements vscode.TreeDataProvider<OverviewTre
                 ),
             );
         }
-        const optionsParent = new OverviewOptionsParent();
+        const settingsParent = new OverviewSettingsParent();
+        const issuesParent = new OverviewIssuesParent();
         const sidebarParent = new OverviewSidebarSectionParent();
         const data = readViolations(root);
 
+        // Only show "Issues" section when triage data exists.
+        const hasIssues = this.configProvider.getTriageNodes().length > 0;
+
         if (data === null) {
-            return [
+            const items: OverviewTreeNode[] = [
                 ...intro,
                 ...integrationOff,
-                optionsParent,
+                settingsParent,
+            ];
+            if (hasIssues) items.push(issuesParent);
+            items.push(
                 sidebarParent,
                 new OverviewItem(
                     'No analysis yet',
@@ -316,9 +339,17 @@ export class OverviewTreeProvider implements vscode.TreeDataProvider<OverviewTre
                     'saropaLints.runAnalysis',
                     'beaker',
                 ),
-            ];
+            );
+            return items;
         }
 
-        return [...intro, ...integrationOff, optionsParent, sidebarParent, ...buildDashboardItems(this.workspaceState, data)];
+        const items: OverviewTreeNode[] = [
+            ...intro,
+            ...integrationOff,
+            settingsParent,
+        ];
+        if (hasIssues) items.push(issuesParent);
+        items.push(sidebarParent, ...buildDashboardItems(this.workspaceState, data));
+        return items;
     }
 }

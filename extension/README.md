@@ -1,6 +1,6 @@
 # Saropa Lints — VS Code Extension
 
-Enable and configure [Saropa Lints](https://pub.dev/packages/saropa_lints) from the IDE. The extension is **on by default** for Dart workspaces: Overview shows workspace options and sidebar toggles immediately. Use **Set Up Project** when you need to add `saropa_lints` to `pubspec.yaml` and write `analysis_options` (no terminal init required).
+Enable and configure [Saropa Lints](https://pub.dev/packages/saropa_lints) from the IDE. The extension is **on by default** for Dart workspaces: Overview shows settings, issues, and sidebar toggles immediately. Use **Set Up Project** when you need to add `saropa_lints` to `pubspec.yaml` and write `analysis_options` (no terminal init required).
 
 After installing, run **"Saropa Lints: Getting Started"** from the Command Palette for a guided tour of all features.
 
@@ -63,7 +63,7 @@ The **Logs** view lists analysis reports from `reports/`. Each log shows a parse
 | `saropaLints.issuesPageSize` | `100` | Max violations shown per file in the Violations tree (1–1000). Remaining appear as “and N more…”. |
 | `saropaLints.violationsGroupBy` | `impact` | Default tree grouping: **impact** lists Critical / High first; use **severity** for Error / Warning / Info. Change anytime from the Violations toolbar. |
 
-**Sidebar defaults:** **Overview & options** and **Violations** show in the activity bar by default (workspace options and section toggles live under Overview). Turn on the standalone **Config** view, Summary, Security, File Risk, Package Vibrancy, TODOs, etc. from **Overview & options → Sidebar** or Settings (`saropaLints.sidebar.show*`).
+**Sidebar defaults:** **Overview & options** and **Violations** show in the activity bar by default (settings, issues, and section toggles live under Overview). Turn on the standalone **Config** view, Summary, Security, File Risk, Package Vibrancy, TODOs, etc. from **Overview & options → Sidebar** or Settings (`saropaLints.sidebar.show*`).
 
 | **TODOs & Hacks** | | |
 | `saropaLints.todosAndHacks.workspaceScanEnabled` | `false` | When **true**, the view scans the workspace for comment markers (resource-intensive). |

@@ -13,9 +13,13 @@ describe('serializeOverviewNode', () => {
     });
 
     it('serializes overview section parents by contextValue', () => {
-        assert.deepStrictEqual(serializeOverviewNode({ contextValue: 'overviewOptionsSection' }), {
-            type: 'overviewOptionsSection',
-            label: 'Workspace options',
+        assert.deepStrictEqual(serializeOverviewNode({ contextValue: 'overviewSettingsSection' }), {
+            type: 'overviewSettingsSection',
+            label: 'Settings',
+        });
+        assert.deepStrictEqual(serializeOverviewNode({ contextValue: 'overviewIssuesSection' }), {
+            type: 'overviewIssuesSection',
+            label: 'Issues',
         });
         assert.deepStrictEqual(serializeOverviewNode({ contextValue: 'overviewSidebarSection' }), {
             type: 'overviewSidebarSection',
@@ -31,6 +35,12 @@ describe('serializeOverviewNode', () => {
         assert.strictEqual(j?.type, 'overviewItem');
         assert.strictEqual(j?.label, 'Violations (3)');
         assert.strictEqual(j?.description, 'On');
+    });
+
+    it('old overviewOptionsSection contextValue falls through to generic item', () => {
+        // Regression: the removed "Workspace options" parent must not match any section branch.
+        const j = serializeOverviewNode({ contextValue: 'overviewOptionsSection', label: 'Workspace options' });
+        assert.strictEqual(j?.type, 'overviewItem');
     });
 
     it('does not treat unknown kind as config when serializeConfigNode returns null', () => {

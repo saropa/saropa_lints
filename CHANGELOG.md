@@ -33,12 +33,13 @@
 
 ---
 
-## [Unreleased]
+## [10.6.0]
 
 ### Changed
 
+- **Extension:** Overview sidebar splits the former "Workspace options" section into two focused sections: **Settings** (lint integration, tier, detected packages, config actions) and **Issues** (triage groups by violation count); Issues hides when no analysis data exists
 - **Extension:** "Apply fix" context menu item is now hidden for violations without a quick fix, instead of showing a dead-end "No quick fix available" message
-- **Extension:** Violations tree now auto-expands all levels when navigated to from workspace options, dashboard links, summary counts, or triage groups
+- **Extension:** Violations tree now auto-expands all levels when navigated to from settings, dashboard links, summary counts, or triage groups
 
 ### Fixed
 

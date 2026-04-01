@@ -49,10 +49,24 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigTreeNod
     }
     if (element) return []; // Other nodes have no children.
 
-    // Root level.
+    // Root level — standalone Config view shows everything in one flat list.
+    return [...this.buildSettingNodes(), ...this.buildTriageSection(), ...this.buildActionNodes()];
+  }
+
+  /** Settings + action nodes (no triage). Used by the overview "Settings" section. */
+  getSettingAndActionNodes(): ConfigTreeNode[] {
+    return [...this.buildSettingNodes(), ...this.buildActionNodes()];
+  }
+
+  /** Triage nodes only (groups + info). Used by the overview "Issues" section. */
+  getTriageNodes(): ConfigTreeNode[] {
+    return this.buildTriageSection();
+  }
+
+  /** Lint integration, tier, run-after-config, detected packages. */
+  private buildSettingNodes(): ConfigTreeNode[] {
     const cfg = vscode.workspace.getConfiguration('saropaLints');
     const enabled = cfg.get<boolean>('enabled', true) ?? true;
-
     const tier = cfg.get<string>('tier', 'recommended') ?? 'recommended';
     const runAfter = cfg.get<boolean>('runAnalysisAfterConfigChange', true) ?? true;
 
@@ -75,23 +89,30 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigTreeNod
       if (parts.length > 0) items.push(setting('Detected', parts.join(' · ')));
     }
 
-    // I1: Triage section — only when violations data with issuesByRule is available.
-    if (root) {
-      const data = readViolations(root);
-      if (data) {
-        this.cachedTriage = buildTriageData(data, root);
-        if (this.cachedTriage) {
-          items.push(...this.buildTriageNodes(this.cachedTriage));
-        }
-      }
-    }
+    return items;
+  }
 
-    items.push(
+  /** Open config, initialize, run analysis. */
+  private buildActionNodes(): ConfigTreeNode[] {
+    return [
       setting('Open analysis_options_custom.yaml', undefined, 'saropaLints.openConfig'),
       setting('Initialize / Update config', undefined, 'saropaLints.initializeConfig'),
       setting('Run analysis', undefined, 'saropaLints.runAnalysis'),
-    );
-    return items;
+    ];
+  }
+
+  /** I1: Triage groups — only when violations data with issuesByRule is available. */
+  private buildTriageSection(): ConfigTreeNode[] {
+    const root = getProjectRoot();
+    if (!root) return [];
+
+    const data = readViolations(root);
+    if (!data) return [];
+
+    this.cachedTriage = buildTriageData(data, root);
+    if (!this.cachedTriage) return [];
+
+    return this.buildTriageNodes(this.cachedTriage);
   }
 
   /** Build the flat list of triage group nodes for the root level. */
