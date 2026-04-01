@@ -85,8 +85,12 @@ export function getReportScript(): string {
                         && row.dataset.update !== 'unknown';
                 case 'unused':
                     return row.dataset.status === 'unused';
+                case 'single-use':
+                    return row.dataset.files === '1';
                 case 'vulns':
                     return parseInt(row.dataset.vulns, 10) > 0;
+                case 'overrides':
+                    return row.dataset.overridden === 'yes';
                 default:
                     return true;
             }

@@ -33,6 +33,15 @@
 
 ---
 
+## [Unreleased]
+
+### Changed
+
+- **Vibrancy Report**: Overrides summary card is now clickable — filters the table to show only overridden packages
+- **Vibrancy Report**: All table column headings now have tooltips explaining what each column represents (e.g. Published = "Date the installed version was published to pub.dev")
+
+---
+
 ## [10.6.1]
 
 ### Changed
