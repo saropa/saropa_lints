@@ -33,9 +33,9 @@ export function getReportStyles(): string {
             background: var(--vscode-list-activeSelectionBackground);
         }
         .vibrant .count { color: var(--vscode-testing-iconPassed); }
-        .quiet .count { color: var(--vscode-editorInfo-foreground); }
-        .legacy .count { color: var(--vscode-editorWarning-foreground); }
-        .stale .count { color: var(--vscode-editorWarning-foreground); }
+        .stable .count { color: var(--vscode-editorInfo-foreground); }
+        .outdated .count { color: var(--vscode-editorWarning-foreground); }
+        .abandoned .count { color: var(--vscode-editorWarning-foreground); }
         .eol .count { color: var(--vscode-editorError-foreground); }
         .updates .count { color: var(--vscode-textLink-foreground); }
         .unused .count { color: var(--vscode-editorWarning-foreground); }

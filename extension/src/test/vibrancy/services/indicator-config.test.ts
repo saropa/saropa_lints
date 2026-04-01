@@ -63,18 +63,18 @@ describe('indicator-config', () => {
             assert.strictEqual(indicator, '🟢');
         });
 
-        it('should return emoji for quiet', () => {
-            const indicator = getCategoryIndicator('quiet');
+        it('should return emoji for stable', () => {
+            const indicator = getCategoryIndicator('stable');
             assert.strictEqual(indicator, '🟡');
         });
 
-        it('should return emoji for legacy-locked', () => {
-            const indicator = getCategoryIndicator('legacy-locked');
+        it('should return emoji for outdated', () => {
+            const indicator = getCategoryIndicator('outdated');
             assert.strictEqual(indicator, '🟠');
         });
 
-        it('should return emoji for stale', () => {
-            const indicator = getCategoryIndicator('stale');
+        it('should return emoji for abandoned', () => {
+            const indicator = getCategoryIndicator('abandoned');
             assert.strictEqual(indicator, '🟠');
         });
 

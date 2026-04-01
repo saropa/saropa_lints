@@ -3,7 +3,7 @@ import type { ReplacementComplexity } from './services/package-code-analyzer';
 import type { PackageUsage } from './services/import-scanner';
 
 /** Status categories for package vibrancy. */
-export type VibrancyCategory = 'vibrant' | 'quiet' | 'legacy-locked' | 'stale' | 'end-of-life';
+export type VibrancyCategory = 'vibrant' | 'stable' | 'outdated' | 'abandoned' | 'end-of-life';
 
 /** Which pubspec section a dependency belongs to. */
 export type DependencySection = 'dependencies' | 'dev_dependencies' | 'transitive';

@@ -1,11 +1,12 @@
 import * as vscode from 'vscode';
 import { VibrancyCategory } from '../types';
+import { CATEGORY_DICTIONARY } from '../category-dictionary';
 
 export interface IndicatorConfig {
     readonly vibrant: string;
-    readonly quiet: string;
-    readonly legacyLocked: string;
-    readonly stale: string;
+    readonly stable: string;
+    readonly outdated: string;
+    readonly abandoned: string;
     readonly endOfLife: string;
     readonly updateAvailable: string;
     readonly prerelease: string;
@@ -20,9 +21,9 @@ export type IndicatorStyle = 'emoji' | 'text' | 'both' | 'none';
 
 const DEFAULT_INDICATORS: IndicatorConfig = {
     vibrant: '🟢',
-    quiet: '🟡',
-    legacyLocked: '🟠',
-    stale: '🟠',
+    stable: '🟡',
+    outdated: '🟠',
+    abandoned: '🟠',
     endOfLife: '🔴',
     updateAvailable: '⬆',
     prerelease: '🧪',
@@ -33,13 +34,10 @@ const DEFAULT_INDICATORS: IndicatorConfig = {
     upToDate: '✓',
 };
 
-const CATEGORY_TEXT: Record<VibrancyCategory, string> = {
-    'vibrant': 'Vibrant',
-    'quiet': 'Quiet',
-    'legacy-locked': 'Legacy',
-    'stale': 'Stale',
-    'end-of-life': 'EOL',
-};
+/** Short category labels for indicator display — sourced from the dictionary. */
+const CATEGORY_TEXT: Record<VibrancyCategory, string> = Object.fromEntries(
+    Object.entries(CATEGORY_DICTIONARY).map(([k, v]) => [k, v.shortLabel]),
+) as Record<VibrancyCategory, string>;
 
 let cachedConfig: IndicatorConfig | null = null;
 let cachedStyle: IndicatorStyle | null = null;
@@ -92,14 +90,17 @@ export function getCategoryIndicator(category: VibrancyCategory): string {
     }
 }
 
+/** Map from VibrancyCategory to IndicatorConfig property name for user-customizable emojis. */
+const CATEGORY_TO_CONFIG_KEY: Record<VibrancyCategory, keyof IndicatorConfig> = {
+    'vibrant': 'vibrant',
+    'stable': 'stable',
+    'outdated': 'outdated',
+    'abandoned': 'abandoned',
+    'end-of-life': 'endOfLife',
+};
+
 function getCategoryEmoji(category: VibrancyCategory, config: IndicatorConfig): string {
-    switch (category) {
-        case 'vibrant': return config.vibrant;
-        case 'quiet': return config.quiet;
-        case 'legacy-locked': return config.legacyLocked;
-        case 'stale': return config.stale;
-        case 'end-of-life': return config.endOfLife;
-    }
+    return config[CATEGORY_TO_CONFIG_KEY[category]];
 }
 
 /** Get a specific indicator by key. */

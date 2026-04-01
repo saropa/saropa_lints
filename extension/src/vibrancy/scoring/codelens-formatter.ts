@@ -1,23 +1,16 @@
-import { VibrancyCategory, VibrancyResult } from '../types';
+import { VibrancyResult } from '../types';
 import { isReplacementPackageName, getReplacementDisplayText } from './known-issues';
 import { categoryLabel } from './status-classifier';
 import { formatSizeMB } from './bloat-calculator';
 import {
     getCategoryIndicator, getIndicator, loadIndicatorStyle,
 } from '../services/indicator-config';
+import { categoryEmoji } from '../category-dictionary';
 
 export type CodeLensDetail = 'minimal' | 'standard' | 'full';
 
-/** @deprecated Use getCategoryIndicator() for customizable indicators. */
-export function categoryEmoji(category: VibrancyCategory): string {
-    switch (category) {
-        case 'vibrant': return '🟢';
-        case 'quiet': return '🟡';
-        case 'legacy-locked': return '🟠';
-        case 'stale': return '🟠';
-        case 'end-of-life': return '🔴';
-    }
-}
+// Re-export so existing callers (e.g. tests) that import from here still work.
+export { categoryEmoji };
 
 function formatUpdateSegment(result: VibrancyResult): string {
     if (!result.updateInfo
@@ -88,10 +81,10 @@ export function formatCodeLensTitle(
         parts.push(`${getIndicator('unused')} Unused`);
     }
 
-    // Show replacement complexity for stale/end-of-life packages when migration is feasible
+    // Show replacement complexity for abandoned/end-of-life packages when migration is feasible
     if (detail === 'full' && result.replacementComplexity) {
         const rc = result.replacementComplexity;
-        const isUnhealthy = result.category === 'stale' || result.category === 'end-of-life';
+        const isUnhealthy = result.category === 'abandoned' || result.category === 'end-of-life';
         const isFeasible = rc.level !== 'large' && rc.level !== 'native';
         if (isUnhealthy && isFeasible) {
             parts.push(`${rc.metrics.libCodeLines.toLocaleString('en-US')} LOC — ${rc.level} to replace`);

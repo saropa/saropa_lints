@@ -924,8 +924,8 @@ async function runScanInner(
             const counts = countByCategory(results);
             logger.info(
                 `Scan complete — ${logger.elapsedMs}ms — ` +
-                `vibrant:${counts.vibrant} quiet:${counts.quiet} ` +
-                `legacy:${counts.legacy} stale:${counts.stale} eol:${counts.eol}`,
+                `vibrant:${counts.vibrant} stable:${counts.stable} ` +
+                `outdated:${counts.outdated} abandoned:${counts.abandoned} eol:${counts.eol}`,
             );
 
             publishResults(targets, results, parsed, depGraphSummary);
@@ -1180,14 +1180,14 @@ async function suppressByCategory(targets: ScanTargets): Promise<void> {
             detail: 'Suppress all packages marked as end-of-life',
         },
         {
-            label: '$(info) Legacy-Locked packages',
-            description: `${countCategory('legacy-locked')} packages`,
-            detail: 'Suppress all packages marked as legacy-locked',
+            label: '$(info) Outdated packages',
+            description: `${countCategory('outdated')} packages`,
+            detail: 'Suppress all packages marked as outdated',
         },
         {
-            label: '$(question) Quiet packages',
-            description: `${countCategory('quiet')} packages`,
-            detail: 'Suppress all packages with low activity',
+            label: '$(question) Stable packages',
+            description: `${countCategory('stable')} packages`,
+            detail: 'Suppress all stable-category packages',
         },
         {
             label: '$(circle-slash) All Blocked packages',
@@ -1206,10 +1206,10 @@ async function suppressByCategory(targets: ScanTargets): Promise<void> {
     let toSuppress: string[] = [];
     if (selection.label.includes('End of Life')) {
         toSuppress = getPackagesByCategory('end-of-life');
-    } else if (selection.label.includes('Legacy-Locked')) {
-        toSuppress = getPackagesByCategory('legacy-locked');
-    } else if (selection.label.includes('Quiet')) {
-        toSuppress = getPackagesByCategory('quiet');
+    } else if (selection.label.includes('Outdated')) {
+        toSuppress = getPackagesByCategory('outdated');
+    } else if (selection.label.includes('Stable')) {
+        toSuppress = getPackagesByCategory('stable');
     } else if (selection.label.includes('Blocked')) {
         toSuppress = getBlockedPackages();
     }
@@ -1497,27 +1497,27 @@ async function promptThresholds(
     });
     if (maxEol === undefined) { return undefined; }
 
-    const maxStale = await vscode.window.showInputBox({
-        title: 'Max Stale Packages',
-        prompt: 'Maximum number of stale packages allowed (low maintenance activity)',
-        value: String(suggested.maxStale),
+    const maxAbandoned = await vscode.window.showInputBox({
+        title: 'Max Abandoned Packages',
+        prompt: 'Maximum number of abandoned packages allowed (low maintenance activity)',
+        value: String(suggested.maxAbandoned),
         validateInput: v => {
             const n = parseInt(v, 10);
             return isNaN(n) || n < 0 ? 'Enter a non-negative number' : undefined;
         },
     });
-    if (maxStale === undefined) { return undefined; }
+    if (maxAbandoned === undefined) { return undefined; }
 
-    const maxLegacy = await vscode.window.showInputBox({
-        title: 'Max Legacy-Locked Packages',
-        prompt: 'Maximum number of legacy-locked packages allowed',
-        value: String(suggested.maxLegacyLocked),
+    const maxOutdated = await vscode.window.showInputBox({
+        title: 'Max Outdated Packages',
+        prompt: 'Maximum number of outdated packages allowed',
+        value: String(suggested.maxOutdated),
         validateInput: v => {
             const n = parseInt(v, 10);
             return isNaN(n) || n < 0 ? 'Enter a non-negative number' : undefined;
         },
     });
-    if (maxLegacy === undefined) { return undefined; }
+    if (maxOutdated === undefined) { return undefined; }
 
     const minVibrancy = await vscode.window.showInputBox({
         title: 'Minimum Average Vibrancy',
@@ -1543,9 +1543,9 @@ async function promptThresholds(
     if (!failOnVuln) { return undefined; }
 
     return {
-        maxStale: parseInt(maxStale, 10),
+        maxAbandoned: parseInt(maxAbandoned, 10),
         maxEndOfLife: parseInt(maxEol, 10),
-        maxLegacyLocked: parseInt(maxLegacy, 10),
+        maxOutdated: parseInt(maxOutdated, 10),
         minAverageVibrancy: parseInt(minVibrancy, 10),
         failOnVulnerability: failOnVuln.value,
     };

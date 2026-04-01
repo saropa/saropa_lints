@@ -64,9 +64,9 @@ h1 {
 }
 
 .score.vibrant { background: var(--vscode-testing-iconPassed); color: #fff; }
-.score.quiet { background: var(--vscode-editorInfo-foreground); color: #fff; }
-.score.legacy-locked { background: var(--vscode-editorWarning-foreground); color: #000; }
-.score.stale { background: var(--vscode-editorWarning-foreground); color: #000; }
+.score.stable { background: var(--vscode-editorInfo-foreground); color: #fff; }
+.score.outdated { background: var(--vscode-editorWarning-foreground); color: #000; }
+.score.abandoned { background: var(--vscode-editorWarning-foreground); color: #000; }
 .score.end-of-life { background: var(--vscode-editorError-foreground); color: #fff; }
 
 .category-badge {
@@ -80,9 +80,9 @@ h1 {
 }
 
 .category-badge.vibrant { background: rgba(40, 167, 69, 0.2); color: var(--vscode-testing-iconPassed); }
-.category-badge.quiet { background: rgba(23, 162, 184, 0.2); color: var(--vscode-editorInfo-foreground); }
-.category-badge.legacy-locked { background: rgba(255, 193, 7, 0.2); color: var(--vscode-editorWarning-foreground); }
-.category-badge.stale { background: rgba(255, 193, 7, 0.2); color: var(--vscode-editorWarning-foreground); }
+.category-badge.stable { background: rgba(23, 162, 184, 0.2); color: var(--vscode-editorInfo-foreground); }
+.category-badge.outdated { background: rgba(255, 193, 7, 0.2); color: var(--vscode-editorWarning-foreground); }
+.category-badge.abandoned { background: rgba(255, 193, 7, 0.2); color: var(--vscode-editorWarning-foreground); }
 .category-badge.end-of-life { background: rgba(220, 53, 69, 0.2); color: var(--vscode-editorError-foreground); }
 
 section {

@@ -27,9 +27,9 @@ const SECTION_ICONS: Record<DependencySection, string> = {
 export function categoryColor(cat: VibrancyCategory): vscode.ThemeColor {
     switch (cat) {
         case 'vibrant': return new vscode.ThemeColor('testing.iconPassed');
-        case 'quiet': return new vscode.ThemeColor('editorInfo.foreground');
-        case 'legacy-locked': return new vscode.ThemeColor('editorWarning.foreground');
-        case 'stale': return new vscode.ThemeColor('editorWarning.foreground');
+        case 'stable': return new vscode.ThemeColor('editorInfo.foreground');
+        case 'outdated': return new vscode.ThemeColor('editorWarning.foreground');
+        case 'abandoned': return new vscode.ThemeColor('editorWarning.foreground');
         case 'end-of-life': return new vscode.ThemeColor('editorError.foreground');
     }
 }

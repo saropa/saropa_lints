@@ -182,7 +182,7 @@ describe('buildDetailViewHtml', () => {
                 latestVersion: '2.0.0',
                 blockerPackage: 'dio',
                 blockerVibrancyScore: 60,
-                blockerCategory: 'quiet',
+                blockerCategory: 'stable',
             },
             updateInfo: {
                 currentVersion: '1.0.0',
@@ -298,7 +298,7 @@ describe('buildDetailViewHtml', () => {
     });
 
     it('should handle all category styles', () => {
-        for (const cat of ['vibrant', 'quiet', 'legacy-locked', 'stale', 'end-of-life'] as const) {
+        for (const cat of ['vibrant', 'stable', 'outdated', 'abandoned', 'end-of-life'] as const) {
             const html = buildDetailViewHtml(makeResult('http', 50, cat));
             assert.ok(html.includes(`class="score ${cat}"`), `Missing score class for ${cat}`);
             assert.ok(html.includes(`class="category-badge ${cat}"`), `Missing badge class for ${cat}`);

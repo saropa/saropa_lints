@@ -12,7 +12,7 @@ function makeResult(name: string, score: number): VibrancyResult {
     return {
         package: { name, version: '1.0.0', constraint: '^1.0.0', source: 'hosted', isDirect: true, section: 'dependencies' },
         pubDev: null, github: null, knownIssue: null, score,
-        category: score >= 70 ? 'vibrant' : 'quiet',
+        category: score >= 70 ? 'vibrant' : 'stable',
         resolutionVelocity: 0, engagementLevel: 0, popularity: 0,
         publisherTrust: 0, updateInfo: null,
         transitiveInfo: null, alternatives: [], latestPrerelease: null, prereleaseTag: null,
@@ -230,7 +230,7 @@ describe('detail sync duck-typing contracts', () => {
             name: 'http',
             combinedRiskScore: 5,
             vibrancyScore: 50,
-            category: 'quiet',
+            category: 'stable',
             problems: [],
             suggestedAction: null,
             actionType: 'none',

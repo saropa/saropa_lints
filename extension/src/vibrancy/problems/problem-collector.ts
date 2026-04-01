@@ -53,8 +53,8 @@ export function collectProblemsForPackage(
 ): void {
     const name = result.package.name;
 
-    // Stale packages (score < 10) are unhealthy but not end-of-life
-    if (result.category === 'end-of-life' || result.category === 'stale' || result.category === 'legacy-locked') {
+    // Abandoned packages (score < 20) are unhealthy but not end-of-life
+    if (result.category === 'end-of-life' || result.category === 'abandoned' || result.category === 'outdated') {
         registry.add(createUnhealthyProblem(result, line));
     }
 
@@ -167,7 +167,7 @@ function createUnhealthyProblem(
     result: VibrancyResult,
     line: number,
 ): UnhealthyPackageProblem {
-    // EOL = high severity; stale/legacy-locked = medium
+    // EOL = high severity; abandoned/outdated = medium
     const severity: ProblemSeverity = result.category === 'end-of-life' ? 'high' : 'medium';
     return {
         id: generateProblemId(result.package.name, 'unhealthy'),

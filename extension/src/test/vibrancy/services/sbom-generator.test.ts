@@ -115,11 +115,11 @@ describe('sbom-generator', () => {
         });
 
         it('should include vibrancy category property', () => {
-            const results = [makeResult('http', { category: 'quiet' })];
+            const results = [makeResult('http', { category: 'stable' })];
             const bom = generateSbom(results, META);
             const props = bom.components[0].properties;
             const catProp = props.find(p => p.name === 'vibrancy:category');
-            assert.strictEqual(catProp?.value, 'quiet');
+            assert.strictEqual(catProp?.value, 'stable');
         });
 
         it('should include publisher when available', () => {

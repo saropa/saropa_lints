@@ -32,16 +32,16 @@ describe('categoryEmoji', () => {
         assert.strictEqual(categoryEmoji('vibrant'), '🟢');
     });
 
-    it('should return yellow for quiet', () => {
-        assert.strictEqual(categoryEmoji('quiet'), '🟡');
+    it('should return yellow for stable', () => {
+        assert.strictEqual(categoryEmoji('stable'), '🟡');
     });
 
-    it('should return orange for legacy-locked', () => {
-        assert.strictEqual(categoryEmoji('legacy-locked'), '🟠');
+    it('should return orange for outdated', () => {
+        assert.strictEqual(categoryEmoji('outdated'), '🟠');
     });
 
-    it('should return orange for stale', () => {
-        assert.strictEqual(categoryEmoji('stale'), '🟠');
+    it('should return orange for abandoned', () => {
+        assert.strictEqual(categoryEmoji('abandoned'), '🟠');
     });
 
     it('should return red for end-of-life', () => {

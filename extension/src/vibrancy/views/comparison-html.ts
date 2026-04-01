@@ -2,22 +2,7 @@ import { ComparisonData, DimensionWinner, RankedComparison, VibrancyCategory } f
 import { formatSizeMB } from '../scoring/bloat-calculator';
 import { escapeHtml } from './html-utils';
 import { isWinnerForDimension } from '../scoring/comparison-ranker';
-
-const CATEGORY_LABELS: Record<VibrancyCategory, string> = {
-    'vibrant': 'Vibrant',
-    'quiet': 'Quiet',
-    'legacy-locked': 'Legacy',
-    'stale': 'Stale',
-    'end-of-life': 'End of Life',
-};
-
-const CATEGORY_EMOJI: Record<VibrancyCategory, string> = {
-    'vibrant': '🟢',
-    'quiet': '🟡',
-    'legacy-locked': '🟠',
-    'stale': '🟠',
-    'end-of-life': '🔴',
-};
+import { CATEGORY_DICTIONARY } from '../category-dictionary';
 
 function getComparisonStyles(): string {
     return `
@@ -89,9 +74,9 @@ function getComparisonStyles(): string {
         }
         .add-btn:hover { background: var(--vscode-button-hoverBackground); }
         .vibrant { color: var(--vscode-testing-iconPassed); }
-        .quiet { color: var(--vscode-editorInfo-foreground); }
-        .legacy { color: var(--vscode-editorWarning-foreground); }
-        .stale { color: var(--vscode-editorWarning-foreground); }
+        .stable { color: var(--vscode-editorInfo-foreground); }
+        .outdated { color: var(--vscode-editorWarning-foreground); }
+        .abandoned { color: var(--vscode-editorWarning-foreground); }
         .eol { color: var(--vscode-editorError-foreground); }
         .verified { color: var(--vscode-testing-iconPassed); }
         .platforms { font-size: 0.9em; }
@@ -114,18 +99,13 @@ function getComparisonScript(): string {
 
 function formatCategory(category: VibrancyCategory | null): string {
     if (!category) { return '—'; }
-    return `${CATEGORY_EMOJI[category]} ${CATEGORY_LABELS[category]}`;
+    const data = CATEGORY_DICTIONARY[category];
+    return `${data.emoji} ${data.label}`;
 }
 
 function getCategoryClass(category: VibrancyCategory | null): string {
     if (!category) { return ''; }
-    switch (category) {
-        case 'vibrant': return 'vibrant';
-        case 'quiet': return 'quiet';
-        case 'legacy-locked': return 'legacy';
-        case 'stale': return 'stale';
-        case 'end-of-life': return 'eol';
-    }
+    return CATEGORY_DICTIONARY[category].cssClass;
 }
 
 interface RowDef {

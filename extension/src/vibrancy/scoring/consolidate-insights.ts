@@ -14,8 +14,8 @@ const PROBLEM_WEIGHTS: Record<ProblemType, number> = {
 };
 
 const EOL_WEIGHT = 30;
-const STALE_WEIGHT = 25;
-const LEGACY_WEIGHT = 20;
+const ABANDONED_WEIGHT = 25;
+const OUTDATED_WEIGHT = 20;
 
 /**
  * Consolidate all feature outputs into unified per-package insights.
@@ -92,17 +92,17 @@ export function collectProblems(
             severity: 'high',
             message: 'Package is end-of-life',
         });
-    } else if (result.category === 'stale') {
+    } else if (result.category === 'abandoned') {
         problems.push({
             type: 'unhealthy',
             severity: 'medium',
-            message: 'Package is stale — low maintenance activity',
+            message: 'Package is abandoned — low maintenance activity',
         });
-    } else if (result.category === 'legacy-locked') {
+    } else if (result.category === 'outdated') {
         problems.push({
             type: 'unhealthy',
             severity: 'medium',
-            message: `Score ${result.score}/100 — legacy-locked`,
+            message: `Score ${result.score}/100 — outdated`,
         });
     }
 
@@ -169,8 +169,8 @@ export function computeCombinedRisk(
     for (const problem of problems) {
         if (problem.type === 'unhealthy') {
             score += result.category === 'end-of-life' ? EOL_WEIGHT
-                : result.category === 'stale' ? STALE_WEIGHT
-                : LEGACY_WEIGHT;
+                : result.category === 'abandoned' ? ABANDONED_WEIGHT
+                : OUTDATED_WEIGHT;
         } else {
             score += PROBLEM_WEIGHTS[problem.type];
         }

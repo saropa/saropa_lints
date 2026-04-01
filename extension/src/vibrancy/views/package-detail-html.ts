@@ -396,9 +396,9 @@ function alertItem(html: string, severity: 'critical' | 'info'): string {
 
 function categoryBadgeClass(cat: string): string {
     if (cat === 'vibrant') { return 'badge-vibrant'; }
-    if (cat === 'quiet') { return 'badge-quiet'; }
-    if (cat === 'legacy-locked') { return 'badge-legacy'; }
-    if (cat === 'stale') { return 'badge-stale'; }
+    if (cat === 'stable') { return 'badge-stable'; }
+    if (cat === 'outdated') { return 'badge-outdated'; }
+    if (cat === 'abandoned') { return 'badge-abandoned'; }
     if (cat === 'end-of-life') { return 'badge-eol'; }
     return '';
 }

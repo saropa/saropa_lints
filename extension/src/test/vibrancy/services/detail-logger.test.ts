@@ -196,7 +196,7 @@ describe('DetailLogger', () => {
                     latestVersion: '2.0.0',
                     blockerPackage: 'dio',
                     blockerVibrancyScore: 60,
-                    blockerCategory: 'quiet',
+                    blockerCategory: 'stable',
                 },
                 updateInfo: {
                     currentVersion: '1.0.0',
@@ -325,7 +325,7 @@ describe('DetailLogger', () => {
             const logger = new DetailLogger(channel as unknown as import('vscode').OutputChannel);
             const results = [
                 makeResult('http', 80),
-                makeResult('bloc', 60, 'quiet'),
+                makeResult('bloc', 60, 'stable'),
             ];
 
             logger.logAllPackages(results);
@@ -340,7 +340,7 @@ describe('DetailLogger', () => {
             const logger = new DetailLogger(channel as unknown as import('vscode').OutputChannel);
             const results = [
                 makeResult('http', 80),
-                makeResult('bloc', 60, 'quiet'),
+                makeResult('bloc', 60, 'stable'),
             ];
 
             logger.logAllPackages(results);

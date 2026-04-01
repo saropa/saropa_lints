@@ -77,8 +77,8 @@ export function getReportScript(): string {
 
         function matchesCardFilter(row, filter) {
             switch (filter) {
-                case 'vibrant': case 'quiet': case 'legacy-locked':
-                case 'stale': case 'end-of-life':
+                case 'vibrant': case 'stable': case 'outdated':
+                case 'abandoned': case 'end-of-life':
                     return row.dataset.category === filter;
                 case 'updates':
                     return row.dataset.update !== 'up-to-date'

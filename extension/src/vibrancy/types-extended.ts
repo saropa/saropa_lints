@@ -54,9 +54,9 @@ export interface BudgetConfig {
     readonly maxDependencies: number | null;
     readonly maxTotalSizeMB: number | null;
     readonly minAverageVibrancy: number | null;
-    readonly maxStale: number | null;
+    readonly maxAbandoned: number | null;
     readonly maxEndOfLife: number | null;
-    readonly maxLegacyLocked: number | null;
+    readonly maxOutdated: number | null;
     readonly maxUnused: number | null;
 }
 
@@ -129,7 +129,7 @@ export type ActionType =
     | 'none';
 
 /** Vibrancy category for display; must match VibrancyCategory in types. */
-export type PackageInsightCategory = 'vibrant' | 'quiet' | 'legacy-locked' | 'stale' | 'end-of-life';
+export type PackageInsightCategory = 'vibrant' | 'stable' | 'outdated' | 'abandoned' | 'end-of-life';
 
 /** Consolidated insight for a package. */
 export interface PackageInsight {
@@ -138,7 +138,7 @@ export interface PackageInsight {
     readonly combinedRiskScore: number;
     /** Vibrancy score 0–100; used for detail view, CodeLens, and to derive A–F grade in Action Items. */
     readonly vibrancyScore: number;
-    /** Category (e.g. stale, end-of-life); used for A–F grade and labels. */
+    /** Category (e.g. abandoned, end-of-life); used for A–F grade and labels. */
     readonly category: PackageInsightCategory;
     readonly problems: readonly Problem[];
     readonly suggestedAction: string | null;
@@ -192,9 +192,9 @@ export type CiPlatform = 'github-actions' | 'gitlab-ci' | 'shell-script';
 
 /** Thresholds for CI vibrancy checks. */
 export interface CiThresholds {
-    readonly maxStale: number;
+    readonly maxAbandoned: number;
     readonly maxEndOfLife: number;
-    readonly maxLegacyLocked: number;
+    readonly maxOutdated: number;
     readonly minAverageVibrancy: number;
     readonly failOnVulnerability: boolean;
 }

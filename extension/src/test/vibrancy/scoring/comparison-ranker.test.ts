@@ -200,7 +200,7 @@ describe('comparison-ranker', () => {
             const mockResult = {
                 package: { name: 'minimal' },
                 score: 50,
-                category: 'quiet' as VibrancyCategory,
+                category: 'stable' as VibrancyCategory,
                 pubDev: null,
                 github: null,
                 archiveSizeBytes: null,

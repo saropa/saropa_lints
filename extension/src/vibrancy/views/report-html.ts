@@ -66,9 +66,9 @@ function buildReportSummary(options: ReportOptions): string {
         <div class="summary-card"><div class="count">${avg}/10</div><div class="label">Avg Score</div></div>
         <div class="summary-card"><div class="count">${totalSize}</div><div class="label">Total Size*</div></div>
         <div class="summary-card vibrant" data-filter="vibrant"><div class="count">${counts.vibrant}</div><div class="label">Vibrant</div></div>
-        <div class="summary-card quiet" data-filter="quiet"><div class="count">${counts.quiet}</div><div class="label">Quiet</div></div>
-        <div class="summary-card legacy" data-filter="legacy-locked"><div class="count">${counts.legacy}</div><div class="label">Legacy</div></div>
-        <div class="summary-card stale" data-filter="stale"><div class="count">${counts.stale}</div><div class="label">Stale</div></div>
+        <div class="summary-card stable" data-filter="stable"><div class="count">${counts.stable}</div><div class="label">Stable</div></div>
+        <div class="summary-card outdated" data-filter="outdated"><div class="count">${counts.outdated}</div><div class="label">Outdated</div></div>
+        <div class="summary-card abandoned" data-filter="abandoned"><div class="count">${counts.abandoned}</div><div class="label">Abandoned</div></div>
         <div class="summary-card eol" data-filter="end-of-life"><div class="count">${counts.eol}</div><div class="label">End of Life</div></div>
         <div class="summary-card updates" data-filter="updates"><div class="count">${updates}</div><div class="label">Updates</div></div>
         <div class="summary-card unused" data-filter="unused"><div class="count">${results.filter(r => r.isUnused).length}</div><div class="label">Unused</div></div>
@@ -127,7 +127,7 @@ function buildReportTable(
             ${th('name', 'Package', 'Package name on pub.dev')}
             ${th('version', 'Version', 'Installed version from pubspec.lock')}
             <th data-col="score" title="${escapeHtml(HEALTH_TOOLTIP)}">Health <span class="info-icon" title="${escapeHtml(HEALTH_TOOLTIP)}">&#9432;</span><span class="sort-arrow"></span></th>
-            ${th('category', 'Category', 'Vibrancy classification: Vibrant, Quiet, Legacy-Locked, Stale, or End-of-Life')}
+            ${th('category', 'Category', 'Vibrancy classification: Vibrant, Stable, Outdated, Abandoned, or End-of-Life')}
             ${th('published', 'Published', 'Date the installed version was published to pub.dev')}
             ${th('stars', 'Stars', 'GitHub repository star count')}
             ${th('size', 'Size', 'Archive size on pub.dev (before tree shaking)')}

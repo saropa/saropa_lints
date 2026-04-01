@@ -38,23 +38,23 @@ describe('threshold-suggester', () => {
         it('should return zero thresholds for empty results', () => {
             const thresholds = suggestThresholds([]);
 
-            assert.strictEqual(thresholds.maxStale, 0);
+            assert.strictEqual(thresholds.maxAbandoned, 0);
             assert.strictEqual(thresholds.maxEndOfLife, 0);
-            assert.strictEqual(thresholds.maxLegacyLocked, 1);
+            assert.strictEqual(thresholds.maxOutdated, 1);
             assert.strictEqual(thresholds.minAverageVibrancy, 0);
             assert.strictEqual(thresholds.failOnVulnerability, true);
         });
 
-        it('should count stale packages correctly', () => {
+        it('should count abandoned packages correctly', () => {
             const results = [
-                makeResult({ category: 'stale' }),
-                makeResult({ category: 'stale' }),
+                makeResult({ category: 'abandoned' }),
+                makeResult({ category: 'abandoned' }),
                 makeResult({ category: 'vibrant' }),
             ];
 
             const thresholds = suggestThresholds(results);
 
-            assert.strictEqual(thresholds.maxStale, 2);
+            assert.strictEqual(thresholds.maxAbandoned, 2);
         });
 
         it('should count end-of-life packages correctly', () => {
@@ -69,17 +69,17 @@ describe('threshold-suggester', () => {
             assert.strictEqual(thresholds.maxEndOfLife, 2);
         });
 
-        it('should count legacy-locked packages and add buffer', () => {
+        it('should count outdated packages and add buffer', () => {
             const results = [
-                makeResult({ category: 'legacy-locked' }),
-                makeResult({ category: 'legacy-locked' }),
-                makeResult({ category: 'legacy-locked' }),
+                makeResult({ category: 'outdated' }),
+                makeResult({ category: 'outdated' }),
+                makeResult({ category: 'outdated' }),
                 makeResult({ category: 'vibrant' }),
             ];
 
             const thresholds = suggestThresholds(results);
 
-            assert.strictEqual(thresholds.maxLegacyLocked, 4);
+            assert.strictEqual(thresholds.maxOutdated, 4);
         });
 
         it('should round down average vibrancy to nearest 5', () => {
@@ -109,14 +109,14 @@ describe('threshold-suggester', () => {
             const results = [
                 makeResult({ category: 'vibrant', score: 85 }),
                 makeResult({ category: 'vibrant', score: 90 }),
-                makeResult({ category: 'quiet', score: 55 }),
+                makeResult({ category: 'stable', score: 55 }),
             ];
 
             const thresholds = suggestThresholds(results);
 
-            assert.strictEqual(thresholds.maxStale, 0);
+            assert.strictEqual(thresholds.maxAbandoned, 0);
             assert.strictEqual(thresholds.maxEndOfLife, 0);
-            assert.strictEqual(thresholds.maxLegacyLocked, 1);
+            assert.strictEqual(thresholds.maxOutdated, 1);
             assert.strictEqual(thresholds.minAverageVibrancy, 75);
         });
 
@@ -126,14 +126,14 @@ describe('threshold-suggester', () => {
                 makeResult({ category: 'end-of-life', score: 10 }),
                 makeResult({ category: 'end-of-life', score: 15 }),
                 makeResult({ category: 'end-of-life', score: 5 }),
-                makeResult({ category: 'legacy-locked', score: 30 }),
+                makeResult({ category: 'outdated', score: 30 }),
                 makeResult({ category: 'vibrant', score: 80 }),
             ];
 
             const thresholds = suggestThresholds(results);
 
             assert.strictEqual(thresholds.maxEndOfLife, 3);
-            assert.strictEqual(thresholds.maxLegacyLocked, 2);
+            assert.strictEqual(thresholds.maxOutdated, 2);
             assert.strictEqual(thresholds.minAverageVibrancy, 25);
         });
 
@@ -147,9 +147,9 @@ describe('threshold-suggester', () => {
     describe('formatThresholdsSummary', () => {
         it('should format all threshold values', () => {
             const thresholds = {
-                maxStale: 1,
+                maxAbandoned: 1,
                 maxEndOfLife: 2,
-                maxLegacyLocked: 5,
+                maxOutdated: 5,
                 minAverageVibrancy: 60,
                 failOnVulnerability: true,
             };
@@ -165,9 +165,9 @@ describe('threshold-suggester', () => {
 
         it('should omit vulnerability text when disabled', () => {
             const thresholds = {
-                maxStale: 0,
+                maxAbandoned: 0,
                 maxEndOfLife: 0,
-                maxLegacyLocked: 1,
+                maxOutdated: 1,
                 minAverageVibrancy: 70,
                 failOnVulnerability: false,
             };

@@ -54,25 +54,25 @@ describe('report-exporter', () => {
             const results = [
                 makeResult({ category: 'vibrant' }),
                 makeResult({ category: 'vibrant' }),
-                makeResult({ category: 'quiet' }),
-                makeResult({ category: 'legacy-locked' }),
-                makeResult({ category: 'stale' }),
+                makeResult({ category: 'stable' }),
+                makeResult({ category: 'outdated' }),
+                makeResult({ category: 'abandoned' }),
                 makeResult({ category: 'end-of-life' }),
             ];
             const counts = countByCategory(results);
             assert.strictEqual(counts.vibrant, 2);
-            assert.strictEqual(counts.quiet, 1);
-            assert.strictEqual(counts.legacy, 1);
-            assert.strictEqual(counts.stale, 1);
+            assert.strictEqual(counts.stable, 1);
+            assert.strictEqual(counts.outdated, 1);
+            assert.strictEqual(counts.abandoned, 1);
             assert.strictEqual(counts.eol, 1);
         });
 
         it('should return zeros for empty results', () => {
             const counts = countByCategory([]);
             assert.strictEqual(counts.vibrant, 0);
-            assert.strictEqual(counts.quiet, 0);
-            assert.strictEqual(counts.legacy, 0);
-            assert.strictEqual(counts.stale, 0);
+            assert.strictEqual(counts.stable, 0);
+            assert.strictEqual(counts.outdated, 0);
+            assert.strictEqual(counts.abandoned, 0);
             assert.strictEqual(counts.eol, 0);
         });
     });

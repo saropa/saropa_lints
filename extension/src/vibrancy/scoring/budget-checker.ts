@@ -9,9 +9,9 @@ export function readBudgetConfig(
         maxDependencies: get<number>('budget.maxDependencies') ?? null,
         maxTotalSizeMB: get<number>('budget.maxTotalSizeMB') ?? null,
         minAverageVibrancy: get<number>('budget.minAverageVibrancy') ?? null,
-        maxStale: get<number>('budget.maxStale') ?? null,
+        maxAbandoned: get<number>('budget.maxAbandoned') ?? null,
         maxEndOfLife: get<number>('budget.maxEndOfLife') ?? null,
-        maxLegacyLocked: get<number>('budget.maxLegacyLocked') ?? null,
+        maxOutdated: get<number>('budget.maxOutdated') ?? null,
         maxUnused: get<number>('budget.maxUnused') ?? null,
     };
 }
@@ -21,9 +21,9 @@ export function hasBudgets(config: BudgetConfig): boolean {
     return config.maxDependencies !== null
         || config.maxTotalSizeMB !== null
         || config.minAverageVibrancy !== null
-        || config.maxStale !== null
+        || config.maxAbandoned !== null
         || config.maxEndOfLife !== null
-        || config.maxLegacyLocked !== null
+        || config.maxOutdated !== null
         || config.maxUnused !== null;
 }
 
@@ -32,18 +32,18 @@ export function computeActuals(results: readonly VibrancyResult[]): {
     totalCount: number;
     totalSizeMB: number;
     averageVibrancy: number;
-    staleCount: number;
+    abandonedCount: number;
     endOfLifeCount: number;
-    legacyLockedCount: number;
+    outdatedCount: number;
     unusedCount: number;
 } {
     const totalCount = results.length;
 
     let totalSizeBytes = 0;
     let totalScore = 0;
-    let staleCount = 0;
+    let abandonedCount = 0;
     let endOfLifeCount = 0;
-    let legacyLockedCount = 0;
+    let outdatedCount = 0;
     let unusedCount = 0;
 
     for (const r of results) {
@@ -51,14 +51,14 @@ export function computeActuals(results: readonly VibrancyResult[]): {
         if (r.archiveSizeBytes !== null) {
             totalSizeBytes += r.archiveSizeBytes;
         }
-        if (r.category === 'stale') {
-            staleCount++;
+        if (r.category === 'abandoned') {
+            abandonedCount++;
         }
         if (r.category === 'end-of-life') {
             endOfLifeCount++;
         }
-        if (r.category === 'legacy-locked') {
-            legacyLockedCount++;
+        if (r.category === 'outdated') {
+            outdatedCount++;
         }
         if (r.isUnused) {
             unusedCount++;
@@ -73,9 +73,9 @@ export function computeActuals(results: readonly VibrancyResult[]): {
         totalCount,
         totalSizeMB,
         averageVibrancy,
-        staleCount,
+        abandonedCount,
         endOfLifeCount,
-        legacyLockedCount,
+        outdatedCount,
         unusedCount,
     };
 }
@@ -168,9 +168,9 @@ export function checkBudgets(
     }));
 
     budgetResults.push(buildResult({
-        dimension: 'Stale',
-        actual: actuals.staleCount,
-        limit: config.maxStale,
+        dimension: 'Abandoned',
+        actual: actuals.abandonedCount,
+        limit: config.maxAbandoned,
         isMinimum: false,
         formatActual: v => `${v}`,
         formatLimit: v => `${v} max`,
@@ -186,9 +186,9 @@ export function checkBudgets(
     }));
 
     budgetResults.push(buildResult({
-        dimension: 'Legacy-Locked',
-        actual: actuals.legacyLockedCount,
-        limit: config.maxLegacyLocked,
+        dimension: 'Outdated',
+        actual: actuals.outdatedCount,
+        limit: config.maxOutdated,
         isMinimum: false,
         formatActual: v => `${v}`,
         formatLimit: v => `${v} max`,
@@ -254,7 +254,7 @@ export function formatBudgetSummary(results: readonly BudgetResult[]): string {
 /** Get packages by category for diagnostic details. */
 export function getPackagesByCategory(
     results: readonly VibrancyResult[],
-    category: 'stale' | 'end-of-life' | 'legacy-locked' | 'unused',
+    category: 'abandoned' | 'end-of-life' | 'outdated' | 'unused',
 ): string[] {
     if (category === 'unused') {
         return results.filter(r => r.isUnused).map(r => r.package.name);
@@ -278,17 +278,17 @@ export function buildExceededDiagnostics(
         let message: string;
 
         switch (br.dimension) {
-            case 'Stale':
-                packageNames = getPackagesByCategory(results, 'stale');
-                message = `Budget exceeded: ${br.actual} Stale packages (limit: ${br.limit}). Review: ${packageNames.join(', ')}`;
+            case 'Abandoned':
+                packageNames = getPackagesByCategory(results, 'abandoned');
+                message = `Budget exceeded: ${br.actual} Abandoned packages (limit: ${br.limit}). Review: ${packageNames.join(', ')}`;
                 break;
             case 'End of Life':
                 packageNames = getPackagesByCategory(results, 'end-of-life');
                 message = `Budget exceeded: ${br.actual} End-of-Life packages (limit: ${br.limit}). Remove or replace: ${packageNames.join(', ')}`;
                 break;
-            case 'Legacy-Locked':
-                packageNames = getPackagesByCategory(results, 'legacy-locked');
-                message = `Budget exceeded: ${br.actual} Legacy-Locked packages (limit: ${br.limit}). Review: ${packageNames.join(', ')}`;
+            case 'Outdated':
+                packageNames = getPackagesByCategory(results, 'outdated');
+                message = `Budget exceeded: ${br.actual} Outdated packages (limit: ${br.limit}). Review: ${packageNames.join(', ')}`;
                 break;
             case 'Unused':
                 packageNames = getPackagesByCategory(results, 'unused');

@@ -72,18 +72,18 @@ describe('buildReportHtml', () => {
     it('should count categories correctly', () => {
         const html = buildReportHtml(opts([
             makeResult('a', 80, 'vibrant'),
-            makeResult('b', 50, 'quiet'),
-            makeResult('c', 20, 'legacy-locked'),
-            makeResult('d', 5, 'stale'),
+            makeResult('b', 50, 'stable'),
+            makeResult('c', 20, 'outdated'),
+            makeResult('d', 5, 'abandoned'),
             makeResult('e', 0, 'end-of-life'),
         ]));
         assert.ok(html.includes('class="summary-card vibrant"'));
-        assert.ok(html.includes('class="summary-card stale"'));
+        assert.ok(html.includes('class="summary-card abandoned"'));
         assert.ok(html.includes('class="summary-card eol"'));
     });
 
     it('should escape HTML in package names', () => {
-        const result = makeResult('<script>alert(1)</script>', 50, 'quiet');
+        const result = makeResult('<script>alert(1)</script>', 50, 'stable');
         const html = buildReportHtml(opts([result]));
         assert.ok(!html.includes('<script>alert(1)</script>'));
         assert.ok(html.includes('&lt;script&gt;'));
@@ -238,9 +238,9 @@ describe('report: summary card filters', () => {
     it('should add data-filter to category cards', () => {
         const html = buildReportHtml(opts([]));
         assert.ok(html.includes('data-filter="vibrant"'));
-        assert.ok(html.includes('data-filter="quiet"'));
-        assert.ok(html.includes('data-filter="legacy-locked"'));
-        assert.ok(html.includes('data-filter="stale"'));
+        assert.ok(html.includes('data-filter="stable"'));
+        assert.ok(html.includes('data-filter="outdated"'));
+        assert.ok(html.includes('data-filter="abandoned"'));
         assert.ok(html.includes('data-filter="end-of-life"'));
         assert.ok(html.includes('data-filter="updates"'));
         assert.ok(html.includes('data-filter="unused"'));

@@ -37,6 +37,8 @@
 
 ### Changed
 
+- **Vibrancy**: Renamed health categories for clarity — "Quiet" → **Stable**, "Legacy-Locked" → **Outdated**, "Stale" → **Abandoned**. Vibrant and End of Life are unchanged.
+- **Vibrancy**: Raised Abandoned threshold from score <10 to score <20 so packages untouched for 4+ years with only bonus points are correctly flagged instead of escaping into Outdated
 - **Vibrancy Report**: Overrides summary card is now clickable — filters the table to show only overridden packages
 - **Vibrancy Report**: All table column headings now have tooltips explaining what each column represents (e.g. Published = "Date the installed version was published to pub.dev")
 
@@ -50,6 +52,12 @@
 ### Fixed
 
 - **Vibrancy Report**: Commented-out imports (e.g. `// import 'package:foo/foo.dart'`) are no longer counted as active usage for unused-package detection
+
+### Breaking
+
+- **Vibrancy Settings**: `budget.maxStale` renamed to `budget.maxAbandoned`; `budget.maxLegacyLocked` renamed to `budget.maxOutdated`. Users who customized these settings will need to update their config.
+- **Vibrancy Exports**: JSON/Markdown export schemas use new category keys (`stable`, `outdated`, `abandoned` instead of `quiet`, `legacy_locked`, `stale`)
+- **Generated CI scripts**: Previously generated CI workflows reference old threshold variable names. Regenerate after updating.
 
 ---
 
