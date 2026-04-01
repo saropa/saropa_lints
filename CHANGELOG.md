@@ -33,7 +33,7 @@
 
 ---
 
-## [Unreleased]
+## [10.7.0]
 
 ### Changed
 
