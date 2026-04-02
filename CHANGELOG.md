@@ -33,16 +33,9 @@
 
 ---
 
-## [Unreleased]
+## [10.8.0]
 
 ### Added
-
----
-
-## [10.7.1]
-
-### Added
-
 
 - **Vibrancy Report**: New "Issues" and "PRs" columns show open GitHub issue and pull request counts, linking directly to the repository's issues and pulls pages
 - **Drift Advisor**: Toolbar toggle button in the Drift Advisor view — `$(plug)` enables integration, `$(circle-slash)` disables it. No more hunting through Settings to find `saropaLints.driftAdvisor.integration`.
