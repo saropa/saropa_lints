@@ -33,6 +33,14 @@
 
 ---
 
+## [10.7.1]
+
+### Added
+
+- **Drift Advisor**: Toolbar toggle button in the Drift Advisor view — `$(plug)` enables integration, `$(circle-slash)` disables it. No more hunting through Settings to find `saropaLints.driftAdvisor.integration`.
+
+---
+
 ## [10.7.0]
 
 ### Changed

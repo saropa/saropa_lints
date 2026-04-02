@@ -22,6 +22,7 @@ export {
     InsightItem,
     BudgetGroupItem,
     BudgetItem,
+    SeverityGroupItem,
 } from './tree-item-classes';
 
 // Re-export all builders

@@ -5,7 +5,7 @@ import { workspace } from '../vscode-mock';
 import { VibrancyTreeProvider } from '../../../vibrancy/providers/tree-data-provider';
 import {
     PackageItem, GroupItem, DetailItem, SuppressedGroupItem,
-    SuppressedPackageItem, buildGroupItems, SectionGroupItem,
+    SuppressedPackageItem, buildGroupItems, SectionGroupItem, SeverityGroupItem,
 } from '../../../vibrancy/providers/tree-items';
 import { VibrancyResult, GitHubMetrics, DependencySection } from '../../../vibrancy/types';
 
@@ -53,36 +53,44 @@ describe('VibrancyTreeProvider', () => {
         assert.strictEqual(provider.getChildren().length, 0);
     });
 
-    it('should return PackageItems at root', () => {
+    it('should return SeverityGroupItem at root', () => {
+        // Severity grouping replaced the flat list; single result goes into one group.
         provider.updateResults([makeResult('http', 80)]);
         const children = provider.getChildren();
         assert.strictEqual(children.length, 1);
-        assert.ok(children[0] instanceof PackageItem);
+        assert.ok(children[0] instanceof SeverityGroupItem);
     });
 
-    it('should sort worst-first', () => {
+    it('should group worse packages before healthier ones', () => {
+        // score<40 → 'outdated' → medium; score>=70 → 'vibrant' → healthy.
         provider.updateResults([
             makeResult('good', 90),
             makeResult('bad', 20),
             makeResult('mid', 50),
         ]);
-        const children = provider.getChildren() as PackageItem[];
-        assert.strictEqual(children[0].result.package.name, 'bad');
-        assert.strictEqual(children[2].result.package.name, 'good');
+        const children = provider.getChildren() as SeverityGroupItem[];
+        // medium group (bad) comes first, then healthy (good, mid)
+        assert.ok(children[0] instanceof SeverityGroupItem);
+        assert.strictEqual(children[0].severity, 'medium');
+        assert.ok(children[1] instanceof SeverityGroupItem);
+        assert.strictEqual(children[1].severity, 'healthy');
     });
 
     it('should return GroupItems as children of PackageItem', () => {
+        // Root → SeverityGroupItem → PackageItem → GroupItem.
         provider.updateResults([makeResult('http', 80)]);
-        const root = provider.getChildren() as PackageItem[];
-        const groups = provider.getChildren(root[0]);
+        const severityGroups = provider.getChildren() as SeverityGroupItem[];
+        const packages = provider.getChildren(severityGroups[0]) as PackageItem[];
+        const groups = provider.getChildren(packages[0]);
         assert.ok(groups.length > 0);
         assert.ok(groups[0] instanceof GroupItem);
     });
 
     it('should return DetailItems as children of GroupItem', () => {
         provider.updateResults([makeResult('http', 80)]);
-        const root = provider.getChildren() as PackageItem[];
-        const groups = provider.getChildren(root[0]) as GroupItem[];
+        const severityGroups = provider.getChildren() as SeverityGroupItem[];
+        const packages = provider.getChildren(severityGroups[0]) as PackageItem[];
+        const groups = provider.getChildren(packages[0]) as GroupItem[];
         const details = provider.getChildren(groups[0]);
         assert.ok(details.length > 0);
         assert.ok(details[0] instanceof DetailItem);
@@ -139,8 +147,9 @@ describe('suppressed grouping', () => {
         stubSuppressed(['bad']);
         provider.updateResults([makeResult('bad', 20), makeResult('good', 90)]);
         const children = provider.getChildren();
+        // 'good' (vibrant) → one SeverityGroupItem('healthy'), then SuppressedGroupItem.
         assert.strictEqual(children.length, 2);
-        assert.ok(children[0] instanceof PackageItem);
+        assert.ok(children[0] instanceof SeverityGroupItem);
         assert.ok(children[1] instanceof SuppressedGroupItem);
     });
 
@@ -155,12 +164,12 @@ describe('suppressed grouping', () => {
         assert.ok(suppressed[0] instanceof SuppressedPackageItem);
     });
 
-    it('should show no group when none suppressed', () => {
+    it('should show no suppressed group when none suppressed', () => {
         stubSuppressed([]);
         provider.updateResults([makeResult('good', 90)]);
         const children = provider.getChildren();
         assert.strictEqual(children.length, 1);
-        assert.ok(children[0] instanceof PackageItem);
+        assert.ok(children[0] instanceof SeverityGroupItem);
     });
 
     it('should show correct count in group label', () => {
@@ -365,15 +374,18 @@ describe('section grouping', () => {
         });
     }
 
-    it('should show flat list when grouping is none', () => {
+    it('should show severity groups when grouping is none', () => {
+        // 'none' now means severity grouping, not a flat list.
+        // Both packages are vibrant (score ≥ 70) → one 'healthy' group.
         stubGrouping('none');
         provider.updateResults([
             makeResult('http', 80, undefined, 'dependencies'),
             makeResult('test', 70, undefined, 'dev_dependencies'),
         ]);
         const children = provider.getChildren();
-        assert.strictEqual(children.length, 2);
-        assert.ok(children.every(c => c instanceof PackageItem));
+        assert.strictEqual(children.length, 1);
+        assert.ok(children[0] instanceof SeverityGroupItem);
+        assert.strictEqual((children[0] as SeverityGroupItem).severity, 'healthy');
     });
 
     it('should show section groups when grouping is section', () => {
@@ -433,5 +445,124 @@ describe('section grouping', () => {
         const deps = groups.find(c => c.section === 'dependencies')!;
         assert.strictEqual(deps.results[0].package.name, 'bad');
         assert.strictEqual(deps.results[1].package.name, 'good');
+    });
+});
+
+describe('severity grouping', () => {
+    let provider: VibrancyTreeProvider;
+    let sandbox: sinon.SinonSandbox;
+
+    beforeEach(() => {
+        sandbox = sinon.createSandbox();
+        provider = new VibrancyTreeProvider();
+    });
+
+    afterEach(() => {
+        sandbox.restore();
+    });
+
+    function stubGroupingNone(): void {
+        sandbox.stub(workspace, 'getConfiguration').returns({
+            get: <T>(key: string, defaultValue?: T): T | undefined => {
+                if (key === 'treeGrouping') { return 'none' as unknown as T; }
+                if (key === 'suppressedPackages') { return [] as unknown as T; }
+                return defaultValue;
+            },
+            update: async () => {},
+        });
+    }
+
+    function makeResultWithCategory(
+        name: string,
+        category: 'vibrant' | 'stable' | 'outdated' | 'abandoned' | 'end-of-life',
+    ): VibrancyResult {
+        return { ...makeResult(name, 50), category };
+    }
+
+    it('should produce high group for end-of-life packages', () => {
+        stubGroupingNone();
+        provider.updateResults([makeResultWithCategory('old', 'end-of-life')]);
+        const children = provider.getChildren() as SeverityGroupItem[];
+        assert.strictEqual(children.length, 1);
+        assert.strictEqual(children[0].severity, 'high');
+    });
+
+    it('should produce high group for abandoned packages', () => {
+        stubGroupingNone();
+        provider.updateResults([makeResultWithCategory('dead', 'abandoned')]);
+        const children = provider.getChildren() as SeverityGroupItem[];
+        assert.strictEqual(children[0].severity, 'high');
+    });
+
+    it('should produce medium group for outdated packages', () => {
+        stubGroupingNone();
+        provider.updateResults([makeResultWithCategory('stale', 'outdated')]);
+        const children = provider.getChildren() as SeverityGroupItem[];
+        assert.strictEqual(children[0].severity, 'medium');
+    });
+
+    it('should produce healthy group for vibrant packages', () => {
+        stubGroupingNone();
+        provider.updateResults([makeResultWithCategory('good', 'vibrant')]);
+        const children = provider.getChildren() as SeverityGroupItem[];
+        assert.strictEqual(children[0].severity, 'healthy');
+    });
+
+    it('should alphabetize packages within a severity group', () => {
+        stubGroupingNone();
+        provider.updateResults([
+            makeResultWithCategory('zebra', 'outdated'),
+            makeResultWithCategory('apple', 'outdated'),
+            makeResultWithCategory('mango', 'outdated'),
+        ]);
+        const children = provider.getChildren() as SeverityGroupItem[];
+        assert.strictEqual(children.length, 1);
+        const names = children[0].results.map(r => r.package.name);
+        assert.deepStrictEqual(names, ['apple', 'mango', 'zebra']);
+    });
+
+    it('should emit high before medium before healthy groups', () => {
+        stubGroupingNone();
+        provider.updateResults([
+            makeResultWithCategory('healthy-pkg', 'vibrant'),
+            makeResultWithCategory('medium-pkg', 'outdated'),
+            makeResultWithCategory('high-pkg', 'end-of-life'),
+        ]);
+        const children = provider.getChildren() as SeverityGroupItem[];
+        assert.strictEqual(children.length, 3);
+        assert.strictEqual(children[0].severity, 'high');
+        assert.strictEqual(children[1].severity, 'medium');
+        assert.strictEqual(children[2].severity, 'healthy');
+    });
+
+    it('should show correct label and count in group header', () => {
+        stubGroupingNone();
+        provider.updateResults([
+            makeResultWithCategory('a', 'outdated'),
+            makeResultWithCategory('b', 'outdated'),
+        ]);
+        const children = provider.getChildren() as SeverityGroupItem[];
+        assert.strictEqual(children[0].label, '🟡 Medium (2)');
+    });
+
+    it('should return PackageItems as children of SeverityGroupItem', () => {
+        stubGroupingNone();
+        provider.updateResults([makeResult('http', 80)]);
+        const groups = provider.getChildren() as SeverityGroupItem[];
+        const packages = provider.getChildren(groups[0]);
+        assert.strictEqual(packages.length, 1);
+        assert.ok(packages[0] instanceof PackageItem);
+    });
+
+    it('should omit empty severity groups', () => {
+        stubGroupingNone();
+        // All packages are vibrant → only 'healthy' group emitted.
+        provider.updateResults([
+            makeResultWithCategory('a', 'vibrant'),
+            makeResultWithCategory('b', 'vibrant'),
+        ]);
+        const children = provider.getChildren() as SeverityGroupItem[];
+        assert.strictEqual(children.length, 1);
+        assert.strictEqual(children[0].severity, 'healthy');
     });
 });
