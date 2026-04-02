@@ -647,6 +647,16 @@
         "command": "saropaLints.driftAdvisor.openInBrowser",
         "title": "Drift Advisor: Open in Browser",
         "icon": "$(link-external)"
+      },
+      {
+        "command": "saropaLints.driftAdvisor.enableIntegration",
+        "title": "Drift Advisor: Enable Integration",
+        "icon": "$(plug)"
+      },
+      {
+        "command": "saropaLints.driftAdvisor.disableIntegration",
+        "title": "Drift Advisor: Disable Integration",
+        "icon": "$(circle-slash)"
       }
     ],
     "menus": {
@@ -767,7 +777,7 @@
           "group": "navigation@6"
         },
         {
-          "command": "saropaLints.packageVibrancy.expandAll",
+          "command": "saropaLints.packageVibrancy.showReport",
           "when": "view == saropaLints.packageVibrancy.packages && saropaLints.packageVibrancy.hasResults",
           "group": "navigation@7"
         },
@@ -839,6 +849,16 @@
         {
           "command": "saropaLints.todosAndHacks.toggleGroupByTag",
           "when": "view == saropaLints.todosAndHacks",
+          "group": "navigation"
+        },
+        {
+          "command": "saropaLints.driftAdvisor.enableIntegration",
+          "when": "view == saropaLints.driftAdvisor && !saropaLints.driftAdvisor.integration",
+          "group": "navigation"
+        },
+        {
+          "command": "saropaLints.driftAdvisor.disableIntegration",
+          "when": "view == saropaLints.driftAdvisor && saropaLints.driftAdvisor.integration",
           "group": "navigation"
         },
         {

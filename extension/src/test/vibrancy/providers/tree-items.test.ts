@@ -1,7 +1,8 @@
 import * as assert from 'assert';
+import * as vscode from 'vscode';
 import {
     DetailItem, buildGroupItems,
-    PackageItem, InsightItem, OverrideItem,
+    PackageItem, InsightItem, OverrideItem, SeverityGroupItem,
 } from '../../../vibrancy/providers/tree-items';
 import {
     ProblemItem, SuggestionItem,
@@ -279,4 +280,57 @@ describe('detail sync duck-typing contracts', () => {
         assert.strictEqual(item.packageName, 'http');
     });
 
+});
+
+describe('SeverityGroupItem', () => {
+    it('should use high label for high severity', () => {
+        const item = new SeverityGroupItem('high', []);
+        assert.strictEqual(item.label, '🔴 High (0)');
+    });
+
+    it('should use medium label for medium severity', () => {
+        const item = new SeverityGroupItem('medium', []);
+        assert.strictEqual(item.label, '🟡 Medium (0)');
+    });
+
+    it('should use low label for low severity', () => {
+        const item = new SeverityGroupItem('low', []);
+        assert.strictEqual(item.label, '🟢 Low (0)');
+    });
+
+    it('should use healthy label for healthy severity', () => {
+        const item = new SeverityGroupItem('healthy', []);
+        assert.strictEqual(item.label, '✅ Healthy (0)');
+    });
+
+    it('should be expanded for high severity', () => {
+        const item = new SeverityGroupItem('high', []);
+        assert.strictEqual(item.collapsibleState, vscode.TreeItemCollapsibleState.Expanded);
+    });
+
+    it('should be expanded for medium severity', () => {
+        const item = new SeverityGroupItem('medium', []);
+        assert.strictEqual(item.collapsibleState, vscode.TreeItemCollapsibleState.Expanded);
+    });
+
+    it('should be collapsed for low severity', () => {
+        const item = new SeverityGroupItem('low', []);
+        assert.strictEqual(item.collapsibleState, vscode.TreeItemCollapsibleState.Collapsed);
+    });
+
+    it('should be collapsed for healthy severity', () => {
+        const item = new SeverityGroupItem('healthy', []);
+        assert.strictEqual(item.collapsibleState, vscode.TreeItemCollapsibleState.Collapsed);
+    });
+
+    it('should reflect result count in label', () => {
+        const results = [makeResult('a', 80), makeResult('b', 80)];
+        const item = new SeverityGroupItem('healthy', results);
+        assert.strictEqual(item.label, '✅ Healthy (2)');
+    });
+
+    it('should set contextValue to vibrancySeverityGroup', () => {
+        const item = new SeverityGroupItem('high', []);
+        assert.strictEqual(item.contextValue, 'vibrancySeverityGroup');
+    });
 });

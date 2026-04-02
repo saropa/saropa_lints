@@ -271,6 +271,25 @@ export class InsightItem extends vscode.TreeItem {
     }
 }
 
+export class SeverityGroupItem extends vscode.TreeItem {
+    constructor(
+        public readonly severity: 'high' | 'medium' | 'low' | 'healthy',
+        public readonly results: VibrancyResult[],
+    ) {
+        const LABELS: Record<string, string> = {
+            high: '🔴 High',
+            medium: '🟡 Medium',
+            low: '🟢 Low',
+            healthy: '✅ Healthy',
+        };
+        const expanded = severity === 'high' || severity === 'medium'
+            ? vscode.TreeItemCollapsibleState.Expanded
+            : vscode.TreeItemCollapsibleState.Collapsed;
+        super(`${LABELS[severity]} (${results.length})`, expanded);
+        this.contextValue = 'vibrancySeverityGroup';
+    }
+}
+
 // Re-export budget classes from their own module so existing callers
 // that import from this file continue to work without changes.
 export { BudgetGroupItem, BudgetItem } from './tree-item-budget-classes';

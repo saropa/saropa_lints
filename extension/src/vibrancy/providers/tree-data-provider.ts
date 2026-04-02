@@ -6,7 +6,7 @@ import {
     OverridesGroupItem, OverrideItem, buildOverrideDetails,
     DepGraphSummaryItem, buildDepGraphSummaryDetails,
     ActionItemsGroupItem, InsightItem, buildInsightDetails,
-    BudgetGroupItem, BudgetItem, PrereleaseItem,
+    BudgetGroupItem, BudgetItem, PrereleaseItem, SeverityGroupItem,
 } from './tree-items';
 import {
     FamilyConflictGroupItem, FamilySplitItem, buildFamilySplitDetails,
@@ -26,7 +26,7 @@ type TreeNode =
     | OverridesGroupItem | OverrideItem | DepGraphSummaryItem
     | SectionGroupItem | ActionItemsGroupItem | InsightItem
     | BudgetGroupItem | BudgetItem | PrereleaseItem
-    | ProblemItem | SuggestionItem;
+    | ProblemItem | SuggestionItem | SeverityGroupItem;
 
 export class VibrancyTreeProvider implements vscode.TreeDataProvider<TreeNode> {
     private _results: VibrancyResult[] = [];
@@ -215,6 +215,9 @@ export class VibrancyTreeProvider implements vscode.TreeDataProvider<TreeNode> {
                 r => new SuppressedPackageItem(r),
             );
         }
+        if (element instanceof SeverityGroupItem) {
+            return element.results.map(r => this._buildPackageItem(r));
+        }
         if (element instanceof SectionGroupItem) {
             return element.results.map(
                 r => this._buildPackageItem(r),
@@ -239,9 +242,6 @@ export class VibrancyTreeProvider implements vscode.TreeDataProvider<TreeNode> {
             items.push(new BudgetGroupItem(this._budgetResults, this._budgetSummary));
         }
 
-        if (this._insights.length > 0) {
-            items.push(new ActionItemsGroupItem(this._insights));
-        }
         if (this._depGraphSummary) {
             items.push(new DepGraphSummaryItem(this._depGraphSummary));
         }
@@ -265,9 +265,7 @@ export class VibrancyTreeProvider implements vscode.TreeDataProvider<TreeNode> {
         if (grouping === 'section') {
             this._buildSectionGroups(filtered, items);
         } else {
-            for (const r of filtered) {
-                items.push(this._buildPackageItem(r));
-            }
+            this._buildSeverityGroups(filtered, items);
         }
 
         const suppressedCount = this._results.length - active.length;
@@ -358,6 +356,46 @@ export class VibrancyTreeProvider implements vscode.TreeDataProvider<TreeNode> {
                 items.push(new SectionGroupItem(section, sectionResults));
             }
         }
+    }
+
+    /** Group packages by their worst problem severity, alphabetized within each group. */
+    private _buildSeverityGroups(
+        results: VibrancyResult[],
+        items: TreeNode[],
+    ): void {
+        const groups = new Map<string, VibrancyResult[]>([
+            ['high', []], ['medium', []], ['low', []], ['healthy', []],
+        ]);
+
+        for (const result of results) {
+            const severity = this._getPackageSeverity(result);
+            groups.get(severity)!.push(result);
+        }
+
+        const order = ['high', 'medium', 'low', 'healthy'] as const;
+        for (const severity of order) {
+            const list = (groups.get(severity) ?? [])
+                .sort((a, b) => a.package.name.localeCompare(b.package.name));
+            if (list.length > 0) {
+                items.push(new SeverityGroupItem(severity, list));
+            }
+        }
+    }
+
+    /** Derive worst severity for a package from registry problems or vibrancy category. */
+    private _getPackageSeverity(
+        result: VibrancyResult,
+    ): 'high' | 'medium' | 'low' | 'healthy' {
+        const problems = this._registry.getForPackage(result.package.name);
+        if (problems.some(p => p.severity === 'high')) { return 'high'; }
+        if (problems.some(p => p.severity === 'medium')) { return 'medium'; }
+        if (problems.length > 0) { return 'low'; }
+        // No registry problems — fall back to vibrancy category
+        if (result.category === 'end-of-life' || result.category === 'abandoned') {
+            return 'high';
+        }
+        if (result.category === 'outdated') { return 'medium'; }
+        return 'healthy';
     }
 
     private _getSuppressedSet(): Set<string> {
