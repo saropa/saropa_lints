@@ -9,8 +9,6 @@
 
 **Score** — [pub.dev / packages / saropa_lints / score](https://pub.dev/packages/saropa_lints/score)
 
-**CI** — [github.com / saropa / saropa_lints / actions](https://github.com/saropa/saropa_lints/actions)
-
 **Releases** — [github.com / saropa / saropa_lints / releases](https://github.com/saropa/saropa_lints/releases)
 
 **VS Code Marketplace** — [marketplace.visualstudio.com / items ? itemName=saropa.saropa-lints](https://marketplace.visualstudio.com/items?itemName=saropa.saropa-lints)
@@ -29,7 +27,15 @@
 
     **Published version**: See field "version": "x.y.z" in [package.json](./package.json)
 
+    **CI** — [github.com / saropa / saropa_lints / actions](https://github.com/saropa/saropa_lints/actions)
+
 -->
+
+---
+
+## [Unreleased]
+
+### Added
 
 ---
 
@@ -37,6 +43,8 @@
 
 ### Added
 
+
+- **Vibrancy Report**: New "Issues" and "PRs" columns show open GitHub issue and pull request counts, linking directly to the repository's issues and pulls pages
 - **Drift Advisor**: Toolbar toggle button in the Drift Advisor view — `$(plug)` enables integration, `$(circle-slash)` disables it. No more hunting through Settings to find `saropaLints.driftAdvisor.integration`.
 
 ---
