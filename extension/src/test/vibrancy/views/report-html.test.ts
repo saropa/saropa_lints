@@ -504,6 +504,107 @@ describe('report: copy-as-JSON button', () => {
     });
 });
 
+describe('report: Issues column', () => {
+    it('should show issue count from openIssues', () => {
+        const html = buildReportHtml(opts([makeResult('http', 80)]));
+        /* makeResult has openIssues: 5, no trueOpenIssues */
+        assert.ok(html.includes('data-issues="5"'));
+    });
+
+    it('should prefer trueOpenIssues over openIssues', () => {
+        const result = makeResult('http', 80);
+        (result as any).github = { ...result.github, trueOpenIssues: 3 };
+        const html = buildReportHtml(opts([result]));
+        assert.ok(html.includes('data-issues="3"'));
+    });
+
+    it('should link to repo /issues when repoUrl available', () => {
+        const result = makeResult('http', 80);
+        (result as any).github = { ...result.github, repoUrl: 'https://github.com/dart-lang/http' };
+        const html = buildReportHtml(opts([result]));
+        assert.ok(html.includes('href="https://github.com/dart-lang/http/issues"'));
+    });
+
+    it('should show dash when no github data', () => {
+        const result = { ...makeResult('http', 80), github: null };
+        const html = buildReportHtml(opts([result]));
+        assert.ok(html.includes('data-issues=""'));
+    });
+
+    it('should include Issues column header with tooltip', () => {
+        const html = buildReportHtml(opts([]));
+        assert.ok(html.includes('data-col="issues"'));
+        assert.ok(html.includes('Open GitHub issues'));
+    });
+});
+
+describe('report: PRs column', () => {
+    it('should show dash when openPullRequests undefined', () => {
+        /* makeResult has no openPullRequests */
+        const html = buildReportHtml(opts([makeResult('http', 80)]));
+        assert.ok(html.includes('data-prs=""'));
+    });
+
+    it('should show PR count when available', () => {
+        const result = makeResult('http', 80);
+        (result as any).github = { ...result.github, openPullRequests: 7 };
+        const html = buildReportHtml(opts([result]));
+        assert.ok(html.includes('data-prs="7"'));
+    });
+
+    it('should link to repo /pulls when repoUrl available', () => {
+        const result = makeResult('http', 80);
+        (result as any).github = {
+            ...result.github,
+            openPullRequests: 2,
+            repoUrl: 'https://github.com/dart-lang/http',
+        };
+        const html = buildReportHtml(opts([result]));
+        assert.ok(html.includes('href="https://github.com/dart-lang/http/pulls"'));
+    });
+
+    it('should include PRs column header with tooltip', () => {
+        const html = buildReportHtml(opts([]));
+        assert.ok(html.includes('data-col="prs"'));
+        assert.ok(html.includes('Open GitHub pull requests'));
+    });
+});
+
+describe('report: Issues and PRs in copy JSON', () => {
+    it('should include openIssues in JSON data', () => {
+        const html = buildReportHtml(opts([makeResult('http', 80)]));
+        assert.ok(html.includes('"openIssues":5'));
+    });
+
+    it('should include openPullRequests as null when unavailable', () => {
+        const html = buildReportHtml(opts([makeResult('http', 80)]));
+        assert.ok(html.includes('"openPullRequests":null'));
+    });
+
+    it('should include openPullRequests count when available', () => {
+        const result = makeResult('http', 80);
+        (result as any).github = { ...result.github, openPullRequests: 4 };
+        const html = buildReportHtml(opts([result]));
+        assert.ok(html.includes('"openPullRequests":4'));
+    });
+
+    it('should include issues and pullRequests links when repo available', () => {
+        const result = makeResult('http', 80);
+        (result as any).github = { ...result.github, repoUrl: 'https://github.com/dart-lang/http' };
+        const html = buildReportHtml(opts([result]));
+        assert.ok(html.includes('github.com/dart-lang/http/issues'));
+        assert.ok(html.includes('github.com/dart-lang/http/pulls'));
+    });
+
+    it('should set issues and pullRequests links to null when no repo', () => {
+        /* makeResult has repositoryUrl: null and no repoUrl */
+        const html = buildReportHtml(opts([makeResult('http', 80)]));
+        /* links object should contain null for both */
+        assert.ok(html.includes('"issues":null'));
+        assert.ok(html.includes('"pullRequests":null'));
+    });
+});
+
 describe('report: health tooltip (score breakdown)', () => {
     it('should include score breakdown in health cell tooltip', () => {
         const result = makeResult('http', 80);

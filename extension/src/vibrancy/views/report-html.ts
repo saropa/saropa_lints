@@ -130,6 +130,8 @@ function buildReportTable(
             ${th('category', 'Category', 'Vibrancy classification: Vibrant, Stable, Outdated, Abandoned, or End-of-Life')}
             ${th('published', 'Published', 'Date the installed version was published to pub.dev')}
             ${th('stars', 'Stars', 'GitHub repository star count')}
+            ${th('issues', 'Issues', 'Open GitHub issues (excludes pull requests when available)')}
+            ${th('prs', 'PRs', 'Open GitHub pull requests')}
             ${th('size', 'Size', 'Archive size on pub.dev (before tree shaking)')}
             ${thOpt('files', 'Files', 'Number of source files that import this package')}
             ${thOpt('transitives', 'Transitives', 'Number of transitive (indirect) dependencies this package pulls in')}
@@ -157,6 +159,8 @@ function buildRow(
     const name = escapeHtml(r.package.name);
     const date = r.pubDev?.publishedDate.split('T')[0] ?? '';
     const stars = r.github?.stars ?? '';
+    const issueCount = r.github?.trueOpenIssues ?? r.github?.openIssues ?? '';
+    const prCount = r.github?.openPullRequests ?? '';
     const activeFileCount = activeFileUsages(r.fileUsages).length;
     const transitiveCount = r.transitiveInfo?.transitiveCount ?? 0;
     const vulnCount = r.vulnerabilities.length;
@@ -165,6 +169,7 @@ function buildRow(
     return `<tr data-name="${name}" data-version="${escapeHtml(r.package.version)}"
         data-score="${r.score}" data-category="${r.category}"
         data-published="${date}" data-stars="${stars}"
+        data-issues="${issueCount}" data-prs="${prCount}"
         data-size="${r.archiveSizeBytes ?? 0}"
         data-files="${activeFileCount}"
         data-transitives="${transitiveCount}"
@@ -181,6 +186,8 @@ function buildRow(
         <td>${categoryLabel(r.category)}</td>
         <td>${date}</td>
         ${buildStarsCell(r)}
+        ${buildIssuesCell(r)}
+        ${buildPrsCell(r)}
         ${buildSizeCell(r)}
         ${hidden.has('files') ? '' : buildFilesCell(r)}
         ${hidden.has('transitives') ? '' : buildTransitivesCell(r)}
@@ -273,10 +280,36 @@ function buildHealthTooltip(r: VibrancyResult): string {
     return lines.join('\n');
 }
 
+/** Resolve the canonical repository URL (trailing slashes stripped). */
+function resolveRepoUrl(r: VibrancyResult): string | undefined {
+    return (r.github?.repoUrl ?? r.pubDev?.repositoryUrl)
+        ?.replace(/\/+$/, '');
+}
+
 function buildStarsCell(r: VibrancyResult): string {
     const stars = r.github?.stars;
     const text = stars != null ? stars.toLocaleString('en-US') : '';
     return `<td class="cell-right">${text}</td>`;
+}
+
+function buildIssuesCell(r: VibrancyResult): string {
+    const count = r.github?.trueOpenIssues ?? r.github?.openIssues;
+    if (count == null) { return '<td class="cell-right">\u2014</td>'; }
+    const repoUrl = resolveRepoUrl(r);
+    if (repoUrl) {
+        return `<td class="cell-right"><a href="${escapeHtml(repoUrl)}/issues">${count.toLocaleString('en-US')}</a></td>`;
+    }
+    return `<td class="cell-right">${count.toLocaleString('en-US')}</td>`;
+}
+
+function buildPrsCell(r: VibrancyResult): string {
+    const count = r.github?.openPullRequests;
+    if (count == null) { return '<td class="cell-right">\u2014</td>'; }
+    const repoUrl = resolveRepoUrl(r);
+    if (repoUrl) {
+        return `<td class="cell-right"><a href="${escapeHtml(repoUrl)}/pulls">${count.toLocaleString('en-US')}</a></td>`;
+    }
+    return `<td class="cell-right">${count.toLocaleString('en-US')}</td>`;
 }
 
 function buildSizeCell(r: VibrancyResult): string {
@@ -386,6 +419,7 @@ function buildPackageJson(
     const name = r.package.name;
     const encoded = encodeURIComponent(name);
     const activeFiles = activeFileUsages(r.fileUsages);
+    const repoBase = resolveRepoUrl(r) ?? null;
     return {
         name,
         version: r.package.version,
@@ -402,6 +436,8 @@ function buildPackageJson(
         category: categoryLabel(r.category),
         published: r.pubDev?.publishedDate.split('T')[0] ?? null,
         stars: r.github?.stars ?? null,
+        openIssues: r.github?.trueOpenIssues ?? r.github?.openIssues ?? null,
+        openPullRequests: r.github?.openPullRequests ?? null,
         archiveSize: r.archiveSizeBytes !== null
             ? formatSizeKB(r.archiveSizeBytes) : null,
         license: r.license ?? null,
@@ -434,6 +470,8 @@ function buildPackageJson(
             license: `https://pub.dev/packages/${encoded}/license`,
             changelog: `https://pub.dev/packages/${encoded}/changelog`,
             repository: r.pubDev?.repositoryUrl ?? null,
+            issues: repoBase ? `${repoBase}/issues` : null,
+            pullRequests: repoBase ? `${repoBase}/pulls` : null,
         },
     };
 }
