@@ -354,6 +354,8 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   };
 
   void vscode.commands.executeCommand('setContext', 'saropaLints.driftAdvisor.connected', false);
+  // Sync integration toggle button state on startup so toolbar shows correct icon immediately.
+  void vscode.commands.executeCommand('setContext', 'saropaLints.driftAdvisor.integration', vscode.workspace.getConfiguration('saropaLints.driftAdvisor').get<boolean>('integration', false));
 
   let driftAdvisorPollTimer: ReturnType<typeof setInterval> | undefined;
   function scheduleDriftAdvisorPoll(): void {
@@ -396,6 +398,8 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       // Status bars must update when config changes (e.g. tier changed via Settings UI).
       updateAllStatusBars();
       if (e.affectsConfiguration('saropaLints.driftAdvisor')) {
+        // Keep toolbar toggle icon in sync when setting changes via Settings UI.
+        void vscode.commands.executeCommand('setContext', 'saropaLints.driftAdvisor.integration', vscode.workspace.getConfiguration('saropaLints.driftAdvisor').get<boolean>('integration', false));
         void vscode.commands.executeCommand('saropaLints.driftAdvisor.refresh');
         scheduleDriftAdvisorPoll();
       }
@@ -803,6 +807,16 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       } else {
         void vscode.window.showInformationMessage('Drift Advisor is not connected. Click Refresh after starting the server.');
       }
+    }),
+    vscode.commands.registerCommand('saropaLints.driftAdvisor.enableIntegration', async () => {
+      await vscode.workspace.getConfiguration('saropaLints.driftAdvisor').update('integration', true, vscode.ConfigurationTarget.Global);
+      // Update context immediately so the toolbar icon flips without waiting for the config-change event.
+      void vscode.commands.executeCommand('setContext', 'saropaLints.driftAdvisor.integration', true);
+    }),
+    vscode.commands.registerCommand('saropaLints.driftAdvisor.disableIntegration', async () => {
+      await vscode.workspace.getConfiguration('saropaLints.driftAdvisor').update('integration', false, vscode.ConfigurationTarget.Global);
+      // Update context immediately so the toolbar icon flips without waiting for the config-change event.
+      void vscode.commands.executeCommand('setContext', 'saropaLints.driftAdvisor.integration', false);
     }),
     vscode.commands.registerCommand('saropaLints.repairConfig', async () => {
       const success = await runRepairConfig(context);
