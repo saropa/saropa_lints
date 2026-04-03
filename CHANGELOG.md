@@ -5,15 +5,15 @@
 > **Looking for older changes?**
 > See [CHANGELOG_ARCHIVE.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 9.5.1.
 
-**Package** — [pub.dev / packages / saropa_lints](https://pub.dev/packages/saropa_lints)
+**Package** — [pub.dev/packages/saropa_lints](https://pub.dev/packages/saropa_lints)
 
-**Score** — [pub.dev / packages / saropa_lints / score](https://pub.dev/packages/saropa_lints/score)
+**Score** — [pub.dev/packages/saropa_lints/score](https://pub.dev/packages/saropa_lints/score)
 
-**Releases** — [github.com / saropa / saropa_lints / releases](https://github.com/saropa/saropa_lints/releases)
+**Releases** — [github.com/saropa/saropa_lints/releases](https://github.com/saropa/saropa_lints/releases)
 
-**VS Code Marketplace** — [marketplace.visualstudio.com / items ? itemName=saropa.saropa-lints](https://marketplace.visualstudio.com/items?itemName=saropa.saropa-lints)
+**VS Code Marketplace** — [marketplace.visualstudio.com/items?itemName=saropa.saropa-lints](https://marketplace.visualstudio.com/items?itemName=saropa.saropa-lints)
 
-**Open VSX Registry** — [open-vsx.org / extension / saropa / saropa-lints](https://open-vsx.org/extension/saropa/saropa-lints)
+**Open VSX Registry** — [open-vsx.org/extension/saropa/saropa-lints](https://open-vsx.org/extension/saropa/saropa-lints)
 
 <!-- MAINTEANCE NOTES -- IMPORTANT --
 
@@ -38,6 +38,12 @@
 ### Changed
 
 - **Vibrancy Report**: Empty cells now show an em-dash with an explanatory tooltip instead of blank space (stars, published date, issues, PRs, size, license, description, and other optional columns)
+- **Vibrancy Report**: Merged Health column into Category as a dimmed suffix, e.g. "Abandoned (1/10)"
+- **Vibrancy Report**: Package name now opens pubspec.yaml at the dependency entry (was: pub.dev link) and shows description as tooltip
+- **Vibrancy Report**: Published date now links to the pub.dev package page and shows the version age suffix (moved from Version column)
+- **Vibrancy Report**: "Files" column renamed to "References" — click the count to search your workspace for that package's imports
+- **Vibrancy Report**: Update column shows a dimmed en-dash instead of a checkmark when no update is available; all placeholder dashes are now dimmed
+- **Vibrancy Report**: License and Description columns are now hidden by default (Description changed from icon to plain-text column)
 
 ---
 

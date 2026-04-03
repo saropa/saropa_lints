@@ -136,14 +136,32 @@ export function getReportStyles(): string {
             margin-left: 6px; vertical-align: middle;
         }
 
-        /* ---- Description + info icons ---- */
-        .col-icon { width: 28px; text-align: center; padding: 6px 4px; }
-        .desc-icon { cursor: help; opacity: 0.6; }
-        .desc-icon:hover { opacity: 1; }
-        .info-icon {
-            cursor: help; opacity: 0.5; font-size: 0.85em; margin-left: 4px;
+        /* ---- Dimmed placeholder text (dashes, hyphens) ---- */
+        .dimmed { opacity: 0.35; }
+
+        /* ---- Description text column ---- */
+        .desc-text {
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 0.85em;
+            color: var(--vscode-descriptionForeground);
         }
-        .info-icon:hover { opacity: 1; }
+
+        /* ---- Clickable package name (links to pubspec.yaml entry) ---- */
+        .pkg-name-link {
+            cursor: pointer;
+            color: var(--vscode-textLink-foreground);
+        }
+        .pkg-name-link:hover { text-decoration: underline; }
+
+        /* ---- Clickable reference count (links to import search) ---- */
+        .ref-link {
+            cursor: pointer;
+            color: var(--vscode-textLink-foreground);
+        }
+        .ref-link:hover { text-decoration: underline; }
 
         /* ---- Copy-row button ---- */
         .col-copy { width: 28px; padding: 6px 4px; }
