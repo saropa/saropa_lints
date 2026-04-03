@@ -57,8 +57,11 @@ export function activeFileUsages(usages: readonly PackageUsage[]): readonly Pack
 export async function scanDartImportsDetailed(
     workspaceRoot: vscode.Uri,
 ): Promise<PackageUsageMap> {
+    // Scan all standard Dart source directories — web/ and tool/ are
+    // first-class entry points (like bin/) and integration_test/ is the
+    // standard Flutter integration-test directory.
     const pattern = new vscode.RelativePattern(
-        workspaceRoot, '{lib,bin,test}/**/*.dart',
+        workspaceRoot, '{lib,bin,test,web,tool,integration_test}/**/*.dart',
     );
     const files = await vscode.workspace.findFiles(pattern);
     const rootPrefix = workspaceRoot.fsPath.replace(/\\/g, '/');

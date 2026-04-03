@@ -2,12 +2,7 @@
 
 2100+ custom lint rules with 250+ quick fixes for Flutter and Dart — static analysis for security, accessibility, performance, and library-specific patterns. Includes a VS Code extension with Package Vibrancy scoring.
 
-> **Looking for older changes?**
-> See [CHANGELOG_ARCHIVE.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 9.5.1.
-
 **Package** — [pub.dev/packages/saropa_lints](https://pub.dev/packages/saropa_lints)
-
-**Score** — [pub.dev/packages/saropa_lints/score](https://pub.dev/packages/saropa_lints/score)
 
 **Releases** — [github.com/saropa/saropa_lints/releases](https://github.com/saropa/saropa_lints/releases)
 
@@ -29,11 +24,13 @@
 
     **CI** — [github.com / saropa / saropa_lints / actions](https://github.com/saropa/saropa_lints/actions)
 
+    **Score** — [pub.dev/packages/saropa_lints/score](https://pub.dev/packages/saropa_lints/score)
+
 -->
 
 ---
 
-## [Unreleased]
+## [10.8.1]
 
 ### Changed
 
@@ -534,4 +531,5 @@ _Keeping your lints fresh — the extension now detects outdated saropa_lints ve
 
 ## [9.5.1] and Earlier
 
-For versions 0.1.0 through 9.5.1, see [CHANGELOG_ARCHIVE.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG_ARCHIVE.md).
+> **Looking for older changes?**
+> See [CHANGELOG_ARCHIVE.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 9.5.1.
