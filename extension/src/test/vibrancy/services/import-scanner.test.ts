@@ -44,6 +44,17 @@ describe('scanDartImports', () => {
         assert.strictEqual(result.size, 1);
     });
 
+    it('should detect sub-path imports (e.g. html/dom.dart)', async () => {
+        const files = [makeUri('/proj/lib/parser.dart')];
+        (vscode.workspace as any).findFiles = async () => files;
+        (vscode.workspace as any).fs.readFile = async () =>
+            encode("import 'package:html/dom.dart';");
+
+        const result = await scanDartImports(makeUri('/proj'));
+        assert.ok(result.has('html'), 'sub-path import html/dom.dart must detect package html');
+        assert.strictEqual(result.size, 1);
+    });
+
     it('should detect imports with show/hide', async () => {
         const files = [makeUri('/proj/lib/main.dart')];
         (vscode.workspace as any).findFiles = async () => files;
