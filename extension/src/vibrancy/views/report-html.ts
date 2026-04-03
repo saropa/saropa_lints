@@ -109,6 +109,9 @@ function getHiddenColumns(results: VibrancyResult[]): Set<HidableColumn> {
 const HEALTH_TOOLTIP = 'Vibrancy Score (0\u201310): overall package health based on '
     + 'maintainer activity, community engagement, and popularity.';
 
+/** Shared tooltip for cells that require GitHub data (stars, issues, PRs). */
+const NO_GITHUB_TOOLTIP = 'No GitHub repository found';
+
 function buildReportTable(
     results: VibrancyResult[],
     overrideNames: ReadonlySet<string>,
@@ -184,7 +187,7 @@ function buildRow(
         ${buildVersionCell(r)}
         ${buildHealthCell(r)}
         <td>${categoryLabel(r.category)}</td>
-        <td>${date}</td>
+        <td${date ? '' : ' title="Publish date not available from pub.dev"'}>${date || '\u2014'}</td>
         ${buildStarsCell(r)}
         ${buildIssuesCell(r)}
         ${buildPrsCell(r)}
@@ -288,13 +291,15 @@ function resolveRepoUrl(r: VibrancyResult): string | undefined {
 
 function buildStarsCell(r: VibrancyResult): string {
     const stars = r.github?.stars;
-    const text = stars != null ? stars.toLocaleString('en-US') : '';
-    return `<td class="cell-right">${text}</td>`;
+    if (stars == null) {
+        return `<td class="cell-right" title="${NO_GITHUB_TOOLTIP}">\u2014</td>`;
+    }
+    return `<td class="cell-right">${stars.toLocaleString('en-US')}</td>`;
 }
 
 function buildIssuesCell(r: VibrancyResult): string {
     const count = r.github?.trueOpenIssues ?? r.github?.openIssues;
-    if (count == null) { return '<td class="cell-right">\u2014</td>'; }
+    if (count == null) { return `<td class="cell-right" title="${NO_GITHUB_TOOLTIP}">\u2014</td>`; }
     const repoUrl = resolveRepoUrl(r);
     if (repoUrl) {
         return `<td class="cell-right"><a href="${escapeHtml(repoUrl)}/issues">${count.toLocaleString('en-US')}</a></td>`;
@@ -304,7 +309,7 @@ function buildIssuesCell(r: VibrancyResult): string {
 
 function buildPrsCell(r: VibrancyResult): string {
     const count = r.github?.openPullRequests;
-    if (count == null) { return '<td class="cell-right">\u2014</td>'; }
+    if (count == null) { return `<td class="cell-right" title="${NO_GITHUB_TOOLTIP}">\u2014</td>`; }
     const repoUrl = resolveRepoUrl(r);
     if (repoUrl) {
         return `<td class="cell-right"><a href="${escapeHtml(repoUrl)}/pulls">${count.toLocaleString('en-US')}</a></td>`;
@@ -313,15 +318,16 @@ function buildPrsCell(r: VibrancyResult): string {
 }
 
 function buildSizeCell(r: VibrancyResult): string {
-    const text = r.archiveSizeBytes !== null
-        ? formatSizeKB(r.archiveSizeBytes) : '\u2014';
-    return `<td class="cell-right">${text}</td>`;
+    if (r.archiveSizeBytes === null) {
+        return '<td class="cell-right" title="Archive size not available from pub.dev">\u2014</td>';
+    }
+    return `<td class="cell-right">${formatSizeKB(r.archiveSizeBytes)}</td>`;
 }
 
 function buildFilesCell(r: VibrancyResult): string {
     const active = activeFileUsages(r.fileUsages);
     const count = active.length;
-    if (count === 0) { return '<td class="cell-right">\u2014</td>'; }
+    if (count === 0) { return '<td class="cell-right" title="No source file imports detected">\u2014</td>'; }
     // Single-use = muted; 6+ = bold (deeply embedded)
     const cls = count === 1 ? ' class="cell-right file-single"'
         : count >= 6 ? ' class="cell-right file-deep"'
@@ -334,8 +340,8 @@ function buildTransitivesCell(r: VibrancyResult): string {
     const count = r.transitiveInfo?.transitiveCount ?? 0;
     const flagged = r.transitiveInfo?.flaggedCount ?? 0;
     let text: string;
-    if (count === 0) { text = '\u2014'; }
-    else if (flagged > 0) { text = `${count} (${flagged}\u26A0)`; }
+    if (count === 0) { return '<td title="No transitive dependencies">\u2014</td>'; }
+    if (flagged > 0) { text = `${count} (${flagged}\u26A0)`; }
     else { text = `${count}`; }
     const cls = flagged > 0 ? ' class="transitive-flagged"' : '';
     return `<td${cls}>${text}</td>`;
@@ -344,7 +350,7 @@ function buildTransitivesCell(r: VibrancyResult): string {
 function buildVulnsCell(r: VibrancyResult): string {
     const count = r.vulnerabilities.length;
     const worst = worstSeverity(r.vulnerabilities);
-    if (count === 0) { return '<td>\u2014</td>'; }
+    if (count === 0) { return '<td title="No known vulnerabilities">\u2014</td>'; }
     const emoji = worst ? severityEmoji(worst) : '';
     const label = worst ? severityLabel(worst) : '';
     const cls = worst ? ` class="vuln-${worst}"` : '';
@@ -353,7 +359,7 @@ function buildVulnsCell(r: VibrancyResult): string {
 
 function buildLicenseCell(r: VibrancyResult): string {
     const license = r.license;
-    if (!license) { return '<td>\u2014</td>'; }
+    if (!license) { return '<td title="License not specified on pub.dev">\u2014</td>'; }
     const name = encodeURIComponent(r.package.name);
     const url = `https://pub.dev/packages/${name}/license`;
     return `<td><a href="${url}">${escapeHtml(license)}</a></td>`;
@@ -383,12 +389,12 @@ function buildStatusCell(r: VibrancyResult): string {
     if (r.isUnused) {
         return '<td><span class="badge-unused">Unused</span></td>';
     }
-    return '<td>\u2014</td>';
+    return '<td title="Package is in use">\u2014</td>';
 }
 
 function buildDescCell(r: VibrancyResult): string {
     const desc = r.pubDev?.description;
-    if (!desc) { return '<td class="col-icon"></td>'; }
+    if (!desc) { return '<td class="col-icon" title="No description available on pub.dev">\u2014</td>'; }
     return `<td class="col-icon"><span class="desc-icon" title="${escapeHtml(desc)}">&#8505;</span></td>`;
 }
 
