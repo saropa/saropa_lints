@@ -617,3 +617,80 @@ describe('report: health tooltip (score breakdown)', () => {
     });
 
 });
+
+describe('report: empty-cell dash with explanatory tooltip', () => {
+    /** Extract the <td> cells from the first <tr> row in the HTML table body. */
+    function rowCells(html: string): string[] {
+        const rowMatch = html.match(/<tbody[^>]*>([\s\S]*?)<\/tbody>/);
+        if (!rowMatch) { return []; }
+        const firstRow = rowMatch[1].match(/<tr[\s\S]*?<\/tr>/);
+        if (!firstRow) { return []; }
+        return [...firstRow[0].matchAll(/<td[^>]*>[\s\S]*?<\/td>/g)].map(m => m[0]);
+    }
+
+    it('should show dash with tooltip when stars are unavailable', () => {
+        const result = { ...makeResult('http', 80), github: null };
+        const html = buildReportHtml(opts([result]));
+        const cells = rowCells(html);
+        const starsCell = cells.find(c => c.includes('\u2014') && c.includes('No GitHub repository found'));
+        assert.ok(starsCell, 'expected a cell with em-dash and GitHub tooltip for missing stars');
+    });
+
+    it('should show dash with tooltip when published date is unavailable', () => {
+        const result = { ...makeResult('http', 80), pubDev: null };
+        const html = buildReportHtml(opts([result]));
+        assert.ok(
+            html.includes('title="Publish date not available from pub.dev"'),
+            'expected tooltip explaining missing publish date',
+        );
+        assert.ok(html.includes('>\u2014<'), 'expected em-dash for missing date');
+    });
+
+    it('should show dash with tooltip when issues count is unavailable', () => {
+        const result = { ...makeResult('http', 80), github: null };
+        const html = buildReportHtml(opts([result]));
+        /* The issues cell should contain an em-dash with a GitHub tooltip */
+        const cells = rowCells(html);
+        const issueCells = cells.filter(c => c.includes('No GitHub repository found'));
+        /* stars, issues, and PRs all show this tooltip when github is null */
+        assert.ok(issueCells.length >= 3, 'expected at least 3 cells with GitHub tooltip (stars, issues, PRs)');
+    });
+
+    it('should show dash with tooltip when archive size is unavailable', () => {
+        /* makeResult defaults to archiveSizeBytes: null */
+        const html = buildReportHtml(opts([makeResult('http', 80)]));
+        assert.ok(html.includes('title="Archive size not available from pub.dev"'));
+    });
+
+    it('should show dash with tooltip when license is unavailable', () => {
+        /* makeResult defaults to license: null */
+        const html = buildReportHtml(opts([makeResult('http', 80)]));
+        assert.ok(html.includes('title="License not specified on pub.dev"'));
+    });
+
+    it('should show dash with tooltip when description is unavailable', () => {
+        /* makeResult defaults to description: null */
+        const html = buildReportHtml(opts([makeResult('http', 80)]));
+        assert.ok(html.includes('title="No description available on pub.dev"'));
+    });
+
+    it('should NOT show dash tooltip when stars are available', () => {
+        /* makeResult has github.stars: 42 */
+        const html = buildReportHtml(opts([makeResult('http', 80)]));
+        /* The stars cell should show the number, not a tooltip about missing data */
+        assert.ok(html.includes('>42<'), 'expected star count rendered');
+        /* "No GitHub repository found" should not appear for the stars cell */
+        const cells = rowCells(html);
+        const starsCellWithTooltip = cells.find(
+            c => c.includes('42') && c.includes('No GitHub repository found'),
+        );
+        assert.ok(!starsCellWithTooltip, 'star cell with data should not have missing-data tooltip');
+    });
+
+    it('should NOT show dash tooltip when license is available', () => {
+        const result = { ...makeResult('http', 80), license: 'MIT' };
+        const html = buildReportHtml(opts([result]));
+        assert.ok(!html.includes('License not specified on pub.dev'));
+        assert.ok(html.includes('>MIT<'));
+    });
+});

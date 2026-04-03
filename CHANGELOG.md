@@ -33,6 +33,14 @@
 
 ---
 
+## [Unreleased]
+
+### Changed
+
+- **Vibrancy Report**: Empty cells now show an em-dash with an explanatory tooltip instead of blank space (stars, published date, issues, PRs, size, license, description, and other optional columns)
+
+---
+
 ## [10.8.0]
 
 ### Added
