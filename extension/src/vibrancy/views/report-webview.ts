@@ -50,7 +50,9 @@ export class VibrancyReportPanel {
         this._panel.webview.html = buildReportHtml(options);
     }
 
-    private async _handleMessage(msg: { type: string }): Promise<void> {
+    private async _handleMessage(
+        msg: { type: string; package?: string },
+    ): Promise<void> {
         if (msg.type === 'openPubspec' && this._pubspecUri) {
             try {
                 const uri = vscode.Uri.parse(this._pubspecUri);
@@ -60,6 +62,36 @@ export class VibrancyReportPanel {
                 /* File may have been moved or workspace closed since render. */
                 vscode.window.showErrorMessage('Could not open pubspec.yaml.');
             }
+        }
+
+        else if (msg.type === 'openPubspecEntry' && this._pubspecUri && msg.package) {
+            try {
+                const uri = vscode.Uri.parse(this._pubspecUri);
+                const doc = await vscode.workspace.openTextDocument(uri);
+                const editor = await vscode.window.showTextDocument(doc);
+                /* Jump to the line containing the package name. */
+                const text = doc.getText();
+                const idx = text.indexOf(`${msg.package}:`);
+                if (idx >= 0) {
+                    const pos = doc.positionAt(idx);
+                    editor.selection = new vscode.Selection(pos, pos);
+                    editor.revealRange(
+                        new vscode.Range(pos, pos),
+                        vscode.TextEditorRevealType.InCenter,
+                    );
+                }
+            } catch {
+                vscode.window.showErrorMessage('Could not open pubspec.yaml.');
+            }
+        }
+
+        else if (msg.type === 'searchImport' && msg.package) {
+            /* Open "Find in Files" pre-filled with the package import pattern. */
+            await vscode.commands.executeCommand('workbench.action.findInFiles', {
+                query: `package:${msg.package}/`,
+                isRegex: false,
+                triggerSearch: true,
+            });
         }
     }
 

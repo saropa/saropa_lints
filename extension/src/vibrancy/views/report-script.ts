@@ -192,5 +192,21 @@ export function getReportScript(): string {
                 vscode.postMessage({ type: 'openPubspec' });
             });
         }
+
+        /* ---- Package name click -> open pubspec.yaml at entry ---- */
+
+        document.querySelectorAll('.pkg-name-link').forEach(function(el) {
+            el.addEventListener('click', function() {
+                vscode.postMessage({ type: 'openPubspecEntry', package: el.dataset.pkg });
+            });
+        });
+
+        /* ---- References click -> search for package imports ---- */
+
+        document.querySelectorAll('.ref-link').forEach(function(el) {
+            el.addEventListener('click', function() {
+                vscode.postMessage({ type: 'searchImport', package: el.dataset.pkg });
+            });
+        });
     `;
 }

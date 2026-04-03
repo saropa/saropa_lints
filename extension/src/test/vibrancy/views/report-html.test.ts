@@ -127,19 +127,25 @@ describe('buildReportHtml', () => {
     });
 });
 
-describe('report: Health column', () => {
-    it('should show score', () => {
+describe('report: Category column with health suffix', () => {
+    it('should show score as dimmed suffix on category', () => {
         const result = makeResult('http', 80);
         const html = buildReportHtml(opts([result]));
-        /* 80/100 → 8/10 */
+        /* 80/100 → 8/10, shown as dimmed suffix after category label */
         assert.ok(html.includes('8/10'));
+        assert.ok(html.includes('class="dimmed"'));
     });
 
-    it('should include Health header with info tooltip', () => {
-        const html = buildReportHtml(opts([]));
-        assert.ok(html.includes('Health'));
-        assert.ok(html.includes('class="info-icon"'));
+    it('should include health tooltip on category cell', () => {
+        const result = makeResult('http', 80);
+        const html = buildReportHtml(opts([result]));
         assert.ok(html.includes('Vibrancy Score'));
+    });
+
+    it('should use score data-col for sorting', () => {
+        const html = buildReportHtml(opts([]));
+        /* Category header sorts by score, not by category string */
+        assert.ok(html.includes('data-col="score"'));
     });
 });
 
@@ -149,11 +155,11 @@ describe('report: column links', () => {
         assert.ok(html.includes('pub.dev/packages/http/versions'));
     });
 
-    it('should link license to pub.dev/license', () => {
+    it('should include license link in copy-as-JSON data', () => {
+        /* License column is hidden by default, but JSON data always includes it */
         const result = { ...makeResult('http', 80), license: 'MIT' };
         const html = buildReportHtml(opts([result]));
         assert.ok(html.includes('pub.dev/packages/http/license'));
-        assert.ok(html.includes('>MIT<'));
     });
 
     it('should link update to pub.dev/changelog', () => {
@@ -305,7 +311,7 @@ describe('report: override filter data attribute', () => {
 describe('report: column heading tooltips', () => {
     it('should include tooltip on Package column header', () => {
         const html = buildReportHtml(opts([]));
-        assert.ok(html.includes('title="Package name on pub.dev"'));
+        assert.ok(html.includes('click to open pubspec.yaml entry'));
     });
 
     it('should include tooltip on Published column header', () => {
@@ -318,9 +324,10 @@ describe('report: column heading tooltips', () => {
         assert.ok(html.includes('title="Archive size on pub.dev (before tree shaking)"'));
     });
 
-    it('should include tooltip on description icon column header', () => {
+    it('should hide description column header by default', () => {
+        /* Description column is off by default — header should not be rendered */
         const html = buildReportHtml(opts([]));
-        assert.ok(html.includes('title="Package description from pub.dev"'));
+        assert.ok(!html.includes('data-col="description"'));
     });
 });
 
@@ -345,22 +352,34 @@ describe('report: toolbar', () => {
     });
 });
 
-describe('report: description icon', () => {
-    it('should show info icon when description exists', () => {
+describe('report: description on package name', () => {
+    it('should show description as tooltip on package name', () => {
         const result = makeResult('http', 80);
         (result as { pubDev: any }).pubDev = {
             ...result.pubDev,
             description: 'A composable HTTP client',
         };
         const html = buildReportHtml(opts([result]));
-        assert.ok(html.includes('desc-icon'));
+        /* Description appears as title attribute on pkg-name-link span */
+        assert.ok(html.includes('pkg-name-link'));
         assert.ok(html.includes('A composable HTTP client'));
     });
 
-    it('should show empty cell when no description', () => {
+    it('should not show description tooltip when no description', () => {
         const html = buildReportHtml(opts([makeResult('http', 80)]));
-        /* Should have col-icon td but no desc-icon span */
-        assert.ok(html.includes('col-icon'));
+        /* Package name still renders as clickable link */
+        assert.ok(html.includes('pkg-name-link'));
+    });
+
+    it('should hide description text column by default', () => {
+        /* Description column is off by default — no desc-text cells rendered */
+        const result = makeResult('http', 80);
+        (result as { pubDev: any }).pubDev = {
+            ...result.pubDev,
+            description: 'A composable HTTP client',
+        };
+        const html = buildReportHtml(opts([result]));
+        assert.ok(!html.includes('class="desc-text"'));
     });
 });
 
@@ -662,16 +681,16 @@ describe('report: empty-cell dash with explanatory tooltip', () => {
         assert.ok(html.includes('title="Archive size not available from pub.dev"'));
     });
 
-    it('should show dash with tooltip when license is unavailable', () => {
-        /* makeResult defaults to license: null */
+    it('should hide license column by default (no license cell rendered)', () => {
+        /* License column is off by default — tooltip should not appear */
         const html = buildReportHtml(opts([makeResult('http', 80)]));
-        assert.ok(html.includes('title="License not specified on pub.dev"'));
+        assert.ok(!html.includes('title="License not specified on pub.dev"'));
     });
 
-    it('should show dash with tooltip when description is unavailable', () => {
-        /* makeResult defaults to description: null */
+    it('should hide description column by default (no description cell rendered)', () => {
+        /* Description column is off by default — no desc-text cells rendered */
         const html = buildReportHtml(opts([makeResult('http', 80)]));
-        assert.ok(html.includes('title="No description available on pub.dev"'));
+        assert.ok(!html.includes('class="desc-text"'));
     });
 
     it('should NOT show dash tooltip when stars are available', () => {
@@ -687,10 +706,105 @@ describe('report: empty-cell dash with explanatory tooltip', () => {
         assert.ok(!starsCellWithTooltip, 'star cell with data should not have missing-data tooltip');
     });
 
-    it('should NOT show dash tooltip when license is available', () => {
+    it('should not render license cell when license column is hidden', () => {
+        /* License column is hidden by default — no MIT cell rendered */
         const result = { ...makeResult('http', 80), license: 'MIT' };
         const html = buildReportHtml(opts([result]));
         assert.ok(!html.includes('License not specified on pub.dev'));
-        assert.ok(html.includes('>MIT<'));
+        /* MIT value should still appear in copy-as-JSON data */
+        assert.ok(html.includes('"license":"MIT"'));
+    });
+
+    it('should wrap all placeholder dashes in dimmed span', () => {
+        /* A result with null github produces dimmed dashes for stars/issues/PRs */
+        const result = { ...makeResult('http', 80), github: null };
+        const html = buildReportHtml(opts([result]));
+        assert.ok(html.includes('class="dimmed"'));
+        /* Dashes should be inside dimmed spans, not bare */
+        assert.ok(html.includes('<span class="dimmed">\u2014</span>'));
+    });
+});
+
+describe('report: published column links to pub.dev', () => {
+    it('should link published date to pub.dev package page', () => {
+        const html = buildReportHtml(opts([makeResult('http', 80)]));
+        /* Published cell should contain a link to pub.dev/packages/http */
+        assert.ok(html.includes('href="https://pub.dev/packages/http"'));
+        assert.ok(html.includes('2025-06-01'));
+    });
+
+    it('should show age suffix on published column (moved from version)', () => {
+        const html = buildReportHtml(opts([makeResult('http', 80)]));
+        /* makeResult has publishedDate 2025-06-01 — age suffix should be on published cell */
+        assert.ok(html.includes('version-age'));
+    });
+
+    it('should show dimmed dash when no publish date', () => {
+        const result = { ...makeResult('http', 80), pubDev: null };
+        const html = buildReportHtml(opts([result]));
+        assert.ok(html.includes('Publish date not available from pub.dev'));
+    });
+});
+
+describe('report: package name links to pubspec entry', () => {
+    it('should render package name as clickable span (not <a>)', () => {
+        const html = buildReportHtml(opts([makeResult('http', 80)]));
+        assert.ok(html.includes('class="pkg-name-link"'));
+        assert.ok(html.includes('data-pkg="http"'));
+    });
+
+    it('should include postMessage handler for pkg-name-link', () => {
+        const html = buildReportHtml(opts([makeResult('http', 80)]));
+        assert.ok(html.includes('openPubspecEntry'));
+    });
+});
+
+describe('report: references column (renamed from files)', () => {
+    it('should use References header label', () => {
+        const result = {
+            ...makeResult('http', 80),
+            fileUsages: [{ filePath: 'lib/main.dart', line: 1, isCommented: false }],
+        };
+        const html = buildReportHtml(opts([result]));
+        assert.ok(html.includes('>References<'));
+    });
+
+    it('should render reference count as clickable span', () => {
+        const result = {
+            ...makeResult('http', 80),
+            fileUsages: [{ filePath: 'lib/main.dart', line: 1, isCommented: false }],
+        };
+        const html = buildReportHtml(opts([result]));
+        assert.ok(html.includes('class="ref-link"'));
+        assert.ok(html.includes('data-pkg="http"'));
+    });
+
+    it('should include postMessage handler for ref-link', () => {
+        const result = {
+            ...makeResult('http', 80),
+            fileUsages: [{ filePath: 'lib/main.dart', line: 1, isCommented: false }],
+        };
+        const html = buildReportHtml(opts([result]));
+        assert.ok(html.includes('searchImport'));
+    });
+});
+
+describe('report: update column uses dimmed hyphen', () => {
+    it('should show dimmed en-dash when no update available', () => {
+        /* makeResult has updateInfo: null (up-to-date) */
+        const html = buildReportHtml(opts([makeResult('http', 80)]));
+        /* En-dash U+2013, not checkmark U+2713 */
+        assert.ok(html.includes('\u2013'));
+        assert.ok(!html.includes('\u2713'));
+    });
+
+    it('should show update arrow when update available', () => {
+        const result = {
+            ...makeResult('http', 80),
+            updateInfo: { currentVersion: '1.0.0', latestVersion: '2.0.0', updateStatus: 'major' as const, changelog: null },
+        };
+        const html = buildReportHtml(opts([result]));
+        assert.ok(html.includes('update-major'));
+        assert.ok(html.includes('\u2192'));
     });
 });
