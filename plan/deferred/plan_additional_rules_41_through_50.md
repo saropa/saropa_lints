@@ -1,13 +1,42 @@
-# Plan: Additional rules 41–50 (ROADMAP)
+# Plan: Additional rules 41–50 (DEFERRED)
 
 **Source:** [ROADMAP.md — Additional rules](../../ROADMAP.md#additional-rules). Ordered by developer usefulness.  
 **Legend:** 🟢 L / 🟡 M / 🔴 H effort · ★ / ★★ / ★★★ wow
 
-Register each rule in `all_rules.dart` and `tiers.dart`; add ROADMAP entry and fixture only after the rule is implemented and the BAD example triggers the lint.
+---
+
+## ⛔ Deferred — All 10 rules duplicate built-in Dart analyzer diagnostics
+
+**Decision:** Deferred indefinitely (2026-04-04).
+
+**Reason:** Every rule in this batch is already a built-in `dart analyze` diagnostic. Reimplementing them as custom lint rules would:
+
+1. **Duplicate existing functionality** — users already get these diagnostics from `dart analyze` for free.
+2. **Produce inferior results** — several require full control flow analysis (`body_might_complete_normally`) or deep type resolution (`argument_type_not_assignable_to_error_handler`) that `custom_lint` doesn't expose the way the compiler does. Implementations would be incomplete approximations.
+3. **Risk false positives/negatives** — without compiler-level flow and type analysis, rules would either miss cases or flag valid code.
+4. **Add maintenance burden** — every Dart language change could break these approximations.
+5. **High effort, low value** — all 10 are rated 🔴 High effort and ★ low wow.
+
+| Rule | Built-in? | Notes |
+|------|-----------|-------|
+| `argument_type_not_assignable_to_error_handler` | Yes — analyzer error | Requires deep type resolution |
+| `body_might_complete_normally` | Yes — analyzer error | Requires full control flow analysis |
+| `const_map_key_not_primitive_equality` | Yes — analyzer error | Requires type hierarchy inspection |
+| `dead_null_aware_expression` | Yes — analyzer hint | Requires nullability flow analysis |
+| `duplicate_pattern_field` | Yes — analyzer error | Pattern AST node inspection |
+| `implicit_super_initializer_missing_arguments` | Yes — analyzer error | Requires constructor resolution |
+| `inconsistent_pattern_variable_logical_or` | Yes — analyzer error | Requires cross-branch type comparison |
+| `invalid_annotation` | Yes — analyzer error | Requires const resolution |
+| `invalid_null_aware_operator` | Yes — analyzer hint | Requires nullability analysis |
+| `invalid_pattern_variable_in_shared_case_scope` | Yes — analyzer error | Requires scope tracking across cases |
+
+**Recommendation:** Spend effort on rules that provide value the analyzer doesn't already give — domain-specific patterns, framework-specific checks, accessibility, or project conventions.
 
 ---
 
-## 1. argument_type_not_assignable_to_error_handler
+## Original plan (preserved for reference)
+
+### 1. argument_type_not_assignable_to_error_handler
 
 | **Kind** | BUG | **Severity** | MINOR | **Effort** | 🔴 H | **Wow** | ★ |
 
@@ -19,19 +48,19 @@ Register each rule in `all_rules.dart` and `tiers.dart`; add ROADMAP entry and f
 
 ---
 
-## 2. body_might_complete_normally
+### 2. body_might_complete_normally
 
 | **Kind** | BUG | **Severity** | MINOR | **Effort** | 🔴 H | **Wow** | ★ |
 
 **Summary:** Method/function with non-nullable return type can complete without returning a value (implicit null).
 
 **Target file:** `lib/src/rules/flow/control_flow_rules.dart`  
-**Approach:** For functions with non-nullable return type, analyze control flow; report if a path exists that doesn’t return. Requires flow analysis.  
+**Approach:** For functions with non-nullable return type, analyze control flow; report if a path exists that doesn't return. Requires flow analysis.  
 **Acceptance criteria:** Missing return on path reported. Register, tier, ROADMAP, fixture, test. **Quick fix:** Optional.
 
 ---
 
-## 3. const_map_key_not_primitive_equality
+### 3. const_map_key_not_primitive_equality
 
 | **Kind** | BUG | **Severity** | MINOR | **Effort** | 🔴 H | **Wow** | ★ |
 
@@ -43,7 +72,7 @@ Register each rule in `all_rules.dart` and `tiers.dart`; add ROADMAP entry and f
 
 ---
 
-## 4. dead_null_aware_expression
+### 4. dead_null_aware_expression
 
 | **Kind** | BUG | **Severity** | MINOR | **Effort** | 🔴 H | **Wow** | ★ |
 
@@ -55,7 +84,7 @@ Register each rule in `all_rules.dart` and `tiers.dart`; add ROADMAP entry and f
 
 ---
 
-## 5. duplicate_pattern_field
+### 5. duplicate_pattern_field
 
 | **Kind** | BUG | **Severity** | MINOR | **Effort** | 🔴 H | **Wow** | ★ |
 
@@ -67,7 +96,7 @@ Register each rule in `all_rules.dart` and `tiers.dart`; add ROADMAP entry and f
 
 ---
 
-## 6. implicit_super_initializer_missing_arguments
+### 6. implicit_super_initializer_missing_arguments
 
 | **Kind** | BUG | **Severity** | MINOR | **Effort** | 🔴 H | **Wow** | ★ |
 
@@ -79,7 +108,7 @@ Register each rule in `all_rules.dart` and `tiers.dart`; add ROADMAP entry and f
 
 ---
 
-## 7. inconsistent_pattern_variable_logical_or
+### 7. inconsistent_pattern_variable_logical_or
 
 | **Kind** | BUG | **Severity** | MINOR | **Effort** | 🔴 H | **Wow** | ★ |
 
@@ -91,7 +120,7 @@ Register each rule in `all_rules.dart` and `tiers.dart`; add ROADMAP entry and f
 
 ---
 
-## 8. invalid_annotation
+### 8. invalid_annotation
 
 | **Kind** | BUG | **Severity** | MINOR | **Effort** | 🔴 H | **Wow** | ★ |
 
@@ -103,7 +132,7 @@ Register each rule in `all_rules.dart` and `tiers.dart`; add ROADMAP entry and f
 
 ---
 
-## 9. invalid_null_aware_operator
+### 9. invalid_null_aware_operator
 
 | **Kind** | BUG | **Severity** | MINOR | **Effort** | 🔴 H | **Wow** | ★ |
 
@@ -115,7 +144,7 @@ Register each rule in `all_rules.dart` and `tiers.dart`; add ROADMAP entry and f
 
 ---
 
-## 10. invalid_pattern_variable_in_shared_case_scope
+### 10. invalid_pattern_variable_in_shared_case_scope
 
 | **Kind** | BUG | **Severity** | MINOR | **Effort** | 🔴 H | **Wow** | ★ |
 
@@ -127,12 +156,6 @@ Register each rule in `all_rules.dart` and `tiers.dart`; add ROADMAP entry and f
 
 ---
 
-## Implementation order (suggested)
-
-1. invalid_annotation · 2. dead_null_aware_expression · 3. invalid_null_aware_operator · 4. argument_type_not_assignable_to_error_handler · 5. const_map_key_not_primitive_equality · 6. duplicate_pattern_field · 7. implicit_super_initializer_missing_arguments · 8. inconsistent_pattern_variable_logical_or · 9. invalid_pattern_variable_in_shared_case_scope · 10. body_might_complete_normally
-
----
-
 ## Checklist per rule
 
-- [ ] Rule in correct `*_rules.dart`; registered in `all_rules.dart`; tier in `tiers.dart`; ROADMAP entry; fixture when BAD triggers; unit test; `/analyze`, `/test`, `/format`; no `// ignore:` fix.
+- [ ] ~~Rule in correct `*_rules.dart`; registered in `all_rules.dart`; tier in `tiers.dart`; ROADMAP entry; fixture when BAD triggers; unit test; `/analyze`, `/test`, `/format`; no `// ignore:` fix.~~ N/A — all deferred.

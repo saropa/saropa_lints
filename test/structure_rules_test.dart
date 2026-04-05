@@ -488,8 +488,7 @@ void main() {
         );
       });
 
-      test('fixture includes const top-level variables (should NOT trigger)',
-          () {
+      test('fixture includes const top-level variables (should NOT trigger)', () {
         final file = File(
           'example_core/lib/structure/avoid_global_state_fixture.dart',
         );
@@ -516,8 +515,7 @@ void main() {
         }
       });
 
-      test('fixture includes final top-level variables (should NOT trigger)',
-          () {
+      test('fixture includes final top-level variables (should NOT trigger)', () {
         final file = File(
           'example_core/lib/structure/avoid_global_state_fixture.dart',
         );
