@@ -3,7 +3,7 @@
 **Rule**: `avoid_global_state`
 **Severity**: False positive (suspected)
 **Date**: 2026-03-25
-**Status**: Needs reproduction
+**Status**: Resolved (2026-04-04) — guard logic confirmed correct; added comprehensive test coverage; reporter node changed to TopLevelVariableDeclaration to prevent offset issues
 **Related**: [BUG_avoid_global_state_static_class_fields.md](BUG_avoid_global_state_static_class_fields.md)
 
 ## Summary

@@ -467,10 +467,12 @@ class AvoidGlobalStateRule extends SaropaLintRule {
           // Skip const and final declarations
           if (variables.isConst || variables.isFinal) continue;
 
-          // This is a mutable top-level variable
-          for (final VariableDeclaration variable in variables.variables) {
-            reporter.atNode(variable);
-          }
+          // Report at the TopLevelVariableDeclaration level (not the
+          // child VariableDeclaration) so the AnnotatedNode offset
+          // adjustment in SaropaDiagnosticReporter correctly skips
+          // any preceding doc comments. Reporting at VariableDeclaration
+          // could produce wrong line numbers when doc comments are present.
+          reporter.atNode(declaration);
         }
       }
     });
