@@ -140,10 +140,9 @@ class _PreferIterableCastFix extends SaropaFixProducer {
     final node = coveringNode;
     if (node == null) return;
 
-    final invocation =
-        node is MethodInvocation
-            ? node
-            : node.thisOrAncestorOfType<MethodInvocation>();
+    final invocation = node is MethodInvocation
+        ? node
+        : node.thisOrAncestorOfType<MethodInvocation>();
     if (invocation == null) return;
     if (invocation.methodName.name != 'castFrom') return;
 
@@ -154,13 +153,11 @@ class _PreferIterableCastFix extends SaropaFixProducer {
 
     // Extract the target type argument (the second type argument, T in castFrom<S, T>)
     final typeArgs = invocation.typeArguments?.arguments;
-    final targetType =
-        (typeArgs != null && typeArgs.length >= 2)
-            ? typeArgs[1].toSource()
-            : null;
+    final targetType = (typeArgs != null && typeArgs.length >= 2)
+        ? typeArgs[1].toSource()
+        : null;
 
-    final castSuffix =
-        targetType != null ? '.cast<$targetType>()' : '.cast()';
+    final castSuffix = targetType != null ? '.cast<$targetType>()' : '.cast()';
     final sourceText = sourceArg.toSource();
 
     // Wrap in parentheses if the source is a complex expression
@@ -171,8 +168,9 @@ class _PreferIterableCastFix extends SaropaFixProducer {
         sourceArg is CascadeExpression ||
         sourceArg is AsExpression ||
         sourceArg is IsExpression;
-    final replacement =
-        needsParens ? '($sourceText)$castSuffix' : '$sourceText$castSuffix';
+    final replacement = needsParens
+        ? '($sourceText)$castSuffix'
+        : '$sourceText$castSuffix';
 
     await builder.addDartFileEdit(file, (b) {
       b.addSimpleReplacement(
@@ -232,8 +230,7 @@ class AvoidDeprecatedUseInheritedMediaQueryRule extends SaropaLintRule {
   bool get requiresFlutterImport => true;
 
   @override
-  Set<String>? get requiredPatterns =>
-      const <String>{'useInheritedMediaQuery'};
+  Set<String>? get requiredPatterns => const <String>{'useInheritedMediaQuery'};
 
   static const LintCode _code = LintCode(
     'avoid_deprecated_use_inherited_media_query',
@@ -251,11 +248,7 @@ class AvoidDeprecatedUseInheritedMediaQueryRule extends SaropaLintRule {
   );
 
   /// Widget classes that accepted the deprecated parameter.
-  static const _targetWidgets = {
-    'MaterialApp',
-    'CupertinoApp',
-    'WidgetsApp',
-  };
+  static const _targetWidgets = {'MaterialApp', 'CupertinoApp', 'WidgetsApp'};
 
   @override
   void runWithReporter(
@@ -304,10 +297,9 @@ class _RemoveUseInheritedMediaQueryFix extends SaropaFixProducer {
     if (node == null) return;
 
     // Walk up to the NamedExpression
-    final named =
-        node is NamedExpression
-            ? node
-            : node.thisOrAncestorOfType<NamedExpression>();
+    final named = node is NamedExpression
+        ? node
+        : node.thisOrAncestorOfType<NamedExpression>();
     if (named == null) return;
     if (named.name.label.name != 'useInheritedMediaQuery') return;
 
@@ -439,10 +431,9 @@ class _PreferUtf8EncodeFix extends SaropaFixProducer {
     final node = coveringNode;
     if (node == null) return;
 
-    final invocation =
-        node is MethodInvocation
-            ? node
-            : node.thisOrAncestorOfType<MethodInvocation>();
+    final invocation = node is MethodInvocation
+        ? node
+        : node.thisOrAncestorOfType<MethodInvocation>();
     if (invocation == null) return;
     if (invocation.methodName.name != 'convert') return;
 
@@ -514,8 +505,7 @@ class AvoidRemovedAppbarBackwardsCompatibilityRule extends SaropaLintRule {
   bool get requiresFlutterImport => true;
 
   @override
-  Set<String>? get requiredPatterns =>
-      const <String>{'backwardsCompatibility'};
+  Set<String>? get requiredPatterns => const <String>{'backwardsCompatibility'};
 
   static const LintCode _code = LintCode(
     'avoid_removed_appbar_backwards_compatibility',
@@ -579,10 +569,9 @@ class _RemoveAppbarBackwardsCompatibilityFix extends SaropaFixProducer {
     final node = coveringNode;
     if (node == null) return;
 
-    final named =
-        node is NamedExpression
-            ? node
-            : node.thisOrAncestorOfType<NamedExpression>();
+    final named = node is NamedExpression
+        ? node
+        : node.thisOrAncestorOfType<NamedExpression>();
     if (named == null) return;
     if (named.name.label.name != 'backwardsCompatibility') return;
 
