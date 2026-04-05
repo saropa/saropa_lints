@@ -792,6 +792,11 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_removed_null_thrown_error',
   // Dart SDK 3.4 deprecated APIs
   'avoid_deprecated_file_system_delete_event_is_directory',
+  // Flutter SDK migration rules (various versions)
+  'prefer_iterable_cast', // INFO - prefer .cast<T>() over Iterable.castFrom (Flutter 3.24)
+  'avoid_deprecated_use_inherited_media_query', // WARNING - deprecated after Flutter 3.7
+  'prefer_utf8_encode', // INFO - prefer utf8.encode() over Utf8Encoder().convert() (Dart 2.18)
+  'avoid_removed_appbar_backwards_compatibility', // WARNING - removed in Flutter 3.10
   // Flutter deprecation migrations
   'avoid_removed_render_object_element_methods',
   'avoid_deprecated_animated_list_typedefs',

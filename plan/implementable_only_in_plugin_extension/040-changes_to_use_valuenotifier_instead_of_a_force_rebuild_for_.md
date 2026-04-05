@@ -83,5 +83,13 @@ Replace old API/pattern with the new recommended approach
 
 ---
 
-**Status:** Not started
+**Status:** Rejected — not implementable as a lint rule
+
+**Rejection reason:** This is an internal Flutter framework refactor of the
+WidgetInspector to use ValueListenableBuilder instead of force rebuilds. This
+is entirely framework-internal behavior — end users do not interact with
+WidgetInspector's rebuild mechanism. There is no user-facing code pattern to
+detect. The "APIs" listed include "CoderDake" (a GitHub username), confirming
+the auto-generated plan misidentified the change scope.
+
 **Generated:** From Flutter SDK v3.19.0 release notes
