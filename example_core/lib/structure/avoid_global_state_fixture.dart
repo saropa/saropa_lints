@@ -111,11 +111,39 @@ dynamic collection;
 
 // BAD: Should trigger avoid_global_state
 // expect_lint: avoid_global_state
-int _bad1039_globalCounter = 0; // Mutable global
-List<String> globalItems = []; // Mutable global collection
+int _bad1039_globalCounter = 0; // LINT: mutable top-level variable
 
-// GOOD: Should NOT trigger avoid_global_state
+// expect_lint: avoid_global_state
+List<String> globalItems = []; // LINT: mutable top-level collection
+
+// expect_lint: avoid_global_state
+var _bad1039_mutableCount = 0; // LINT: var top-level variable
+
+// GOOD: const top-level variables should NOT trigger
+const int maxItems = 100;
+
+/// Doc comment before const variable
+const bool _isColorLineOutput = true;
+
+/// Another doc comment
+const int kDefaultStackFrameCount = 6;
+
+// GOOD: final top-level variables should NOT trigger
+final List<String> defaultItems = const ['a', 'b'];
+
+/// Doc comment before final variable
+final String _defaultName = 'test';
+
+// GOOD: static class fields should NOT trigger (not top-level)
+class _AvoidGlobalStateGoodClass {
+  static List<int>? _sortedItems;
+  static bool skippedByGate = false;
+  static var mutableField = 0;
+}
+
+// GOOD: Should NOT trigger (inside function, not top-level)
 void _good1039() {
-  const int maxItems = 100; // Immutable
-  final List<String> defaultItems = const ['a', 'b']; // Immutable
+  const int localConst = 100;
+  final List<String> localFinal = const ['a', 'b'];
+  var localMutable = 0;
 }

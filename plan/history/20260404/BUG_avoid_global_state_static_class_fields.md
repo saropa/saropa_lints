@@ -3,7 +3,7 @@
 **Rule**: `avoid_global_state`
 **Severity**: False positive / incorrect line reporting
 **Date**: 2026-03-25
-**Status**: Needs reproduction
+**Status**: Resolved (2026-04-04) — reporter changed from VariableDeclaration to TopLevelVariableDeclaration to fix offset calculation; added test coverage for static class fields, const/final with doc comments
 **Related**: [BUG_avoid_global_state_const_false_positive.md](BUG_avoid_global_state_const_false_positive.md) — may share a root cause
 
 ## Summary

@@ -469,6 +469,105 @@ void main() {
         // Avoidance pattern not present
         expect('avoid_global_state passes', isNotNull);
       });
+
+      test('fixture has exactly 3 BAD cases (expect_lint) and GOOD cases', () {
+        final file = File(
+          'example_core/lib/structure/avoid_global_state_fixture.dart',
+        );
+        expect(file.existsSync(), isTrue);
+        final content = file.readAsStringSync();
+
+        // Verify BAD cases: exactly 3 mutable top-level variables
+        final expectLintCount = RegExp(
+          r'// expect_lint: avoid_global_state',
+        ).allMatches(content).length;
+        expect(
+          expectLintCount,
+          equals(3),
+          reason: 'Fixture must have exactly 3 BAD cases that trigger the rule',
+        );
+      });
+
+      test('fixture includes const top-level variables (should NOT trigger)',
+          () {
+        final file = File(
+          'example_core/lib/structure/avoid_global_state_fixture.dart',
+        );
+        final content = file.readAsStringSync();
+
+        // Verify const declarations are present and NOT preceded by expect_lint
+        expect(content, contains('const int maxItems'));
+        expect(content, contains('const bool _isColorLineOutput'));
+        expect(content, contains('const int kDefaultStackFrameCount'));
+
+        // Verify none of the const lines are preceded by expect_lint
+        final lines = content.split('\n');
+        for (var i = 1; i < lines.length; i++) {
+          if (lines[i].contains('const ') &&
+              !lines[i].trimLeft().startsWith('//')) {
+            expect(
+              lines[i - 1].contains('expect_lint: avoid_global_state'),
+              isFalse,
+              reason:
+                  'const declaration at line ${i + 1} must not have expect_lint: '
+                  '${lines[i].trim()}',
+            );
+          }
+        }
+      });
+
+      test('fixture includes final top-level variables (should NOT trigger)',
+          () {
+        final file = File(
+          'example_core/lib/structure/avoid_global_state_fixture.dart',
+        );
+        final content = file.readAsStringSync();
+
+        // Verify final declarations are present and NOT preceded by expect_lint
+        expect(content, contains('final List<String> defaultItems'));
+        expect(content, contains("final String _defaultName"));
+
+        final lines = content.split('\n');
+        for (var i = 1; i < lines.length; i++) {
+          final trimmed = lines[i].trimLeft();
+          if (trimmed.startsWith('final ') && !trimmed.startsWith('//')) {
+            expect(
+              lines[i - 1].contains('expect_lint: avoid_global_state'),
+              isFalse,
+              reason:
+                  'final declaration at line ${i + 1} must not have expect_lint: '
+                  '${lines[i].trim()}',
+            );
+          }
+        }
+      });
+
+      test(
+        'fixture includes class with static fields only (should NOT trigger)',
+        () {
+          final file = File(
+            'example_core/lib/structure/avoid_global_state_fixture.dart',
+          );
+          final content = file.readAsStringSync();
+
+          // Static class fields must not be flagged as global state
+          expect(content, contains('static List<int>? _sortedItems'));
+          expect(content, contains('static bool skippedByGate'));
+          expect(content, contains('static var mutableField'));
+
+          // Class declaration itself must not be preceded by expect_lint
+          final lines = content.split('\n');
+          for (var i = 1; i < lines.length; i++) {
+            if (lines[i].contains('_AvoidGlobalStateGoodClass')) {
+              expect(
+                lines[i - 1].contains('expect_lint: avoid_global_state'),
+                isFalse,
+                reason: 'Class with static fields must not trigger the rule',
+              );
+            }
+          }
+        },
+      );
     });
 
     group('avoid_medium_length_files', () {
