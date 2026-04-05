@@ -128,5 +128,12 @@ Replace old API/pattern with the new recommended approach
 
 ---
 
-**Status:** Not started
+**Status:** Rejected — not implementable as a lint rule
+
+**Rejection reason:** This is an internal Flutter framework behavioral change
+to how OverlayPortal.overlayChild contributes semantics nodes to the semantics
+tree. The change is transparent to end users — it fixes an accessibility issue
+(#134456) within the framework itself. There is no user-facing API change,
+deprecation, or code pattern to detect.
+
 **Generated:** From Flutter SDK v3.19.0 release notes

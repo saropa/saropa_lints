@@ -2820,6 +2820,12 @@ _allRuleFactories = <SaropaLintRule Function()>[
   // Dart SDK 3.4 deprecated APIs (migration)
   AvoidDeprecatedFileSystemDeleteEventIsDirectoryRule.new,
 
+  // Flutter SDK migration rules (various versions)
+  PreferIterableCastRule.new,
+  AvoidDeprecatedUseInheritedMediaQueryRule.new,
+  PreferUtf8EncodeRule.new,
+  AvoidRemovedAppbarBackwardsCompatibilityRule.new,
+
   // Flutter deprecation migration rules (various versions)
   AvoidRemovedRenderObjectElementMethodsRule.new,
   AvoidDeprecatedAnimatedListTypedefsRule.new,

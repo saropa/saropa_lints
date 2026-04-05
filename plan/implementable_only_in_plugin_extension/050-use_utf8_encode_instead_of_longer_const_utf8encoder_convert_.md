@@ -109,18 +109,18 @@ Replace old API/pattern with the new recommended approach
 
 ## Implementation Checklist
 
-- [ ] Verify the API change in Flutter/Dart SDK source
-- [ ] Determine minimum SDK version requirement
-- [ ] Write detection logic (AST visitor)
-- [ ] Write quick-fix replacement
+- [x] Verify the API change in Flutter/Dart SDK source
+- [x] Determine minimum SDK version requirement
+- [x] Write detection logic (AST visitor)
+- [x] Write quick-fix replacement
 - [ ] Create test fixture with bad/good examples
 - [ ] Add unit tests
-- [ ] Register rule in `all_rules.dart`
-- [ ] Add to tier in `tiers.dart`
+- [x] Register rule in `all_rules.dart`
+- [x] Add to tier in `tiers.dart`
 - [ ] Update ROADMAP.md
-- [ ] Update CHANGELOG.md
+- [x] Update CHANGELOG.md
 
 ---
 
-**Status:** Not started
+**Status:** Implemented as `prefer_utf8_encode`
 **Generated:** From Flutter SDK v3.16.0 release notes

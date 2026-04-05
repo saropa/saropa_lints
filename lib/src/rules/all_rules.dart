@@ -28,6 +28,7 @@ export 'code_quality/unnecessary_code_rules.dart';
 export 'config/config_rules.dart';
 export 'config/dart_sdk_3_removal_rules.dart';
 export 'config/dart_sdk_34_deprecation_rules.dart';
+export 'config/flutter_sdk_migration_rules.dart';
 export 'config/migration_rules.dart';
 export 'config/platform_rules.dart';
 

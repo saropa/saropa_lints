@@ -30,6 +30,21 @@
 
 ---
 
+## [Unreleased]
+
+### Added
+
+- **prefer_iterable_cast**: Flags `Iterable.castFrom(x)` (and `List.castFrom`, `Set.castFrom`, `Map.castFrom`) and suggests the more readable `.cast<T>()` instance method (Flutter 3.24, PR #150185). Includes quick fix.
+- **avoid_deprecated_use_inherited_media_query**: Flags the deprecated `useInheritedMediaQuery` parameter on `MaterialApp`, `CupertinoApp`, and `WidgetsApp` (deprecated after Flutter 3.7). The setting is ignored. Includes quick fix to remove the argument.
+- **prefer_utf8_encode**: Flags `Utf8Encoder().convert(x)` and suggests the shorter `utf8.encode(x)` from `dart:convert` (Dart 2.18 / Flutter 3.16, PR #130567). Includes quick fix.
+- **avoid_removed_appbar_backwards_compatibility**: Flags the removed `AppBar.backwardsCompatibility` parameter (removed in Flutter 3.10, PR #120618). Includes quick fix to remove the argument.
+
+### Fixed
+
+- **avoid_global_state**: Report diagnostic at declaration level instead of individual variable nodes to prevent wrong line numbers when doc comments precede the declaration
+
+---
+
 ## [10.8.1]
 
 ### Changed

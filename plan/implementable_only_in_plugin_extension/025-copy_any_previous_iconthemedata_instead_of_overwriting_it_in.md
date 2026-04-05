@@ -131,5 +131,11 @@ Replace old API/pattern with the new recommended approach
 
 ---
 
-**Status:** Not started
+**Status:** Rejected — not implementable as a lint rule
+
+**Rejection reason:** This is an internal Flutter framework change to how
+CupertinoButton passes IconThemeData to its child. End users do not construct
+IconThemeData inside CupertinoButton themselves — the framework does it
+internally. There is no user-facing code pattern to detect or suggest replacing.
+
 **Generated:** From Flutter SDK v3.24.0 release notes
