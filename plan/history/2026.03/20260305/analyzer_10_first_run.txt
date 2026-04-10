@@ -1,0 +1,498 @@
+# analyzer 10 "first run" — pubspec-only bump (no code changes)
+# Branch: throwaway/analyzer_10_first_run from origin/main
+# Bumped: version 7.0.0, analyzer ^10.0.0, analysis_server_plugin ^0.3.10, analyzer_plugin ^0.14.0
+# Command: dart analyze --fatal-infos 2>&1
+# Use this list as the concrete errors/deprecations to fix (Phases 3–7).
+# Summary: 388 issues (all info — deprecated_member_use .name → lowerCaseName).
+
+Analyzing saropa_lints...
+
+                                                                                
+ΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæ 0% Γöé Files: 10/2769 Γöé Issues: 0 Γöé ETA: 1m 54s Γöé banned_usage_config.dart
+                                                                                
+ΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæ 1% Γöé Files: 20/2769 Γöé Issues: 0 Γöé ETA: 1m 19s Γöé add_to_utc_fix.dart
+                                                                                
+ΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæ 1% Γöé Files: 30/2769 Γöé Issues: 0 Γöé ETA: 1m 1s Γöé prefer_declaring_const_constructor_fix.dart
+                                                                                
+ΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæ 1% Γöé Files: 40/2769 Γöé Issues: 0 Γöé ETA: 51s Γöé prefer_dedicated_media_query_method_fix.dart
+                                                                                
+ΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæ 2% Γöé Files: 50/2769 Γöé Issues: 0 Γöé ETA: 43s Γöé remove_unnecessary_override_fix.dart
+                                                                                
+ΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæ 2% Γöé Files: 60/2769 Γöé Issues: 0 Γöé ETA: 34s Γöé replace_where_is_empty_with_any_fix.dart
+                                                                                
+ΓûêΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæ 3% Γöé Files: 70/2769 Γöé Issues: 0 Γöé ETA: 28s Γöé use_contains_fix.dart
+                                                                                
+ΓûêΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæ 3% Γöé Files: 80/2769 Γöé Issues: 0 Γöé ETA: 25s Γöé replace_bitwise_with_logical_fix.dart
+                                                                                
+ΓûêΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæ 3% Γöé Files: 90/2769 Γöé Issues: 0 Γöé ETA: 22s Γöé remove_double_negation_fix.dart
+                                                                                
+ΓûêΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæ 4% Γöé Files: 100/2769 Γöé Issues: 0 Γöé ETA: 20s Γöé use_positive_form_fix.dart
+                                                                                
+ΓûêΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæ 4% Γöé Files: 110/2769 Γöé Issues: 0 Γöé ETA: 18s Γöé remove_self_assignment_fix.dart
+                                                                                
+ΓûêΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæ 4% Γöé Files: 120/2769 Γöé Issues: 0 Γöé ETA: 17s Γöé add_blank_line_after_declarations_fix.dart
+                                                                                
+ΓûêΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæ 5% Γöé Files: 130/2769 Γöé Issues: 0 Γöé ETA: 16s Γöé use_date_time_try_parse_fix.dart
+                                                                                
+ΓûêΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæ 5% Γöé Files: 140/2769 Γöé Issues: 0 Γöé ETA: 15s Γöé prefer_addition_subtraction_assignments_fix.dart
+                                                                                
+ΓûêΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæ 5% Γöé Files: 150/2769 Γöé Issues: 0 Γöé ETA: 14s Γöé remove_listen_false_fix.dart
+                                                                                
+ΓûêΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæ 6% Γöé Files: 160/2769 Γöé Issues: 0 Γöé ETA: 14s Γöé use_shorthand_pattern_field_fix.dart
+                                                                                
+ΓûêΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæ 6% Γöé Files: 170/2769 Γöé Issues: 0 Γöé ETA: 13s Γöé replace_sliver_to_box_adapter_fix.dart
+                                                                                
+ΓûêΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæ 7% Γöé Files: 180/2769 Γöé Issues: 0 Γöé ETA: 12s Γöé remove_unnecessary_nullable_return_type_fix.dart
+                                                                                
+ΓûêΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæ 7% Γöé Files: 190/2769 Γöé Issues: 0 Γöé ETA: 12s Γöé add_import_group_comments_fix.dart
+                                                                                
+ΓûêΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæ 7% Γöé Files: 200/2769 Γöé Issues: 0 Γöé ETA: 12s Γöé wrap_with_material_app_fix.dart
+                                                                                
+ΓûêΓûêΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæ 8% Γöé Files: 210/2769 Γöé Issues: 0 Γöé ETA: 11s Γöé invert_unnecessary_negation_fix.dart
+                                                                                
+ΓûêΓûêΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæ 8% Γöé Files: 220/2769 Γöé Issues: 0 Γöé ETA: 11s Γöé replace_null_aware_spread_fix.dart
+                                                                                
+ΓûêΓûêΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæ 8% Γöé Files: 230/2769 Γöé Issues: 0 Γöé ETA: 11s Γöé remove_material2_fallback_fix.dart
+                                                                                
+ΓûêΓûêΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæ 9% Γöé Files: 240/2769 Γöé Issues: 0 Γöé ETA: 11s Γöé import_utils.dart
+                                                                                
+ΓûêΓûêΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæ 9% Γöé Files: 250/2769 Γöé Issues: 0 Γöé ETA: 10s Γöé owasp_category.dart
+                                                                                
+ΓûêΓûêΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæ 9% Γöé Files: 260/2769 Γöé Issues: 0 Γöé ETA: 11s Γöé architecture_rules.dart
+                                                                                
+ΓûêΓûêΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæ 10% Γöé Files: 270/2769 Γöé Issues: 0 Γöé ETA: 11s Γöé complexity_rules.dart
+                                                                                
+ΓûêΓûêΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæ 10% Γöé Files: 280/2769 Γöé Issues: 0 Γöé ETA: 12s Γöé naming_style_rules.dart
+                                                                                
+ΓûêΓûêΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæ 10% Γöé Files: 290/2769 Γöé Issues: 0 Γöé ETA: 13s Γöé type_safety_rules.dart
+                                                                                
+ΓûêΓûêΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæ 11% Γöé Files: 300/2769 Γöé Issues: 0 Γöé ETA: 15s Γöé auto_route_rules.dart
+                                                                                
+ΓûêΓûêΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæ 11% Γöé Files: 310/2769 Γöé Issues: 0 Γöé ETA: 17s Γöé get_it_rules.dart
+                                                                                
+ΓûêΓûêΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæ 12% Γöé Files: 320/2769 Γöé Issues: 0 Γöé ETA: 19s Γöé sqflite_rules.dart
+                                                                                
+ΓûêΓûêΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæ 12% Γöé Files: 330/2769 Γöé Issues: 0 Γöé ETA: 20s Γöé web_rules.dart
+                                                                                
+ΓûêΓûêΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæ 12% Γöé Files: 340/2769 Γöé Issues: 0 Γöé ETA: 21s Γöé stylistic_additional_rules.dart
+                                                                                
+ΓûêΓûêΓûêΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæ 13% Γöé Files: 350/2769 Γöé Issues: 0 Γöé ETA: 22s Γöé accessibility_rules.dart
+                                                                                
+ΓûêΓûêΓûêΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæ 13% Γöé Files: 360/2769 Γöé Issues: 0 Γöé ETA: 23s Γöé ui_ux_rules.dart
+                                                                                
+ΓûêΓûêΓûêΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæ 13% Γöé Files: 370/2769 Γöé Issues: 0 Γöé ETA: 24s Γöé type_annotation_utils.dart
+                                                                                
+ΓûêΓûêΓûêΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæ 14% Γöé Files: 380/2769 Γöé Issues: 0 Γöé ETA: 26s Γöé auto_route_rules_test.dart
+                                                                                
+ΓûêΓûêΓûêΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæ 14% Γöé Files: 390/2769 Γöé Issues: 0 Γöé ETA: 27s Γöé complexity_rules_test.dart
+                                                                                
+ΓûêΓûêΓûêΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæ 14% Γöé Files: 400/2769 Γöé Issues: 0 Γöé ETA: 28s Γöé dependency_injection_rules_test.dart
+                                                                                
+ΓûêΓûêΓûêΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæ 15% Γöé Files: 410/2769 Γöé Issues: 0 Γöé ETA: 29s Γöé false_positive_fixes_test.dart
+                                                                                
+ΓûêΓûêΓûêΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæ 15% Γöé Files: 420/2769 Γöé Issues: 0 Γöé ETA: 29s Γöé geolocator_rules_test.dart
+                                                                                
+ΓûêΓûêΓûêΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæ 16% Γöé Files: 430/2769 Γöé Issues: 0 Γöé ETA: 29s Γöé internationalization_rules_test.dart
+                                                                                
+ΓûêΓûêΓûêΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæ 16% Γöé Files: 440/2769 Γöé Issues: 0 Γöé ETA: 28s Γöé money_rules_test.dart
+                                                                                
+ΓûêΓûêΓûêΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæ 16% Γöé Files: 450/2769 Γöé Issues: 0 Γöé ETA: 28s Γöé provider_rules_test.dart
+                                                                                
+ΓûêΓûêΓûêΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæ 17% Γöé Files: 460/2769 Γöé Issues: 0 Γöé ETA: 28s Γöé roadmap_detail_9_rules_test.dart
+                                                                                
+ΓûêΓûêΓûêΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæ 17% Γöé Files: 470/2769 Γöé Issues: 0 Γöé ETA: 27s Γöé structure_rules_test.dart
+                                                                                
+ΓûêΓûêΓûêΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæ 17% Γöé Files: 480/2769 Γöé Issues: 0 Γöé ETA: 27s Γöé test_rules_test.dart
+                                                                                
+
+   info - bin\init.dart:906:41 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - bin\init.dart:906:41 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\main.dart:69:18 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\main.dart:69:18 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\main.dart:71:56 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\main.dart:71:56 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\saropa_lints.dart:2863:19 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\saropa_lints.dart:2863:19 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\saropa_lints.dart:3033:47 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\saropa_lints.dart:3033:47 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\src\fixes\exception\remove_leading_underscore_from_exception_class_fix.dart:33:28 - 'name' is deprecated and shouldn't be used. Use namePart instead. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\src\fixes\exception\remove_leading_underscore_from_exception_class_fix.dart:33:28 - 'name' is deprecated and shouldn't be used. Use namePart instead. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\src\fixes\exception\remove_leading_underscore_from_exception_class_fix.dart:37:29 - 'name' is deprecated and shouldn't be used. Use namePart instead. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\src\fixes\exception\remove_leading_underscore_from_exception_class_fix.dart:37:29 - 'name' is deprecated and shouldn't be used. Use namePart instead. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\src\rules\architecture\lifecycle_rules.dart:404:45 - 'members' is deprecated and shouldn't be used. Use body instead. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\src\rules\architecture\lifecycle_rules.dart:404:45 - 'members' is deprecated and shouldn't be used. Use body instead. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\src\rules\architecture\lifecycle_rules.dart:418:45 - 'members' is deprecated and shouldn't be used. Use body instead. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\src\rules\architecture\lifecycle_rules.dart:418:45 - 'members' is deprecated and shouldn't be used. Use body instead. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\src\rules\architecture\lifecycle_rules.dart:532:31 - 'name' is deprecated and shouldn't be used. Use namePart instead. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\src\rules\architecture\lifecycle_rules.dart:532:31 - 'name' is deprecated and shouldn't be used. Use namePart instead. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\src\rules\architecture\lifecycle_rules.dart:558:43 - 'members' is deprecated and shouldn't be used. Use body instead. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\src\rules\architecture\lifecycle_rules.dart:558:43 - 'members' is deprecated and shouldn't be used. Use body instead. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\src\rules\architecture\lifecycle_rules.dart:579:43 - 'members' is deprecated and shouldn't be used. Use body instead. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\src\rules\architecture\lifecycle_rules.dart:579:43 - 'members' is deprecated and shouldn't be used. Use body instead. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\src\saropa_lint_rule.dart:1836:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\src\saropa_lint_rule.dart:1836:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\src\saropa_lint_rule.dart:1848:60 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\src\saropa_lint_rule.dart:1848:60 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\src\saropa_lint_rule.dart:1857:17 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\src\saropa_lint_rule.dart:1857:17 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\src\saropa_lint_rule.dart:2405:64 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\src\saropa_lint_rule.dart:2405:64 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\src\saropa_lint_rule.dart:2410:37 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\src\saropa_lint_rule.dart:2410:37 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\src\saropa_lint_rule.dart:2440:25 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\src\saropa_lint_rule.dart:2440:25 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\src\saropa_lint_rule.dart:2454:29 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\src\saropa_lint_rule.dart:2454:29 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\src\saropa_lint_rule.dart:2554:41 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\src\saropa_lint_rule.dart:2554:41 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\src\saropa_lint_rule.dart:2577:12 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\src\saropa_lint_rule.dart:2577:12 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\src\violation_parser.dart:13:19 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\src\violation_parser.dart:13:19 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\auto_route_rules_test.dart:39:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\auto_route_rules_test.dart:39:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\auto_route_rules_test.dart:50:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\auto_route_rules_test.dart:50:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\auto_route_rules_test.dart:61:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\auto_route_rules_test.dart:61:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\auto_route_rules_test.dart:72:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\auto_route_rules_test.dart:72:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\auto_route_rules_test.dart:83:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\auto_route_rules_test.dart:83:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\auto_route_rules_test.dart:94:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\auto_route_rules_test.dart:94:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\complexity_rules_test.dart:13:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\complexity_rules_test.dart:13:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\complexity_rules_test.dart:23:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\complexity_rules_test.dart:23:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\complexity_rules_test.dart:33:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\complexity_rules_test.dart:33:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\complexity_rules_test.dart:43:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\complexity_rules_test.dart:43:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\complexity_rules_test.dart:50:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\complexity_rules_test.dart:50:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\complexity_rules_test.dart:57:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\complexity_rules_test.dart:57:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\complexity_rules_test.dart:67:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\complexity_rules_test.dart:67:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\complexity_rules_test.dart:77:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\complexity_rules_test.dart:77:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\complexity_rules_test.dart:84:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\complexity_rules_test.dart:84:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\complexity_rules_test.dart:91:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\complexity_rules_test.dart:91:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\complexity_rules_test.dart:101:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\complexity_rules_test.dart:101:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\complexity_rules_test.dart:108:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\complexity_rules_test.dart:108:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\complexity_rules_test.dart:118:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\complexity_rules_test.dart:118:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\complexity_rules_test.dart:125:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\complexity_rules_test.dart:125:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\config_rules_test.dart:13:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\config_rules_test.dart:13:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\config_rules_test.dart:20:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\config_rules_test.dart:20:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\config_rules_test.dart:30:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\config_rules_test.dart:30:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\config_rules_test.dart:37:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\config_rules_test.dart:37:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\config_rules_test.dart:47:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\config_rules_test.dart:47:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\config_rules_test.dart:54:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\config_rules_test.dart:54:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\config_rules_test.dart:64:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\config_rules_test.dart:64:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\config_rules_test.dart:71:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\config_rules_test.dart:71:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\config_rules_test.dart:81:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\config_rules_test.dart:81:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\connectivity_rules_test.dart:13:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\connectivity_rules_test.dart:13:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\connectivity_rules_test.dart:23:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\connectivity_rules_test.dart:23:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\connectivity_rules_test.dart:33:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\connectivity_rules_test.dart:33:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\context_rules_test.dart:13:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\context_rules_test.dart:13:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\context_rules_test.dart:20:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\context_rules_test.dart:20:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\context_rules_test.dart:30:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\context_rules_test.dart:30:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\context_rules_test.dart:40:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\context_rules_test.dart:40:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\context_rules_test.dart:50:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\context_rules_test.dart:50:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\context_rules_test.dart:60:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\context_rules_test.dart:60:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\crypto_rules_test.dart:13:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\crypto_rules_test.dart:13:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\crypto_rules_test.dart:23:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\crypto_rules_test.dart:23:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\crypto_rules_test.dart:33:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\crypto_rules_test.dart:33:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\crypto_rules_test.dart:43:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\crypto_rules_test.dart:43:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\crypto_rules_test.dart:53:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\crypto_rules_test.dart:53:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\db_yield_rules_test.dart:13:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\db_yield_rules_test.dart:13:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\db_yield_rules_test.dart:23:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\db_yield_rules_test.dart:23:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\db_yield_rules_test.dart:33:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\db_yield_rules_test.dart:33:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\debug_rules_test.dart:13:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\debug_rules_test.dart:13:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\debug_rules_test.dart:20:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\debug_rules_test.dart:20:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\debug_rules_test.dart:27:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\debug_rules_test.dart:27:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\debug_rules_test.dart:34:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\debug_rules_test.dart:34:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\debug_rules_test.dart:44:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\debug_rules_test.dart:44:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\debug_rules_test.dart:51:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\debug_rules_test.dart:51:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\debug_rules_test.dart:58:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\debug_rules_test.dart:58:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\debug_rules_test.dart:68:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\debug_rules_test.dart:68:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\debug_rules_test.dart:75:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\debug_rules_test.dart:75:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\disposal_rules_test.dart:13:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\disposal_rules_test.dart:13:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\disposal_rules_test.dart:23:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\disposal_rules_test.dart:23:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\disposal_rules_test.dart:33:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\disposal_rules_test.dart:33:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\disposal_rules_test.dart:43:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\disposal_rules_test.dart:43:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\disposal_rules_test.dart:53:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\disposal_rules_test.dart:53:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\disposal_rules_test.dart:63:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\disposal_rules_test.dart:63:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\disposal_rules_test.dart:73:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\disposal_rules_test.dart:73:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\disposal_rules_test.dart:83:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\disposal_rules_test.dart:83:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\disposal_rules_test.dart:93:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\disposal_rules_test.dart:93:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\disposal_rules_test.dart:103:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\disposal_rules_test.dart:103:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\disposal_rules_test.dart:113:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\disposal_rules_test.dart:113:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\disposal_rules_test.dart:120:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\disposal_rules_test.dart:120:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\disposal_rules_test.dart:127:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\disposal_rules_test.dart:127:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\disposal_rules_test.dart:137:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\disposal_rules_test.dart:137:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\disposal_rules_test.dart:144:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\disposal_rules_test.dart:144:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\disposal_rules_test.dart:154:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\disposal_rules_test.dart:154:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\disposal_rules_test.dart:164:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\disposal_rules_test.dart:164:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\equality_rules_test.dart:13:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\equality_rules_test.dart:13:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\equality_rules_test.dart:20:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\equality_rules_test.dart:20:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\equality_rules_test.dart:30:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\equality_rules_test.dart:30:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\equality_rules_test.dart:37:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\equality_rules_test.dart:37:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\equality_rules_test.dart:44:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\equality_rules_test.dart:44:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\equality_rules_test.dart:54:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\equality_rules_test.dart:54:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\equality_rules_test.dart:61:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\equality_rules_test.dart:61:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\error_handling_rules_test.dart:16:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\error_handling_rules_test.dart:16:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\error_handling_rules_test.dart:26:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\error_handling_rules_test.dart:26:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\error_handling_rules_test.dart:33:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\error_handling_rules_test.dart:33:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\error_handling_rules_test.dart:40:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\error_handling_rules_test.dart:40:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\error_handling_rules_test.dart:47:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\error_handling_rules_test.dart:47:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\error_handling_rules_test.dart:54:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\error_handling_rules_test.dart:54:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\error_handling_rules_test.dart:64:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\error_handling_rules_test.dart:64:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\error_handling_rules_test.dart:74:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\error_handling_rules_test.dart:74:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\error_handling_rules_test.dart:81:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\error_handling_rules_test.dart:81:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\error_handling_rules_test.dart:91:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\error_handling_rules_test.dart:91:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\error_handling_rules_test.dart:98:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\error_handling_rules_test.dart:98:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\error_handling_rules_test.dart:108:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\error_handling_rules_test.dart:108:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\error_handling_rules_test.dart:115:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\error_handling_rules_test.dart:115:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\error_handling_rules_test.dart:125:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\error_handling_rules_test.dart:125:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\error_handling_rules_test.dart:135:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\error_handling_rules_test.dart:135:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\error_handling_rules_test.dart:145:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\error_handling_rules_test.dart:145:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\error_handling_rules_test.dart:155:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\error_handling_rules_test.dart:155:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\error_handling_rules_test.dart:165:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\error_handling_rules_test.dart:165:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\error_handling_rules_test.dart:172:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\error_handling_rules_test.dart:172:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\error_handling_rules_test.dart:179:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\error_handling_rules_test.dart:179:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\error_handling_rules_test.dart:189:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\error_handling_rules_test.dart:189:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\error_handling_rules_test.dart:199:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\error_handling_rules_test.dart:199:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\exception_rules_test.dart:13:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\exception_rules_test.dart:13:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\exception_rules_test.dart:23:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\exception_rules_test.dart:23:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\exception_rules_test.dart:30:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\exception_rules_test.dart:30:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\exception_rules_test.dart:40:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\exception_rules_test.dart:40:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\exception_rules_test.dart:50:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\exception_rules_test.dart:50:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\lifecycle_rules_test.dart:13:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\lifecycle_rules_test.dart:13:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\lifecycle_rules_test.dart:23:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\lifecycle_rules_test.dart:23:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\lifecycle_rules_test.dart:33:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\lifecycle_rules_test.dart:33:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\lifecycle_rules_test.dart:43:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\lifecycle_rules_test.dart:43:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\lifecycle_rules_test.dart:53:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\lifecycle_rules_test.dart:53:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\lifecycle_rules_test.dart:63:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\lifecycle_rules_test.dart:63:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\memory_management_rules_test.dart:13:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\memory_management_rules_test.dart:13:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\memory_management_rules_test.dart:23:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\memory_management_rules_test.dart:23:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\memory_management_rules_test.dart:30:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\memory_management_rules_test.dart:30:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\memory_management_rules_test.dart:40:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\memory_management_rules_test.dart:40:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\memory_management_rules_test.dart:50:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\memory_management_rules_test.dart:50:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\memory_management_rules_test.dart:60:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\memory_management_rules_test.dart:60:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\memory_management_rules_test.dart:70:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\memory_management_rules_test.dart:70:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\memory_management_rules_test.dart:80:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\memory_management_rules_test.dart:80:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\memory_management_rules_test.dart:87:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\memory_management_rules_test.dart:87:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\memory_management_rules_test.dart:97:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\memory_management_rules_test.dart:97:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\memory_management_rules_test.dart:107:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\memory_management_rules_test.dart:107:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\memory_management_rules_test.dart:117:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\memory_management_rules_test.dart:117:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\memory_management_rules_test.dart:127:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\memory_management_rules_test.dart:127:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\migration_rules_test.dart:25:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\migration_rules_test.dart:25:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\migration_rules_test.dart:33:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\migration_rules_test.dart:33:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\migration_rules_test.dart:44:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\migration_rules_test.dart:44:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\notification_rules_test.dart:13:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\notification_rules_test.dart:13:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\notification_rules_test.dart:23:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\notification_rules_test.dart:23:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\notification_rules_test.dart:33:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\notification_rules_test.dart:33:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\notification_rules_test.dart:43:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\notification_rules_test.dart:43:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\notification_rules_test.dart:53:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\notification_rules_test.dart:53:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\notification_rules_test.dart:63:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\notification_rules_test.dart:63:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\notification_rules_test.dart:73:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\notification_rules_test.dart:73:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\notification_rules_test.dart:83:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\notification_rules_test.dart:83:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\platform_rules_test.dart:13:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\platform_rules_test.dart:13:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\platform_rules_test.dart:20:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\platform_rules_test.dart:20:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\platform_rules_test.dart:30:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\platform_rules_test.dart:30:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\return_rules_test.dart:13:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\return_rules_test.dart:13:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\return_rules_test.dart:20:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\return_rules_test.dart:20:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\return_rules_test.dart:27:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\return_rules_test.dart:27:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\return_rules_test.dart:34:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\return_rules_test.dart:34:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\return_rules_test.dart:41:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\return_rules_test.dart:41:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\return_rules_test.dart:48:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\return_rules_test.dart:48:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\return_rules_test.dart:58:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\return_rules_test.dart:58:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\return_rules_test.dart:68:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\return_rules_test.dart:68:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\roadmap_detail_12_rules_test.dart:34:54 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\roadmap_detail_12_rules_test.dart:34:54 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\roadmap_detail_9_rules_test.dart:38:54 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\roadmap_detail_9_rules_test.dart:38:54 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\roadmap_detail_9_rules_test.dart:52:34 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\roadmap_detail_9_rules_test.dart:52:34 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\rxdart_rules_test.dart:26:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\rxdart_rules_test.dart:26:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\saropa_lints_test.dart:37:51 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\saropa_lints_test.dart:37:51 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\saropa_lints_test.dart:102:51 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\saropa_lints_test.dart:102:51 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\saropa_lints_test.dart:153:39 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\saropa_lints_test.dart:153:39 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\saropa_lints_test.dart:182:51 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\saropa_lints_test.dart:182:51 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\saropa_lints_test.dart:304:32 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\saropa_lints_test.dart:304:32 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\saropa_lints_test.dart:337:55 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\saropa_lints_test.dart:337:55 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\saropa_lints_test.dart:338:56 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\saropa_lints_test.dart:338:56 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\saropa_lints_test.dart:363:32 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\saropa_lints_test.dart:363:32 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\saropa_lints_test.dart:385:35 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\saropa_lints_test.dart:385:35 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\saropa_lints_test.dart:403:27 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\saropa_lints_test.dart:403:27 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\sqflite_rules_test.dart:13:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\sqflite_rules_test.dart:13:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\sqflite_rules_test.dart:23:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\sqflite_rules_test.dart:23:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\theming_rules_test.dart:13:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\theming_rules_test.dart:13:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\theming_rules_test.dart:20:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\theming_rules_test.dart:20:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\theming_rules_test.dart:30:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\theming_rules_test.dart:30:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\theming_rules_test.dart:37:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\theming_rules_test.dart:37:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\theming_rules_test.dart:44:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\theming_rules_test.dart:44:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\theming_rules_test.dart:51:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\theming_rules_test.dart:51:24 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\web_rules_test.dart:146:28 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\web_rules_test.dart:146:28 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\widget_patterns_rules_test.dart:1418:48 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\widget_patterns_rules_test.dart:1418:48 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\widget_patterns_rules_test.dart:1427:44 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - test\widget_patterns_rules_test.dart:1427:44 - 'name' is deprecated and shouldn't be used. Please use lowerCaseName. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+
+388 issues found.
+ΓûêΓûêΓûêΓûêΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæ 18% Γöé Files: 490/2769 Γöé Issues: 0 Γöé ETA: 27s Γöé widget_layout_rules_test.dart
