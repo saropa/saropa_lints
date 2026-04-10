@@ -1,0 +1,101 @@
+# Prefer Retry Flaky
+
+**GitHub:** [https://github.com/saropa/saropa_lints/issues/42](https://github.com/saropa/saropa_lints/issues/42)
+
+**Opened:** 2026-01-23T14:02:00Z
+
+**Resolved in:** N/A — Deferred (test retry pattern detection). Issue closed.
+
+---
+
+## Detail
+
+### Problem  
+Integration tests on real devices are inherently flaky. Configuring retry count in CI (e.g., --retry=2) is better than deleting useful tests.
+
+### Why This Is Complex  
+- **Pattern detection:** Requires analyzing test configuration and retry logic.
+- **CI diversity:** Different CI systems and flags for retry.
+- **False positives:** Some tests may not need retries.
+
+### Desired Outcome  
+- Detect integration tests without retry configuration.
+- Warn about potential flakiness.
+- Suggest configuring retries in CI for flaky tests.
+
+### References  
+- See ROADMAP.md section: "prefer_retry_flaky"
+
+---
+
+## Roadmap task spec (merged from bugs/roadmap/task_prefer_retry_flaky.md)
+
+# Task: `prefer_retry_flaky`
+
+## Summary
+- **Rule Name**: `prefer_retry_flaky`
+- **Tier**: Comprehensive
+- **Severity**: INFO
+- **Status**: Planned
+- **Source**: ROADMAP.md — 1.4 Testing Rules
+
+## Problem Statement
+
+Integration tests on real devices are inherently flaky. Configure retry count in CI (e.g., `--retry=2`) rather than deleting useful tests.
+
+This rule aims to improve code quality, security, or maintainability by enforcing a specific practice. Implementation must reliably detect true violations while avoiding false positives.
+
+## Description (from ROADMAP)
+
+> Integration tests on real devices are inherently flaky. Configure retry count in CI (e.g., `--retry=2`) rather than deleting useful tests.
+
+## Code Examples
+
+### Bad (should trigger)
+
+```dart
+// Example violation: code that the rule should report.
+// TODO: Replace with concrete example for `prefer_retry_flaky`.
+```
+
+### Good (should not trigger)
+
+```dart
+// Compliant code that must not be flagged.
+// TODO: Replace with concrete example for `prefer_retry_flaky`.
+```
+
+## Detection: True Positives
+
+- **Goal**: Reliably detect all real violations of the practice.
+- **Approach**: Prefer type/element checks and exact-match sets over substring or `toSource()` matching.
+- **AST coverage**: Consider all AST shapes for the same pattern (e.g. both `MethodDeclaration` and `FunctionDeclaration`) so violations are not missed.
+- **Edge cases**: Document which constructs are in scope (e.g. test files, generated code, platform-specific code) and ensure detection is consistent.
+
+## False Positives
+
+- **Risk**: Compliant code flagged as violation erodes trust and leads to suppressions.
+- **Mitigation**: Use word boundaries in regexes (e.g. `\\b` so "auth" does not match "Oauth"); avoid `name.contains('X')` for identifiers.
+- **Allowlist**: Consider whether tests, generated files, or certain packages should be excluded.
+- **Ambiguity**: If the rule is heuristic (e.g. "complex" method), document thresholds and consider INFO severity.
+
+## External References
+
+- [Dart Lint Rules](https://dart.dev/tools/linter-rules) — official lint rule design.
+- [Flutter API docs](https://api.flutter.dev/) — for widget/API-specific rules.
+- [OWASP Mobile](https://owasp.org/www-project-mobile-top-10/) — for security rules.
+- [Dart custom_lint](https://pub.dev/packages/custom_lint) — plugin API and performance.
+- Add package/docs links relevant to `prefer_retry_flaky` (e.g. bloc, riverpod, hive).
+
+## Quality & Performance
+
+- **Analyzer cost**: Prefer targeted registry callbacks (e.g. `addMethodDeclaration`) over full unit traversal where possible.
+- **Caching**: Use `ProjectContext` for project-level checks (e.g. `usesPackage('x')`) to avoid repeated work.
+- **Early exit**: Skip files or nodes that cannot violate (e.g. no Bloc usage) before running heavy logic.
+- **Test requirement**: Add at least one true-positive and one false-positive fixture (or test that runs the linter and asserts).
+
+## Notes & Issues
+
+- Before implementing: confirm no overlap with existing rules in [CODE_INDEX.md](../../CODE_INDEX.md).
+- Checklist: exact-match or type checks (no `.contains()` on names); consider all AST shapes; document edge cases.
+
