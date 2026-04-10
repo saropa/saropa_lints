@@ -30,6 +30,7 @@ export 'config/dart_sdk_3_removal_rules.dart';
 export 'config/dart_sdk_34_deprecation_rules.dart';
 export 'config/flutter_sdk_migration_rules.dart';
 export 'config/migration_rules.dart';
+export 'config/sdk_migration_batch2_rules.dart';
 export 'config/platform_rules.dart';
 
 // Core (async, context, naming, state, docs, performance)

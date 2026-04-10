@@ -30,6 +30,23 @@
 
 ---
 
+## [Unreleased]
+
+### Added
+
+- **prefer_isnan_over_nan_equality**: Flags `x == double.nan` (always false) and `x != double.nan` (always true) — use `.isNaN` instead (IEEE 754). Includes quick fix.
+- **prefer_code_unit_at**: Flags `string.codeUnits[i]` which allocates an entire List just to read one code unit — use `string.codeUnitAt(i)` instead (Flutter 3.10, PR #120234). Includes quick fix.
+- **prefer_never_over_always_throws**: Flags the deprecated `@alwaysThrows` annotation from `package:meta` — use `Never` return type instead (Dart 2.12+).
+- **prefer_visibility_over_opacity_zero**: Flags `Opacity(opacity: 0.0, ...)` which inserts an unnecessary compositing layer — use `Visibility(visible: false, ...)` instead (Flutter 3.7, PR #112191).
+- **avoid_platform_constructor**: Flags `Platform()` constructor usage deprecated in Dart 3.1 — all useful Platform members are static.
+- **prefer_keyboard_listener_over_raw**: Flags deprecated `RawKeyboardListener` — use `KeyboardListener` which handles IME and key composition correctly (Flutter 3.18). Includes quick fix.
+- **avoid_extending_html_native_class**: Flags extending native `dart:html` classes (`HtmlElement`, `CanvasElement`, etc.) which can no longer be subclassed (Dart 3.8 breaking change).
+- **avoid_extending_security_context**: Flags extending or implementing `SecurityContext` from `dart:io` which is now `final` (Dart 3.5, breaking change #55786).
+- **avoid_deprecated_pointer_arithmetic**: Flags deprecated `Pointer.elementAt()` from `dart:ffi` — use the `+` operator instead (Dart 3.3). Includes quick fix.
+- **prefer_extracting_repeated_map_lookup**: Flags 3+ identical `map[key]` accesses in the same function body — extract into a local variable for readability and type safety (Flutter 3.10, PR #122178).
+
+---
+
 ## [10.9.0]
 
 ### Added
