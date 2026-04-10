@@ -797,6 +797,17 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_deprecated_use_inherited_media_query', // WARNING - deprecated after Flutter 3.7
   'prefer_utf8_encode', // INFO - prefer utf8.encode() over Utf8Encoder().convert() (Dart 2.18)
   'avoid_removed_appbar_backwards_compatibility', // WARNING - removed in Flutter 3.10
+  // SDK migration batch 2 (plan files 057–094)
+  'prefer_isnan_over_nan_equality', // WARNING - == double.nan is always false (IEEE 754)
+  'prefer_code_unit_at', // INFO - avoid .codeUnits[i] allocation (Flutter 3.10)
+  'prefer_never_over_always_throws', // WARNING - @alwaysThrows deprecated (Dart 2.12)
+  'prefer_visibility_over_opacity_zero', // INFO - Visibility instead of Opacity(0) (Flutter 3.7)
+  'avoid_platform_constructor', // WARNING - Platform() deprecated (Dart 3.1)
+  'prefer_keyboard_listener_over_raw', // WARNING - RawKeyboardListener deprecated (Flutter 3.18)
+  'avoid_extending_html_native_class', // ERROR - dart:html non-extensible (Dart 3.8)
+  'avoid_extending_security_context', // ERROR - SecurityContext final (Dart 3.5)
+  'avoid_deprecated_pointer_arithmetic', // WARNING - Pointer.elementAt() deprecated (Dart 3.3)
+  'prefer_extracting_repeated_map_lookup', // INFO - extract repeated map[key] (Flutter 3.10)
   // Flutter deprecation migrations
   'avoid_removed_render_object_element_methods',
   'avoid_deprecated_animated_list_typedefs',

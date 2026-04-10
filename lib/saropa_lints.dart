@@ -2826,6 +2826,18 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferUtf8EncodeRule.new,
   AvoidRemovedAppbarBackwardsCompatibilityRule.new,
 
+  // SDK migration batch 2 rules (plan files 057–094)
+  PreferIsNanOverNanEqualityRule.new,
+  PreferCodeUnitAtRule.new,
+  PreferNeverOverAlwaysThrowsRule.new,
+  PreferVisibilityOverOpacityZeroRule.new,
+  AvoidPlatformConstructorRule.new,
+  PreferKeyboardListenerOverRawRule.new,
+  AvoidExtendingHtmlNativeClassRule.new,
+  AvoidExtendingSecurityContextRule.new,
+  AvoidDeprecatedPointerArithmeticRule.new,
+  PreferExtractingRepeatedMapLookupRule.new,
+
   // Flutter deprecation migration rules (various versions)
   AvoidRemovedRenderObjectElementMethodsRule.new,
   AvoidDeprecatedAnimatedListTypedefsRule.new,

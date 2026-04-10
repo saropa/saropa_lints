@@ -1546,6 +1546,18 @@ saropa_lints:
     - avoid_removed_dart_developer_metrics: false       # WARNING - Metrics/Metric/Counter/Gauge removed dart:developer Dart 3.0
     - avoid_deprecated_network_interface_list_supported: false # WARNING - NetworkInterface.listSupported deprecated dart:io
 
+    # --- Migration (SDK Batch 2 — plan files 057–094) ---
+    - prefer_isnan_over_nan_equality: false              # WARNING - == double.nan always false (IEEE 754, quick fix)
+    - prefer_code_unit_at: false                         # INFO - .codeUnits[i]→.codeUnitAt(i) allocation (Flutter 3.10, quick fix)
+    - prefer_never_over_always_throws: false              # WARNING - @alwaysThrows→Never return type (Dart 2.12)
+    - prefer_visibility_over_opacity_zero: false          # INFO - Opacity(0)→Visibility(false) compositing (Flutter 3.7)
+    - avoid_platform_constructor: false                   # WARNING - Platform() deprecated (Dart 3.1)
+    - prefer_keyboard_listener_over_raw: false            # WARNING - RawKeyboardListener→KeyboardListener (Flutter 3.18, quick fix)
+    - avoid_extending_html_native_class: false            # ERROR - dart:html non-extensible (Dart 3.8 breaking change)
+    - avoid_extending_security_context: false             # ERROR - SecurityContext final (Dart 3.5 breaking change)
+    - avoid_deprecated_pointer_arithmetic: false          # WARNING - Pointer.elementAt()→+ operator (Dart 3.3, quick fix)
+    - prefer_extracting_repeated_map_lookup: false        # INFO - 3+ repeated map[key]→extract to variable (Flutter 3.10)
+
     # =========================================================================
     # V5.1.0 RULES - New lint rules
     # =========================================================================
