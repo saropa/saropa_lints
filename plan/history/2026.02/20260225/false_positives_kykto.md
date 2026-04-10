@@ -163,7 +163,7 @@ correctly implemented via `Timer` in the enclosing `State` class. The lint does
 not recognize `Timer`-based debounce patterns.
 
 **Suggested improvement:** Detect common debounce patterns: a `Timer` field on
-the State class that is cancelled and re-created inside `onChanged`. Also
+the State class that is canceled and re-created inside `onChanged`. Also
 recognize `Debouncer` utility classes and `RestartableTimer`.
 
 ---

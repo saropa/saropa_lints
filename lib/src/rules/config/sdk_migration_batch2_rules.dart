@@ -175,7 +175,8 @@ class _PreferIsNanFix extends SaropaFixProducer {
     final valueSource = valueExpr.toSource();
     // Wrap complex expressions in parens to preserve precedence.
     // Simple identifiers and property accesses don't need wrapping.
-    final needsParens = valueExpr is! SimpleIdentifier &&
+    final needsParens =
+        valueExpr is! SimpleIdentifier &&
         valueExpr is! PrefixedIdentifier &&
         valueExpr is! PropertyAccess;
     final wrapped = needsParens ? '($valueSource)' : valueSource;
@@ -249,8 +250,7 @@ class PreferCodeUnitAtRule extends SaropaLintRule {
         'any intermediate list allocation, which is both faster and produces '
         'less garbage-collection pressure. This pattern was fixed across the '
         'Flutter framework in PR #120234. {v1}',
-    correctionMessage:
-        "Replace 'text.codeUnits[i]' with 'text.codeUnitAt(i)'.",
+    correctionMessage: "Replace 'text.codeUnits[i]' with 'text.codeUnitAt(i)'.",
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -1004,8 +1004,7 @@ class AvoidDeprecatedPointerArithmeticRule extends SaropaLintRule {
         'applies to Array.elementAt() which was deprecated in favor of the '
         '[] operator. Migrate to operator syntax before the deprecated methods '
         'are removed. {v1}',
-    correctionMessage:
-        "Replace 'ptr.elementAt(n)' with 'ptr + n'.",
+    correctionMessage: "Replace 'ptr.elementAt(n)' with 'ptr + n'.",
     severity: DiagnosticSeverity.WARNING,
   );
 
@@ -1044,7 +1043,8 @@ bool _isFfiPointerType(InterfaceElement element) {
   }
   // Check supertypes for Pointer
   for (final sup in element.allSupertypes) {
-    if (sup.element.name == 'Pointer' && _isDartFfiLibrary(sup.element.library)) {
+    if (sup.element.name == 'Pointer' &&
+        _isDartFfiLibrary(sup.element.library)) {
       return true;
     }
   }

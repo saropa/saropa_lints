@@ -1348,8 +1348,8 @@ def main() -> int:
             "  Apply these changes to source files?",
             Color.WHITE,
         )
-        response = input("  [y/N] ").strip().lower()
-        if response == "y":
+        response = input("  [Y/n] ").strip().lower()
+        if response != "n":
             _apply_changes(result.changes)
             applied = True
         else:

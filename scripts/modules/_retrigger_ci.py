@@ -56,12 +56,12 @@ def _prompt_limit() -> int:
 def _prompt_rerun_and_watch() -> tuple[bool, bool]:
     """After showing failed runs, ask to re-run and whether to watch. (rerun, watch)."""
     try:
-        r = input("  Re-run all failed workflows? [y/N]: ").strip().lower()
-        rerun = r == "y"
+        r = input("  Re-run all failed workflows? [Y/n]: ").strip().lower()
+        rerun = r != "n"
         watch = False
         if rerun:
-            w = input("  Watch until runs complete? [y/N]: ").strip().lower()
-            watch = w == "y"
+            w = input("  Watch until runs complete? [Y/n]: ").strip().lower()
+            watch = w != "n"
         return rerun, watch
     except (EOFError, KeyboardInterrupt):
         return False, False
@@ -210,8 +210,8 @@ def offer_retrigger_ci(limit: int = 10) -> None:
     _display_failed_runs(failed_runs)
     print()
     try:
-        r = input("  Re-run failed workflows? [y/N]: ").strip().lower()
-        rerun = r == "y"
+        r = input("  Re-run failed workflows? [Y/n]: ").strip().lower()
+        rerun = r != "n"
     except (EOFError, KeyboardInterrupt):
         return
     if not rerun:
@@ -222,8 +222,8 @@ def offer_retrigger_ci(limit: int = 10) -> None:
     print()
     print_success(f"Re-triggered {len(triggered)} run(s).")
     try:
-        w = input("  Watch until runs complete? [y/N]: ").strip().lower()
-        watch = w == "y"
+        w = input("  Watch until runs complete? [Y/n]: ").strip().lower()
+        watch = w != "n"
     except (EOFError, KeyboardInterrupt):
         return
     if watch:

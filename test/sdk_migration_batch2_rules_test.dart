@@ -136,10 +136,7 @@ void main() {
 
     test('PreferExtractingRepeatedMapLookupRule instantiates correctly', () {
       final rule = PreferExtractingRepeatedMapLookupRule();
-      expect(
-        rule.code.lowerCaseName,
-        'prefer_extracting_repeated_map_lookup',
-      );
+      expect(rule.code.lowerCaseName, 'prefer_extracting_repeated_map_lookup');
       expect(
         rule.code.problemMessage,
         contains('[prefer_extracting_repeated_map_lookup]'),
