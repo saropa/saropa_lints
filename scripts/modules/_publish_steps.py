@@ -506,12 +506,12 @@ def check_working_tree(project_dir: Path) -> tuple[bool, bool]:
         response = (
             input(
                 "  These changes will be included in the "
-                "release commit. Continue? [y/N] "
+                "release commit. Continue? [Y/n] "
             )
             .strip()
             .lower()
         )
-        if not response.startswith("y"):
+        if response.startswith("n"):
             return False, True
         return True, True
 
@@ -1316,11 +1316,11 @@ def validate_changelog(
 
     if not release_notes:
         response = (
-            input(f"  Use generic message 'Release {version}'? [y/N] ")
+            input(f"  Use generic message 'Release {version}'? [Y/n] ")
             .strip()
             .lower()
         )
-        if not response.startswith("y"):
+        if response.startswith("n"):
             return False, ""
         release_notes = f"Release {version}"
     else:

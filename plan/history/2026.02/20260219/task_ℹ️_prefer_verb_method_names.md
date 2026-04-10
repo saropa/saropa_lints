@@ -184,7 +184,7 @@ void main() {
 ```
 
 ## Quick Fix
-This rule does not provide an automated quick fix because renaming a method is a semantic decision requiring developer judgement. Instead, provide a suggestion in the `correctionMessage`:
+This rule does not provide an automated quick fix because renaming a method is a semantic decision requiring developer judgment. Instead, provide a suggestion in the `correctionMessage`:
 
 ```
 correctionMessage: 'Prefix the method name with a verb such as "get", "fetch", "compute", "build", "find", or "handle" to clarify what the method does. For example, rename "data()" to "fetchData()" or "getData()".',

@@ -11,10 +11,10 @@
 ## Detail
 
 ### Problem  
-When a new search is started, the previous search request should be cancelled to avoid race conditions and wasted resources. This is especially important for networked or async search operations.
+When a new search is started, the previous search request should be canceled to avoid race conditions and wasted resources. This is especially important for networked or async search operations.
 
 ### Why This Is Complex  
-- **Pattern detection:** Requires analyzing how search requests are managed and cancelled.
+- **Pattern detection:** Requires analyzing how search requests are managed and canceled.
 - **API diversity:** Different libraries and patterns for cancellation (e.g., CancelToken, abort controller).
 - **False positives:** Some searches are intentionally allowed to run concurrently.
 

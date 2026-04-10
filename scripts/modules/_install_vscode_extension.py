@@ -274,8 +274,8 @@ def install_extension(source_dir: Path, extensions_dir: Path) -> bool:
     # Check if already installed
     if target_dir.exists():
         print_warning(f"Extension already exists at: {target_dir}")
-        response = input("  Overwrite existing installation? [y/N] ").strip().lower()
-        if not response.startswith("y"):
+        response = input("  Overwrite existing installation? [Y/n] ").strip().lower()
+        if response.startswith("n"):
             print_info("Installation canceled")
             return False
 
@@ -421,7 +421,7 @@ def main() -> int:
         print_colored("      1. VS Code (standard)", Color.CYAN)
         print_colored("      2. VS Code Insiders", Color.CYAN)
         print()
-        response = input("  Select [1/2]: ").strip()
+        response = input("  Select [1]: ").strip()
         if response == "2":
             target_dir = insiders_dir
             vscode_variant = "VS Code Insiders"
