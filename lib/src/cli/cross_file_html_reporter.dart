@@ -33,8 +33,8 @@ void reportToHtml(CrossFileResult result, String outputDir) {
   <h1>Cross-file analysis report</h1>
   <p class="summary">Unused files: ${u.length} | Circular dependencies: ${c.length} | Files: $fileCount | Total imports: $totalImports</p>
   <ul>
-    <li><a href="unused-files.html">Unused files ($u.length)</a></li>
-    <li><a href="circular-deps.html">Circular dependencies ($c.length)</a></li>
+    <li><a href="unused-files.html">Unused files (${u.length})</a></li>
+    <li><a href="circular-deps.html">Circular dependencies (${c.length})</a></li>
   </ul>
 </body>
 </html>

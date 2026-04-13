@@ -9,11 +9,16 @@ class CrossFileResult {
     required this.unusedFiles,
     required this.circularDependencies,
     required this.stats,
+    this.includedPaths = const {},
   });
 
   final List<String> unusedFiles;
   final List<List<String>> circularDependencies;
   final Map<String, dynamic> stats;
+
+  /// All file paths that survived exclude filtering. Empty when no excludes
+  /// were applied (callers should fall back to the full graph in that case).
+  final Set<String> includedPaths;
 }
 
 /// Formats cross-file analysis results as text or JSON.
