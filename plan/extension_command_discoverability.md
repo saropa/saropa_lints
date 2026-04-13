@@ -242,11 +242,11 @@ This gives new users a path to discover features before they've run anything.
 - [x] `extension/src/views/commandCatalogRegistry.ts` — static catalog data for all 117 commands
 - [x] `extension/package.json` — register `saropaLints.showCommandCatalog` command
 - [x] `extension/src/extension.ts` — register catalog in `activate()`
-- [ ] Test: catalog registry vs package.json sync check
+- [x] Test: catalog registry vs package.json sync check (11 tests in `commandCatalogRegistry.test.ts`)
 - [x] Audit `when: false` commands — 7 copy-as-JSON converted to `saropaLints.isDartProject`, 6 truly internal kept hidden
 - [x] 3 new walkthrough steps (Package Health, TODOs & Hacks, Browse Commands) + media markdown files
 - [x] Welcome view update — add command catalog link to both welcome views
-- [ ] CONTRIBUTING.md update — document catalog registry maintenance requirement
+- [x] CONTRIBUTING.md update — document catalog registry maintenance requirement
 
 ---
 
