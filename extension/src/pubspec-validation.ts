@@ -36,6 +36,12 @@ interface DepEntry {
     readonly startChar: number;
     /** Column where the package name ends. */
     readonly endChar: number;
+    /**
+     * True when the entry is an SDK dependency (has `sdk: flutter` or
+     * similar sub-key). SDK deps are conventionally placed before
+     * pub-hosted packages and exempt from alphabetical ordering.
+     */
+    readonly isSdk: boolean;
 }
 
 interface DepSection {
@@ -92,10 +98,13 @@ function parseDependencySections(lines: readonly string[]): DepSection[] {
         const name = depMatch[2];
         const rawValue = depMatch[4].trim();
 
-        // Skip SDK/path/git deps (value is empty and next line is indented
-        // further, or value is empty meaning "hosted latest")
+        // Detect SDK/path/git deps — value is empty and next line is
+        // indented further (has sub-keys like `sdk: flutter`)
         const nextLine = i + 1 < lines.length ? lines[i + 1] : '';
         const hasSubKey = /^ {4}\S/.test(nextLine);
+
+        // SDK dep: next line is `    sdk: <name>`
+        const isSdk = hasSubKey && /^ {4}sdk\s*:/.test(nextLine);
 
         // Extract constraint: quoted or unquoted value on same line
         let constraint = '';
@@ -110,6 +119,7 @@ function parseDependencySections(lines: readonly string[]): DepSection[] {
             line: i,
             startChar: depMatch[1].length,
             endChar: depMatch[1].length + name.length,
+            isSdk,
         });
     }
 
@@ -175,7 +185,7 @@ function checkAnyVersion(
             if (entry.constraint === 'any') {
                 diagnostics.push(createDiag(
                     entry,
-                    `'${entry.name}' uses 'any' version constraint — `
+                    `[saropa_lints] '${entry.name}' uses 'any' version constraint — `
                     + 'pin to a specific range (e.g. ^1.0.0) for reproducible builds',
                     vscode.DiagnosticSeverity.Warning,
                     'avoid_any_version',
@@ -196,7 +206,11 @@ function checkDependencyOrdering(
     diagnostics: vscode.Diagnostic[],
 ): void {
     for (const section of sections) {
-        const names = section.entries.map(e => e.name);
+        // SDK deps (flutter, flutter_localizations, etc.) are
+        // conventionally placed first — only check alphabetical
+        // order among non-SDK (pub-hosted) entries.
+        const pubEntries = section.entries.filter(e => !e.isSdk);
+        const names = pubEntries.map(e => e.name);
         const sorted = [...names].sort((a, b) =>
             a.toLowerCase().localeCompare(b.toLowerCase()),
         );
@@ -205,10 +219,10 @@ function checkDependencyOrdering(
             if (names[i] !== sorted[i]) {
                 // Report on the first out-of-order entry only, to avoid
                 // flooding the user with N diagnostics for one unsorted block
-                const entry = section.entries[i];
+                const entry = pubEntries[i];
                 diagnostics.push(createDiag(
                     entry,
-                    `'${section.header}' are not sorted alphabetically — `
+                    `[saropa_lints] '${section.header}' are not sorted alphabetically — `
                     + `'${entry.name}' should come after '${sorted[i]}'`,
                     vscode.DiagnosticSeverity.Information,
                     'dependencies_ordering',
@@ -252,7 +266,7 @@ function checkCaretSyntax(
             if (/^\d+\.\d+\.\d+/.test(c)) {
                 diagnostics.push(createDiag(
                     entry,
-                    `'${entry.name}: ${c}' pins to an exact version — `
+                    `[saropa_lints] '${entry.name}: ${c}' pins to an exact version — `
                     + `use '^${c}' for compatible updates`,
                     vscode.DiagnosticSeverity.Information,
                     'prefer_caret_version_syntax',
@@ -291,7 +305,7 @@ function checkDependencyOverrides(
 
             diagnostics.push(createDiag(
                 entry,
-                `'${entry.name}' in dependency_overrides has no comment — `
+                `[saropa_lints] '${entry.name}' in dependency_overrides has no comment — `
                 + 'add a comment explaining why this override is needed',
                 vscode.DiagnosticSeverity.Warning,
                 'avoid_dependency_overrides',
@@ -307,8 +321,13 @@ function checkDependencyOverrides(
  * If `publish_to` is absent, the package can be accidentally published
  * with `dart pub publish`. Adding `publish_to: none` prevents this.
  *
- * Skips: packages that already have any `publish_to` field (whether
- * `none` or a custom registry URL).
+ * Skips:
+ * - Packages that already have any `publish_to` field (whether `none`
+ *   or a custom registry URL).
+ * - Packages that appear intentionally published: having `topics:`,
+ *   `homepage:`, or `repository:` fields signals the author intends
+ *   pub.dev publication, so suggesting `publish_to: none` would be
+ *   a false positive.
  */
 function checkPublishToNone(
     lines: string[],
@@ -319,6 +338,14 @@ function checkPublishToNone(
         line => /^publish_to\s*:/.test(line),
     );
     if (hasPublishTo) { return; }
+
+    // Skip packages that show clear intent to publish — these top-level
+    // fields are only useful for pub.dev-listed packages, so their
+    // presence means publish_to: none would be wrong.
+    const looksPublished = lines.some(
+        line => /^(topics|homepage|repository)\s*:/.test(line),
+    );
+    if (looksPublished) { return; }
 
     // Find the `name:` line to attach the diagnostic to
     const nameLineIndex = lines.findIndex(
@@ -336,7 +363,7 @@ function checkPublishToNone(
     );
     const diag = new vscode.Diagnostic(
         range,
-        `'${pkgName}' has no 'publish_to' field — `
+        `[saropa_lints] '${pkgName}' has no 'publish_to' field — `
         + "add 'publish_to: none' to prevent accidental publishing",
         vscode.DiagnosticSeverity.Information,
     );
@@ -373,7 +400,7 @@ function checkPinnedVersionSyntax(
             if (/^\d+\.\d+\.\d+/.test(bare)) {
                 diagnostics.push(createDiag(
                     entry,
-                    `'${entry.name}: ${c}' uses a caret range — `
+                    `[saropa_lints] '${entry.name}: ${c}' uses a caret range — `
                     + `use '${bare}' to pin the exact version`,
                     vscode.DiagnosticSeverity.Information,
                     'prefer_pinned_version_syntax',
@@ -444,7 +471,7 @@ function checkPubspecOrdering(
             const curr = found[i];
             diagnostics.push(createLineDiag(
                 curr.line, 0, curr.length,
-                `'${curr.key}' should appear before '${found[i - 1].key}' — `
+                `[saropa_lints] '${curr.key}' should appear before '${found[i - 1].key}' — `
                 + 'follow the recommended pubspec field order',
                 vscode.DiagnosticSeverity.Information,
                 'pubspec_ordering',
@@ -479,7 +506,7 @@ function checkNewlineBeforeEntry(
         // no visual separator
         diagnostics.push(createLineDiag(
             i, 0, lines[i].length,
-            `add a blank line before '${match[1]}:' for readability`,
+            `[saropa_lints] add a blank line before '${match[1]}:' for readability`,
             vscode.DiagnosticSeverity.Information,
             'newline_before_pubspec_entry',
         ));
@@ -540,7 +567,7 @@ function checkCommentingPubspecIgnores(
         const startChar = entryMatch[1].length;
         diagnostics.push(createLineDiag(
             i, startChar, startChar + advisory.length,
-            `ignored advisory '${advisory}' has no comment — `
+            `[saropa_lints] ignored advisory '${advisory}' has no comment — `
             + 'add a comment explaining why this advisory is safe to ignore',
             vscode.DiagnosticSeverity.Information,
             'prefer_commenting_pubspec_ignores',
@@ -579,7 +606,7 @@ function checkResolutionWorkspace(
 
     diagnostics.push(createLineDiag(
         workspaceLine, 0, lines[workspaceLine].length,
-        "workspace root is missing 'resolution: workspace' — "
+        "[saropa_lints] workspace root is missing 'resolution: workspace' — "
         + 'add it for shared dependency resolution across sub-packages',
         vscode.DiagnosticSeverity.Information,
         'add_resolution_workspace',
@@ -629,7 +656,7 @@ function checkL10nYamlConfig(
         const endChar = startChar + genMatch[2].length;
         diagnostics.push(createLineDiag(
             i, startChar, endChar,
-            "inline 'generate: true' under flutter — "
+            "[saropa_lints] inline 'generate: true' under flutter — "
             + "prefer a dedicated 'l10n.yaml' file for localization config",
             vscode.DiagnosticSeverity.Information,
             'prefer_l10n_yaml_config',
