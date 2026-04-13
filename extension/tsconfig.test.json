@@ -58,7 +58,9 @@
     "src/reportWriter.ts",
     "src/suppressionsStore.ts",
     "src/projectRoot.ts",
-    "src/test/views/issuesTree.test.ts"
+    "src/test/views/issuesTree.test.ts",
+    "src/pubspec-validation.ts",
+    "src/test/pubspec-validation.test.ts"
   ],
   "exclude": ["node_modules", ".vscode-test", "out", "dist"]
 }

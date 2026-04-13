@@ -22,10 +22,10 @@ Other rejected Drift ideas (redundant with compiler/library or trivial): schema 
 
 | Rule | Why rejected |
 |------|-------------|
-| `avoid_any_version` | Requires YAML parsing of `pubspec.yaml`. Moved to pubspec rules — could be implemented via extension or CLI, but NOT as an analyzer plugin rule on `.dart` files. See note below. |
+| ~~`avoid_any_version`~~ | **Implemented** as extension-side diagnostic (v10.11.0). Removed from this list. |
 | `avoid_banned_api` | Configurable layer-boundary rule requires per-project config parsing from `analysis_options.yaml`. High maintenance, overlaps with `banned_usage`. |
 | `avoid_connectivity_ui_decisions` | False positive rate too high. Cannot distinguish full-screen offline block (bad) from small offline indicator (fine) — identical AST: `StreamBuilder` → `if` on `ConnectivityResult` → `return widget`. |
-| `avoid_dependency_overrides` | Requires reading `pubspec.yaml`. Same barrier as `avoid_any_version`. |
+| ~~`avoid_dependency_overrides`~~ | **Implemented** as extension-side diagnostic (v10.11.0). Removed from this list. |
 | `avoid_firestore_admin_role_overuse` | Cannot distinguish security enforcement (bad) from UI personalization (fine). `claims['admin']` for UI gating looks identical in both cases. |
 | `avoid_large_assets_on_web` | Lint cannot read file sizes from disk. Asset paths are strings. Analyzer does not resolve to filesystem. Build-time/CI concern, not a lint. |
 | `avoid_large_object_in_state` | Static analysis cannot measure runtime object size. `Uint8List` could be 16 bytes or 5 MB. DevTools memory profiler is the correct tool. |
@@ -36,11 +36,6 @@ Other rejected Drift ideas (redundant with compiler/library or trivial): schema 
 
 ### Note on pubspec rules listed here
 
-`avoid_any_version` and `avoid_dependency_overrides` were rejected specifically as **analyzer plugin rules** (running on `.dart` files). They could still be implemented as:
-- Extension-side checks (TypeScript, reading `pubspec.yaml` directly)
-- CLI commands
-- A future pubspec-aware analysis path
+`avoid_dependency_overrides` was rejected specifically as an **analyzer plugin rule** (running on `.dart` files). It has now been implemented as an extension-side diagnostic following the same pattern as `avoid_any_version`.
 
-If implemented via a non-plugin path, remove them from this file and track them as active work.
-
-**Total: 14 rules**
+**Total: 14 rules** (2 implemented, 12 permanently rejected)

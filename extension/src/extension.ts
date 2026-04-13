@@ -39,6 +39,7 @@ import { RulePacksWebviewProvider } from './rulePacks/rulePacksWebviewProvider';
 import { openRuleExplainPanelForViolation, openRuleExplainPanel } from './views/ruleExplainView';
 import { readViolations, ViolationsData, getViolationsPath as getViolationsFilePath } from './violationsReader';
 import { hasSaropaLintsDep } from './pubspecReader';
+import { registerPubspecValidation } from './pubspec-validation';
 import {
   appendSnapshot,
   loadHistory,
@@ -196,6 +197,10 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   const driftAdvisorDiagCollection = vscode.languages.createDiagnosticCollection('Saropa Drift Advisor');
   context.subscriptions.push(driftAdvisorDiagCollection);
   const driftAdvisorProvider = new DriftAdvisorTreeProvider(driftAdvisorDiagCollection);
+
+  // Pubspec validation: inline diagnostics for dependency ordering,
+  // version syntax, and constraint issues on pubspec.yaml
+  registerPubspecValidation(context);
 
   const issuesProvider = new IssuesTreeProvider(context.workspaceState);
   const summaryProvider = new SummaryTreeProvider();
