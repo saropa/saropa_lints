@@ -683,6 +683,13 @@ export class PubspecValidation {
     }
 }
 
+/** Read the preferPinnedVersions setting from VS Code configuration. */
+function readPinnedVersionsSetting(): boolean {
+    return vscode.workspace
+        .getConfiguration('saropaLints.pubspecValidation')
+        .get<boolean>('preferPinnedVersions', false) ?? false;
+}
+
 /**
  * Create a PubspecValidation instance with its own DiagnosticCollection.
  *
@@ -690,6 +697,9 @@ export class PubspecValidation {
  * `validator.update(uri, content)` — this allows a single shared
  * pubspec.yaml listener to drive both PubspecValidation and SDK/Vibrancy
  * diagnostics without duplicate event subscriptions or debounce timers.
+ *
+ * Also reads the `preferPinnedVersions` setting and listens for changes,
+ * re-validating open pubspec files when the setting toggles.
  */
 export function createPubspecValidation(
     context: vscode.ExtensionContext,
@@ -698,29 +708,50 @@ export function createPubspecValidation(
         'saropa-pubspec',
     );
     context.subscriptions.push(collection);
-    return new PubspecValidation(collection);
+
+    const validator = new PubspecValidation(collection);
+    validator.preferPinnedVersions = readPinnedVersionsSetting();
+
+    // Re-read the setting when it changes and refresh open pubspecs
+    context.subscriptions.push(
+        vscode.workspace.onDidChangeConfiguration(e => {
+            if (!e.affectsConfiguration(
+                'saropaLints.pubspecValidation.preferPinnedVersions',
+            )) { return; }
+            validator.preferPinnedVersions = readPinnedVersionsSetting();
+            // Re-validate any open pubspec.yaml editors immediately
+            for (const editor of vscode.window.visibleTextEditors) {
+                if (editor.document.fileName.endsWith('pubspec.yaml')) {
+                    validator.update(
+                        editor.document.uri,
+                        editor.document.getText(),
+                    );
+                }
+            }
+        }),
+    );
+
+    return validator;
 }
 
 /**
- * Fallback listener registration for when vibrancy activation fails.
+ * Wire up pubspec.yaml document listeners with debounce. Shared helper
+ * used by both the primary listener path (extension-activation.ts) and
+ * the fallback path (when vibrancy activation fails).
  *
- * Normally, pubspec.yaml listeners are registered centrally in
- * extension-activation.ts so that one listener drives both pubspec
- * validation and SDK diagnostics. If vibrancy activation throws,
- * this function registers standalone listeners so pubspec validation
- * still works — the user loses SDK/vibrancy diagnostics but keeps
- * style/structure checks.
+ * @param onRefresh Called with the document when pubspec.yaml is opened
+ *   or edited (after debounce). May be sync or async.
  */
-export function registerFallbackPubspecListeners(
+export function registerPubspecDocListeners(
     context: vscode.ExtensionContext,
-    validator: PubspecValidation,
+    onRefresh: (doc: vscode.TextDocument) => void | Promise<void>,
 ): void {
     const isPubspec = (doc: vscode.TextDocument) =>
         doc.fileName.endsWith('pubspec.yaml');
 
     const refresh = (doc: vscode.TextDocument) => {
         if (!isPubspec(doc)) { return; }
-        validator.update(doc.uri, doc.getText());
+        void onRefresh(doc);
     };
 
     let debounceTimer: ReturnType<typeof setTimeout> | null = null;
@@ -738,8 +769,21 @@ export function registerFallbackPubspecListeners(
         }),
     );
     for (const editor of vscode.window.visibleTextEditors) {
-        if (isPubspec(editor.document)) {
-            refresh(editor.document);
-        }
+        refresh(editor.document);
     }
+}
+
+/**
+ * Fallback listener registration for when vibrancy activation fails.
+ * Registers standalone pubspec.yaml listeners so pubspec validation
+ * still works — the user loses SDK/vibrancy diagnostics but keeps
+ * style/structure checks.
+ */
+export function registerFallbackPubspecListeners(
+    context: vscode.ExtensionContext,
+    validator: PubspecValidation,
+): void {
+    registerPubspecDocListeners(context, (doc) => {
+        validator.update(doc.uri, doc.getText());
+    });
 }

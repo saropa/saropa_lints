@@ -34,6 +34,7 @@
     "src/sidebarToggleLabel.ts",
     "src/overviewEmbeddedConfigKinds.ts",
     "src/test/sidebarSectionVisibilityKeys.test.ts",
+    "src/test/sidebarToggleCommand.test.ts",
     "src/test/sidebarToggleLabel.test.ts",
     "src/test/overviewEmbeddedConfigKinds.test.ts",
     "src/copyTreeAsJson.ts",
@@ -60,7 +61,9 @@
     "src/projectRoot.ts",
     "src/test/views/issuesTree.test.ts",
     "src/pubspec-validation.ts",
-    "src/test/pubspec-validation.test.ts"
+    "src/test/pubspec-validation.test.ts",
+    "src/pubspec-code-actions.ts",
+    "src/test/pubspec-code-actions.test.ts"
   ],
   "exclude": ["node_modules", ".vscode-test", "out", "dist"]
 }

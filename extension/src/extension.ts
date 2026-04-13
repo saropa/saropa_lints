@@ -40,6 +40,7 @@ import { openRuleExplainPanelForViolation, openRuleExplainPanel } from './views/
 import { readViolations, ViolationsData, getViolationsPath as getViolationsFilePath } from './violationsReader';
 import { hasSaropaLintsDep } from './pubspecReader';
 import { createPubspecValidation, registerFallbackPubspecListeners } from './pubspec-validation';
+import { PubspecCodeActionProvider } from './pubspec-code-actions';
 import {
   appendSnapshot,
   loadHistory,
@@ -203,6 +204,16 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // Listeners are registered centrally in extension-activation.ts to
   // share a single pubspec.yaml watcher with SDK diagnostics.
   const pubspecValidator = createPubspecValidation(context);
+
+  // Quick-fix code actions for pubspec validation diagnostics
+  // (caret/pin syntax, publish_to, blank lines, resolution workspace)
+  context.subscriptions.push(
+    vscode.languages.registerCodeActionsProvider(
+      { language: 'yaml', pattern: '**/pubspec.yaml' },
+      new PubspecCodeActionProvider(),
+      { providedCodeActionKinds: [vscode.CodeActionKind.QuickFix] },
+    ),
+  );
 
   const issuesProvider = new IssuesTreeProvider(context.workspaceState);
   const summaryProvider = new SummaryTreeProvider();
@@ -622,7 +633,8 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     vscode.commands.registerCommand('saropaLints.openConfig', openConfig),
     vscode.commands.registerCommand('saropaLints.toggleSidebarSection', async (key: unknown) => {
       if (typeof key !== 'string') {
-        log(`toggleSidebarSection: ignored non-string key: ${typeof key}`);
+        // Command was invoked without a valid section key (e.g. from the
+        // command palette where no argument is passed).  Nothing to toggle.
         return;
       }
       try {
@@ -643,7 +655,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       } catch (err) {
         // Surface config-update failures so the user sees feedback.
         const msg = err instanceof Error ? err.message : String(err);
-        log(`toggleSidebarSection error for "${key}": ${msg}`);
+        console.error(`toggleSidebarSection error for "${key}": ${msg}`);
         void vscode.window.showErrorMessage(
           `Saropa Lints: failed to toggle sidebar section — ${msg}`,
         );
