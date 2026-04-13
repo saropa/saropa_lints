@@ -38,10 +38,12 @@
 
 ### Added (Extension)
 
-- **Pubspec validation diagnostics**: Three new inline checks on `pubspec.yaml`, shown in the Problems panel and as editor squiggles:
+- **Pubspec validation diagnostics**: Five inline checks on `pubspec.yaml`, shown in the Problems panel and as editor squiggles:
   - `avoid_any_version` (Warning): Flags `any` version constraints in dependencies
   - `dependencies_ordering` (Info): Flags unsorted dependency lists
   - `prefer_caret_version_syntax` (Info): Flags bare version pins (`1.2.3`) — suggests caret syntax (`^1.2.3`)
+  - `avoid_dependency_overrides` (Warning): Flags `dependency_overrides` entries without an explanatory comment
+  - `prefer_publish_to_none` (Info): Flags pubspec files missing `publish_to: none` field
 - Diagnostics update live as you edit pubspec.yaml (300ms debounce). SDK/path/git dependencies and `dependency_overrides` are handled correctly.
 
 ### Fixed
