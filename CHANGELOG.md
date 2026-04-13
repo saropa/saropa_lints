@@ -30,6 +30,22 @@
 
 ---
 
+## [Unreleased]
+
+### Fixed
+
+- **avoid_stream_subscription_in_field**: Fixed false positive when `.listen()` is inside a conditional block (`if`/`for`) and assigned to a properly-named subscription field. The parent-walk loop now stops at closure (`FunctionExpression`) boundaries to prevent escaping into outer scopes. **Note:** this also fixes false negatives where a bare `.listen()` inside a closure was incorrectly suppressed because an outer scope had a properly-named subscription assignment — those uncaptured subscriptions will now correctly fire the lint.
+
+### Added
+
+- **Bug Report Guide**: Added `bugs/BUG_REPORT_GUIDE.md` — structured template and investigation checklist for filing lint rule bugs (false positives, false negatives, crashes, wrong fixes, performance)
+
+### Maintenance
+
+Moved [9.9.0] and older logs to [CHANGELOG_ARCHIVE.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG_ARCHIVE.md)
+
+---
+
 ## [10.10.0]
 
 ### Added
@@ -361,207 +377,7 @@ In this milestone update work centers on the composite analyzer plugin hook (`re
 
 ---
 
-## [9.10.0]
-
-This release adds version-gap awareness: see which PRs and issues landed between your pinned version and latest, triage them with a persistent review checklist, and focus your pubspec tooltip on must-know stats with a "View Full Details" link to a full-detail panel. — [log](https://github.com/saropa/saropa_lints/blob/v9.10.0/CHANGELOG.md)
-
-### Added
-
-• **Version-gap PR/issue viewer** — new "Package Details" webview panel shows merged PRs and closed issues between your current package version and latest, fetched from GitHub on demand. Includes searchable/filterable/sortable table with per-item review controls.
-
-• **Review checklist** — persistent triage state for version-gap items. Mark each PR/issue as reviewed, applicable, or not-applicable. State persists across sessions and auto-prunes when package versions change.
-
-• **Full-detail package panel** — new command `Show Package Details` opens a comprehensive editor-area panel with version info, community metrics, alerts, vulnerabilities, version-gap table, platforms, and suggestions.
-
-• **"View Full Details" links** — compact hover tooltip and sidebar detail view now include a "View Full Details" button that opens the full panel.
-
-• **Version-gap configuration** — new setting `saropaLints.packageVibrancy.enableVersionGap` (default: off) to enable GitHub version-gap fetching. Recommended with a GitHub token for best results.
-
-### Changed
-
-• **Compact hover tooltip** — pubspec dependency hover reduced from 60-100+ lines to ~10 lines of must-know stats (score, update, license, vulnerabilities, critical alerts, action item count).
-
----
-
-## [9.9.1]
-
-Flutter deprecation migration rules and ROADMAP additional rules 11–20. — [log](https://github.com/saropa/saropa_lints/blob/v9.9.1/CHANGELOG.md)
-
-### Added
-
-• **Lint rules** — 7 new Flutter deprecation migration rules (WARNING, Recommended tier):
-
-- **prefer_m3_text_theme**: flags deprecated 2018-era TextTheme member names (headline1–6, subtitle1–2, bodyText1–2, caption, button, overline) removed in Flutter 3.22. Quick fix renames to M3 equivalents.
-- **prefer_keepalive_dispose**: flags `KeepAliveHandle.release()` removed after Flutter 3.19; use `dispose()` instead. Quick fix renames the method call.
-- **prefer_pan_axis**: flags `InteractiveViewer.alignPanAxis` removed after Flutter 3.19; use `panAxis` enum parameter instead.
-- **prefer_context_menu_builder**: flags `CupertinoContextMenu.previewBuilder` removed after Flutter 3.19; use `builder` (callback signature changed, manual migration required).
-- **prefer_button_style_icon_alignment**: flags `iconAlignment` parameter on button constructors deprecated in Flutter 3.28; move to `ButtonStyle.iconAlignment`.
-- **prefer_key_event**: flags deprecated `RawKeyEvent`/`RawKeyboard` system deprecated in Flutter 3.18; migrate to `KeyEvent`/`HardwareKeyboard`.
-- **prefer_platform_menu_bar_child**: flags `PlatformMenuBar.body` removed after Flutter 3.16; use `child` instead. Quick fix renames the parameter.
-
-• **Lint rules** — **prefer_tabbar_theme_indicator_color**: flags `ThemeData.indicatorColor` usage deprecated in Flutter 3.32.0; migrate to `TabBarThemeData.indicatorColor` (WARNING, Recommended tier). Quick fix removes the deprecated argument.
-
-• **Lint rules** — 10 new rules from ROADMAP additional rules 11–20:
-
-- **uri_does_not_exist** (ERROR, Essential): import/export/part URI refers to a non-existent file.
-- **depend_on_referenced_packages** (WARNING, Essential): imported package not listed in pubspec.yaml dependencies.
-- **secure_pubspec_urls** (WARNING, Recommended): flags insecure http:// or git:// URLs in pubspec dependency sources.
-- **package_names** (WARNING, Recommended): package name in pubspec must be lowercase_with_underscores.
-- **prefer_for_elements_to_map_from_iterable** (WARNING, Professional): prefer for-element map literal over Map.fromIterable with key/value closures.
-- **missing_code_block_language_in_doc_comment** (INFO, Comprehensive): fenced code block in doc comment missing language identifier.
-- **unintended_html_in_doc_comment** (INFO, Comprehensive): angle brackets in doc comment prose interpreted as HTML.
-- **uri_does_not_exist_in_doc_import** (INFO, Comprehensive): @docImport URI refers to a non-existent file.
-- **invalid_visible_outside_template_annotation** (WARNING, Comprehensive): @visibleOutsideTemplate used on wrong declaration type.
-- **sort_pub_dependencies** (INFO, Comprehensive): pubspec dependencies not sorted alphabetically.
-
-## [9.9.0]
-
-Import graph tracking, scan API, TODOs & Hacks view, and new lint rules. — [log](https://github.com/saropa/saropa_lints/blob/v9.9.0/CHANGELOG.md)
-
-### Fixed
-
-• **Package** — Analysis log report sections **FILE IMPORTANCE**, **FIX PRIORITY**, and **PROJECT STRUCTURE** now receive import graph data: `ImportGraphTracker.collectImports` runs from `SaropaContext` on each analyzed file (right after the file is recorded for progress), and `ImportGraphTracker.setProjectInfo` runs from `AnalysisReporter.initialize` so `package:` self-imports resolve. If the reporter is never initialized (e.g. progress reporting off), `collectImports` infers project root and package name from the file path once. Windows path keys (`\` vs `/`) are aligned when resolving edges so the graph matches analyzer file paths.
-
-• **Package** — **Cross-isolate import graph:** each batch file (`.batches/*.json`) now includes optional `ig` (raw import/export URIs per file). `ReportConsolidator` merges `ig` across isolates into `ConsolidatedData.mergedRawImports`; the combined report hydrates `ImportGraphTracker` from that merge so FILE IMPORTANCE / PROJECT STRUCTURE reflect the whole session. Legacy batches without `ig` still use in-memory graph data from the writing isolate. **Path alignment:** consolidated violations use project-relative paths; `ImportGraphTracker` resolves scores and FILE IMPORTANCE issue counts against graph keys via canonical path matching.
-
-• **Package** — Priority report correctness: progress/report counts are now deduplicated by `ruleName:offset` (offset-based) instead of `ruleName:line`, preventing inflated FIX PRIORITY / FILE IMPORTANCE counts when the same rule emits multiple diagnostics at the same location. The combined report also omits the legacy flat `ALL VIOLATIONS` section so developers work from the prioritized view.
-
-### Added
-
-• **Package** — Performance benchmark: added `test/import_graph_tracker_perf_test.dart` to measure ordering overhead for FILE IMPORTANCE / FIX PRIORITY / PROJECT STRUCTURE sections. Synthetic “200-file chain + 500 violations” took ~60-80ms in unit test (the “<20ms” target still needs optimization).
-• **Extension** — Added setting `saropaLints.runAnalysisOpenEditorsOnly` to run `dart/flutter analyze` only for Dart files currently open in VS Code (faster turnaround during focused work).
-
-• **Extension** — **Drift Advisor integration (optional):** When using a Dart/Drift project and a running Saropa Drift Advisor server, enable `saropaLints.driftAdvisor.integration` in settings. The extension discovers the server (ports 8642–8649 by default via GET /api/health), fetches index suggestions and anomalies (GET /api/issues when supported, else legacy endpoints), maps table/column to Dart file/line via PascalCase/camelCase heuristics, and shows issues in the **Drift Advisor** sidebar view and optionally in the Problems list (source "Saropa Drift Advisor"). Settings: integration, portRange, pollIntervalMs, showInProblems. Commands: Refresh, Open in Browser. No dependency on the Drift Advisor extension at install time. See About Saropa Lints and plan in bugs/history.
-
-• **Extension** — **Log Capture integration**: Public API for other extensions (e.g. Saropa Log Capture). When the extension is activated, `exports` provides: `getViolationsData()`, `getViolationsPath()`, `getHealthScoreParams()`, `runAnalysis()`, `runAnalysisForFiles(files)`, `getVersion()`. Consumers use `vscode.extensions.getExtension('saropa.saropa-lints')?.exports`. No progress UI when `runAnalysisForFiles` is invoked via API unless `showProgress: true`; file list is normalized, deduplicated, sorted, and capped at 50. See extension README “API for other extensions” and `bugs/plan/plan_log_capture_integration.md`.
-
-• **Package** — **Consumer manifest**: `reports/.saropa_lints/consumer_contract.json` is written after every violation export with `schemaVersion`, `healthScore` (impactWeights, decayRate), and `tierRuleSets` (rule names per tier: essential, recommended, professional, comprehensive, pedantic, stylistic). Single source for health score constants: `lib/src/report/health_score_constants.dart`; extension’s `healthScore.ts` and the manifest stay in sync. Documented in VIOLATION_EXPORT_API.md “Consumer manifest” section.
-
-• **Package** — **Rule metadata API:** `RuleType`, `RuleStatus`, and `AccuracyTarget` (`lib/src/rule_metadata.dart`); optional getters on `SaropaLintRule` (`ruleType`, `accuracyTarget`, `ruleStatus`, `cweIds`, `certIds`, `tags`). Exported from `package:saropa_lints/saropa_lints.dart`. Bulk `ruleType`/`tags` by category: `scripts/bulk_rule_metadata.py`. Security follow-up: populated `cweIds` and added `securityHotspot` + `review-required` (WebView/redirects) via `scripts/apply_security_metadata_cwe_hotspots.py` where human review is expected. See `bugs/discussion/RULE_METADATA_BULK_STATUS.md`.
-
-• **Scan** — Public programmatic API and CLI extensions: (1) **Public API**: `package:saropa_lints/scan.dart` exports `ScanRunner`, `ScanConfig`, `ScanDiagnostic`, `loadScanConfig`, `scanDiagnosticsToJson`, `scanDiagnosticsToJsonString`, and `ScanMessageSink` for running scans from code without the CLI. (2) **File-list support**: `ScanRunner(dartFiles: [...])` and CLI `--files <path>...` and `--files-from-stdin` (one path per line) to scan only specified files; relative paths resolved against project root; optional exclusions applied. (3) **Tier override**: `ScanRunner(tier: 'essential'|...)` and CLI `--tier <name>` to use a tier’s rule set for that run without changing `analysis_options.yaml`. (4) **Message sink**: optional `messageSink` callback to redirect or suppress progress/error output. (5) **JSON output**: `--format json` writes machine-readable JSON to stdout; same schema via `scanDiagnosticsToJson` / `scanDiagnosticsToJsonString`. (6) **CLI parser**: `parseScanArgs` in `lib/src/scan/scan_cli_args.dart` (testable); `--tier` with no value now exits 2 with clear message. (7) **Tests**: `test/scan_cli_args_test.dart` (parseScanArgs + process test), `test/scan_runner_test.dart` (ScanRunner with tier, dartFiles). Backward-compatible; existing `dart run saropa_lints scan [path]` unchanged when options omitted. See README “Standalone Scanner” and “Programmatic scan”.
-
-### Changed
-
-• **Package Vibrancy** — Unused-package detection no longer flags federated platform plugins with non-standard suffixes (e.g. `google_maps_flutter_ios_sdk10`) when the parent package is in `dependencies` or `dev_dependencies`; uses a parent-package heuristic in addition to the existing hard-coded suffix list.
-
-• **Package Vibrancy** — Report and webview titles use "Package Vibrancy Report" consistently (removed leftover "Saropa " from markdown export and HTML/webview panel).
-
-### Added
-
-• **Extension** — **TODOs & Hacks** view: Todo-Tree-style sidebar that lists TODO, FIXME, HACK, XXX, and BUG comment markers by scanning workspace files (no Dart analyzer or violations.json). Tree shows by folder → file → line, or by tag → file → line when "Group by tag" is enabled. Click a line to open the file at that line. Settings: tags, include/exclude globs, maxFilesToScan, autoRefresh (debounced refresh on save), groupByTag, and optional customRegex override. View toolbar: **Refresh** and **Toggle group by tag / folder**. "Scanning…" message shown briefly on refresh/toggle. When the scan hits the file cap, a placeholder node explains how to increase the limit. Unit tests for regex and exclude-pattern logic (run `npm run test` in extension directory). Implementation: core uses `regex.exec()` with `lastIndex` reset when global; concurrency guard prevents duplicate full scans when expanding multiple tag nodes.
-
-• **Lint rules** — **no_runtimeType_toString**: flags `runtimeType.toString()` and suggests type checks or direct `Type` comparison (performance, MAJOR, Recommended tier).
-
-• **Lint rules** — **use_truncating_division**: flags `(a / b).toInt()` and suggests `a ~/ b` (MAJOR, Recommended tier).
-
-• **Lint rules** — Eight additional rules from ROADMAP (comprehensive tier): **external_with_initializer** (external field/variable must not have initializer), **illegal_enum_values** (enum must not declare instance member named `values`), **wrong_number_of_parameters_for_setter** (setter must have exactly one required positional parameter), **duplicate_ignore** (same diagnostic listed twice in one ignore comment), **type_check_with_null** (prefer `== null` / `!= null` over `is Null` / `is! Null`), **unnecessary_library_name** (library directive with only a name and no URI), **invalid_runtime_check_with_js_interop_types** (is/is! with JS interop type at runtime), **argument_must_be_native** (Native.addressOf argument must be @Native or native type).
-
-• **Extension** — **Explain rule**: right-click any violation in the Issues view (or run **Saropa Lints: Explain rule** from the command palette) to open a side tab with full rule details: problem message, how to fix, severity, impact, OWASP mapping (when present), and a link to the ROADMAP. The panel reuses a single tab; the documentation link opens in the default browser.
-
-• **Extension** — **Create Saropa Lints Instructions for AI Agents**: Command (Overview title bar and Command Palette) creates `.cursor/rules/saropa_lints_instructions.mdc` in the workspace from a bundled template, so AI agents get project guidelines (essential files, workflow, prohibitions, principles). Uses async file I/O and a short progress notification.
-
-### Administration
-
-• **Scripts** — `publish.py` main workflow refactored into smaller helpers (`_PublishContext`, `_run_audit_step`, `_run_pre_publish_pipeline`, `_run_badge_validation_docs_dryrun`, etc.) to reduce cognitive complexity; behavior unchanged. Extension install/publish prompts centralized in `_prompt_extension_install_and_publish`. Main docstring documents flow for reviewers. `SystemExit` from `exit_with_error()` is caught so `finally` (timer summary) runs and the intended exit code is returned.
-
-• **Scripts** — Version prompt in `publish.py` refactored into smaller helpers (`_handle_win_key`, `_prompt_version_windows`, `_prompt_version_unix`) to satisfy cognitive complexity limits; behavior unchanged.
-
-• **Scripts** — Gap analysis export: `scripts/export_saropa_rules_for_gap.py` exports rule names and categories to JSON for comparison with external Dart rule sets. Procedure and inputs/outputs are documented in `bugs/discussion/GAP_ANALYSIS_EXTERNAL_DART.md`. Rule metadata plan (rule types, accuracy targets, tags, quality gates, etc.) is in `bugs/discussion/PLAN_RULE_METADATA_AND_QUALITY.md`.
-
-• **Extension** — First-run notification: score qualifier uses an if/else chain instead of a nested ternary (lint compliance, readability).
-
-• **Extension** — Prefer `.at(-n)` for from-end array access in celebration/snapshot logic (lint compliance).
-
-• **Extension** — Code quality: resolve SonarQube/TypeScript findings (node: imports, reduced cognitive complexity, batched subscriptions, replaceAll, positive conditions, extracted celebration/status-bar helpers); behavior unchanged.
-
----
-
-## [9.8.1]
-
-_Smarter SDK guidance in pubspec and less noise when already on 3.9+._ — [log](https://github.com/saropa/saropa_lints/blob/v9.8.1/CHANGELOG.md)
-
-### Added
-
-• **Package Vibrancy** — SDK constraint diagnostic now includes actionable guidance: "Aim for >=3.10.0; use >=3.9.0 only if you need to support more legacy setups." Quick fixes: **Set Dart SDK to >=3.10.0** (preferred) and **Set Dart SDK to >=3.9.0 (legacy support)**; both preserve the existing upper bound (e.g. <4.0.0). Hover on the `sdk:` or `flutter:` line in `pubspec.yaml` shows the Dart/Flutter version history table; diagnostic code links to [PACKAGE_VIBRANCY.md](https://github.com/saropa/saropa_lints/blob/main/PACKAGE_VIBRANCY.md).
-
-### Changed
-
-• **Package Vibrancy** — "Behind latest stable" is no longer shown when the Dart SDK minimum is already >=3.9.0, to avoid nagging projects that have adopted the recommended legacy floor.
-
----
-
-## [9.8.0]
-
-_One-line vibrancy summary in pubspec by default and consistent "Package Vibrancy" naming._ — [log](https://github.com/saropa/saropa_lints/blob/v9.8.0/CHANGELOG.md)
-
-### Changed
-
-• **Package Vibrancy** — Inline diagnostics in `pubspec.yaml` are now simplified by default: a single summary line (e.g. "Package Vibrancy: 12 stale, 8 legacy-locked — Open Package Vibrancy view for details.") instead of one warning per package. New setting `saropaLints.packageVibrancy.inlineDiagnostics`: **summary** (default), **critical** (only end-of-life/vulnerabilities/family conflicts per-line), **all** (one diagnostic per package, previous behavior), or **none** (sidebar only). Reduces noise in large projects while keeping the Package Vibrancy view as the place for full details.
-
-• **Package Vibrancy** — All user-facing text and diagnostic sources now use "Package Vibrancy" only; the former "Saropa Package Vibrancy" label has been removed from the extension (settings title, report headers, CI-generated comments, and diagnostics).
-
----
-
-## [9.7.0]
-
-_Headless config writer, cross-file analysis CLI, and a polished Issues view._ — [log](https://github.com/saropa/saropa_lints/blob/v9.7.0/CHANGELOG.md)
-
-### Added
-
-• **Headless config writer (write_config)** — New `write_config` executable and `lib/src/init/write_config_runner.dart` for writing `analysis_options.yaml` from tier + `analysis_options_custom.yaml` without interactive output. Extension now calls `dart run saropa_lints:write_config --tier <tier> --target <workspace>` instead of init for Enable, Initialize Config, and Set tier. Init remains for CI/scripting. Aligns with [003_INIT_REDESIGN](bugs/discussion/003_INIT_REDESIGN.md) (extension-driven config).
-
-• **Cross-file analysis CLI** — New `cross_file` executable: `dart run saropa_lints:cross_file <command>` with commands `unused-files`, `circular-deps`, `import-stats`, and `report`. Builds the import graph from `lib/`, reports files with no importers, circular import chains, and graph statistics. Output: text (default), JSON, or HTML via `report --output-dir`. Baseline: `--baseline <file>` and `--update-baseline` to suppress known issues and fail only on new violations. Exit codes 0/1/2. README and [doc/cross_file_ci_example.md](doc/cross_file_ci_example.md) for CI. See [ROADMAP Part 3](ROADMAP.md).
-
-• **Central cache stats** — `CacheStatsAggregator.getStats()` returns a single map aggregating statistics from all project caches (import graph, throttle, speculative, rule batch, baseline, semantic, etc.) for debugging and monitoring.
-
-### Changed
-
-• **Extension** — Polished Issues view violation context menu with icons for Apply fix / Copy message, a separator between action and hide groups, and clearer suppression behavior (rule vs rule-in-file); extension README documents how to clear and manage suppressions from the toolbar.
-
----
-
-## [9.6.1]
-
-_No more vibrancy warnings for path or git-resolved dependencies._ — [log](https://github.com/saropa/saropa_lints/blob/v9.6.1/CHANGELOG.md)
-
-### Fixed
-
-• **Package Vibrancy** — Do not show the main vibrancy diagnostic (Review/stale/legacy-locked/end-of-life/monitor) for dependencies resolved via path or git override; the resolved artifact is local or from git, so the upstream pub.dev score is not actionable and was causing false positives.
-
----
-
-## [9.6.0]
-
-_Clearer Package Vibrancy scoring and reliable filter-by-type behavior._ — [log](https://github.com/saropa/saropa_lints/blob/v9.6.0/CHANGELOG.md)
-
-### Added
-
-• **Package Vibrancy** — Action Items tree now shows a simple letter grade (A = best … E = stale … F = dangerous) and problem count instead of a numeric “risk” score; aligns with a single, clear scoring system and correct pluralization (“1 problem” / “2 problems”)
-
-### Fixed
-
-• **Package Vibrancy** — Filter by Problem Type now correctly applies the selected types; resolved QuickPick selections using a shared id+label fallback so filter state is set reliably across environments
-
----
-
-## [9.5.2]
-
-_Keeping your lints fresh — the extension now detects outdated saropa_lints versions and offers one-click upgrades, plus new SDK constraint diagnostics._ — [log](https://github.com/saropa/saropa_lints/blob/v9.5.2/CHANGELOG.md)
-
-### Added
-
-• **Extension** — background upgrade checker: on activation, the extension checks pub.dev for newer saropa_lints versions and shows a non-intrusive notification with Upgrade, View Changelog, and Dismiss actions; throttled to once per 24 hours, remembers dismissed versions, skips path/git dependencies, and respects the new `saropaLints.checkForUpdates` setting
-
-• **Extension** — SDK constraint diagnostics: inspects the `environment` section of `pubspec.yaml` and reports when Dart SDK or Flutter version constraints are behind the latest stable release; shows Warning when the upper bound excludes latest, Information when behind by a minor version, and Hint for patch-level gaps; fires on file open, on edit (debounced), and after every vibrancy scan
-
-• **Extension** — overview panel toolbar: added About (info icon) and Run Analysis (play icon) buttons to the overview panel title bar; removed redundant tree items (Run Analysis, Summary, Config, Suggestions) that duplicate existing sidebar views
-
-• **Extension** — overview tree icons: each overview item now displays a contextual icon (pulse for health score, warning/pass for violations, graph-line for trends, arrow-down for regressions, star-full for celebrations, history for last run)
-
----
-
-## [9.5.1] and Earlier
+## [9.10.0] and Earlier
 
 > **Looking for older changes?**
-> See [CHANGELOG_ARCHIVE.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 9.5.1.
+> See [CHANGELOG_ARCHIVE.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 9.10.0.

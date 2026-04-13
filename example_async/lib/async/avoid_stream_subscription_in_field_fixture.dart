@@ -222,3 +222,70 @@ class _GoodMergeStreamCapturedState extends State<MyWidget> {
     super.dispose();
   }
 }
+
+// ===========================================================================
+// GOOD: Conditional .listen() inside if block, assigned to subscription field
+// Regression test for false positive on conditional listen (GitHub bug report)
+// ===========================================================================
+
+class _GoodConditionalListenState extends State<MyWidget> {
+  StreamSubscription<int>? _rebuildTriggerSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    if (1 > 0) {
+      _rebuildTriggerSubscription = testStream.listen((_) {
+        print('conditional rebuild');
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _rebuildTriggerSubscription?.cancel();
+    super.dispose();
+  }
+}
+
+// ===========================================================================
+// GOOD: .listen() return value passed as argument (e.g. subscriptions.add())
+// inside a closure — the caller manages the subscription
+// ===========================================================================
+
+class _GoodListenAsArgInsideClosureState extends State<MyWidget> {
+  @override
+  void initState() {
+    super.initState();
+    final List<StreamSubscription<int>> subs = <StreamSubscription<int>>[];
+    for (final Stream<int> s in <Stream<int>>[testStream]) {
+      subs.add(s.listen((_) => print('inner')));
+    }
+  }
+}
+
+// ===========================================================================
+// BAD: Bare .listen() inside a closure — subscription is NOT captured even
+// though the outer scope has a properly-named subscription field.
+// Before the FunctionExpression boundary fix the first loop walked past the
+// closure and found the outer assignment, incorrectly suppressing the lint.
+// ===========================================================================
+
+class _BadBareListenInsideClosureState extends State<MyWidget> {
+  StreamSubscription<int>? _dataSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _dataSubscription = testStream.listen((_) {
+      // expect_lint: avoid_stream_subscription_in_field
+      mergeStream.listen((_) => print('leaked'));
+    });
+  }
+
+  @override
+  void dispose() {
+    _dataSubscription?.cancel();
+    super.dispose();
+  }
+}
