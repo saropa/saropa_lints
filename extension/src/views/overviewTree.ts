@@ -8,7 +8,7 @@
  *
  * ## Behaviour contracts (for reviewers)
  *
- * - **Dart workspace:** always returns intro rows, **Settings** (embedded config),
+ * - **Dart workspace:** always returns a **Help & resources** group (intro links), **Settings** (embedded config),
  *   conditionally **Issues** (when triage data exists),
  *   and **Sidebar** section toggles so users are never stuck on a bare welcome with only
  *   a single “Enable” affordance. `saropaLints.enabled` defaults **true**; when a user turns
@@ -41,6 +41,16 @@ import {
 const OVERVIEW_INTRO_TOOLTIP =
     'Saropa Lints provides 2050+ Dart and Flutter lint rules for security, accessibility, and performance. '
     + 'It has two components: a pub.dev package with the rules and a VS Code extension for visual analysis and configuration.';
+
+/** Collapsible group for onboarding and documentation links (always first when the tree has content). */
+export class OverviewHelpParent extends vscode.TreeItem {
+    constructor() {
+        super('Help & resources', vscode.TreeItemCollapsibleState.Expanded);
+        this.contextValue = 'overviewHelpSection';
+        this.iconPath = new vscode.ThemeIcon('question');
+        this.tooltip = 'Walkthrough, About, commands, and pub.dev';
+    }
+}
 
 /** Collapsible group for lint settings and config actions. */
 export class OverviewSettingsParent extends vscode.TreeItem {
@@ -249,6 +259,7 @@ function isConfigTreeNode(node: OverviewTreeNode): node is ConfigTreeNode {
 
 export type OverviewTreeNode =
     | OverviewItem
+    | OverviewHelpParent
     | OverviewSettingsParent
     | OverviewIssuesParent
     | OverviewSidebarSectionParent
@@ -281,6 +292,9 @@ export class OverviewTreeProvider implements vscode.TreeDataProvider<OverviewTre
     async getChildren(element?: OverviewTreeNode): Promise<OverviewTreeNode[]> {
         const cfg = vscode.workspace.getConfiguration('saropaLints');
 
+        if (element instanceof OverviewHelpParent) {
+            return buildOverviewIntroItems();
+        }
         if (element instanceof OverviewSettingsParent) {
             return this.configProvider.getSettingAndActionNodes();
         }
@@ -303,7 +317,7 @@ export class OverviewTreeProvider implements vscode.TreeDataProvider<OverviewTre
         }
 
         const enabled = cfg.get<boolean>('enabled', true) ?? true;
-        const intro = buildOverviewIntroItems();
+        const helpParent = new OverviewHelpParent();
         const integrationOff: OverviewItem[] = [];
         if (!enabled) {
             integrationOff.push(
@@ -326,7 +340,7 @@ export class OverviewTreeProvider implements vscode.TreeDataProvider<OverviewTre
 
         if (data === null) {
             const items: OverviewTreeNode[] = [
-                ...intro,
+                helpParent,
                 ...integrationOff,
                 settingsParent,
             ];
@@ -344,7 +358,7 @@ export class OverviewTreeProvider implements vscode.TreeDataProvider<OverviewTre
         }
 
         const items: OverviewTreeNode[] = [
-            ...intro,
+            helpParent,
             ...integrationOff,
             settingsParent,
         ];

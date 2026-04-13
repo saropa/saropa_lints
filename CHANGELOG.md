@@ -38,10 +38,16 @@
 ### Fixed
 
 - **`avoid_hardcoded_config` (v5):** No longer reports URL/key-like string literals used as initializers for top-level `const` declarations or `static const` class fields. Those are the usual single-source-of-truth pattern; mutable `static final` / locals still warn.
+- **`dependencies_ordering` (extension):** No longer flags SDK dependencies (`flutter`, `flutter_localizations`, `flutter_test`, `integration_test`) as out of alphabetical order when they appear before pub-hosted packages. SDK deps are now exempt from the alphabetical sort; only pub-hosted entries are checked.
+- **Adoption Gate (extension):** No longer shows false "Discontinued" badge on SDK dependencies (`flutter`, `flutter_test`, `flutter_localizations`, `integration_test`, etc.). SDK packages are not hosted on pub.dev; looking them up produced misleading warnings because the pub.dev `flutter` placeholder is marked discontinued. Also fixed badge placement: `findPackageLine` now only matches within dependency sections, so badges no longer appear on `environment:` constraint lines.
+
+### Changed
+
+- **SDK_PACKAGES (extension):** Consolidated three duplicate `SDK_PACKAGES` sets (annotate-command, unused-detector, pubspec-sorter) into a single shared constant at `sdk-packages.ts`. Added missing `integration_test` and `flutter_driver` entries to the pubspec-sorter set.
 
 ### Added (Extension)
 
-- **Help hub**: New “Saropa Lints: Help” command (`saropaLints.openHelpHub`) opens a quick pick for Getting Started, About, Browse All Commands, and pub.dev. **Overview** intro links are grouped under a permanent **Help & resources** tree section. **Violations** always shows a **Help & resources** row at the top when the tree has content. **View title bar**: Help (question icon) on Overview and Violations opens the same hub (alongside the existing command-catalog title action).
+- **Help hub**: New “Saropa Lints: Help” command (`saropaLints.openHelpHub`) opens a quick pick for Getting Started, About, Browse All Commands, and pub.dev. **Overview** intro links are grouped under a permanent collapsible **Help & resources** tree section; the title bar shows only the Command Catalog icon (help is in the tree). **Violations** always shows a **Help & resources** row at the top when the tree has content, plus both Help and Command Catalog icons in the title bar.
 
 ### Changed (Extension)
 
