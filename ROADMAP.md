@@ -47,23 +47,6 @@ These rules follow the **existing Info.plist pattern**: a Dart rule fires when i
 
 **GitHub issues**: [#35](https://github.com/saropa/saropa_lints/issues/35), [#36](https://github.com/saropa/saropa_lints/issues/36), [#37](https://github.com/saropa/saropa_lints/issues/37), [#41](https://github.com/saropa/saropa_lints/issues/41)
 
-### Pubspec Rules (extension-side or CLI)
-
-These rules check `pubspec.yaml` content. The extension already parses pubspec via `pubspecReader.ts`, and the Dart side caches package info in `ProjectContext`. These can be implemented as:
-
-- **Extension-side checks** (TypeScript, reading pubspec directly)
-- **CLI commands** (Dart, reading pubspec from disk)
-- **Dart rules that fire once per project** (read pubspec on first file analysis, cache result)
-
-| Rule | Tier | Severity | What it checks |
-|------|------|----------|----------------|
-| `prefer_pinned_version_syntax` | Stylistic | INFO | Pinned version syntax preferred in some workflows |
-| `add_resolution_workspace` | Professional | INFO | Monorepo: add resolution workspace |
-| `pubspec_ordering` | Stylistic | INFO | Pubspec fields in recommended order |
-| `newline_before_pubspec_entry` | Stylistic | INFO | Blank lines between major sections |
-| `prefer_commenting_pubspec_ignores` | Professional | INFO | Comment pubspec ignore entries |
-| `prefer_l10n_yaml_config` | Professional | INFO | Prefer l10n config via `l10n.yaml` |
-
 ### Cross-File CLI Improvements
 
 The CLI tool (`dart run saropa_lints:cross_file`) is functional but can be improved. See [plan/cross_file_cli_design.md](plan/cross_file_cli_design.md) for the full design.
@@ -93,6 +76,7 @@ Some rules intentionally conflict or overlap; the **init wizard** (`dart run sar
 | **Intentional pair** | `avoid_cubit_usage` vs `prefer_cubit_for_simple_state` | Opposite preferences: prefer Bloc (event traceability) vs prefer Cubit for simple state. Enable one via the wizard. |
 | **Narrow variant** | `prefer_expression_body_getters` vs `prefer_arrow_functions` | Getter-only vs all single-expression bodies. Can enable both or just one. |
 | **Narrow variant** | `prefer_super_parameters` vs `prefer_super_key` | Both can flag `super(key: key)` on widgets; `prefer_super_key` is Flutter-widget + `Key` only. |
+| **Intentional pair** | `prefer_caret_version_syntax` vs `prefer_pinned_version_syntax` | Extension-side pubspec diagnostics. Caret (default) vs exact pin. Controlled via `preferPinnedVersions` flag. |
 | **Other pairs** | e.g. `prefer_type_over_var` / `prefer_var_over_explicit_type` | Documented in rule DartDoc and CHANGELOG; wizard shows both so users pick one. |
 
 When adding or reviewing rules, check CODE_INDEX and tiers for existing stylistic opposites; document pairs in the rule's DartDoc and, if needed, in this table.
