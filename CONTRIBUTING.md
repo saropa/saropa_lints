@@ -666,6 +666,15 @@ Stylistic rules require extra documentation since they're not in any tier:
 | CHANGELOG.md | Version history | Any release |
 | CONTRIBUTING.md | This file | Changing contribution process |
 
+## Adding an Extension Command
+
+When adding a new command to the VS Code extension:
+
+1. Declare it in `extension/package.json` under `contributes.commands`
+2. Register the handler in `extension/src/extension.ts` (or the appropriate activation module)
+3. **Add an entry to the command catalog registry** at `extension/src/views/commandCatalogRegistry.ts` — include a human-readable title, one-line description, category, codicon, and `internal: true` if it is only invoked from context menus or programmatically
+4. Run the sync test (`commandCatalogRegistry.test.ts`) — it will fail if the registry and `package.json` are out of sync
+
 ## Pull Request Checklist
 
 - [ ] Rule extends `SaropaLintRule` (not `DartLintRule`)

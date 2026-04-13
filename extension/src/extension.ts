@@ -31,6 +31,7 @@ import { SecurityPostureTreeProvider } from './views/securityPostureTree';
 import { FileRiskTreeProvider } from './views/fileRiskTree';
 import { TodosAndHacksTreeProvider } from './views/todosAndHacksTree';
 import { showAboutPanel } from './views/aboutView';
+import { showCommandCatalogPanel } from './views/commandCatalogView';
 import { discoverServer } from './driftAdvisor/discovery';
 import { fetchIssues } from './driftAdvisor/client';
 import { mapIssuesToLocations } from './driftAdvisor/mapper';
@@ -673,6 +674,9 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     }),
     vscode.commands.registerCommand('saropaLints.showAbout', () => {
       showAboutPanel(context.extensionUri, extVersion);
+    }),
+    vscode.commands.registerCommand('saropaLints.showCommandCatalog', () => {
+      showCommandCatalogPanel();
     }),
     vscode.commands.registerCommand('saropaLints.openPubDevSaropaLints', () => {
       void vscode.env.openExternal(vscode.Uri.parse('https://pub.dev/packages/saropa_lints'));
