@@ -21,9 +21,7 @@ void main() {
 
   group('excludeGlobs filtering', () {
     test('no excludes returns all files', () async {
-      final result = await runCrossFileAnalysis(
-        projectPath: fixturePath,
-      );
+      final result = await runCrossFileAnalysis(projectPath: fixturePath);
       expect(result.stats['fileCount'], 4);
       // No excludes active → includedPaths should be empty (signals "use all").
       expect(result.includedPaths, isEmpty);
@@ -31,9 +29,7 @@ void main() {
 
     test('excluding orphan.dart removes it from unused files', () async {
       // Without exclude: orphan.dart appears as unused.
-      final baseline = await runCrossFileAnalysis(
-        projectPath: fixturePath,
-      );
+      final baseline = await runCrossFileAnalysis(projectPath: fixturePath);
       expect(
         baseline.unusedFiles.any((f) => f.endsWith('orphan.dart')),
         isTrue,

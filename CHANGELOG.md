@@ -32,7 +32,7 @@
 
 ---
 
-## [Unreleased]
+## [10.11.0]
 
 New graph command for import visualization, a searchable command catalog in the extension, eleven pubspec validation diagnostics with quick fixes, and a batch of bug fixes. — [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
 

@@ -23,8 +23,7 @@ void exportDotGraph({
 }) {
   // Use the provided set (already exclude-filtered by the caller) or fall
   // back to the full graph when no filter is active.
-  final allPaths = (includedPaths ?? ImportGraphCache.getFilePaths())
-      .toList()
+  final allPaths = (includedPaths ?? ImportGraphCache.getFilePaths()).toList()
     ..sort();
   final root = projectPath.replaceAll('\\', '/');
 
