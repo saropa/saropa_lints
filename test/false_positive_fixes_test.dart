@@ -957,8 +957,10 @@ void main() {
         // _rebuildTriggerSubscription = stream.listen(...) inside if block.
         // The AssignmentExpression is a direct parent of .listen() regardless
         // of surrounding if/for blocks — the first loop finds it immediately.
-        expect('Conditional block does not interfere with assignment check',
-            isNotNull);
+        expect(
+          'Conditional block does not interfere with assignment check',
+          isNotNull,
+        );
       });
 
       test('bare listen inside closure should trigger even when outer scope '
@@ -967,8 +969,10 @@ void main() {
         // The inner .listen() is uncaptured. The first loop must stop at the
         // FunctionExpression boundary so it does not find the outer _sub
         // assignment and incorrectly suppress the lint.
-        expect('FunctionExpression boundary prevents cross-scope suppression',
-            isNotNull);
+        expect(
+          'FunctionExpression boundary prevents cross-scope suppression',
+          isNotNull,
+        );
       });
     });
 
