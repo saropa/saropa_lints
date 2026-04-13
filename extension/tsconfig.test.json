@@ -18,6 +18,8 @@
     "src/test/vibrancy/vscode-mock.ts",
     "src/test/vibrancy/vscode-mock-classes.ts",
     "src/test/vibrancy/test-helpers.ts",
+    "src/test/vibrancy/services/pubspec-sorter.test.ts",
+    "src/test/vibrancy/providers/annotate-command.test.ts",
     "src/test/vibrancy/category-dictionary.test.ts",
     "src/test/vibrancy/scan-helpers.test.ts",
     "src/test/vibrancy/services/package-code-analyzer.test.ts",
@@ -63,7 +65,9 @@
     "src/pubspec-validation.ts",
     "src/test/pubspec-validation.test.ts",
     "src/pubspec-code-actions.ts",
-    "src/test/pubspec-code-actions.test.ts"
+    "src/test/pubspec-code-actions.test.ts",
+    "src/views/commandCatalogRegistry.ts",
+    "src/test/commandCatalogRegistry.test.ts"
   ],
   "exclude": ["node_modules", ".vscode-test", "out", "dist"]
 }

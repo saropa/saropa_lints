@@ -107,19 +107,22 @@ function findExistingAnnotations(
             const urlLine = cursor;
             processedLines.add(urlLine);
 
-            const descLine = cursor - 1;
-            if (
-                descLine >= 0
-                && !processedLines.has(descLine)
-                && isAutoDescription(doc.lineAt(descLine).text)
+            // Scan upward through ALL consecutive auto-description lines
+            // above the URL — previous runs may have left duplicates
+            let topLine = urlLine;
+            let scanLine = urlLine - 1;
+            while (
+                scanLine >= 0
+                && !processedLines.has(scanLine)
+                && isAutoDescription(doc.lineAt(scanLine).text)
             ) {
-                processedLines.add(descLine);
-                ranges.push({ start: descLine, end: urlLine + 1 });
-                cursor = descLine - 1;
-            } else {
-                ranges.push({ start: urlLine, end: urlLine + 1 });
-                cursor--;
+                processedLines.add(scanLine);
+                topLine = scanLine;
+                scanLine--;
             }
+
+            ranges.push({ start: topLine, end: urlLine + 1 });
+            cursor = topLine - 1;
         } else {
             cursor--;
         }
