@@ -70,15 +70,27 @@ export function parseViolationsGroupBy(cfg: vscode.WorkspaceConfiguration): Grou
   return (GROUP_BY_MODES as readonly string[]).includes(raw) ? (raw as GroupByMode) : 'impact';
 }
 
+/** Permanent root row: opens the same help quick pick as the Overview toolbar. */
+export interface IssuesHelpItem {
+  kind: 'help';
+}
+
+const ISSUES_HELP_ROOT: IssuesHelpItem = { kind: 'help' };
+
+function prependIssuesHelpRow(nodes: IssueTreeNode[]): IssueTreeNode[] {
+  return [ISSUES_HELP_ROOT, ...nodes];
+}
+
 /** Discriminated union for all node types in the Issues tree. */
 export type IssueTreeNode =
-  | SeverityItem
-  | FolderItem
-  | FileItem
-  | ViolationItem
-  | OverflowItem
-  | PlaceholderItem
-  | GroupItem;
+    | IssuesHelpItem
+    | SeverityItem
+    | FolderItem
+    | FileItem
+    | ViolationItem
+    | OverflowItem
+    | PlaceholderItem
+    | GroupItem;
 
 /**
  * D10: Generic group header for non-severity grouping modes.
@@ -484,6 +496,21 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
 
   getTreeItem(element: IssueTreeNode): vscode.TreeItem {
     const wsRoot = getProjectRoot() ?? '';
+    if (element.kind === 'help') {
+      const item = new vscode.TreeItem(
+        'Help & resources',
+        vscode.TreeItemCollapsibleState.None,
+      );
+      item.iconPath = new vscode.ThemeIcon('question');
+      item.command = {
+        command: 'saropaLints.openHelpHub',
+        title: 'Open Help',
+        arguments: [],
+      };
+      item.tooltip = 'Walkthrough, About, commands, and pub.dev';
+      item.contextValue = 'issuesHelp';
+      return item;
+    }
     if (element.kind === 'placeholder') {
       const item = new vscode.TreeItem(
         element.label,
@@ -664,6 +691,9 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
   }
 
   async getChildren(element?: IssueTreeNode): Promise<IssueTreeNode[]> {
+    if (element?.kind === 'help') {
+      return [];
+    }
     const root = getProjectRoot();
     if (!root) return [];
 
@@ -675,7 +705,7 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
     // Zero violations after analysis — show a clean-state item (not empty,
     // because viewsWelcome would misleadingly say "No analysis results yet").
     if (violations.length === 0 && !element) {
-      return [
+      return prependIssuesHelpRow([
         {
           kind: 'placeholder' as const,
           id: 'no-data' as const,
@@ -683,7 +713,7 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
           description: 'All clear',
           command: 'saropaLints.runAnalysis',
         },
-      ];
+      ]);
     }
 
     const index = this.getIndex(root);
@@ -694,7 +724,7 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
       for (const list of byFile.values()) filteredTotal += list.length;
     }
     if (filteredTotal === 0 && !element) {
-      return [
+      return prependIssuesHelpRow([
         {
           kind: 'placeholder',
           id: 'no-match',
@@ -702,13 +732,13 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
           description: 'Clear filters or suppressions',
           command: 'saropaLints.clearIssuesFilters',
         },
-      ];
+      ]);
     }
 
     if (!element) {
       // D10: Delegate to grouping-mode-specific root builder.
       if (this.groupBy !== 'severity') {
-        return this.buildGroupedRoot(index);
+        return prependIssuesHelpRow(this.buildGroupedRoot(index));
       }
       const items: SeverityItem[] = [];
       for (const sev of SEVERITY_ORDER) {
@@ -718,7 +748,7 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
         for (const list of byFile.values()) count += list.length;
         if (count > 0) items.push({ kind: 'severity', severity: sev, count });
       }
-      return items;
+      return prependIssuesHelpRow(items);
     }
 
     // D10: GroupItem children — sub-group violations by file for easy navigation.
