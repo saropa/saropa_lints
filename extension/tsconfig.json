@@ -13,5 +13,12 @@
     "resolveJsonModule": true,
     "esModuleInterop": true
   },
-  "exclude": ["node_modules", ".vscode-test", "out", "dist", "src/test"]
+  "exclude": [
+    "node_modules",
+    ".vscode-test",
+    "out",
+    "dist",
+    "src/test",
+    "media/codicons"
+  ]
 }

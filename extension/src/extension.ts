@@ -24,6 +24,7 @@ import type { SaropaLintsApi } from './api';
 import { invalidateCodeLenses, registerCodeLensProvider } from './codeLensProvider';
 import { IssuesTreeProvider, parseViolationsGroupBy, registerIssueCommands, type IssueTreeNode } from './views/issuesTree';
 import { OverviewTreeProvider } from './views/overviewTree';
+import { showHelpHubQuickPick } from './views/helpHub';
 import { SummaryTreeProvider } from './views/summaryTree';
 import { ConfigTreeProvider } from './views/configTree';
 import { SuggestionsTreeProvider } from './views/suggestionsTree';
@@ -672,11 +673,14 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         false,
       );
     }),
+    vscode.commands.registerCommand('saropaLints.openHelpHub', () => {
+      void showHelpHubQuickPick();
+    }),
     vscode.commands.registerCommand('saropaLints.showAbout', () => {
       showAboutPanel(context.extensionUri, extVersion);
     }),
     vscode.commands.registerCommand('saropaLints.showCommandCatalog', () => {
-      showCommandCatalogPanel();
+      showCommandCatalogPanel(context);
     }),
     vscode.commands.registerCommand('saropaLints.openPubDevSaropaLints', () => {
       void vscode.env.openExternal(vscode.Uri.parse('https://pub.dev/packages/saropa_lints'));
