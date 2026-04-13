@@ -3,7 +3,7 @@ import { CacheService } from './services/cache-service';
 import { VibrancyTreeProvider } from './providers/tree-data-provider';
 import { VibrancyDiagnostics } from './providers/diagnostics';
 import { SdkDiagnostics } from './providers/sdk-diagnostics';
-import { PubspecValidation } from '../pubspec-validation';
+import { PubspecValidation, registerPubspecDocListeners } from '../pubspec-validation';
 import { VibrancyCodeActionProvider } from './providers/code-action-provider';
 import { VibrancyCodeLensProvider, setCodeLensToggle, setPrereleaseToggle } from './providers/codelens-provider';
 import { VibrancyHoverProvider } from './providers/hover-provider';
@@ -253,21 +253,16 @@ function registerFileWatcher(
  * Register a single set of pubspec.yaml listeners that drive BOTH
  * SDK constraint diagnostics and pubspec validation diagnostics.
  *
- * Previously these were separate listener registrations with separate
- * debounce timers (300ms and 500ms). Merging them eliminates duplicate
- * event subscriptions, duplicate isPubspec() checks, and duplicate
- * debounce timers — one listener fires both diagnostic engines.
+ * Uses the shared `registerPubspecDocListeners` helper from
+ * pubspec-validation.ts — the same helper that the fallback path
+ * uses when vibrancy activation fails.
  */
 function registerPubspecListeners(
     context: vscode.ExtensionContext,
     cache: CacheService,
     pubspecValidator?: PubspecValidation,
 ): void {
-    const isPubspec = (doc: vscode.TextDocument) =>
-        doc.fileName.endsWith('pubspec.yaml');
-
-    const refresh = async (doc: vscode.TextDocument) => {
-        if (!isPubspec(doc)) { return; }
+    registerPubspecDocListeners(context, async (doc) => {
         const content = doc.getText();
 
         // Pubspec validation: synchronous, fast — runs style/structure
@@ -288,31 +283,7 @@ function registerPubspecListeners(
                 : await fetchFlutterReleases(cache);
             sdkDiagnostics.update(doc.uri, content, releases);
         }
-    };
-
-    // Debounce edits (300ms) to avoid re-computing on every keystroke
-    let debounceTimer: ReturnType<typeof setTimeout> | null = null;
-    const debouncedRefresh = (doc: vscode.TextDocument) => {
-        if (debounceTimer) { clearTimeout(debounceTimer); }
-        debounceTimer = setTimeout(() => { void refresh(doc); }, 300);
-    };
-
-    // Fire immediately on open
-    context.subscriptions.push(
-        vscode.workspace.onDidOpenTextDocument(doc => { void refresh(doc); }),
-    );
-    // Fire with debounce on edit
-    context.subscriptions.push(
-        vscode.workspace.onDidChangeTextDocument(e => {
-            debouncedRefresh(e.document);
-        }),
-    );
-    // Fire for already-open pubspec.yaml editors
-    for (const editor of vscode.window.visibleTextEditors) {
-        if (isPubspec(editor.document)) {
-            void refresh(editor.document);
-        }
-    }
+    });
 }
 
 function registerSuppressListener(

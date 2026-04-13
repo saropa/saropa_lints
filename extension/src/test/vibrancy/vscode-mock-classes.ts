@@ -228,6 +228,11 @@ export class WorkspaceEdit {
     delete(uri: any, range: any): void {
         this._edits.push({ uri, range, newText: '' });
     }
+    insert(uri: any, position: any, newText: string): void {
+        // insert is a replace at a zero-width range at the given position
+        const range = { start: position, end: position };
+        this._edits.push({ uri, range, newText });
+    }
     getEdits(): any[] { return this._edits; }
 }
 
