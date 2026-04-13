@@ -39,7 +39,7 @@ import { RulePacksWebviewProvider } from './rulePacks/rulePacksWebviewProvider';
 import { openRuleExplainPanelForViolation, openRuleExplainPanel } from './views/ruleExplainView';
 import { readViolations, ViolationsData, getViolationsPath as getViolationsFilePath } from './violationsReader';
 import { hasSaropaLintsDep } from './pubspecReader';
-import { registerPubspecValidation } from './pubspec-validation';
+import { createPubspecValidation, registerFallbackPubspecListeners } from './pubspec-validation';
 import {
   appendSnapshot,
   loadHistory,
@@ -199,8 +199,10 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   const driftAdvisorProvider = new DriftAdvisorTreeProvider(driftAdvisorDiagCollection);
 
   // Pubspec validation: inline diagnostics for dependency ordering,
-  // version syntax, and constraint issues on pubspec.yaml
-  registerPubspecValidation(context);
+  // version syntax, and constraint issues on pubspec.yaml.
+  // Listeners are registered centrally in extension-activation.ts to
+  // share a single pubspec.yaml watcher with SDK diagnostics.
+  const pubspecValidator = createPubspecValidation(context);
 
   const issuesProvider = new IssuesTreeProvider(context.workspaceState);
   const summaryProvider = new SummaryTreeProvider();
@@ -619,21 +621,33 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     }),
     vscode.commands.registerCommand('saropaLints.openConfig', openConfig),
     vscode.commands.registerCommand('saropaLints.toggleSidebarSection', async (key: unknown) => {
-      if (typeof key !== 'string') return;
-      const cfg = vscode.workspace.getConfiguration('saropaLints');
-      const def = defaultSidebarSectionVisible(key);
-      const cur = cfg.get<boolean>(key, def) ?? def;
-      const next = !cur;
-      const target = vscode.workspace.workspaceFolders?.length
-        ? vscode.ConfigurationTarget.Workspace
-        : vscode.ConfigurationTarget.Global;
-      if (key === 'sidebar.showDriftAdvisor') {
-        await applyDriftSidebarToggle(context.workspaceState, cfg, next, target);
-      } else {
-        await cfg.update(key, next, target);
+      if (typeof key !== 'string') {
+        log(`toggleSidebarSection: ignored non-string key: ${typeof key}`);
+        return;
       }
-      updateSidebarSectionVisibility();
-      overviewProvider.refresh();
+      try {
+        const cfg = vscode.workspace.getConfiguration('saropaLints');
+        const def = defaultSidebarSectionVisible(key);
+        const cur = cfg.get<boolean>(key, def) ?? def;
+        const next = !cur;
+        const target = vscode.workspace.workspaceFolders?.length
+          ? vscode.ConfigurationTarget.Workspace
+          : vscode.ConfigurationTarget.Global;
+        if (key === 'sidebar.showDriftAdvisor') {
+          await applyDriftSidebarToggle(context.workspaceState, cfg, next, target);
+        } else {
+          await cfg.update(key, next, target);
+        }
+        updateSidebarSectionVisibility();
+        overviewProvider.refresh();
+      } catch (err) {
+        // Surface config-update failures so the user sees feedback.
+        const msg = err instanceof Error ? err.message : String(err);
+        log(`toggleSidebarSection error for "${key}": ${msg}`);
+        void vscode.window.showErrorMessage(
+          `Saropa Lints: failed to toggle sidebar section — ${msg}`,
+        );
+      }
     }),
     vscode.commands.registerCommand('saropaLints.focusView', () => {
       vscode.commands.executeCommand('saropaLints.overview.focus');
@@ -1130,9 +1144,12 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       vibrancyData = data;
       updateAllStatusBars();
       overviewProvider.refresh();
-    });
+    }, pubspecValidator);
   } catch (err) {
     console.error('[Saropa Lints] Package Vibrancy activation failed:', err);
+    // Fallback: if vibrancy fails, register standalone pubspec listeners
+    // so pubspec validation still works without vibrancy/SDK diagnostics.
+    registerFallbackPubspecListeners(context, pubspecValidator);
   }
 
   // Background upgrade check — runs asynchronously, fails silently.

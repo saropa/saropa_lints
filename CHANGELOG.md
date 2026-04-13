@@ -53,6 +53,11 @@
 - `prefer_pinned_version_syntax` and `prefer_caret_version_syntax` are mutually exclusive stylistic rules — controlled via `PubspecValidation.preferPinnedVersions` flag (default: caret preferred).
 - Diagnostics update live as you edit pubspec.yaml (300ms debounce). SDK/path/git dependencies and `dependency_overrides` are handled correctly.
 
+### Changed (Extension)
+
+- **Unified pubspec.yaml listener**: Pubspec validation and SDK constraint diagnostics now share a single document listener with one debounce timer (300ms), eliminating duplicate event subscriptions and duplicate `isPubspec()` checks. Previously each module registered its own `onDidOpen`/`onDidChange` listeners independently.
+- **Internal**: `parseDependencySections()` now accepts a pre-split lines array, eliminating a duplicate `content.split('\n')` call per validation run.
+
 ### Fixed
 
 - **avoid_stream_subscription_in_field**: Fixed false positive when `.listen()` is inside a conditional block (`if`/`for`) and assigned to a properly-named subscription field. The parent-walk loop now stops at closure (`FunctionExpression`) boundaries to prevent escaping into outer scopes. **Note:** this also fixes false negatives where a bare `.listen()` inside a closure was incorrectly suppressed because an outer scope had a properly-named subscription assignment — those uncaptured subscriptions will now correctly fire the lint.

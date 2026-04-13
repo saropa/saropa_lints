@@ -60,8 +60,7 @@ interface DepSection {
  *
  * Skips SDK/path/git deps (they have sub-keys, not version strings).
  */
-function parseDependencySections(content: string): DepSection[] {
-    const lines = content.split('\n');
+function parseDependencySections(lines: readonly string[]): DepSection[] {
     const sections: DepSection[] = [];
     let current: DepSection | null = null;
 
@@ -657,8 +656,8 @@ export class PubspecValidation {
     /** Run all pubspec checks and update inline diagnostics. */
     update(uri: vscode.Uri, content: string): void {
         const diagnostics: vscode.Diagnostic[] = [];
-        const sections = parseDependencySections(content);
         const lines = content.split('\n');
+        const sections = parseDependencySections(lines);
 
         checkAnyVersion(sections, diagnostics);
         checkDependencyOrdering(sections, diagnostics);
@@ -685,19 +684,37 @@ export class PubspecValidation {
 }
 
 /**
- * Register pubspec.yaml listeners that run validation checks when
- * the file is opened or edited. Call from extension activate().
+ * Create a PubspecValidation instance with its own DiagnosticCollection.
+ *
+ * The caller is responsible for wiring up document listeners that call
+ * `validator.update(uri, content)` — this allows a single shared
+ * pubspec.yaml listener to drive both PubspecValidation and SDK/Vibrancy
+ * diagnostics without duplicate event subscriptions or debounce timers.
  */
-export function registerPubspecValidation(
+export function createPubspecValidation(
     context: vscode.ExtensionContext,
 ): PubspecValidation {
     const collection = vscode.languages.createDiagnosticCollection(
         'saropa-pubspec',
     );
-    const validator = new PubspecValidation(collection);
-
     context.subscriptions.push(collection);
+    return new PubspecValidation(collection);
+}
 
+/**
+ * Fallback listener registration for when vibrancy activation fails.
+ *
+ * Normally, pubspec.yaml listeners are registered centrally in
+ * extension-activation.ts so that one listener drives both pubspec
+ * validation and SDK diagnostics. If vibrancy activation throws,
+ * this function registers standalone listeners so pubspec validation
+ * still works — the user loses SDK/vibrancy diagnostics but keeps
+ * style/structure checks.
+ */
+export function registerFallbackPubspecListeners(
+    context: vscode.ExtensionContext,
+    validator: PubspecValidation,
+): void {
     const isPubspec = (doc: vscode.TextDocument) =>
         doc.fileName.endsWith('pubspec.yaml');
 
@@ -706,29 +723,23 @@ export function registerPubspecValidation(
         validator.update(doc.uri, doc.getText());
     };
 
-    // Debounce edits (300ms) to avoid re-checking on every keystroke
     let debounceTimer: ReturnType<typeof setTimeout> | null = null;
     const debouncedRefresh = (doc: vscode.TextDocument) => {
         if (debounceTimer) { clearTimeout(debounceTimer); }
         debounceTimer = setTimeout(() => { refresh(doc); }, 300);
     };
 
-    // Fire immediately on open
     context.subscriptions.push(
         vscode.workspace.onDidOpenTextDocument(doc => { refresh(doc); }),
     );
-    // Fire with debounce on edit
     context.subscriptions.push(
         vscode.workspace.onDidChangeTextDocument(e => {
             debouncedRefresh(e.document);
         }),
     );
-    // Fire for already-open pubspec.yaml editors
     for (const editor of vscode.window.visibleTextEditors) {
         if (isPubspec(editor.document)) {
             refresh(editor.document);
         }
     }
-
-    return validator;
 }
