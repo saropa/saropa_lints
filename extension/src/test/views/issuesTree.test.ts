@@ -13,12 +13,14 @@ import { TreeItemCollapsibleState } from '../vibrancy/vscode-mock-classes';
 // projectRoot's getProjectRoot is called in getTreeItem and many methods.
 import * as projectRoot from '../../projectRoot';
 import * as suppressionsStore from '../../suppressionsStore';
+import * as violationsReader from '../../violationsReader';
 
 import { IssuesTreeProvider, type IssueTreeNode } from '../../views/issuesTree';
+import { clearTestConfig, setTestConfig } from '../vibrancy/vscode-mock';
 
 /** Minimal Memento mock matching vscode.Memento. */
 class MockMemento {
-  private store = new Map<string, unknown>();
+  private readonly store = new Map<string, unknown>();
   get<T>(key: string, defaultValue?: T): T | undefined {
     return this.store.has(key) ? (this.store.get(key) as T) : defaultValue;
   }
@@ -41,14 +43,12 @@ function makeFolderNode(): IssueTreeNode {
 
 describe('IssuesTreeProvider expand-all', () => {
   let provider: IssuesTreeProvider;
-  let getProjectRootStub: sinon.SinonStub;
-  let loadSuppressionsStub: sinon.SinonStub;
 
   beforeEach(() => {
     // Stub getProjectRoot to return a fake path so getTreeItem doesn't blow up.
-    getProjectRootStub = sinon.stub(projectRoot, 'getProjectRoot').returns('/fake/root');
+    sinon.stub(projectRoot, 'getProjectRoot').returns('/fake/root');
     // Stub loadSuppressions so the constructor doesn't fail.
-    loadSuppressionsStub = sinon.stub(suppressionsStore, 'loadSuppressions').returns({
+    sinon.stub(suppressionsStore, 'loadSuppressions').returns({
       hiddenFolders: [],
       hiddenFiles: [],
       hiddenRules: [],
@@ -131,5 +131,72 @@ describe('IssuesTreeProvider expand-all', () => {
     provider.expandAll();
     const item = provider.getTreeItem(makeSeverityNode());
     assert.strictEqual(item.collapsibleState, TreeItemCollapsibleState.Expanded);
+  });
+});
+
+describe('IssuesTreeProvider permanent help row', () => {
+  let readViolationsStub: sinon.SinonStub;
+
+  beforeEach(() => {
+    clearTestConfig();
+    setTestConfig('saropaLints', 'violationsGroupBy', 'severity');
+    sinon.stub(projectRoot, 'getProjectRoot').returns('/fake/root');
+    sinon.stub(suppressionsStore, 'loadSuppressions').returns({
+      hiddenFolders: [],
+      hiddenFiles: [],
+      hiddenRules: [],
+      hiddenRuleInFile: {},
+      hiddenSeverities: [],
+      hiddenImpacts: [],
+    });
+    readViolationsStub = sinon.stub(violationsReader, 'readViolations');
+  });
+
+  afterEach(() => {
+    sinon.restore();
+    clearTestConfig();
+  });
+
+  it('prepends kind "help" before severity groups when violations exist (after: stable entry point)', async () => {
+    readViolationsStub.returns({
+      violations: [
+        { file: 'lib/a.dart', line: 1, rule: 'r1', message: 'm', severity: 'warning' },
+      ],
+      summary: { totalViolations: 1 },
+    });
+    const provider = new IssuesTreeProvider(new MockMemento() as any);
+    const root = await provider.getChildren();
+    assert.ok(root.length >= 2, 'expected help row + at least one severity group');
+    assert.strictEqual(root[0].kind, 'help');
+    assert.strictEqual(root[1].kind, 'severity');
+  });
+
+  it('prepends kind "help" before the empty-state placeholder when there are zero violations', async () => {
+    readViolationsStub.returns({
+      violations: [],
+      summary: { totalViolations: 0 },
+    });
+    const provider = new IssuesTreeProvider(new MockMemento() as any);
+    const root = await provider.getChildren();
+    assert.strictEqual(root.length, 2);
+    assert.strictEqual(root[0].kind, 'help');
+    assert.strictEqual((root[1] as IssueTreeNode & { kind: string }).kind, 'placeholder');
+  });
+
+  it('getTreeItem(help) wires openHelpHub', () => {
+    readViolationsStub.returns(null);
+    const provider = new IssuesTreeProvider(new MockMemento() as any);
+    const item = provider.getTreeItem({ kind: 'help' });
+    assert.strictEqual(item.command?.command, 'saropaLints.openHelpHub');
+  });
+
+  it('getChildren(help) returns no children', async () => {
+    readViolationsStub.returns({
+      violations: [{ file: 'lib/a.dart', line: 1, rule: 'r', message: 'm', severity: 'error' }],
+      summary: { totalViolations: 1 },
+    });
+    const provider = new IssuesTreeProvider(new MockMemento() as any);
+    const nested = await provider.getChildren({ kind: 'help' });
+    assert.deepStrictEqual(nested, []);
   });
 });

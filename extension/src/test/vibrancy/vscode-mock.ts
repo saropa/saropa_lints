@@ -1,6 +1,10 @@
 /**
  * Mock implementation of the vscode API for unit testing outside VS Code.
  * Trimmed subset from saropa_drift_viewer, covering the APIs this extension uses.
+ *
+ * Quick-pick tests drive `window.showQuickPick` via `setQuickPickNextResult`. The
+ * exported `quickPickNextResult` is a const `{ value }` object so we avoid
+ * `export let` while still resetting state in `resetMocks()`.
  */
 
 export {
@@ -56,6 +60,13 @@ export const messageMock = {
 
 const registeredCommands: Record<string, (...args: any[]) => any> = {};
 
+/** Test hook: next `window.showQuickPick` resolution (undefined = user dismissed). */
+export const quickPickNextResult: { value: unknown } = { value: undefined };
+
+export function setQuickPickNextResult(value: unknown): void {
+    quickPickNextResult.value = value;
+}
+
 export const window = {
     createWebviewPanel: (
         _viewType: string,
@@ -94,6 +105,8 @@ export const window = {
         messageMock.errors.push(msg);
     },
     showTextDocument: async (_doc: any, _options?: any) => ({}),
+    showQuickPick: async <T extends { label: string }>(_items: readonly T[]) =>
+        quickPickNextResult.value as T | undefined,
     onDidChangeWindowState: (_listener: (state: { focused: boolean }) => void) => ({
         dispose: () => { /* no-op */ },
     }),
@@ -234,6 +247,7 @@ export function resetMocks(): void {
     createdDiagnosticCollections.length = 0;
     messageMock.reset();
     envMock.reset();
+    quickPickNextResult.value = undefined;
     for (const key of Object.keys(registeredCommands)) {
         delete registeredCommands[key];
     }
