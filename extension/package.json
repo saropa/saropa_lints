@@ -119,12 +119,12 @@
     "viewsWelcome": [
       {
         "view": "saropaLints.overview",
-        "contents": "Saropa Lints provides 2050+ Dart and Flutter lint rules for security, accessibility, and performance. It has two components: a pub.dev package with the rules and a VS Code extension for visual analysis and configuration.\n\nRequires a Dart or Flutter project.\n\nOpen a folder containing a `pubspec.yaml` to get started.\n\n[Learn more online](https://pub.dev/packages/saropa_lints)\n[About Saropa Lints](command:saropaLints.showAbout)\n[Getting Started](command:saropaLints.openWalkthrough)",
+        "contents": "Saropa Lints provides 2050+ Dart and Flutter lint rules for security, accessibility, and performance. It has two components: a pub.dev package with the rules and a VS Code extension for visual analysis and configuration.\n\nRequires a Dart or Flutter project.\n\nOpen a folder containing a `pubspec.yaml` to get started.\n\n[Learn more online](https://pub.dev/packages/saropa_lints)\n[Browse All Commands](command:saropaLints.showCommandCatalog)\n[About Saropa Lints](command:saropaLints.showAbout)\n[Getting Started](command:saropaLints.openWalkthrough)",
         "when": "!saropaLints.isDartProject"
       },
       {
         "view": "saropaLints.issues",
-        "contents": "No analysis results yet.\n\n[Run Analysis](command:saropaLints.runAnalysis)\n[Open Config](command:saropaLints.openConfig)\n[Set up saropa_lints in pubspec](command:saropaLints.enable)",
+        "contents": "No analysis results yet.\n\n[Run Analysis](command:saropaLints.runAnalysis)\n[Open Config](command:saropaLints.openConfig)\n[Set up saropa_lints in pubspec](command:saropaLints.enable)\n[Browse All Commands](command:saropaLints.showCommandCatalog)",
         "when": "saropaLints.isDartProject && !saropaLints.hasViolations"
       }
     ],
@@ -251,37 +251,37 @@
       },
       {
         "command": "saropaLints.issues.copyAsJson",
-        "title": "Copy as JSON",
+        "title": "Copy Violations as JSON",
         "icon": "$(clippy)"
       },
       {
         "command": "saropaLints.config.copyAsJson",
-        "title": "Copy as JSON",
+        "title": "Copy Config as JSON",
         "icon": "$(clippy)"
       },
       {
         "command": "saropaLints.summary.copyAsJson",
-        "title": "Copy as JSON",
+        "title": "Copy Summary as JSON",
         "icon": "$(clippy)"
       },
       {
         "command": "saropaLints.securityPosture.copyAsJson",
-        "title": "Copy as JSON",
+        "title": "Copy Security Posture as JSON",
         "icon": "$(clippy)"
       },
       {
         "command": "saropaLints.fileRisk.copyAsJson",
-        "title": "Copy as JSON",
+        "title": "Copy File Risk as JSON",
         "icon": "$(clippy)"
       },
       {
         "command": "saropaLints.overview.copyAsJson",
-        "title": "Copy as JSON",
+        "title": "Copy Overview as JSON",
         "icon": "$(clippy)"
       },
       {
         "command": "saropaLints.suggestions.copyAsJson",
-        "title": "Copy as JSON",
+        "title": "Copy Suggestions as JSON",
         "icon": "$(clippy)"
       },
       {
@@ -661,6 +661,11 @@
         "command": "saropaLints.driftAdvisor.disableIntegration",
         "title": "Drift Advisor: Disable Integration",
         "icon": "$(circle-slash)"
+      },
+      {
+        "command": "saropaLints.showCommandCatalog",
+        "title": "Saropa Lints: Browse All Commands",
+        "icon": "$(list-flat)"
       }
     ],
     "menus": {
@@ -1127,31 +1132,31 @@
         },
         {
           "command": "saropaLints.issues.copyAsJson",
-          "when": "false"
+          "when": "saropaLints.isDartProject"
         },
         {
           "command": "saropaLints.config.copyAsJson",
-          "when": "false"
+          "when": "saropaLints.isDartProject"
         },
         {
           "command": "saropaLints.summary.copyAsJson",
-          "when": "false"
+          "when": "saropaLints.isDartProject"
         },
         {
           "command": "saropaLints.securityPosture.copyAsJson",
-          "when": "false"
+          "when": "saropaLints.isDartProject"
         },
         {
           "command": "saropaLints.fileRisk.copyAsJson",
-          "when": "false"
+          "when": "saropaLints.isDartProject"
         },
         {
           "command": "saropaLints.overview.copyAsJson",
-          "when": "false"
+          "when": "saropaLints.isDartProject"
         },
         {
           "command": "saropaLints.suggestions.copyAsJson",
-          "when": "false"
+          "when": "saropaLints.isDartProject"
         },
         {
           "command": "saropaLints.toggleSidebarSection",
@@ -1856,6 +1861,39 @@
             ]
           },
           {
+            "id": "saropaLints.walkthrough.packageVibrancy",
+            "title": "Package Health",
+            "description": "Scan dependencies for version gaps, maintenance signals, and known issues. Export a **CycloneDX SBOM** for supply-chain audits.\n\nResults appear as code lens badges and in the Package Vibrancy tree.\n\n[Scan Package Vibrancy](command:saropaLints.packageVibrancy.scan)",
+            "media": {
+              "markdown": "media/walkthrough-package-vibrancy.md"
+            },
+            "completionEvents": [
+              "onCommand:saropaLints.packageVibrancy.scan"
+            ]
+          },
+          {
+            "id": "saropaLints.walkthrough.todosAndHacks",
+            "title": "TODOs & Hacks",
+            "description": "Find every `TODO`, `HACK`, and `FIXME` comment across the workspace. Group by tag type or folder, and click to jump to the source.\n\n[Refresh TODOs & Hacks](command:saropaLints.todosAndHacks.refresh)",
+            "media": {
+              "markdown": "media/walkthrough-todos-and-hacks.md"
+            },
+            "completionEvents": [
+              "onCommand:saropaLints.todosAndHacks.refresh"
+            ]
+          },
+          {
+            "id": "saropaLints.walkthrough.commandCatalog",
+            "title": "Browse All Commands",
+            "description": "115+ commands organized by category with search. Find analysis, security, package health, and reporting commands in one place.\n\n[Browse All Commands](command:saropaLints.showCommandCatalog)",
+            "media": {
+              "markdown": "media/walkthrough-command-catalog.md"
+            },
+            "completionEvents": [
+              "onCommand:saropaLints.showCommandCatalog"
+            ]
+          },
+          {
             "id": "saropaLints.walkthrough.aboutSaropa",
             "title": "About Saropa",
             "description": "Saropa Pty Limited — building digital safeguards since 2010.\n\nDart packages, VS Code extensions, and consumer apps for developers who value reliability.\n\n[Visit saropa.com](https://saropa.com/)",
@@ -1877,7 +1915,7 @@
     "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
     "package": "npm run precompile && npm run check-types && node esbuild.js --production",
     "lint": "tsc --noEmit -p ./",
-    "test": "tsc -p tsconfig.test.json && node node_modules/mocha/bin/mocha \"out-test/test/todosAndHacks/**/*.test.js\" \"out-test/test/driftAdvisor/**/*.test.js\" \"out-test/test/vibrancy/category-dictionary.test.js\" \"out-test/test/vibrancy/scan-helpers.test.js\" \"out-test/test/vibrancy/services/review-state.test.js\" \"out-test/test/vibrancy/scoring/status-classifier.test.js\" \"out-test/test/vibrancy/scoring/vibrancy-calculator.test.js\" \"out-test/test/vibrancy/scoring/bloat-calculator.test.js\" \"out-test/test/vibrancy/views/report-html.test.js\" \"out-test/test/rulePacks/**/*.test.js\" \"out-test/test/sidebarSectionVisibilityKeys.test.js\" \"out-test/test/sidebarToggleCommand.test.js\" \"out-test/test/sidebarToggleLabel.test.js\" \"out-test/test/overviewEmbeddedConfigKinds.test.js\" \"out-test/test/treeSerializers.test.js\" \"out-test/test/copyTreeAsJson.test.js\" \"out-test/test/suggestionCounts.test.js\" \"out-test/test/sidebarSectionCounts.test.js\" \"out-test/test/pathUtils.test.js\" \"out-test/test/violationsReader.test.js\" \"out-test/test/views/**/*.test.js\" \"out-test/test/pubspec-validation.test.js\" \"out-test/test/pubspec-code-actions.test.js\" --timeout 10000"
+    "test": "tsc -p tsconfig.test.json && node node_modules/mocha/bin/mocha \"out-test/test/todosAndHacks/**/*.test.js\" \"out-test/test/driftAdvisor/**/*.test.js\" \"out-test/test/vibrancy/category-dictionary.test.js\" \"out-test/test/vibrancy/scan-helpers.test.js\" \"out-test/test/vibrancy/services/review-state.test.js\" \"out-test/test/vibrancy/scoring/status-classifier.test.js\" \"out-test/test/vibrancy/scoring/vibrancy-calculator.test.js\" \"out-test/test/vibrancy/scoring/bloat-calculator.test.js\" \"out-test/test/vibrancy/views/report-html.test.js\" \"out-test/test/rulePacks/**/*.test.js\" \"out-test/test/sidebarSectionVisibilityKeys.test.js\" \"out-test/test/sidebarToggleCommand.test.js\" \"out-test/test/sidebarToggleLabel.test.js\" \"out-test/test/overviewEmbeddedConfigKinds.test.js\" \"out-test/test/treeSerializers.test.js\" \"out-test/test/copyTreeAsJson.test.js\" \"out-test/test/suggestionCounts.test.js\" \"out-test/test/sidebarSectionCounts.test.js\" \"out-test/test/pathUtils.test.js\" \"out-test/test/violationsReader.test.js\" \"out-test/test/views/**/*.test.js\" \"out-test/test/pubspec-validation.test.js\" \"out-test/test/pubspec-code-actions.test.js\" \"out-test/test/vibrancy/services/pubspec-sorter.test.js\" \"out-test/test/vibrancy/providers/annotate-command.test.js\" \"out-test/test/commandCatalogRegistry.test.js\" --timeout 10000"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.10",

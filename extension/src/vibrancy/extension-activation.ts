@@ -1312,8 +1312,13 @@ async function runSortDependencies(): Promise<void> {
         return;
     }
 
+    // entriesMoved=0 means only formatting changed (blank line spacing);
+    // entriesMoved>0 means packages were reordered
+    const detail = result.entriesMoved > 0
+        ? `Sorted ${result.entriesMoved} dependencies`
+        : 'Reformatted dependencies';
     vscode.window.showInformationMessage(
-        `Sorted ${result.entriesMoved} dependencies in ${result.sectionsModified.join(', ')}`,
+        `${detail} in ${result.sectionsModified.join(', ')}`,
     );
 }
 

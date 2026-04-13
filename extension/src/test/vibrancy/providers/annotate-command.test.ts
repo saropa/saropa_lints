@@ -1,3 +1,4 @@
+import '../register-vscode-mock';
 import * as assert from 'assert';
 import {
     formatAnnotation,
@@ -206,6 +207,28 @@ describe('annotate-command', () => {
             assert.strictEqual(edits.length, 1);
             assert.strictEqual(edits[0].deleteRanges.length, 2);
             assert.ok(edits[0].text.includes('Final description'));
+        });
+
+        it('should clean up duplicate description lines', () => {
+            // Bug fix: previously only one description line above a URL was
+            // detected, leaving duplicates from prior runs behind
+            const doc = makeFakeDoc(
+                'dependencies:\n'
+                + '  # A composable, multi-platform, Future-based API for HTTP requests.\n'
+                + '  # A composable, multi-platform, Future-based API for HTTP requests.\n'
+                + '  # https://pub.dev/packages/http\n'
+                + '  http: ^1.6.0',
+            );
+            const descriptions = new Map([['http', 'New description']]);
+
+            const edits = buildAnnotationEdits(
+                doc, ['http'], descriptions,
+            );
+
+            assert.strictEqual(edits.length, 1);
+            // All three lines (two descriptions + URL) should be in one
+            // delete range, not leaving an orphaned duplicate behind
+            assert.strictEqual(edits[0].deleteRanges.length, 1);
         });
 
         it('should preserve user comments between annotations', () => {

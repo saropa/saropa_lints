@@ -45,10 +45,15 @@ export async function sortDependencies(
         if (entries.length < 2) { continue; }
 
         const sorted = sortEntries(entries, options.sdkFirst);
-        const moved = countMoved(entries, sorted);
-        if (moved === 0) { continue; }
+        const newLines = buildSortedLines(sorted, options.sdkFirst);
 
-        const newLines = sorted.flatMap(e => e.lines);
+        // Check if anything actually changed (order or formatting)
+        const originalLines = lines.slice(sectionInfo.start, sectionInfo.end);
+        const newContent = newLines.join('\n');
+        const originalContent = originalLines.join('\n');
+        if (newContent === originalContent) { continue; }
+
+        const moved = countMoved(entries, sorted);
         edits.push({
             start: sectionInfo.start,
             end: sectionInfo.end,
@@ -165,6 +170,73 @@ function sortEntries(entries: DependencyEntry[], sdkFirst: boolean): DependencyE
         }
         return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
     });
+}
+
+/**
+ * Find the group key for a package — the shortest other package name in the
+ * section that is a prefix of this name at a '_' boundary. Packages sharing
+ * a group key stay adjacent without blank line separators.
+ *
+ * Example: if both 'drift' and 'drift_flutter' are in the section,
+ * drift_flutter's group key is 'drift', so they stay together.
+ */
+function getGroupKey(name: string, allNames: Set<string>): string {
+    const parts = name.split('_');
+    // Check progressively longer prefixes: 'drift' before 'drift_flutter'
+    for (let i = 1; i < parts.length; i++) {
+        const prefix = parts.slice(0, i).join('_');
+        if (allNames.has(prefix) && prefix !== name) {
+            return prefix;
+        }
+    }
+    return name;
+}
+
+/**
+ * Build output lines from sorted entries, inserting blank lines between
+ * package groups. Packages are grouped when one name is a prefix of another
+ * at a '_' boundary (e.g. drift + drift_flutter + drift_dev). SDK packages
+ * are always separated from non-SDK packages by a blank line.
+ */
+function buildSortedLines(
+    entries: DependencyEntry[],
+    sdkFirst: boolean,
+): string[] {
+    if (entries.length === 0) { return []; }
+
+    // Collect non-SDK names for group-key computation
+    const nonSdkNames = new Set(
+        entries.filter(e => !e.isSdk).map(e => e.name),
+    );
+
+    const result: string[] = [...entries[0].lines];
+
+    for (let i = 1; i < entries.length; i++) {
+        const prev = entries[i - 1];
+        const curr = entries[i];
+
+        let needsBlankLine: boolean;
+
+        if (sdkFirst && prev.isSdk !== curr.isSdk) {
+            // Always separate SDK block from non-SDK block
+            needsBlankLine = true;
+        } else if (prev.isSdk && curr.isSdk) {
+            // SDK packages stay together
+            needsBlankLine = false;
+        } else {
+            // Both non-SDK: separate unless they share a group key
+            const prevKey = getGroupKey(prev.name, nonSdkNames);
+            const currKey = getGroupKey(curr.name, nonSdkNames);
+            needsBlankLine = prevKey !== currKey;
+        }
+
+        if (needsBlankLine) {
+            result.push('');
+        }
+        result.push(...curr.lines);
+    }
+
+    return result;
 }
 
 function countMoved(original: DependencyEntry[], sorted: DependencyEntry[]): number {
