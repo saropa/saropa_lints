@@ -142,6 +142,48 @@ void main() {
 
   group('Configuration - Avoidance Rules', () {
     group('avoid_hardcoded_config', () {
+      test('fixture: static const and top-level const have no expect_lint', () {
+        final content = File(
+          'example_async/lib/config/avoid_hardcoded_config_fixture.dart',
+        ).readAsStringSync();
+        expect(
+          content.contains('cdnBaseUrl'),
+          isTrue,
+          reason: 'GOOD: static const URL',
+        );
+        expect(
+          content.contains('kTopLevelApiUrl'),
+          isTrue,
+          reason: 'GOOD: top-level const URL',
+        );
+        for (final line in content.split('\n')) {
+          if (line.contains('cdnBaseUrl') ||
+              line.contains('kTopLevelApiUrl') ||
+              line.contains('queryParamLimit') ||
+              line.contains('packageVersion')) {
+            expect(
+              line.contains('expect_lint:'),
+              isFalse,
+              reason: 'Named compile-time constants must not be marked BAD: $line',
+            );
+          }
+        }
+      });
+
+      test('fixture: exactly two BAD sites with expect_lint', () {
+        final content = File(
+          'example_async/lib/config/avoid_hardcoded_config_fixture.dart',
+        ).readAsStringSync();
+        final matches = RegExp(
+          r'// expect_lint: avoid_hardcoded_config',
+        ).allMatches(content);
+        expect(
+          matches.length,
+          2,
+          reason: 'static final field + method local should each expect_lint',
+        );
+      });
+
       test('configuration value in source SHOULD trigger', () {
         expect('configuration value in source', isNotNull);
       });

@@ -13,7 +13,7 @@ import '../../saropa_lint_rule.dart';
 
 /// Warns when hardcoded configuration values are detected.
 ///
-/// Since: v4.1.6 | Updated: v4.13.0 | Rule version: v4
+/// Since: v4.1.6 | Updated: v4.14.0 | Rule version: v5
 ///
 /// Hardcoded URLs, API keys, and configuration values make code
 /// difficult to maintain and deploy to different environments.
@@ -22,8 +22,8 @@ import '../../saropa_lint_rule.dart';
 ///
 /// **BAD:**
 /// ```dart
-/// const apiUrl = 'https://api.example.com/v1';
-/// const apiKey = 'sk_live_abc123';
+/// final apiUrl = 'https://api.example.com/v1';
+/// final apiKey = 'sk_live_abc123';
 /// final baseUrl = 'http://localhost:3000';
 /// ```
 ///
@@ -32,6 +32,11 @@ import '../../saropa_lint_rule.dart';
 /// final apiUrl = const String.fromEnvironment('API_URL');
 /// final apiKey = dotenv.env['API_KEY'];
 /// final baseUrl = AppConfig.instance.baseUrl;
+/// // Centralized named constants (top-level const or static const fields)
+/// const String kApiUrl = 'https://api.example.com/v1';
+/// class ServerConstants {
+///   static const String cdnBase = 'https://cdn.example.com/pkg';
+/// }
 /// ```
 class AvoidHardcodedConfigRule extends SaropaLintRule {
   AvoidHardcodedConfigRule() : super(code: _code);
@@ -50,7 +55,7 @@ class AvoidHardcodedConfigRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'avoid_hardcoded_config',
-    '[avoid_hardcoded_config] Hardcoded configuration value detected. Embedding URLs, ports, API keys, or feature flags directly in source code makes the app inflexible across environments (dev, staging, production) and forces a rebuild for every configuration change, increasing deployment risk. {v4}',
+    '[avoid_hardcoded_config] Hardcoded configuration value detected. Embedding URLs, ports, API keys, or feature flags directly in source code makes the app inflexible across environments (dev, staging, production) and forces a rebuild for every configuration change, increasing deployment risk. {v5}',
     correctionMessage:
         'Use String.fromEnvironment, dotenv, or a config service for environment-specific values.',
     severity: DiagnosticSeverity.WARNING,
@@ -89,6 +94,19 @@ class AvoidHardcodedConfigRule extends SaropaLintRule {
     return false;
   }
 
+  /// Top-level `const` and class `static const` fields are the intended
+  /// single place for fixed URLs/keys; skip those initializers.
+  static bool _isNamedCompileTimeConstant(VariableDeclaration node) {
+    final AstNode? list = node.parent;
+    if (list is! VariableDeclarationList || !list.isConst) return false;
+    final AstNode? container = list.parent;
+    if (container is TopLevelVariableDeclaration) return true;
+    if (container is FieldDeclaration) {
+      return container.isStatic;
+    }
+    return false;
+  }
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -108,7 +126,7 @@ class AvoidHardcodedConfigRule extends SaropaLintRule {
 
       // Check if value looks like a hardcoded config
       if (_urlPattern.hasMatch(value) || _keyPattern.hasMatch(value)) {
-        if (!_isSafeUrl(value)) {
+        if (!_isSafeUrl(value) && !_isNamedCompileTimeConstant(node)) {
           reporter.atNode(node);
         }
       }
@@ -128,7 +146,8 @@ class AvoidHardcodedConfigRule extends SaropaLintRule {
         // Check for URL or key patterns in config-named variables
         if (_configNamePattern.hasMatch(varName)) {
           if (_urlPattern.hasMatch(value) || _keyPattern.hasMatch(value)) {
-            if (!_isSafeUrl(value)) {
+            if (!_isSafeUrl(value) &&
+                !_isNamedCompileTimeConstant(variable)) {
               reporter.atNode(variable);
             }
           }
@@ -208,6 +227,9 @@ class AvoidHardcodedConfigTestRule extends SaropaLintRule {
   }
 
   static bool _isHardcodedConfig(VariableDeclaration node) {
+    if (AvoidHardcodedConfigRule._isNamedCompileTimeConstant(node)) {
+      return false;
+    }
     final Expression? initializer = node.initializer;
     if (initializer is! StringLiteral) return false;
 

@@ -35,6 +35,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- **`avoid_hardcoded_config` (v5):** No longer reports URL/key-like string literals used as initializers for top-level `const` declarations or `static const` class fields. Those are the usual single-source-of-truth pattern; mutable `static final` / locals still warn.
+
 ### Added (Extension)
 
 - **Help hub**: New “Saropa Lints: Help” command (`saropaLints.openHelpHub`) opens a quick pick for Getting Started, About, Browse All Commands, and pub.dev. **Overview** intro links are grouped under a permanent **Help & resources** tree section. **Violations** always shows a **Help & resources** row at the top when the tree has content. **View title bar**: Help (question icon) on Overview and Violations opens the same hub (alongside the existing command-catalog title action).
