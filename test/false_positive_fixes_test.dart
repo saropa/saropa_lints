@@ -44,6 +44,9 @@ import 'package:test/test.dart';
 /// 15. use_existing_variable - same-source initializers that contain method/function
 ///     invocations are excluded (e.g. nextDouble(), DateTime.now()) so same source is
 ///     not treated as same value.
+/// 16. avoid_stream_subscription_in_field - FunctionExpression closure boundary in
+///     first parent-walk loop prevents cross-scope suppression (conditional listen
+///     false positive, bare listen inside closure false negative).
 ///
 /// Test fixtures are located in:
 /// - example/lib/require_subscription_status_check_example.dart
@@ -947,6 +950,25 @@ void main() {
       test('listen() as argument to collection.add should NOT trigger', () {
         // subscriptions.add(stream.listen(...)); caller manages subscription.
         expect('ArgumentList parent skips bare-call classification', isNotNull);
+      });
+
+      test('conditional listen assigned to subscription field should NOT '
+          'trigger', () {
+        // _rebuildTriggerSubscription = stream.listen(...) inside if block.
+        // The AssignmentExpression is a direct parent of .listen() regardless
+        // of surrounding if/for blocks — the first loop finds it immediately.
+        expect('Conditional block does not interfere with assignment check',
+            isNotNull);
+      });
+
+      test('bare listen inside closure should trigger even when outer scope '
+          'has subscription assignment', () {
+        // _sub = stream.listen((_) { otherStream.listen(...); });
+        // The inner .listen() is uncaptured. The first loop must stop at the
+        // FunctionExpression boundary so it does not find the outer _sub
+        // assignment and incorrectly suppress the lint.
+        expect('FunctionExpression boundary prevents cross-scope suppression',
+            isNotNull);
       });
     });
 

@@ -3088,9 +3088,13 @@ class AvoidStreamSubscriptionInFieldRule extends SaropaLintRule {
           if (_isStreamSubscriptionType(declType)) return;
         }
 
-        // Stop at method or class level
+        // Stop at method, function, or closure boundary — walking past a
+        // FunctionExpression would escape the closure scope and match
+        // assignments in an outer scope (false negative for bare .listen()
+        // inside callbacks, false positive for properly captured outer calls).
         if (current is MethodDeclaration ||
             current is FunctionDeclaration ||
+            current is FunctionExpression ||
             current is ClassDeclaration) {
           break;
         }
@@ -3118,7 +3122,12 @@ class AvoidStreamSubscriptionInFieldRule extends SaropaLintRule {
           // Being assigned or returned, check if it's to a subscription type
           break;
         }
-        if (current is Block || current is MethodDeclaration) {
+        // Stop at block, method, or closure boundary — expression-body
+        // closures (e.g. (_) => stream.listen(...)) have no Block node,
+        // so FunctionExpression is needed to prevent escaping the closure.
+        if (current is Block ||
+            current is MethodDeclaration ||
+            current is FunctionExpression) {
           break;
         }
         current = current.parent;
