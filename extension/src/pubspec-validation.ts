@@ -7,6 +7,12 @@
  * - `prefer_caret_version_syntax`: version constraints without `^` prefix
  * - `avoid_dependency_overrides`: dependency_overrides entries without comment
  * - `prefer_publish_to_none`: missing `publish_to: none` for private packages
+ * - `prefer_pinned_version_syntax`: caret constraints where exact pins preferred
+ * - `pubspec_ordering`: top-level fields not in recommended order
+ * - `newline_before_pubspec_entry`: missing blank line before top-level sections
+ * - `prefer_commenting_pubspec_ignores`: ignored_advisories without comments
+ * - `add_resolution_workspace`: workspace root missing resolution field
+ * - `prefer_l10n_yaml_config`: inline l10n config instead of l10n.yaml
  *
  * Follows the same pattern as SdkDiagnostics / VibrancyDiagnostics:
  * construct with a DiagnosticCollection, call update() with file URI
@@ -122,6 +128,29 @@ function createDiag(
     const range = new vscode.Range(
         entry.line, entry.startChar,
         entry.line, entry.endChar,
+    );
+    const diag = new vscode.Diagnostic(range, message, severity);
+    diag.source = SOURCE;
+    diag.code = code;
+    return diag;
+}
+
+/**
+ * Create a diagnostic on an arbitrary line (not tied to a DepEntry).
+ * Used by checks that inspect top-level YAML structure rather than
+ * individual dependency entries.
+ */
+function createLineDiag(
+    lineIndex: number,
+    startChar: number,
+    endChar: number,
+    message: string,
+    severity: vscode.DiagnosticSeverity,
+    code: string,
+): vscode.Diagnostic {
+    const range = new vscode.Range(
+        lineIndex, startChar,
+        lineIndex, endChar,
     );
     const diag = new vscode.Diagnostic(range, message, severity);
     diag.source = SOURCE;
@@ -317,9 +346,310 @@ function checkPublishToNone(
     diagnostics.push(diag);
 }
 
+/**
+ * prefer_pinned_version_syntax: flag caret constraints, prefer exact pins.
+ *
+ * Stylistic opposite of `prefer_caret_version_syntax`. Some workflows
+ * (CI reproducibility, monorepos) prefer exact version pins (`1.2.3`)
+ * over caret ranges (`^1.2.3`). Users enable one or the other via
+ * the init wizard — both should never be active simultaneously.
+ *
+ * Skips: empty constraints (hosted latest), `any`, range expressions,
+ * and `dependency_overrides` (overrides intentionally use exact pins).
+ */
+function checkPinnedVersionSyntax(
+    sections: DepSection[],
+    diagnostics: vscode.Diagnostic[],
+): void {
+    for (const section of sections) {
+        // Skip dependency_overrides — exact pins are expected there
+        if (section.header === 'dependency_overrides') { continue; }
+
+        for (const entry of section.entries) {
+            const c = entry.constraint;
+            // Only flag caret versions like ^1.2.3
+            if (!c || !c.startsWith('^')) { continue; }
+
+            const bare = c.substring(1);
+            if (/^\d+\.\d+\.\d+/.test(bare)) {
+                diagnostics.push(createDiag(
+                    entry,
+                    `'${entry.name}: ${c}' uses a caret range — `
+                    + `use '${bare}' to pin the exact version`,
+                    vscode.DiagnosticSeverity.Information,
+                    'prefer_pinned_version_syntax',
+                ));
+            }
+        }
+    }
+}
+
+/**
+ * Recommended top-level field order for pubspec.yaml, based on the
+ * Dart pub.dev conventions. Fields not in this list are allowed
+ * anywhere without triggering a diagnostic.
+ */
+const PUBSPEC_FIELD_ORDER = [
+    'name',
+    'description',
+    'version',
+    'publish_to',
+    'homepage',
+    'repository',
+    'issue_tracker',
+    'documentation',
+    'environment',
+    'dependencies',
+    'dev_dependencies',
+    'dependency_overrides',
+    'flutter',
+];
+
+/**
+ * pubspec_ordering: flag top-level fields not in recommended order.
+ *
+ * The Dart/pub.dev convention places `name` first, then metadata,
+ * then environment, then dependencies, then flutter config. Following
+ * this order makes pubspec files predictable and easier to scan.
+ *
+ * Only checks fields that appear in PUBSPEC_FIELD_ORDER; unknown
+ * fields (e.g. custom keys, `resolution`, `workspace`) are ignored.
+ * Reports only the first out-of-order field to avoid flooding.
+ */
+function checkPubspecOrdering(
+    lines: string[],
+    diagnostics: vscode.Diagnostic[],
+): void {
+    // Collect top-level fields and their line numbers, in source order
+    const found: { key: string; line: number; length: number }[] = [];
+    for (let i = 0; i < lines.length; i++) {
+        const match = lines[i].match(/^(\w[\w_]*)\s*:/);
+        if (!match) { continue; }
+        const key = match[1];
+        // Only track known fields — custom keys are allowed anywhere
+        if (PUBSPEC_FIELD_ORDER.includes(key)) {
+            found.push({ key, line: i, length: lines[i].length });
+        }
+    }
+
+    if (found.length < 2) { return; }
+
+    // Check that found fields appear in the same relative order as
+    // PUBSPEC_FIELD_ORDER. Compare adjacent pairs.
+    for (let i = 1; i < found.length; i++) {
+        const prevIdx = PUBSPEC_FIELD_ORDER.indexOf(found[i - 1].key);
+        const currIdx = PUBSPEC_FIELD_ORDER.indexOf(found[i].key);
+
+        if (currIdx < prevIdx) {
+            // Current field should come before the previous one
+            const curr = found[i];
+            diagnostics.push(createLineDiag(
+                curr.line, 0, curr.length,
+                `'${curr.key}' should appear before '${found[i - 1].key}' — `
+                + 'follow the recommended pubspec field order',
+                vscode.DiagnosticSeverity.Information,
+                'pubspec_ordering',
+            ));
+            // Report only the first violation to keep diagnostics actionable
+            return;
+        }
+    }
+}
+
+/**
+ * newline_before_pubspec_entry: flag top-level sections without a
+ * preceding blank line.
+ *
+ * Blank lines between major sections improve readability. This check
+ * flags any top-level key that is not the first line and is not
+ * preceded by at least one blank line (or comment-only line).
+ */
+function checkNewlineBeforeEntry(
+    lines: string[],
+    diagnostics: vscode.Diagnostic[],
+): void {
+    for (let i = 1; i < lines.length; i++) {
+        const match = lines[i].match(/^(\w[\w_]*)\s*:/);
+        if (!match) { continue; }
+
+        // Check line above — should be blank or a comment
+        const prev = lines[i - 1].trim();
+        if (prev === '' || prev.startsWith('#')) { continue; }
+
+        // The previous line is non-blank content, so this section has
+        // no visual separator
+        diagnostics.push(createLineDiag(
+            i, 0, lines[i].length,
+            `add a blank line before '${match[1]}:' for readability`,
+            vscode.DiagnosticSeverity.Information,
+            'newline_before_pubspec_entry',
+        ));
+    }
+}
+
+/**
+ * prefer_commenting_pubspec_ignores: flag ignored_advisories entries
+ * without an explanatory comment.
+ *
+ * The `ignored_advisories` field in pubspec.yaml lists security
+ * advisory IDs that `dart pub` should skip. Each suppressed advisory
+ * should have a comment explaining why it is safe to ignore —
+ * otherwise reviewers cannot assess the risk.
+ *
+ * Expected format:
+ *   ignored_advisories:
+ *     # Not exploitable in our usage — we never parse untrusted XML
+ *     - GHSA-xxxx-yyyy-zzzz
+ */
+function checkCommentingPubspecIgnores(
+    lines: string[],
+    diagnostics: vscode.Diagnostic[],
+): void {
+    let inIgnoredAdvisories = false;
+
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+
+        // Detect the ignored_advisories section header
+        if (/^ignored_advisories\s*:/.test(line)) {
+            inIgnoredAdvisories = true;
+            continue;
+        }
+
+        // Any other top-level key ends the section
+        if (inIgnoredAdvisories && /^\S/.test(line) && line.trim() !== '') {
+            inIgnoredAdvisories = false;
+            continue;
+        }
+
+        if (!inIgnoredAdvisories) { continue; }
+
+        // List entry: "  - GHSA-xxxx-yyyy-zzzz"
+        const entryMatch = line.match(/^( +- +)(\S+)/);
+        if (!entryMatch) { continue; }
+
+        // Check for inline comment on the entry line
+        if (line.includes('#')) { continue; }
+
+        // Check for comment on the line above
+        if (i > 0) {
+            const prevLine = lines[i - 1].trim();
+            if (prevLine.startsWith('#')) { continue; }
+        }
+
+        const advisory = entryMatch[2];
+        const startChar = entryMatch[1].length;
+        diagnostics.push(createLineDiag(
+            i, startChar, startChar + advisory.length,
+            `ignored advisory '${advisory}' has no comment — `
+            + 'add a comment explaining why this advisory is safe to ignore',
+            vscode.DiagnosticSeverity.Information,
+            'prefer_commenting_pubspec_ignores',
+        ));
+    }
+}
+
+/**
+ * add_resolution_workspace: flag workspace roots missing `resolution`.
+ *
+ * Dart 3.x monorepos use `workspace:` in the root pubspec to list
+ * sub-packages. The root should also declare `resolution: workspace`
+ * to enable shared dependency resolution. If `workspace:` is present
+ * but `resolution:` is absent, sub-packages may resolve dependencies
+ * independently, defeating the purpose of a workspace.
+ */
+function checkResolutionWorkspace(
+    lines: string[],
+    diagnostics: vscode.Diagnostic[],
+): void {
+    let workspaceLine = -1;
+    let hasResolution = false;
+
+    for (let i = 0; i < lines.length; i++) {
+        if (/^workspace\s*:/.test(lines[i])) {
+            workspaceLine = i;
+        }
+        if (/^resolution\s*:/.test(lines[i])) {
+            hasResolution = true;
+        }
+    }
+
+    // Only flag if this is a workspace root (has workspace:) but
+    // missing resolution field
+    if (workspaceLine < 0 || hasResolution) { return; }
+
+    diagnostics.push(createLineDiag(
+        workspaceLine, 0, lines[workspaceLine].length,
+        "workspace root is missing 'resolution: workspace' — "
+        + 'add it for shared dependency resolution across sub-packages',
+        vscode.DiagnosticSeverity.Information,
+        'add_resolution_workspace',
+    ));
+}
+
+/**
+ * prefer_l10n_yaml_config: flag inline l10n configuration.
+ *
+ * Flutter's `generate: true` under the `flutter:` section enables
+ * code generation for localization. The l10n configuration (template
+ * ARB file, output class, etc.) can live inline in pubspec.yaml or
+ * in a dedicated `l10n.yaml` file. A separate file is preferred
+ * because it keeps pubspec focused on dependencies and metadata,
+ * and is the approach recommended by Flutter documentation.
+ *
+ * This check flags `generate: true` under the `flutter:` section.
+ */
+function checkL10nYamlConfig(
+    lines: string[],
+    diagnostics: vscode.Diagnostic[],
+): void {
+    let inFlutterSection = false;
+
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+
+        // Detect flutter: section header
+        if (/^flutter\s*:/.test(line)) {
+            inFlutterSection = true;
+            continue;
+        }
+
+        // Any other top-level key ends the flutter section
+        if (inFlutterSection && /^\S/.test(line) && line.trim() !== '') {
+            inFlutterSection = false;
+            continue;
+        }
+
+        if (!inFlutterSection) { continue; }
+
+        // Check for generate: true under flutter:
+        const genMatch = line.match(/^( +)(generate)\s*:\s*true/);
+        if (!genMatch) { continue; }
+
+        const startChar = genMatch[1].length;
+        const endChar = startChar + genMatch[2].length;
+        diagnostics.push(createLineDiag(
+            i, startChar, endChar,
+            "inline 'generate: true' under flutter — "
+            + "prefer a dedicated 'l10n.yaml' file for localization config",
+            vscode.DiagnosticSeverity.Information,
+            'prefer_l10n_yaml_config',
+        ));
+        return;
+    }
+}
+
 // ── Public API ─────────────────────────────────────────────────
 
 export class PubspecValidation {
+    /**
+     * When true, run `prefer_pinned_version_syntax` instead of
+     * `prefer_caret_version_syntax`. These are mutually exclusive
+     * stylistic rules — the user chooses one via configuration.
+     * Default: false (prefer caret syntax, matching `dart pub add`).
+     */
+    preferPinnedVersions = false;
+
     constructor(
         private readonly _collection: vscode.DiagnosticCollection,
     ) {}
@@ -332,9 +662,19 @@ export class PubspecValidation {
 
         checkAnyVersion(sections, diagnostics);
         checkDependencyOrdering(sections, diagnostics);
-        checkCaretSyntax(sections, diagnostics);
+        // Stylistic pair: run one or the other, never both
+        if (this.preferPinnedVersions) {
+            checkPinnedVersionSyntax(sections, diagnostics);
+        } else {
+            checkCaretSyntax(sections, diagnostics);
+        }
         checkDependencyOverrides(sections, lines, diagnostics);
         checkPublishToNone(lines, diagnostics);
+        checkPubspecOrdering(lines, diagnostics);
+        checkNewlineBeforeEntry(lines, diagnostics);
+        checkCommentingPubspecIgnores(lines, diagnostics);
+        checkResolutionWorkspace(lines, diagnostics);
+        checkL10nYamlConfig(lines, diagnostics);
 
         this._collection.set(uri, diagnostics);
     }

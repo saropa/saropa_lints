@@ -6,9 +6,15 @@ import * as vscode from 'vscode';
 import { PubspecValidation } from '../pubspec-validation';
 import { MockDiagnosticCollection, Diagnostic } from './vibrancy/vscode-mock';
 
-function runValidation(content: string): Diagnostic[] {
+function runValidation(
+    content: string,
+    opts?: { preferPinnedVersions?: boolean },
+): Diagnostic[] {
     const collection = new MockDiagnosticCollection('test-pubspec');
     const validator = new PubspecValidation(collection as any);
+    if (opts?.preferPinnedVersions) {
+        validator.preferPinnedVersions = true;
+    }
     const uri = vscode.Uri.file('/test/pubspec.yaml');
     validator.update(uri, content);
     return (collection.get(uri) ?? []) as Diagnostic[];
@@ -204,8 +210,9 @@ describe('SDK and path deps', () => {
 // ── Edge cases ─────────────────────────────────────────────────
 
 describe('edge cases', () => {
-    it('produces no diagnostics for empty pubspec', () => {
-        const diags = runValidation('name: my_app\nversion: 1.0.0\npublish_to: none\n');
+    it('produces no diagnostics for minimal clean pubspec', () => {
+        const content = 'name: my_app\n\nversion: 1.0.0\n\npublish_to: none\n';
+        const diags = runValidation(content);
         assert.strictEqual(diags.length, 0);
     });
 
@@ -329,6 +336,328 @@ describe('prefer_publish_to_none', () => {
     });
 });
 
+// ── prefer_pinned_version_syntax ──────────────────────────────
+
+describe('prefer_pinned_version_syntax', () => {
+    const pinned = { preferPinnedVersions: true };
+
+    it('flags caret version constraint', () => {
+        const content = [
+            'dependencies:',
+            '  http: ^1.2.3',
+        ].join('\n');
+        const diags = findByCode(
+            runValidation(content, pinned), 'prefer_pinned_version_syntax',
+        );
+        assert.strictEqual(diags.length, 1);
+        assert.ok(diags[0].message.includes('1.2.3'));
+    });
+
+    it('does not flag bare version (already pinned)', () => {
+        const content = [
+            'dependencies:',
+            '  http: 1.2.3',
+        ].join('\n');
+        const diags = findByCode(
+            runValidation(content, pinned), 'prefer_pinned_version_syntax',
+        );
+        assert.strictEqual(diags.length, 0);
+    });
+
+    it('does not flag range constraint', () => {
+        const content = [
+            'dependencies:',
+            "  http: '>=1.0.0 <2.0.0'",
+        ].join('\n');
+        const diags = findByCode(
+            runValidation(content, pinned), 'prefer_pinned_version_syntax',
+        );
+        assert.strictEqual(diags.length, 0);
+    });
+
+    it('skips dependency_overrides section', () => {
+        const content = [
+            'dependency_overrides:',
+            '  http: ^1.2.3 # compat',
+        ].join('\n');
+        const diags = findByCode(
+            runValidation(content, pinned), 'prefer_pinned_version_syntax',
+        );
+        assert.strictEqual(diags.length, 0);
+    });
+
+    it('does not flag any constraint', () => {
+        const content = [
+            'dependencies:',
+            '  http: any',
+        ].join('\n');
+        const diags = findByCode(
+            runValidation(content, pinned), 'prefer_pinned_version_syntax',
+        );
+        assert.strictEqual(diags.length, 0);
+    });
+
+    it('does not run when preferPinnedVersions is false', () => {
+        const content = [
+            'dependencies:',
+            '  http: ^1.2.3',
+        ].join('\n');
+        // Default mode — should not fire pinned check
+        const diags = findByCode(runValidation(content), 'prefer_pinned_version_syntax');
+        assert.strictEqual(diags.length, 0);
+    });
+});
+
+// ── pubspec_ordering ──────────────────────────────────────────
+
+describe('pubspec_ordering', () => {
+    it('flags field out of recommended order', () => {
+        const content = [
+            'version: 1.0.0',
+            '',
+            'name: my_app',
+        ].join('\n');
+        const diags = findByCode(runValidation(content), 'pubspec_ordering');
+        assert.strictEqual(diags.length, 1);
+        assert.ok(diags[0].message.includes('name'));
+        assert.ok(diags[0].message.includes('version'));
+    });
+
+    it('passes fields in correct order', () => {
+        const content = [
+            'name: my_app',
+            '',
+            'version: 1.0.0',
+            '',
+            'environment:',
+            '  sdk: ^3.0.0',
+            '',
+            'dependencies:',
+            '  http: ^1.0.0',
+        ].join('\n');
+        const diags = findByCode(runValidation(content), 'pubspec_ordering');
+        assert.strictEqual(diags.length, 0);
+    });
+
+    it('ignores unknown fields', () => {
+        const content = [
+            'name: my_app',
+            '',
+            'custom_field: value',
+            '',
+            'version: 1.0.0',
+        ].join('\n');
+        const diags = findByCode(runValidation(content), 'pubspec_ordering');
+        assert.strictEqual(diags.length, 0);
+    });
+
+    it('reports only the first out-of-order field', () => {
+        const content = [
+            'dependencies:',
+            '  http: ^1.0.0',
+            '',
+            'environment:',
+            '  sdk: ^3.0.0',
+            '',
+            'name: my_app',
+        ].join('\n');
+        const diags = findByCode(runValidation(content), 'pubspec_ordering');
+        assert.strictEqual(diags.length, 1);
+    });
+});
+
+// ── newline_before_pubspec_entry ──────────────────────────────
+
+describe('newline_before_pubspec_entry', () => {
+    it('flags section without preceding blank line', () => {
+        const content = [
+            'name: my_app',
+            'version: 1.0.0',
+        ].join('\n');
+        const diags = findByCode(runValidation(content), 'newline_before_pubspec_entry');
+        assert.strictEqual(diags.length, 1);
+        assert.ok(diags[0].message.includes('version'));
+    });
+
+    it('passes when blank line separates sections', () => {
+        const content = [
+            'name: my_app',
+            '',
+            'version: 1.0.0',
+        ].join('\n');
+        const diags = findByCode(runValidation(content), 'newline_before_pubspec_entry');
+        assert.strictEqual(diags.length, 0);
+    });
+
+    it('accepts comment line as separator', () => {
+        const content = [
+            'name: my_app',
+            '# Version info',
+            'version: 1.0.0',
+        ].join('\n');
+        const diags = findByCode(runValidation(content), 'newline_before_pubspec_entry');
+        assert.strictEqual(diags.length, 0);
+    });
+
+    it('does not flag the first line', () => {
+        const content = 'name: my_app\n';
+        const diags = findByCode(runValidation(content), 'newline_before_pubspec_entry');
+        assert.strictEqual(diags.length, 0);
+    });
+
+    it('flags multiple consecutive sections without blank lines', () => {
+        const content = [
+            'name: my_app',
+            'version: 1.0.0',
+            'description: A test app',
+        ].join('\n');
+        const diags = findByCode(runValidation(content), 'newline_before_pubspec_entry');
+        assert.strictEqual(diags.length, 2);
+    });
+});
+
+// ── prefer_commenting_pubspec_ignores ─────────────────────────
+
+describe('prefer_commenting_pubspec_ignores', () => {
+    it('flags ignored advisory without comment', () => {
+        const content = [
+            'ignored_advisories:',
+            '  - GHSA-xxxx-yyyy-zzzz',
+        ].join('\n');
+        const diags = findByCode(runValidation(content), 'prefer_commenting_pubspec_ignores');
+        assert.strictEqual(diags.length, 1);
+        assert.ok(diags[0].message.includes('GHSA-xxxx-yyyy-zzzz'));
+    });
+
+    it('skips advisory with inline comment', () => {
+        const content = [
+            'ignored_advisories:',
+            '  - GHSA-xxxx-yyyy-zzzz # not exploitable in our usage',
+        ].join('\n');
+        const diags = findByCode(runValidation(content), 'prefer_commenting_pubspec_ignores');
+        assert.strictEqual(diags.length, 0);
+    });
+
+    it('skips advisory with comment on line above', () => {
+        const content = [
+            'ignored_advisories:',
+            '  # We never parse untrusted XML',
+            '  - GHSA-xxxx-yyyy-zzzz',
+        ].join('\n');
+        const diags = findByCode(runValidation(content), 'prefer_commenting_pubspec_ignores');
+        assert.strictEqual(diags.length, 0);
+    });
+
+    it('flags multiple uncommented advisories', () => {
+        const content = [
+            'ignored_advisories:',
+            '  - GHSA-aaaa-bbbb-cccc',
+            '  - GHSA-dddd-eeee-ffff',
+        ].join('\n');
+        const diags = findByCode(runValidation(content), 'prefer_commenting_pubspec_ignores');
+        assert.strictEqual(diags.length, 2);
+    });
+
+    it('produces no diagnostics when no ignored_advisories section', () => {
+        const content = [
+            'name: my_app',
+            '',
+            'version: 1.0.0',
+        ].join('\n');
+        const diags = findByCode(runValidation(content), 'prefer_commenting_pubspec_ignores');
+        assert.strictEqual(diags.length, 0);
+    });
+});
+
+// ── add_resolution_workspace ─────────────────────────────────
+
+describe('add_resolution_workspace', () => {
+    it('flags workspace root without resolution field', () => {
+        const content = [
+            'name: mono_root',
+            '',
+            'workspace:',
+            '  - packages/app',
+            '  - packages/shared',
+        ].join('\n');
+        const diags = findByCode(runValidation(content), 'add_resolution_workspace');
+        assert.strictEqual(diags.length, 1);
+        assert.ok(diags[0].message.includes('resolution'));
+    });
+
+    it('passes workspace root with resolution field', () => {
+        const content = [
+            'name: mono_root',
+            '',
+            'resolution: workspace',
+            '',
+            'workspace:',
+            '  - packages/app',
+        ].join('\n');
+        const diags = findByCode(runValidation(content), 'add_resolution_workspace');
+        assert.strictEqual(diags.length, 0);
+    });
+
+    it('does not flag non-workspace pubspec', () => {
+        const content = [
+            'name: my_app',
+            '',
+            'version: 1.0.0',
+        ].join('\n');
+        const diags = findByCode(runValidation(content), 'add_resolution_workspace');
+        assert.strictEqual(diags.length, 0);
+    });
+});
+
+// ── prefer_l10n_yaml_config ──────────────────────────────────
+
+describe('prefer_l10n_yaml_config', () => {
+    it('flags generate: true under flutter section', () => {
+        const content = [
+            'name: my_app',
+            '',
+            'flutter:',
+            '  generate: true',
+        ].join('\n');
+        const diags = findByCode(runValidation(content), 'prefer_l10n_yaml_config');
+        assert.strictEqual(diags.length, 1);
+        assert.ok(diags[0].message.includes('l10n.yaml'));
+    });
+
+    it('does not flag flutter section without generate', () => {
+        const content = [
+            'name: my_app',
+            '',
+            'flutter:',
+            '  uses-material-design: true',
+        ].join('\n');
+        const diags = findByCode(runValidation(content), 'prefer_l10n_yaml_config');
+        assert.strictEqual(diags.length, 0);
+    });
+
+    it('does not flag generate: false', () => {
+        const content = [
+            'name: my_app',
+            '',
+            'flutter:',
+            '  generate: false',
+        ].join('\n');
+        const diags = findByCode(runValidation(content), 'prefer_l10n_yaml_config');
+        assert.strictEqual(diags.length, 0);
+    });
+
+    it('does not flag generate outside flutter section', () => {
+        const content = [
+            'name: my_app',
+            '',
+            'custom:',
+            '  generate: true',
+        ].join('\n');
+        const diags = findByCode(runValidation(content), 'prefer_l10n_yaml_config');
+        assert.strictEqual(diags.length, 0);
+    });
+});
+
 // ── Combined ───────────────────────────────────────────────────
 
 describe('combined checks', () => {
@@ -344,14 +673,17 @@ describe('combined checks', () => {
         assert.ok(codes.includes('avoid_any_version'));
         assert.ok(codes.includes('dependencies_ordering'));
         assert.ok(codes.includes('prefer_caret_version_syntax'));
-        // Also flags missing publish_to
+        // Also flags missing publish_to and missing blank line
         assert.ok(codes.includes('prefer_publish_to_none'));
+        assert.ok(codes.includes('newline_before_pubspec_entry'));
     });
 
     it('produces no diagnostics for clean pubspec', () => {
         const content = [
             'name: my_app',
+            '',
             'version: 1.0.0',
+            '',
             'publish_to: none',
             '',
             'environment:',

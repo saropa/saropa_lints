@@ -38,12 +38,19 @@
 
 ### Added (Extension)
 
-- **Pubspec validation diagnostics**: Five inline checks on `pubspec.yaml`, shown in the Problems panel and as editor squiggles:
+- **Pubspec validation diagnostics**: Eleven inline checks on `pubspec.yaml`, shown in the Problems panel and as editor squiggles:
   - `avoid_any_version` (Warning): Flags `any` version constraints in dependencies
   - `dependencies_ordering` (Info): Flags unsorted dependency lists
   - `prefer_caret_version_syntax` (Info): Flags bare version pins (`1.2.3`) — suggests caret syntax (`^1.2.3`)
   - `avoid_dependency_overrides` (Warning): Flags `dependency_overrides` entries without an explanatory comment
   - `prefer_publish_to_none` (Info): Flags pubspec files missing `publish_to: none` field
+  - `prefer_pinned_version_syntax` (Info): Stylistic opposite of `prefer_caret_version_syntax` — flags caret ranges, prefers exact pins (opt-in)
+  - `pubspec_ordering` (Info): Flags top-level fields not in recommended order (name, description, version, ...)
+  - `newline_before_pubspec_entry` (Info): Flags top-level sections without a preceding blank line
+  - `prefer_commenting_pubspec_ignores` (Info): Flags `ignored_advisories` entries without an explanatory comment
+  - `add_resolution_workspace` (Info): Flags workspace roots missing `resolution: workspace` field
+  - `prefer_l10n_yaml_config` (Info): Flags inline `generate: true` under flutter — suggests `l10n.yaml`
+- `prefer_pinned_version_syntax` and `prefer_caret_version_syntax` are mutually exclusive stylistic rules — controlled via `PubspecValidation.preferPinnedVersions` flag (default: caret preferred).
 - Diagnostics update live as you edit pubspec.yaml (300ms debounce). SDK/path/git dependencies and `dependency_overrides` are handled correctly.
 
 ### Fixed
