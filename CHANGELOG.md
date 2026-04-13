@@ -1,3 +1,4 @@
+<!-- markdownlint-disable-file MD024 MD033 -->
 # Changelog
 
 2100+ custom lint rules with 250+ quick fixes for Flutter and Dart — static analysis for security, accessibility, performance, and library-specific patterns. Includes a VS Code extension with Package Vibrancy scoring.
@@ -29,6 +30,18 @@
     **Score** — [pub.dev/packages/saropa_lints/score](https://pub.dev/packages/saropa_lints/score)
 
 -->
+
+---
+
+## [Unreleased]
+
+### Added (Extension)
+
+- **Help hub**: New “Saropa Lints: Help” command (`saropaLints.openHelpHub`) opens a quick pick for Getting Started, About, Browse All Commands, and pub.dev. **Overview** intro links are grouped under a permanent **Help & resources** tree section. **Violations** always shows a **Help & resources** row at the top when the tree has content. **View title bar**: Help (question icon) on Overview and Violations opens the same hub (alongside the existing command-catalog title action).
+
+### Changed (Extension)
+
+- **Command catalog**: Sidebar title actions on Overview and Violations open the catalog; Codicons load in the webview; recent command runs are stored for one-click replay with a clear control; UI refresh (hero header, cards, command IDs). **Toolbar trim**: fewer Package Vibrancy and Violations title-bar entries (secondary actions remain in the command palette and catalog). **Context menu**: removed “Log package details” from package rows. **Catalog UX**: categories ordered setup → analysis → violations → rules → security → reporting → vibrancy → …; entries sorted A–Z within each section; search indexes title, description, and command id (including spaced tokens); responsive layout for narrow panes.
 
 ---
 
@@ -78,7 +91,6 @@ New graph command for import visualization, a searchable command catalog in the 
 - **avoid_stream_subscription_in_field**: Fixed false positive when `.listen()` is inside a conditional block (`if`/`for`) and assigned to a properly-named subscription field. The parent-walk loop now stops at closure (`FunctionExpression`) boundaries to prevent escaping into outer scopes. **Note:** this also fixes false negatives where a bare `.listen()` inside a closure was incorrectly suppressed because an outer scope had a properly-named subscription assignment — those uncaptured subscriptions will now correctly fire the lint.
 - **cross_file HTML reporter**: Fixed string interpolation bug in index page — file counts were rendered as list objects instead of numbers.
 - **cross_file --exclude**: The `--exclude` glob flag is now applied to filter results. Previously it was parsed but silently ignored.
-
 
 <details>
 <summary>Maintenance</summary>

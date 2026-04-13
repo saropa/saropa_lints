@@ -58,8 +58,8 @@ export const catalogCategoryOrder: readonly CatalogCategory[] = [
   'Analysis',
   'Violations & Filtering',
   'Rules & Fixes',
-  'Reporting & Export',
   'Security Posture',
+  'Reporting & Export',
   'Package Vibrancy',
   'Package Vibrancy — Filters',
   'Package Vibrancy — Updates',
@@ -118,13 +118,6 @@ export const catalogEntries: readonly CatalogEntry[] = [
     icon: 'layers',
   },
   {
-    command: 'saropaLints.showOutput',
-    title: 'Show Output',
-    description: 'Open the Saropa Lints output channel to see diagnostic logs.',
-    category: 'Setup & Configuration',
-    icon: 'output',
-  },
-  {
     command: 'saropaLints.createSaropaInstructions',
     title: 'Create AI Agent Instructions',
     description: 'Generate a Saropa Lints instruction file for AI coding assistants.',
@@ -154,6 +147,13 @@ export const catalogEntries: readonly CatalogEntry[] = [
     description: 'Show or hide inline violation annotations in the editor.',
     category: 'Analysis',
     icon: 'comment',
+  },
+  {
+    command: 'saropaLints.showOutput',
+    title: 'Show Output',
+    description: 'Open the Saropa Lints output channel to see diagnostic logs.',
+    category: 'Analysis',
+    icon: 'output',
   },
 
   // ── Violations & Filtering ───────────────────────────────────────────────
@@ -377,15 +377,18 @@ export const catalogEntries: readonly CatalogEntry[] = [
     icon: 'check',
   },
 
-  // ── Reporting & Export ───────────────────────────────────────────────────
+  // ── Security Posture ─────────────────────────────────────────────────────
 
   {
     command: 'saropaLints.exportOwaspReport',
     title: 'Export OWASP Compliance Report',
     description: 'Generate and save an OWASP compliance report for the project.',
-    category: 'Reporting & Export',
+    category: 'Security Posture',
     icon: 'shield',
   },
+
+  // ── Reporting & Export ───────────────────────────────────────────────────
+
   {
     command: 'saropaLints.issues.copyAsJson',
     title: 'Copy Violations as JSON',
@@ -435,10 +438,6 @@ export const catalogEntries: readonly CatalogEntry[] = [
     category: 'Reporting & Export',
     icon: 'clippy',
   },
-
-  // ── Security Posture ─────────────────────────────────────────────────────
-  // (Security posture commands are surfaced through the tree view and the
-  //  OWASP export above. No dedicated user-invokable commands beyond that.)
 
   // ── Package Vibrancy ─────────────────────────────────────────────────────
 
@@ -946,6 +945,14 @@ export const catalogEntries: readonly CatalogEntry[] = [
     icon: 'info',
   },
   {
+    command: 'saropaLints.openHelpHub',
+    title: 'Help',
+    description:
+      'Open walkthrough, About, command catalog, and pub.dev from one quick pick (same as sidebar Help rows).',
+    category: 'Views & Navigation',
+    icon: 'question',
+  },
+  {
     command: 'saropaLints.openPubDevSaropaLints',
     title: 'Open Package on pub.dev',
     description: 'Open the saropa_lints package page on pub.dev.',
@@ -961,6 +968,11 @@ export const catalogEntries: readonly CatalogEntry[] = [
     internal: true,
   },
 ];
+
+/** Fast lookup for titles, icons, and history (see command catalog webview). */
+export const catalogEntryByCommand: ReadonlyMap<string, CatalogEntry> = new Map(
+  catalogEntries.map((e) => [e.command, e]),
+);
 
 /**
  * Returns catalog entries grouped by category, in the order defined by
@@ -986,6 +998,13 @@ export function entriesByCategory(): Map<CatalogCategory, CatalogEntry[]> {
     if (list.length === 0) {
       map.delete(cat);
     }
+  }
+
+  // Stable, predictable order within each section (title A→Z).
+  for (const list of map.values()) {
+    list.sort((a, b) =>
+      a.title.localeCompare(b.title, 'en', { sensitivity: 'base' }),
+    );
   }
 
   return map;

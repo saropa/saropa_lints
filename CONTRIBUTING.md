@@ -675,6 +675,8 @@ When adding a new command to the VS Code extension:
 3. **Add an entry to the command catalog registry** at `extension/src/views/commandCatalogRegistry.ts` — include a human-readable title, one-line description, category, codicon, and `internal: true` if it is only invoked from context menus or programmatically
 4. Run the sync test (`commandCatalogRegistry.test.ts`) — it will fail if the registry and `package.json` are out of sync
 
+The catalog webview ships Codicons from `media/codicons/` (copied during `npm run precompile` / `compile` via `extension/scripts/copy-codicons.js`). After changing `@vscode/codicons` versions, run a compile so the VSIX includes updated font/CSS files.
+
 ## Pull Request Checklist
 
 - [ ] Rule extends `SaropaLintRule` (not `DartLintRule`)

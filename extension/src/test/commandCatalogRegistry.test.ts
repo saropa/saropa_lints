@@ -12,9 +12,9 @@ import * as path from 'node:path';
 import {
   catalogCategoryOrder,
   catalogEntries,
-  type CatalogCategory,
   entriesByCategory,
 } from '../views/commandCatalogRegistry';
+import { buildCatalogSearchBlob } from '../views/commandCatalogSearch';
 
 /** Read and deduplicate command IDs from package.json contributes.commands. */
 function loadPackageJsonCommands(): Set<string> {
@@ -189,5 +189,68 @@ describe('commandCatalogRegistry', () => {
       catalogCommands.has('saropaLints.showCommandCatalog'),
       'The catalog command should catalog itself',
     );
+  });
+
+  // ── Display grouping & search index (explicit regression guards) ───────
+
+  it('entriesByCategory sorts entries by title within each section (A→Z)', () => {
+    const grouped = entriesByCategory();
+    for (const [, list] of grouped) {
+      const titles = list.map((e) => e.title);
+      const sorted = [...titles].sort((a, b) =>
+        a.localeCompare(b, 'en', { sensitivity: 'base' }),
+      );
+      assert.deepStrictEqual(
+        titles,
+        sorted,
+        'Titles should be sorted: ' + titles.join(' | '),
+      );
+    }
+  });
+
+  it('Security Posture appears before Reporting & Export in sidebar order', () => {
+    const si = catalogCategoryOrder.indexOf('Security Posture');
+    const ri = catalogCategoryOrder.indexOf('Reporting & Export');
+    assert.ok(si >= 0 && ri >= 0);
+    assert.ok(si < ri, 'Security should precede Reporting');
+  });
+
+  it('export OWASP report is categorized under Security Posture', () => {
+    const e = catalogEntries.find((x) => x.command === 'saropaLints.exportOwaspReport');
+    assert.ok(e);
+    assert.strictEqual(e.category, 'Security Posture');
+  });
+
+  it('show output is categorized under Analysis', () => {
+    const e = catalogEntries.find((x) => x.command === 'saropaLints.showOutput');
+    assert.ok(e);
+    assert.strictEqual(e.category, 'Analysis');
+  });
+});
+
+describe('buildCatalogSearchBlob', () => {
+  it('indexes description so queries match help text, not only titles', () => {
+    const blob = buildCatalogSearchBlob({
+      command: 'saropaLints.runAnalysis',
+      title: 'Run Analysis',
+      description: 'Analyze the current project and refresh violation data.',
+      category: 'Analysis',
+      icon: 'play',
+    });
+    assert.ok(blob.includes('analyze the current project'));
+  });
+
+  it('indexes dotted id and spaced tokens for fragment queries', () => {
+    const blob = buildCatalogSearchBlob({
+      command: 'saropaLints.runAnalysis',
+      title: 'Run Analysis',
+      description: 'x',
+      category: 'Analysis',
+      icon: 'play',
+    });
+    // Command ids use camelCase; toLowerCase() does not insert underscores.
+    assert.ok(blob.includes('saropalints.runanalysis'));
+    assert.ok(blob.includes('saropalints runanalysis'));
+    assert.ok(blob.includes('run analysis'));
   });
 });
