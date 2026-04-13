@@ -93,6 +93,69 @@ describe('dependencies_ordering', () => {
         assert.strictEqual(diags.length, 0);
     });
 
+    it('does not flag SDK deps before pub deps', () => {
+        // SDK deps conventionally come first — not a sorting violation
+        const content = [
+            'dependencies:',
+            '  flutter:',
+            '    sdk: flutter',
+            '  flutter_localizations:',
+            '    sdk: flutter',
+            '',
+            '  airplane_mode_checker: ^3.2.0',
+            '  http: ^1.6.0',
+        ].join('\n');
+        const diags = findByCode(runValidation(content), 'dependencies_ordering');
+        assert.strictEqual(diags.length, 0);
+    });
+
+    it('does not flag SDK deps in dev_dependencies before pub deps', () => {
+        const content = [
+            'dev_dependencies:',
+            '  flutter_test:',
+            '    sdk: flutter',
+            '  integration_test:',
+            '    sdk: flutter',
+            '',
+            '  analyzer: any',
+            '  build_runner: ^2.7.1',
+        ].join('\n');
+        const diags = findByCode(runValidation(content), 'dependencies_ordering');
+        assert.strictEqual(diags.length, 0);
+    });
+
+    it('still flags unsorted pub deps when SDK deps are present', () => {
+        // SDK deps are fine at top, but pub deps among themselves must
+        // be alphabetical — here 'http' before 'airplane' is wrong
+        const content = [
+            'dependencies:',
+            '  flutter:',
+            '    sdk: flutter',
+            '',
+            '  http: ^1.6.0',
+            '  airplane_mode_checker: ^3.2.0',
+        ].join('\n');
+        const diags = findByCode(runValidation(content), 'dependencies_ordering');
+        assert.strictEqual(diags.length, 1);
+        assert.ok(diags[0].message.includes('http'));
+    });
+
+    it('does not flag multiple SDK deps regardless of mutual order', () => {
+        // flutter_localizations before flutter is fine — SDK deps are
+        // exempt from alphabetical ordering entirely
+        const content = [
+            'dependencies:',
+            '  flutter_localizations:',
+            '    sdk: flutter',
+            '  flutter:',
+            '    sdk: flutter',
+            '',
+            '  http: ^1.0.0',
+        ].join('\n');
+        const diags = findByCode(runValidation(content), 'dependencies_ordering');
+        assert.strictEqual(diags.length, 0);
+    });
+
     it('checks each section independently', () => {
         const content = [
             'dependencies:',
@@ -333,6 +396,39 @@ describe('prefer_publish_to_none', () => {
         assert.strictEqual(diags.length, 1);
         // name: is on line 0
         assert.strictEqual(diags[0].range.start.line, 0);
+    });
+
+    it('does not flag pubspec with topics field (pub.dev package)', () => {
+        // topics: is exclusively a pub.dev feature — its presence means
+        // the package is intentionally published
+        const content = [
+            'name: my_published_pkg',
+            'version: 1.0.0',
+            'topics:',
+            '  - linter',
+        ].join('\n');
+        const diags = findByCode(runValidation(content), 'prefer_publish_to_none');
+        assert.strictEqual(diags.length, 0);
+    });
+
+    it('does not flag pubspec with homepage field', () => {
+        const content = [
+            'name: my_published_pkg',
+            'version: 1.0.0',
+            'homepage: https://pub.dev/packages/my_published_pkg',
+        ].join('\n');
+        const diags = findByCode(runValidation(content), 'prefer_publish_to_none');
+        assert.strictEqual(diags.length, 0);
+    });
+
+    it('does not flag pubspec with repository field', () => {
+        const content = [
+            'name: my_published_pkg',
+            'version: 1.0.0',
+            'repository: https://github.com/user/my_published_pkg',
+        ].join('\n');
+        const diags = findByCode(runValidation(content), 'prefer_publish_to_none');
+        assert.strictEqual(diags.length, 0);
     });
 });
 
