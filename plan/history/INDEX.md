@@ -21,3 +21,5 @@ Searchable index of all files in `plan/history/`. Search this file instead of sc
 ### 2026.03
 
 ### 2026.04
+
+- [avoid_stream_subscription_in_field_false_positive_conditional_listen](2026.04/20260413/avoid_stream_subscription_in_field_false_positive_conditional_listen.md) — false positive when StreamSubscription field is conditionally assigned in a listen callback

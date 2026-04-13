@@ -32,17 +32,34 @@
 
 ## [Unreleased]
 
+### Added
+
+- **cross_file graph command**: New `dart run saropa_lints:cross_file graph` command exports the import graph in DOT format for Graphviz visualization. Use `--output-dir` to control where `import_graph.dot` is written.
+
+### Added (Extension)
+
+- **Pubspec validation diagnostics**: Three new inline checks on `pubspec.yaml`, shown in the Problems panel and as editor squiggles:
+  - `avoid_any_version` (Warning): Flags `any` version constraints in dependencies
+  - `dependencies_ordering` (Info): Flags unsorted dependency lists
+  - `prefer_caret_version_syntax` (Info): Flags bare version pins (`1.2.3`) — suggests caret syntax (`^1.2.3`)
+- Diagnostics update live as you edit pubspec.yaml (300ms debounce). SDK/path/git dependencies and `dependency_overrides` are handled correctly.
+
 ### Fixed
 
 - **avoid_stream_subscription_in_field**: Fixed false positive when `.listen()` is inside a conditional block (`if`/`for`) and assigned to a properly-named subscription field. The parent-walk loop now stops at closure (`FunctionExpression`) boundaries to prevent escaping into outer scopes. **Note:** this also fixes false negatives where a bare `.listen()` inside a closure was incorrectly suppressed because an outer scope had a properly-named subscription assignment — those uncaptured subscriptions will now correctly fire the lint.
+- **cross_file HTML reporter**: Fixed string interpolation bug in index page — file counts were rendered as list objects instead of numbers.
+- **cross_file --exclude**: The `--exclude` glob flag is now applied to filter results. Previously it was parsed but silently ignored.
 
-### Added
 
+<details>
+<summary>Maintenance</summary>
+
+- **Roadmap restructure**: Split deferred rules into focused documents in `plan/deferred/` by barrier type (cross-file, unreliable detection, external dependencies, framework limitations, compiler diagnostics, not viable). Trimmed ROADMAP.md to actionable content only. Moved cross-file CLI design to `plan/cross_file_cli_design.md`.
 - **Bug Report Guide**: Added `bugs/BUG_REPORT_GUIDE.md` — structured template and investigation checklist for filing lint rule bugs (false positives, false negatives, crashes, wrong fixes, performance)
+- **Changelog Archive**: Moved [9.9.0] and older logs to [CHANGELOG_ARCHIVE.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG_ARCHIVE.md)
+- **Plan history restore**: Restored 21 active plan/discussion/bug documents plus `deferred/` and `implementable_only_in_plugin_extension/` directories back to `plan/` root — these were incorrectly swept into `plan/history/` by the consolidation commit. Added `plan/history/INDEX.md` as a searchable index for the 1,069 history files.
 
-### Maintenance
-
-Moved [9.9.0] and older logs to [CHANGELOG_ARCHIVE.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG_ARCHIVE.md)
+</details>
 
 ---
 
