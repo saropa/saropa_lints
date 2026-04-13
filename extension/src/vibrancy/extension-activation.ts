@@ -3,6 +3,7 @@ import { CacheService } from './services/cache-service';
 import { VibrancyTreeProvider } from './providers/tree-data-provider';
 import { VibrancyDiagnostics } from './providers/diagnostics';
 import { SdkDiagnostics } from './providers/sdk-diagnostics';
+import { PubspecValidation } from '../pubspec-validation';
 import { VibrancyCodeActionProvider } from './providers/code-action-provider';
 import { VibrancyCodeLensProvider, setCodeLensToggle, setPrereleaseToggle } from './providers/codelens-provider';
 import { VibrancyHoverProvider } from './providers/hover-provider';
@@ -157,6 +158,7 @@ export function getProblemRegistry(): ProblemRegistry {
 export function runActivation(
     context: vscode.ExtensionContext,
     onStatusUpdate?: VibrancyStatusCallback,
+    pubspecValidator?: PubspecValidation,
 ): void {
     vibrancyStatusCallback = onStatusUpdate ?? null;
     const cache = new CacheService(context.globalState);
@@ -232,7 +234,7 @@ export function runActivation(
     registerAnnotateCommand(context);
     registerRegistryCommands(context, registryService);
     registerFileWatcher(context, targets);
-    registerSdkDiagnosticListeners(context, cache);
+    registerPubspecListeners(context, cache, pubspecValidator);
     registerSuppressListener(context, targets);
     registerConfigListener(context, codeLensProvider, treeProvider, prereleaseToggle);
     autoScanIfPubspec(targets);
@@ -248,30 +250,51 @@ function registerFileWatcher(
 }
 
 /**
- * Register listeners that update SDK constraint diagnostics when
- * pubspec.yaml is opened or edited, without requiring a full scan.
+ * Register a single set of pubspec.yaml listeners that drive BOTH
+ * SDK constraint diagnostics and pubspec validation diagnostics.
+ *
+ * Previously these were separate listener registrations with separate
+ * debounce timers (300ms and 500ms). Merging them eliminates duplicate
+ * event subscriptions, duplicate isPubspec() checks, and duplicate
+ * debounce timers — one listener fires both diagnostic engines.
  */
-function registerSdkDiagnosticListeners(
+function registerPubspecListeners(
     context: vscode.ExtensionContext,
     cache: CacheService,
+    pubspecValidator?: PubspecValidation,
 ): void {
     const isPubspec = (doc: vscode.TextDocument) =>
         doc.fileName.endsWith('pubspec.yaml');
 
     const refresh = async (doc: vscode.TextDocument) => {
-        if (!sdkDiagnostics || !isPubspec(doc)) { return; }
-        // Use cached releases when available; fetch otherwise
-        const releases = lastFlutterReleases.length > 0
-            ? lastFlutterReleases
-            : await fetchFlutterReleases(cache);
-        sdkDiagnostics.update(doc.uri, doc.getText(), releases);
+        if (!isPubspec(doc)) { return; }
+        const content = doc.getText();
+
+        // Pubspec validation: synchronous, fast — runs style/structure
+        // checks on the YAML content (ordering, version syntax, etc.).
+        // Wrapped in try/catch so a validation bug doesn't block SDK
+        // diagnostics from running.
+        try {
+            pubspecValidator?.update(doc.uri, content);
+        } catch (e) {
+            console.error('[Saropa Lints] Pubspec validation error:', e);
+        }
+
+        // SDK diagnostics: async — may fetch Flutter release data from
+        // cache or network on first call
+        if (sdkDiagnostics) {
+            const releases = lastFlutterReleases.length > 0
+                ? lastFlutterReleases
+                : await fetchFlutterReleases(cache);
+            sdkDiagnostics.update(doc.uri, content, releases);
+        }
     };
 
-    // Debounce edits — avoid re-computing on every keystroke (500ms)
+    // Debounce edits (300ms) to avoid re-computing on every keystroke
     let debounceTimer: ReturnType<typeof setTimeout> | null = null;
     const debouncedRefresh = (doc: vscode.TextDocument) => {
         if (debounceTimer) { clearTimeout(debounceTimer); }
-        debounceTimer = setTimeout(() => { void refresh(doc); }, 500);
+        debounceTimer = setTimeout(() => { void refresh(doc); }, 300);
     };
 
     // Fire immediately on open
