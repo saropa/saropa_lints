@@ -33,6 +33,19 @@
 
 ---
 
+## [Unreleased]
+
+### Added
+
+- **Extension:** Inline suppression for pubspec validation rules via `# saropa_lints:ignore <rule_code>[, ...]` comments. Place the directive on the line above (or inline after) a flagged entry to suppress specific diagnostics without disabling the rule globally. All 11 pubspec rules support suppression automatically.
+
+### Fixed
+
+- **Extension:** `prefer_l10n_yaml_config` no longer fires when `l10n.yaml` already exists alongside `pubspec.yaml`. Flutter tooling requires `generate: true` in pubspec even with a dedicated l10n config file — flagging it was a false positive.
+- **Extension:** Package Vibrancy scan logger no longer creates a separate log file per scan. Scans are debounced (5 s after last `pubspec.lock` change), logs append to one file per hour, and identical-result scans are skipped entirely.
+
+---
+
 ## [10.12.1]
 
 ### Fixed

@@ -2,20 +2,23 @@
 import './vibrancy/register-vscode-mock';
 
 import * as assert from 'node:assert';
+import * as fs from 'node:fs';
+import * as os from 'node:os';
+import * as path from 'node:path';
 import * as vscode from 'vscode';
-import { PubspecValidation } from '../pubspec-validation';
+import { PubspecValidation, parseSuppressedRules } from '../pubspec-validation';
 import { MockDiagnosticCollection, Diagnostic } from './vibrancy/vscode-mock';
 
 function runValidation(
     content: string,
-    opts?: { preferPinnedVersions?: boolean },
+    opts?: { preferPinnedVersions?: boolean; pubspecUri?: ReturnType<typeof vscode.Uri.file> },
 ): Diagnostic[] {
     const collection = new MockDiagnosticCollection('test-pubspec');
     const validator = new PubspecValidation(collection as any);
     if (opts?.preferPinnedVersions) {
         validator.preferPinnedVersions = true;
     }
-    const uri = vscode.Uri.file('/test/pubspec.yaml');
+    const uri = opts?.pubspecUri ?? vscode.Uri.file('/test/pubspec.yaml');
     validator.update(uri, content);
     return (collection.get(uri) ?? []) as Diagnostic[];
 }
@@ -751,6 +754,231 @@ describe('prefer_l10n_yaml_config', () => {
         ].join('\n');
         const diags = findByCode(runValidation(content), 'prefer_l10n_yaml_config');
         assert.strictEqual(diags.length, 0);
+    });
+
+    it('does not flag when l10n.yaml exists alongside pubspec', () => {
+        // Create a temp directory with l10n.yaml to simulate a project
+        // that already follows the recommended pattern
+        const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'saropa-l10n-'));
+        try {
+            fs.writeFileSync(path.join(tmpDir, 'l10n.yaml'), 'arb-dir: lib/l10n\n');
+            const pubspecUri = vscode.Uri.file(path.join(tmpDir, 'pubspec.yaml'));
+            const content = [
+                'name: my_app',
+                '',
+                'flutter:',
+                '  generate: true',
+            ].join('\n');
+            const diags = findByCode(
+                runValidation(content, { pubspecUri }),
+                'prefer_l10n_yaml_config',
+            );
+            // l10n.yaml exists — generate: true is required by Flutter
+            // tooling, so the rule should NOT fire
+            assert.strictEqual(diags.length, 0);
+        } finally {
+            fs.rmSync(tmpDir, { recursive: true, force: true });
+        }
+    });
+
+    it('flags when l10n.yaml does not exist alongside pubspec', () => {
+        // Create a temp directory WITHOUT l10n.yaml — the rule should
+        // fire because there is no dedicated config file
+        const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'saropa-l10n-'));
+        try {
+            const pubspecUri = vscode.Uri.file(path.join(tmpDir, 'pubspec.yaml'));
+            const content = [
+                'name: my_app',
+                '',
+                'flutter:',
+                '  generate: true',
+            ].join('\n');
+            const diags = findByCode(
+                runValidation(content, { pubspecUri }),
+                'prefer_l10n_yaml_config',
+            );
+            assert.strictEqual(diags.length, 1);
+        } finally {
+            fs.rmSync(tmpDir, { recursive: true, force: true });
+        }
+    });
+});
+
+// ── parseSuppressedRules ─────────────────────────────────────
+
+describe('parseSuppressedRules', () => {
+    it('parses single rule code', () => {
+        const result = parseSuppressedRules('# saropa_lints:ignore avoid_any_version');
+        assert.deepStrictEqual([...result], ['avoid_any_version']);
+    });
+
+    it('parses multiple rule codes', () => {
+        const result = parseSuppressedRules(
+            '# saropa_lints:ignore avoid_any_version, dependencies_ordering',
+        );
+        assert.ok(result.has('avoid_any_version'));
+        assert.ok(result.has('dependencies_ordering'));
+        assert.strictEqual(result.size, 2);
+    });
+
+    it('returns empty set for normal comment', () => {
+        const result = parseSuppressedRules('# This is a normal comment');
+        assert.strictEqual(result.size, 0);
+    });
+
+    it('returns empty set when no rule codes after ignore', () => {
+        // "saropa_lints:ignore" with nothing after it — the \s+ in the
+        // regex requires at least one whitespace char, so this won't match
+        const result = parseSuppressedRules('# saropa_lints:ignore');
+        assert.strictEqual(result.size, 0);
+    });
+
+    it('handles extra whitespace', () => {
+        const result = parseSuppressedRules(
+            '#   saropa_lints:ignore   avoid_any_version  ,  dependencies_ordering  ',
+        );
+        assert.ok(result.has('avoid_any_version'));
+        assert.ok(result.has('dependencies_ordering'));
+        assert.strictEqual(result.size, 2);
+    });
+});
+
+// ── Inline suppression (centralized filter) ──────────────────
+
+describe('inline suppression', () => {
+    it('suppresses avoid_any_version via comment on line above', () => {
+        const content = [
+            'dependencies:',
+            '  # saropa_lints:ignore avoid_any_version',
+            '  http: any',
+        ].join('\n');
+        const diags = findByCode(runValidation(content), 'avoid_any_version');
+        assert.strictEqual(diags.length, 0);
+    });
+
+    it('suppresses avoid_any_version via inline comment', () => {
+        const content = [
+            'dependencies:',
+            '  http: any # saropa_lints:ignore avoid_any_version',
+        ].join('\n');
+        const diags = findByCode(runValidation(content), 'avoid_any_version');
+        assert.strictEqual(diags.length, 0);
+    });
+
+    it('does not suppress with wrong rule code', () => {
+        const content = [
+            'dependencies:',
+            '  # saropa_lints:ignore dependencies_ordering',
+            '  http: any',
+        ].join('\n');
+        const diags = findByCode(runValidation(content), 'avoid_any_version');
+        // Wrong code — avoid_any_version should still fire
+        assert.strictEqual(diags.length, 1);
+    });
+
+    it('does not suppress with unrelated comment', () => {
+        const content = [
+            'dependencies:',
+            '  # This uses any intentionally',
+            '  http: any',
+        ].join('\n');
+        const diags = findByCode(runValidation(content), 'avoid_any_version');
+        // Regular comment is not a suppression directive
+        assert.strictEqual(diags.length, 1);
+    });
+
+    it('suppresses prefer_caret_version_syntax', () => {
+        const content = [
+            'dependencies:',
+            '  # saropa_lints:ignore prefer_caret_version_syntax',
+            '  http: 1.2.3',
+        ].join('\n');
+        const diags = findByCode(runValidation(content), 'prefer_caret_version_syntax');
+        assert.strictEqual(diags.length, 0);
+    });
+
+    it('suppresses newline_before_pubspec_entry via inline comment', () => {
+        // The line-above position won't work here because the rule
+        // already treats any comment line above as a valid separator
+        // (so the diagnostic never fires). Use inline suppression
+        // instead to verify the filter actually runs.
+        const content = [
+            'name: my_app',
+            'version: 1.0.0 # saropa_lints:ignore newline_before_pubspec_entry',
+        ].join('\n');
+        const diags = findByCode(runValidation(content), 'newline_before_pubspec_entry');
+        assert.strictEqual(diags.length, 0);
+    });
+
+    it('still fires newline_before_pubspec_entry without suppression', () => {
+        // Confirm the diagnostic actually fires without suppression,
+        // so the test above is meaningful
+        const content = [
+            'name: my_app',
+            'version: 1.0.0',
+        ].join('\n');
+        const diags = findByCode(runValidation(content), 'newline_before_pubspec_entry');
+        assert.strictEqual(diags.length, 1);
+    });
+
+    it('suppresses multiple rules on one line', () => {
+        const content = [
+            'name: my_app',
+            'dependencies:',
+            '  # saropa_lints:ignore avoid_any_version, prefer_caret_version_syntax',
+            '  http: any',
+        ].join('\n');
+        const diags = runValidation(content);
+        const anyDiags = findByCode(diags, 'avoid_any_version');
+        const caretDiags = findByCode(diags, 'prefer_caret_version_syntax');
+        assert.strictEqual(anyDiags.length, 0);
+        assert.strictEqual(caretDiags.length, 0);
+    });
+
+    it('suppresses only the listed rule, not others on same line', () => {
+        // This entry triggers both avoid_any_version and
+        // dependencies_ordering (zebra before alpha is wrong).
+        // Suppression targets only avoid_any_version.
+        const content = [
+            'dependencies:',
+            '  # saropa_lints:ignore avoid_any_version',
+            '  zebra: any',
+            '  alpha: ^1.0.0',
+        ].join('\n');
+        const diags = runValidation(content);
+        const anyDiags = findByCode(diags, 'avoid_any_version');
+        const orderDiags = findByCode(diags, 'dependencies_ordering');
+        // avoid_any_version suppressed, ordering still fires
+        assert.strictEqual(anyDiags.length, 0);
+        assert.strictEqual(orderDiags.length, 1);
+    });
+
+    it('suppresses pubspec_ordering when comment is adjacent to flagged field', () => {
+        // The diagnostic attaches to the out-of-order field (name:
+        // on line 3), so the suppression must be on line 2 (adjacent).
+        // A comment on line 0 (next to version:) would NOT suppress
+        // because it's not adjacent to the flagged line.
+        const content = [
+            'version: 1.0.0',
+            '',
+            '# saropa_lints:ignore pubspec_ordering',
+            'name: my_app',
+        ].join('\n');
+        const diags = findByCode(runValidation(content), 'pubspec_ordering');
+        assert.strictEqual(diags.length, 0);
+    });
+
+    it('does not suppress pubspec_ordering when comment is not adjacent', () => {
+        // Suppression on line 0 is not adjacent to the flagged field
+        // on line 3 — the diagnostic should still fire
+        const content = [
+            '# saropa_lints:ignore pubspec_ordering',
+            'version: 1.0.0',
+            '',
+            'name: my_app',
+        ].join('\n');
+        const diags = findByCode(runValidation(content), 'pubspec_ordering');
+        assert.strictEqual(diags.length, 1);
     });
 });
 
