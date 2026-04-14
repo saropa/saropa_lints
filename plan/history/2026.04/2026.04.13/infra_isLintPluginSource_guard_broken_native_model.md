@@ -1,6 +1,6 @@
 # BUG: Infrastructure — `isLintPluginSource` guard broken in native analyzer model
 
-**Status: Fix Ready**
+**Status: Closed**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
@@ -140,7 +140,8 @@ No fixture is needed — this is infrastructure behavior. The fix should be veri
 
 ## Commits
 
-<!-- Add commit hashes as fixes land. -->
+- `24012a5b` fix: wire isLintPluginSource into per-file filtering
+- `09ddce1b` refactor: remove 43 dead isLintPluginSource guards from rule files
 
 ---
 
