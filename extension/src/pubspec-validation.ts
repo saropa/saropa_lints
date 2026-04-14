@@ -848,8 +848,24 @@ export function registerPubspecDocListeners(
     const isPubspec = (doc: vscode.TextDocument) =>
         doc.fileName.endsWith('pubspec.yaml');
 
+    // Track URIs already refreshed during the initial sync so we
+    // don't call onRefresh twice for the same document.
+    // onDidOpenTextDocument fires retroactively for already-loaded
+    // docs, and the visibleTextEditors loop covers them too —
+    // without dedup, update() runs twice and VS Code can show
+    // duplicate diagnostics with different modelVersionIds.
+    const initialSeen = new Set<string>();
+
     const refresh = (doc: vscode.TextDocument) => {
         if (!isPubspec(doc)) { return; }
+        void onRefresh(doc);
+    };
+
+    const initialRefresh = (doc: vscode.TextDocument) => {
+        if (!isPubspec(doc)) { return; }
+        const key = doc.uri.toString();
+        if (initialSeen.has(key)) { return; }
+        initialSeen.add(key);
         void onRefresh(doc);
     };
 
@@ -860,7 +876,9 @@ export function registerPubspecDocListeners(
     };
 
     context.subscriptions.push(
-        vscode.workspace.onDidOpenTextDocument(doc => { refresh(doc); }),
+        vscode.workspace.onDidOpenTextDocument(doc => {
+            initialRefresh(doc);
+        }),
     );
     context.subscriptions.push(
         vscode.workspace.onDidChangeTextDocument(e => {
@@ -868,7 +886,7 @@ export function registerPubspecDocListeners(
         }),
     );
     for (const editor of vscode.window.visibleTextEditors) {
-        refresh(editor.document);
+        initialRefresh(editor.document);
     }
 }
 

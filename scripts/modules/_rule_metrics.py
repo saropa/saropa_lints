@@ -139,9 +139,8 @@ def _get_example_dirs(project_dir: Path) -> list[Path]:
     return [
         d
         for name in [
-            "example", "example_core", "example_async",
-            "example_widgets", "example_style",
-            "example_packages", "example_platforms",
+            "example",
+            "example_packages",
         ]
         if (d := project_dir / name / "lib").exists()
     ]
@@ -151,7 +150,7 @@ def _fixture_category_alias(category: str) -> str:
     """Map split category names to their shared fixture directory name.
 
     When rule files are split (e.g. security_*), fixtures typically remain in
-    the original shared folder (e.g. example_async/lib/security/). We must map
+    the original shared folder (e.g. example/lib/security/). We must map
     split categories to that folder and then count fixtures by rule name to
     avoid double-counting.
     """

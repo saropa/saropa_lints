@@ -1148,7 +1148,7 @@ class AvoidAuthInQueryParamsRule extends SaropaLintRule {
 /// await encryptedFile.writeAsBytes(cipherBytes);
 /// ```
 ///
-/// Fixture: `example_async/lib/security/require_data_encryption_fixture.dart`.
+/// Fixture: `example/lib/security/require_data_encryption_fixture.dart`.
 class RequireDataEncryptionRule extends SaropaLintRule {
   RequireDataEncryptionRule() : super(code: _code);
 
