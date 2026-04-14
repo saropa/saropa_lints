@@ -96,6 +96,7 @@
     "deeplink",
     "defaulttargetplatform",
     "deprioritized",
+    "devconvert",
     "dotenv",
     "dryrun",
     "edgeinsets",

@@ -5,6 +5,7 @@ import { fetchPackageInfo, fetchPackageMetrics, fetchPublisher } from '../servic
 import { findKnownIssue } from '../scoring/known-issues';
 import { classifyAdoption, AdoptionTier, AdoptionResult } from '../scoring/adoption-classifier';
 import { getLatestResults } from '../extension-activation';
+import { SDK_PACKAGES } from '../sdk-packages';
 
 const DEBOUNCE_MS = 1500;
 
@@ -134,7 +135,11 @@ export function findCandidates(content: string): string[] {
     const resolved = new Set(
         getLatestResults().map(r => r.package.name),
     );
-    return allNames.filter(name => !resolved.has(name));
+    // SDK packages (flutter, flutter_test, etc.) use `sdk: flutter` in
+    // pubspec.yaml and are not hosted on pub.dev. Looking them up produces
+    // false "Discontinued" warnings because the pub.dev `flutter` package
+    // is marked as discontinued (it's an SDK, not a hosted package).
+    return allNames.filter(name => !resolved.has(name) && !SDK_PACKAGES.has(name));
 }
 
 async function fetchAndClassify(
@@ -190,9 +195,31 @@ function groupByTier(
     return grouped;
 }
 
+/**
+ * Find the line number of a package name within a dependency section
+ * (dependencies, dev_dependencies, dependency_overrides). Ignores matches
+ * in other sections like environment where `flutter:` is a version constraint.
+ */
 function findPackageLine(lines: string[], name: string): number {
     const pattern = new RegExp(`^\\s{2}${name}\\s*:`);
-    return lines.findIndex(line => pattern.test(line));
+    const sectionHeader = /^(dependencies|dev_dependencies|dependency_overrides)\s*:/;
+    let inDepSection = false;
+
+    for (let i = 0; i < lines.length; i++) {
+        const trimmed = lines[i].trimEnd();
+        if (sectionHeader.test(trimmed)) {
+            inDepSection = true;
+            continue;
+        }
+        // A new top-level key ends the current section
+        if (/^\S/.test(trimmed) && inDepSection) {
+            inDepSection = false;
+        }
+        if (inDepSection && pattern.test(trimmed)) {
+            return i;
+        }
+    }
+    return -1;
 }
 
 function isPubspecYaml(document: vscode.TextDocument): boolean {

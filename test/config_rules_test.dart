@@ -164,7 +164,8 @@ void main() {
             expect(
               line.contains('expect_lint:'),
               isFalse,
-              reason: 'Named compile-time constants must not be marked BAD: $line',
+              reason:
+                  'Named compile-time constants must not be marked BAD: $line',
             );
           }
         }

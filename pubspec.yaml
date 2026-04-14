@@ -1,14 +1,28 @@
 # Package identity
 name: saropa_lints
+
+# Shown on pub.dev and in IDE package browsers
 description: >-
   2134 custom lint rules with 254 quick fixes for Flutter and Dart.
   Static analysis for security, accessibility, and performance.
-version: 10.11.1
+
+# SemVer version used by pub.dev and dependency resolution
+version: 10.12.0
+
+# The following line prevents the package from being accidentally published to
+# pub.dev using `flutter pub publish`. This is preferred for private packages.
+publish_to: "none" # Remove this line if you wish to publish to pub.devconvert
+
+# SPDX license identifier shown on pub.dev
 license: MIT
 
-# Project links for pub.dev
+# Link shown on pub.dev package page
 homepage: https://pub.dev/packages/saropa_lints
+
+# Source code link shown on pub.dev
 repository: https://github.com/saropa/saropa_lints
+
+# Bug report link shown on pub.dev
 issue_tracker: https://github.com/saropa/saropa_lints/issues
 
 # Searchable categories on pub.dev
@@ -31,7 +45,7 @@ executables:
 
 # Dart SDK constraint (pure Dart package; Flutter topic tag provides discoverability)
 environment:
-  sdk: ">=3.9.0 <4.0.0"
+  sdk: ">=3.9.0 <4.0.0" # detect: flutter doctor -v Dart version
 
 # Runtime dependencies for lint rule implementation
 ##################################################################################################
@@ -43,9 +57,17 @@ dependencies:
   # A framework and support code for building plugins for the analysis server.
   # https://pub.dev/packages/analysis_server_plugin
   analysis_server_plugin: ^0.3.4
+
   # This package provides a library that performs static analysis of Dart code.
   # https://pub.dev/packages/analyzer
+  # NOTE: analyzer 12 is required — it introduced breaking API changes we depend on:
+  #   - lowerCaseName is now native on DiagnosticCode/LintCode (shims removed in v10.3.0)
+  #   - LibraryIdentifier replaced by DottedName in the AST
+  #   - RuleVisitorRegistry added/removed visitor methods (~500 call sites migrated)
+  # Rolling back to analyzer 11 would require re-adding compatibility shims, dual AST
+  # node handling, and dual visitor interfaces across 70+ rule files.
   analyzer: ^12.0.0
+
   # A framework and support code for building plugins for the analysis server.
   # https://pub.dev/packages/analyzer_plugin
   analyzer_plugin: ^0.14.7

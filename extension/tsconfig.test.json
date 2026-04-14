@@ -21,6 +21,7 @@
     "src/test/vibrancy/test-helpers.ts",
     "src/test/vibrancy/services/pubspec-sorter.test.ts",
     "src/test/vibrancy/providers/annotate-command.test.ts",
+    "src/test/vibrancy/providers/adoption-gate.test.ts",
     "src/test/vibrancy/category-dictionary.test.ts",
     "src/test/vibrancy/scan-helpers.test.ts",
     "src/test/vibrancy/services/package-code-analyzer.test.ts",

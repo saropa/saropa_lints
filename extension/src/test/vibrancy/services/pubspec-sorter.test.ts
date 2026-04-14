@@ -69,8 +69,13 @@ describe('pubspec-sorter', () => {
 
     describe('buildSortedLines blank-line insertion', () => {
         // Mirror the buildSortedLines + getGroupKey logic from pubspec-sorter.ts
-        // to verify before/after blank-line behavior
-        interface Entry { name: string; lines: string[]; isSdk: boolean }
+        // to verify before/after blank-line behavior and comment preservation
+        interface Entry {
+            name: string;
+            lines: string[];
+            leadingComments: string[];
+            isSdk: boolean;
+        }
 
         function getGroupKey(name: string, allNames: Set<string>): string {
             const parts = name.split('_');
@@ -88,7 +93,10 @@ describe('pubspec-sorter', () => {
             const nonSdkNames = new Set(
                 entries.filter(e => !e.isSdk).map(e => e.name),
             );
-            const result: string[] = [...entries[0].lines];
+            const result: string[] = [
+                ...entries[0].leadingComments,
+                ...entries[0].lines,
+            ];
             for (let i = 1; i < entries.length; i++) {
                 const prev = entries[i - 1];
                 const curr = entries[i];
@@ -96,20 +104,30 @@ describe('pubspec-sorter', () => {
                 if (sdkFirst && prev.isSdk !== curr.isSdk) {
                     needsBlankLine = true;
                 } else if (prev.isSdk && curr.isSdk) {
-                    needsBlankLine = false;
+                    // Add blank line if the SDK entry has its own doc block
+                    needsBlankLine = curr.leadingComments.length > 0;
                 } else {
                     const prevKey = getGroupKey(prev.name, nonSdkNames);
                     const currKey = getGroupKey(curr.name, nonSdkNames);
                     needsBlankLine = prevKey !== currKey;
                 }
                 if (needsBlankLine) { result.push(''); }
-                result.push(...curr.lines);
+                result.push(...curr.leadingComments, ...curr.lines);
             }
             return result;
         }
 
-        function makeEntry(name: string, isSdk = false): Entry {
-            return { name, lines: [`  ${name}: ^1.0.0`], isSdk };
+        function makeEntry(
+            name: string,
+            isSdk = false,
+            leadingComments: string[] = [],
+        ): Entry {
+            return {
+                name,
+                lines: [`  ${name}: ^1.0.0`],
+                leadingComments,
+                isSdk,
+            };
         }
 
         it('should insert blank lines between unrelated packages', () => {
@@ -186,6 +204,75 @@ describe('pubspec-sorter', () => {
         it('should return single entry without blank lines', () => {
             const lines = buildSortedLines([makeEntry('http')], true);
             assert.deepStrictEqual(lines, ['  http: ^1.0.0']);
+        });
+
+        it('should preserve leading comments on entries', () => {
+            const entries = [
+                makeEntry('dio', false, ['  # HTTP client library']),
+                makeEntry('http', false, ['  # Dart HTTP package']),
+            ];
+            const lines = buildSortedLines(entries, true);
+            assert.deepStrictEqual(lines, [
+                '  # HTTP client library',
+                '  dio: ^1.0.0',
+                '',
+                '  # Dart HTTP package',
+                '  http: ^1.0.0',
+            ]);
+        });
+
+        it('should preserve multi-line comment blocks', () => {
+            const entries = [
+                makeEntry('http', false, [
+                    '  # A composable, Future-based library for making HTTP requests.',
+                    '  # https://pub.dev/packages/http/changelog',
+                ]),
+            ];
+            const lines = buildSortedLines(entries, true);
+            assert.deepStrictEqual(lines, [
+                '  # A composable, Future-based library for making HTTP requests.',
+                '  # https://pub.dev/packages/http/changelog',
+                '  http: ^1.0.0',
+            ]);
+        });
+
+        it('should preserve SDK group header comment', () => {
+            const entries = [
+                makeEntry('flutter', true, [
+                    '  # SDK deps first — bundled with Flutter SDK',
+                ]),
+                makeEntry('flutter_test', true),
+                makeEntry('dio', false, ['  # HTTP client']),
+            ];
+            const lines = buildSortedLines(entries, true);
+            assert.deepStrictEqual(lines, [
+                '  # SDK deps first — bundled with Flutter SDK',
+                '  flutter: ^1.0.0',
+                '  flutter_test: ^1.0.0',
+                '',
+                '  # HTTP client',
+                '  dio: ^1.0.0',
+            ]);
+        });
+
+        it('should add blank line before SDK entry with its own doc block', () => {
+            const entries = [
+                makeEntry('flutter', true, [
+                    '  # SDK deps first',
+                ]),
+                makeEntry('flutter_test', true, [
+                    '  # Test harness docs',
+                ]),
+            ];
+            const lines = buildSortedLines(entries, true);
+            // Both SDK, but flutter_test has comments so gets a blank separator
+            assert.deepStrictEqual(lines, [
+                '  # SDK deps first',
+                '  flutter: ^1.0.0',
+                '',
+                '  # Test harness docs',
+                '  flutter_test: ^1.0.0',
+            ]);
         });
     });
 
