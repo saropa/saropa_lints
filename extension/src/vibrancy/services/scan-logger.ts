@@ -3,14 +3,14 @@
  *
  * Each scan builds up timestamped entries via `log()` / `info()` / etc.
  * On completion, `writeToFile()` persists them to the workspace's
- * `reports/` directory using an **hourly** file strategy:
+ * `reports/` directory using a **daily** file strategy:
  *
- *   reports/yyyymmdd/yyyymmdd_HH_pubspec_vibrancy.log
+ *   reports/yyyymmdd/yyyymmdd_pubspec_vibrancy.log
  *
- * Multiple scans within the same clock-hour append to the same file
- * (separated by a visual rule).  If the scan summary (package counts)
- * is identical to the previous entry, the write is skipped entirely
- * to avoid bloating the log with duplicate no-op results.
+ * Multiple scans within the same calendar day append to the same
+ * file (separated by a visual rule).  If the scan summary (package
+ * counts) is identical to the previous entry, the write is skipped
+ * entirely to avoid bloating the log with duplicate no-op results.
  */
 import * as vscode from 'vscode';
 
@@ -61,12 +61,12 @@ export class ScanLogger {
     }
 
     /**
-     * Append to the current hour's log file:
-     *   reports/yyyymmdd/yyyymmdd_HH_pubspec_vibrancy.log
+     * Append to the daily log file:
+     *   reports/yyyymmdd/yyyymmdd_pubspec_vibrancy.log
      *
-     * If the file already exists and its last non-empty line matches
-     * the last line of this scan's output (identical summary), the
-     * write is skipped — nothing changed since the previous scan.
+     * One file per calendar day.  If the scan summary (package
+     * category counts) is identical to the last entry already in the
+     * file, the write is skipped — nothing changed.
      */
     async writeToFile(): Promise<string | null> {
         const folders = vscode.workspace.workspaceFolders;
@@ -74,8 +74,7 @@ export class ScanLogger {
 
         const now = new Date();
         const dateDir = formatDateDir(now);
-        const hour = String(now.getHours()).padStart(2, '0');
-        const fileName = `${dateDir}_${hour}_pubspec_vibrancy.log`;
+        const fileName = `${dateDir}_pubspec_vibrancy.log`;
 
         const dirUri = vscode.Uri.joinPath(
             folders[0].uri, 'reports', dateDir,
@@ -85,8 +84,7 @@ export class ScanLogger {
         const fileUri = vscode.Uri.joinPath(dirUri, fileName);
         const newContent = this.toLogContent();
 
-        // Skip write when results are identical to the previous scan
-        // in this hour's log (avoids bloat from no-op rescans).
+        // Skip write when results are identical to the previous scan.
         // Compare only the result portion of the summary line — the
         // timestamp prefix and elapsed-ms vary between scans even
         // when the actual package scores are unchanged.
