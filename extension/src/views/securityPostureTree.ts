@@ -11,8 +11,9 @@
  */
 
 import * as vscode from 'vscode';
-import { readViolations, Violation } from '../violationsReader';
+import { readViolations, Violation, filterDisabledFromData } from '../violationsReader';
 import { getProjectRoot } from '../projectRoot';
+import { readDisabledRules } from '../configWriter';
 
 // --- OWASP category labels ---
 
@@ -128,11 +129,14 @@ export class SecurityPostureTreeProvider implements vscode.TreeDataProvider<Secu
     const root = getProjectRoot();
     if (!root) return [];
 
-    const data = readViolations(root);
-    if (!data) return [];
-
     // Compute once and cache for both top-level and group-expand calls.
+    // Only read files when the cache is empty (refresh() clears it).
     if (!this.cachedCounts) {
+      const rawData = readViolations(root);
+      if (!rawData) return [];
+      // Filter out violations for rules disabled in config so OWASP
+      // counts stay consistent with the Violations view.
+      const data = filterDisabledFromData(rawData, readDisabledRules(root));
       this.cachedCounts = buildCounts(data.violations);
     }
     const counts = this.cachedCounts;

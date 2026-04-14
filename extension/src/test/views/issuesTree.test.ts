@@ -134,6 +134,153 @@ describe('IssuesTreeProvider expand-all', () => {
   });
 });
 
+describe('IssuesTreeProvider self-contained element children', () => {
+  let readViolationsStub: sinon.SinonStub;
+
+  beforeEach(() => {
+    clearTestConfig();
+    setTestConfig('saropaLints', 'violationsGroupBy', 'severity');
+    sinon.stub(projectRoot, 'getProjectRoot').returns('/fake/root');
+    sinon.stub(suppressionsStore, 'loadSuppressions').returns({
+      hiddenFolders: [],
+      hiddenFiles: [],
+      hiddenRules: [],
+      hiddenRuleInFile: {},
+      hiddenSeverities: [],
+      hiddenImpacts: [],
+    });
+    readViolationsStub = sinon.stub(violationsReader, 'readViolations');
+  });
+
+  afterEach(() => {
+    sinon.restore();
+    clearTestConfig();
+  });
+
+  // --- FileItem children ---
+
+  it('file node returns violation children from embedded data', async () => {
+    // readViolations returns data — normal path
+    readViolationsStub.returns({
+      violations: [
+        { file: 'lib/a.dart', line: 10, rule: 'r1', message: 'msg1', severity: 'warning' },
+        { file: 'lib/a.dart', line: 5, rule: 'r2', message: 'msg2', severity: 'warning' },
+      ],
+      summary: { totalViolations: 2 },
+    });
+    const provider = new IssuesTreeProvider(new MockMemento() as any);
+    const fileNode: IssueTreeNode = {
+      kind: 'file',
+      severity: 'warning',
+      filePath: 'lib/a.dart',
+      violations: [
+        { file: 'lib/a.dart', line: 10, rule: 'r1', message: 'msg1', severity: 'warning' },
+        { file: 'lib/a.dart', line: 5, rule: 'r2', message: 'msg2', severity: 'warning' },
+      ],
+    };
+    const children = await provider.getChildren(fileNode);
+    assert.strictEqual(children.length, 2);
+    assert.strictEqual(children[0].kind, 'violation');
+    assert.strictEqual(children[1].kind, 'violation');
+    // Sorted by line — line 5 before line 10
+    const v0 = children[0] as IssueTreeNode & { kind: 'violation'; violation: { line: number } };
+    const v1 = children[1] as IssueTreeNode & { kind: 'violation'; violation: { line: number } };
+    assert.strictEqual(v0.violation.line, 5);
+    assert.strictEqual(v1.violation.line, 10);
+  });
+
+  it('file node returns children even when violations.json is unavailable (fix: write lock during scan)', async () => {
+    // Simulate violations.json being temporarily unreadable — the bug
+    // that caused file items to expand to nothing.
+    readViolationsStub.returns(null);
+    const provider = new IssuesTreeProvider(new MockMemento() as any);
+    const fileNode: IssueTreeNode = {
+      kind: 'file',
+      severity: 'warning',
+      filePath: 'lib/a.dart',
+      violations: [
+        { file: 'lib/a.dart', line: 1, rule: 'r1', message: 'msg', severity: 'warning' },
+      ],
+    };
+    const children = await provider.getChildren(fileNode);
+    // Before fix: returned [] because readViolations(null) hit early return.
+    // After fix: uses element.violations directly — no disk read needed.
+    assert.strictEqual(children.length, 1, 'file node must resolve from embedded data, not disk');
+    assert.strictEqual(children[0].kind, 'violation');
+  });
+
+  // --- GroupItem children ---
+
+  it('group node returns file children from embedded violations', async () => {
+    readViolationsStub.returns({
+      violations: [
+        { file: 'lib/a.dart', line: 1, rule: 'r1', message: 'm', severity: 'warning', impact: 'high' },
+        { file: 'lib/b.dart', line: 2, rule: 'r2', message: 'm', severity: 'warning', impact: 'high' },
+      ],
+      summary: { totalViolations: 2 },
+    });
+    const provider = new IssuesTreeProvider(new MockMemento() as any);
+    const groupNode: IssueTreeNode = {
+      kind: 'group',
+      mode: 'impact',
+      groupKey: 'high',
+      label: 'High',
+      count: 2,
+      violations: [
+        { file: 'lib/a.dart', line: 1, rule: 'r1', message: 'm', severity: 'warning', impact: 'high' },
+        { file: 'lib/b.dart', line: 2, rule: 'r2', message: 'm', severity: 'warning', impact: 'high' },
+      ],
+    };
+    const children = await provider.getChildren(groupNode);
+    assert.strictEqual(children.length, 2);
+    // buildFileItems groups by file — both should be 'file' kind
+    assert.ok(children.every(c => c.kind === 'file'));
+  });
+
+  it('group node returns file children even when violations.json is unavailable', async () => {
+    readViolationsStub.returns(null);
+    const provider = new IssuesTreeProvider(new MockMemento() as any);
+    const groupNode: IssueTreeNode = {
+      kind: 'group',
+      mode: 'impact',
+      groupKey: 'high',
+      label: 'High',
+      count: 1,
+      violations: [
+        { file: 'lib/a.dart', line: 1, rule: 'r1', message: 'm', severity: 'warning', impact: 'high' },
+      ],
+    };
+    const children = await provider.getChildren(groupNode);
+    // Before fix: returned [] because readViolations(null) hit early return.
+    // After fix: uses element.violations directly.
+    assert.strictEqual(children.length, 1, 'group node must resolve from embedded data, not disk');
+    assert.strictEqual(children[0].kind, 'file');
+  });
+
+  // --- Overflow behavior ---
+
+  it('file node respects page size and adds overflow item', async () => {
+    readViolationsStub.returns(null);
+    setTestConfig('saropaLints', 'issuesPageSize', 1);
+    const provider = new IssuesTreeProvider(new MockMemento() as any);
+    const fileNode: IssueTreeNode = {
+      kind: 'file',
+      severity: 'warning',
+      filePath: 'lib/a.dart',
+      violations: [
+        { file: 'lib/a.dart', line: 1, rule: 'r1', message: 'msg1', severity: 'warning' },
+        { file: 'lib/a.dart', line: 2, rule: 'r2', message: 'msg2', severity: 'warning' },
+        { file: 'lib/a.dart', line: 3, rule: 'r3', message: 'msg3', severity: 'warning' },
+      ],
+    };
+    const children = await provider.getChildren(fileNode);
+    // Page size 1 → 1 violation + 1 overflow ("and 2 more…")
+    assert.strictEqual(children.length, 2);
+    assert.strictEqual(children[0].kind, 'violation');
+    assert.strictEqual(children[1].kind, 'overflow');
+  });
+});
+
 describe('IssuesTreeProvider permanent help row', () => {
   let readViolationsStub: sinon.SinonStub;
 
