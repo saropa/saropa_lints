@@ -299,9 +299,7 @@ List<SuppressionRecord> _suppressionsFromJson(dynamic raw) {
     );
     if (kind == null) continue;
 
-    result.add(
-      SuppressionRecord(rule: r, file: f, line: l, kind: kind),
-    );
+    result.add(SuppressionRecord(rule: r, file: f, line: l, kind: kind));
   }
   return result;
 }

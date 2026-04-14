@@ -377,9 +377,7 @@ void main() {
 
     group('avoid_importing_entrypoint_exports', () {
       test('bad fixture imports a file that re-exports main.dart', () {
-        final barrel = File(
-          'example/lib/structure/entrypoint_barrel.dart',
-        );
+        final barrel = File('example/lib/structure/entrypoint_barrel.dart');
         expect(barrel.existsSync(), isTrue);
         final content = barrel.readAsStringSync();
         expect(content, contains("export '../main.dart'"));
