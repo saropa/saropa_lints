@@ -1,6 +1,6 @@
 # BUG: `dependencies_ordering` — False positive on SDK dependencies
 
-**Status: Fix Ready**
+**Status: Closed**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 

@@ -33,7 +33,9 @@
 
 ---
 
-## [Unreleased]
+## [10.12.2]
+
+Pubspec inline suppression comments, l10n.yaml false-positive fix, and scan logger cleanup. — [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
 
 ### Added
 
@@ -48,6 +50,8 @@
 
 ## [10.12.1]
 
+Publishing fix — removed stale publish_to field that blocked CI. — [log](https://github.com/saropa/saropa_lints/blob/v10.12.1/CHANGELOG.md)
+
 ### Fixed
 
 - **Publishing:** Removed `publish_to: "none"` from pubspec.yaml — the template placeholder blocked `dart pub publish` in CI. The field defaults to pub.dev when absent.
@@ -55,6 +59,8 @@
 ---
 
 ## [10.12.0]
+
+False-positive fixes across hardcoded config, dependency ordering, adoption gate, and pubspec diagnostics; plus a help hub, comment-preserving sort, and command catalog refresh. — [log](https://github.com/saropa/saropa_lints/blob/v10.12.0/CHANGELOG.md)
 
 ### Fixed
 
