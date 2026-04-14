@@ -5,7 +5,7 @@ import 'package:test/test.dart';
 
 /// Tests for 6 Lifecycle lint rules.
 ///
-/// Test fixtures: example_async/lib/lifecycle/*
+/// Test fixtures: example/lib/lifecycle/*
 void main() {
   group('Lifecycle Rules - Rule Instantiation', () {
     test('AvoidWorkInPausedStateRule', () {
@@ -86,7 +86,7 @@ void main() {
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
-          'example_async/lib/lifecycle/${fixture}_fixture.dart',
+          'example/lib/lifecycle/${fixture}_fixture.dart',
         );
         expect(file.existsSync(), isTrue);
       });

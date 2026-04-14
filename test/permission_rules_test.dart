@@ -6,7 +6,7 @@ import 'package:saropa_lints/src/rules/security/permission_rules.dart';
 
 /// Tests for 6 Permission lint rules.
 ///
-/// Test fixtures: example_async/lib/permission/*
+/// Test fixtures: example/lib/permission/*
 void main() {
   group('Permission Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {
@@ -69,7 +69,7 @@ void main() {
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
-          'example_async/lib/permission/${fixture}_fixture.dart',
+          'example/lib/permission/${fixture}_fixture.dart',
         );
         expect(file.existsSync(), isTrue);
       });

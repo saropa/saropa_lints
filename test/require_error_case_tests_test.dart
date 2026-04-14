@@ -9,12 +9,12 @@ import 'package:test/test.dart';
 /// without missing genuine happy-path-only test files.
 ///
 /// Test fixture:
-/// - example_style/lib/testing_best_practices/require_error_case_tests_fixture.dart
+/// - example/lib/testing_best_practices/require_error_case_tests_fixture.dart
 void main() {
   group('require_error_case_tests', () {
     test('fixture file exists', () {
       final file = File(
-        'example_style/lib/testing_best_practices/'
+        'example/lib/testing_best_practices/'
         'require_error_case_tests_fixture.dart',
       );
       expect(file.existsSync(), isTrue);
@@ -140,7 +140,7 @@ void main() {
       late String fixtureSource;
       setUp(() {
         fixtureSource = File(
-          'example_style/lib/testing_best_practices/'
+          'example/lib/testing_best_practices/'
           'require_error_case_tests_fixture.dart',
         ).readAsStringSync();
       });

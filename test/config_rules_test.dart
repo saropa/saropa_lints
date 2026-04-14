@@ -5,7 +5,7 @@ import 'package:test/test.dart';
 
 /// Tests for 11 Configuration lint rules.
 ///
-/// Test fixtures: example_async/lib/config/*
+/// Test fixtures: example/lib/config/*
 void main() {
   group('Configuration Rules - Rule Instantiation', () {
     test('AvoidHardcodedConfigRule', () {
@@ -134,7 +134,7 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File('example_async/lib/config/${fixture}_fixture.dart');
+        final file = File('example/lib/config/${fixture}_fixture.dart');
         expect(file.existsSync(), isTrue);
       });
     }
@@ -144,7 +144,7 @@ void main() {
     group('avoid_hardcoded_config', () {
       test('fixture: static const and top-level const have no expect_lint', () {
         final content = File(
-          'example_async/lib/config/avoid_hardcoded_config_fixture.dart',
+          'example/lib/config/avoid_hardcoded_config_fixture.dart',
         ).readAsStringSync();
         expect(
           content.contains('cdnBaseUrl'),
@@ -173,7 +173,7 @@ void main() {
 
       test('fixture: exactly two BAD sites with expect_lint', () {
         final content = File(
-          'example_async/lib/config/avoid_hardcoded_config_fixture.dart',
+          'example/lib/config/avoid_hardcoded_config_fixture.dart',
         ).readAsStringSync();
         final matches = RegExp(
           r'// expect_lint: avoid_hardcoded_config',

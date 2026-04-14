@@ -12,10 +12,10 @@ void main() {
   // Process.run('dart', ['run', 'custom_lint']) can hang if the analyzer
   // plugin stalls or package resolution deadlocks — cap each test.
   group('Fixture lint integration', timeout: const Timeout(Duration(minutes: 2)), () {
-    test('custom_lint on example_async produces parseable violations', () async {
-      final exampleDir = Directory('example_async');
+    test('custom_lint on example produces parseable violations', () async {
+      final exampleDir = Directory('example');
       if (!exampleDir.existsSync()) {
-        return; // Skip when example_async not present (e.g. in some CI)
+        return; // Skip when example not present (e.g. in some CI)
       }
 
       final result = await Process.run(
@@ -43,14 +43,14 @@ void main() {
       }
     });
 
-    /// Behavioral test: run linter on example_async and assert specific rules
+    /// Behavioral test: run linter on example and assert specific rules
     /// fire on fixture code (proves linter-on-code when custom_lint runs).
     /// When custom_lint cannot run (e.g. resolver conflict) or reports no
     /// violations, we skip per-rule assertions so the test still passes.
     test(
-      'custom_lint on example_async reports expected rules from fixtures',
+      'custom_lint on example reports expected rules from fixtures',
       () async {
-        final exampleDir = Directory('example_async');
+        final exampleDir = Directory('example');
         if (!exampleDir.existsSync()) {
           return;
         }
@@ -71,7 +71,7 @@ void main() {
         }
 
         final ruleCodes = violations.map((v) => v.rule).toSet();
-        // Fixtures in example_async/lib with expect_lint for these rules;
+        // Fixtures in example/lib with expect_lint for these rules;
         // assert they appear when custom_lint runs (behavioral coverage).
         // Priority: async, error_handling, security (see UNIT_TEST_COVERAGE_REVIEW.md §4).
         const expectedFromFixtures = [
@@ -139,7 +139,7 @@ void main() {
           expect(
             ruleCodes.contains(rule),
             isTrue,
-            reason: 'Rule $rule should fire on example_async fixtures',
+            reason: 'Rule $rule should fire on example fixtures',
           );
         }
       },
@@ -150,7 +150,7 @@ void main() {
     test(
       'avoid_unawaited_future fixture has exactly one violation (unawaited() lines do not trigger)',
       () async {
-        final exampleDir = Directory('example_async');
+        final exampleDir = Directory('example');
         if (!exampleDir.existsSync()) {
           return;
         }
@@ -194,7 +194,7 @@ void main() {
     /// Behavioral test: compliant-only file must produce no violations.
     /// Proves "compliant code → no lint" for the rules exercised in that file.
     test('compliant-only fixture has no violations', () async {
-      final exampleDir = Directory('example_async');
+      final exampleDir = Directory('example');
       if (!exampleDir.existsSync()) {
         return;
       }

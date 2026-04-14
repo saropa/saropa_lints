@@ -5,7 +5,7 @@ import 'package:test/test.dart';
 
 /// Tests for 27 Collection lint rules.
 ///
-/// Test fixtures: example_core/lib/collection/*
+/// Test fixtures: example/lib/collection/*
 void main() {
   group('Collection Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {
@@ -202,7 +202,7 @@ void main() {
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
-          'example_core/lib/collection/${fixture}_fixture.dart',
+          'example/lib/collection/${fixture}_fixture.dart',
         );
         expect(file.existsSync(), isTrue);
       });

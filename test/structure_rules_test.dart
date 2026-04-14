@@ -5,7 +5,7 @@ import 'package:test/test.dart';
 
 /// Tests for 47 Structure lint rules.
 ///
-/// Test fixtures: example_core/lib/structure/*
+/// Test fixtures: example/lib/structure/*
 void main() {
   group('Structure Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {
@@ -356,7 +356,7 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File('example_core/lib/structure/${fixture}_fixture.dart');
+        final file = File('example/lib/structure/${fixture}_fixture.dart');
         expect(file.existsSync(), isTrue);
       });
     }
@@ -378,7 +378,7 @@ void main() {
     group('avoid_importing_entrypoint_exports', () {
       test('bad fixture imports a file that re-exports main.dart', () {
         final barrel = File(
-          'example_core/lib/structure/entrypoint_barrel.dart',
+          'example/lib/structure/entrypoint_barrel.dart',
         );
         expect(barrel.existsSync(), isTrue);
         final content = barrel.readAsStringSync();
@@ -387,7 +387,7 @@ void main() {
 
       test('good fixture imports a file that does not re-export main.dart', () {
         final goodFixture = File(
-          'example_core/lib/structure/avoid_importing_entrypoint_exports_good_fixture.dart',
+          'example/lib/structure/avoid_importing_entrypoint_exports_good_fixture.dart',
         );
         expect(goodFixture.existsSync(), isTrue);
         expect(
@@ -395,7 +395,7 @@ void main() {
           contains("import 'avoid_barrel_files_fixture.dart'"),
         );
         final target = File(
-          'example_core/lib/structure/avoid_barrel_files_fixture.dart',
+          'example/lib/structure/avoid_barrel_files_fixture.dart',
         );
         expect(target.existsSync(), isTrue);
         final targetContent = target.readAsStringSync();
@@ -472,7 +472,7 @@ void main() {
 
       test('fixture has exactly 3 BAD cases (expect_lint) and GOOD cases', () {
         final file = File(
-          'example_core/lib/structure/avoid_global_state_fixture.dart',
+          'example/lib/structure/avoid_global_state_fixture.dart',
         );
         expect(file.existsSync(), isTrue);
         final content = file.readAsStringSync();
@@ -490,7 +490,7 @@ void main() {
 
       test('fixture includes const top-level variables (should NOT trigger)', () {
         final file = File(
-          'example_core/lib/structure/avoid_global_state_fixture.dart',
+          'example/lib/structure/avoid_global_state_fixture.dart',
         );
         final content = file.readAsStringSync();
 
@@ -517,7 +517,7 @@ void main() {
 
       test('fixture includes final top-level variables (should NOT trigger)', () {
         final file = File(
-          'example_core/lib/structure/avoid_global_state_fixture.dart',
+          'example/lib/structure/avoid_global_state_fixture.dart',
         );
         final content = file.readAsStringSync();
 
@@ -544,7 +544,7 @@ void main() {
         'fixture includes class with static fields only (should NOT trigger)',
         () {
           final file = File(
-            'example_core/lib/structure/avoid_global_state_fixture.dart',
+            'example/lib/structure/avoid_global_state_fixture.dart',
           );
           final content = file.readAsStringSync();
 
@@ -672,7 +672,7 @@ void main() {
         'fixture has exactly 3 BAD cases (expect_lint) and GOOD exclusions',
         () {
           final file = File(
-            'example_core/lib/structure/avoid_long_parameter_list_fixture.dart',
+            'example/lib/structure/avoid_long_parameter_list_fixture.dart',
           );
           expect(file.existsSync(), isTrue);
           final content = file.readAsStringSync();
@@ -708,7 +708,7 @@ void main() {
         'excluded patterns (copyWith, all-optional) have no expect_lint on their declaration',
         () {
           final file = File(
-            'example_core/lib/structure/avoid_long_parameter_list_fixture.dart',
+            'example/lib/structure/avoid_long_parameter_list_fixture.dart',
           );
           final lines = file.readAsStringSync().split('\n');
           int? copyWithLineIdx;
@@ -852,7 +852,7 @@ void main() {
         // passthrough, and nullable method return — all must NOT
         // trigger the rule (they are correctly nullable).
         final fixture = File(
-          'example_core/lib/structure/'
+          'example/lib/structure/'
           'avoid_unnecessary_nullable_return_type_fixture.dart',
         );
         final content = fixture.readAsStringSync();

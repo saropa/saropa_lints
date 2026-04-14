@@ -6,7 +6,7 @@ import 'package:test/test.dart';
 
 /// Tests for Web lint rules.
 ///
-/// Test fixtures: example_platforms/lib/web/
+/// Test fixtures: example/lib/web/
 void main() {
   group('Web Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {
@@ -86,7 +86,7 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File('example_platforms/lib/web/${fixture}_fixture.dart');
+        final file = File('example/lib/web/${fixture}_fixture.dart');
         expect(file.existsSync(), isTrue);
       });
     }

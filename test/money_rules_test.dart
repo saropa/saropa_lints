@@ -6,7 +6,7 @@ import 'package:saropa_lints/src/rules/data/money_rules.dart';
 
 /// Tests for 2 Money/Currency lint rules.
 ///
-/// Test fixtures: example_async/lib/money/*
+/// Test fixtures: example/lib/money/*
 void main() {
   group('Money Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {
@@ -40,7 +40,7 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File('example_async/lib/money/${fixture}_fixture.dart');
+        final file = File('example/lib/money/${fixture}_fixture.dart');
         expect(file.existsSync(), isTrue);
       });
     }

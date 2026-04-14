@@ -5,7 +5,7 @@ import 'package:test/test.dart';
 
 /// Tests for 20 Animation lint rules.
 ///
-/// Test fixtures: example_widgets/lib/animation/*
+/// Test fixtures: example/lib/animation/*
 void main() {
   group('Animation Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {
@@ -147,7 +147,7 @@ void main() {
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
-          'example_widgets/lib/animation/${fixture}_fixture.dart',
+          'example/lib/animation/${fixture}_fixture.dart',
         );
         expect(file.existsSync(), isTrue);
       });

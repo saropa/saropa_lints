@@ -6,7 +6,7 @@ import 'package:saropa_lints/src/rules/data/json_datetime_rules.dart';
 
 /// Tests for 13 Json Datetime lint rules.
 ///
-/// Test fixtures: example_async/lib/json_datetime/*
+/// Test fixtures: example/lib/json_datetime/*
 void main() {
   group('Json Datetime Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {
@@ -119,7 +119,7 @@ void main() {
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
-          'example_async/lib/json_datetime/${fixture}_fixture.dart',
+          'example/lib/json_datetime/${fixture}_fixture.dart',
         );
         expect(file.existsSync(), isTrue);
       });

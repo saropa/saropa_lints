@@ -5,7 +5,7 @@ import 'package:test/test.dart';
 
 /// Tests for 3 Database Yield lint rules.
 ///
-/// Test fixtures: example_async/lib/db_yield/*
+/// Test fixtures: example/lib/db_yield/*
 void main() {
   group('Database Yield Rules - Rule Instantiation', () {
     test('RequireYieldAfterDbWriteRule', () {
@@ -46,7 +46,7 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File('example_async/lib/db_yield/${fixture}_fixture.dart');
+        final file = File('example/lib/db_yield/${fixture}_fixture.dart');
         expect(file.existsSync(), isTrue);
       });
     }

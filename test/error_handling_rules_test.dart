@@ -8,7 +8,7 @@ import 'package:test/test.dart';
 /// These rules cover exception handling, error logging, stack trace
 /// preservation, and production error safety.
 ///
-/// Test fixtures: example_async/lib/error_handling/*
+/// Test fixtures: example/lib/error_handling/*
 void main() {
   group('Error Handling Rules - Rule Instantiation', () {
     test('AvoidSwallowingExceptionsRule', () {
@@ -238,7 +238,7 @@ void main() {
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
-          'example_async/lib/error_handling/${fixture}_fixture.dart',
+          'example/lib/error_handling/${fixture}_fixture.dart',
         );
         expect(file.existsSync(), isTrue);
       });

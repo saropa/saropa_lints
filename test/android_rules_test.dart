@@ -6,7 +6,7 @@ import 'package:saropa_lints/src/rules/platforms/android_rules.dart';
 
 /// Tests for 7 Android lint rules.
 ///
-/// Test fixtures: example_platforms/lib/android/
+/// Test fixtures: example/lib/android/
 void main() {
   group('Android Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {
@@ -76,7 +76,7 @@ void main() {
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
-          'example_platforms/lib/android/${fixture}_fixture.dart',
+          'example/lib/android/${fixture}_fixture.dart',
         );
         expect(file.existsSync(), isTrue);
       });

@@ -5,7 +5,7 @@ import 'package:test/test.dart';
 
 /// Tests for 9 Architecture lint rules.
 ///
-/// Test fixtures: example_core/lib/architecture/*
+/// Test fixtures: example/lib/architecture/*
 void main() {
   group('Architecture Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {
@@ -76,7 +76,7 @@ void main() {
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
-          'example_core/lib/architecture/${fixture}_fixture.dart',
+          'example/lib/architecture/${fixture}_fixture.dart',
         );
         expect(file.existsSync(), isTrue);
       });

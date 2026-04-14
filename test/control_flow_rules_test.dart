@@ -5,7 +5,7 @@ import 'package:test/test.dart';
 
 /// Tests for 31 Control Flow lint rules.
 ///
-/// Test fixtures: example_core/lib/control_flow/*
+/// Test fixtures: example/lib/control_flow/*
 void main() {
   group('Control Flow Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {
@@ -213,7 +213,7 @@ void main() {
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
-          'example_core/lib/control_flow/${fixture}_fixture.dart',
+          'example/lib/control_flow/${fixture}_fixture.dart',
         );
         expect(file.existsSync(), isTrue);
       });

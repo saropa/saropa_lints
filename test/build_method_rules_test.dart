@@ -6,7 +6,7 @@ import 'package:saropa_lints/src/rules/widget/build_method_rules.dart';
 
 /// Tests for 11 Build Method lint rules.
 ///
-/// Test fixtures: example_widgets/lib/build_method/*
+/// Test fixtures: example/lib/build_method/*
 void main() {
   group('Build Method Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {
@@ -104,7 +104,7 @@ void main() {
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
-          'example_widgets/lib/build_method/${fixture}_fixture.dart',
+          'example/lib/build_method/${fixture}_fixture.dart',
         );
         expect(file.existsSync(), isTrue);
       });

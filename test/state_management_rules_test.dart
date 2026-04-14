@@ -6,7 +6,7 @@ import 'package:saropa_lints/src/rules/core/state_management_rules.dart';
 
 /// Tests for 10 State Management lint rules.
 ///
-/// Test fixtures: example_async/lib/state_management/*
+/// Test fixtures: example/lib/state_management/*
 void main() {
   group('State Management Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {
@@ -104,7 +104,7 @@ void main() {
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
-          'example_async/lib/state_management/${fixture}_fixture.dart',
+          'example/lib/state_management/${fixture}_fixture.dart',
         );
         expect(file.existsSync(), isTrue);
       });

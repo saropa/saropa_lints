@@ -6,7 +6,7 @@ import 'package:saropa_lints/src/rules/testing/testing_best_practices_rules.dart
 
 /// Tests for 35 Testing Best Practices lint rules.
 ///
-/// Test fixtures: example_style/lib/testing_best_practices/*
+/// Test fixtures: example/lib/testing_best_practices/*
 void main() {
   group('Testing Best Practices Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {
@@ -268,7 +268,7 @@ void main() {
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
-          'example_style/lib/testing_best_practices/${fixture}_fixture.dart',
+          'example/lib/testing_best_practices/${fixture}_fixture.dart',
         );
         expect(file.existsSync(), isTrue);
       });

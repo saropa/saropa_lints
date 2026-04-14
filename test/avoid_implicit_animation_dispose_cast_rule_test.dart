@@ -5,7 +5,7 @@ import 'package:test/test.dart';
 
 /// Behavioral and registration tests for [AvoidImplicitAnimationDisposeCastRule].
 ///
-/// Complements `example_widgets/lib/animation/avoid_implicit_animation_dispose_cast_fixture.dart`
+/// Complements `example/lib/animation/avoid_implicit_animation_dispose_cast_fixture.dart`
 /// (expect_lint) and documents false-positive boundaries.
 void main() {
   const ruleName = 'avoid_implicit_animation_dispose_cast';
@@ -48,7 +48,7 @@ void main() {
 
     test('fixture: BAD case has expect_lint before violation', () {
       final file = File(
-        'example_widgets/lib/animation/${ruleName}_fixture.dart',
+        'example/lib/animation/${ruleName}_fixture.dart',
       );
       expect(file.existsSync(), isTrue);
       final content = file.readAsStringSync();
@@ -64,7 +64,7 @@ void main() {
       'fixture: GOOD dispose-only block has no expect_lint (false positive guard)',
       () {
         final content = File(
-          'example_widgets/lib/animation/${ruleName}_fixture.dart',
+          'example/lib/animation/${ruleName}_fixture.dart',
         ).readAsStringSync();
         final start = content.indexOf('class _GoodImplicitAnimState');
         final end = content.indexOf('class _GoodCurveReadWidget');
@@ -83,7 +83,7 @@ void main() {
       'fixture: curve-read GOOD block has no expect_lint (non-dispose cast)',
       () {
         final content = File(
-          'example_widgets/lib/animation/${ruleName}_fixture.dart',
+          'example/lib/animation/${ruleName}_fixture.dart',
         ).readAsStringSync();
         final start = content.indexOf('class _GoodCurveReadState');
         expect(start, greaterThan(-1));

@@ -7,7 +7,7 @@ import 'package:saropa_lints/src/saropa_lint_rule.dart';
 
 /// Tests for 28 Stylistic lint rules.
 ///
-/// Test fixtures: example_style/lib/stylistic/*
+/// Test fixtures: example/lib/stylistic/*
 void main() {
   group('Stylistic Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {
@@ -326,7 +326,7 @@ void main() {
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
-          'example_style/lib/stylistic/${fixture}_fixture.dart',
+          'example/lib/stylistic/${fixture}_fixture.dart',
         );
         expect(file.existsSync(), isTrue);
       });
@@ -668,7 +668,7 @@ void main() {
 
       test('fixture has BAD examples that trigger', () {
         final content = File(
-          'example_style/lib/stylistic/prefer_doc_comments_over_regular_fixture.dart',
+          'example/lib/stylistic/prefer_doc_comments_over_regular_fixture.dart',
         ).readAsStringSync();
         // Public functions with regular comments above them
         expect(content, contains('String greet()'));
@@ -681,7 +681,7 @@ void main() {
 
       test('fixture has section-header false-positive guards', () {
         final content = File(
-          'example_style/lib/stylistic/prefer_doc_comments_over_regular_fixture.dart',
+          'example/lib/stylistic/prefer_doc_comments_over_regular_fixture.dart',
         ).readAsStringSync();
         // Divider lines should not trigger
         expect(content, contains('-------'));
@@ -691,14 +691,14 @@ void main() {
 
       test('fixture has blank-line-gap false-positive guard', () {
         final content = File(
-          'example_style/lib/stylistic/prefer_doc_comments_over_regular_fixture.dart',
+          'example/lib/stylistic/prefer_doc_comments_over_regular_fixture.dart',
         ).readAsStringSync();
         expect(content, contains('separatedByBlankLine'));
       });
 
       test('fixture has annotation marker false-positive guards', () {
         final content = File(
-          'example_style/lib/stylistic/prefer_doc_comments_over_regular_fixture.dart',
+          'example/lib/stylistic/prefer_doc_comments_over_regular_fixture.dart',
         ).readAsStringSync();
         expect(content, contains('TODO: Implement'));
         expect(content, contains('FIXME: Handle'));

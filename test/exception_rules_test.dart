@@ -5,7 +5,7 @@ import 'package:test/test.dart';
 
 /// Tests for 5 Exception lint rules.
 ///
-/// Test fixtures: example_core/lib/exception/*
+/// Test fixtures: example/lib/exception/*
 void main() {
   group('Exception Rules - Rule Instantiation', () {
     test('AvoidNonFinalExceptionClassFieldsRule', () {
@@ -68,7 +68,7 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File('example_core/lib/exception/${fixture}_fixture.dart');
+        final file = File('example/lib/exception/${fixture}_fixture.dart');
         expect(file.existsSync(), isTrue);
       });
     }

@@ -6,7 +6,7 @@ import 'package:saropa_lints/src/rules/resources/file_handling_rules.dart';
 
 /// Tests for 15 File Handling lint rules.
 ///
-/// Test fixtures: example_async/lib/file_handling/*
+/// Test fixtures: example/lib/file_handling/*
 void main() {
   group('File Handling Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {
@@ -132,7 +132,7 @@ void main() {
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
-          'example_async/lib/file_handling/${fixture}_fixture.dart',
+          'example/lib/file_handling/${fixture}_fixture.dart',
         );
         expect(file.existsSync(), isTrue);
       });

@@ -5,7 +5,7 @@ import 'package:test/test.dart';
 
 /// Tests for 19 Type lint rules.
 ///
-/// Test fixtures: example_core/lib/type/*
+/// Test fixtures: example/lib/type/*
 void main() {
   group('Type Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {
@@ -183,7 +183,7 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File('example_core/lib/type/${fixture}_fixture.dart');
+        final file = File('example/lib/type/${fixture}_fixture.dart');
         expect(file.existsSync(), isTrue);
       });
     }

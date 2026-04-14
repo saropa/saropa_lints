@@ -5,7 +5,7 @@ import 'package:test/test.dart';
 
 /// Tests for 9 Debug lint rules.
 ///
-/// Test fixtures: example_async/lib/debug/*
+/// Test fixtures: example/lib/debug/*
 void main() {
   group('Debug Rules - Rule Instantiation', () {
     test('AlwaysFailRule (prefer_fail_test_case)', () {
@@ -98,7 +98,7 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File('example_async/lib/debug/${fixture}_fixture.dart');
+        final file = File('example/lib/debug/${fixture}_fixture.dart');
         expect(file.existsSync(), isTrue);
       });
     }

@@ -5,7 +5,7 @@ import 'package:test/test.dart';
 
 /// Tests for 39 Accessibility lint rules.
 ///
-/// Test fixtures: example_widgets/lib/accessibility/*
+/// Test fixtures: example/lib/accessibility/*
 void main() {
   group('Accessibility Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {
@@ -266,7 +266,7 @@ void main() {
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
-          'example_widgets/lib/accessibility/${fixture}_fixture.dart',
+          'example/lib/accessibility/${fixture}_fixture.dart',
         );
         expect(file.existsSync(), isTrue);
       });

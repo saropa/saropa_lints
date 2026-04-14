@@ -6,7 +6,7 @@ import 'package:saropa_lints/src/rules/media/media_rules.dart';
 
 /// Tests for 3 Media lint rules.
 ///
-/// Test fixtures: example_async/lib/media/*
+/// Test fixtures: example/lib/media/*
 void main() {
   group('Media Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {
@@ -47,7 +47,7 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File('example_async/lib/media/${fixture}_fixture.dart');
+        final file = File('example/lib/media/${fixture}_fixture.dart');
         expect(file.existsSync(), isTrue);
       });
     }

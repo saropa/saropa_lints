@@ -13,7 +13,7 @@ import 'package:saropa_lints/src/rules/code_quality/code_quality_variables_rules
 /// pattern matching, collection best practices, string handling,
 /// switch expressions, and code maintainability.
 ///
-/// Test fixtures: example_core/lib/code_quality/*
+/// Test fixtures: example/lib/code_quality/*
 void main() {
   group('Code Quality Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {
@@ -768,7 +768,7 @@ void main() {
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
-          'example_core/lib/code_quality/${fixture}_fixture.dart',
+          'example/lib/code_quality/${fixture}_fixture.dart',
         );
         expect(file.existsSync(), isTrue);
       });
@@ -1341,7 +1341,7 @@ void main() {
         'same-source initializers with method invocations should NOT trigger',
         () {
           // e.g. final a = DateTime.now(); final b = DateTime.now();
-          // Fixture: example_core/lib/code_quality/use_existing_variable_fixture.dart
+          // Fixture: example/lib/code_quality/use_existing_variable_fixture.dart
           // _goodSameSourceWithInvocation() must not report use_existing_variable.
           expect(
             'invocation-containing initializers excluded from duplicate check',

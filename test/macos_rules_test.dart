@@ -6,7 +6,7 @@ import 'package:saropa_lints/src/rules/platforms/macos_rules.dart';
 
 /// Tests for 15 macOS lint rules.
 ///
-/// Test fixtures: example_platforms/lib/macos/
+/// Test fixtures: example/lib/macos/
 void main() {
   group('Macos Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {
@@ -132,7 +132,7 @@ void main() {
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
-          'example_platforms/lib/macos/${fixture}_fixture.dart',
+          'example/lib/macos/${fixture}_fixture.dart',
         );
         expect(file.existsSync(), isTrue);
       });

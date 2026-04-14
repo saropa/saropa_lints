@@ -5,7 +5,7 @@ import 'package:test/test.dart';
 
 /// Tests for 8 Return lint rules.
 ///
-/// Test fixtures: example_core/lib/return/*
+/// Test fixtures: example/lib/return/*
 void main() {
   group('Return Rules - Rule Instantiation', () {
     test('AvoidReturningCascadesRule', () {
@@ -89,7 +89,7 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File('example_core/lib/return/${fixture}_fixture.dart');
+        final file = File('example/lib/return/${fixture}_fixture.dart');
         expect(file.existsSync(), isTrue);
       });
     }

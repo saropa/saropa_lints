@@ -6,7 +6,7 @@ import 'package:saropa_lints/src/rules/data/record_pattern_rules.dart';
 
 /// Tests for 19 Record Pattern lint rules.
 ///
-/// Test fixtures: example_core/lib/record_pattern/*
+/// Test fixtures: example/lib/record_pattern/*
 void main() {
   group('Record Pattern Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {
@@ -167,7 +167,7 @@ void main() {
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
-          'example_core/lib/record_pattern/${fixture}_fixture.dart',
+          'example/lib/record_pattern/${fixture}_fixture.dart',
         );
         expect(file.existsSync(), isTrue);
       });
