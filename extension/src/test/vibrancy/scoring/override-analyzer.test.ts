@@ -40,9 +40,10 @@ describe('override-analyzer', () => {
         const makeGraphPkg = (
             name: string,
             dependencies: string[] = [],
+            version = '1.0.0',
         ): DepGraphPackage => ({
             name,
-            version: '1.0.0',
+            version,
             kind: 'direct',
             dependencies,
         });
@@ -68,7 +69,8 @@ describe('override-analyzer', () => {
         it('should mark overrides without conflicts as stale', () => {
             const overrides = [makeOverride('intl', '0.18.5')];
             const deps = [makeDep('intl', '0.18.5', '^0.18.0')];
-            const graph = [makeGraphPkg('intl')];
+            // Graph resolved version matches override — no conflict
+            const graph = [makeGraphPkg('intl', [], '0.18.5')];
 
             const result = analyzeOverrides(overrides, deps, graph, new Map());
 
@@ -97,6 +99,60 @@ describe('override-analyzer', () => {
             assert.strictEqual(result.length, 1);
             assert.strictEqual(result[0].addedDate, null);
             assert.strictEqual(result[0].ageDays, null);
+        });
+
+        it('should mark override as active when package is transitive dep of SDK package', () => {
+            // Simulates: flutter_test (SDK package) depends on meta, and the
+            // user overrides meta to 1.18.0 to resolve an SDK pin conflict.
+            // dart pub deps --json shows meta at 1.18.0 (post-override), so
+            // version comparison alone can't detect the conflict. Instead, we
+            // detect that meta is a transitive dep of an SDK package.
+            const overrides = [makeOverride('meta', '1.18.0')];
+            const deps: PackageDependency[] = [
+                // meta itself (hosted, transitive)
+                makeDep('meta', '1.18.0', '1.18.0', false),
+                // flutter_test is source: sdk in pubspec.lock
+                {
+                    name: 'flutter_test', version: '0.0.0',
+                    constraint: 'sdk', source: 'sdk',
+                    isDirect: true, section: 'dev_dependencies',
+                },
+            ];
+            const graph = [
+                makeGraphPkg('flutter_test', ['meta']),
+                makeGraphPkg('meta', [], '1.18.0'),
+            ];
+
+            const result = analyzeOverrides(overrides, deps, graph, new Map());
+
+            assert.strictEqual(result.length, 1);
+            assert.strictEqual(result[0].status, 'active');
+            assert.strictEqual(result[0].blocker, 'SDK transitive (flutter_test)');
+        });
+
+        it('should remain stale when override is not a transitive dep of any SDK package', () => {
+            // Package is overridden but no SDK package depends on it — the
+            // override has no detectable justification.
+            const overrides = [makeOverride('http', '1.2.0')];
+            const deps: PackageDependency[] = [
+                makeDep('http', '1.2.0', '^1.0.0', false),
+                // some_lib is hosted, not SDK
+                {
+                    name: 'some_lib', version: '2.0.0',
+                    constraint: '^2.0.0', source: 'hosted',
+                    isDirect: true, section: 'dependencies',
+                },
+            ];
+            const graph = [
+                makeGraphPkg('some_lib', ['http']),
+                makeGraphPkg('http', [], '1.2.0'),
+            ];
+
+            const result = analyzeOverrides(overrides, deps, graph, new Map());
+
+            assert.strictEqual(result.length, 1);
+            assert.strictEqual(result[0].status, 'stale');
+            assert.strictEqual(result[0].blocker, null);
         });
     });
 

@@ -8,6 +8,7 @@ import {
     buildPackageApiUrl,
     buildMetricsApiUrl,
     buildPublisherApiUrl,
+    buildScoreApiUrl,
     buildRegistryHeaders,
 } from './registry-service';
 
@@ -106,6 +107,12 @@ export async function fetchPackageInfoWithPrerelease(
             }
         }
 
+        // Extract direct dependency names from pubspec.dependencies (keys only)
+        const rawDeps = pubspec.dependencies;
+        const dependencyNames = rawDeps && typeof rawDeps === 'object'
+            ? Object.keys(rawDeps).sort()
+            : [];
+
         const info: PubDevPackageInfo = {
             name: json.name ?? name,
             latestVersion: latest.version ?? '',
@@ -119,6 +126,7 @@ export async function fetchPackageInfoWithPrerelease(
             license: pubspec.license ?? null,
             description: pubspec.description ?? null,
             topics: Array.isArray(pubspec.topics) ? pubspec.topics : [],
+            dependencies: dependencyNames,
         };
 
         const archiveUrl = latest.archive_url ?? null;
@@ -153,7 +161,7 @@ export async function fetchPackageMetrics(
     registryOpts?: RegistryOptions,
 ): Promise<PubDevMetrics> {
     const fallback: PubDevMetrics = {
-        pubPoints: 0, platforms: [], wasmReady: null,
+        pubPoints: 0, likes: null, platforms: [], wasmReady: null,
     };
 
     const registryUrl = registryOpts?.registryUrl ?? PUB_DEV_URL;
@@ -173,17 +181,46 @@ export async function fetchPackageMetrics(
         ? await buildRegistryHeaders(registryUrl, registryService)
         : {};
 
+    // Fetch metrics and score (likes) endpoints in parallel
+    const scoreUrl = buildScoreApiUrl(registryUrl, name);
     try {
-        logger?.apiRequest('GET', url);
-        const t0 = Date.now();
-        const resp = await fetchWithRetry(url, { headers }, logger);
-        logger?.apiResponse(resp.status, resp.statusText, Date.now() - t0);
-        if (!resp.ok) { return fallback; }
+        const [metricsResp, scoreResp] = await Promise.all([
+            (async () => {
+                logger?.apiRequest('GET', url);
+                const t0 = Date.now();
+                const resp = await fetchWithRetry(url, { headers }, logger);
+                logger?.apiResponse(resp.status, resp.statusText, Date.now() - t0);
+                return resp;
+            })(),
+            (async () => {
+                logger?.apiRequest('GET', scoreUrl);
+                const t0 = Date.now();
+                const resp = await fetchWithRetry(scoreUrl, { headers }, logger);
+                logger?.apiResponse(resp.status, resp.statusText, Date.now() - t0);
+                return resp;
+            })(),
+        ]);
 
-        const json: any = await resp.json();
-        const tags: string[] = json.score?.tags ?? [];
+        // Extract likes from score API even if metrics endpoint failed —
+        // the two endpoints are independent and one succeeding should not
+        // be discarded because the other failed.
+        let likes: number | null = null;
+        if (scoreResp.ok) {
+            const scoreJson: any = await scoreResp.json();
+            likes = scoreJson.likeCount ?? null;
+        }
+
+        if (!metricsResp.ok) {
+            // Return partial result: likes available, metrics zeroed
+            return { ...fallback, likes };
+        }
+
+        const metricsJson: any = await metricsResp.json();
+        const tags: string[] = metricsJson.score?.tags ?? [];
+
         const result: PubDevMetrics = {
-            pubPoints: json.score?.grantedPoints ?? 0,
+            pubPoints: metricsJson.score?.grantedPoints ?? 0,
+            likes,
             platforms: extractPlatforms(tags),
             wasmReady: tags.some(t => WASM_TAGS.includes(t)),
         };
@@ -302,6 +339,57 @@ async function resolveArchiveUrl(
         const json: any = await resp.json();
         return json.latest?.archive_url ?? null;
     } catch {
+        return null;
+    }
+}
+
+/**
+ * Fetch how many published packages on pub.dev depend on this package.
+ * Scrapes the pub.dev search results page for the "Results N packages" count.
+ * Only works for pub.dev (not custom registries) — ecosystem adoption on a
+ * private registry is meaningless for vibrancy scoring.
+ *
+ * Returns null on failure (network error, unexpected HTML format) so the
+ * scoring layer can gracefully skip the adoption bonus.
+ */
+export async function fetchReverseDependencyCount(
+    name: string,
+    cache?: CacheService,
+    logger?: ScanLogger,
+): Promise<number | null> {
+    const cacheKey = `pub.reverseDeps.${name}`;
+    const cached = cache?.get<number>(cacheKey);
+    if (cached !== null && cached !== undefined) {
+        logger?.cacheHit(cacheKey);
+        return cached;
+    }
+    logger?.cacheMiss(cacheKey);
+
+    // Use the pub.dev HTML search page because the JSON search API
+    // doesn't return a total count — it only returns paginated results.
+    const url = `https://pub.dev/packages?q=dependency%3A${encodeURIComponent(name)}`;
+    try {
+        logger?.apiRequest('GET', url);
+        const t0 = Date.now();
+        const resp = await fetchWithRetry(url, undefined, logger);
+        logger?.apiResponse(resp.status, resp.statusText, Date.now() - t0);
+        if (!resp.ok) { return null; }
+
+        const html = await resp.text();
+        // pub.dev renders "Results N packages" at the top of search results.
+        // When no packages match, the page shows a different message with no
+        // "Results" prefix, so the regex returns null → 0 dependents.
+        const match = html.match(/Results\s+([\d,]+)\s+packages?/i);
+        if (!match) { return 0; }
+
+        // Count may contain commas for thousands (e.g. "1,314 packages")
+        const count = parseInt(match[1].replace(/,/g, ''), 10);
+        if (!Number.isFinite(count)) { return null; }
+
+        await cache?.set(cacheKey, count);
+        return count;
+    } catch {
+        logger?.error(`Failed to fetch reverse dependency count for ${name}`);
         return null;
     }
 }

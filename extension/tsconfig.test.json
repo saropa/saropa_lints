@@ -31,6 +31,7 @@
     "src/test/vibrancy/scoring/status-classifier.test.ts",
     "src/test/vibrancy/scoring/vibrancy-calculator.test.ts",
     "src/test/vibrancy/scoring/bloat-calculator.test.ts",
+    "src/test/vibrancy/scoring/override-analyzer.test.ts",
     "src/test/vibrancy/views/report-html.test.ts",
     "src/test/vibrancy/views/html-utils.test.ts",
     "src/test/vibrancy/views/detail-view-html.test.ts",
