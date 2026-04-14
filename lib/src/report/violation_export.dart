@@ -219,6 +219,18 @@ class ViolationExporter {
       'issuesByFile': _relativizeFileKeys(data.issuesByFile, projectRoot),
       'issuesByRule': data.issuesByRule,
       'ruleSeverities': _lowercaseSeverities(data.ruleSeverities),
+      // Suppression tracking: counts of diagnostics silenced by ignore
+      // comments or baseline, broken down by kind. Consumed by the
+      // extension Overview tree and available for CI pipelines.
+      //
+      // NOTE: SuppressionTracker is per-isolate static state, not yet
+      // included in BatchData for cross-isolate merging. In the common
+      // single-isolate case this is accurate. Multi-isolate consolidation
+      // would require adding suppression counts to BatchData (Phase 1).
+      'suppressions': <String, Object>{
+        'total': SuppressionTracker.total,
+        'byKind': SuppressionTracker.countsByKind,
+      },
     };
   }
 

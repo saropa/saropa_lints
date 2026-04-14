@@ -41,7 +41,22 @@ export interface IssuesByRule {
   [rule: string]: number;
 }
 
+/** Suppression counts broken down by how the diagnostic was silenced. */
+export interface SuppressionsByKind {
+  ignore?: number;
+  ignoreForFile?: number;
+  baseline?: number;
+}
+
+/** Aggregate suppression data included in the violations.json summary. */
+export interface SuppressionsSummary {
+  total?: number;
+  byKind?: SuppressionsByKind;
+}
+
 export interface ViolationsData {
+  /** ISO 8601 timestamp when the analysis was run. */
+  timestamp?: string;
   violations: Violation[];
   summary?: {
     totalViolations?: number;
@@ -51,6 +66,8 @@ export interface ViolationsData {
     byImpact?: ByImpact;
     /** Rule name → issue count. Use for triage grouping. */
     issuesByRule?: IssuesByRule;
+    /** Counts of diagnostics suppressed by ignore comments or baseline. */
+    suppressions?: SuppressionsSummary;
   };
   config?: {
     tier?: string;
@@ -75,6 +92,7 @@ export function readViolations(workspaceRoot: string): ViolationsData | null {
     const raw = JSON.parse(fs.readFileSync(p, 'utf-8'));
     const summary = raw.summary;
     return {
+      timestamp: typeof raw.timestamp === 'string' ? raw.timestamp : undefined,
       violations: Array.isArray(raw.violations) ? raw.violations : [],
       summary: summary
         ? {
@@ -88,6 +106,21 @@ export function readViolations(workspaceRoot: string): ViolationsData | null {
               typeof summary.issuesByRule === 'object' &&
               !Array.isArray(summary.issuesByRule)
                 ? summary.issuesByRule
+                : undefined,
+            suppressions:
+              summary.suppressions &&
+              typeof summary.suppressions === 'object' &&
+              !Array.isArray(summary.suppressions)
+                ? {
+                    total: typeof summary.suppressions.total === 'number'
+                      ? summary.suppressions.total
+                      : undefined,
+                    byKind:
+                      summary.suppressions.byKind &&
+                      typeof summary.suppressions.byKind === 'object'
+                        ? summary.suppressions.byKind
+                        : undefined,
+                  }
                 : undefined,
           }
         : undefined,
@@ -116,4 +149,49 @@ export function hasViolations(workspaceRoot: string): boolean {
   const data = readViolations(workspaceRoot);
   if (!data) return false;
   return (data.summary?.totalViolations ?? data.violations.length) > 0;
+}
+
+/**
+ * Return a copy of ViolationsData with violations for disabled rules removed
+ * and summary counts recomputed from the filtered violations array.
+ *
+ * Pass-through when `disabled` is empty (no allocation).
+ */
+export function filterDisabledFromData(
+  data: ViolationsData,
+  disabled: Set<string>,
+): ViolationsData {
+  if (disabled.size === 0) return data;
+
+  const filtered = data.violations.filter((v) => !disabled.has(v.rule));
+
+  // Recompute summary counts from filtered violations.
+  const bySeverity: BySeverity = {};
+  const byImpact: ByImpact = {};
+  const issuesByRule: IssuesByRule = {};
+  const filesWithIssues = new Set<string>();
+
+  for (const v of filtered) {
+    const sev = (v.severity ?? 'info').toLowerCase() as keyof BySeverity;
+    bySeverity[sev] = (bySeverity[sev] ?? 0) + 1;
+
+    const imp = (v.impact ?? 'low').toLowerCase() as keyof ByImpact;
+    byImpact[imp] = (byImpact[imp] ?? 0) + 1;
+
+    issuesByRule[v.rule] = (issuesByRule[v.rule] ?? 0) + 1;
+    filesWithIssues.add(v.file);
+  }
+
+  return {
+    ...data,
+    violations: filtered,
+    summary: {
+      ...data.summary,
+      totalViolations: filtered.length,
+      filesWithIssues: filesWithIssues.size,
+      bySeverity,
+      byImpact,
+      issuesByRule,
+    },
+  };
 }
