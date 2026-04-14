@@ -96,8 +96,6 @@ class PreferIterableCastRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    if (context.isLintPluginSource) return;
-
     context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'castFrom') return;
 
@@ -255,8 +253,6 @@ class AvoidDeprecatedUseInheritedMediaQueryRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    if (context.isLintPluginSource) return;
-
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final typeName = node.constructorName.type.name.lexeme;
       if (!_targetWidgets.contains(typeName)) return;
@@ -381,8 +377,6 @@ class PreferUtf8EncodeRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    if (context.isLintPluginSource) return;
-
     // Detect: Utf8Encoder().convert(x) or const Utf8Encoder().convert(x)
     // The AST shape is a MethodInvocation where:
     //   - methodName = 'convert'
@@ -527,8 +521,6 @@ class AvoidRemovedAppbarBackwardsCompatibilityRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    if (context.isLintPluginSource) return;
-
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final typeName = node.constructorName.type.name.lexeme;
       // AppBar and SliverAppBar both accepted this parameter

@@ -107,7 +107,7 @@ bool _shouldSkipCurrentFile() {
 }
 ```
 
-After this, the per-rule `if (context.isLintPluginSource) return;` guards become redundant but harmless. They can be removed in a follow-up cleanup.
+After this, the per-rule `if (context.isLintPluginSource) return;` guards become redundant. All 43 guards were removed in Fix 2.
 
 ### Option B: Add to `_globalExcludedFolders`
 
@@ -125,14 +125,16 @@ No fixture is needed — this is infrastructure behavior. The fix should be veri
 
 ## Changes Made
 
-- **`lib/src/native/saropa_context.dart`**: Added `isLintPluginSource` check at the top of `_shouldSkipCurrentFile()`, before any rule-specific filtering. This runs per-file (cached per path) and skips all files under `/rules/` or `/fixes/` directories. The check runs even when `_saropaRule` is null, so non-SaropaLintRule rules also skip plugin source.
+- **`lib/src/native/saropa_context.dart`** (Fix 1): Added `isLintPluginSource` check at the top of `_shouldSkipCurrentFile()`, before any rule-specific filtering. This runs per-file (cached per path) and skips all files under `/rules/` or `/fixes/` directories. The check runs even when `_saropaRule` is null, so non-SaropaLintRule rules also skip plugin source.
+- **12 rule files** (Fix 2): Removed all 43 dead `if (context.isLintPluginSource) return;` guards and their comments. These were no-ops in the native model. Files: `iap_rules.dart`, `config_rules.dart`, `dart_sdk_34_deprecation_rules.dart`, `dart_sdk_3_removal_rules.dart` (16), `flutter_sdk_migration_rules.dart` (4), `migration_rules.dart` (13), `sdk_migration_batch2_rules.dart` (2), `api_network_rules.dart`, `firebase_rules.dart`, `ios_platform_lifecycle_rules.dart`, `crypto_rules.dart`, `security_network_input_rules.dart`.
 - **`CHANGELOG.md`**: Added entry under `[Unreleased] > Fixed`.
 
 ---
 
 ## Tests Added
 
-<!-- Fill in when a fix is written. -->
+- `dart test test/migration_rules_test.dart` — 95/95 pass (covers all migration rules affected by guard removal)
+- `dart analyze --fatal-infos` — clean (confirms no syntax/import issues from removals)
 
 ---
 

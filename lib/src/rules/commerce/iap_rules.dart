@@ -81,9 +81,6 @@ class AvoidPurchaseInSandboxProductionRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    // Skip lint rule/fix source — sandbox URL patterns trigger self-referential FPs
-    if (context.isLintPluginSource) return;
-
     context.addMethodInvocation((MethodInvocation node) {
       // Check for hardcoded Apple sandbox/production URLs
       final String nodeSource = node.toSource();

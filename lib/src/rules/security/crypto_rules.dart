@@ -486,9 +486,6 @@ class RequireUniqueIvPerEncryptionRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    // Skip lint rule/fix source — IV detection patterns trigger self-referential FPs
-    if (context.isLintPluginSource) return;
-
     // Check for static IV fields
     context.addFieldDeclaration((FieldDeclaration node) {
       final bool isStatic = node.isStatic;

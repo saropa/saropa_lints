@@ -3546,9 +3546,6 @@ class RequireHttpsOnlyRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    // Skip lint rule/fix source — http:// comparison patterns trigger self-referential FPs
-    if (context.isLintPluginSource) return;
-
     checkHttpUrls(context, (AstNode node) => reporter.atNode(node));
   }
 

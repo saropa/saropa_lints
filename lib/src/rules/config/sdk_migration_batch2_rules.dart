@@ -483,8 +483,6 @@ class PreferVisibilityOverOpacityZeroRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    if (context.isLintPluginSource) return;
-
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Opacity') return;
@@ -664,8 +662,6 @@ class PreferKeyboardListenerOverRawRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    if (context.isLintPluginSource) return;
-
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'RawKeyboardListener') return;

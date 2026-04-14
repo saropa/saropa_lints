@@ -187,8 +187,6 @@ class AvoidDeprecatedListConstructorRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    if (context.isLintPluginSource) return;
-
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final NamedType typeNode = node.constructorName.type;
       final Element? typeEl = typeNode.element;
@@ -286,8 +284,6 @@ class AvoidRemovedProxyAnnotationRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    if (context.isLintPluginSource) return;
-
     context.addAnnotation((Annotation node) {
       final id = _annotationNameIdentifier(node);
       if (id == null || id.name != 'proxy') return;
@@ -338,8 +334,6 @@ class AvoidRemovedProvisionalAnnotationRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    if (context.isLintPluginSource) return;
-
     context.addAnnotation((Annotation node) {
       final id = _annotationNameIdentifier(node);
       if (id == null || id.name != 'Provisional') return;
@@ -440,8 +434,6 @@ class AvoidDeprecatedExpiresGetterRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    if (context.isLintPluginSource) return;
-
     void checkTarget(Expression? target, SimpleIdentifier prop) {
       if (prop.name != 'expires') return;
       final t = target?.staticType;
@@ -530,8 +522,6 @@ class AvoidRemovedCastErrorRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    if (context.isLintPluginSource) return;
-
     context.addNamedType(
       (NamedType node) => _reportRemovedCoreType(node, reporter, 'CastError'),
     );
@@ -574,8 +564,6 @@ class AvoidRemovedFallThroughErrorRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    if (context.isLintPluginSource) return;
-
     context.addNamedType(
       (NamedType node) =>
           _reportRemovedCoreType(node, reporter, 'FallThroughError'),
@@ -621,8 +609,6 @@ class AvoidRemovedAbstractClassInstantiationErrorRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    if (context.isLintPluginSource) return;
-
     context.addNamedType(
       (NamedType node) => _reportRemovedCoreType(
         node,
@@ -670,8 +656,6 @@ class AvoidRemovedCyclicInitializationErrorRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    if (context.isLintPluginSource) return;
-
     context.addNamedType(
       (NamedType node) =>
           _reportRemovedCoreType(node, reporter, 'CyclicInitializationError'),
@@ -719,8 +703,6 @@ class AvoidRemovedNoSuchMethodErrorDefaultConstructorRule
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    if (context.isLintPluginSource) return;
-
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final NamedType typeNode = node.constructorName.type;
       final Element? typeEl = typeNode.element;
@@ -768,8 +750,6 @@ class AvoidRemovedBidirectionalIteratorRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    if (context.isLintPluginSource) return;
-
     context.addNamedType(
       (NamedType node) =>
           _reportRemovedCoreType(node, reporter, 'BidirectionalIterator'),
@@ -815,8 +795,6 @@ class AvoidRemovedDeferredLibraryRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    if (context.isLintPluginSource) return;
-
     context.addAnnotation((Annotation node) {
       final id = _annotationNameIdentifier(node);
       if (id == null || id.name != 'DeferredLibrary') return;
@@ -894,8 +872,6 @@ class AvoidDeprecatedHasNextIteratorRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    if (context.isLintPluginSource) return;
-
     context.addNamedType((NamedType node) {
       if (node.name.lexeme != 'HasNextIterator') return;
       final el = node.element;
@@ -961,8 +937,6 @@ class AvoidRemovedMaxUserTagsConstantRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    if (context.isLintPluginSource) return;
-
     void reportIfUserTagAccess(SimpleIdentifier prop) {
       if (prop.name != 'MAX_USER_TAGS') return;
       final parent = prop.parent;
@@ -1059,8 +1033,6 @@ class AvoidRemovedDartDeveloperMetricsRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    if (context.isLintPluginSource) return;
-
     void reportNamedType(NamedType node) {
       final name = node.name.lexeme;
       if (!_removedTypeNames.contains(name)) return;
@@ -1126,8 +1098,6 @@ class AvoidDeprecatedNetworkInterfaceListSupportedRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    if (context.isLintPluginSource) return;
-
     context.addPropertyAccess((PropertyAccess node) {
       if (node.propertyName.name != 'listSupported') return;
       if (!_isNetworkInterfaceClassFromDartIo(node.realTarget)) return;
@@ -1206,8 +1176,6 @@ class AvoidRemovedNullThrownErrorRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    if (context.isLintPluginSource) return;
-
     context.addNamedType(
       (NamedType node) =>
           _reportRemovedCoreType(node, reporter, 'NullThrownError'),

@@ -83,9 +83,6 @@ class AvoidAssetManifestJsonRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    // Skip lint rule/fix source — detection patterns trigger self-referential FPs
-    if (context.isLintPluginSource) return;
-
     context.addSimpleStringLiteral((SimpleStringLiteral node) {
       if (node.value == 'AssetManifest.json') {
         reporter.atNode(node);
@@ -311,8 +308,6 @@ class PreferDropdownMenuItemButtonOpacityAnimationRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    if (context.isLintPluginSource) return;
-
     context.addPostfixExpression((PostfixExpression node) {
       _reportOpacityAnimationBangIfLegacy(node, reporter);
     });
@@ -623,9 +618,6 @@ class PreferTabbarThemeIndicatorColorRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    // Skip lint rule/fix source — detection patterns trigger self-referential FPs
-    if (context.isLintPluginSource) return;
-
     // Case 1: ThemeData(indicatorColor: value)
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final typeName = node.constructorName.type.name.lexeme;
@@ -1044,9 +1036,6 @@ class PreferContextMenuBuilderRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    // Skip lint rule/fix source — detection patterns trigger self-referential FPs
-    if (context.isLintPluginSource) return;
-
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'CupertinoContextMenu') return;
@@ -1240,9 +1229,6 @@ class PreferButtonStyleIconAlignmentRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    // Skip lint rule/fix source — detection patterns trigger self-referential FPs
-    if (context.isLintPluginSource) return;
-
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final typeName = node.constructorName.type.name.lexeme;
       if (!_buttonTypes.contains(typeName)) return;
@@ -1360,9 +1346,6 @@ class PreferKeyEventRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    // Skip lint rule/fix source — detection patterns trigger self-referential FPs
-    if (context.isLintPluginSource) return;
-
     // Case 1: Detect deprecated type references (e.g., RawKeyEvent in type
     // annotations, is-checks, and constructor calls).
     context.addNamedType((NamedType node) {
@@ -1493,9 +1476,6 @@ class PreferM3TextThemeRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    // Skip lint rule/fix source — detection patterns trigger self-referential FPs
-    if (context.isLintPluginSource) return;
-
     // Case 1: TextTheme(headline1: ...) or textTheme.copyWith(headline1: ...)
     // Detect deprecated named args in TextTheme constructor and copyWith.
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
@@ -1701,8 +1681,6 @@ class PreferOverflowBarOverButtonBarRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    if (context.isLintPluginSource) return;
-
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final CompilationUnit unit = node.root as CompilationUnit;
       final typeName = node.constructorName.type.name.lexeme;
@@ -1940,8 +1918,6 @@ class AvoidDeprecatedFlutterTestWindowRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    if (context.isLintPluginSource) return;
-
     context.addNamedType((NamedType node) {
       if (node.parent is ConstructorName) return;
       if (!isFlutterTestSdkTestWindowElement(node.element)) return;
@@ -2054,8 +2030,6 @@ class AvoidRemovedRenderObjectElementMethodsRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    if (context.isLintPluginSource) return;
-
     // Detect override declarations of the removed methods.
     context.addMethodDeclaration((MethodDeclaration node) {
       final name = node.name.lexeme;
@@ -2222,8 +2196,6 @@ class AvoidDeprecatedAnimatedListTypedefsRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    if (context.isLintPluginSource) return;
-
     context.addNamedType((NamedType node) {
       final name = node.name.lexeme;
       if (!_renames.containsKey(name)) return;
@@ -2342,8 +2314,6 @@ class AvoidDeprecatedUseMaterial3CopyWithRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    if (context.isLintPluginSource) return;
-
     context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'copyWith') return;
 
@@ -2485,8 +2455,6 @@ class AvoidDeprecatedOnSurfaceDestroyedRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    if (context.isLintPluginSource) return;
-
     void checkProperty(SimpleIdentifier prop, DartType? targetType) {
       if (prop.name != 'onSurfaceDestroyed') return;
       if (targetType == null) return;

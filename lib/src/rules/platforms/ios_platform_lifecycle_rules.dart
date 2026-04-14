@@ -482,9 +482,6 @@ class AvoidIosInAppBrowserForAuthRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    // Skip lint rule/fix source — OAuth URL patterns trigger self-referential FPs
-    if (context.isLintPluginSource) return;
-
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.typeName;
 
