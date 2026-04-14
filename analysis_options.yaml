@@ -28,12 +28,7 @@ analyzer:
     - "build/**"
     - ".dart_tool/**"
     - "example/**"
-    - "example_async/**"
-    - "example_core/**"
     - "example_packages/**"
-    - "example_platforms/**"
-    - "example_style/**"
-    - "example_widgets/**"
     - "test/fixtures/**"
     - "self_check/**"
 linter:
@@ -42,7 +37,7 @@ linter:
 
 plugins:
   saropa_lints:
-    version: "10.11.0"
+    version: "10.12.2"
     # ═══════════════════════════════════════════════════════════════════
     # SAROPA LINTS CONFIGURATION
     # ═══════════════════════════════════════════════════════════════════
