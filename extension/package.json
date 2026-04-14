@@ -52,9 +52,20 @@
     "views": {
       "saropaLints": [
         {
+          "id": "saropaLints.commandCatalogSidebar",
+          "name": "Commands",
+          "type": "webview",
+          "when": "saropaLints.isDartProject && saropaLints.sidebar.showCommandCatalog"
+        },
+        {
           "id": "saropaLints.overview",
           "name": "Overview & options",
           "when": "saropaLints.sidebar.showOverview"
+        },
+        {
+          "id": "saropaLints.fileRisk",
+          "name": "File Risk",
+          "when": "saropaLints.hasViolations && saropaLints.sidebar.showFileRisk"
         },
         {
           "id": "saropaLints.issues",
@@ -86,11 +97,6 @@
           "id": "saropaLints.securityPosture",
           "name": "Security Posture",
           "when": "saropaLints.hasViolations && saropaLints.sidebar.showSecurityPosture"
-        },
-        {
-          "id": "saropaLints.fileRisk",
-          "name": "File Risk",
-          "when": "saropaLints.hasViolations && saropaLints.sidebar.showFileRisk"
         },
         {
           "id": "saropaLints.packageVibrancy.packages",
@@ -161,6 +167,10 @@
       {
         "command": "saropaLints.focusIssuesForFile",
         "title": "Saropa Lints: Show Violations for File"
+      },
+      {
+        "command": "saropaLints.openFileAndFocusIssues",
+        "title": "Saropa Lints: Open File and Show Violations"
       },
       {
         "command": "saropaLints.focusIssuesForActiveFile",
@@ -273,6 +283,18 @@
         "command": "saropaLints.fileRisk.copyAsJson",
         "title": "Copy File Risk as JSON",
         "icon": "$(clippy)"
+      },
+      {
+        "command": "saropaLints.fileRisk.showViolations",
+        "title": "Show Violations for File"
+      },
+      {
+        "command": "saropaLints.fileRisk.hideFile",
+        "title": "Hide File"
+      },
+      {
+        "command": "saropaLints.fileRisk.copyPath",
+        "title": "Copy Path"
       },
       {
         "command": "saropaLints.overview.copyAsJson",
@@ -445,6 +467,11 @@
         "command": "saropaLints.packageVibrancy.openUrl",
         "title": "Open Link",
         "icon": "$(link-external)"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.openSourceFolder",
+        "title": "Open Source Folder",
+        "icon": "$(folder-opened)"
       },
       {
         "command": "saropaLints.packageVibrancy.commentOutUnused",
@@ -766,6 +793,11 @@
           "group": "navigation"
         },
         {
+          "command": "saropaLints.fileRisk.copyAsJson",
+          "when": "view == saropaLints.fileRisk",
+          "group": "navigation"
+        },
+        {
           "command": "saropaLints.refresh",
           "when": "view == saropaLints.fileRisk",
           "group": "navigation"
@@ -907,8 +939,33 @@
           "group": "2_hide@2"
         },
         {
+          "command": "saropaLints.disableRules",
+          "when": "view == saropaLints.issues && viewItem =~ /^violation/",
+          "group": "3_config@1"
+        },
+        {
           "command": "saropaLints.hideSeverity",
           "when": "view == saropaLints.issues && viewItem == severity"
+        },
+        {
+          "command": "saropaLints.fileRisk.showViolations",
+          "when": "view == saropaLints.fileRisk && viewItem == fileRiskFile",
+          "group": "1_navigate@1"
+        },
+        {
+          "command": "saropaLints.fileRisk.hideFile",
+          "when": "view == saropaLints.fileRisk && viewItem == fileRiskFile",
+          "group": "2_suppress@1"
+        },
+        {
+          "command": "saropaLints.fileRisk.copyPath",
+          "when": "view == saropaLints.fileRisk && viewItem == fileRiskFile",
+          "group": "3_copy@1"
+        },
+        {
+          "command": "saropaLints.fileRisk.copyAsJson",
+          "when": "view == saropaLints.fileRisk && viewItem == fileRiskFile",
+          "group": "3_copy@2"
         },
         {
           "command": "saropaLints.focusIssuesForActiveFile",
@@ -944,9 +1001,14 @@
           "when": "view == saropaLints.securityPosture && viewItem == securityGroup"
         },
         {
-          "command": "saropaLints.packageVibrancy.goToPackage",
+          "command": "saropaLints.packageVibrancy.copyAsJson",
           "when": "viewItem =~ /vibrancyPackage/",
-          "group": "inline"
+          "group": "inline@1"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.focusDetails",
+          "when": "viewItem =~ /vibrancyPackage/",
+          "group": "inline@2"
         },
         {
           "command": "saropaLints.packageVibrancy.goToPackage",
@@ -986,6 +1048,11 @@
         {
           "command": "saropaLints.packageVibrancy.openUrl",
           "when": "viewItem == vibrancyDetailLink",
+          "group": "inline"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.openSourceFolder",
+          "when": "viewItem == vibrancySourceCode",
           "group": "inline"
         },
         {
@@ -1129,6 +1196,22 @@
           "when": "saropaLints.isDartProject"
         },
         {
+          "command": "saropaLints.openFileAndFocusIssues",
+          "when": "false"
+        },
+        {
+          "command": "saropaLints.fileRisk.showViolations",
+          "when": "false"
+        },
+        {
+          "command": "saropaLints.fileRisk.hideFile",
+          "when": "false"
+        },
+        {
+          "command": "saropaLints.fileRisk.copyPath",
+          "when": "false"
+        },
+        {
           "command": "saropaLints.toggleSidebarSection",
           "when": "false"
         }
@@ -1204,6 +1287,11 @@
       {
         "title": "Sidebar",
         "properties": {
+          "saropaLints.sidebar.showCommandCatalog": {
+            "type": "boolean",
+            "default": true,
+            "description": "Show the Commands sidebar section — a searchable index of every extension command, with recent history and one-click execution."
+          },
           "saropaLints.sidebar.showOverview": {
             "type": "boolean",
             "default": true,
@@ -1251,8 +1339,8 @@
           },
           "saropaLints.sidebar.showPackageDetails": {
             "type": "boolean",
-            "default": false,
-            "description": "Show the Package Details webview in the sidebar. Off by default; full details remain available via Show Package Details and pubspec hovers."
+            "default": true,
+            "description": "Show the Package Details webview in the sidebar. Only visible when a Vibrancy scan has results. Full details also available via Show Package Details and pubspec hovers."
           },
           "saropaLints.sidebar.showTodosAndHacks": {
             "type": "boolean",
@@ -1885,7 +1973,7 @@
     "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
     "package": "npm run precompile && npm run check-types && node esbuild.js --production",
     "lint": "tsc --noEmit -p ./",
-    "test": "tsc -p tsconfig.test.json && node node_modules/mocha/bin/mocha \"out-test/test/todosAndHacks/**/*.test.js\" \"out-test/test/driftAdvisor/**/*.test.js\" \"out-test/test/vibrancy/category-dictionary.test.js\" \"out-test/test/vibrancy/vscode-mock.test.js\" \"out-test/test/vibrancy/scan-helpers.test.js\" \"out-test/test/vibrancy/services/review-state.test.js\" \"out-test/test/vibrancy/services/scan-logger.test.js\" \"out-test/test/vibrancy/scoring/status-classifier.test.js\" \"out-test/test/vibrancy/scoring/vibrancy-calculator.test.js\" \"out-test/test/vibrancy/scoring/bloat-calculator.test.js\" \"out-test/test/vibrancy/views/report-html.test.js\" \"out-test/test/rulePacks/**/*.test.js\" \"out-test/test/sidebarSectionVisibilityKeys.test.js\" \"out-test/test/sidebarToggleCommand.test.js\" \"out-test/test/sidebarToggleLabel.test.js\" \"out-test/test/overviewEmbeddedConfigKinds.test.js\" \"out-test/test/treeSerializers.test.js\" \"out-test/test/copyTreeAsJson.test.js\" \"out-test/test/suggestionCounts.test.js\" \"out-test/test/sidebarSectionCounts.test.js\" \"out-test/test/pathUtils.test.js\" \"out-test/test/violationsReader.test.js\" \"out-test/test/views/**/*.test.js\" \"out-test/test/pubspec-validation.test.js\" \"out-test/test/pubspec-code-actions.test.js\" \"out-test/test/vibrancy/services/pubspec-sorter.test.js\" \"out-test/test/vibrancy/providers/annotate-command.test.js\" \"out-test/test/vibrancy/providers/adoption-gate.test.js\" \"out-test/test/commandCatalogRegistry.test.js\" --timeout 10000"
+    "test": "tsc -p tsconfig.test.json && node node_modules/mocha/bin/mocha \"out-test/test/todosAndHacks/**/*.test.js\" \"out-test/test/driftAdvisor/**/*.test.js\" \"out-test/test/vibrancy/category-dictionary.test.js\" \"out-test/test/vibrancy/vscode-mock.test.js\" \"out-test/test/vibrancy/scan-helpers.test.js\" \"out-test/test/vibrancy/services/review-state.test.js\" \"out-test/test/vibrancy/services/scan-logger.test.js\" \"out-test/test/vibrancy/services/github-api.test.js\" \"out-test/test/vibrancy/scoring/status-classifier.test.js\" \"out-test/test/vibrancy/scoring/vibrancy-calculator.test.js\" \"out-test/test/vibrancy/scoring/bloat-calculator.test.js\" \"out-test/test/vibrancy/views/report-html.test.js\" \"out-test/test/vibrancy/views/html-utils.test.js\" \"out-test/test/vibrancy/views/detail-view-html.test.js\" \"out-test/test/vibrancy/providers/tree-items.test.js\" \"out-test/test/vibrancy/providers/hover-provider.test.js\" \"out-test/test/rulePacks/**/*.test.js\" \"out-test/test/sidebarSectionVisibilityKeys.test.js\" \"out-test/test/sidebarToggleCommand.test.js\" \"out-test/test/sidebarToggleLabel.test.js\" \"out-test/test/overviewEmbeddedConfigKinds.test.js\" \"out-test/test/treeSerializers.test.js\" \"out-test/test/copyTreeAsJson.test.js\" \"out-test/test/suggestionCounts.test.js\" \"out-test/test/sidebarSectionCounts.test.js\" \"out-test/test/pathUtils.test.js\" \"out-test/test/violationsReader.test.js\" \"out-test/test/violationsReaderFilter.test.js\" \"out-test/test/configWriterDisabledRules.test.js\" \"out-test/test/views/**/*.test.js\" \"out-test/test/pubspec-validation.test.js\" \"out-test/test/pubspec-code-actions.test.js\" \"out-test/test/vibrancy/services/pubspec-sorter.test.js\" \"out-test/test/vibrancy/providers/annotate-command.test.js\" \"out-test/test/vibrancy/providers/adoption-gate.test.js\" \"out-test/test/commandCatalogRegistry.test.js\" \"out-test/test/commandCatalogSidebar.test.js\" \"out-test/test/fileRiskData.test.js\" --timeout 10000"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.10",

@@ -1,13 +1,15 @@
 /**
  * D6: File Risk tree — files ranked by violation density.
  * Shows the riskiest files first so developers know where to focus.
- * Click a file to filter the Violations view to that file.
+ * Click a file to open it in the editor and filter the Violations view.
  */
 
 import * as vscode from 'vscode';
 import * as path from 'path';
 import { readViolations, Violation } from '../violationsReader';
 import { getProjectRoot } from '../projectRoot';
+import { readDisabledRules } from '../configWriter';
+import { loadSuppressions, isPathHidden, isRuleHidden } from '../suppressionsStore';
 
 /**
  * Impact weights matching healthScore.ts so that risk ranking is
@@ -24,7 +26,7 @@ const RISK_WEIGHTS: Record<string, number> = {
 
 const MAX_FILES = 30;
 
-interface FileRisk {
+export interface FileRisk {
   filePath: string;
   total: number;
   critical: number;
@@ -35,8 +37,10 @@ interface FileRisk {
 /**
  * Aggregate violations per file and compute a weighted risk score.
  * Returns files sorted by risk score descending — worst files first.
+ *
+ * Also used by the Overview tree for its embedded "Riskiest Files" group.
  */
-function buildFileRisks(violations: Violation[]): FileRisk[] {
+export function buildFileRisks(violations: Violation[]): FileRisk[] {
   const byFile = new Map<string, { total: number; critical: number; high: number; weighted: number }>();
 
   for (const v of violations) {
@@ -65,7 +69,7 @@ function buildFileRisks(violations: Violation[]): FileRisk[] {
   return risks;
 }
 
-type FileRiskNode = SummaryNode | FileNode;
+type FileRiskNode = SummaryNode | FileNode | TimestampNode;
 
 interface SummaryNode {
   kind: 'summary';
@@ -78,6 +82,34 @@ interface FileNode {
   risk: FileRisk;
 }
 
+interface TimestampNode {
+  kind: 'timestamp';
+  label: string;
+  isStale: boolean;
+}
+
+/** Threshold in milliseconds beyond which scan data is considered stale (24 hours). */
+const STALE_THRESHOLD_MS = 24 * 60 * 60 * 1000;
+
+/** Format an ISO timestamp into a human-readable relative age string. */
+export function formatAge(isoTimestamp: string): { label: string; isStale: boolean } {
+  const scanDate = new Date(isoTimestamp);
+  if (isNaN(scanDate.getTime())) return { label: 'unknown', isStale: false };
+
+  const ageMs = Date.now() - scanDate.getTime();
+  const isStale = ageMs > STALE_THRESHOLD_MS;
+
+  // Build relative label: "2 hours ago", "3 days ago", etc.
+  const seconds = Math.floor(ageMs / 1000);
+  if (seconds < 60) return { label: 'just now', isStale };
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return { label: `${minutes}m ago`, isStale };
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return { label: `${hours}h ago`, isStale };
+  const days = Math.floor(hours / 24);
+  return { label: `${days}d ago`, isStale };
+}
+
 /** Pick an icon reflecting severity mix: flame for critical, warning for high, info otherwise. */
 function riskIcon(r: FileRisk): vscode.ThemeIcon {
   if (r.critical > 0) return new vscode.ThemeIcon('flame', new vscode.ThemeColor('list.errorForeground'));
@@ -88,6 +120,11 @@ function riskIcon(r: FileRisk): vscode.ThemeIcon {
 export class FileRiskTreeProvider implements vscode.TreeDataProvider<FileRiskNode> {
   private _onDidChangeTreeData = new vscode.EventEmitter<FileRiskNode | undefined | void>();
   readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
+  private workspaceState: vscode.Memento;
+
+  constructor(workspaceState: vscode.Memento) {
+    this.workspaceState = workspaceState;
+  }
 
   refresh(): void {
     this._onDidChangeTreeData.fire();
@@ -99,6 +136,31 @@ export class FileRiskTreeProvider implements vscode.TreeDataProvider<FileRiskNod
       item.description = element.description;
       item.iconPath = new vscode.ThemeIcon('graph');
       item.contextValue = 'fileRiskSummary';
+      // Click → show all violations (clear filters and focus Violations view).
+      item.command = {
+        command: 'saropaLints.focusIssues',
+        title: 'Show all violations',
+        arguments: [],
+      };
+      return item;
+    }
+
+    if (element.kind === 'timestamp') {
+      const item = new vscode.TreeItem(element.label, vscode.TreeItemCollapsibleState.None);
+      // Stale data gets a warning icon; fresh data gets a clock icon.
+      item.iconPath = element.isStale
+        ? new vscode.ThemeIcon('warning', new vscode.ThemeColor('list.warningForeground'))
+        : new vscode.ThemeIcon('clock');
+      item.contextValue = 'fileRiskTimestamp';
+      if (element.isStale) {
+        item.tooltip = 'Scan data may be outdated. Run analysis to refresh.';
+        // Click → run analysis to refresh the data.
+        item.command = {
+          command: 'saropaLints.runAnalysis',
+          title: 'Run analysis',
+          arguments: [],
+        };
+      }
       return item;
     }
 
@@ -114,10 +176,10 @@ export class FileRiskTreeProvider implements vscode.TreeDataProvider<FileRiskNod
     if (r.high > 0) parts.push(`${r.high} high`);
     item.tooltip = `${r.filePath}\n${parts.join(', ')}\nRisk score: ${Math.round(r.riskScore)}`;
 
-    // Click → filter Violations view to this file.
+    // Click → open the file in the editor and filter Violations view.
     item.command = {
-      command: 'saropaLints.focusIssuesForFile',
-      title: 'Show issues for this file',
+      command: 'saropaLints.openFileAndFocusIssues',
+      title: 'Open file and show issues',
       arguments: [r.filePath],
     };
     item.contextValue = 'fileRiskFile';
@@ -133,27 +195,57 @@ export class FileRiskTreeProvider implements vscode.TreeDataProvider<FileRiskNod
     const data = readViolations(root);
     if (!data || data.violations.length === 0) return [];
 
-    const risks = buildFileRisks(data.violations);
+    // Filter out violations that should not affect risk scores:
+    // 1. Rules disabled in analysis_options.yaml / analysis_options_custom.yaml
+    // 2. Files/folders/rules/severities/impacts hidden via view-level suppressions
+    const disabled = readDisabledRules(root);
+    const suppressions = loadSuppressions(this.workspaceState);
+    const violations = data.violations.filter((v) => {
+      if (disabled.has(v.rule)) return false;
+      if (isPathHidden(suppressions, v.file)) return false;
+      if (isRuleHidden(suppressions, v.file, v.rule)) return false;
+      const severity = (v.severity ?? 'info').toLowerCase();
+      if (suppressions.hiddenSeverities.includes(severity)) return false;
+      const impact = (v.impact ?? 'low').toLowerCase();
+      if (suppressions.hiddenImpacts.includes(impact)) return false;
+      return true;
+    });
+    if (violations.length === 0) return [];
+
+    const risks = buildFileRisks(violations);
     if (risks.length === 0) return [];
 
     const items: FileRiskNode[] = [];
 
-    // D6: Summary — "Top N files have X% of critical issues".
+    // D6: Summary — flat counts of files and severity breakdown.
+    const totalViolations = risks.reduce((s, r) => s + r.total, 0);
     const totalCritical = risks.reduce((s, r) => s + r.critical, 0);
-    if (totalCritical > 0) {
-      const topN = Math.min(5, risks.length);
-      const topCritical = risks.slice(0, topN).reduce((s, r) => s + r.critical, 0);
-      const pct = Math.round((topCritical / totalCritical) * 100);
-      items.push({
-        kind: 'summary',
-        label: `Top ${topN} files have ${pct}% of critical issues`,
-        description: `${totalCritical} critical total`,
-      });
-    }
+    const totalHigh = risks.reduce((s, r) => s + r.high, 0);
+    const parts: string[] = [`${risks.length} file${risks.length === 1 ? '' : 's'}`];
+    if (totalCritical > 0) parts.push(`${totalCritical} critical`);
+    if (totalHigh > 0) parts.push(`${totalHigh} high`);
+    // Only show total violations when there are medium/low beyond critical+high.
+    const otherCount = totalViolations - totalCritical - totalHigh;
+    if (otherCount > 0) parts.push(`${otherCount} other`);
+    items.push({
+      kind: 'summary',
+      label: parts.join(', '),
+      description: `${totalViolations} violation${totalViolations === 1 ? '' : 's'} total`,
+    });
 
     // File items capped at MAX_FILES.
     for (const risk of risks.slice(0, MAX_FILES)) {
       items.push({ kind: 'file', risk });
+    }
+
+    // Timestamp node — shows when the scan was run, with a warning if stale.
+    if (data.timestamp) {
+      const { label: ageLabel, isStale } = formatAge(data.timestamp);
+      items.push({
+        kind: 'timestamp',
+        label: isStale ? `Scanned ${ageLabel} — click to refresh` : `Scanned ${ageLabel}`,
+        isStale,
+      });
     }
 
     return items;

@@ -63,7 +63,7 @@ The **Logs** view lists analysis reports from `reports/`. Each log shows a parse
 | `saropaLints.issuesPageSize` | `100` | Max violations shown per file in the Violations tree (1–1000). Remaining appear as “and N more…”. |
 | `saropaLints.violationsGroupBy` | `impact` | Default tree grouping: **impact** lists Critical / High first; use **severity** for Error / Warning / Info. Change anytime from the Violations toolbar. |
 
-**Sidebar defaults:** **Overview & options** and **Violations** show in the activity bar by default (settings, issues, and section toggles live under Overview). Turn on the standalone **Config** view, Summary, Security, File Risk, Package Vibrancy, TODOs, etc. from **Overview & options → Sidebar** or Settings (`saropaLints.sidebar.show*`).
+**Sidebar defaults:** **Commands** (searchable index of every command), **Overview & options**, and **Violations** show in the activity bar by default. Overview includes embedded Health Summary, Next Steps, and Riskiest Files groups when violations exist. **Package Details** appears automatically after a Vibrancy scan. Turn on standalone **Config**, Summary, Security, File Risk, Package Vibrancy, TODOs, etc. from **Overview & options → Sidebar** or Settings (`saropaLints.sidebar.show*`).
 
 | **TODOs & Hacks** | | |
 | `saropaLints.todosAndHacks.workspaceScanEnabled` | `false` | When **true**, the view scans the workspace for comment markers (resource-intensive). |
