@@ -44,7 +44,7 @@ Pubspec inline suppression comments, l10n.yaml false-positive fix, and scan logg
 ### Fixed
 
 - **Extension:** `prefer_l10n_yaml_config` no longer fires when `l10n.yaml` already exists alongside `pubspec.yaml`. Flutter tooling requires `generate: true` in pubspec even with a dedicated l10n config file — flagging it was a false positive.
-- **Extension:** Package Vibrancy scan logger no longer creates a separate log file per scan. Scans are debounced (5 s after last `pubspec.lock` change), logs append to one file per hour, and identical-result scans are skipped entirely.
+- **Extension:** Package Vibrancy scan logger no longer creates a separate log file per scan. Scans are debounced (5 s after last `pubspec.lock` change), logs append to one file per day, and identical-result scans are skipped entirely.
 
 ---
 
