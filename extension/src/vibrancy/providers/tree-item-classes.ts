@@ -4,7 +4,7 @@ import {
     VibrancyResult, VibrancyCategory, DepGraphSummary,
     OverrideAnalysis, DependencySection, PackageInsight,
 } from '../types';
-import { categoryIcon, categoryLabel, categoryToGrade } from '../scoring/status-classifier';
+import { categoryIcon, categoryLabel } from '../scoring/status-classifier';
 import { formatPrereleaseTag } from '../scoring/prerelease-classifier';
 
 /**
@@ -58,15 +58,20 @@ export class PackageItem extends vscode.TreeItem {
         super(result.package.name, vscode.TreeItemCollapsibleState.Collapsed);
         const hasUpdate = result.updateInfo?.updateStatus
             && result.updateInfo.updateStatus !== 'up-to-date';
-        const displayScore = Math.round(result.score / 10);
-        let desc = `${displayScore}/10 — ${categoryLabel(result.category)}`;
+        // Compact rating: category label in parentheses, consistent with vibrancy report
+        this.description = `(${categoryLabel(result.category)})`;
+        // Append shared% so users can tell at a glance whether a package's
+        // transitive weight is mostly already in the dep graph
+        const ti = result.transitiveInfo;
+        if (ti && ti.transitiveCount > 0 && ti.sharedDeps.length > 0) {
+            const pct = Math.round(
+                (ti.sharedDeps.length / ti.transitiveCount) * 100,
+            );
+            this.description += ` ${pct}% shared`;
+        }
         if (hasUpdate) {
-            desc += ` → ${result.updateInfo!.latestVersion}`;
+            this.description += ` → ${result.updateInfo!.latestVersion}`;
         }
-        if (problemCount && problemCount > 0) {
-            desc += ` — ${problemCount} problem${problemCount === 1 ? '' : 's'}`;
-        }
-        this.description = desc;
         this.iconPath = new vscode.ThemeIcon(
             categoryIcon(result.category),
             categoryColor(result.category),
@@ -84,7 +89,7 @@ export class PackageItem extends vscode.TreeItem {
 
 export class SuppressedGroupItem extends vscode.TreeItem {
     constructor(count: number) {
-        super(`Suppressed (${count})`, vscode.TreeItemCollapsibleState.Collapsed);
+        super(`Suppressed [${count}]`, vscode.TreeItemCollapsibleState.Collapsed);
         this.iconPath = new vscode.ThemeIcon(
             'eye-closed',
             new vscode.ThemeColor('disabledForeground'),
@@ -100,7 +105,7 @@ export class SectionGroupItem extends vscode.TreeItem {
     ) {
         const label = SECTION_LABELS[section];
         const count = results.length;
-        super(`${label} (${count})`, vscode.TreeItemCollapsibleState.Expanded);
+        super(`${label} [${count}]`, vscode.TreeItemCollapsibleState.Expanded);
         this.iconPath = new vscode.ThemeIcon(SECTION_ICONS[section]);
         this.contextValue = 'vibrancySectionGroup';
     }
@@ -140,6 +145,32 @@ export class DetailItem extends vscode.TreeItem {
     }
 }
 
+/**
+ * Tree item for the Source Code node in the Size group.
+ * Double-clicking opens the package's local source directory.
+ */
+export class SourceCodeItem extends vscode.TreeItem {
+    /** Always undefined — present so GroupChildItem shares the `url` field with DetailItem. */
+    readonly url: undefined = undefined;
+
+    constructor(
+        emoji: string,
+        shortDesc: string,
+        fullDesc: string,
+        public readonly packageName: string,
+    ) {
+        super(`${emoji} Source Code`, vscode.TreeItemCollapsibleState.None);
+        this.description = shortDesc;
+        this.tooltip = fullDesc;
+        this.command = {
+            command: 'saropaLints.packageVibrancy.openSourceFolder',
+            title: 'Open Source Folder',
+            arguments: [packageName],
+        };
+        this.contextValue = 'vibrancySourceCode';
+    }
+}
+
 export class PrereleaseItem extends vscode.TreeItem {
     constructor(
         public readonly packageName: string,
@@ -163,10 +194,13 @@ export class PrereleaseItem extends vscode.TreeItem {
     }
 }
 
+/** Allowed child types for group items in the tree view. */
+export type GroupChildItem = DetailItem | SourceCodeItem;
+
 export class GroupItem extends vscode.TreeItem {
     constructor(
         label: string,
-        public readonly children: DetailItem[],
+        public readonly children: readonly GroupChildItem[],
         collapsibleState = vscode.TreeItemCollapsibleState.Expanded,
     ) {
         super(label, collapsibleState);
@@ -184,7 +218,7 @@ export class DepGraphSummaryItem extends vscode.TreeItem {
 export class OverridesGroupItem extends vscode.TreeItem {
     constructor(public readonly analyses: readonly OverrideAnalysis[]) {
         super(
-            `Overrides (${analyses.length})`,
+            `Overrides [${analyses.length}]`,
             vscode.TreeItemCollapsibleState.Expanded,
         );
         const staleCount = analyses.filter(a => a.status === 'stale').length;
@@ -230,7 +264,7 @@ export class OverrideItem extends vscode.TreeItem {
 
 export class ActionItemsGroupItem extends vscode.TreeItem {
     constructor(public readonly insights: readonly PackageInsight[]) {
-        super(`Action Items (${insights.length})`, vscode.TreeItemCollapsibleState.Expanded);
+        super(`Action Items [${insights.length}]`, vscode.TreeItemCollapsibleState.Expanded);
         this.iconPath = new vscode.ThemeIcon(
             'target',
             new vscode.ThemeColor('editorWarning.foreground'),
@@ -244,10 +278,10 @@ export class InsightItem extends vscode.TreeItem {
     constructor(public readonly insight: PackageInsight) {
         const problemCount = insight.problems.length;
         super(insight.name, vscode.TreeItemCollapsibleState.Collapsed);
-        // PackageInsightCategory matches VibrancyCategory; cast for status-classifier.
-        const grade = categoryToGrade(insight.category as VibrancyCategory);
+        // PackageInsightCategory matches VibrancyCategory; use same label as vibrancy report
+        const cat = categoryLabel(insight.category as VibrancyCategory);
         const problemNoun = problemCount === 1 ? 'problem' : 'problems';
-        this.description = `${grade} — ${problemCount} ${problemNoun}`;
+        this.description = `${cat} — ${problemCount} ${problemNoun}`;
 
         const highestSeverity = insight.problems.reduce<'low' | 'medium' | 'high'>(
             (max, p) => {
@@ -285,7 +319,7 @@ export class SeverityGroupItem extends vscode.TreeItem {
         const expanded = severity === 'high' || severity === 'medium'
             ? vscode.TreeItemCollapsibleState.Expanded
             : vscode.TreeItemCollapsibleState.Collapsed;
-        super(`${LABELS[severity]} (${results.length})`, expanded);
+        super(`${LABELS[severity]} [${results.length}]`, expanded);
         this.contextValue = 'vibrancySeverityGroup';
     }
 }

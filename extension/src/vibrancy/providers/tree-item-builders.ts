@@ -5,7 +5,7 @@ import { formatSizeMB } from '../scoring/bloat-calculator';
 import { classifyLicense, licenseEmoji } from '../scoring/license-classifier';
 import { formatRelativeTime } from '../scoring/time-formatter';
 import { severityEmoji, severityLabel, worstSeverity } from '../scoring/vuln-classifier';
-import { DetailItem, GroupItem } from './tree-item-classes';
+import { DetailItem, GroupItem, SourceCodeItem } from './tree-item-classes';
 
 // Builder functions for tree item group nodes (Version, Update, Community, etc.).
 // Detail-level builders live in tree-item-detail-builders.ts and are
@@ -212,6 +212,14 @@ function buildCommunityGroup(result: VibrancyResult): GroupItem | null {
             '📊 Pub Points', `${result.pubDev.pubPoints}/160`,
         ));
     }
+    if (result.reverseDependencyCount !== null && result.reverseDependencyCount > 0) {
+        const count = result.reverseDependencyCount;
+        const depUrl = `https://pub.dev/packages?q=dependency%3A${encodeURIComponent(result.package.name)}`;
+        items.push(new DetailItem(
+            '📦 Dependents', `${count.toLocaleString('en-US')} packages`,
+            depUrl,
+        ));
+    }
     if (result.verifiedPublisher) {
         items.push(new DetailItem('✅ Publisher', 'Verified'));
     }
@@ -220,7 +228,7 @@ function buildCommunityGroup(result: VibrancyResult): GroupItem | null {
 }
 
 function buildSizeGroup(result: VibrancyResult): GroupItem | null {
-    const items: DetailItem[] = [];
+    const items: (DetailItem | SourceCodeItem)[] = [];
 
     if (result.bloatRating !== null && result.archiveSizeBytes !== null) {
         const emoji = bloatEmoji(result.bloatRating);
@@ -233,11 +241,32 @@ function buildSizeGroup(result: VibrancyResult): GroupItem | null {
     if (result.replacementComplexity) {
         const rc = result.replacementComplexity;
         const emoji = replacementEmoji(rc.level);
-        items.push(new DetailItem(`${emoji} Source`, rc.summary));
+        // Short description for tree view; full summary in tooltip
+        const shortDesc = formatShortSourceDesc(rc.metrics);
+        items.push(new SourceCodeItem(
+            emoji, shortDesc, rc.summary, result.package.name,
+        ));
     }
 
     if (items.length === 0) { return null; }
     return new GroupItem('📏 Size', items);
+}
+
+/** Format a compact source description for the tree view. */
+function formatShortSourceDesc(
+    m: import('../services/package-code-analyzer').PackageCodeMetrics,
+): string {
+    // Handle edge case where package has no lib/ content
+    if (m.libCodeLines === 0 && m.libFileCount === 0) {
+        return m.hasNativeCode ? 'native only' : 'no source';
+    }
+    // e.g. "2.5k lines, 18 files" or "500 lines + native"
+    const loc = m.libCodeLines;
+    const locStr = loc >= 1000
+        ? `${(loc / 1000).toFixed(1)}k` : `${loc}`;
+    const fileStr = m.libFileCount === 1 ? '1 file' : `${m.libFileCount} files`;
+    const native = m.hasNativeCode ? ' + native' : '';
+    return `${locStr} lines, ${fileStr}${native}`;
 }
 
 function buildAlertsGroup(result: VibrancyResult): GroupItem | null {
@@ -281,16 +310,32 @@ export function buildDependencyGroup(result: VibrancyResult): GroupItem | null {
 
     const items: DetailItem[] = [];
 
-    const countDesc = info.flaggedCount > 0
-        ? `${info.transitiveCount} (${info.flaggedCount} flagged)`
-        : `${info.transitiveCount}`;
-    items.push(new DetailItem('Transitive', `${countDesc} packages`));
+    // Split transitives into unique (only this package pulls them in)
+    // and shared (already in the dep graph via other direct deps).
+    // This distinguishes real added weight from already-paid-for deps.
+    const sharedCount = info.sharedDeps.length;
+    // Clamp to zero — sharedDeps should always be a subset of transitives
+    // but defensive clamping prevents a negative display if data is inconsistent
+    const uniqueCount = Math.max(0, info.transitiveCount - sharedCount);
 
-    if (info.sharedDeps.length > 0) {
+    const flaggedSuffix = info.flaggedCount > 0
+        ? ` (${info.flaggedCount} flagged)` : '';
+    items.push(new DetailItem(
+        'Transitive', `${info.transitiveCount} packages${flaggedSuffix}`,
+    ));
+
+    if (sharedCount > 0) {
+        // Show unique vs shared breakdown so users can tell whether a
+        // package's reported size is mostly shared weight they already carry
+        items.push(new DetailItem(
+            '🆕 Unique', `${uniqueCount} packages (added by this dep only)`,
+        ));
         const sharedList = info.sharedDeps.slice(0, 3).join(', ');
         const more = info.sharedDeps.length > 3
             ? ` +${info.sharedDeps.length - 3}` : '';
-        items.push(new DetailItem('🔗 Shared', `${sharedList}${more}`));
+        items.push(new DetailItem(
+            '🔗 Shared', `${sharedCount} packages — ${sharedList}${more}`,
+        ));
     }
 
     return new GroupItem('📊 Dependencies', items);

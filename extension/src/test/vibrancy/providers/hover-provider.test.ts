@@ -1,3 +1,4 @@
+import '../register-vscode-mock';
 import * as assert from 'assert';
 import * as vscode from 'vscode';
 import { VibrancyHoverProvider } from '../../../vibrancy/providers/hover-provider';
@@ -18,6 +19,7 @@ function makeResult(name: string, score: number): VibrancyResult {
             license: null,
             description: null,
             topics: [],
+            dependencies: [],
         },
         github: { stars: 500, openIssues: 10, closedIssuesLast90d: 5,
             mergedPrsLast90d: 3, avgCommentsPerIssue: 2,
@@ -36,7 +38,8 @@ function makeResult(name: string, score: number): VibrancyResult {
         isUnused: false, platforms: null, verifiedPublisher: false, wasmReady: null,
         blocker: null, upgradeBlockStatus: 'up-to-date',
         transitiveInfo: null, alternatives: [], latestPrerelease: null, prereleaseTag: null,
-        vulnerabilities: [],
+        vulnerabilities: [], fileUsages: [], versionGap: null, overrideGap: null,
+        replacementComplexity: null, likes: null, reverseDependencyCount: null, readme: null,
     };
 }
 
@@ -166,5 +169,57 @@ describe('VibrancyHoverProvider', () => {
         // Rescan clears stale clipboard entries.
         provider.updateResults([]);
         assert.strictEqual(provider.getClipboardText('http'), undefined);
+    });
+
+    it('should include VERSION section in hover content', () => {
+        provider.updateResults([makeResult('http', 85)]);
+        const doc = makeMockDocument('  http: ^1.0.0');
+        const hover = provider.provideHover(doc, new vscode.Position(0, 2));
+        const md = hover!.contents as unknown as vscode.MarkdownString;
+        assert.ok(md.value.includes('**VERSION**'), 'hover should include VERSION heading');
+        assert.ok(md.value.includes('Constraint'), 'hover should include constraint row');
+    });
+
+    it('should include COMMUNITY section when github data present', () => {
+        provider.updateResults([makeResult('http', 85)]);
+        const doc = makeMockDocument('  http: ^1.0.0');
+        const hover = provider.provideHover(doc, new vscode.Position(0, 2));
+        const md = hover!.contents as unknown as vscode.MarkdownString;
+        assert.ok(md.value.includes('**COMMUNITY**'), 'hover should include COMMUNITY heading');
+        assert.ok(md.value.includes('Stars'), 'hover should include stars row');
+    });
+
+    it('should include category label in header, not letter grade', () => {
+        provider.updateResults([makeResult('http', 85)]);
+        const doc = makeMockDocument('  http: ^1.0.0');
+        const hover = provider.provideHover(doc, new vscode.Position(0, 2));
+        const md = hover!.contents as unknown as vscode.MarkdownString;
+        // Category label should be present — consistent with vibrancy report
+        assert.ok(md.value.includes('Vibrant'), 'hover should include category label');
+    });
+
+    it('should include Report Issue link when repo URL available', () => {
+        const result: VibrancyResult = {
+            ...makeResult('http', 85),
+            github: {
+                ...makeResult('http', 85).github!,
+                repoUrl: 'https://github.com/dart-lang/http',
+            },
+        };
+        provider.updateResults([result]);
+        const doc = makeMockDocument('  http: ^1.0.0');
+        const hover = provider.provideHover(doc, new vscode.Position(0, 2));
+        const md = hover!.contents as unknown as vscode.MarkdownString;
+        assert.ok(md.value.includes('Report Issue'), 'hover should include Report Issue link');
+        assert.ok(md.value.includes('/issues/new'), 'hover should link to new issue page');
+    });
+
+    it('should include Changelog link in footer', () => {
+        provider.updateResults([makeResult('http', 85)]);
+        const doc = makeMockDocument('  http: ^1.0.0');
+        const hover = provider.provideHover(doc, new vscode.Position(0, 2));
+        const md = hover!.contents as unknown as vscode.MarkdownString;
+        assert.ok(md.value.includes('Changelog'), 'hover should include Changelog link');
+        assert.ok(md.value.includes('pub.dev/packages/http/changelog'));
     });
 });

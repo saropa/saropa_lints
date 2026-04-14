@@ -180,6 +180,38 @@ export const catalogEntries: readonly CatalogEntry[] = [
     icon: 'file',
   },
   {
+    command: 'saropaLints.openFileAndFocusIssues',
+    title: 'Open File and Show Violations',
+    description: 'Open a file in the editor and filter the violations view to it.',
+    category: 'Violations & Filtering',
+    icon: 'go-to-file',
+    internal: true,
+  },
+  {
+    command: 'saropaLints.fileRisk.showViolations',
+    title: 'Show Violations for File (File Risk)',
+    description: 'Filter the violations view to the selected file risk entry.',
+    category: 'Violations & Filtering',
+    icon: 'filter',
+    internal: true,
+  },
+  {
+    command: 'saropaLints.fileRisk.hideFile',
+    title: 'Hide File (File Risk)',
+    description: 'Suppress a file from the violations and file risk views.',
+    category: 'Violations & Filtering',
+    icon: 'eye-closed',
+    internal: true,
+  },
+  {
+    command: 'saropaLints.fileRisk.copyPath',
+    title: 'Copy Path (File Risk)',
+    description: 'Copy the relative file path from a file risk entry.',
+    category: 'Violations & Filtering',
+    icon: 'clippy',
+    internal: true,
+  },
+  {
     command: 'saropaLints.focusIssuesForActiveFile',
     title: 'Show in Saropa Lints',
     description: 'Show violations for the currently open file in the sidebar.',
@@ -781,6 +813,14 @@ export const catalogEntries: readonly CatalogEntry[] = [
     description: 'Create a CI pipeline configuration for dependency monitoring.',
     category: 'Package Vibrancy',
     icon: 'server-process',
+  },
+  {
+    command: 'saropaLints.packageVibrancy.openSourceFolder',
+    title: 'Open Source Folder',
+    description: 'Open the local source folder for a cached package dependency.',
+    category: 'Package Vibrancy',
+    icon: 'folder-opened',
+    internal: true,
   },
 
   // ── Package Vibrancy — Filters ───────────────────────────────────────────

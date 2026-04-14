@@ -13,6 +13,8 @@ export {
     SectionGroupItem,
     SuppressedPackageItem,
     DetailItem,
+    SourceCodeItem,
+    GroupChildItem,
     PrereleaseItem,
     GroupItem,
     DepGraphSummaryItem,

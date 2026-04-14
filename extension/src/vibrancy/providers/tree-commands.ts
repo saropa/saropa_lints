@@ -16,6 +16,7 @@ import { getLatestResults, getScannedPubspecUri } from '../extension-activation'
 import { UpdateFromCodeLensArgs } from './codelens-provider';
 import { ComparisonPanel } from '../views/comparison-webview';
 import { resultToComparisonData } from '../scoring/comparison-ranker';
+import { resolvePackagePaths } from '../services/package-code-analyzer';
 
 // Re-export for backward compatibility
 export { findPubspecYaml, buildVersionEdit, findPackageLines, readVersionConstraint };
@@ -72,6 +73,7 @@ export function registerTreeCommands(
         vscode.commands.registerCommand('saropaLints.packageVibrancy.updateFromCodeLens', updateFromCodeLens),
         vscode.commands.registerCommand('saropaLints.packageVibrancy.focusPackageInTree', focusPackageInTree),
         vscode.commands.registerCommand('saropaLints.packageVibrancy.compareSelected', compareSelected),
+        vscode.commands.registerCommand('saropaLints.packageVibrancy.openSourceFolder', openSourceFolder),
     );
 }
 
@@ -326,5 +328,33 @@ function compareSelected(
         resultToComparisonData(item.result, true));
 
     ComparisonPanel.createOrShow(comparisonData);
+}
+
+/**
+ * Open the local source folder for a package in the file explorer.
+ * Resolves the package path from .dart_tool/package_config.json.
+ */
+async function openSourceFolder(packageName: string): Promise<void> {
+    if (!packageName || typeof packageName !== 'string') { return; }
+
+    const workspaceFolders = vscode.workspace.workspaceFolders;
+    if (!workspaceFolders?.length) { return; }
+
+    const workspaceRoot = workspaceFolders[0].uri;
+    const packagePaths = await resolvePackagePaths(workspaceRoot);
+    const localPath = packagePaths.get(packageName);
+
+    if (!localPath) {
+        vscode.window.showWarningMessage(
+            `Could not find local source for ${packageName}`,
+        );
+        return;
+    }
+
+    // Open the package root folder in a new VS Code window so the user
+    // can browse the source code directly in the editor.
+    await vscode.commands.executeCommand('vscode.openFolder', localPath, {
+        forceNewWindow: true,
+    });
 }
 
