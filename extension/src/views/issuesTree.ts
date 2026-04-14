@@ -28,6 +28,7 @@ import {
 } from '../suppressionsStore';
 import { normalizeOwaspId } from './securityPostureTree';
 import { getProjectRoot } from '../projectRoot';
+import { readDisabledRules } from '../configWriter';
 
 const SEVERITY_ORDER = ['error', 'warning', 'info'] as const;
 const DEFAULT_PAGE_SIZE = 100;
@@ -233,6 +234,9 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
   private severitiesToShow = new Set<string>(SEVERITY_ORDER);
   private impactsToShow = new Set<string>(['critical', 'high', 'medium', 'low', 'opinionated']);
   private rulesToHide = new Set<string>();
+  /** Rules disabled in analysis_options.yaml / analysis_options_custom.yaml.
+   *  Merged with user-set rulesToHide when filtering violations. */
+  private configDisabledRules = new Set<string>();
   private focusedFile: string | undefined = undefined;
   private groupBy: GroupByMode;
   private cachedIndex: Map<string, Map<string, Violation[]>> | null = null;
@@ -325,12 +329,13 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
       const data = readViolations(root);
       const violations = data?.violations ?? [];
       totalUnfiltered = violations.length;
+      this.configDisabledRules = readDisabledRules(root);
       const idx = buildFilteredIndex(
         violations,
         this.textFilter,
         this.severitiesToShow,
         this.impactsToShow,
-        this.rulesToHide,
+        this.effectiveRulesToHide(),
         this.suppressions,
         this.focusedFile,
       );
@@ -473,6 +478,13 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
     this.fireChanged();
   }
 
+  /** Merge user-set rulesToHide with config-disabled rules for filtering. */
+  private effectiveRulesToHide(): Set<string> {
+    if (this.configDisabledRules.size === 0) return this.rulesToHide;
+    if (this.rulesToHide.size === 0) return this.configDisabledRules;
+    return new Set([...this.rulesToHide, ...this.configDisabledRules]);
+  }
+
   private getIndex(root: string): Map<string, Map<string, Violation[]>> | null {
     const data = readViolations(root);
     if (!data) return null;
@@ -482,12 +494,15 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
     // Null when the analyzer doesn't emit this field (backward compat).
     const fixNames = data.config?.rulesWithFixes;
     this.rulesWithFixesSet = fixNames ? new Set(fixNames) : null;
+    // Re-read config-disabled rules so stale violations.json entries for
+    // rules the user has since disabled are automatically hidden.
+    this.configDisabledRules = readDisabledRules(root);
     this.cachedIndex = buildFilteredIndex(
       violations,
       this.textFilter,
       this.severitiesToShow,
       this.impactsToShow,
-      this.rulesToHide,
+      this.effectiveRulesToHide(),
       this.suppressions,
       this.focusedFile,
     );
@@ -694,6 +709,19 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
     if (element?.kind === 'help') {
       return [];
     }
+
+    // Self-contained elements: these carry their own data and don't need
+    // a disk read. Handle them first so a temporarily unavailable
+    // violations.json (write lock during scan, etc.) can't make
+    // already-loaded children disappear.
+    if (element?.kind === 'file') {
+      return this._buildFileChildren(element);
+    }
+    if (element?.kind === 'group') {
+      return buildFileItems(element.violations);
+    }
+
+    // Everything below needs the violations index from disk.
     const root = getProjectRoot();
     if (!root) return [];
 
@@ -749,11 +777,6 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
         if (count > 0) items.push({ kind: 'severity', severity: sev, count });
       }
       return prependIssuesHelpRow(items);
-    }
-
-    // D10: GroupItem children — sub-group violations by file for easy navigation.
-    if (element.kind === 'group') {
-      return buildFileItems(element.violations);
     }
 
     if (element.kind === 'severity') {
@@ -818,25 +841,26 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
       return result;
     }
 
-    if (element.kind === 'file') {
-      const list = element.violations;
-      const sorted = [...list].sort((a, b) => a.line - b.line);
-      const pageSize = getPageSize();
-      const page = sorted.slice(0, pageSize);
-      const result: IssueTreeNode[] = page.map((v) => ({ kind: 'violation', violation: v }));
-      const rest = sorted.length - pageSize;
-      if (rest > 0) {
-        result.push({
-          kind: 'overflow',
-          filePath: element.filePath,
-          severity: element.severity,
-          count: rest,
-        });
-      }
-      return result;
-    }
-
     return [];
+  }
+
+  /** Build children for a file node from its embedded violations array. */
+  private _buildFileChildren(element: FileItem): IssueTreeNode[] {
+    const list = element.violations;
+    const sorted = [...list].sort((a, b) => a.line - b.line);
+    const pageSize = getPageSize();
+    const page = sorted.slice(0, pageSize);
+    const result: IssueTreeNode[] = page.map((v) => ({ kind: 'violation', violation: v }));
+    const rest = sorted.length - pageSize;
+    if (rest > 0) {
+      result.push({
+        kind: 'overflow',
+        filePath: element.filePath,
+        severity: element.severity,
+        count: rest,
+      });
+    }
+    return result;
   }
 
   /**

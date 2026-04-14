@@ -1,6 +1,10 @@
 /**
  * I2: Read/write rule overrides in analysis_options_custom.yaml.
  * Modifies only the RULE OVERRIDES section; other sections are untouched.
+ *
+ * Also provides readDisabledRules() which merges disabled rules from both
+ * analysis_options.yaml (diagnostics section) and analysis_options_custom.yaml
+ * (RULE OVERRIDES section) for use by tree views that filter stale violations.
  */
 
 import * as fs from 'fs';
@@ -21,6 +25,78 @@ const OVERRIDES_SECTION_HEADER = `
 /** Regex to match a rule entry: `rule_name: true` or `rule_name: false`. */
 function ruleEntryPattern(ruleName: string): RegExp {
   return new RegExp(`^(\\s*${ruleName}:\\s*)(true|false)`, 'm');
+}
+
+/**
+ * Cached result of readDisabledRules keyed by project root.
+ * Invalidated when analysis_options.yaml or analysis_options_custom.yaml
+ * is saved (see invalidateDisabledRulesCache). This avoids reading the
+ * same two YAML files 6+ times per refresh cycle (once per tree provider).
+ */
+let _disabledRulesCache: { root: string; rules: Set<string> } | null = null;
+
+/**
+ * Clear the disabled-rules cache so the next readDisabledRules call
+ * re-reads the config files. Call this when analysis_options.yaml or
+ * analysis_options_custom.yaml is saved, or after writeRuleOverrides.
+ */
+export function invalidateDisabledRulesCache(): void {
+  _disabledRulesCache = null;
+}
+
+/**
+ * Read rules explicitly set to `false` in the analysis_options.yaml diagnostics
+ * section AND in analysis_options_custom.yaml RULE OVERRIDES section.
+ *
+ * These are rules the user has intentionally disabled — violations for these
+ * rules should be hidden even if they appear in a stale violations.json file.
+ *
+ * Results are cached per project root and invalidated via
+ * invalidateDisabledRulesCache() on config file save events.
+ */
+export function readDisabledRules(root: string): Set<string> {
+  // Return cached result if the root matches.
+  if (_disabledRulesCache && _disabledRulesCache.root === root) {
+    return _disabledRulesCache.rules;
+  }
+
+  const disabled = new Set<string>();
+
+  // 1. Read diagnostics section from analysis_options.yaml.
+  //    The Dart plugin writes this section under `plugins: > saropa_lints: > diagnostics:`.
+  //    Rules set to `false` are disabled.
+  const mainPath = path.join(root, 'analysis_options.yaml');
+  if (fs.existsSync(mainPath)) {
+    const content = fs.readFileSync(mainPath, 'utf-8');
+    const sectionMatch = /^\s+diagnostics:\s*$/m.exec(content);
+    if (sectionMatch) {
+      const lines = content.substring(sectionMatch.index + sectionMatch[0].length).split('\n');
+      for (const line of lines) {
+        if (line.trim() === '' || line.trimStart().startsWith('#')) continue;
+        // diagnostics entries are indented 6+ spaces; stop at less indentation
+        if (!line.startsWith('      ')) break;
+        const match = /^\s+([\w_]+):\s*(true|false)/.exec(line);
+        if (match && match[2] === 'false') {
+          disabled.add(match[1]);
+        }
+      }
+    }
+  }
+
+  // 2. Read RULE OVERRIDES from analysis_options_custom.yaml.
+  //    Rules set to `false` here also count as disabled.
+  for (const [rule, enabled] of readRuleOverrides(root)) {
+    if (!enabled) {
+      disabled.add(rule);
+    } else {
+      // A `true` override in custom file re-enables a rule, so remove it
+      // from disabled (custom overrides take precedence).
+      disabled.delete(rule);
+    }
+  }
+
+  _disabledRulesCache = { root, rules: disabled };
+  return disabled;
 }
 
 /** Read rule overrides from the RULE OVERRIDES section. */
@@ -90,6 +166,8 @@ export function writeRuleOverrides(root: string, overrides: RuleOverride[]): voi
   }
 
   fs.writeFileSync(filePath, before + after, 'utf-8');
+  // Invalidate cache since the custom config file just changed.
+  invalidateDisabledRulesCache();
 }
 
 /**
@@ -115,4 +193,6 @@ export function removeRuleOverrides(root: string, ruleNames: string[]): void {
     after = after.replace(linePattern, '');
   }
   fs.writeFileSync(filePath, before + after, 'utf-8');
+  // Invalidate cache since the custom config file just changed.
+  invalidateDisabledRulesCache();
 }

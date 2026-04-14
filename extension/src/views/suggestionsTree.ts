@@ -6,9 +6,10 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
-import { readViolations, type ViolationsData } from '../violationsReader';
+import { readViolations, filterDisabledFromData, type ViolationsData } from '../violationsReader';
 import { computeHealthScore, estimateScoreWithout } from '../healthScore';
 import { getProjectRoot } from '../projectRoot';
+import { readDisabledRules } from '../configWriter';
 
 export { countSuggestionItems } from '../suggestionCounts';
 
@@ -46,9 +47,13 @@ export class SuggestionsTreeProvider implements vscode.TreeDataProvider<Suggesti
     const items: SuggestionItem[] = [];
     const cfg = vscode.workspace.getConfiguration('saropaLints');
 
-    const data = root ? readViolations(root) : null;
+    const rawData = root ? readViolations(root) : null;
     // C5: When no data, return empty so viewsWelcome "Run analysis" shows.
-    if (!data) return [];
+    if (!rawData) return [];
+
+    // Filter out violations for rules disabled in config so suggestion
+    // counts stay consistent with the Violations view.
+    const data = filterDisabledFromData(rawData, readDisabledRules(root!));
 
     const byImpact = data?.summary?.byImpact;
     const bySeverity = data?.summary?.bySeverity;

@@ -4,8 +4,9 @@
  */
 
 import * as vscode from 'vscode';
-import { readViolations } from '../violationsReader';
+import { readViolations, filterDisabledFromData } from '../violationsReader';
 import { getProjectRoot } from '../projectRoot';
+import { readDisabledRules } from '../configWriter';
 
 /** Stable id used for expandable nodes (By severity, By impact) so getChildren does not rely on label text. */
 class SummaryItem extends vscode.TreeItem {
@@ -43,9 +44,12 @@ export class SummaryTreeProvider implements vscode.TreeDataProvider<SummaryItem>
     // C5: Return empty for no-workspace and no-data so viewsWelcome renders.
     if (!root) return [];
 
-    const data = readViolations(root);
-    if (!data) return [];
+    const rawData = readViolations(root);
+    if (!rawData) return [];
 
+    // Filter out violations for rules disabled in config so summary
+    // counts stay consistent with the Violations view.
+    const data = filterDisabledFromData(rawData, readDisabledRules(root));
     const s = data.summary;
     const c = data.config;
 
