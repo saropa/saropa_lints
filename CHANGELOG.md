@@ -37,7 +37,7 @@
 
 ### Fixed
 
-- **Publishing:** Changed `publish_to` from `"none"` to `"https://pub.dev"` in pubspec.yaml — the template placeholder blocked `dart pub publish` in CI.
+- **Publishing:** Removed `publish_to: "none"` from pubspec.yaml — the template placeholder blocked `dart pub publish` in CI. The field defaults to pub.dev when absent.
 
 ---
 

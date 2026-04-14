@@ -9,9 +9,6 @@ description: >-
 # SemVer version used by pub.dev and dependency resolution
 version: 10.12.1
 
-# Published to pub.dev via GitHub Actions on tag push
-publish_to: "https://pub.dev"
-
 # SPDX license identifier shown on pub.dev
 license: MIT
 
