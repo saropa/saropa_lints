@@ -32,6 +32,56 @@
 -->
 
 ---
+## [11.0.0]
+
+A major extension UX upgrade featuring a new searchable command catalog sidebar, embedded health dashboards, rich package details with logos and README images, unique vs. shared dependency breakdowns, and workspace-wide diagnostic suppression tracking. — [log](https://github.com/saropa/saropa_lints/blob/v11.0.0/CHANGELOG.md)
+
+### Added
+
+- **Extension:** Commands sidebar section — a searchable, always-visible index of every extension command as the first sidebar section. Includes recent command history and one-click execution. The full editor-tab catalog remains available via the "Open full catalog" link.
+- **Extension:** Overview now embeds Health Summary, Next Steps, and Riskiest Files groups directly — users see violation breakdowns, prioritized actions, and risky files without enabling standalone sidebar sections. Clicking items filters the Violations view. Standalone sections remain available for users who prefer dedicated views.
+- **Extension:** Package Details sidebar section now defaults to visible — it only appears when a Vibrancy scan has results (gated by the existing `when` clause), so no clutter for users who haven't scanned.
+- **Extension:** Vibrancy scoring now includes an ecosystem adoption bonus based on reverse dependency count — how many published packages on pub.dev depend on a given package. Packages with dependents get a score boost (up to +10 points on a logarithmic curve); packages with zero dependents are unaffected (bonus-only, no penalty). The count is displayed in the Community group of the tree view, sidebar detail, and full detail panel with a clickable link to the pub.dev search results.
+- **Extension:** Package detail panel and sidebar now show package description (truncated with "read more" link), topic badges linking to pub.dev topic search, likes count in the Community section, direct dependencies as clickable chips, and a Documentation link to the pub.dev API reference.
+- **Extension:** Package detail panel and sidebar now show the package logo (first non-badge image from README) in the header and a README Images gallery section. Both are lazy-loaded from the GitHub API when the detail panel opens. HTTP-only images are filtered out to prevent silent CSP failures.
+- **Extension:** Package detail and sidebar CSP updated to allow HTTPS images for logo and README screenshots.
+- **Plugin:** Suppression tracking — every diagnostic silenced by `// ignore:`, `// ignore_for_file:`, or baseline is now counted by kind. `SuppressionTracker` class follows the existing `ImpactTracker` pattern. Counts appear in the console summary log, in the `violations.json` summary under `suppressions`, and in the extension Overview tree dashboard and Health Summary section. Foundation for Discussion #56 full suppression audit trail.
+
+### Changed
+
+- **Extension:** Size Distribution chart in the vibrancy report now has an "Include transitives" checkbox. Unchecking it hides transitive packages from both the bar chart and donut chart, recalculating percentages for direct dependencies only. Helps identify whether a package's apparent size is real or inflated by shared transitive weight.
+- **Extension:** Package Vibrancy tree now shows unique vs shared transitive dependency breakdown in the Dependencies group. Shared transitives are already in the project via other direct deps — only unique transitives represent added weight. Package rows show a compact `N% shared` indicator so misleading size reports (e.g. a 63MB package whose weight is entirely from a dep you already carry) are immediately visible.
+- **Extension:** Package detail sidebar webview now includes a Dependencies section with a visual unique/shared bar, counts, and shared dependency names.
+- **Extension:** Package Vibrancy tree row inline icons replaced: removed redundant go-to-file icon (row click already navigates) and added Copy as JSON (`$(clippy)`) and Focus Details (`$(preview)`) inline actions.
+- **Extension:** File Risk section moved above Violations in the sidebar so it acts as a natural file selector before the detail view.
+- **Extension:** File Risk summary replaced the confusing "Top N files have X% of critical issues" label with a flat breakdown: file count, critical, high, and other counts.
+- **Extension:** Clicking a file in the File Risk tree now opens the file in the editor (in addition to filtering the Violations view).
+- **Extension:** File Risk tree now has a Copy All toolbar button (clipboard icon) for copying the full tree as JSON.
+- **Extension:** File Risk file items now have right-click context menu actions: Show Violations for File, Hide File, Copy Path, and Copy as JSON.
+- **Extension:** File Risk summary node is now clickable — opens all violations in the Violations view.
+- **Extension:** File Risk tree now respects view-level suppressions from the Violations view (hidden folders, files, rules, severities, and impacts).
+- **Extension:** File Risk tree shows a "Scanned Xd ago" timestamp node at the bottom. When scan data is older than 24 hours, the node shows a warning icon and clicking it runs analysis to refresh.
+- **Extension:** All tree views (Violations, File Risk, Summary, Security Posture, Suggestions) now respect rules disabled in `analysis_options.yaml` (`diagnostics:` section) and `analysis_options_custom.yaml` (`RULE OVERRIDES` section). Violations for disabled rules are automatically hidden even when `violations.json` is stale.
+- **Extension:** Right-clicking a violation in the Violations tree now offers "Disable rule(s)" to persistently disable the rule via `analysis_options_custom.yaml`, in addition to the existing view-level "Hide Rule" suppression.
+- **Extension:** Package Vibrancy tree items now show the category label in parentheses (e.g. `(Stable)`, `(Outdated)`) instead of the verbose `3/10 — Outdated — 1 problem` format, consistent with the vibrancy report terminology. The full score remains in the hover tooltip and detail views.
+- **Extension:** Group node counts now use brackets (e.g. `Dependencies [5]`) instead of parentheses for visual distinction from the grade.
+- **Extension:** "Source" node renamed to "Source Code" with a shorter description (e.g. `2.5k lines, 18 files`). Full detail shown in tooltip. Double-clicking opens the package's local source folder.
+- **Extension:** Hover tooltip in pubspec.yaml now includes all information from the detail panel — version, community stats, size, file usages, alerts, vulnerabilities, platforms, alternatives, and action items. Footer links include pub.dev, Changelog, Versions, Repository, Open Issues, and Report Issue.
+- **Extension:** Links in the package detail panel and sidebar detail view now render as underlined hyperlinks for discoverability. Added direct links to Changelog, Versions, Open Issues, and Report Issue alongside existing pub.dev and Repository links.
+
+### Fixed
+
+- **Extension:** Violations tree file items no longer expand to empty. `getChildren()` re-read `violations.json` on every expansion — if the file was temporarily unavailable (write lock during scan, concurrent rewrite), the early-return guards returned `[]` before reaching the file-item handler. File and group nodes now resolve from their embedded data before any disk read, so already-loaded children survive a transient I/O hiccup.
+- **Extension:** Pubspec validation no longer shows duplicate diagnostics on startup. `onDidOpenTextDocument` fires retroactively for already-loaded documents, and the `visibleTextEditors` loop covered them again — deduplicating the initial sync prevents `update()` from running twice for the same file.
+
+
+<details>
+<summary>Maintenance</summary>
+
+- Consolidated 7 example fixture packages into 2 (`example/` and `example_packages/`). Merged `example_async`, `example_core`, `example_platforms`, `example_style`, and `example_widgets` into the main `example/` directory. Only `example_packages` remains separate (it requires the `bloc` dependency). Reduces pubspec/lockfile/analysis_options maintenance from 7 projects to 2.
+</details>
+
+---
 
 ## [10.12.2]
 
