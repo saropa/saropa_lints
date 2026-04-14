@@ -21,6 +21,7 @@ function makeResult(
             license: null,
             description: null,
             topics: [],
+            dependencies: [],
         },
         github: {
             stars: 1234,
@@ -45,6 +46,7 @@ function makeResult(
         bloatRating: null,
         license: 'MIT',
         isUnused: false,
+        fileUsages: [],
         platforms: ['android', 'ios', 'web'],
         verifiedPublisher: true,
         wasmReady: true,
@@ -55,6 +57,12 @@ function makeResult(
         latestPrerelease: null,
         prereleaseTag: null,
         vulnerabilities: [],
+        versionGap: null,
+        overrideGap: null,
+        replacementComplexity: null,
+        likes: null,
+        reverseDependencyCount: null,
+        readme: null,
     };
 }
 
@@ -131,7 +139,9 @@ describe('buildDetailViewHtml', () => {
 
     it('should show links section', () => {
         const html = buildDetailViewHtml(makeResult('http', 80));
-        assert.ok(html.includes('View on pub.dev'));
+        // Link text changed from "View on pub.dev" to "pub.dev" in the
+        // sidebar link refactor — verify both the label and target URL.
+        assert.ok(html.includes('pub.dev'));
         assert.ok(html.includes('pub.dev/packages/http'));
         assert.ok(html.includes('Repository'));
     });
@@ -319,5 +329,100 @@ describe('buildDetailViewHtml', () => {
         assert.ok(!html.includes('💡 SUGGESTION'));
         assert.ok(!html.includes('🚨 ALERTS'));
         assert.ok(!html.includes('📱 PLATFORMS'));
+        assert.ok(!html.includes('📊 DEPENDENCIES'));
+    });
+});
+
+describe('buildDetailViewHtml dependencies section', () => {
+    it('should not show dependencies section when no transitive info', () => {
+        const html = buildDetailViewHtml(makeResult('http', 80));
+        assert.ok(!html.includes('📊 DEPENDENCIES'));
+    });
+
+    it('should not show dependencies section when transitive count is zero', () => {
+        const result: VibrancyResult = {
+            ...makeResult('http', 80),
+            transitiveInfo: {
+                directDep: 'http',
+                transitiveCount: 0,
+                flaggedCount: 0,
+                transitives: [],
+                sharedDeps: [],
+            },
+        };
+        const html = buildDetailViewHtml(result);
+        assert.ok(!html.includes('📊 DEPENDENCIES'));
+    });
+
+    it('should show dependencies section with transitive count', () => {
+        const result: VibrancyResult = {
+            ...makeResult('http', 80),
+            transitiveInfo: {
+                directDep: 'http',
+                transitiveCount: 8,
+                flaggedCount: 0,
+                transitives: Array.from({ length: 8 }, (_, i) => `dep_${i}`),
+                sharedDeps: [],
+            },
+        };
+        const html = buildDetailViewHtml(result);
+        assert.ok(html.includes('📊 DEPENDENCIES'));
+        assert.ok(html.includes('8 transitive packages'));
+    });
+
+    it('should show unique and shared breakdown with visual bar', () => {
+        const result: VibrancyResult = {
+            ...makeResult('crop_your_image', 80),
+            transitiveInfo: {
+                directDep: 'crop_your_image',
+                transitiveCount: 12,
+                flaggedCount: 0,
+                transitives: Array.from({ length: 12 }, (_, i) => `dep_${i}`),
+                sharedDeps: ['image', 'meta', 'collection'],
+            },
+        };
+        const html = buildDetailViewHtml(result);
+        assert.ok(html.includes('📊 DEPENDENCIES'));
+        // Visual bar with unique (75%) and shared (25%) segments
+        assert.ok(html.includes('dep-bar-unique'));
+        assert.ok(html.includes('dep-bar-shared'));
+        // Counts: 9 unique, 3 shared (25%)
+        assert.ok(html.includes('9 unique'));
+        assert.ok(html.includes('3 shared'));
+        // Shared dep names listed
+        assert.ok(html.includes('image'));
+        assert.ok(html.includes('meta'));
+        assert.ok(html.includes('collection'));
+    });
+
+    it('should show flagged indicator', () => {
+        const result: VibrancyResult = {
+            ...makeResult('http', 80),
+            transitiveInfo: {
+                directDep: 'http',
+                transitiveCount: 5,
+                flaggedCount: 2,
+                transitives: ['a', 'b', 'c', 'd', 'e'],
+                sharedDeps: [],
+            },
+        };
+        const html = buildDetailViewHtml(result);
+        assert.ok(html.includes('(2 flagged)'));
+    });
+
+    it('should escape shared dep names to prevent XSS', () => {
+        const result: VibrancyResult = {
+            ...makeResult('http', 80),
+            transitiveInfo: {
+                directDep: 'http',
+                transitiveCount: 3,
+                flaggedCount: 0,
+                transitives: ['<script>evil</script>', 'safe_dep', 'another'],
+                sharedDeps: ['<script>evil</script>', 'safe_dep'],
+            },
+        };
+        const html = buildDetailViewHtml(result);
+        assert.ok(!html.includes('<script>evil</script>'));
+        assert.ok(html.includes('&lt;script&gt;'));
     });
 });

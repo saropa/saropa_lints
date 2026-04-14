@@ -5,7 +5,8 @@ import { buildPackageDetailHtml } from './package-detail-html';
 import { fetchVersionGap } from '../services/github-version-gap';
 import { getVersionGapEnabled, getGithubToken } from '../services/config-service';
 import { CacheService } from '../services/cache-service';
-import { extractGitHubRepo } from '../services/github-api';
+import { extractGitHubRepo, fetchReadmeImages } from '../services/github-api';
+import { fetchReverseDependencyCount } from '../services/pub-dev-api';
 import { openFileAtLine } from './view-actions';
 
 const PANEL_ID = 'saropaPackageDetail';
@@ -22,6 +23,8 @@ export class PackageDetailPanel {
     private _result: VibrancyResult;
     private readonly _reviewState: ReviewStateService;
     private readonly _cache: CacheService | undefined;
+    /** Timer handle for debouncing rapid sequential re-renders from lazy fetches. */
+    private _renderTimer: ReturnType<typeof setTimeout> | undefined;
 
     private constructor(
         panel: vscode.WebviewPanel,
@@ -43,10 +46,8 @@ export class PackageDetailPanel {
 
         this._render();
 
-        // Lazy-fetch version gap data if enabled
-        if (getVersionGapEnabled()) {
-            this._fetchAndRenderGap();
-        }
+        // Lazy-fetch additional data in parallel (version gap, README images)
+        this._fetchLazyData();
     }
 
     /** Show the detail panel for a package, creating or revealing as needed. */
@@ -59,9 +60,7 @@ export class PackageDetailPanel {
             PackageDetailPanel.currentPanel._result = result;
             PackageDetailPanel.currentPanel._panel.reveal();
             PackageDetailPanel.currentPanel._render();
-            if (getVersionGapEnabled()) {
-                PackageDetailPanel.currentPanel._fetchAndRenderGap();
-            }
+            PackageDetailPanel.currentPanel._fetchLazyData();
             return;
         }
 
@@ -75,6 +74,19 @@ export class PackageDetailPanel {
         PackageDetailPanel.currentPanel = new PackageDetailPanel(
             panel, result, reviewState, cache,
         );
+    }
+
+    /**
+     * Schedule a render after a short delay to batch rapid updates from
+     * multiple lazy fetches resolving close together. Reduces visible
+     * flicker from sequential full-page HTML replacements.
+     */
+    private _scheduleRender(): void {
+        if (this._renderTimer) { clearTimeout(this._renderTimer); }
+        this._renderTimer = setTimeout(() => {
+            this._renderTimer = undefined;
+            this._render();
+        }, 100);
     }
 
     private _render(): void {
@@ -95,6 +107,81 @@ export class PackageDetailPanel {
         this._panel.webview.html = buildPackageDetailHtml(
             this._result, reviews, summary,
         );
+    }
+
+    /**
+     * Launch all lazy data fetches in parallel. Each one independently
+     * updates the result and re-renders when its data arrives.
+     */
+    private _fetchLazyData(): void {
+        if (getVersionGapEnabled()) {
+            this._fetchAndRenderGap();
+        }
+        this._fetchAndRenderReadme();
+        this._fetchAndRenderReverseDeps();
+    }
+
+    /**
+     * Fetch reverse dependency count from pub.dev, then re-render.
+     * This scrapes pub.dev HTML so it runs lazily when the panel opens.
+     */
+    private async _fetchAndRenderReverseDeps(): Promise<void> {
+        const r = this._result;
+        // Skip if the scan already populated the count — avoids a redundant
+        // fetch and re-render when the data arrived during the scan phase.
+        if (r.reverseDependencyCount !== null) { return; }
+        const fetchTarget = r.package.name + '@' + r.package.version;
+
+        try {
+            const count = await fetchReverseDependencyCount(
+                r.package.name, this._cache,
+            );
+
+            // Guard: discard if user switched to a different package while fetching
+            const currentTarget = this._result.package.name + '@' + this._result.package.version;
+            if (fetchTarget !== currentTarget) { return; }
+
+            if (count !== null) {
+                this._result = { ...this._result, reverseDependencyCount: count };
+                this._scheduleRender();
+            }
+        } catch {
+            // Silently fail — panel still shows everything except reverse deps
+        }
+    }
+
+    /**
+     * Fetch README from GitHub and extract logo + images, then re-render.
+     * Guards against stale fetches when the user switches packages mid-flight.
+     */
+    private async _fetchAndRenderReadme(): Promise<void> {
+        const r = this._result;
+        const repoUrl = r.github?.repoUrl ?? r.pubDev?.repositoryUrl;
+        if (!repoUrl) { return; }
+
+        const parsed = extractGitHubRepo(repoUrl);
+        if (!parsed) { return; }
+
+        const token = getGithubToken() || undefined;
+        const fetchTarget = r.package.name + '@' + r.package.version;
+
+        try {
+            const readme = await fetchReadmeImages(
+                parsed.owner, parsed.repo,
+                { token, cache: this._cache },
+            );
+
+            // Guard: discard if user switched to a different package while fetching
+            const currentTarget = this._result.package.name + '@' + this._result.package.version;
+            if (fetchTarget !== currentTarget) { return; }
+
+            if (readme) {
+                this._result = { ...this._result, readme };
+                this._scheduleRender();
+            }
+        } catch {
+            // Silently fail — panel still shows everything except README images
+        }
     }
 
     /**
@@ -137,7 +224,7 @@ export class PackageDetailPanel {
 
             // Update the result with gap data and re-render
             this._result = { ...this._result, versionGap: gap };
-            this._render();
+            this._scheduleRender();
         } catch {
             // Silently fail — panel still shows everything except gap section
         }
@@ -199,6 +286,7 @@ export class PackageDetailPanel {
 
     private _dispose(): void {
         PackageDetailPanel.currentPanel = undefined;
+        if (this._renderTimer) { clearTimeout(this._renderTimer); }
         for (const d of this._disposables) {
             d.dispose();
         }

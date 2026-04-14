@@ -3,7 +3,7 @@ import { categoryLabel } from '../scoring/status-classifier';
 import { isReplacementPackageName, getReplacementDisplayText } from '../scoring/known-issues';
 import { formatSizeMB } from '../scoring/bloat-calculator';
 import { formatRelativeTime } from '../scoring/time-formatter';
-import { escapeHtml } from './html-utils';
+import { escapeHtml, resolveRepoUrl } from './html-utils';
 import { getDetailStyles } from './detail-view-styles';
 import { getDetailScript } from './detail-view-script';
 
@@ -42,22 +42,28 @@ function buildPackageDetailHtml(r: VibrancyResult): string {
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="Content-Security-Policy"
-        content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline';">
+        content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src https:;">
     <style>${getDetailStyles()}</style>
 </head>
 <body>
     <header>
+        ${buildSidebarLogo(r)}
         <h1>${name}</h1>
         <div class="score ${r.category}">${displayScore}/10</div>
     </header>
     <div class="category-badge ${r.category}">${categoryLabel(r.category)}</div>
-    
+    ${buildSidebarDescription(r)}
+    ${buildSidebarTopics(r)}
+
     ${buildVersionSection(r)}
     ${buildUpdateSection(r)}
     ${buildSuggestionSection(r)}
     ${buildCommunitySection(r)}
+    ${buildDirectDependenciesSection(r)}
+    ${buildDependenciesSection(r)}
     ${buildAlertsSection(r)}
     ${buildPlatformsSection(r)}
+    ${buildSidebarImagesSection(r)}
     ${buildLinksSection(r)}
     
     <script>${getDetailScript()}</script>
@@ -181,6 +187,9 @@ function buildCommunitySection(r: VibrancyResult): string {
         const gh = r.github;
         const metrics: string[] = [];
         metrics.push(`⭐ ${formatNumber(gh.stars)}`);
+        if (r.likes !== null) {
+            metrics.push(`❤️ ${formatNumber(r.likes)}`);
+        }
         const issueCount = gh.trueOpenIssues ?? gh.openIssues;
         metrics.push(`📋 ${issueCount} issues`);
         if (gh.openPullRequests !== undefined) {
@@ -204,6 +213,10 @@ function buildCommunitySection(r: VibrancyResult): string {
         parts.push(`<div class="detail-row">${r.pubDev.pubPoints}/160 pub points</div>`);
     }
 
+    if (r.reverseDependencyCount !== null && r.reverseDependencyCount > 0) {
+        parts.push(`<div class="detail-row">📦 ${r.reverseDependencyCount.toLocaleString('en-US')} dependents</div>`);
+    }
+
     if (r.verifiedPublisher && r.pubDev?.publisher) {
         parts.push(`<div class="detail-row">✅ ${escapeHtml(r.pubDev.publisher)}</div>`);
     }
@@ -213,6 +226,61 @@ function buildCommunitySection(r: VibrancyResult): string {
     }
 
     return buildSection('📊 COMMUNITY', parts);
+}
+
+function buildDependenciesSection(r: VibrancyResult): string {
+    const ti = r.transitiveInfo;
+    if (!ti || ti.transitiveCount === 0) {
+        return '';
+    }
+
+    const parts: string[] = [];
+    const sharedCount = ti.sharedDeps.length;
+    // Clamp to zero — sharedDeps should always be a subset of transitives
+    // but defensive clamping prevents a negative display if data is inconsistent
+    const uniqueCount = Math.max(0, ti.transitiveCount - sharedCount);
+
+    // Total count with flagged indicator
+    const flaggedNote = ti.flaggedCount > 0
+        ? ` <span class="warning">(${ti.flaggedCount} flagged)</span>` : '';
+    parts.push(
+        `<div class="detail-row">`
+        + `${ti.transitiveCount} transitive packages${flaggedNote}`
+        + `</div>`,
+    );
+
+    if (sharedCount > 0) {
+        // Visual bar showing unique vs shared proportion.
+        // Shared deps are already in the project via other direct deps,
+        // so they represent no additional weight — only unique deps are
+        // the real cost of adding this package.
+        const sharedPct = Math.round((sharedCount / ti.transitiveCount) * 100);
+        const uniquePct = 100 - sharedPct;
+        parts.push(
+            `<div class="dep-bar">`
+            + `<div class="dep-bar-unique" style="width:${uniquePct}%"></div>`
+            + `<div class="dep-bar-shared" style="width:${sharedPct}%"></div>`
+            + `</div>`,
+        );
+        parts.push(
+            `<div class="detail-row">`
+            + `🆕 ${uniqueCount} unique · 🔗 ${sharedCount} shared (${sharedPct}%)`
+            + `</div>`,
+        );
+
+        // List shared deps with which other direct deps also use them
+        const top = ti.sharedDeps.slice(0, 5);
+        const sharedNames = top.map(d => escapeHtml(d)).join(', ');
+        const overflow = ti.sharedDeps.length > 5
+            ? ` +${ti.sharedDeps.length - 5} more` : '';
+        parts.push(
+            `<div class="detail-row muted">`
+            + `Shared: ${sharedNames}${overflow}`
+            + `</div>`,
+        );
+    }
+
+    return buildSection('📊 DEPENDENCIES', parts);
 }
 
 function buildAlertsSection(r: VibrancyResult): string {
@@ -259,6 +327,7 @@ function buildPlatformsSection(r: VibrancyResult): string {
 
 function buildLinksSection(r: VibrancyResult): string {
     const pubUrl = `https://pub.dev/packages/${encodeURIComponent(r.package.name)}`;
+    const repoUrl = resolveRepoUrl(r.github?.repoUrl, r.pubDev?.repositoryUrl);
     const links: string[] = [];
 
     // "View Full Details" opens the full editor-area detail panel
@@ -267,15 +336,92 @@ function buildLinksSection(r: VibrancyResult): string {
         + `data-package="${escapeHtml(r.package.name)}">View Full Details</button>`,
     );
 
-    links.push(`<a href="${pubUrl}" data-url="${pubUrl}" class="link">View on pub.dev</a>`);
+    const docUrl = `https://pub.dev/documentation/${encodeURIComponent(r.package.name)}/latest/`;
 
-    // Prefer canonical GitHub URL (may differ from pubspec URL which can include /tree/main)
-    const repoLink = r.github?.repoUrl ?? r.pubDev?.repositoryUrl;
-    if (repoLink) {
-        links.push(`<a href="${escapeHtml(repoLink)}" data-url="${escapeHtml(repoLink)}" class="link">Repository</a>`);
+    // All links styled as underlined hyperlinks for discoverability
+    links.push(sidebarLink(pubUrl, 'pub.dev'));
+    links.push(sidebarLink(docUrl, 'Documentation'));
+    links.push(sidebarLink(`${pubUrl}/changelog`, 'Changelog'));
+    if (repoUrl) {
+        links.push(sidebarLink(repoUrl, 'Repository'));
+        links.push(sidebarLink(`${repoUrl}/issues`, 'Issues'));
+        links.push(sidebarLink(`${repoUrl}/issues/new`, 'Report Issue'));
     }
 
     return `<div class="links-section">${links.join('')}</div>`;
+}
+
+/** Build a styled link for the sidebar detail view. */
+function sidebarLink(url: string, label: string): string {
+    return `<a href="${escapeHtml(url)}" data-url="${escapeHtml(url)}" class="link">${escapeHtml(label)}</a>`;
+}
+
+/** Show package logo from README in the sidebar header (lazy-loaded). */
+function buildSidebarLogo(r: VibrancyResult): string {
+    if (!r.readme?.logoUrl) { return ''; }
+    return `<img class="sidebar-logo" src="${escapeHtml(r.readme.logoUrl)}" alt="${escapeHtml(r.package.name)} logo" />`;
+}
+
+/** Truncated description with "read more" link to pub.dev. */
+function buildSidebarDescription(r: VibrancyResult): string {
+    const desc = r.pubDev?.description;
+    if (!desc) { return ''; }
+
+    const pubUrl = `https://pub.dev/packages/${encodeURIComponent(r.package.name)}`;
+    const maxLen = 80; // Shorter than the full panel (100) — sidebar is narrower
+    if (desc.length <= maxLen) {
+        return `<div class="sidebar-description">${escapeHtml(desc)}</div>`;
+    }
+
+    const slice = desc.substring(0, maxLen);
+    const truncated = slice.replace(/\s+\S*$/, '') || slice;
+    return `<div class="sidebar-description">${escapeHtml(truncated)}&hellip; <a href="${escapeHtml(pubUrl)}" data-url="${escapeHtml(pubUrl)}" class="link">more</a></div>`;
+}
+
+/** Topic pill badges linking to pub.dev topic search. */
+function buildSidebarTopics(r: VibrancyResult): string {
+    const topics = r.pubDev?.topics;
+    if (!topics?.length) { return ''; }
+
+    const badges = topics.map(t => {
+        const url = `https://pub.dev/packages?q=topic%3A${encodeURIComponent(t)}`;
+        return `<a href="${escapeHtml(url)}" data-url="${escapeHtml(url)}" class="sidebar-topic">#${escapeHtml(t)}</a>`;
+    }).join(' ');
+
+    return `<div class="sidebar-topics">${badges}</div>`;
+}
+
+/** Direct dependencies from the package's pubspec (clickable chips). */
+function buildDirectDependenciesSection(r: VibrancyResult): string {
+    const deps = r.pubDev?.dependencies;
+    if (!deps?.length) { return ''; }
+
+    const chips = deps.map(name => {
+        const url = `https://pub.dev/packages/${encodeURIComponent(name)}`;
+        return `<a href="${escapeHtml(url)}" data-url="${escapeHtml(url)}" class="sidebar-dep-chip">${escapeHtml(name)}</a>`;
+    }).join(' ');
+
+    return buildSection('📦 DIRECT DEPS', [`<div class="sidebar-dep-list">${chips}</div>`]);
+}
+
+/** README image gallery (up to 3 images, sidebar-sized). */
+function buildSidebarImagesSection(r: VibrancyResult): string {
+    const images = r.readme?.imageUrls;
+    if (!images?.length) { return ''; }
+
+    // Exclude the logo and cap at 3 for the narrower sidebar
+    const galleryImages = images
+        .filter(url => url !== r.readme?.logoUrl)
+        .slice(0, 3);
+    if (galleryImages.length === 0) { return ''; }
+
+    const items = galleryImages.map(url =>
+        `<a href="${escapeHtml(url)}" data-url="${escapeHtml(url)}">`
+        + `<img src="${escapeHtml(url)}" alt="README image" loading="lazy" />`
+        + `</a>`,
+    ).join('');
+
+    return buildSection('🖼️ README IMAGES', [`<div class="sidebar-gallery">${items}</div>`]);
 }
 
 function buildSection(title: string, parts: string[]): string {

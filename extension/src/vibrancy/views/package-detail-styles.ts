@@ -18,6 +18,15 @@ export function getPackageDetailStyles(): string {
         }
         a:hover { text-decoration: underline; }
 
+        /* Action links look like styled hyperlinks — underlined and link-colored */
+        .action-link {
+            text-decoration: underline;
+            cursor: pointer;
+        }
+        .action-link:hover {
+            color: var(--vscode-textLink-activeForeground, var(--vscode-textLink-foreground));
+        }
+
         h1 {
             font-size: 1.4em;
             margin-bottom: 4px;
@@ -284,6 +293,86 @@ export function getPackageDetailStyles(): string {
             padding: 6px 8px 2px;
             font-size: 0.85em;
             color: var(--vscode-descriptionForeground);
+        }
+
+        /* ---- Description section ---- */
+        .description-text {
+            padding: 8px 12px;
+            font-size: 0.95em;
+            color: var(--vscode-foreground);
+            line-height: 1.6;
+        }
+
+        /* ---- Topics section ---- */
+        .topics-row {
+            padding: 8px 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .topic-badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            background: var(--vscode-badge-background, #4d4d4d);
+            color: var(--vscode-badge-foreground, #fff);
+            font-size: 0.8em;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .topic-badge:hover {
+            opacity: 0.85;
+            text-decoration: none;
+        }
+
+        /* ---- Dependencies section ---- */
+        .dep-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .dep-chip {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            border: 1px solid var(--vscode-widget-border, #333);
+            background: var(--vscode-sideBarSectionHeader-background, #252526);
+            color: var(--vscode-foreground);
+            font-size: 0.8em;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .dep-chip:hover {
+            background: var(--vscode-list-hoverBackground, #2a2d2e);
+            text-decoration: none;
+        }
+
+        /* ---- Package logo in header ---- */
+        .package-logo {
+            width: 48px;
+            height: 48px;
+            object-fit: contain;
+            border-radius: 6px;
+            margin-right: 12px;
+            vertical-align: middle;
+        }
+
+        /* ---- README image gallery ---- */
+        .image-gallery {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .image-gallery img {
+            max-width: 200px;
+            max-height: 150px;
+            object-fit: contain;
+            border-radius: 4px;
+            border: 1px solid var(--vscode-widget-border, #333);
+            cursor: pointer;
+        }
+        .image-gallery img:hover {
+            border-color: var(--vscode-focusBorder, #007acc);
         }
     `;
 }

@@ -9,6 +9,11 @@ interface ChartSegment {
     readonly percentage: number;
     readonly colorIndex: number;
     readonly isOther: boolean;
+    /** Dependency section — used to filter transitives from the chart. */
+    readonly section: string;
+    /** Bytes from transitive packages pooled into this segment (only
+     *  meaningful for the "Other" bucket which consolidates mixed sections). */
+    readonly transitiveBytes: number;
 }
 
 const MAX_NAMED_SEGMENTS = 8;
@@ -21,9 +26,21 @@ export function buildChartSection(results: VibrancyResult[]): string {
     const segments = prepareChartData(results);
     if (segments.length === 0) { return ''; }
 
+    // Only show the toggle when transitives are present in the chart data
+    const hasTransitives = segments.some(s => s.section === 'transitive');
+    const toggleHtml = hasTransitives
+        ? `<label class="chart-toggle">
+               <input type="checkbox" id="include-transitives" checked />
+               Include transitives
+           </label>`
+        : '';
+
     return `
     <section class="chart-section">
-        <h2>Size Distribution</h2>
+        <div class="chart-header">
+            <h2>Size Distribution</h2>
+            ${toggleHtml}
+        </div>
         <div class="chart-container">
             <div class="bar-chart-panel">
                 ${buildBarChart(segments)}
@@ -47,7 +64,11 @@ export function buildChartSection(results: VibrancyResult[]): string {
 function prepareChartData(results: VibrancyResult[]): ChartSegment[] {
     const withSize = results
         .filter(r => r.archiveSizeBytes !== null && r.archiveSizeBytes > 0)
-        .map(r => ({ name: r.package.name, sizeBytes: r.archiveSizeBytes! }));
+        .map(r => ({
+            name: r.package.name,
+            sizeBytes: r.archiveSizeBytes!,
+            section: r.package.section,
+        }));
 
     withSize.sort((a, b) => b.sizeBytes - a.sizeBytes);
 
@@ -74,10 +95,17 @@ function prepareChartData(results: VibrancyResult[]): ChartSegment[] {
         percentage: (pkg.sizeBytes / totalBytes) * 100,
         colorIndex: i,
         isOther: false,
+        section: pkg.section,
+        transitiveBytes: 0,
     }));
 
     if (otherPool.length > 0) {
         const otherBytes = otherPool.reduce((s, p) => s + p.sizeBytes, 0);
+        // Track how many bytes in "Other" come from transitives so the
+        // client-side toggle can subtract them for accurate percentages
+        const otherTransitiveBytes = otherPool
+            .filter(p => p.section === 'transitive')
+            .reduce((s, p) => s + p.sizeBytes, 0);
         const noun = otherPool.length === 1 ? 'package' : 'packages';
         segments.push({
             name: `Other (${otherPool.length} ${noun})`,
@@ -85,6 +113,8 @@ function prepareChartData(results: VibrancyResult[]): ChartSegment[] {
             percentage: (otherBytes / totalBytes) * 100,
             colorIndex: OTHER_COLOR_INDEX,
             isOther: true,
+            section: '',
+            transitiveBytes: otherTransitiveBytes,
         });
     }
 
@@ -103,8 +133,12 @@ function buildBarChart(segments: ChartSegment[]): string {
         const dataAttrs = seg.isOther
             ? 'data-other="true"'
             : `data-package="${safeName}"`;
+        const sectionAttr = seg.section
+            ? ` data-section="${escapeHtml(seg.section)}"` : '';
+        const transitiveAttr = seg.transitiveBytes > 0
+            ? ` data-transitive-size="${seg.transitiveBytes}"` : '';
 
-        return `<div class="bar-row" ${dataAttrs}
+        return `<div class="bar-row" ${dataAttrs}${sectionAttr}${transitiveAttr}
                 data-size="${seg.sizeBytes}" data-pct="${pctLabel}">
             <div class="bar-label" title="${safeName}">${safeName}</div>
             <div class="bar-track">
@@ -142,9 +176,13 @@ function buildDonutChart(segments: ChartSegment[]): string {
         const dataAttrs = seg.isOther
             ? 'data-other="true"'
             : `data-package="${safeName}"`;
+        const sectionAttr = seg.section
+            ? ` data-section="${escapeHtml(seg.section)}"` : '';
+        const transitiveAttr = seg.transitiveBytes > 0
+            ? ` data-transitive-size="${seg.transitiveBytes}"` : '';
 
         return `<circle class="donut-segment donut-color-${seg.colorIndex}"
-            ${dataAttrs}
+            ${dataAttrs}${sectionAttr}${transitiveAttr}
             data-size="${seg.sizeBytes}"
             data-pct="${seg.percentage.toFixed(1)}"
             data-name="${safeName}"
