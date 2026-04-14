@@ -1808,40 +1808,88 @@ enum SuppressionKind {
   baseline,
 }
 
+/// A single suppressed diagnostic — a lint that *would* have been reported
+/// but was silenced by an ignore comment or the baseline.
+///
+/// Equality is based on [file], [line], and [rule] so that duplicate
+/// suppressions (from re-analysis) are collapsed in a [Set].
+class SuppressionRecord {
+  const SuppressionRecord({
+    required this.rule,
+    required this.file,
+    required this.line,
+    required this.kind,
+  });
+
+  final String rule;
+  final String file;
+  final int line;
+  final SuppressionKind kind;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SuppressionRecord &&
+          file == other.file &&
+          line == other.line &&
+          rule == other.rule;
+
+  @override
+  int get hashCode => Object.hash(file, line, rule);
+}
+
 /// Tracks suppressions — diagnostics that *would* have been reported but
 /// were silenced by ignore comments or the baseline.
 ///
-/// Mirrors the [ImpactTracker] pattern: static counters accumulated during
-/// analysis, exposed via getters, and reset between sessions.
+/// Mirrors the [ImpactTracker] pattern: records accumulated during analysis,
+/// exposed via getters, serialized to batch data, and reset between sessions.
 ///
-/// ## Quick-win scope
-///
-/// This initial version tracks aggregate counts only (no per-file records).
-/// A future phase will add full `SuppressionRecord` objects with file/line
-/// detail for the extension sidebar and JSON export.
+/// Each suppression is stored as a [SuppressionRecord] with rule, file, line,
+/// and kind. Duplicates (same file + line + rule) are collapsed via the
+/// record's equality contract.
 class SuppressionTracker {
   SuppressionTracker._();
 
+  static final LinkedHashSet<SuppressionRecord> _records =
+      LinkedHashSet<SuppressionRecord>();
+
+  // Cached per-kind counts — maintained on insert to avoid O(n) scans
+  // when the summary log or JSON export reads them on every flush.
   static int _ignoreCount = 0;
   static int _ignoreForFileCount = 0;
   static int _baselineCount = 0;
 
-  /// Record one suppression of the given [kind].
-  static void record(SuppressionKind kind) {
-    // Increment the counter for the suppression kind. Using a switch
-    // ensures new enum values cause a compile-time error here.
-    switch (kind) {
-      case SuppressionKind.ignore:
-        _ignoreCount++;
-      case SuppressionKind.ignoreForFile:
-        _ignoreForFileCount++;
-      case SuppressionKind.baseline:
-        _baselineCount++;
+  /// Record one suppression with full location data.
+  ///
+  /// Duplicate records (same file + line + rule) are silently ignored
+  /// thanks to [SuppressionRecord]'s equality contract. The per-kind
+  /// counters only increment when a genuinely new record is added.
+  static void record({
+    required String rule,
+    required String file,
+    required int line,
+    required SuppressionKind kind,
+  }) {
+    final r = SuppressionRecord(rule: rule, file: file, line: line, kind: kind);
+    // Only increment the counter if this is a genuinely new record
+    // (not a duplicate that the LinkedHashSet rejects).
+    if (_records.add(r)) {
+      switch (kind) {
+        case SuppressionKind.ignore:
+          _ignoreCount++;
+        case SuppressionKind.ignoreForFile:
+          _ignoreForFileCount++;
+        case SuppressionKind.baseline:
+          _baselineCount++;
+      }
     }
   }
 
+  /// All suppression records, unmodifiable.
+  static List<SuppressionRecord> get records => _records.toList();
+
   /// Total suppressions across all kinds.
-  static int get total => _ignoreCount + _ignoreForFileCount + _baselineCount;
+  static int get total => _records.length;
 
   /// Count of line-level `// ignore:` suppressions.
   static int get ignoreCount => _ignoreCount;
@@ -1859,6 +1907,24 @@ class SuppressionTracker {
     'baseline': _baselineCount,
   };
 
+  /// Suppression counts grouped by rule name.
+  static Map<String, int> get byRule {
+    final counts = <String, int>{};
+    for (final r in _records) {
+      counts[r.rule] = (counts[r.rule] ?? 0) + 1;
+    }
+    return counts;
+  }
+
+  /// Suppression counts grouped by file path.
+  static Map<String, int> get byFile {
+    final counts = <String, int>{};
+    for (final r in _records) {
+      counts[r.file] = (counts[r.file] ?? 0) + 1;
+    }
+    return counts;
+  }
+
   /// Human-readable summary, e.g. "12 suppressions (8 ignore, 2 file-level, 2 baseline)".
   ///
   /// Returns an empty string when there are no suppressions.
@@ -1866,15 +1932,19 @@ class SuppressionTracker {
     final t = total;
     if (t == 0) return '';
 
+    final ic = ignoreCount;
+    final fc = ignoreForFileCount;
+    final bc = baselineCount;
     final parts = <String>[];
-    if (_ignoreCount > 0) parts.add('$_ignoreCount ignore');
-    if (_ignoreForFileCount > 0) parts.add('$_ignoreForFileCount file-level');
-    if (_baselineCount > 0) parts.add('$_baselineCount baseline');
+    if (ic > 0) parts.add('$ic ignore');
+    if (fc > 0) parts.add('$fc file-level');
+    if (bc > 0) parts.add('$bc baseline');
     return '$t suppression${t == 1 ? '' : 's'} (${parts.join(', ')})';
   }
 
-  /// Clear all counters (called between analysis sessions).
+  /// Clear all records and counters (called between analysis sessions).
   static void reset() {
+    _records.clear();
     _ignoreCount = 0;
     _ignoreForFileCount = 0;
     _baselineCount = 0;
@@ -2810,15 +2880,15 @@ class SaropaDiagnosticReporter {
   /// Reports a diagnostic at the given [token].
   void atToken(Token token, [LintCode? code]) {
     if (_isBaselined(token.offset)) {
-      SuppressionTracker.record(SuppressionKind.baseline);
+      _trackSuppression(token.offset, SuppressionKind.baseline);
       return;
     }
     if (_isIgnoredForFile()) {
-      SuppressionTracker.record(SuppressionKind.ignoreForFile);
+      _trackSuppression(token.offset, SuppressionKind.ignoreForFile);
       return;
     }
     if (IgnoreUtils.hasIgnoreCommentOnToken(token, _ruleName)) {
-      SuppressionTracker.record(SuppressionKind.ignore);
+      _trackSuppression(token.offset, SuppressionKind.ignore);
       return;
     }
     _rule.reportAtToken(token);
@@ -2828,12 +2898,12 @@ class SaropaDiagnosticReporter {
   /// Reports a diagnostic at the given offset and length.
   void atOffset({required int offset, required int length}) {
     if (_isBaselined(offset)) {
-      SuppressionTracker.record(SuppressionKind.baseline);
+      _trackSuppression(offset, SuppressionKind.baseline);
       return;
     }
     // File-level only — no AST node available for node-level ignore check.
     if (_isIgnoredForFile()) {
-      SuppressionTracker.record(SuppressionKind.ignoreForFile);
+      _trackSuppression(offset, SuppressionKind.ignoreForFile);
       return;
     }
     _rule.reportAtOffset(offset, length);
@@ -2850,15 +2920,15 @@ class SaropaDiagnosticReporter {
   /// so the summary log and violations.json include suppression counts.
   bool _isSuppressed(int offset, AstNode node) {
     if (_isBaselined(offset)) {
-      SuppressionTracker.record(SuppressionKind.baseline);
+      _trackSuppression(offset, SuppressionKind.baseline);
       return true;
     }
     if (_isIgnoredForFile()) {
-      SuppressionTracker.record(SuppressionKind.ignoreForFile);
+      _trackSuppression(offset, SuppressionKind.ignoreForFile);
       return true;
     }
     if (IgnoreUtils.hasIgnoreComment(node, _ruleName)) {
-      SuppressionTracker.record(SuppressionKind.ignore);
+      _trackSuppression(offset, SuppressionKind.ignore);
       return true;
     }
     return false;
@@ -2915,6 +2985,25 @@ class SaropaDiagnosticReporter {
       ruleName: _ruleName,
       line: line,
       offset: offset,
+    );
+  }
+
+  /// Record a suppression in [SuppressionTracker] with full location data.
+  ///
+  /// Mirrors [_trackViolation] but for diagnostics that were silenced.
+  /// Resolves file path and line number from [_ruleContext] the same way
+  /// violation tracking does, so suppression records are comparable.
+  void _trackSuppression(int offset, SuppressionKind kind) {
+    final unit = _ruleContext.currentUnit;
+    if (unit == null) return;
+    final path = unit.file.path;
+    final line = unit.unit.lineInfo.getLocation(offset).lineNumber;
+
+    SuppressionTracker.record(
+      rule: _ruleName,
+      file: path,
+      line: line,
+      kind: kind,
     );
   }
 }

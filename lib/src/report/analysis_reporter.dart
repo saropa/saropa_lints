@@ -276,6 +276,7 @@ class AnalysisReporter {
       ),
       violations: ImpactTracker.violations,
       rawImportsByFile: ImportGraphTracker.snapshotRawImportsForBatch(),
+      suppressions: SuppressionTracker.records,
     );
 
     ReportConsolidator.writeBatch(projectRoot, batch);

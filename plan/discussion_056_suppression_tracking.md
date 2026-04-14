@@ -171,11 +171,15 @@ Three quick wins shipped as the foundation for full suppression tracking:
 - Added `SuppressionsSummary` and `SuppressionsByKind` interfaces to the extension's `violationsReader.ts` and wired parsing.
 - Added a suppression count row ("N suppressed") to the Overview tree dashboard and the embedded Health Summary section in `overviewTree.ts`.
 
-### Phase 1: Per-file suppression records (next)
+### Phase 1: Per-file suppression records (implemented 2026-04-14)
 
-1. Expand `SuppressionTracker` to store full `SuppressionRecord` objects (rule, file, line, kind) in addition to counts.
-2. Write a separate `suppressions.json` file alongside `violations.json` with the full record list and summary.
-3. Add per-rule and per-file suppression breakdowns to `violations.json` summary.
+1. Added `SuppressionRecord` class (rule, file, line, kind) with equality by (file, line, rule) for deduplication.
+2. Expanded `SuppressionTracker` from simple counters to a `LinkedHashSet<SuppressionRecord>` storing full records. Added `byRule` and `byFile` aggregate getters.
+3. Updated `SaropaDiagnosticReporter` — new `_trackSuppression(offset, kind)` method (mirrors `_trackViolation`) resolves file/line from `_ruleContext` and records to `SuppressionTracker`.
+4. Added suppression records to `BatchData` (serialized as `sup` key) and `ConsolidatedData` for cross-isolate merging with path normalization and deduplication.
+5. `ViolationExporter._buildSummary()` now reads from `ConsolidatedData.suppressions` (not static tracker state), producing `byKind`, `byRule`, and `byFile` breakdowns in `violations.json`.
+6. Extension `SuppressionsSummary` interface extended with `byRule` and `byFile` fields; parsing and tests updated.
+7. Overview tree Health Summary row now shows rule/file counts (e.g. "12 — across 5 rules in 3 files").
 
 ### Phase 2: Extension sidebar section
 
@@ -188,7 +192,7 @@ Three quick wins shipped as the foundation for full suppression tracking:
 
 1. Include suppression summary in text report exports (`reportWriter.ts`).
 2. Include security-rule suppressions in OWASP export (`owaspExport.ts`).
-3. Document `suppressions.json` schema for CI consumption.
+3. Document the `violations.json` suppressions schema for CI consumption.
 4. Add suppression-rate metric (suppressions / total) to Overview tree.
 
 ### Phase 4: Custom prefixes (depends on Discussion #59)
@@ -208,6 +212,6 @@ Three quick wins shipped as the foundation for full suppression tracking:
 
 ## 8. Open questions
 
-- Should `suppressions.json` be cumulative across runs (append) or replaced each run? Replaced is simpler and matches `violations.json` behavior.
 - Should the extension show a suppression-rate percentage (suppressions / total) in the Overview tree, or is that too noisy?
 - Should there be a command to "go to next suppression" for cleanup workflows, similar to "go to next error"?
+- Should the sidebar section (Phase 2) show individual suppression records with click-to-navigate, or just the per-rule/per-file aggregates from violations.json?

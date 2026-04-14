@@ -439,7 +439,13 @@ function buildEmbeddedSummaryItems(workspaceState: vscode.Memento): OverviewItem
     // ignore comments or the baseline so teams can track tech debt.
     const supTotal = s?.suppressions?.total ?? 0;
     if (supTotal > 0) {
-        items.push(new OverviewItem('Suppressed', String(supTotal), undefined, 'eye-closed'));
+        const ruleCount = Object.keys(s?.suppressions?.byRule ?? {}).length;
+        const fileCount = Object.keys(s?.suppressions?.byFile ?? {}).length;
+        // e.g. "across 5 rules in 3 files"
+        const detail = ruleCount > 0
+            ? `across ${ruleCount} rule${ruleCount === 1 ? '' : 's'} in ${fileCount} file${fileCount === 1 ? '' : 's'}`
+            : undefined;
+        items.push(new OverviewItem('Suppressed', `${supTotal}${detail ? ` — ${detail}` : ''}`, undefined, 'eye-closed'));
     }
 
     // Severity breakdown — each item filters the Violations view.

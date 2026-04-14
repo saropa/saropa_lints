@@ -52,6 +52,10 @@ export interface SuppressionsByKind {
 export interface SuppressionsSummary {
   total?: number;
   byKind?: SuppressionsByKind;
+  /** Rule name → suppression count. */
+  byRule?: Record<string, number>;
+  /** Relative file path → suppression count. */
+  byFile?: Record<string, number>;
 }
 
 export interface ViolationsData {
@@ -119,6 +123,18 @@ export function readViolations(workspaceRoot: string): ViolationsData | null {
                       summary.suppressions.byKind &&
                       typeof summary.suppressions.byKind === 'object'
                         ? summary.suppressions.byKind
+                        : undefined,
+                    byRule:
+                      summary.suppressions.byRule &&
+                      typeof summary.suppressions.byRule === 'object' &&
+                      !Array.isArray(summary.suppressions.byRule)
+                        ? summary.suppressions.byRule
+                        : undefined,
+                    byFile:
+                      summary.suppressions.byFile &&
+                      typeof summary.suppressions.byFile === 'object' &&
+                      !Array.isArray(summary.suppressions.byFile)
+                        ? summary.suppressions.byFile
                         : undefined,
                   }
                 : undefined,
