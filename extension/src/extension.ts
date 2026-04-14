@@ -33,6 +33,7 @@ import { FileRiskTreeProvider } from './views/fileRiskTree';
 import { TodosAndHacksTreeProvider } from './views/todosAndHacksTree';
 import { showAboutPanel } from './views/aboutView';
 import { showCommandCatalogPanel } from './views/commandCatalogView';
+import { CommandCatalogSidebarProvider, COMMAND_CATALOG_SIDEBAR_VIEW_ID } from './views/commandCatalogSidebarProvider';
 import { discoverServer } from './driftAdvisor/discovery';
 import { fetchIssues } from './driftAdvisor/client';
 import { mapIssuesToLocations } from './driftAdvisor/mapper';
@@ -58,7 +59,7 @@ import {
   DECAY_RATE,
 } from './healthScore';
 import { registerInlineAnnotations, updateAnnotationsForAllEditors, invalidateAnnotationCache } from './inlineAnnotations';
-import { writeRuleOverrides, removeRuleOverrides } from './configWriter';
+import { writeRuleOverrides, removeRuleOverrides, invalidateDisabledRulesCache } from './configWriter';
 import { logReport, logSection, flushReport } from './reportWriter';
 import { generateOwaspReport } from './owaspExport';
 import { getProjectRoot, invalidateProjectRoot } from './projectRoot';
@@ -238,7 +239,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   );
   const suggestionsProvider = new SuggestionsTreeProvider();
   const securityProvider = new SecurityPostureTreeProvider();
-  const fileRiskProvider = new FileRiskTreeProvider();
+  const fileRiskProvider = new FileRiskTreeProvider(context.workspaceState);
 
   context.subscriptions.push(
     vscode.window.registerTreeDataProvider('saropaLints.overview', overviewProvider),
@@ -281,14 +282,26 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   context.subscriptions.push(
     vscode.window.registerWebviewViewProvider('saropaLints.rulePacks', rulePacksWebviewProvider),
   );
+
+  // Command catalog sidebar — searchable index of every extension command.
+  // Sits at the top of the sidebar so it is the first thing users see.
+  const catalogSidebarProvider = new CommandCatalogSidebarProvider(context.extensionUri, context);
+  context.subscriptions.push(
+    vscode.window.registerWebviewViewProvider(COMMAND_CATALOG_SIDEBAR_VIEW_ID, catalogSidebarProvider),
+  );
   let driftAdvisorRefreshInProgress = false;
 
   let todosAndHacksSaveDebounce: ReturnType<typeof setTimeout> | undefined;
   context.subscriptions.push(
     vscode.workspace.onDidSaveTextDocument((doc) => {
       const base = doc.uri.fsPath.replaceAll('\\', '/');
-      if (base.endsWith('/analysis_options.yaml')) {
-        rulePacksWebviewProvider.refresh();
+      if (base.endsWith('/analysis_options.yaml') || base.endsWith('/analysis_options_custom.yaml')) {
+        // Invalidate the disabled-rules cache so tree views pick up
+        // rule enable/disable changes on the next refresh.
+        invalidateDisabledRulesCache();
+        if (base.endsWith('/analysis_options.yaml')) {
+          rulePacksWebviewProvider.refresh();
+        }
       }
       const cfg = vscode.workspace.getConfiguration('saropaLints.todosAndHacks');
       if (!cfg.get<boolean>('workspaceScanEnabled', false)) return;
@@ -732,6 +745,21 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       updateIssuesViewMessage();
       issuesProvider.expandAll();
       void vscode.commands.executeCommand('saropaLints.issues.focus');
+    }),
+    // Open file in editor AND filter Violations view (File Risk tree click).
+    vscode.commands.registerCommand('saropaLints.openFileAndFocusIssues', (filePath: string) => {
+      const normalized = typeof filePath === 'string' ? filePath.replaceAll('\\', '/') : '';
+      if (!normalized) return;
+      // Open the file in the editor so the user can see the source.
+      const root = getProjectRoot();
+      if (root) {
+        const absPath = path.resolve(root, normalized);
+        void vscode.window.showTextDocument(vscode.Uri.file(absPath), { preview: true });
+      }
+      // Also filter the Violations view to this file.
+      issuesProvider.setTextFilter(normalized);
+      updateIssuesViewMessage();
+      issuesProvider.expandAll();
     }),
     // Focus Violations view filtered to the active editor's file (e.g. from Problems view context menu).
     vscode.commands.registerCommand('saropaLints.focusIssuesForActiveFile', () => {
@@ -1213,9 +1241,11 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
 function resolveRulesFromArg(arg: unknown): string[] | undefined {
   if (Array.isArray(arg)) return arg;
   if (arg && typeof arg === 'object' && 'kind' in arg) {
-    const node = arg as { kind: string; rules?: string[]; ruleName?: string };
+    const node = arg as { kind: string; rules?: string[]; ruleName?: string; violation?: { rule?: string } };
     if (node.kind === 'triageGroup' && Array.isArray(node.rules)) return node.rules;
     if (node.kind === 'triageRule' && typeof node.ruleName === 'string') return [node.ruleName];
+    // Support invoking disableRules from a violation node in the issues tree.
+    if (node.kind === 'violation' && typeof node.violation?.rule === 'string') return [node.violation.rule];
   }
   return undefined;
 }
@@ -1361,7 +1391,37 @@ function registerCopyAsJsonCommands(
     vscode.commands.registerCommand('saropaLints.suggestions.copyAsJson', (item: unknown, selected?: unknown[]) =>
       copyTreeNodesToClipboard(item, selected, serializeSuggestionNode, (n) => suggestionsProvider.getChildren(), 'Suggestions'),
     ),
+
+    // File Risk context menu: show violations for this file (filter without opening).
+    vscode.commands.registerCommand('saropaLints.fileRisk.showViolations', (element: unknown) => {
+      const filePath = extractFileRiskPath(element);
+      if (filePath) void vscode.commands.executeCommand('saropaLints.focusIssuesForFile', filePath);
+    }),
+
+    // File Risk context menu: hide file (suppress from violations view).
+    vscode.commands.registerCommand('saropaLints.fileRisk.hideFile', (element: unknown) => {
+      const filePath = extractFileRiskPath(element);
+      if (!filePath) return;
+      issuesProvider.addSuppressionFile(filePath);
+      // Refresh file risk tree so the hidden file disappears from ranking.
+      fileRiskProvider.refresh();
+      vscode.window.setStatusBarMessage('File hidden. Clear suppressions in Violations to show again.', 3000);
+    }),
+
+    // File Risk context menu: copy relative file path.
+    vscode.commands.registerCommand('saropaLints.fileRisk.copyPath', (element: unknown) => {
+      const filePath = extractFileRiskPath(element);
+      if (filePath) void vscode.env.clipboard.writeText(filePath);
+    }),
   );
+}
+
+/** Extract the relative file path from a FileRiskNode tree element. */
+function extractFileRiskPath(element: unknown): string | undefined {
+  if (!element || typeof element !== 'object') return undefined;
+  const node = element as { kind?: string; risk?: { filePath?: string } };
+  if (node.kind !== 'file' || !node.risk?.filePath) return undefined;
+  return node.risk.filePath;
 }
 
 export function deactivate(): void {

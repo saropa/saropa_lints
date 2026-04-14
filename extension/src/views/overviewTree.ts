@@ -24,10 +24,13 @@
  */
 
 import * as vscode from 'vscode';
-import { readViolations, type ViolationsData } from '../violationsReader';
+import * as path from 'node:path';
+import * as fs from 'node:fs';
+import { readViolations, filterDisabledFromData, type ViolationsData } from '../violationsReader';
 import { loadHistory, getTrendSummary, getScoreTrendSummary, findPreviousScore, detectScoreRegression } from '../runHistory';
-import { computeHealthScore, formatScoreDelta } from '../healthScore';
+import { computeHealthScore, formatScoreDelta, estimateScoreWithout } from '../healthScore';
 import { getProjectRoot } from '../projectRoot';
+import { readDisabledRules } from '../configWriter';
 import type { ConfigTreeProvider } from './configTree';
 import type { ConfigTreeNode } from './triageTree';
 import { renderTreeItem } from './triageTree';
@@ -37,6 +40,8 @@ import {
     OverviewSidebarToggleItem,
     buildSidebarToggleItems,
 } from './overviewSidebarTree';
+import { buildFileRisks } from './fileRiskTree';
+import { loadSuppressions, isPathHidden, isRuleHidden } from '../suppressionsStore';
 
 const OVERVIEW_INTRO_TOOLTIP =
     'Saropa Lints provides 2050+ Dart and Flutter lint rules for security, accessibility, and performance. '
@@ -72,6 +77,36 @@ export class OverviewIssuesParent extends vscode.TreeItem {
     }
 }
 
+/** Collapsible group: health summary (tier, counts, severity/impact breakdown). */
+export class OverviewSummaryParent extends vscode.TreeItem {
+    constructor() {
+        super('Health Summary', vscode.TreeItemCollapsibleState.Collapsed);
+        this.contextValue = 'overviewSummarySection';
+        this.iconPath = new vscode.ThemeIcon('dashboard');
+        this.tooltip = 'Tier, file counts, and violation breakdown by severity and impact';
+    }
+}
+
+/** Collapsible group: prioritized next steps (what to fix first). */
+export class OverviewSuggestionsParent extends vscode.TreeItem {
+    constructor() {
+        super('Next Steps', vscode.TreeItemCollapsibleState.Collapsed);
+        this.contextValue = 'overviewSuggestionsSection';
+        this.iconPath = new vscode.ThemeIcon('lightbulb');
+        this.tooltip = 'Prioritized actions — what to fix next and estimated score impact';
+    }
+}
+
+/** Collapsible group: riskiest files (top files by weighted violation density). */
+export class OverviewRiskParent extends vscode.TreeItem {
+    constructor() {
+        super('Riskiest Files', vscode.TreeItemCollapsibleState.Collapsed);
+        this.contextValue = 'overviewRiskSection';
+        this.iconPath = new vscode.ThemeIcon('flame');
+        this.tooltip = 'Files ranked by violation severity — where to focus first';
+    }
+}
+
 /** C1: Format an ISO timestamp as a human-readable relative time. */
 function formatTimeAgo(iso: string): string {
     const ms = Date.now() - new Date(iso).getTime();
@@ -94,11 +129,12 @@ class OverviewItem extends vscode.TreeItem {
         commandId: string | undefined,
         iconId?: string,
         iconColor?: vscode.ThemeColor,
+        commandArgs?: unknown[],
     ) {
         super(label, vscode.TreeItemCollapsibleState.None);
         this.description = description;
         if (commandId) {
-            this.command = { command: commandId, title: label, arguments: [] };
+            this.command = { command: commandId, title: label, arguments: commandArgs ?? [] };
         }
         this.contextValue = 'overviewItem';
         if (iconId) {
@@ -178,6 +214,27 @@ function appendViolationCountRow(items: OverviewItem[], total: number, critical:
     );
 }
 
+function appendSuppressionRow(items: OverviewItem[], data: ViolationsData): void {
+    const sup = data.summary?.suppressions;
+    const total = sup?.total ?? 0;
+    if (total <= 0) return;
+
+    // Build a short breakdown description, e.g. "5 ignore, 3 file-level, 2 baseline"
+    const parts: string[] = [];
+    const byKind = sup?.byKind;
+    if (byKind?.ignore) parts.push(`${byKind.ignore} ignore`);
+    if (byKind?.ignoreForFile) parts.push(`${byKind.ignoreForFile} file-level`);
+    if (byKind?.baseline) parts.push(`${byKind.baseline} baseline`);
+    const desc = parts.length > 0 ? parts.join(', ') : 'View details';
+
+    items.push(
+        new OverviewItem(
+            `${total} suppressed`, desc,
+            'saropaLints.focusIssues', 'eye-closed',
+        ),
+    );
+}
+
 function appendTrendRow(items: OverviewItem[], history: ReturnType<typeof loadHistory>): void {
     const scoreTrend = getScoreTrendSummary(history);
     if (scoreTrend) {
@@ -236,6 +293,7 @@ function buildDashboardItems(workspaceState: vscode.Memento, data: ViolationsDat
 
     appendHealthRow(items, history, data, total);
     appendViolationCountRow(items, total, critical);
+    appendSuppressionRow(items, data);
     appendTrendRow(items, history);
     appendRegressionAndMilestone(items, history, data);
 
@@ -244,6 +302,302 @@ function buildDashboardItems(workspaceState: vscode.Memento, data: ViolationsDat
         items.push(
             new OverviewItem('Last run', formatTimeAgo(lastEntry.timestamp), 'saropaLints.runAnalysis', 'history'),
         );
+    }
+
+    return items;
+}
+
+// ── Embedded group builders ─────────────────────────────────────────────────
+//
+// These mirror the data from the standalone Summary, Suggestions, and File Risk
+// providers but render as OverviewItem instances so they live inside the
+// Overview tree without type-system coupling to other providers.
+
+/** Max files to show in the embedded "Riskiest Files" group. */
+const EMBEDDED_RISK_MAX = 10;
+
+/** Cached result from loadFilteredViolations — cleared on each refresh(). */
+let _cachedFiltered: { data: ViolationsData; root: string } | null | undefined;
+
+/**
+ * Load violations data filtered by disabled rules and view-level suppressions.
+ * Result is cached until the next OverviewTreeProvider.refresh() call so all
+ * three embedded groups (Summary, Suggestions, Risk) share one read.
+ *
+ * Applies the same suppression filtering as the standalone File Risk view
+ * (path hiding, rule hiding, severity hiding, impact hiding) so the embedded
+ * groups stay consistent with the standalone views.
+ */
+function loadFilteredViolations(
+    workspaceState: vscode.Memento,
+): { data: ViolationsData; root: string } | null {
+    // Return cached result if available (set to undefined on refresh).
+    if (_cachedFiltered !== undefined) return _cachedFiltered;
+
+    const root = getProjectRoot();
+    if (!root) {
+        _cachedFiltered = null;
+        return null;
+    }
+    const raw = readViolations(root);
+    if (!raw) {
+        _cachedFiltered = null;
+        return null;
+    }
+
+    // Filter disabled rules (analysis_options.yaml) then view-level suppressions.
+    const disabled = readDisabledRules(root);
+    const afterDisabled = filterDisabledFromData(raw, disabled);
+    const suppressions = loadSuppressions(workspaceState);
+
+    const filtered = afterDisabled.violations.filter((v) => {
+        if (isPathHidden(suppressions, v.file)) return false;
+        if (isRuleHidden(suppressions, v.file, v.rule)) return false;
+        const severity = (v.severity ?? 'info').toLowerCase();
+        if (suppressions.hiddenSeverities.includes(severity)) return false;
+        const impact = (v.impact ?? 'low').toLowerCase();
+        if (suppressions.hiddenImpacts.includes(impact)) return false;
+        return true;
+    });
+
+    // Rebuild summary counts to match filtered violations.
+    const data: ViolationsData = {
+        ...afterDisabled,
+        violations: filtered,
+        summary: rebuildSummary(afterDisabled, filtered),
+    };
+
+    _cachedFiltered = { data, root };
+    return _cachedFiltered;
+}
+
+/**
+ * Rebuild the summary section to reflect a filtered violation set.
+ * Preserves config, tier, and file-count fields from the original summary;
+ * recomputes severity/impact/total counts from the filtered violations.
+ */
+function rebuildSummary(
+    original: ViolationsData,
+    filtered: ViolationsData['violations'],
+): ViolationsData['summary'] {
+    const s = original.summary;
+    const bySeverity: Record<string, number> = {};
+    const byImpact: Record<string, number> = {};
+    for (const v of filtered) {
+        const sev = (v.severity ?? 'info').toLowerCase();
+        bySeverity[sev] = (bySeverity[sev] ?? 0) + 1;
+        const imp = (v.impact ?? 'low').toLowerCase();
+        byImpact[imp] = (byImpact[imp] ?? 0) + 1;
+    }
+    return {
+        ...s,
+        totalViolations: filtered.length,
+        bySeverity: {
+            error: bySeverity['error'] ?? 0,
+            warning: bySeverity['warning'] ?? 0,
+            info: bySeverity['info'] ?? 0,
+        },
+        byImpact: {
+            critical: byImpact['critical'] ?? 0,
+            high: byImpact['high'] ?? 0,
+            medium: byImpact['medium'] ?? 0,
+            low: byImpact['low'] ?? 0,
+            opinionated: byImpact['opinionated'] ?? 0,
+        },
+    };
+}
+
+/** Clear the cached filtered violations — call from refresh(). */
+function invalidateEmbeddedCache(): void {
+    _cachedFiltered = undefined;
+}
+
+/**
+ * Health Summary: tier, file counts, severity/impact breakdown.
+ * Mirrors summaryTree.ts logic but renders as OverviewItems.
+ */
+function buildEmbeddedSummaryItems(workspaceState: vscode.Memento): OverviewItem[] {
+    const loaded = loadFilteredViolations(workspaceState);
+    if (!loaded) return [];
+    const { data } = loaded;
+    const s = data.summary;
+    const c = data.config;
+    const total = s?.totalViolations ?? data.violations.length;
+
+    const items: OverviewItem[] = [
+        new OverviewItem('Total violations', String(total), 'saropaLints.focusIssues', 'symbol-number'),
+        new OverviewItem('Tier', c?.tier ?? '—', undefined, 'shield'),
+    ];
+    if (s?.filesAnalyzed != null) {
+        items.push(new OverviewItem('Files analyzed', String(s.filesAnalyzed), undefined, 'file'));
+    }
+    if (s?.filesWithIssues != null) {
+        items.push(new OverviewItem('Files with violations', String(s.filesWithIssues), undefined, 'file'));
+    }
+
+    // Suppression count — shows how many diagnostics were silenced by
+    // ignore comments or the baseline so teams can track tech debt.
+    const supTotal = s?.suppressions?.total ?? 0;
+    if (supTotal > 0) {
+        items.push(new OverviewItem('Suppressed', String(supTotal), undefined, 'eye-closed'));
+    }
+
+    // Severity breakdown — each item filters the Violations view.
+    if (s?.bySeverity) {
+        const sev = s.bySeverity;
+        if (sev.error) {
+            items.push(new OverviewItem(
+                `Errors: ${sev.error}`, 'Click to filter',
+                'saropaLints.focusIssuesWithSeverityFilter', 'error',
+                undefined, ['error'],
+            ));
+        }
+        if (sev.warning) {
+            items.push(new OverviewItem(
+                `Warnings: ${sev.warning}`, 'Click to filter',
+                'saropaLints.focusIssuesWithSeverityFilter', 'warning',
+                undefined, ['warning'],
+            ));
+        }
+        if (sev.info) {
+            items.push(new OverviewItem(
+                `Info: ${sev.info}`, 'Click to filter',
+                'saropaLints.focusIssuesWithSeverityFilter', 'info',
+                undefined, ['info'],
+            ));
+        }
+    }
+
+    // Impact breakdown — each item filters the Violations view.
+    if (s?.byImpact) {
+        const bi = s.byImpact;
+        if (bi.critical) {
+            items.push(new OverviewItem(
+                `Critical: ${bi.critical}`, 'Click to filter',
+                'saropaLints.focusIssuesWithImpactFilter', 'flame',
+                new vscode.ThemeColor('list.errorForeground'), ['critical'],
+            ));
+        }
+        if (bi.high) {
+            items.push(new OverviewItem(
+                `High: ${bi.high}`, 'Click to filter',
+                'saropaLints.focusIssuesWithImpactFilter', 'warning',
+                new vscode.ThemeColor('list.warningForeground'), ['high'],
+            ));
+        }
+    }
+    return items;
+}
+
+/**
+ * Next Steps: prioritized actions with estimated score impact.
+ * Mirrors suggestionsTree.ts logic but renders as OverviewItems.
+ */
+function buildEmbeddedSuggestionItems(workspaceState: vscode.Memento): OverviewItem[] {
+    const loaded = loadFilteredViolations(workspaceState);
+    if (!loaded) return [];
+    const { data, root } = loaded;
+    const byImpact = data.summary?.byImpact;
+    const bySeverity = data.summary?.bySeverity;
+    const total = data.summary?.totalViolations ?? data.violations.length;
+    const critical = byImpact?.critical ?? 0;
+    const high = byImpact?.high ?? 0;
+    const errors = bySeverity?.error ?? 0;
+
+    const currentScore = computeHealthScore(data)?.score;
+    const items: OverviewItem[] = [];
+
+    if (critical > 0) {
+        const projected = estimateScoreWithout(data, 'critical');
+        const gain = (currentScore !== undefined && projected !== null)
+            ? projected - currentScore : null;
+        const desc = (gain !== null && gain > 0)
+            ? `estimated +${gain} points` : 'Show in Issues';
+        items.push(new OverviewItem(
+            `Fix ${critical} critical issue(s)`, desc,
+            'saropaLints.focusIssuesWithImpactFilter', 'flame',
+            new vscode.ThemeColor('list.errorForeground'), ['critical'],
+        ));
+    }
+    if (high > 0 && items.length < 3) {
+        const projected = estimateScoreWithout(data, 'high');
+        const gain = (currentScore !== undefined && projected !== null)
+            ? projected - currentScore : null;
+        const desc = (gain !== null && gain > 0)
+            ? `estimated +${gain} points` : 'Show in Issues';
+        items.push(new OverviewItem(
+            `Address ${high} high-impact issue(s)`, desc,
+            'saropaLints.focusIssuesWithImpactFilter', 'warning',
+            new vscode.ThemeColor('list.warningForeground'), ['high'],
+        ));
+    }
+    if (errors > 0 && !items.some((i) => String(i.label).includes('error'))) {
+        items.push(new OverviewItem(
+            `Fix ${errors} analyzer error(s)`, 'Show in Issues',
+            'saropaLints.focusIssuesWithSeverityFilter', 'error',
+            undefined, ['error'],
+        ));
+    }
+
+    // Baseline suggestion — only if no baseline file exists.
+    const baselinePath = path.join(root, 'saropa_baseline.json');
+    if (total > 0 && !fs.existsSync(baselinePath)) {
+        items.push(new OverviewItem(
+            'Create baseline', 'Suppress existing, check new code',
+            'saropaLints.openConfig', 'new-file',
+        ));
+    }
+
+    return items.slice(0, 6);
+}
+
+/**
+ * Riskiest Files: top N files by severity-weighted violation density.
+ * Compact version of fileRiskTree.ts — shows fewer files with simpler rendering.
+ */
+function buildEmbeddedRiskItems(workspaceState: vscode.Memento): OverviewItem[] {
+    const loaded = loadFilteredViolations(workspaceState);
+    if (!loaded) return [];
+    const { data } = loaded;
+    if (data.violations.length === 0) return [];
+
+    const risks = buildFileRisks(data.violations);
+    if (risks.length === 0) return [];
+
+    const items: OverviewItem[] = [];
+    for (const r of risks.slice(0, EMBEDDED_RISK_MAX)) {
+        const base = path.basename(r.filePath);
+        // Pick icon based on severity: flame for critical, warning for high, info otherwise.
+        let iconId = 'info';
+        let iconColor: vscode.ThemeColor | undefined;
+        if (r.critical > 0) {
+            iconId = 'flame';
+            iconColor = new vscode.ThemeColor('list.errorForeground');
+        } else if (r.high > 0) {
+            iconId = 'warning';
+            iconColor = new vscode.ThemeColor('list.warningForeground');
+        }
+
+        const parts: string[] = [`${r.total} violation${r.total === 1 ? '' : 's'}`];
+        if (r.critical > 0) parts.push(`${r.critical} critical`);
+        if (r.high > 0) parts.push(`${r.high} high`);
+
+        items.push(new OverviewItem(
+            base, parts.join(', '),
+            'saropaLints.openFileAndFocusIssues', iconId, iconColor,
+            [r.filePath],
+        ));
+    }
+
+    // If there are more files than shown, add a "Show all" item that
+    // enables the standalone File Risk sidebar section.
+    if (risks.length > EMBEDDED_RISK_MAX) {
+        items.push(new OverviewItem(
+            `${risks.length - EMBEDDED_RISK_MAX} more files…`,
+            'Open File Risk section',
+            'saropaLints.toggleSidebarSection', 'ellipsis',
+            undefined, ['sidebar.showFileRisk'],
+        ));
     }
 
     return items;
@@ -262,6 +616,9 @@ export type OverviewTreeNode =
     | OverviewHelpParent
     | OverviewSettingsParent
     | OverviewIssuesParent
+    | OverviewSummaryParent
+    | OverviewSuggestionsParent
+    | OverviewRiskParent
     | OverviewSidebarSectionParent
     | OverviewSidebarToggleItem
     | ConfigTreeNode;
@@ -279,6 +636,7 @@ export class OverviewTreeProvider implements vscode.TreeDataProvider<OverviewTre
     ) {}
 
     refresh(): void {
+        invalidateEmbeddedCache();
         this._onDidChangeTreeData.fire();
     }
 
@@ -303,6 +661,15 @@ export class OverviewTreeProvider implements vscode.TreeDataProvider<OverviewTre
         }
         if (element !== undefined && isConfigTreeNode(element)) {
             return this.configProvider.getChildren(element);
+        }
+        if (element instanceof OverviewSummaryParent) {
+            return buildEmbeddedSummaryItems(this.workspaceState);
+        }
+        if (element instanceof OverviewSuggestionsParent) {
+            return buildEmbeddedSuggestionItems(this.workspaceState);
+        }
+        if (element instanceof OverviewRiskParent) {
+            return buildEmbeddedRiskItems(this.workspaceState);
         }
         if (element instanceof OverviewSidebarSectionParent) {
             return buildSidebarToggleItems(cfg, this.workspaceState, this.getSectionCounts());
@@ -364,6 +731,19 @@ export class OverviewTreeProvider implements vscode.TreeDataProvider<OverviewTre
         ];
         if (hasIssues) items.push(issuesParent);
         items.push(sidebarParent, ...buildDashboardItems(this.workspaceState, data));
+
+        // Embedded groups: surface Summary, Suggestions, and File Risk data
+        // directly inside Overview so users discover them without enabling
+        // standalone sidebar sections. Each group builds items on expand using
+        // the same violations.json data the standalone views read.
+        const total = data.summary?.totalViolations ?? data.violations?.length ?? 0;
+        if (total > 0) {
+            items.push(
+                new OverviewSummaryParent(),
+                new OverviewSuggestionsParent(),
+                new OverviewRiskParent(),
+            );
+        }
         return items;
     }
 }
