@@ -8,7 +8,7 @@ import { classifyLicense, licenseEmoji } from '../scoring/license-classifier';
 import { worstSeverity, severityEmoji, severityLabel } from '../scoring/vuln-classifier';
 import { formatRelativeTime } from '../scoring/time-formatter';
 import { formatPrereleaseTag } from '../scoring/prerelease-classifier';
-import { escapeHtml } from './html-utils';
+import { escapeHtml, resolveRepoUrl } from './html-utils';
 import { getPackageDetailStyles } from './package-detail-styles';
 import { getPackageDetailScript } from './package-detail-script';
 
@@ -23,14 +23,18 @@ export function buildPackageDetailHtml(
 ): string {
     const parts = [
         buildHeader(result),
+        buildDescriptionSection(result),
+        buildTopicsSection(result),
         buildVersionSection(result),
         buildCommunitySection(result),
         buildFileUsagesSection(result),
+        buildDependenciesSection(result),
         buildAlertsSection(result),
         buildVersionGapSection(result.versionGap, 'Version Gap', reviews, reviewSummary),
         buildVersionGapSection(result.overrideGap, 'Override Gap', reviews, reviewSummary),
         buildPlatformsSection(result),
         buildSuggestionsSection(result),
+        buildImagesSection(result),
         buildLinksRow(result),
     ];
 
@@ -47,17 +51,29 @@ function buildHeader(r: VibrancyResult): string {
     const cat = escapeHtml(categoryLabel(r.category));
     const license = r.license ? escapeHtml(r.license) : '';
     const pubUrl = `https://pub.dev/packages/${encodeURIComponent(r.package.name)}`;
-    const repoUrl = r.github?.repoUrl ?? r.pubDev?.repositoryUrl ?? '';
+    const repoUrl = resolveRepoUrl(r.github?.repoUrl, r.pubDev?.repositoryUrl);
+
+    const docUrl = `https://pub.dev/documentation/${encodeURIComponent(r.package.name)}/latest/`;
 
     const links: string[] = [];
-    links.push(`<a href="#" data-action="openUrl" data-url="${escapeHtml(pubUrl)}">pub.dev</a>`);
+    links.push(actionLink(pubUrl, 'pub.dev'));
+    links.push(actionLink(docUrl, 'Documentation'));
+    links.push(actionLink(`${pubUrl}/changelog`, 'Changelog'));
+    links.push(actionLink(`${pubUrl}/versions`, 'Versions'));
     if (repoUrl) {
-        links.push(`<a href="#" data-action="openUrl" data-url="${escapeHtml(repoUrl)}">GitHub</a>`);
+        links.push(actionLink(repoUrl, 'Repository'));
+        links.push(actionLink(`${repoUrl}/issues`, 'Open Issues'));
+        links.push(actionLink(`${repoUrl}/issues/new`, 'Report Issue'));
     }
+
+    // Show package logo from README if available (lazy-loaded)
+    const logoHtml = r.readme?.logoUrl
+        ? `<img class="package-logo" src="${escapeHtml(r.readme.logoUrl)}" alt="${escapeHtml(r.package.name)} logo" />`
+        : '';
 
     return `
         <div class="header">
-            <h1>${escapeHtml(r.package.name)}</h1>
+            ${logoHtml}<h1>${escapeHtml(r.package.name)}</h1>
             <span>v${escapeHtml(r.package.version)}</span>
             <span class="badge ${badgeClass}">${score}/10 ${cat}</span>
             <div class="header-meta">
@@ -65,6 +81,36 @@ function buildHeader(r: VibrancyResult): string {
             </div>
         </div>
     `;
+}
+
+function buildDescriptionSection(r: VibrancyResult): string {
+    const desc = r.pubDev?.description;
+    if (!desc) { return ''; }
+
+    const pubUrl = `https://pub.dev/packages/${encodeURIComponent(r.package.name)}`;
+    const maxLen = 100;
+
+    if (desc.length <= maxLen) {
+        return `<div class="description-text">${escapeHtml(desc)}</div>`;
+    }
+
+    // Truncate at the last word boundary within maxLen. If no whitespace
+    // exists (e.g. a single long URL), falls back to the hard maxLen cut.
+    const slice = desc.substring(0, maxLen);
+    const truncated = slice.replace(/\s+\S*$/, '') || slice;
+    return `<div class="description-text">${escapeHtml(truncated)}&hellip; ${actionLink(pubUrl, 'read more')}</div>`;
+}
+
+function buildTopicsSection(r: VibrancyResult): string {
+    const topics = r.pubDev?.topics;
+    if (!topics?.length) { return ''; }
+
+    const badges = topics.map(t => {
+        const url = `https://pub.dev/packages?q=topic%3A${encodeURIComponent(t)}`;
+        return `<a href="#" class="topic-badge" data-action="openUrl" data-url="${escapeHtml(url)}">#${escapeHtml(t)}</a>`;
+    }).join(' ');
+
+    return `<div class="topics-row">${badges}</div>`;
 }
 
 function buildVersionSection(r: VibrancyResult): string {
@@ -100,9 +146,11 @@ function buildVersionSection(r: VibrancyResult): string {
             + `data-version="${escapeHtml(r.updateInfo.latestVersion)}">Upgrade</button>`,
         );
     }
+    const changelogUrl = `https://pub.dev/packages/${encodeURIComponent(r.package.name)}/changelog`;
+    // Styled as a secondary button (not an <a>) to match the Upgrade button visually
     buttons.push(
-        `<button class="action-btn secondary" data-action="changelog" `
-        + `data-name="${escapeHtml(r.package.name)}">View Changelog</button>`,
+        `<button class="action-btn secondary" data-action="openUrl" `
+        + `data-url="${escapeHtml(changelogUrl)}">View Changelog</button>`,
     );
 
     return section('VERSION', `
@@ -117,11 +165,22 @@ function buildCommunitySection(r: VibrancyResult): string {
 
     if (r.github) {
         const gh = r.github;
+        const repoUrl = resolveRepoUrl(gh.repoUrl, r.pubDev?.repositoryUrl);
         rows.push(row('Stars', `${gh.stars}`));
+        if (r.likes !== null) {
+            rows.push(row('Likes', `${r.likes}`));
+        }
         const issues = gh.trueOpenIssues ?? gh.openIssues;
-        rows.push(row('Open Issues', `${issues}`));
+        // Make issue/PR counts clickable links to the GitHub pages
+        const issueLink = repoUrl
+            ? `${actionLink(`${repoUrl}/issues`, `${issues}`)} · ${actionLink(`${repoUrl}/issues/new`, 'Report')}`
+            : `${issues}`;
+        rows.push(row('Open Issues', issueLink));
         if (gh.openPullRequests !== undefined) {
-            rows.push(row('Open PRs', `${gh.openPullRequests}`));
+            const prLink = repoUrl
+                ? actionLink(`${repoUrl}/pulls`, `${gh.openPullRequests}`)
+                : `${gh.openPullRequests}`;
+            rows.push(row('Open PRs', prLink));
         }
         const activity = gh.closedIssuesLast90d + gh.mergedPrsLast90d;
         rows.push(row('Activity (90d)',
@@ -144,6 +203,11 @@ function buildCommunitySection(r: VibrancyResult): string {
         const flagged = r.transitiveInfo.flaggedCount > 0
             ? ` (${r.transitiveInfo.flaggedCount} flagged)` : '';
         rows.push(row('Transitive Deps', `${r.transitiveInfo.transitiveCount}${flagged}`));
+    }
+    if (r.reverseDependencyCount !== null && r.reverseDependencyCount > 0) {
+        // Link to pub.dev search for packages depending on this one
+        const depSearchUrl = `https://pub.dev/packages?q=dependency%3A${encodeURIComponent(r.package.name)}`;
+        rows.push(row('Dependents', `${actionLink(depSearchUrl, `${r.reverseDependencyCount.toLocaleString('en-US')} packages`)}`));
     }
 
     return section('COMMUNITY', `<table class="metrics-table"><tbody>${rows.join('')}</tbody></table>`);
@@ -178,6 +242,18 @@ function buildFileUsagesSection(r: VibrancyResult): string {
     const count = active.length;
     const label = count === 1 ? '1 file' : `${count} files`;
     return section(`FILE USAGES (${label})`, items.join(''));
+}
+
+function buildDependenciesSection(r: VibrancyResult): string {
+    const deps = r.pubDev?.dependencies;
+    if (!deps?.length) { return ''; }
+
+    const chips = deps.map(name => {
+        const url = `https://pub.dev/packages/${encodeURIComponent(name)}`;
+        return `<a href="#" class="dep-chip" data-action="openUrl" data-url="${escapeHtml(url)}">${escapeHtml(name)}</a>`;
+    }).join(' ');
+
+    return section('DEPENDENCIES', `<div class="dep-list">${chips}</div>`);
 }
 
 function buildAlertsSection(r: VibrancyResult): string {
@@ -362,13 +438,38 @@ function buildSuggestionsSection(r: VibrancyResult): string {
     return section('SUGGESTIONS', items);
 }
 
+function buildImagesSection(r: VibrancyResult): string {
+    const images = r.readme?.imageUrls;
+    if (!images?.length) { return ''; }
+
+    // Exclude the logo (already shown in header) and cap at 4 gallery images
+    const galleryImages = images
+        .filter(url => url !== r.readme?.logoUrl)
+        .slice(0, 4);
+    if (galleryImages.length === 0) { return ''; }
+
+    const items = galleryImages.map(url =>
+        `<a href="#" data-action="openUrl" data-url="${escapeHtml(url)}">`
+        + `<img src="${escapeHtml(url)}" alt="README image" loading="lazy" />`
+        + `</a>`,
+    ).join('');
+
+    return section('README IMAGES', `<div class="image-gallery">${items}</div>`);
+}
+
 function buildLinksRow(r: VibrancyResult): string {
     const pubUrl = `https://pub.dev/packages/${encodeURIComponent(r.package.name)}`;
-    const repoUrl = r.github?.repoUrl ?? r.pubDev?.repositoryUrl ?? '';
+    const docUrl = `https://pub.dev/documentation/${encodeURIComponent(r.package.name)}/latest/`;
+    const repoUrl = resolveRepoUrl(r.github?.repoUrl, r.pubDev?.repositoryUrl);
     const links: string[] = [];
-    links.push(`<a href="#" data-action="openUrl" data-url="${escapeHtml(pubUrl)}">View on pub.dev</a>`);
+    links.push(actionLink(pubUrl, 'View on pub.dev'));
+    links.push(actionLink(docUrl, 'Documentation'));
+    links.push(actionLink(`${pubUrl}/changelog`, 'Changelog'));
+    links.push(actionLink(`${pubUrl}/versions`, 'Versions'));
     if (repoUrl) {
-        links.push(`<a href="#" data-action="openUrl" data-url="${escapeHtml(repoUrl)}">Repository</a>`);
+        links.push(actionLink(repoUrl, 'Repository'));
+        links.push(actionLink(`${repoUrl}/issues`, 'Open Issues'));
+        links.push(actionLink(`${repoUrl}/issues/new`, 'Report Issue'));
     }
     return `<div class="links-row">${links.join(' &middot; ')}</div>`;
 }
@@ -376,6 +477,11 @@ function buildLinksRow(r: VibrancyResult): string {
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
+
+/** Build an <a> tag styled as a link that opens a URL via the webview message handler. */
+function actionLink(url: string, label: string): string {
+    return `<a href="#" class="action-link" data-action="openUrl" data-url="${escapeHtml(url)}">${escapeHtml(label)}</a>`;
+}
 
 function section(title: string, body: string): string {
     return `
@@ -413,7 +519,7 @@ function wrapHtml(title: string, body: string): string {
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="Content-Security-Policy"
-          content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline';">
+          content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src https:;">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${escapeHtml(title)}</title>
     <style>${getPackageDetailStyles()}</style>

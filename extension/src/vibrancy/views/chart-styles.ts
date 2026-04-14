@@ -14,10 +14,29 @@ export function getChartStyles(): string {
             --chart-color-8: hsl(270, 50%, 60%);
             --chart-color-9: var(--vscode-descriptionForeground);
         }
+        .chart-header {
+            display: flex;
+            align-items: baseline;
+            gap: 16px;
+            margin-bottom: 12px;
+        }
         .chart-section h2 {
             font-size: 1.1em;
-            margin-bottom: 12px;
+            margin-bottom: 0;
             opacity: 0.9;
+        }
+        .chart-toggle {
+            font-size: 0.85em;
+            color: var(--vscode-descriptionForeground);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            user-select: none;
+        }
+        .chart-toggle input[type="checkbox"] {
+            cursor: pointer;
+            accent-color: var(--vscode-focusBorder);
         }
         .chart-container {
             display: flex;

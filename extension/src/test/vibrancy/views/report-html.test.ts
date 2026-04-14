@@ -25,7 +25,7 @@ function makeResult(
             publisher: null,
             license: null,
             description: null,
-            topics: [],
+            topics: [], dependencies: [],
         },
         github: { stars: 42, openIssues: 5, closedIssuesLast90d: 3,
             mergedPrsLast90d: 2, avgCommentsPerIssue: 1.5,
@@ -44,6 +44,7 @@ function makeResult(
         isUnused: false, fileUsages: [], platforms: null, verifiedPublisher: false, wasmReady: null, blocker: null, upgradeBlockStatus: 'up-to-date',
         transitiveInfo: null, alternatives: [], latestPrerelease: null, prereleaseTag: null, vulnerabilities: [],
         versionGap: null, overrideGap: null, replacementComplexity: null,
+        likes: null, reverseDependencyCount: null, readme: null,
     };
 }
 

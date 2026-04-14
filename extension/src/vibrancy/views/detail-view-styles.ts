@@ -209,6 +209,24 @@ section[data-expanded="false"] .section-content {
     text-decoration: underline;
 }
 
+/* Unique vs shared dependency bar — shows proportion of transitives that
+   are already in the project via other direct deps (shared = no added cost). */
+.dep-bar {
+    display: flex;
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 6px 0;
+}
+
+.dep-bar-unique {
+    background: var(--vscode-editorWarning-foreground);
+}
+
+.dep-bar-shared {
+    background: var(--vscode-testing-iconPassed);
+}
+
 .links-section {
     display: flex;
     flex-direction: column;
@@ -220,12 +238,96 @@ section[data-expanded="false"] .section-content {
 
 .link {
     color: var(--vscode-textLink-foreground);
-    text-decoration: none;
+    text-decoration: underline;
     font-size: 12px;
+    cursor: pointer;
 }
 
 .link:hover {
-    text-decoration: underline;
+    color: var(--vscode-textLink-activeForeground, var(--vscode-textLink-foreground));
+}
+
+/* ---- Sidebar logo in header ---- */
+.sidebar-logo {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    border-radius: 4px;
+    margin-right: 8px;
+    flex-shrink: 0;
+}
+
+/* ---- Sidebar description ---- */
+.sidebar-description {
+    font-size: 12px;
+    color: var(--vscode-descriptionForeground);
+    margin-bottom: 10px;
+    line-height: 1.4;
+}
+
+/* ---- Sidebar topic badges ---- */
+.sidebar-topics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 12px;
+}
+
+.sidebar-topic {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 10px;
+    background: var(--vscode-badge-background, #4d4d4d);
+    color: var(--vscode-badge-foreground, #fff);
+    font-size: 10px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.sidebar-topic:hover {
+    opacity: 0.85;
+}
+
+/* ---- Sidebar direct dependency chips ---- */
+.sidebar-dep-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.sidebar-dep-chip {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 10px;
+    border: 1px solid var(--vscode-widget-border, #333);
+    color: var(--vscode-foreground);
+    font-size: 10px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.sidebar-dep-chip:hover {
+    background: var(--vscode-list-hoverBackground, #2a2d2e);
+}
+
+/* ---- Sidebar image gallery ---- */
+.sidebar-gallery {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.sidebar-gallery img {
+    max-width: 120px;
+    max-height: 90px;
+    object-fit: contain;
+    border-radius: 3px;
+    border: 1px solid var(--vscode-widget-border, #333);
+    cursor: pointer;
+}
+
+.sidebar-gallery img:hover {
+    border-color: var(--vscode-focusBorder, #007acc);
 }
 `;
 }
