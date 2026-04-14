@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { VibrancyResult, VibrancyCategory, FamilySplit, OverrideAnalysis, DepGraphSummary, DependencySection, PackageInsight, BudgetResult } from '../types';
 import {
-    PackageItem, DetailItem, GroupItem, SuppressedGroupItem,
+    PackageItem, DetailItem, SourceCodeItem, GroupItem, SuppressedGroupItem,
     SuppressedPackageItem, buildGroupItems, SectionGroupItem,
     OverridesGroupItem, OverrideItem, buildOverrideDetails,
     DepGraphSummaryItem, buildDepGraphSummaryDetails,
@@ -21,7 +21,7 @@ import { VibrancyFilterManager, VibrancyFilterState, VibrancyViewMode } from './
 import { ProblemSeverity, ProblemType } from '../problems/problem-types';
 
 type TreeNode =
-    | PackageItem | GroupItem | DetailItem
+    | PackageItem | GroupItem | DetailItem | SourceCodeItem
     | SuppressedGroupItem | FamilyConflictGroupItem | FamilySplitItem
     | OverridesGroupItem | OverrideItem | DepGraphSummaryItem
     | SectionGroupItem | ActionItemsGroupItem | InsightItem
@@ -227,7 +227,8 @@ export class VibrancyTreeProvider implements vscode.TreeDataProvider<TreeNode> {
             return this._buildPackageChildren(element);
         }
         if (element instanceof GroupItem) {
-            return element.children;
+            // Children may be DetailItem, SourceCodeItem, or other TreeItem subtypes
+            return element.children as TreeNode[];
         }
         return [];
     }
