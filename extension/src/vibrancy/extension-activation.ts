@@ -245,8 +245,30 @@ function registerFileWatcher(
     targets: ScanTargets,
 ): void {
     const watcher = vscode.workspace.createFileSystemWatcher('**/pubspec.lock');
-    watcher.onDidChange(() => runScan(targets));
-    context.subscriptions.push(watcher);
+
+    // Debounce: pubspec.lock can be written multiple times in quick
+    // succession (pub get, IDE auto-resolve, etc.).  Wait 5 seconds
+    // after the last change before triggering a scan so we don't
+    // spam scans and log files.
+    let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+    watcher.onDidChange(() => {
+        if (debounceTimer) { clearTimeout(debounceTimer); }
+        debounceTimer = setTimeout(() => {
+            debounceTimer = null;
+            runScan(targets);
+        }, 5_000);
+    });
+
+    // Cancel any pending debounce when the extension deactivates
+    // so the callback doesn't fire into a disposed context.
+    const timerDisposable = new vscode.Disposable(() => {
+        if (debounceTimer) {
+            clearTimeout(debounceTimer);
+            debounceTimer = null;
+        }
+    });
+
+    context.subscriptions.push(watcher, timerDisposable);
 }
 
 /**
