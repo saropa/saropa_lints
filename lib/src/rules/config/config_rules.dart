@@ -146,8 +146,7 @@ class AvoidHardcodedConfigRule extends SaropaLintRule {
         // Check for URL or key patterns in config-named variables
         if (_configNamePattern.hasMatch(varName)) {
           if (_urlPattern.hasMatch(value) || _keyPattern.hasMatch(value)) {
-            if (!_isSafeUrl(value) &&
-                !_isNamedCompileTimeConstant(variable)) {
+            if (!_isSafeUrl(value) && !_isNamedCompileTimeConstant(variable)) {
               reporter.atNode(variable);
             }
           }
@@ -333,9 +332,6 @@ class AvoidMixedEnvironmentsRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    // Skip lint rule/fix source — environment string patterns trigger self-referential FPs
-    if (context.isLintPluginSource) return;
-
     context.addClassDeclaration((ClassDeclaration node) {
       final String className = node.namePart.typeName.lexeme.toLowerCase();
 

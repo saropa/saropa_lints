@@ -3554,9 +3554,6 @@ class RequireWebsocketReconnectionRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    // Skip lint rule/fix source — WebSocket patterns trigger self-referential FPs
-    if (context.isLintPluginSource) return;
-
     context.addClassDeclaration((ClassDeclaration node) {
       final String className = node.namePart.typeName.lexeme;
 

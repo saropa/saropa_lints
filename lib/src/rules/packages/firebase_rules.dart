@@ -488,9 +488,6 @@ class RequireDatabaseMigrationRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    // Skip lint rule/fix source — DB detection patterns trigger self-referential FPs
-    if (context.isLintPluginSource) return;
-
     context.addClassDeclaration((ClassDeclaration node) {
       final String classSource = node.toSource();
 

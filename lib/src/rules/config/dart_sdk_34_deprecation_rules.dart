@@ -102,8 +102,6 @@ class AvoidDeprecatedFileSystemDeleteEventIsDirectoryRule
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    if (context.isLintPluginSource) return;
-
     context.addPropertyAccess((PropertyAccess node) {
       if (node.propertyName.name != 'isDirectory') return;
       final targetType = node.realTarget.staticType;
