@@ -33,6 +33,14 @@
 
 ---
 
+## [10.12.1]
+
+### Fixed
+
+- **Publishing:** Changed `publish_to` from `"none"` to `"https://pub.dev"` in pubspec.yaml — the template placeholder blocked `dart pub publish` in CI.
+
+---
+
 ## [10.12.0]
 
 ### Fixed
