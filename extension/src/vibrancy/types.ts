@@ -45,6 +45,8 @@ export interface PubDevPackageInfo {
     readonly license: string | null;
     readonly description: string | null;
     readonly topics: readonly string[];
+    /** Direct dependency names from the package's pubspec (keys only, sorted). */
+    readonly dependencies: readonly string[];
 }
 
 /** A GitHub issue flagged as high-signal for compatibility/deprecation. */
@@ -107,9 +109,11 @@ export interface KnownIssue {
     readonly overrideReason?: string;
 }
 
-/** Live metrics from pub.dev /metrics endpoint. Null wasmReady = API failed. */
+/** Live metrics from pub.dev /metrics and /score endpoints. Null wasmReady = API failed. */
 export interface PubDevMetrics {
     readonly pubPoints: number;
+    /** Number of likes from pub.dev. Null when score API failed. */
+    readonly likes: number | null;
     readonly platforms: readonly string[];
     readonly wasmReady: boolean | null;
 }
@@ -186,6 +190,14 @@ export interface BlockerInfo {
     readonly blockerCategory: VibrancyCategory | null;
 }
 
+/** README content parsed for display: logo and inline images. */
+export interface ReadmeData {
+    /** First non-badge image before the first ## heading (likely the project logo). */
+    readonly logoUrl: string | null;
+    /** All non-badge image URLs found in the README, deduplicated, max 5. */
+    readonly imageUrls: readonly string[];
+}
+
 /** Computed vibrancy result for one package. */
 export interface VibrancyResult {
     readonly package: PackageDependency;
@@ -226,6 +238,12 @@ export interface VibrancyResult {
     readonly overrideGap: VersionGapResult | null;
     /** Replacement complexity based on local source analysis. Null when not yet analyzed. */
     readonly replacementComplexity: ReplacementComplexity | null;
+    /** Number of likes on pub.dev. Null until fetched. */
+    readonly likes: number | null;
+    /** Number of published packages on pub.dev that depend on this package. Null when not yet fetched or fetch failed. */
+    readonly reverseDependencyCount: number | null;
+    /** README logo and images. Null until lazy-fetched when detail panel opens. */
+    readonly readme: ReadmeData | null;
 }
 
 /** A single package entry from `dart pub outdated --json`. */

@@ -54,7 +54,7 @@ describe('status-classifier', () => {
                     publisher: null,
                     license: null,
                     description: null,
-                    topics: [],
+                    topics: [], dependencies: [],
                 },
             });
             assert.strictEqual(cat, 'end-of-life');
@@ -119,7 +119,7 @@ describe('status-classifier', () => {
                     publisher: 'firebase.google.com',
                     license: null,
                     description: null,
-                    topics: [],
+                    topics: [], dependencies: [],
                 },
             });
             assert.strictEqual(cat, 'vibrant');
@@ -136,7 +136,7 @@ describe('status-classifier', () => {
                     publisher: 'dart.dev',
                     license: null,
                     description: null,
-                    topics: [],
+                    topics: [], dependencies: [],
                 },
             });
             assert.strictEqual(cat, 'vibrant');
@@ -153,7 +153,7 @@ describe('status-classifier', () => {
                     publisher: 'example.com',
                     license: null,
                     description: null,
-                    topics: [],
+                    topics: [], dependencies: [],
                 },
             });
             assert.strictEqual(cat, 'stable');
@@ -170,7 +170,7 @@ describe('status-classifier', () => {
                     publisher: 'Dart.dev',
                     license: null,
                     description: null,
-                    topics: [],
+                    topics: [], dependencies: [],
                 },
             });
             assert.strictEqual(cat, 'stable');
@@ -187,7 +187,7 @@ describe('status-classifier', () => {
                     publisher: 'dart.dev',
                     license: null,
                     description: null,
-                    topics: [],
+                    topics: [], dependencies: [],
                 },
             });
             assert.strictEqual(cat, 'end-of-life');
@@ -234,7 +234,7 @@ describe('status-classifier', () => {
                     publisher: null,
                     license: null,
                     description: null,
-                    topics: [],
+                    topics: [], dependencies: [],
                 },
             });
             assert.strictEqual(cat, 'outdated');
@@ -252,7 +252,7 @@ describe('status-classifier', () => {
                     publisher: null,
                     license: null,
                     description: null,
-                    topics: [],
+                    topics: [], dependencies: [],
                 },
             });
             assert.strictEqual(cat, 'abandoned');
@@ -270,7 +270,7 @@ describe('status-classifier', () => {
                     publisher: null,
                     license: null,
                     description: null,
-                    topics: [],
+                    topics: [], dependencies: [],
                 },
             });
             assert.strictEqual(cat, 'end-of-life');
@@ -291,7 +291,7 @@ describe('status-classifier', () => {
                     publisher: 'google.dev',
                     license: null,
                     description: null,
-                    topics: [],
+                    topics: [], dependencies: [],
                 },
             });
             assert.strictEqual(cat, 'end-of-life');

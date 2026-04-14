@@ -1,4 +1,4 @@
-import { FlaggedIssue, GitHubMetrics } from '../types';
+import { FlaggedIssue, GitHubMetrics, ReadmeData } from '../types';
 import { flagHighSignalIssues } from '../scoring/issue-signals';
 import { CacheService } from './cache-service';
 import { ScanLogger } from './scan-logger';
@@ -191,4 +191,172 @@ function buildMetrics(raw: RawRepoData, now: number): GitHubMetrics {
         flaggedIssues: raw.flagged,
         license: raw.repoData.license?.spdx_id ?? null,
     };
+}
+
+// ---------------------------------------------------------------------------
+// README image extraction
+// ---------------------------------------------------------------------------
+
+/** Known badge/CI image domains to filter out of README images. */
+const BADGE_PATTERNS = [
+    'shields.io',
+    'img.shields.io',
+    'travis-ci.org',
+    'travis-ci.com',
+    'codecov.io',
+    'coveralls.io',
+    'badge.svg',        // Common badge filename
+    '/badge.png',
+    '/badge?',          // Badge API query URLs
+    '/workflows/',      // GitHub Actions badge paths
+    'github.com/actions/',
+    'pub.dev/static/',  // pub.dev static assets (badges)
+];
+
+/**
+ * Fetch the repository README from GitHub and extract image URLs.
+ * Returns logo (first non-badge image before first ## heading) and all
+ * non-badge images found in the markdown (max 5).
+ */
+export async function fetchReadmeImages(
+    owner: string,
+    repo: string,
+    params?: { token?: string; cache?: CacheService; logger?: ScanLogger },
+): Promise<ReadmeData | null> {
+    const log = params?.logger;
+    const cacheKey = `gh.readme.${owner}.${repo}`;
+    const cached = params?.cache?.get<ReadmeData>(cacheKey);
+    if (cached) {
+        log?.cacheHit(cacheKey);
+        return cached;
+    }
+    log?.cacheMiss(cacheKey);
+
+    const url = `${GITHUB_API}/repos/${owner}/${repo}/readme`;
+    const headers = buildHeaders(params?.token);
+
+    try {
+        log?.apiRequest('GET', url);
+        const t0 = Date.now();
+        const resp = await fetchWithRetry(url, { headers }, log);
+        log?.apiResponse(resp.status, resp.statusText, Date.now() - t0);
+        if (!resp.ok) { return null; }
+
+        const json: any = await resp.json();
+        if (json.encoding !== 'base64' || !json.content) { return null; }
+
+        // Decode base64 README content
+        const markdown = Buffer.from(json.content, 'base64').toString('utf-8');
+        const result = parseMarkdownImages(markdown, owner, repo);
+
+        await params?.cache?.set(cacheKey, result);
+        return result;
+    } catch {
+        log?.error(`Failed to fetch README for ${owner}/${repo}`);
+        return null;
+    }
+}
+
+/**
+ * Parse a markdown string for image URLs, filtering out badges and CI images.
+ * Returns the logo (first non-badge image before any ## heading) and up to 5
+ * non-badge images total.
+ */
+export function parseMarkdownImages(
+    markdown: string,
+    owner: string,
+    repo: string,
+): ReadmeData {
+    const rawBaseUrl = `https://raw.githubusercontent.com/${owner}/${repo}/HEAD/`;
+    const allUrls: string[] = [];
+
+    // Match markdown images: ![alt](url) — supports balanced parentheses in URLs
+    // (e.g. https://example.com/image(1).png) and ignores trailing title text
+    const mdImageRegex = /!\[[^\]]*\]\(((?:[^()\s]|\([^)]*\))+)\)/g;
+    let match: RegExpExecArray | null;
+    while ((match = mdImageRegex.exec(markdown)) !== null) {
+        allUrls.push(match[1].trim());
+    }
+
+    // Match HTML images: <img src="url">
+    const htmlImageRegex = /<img[^>]+src=["']([^"']+)["']/gi;
+    while ((match = htmlImageRegex.exec(markdown)) !== null) {
+        allUrls.push(match[1].trim());
+    }
+
+    // Resolve relative URLs to absolute, filter out badges, and drop
+    // http:// images — they would be silently blocked by the webview CSP
+    // (which only allows img-src https:) resulting in empty placeholders.
+    const resolved = allUrls
+        .map(url => resolveImageUrl(url, rawBaseUrl))
+        .filter(url => !isBadgeImage(url) && !url.startsWith('http://'));
+
+    // Deduplicate while preserving order
+    const seen = new Set<string>();
+    const unique: string[] = [];
+    for (const url of resolved) {
+        if (!seen.has(url)) {
+            seen.add(url);
+            unique.push(url);
+        }
+    }
+
+    // Logo: first non-badge image that appears before the first ## heading
+    const firstHeadingIdx = markdown.search(/^##\s/m);
+    const preHeading = firstHeadingIdx >= 0
+        ? markdown.substring(0, firstHeadingIdx)
+        : markdown;
+    let logoUrl: string | null = null;
+
+    // Check markdown images in the pre-heading section
+    const preImageRegex = /!\[[^\]]*\]\(((?:[^()\s]|\([^)]*\))+)\)/g;
+    while ((match = preImageRegex.exec(preHeading)) !== null) {
+        const url = resolveImageUrl(match[1].trim(), rawBaseUrl);
+        if (!isBadgeImage(url)) {
+            logoUrl = url;
+            break;
+        }
+    }
+
+    // If no markdown image found, check HTML images in pre-heading section
+    if (!logoUrl) {
+        const preHtmlRegex = /<img[^>]+src=["']([^"']+)["']/gi;
+        while ((match = preHtmlRegex.exec(preHeading)) !== null) {
+            const url = resolveImageUrl(match[1].trim(), rawBaseUrl);
+            if (!isBadgeImage(url)) {
+                logoUrl = url;
+                break;
+            }
+        }
+    }
+
+    return {
+        logoUrl,
+        imageUrls: unique.slice(0, 5),
+    };
+}
+
+/**
+ * Resolve a potentially relative URL against the raw GitHub content base.
+ * Handles ./ and ../ prefixes by collapsing path segments so URLs like
+ * ../assets/logo.png resolve correctly against the base URL.
+ */
+function resolveImageUrl(url: string, rawBaseUrl: string): string {
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+        return url;
+    }
+    // Use URL constructor to properly resolve relative paths (collapses ../)
+    try {
+        return new URL(url, rawBaseUrl).href;
+    } catch {
+        // Fallback: strip leading ./ and concatenate directly
+        const cleaned = url.startsWith('./') ? url.substring(2) : url;
+        return rawBaseUrl + cleaned;
+    }
+}
+
+/** Check if an image URL looks like a CI badge or status indicator. */
+function isBadgeImage(url: string): boolean {
+    const lower = url.toLowerCase();
+    return BADGE_PATTERNS.some(p => lower.includes(p));
 }

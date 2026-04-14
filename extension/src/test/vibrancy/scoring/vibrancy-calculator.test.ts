@@ -8,6 +8,7 @@ import {
     calcFlaggedIssuePenalty,
     calcPublisherTrust,
     calcPubQualityBonus,
+    calcAdoptionBonus,
     computeVibrancyScore,
     TRUSTED_PUBLISHERS,
     RESOLUTION_PUBLISH_RECENCY_CAP,
@@ -338,6 +339,91 @@ describe('vibrancy-calculator', () => {
 
         it('should return 0 for negative input', () => {
             assert.strictEqual(calcFlaggedIssuePenalty(-1), 0);
+        });
+    });
+
+    describe('calcAdoptionBonus', () => {
+        it('should return 0 for null (fetch failed)', () => {
+            assert.strictEqual(calcAdoptionBonus(null), 0);
+        });
+
+        it('should return 0 for zero dependents (no penalty)', () => {
+            assert.strictEqual(calcAdoptionBonus(0), 0);
+        });
+
+        it('should return 0 for negative count', () => {
+            assert.strictEqual(calcAdoptionBonus(-5), 0);
+        });
+
+        it('should return ~1.0 for 1 dependent', () => {
+            const bonus = calcAdoptionBonus(1);
+            // log10(2)/log10(1001) * 10 ≈ 1.003
+            assert.ok(bonus > 0.9 && bonus < 1.1, `expected ~1.0, got ${bonus}`);
+        });
+
+        it('should return ~3.5 for 10 dependents', () => {
+            const bonus = calcAdoptionBonus(10);
+            assert.ok(bonus > 3.0 && bonus < 4.0, `expected ~3.5, got ${bonus}`);
+        });
+
+        it('should return ~5.7 for 50 dependents', () => {
+            const bonus = calcAdoptionBonus(50);
+            assert.ok(bonus > 5.2 && bonus < 6.2, `expected ~5.7, got ${bonus}`);
+        });
+
+        it('should return ~7.7 for 200 dependents', () => {
+            const bonus = calcAdoptionBonus(200);
+            assert.ok(bonus > 7.2 && bonus < 8.2, `expected ~7.7, got ${bonus}`);
+        });
+
+        it('should return 10.0 (max) for 1000 dependents', () => {
+            const bonus = calcAdoptionBonus(1000);
+            assert.strictEqual(bonus, 10);
+        });
+
+        it('should cap at maxBonus for very high counts', () => {
+            const bonus = calcAdoptionBonus(50000);
+            assert.strictEqual(bonus, 10);
+        });
+
+        it('should respect custom maxBonus', () => {
+            const bonus = calcAdoptionBonus(1000, 20);
+            assert.strictEqual(bonus, 20);
+        });
+
+        it('should return 0 when maxBonus is 0', () => {
+            assert.strictEqual(calcAdoptionBonus(500, 0), 0);
+        });
+
+        it('should monotonically increase with count', () => {
+            const counts = [1, 5, 10, 50, 100, 200, 500, 1000];
+            let prev = 0;
+            for (const count of counts) {
+                const bonus = calcAdoptionBonus(count);
+                assert.ok(bonus > prev,
+                    `bonus for ${count} (${bonus}) should exceed bonus for previous (${prev})`);
+                prev = bonus;
+            }
+        });
+
+        it('should lift composite score for packages with ecosystem adoption', () => {
+            // A package with no GitHub activity but 200 dependents should
+            // get a meaningful boost over the same package with 0 dependents
+            const params = { resolutionVelocity: 0, engagementLevel: 0, popularity: 50 };
+            const publisherTrust = 5;
+
+            const withoutAdoption = computeVibrancyScore(
+                params, undefined, 0, publisherTrust,
+            );
+            const adoptionBonusValue = calcAdoptionBonus(200);
+            const withAdoption = computeVibrancyScore(
+                params, undefined, 0, publisherTrust + adoptionBonusValue,
+            );
+            assert.ok(withAdoption > withoutAdoption,
+                'adoption bonus should lift score for packages depended on by others');
+            // ~7.7 point lift for 200 dependents
+            assert.ok(withAdoption - withoutAdoption > 7,
+                `expected ~7.7 point lift, got ${withAdoption - withoutAdoption}`);
         });
     });
 

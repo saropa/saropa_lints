@@ -298,3 +298,8 @@ export function buildMetricsApiUrl(registryUrl: string, packageName: string): st
 export function buildPublisherApiUrl(registryUrl: string, packageName: string): string {
     return buildApiUrl(registryUrl, packageName, '/publisher');
 }
+
+/** Build the score API URL (likes, granted points). */
+export function buildScoreApiUrl(registryUrl: string, packageName: string): string {
+    return buildApiUrl(registryUrl, packageName, '/score');
+}

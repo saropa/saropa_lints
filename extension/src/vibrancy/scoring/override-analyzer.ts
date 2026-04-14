@@ -81,6 +81,21 @@ function findConflict(
         }
     }
 
+    // SDK-transitive heuristic: if the overridden package is a transitive
+    // dependency of any SDK package (source: "sdk" in pubspec.lock), treat the
+    // override as active. SDK packages like flutter_test pin exact transitive
+    // versions that aren't visible in dart pub deps --json. The override almost
+    // certainly exists to resolve a conflict between the SDK pin and a non-SDK
+    // package's constraint (e.g. flutter_test pins meta 1.17.0, but analyzer
+    // ^12 requires meta ^1.18.0). We can't detect the conflict through normal
+    // constraint analysis because the SDK constraint is opaque.
+    const sdkBlocker = findSdkTransitiveDependant(
+        override.name, deps, depGraph,
+    );
+    if (sdkBlocker) {
+        return `SDK transitive (${sdkBlocker})`;
+    }
+
     return null;
 }
 
@@ -93,6 +108,33 @@ function findTransitiveConstraint(
     _depName: string,
     _depGraph: Map<string, DepGraphPackage>,
 ): string | null {
+    return null;
+}
+
+/**
+ * Check if an overridden package is a transitive dependency of any SDK package.
+ * Returns the name of the SDK package that depends on it, or null.
+ *
+ * SDK packages (flutter_test, flutter, etc.) have source "sdk" in pubspec.lock.
+ * Their transitive version pins are opaque — dart pub deps --json doesn't
+ * expose constraint ranges for them. When someone overrides a transitive dep
+ * of an SDK package, it's almost certainly to resolve a pin conflict.
+ */
+function findSdkTransitiveDependant(
+    depName: string,
+    deps: Map<string, PackageDependency>,
+    depGraph: Map<string, DepGraphPackage>,
+): string | null {
+    for (const [, pkg] of depGraph) {
+        if (pkg.name === depName) { continue; }
+        if (!pkg.dependencies.includes(depName)) { continue; }
+
+        // Check if this dependant is an SDK package by its lock file source
+        const depEntry = deps.get(pkg.name);
+        if (depEntry && depEntry.source === 'sdk') {
+            return pkg.name;
+        }
+    }
     return null;
 }
 

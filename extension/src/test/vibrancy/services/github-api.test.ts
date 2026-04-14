@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import * as fs from 'fs';
 import * as path from 'path';
-import { extractGitHubRepo, fetchRepoMetrics } from '../../../vibrancy/services/github-api';
+import { extractGitHubRepo, fetchRepoMetrics, parseMarkdownImages } from '../../../vibrancy/services/github-api';
 
 // From compiled out-test/test/vibrancy/services/ go up 4 levels to extension/,
 // then into src/test/fixtures/.
@@ -224,6 +224,123 @@ describe('github-api', () => {
             const metrics = await fetchRepoMetrics('org', 'old');
             assert.ok(metrics);
             assert.strictEqual(metrics.isArchived, true);
+        });
+    });
+
+    describe('parseMarkdownImages', () => {
+        const owner = 'test-org';
+        const repo = 'test-repo';
+        const rawBase = `https://raw.githubusercontent.com/${owner}/${repo}/HEAD/`;
+
+        it('should extract markdown image URLs', () => {
+            const md = '# Title\n![Logo](logo.png)\nSome text\n![Screenshot](docs/screen.png)';
+            const result = parseMarkdownImages(md, owner, repo);
+            assert.strictEqual(result.imageUrls.length, 2);
+            assert.strictEqual(result.imageUrls[0], `${rawBase}logo.png`);
+            assert.strictEqual(result.imageUrls[1], `${rawBase}docs/screen.png`);
+        });
+
+        it('should extract HTML img tags', () => {
+            const md = '# Title\n<img src="assets/logo.png" alt="logo" />';
+            const result = parseMarkdownImages(md, owner, repo);
+            assert.strictEqual(result.imageUrls.length, 1);
+            assert.strictEqual(result.imageUrls[0], `${rawBase}assets/logo.png`);
+        });
+
+        it('should resolve absolute URLs without modification', () => {
+            const md = '![Logo](https://example.com/logo.png)';
+            const result = parseMarkdownImages(md, owner, repo);
+            assert.strictEqual(result.imageUrls[0], 'https://example.com/logo.png');
+        });
+
+        it('should resolve ../ relative paths correctly', () => {
+            // URL constructor resolves ../ against the base
+            const md = '![Logo](../assets/logo.png)';
+            const result = parseMarkdownImages(md, owner, repo);
+            assert.ok(
+                result.imageUrls[0].includes('assets/logo.png'),
+                `Expected resolved URL, got: ${result.imageUrls[0]}`,
+            );
+            // Should NOT contain ../ in the final URL
+            assert.ok(
+                !result.imageUrls[0].includes('../'),
+                `URL should not contain ../, got: ${result.imageUrls[0]}`,
+            );
+        });
+
+        it('should resolve ./ relative paths', () => {
+            const md = '![Logo](./assets/logo.png)';
+            const result = parseMarkdownImages(md, owner, repo);
+            assert.strictEqual(result.imageUrls[0], `${rawBase}assets/logo.png`);
+        });
+
+        it('should filter out badge images from shields.io', () => {
+            const md = '![Badge](https://img.shields.io/badge/coverage-90-green)\n![Real](screenshot.png)';
+            const result = parseMarkdownImages(md, owner, repo);
+            assert.strictEqual(result.imageUrls.length, 1);
+            assert.strictEqual(result.imageUrls[0], `${rawBase}screenshot.png`);
+        });
+
+        it('should filter out GitHub Actions workflow badges', () => {
+            const md = '![CI](https://github.com/org/repo/workflows/CI/badge.svg)\n![Real](demo.gif)';
+            const result = parseMarkdownImages(md, owner, repo);
+            assert.strictEqual(result.imageUrls.length, 1);
+            assert.strictEqual(result.imageUrls[0], `${rawBase}demo.gif`);
+        });
+
+        it('should handle URLs with parentheses', () => {
+            const md = '![Screen](https://example.com/image(1).png)';
+            const result = parseMarkdownImages(md, owner, repo);
+            assert.strictEqual(result.imageUrls.length, 1);
+            assert.strictEqual(result.imageUrls[0], 'https://example.com/image(1).png');
+        });
+
+        it('should deduplicate identical image URLs', () => {
+            const md = '![A](logo.png)\n![B](logo.png)\n![C](other.png)';
+            const result = parseMarkdownImages(md, owner, repo);
+            assert.strictEqual(result.imageUrls.length, 2);
+        });
+
+        it('should cap at 5 images', () => {
+            const images = Array.from({ length: 10 }, (_, i) => `![img](img${i}.png)`).join('\n');
+            const result = parseMarkdownImages(images, owner, repo);
+            assert.strictEqual(result.imageUrls.length, 5);
+        });
+
+        it('should identify logo as first non-badge image before ## heading', () => {
+            const md = '# My Package\n![Badge](https://img.shields.io/v1)\n![Logo](logo.png)\n## Installation\n![Screen](screen.png)';
+            const result = parseMarkdownImages(md, owner, repo);
+            assert.strictEqual(result.logoUrl, `${rawBase}logo.png`);
+        });
+
+        it('should return null logo when no images before ## heading', () => {
+            const md = '## Setup\n![Screen](screen.png)';
+            const result = parseMarkdownImages(md, owner, repo);
+            // No ## heading means entire doc is checked — screen.png appears after ## Setup
+            // Actually the regex searches for ^##\s which matches "## Setup" at position 0
+            // So preHeading is empty string
+            assert.strictEqual(result.logoUrl, null);
+        });
+
+        it('should return null logo when only badges before ## heading', () => {
+            const md = '# Title\n![Badge](https://img.shields.io/v1)\n## Docs\n![Real](real.png)';
+            const result = parseMarkdownImages(md, owner, repo);
+            assert.strictEqual(result.logoUrl, null);
+        });
+
+        it('should return empty arrays for markdown with no images', () => {
+            const md = '# Title\nJust text, no images here.';
+            const result = parseMarkdownImages(md, owner, repo);
+            assert.strictEqual(result.imageUrls.length, 0);
+            assert.strictEqual(result.logoUrl, null);
+        });
+
+        it('should not filter pub.dev package screenshot URLs', () => {
+            // The badge filter should NOT block legitimate package screenshots
+            // Only pub.dev/static/ paths (badge assets) should be filtered
+            const md = '![Demo](https://pub.dev/packages/my_pkg/screenshot.png)';
+            const result = parseMarkdownImages(md, owner, repo);
+            assert.strictEqual(result.imageUrls.length, 1);
         });
     });
 });

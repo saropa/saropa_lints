@@ -6,7 +6,7 @@ import { CacheService } from './services/cache-service';
 import { ScanLogger } from './services/scan-logger';
 import {
     fetchPackageInfoWithPrerelease, fetchPackageMetrics, fetchPublisher,
-    fetchArchiveSize,
+    fetchArchiveSize, fetchReverseDependencyCount,
 } from './services/pub-dev-api';
 import { calcBloatRating } from './scoring/bloat-calculator';
 import { extractGitHubRepo, fetchRepoMetrics } from './services/github-api';
@@ -19,6 +19,7 @@ import {
     calcFlaggedIssuePenalty,
     calcPublisherTrust,
     calcPubQualityBonus,
+    calcAdoptionBonus,
     calcPublishRecency,
     computeVibrancyScore,
     ScoringWeights,
@@ -51,10 +52,11 @@ export async function analyzePackage(
     const knownIssue = findKnownIssue(dep.name, dep.version);
     if (knownIssue) { log?.info(`Known issue: ${knownIssue.status}`); }
 
-    const [pubDevResult, metrics, publisher] = await Promise.all([
+    const [pubDevResult, metrics, publisher, reverseDependencyCount] = await Promise.all([
         fetchPackageInfoWithPrerelease(dep.name, params.cache, log),
         fetchPackageMetrics(dep.name, params.cache, log),
         fetchPublisher(dep.name, params.cache, log),
+        fetchReverseDependencyCount(dep.name, params.cache, log),
     ]);
     const pubDev = pubDevResult.info;
     const prereleaseInfo = pubDevResult.prerelease;
@@ -68,6 +70,7 @@ export async function analyzePackage(
         github, pubPoints, publishedDate: pubDev?.publishedDate ?? null,
         publisher, weights: params.weights,
         maxPublisherBonus: params.publisherTrustBonus,
+        reverseDependencyCount,
     });
     const pubDevWithPoints = pubDev
         ? { ...pubDev, pubPoints, publisher } : null;
@@ -131,6 +134,9 @@ export async function analyzePackage(
         versionGap: null,
         overrideGap: null,
         replacementComplexity: null,
+        likes: metrics.likes,
+        reverseDependencyCount,
+        readme: null, // Lazy-loaded when detail panel opens
     };
 }
 
@@ -255,6 +261,7 @@ function computeScores(params: {
     readonly publisher: string | null;
     readonly weights?: ScoringWeights;
     readonly maxPublisherBonus?: number;
+    readonly reverseDependencyCount: number | null;
 }) {
     const { github, pubPoints, publishedDate, publisher } = params;
     const daysSincePublish = publishedDate
@@ -274,11 +281,14 @@ function computeScores(params: {
     );
 
     const pubQualityBonus = calcPubQualityBonus(pubPoints);
+    // Adoption bonus: reward packages that other published packages depend on.
+    // Bonus-only — 0 dependents means 0 bonus, not a penalty.
+    const adoptionBonus = calcAdoptionBonus(params.reverseDependencyCount);
     const flaggedPenalty = github
         ? calcFlaggedIssuePenalty(github.flaggedIssues?.length ?? 0) : 0;
     const score = computeVibrancyScore(
         { resolutionVelocity, engagementLevel, popularity }, params.weights,
-        flaggedPenalty, publisherTrust + pubQualityBonus,
+        flaggedPenalty, publisherTrust + pubQualityBonus + adoptionBonus,
     );
     return {
         score, resolutionVelocity, engagementLevel,

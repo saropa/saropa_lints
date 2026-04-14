@@ -6,7 +6,7 @@ export { TRUSTED_PUBLISHERS, isTrustedPublisher } from './trusted-publishers';
 /**
  * Default scoring weights for the vibrancy formula:
  *   V_score = (W_R * Resolution) + (W_E * Engagement) + (W_P * Popularity)
- *           + publisherBonus + pubQualityBonus − penalty
+ *           + publisherBonus + pubQualityBonus + adoptionBonus − penalty
  *
  * Resolution and Engagement are heavily weighted because active maintainer
  * response matters more than historical star counts. The pubQualityBonus
@@ -128,6 +128,40 @@ export function calcPubQualityBonus(
 ): number {
     if (maxBonus <= 0 || pubPoints <= 0) { return 0; }
     return Math.min(maxBonus, (pubPoints / 160) * maxBonus);
+}
+
+/** Maximum adoption bonus added to the vibrancy score. */
+export const DEFAULT_MAX_ADOPTION_BONUS = 10;
+
+/**
+ * Bonus for ecosystem adoption measured by reverse dependency count (0–maxBonus).
+ * This is bonus-only: packages with 0 dependents get 0 bonus (no penalty).
+ *
+ * Uses a logarithmic curve because reverse dependency counts are extremely
+ * skewed on pub.dev:
+ *   - Most packages: 0–10 dependents
+ *   - Moderately popular: 50–200
+ *   - Very popular (provider, http): 500–2000+
+ *
+ * The log curve spreads the meaningful range across the bonus:
+ *   -    1 dep  →  1.0 bonus  (minimal signal)
+ *   -   10 deps →  3.5 bonus  (some adoption)
+ *   -   50 deps →  5.7 bonus  (solid adoption)
+ *   -  200 deps →  7.7 bonus  (strong adoption)
+ *   - 1000 deps → 10.0 bonus  (saturated — max)
+ */
+export function calcAdoptionBonus(
+    reverseDependencyCount: number | null,
+    maxBonus: number = DEFAULT_MAX_ADOPTION_BONUS,
+): number {
+    // Null = fetch failed or not yet fetched → no bonus, no penalty
+    if (reverseDependencyCount === null || reverseDependencyCount <= 0) {
+        return 0;
+    }
+    if (maxBonus <= 0) { return 0; }
+    // log10(count + 1) / log10(1001) maps 1→~0, 1000→1.0
+    const normalized = Math.log10(reverseDependencyCount + 1) / Math.log10(1001);
+    return Math.min(maxBonus, normalized * maxBonus);
 }
 
 /** Penalty for flagged high-signal open issues (0–15 points). */
