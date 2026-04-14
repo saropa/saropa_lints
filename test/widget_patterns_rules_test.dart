@@ -1274,28 +1274,31 @@ void main() {
         expect('redundant SafeArea detected', isNotNull);
       });
 
-      test('fixture has exactly one BAD (expect_lint) and GOOD top:false case', () {
-        final file = File(
-          'example/lib/widget_patterns/prefer_safe_area_consumer_fixture.dart',
-        );
-        expect(file.existsSync(), isTrue);
-        final content = file.readAsStringSync();
-        final expectLintCount = RegExp(
-          r'// expect_lint: prefer_safe_area_consumer',
-        ).allMatches(content).length;
-        expect(
-          expectLintCount,
-          1,
-          reason: 'Exactly one BAD case should have expect_lint',
-        );
-        expect(
-          content.contains('top: false') &&
-              content.contains('_goodSafeAreaTopFalse'),
-          isTrue,
-          reason:
-              'Fixture must include GOOD case SafeArea(top: false) to prevent regression',
-        );
-      });
+      test(
+        'fixture has exactly one BAD (expect_lint) and GOOD top:false case',
+        () {
+          final file = File(
+            'example/lib/widget_patterns/prefer_safe_area_consumer_fixture.dart',
+          );
+          expect(file.existsSync(), isTrue);
+          final content = file.readAsStringSync();
+          final expectLintCount = RegExp(
+            r'// expect_lint: prefer_safe_area_consumer',
+          ).allMatches(content).length;
+          expect(
+            expectLintCount,
+            1,
+            reason: 'Exactly one BAD case should have expect_lint',
+          );
+          expect(
+            content.contains('top: false') &&
+                content.contains('_goodSafeAreaTopFalse'),
+            isTrue,
+            reason:
+                'Fixture must include GOOD case SafeArea(top: false) to prevent regression',
+          );
+        },
+      );
     });
 
     group('prefer_scaffold_messenger_maybeof', () {

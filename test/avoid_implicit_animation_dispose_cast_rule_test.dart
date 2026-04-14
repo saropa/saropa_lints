@@ -47,9 +47,7 @@ void main() {
     });
 
     test('fixture: BAD case has expect_lint before violation', () {
-      final file = File(
-        'example/lib/animation/${ruleName}_fixture.dart',
-      );
+      final file = File('example/lib/animation/${ruleName}_fixture.dart');
       expect(file.existsSync(), isTrue);
       final content = file.readAsStringSync();
       expect(

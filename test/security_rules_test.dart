@@ -774,22 +774,25 @@ void main() {
         expect('screenshot-enabled sensitive screen detected', isNotNull);
       });
 
-      test('fixture has exactly one BAD (expect_lint) so rule triggers once', () {
-        final path =
-            'example/lib/security/avoid_screenshot_sensitive_fixture.dart';
-        final file = File(path);
-        expect(file.existsSync(), isTrue, reason: 'Fixture must exist');
-        final content = file.readAsStringSync();
-        final count = RegExp(
-          r'// expect_lint: avoid_screenshot_sensitive',
-        ).allMatches(content).length;
-        expect(
-          count,
-          1,
-          reason:
-              'Exactly one BAD class (PaymentScreen) should have expect_lint',
-        );
-      });
+      test(
+        'fixture has exactly one BAD (expect_lint) so rule triggers once',
+        () {
+          final path =
+              'example/lib/security/avoid_screenshot_sensitive_fixture.dart';
+          final file = File(path);
+          expect(file.existsSync(), isTrue, reason: 'Fixture must exist');
+          final content = file.readAsStringSync();
+          final count = RegExp(
+            r'// expect_lint: avoid_screenshot_sensitive',
+          ).allMatches(content).length;
+          expect(
+            count,
+            1,
+            reason:
+                'Exactly one BAD class (PaymentScreen) should have expect_lint',
+          );
+        },
+      );
 
       test(
         'fixture GOOD classes (debug/viewer, fromsettings) must NOT trigger',

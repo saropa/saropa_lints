@@ -793,14 +793,10 @@ class ProgressTracker {
         );
       }
       if (fileCount > 0) {
-        buf.writeln(
-          '    $dim//$reset ignore_for_file: $bold$fileCount$reset',
-        );
+        buf.writeln('    $dim//$reset ignore_for_file: $bold$fileCount$reset');
       }
       if (baseCount > 0) {
-        buf.writeln(
-          '    $dim●$reset baseline:         $bold$baseCount$reset',
-        );
+        buf.writeln('    $dim●$reset baseline:         $bold$baseCount$reset');
       }
       buf.writeln(
         '    $dim──$reset Total suppressed: $bold$suppressionTotal$reset',
