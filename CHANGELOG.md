@@ -41,6 +41,10 @@
 - **`dependencies_ordering` (extension):** No longer flags SDK dependencies (`flutter`, `flutter_localizations`, `flutter_test`, `integration_test`) as out of alphabetical order when they appear before pub-hosted packages. SDK deps are now exempt from the alphabetical sort; only pub-hosted entries are checked.
 - **Adoption Gate (extension):** No longer shows false "Discontinued" badge on SDK dependencies (`flutter`, `flutter_test`, `flutter_localizations`, `integration_test`, etc.). SDK packages are not hosted on pub.dev; looking them up produced misleading warnings because the pub.dev `flutter` placeholder is marked discontinued. Also fixed badge placement: `findPackageLine` now only matches within dependency sections, so badges no longer appear on `environment:` constraint lines.
 
+- **`prefer_publish_to_none` (extension):** No longer flags packages that have `topics:`, `homepage:`, or `repository:` fields — these are pub.dev publication signals, so suggesting `publish_to: none` was a false positive on intentionally published packages.
+- **Pubspec diagnostics (extension):** All 11 pubspec.yaml validation messages now include the `[saropa_lints]` prefix, matching the convention used by the Dart-side lint rules.
+- **`isLintPluginSource` guard (infra):** The per-file guard that prevents rules from firing on their own source code was broken in the native analyzer model — it ran once at registration time, not per-file. Moved the check into `_shouldSkipCurrentFile()` so it evaluates per-file and removed the 43 dead per-rule guards across 12 rule files. Fixes 8 false positives from `avoid_ios_in_app_browser_for_auth` on its own OAuth URL pattern definitions, plus potential false positives in all other affected rule files.
+
 ### Changed
 
 - **SDK_PACKAGES (extension):** Consolidated three duplicate `SDK_PACKAGES` sets (annotate-command, unused-detector, pubspec-sorter) into a single shared constant at `sdk-packages.ts`. Added missing `integration_test` and `flutter_driver` entries to the pubspec-sorter set.
@@ -48,6 +52,10 @@
 ### Added (Extension)
 
 - **Help hub**: New “Saropa Lints: Help” command (`saropaLints.openHelpHub`) opens a quick pick for Getting Started, About, Browse All Commands, and pub.dev. **Overview** intro links are grouped under a permanent collapsible **Help & resources** tree section; the title bar shows only the Command Catalog icon (help is in the tree). **Violations** always shows a **Help & resources** row at the top when the tree has content, plus both Help and Command Catalog icons in the title bar.
+
+### Fixed (Extension)
+
+- **Pubspec sorter**: Comments that precede a dependency entry (description, changelog URL, version-pin notes) now travel with the entry during sorting instead of being stripped. Trailing decorative comment blocks (section dividers) at the end of a section are also preserved. Previously, running "Sort Dependencies" on a richly commented pubspec would silently delete all comments.
 
 ### Changed (Extension)
 

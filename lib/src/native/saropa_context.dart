@@ -129,6 +129,11 @@ class SaropaContext {
     // PROJECT STRUCTURE (idempotent per path; see ImportGraphTracker).
     ImportGraphTracker.collectImports(path, fileContent);
 
+    // Skip lint plugin source files — pattern definitions in rule/fix files
+    // trigger self-referential false positives (e.g. OAuth URL strings in
+    // AvoidIosInAppBrowserForAuthRule matching its own detection patterns).
+    if (isLintPluginSource) return _wasLastFileSkipped = true;
+
     final rule = _saropaRule;
     if (rule == null) return false;
 
