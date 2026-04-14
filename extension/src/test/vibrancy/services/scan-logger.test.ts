@@ -1,5 +1,7 @@
 import * as assert from 'assert';
-import { ScanLogger } from '../../../vibrancy/services/scan-logger';
+import {
+    ScanLogger, lastNonEmptyLine, extractScanSummary,
+} from '../../../vibrancy/services/scan-logger';
 
 describe('ScanLogger', () => {
     let logger: ScanLogger;
@@ -83,5 +85,94 @@ describe('ScanLogger', () => {
         assert.ok(logger.elapsedMs >= 0);
         await new Promise(r => setTimeout(r, 5));
         assert.ok(logger.elapsedMs >= 4);
+    });
+});
+
+describe('lastNonEmptyLine', () => {
+    it('should return the last non-empty line', () => {
+        assert.strictEqual(
+            lastNonEmptyLine('line1\nline2\n'),
+            'line2',
+        );
+    });
+
+    it('should skip trailing blank lines', () => {
+        assert.strictEqual(
+            lastNonEmptyLine('first\nsecond\n\n  \n'),
+            'second',
+        );
+    });
+
+    it('should return null for empty string', () => {
+        assert.strictEqual(lastNonEmptyLine(''), null);
+    });
+
+    it('should return null for whitespace-only string', () => {
+        assert.strictEqual(lastNonEmptyLine('  \n  \n'), null);
+    });
+
+    it('should trim the returned line', () => {
+        assert.strictEqual(
+            lastNonEmptyLine('  padded  \n'),
+            'padded',
+        );
+    });
+});
+
+describe('extractScanSummary', () => {
+    const fullLine =
+        '2026-04-14T01:28:55.692Z  [INFO ]  Scan complete — 2290ms — ' +
+        'vibrant:28 stable:48 outdated:35 abandoned:0 eol:1';
+
+    it('should extract counts from a full summary line', () => {
+        assert.strictEqual(
+            extractScanSummary(fullLine),
+            'vibrant:28 stable:48 outdated:35 abandoned:0 eol:1',
+        );
+    });
+
+    it('should return identical output for same counts with different timestamps', () => {
+        const line1 =
+            '2026-04-14T01:24:24.928Z  [INFO ]  Scan complete — 13144ms — ' +
+            'vibrant:28 stable:48 outdated:35 abandoned:0 eol:1';
+        const line2 =
+            '2026-04-14T01:28:55.692Z  [INFO ]  Scan complete — 2290ms — ' +
+            'vibrant:28 stable:48 outdated:35 abandoned:0 eol:1';
+        // Before this fix, the full lines differ (timestamp + elapsed).
+        // extractScanSummary strips those so only counts are compared.
+        assert.notStrictEqual(line1, line2);
+        assert.strictEqual(
+            extractScanSummary(line1),
+            extractScanSummary(line2),
+        );
+    });
+
+    it('should return different output when counts change', () => {
+        const changed =
+            '2026-04-14T02:00:00.000Z  [INFO ]  Scan complete — 5000ms — ' +
+            'vibrant:29 stable:47 outdated:35 abandoned:0 eol:1';
+        assert.notStrictEqual(
+            extractScanSummary(fullLine),
+            extractScanSummary(changed),
+        );
+    });
+
+    it('should return null for non-summary lines', () => {
+        assert.strictEqual(
+            extractScanSummary('[INFO ]  something else'),
+            null,
+        );
+    });
+
+    it('should return null for null input', () => {
+        assert.strictEqual(extractScanSummary(null), null);
+    });
+
+    it('should return null for line with Scan complete but no counts', () => {
+        // Malformed line with only one " — " separator after marker
+        assert.strictEqual(
+            extractScanSummary('Scan complete — 100ms'),
+            null,
+        );
     });
 });
