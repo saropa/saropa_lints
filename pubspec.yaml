@@ -7,7 +7,7 @@ description: >-
   Static analysis for security, accessibility, and performance.
 
 # SemVer version used by pub.dev and dependency resolution
-version: 11.0.0
+version: 11.0.1
 
 # SPDX license identifier shown on pub.dev
 license: MIT
