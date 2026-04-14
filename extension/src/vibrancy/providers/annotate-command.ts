@@ -10,11 +10,7 @@ import {
     SectionHeaderEdit,
     buildSectionHeaderEdits, buildSubSectionHeaderEdits, buildOverrideMarkerEdit,
 } from './annotate-headers';
-
-const SDK_PACKAGES = new Set([
-    'flutter', 'flutter_test', 'flutter_localizations',
-    'flutter_web_plugins', 'flutter_driver',
-]);
+import { SDK_PACKAGES } from '../sdk-packages';
 
 const FETCH_CONCURRENCY = 3;
 

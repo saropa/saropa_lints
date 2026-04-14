@@ -1,3 +1,4 @@
+import '../register-vscode-mock';
 import * as assert from 'assert';
 import { findCandidates } from '../../../vibrancy/providers/adoption-gate';
 
@@ -61,6 +62,56 @@ dependencies:
   http: ^1.0.0
 environment:
   sdk: ">=3.0.0 <4.0.0"
+`;
+            const candidates = findCandidates(yaml);
+            assert.deepStrictEqual(candidates, ['http']);
+        });
+
+        it('should exclude SDK packages (flutter, flutter_test, etc.)', () => {
+            // SDK packages use `sdk: flutter` in pubspec.yaml and are not
+            // hosted on pub.dev. Looking them up produces false "Discontinued"
+            // warnings because the pub.dev `flutter` package is discontinued.
+            const yaml = `
+name: my_app
+environment:
+  sdk: ">=3.10.7 <4.0.0"
+  flutter: ">=3.41.2"
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  http: ^1.2.0
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  integration_test:
+    sdk: flutter
+  test: ^1.25.0
+`;
+            const candidates = findCandidates(yaml);
+            // Only hosted packages should appear; SDK deps should be filtered
+            assert.ok(candidates.includes('http'), 'hosted dep http should be a candidate');
+            assert.ok(candidates.includes('test'), 'hosted dep test should be a candidate');
+            assert.ok(!candidates.includes('flutter'), 'SDK dep flutter should be excluded');
+            assert.ok(!candidates.includes('flutter_localizations'), 'SDK dep flutter_localizations should be excluded');
+            assert.ok(!candidates.includes('flutter_test'), 'SDK dep flutter_test should be excluded');
+            assert.ok(!candidates.includes('integration_test'), 'SDK dep integration_test should be excluded');
+            assert.strictEqual(candidates.length, 2);
+        });
+
+        it('should exclude flutter_web_plugins and flutter_driver', () => {
+            const yaml = `
+name: my_app
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_web_plugins:
+    sdk: flutter
+  http: ^1.0.0
+dev_dependencies:
+  flutter_driver:
+    sdk: flutter
 `;
             const candidates = findCandidates(yaml);
             assert.deepStrictEqual(candidates, ['http']);

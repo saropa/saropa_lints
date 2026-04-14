@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { SDK_PACKAGES } from '../sdk-packages';
 
 export interface SortOptions {
     readonly sdkFirst: boolean;
@@ -10,7 +11,6 @@ export interface SortResult {
     readonly entriesMoved: number;
 }
 
-const SDK_PACKAGES = new Set(['flutter', 'flutter_test', 'flutter_localizations', 'flutter_web_plugins']);
 const DEPENDENCY_SECTIONS = ['dependencies', 'dev_dependencies', 'dependency_overrides'];
 
 interface DependencyEntry {
@@ -18,7 +18,15 @@ interface DependencyEntry {
     startLine: number;
     endLine: number;
     lines: string[];
+    /** Comment lines that precede this entry and travel with it during sort. */
+    leadingComments: string[];
     isSdk: boolean;
+}
+
+interface ParseResult {
+    entries: DependencyEntry[];
+    /** Trailing lines after the last entry (decorators, section dividers). */
+    tail: string[];
 }
 
 /**
@@ -41,11 +49,16 @@ export async function sortDependencies(
         const sectionInfo = findSection(lines, section);
         if (!sectionInfo) { continue; }
 
-        const entries = parseEntries(lines, sectionInfo.start, sectionInfo.end);
+        const { entries, tail } = parseEntries(lines, sectionInfo.start, sectionInfo.end);
         if (entries.length < 2) { continue; }
 
         const sorted = sortEntries(entries, options.sdkFirst);
         const newLines = buildSortedLines(sorted, options.sdkFirst);
+        // Append trailing lines (decorators, section dividers) that follow
+        // the last entry but are still inside the section range
+        if (tail.length > 0) {
+            newLines.push(...tail);
+        }
 
         // Check if anything actually changed (order or formatting)
         const originalLines = lines.slice(sectionInfo.start, sectionInfo.end);
@@ -113,24 +126,46 @@ function findSection(lines: string[], sectionName: string): { start: number; end
     return start < end ? { start, end } : null;
 }
 
-function parseEntries(lines: string[], start: number, end: number): DependencyEntry[] {
+/**
+ * Parse dependency entries from a section, collecting comment lines that
+ * precede each entry so they travel with it during sorting. Blank lines
+ * between entries are treated as group separators (rebuilt by
+ * buildSortedLines) rather than entry-specific content.
+ */
+function parseEntries(lines: string[], start: number, end: number): ParseResult {
     const entries: DependencyEntry[] = [];
+    // Buffer for comment/blank lines seen between entries
+    let pending: string[] = [];
     let i = start;
 
     while (i < end) {
         const line = lines[i];
 
-        if (line.trim() === '' || !/^\s{2}\S/.test(line)) {
+        // Blank lines go into the pending buffer
+        if (line.trim() === '') {
+            pending.push(line);
             i++;
             continue;
         }
 
+        // Lines that aren't 2-space indented (shouldn't happen inside a
+        // section, but guard against it)
+        if (!/^\s{2}\S/.test(line)) {
+            pending.push(line);
+            i++;
+            continue;
+        }
+
+        // 2-space indented line — either a dependency name or a comment
         const match = line.match(/^\s{2}(\w[\w_-]*)\s*:/);
         if (!match) {
+            // Comment or decorator line (e.g. `  # description`)
+            pending.push(line);
             i++;
             continue;
         }
 
+        // Found a dependency entry — collect continuation lines (4+ indent)
         const name = match[1];
         const startLine = i;
         const entryLines: string[] = [line];
@@ -138,10 +173,9 @@ function parseEntries(lines: string[], start: number, end: number): DependencyEn
 
         while (i < end) {
             const nextLine = lines[i];
-            if (nextLine.trim() === '') {
-                i++;
-                continue;
-            }
+            // Break on blank lines so they go into the pending buffer for
+            // the next entry instead of being silently consumed
+            if (nextLine.trim() === '') { break; }
             if (/^\s{4,}\S/.test(nextLine)) {
                 entryLines.push(nextLine);
                 i++;
@@ -150,16 +184,24 @@ function parseEntries(lines: string[], start: number, end: number): DependencyEn
             }
         }
 
+        // Trim leading blank lines from pending — blank lines are group
+        // separators rebuilt by buildSortedLines, not entry-specific
+        while (pending.length > 0 && pending[0].trim() === '') {
+            pending.shift();
+        }
+
         entries.push({
             name,
             startLine,
             endLine: i,
             lines: entryLines,
+            leadingComments: pending,
             isSdk: SDK_PACKAGES.has(name),
         });
+        pending = [];
     }
 
-    return entries;
+    return { entries, tail: pending };
 }
 
 function sortEntries(entries: DependencyEntry[], sdkFirst: boolean): DependencyEntry[] {
@@ -209,7 +251,12 @@ function buildSortedLines(
         entries.filter(e => !e.isSdk).map(e => e.name),
     );
 
-    const result: string[] = [...entries[0].lines];
+    // First entry: emit its leading comments (e.g. "# SDK deps first")
+    // and its dependency lines
+    const result: string[] = [
+        ...entries[0].leadingComments,
+        ...entries[0].lines,
+    ];
 
     for (let i = 1; i < entries.length; i++) {
         const prev = entries[i - 1];
@@ -221,8 +268,9 @@ function buildSortedLines(
             // Always separate SDK block from non-SDK block
             needsBlankLine = true;
         } else if (prev.isSdk && curr.isSdk) {
-            // SDK packages stay together
-            needsBlankLine = false;
+            // SDK packages stay together — but still add a blank line if
+            // the entry has its own leading comments (e.g. a doc block)
+            needsBlankLine = curr.leadingComments.length > 0;
         } else {
             // Both non-SDK: separate unless they share a group key
             const prevKey = getGroupKey(prev.name, nonSdkNames);
@@ -233,7 +281,8 @@ function buildSortedLines(
         if (needsBlankLine) {
             result.push('');
         }
-        result.push(...curr.lines);
+        // Emit leading comments, then the dependency lines
+        result.push(...curr.leadingComments, ...curr.lines);
     }
 
     return result;
