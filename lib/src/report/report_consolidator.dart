@@ -23,6 +23,7 @@ class ConsolidatedData {
     required this.violations,
     required this.batchCount,
     this.mergedRawImports = const <String, List<String>>{},
+    this.suppressions = const <SuppressionRecord>[],
   });
 
   final ReportConfig? config;
@@ -40,6 +41,10 @@ class ConsolidatedData {
   /// Union of per-file import/export URIs from all isolate batches, keyed by
   /// absolute normalized paths. Empty when batches omit `ig` (legacy).
   final Map<String, List<String>> mergedRawImports;
+
+  /// Deduplicated suppression records from all isolate batches.
+  /// Paths are normalized to project-relative form.
+  final List<SuppressionRecord> suppressions;
 
   /// Total violation count across all impact levels.
   int get total => violations.values.fold(0, (s, l) => s + l.length);
@@ -340,6 +345,7 @@ class ReportConsolidator {
     }
 
     final mergedImports = _mergeImportSnapshots(projectRoot, batches);
+    final mergedSuppressions = _mergeSuppressions(projectRoot, batches);
 
     return ConsolidatedData(
       config: config,
@@ -354,6 +360,7 @@ class ReportConsolidator {
       violations: deduped,
       batchCount: batches.length,
       mergedRawImports: mergedImports,
+      suppressions: mergedSuppressions,
     );
   }
 
@@ -396,6 +403,36 @@ class ReportConsolidator {
       return true;
     }
     return false;
+  }
+
+  /// Deduplicate suppressions by `(file, line, rule)` across all batches.
+  ///
+  /// Uses normalized paths so the same suppression reported with different
+  /// path forms (absolute vs relative) is counted once.
+  static List<SuppressionRecord> _mergeSuppressions(
+    String projectRoot,
+    List<BatchData> batches,
+  ) {
+    final seen = <String>{};
+    final result = <SuppressionRecord>[];
+
+    for (final batch in batches) {
+      for (final s in batch.suppressions) {
+        final normFile = _normalizePath(s.file, projectRoot);
+        final key = '$normFile:${s.line}:${s.rule}';
+        if (seen.add(key)) {
+          result.add(
+            SuppressionRecord(
+              rule: s.rule,
+              file: normFile,
+              line: s.line,
+              kind: s.kind,
+            ),
+          );
+        }
+      }
+    }
+    return result;
   }
 
   /// Deduplicate violations by `(file, line, rule)` across all batches.

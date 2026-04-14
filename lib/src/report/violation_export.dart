@@ -220,17 +220,57 @@ class ViolationExporter {
       'issuesByRule': data.issuesByRule,
       'ruleSeverities': _lowercaseSeverities(data.ruleSeverities),
       // Suppression tracking: counts of diagnostics silenced by ignore
-      // comments or baseline, broken down by kind. Consumed by the
-      // extension Overview tree and available for CI pipelines.
-      //
-      // NOTE: SuppressionTracker is per-isolate static state, not yet
-      // included in BatchData for cross-isolate merging. In the common
-      // single-isolate case this is accurate. Multi-isolate consolidation
-      // would require adding suppression counts to BatchData (Phase 1).
-      'suppressions': <String, Object>{
-        'total': SuppressionTracker.total,
-        'byKind': SuppressionTracker.countsByKind,
+      // comments or baseline, broken down by kind, rule, and file.
+      // Consumed by the extension Overview tree and available for CI.
+      // Uses consolidated data from BatchData merge so multi-isolate
+      // counts are accurate.
+      'suppressions': _buildSuppressionSummary(data, projectRoot),
+    };
+  }
+
+  /// Build the suppressions summary from consolidated cross-isolate data.
+  ///
+  /// Includes total count, breakdown by kind (ignore / ignoreForFile /
+  /// baseline), per-rule counts, and per-file counts with relativized paths.
+  static Map<String, Object> _buildSuppressionSummary(
+    ConsolidatedData data,
+    String projectRoot,
+  ) {
+    final records = data.suppressions;
+
+    // Counts by kind
+    var ignoreCount = 0;
+    var ignoreForFileCount = 0;
+    var baselineCount = 0;
+    final byRule = <String, int>{};
+    final byFile = <String, int>{};
+
+    for (final s in records) {
+      switch (s.kind) {
+        case SuppressionKind.ignore:
+          ignoreCount++;
+        case SuppressionKind.ignoreForFile:
+          ignoreForFileCount++;
+        case SuppressionKind.baseline:
+          baselineCount++;
+      }
+      byRule[s.rule] = (byRule[s.rule] ?? 0) + 1;
+      // File paths in consolidated records are already normalized to
+      // project-relative form by _mergeSuppressions, but relativize
+      // again for safety (idempotent).
+      final relFile = toRelativePath(s.file, projectRoot);
+      byFile[relFile] = (byFile[relFile] ?? 0) + 1;
+    }
+
+    return <String, Object>{
+      'total': records.length,
+      'byKind': <String, int>{
+        'ignore': ignoreCount,
+        'ignoreForFile': ignoreForFileCount,
+        'baseline': baselineCount,
       },
+      'byRule': byRule,
+      'byFile': byFile,
     };
   }
 

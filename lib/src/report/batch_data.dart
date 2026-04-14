@@ -22,6 +22,7 @@ class BatchData {
     required this.severityCounts,
     required this.violations,
     this.rawImportsByFile = const <String, List<String>>{},
+    this.suppressions = const <SuppressionRecord>[],
   });
 
   static const int _formatVersion = 1;
@@ -40,6 +41,10 @@ class BatchData {
   /// Raw `import` / `export` URI strings per analyzed file path (absolute
   /// or project-relative). Serialized as `ig` for cross-isolate merge.
   final Map<String, List<String>> rawImportsByFile;
+
+  /// Suppression records from this isolate's analysis pass.
+  /// Serialized as `sup` for cross-isolate merge.
+  final List<SuppressionRecord> suppressions;
 
   /// Serialize to JSON string.
   String toJsonString() {
@@ -60,6 +65,9 @@ class BatchData {
     }
     if (rawImportsByFile.isNotEmpty) {
       map['ig'] = rawImportsByFile;
+    }
+    if (suppressions.isNotEmpty) {
+      map['sup'] = _suppressionsToJson(suppressions);
     }
     return const JsonEncoder().convert(map);
   }
@@ -93,6 +101,7 @@ class BatchData {
         severityCounts: _severityCountsFromJson(map['sc']),
         violations: _violationsFromJson(map['vl']),
         rawImportsByFile: _stringListMap(map['ig']),
+        suppressions: _suppressionsFromJson(map['sup']),
       );
     } on FormatException {
       return null;
@@ -252,4 +261,47 @@ Map<String, List<String>> _stringListMap(dynamic raw) {
     }
   });
   return out;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Suppression record serialization — compact keys to minimize batch file size.
+// ─────────────────────────────────────────────────────────────────────────────
+
+List<Map<String, Object>> _suppressionsToJson(List<SuppressionRecord> records) {
+  return records
+      .map(
+        (s) => <String, Object>{
+          'r': s.rule,
+          'f': s.file,
+          'l': s.line,
+          'k': s.kind.name,
+        },
+      )
+      .toList();
+}
+
+List<SuppressionRecord> _suppressionsFromJson(dynamic raw) {
+  if (raw is! List<dynamic>) return const <SuppressionRecord>[];
+  final result = <SuppressionRecord>[];
+  for (final item in raw) {
+    if (item is! Map<String, dynamic>) continue;
+    final r = item['r'];
+    final f = item['f'];
+    final l = item['l'];
+    final k = item['k'];
+    if (r is! String || f is! String || l is! int || k is! String) continue;
+
+    // Parse the kind string back to the enum. Skip unknown values so
+    // forward-compatible if new kinds are added later.
+    final kind = SuppressionKind.values.cast<SuppressionKind?>().firstWhere(
+      (v) => v?.name == k,
+      orElse: () => null,
+    );
+    if (kind == null) continue;
+
+    result.add(
+      SuppressionRecord(rule: r, file: f, line: l, kind: kind),
+    );
+  }
+  return result;
 }

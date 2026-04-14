@@ -141,4 +141,39 @@ describe('readViolations', () => {
     const data = readViolations(root);
     assert.strictEqual(data?.summary?.suppressions?.total, 0);
   });
+
+  it('parses suppressions byRule and byFile breakdowns', () => {
+    const root = writeJson({
+      violations: [],
+      summary: {
+        suppressions: {
+          total: 7,
+          byKind: { ignore: 5, ignoreForFile: 2 },
+          byRule: { avoid_print: 4, require_https: 3 },
+          byFile: { 'lib/app.dart': 5, 'lib/api.dart': 2 },
+        },
+      },
+    });
+    const data = readViolations(root);
+    assert.deepStrictEqual(data?.summary?.suppressions?.byRule, {
+      avoid_print: 4,
+      require_https: 3,
+    });
+    assert.deepStrictEqual(data?.summary?.suppressions?.byFile, {
+      'lib/app.dart': 5,
+      'lib/api.dart': 2,
+    });
+  });
+
+  it('returns undefined byRule/byFile when absent (backward compat)', () => {
+    const root = writeJson({
+      violations: [],
+      summary: {
+        suppressions: { total: 3, byKind: { ignore: 3 } },
+      },
+    });
+    const data = readViolations(root);
+    assert.strictEqual(data?.summary?.suppressions?.byRule, undefined);
+    assert.strictEqual(data?.summary?.suppressions?.byFile, undefined);
+  });
 });

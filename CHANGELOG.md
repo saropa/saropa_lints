@@ -45,7 +45,7 @@ A major extension UX upgrade featuring a new searchable command catalog sidebar,
 - **Extension:** Package detail panel and sidebar now show package description (truncated with "read more" link), topic badges linking to pub.dev topic search, likes count in the Community section, direct dependencies as clickable chips, and a Documentation link to the pub.dev API reference.
 - **Extension:** Package detail panel and sidebar now show the package logo (first non-badge image from README) in the header and a README Images gallery section. Both are lazy-loaded from the GitHub API when the detail panel opens. HTTP-only images are filtered out to prevent silent CSP failures.
 - **Extension:** Package detail and sidebar CSP updated to allow HTTPS images for logo and README screenshots.
-- **Plugin:** Suppression tracking — every diagnostic silenced by `// ignore:`, `// ignore_for_file:`, or baseline is now counted by kind. `SuppressionTracker` class follows the existing `ImpactTracker` pattern. Counts appear in the console summary log, in the `violations.json` summary under `suppressions`, and in the extension Overview tree dashboard and Health Summary section. Foundation for Discussion #56 full suppression audit trail.
+- **Plugin:** Suppression tracking — every diagnostic silenced by `// ignore:`, `// ignore_for_file:`, or baseline is now recorded as a full `SuppressionRecord` (rule, file, line, kind). Records are included in batch data for cross-isolate merging, deduplicated with normalized paths, and exported in `violations.json` with `byKind`, `byRule`, and `byFile` breakdowns. Counts appear in the console summary log and the extension Overview tree. Foundation for Discussion #56 suppression audit trail.
 
 ### Changed
 
@@ -73,6 +73,7 @@ A major extension UX upgrade featuring a new searchable command catalog sidebar,
 
 - **Extension:** Violations tree file items no longer expand to empty. `getChildren()` re-read `violations.json` on every expansion — if the file was temporarily unavailable (write lock during scan, concurrent rewrite), the early-return guards returned `[]` before reaching the file-item handler. File and group nodes now resolve from their embedded data before any disk read, so already-loaded children survive a transient I/O hiccup.
 - **Extension:** Pubspec validation no longer shows duplicate diagnostics on startup. `onDidOpenTextDocument` fires retroactively for already-loaded documents, and the `visibleTextEditors` loop covered them again — deduplicating the initial sync prevents `update()` from running twice for the same file.
+- **Extension:** `stale-override` no longer false-positives on overrides that resolve SDK-pinned transitive conflicts (e.g. `meta: 1.18.0` when `flutter_test` pins `1.17.0` but `analyzer ^12` requires `^1.18.0`). The override analyzer now compares the overridden version against the dep-graph resolved version — if they differ, the override is classified as active.
 
 
 <details>
@@ -121,10 +122,6 @@ False-positive fixes across hardcoded config, dependency ordering, adoption gate
 - **Pubspec diagnostics (extension):** All 11 pubspec.yaml validation messages now include the `[saropa_lints]` prefix, matching the convention used by the Dart-side lint rules.
 - **`isLintPluginSource` guard (infra):** The per-file guard that prevents rules from firing on their own source code was broken in the native analyzer model — it ran once at registration time, not per-file. Moved the check into `_shouldSkipCurrentFile()` so it evaluates per-file and removed the 43 dead per-rule guards across 12 rule files. Fixes 8 false positives from `avoid_ios_in_app_browser_for_auth` on its own OAuth URL pattern definitions, plus potential false positives in all other affected rule files.
 
-### Changed
-
-- **SDK_PACKAGES (extension):** Consolidated three duplicate `SDK_PACKAGES` sets (annotate-command, unused-detector, pubspec-sorter) into a single shared constant at `sdk-packages.ts`. Added missing `integration_test` and `flutter_driver` entries to the pubspec-sorter set.
-
 ### Added (Extension)
 
 - **Help hub**: New “Saropa Lints: Help” command (`saropaLints.openHelpHub`) opens a quick pick for Getting Started, About, Browse All Commands, and pub.dev. **Overview** intro links are grouped under a permanent collapsible **Help & resources** tree section; the title bar shows only the Command Catalog icon (help is in the tree). **Violations** always shows a **Help & resources** row at the top when the tree has content, plus both Help and Command Catalog icons in the title bar.
@@ -136,6 +133,12 @@ False-positive fixes across hardcoded config, dependency ordering, adoption gate
 ### Changed (Extension)
 
 - **Command catalog**: Sidebar title actions on Overview and Violations open the catalog; Codicons load in the webview; recent command runs are stored for one-click replay with a clear control; UI refresh (hero header, cards, command IDs). **Toolbar trim**: fewer Package Vibrancy and Violations title-bar entries (secondary actions remain in the command palette and catalog). **Context menu**: removed “Log package details” from package rows. **Catalog UX**: categories ordered setup → analysis → violations → rules → security → reporting → vibrancy → …; entries sorted A–Z within each section; search indexes title, description, and command id (including spaced tokens); responsive layout for narrow panes.
+
+<details>
+<summary>Maintenance</summary>
+
+- **SDK_PACKAGES (extension):** Consolidated three duplicate `SDK_PACKAGES` sets (annotate-command, unused-detector, pubspec-sorter) into a single shared constant at `sdk-packages.ts`. Added missing `integration_test` and `flutter_driver` entries to the pubspec-sorter set.
+</details>
 
 ---
 
@@ -174,11 +177,6 @@ New graph command for import visualization, a searchable command catalog in the 
 
 - **Duplicate annotation comments**: The annotate-packages feature could leave duplicate description comments above a dependency (e.g. two identical `# A composable, multi-platform...` lines) when re-run on a pubspec that already had annotations from a prior run. The scanner now removes all consecutive auto-description lines above a URL, not just the single closest one.
 
-### Changed (Extension)
-
-- **Unified pubspec.yaml listener**: Pubspec validation and SDK constraint diagnostics now share a single `registerPubspecDocListeners` helper with one debounce timer (300ms), eliminating duplicate event subscriptions. Includes error boundary — a pubspec validation failure does not block SDK diagnostics. Fallback listeners are registered if vibrancy activation fails.
-- **Internal**: `parseDependencySections()` now accepts a pre-split lines array, eliminating a duplicate `content.split('\n')` call per validation run.
-
 ### Fixed
 
 - **Sidebar section toggles not responding**: Clicking an "Off" sidebar toggle in Overview & options produced no feedback. Root cause: the `toggleSidebarSection` command was registered at runtime but not declared in `contributes.commands`, so VS Code silently ignored tree-item clicks. Added the command declaration and a `commandPalette` hide entry, and wrapped the handler in try/catch so config-update failures now surface as error notifications.
@@ -189,6 +187,8 @@ New graph command for import visualization, a searchable command catalog in the 
 <details>
 <summary>Maintenance</summary>
 
+- **Unified pubspec.yaml listener**: Pubspec validation and SDK constraint diagnostics now share a single `registerPubspecDocListeners` helper with one debounce timer (300ms), eliminating duplicate event subscriptions. Includes error boundary — a pubspec validation failure does not block SDK diagnostics.
+- **Internal**: `parseDependencySections()` now accepts a pre-split lines array, eliminating a duplicate `content.split('\n')` call per validation run.
 - **Roadmap restructure**: Split deferred rules into focused documents in `plan/deferred/` by barrier type (cross-file, unreliable detection, external dependencies, framework limitations, compiler diagnostics, not viable). Trimmed ROADMAP.md to actionable content only. Moved cross-file CLI design to `plan/cross_file_cli_design.md`.
 - **Bug Report Guide**: Added `bugs/BUG_REPORT_GUIDE.md` — structured template and investigation checklist for filing lint rule bugs (false positives, false negatives, crashes, wrong fixes, performance)
 - **Changelog Archive**: Moved [9.9.0] and older logs to [CHANGELOG_ARCHIVE.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG_ARCHIVE.md)
@@ -339,11 +339,13 @@ Fixed VS Code Marketplace publishing blocked by TypeScript 5.9 bug; modularized 
 
 - **(Extension)** Fixed VS Code Marketplace publishing blocked since v10.2.2 by TypeScript 5.9 bug — `tsc --noEmit` fails with "Unknown compiler option" because TS 5.9's `createOptionNameMap()` reads `option.lowerCaseName` (a property that doesn't exist on any option declaration), building an empty lookup map; pinned TypeScript to `~5.8.3` to restore extension compilation and Marketplace publishing
 
-### Changed
+<details>
+<summary>Maintenance</summary>
 
-- Modularized `scripts/publish.py` (1,246 → 202 lines) into three focused modules: `_publish_workflow.py` (pipeline orchestration), version prompting/sync into `_version_changelog.py`, and store verification into `_extension_publish.py`
-- Added `scripts/README.md` with architecture diagram, module map, exit codes, and troubleshooting
-- Added pub.dev publication verification: polls the pub.dev API after publish to confirm the new version is live
+- Modularized `scripts/publish.py` (1,246 → 202 lines) into three focused modules: `_publish_workflow.py` (pipeline orchestration), version prompting/sync into `_version_changelog.py`, and store verification into `_extension_publish.py`.
+- Added `scripts/README.md` with architecture diagram, module map, exit codes, and troubleshooting.
+- Added pub.dev publication verification: polls the pub.dev API after publish to confirm the new version is live.
+</details>
 
 ---
 
@@ -366,8 +368,13 @@ Vibrancy Report overhaul — auto-hiding blank columns, clickable summary cards 
 - **(Extension)** Section badges (`dev`, `transitive`) shown in Package column
 - **(Extension)** Description info icon column with tooltip on hover
 - **(Extension)** Override count shown in summary cards
-- **(Extension)** `createdDate` field added to pub.dev metadata
-- **(Extension)** `installedVersionDate` field added to vibrancy results
+
+<details>
+<summary>Maintenance</summary>
+
+- `createdDate` field added to pub.dev metadata model.
+- `installedVersionDate` field added to vibrancy results model.
+</details>
 
 ---
 
@@ -375,17 +382,19 @@ Vibrancy Report overhaul — auto-hiding blank columns, clickable summary cards 
 
 Analyzer 12 migration — rewrites ~500 call sites across 70+ rule files to the new AST API, adds vibrancy scan cancel/supersede support. — [log](https://github.com/saropa/saropa_lints/blob/v10.3.0/CHANGELOG.md)
 
-### Changed
-
-- **Analyzer upgraded from ^9.0.0 to ^12.0.0** — migrated ~500 call sites across 70+ rule files to the new AST API (`ClassDeclaration.body.members`, `ClassNamePart.typeName`, `PrimaryConstructorDeclaration`, `DottedName`, etc.)
-- **Removed analyzer-9 compatibility extensions** — `DiagnosticCodeLowerCase` and `LintCodeLowerCase` shims removed; `lowerCaseName` is now native in analyzer 12
-- **Updated `CapturingRuleVisitorRegistry`** — added 5 new visitor methods and removed 4 obsolete ones to match the analyzer 12 `RuleVisitorRegistry` interface
-- **Updated test registry** — `PluginRegistry` interface changes: `enabled()` method, `DiagnosticCode` parameter on `registerFixForRule`
-
 ### Added
 
 - **Vibrancy scan cancel button** — the progress notification now shows a Cancel button so users can abort a long-running scan
 - **Scan supersede** — starting a new vibrancy scan automatically cancels any in-progress scan instead of silently dropping the request
+
+<details>
+<summary>Maintenance</summary>
+
+- **Analyzer upgraded from ^9.0.0 to ^12.0.0** — migrated ~500 call sites across 70+ rule files to the new AST API (`ClassDeclaration.body.members`, `ClassNamePart.typeName`, `PrimaryConstructorDeclaration`, `DottedName`, etc.)
+- **Removed analyzer-9 compatibility extensions** — `DiagnosticCodeLowerCase` and `LintCodeLowerCase` shims removed; `lowerCaseName` is now native in analyzer 12.
+- **Updated `CapturingRuleVisitorRegistry`** — added 5 new visitor methods and removed 4 obsolete ones to match the analyzer 12 `RuleVisitorRegistry` interface.
+- **Updated test registry** — `PluginRegistry` interface changes: `enabled()` method, `DiagnosticCode` parameter on `registerFixForRule`.
+</details>
 
 ---
 
@@ -422,9 +431,14 @@ Stream subscription detection improvements — fixes false negatives on rxdart a
 
 - `avoid_stream_subscription_in_field` now detects uncaptured `.listen()` calls on Stream subclasses (e.g. rxdart `MergeStream`, `BehaviorSubject`) that were previously missed by string-based type checking
 - `avoid_stream_subscription_in_field` problem message and correction message now accurately describe the rule's behavior (detecting uncaptured `.listen()` calls) instead of incorrectly claiming it checks `dispose()`
-- Test fixture for `avoid_stream_subscription_in_field` now uses properly-typed `Stream<int>` variables instead of undefined `dynamic` references that bypassed the type check
 - **(Extension)** Violations sidebar no longer opens a "file not found" error when source files have been moved or renamed since the last analysis; affected items show a warning icon with "(file moved or deleted)" label
 - **(Extension)** "Fix all in this file" command now shows a user-friendly warning instead of silently failing on moved/deleted files
+
+<details>
+<summary>Maintenance</summary>
+
+- Test fixture for `avoid_stream_subscription_in_field` now uses properly-typed `Stream<int>` variables instead of undefined `dynamic` references that bypassed the type check.
+</details>
 
 ## [10.1.1]
 
@@ -455,7 +469,12 @@ This release focuses on Flutter SDK alignment (new migration lints and a shared 
 
 - **Package Vibrancy (VS Code extension)** — Introduces [`extension/src/vibrancy/scoring/trusted-publishers.ts`](extension/src/vibrancy/scoring/trusted-publishers.ts): **`TRUSTED_PUBLISHERS`** (`dart.dev`, `google.dev`, `flutter.dev`, `firebase.google.com`) and **`isTrustedPublisher()`**. The same set controls (1) the **`publisherTrustBonus`** scoring bonus and (2) promoting **Quiet** → **Vibrant** when the raw score is in the mid band but the dependency is from a trusted publisher—so pubspec CodeLens and reports match maintainer intent. **EOL still wins:** discontinued packages, known end-of-life entries, and archived GitHub repos are unchanged; publisher IDs are matched case-sensitively (as on pub.dev). **`saropaLints.packageVibrancy.publisherTrustBonus`** setting description updated to describe the trusted list. **Tests:** `npm test` runs [`vibrancy-calculator.test.ts`](extension/src/test/vibrancy/scoring/vibrancy-calculator.test.ts) (trust bonus for every trusted ID) and extended [`status-classifier.test.ts`](extension/src/test/vibrancy/scoring/status-classifier.test.ts) (trusted upgrade, non-trusted quiet, wrong-case publisher, EOL overrides).
 
-- **Analyzer identifier → element** — Shared `elementFromAstIdentifier` in [`lib/src/element_identifier_utils.dart`](lib/src/element_identifier_utils.dart) tries `.element` then `.staticElement` with optional `logFailures`. Used by `image_filter_quality_detection` and deprecated-API checks in `code_quality_avoid_rules.dart`. Documented in [CODE_INDEX.md](CODE_INDEX.md). Tests: [`test/element_identifier_utils_test.dart`](test/element_identifier_utils_test.dart).
+
+<details>
+<summary>Maintenance</summary>
+
+- **Analyzer identifier → element** — Shared `elementFromAstIdentifier` in `lib/src/element_identifier_utils.dart` tries `.element` then `.staticElement` with optional `logFailures`. Used by `image_filter_quality_detection` and deprecated-API checks in `code_quality_avoid_rules.dart`. Tests: `test/element_identifier_utils_test.dart`.
+</details>
 
 ---
 
@@ -466,9 +485,14 @@ This patch wires ten compile-time mirror rules into the public rule list and tie
 ### Fixed
 
 - **Plan additional rules 31–40** — The ten compile-time / doc / style mirror rules (`abstract_field_initializer`, `abi_specific_integer_invalid`, `annotate_redeclares`, `deprecated_new_in_comment_reference`, `document_ignores`, `non_constant_map_element`, `return_in_generator`, `subtype_of_disallowed_type`, `undefined_enum_constructor`, `yield_in_non_generator`) were present in source but missing from [`saropa_lints.dart`](lib/saropa_lints.dart) `_allRuleFactories` and from [`essentialRules`](lib/src/tiers.dart); they are now registered so tiers and tooling load them.
-- **Analyzer 9 (migration / fixes)** — `prefer_dropdown_menu_item_button_opacity_animation` uses `declaredFragment?.element` on class and field declarations, `DartType.nullabilitySuffix` for nullable `CurvedAnimation?`, [SimpleIdentifier.element] for `!` operands, and `reporter.atToken` for field names. `PreferDropdownMenuItemButtonOpacityAnimationFieldFix` uses `NamedType.name.lexeme` and `VariableDeclarationList.lateKeyword` / `keyword` for insertion offsets. `image_filter_quality_detection` uses `SimpleIdentifier.element` only (removed `staticElement`).
 - **`require_data_encryption`** — The `pin` keyword is matched only when not immediately preceded by an ASCII letter, so identifiers such as `OwaspMapping` (where `Mapping` embeds `…p-i-n…`) no longer false-positive on ordinary `write`/`writeAsString` calls. Regression coverage: `test/require_data_encryption_pin_pattern_test.dart`; fixture: `example_async/lib/security/require_data_encryption_fixture.dart`.
-- **`rootUriToPath`** — `file://` roots use `Uri.tryParse` so invalid URIs return null instead of throwing; satisfies `prefer_try_parse_for_dynamic_data` for package_config paths. Tests: `test/project_info_root_uri_test.dart`.
+
+<details>
+<summary>Maintenance</summary>
+
+- **Analyzer 9 (migration / fixes)** — `prefer_dropdown_menu_item_button_opacity_animation` uses `declaredFragment?.element` on class and field declarations, `DartType.nullabilitySuffix` for nullable `CurvedAnimation?`, `SimpleIdentifier.element` for `!` operands, and `reporter.atToken` for field names. `image_filter_quality_detection` uses `SimpleIdentifier.element` only (removed `staticElement`).
+- **`rootUriToPath`** — `file://` roots use `Uri.tryParse` so invalid URIs return null instead of throwing. Tests: `test/project_info_root_uri_test.dart`.
+</details>
 
 ---
 
@@ -488,11 +512,7 @@ In this milestone update work centers on the composite analyzer plugin hook (`re
 
 ### Fixed
 
-• **Publish / tier integrity** — `scripts/modules/_tier_integrity.py` `get_registered_rule_names` now resolves rule classes when the `extends` clause starts on the line after the class name (valid Dart; previously produced a false **phantom** for `avoid_removed_nosuchmethoderror_default_constructor`). `AvoidRemovedNoSuchMethodErrorDefaultConstructorRule` header documented to stay single-line for consistency with adjacent migration rules. Python regression coverage: `scripts/tests/test_tier_integrity_registered_names.py`.
-
 • **VS Code extension** — **Violations tree:** enable `canSelectMany` on `saropaLints.issues` so Ctrl/Cmd+click multi-select works with **Copy as JSON** (command already preferred the selection array; the UI could not select multiple rows before). Selection resolution moved to `extension/src/copyTreeAsJsonSelection.ts` for unit tests without the VS Code runtime. Tests: `extension/src/test/copyTreeAsJson.test.ts`.
-
-• **VS Code extension** — Code cleanup: batch `context.subscriptions.push` where it was split unnecessarily (`extension.ts`), and refactor vibrancy “Copy as JSON” serialization into small matchers with documented dispatch order (`treeSerializers.ts`). Adds unit tests for `serializeVibrancyNode` (including false-positive guards for partial package/problem/suggestion payloads).
 
 ### Changed
 
@@ -524,13 +544,7 @@ In this milestone update work centers on the composite analyzer plugin hook (`re
 
 • **VS Code extension** — **Overview & options** sidebar: **Workspace options** embeds the same tree as the standalone Config view; section toggles show counts in the label (e.g. `Package Vibrancy (2)`) with **On**/**Off** in the description; intro links (pub.dev, About, Getting Started) remain visible whenever Saropa is enabled; standalone Config defaults off (`saropaLints.sidebar.showConfig`). Command **Saropa Lints: Open package on pub.dev** (`saropaLints.openPubDevSaropaLints`). Overview **Copy as JSON** recurses through nested children. Embedded config nodes are allowlisted by `kind` (`overviewEmbeddedConfigKinds.ts`); sidebar label formatting lives in `sidebarToggleLabel.ts` for Node tests. Unit tests: `sidebarToggleLabel`, `overviewEmbeddedConfigKinds`, `serializeOverviewNode`.
 
-• **Rule packs** — Maintainer workflow documented in `doc/guides/rule_packs.md` (regenerate, composite map, audit). Added `test/rule_pack_registry_test.dart` (composite `avoid_isar_import_with_drift` on drift + isar; `collection_compat` merge) and expanded pubspec-marker false-positive coverage. README badge rule count aligned with `pubspec.yaml` (2105).
-
 • **VS Code extension** — **TODOs & Hacks** default `includeGlobs` no longer scans `**/*.md` (Markdown READMEs/plans often match tag words in prose). Defaults remain Dart, YAML, TypeScript, and JavaScript; add `**/*.md` in settings if you want docs included. `package.json` defaults and `todosAndHacksDefaults.ts` stay in sync (unit test).
-
-• **Dart SDK** — `example*` and `self_check` `pubspec.yaml` floors aligned to `>=3.9.0` with the main package ([PACKAGE_VIBRANCY.md](https://github.com/saropa/saropa_lints/blob/main/PACKAGE_VIBRANCY.md) legacy-support baseline), replacing stale lower example constraints.
-
-• **Dart SDK 3.0 migration rules** — `avoid_removed_max_user_tags_constant` and `avoid_removed_dart_developer_metrics` use **high** [LintImpact] (removed APIs are compile failures on Dart 3). File header and rule DartDocs in `dart_sdk_3_removal_rules.dart` expanded for reviewers and false-positive contracts.
 
 • **ListView extent hints** — `avoid_listview_without_item_extent`, `prefer_item_extent`, `prefer_prototype_item`, `prefer_itemextent_when_known`, and `require_item_extent_for_large_lists` now treat **`itemExtentBuilder`** (Flutter 3.16+, PR #131393) as a valid alternative to `itemExtent` / `prototypeItem` where applicable. `avoid_listview_without_item_extent` also applies to **`ListView.separated`**.
 
@@ -538,6 +552,16 @@ In this milestone update work centers on the composite analyzer plugin hook (`re
 
 - **prefer_super_key**: flags `Key? key` with `super(key: key)` on `StatelessWidget` / `StatefulWidget` / `*Widget` subclasses; prefer `super.key` ([Flutter PR #147621](https://github.com/flutter/flutter/pull/147621)). Quick fix rewrites the constructor.
 - **avoid_chip_delete_inkwell_circle_border**: flags chip `deleteIcon` subtrees that use `InkWell` with `customBorder: CircleBorder()`, which mismatches the square chip delete region fixed in Flutter 3.22 ([PR #144319](https://github.com/flutter/flutter/pull/144319)). Handles both `InstanceCreationExpression` and unqualified `MethodInvocation` chip calls, and nested `InkWell`/`CircleBorder` parse shapes.
+
+<details>
+<summary>Maintenance</summary>
+
+- **Publish / tier integrity** — `scripts/modules/_tier_integrity.py` `get_registered_rule_names` now resolves rule classes when the `extends` clause starts on the line after the class name (valid Dart; previously produced a false **phantom** for `avoid_removed_nosuchmethoderror_default_constructor`). Python regression coverage added.
+- **Code cleanup** — Batched `context.subscriptions.push` calls in `extension.ts`; refactored vibrancy "Copy as JSON" serialization into small matchers with documented dispatch order (`treeSerializers.ts`). Added unit tests for `serializeVibrancyNode`.
+- **Rule packs** — Maintainer workflow documented in `doc/guides/rule_packs.md` (regenerate, composite map, audit). Added `test/rule_pack_registry_test.dart` and expanded pubspec-marker false-positive coverage. README badge rule count aligned with `pubspec.yaml` (2105).
+- **Dart SDK** — `example*` and `self_check` `pubspec.yaml` floors aligned to `>=3.9.0` with the main package, replacing stale lower example constraints.
+- **Dart SDK 3.0 migration rules** — `avoid_removed_max_user_tags_constant` and `avoid_removed_dart_developer_metrics` use **high** LintImpact (removed APIs are compile failures on Dart 3). File header and rule DartDocs expanded for reviewers and false-positive contracts.
+</details>
 
 ---
 

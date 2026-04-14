@@ -155,4 +155,23 @@ describe('filterDisabledFromData', () => {
     const result = filterDisabledFromData(data, new Set());
     assert.strictEqual(result.summary?.suppressions?.total, 3);
   });
+
+  it('preserves suppressions byRule and byFile through filtering', () => {
+    const data: ViolationsData = {
+      violations: [v('rule_a'), v('rule_b')],
+      summary: {
+        totalViolations: 2,
+        suppressions: {
+          total: 5,
+          byKind: { ignore: 3, baseline: 2 },
+          byRule: { rule_c: 3, rule_d: 2 },
+          byFile: { 'lib/x.dart': 5 },
+        },
+      },
+    };
+    const result = filterDisabledFromData(data, new Set(['rule_a']));
+    // byRule/byFile are analysis-time data, not recomputed by filtering.
+    assert.deepStrictEqual(result.summary?.suppressions?.byRule, { rule_c: 3, rule_d: 2 });
+    assert.deepStrictEqual(result.summary?.suppressions?.byFile, { 'lib/x.dart': 5 });
+  });
 });
