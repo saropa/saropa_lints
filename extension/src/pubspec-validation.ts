@@ -1,3 +1,5 @@
+import * as fs from 'node:fs';
+
 /**
  * Pubspec validation diagnostics.
  *
@@ -165,6 +167,50 @@ function createLineDiag(
     diag.source = SOURCE;
     diag.code = code;
     return diag;
+}
+
+// ── Suppression ───────────────────────────────────────────────
+
+/**
+ * Extract suppressed rule codes from a comment string.
+ *
+ * Recognizes the format: `# saropa_lints:ignore rule_a, rule_b`
+ * The directive can appear anywhere in the string (inline after
+ * YAML content or on a standalone comment line).
+ *
+ * Returns an empty set if the line contains no suppression directive.
+ */
+export function parseSuppressedRules(commentLine: string): Set<string> {
+    const match = commentLine.match(
+        /saropa_lints:ignore\s+(.+)/,
+    );
+    if (!match) { return new Set(); }
+    return new Set(
+        match[1].split(',').map(s => s.trim()).filter(Boolean),
+    );
+}
+
+/**
+ * Check whether a diagnostic on a given line is suppressed by an
+ * inline `# saropa_lints:ignore <code>` comment — either on the
+ * same line or on the line immediately above.
+ */
+function isSuppressed(
+    lines: readonly string[],
+    diagLine: number,
+    code: string,
+): boolean {
+    // Check inline comment on the diagnostic's own line
+    const sameLine = lines[diagLine] ?? '';
+    if (parseSuppressedRules(sameLine).has(code)) { return true; }
+
+    // Check comment on the line above
+    if (diagLine > 0) {
+        const prevLine = (lines[diagLine - 1] ?? '').trim();
+        if (parseSuppressedRules(prevLine).has(code)) { return true; }
+    }
+
+    return false;
 }
 
 // ── Rule checks ────────────────────────────────────────────────
@@ -623,12 +669,27 @@ function checkResolutionWorkspace(
  * because it keeps pubspec focused on dependencies and metadata,
  * and is the approach recommended by Flutter documentation.
  *
- * This check flags `generate: true` under the `flutter:` section.
+ * This check flags `generate: true` under the `flutter:` section,
+ * unless a dedicated `l10n.yaml` file already exists alongside
+ * pubspec.yaml — in that case `generate: true` is required by
+ * Flutter tooling and flagging it would be a false positive.
+ *
+ * Note: this is the only check in this module that performs
+ * filesystem I/O (a synchronous `existsSync` call).
  */
 function checkL10nYamlConfig(
     lines: string[],
     diagnostics: vscode.Diagnostic[],
+    pubspecUri: vscode.Uri,
 ): void {
+    // If l10n.yaml already exists alongside pubspec.yaml, the project
+    // follows the recommended pattern. Flutter tooling *requires*
+    // `generate: true` in pubspec.yaml even with a dedicated l10n.yaml,
+    // so flagging it would be a false positive.
+    const workspaceDir = vscode.Uri.joinPath(pubspecUri, '..');
+    const l10nYamlPath = vscode.Uri.joinPath(workspaceDir, 'l10n.yaml').fsPath;
+    if (fs.existsSync(l10nYamlPath)) { return; }
+
     let inFlutterSection = false;
 
     for (let i = 0; i < lines.length; i++) {
@@ -700,9 +761,20 @@ export class PubspecValidation {
         checkNewlineBeforeEntry(lines, diagnostics);
         checkCommentingPubspecIgnores(lines, diagnostics);
         checkResolutionWorkspace(lines, diagnostics);
-        checkL10nYamlConfig(lines, diagnostics);
+        checkL10nYamlConfig(lines, diagnostics, uri);
 
-        this._collection.set(uri, diagnostics);
+        // Filter out diagnostics suppressed by inline comments.
+        // A comment `# saropa_lints:ignore <rule_code>` on the same
+        // line or the line above suppresses that specific diagnostic.
+        const filtered = diagnostics.filter(diag => {
+            const diagLine = diag.range.start.line;
+            const code = typeof diag.code === 'string' ? diag.code : '';
+            // Keep diagnostics with no code — nothing to match against
+            if (!code) { return true; }
+            return !isSuppressed(lines, diagLine, code);
+        });
+
+        this._collection.set(uri, filtered);
     }
 
     clear(): void {
