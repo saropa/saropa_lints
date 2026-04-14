@@ -155,6 +155,7 @@ class AnalysisReporter {
   static void _startNewSession() {
     ProgressTracker.reset();
     ImpactTracker.reset();
+    SuppressionTracker.reset();
     ImportGraphTracker.reset();
     ProgressTracker.clearReanalysisFlag();
     final root = _projectRoot;

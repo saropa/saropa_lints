@@ -777,6 +777,36 @@ class ProgressTracker {
       buf.writeln('  $green✓ No issues found!$reset');
     }
 
+    // Suppression breakdown (only if any diagnostics were suppressed)
+    final suppressionTotal = SuppressionTracker.total;
+    if (suppressionTotal > 0) {
+      buf.writeln();
+      buf.writeln('$dim${'─' * 70}$reset');
+      buf.writeln('  $bold SUPPRESSED DIAGNOSTICS$reset');
+      buf.writeln('$dim${'─' * 70}$reset');
+      final ignoreCount = SuppressionTracker.ignoreCount;
+      final fileCount = SuppressionTracker.ignoreForFileCount;
+      final baseCount = SuppressionTracker.baselineCount;
+      if (ignoreCount > 0) {
+        buf.writeln(
+          '    $dim//$reset ignore:          $bold$ignoreCount$reset',
+        );
+      }
+      if (fileCount > 0) {
+        buf.writeln(
+          '    $dim//$reset ignore_for_file: $bold$fileCount$reset',
+        );
+      }
+      if (baseCount > 0) {
+        buf.writeln(
+          '    $dim●$reset baseline:         $bold$baseCount$reset',
+        );
+      }
+      buf.writeln(
+        '    $dim──$reset Total suppressed: $bold$suppressionTotal$reset',
+      );
+    }
+
     // Top offending files (max 5 to keep summary compact)
     if (_issuesByFile.isNotEmpty) {
       final sortedFiles = _issuesByFile.entries.toList()
@@ -1763,6 +1793,94 @@ class ImpactTracker {
   }
 }
 
+/// How a diagnostic was suppressed.
+///
+/// Used by [SuppressionTracker] to distinguish between the three suppression
+/// mechanisms so reports and the extension can break down counts by kind.
+enum SuppressionKind {
+  /// Suppressed by a line-level `// ignore: rule_name` comment.
+  ignore,
+
+  /// Suppressed by a file-level `// ignore_for_file: rule_name` comment.
+  ignoreForFile,
+
+  /// Suppressed by the baseline (saropa_baseline.json).
+  baseline,
+}
+
+/// Tracks suppressions — diagnostics that *would* have been reported but
+/// were silenced by ignore comments or the baseline.
+///
+/// Mirrors the [ImpactTracker] pattern: static counters accumulated during
+/// analysis, exposed via getters, and reset between sessions.
+///
+/// ## Quick-win scope
+///
+/// This initial version tracks aggregate counts only (no per-file records).
+/// A future phase will add full `SuppressionRecord` objects with file/line
+/// detail for the extension sidebar and JSON export.
+class SuppressionTracker {
+  SuppressionTracker._();
+
+  static int _ignoreCount = 0;
+  static int _ignoreForFileCount = 0;
+  static int _baselineCount = 0;
+
+  /// Record one suppression of the given [kind].
+  static void record(SuppressionKind kind) {
+    // Increment the counter for the suppression kind. Using a switch
+    // ensures new enum values cause a compile-time error here.
+    switch (kind) {
+      case SuppressionKind.ignore:
+        _ignoreCount++;
+      case SuppressionKind.ignoreForFile:
+        _ignoreForFileCount++;
+      case SuppressionKind.baseline:
+        _baselineCount++;
+    }
+  }
+
+  /// Total suppressions across all kinds.
+  static int get total => _ignoreCount + _ignoreForFileCount + _baselineCount;
+
+  /// Count of line-level `// ignore:` suppressions.
+  static int get ignoreCount => _ignoreCount;
+
+  /// Count of file-level `// ignore_for_file:` suppressions.
+  static int get ignoreForFileCount => _ignoreForFileCount;
+
+  /// Count of baseline suppressions.
+  static int get baselineCount => _baselineCount;
+
+  /// Counts by kind, suitable for JSON serialization.
+  static Map<String, int> get countsByKind => <String, int>{
+    'ignore': _ignoreCount,
+    'ignoreForFile': _ignoreForFileCount,
+    'baseline': _baselineCount,
+  };
+
+  /// Human-readable summary, e.g. "12 suppressions (8 ignore, 2 file-level, 2 baseline)".
+  ///
+  /// Returns an empty string when there are no suppressions.
+  static String get summary {
+    final t = total;
+    if (t == 0) return '';
+
+    final parts = <String>[];
+    if (_ignoreCount > 0) parts.add('$_ignoreCount ignore');
+    if (_ignoreForFileCount > 0) parts.add('$_ignoreForFileCount file-level');
+    if (_baselineCount > 0) parts.add('$_baselineCount baseline');
+    return '$t suppression${t == 1 ? '' : 's'} (${parts.join(', ')})';
+  }
+
+  /// Clear all counters (called between analysis sessions).
+  static void reset() {
+    _ignoreCount = 0;
+    _ignoreForFileCount = 0;
+    _baselineCount = 0;
+  }
+}
+
 /// A recorded lint violation with location and metadata.
 ///
 /// Equality is based on [file], [line], and [rule] so that duplicate
@@ -2691,18 +2809,33 @@ class SaropaDiagnosticReporter {
 
   /// Reports a diagnostic at the given [token].
   void atToken(Token token, [LintCode? code]) {
-    if (_isBaselined(token.offset)) return;
-    if (_isIgnoredForFile()) return;
-    if (IgnoreUtils.hasIgnoreCommentOnToken(token, _ruleName)) return;
+    if (_isBaselined(token.offset)) {
+      SuppressionTracker.record(SuppressionKind.baseline);
+      return;
+    }
+    if (_isIgnoredForFile()) {
+      SuppressionTracker.record(SuppressionKind.ignoreForFile);
+      return;
+    }
+    if (IgnoreUtils.hasIgnoreCommentOnToken(token, _ruleName)) {
+      SuppressionTracker.record(SuppressionKind.ignore);
+      return;
+    }
     _rule.reportAtToken(token);
     _trackViolation(token.offset);
   }
 
   /// Reports a diagnostic at the given offset and length.
   void atOffset({required int offset, required int length}) {
-    if (_isBaselined(offset)) return;
+    if (_isBaselined(offset)) {
+      SuppressionTracker.record(SuppressionKind.baseline);
+      return;
+    }
     // File-level only — no AST node available for node-level ignore check.
-    if (_isIgnoredForFile()) return;
+    if (_isIgnoredForFile()) {
+      SuppressionTracker.record(SuppressionKind.ignoreForFile);
+      return;
+    }
     _rule.reportAtOffset(offset, length);
     _trackViolation(offset);
   }
@@ -2712,10 +2845,24 @@ class SaropaDiagnosticReporter {
   /// Checks baseline, file-level `// ignore_for_file:`, and node-level
   /// `// ignore:` directives so suppressed violations are excluded from
   /// both analyzer output and violations.json.
-  bool _isSuppressed(int offset, AstNode node) =>
-      _isBaselined(offset) ||
-      _isIgnoredForFile() ||
-      IgnoreUtils.hasIgnoreComment(node, _ruleName);
+  ///
+  /// When a suppression is detected, records it in [SuppressionTracker]
+  /// so the summary log and violations.json include suppression counts.
+  bool _isSuppressed(int offset, AstNode node) {
+    if (_isBaselined(offset)) {
+      SuppressionTracker.record(SuppressionKind.baseline);
+      return true;
+    }
+    if (_isIgnoredForFile()) {
+      SuppressionTracker.record(SuppressionKind.ignoreForFile);
+      return true;
+    }
+    if (IgnoreUtils.hasIgnoreComment(node, _ruleName)) {
+      SuppressionTracker.record(SuppressionKind.ignore);
+      return true;
+    }
+    return false;
+  }
 
   /// Check if this violation is suppressed by the baseline.
   bool _isBaselined(int offset) {

@@ -69,4 +69,76 @@ describe('readViolations', () => {
     const data = readViolations(root);
     assert.deepStrictEqual(data?.config?.rulesWithFixes, []);
   });
+
+  // ── Suppression parsing ─────────────────────────────────────────────
+
+  it('parses suppressions summary with total and byKind', () => {
+    const root = writeJson({
+      violations: [],
+      summary: {
+        totalViolations: 0,
+        suppressions: {
+          total: 14,
+          byKind: { ignore: 8, ignoreForFile: 4, baseline: 2 },
+        },
+      },
+    });
+    const data = readViolations(root);
+    assert.strictEqual(data?.summary?.suppressions?.total, 14);
+    assert.deepStrictEqual(data?.summary?.suppressions?.byKind, {
+      ignore: 8,
+      ignoreForFile: 4,
+      baseline: 2,
+    });
+  });
+
+  it('returns undefined suppressions when field is absent (backward compat)', () => {
+    const root = writeJson({
+      violations: [],
+      summary: { totalViolations: 0 },
+    });
+    const data = readViolations(root);
+    // Older violations.json files won't have the suppressions field.
+    assert.strictEqual(data?.summary?.suppressions, undefined);
+  });
+
+  it('returns undefined suppressions when field is not an object', () => {
+    const root = writeJson({
+      violations: [],
+      summary: { totalViolations: 0, suppressions: 'not-an-object' },
+    });
+    const data = readViolations(root);
+    assert.strictEqual(data?.summary?.suppressions, undefined);
+  });
+
+  it('handles suppressions with total only (no byKind)', () => {
+    const root = writeJson({
+      violations: [],
+      summary: { suppressions: { total: 5 } },
+    });
+    const data = readViolations(root);
+    assert.strictEqual(data?.summary?.suppressions?.total, 5);
+    assert.strictEqual(data?.summary?.suppressions?.byKind, undefined);
+  });
+
+  it('handles suppressions with non-numeric total gracefully', () => {
+    const root = writeJson({
+      violations: [],
+      summary: { suppressions: { total: 'bad' } },
+    });
+    const data = readViolations(root);
+    // Non-numeric total is dropped to undefined rather than propagated.
+    assert.strictEqual(data?.summary?.suppressions?.total, undefined);
+  });
+
+  it('handles suppressions with zero total', () => {
+    const root = writeJson({
+      violations: [],
+      summary: {
+        suppressions: { total: 0, byKind: { ignore: 0, ignoreForFile: 0, baseline: 0 } },
+      },
+    });
+    const data = readViolations(root);
+    assert.strictEqual(data?.summary?.suppressions?.total, 0);
+  });
 });
