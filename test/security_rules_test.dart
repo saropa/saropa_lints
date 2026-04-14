@@ -9,7 +9,7 @@ import 'package:test/test.dart';
 /// These rules cover credential security, injection prevention, secure storage,
 /// WebView security, authentication, data protection, and OWASP compliance.
 ///
-/// Test fixtures: example_async/lib/security/*
+/// Test fixtures: example/lib/security/*
 void main() {
   group('Security Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {
@@ -379,7 +379,7 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File('example_async/lib/security/${fixture}_fixture.dart');
+        final file = File('example/lib/security/${fixture}_fixture.dart');
         expect(file.existsSync(), isTrue);
       });
     }
@@ -530,7 +530,7 @@ void main() {
         'fixture has exactly 3 BAD cases with expect_lint (unvalidated redirect should trigger)',
         () {
           final file = File(
-            'example_async/lib/security/avoid_redirect_injection_fixture.dart',
+            'example/lib/security/avoid_redirect_injection_fixture.dart',
           );
           expect(file.existsSync(), isTrue);
           final content = file.readAsStringSync();
@@ -550,7 +550,7 @@ void main() {
         'allowlist-validated destination (allowed/validated in block) should NOT trigger',
         () {
           final file = File(
-            'example_async/lib/security/avoid_redirect_injection_fixture.dart',
+            'example/lib/security/avoid_redirect_injection_fixture.dart',
           );
           expect(file.existsSync(), isTrue);
           final content = file.readAsStringSync();
@@ -776,7 +776,7 @@ void main() {
 
       test('fixture has exactly one BAD (expect_lint) so rule triggers once', () {
         final path =
-            'example_async/lib/security/avoid_screenshot_sensitive_fixture.dart';
+            'example/lib/security/avoid_screenshot_sensitive_fixture.dart';
         final file = File(path);
         expect(file.existsSync(), isTrue, reason: 'Fixture must exist');
         final content = file.readAsStringSync();
@@ -795,7 +795,7 @@ void main() {
         'fixture GOOD classes (debug/viewer, fromsettings) must NOT trigger',
         () {
           final path =
-              'example_async/lib/security/avoid_screenshot_sensitive_fixture.dart';
+              'example/lib/security/avoid_screenshot_sensitive_fixture.dart';
           final content = File(path).readAsStringSync();
           expect(
             content.contains('_DriftViewerWebViewScreen'),

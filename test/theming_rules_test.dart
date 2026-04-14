@@ -5,7 +5,7 @@ import 'package:test/test.dart';
 
 /// Tests for 6 Theming lint rules.
 ///
-/// Test fixtures: example_widgets/lib/theming/*
+/// Test fixtures: example/lib/theming/*
 void main() {
   group('Theming Rules - Rule Instantiation', () {
     test('RequireDarkModeTestingRule', () {
@@ -68,7 +68,7 @@ void main() {
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
-          'example_widgets/lib/theming/${fixture}_fixture.dart',
+          'example/lib/theming/${fixture}_fixture.dart',
         );
         expect(file.existsSync(), isTrue);
       });

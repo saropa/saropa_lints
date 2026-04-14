@@ -5,7 +5,7 @@ import 'package:test/test.dart';
 
 /// Tests for 49 Performance lint rules.
 ///
-/// Test fixtures: example_async/lib/performance/*
+/// Test fixtures: example/lib/performance/*
 void main() {
   group('Performance Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {
@@ -325,7 +325,7 @@ void main() {
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
-          'example_async/lib/performance/${fixture}_fixture.dart',
+          'example/lib/performance/${fixture}_fixture.dart',
         );
         expect(file.existsSync(), isTrue);
       });

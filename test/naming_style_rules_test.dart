@@ -5,7 +5,7 @@ import 'package:test/test.dart';
 
 /// Tests for 28 Naming Style lint rules.
 ///
-/// Test fixtures: example_core/lib/naming_style/*
+/// Test fixtures: example/lib/naming_style/*
 void main() {
   group('Naming Style Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {
@@ -226,7 +226,7 @@ void main() {
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
-          'example_core/lib/naming_style/${fixture}_fixture.dart',
+          'example/lib/naming_style/${fixture}_fixture.dart',
         );
         expect(file.existsSync(), isTrue);
       });

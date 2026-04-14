@@ -6,7 +6,7 @@ import 'package:test/test.dart';
 
 /// Tests for 10 Formatting lint rules.
 ///
-/// Test fixtures: example_core/lib/formatting/*
+/// Test fixtures: example/lib/formatting/*
 void main() {
   group('Formatting Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {
@@ -118,7 +118,7 @@ void main() {
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
-          'example_core/lib/formatting/${fixture}_fixture.dart',
+          'example/lib/formatting/${fixture}_fixture.dart',
         );
         expect(file.existsSync(), isTrue);
       });
@@ -230,7 +230,7 @@ void main() {
 
       test('fixture has bad example with expect_lint marker', () {
         final content = File(
-          'example_core/lib/formatting/prefer_blank_line_before_else_fixture.dart',
+          'example/lib/formatting/prefer_blank_line_before_else_fixture.dart',
         ).readAsStringSync();
         expect(
           content,
@@ -241,7 +241,7 @@ void main() {
 
       test('fixture has good example without violation', () {
         final content = File(
-          'example_core/lib/formatting/prefer_blank_line_before_else_fixture.dart',
+          'example/lib/formatting/prefer_blank_line_before_else_fixture.dart',
         ).readAsStringSync();
         expect(content, contains('_good'));
       });
@@ -250,7 +250,7 @@ void main() {
         'fixture has false-positive guard: if without else must not trigger',
         () {
           final content = File(
-            'example_core/lib/formatting/prefer_blank_line_before_else_fixture.dart',
+            'example/lib/formatting/prefer_blank_line_before_else_fixture.dart',
           ).readAsStringSync();
           expect(content, contains('_noElse'));
           expect(content, contains('if (x)'));
@@ -262,7 +262,7 @@ void main() {
         'fixture has false-positive guard: else-if chains must not trigger',
         () {
           final content = File(
-            'example_core/lib/formatting/prefer_blank_line_before_else_fixture.dart',
+            'example/lib/formatting/prefer_blank_line_before_else_fixture.dart',
           ).readAsStringSync();
           expect(content, contains('_elseIfChain'));
           expect(content, contains('else if'));
@@ -292,7 +292,7 @@ void main() {
 
       test('fixture has bad example with expect_lint marker', () {
         final content = File(
-          'example_core/lib/formatting/prefer_blank_line_after_loop_fixture.dart',
+          'example/lib/formatting/prefer_blank_line_after_loop_fixture.dart',
         ).readAsStringSync();
         expect(
           content,
@@ -303,7 +303,7 @@ void main() {
 
       test('fixture has good example without violation', () {
         final content = File(
-          'example_core/lib/formatting/prefer_blank_line_after_loop_fixture.dart',
+          'example/lib/formatting/prefer_blank_line_after_loop_fixture.dart',
         ).readAsStringSync();
         expect(content, contains('_good'));
       });
@@ -312,7 +312,7 @@ void main() {
         'fixture has false-positive guard: block with only loop must not trigger',
         () {
           final content = File(
-            'example_core/lib/formatting/prefer_blank_line_after_loop_fixture.dart',
+            'example/lib/formatting/prefer_blank_line_after_loop_fixture.dart',
           ).readAsStringSync();
           expect(content, contains('_onlyLoop'));
           expect(content, contains('for (var i = 0'));
@@ -407,7 +407,7 @@ void main() {
 
       test('fixture has bad example with expect_lint marker', () {
         final content = File(
-          'example_core/lib/formatting/require_ignore_comment_spacing_fixture.dart',
+          'example/lib/formatting/require_ignore_comment_spacing_fixture.dart',
         ).readAsStringSync();
         expect(
           content,
@@ -421,7 +421,7 @@ void main() {
         'fixture has good examples (space after colon) that must not trigger',
         () {
           final content = File(
-            'example_core/lib/formatting/require_ignore_comment_spacing_fixture.dart',
+            'example/lib/formatting/require_ignore_comment_spacing_fixture.dart',
           ).readAsStringSync();
           expect(content, contains('// ignore: require_debouncer_cancel'));
           expect(content, contains('// ignore_for_file: avoid_print'));

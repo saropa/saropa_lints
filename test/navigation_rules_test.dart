@@ -5,7 +5,7 @@ import 'package:test/test.dart';
 
 /// Tests for 36 Navigation lint rules.
 ///
-/// Test fixtures: example_widgets/lib/navigation/*
+/// Test fixtures: example/lib/navigation/*
 void main() {
   group('Navigation Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {
@@ -256,7 +256,7 @@ void main() {
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
-          'example_widgets/lib/navigation/${fixture}_fixture.dart',
+          'example/lib/navigation/${fixture}_fixture.dart',
         );
         expect(file.existsSync(), isTrue);
       });

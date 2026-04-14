@@ -8,8 +8,8 @@ import 'package:test/test.dart';
 /// - `prefer_capitalized_comment_start` (flags prose, skips code)
 ///
 /// Test fixtures for integration testing:
-/// - example_style/lib/stylistic/prefer_no_commented_out_code_fixture.dart
-/// - example_style/lib/stylistic/prefer_capitalized_comment_start_fixture.dart
+/// - example/lib/stylistic/prefer_no_commented_out_code_fixture.dart
+/// - example/lib/stylistic/prefer_capitalized_comment_start_fixture.dart
 void main() {
   group('CommentPatterns.isLikelyCode', () {
     group('should detect commented-out code', () {

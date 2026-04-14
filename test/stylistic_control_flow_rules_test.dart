@@ -10,7 +10,7 @@ import 'package:saropa_lints/src/rules/stylistic/stylistic_control_flow_rules.da
 
 /// Tests for 14 Stylistic Control Flow lint rules.
 ///
-/// Test fixtures: example_style/lib/stylistic_control_flow/*
+/// Test fixtures: example/lib/stylistic_control_flow/*
 void main() {
   group('Stylistic Control Flow Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {
@@ -164,7 +164,7 @@ void main() {
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
-          'example_style/lib/stylistic_control_flow/${fixture}_fixture.dart',
+          'example/lib/stylistic_control_flow/${fixture}_fixture.dart',
         );
         expect(file.existsSync(), isTrue);
       });

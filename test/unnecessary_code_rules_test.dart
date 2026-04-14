@@ -6,7 +6,7 @@ import 'package:saropa_lints/src/rules/code_quality/unnecessary_code_rules.dart'
 
 /// Tests for 14 Unnecessary Code lint rules.
 ///
-/// Test fixtures: example_core/lib/unnecessary_code/*
+/// Test fixtures: example/lib/unnecessary_code/*
 void main() {
   group('Unnecessary Code Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {
@@ -116,7 +116,7 @@ void main() {
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
-          'example_core/lib/unnecessary_code/${fixture}_fixture.dart',
+          'example/lib/unnecessary_code/${fixture}_fixture.dart',
         );
         expect(file.existsSync(), isTrue);
       });

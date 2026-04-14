@@ -50,8 +50,8 @@ import 'package:test/test.dart';
 ///
 /// Test fixtures are located in:
 /// - example/lib/require_subscription_status_check_example.dart
-/// - example_widgets/lib/navigation/require_deep_link_fallback_fixture.dart
-/// - example_async/lib/security/require_https_only_fixture.dart
+/// - example/lib/navigation/require_deep_link_fallback_fixture.dart
+/// - example/lib/security/require_https_only_fixture.dart
 /// - example/lib/avoid_variable_shadowing_fixture.dart
 /// - example_packages/lib/isar/avoid_isar_clear_in_production_fixture.dart
 /// - example/lib/avoid_nested_assignments_fixture.dart
@@ -1236,14 +1236,14 @@ void main() {
 
   group('6.0.4 / 6.0.5 False Positive Fixes', () {
     // Document expected behavior for rules fixed in CHANGELOG 6.0.4/6.0.5.
-    // Fixtures: example_async/lib/security/*, example_core/lib/collection*,
-    // example_widgets/lib/ui_ux/require_search_debounce_fixture.dart,
-    // example_widgets/lib/accessibility/require_minimum_contrast_fixture.dart.
+    // Fixtures: example/lib/security/*, example/lib/collection*,
+    // example/lib/ui_ux/require_search_debounce_fixture.dart,
+    // example/lib/accessibility/require_minimum_contrast_fixture.dart.
 
     group('avoid_dynamic_sql', () {
       test('PRAGMA with interpolation should NOT trigger', () {
         // PRAGMA does not support ? placeholders; interpolation is required.
-        // Fixture: example_async/lib/security/avoid_dynamic_sql_fixture.dart
+        // Fixture: example/lib/security/avoid_dynamic_sql_fixture.dart
         expect('PRAGMA exemption in fixture', isNotNull);
       });
 
@@ -1495,12 +1495,12 @@ void main() {
     });
 
     test('require_deep_link_fallback has test fixture', () {
-      // Located at: example_widgets/lib/navigation/require_deep_link_fallback_fixture.dart
+      // Located at: example/lib/navigation/require_deep_link_fallback_fixture.dart
       expect(true, isTrue);
     });
 
     test('require_https_only has test fixture', () {
-      // Located at: example_async/lib/security/require_https_only_fixture.dart
+      // Located at: example/lib/security/require_https_only_fixture.dart
       expect(true, isTrue);
     });
 
@@ -1515,7 +1515,7 @@ void main() {
     });
 
     test('prefer_late_final has test fixture', () {
-      // Located at: example_core/lib/code_quality/code_quality_fixture.dart
+      // Located at: example/lib/code_quality/code_quality_fixture.dart
       expect(true, isTrue);
     });
 
@@ -1526,51 +1526,51 @@ void main() {
 
     test('require_websocket_reconnection has mock stubs', () {
       // Located at: example/lib/flutter_mocks.dart (WebSocket, WebSocketChannel)
-      // Fixture at: example_async/lib/async/async_rules_fixture.dart
+      // Fixture at: example/lib/async/async_rules_fixture.dart
       expect(true, isTrue);
     });
 
     test('prefer_wheretype_over_where_is has test fixture', () {
-      // Located at: example_style/lib/stylistic_null_collection/prefer_wheretype_over_where_is_fixture.dart
+      // Located at: example/lib/stylistic_null_collection/prefer_wheretype_over_where_is_fixture.dart
       expect(true, isTrue);
     });
 
     test('6.0.4 avoid_dynamic_sql has regression fixture', () {
-      // example_async/lib/security/avoid_dynamic_sql_fixture.dart (PRAGMA, word-boundary)
+      // example/lib/security/avoid_dynamic_sql_fixture.dart (PRAGMA, word-boundary)
       expect(true, isTrue);
     });
 
     test('6.0.4 avoid_path_traversal has regression fixture', () {
-      // example_async/lib/security/avoid_path_traversal_fixture.dart (private helper)
+      // example/lib/security/avoid_path_traversal_fixture.dart (private helper)
       expect(true, isTrue);
     });
 
     test(
       'avoid_screenshot_sensitive has regression fixture (debug/viewer, fromsettings)',
       () {
-        // example_async/lib/security/avoid_screenshot_sensitive_fixture.dart
+        // example/lib/security/avoid_screenshot_sensitive_fixture.dart
         // Debug/tooling (viewer, webview) and WebViewScreenFromSettings must NOT trigger
         expect(true, isTrue);
       },
     );
 
     test('6.0.4 require_file_path_sanitization has regression fixture', () {
-      // example_async/lib/file_handling/require_file_path_sanitization_fixture.dart
+      // example/lib/file_handling/require_file_path_sanitization_fixture.dart
       expect(true, isTrue);
     });
 
     test('6.0.4 avoid_unsafe_reduce has regression fixture', () {
-      // example_core/lib/collections/avoid_unsafe_reduce_fixture.dart (guarded reduce)
+      // example/lib/collections/avoid_unsafe_reduce_fixture.dart (guarded reduce)
       expect(true, isTrue);
     });
 
     test('6.0.4 require_search_debounce has regression fixture', () {
-      // example_widgets/lib/ui_ux/require_search_debounce_fixture.dart (class field debouncer)
+      // example/lib/ui_ux/require_search_debounce_fixture.dart (class field debouncer)
       expect(true, isTrue);
     });
 
     test('6.0.4 require_minimum_contrast has regression fixture', () {
-      // example_widgets/lib/accessibility/require_minimum_contrast_fixture.dart (unresolvable bg)
+      // example/lib/accessibility/require_minimum_contrast_fixture.dart (unresolvable bg)
       expect(true, isTrue);
     });
   });

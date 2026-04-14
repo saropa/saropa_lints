@@ -5,7 +5,7 @@ import 'package:test/test.dart';
 
 /// Tests for 14 Complexity lint rules.
 ///
-/// Test fixtures: example_core/lib/complexity/*
+/// Test fixtures: example/lib/complexity/*
 void main() {
   group('Complexity Rules - Rule Instantiation', () {
     test('AvoidBitwiseOperatorsWithBooleansRule', () {
@@ -153,7 +153,7 @@ void main() {
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
-          'example_core/lib/complexity/${fixture}_fixture.dart',
+          'example/lib/complexity/${fixture}_fixture.dart',
         );
         expect(file.existsSync(), isTrue);
       });

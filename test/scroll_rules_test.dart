@@ -5,7 +5,7 @@ import 'package:test/test.dart';
 
 /// Tests for 18 Scroll lint rules.
 ///
-/// Test fixtures: example_widgets/lib/scroll/*
+/// Test fixtures: example/lib/scroll/*
 void main() {
   group('Scroll Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {
@@ -133,7 +133,7 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File('example_widgets/lib/scroll/${fixture}_fixture.dart');
+        final file = File('example/lib/scroll/${fixture}_fixture.dart');
         expect(file.existsSync(), isTrue);
       });
     }

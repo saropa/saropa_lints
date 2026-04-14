@@ -11,12 +11,12 @@ import 'package:test/test.dart';
 ///    groups no longer inflate each other's duplicate count.
 ///
 /// Test fixture:
-/// - example_style/lib/testing/testing_rules_additional_fixture.dart
+/// - example/lib/testing/testing_rules_additional_fixture.dart
 void main() {
   group('prefer_setup_teardown', () {
     test('fixture file exists', () {
       final file = File(
-        'example_style/lib/testing/testing_rules_additional_fixture.dart',
+        'example/lib/testing/testing_rules_additional_fixture.dart',
       );
       expect(file.existsSync(), isTrue);
     });

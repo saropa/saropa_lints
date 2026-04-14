@@ -6,7 +6,7 @@ import 'package:test/test.dart';
 
 /// Tests for 5 Cryptography lint rules.
 ///
-/// Test fixtures: example_async/lib/crypto/*
+/// Test fixtures: example/lib/crypto/*
 void main() {
   group('Cryptography Rules - Rule Instantiation', () {
     test('AvoidHardcodedEncryptionKeysRule', () {
@@ -99,7 +99,7 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File('example_async/lib/crypto/${fixture}_fixture.dart');
+        final file = File('example/lib/crypto/${fixture}_fixture.dart');
         expect(file.existsSync(), isTrue);
       });
     }

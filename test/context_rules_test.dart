@@ -5,7 +5,7 @@ import 'package:test/test.dart';
 
 /// Tests for 6 Context lint rules.
 ///
-/// Test fixtures: example_async/lib/context/*
+/// Test fixtures: example/lib/context/*
 void main() {
   group('Context Rules - Rule Instantiation', () {
     test('AvoidStoringContextRule', () {
@@ -80,7 +80,7 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File('example_async/lib/context/${fixture}_fixture.dart');
+        final file = File('example/lib/context/${fixture}_fixture.dart');
         expect(file.existsSync(), isTrue);
       });
     }

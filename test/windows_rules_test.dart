@@ -6,7 +6,7 @@ import 'package:saropa_lints/src/rules/platforms/windows_rules.dart';
 
 /// Tests for 5 Windows lint rules.
 ///
-/// Test fixtures: example_platforms/lib/windows/
+/// Test fixtures: example/lib/windows/
 void main() {
   group('Windows Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {
@@ -62,7 +62,7 @@ void main() {
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
-          'example_platforms/lib/windows/${fixture}_fixture.dart',
+          'example/lib/windows/${fixture}_fixture.dart',
         );
         expect(file.existsSync(), isTrue);
       });

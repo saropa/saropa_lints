@@ -5,7 +5,7 @@ import 'package:test/test.dart';
 
 /// Tests for 7 Equality lint rules.
 ///
-/// Test fixtures: example_core/lib/equality/*
+/// Test fixtures: example/lib/equality/*
 void main() {
   group('Equality Rules - Rule Instantiation', () {
     test('AvoidEqualExpressionsRule', () {
@@ -84,7 +84,7 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File('example_core/lib/equality/${fixture}_fixture.dart');
+        final file = File('example/lib/equality/${fixture}_fixture.dart');
         expect(file.existsSync(), isTrue);
       });
     }

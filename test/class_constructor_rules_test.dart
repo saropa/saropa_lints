@@ -5,7 +5,7 @@ import 'package:test/test.dart';
 
 /// Tests for 21 Class Constructor lint rules.
 ///
-/// Test fixtures: example_core/lib/class_constructor/*
+/// Test fixtures: example/lib/class_constructor/*
 void main() {
   group('Class Constructor Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {
@@ -177,7 +177,7 @@ void main() {
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
-          'example_core/lib/class_constructor/${fixture}_fixture.dart',
+          'example/lib/class_constructor/${fixture}_fixture.dart',
         );
         expect(file.existsSync(), isTrue);
       });

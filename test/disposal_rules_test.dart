@@ -5,7 +5,7 @@ import 'package:test/test.dart';
 
 /// Tests for 17 Disposal lint rules.
 ///
-/// Test fixtures: example_async/lib/disposal/*
+/// Test fixtures: example/lib/disposal/*
 void main() {
   group('Disposal Rules - Rule Instantiation', () {
     test('RequireMediaPlayerDisposeRule', () {
@@ -198,7 +198,7 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File('example_async/lib/disposal/${fixture}_fixture.dart');
+        final file = File('example/lib/disposal/${fixture}_fixture.dart');
         expect(file.existsSync(), isTrue);
       });
     }
@@ -340,7 +340,7 @@ void main() {
         'fixture has exactly one BAD (expect_lint) so rule triggers once',
         () {
           final path =
-              'example_async/lib/disposal/require_debouncer_cancel_fixture.dart';
+              'example/lib/disposal/require_debouncer_cancel_fixture.dart';
           final file = File(path);
           expect(file.existsSync(), isTrue, reason: 'Fixture must exist');
           final content = file.readAsStringSync();
@@ -359,7 +359,7 @@ void main() {
         'fixture GOOD classes (no trigger): simple dispose and State-with-mixin',
         () {
           final path =
-              'example_async/lib/disposal/require_debouncer_cancel_fixture.dart';
+              'example/lib/disposal/require_debouncer_cancel_fixture.dart';
           final content = File(path).readAsStringSync();
           expect(
             content.contains('_good332__SearchState'),

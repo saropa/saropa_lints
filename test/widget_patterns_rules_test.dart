@@ -11,7 +11,7 @@ import 'package:saropa_lints/src/rules/widget/widget_patterns_ux_rules.dart';
 /// These rules cover widget structure, accessibility, theming, navigation,
 /// form handling, image patterns, gesture handling, and platform integration.
 ///
-/// Test fixtures: example_widgets/lib/widget_patterns/*
+/// Test fixtures: example/lib/widget_patterns/*
 void main() {
   group('Widget Patterns Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {
@@ -759,7 +759,7 @@ void main() {
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
-          'example_widgets/lib/widget_patterns/${fixture}_fixture.dart',
+          'example/lib/widget_patterns/${fixture}_fixture.dart',
         );
         expect(file.existsSync(), isTrue);
       });
@@ -1276,7 +1276,7 @@ void main() {
 
       test('fixture has exactly one BAD (expect_lint) and GOOD top:false case', () {
         final file = File(
-          'example_widgets/lib/widget_patterns/prefer_safe_area_consumer_fixture.dart',
+          'example/lib/widget_patterns/prefer_safe_area_consumer_fixture.dart',
         );
         expect(file.existsSync(), isTrue);
         final content = file.readAsStringSync();

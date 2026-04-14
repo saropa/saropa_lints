@@ -5,7 +5,7 @@ import 'package:test/test.dart';
 
 /// Tests for 13 Memory Management lint rules.
 ///
-/// Test fixtures: example_async/lib/memory_management/*
+/// Test fixtures: example/lib/memory_management/*
 void main() {
   group('Memory Management Rules - Rule Instantiation', () {
     test('AvoidLargeObjectsInStateRule', () {
@@ -151,7 +151,7 @@ void main() {
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
-          'example_async/lib/memory_management/${fixture}_fixture.dart',
+          'example/lib/memory_management/${fixture}_fixture.dart',
         );
         expect(file.existsSync(), isTrue);
       });

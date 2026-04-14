@@ -9,7 +9,7 @@ import 'package:test/test.dart';
 ///
 /// Covers "before" scheduling-hack shapes vs "after" / benign shapes without
 /// requiring a resolved `dart:html` SDK binding (that is covered by the
-/// example_platforms fixture + plugin integration).
+/// example fixture + plugin integration).
 void main() {
   group('windowPostMessageArgsLookLikeSchedulingHack', () {
     test('true for postMessage("", "*")', () {

@@ -5,7 +5,7 @@ import 'package:test/test.dart';
 
 /// Tests for 3 Platform lint rules.
 ///
-/// Test fixtures: example_platforms/lib/platform/*
+/// Test fixtures: example/lib/platform/*
 void main() {
   group('Platform Rules - Rule Instantiation', () {
     test('RequirePlatformCheckRule', () {
@@ -47,7 +47,7 @@ void main() {
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
-          'example_platforms/lib/platform/${fixture}_fixture.dart',
+          'example/lib/platform/${fixture}_fixture.dart',
         );
         expect(file.existsSync(), isTrue);
       });

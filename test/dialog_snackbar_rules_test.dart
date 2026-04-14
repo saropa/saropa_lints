@@ -6,7 +6,7 @@ import 'package:saropa_lints/src/rules/widget/dialog_snackbar_rules.dart';
 
 /// Tests for 6 Dialog & SnackBar lint rules.
 ///
-/// Test fixtures: example_widgets/lib/dialog_snackbar/*
+/// Test fixtures: example/lib/dialog_snackbar/*
 void main() {
   group('Dialog Snackbar Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {
@@ -69,7 +69,7 @@ void main() {
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
-          'example_widgets/lib/dialog_snackbar/${fixture}_fixture.dart',
+          'example/lib/dialog_snackbar/${fixture}_fixture.dart',
         );
         expect(file.existsSync(), isTrue);
       });

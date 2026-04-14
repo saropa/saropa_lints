@@ -6,7 +6,7 @@ import 'package:saropa_lints/src/rules/testing/test_rules.dart';
 
 /// Tests for 30 Test Rules lint rules.
 ///
-/// Test fixtures: example_style/lib/test/*
+/// Test fixtures: example/lib/test/*
 void main() {
   group('Test Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {
@@ -250,7 +250,7 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File('example_style/lib/test/${fixture}_fixture.dart');
+        final file = File('example/lib/test/${fixture}_fixture.dart');
         expect(file.existsSync(), isTrue);
       });
     }

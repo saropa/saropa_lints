@@ -6,7 +6,7 @@ import 'package:saropa_lints/src/rules/commerce/iap_rules.dart';
 
 /// Tests for 5 In-App Purchase lint rules.
 ///
-/// Test fixtures: example_async/lib/iap/*
+/// Test fixtures: example/lib/iap/*
 void main() {
   group('Iap Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {
@@ -61,7 +61,7 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File('example_async/lib/iap/${fixture}_fixture.dart');
+        final file = File('example/lib/iap/${fixture}_fixture.dart');
         expect(file.existsSync(), isTrue);
       });
     }
@@ -83,7 +83,7 @@ void main() {
     group('require_subscription_status_check', () {
       test('fixture has bad example with expect_lint marker', () {
         final content = File(
-          'example_async/lib/iap/require_subscription_status_check_fixture.dart',
+          'example/lib/iap/require_subscription_status_check_fixture.dart',
         ).readAsStringSync();
         expect(
           content,
@@ -94,7 +94,7 @@ void main() {
 
       test('fixture has good example without expect_lint', () {
         final content = File(
-          'example_async/lib/iap/require_subscription_status_check_fixture.dart',
+          'example/lib/iap/require_subscription_status_check_fixture.dart',
         ).readAsStringSync();
         expect(content, contains('_good'));
         expect(content, contains('FutureBuilder'));
@@ -102,7 +102,7 @@ void main() {
 
       test('fixture has no remaining TODOs', () {
         final content = File(
-          'example_async/lib/iap/require_subscription_status_check_fixture.dart',
+          'example/lib/iap/require_subscription_status_check_fixture.dart',
         ).readAsStringSync();
         expect(content, isNot(contains('// TODO: Add')));
       });

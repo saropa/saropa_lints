@@ -9,7 +9,7 @@ import 'package:saropa_lints/src/rules/stylistic/stylistic_additional_rules.dart
 
 /// Tests for 24 Stylistic Additional lint rules.
 ///
-/// Test fixtures: example_style/lib/stylistic_additional/*
+/// Test fixtures: example/lib/stylistic_additional/*
 void main() {
   group('Stylistic Additional Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {
@@ -198,7 +198,7 @@ void main() {
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
-          'example_style/lib/stylistic_additional/${fixture}_fixture.dart',
+          'example/lib/stylistic_additional/${fixture}_fixture.dart',
         );
         expect(file.existsSync(), isTrue);
       });

@@ -6,7 +6,7 @@ import 'package:saropa_lints/src/rules/resources/resource_management_rules.dart'
 
 /// Tests for 14 Resource Management lint rules.
 ///
-/// Test fixtures: example_async/lib/resource_management/*
+/// Test fixtures: example/lib/resource_management/*
 void main() {
   group('Resource Management Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {
@@ -125,7 +125,7 @@ void main() {
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
-          'example_async/lib/resource_management/${fixture}_fixture.dart',
+          'example/lib/resource_management/${fixture}_fixture.dart',
         );
         expect(file.existsSync(), isTrue);
       });

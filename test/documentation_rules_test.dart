@@ -5,7 +5,7 @@ import 'package:test/test.dart';
 
 /// Tests for 12 Documentation lint rules.
 ///
-/// Test fixtures: example_style/lib/documentation/*
+/// Test fixtures: example/lib/documentation/*
 void main() {
   group('Documentation Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {
@@ -103,7 +103,7 @@ void main() {
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
-          'example_style/lib/documentation/${fixture}_fixture.dart',
+          'example/lib/documentation/${fixture}_fixture.dart',
         );
         expect(file.existsSync(), isTrue);
       });

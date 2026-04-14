@@ -6,7 +6,7 @@ import 'package:saropa_lints/src/rules/architecture/dependency_injection_rules.d
 
 /// Tests for 15 Dependency Injection lint rules.
 ///
-/// Test fixtures: example_core/lib/dependency_injection/*
+/// Test fixtures: example/lib/dependency_injection/*
 void main() {
   group('Dependency Injection Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {
@@ -132,7 +132,7 @@ void main() {
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
-          'example_core/lib/dependency_injection/${fixture}_fixture.dart',
+          'example/lib/dependency_injection/${fixture}_fixture.dart',
         );
         expect(file.existsSync(), isTrue);
       });

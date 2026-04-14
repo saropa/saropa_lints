@@ -6,7 +6,7 @@ import 'package:saropa_lints/src/rules/stylistic/stylistic_widget_rules.dart';
 
 /// Tests for 13 Stylistic Widget lint rules.
 ///
-/// Test fixtures: example_style/lib/stylistic_widget/*
+/// Test fixtures: example/lib/stylistic_widget/*
 void main() {
   group('Stylistic Widget Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {
@@ -118,7 +118,7 @@ void main() {
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
-          'example_style/lib/stylistic_widget/${fixture}_fixture.dart',
+          'example/lib/stylistic_widget/${fixture}_fixture.dart',
         );
         expect(file.existsSync(), isTrue);
       });

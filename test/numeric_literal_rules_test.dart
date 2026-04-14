@@ -6,7 +6,7 @@ import 'package:saropa_lints/src/rules/data/numeric_literal_rules.dart';
 
 /// Tests for 11 Numeric Literal lint rules.
 ///
-/// Test fixtures: example_core/lib/numeric_literal/*
+/// Test fixtures: example/lib/numeric_literal/*
 void main() {
   group('Numeric Literal Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {
@@ -96,7 +96,7 @@ void main() {
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
-          'example_core/lib/numeric_literal/${fixture}_fixture.dart',
+          'example/lib/numeric_literal/${fixture}_fixture.dart',
         );
         expect(file.existsSync(), isTrue);
       });

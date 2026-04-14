@@ -5,7 +5,7 @@ import 'package:test/test.dart';
 
 /// Tests for 26 Forms lint rules.
 ///
-/// Test fixtures: example_widgets/lib/forms/*
+/// Test fixtures: example/lib/forms/*
 void main() {
   group('Forms Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {
@@ -187,7 +187,7 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File('example_widgets/lib/forms/${fixture}_fixture.dart');
+        final file = File('example/lib/forms/${fixture}_fixture.dart');
         expect(file.existsSync(), isTrue);
       });
     }

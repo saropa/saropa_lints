@@ -5,7 +5,7 @@ import 'package:test/test.dart';
 
 /// Tests for 8 Notification lint rules.
 ///
-/// Test fixtures: example_async/lib/notification/*
+/// Test fixtures: example/lib/notification/*
 void main() {
   group('Notification Rules - Rule Instantiation', () {
     test('RequireNotificationChannelAndroidRule', () {
@@ -114,7 +114,7 @@ void main() {
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
-          'example_async/lib/notification/${fixture}_fixture.dart',
+          'example/lib/notification/${fixture}_fixture.dart',
         );
         expect(file.existsSync(), isTrue);
       });
