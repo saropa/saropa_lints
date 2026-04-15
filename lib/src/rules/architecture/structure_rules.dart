@@ -10,6 +10,7 @@ import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/source/line_info.dart';
 import 'package:path/path.dart' as p;
 
+import '../../fixes/structure/add_abstract_final_fix.dart';
 import '../../fixes/structure/delete_duplicate_export_fix.dart';
 import '../../fixes/structure/delete_duplicate_import_fix.dart';
 import '../../fixes/structure/delete_duplicate_mixin_fix.dart';
@@ -17,6 +18,7 @@ import '../../fixes/async/avoid_redundant_async_fix.dart';
 import '../../fixes/structure/delete_throw_in_finally_fix.dart';
 import '../../fixes/structure/prefer_trailing_underscore_for_unused_fix.dart';
 import '../../fixes/structure/remove_double_slash_imports_fix.dart';
+import '../../fixes/structure/remove_library_name_fix.dart';
 import '../../fixes/structure/remove_unnecessary_nullable_return_type_fix.dart';
 import '../../fixes/structure/remove_unnecessary_reassignment_fix.dart';
 import '../../fixes/return/inline_immediate_return_fix.dart';
@@ -2059,6 +2061,12 @@ class PreferAbstractFinalStaticClassRule extends SaropaLintRule {
         'Use "abstract final class" to prevent instantiation. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     severity: DiagnosticSeverity.INFO,
   );
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        AddAbstractFinalFix(context: context),
+  ];
 
   @override
   void runWithReporter(
@@ -4423,6 +4431,12 @@ class UnnecessaryLibraryNameRule extends SaropaLintRule {
     correctionMessage: 'Replace with "library;" or remove the name.',
     severity: DiagnosticSeverity.INFO,
   );
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveLibraryNameFix(context: context),
+  ];
 
   @override
   void runWithReporter(

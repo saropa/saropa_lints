@@ -26,6 +26,10 @@ class RemoveLateKeywordFix extends SaropaFixProducer {
     final node = coveringNode;
     if (node == null) return;
 
+    // Extract the late keyword token from various AST node types.
+    // Rules report on different node types (FieldDeclaration,
+    // VariableDeclaration, VariableDeclarationStatement), so we
+    // handle each case to find the VariableDeclarationList.
     Token? lateToken;
     if (node is VariableDeclaration) {
       final parent = node.parent;
@@ -34,6 +38,8 @@ class RemoveLateKeywordFix extends SaropaFixProducer {
       }
     } else if (node is FieldDeclaration) {
       lateToken = node.fields.lateKeyword;
+    } else if (node is VariableDeclarationStatement) {
+      lateToken = node.variables.lateKeyword;
     } else {
       final decl = node.thisOrAncestorOfType<VariableDeclaration>();
       final parentList = decl?.parent;
