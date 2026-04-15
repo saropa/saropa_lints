@@ -114,7 +114,7 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] avoid_very_long_length_files
 - [ ] avoid_very_long_length_test_files
 - [ ] limit_max_imports
-- [ ] prefer_abstract_final_static_class
+- [X] prefer_abstract_final_static_class
 - [ ] prefer_constructors_first
 - [ ] prefer_constructors_over_static_methods
 - [ ] prefer_deferred_imports
@@ -145,9 +145,9 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 #### code_quality_avoid_rules.dart
 
 - [ ] avoid_accessing_collections_by_constant_index
-- [ ] avoid_async_call_in_sync_function
+- [X] avoid_async_call_in_sync_function
 - [ ] avoid_contradictory_expressions
-- [ ] avoid_default_tostring
+- [X] avoid_default_tostring
 - [ ] avoid_deprecated_usage
 - [ ] avoid_duplicate_constant_values
 - [ ] avoid_duplicate_string_literals
@@ -162,7 +162,7 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] avoid_missing_interpolation
 - [ ] avoid_nested_extension_types
 - [ ] avoid_passing_self_as_argument
-- [ ] avoid_positional_boolean_parameters
+- [X] avoid_positional_boolean_parameters
 - [ ] avoid_recursive_calls
 - [ ] avoid_recursive_tostring
 - [ ] avoid_referencing_discarded_variables
@@ -170,7 +170,7 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] avoid_similar_names
 - [ ] avoid_slow_collection_methods
 - [ ] banned_identifier_usage
-- [ ] missing_use_result_annotation
+- [X] missing_use_result_annotation
 - [ ] use_specific_deprecation
 
 #### code_quality_control_flow_rules.dart
@@ -203,14 +203,14 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 #### code_quality_variables_rules.dart
 
 - [ ] avoid_late_final_reassignment
-- [ ] avoid_late_for_nullable
+- [X] avoid_late_for_nullable
 - [ ] avoid_missing_enum_constant_in_map
 - [ ] avoid_parameter_mutation
 - [ ] avoid_parameter_reassignment
 - [ ] avoid_unassigned_fields
 - [ ] avoid_unassigned_late_fields
-- [ ] avoid_unnecessary_late_fields
-- [ ] avoid_unnecessary_local_late
+- [X] avoid_unnecessary_late_fields
+- [X] avoid_unnecessary_local_late
 - [ ] avoid_unnecessary_nullable_fields
 - [ ] avoid_unnecessary_nullable_parameters
 - [ ] avoid_unnecessary_patterns
@@ -221,7 +221,7 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] match_base_class_default_value
 - [ ] move_variable_closer_to_its_usage
 - [ ] move_variable_outside_iteration
-- [ ] prefer_late_final
+- [X] prefer_late_final
 - [ ] prefer_late_lazy_initialization
 - [ ] use_existing_destructuring
 - [ ] use_existing_variable

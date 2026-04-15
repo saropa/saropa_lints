@@ -48,7 +48,8 @@ class AddToStringFix extends SaropaFixProducer {
 
     // Format: ClassName(field1: $field1, field2: $field2)
     final fieldParts = fields.map((f) => '$f: \$$f').join(', ');
-    final method = '\n$memberIndent\n'
+    final method =
+        '\n$memberIndent\n'
         '$memberIndent@override\n'
         "${memberIndent}String toString() => '$className($fieldParts)';\n";
 
