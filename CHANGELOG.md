@@ -32,6 +32,14 @@
 -->
 
 ---
+
+## [Unreleased]
+
+### Security
+
+- Fix CVE in transitive dependency `serialize-javascript` (RCE via RegExp.flags and Date.toISOString) by adding npm `overrides` to pin `>=7.0.5`
+
+---
 ## [11.0.0]
 
 A major extension UX upgrade featuring a new searchable command catalog sidebar, embedded health dashboards, rich package details with logos and README images, unique vs. shared dependency breakdowns, and workspace-wide diagnostic suppression tracking. — [log](https://github.com/saropa/saropa_lints/blob/v11.0.0/CHANGELOG.md)

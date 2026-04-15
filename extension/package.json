@@ -1982,7 +1982,7 @@
     "@types/sinon": "^21.0.0",
     "@types/vscode": "^1.74.0",
     "esbuild": "^0.25.0",
-    "mocha": "^11.7.5",
+    "mocha": "^11.3.0",
     "npm-run-all": "^4.1.5",
     "semver": "^7.7.4",
     "sinon": "^21.0.3",
@@ -1990,5 +1990,8 @@
   },
   "dependencies": {
     "@vscode/codicons": "^0.0.36"
+  },
+  "overrides": {
+    "serialize-javascript": ">=7.0.5"
   }
 }
