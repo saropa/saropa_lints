@@ -1,12 +1,19 @@
-"""List every rule that has no quick fix, grouped by file. One-off for QUICK_FIX_PLAN.md."""
+"""List every rule that has no quick fix, grouped by file.
+
+Output is written to reports/<yyyymmdd>/<yyyymmdd_HHmmss>_list_rules_without_fixes.log
+"""
 from __future__ import annotations
 
 import re
+from datetime import datetime
 from pathlib import Path
+
+# Project root is one level above this script's directory
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 
 def main() -> None:
-    rules_dir = Path(__file__).resolve().parent.parent / "lib" / "src" / "rules"
+    rules_dir = PROJECT_ROOT / "lib" / "src" / "rules"
     name_pat = re.compile(r"LintCode\(\s*(?:name:\s*)?'([a-z0-9_]+)'")
     fix_pat = re.compile(r"get fixGenerators =>\s*\[")
 
@@ -40,11 +47,26 @@ def main() -> None:
         if rule_without_fix:
             results.append((dart_file.name, sorted(set(rule_without_fix))))
 
+    # Build output lines
+    lines: list[str] = []
     for fname, rules in results:
-        print("FILE:", fname)
+        lines.append(f"FILE: {fname}")
         for r in rules:
-            print("  - [ ]", r)
-        print()
+            lines.append(f"  - [ ] {r}")
+        lines.append("")
+
+    output_text = "\n".join(lines)
+
+    # Write to reports/<yyyymmdd>/<yyyymmdd_HHmmss>_list_rules_without_fixes.log
+    now = datetime.now()
+    timestamp = now.strftime("%Y%m%d_%H%M%S")
+    date_folder = timestamp[:8]
+    report_dir = PROJECT_ROOT / "reports" / date_folder
+    report_dir.mkdir(parents=True, exist_ok=True)
+    report_path = report_dir / f"{timestamp}_list_rules_without_fixes.log"
+
+    report_path.write_text(output_text, encoding="utf-8")
+    print(f"Report written to: {report_path.relative_to(PROJECT_ROOT)}")
 
 
 if __name__ == "__main__":

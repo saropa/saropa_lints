@@ -33,7 +33,7 @@
 
 ---
 
-## [Unreleased]
+## [11.1.0]
 
 ### Added
 
@@ -52,9 +52,11 @@
 
 - **Quick fix:** `RemoveLateKeywordFix` now handles `VariableDeclarationStatement` nodes (used by `avoid_unnecessary_local_late`)
 
-### Security
+<details>
+<summary>Maintenance</summary>
+- **Security:**  Fix CVE in transitive dependency `serialize-javascript` (RCE via RegExp.flags and Date.toISOString) by adding npm `overrides` to pin `>=7.0.5`
+</details>
 
-- Fix CVE in transitive dependency `serialize-javascript` (RCE via RegExp.flags and Date.toISOString) by adding npm `overrides` to pin `>=7.0.5`
 
 ---
 ## [11.0.0]

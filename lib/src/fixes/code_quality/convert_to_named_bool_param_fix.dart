@@ -54,8 +54,9 @@ class ConvertToNamedBoolParamFix extends SaropaFixProducer {
     // Guard: only safe when the bool param is the last positional
     // parameter. Inserting `{required ...}` in the middle of a
     // positional list produces invalid syntax.
-    final positionalParams =
-        paramList.parameters.where((p) => !p.isNamed).toList();
+    final positionalParams = paramList.parameters
+        .where((p) => !p.isNamed)
+        .toList();
     if (positionalParams.isNotEmpty && positionalParams.last != param) {
       return;
     }
