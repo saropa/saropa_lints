@@ -35,6 +35,23 @@
 
 ## [Unreleased]
 
+### Added
+
+- **Quick fix:** `unnecessary_library_name` — remove the library name, leaving bare `library;`
+- **Quick fix:** `avoid_late_for_nullable` — remove the `late` keyword from nullable field/variable declarations
+- **Quick fix:** `prefer_late_final` — change `late` to `late final` for single-assignment variables
+- **Quick fix:** `prefer_abstract_final_static_class` — add `abstract final` modifiers to static-only classes
+- **Quick fix:** `avoid_async_call_in_sync_function` — wrap unhandled Future call with `unawaited()`
+- **Quick fix:** `avoid_default_tostring` — generate a `toString()` override listing all instance fields
+- **Quick fix:** `missing_use_result_annotation` — add `@useResult` annotation before builder/factory methods
+- **Quick fix:** `avoid_unnecessary_local_late` — remove `late` from immediately-initialized local variables
+- **Quick fix:** `avoid_unnecessary_late_fields` — remove `late` from constructor-assigned fields
+- **Quick fix:** `avoid_positional_boolean_parameters` — convert positional bool parameter to required named
+
+### Changed
+
+- **Quick fix:** `RemoveLateKeywordFix` now handles `VariableDeclarationStatement` nodes (used by `avoid_unnecessary_local_late`)
+
 ### Security
 
 - Fix CVE in transitive dependency `serialize-javascript` (RCE via RegExp.flags and Date.toISOString) by adding npm `overrides` to pin `>=7.0.5`

@@ -8,6 +8,8 @@ import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/source/line_info.dart';
 
+import '../../fixes/code_quality/add_late_final_fix.dart';
+import '../../fixes/code_quality/remove_late_keyword_fix.dart';
 import '../../fixes/code_quality/remove_unused_assignment_fix.dart';
 import '../../saropa_lint_rule.dart';
 import '../../type_annotation_utils.dart';
@@ -1444,6 +1446,12 @@ class AvoidUnnecessaryLateFieldsRule extends SaropaLintRule {
   );
 
   @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveLateKeywordFix(context: context),
+  ];
+
+  @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
@@ -1733,6 +1741,12 @@ class AvoidUnnecessaryLocalLateRule extends SaropaLintRule {
         'Remove the late keyword and keep the immediate initializer. Use final or var to declare the variable with full compile-time initialization safety.',
     severity: DiagnosticSeverity.INFO,
   );
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveLateKeywordFix(context: context),
+  ];
 
   @override
   void runWithReporter(
@@ -2521,6 +2535,12 @@ class PreferLateFinalRule extends SaropaLintRule {
   );
 
   @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        AddLateFinalFix(context: context),
+  ];
+
+  @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
@@ -2782,6 +2802,12 @@ class AvoidLateForNullableRule extends SaropaLintRule {
         'Remove the late keyword and rely on the nullable type (T?) with null checks. The variable will default to null until explicitly assigned, which is safer and more predictable.',
     severity: DiagnosticSeverity.ERROR,
   );
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveLateKeywordFix(context: context),
+  ];
 
   @override
   void runWithReporter(

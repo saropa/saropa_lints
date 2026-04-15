@@ -27,7 +27,11 @@ import '../../fixes/code_quality/remove_inferrable_type_arguments_fix.dart';
 import '../../fixes/code_quality/remove_redundant_pragma_inline_fix.dart';
 import '../../fixes/code_quality/remove_unnecessary_override_fix.dart';
 import '../../fixes/code_quality/remove_unnecessary_statement_fix.dart';
+import '../../fixes/code_quality/add_tostring_fix.dart';
+import '../../fixes/code_quality/add_use_result_fix.dart';
+import '../../fixes/code_quality/convert_to_named_bool_param_fix.dart';
 import '../../fixes/code_quality/replace_weak_crypto_fix.dart';
+import '../../fixes/code_quality/wrap_unawaited_fix.dart';
 import '../../saropa_lint_rule.dart';
 
 class AvoidAdjacentStringsRule extends SaropaLintRule {
@@ -1286,6 +1290,12 @@ class MissingUseResultAnnotationRule extends SaropaLintRule {
   );
 
   @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        AddUseResultFix(context: context),
+  ];
+
+  @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
@@ -1616,6 +1626,12 @@ class AvoidAsyncCallInSyncFunctionRule extends SaropaLintRule {
         'Mark the enclosing function as async and await the call, chain with .then()/.catchError() for explicit handling, or wrap with unawaited() to document the intentional fire-and-forget.',
     severity: DiagnosticSeverity.WARNING,
   );
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        WrapUnawaitedFix(context: context),
+  ];
 
   @override
   void runWithReporter(
@@ -2205,6 +2221,12 @@ class AvoidDefaultToStringRule extends SaropaLintRule {
         'Override toString() to return a string representation of the object\'s key fields and current state. Format as "ClassName(field1: value1, field2: value2)" for easy inspection during debugging.',
     severity: DiagnosticSeverity.INFO,
   );
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        AddToStringFix(context: context),
+  ];
 
   @override
   void runWithReporter(
@@ -3695,6 +3717,12 @@ class AvoidPositionalBooleanParametersRule extends SaropaLintRule {
         'Convert to a named parameter so call sites are self-documenting.',
     severity: DiagnosticSeverity.INFO,
   );
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ConvertToNamedBoolParamFix(context: context),
+  ];
 
   @override
   void runWithReporter(
