@@ -1050,7 +1050,8 @@ void _visitAllDocComments(
     if (topDoc != null) callback(topDoc);
 
     // Member doc comments inside classes, enums, mixins, extensions
-    final NodeList<ClassMember>? members;
+    // analyzer 11: ClassBody.members returns List<ClassMember> via compat shim
+    final List<ClassMember>? members;
     if (declaration is ClassDeclaration) {
       members = declaration.body.members;
     } else if (declaration is EnumDeclaration) {

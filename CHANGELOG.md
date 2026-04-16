@@ -33,7 +33,22 @@
 
 ---
 
+## [12.0.0]
+
+Rolled back from analyzer 12 to analyzer 11 — analyzer 12 requires `meta ^1.18.0` but Flutter stable (3.41.6 / Dart 3.11.4) pins `meta` to `1.17.0`, which made saropa_lints `>=10.3.0` unresolvable for every Flutter project on stable. The pub solver would reject the package outright with a `meta` version conflict. This downgrade restores compatibility with Flutter stable while keeping all 2134 rules and 254 quick fixes intact.  — [log](https://github.com/saropa/saropa_lints/blob/v12.0.0/CHANGELOG.md)
+
+### Fixed
+
+- **Critical:** Downgrade `analyzer` from `^12.0.0` to `>=9.0.0 <12.0.0` — analyzer 12 requires `meta ^1.18.0` which conflicts with Flutter stable's pinned `meta 1.17.0`, making saropa_lints unresolvable for all Flutter consumers (see `bugs/infra_meta_pin_flutter_incompatible.md`)
+- Downgrade `analyzer_plugin` from `^0.14.7` to `>=0.11.0 <0.14.7` for analyzer 11 compatibility
+- Add `ClassBodyMembersCompat` extension to bridge analyzer 11's sealed `ClassBody` (where `.members` is only on `BlockClassBody`, not the base type)
+
+
+---
+
 ## [11.1.0]
+
+Ten new quick fixes — click the lightbulb and let the IDE rewrite `late`, `abstract final`, `unawaited()`, `toString()`, and more for you. — [log](https://github.com/saropa/saropa_lints/blob/v11.1.0/CHANGELOG.md)
 
 ### Added
 
@@ -57,8 +72,8 @@
 - **Security:**  Fix CVE in transitive dependency `serialize-javascript` (RCE via RegExp.flags and Date.toISOString) by adding npm `overrides` to pin `>=7.0.5`
 </details>
 
-
 ---
+
 ## [11.0.0]
 
 A major extension UX upgrade featuring a new searchable command catalog sidebar, embedded health dashboards, rich package details with logos and README images, unique vs. shared dependency breakdowns, and workspace-wide diagnostic suppression tracking. — [log](https://github.com/saropa/saropa_lints/blob/v11.0.0/CHANGELOG.md)
