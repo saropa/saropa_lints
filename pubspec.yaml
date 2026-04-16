@@ -56,17 +56,14 @@ dependencies:
 
   # This package provides a library that performs static analysis of Dart code.
   # https://pub.dev/packages/analyzer
-  # NOTE: analyzer 12 is required — it introduced breaking API changes we depend on:
-  #   - lowerCaseName is now native on DiagnosticCode/LintCode (shims removed in v10.3.0)
-  #   - LibraryIdentifier replaced by DottedName in the AST
-  #   - RuleVisitorRegistry added/removed visitor methods (~500 call sites migrated)
-  # Rolling back to analyzer 11 would require re-adding compatibility shims, dual AST
-  # node handling, and dual visitor interfaces across 70+ rule files.
-  analyzer: ^12.0.0
+  # NOTE: Must stay compatible with Flutter stable's pinned meta version.
+  # analyzer 12 requires meta ^1.18.0 which conflicts with Flutter stable's
+  # meta 1.17.0 pin — making saropa_lints unresolvable for Flutter consumers.
+  analyzer: ">=9.0.0 <12.0.0"
 
   # A framework and support code for building plugins for the analysis server.
   # https://pub.dev/packages/analyzer_plugin
-  analyzer_plugin: ^0.14.7
+  analyzer_plugin: ">=0.11.0 <0.14.7"
 
   # Collections and utilities functions and classes related to collections.
   # https://pub.dev/packages/collection

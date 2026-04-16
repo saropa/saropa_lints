@@ -1,6 +1,7 @@
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:saropa_lints/src/analyzer_compat.dart';
 import 'package:saropa_lints/src/rules/widget/flutter_migration_widget_detection.dart';
 import 'package:test/test.dart';
 

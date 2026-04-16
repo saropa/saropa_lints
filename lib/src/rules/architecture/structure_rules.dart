@@ -2768,7 +2768,7 @@ class AvoidClassesWithOnlyStaticMembersRule extends SaropaLintRule {
           node.withClause != null) {
         return;
       }
-      final NodeList<ClassMember> members = node.body.members;
+      final List<ClassMember> members = node.body.members;
       if (members.isEmpty) return;
       for (final ClassMember m in members) {
         if (m is ConstructorDeclaration) {
@@ -2904,7 +2904,7 @@ class PreferGettersBeforeSettersRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    void checkMembers(NodeList<ClassMember> members) {
+    void checkMembers(List<ClassMember> members) {
       final getterIndexes = <String, int>{};
       final setterNodes = <String, MethodDeclaration>{};
       final setterIndexes = <String, int>{};
@@ -4444,8 +4444,8 @@ class UnnecessaryLibraryNameRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addLibraryDirective((LibraryDirective node) {
-      // LibraryIdentifier replaced by DottedName in analyzer 12
-      final DottedName? name = node.name;
+      // analyzer 11: LibraryDirective.name returns LibraryIdentifier
+      final LibraryIdentifier? name = node.name;
       if (name == null) return;
       if (name.toSource().isEmpty) return;
       reporter.atNode(name);

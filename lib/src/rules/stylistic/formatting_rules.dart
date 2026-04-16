@@ -207,7 +207,7 @@ class NewlineBeforeConstructorRule extends SaropaLintRule {
   }
 
   void _checkMembers(
-    NodeList<ClassMember> members,
+    List<ClassMember> members,
     CompilationUnit unit,
     SaropaDiagnosticReporter reporter,
   ) {
@@ -339,7 +339,7 @@ class NewlineBeforeMethodRule extends SaropaLintRule {
   }
 
   void _checkMembers(
-    NodeList<ClassMember> members,
+    List<ClassMember> members,
     CompilationUnit unit,
     SaropaDiagnosticReporter reporter,
   ) {

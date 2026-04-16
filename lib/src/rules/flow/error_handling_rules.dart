@@ -925,7 +925,7 @@ class AvoidUncaughtFutureErrorsRule extends SaropaLintRule {
           result.add(declaration.name.lexeme);
         }
       } else {
-        final NodeList<ClassMember>? members = switch (declaration) {
+        final List<ClassMember>? members = switch (declaration) {
           ClassDeclaration d => d.body.members,
           EnumDeclaration d => d.body.members,
           MixinDeclaration d => d.body.members,
@@ -941,10 +941,7 @@ class AvoidUncaughtFutureErrorsRule extends SaropaLintRule {
   }
 
   /// Adds method names from [members] that contain a top-level try-catch.
-  void _addMethodsWithTryCatch(
-    NodeList<ClassMember> members,
-    Set<String> result,
-  ) {
+  void _addMethodsWithTryCatch(List<ClassMember> members, Set<String> result) {
     for (final ClassMember member in members) {
       if (member is MethodDeclaration && _bodyHasTryCatch(member.body)) {
         result.add(member.name.lexeme);
