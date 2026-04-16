@@ -380,6 +380,10 @@ def run_command(
         text=True,
         shell=use_shell,
         env=env,
+        # Force UTF-8 to avoid UnicodeDecodeError on Windows,
+        # where the default cp1252 can't handle all dart output bytes
+        encoding="utf-8",
+        errors="replace",
     )
 
     if result.returncode != 0 and not allow_failure:
