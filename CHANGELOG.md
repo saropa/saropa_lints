@@ -33,6 +33,15 @@
 
 ---
 
+## [12.0.1]
+
+### Changed
+
+- **Extension:** Prominent "Set Up Project" banner at the top of the Overview sidebar when `saropa_lints` is not yet in `pubspec.yaml` — new users no longer have to hunt for the setup action
+- **Extension:** Auto-detect notification on activation when a Dart project lacks `saropa_lints`, offering one-click setup directly from the toast
+
+---
+
 ## [12.0.0]
 
 Rolled back from analyzer 12 to analyzer 11 — analyzer 12 requires `meta ^1.18.0` but Flutter stable (3.41.6 / Dart 3.11.4) pins `meta` to `1.17.0`, which made saropa_lints `>=10.3.0` unresolvable for every Flutter project on stable. The pub solver would reject the package outright with a `meta` version conflict. This downgrade restores compatibility with Flutter stable while keeping all 2134 rules and 254 quick fixes intact.  — [log](https://github.com/saropa/saropa_lints/blob/v12.0.0/CHANGELOG.md)

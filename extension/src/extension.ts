@@ -1208,6 +1208,21 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     });
   }
 
+  // Prompt setup when this is a Dart project but saropa_lints is not in
+  // pubspec.yaml. The notification is the most discoverable entry point for
+  // new users who don't yet know to look in the sidebar.
+  if (isDartProject && root && !hasSaropaLintsDep(root)) {
+    void vscode.window.showInformationMessage(
+      'Saropa Lints detected a Dart project without saropa_lints configured. Set up now for 2100+ lint rules.',
+      'Set Up Project',
+      'Not Now',
+    ).then((choice) => {
+      if (choice === 'Set Up Project') {
+        void vscode.commands.executeCommand('saropaLints.enable');
+      }
+    });
+  }
+
   // Public API for other extensions (e.g. Saropa Log Capture). See api.ts and extension README.
   const api: SaropaLintsApi = {
     getViolationsData(): ViolationsData | null {

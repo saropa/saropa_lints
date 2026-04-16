@@ -30,6 +30,7 @@ import { readViolations, filterDisabledFromData, type ViolationsData } from '../
 import { loadHistory, getTrendSummary, getScoreTrendSummary, findPreviousScore, detectScoreRegression } from '../runHistory';
 import { computeHealthScore, formatScoreDelta, estimateScoreWithout } from '../healthScore';
 import { getProjectRoot } from '../projectRoot';
+import { hasSaropaLintsDep } from '../pubspecReader';
 import { readDisabledRules } from '../configWriter';
 import type { ConfigTreeProvider } from './configTree';
 import type { ConfigTreeNode } from './triageTree';
@@ -691,8 +692,28 @@ export class OverviewTreeProvider implements vscode.TreeDataProvider<OverviewTre
 
         const enabled = cfg.get<boolean>('enabled', true) ?? true;
         const helpParent = new OverviewHelpParent();
+
+        // Prominent setup banner when saropa_lints is not yet in pubspec.yaml.
+        // This is the primary onboarding affordance — it must be impossible to
+        // miss so new users don't get stuck wondering why nothing works.
+        const needsSetup = !hasSaropaLintsDep(root);
+        const setupBanner: OverviewItem[] = [];
+        if (needsSetup) {
+            setupBanner.push(
+                new OverviewItem(
+                    'Set Up Project',
+                    'Add saropa_lints to pubspec + configure analysis',
+                    'saropaLints.enable',
+                    'rocket',
+                    new vscode.ThemeColor('list.warningForeground'),
+                ),
+            );
+        }
+
         const integrationOff: OverviewItem[] = [];
-        if (!enabled) {
+        if (!enabled && !needsSetup) {
+            // Only show the "integration off" row when the package is already
+            // installed but the user explicitly disabled integration.
             integrationOff.push(
                 new OverviewItem(
                     'Lint integration: Off',
@@ -713,6 +734,7 @@ export class OverviewTreeProvider implements vscode.TreeDataProvider<OverviewTre
 
         if (data === null) {
             const items: OverviewTreeNode[] = [
+                ...setupBanner,
                 helpParent,
                 ...integrationOff,
                 settingsParent,
@@ -731,6 +753,7 @@ export class OverviewTreeProvider implements vscode.TreeDataProvider<OverviewTre
         }
 
         const items: OverviewTreeNode[] = [
+            ...setupBanner,
             helpParent,
             ...integrationOff,
             settingsParent,
