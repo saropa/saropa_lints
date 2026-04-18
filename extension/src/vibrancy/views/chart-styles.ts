@@ -13,6 +13,10 @@ export function getChartStyles(): string {
             --chart-color-7: hsl(330, 55%, 55%);
             --chart-color-8: hsl(270, 50%, 60%);
             --chart-color-9: var(--vscode-descriptionForeground);
+            /* Unique transitives — teal tone to stand out from direct deps */
+            --chart-color-10: hsl(190, 50%, 50%);
+            /* Shared transitives — muted/desaturated to signal "already paid for" */
+            --chart-color-11: hsl(220, 15%, 50%);
         }
         .chart-header {
             display: flex;
@@ -117,6 +121,8 @@ export function getChartStyles(): string {
         .bar-color-7 { background: var(--chart-color-7); }
         .bar-color-8 { background: var(--chart-color-8); }
         .bar-color-9 { background: var(--chart-color-9); }
+        .bar-color-10 { background: var(--chart-color-10); }
+        .bar-color-11 { background: var(--chart-color-11); }
 
         /* Donut chart */
         .donut-chart { max-width: 200px; max-height: 200px; }
@@ -139,6 +145,8 @@ export function getChartStyles(): string {
         .donut-color-7 { stroke: var(--chart-color-7); }
         .donut-color-8 { stroke: var(--chart-color-8); }
         .donut-color-9 { stroke: var(--chart-color-9); }
+        .donut-color-10 { stroke: var(--chart-color-10); }
+        .donut-color-11 { stroke: var(--chart-color-11); }
 
         /* Tooltip */
         .chart-tooltip {
