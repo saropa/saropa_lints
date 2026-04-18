@@ -33,6 +33,21 @@
 
 ---
 
+## [Unreleased]
+
+### Added
+
+- **Extension:** Size Distribution chart now separates transitive dependencies into distinct "Unique transitives" and "Shared transitives" segments instead of burying them in a single "Other" bucket. Unique transitives are the real cost of adding a package — shared transitives are already pulled in by other direct deps. A new "Exclude shared" checkbox hides shared transitive segments from both charts and the table, recalculating percentages for the remaining packages. This makes inflated size reports (e.g. a 63 MB package whose weight is entirely from a dep you already carry) immediately visible.
+- **Extension:** Report renamed from "Package Vibrancy Report" to "Saropa Package Vibrancy" with the extension version shown as dimmed text next to the title.
+- **Extension:** Animated radial gauge in the report header (floating top-right) showing the overall project health score on a color-coded 270-degree arc that fills on load.
+- **Extension:** Letter grade badges (A through F) in the Category column, synced with the extension's category dictionary (A=Vibrant, B=Stable, C=Outdated, E=Abandoned, F=End-of-Life). Displayed as color-coded pill badges alongside the category label.
+- **Extension:** Expandable detail cards — click any row (or press Enter with keyboard focus) to reveal an inline card with score breakdown, vulnerability list, file references, transitive dependency cloud, and external links. Collapse with a second click or Escape.
+- **Extension:** Keyboard navigation in the report table — arrow keys (or j/k) move a visible focus highlight between rows, Enter/Space toggles expansion, Escape collapses all.
+- **Extension:** New "Deps" column showing transitive dependency count per package with a tree icon. Shared dependencies are highlighted with a badge, and a tooltip lists all transitives with shared ones marked.
+- **Extension:** Detail card dependency cloud highlights shared transitive deps in bold with a "shared" badge, so blast-radius of package removal is immediately visible.
+
+---
+
 ## [12.0.1]
 
 ### Changed
