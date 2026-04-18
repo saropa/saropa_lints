@@ -71,11 +71,13 @@ function buildRadialGauge(avgScore: number): string {
     const color = pct >= 50
         ? `hsl(${Math.round(60 + (pct - 50) * 1.2)}, 80%, 45%)`
         : `hsl(${Math.round(pct * 1.2)}, 80%, 45%)`;
-    const gradeLabel = displayScore >= 9 ? 'A'
-        : displayScore >= 7 ? 'B'
-            : displayScore >= 5 ? 'C'
-                : displayScore >= 3 ? 'E'
-                    : 'F';
+    /* Grade thresholds match classifyStatus: >=70 vibrant(A), >=40 stable(B),
+       >=20 outdated(C), <20 abandoned(E). F is only for hard EOL signals
+       (discontinued/archived) which can't be derived from score alone. */
+    const gradeLabel = pct >= 70 ? 'A'
+        : pct >= 40 ? 'B'
+            : pct >= 20 ? 'C'
+                : 'E';
     return `<div class="radial-gauge" title="Overall project health: ${displayScore}/10 (${gradeLabel})">
         <svg viewBox="0 0 88 88" class="gauge-svg">
             <circle cx="44" cy="44" r="${r}" fill="none"
