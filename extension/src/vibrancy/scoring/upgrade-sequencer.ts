@@ -40,7 +40,14 @@ export function buildUpgradeOrder(
     return assignOrder(grouped);
 }
 
+/** Sources that can be upgraded via version constraint bump. */
+const UPGRADABLE_SOURCES = new Set(['hosted']);
+
 function isUpgradable(r: VibrancyResult): boolean {
+    // Only hosted (pub.dev) packages can be upgraded by editing a version
+    // constraint. Git, path, and SDK deps must be changed manually.
+    if (!UPGRADABLE_SOURCES.has(r.package.source)) { return false; }
+
     return r.updateInfo !== null
         && r.updateInfo.updateStatus !== 'up-to-date'
         && r.upgradeBlockStatus !== 'blocked';

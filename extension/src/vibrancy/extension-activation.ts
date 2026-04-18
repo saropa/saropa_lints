@@ -1081,7 +1081,7 @@ async function planAndExecuteUpgrades(): Promise<void> {
     upgradeChannel.show(true);
 
     const choice = await vscode.window.showInformationMessage(
-        `Proceed with ${steps.length} upgrade(s)? Stop on first failure.`,
+        `Proceed with ${steps.length} upgrade(s)? Failed steps roll back and the plan continues.`,
         'Execute', 'Cancel',
     );
     if (choice !== 'Execute') { return; }
