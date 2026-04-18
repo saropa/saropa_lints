@@ -34,6 +34,12 @@ from scripts.modules._utils import (
     Color,
 )
 
+# Publisher management page — shown after every publish attempt so the
+# user can verify or manually upload the .vsix when PAT auth fails.
+MARKETPLACE_MANAGE_URL = (
+    "https://marketplace.visualstudio.com/manage/publishers/Saropa"
+)
+
 
 def _extension_dir(project_dir: Path) -> Path:
     return project_dir / "extension"
@@ -179,6 +185,14 @@ def publish_extension_to_marketplace(
             print_error(r.stderr.strip())
         if r.stdout:
             print_error(r.stdout.strip())
+        # Guide the user to the management page and manual upload
+        print_warning(
+            "Marketplace publish failed (PAT expired or missing scope?)."
+        )
+        print_info(f"  Manage: {MARKETPLACE_MANAGE_URL}")
+        print_info(
+            f"  You can also upload the .vsix manually: {vsix_path.name}"
+        )
         return False
     return True
 
@@ -266,7 +280,10 @@ def package_extension(project_dir: Path, version: str) -> Path | None:
 
 def publish_extension(project_dir: Path, vsix_path: Path) -> bool:
     """Publish to Marketplace then Open VSX (if OVSX_PAT set). Returns True if both succeed or skip."""
-    if not publish_extension_to_marketplace(project_dir, vsix_path):
+    marketplace_ok = publish_extension_to_marketplace(project_dir, vsix_path)
+    if marketplace_ok:
+        print_info(f"  Manage: {MARKETPLACE_MANAGE_URL}")
+    if not marketplace_ok:
         return False
     return publish_extension_to_ovsx(project_dir, vsix_path)
 
