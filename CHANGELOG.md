@@ -33,6 +33,26 @@
 
 ---
 
+## [Unreleased]
+
+### Added
+
+- **Extension:** Report renamed from "Package Vibrancy Report" to "Saropa Package Vibrancy" with the extension version shown as dimmed text next to the title.
+- **Extension:** Animated radial gauge in the report header (floating top-right) showing the overall project health score on a color-coded 270-degree arc that fills on load.
+- **Extension:** Letter grade badges (A through F) in the Category column, synced with the extension's category dictionary (A=Vibrant, B=Stable, C=Outdated, E=Abandoned, F=End-of-Life). Displayed as color-coded pill badges alongside the category label.
+- **Extension:** Expandable detail cards — click any row (or press Enter with keyboard focus) to reveal an inline card with score breakdown, vulnerability list, file references, transitive dependency cloud, and external links. Collapse with a second click or Escape.
+- **Extension:** Keyboard navigation in the report table — arrow keys (or j/k) move a visible focus highlight between rows, Enter/Space toggles expansion, Escape collapses all.
+- **Extension:** New "Deps" column showing transitive dependency count per package with a tree icon. Shared dependencies are highlighted with a badge, and a tooltip lists all transitives with shared ones marked.
+- **Extension:** Detail card dependency cloud highlights shared transitive deps in bold with a "shared" badge, so blast-radius of package removal is immediately visible.
+
+### Fixed
+
+- **Extension:** Radial gauge grade thresholds now match the category classifier boundaries (>=70 Vibrant/A, >=40 Stable/B, >=20 Outdated/C, <20 Abandoned/E) instead of diverging display-score thresholds.
+- **Extension:** Table sorting now keeps detail rows paired with their parent package row. Previously, sorting would break the pairing and cluster orphaned detail rows together.
+- **Extension:** Table filtering now correctly hides detail rows when their parent row is filtered out, preventing orphaned expanded cards from remaining visible.
+
+---
+
 ## [12.0.3]
 
 ### Fixed
