@@ -65,19 +65,28 @@ describe('upgrade-executor', () => {
             assert.ok(output.includes('✅ b'));
         });
 
-        it('should format pub-get failure', () => {
+        it('should format pub-get failure with error details', () => {
+            const pubOutput = 'Resolving dependencies...\n'
+                + 'Because foo depends on bar ^1.0.0 which depends on baz ^2.0.0, baz ^2.0.0 is required.\n'
+                + 'So, because foo depends on baz ^3.0.0, version solving failed.';
             const report: UpgradeReport = {
                 steps: [
-                    { step: makeStep('a', 1), outcome: 'pub-get-failed', output: 'error' },
-                    { step: makeStep('b', 2), outcome: 'skipped', output: '' },
+                    { step: makeStep('a', 1), outcome: 'pub-get-failed', output: pubOutput },
+                    { step: makeStep('b', 2), outcome: 'success', output: '' },
                 ],
-                completedCount: 0,
+                completedCount: 1,
                 failedAt: 'a',
             };
             const output = formatUpgradeReport(report);
             assert.ok(output.includes('❌ a'));
             assert.ok(output.includes('pub get failed'));
-            assert.ok(output.includes('⏭️ b'));
+            // Error summary should include the "Because..." line
+            assert.ok(
+                output.includes('Because foo depends on bar'),
+                'Should include version conflict reason',
+            );
+            // b should still succeed — failures no longer halt the plan
+            assert.ok(output.includes('✅ b'));
         });
 
         it('should format test failure', () => {

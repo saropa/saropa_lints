@@ -24,29 +24,25 @@ export async function executeUpgradePlan(
 
     const limited = steps.slice(0, config.maxSteps);
     const results: UpgradeStepResult[] = [];
-    let failed = false;
 
+    // Each step is independent: a failure rolls back and the plan
+    // continues to the next package instead of halting everything.
     for (const step of limited) {
-        if (failed) {
-            results.push({ step, outcome: 'skipped', output: '' });
-            continue;
-        }
         const result = await executeStep(
             step, yamlUri, cwd, channel, config,
         );
         results.push(result);
-        if (result.outcome !== 'success') { failed = true; }
     }
 
     const completedCount = results.filter(
         r => r.outcome === 'success',
     ).length;
-    const failedStep = results.find(
-        r => r.outcome !== 'success' && r.outcome !== 'skipped',
-    );
+    const failedNames = results
+        .filter(r => r.outcome !== 'success' && r.outcome !== 'skipped')
+        .map(r => r.step.packageName);
     return {
         steps: results, completedCount,
-        failedAt: failedStep?.step.packageName ?? null,
+        failedAt: failedNames.length > 0 ? failedNames.join(', ') : null,
     };
 }
 
@@ -161,7 +157,7 @@ export function formatUpgradePlan(
         );
     }
     lines.push('\nEach step: bump version → pub get → flutter test → next');
-    lines.push('Stop on first failure.\n');
+    lines.push('Failed steps roll back and the plan continues.\n');
     return lines.join('\n');
 }
 
@@ -173,15 +169,22 @@ export function formatUpgradeReport(
     for (const result of report.steps) {
         const name = result.step.packageName;
         const ver = `${result.step.currentVersion} → ${result.step.targetVersion}`;
+        // Include the first meaningful error line so the user knows *why*
+        // the step failed without scrolling through the full output log.
+        const reason = extractErrorSummary(result.output);
         switch (result.outcome) {
             case 'success':
                 lines.push(`  ✅ ${name} ${ver}`);
                 break;
             case 'pub-get-failed':
-                lines.push(`  ❌ ${name} ${ver}\n     └─ pub get failed`);
+                lines.push(`  ❌ ${name} ${ver}`);
+                lines.push(`     └─ pub get failed`);
+                if (reason) { lines.push(`     └─ ${reason}`); }
                 break;
             case 'test-failed':
-                lines.push(`  ❌ ${name} ${ver}\n     └─ flutter test failed`);
+                lines.push(`  ❌ ${name} ${ver}`);
+                lines.push(`     └─ flutter test failed`);
+                if (reason) { lines.push(`     └─ ${reason}`); }
                 break;
             case 'skipped':
                 lines.push(`  ⏭️ ${name} — skipped`);
@@ -189,4 +192,36 @@ export function formatUpgradeReport(
         }
     }
     return lines.join('\n');
+}
+
+/**
+ * Extract the first meaningful error line from pub/test output.
+ * Looks for version-solving failures ("Because..."), generic errors,
+ * and test failure summaries. Returns null if nothing useful is found.
+ */
+function extractErrorSummary(output: string): string | null {
+    if (!output) { return null; }
+    const lines = output.split('\n').map(l => l.trim()).filter(Boolean);
+
+    // Pub version-solving: "Because X depends on Y which depends on Z..."
+    const because = lines.find(l => l.startsWith('Because '));
+    if (because) { return because; }
+
+    // Pub: "version solving failed" summary line
+    const versionFail = lines.find(
+        l => l.includes('version solving failed'),
+    );
+    if (versionFail) { return versionFail; }
+
+    // Test: "Some tests failed" or "N test(s) failed"
+    const testFail = lines.find(l => /tests?\s+failed/i.test(l));
+    if (testFail) { return testFail; }
+
+    // Generic: first line containing "error" (case-insensitive)
+    const errorLine = lines.find(
+        l => /\berror\b/i.test(l) && !l.startsWith('//'),
+    );
+    if (errorLine) { return errorLine; }
+
+    return null;
 }

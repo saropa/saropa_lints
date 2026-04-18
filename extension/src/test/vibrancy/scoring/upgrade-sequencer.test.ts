@@ -174,5 +174,35 @@ describe('upgrade-sequencer', () => {
             assert.strictEqual(steps.length, 1);
             assert.strictEqual(steps[0].packageName, 'ok_pkg');
         });
+
+        it('should exclude git-sourced packages', () => {
+            // Git deps cannot be upgraded via version constraint bump
+            const gitResult = makeResult('device_calendar', {
+                updateStatus: 'patch',
+            });
+            // Override source to simulate a git dependency
+            (gitResult.package as { source: string }).source = 'git';
+            const results = [
+                gitResult,
+                makeResult('http', { updateStatus: 'patch' }),
+            ];
+            const steps = buildUpgradeOrder(results, new Map());
+            assert.strictEqual(steps.length, 1);
+            assert.strictEqual(steps[0].packageName, 'http');
+        });
+
+        it('should exclude path-sourced packages', () => {
+            const pathResult = makeResult('my_local_pkg', {
+                updateStatus: 'minor',
+            });
+            (pathResult.package as { source: string }).source = 'path';
+            const results = [
+                pathResult,
+                makeResult('meta', { updateStatus: 'patch' }),
+            ];
+            const steps = buildUpgradeOrder(results, new Map());
+            assert.strictEqual(steps.length, 1);
+            assert.strictEqual(steps[0].packageName, 'meta');
+        });
     });
 });

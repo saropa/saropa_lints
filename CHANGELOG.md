@@ -33,6 +33,16 @@
 
 ---
 
+## [12.0.3]
+
+### Fixed
+
+- **Extension:** Upgrade plan no longer includes git, path, or SDK dependencies that cannot be upgraded via version constraint bump. Previously these would appear in the plan and immediately fail with an unhelpful "pub get failed" message.
+- **Extension:** Upgrade report now shows the actual error reason (e.g. version conflict details) instead of just "pub get failed" or "flutter test failed".
+- **Extension:** Upgrade plan continues to the next package after a step failure instead of halting the entire plan. Each failed step rolls back independently so subsequent packages still get attempted.
+
+---
+
 ## [12.0.2]
 
 ### Added
