@@ -598,6 +598,7 @@ function registerCommands(
                 overrideCount: lastOverrideAnalyses.length,
                 overrideNames: new Set(lastOverrideAnalyses.map(a => a.entry.name)),
                 pubspecUri: lastParsedDeps?.yamlUri?.toString() ?? null,
+                extensionVersion: (context.extension.packageJSON as { version: string }).version,
             }),
         ),
         vscode.commands.registerCommand(

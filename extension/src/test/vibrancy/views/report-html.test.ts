@@ -4,7 +4,7 @@ import { VibrancyResult } from '../../../vibrancy/types';
 
 /** Default options with no overrides and no pubspec URI. */
 function opts(results: VibrancyResult[]): ReportOptions {
-    return { results, overrideCount: 0, overrideNames: new Set(), pubspecUri: null };
+    return { results, overrideCount: 0, overrideNames: new Set(), pubspecUri: null, extensionVersion: '0.0.0-test' };
 }
 
 function makeResult(
@@ -227,6 +227,65 @@ describe('report: section badges', () => {
     });
 });
 
+describe('report: shared transitive data attribute', () => {
+    it('should mark shared transitive rows with data-shared-transitive=yes', () => {
+        // Direct dep with transitiveInfo listing 'collection' as shared
+        const directDep = {
+            ...makeResult('http', 80),
+            transitiveInfo: {
+                directDep: 'http', transitiveCount: 3, flaggedCount: 0,
+                transitives: ['collection', 'meta', 'async'],
+                sharedDeps: ['collection'],
+            },
+        };
+        // Transitive dep that IS shared (appears in sharedDeps above)
+        const sharedTransitive = {
+            ...makeResult('collection', 70),
+            package: { ...makeResult('collection', 70).package, section: 'transitive' as const },
+        };
+        const html = buildReportHtml(opts([directDep, sharedTransitive]));
+        const collectionRow = html.match(/<tr[^>]*data-name="collection"[^>]*>/);
+        assert.ok(collectionRow, 'expected collection row');
+        assert.ok(
+            collectionRow![0].includes('data-shared-transitive="yes"'),
+            'shared transitive should have data-shared-transitive=yes',
+        );
+    });
+
+    it('should mark non-shared transitive rows with data-shared-transitive=no', () => {
+        // Direct dep with transitiveInfo — 'meta' is NOT in sharedDeps
+        const directDep = {
+            ...makeResult('http', 80),
+            transitiveInfo: {
+                directDep: 'http', transitiveCount: 2, flaggedCount: 0,
+                transitives: ['meta', 'async'],
+                sharedDeps: [],
+            },
+        };
+        const uniqueTransitive = {
+            ...makeResult('meta', 60),
+            package: { ...makeResult('meta', 60).package, section: 'transitive' as const },
+        };
+        const html = buildReportHtml(opts([directDep, uniqueTransitive]));
+        const metaRow = html.match(/<tr[^>]*data-name="meta"[^>]*>/);
+        assert.ok(metaRow, 'expected meta row');
+        assert.ok(
+            metaRow![0].includes('data-shared-transitive="no"'),
+            'unique transitive should have data-shared-transitive=no',
+        );
+    });
+
+    it('should mark direct deps with data-shared-transitive=no', () => {
+        const html = buildReportHtml(opts([makeResult('http', 80)]));
+        const httpRow = html.match(/<tr[^>]*data-name="http"[^>]*>/);
+        assert.ok(httpRow, 'expected http row');
+        assert.ok(
+            httpRow![0].includes('data-shared-transitive="no"'),
+            'direct dep should always have data-shared-transitive=no',
+        );
+    });
+});
+
 describe('report: size in KB', () => {
     it('should format archive size in KB', () => {
         const result = { ...makeResult('http', 80), archiveSizeBytes: 276480 };
@@ -256,7 +315,7 @@ describe('report: summary card filters', () => {
 
     it('should show override count card', () => {
         const html = buildReportHtml({
-            results: [], overrideCount: 3, overrideNames: new Set(), pubspecUri: null,
+            results: [], overrideCount: 3, overrideNames: new Set(), pubspecUri: null, extensionVersion: '0.0.0-test',
         });
         assert.ok(html.includes('>3<'));
         assert.ok(html.includes('Overrides'));
@@ -275,7 +334,7 @@ describe('report: override filter data attribute', () => {
             results: [result],
             overrideCount: 1,
             overrideNames: new Set(['http']),
-            pubspecUri: null,
+            pubspecUri: null, extensionVersion: '0.0.0-test',
         });
         assert.ok(html.includes('data-overridden="yes"'));
     });
@@ -286,7 +345,7 @@ describe('report: override filter data attribute', () => {
             results: [result],
             overrideCount: 0,
             overrideNames: new Set(),
-            pubspecUri: null,
+            pubspecUri: null, extensionVersion: '0.0.0-test',
         });
         assert.ok(html.includes('data-overridden="no"'));
     });
@@ -297,7 +356,7 @@ describe('report: override filter data attribute', () => {
             results,
             overrideCount: 1,
             overrideNames: new Set(['http']),
-            pubspecUri: null,
+            pubspecUri: null, extensionVersion: '0.0.0-test',
         });
         /* http row has yes, bloc row has no */
         const httpRow = html.match(/<tr[^>]*data-name="http"[^>]*>/);
@@ -341,7 +400,7 @@ describe('report: toolbar', () => {
 
     it('should include pubspec button when URI provided', () => {
         const html = buildReportHtml({
-            results: [], overrideCount: 0, overrideNames: new Set(), pubspecUri: 'file:///project/pubspec.yaml',
+            results: [], overrideCount: 0, overrideNames: new Set(), pubspecUri: 'file:///project/pubspec.yaml', extensionVersion: '0.0.0-test',
         });
         assert.ok(html.includes('id="open-pubspec"'));
         assert.ok(html.includes('pubspec.yaml'));
@@ -505,7 +564,7 @@ describe('report: copy-as-JSON button', () => {
             results: [result],
             overrideCount: 1,
             overrideNames: new Set(['http']),
-            pubspecUri: null,
+            pubspecUri: null, extensionVersion: '0.0.0-test',
         });
         assert.ok(html.includes('"isOverridden":true'));
     });

@@ -20,7 +20,7 @@ export class VibrancyReportPanel {
 
         const panel = vscode.window.createWebviewPanel(
             'saropaVibrancyReport',
-            'Package Vibrancy Report',
+            'Saropa Package Vibrancy',
             vscode.ViewColumn.One,
             { enableScripts: true, retainContextWhenHidden: true },
         );

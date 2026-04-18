@@ -10,6 +10,106 @@ export function getReportStyles(): string {
         }
         h1 { font-size: 1.4em; margin-bottom: 8px; }
 
+        /* ---- Report header with floating gauge ---- */
+        .report-header {
+            display: flex; align-items: flex-start;
+            justify-content: space-between;
+        }
+        .header-version {
+            font-size: 0.55em; font-weight: normal;
+            opacity: 0.5; margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        /* ---- Radial gauge ---- */
+        .radial-gauge {
+            position: relative; width: 72px; height: 72px;
+            flex-shrink: 0;
+        }
+        .gauge-svg { width: 72px; height: 72px; }
+        /* Animate the arc fill on load: start fully hidden, transition to target. */
+        .gauge-fill {
+            stroke-dasharray: 0 999;
+            transition: stroke-dasharray 1.2s ease-out;
+        }
+        .gauge-label {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -55%);
+            font-size: 1.3em; font-weight: bold;
+        }
+        .gauge-sub {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, 40%);
+            font-size: 0.65em; opacity: 0.5;
+        }
+
+        /* ---- Letter grade badges ---- */
+        .grade-badge {
+            display: inline-block;
+            width: 20px; height: 20px; line-height: 20px;
+            text-align: center; border-radius: 4px;
+            font-size: 0.75em; font-weight: bold;
+            margin-right: 4px; vertical-align: middle;
+        }
+        .grade-A { background: var(--vscode-testing-iconPassed); color: var(--vscode-editor-background); }
+        .grade-B { background: var(--vscode-editorInfo-foreground); color: var(--vscode-editor-background); }
+        .grade-C { background: var(--vscode-editorWarning-foreground); color: var(--vscode-editor-background); }
+        .grade-D { background: var(--vscode-editorWarning-foreground); color: var(--vscode-editor-background); opacity: 0.8; }
+        .grade-E { background: var(--vscode-editorWarning-foreground); color: var(--vscode-editor-background); }
+        .grade-F { background: var(--vscode-editorError-foreground); color: var(--vscode-editor-background); }
+
+        /* ---- Row expansion ---- */
+        .col-expand { width: 24px; padding: 6px 2px; }
+        .expand-cell { text-align: center; padding: 6px 2px; width: 24px; cursor: pointer; }
+        .expand-chevron {
+            display: inline-block; font-size: 0.7em;
+            transition: transform 0.2s;
+            opacity: 0.5; user-select: none;
+        }
+        .expand-cell:hover .expand-chevron { opacity: 1; }
+        .pkg-row.expanded .expand-chevron { transform: rotate(90deg); opacity: 1; }
+        .detail-row td { padding: 0; border-bottom: none; }
+        .detail-card {
+            background: var(--vscode-editor-inactiveSelectionBackground);
+            border-radius: 6px; padding: 12px 16px;
+            margin: 4px 8px 8px;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+        }
+        .detail-section h4 {
+            margin: 0 0 6px; font-size: 0.85em;
+            opacity: 0.8; border-bottom: 1px solid var(--vscode-widget-border);
+            padding-bottom: 4px;
+        }
+        .detail-grid {
+            display: grid; grid-template-columns: auto 1fr;
+            gap: 2px 12px; font-size: 0.85em;
+        }
+        .detail-label { opacity: 0.6; }
+        .vuln-row { font-size: 0.85em; margin: 2px 0; }
+        .file-row { font-size: 0.8em; opacity: 0.8; font-family: monospace; }
+        .detail-links .link-list { font-size: 0.85em; }
+        .detail-search-link { cursor: pointer; font-size: 0.85em; }
+
+        /* ---- Deps column ---- */
+        .deps-icon { font-size: 0.85em; margin-right: 2px; }
+        .badge-shared {
+            background: var(--vscode-editorInfo-foreground);
+            color: var(--vscode-editor-background);
+            padding: 1px 4px; border-radius: 3px;
+            font-size: 0.7em; margin-left: 4px;
+            vertical-align: middle;
+        }
+        .badge-shared-sm {
+            background: var(--vscode-editorInfo-foreground);
+            color: var(--vscode-editor-background);
+            padding: 0 3px; border-radius: 2px;
+            font-size: 0.65em; margin-left: 3px;
+        }
+        .dep-cloud { font-size: 0.8em; line-height: 1.8; }
+        .dep-cloud span { margin-right: 6px; }
+        .dep-shared { font-weight: bold; color: var(--vscode-editorInfo-foreground); }
+
         /* ---- Summary cards ---- */
         .summary {
             display: flex; gap: 16px; margin-bottom: 16px;
@@ -91,6 +191,10 @@ export function getReportStyles(): string {
         }
         th[data-col]:hover { background: var(--vscode-list-hoverBackground); }
         tr:hover { background: var(--vscode-list-hoverBackground); }
+        .row-focused {
+            outline: 2px solid var(--vscode-focusBorder);
+            outline-offset: -2px;
+        }
         .sort-arrow { margin-left: 4px; opacity: 0.6; }
         a {
             color: var(--vscode-textLink-foreground);
