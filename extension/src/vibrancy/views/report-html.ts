@@ -1,5 +1,5 @@
 import { VibrancyResult, activeFileUsages } from '../types';
-import { categoryLabel, countByCategory } from '../scoring/status-classifier';
+import { categoryLabel, categoryToGrade, countByCategory } from '../scoring/status-classifier';
 import { formatSizeMB, formatSizeKB } from '../scoring/bloat-calculator';
 import { worstSeverity, severityEmoji, severityLabel } from '../scoring/vuln-classifier';
 import { getReportStyles } from './report-styles';
@@ -16,6 +16,8 @@ export interface ReportOptions {
     /** Names of packages that have dependency_overrides entries. */
     readonly overrideNames: ReadonlySet<string>;
     readonly pubspecUri: string | null;
+    /** Extension version from package.json, shown next to the report title. */
+    readonly extensionVersion: string;
 }
 
 /** Columns that can be auto-hidden when all values are empty or off by default. */
@@ -24,6 +26,10 @@ type HidableColumn = 'transitives' | 'vulns' | 'status' | 'files' | 'license' | 
 /** Build the full HTML for the vibrancy report webview. */
 export function buildReportHtml(options: ReportOptions): string {
     const { results } = options;
+    /* Average score for the radial gauge (0-100 raw scale). */
+    const avg = results.length > 0
+        ? Math.round(results.reduce((s, r) => s + r.score, 0) / results.length)
+        : 0;
     return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -33,7 +39,10 @@ export function buildReportHtml(options: ReportOptions): string {
     <style>${getReportStyles()}${getChartStyles()}</style>
 </head>
 <body>
-    <h1>Package Vibrancy Report</h1>
+    <div class="report-header">
+        <h1>Saropa Package Vibrancy <span class="header-version">v${escapeHtml(options.extensionVersion)}</span></h1>
+        ${buildRadialGauge(avg)}
+    </div>
     ${buildReportSummary(options)}
     ${buildChartSection(results)}
     ${buildToolbar(options)}
@@ -41,6 +50,51 @@ export function buildReportHtml(options: ReportOptions): string {
     <script>${buildPackageDataScript(results, options.overrideNames)}${getReportScript()}${getChartScript()}</script>
 </body>
 </html>`;
+}
+
+/**
+ * Animated radial gauge SVG showing the overall project health score.
+ * The arc fills from red (0) through yellow (50) to green (100) and
+ * animates on load via a CSS stroke-dashoffset transition.
+ */
+function buildRadialGauge(avgScore: number): string {
+    /* avgScore is 0-100 (raw vibrancy score, not /10). */
+    const pct = Math.max(0, Math.min(100, avgScore));
+    const displayScore = Math.round(pct / 10);
+    /* Arc geometry: 270-degree arc (3/4 circle), radius 36, centered at 44,44. */
+    const r = 36;
+    const circumference = 2 * Math.PI * r;
+    /* 270 degrees = 3/4 of full circle */
+    const arcLength = circumference * 0.75;
+    const filled = arcLength * (pct / 100);
+    /* Color: interpolate red(0) -> yellow(50) -> green(100). */
+    const color = pct >= 50
+        ? `hsl(${Math.round(60 + (pct - 50) * 1.2)}, 80%, 45%)`
+        : `hsl(${Math.round(pct * 1.2)}, 80%, 45%)`;
+    const gradeLabel = displayScore >= 9 ? 'A'
+        : displayScore >= 7 ? 'B'
+            : displayScore >= 5 ? 'C'
+                : displayScore >= 3 ? 'E'
+                    : 'F';
+    return `<div class="radial-gauge" title="Overall project health: ${displayScore}/10 (${gradeLabel})">
+        <svg viewBox="0 0 88 88" class="gauge-svg">
+            <circle cx="44" cy="44" r="${r}" fill="none"
+                stroke="var(--vscode-widget-border)" stroke-width="7"
+                stroke-dasharray="${arcLength} ${circumference}"
+                stroke-dashoffset="0"
+                stroke-linecap="round"
+                transform="rotate(135 44 44)" />
+            <circle cx="44" cy="44" r="${r}" fill="none"
+                stroke="${color}" stroke-width="7"
+                stroke-dasharray="${filled} ${circumference}"
+                stroke-dashoffset="0"
+                stroke-linecap="round"
+                transform="rotate(135 44 44)"
+                class="gauge-fill" style="--gauge-target: ${filled}; --gauge-arc: ${arcLength};" />
+        </svg>
+        <div class="gauge-label">${displayScore}</div>
+        <div class="gauge-sub">/10</div>
+    </div>`;
 }
 
 function buildReportSummary(options: ReportOptions): string {
@@ -112,11 +166,19 @@ function getHiddenColumns(results: VibrancyResult[]): Set<HidableColumn> {
 /** Shared tooltip for cells that require GitHub data (stars, issues, PRs). */
 const NO_GITHUB_TOOLTIP = 'No GitHub repository found';
 
+/** Derive shared transitive dep names from all results' TransitiveInfo. */
+function deriveSharedDepNames(results: VibrancyResult[]): ReadonlySet<string> {
+    return new Set(
+        results.flatMap(r => r.transitiveInfo?.sharedDeps ?? []),
+    );
+}
+
 function buildReportTable(
     results: VibrancyResult[],
     overrideNames: ReadonlySet<string>,
 ): string {
     const hidden = getHiddenColumns(results);
+    const sharedDepNames = deriveSharedDepNames(results);
     const th = (col: string, label: string, tooltip?: string) => {
         const titleAttr = tooltip ? ` title="${escapeHtml(tooltip)}"` : '';
         return `<th data-col="${col}"${titleAttr}>${label}<span class="sort-arrow"></span></th>`;
@@ -124,8 +186,20 @@ function buildReportTable(
     const thOpt = (col: HidableColumn, label: string, tooltip?: string) =>
         hidden.has(col) ? '' : th(col, label, tooltip);
 
+    /* Count visible columns so the detail row can span them all.
+       Base columns: expand + copy + name + version + category + published +
+       stars + issues + prs + size + deps + update = 12. */
+    const visibleCols = 12
+        + (hidden.has('files') ? 0 : 1)
+        + (hidden.has('transitives') ? 0 : 1)
+        + (hidden.has('vulns') ? 0 : 1)
+        + (hidden.has('license') ? 0 : 1)
+        + (hidden.has('status') ? 0 : 1)
+        + (hidden.has('description') ? 0 : 1);
+
     return `<table>
         <thead><tr>
+            <th class="col-expand"></th>
             <th class="col-copy"></th>
             ${th('name', 'Package', 'Package name \u2014 click to open pubspec.yaml entry')}
             ${th('version', 'Version', 'Installed version from pubspec.lock')}
@@ -135,6 +209,7 @@ function buildReportTable(
             ${th('issues', 'Issues', 'Open GitHub issues (excludes pull requests when available)')}
             ${th('prs', 'PRs', 'Open GitHub pull requests')}
             ${th('size', 'Size', 'Archive size on pub.dev (before tree shaking)')}
+            <th title="Direct transitive dependencies \u2014 shared deps highlighted">Deps</th>
             ${thOpt('files', 'References', 'Number of source files that import this package \u2014 click to search')}
             ${thOpt('transitives', 'Transitives', 'Number of transitive (indirect) dependencies this package pulls in')}
             ${thOpt('vulns', 'Vulns', 'Known security vulnerabilities from OSV and GitHub Advisory databases')}
@@ -144,7 +219,7 @@ function buildReportTable(
             ${thOpt('description', 'Description', 'Package description from pub.dev')}
         </tr></thead>
         <tbody id="pkg-body">
-            ${results.map(r => buildRow(r, hidden, overrideNames)).join('\n')}
+            ${results.map(r => buildRow(r, hidden, overrideNames, sharedDepNames, visibleCols)).join('\n')}
         </tbody>
     </table>`;
 }
@@ -157,6 +232,8 @@ function buildRow(
     r: VibrancyResult,
     hidden: Set<HidableColumn>,
     overrideNames: ReadonlySet<string>,
+    sharedDepNames: ReadonlySet<string>,
+    colspan: number,
 ): string {
     const name = escapeHtml(r.package.name);
     const date = r.pubDev?.publishedDate.split('T')[0] ?? '';
@@ -166,9 +243,13 @@ function buildRow(
     const activeFileCount = activeFileUsages(r.fileUsages).length;
     const transitiveCount = r.transitiveInfo?.transitiveCount ?? 0;
     const vulnCount = r.vulnerabilities.length;
+    // A transitive package is "shared" if 2+ direct deps pull it in,
+    // meaning removing any single direct dep would NOT eliminate it.
+    const isSharedTransitive = r.package.section === 'transitive'
+        && sharedDepNames.has(r.package.name);
     const isOverridden = overrideNames.has(r.package.name) ? 'yes' : 'no';
 
-    return `<tr data-name="${name}" data-version="${escapeHtml(r.package.version)}"
+    return `<tr class="pkg-row" data-name="${name}" data-version="${escapeHtml(r.package.version)}"
         data-score="${r.score}" data-category="${r.category}"
         data-published="${date}" data-stars="${stars}"
         data-issues="${issueCount}" data-prs="${prCount}"
@@ -180,7 +261,9 @@ function buildRow(
         data-update="${r.updateInfo?.updateStatus ?? 'unknown'}"
         data-status="${r.isUnused ? 'unused' : 'ok'}"
         data-section="${r.package.section}"
-        data-overridden="${isOverridden}">
+        data-overridden="${isOverridden}"
+        data-shared-transitive="${isSharedTransitive ? 'yes' : 'no'}">
+        <td class="expand-cell"><span class="expand-chevron" title="Expand details">\u25B6</span></td>
         <td class="copy-cell"><span class="copy-btn" data-pkg="${name}" title="Copy row as JSON">&#128203;</span></td>
         ${buildNameCell(r)}
         ${buildVersionCell(r)}
@@ -190,6 +273,7 @@ function buildRow(
         ${buildIssuesCell(r)}
         ${buildPrsCell(r)}
         ${buildSizeCell(r)}
+        ${buildDepsCell(r)}
         ${hidden.has('files') ? '' : buildReferencesCell(r)}
         ${hidden.has('transitives') ? '' : buildTransitivesCell(r)}
         ${hidden.has('vulns') ? '' : buildVulnsCell(r)}
@@ -197,6 +281,9 @@ function buildRow(
         ${buildUpdateCell(r)}
         ${hidden.has('status') ? '' : buildStatusCell(r)}
         ${hidden.has('description') ? '' : buildDescCell(r)}
+    </tr>
+    <tr class="detail-row" data-detail-for="${name}" style="display:none">
+        <td colspan="${colspan}">${buildDetailCard(r)}</td>
     </tr>`;
 }
 
@@ -260,11 +347,12 @@ function formatDate(isoDate: string | null | undefined): string {
     return isoDate.split('T')[0] ?? '';
 }
 
-/** Category column with health score as a dimmed suffix, e.g. "Abandoned (1/10)". */
+/** Category column with letter grade badge and health score suffix. */
 function buildCategoryCell(r: VibrancyResult): string {
     const scoreVal = Math.round(r.score / 10);
+    const grade = categoryToGrade(r.category);
     const tooltip = buildHealthTooltip(r);
-    return `<td title="${escapeHtml(tooltip)}">${categoryLabel(r.category)} <span class="dimmed">(${scoreVal}/10)</span></td>`;
+    return `<td title="${escapeHtml(tooltip)}"><span class="grade-badge grade-${grade}">${grade}</span> ${categoryLabel(r.category)} <span class="dimmed">(${scoreVal}/10)</span></td>`;
 }
 
 /** Published date linking to the pub.dev package page, with age suffix. */
@@ -410,6 +498,133 @@ function buildDescCell(r: VibrancyResult): string {
     const desc = r.pubDev?.description;
     if (!desc) { return '<td class="desc-text"><span class="dimmed">\u2014</span></td>'; }
     return `<td class="desc-text" title="${escapeHtml(desc)}">${escapeHtml(desc)}</td>`;
+}
+
+/** Deps column: icon showing transitive dep count, with shared deps highlighted. */
+function buildDepsCell(r: VibrancyResult): string {
+    const info = r.transitiveInfo;
+    if (!info || info.transitiveCount === 0) {
+        return '<td class="cell-right" title="No transitive dependencies"><span class="dimmed">\u2014</span></td>';
+    }
+    const total = info.transitiveCount;
+    const shared = info.sharedDeps.length;
+    /* Build a tooltip listing all transitive deps, marking shared ones. */
+    const depLines = info.transitives.map(dep => {
+        const isShared = info.sharedDeps.includes(dep);
+        return isShared ? `\u2022 ${dep} (shared)` : `\u2022 ${dep}`;
+    });
+    const tooltip = `${total} transitive deps${shared > 0 ? ` (${shared} shared)` : ''}\n${depLines.join('\n')}`;
+    /* Show count with a tree icon; highlight if shared deps exist. */
+    const sharedBadge = shared > 0
+        ? ` <span class="badge-shared" title="${shared} shared with other packages">${shared}s</span>`
+        : '';
+    return `<td class="cell-right" title="${escapeHtml(tooltip)}"><span class="deps-icon">\u{1F333}</span> ${total}${sharedBadge}</td>`;
+}
+
+/** Expandable detail card shown when a row is expanded. Contains score
+ *  breakdown, vulnerability list, file usages, and dependency tree. */
+function buildDetailCard(r: VibrancyResult): string {
+    const sections: string[] = [];
+
+    /* Score breakdown */
+    sections.push(buildDetailScoreSection(r));
+
+    /* Vulnerabilities */
+    if (r.vulnerabilities.length > 0) {
+        sections.push(buildDetailVulnSection(r));
+    }
+
+    /* File usages */
+    const active = activeFileUsages(r.fileUsages);
+    if (active.length > 0) {
+        sections.push(buildDetailFilesSection(r, active));
+    }
+
+    /* Transitive dependency tree */
+    if (r.transitiveInfo && r.transitiveInfo.transitiveCount > 0) {
+        sections.push(buildDetailDepsSection(r));
+    }
+
+    /* Links */
+    sections.push(buildDetailLinksSection(r));
+
+    return `<div class="detail-card">${sections.join('')}</div>`;
+}
+
+function buildDetailScoreSection(r: VibrancyResult): string {
+    const fmt = (v: number) => Math.round(v);
+    const grade = categoryToGrade(r.category);
+    return `<div class="detail-section">
+        <h4>Health Score <span class="grade-badge grade-${grade}">${grade}</span></h4>
+        <div class="detail-grid">
+            <span class="detail-label">Overall</span><span>${Math.round(r.score / 10)}/10</span>
+            <span class="detail-label">Resolution Velocity</span><span>${fmt(r.resolutionVelocity)}</span>
+            <span class="detail-label">Engagement Level</span><span>${fmt(r.engagementLevel)}</span>
+            <span class="detail-label">Popularity</span><span>${fmt(r.popularity)}</span>
+            <span class="detail-label">Publisher Trust</span><span>${fmt(r.publisherTrust)}</span>
+        </div>
+    </div>`;
+}
+
+function buildDetailVulnSection(r: VibrancyResult): string {
+    const rows = r.vulnerabilities.map(v => {
+        const sev = v.severity ? `<span class="vuln-${v.severity}">${severityLabel(v.severity)}</span>` : '';
+        const link = v.url ? `<a href="${escapeHtml(v.url)}">${escapeHtml(v.id)}</a>` : escapeHtml(v.id);
+        const fix = v.fixedVersion ? ` \u2192 fix in ${escapeHtml(v.fixedVersion)}` : '';
+        return `<div class="vuln-row">${sev} ${link}: ${escapeHtml(v.summary ?? '')}${fix}</div>`;
+    });
+    return `<div class="detail-section">
+        <h4>Vulnerabilities (${r.vulnerabilities.length})</h4>
+        ${rows.join('\n')}
+    </div>`;
+}
+
+function buildDetailFilesSection(
+    r: VibrancyResult,
+    active: ReturnType<typeof activeFileUsages>,
+): string {
+    const name = escapeHtml(r.package.name);
+    const fileList = active.slice(0, 20).map(u =>
+        `<div class="file-row">${escapeHtml(u.filePath)}:${u.line}</div>`,
+    ).join('\n');
+    const more = active.length > 20
+        ? `<div class="dimmed">... and ${active.length - 20} more</div>` : '';
+    return `<div class="detail-section">
+        <h4>File References (${active.length}) <span class="ref-link detail-search-link" data-pkg="${name}" title="Search imports">\u{1F50D}</span></h4>
+        ${fileList}${more}
+    </div>`;
+}
+
+function buildDetailDepsSection(r: VibrancyResult): string {
+    const info = r.transitiveInfo!;
+    const depItems = info.transitives.map(dep => {
+        const isShared = info.sharedDeps.includes(dep);
+        const cls = isShared ? ' class="dep-shared"' : '';
+        const badge = isShared ? ' <span class="badge-shared-sm">shared</span>' : '';
+        return `<span${cls}>${escapeHtml(dep)}${badge}</span>`;
+    });
+    return `<div class="detail-section">
+        <h4>Transitive Dependencies (${info.transitiveCount})</h4>
+        <div class="dep-cloud">${depItems.join(' ')}</div>
+    </div>`;
+}
+
+function buildDetailLinksSection(r: VibrancyResult): string {
+    const name = encodeURIComponent(r.package.name);
+    const links: string[] = [
+        `<a href="https://pub.dev/packages/${name}">pub.dev</a>`,
+        `<a href="https://pub.dev/packages/${name}/changelog">changelog</a>`,
+        `<a href="https://pub.dev/packages/${name}/versions">versions</a>`,
+    ];
+    const repoUrl = (r.github?.repoUrl ?? r.pubDev?.repositoryUrl)?.replace(/\/+$/, '');
+    if (repoUrl) {
+        links.push(`<a href="${escapeHtml(repoUrl)}">repository</a>`);
+        links.push(`<a href="${escapeHtml(repoUrl)}/issues">issues</a>`);
+    }
+    return `<div class="detail-section detail-links">
+        <h4>Links</h4>
+        <div class="link-list">${links.join(' \u2022 ')}</div>
+    </div>`;
 }
 
 // ---------------------------------------------------------------------------

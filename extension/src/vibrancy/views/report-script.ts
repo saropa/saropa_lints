@@ -10,6 +10,7 @@ export function getReportScript(): string {
         /* ---- Filter state (shared across card, chart, and search filters) ---- */
         var activeCardFilter = null;
         var chartFilterPackage = null;
+        var excludeSharedTransitives = false;
 
         /* ---- Sorting ---- */
 
@@ -70,6 +71,12 @@ export function getReportScript(): string {
                 return false;
             }
             if (chartFilterPackage && row.dataset.name !== chartFilterPackage) {
+                return false;
+            }
+            // Hide shared transitive rows when the "Exclude shared" chart
+            // toggle is checked — these deps are already pulled in by
+            // other direct deps, so removing any single dep won't help.
+            if (excludeSharedTransitives && row.dataset.sharedTransitive === 'yes') {
                 return false;
             }
             return true;
@@ -154,6 +161,13 @@ export function getReportScript(): string {
             });
         }
 
+        /* ---- Exclude shared transitives (called from chart-script.ts) ---- */
+
+        function setExcludeShared(exclude) {
+            excludeSharedTransitives = exclude;
+            applyFilters();
+        }
+
         /* ---- Search box ---- */
 
         var searchInput = document.getElementById('search-input');
@@ -208,5 +222,97 @@ export function getReportScript(): string {
                 vscode.postMessage({ type: 'searchImport', package: el.dataset.pkg });
             });
         });
+
+        /* ---- Radial gauge animation ---- */
+        /* Trigger the CSS transition after the DOM is painted by setting
+           the final stroke-dasharray value on the next animation frame. */
+        requestAnimationFrame(function() {
+            var gaugeFill = document.querySelector('.gauge-fill');
+            if (gaugeFill) {
+                var target = parseFloat(gaugeFill.style.getPropertyValue('--gauge-target')) || 0;
+                var arc = parseFloat(gaugeFill.style.getPropertyValue('--gauge-arc')) || 999;
+                gaugeFill.setAttribute('stroke-dasharray', target + ' ' + (arc * 2));
+            }
+        });
+
+        /* ---- Row expansion (chevron click toggles detail row) ---- */
+
+        var focusedRowIdx = -1;
+
+        document.querySelectorAll('.expand-cell').forEach(function(cell) {
+            cell.addEventListener('click', function(e) {
+                e.stopPropagation();
+                var pkgRow = cell.closest('.pkg-row');
+                if (pkgRow) { toggleDetail(pkgRow); }
+            });
+        });
+
+        /* Click anywhere on the row (except links/buttons) also toggles. */
+        document.querySelectorAll('.pkg-row').forEach(function(row) {
+            row.addEventListener('click', function(e) {
+                var tag = e.target.tagName;
+                /* Don't toggle if the user clicked a link, button, or interactive element. */
+                if (tag === 'A' || tag === 'BUTTON' || e.target.classList.contains('copy-btn')
+                    || e.target.classList.contains('pkg-name-link')
+                    || e.target.classList.contains('ref-link')) { return; }
+                toggleDetail(row);
+            });
+        });
+
+        function toggleDetail(pkgRow) {
+            var name = pkgRow.dataset.name;
+            var detailRow = document.querySelector('tr[data-detail-for="' + name + '"]');
+            if (!detailRow) { return; }
+            var isExpanded = pkgRow.classList.contains('expanded');
+            if (isExpanded) {
+                pkgRow.classList.remove('expanded');
+                detailRow.style.display = 'none';
+            } else {
+                pkgRow.classList.add('expanded');
+                detailRow.style.display = '';
+            }
+        }
+
+        /* ---- Keyboard navigation ---- */
+
+        document.addEventListener('keydown', function(e) {
+            var rows = Array.from(document.querySelectorAll('.pkg-row'));
+            /* Only visible rows */
+            rows = rows.filter(function(r) { return r.style.display !== 'none'; });
+            if (rows.length === 0) { return; }
+
+            if (e.key === 'ArrowDown' || e.key === 'j') {
+                e.preventDefault();
+                focusedRowIdx = Math.min(focusedRowIdx + 1, rows.length - 1);
+                highlightRow(rows);
+            } else if (e.key === 'ArrowUp' || e.key === 'k') {
+                e.preventDefault();
+                focusedRowIdx = Math.max(focusedRowIdx - 1, 0);
+                highlightRow(rows);
+            } else if (e.key === 'Enter' || e.key === ' ') {
+                /* Don't intercept if the user is typing in the search box. */
+                if (document.activeElement && document.activeElement.id === 'search-input') { return; }
+                e.preventDefault();
+                if (focusedRowIdx >= 0 && focusedRowIdx < rows.length) {
+                    toggleDetail(rows[focusedRowIdx]);
+                }
+            } else if (e.key === 'Escape') {
+                /* Collapse all expanded rows and clear focus. */
+                document.querySelectorAll('.pkg-row.expanded').forEach(function(row) {
+                    toggleDetail(row);
+                });
+                focusedRowIdx = -1;
+                highlightRow(rows);
+            }
+        });
+
+        function highlightRow(rows) {
+            rows.forEach(function(r, i) {
+                r.classList.toggle('row-focused', i === focusedRowIdx);
+            });
+            if (focusedRowIdx >= 0 && focusedRowIdx < rows.length) {
+                rows[focusedRowIdx].scrollIntoView({ block: 'nearest' });
+            }
+        }
     `;
 }
