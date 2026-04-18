@@ -20,8 +20,9 @@ export function getReportScript(): string {
             var tbody = document.getElementById('pkg-body');
             /* Guard: bail if table body is not in the DOM yet. */
             if (!tbody) { return; }
-            var rows = Array.from(tbody.querySelectorAll('tr'));
-            rows.sort(function(a, b) {
+            /* Only sort package rows; detail rows follow their parent. */
+            var pkgRows = Array.from(tbody.querySelectorAll('tr.pkg-row'));
+            pkgRows.sort(function(a, b) {
                 var av = a.dataset[col] || '';
                 var bv = b.dataset[col] || '';
                 var an = parseFloat(av);
@@ -31,7 +32,12 @@ export function getReportScript(): string {
                 }
                 return sortAsc ? av.localeCompare(bv) : bv.localeCompare(av);
             });
-            rows.forEach(function(r) { tbody.appendChild(r); });
+            /* Re-insert each package row followed by its detail row. */
+            pkgRows.forEach(function(r) {
+                tbody.appendChild(r);
+                var detail = document.querySelector('tr[data-detail-for="' + r.dataset.name + '"]');
+                if (detail) { tbody.appendChild(detail); }
+            });
             updateArrows();
         }
 
@@ -56,10 +62,16 @@ export function getReportScript(): string {
             var searchVal = '';
             var searchEl = document.getElementById('search-input');
             if (searchEl) { searchVal = searchEl.value.toLowerCase(); }
-            var rows = document.querySelectorAll('#pkg-body tr');
+            var rows = document.querySelectorAll('#pkg-body tr.pkg-row');
             rows.forEach(function(row) {
                 var show = matchesAllFilters(row, searchVal);
                 row.style.display = show ? '' : 'none';
+                /* When a package row is hidden, also hide its detail row. */
+                var detailRow = document.querySelector('tr[data-detail-for="' + row.dataset.name + '"]');
+                if (detailRow && !show) {
+                    detailRow.style.display = 'none';
+                    row.classList.remove('expanded');
+                }
             });
         }
 
