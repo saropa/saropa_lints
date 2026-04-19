@@ -56,12 +56,12 @@ Replace with the recommended alternative API
 - [x] Verify the API change in Flutter/Dart SDK source
 - [x] Determine minimum SDK version requirement
 - [x] Write detection logic (AST visitor)
-- [ ] Write quick-fix replacement (no in-SDK replacement)
+- [x] Write quick-fix replacement (intentionally deferred — `dart:developer` removed `Metrics`/`Metric`/`Counter`/`Gauge` without an in-SDK replacement; users must adopt an external metrics package, which the rule cannot select for them)
 - [x] Create test fixture with bad/good examples
 - [x] Add unit tests
 - [x] Register rule in `all_rules.dart`
 - [x] Add to tier in `tiers.dart`
-- [ ] Update ROADMAP.md
+- [x] Update ROADMAP.md (rule was never listed in ROADMAP — confirmed via grep; goal count auto-syncs at publish time)
 - [x] Update CHANGELOG.md
 
 **Rule:** `avoid_removed_dart_developer_metrics` (covers `Metrics`, `Metric`, `Counter`, `Gauge` from `dart:developer`) in `lib/src/rules/config/dart_sdk_3_removal_rules.dart`.

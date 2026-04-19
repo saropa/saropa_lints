@@ -105,5 +105,12 @@ Replace old API/pattern with the new recommended approach
 
 ---
 
-**Status:** Not started
+**Status:** Rejected — not implementable as a lint rule
+
+**Rejection reason:** `effectiveInactivePressedOverlayColor` and
+`effectiveInactiveThumbColor` are private/internal helpers inside the Material
+`Switch` implementation. End users never reference these identifiers in their
+own code — they only configure `Switch` via public properties like
+`inactiveThumbColor` and `overlayColor`. There is no user-facing API pattern to
+detect; the PR is an internal default-value bug fix transparent to callers.
 **Generated:** From Flutter SDK v3.7.0 release notes

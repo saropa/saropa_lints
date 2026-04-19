@@ -62,5 +62,12 @@ Suggest using the new, more concise API
 
 ---
 
-**Status:** Not started
+**Status:** Rejected — not implementable as a lint rule
+
+**Rejection reason:** Purely additive: Dart 3.1 added a new `SameSite` class
+for HTTP cookies. No existing API was deprecated, removed, or changed; no
+migration is required. There is no "old pattern → new pattern" to detect.
+Proactively suggesting users set `SameSite` on every `Cookie` would be
+opinionated lint noise, not a migration rule, and is out of scope for this
+plan's SDK-delta lint theme.
 **Generated:** From Dart SDK v3.1.0 release notes

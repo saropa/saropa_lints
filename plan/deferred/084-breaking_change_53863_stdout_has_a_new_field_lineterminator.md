@@ -63,5 +63,11 @@ Suggest using the new, more concise API
 
 ---
 
-**Status:** Not started
+**Status:** Rejected — not implementable as a lint rule
+
+**Rejection reason:** The "breaking change" is that `Stdout` gained a new
+`lineTerminator` field — additive API. Existing code writing to `stdout`/`stderr`
+continues to work unchanged. The breakage only affects subclasses of `Stdout`
+(virtually none in user code) that must now implement the new field. There is
+no mechanical migration or deprecated pattern for ordinary callers to detect.
 **Generated:** From Dart SDK v3.4.0 release notes

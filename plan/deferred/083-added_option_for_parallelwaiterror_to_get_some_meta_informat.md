@@ -62,5 +62,12 @@ Suggest using the new, more concise API
 
 ---
 
-**Status:** Not started
+**Status:** Rejected — not implementable as a lint rule
+
+**Rejection reason:** This is an additive enhancement — `ParallelWaitError`
+gained optional meta-information exposed via `toString`, plus optional
+parameters on `Iterable<Future>.wait`. No existing call site needs to change;
+the old call shape keeps working. There is no deprecated pattern to detect and
+no "old vs new" migration. Proactively suggesting users pass the new optional
+argument would be low-signal noise.
 **Generated:** From Dart SDK v3.4.0 release notes

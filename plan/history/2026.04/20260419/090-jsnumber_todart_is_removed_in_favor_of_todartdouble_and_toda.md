@@ -50,18 +50,21 @@ Replace with the new API signature or pattern
 
 ## Implementation Checklist
 
-- [ ] Verify the API change in Flutter/Dart SDK source
-- [ ] Determine minimum SDK version requirement
-- [ ] Write detection logic (AST visitor)
-- [ ] Write quick-fix replacement
-- [ ] Create test fixture with bad/good examples
-- [ ] Add unit tests
-- [ ] Register rule in `all_rules.dart`
-- [ ] Add to tier in `tiers.dart`
-- [ ] Update ROADMAP.md
-- [ ] Update CHANGELOG.md
+- [x] Verify the API change in Flutter/Dart SDK source (JSNumber.toDart removed in Dart 3.2)
+- [x] Determine minimum SDK version requirement (Dart 3.2+)
+- [x] Write detection logic (AST visitor) — PropertyAccess + PrefixedIdentifier on JSNumber receivers
+- [x] Write quick-fix replacement (intentionally deferred — choice between `toDartDouble` and `toDartInt` is a semantic decision the developer must make; correction message lists both options)
+- [x] Create test fixture with bad/good examples (`example/lib/flutter_sdk_migration_rules_fixture.dart`)
+- [x] Add unit tests (`test/flutter_sdk_migration_rules_test.dart`)
+- [x] Register rule in `saropa_lints.dart` factories
+- [x] Add to tier in `tiers.dart` (Recommended)
+- [x] Update ROADMAP.md (rule was never listed in ROADMAP — confirmed via grep; `Goal: …` count auto-syncs at publish time)
+- [x] Update CHANGELOG.md
+
+**Rule:** `avoid_removed_js_number_to_dart` in
+`lib/src/rules/config/flutter_sdk_migration_rules.dart`.
 
 ---
 
-**Status:** Not started
+**Status:** Implemented
 **Generated:** From Dart SDK v3.2.0 release notes

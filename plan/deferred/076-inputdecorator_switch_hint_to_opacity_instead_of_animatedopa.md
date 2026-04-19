@@ -122,5 +122,12 @@ Replace old API/pattern with the new recommended approach
 
 ---
 
-**Status:** Not started
+**Status:** Rejected — not implementable as a lint rule
+
+**Rejection reason:** This is an internal Flutter framework change to how
+`InputDecorator` renders its hint: the framework now uses `Opacity` instead of
+`AnimatedOpacity` internally. End users do not construct the hint widget
+themselves — they only supply `InputDecoration(hintText: ...)`. There is no
+user-facing code pattern to detect or migrate. Flagging bare `AnimatedOpacity`
+usage in user code would be unrelated to this PR and produce false positives.
 **Generated:** From Flutter SDK v3.3.0 release notes

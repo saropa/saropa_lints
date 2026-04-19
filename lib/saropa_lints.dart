@@ -2825,6 +2825,8 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidDeprecatedUseInheritedMediaQueryRule.new,
   PreferUtf8EncodeRule.new,
   AvoidRemovedAppbarBackwardsCompatibilityRule.new,
+  PreferTypeSyncOverIsLinkSyncRule.new,
+  AvoidRemovedJsNumberToDartRule.new,
 
   // SDK migration batch 2 rules (plan files 057–094)
   PreferIsNanOverNanEqualityRule.new,

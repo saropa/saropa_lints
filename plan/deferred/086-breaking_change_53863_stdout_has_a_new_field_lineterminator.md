@@ -64,5 +64,10 @@ Suggest adding the new parameter for better behavior
 
 ---
 
-**Status:** Not started
+**Status:** Rejected — duplicate of plan #084
+
+**Rejection reason:** This plan was auto-generated from the same release note
+entry as plan #084 but categorized as "New Parameter / Option" instead of
+"New Feature / API". Same additive `Stdout.lineTerminator` field — no
+actionable migration pattern for users. See #084 for the full rationale.
 **Generated:** From Dart SDK v3.4.0 release notes

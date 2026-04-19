@@ -58,5 +58,14 @@ Replace old API/pattern with the new recommended approach
 
 ---
 
-**Status:** Not started
+**Status:** Rejected — not implementable as a lint rule
+
+**Rejection reason:** The auto-generated release note fragment ("calls these
+members, and use that instead") is a truncated mid-sentence excerpt of the
+Dart 3.1 `@staticInterop` / `external` extension member breaking change. The
+"Detected APIs" field is literally `N/A`. There is no concrete identifier,
+class, or method name to drive an AST detector — any rule would be guessing
+at what to match. Actionable staticInterop migrations (if any) would need
+their own dedicated plan with a specific API target, not this truncated
+fragment.
 **Generated:** From Dart SDK v3.1.0 release notes
