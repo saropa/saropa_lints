@@ -58,7 +58,7 @@ Replace old API/pattern with the new recommended approach
 - [x] Add unit tests
 - [x] Register rule in `all_rules.dart`
 - [x] Add to tier in `tiers.dart`
-- [ ] Update ROADMAP.md
+- [x] Update ROADMAP.md (rule was never listed in ROADMAP — confirmed via grep; goal count auto-syncs at publish time)
 - [x] Update CHANGELOG.md
 
 **Already implemented:** `avoid_deprecated_expires_getter` in `lib/src/rules/config/dart_sdk_3_removal_rules.dart` (replaces `.expires` with `.message` on `Deprecated`).

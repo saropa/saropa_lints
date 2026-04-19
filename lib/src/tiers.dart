@@ -797,6 +797,8 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_deprecated_use_inherited_media_query', // WARNING - deprecated after Flutter 3.7
   'prefer_utf8_encode', // INFO - prefer utf8.encode() over Utf8Encoder().convert() (Dart 2.18)
   'avoid_removed_appbar_backwards_compatibility', // WARNING - removed in Flutter 3.10
+  'prefer_type_sync_over_is_link_sync', // WARNING - FileSystemEntity.isLinkSync returns false on Windows (plan #079)
+  'avoid_removed_js_number_to_dart', // WARNING - JSNumber.toDart removed in Dart 3.2 (plan #090)
   // SDK migration batch 2 (plan files 057–094)
   'prefer_isnan_over_nan_equality', // WARNING - == double.nan is always false (IEEE 754)
   'prefer_code_unit_at', // INFO - avoid .codeUnits[i] allocation (Flutter 3.10)

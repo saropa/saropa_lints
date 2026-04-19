@@ -58,7 +58,7 @@ Replace old API/pattern with the new recommended approach
 - [x] Add unit tests
 - [x] Register rule in `all_rules.dart`
 - [x] Add to tier in `tiers.dart`
-- [ ] Update ROADMAP.md
+- [x] Update ROADMAP.md (rules were never listed in ROADMAP — confirmed via grep; goal count auto-syncs at publish time)
 - [x] Update CHANGELOG.md
 
 **CastError → TypeError:** `avoid_removed_cast_error` in `lib/src/rules/config/dart_sdk_3_removal_rules.dart`.

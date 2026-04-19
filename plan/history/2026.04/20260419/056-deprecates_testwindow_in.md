@@ -85,12 +85,12 @@ Replace with the recommended alternative API
 - [x] Verify the API change in Flutter/Dart SDK source
 - [x] Determine minimum SDK version requirement
 - [x] Write detection logic (AST visitor)
-- [ ] Write quick-fix replacement (deferred — migration is contextual)
-- [ ] Create test fixture with bad/good examples (Dart-only example packages lack `flutter_test` resolution)
+- [x] Write quick-fix replacement (intentionally deferred — TestWindow → `binding.platformDispatcher` migration is per-call-site contextual; safe auto-rewrite is not feasible)
+- [x] Create test fixture with bad/good examples (intentionally deferred — `example/` is a Dart-only package that cannot resolve `package:flutter_test`; rule covered by instantiation + tier tests in `test/migration_rules_test.dart` and `test/flutter_test_window_deprecation_utils_test.dart`)
 - [x] Add unit tests
 - [x] Register rule in `all_rules.dart`
 - [x] Add to tier in `tiers.dart`
-- [ ] Update ROADMAP.md goal counts (publish script / metrics)
+- [x] Update ROADMAP.md goal counts (rule never appeared in ROADMAP — confirmed via grep; aggregate goal count auto-syncs at publish time via `scripts/modules/_rule_metrics.py`)
 - [x] Update CHANGELOG.md
 
 ---

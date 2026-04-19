@@ -579,3 +579,219 @@ class _RemoveAppbarBackwardsCompatibilityFix extends SaropaFixProducer {
     });
   }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// prefer_type_sync_over_is_link_sync (#079)
+// ─────────────────────────────────────────────────────────────────────────────
+
+// `FileSystemEntity.isLinkSync` on Windows unconditionally returns `false`
+// (documented SDK behavior: https://api.dart.dev/dart-io/FileSystemEntity/isLinkSync.html),
+// which silently breaks cross-platform checks for symbolic links / junctions.
+// The portable replacement is `FileSystemEntity.typeSync(path, followLinks: false)`
+// compared against `FileSystemEntityType.link`. We do NOT auto-fix because the
+// rewrite changes a simple `bool` expression into a type comparison and may
+// need extra parentheses in complex contexts; we leave the mechanical change
+// to the developer to preserve surrounding semantics.
+
+/// Flags static `FileSystemEntity.isLinkSync(path)` calls and suggests
+/// `FileSystemEntity.typeSync(path, followLinks: false) == FileSystemEntityType.link`
+/// for portable cross-platform behavior.
+///
+/// Since: Unreleased | Rule version: v1
+///
+/// `FileSystemEntity.isLinkSync` returns `false` unconditionally on Windows
+/// per its documented behavior, which produces silently-wrong results when
+/// your code runs on Windows. `FileSystemEntity.typeSync(path, followLinks: false)`
+/// reports `FileSystemEntityType.link` correctly across platforms.
+///
+/// **BAD:**
+/// ```dart
+/// if (FileSystemEntity.isLinkSync(path)) {
+///   // On Windows this branch never runs.
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// if (FileSystemEntity.typeSync(path, followLinks: false) ==
+///     FileSystemEntityType.link) {
+///   // Correct on Windows, macOS, and Linux.
+/// }
+/// ```
+///
+/// See: https://api.dart.dev/dart-io/FileSystemEntity/isLinkSync.html
+class PreferTypeSyncOverIsLinkSyncRule extends SaropaLintRule {
+  PreferTypeSyncOverIsLinkSyncRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.bug;
+
+  @override
+  Set<String> get tags => const {
+    'dart-io',
+    'portability',
+    'config',
+    'migration',
+  };
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'isLinkSync'};
+
+  static const LintCode _code = LintCode(
+    'prefer_type_sync_over_is_link_sync',
+    '[prefer_type_sync_over_is_link_sync] FileSystemEntity.isLinkSync '
+        'unconditionally returns false on Windows (documented dart:io '
+        'behavior), which silently breaks cross-platform symbolic-link '
+        'checks. Use FileSystemEntity.typeSync(path, followLinks: false) == '
+        'FileSystemEntityType.link instead — it reports links correctly on '
+        'Windows, macOS, and Linux. This bug is easy to miss because it only '
+        'manifests when the code actually runs on Windows. {v1}',
+    correctionMessage:
+        "Replace 'FileSystemEntity.isLinkSync(path)' with "
+        "'FileSystemEntity.typeSync(path, followLinks: false) == "
+        "FileSystemEntityType.link' for portable behavior.",
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'isLinkSync') return;
+
+      // Only flag the static call on the FileSystemEntity class.
+      final target = node.target;
+      if (target is! SimpleIdentifier) return;
+      if (target.name != 'FileSystemEntity') return;
+
+      // Confirm the static method resolves to dart:io when possible; if
+      // resolution fails (unresolved during migration), still report on the
+      // exact lexeme match to catch migration-in-progress codebases.
+      final element = node.methodName.element;
+      if (element is MethodElement) {
+        if (!element.isStatic) return;
+        if (element.library.uri.toString() != 'dart:io') return;
+      }
+
+      reporter.atNode(node);
+    });
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// avoid_removed_js_number_to_dart (#090)
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Dart SDK 3.2 removed the single `JSNumber.toDart` getter in favor of the
+// type-explicit `JSNumber.toDartDouble` and `JSNumber.toDartInt` getters so
+// that the numeric conversion no longer silently widens/narrows. We detect
+// `.toDart` accesses whose receiver resolves to `JSNumber` from
+// `dart:js_interop` (falling back to the lexical name when resolution fails,
+// which is typical after the SDK drops the declaration). We do NOT auto-fix
+// because the choice between `.toDartDouble` and `.toDartInt` is semantic —
+// the developer must pick the representation they actually need.
+
+bool _isJsInteropLibrary(LibraryElement? lib) {
+  if (lib == null) return true; // unresolved — treat as potential JSNumber
+  return lib.uri.toString() == 'dart:js_interop';
+}
+
+/// True when [target]'s static type is `JSNumber` from `dart:js_interop`, or
+/// its type is unresolved (common during migration after the SDK removed the
+/// getter).
+bool _receiverIsJsNumber(Expression? target) {
+  if (target == null) return false;
+  final type = target.staticType;
+  if (type == null) return true; // unresolved — allow lexical match path
+  final element = type.element;
+  if (element == null) return true;
+  if (element.name != 'JSNumber') return false;
+  return _isJsInteropLibrary(element.library);
+}
+
+/// Flags the removed `JSNumber.toDart` getter from `dart:js_interop`.
+///
+/// Since: Unreleased | Rule version: v1
+///
+/// Dart SDK 3.2 removed `JSNumber.toDart` in favor of `toDartDouble` and
+/// `toDartInt` so the target numeric type is explicit at the call site.
+/// Code still using `.toDart` on a `JSNumber` fails to compile on Dart
+/// 3.2+; this rule surfaces the migration with a more actionable message
+/// than the analyzer's default `deprecated_member_use` diagnostic.
+///
+/// **BAD:**
+/// ```dart
+/// import 'dart:js_interop';
+///
+/// num fromJs(JSNumber n) => n.toDart; // removed in Dart 3.2
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// import 'dart:js_interop';
+///
+/// double asDouble(JSNumber n) => n.toDartDouble;
+/// int asInt(JSNumber n) => n.toDartInt;
+/// ```
+class AvoidRemovedJsNumberToDartRule extends SaropaLintRule {
+  AvoidRemovedJsNumberToDartRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'dart-js-interop', 'config', 'migration'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'toDart'};
+
+  static const LintCode _code = LintCode(
+    'avoid_removed_js_number_to_dart',
+    '[avoid_removed_js_number_to_dart] JSNumber.toDart was removed in Dart '
+        '3.2 (dart:js_interop) in favor of the type-explicit toDartDouble '
+        'and toDartInt getters. The old getter hid whether the value was '
+        'converted to an int or a double; the replacements make the target '
+        'numeric type explicit at the call site. Pick toDartDouble when the '
+        'JavaScript value is fractional or unknown, and toDartInt when it '
+        'is guaranteed to be a whole number. {v1}',
+    correctionMessage:
+        "Replace '.toDart' with '.toDartDouble' (for floating-point) or "
+        "'.toDartInt' (for integers) depending on the target Dart type.",
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    // Handle `(expr).toDart` and other PropertyAccess shapes.
+    context.addPropertyAccess((PropertyAccess node) {
+      if (node.propertyName.name != 'toDart') return;
+      if (!_receiverIsJsNumber(node.realTarget)) return;
+      reporter.atNode(node.propertyName);
+    });
+
+    // Handle `identifier.toDart` (parsed as PrefixedIdentifier, not
+    // PropertyAccess) where `identifier` is a JSNumber-typed variable.
+    context.addPrefixedIdentifier((PrefixedIdentifier node) {
+      if (node.identifier.name != 'toDart') return;
+      if (!_receiverIsJsNumber(node.prefix)) return;
+      reporter.atNode(node.identifier);
+    });
+  }
+}

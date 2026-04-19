@@ -120,11 +120,11 @@ Replace with the recommended alternative API
 - [x] Determine minimum SDK version requirement
 - [x] Write detection logic (AST visitor)
 - [x] Write quick-fix replacement
-- [ ] Create test fixture with bad/good examples
-- [ ] Add unit tests
+- [x] Create test fixture with bad/good examples (`example/lib/flutter_sdk_migration_rules_fixture.dart`)
+- [x] Add unit tests (`test/flutter_sdk_migration_rules_test.dart`)
 - [x] Register rule in `all_rules.dart`
 - [x] Add to tier in `tiers.dart`
-- [ ] Update ROADMAP.md
+- [x] Update ROADMAP.md (rule was never listed in ROADMAP — confirmed via grep; `Goal: …` count auto-syncs at publish time)
 - [x] Update CHANGELOG.md
 
 ---

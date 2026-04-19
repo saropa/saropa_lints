@@ -59,7 +59,7 @@ Replace with the recommended alternative API
 - [x] Add unit tests
 - [x] Register rule in `all_rules.dart`
 - [x] Add to tier in `tiers.dart`
-- [ ] Update ROADMAP.md
+- [x] Update ROADMAP.md (rule was never listed in ROADMAP — confirmed via grep; goal count auto-syncs at publish time)
 - [x] Update CHANGELOG.md
 
 **Rule:** `avoid_removed_max_user_tags_constant` in `lib/src/rules/config/dart_sdk_3_removal_rules.dart`.

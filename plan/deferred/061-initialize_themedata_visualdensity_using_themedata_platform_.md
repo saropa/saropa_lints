@@ -94,5 +94,12 @@ Replace old API/pattern with the new recommended approach
 
 ---
 
-**Status:** Not started
+**Status:** Rejected — not implementable as a lint rule
+
+**Rejection reason:** This is an internal change to how `ThemeData` initializes
+its default `visualDensity` when the user passes `platform` but leaves
+`visualDensity` unset. The fix is inside the `ThemeData` constructor — users do
+not call or override the initialization path. Code that passes `platform:` and
+expects platform-correct `visualDensity` simply works after upgrading. There is
+no user-facing pattern to detect.
 **Generated:** From Flutter SDK v3.10.0 release notes

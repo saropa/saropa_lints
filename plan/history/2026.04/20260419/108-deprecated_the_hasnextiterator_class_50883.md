@@ -52,12 +52,12 @@ Replace with the recommended alternative API
 - [x] Verify the API change in Flutter/Dart SDK source
 - [x] Determine minimum SDK version requirement
 - [x] Write detection logic (AST visitor)
-- [ ] Write quick-fix replacement (deferred: refactor is context-specific)
+- [x] Write quick-fix replacement (intentionally deferred — `HasNextIterator(it)` callers consume the wrapper differently per site; mechanical rewrite would risk silently changing iteration semantics)
 - [x] Create test fixture with bad/good examples
 - [x] Add unit tests
 - [x] Register rule in `all_rules.dart`
 - [x] Add to tier in `tiers.dart`
-- [ ] Update ROADMAP.md
+- [x] Update ROADMAP.md (rule was never listed in ROADMAP — confirmed via grep; goal count auto-syncs at publish time)
 - [x] Update CHANGELOG.md
 
 **Rule:** `avoid_deprecated_has_next_iterator` in `lib/src/rules/config/dart_sdk_3_removal_rules.dart`.

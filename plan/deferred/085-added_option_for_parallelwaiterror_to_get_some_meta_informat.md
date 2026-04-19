@@ -63,5 +63,11 @@ Suggest adding the new parameter for better behavior
 
 ---
 
-**Status:** Not started
+**Status:** Rejected — duplicate of plan #083
+
+**Rejection reason:** This plan was auto-generated from the same release note
+entry as plan #083 but categorized as "New Parameter / Option" instead of
+"New Feature / API". Same additive change to `ParallelWaitError` /
+`Iterable<Future>.wait` — no actionable migration pattern for users. See #083
+for the full rejection rationale.
 **Generated:** From Dart SDK v3.4.0 release notes

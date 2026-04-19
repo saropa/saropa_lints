@@ -62,5 +62,14 @@ Suggest using the new, more concise API
 
 ---
 
-**Status:** Not started
+**Status:** Rejected — not implementable as a lint rule
+
+**Rejection reason:** The release note itself explicitly says this "shouldn't
+make a difference unless the extension names were explicitly used." The change
+reorganizes `dart:js_interop` extensions into `JSAnyOperatorExtension` — the
+operators continue to resolve automatically for nearly all call sites. The
+only affected code is uncommon direct references to the old extension class
+names. Detecting that via lint would require hard-coded name lists for
+effectively zero real-world impact; the analyzer's own `deprecated_member_use`
+already covers any directly referenced old names.
 **Generated:** From Dart SDK v3.3.0 release notes
