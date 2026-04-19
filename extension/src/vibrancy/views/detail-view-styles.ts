@@ -69,22 +69,6 @@ h1 {
 .score.abandoned { background: var(--vscode-editorWarning-foreground); color: #000; }
 .score.end-of-life { background: var(--vscode-editorError-foreground); color: #fff; }
 
-.category-badge {
-    display: inline-block;
-    font-size: 11px;
-    padding: 2px 6px;
-    border-radius: 3px;
-    margin-bottom: 12px;
-    text-transform: uppercase;
-    font-weight: 500;
-}
-
-.category-badge.vibrant { background: rgba(40, 167, 69, 0.2); color: var(--vscode-testing-iconPassed); }
-.category-badge.stable { background: rgba(23, 162, 184, 0.2); color: var(--vscode-editorInfo-foreground); }
-.category-badge.outdated { background: rgba(255, 193, 7, 0.2); color: var(--vscode-editorWarning-foreground); }
-.category-badge.abandoned { background: rgba(255, 193, 7, 0.2); color: var(--vscode-editorWarning-foreground); }
-.category-badge.end-of-life { background: rgba(220, 53, 69, 0.2); color: var(--vscode-editorError-foreground); }
-
 section {
     margin-bottom: 16px;
     border: 1px solid var(--vscode-widget-border, var(--vscode-editorWidget-border, #333));

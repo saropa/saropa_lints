@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { VibrancyResult, FlaggedIssue } from '../types';
-import { categoryLabel } from '../scoring/status-classifier';
+import { categoryLabel, categoryToGrade, scoreToGrade } from '../scoring/status-classifier';
 import { isReplacementPackageName, getReplacementDisplayText } from '../scoring/known-issues';
 import { formatSizeMB } from '../scoring/bloat-calculator';
 import { formatRelativeTime } from '../scoring/time-formatter';
@@ -52,10 +52,10 @@ export class DetailLogger {
     }
 
     private _logPackageContent(result: VibrancyResult, timestamp: string): void {
-        const displayScore = Math.round(result.score / 10);
+        const grade = categoryToGrade(result.category);
         const catLabel = categoryLabel(result.category);
 
-        this._logWithTimestamp(timestamp, `${result.package.name} — ${displayScore}/10 (${catLabel})`);
+        this._logWithTimestamp(timestamp, `${result.package.name} — ${grade} (${catLabel})`);
         this._logWithTimestamp(timestamp, '─'.repeat(50));
 
         this._logVersionInfo(result, timestamp);
@@ -99,9 +99,14 @@ export class DetailLogger {
         if (result.blocker) {
             this._logWithTimestamp(timestamp, '⚠️ Upgrade Blocked:');
             this._logIndented(timestamp, `Blocked by ${result.blocker.blockerPackage}`);
-            if (result.blocker.blockerVibrancyScore !== null) {
-                const blockerScore = Math.round(result.blocker.blockerVibrancyScore / 10);
-                this._logIndented(timestamp, `Blocker score: ${blockerScore}/10`);
+            /* Prefer category-derived letter (handles EOL/trusted-pub overrides);
+               fall back to score-derived letter when only the score survived. */
+            const bCat = result.blocker.blockerCategory;
+            const bScore = result.blocker.blockerVibrancyScore;
+            if (bCat !== null) {
+                this._logIndented(timestamp, `Blocker grade: ${categoryToGrade(bCat)}`);
+            } else if (bScore !== null) {
+                this._logIndented(timestamp, `Blocker grade: ${scoreToGrade(bScore)}`);
             }
         }
     }

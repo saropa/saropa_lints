@@ -1,5 +1,6 @@
 import { VibrancyResult, BudgetConfig, BudgetResult, BudgetStatus } from '../types';
 import { formatSizeMB } from './bloat-calculator';
+import { scoreToGrade } from './status-classifier';
 
 /** Read budget configuration from workspace settings. */
 export function readBudgetConfig(
@@ -163,8 +164,10 @@ export function checkBudgets(
         actual: actuals.averageVibrancy,
         limit: config.minAverageVibrancy,
         isMinimum: true,
-        formatActual: v => `${Math.round(v / 10)}/10`,
-        formatLimit: v => `${Math.round(v / 10)}/10`,
+        /* Letter grade for display; raw 0-100 actual/limit stay in the
+           BudgetResult record for CI threshold math. */
+        formatActual: v => scoreToGrade(v),
+        formatLimit: v => scoreToGrade(v),
     }));
 
     budgetResults.push(buildResult({
@@ -301,7 +304,9 @@ export function buildExceededDiagnostics(
                 message = `Budget exceeded: Total archive size ${formatSizeMB(br.actual * 1024 * 1024)} (limit: ${br.limit?.toFixed(1)} MB). Review large dependencies.`;
                 break;
             case 'Avg Vibrancy':
-                message = `Budget exceeded: Average vibrancy ${Math.round(br.actual / 10)}/10 is below minimum ${Math.round(br.limit / 10)}/10. Improve dependency health.`;
+                /* Letter-only for user-facing budget messages; raw 0-100 values
+                   remain in the BudgetResult record for thresholds and CI. */
+                message = `Budget exceeded: Project Package Grade ${scoreToGrade(br.actual)} is below minimum ${scoreToGrade(br.limit)}. Improve dependency health.`;
                 break;
             default:
                 continue;

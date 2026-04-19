@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 
 import { VibrancyResult, UpdateInfo } from '../types';
 import { formatSizeMB } from '../scoring/bloat-calculator';
+import { categoryToGrade, scoreToGrade } from '../scoring/status-classifier';
 import { classifyLicense, licenseEmoji } from '../scoring/license-classifier';
 import { formatRelativeTime } from '../scoring/time-formatter';
 import { severityEmoji, severityLabel, worstSeverity } from '../scoring/vuln-classifier';
@@ -134,11 +135,16 @@ function buildUpdateGroup(result: VibrancyResult): GroupItem | null {
         items.push(new DetailItem(
             '🔒 Blocked by', b.blockerPackage,
         ));
-        if (b.blockerVibrancyScore !== null) {
-            const score = Math.round(b.blockerVibrancyScore / 10);
-            const cat = b.blockerCategory ?? 'unknown';
+        /* Prefer the category-derived letter (respects EOL/trusted-publisher
+           overrides); fall back to score-derived letter if only the raw score
+           survived. Either way: letter, no /10. */
+        if (b.blockerCategory !== null) {
             items.push(new DetailItem(
-                '  vibrancy', `${score}/10 (${cat})`,
+                '  vibrancy', categoryToGrade(b.blockerCategory),
+            ));
+        } else if (b.blockerVibrancyScore !== null) {
+            items.push(new DetailItem(
+                '  vibrancy', scoreToGrade(b.blockerVibrancyScore),
             ));
         }
     }
@@ -381,14 +387,16 @@ function buildAlternativesGroup(result: VibrancyResult): GroupItem | null {
     const items: DetailItem[] = [];
     for (const alt of result.alternatives) {
         const badge = alt.source === 'curated' ? 'Recommended' : 'Similar';
-        const scoreText = alt.score !== null ? ` (${Math.round(alt.score / 10)}/10)` : '';
+        /* Letter grade only (derived from the alt's raw score — alts don't
+           carry a category). Previously "(7/10)". */
+        const gradeText = alt.score !== null ? ` (${scoreToGrade(alt.score)})` : '';
         const likesText = alt.likes > 0 ? `, ${alt.likes} likes` : '';
         const url = `https://pub.dev/packages/${alt.name}`;
         const emoji = alt.source === 'curated' ? '⭐' : '💡';
 
         items.push(new DetailItem(
             `${emoji} ${alt.name}`,
-            `${badge}${scoreText}${likesText}`,
+            `${badge}${gradeText}${likesText}`,
             url,
         ));
     }

@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { VibrancyResult, FamilySplit, OverrideAnalysis, BudgetResult, VulnSeverity, Vulnerability } from '../types';
 import { findPackageRange } from '../services/pubspec-parser';
-import { categoryToSeverity } from '../scoring/status-classifier';
+import { categoryToSeverity, categoryToGrade } from '../scoring/status-classifier';
 import {
     getEndOfLifeDiagnostics,
     getVulnSeverityThreshold,
@@ -226,7 +226,7 @@ function computeSeverity(
 }
 
 function buildMessage(result: VibrancyResult): string {
-    const score = Math.round(result.score / 10);
+    const grade = categoryToGrade(result.category);
     const name = result.package.name;
     const replacement = result.knownIssue?.replacement;
     const displayReplacement = replacement
@@ -259,10 +259,12 @@ function buildMessage(result: VibrancyResult): string {
         msg += ` | Update: ${result.updateInfo.currentVersion} → ${result.updateInfo.latestVersion}`;
     }
     if (result.blocker) {
-        const bScore = result.blocker.blockerVibrancyScore;
-        const scoreStr = bScore !== null
-            ? ` (${Math.round(bScore / 10)}/10)` : '';
-        msg += ` | Blocked: ${result.blocker.blockerPackage}${scoreStr}`;
+        /* The blocker package has its own category; if we have it, use its
+           letter grade. Otherwise omit — a numeric score on the blocker
+           would re-introduce the very precision we just dropped. */
+        const bCat = result.blocker.blockerCategory;
+        const gradeStr = bCat ? ` (${categoryToGrade(bCat)})` : '';
+        msg += ` | Blocked: ${result.blocker.blockerPackage}${gradeStr}`;
     }
 
     const flaggedCount = result.github?.flaggedIssues?.length ?? 0;
@@ -270,7 +272,7 @@ function buildMessage(result: VibrancyResult): string {
         msg += ` | ${flaggedCount} flagged issue(s)`;
     }
 
-    return `${msg} (${score}/10)`;
+    return `${msg} (${grade})`;
 }
 
 function buildFamilyConflictMessage(

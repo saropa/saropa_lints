@@ -55,13 +55,15 @@ describe('buildReportHtml', () => {
         assert.ok(html.includes('</html>'));
     });
 
-    it('should show package count and average score', () => {
+    it('should show package count and project grade', () => {
         const html = buildReportHtml(opts([
             makeResult('http', 80),
             makeResult('bloc', 60),
         ]));
         assert.ok(html.includes('>2<'));
-        assert.ok(html.includes('>7/10<'));
+        /* avg score 70 → grade A; shown in the "Project Package Grade" card. */
+        assert.ok(html.includes('Project Package Grade'));
+        assert.ok(html.includes('>A<'));
     });
 
     it('should include package rows in table', () => {
@@ -128,19 +130,30 @@ describe('buildReportHtml', () => {
     });
 });
 
-describe('report: Category column with health suffix', () => {
-    it('should show score as dimmed suffix on category', () => {
+describe('report: Category column shows letter grade only', () => {
+    it('should render only the letter grade badge, with no label or /10 suffix', () => {
         const result = makeResult('http', 80);
         const html = buildReportHtml(opts([result]));
-        /* 80/100 → 8/10, shown as dimmed suffix after category label */
-        assert.ok(html.includes('8/10'));
-        assert.ok(html.includes('class="dimmed"'));
+        /* After the letter-only redesign, the category cell contains only
+           a grade badge (e.g. A). The old "(8/10)" dimmed suffix and the
+           inline "Vibrant" label are no longer rendered in the cell body.
+           (/10 still appears inside the health tooltip — that's expected
+           and intentionally preserved.) */
+        assert.ok(html.includes('grade-badge grade-A'));
+        assert.ok(!html.includes('(8/10)'));
+        /* The inline category-cell label "Vibrant" used to sit between
+           the badge and the dimmed score; now it lives only in the tooltip. */
+        assert.ok(!html.includes('>A</span> Vibrant '));
     });
 
     it('should include health tooltip on category cell', () => {
         const result = makeResult('http', 80);
         const html = buildReportHtml(opts([result]));
-        assert.ok(html.includes('Vibrancy Score'));
+        /* Tooltip header changed from "Vibrancy Score: n/10" to "Grade: X"
+           after the letter-only redesign — the numeric restatement was redundant
+           with the cell letter. The factor rows below still appear and are
+           verified in the separate "health tooltip (score breakdown)" test. */
+        assert.ok(html.includes('Grade: A'));
     });
 
     it('should use score data-col for sorting', () => {
@@ -688,7 +701,10 @@ describe('report: health tooltip (score breakdown)', () => {
     it('should include score breakdown in health cell tooltip', () => {
         const result = makeResult('http', 80);
         const html = buildReportHtml(opts([result]));
-        assert.ok(html.includes('Vibrancy Score: 8/10'));
+        /* First line is now the letter grade, not "Vibrancy Score: n/10"
+           — the aggregate was redundant with the cell letter. Factor rows
+           (the actual breakdown) remain unchanged. */
+        assert.ok(html.includes('Grade: A'));
         assert.ok(html.includes('Resolution Velocity: 50'));
         assert.ok(html.includes('Engagement Level: 40'));
         assert.ok(html.includes('Popularity: 30'));

@@ -41,7 +41,7 @@ describe('comparison-ranker', () => {
             const result = rankPackages(packages);
 
             const vibrancyWinner = result.winners.find(
-                w => w.dimension === 'Vibrancy Score',
+                w => w.dimension === 'Vibrancy Grade',
             );
             assert.ok(vibrancyWinner, 'Should have vibrancy winner');
             assert.strictEqual(vibrancyWinner.winnerName, 'http');
@@ -102,7 +102,7 @@ describe('comparison-ranker', () => {
             const result = rankPackages(packages);
 
             const vibrancyWinner = result.winners.find(
-                w => w.dimension === 'Vibrancy Score',
+                w => w.dimension === 'Vibrancy Grade',
             );
             assert.ok(vibrancyWinner === undefined || vibrancyWinner.winnerName === 'has-data');
         });
@@ -116,7 +116,7 @@ describe('comparison-ranker', () => {
             const result = rankPackages(packages);
 
             const vibrancyWinner = result.winners.find(
-                w => w.dimension === 'Vibrancy Score',
+                w => w.dimension === 'Vibrancy Grade',
             );
             assert.strictEqual(vibrancyWinner, undefined);
         });
@@ -154,7 +154,7 @@ describe('comparison-ranker', () => {
             const result = rankPackages(packages);
 
             const vibrancyWinner = result.winners.find(
-                w => w.dimension === 'Vibrancy Score',
+                w => w.dimension === 'Vibrancy Grade',
             );
             assert.ok(vibrancyWinner);
             assert.ok(
@@ -291,36 +291,36 @@ describe('comparison-ranker', () => {
         it('should return true when package is the winner', () => {
             const winners: DimensionWinner[] = [
                 {
-                    dimension: 'Vibrancy Score',
+                    dimension: 'Vibrancy Grade',
                     winnerName: 'http',
-                    value: '92/100',
+                    value: 'A',
                     allValues: [],
                 },
             ];
 
-            assert.strictEqual(isWinnerForDimension('http', 'Vibrancy Score', winners), true);
-            assert.strictEqual(isWinnerForDimension('dio', 'Vibrancy Score', winners), false);
+            assert.strictEqual(isWinnerForDimension('http', 'Vibrancy Grade', winners), true);
+            assert.strictEqual(isWinnerForDimension('dio', 'Vibrancy Grade', winners), false);
         });
 
         it('should return false for non-existent dimension', () => {
             const winners: DimensionWinner[] = [];
 
-            assert.strictEqual(isWinnerForDimension('http', 'Vibrancy Score', winners), false);
+            assert.strictEqual(isWinnerForDimension('http', 'Vibrancy Grade', winners), false);
         });
 
         it('should handle tied winners', () => {
             const winners: DimensionWinner[] = [
                 {
-                    dimension: 'Vibrancy Score',
+                    dimension: 'Vibrancy Grade',
                     winnerName: 'http, dio',
-                    value: '90/100',
+                    value: 'A',
                     allValues: [],
                 },
             ];
 
-            assert.strictEqual(isWinnerForDimension('http', 'Vibrancy Score', winners), true);
-            assert.strictEqual(isWinnerForDimension('dio', 'Vibrancy Score', winners), true);
-            assert.strictEqual(isWinnerForDimension('chopper', 'Vibrancy Score', winners), false);
+            assert.strictEqual(isWinnerForDimension('http', 'Vibrancy Grade', winners), true);
+            assert.strictEqual(isWinnerForDimension('dio', 'Vibrancy Grade', winners), true);
+            assert.strictEqual(isWinnerForDimension('chopper', 'Vibrancy Grade', winners), false);
         });
     });
 });

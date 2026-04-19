@@ -1,5 +1,7 @@
 import { VibrancyResult, activeFileUsages } from '../types';
-import { categoryLabel, categoryToGrade, countByCategory } from '../scoring/status-classifier';
+import {
+    categoryLabel, categoryToGrade, countByCategory, scoreToGrade,
+} from '../scoring/status-classifier';
 import { formatSizeMB, formatSizeKB } from '../scoring/bloat-calculator';
 import { worstSeverity, severityEmoji, severityLabel } from '../scoring/vuln-classifier';
 import { getReportStyles } from './report-styles';
@@ -58,9 +60,8 @@ export function buildReportHtml(options: ReportOptions): string {
  * animates on load via a CSS stroke-dashoffset transition.
  */
 function buildRadialGauge(avgScore: number): string {
-    /* avgScore is 0-100 (raw vibrancy score, not /10). */
+    /* avgScore is 0-100 (raw vibrancy score). */
     const pct = Math.max(0, Math.min(100, avgScore));
-    const displayScore = Math.round(pct / 10);
     /* Arc geometry: 270-degree arc (3/4 circle), radius 36, centered at 44,44. */
     const r = 36;
     const circumference = 2 * Math.PI * r;
@@ -71,14 +72,10 @@ function buildRadialGauge(avgScore: number): string {
     const color = pct >= 50
         ? `hsl(${Math.round(60 + (pct - 50) * 1.2)}, 80%, 45%)`
         : `hsl(${Math.round(pct * 1.2)}, 80%, 45%)`;
-    /* Grade thresholds match classifyStatus: >=70 vibrant(A), >=40 stable(B),
-       >=20 outdated(C), <20 abandoned(E). F is only for hard EOL signals
-       (discontinued/archived) which can't be derived from score alone. */
-    const gradeLabel = pct >= 70 ? 'A'
-        : pct >= 40 ? 'B'
-            : pct >= 20 ? 'C'
-                : 'E';
-    return `<div class="radial-gauge" title="Overall project health: ${displayScore}/10 (${gradeLabel})">
+    /* Grade derived from score thresholds (never F: F requires hard EOL
+       signals that can't be inferred from an average score). */
+    const gradeLabel = scoreToGrade(pct);
+    return `<div class="radial-gauge" title="Project Package Grade: ${gradeLabel}">
         <svg viewBox="0 0 88 88" class="gauge-svg">
             <circle cx="44" cy="44" r="${r}" fill="none"
                 stroke="var(--vscode-widget-border)" stroke-width="7"
@@ -94,8 +91,7 @@ function buildRadialGauge(avgScore: number): string {
                 transform="rotate(135 44 44)"
                 class="gauge-fill" style="--gauge-target: ${filled}; --gauge-arc: ${arcLength};" />
         </svg>
-        <div class="gauge-label">${displayScore}</div>
-        <div class="gauge-sub">/10</div>
+        <div class="gauge-label">${gradeLabel}</div>
     </div>`;
 }
 
@@ -105,9 +101,10 @@ function buildReportSummary(options: ReportOptions): string {
     const updates = results.filter(
         r => r.updateInfo && r.updateInfo.updateStatus !== 'up-to-date',
     ).length;
-    const avg = results.length > 0
-        ? Math.round(results.reduce((s, r) => s + r.score, 0) / results.length / 10)
+    const avgScore = results.length > 0
+        ? results.reduce((s, r) => s + r.score, 0) / results.length
         : 0;
+    const avgGrade = results.length > 0 ? scoreToGrade(avgScore) : '—';
     const totalBytes = results.reduce(
         (sum, r) => sum + (r.archiveSizeBytes ?? 0), 0,
     );
@@ -119,13 +116,13 @@ function buildReportSummary(options: ReportOptions): string {
 
     return `<div class="summary">
         <div class="summary-card"><div class="count">${results.length}</div><div class="label">Packages</div></div>
-        <div class="summary-card"><div class="count">${avg}/10</div><div class="label">Avg Score</div></div>
+        <div class="summary-card"><div class="count">${avgGrade}</div><div class="label">Project Package Grade</div></div>
         <div class="summary-card"><div class="count">${totalSize}</div><div class="label">Total Size*</div></div>
-        <div class="summary-card vibrant" data-filter="vibrant"><div class="count">${counts.vibrant}</div><div class="label">Vibrant</div></div>
-        <div class="summary-card stable" data-filter="stable"><div class="count">${counts.stable}</div><div class="label">Stable</div></div>
-        <div class="summary-card outdated" data-filter="outdated"><div class="count">${counts.outdated}</div><div class="label">Outdated</div></div>
-        <div class="summary-card abandoned" data-filter="abandoned"><div class="count">${counts.abandoned}</div><div class="label">Abandoned</div></div>
-        <div class="summary-card eol" data-filter="end-of-life"><div class="count">${counts.eol}</div><div class="label">End of Life</div></div>
+        <div class="summary-card vibrant" data-filter="vibrant" title="Vibrant"><div class="count">${counts.vibrant}</div><div class="label">A</div></div>
+        <div class="summary-card stable" data-filter="stable" title="Stable"><div class="count">${counts.stable}</div><div class="label">B</div></div>
+        <div class="summary-card outdated" data-filter="outdated" title="Outdated"><div class="count">${counts.outdated}</div><div class="label">C</div></div>
+        <div class="summary-card abandoned" data-filter="abandoned" title="Abandoned"><div class="count">${counts.abandoned}</div><div class="label">E</div></div>
+        <div class="summary-card eol" data-filter="end-of-life" title="End of Life"><div class="count">${counts.eol}</div><div class="label">F</div></div>
         <div class="summary-card updates" data-filter="updates"><div class="count">${updates}</div><div class="label">Updates</div></div>
         <div class="summary-card unused" data-filter="unused"><div class="count">${results.filter(r => r.isUnused).length}</div><div class="label">Unused</div></div>
         ${singleUse > 0 ? `<div class="summary-card single-use" data-filter="single-use"><div class="count">${singleUse}</div><div class="label">Single-use</div></div>` : ''}
@@ -140,8 +137,23 @@ function buildToolbar(options: ReportOptions): string {
     const pubspecBtn = options.pubspecUri
         ? '<button id="open-pubspec" class="toolbar-btn" title="Open pubspec.yaml">&#128196; pubspec.yaml</button>'
         : '';
+    // Footprint-mode toggle controls what the Size column shows:
+    //   own     = archive size of the package itself (default; matches old behavior)
+    //   unique  = own + transitives used ONLY by this dep (cost saved if removed)
+    //   total   = own + ALL transitives, including ones shared with other deps
+    const footprintToggle = `<div class="footprint-toggle" role="group" aria-label="Size column footprint mode"
+        title="What the Size column shows: own archive only, plus unique transitives (cost if removed), or plus all transitives (theoretical max).">
+        <span class="toggle-label">Footprint:</span>
+        <button class="toggle-btn footprint-btn active" data-footprint="own"
+            title="Own archive size only — matches pub.dev download size">Own</button>
+        <button class="toggle-btn footprint-btn" data-footprint="unique"
+            title="Own size + transitives used only by this dep (savings if you remove it)">+ Unique</button>
+        <button class="toggle-btn footprint-btn" data-footprint="total"
+            title="Own size + all transitives, including ones shared with other deps">+ All</button>
+    </div>`;
     return `<div class="table-toolbar">
         <input type="text" id="search-input" placeholder="Search packages\u2026" class="search-input" />
+        ${footprintToggle}
         ${pubspecBtn}
     </div>`;
 }
@@ -316,10 +328,11 @@ function formatAgeSuffix(isoDate: string | null | undefined): string {
     const ms = Date.parse(isoDate);
     if (isNaN(ms)) { return ''; }
     const months = Math.max(0, Math.floor((Date.now() - ms) / (30.44 * 86_400_000)));
-    let label: string;
-    if (months < 1) { label = 'new'; }
-    else if (months < 24) { label = `${months}mo`; }
-    else { label = `${Math.floor(months / 12)}y`; }
+    // Suppress the suffix entirely for ages under a month — the previous
+    // "(new)" label was misleading (recently published != fresh release of a
+    // mature package), so we just omit it rather than guess a useful word.
+    if (months < 1) { return ''; }
+    const label = months < 24 ? `${months}mo` : `${Math.floor(months / 12)}y`;
     return ` <span class="version-age">(${label})</span>`;
 }
 
@@ -349,12 +362,11 @@ function formatDate(isoDate: string | null | undefined): string {
     return isoDate.split('T')[0] ?? '';
 }
 
-/** Category column with letter grade badge and health score suffix. */
+/** Category column: letter grade badge only. Label/score surfaced via tooltip. */
 function buildCategoryCell(r: VibrancyResult): string {
-    const scoreVal = Math.round(r.score / 10);
     const grade = categoryToGrade(r.category);
     const tooltip = buildHealthTooltip(r);
-    return `<td title="${escapeHtml(tooltip)}"><span class="grade-badge grade-${grade}">${grade}</span> ${categoryLabel(r.category)} <span class="dimmed">(${scoreVal}/10)</span></td>`;
+    return `<td title="${escapeHtml(tooltip)}"><span class="grade-badge grade-${grade}">${grade}</span></td>`;
 }
 
 /** Published date linking to the pub.dev package page, with age suffix. */
@@ -371,8 +383,12 @@ function buildPublishedCell(r: VibrancyResult): string {
 /** Build a multi-line tooltip explaining the vibrancy score breakdown. */
 function buildHealthTooltip(r: VibrancyResult): string {
     const fmt = (v: number) => Math.round(v);
+    /* The leading "Vibrancy Score: n/10" line was removed — the cell
+       already shows the letter grade and a numeric restatement adds no
+       new information. The factor rows that remain are distinct signals,
+       not the aggregate. */
     const lines = [
-        `Vibrancy Score: ${Math.round(r.score / 10)}/10`,
+        `Grade: ${categoryToGrade(r.category)}`,
         '',
         `Resolution Velocity: ${fmt(r.resolutionVelocity)}`,
         `Engagement Level: ${fmt(r.engagementLevel)}`,
@@ -418,9 +434,26 @@ function buildPrsCell(r: VibrancyResult): string {
 
 function buildSizeCell(r: VibrancyResult): string {
     if (r.archiveSizeBytes === null) {
-        return '<td class="cell-right" title="Archive size not available from pub.dev"><span class="dimmed">\u2014</span></td>';
+        return '<td class="cell-right size-cell" title="Archive size not available from pub.dev"><span class="dimmed">\u2014</span></td>';
     }
-    return `<td class="cell-right">${formatSizeKB(r.archiveSizeBytes)}</td>`;
+    // Render three precomputed labels — the toolbar toggle picks which one is
+    // visible by toggling a class on the table. This avoids re-running format
+    // logic in JS on every toggle.
+    const own = r.archiveSizeBytes;
+    const uniqueT = r.transitiveInfo?.uniqueTransitiveSizeBytes ?? 0;
+    const sharedT = r.transitiveInfo?.sharedTransitiveSizeBytes ?? 0;
+    const ownLabel = formatSizeKB(own);
+    const uniqueLabel = formatSizeKB(own + uniqueT);
+    const totalLabel = formatSizeKB(own + uniqueT + sharedT);
+    const tooltip = r.transitiveInfo && r.transitiveInfo.transitiveCount > 0
+        ? `Own: ${ownLabel}\nWith unique transitives: ${uniqueLabel}\nWith shared transitives: ${totalLabel}`
+        : `Archive size: ${ownLabel}`;
+    return `<td class="cell-right size-cell" title="${escapeHtml(tooltip)}"
+        data-size-own="${own}" data-size-unique="${own + uniqueT}" data-size-total="${own + uniqueT + sharedT}">`
+        + `<span class="size-own">${ownLabel}</span>`
+        + `<span class="size-unique">${uniqueLabel}</span>`
+        + `<span class="size-total">${totalLabel}</span>`
+        + `</td>`;
 }
 
 /** References column: click count to search for imports of this package. */
@@ -556,10 +589,12 @@ function buildDetailCard(r: VibrancyResult): string {
 function buildDetailScoreSection(r: VibrancyResult): string {
     const fmt = (v: number) => Math.round(v);
     const grade = categoryToGrade(r.category);
+    /* The "Overall" numeric row was removed — it was the same info as the
+       header grade letter, just shown as a /10. The factor rows below stay
+       because they're distinct dimensions, not the same aggregate. */
     return `<div class="detail-section">
         <h4>Health Score <span class="grade-badge grade-${grade}">${grade}</span></h4>
         <div class="detail-grid">
-            <span class="detail-label">Overall</span><span>${Math.round(r.score / 10)}/10</span>
             <span class="detail-label">Resolution Velocity</span><span>${fmt(r.resolutionVelocity)}</span>
             <span class="detail-label">Engagement Level</span><span>${fmt(r.engagementLevel)}</span>
             <span class="detail-label">Popularity</span><span>${fmt(r.popularity)}</span>

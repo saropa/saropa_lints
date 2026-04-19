@@ -111,11 +111,15 @@ describe('VibrancyCodeLensProvider', () => {
         assert.deepStrictEqual(lenses[0].command?.arguments, ['http']);
     });
 
-    it('should include score in CodeLens title', () => {
+    it('should include grade letter in CodeLens title', () => {
+        /* Title format changed from "🟢 9/10 Vibrant" to "🟢 A" — letter
+           replaces the score+label pair. Check we still get the expected
+           grade character when the package is vibrant. */
         provider.updateResults([makeResult('http', { score: 85 })]);
         const doc = makeMockDocument(PUBSPEC_CONTENT);
         const lenses = provider.provideCodeLenses(doc);
-        assert.ok(lenses[0].command?.title.includes('9/10'));
+        assert.ok(lenses[0].command?.title.includes(' A'));
+        assert.ok(!lenses[0].command?.title.includes('/10'));
     });
 
     it('should include category label in title', () => {

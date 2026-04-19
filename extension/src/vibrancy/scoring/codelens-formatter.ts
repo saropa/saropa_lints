@@ -1,6 +1,6 @@
 import { VibrancyResult } from '../types';
 import { isReplacementPackageName, getReplacementDisplayText } from './known-issues';
-import { categoryLabel } from './status-classifier';
+import { categoryToGrade } from './status-classifier';
 import { formatSizeMB } from './bloat-calculator';
 import {
     getCategoryIndicator, getIndicator, loadIndicatorStyle,
@@ -50,18 +50,21 @@ export function formatCodeLensTitle(
 ): string {
     const style = loadIndicatorStyle();
     const indicator = getCategoryIndicator(result.category);
-    const displayScore = Math.round(result.score / 10);
+    /* Letter grade replaces the old /10 score across every indicator style.
+       For 'text' style the indicator already spells out the category, so the
+       letter would be redundant — indicator alone suffices. For 'none' the
+       letter IS the indicator. For 'emoji'/'both' we show indicator + letter
+       (emoji first, then grade), which keeps the visual signal plus a
+       compact, consistent grade glyph. */
+    const grade = categoryToGrade(result.category);
 
     let scorePart: string;
-    if (style === 'none') {
-        scorePart = `${displayScore}/10`;
-    } else if (style === 'text') {
-        scorePart = `${displayScore}/10 ${indicator}`;
-    } else if (style === 'both') {
-        scorePart = `${indicator} ${displayScore}/10`;
+    if (style === 'text') {
+        scorePart = indicator;
+    } else if (style === 'none') {
+        scorePart = grade;
     } else {
-        const label = categoryLabel(result.category);
-        scorePart = `${indicator} ${displayScore}/10 ${label}`;
+        scorePart = `${indicator} ${grade}`;
     }
 
     const parts: string[] = [scorePart];

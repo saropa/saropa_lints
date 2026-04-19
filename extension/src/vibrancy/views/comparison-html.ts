@@ -2,7 +2,7 @@ import { ComparisonData, DimensionWinner, RankedComparison, VibrancyCategory } f
 import { formatSizeMB } from '../scoring/bloat-calculator';
 import { escapeHtml } from './html-utils';
 import { isWinnerForDimension } from '../scoring/comparison-ranker';
-import { CATEGORY_DICTIONARY } from '../category-dictionary';
+import { CATEGORY_DICTIONARY, scoreToGrade } from '../category-dictionary';
 
 function getComparisonStyles(): string {
     return `
@@ -117,9 +117,12 @@ interface RowDef {
 
 const ROWS: readonly RowDef[] = [
     {
-        label: 'Vibrancy Score',
-        dimension: 'Vibrancy Score',
-        extract: p => p.vibrancyScore !== null ? `${p.vibrancyScore}/100` : '—',
+        /* Renamed "Vibrancy Score" → "Vibrancy Grade" and the cell shows the
+           letter. The underlying score is still used for winner-ranking in
+           comparison-ranker so ordering remains precise. */
+        label: 'Vibrancy Grade',
+        dimension: 'Vibrancy Grade',
+        extract: p => p.vibrancyScore !== null ? scoreToGrade(p.vibrancyScore) : '—',
     },
     {
         label: 'Category',

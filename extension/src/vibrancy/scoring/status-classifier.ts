@@ -5,7 +5,7 @@ import { isTrustedPublisher } from './trusted-publishers';
 // import paths (`from './status-classifier'`) continue to work.
 export {
     categoryLabel, categoryIcon, categoryToSeverity, categoryToGrade,
-    type VibrancyGrade,
+    scoreToGrade, type VibrancyGrade,
 } from '../category-dictionary';
 
 /** Count results by vibrancy category. */
