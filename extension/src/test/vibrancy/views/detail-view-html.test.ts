@@ -85,16 +85,20 @@ describe('buildDetailViewHtml', () => {
         assert.ok(html.includes('Content-Security-Policy'));
     });
 
-    it('should show package name and score', () => {
-        const html = buildDetailViewHtml(makeResult('http', 80));
+    it('should show package name and grade letter', () => {
+        const html = buildDetailViewHtml(makeResult('http', 80, 'vibrant'));
         assert.ok(html.includes('<h1>http</h1>'));
-        assert.ok(html.includes('>8/10<'));
+        /* Letter grade only; the raw /10 score is no longer rendered. */
+        assert.ok(html.includes('>A</div>'));
+        assert.ok(!html.includes('8/10'));
     });
 
-    it('should show category badge', () => {
+    it('should expose category label via the grade tooltip (not as visible text)', () => {
         const html = buildDetailViewHtml(makeResult('http', 80, 'vibrant'));
-        assert.ok(html.includes('class="category-badge vibrant"'));
-        assert.ok(html.includes('Vibrant'));
+        /* Category label moved into the title tooltip; the old standalone
+           category-badge div was removed as part of the letter-only redesign. */
+        assert.ok(html.includes('title="Vibrant"'));
+        assert.ok(!html.includes('category-badge'));
     });
 
     it('should show version section', () => {
@@ -308,10 +312,12 @@ describe('buildDetailViewHtml', () => {
     });
 
     it('should handle all category styles', () => {
+        /* After the letter-only redesign, only the .score div remains — the
+           standalone .category-badge was removed. The .score box is still
+           category-tinted via its modifier class and now holds the letter. */
         for (const cat of ['vibrant', 'stable', 'outdated', 'abandoned', 'end-of-life'] as const) {
             const html = buildDetailViewHtml(makeResult('http', 50, cat));
             assert.ok(html.includes(`class="score ${cat}"`), `Missing score class for ${cat}`);
-            assert.ok(html.includes(`class="category-badge ${cat}"`), `Missing badge class for ${cat}`);
         }
     });
 

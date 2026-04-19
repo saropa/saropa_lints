@@ -73,7 +73,10 @@ describe('DetailLogger', () => {
     });
 
     describe('logPackage', () => {
-        it('should log package name and score', () => {
+        it('should log package name and grade', () => {
+            /* Log format changed from "name — 8/10 (Vibrant)" to
+               "name — A (Vibrant)" — letter replaces /10, category
+               label stays for the parenthetical context. */
             const channel = createMockChannel();
             const logger = new DetailLogger(channel as unknown as import('vscode').OutputChannel);
             const result = makeResult('http', 80);
@@ -82,7 +85,8 @@ describe('DetailLogger', () => {
 
             const output = channel.appendLine.getCalls().map(c => c.args[0]).join('\n');
             assert.ok(output.includes('http'));
-            assert.ok(output.includes('8/10'));
+            assert.ok(output.includes(' A '));
+            assert.ok(!output.includes('/10'));
             assert.ok(output.includes('Vibrant'));
         });
 

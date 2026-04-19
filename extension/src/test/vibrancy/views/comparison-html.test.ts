@@ -83,15 +83,17 @@ describe('buildComparisonHtml', () => {
         assert.ok(html.includes('http'));
     });
 
-    it('should show vibrancy score row', () => {
+    it('should show vibrancy grade row', () => {
+        /* Row renamed "Vibrancy Score" → "Vibrancy Grade"; cell shows the
+           letter (derived via scoreToGrade). Both 92 and 88 map to A
+           (threshold: >=70). */
         const ranked = makeRankedComparison([
             makePackage({ name: 'http', vibrancyScore: 92 }),
             makePackage({ name: 'dio', vibrancyScore: 88 }),
         ]);
         const html = buildComparisonHtml(ranked);
-        assert.ok(html.includes('Vibrancy Score'));
-        assert.ok(html.includes('92/100'));
-        assert.ok(html.includes('88/100'));
+        assert.ok(html.includes('Vibrancy Grade'));
+        assert.ok(!html.includes('/100'));
     });
 
     it('should show category with emoji', () => {
@@ -178,12 +180,14 @@ describe('buildComparisonHtml', () => {
     });
 
     it('should handle null vibrancy score', () => {
+        /* Score 80 now renders as "A" (scoreToGrade threshold >=70). Null
+           score still renders the em-dash placeholder. */
         const ranked = makeRankedComparison([
             makePackage({ name: 'known', vibrancyScore: 80 }),
             makePackage({ name: 'unknown', vibrancyScore: null }),
         ]);
         const html = buildComparisonHtml(ranked);
-        assert.ok(html.includes('80/100'));
+        assert.ok(!html.includes('80/100'));
         assert.ok(html.includes('—') || html.includes('&mdash;'));
     });
 

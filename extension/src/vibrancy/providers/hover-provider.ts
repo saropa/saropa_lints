@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { VibrancyResult, FamilySplit, PackageInsight, activeFileUsages } from '../types';
-import { categoryLabel } from '../scoring/status-classifier';
+import { categoryLabel, categoryToGrade, scoreToGrade } from '../scoring/status-classifier';
 import { classifyLicense, licenseEmoji } from '../scoring/license-classifier';
 import { worstSeverity, severityEmoji, severityLabel } from '../scoring/vuln-classifier';
 import { formatRelativeTime } from '../scoring/time-formatter';
@@ -110,11 +110,13 @@ function buildHoverContent(
     const md = new vscode.MarkdownString();
     md.isTrusted = true;
 
-    // Header: package name + version + category (consistent with vibrancy report)
-    const displayScore = Math.round(result.score / 10);
+    // Header: package name + version + letter grade (numeric score dropped;
+    // the /10 never conveyed anything the letter didn't — see ADR in
+    // category-dictionary for the letter-only rationale).
+    const grade = categoryToGrade(result.category);
     md.appendMarkdown(
         `**${result.package.name}** v${result.package.version} `
-        + `— **${displayScore}/10** ${categoryLabel(result.category)}\n\n`,
+        + `— **${grade}** ${categoryLabel(result.category)}\n\n`,
     );
 
     // --- VERSION ---
@@ -286,9 +288,12 @@ function appendHoverPlatforms(md: vscode.MarkdownString, r: VibrancyResult): voi
 
 function appendHoverAlternatives(md: vscode.MarkdownString, r: VibrancyResult): void {
     if (!r.alternatives?.length) { return; }
+    /* Alternatives only carry a raw score (no category), so we derive the
+       letter via scoreToGrade — same thresholds as the gauge. The old
+       "(7/10)" suffix is gone; letter is enough to rank at a glance. */
     const lines = r.alternatives.map(alt => {
-        const score = alt.score !== null ? ` (${Math.round(alt.score / 10)}/10)` : '';
-        return `- ${alt.name}${score}`;
+        const grade = alt.score !== null ? ` (${scoreToGrade(alt.score)})` : '';
+        return `- ${alt.name}${grade}`;
     });
     md.appendMarkdown(`**ALTERNATIVES**\n\n${lines.join('\n')}\n\n`);
 }

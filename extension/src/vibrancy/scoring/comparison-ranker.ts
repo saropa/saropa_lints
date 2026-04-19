@@ -1,5 +1,6 @@
 import { ComparisonData, DimensionWinner, RankedComparison } from '../types';
 import { formatSizeMB } from './bloat-calculator';
+import { scoreToGrade } from './status-classifier';
 
 type DimensionExtractor = (pkg: ComparisonData) => number | null;
 type DimensionFormatter = (value: number | null) => string;
@@ -13,9 +14,12 @@ interface DimensionDef {
 
 const DIMENSIONS: readonly DimensionDef[] = [
     {
-        name: 'Vibrancy Score',
+        /* Renamed from "Vibrancy Score" to "Vibrancy Grade" as part of the
+           letter-only rollout. Ranking still uses the raw 0-100 score so
+           ordering stays precise; only the displayed value is the letter. */
+        name: 'Vibrancy Grade',
         extract: p => p.vibrancyScore,
-        format: v => v !== null ? `${v}/100` : '—',
+        format: v => v !== null ? scoreToGrade(v) : '—',
         higherIsBetter: true,
     },
     {

@@ -90,13 +90,16 @@ describe('VibrancyHoverProvider', () => {
         assert.ok(result instanceof vscode.Hover);
     });
 
-    it('should include score in hover content', () => {
+    it('should include grade in hover content', () => {
+        /* Previously asserted "9" and "/10"; hover now shows the letter
+           grade derived from the category (vibrant → A by default in the
+           test helper), not a /10 score. */
         provider.updateResults([makeResult('http', 85)]);
         const doc = makeMockDocument('  http: ^1.0.0');
         const hover = provider.provideHover(doc, new vscode.Position(0, 2));
         const md = hover!.contents as unknown as vscode.MarkdownString;
-        assert.ok(md.value.includes('9'));
-        assert.ok(md.value.includes('/10'));
+        assert.ok(md.value.includes('**A**'));
+        assert.ok(!md.value.includes('/10'));
     });
 
     it('should include pub.dev link', () => {

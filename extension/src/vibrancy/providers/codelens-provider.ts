@@ -5,7 +5,7 @@ import { CodeLensDetail } from '../scoring/codelens-formatter';
 import { CodeLensToggle } from '../ui/codelens-toggle';
 import { PrereleaseToggle, arePrereleasesEnabled, getPrereleaseTagFilter } from '../ui/prerelease-toggle';
 import { getCategoryIndicator, getIndicator } from '../services/indicator-config';
-import { categoryLabel } from '../scoring/status-classifier';
+import { categoryToGrade } from '../scoring/status-classifier';
 import { formatPrereleaseTag } from '../scoring/prerelease-classifier';
 import { isReplacementPackageName, getReplacementDisplayText } from '../scoring/known-issues';
 
@@ -150,10 +150,11 @@ function isPrereleaseEnabled(): boolean {
 
 function formatStatusTitle(result: VibrancyResult, detail: CodeLensDetail): string {
     const indicator = getCategoryIndicator(result.category);
-    const displayScore = Math.round(result.score / 10);
-    const label = categoryLabel(result.category);
+    /* Indicator + letter; the old "/10 label" was redundant with the indicator
+       and added false precision the letter deliberately avoids. */
+    const grade = categoryToGrade(result.category);
 
-    let title = `${indicator} ${displayScore}/10 ${label}`;
+    let title = `${indicator} ${grade}`;
 
     if (detail === 'minimal') {
         return title;

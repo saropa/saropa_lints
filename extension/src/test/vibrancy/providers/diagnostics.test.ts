@@ -140,11 +140,14 @@ describe('VibrancyDiagnostics', () => {
         assert.strictEqual(diags[0].severity, vscode.DiagnosticSeverity.Information);
     });
 
+    /* Diagnostic messages now end with the letter grade "(X)" rather than
+       the old "(n/10)" aggregate. The letter comes from the package category,
+       not the score, so these assertions key off the test helper's category. */
     it('should use Review verb for abandoned messages', () => {
         const results = [makeResult('old_pkg', 5, 'abandoned')];
         diagnostics.update(uri, PUBSPEC_CONTENT, results);
         const diags = collection.get(uri)!;
-        assert.strictEqual(diags[0].message, 'Review old_pkg (1/10)');
+        assert.strictEqual(diags[0].message, 'Review old_pkg (E)');
     });
 
     it('should use Deprecated label for end-of-life messages without replacement', () => {
@@ -152,21 +155,21 @@ describe('VibrancyDiagnostics', () => {
         const results = [makeResult('old_pkg', 5, 'end-of-life')];
         diagnostics.update(uri, PUBSPEC_CONTENT, results);
         const diags = collection.get(uri)!;
-        assert.strictEqual(diags[0].message, 'Deprecated: old_pkg (1/10)');
+        assert.strictEqual(diags[0].message, 'Deprecated: old_pkg (F)');
     });
 
     it('should use Review verb for outdated messages', () => {
         const results = [makeResult('flutter_bloc', 35, 'outdated')];
         diagnostics.update(uri, PUBSPEC_CONTENT, results);
         const diags = collection.get(uri)!;
-        assert.strictEqual(diags[0].message, 'Review flutter_bloc (4/10)');
+        assert.strictEqual(diags[0].message, 'Review flutter_bloc (C)');
     });
 
     it('should use Monitor verb for stable messages', () => {
         const results = [makeResult('http', 55, 'stable')];
         diagnostics.update(uri, PUBSPEC_CONTENT, results);
         const diags = collection.get(uri)!;
-        assert.strictEqual(diags[0].message, 'Monitor http (6/10)');
+        assert.strictEqual(diags[0].message, 'Monitor http (B)');
     });
 
     it('should suggest replacement in message when known', () => {

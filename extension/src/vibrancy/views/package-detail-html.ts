@@ -2,7 +2,7 @@ import {
     VibrancyResult, VersionGapResult, ReviewEntry, activeFileUsages,
 } from '../types';
 import { ReviewSummary } from '../services/review-state';
-import { categoryLabel } from '../scoring/status-classifier';
+import { categoryLabel, categoryToGrade, scoreToGrade } from '../scoring/status-classifier';
 import { formatSizeMB } from '../scoring/bloat-calculator';
 import { classifyLicense, licenseEmoji } from '../scoring/license-classifier';
 import { worstSeverity, severityEmoji, severityLabel } from '../scoring/vuln-classifier';
@@ -46,8 +46,9 @@ export function buildPackageDetailHtml(
 // ---------------------------------------------------------------------------
 
 function buildHeader(r: VibrancyResult): string {
-    const score = Math.round(r.score / 10);
     const badgeClass = categoryBadgeClass(r.category);
+    const grade = categoryToGrade(r.category);
+    /* Letter grade only in the header badge; full category label lives in the title tooltip. */
     const cat = escapeHtml(categoryLabel(r.category));
     const license = r.license ? escapeHtml(r.license) : '';
     const pubUrl = `https://pub.dev/packages/${encodeURIComponent(r.package.name)}`;
@@ -75,7 +76,7 @@ function buildHeader(r: VibrancyResult): string {
         <div class="header">
             ${logoHtml}<h1>${escapeHtml(r.package.name)}</h1>
             <span>v${escapeHtml(r.package.version)}</span>
-            <span class="badge ${badgeClass}">${score}/10 ${cat}</span>
+            <span class="badge ${badgeClass}" title="${cat}">${grade}</span>
             <div class="header-meta">
                 ${license ? `${license} &middot; ` : ''}${links.join(' &middot; ')}
             </div>
@@ -203,6 +204,32 @@ function buildCommunitySection(r: VibrancyResult): string {
         const flagged = r.transitiveInfo.flaggedCount > 0
             ? ` (${r.transitiveInfo.flaggedCount} flagged)` : '';
         rows.push(row('Transitive Deps', `${r.transitiveInfo.transitiveCount}${flagged}`));
+
+        // True footprint: own archive + transitives this dep pulls in.
+        // Distinguish unique (eliminated by removing this dep) from shared
+        // (still pulled in by other direct deps after removal). When neither
+        // size field is populated (null/undefined for fixtures from older
+        // builds), skip the row so we don't render a misleading 0 MB.
+        const own = r.archiveSizeBytes ?? 0;
+        const uniqueT = r.transitiveInfo.uniqueTransitiveSizeBytes;
+        const sharedT = r.transitiveInfo.sharedTransitiveSizeBytes;
+        const haveData = (uniqueT !== null && uniqueT !== undefined)
+            || (sharedT !== null && sharedT !== undefined);
+        if (haveData) {
+            const unique = uniqueT ?? 0;
+            const shared = sharedT ?? 0;
+            const ifRemoved = own + unique;
+            const total = own + unique + shared;
+            const breakdown = shared > 0
+                ? `${formatSizeMB(ifRemoved)} unique &middot; +${formatSizeMB(shared)} shared = ${formatSizeMB(total)} total`
+                : `${formatSizeMB(total)}`;
+            rows.push(row(
+                'True Footprint',
+                `<span title="Own ${formatSizeMB(own)} + unique transitives ${formatSizeMB(unique)} + shared transitives ${formatSizeMB(shared)}. `
+                + `Removing this dep saves ${formatSizeMB(ifRemoved)} (shared deps stay pulled in by others).">`
+                + `${breakdown}</span>`,
+            ));
+        }
     }
     if (r.reverseDependencyCount !== null && r.reverseDependencyCount > 0) {
         // Link to pub.dev search for packages depending on this one
@@ -429,10 +456,11 @@ function buildPlatformsSection(r: VibrancyResult): string {
 function buildSuggestionsSection(r: VibrancyResult): string {
     if (!r.alternatives?.length) { return ''; }
     const items = r.alternatives.map(alt => {
-        const scoreText = alt.score !== null ? ` (${Math.round(alt.score / 10)}/10)` : '';
+        /* Letter grade only (alts don't carry a category, so derive from score). */
+        const gradeText = alt.score !== null ? ` (${scoreToGrade(alt.score)})` : '';
         const url = `https://pub.dev/packages/${encodeURIComponent(alt.name)}`;
         return `<div>
-            <a href="#" data-action="openUrl" data-url="${escapeHtml(url)}">${escapeHtml(alt.name)}</a>${scoreText}
+            <a href="#" data-action="openUrl" data-url="${escapeHtml(url)}">${escapeHtml(alt.name)}</a>${gradeText}
         </div>`;
     }).join('');
     return section('SUGGESTIONS', items);

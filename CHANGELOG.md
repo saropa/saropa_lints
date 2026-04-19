@@ -33,6 +33,43 @@
 
 ---
 
+## [Unreleased]
+
+Letter-only grading for package vibrancy across the report and detail views, plus a new "true footprint" view that links shared dependency size into per-package cost.
+
+### Added
+
+- **Extension:** Footprint-mode toggle (Own / + Unique / + All) in the vibrancy report toolbar — switches what the Size column shows: the package's own archive (default), own + transitives used only by this dep (the size you'd save by removing it), or own + all transitives including ones shared with other direct deps. Sorting by Size respects the active mode.
+- **Extension:** "True Footprint" row in the package detail panel — for any direct dep with transitives, surfaces the breakdown as `unique &middot; +shared = total` with a tooltip explaining how much disappears if you remove the dep vs. how much stays pulled in by other deps. Lets you spot cases like `crop_your_image` where the bulk of the size comes from a shared `image` transitive.
+- **Extension:** `TransitiveInfo.uniqueTransitiveSizeBytes` and `sharedTransitiveSizeBytes` fields, computed in `enrichTransitiveInfo` from the per-package archive sizes already gathered during scan.
+
+### Fixed
+
+- **Extension:** Vibrancy report column headers no longer wrap to two lines when many optional columns are visible. Headers, right-aligned numeric cells, and the footprint-mode toggle buttons now use `white-space: nowrap` so each value stays on a single line.
+- **Extension:** Vibrancy report version-age suffix no longer shows `(new)` for packages published within the last month. The label was misleading (a recently published version of a mature package isn't "new") and didn't carry useful information, so the suffix is now omitted entirely under one month.
+
+### Changed
+
+- **Extension:** Vibrancy report Category column now shows the letter grade badge only — the category label ("Vibrant", "Stable", etc.) and the dimmed `(n/10)` suffix were removed. Full label and score breakdown remain available via the hover tooltip.
+- **Extension:** Report summary filter cards (Vibrant/Stable/Outdated/Abandoned/End-of-Life) now display the grade letter (A/B/C/E/F) as their label. The full category name moved to a `title` tooltip on each card.
+- **Extension:** Report average-score summary card renamed to "Project Package Grade" and now shows a single letter derived from the average vibrancy score, replacing the old `n/10` value.
+- **Extension:** Radial gauge in the report header now displays the project package grade letter instead of the `n` / `/10` stack. Tooltip label updated to "Project Package Grade".
+- **Extension:** Sidebar detail view header replaced the `n/10` score pill plus standalone category-badge with a single letter pill. Category name is surfaced via the pill's `title` tooltip.
+- **Extension:** Package detail panel header badge (top-right) now shows the letter grade only; the `n/10` score and inline category label were dropped (label moved to the title tooltip).
+- **Extension:** Expanded row "Health Score" detail card dropped the redundant "Overall" numeric row — the aggregate is already shown as the letter badge in the card header; the factor rows (Resolution Velocity, Engagement Level, Popularity, Publisher Trust) remain.
+- **Extension:** Health breakdown tooltip (shown on hover over a row's grade cell) now leads with "Grade: X" instead of "Vibrancy Score: n/10". Factor rows unchanged.
+- **Extension:** CodeLens titles changed from "emoji n/10 Label" to "emoji X" (letter). The `indicatorStyle: text` variant now shows only the text indicator since a letter next to the text label was redundant; `indicatorStyle: none` shows the letter alone.
+- **Extension:** pubspec hover tooltips show "**X** Category" (letter + label) in place of "**n/10** Category". Alternatives list shows "(X)" per alt (letter derived from the alt's score via `scoreToGrade`).
+- **Extension:** Diagnostic messages trail with "(X)" (grade letter) instead of "(n/10)". Applies to Review/Monitor/Deprecated verbs and to blocker annotations.
+- **Extension:** Vibrancy tree view blocker row switched from "score (category)" to a single letter grade. Alternatives group shows "(X)" per suggestion.
+- **Extension:** Package comparison view row renamed "Vibrancy Score" → "Vibrancy Grade"; cell displays the letter derived from the 0-100 score (ranking still uses the numeric score so ordering stays precise).
+- **Extension:** Markdown report export renamed the "Score" column to "Grade" and displays the letter. The JSON sibling preserves the numeric `health.score` field unchanged so downstream automation keeps working.
+- **Extension:** Budget-exceeded message for the `minAverageVibrancy` rule now reads "Project Package Grade X is below minimum Y" instead of showing `n/10` actual vs limit.
+- **Extension:** DetailLogger output channel prints "name — X (Category)" and "Blocker grade: X" instead of `n/10` forms.
+- **Extension:** New `scoreToGrade(score)` helper in `category-dictionary.ts`, re-exported from `status-classifier`, providing a single source of truth for score-to-letter thresholds used by the gauge, summary card, alternatives, comparison view, and budget messages.
+
+---
+
 ## [12.1.0]
 
 ### Added

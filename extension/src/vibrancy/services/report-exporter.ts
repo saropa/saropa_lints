@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { VibrancyResult, activeFileUsages } from '../types';
-import { categoryLabel, countByCategory } from '../scoring/status-classifier';
+import { categoryLabel, categoryToGrade, countByCategory } from '../scoring/status-classifier';
 import { formatSizeMB } from '../scoring/bloat-calculator';
 import { resolveReportFolder, formatTimestamp } from './report-utils';
 
@@ -94,14 +94,18 @@ function mdSummary(
 }
 
 function mdPackageRows(results: VibrancyResult[]): string[] {
+    /* Markdown export swapped "Score" (n/10) for "Grade" (letter). The
+       old column conveyed the same information as Status (category label)
+       just through a rounded number — redundant. Downstream automation
+       that parses markdown reports should switch to the JSON sibling. */
     const rows = ['', '## Packages', '',
-        '| Name | Version | Latest | Status | Score | Files | License | Size |',
+        '| Name | Version | Latest | Status | Grade | Files | License | Size |',
         '|------|---------|--------|--------|-------|-------|---------|------|',
     ];
     for (const r of results) {
         const latest = r.pubDev?.latestVersion ?? '';
         const label = categoryLabel(r.category);
-        const displayScore = Math.round(r.score / 10);
+        const grade = categoryToGrade(r.category);
         const activeUsages = activeFileUsages(r.fileUsages);
         const fileCount = activeUsages.length;
         const fileLocations = activeUsages.length <= 3
@@ -111,7 +115,7 @@ function mdPackageRows(results: VibrancyResult[]): string[] {
             ? formatSizeMB(r.archiveSizeBytes) : '—';
         const license = r.license ?? '—';
         rows.push(
-            `| ${r.package.name} | ${r.package.version} | ${latest} | ${label} | ${displayScore}/10 | ${fileLocations || '—'} | ${license} | ${size} |`,
+            `| ${r.package.name} | ${r.package.version} | ${latest} | ${label} | ${grade} | ${fileLocations || '—'} | ${license} | ${size} |`,
         );
     }
     return rows;

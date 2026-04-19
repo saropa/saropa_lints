@@ -51,10 +51,13 @@ describe('categoryEmoji', () => {
 
 describe('formatCodeLensTitle', () => {
     describe('minimal detail', () => {
-        it('should show only score and category', () => {
+        /* After the letter-only redesign, the title is "emoji + grade"
+           (no /10, no category label). Emoji comes from the indicator
+           config; grade comes from the category. */
+        it('should show only emoji and grade letter', () => {
             const result = makeResult({ score: 85 });
             const title = formatCodeLensTitle(result, 'minimal');
-            assert.strictEqual(title, '🟢 9/10 Vibrant');
+            assert.strictEqual(title, '🟢 A');
         });
 
         it('should not include update info', () => {
@@ -150,23 +153,28 @@ describe('formatCodeLensTitle', () => {
         });
     });
 
-    describe('score rounding', () => {
-        it('should round score to nearest integer', () => {
-            const result = makeResult({ score: 45 });
+    /* The old "score rounding" describe block covered /10 rounding edge cases
+       (45→5/10, 3→0/10, 100→10/10). Those assertions don't apply to letters:
+       the grade is category-derived, not a rounded score. The replacement
+       block below verifies the category→letter mapping that now drives the
+       displayed value. */
+    describe('grade letter from category', () => {
+        it('should show A for vibrant category', () => {
+            const result = makeResult({ score: 85, category: 'vibrant' });
             const title = formatCodeLensTitle(result, 'minimal');
-            assert.ok(title.includes('5/10'));
+            assert.ok(title.includes(' A'));
         });
 
-        it('should show 0 for very low scores', () => {
+        it('should show F for end-of-life category', () => {
             const result = makeResult({ score: 3, category: 'end-of-life' });
             const title = formatCodeLensTitle(result, 'minimal');
-            assert.ok(title.includes('0/10'));
+            assert.ok(title.includes(' F'));
         });
 
-        it('should show 10 for perfect scores', () => {
-            const result = makeResult({ score: 100 });
+        it('should show A for vibrant regardless of numeric score', () => {
+            const result = makeResult({ score: 100, category: 'vibrant' });
             const title = formatCodeLensTitle(result, 'minimal');
-            assert.ok(title.includes('10/10'));
+            assert.ok(title.includes(' A'));
         });
     });
 
@@ -176,7 +184,9 @@ describe('formatCodeLensTitle', () => {
             const title = formatCodeLensTitle(result, 'standard');
             const segments = title.split(' · ');
             assert.ok(segments.length >= 3);
-            assert.ok(segments[0].includes('Vibrant'));
+            /* First segment is now the grade letter (indicator + "A"),
+               not the category label "Vibrant". */
+            assert.ok(segments[0].includes(' A'));
             assert.ok(segments.some(s => s.includes('Up to date')));
             assert.ok(segments.some(s => s.includes('Unused')));
         });

@@ -1,5 +1,5 @@
 import { VibrancyResult } from '../types';
-import { categoryLabel } from '../scoring/status-classifier';
+import { categoryLabel, categoryToGrade } from '../scoring/status-classifier';
 import { isReplacementPackageName, getReplacementDisplayText } from '../scoring/known-issues';
 import { formatSizeMB } from '../scoring/bloat-calculator';
 import { formatRelativeTime } from '../scoring/time-formatter';
@@ -34,8 +34,10 @@ function buildPlaceholderHtml(): string {
 }
 
 function buildPackageDetailHtml(r: VibrancyResult): string {
-    const displayScore = Math.round(r.score / 10);
     const name = escapeHtml(r.package.name);
+    const grade = categoryToGrade(r.category);
+    /* Letter grade only; full category name surfaces via title tooltip. */
+    const gradeTitle = escapeHtml(categoryLabel(r.category));
 
     return `<!DOCTYPE html>
 <html lang="en">
@@ -49,9 +51,8 @@ function buildPackageDetailHtml(r: VibrancyResult): string {
     <header>
         ${buildSidebarLogo(r)}
         <h1>${name}</h1>
-        <div class="score ${r.category}">${displayScore}/10</div>
+        <div class="score ${r.category}" title="${gradeTitle}">${grade}</div>
     </header>
-    <div class="category-badge ${r.category}">${categoryLabel(r.category)}</div>
     ${buildSidebarDescription(r)}
     ${buildSidebarTopics(r)}
 

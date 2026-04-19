@@ -95,6 +95,22 @@ export function categoryToGrade(category: VibrancyCategory): VibrancyGrade {
     return CATEGORY_DICTIONARY[category].grade;
 }
 
+/**
+ * Map a raw vibrancy score (0-100) to a letter grade.
+ *
+ * Thresholds mirror classifyStatus in status-classifier: >=70 vibrant(A),
+ * >=40 stable(B), >=20 outdated(C), <20 abandoned(E). F is only emitted
+ * for hard EOL signals (discontinued/archived), so a pure score-based
+ * mapping never returns F.
+ */
+export function scoreToGrade(score: number): VibrancyGrade {
+    const pct = Math.max(0, Math.min(100, score));
+    if (pct >= 70) { return 'A'; }
+    if (pct >= 40) { return 'B'; }
+    if (pct >= 20) { return 'C'; }
+    return 'E';
+}
+
 export function categoryEmoji(category: VibrancyCategory): string {
     return CATEGORY_DICTIONARY[category].emoji;
 }
