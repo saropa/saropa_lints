@@ -847,8 +847,17 @@ async function runScanInner(
 
                 const transitiveInfos = countTransitives(directDeps, depGraph.packages);
                 const sharedDeps = findSharedDeps(directDeps, depGraph.packages);
+                // Build name -> archive size lookup so the analyzer can compute
+                // unique/shared transitive footprint per direct dep. Sourced
+                // from the already-resolved per-package results (pub.dev sizes).
+                const sizeLookup = new Map<string, number>();
+                for (const r of results) {
+                    if (typeof r.archiveSizeBytes === 'number' && r.archiveSizeBytes > 0) {
+                        sizeLookup.set(r.package.name, r.archiveSizeBytes);
+                    }
+                }
                 const enrichedInfos = enrichTransitiveInfo(
-                    transitiveInfos, sharedDeps, knownIssuesMap,
+                    transitiveInfos, sharedDeps, knownIssuesMap, sizeLookup,
                 );
 
                 const transitiveMap = new Map(

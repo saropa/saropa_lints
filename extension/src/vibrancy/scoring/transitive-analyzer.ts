@@ -139,18 +139,31 @@ export function flagRiskyTransitives(
 }
 
 /**
- * Enrich TransitiveInfo entries with flagged counts and shared deps.
+ * Enrich TransitiveInfo entries with flagged counts, shared deps, and
+ * (when sizes are provided) unique/shared transitive size totals.
+ *
+ * `sizeLookup` maps package name -> archive size in bytes. Packages missing
+ * from the map contribute 0 bytes. When the lookup is omitted or empty for
+ * every transitive, the size fields are left null so the UI can render
+ * an em-dash rather than a misleading 0 MB.
  */
 export function enrichTransitiveInfo(
     infos: readonly TransitiveInfo[],
     sharedDeps: readonly SharedDep[],
     knownIssues: ReadonlyMap<string, readonly KnownIssue[]>,
+    sizeLookup?: ReadonlyMap<string, number>,
 ): TransitiveInfo[] {
     const sharedSet = new Set(sharedDeps.map(s => s.name));
 
     return infos.map(info => {
         let flaggedCount = 0;
         const sharedInThis: string[] = [];
+        // Track unique vs shared size separately so the UI can offer:
+        // - "remove this dep" cost = own + uniqueTransitive (shared persist)
+        // - "theoretical max" cost = own + uniqueTransitive + sharedTransitive
+        let uniqueBytes = 0;
+        let sharedBytes = 0;
+        let sawAnySize = false;
 
         for (const transitive of info.transitives) {
             const issues = knownIssues.get(transitive);
@@ -158,8 +171,18 @@ export function enrichTransitiveInfo(
             if (issues?.some(i => i.status === 'discontinued' || i.status === 'end_of_life')) {
                 flaggedCount++;
             }
-            if (sharedSet.has(transitive)) {
+            const isShared = sharedSet.has(transitive);
+            if (isShared) {
                 sharedInThis.push(transitive);
+            }
+            const size = sizeLookup?.get(transitive);
+            if (typeof size === 'number' && size > 0) {
+                sawAnySize = true;
+                if (isShared) {
+                    sharedBytes += size;
+                } else {
+                    uniqueBytes += size;
+                }
             }
         }
 
@@ -167,6 +190,10 @@ export function enrichTransitiveInfo(
             ...info,
             flaggedCount,
             sharedDeps: sharedInThis,
+            // Null when no transitive had a known size — distinguishes
+            // "no data" from genuinely 0 bytes.
+            uniqueTransitiveSizeBytes: sawAnySize ? uniqueBytes : null,
+            sharedTransitiveSizeBytes: sawAnySize ? sharedBytes : null,
         };
     });
 }

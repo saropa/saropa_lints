@@ -184,6 +184,50 @@ describe('transitive-analyzer', () => {
             assert.strictEqual(enriched[0].flaggedCount, 1);
             assert.deepStrictEqual(enriched[0].sharedDeps, ['shared_pkg']);
         });
+
+        it('splits transitive bytes into unique vs shared when sizes provided', () => {
+            // Direct dep `a` pulls in `unique_pkg` (1MB, only via a) and
+            // `shared_pkg` (5MB, also pulled in by other direct deps). The
+            // analyzer must attribute the 1MB to "unique" (cost saved if a
+            // is removed) and the 5MB to "shared" (stays after removal).
+            const infos = [{
+                directDep: 'a',
+                transitiveCount: 2,
+                flaggedCount: 0,
+                transitives: ['unique_pkg', 'shared_pkg'],
+                sharedDeps: [],
+            }];
+            const sharedDeps = [{ name: 'shared_pkg', usedBy: ['a', 'b'] }];
+            const knownIssues = new Map<string, readonly KnownIssue[]>();
+            const sizeLookup = new Map<string, number>([
+                ['unique_pkg', 1_000_000],
+                ['shared_pkg', 5_000_000],
+            ]);
+
+            const enriched = enrichTransitiveInfo(
+                infos, sharedDeps, knownIssues, sizeLookup,
+            );
+
+            assert.strictEqual(enriched[0].uniqueTransitiveSizeBytes, 1_000_000);
+            assert.strictEqual(enriched[0].sharedTransitiveSizeBytes, 5_000_000);
+        });
+
+        it('leaves size fields null when no transitives have known sizes', () => {
+            // Distinguishes "no data" from genuinely 0 bytes so the UI can
+            // render an em-dash rather than a misleading "0 MB".
+            const infos = [{
+                directDep: 'a',
+                transitiveCount: 1,
+                flaggedCount: 0,
+                transitives: ['untracked_pkg'],
+                sharedDeps: [],
+            }];
+            const enriched = enrichTransitiveInfo(
+                infos, [], new Map(), new Map(),
+            );
+            assert.strictEqual(enriched[0].uniqueTransitiveSizeBytes, null);
+            assert.strictEqual(enriched[0].sharedTransitiveSizeBytes, null);
+        });
     });
 
     describe('buildDepGraphSummary', () => {
