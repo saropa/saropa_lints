@@ -45,8 +45,9 @@ void main() {
   group('flutter_sdk_migration fixture', () {
     test('fixture file exists', () {
       expect(
-        File('example/lib/flutter_sdk_migration_rules_fixture.dart')
-            .existsSync(),
+        File(
+          'example/lib/flutter_sdk_migration_rules_fixture.dart',
+        ).existsSync(),
         isTrue,
       );
     });
@@ -135,10 +136,7 @@ void main() {
     test('patterns are specific enough to skip irrelevant files', () {
       // Each rule's pattern must include the API token it cares about so
       // files not containing that token are short-circuited before AST walk.
-      expect(
-        PreferIterableCastRule().requiredPatterns,
-        contains('castFrom'),
-      );
+      expect(PreferIterableCastRule().requiredPatterns, contains('castFrom'));
       expect(
         AvoidDeprecatedUseInheritedMediaQueryRule().requiredPatterns,
         contains('useInheritedMediaQuery'),
