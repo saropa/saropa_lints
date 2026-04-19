@@ -11,6 +11,7 @@ import '../../fixes/control_flow/remove_double_negation_fix.dart';
 import '../../fixes/control_flow/replace_assignment_with_comparison_fix.dart';
 import '../../fixes/control_flow/remove_duplicate_switch_case_fix.dart';
 import '../../fixes/control_flow/simplify_de_morgan_fix.dart';
+import '../../fixes/control_flow/prefer_is_num_over_int_double_fix.dart';
 import '../../fixes/control_flow/prefer_returning_conditionals_fix.dart';
 import '../../fixes/control_flow/remove_redundant_else_fix.dart';
 import '../../fixes/control_flow/remove_unconditional_break_fix.dart';
@@ -2438,6 +2439,12 @@ class AvoidDoubleAndIntChecksRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        PreferIsNumOverIntDoubleFix(context: context),
+  ];
 
   String? _typeName(TypeAnnotation type) {
     if (type is NamedType) return type.name.lexeme;

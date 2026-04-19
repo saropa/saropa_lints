@@ -10,6 +10,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
 
+import '../../fixes/type/remove_null_assertion_fix.dart';
 import '../../fixes/type_safety/replace_redundant_null_check_fix.dart';
 import '../../saropa_lint_rule.dart';
 import '../../type_annotation_utils.dart';
@@ -519,6 +520,12 @@ class AvoidNonNullAssertionRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveNullAssertionFix(context: context),
+  ];
 }
 
 /// Warns when `as` keyword is used for type casting.

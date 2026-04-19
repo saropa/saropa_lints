@@ -39,6 +39,18 @@ Letter-only grading for package vibrancy across the report and detail views, plu
 
 ### Added
 
+- **Quick fixes (Batch 12):** Added 10 new quick fixes (9 new producers, 1 reuse) for previously fix-less rules:
+  - `avoid_redundant_positional_field_name` (record_pattern) — deletes the redundant `$N` name from a positional record field.
+  - `prefer_wildcard_pattern` (record_pattern) — replaces an unused pattern variable name (`unused`, `ignore`, …) with `_`.
+  - `prefer_wildcard_for_unused_param` (naming_style) — renames an unused positional parameter to the `_` wildcard.
+  - `avoid_non_null_assertion` (type_safety) — reuses the existing `RemoveNullAssertionFix` to strip the `!` operator.
+  - `prefer_const_constructor_declarations` (class_constructor) — inserts `const` before a generative constructor.
+  - `prefer_const_constructors_in_immutables` (class_constructor) — inserts `const` on the first non-const generative constructor in an @immutable / Widget class.
+  - `prefer_final_fields` and `prefer_final_fields_always` (class_constructor) — adds `final` to a mutable instance field (replacing a leading `var` when present).
+  - `avoid_double_and_int_checks` (control_flow) — rewrites `x is int || x is double` / `&&` to the equivalent `x is num` check.
+  - `deprecated_new_in_comment_reference` (documentation) — strips the deprecated `new ` keyword from `[new Foo]` doc references.
+- **Rule:** `prefer_type_sync_over_is_link_sync` (WARNING, Recommended tier) — flags static `FileSystemEntity.isLinkSync(path)` calls, which return `false` unconditionally on Windows per documented `dart:io` behavior and silently break cross-platform symbolic-link checks. Suggests the portable replacement `FileSystemEntity.typeSync(path, followLinks: false) == FileSystemEntityType.link`. Plan #079.
+- **Rule:** `avoid_removed_js_number_to_dart` (WARNING, Recommended tier) — flags the removed `JSNumber.toDart` getter from `dart:js_interop` (Dart SDK 3.2). Surfaces a more actionable migration message than the analyzer default, directing developers to the type-explicit `toDartDouble` (floating-point) or `toDartInt` (integer) getters. No auto-fix because the numeric target type is a semantic choice. Plan #090.
 - **Extension:** Footprint-mode toggle (Own / + Unique / + All) in the vibrancy report toolbar — switches what the Size column shows: the package's own archive (default), own + transitives used only by this dep (the size you'd save by removing it), or own + all transitives including ones shared with other direct deps. Sorting by Size respects the active mode.
 - **Extension:** "True Footprint" row in the package detail panel — for any direct dep with transitives, surfaces the breakdown as `unique &middot; +shared = total` with a tooltip explaining how much disappears if you remove the dep vs. how much stays pulled in by other deps. Lets you spot cases like `crop_your_image` where the bulk of the size comes from a shared `image` transitive.
 - **Extension:** `TransitiveInfo.uniqueTransitiveSizeBytes` and `sharedTransitiveSizeBytes` fields, computed in `enrichTransitiveInfo` from the per-package archive sizes already gathered during scan.

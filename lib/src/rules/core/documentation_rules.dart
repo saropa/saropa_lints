@@ -12,6 +12,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 
+import '../../fixes/stylistic/deprecated_new_in_comment_reference_fix.dart';
 import '../../saropa_lint_rule.dart';
 
 /// Warns when public API lacks documentation.
@@ -1483,6 +1484,12 @@ class DeprecatedNewInCommentReferenceRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        DeprecatedNewInCommentReferenceFix(context: context),
+  ];
 
   /// Library doc from a `library` directive when present.
   static Comment? _libraryDocFromUnit(CompilationUnit unit) {
