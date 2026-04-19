@@ -3,6 +3,8 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 
+import '../../fixes/record_pattern/prefer_wildcard_pattern_fix.dart';
+import '../../fixes/record_pattern/remove_redundant_positional_field_name_fix.dart';
 import '../../fixes/record_pattern/use_shorthand_pattern_field_fix.dart';
 import '../../saropa_lint_rule.dart';
 
@@ -840,6 +842,12 @@ class AvoidRedundantPositionalFieldNameRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveRedundantPositionalFieldNameFix(context: context),
+  ];
 }
 
 /// Warns when destructuring is used for only one field.
@@ -1173,6 +1181,12 @@ class PreferWildcardPatternRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        PreferWildcardPatternFix(context: context),
+  ];
 }
 
 /// Warns when record fields are not in alphabetical order.

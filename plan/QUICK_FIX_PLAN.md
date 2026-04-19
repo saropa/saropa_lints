@@ -12,10 +12,10 @@
 
 ### Broad summary
 
-- **Batches 1–11 are done.** Those batches added many quick fixes (structure, bloc, performance, naming, type, code_quality, unnecessary_code, control flow, return, error handling, async, equality, collection, formatting, complexity). The plan no longer lists the individual completed items; only the batch headers and exit criteria remain.
-- **What’s actually left:** (1) one-time pre-flight and post-batch audits if you haven’t run them, (2) one optional fix in the “Batch 6” area, (3) re-run the full audit and record numbers, (4) **future batches (Batch 12+)** — add more quick fixes by choosing rules from Part 1 and following the batch workflow.
+- **Batches 1–12 are done.** Batch 12 (2026-04-18) added 10 quick fixes across record_pattern, naming_style, type_safety, class_constructor, control_flow, and documentation rules — see **H7. Batch 12** below for the list.
+- **What’s actually left:** (1) one-time pre-flight and post-batch audits if you haven’t run them, (2) one optional fix in the “Batch 6” area, (3) re-run the full audit and record numbers, (4) **future batches (Batch 13+)** — add more quick fixes by choosing rules from Part 1 and following the batch workflow.
 
-So: **no remaining work inside Batches 1–11.** Remaining work is housekeeping (audits), the optional Batch 6 fix, and planning/doing **Batch 12+** using Part 1.
+So: **no remaining work inside Batches 1–12.** Remaining work is housekeeping (audits), the optional Batch 6 fix, and planning/doing **Batch 13+** using Part 1.
 
 ### Detail: actionable items
 
@@ -24,7 +24,7 @@ So: **no remaining work inside Batches 1–11.** Remaining work is housekeeping 
 | **One-time**     | Run `python scripts/publish.py` (audit-only); record fix count and “files needing quick fixes”. Confirm `dart analyze --fatal-infos` and `dart test` pass. Optionally create a branch for quick-fix work.                                                                                                                                                                                             | **A. Pre-flight**          |
 | **Optional**     | Add a second fix for `avoid_synchronous_file_io`: when the call is inside an async function, also insert `await` at the call site (multi-edit).                                                                                                                                                                                                                                                       | **H. Batch 6**             |
 | **Ongoing**      | Run full audit again; record new fix count and worst-offending files.                                                                                                                                                                                                                                                                                                                                 | **I. After Batch 6**       |
-| **Next batches** | Add **Batch 12+** by picking more rules from **Part 1** (e.g. structure_rules, bloc_rules, performance_rules, naming_style, type_rules “EASY” candidates, or “Additional EASY buckets” like firebase_rules, drift_rules, widget_patterns_require_rules, iOS). For each new fix: follow **B. Batch workflow** (add fix producer → wire to rule → fixture → test → format/analyze/test → re-run audit). | **Part 1** + **B** + **I** |
+| **Next batches** | Add **Batch 13+** by picking more rules from **Part 1**. Many Section-3 EASY candidates are now wired via Batch 12; remaining easy candidates cluster in `firebase_rules`, `drift_rules`, `widget_patterns_require_rules`, and the iOS sub-files (section 4). For each new fix: follow **B. Batch workflow** (add fix producer → wire to rule → fixture → test → format/analyze/test → re-run audit). | **Part 1** + **B** + **I** |
 
 ---
 
@@ -339,11 +339,11 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] avoid_variable_shadowing
 - [ ] prefer_asserts_in_initializer_lists
 - [ ] prefer_base_class
-- [ ] prefer_const_constructor_declarations
-- [ ] prefer_const_constructors_in_immutables
+- [X] prefer_const_constructor_declarations
+- [X] prefer_const_constructors_in_immutables
 - [ ] prefer_factory_constructor
-- [ ] prefer_final_fields
-- [ ] prefer_final_fields_always
+- [X] prefer_final_fields
+- [X] prefer_final_fields_always
 - [ ] prefer_interface_class
 - [ ] prefer_non_const_constructors
 - [ ] prefer_private_extension_type_field
@@ -365,6 +365,7 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 #### documentation_rules.dart
 
 - [ ] avoid_misleading_documentation
+- [X] deprecated_new_in_comment_reference
 - [ ] prefer_correct_throws
 - [ ] require_complex_logic_comments
 - [ ] require_deprecation_message
@@ -409,7 +410,7 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] prefer_prefixed_global_constants
 - [ ] prefer_typedef_for_callbacks
 - [ ] prefer_verb_method_names
-- [ ] prefer_wildcard_for_unused_param
+- [X] prefer_wildcard_for_unused_param
 
 #### performance_rules.dart
 
@@ -538,7 +539,7 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] avoid_nested_records
 - [ ] avoid_one_field_records
 - [ ] avoid_positional_record_field_access
-- [ ] avoid_redundant_positional_field_name
+- [X] avoid_redundant_positional_field_name
 - [ ] avoid_single_field_destructuring
 - [ ] move_records_to_typedefs
 - [ ] prefer_class_destructuring
@@ -546,7 +547,7 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] prefer_simpler_patterns_null_check
 - [ ] prefer_sorted_pattern_fields
 - [ ] prefer_sorted_record_fields
-- [ ] prefer_wildcard_pattern
+- [X] prefer_wildcard_pattern
 
 #### type_rules.dart
 
@@ -570,7 +571,7 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 
 - [ ] avoid_dynamic_json_access
 - [ ] avoid_dynamic_json_chains
-- [ ] avoid_non_null_assertion
+- [X] avoid_non_null_assertion
 - [ ] avoid_type_casts
 - [ ] avoid_unrelated_type_casts
 - [ ] avoid_unsafe_cast
@@ -589,7 +590,7 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 
 - [ ] avoid_collapsible_if
 - [ ] avoid_constant_switches
-- [ ] avoid_double_and_int_checks
+- [X] avoid_double_and_int_checks
 - [ ] avoid_if_with_many_branches
 - [ ] avoid_nested_assignments
 - [ ] avoid_nested_conditional_expressions
@@ -2352,6 +2353,22 @@ Execution work follows **Part 2 (Checklist)** below.
 ### H6. Batch 11 — Collection, formatting, code quality, return, complexity (EASY)
 
 **Exit criteria:** +13 fixes, tests in collection/formatting/code_quality/return/complexity test files, audit increases.
+
+### H7. Batch 12 — record_pattern, naming_style, type_safety, class_constructor, control_flow, documentation (EASY + MEDIUM) — DONE
+
+**+10 fixes (9 new producers, 1 reuse):**
+
+- `avoid_redundant_positional_field_name` — `RemoveRedundantPositionalFieldNameFix`
+- `prefer_wildcard_pattern` — `PreferWildcardPatternFix`
+- `prefer_wildcard_for_unused_param` — `PreferWildcardForUnusedParamFix`
+- `avoid_non_null_assertion` — reuses `RemoveNullAssertionFix`
+- `prefer_const_constructor_declarations` — `PreferConstConstructorDeclarationsFix`
+- `prefer_const_constructors_in_immutables` — reuses `PreferConstConstructorDeclarationsFix`
+- `prefer_final_fields` and `prefer_final_fields_always` — `PreferFinalFieldsFix`
+- `avoid_double_and_int_checks` — `PreferIsNumOverIntDoubleFix`
+- `deprecated_new_in_comment_reference` — `DeprecatedNewInCommentReferenceFix`
+
+All 10 wired, `rule_quick_fix_presence_test.dart` updated (+10 entries), fixtures created/verified. `dart analyze --fatal-infos` clean; targeted test files green.
 
 ### I. After Batch 6
 

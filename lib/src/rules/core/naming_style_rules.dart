@@ -6,6 +6,7 @@ import 'package:analyzer/dart/ast/visitor.dart';
 
 import '../../comment_utils.dart';
 import '../../fixes/stylistic/capitalize_comment_fix.dart';
+import '../../fixes/stylistic/prefer_wildcard_for_unused_param_fix.dart';
 import '../../saropa_lint_rule.dart';
 
 /// Warns when a getter name starts with 'get'.
@@ -2692,6 +2693,12 @@ class PreferWildcardForUnusedParamRule extends SaropaLintRule {
     body.accept(visitor);
     return visitor.isUsed;
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        PreferWildcardForUnusedParamFix(context: context),
+  ];
 }
 
 // =============================================================================

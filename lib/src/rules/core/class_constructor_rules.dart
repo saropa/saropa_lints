@@ -6,9 +6,11 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 
 import '../../saropa_lint_rule.dart';
+import '../../fixes/class_constructor/prefer_const_constructor_declarations_fix.dart';
 import '../../fixes/class_constructor/prefer_const_string_list_fix.dart';
 import '../../fixes/class_constructor/prefer_declaring_const_constructor_fix.dart';
 import '../../fixes/class_constructor/prefer_final_class_fix.dart';
+import '../../fixes/class_constructor/prefer_final_fields_fix.dart';
 
 /// Warns when a class declares a call() method.
 ///
@@ -2318,6 +2320,12 @@ class PreferConstConstructorsInImmutablesRule extends SaropaLintRule {
     });
   }
 
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        PreferConstConstructorDeclarationsFix(context: context),
+  ];
+
   static bool _isImmutableClass(ClassDeclaration node) {
     for (final Annotation a in node.metadata) {
       final String name = a.name.name;
@@ -2420,6 +2428,12 @@ class PreferConstConstructorDeclarationsRule extends SaropaLintRule {
       reporter.atNode(nonConstGenConstructor);
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        PreferConstConstructorDeclarationsFix(context: context),
+  ];
 
   /// True if any parameter is a function type (const constructor impossible).
   static bool _constructorHasFunctionTypeParam(ConstructorDeclaration node) {
@@ -2572,6 +2586,12 @@ class PreferFinalFieldsRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        PreferFinalFieldsFix(context: context),
+  ];
 }
 
 /// All instance fields should be final.
@@ -2642,6 +2662,12 @@ class PreferFinalFieldsAlwaysRule extends SaropaLintRule {
       reporter.atNode(node);
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        PreferFinalFieldsFix(context: context),
+  ];
 }
 
 class _AssignmentToFieldVisitor extends RecursiveAstVisitor<void> {

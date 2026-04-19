@@ -6,10 +6,15 @@ import 'package:saropa_lints/src/rules/code_quality/code_quality_variables_rules
 import 'package:saropa_lints/src/rules/code_quality/complexity_rules.dart';
 import 'package:saropa_lints/src/rules/code_quality/unnecessary_code_rules.dart';
 import 'package:saropa_lints/src/rules/core/async_rules.dart';
+import 'package:saropa_lints/src/rules/core/class_constructor_rules.dart';
+import 'package:saropa_lints/src/rules/core/documentation_rules.dart';
+import 'package:saropa_lints/src/rules/core/naming_style_rules.dart';
 import 'package:saropa_lints/src/rules/data/collection_rules.dart';
 import 'package:saropa_lints/src/rules/data/equality_rules.dart';
 import 'package:saropa_lints/src/rules/data/numeric_literal_rules.dart';
+import 'package:saropa_lints/src/rules/data/record_pattern_rules.dart';
 import 'package:saropa_lints/src/rules/data/type_rules.dart';
+import 'package:saropa_lints/src/rules/data/type_safety_rules.dart';
 import 'package:saropa_lints/src/rules/flow/control_flow_rules.dart';
 import 'package:saropa_lints/src/rules/flow/exception_rules.dart';
 import 'package:saropa_lints/src/rules/flow/return_rules.dart';
@@ -313,6 +318,39 @@ void main() {
     hasFix(
       'AvoidImplicitAnimationDisposeCastRule',
       () => AvoidImplicitAnimationDisposeCastRule(),
+    );
+
+    // Batch 12 — new quick fixes (10 rules)
+    // Record pattern (2)
+    hasFix(
+      'AvoidRedundantPositionalFieldNameRule',
+      () => AvoidRedundantPositionalFieldNameRule(),
+    );
+    hasFix('PreferWildcardPatternRule', () => PreferWildcardPatternRule());
+    // Naming style (1)
+    hasFix(
+      'PreferWildcardForUnusedParamRule',
+      () => PreferWildcardForUnusedParamRule(),
+    );
+    // Type safety (1)
+    hasFix('AvoidNonNullAssertionRule', () => AvoidNonNullAssertionRule());
+    // Class constructor (4)
+    hasFix(
+      'PreferConstConstructorsInImmutablesRule',
+      () => PreferConstConstructorsInImmutablesRule(),
+    );
+    hasFix(
+      'PreferConstConstructorDeclarationsRule',
+      () => PreferConstConstructorDeclarationsRule(),
+    );
+    hasFix('PreferFinalFieldsRule', () => PreferFinalFieldsRule());
+    hasFix('PreferFinalFieldsAlwaysRule', () => PreferFinalFieldsAlwaysRule());
+    // Control flow (1)
+    hasFix('AvoidDoubleAndIntChecksRule', () => AvoidDoubleAndIntChecksRule());
+    // Documentation (1)
+    hasFix(
+      'DeprecatedNewInCommentReferenceRule',
+      () => DeprecatedNewInCommentReferenceRule(),
     );
   });
 }
