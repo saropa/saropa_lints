@@ -174,16 +174,60 @@ export function getReportStyles(): string {
             background: var(--vscode-button-secondaryHoverBackground);
         }
 
+        /* ---- Footprint mode toggle ---- */
+        /* Three buttons that swap the Size column between own / +unique /
+           +all transitive footprint. Active button gets a brighter bg. */
+        .footprint-toggle {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 2px 6px;
+            border: 1px solid var(--vscode-widget-border);
+            border-radius: 3px;
+        }
+        .footprint-toggle .toggle-label {
+            font-size: 0.75em; opacity: 0.7;
+            margin-right: 2px;
+        }
+        .toggle-btn {
+            background: transparent;
+            color: var(--vscode-foreground);
+            border: 1px solid transparent;
+            padding: 2px 8px;
+            border-radius: 2px;
+            cursor: pointer;
+            font-size: 0.8em;
+            white-space: nowrap;
+        }
+        .toggle-btn:hover {
+            background: var(--vscode-list-hoverBackground);
+        }
+        .toggle-btn.active {
+            background: var(--vscode-button-background);
+            color: var(--vscode-button-foreground);
+        }
+
+        /* Size column: only the span matching the active footprint mode
+           is visible. Default class is set in JS on table load. */
+        .size-cell .size-own,
+        .size-cell .size-unique,
+        .size-cell .size-total { display: none; }
+        table.fp-own .size-cell .size-own { display: inline; }
+        table.fp-unique .size-cell .size-unique { display: inline; }
+        table.fp-total .size-cell .size-total { display: inline; }
+
         /* ---- Table ---- */
         table {
             width: 100%; border-collapse: collapse; margin-top: 8px;
         }
         th, td {
-            text-align: left; padding: 6px 10px;
+            text-align: left; padding: 4px 6px;
             border-bottom: 1px solid var(--vscode-widget-border);
         }
         th {
             background: var(--vscode-editor-inactiveSelectionBackground);
+            /* Prevent header text wrapping when many columns are visible.
+               Long labels like "Transitives" / "References" / "Published"
+               otherwise stack to two lines and inflate row height. */
+            white-space: nowrap;
         }
         /* Only sortable headers (with data-col) get pointer cursor. */
         th[data-col] {
@@ -203,7 +247,8 @@ export function getReportStyles(): string {
         a:hover { text-decoration: underline; }
 
         /* ---- Right-aligned numeric cells ---- */
-        .cell-right { text-align: right; }
+        /* nowrap so size/count values stay on one line in narrow viewports. */
+        .cell-right { text-align: right; white-space: nowrap; }
 
         /* ---- File usage count styling ---- */
         .file-single { color: var(--vscode-descriptionForeground); }

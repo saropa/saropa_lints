@@ -12,6 +12,10 @@ export function getReportScript(): string {
         var chartFilterPackage = null;
         var excludeSharedTransitives = false;
 
+        /* Footprint mode controls which size value the Size column shows
+           and which size the size sort uses: 'own' | 'unique' | 'total'. */
+        var footprintMode = 'own';
+
         /* ---- Sorting ---- */
 
         function sortTable(col) {
@@ -23,8 +27,21 @@ export function getReportScript(): string {
             /* Only sort package rows; detail rows follow their parent. */
             var pkgRows = Array.from(tbody.querySelectorAll('tr.pkg-row'));
             pkgRows.sort(function(a, b) {
-                var av = a.dataset[col] || '';
-                var bv = b.dataset[col] || '';
+                /* The Size column has three precomputed values per cell;
+                   sort using whichever footprint mode is active. */
+                var av, bv;
+                if (col === 'size') {
+                    var ac = a.querySelector('.size-cell');
+                    var bc = b.querySelector('.size-cell');
+                    var attr = 'sizeOwn';
+                    if (footprintMode === 'unique') { attr = 'sizeUnique'; }
+                    else if (footprintMode === 'total') { attr = 'sizeTotal'; }
+                    av = (ac && ac.dataset[attr]) || '0';
+                    bv = (bc && bc.dataset[attr]) || '0';
+                } else {
+                    av = a.dataset[col] || '';
+                    bv = b.dataset[col] || '';
+                }
                 var an = parseFloat(av);
                 var bn = parseFloat(bv);
                 if (!isNaN(an) && !isNaN(bn)) {
@@ -179,6 +196,37 @@ export function getReportScript(): string {
             excludeSharedTransitives = exclude;
             applyFilters();
         }
+
+        /* ---- Footprint mode toggle (Size column) ---- */
+        /* Three buttons in the toolbar control which precomputed value the
+           Size cell displays. The cell renders all three spans and CSS hides
+           the inactive ones based on a class on the table. */
+        function setFootprintMode(mode) {
+            if (mode !== 'own' && mode !== 'unique' && mode !== 'total') { return; }
+            footprintMode = mode;
+            var table = document.querySelector('table');
+            if (table) {
+                table.classList.remove('fp-own', 'fp-unique', 'fp-total');
+                table.classList.add('fp-' + mode);
+            }
+            document.querySelectorAll('.footprint-btn').forEach(function(btn) {
+                btn.classList.toggle('active', btn.dataset.footprint === mode);
+            });
+            /* If the user is currently sorted by size, re-sort to reflect the
+               new mode without flipping direction. */
+            if (sortCol === 'size') {
+                sortAsc = !sortAsc; /* sortTable flips it back */
+                sortTable('size');
+            }
+        }
+        document.querySelectorAll('.footprint-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                setFootprintMode(btn.dataset.footprint);
+            });
+        });
+        /* Default: own — set the class so CSS reveals the right span. */
+        var initialTable = document.querySelector('table');
+        if (initialTable) { initialTable.classList.add('fp-own'); }
 
         /* ---- Search box ---- */
 

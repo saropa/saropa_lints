@@ -150,6 +150,20 @@ export interface TransitiveInfo {
     readonly flaggedCount: number;
     readonly transitives: readonly string[];
     readonly sharedDeps: readonly string[];
+    /**
+     * Sum of archive sizes (bytes) of transitives used ONLY by this dep.
+     * Removing this direct dep would eliminate this many bytes.
+     * Null when no size data was available for any transitive; undefined
+     * in older fixtures and tests that predate this field.
+     */
+    readonly uniqueTransitiveSizeBytes?: number | null;
+    /**
+     * Sum of archive sizes (bytes) of transitives this dep shares with at least
+     * one other direct dep. Removing this dep would NOT eliminate these bytes.
+     * Null when no size data was available for any shared transitive;
+     * undefined in older fixtures and tests that predate this field.
+     */
+    readonly sharedTransitiveSizeBytes?: number | null;
 }
 
 /** A suggested alternative package. */
