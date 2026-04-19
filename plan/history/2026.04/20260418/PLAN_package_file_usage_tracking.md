@@ -129,11 +129,11 @@ After calling `scanDartImportsDetailed`:
 
 **File:** `views/report-html.ts`
 
-Add a new column "Usages" (or "Files") to the table:
+Add a new column "References" to the table (chosen over the proposed "Files"/"Usages" because it covers both `import` and `export` directives, which are both "references" but not all "imports"):
 
 | Header | Data attribute | Value | Tooltip |
 |--------|---------------|-------|---------|
-| Files | `data-usages` | count | "Number of files that import this package" |
+| References | `data-files` | count | "Number of source files that import this package — click to search" |
 
 Cell display:
 - `0` → shown with unused styling (already handled by Status column)
@@ -201,15 +201,15 @@ Markdown export:
 - No additional filesystem I/O beyond what the current scanner already does
 - Consider caching the detailed map alongside existing scan results
 
-## Risks
+## Risks — Outcomes
 
-- **Large monorepos**: Projects with thousands of Dart files could have slower scans. Mitigate by reusing the existing file list and processing in parallel (already done via `Promise.all`).
-- **Commented-out imports**: Detecting `// import 'package:...'` adds noise. Make this opt-in or visually distinct.
-- **Re-exports**: A package imported once but re-exported might appear as single-use when it's actually foundational. Consider flagging re-exports separately.
+- **Large monorepos**: Mitigated. The detailed scanner uses the same file glob and `Promise.all` parallelism as the original. No measurable regression observed.
+- **Commented-out imports**: Resolved. Visually distinct in the detail panel (separate "Commented-out references:" subsection with muted/italic styling) and excluded from active counts via `activeFileUsages()`.
+- **Re-exports**: **Resolved** (2026-04-18). Each `PackageUsage` now carries an `isExport: boolean` flag set by the scanner. The Single-use summary card (server-side count and client-side filter both) excludes any package with at least one active re-export via `hasActiveReExport()`. The detail panel tags individual re-export lines with a "re-export" badge and adds a "public API surface" note to the section header. The report row's References cell shows a small "↪" badge after the count and prepends a warning line to its tooltip when re-exported, and re-exported packages are not styled as "muted single-use".
 
-## Open Questions
+## Open Questions — Resolutions
 
-1. Should we count `test/` imports separately from `lib/` imports? (Test-only usage has different implications)
-2. Should the column be "Files" (count of importing files) or "Usages" (total import statements, including multiple per file)?
-3. Should commented-out imports be included in the count or shown separately?
-4. Should we detect *symbol-level* usage (which classes/functions from the package are used) or just import-level? Symbol-level is significantly more complex and may be better as a separate feature.
+1. **Should we count `test/` imports separately from `lib/` imports?** **Not implemented.** All scanned directories (`lib`, `bin`, `test`, `web`, `tool`, `integration_test`) are pooled into a single count. Test-only usage is not visually distinguished. Future work if it proves useful in practice.
+2. **Should the column be "Files" or "Usages"?** **Resolved as distinct-file count.** A file with multiple imports of the same package counts as 1 reference (one `PackageUsage` per directive line, but the surfaced cell value is `activeFileUsages(...).length` of distinct file paths).
+3. **Should commented-out imports be included in the count or shown separately?** **Shown separately.** `PackageUsage.isCommented: boolean` flags commented-out lines. The active count uses `activeFileUsages()` to filter them out; the detail panel renders a "Commented-out references:" subsection for them.
+4. **Should we detect *symbol-level* usage?** **Deferred.** Tracked as future work — symbol-level resolution requires AST analysis and is significantly more complex than directive-line scanning. No work scheduled.

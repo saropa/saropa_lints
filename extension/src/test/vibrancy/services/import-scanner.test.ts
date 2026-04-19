@@ -5,6 +5,7 @@ import {
     scanDartImportsDetailed,
     activePackageNames,
     activeFileUsages,
+    hasActiveReExport,
     PackageUsage,
 } from '../../../vibrancy/services/import-scanner';
 
@@ -265,6 +266,70 @@ describe('scanDartImportsDetailed', () => {
 
         const result = await scanDartImportsDetailed(makeUri('/proj'));
         assert.strictEqual(result.size, 0);
+    });
+
+    it('should mark export directives with isExport=true', async () => {
+        // Re-exports are part of the library's public API surface; the
+        // scanner must distinguish them from regular imports so downstream
+        // classification (single-use card, replacement complexity) doesn't
+        // suggest removing a package that callers depend on transitively.
+        const files = [makeUri('/proj/lib/api.dart')];
+        (vscode.workspace as any).findFiles = async () => files;
+        (vscode.workspace as any).fs.readFile = async () =>
+            encode(
+                "import 'package:meta/meta.dart';\n"
+                + "export 'package:public_pkg/public_pkg.dart';",
+            );
+
+        const result = await scanDartImportsDetailed(makeUri('/proj'));
+        const meta = result.get('meta');
+        const publicPkg = result.get('public_pkg');
+        assert.strictEqual(meta?.[0].isExport, false, 'plain import is not an export');
+        assert.strictEqual(publicPkg?.[0].isExport, true, 'export directive sets isExport=true');
+    });
+
+    it('should mark commented-out export directives with isExport=true', async () => {
+        const files = [makeUri('/proj/lib/api.dart')];
+        (vscode.workspace as any).findFiles = async () => files;
+        (vscode.workspace as any).fs.readFile = async () =>
+            encode("// export 'package:old_api/old_api.dart';");
+
+        const result = await scanDartImportsDetailed(makeUri('/proj'));
+        const usages = result.get('old_api');
+        assert.strictEqual(usages?.[0].isCommented, true);
+        assert.strictEqual(usages?.[0].isExport, true);
+    });
+});
+
+describe('hasActiveReExport', () => {
+    it('returns true when at least one active usage is an export', () => {
+        const usages: PackageUsage[] = [
+            { filePath: 'lib/internal.dart', line: 1, isCommented: false, isExport: false },
+            { filePath: 'lib/api.dart', line: 5, isCommented: false, isExport: true },
+        ];
+        assert.strictEqual(hasActiveReExport(usages), true);
+    });
+
+    it('returns false when all exports are commented out', () => {
+        // A commented-out re-export isn't actually exposing anything — it's
+        // dead code. The active-only filter is what protects the user from
+        // removing a stale comment and accidentally classifying the package
+        // as non-removable.
+        const usages: PackageUsage[] = [
+            { filePath: 'lib/api.dart', line: 1, isCommented: true, isExport: true },
+        ];
+        assert.strictEqual(hasActiveReExport(usages), false);
+    });
+
+    it('returns false when there are only imports', () => {
+        const usages: PackageUsage[] = [
+            { filePath: 'lib/a.dart', line: 1, isCommented: false, isExport: false },
+        ];
+        assert.strictEqual(hasActiveReExport(usages), false);
+    });
+
+    it('returns false for empty usages', () => {
+        assert.strictEqual(hasActiveReExport([]), false);
     });
 });
 

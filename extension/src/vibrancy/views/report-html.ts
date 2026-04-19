@@ -1,4 +1,4 @@
-import { VibrancyResult, activeFileUsages } from '../types';
+import { VibrancyResult, activeFileUsages, hasActiveReExport } from '../types';
 import {
     categoryLabel, categoryToGrade, countByCategory, scoreToGrade,
 } from '../scoring/status-classifier';
@@ -110,8 +110,13 @@ function buildReportSummary(options: ReportOptions): string {
     );
     const totalSize = totalBytes > 0 ? formatSizeMB(totalBytes) : '\u2014';
     const vulnPackages = results.filter(r => r.vulnerabilities.length > 0).length;
+    // "Single-use" excludes packages whose only reference is a re-export.
+    // A `lib/foo.dart` that does `export 'package:bar/...';` is exposing the
+    // package as part of its own public API, so the dep isn't "easy to remove"
+    // even though it appears in just one source file.
     const singleUse = results.filter(
-        r => activeFileUsages(r.fileUsages).length === 1,
+        r => activeFileUsages(r.fileUsages).length === 1
+            && !hasActiveReExport(r.fileUsages),
     ).length;
 
     return `<div class="summary">
@@ -262,6 +267,9 @@ function buildRow(
     const isSharedTransitive = r.package.section === 'transitive'
         && sharedDepNames.has(r.package.name);
     const isOverridden = overrideNames.has(r.package.name) ? 'yes' : 'no';
+    // Re-export marker: drives the row tooltip badge and ensures the
+    // client-side "single-use" filter excludes packages exposed via export.
+    const isReExport = hasActiveReExport(r.fileUsages) ? 'yes' : 'no';
 
     return `<tr class="pkg-row" data-name="${name}" data-version="${escapeHtml(r.package.version)}"
         data-score="${r.score}" data-category="${r.category}"
@@ -276,7 +284,8 @@ function buildRow(
         data-status="${r.isUnused ? 'unused' : 'ok'}"
         data-section="${r.package.section}"
         data-overridden="${isOverridden}"
-        data-shared-transitive="${isSharedTransitive ? 'yes' : 'no'}">
+        data-shared-transitive="${isSharedTransitive ? 'yes' : 'no'}"
+        data-reexport="${isReExport}">
         <td class="expand-cell"><span class="expand-chevron" title="Expand details">\u25B6</span></td>
         <td class="copy-cell"><span class="copy-btn" data-pkg="${name}" title="Copy row as JSON">&#128203;</span></td>
         ${buildNameCell(r)}
@@ -463,13 +472,32 @@ function buildReferencesCell(r: VibrancyResult): string {
     if (count === 0) {
         return '<td class="cell-right" title="No source file imports detected"><span class="dimmed">\u2014</span></td>';
     }
-    // Single-use = muted; 6+ = bold (deeply embedded)
-    const cls = count === 1 ? ' file-single'
+    // Single-use = muted; 6+ = bold (deeply embedded). A re-export overrides
+    // single-use styling so it doesn't read as "easy to remove".
+    const isReExport = hasActiveReExport(r.fileUsages);
+    const cls = isReExport ? '' /* re-export = full-strength, never muted */
+        : count === 1 ? ' file-single'
         : count >= 6 ? ' file-deep'
         : '';
-    const tooltip = active.map(u => `${u.filePath}:${u.line}`).join('\n');
+    // Mark re-export lines in the multi-line tooltip so the user sees which
+    // file is exposing the package as part of its public API.
+    const tooltipLines = active.map(u =>
+        `${u.filePath}:${u.line}${u.isExport ? ' (re-export)' : ''}`,
+    );
+    if (isReExport) {
+        tooltipLines.unshift('Public API surface — at least one usage is a re-export.', '');
+    }
+    const tooltip = tooltipLines.join('\n');
     const name = escapeHtml(r.package.name);
-    return `<td class="cell-right${cls}" title="${escapeHtml(tooltip)}"><span class="ref-link" data-pkg="${name}">${count}</span></td>`;
+    // Tiny badge after the count when re-exported — the whole table is dense
+    // so we keep this to a single character ("\u21AA" leftwards arrow with
+    // hook = "exposed onward").
+    const reexportBadge = isReExport
+        ? ' <span class="ref-reexport-badge" title="Re-exported">\u21AA</span>'
+        : '';
+    return `<td class="cell-right${cls}" title="${escapeHtml(tooltip)}">`
+        + `<span class="ref-link" data-pkg="${name}">${count}</span>${reexportBadge}`
+        + `</td>`;
 }
 
 function buildTransitivesCell(r: VibrancyResult): string {

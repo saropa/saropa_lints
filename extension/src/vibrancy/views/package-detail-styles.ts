@@ -294,6 +294,23 @@ export function getPackageDetailStyles(): string {
             font-size: 0.85em;
             color: var(--vscode-descriptionForeground);
         }
+        /* Re-export badge — small inline pill to flag public-API surface
+           usages without overwhelming the file path link visually. */
+        .file-usage-reexport {
+            display: inline-block;
+            padding: 0 4px;
+            margin-left: 6px;
+            border-radius: 2px;
+            font-size: 0.75em;
+            background: var(--vscode-editorInfo-foreground);
+            color: var(--vscode-editor-background);
+            vertical-align: middle;
+        }
+        .reexport-note {
+            font-size: 0.8em;
+            color: var(--vscode-descriptionForeground);
+            font-weight: normal;
+        }
 
         /* ---- Description section ---- */
         .description-text {
