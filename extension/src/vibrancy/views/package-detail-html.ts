@@ -248,9 +248,16 @@ function buildFileUsagesSection(r: VibrancyResult): string {
     const items: string[] = [];
     for (const u of active) {
         const display = escapeHtml(`${u.filePath}:${u.line}`);
+        // Tag exports so the user sees this isn't just an internal import —
+        // a re-exported package is part of the library's public API surface
+        // and removing it is a breaking change for downstream consumers.
+        const reexportBadge = u.isExport
+            ? ' <span class="file-usage-reexport" title="Re-exported — part of this library\u2019s public API">re-export</span>'
+            : '';
         items.push(
             `<div class="file-usage-item">`
             + `<a href="#" data-action="openFile" data-path="${escapeHtml(u.filePath)}" data-line="${u.line}">${display}</a>`
+            + reexportBadge
             + `</div>`,
         );
     }
@@ -258,9 +265,13 @@ function buildFileUsagesSection(r: VibrancyResult): string {
         items.push(`<div class="file-usage-commented">Commented-out references:</div>`);
         for (const u of commented) {
             const display = escapeHtml(`${u.filePath}:${u.line}`);
+            const reexportBadge = u.isExport
+                ? ' <span class="file-usage-reexport" title="Commented-out re-export">re-export</span>'
+                : '';
             items.push(
                 `<div class="file-usage-item commented">`
                 + `<a href="#" data-action="openFile" data-path="${escapeHtml(u.filePath)}" data-line="${u.line}">${display}</a>`
+                + reexportBadge
                 + `</div>`,
             );
         }
@@ -268,7 +279,12 @@ function buildFileUsagesSection(r: VibrancyResult): string {
 
     const count = active.length;
     const label = count === 1 ? '1 file' : `${count} files`;
-    return section(`FILE USAGES (${label})`, items.join(''));
+    // Headline note when ANY active usage is an export — surfaces the public-
+    // API status without requiring the reader to scan the file list.
+    const reexportNote = active.some(u => u.isExport)
+        ? ' <span class="reexport-note" title="At least one usage is an export directive">&middot; public API surface</span>'
+        : '';
+    return section(`FILE USAGES (${label})${reexportNote}`, items.join(''));
 }
 
 function buildDependenciesSection(r: VibrancyResult): string {

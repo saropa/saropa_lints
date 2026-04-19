@@ -339,4 +339,4 @@ export interface RankedComparison {
 export * from './types-extended';
 export type { ReplacementComplexity, ReplacementLevel, PackageCodeMetrics } from './services/package-code-analyzer';
 export type { PackageUsage, PackageUsageMap } from './services/import-scanner';
-export { activeFileUsages } from './services/import-scanner';
+export { activeFileUsages, hasActiveReExport } from './services/import-scanner';

@@ -122,7 +122,12 @@ export function getReportScript(): string {
                 case 'unused':
                     return row.dataset.status === 'unused';
                 case 'single-use':
-                    return row.dataset.files === '1';
+                    /* Mirror server-side rule (report-html.ts buildReportSummary):
+                       a re-exported package is part of the public API surface,
+                       so it doesn't belong in "easy to replace" candidates even
+                       if it shows up in only one file. */
+                    return row.dataset.files === '1'
+                        && row.dataset.reexport !== 'yes';
                 case 'vulns':
                     return parseInt(row.dataset.vulns, 10) > 0;
                 case 'overrides':

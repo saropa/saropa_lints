@@ -1,10 +1,13 @@
 import * as vscode from 'vscode';
 
-// Match both `import` and `export` directives — re-exported packages are used too
-const IMPORT_PATTERN = /(?:import|export)\s+['"]package:(\w+)\//g;
+// Match both `import` and `export` directives — re-exported packages are used too.
+// Capture group 1 = directive (import|export); group 2 = package name. Distinguishing
+// the two matters for downstream classification: an `export` is a public-API surface,
+// not a removable internal dependency.
+const IMPORT_PATTERN = /(import|export)\s+['"]package:(\w+)\//g;
 
 // Detect commented-out import/export directives (single-line // comments only)
-const COMMENTED_IMPORT_PATTERN = /^\s*\/\/\s*(?:import|export)\s+['"]package:(\w+)\//;
+const COMMENTED_IMPORT_PATTERN = /^\s*\/\/\s*(import|export)\s+['"]package:(\w+)\//;
 
 /** A single import/export occurrence of a package. */
 export interface PackageUsage {
@@ -14,6 +17,15 @@ export interface PackageUsage {
     readonly line: number;
     /** Whether this is a commented-out reference. */
     readonly isCommented: boolean;
+    /**
+     * True when the directive is `export` rather than `import`. Re-exports
+     * make the package part of this library's public API, so downstream
+     * consumers depend on it transitively — treating such packages as
+     * "single-use, easy to remove" is misleading. Optional for source
+     * compatibility with older fixtures that predate the field; the scanner
+     * always sets it explicitly.
+     */
+    readonly isExport?: boolean;
 }
 
 /** Per-package usage map: package name -> list of usages. */
@@ -48,6 +60,16 @@ export function activePackageNames(usageMap: PackageUsageMap): Set<string> {
 /** Return only the active (non-commented) usages for a VibrancyResult. */
 export function activeFileUsages(usages: readonly PackageUsage[]): readonly PackageUsage[] {
     return usages.filter(u => !u.isCommented);
+}
+
+/**
+ * True when at least one active (non-commented) usage of the package is an
+ * `export` directive — meaning this package is part of the library's public
+ * API surface and can't be safely removed without breaking downstream
+ * consumers. Used to suppress misleading "single-use" / removable signals.
+ */
+export function hasActiveReExport(usages: readonly PackageUsage[]): boolean {
+    return usages.some(u => !u.isCommented && u.isExport);
 }
 
 /**
@@ -105,18 +127,25 @@ function collectDetailedImports(
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
 
-        // Check for commented-out imports first (more specific pattern)
+        // Check for commented-out imports first (more specific pattern).
+        // Capture group 1 = directive ('import'|'export'), group 2 = package name.
         const commentMatch = COMMENTED_IMPORT_PATTERN.exec(line);
         if (commentMatch) {
-            addUsage(out, commentMatch[1], { filePath, line: i + 1, isCommented: true });
+            addUsage(out, commentMatch[2], {
+                filePath, line: i + 1, isCommented: true,
+                isExport: commentMatch[1] === 'export',
+            });
             continue;
         }
 
-        // Check for active imports
+        // Check for active imports. Same capture group meaning as above.
         re.lastIndex = 0;
         let match: RegExpExecArray | null;
         while ((match = re.exec(line)) !== null) {
-            addUsage(out, match[1], { filePath, line: i + 1, isCommented: false });
+            addUsage(out, match[2], {
+                filePath, line: i + 1, isCommented: false,
+                isExport: match[1] === 'export',
+            });
         }
     }
 }

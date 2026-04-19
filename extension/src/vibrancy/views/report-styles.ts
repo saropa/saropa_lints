@@ -253,6 +253,14 @@ export function getReportStyles(): string {
         /* ---- File usage count styling ---- */
         .file-single { color: var(--vscode-descriptionForeground); }
         .file-deep { font-weight: bold; }
+        /* Tiny badge next to the References count when at least one usage
+           is a re-export. Subtle — the cell is already crowded and the
+           tooltip carries the explanation. */
+        .ref-reexport-badge {
+            color: var(--vscode-editorInfo-foreground);
+            font-weight: bold;
+            margin-left: 2px;
+        }
 
         /* ---- Version age suffix ---- */
         .version-age {
