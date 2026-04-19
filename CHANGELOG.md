@@ -33,7 +33,7 @@
 
 ---
 
-## [Unreleased]
+## [12.2.0]
 
 Letter-only grading for package vibrancy across the report and detail views, plus a new "true footprint" view that links shared dependency size into per-package cost.
 
