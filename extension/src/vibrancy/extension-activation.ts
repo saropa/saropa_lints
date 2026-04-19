@@ -24,7 +24,19 @@ import { countByCategory } from './scoring/status-classifier';
 import { registerTreeCommands } from './providers/tree-commands';
 import { registerUpgradeCommand } from './providers/upgrade-command';
 import { registerAnnotateCommand } from './providers/annotate-command';
-import { readScanConfig, scanPackages, buildScanMeta, ParsedDeps, findAndParseDeps } from './scan-helpers';
+import { readScanConfig, scanPackages, buildScanMeta, ParsedDeps, findAndParseDeps, findPubspecPair } from './scan-helpers';
+import {
+    FINGERPRINT_SCHEMA_VERSION,
+    LastScanFingerprint,
+    clearFingerprint,
+    computeLockHash,
+    hashConfig,
+    isFingerprintFresh,
+    loadFingerprint,
+    rehydrateParsedDeps,
+    saveFingerprint,
+    serialiseParsedDeps,
+} from './services/startup-gate';
 import { scanDartImportsDetailed, activePackageNames } from './services/import-scanner';
 import { enrichReplacementComplexity } from './services/package-code-analyzer';
 import { detectUnused } from './scoring/unused-detector';
@@ -51,6 +63,8 @@ import {
 import {
     addSuppressedPackage, addSuppressedPackages, clearSuppressedPackages,
     getVulnScanEnabled, getGitHubAdvisoryEnabled, getGithubToken,
+    getCacheTtlHours, getStartupScanSkipTtlMinutes,
+    getShowStartupScanSkipStatusBar,
 } from './services/config-service';
 import { queryVulnerabilities } from './services/osv-api';
 import { queryGitHubAdvisories, mergeVulnerabilities } from './services/github-advisory-api';
@@ -161,7 +175,11 @@ export function runActivation(
     pubspecValidator?: PubspecValidation,
 ): void {
     vibrancyStatusCallback = onStatusUpdate ?? null;
-    const cache = new CacheService(context.globalState);
+    // Honor user-configurable cache TTL (hours -> ms).  Read once at
+    // activation; changing the setting requires a window reload, matching
+    // the existing pattern for other constructor-time config.
+    const cacheTtlMs = getCacheTtlHours() * 60 * 60 * 1000;
+    const cache = new CacheService(context.globalState, cacheTtlMs);
     reviewStateService = new ReviewStateService(context.workspaceState);
     registryService = new RegistryService(context.secrets);
     context.subscriptions.push(registryService);
@@ -214,6 +232,7 @@ export function runActivation(
         codeLens: codeLensProvider, codeActions: codeActionProvider,
         diagnostics, cache, adoptionGate, codeLensToggle,
         prereleaseToggle, state: stateManager,
+        workspaceState: context.workspaceState,
     };
 
     detailViewProvider = new DetailViewProvider(context.extensionUri);
@@ -580,6 +599,13 @@ interface ScanTargets {
     codeLensToggle: CodeLensToggle;
     prereleaseToggle: PrereleaseToggle;
     state: VibrancyStateManager;
+    /**
+     * Workspace-scoped Memento used by the startup-scan skip-gate to
+     * persist a fingerprint of the last successful scan.  Per-workspace
+     * because pubspec.lock is workspace-scoped — rehydrating cached
+     * results in a different workspace would be wrong.
+     */
+    workspaceState: vscode.Memento;
 }
 
 function registerCommands(
@@ -604,7 +630,14 @@ function registerCommands(
         vscode.commands.registerCommand(
             'saropaLints.packageVibrancy.clearCache',
             async () => {
-                await targets.cache.clear();
+                // Clear both the per-package API cache AND the
+                // last-scan fingerprint.  Otherwise the next startup
+                // would silently rehydrate from stale results and the
+                // user would see no effect from clearing the cache.
+                await Promise.all([
+                    targets.cache.clear(),
+                    clearFingerprint(targets.workspaceState),
+                ]);
                 vscode.window.showInformationMessage('Vibrancy cache cleared');
             },
         ),
@@ -732,9 +765,126 @@ async function autoScanIfPubspec(targets: ScanTargets): Promise<void> {
     const files = await vscode.workspace.findFiles(
         '**/pubspec.yaml', '**/.*/**', 1,
     );
-    if (files.length > 0) {
-        await runScan(targets);
+    if (files.length === 0) { return; }
+
+    // Skip-gate: when the previous scan finished recently AND nothing
+    // relevant changed (lock file, scoring weights, allowlist...), reuse
+    // the cached results silently instead of re-running the full scan.
+    const skipped = await tryStartupSkipGate(targets);
+    if (skipped) { return; }
+
+    await runScan(targets);
+}
+
+/**
+ * Decide whether the startup scan can be skipped using the persisted
+ * fingerprint.  When the gate hits, this function rehydrates module
+ * state (results, parsed deps, scan meta) and republishes to the UI
+ * providers without showing a progress notification.  Returns true on
+ * a successful skip, false when a normal scan should run.
+ */
+async function tryStartupSkipGate(targets: ScanTargets): Promise<boolean> {
+    const skipTtlMinutes = getStartupScanSkipTtlMinutes();
+    // 0 disables the optimisation entirely — equivalent to the old
+    // unconditional scan-on-open behaviour.
+    if (skipTtlMinutes <= 0) { return false; }
+
+    const fp = loadFingerprint(targets.workspaceState);
+    if (!fp) { return false; }
+
+    // Locate pubspec.lock without doing a full pubspec parse — that's
+    // the whole point of the cheap gate.
+    const pair = await findPubspecPair();
+    if (!pair) { return false; }
+
+    const lockHash = await computeLockHash(pair.lock);
+    if (!lockHash) { return false; }
+
+    const configHash = computeCurrentConfigHash();
+    if (!isFingerprintFresh(fp, lockHash, configHash, skipTtlMinutes)) {
+        return false;
     }
+
+    // Cache hit — rehydrate and republish.  No network, no parsing,
+    // no notification.
+    const parsed = rehydrateParsedDeps(fp.parsedDeps);
+    latestResults = fp.results;
+    lastParsedDeps = parsed;
+    lastScanMeta = fp.scanMeta;
+    publishResults(
+        targets, fp.results, parsed,
+        fp.depGraphSummary as import('./types').DepGraphSummary | null,
+    );
+
+    if (getShowStartupScanSkipStatusBar()) {
+        showStartupSkipStatusBar(fp.timestamp);
+    }
+    return true;
+}
+
+/** Compose the current scan-config fingerprint from live settings. */
+function computeCurrentConfigHash(): string {
+    const cfg = readScanConfig();
+    return hashConfig({
+        weights: cfg.weights as unknown as Record<string, number>,
+        allowlist: Array.from(cfg.allowSet).sort(),
+        repoOverrides: cfg.repoOverrides,
+        publisherTrustBonus: cfg.publisherTrustBonus,
+    });
+}
+
+/**
+ * Persist the current scan results so the next startup can skip
+ * re-scanning when inputs are unchanged.  Always best-effort — any
+ * failure here is silently swallowed because the worst case is just
+ * "next startup runs the scan", which is the existing behaviour.
+ */
+async function persistScanFingerprint(
+    targets: ScanTargets,
+    parsed: ParsedDeps,
+    results: VibrancyResult[],
+    depGraphSummary: import('./types').DepGraphSummary | null,
+    scanMeta: ReportMetadata,
+): Promise<void> {
+    try {
+        const pair = await findPubspecPair();
+        if (!pair) { return; }
+        const lockHash = await computeLockHash(pair.lock);
+        if (!lockHash) { return; }
+
+        const fingerprint: LastScanFingerprint = {
+            schemaVersion: FINGERPRINT_SCHEMA_VERSION,
+            lockHash,
+            configHash: computeCurrentConfigHash(),
+            timestamp: Date.now(),
+            results,
+            parsedDeps: serialiseParsedDeps(parsed),
+            scanMeta,
+            depGraphSummary,
+        };
+        await saveFingerprint(targets.workspaceState, fingerprint);
+    } catch {
+        // Best-effort — failure here just means next startup rescans.
+    }
+}
+
+/**
+ * Show a transient status bar item indicating a skipped startup scan.
+ * Hidden after a short delay; this is purely a passive cue so the user
+ * understands why no progress notification appeared.
+ */
+function showStartupSkipStatusBar(scanTimestamp: number): void {
+    const item = vscode.window.createStatusBarItem(
+        vscode.StatusBarAlignment.Right, 100,
+    );
+    const ageMinutes = Math.max(1, Math.round((Date.now() - scanTimestamp) / 60_000));
+    item.text = `$(check) Vibrancy: cached (${ageMinutes}m)`;
+    item.tooltip = 'Startup scan skipped — pubspec.lock and scan config unchanged. '
+        + 'Run "Package Vibrancy: Scan" to force a refresh.';
+    item.command = 'saropaLints.packageVibrancy.scan';
+    item.show();
+    // Hide after 10 seconds — the cue should be brief, not permanent.
+    setTimeout(() => item.dispose(), 10_000);
 }
 
 async function runScan(targets: ScanTargets): Promise<void> {
@@ -966,6 +1116,11 @@ async function runScanInner(
                     // Pruning is best-effort — never block scan
                 });
             }
+
+            // Persist fingerprint so the next VS Code restart can skip
+            // this scan when nothing relevant has changed.  Best-effort:
+            // any failure here just means the next startup re-scans.
+            await persistScanFingerprint(targets, parsed, results, depGraphSummary, lastScanMeta);
 
             try {
                 await logger.writeToFile();

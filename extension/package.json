@@ -1487,6 +1487,18 @@
             "maximum": 168,
             "description": "Cache TTL in hours for API responses"
           },
+          "saropaLints.packageVibrancy.startupScanSkipTtlMinutes": {
+            "type": "number",
+            "default": 60,
+            "minimum": 0,
+            "maximum": 10080,
+            "description": "Skip the startup vibrancy scan if the last completed scan finished within this many minutes AND pubspec.lock + scan config are unchanged. Set to 0 to always run the startup scan (no skipping)."
+          },
+          "saropaLints.packageVibrancy.showStartupScanSkipStatusBar": {
+            "type": "boolean",
+            "default": false,
+            "description": "When the startup scan is skipped (cached results reused), show a brief status bar indicator. Off by default — silent rehydrate."
+          },
           "saropaLints.packageVibrancy.suppressedPackages": {
             "type": "array",
             "items": {
@@ -1973,7 +1985,7 @@
     "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
     "package": "npm run precompile && npm run check-types && node esbuild.js --production",
     "lint": "tsc --noEmit -p ./",
-    "test": "tsc -p tsconfig.test.json && node node_modules/mocha/bin/mocha \"out-test/test/todosAndHacks/**/*.test.js\" \"out-test/test/driftAdvisor/**/*.test.js\" \"out-test/test/vibrancy/category-dictionary.test.js\" \"out-test/test/vibrancy/vscode-mock.test.js\" \"out-test/test/vibrancy/scan-helpers.test.js\" \"out-test/test/vibrancy/services/review-state.test.js\" \"out-test/test/vibrancy/services/scan-logger.test.js\" \"out-test/test/vibrancy/services/github-api.test.js\" \"out-test/test/vibrancy/services/import-scanner.test.js\" \"out-test/test/vibrancy/scoring/status-classifier.test.js\" \"out-test/test/vibrancy/scoring/vibrancy-calculator.test.js\" \"out-test/test/vibrancy/scoring/bloat-calculator.test.js\" \"out-test/test/vibrancy/scoring/override-analyzer.test.js\" \"out-test/test/vibrancy/views/report-html.test.js\" \"out-test/test/vibrancy/views/html-utils.test.js\" \"out-test/test/vibrancy/views/detail-view-html.test.js\" \"out-test/test/vibrancy/providers/tree-items.test.js\" \"out-test/test/vibrancy/providers/hover-provider.test.js\" \"out-test/test/rulePacks/**/*.test.js\" \"out-test/test/sidebarSectionVisibilityKeys.test.js\" \"out-test/test/sidebarToggleCommand.test.js\" \"out-test/test/sidebarToggleLabel.test.js\" \"out-test/test/overviewEmbeddedConfigKinds.test.js\" \"out-test/test/treeSerializers.test.js\" \"out-test/test/copyTreeAsJson.test.js\" \"out-test/test/suggestionCounts.test.js\" \"out-test/test/sidebarSectionCounts.test.js\" \"out-test/test/pathUtils.test.js\" \"out-test/test/violationsReader.test.js\" \"out-test/test/violationsReaderFilter.test.js\" \"out-test/test/configWriterDisabledRules.test.js\" \"out-test/test/views/**/*.test.js\" \"out-test/test/pubspec-validation.test.js\" \"out-test/test/pubspec-code-actions.test.js\" \"out-test/test/vibrancy/services/pubspec-sorter.test.js\" \"out-test/test/vibrancy/providers/annotate-command.test.js\" \"out-test/test/vibrancy/providers/adoption-gate.test.js\" \"out-test/test/commandCatalogRegistry.test.js\" \"out-test/test/commandCatalogSidebar.test.js\" \"out-test/test/fileRiskData.test.js\" --timeout 10000"
+    "test": "tsc -p tsconfig.test.json && node node_modules/mocha/bin/mocha \"out-test/test/todosAndHacks/**/*.test.js\" \"out-test/test/driftAdvisor/**/*.test.js\" \"out-test/test/vibrancy/category-dictionary.test.js\" \"out-test/test/vibrancy/vscode-mock.test.js\" \"out-test/test/vibrancy/scan-helpers.test.js\" \"out-test/test/vibrancy/services/review-state.test.js\" \"out-test/test/vibrancy/services/scan-logger.test.js\" \"out-test/test/vibrancy/services/github-api.test.js\" \"out-test/test/vibrancy/services/import-scanner.test.js\" \"out-test/test/vibrancy/services/startup-gate.test.js\" \"out-test/test/vibrancy/scoring/status-classifier.test.js\" \"out-test/test/vibrancy/scoring/vibrancy-calculator.test.js\" \"out-test/test/vibrancy/scoring/bloat-calculator.test.js\" \"out-test/test/vibrancy/scoring/override-analyzer.test.js\" \"out-test/test/vibrancy/views/report-html.test.js\" \"out-test/test/vibrancy/views/html-utils.test.js\" \"out-test/test/vibrancy/views/detail-view-html.test.js\" \"out-test/test/vibrancy/providers/tree-items.test.js\" \"out-test/test/vibrancy/providers/hover-provider.test.js\" \"out-test/test/rulePacks/**/*.test.js\" \"out-test/test/sidebarSectionVisibilityKeys.test.js\" \"out-test/test/sidebarToggleCommand.test.js\" \"out-test/test/sidebarToggleLabel.test.js\" \"out-test/test/overviewEmbeddedConfigKinds.test.js\" \"out-test/test/treeSerializers.test.js\" \"out-test/test/copyTreeAsJson.test.js\" \"out-test/test/suggestionCounts.test.js\" \"out-test/test/sidebarSectionCounts.test.js\" \"out-test/test/pathUtils.test.js\" \"out-test/test/violationsReader.test.js\" \"out-test/test/violationsReaderFilter.test.js\" \"out-test/test/configWriterDisabledRules.test.js\" \"out-test/test/views/**/*.test.js\" \"out-test/test/pubspec-validation.test.js\" \"out-test/test/pubspec-code-actions.test.js\" \"out-test/test/vibrancy/services/pubspec-sorter.test.js\" \"out-test/test/vibrancy/providers/annotate-command.test.js\" \"out-test/test/vibrancy/providers/adoption-gate.test.js\" \"out-test/test/commandCatalogRegistry.test.js\" \"out-test/test/commandCatalogSidebar.test.js\" \"out-test/test/fileRiskData.test.js\" --timeout 10000"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.10",

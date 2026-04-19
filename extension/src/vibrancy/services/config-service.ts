@@ -28,6 +28,27 @@ export function getScanOnOpen(): boolean {
     return getConfig().get<boolean>('scanOnOpen', true);
 }
 
+/**
+ * Minutes within which a previously completed scan is considered fresh
+ * enough to skip a startup re-scan (provided pubspec.lock and the
+ * scan-config fingerprint are unchanged).
+ *
+ * Returning 0 means "never skip — always run the startup scan", matching
+ * the old behaviour for users who explicitly disable this optimisation.
+ */
+export function getStartupScanSkipTtlMinutes(): number {
+    return getConfig().get<number>('startupScanSkipTtlMinutes', 60);
+}
+
+/**
+ * When the startup scan is skipped (cached results were rehydrated), show
+ * a brief status-bar indicator so the user knows why no progress
+ * notification appeared. Off by default — silent rehydrate is the point.
+ */
+export function getShowStartupScanSkipStatusBar(): boolean {
+    return getConfig().get<boolean>('showStartupScanSkipStatusBar', false);
+}
+
 export function getIncludeDevDependencies(): boolean {
     return getConfig().get<boolean>('includeDevDependencies', true);
 }

@@ -101,8 +101,11 @@ function isScannableSource(source: string, includeOverridden: boolean): boolean 
 /**
  * Find pubspec.yaml + pubspec.lock, preferring workspace root.
  * Falls back to recursive search for monorepo / nested project layouts.
+ *
+ * Exported so the startup skip-gate can locate pubspec.lock for a cheap
+ * hash check without doing a full pubspec parse.
  */
-async function findPubspecPair(): Promise<{ yaml: vscode.Uri; lock: vscode.Uri } | null> {
+export async function findPubspecPair(): Promise<{ yaml: vscode.Uri; lock: vscode.Uri } | null> {
     const folders = vscode.workspace.workspaceFolders;
     if (folders) {
         for (const folder of folders) {
