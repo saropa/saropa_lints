@@ -3,6 +3,7 @@ import 'dart:typed_data' show Uint64List;
 
 import 'package:saropa_lints/src/project_context.dart' show ProjectContext;
 import 'package:saropa_lints/src/saropa_lint_rule.dart' show LintImpact;
+import 'package:saropa_lints/src/string_slice_utils.dart';
 
 /// Numeric weights for [LintImpact] used in priority scoring.
 extension _LintImpactNumeric on LintImpact {
@@ -162,10 +163,12 @@ class ImportGraphTracker {
 
     if (timingEnabled) {
       // Print to stdout so it shows up in unit test logs.
+      // Default nullable stopwatch readings to 0 (avoid_nullable_interpolation):
+      // a missing stopwatch means that phase wasn't timed, not an actual null.
       stdout.writeln(
-        'ImportGraphTracker timing: resolve=${swResolve?.elapsedMilliseconds}ms '
-        'fanIn=${swFanIn?.elapsedMilliseconds}ms '
-        'classify=${swClassify?.elapsedMilliseconds}ms',
+        'ImportGraphTracker timing: resolve=${swResolve?.elapsedMilliseconds ?? 0}ms '
+        'fanIn=${swFanIn?.elapsedMilliseconds ?? 0}ms '
+        'classify=${swClassify?.elapsedMilliseconds ?? 0}ms',
       );
     }
   }
@@ -312,14 +315,18 @@ class ImportGraphTracker {
     // Skip SDK imports
     if (uri.startsWith('dart:')) return null;
 
+    // Copy static nullable fields into locals (avoid_nullable_interpolation).
+    final packageName = _packageName;
+    final projectRoot = _projectRoot;
+
     // Self-package imports
-    if (uri.startsWith('package:') && _packageName != null) {
-      final prefix = 'package:$_packageName/';
+    if (uri.startsWith('package:') && packageName != null) {
+      final prefix = 'package:$packageName/';
       if (uri.startsWith(prefix)) {
-        final relative = uri.substring(prefix.length);
+        final relative = uri.afterIndex(prefix.length);
         // Fast path: package self-imports are already library-relative.
         // We only need canonical separator/case matching in lookup.
-        final resolved = '$_projectRoot/lib/$relative';
+        final resolved = '${projectRoot ?? '.'}/lib/$relative';
         return _coerceToRegisteredPath(resolved);
       }
       // External package — skip
@@ -364,7 +371,7 @@ class ImportGraphTracker {
   static String _parentDir(String filePath) {
     final normalized = filePath.replaceAll('\\', '/');
     final lastSlash = normalized.lastIndexOf('/');
-    return lastSlash >= 0 ? normalized.substring(0, lastSlash) : '.';
+    return lastSlash >= 0 ? normalized.prefix(lastSlash) : '.';
   }
 
   /// Normalize a path: replace backslashes, resolve `.` and `..`.
@@ -646,7 +653,7 @@ class ImportGraphTracker {
     for (final file in _rawImports.keys) {
       final fileNorm = file.replaceAll('\\', '/');
       final relativePath = rootPath != null && fileNorm.startsWith('$rootPath/')
-          ? fileNorm.substring(rootPath.length + 1)
+          ? fileNorm.afterIndex(rootPath.length + 1)
           : fileNorm;
 
       final (layer, weight) = _classifyFile(relativePath);
@@ -696,7 +703,7 @@ class ImportGraphTracker {
     final rootPath = root.replaceAll('\\', '/');
     final file = filePath.replaceAll('\\', '/');
     if (file.startsWith('$rootPath/')) {
-      return file.substring(rootPath.length + 1);
+      return file.afterIndex(rootPath.length + 1);
     }
     return filePath;
   }

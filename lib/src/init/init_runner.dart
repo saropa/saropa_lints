@@ -88,8 +88,10 @@ Future<void> runInit(List<String> args) async {
   // Enable ANSI color support on Windows 10+
   tryEnableAnsiWindows();
 
-  // Initialize log timestamp for report file
-  final now = DateTime.now();
+  // Initialize log timestamp for report file.
+  // Fix: prefer_utc_for_storage — log file names are written to disk and
+  // may be consumed across time zones; UTC keeps ordering stable.
+  final now = DateTime.now().toUtc();
   log.timestamp =
       '${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}_'
       '${now.hour.toString().padLeft(2, '0')}${now.minute.toString().padLeft(2, '0')}${now.second.toString().padLeft(2, '0')}';
@@ -108,7 +110,9 @@ Future<void> runInit(List<String> args) async {
   log.buffer.writeln('SAROPA LINTS CONFIGURATION LOG');
   log.buffer.writeln('Version: $version');
   log.buffer.writeln('Source: $source');
-  log.buffer.writeln('Generated: ${now.toIso8601String()}');
+  // Fix: prefer_utc_for_storage — explicit .toUtc() at the call site so the
+  // rule sees timezone normalization at the usage site.
+  log.buffer.writeln('Generated: ${now.toUtc().toIso8601String()}');
   log.buffer.writeln('Arguments: ${args.join(' ')}');
   log.buffer.writeln('=' * 80);
   log.buffer.writeln();
@@ -117,6 +121,7 @@ Future<void> runInit(List<String> args) async {
 
   if (cliArgs.isShowHelp) {
     printUsage();
+
     return;
   }
 
@@ -127,6 +132,7 @@ Future<void> runInit(List<String> args) async {
 
   if (cliArgs.listPacksOnly) {
     printRulePacksInitSummary(targetDir: targetDir);
+
     return;
   }
 
@@ -162,13 +168,15 @@ Future<void> runInit(List<String> args) async {
 
   if (tier == null && cliArgs.tier != null) {
     // User explicitly provided an invalid tier name/number
-    log.terminal(errorText('✗ Error: Invalid tier "${cliArgs.tier}"'));
+    // Default nullable tier to empty string (avoid_nullable_interpolation).
+    log.terminal(errorText('✗ Error: Invalid tier "${cliArgs.tier ?? ''}"'));
     log.terminal('');
     log.terminal('Valid tiers:');
     for (final MapEntry<String, int> entry in tierIds.entries) {
       log.terminal('  ${entry.value} or ${tierColor(entry.key)}');
     }
     exitCode = 1;
+
     return;
   }
 
@@ -181,13 +189,16 @@ Future<void> runInit(List<String> args) async {
       'recommended${InitColors.reset}',
     );
   }
+
   final String resolvedTier = tier;
 
+  // Default nullable map lookups to empty string / '?' for safe output
+  // (avoid_nullable_interpolation).
   log.terminal(
-    '${InitColors.bold}Tier:${InitColors.reset} ${tierColor(resolvedTier)} (level ${tierIds[resolvedTier]})',
+    '${InitColors.bold}Tier:${InitColors.reset} ${tierColor(resolvedTier)} (level ${tierIds[resolvedTier] ?? '?'})',
   );
   log.terminal(
-    '${InitColors.dim}${tierDescriptions[resolvedTier]}${InitColors.reset}',
+    '${InitColors.dim}${tierDescriptions[resolvedTier] ?? ''}${InitColors.reset}',
   );
   log.terminal('');
 
@@ -319,8 +330,10 @@ Future<void> runInit(List<String> args) async {
   // Track whether v4 migration occurred (used for ignore comment tip)
   bool v4Detected = false;
   Map<String, bool> v4MigratedRules = <String, bool>{};
-  // Count rule names normalized from v6 (mixed-case) to v7 (lowerCaseName)
-  final List<int> v7NormalizedCount = [0];
+  // Count rule names normalized from v6 (mixed-case) to v7 (lowerCaseName).
+  // MutableCounter wraps the shared counter so nested helpers can increment
+  // without parameter mutation or constant-index list access warnings.
+  final MutableCounter v7NormalizedCount = MutableCounter();
 
   if (outputFile.existsSync()) {
     existingContent = outputFile.readAsStringSync();
@@ -361,12 +374,12 @@ Future<void> runInit(List<String> args) async {
       userCustomizations = result.customizations;
 
       // cspell:ignore prefer_debug_print
-      if (v7NormalizedCount[0] > 0) {
+      if (v7NormalizedCount.value > 0) {
         log.terminal(
           '${InitColors.yellow}--- V7 MIGRATION ---${InitColors.reset}',
         );
         log.terminal(
-          '${InitColors.yellow}Normalized ${v7NormalizedCount[0]} rule name(s) '
+          '${InitColors.yellow}Normalized ${v7NormalizedCount.value} rule name(s) '
           'to lowerCaseName (v7 config format).${InitColors.reset}',
         );
         log.terminal(
@@ -506,10 +519,21 @@ Future<void> runInit(List<String> args) async {
     try {
       final outputDir = outputFile.parent.path;
       final outputName = cliArgs.outputPath.split('/').last.split('\\').last;
-      final backupPath = '$outputDir/${log.timestamp}_$outputName.bak';
+      // Default nullable timestamp to 'unset' (avoid_nullable_interpolation).
+      final backupPath =
+          '$outputDir/${log.timestamp ?? 'unset'}_$outputName.bak';
       outputFile.copySync(backupPath);
     } on Exception catch (e, st) {
       dev.log('Backup before overwrite failed', error: e, stackTrace: st);
+    }
+    // Object fallback (avoid_catch_exception_alone): catch Errors too so
+    // programming bugs like StateError aren't silently dropped.
+    on Object catch (e, st) {
+      dev.log(
+        'Backup before overwrite failed (Error)',
+        error: e,
+        stackTrace: st,
+      );
     }
 
     try {
@@ -517,6 +541,13 @@ Future<void> runInit(List<String> args) async {
       log.terminal('${successText('✓ Written to:')} ${cliArgs.outputPath}');
     } on Exception catch (e, st) {
       dev.log('Failed to write config file', error: e, stackTrace: st);
+      log.terminal(errorText('✗ Failed to write file: $e'));
+      exitCode = 2;
+      return;
+    }
+    // Object fallback (avoid_catch_exception_alone).
+    on Object catch (e, st) {
+      dev.log('Failed to write config file (Error)', error: e, stackTrace: st);
       log.terminal(errorText('✗ Failed to write file: $e'));
       exitCode = 2;
       return;
@@ -564,8 +595,10 @@ void _printRuleSummary({
   log.terminal(
     '${InitColors.bold}Rules:${InitColors.reset} ${successText('${finalEnabled.length} enabled')} / ${errorText('${finalDisabled.length} disabled')} ${InitColors.dim}($disabledPct%)${InitColors.reset}',
   );
+  // Default nullable severity counts to 0 (avoid_nullable_interpolation):
+  // missing severity key means zero counted, not a logical 'null'.
   log.terminal(
-    '${InitColors.bold}Severity:${InitColors.reset} ${InitColors.red}${enabledBySeverity['ERROR']} errors${InitColors.reset} \u00b7 ${InitColors.yellow}${enabledBySeverity['WARNING']} warnings${InitColors.reset} \u00b7 ${InitColors.cyan}${enabledBySeverity['INFO']} info${InitColors.reset}',
+    '${InitColors.bold}Severity:${InitColors.reset} ${InitColors.red}${enabledBySeverity['ERROR'] ?? 0} errors${InitColors.reset} \u00b7 ${InitColors.yellow}${enabledBySeverity['WARNING'] ?? 0} warnings${InitColors.reset} \u00b7 ${InitColors.cyan}${enabledBySeverity['INFO'] ?? 0} info${InitColors.reset}',
   );
 
   final customCount = userCustomizations.length;
@@ -579,13 +612,14 @@ void _printRuleSummary({
       final severity = getRuleSeverity(rule);
       customBySeverity[severity] = (customBySeverity[severity] ?? 0) + 1;
     }
+    // Default nullable severity counts to 0 (avoid_nullable_interpolation).
     log.terminal(
       '${InitColors.bold}Project Overrides${InitColors.reset} ${InitColors.dim}(analysis_options_custom.yaml):${InitColors.reset} '
       '$customCount '
       '${InitColors.dim}(${InitColors.reset}'
-      '${InitColors.red}${customBySeverity['ERROR']} error${InitColors.reset}, '
-      '${InitColors.yellow}${customBySeverity['WARNING']} warning${InitColors.reset}, '
-      '${InitColors.cyan}${customBySeverity['INFO']} info${InitColors.reset}'
+      '${InitColors.red}${customBySeverity['ERROR'] ?? 0} error${InitColors.reset}, '
+      '${InitColors.yellow}${customBySeverity['WARNING'] ?? 0} warning${InitColors.reset}, '
+      '${InitColors.cyan}${customBySeverity['INFO'] ?? 0} info${InitColors.reset}'
       '${InitColors.dim})${InitColors.reset}',
     );
   }

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:saropa_lints/src/project_context.dart';
+import 'package:saropa_lints/src/string_slice_utils.dart';
 
 /// Exports the import graph in DOT format for Graphviz visualization.
 ///
@@ -44,7 +45,9 @@ void exportDotGraph({
   // Emit node labels (relative paths for readability).
   for (final path in allPaths) {
     final label = _relativize(path, root);
-    buf.writeln('  ${nodeIds[path]} [label="${_escape(label)}"];');
+    // Default nullable nodeIds[path] to '?' (avoid_nullable_interpolation);
+    // missing id here means an unreachable node, which we still render safely.
+    buf.writeln('  ${nodeIds[path] ?? '?'} [label="${_escape(label)}"];');
   }
   buf.writeln();
 
@@ -77,7 +80,7 @@ void exportDotGraph({
 String _relativize(String path, String root) {
   final normalized = path.replaceAll('\\', '/');
   if (normalized.startsWith(root)) {
-    return normalized.substring(root.length).replaceFirst(RegExp('^/'), '');
+    return normalized.afterIndex(root.length).replaceFirst(RegExp('^/'), '');
   }
   return normalized;
 }

@@ -69,7 +69,8 @@ void main() {
           result.unusedFiles.any((path) => path.endsWith('orphan.dart')),
           isTrue,
         );
-        expect(result.unusedFiles.length, 1);
+        // Fix: hasLength gives clearer failure output than raw int matcher.
+        expect(result.unusedFiles, hasLength(1));
       },
     );
 

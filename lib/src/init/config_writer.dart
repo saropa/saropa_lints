@@ -3,6 +3,7 @@ library;
 
 import 'package:saropa_lints/saropa_lints.dart' show RuleTier;
 import 'package:saropa_lints/src/init/rule_metadata.dart';
+import 'package:saropa_lints/src/string_slice_utils.dart';
 
 /// Matches the `plugins:` section header in YAML.
 final RegExp _pluginsSectionPattern = RegExp(r'^plugins:\s*$', multiLine: true);
@@ -259,12 +260,12 @@ String replacePluginsSection(String existingContent, String newPlugins) {
     return '$existingContent\n$newPlugins';
   }
 
-  // Find the end of the plugins section (next top-level key or end of file)
-  final String beforePlugins = existingContent.substring(
-    0,
-    customLintMatch.start,
-  );
-  final String afterPluginsStart = existingContent.substring(
+  // Find the end of the plugins section (next top-level key or end of file).
+  // Fix: avoid_string_substring — use clamped slice/afterIndex extensions so
+  // index out-of-range cannot throw RangeError even when match offsets shift
+  // due to earlier edits.
+  final String beforePlugins = existingContent.prefix(customLintMatch.start);
+  final String afterPluginsStart = existingContent.afterIndex(
     customLintMatch.end,
   );
 
@@ -272,7 +273,7 @@ String replacePluginsSection(String existingContent, String newPlugins) {
   final Match? nextSection = topLevelKeyPattern.firstMatch(afterPluginsStart);
 
   final String afterPlugins = nextSection != null
-      ? afterPluginsStart.substring(nextSection.start)
+      ? afterPluginsStart.afterIndex(nextSection.start)
       : '';
 
   return '$beforePlugins$newPlugins\n$afterPlugins';

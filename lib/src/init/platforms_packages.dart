@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:saropa_lints/src/init/display.dart';
 import 'package:saropa_lints/src/init/log_writer.dart';
 import 'package:saropa_lints/src/tiers.dart' as tiers;
+import 'package:saropa_lints/src/string_slice_utils.dart';
 
 /// Ensure platforms setting exists in an existing custom config file.
 ///
@@ -43,19 +44,19 @@ platforms:
   if (maxIssuesMatch != null) {
     final insertPos = maxIssuesMatch.end;
     newContent =
-        content.substring(0, insertPos) +
+        content.prefix(insertPos) +
         '\n' +
         settingBlock +
-        content.substring(insertPos);
+        content.afterIndex(insertPos);
   } else {
     final headerEndMatch = RegExp(r'╚[═]+╝\n*').firstMatch(content);
     if (headerEndMatch != null) {
       final insertPos = headerEndMatch.end;
       newContent =
-          content.substring(0, insertPos) +
+          content.prefix(insertPos) +
           '\n' +
           settingBlock +
-          content.substring(insertPos);
+          content.afterIndex(insertPos);
     } else {
       newContent = settingBlock + content;
     }
@@ -79,8 +80,10 @@ void ensurePackagesSetting(File file) {
     return; // Already has the setting
   }
 
+  // Default missing defaultPackages[p] to false (avoid_nullable_interpolation):
+  // packages not listed in defaults default to disabled.
   final packageEntries = tiers.allPackages
-      .map((p) => '  $p: ${tiers.defaultPackages[p]}')
+      .map((p) => '  $p: ${tiers.defaultPackages[p] ?? false}')
       .join('\n');
 
   final settingBlock =
@@ -113,20 +116,20 @@ $packageEntries
   if (platformsEndMatch != null) {
     final insertPos = platformsEndMatch.end;
     newContent =
-        content.substring(0, insertPos) +
+        content.prefix(insertPos) +
         '\n' +
         settingBlock +
-        content.substring(insertPos);
+        content.afterIndex(insertPos);
   } else {
     // Fallback: insert after max_issues
     final maxIssuesMatch = RegExp(r'max_issues:\s*\d+\n*').firstMatch(content);
     if (maxIssuesMatch != null) {
       final insertPos = maxIssuesMatch.end;
       newContent =
-          content.substring(0, insertPos) +
+          content.prefix(insertPos) +
           '\n' +
           settingBlock +
-          content.substring(insertPos);
+          content.afterIndex(insertPos);
     } else {
       newContent = settingBlock + content;
     }
@@ -203,7 +206,7 @@ Map<String, bool> extractPlatformsFromFile(File file) {
   if (sectionMatch == null) return platforms;
 
   // Extract indented entries after platforms:
-  final afterSection = content.substring(sectionMatch.end);
+  final afterSection = content.afterIndex(sectionMatch.end);
 
   final platformPattern = RegExp(
     r'^\s+(ios|android|macos|web|windows|linux):\s*(true|false)',
@@ -212,7 +215,7 @@ Map<String, bool> extractPlatformsFromFile(File file) {
 
   for (final match in platformPattern.allMatches(afterSection)) {
     // Stop if we hit a non-indented line (next section)
-    final beforeMatch = afterSection.substring(0, match.start);
+    final beforeMatch = afterSection.prefix(match.start);
     if (RegExp(r'^\S', multiLine: true).hasMatch(beforeMatch)) break;
 
     final name = match.group(1);
@@ -254,7 +257,7 @@ Map<String, bool> extractPackagesFromFile(File file) {
   if (sectionMatch == null) return packages;
 
   // Extract indented entries after packages:
-  final afterSection = content.substring(sectionMatch.end);
+  final afterSection = content.afterIndex(sectionMatch.end);
 
   final packagePattern = RegExp(
     r'^\s+([\w_]+):\s*(true|false)',
@@ -263,7 +266,7 @@ Map<String, bool> extractPackagesFromFile(File file) {
 
   for (final match in packagePattern.allMatches(afterSection)) {
     // Stop if we hit a non-indented line (next section)
-    final beforeMatch = afterSection.substring(0, match.start);
+    final beforeMatch = afterSection.prefix(match.start);
     if (RegExp(r'^\S', multiLine: true).hasMatch(beforeMatch)) break;
 
     final name = match.group(1);

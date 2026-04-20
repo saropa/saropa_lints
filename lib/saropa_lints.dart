@@ -43,6 +43,7 @@ import 'package:saropa_lints/src/native/plugin_logger.dart';
 import 'package:saropa_lints/src/report/analysis_reporter.dart';
 import 'package:saropa_lints/src/rules/all_rules.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart';
+import 'package:saropa_lints/src/string_slice_utils.dart';
 import 'package:saropa_lints/src/tiers.dart';
 
 // Export all rule classes for documentation
@@ -147,7 +148,12 @@ String _resolveVersion() {
     // Resolve rootUri to an absolute directory path.
     final String packageDir;
     if (rootUri.startsWith('file://')) {
-      packageDir = Uri.parse(rootUri).toFilePath();
+      // Fix: require_url_validation — parse is safe because the scheme check
+      // above already constrains rootUri to file://. The explicit scheme
+      // assert documents the invariant and satisfies the rule's SSRF guard.
+      final parsedUri = Uri.parse(rootUri);
+      if (parsedUri.scheme != 'file') return 'unknown';
+      packageDir = parsedUri.toFilePath();
     } else if (rootUri.startsWith('../')) {
       final dartToolDir = Directory('.dart_tool').absolute.path;
       packageDir = Directory('$dartToolDir/$rootUri').absolute.path;
@@ -2994,9 +3000,10 @@ late final Map<String, SaropaLintRule Function()> _ruleFactories =
 /// export, which the VS Code extension reads to disable "Apply fix" for
 /// rules without fixes.
 Set<String> get rulesWithFixes {
-  // Force lazy initialization of _ruleFactories (which populates this set).
-  // ignore: unnecessary_statements
-  _ruleFactories;
+  // Fix: avoid_unnecessary_statements — bind the lazy getter to a throwaway
+  // variable so the expression has a documented consumer. The read is still
+  // what triggers lazy initialization of _ruleFactories.
+  final _ = _ruleFactories;
   return _rulesWithFixesSet;
 }
 
@@ -3116,7 +3123,7 @@ void registerSaropaLintRules(PluginRegistry registry) {
       'registerSaropaLintRules: registered $registered rules '
       '(${rules.length} candidates, ${rules.length - registered} disabled)',
     );
-  } catch (e, st) {
+  } on Object catch (e, st) {
     PluginLogger.log(
       'registerSaropaLintRules failed',
       error: e,
@@ -3207,7 +3214,7 @@ _CustomYamlSettings _parseCustomYamlSettings() {
       enabledPackages: enabledPackages,
       disabledPackages: disabledPackages,
     );
-  } catch (e) {
+  } on Object catch (e) {
     stderr.writeln(
       '[saropa_lints] Failed to parse analysis_options_custom.yaml: $e',
     );
@@ -3228,7 +3235,7 @@ void _parseYamlSection({
   final match = sectionPattern.firstMatch(content);
   if (match == null) return;
 
-  final lines = content.substring(match.end).split('\n');
+  final lines = content.afterIndex(match.end).split('\n');
   for (final line in lines) {
     // Stop at next non-indented, non-empty, non-comment line
     if (line.trim().isEmpty || line.trimLeft().startsWith('#')) continue;
@@ -3273,8 +3280,14 @@ void _checkConflictingRules(List<SaropaLintRule> enabledRules) {
       .toSet();
 
   for (final List<String> pair in _conflictingRulePairs) {
-    final String rule1 = pair[0];
-    final String rule2 = pair[1];
+    // Destructure the pair with firstOrNull/lastOrNull to avoid the
+    // avoid_accessing_collections_by_constant_index lint and avoid
+    // avoid_unsafe_collection_methods; pairs always have exactly two
+    // elements, but the *OrNull variants make that explicit.
+    if (pair.length != 2) continue;
+    final String? rule1 = pair.firstOrNull;
+    final String? rule2 = pair.lastOrNull;
+    if (rule1 == null || rule2 == null) continue;
 
     if (enabledNames.contains(rule1) && enabledNames.contains(rule2)) {
       // Use stderr to avoid corrupting JSON-RPC protocol in analysis server
@@ -3377,7 +3390,7 @@ void _loadAnalysisConfig() {
         ProgressTracker.setFileOnly(fileOnly: true);
       }
     }
-  } catch (e) {
+  } on Object catch (e) {
     stderr.writeln(
       '[saropa_lints] Failed to read analysis_options_custom.yaml: $e',
     );

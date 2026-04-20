@@ -50,7 +50,7 @@ class SaropaLintsPlugin extends Plugin {
     PluginLogger.log('Plugin.start() — loading initial config');
     try {
       loadNativePluginConfig();
-    } catch (e, st) {
+    } on Object catch (e, st) {
       PluginLogger.log(
         'loadNativePluginConfig failed in Plugin.start()',
         error: e,

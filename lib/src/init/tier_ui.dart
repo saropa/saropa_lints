@@ -35,7 +35,7 @@ Options:
   -h, --help            Show this help message
 
 Tiers:
-${tierOrder.map((String t) => '  ${tierIds[t]}. $t\n     ${tierDescriptions[t]}').join('\n')}
+${tierOrder.map((String t) => '  ${tierIds[t] ?? '?'}. $t\n     ${tierDescriptions[t] ?? ''}').join('\n')}
 
 Examples:
   dart run saropa_lints:init --tier recommended

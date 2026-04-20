@@ -6,6 +6,7 @@
 library;
 
 import 'dart:io' show File, Platform;
+import 'package:saropa_lints/src/string_slice_utils.dart';
 
 /// Rule configuration loaded from a project's config files.
 class ScanConfig {
@@ -37,7 +38,7 @@ ScanConfig? loadScanConfig(String projectRoot) {
   ).firstMatch(configContent);
   if (sectionMatch == null) return null;
 
-  final lines = configContent.substring(sectionMatch.end).split('\n');
+  final lines = configContent.afterIndex(sectionMatch.end).split('\n');
   for (final line in lines) {
     if (line.trim().isEmpty || line.trimLeft().startsWith('#')) continue;
     if (!line.startsWith('      ')) break;
@@ -79,7 +80,7 @@ void _loadSeverityOverrides(
   ).firstMatch(content);
   if (sectionMatch == null) return;
 
-  final lines = content.substring(sectionMatch.end).split('\n');
+  final lines = content.afterIndex(sectionMatch.end).split('\n');
   for (final line in lines) {
     if (line.trim().isEmpty || line.trimLeft().startsWith('#')) continue;
     if (!line.startsWith('  ')) break;

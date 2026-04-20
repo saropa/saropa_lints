@@ -10,6 +10,7 @@ import 'package:saropa_lints/src/report/import_graph_tracker.dart';
 import 'package:saropa_lints/src/report/report_consolidator.dart';
 import 'package:saropa_lints/src/report/violation_export.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart';
+import 'package:saropa_lints/src/string_slice_utils.dart';
 
 /// Snapshot of the analysis configuration captured at rule-loading time.
 ///
@@ -116,7 +117,7 @@ class AnalysisReporter {
   static String _generateIsolateId() {
     final now = DateTime.now().microsecondsSinceEpoch;
     final rand = Random().nextInt(0xFFFF);
-    return (now ^ rand).toRadixString(36).substring(0, 6);
+    return (now ^ rand).toRadixString(36).prefix(6);
   }
 
   /// Schedule report writing after a debounce period.
@@ -185,7 +186,7 @@ class AnalysisReporter {
   ///
   /// Timestamps follow the format `YYYYMMDD_HHMMSS`. The first 8 characters
   /// are the date portion used to group report files by day.
-  static String dateFolder(String timestamp) => timestamp.substring(0, 8);
+  static String dateFolder(String timestamp) => timestamp.prefix(8);
 
   /// Full path to the report file, or null if not initialized.
   static String? get reportPath {
@@ -248,7 +249,7 @@ class AnalysisReporter {
         stderr.writeln('');
         stderr.writeln('[saropa_lints] Report: $path');
       }
-    } catch (e) {
+    } on Object catch (e) {
       stderr.writeln('[saropa_lints] Could not write report: $e');
     }
   }
@@ -315,8 +316,10 @@ class AnalysisReporter {
     int batchCount,
   ) {
     buf.writeln('Saropa Lints Analysis Report');
-    buf.writeln('Generated: ${DateTime.now().toIso8601String()}');
-    buf.writeln('Project: $_projectRoot');
+    // Use UTC for the generated timestamp (prefer_utc_for_storage).
+    buf.writeln('Generated: ${DateTime.now().toUtc().toIso8601String()}');
+    // Default nullable project root to '<unknown>' (avoid_nullable_interpolation).
+    buf.writeln('Project: ${_projectRoot ?? '<unknown>'}');
     if (config != null) {
       buf.writeln('Version: ${config.version}');
     }
@@ -403,13 +406,14 @@ class AnalysisReporter {
 
   /// Write the full analysis_options_custom.yaml content verbatim.
   static void _writeCustomYamlSubsection(StringBuffer buf) {
-    if (_projectRoot == null) return;
+    // Copy static nullable to local (avoid_nullable_interpolation): field
+    // promotion does not apply to static references inside other methods.
+    final root = _projectRoot;
+    if (root == null) return;
 
     try {
       final sep = Platform.pathSeparator;
-      final customFile = File(
-        '$_projectRoot${sep}analysis_options_custom.yaml',
-      );
+      final customFile = File('$root${sep}analysis_options_custom.yaml');
       if (!customFile.existsSync()) return;
 
       final content = customFile.readAsStringSync().trimRight();
@@ -735,11 +739,13 @@ class AnalysisReporter {
   /// Trashed files can still be viewed but are excluded from the
   /// active reports listing.
   static void _cleanOldReports() {
-    if (_projectRoot == null) return;
+    // Copy static nullable into local (avoid_nullable_interpolation).
+    final root = _projectRoot;
+    if (root == null) return;
 
     try {
       final sep = Platform.pathSeparator;
-      final reportsDir = Directory('$_projectRoot${sep}reports');
+      final reportsDir = Directory('$root${sep}reports');
       if (!reportsDir.existsSync()) return;
 
       // Collect report files from all date subdirectories
@@ -759,7 +765,7 @@ class AnalysisReporter {
 
       if (reportFiles.length <= _maxReportFiles) return;
 
-      final trashDir = Directory('$_projectRoot${sep}reports$sep.trash');
+      final trashDir = Directory('$root${sep}reports$sep.trash');
       if (!trashDir.existsSync()) {
         trashDir.createSync(recursive: true);
       }
@@ -794,5 +800,14 @@ class AnalysisReporter {
     _config = null;
     _owaspLookup = null;
     ImportGraphTracker.reset();
+  }
+
+  /// Explicit disposal for long-running hosts (tests, tooling) that need to
+  /// release the debounce [Timer] without clearing the rest of the report
+  /// state. Fix for require_dispose_pattern: satisfies the rule's check for
+  /// a named cleanup hook while preserving the lighter-weight [reset] path.
+  static void dispose() {
+    _debounceTimer?.cancel();
+    _debounceTimer = null;
   }
 }

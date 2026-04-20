@@ -124,5 +124,6 @@ void _good800() {
   for (final item in items) {
     buffer.write(item.toString());
   }
+
   final result = buffer.toString();
 }

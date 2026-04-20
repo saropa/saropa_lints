@@ -121,5 +121,6 @@ void _good124() async {
   if (permission == LocationPermission.deniedForever) {
     return; // Handle denial
   }
+
   final position = await Geolocator.getCurrentPosition();
 }

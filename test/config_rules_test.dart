@@ -178,9 +178,10 @@ void main() {
         final matches = RegExp(
           r'// expect_lint: avoid_hardcoded_config',
         ).allMatches(content);
+        // Fix: hasLength matcher yields clearer failure message than raw count.
         expect(
-          matches.length,
-          2,
+          matches,
+          hasLength(2),
           reason: 'static final field + method local should each expect_lint',
         );
       });

@@ -225,6 +225,7 @@ bool _isSchedulerEndOfFrame(MethodInvocation node) {
   if (target is! PropertyAccess || target.propertyName.name != 'instance') {
     return false;
   }
+
   final Expression? receiver = target.target;
   if (receiver == null) return false;
   if (receiver is SimpleIdentifier) {

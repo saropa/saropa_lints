@@ -7,6 +7,7 @@ import 'package:saropa_lints/src/init/config_writer.dart'
     show topLevelKeyPattern;
 import 'package:saropa_lints/src/init/display.dart';
 import 'package:saropa_lints/src/init/log_writer.dart';
+import 'package:saropa_lints/src/string_slice_utils.dart';
 
 /// Matches the `custom_lint:` section header (v4 format) in YAML.
 final RegExp _customLintSectionPattern = RegExp(
@@ -50,10 +51,10 @@ Map<String, bool> extractV4Rules(String yamlContent, Set<String> allRules) {
   if (sectionMatch == null) return rules;
 
   // Get content from custom_lint: until next top-level key or EOF
-  final String afterSection = yamlContent.substring(sectionMatch.end);
+  final String afterSection = yamlContent.afterIndex(sectionMatch.end);
   final Match? nextTopLevel = topLevelKeyPattern.firstMatch(afterSection);
   final String sectionContent = nextTopLevel != null
-      ? afterSection.substring(0, nextTopLevel.start)
+      ? afterSection.prefix(nextTopLevel.start)
       : afterSection;
 
   for (final Match match in _v4RuleEntryPattern.allMatches(sectionContent)) {
@@ -79,14 +80,16 @@ String removeCustomLintSection(String content) {
 
   if (sectionMatch == null) return content;
 
-  final String before = content.substring(0, sectionMatch.start);
-  final String afterStart = content.substring(sectionMatch.end);
+  final String before = content.prefix(sectionMatch.start);
+  final String afterStart = content.afterIndex(sectionMatch.end);
   final Match? nextTopLevel = topLevelKeyPattern.firstMatch(afterStart);
   final String after = nextTopLevel != null
-      ? afterStart.substring(nextTopLevel.start)
+      ? afterStart.afterIndex(nextTopLevel.start)
       : '';
 
-  return '${before.trimRight()}\n\n$after'.trimRight() + '\n';
+  // Fix: avoid_missing_interpolation — append trailing newline via
+  // interpolation instead of string concatenation for idiomatic Dart.
+  return '${'${before.trimRight()}\n\n$after'.trimRight()}\n';
 }
 
 /// Removes `- custom_lint` from the `analyzer: plugins:` section.
@@ -125,6 +128,7 @@ void cleanPubspecCustomLint({required bool dryRun, required String targetDir}) {
       '${InitColors.dim}  Non-interactive: skipping pubspec.yaml '
       'cleanup (remove custom_lint manually)${InitColors.reset}',
     );
+
     return;
   }
 
@@ -138,6 +142,7 @@ void cleanPubspecCustomLint({required bool dryRun, required String targetDir}) {
     log.terminal(
       '${InitColors.dim}  Skipped pubspec.yaml cleanup${InitColors.reset}',
     );
+
     return;
   }
 
@@ -146,6 +151,7 @@ void cleanPubspecCustomLint({required bool dryRun, required String targetDir}) {
       '${InitColors.dim}  (dry-run) Would remove custom_lint from '
       'pubspec.yaml${InitColors.reset}',
     );
+
     return;
   }
 
@@ -170,10 +176,10 @@ String? removeDevDep(String content, String packageName) {
   if (devMatch == null) return null;
 
   // Find the section boundaries
-  final String afterDevDeps = content.substring(devMatch.end);
+  final String afterDevDeps = content.afterIndex(devMatch.end);
   final Match? nextSection = topLevelKeyPattern.firstMatch(afterDevDeps);
   final String devSection = nextSection != null
-      ? afterDevDeps.substring(0, nextSection.start)
+      ? afterDevDeps.prefix(nextSection.start)
       : afterDevDeps;
 
   // Match the dependency line within dev_dependencies
@@ -186,9 +192,9 @@ String? removeDevDep(String content, String packageName) {
 
   // Remove only within the dev_dependencies section
   final String cleanedSection = devSection.replaceAll(depLine, '');
-  final String before = content.substring(0, devMatch.end);
+  final String before = content.prefix(devMatch.end);
   final String after = nextSection != null
-      ? afterDevDeps.substring(nextSection.start)
+      ? afterDevDeps.afterIndex(nextSection.start)
       : '';
 
   return '$before$cleanedSection$after';

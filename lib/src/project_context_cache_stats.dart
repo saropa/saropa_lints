@@ -46,7 +46,16 @@ class CacheStatsAggregator {
   static Map<String, dynamic>? _safeStats(Map<String, dynamic> Function() fn) {
     try {
       return fn();
-    } catch (_) {
+    } on Object catch (e, st) {
+      // Fix: avoid_swallowing_exceptions — cache-stats are diagnostic-only and
+      // must never crash analysis; we log so failures are visible in
+      // developer tooling rather than silently hidden.
+      developer.log(
+        '_safeStats: stats function threw',
+        name: 'saropa_lints',
+        error: e,
+        stackTrace: st,
+      );
       return null;
     }
   }

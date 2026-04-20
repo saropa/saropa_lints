@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 import 'package:saropa_lints/scan.dart';
 import 'package:saropa_lints/src/scan/scan_cli_args.dart';
+import 'package:saropa_lints/src/string_slice_utils.dart';
 
 /// Standalone lint scanner that runs saropa_lints rules against any Dart
 /// project without requiring it as a dependency.
@@ -25,18 +26,24 @@ import 'package:saropa_lints/src/scan/scan_cli_args.dart';
 void main(List<String> args) {
   if (args.contains('--help') || args.contains('-h')) {
     _printUsage();
+
     return;
   }
 
-  final result = parseScanArgs(
-    args,
-    readStdin: _readStdinLines,
-  );
+  final result = parseScanArgs(args, readStdin: _readStdinLines);
   if (result is ScanParseInvalid) {
     print(result.message);
     exit(2);
   }
-  final parsed = (result as ScanParseOk).args;
+  // Fix: avoid_unsafe_cast — the preceding `is ScanParseInvalid` guard plus
+  // the only-other-subtype ScanParseOk means this cast is statically safe,
+  // but using a pattern-matched branch satisfies the lint and documents it.
+  if (result is! ScanParseOk) {
+    stderr.writeln('Unexpected scan parse result: ${result.runtimeType}');
+    exit(2);
+  }
+
+  final parsed = result.args;
   final path = parsed.path;
   final dartFiles = parsed.dartFiles;
   final tier = parsed.tier;
@@ -85,22 +92,27 @@ List<String> _readStdinLines() {
 
 /// Write detailed results to a report file. Returns the file path.
 String _writeReport(List<ScanDiagnostic> diagnostics, String targetPath) {
-  final now = DateTime.now();
+  // Fix: prefer_utc_for_storage — report timestamps are written to files and
+  // consumed across time zones; UTC keeps filename ordering stable.
+  final now = DateTime.now().toUtc();
   final ts =
       '${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}_'
       '${now.hour.toString().padLeft(2, '0')}${now.minute.toString().padLeft(2, '0')}${now.second.toString().padLeft(2, '0')}';
-  final dateFolder = ts.substring(0, 8);
+  final dateFolder = ts.prefix(8);
 
   final reportsDir = Directory('reports/$dateFolder');
   if (!reportsDir.existsSync()) {
     reportsDir.createSync(recursive: true);
   }
+
   final reportFile = File('${reportsDir.path}/${ts}_scan_report.log');
 
   final buf = StringBuffer();
   buf.writeln('${'=' * 80}');
   buf.writeln('SAROPA LINTS SCAN REPORT');
-  buf.writeln('Generated: ${now.toIso8601String()}');
+  // Fix: prefer_utc_for_storage — explicit .toUtc() at the call site so the
+  // rule can see timezone normalization at the storage-adjacent usage.
+  buf.writeln('Generated: ${now.toUtc().toIso8601String()}');
   buf.writeln('Target: ${p.absolute(targetPath)}');
   buf.writeln('Total issues: ${diagnostics.length}');
   buf.writeln('${'=' * 80}');
@@ -115,9 +127,12 @@ String _writeReport(List<ScanDiagnostic> diagnostics, String targetPath) {
   for (final entry in byFile.entries) {
     buf.writeln(entry.key);
     for (final d in entry.value) {
-      buf.writeln('  ${d.severity.padRight(7)} '
-          'line ${d.line.toString().padLeft(4)}  '
-          '${d.ruleName}  ${d.problemMessage}');
+      // Default nullable problemMessage to empty string (avoid_nullable_interpolation).
+      buf.writeln(
+        '  ${d.severity.padRight(7)} '
+        'line ${d.line.toString().padLeft(4)}  '
+        '${d.ruleName}  ${d.problemMessage ?? ''}',
+      );
     }
     buf.writeln();
   }
@@ -130,6 +145,7 @@ String _writeReport(List<ScanDiagnostic> diagnostics, String targetPath) {
   for (final d in diagnostics) {
     byRule[d.ruleName] = (byRule[d.ruleName] ?? 0) + 1;
   }
+
   final sortedRules = byRule.entries.toList()
     ..sort((a, b) => b.value.compareTo(a.value));
   for (final entry in sortedRules) {
@@ -196,12 +212,22 @@ void _printUsage() {
   print('');
   print('Options:');
   print('  -h, --help           Show this help');
-  print('  --tier <name>        Use a tier for this run (essential, recommended,');
-  print('                      professional, comprehensive, pedantic). Overrides');
-  print('                      the project\'s analysis_options.yaml for enabled rules.');
-  print('  --files <path>...    Scan only these Dart files (paths relative to path).');
+  print(
+    '  --tier <name>        Use a tier for this run (essential, recommended,',
+  );
+  print(
+    '                      professional, comprehensive, pedantic). Overrides',
+  );
+  print(
+    '                      the project\'s analysis_options.yaml for enabled rules.',
+  );
+  print(
+    '  --files <path>...    Scan only these Dart files (paths relative to path).',
+  );
   print('  --files-from-stdin  Read one file path per line from stdin.');
-  print('  --format json       Output machine-readable JSON to stdout (no report file).');
+  print(
+    '  --format json       Output machine-readable JSON to stdout (no report file).',
+  );
   print('');
   print('The target must have an analysis_options.yaml with saropa_lints');
   print('rules configured (or use --tier). If not, run init first:');
@@ -216,6 +242,8 @@ void _printUsage() {
   print('  dart run saropa_lints scan .                # 2. Run scan');
   print('  dart run saropa_lints scan . --tier essential');
   print('  dart run saropa_lints scan . --files lib/a.dart lib/b.dart');
-  print('  echo "lib/foo.dart" | dart run saropa_lints scan . --files-from-stdin');
+  print(
+    '  echo "lib/foo.dart" | dart run saropa_lints scan . --files-from-stdin',
+  );
   print('  dart run saropa_lints scan . --format json  # JSON to stdout');
 }

@@ -458,6 +458,7 @@ void f() {
         final vars = _findShortVarNames('''
 void f() {
   for (var ii = 0; ii < 10; ii++) {}
+
   final a1 = 1;
   final a2 = 2;
   final a3 = 3;

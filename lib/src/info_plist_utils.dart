@@ -2,6 +2,7 @@
 
 import 'dart:developer' as developer;
 import 'dart:io';
+import 'package:saropa_lints/src/string_slice_utils.dart';
 
 /// Utilities for checking iOS Info.plist permission keys.
 ///
@@ -83,7 +84,7 @@ class InfoPlistChecker {
       // Move up one directory
       final lastSlash = current.lastIndexOf('/');
       if (lastSlash <= 0) break;
-      current = current.substring(0, lastSlash);
+      current = current.prefix(lastSlash);
 
       // Check if pubspec.yaml exists here
       try {

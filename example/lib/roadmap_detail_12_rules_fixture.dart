@@ -12,7 +12,8 @@ import 'package:flutter/material.dart';
 // BAD: Container with only child — expect_lint in widget
 Widget badContainerOnlyChild() {
   return Container(
-      child: Text('Hi')); // expect_lint: avoid_unnecessary_containers
+    child: Text('Hi'),
+  ); // expect_lint: avoid_unnecessary_containers
 }
 
 Widget goodContainerWithPadding() {
@@ -22,7 +23,9 @@ Widget goodContainerWithPadding() {
 // ========== prefer_adjacent_strings ==========
 void adjacentStrings() {
   final bad = 'a' + 'b'; // expect_lint: prefer_adjacent_strings
-  final good = 'a' 'b';
+  final good =
+      'a'
+      'b';
 }
 
 // ========== prefer_adjective_bool_getters ==========
@@ -41,6 +44,7 @@ class BadAssertInBody {
   BadAssertInBody(this.x) {
     assert(x > 0); // expect_lint: prefer_asserts_in_initializer_lists
   }
+
   final int x;
 }
 
@@ -52,8 +56,9 @@ class GoodAssertInInitializer {
 // ========== prefer_const_constructors_in_immutables ==========
 @immutable
 class BadImmutableNoConst {
-  BadImmutableNoConst(
-      {required this.url}); // expect_lint: prefer_const_constructors_in_immutables
+  BadImmutableNoConst({
+    required this.url,
+  }); // expect_lint: prefer_const_constructors_in_immutables
   final String url;
 }
 
@@ -75,7 +80,7 @@ Widget constLiterals() {
   return Column(
     children: [
       Text('a'),
-      Text('b')
+      Text('b'),
     ], // expect_lint: prefer_const_literals_to_create_immutables
   );
 }
@@ -133,6 +138,7 @@ class NoLintAssertUsesMethod {
   NoLintAssertUsesMethod(this.x) {
     assert(_check(x)); // instance method — cannot move
   }
+
   final int x;
   bool _check(int v) => v > 0;
 }

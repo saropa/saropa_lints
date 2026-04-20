@@ -31,6 +31,8 @@
 /// for a correct effective set. Prefer disjoint pack membership.
 library;
 
+import 'dart:developer' as developer;
+
 import 'package:pub_semver/pub_semver.dart';
 
 import 'package:saropa_lints/src/config/rule_pack_codes_generated.dart';
@@ -71,7 +73,15 @@ bool packPassesDependencyGate(
     final version = Version.parse(raw);
     final constraint = VersionConstraint.parse(gate.constraint);
     return constraint.allows(version);
-  } catch (_) {
+  } on Object catch (e, st) {
+    // Fix: avoid_swallowing_exceptions — invalid semver strings disable the
+    // gate (treated as not-applicable), but we log for visibility.
+    developer.log(
+      'matchesRulePackGate: semver parse failed for ${gate.dependency}',
+      name: 'saropa_lints',
+      error: e,
+      stackTrace: st,
+    );
     return false;
   }
 }
@@ -97,7 +107,14 @@ bool isRulePackSuggestedByPubspec(String packId, String pubspecYamlContent) {
   final markers = kRulePackPubspecMarkers[packId];
   if (markers == null) return false;
   for (final name in markers) {
-    final re = RegExp(r'^\s+' + RegExp.escape(name) + r'\s*:', multiLine: true);
+    // Fix: avoid_missing_interpolation — interpolate the raw-string segments
+    // into one literal instead of + concatenation for clarity and consistency.
+    final re = RegExp(
+      r'^\s+'
+      '${RegExp.escape(name)}'
+      r'\s*:',
+      multiLine: true,
+    );
     if (re.hasMatch(pubspecYamlContent)) return true;
   }
   return false;

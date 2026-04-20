@@ -36,6 +36,7 @@ void _checkPubspecDependency(LogWriter log, String targetDir) {
       pass: false,
       detail: 'file not found — are you in the project root?',
     );
+
     return;
   }
 
@@ -83,8 +84,10 @@ void _checkDartSdkVersion(LogWriter log) {
       pass: false,
       detail: 'could not parse: ${Platform.version}',
     );
+
     return;
   }
+
   final (major, minor) = parsed;
   if (major > 3 || (major == 3 && minor >= 6)) {
     log.check('Dart SDK $major.$minor (plugin support OK)', pass: true);
@@ -128,6 +131,7 @@ void _auditExistingConfig(
 
   if (!configFile.existsSync()) {
     log.check('No existing analysis_options.yaml (fresh setup)', pass: true);
+
     return;
   }
 

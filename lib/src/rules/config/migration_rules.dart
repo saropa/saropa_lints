@@ -378,6 +378,7 @@ void _reportOpacityAnimationBangIfLegacy(
     if (target == null) return;
     if (!_dartTypeIsOrExtendsDropdownMenuItemButton(target.staticType)) return;
     reporter.atNode(node);
+
     return;
   }
   if (operand is SimpleIdentifier) {

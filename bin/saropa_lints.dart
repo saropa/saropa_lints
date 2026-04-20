@@ -31,6 +31,7 @@ import 'scan.dart' as scan_cmd;
 Future<void> main(List<String> args) async {
   if (args.firstOrNull == '--help' || args.firstOrNull == '-h') {
     _printUsage();
+
     return;
   }
 
@@ -81,5 +82,7 @@ void _printUsage() {
   print('  dart run saropa_lints baseline');
   print('  dart run saropa_lints baseline --update');
   print('  dart run saropa_lints impact-report');
-  print('  dart run saropa_lints init --target . && dart run saropa_lints scan .');
+  print(
+    '  dart run saropa_lints init --target . && dart run saropa_lints scan .',
+  );
 }

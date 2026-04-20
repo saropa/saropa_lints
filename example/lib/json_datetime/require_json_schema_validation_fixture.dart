@@ -143,5 +143,6 @@ void _good457() async {
   if (!_validateUserResponse(json)) {
     throw ApiException('Invalid user response');
   }
+
   final user = User.fromJson(json);
 }

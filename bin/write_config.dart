@@ -70,7 +70,8 @@ void main(List<String> args) {
   ));
 
   if (!result.ok) {
-    stderr.writeln('write_config: ${result.error}');
+    // Default nullable error to a descriptive placeholder (avoid_nullable_interpolation).
+    stderr.writeln('write_config: ${result.error ?? 'unknown error'}');
     exit(2);
   }
 }

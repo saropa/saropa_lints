@@ -238,19 +238,23 @@ class CompilationUnitCache {
       return cached;
     }
 
-    // Create new data
-    final data = CompilationUnitDerivedData();
+    // Create new data. Fix: avoid_parameter_mutation — _analyzeContent now
+    // builds and returns the populated object instead of mutating a shared
+    // parameter, so the cache stores the fully built result directly.
+    final data = _analyzeContent(content);
     _cache[filePath] = data;
     _contentHashes[filePath] = hash;
-
-    // Pre-populate with basic content analysis
-    _analyzeContent(content, data);
 
     return data;
   }
 
   /// Quick content analysis to populate basic data.
-  static void _analyzeContent(String content, CompilationUnitDerivedData data) {
+  ///
+  /// Fix: avoid_parameter_mutation — this helper now constructs the data
+  /// object itself rather than mutating a caller-owned instance. Callers pass
+  /// raw content and receive a fully populated [CompilationUnitDerivedData].
+  static CompilationUnitDerivedData _analyzeContent(String content) {
+    final data = CompilationUnitDerivedData();
     // Check for widgets
     data.hasWidgets =
         content.contains('extends StatelessWidget') ||
@@ -298,6 +302,7 @@ class CompilationUnitCache {
         data.functionNames.add(name);
       }
     }
+    return data;
   }
 
   /// Get cached data for a file (returns null if not cached).

@@ -287,6 +287,57 @@ def run_extension_only_mode(
     return ExitCode.SUCCESS.value
 
 
+def run_publish_existing_vsix_mode(
+    mode: str,
+    project_dir: Path,
+) -> int | None:
+    """If mode is publish_existing_vsix, skip packaging and publish the newest
+    .vsix already in extension/ to Marketplace + Open VSX. Returns exit code;
+    else None.
+
+    Rationale: publish.py auto-bumps pubspec.yaml / extension/package.json
+    after a successful pub.dev publish for the *next* cycle. Running mode 6
+    (Extension only) after that packages the *next* version of the .vsix,
+    which then drifts from the pub.dev release. This mode lets you publish
+    an already-packaged .vsix (e.g. one that matches the live pub.dev
+    version) without re-packaging.
+    """
+    if mode != "publish_existing_vsix":
+        return None
+    if not extension_exists(project_dir):
+        exit_with_error(
+            f"Extension directory not found: {project_dir / 'extension'}",
+            ExitCode.PREREQUISITES_FAILED,
+        )
+    ext_dir = project_dir / "extension"
+    # Newest .vsix first so the most recently packaged one is the default.
+    vsix_files = sorted(
+        ext_dir.glob("*.vsix"),
+        key=lambda p: p.stat().st_mtime,
+        reverse=True,
+    )
+    if not vsix_files:
+        exit_with_error(
+            f"No .vsix found in {ext_dir}. Run mode 6 to package one first.",
+            ExitCode.PREREQUISITES_FAILED,
+        )
+    print_header("EXTENSION: PUBLISH EXISTING .VSIX")
+    if len(vsix_files) > 1:
+        print_info(f"Found {len(vsix_files)} .vsix files; newest first:")
+        for idx, candidate in enumerate(vsix_files, start=1):
+            marker = " <- selected" if idx == 1 else ""
+            print_colored(f"      {idx}) {candidate.name}{marker}", Color.CYAN)
+    vsix = vsix_files[0]
+    print_success(f"Selected: {vsix.name}")
+    if _prompt_extension_install_and_publish(vsix):
+        if not publish_extension(project_dir, vsix):
+            exit_with_error(
+                "Extension publish failed",
+                ExitCode.PUBLISH_FAILED,
+            )
+    return ExitCode.SUCCESS.value
+
+
 def run_fix_docs_mode(mode: str, project_dir: Path) -> int | None:
     """If mode is fix_docs, run fix-docs workflow and return exit code; else None."""
     if mode != "fix_docs":

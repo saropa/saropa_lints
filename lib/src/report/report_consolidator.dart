@@ -7,6 +7,7 @@ import 'package:path/path.dart' as path;
 import 'package:saropa_lints/src/report/analysis_reporter.dart';
 import 'package:saropa_lints/src/report/batch_data.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart';
+import 'package:saropa_lints/src/string_slice_utils.dart';
 
 /// Merged analysis data from all isolate batches in a session.
 class ConsolidatedData {
@@ -116,7 +117,7 @@ class ReportConsolidator {
 
       final batchDir = Directory('$reportsDir$sep$_batchDirName');
       if (!batchDir.existsSync()) batchDir.createSync();
-    } catch (e) {
+    } on Object catch (e) {
       stderr.writeln('[saropa_lints] Could not create session: $e');
     }
     return sessionId;
@@ -129,7 +130,7 @@ class ReportConsolidator {
       final dir = Directory(_batchDir(projectRoot));
       if (!dir.existsSync()) dir.createSync(recursive: true);
       File(path).writeAsStringSync(data.toJsonString());
-    } catch (e) {
+    } on Object catch (e) {
       stderr.writeln('[saropa_lints] Could not write batch: $e');
     }
   }
@@ -288,7 +289,7 @@ class ReportConsolidator {
     final root = projectRoot.replaceAll('\\', '/');
     final file = path.replaceAll('\\', '/');
     if (file.startsWith('$root/')) {
-      return file.substring(root.length + 1);
+      return file.afterIndex(root.length + 1);
     }
     return file;
   }

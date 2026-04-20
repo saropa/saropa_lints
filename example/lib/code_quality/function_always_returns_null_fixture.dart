@@ -115,6 +115,7 @@ Stream<List<String>> asyncGeneratorWithEarlyExit(String query) async* {
   final List<String>? items = await _loadItems(query);
   if (items == null || items.isEmpty) {
     yield <String>[];
+
     return; // Ends stream, not a null return
   }
   yield items;

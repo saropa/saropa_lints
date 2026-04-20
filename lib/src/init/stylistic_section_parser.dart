@@ -2,6 +2,7 @@
 library;
 
 import 'package:saropa_lints/src/tiers.dart' as tiers;
+import 'package:saropa_lints/src/string_slice_utils.dart';
 
 final RegExp stylisticSectionHeaderPattern = RegExp(
   r'# STYLISTIC RULES\s*\n',
@@ -34,7 +35,7 @@ int findStylisticSectionEnd(String content, int sectionStart) {
 
   // Skip past the "# STYLISTIC RULES" line and its closing divider
   final afterSectionHeader = stylisticSectionHeaderPattern.firstMatch(
-    content.substring(afterHeader),
+    content.afterIndex(afterHeader),
   );
   final searchFrom = afterSectionHeader != null
       ? afterHeader + afterSectionHeader.end
@@ -43,7 +44,7 @@ int findStylisticSectionEnd(String content, int sectionStart) {
   final nextDivider = RegExp(
     r'\n# ─+\n# ',
     multiLine: true,
-  ).firstMatch(content.substring(searchFrom));
+  ).firstMatch(content.afterIndex(searchFrom));
 
   if (nextDivider != null) {
     return searchFrom + nextDivider.start + 1; // +1 for the leading \n
@@ -58,7 +59,7 @@ Map<String, bool> extractStylisticSectionValues(String content) {
 
   final sectionStart = findStylisticSectionStart(content);
   final sectionEnd = findStylisticSectionEnd(content, sectionStart);
-  final sectionContent = content.substring(sectionStart, sectionEnd);
+  final sectionContent = content.slice(sectionStart, sectionEnd);
 
   final rulePattern = RegExp(r'^([\w_]+):\s*(true|false)', multiLine: true);
 
@@ -86,7 +87,7 @@ Set<String> extractReviewedRules(String content) {
 
   final sectionStart = findStylisticSectionStart(content);
   final sectionEnd = findStylisticSectionEnd(content, sectionStart);
-  final sectionContent = content.substring(sectionStart, sectionEnd);
+  final sectionContent = content.slice(sectionStart, sectionEnd);
 
   // Match lines like: rule_name: true/false  # [reviewed] ...
   final reviewedPattern = RegExp(
@@ -112,9 +113,9 @@ String stripReviewedMarkers(String content) {
   final sectionStart = findStylisticSectionStart(content);
   final sectionEnd = findStylisticSectionEnd(content, sectionStart);
 
-  final before = content.substring(0, sectionStart);
-  final section = content.substring(sectionStart, sectionEnd);
-  final after = content.substring(sectionEnd);
+  final before = content.prefix(sectionStart);
+  final section = content.slice(sectionStart, sectionEnd);
+  final after = content.afterIndex(sectionEnd);
 
   return before + section.replaceAll(RegExp(r' \[reviewed\]'), '') + after;
 }
@@ -127,7 +128,7 @@ Map<String, bool> extractRemovedStylisticRules(String content) {
 
   final sectionStart = findStylisticSectionStart(content);
   final sectionEnd = findStylisticSectionEnd(content, sectionStart);
-  final sectionContent = content.substring(sectionStart, sectionEnd);
+  final sectionContent = content.slice(sectionStart, sectionEnd);
 
   final rulePattern = RegExp(r'^([\w_]+):\s*(true|false)', multiLine: true);
 
@@ -154,7 +155,7 @@ Map<String, bool> extractOverrideSectionValues(String content) {
 
   // Content after the RULE OVERRIDES header until end of file
   // (it's the last section)
-  final afterSection = content.substring(sectionMatch.end);
+  final afterSection = content.afterIndex(sectionMatch.end);
 
   final rulePattern = RegExp(r'^([\w_]+):\s*(true|false)', multiLine: true);
 
@@ -177,8 +178,8 @@ String removeRulesFromOverridesSection(
   if (sectionMatch == null) return content;
 
   // Only modify content after the RULE OVERRIDES header
-  final before = content.substring(0, sectionMatch.end);
-  var after = content.substring(sectionMatch.end);
+  final before = content.prefix(sectionMatch.end);
+  var after = content.afterIndex(sectionMatch.end);
 
   for (final rule in rulesToRemove) {
     // Remove the line: "rule_name: true/false" with optional comment/newline

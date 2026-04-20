@@ -1,5 +1,6 @@
 import 'dart:developer' as developer;
 import 'dart:io';
+import 'package:saropa_lints/src/string_slice_utils.dart';
 
 /// Date-based baseline for ignoring violations in code older than a specified date.
 ///
@@ -159,7 +160,7 @@ class BaselineDate {
     final lines = output.split('\n');
     for (final line in lines) {
       if (line.startsWith('committer-time ')) {
-        final timestampStr = line.substring('committer-time '.length).trim();
+        final timestampStr = line.afterIndex('committer-time '.length).trim();
         final timestamp = int.tryParse(timestampStr);
         if (timestamp != null) {
           return DateTime.fromMillisecondsSinceEpoch(timestamp * 1000);
@@ -189,9 +190,9 @@ class BaselineDate {
     final rootNorm = gitRoot.replaceAll('\\', '/');
 
     if (normalized.startsWith(rootNorm)) {
-      var relative = normalized.substring(rootNorm.length);
+      var relative = normalized.afterIndex(rootNorm.length);
       if (relative.startsWith('/')) {
-        relative = relative.substring(1);
+        relative = relative.afterIndex(1);
       }
       return relative;
     }
@@ -256,15 +257,20 @@ class BaselineDate {
       if (line.isNotEmpty && !line.startsWith('\t')) {
         final parts = line.split(' ');
         if (parts.length >= 3) {
-          // Check if this looks like a commit hash line
-          if (parts[0].length == 40 && _isHex(parts[0])) {
-            currentLine = int.tryParse(parts[2]);
+          // Check if this looks like a commit hash line.
+          // Read positional fields by name to avoid
+          // avoid_accessing_collections_by_constant_index; git porcelain
+          // header has a fixed column layout so these indexes are safe.
+          final hash = parts.first;
+          final finalLineField = parts.elementAtOrNull(2);
+          if (hash.length == 40 && _isHex(hash) && finalLineField != null) {
+            currentLine = int.tryParse(finalLineField);
           }
         }
       }
 
       if (line.startsWith('committer-time ')) {
-        final timestampStr = line.substring('committer-time '.length).trim();
+        final timestampStr = line.afterIndex('committer-time '.length).trim();
         final timestamp = int.tryParse(timestampStr);
         if (timestamp != null) {
           currentDate = DateTime.fromMillisecondsSinceEpoch(timestamp * 1000);

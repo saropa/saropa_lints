@@ -191,4 +191,9 @@ WriteConfigResult runWriteConfig(WriteConfigOptions options) {
   } on Exception catch (e) {
     return WriteConfigResult(ok: false, error: e.toString());
   }
+  // Object fallback (avoid_catch_exception_alone): writeAsStringSync can also
+  // surface Error subtypes on truly exceptional filesystem conditions.
+  on Object catch (e) {
+    return WriteConfigResult(ok: false, error: e.toString());
+  }
 }

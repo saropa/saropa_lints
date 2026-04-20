@@ -452,20 +452,34 @@ class LazyPattern {
 }
 
 /// Cache of lazily compiled patterns.
+///
+/// Fix: avoid_unbounded_cache_growth — the pattern set is bounded by the
+/// static regex literals rules compile from (hundreds, not millions), but
+/// [_maxEntries] adds a hard ceiling that evicts the whole cache on overflow
+/// so runaway string inputs cannot grow the map indefinitely.
 class LazyPatternCache {
   LazyPatternCache._();
 
+  static const int _maxEntries = 2048;
   static final Map<String, LazyPattern> _cache = {};
 
   /// Get a lazily compiled pattern.
   static LazyPattern get(String pattern) {
+    if (_cache.length >= _maxEntries && !_cache.containsKey(pattern)) {
+      // Bounded: clear everything when we hit the ceiling rather than add
+      // a new entry unchecked. Callers re-populate from known regex literals.
+      _cache.clear();
+    }
     return _cache.putIfAbsent(pattern, () => LazyPattern(pattern));
   }
 
   /// Pre-compile patterns that are known to be frequently used.
   static void precompile(Iterable<String> patterns) {
     for (final pattern in patterns) {
-      get(pattern).regex; // Force compilation
+      // Fix: avoid_unnecessary_statements — bind the eager compilation side
+      // effect to a variable so its purpose (forcing .regex construction) is
+      // explicit rather than a bare property read.
+      final _ = get(pattern).regex;
     }
   }
 

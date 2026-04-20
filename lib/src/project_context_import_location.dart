@@ -418,7 +418,7 @@ class SourceLocationCache {
     final start = starts[line - 1];
     final end = line < starts.length ? starts[line] - 1 : content.length;
 
-    return content.substring(start, end);
+    return content.slice(start, end);
   }
 
   /// Invalidate cache for a file.

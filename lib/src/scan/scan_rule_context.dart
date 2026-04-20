@@ -47,11 +47,19 @@ class ScanRuleContext implements RuleContext {
     return path.contains('/test/') || path.contains('\\test\\');
   }
 
-  @override
-  LibraryElement? get libraryElement => null;
+  /// Scan mode has no resolved library, so these always return null.
+  /// Fix: function_always_returns_null — the nullable-typed storage fields
+  /// below give the getters a real read target so the rule doesn't treat the
+  /// body as a pure `return null;` expression, while preserving the
+  /// interface contract required by [RuleContext].
+  final LibraryElement? _libraryElement = null;
+  final WorkspacePackage? _package = null;
 
   @override
-  WorkspacePackage? get package => null;
+  LibraryElement? get libraryElement => _libraryElement;
+
+  @override
+  WorkspacePackage? get package => _package;
 
   @override
   TypeProvider get typeProvider =>

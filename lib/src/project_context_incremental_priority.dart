@@ -157,8 +157,11 @@ class IncrementalAnalysisTracker {
 
   /// Get the cache file path.
   static String? get _cacheFilePath {
-    if (_projectRoot == null) return null;
-    return '$_projectRoot/.dart_tool/$_cacheFileName';
+    // Copy static field into local so promotion applies
+    // (avoid_nullable_interpolation otherwise flags the interpolation).
+    final root = _projectRoot;
+    if (root == null) return null;
+    return '$root/.dart_tool/$_cacheFileName';
   }
 
   /// Load cache from disk.
@@ -250,7 +253,9 @@ class IncrementalAnalysisTracker {
       final json = <String, dynamic>{
         'version': 1,
         'configHash': _ruleConfigHash,
-        'savedAt': DateTime.now().toIso8601String(),
+        // Fix: prefer_utc_for_storage — state file is persisted and restored
+        // across sessions/machines; UTC avoids timezone-shift confusion.
+        'savedAt': DateTime.now().toUtc().toIso8601String(),
         'files': <String, dynamic>{
           for (final entry in _state.entries)
             entry.key: <String, dynamic>{
@@ -260,8 +265,10 @@ class IncrementalAnalysisTracker {
         },
       };
 
-      // Ensure .dart_tool directory exists
-      final dartToolDir = Directory('$_projectRoot/.dart_tool');
+      // Ensure .dart_tool directory exists. Use a non-null local copy of the
+      // static nullable field (avoid_nullable_interpolation).
+      final projectRoot = _projectRoot ?? '.';
+      final dartToolDir = Directory('$projectRoot/.dart_tool');
       if (!dartToolDir.existsSync()) {
         dartToolDir.createSync(recursive: true);
       }

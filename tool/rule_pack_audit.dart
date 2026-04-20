@@ -21,6 +21,7 @@ library;
 import 'dart:io';
 
 import 'package:saropa_lints/src/config/rule_packs.dart';
+import '../lib/src/string_slice_utils.dart';
 
 final RegExp _lintCodeName = RegExp(
   r"LintCode\s*\(\s*'([a-z0-9_]+)'",
@@ -45,7 +46,7 @@ void applyCompositeRulePacks(Map<String, Set<String>> extracted) {
 String packIdForStem(String stem) {
   if (stem == 'package_specific_rules') return 'package_specific';
   if (stem.endsWith('_rules')) {
-    return stem.substring(0, stem.length - '_rules'.length);
+    return stem.prefix(stem.length - '_rules'.length);
   }
   return stem;
 }
@@ -54,7 +55,10 @@ Map<String, Set<String>> extractFromPackagesDir(Directory dir) {
   final out = <String, Set<String>>{};
   for (final entity in dir.listSync()) {
     if (entity is! File) continue;
-    final name = entity.uri.pathSegments.last;
+    // Fix: avoid_unsafe_collection_methods — lastOrNull + continue guards
+    // against URIs with no path segments rather than throwing StateError.
+    final name = entity.uri.pathSegments.lastOrNull;
+    if (name == null) continue;
     if (!name.endsWith('_rules.dart')) continue;
     final stem = name.replaceAll('.dart', '');
     final pack = packIdForStem(stem);
@@ -72,6 +76,7 @@ void main(List<String> args) {
   if (!packagesDir.existsSync()) {
     stderr.writeln('Missing lib/src/rules/packages');
     exitCode = 2;
+
     return;
   }
 

@@ -5,6 +5,7 @@ import 'baseline_config.dart';
 import 'baseline_date.dart';
 import 'baseline_file.dart';
 import 'baseline_paths.dart';
+import 'package:saropa_lints/src/string_slice_utils.dart';
 
 /// Central manager for baseline functionality.
 ///
@@ -295,8 +296,11 @@ class BaselineManager {
 
   /// Resolve a baseline file path relative to project root.
   static String _resolveFilePath(String path) {
-    if (_projectRoot != null) {
-      final resolved = '$_projectRoot/$path'.replaceAll('\\', '/');
+    // Copy static nullable field into a non-null local (avoid_nullable_interpolation);
+    // field promotion does not cross static-to-instance scope.
+    final root = _projectRoot;
+    if (root != null) {
+      final resolved = '$root/$path'.replaceAll('\\', '/');
       if (File(resolved).existsSync()) {
         return resolved;
       }
@@ -312,16 +316,16 @@ class BaselineManager {
     if (_projectRoot != null) {
       final rootNorm = _projectRoot!.replaceAll('\\', '/');
       if (normalized.startsWith(rootNorm)) {
-        normalized = normalized.substring(rootNorm.length);
+        normalized = normalized.afterIndex(rootNorm.length);
         if (normalized.startsWith('/')) {
-          normalized = normalized.substring(1);
+          normalized = normalized.afterIndex(1);
         }
       }
     }
 
     // Remove leading ./ if present
     if (normalized.startsWith('./')) {
-      normalized = normalized.substring(2);
+      normalized = normalized.afterIndex(2);
     }
 
     return normalized;

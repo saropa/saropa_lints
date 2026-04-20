@@ -30,6 +30,7 @@ import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:path/path.dart' as p;
 
 import 'project_context.dart';
+import 'package:saropa_lints/src/string_slice_utils.dart';
 
 /// Condition names that mean "native only" (file is not loaded on web).
 const Set<String> _nativeOnlyConditionNames = {
@@ -101,6 +102,7 @@ void _collectNativeOnlyTargetsFromFile(
       error: e,
       stackTrace: st,
     );
+
     return;
   }
 
@@ -148,10 +150,11 @@ String? _resolveUri(
     if (packageName.isEmpty) return null;
     final prefix = 'package:$packageName/';
     if (!uri.startsWith(prefix)) return null;
-    final relative = uri.substring(prefix.length);
+    final relative = uri.afterIndex(prefix.length);
     final resolved = p.normalize(p.join(projectRoot, 'lib', relative));
     return resolved.replaceAll('\\', '/');
   }
+
   final fromDir = File(fromFilePath).parent.path;
   final resolved = p.normalize(p.join(fromDir, uri));
   return resolved.replaceAll('\\', '/');

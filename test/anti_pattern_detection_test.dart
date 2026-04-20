@@ -150,9 +150,11 @@ void main() {
     test(
       'dangerous pattern count matches audit (Dart and publish script in sync)',
       () {
+        // Fix: expect(list.length, N) flagged by avoid_misused_test_matchers;
+        // switch to hasLength for better failure output on divergence.
         expect(
-          _dangerousPatterns.length,
-          9,
+          _dangerousPatterns,
+          hasLength(9),
           reason:
               'Publish script scripts/modules/_audit_checks.py uses the same '
               '9 patterns. Update both if adding or removing a pattern.',

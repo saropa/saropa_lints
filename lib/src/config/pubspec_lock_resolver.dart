@@ -3,6 +3,7 @@
 /// Reads resolved package versions from [pubspec.lock] for rule-pack semver gates.
 library;
 
+import 'dart:developer' as developer;
 import 'dart:io' show File;
 
 import 'package:path/path.dart' as p;
@@ -76,6 +77,7 @@ Map<String, String>? readResolvedPackageVersions(String projectRoot) {
     }
     return null;
   }
+
   final mtime = file.lastModifiedSync().millisecondsSinceEpoch;
   if (_cachedRoot == projectRoot &&
       _cachedMtime == mtime &&
@@ -89,7 +91,16 @@ Map<String, String>? readResolvedPackageVersions(String projectRoot) {
     _cachedMtime = mtime;
     _cachedVersions = map;
     return map;
-  } catch (_) {
+  } on Object catch (e, st) {
+    // Fix: avoid_swallowing_exceptions — parse failures are non-fatal (caller
+    // falls back to pubspec.yaml version ranges), but log so silent failures
+    // are observable during development.
+    developer.log(
+      'resolveLockedVersions: read/parse pubspec.lock failed',
+      name: 'saropa_lints',
+      error: e,
+      stackTrace: st,
+    );
     return null;
   }
 }

@@ -15,6 +15,7 @@ import 'dart:isolate';
 import 'dart:typed_data';
 
 import 'package:path/path.dart' as p;
+import 'package:saropa_lints/src/string_slice_utils.dart';
 
 part 'project_context_path_bloom_git.dart';
 part 'project_context_project_file.dart';

@@ -5,6 +5,7 @@ import 'package:saropa_lints/saropa_lints.dart'
     show RuleTier, SaropaLintRule, allSaropaRules;
 // ignore: implementation_imports
 import 'package:saropa_lints/src/tiers.dart' as tiers;
+import 'package:saropa_lints/src/string_slice_utils.dart';
 
 // ---------------------------------------------------------------------------
 // Tier utilities
@@ -152,7 +153,7 @@ String getStylisticDescription(String ruleName) {
 /// Remove rule name prefix if present (e.g., "`[rule_name]` ...").
 String stripRulePrefix(String msg) {
   final prefixMatch = RegExp(r'^\[[\w_]+\]\s*').firstMatch(msg);
-  if (prefixMatch != null) return msg.substring(prefixMatch.end);
+  if (prefixMatch != null) return msg.afterIndex(prefixMatch.end);
   return msg;
 }
 

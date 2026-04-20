@@ -144,6 +144,10 @@ class LogWriter {
         '$e${InitColors.reset}',
       );
     }
+    // Object fallback (avoid_catch_exception_alone).
+    on Object catch (e, st) {
+      dev.log('Could not write log file (Error)', error: e, stackTrace: st);
+    }
   }
 }
 
@@ -189,7 +193,7 @@ void migrateOldReports() {
       '${InitColors.dim}Migrated $n old report${n == 1 ? '' : 's'}'
       ' to date subfolders${InitColors.reset}',
     );
-  } catch (e) {
+  } on Object catch (e) {
     // ignore: avoid_print
     print(
       '${InitColors.yellow}Warning: Could not migrate old reports: '
@@ -230,7 +234,7 @@ Future<String?> findNewestPluginReport(
         final name = reports.first.path.split('/').last.split('\\').last;
         return 'reports/$dateFolderName/$name';
       }
-    } catch (e, st) {
+    } on Object catch (e, st) {
       dev.log(
         'Non-critical: listing report files failed',
         error: e,

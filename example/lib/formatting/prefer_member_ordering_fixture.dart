@@ -109,6 +109,7 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // expect_lint: prefer_member_ordering
 class _BadClass389 {
   void method() {}
+
   final int field = 0; // Field declared after method
 }
 

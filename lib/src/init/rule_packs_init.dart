@@ -27,15 +27,19 @@ void printRulePacksInitSummary({required String targetDir}) {
     log.terminal(
       '${InitColors.dim}No pubspec.yaml — skipping rule pack list.${InitColors.reset}',
     );
+
     return;
   }
   String pubspecContent;
   try {
     pubspecContent = pubspecFile.readAsStringSync();
-  } catch (_) {
+  } on Object catch (e) {
+    // Fix: avoid_swallowing_exceptions — surface the error message in the
+    // terminal log alongside the skip notice so users can diagnose IO issues.
     log.terminal(
-      '${InitColors.yellow}Could not read pubspec.yaml — skipping rule pack list.${InitColors.reset}',
+      '${InitColors.yellow}Could not read pubspec.yaml ($e) — skipping rule pack list.${InitColors.reset}',
     );
+
     return;
   }
 

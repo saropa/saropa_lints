@@ -124,6 +124,7 @@ void _good275() {
   if (y) {}
 
   if (z) {}
+
   final a = true;
   final b = false;
 }
