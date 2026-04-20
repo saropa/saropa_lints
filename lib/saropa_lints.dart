@@ -103,6 +103,7 @@ export 'package:saropa_lints/src/project_context.dart'
 export 'package:saropa_lints/src/native/config_loader.dart'
     show
         loadNativePluginConfig,
+        loadNativePluginConfigFromProjectRoot,
         loadOutputConfigFromProjectRoot,
         loadRulePacksConfigFromProjectRoot;
 
@@ -3048,13 +3049,21 @@ List<SaropaLintRule> getRulesFromRegistry(Set<String> ruleNames) {
 ///
 /// ## Semantics
 ///
-/// - If [SaropaLintRule.enabledRules] is null or empty, returns immediately
-///   (no rules registered).
-/// - Builds instances only for known rule names via [getRulesFromRegistry];
-///   unknown names in the enabled set are ignored (no throw).
-/// - Skips a rule when [SaropaLintRule.isDisabled] is true, including when the
-///   user disabled it via a [SaropaLintRule.configAliases] entry in YAML (same
-///   behavior as tier/diagnostic resolution elsewhere).
+/// - Registers **every** rule from [_ruleFactories] unconditionally. The
+///   per-rule enable gate happens at visitor-entry time in
+///   [SaropaContext._wrapCallback], NOT here. This is required because the
+///   `analysis_server_plugin` API calls `Plugin.register` synchronously in
+///   the `PluginServer` constructor — before `start()`, before any
+///   communication channel, before any context-root information. At
+///   registration time the plugin cannot know the consumer's project root,
+///   so it cannot know which rules are enabled. The previous design read
+///   [SaropaLintRule.enabledRules] here and early-returned when it was
+///   null/empty, which silently killed every rule for every consumer whose
+///   `Directory.current` at plugin-start time was not the project root —
+///   e.g. every VS Code user whose workspace was opened via the file picker
+///   rather than `code .` from the project folder.
+/// - Skips a rule when [SaropaLintRule.isDisabled] is true (honors
+///   [SaropaLintRule.configAliases]).
 /// - Skips rules whose [LintCode] resolves to an empty [LintCode.lowerCaseName].
 /// - Registers each remaining rule and its [SaropaLintRule.fixGenerators] on
 ///   [registry]. Failures are logged and swallowed so a bad rule cannot crash
@@ -3071,10 +3080,13 @@ List<SaropaLintRule> getRulesFromRegistry(Set<String> ruleNames) {
 /// `doc/guides/composite_analyzer_plugin.md`.
 void registerSaropaLintRules(PluginRegistry registry) {
   try {
-    final enabled = SaropaLintRule.enabledRules;
-    if (enabled == null || enabled.isEmpty) return;
-
-    final rules = getRulesFromRegistry(enabled);
+    // Instantiate every factory. ~2100 lightweight rule instances is
+    // acceptable — the alternative (conditionally instantiating only an
+    // "enabled" subset at register time) is structurally broken because
+    // the plugin cannot know the project root when `register()` is called
+    // (see doc comment above). Per-visitor early-return on non-enabled
+    // rules happens in `SaropaContext._wrapCallback` at ~O(1) per visit.
+    final rules = _ruleFactories.values.map((f) => f()).toList(growable: false);
     if (rules.isEmpty) return;
 
     for (final rule in rules) {

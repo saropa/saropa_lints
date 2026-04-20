@@ -34,12 +34,50 @@ import '../saropa_lint_rule.dart' show ProgressTracker, SaropaLintRule;
 /// then baseline, banned usage, and output (max_issues, file-only).
 /// Safe to call multiple times — static fields are simply overwritten.
 /// Never throws; failures in any step are caught and the rest still run.
+///
+/// Uses [Directory.current] to locate config files. This works for CLI
+/// invocations where cwd == project root, but fails silently for the
+/// analyzer-launched plugin where cwd is the analysis-server process's
+/// working directory (often the user's home or wherever the IDE was
+/// launched from). For that path, see [loadNativePluginConfigFromProjectRoot],
+/// triggered lazily by [SaropaContext._wrapCallback] once the real project
+/// root can be derived from an analyzed file path.
 void loadNativePluginConfig() {
+  _loadFromRoot(null);
+}
+
+/// Reloads all plugin configuration using a known [projectRoot] instead of
+/// [Directory.current]. Call when the analyzer supplies a file path from
+/// which the real project root can be derived (walk up to `pubspec.yaml`).
+///
+/// This is the fix for the analyzer-launched-plugin bug where the plugin's
+/// `start()` runs with cwd set to the analysis-server process's working
+/// directory, not the consumer project. Without a reload from the real
+/// project root, [SaropaLintRule.enabledRules] stays null and every rule
+/// is silently gated off at visitor-entry time.
+///
+/// Safe to call multiple times — static fields are simply overwritten.
+/// Never throws; failures in any step are caught and the rest still run.
+void loadNativePluginConfigFromProjectRoot(String projectRoot) {
+  if (projectRoot.isEmpty) return;
+  _loadFromRoot(projectRoot);
+}
+
+/// Shared implementation for config loading from an optional [projectRoot].
+/// When null, falls back to [Directory.current].
+void _loadFromRoot(String? projectRoot) {
   try {
-    final content = _readProjectFile('analysis_options_custom.yaml');
+    final content = _readProjectFile(
+      'analysis_options_custom.yaml',
+      projectRoot,
+    );
     _loadSeverityOverrides(content);
-    _loadDiagnosticsConfig();
-    _loadRulePacksConfig();
+    _loadDiagnosticsConfig(projectRoot);
+    if (projectRoot != null) {
+      loadRulePacksConfigFromProjectRoot(projectRoot);
+    } else {
+      _loadRulePacksConfig();
+    }
     _loadBaselineConfig(content);
     loadBannedUsageConfig(content);
     _loadOutputConfig(content);
@@ -179,17 +217,41 @@ void _loadSeverityOverrides(String? content) {
 /// [SaropaLintRule.disabledRules]. This merges with any severity-implied
 /// enables and severity-disabled rules from the custom config file.
 ///
-/// When no file or no diagnostics section is found, returns without
-/// modifying [enabledRules] — preserving any severity-implied enables.
-void _loadDiagnosticsConfig() {
-  final content = _readProjectFile('analysis_options.yaml');
-  if (content == null) return;
+/// When no file or no diagnostics section is found, logs a diagnostic via
+/// [developer.log] and returns without modifying [enabledRules] — preserving
+/// any severity-implied enables. The log surfaces the "plugin loaded but
+/// silent" failure mode so consumers can see why zero diagnostics flow.
+///
+/// [projectRoot] resolves `analysis_options.yaml` relative to the consumer's
+/// project when provided. When null, falls back to [Directory.current] —
+/// which fails silently in the analyzer-launched path (see
+/// [loadNativePluginConfigFromProjectRoot]).
+void _loadDiagnosticsConfig([String? projectRoot]) {
+  final content = _readProjectFile('analysis_options.yaml', projectRoot);
+  if (content == null) {
+    developer.log(
+      'analysis_options.yaml not found at '
+      '${projectRoot ?? Directory.current.path} — saropa_lints will not '
+      'enable any rules until config is reloaded from the project root.',
+      name: 'saropa_lints',
+    );
+    return;
+  }
 
   final sectionMatch = RegExp(
     r'^\s+diagnostics:\s*$',
     multiLine: true,
   ).firstMatch(content);
-  if (sectionMatch == null) return;
+  if (sectionMatch == null) {
+    developer.log(
+      'analysis_options.yaml found at '
+      '${projectRoot ?? Directory.current.path} but no '
+      '`plugins > saropa_lints > diagnostics:` block present. '
+      'Run `dart run saropa_lints:init` or use the extension to generate it.',
+      name: 'saropa_lints',
+    );
+    return;
+  }
 
   final enabled = SaropaLintRule.enabledRules ?? <String>{};
   final disabled = SaropaLintRule.disabledRules ?? <String>{};

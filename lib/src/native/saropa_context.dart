@@ -20,10 +20,12 @@ import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/source/line_info.dart';
 
-import '../project_context.dart' show FileTypeDetector;
+import '../project_context.dart' show FileTypeDetector, ProjectContext;
 import '../report/import_graph_tracker.dart' show ImportGraphTracker;
 import '../saropa_lint_rule.dart' show ProgressTracker, SaropaLintRule;
 import 'compat_visitor.dart';
+import 'config_loader.dart'
+    show loadNativePluginConfigFromProjectRoot;
 
 /// Wraps [RuleVisitorRegistry] to provide callback-based registration.
 ///
@@ -106,13 +108,54 @@ class SaropaContext {
   /// and other filtering properties. If the file should be skipped, the
   /// callback returns without invoking the original.
   ///
+  /// **Lazy config reload.** Before per-file filtering, the wrapper triggers
+  /// a one-shot reload of plugin configuration from the **real** project
+  /// root — derived from the analyzed file path by walking up to the nearest
+  /// `pubspec.yaml` via [ProjectContext.findProjectRoot]. This is the fix
+  /// for the analyzer-launched-plugin bug where `Plugin.start` runs with
+  /// `Directory.current` set to the analysis-server process's cwd (often
+  /// the user's home), so the initial `analysis_options.yaml` read silently
+  /// failed. The reload populates severity overrides, rule-pack codes,
+  /// baseline config, banned-usage rules, and output options from the
+  /// correct root.
+  ///
+  /// **Why no enabled-check here.** Rule enablement is already filtered by
+  /// the analyzer's native `Registry.ruleRegistry.enabled(diagnosticConfigs)`
+  /// — disabled rules never have `registerNodeProcessors` called and never
+  /// reach this wrapper. A second check here would be redundant.
+  ///
   /// If the rule is not a [SaropaLintRule], returns the callback unchanged.
   void Function(T) _wrapCallback<T extends AstNode>(void Function(T) callback) {
     if (_saropaRule == null) return callback;
     return (T node) {
+      _ensureConfigLoadedFromProjectRoot();
       if (_shouldSkipCurrentFile()) return;
       callback(node);
     };
+  }
+
+  /// True once a successful config reload from the real project root has
+  /// been attempted. Shared across all rules and all files — one reload per
+  /// analysis-server session is sufficient because the config targets
+  /// ([SaropaLintRule.enabledRules], severity overrides, rule packs,
+  /// baseline, banned-usage, output) are all static globals.
+  static bool _configReloadAttempted = false;
+
+  /// Lazily reloads plugin config from the real project root on the very
+  /// first visitor invocation that has a usable file path.
+  ///
+  /// Idempotent: subsequent calls return immediately. Never throws —
+  /// failures are logged via `developer.log` by the inner loader and the
+  /// plugin falls back to whatever config was loaded at `start()` time
+  /// (possibly nothing if `Directory.current` wasn't the project root).
+  void _ensureConfigLoadedFromProjectRoot() {
+    if (_configReloadAttempted) return;
+    final path = filePath;
+    if (path.isEmpty) return;
+    final projectRoot = ProjectContext.findProjectRoot(path);
+    if (projectRoot == null || projectRoot.isEmpty) return;
+    _configReloadAttempted = true;
+    loadNativePluginConfigFromProjectRoot(projectRoot);
   }
 
   /// Checks whether the current file should be skipped for this rule.

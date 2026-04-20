@@ -18,8 +18,10 @@ import {
   runRepairConfig,
   runSetTier,
   showOutputChannel,
+  getSharedOutputChannel,
   TIER_ORDER,
 } from './setup';
+import { verifyPluginLiveness, surfaceLivenessResult } from './pluginLiveness';
 import type { SaropaLintsApi } from './api';
 import { invalidateCodeLenses, registerCodeLensProvider } from './codeLensProvider';
 import { IssuesTreeProvider, parseViolationsGroupBy, registerIssueCommands, type IssueTreeNode } from './views/issuesTree';
@@ -607,6 +609,25 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         flushReport(root);
       }
 
+      // Plugin liveness probe: detect the "analyzer launched the plugin but
+      // zero diagnostics flow" failure mode. Before the fix for the
+      // `Directory.current` bug (config_loader reading config relative to
+      // the wrong cwd), this was the default experience for any consumer
+      // who opened VS Code via the file picker rather than `code .` from
+      // the project folder — the plugin registered no rules and silently
+      // produced no warnings. The probe reads violations.json (written by
+      // the plugin itself) and surfaces a specific, actionable warning if
+      // the plugin wrote no report, loaded zero rules, or analyzed zero
+      // files. Skipped silently when the plugin is alive.
+      if (root) {
+        const liveness = verifyPluginLiveness(root);
+        logReport(`- Liveness: ${liveness.status}`);
+        logReport(`- Enabled rules: ${liveness.enabledRuleCount}`);
+        logReport(`- Files analyzed: ${liveness.filesAnalyzed}`);
+        flushReport(root);
+        await surfaceLivenessResult(liveness, getSharedOutputChannel());
+      }
+
       await showFirstRunNotification(health, totalViolations);
     }),
     vscode.commands.registerCommand('saropaLints.disable', async () => {
@@ -615,6 +636,32 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       updateContext(false, false);
       refreshAll();
       updateAllStatusBars();
+    }),
+    // Standalone liveness check. Users hit this from the command palette when
+    // they suspect saropa_lints is silent (Problems pane empty even though
+    // the plugin is declared in analysis_options.yaml). The probe returns
+    // an explicit status — `alive`, `no-report`, `config-not-loaded`, or
+    // `no-files-analyzed` — and surfaces a warning with the recovery step
+    // when the plugin is mis-wired. When alive, the command shows a brief
+    // confirmation (because the user explicitly asked) with the enabled
+    // rule count, so they can see the plugin is doing its job.
+    vscode.commands.registerCommand('saropaLints.verifyPlugin', async () => {
+      const root = getProjectRoot();
+      if (!root) {
+        await vscode.window.showErrorMessage(
+          'Saropa Lints: no workspace folder is open. Open your Dart/Flutter project first.',
+        );
+        return;
+      }
+      const liveness = verifyPluginLiveness(root);
+      if (liveness.status === 'alive') {
+        await vscode.window.showInformationMessage(
+          `Saropa Lints is alive: ${liveness.enabledRuleCount} rules enabled, ` +
+          `${liveness.filesAnalyzed} files analyzed.`,
+        );
+        return;
+      }
+      await surfaceLivenessResult(liveness, getSharedOutputChannel());
     }),
     vscode.commands.registerCommand('saropaLints.runAnalysis', async () => {
       const ok = await runAnalysisCommand(context);

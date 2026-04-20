@@ -52,39 +52,69 @@ void main() {
   });
 
   group('registerSaropaLintRules', () {
-    test('no-op when enabledRules is null', () {
+    // Semantics changed (fatal-bug fix): registerSaropaLintRules now
+    // registers every known rule unconditionally. The per-rule enable
+    // gate has moved to SaropaContext._wrapCallback (visitor-entry time).
+    //
+    // Rationale: the `analysis_server_plugin` API calls `Plugin.register`
+    // synchronously in the `PluginServer` constructor, before `start()`,
+    // before the communication channel, before any context-root info.
+    // At register time the plugin cannot know the consumer's project root
+    // and therefore cannot know which rules are enabled. The previous
+    // design early-returned here when `enabledRules` was null/empty — which
+    // silently killed every rule for consumers whose `Directory.current` at
+    // plugin-start was not the project root (e.g. every VS Code user who
+    // opened their workspace via the file picker rather than `code .`
+    // from the project folder).
+
+    test('registers all known rules when enabledRules is null', () {
       SaropaLintRule.enabledRules = null;
-      final cap = _CaptureRegistry();
-      registerSaropaLintRules(cap);
-      expect(cap.lintRules, isEmpty);
-    });
-
-    test('no-op when enabledRules is empty', () {
-      SaropaLintRule.enabledRules = <String>{};
-      final cap = _CaptureRegistry();
-      registerSaropaLintRules(cap);
-      expect(cap.lintRules, isEmpty);
-    });
-
-    test('registers enabled rule and fixes', () {
-      const ruleName = 'avoid_debug_print';
-      SaropaLintRule.enabledRules = {ruleName};
       SaropaLintRule.disabledRules = null;
-      expect(getRulesFromRegistry(SaropaLintRule.enabledRules!), isNotEmpty);
       final cap = _CaptureRegistry();
       registerSaropaLintRules(cap);
-      expect(cap.lintRules, isNotEmpty);
-      expect(cap.lintRules.single.name, ruleName);
+      // Should register every rule the factory map knows about (~2100).
+      // Exact count varies as rules are added — assert "plenty" instead
+      // of a brittle absolute.
+      expect(
+        cap.lintRules.length,
+        greaterThan(500),
+        reason:
+            'All rules must register at Plugin.register time; the enable '
+            'gate moved to _wrapCallback. See bug: plugin silent for all '
+            'consumers whose cwd differed from project root.',
+      );
+    });
+
+    test('registers all known rules when enabledRules is empty', () {
+      SaropaLintRule.enabledRules = <String>{};
+      SaropaLintRule.disabledRules = null;
+      final cap = _CaptureRegistry();
+      registerSaropaLintRules(cap);
+      expect(cap.lintRules.length, greaterThan(500));
+    });
+
+    test('registers fixes for rules that declare them', () {
+      SaropaLintRule.enabledRules = null;
+      SaropaLintRule.disabledRules = null;
+      final cap = _CaptureRegistry();
+      registerSaropaLintRules(cap);
       expect(cap.fixes, isNotEmpty);
     });
 
     test('skips rule listed in disabledRules by canonical name', () {
       const ruleName = 'avoid_debug_print';
-      SaropaLintRule.enabledRules = {ruleName};
+      SaropaLintRule.enabledRules = null;
       SaropaLintRule.disabledRules = {ruleName};
       final cap = _CaptureRegistry();
       registerSaropaLintRules(cap);
-      expect(cap.lintRules, isEmpty);
+      final matching = cap.lintRules
+          .where((r) => r.name == ruleName)
+          .toList();
+      expect(
+        matching,
+        isEmpty,
+        reason: 'disabledRules must still suppress registration',
+      );
     });
 
     test(
@@ -92,7 +122,7 @@ void main() {
       () {
         const canonical = 'require_riverpod_lint';
         const alias = 'require_riverpod_lint_package';
-        SaropaLintRule.enabledRules = {canonical};
+        SaropaLintRule.enabledRules = null;
         SaropaLintRule.disabledRules = {alias};
         expect(
           getRulesFromRegistry({canonical}).single.isDisabled,
@@ -101,29 +131,35 @@ void main() {
         );
         final cap = _CaptureRegistry();
         registerSaropaLintRules(cap);
-        expect(cap.lintRules, isEmpty);
+        final matching = cap.lintRules
+            .where((r) => r.name == canonical)
+            .toList();
+        expect(matching, isEmpty);
       },
     );
 
-    test('unknown enabled names do not register or throw', () {
-      SaropaLintRule.enabledRules = {
-        'avoid_debug_print',
-        'nonexistent_rule_xyz_12345',
-      };
-      SaropaLintRule.disabledRules = null;
-      final cap = _CaptureRegistry();
-      registerSaropaLintRules(cap);
-      expect(cap.lintRules, hasLength(1));
-      expect(cap.lintRules.single.name, 'avoid_debug_print');
-    });
-
-    test('only unknown names yields no registrations (before state)', () {
-      SaropaLintRule.enabledRules = {'totally_unknown_lint_abc'};
-      SaropaLintRule.disabledRules = null;
-      final cap = _CaptureRegistry();
-      registerSaropaLintRules(cap);
-      expect(cap.lintRules, isEmpty);
-      expect(cap.fixes, isEmpty);
-    });
+    test(
+      'unknown names in enabledRules do not block registration of known rules',
+      () {
+        // enabledRules is now consulted at _wrapCallback time, not here.
+        // Unknown names in the set are simply never matched; they have no
+        // effect at register time.
+        SaropaLintRule.enabledRules = {
+          'avoid_debug_print',
+          'nonexistent_rule_xyz_12345',
+        };
+        SaropaLintRule.disabledRules = null;
+        final cap = _CaptureRegistry();
+        registerSaropaLintRules(cap);
+        expect(
+          cap.lintRules.any((r) => r.name == 'avoid_debug_print'),
+          isTrue,
+        );
+        expect(
+          cap.lintRules.any((r) => r.name == 'nonexistent_rule_xyz_12345'),
+          isFalse,
+        );
+      },
+    );
   });
 }
