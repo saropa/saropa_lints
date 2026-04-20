@@ -301,7 +301,10 @@ void loadRulePacksConfigFromProjectRoot(String projectRoot) {
 }
 
 void _reloadRulePacksFromRoot(String projectRoot) {
-  final enabled = SaropaLintRule.enabledRules ?? <String>{};
+  // Take a mutable copy: callers (e.g. ScanRunner with tier=...) may assign a
+  // `const Set<String>` from tiers.dart to SaropaLintRule.enabledRules, and
+  // removeAll/add below must succeed regardless of the source's mutability.
+  final enabled = <String>{...?SaropaLintRule.enabledRules};
   if (_packContributedCodes != null) {
     enabled.removeAll(_packContributedCodes!);
   }

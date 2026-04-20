@@ -33,6 +33,16 @@
 
 ---
 
+## [12.3.1]
+
+Hotfix on top of 12.3.0: the `scan` CLI (and any caller that invoked the plugin with a tier) crashed with `Unsupported operation: Cannot change an unmodifiable set` as soon as the second source file was visited, because tier rule-sets are `const` and the plugin's rule-pack reloader tried to mutate them in place. 12.3.0 was tagged but never actually published to pub.dev because this surfaced on the CI test step — republishing as 12.3.1 with the fix. — [log](https://github.com/saropa/saropa_lints/blob/v12.3.1/CHANGELOG.md)
+
+### Fixed
+
+- **Plugin crash on second analyzed file when enabled rules came from a tier (`essential`, `recommended`, …).** `ScanRunner._resolveRuleNames()` returns the exact `const Set<String>` literal from [tiers.dart](lib/src/tiers.dart) (e.g. `essentialRules`) and assigns it directly to the static `SaropaLintRule.enabledRules`. Later, on every analyzed file, `ProgressTracker.recordFile` calls `loadRulePacksConfigFromProjectRoot`, which calls `_reloadRulePacksFromRoot` — that function read `SaropaLintRule.enabledRules` back as `enabled` and then called `enabled.removeAll(_packContributedCodes!)` (and `enabled.add(code)` via `mergeRulePacksIntoEnabled`). Both mutations throw `Unsupported operation: Cannot change an unmodifiable set` against a `const` set. The crash was order-dependent: the first call through the function took the early-return `content == null` branch and only set `_packContributedCodes = {}`, so the failure only materialized on the *second* call into `_reloadRulePacksFromRoot` (when `_packContributedCodes` was non-null and `removeAll` actually got executed). That's why the bug slipped through local testing — `dart test` happens to schedule the `scan_runner_test.dart` cases in an order that either avoids the second call or avoids a project root with a rule-packs block; CI's parallel test runner hit the failing ordering and blew up with `##[error]8507 tests passed, 1 failed.` on `test/scan_runner_test.dart: ScanRunner run with tier returns non-null list`, which aborted the publish workflow before the `pub publish` step ran. Fix: `_reloadRulePacksFromRoot` now takes a mutable copy (`final enabled = <String>{...?SaropaLintRule.enabledRules};`) at function entry, so `removeAll` / `add` always succeed regardless of whether the source set is a `const` tier literal, a `Set.union(...)` composite, or a previously-assigned mutable set. The fix is defensive at the mutation site rather than the single known producer (`ScanRunner`), so any future caller that assigns an unmodifiable set to `enabledRules` stays safe. ([config_loader.dart](lib/src/native/config_loader.dart))
+
+---
+
 ## [12.3.0]
 
 Windows users get their vibrancy reports back (CLI spawn + transitive footprint fixes), the plugin now logs to `reports/.saropa_lints/plugin.log` so silent failures are visible, and the report toolbar gains Rescan, Open Project, and Copy All JSON buttons — plus a new `prefer_listenable_builder` rule. — [log](https://github.com/saropa/saropa_lints/blob/v2.3.0/CHANGELOG.md)
