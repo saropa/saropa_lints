@@ -755,6 +755,7 @@ const Set<String> recommendedOnlyRules = <String>{
   'prefer_correct_package_name', // library/package naming - tooling/build
   'require_macos_notarization_ready', // macOS distribution reminder (INFO)
   'avoid_animation_rebuild_waste', // animation performance
+  'prefer_listenable_builder', // Flutter 3.13+ migration — semantic clarity
   'require_deep_link_fallback', // deep link error handling
   'require_stepper_validation', // stepper form validation
   'require_immutable_bloc_state', // state immutability best practice

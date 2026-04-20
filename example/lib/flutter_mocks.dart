@@ -479,13 +479,27 @@ class SimpleDialog extends Widget {
 // Animation
 // ============================================================================
 
-class AnimationController {
-  AnimationController({required dynamic vsync, Duration? duration});
-  void dispose() {}
-  double get value => 0.0;
+/// Mock of `package:flutter/foundation.dart`'s [Listenable] — the common
+/// supertype of [ValueNotifier], [ChangeNotifier], and [Animation].
+/// Needed for rules that distinguish `Listenable` from `Animation` via
+/// static type checks (e.g. `prefer_listenable_builder`).
+abstract class Listenable {
+  void addListener(void Function() listener) {}
+  void removeListener(void Function() listener) {}
 }
 
-abstract class Animation<T> {
+class AnimationController implements Animation<double> {
+  AnimationController({required dynamic vsync, Duration? duration});
+  void dispose() {}
+  @override
+  double get value => 0.0;
+  @override
+  void addListener(void Function() listener) {}
+  @override
+  void removeListener(void Function() listener) {}
+}
+
+abstract class Animation<T> implements Listenable {
   T get value;
 }
 
@@ -495,12 +509,20 @@ class CurvedAnimation implements Animation<double> {
   void dispose() {}
   @override
   double get value => 0.0;
+  @override
+  void addListener(void Function() listener) {}
+  @override
+  void removeListener(void Function() listener) {}
 }
 
 /// Parent animation placeholder for [ImplicitlyAnimatedWidgetState] mocks.
 class _ImplicitAnimationParent implements Animation<double> {
   @override
   double get value => 0.0;
+  @override
+  void addListener(void Function() listener) {}
+  @override
+  void removeListener(void Function() listener) {}
 }
 
 /// Minimal mock of Flutter’s [ImplicitlyAnimatedWidget] / state (implicit_animations.dart).
@@ -996,13 +1018,21 @@ class TextEditingValue {
 // ValueNotifier
 // ============================================================================
 
-class ValueNotifier<T> {
+class ValueNotifier<T> implements Listenable {
   ValueNotifier(T value);
   void dispose() {}
+  @override
+  void addListener(void Function() listener) {}
+  @override
+  void removeListener(void Function() listener) {}
 }
 
-class ChangeNotifier {
+class ChangeNotifier implements Listenable {
   void dispose() {}
+  @override
+  void addListener(void Function() listener) {}
+  @override
+  void removeListener(void Function() listener) {}
 }
 
 // ============================================================================
@@ -1998,7 +2028,19 @@ class AnimatedWidget extends Widget {
 class AnimatedBuilder extends Widget {
   const AnimatedBuilder({
     super.key,
-    required dynamic animation,
+    required Listenable animation,
+    required dynamic builder,
+    Widget? child,
+  });
+}
+
+/// Mock of [ListenableBuilder] (Flutter 3.13+). Shares parameter surface
+/// with [AnimatedBuilder]; used by the `prefer_listenable_builder` migration
+/// fixture.
+class ListenableBuilder extends Widget {
+  const ListenableBuilder({
+    super.key,
+    required Listenable animation,
     required dynamic builder,
     Widget? child,
   });

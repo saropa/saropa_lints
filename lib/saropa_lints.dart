@@ -1648,6 +1648,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidOverlappingAnimationsRule.new,
   AvoidAnimationRebuildWasteRule.new,
   PreferPhysicsSimulationRule.new,
+  PreferListenableBuilderRule.new,
 
   // Platform-specific rules (roadmap_up_next)
   AvoidPlatformChannelOnWebRule.new,

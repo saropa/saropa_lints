@@ -11,6 +11,7 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 
+import '../../fixes/animation/prefer_listenable_builder_fix.dart';
 import '../../fixes/animation/remove_redundant_implicit_animation_dispose_fix.dart';
 import '../../implicit_animation_dispose_cast_ast.dart';
 import '../../saropa_lint_rule.dart';
@@ -2252,6 +2253,159 @@ class AvoidImplicitAnimationDisposeCastRule extends SaropaLintRule {
       reporter.atNode(node);
     });
   }
+}
+
+/// Warns when `AnimatedBuilder` is given a plain `Listenable` (not an
+/// `Animation`) and recommends `ListenableBuilder` instead.
+///
+/// `ListenableBuilder` was added in Flutter 3.13.0 as the semantically
+/// precise widget for "rebuild on any `Listenable` change". `AnimatedBuilder`
+/// should continue to be used when the source is an `Animation` or
+/// `AnimationController` — it is idiomatic there.
+///
+/// The rule only fires when the analyzer can resolve the `animation:`
+/// argument's static type and that type implements `Listenable` but is not
+/// a subtype of `Animation`. Unresolved / `dynamic` types are skipped to
+/// avoid false positives.
+///
+/// Since: v12.2.2 | Rule version: v1
+///
+/// **BAD:**
+/// ```dart
+/// final counter = ValueNotifier<int>(0);
+/// return AnimatedBuilder(
+///   animation: counter,
+///   builder: (context, _) => Text('${counter.value}'),
+/// );
+/// ```
+///
+/// **GOOD:** (ValueNotifier is a Listenable, not an Animation)
+/// ```dart
+/// return ListenableBuilder(
+///   animation: counter,
+///   builder: (context, _) => Text('${counter.value}'),
+/// );
+/// ```
+///
+/// **GOOD:** (AnimationController is an Animation — keep AnimatedBuilder)
+/// ```dart
+/// return AnimatedBuilder(
+///   animation: _controller,
+///   builder: (context, _) => Transform.rotate(angle: _controller.value, child: ...),
+/// );
+/// ```
+class PreferListenableBuilderRule extends SaropaLintRule {
+  PreferListenableBuilderRule() : super(code: _code);
+
+  /// Code smell / migration hint — not a correctness bug, so low impact.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'ui', 'animation', 'migration'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  /// Early-exit gate — files that never mention AnimatedBuilder are skipped
+  /// before AST callbacks run.
+  @override
+  Set<String>? get requiredPatterns => {'AnimatedBuilder'};
+
+  static const LintCode _code = LintCode(
+    'prefer_listenable_builder',
+    '[prefer_listenable_builder] AnimatedBuilder is being passed a plain '
+        'Listenable (ValueNotifier, ChangeNotifier, or a custom Listenable) '
+        'rather than an Animation. Flutter 3.13+ introduced ListenableBuilder '
+        'as the semantically precise widget for this case — using '
+        'AnimatedBuilder here obscures intent because the name implies an '
+        'Animation source that is not actually present. Prefer '
+        'ListenableBuilder when the source is not an Animation; keep '
+        'AnimatedBuilder for AnimationController, CurvedAnimation, '
+        'Tween.animate(...) results, and other Animation subtypes. {v1}',
+    correctionMessage:
+        'Rename the constructor from AnimatedBuilder to ListenableBuilder. '
+        'The two widgets share the same named parameters (animation, '
+        'builder, child), so no argument changes are required. Requires '
+        'Flutter 3.13.0 or later.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        PreferListenableBuilderFix(context: context),
+  ];
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      // Filter to AnimatedBuilder instance creations by source token; cheap
+      // comparison that avoids resolving the constructor element when it
+      // isn't relevant.
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'AnimatedBuilder') return;
+
+      // Locate the `animation:` named argument. If it's absent (constructor
+      // mis-use), nothing to report — the Dart analyzer will already flag it.
+      Expression? animationArg;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'animation') {
+          animationArg = arg.expression;
+          break;
+        }
+      }
+      if (animationArg == null) return;
+
+      // Need a resolved interface type to make the Animation-vs-Listenable
+      // decision reliably. Unresolved / dynamic types are skipped to avoid
+      // firing on half-typed code.
+      final DartType? argType = animationArg.staticType;
+      if (argType is! InterfaceType) return;
+
+      // Animation check must run first — a custom class that extends both
+      // Animation and a plain Listenable should be treated as an Animation
+      // (AnimatedBuilder is the correct widget for it).
+      if (_isAnimationType(argType)) return;
+
+      // Only flag when the argument really is a Listenable — otherwise the
+      // user will just get a compile error after the fix is applied.
+      if (!_isListenableType(argType)) return;
+
+      reporter.atNode(node.constructorName);
+    });
+  }
+}
+
+/// Returns `true` when [type] is `Animation<T>` or any subtype of it
+/// (`AnimationController`, `CurvedAnimation`, `ReverseAnimation`, the result
+/// of `Tween.animate(...)`, etc.).
+bool _isAnimationType(InterfaceType type) {
+  if (type.element.name == 'Animation') return true;
+  for (final InterfaceType sup in type.allSupertypes) {
+    if (sup.element.name == 'Animation') return true;
+  }
+  return false;
+}
+
+/// Returns `true` when [type] implements `Listenable` either directly
+/// (`type.element.name == 'Listenable'`) or through its supertype chain
+/// (`ValueNotifier`, `ChangeNotifier`, custom `Listenable` implementations).
+bool _isListenableType(InterfaceType type) {
+  if (type.element.name == 'Listenable') return true;
+  for (final InterfaceType sup in type.allSupertypes) {
+    if (sup.element.name == 'Listenable') return true;
+  }
+  return false;
 }
 
 bool _isCurvedAnimationNamedType(TypeAnnotation typeAnnotation) {
