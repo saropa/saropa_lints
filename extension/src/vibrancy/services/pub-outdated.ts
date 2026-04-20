@@ -5,6 +5,8 @@ import { runDartPubOutdated } from './flutter-cli';
 export interface PubOutdatedResult {
     readonly entries: readonly PubOutdatedEntry[];
     readonly success: boolean;
+    /** Concrete failure reason propagated from the child process. */
+    readonly errorMessage?: string;
 }
 
 /** Run `dart pub outdated --json` and parse the output. */
@@ -13,7 +15,10 @@ export async function fetchPubOutdated(
 ): Promise<PubOutdatedResult> {
     const result = await runDartPubOutdated(cwd);
     if (!result.success) {
-        return { entries: [], success: false };
+        return {
+            entries: [], success: false,
+            errorMessage: result.errorMessage,
+        };
     }
     const entries = parsePubOutdatedJson(result.output);
     return { entries, success: true };

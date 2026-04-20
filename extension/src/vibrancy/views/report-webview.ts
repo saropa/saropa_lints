@@ -93,6 +93,23 @@ export class VibrancyReportPanel {
                 triggerSearch: true,
             });
         }
+
+        else if (msg.type === 'openOtherProject') {
+            /* Pops the file picker in the host and (on selection) opens
+               the chosen pubspec.yaml's folder in a new VS Code window. */
+            await vscode.commands.executeCommand(
+                'saropaLints.packageVibrancy.openOtherProject',
+            );
+        }
+
+        else if (msg.type === 'rescan') {
+            /* Run the scan, then reopen the report so the panel refreshes
+               with the fresh results. showReport calls createOrShow which
+               detects the existing panel and rebuilds its HTML via
+               _updateContent, so the rescan button resets naturally. */
+            await vscode.commands.executeCommand('saropaLints.packageVibrancy.scan');
+            await vscode.commands.executeCommand('saropaLints.packageVibrancy.showReport');
+        }
     }
 
     private _dispose(): void {

@@ -21,7 +21,21 @@ export async function enrichWithBlockers(
         fetchDepGraph(cwd),
     ]);
     if (!outdatedResult.success || !depGraphResult.success) {
-        logger.info('Blocker analysis skipped — CLI commands failed');
+        // Surface the actual stderr so the "silent no-transitives"
+        // failure mode (no Transitives column, Footprint toggle has
+        // nothing to vary) is self-diagnosing from the log. Typical
+        // causes: `dart` not on PATH, `.dart_tool/` missing because
+        // `pub get` never ran, or permissions/sandbox issues.
+        const reasons: string[] = [];
+        if (!outdatedResult.success) {
+            reasons.push(`pub outdated: ${outdatedResult.errorMessage ?? 'unknown error'}`);
+        }
+        if (!depGraphResult.success) {
+            reasons.push(`pub deps: ${depGraphResult.errorMessage ?? 'unknown error'}`);
+        }
+        logger.error(
+            `Blocker analysis skipped — CLI commands failed — ${reasons.join(' | ')}`,
+        );
         return { results, reverseDeps: new Map() };
     }
 

@@ -664,6 +664,10 @@ function registerCommands(
             () => planAndExecuteUpgrades(),
         ),
         vscode.commands.registerCommand(
+            'saropaLints.packageVibrancy.openOtherProject',
+            () => openOtherProject(),
+        ),
+        vscode.commands.registerCommand(
             'saropaLints.packageVibrancy.goToOverride',
             (packageName: string) => goToOverride(packageName),
         ),
@@ -998,12 +1002,46 @@ async function runScanInner(
                 const transitiveInfos = countTransitives(directDeps, depGraph.packages);
                 const sharedDeps = findSharedDeps(directDeps, depGraph.packages);
                 // Build name -> archive size lookup so the analyzer can compute
-                // unique/shared transitive footprint per direct dep. Sourced
-                // from the already-resolved per-package results (pub.dev sizes).
+                // unique/shared transitive footprint per direct dep. We need
+                // sizes for BOTH direct deps (already resolved) AND all their
+                // transitives (not resolved by the main scan, since only
+                // direct deps get full vibrancy analysis). Without transitive
+                // sizes, uniqueTransitiveSizeBytes / sharedTransitiveSizeBytes
+                // all resolve to null → the Footprint toggle silently shows
+                // identical values across Own / +Unique / +All.
                 const sizeLookup = new Map<string, number>();
                 for (const r of results) {
                     if (typeof r.archiveSizeBytes === 'number' && r.archiveSizeBytes > 0) {
                         sizeLookup.set(r.package.name, r.archiveSizeBytes);
+                    }
+                }
+                // Collect every transitive name across all direct deps,
+                // deduplicated and excluding those we already have sizes
+                // for. These are hosted pub packages we haven't queried yet.
+                const transitiveNames = new Set<string>();
+                for (const info of transitiveInfos) {
+                    for (const t of info.transitives) {
+                        if (!sizeLookup.has(t)) { transitiveNames.add(t); }
+                    }
+                }
+                if (transitiveNames.size > 0) {
+                    progress.report({
+                        message: `Fetching ${transitiveNames.size} transitive sizes...`,
+                    });
+                    // Cached per package in fetchArchiveSize, so subsequent
+                    // scans pay zero API cost. First scan in a project
+                    // triggers N parallel HEAD requests; pub.dev tolerates
+                    // this and the cache eliminates the repeat cost.
+                    const sizeFetches = await Promise.all(
+                        [...transitiveNames].map(async name => ({
+                            name,
+                            size: await fetchArchiveSize(name, targets.cache, logger),
+                        })),
+                    );
+                    for (const { name, size } of sizeFetches) {
+                        if (typeof size === 'number' && size > 0) {
+                            sizeLookup.set(name, size);
+                        }
                     }
                 }
                 const enrichedInfos = enrichTransitiveInfo(
@@ -1290,6 +1328,49 @@ async function requireResults<T>(
     if (result) {
         vscode.window.showInformationMessage(successMsg(result));
     }
+}
+
+/**
+ * Open another Flutter/Dart project for vibrancy diagnosis.
+ *
+ * Prompts the user to pick any pubspec.yaml on disk, then opens that
+ * file's parent directory in a new VS Code window. The new window's
+ * own extension host takes over from there — the user runs the scan
+ * normally in the new window, and our scan logic picks up the
+ * project-local pubspec.lock, .dart_tool, and source tree without any
+ * path rewiring in the current workspace.
+ *
+ * Primary use case: diagnosing why a given project's transitive info
+ * or dep graph isn't populating, without having to close the current
+ * workspace.
+ */
+async function openOtherProject(): Promise<void> {
+    const picked = await vscode.window.showOpenDialog({
+        canSelectFiles: true,
+        canSelectFolders: false,
+        canSelectMany: false,
+        openLabel: 'Open project for Vibrancy scan',
+        title: 'Select a pubspec.yaml to open its project in a new window',
+        filters: { 'Pubspec': ['yaml'] },
+    });
+    if (!picked || picked.length === 0) { return; }
+
+    const pubspecUri = picked[0];
+    // Reject anything that isn't actually a pubspec.yaml. The file-picker
+    // filter is advisory on some platforms, so guard explicitly.
+    if (!pubspecUri.fsPath.toLowerCase().endsWith('pubspec.yaml')) {
+        vscode.window.showErrorMessage(
+            'Selected file is not a pubspec.yaml.',
+        );
+        return;
+    }
+
+    const folderUri = vscode.Uri.joinPath(pubspecUri, '..');
+    // forceNewWindow keeps the current workspace intact so the user can
+    // flip between projects for comparison without losing context.
+    await vscode.commands.executeCommand(
+        'vscode.openFolder', folderUri, { forceNewWindow: true },
+    );
 }
 
 async function goToOverride(packageName: string): Promise<void> {

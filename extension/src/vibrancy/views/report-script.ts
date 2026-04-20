@@ -78,7 +78,10 @@ export function getReportScript(): string {
         function applyFilters() {
             var searchVal = '';
             var searchEl = document.getElementById('search-input');
-            if (searchEl) { searchVal = searchEl.value.toLowerCase(); }
+            /* Trim pasted whitespace (leading/trailing spaces, newlines, tabs)
+               so copy-paste from package lists or terminal output still
+               matches — users rarely intend to search for a literal space. */
+            if (searchEl) { searchVal = searchEl.value.trim().toLowerCase(); }
             var rows = document.querySelectorAll('#pkg-body tr.pkg-row');
             rows.forEach(function(row) {
                 var show = matchesAllFilters(row, searchVal);
@@ -236,8 +239,32 @@ export function getReportScript(): string {
         /* ---- Search box ---- */
 
         var searchInput = document.getElementById('search-input');
+        var searchClear = document.getElementById('search-clear');
+        /* Toggle the inline clear (X) button's visibility based on whether
+           the trimmed input has any content. Called on every keystroke and
+           after the button clears the field. */
+        function updateSearchClearVisibility() {
+            if (!searchClear || !searchInput) { return; }
+            var hasText = searchInput.value.trim().length > 0;
+            searchClear.hidden = !hasText;
+        }
         if (searchInput) {
-            searchInput.addEventListener('keyup', function() { applyFilters(); });
+            searchInput.addEventListener('keyup', function() {
+                applyFilters();
+                updateSearchClearVisibility();
+            });
+            /* 'input' catches paste/cut/IME commits that 'keyup' misses —
+               without it, pasting text wouldn't reveal the clear button
+               until the user pressed another key. */
+            searchInput.addEventListener('input', updateSearchClearVisibility);
+        }
+        if (searchClear && searchInput) {
+            searchClear.addEventListener('click', function() {
+                searchInput.value = '';
+                applyFilters();
+                updateSearchClearVisibility();
+                searchInput.focus();
+            });
         }
 
         /* ---- Copy row as JSON ---- */
@@ -293,6 +320,40 @@ export function getReportScript(): string {
         if (pubspecBtn) {
             pubspecBtn.addEventListener('click', function() {
                 vscode.postMessage({ type: 'openPubspec' });
+            });
+        }
+
+        /* ---- Open Another Project ---- */
+        /* File picker in the extension host; opens the selected
+           pubspec.yaml's folder in a new VS Code window. */
+        var openOtherBtn = document.getElementById('open-other');
+        if (openOtherBtn) {
+            openOtherBtn.addEventListener('click', function() {
+                vscode.postMessage({ type: 'openOtherProject' });
+            });
+        }
+
+        /* ---- Rescan ---- */
+        /* Sends a message to the extension host which runs the
+           saropaLints.packageVibrancy.scan command. Button is disabled
+           while the request is in flight to prevent duplicate scans. */
+        var rescanBtn = document.getElementById('rescan');
+        if (rescanBtn) {
+            var rescanOriginal = rescanBtn.innerHTML;
+            rescanBtn.addEventListener('click', function() {
+                if (rescanBtn.disabled) { return; }
+                rescanBtn.disabled = true;
+                rescanBtn.innerHTML = '\\u29D6 Scanning\\u2026';
+                vscode.postMessage({ type: 'rescan' });
+                /* Host will rebuild the webview HTML on completion, which
+                   replaces this handler. The timeout is a fallback in case
+                   the scan fails or is cancelled before HTML rebuild. */
+                setTimeout(function() {
+                    if (rescanBtn && rescanBtn.disabled) {
+                        rescanBtn.disabled = false;
+                        rescanBtn.innerHTML = rescanOriginal;
+                    }
+                }, 60000);
             });
         }
 
