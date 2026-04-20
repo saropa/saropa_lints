@@ -142,6 +142,11 @@ function buildToolbar(options: ReportOptions): string {
     const pubspecBtn = options.pubspecUri
         ? '<button id="open-pubspec" class="toolbar-btn" title="Open pubspec.yaml">&#128196; pubspec.yaml</button>'
         : '';
+    // Copies every package row as a JSON array, including all expander
+    // content (health factors, vulnerabilities, file references, full
+    // transitive dep list with shared flags, links). Same per-package
+    // shape as the per-row copy button, just aggregated.
+    const copyAllBtn = '<button id="copy-all" class="toolbar-btn" title="Copy entire table as JSON (all rows + expander details)">&#128203; Copy All JSON</button>';
     // Footprint-mode toggle controls what the Size column shows:
     //   own     = archive size of the package itself (default; matches old behavior)
     //   unique  = own + transitives used ONLY by this dep (cost saved if removed)
@@ -159,6 +164,7 @@ function buildToolbar(options: ReportOptions): string {
     return `<div class="table-toolbar">
         <input type="text" id="search-input" placeholder="Search packages\u2026" class="search-input" />
         ${footprintToggle}
+        ${copyAllBtn}
         ${pubspecBtn}
     </div>`;
 }
@@ -728,6 +734,7 @@ function buildPackageJson(
         isOverridden: overrideNames.has(name),
         health: {
             score: Math.round(r.score / 10),
+            grade: categoryToGrade(r.category),
             resolutionVelocity: Math.round(r.resolutionVelocity),
             engagementLevel: Math.round(r.engagementLevel),
             popularity: Math.round(r.popularity),
@@ -751,6 +758,11 @@ function buildPackageJson(
         transitives: r.transitiveInfo ? {
             count: r.transitiveInfo.transitiveCount,
             flagged: r.transitiveInfo.flaggedCount,
+            // Full dep list + shared markers mirrors the expander's
+            // "Transitive Dependencies" section so the JSON has
+            // everything the expander reveals visually.
+            deps: [...r.transitiveInfo.transitives],
+            sharedDeps: [...r.transitiveInfo.sharedDeps],
         } : null,
         vulnerabilities: r.vulnerabilities.map(v => ({
             id: v.id,

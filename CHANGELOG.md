@@ -35,6 +35,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- **Extension:** Vibrancy report toolbar now has a **Copy All JSON** button that copies every row's full record — including all expander content (health factors with letter grade, full vulnerability list, every file reference, the complete transitive dependency list with shared markers, and pub.dev/repo links) — as a JSON array to the clipboard. The per-row JSON was also enriched with `health.grade`, `transitives.deps`, and `transitives.sharedDeps` so the single-row copy button produces the same shape. ([report-html.ts](extension/src/vibrancy/views/report-html.ts), [report-script.ts](extension/src/vibrancy/views/report-script.ts))
+
 ### Fixed
 
 - **Extension:** Vibrancy report header gauge now actually fills to its target arc length. The static CSS rule `.gauge-fill { stroke-dasharray: 0 999 }` was overriding the inline SVG `stroke-dasharray` attribute (CSS rules trump SVG presentation attributes), so the gauge always rendered empty even when the project grade was B/C/D/E. The inline `--gauge-target` / `--gauge-arc` CSS variables set on the `<circle>` are now consumed by the rule, and the load-time fill animation moved to a `@keyframes` so the resting state actually paints. ([report-styles.ts](extension/src/vibrancy/views/report-styles.ts))
