@@ -35,6 +35,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- **Extension:** Vibrancy report header gauge now actually fills to its target arc length. The static CSS rule `.gauge-fill { stroke-dasharray: 0 999 }` was overriding the inline SVG `stroke-dasharray` attribute (CSS rules trump SVG presentation attributes), so the gauge always rendered empty even when the project grade was B/C/D/E. The inline `--gauge-target` / `--gauge-arc` CSS variables set on the `<circle>` are now consumed by the rule, and the load-time fill animation moved to a `@keyframes` so the resting state actually paints. ([report-styles.ts](extension/src/vibrancy/views/report-styles.ts))
+
 <details>
 <summary>Maintenance</summary>
 

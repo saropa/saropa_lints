@@ -27,10 +27,18 @@ export function getReportStyles(): string {
             flex-shrink: 0;
         }
         .gauge-svg { width: 72px; height: 72px; }
-        /* Animate the arc fill on load: start fully hidden, transition to target. */
+        /* Animate the arc fill on load: start at 0, fill to target.
+           The resting value uses inline CSS vars set on the <circle>
+           (--gauge-target = filled length, --gauge-arc = full arc).
+           Without referencing the vars here, the static rule would
+           override the SVG attribute and the gauge would always read 0. */
         .gauge-fill {
-            stroke-dasharray: 0 999;
-            transition: stroke-dasharray 1.2s ease-out;
+            stroke-dasharray: var(--gauge-target, 0) var(--gauge-arc, 999);
+            animation: gauge-fill-in 1.2s ease-out;
+        }
+        @keyframes gauge-fill-in {
+            from { stroke-dasharray: 0 var(--gauge-arc, 999); }
+            to   { stroke-dasharray: var(--gauge-target, 0) var(--gauge-arc, 999); }
         }
         .gauge-label {
             position: absolute; top: 50%; left: 50%;
