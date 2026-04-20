@@ -72,10 +72,117 @@ class ProjectContext {
     return getProjectInfo(filePath)?.hasDependency(packageName) ?? false;
   }
 
+  /// Returns `true` when the project containing [filePath] declares a
+  /// Flutter SDK constraint whose **lower bound** is ≥ `major.minor.patch`.
+  ///
+  /// **Defaults to `true` (assume modern)** when the constraint is missing
+  /// or unparseable — rules should emit migration hints by default and let
+  /// users silence false positives, rather than silently skip real
+  /// violations on projects with non-standard pubspec formats.
+  ///
+  /// Used by SDK-migration rules (e.g. `prefer_listenable_builder`, which
+  /// requires Flutter 3.13.0+) to suppress reports on projects that are
+  /// legitimately pinned below the feature's availability window.
+  static bool flutterSdkAtLeast(
+    String? filePath,
+    int major,
+    int minor,
+    int patch,
+  ) {
+    final info = getProjectInfo(filePath);
+    final current = info?.flutterSdkMinVersion;
+    if (current == null) return true; // unknown → assume modern
+    return current.isAtLeast(_FlutterSdkVersion(major, minor, patch));
+  }
+
   /// Clear the project cache (useful for testing).
   static void clearCache() {
     _projectCache.clear();
   }
+}
+
+/// Semver-like triple for Flutter SDK version comparisons.
+///
+/// Only major/minor/patch are compared; pre-release / build metadata
+/// (e.g. `3.13.0-0.0.pre`) is stripped during parsing because Flutter SDK
+/// gates are always expressed in terms of stable releases.
+class _FlutterSdkVersion {
+  const _FlutterSdkVersion(this.major, this.minor, this.patch);
+
+  final int major;
+  final int minor;
+  final int patch;
+
+  /// `true` when `this` ≥ [other] in standard semver lexicographic order
+  /// over (major, minor, patch).
+  bool isAtLeast(_FlutterSdkVersion other) {
+    if (major != other.major) return major > other.major;
+    if (minor != other.minor) return minor > other.minor;
+    return patch >= other.patch;
+  }
+
+  @override
+  String toString() => '$major.$minor.$patch';
+}
+
+/// Parses the lower bound of a `flutter:` version constraint from a
+/// pubspec `environment:` block. Returns `null` when the constraint is
+/// absent, `"any"`, or otherwise unparseable.
+///
+/// Recognized forms (the ones Flutter templates and pub.dev emit):
+/// - `"3.13.0"`            → 3.13.0 (exact)
+/// - `"^3.13.0"`           → 3.13.0 (caret: compatible range)
+/// - `">=3.13.0"`          → 3.13.0 (open upper bound)
+/// - `">=3.13.0 <4.0.0"`   → 3.13.0 (ranged)
+/// - `"3.13.0-0.0.pre"`    → 3.13.0 (pre-release suffix stripped)
+/// - `"any"`               → null (no minimum declared)
+_FlutterSdkVersion? _parseFlutterConstraint(String pubspecContent) {
+  // Match the `environment:` block and capture its indented children only.
+  // pubspec is flat YAML here — no nesting beyond one level — so the
+  // `^[ \t]+.*` continuation pattern is sufficient.
+  final envMatch = RegExp(
+    r'^environment:\s*\n((?:[ \t]+.*\n)+)',
+    multiLine: true,
+  ).firstMatch(pubspecContent);
+  if (envMatch == null) return null;
+  final envBlock = envMatch.group(1) ?? '';
+
+  // Extract the right-hand side of the `flutter:` key (optionally quoted).
+  final flutterMatch = RegExp(
+    '''^\\s+flutter:\\s*['"]?([^'"\\n]+?)['"]?\\s*\$''',
+    multiLine: true,
+  ).firstMatch(envBlock);
+  if (flutterMatch == null) return null;
+
+  final constraint = (flutterMatch.group(1) ?? '').trim();
+  if (constraint.isEmpty || constraint == 'any') return null;
+
+  return _parseFlutterLowerBound(constraint);
+}
+
+/// Extracts the `major.minor.patch` lower bound from a version constraint
+/// string. Returns `null` when the string does not contain a parseable
+/// triple.
+_FlutterSdkVersion? _parseFlutterLowerBound(String constraint) {
+  // Prefer an explicit `>= X.Y.Z` token when present; otherwise fall back
+  // to a caret or bare version. Any of these yield the same lower bound.
+  String lower = constraint;
+  final geMatch = RegExp(r'>=\s*(\d+\.\d+\.\d+[^\s]*)').firstMatch(constraint);
+  if (geMatch != null) {
+    lower = geMatch.group(1) ?? '';
+  } else if (constraint.startsWith('^')) {
+    lower = constraint.substring(1).trim();
+  }
+
+  final parts = lower.split('.');
+  if (parts.length < 3) return null;
+  final major = int.tryParse(parts[0]);
+  final minor = int.tryParse(parts[1]);
+  // Strip pre-release / build metadata from patch (e.g. "0-0.0.pre" → "0").
+  final patchStr = parts[2].split(RegExp(r'[-+]')).first;
+  final patch = int.tryParse(patchStr);
+  if (major == null || minor == null || patch == null) return null;
+  return _FlutterSdkVersion(major, minor, patch);
 }
 
 /// Cached information about a project.
@@ -84,6 +191,7 @@ class _ProjectInfo {
     required this.isFlutterProject,
     required this.dependencies,
     required this.packageName,
+    required this.flutterSdkMinVersion,
   });
 
   factory _ProjectInfo._fromProjectRoot(String projectRoot) {
@@ -93,6 +201,7 @@ class _ProjectInfo {
         isFlutterProject: false,
         dependencies: {},
         packageName: '',
+        flutterSdkMinVersion: null,
       );
     }
 
@@ -122,18 +231,21 @@ class _ProjectInfo {
         isFlutterProject: isFlutter,
         dependencies: deps,
         packageName: packageName,
+        flutterSdkMinVersion: _parseFlutterConstraint(content),
       );
     } on FormatException {
       return _ProjectInfo._(
         isFlutterProject: false,
         dependencies: {},
         packageName: '',
+        flutterSdkMinVersion: null,
       );
     } on IOException {
       return _ProjectInfo._(
         isFlutterProject: false,
         dependencies: {},
         packageName: '',
+        flutterSdkMinVersion: null,
       );
     }
   }
@@ -146,6 +258,11 @@ class _ProjectInfo {
 
   /// Set of dependency names in the project.
   final Set<String> dependencies;
+
+  /// Lower bound of the project's Flutter SDK constraint (from
+  /// `environment.flutter` in pubspec.yaml). `null` when missing, `"any"`,
+  /// or unparseable — callers should treat null as "assume modern".
+  final _FlutterSdkVersion? flutterSdkMinVersion;
 
   /// Check if the project has a specific dependency.
   bool hasDependency(String name) => dependencies.contains(name);

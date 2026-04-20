@@ -93,7 +93,7 @@ Write fixtures for each of the above in `example/lib/` before asserting the rule
 ## Implementation Checklist
 
 - [x] Verify the API change in Flutter SDK source (confirm `ListenableBuilder` constructor signature matches `AnimatedBuilder` for `animation`/`builder`/`child`).
-- [x] Determine minimum SDK version requirement (Flutter 3.13.0 for `ListenableBuilder` — noted in the rule's `correctionMessage`; no runtime gate since `ProjectContext` has no SDK-version detection today).
+- [x] Determine minimum SDK version requirement (Flutter 3.13.0) **and enforce it at runtime** via `ProjectContext.flutterSdkAtLeast(filePath, 3, 13, 0)`. Gate parses `environment.flutter` from `pubspec.yaml`, handling exact / caret / range / pre-release / `any` forms; defaults to `true` (assume modern) when unparseable so rules still fire on unusual pubspec formats. Reusable by future SDK-migration rules.
 - [x] Write detection logic (AST visitor) in [`lib/src/rules/ui/animation_rules.dart`](../lib/src/rules/ui/animation_rules.dart).
 - [x] Write quick-fix replacement (rename constructor) — [`lib/src/fixes/animation/prefer_listenable_builder_fix.dart`](../lib/src/fixes/animation/prefer_listenable_builder_fix.dart).
 - [x] Create test fixture in [`example/lib/animation/prefer_listenable_builder_fixture.dart`](../example/lib/animation/prefer_listenable_builder_fixture.dart) covering ValueNotifier / ChangeNotifier (BAD), AnimationController / CurvedAnimation / already-migrated `ListenableBuilder` (GOOD), and dynamic/unresolved (GOOD). Flutter mocks were extended with a `Listenable` interface so type resolution works downstream.
