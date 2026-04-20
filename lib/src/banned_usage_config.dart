@@ -12,6 +12,8 @@
 /// optional `reason: '...'` on the next line.
 library;
 
+import 'package:saropa_lints/src/string_slice_utils.dart';
+
 /// A single banned identifier entry.
 class BannedUsageEntry {
   const BannedUsageEntry({
@@ -53,14 +55,14 @@ void loadBannedUsageConfig(String? content) {
   ).firstMatch(content);
   if (sectionMatch == null) return;
 
-  final afterSection = content.substring(sectionMatch.end);
+  final afterSection = content.afterIndex(sectionMatch.end);
   final entriesMatch = RegExp(
     r'^\s+entries:\s*$',
     multiLine: true,
   ).firstMatch(afterSection);
   if (entriesMatch == null) return;
 
-  final lines = afterSection.substring(entriesMatch.end).split('\n');
+  final lines = afterSection.afterIndex(entriesMatch.end).split('\n');
   String? currentId;
   String? currentReason;
 

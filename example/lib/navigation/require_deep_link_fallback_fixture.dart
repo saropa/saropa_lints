@@ -121,11 +121,14 @@ void _good509_handleDeepLink(Uri uri) async {
   final productId = uri.pathSegments.length > 1 ? uri.pathSegments[1] : null;
   if (productId == null) {
     Navigator.pushReplacement(context, NotFoundPage());
+
     return;
   }
+
   final product = await productService.getProduct(productId);
   if (product == null) {
     Navigator.pushReplacement(context, NotFoundPage());
+
     return;
   }
   Navigator.push(context, ProductPage(product: product));

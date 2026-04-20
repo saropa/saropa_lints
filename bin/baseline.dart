@@ -22,6 +22,7 @@ import 'package:saropa_lints/src/violation_parser.dart';
 Future<void> main(List<String> args) async {
   if (args.contains('--help') || args.contains('-h')) {
     _printUsage();
+
     return;
   }
 
@@ -35,6 +36,7 @@ Future<void> main(List<String> args) async {
   if (outputIndex != -1 && outputIndex + 1 < args.length) {
     outputPath = args[outputIndex + 1];
   }
+
   final outputIndexShort = args.indexOf('-o');
   if (outputIndexShort != -1 && outputIndexShort + 1 < args.length) {
     outputPath = args[outputIndexShort + 1];
@@ -98,6 +100,7 @@ Future<void> main(List<String> args) async {
     print('No violations found!');
     print('');
     print('Your codebase is already clean - no baseline needed.');
+
     return;
   }
 
@@ -157,6 +160,7 @@ Future<void> main(List<String> args) async {
       ruleCounts[entry.key] = (ruleCounts[entry.key] ?? 0) + entry.value.length;
     }
   }
+
   final topRules = ruleCounts.entries.toList()
     ..sort((a, b) => b.value.compareTo(a.value));
 

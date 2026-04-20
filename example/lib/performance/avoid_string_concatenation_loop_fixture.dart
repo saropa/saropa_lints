@@ -125,5 +125,6 @@ void _good788() {
   for (final item in items) {
     buffer.write(item.name);
   }
+
   final result = buffer.toString();
 }

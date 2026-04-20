@@ -94,6 +94,7 @@ Future<int> _run(List<String> args) async {
   if (outputDirIdx >= 0 && outputDirIdx + 1 < rest.length) {
     outputDir = rest[outputDirIdx + 1];
   }
+
   final resolvedOutputDir = outputDir ?? 'reports';
 
   // Build import graph and run analysis (unused files, circular deps, stats).
@@ -105,9 +106,15 @@ Future<int> _run(List<String> args) async {
       projectPath: projectPath,
       excludeGlobs: excludes,
     );
-  } catch (e, st) {
-    print('Error: $e');
-    print(st);
+  } on Object catch (e, st) {
+    // Fix: avoid_print_error / avoid_stack_trace_in_production — structured
+    // CLI error output goes to stderr with a single diagnostic line. The
+    // stack trace is only printed when SAROPA_DEBUG is set so production
+    // runs do not leak implementation details.
+    stderr.writeln('Error: $e');
+    if (Platform.environment['SAROPA_DEBUG'] == '1') {
+      stderr.writeln(st);
+    }
     return 2;
   }
 
@@ -135,8 +142,7 @@ Future<int> _run(List<String> args) async {
     exportDotGraph(
       projectPath: projectPath,
       outputPath: dotPath,
-      includedPaths:
-          result.includedPaths.isEmpty ? null : result.includedPaths,
+      includedPaths: result.includedPaths.isEmpty ? null : result.includedPaths,
     );
     stderr.writeln('DOT graph written to $dotPath');
     stderr.writeln(
@@ -155,8 +161,8 @@ Future<int> _run(List<String> args) async {
     return 0;
   }
 
-  final hasIssues = result.unusedFiles.isNotEmpty ||
-      result.circularDependencies.isNotEmpty;
+  final hasIssues =
+      result.unusedFiles.isNotEmpty || result.circularDependencies.isNotEmpty;
   return hasIssues ? 1 : 0;
 }
 

@@ -24,6 +24,7 @@
 library;
 
 import 'dart:developer' as developer;
+import 'package:saropa_lints/src/string_slice_utils.dart';
 
 class BaselinePaths {
   BaselinePaths(List<String>? patterns)
@@ -78,12 +79,12 @@ class BaselinePaths {
 
     // Remove leading ./ if present
     if (normalized.startsWith('./')) {
-      normalized = normalized.substring(2);
+      normalized = normalized.afterIndex(2);
     }
 
     // Remove leading / if present (for absolute paths)
     if (normalized.startsWith('/')) {
-      normalized = normalized.substring(1);
+      normalized = normalized.afterIndex(1);
     }
 
     return normalized;
@@ -124,7 +125,7 @@ class _CompiledPattern {
     // Remove trailing slash but remember it was a directory pattern
     final isDirectoryPattern = glob.endsWith('/');
     if (isDirectoryPattern) {
-      glob = glob.substring(0, glob.length - 1);
+      glob = glob.prefix(glob.length - 1);
     }
 
     // Escape regex special characters (except * and ?)

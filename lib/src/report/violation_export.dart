@@ -11,6 +11,7 @@ import 'package:saropa_lints/src/report/health_score_constants.dart';
 import 'package:saropa_lints/src/report/report_consolidator.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart';
 import 'package:saropa_lints/src/tiers.dart' as tiers;
+import 'package:saropa_lints/src/string_slice_utils.dart';
 
 /// Writes a structured JSON export of all lint violations.
 ///
@@ -51,7 +52,7 @@ class ViolationExporter {
 
       _writeAtomic(projectRoot, encoded);
       _writeConsumerContract(projectRoot);
-    } catch (e) {
+    } on Object catch (e) {
       stderr.writeln('[saropa_lints] Could not write violation export: $e');
     }
   }
@@ -85,7 +86,7 @@ class ViolationExporter {
       };
       final encoded = const JsonEncoder.withIndent('  ').convert(json);
       _writeAtomicFile(projectRoot, _consumerContractFileName, encoded);
-    } catch (e) {
+    } on Object catch (e) {
       stderr.writeln(
         '[saropa_lints] Could not write consumer_contract.json: $e',
       );
@@ -139,7 +140,14 @@ class ViolationExporter {
       }
       try {
         if (tmpFile.existsSync()) tmpFile.deleteSync();
-      } catch (_) {}
+      } on Object catch (e) {
+        // Fix: avoid_swallowing_exceptions — best-effort temp cleanup; log to
+        // stderr instead of silently dropping so stale temp files become
+        // diagnosable during development.
+        stderr.writeln(
+          '[saropa_lints] Could not delete temp file ${tmpFile.path}: $e',
+        );
+      }
     }
   }
 
@@ -386,7 +394,7 @@ String toRelativePath(String filePath, String projectRoot) {
   final root = projectRoot.replaceAll('\\', '/');
   final file = filePath.replaceAll('\\', '/');
   if (file.startsWith('$root/')) {
-    return file.substring(root.length + 1);
+    return file.afterIndex(root.length + 1);
   }
 
   return file;

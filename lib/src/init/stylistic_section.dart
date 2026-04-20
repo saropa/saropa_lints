@@ -11,6 +11,7 @@ import 'package:saropa_lints/src/init/rule_metadata.dart';
 import 'package:saropa_lints/src/init/stylistic_rulesets.dart';
 import 'package:saropa_lints/src/init/stylistic_section_parser.dart';
 import 'package:saropa_lints/src/tiers.dart' as tiers;
+import 'package:saropa_lints/src/string_slice_utils.dart';
 
 /// Builds the STYLISTIC RULES section content for analysis_options_custom.yaml.
 ///
@@ -120,6 +121,7 @@ void ensureStylisticRulesSection(File file) {
 
   if (sectionMatch == null) {
     insertNewStylisticSection(file, content, skipRules);
+
     return;
   }
 
@@ -151,9 +153,9 @@ void ensureStylisticRulesSection(File file) {
   final sectionEnd = findStylisticSectionEnd(content, sectionStart);
 
   final newContent =
-      content.substring(0, sectionStart) +
+      content.prefix(sectionStart) +
       newSection +
-      content.substring(sectionEnd);
+      content.afterIndex(sectionEnd);
 
   file.writeAsStringSync(newContent);
 }
@@ -177,9 +179,9 @@ void insertNewStylisticSection(
 
   if (overridesHeaderMatch != null) {
     newContent =
-        content.substring(0, overridesHeaderMatch.start) +
+        content.prefix(overridesHeaderMatch.start) +
         insertContent +
-        content.substring(overridesHeaderMatch.start);
+        content.afterIndex(overridesHeaderMatch.start);
   } else {
     newContent = content + insertContent;
   }

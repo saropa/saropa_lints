@@ -122,10 +122,12 @@ class BaselineConfig {
   }
 
   @override
+  // Default nullable fields to '<unset>' so toString() never prints the
+  // literal 'null' (avoid_nullable_interpolation).
   String toString() =>
       'BaselineConfig('
-      'file: $file, '
-      'date: $date, '
+      'file: ${file ?? '<unset>'}, '
+      'date: ${date ?? '<unset>'}, '
       'paths: $paths, '
       'onlyImpacts: $onlyImpacts)';
 }

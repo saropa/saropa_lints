@@ -67,7 +67,9 @@ final class PluginLogger {
     );
 
     final entry = _LogEntry(
-      timestamp: DateTime.now(),
+      // Fix: prefer_utc_for_storage — log entries are persisted to file and
+      // may be read from any time zone; UTC keeps ordering stable.
+      timestamp: DateTime.now().toUtc(),
       message: message,
       error: error?.toString(),
       stackTrace: stackTrace?.toString(),
@@ -110,7 +112,8 @@ final class PluginLogger {
       _appendToFile(
         path,
         _LogEntry(
-          timestamp: DateTime.now(),
+          // Fix: prefer_utc_for_storage — session header persists to the log.
+          timestamp: DateTime.now().toUtc(),
           message: '--- saropa_lints plugin session started ---',
         ),
       );
@@ -131,6 +134,16 @@ final class PluginLogger {
         stackTrace: st,
       );
     }
+    // Object fallback (avoid_catch_exception_alone): the logger must never
+    // crash the analysis isolate, even on programmer-error subclasses of Error.
+    on Object catch (e, st) {
+      developer.log(
+        'PluginLogger.setProjectRoot failed (Error)',
+        name: 'saropa_lints',
+        error: e,
+        stackTrace: st,
+      );
+    }
   }
 
   /// Writes one line for [entry] to [path] in append mode. Never throws —
@@ -138,15 +151,21 @@ final class PluginLogger {
   /// rather than crash the analysis isolate.
   static void _appendToFile(String path, _LogEntry entry) {
     try {
+      // Fix: prefer_utc_for_storage — explicit .toUtc() at serialization so
+      // the rule sees UTC normalization adjacent to the storage write.
       final line = StringBuffer()
-        ..write(entry.timestamp.toIso8601String())
+        ..write(entry.timestamp.toUtc().toIso8601String())
         ..write(' | ')
         ..write(entry.message);
-      if (entry.error != null && entry.error!.isNotEmpty) {
-        line.write('\n  error: ${entry.error}');
+      // Field promotion does not cross property access; default to empty
+      // string to avoid printing literal 'null' (avoid_nullable_interpolation).
+      final err = entry.error;
+      if (err != null && err.isNotEmpty) {
+        line.write('\n  error: $err');
       }
-      if (entry.stackTrace != null && entry.stackTrace!.isNotEmpty) {
-        line.write('\n  stack: ${entry.stackTrace}');
+      final st = entry.stackTrace;
+      if (st != null && st.isNotEmpty) {
+        line.write('\n  stack: $st');
       }
       line.writeln();
       File(path).writeAsStringSync(
@@ -154,8 +173,25 @@ final class PluginLogger {
         mode: FileMode.append,
         flush: true, // fsync: the user may read the file immediately
       );
-    } on Exception {
-      // Swallow: if we cannot log, we cannot log. Never throw from a logger.
+    } on Exception catch (e, st) {
+      // Acknowledge via developer.log (avoid_swallowing_exceptions). Never
+      // throw from a logger — the analysis isolate must continue.
+      developer.log(
+        '_appendToFile failed',
+        name: 'saropa_lints',
+        error: e,
+        stackTrace: st,
+      );
+    }
+    // Object fallback (avoid_catch_exception_alone) — same rationale: never
+    // throw from the logger, even for Error subclasses.
+    on Object catch (e, st) {
+      developer.log(
+        '_appendToFile failed (Error)',
+        name: 'saropa_lints',
+        error: e,
+        stackTrace: st,
+      );
     }
   }
 

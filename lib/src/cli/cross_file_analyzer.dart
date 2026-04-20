@@ -1,6 +1,7 @@
 import 'package:path/path.dart' as p;
 import 'package:saropa_lints/src/cli/cross_file_reporter.dart';
 import 'package:saropa_lints/src/project_context.dart';
+import 'package:saropa_lints/src/string_slice_utils.dart';
 
 /// Runs cross-file analysis: builds import graph and returns unused files,
 /// circular dependencies, and stats.
@@ -28,7 +29,7 @@ Future<CrossFileResult> runCrossFileAnalysis({
     final normalized = filePath.replaceAll('\\', '/');
     final root = projectPath.replaceAll('\\', '/');
     final relative = normalized.startsWith(root)
-        ? normalized.substring(root.length).replaceFirst(RegExp('^/'), '')
+        ? normalized.afterIndex(root.length).replaceFirst(RegExp('^/'), '')
         : p.basename(normalized);
     return excludeRegExps.any((re) => re.hasMatch(relative));
   }

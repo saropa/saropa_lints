@@ -58,7 +58,7 @@ void tryEnableAnsiWindows() {
       ); // ENABLE_VIRTUAL_TERMINAL_PROCESSING
     }
     free(heap, 0, ptr);
-  } catch (e, st) {
+  } on Object catch (e, st) {
     dev.log(
       'VTP unavailable; colors degrade to plain text',
       error: e,

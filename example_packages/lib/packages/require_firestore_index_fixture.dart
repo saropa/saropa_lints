@@ -133,6 +133,7 @@ void _good628() {
   //     { "fieldPath": "rating", "order": "DESCENDING" }
   //   ]
   // }
+
   final query = FirebaseFirestore.instance
       .collection('products')
       .where('category', isEqualTo: 'electronics')

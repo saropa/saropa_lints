@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer' as developer;
 import 'dart:io';
 
 import 'package:saropa_lints/src/cli/cross_file_reporter.dart';
@@ -35,7 +36,16 @@ class CrossFileBaseline {
       if (content.isEmpty) return null;
       final decoded = jsonDecode(content) as Map<String, dynamic>?;
       return fromJson(decoded);
-    } catch (_) {
+    } on Object catch (e, st) {
+      // Fix: avoid_swallowing_exceptions — baseline load failure is non-fatal
+      // (caller falls back to a fresh baseline), but we log so the failure is
+      // visible in developer tooling rather than silently hidden.
+      developer.log(
+        'CrossFileBaseline.load: read/parse failed for $path',
+        name: 'saropa_lints',
+        error: e,
+        stackTrace: st,
+      );
       return null;
     }
   }

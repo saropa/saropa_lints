@@ -11,6 +11,7 @@ import 'package:saropa_lints/src/init/log_writer.dart';
 import 'package:saropa_lints/src/init/platforms_packages.dart';
 import 'package:saropa_lints/src/init/stylistic_section_parser.dart';
 import 'package:saropa_lints/src/tiers.dart' as tiers;
+import 'package:saropa_lints/src/string_slice_utils.dart';
 
 /// Extract rule overrides from analysis_options_custom.yaml.
 ///
@@ -261,6 +262,7 @@ void ensureMaxIssuesSetting(File file, {void Function(String)? logLine}) {
       '${InitColors.green}✓ Added analysis settings to '
       '${file.path}${InitColors.reset}',
     );
+
     return;
   }
 
@@ -297,10 +299,10 @@ output: both
 
   if (headerEndMatch != null) {
     final insertPos = headerEndMatch.end;
-    return content.substring(0, insertPos) +
+    return content.prefix(insertPos) +
         '\n' +
         settingBlock +
-        content.substring(insertPos);
+        content.afterIndex(insertPos);
   }
 
   return settingBlock + content;
@@ -318,7 +320,5 @@ String addOutputSetting(String content) {
   final insertPos = maxIssuesMatch.end;
   const outputLine = 'output: both\n';
 
-  return content.substring(0, insertPos) +
-      outputLine +
-      content.substring(insertPos);
+  return content.prefix(insertPos) + outputLine + content.afterIndex(insertPos);
 }

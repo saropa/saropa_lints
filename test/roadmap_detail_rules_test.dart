@@ -49,8 +49,9 @@ void main() {
     });
 
     test('all 15 rule names are documented', () {
-      expect(allNewRules.length, 15);
-      expect(allNewRules.toSet().length, 15);
+      // Fix: hasLength matcher yields clearer diagnostics than raw int compare.
+      expect(allNewRules, hasLength(15));
+      expect(allNewRules.toSet(), hasLength(15));
     });
   });
 

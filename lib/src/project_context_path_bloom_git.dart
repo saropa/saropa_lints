@@ -102,7 +102,7 @@ class BloomFilter {
         add(word);
         // Add prefixes for partial matching
         for (var len = 3; len <= word.length && len <= 10; len++) {
-          add(word.substring(0, len));
+          add(word.prefix(len));
         }
       }
     }
@@ -224,17 +224,24 @@ class GitAwarePriority {
       for (final entry in entries) {
         if (entry.length < 4) continue;
 
-        final status = entry.substring(0, 2);
-        final path = entry.substring(3);
+        final status = entry.prefix(2);
+        final path = entry.afterIndex(3);
         final absolutePath = '$root/$path';
 
+        // Git status porcelain has a fixed 2-character code. Parse via the
+        // String API (characters) instead of fixed indexes to avoid
+        // avoid_accessing_collections_by_constant_index.
+        if (status.length < 2) continue;
+        final indexChar = status.prefix(1);
+        final workTreeChar = status.afterIndex(1).prefix(1);
+
         // Index status (staged)
-        if (status[0] != ' ' && status[0] != '?') {
+        if (indexChar != ' ' && indexChar != '?') {
           _stagedFiles.add(absolutePath);
         }
 
         // Work tree status (modified)
-        if (status[1] != ' ') {
+        if (workTreeChar != ' ') {
           _modifiedFiles.add(absolutePath);
         }
 

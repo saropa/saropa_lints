@@ -8,6 +8,7 @@ import 'dart:developer' as dev;
 import 'dart:io';
 
 import 'package:path/path.dart' as path;
+import 'package:saropa_lints/src/string_slice_utils.dart';
 
 const int _maxLineLength = 78; // chars per bullet before "..."
 const String _changelogUrl = 'https://pub.dev/packages/saropa_lints/changelog';
@@ -54,7 +55,7 @@ List<String> formatWhatsNew({
     if (categories.isEmpty) return const [];
 
     return _format(categories, section.isUnreleased ? null : version, colors);
-  } catch (e, st) {
+  } on Object catch (e, st) {
     dev.log(
       'Failed to parse CHANGELOG for whats new',
       error: e,
@@ -72,14 +73,24 @@ List<String> formatWhatsNew({
   String version,
 ) {
   var isUnreleased = false;
+  // Fix: avoid_missing_interpolation — interpolate the escaped version into
+  // the pattern literal rather than concatenating raw-string halves.
   var match = RegExp(
-    r'^## \[' + RegExp.escape(version) + r'\]',
+    r'^## \['
+    '${RegExp.escape(version)}'
+    r'\]',
     multiLine: true,
   ).firstMatch(content);
 
   if (match == null) {
-    match = RegExp(r'^## \[Unreleased\]', multiLine: true).firstMatch(content);
-    if (match == null) return null;
+    // Fix: no_equal_nested_conditions — the previous code re-checked the same
+    // null condition inside its own branch. Now we early-return directly.
+    final unreleasedMatch = RegExp(
+      r'^## \[Unreleased\]',
+      multiLine: true,
+    ).firstMatch(content);
+    if (unreleasedMatch == null) return null;
+    match = unreleasedMatch;
     isUnreleased = true;
   }
 
@@ -88,10 +99,10 @@ List<String> formatWhatsNew({
   if (startIndex == -1) return null;
 
   final sectionEnd = RegExp(r'^(?:---|## \[)', multiLine: true);
-  final endMatch = sectionEnd.firstMatch(content.substring(startIndex + 1));
+  final endMatch = sectionEnd.firstMatch(content.afterIndex(startIndex + 1));
   final text = endMatch != null
-      ? content.substring(startIndex + 1, startIndex + 1 + endMatch.start)
-      : content.substring(startIndex + 1);
+      ? content.slice(startIndex + 1, startIndex + 1 + endMatch.start)
+      : content.afterIndex(startIndex + 1);
 
   return (text: text.trim(), isUnreleased: isUnreleased);
 }
@@ -175,5 +186,5 @@ void _renderCategory(List<String> lines, _Cat cat, AnsiColors c) {
 /// Truncate a line to [_maxLineLength] characters, appending "..." if needed.
 String _truncateLine(String text) {
   if (text.length <= _maxLineLength) return text;
-  return '${text.substring(0, _maxLineLength - 3)}...';
+  return '${text.prefix(_maxLineLength - 3)}...';
 }

@@ -21,6 +21,7 @@ void goodWithContentTypeGuard() {
   if (request.headers.contentType?.mimeType != 'application/json') {
     return;
   }
+
   final data = jsonDecode(body);
   return;
 }
@@ -30,6 +31,7 @@ void goodWithContentTypeGuardThrows() {
   if (request.headers.contentType?.mimeType != 'application/json') {
     throw FormatException('Unexpected Content-Type');
   }
+
   final data = jsonDecode(body);
   return;
 }

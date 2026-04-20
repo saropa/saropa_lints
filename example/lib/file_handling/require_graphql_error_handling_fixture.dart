@@ -123,7 +123,9 @@ void _good371() async {
   final result = await client.query(options);
   if (result.hasException) {
     handleError(result.exception!);
+
     return;
   }
+
   final data = result.data!['users'];
 }

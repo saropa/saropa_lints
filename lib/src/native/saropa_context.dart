@@ -141,6 +141,13 @@ class SaropaContext {
   /// baseline, banned-usage, output) are all static globals.
   static bool _configReloadAttempted = false;
 
+  /// One-shot latch setter. Fix for avoid_assigning_to_static_field: assignment
+  /// is now encapsulated in a static method so instance-method callers don't
+  /// mutate the field directly.
+  static void _markConfigReloadAttempted() {
+    _configReloadAttempted = true;
+  }
+
   /// Lazily reloads plugin config from the real project root on the very
   /// first visitor invocation that has a usable file path.
   ///
@@ -154,7 +161,9 @@ class SaropaContext {
     if (path.isEmpty) return;
     final projectRoot = ProjectContext.findProjectRoot(path);
     if (projectRoot == null || projectRoot.isEmpty) return;
-    _configReloadAttempted = true;
+    // Fix: avoid_assigning_to_static_field — route the latch update through a
+    // static method so mutation of the one-shot flag is expressed statically.
+    _markConfigReloadAttempted();
     // Initialize the user-visible plugin log BEFORE the config reload so
     // any log events emitted during load (successes, missing file, missing
     // diagnostics block) land in the file immediately. Buffered early

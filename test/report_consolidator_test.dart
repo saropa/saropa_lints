@@ -83,7 +83,8 @@ void main() {
 
       final list = consolidated.violations[LintImpact.high];
       expect(list, isNotNull);
-      expect(list!.length, 1);
+      // Fix: hasLength matcher yields clearer diagnostics than raw int.
+      expect(list!, hasLength(1));
       expect(list.single.file, 'lib/foo.dart');
       expect(list.single.rule, 'test_rule');
       expect(list.single.line, 10);
@@ -135,7 +136,8 @@ void main() {
       );
 
       expect(consolidated, isNotNull);
-      expect(consolidated!.mergedRawImports.length, 2);
+      // Fix: hasLength matcher yields clearer diagnostics than raw int.
+      expect(consolidated!.mergedRawImports, hasLength(2));
       expect(
         consolidated.mergedRawImports[absA],
         contains("import 'dart:async';"),

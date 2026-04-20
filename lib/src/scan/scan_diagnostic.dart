@@ -26,6 +26,8 @@ class ScanDiagnostic {
   final String? correctionMessage;
 
   @override
+  // Default nullable problemMessage to an empty string so the output never
+  // prints the literal 'null' (avoid_nullable_interpolation).
   String toString() =>
-      '$severity - $problemMessage - $filePath:$line:$column - $ruleName';
+      '$severity - ${problemMessage ?? ''} - $filePath:$line:$column - $ruleName';
 }

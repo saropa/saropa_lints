@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:saropa_lints/src/string_slice_utils.dart';
 
 /// Handles reading and writing baseline JSON files.
 ///
@@ -175,7 +176,7 @@ class BaselineFile {
 
     // Remove leading ./ if present
     if (normalized.startsWith('./')) {
-      normalized = normalized.substring(2);
+      normalized = normalized.afterIndex(2);
     }
 
     return normalized;

@@ -7,6 +7,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:saropa_lints/src/string_slice_utils.dart';
 
 /// Check if the file containing [node] imports any of the specified packages.
 ///
@@ -144,7 +145,7 @@ abstract final class ImportGroup {
   /// any comment lines (// or ///), excluding blank lines and whitespace.
   static bool hasCommentsBetween(String content, int start, int end) {
     if (start >= end || start < 0 || end > content.length) return false;
-    final segment = content.substring(start, end);
+    final segment = content.slice(start, end);
     for (final line in segment.split('\n')) {
       final trimmed = line.trim();
       if (trimmed.startsWith('//')) return true;

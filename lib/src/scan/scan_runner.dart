@@ -98,8 +98,10 @@ class ScanRunner {
     SaropaLintRule.enabledRules = ruleNames;
     SaropaLintRule.disabledRules = null;
     final rules = getRulesFromRegistry(ruleNames);
-    if (tier != null) {
-      _out('Loaded ${rules.length} rules for tier: $tier');
+    // Copy nullable to local so promotion applies (avoid_nullable_interpolation).
+    final tierLabel = tier;
+    if (tierLabel != null) {
+      _out('Loaded ${rules.length} rules for tier: $tierLabel');
     } else {
       _out('Loaded ${rules.length} rules from analysis_options.yaml');
     }
@@ -117,10 +119,14 @@ class ScanRunner {
 
   /// Resolves enabled rule names: from [tier] if set (validated via [tierOrder]), otherwise from project config.
   Set<String>? _resolveRuleNames() {
-    if (tier != null) {
-      final normalized = tier!.toLowerCase();
+    // Copy nullable to local for field promotion (avoid_nullable_interpolation).
+    final tierLabel = tier;
+    if (tierLabel != null) {
+      final normalized = tierLabel.toLowerCase();
       if (!tierOrder.contains(normalized)) {
-        _out("Unknown tier: '$tier'. Valid tiers: ${tierOrder.join(', ')}");
+        _out(
+          "Unknown tier: '$tierLabel'. Valid tiers: ${tierOrder.join(', ')}",
+        );
         return null;
       }
       return getRulesForTier(normalized);

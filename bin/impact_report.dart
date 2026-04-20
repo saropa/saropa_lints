@@ -22,6 +22,7 @@ import 'package:saropa_lints/src/violation_parser.dart';
 Future<void> main(List<String> args) async {
   if (args.contains('--help') || args.contains('-h')) {
     _printUsage();
+
     return;
   }
 
@@ -60,6 +61,7 @@ Future<void> main(List<String> args) async {
     print('MEDIUM:   0');
     print('LOW:      0');
     print('OPINIONATED: 0');
+
     return;
   }
 

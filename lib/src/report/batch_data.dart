@@ -52,7 +52,9 @@ class BatchData {
       'v': _formatVersion,
       's': sessionId,
       'i': isolateId,
-      'u': updatedAt.toIso8601String(),
+      // Fix: prefer_utc_for_storage — batch JSON is read across isolates/machines;
+      // UTC keeps ordering stable regardless of consumer timezone.
+      'u': updatedAt.toUtc().toIso8601String(),
       'af': analyzedFiles,
       'ibf': issuesByFile,
       'ibr': issuesByRule,

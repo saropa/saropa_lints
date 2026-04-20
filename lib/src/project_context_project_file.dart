@@ -171,7 +171,7 @@ _FlutterSdkVersion? _parseFlutterLowerBound(String constraint) {
   if (geMatch != null) {
     lower = geMatch.group(1) ?? '';
   } else if (constraint.startsWith('^')) {
-    lower = constraint.substring(1).trim();
+    lower = constraint.afterIndex(1).trim();
   }
 
   final parts = lower.split('.');

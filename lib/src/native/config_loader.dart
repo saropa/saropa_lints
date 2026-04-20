@@ -27,6 +27,7 @@ import '../config/pubspec_lock_resolver.dart';
 import '../config/rule_packs.dart';
 import '../saropa_lint_rule.dart' show ProgressTracker, SaropaLintRule;
 import 'plugin_logger.dart' show PluginLogger;
+import 'package:saropa_lints/src/string_slice_utils.dart';
 
 /// Loads all plugin configuration from yaml and environment variables.
 /// Order matters: severity overrides first, then diagnostics (enable/disable),
@@ -90,7 +91,7 @@ void _loadFromRoot(String? projectRoot) {
       'Config loaded from ${projectRoot ?? Directory.current.path} — '
       'enabledRules: $enabledCount',
     );
-  } catch (e, st) {
+  } on Object catch (e, st) {
     PluginLogger.log('loadNativePluginConfig failed', error: e, stackTrace: st);
     // Defensive: ensure plugin can still register with defaults
   }
@@ -108,7 +109,7 @@ String? _readProjectFile(String filename, [String? projectRoot]) {
     final file = File(path);
     if (!file.existsSync()) return null;
     return file.readAsStringSync();
-  } catch (e, st) {
+  } on Object catch (e, st) {
     PluginLogger.log('_readProjectFile failed', error: e, stackTrace: st);
     // I/O or path error; return null so config steps use defaults
     return null;
@@ -126,7 +127,7 @@ void loadOutputConfigFromProjectRoot(String projectRoot) {
       projectRoot,
     );
     if (content != null) _loadOutputConfig(content);
-  } catch (e, st) {
+  } on Object catch (e, st) {
     PluginLogger.log(
       'loadOutputConfigFromProjectRoot failed',
       error: e,
@@ -151,6 +152,7 @@ void _loadSeverityOverrides(String? content) {
     SaropaLintRule.severityOverrides = null;
     SaropaLintRule.disabledRules = null;
     SaropaLintRule.enabledRules = null;
+
     return;
   }
 
@@ -163,7 +165,7 @@ void _loadSeverityOverrides(String? content) {
   final overrides = <String, DiagnosticSeverity>{};
   final disabled = <String>{};
 
-  final lines = content.substring(sectionMatch.end).split('\n');
+  final lines = content.afterIndex(sectionMatch.end).split('\n');
   for (final line in lines) {
     if (line.trim().isEmpty || line.trimLeft().startsWith('#')) continue;
     if (!line.startsWith('  ')) break;
@@ -232,6 +234,7 @@ void _loadDiagnosticsConfig([String? projectRoot]) {
       '${projectRoot ?? Directory.current.path} — saropa_lints will not '
       'enable any rules until config is reloaded from the project root.',
     );
+
     return;
   }
 
@@ -246,12 +249,13 @@ void _loadDiagnosticsConfig([String? projectRoot]) {
       '`plugins > saropa_lints > diagnostics:` block present. '
       'Run `dart run saropa_lints:init` or use the extension to generate it.',
     );
+
     return;
   }
 
   final enabled = SaropaLintRule.enabledRules ?? <String>{};
   final disabled = SaropaLintRule.disabledRules ?? <String>{};
-  final lines = content.substring(sectionMatch.end).split('\n');
+  final lines = content.afterIndex(sectionMatch.end).split('\n');
 
   for (final line in lines) {
     if (line.trim().isEmpty || line.trimLeft().startsWith('#')) continue;
@@ -313,6 +317,7 @@ void _reloadRulePacksFromRoot(String projectRoot) {
   if (content == null) {
     _packContributedCodes = {};
     SaropaLintRule.enabledRules = enabled.isEmpty ? null : enabled;
+
     return;
   }
 
@@ -356,7 +361,7 @@ void _loadBaselineConfig(String? content) {
 /// Parse the baseline section into a Map for [BaselineConfig.fromYaml].
 Map<String, Object> _parseBaselineSection(String content, int offset) {
   final map = <String, Object>{};
-  final lines = content.substring(offset).split('\n');
+  final lines = content.afterIndex(offset).split('\n');
   List<String>? currentList;
   String? currentListKey;
 
@@ -427,7 +432,7 @@ void _loadOutputConfig(String? content) {
       }
       outputFromEnv = true;
     }
-  } catch (e, st) {
+  } on Object catch (e, st) {
     PluginLogger.log(
       '_loadOutputConfig env read failed',
       error: e,

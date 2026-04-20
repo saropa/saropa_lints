@@ -129,12 +129,13 @@ from scripts.modules._publish_workflow import (
     run_extension_only_mode,
     run_fix_docs_mode,
     run_full_publish,
+    run_publish_existing_vsix_mode,
     validate_pubspec_changelog,
 )
 
 
 def _prompt_publish_mode() -> str:
-    """Ask user for run mode via interactive menu (1-6)."""
+    """Ask user for run mode via interactive menu (1-7)."""
     print_header("PUBLISH OPTIONS")
     print(
         "  1) Full publish (audit \u2192 format \u2192 analysis \u2192 tests \u2192 version \u2192 release)"
@@ -144,6 +145,7 @@ def _prompt_publish_mode() -> str:
     print("  4) Publish without audit (skip audit; format \u2192 analysis \u2192 tests \u2192 release)")
     print("  5) Analyze only (run dart analyze, write log; then exit)")
     print("  6) Extension only (package .vsix, optionally publish to Marketplace/Open VSX)")
+    print("  7) Publish existing .vsix (skip packaging; newest in extension/)")
     try:
         raw = input("  Choice [1]: ").strip() or "1"
         n = int(raw)
@@ -157,6 +159,8 @@ def _prompt_publish_mode() -> str:
             return "analyze_only"
         if n == 6:
             return "extension_only"
+        if n == 7:
+            return "publish_existing_vsix"
     except (ValueError, EOFError, KeyboardInterrupt):
         pass
     return "full"
@@ -193,6 +197,7 @@ def main(
     for handler in (
         lambda: run_analyze_only(mode, project_dir),
         lambda: run_extension_only_mode(mode, project_dir, pubspec_path),
+        lambda: run_publish_existing_vsix_mode(mode, project_dir),
         lambda: run_fix_docs_mode(mode, project_dir),
     ):
         code = handler()

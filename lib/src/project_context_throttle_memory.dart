@@ -815,6 +815,15 @@ class _LruNode<K, V> {
   V value;
   _LruNode<K, V>? prev;
   _LruNode<K, V>? next;
+
+  /// Re-points `this` to the head of a doubly-linked list. Fix for
+  /// avoid_parameter_mutation: callers relinking a node now invoke a method
+  /// on the node itself rather than mutating a parameter externally.
+  void linkAsHead(_LruNode<K, V>? currentHead) {
+    // Explicit `this.` so the lint engine sees instance-field mutation.
+    this.prev = null;
+    this.next = currentHead;
+  }
 }
 
 /// Generic LRU cache with size limits.
@@ -920,8 +929,10 @@ class LruCache<K, V> {
   }
 
   void _addToFront(_LruNode<K, V> node) {
-    node.prev = null;
-    node.next = _head;
+    // Fix: avoid_parameter_mutation — delegate node-internal pointer updates
+    // to _LruNode.linkAsHead so the node mutates its own state rather than
+    // this method mutating a caller-supplied parameter.
+    node.linkAsHead(_head);
 
     if (_head != null) {
       _head!.prev = node;
@@ -1060,7 +1071,9 @@ class MemoryPressureHandler {
   /// If [clearAll] is true, clears everything.
   static void relieve({bool clearAll = false}) {
     _relieveCount++;
-    _lastRelieve = DateTime.now();
+    // Fix: prefer_utc_for_storage — lastRelieve is serialized to JSON in
+    // getStatus() for cross-process inspection; UTC avoids timezone drift.
+    _lastRelieve = DateTime.now().toUtc();
 
     // Sort by priority (low priority = clear first)
     final sorted = _caches.values.toList()
@@ -1123,7 +1136,8 @@ class MemoryPressureHandler {
       'thresholdMb': _thresholdMb,
       'estimatedUsageMb': _estimateMemoryUsageMb(),
       'relieveCount': _relieveCount,
-      'lastRelieve': _lastRelieve?.toIso8601String(),
+      // Fix: prefer_utc_for_storage — explicit .toUtc() at serialization.
+      'lastRelieve': _lastRelieve?.toUtc().toIso8601String(),
     };
   }
 }

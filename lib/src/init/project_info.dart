@@ -21,7 +21,7 @@ String? getSaropaLintsRootUri() {
     ).firstMatch(content);
 
     return match?.group(1);
-  } catch (e, st) {
+  } on Object catch (e, st) {
     dev.log(
       'Failed to read saropa_lints rootUri from package_config',
       error: e,
@@ -66,7 +66,7 @@ String getPackageVersion() {
       multiLine: true,
     ).firstMatch(content);
     return match?.group(1)?.trim() ?? 'unknown';
-  } catch (e, st) {
+  } on Object catch (e, st) {
     dev.log(
       'Failed to read saropa_lints version from pubspec',
       error: e,
@@ -161,7 +161,7 @@ Map<String, bool> detectProjectPackages(
       '${detected.entries.where((e) => e.value).map((e) => e.key).join(', ')}'
       '${isFlutter ? ' (Flutter project)' : ' (pure Dart)'}${InitColors.reset}',
     );
-  } catch (e, st) {
+  } on Object catch (e, st) {
     dev.log(
       'Could not read project pubspec for package detection',
       error: e,

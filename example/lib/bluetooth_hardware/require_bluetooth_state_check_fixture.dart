@@ -119,6 +119,7 @@ void _good120_connect() async {
   final state = await FlutterBluePlus.adapterState.first;
   if (state != BluetoothAdapterState.on) {
     showError('Please enable Bluetooth');
+
     return;
   }
   device.connect();
