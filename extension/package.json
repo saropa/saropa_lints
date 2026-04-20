@@ -389,32 +389,44 @@
       },
       {
         "command": "saropaLints.packageVibrancy.scan",
-        "title": "Scan Package Vibrancy",
+        "title": "Scan Packages",
+        "category": "Saropa",
         "icon": "$(refresh)"
       },
       {
+        "command": "saropaLints.packageVibrancy.openOtherProject",
+        "title": "Scan Another Project...",
+        "category": "Saropa",
+        "icon": "$(folder-opened)"
+      },
+      {
         "command": "saropaLints.packageVibrancy.showReport",
-        "title": "Show Vibrancy Report",
+        "title": "Show Report",
+        "category": "Saropa",
         "icon": "$(graph)"
       },
       {
         "command": "saropaLints.packageVibrancy.clearCache",
         "title": "Clear Cache",
+        "category": "Saropa",
         "icon": "$(trash)"
       },
       {
         "command": "saropaLints.packageVibrancy.exportReport",
-        "title": "Export Vibrancy Report",
+        "title": "Export Report",
+        "category": "Saropa",
         "icon": "$(export)"
       },
       {
         "command": "saropaLints.packageVibrancy.browseKnownIssues",
-        "title": "Browse Known Issues Library",
+        "title": "Browse Known Issues",
+        "category": "Saropa",
         "icon": "$(library)"
       },
       {
         "command": "saropaLints.packageVibrancy.exportSbom",
-        "title": "Export SBOM (CycloneDX)",
+        "title": "Export SBOM",
+        "category": "Saropa",
         "icon": "$(shield)"
       },
       {
@@ -532,7 +544,8 @@
       },
       {
         "command": "saropaLints.packageVibrancy.toggleCodeLens",
-        "title": "Toggle Vibrancy Badges"
+        "title": "Toggle Badges",
+        "category": "Saropa"
       },
       {
         "command": "saropaLints.packageVibrancy.focusDetails",
@@ -1141,11 +1154,11 @@
         },
         {
           "command": "saropaLints.packageVibrancy.showCodeLens",
-          "when": "!saropaLints.packageVibrancy.codeLensEnabled"
+          "when": "false"
         },
         {
           "command": "saropaLints.packageVibrancy.hideCodeLens",
-          "when": "saropaLints.packageVibrancy.codeLensEnabled"
+          "when": "false"
         },
         {
           "command": "saropaLints.packageVibrancy.updateFromCodeLens",

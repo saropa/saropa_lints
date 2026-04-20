@@ -151,6 +151,10 @@ function buildToolbar(options: ReportOptions): string {
     // webview message channel so users don't have to leave the report to
     // trigger a refresh after editing pubspec.yaml or running `pub get`.
     const rescanBtn = '<button id="rescan" class="toolbar-btn" title="Rescan packages (runs Package Vibrancy: Scan)">&#128260; Rescan</button>';
+    // Open another project — file picker → opens the selected
+    // pubspec.yaml's folder in a new VS Code window. Useful for
+    // diagnosing multiple projects without swapping workspace roots.
+    const openOtherBtn = '<button id="open-other" class="toolbar-btn" title="Open another pubspec.yaml\'s project in a new window for Vibrancy scan">&#128194; Open Project\u2026</button>';
     // Footprint-mode toggle controls what the Size column shows:
     //   own     = archive size of the package itself (default; matches old behavior)
     //   unique  = own + transitives used ONLY by this dep (cost saved if removed)
@@ -176,6 +180,7 @@ function buildToolbar(options: ReportOptions): string {
         ${searchField}
         ${footprintToggle}
         ${rescanBtn}
+        ${openOtherBtn}
         ${copyAllBtn}
         ${pubspecBtn}
     </div>`;

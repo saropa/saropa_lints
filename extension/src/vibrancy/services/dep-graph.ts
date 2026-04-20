@@ -14,6 +14,8 @@ export interface DepGraphResult {
     readonly root: string;
     readonly packages: readonly DepGraphPackage[];
     readonly success: boolean;
+    /** Concrete failure reason propagated from the child process. */
+    readonly errorMessage?: string;
 }
 
 /** Run `dart pub deps --json` and parse the output. */
@@ -22,7 +24,10 @@ export async function fetchDepGraph(
 ): Promise<DepGraphResult> {
     const result = await runDartPubDeps(cwd);
     if (!result.success) {
-        return { root: '', packages: [], success: false };
+        return {
+            root: '', packages: [], success: false,
+            errorMessage: result.errorMessage,
+        };
     }
     return { ...parseDepGraphJson(result.output), success: true };
 }

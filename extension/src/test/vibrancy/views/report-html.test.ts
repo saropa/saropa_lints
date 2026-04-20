@@ -424,6 +424,18 @@ describe('report: toolbar', () => {
         const html = buildReportHtml(opts([]));
         assert.ok(!html.includes('id="open-pubspec"'));
     });
+
+    it('should include rescan button', () => {
+        const html = buildReportHtml(opts([]));
+        assert.ok(html.includes('id="rescan"'));
+        assert.ok(html.includes('Rescan'));
+    });
+
+    it('should include open-other-project button', () => {
+        const html = buildReportHtml(opts([]));
+        assert.ok(html.includes('id="open-other"'));
+        assert.ok(html.includes('Open Project'));
+    });
 });
 
 describe('report: description on package name', () => {
