@@ -1377,7 +1377,23 @@ void main() {
             'saropa_use_existing_',
           );
           addTearDown(() async {
-            if (tempDir.existsSync()) await tempDir.delete(recursive: true);
+            if (!tempDir.existsSync()) return;
+            // Windows can briefly hold directory handles after the spawned
+            // `dart pub get` / `dart analyze` subprocesses exit (errno 32 /
+            // EBUSY — PathAccessException on delete). Retry a few times with
+            // backoff, then swallow the failure. Leaving the temp dir is
+            // harmless — the OS cleans %TEMP% up, and a cleanup flake should
+            // never fail an otherwise-passing test.
+            for (var attempt = 0; attempt < 5; attempt++) {
+              try {
+                await tempDir.delete(recursive: true);
+                return;
+              } on FileSystemException {
+                await Future<void>.delayed(
+                  Duration(milliseconds: 100 * (1 << attempt)),
+                );
+              }
+            }
           });
           final repoPath = repoRoot.path.replaceAll('\\', '/');
           await Directory(
