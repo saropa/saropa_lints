@@ -33,18 +33,7 @@
 
 ---
 
-## [Unreleased]
-
-<details>
-<summary>Maintenance</summary>
-
-- **Tests:** Harden the teardown of the `use_existing_variable` integration test ([test/code_quality_rules_test.dart](test/code_quality_rules_test.dart)) against a Windows-only flake. The test creates a temp package under `build\test_tmp\`, spawns `dart pub get` + `dart analyze` subprocesses, then deletes the temp directory in `addTearDown`. On Windows, directory handles from the exited subprocesses can linger briefly after `Process.run()` returns, so `Directory.delete(recursive: true)` would fail with `PathAccessException: ... errno = 32` (EBUSY) and error the test even though all assertions passed. The teardown now retries up to 5 times with exponential backoff (100 ms → 1600 ms) and swallows the final failure — leaving a temp dir is harmless because the OS cleans `%TEMP%` and `build/test_tmp/` eventually, and a cleanup race should never fail an otherwise-passing test.
-
-</details>
-
----
-
-## [2.3.0]
+## [12.3.0]
 
 Windows users get their vibrancy reports back (CLI spawn + transitive footprint fixes), the plugin now logs to `reports/.saropa_lints/plugin.log` so silent failures are visible, and the report toolbar gains Rescan, Open Project, and Copy All JSON buttons — plus a new `prefer_listenable_builder` rule. — [log](https://github.com/saropa/saropa_lints/blob/v2.3.0/CHANGELOG.md)
 
@@ -84,6 +73,7 @@ Windows users get their vibrancy reports back (CLI spawn + transitive footprint 
 - **Plan housekeeping (`plan/deferred/`):** Consolidated 66 individual plan files into a single landing doc at [`plan/deferred/sdk_release_notes_review.md`](plan/deferred/sdk_release_notes_review.md) with a verdict table grouped by rejection category and per-plan one-liner. Removed the redundant `plan/deferred/README.md` — its category-file index (`compiler_diagnostics`, `cross_file_analysis`, `external_dependencies`, `framework_limitations`, `unreliable_detection`, `not_viable`, `plan_additional_rules_41_through_50`) and the "before adding a new entry" checklist were folded into the review doc so there is one landing page instead of two.
 - **Publish script:** Pre-publish audit no longer auto-aborts when British English spellings are found. The spelling check now prints the report and prompts **[R]etry** (re-scan after fixing) or **[I]gnore** (continue the publish with the hits in place). Default on empty input is Retry, the safer option; Ctrl+C still aborts. Previously the only recourse was "fix every hit then re-run the entire 30-second audit" — minor user-facing copy could block a release even when the spelling was intentional (e.g. quoting a third-party API, product-name casing). When the user chooses Ignore, the consolidated audit reports the check as a ⚠ warning (not ✗ fail) so the decision is visible in the run log; when Retry is chosen, the script rescans in-place without re-running any other audit step. ([_publish_steps.py](scripts/modules/_publish_steps.py))
 - `scripts/publish.py` — display the Saropa logo before prompting for the publish mode. The interactive menu (`Full publish`, `Audit only`, etc.) was printed before `show_saropa_logo()`, violating the "logo always comes first" rule for Saropa scripts. `main()` now accepts `mode=None` and prompts interactively after setup + logo; `__main__` just calls `main()`.
+- **Tests:** Harden the teardown of the `use_existing_variable` integration test ([test/code_quality_rules_test.dart](test/code_quality_rules_test.dart)) against a Windows-only flake. The test creates a temp package under `build\test_tmp\`, spawns `dart pub get` + `dart analyze` subprocesses, then deletes the temp directory in `addTearDown`. On Windows, directory handles from the exited subprocesses can linger briefly after `Process.run()` returns, so `Directory.delete(recursive: true)` would fail with `PathAccessException: ... errno = 32` (EBUSY) and error the test even though all assertions passed. The teardown now retries up to 5 times with exponential backoff (100 ms → 1600 ms) and swallows the final failure — leaving a temp dir is harmless because the OS cleans `%TEMP%` and `build/test_tmp/` eventually, and a cleanup race should never fail an otherwise-passing test.
 
 </details>
 
