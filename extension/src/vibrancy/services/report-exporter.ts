@@ -163,9 +163,19 @@ function mapPackageToJson(r: VibrancyResult) {
         archive_size_bytes: r.archiveSizeBytes,
         bloat_rating: r.bloatRating,
         file_usage_count: activeUsages.length,
-        file_usages: activeUsages.map(u => ({
-            file_path: u.filePath,
-            line: u.line,
-        })),
+        // One entry per file — the scanner merges import + export of
+        // the same package in the same file into a single usage. `line`
+        // stays for back-compat; `import_line` / `export_line` surface
+        // the directive-level detail that was previously collapsed into
+        // a single number.
+        file_usages: activeUsages.map(u => {
+            const entry: Record<string, unknown> = {
+                file_path: u.filePath,
+                line: u.line,
+            };
+            if (u.importLine != null) { entry.import_line = u.importLine; }
+            if (u.exportLine != null) { entry.export_line = u.exportLine; }
+            return entry;
+        }),
     };
 }

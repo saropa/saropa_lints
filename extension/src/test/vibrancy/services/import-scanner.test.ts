@@ -299,6 +299,60 @@ describe('scanDartImportsDetailed', () => {
         assert.strictEqual(usages?.[0].isCommented, true);
         assert.strictEqual(usages?.[0].isExport, true);
     });
+
+    it('should merge import and export of the same package in the same file into one usage', async () => {
+        // Regression: the References column previously double-counted files
+        // like share_utils.dart that both import share_plus for internal use
+        // AND export a subset of its symbols as part of the library's public
+        // API. The scanner now produces ONE usage per (filePath, isCommented)
+        // with `importLine` and `exportLine` both populated, so
+        // activeFileUsages(...).length = 1 (the file count) while the
+        // directive-level detail is preserved in the new line fields.
+        const files = [makeUri('/proj/lib/utils/system/share_utils.dart')];
+        (vscode.workspace as any).findFiles = async () => files;
+        (vscode.workspace as any).fs.readFile = async () =>
+            encode(
+                "export 'package:share_plus/share_plus.dart' show XFile;\n"
+                + "import 'package:other/other.dart';\n"
+                + "\n"
+                + "// some comment\n"
+                + "import 'package:share_plus/share_plus.dart';",
+            );
+
+        const result = await scanDartImportsDetailed(makeUri('/proj'));
+        const sharePlus = result.get('share_plus');
+        assert.ok(sharePlus, 'share_plus should be in usage map');
+        assert.strictEqual(sharePlus.length, 1, 'import+export of same pkg in one file is 1 usage');
+        assert.strictEqual(sharePlus[0].exportLine, 1);
+        assert.strictEqual(sharePlus[0].importLine, 5);
+        assert.strictEqual(sharePlus[0].isExport, true, 'isExport derived from exportLine');
+        assert.strictEqual(sharePlus[0].line, 1, 'primary line prefers exportLine');
+        assert.strictEqual(sharePlus[0].isCommented, false);
+    });
+
+    it('should keep active and commented entries separate when dedup-merging', async () => {
+        // A file with an active import + a commented-out export of the same
+        // package produces two entries — one per isCommented bucket — so the
+        // "active files" count still excludes the dead directive.
+        const files = [makeUri('/proj/lib/legacy.dart')];
+        (vscode.workspace as any).findFiles = async () => files;
+        (vscode.workspace as any).fs.readFile = async () =>
+            encode(
+                "import 'package:http/http.dart';\n"
+                + "// export 'package:http/http.dart';",
+            );
+
+        const result = await scanDartImportsDetailed(makeUri('/proj'));
+        const http = result.get('http');
+        assert.ok(http);
+        assert.strictEqual(http.length, 2);
+        const active = http.find(u => !u.isCommented);
+        const commented = http.find(u => u.isCommented);
+        assert.strictEqual(active?.importLine, 1);
+        assert.strictEqual(active?.exportLine, null);
+        assert.strictEqual(commented?.exportLine, 2);
+        assert.strictEqual(commented?.importLine, null);
+    });
 });
 
 describe('hasActiveReExport', () => {

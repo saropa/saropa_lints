@@ -49,7 +49,7 @@ export function buildReportHtml(options: ReportOptions): string {
     ${buildChartSection(results)}
     ${buildToolbar(options)}
     ${buildReportTable(results, options.overrideNames)}
-    <script>${buildPackageDataScript(results, options.overrideNames)}${getReportScript()}${getChartScript()}</script>
+    <script>${buildPackageDataScript(results, options.overrideNames, buildRepoShareMap(results))}${getReportScript()}${getChartScript()}</script>
 </body>
 </html>`;
 }
@@ -147,6 +147,10 @@ function buildToolbar(options: ReportOptions): string {
     // transitive dep list with shared flags, links). Same per-package
     // shape as the per-row copy button, just aggregated.
     const copyAllBtn = '<button id="copy-all" class="toolbar-btn" title="Copy entire table as JSON (all rows + expander details)">&#128203; Copy All JSON</button>';
+    // Rescan button — invokes saropaLints.packageVibrancy.scan via the
+    // webview message channel so users don't have to leave the report to
+    // trigger a refresh after editing pubspec.yaml or running `pub get`.
+    const rescanBtn = '<button id="rescan" class="toolbar-btn" title="Rescan packages (runs Package Vibrancy: Scan)">&#128260; Rescan</button>';
     // Footprint-mode toggle controls what the Size column shows:
     //   own     = archive size of the package itself (default; matches old behavior)
     //   unique  = own + transitives used ONLY by this dep (cost saved if removed)
@@ -161,9 +165,17 @@ function buildToolbar(options: ReportOptions): string {
         <button class="toggle-btn footprint-btn" data-footprint="total"
             title="Own size + all transitives, including ones shared with other deps">+ All</button>
     </div>`;
-    return `<div class="table-toolbar">
+    // Search field wrapped so we can absolutely position a clear (X) button
+    // inside it; the button stays hidden until the user types something, and
+    // a click clears the input + re-runs filters.
+    const searchField = `<div class="search-wrapper">
         <input type="text" id="search-input" placeholder="Search packages\u2026" class="search-input" />
+        <button type="button" id="search-clear" class="search-clear" title="Clear search" aria-label="Clear search" hidden>&times;</button>
+    </div>`;
+    return `<div class="table-toolbar">
+        ${searchField}
         ${footprintToggle}
+        ${rescanBtn}
         ${copyAllBtn}
         ${pubspecBtn}
     </div>`;
@@ -188,8 +200,30 @@ function getHiddenColumns(results: VibrancyResult[]): Set<HidableColumn> {
     return hidden;
 }
 
-/** Shared tooltip for cells that require GitHub data (stars, issues, PRs). */
+/** Shared tooltip for cells that require GitHub data (issues, PRs). */
 const NO_GITHUB_TOOLTIP = 'No GitHub repository found';
+
+/**
+ * Build a canonical-repo → count map so the JSON export can flag packages
+ * that share a repo URL with other project packages. Stars on GitHub apply
+ * to the whole repository (not to a subdirectory), so a high star count on
+ * a monorepo sibling like `firebase_core` doesn't signal anything
+ * `firebase_core`-specific — every Firebase package in the project would
+ * report the same number. The sibling count lets consumers of the row JSON
+ * disambiguate "this repo has 12k stars on its own merit" from "this repo
+ * has 12k stars shared across 8 project packages".
+ */
+function buildRepoShareMap(
+    results: readonly VibrancyResult[],
+): ReadonlyMap<string, number> {
+    const counts = new Map<string, number>();
+    for (const r of results) {
+        const url = resolveRepoUrl(r);
+        if (!url) { continue; }
+        counts.set(url, (counts.get(url) ?? 0) + 1);
+    }
+    return counts;
+}
 
 /** Derive shared transitive dep names from all results' TransitiveInfo. */
 function deriveSharedDepNames(results: VibrancyResult[]): ReadonlySet<string> {
@@ -213,8 +247,13 @@ function buildReportTable(
 
     /* Count visible columns so the detail row can span them all.
        Base columns: expand + copy + name + version + category + published +
-       stars + issues + prs + size + deps + update = 12. */
-    const visibleCols = 12
+       likes + downloads + issues + prs + size + deps + update = 13.
+       (Stars used to be a column; it was replaced by Likes because GitHub
+       stars apply to the whole repo — monorepo siblings all reported the
+       same number — while pub.dev likes are per-package. Downloads were
+       added as a second package-specific trust signal from the same
+       source.) */
+    const visibleCols = 13
         + (hidden.has('files') ? 0 : 1)
         + (hidden.has('transitives') ? 0 : 1)
         + (hidden.has('vulns') ? 0 : 1)
@@ -230,7 +269,8 @@ function buildReportTable(
             ${th('version', 'Version', 'Installed version from pubspec.lock')}
             ${th('score', 'Category', 'Vibrancy classification and health score (0\u201310)')}
             ${th('published', 'Published', 'Date the installed version was published to pub.dev')}
-            ${th('stars', 'Stars', 'GitHub repository star count')}
+            ${th('likes', 'Likes', 'pub.dev likes \u2014 click to open the package score page')}
+            ${th('downloads', 'Downloads', 'pub.dev downloads in the last 30 days \u2014 click to open the package score page')}
             ${th('issues', 'Issues', 'Open GitHub issues (excludes pull requests when available)')}
             ${th('prs', 'PRs', 'Open GitHub pull requests')}
             ${th('size', 'Size', 'Archive size on pub.dev (before tree shaking)')}
@@ -262,7 +302,12 @@ function buildRow(
 ): string {
     const name = escapeHtml(r.package.name);
     const date = r.pubDev?.publishedDate.split('T')[0] ?? '';
-    const stars = r.github?.stars ?? '';
+    /* data-likes / data-downloads feed the sort logic (see report-script.ts
+       sortTable). Empty string sorts as NaN → alphabetical fallback, which
+       matches the prior data-stars behavior for packages missing the
+       signal. */
+    const likes = r.likes ?? '';
+    const downloads = r.downloadCount30Days ?? '';
     const issueCount = r.github?.trueOpenIssues ?? r.github?.openIssues ?? '';
     const prCount = r.github?.openPullRequests ?? '';
     const activeFileCount = activeFileUsages(r.fileUsages).length;
@@ -279,7 +324,7 @@ function buildRow(
 
     return `<tr class="pkg-row" data-name="${name}" data-version="${escapeHtml(r.package.version)}"
         data-score="${r.score}" data-category="${r.category}"
-        data-published="${date}" data-stars="${stars}"
+        data-published="${date}" data-likes="${likes}" data-downloads="${downloads}"
         data-issues="${issueCount}" data-prs="${prCount}"
         data-size="${r.archiveSizeBytes ?? 0}"
         data-files="${activeFileCount}"
@@ -298,7 +343,8 @@ function buildRow(
         ${buildVersionCell(r)}
         ${buildCategoryCell(r)}
         ${buildPublishedCell(r)}
-        ${buildStarsCell(r)}
+        ${buildLikesCell(r)}
+        ${buildDownloadsCell(r)}
         ${buildIssuesCell(r)}
         ${buildPrsCell(r)}
         ${buildSizeCell(r)}
@@ -419,12 +465,61 @@ function resolveRepoUrl(r: VibrancyResult): string | undefined {
         ?.replace(/\/+$/, '');
 }
 
-function buildStarsCell(r: VibrancyResult): string {
-    const stars = r.github?.stars;
-    if (stars == null) {
-        return `<td class="cell-right" title="${NO_GITHUB_TOOLTIP}"><span class="dimmed">\u2014</span></td>`;
+/** Build the pub.dev score page URL for a package. */
+function pubDevScoreUrl(name: string): string {
+    return `https://pub.dev/packages/${encodeURIComponent(name)}/score`;
+}
+
+/**
+ * Compact number formatter shared by Likes and Downloads cells. Keeps the
+ * table narrow for high-traffic packages (e.g. `http` has 8M+ downloads
+ * which would blow out the column at full width). The cell's title
+ * attribute still exposes the full comma-formatted number for precise
+ * inspection.
+ */
+function formatCompactCount(n: number): string {
+    if (n >= 1_000_000) { return `${(n / 1_000_000).toFixed(1)}M`; }
+    if (n >= 1_000) { return `${(n / 1_000).toFixed(1)}k`; }
+    return String(n);
+}
+
+/**
+ * Likes cell — pub.dev like count for the package. Replaces the old Stars
+ * column. GitHub stars are a repo-level signal, not a package-level one;
+ * every package published from a monorepo (firebase/flutterfire,
+ * bloclibrary/bloc, flutter/packages, ...) reported the same star count,
+ * which was misleading and prompted this switch. Likes are per-package and
+ * so give a true per-row comparison. The number links to the package's
+ * pub.dev /score tab, which shows likes alongside downloads and pub points.
+ */
+function buildLikesCell(r: VibrancyResult): string {
+    const likes = r.likes;
+    const href = pubDevScoreUrl(r.package.name);
+    if (likes == null) {
+        return `<td class="cell-right" title="pub.dev likes not available"><a href="${href}"><span class="dimmed">\u2014</span></a></td>`;
     }
-    return `<td class="cell-right">${stars.toLocaleString('en-US')}</td>`;
+    const full = likes.toLocaleString('en-US');
+    const compact = formatCompactCount(likes);
+    return `<td class="cell-right" title="${full} pub.dev likes">`
+        + `<a href="${href}">${escapeHtml(compact)}</a></td>`;
+}
+
+/**
+ * Downloads cell — pub.dev `downloadCount30Days` for the package. Per-
+ * package trust signal, surfaced from the same score API response that
+ * populates Likes. Null when the score API failed or did not return the
+ * field (e.g. older registry mirrors that predate the feature).
+ */
+function buildDownloadsCell(r: VibrancyResult): string {
+    const downloads = r.downloadCount30Days;
+    const href = pubDevScoreUrl(r.package.name);
+    if (downloads == null) {
+        return `<td class="cell-right" title="pub.dev 30-day downloads not available"><a href="${href}"><span class="dimmed">\u2014</span></a></td>`;
+    }
+    const full = downloads.toLocaleString('en-US');
+    const compact = formatCompactCount(downloads);
+    return `<td class="cell-right" title="${full} downloads in the last 30 days">`
+        + `<a href="${href}">${escapeHtml(compact)}</a></td>`;
 }
 
 function buildIssuesCell(r: VibrancyResult): string {
@@ -486,10 +581,25 @@ function buildReferencesCell(r: VibrancyResult): string {
         : count >= 6 ? ' file-deep'
         : '';
     // Mark re-export lines in the multi-line tooltip so the user sees which
-    // file is exposing the package as part of its public API.
-    const tooltipLines = active.map(u =>
-        `${u.filePath}:${u.line}${u.isExport ? ' (re-export)' : ''}`,
-    );
+    // file is exposing the package as part of its public API. A file that
+    // both imports and re-exports the same package (deduplicated into one
+    // usage) renders as two tooltip rows so the user still sees both
+    // directive locations — the count on the cell is just the file count.
+    const tooltipLines: string[] = [];
+    for (const u of active) {
+        if (u.exportLine != null) {
+            tooltipLines.push(`${u.filePath}:${u.exportLine} (re-export)`);
+        }
+        if (u.importLine != null) {
+            tooltipLines.push(`${u.filePath}:${u.importLine}`);
+        }
+        // Fallback for fixtures that don't populate the directive lines.
+        if (u.exportLine == null && u.importLine == null) {
+            tooltipLines.push(
+                `${u.filePath}:${u.line}${u.isExport ? ' (re-export)' : ''}`,
+            );
+        }
+    }
     if (isReExport) {
         tooltipLines.unshift('Public API surface — at least one usage is a re-export.', '');
     }
@@ -542,10 +652,10 @@ function buildUpdateCell(r: VibrancyResult): string {
         && r.updateInfo.updateStatus !== 'unknown';
     const name = encodeURIComponent(r.package.name);
     const url = `https://pub.dev/packages/${name}/changelog`;
-    if (!hasUpdate) { return '<td><span class="dimmed">\u2013</span></td>'; }
+    if (!hasUpdate) { return '<td class="cell-right"><span class="dimmed">\u2013</span></td>'; }
     const text = escapeHtml(`\u2192 ${r.updateInfo!.latestVersion}`);
     const cls = getUpdateClass(r.updateInfo!.updateStatus);
-    return `<td class="${cls}"><a href="${url}">${text}</a></td>`;
+    return `<td class="cell-right ${cls}"><a href="${url}">${text}</a></td>`;
 }
 
 function getUpdateClass(status: string): string {
@@ -655,9 +765,25 @@ function buildDetailFilesSection(
     active: ReturnType<typeof activeFileUsages>,
 ): string {
     const name = escapeHtml(r.package.name);
-    const fileList = active.slice(0, 20).map(u =>
-        `<div class="file-row">${escapeHtml(u.filePath)}:${u.line}</div>`,
-    ).join('\n');
+    // Each usage is one source file after the scanner dedupe. Render a
+    // row per directive kind (import / export) that the file contains so
+    // both line locations stay visible even though the header count is
+    // now files-not-directives. Files without the split fields fall back
+    // to the pre-dedupe single-line display.
+    const fileList = active.slice(0, 20).flatMap(u => {
+        const rows: string[] = [];
+        const path = escapeHtml(u.filePath);
+        if (u.exportLine != null) {
+            rows.push(`<div class="file-row">${path}:${u.exportLine} (re-export)</div>`);
+        }
+        if (u.importLine != null) {
+            rows.push(`<div class="file-row">${path}:${u.importLine}</div>`);
+        }
+        if (u.exportLine == null && u.importLine == null) {
+            rows.push(`<div class="file-row">${path}:${u.line}</div>`);
+        }
+        return rows;
+    }).join('\n');
     const more = active.length > 20
         ? `<div class="dimmed">... and ${active.length - 20} more</div>` : '';
     return `<div class="detail-section">
@@ -706,10 +832,11 @@ function buildDetailLinksSection(r: VibrancyResult): string {
 function buildPackageDataScript(
     results: VibrancyResult[],
     overrideNames: ReadonlySet<string>,
+    repoShareMap: ReadonlyMap<string, number>,
 ): string {
     const entries = results.map(r => {
         const key = JSON.stringify(r.package.name);
-        const val = JSON.stringify(buildPackageJson(r, overrideNames));
+        const val = JSON.stringify(buildPackageJson(r, overrideNames, repoShareMap));
         return `${key}:${val}`;
     });
     /* Escape < to \u003c so embedded JSON cannot break out of the script tag */
@@ -717,10 +844,36 @@ function buildPackageDataScript(
     return raw.replace(/</g, '\\u003c');
 }
 
+/**
+ * Build the `stars` JSON block: the raw GitHub star count paired with the
+ * canonical repo URL and a monorepo-sibling count. Repo stars are not a
+ * reliable per-package signal because every package in a monorepo
+ * (firebase/flutterfire, bloclibrary/bloc, flutter/packages, ...) reports
+ * the same number. We still surface the count because it's useful context
+ * for the repo as a whole, but we pair it with `repoUrl` (so consumers can
+ * click through) and `monorepoSiblings` (so they can discount the number
+ * when >0). Returns null when no GitHub data was fetched.
+ */
+function buildStarsBlock(
+    r: VibrancyResult,
+    repoShareMap: ReadonlyMap<string, number>,
+): { count: number; repoUrl: string | null; monorepoSiblings: number } | null {
+    const count = r.github?.stars;
+    if (count == null) { return null; }
+    const repoUrl = resolveRepoUrl(r) ?? null;
+    /* `repoShareMap` counts how many results resolve to the same repo URL;
+       subtract this row to get the number of OTHER packages in the project
+       sharing the repo. 0 siblings = dedicated repo, so the star count is
+       reliable per-package. */
+    const shared = repoUrl ? (repoShareMap.get(repoUrl) ?? 1) - 1 : 0;
+    return { count, repoUrl, monorepoSiblings: Math.max(0, shared) };
+}
+
 /** Build a comprehensive JSON-safe object for one package row. */
 function buildPackageJson(
     r: VibrancyResult,
     overrideNames: ReadonlySet<string>,
+    repoShareMap: ReadonlyMap<string, number>,
 ): Record<string, unknown> {
     const name = r.package.name;
     const encoded = encodeURIComponent(name);
@@ -742,7 +895,17 @@ function buildPackageJson(
         },
         category: categoryLabel(r.category),
         published: r.pubDev?.publishedDate.split('T')[0] ?? null,
-        stars: r.github?.stars ?? null,
+        /* Per-package pub.dev signals (what the Likes / Downloads table
+           columns now show). These are the primary trust indicators we
+           expose in the report because, unlike repo stars, they measure
+           this specific package. */
+        likes: r.likes ?? null,
+        downloadCount30Days: r.downloadCount30Days ?? null,
+        /* Repo-level context retained for consumers that still want the
+           GitHub star count, paired with the repo URL and the count of
+           other project packages sharing the same repo (monorepo
+           detection). See buildStarsBlock for the rationale. */
+        stars: buildStarsBlock(r, repoShareMap),
         openIssues: r.github?.trueOpenIssues ?? r.github?.openIssues ?? null,
         openPullRequests: r.github?.openPullRequests ?? null,
         archiveSize: r.archiveSizeBytes !== null
@@ -754,7 +917,18 @@ function buildPackageJson(
         } : null,
         isUnused: r.isUnused,
         fileCount: activeFiles.length,
-        files: activeFiles.map(u => `${u.filePath}:${u.line}`),
+        // One entry per source file. Now that the scanner dedupes by
+        // (filePath, isCommented), a file that both imports and
+        // re-exports the same package is a single object with both
+        // `import` and `export` line numbers populated — previously it
+        // showed up as two separate `"path:line"` strings, which made
+        // `fileCount` double-count the file.
+        files: activeFiles.map(u => {
+            const entry: Record<string, unknown> = { path: u.filePath };
+            if (u.importLine != null) { entry.import = u.importLine; }
+            if (u.exportLine != null) { entry.export = u.exportLine; }
+            return entry;
+        }),
         transitives: r.transitiveInfo ? {
             count: r.transitiveInfo.transitiveCount,
             flagged: r.transitiveInfo.flaggedCount,
@@ -779,6 +953,10 @@ function buildPackageJson(
         links: {
             pubDev: `https://pub.dev/packages/${encoded}`,
             versions: `https://pub.dev/packages/${encoded}/versions`,
+            /* Score page is the destination for the Likes / Downloads
+               cells; including it here lets JSON consumers jump to the
+               same view without rebuilding the URL. */
+            score: `https://pub.dev/packages/${encoded}/score`,
             license: `https://pub.dev/packages/${encoded}/license`,
             changelog: `https://pub.dev/packages/${encoded}/changelog`,
             repository: r.pubDev?.repositoryUrl ?? null,
