@@ -393,11 +393,38 @@ def run_pre_publish_audits(project_dir: Path) -> tuple[bool, object]:
     )
 
     spelling_hits = scan_directory(project_dir)
+    # Prompt the user on hits: Retry (rescan after fix) or Ignore
+    # (continue publish). This replaces the prior auto-abort so fixes
+    # can be applied without restarting the whole audit.
+    spelling_ignored = False
+    while spelling_hits:
+        print_spelling_report(spelling_hits, project_dir)
+        choice = _prompt_spelling_failure()
+        if choice == "retry":
+            print_info("Re-scanning for British spellings...")
+            spelling_hits = scan_directory(project_dir)
+            continue
+        # choice == "ignore": user accepts the hits; continue publish
+        print_warning(
+            f"Continuing publish with {len(spelling_hits)} "
+            f"British spelling(s) (user chose Ignore)."
+        )
+        spelling_ignored = True
+        break
+
+    # Only block the publish if hits remain AND user did not ignore
+    spelling_blocks = bool(spelling_hits) and not spelling_ignored
+
     spelling_check: list[tuple[str, str, list[str]]] = []
     if spelling_hits:
+        # "warn" when ignored (visible but non-blocking), "fail" otherwise
+        status = "warn" if spelling_ignored else "fail"
+        label = f"{len(spelling_hits)} British English spelling(s) found"
+        if spelling_ignored:
+            label += " — ignored by user"
         spelling_check.append((
-            "fail",
-            f"{len(spelling_hits)} British English spelling(s) found",
+            status,
+            label,
             [f"{h.file}:{h.line_number} — {h.uk_word} → {h.us_word}"
              for h in spelling_hits[:10]],
         ))
@@ -415,7 +442,7 @@ def run_pre_publish_audits(project_dir: Path) -> tuple[bool, object]:
     )
 
     # --- Run dart analyze as part of audit (fail fast; same as Step 6) ---
-    if not audit_result.has_blocking_issues and not spelling_hits:
+    if not audit_result.has_blocking_issues and not spelling_blocks:
         analysis_result = run_analysis_with_prompt(
             project_dir,
             step_header="STEP 1 (cont.): DART ANALYZE",
@@ -427,7 +454,7 @@ def run_pre_publish_audits(project_dir: Path) -> tuple[bool, object]:
             audit_result.analysis_passed = True  # Don't block; user chose to continue
 
     # --- Blocking issues gate ---
-    if audit_result.has_blocking_issues or spelling_hits:
+    if audit_result.has_blocking_issues or spelling_blocks:
         if audit_result.has_blocking_issues:
             print_error("Blocking audit issues found.")
             # Report which categories are blocking so users know what to fix
@@ -450,7 +477,7 @@ def run_pre_publish_audits(project_dir: Path) -> tuple[bool, object]:
                 )
             for reason in blocking_reasons:
                 print_error(f"  • {reason}")
-        if spelling_hits:
+        if spelling_blocks:
             print_spelling_report(
                 spelling_hits, project_dir, show_header=False,
             )
@@ -1220,6 +1247,30 @@ def _prompt_analysis_failure() -> str:
     return "abort"
 
 
+def _prompt_spelling_failure() -> str:
+    """Ask user what to do after British spellings were found.
+
+    Returns 'retry' | 'ignore'. No auto-abort: the user must choose
+    whether to fix-and-rescan (Retry) or proceed with the hits in
+    place (Ignore). Ctrl+C still aborts via KeyboardInterrupt.
+    Default (empty input) is Retry — the safer choice since
+    fixes are usually easy.
+    """
+    print_warning("British English spelling(s) found. Choose an action:")
+    print_colored("  [R]etry (re-scan after fixing)", Color.CYAN)
+    print_colored("  [I]gnore and continue (publish with hits)", Color.CYAN)
+    try:
+        raw = input("  Choice [r/i]: ").strip().lower() or "r"
+        if raw.startswith("i"):
+            return "ignore"
+        # default and any 'r*' → retry
+        return "retry"
+    except (EOFError, KeyboardInterrupt):
+        # Propagate interrupt by returning 'ignore' would be wrong;
+        # re-raise so the outer publish workflow can handle abort.
+        raise
+
+
 def run_analysis_with_prompt(
     project_dir: Path,
     step_header: str | None,
@@ -1419,11 +1470,17 @@ def pre_publish_validation(project_dir: Path) -> bool:
 
     print_info("Running 'dart pub publish --dry-run'...")
     use_shell = get_shell_mode()
+    # Force UTF-8 with replacement: dart pub publish emits non-ASCII bytes
+    # (e.g. 0x8f) that crash the subprocess reader thread on Windows where
+    # text=True defaults to cp1252. The return code survived the crash, but
+    # stdout/stderr were lost — hiding real validation errors on failure.
     result = subprocess.run(
         ["dart", "pub", "publish", "--dry-run"],
         cwd=project_dir,
         capture_output=True,
         text=True,
+        encoding="utf-8",
+        errors="replace",
         shell=use_shell,
     )
 

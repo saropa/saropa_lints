@@ -163,18 +163,26 @@ def _prompt_publish_mode() -> str:
 
 
 def main(
-    mode: str = "full",
+    mode: str | None = None,
     output_level: OutputLevel | None = None,
 ) -> int:
     """Run publish workflow. Returns exit code (0 = success).
 
     Args:
-        mode: 'full' | 'audit_only' | 'fix_docs' | 'full_skip_audit' | 'analyze_only' | 'extension_only'
+        mode: 'full' | 'audit_only' | 'fix_docs' | 'full_skip_audit' | 'analyze_only' | 'extension_only'.
+              If None, prompts the user interactively (after displaying the logo so
+              the Saropa brand always appears first — see "logo ALWAYS first" rule).
         output_level: Verbosity level (defaults to VERBOSE).
     """
+    # Terminal setup + logo MUST happen before any prompt so the Saropa logo
+    # is the first thing the user sees when running the script.
     enable_ansi_support()
     set_output_level(output_level or OutputLevel.VERBOSE)
     show_saropa_logo()
+
+    # Prompt for mode AFTER the logo is displayed (previously prompted before logo).
+    if mode is None:
+        mode = _prompt_publish_mode()
 
     project_dir = get_project_dir()
     pubspec_path = project_dir / "pubspec.yaml"
@@ -199,4 +207,5 @@ def main(
 
 
 if __name__ == "__main__":
-    sys.exit(main(mode=_prompt_publish_mode()))
+    # main() now displays the logo before prompting for mode, so call it directly.
+    sys.exit(main())

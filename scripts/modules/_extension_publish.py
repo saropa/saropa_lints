@@ -22,6 +22,21 @@ import re
 import time
 import urllib.request
 from pathlib import Path
+from typing import NamedTuple
+
+
+class StorePublicationResult(NamedTuple):
+    """Per-store result from verify_extension_store_publication.
+
+    Each field is True only if that store reports the expected version
+    within the polling window. Separate booleans let the caller issue
+    targeted warnings (e.g. Marketplace failed but Open VSX succeeded,
+    which is the exact scenario that prompted this split — PAT or upload
+    silently failing on Marketplace while Open VSX publishes fine).
+    """
+
+    marketplace_ok: bool
+    open_vsx_ok: bool
 
 from scripts.modules._utils import (
     print_colored,
@@ -382,13 +397,20 @@ def verify_extension_store_publication(
     publisher: str,
     extension_name: str,
     expected_version: str,
+    vsix_path: Path | None = None,
     interval_seconds: int = 30,
     timeout_seconds: int = 600,
-) -> bool:
+) -> StorePublicationResult:
     """Poll Marketplace and Open VSX until both report expected version or timeout.
 
-    Checks every *interval_seconds* for up to *timeout_seconds*. Returns True
-    when both stores report *expected_version*, False on timeout.
+    Polls every *interval_seconds* for up to *timeout_seconds*. Returns a
+    StorePublicationResult with per-store booleans so the caller can warn
+    specifically about a Marketplace failure (the common case: a silent
+    vsce publish that returned 0 but never actually propagated the new
+    version because the PAT was expired or lacked scope).
+
+    On failure, prints the MARKETPLACE_MANAGE_URL and manual-upload guidance
+    so the user can open the page and drop the .vsix in themselves.
     """
     print_header("FINAL STEP: STORE PUBLICATION VERIFICATION")
     print_info(
@@ -398,25 +420,37 @@ def verify_extension_store_publication(
     item_name = f"{publisher}.{extension_name}"
     attempts = (timeout_seconds // interval_seconds) + 1
 
+    # Track the most recent values we observed so the final summary can
+    # report which version each store reported (or "unavailable" if the
+    # API call failed entirely). Also track per-store success so we can
+    # stop re-checking a store once it has propagated.
     last_marketplace = "unknown"
     last_openvsx = "unknown"
-    for attempt in range(1, attempts + 1):
-        marketplace_version = _fetch_marketplace_latest_version(item_name)
-        open_vsx_version = _fetch_open_vsx_latest_version(
-            publisher, extension_name,
-        )
-        last_marketplace = marketplace_version or "unavailable"
-        last_openvsx = open_vsx_version or "unavailable"
+    marketplace_ok = False
+    open_vsx_ok = False
 
-        marketplace_ok = marketplace_version == expected_version
-        open_vsx_ok = open_vsx_version == expected_version
+    for attempt in range(1, attempts + 1):
+        # Only re-query a store that hasn't yet reported the expected
+        # version. Once it's confirmed we leave its last-seen value alone.
+        if not marketplace_ok:
+            marketplace_version = _fetch_marketplace_latest_version(item_name)
+            last_marketplace = marketplace_version or "unavailable"
+            marketplace_ok = marketplace_version == expected_version
+        if not open_vsx_ok:
+            open_vsx_version = _fetch_open_vsx_latest_version(
+                publisher, extension_name,
+            )
+            last_openvsx = open_vsx_version or "unavailable"
+            open_vsx_ok = open_vsx_version == expected_version
 
         if marketplace_ok and open_vsx_ok:
             print_success(
-                f"Store propagation complete: Marketplace={marketplace_version}, "
-                f"Open VSX={open_vsx_version}"
+                f"Store propagation complete: Marketplace={last_marketplace}, "
+                f"Open VSX={last_openvsx}"
             )
-            return True
+            return StorePublicationResult(
+                marketplace_ok=True, open_vsx_ok=True,
+            )
 
         print_info(
             f"Attempt {attempt}/{attempts}: Marketplace={last_marketplace}, "
@@ -425,9 +459,34 @@ def verify_extension_store_publication(
         if attempt < attempts:
             time.sleep(interval_seconds)
 
-    print_warning(
-        "Store propagation not confirmed within 10 minutes. "
-        f"Last seen versions: Marketplace={last_marketplace}, "
-        f"Open VSX={last_openvsx}."
+    # Timed out — emit per-store warnings so the user knows exactly which
+    # store needs manual intervention. Marketplace failure is the loud one
+    # because we've seen vsce return success while the Marketplace silently
+    # drops the upload (expired PAT, missing "Marketplace > Manage" scope).
+    if not marketplace_ok:
+        print_warning(
+            f"VS Code Marketplace still shows {last_marketplace} "
+            f"(expected {expected_version}). The publish did not propagate."
+        )
+        print_info(
+            f"  Open {MARKETPLACE_MANAGE_URL} and upload the .vsix manually."
+        )
+        if vsix_path and vsix_path.is_file():
+            print_info(f"  File to upload: {vsix_path}")
+    else:
+        print_success(f"Marketplace OK: {last_marketplace}")
+
+    if not open_vsx_ok:
+        print_warning(
+            f"Open VSX still shows {last_openvsx} "
+            f"(expected {expected_version})."
+        )
+        print_info(
+            f"  Manage: https://open-vsx.org/user-settings/extensions"
+        )
+    else:
+        print_success(f"Open VSX OK: {last_openvsx}")
+
+    return StorePublicationResult(
+        marketplace_ok=marketplace_ok, open_vsx_ok=open_vsx_ok,
     )
-    return False
