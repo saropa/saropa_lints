@@ -114,6 +114,12 @@ export interface PubDevMetrics {
     readonly pubPoints: number;
     /** Number of likes from pub.dev. Null when score API failed. */
     readonly likes: number | null;
+    /**
+     * Downloads on pub.dev in the trailing 30 days (from score API's
+     * `downloadCount30Days` field). Null when the score API failed or did
+     * not include the field (e.g. older registry mirrors).
+     */
+    readonly downloadCount30Days: number | null;
     readonly platforms: readonly string[];
     readonly wasmReady: boolean | null;
 }
@@ -254,6 +260,13 @@ export interface VibrancyResult {
     readonly replacementComplexity: ReplacementComplexity | null;
     /** Number of likes on pub.dev. Null until fetched. */
     readonly likes: number | null;
+    /**
+     * Downloads on pub.dev in the trailing 30 days. Null when the score API
+     * failed or did not include the field. A strong trust signal because
+     * unlike stars (which count the whole repo) it is tied to this specific
+     * package.
+     */
+    readonly downloadCount30Days: number | null;
     /** Number of published packages on pub.dev that depend on this package. Null when not yet fetched or fetch failed. */
     readonly reverseDependencyCount: number | null;
     /** README logo and images. Null until lazy-fetched when detail panel opens. */

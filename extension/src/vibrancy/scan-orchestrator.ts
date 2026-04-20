@@ -135,6 +135,7 @@ export async function analyzePackage(
         overrideGap: null,
         replacementComplexity: null,
         likes: metrics.likes,
+        downloadCount30Days: metrics.downloadCount30Days,
         reverseDependencyCount,
         readme: null, // Lazy-loaded when detail panel opens
     };

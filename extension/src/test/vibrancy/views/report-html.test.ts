@@ -44,7 +44,8 @@ function makeResult(
         isUnused: false, fileUsages: [], platforms: null, verifiedPublisher: false, wasmReady: null, blocker: null, upgradeBlockStatus: 'up-to-date',
         transitiveInfo: null, alternatives: [], latestPrerelease: null, prereleaseTag: null, vulnerabilities: [],
         versionGap: null, overrideGap: null, replacementComplexity: null,
-        likes: null, reverseDependencyCount: null, readme: null,
+        likes: null, downloadCount30Days: null,
+        reverseDependencyCount: null, readme: null,
     };
 }
 
@@ -723,12 +724,32 @@ describe('report: empty-cell dash with explanatory tooltip', () => {
         return [...firstRow[0].matchAll(/<td[^>]*>[\s\S]*?<\/td>/g)].map(m => m[0]);
     }
 
-    it('should show dash with tooltip when stars are unavailable', () => {
-        const result = { ...makeResult('http', 80), github: null };
+    it('should show dash in likes cell when pub.dev likes are unavailable', () => {
+        /* Likes column replaced Stars. When r.likes is null the cell still
+           renders a dash and links to the pub.dev /score page — clicking
+           takes the user to the authoritative source rather than leaving
+           them with a dead cell. */
+        const result = { ...makeResult('http', 80), likes: null };
         const html = buildReportHtml(opts([result]));
         const cells = rowCells(html);
-        const starsCell = cells.find(c => c.includes('\u2014') && c.includes('No GitHub repository found'));
-        assert.ok(starsCell, 'expected a cell with em-dash and GitHub tooltip for missing stars');
+        const likesCell = cells.find(c =>
+            c.includes('\u2014')
+            && c.includes('pub.dev likes not available')
+            && c.includes('/score'),
+        );
+        assert.ok(likesCell, 'expected likes cell with em-dash, tooltip, and /score link when likes missing');
+    });
+
+    it('should show dash in downloads cell when pub.dev downloads are unavailable', () => {
+        /* Downloads cell uses downloadCount30Days; null → dash + tooltip. */
+        const result = { ...makeResult('http', 80), downloadCount30Days: null };
+        const html = buildReportHtml(opts([result]));
+        const cells = rowCells(html);
+        const dlCell = cells.find(c =>
+            c.includes('\u2014')
+            && c.includes('pub.dev 30-day downloads not available'),
+        );
+        assert.ok(dlCell, 'expected downloads cell with em-dash and tooltip when downloads missing');
     });
 
     it('should show dash with tooltip when published date is unavailable', () => {
@@ -741,14 +762,14 @@ describe('report: empty-cell dash with explanatory tooltip', () => {
         assert.ok(html.includes('>\u2014<'), 'expected em-dash for missing date');
     });
 
-    it('should show dash with tooltip when issues count is unavailable', () => {
+    it('should show dash with tooltip when issues/PRs are unavailable', () => {
         const result = { ...makeResult('http', 80), github: null };
         const html = buildReportHtml(opts([result]));
-        /* The issues cell should contain an em-dash with a GitHub tooltip */
+        /* Stars column was removed — only issues and PRs still depend on
+           GitHub data, so only 2 cells get the NO_GITHUB_TOOLTIP. */
         const cells = rowCells(html);
         const issueCells = cells.filter(c => c.includes('No GitHub repository found'));
-        /* stars, issues, and PRs all show this tooltip when github is null */
-        assert.ok(issueCells.length >= 3, 'expected at least 3 cells with GitHub tooltip (stars, issues, PRs)');
+        assert.ok(issueCells.length >= 2, 'expected at least 2 cells with GitHub tooltip (issues, PRs)');
     });
 
     it('should show dash with tooltip when archive size is unavailable', () => {
@@ -769,17 +790,33 @@ describe('report: empty-cell dash with explanatory tooltip', () => {
         assert.ok(!html.includes('class="desc-text"'));
     });
 
-    it('should NOT show dash tooltip when stars are available', () => {
-        /* makeResult has github.stars: 42 */
-        const html = buildReportHtml(opts([makeResult('http', 80)]));
-        /* The stars cell should show the number, not a tooltip about missing data */
-        assert.ok(html.includes('>42<'), 'expected star count rendered');
-        /* "No GitHub repository found" should not appear for the stars cell */
-        const cells = rowCells(html);
-        const starsCellWithTooltip = cells.find(
-            c => c.includes('42') && c.includes('No GitHub repository found'),
+    it('should render likes count linking to pub.dev /score when available', () => {
+        /* Likes cell replaces the old Stars cell. The count links to the
+           pub.dev /score tab — clicking takes the user to the authoritative
+           source for likes / pub points / downloads. */
+        const result = { ...makeResult('http', 80), likes: 1234 };
+        const html = buildReportHtml(opts([result]));
+        /* Compact number rendered (>=1000 → "1.2k") with full count in the
+           cell tooltip. */
+        assert.ok(html.includes('1.2k'), 'expected compact likes count rendered');
+        assert.ok(html.includes('title="1,234 pub.dev likes"'), 'expected likes tooltip with full count');
+        assert.ok(
+            html.includes('href="https://pub.dev/packages/http/score"'),
+            'expected likes cell to link to pub.dev /score page',
         );
-        assert.ok(!starsCellWithTooltip, 'star cell with data should not have missing-data tooltip');
+    });
+
+    it('should render downloads count linking to pub.dev /score when available', () => {
+        /* Downloads cell uses the same score-page link. 8,271,810 → "8.3M"
+           to keep the column compact; full count appears in the tooltip. */
+        const result = { ...makeResult('http', 80), downloadCount30Days: 8_271_810 };
+        const html = buildReportHtml(opts([result]));
+        assert.ok(html.includes('8.3M'), 'expected compact downloads count rendered');
+        assert.ok(
+            html.includes('title="8,271,810 downloads in the last 30 days"'),
+            'expected downloads tooltip with full count',
+        );
+        assert.ok(html.includes('href="https://pub.dev/packages/http/score"'));
     });
 
     it('should not render license cell when license column is hidden', () => {
@@ -792,12 +829,70 @@ describe('report: empty-cell dash with explanatory tooltip', () => {
     });
 
     it('should wrap all placeholder dashes in dimmed span', () => {
-        /* A result with null github produces dimmed dashes for stars/issues/PRs */
+        /* A result with null github produces dimmed dashes for issues/PRs
+           (Stars was replaced by the pub.dev-sourced Likes column, which
+           renders a dash via its own `pub.dev likes not available` path). */
         const result = { ...makeResult('http', 80), github: null };
         const html = buildReportHtml(opts([result]));
         assert.ok(html.includes('class="dimmed"'));
         /* Dashes should be inside dimmed spans, not bare */
         assert.ok(html.includes('<span class="dimmed">\u2014</span>'));
+    });
+});
+
+describe('report: stars JSON context (monorepo disambiguation)', () => {
+    /* Stars were removed from the table because every monorepo sibling
+       reported the same count. They stay in the copy-as-JSON payload
+       paired with repoUrl and monorepoSiblings, so consumers can decide
+       how to weight the signal. */
+    it('should expose stars block with repoUrl and siblings=0 for a solo-repo package', () => {
+        const r = makeResult('http', 80);
+        /* Give it a repo URL so resolveRepoUrl has something to work with. */
+        const result: VibrancyResult = {
+            ...r,
+            pubDev: { ...r.pubDev!, repositoryUrl: 'https://github.com/dart-lang/http' },
+        };
+        const html = buildReportHtml(opts([result]));
+        /* JSON gets embedded in a var packageData={...} script block. */
+        assert.ok(html.includes('"stars":{"count":42'));
+        assert.ok(html.includes('"repoUrl":"https://github.com/dart-lang/http"'));
+        assert.ok(html.includes('"monorepoSiblings":0'));
+    });
+
+    it('should count siblings when multiple packages share one repo URL', () => {
+        /* Simulate a flutterfire-style monorepo: three packages all
+           reporting the same repo URL. Each row's JSON should report
+           monorepoSiblings=2 (the other two packages in the project). */
+        const mkSibling = (name: string): VibrancyResult => {
+            const base = makeResult(name, 80);
+            return {
+                ...base,
+                pubDev: { ...base.pubDev!, repositoryUrl: 'https://github.com/firebase/flutterfire' },
+            };
+        };
+        const results = [mkSibling('firebase_core'), mkSibling('firebase_auth'), mkSibling('cloud_firestore')];
+        const html = buildReportHtml(opts(results));
+        /* Every row should see 2 siblings (N - 1). */
+        const matches = html.match(/"monorepoSiblings":2/g) ?? [];
+        assert.strictEqual(matches.length, 3, 'expected all 3 monorepo packages to report 2 siblings each');
+    });
+
+    it('should set stars block to null when github data is missing', () => {
+        const result = { ...makeResult('http', 80), github: null };
+        const html = buildReportHtml(opts([result]));
+        assert.ok(html.includes('"stars":null'), 'expected stars:null when no github data');
+    });
+
+    it('should expose likes and downloadCount30Days in row JSON', () => {
+        const result = { ...makeResult('http', 80), likes: 8429, downloadCount30Days: 8_271_810 };
+        const html = buildReportHtml(opts([result]));
+        assert.ok(html.includes('"likes":8429'));
+        assert.ok(html.includes('"downloadCount30Days":8271810'));
+    });
+
+    it('should expose score link alongside other pub.dev links', () => {
+        const html = buildReportHtml(opts([makeResult('http', 80)]));
+        assert.ok(html.includes('"score":"https://pub.dev/packages/http/score"'));
     });
 });
 
