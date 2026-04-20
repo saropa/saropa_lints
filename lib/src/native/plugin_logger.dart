@@ -13,7 +13,7 @@
 /// `violations.json` report.
 ///
 /// **Lifecycle problem and the fix.** At plugin `start()` time the project
-/// root is not yet known (see [config_loader]), so the log file path cannot
+/// root is not yet known (see `config_loader`), so the log file path cannot
 /// be resolved. Early log events are buffered in memory (capped at
 /// [_maxBufferSize] entries — enough for startup diagnostics, not unbounded).
 /// Once [setProjectRoot] is called from
@@ -50,17 +50,13 @@ final class PluginLogger {
   static final List<_LogEntry> _buffer = [];
 
   /// Absolute path of the log file once the project root is known.
-  /// Null means entries still go into [_buffer].
+  /// Null means entries still go into `_buffer`.
   static String? _logFilePath;
 
   /// Records a log event. Always mirrors to `developer.log` (for analysis-
   /// server log continuity), then either appends to the user-visible log
   /// file or buffers the entry for later flush.
-  static void log(
-    String message, {
-    Object? error,
-    StackTrace? stackTrace,
-  }) {
+  static void log(String message, {Object? error, StackTrace? stackTrace}) {
     // Always send to developer.log so it still shows in the analysis server
     // log file for advanced users / CI log harvesting.
     developer.log(
@@ -111,10 +107,13 @@ final class PluginLogger {
 
       // Write a session header so multiple sessions are visually separable
       // in the (append-only) log file when tailing.
-      _appendToFile(path, _LogEntry(
-        timestamp: DateTime.now(),
-        message: '--- saropa_lints plugin session started ---',
-      ));
+      _appendToFile(
+        path,
+        _LogEntry(
+          timestamp: DateTime.now(),
+          message: '--- saropa_lints plugin session started ---',
+        ),
+      );
 
       // Flush everything buffered before the root was known.
       for (final entry in _buffer) {
