@@ -1,7 +1,7 @@
 # Plan #054 — `prefer_listenable_builder_over_animated_builder`
 
 **Source:** Flutter SDK 3.13.0 (when `ListenableBuilder` was added)
-**Status:** Promoted out of `deferred/` on 2026-04-19 after review confirmed a viable detection path.
+**Status:** ✅ Implemented on 2026-04-20 — rule `prefer_listenable_builder` shipped in Recommended tier with quick fix.
 **Category:** Replacement / Migration
 **Relevance Score:** 6
 
@@ -92,21 +92,15 @@ Write fixtures for each of the above in `example/lib/` before asserting the rule
 
 ## Implementation Checklist
 
-- [ ] Verify the API change in Flutter SDK source (confirm `ListenableBuilder` constructor signature matches `AnimatedBuilder` for `animation`/`builder`/`child`).
-- [ ] Determine minimum SDK version requirement (Flutter 3.13.0 for `ListenableBuilder`).
-- [ ] Write detection logic (AST visitor) in `lib/src/rules/ui/animation_rules.dart`.
-- [ ] Write quick-fix replacement (rename constructor).
-- [ ] Create test fixture in `example/lib/` covering:
-  - BAD: `AnimatedBuilder(animation: ValueNotifier<int>(0), ...)`
-  - BAD: `AnimatedBuilder(animation: ChangeNotifier(), ...)`
-  - OK: `AnimatedBuilder(animation: _animationController, ...)`
-  - OK: `AnimatedBuilder(animation: Tween(...).animate(_controller), ...)`
-  - OK: unresolved / `dynamic` type — no report
-- [ ] Add unit tests in `test/`.
-- [ ] Register rule class in `lib/saropa_lints.dart` `_allRuleFactories` (~line 157).
-- [ ] Add rule name to appropriate tier set in `lib/src/tiers.dart`.
-- [ ] Update `ROADMAP.md` entry.
-- [ ] Update `CHANGELOG.md` under `[Unreleased]`.
+- [x] Verify the API change in Flutter SDK source (confirm `ListenableBuilder` constructor signature matches `AnimatedBuilder` for `animation`/`builder`/`child`).
+- [x] Determine minimum SDK version requirement (Flutter 3.13.0 for `ListenableBuilder` — noted in the rule's `correctionMessage`; no runtime gate since `ProjectContext` has no SDK-version detection today).
+- [x] Write detection logic (AST visitor) in [`lib/src/rules/ui/animation_rules.dart`](../lib/src/rules/ui/animation_rules.dart).
+- [x] Write quick-fix replacement (rename constructor) — [`lib/src/fixes/animation/prefer_listenable_builder_fix.dart`](../lib/src/fixes/animation/prefer_listenable_builder_fix.dart).
+- [x] Create test fixture in [`example/lib/animation/prefer_listenable_builder_fixture.dart`](../example/lib/animation/prefer_listenable_builder_fixture.dart) covering ValueNotifier / ChangeNotifier (BAD), AnimationController / CurvedAnimation / already-migrated `ListenableBuilder` (GOOD), and dynamic/unresolved (GOOD). Flutter mocks were extended with a `Listenable` interface so type resolution works downstream.
+- [x] Add unit tests in [`test/prefer_listenable_builder_rule_test.dart`](../test/prefer_listenable_builder_rule_test.dart).
+- [x] Register rule class in [`lib/saropa_lints.dart`](../lib/saropa_lints.dart) `_allRuleFactories`.
+- [x] Add rule name to `recommendedOnlyRules` in [`lib/src/tiers.dart`](../lib/src/tiers.dart).
+- [x] Update `CHANGELOG.md` under `[Unreleased]`. ROADMAP body lists categories (not individual rules); the auto-sync line tracks the rule count.
 - [ ] `/analyze`, `/test`, `/format`.
 
 ---

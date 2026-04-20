@@ -37,7 +37,12 @@
 
 ### Added
 
+- **Rule `prefer_listenable_builder`** (Recommended tier, INFO): Flags `AnimatedBuilder(animation: <plainListenable>, ...)` and recommends `ListenableBuilder` instead. The rule only fires when the analyzer can resolve the `animation:` argument's static type and that type implements `Listenable` but is not a subtype of `Animation` — so `AnimationController`, `CurvedAnimation`, `Tween.animate(...)` results, and custom `Animation` subclasses are correctly left alone. `ValueNotifier`, `ChangeNotifier`, and custom `Listenable` implementations trigger the migration hint. Ships a one-token quick fix that renames the constructor (the two widgets share the same `animation:`/`builder:`/`child:` parameter surface). Requires Flutter 3.13.0 or later. Promoted from [plan/054](plan/054-prefer_listenable_builder_over_animated_builder.md). ([animation_rules.dart](lib/src/rules/ui/animation_rules.dart), [prefer_listenable_builder_fix.dart](lib/src/fixes/animation/prefer_listenable_builder_fix.dart))
 - **Extension:** Vibrancy report toolbar now has a **Copy All JSON** button that copies every row's full record — including all expander content (health factors with letter grade, full vulnerability list, every file reference, the complete transitive dependency list with shared markers, and pub.dev/repo links) — as a JSON array to the clipboard. The per-row JSON was also enriched with `health.grade`, `transitives.deps`, and `transitives.sharedDeps` so the single-row copy button produces the same shape. ([report-html.ts](extension/src/vibrancy/views/report-html.ts), [report-script.ts](extension/src/vibrancy/views/report-script.ts))
+
+### Changed
+
+- **Extension:** Vibrancy report **Update** column is now right-aligned, matching the other numeric/compact columns (Stars, Issues, PRs, Size, References, Transitives, Deps). Both the update-arrow cells (e.g. `\u2192 2.0.0`) and the dimmed en-dash placeholder now align on the right edge. ([report-html.ts](extension/src/vibrancy/views/report-html.ts))
 
 ### Fixed
 
