@@ -39,6 +39,7 @@ import 'package:analysis_server_plugin/registry.dart' show PluginRegistry;
 import 'package:analyzer/error/error.dart' show DiagnosticCode;
 import 'package:saropa_lints/src/baseline/baseline_config.dart';
 import 'package:saropa_lints/src/baseline/baseline_manager.dart';
+import 'package:saropa_lints/src/native/plugin_logger.dart';
 import 'package:saropa_lints/src/report/analysis_reporter.dart';
 import 'package:saropa_lints/src/rules/all_rules.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart';
@@ -3089,6 +3090,7 @@ void registerSaropaLintRules(PluginRegistry registry) {
     final rules = _ruleFactories.values.map((f) => f()).toList(growable: false);
     if (rules.isEmpty) return;
 
+    var registered = 0;
     for (final rule in rules) {
       final code = rule.code;
       if (code.lowerCaseName.isEmpty) continue;
@@ -3098,15 +3100,25 @@ void registerSaropaLintRules(PluginRegistry registry) {
       }
 
       registry.registerLintRule(rule);
+      registered++;
 
       for (final generator in rule.fixGenerators) {
         registry.registerFixForRule(code, generator);
       }
     }
+
+    // User-visible telemetry — once the project root is known and the
+    // buffered log flushes, consumers can see "Registered N rules" in
+    // `reports/.saropa_lints/plugin.log`. If they instead see "Registered
+    // 0 rules" or no line at all, the plugin is mis-wired (e.g. every
+    // rule landed in disabledRules, or register() was never called).
+    PluginLogger.log(
+      'registerSaropaLintRules: registered $registered rules '
+      '(${rules.length} candidates, ${rules.length - registered} disabled)',
+    );
   } catch (e, st) {
-    developer.log(
+    PluginLogger.log(
       'registerSaropaLintRules failed',
-      name: 'saropa_lints',
       error: e,
       stackTrace: st,
     );

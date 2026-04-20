@@ -26,6 +26,7 @@ import '../saropa_lint_rule.dart' show ProgressTracker, SaropaLintRule;
 import 'compat_visitor.dart';
 import 'config_loader.dart'
     show loadNativePluginConfigFromProjectRoot;
+import 'plugin_logger.dart' show PluginLogger;
 
 /// Wraps [RuleVisitorRegistry] to provide callback-based registration.
 ///
@@ -155,6 +156,11 @@ class SaropaContext {
     final projectRoot = ProjectContext.findProjectRoot(path);
     if (projectRoot == null || projectRoot.isEmpty) return;
     _configReloadAttempted = true;
+    // Initialize the user-visible plugin log BEFORE the config reload so
+    // any log events emitted during load (successes, missing file, missing
+    // diagnostics block) land in the file immediately. Buffered early
+    // entries from Plugin.start() also flush here.
+    PluginLogger.setProjectRoot(projectRoot);
     loadNativePluginConfigFromProjectRoot(projectRoot);
   }
 

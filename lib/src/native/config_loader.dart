@@ -15,7 +15,6 @@
 /// - [BannedUsageConfig] from custom yaml
 library;
 
-import 'dart:developer' as developer;
 import 'dart:io' show Directory, File, Platform;
 
 import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
@@ -27,6 +26,7 @@ import '../config/analysis_options_rule_packs.dart';
 import '../config/pubspec_lock_resolver.dart';
 import '../config/rule_packs.dart';
 import '../saropa_lint_rule.dart' show ProgressTracker, SaropaLintRule;
+import 'plugin_logger.dart' show PluginLogger;
 
 /// Loads all plugin configuration from yaml and environment variables.
 /// Order matters: severity overrides first, then diagnostics (enable/disable),
@@ -81,10 +81,18 @@ void _loadFromRoot(String? projectRoot) {
     _loadBaselineConfig(content);
     loadBannedUsageConfig(content);
     _loadOutputConfig(content);
+
+    // Success telemetry — visible in reports/.saropa_lints/plugin.log once
+    // the project root is set. This is the primary signal users can check
+    // to confirm the fix landed and their config was actually read.
+    final enabledCount = SaropaLintRule.enabledRules?.length ?? 0;
+    PluginLogger.log(
+      'Config loaded from ${projectRoot ?? Directory.current.path} — '
+      'enabledRules: $enabledCount',
+    );
   } catch (e, st) {
-    developer.log(
+    PluginLogger.log(
       'loadNativePluginConfig failed',
-      name: 'saropa_lints',
       error: e,
       stackTrace: st,
     );
@@ -105,9 +113,8 @@ String? _readProjectFile(String filename, [String? projectRoot]) {
     if (!file.existsSync()) return null;
     return file.readAsStringSync();
   } catch (e, st) {
-    developer.log(
+    PluginLogger.log(
       '_readProjectFile failed',
-      name: 'saropa_lints',
       error: e,
       stackTrace: st,
     );
@@ -128,9 +135,8 @@ void loadOutputConfigFromProjectRoot(String projectRoot) {
     );
     if (content != null) _loadOutputConfig(content);
   } catch (e, st) {
-    developer.log(
+    PluginLogger.log(
       'loadOutputConfigFromProjectRoot failed',
-      name: 'saropa_lints',
       error: e,
       stackTrace: st,
     );
@@ -218,7 +224,7 @@ void _loadSeverityOverrides(String? content) {
 /// enables and severity-disabled rules from the custom config file.
 ///
 /// When no file or no diagnostics section is found, logs a diagnostic via
-/// [developer.log] and returns without modifying [enabledRules] — preserving
+/// [PluginLogger] and returns without modifying [enabledRules] — preserving
 /// any severity-implied enables. The log surfaces the "plugin loaded but
 /// silent" failure mode so consumers can see why zero diagnostics flow.
 ///
@@ -229,11 +235,10 @@ void _loadSeverityOverrides(String? content) {
 void _loadDiagnosticsConfig([String? projectRoot]) {
   final content = _readProjectFile('analysis_options.yaml', projectRoot);
   if (content == null) {
-    developer.log(
+    PluginLogger.log(
       'analysis_options.yaml not found at '
       '${projectRoot ?? Directory.current.path} — saropa_lints will not '
       'enable any rules until config is reloaded from the project root.',
-      name: 'saropa_lints',
     );
     return;
   }
@@ -243,12 +248,11 @@ void _loadDiagnosticsConfig([String? projectRoot]) {
     multiLine: true,
   ).firstMatch(content);
   if (sectionMatch == null) {
-    developer.log(
+    PluginLogger.log(
       'analysis_options.yaml found at '
       '${projectRoot ?? Directory.current.path} but no '
       '`plugins > saropa_lints > diagnostics:` block present. '
       'Run `dart run saropa_lints:init` or use the extension to generate it.',
-      name: 'saropa_lints',
     );
     return;
   }
@@ -429,9 +433,8 @@ void _loadOutputConfig(String? content) {
       outputFromEnv = true;
     }
   } catch (e, st) {
-    developer.log(
+    PluginLogger.log(
       '_loadOutputConfig env read failed',
-      name: 'saropa_lints',
       error: e,
       stackTrace: st,
     );
