@@ -70,6 +70,7 @@ from scripts.modules._rule_metrics import (
     sync_readme_badges,
 )
 from scripts.modules._extension_publish import (
+    MARKETPLACE_MANAGE_URL,
     extension_exists,
     get_extension_identity,
     install_extension,
@@ -568,14 +569,17 @@ def run_version_bump(
 
 def run_extension_after_publish(
     project_dir: Path, version: str, timer: StepTimer,
-) -> bool:
+) -> Path | None:
     """Package .vsix, optionally install and publish.
 
     Returns:
-        True if extension was published to stores.
+        Path to the .vsix when the extension was published to stores,
+        otherwise None. The path is used by the downstream store-verification
+        step to tell the user which file to upload manually if Marketplace
+        propagation fails.
     """
     if not extension_exists(project_dir):
-        return False
+        return None
     with timer.step("Extension"):
         vsix = package_extension(project_dir, version)
         if not vsix:
@@ -583,7 +587,7 @@ def run_extension_after_publish(
                 "Extension packaging failed — .vsix was not created. "
                 "Check compile errors above."
             )
-            return False
+            return None
         if not _prompt_extension_install_and_publish(
             vsix,
             skip_publish_msg=(
@@ -591,14 +595,14 @@ def run_extension_after_publish(
                 "Run option 6 (extension only) to publish later."
             ),
         ):
-            return False
+            return None
         if publish_extension(project_dir, vsix):
-            return True
+            return vsix
         print_warning(
             "Extension publish to Marketplace/Open VSX failed. "
             "Check output above for details."
         )
-        return False
+        return None
 
 
 # =============================================================================
@@ -678,20 +682,39 @@ def run_full_publish(
             ctx.branch,
             timer,
         )
-        extension_published = run_extension_after_publish(
+        published_vsix = run_extension_after_publish(
             ctx.project_dir, version, timer,
         )
+        extension_published = published_vsix is not None
         if extension_published:
             with timer.step("Store verification"):
                 publisher, ext_name = get_extension_identity(ctx.project_dir)
                 if publisher and ext_name:
-                    verify_extension_store_publication(
+                    # Pass vsix_path so that, on Marketplace timeout, the
+                    # verification step can show the exact file to upload.
+                    result = verify_extension_store_publication(
                         publisher=publisher,
                         extension_name=ext_name,
                         expected_version=version,
+                        vsix_path=published_vsix,
                         interval_seconds=30,
                         timeout_seconds=600,
                     )
+                    # Marketplace silently failing is the motivating case
+                    # here: vsce returns 0 but the Marketplace never serves
+                    # the new version. Open the manage page so the user
+                    # can upload the .vsix by hand without hunting for it.
+                    if not result.marketplace_ok:
+                        print_warning(
+                            "ACTION REQUIRED: upload the .vsix manually to "
+                            "the VS Code Marketplace."
+                        )
+                        try:
+                            webbrowser.open(MARKETPLACE_MANAGE_URL)
+                        except Exception:
+                            # Browser launch is best-effort; the warning
+                            # text above already shows the URL.
+                            pass
                 else:
                     print_warning(
                         "Could not resolve extension identity; "
