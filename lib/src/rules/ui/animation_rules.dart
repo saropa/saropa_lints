@@ -2348,6 +2348,11 @@ class PreferListenableBuilderRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    // SDK gate: skip projects pinned below Flutter 3.13.0, where
+    // ListenableBuilder did not yet exist. Unknown / unparseable constraints
+    // default to "assume modern" so we still emit on the common case.
+    if (!ProjectContext.flutterSdkAtLeast(context.filePath, 3, 13, 0)) return;
+
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
       // Filter to AnimatedBuilder instance creations by source token; cheap
       // comparison that avoids resolving the constructor element when it
