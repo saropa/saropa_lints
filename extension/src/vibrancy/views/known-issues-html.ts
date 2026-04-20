@@ -49,9 +49,16 @@ function buildSummaryCards(total: number, withReplacement: number): string {
 }
 
 function buildToolbar(): string {
+    // Search field wrapped so we can absolutely position a clear (X) button
+    // inside it; the button stays hidden until the user types, then clears
+    // the input + re-runs filters on click. See known-issues-script.ts.
     return `<div class="toolbar">
-        <input id="search-input" type="text"
-            placeholder="Search packages..." autocomplete="off">
+        <div class="search-wrapper">
+            <input id="search-input" type="text"
+                placeholder="Search packages..." autocomplete="off">
+            <button type="button" id="search-clear" class="search-clear"
+                title="Clear search" aria-label="Clear search" hidden>&times;</button>
+        </div>
         <label class="filter-label">
             <input id="filter-has-replacement" type="checkbox">
             Has replacement
@@ -118,8 +125,18 @@ function getExtraStyles(): string {
             display: flex; gap: 16px; align-items: center;
             margin-bottom: 12px;
         }
+        /* Relative wrapper anchors the absolutely-positioned clear (X)
+           button inside the search field. flex:1 lets the wrapper grow
+           like the bare input used to. */
+        .search-wrapper {
+            position: relative;
+            display: flex;
+            flex: 1;
+            max-width: 400px;
+            align-items: center;
+        }
         #search-input {
-            flex: 1; max-width: 400px; padding: 6px 10px;
+            flex: 1; padding: 6px 28px 6px 10px; /* right pad for clear (X) */
             font-size: 0.95em;
             color: var(--vscode-input-foreground);
             background: var(--vscode-input-background);
@@ -128,6 +145,30 @@ function getExtraStyles(): string {
         }
         #search-input:focus {
             border-color: var(--vscode-focusBorder);
+        }
+        /* Clear (X) button lives inside the input via absolute positioning.
+           Hidden by default via [hidden]; known-issues-script.ts toggles it
+           when the input value is non-empty after trim. */
+        .search-clear {
+            position: absolute;
+            right: 6px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            padding: 0;
+            line-height: 16px;
+            font-size: 16px;
+            border: none;
+            background: transparent;
+            color: var(--vscode-input-foreground);
+            opacity: 0.6;
+            cursor: pointer;
+            border-radius: 2px;
+        }
+        .search-clear:hover {
+            opacity: 1;
+            background: var(--vscode-toolbar-hoverBackground);
         }
         .filter-label {
             font-size: 0.9em; cursor: pointer;

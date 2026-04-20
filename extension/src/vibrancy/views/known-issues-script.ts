@@ -5,12 +5,24 @@ export function getKnownIssuesScript(): string {
         let sortAsc = true;
 
         const searchInput = document.getElementById('search-input');
+        const searchClear = document.getElementById('search-clear');
         const filterCheckbox = document.getElementById('filter-has-replacement');
         const tbody = document.getElementById('pkg-body');
         const countEl = document.getElementById('visible-count');
 
+        /* Toggle the inline clear (X) button's visibility based on whether
+           the trimmed input has any content. Called on every input event
+           and after the button clears the field. */
+        function updateSearchClearVisibility() {
+            if (!searchClear || !searchInput) { return; }
+            searchClear.hidden = searchInput.value.trim().length === 0;
+        }
+
         function applyFilters() {
-            const query = searchInput.value.toLowerCase();
+            /* Trim pasted whitespace (leading/trailing spaces, newlines, tabs)
+               so copy-paste from package lists or terminal output still
+               matches — users rarely intend to search for a literal space. */
+            const query = searchInput.value.trim().toLowerCase();
             const onlyWithReplacement = filterCheckbox.checked;
             let visible = 0;
 
@@ -57,7 +69,18 @@ export function getKnownIssuesScript(): string {
             });
         }
 
-        searchInput.addEventListener('input', applyFilters);
+        searchInput.addEventListener('input', function() {
+            applyFilters();
+            updateSearchClearVisibility();
+        });
+        if (searchClear) {
+            searchClear.addEventListener('click', function() {
+                searchInput.value = '';
+                applyFilters();
+                updateSearchClearVisibility();
+                searchInput.focus();
+            });
+        }
         filterCheckbox.addEventListener('change', applyFilters);
 
         document.querySelectorAll('th[data-col]').forEach(th => {
