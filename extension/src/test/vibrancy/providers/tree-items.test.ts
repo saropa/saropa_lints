@@ -23,7 +23,8 @@ function makeResult(name: string, score: number): VibrancyResult {
         blocker: null, upgradeBlockStatus: 'up-to-date',
         transitiveInfo: null, alternatives: [], latestPrerelease: null, prereleaseTag: null,
         vulnerabilities: [], versionGap: null, overrideGap: null,
-        replacementComplexity: null, likes: null, reverseDependencyCount: null, readme: null,
+        replacementComplexity: null, likes: null, downloadCount30Days: null,
+        reverseDependencyCount: null, readme: null,
     };
 }
 

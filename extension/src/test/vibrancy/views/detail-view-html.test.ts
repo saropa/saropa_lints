@@ -61,6 +61,7 @@ function makeResult(
         overrideGap: null,
         replacementComplexity: null,
         likes: null,
+        downloadCount30Days: null,
         reverseDependencyCount: null,
         readme: null,
     };

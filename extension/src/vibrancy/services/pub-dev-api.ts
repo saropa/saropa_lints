@@ -161,7 +161,8 @@ export async function fetchPackageMetrics(
     registryOpts?: RegistryOptions,
 ): Promise<PubDevMetrics> {
     const fallback: PubDevMetrics = {
-        pubPoints: 0, likes: null, platforms: [], wasmReady: null,
+        pubPoints: 0, likes: null, downloadCount30Days: null,
+        platforms: [], wasmReady: null,
     };
 
     const registryUrl = registryOpts?.registryUrl ?? PUB_DEV_URL;
@@ -201,18 +202,23 @@ export async function fetchPackageMetrics(
             })(),
         ]);
 
-        // Extract likes from score API even if metrics endpoint failed —
-        // the two endpoints are independent and one succeeding should not
-        // be discarded because the other failed.
+        // Extract likes + 30-day download count from the score API even if
+        // the metrics endpoint failed — the two endpoints are independent,
+        // and one succeeding should not be discarded because the other
+        // failed. `downloadCount30Days` is a package-specific trust signal
+        // (unlike repo stars, which are shared across all packages in a
+        // monorepo) so we want it whenever the score API responds.
         let likes: number | null = null;
+        let downloadCount30Days: number | null = null;
         if (scoreResp.ok) {
             const scoreJson: any = await scoreResp.json();
             likes = scoreJson.likeCount ?? null;
+            downloadCount30Days = scoreJson.downloadCount30Days ?? null;
         }
 
         if (!metricsResp.ok) {
-            // Return partial result: likes available, metrics zeroed
-            return { ...fallback, likes };
+            // Return partial result: score-derived fields available, metrics zeroed
+            return { ...fallback, likes, downloadCount30Days };
         }
 
         const metricsJson: any = await metricsResp.json();
@@ -221,6 +227,7 @@ export async function fetchPackageMetrics(
         const result: PubDevMetrics = {
             pubPoints: metricsJson.score?.grantedPoints ?? 0,
             likes,
+            downloadCount30Days,
             platforms: extractPlatforms(tags),
             wasmReady: tags.some(t => WASM_TAGS.includes(t)),
         };

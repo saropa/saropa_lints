@@ -55,6 +55,7 @@ export function makeMinimalResult(options: MakeResultOptions = {}): VibrancyResu
         overrideGap: null,
         replacementComplexity: null,
         likes: null,
+        downloadCount30Days: null,
         reverseDependencyCount: null,
         readme: null,
     };
