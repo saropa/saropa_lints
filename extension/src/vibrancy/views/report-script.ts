@@ -263,6 +263,30 @@ export function getReportScript(): string {
             });
         });
 
+        /* ---- Copy entire table as JSON ---- */
+        /* Copies an array of every package's full JSON record (same shape
+           as the per-row copy, so all expander content is included). */
+
+        var copyAllBtn = document.getElementById('copy-all');
+        if (copyAllBtn) {
+            var copyAllLabel = copyAllBtn.innerHTML;
+            copyAllBtn.addEventListener('click', function() {
+                if (copyAllBtn.classList.contains('copied')) { return; }
+                var all = Object.keys(packageData).map(function(k) {
+                    return packageData[k];
+                });
+                var json = JSON.stringify(all, null, 2);
+                navigator.clipboard.writeText(json).then(function() {
+                    copyAllBtn.innerHTML = '\\u2713 Copied ' + all.length;
+                    copyAllBtn.classList.add('copied');
+                    setTimeout(function() {
+                        copyAllBtn.innerHTML = copyAllLabel;
+                        copyAllBtn.classList.remove('copied');
+                    }, 1500);
+                });
+            });
+        }
+
         /* ---- Open pubspec.yaml ---- */
 
         var pubspecBtn = document.getElementById('open-pubspec');
