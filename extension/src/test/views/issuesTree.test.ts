@@ -14,6 +14,7 @@ import { TreeItemCollapsibleState } from '../vibrancy/vscode-mock-classes';
 import * as projectRoot from '../../projectRoot';
 import * as suppressionsStore from '../../suppressionsStore';
 import * as violationsReader from '../../violationsReader';
+import * as pathUtils from '../../pathUtils';
 
 import { IssuesTreeProvider, type IssueTreeNode } from '../../views/issuesTree';
 import { clearTestConfig, setTestConfig } from '../vibrancy/vscode-mock';
@@ -345,5 +346,69 @@ describe('IssuesTreeProvider permanent help row', () => {
     const provider = new IssuesTreeProvider(new MockMemento() as any);
     const nested = await provider.getChildren({ kind: 'help' });
     assert.deepStrictEqual(nested, []);
+  });
+});
+
+/**
+ * Regression: clicking an existing-file row in the Violations view did
+ * nothing because FileItem only set resourceUri, never the `vscode.open`
+ * command. Expectation: when the file exists on disk, getTreeItem('file')
+ * attaches a `vscode.open` command; when it doesn't exist (moved/deleted
+ * since last analysis), the command must stay unset so we don't surface
+ * a "file not found" error to the user.
+ */
+describe('IssuesTreeProvider file item open-on-click', () => {
+  let cachedFileExistsStub: sinon.SinonStub;
+
+  beforeEach(() => {
+    sinon.stub(projectRoot, 'getProjectRoot').returns('/fake/root');
+    sinon.stub(suppressionsStore, 'loadSuppressions').returns({
+      hiddenFolders: [],
+      hiddenFiles: [],
+      hiddenRules: [],
+      hiddenRuleInFile: {},
+      hiddenSeverities: [],
+      hiddenImpacts: [],
+    });
+    cachedFileExistsStub = sinon.stub(pathUtils, 'cachedFileExists');
+  });
+
+  afterEach(() => {
+    sinon.restore();
+  });
+
+  it('attaches vscode.open command when file exists on disk', () => {
+    cachedFileExistsStub.returns(true);
+    const provider = new IssuesTreeProvider(new MockMemento() as any);
+    const fileNode: IssueTreeNode = {
+      kind: 'file',
+      severity: 'warning',
+      filePath: 'lib/a.dart',
+      violations: [
+        { file: 'lib/a.dart', line: 1, rule: 'r', message: 'm', severity: 'warning' },
+      ],
+    };
+    const item = provider.getTreeItem(fileNode);
+    // Command must be wired so clicking the row opens the file; previously
+    // only resourceUri was set, which meant the click only toggled expand/collapse.
+    assert.strictEqual(item.command?.command, 'vscode.open');
+    assert.ok(item.command?.arguments && item.command.arguments.length === 1);
+  });
+
+  it('omits command when file is missing (moved/deleted since analysis)', () => {
+    cachedFileExistsStub.returns(false);
+    const provider = new IssuesTreeProvider(new MockMemento() as any);
+    const fileNode: IssueTreeNode = {
+      kind: 'file',
+      severity: 'warning',
+      filePath: 'lib/ghost.dart',
+      violations: [
+        { file: 'lib/ghost.dart', line: 1, rule: 'r', message: 'm', severity: 'warning' },
+      ],
+    };
+    const item = provider.getTreeItem(fileNode);
+    // No command — otherwise clicking would surface a confusing
+    // "file not found" error. Tooltip explains the stale state instead.
+    assert.strictEqual(item.command, undefined);
   });
 });

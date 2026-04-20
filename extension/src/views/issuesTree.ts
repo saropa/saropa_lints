@@ -594,6 +594,14 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
         item.tooltip = element.severity
           ? `${element.filePath} — ${element.violations.length} ${element.severity}(s)`
           : `${element.filePath} — ${element.violations.length} violation${element.violations.length === 1 ? '' : 's'}`;
+        // Clicking the file row opens the file. The expand/collapse triangle
+        // still toggles children; this matches VS Code's standard tree behavior
+        // where a collapsible node with a command both expands and invokes.
+        item.command = {
+          command: 'vscode.open',
+          title: 'Open File',
+          arguments: [item.resourceUri],
+        };
       } else {
         // File was moved or deleted since last analysis — show warning instead of broken link.
         item.iconPath = STALE_ICON;
