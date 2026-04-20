@@ -1,5 +1,5 @@
 import {
-    VibrancyResult, VersionGapResult, ReviewEntry, activeFileUsages,
+    VibrancyResult, VersionGapResult, ReviewEntry, activeFileUsages, PackageUsage,
 } from '../types';
 import { ReviewSummary } from '../services/review-state';
 import { categoryLabel, categoryToGrade, scoreToGrade } from '../scoring/status-classifier';
@@ -245,35 +245,18 @@ function buildFileUsagesSection(r: VibrancyResult): string {
     const commented = r.fileUsages.filter(u => u.isCommented);
     if (active.length === 0 && commented.length === 0) { return ''; }
 
+    // Each usage is one source file after the scanner dedupe. Render a
+    // link per directive kind the file contains (import and/or export)
+    // so both line locations stay clickable, even though the header
+    // count is now files-not-directives.
     const items: string[] = [];
     for (const u of active) {
-        const display = escapeHtml(`${u.filePath}:${u.line}`);
-        // Tag exports so the user sees this isn't just an internal import —
-        // a re-exported package is part of the library's public API surface
-        // and removing it is a breaking change for downstream consumers.
-        const reexportBadge = u.isExport
-            ? ' <span class="file-usage-reexport" title="Re-exported — part of this library\u2019s public API">re-export</span>'
-            : '';
-        items.push(
-            `<div class="file-usage-item">`
-            + `<a href="#" data-action="openFile" data-path="${escapeHtml(u.filePath)}" data-line="${u.line}">${display}</a>`
-            + reexportBadge
-            + `</div>`,
-        );
+        items.push(...renderFileUsageLinks(u, /* isCommentedBlock */ false));
     }
     if (commented.length > 0) {
         items.push(`<div class="file-usage-commented">Commented-out references:</div>`);
         for (const u of commented) {
-            const display = escapeHtml(`${u.filePath}:${u.line}`);
-            const reexportBadge = u.isExport
-                ? ' <span class="file-usage-reexport" title="Commented-out re-export">re-export</span>'
-                : '';
-            items.push(
-                `<div class="file-usage-item commented">`
-                + `<a href="#" data-action="openFile" data-path="${escapeHtml(u.filePath)}" data-line="${u.line}">${display}</a>`
-                + reexportBadge
-                + `</div>`,
-            );
+            items.push(...renderFileUsageLinks(u, /* isCommentedBlock */ true));
         }
     }
 
@@ -285,6 +268,56 @@ function buildFileUsagesSection(r: VibrancyResult): string {
         ? ' <span class="reexport-note" title="At least one usage is an export directive">&middot; public API surface</span>'
         : '';
     return section(`FILE USAGES (${label})${reexportNote}`, items.join(''));
+}
+
+/**
+ * Render one link per directive kind (import and/or export) for a single
+ * file's usage. A file that both imports and re-exports the package
+ * produces two links — one to the export line tagged "re-export", one
+ * to the import line — so the user can jump to either directive. Files
+ * predating the split fields (test fixtures without importLine/exportLine)
+ * fall back to the single-line display driven off `u.line` / `u.isExport`.
+ */
+function renderFileUsageLinks(u: PackageUsage, isCommentedBlock: boolean): string[] {
+    const itemClass = isCommentedBlock ? 'file-usage-item commented' : 'file-usage-item';
+    const badgeTitle = isCommentedBlock
+        ? 'Commented-out re-export'
+        : 'Re-exported \u2014 part of this library\u2019s public API';
+    const path = escapeHtml(u.filePath);
+    const rows: string[] = [];
+
+    if (u.exportLine != null) {
+        rows.push(buildUsageLink(itemClass, path, u.filePath, u.exportLine, badgeTitle, true));
+    }
+    if (u.importLine != null) {
+        // Plain import — no re-export badge even if the same file also
+        // re-exports (the export row above already carries the badge).
+        rows.push(buildUsageLink(itemClass, path, u.filePath, u.importLine, badgeTitle, false));
+    }
+    if (u.exportLine == null && u.importLine == null) {
+        // Fixture fallback — no directive line splits, honor legacy
+        // `isExport` flag for the badge.
+        rows.push(buildUsageLink(itemClass, path, u.filePath, u.line, badgeTitle, !!u.isExport));
+    }
+    return rows;
+}
+
+function buildUsageLink(
+    itemClass: string,
+    escapedPath: string,
+    rawPath: string,
+    line: number,
+    badgeTitle: string,
+    showBadge: boolean,
+): string {
+    const display = escapeHtml(`${rawPath}:${line}`);
+    const reexportBadge = showBadge
+        ? ` <span class="file-usage-reexport" title="${badgeTitle}">re-export</span>`
+        : '';
+    return `<div class="${itemClass}">`
+        + `<a href="#" data-action="openFile" data-path="${escapedPath}" data-line="${line}">${display}</a>`
+        + reexportBadge
+        + `</div>`;
 }
 
 function buildDependenciesSection(r: VibrancyResult): string {

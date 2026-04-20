@@ -9,23 +9,54 @@ const IMPORT_PATTERN = /(import|export)\s+['"]package:(\w+)\//g;
 // Detect commented-out import/export directives (single-line // comments only)
 const COMMENTED_IMPORT_PATTERN = /^\s*\/\/\s*(import|export)\s+['"]package:(\w+)\//;
 
-/** A single import/export occurrence of a package. */
+/**
+ * A package's usage within a single source file.
+ *
+ * Previously the scanner emitted one entry per directive, so a file that
+ * both imported and re-exported the same package produced two separate
+ * usages — and the References column in the Vibrancy report double-counted
+ * it (e.g. `share_utils.dart` with `import 'package:share_plus/...'` plus
+ * `export 'package:share_plus/...' show XFile, ...` reported 2 references
+ * for what is physically one file). The scanner now deduplicates by
+ * `(filePath, isCommented)` and tracks the directive lines separately via
+ * `importLine` / `exportLine`, so callers get an accurate per-file count
+ * while keeping full directive detail for JSON export and tooltips.
+ */
 export interface PackageUsage {
     /** Relative path from workspace root (e.g. "lib/widgets/panel.dart"). */
     readonly filePath: string;
-    /** 1-based line number of the import/export statement. */
+    /**
+     * Primary display line. Prefers `exportLine` when the file re-exports
+     * the package (public API surface is the more significant signal),
+     * otherwise falls back to `importLine`. Retained so existing callers
+     * that render a single `file:line` reference keep working without
+     * change. 0 indicates no directive was recorded (shouldn't happen for
+     * scanner output — only possible in minimal test fixtures).
+     */
     readonly line: number;
-    /** Whether this is a commented-out reference. */
+    /** Whether this file's directives are commented-out (dead references). */
     readonly isCommented: boolean;
     /**
-     * True when the directive is `export` rather than `import`. Re-exports
-     * make the package part of this library's public API, so downstream
-     * consumers depend on it transitively — treating such packages as
-     * "single-use, easy to remove" is misleading. Optional for source
-     * compatibility with older fixtures that predate the field; the scanner
-     * always sets it explicitly.
+     * True when the file has an `export` directive for this package —
+     * i.e. the package is part of this library's public API surface, so
+     * treating it as "single-use, easy to remove" is misleading.
+     * Derived from `exportLine !== null` when populated by the scanner;
+     * stays optional for source compatibility with test fixtures that
+     * predate the field.
      */
     readonly isExport?: boolean;
+    /**
+     * 1-based line number of the `import` directive in this file, or
+     * `null` if the package is only re-exported and never imported.
+     * Optional for source compatibility with existing test fixtures.
+     */
+    readonly importLine?: number | null;
+    /**
+     * 1-based line number of the `export` directive in this file, or
+     * `null` if the package is imported but not re-exported. Optional for
+     * source compatibility with existing test fixtures.
+     */
+    readonly exportLine?: number | null;
 }
 
 /** Per-package usage map: package name -> list of usages. */
@@ -115,6 +146,12 @@ function toRelativePath(absolute: string, rootPrefix: string): string {
 /**
  * Collect per-line import information from a single file's content.
  * Detects both active and commented-out import/export statements.
+ *
+ * Entries are merged per `(filePath, isCommented)` tuple so a file that
+ * has both an `import` and an `export` of the same package produces ONE
+ * usage (with `importLine` and `exportLine` populated) rather than two.
+ * This matches the intuition behind the "References" column label in the
+ * report ("Number of source files that import this package").
  */
 function collectDetailedImports(
     content: string,
@@ -126,15 +163,17 @@ function collectDetailedImports(
     const re = new RegExp(IMPORT_PATTERN.source, 'g');
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
+        const lineNumber = i + 1;
 
         // Check for commented-out imports first (more specific pattern).
         // Capture group 1 = directive ('import'|'export'), group 2 = package name.
         const commentMatch = COMMENTED_IMPORT_PATTERN.exec(line);
         if (commentMatch) {
-            addUsage(out, commentMatch[2], {
-                filePath, line: i + 1, isCommented: true,
-                isExport: commentMatch[1] === 'export',
-            });
+            recordDirective(
+                out, commentMatch[2], filePath, lineNumber,
+                commentMatch[1] === 'export' ? 'export' : 'import',
+                true,
+            );
             continue;
         }
 
@@ -142,23 +181,84 @@ function collectDetailedImports(
         re.lastIndex = 0;
         let match: RegExpExecArray | null;
         while ((match = re.exec(line)) !== null) {
-            addUsage(out, match[2], {
-                filePath, line: i + 1, isCommented: false,
-                isExport: match[1] === 'export',
-            });
+            recordDirective(
+                out, match[2], filePath, lineNumber,
+                match[1] === 'export' ? 'export' : 'import',
+                false,
+            );
         }
     }
 }
 
-function addUsage(
+/**
+ * Merge a directive into the usage map, deduplicating per
+ * `(filePath, isCommented)`. When a file already has an entry for the
+ * same commented-status, the new directive's line number is stored in
+ * the matching slot (`importLine` or `exportLine`) on a replacement
+ * record — preserving the `readonly` contract on `PackageUsage`.
+ *
+ * The first occurrence of each directive kind wins so re-scanning the
+ * same file is deterministic (e.g. if somehow two `import` statements
+ * of the same package appear in one file, the earlier one is reported).
+ */
+function recordDirective(
     map: Map<string, PackageUsage[]>,
     packageName: string,
-    usage: PackageUsage,
+    filePath: string,
+    lineNumber: number,
+    directive: 'import' | 'export',
+    isCommented: boolean,
 ): void {
-    const list = map.get(packageName);
-    if (list) {
-        list.push(usage);
-    } else {
-        map.set(packageName, [usage]);
+    let list = map.get(packageName);
+    if (!list) {
+        list = [];
+        map.set(packageName, list);
     }
+    const existingIdx = list.findIndex(
+        u => u.filePath === filePath && u.isCommented === isCommented,
+    );
+    if (existingIdx < 0) {
+        list.push(buildUsage(
+            filePath, isCommented,
+            directive === 'import' ? lineNumber : null,
+            directive === 'export' ? lineNumber : null,
+        ));
+        return;
+    }
+    // Merge into the existing entry. `?? null` normalizes the optional
+    // scanner fields (they are always populated on scanner-produced
+    // records, but the interface permits `undefined` for test fixtures).
+    const existing = list[existingIdx];
+    const existingImport = existing.importLine ?? null;
+    const existingExport = existing.exportLine ?? null;
+    list[existingIdx] = buildUsage(
+        filePath, isCommented,
+        directive === 'import' && existingImport === null
+            ? lineNumber : existingImport,
+        directive === 'export' && existingExport === null
+            ? lineNumber : existingExport,
+    );
+}
+
+/**
+ * Construct a canonical PackageUsage. `line` is derived from the
+ * available directive lines (prefer `exportLine` because a re-export
+ * is the signal the downstream-consumer tooltip / badge highlights);
+ * `isExport` mirrors `exportLine !== null` so legacy callers keep
+ * working.
+ */
+function buildUsage(
+    filePath: string,
+    isCommented: boolean,
+    importLine: number | null,
+    exportLine: number | null,
+): PackageUsage {
+    return {
+        filePath,
+        isCommented,
+        importLine,
+        exportLine,
+        line: exportLine ?? importLine ?? 0,
+        isExport: exportLine !== null,
+    };
 }
