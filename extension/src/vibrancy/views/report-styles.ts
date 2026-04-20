@@ -156,8 +156,16 @@ export function getReportStyles(): string {
             display: flex; gap: 12px; align-items: center;
             margin: 12px 0 8px;
         }
+        /* Relative wrapper anchors the absolutely-positioned clear (X)
+           button inside the search field. inline-flex keeps the wrapper
+           sized to the input so the toolbar layout is unchanged. */
+        .search-wrapper {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+        }
         .search-input {
-            padding: 4px 8px;
+            padding: 4px 24px 4px 8px; /* right padding leaves room for clear (X) */
             border: 1px solid var(--vscode-input-border);
             background: var(--vscode-input-background);
             color: var(--vscode-input-foreground);
@@ -168,6 +176,30 @@ export function getReportStyles(): string {
         .search-input:focus {
             outline: none;
             border-color: var(--vscode-focusBorder);
+        }
+        /* Clear (X) button lives inside the input via absolute positioning.
+           Hidden by default via [hidden]; report-script.ts toggles it when
+           the input value is non-empty after trim. */
+        .search-clear {
+            position: absolute;
+            right: 4px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            padding: 0;
+            line-height: 14px;
+            font-size: 14px;
+            border: none;
+            background: transparent;
+            color: var(--vscode-input-foreground);
+            opacity: 0.6;
+            cursor: pointer;
+            border-radius: 2px;
+        }
+        .search-clear:hover {
+            opacity: 1;
+            background: var(--vscode-toolbar-hoverBackground);
         }
         .toolbar-btn {
             background: var(--vscode-button-secondaryBackground);
