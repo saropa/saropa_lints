@@ -91,11 +91,7 @@ void _loadFromRoot(String? projectRoot) {
       'enabledRules: $enabledCount',
     );
   } catch (e, st) {
-    PluginLogger.log(
-      'loadNativePluginConfig failed',
-      error: e,
-      stackTrace: st,
-    );
+    PluginLogger.log('loadNativePluginConfig failed', error: e, stackTrace: st);
     // Defensive: ensure plugin can still register with defaults
   }
 }
@@ -113,11 +109,7 @@ String? _readProjectFile(String filename, [String? projectRoot]) {
     if (!file.existsSync()) return null;
     return file.readAsStringSync();
   } catch (e, st) {
-    PluginLogger.log(
-      '_readProjectFile failed',
-      error: e,
-      stackTrace: st,
-    );
+    PluginLogger.log('_readProjectFile failed', error: e, stackTrace: st);
     // I/O or path error; return null so config steps use defaults
     return null;
   }

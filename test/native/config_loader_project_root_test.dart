@@ -102,9 +102,9 @@ plugins:
         // must surface this via developer.log (not tested here — runtime
         // side-effect) and leave enabledRules null so the visitor-entry
         // gate fails closed.
-        File(p.join(tempDir.path, 'analysis_options.yaml')).writeAsStringSync(
-          'analyzer:\n  exclude:\n    - "**/*.g.dart"\n',
-        );
+        File(
+          p.join(tempDir.path, 'analysis_options.yaml'),
+        ).writeAsStringSync('analyzer:\n  exclude:\n    - "**/*.g.dart"\n');
 
         loadNativePluginConfigFromProjectRoot(tempDir.path);
 

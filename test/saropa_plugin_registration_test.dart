@@ -107,9 +107,7 @@ void main() {
       SaropaLintRule.disabledRules = {ruleName};
       final cap = _CaptureRegistry();
       registerSaropaLintRules(cap);
-      final matching = cap.lintRules
-          .where((r) => r.name == ruleName)
-          .toList();
+      final matching = cap.lintRules.where((r) => r.name == ruleName).toList();
       expect(
         matching,
         isEmpty,
@@ -151,10 +149,7 @@ void main() {
         SaropaLintRule.disabledRules = null;
         final cap = _CaptureRegistry();
         registerSaropaLintRules(cap);
-        expect(
-          cap.lintRules.any((r) => r.name == 'avoid_debug_print'),
-          isTrue,
-        );
+        expect(cap.lintRules.any((r) => r.name == 'avoid_debug_print'), isTrue);
         expect(
           cap.lintRules.any((r) => r.name == 'nonexistent_rule_xyz_12345'),
           isFalse,

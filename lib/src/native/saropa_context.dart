@@ -24,8 +24,7 @@ import '../project_context.dart' show FileTypeDetector, ProjectContext;
 import '../report/import_graph_tracker.dart' show ImportGraphTracker;
 import '../saropa_lint_rule.dart' show ProgressTracker, SaropaLintRule;
 import 'compat_visitor.dart';
-import 'config_loader.dart'
-    show loadNativePluginConfigFromProjectRoot;
+import 'config_loader.dart' show loadNativePluginConfigFromProjectRoot;
 import 'plugin_logger.dart' show PluginLogger;
 
 /// Wraps [RuleVisitorRegistry] to provide callback-based registration.
