@@ -33,6 +33,17 @@
 
 ---
 
+## [Unreleased]
+
+<details>
+<summary>Maintenance</summary>
+
+- **Tests:** Harden the teardown of the `use_existing_variable` integration test ([test/code_quality_rules_test.dart](test/code_quality_rules_test.dart)) against a Windows-only flake. The test creates a temp package under `build\test_tmp\`, spawns `dart pub get` + `dart analyze` subprocesses, then deletes the temp directory in `addTearDown`. On Windows, directory handles from the exited subprocesses can linger briefly after `Process.run()` returns, so `Directory.delete(recursive: true)` would fail with `PathAccessException: ... errno = 32` (EBUSY) and error the test even though all assertions passed. The teardown now retries up to 5 times with exponential backoff (100 ms → 1600 ms) and swallows the final failure — leaving a temp dir is harmless because the OS cleans `%TEMP%` and `build/test_tmp/` eventually, and a cleanup race should never fail an otherwise-passing test.
+
+</details>
+
+---
+
 ## [2.3.0]
 
 Windows users get their vibrancy reports back (CLI spawn + transitive footprint fixes), the plugin now logs to `reports/.saropa_lints/plugin.log` so silent failures are visible, and the report toolbar gains Rescan, Open Project, and Copy All JSON buttons — plus a new `prefer_listenable_builder` rule. — [log](https://github.com/saropa/saropa_lints/blob/v2.3.0/CHANGELOG.md)
