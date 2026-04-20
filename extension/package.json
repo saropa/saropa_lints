@@ -149,6 +149,10 @@
         "icon": "$(play)"
       },
       {
+        "command": "saropaLints.verifyPlugin",
+        "title": "Saropa Lints: Verify Plugin Is Running (liveness check)"
+      },
+      {
         "command": "saropaLints.initializeConfig",
         "title": "Saropa Lints: Initialize / Update Config"
       },

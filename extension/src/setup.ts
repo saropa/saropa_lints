@@ -518,3 +518,12 @@ export async function runSetTier(context: vscode.ExtensionContext): Promise<Tier
 export function showOutputChannel(): void {
   getOutputChannel().show();
 }
+
+/**
+ * Expose the output channel for consumers that need to append their own
+ * diagnostic text (e.g. plugin liveness probe). Returns the shared instance
+ * — do NOT call `.dispose()` on the returned channel; ownership stays here.
+ */
+export function getSharedOutputChannel(): vscode.OutputChannel {
+  return getOutputChannel();
+}
