@@ -13,12 +13,12 @@
 library;
 
 import 'dart:async' show FutureOr;
-import 'dart:developer' as developer;
 
 import 'package:analysis_server_plugin/plugin.dart';
 import 'package:analysis_server_plugin/registry.dart';
 
 import 'saropa_lints.dart';
+import 'src/native/plugin_logger.dart' show PluginLogger;
 
 // ---------------------------------------------------------------------------
 // Plugin discovery: analysis server loads this file and reads [plugin].
@@ -39,14 +39,20 @@ class SaropaLintsPlugin extends Plugin {
 
   /// Loads plugin configuration (enabled rules, severity overrides, etc.)
   /// from analysis_options / SAROPA env vars before rules are registered.
+  ///
+  /// Logs the start event via [PluginLogger] — the entry will be buffered
+  /// in memory until [SaropaContext._ensureConfigLoadedFromProjectRoot]
+  /// calls [PluginLogger.setProjectRoot] on the first analyzed file, then
+  /// flushed to `reports/.saropa_lints/plugin.log` so users have a visible
+  /// surface confirming the plugin actually started.
   @override
   FutureOr<void> start() {
+    PluginLogger.log('Plugin.start() — loading initial config');
     try {
       loadNativePluginConfig();
     } catch (e, st) {
-      developer.log(
-        'loadNativePluginConfig failed',
-        name: 'saropa_lints',
+      PluginLogger.log(
+        'loadNativePluginConfig failed in Plugin.start()',
         error: e,
         stackTrace: st,
       );
@@ -60,6 +66,7 @@ class SaropaLintsPlugin extends Plugin {
   /// same registration path.
   @override
   void register(PluginRegistry registry) {
+    PluginLogger.log('Plugin.register() — registering rules with analyzer');
     registerSaropaLintRules(registry);
   }
 }
