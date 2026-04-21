@@ -125,3 +125,46 @@ void _good1228() {
   // or (safe, not flagged)
   // onTap: callback == null ? null : () => callback(),
 }
+
+// GOOD: `RegExpMatch.group(N)!` — literal regex with explicit non-optional
+// capture groups guarantees `group(1)` and `group(2)` are non-null on a
+// successful match. The narrow heuristic recognizes this idiom by the
+// receiver's type (`RegExpMatch`) without inspecting the pattern string.
+void _goodRegExpMatchGroupAllMatches() {
+  final stackStr = StackTrace.current.toString();
+  final framePattern = RegExp(r'#\d+\s+\S+\s+\((.+?):(\d+):\d+\)');
+  for (final match in framePattern.allMatches(stackStr)) {
+    final file = match.group(1)!; // guaranteed non-null on successful match
+    final line = int.tryParse(match.group(2)!);
+    if (line == null) continue;
+    print('$file:$line');
+  }
+}
+
+// GOOD: Same idiom with `firstMatch` — receiver static type after the null
+// check is `RegExpMatch`, so `.group(0)` / `.group(N)!` is treated as safe.
+void _goodRegExpMatchGroupFirstMatch() {
+  const s = 'abc 42';
+  final match = RegExp(r'(\w+)\s+(\d+)').firstMatch(s);
+  if (match != null) {
+    final word = match.group(1)!;
+    final whole = match.group(0)!; // group(0) is the full match
+    print('$whole: $word');
+  }
+}
+
+// ACCEPTED MISS (Hypothesis B trade-off): the regex has an optional capture
+// group `(a)?`, so `m.group(1)` CAN legitimately be null when the match
+// succeeds via the `b`-only branch. The narrow heuristic silences this case
+// because the receiver is still `RegExpMatch`. Documented here so the fixture
+// shows the acceptable limit of the current check — a future Hypothesis A
+// implementation that inspects the pattern string would flag this.
+void _acceptedMissOptionalGroup() {
+  const s = 'ab';
+  final match = RegExp(r'(a)?b').firstMatch(s);
+  if (match != null) {
+    // Not flagged by avoid_null_assertion today — the user owns this risk.
+    final maybe = match.group(1)!;
+    print(maybe);
+  }
+}
