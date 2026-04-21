@@ -484,11 +484,17 @@ class PreferCommentingAnalyzerIgnoresRule extends SaropaLintRule {
 
 /// Suggests using debugPrint instead of print for better output throttling.
 ///
-/// Since: unknown | Rule version: v1
+/// Since: unknown | Updated: v12.3.3 | Rule version: v2
 ///
 /// The print() function can overwhelm the system console and cause message
 /// loss when called rapidly. debugPrint() throttles output to avoid this
 /// issue and is the recommended way to log debug information.
+///
+/// **Scope:** Flutter projects only. debugPrint() is defined in
+/// `package:flutter/foundation.dart`, so the recommendation is unactionable
+/// in a pure Dart package — adopting it would require taking on a full
+/// Flutter dependency. The rule returns early when the enclosing project
+/// does not declare Flutter in its pubspec (mirrors `avoid_print_in_release`).
 ///
 /// **BAD:**
 /// ```dart
@@ -529,7 +535,7 @@ class PreferDebugPrintRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'prefer_debug_print',
-    '[prefer_debug_print] print() should use debugPrint() for throttled console output. {v1}',
+    '[prefer_debug_print] print() should use debugPrint() for throttled console output. {v2}',
     correctionMessage:
         'Replace print() with debugPrint() to prevent console buffer overflow.',
     severity: DiagnosticSeverity.INFO,
@@ -540,6 +546,13 @@ class PreferDebugPrintRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    // debugPrint() lives in package:flutter/foundation.dart, so recommending
+    // it in a pure Dart package is unactionable — the author would have to
+    // take on a full Flutter dependency just to silence this lint. Mirror
+    // the gate used by AvoidPrintInReleaseRule below.
+    final projectInfo = ProjectContext.getProjectInfo(context.filePath);
+    if (projectInfo == null || !projectInfo.isFlutterProject) return;
+
     context.addMethodInvocation((MethodInvocation node) {
       // Only check for print function calls
       if (node.methodName.name != 'print') return;

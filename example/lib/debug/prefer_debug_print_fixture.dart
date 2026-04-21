@@ -101,7 +101,16 @@
 // ignore_for_file: equal_keys_in_map, unused_catch_stack
 // ignore_for_file: non_constant_default_value, not_a_type
 // Test fixture for: prefer_debug_print
-// Source: lib\src\rules\debug_rules.dart
+// Source: lib\src\rules\testing\debug_rules.dart
+//
+// NOTE: `example/pubspec.yaml` does NOT declare a Flutter dependency, so from
+// `ProjectContext.getProjectInfo(...).isFlutterProject`'s perspective this
+// package is pure Dart. As of v12.3.3 / {v2}, `prefer_debug_print` gates on
+// that flag — recommending `debugPrint` in a pure Dart package is
+// unactionable because it lives in `package:flutter/foundation.dart`. Every
+// `print(...)` below therefore documents "expect NO lint (pure Dart)". The
+// BAD/GOOD pair is retained to illustrate the recommendation shape for
+// Flutter consumers; a matching Flutter fixture would assert `expect_lint`.
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
@@ -109,17 +118,27 @@ dynamic item;
 final largeList = List.generate(1000, (i) => i);
 dynamic output;
 
-// BAD: Should trigger prefer_debug_print
-// expect_lint: prefer_debug_print
+// Flutter-project shape: would trigger in a Flutter pubspec, does NOT
+// trigger in this pure-Dart example (isFlutterProject guard returns early).
 void _bad309() {
   for (final item in largeList) {
     print('Processing: $item'); // Can overflow console buffer!
   }
 }
 
-// GOOD: Should NOT trigger prefer_debug_print
+// Always compliant: `debugPrint` is the recommended call in a Flutter project
+// and produces no diagnostic regardless of project type.
 void _good309() {
   for (final item in largeList) {
     debugPrint('Processing: $item'); // Throttled output
   }
+}
+
+// Pure-Dart regression guard: mirrors the reproducer in
+// `bugs/prefer_debug_print_false_positive_pure_dart_package.md`. A top-level
+// `print(...)` in a non-Flutter package must NOT produce `prefer_debug_print`
+// — pulling in Flutter just to silence a lint is categorically the wrong fix.
+void _pureDartNoLint() {
+  print('boot banner'); // expect NO lint
+  print('shutdown'); // expect NO lint
 }
