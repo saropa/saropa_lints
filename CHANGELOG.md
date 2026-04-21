@@ -35,7 +35,7 @@
 
 ---
 
-## [Unreleased]
+## [12.3.3]
 
 `avoid_path_traversal` and `require_file_path_sanitization` no longer flag private helpers whose tainted parameter only ever receives compile-time string literals, or whose caller resolves the path through a trusted Dart-SDK API (`Isolate.resolvePackageUri`, `Directory.systemTemp`, `Platform.resolvedExecutable`, `Platform.script`, `Directory.current`, `File.fromUri` / `Directory.fromUri` / `Link.fromUri`). `avoid_null_assertion` no longer flags the common `RegExpMatch.group(N)!` idiom — iterating `allMatches` / `firstMatch` over a literal regex and force-unwrapping a group is now recognized as a safe pattern. `prefer_debug_print` no longer pesters pure Dart packages to call a Flutter-only API.
 
