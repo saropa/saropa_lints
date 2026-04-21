@@ -83,7 +83,7 @@ The **Logs** view lists analysis reports from `reports/`. Each log shows a parse
 - **Saropa Lints: Run Analysis** — Run `dart analyze` / `flutter analyze`.
 - **Saropa Lints: Initialize / Update Config** — Write analysis_options.yaml with the current tier (uses write_config).
 - **Saropa Lints: Open Config** — Open `analysis_options_custom.yaml` or `analysis_options.yaml`.
-- **Filter by text…** / **Filter by type…** / **Filter by rule…** — Filter the Violations tree (view toolbar).
+- **Filter by text…** / **Filter by severity and impact…** / **Filter by rule name…** — Filter the Violations tree (view toolbar).
 - **Clear filters** / **Clear suppressions** — Reset filters or hidden items (view toolbar when active).
 - **Saropa Lints: Show All Violations** — Open the Violations view and show all findings (clears filters). Used when clicking "Total violations" in Summary.
 - **Saropa Lints: Show in Saropa Lints** — Focus the Violations view filtered to the active editor's file (e.g. from Problems view context menu or command palette).

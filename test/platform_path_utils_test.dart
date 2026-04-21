@@ -47,9 +47,7 @@ void main() {
       );
       // Platform.resolvedExecutable matches via `resolvedExecutable`.
       expect(
-        bodyContainsPlatformPathApi(
-          'final exe = Platform.resolvedExecutable;',
-        ),
+        bodyContainsPlatformPathApi('final exe = Platform.resolvedExecutable;'),
         isTrue,
       );
     });
@@ -57,10 +55,7 @@ void main() {
     test('returns false for bodies with no API reference', () {
       expect(bodyContainsPlatformPathApi('final x = foo(bar);'), isFalse);
       // Similar-looking but unlisted names do not match.
-      expect(
-        bodyContainsPlatformPathApi('final x = _resolveRoot();'),
-        isFalse,
-      );
+      expect(bodyContainsPlatformPathApi('final x = _resolveRoot();'), isFalse);
     });
   });
 
@@ -69,12 +64,14 @@ void main() {
       // Top-level function body references Isolate.resolvePackageUri —
       // `resolvePackageUri` is in the allowlist, so any node inside that
       // body is trusted.
-      final CompilationUnit unit = parseString(content: '''
+      final CompilationUnit unit = parseString(
+        content: '''
 Future<void> f() async {
   final uri = await Isolate.resolvePackageUri(u);
   final file = File('\${uri.path}/a');
 }
-''').unit;
+''',
+      ).unit;
       final FunctionDeclaration func =
           unit.declarations.first as FunctionDeclaration;
       final BlockFunctionBody body =
@@ -87,11 +84,13 @@ Future<void> f() async {
 
     test('returns false when body has no API and no callers', () {
       // Top-level public function with no allowlist match anywhere.
-      final CompilationUnit unit = parseString(content: '''
+      final CompilationUnit unit = parseString(
+        content: '''
 Future<void> g(String userPath) async {
   final file = File('/data/\$userPath');
 }
-''').unit;
+''',
+      ).unit;
       final FunctionDeclaration func =
           unit.declarations.first as FunctionDeclaration;
       final BlockFunctionBody body =
@@ -103,7 +102,8 @@ Future<void> g(String userPath) async {
 
   group('isParamPassedOnlyLiteralsAtCallSites — Hypothesis B', () {
     test('trusts private helper whose every call site passes a literal', () {
-      final CompilationUnit unit = parseString(content: '''
+      final CompilationUnit unit = parseString(
+        content: '''
 class AssetServer {
   Future<void> sendStyle() => _send('assets/style.css');
   Future<void> sendScript() => _send('assets/bundle.js');
@@ -112,9 +112,9 @@ class AssetServer {
     final file = File('\$root/\$relativePath');
   }
 }
-''').unit;
-      final ClassDeclaration cls =
-          unit.declarations.first as ClassDeclaration;
+''',
+      ).unit;
+      final ClassDeclaration cls = unit.declarations.first as ClassDeclaration;
       final MethodDeclaration send = cls.body.members
           .whereType<MethodDeclaration>()
           .firstWhere((m) => m.name.lexeme == '_send');
@@ -131,7 +131,8 @@ class AssetServer {
     });
 
     test('rejects when at least one call site passes a non-literal', () {
-      final CompilationUnit unit = parseString(content: '''
+      final CompilationUnit unit = parseString(
+        content: '''
 class Mixed {
   Future<void> safe() => _open('safe.css');
   Future<void> unsafe(String userInput) => _open(userInput);
@@ -139,9 +140,9 @@ class Mixed {
     final file = File('/data/\$p');
   }
 }
-''').unit;
-      final ClassDeclaration cls =
-          unit.declarations.first as ClassDeclaration;
+''',
+      ).unit;
+      final ClassDeclaration cls = unit.declarations.first as ClassDeclaration;
       final MethodDeclaration open = cls.body.members
           .whereType<MethodDeclaration>()
           .firstWhere((m) => m.name.lexeme == '_open');
@@ -156,24 +157,22 @@ class Mixed {
     test('rejects when zero call sites observed (conservative)', () {
       // Private but never called in this unit — cannot prove all callers
       // pass literals, so return false.
-      final CompilationUnit unit = parseString(content: '''
+      final CompilationUnit unit = parseString(
+        content: '''
 class Lonely {
   Future<void> _unused(String p) async {
     final file = File('/data/\$p');
   }
 }
-''').unit;
-      final ClassDeclaration cls =
-          unit.declarations.first as ClassDeclaration;
+''',
+      ).unit;
+      final ClassDeclaration cls = unit.declarations.first as ClassDeclaration;
       final MethodDeclaration helper =
           cls.body.members.first as MethodDeclaration;
       final BlockFunctionBody body = helper.body as BlockFunctionBody;
 
       expect(
-        isParamPassedOnlyLiteralsAtCallSites(
-          body.block.statements.last,
-          'p',
-        ),
+        isParamPassedOnlyLiteralsAtCallSites(body.block.statements.last, 'p'),
         isFalse,
       );
     });
@@ -181,66 +180,63 @@ class Lonely {
     test('returns false for public methods (non-underscore name)', () {
       // Only private helpers qualify — public ones could be called from
       // outside the unit with arbitrary arguments.
-      final CompilationUnit unit = parseString(content: '''
+      final CompilationUnit unit = parseString(
+        content: '''
 class Pub {
   Future<void> caller() => open('lit.css');
   Future<void> open(String p) async {
     final file = File('/data/\$p');
   }
 }
-''').unit;
-      final ClassDeclaration cls =
-          unit.declarations.first as ClassDeclaration;
+''',
+      ).unit;
+      final ClassDeclaration cls = unit.declarations.first as ClassDeclaration;
       final MethodDeclaration open = cls.body.members
           .whereType<MethodDeclaration>()
           .firstWhere((m) => m.name.lexeme == 'open');
       final BlockFunctionBody body = open.body as BlockFunctionBody;
 
       expect(
-        isParamPassedOnlyLiteralsAtCallSites(
-          body.block.statements.last,
-          'p',
-        ),
+        isParamPassedOnlyLiteralsAtCallSites(body.block.statements.last, 'p'),
         isFalse,
       );
     });
 
     test('accepts AdjacentStrings of SimpleStringLiterals as literal', () {
-      final CompilationUnit unit = parseString(content: '''
+      final CompilationUnit unit = parseString(
+        content: '''
 class Adj {
   Future<void> go() => _helper('a' 'b' 'c');
   Future<void> _helper(String p) async {
     final file = File('/data/\$p');
   }
 }
-''').unit;
-      final ClassDeclaration cls =
-          unit.declarations.first as ClassDeclaration;
+''',
+      ).unit;
+      final ClassDeclaration cls = unit.declarations.first as ClassDeclaration;
       final MethodDeclaration helper = cls.body.members
           .whereType<MethodDeclaration>()
           .firstWhere((m) => m.name.lexeme == '_helper');
       final BlockFunctionBody body = helper.body as BlockFunctionBody;
 
       expect(
-        isParamPassedOnlyLiteralsAtCallSites(
-          body.block.statements.last,
-          'p',
-        ),
+        isParamPassedOnlyLiteralsAtCallSites(body.block.statements.last, 'p'),
         isTrue,
       );
     });
 
     test('resolves named parameter by label, not positional index', () {
-      final CompilationUnit unit = parseString(content: '''
+      final CompilationUnit unit = parseString(
+        content: '''
 class Named {
   Future<void> caller() => _helper(path: 'lit.css', count: 1);
   Future<void> _helper({required String path, required int count}) async {
     final file = File('/data/\$path');
   }
 }
-''').unit;
-      final ClassDeclaration cls =
-          unit.declarations.first as ClassDeclaration;
+''',
+      ).unit;
+      final ClassDeclaration cls = unit.declarations.first as ClassDeclaration;
       final MethodDeclaration helper = cls.body.members
           .whereType<MethodDeclaration>()
           .firstWhere((m) => m.name.lexeme == '_helper');
@@ -258,26 +254,24 @@ class Named {
     test('rejects interpolated StringInterpolation with expressions', () {
       // Interpolation whose parts include runtime expressions cannot be
       // treated as a compile-time literal.
-      final CompilationUnit unit = parseString(content: r'''
+      final CompilationUnit unit = parseString(
+        content: r'''
 class Interp {
   Future<void> caller(String u) => _helper('pre-$u');
   Future<void> _helper(String p) async {
     final file = File('/data/$p');
   }
 }
-''').unit;
-      final ClassDeclaration cls =
-          unit.declarations.first as ClassDeclaration;
+''',
+      ).unit;
+      final ClassDeclaration cls = unit.declarations.first as ClassDeclaration;
       final MethodDeclaration helper = cls.body.members
           .whereType<MethodDeclaration>()
           .firstWhere((m) => m.name.lexeme == '_helper');
       final BlockFunctionBody body = helper.body as BlockFunctionBody;
 
       expect(
-        isParamPassedOnlyLiteralsAtCallSites(
-          body.block.statements.last,
-          'p',
-        ),
+        isParamPassedOnlyLiteralsAtCallSites(body.block.statements.last, 'p'),
         isFalse,
       );
     });

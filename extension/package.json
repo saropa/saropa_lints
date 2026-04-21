@@ -2,7 +2,7 @@
   "name": "saropa-lints",
   "displayName": "Saropa Lints",
   "description": "2050+ Dart/Flutter lint rules with visual analysis, plus Package Vibrancy for dependency health scoring, vulnerability scanning, and upgrade planning.",
-  "version": "12.3.2",
+  "version": "12.3.3",
   "publisher": "saropa",
   "license": "MIT",
   "repository": {
@@ -212,11 +212,13 @@
       },
       {
         "command": "saropaLints.setIssuesFilterByType",
-        "title": "Filter by type…"
+        "title": "Filter by severity and impact…",
+        "icon": "$(list-filter)"
       },
       {
         "command": "saropaLints.setIssuesFilterByRule",
-        "title": "Filter by rule…"
+        "title": "Filter by rule name…",
+        "icon": "$(law)"
       },
       {
         "command": "saropaLints.clearIssuesFilters",
