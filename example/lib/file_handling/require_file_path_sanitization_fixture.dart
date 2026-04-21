@@ -153,3 +153,57 @@ Future<File> goodPrivateHelperWithPlatformPath() async {
 Future<File> _openDbInAppDir(String appDirPath) async {
   return File('$appDirPath/db.sqlite');
 }
+
+/// GOOD (v12.3.4 regression — internal-resolver-parameter false positive):
+/// Private helper whose every call site passes a compile-time literal.
+/// Param name appears in the path source, but no user input reaches it.
+class AssetReaderLiteralOnly {
+  Future<void> readStyle() => _read('assets/web/style.css');
+  Future<void> readJs() => _read('assets/web/bundle.js');
+  Future<void> _read(String relativePath) async {
+    final root = Directory.current.path;
+    final f = File('$root/$relativePath');
+    if (await f.exists()) await f.readAsString();
+  }
+}
+
+/// GOOD (v12.3.4 regression): param sourced from Isolate.resolvePackageUri —
+/// trusted Dart-SDK resolver, now in the platformPathApis allowlist.
+Future<File?> openFromPackageRoot() async {
+  final uri = await Isolate.resolvePackageUri(Uri.parse('package:p/p.dart'));
+  if (uri == null) return null;
+  final root = File.fromUri(uri).parent.parent.path;
+  return _openAtPackageRoot(root);
+}
+
+Future<File> _openAtPackageRoot(String packageRoot) async {
+  return File('$packageRoot/assets/web/style.css');
+}
+
+/// GOOD (v12.3.4 regression): Directory.systemTemp — trusted resolver.
+Future<File> openInTemp() async {
+  final tmp = Directory.systemTemp.path;
+  return _openAtTmp(tmp);
+}
+
+Future<File> _openAtTmp(String tmpDir) async {
+  return File('$tmpDir/scratch.txt');
+}
+
+/// GOOD (v12.3.4 regression): Platform.resolvedExecutable — trusted resolver.
+Future<File> openNearExe() async {
+  final exe = Platform.resolvedExecutable;
+  return _openAtExe(exe);
+}
+
+Future<File> _openAtExe(String exePath) async {
+  return File('$exePath.log');
+}
+
+/// REGRESSION BAD: private helper with zero observed call sites — the
+/// literal-only check returns false (cannot prove all callers pass literals
+/// if we see none), so the lint still fires. Guards against over-suppression.
+Future<File> _badHttpQueryStillLints(String userInput) async {
+  // expect_lint: require_file_path_sanitization
+  return File('/data/$userInput');
+}

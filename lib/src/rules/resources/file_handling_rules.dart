@@ -1806,11 +1806,18 @@ class RequireFilePathSanitizationRule extends SaropaLintRule {
     // Check if any parameter is used in the path
     for (final FormalParameter param in params.parameters) {
       final String paramName = param.name?.lexeme ?? '';
-      if (paramName.isNotEmpty && pathSource.contains(paramName)) {
-        // Parameter used in file path without sanitization
-        reporter.atNode(node);
-        return;
-      }
+      if (paramName.isEmpty || !pathSource.contains(paramName)) continue;
+
+      // A private helper whose tainted parameter receives nothing but
+      // compile-time string literals at every observed call site cannot be
+      // reached by attacker input — skip without reporting. This closes the
+      // `_sendWebAsset('assets/web/style.css')` class of false positives
+      // (bugs/require_file_path_sanitization_false_positive_internal_resolver_parameter.md).
+      if (isParamPassedOnlyLiteralsAtCallSites(node, paramName)) continue;
+
+      // Parameter used in file path without sanitization
+      reporter.atNode(node);
+      return;
     }
   }
 }
