@@ -2185,6 +2185,12 @@ class AvoidPathTraversalRule extends SaropaLintRule {
       // calls a trusted platform path API.
       if (isFromPlatformPathApi(node)) return;
 
+      // Private helper whose tainted parameter is only fed compile-time
+      // string literals at every call site. No attacker-controlled input can
+      // reach the `File(...)` path, so this is not path traversal. See
+      // bugs/avoid_path_traversal_false_positive_internal_resolver_parameter.md.
+      if (isParamPassedOnlyLiteralsAtCallSites(node, usedParam)) return;
+
       // Parameter is used - check for validation
       if (_hasPathValidation(node)) return;
 

@@ -124,6 +124,85 @@ Future<File> _deleteOldUnencryptedDb(String dbDirPath) async {
   return File('$dbDirPath/old_db.sqlite');
 }
 
+/// GOOD (v12.3.4 regression — internal-resolver-parameter false positive):
+/// Private helper whose every call site passes a compile-time string literal.
+/// Param name appears in the path source, but no user input can reach it.
+class AssetServer {
+  Future<void> sendWebStyle() => _sendWebAsset('assets/web/style.css');
+  Future<void> sendWebApp() => _sendWebAsset('assets/web/bundle.js');
+
+  Future<void> _sendWebAsset(String relativePath) async {
+    final packageRoot = await _resolvePackageRoot();
+    if (packageRoot == null) return;
+    // Should NOT lint: caller passes literals only; packageRoot comes from
+    // Isolate.resolvePackageUri (trusted Dart-SDK resolver).
+    final file = File('$packageRoot/$relativePath');
+    if (await file.exists()) await file.readAsString();
+  }
+
+  static Future<void> cacheDriverWebBundle() =>
+      _cacheWebAssets('/opt/my_pkg/root');
+
+  static Future<void> _cacheWebAssets(String packageRoot) async {
+    // Should NOT lint: every call site passes a literal.
+    final cssFile = File('$packageRoot/assets/web/style.css');
+    final jsFile = File('$packageRoot/assets/web/bundle.js');
+    if (await cssFile.exists()) await cssFile.readAsString();
+    if (await jsFile.exists()) await jsFile.readAsString();
+  }
+
+  Future<String?> _resolvePackageRoot() async {
+    final uri = await Isolate.resolvePackageUri(
+      Uri.parse('package:my_pkg/my_pkg.dart'),
+    );
+    return uri == null ? null : File.fromUri(uri).parent.parent.path;
+  }
+}
+
+/// GOOD (v12.3.4 regression): param resolved from Isolate.resolvePackageUri —
+/// trusted Dart-SDK resolver, now in the platformPathApis allowlist.
+Future<File?> fromPackageRoot() async {
+  final uri = await Isolate.resolvePackageUri(Uri.parse('package:p/p.dart'));
+  if (uri == null) return null;
+  final root = File.fromUri(uri).parent.parent.path;
+  return _openFromPackageRoot(root);
+}
+
+Future<File> _openFromPackageRoot(String packageRoot) async {
+  // Should NOT lint: caller's body contains `resolvePackageUri`.
+  return File('$packageRoot/assets/web/style.css');
+}
+
+/// GOOD (v12.3.4 regression): Directory.systemTemp.path — trusted resolver.
+Future<File> fromSystemTemp() async {
+  final tmp = Directory.systemTemp.path;
+  return _openInTemp(tmp);
+}
+
+Future<File> _openInTemp(String tmp) async {
+  // Should NOT lint: caller's body contains `systemTemp`.
+  return File('$tmp/scratch.txt');
+}
+
+/// GOOD (v12.3.4 regression): Platform.resolvedExecutable — trusted resolver.
+Future<File> fromResolvedExe() async {
+  final exe = Platform.resolvedExecutable;
+  return _openNearExe(exe);
+}
+
+Future<File> _openNearExe(String exePath) async {
+  // Should NOT lint: caller's body contains `resolvedExecutable`.
+  return File('$exePath.log');
+}
+
+/// REGRESSION BAD: HTTP query param flows to File(...). The rule MUST still
+/// catch this — literal-only and platform-resolver escape hatches do NOT
+/// trigger here because the caller is anonymous/unknown.
+Future<File> badFromHttpQuery(String userInput) async {
+  // expect_lint: avoid_path_traversal
+  return File('/data/$userInput');
+}
+
 /// GOOD: User input WITH proper sanitization
 
 /// Sanitized user input - has basename check
