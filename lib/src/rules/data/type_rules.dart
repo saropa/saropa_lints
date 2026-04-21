@@ -582,7 +582,7 @@ class AvoidNullableToStringRule extends SaropaLintRule {
 
 /// Warns when the null assertion operator (!) is used unsafely.
 ///
-/// Since: v1.1.18 | Updated: v4.13.0 | Rule version: v7
+/// Since: v1.1.18 | Updated: v12.3.3 | Rule version: v8
 ///
 /// The bang operator can cause runtime crashes when the value is unexpectedly null.
 /// Use null-safe alternatives instead:
@@ -597,6 +597,8 @@ class AvoidNullableToStringRule extends SaropaLintRule {
 /// - Short-circuit `||`: `x == null || x!.length > 0` (x! won't execute if null)
 /// - Short-circuit `||`: `x.isListNullOrEmpty || x!.length < 2`
 /// - Short-circuit `&&`: `x != null && x!.doSomething()`
+/// - `RegExpMatch.group(N)!` on a successful match: the dominant regex idiom
+///   where an explicit non-optional capture group is guaranteed non-null.
 ///
 /// Example of **bad** code:
 /// ```dart
@@ -632,7 +634,7 @@ class AvoidNullAssertionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'avoid_null_assertion',
     '[avoid_null_assertion] Null assertion operator (!) throws a runtime exception if the value is null, crashing the app without a meaningful error message. '
-        'The resulting _CastError provides no context about which value was null or why, making production crashes difficult to diagnose from error reports alone. {v7}',
+        'The resulting _CastError provides no context about which value was null or why, making production crashes difficult to diagnose from error reports alone. {v8}',
     correctionMessage:
         'Use null-safe alternatives: ?? for default values (e.g., name ?? \'Unknown\'), if-null checks for conditional logic, or ?. for optional chaining. '
         'When null is truly impossible, add an assert with a descriptive message or use a guard clause that throws a custom exception.',
@@ -686,9 +688,82 @@ class AvoidNullAssertionRule extends SaropaLintRule {
       if (_isInSafeIfBlock(node)) return;
       if (_isInShortCircuitSafe(node)) return;
       if (_isAfterNullCoalescingAssignment(node)) return;
+      if (_isSafeRegExpMatchGroup(node)) return;
 
       reporter.atNode(node);
     });
+  }
+
+  /// Checks if the null assertion is on a `RegExpMatch.group(N)` call.
+  ///
+  /// Safe pattern (the common regex idiom this rule previously false-positived on):
+  /// ```dart
+  /// for (final match in RegExp(r'(\d+):(\w+)').allMatches(s)) {
+  ///   final number = match.group(1)!; // guaranteed non-null on a successful match
+  ///   final word = match.group(2)!;   // same
+  /// }
+  /// ```
+  ///
+  /// Why this is treated as safe without inspecting the regex pattern:
+  /// The dominant real-world case is a literal RegExp with explicit, non-optional
+  /// capture groups where `group(N >= 1)` (and `group(0)`, the full match) are
+  /// statically guaranteed non-null for every successful match. Inspecting the
+  /// pattern string to count non-optional groups (full Hypothesis A) is expensive
+  /// and brittle (alternations, nested optionals, named groups). Because
+  /// `avoid_null_assertion` is INFO severity and the narrow heuristic eliminates
+  /// the overwhelming majority of nuisance reports on this idiom, we accept the
+  /// edge-case miss where the user wrote a regex with an optional capture group
+  /// (e.g. `(a)?b`) and dereferenced its index with `!` — that is genuinely unsafe
+  /// but rare and would benefit more from a dedicated regex-group rule later.
+  ///
+  /// See `bugs/avoid_null_assertion_false_positive_regex_match_group.md` for
+  /// the triggering report and the Hypothesis A / B trade-off discussion.
+  bool _isSafeRegExpMatchGroup(PostfixExpression node) {
+    // Operand must be `something.group(<int literal>)`.
+    final Expression operand = node.operand;
+    if (operand is! MethodInvocation) return false;
+    if (operand.methodName.name != 'group') return false;
+
+    // Reject null-aware `match?.group(1)!` — if `match` is nullable, the outer
+    // `!` can still throw on a null receiver regardless of what `group` would
+    // have returned. The safe-pattern claim only holds when the call is a
+    // plain `.` invocation on a non-null `RegExpMatch` / `Match`.
+    final Token? invocationOperator = operand.operator;
+    if (invocationOperator != null &&
+        invocationOperator.type == TokenType.QUESTION_PERIOD) {
+      return false;
+    }
+
+    // The argument must be a non-negative integer literal. `group(0)` is the
+    // full match (always non-null on a successful match); `group(N >= 1)` is a
+    // specific capture group. Non-literal arguments are rejected because we
+    // cannot reason about runtime values.
+    final NodeList<Expression> args = operand.argumentList.arguments;
+    if (args.length != 1) return false;
+    final Expression arg = args.first;
+    if (arg is! IntegerLiteral) return false;
+    final int? groupIndex = arg.value;
+    if (groupIndex == null || groupIndex < 0) return false;
+
+    // Receiver must resolve to `dart:core` `RegExpMatch` (or its supertype
+    // `Match`). We deliberately check by element + library rather than display
+    // string to avoid matching user-defined classes named `Match`.
+    final Expression? target = operand.target;
+    if (target == null) return false;
+    final DartType? type = target.staticType;
+    if (type == null) return false;
+
+    // Reject if the receiver itself is still statically nullable — the
+    // idiomatic safe case is a non-null `RegExpMatch`, either produced inside
+    // a `for (final match in regex.allMatches(...))` loop or after an
+    // explicit `if (match != null)` promotion on a `firstMatch(...)` result.
+    if (type.nullabilitySuffix == NullabilitySuffix.question) return false;
+
+    final Element? element = type.element;
+    if (element == null) return false;
+    final String? typeName = element.name;
+    if (typeName != 'RegExpMatch' && typeName != 'Match') return false;
+    return element.library?.name == 'dart.core';
   }
 
   @override
