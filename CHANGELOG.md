@@ -35,7 +35,7 @@
 
 ---
 
-## [Unreleased]
+## [12.3.4]
 
 New rule `avoid_drift_insert_missing_conflict_target` catches a class of production-crash patterns that existing Drift rules let slip: inserts targeting a table with `@TableIndex(..., unique: true)` on a non-PK column, where the insert omits a matching `onConflict: DoUpdate(target: [uniqueCol])`. Without that target, SQLite falls back to `ON CONFLICT("id")` and raises `SqliteException(2067)` the moment the unique value already exists on disk or appears twice in one batch — the exact failure mode that crashed the Saropa contacts app mid-import, frozen silently on splash by a `debugger()` in `debugException`.
 

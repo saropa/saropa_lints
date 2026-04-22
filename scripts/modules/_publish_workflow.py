@@ -207,6 +207,14 @@ def print_success_banner(
             f"/items?itemName={publisher}.{extension_name}",
             Color.CYAN,
         )
+        # Publisher management console — lets the user verify the publish,
+        # re-upload a .vsix manually, or inspect stats. Surfaced here so it's
+        # a one-click hop after a successful release instead of hunting the URL.
+        print_colored(
+            f"      Manage:       https://marketplace.visualstudio.com"
+            f"/manage/publishers/{publisher}",
+            Color.CYAN,
+        )
         print_colored(
             f"      Open VSX:     https://open-vsx.org"
             f"/extension/{publisher}/{extension_name}",
