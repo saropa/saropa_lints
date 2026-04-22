@@ -35,6 +35,16 @@
 
 ---
 
+## [Unreleased]
+
+New rule `avoid_drift_insert_missing_conflict_target` catches a class of production-crash patterns that existing Drift rules let slip: inserts targeting a table with `@TableIndex(..., unique: true)` on a non-PK column, where the insert omits a matching `onConflict: DoUpdate(target: [uniqueCol])`. Without that target, SQLite falls back to `ON CONFLICT("id")` and raises `SqliteException(2067)` the moment the unique value already exists on disk or appears twice in one batch — the exact failure mode that crashed the Saropa contacts app mid-import, frozen silently on splash by a `debugger()` in `debugException`.
+
+### Added
+
+- **New rule: `avoid_drift_insert_missing_conflict_target` (Essential tier, ERROR severity).** Detects `batch.insert(...)`, `batch.insertAll(...)`, `into(table).insert(...)`, and `table.insertOnConflictUpdate(...)` against tables that declare `@TableIndex(..., unique: true)` on a non-PK column when the call does not pass a matching `onConflict: DoUpdate(target: [<UNIQUE col>])` / `DoUpdate.withExcluded(target: [...])` or `mode: InsertMode.replace`. `insertOnConflictUpdate` is always flagged against a UNIQUE-indexed non-PK column because the method defaults to `ON CONFLICT("id")` — the PK — and silently misses the UNIQUE index, which is the "looks safe but isn't" case that motivated the rule. Implemented in [drift_rules.dart](lib/src/rules/packages/drift_rules.dart) via a compilation-unit scan that collects `@TableIndex(unique: true)` annotations (excluding UNIQUE-on-PK, where Drift's default conflict handling is safe), then resolves call-site table identifiers through Drift's lower-first getter convention (`class ContactPoints` → `db.contactPoints`). Generated `.g.dart` files are exempt. Registered in [saropa_lints.dart](lib/saropa_lints.dart) `_allRuleFactories` and added to `essentialRules` and `driftPackageRules` in [tiers.dart](lib/src/tiers.dart). Severity matches the sibling `avoid_drift_enum_index_reorder` (ERROR) — same class of "silent data corruption / runtime crash" hazard. Bug report: [bugs/infra_new_rule_drift_insert_missing_conflict_target.md](bugs/infra_new_rule_drift_insert_missing_conflict_target.md). Fixture: [avoid_drift_insert_missing_conflict_target_fixture.dart](example_packages/lib/drift/avoid_drift_insert_missing_conflict_target_fixture.dart). Tests: [drift_rules_test.dart](test/drift_rules_test.dart).
+
+---
+
 ## [12.3.3]
 
 `avoid_path_traversal` and `require_file_path_sanitization` no longer flag private helpers whose tainted parameter only ever receives compile-time string literals, or whose caller resolves the path through a trusted Dart-SDK API (`Isolate.resolvePackageUri`, `Directory.systemTemp`, `Platform.resolvedExecutable`, `Platform.script`, `Directory.current`, `File.fromUri` / `Directory.fromUri` / `Link.fromUri`). `avoid_null_assertion` no longer flags the common `RegExpMatch.group(N)!` idiom — iterating `allMatches` / `firstMatch` over a literal regex and force-unwrapping a group is now recognized as a safe pattern. `prefer_debug_print` no longer pesters pure Dart packages to call a Flutter-only API.
