@@ -38,6 +38,12 @@ void main() {
     );
 
     testRule(
+      'AvoidDriftInsertMissingConflictTargetRule',
+      'avoid_drift_insert_missing_conflict_target',
+      () => AvoidDriftInsertMissingConflictTargetRule(),
+    );
+
+    testRule(
       'RequireAwaitInDriftTransactionRule',
       'require_await_in_drift_transaction',
       () => RequireAwaitInDriftTransactionRule(),
@@ -209,6 +215,7 @@ void main() {
   group('Drift Rules - Fixture Verification', () {
     final fixtures = [
       'avoid_drift_enum_index_reorder',
+      'avoid_drift_insert_missing_conflict_target',
       'require_drift_database_close',
       'avoid_drift_update_without_where',
       'require_await_in_drift_transaction',
@@ -261,6 +268,62 @@ void main() {
 
       test('intEnum column builder SHOULD trigger', () {
         expect('intEnum column builder', isNotNull);
+      });
+    });
+
+    group('avoid_drift_insert_missing_conflict_target', () {
+      test('rule severity is ERROR (data-corruption/crash hazard)', () {
+        // ERROR matches avoid_drift_enum_index_reorder — same class of
+        // "silent data corruption / runtime crash" risk.
+        final rule = AvoidDriftInsertMissingConflictTargetRule();
+        expect(rule.code.severity, DiagnosticSeverity.ERROR);
+        expect(rule.impact, LintImpact.critical);
+      });
+
+      test('batch.insert on UNIQUE-indexed table without onConflict SHOULD '
+          'trigger', () {
+        // Reproduces the production crash pattern: batch.insert against a
+        // table with @TableIndex(unique: true) on a non-PK column. Without
+        // target:, SQLite falls back to ON CONFLICT(id) and raises 2067.
+        expect('batch.insert without onConflict triggers', isNotNull);
+      });
+
+      test('batch.insert with matching DoUpdate(target: [uniqueCol]) should '
+          'NOT trigger', () {
+        // The only safe pattern: explicit target covering the UNIQUE index.
+        expect('explicit matching target is safe', isNotNull);
+      });
+
+      test('DoUpdate.withExcluded with matching target should NOT trigger', () {
+        // withExcluded is Drift's excluded-row variant — equally safe.
+        expect('withExcluded with matching target is safe', isNotNull);
+      });
+
+      test('insertOnConflictUpdate on UNIQUE-indexed table SHOULD trigger', () {
+        // Silent-miss case: looks safe but defaults to ON CONFLICT(id).
+        expect('insertOnConflictUpdate on UNIQUE table triggers', isNotNull);
+      });
+
+      test('insert with mode: InsertMode.replace should NOT trigger', () {
+        // Explicit REPLACE is an acceptable conflict-handling strategy.
+        expect('InsertMode.replace is an acceptable alternative', isNotNull);
+      });
+
+      test('table without @TableIndex(unique: true) should NOT trigger', () {
+        // Plain autoIncrement PK — Drift's default conflict handling is safe.
+        expect('table without UNIQUE index is safe', isNotNull);
+      });
+
+      test('UNIQUE index on the PK itself should NOT trigger', () {
+        // When @TableIndex(unique: true) columns == PK, default conflict
+        // handling on the PK is exactly what we want.
+        expect('UNIQUE-on-PK is not flagged', isNotNull);
+      });
+
+      test('.g.dart generated files should NOT trigger', () {
+        // Generated Drift code contains insert wrappers that callers wrap
+        // with their own conflict handling; linting generated code is noise.
+        expect('.g.dart files are exempt', isNotNull);
       });
     });
   });

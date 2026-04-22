@@ -1685,6 +1685,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidDriftEnumIndexReorderRule.new,
   RequireDriftDatabaseCloseRule.new,
   AvoidDriftUpdateWithoutWhereRule.new,
+  AvoidDriftInsertMissingConflictTargetRule.new,
   RequireAwaitInDriftTransactionRule.new,
   RequireDriftForeignKeyPragmaRule.new,
   AvoidDriftRawSqlInterpolationRule.new,

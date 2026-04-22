@@ -519,6 +519,7 @@ const Set<String> essentialRules = <String>{
   'require_hive_type_adapter',
   'require_hive_encryption_key_secure',
   'avoid_drift_enum_index_reorder', // ERROR - data corruption from enum .index storage
+  'avoid_drift_insert_missing_conflict_target', // ERROR - runtime crash (SqliteException 2067) when UNIQUE index is not targeted
   'require_type_adapter_registration', // ERROR - adapter not registered before openBox
   'avoid_hive_field_index_reuse', // ERROR - data corruption from duplicate indices
   // Part 5 - HTTP/Dio Rules (Essential)
@@ -3675,6 +3676,7 @@ const Set<String> sqflitePackageRules = <String>{
 /// Rules specific to the Drift database package.
 const Set<String> driftPackageRules = <String>{
   'avoid_drift_enum_index_reorder',
+  'avoid_drift_insert_missing_conflict_target',
   'require_drift_database_close',
   'avoid_drift_update_without_where',
   'require_await_in_drift_transaction',

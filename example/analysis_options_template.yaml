@@ -1626,6 +1626,7 @@ saropa_lints:
 
     # --- Drift (SQLite) ---
     - avoid_drift_enum_index_reorder: false            # ERROR - enum .index data corruption (v5.1.0)
+    - avoid_drift_insert_missing_conflict_target: false # ERROR - insert misses UNIQUE @TableIndex → SqliteException 2067 (v12.3.4)
     - require_drift_database_close: false              # WARNING - unclosed database leak (v5.1.0)
     - avoid_drift_update_without_where: false          # WARNING - bulk update/delete (v5.1.0)
     - require_await_in_drift_transaction: false        # WARNING - unawaited in transaction (v5.1.0)

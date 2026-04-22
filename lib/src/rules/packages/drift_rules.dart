@@ -356,6 +356,435 @@ String? _getFullChainSource(AstNode node) {
 }
 
 // =============================================================================
+// avoid_drift_insert_missing_conflict_target
+// =============================================================================
+
+/// Warns when a Drift insert targets a table with a UNIQUE `@TableIndex`
+/// on a non-primary-key column and does not pass a matching
+/// `onConflict: DoUpdate(target: [uniqueCol])`.
+///
+/// Since: v12.3.4 | Rule version: v1
+///
+/// Drift tables declaring `@TableIndex(..., unique: true)` on a non-PK column
+/// need an explicit conflict target on every `batch.insert(...)` /
+/// `into(table).insert(...)`. Without `target:`, SQLite falls back to
+/// `ON CONFLICT("id")` — the primary key — and misses the real UNIQUE
+/// constraint. The insert succeeds for new rows and raises
+/// `SqliteException(2067): UNIQUE constraint failed` the moment the unique
+/// value (UUID, email, etc.) already exists on disk or appears twice in one
+/// batch. The crash is usually discovered late: mid-way through a static-data
+/// import, after a `debugger()` in `debugException` has silently frozen the
+/// isolate. The hazard is invisible at the call site because the table's
+/// annotation lives in a different file from the IO method.
+///
+/// The rule scans the current compilation unit for `@TableIndex(unique: true)`
+/// annotations on non-PK columns, then flags any `insert`, `insertAll`, or
+/// `insertOnConflictUpdate` call against those tables that does not either:
+/// - pass `onConflict: DoUpdate(target: [<UNIQUE col>])` /
+///   `DoUpdate.withExcluded(target: [...])` referencing at least one of the
+///   UNIQUE columns, or
+/// - use `mode: InsertMode.replace` (explicit REPLACE is an acceptable
+///   alternative).
+///
+/// `insertOnConflictUpdate` without an explicit `target:` is ALWAYS flagged
+/// against a UNIQUE-indexed non-PK column — the method looks safe but
+/// defaults to `ON CONFLICT("id")` and misses the real UNIQUE index.
+///
+/// **BAD:**
+/// ```dart
+/// @TableIndex(name: 'idx', columns: {#uuid}, unique: true)
+/// class ContactPoints extends Table {
+///   IntColumn get id => integer().autoIncrement()();
+///   TextColumn get uuid => text()();
+/// }
+///
+/// Future<void> putAll(AppDatabase db, List<ContactPointsCompanion> rows) async {
+///   await db.batch((batch) {
+///     for (final row in rows) {
+///       batch.insert(db.contactPoints, row); // UNIQUE(uuid) will raise 2067
+///     }
+///   });
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Future<void> putAll(AppDatabase db, List<ContactPointsCompanion> rows) async {
+///   await db.batch((batch) {
+///     for (final row in rows) {
+///       batch.insert(
+///         db.contactPoints,
+///         row,
+///         onConflict: DoUpdate(
+///           (_) => row,
+///           target: [db.contactPoints.uuid],
+///         ),
+///       );
+///     }
+///   });
+/// }
+/// ```
+class AvoidDriftInsertMissingConflictTargetRule extends SaropaLintRule {
+  AvoidDriftInsertMissingConflictTargetRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'avoid_drift_insert_missing_conflict_target',
+    '[avoid_drift_insert_missing_conflict_target] Drift insert into a table '
+        'with a UNIQUE @TableIndex on a non-PK column is missing a matching '
+        'onConflict: DoUpdate(target: [uniqueCol]). Without target:, SQLite '
+        'falls back to ON CONFLICT("id") and misses the UNIQUE index — the '
+        'insert raises SqliteException(2067) the moment the unique value '
+        'already exists on disk or appears twice in one batch. {v1}',
+    correctionMessage:
+        'Pass onConflict: DoUpdate((_) => row, target: '
+        '[db.<table>.<uniqueCol>]) — or DoUpdate.withExcluded(...) — so '
+        'SQLite dedupes on the UNIQUE index. InsertMode.replace is also '
+        'acceptable when REPLACE semantics are intentional.',
+    severity: DiagnosticSeverity.ERROR,
+  );
+
+  /// Drift insert method names that are affected by a missing conflict
+  /// target on a UNIQUE-indexed table.
+  static const Set<String> _insertMethods = <String>{
+    'insert',
+    'insertAll',
+    'insertOnConflictUpdate',
+  };
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    // Skip generated Drift code — `.g.dart` files contain the generated
+    // insert wrappers and emit their own conflict handling. Evaluate once
+    // per file instead of per MethodInvocation.
+    final filePath = context.filePath;
+    if (filePath.endsWith('.g.dart')) return;
+
+    // Lazy cache of the file's UNIQUE @TableIndex tables. A file with N
+    // insert calls would otherwise re-walk every top-level declaration N
+    // times. Computed on first use inside the visitor so files with no
+    // insert calls pay zero cost.
+    Map<String, Set<String>>? uniqueTablesCache;
+
+    context.addMethodInvocation((MethodInvocation node) {
+      final methodName = node.methodName.name;
+      if (!_insertMethods.contains(methodName)) return;
+      if (!fileImportsPackage(node, PackageImports.drift)) return;
+
+      // Resolve the target table identifier. For batch.insert(table, row)
+      // / batch.insertAll(table, rows), the table is the first positional
+      // argument. For db.<table>.insertOnConflictUpdate(row) and
+      // into(table).insert(row), it's in the receiver chain.
+      final targetTableId = _extractTargetTableIdentifier(node);
+      if (targetTableId == null) return;
+
+      // Collect UNIQUE @TableIndex metadata for tables declared in the
+      // current compilation unit. Cross-file table declarations are not
+      // reachable from the AST alone — a deliberate conservative choice
+      // to avoid false positives on multi-file Drift setups.
+      uniqueTablesCache ??= _collectUniqueIndexedTables(node);
+      final uniqueCols =
+          _resolveUniqueColumns(uniqueTablesCache!, targetTableId);
+      if (uniqueCols == null || uniqueCols.isEmpty) return;
+
+      // `insertOnConflictUpdate` defaults to ON CONFLICT(id) — which is the
+      // PK, not the UNIQUE index. There is no way to override the target on
+      // this convenience method, so it is ALWAYS a silent miss against a
+      // non-PK UNIQUE-indexed table.
+      if (methodName == 'insertOnConflictUpdate') {
+        reporter.atNode(node.methodName);
+        return;
+      }
+
+      // For plain insert/insertAll: require an explicit conflict handler
+      // that matches the UNIQUE index, or an explicit InsertMode.replace.
+      if (_hasReplaceMode(node) || _hasMatchingConflictTarget(node, uniqueCols)) {
+        return;
+      }
+
+      reporter.atNode(node.methodName);
+    });
+  }
+}
+
+/// Scans the compilation unit containing [node] for `class X extends Table`
+/// declarations annotated with `@TableIndex(..., unique: true)` on a non-PK
+/// column, returning a map of `lower-first table name` → set of UNIQUE
+/// column names (parsed from the `columns: {#col1, #col2}` Symbol literal).
+///
+/// Why "lower-first": Drift generates a getter named `db.contactPoints`
+/// from `class ContactPoints extends Table` (first letter lowercased), so
+/// the call-site identifier we match against is the lower-first form.
+Map<String, Set<String>> _collectUniqueIndexedTables(AstNode node) {
+  final unit = node.thisOrAncestorOfType<CompilationUnit>();
+  if (unit == null) return const <String, Set<String>>{};
+
+  final result = <String, Set<String>>{};
+  for (final decl in unit.declarations) {
+    if (decl is! ClassDeclaration) continue;
+    if (!_extendsDriftTable(decl)) continue;
+
+    final uniqueCols = _readUniqueIndexColumns(decl);
+    if (uniqueCols.isEmpty) continue;
+
+    // Lower-first of class name — Drift's default getter naming convention.
+    final className = decl.namePart.typeName.lexeme;
+    if (className.isEmpty) continue;
+    final key = className[0].toLowerCase() + className.substring(1);
+    result[key] = uniqueCols;
+    // Also index by the class name itself, because some callers reference
+    // the table type directly (e.g. `ContactPoints` rather than
+    // `db.contactPoints`).
+    result[className] = uniqueCols;
+  }
+  return result;
+}
+
+/// True when [decl] extends Drift's `Table` base class.
+bool _extendsDriftTable(ClassDeclaration decl) {
+  final superclass = decl.extendsClause?.superclass;
+  if (superclass == null) return false;
+  return superclass.name.lexeme == 'Table';
+}
+
+/// Reads `@TableIndex(..., columns: {#col1, #col2}, unique: true)`
+/// annotations on [decl] and returns the union of column Symbol names for
+/// every UNIQUE index that is NOT exactly the PK. Returns an empty set if
+/// the table has no non-PK UNIQUE indexes.
+Set<String> _readUniqueIndexColumns(ClassDeclaration decl) {
+  final pkColumns = _collectPrimaryKeyColumns(decl);
+  final uniqueCols = <String>{};
+  for (final annotation in decl.metadata) {
+    if (annotation.name.name != 'TableIndex') continue;
+    final args = annotation.arguments?.arguments;
+    if (args == null) continue;
+
+    bool? unique;
+    Set<String>? cols;
+    for (final arg in args) {
+      if (arg is! NamedExpression) continue;
+      final label = arg.name.label.name;
+      if (label == 'unique') {
+        final expr = arg.expression;
+        if (expr is BooleanLiteral) unique = expr.value;
+      } else if (label == 'columns') {
+        cols = _parseSymbolSet(arg.expression);
+      }
+    }
+    if (unique != true || cols == null || cols.isEmpty) continue;
+
+    // Skip UNIQUE indexes that are exactly the PK — Drift's default
+    // conflict resolution already handles the PK case safely.
+    if (pkColumns.isNotEmpty && _setEquals(cols, pkColumns)) continue;
+    uniqueCols.addAll(cols);
+  }
+  return uniqueCols;
+}
+
+/// Extracts `{#col1, #col2}` set-literal symbols into a Set of names.
+/// Returns null when the expression is not a recognized set of Symbol
+/// literals.
+Set<String>? _parseSymbolSet(Expression expression) {
+  if (expression is! SetOrMapLiteral) return null;
+  final result = <String>{};
+  for (final element in expression.elements) {
+    if (element is! SymbolLiteral) continue;
+    // SymbolLiteral.components are tokens like `#contactSaropaUUID` → single
+    // identifier "contactSaropaUUID".
+    if (element.components.length != 1) continue;
+    result.add(element.components.first.lexeme);
+  }
+  return result;
+}
+
+/// Collects primary-key column names declared via a `primaryKey` getter
+/// override on [decl] — used to exclude the "UNIQUE is literally the PK"
+/// case, where Drift's default conflict handling is already safe.
+Set<String> _collectPrimaryKeyColumns(ClassDeclaration decl) {
+  for (final member in decl.body.members) {
+    if (member is! MethodDeclaration) continue;
+    if (member.name.lexeme != 'primaryKey') continue;
+    final body = member.body;
+    if (body is! ExpressionFunctionBody) continue;
+    final set = _parseSymbolSet(body.expression);
+    if (set != null) return set;
+  }
+  return const <String>{};
+}
+
+bool _setEquals(Set<String> a, Set<String> b) {
+  if (a.length != b.length) return false;
+  for (final e in a) {
+    if (!b.contains(e)) return false;
+  }
+  return true;
+}
+
+/// Attempts to extract the table identifier being inserted into.
+/// Covers these shapes:
+/// - `batch.insert(db.contactPoints, row)` → `contactPoints`
+/// - `batch.insertAll(db.contactPoints, rows)` → `contactPoints`
+/// - `db.contactPoints.insertOnConflictUpdate(row)` → `contactPoints`
+/// - `db.into(db.contactPoints).insert(row)` → `contactPoints`
+String? _extractTargetTableIdentifier(MethodInvocation node) {
+  final methodName = node.methodName.name;
+
+  // Batch shapes pass the table as the first positional argument.
+  if (methodName == 'insert' || methodName == 'insertAll') {
+    final positional = node.argumentList.arguments
+        .where((a) => a is! NamedExpression)
+        .toList();
+    if (positional.isNotEmpty) {
+      final fromArg = _identifierOfTableExpr(positional.first);
+      if (fromArg != null) return fromArg;
+    }
+  }
+
+  // Receiver-based shapes: db.<table>.insertOnConflictUpdate(...),
+  // db.into(<table>).insert(...), (update(<table>)..where(...)).insert(...)
+  final target = node.target;
+  if (target != null) {
+    final fromReceiver = _identifierOfTableExpr(target);
+    if (fromReceiver != null) return fromReceiver;
+    // Walk into `into(<table>)` when the target is such a call.
+    if (target is MethodInvocation && target.methodName.name == 'into') {
+      final intoArgs = target.argumentList.arguments
+          .where((a) => a is! NamedExpression)
+          .toList();
+      if (intoArgs.isNotEmpty) {
+        return _identifierOfTableExpr(intoArgs.first);
+      }
+    }
+  }
+  return null;
+}
+
+/// Extracts the "table identifier" from an expression like
+/// `db.contactPoints` (PropertyAccess), `contactPoints` (SimpleIdentifier),
+/// or `db.contactPoints` (PrefixedIdentifier). Returns null for anything
+/// else.
+String? _identifierOfTableExpr(Expression expr) {
+  if (expr is SimpleIdentifier) return expr.name;
+  if (expr is PrefixedIdentifier) return expr.identifier.name;
+  if (expr is PropertyAccess) return expr.propertyName.name;
+  return null;
+}
+
+/// Resolves the UNIQUE column set for a call-site table identifier. Matches
+/// against both the raw class name (`ContactPoints`) and its lower-first
+/// form (`contactPoints`), since Drift's default getter name is the
+/// lower-first form of the table class.
+Set<String>? _resolveUniqueColumns(
+  Map<String, Set<String>> uniqueTables,
+  String targetTableId,
+) {
+  final byExact = uniqueTables[targetTableId];
+  if (byExact != null) return byExact;
+  // Fall back to a case-insensitive match on the first character — Drift's
+  // getter is lower-first, but older codebases occasionally capitalize.
+  if (targetTableId.isNotEmpty) {
+    final flipped = targetTableId[0].toUpperCase() + targetTableId.substring(1);
+    final byFlipped = uniqueTables[flipped];
+    if (byFlipped != null) return byFlipped;
+  }
+  return null;
+}
+
+/// True when [node]'s `onConflict:` argument is a `DoUpdate(...)` (or
+/// `DoUpdate.withExcluded(...)`) whose `target:` list references at least
+/// one of [uniqueCols].
+bool _hasMatchingConflictTarget(MethodInvocation node, Set<String> uniqueCols) {
+  final onConflict = _namedArg(node, 'onConflict');
+  if (onConflict == null) return false;
+
+  Expression value = onConflict.expression;
+  // Allow nested parens/as/await.
+  while (value is ParenthesizedExpression) {
+    value = value.expression;
+  }
+
+  // The expression can be a constructor invocation of DoUpdate /
+  // UpsertMultiple, a static call like DoUpdate.withExcluded(...), or
+  // (less commonly) a bare DoUpdate(...) invocation. Only DoUpdate and
+  // UpsertMultiple expose a `target:` argument; DoNothing is conservatively
+  // NOT accepted — it silently skips the row on conflict, which is almost
+  // never what the caller of an import pipeline wants.
+  if (value is InstanceCreationExpression) {
+    final receiverName = value.constructorName.type.name.lexeme;
+    if (receiverName != 'DoUpdate' && receiverName != 'UpsertMultiple') {
+      return false;
+    }
+    final target = _namedArgFromArgList(value.argumentList, 'target');
+    return _targetSetContainsAny(target?.expression, uniqueCols);
+  }
+  if (value is MethodInvocation) {
+    // DoUpdate.withExcluded(...) — receiver is the class name.
+    final recv = value.target;
+    final isNamedCtor = recv is SimpleIdentifier && recv.name == 'DoUpdate';
+    // Bare DoUpdate(...) — method name itself is the class.
+    final isBareCtor = value.methodName.name == 'DoUpdate';
+    if (!isNamedCtor && !isBareCtor) return false;
+    final target = _namedArgFromArgList(value.argumentList, 'target');
+    return _targetSetContainsAny(target?.expression, uniqueCols);
+  }
+  return false;
+}
+
+/// True when [expr] is a `<...>[db.<table>.<col>, ...]` list literal that
+/// contains at least one identifier whose name matches an entry in
+/// [uniqueCols].
+bool _targetSetContainsAny(Expression? expr, Set<String> uniqueCols) {
+  if (expr is! ListLiteral) return false;
+  for (final element in expr.elements) {
+    if (element is! Expression) continue;
+    final name = _identifierOfTableExpr(element);
+    if (name != null && uniqueCols.contains(name)) return true;
+  }
+  return false;
+}
+
+/// True when [node] has an `mode: InsertMode.replace` argument — explicit
+/// REPLACE is an acceptable alternative to a matching conflict target.
+bool _hasReplaceMode(MethodInvocation node) {
+  final mode = _namedArg(node, 'mode');
+  if (mode == null) return false;
+  final expr = mode.expression;
+  // Match InsertMode.replace regardless of whether it's via PrefixedIdentifier
+  // or PropertyAccess (e.g. drift.InsertMode.replace).
+  String? propertyName;
+  if (expr is PrefixedIdentifier) {
+    propertyName = expr.identifier.name;
+  } else if (expr is PropertyAccess) {
+    propertyName = expr.propertyName.name;
+  }
+  return propertyName == 'replace';
+}
+
+NamedExpression? _namedArg(MethodInvocation node, String name) =>
+    _namedArgFromArgList(node.argumentList, name);
+
+NamedExpression? _namedArgFromArgList(ArgumentList args, String name) {
+  for (final arg in args.arguments) {
+    if (arg is NamedExpression && arg.name.label.name == name) return arg;
+  }
+  return null;
+}
+
+// =============================================================================
 // require_await_in_drift_transaction
 // =============================================================================
 
