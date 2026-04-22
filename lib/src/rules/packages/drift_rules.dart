@@ -497,8 +497,10 @@ class AvoidDriftInsertMissingConflictTargetRule extends SaropaLintRule {
       // reachable from the AST alone — a deliberate conservative choice
       // to avoid false positives on multi-file Drift setups.
       uniqueTablesCache ??= _collectUniqueIndexedTables(node);
-      final uniqueCols =
-          _resolveUniqueColumns(uniqueTablesCache!, targetTableId);
+      final uniqueCols = _resolveUniqueColumns(
+        uniqueTablesCache!,
+        targetTableId,
+      );
       if (uniqueCols == null || uniqueCols.isEmpty) return;
 
       // `insertOnConflictUpdate` defaults to ON CONFLICT(id) — which is the
@@ -512,7 +514,8 @@ class AvoidDriftInsertMissingConflictTargetRule extends SaropaLintRule {
 
       // For plain insert/insertAll: require an explicit conflict handler
       // that matches the UNIQUE index, or an explicit InsertMode.replace.
-      if (_hasReplaceMode(node) || _hasMatchingConflictTarget(node, uniqueCols)) {
+      if (_hasReplaceMode(node) ||
+          _hasMatchingConflictTarget(node, uniqueCols)) {
         return;
       }
 
