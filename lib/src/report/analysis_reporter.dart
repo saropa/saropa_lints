@@ -8,6 +8,7 @@ import 'dart:math' show Random;
 import 'package:saropa_lints/src/report/batch_data.dart';
 import 'package:saropa_lints/src/report/import_graph_tracker.dart';
 import 'package:saropa_lints/src/report/report_consolidator.dart';
+import 'package:saropa_lints/src/report/report_synthesis.dart';
 import 'package:saropa_lints/src/report/violation_export.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart';
 import 'package:saropa_lints/src/string_slice_utils.dart';
@@ -65,6 +66,23 @@ class AnalysisReporter {
   static ReportConfig? _config;
   static Map<String, OwaspMapping>? _owaspLookup;
 
+  /// Names of saropa-authored rules (keys of the plugin's factory map).
+  ///
+  /// Populated from `saropa_lints.dart` at rule-registration time. Used by
+  /// [ReportSynthesis] to classify each row in the TOP RULES table as
+  /// saropa-authored vs. SDK/other. Stored as a reporter-level field so the
+  /// report writer does not need a back-reference into the plugin's
+  /// top-level library (which would be a layering violation).
+  static Set<String> _saropaRuleNames = const <String>{};
+
+  /// Names of rules that register at least one quick-fix generator.
+  ///
+  /// Populated alongside [_saropaRuleNames] from the same plugin
+  /// registration pass. Used to render the `Fixable?` column in the
+  /// widened TOP RULES table and to split triage candidates into
+  /// auto-fixable vs. suppress-or-manual groups.
+  static Set<String> _fixableRuleNames = const <String>{};
+
   /// Debounce duration: write reports after this idle period.
   static const Duration _debounce = Duration(seconds: 3);
 
@@ -91,6 +109,22 @@ class AnalysisReporter {
   /// Maps rule name → [OwaspMapping] for rules that have OWASP mappings.
   static void setOwaspLookup(Map<String, OwaspMapping> lookup) {
     _owaspLookup = lookup;
+  }
+
+  /// Publish the saropa-authored rule set and the fix-availability set so
+  /// the TOP RULES table and triage synthesis can attribute each rule
+  /// correctly.
+  ///
+  /// Called from `saropa_lints.dart` once, after the plugin's rule factory
+  /// map is built — at that point both sets are already computed and we
+  /// only pay the cost of two static assignments. Passing `const {}` is
+  /// fine; the synthesis module tolerates empty sets.
+  static void setPluginRuleMetadata({
+    required Set<String> saropaRuleNames,
+    required Set<String> fixableRuleNames,
+  }) {
+    _saropaRuleNames = saropaRuleNames;
+    _fixableRuleNames = fixableRuleNames;
   }
 
   /// Initialize the reporter with the project root directory.
@@ -293,12 +327,41 @@ class AnalysisReporter {
     final config = data.config ?? _config;
     final buf = StringBuffer();
 
+    // Synthesize triage-oriented views up front so the header and the
+    // TOP RULES section share one ordered row list — no second pass, no
+    // drift between "what CONCENTRATION claims" and "what TOP RULES shows".
+    final rows = ReportSynthesis.buildRuleRows(
+      issuesByRule: data.issuesByRule,
+      ruleSeverities: data.ruleSeverities,
+      saropaRuleNames: _saropaRuleNames,
+      fixableRuleNames: _fixableRuleNames,
+      total: data.total,
+    );
+    final concentration = ReportSynthesis.buildConcentration(
+      rows: rows,
+      total: data.total,
+    );
+    final hasFileImportance = ImportGraphTracker.allFiles.isNotEmpty;
+    final triage = ReportSynthesis.buildTriage(
+      rows: rows,
+      total: data.total,
+      hasFileImportance: hasFileImportance,
+    );
+    final delta = _findRunDelta(path, data.total);
+
     _writeHeader(buf, config, data.batchCount);
+    _writeSynthesisSections(
+      buf: buf,
+      total: data.total,
+      concentration: concentration,
+      triage: triage,
+      delta: delta,
+    );
     _writeConfigSection(buf, config);
     _writeOverview(buf, data);
     _writeImpactSection(buf, data.impactCounts, data.total);
     _writeSeveritySubsection(buf, data);
-    _writeTopRulesFromMap(buf, data.issuesByRule, data.ruleSeverities);
+    _writeTopRulesTable(buf, rows);
     _writeFileImportance(buf, data.issuesByFile);
     _writePrioritizedViolations(buf, data.violations);
     _writeProjectStructure(buf);
@@ -307,6 +370,158 @@ class AnalysisReporter {
     buf.writeln('Total: ${data.total} issues');
 
     File(path).writeAsStringSync(buf.toString());
+  }
+
+  /// Find the previous run's total for the `CHANGE SINCE LAST RUN` section.
+  ///
+  /// Scoped to the date folder the current report is being written into so
+  /// cross-day comparisons don't accidentally fire. Returns null on the
+  /// first run of the day, or when every prior file in the folder has an
+  /// unparseable header (tolerant: one bad file does not block the run).
+  static RunDelta? _findRunDelta(String currentReportPath, int currentTotal) {
+    final sep = Platform.pathSeparator;
+    final parts = currentReportPath.split(sep);
+    if (parts.length < 2) return null;
+    final currentFilename = parts.last;
+    final dateFolder = parts.sublist(0, parts.length - 1).join(sep);
+    return ReportSynthesis.findPreviousRunTotal(
+      dateFolder: dateFolder,
+      currentReportFilename: currentFilename,
+      currentTotal: currentTotal,
+    );
+  }
+
+  /// Emit the synthesis sections above the existing `CONFIGURATION` block.
+  ///
+  /// Ordering is deliberate: concentration first (headline — 2 lines tell
+  /// the user what to do), then delta (trend — did the last action help?),
+  /// then triage (plan — what to do next). Skipped entirely on small
+  /// runs where the original flat format is already readable.
+  static void _writeSynthesisSections({
+    required StringBuffer buf,
+    required int total,
+    required ConcentrationSummary concentration,
+    required TriageRecommendation triage,
+    required RunDelta? delta,
+  }) {
+    const thresholds = SynthesisThresholds.defaults;
+    final showConcentration =
+        total >= thresholds.concentrationMinTotal && concentration.shouldRender;
+    final showTriage =
+        total >= thresholds.triageMinTotal && triage.shouldRender;
+    if (!showConcentration && !showTriage && delta == null) return;
+
+    if (showConcentration) {
+      _writeConcentration(buf, concentration);
+    }
+    if (delta != null) {
+      _writeRunDelta(buf, delta);
+    }
+    if (showTriage) {
+      _writeTriage(buf, triage);
+    }
+  }
+
+  /// Headline concentration block. Keep it short — at most ~8 lines — so
+  /// a terminal viewer sees the one fact the triage depends on without
+  /// scrolling.
+  static void _writeConcentration(StringBuffer buf, ConcentrationSummary c) {
+    // Defensive guard: _writeSynthesisSections gates on shouldRender which
+    // implies top.isNotEmpty, but we null-check via firstOrNull so the
+    // reporter never crashes if that invariant is ever broken — a silent
+    // skipped section is infinitely preferable to a runtime StateError
+    // mid-report-write that would truncate the output file.
+    final topRule = c.top.isNotEmpty ? c.top.first : null;
+    if (topRule == null) return;
+    buf.writeln('CONCENTRATION (highest-leverage single action)');
+    final topShare = (topRule.share * 100).toStringAsFixed(1);
+    buf.writeln(
+      '  Top rule:  ${topRule.name}'
+      '  ${topRule.count}  ($topShare% of total, '
+      'source: ${topRule.source.label})',
+    );
+    if (c.top.length > 1) {
+      final aggregateShare = (c.topThreeCount * 100.0 / c.total)
+          .toStringAsFixed(1);
+      final names = c.top.map((r) => r.name).join(', ');
+      buf.writeln(
+        '  Top ${c.top.length}:    $names  ($aggregateShare% combined)',
+      );
+    }
+    buf.writeln(
+      '  → Suppress top rule → residual: ${c.residualAfterTopRule} issues',
+    );
+    if (c.top.length > 1) {
+      buf.writeln(
+        '  → Suppress top ${c.top.length}   → residual: '
+        '${c.residualAfterTopThree} issues',
+      );
+    }
+    buf.writeln();
+  }
+
+  /// Delta vs. previous run. Single-line summary — the user just needs to
+  /// see "is this trending the right way?".
+  static void _writeRunDelta(StringBuffer buf, RunDelta d) {
+    final sign = d.delta > 0 ? '+' : '';
+    final pctSign = d.percentChange > 0 ? '+' : '';
+    final pct = d.percentChange.toStringAsFixed(1);
+    buf.writeln('CHANGE SINCE LAST RUN');
+    buf.writeln(
+      '  Previous: ${d.previousTotal}'
+      '  (${d.previousReportFile})',
+    );
+    buf.writeln(
+      '  Current:  ${d.currentTotal}  '
+      '(delta $sign${d.delta}, $pctSign$pct%)',
+    );
+    buf.writeln();
+  }
+
+  /// Staged triage plan: suppress → baseline → fix. The three steps map to
+  /// three different user actions (config edit, one-shot command, manual
+  /// fixes), so keeping them visually distinct saves the user from
+  /// conflating them.
+  static void _writeTriage(StringBuffer buf, TriageRecommendation t) {
+    buf.writeln('RECOMMENDED TRIAGE');
+
+    if (t.suppressCandidates.isNotEmpty) {
+      buf.writeln('  Step 1 — Suppress (highest-leverage, lowest risk)');
+      for (final r in t.suppressCandidates) {
+        final pct = (r.share * 100).toStringAsFixed(1);
+        buf.writeln(
+          '    ${r.name}  ${r.count}  ($pct%)  '
+          'source: ${r.source.label}, severity: ${r.severity}',
+        );
+      }
+      buf.writeln(
+        '    → Residual after suppress: ${t.residualAfterSuppress} issues',
+      );
+      buf.writeln(
+        '    (Baseline via analysis_options.yaml or '
+        "set severity to 'false'.)",
+      );
+    }
+
+    if (t.autoFixableCandidates.isNotEmpty) {
+      buf.writeln('  Step 2 — Auto-fix (rules with registered quick fixes)');
+      for (final r in t.autoFixableCandidates) {
+        final pct = (r.share * 100).toStringAsFixed(1);
+        buf.writeln('    ${r.name}  ${r.count}  ($pct%)');
+      }
+      buf.writeln(
+        '    → Run `dart fix --apply` to resolve the fixable portion '
+        'automatically.',
+      );
+    }
+
+    if (t.hasFileImportance) {
+      buf.writeln(
+        '  Step 3 — Fix highest-score files '
+        '(see FILE IMPORTANCE table below).',
+      );
+    }
+    buf.writeln();
   }
 
   /// Write the report header block.
@@ -488,27 +703,55 @@ class AnalysisReporter {
     buf.writeln();
   }
 
-  /// Write top rules section from raw maps.
-  static void _writeTopRulesFromMap(
-    StringBuffer buf,
-    Map<String, int> issuesByRule,
-    Map<String, String> ruleSeverities,
-  ) {
-    if (issuesByRule.isEmpty) return;
+  /// Write the widened TOP RULES table.
+  ///
+  /// Columns: `#`, rule name, count, `% of total`, severity, source,
+  /// fixability. The two rightmost columns (source / fixable) turn the
+  /// table from "what triggered" into "what to do about it" — the same
+  /// insight the CONCENTRATION and RECOMMENDED TRIAGE sections highlight,
+  /// but visible at row granularity for the full top 20.
+  static void _writeTopRulesTable(StringBuffer buf, List<RuleRow> rows) {
+    if (rows.isEmpty) return;
 
-    final sorted = issuesByRule.entries.toList()
-      ..sort((a, b) => b.value.compareTo(a.value));
-    final top = sorted.take(20);
+    final top = rows.take(20).toList(growable: false);
+    // Column widths chosen to fit an 80-column terminal with the longest
+    // real-world rule names (e.g. `avoid_excessive_rebuilds_animation`).
+    const ruleWidth = 42;
 
     buf.writeln('TOP RULES');
-    var i = 1;
-    for (final entry in top) {
-      final severity = ruleSeverities[entry.key] ?? '?';
+    buf.writeln(
+      '  ${'#'.padLeft(2)}  '
+      '${'Rule'.padRight(ruleWidth)}  '
+      '${'Count'.padLeft(6)}  '
+      '${'%'.padLeft(5)}  '
+      '${'Severity'.padRight(8)}  '
+      '${'Source'.padRight(13)}  '
+      'Fixable?',
+    );
+    buf.writeln(
+      '  ${'-' * 2}  ${'-' * ruleWidth}  ${'-' * 6}  ${'-' * 5}  '
+      '${'-' * 8}  ${'-' * 13}  --------',
+    );
+    for (var i = 0; i < top.length; i++) {
+      final r = top[i];
+      final pct = (r.share * 100).toStringAsFixed(1);
+      // Truncate overlong names with an ASCII ellipsis so terminal encodings
+      // that don't support U+2026 still render the table cleanly.
+      // Use SaropaStringSlice.prefix (safe slice) instead of substring to
+      // avoid avoid_string_substring warnings; the length guard above
+      // already ensures the slice index is in-range.
+      final nameCol = r.name.length > ruleWidth
+          ? '${r.name.prefix(ruleWidth - 3)}...'
+          : r.name.padRight(ruleWidth);
       buf.writeln(
-        '  ${i.toString().padLeft(2)}. '
-        '${entry.key} (${entry.value}) [$severity]',
+        '  ${(i + 1).toString().padLeft(2)}  '
+        '$nameCol  '
+        '${r.count.toString().padLeft(6)}  '
+        '${pct.padLeft(5)}  '
+        '${r.severity.padRight(8)}  '
+        '${r.source.label.padRight(13)}  '
+        '${r.fixable ? 'Yes' : 'No'}',
       );
-      i++;
     }
     buf.writeln();
   }
