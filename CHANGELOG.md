@@ -35,6 +35,16 @@
 
 ---
 
+## [Unreleased]
+
+The VS Code extension's `Run Analysis` command stops dumping `dart analyze`'s progress-bar stderr into the warning popup — it now reports the real issue count from `violations.json` with `View Violations` / `Show Output` buttons.
+
+### Fixed
+
+- **VS Code extension `Run Analysis`: warning popup now shows the real issue count instead of `dart analyze`'s progress-bar stderr.** When analysis exited non-zero, the follow-up `showWarningMessage` used to splice the first 200 chars of stderr into the popup body, which on any run long enough to emit progress output landed on the `░░░░ N% │ Files: … │ Issues: … │ ETA: …` bar — frozen mid-line, with no count and no action buttons. The new helper in [setup.ts](extension/src/setup.ts) reads `reports/.saropa_lints/violations.json` (already written by the plugin and already consumed by the success-path status-bar message) and composes `Saropa Lints: N issues found.` with `[View Violations]` and `[Show Output]` buttons wired to the existing `saropaLints.focusIssues` and `saropaLints.showOutput` commands. Falls back to `Saropa Lints analysis finished with a non-zero exit. See Output for details.` when `violations.json` is missing or unreadable. The `openEditorsOnly` branch uses the same helper with a scope label. Bug report: [bugs/infra_run_analysis_popup_dumps_progress_stderr.md](bugs/infra_run_analysis_popup_dumps_progress_stderr.md). Test: [formatAnalysisIssuesMessage.test.ts](extension/src/test/formatAnalysisIssuesMessage.test.ts).
+
+---
+
 ## [12.3.4]
 
 New rule `avoid_drift_insert_missing_conflict_target` catches a class of production-crash patterns that existing Drift rules let slip: inserts targeting a table with `@TableIndex(..., unique: true)` on a non-PK column, where the insert omits a matching `onConflict: DoUpdate(target: [uniqueCol])`. Without that target, SQLite falls back to `ON CONFLICT("id")` and raises `SqliteException(2067)` the moment the unique value already exists on disk or appears twice in one batch — the exact failure mode that crashed the Saropa contacts app mid-import, frozen silently on splash by a `debugger()` in `debugException`.

@@ -9,6 +9,7 @@ import * as path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { logReport, logSection, flushReport } from './reportWriter';
 import { getProjectRoot } from './projectRoot';
+import { readViolations } from './violationsReader';
 
 const SAROPA_LINTS_DEV_DEP = 'saropa_lints';
 const DEFAULT_VERSION = '^9.1.0';
@@ -252,6 +253,62 @@ async function runAnalysisAfterConfigChangeScoped(
   logReport(analysisResult.ok ? fullOkMessage : fullFailMessage);
 }
 
+/**
+ * Compose the warning-popup text for the analysis-reported-issues path.
+ *
+ * Why a pure helper: the prior implementation spliced the first 200 chars of
+ * `dart analyze`'s stderr into the popup (bugs/infra_run_analysis_popup_dumps_progress_stderr.md).
+ * stderr carries the progress bar, not diagnostics, so the popup was always
+ * garbled progress chrome. Isolating the message composition here (a) keeps the
+ * real count (from violations.json) in one place instead of reconstructing it
+ * at two call sites, and (b) makes the pluralization / scope-label / zero-count
+ * branches unit-testable without stubbing the vscode UI module.
+ *
+ * Exported for testing; call sites use showAnalysisIssuesNotification().
+ */
+export function formatAnalysisIssuesMessage(total: number, scope?: string): string {
+  // Leading space inside the parens so the undefined branch doesn't leave a
+  // stray " ()" at the end — the bug report's fixture explicitly calls this out.
+  const scopeLabel = scope ? ` (${scope})` : '';
+  if (total > 0) {
+    const noun = total === 1 ? 'issue' : 'issues';
+    // toLocaleString for thousands separators — 5,234 reads much better than
+    // 5234 in a two-line warning popup on a large project.
+    return `Saropa Lints: ${total.toLocaleString()} ${noun} found${scopeLabel}.`;
+  }
+  // total === 0 path: violations.json missing/unreadable OR a zero-length list
+  // accompanied by a non-zero analyze exit (e.g. analyzer crash, compile error,
+  // plugin fail). Can't promise a count, so direct users to Output instead.
+  return `Saropa Lints analysis finished with a non-zero exit${scopeLabel}. See Output for details.`;
+}
+
+/**
+ * Warn the user that `dart analyze` reported issues, with the real count and
+ * clickable buttons for the next step.
+ *
+ * Why fire-and-forget: the caller wraps analysis in `window.withProgress`, so
+ * awaiting the popup would keep the progress indicator pinned until the user
+ * dismisses the popup — a bad UX. The popup is modeless; the button handlers
+ * dispatch their own commands asynchronously.
+ */
+function showAnalysisIssuesNotification(workspaceRoot: string, scope?: string): void {
+  const data = readViolations(workspaceRoot);
+  // Prefer summary.totalViolations (authoritative — written by the plugin).
+  // Fall back to violations.length so older violations.json files (pre-summary)
+  // still produce a useful number. Final fallback of 0 triggers the
+  // "non-zero exit, see Output" branch in formatAnalysisIssuesMessage.
+  const total = data?.summary?.totalViolations ?? data?.violations.length ?? 0;
+  const message = formatAnalysisIssuesMessage(total, scope);
+
+  void vscode.window.showWarningMessage(message, 'View Violations', 'Show Output').then((choice) => {
+    if (choice === 'View Violations') {
+      void vscode.commands.executeCommand('saropaLints.focusIssues');
+    } else if (choice === 'Show Output') {
+      void vscode.commands.executeCommand('saropaLints.showOutput');
+    }
+  });
+}
+
 export async function runAnalysis(context: vscode.ExtensionContext): Promise<boolean> {
   const workspaceRoot = getProjectRoot();
   if (!workspaceRoot) {
@@ -280,7 +337,9 @@ export async function runAnalysis(context: vscode.ExtensionContext): Promise<boo
         }
         ok = await runAnalysisForFiles(context, files, { showProgress: false });
         if (!ok) {
-          vscode.window.showWarningMessage('Analysis reported violations (open Dart files only). Check the Violations view.');
+          // See bugs/infra_run_analysis_popup_dumps_progress_stderr.md — scope
+          // label tells the user why the count may differ from a full run.
+          showAnalysisIssuesNotification(workspaceRoot, 'open editors only');
         }
         return;
       }
@@ -294,9 +353,11 @@ export async function runAnalysis(context: vscode.ExtensionContext): Promise<boo
         logReport('- Analysis completed clean');
       } else {
         logReport(`- Analysis reported issues (${cmd} analyze)`);
-        vscode.window.showWarningMessage(
-          `Analysis reported issues. ${result.stderr ? result.stderr.slice(0, 200) : 'See Problems view.'}`,
-        );
+        // See bugs/infra_run_analysis_popup_dumps_progress_stderr.md — the old
+        // code sliced result.stderr into the popup, but dart analyze writes a
+        // progress bar to stderr, so the popup was always garbled chrome.
+        // Read the authoritative count from violations.json instead.
+        showAnalysisIssuesNotification(workspaceRoot);
       }
       flushReport(workspaceRoot);
     },
