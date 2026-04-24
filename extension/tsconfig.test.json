@@ -63,6 +63,8 @@
     "src/test/sidebarSectionCounts.test.ts",
     "src/pathUtils.ts",
     "src/test/pathUtils.test.ts",
+    "src/setup.ts",
+    "src/test/formatAnalysisIssuesMessage.test.ts",
     "src/test/violationsReader.test.ts",
     "src/test/violationsReaderFilter.test.ts",
     "src/configWriter.ts",
