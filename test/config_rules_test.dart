@@ -107,21 +107,12 @@ void main() {
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
-    test('DependOnReferencedPackagesRule', () {
-      final rule = DependOnReferencedPackagesRule();
-      // Identifier is deliberately namespaced with `saropa_` because the Dart
-      // SDK already ships a built-in lint named `depend_on_referenced_packages`;
-      // reusing that bare name produced two diagnostics per import when both
-      // were enabled (see
-      // bugs/depend_on_referenced_packages_name_collision_with_sdk_lint.md).
-      expect(rule.code.lowerCaseName, 'saropa_depend_on_referenced_packages');
-      expect(
-        rule.code.problemMessage,
-        contains('[saropa_depend_on_referenced_packages]'),
-      );
-      expect(rule.code.problemMessage.length, greaterThan(50));
-      expect(rule.code.correctionMessage, isNotNull);
-    });
+    // `DependOnReferencedPackagesRule` / `saropa_depend_on_referenced_packages`
+    // was REMOVED. Delegated to the Dart SDK's built-in lint of the same
+    // base name, shipped via `package:lints/core.yaml` — saropa's
+    // homegrown parser kept mis-parsing real-world pubspecs and firing on
+    // legitimate imports. No replacement test: there is no replacement
+    // rule in this plugin.
   });
 
   group('Configuration Rules - Fixture Verification', () {
@@ -320,26 +311,8 @@ void main() {
       });
     });
 
-    group('saropa_depend_on_referenced_packages', () {
-      test('import of unlisted package SHOULD trigger', () {
-        // package:http not in pubspec.yaml
-        expect('missing dep triggers rule', isNotNull);
-      });
-
-      test('import of listed package should NOT trigger', () {
-        // package:http in dependencies
-        expect('listed dep does not trigger', isNotNull);
-      });
-
-      test('own package import should NOT trigger', () {
-        // import 'package:my_app/...' when my_app is the project
-        expect('own package import does not trigger', isNotNull);
-      });
-
-      test('dart: and relative imports should NOT trigger', () {
-        // Non-package imports are skipped
-        expect('non-package imports skipped', isNotNull);
-      });
-    });
+    // saropa_depend_on_referenced_packages placeholder group removed along
+    // with the rule. See the Rule Instantiation group above for the removal
+    // rationale.
   });
 }

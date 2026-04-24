@@ -1235,98 +1235,22 @@ class SecurePubspecUrlsRule extends SaropaLintRule {
 }
 
 // =============================================================================
-// depend_on_referenced_packages
+// depend_on_referenced_packages — REMOVED.
 // =============================================================================
-
-/// Warns when an imported package is not listed in pubspec dependencies.
-///
-/// Since: v9.10.0 | Rule version: v1
-///
-/// Every `package:foo/...` import must correspond to a dependency declared
-/// in pubspec.yaml. Missing dependencies cause resolution failures and
-/// make the project non-portable.
-///
-/// **Known limitation:** This rule checks both `dependencies` and
-/// `dev_dependencies` against ALL imports. It does not distinguish whether
-/// a file is under `lib/` (which should only use `dependencies`) or
-/// `test/` (which may also use `dev_dependencies`). A package listed in
-/// `dev_dependencies` but imported from `lib/` will not be flagged. This
-/// is a pragmatic trade-off: accurately distinguishing lib vs test imports
-/// requires resolving the package layout, which is expensive and fragile.
-///
-/// **BAD:**
-/// ```dart
-/// import 'package:http/http.dart';  // http not in pubspec.yaml
-/// ```
-///
-/// **GOOD:**
-/// ```dart
-/// import 'package:http/http.dart';  // http listed in dependencies
-/// ```
-class DependOnReferencedPackagesRule extends SaropaLintRule {
-  DependOnReferencedPackagesRule() : super(code: _code);
-
-  @override
-  LintImpact get impact => LintImpact.high;
-
-  @override
-  RuleType? get ruleType => RuleType.codeSmell;
-
-  @override
-  Set<String> get tags => const {'config', 'reliability'};
-
-  @override
-  RuleCost get cost => RuleCost.low;
-
-  // Rule name is prefixed with `saropa_` to avoid colliding with the Dart SDK's
-  // built-in `depend_on_referenced_packages` lint (shipped via
-  // `package:lints/core.yaml` and transitively by `package:flutter_lints`).
-  // Two emitters sharing the same `LintCode.name` produced two diagnostics for
-  // every qualifying import in projects that enabled both, inflating every
-  // downstream count (Problems panel, violations.json, report logs) by up to
-  // 2x. See bugs/depend_on_referenced_packages_name_collision_with_sdk_lint.md.
-  static const LintCode _code = LintCode(
-    'saropa_depend_on_referenced_packages',
-    '[saropa_depend_on_referenced_packages] Imported package is not listed in pubspec.yaml dependencies. Using a package without declaring the dependency means builds rely on transitive resolution, which can break unexpectedly when other packages update their own dependencies. Every package import must have a corresponding entry in pubspec.yaml. {v1}',
-    correctionMessage:
-        'Add the missing package to dependencies (or dev_dependencies for test files) in pubspec.yaml.',
-    severity: DiagnosticSeverity.WARNING,
-  );
-
-  /// Extracts the package name from a package: URI.
-  /// e.g. 'package:http/http.dart' -> 'http'
-  static final RegExp _packageUri = RegExp(r'^package:(\w+)/');
-
-  @override
-  void runWithReporter(
-    SaropaDiagnosticReporter reporter,
-    SaropaContext context,
-  ) {
-    // Resolve project root and own package name once per file (not per
-    // import directive) to avoid N directory traversals for N imports.
-    final root = ProjectContext.findProjectRoot(context.filePath);
-    final ownName = root != null ? ProjectContext.getPackageName(root) : '';
-
-    context.addImportDirective((ImportDirective node) {
-      final String? uri = node.uri.stringValue;
-      if (uri == null) return;
-
-      // Only check package: imports (skip dart: and relative)
-      if (!uri.startsWith('package:')) return;
-
-      final match = _packageUri.firstMatch(uri);
-      if (match == null) return;
-
-      final String packageName = match.group(1)!;
-
-      // Skip the project's own package name
-      if (packageName == ownName) return;
-
-      // Check if the package is in pubspec dependencies
-      if (ProjectContext.hasDependency(context.filePath, packageName)) return;
-
-      // Package not found in dependencies — report at the import directive
-      reporter.atNode(node);
-    });
-  }
-}
+//
+// The Dart SDK already ships `depend_on_referenced_packages` via
+// `package:lints/core.yaml` (transitively via `package:flutter_lints`), and
+// the SDK implementation is tested against the full ecosystem and knows
+// about every pubspec shape that exists. Saropa's parallel implementation
+// kept firing on legitimate imports — most recently on the project's own
+// `package:<ownPkg>/...` imports in real projects — because the pubspec
+// name / dependency parsing was a fragile homegrown regex that produced
+// different failures on different pubspec layouts.
+//
+// Users who want this check still get it from `flutter_lints` / `lints`.
+// No replacement class is needed; removing it is the entire fix.
+//
+// History: this rule shipped in v9.10.0, was renamed to
+// `saropa_depend_on_referenced_packages` to stop double-reporting with
+// the SDK lint, and is now removed entirely because the underlying
+// pubspec parsing was too brittle to maintain in parallel to the SDK.

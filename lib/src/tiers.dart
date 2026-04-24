@@ -722,10 +722,12 @@ const Set<String> essentialRules = <String>{
   // v5.1.0 - Batch 3 (Essential)
   'avoid_connectivity_equals_internet', // WARNING - ConnectivityResult != internet
   // Additional rules (plan_additional_rules_11_through_20)
-  // Renamed from 'depend_on_referenced_packages' to avoid colliding with the
-  // Dart SDK's built-in lint of the same name (from package:lints). See
-  // bugs/depend_on_referenced_packages_name_collision_with_sdk_lint.md.
-  'saropa_depend_on_referenced_packages', // WARNING - package import not in pubspec
+  // Removed: `saropa_depend_on_referenced_packages` (and its earlier alias
+  // `depend_on_referenced_packages`). The Dart SDK lint of the same name
+  // already ships via `package:lints/core.yaml`, so delegating to it avoids
+  // both double-reporting AND the parallel-implementation false positives
+  // that were firing on every `package:<ownPkg>/...` import in real
+  // projects. Users still get the check through `flutter_lints` / `lints`.
   'uri_does_not_exist', // ERROR - import/export/part URI missing
   // Additional rules (plan_additional_rules_21_through_30)
   'conflicting_constructor_and_static_member',

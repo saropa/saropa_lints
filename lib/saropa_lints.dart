@@ -2957,7 +2957,14 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PackageNamesRule.new,
   SortPubDependenciesRule.new,
   SecurePubspecUrlsRule.new,
-  DependOnReferencedPackagesRule.new,
+  // Removed: `DependOnReferencedPackagesRule` — the Dart SDK already ships
+  // `depend_on_referenced_packages` via `package:lints/core.yaml` (transitively
+  // via `package:flutter_lints/flutter.yaml`), so duplicating it here only
+  // produced double-reporting (pre-rename) or a parallel implementation that
+  // kept failing on real-world pubspecs (post-rename). Delegating to the SDK
+  // lint — which is tested against the full Dart ecosystem — removes a whole
+  // class of false-positive storms. Users who want this check keep getting
+  // it from `flutter_lints` / `lints`; no config change required.
   UriDoesNotExistRule.new,
 
   // Additional rules (plan_additional_rules_21_through_30)
