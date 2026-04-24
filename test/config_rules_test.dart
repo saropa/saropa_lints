@@ -109,10 +109,15 @@ void main() {
     });
     test('DependOnReferencedPackagesRule', () {
       final rule = DependOnReferencedPackagesRule();
-      expect(rule.code.lowerCaseName, 'depend_on_referenced_packages');
+      // Identifier is deliberately namespaced with `saropa_` because the Dart
+      // SDK already ships a built-in lint named `depend_on_referenced_packages`;
+      // reusing that bare name produced two diagnostics per import when both
+      // were enabled (see
+      // bugs/depend_on_referenced_packages_name_collision_with_sdk_lint.md).
+      expect(rule.code.lowerCaseName, 'saropa_depend_on_referenced_packages');
       expect(
         rule.code.problemMessage,
-        contains('[depend_on_referenced_packages]'),
+        contains('[saropa_depend_on_referenced_packages]'),
       );
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
@@ -315,7 +320,7 @@ void main() {
       });
     });
 
-    group('depend_on_referenced_packages', () {
+    group('saropa_depend_on_referenced_packages', () {
       test('import of unlisted package SHOULD trigger', () {
         // package:http not in pubspec.yaml
         expect('missing dep triggers rule', isNotNull);

@@ -72,6 +72,81 @@ class ProjectContext {
     return getProjectInfo(filePath)?.hasDependency(packageName) ?? false;
   }
 
+  /// Returns `true` when the project containing [filePath] could produce a
+  /// web build — i.e. when rules whose failure mode is "breaks on web"
+  /// should fire.
+  ///
+  /// **Signals used (any one is sufficient):**
+  /// - A `web/` directory exists at the project root. `flutter create
+  ///   --platforms=web` creates this directory and it's the required root
+  ///   for `index.html`; its absence on a Flutter project is a strong
+  ///   signal that the project cannot produce a web build.
+  /// - The project is not a Flutter project at all (no `flutter:` / `sdk:
+  ///   flutter` in pubspec). Pure Dart libraries run on any platform
+  ///   including the browser, so web-compat warnings still apply — a
+  ///   library author can't know their caller's platform targets.
+  ///
+  /// **Defaults to `true` (assume web) when unknown** (no path, no
+  /// pubspec, unparseable): same philosophy as [flutterSdkAtLeast] —
+  /// prefer to warn on the cautious side rather than silently skip a
+  /// real cross-platform issue.
+  ///
+  /// **Why this exists:** `avoid_platform_specific_imports` justifies
+  /// itself with "dart:io breaks web builds". In a mobile-only Flutter
+  /// app (android/ios/macos only, no `web/`) that failure mode is
+  /// structurally impossible, and every `dart:io` diagnostic is pure
+  /// noise. See `bugs/avoid_platform_specific_imports_false_positive_non_web_project.md`.
+  static bool hasWebSupport(String? filePath) {
+    return getProjectInfo(filePath)?.hasWebSupport ?? true;
+  }
+
+  /// Returns `true` when the project containing [filePath] targets any
+  /// non-web platform (android, ios, macos, windows, linux) OR is a pure
+  /// Dart library — i.e. when rules whose failure mode is "breaks on
+  /// non-web platforms" should fire.
+  ///
+  /// **Signals used (any one is sufficient):**
+  /// - Any of `android/`, `ios/`, `macos/`, `windows/`, `linux/` exists
+  ///   at the project root (the standard Flutter platform-directory
+  ///   layout emitted by `flutter create --platforms=...`).
+  /// - The project is not a Flutter project at all. Pure Dart libraries
+  ///   are consumed by arbitrary clients — including VM, AOT-compiled,
+  ///   and browser targets — so warnings about "won't work on X" still
+  ///   apply since the library author can't know the consumer's target.
+  ///
+  /// **Defaults to `true` (assume yes) when unknown** (no path, no
+  /// pubspec, unparseable): unknown → assume strict, same philosophy as
+  /// [hasWebSupport] and [flutterSdkAtLeast].
+  ///
+  /// **Why this exists:** `avoid_web_only_dependencies` justifies
+  /// itself with "dart:html crashes at startup on mobile/desktop". In a
+  /// web-only Flutter app (no android/ios/macos/windows/linux
+  /// directories at root) that failure mode is structurally impossible
+  /// and every diagnostic raised is noise. Companion to [hasWebSupport].
+  /// See `bugs/platform_gate_missing_from_sibling_rules.md`.
+  static bool hasNonWebPlatform(String? filePath) {
+    return getProjectInfo(filePath)?.hasNonWebPlatform ?? true;
+  }
+
+  /// Returns `true` when the project containing [filePath] targets a
+  /// platform where end users interact via a pointer device (mouse /
+  /// trackpad / external stylus): web, macos, windows, or linux. Pure
+  /// Dart libraries default to `true`.
+  ///
+  /// **Why this is distinct from [hasNonWebPlatform]:** Android and iOS
+  /// apps technically *can* receive pointer input (ChromeOS / iPad
+  /// Magic Keyboard / external mice), but by default they render no
+  /// cursor — so rules like `prefer_cursor_for_buttons` that suggest
+  /// `mouseCursor: SystemMouseCursors.click` deliver near-zero value
+  /// on a pure-mobile project and should be suppressed there. Desktop
+  /// and web always render a cursor; those are the platforms the rule
+  /// is written for.
+  ///
+  /// **Defaults to `true` when unknown** (same philosophy as siblings).
+  static bool hasPointerPlatform(String? filePath) {
+    return getProjectInfo(filePath)?.hasPointerPlatform ?? true;
+  }
+
   /// Returns `true` when the project containing [filePath] declares a
   /// Flutter SDK constraint whose **lower bound** is ≥ `major.minor.patch`.
   ///
@@ -192,16 +267,26 @@ class _ProjectInfo {
     required this.dependencies,
     required this.packageName,
     required this.flutterSdkMinVersion,
+    required this.hasWebSupport,
+    required this.hasNonWebPlatform,
+    required this.hasPointerPlatform,
   });
 
   factory _ProjectInfo._fromProjectRoot(String projectRoot) {
     final pubspecFile = File('$projectRoot/pubspec.yaml');
     if (!pubspecFile.existsSync()) {
+      // No pubspec: we can't tell anything about this tree. Assume every
+      // platform-target flag is set so rules that warn about
+      // cross-platform hazards still fire — matches the
+      // unknown-defaults-to-true philosophy below.
       return _ProjectInfo._(
         isFlutterProject: false,
         dependencies: {},
         packageName: '',
         flutterSdkMinVersion: null,
+        hasWebSupport: true,
+        hasNonWebPlatform: true,
+        hasPointerPlatform: true,
       );
     }
 
@@ -219,19 +304,82 @@ class _ProjectInfo {
       ).firstMatch(content);
       final packageName = nameMatch?.group(1) ?? '';
 
-      // Parse dependencies (simple regex-based parsing)
+      // Parse dependencies (simple regex-based parsing).
+      //
+      // CRITICAL: `multiLine: true` is required. Without it `^` anchors only
+      // at position 0 of the string, so `allMatches` returns at most one hit —
+      // and since pubspec.yaml always starts with `name:` (no leading
+      // whitespace), the match set was silently empty. That meant
+      // `hasDependency(..., <anything>)` returned `false` for every project,
+      // so every rule that gates on "skip when the pubspec declares the
+      // package" lost its guard. For `saropa_depend_on_referenced_packages`
+      // (formerly `depend_on_referenced_packages`) this flagged every single
+      // `package:` import as undeclared — 22,695 false positives on
+      // saropa-contacts. See
+      // bugs/depend_on_referenced_packages_name_collision_with_sdk_lint.md
+      // §"Secondary — possible over-firing on the saropa side".
+      //
+      // The parser is intentionally over-inclusive (it also collects nested
+      // keys like `sdk:` under `flutter:`) — false negatives in the skip set
+      // are the safe failure mode here, since they only prevent the rule
+      // from firing, not cause spurious fires.
       final deps = <String>{};
-      final depMatches = RegExp(r'^\s+(\w+):').allMatches(content);
+      final depMatches = RegExp(r'^\s+(\w+):', multiLine: true).allMatches(content);
       for (final match in depMatches) {
         final dep = match.group(1);
         if (dep != null) deps.add(dep);
       }
+
+      // Project-root directory probes. Each is one syscall and only runs
+      // once per project (cached via `_projectCache.putIfAbsent`), so the
+      // full set is still cheaper than the existing pubspec read above.
+      //
+      // Standard Flutter project layout: `flutter create --platforms=<X>`
+      // emits one directory per enabled platform. The presence of a
+      // directory is the canonical signal that the project can produce
+      // a build for that target.
+      //
+      // We intentionally don't try to parse `flutter.plugin.platforms`
+      // in pubspec — the directory checks catch apps, and the
+      // `!isFlutter` branches below catch pure Dart libraries. Plugin
+      // packages that declare a platform but have no matching directory
+      // are rare enough to leave to a future refinement.
+      final bool hasWebDir = Directory('$projectRoot/web').existsSync();
+      final bool hasAndroidDir =
+          Directory('$projectRoot/android').existsSync();
+      final bool hasIosDir = Directory('$projectRoot/ios').existsSync();
+      final bool hasMacosDir = Directory('$projectRoot/macos').existsSync();
+      final bool hasWindowsDir =
+          Directory('$projectRoot/windows').existsSync();
+      final bool hasLinuxDir = Directory('$projectRoot/linux').existsSync();
 
       return _ProjectInfo._(
         isFlutterProject: isFlutter,
         dependencies: deps,
         packageName: packageName,
         flutterSdkMinVersion: _parseFlutterConstraint(content),
+        // Web rules should fire when the project has a `web/` dir, or
+        // when it's a pure Dart library (libraries are consumed by
+        // arbitrary clients including browsers).
+        hasWebSupport: hasWebDir || !isFlutter,
+        // Inverse of `hasWebSupport`: web-only rules should NOT fire
+        // when the project has any non-web platform directory. Pure
+        // Dart libraries default true — the library author can't
+        // know the consumer's target platform.
+        hasNonWebPlatform: hasAndroidDir ||
+            hasIosDir ||
+            hasMacosDir ||
+            hasWindowsDir ||
+            hasLinuxDir ||
+            !isFlutter,
+        // Cursor / hover-UX rules apply on platforms that render a
+        // pointer by default: web + desktop (macos/windows/linux).
+        // Pure mobile (android/ios only) gets zero value from these
+        // rules because the cursor is never visible. Pure Dart
+        // libraries default true.
+        hasPointerPlatform:
+            hasWebDir || hasMacosDir || hasWindowsDir || hasLinuxDir ||
+                !isFlutter,
       );
     } on FormatException {
       return _ProjectInfo._(
@@ -239,6 +387,9 @@ class _ProjectInfo {
         dependencies: {},
         packageName: '',
         flutterSdkMinVersion: null,
+        hasWebSupport: true,
+        hasNonWebPlatform: true,
+        hasPointerPlatform: true,
       );
     } on IOException {
       return _ProjectInfo._(
@@ -246,6 +397,9 @@ class _ProjectInfo {
         dependencies: {},
         packageName: '',
         flutterSdkMinVersion: null,
+        hasWebSupport: true,
+        hasNonWebPlatform: true,
+        hasPointerPlatform: true,
       );
     }
   }
@@ -263,6 +417,25 @@ class _ProjectInfo {
   /// `environment.flutter` in pubspec.yaml). `null` when missing, `"any"`,
   /// or unparseable — callers should treat null as "assume modern".
   final _FlutterSdkVersion? flutterSdkMinVersion;
+
+  /// Whether the project could produce a web build. See
+  /// [ProjectContext.hasWebSupport] for the full rationale; briefly, this
+  /// is `true` when the project has a `web/` directory OR is a pure Dart
+  /// (non-Flutter) package.
+  final bool hasWebSupport;
+
+  /// Whether the project targets at least one non-web platform
+  /// (android, ios, macos, windows, linux). See
+  /// [ProjectContext.hasNonWebPlatform] for the full rationale; briefly,
+  /// this is `true` when any of the five platform directories exists OR
+  /// the project is a pure Dart (non-Flutter) package.
+  final bool hasNonWebPlatform;
+
+  /// Whether the project targets at least one platform that renders a
+  /// pointer cursor by default (web, macos, windows, linux). See
+  /// [ProjectContext.hasPointerPlatform] for why mobile is excluded
+  /// despite technically supporting external pointer devices.
+  final bool hasPointerPlatform;
 
   /// Check if the project has a specific dependency.
   bool hasDependency(String name) => dependencies.contains(name);
