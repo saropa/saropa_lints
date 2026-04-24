@@ -1,6 +1,6 @@
 # BUG: 7 Platform-Target Rules Fire in Projects That Can't Hit Their Failure Mode
 
-**Status: Fix Ready**
+**Status: Closed**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
@@ -266,7 +266,10 @@ exercise the predicates directly, which is the load-bearing change.
 
 ## Commits
 
-<!-- Add commit hashes as fixes land. -->
+- `1158ad76` — added `hasWebSupport` + pubspec dep-parser fix (landed the
+  first predicate via the sibling bug).
+- `78706b71` — audit + 7 sibling gates + `hasNonWebPlatform` +
+  `hasPointerPlatform` + 24 new test cases.
 
 ---
 
