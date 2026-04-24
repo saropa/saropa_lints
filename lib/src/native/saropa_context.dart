@@ -20,7 +20,9 @@ import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/source/line_info.dart';
 
+import '../init/project_info.dart' show getPackageVersion;
 import '../project_context.dart' show FileTypeDetector, ProjectContext;
+import '../report/analysis_reporter.dart' show AnalysisReporter, ReportConfig;
 import '../report/import_graph_tracker.dart' show ImportGraphTracker;
 import '../saropa_lint_rule.dart' show ProgressTracker, SaropaLintRule;
 import 'compat_visitor.dart';
@@ -170,6 +172,50 @@ class SaropaContext {
     // entries from Plugin.start() also flush here.
     PluginLogger.setProjectRoot(projectRoot);
     loadNativePluginConfigFromProjectRoot(projectRoot);
+    _captureReportConfigSnapshot();
+  }
+
+  /// Capture the resolved rule configuration into [AnalysisReporter] so the
+  /// report header's CONFIGURATION block is populated instead of printing
+  /// "(not available — config was not captured)".
+  ///
+  /// Called exactly once per plugin session, immediately after the config
+  /// reload from the real project root — so the statics on
+  /// [SaropaLintRule] already reflect the consumer's
+  /// `analysis_options.yaml` + `analysis_options_custom.yaml`. Skipped
+  /// with a safe fallback when no rules are enabled (the reload either
+  /// failed silently or found no diagnostics block); printing `0 rules`
+  /// is less useful than the existing unavailable message, but still
+  /// concrete and truthful.
+  ///
+  /// Tier / platform / package filters are plugin-path unknowns (those
+  /// arrive through the scan CLI's own `ReportConfig` builder, which
+  /// already calls [AnalysisReporter.setAnalysisConfig] with full data).
+  /// Stored as empty lists so the existing config writer renders the
+  /// known parts without guessing the unknown ones.
+  static void _captureReportConfigSnapshot() {
+    final enabled = SaropaLintRule.enabledRules;
+    final disabled = SaropaLintRule.disabledRules;
+    if (enabled == null || enabled.isEmpty) return;
+
+    AnalysisReporter.setAnalysisConfig(
+      ReportConfig(
+        version: getPackageVersion(),
+        // "plugin" rather than a tier name — the analyzer plugin path
+        // receives a rule set directly, never a tier enum. The scan CLI
+        // path, which does resolve a tier, already sets its own config.
+        effectiveTier: 'plugin',
+        enabledRuleCount: enabled.length,
+        enabledRuleNames: enabled.toList(growable: false),
+        enabledPlatforms: const <String>[],
+        disabledPlatforms: const <String>[],
+        enabledPackages: const <String>[],
+        disabledPackages: const <String>[],
+        userExclusions: disabled?.toList(growable: false) ?? const <String>[],
+        maxIssues: ProgressTracker.maxIssues,
+        outputMode: 'plugin',
+      ),
+    );
   }
 
   /// Checks whether the current file should be skipped for this rule.
