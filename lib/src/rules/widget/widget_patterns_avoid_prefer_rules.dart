@@ -3833,6 +3833,14 @@ class PreferCursorForButtonsRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    // The rule's value is in rendering an appropriate cursor on
+    // platforms that show one by default: web + desktop
+    // (macos/windows/linux). Pure-mobile Flutter apps (android/ios
+    // only, no web/desktop) don't render a cursor, so the rule's
+    // diagnostics are UX-irrelevant noise. See sibling bug report
+    // bugs/platform_gate_missing_from_sibling_rules.md.
+    if (!ProjectContext.hasPointerPlatform(context.filePath)) return;
+
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (!_interactiveWidgets.contains(typeName)) return;

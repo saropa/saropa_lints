@@ -377,6 +377,15 @@ class AvoidWebOnlyDependenciesRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    // Inverse of the web-gate pattern: this rule warns that `dart:html`
+    // & friends crash at startup on mobile/desktop. A web-only project
+    // (no android/ios/macos/windows/linux directories at the project
+    // root) can't hit that failure mode, so every diagnostic is noise.
+    // Pure Dart libraries default true (consumers' targets unknown).
+    // See sibling bug report
+    // bugs/platform_gate_missing_from_sibling_rules.md.
+    if (!ProjectContext.hasNonWebPlatform(context.filePath)) return;
+
     context.addImportDirective((ImportDirective node) {
       final String? uri = node.uri.stringValue;
       if (uri == null) return;

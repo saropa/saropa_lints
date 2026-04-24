@@ -290,6 +290,14 @@ class AvoidSecureStorageOnWebRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    // The rule warns that `flutter_secure_storage` falls back to
+    // `localStorage` on web, which isn't actually secure. If the project
+    // has no `web/` directory, it cannot emit a web build, so the
+    // insecure-fallback path is unreachable — every diagnostic raised
+    // here is noise. See sibling bug report
+    // bugs/platform_gate_missing_from_sibling_rules.md.
+    if (!ProjectContext.hasWebSupport(context.filePath)) return;
+
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String? constructorName = node.constructorName.type.element?.name;
       if (constructorName != 'FlutterSecureStorage') return;

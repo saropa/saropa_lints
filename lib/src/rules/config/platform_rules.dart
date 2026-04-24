@@ -81,6 +81,12 @@ class RequirePlatformCheckRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    // If the project can't produce a web build, `dart:io` can't throw
+    // `UnsupportedError` at runtime — the rule's entire justification
+    // does not apply. See sibling bug report
+    // bugs/platform_gate_missing_from_sibling_rules.md.
+    if (!ProjectContext.hasWebSupport(context.filePath)) return;
+
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String constructorName = node.constructorName.type.name.lexeme;
 
@@ -167,6 +173,12 @@ class PreferPlatformIoConditionalRule extends SaropaLintRule {
     // Non-Flutter projects never run on web — Platform.* checks are safe
     final projectInfo = ProjectContext.getProjectInfo(context.filePath);
     if (projectInfo == null || !projectInfo.isFlutterProject) return;
+
+    // Mobile-only / desktop-only Flutter projects (no `web/` directory)
+    // can never hit the "Platform.* throws on web" failure mode, so the
+    // kIsWeb guard the rule demands is pure ceremony. See sibling bug
+    // report bugs/platform_gate_missing_from_sibling_rules.md.
+    if (!ProjectContext.hasWebSupport(context.filePath)) return;
 
     // Files that are the native branch of a conditional import (dart.library.io
     // or dart.library.ffi) are never loaded on web; no need to require kIsWeb.

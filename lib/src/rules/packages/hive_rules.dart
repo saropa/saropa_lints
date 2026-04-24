@@ -2523,6 +2523,13 @@ class PreferHiveWebAwareRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    // The rule's entire value proposition is "consider kIsWeb if
+    // targeting web". A project with no `web/` directory cannot target
+    // web — the `kIsWeb` branch is dead code and the rule is noise.
+    // See sibling bug report
+    // bugs/platform_gate_missing_from_sibling_rules.md.
+    if (!ProjectContext.hasWebSupport(context.filePath)) return;
+
     final String content = context.fileContent;
     final bool hasWebCheck = RegExp(r'\bkIsWeb\b').hasMatch(content);
     if (hasWebCheck) return;
