@@ -21,6 +21,18 @@
     [log](https://github.com/saropa/saropa_lints/blob/vX.Y.Z/CHANGELOG.md)
     substituting X.Y.Z.
 
+    **Bullet density (HARD RULE — applies to every entry under `### Added` / `### Changed` / `### Fixed` / `### Removed`, including `### Added (Extension)` / `### Fixed (Extension)` / `### Changed (Extension)` and similar)** — One sentence per bullet. That sentence answers, in order: *what changed* → *why the user cares* → *what the user must do* (say "No action required" explicitly when true). A second sentence is allowed ONLY when a concrete user action (migration step, config line to remove) cannot fit in the first. Three-sentence bullets are forbidden — split into multiple bullets, or move the detail to the commit message, PR description, bug report, or inline code comment. When a bullet genuinely needs more context, LINK OUT to those places; do not inline the explanation. Concision edits may touch historical sections on purpose.
+
+    Hard bans inside bullets (send any of these to the commit message / PR / code comments instead):
+    - **PR archaeology** — narrative of prior failed attempts, rename history, "after X didn't hold…". The changelog describes the landed state.
+    - **File-by-file inventories** — `Removed from config_rules.dart, saropa_lints.dart, tiers.dart, …`. That's the git diff.
+    - **Test counts** — `8,585 Dart tests pass` / `817 passing, 1 failing (unrelated)`. That's CI output.
+    - **Code-internal names** — AST visitor classes, regex flags (`multiLine: true`), function signatures (`flushReport(root, options?)`), field names, type names, private identifiers. If a reader would need the source to understand the phrase, it does not belong here.
+    - **Bug-report / fixture / test file paths** — those belong in the commit message footer.
+    - **How-the-decision-was-made paragraphs** — one-clause reasoning is fine; a paragraph is not.
+
+    **Maintenance** `<details>` bullets: keep them short and free of the same bans (no test counts, no file inventories); the strict what → why → must-do template is optional there when the change is infra-only.
+
     **Tagged changelog** — Published versions use git tag **`vx.y.z`**; each section below ends its summary line with **[log](url)** to that snapshot (or a standalone **[log](url)** when there is no summary). Compare to [current `main`](https://github.com/saropa/saropa-lints/blob/main/CHANGELOG.md).
 
     **Published version**: See field "version": "x.y.z" in [package.json](./package.json)
@@ -35,21 +47,17 @@
 
 ---
 
-## [Unreleased]
+## [12.4.2]
 
-`saropa_depend_on_referenced_packages` has been removed. The Dart SDK already ships the same lint via `package:lints/core.yaml` and it works — saropa's parallel implementation kept false-positive-firing on legitimate imports (most recently the project's own `package:<ownPkg>/...` imports across thousands of files in real Flutter projects). Users keep the check through `flutter_lints` / `lints`; no config change required on your end.
+`saropa_depend_on_referenced_packages` is removed because the Dart SDK already ships the same check via `lints` / `flutter_lints`, and saropa’s copy kept false-positiveing on legitimate imports. You still get the behavior from the SDK; nothing breaks if you leave old config in place.
 
 ### Removed
 
-- **`saropa_depend_on_referenced_packages` rule deleted entirely.** The Dart SDK already ships `depend_on_referenced_packages` via `package:lints/core.yaml` (transitively via `package:flutter_lints/flutter.yaml`), and the SDK implementation is tested against every pubspec shape in the Dart ecosystem. Saropa's parallel implementation kept firing on legitimate imports — most recently on the project's own `package:<ownPkg>/...` imports in real Flutter projects, where the `ownName` / `hasDependency` guards were silently failing at plugin runtime despite my simulation saying they should pass. After one rename (`depend_on_referenced_packages` → `saropa_depend_on_referenced_packages`) and one parser repair (`multiLine: true`) failed to hold the fix in production, the rule is now gone: the homegrown pubspec parser underneath it is too brittle to maintain in parallel with the SDK lint, and the right thing to do is delegate. **Users still get the same check** from `flutter_lints` / `lints` if they include either — no replacement config is required. Anyone with `saropa_depend_on_referenced_packages: true` explicitly set in their `analysis_options.yaml` `plugins:` block will see the line quietly ignored by the analyzer (no error, no warning); safe to delete on your next cleanup pass. Removed from [config_rules.dart](lib/src/rules/config/config_rules.dart) (class + `LintCode` + `_packageUri` regex + runner), [saropa_lints.dart](lib/saropa_lints.dart) `_allRuleFactories`, [tiers.dart](lib/src/tiers.dart) `essentialRules`, and [config_rules_test.dart](test/config_rules_test.dart) (unit test + placeholder group). Removal comments are left in-place at each former registration site explaining the history — so a future reader doesn't reintroduce the rule and walk back into the same false-positive storm. Full Dart test suite: 8,585 passing. Full extension suite: 817 passing, 1 failing (pre-existing `saropaLints.verifyPlugin` catalog mismatch, unrelated).
-
----
-
-## [12.4.2]
+- Removed `saropa_depend_on_referenced_packages` so duplicate / noisy import checks go away while the SDK lint keeps the same coverage for you. No action required; delete any `saropa_depend_on_referenced_packages` entry from `analysis_options.yaml` when you tidy config.
 
 <details><summary>Maintenance</summary>
 
-- **`scripts/publish.py`: Marketplace + Open VSX store-publication verification now runs at the end of every publish flow that touches the stores, not just the full pipeline.** Modes 6 (Extension only) and 7 (Publish existing .vsix) previously ended immediately after `vsce publish` returned 0, so the silent-Marketplace-drop case (expired PAT, missing scope, vsce returning success without propagation) was undetected unless the user happened to be running the full publish flow. The verification block — poll Marketplace + Open VSX every 30s for up to 10 min, warn loudly on Marketplace failure and auto-open the publisher manage page — was extracted from `run_full_publish` into a shared `_verify_marketplace_and_ovsx` helper in [_publish_workflow.py](scripts/modules/_publish_workflow.py) and wired into `run_extension_only_mode` and `run_publish_existing_vsix_mode`. Mode 7 derives the expected version from the `.vsix` filename via a new `_version_from_vsix_filename` helper rather than `extension/package.json`, because that mode is specifically used to publish an older `.vsix` while `package.json` already points at the next pre-bumped version — filename is the source of truth for what was actually packaged. No change to rule behavior, no change to the `.vsix` artifact.
+- Publish script: extension-only and publish-existing-.vsix modes now run the same Marketplace + Open VSX verification as the full flow so a “successful” store publish cannot slip through undetected. No action required for package or rule users.
 
 </details>
 
@@ -57,21 +65,21 @@
 
 ## [12.4.1]
 
-The analysis report now prints the real saropa_lints version in its header instead of `Version: unknown`, so every report file is self-identifying and you can tell at a glance which plugin build produced a given diagnostic set. The VS Code extension's own report and the post-analysis notification now include the resolved saropa_lints version + source too — no more opening files to answer "which plugin build is actually running?". The post-analysis popup adds `[Copy Report]` and `[Open Report]` buttons so you can grab the full report in one click without navigating `reports/<date>/` by hand. `avoid_color_only_meaning` no longer flags theme-adaptive ternaries — `ColoredBox(color: ThemeUtils.isDarkMode ? ... : ...)` and its platform / directionality siblings pass clean, so you can stop scattering `// ignore:` comments over ordinary theming code. `prefer_final_locals` no longer fires on variables that *are* reassigned inside `if` bodies, closures, `try`/`catch`, `switch` cases, `for`/`while`/`do` bodies, or any nested block — a single-project sweep dropped 148 false positives and the rule is safe to re-enable in projects that had disabled it.
+Analysis reports and the Run Analysis popup now show which saropa_lints build ran, and the popup can copy or open the latest consolidated report without digging through folders. Theme- and platform-driven color branches no longer trip `avoid_color_only_meaning`, and `prefer_final_locals` stops suggesting `final` where the variable is reassigned inside nested blocks or closures.
 
 ### Added
 
-- **"Copy Report" and "Open Report" buttons on the Run Analysis popup, plus matching palette commands.** The post-analysis notification now exposes four buttons instead of two — `[View Violations] [Copy Report] [Open Report] [Show Output]` — so users who want to paste the report into a chat / issue / email or scroll through it themselves can do so in one click, without hunting through date-stamped folders under `reports/`. Both new actions target the Dart plugin's consolidated `*_saropa_lint_report.log` (the file with concentration / top-rules / triage sections), not the thinner extension audit trail — that's the report users actually want. New helper `findLatestAnalysisReport(workspaceRoot)` in [reportWriter.ts](extension/src/reportWriter.ts) locates the newest report by file **mtime**, not filename, so runs within the same second still disambiguate correctly. The scan covers **all** date folders, not just today's, because a run started near midnight lands in the previous date folder and "today's folder doesn't exist yet" should not silently fail; hidden / system `.saropa_lints` folders are skipped so the plugin's internal `violations.json` dir can't masquerade as a report. New commands `saropaLints.copyLatestReport` and `saropaLints.openLatestReport` are registered in [extension.ts](extension/src/extension.ts), added to the [package.json](extension/package.json) `commands` block so they appear in the command palette (`Saropa Lints: Copy Latest Report` / `Saropa Lints: Open Latest Report`), and added to [commandCatalogRegistry.ts](extension/src/views/commandCatalogRegistry.ts) so the "every command has a catalog entry" guardrail test stays green. Both handlers degrade gracefully: when `reports/` is missing or empty, the user sees `Saropa Lints: no analysis report found under reports/. Run "Saropa Lints: Run Analysis" first.` instead of a silent no-op or a cryptic I/O error. Open uses `preview: false` (persistent tab) because users who explicitly chose "Open Report" want a tab that survives clicking into another file. Regression coverage in the new [findLatestAnalysisReport.test.ts](extension/src/test/findLatestAnalysisReport.test.ts) (7 cases): missing `reports/` dir, empty dir, single-report happy path, mtime disambiguation within one date folder, cross-date-folder scan for the near-midnight case, hidden-folder skip, and non-matching-filename skip.
+- Run Analysis popup adds Copy Report and Open Report (plus palette commands) so you can share or open the latest `*_saropa_lint_report.log` in one step instead of browsing dated folders under `reports/`. No action required.
 
 ### Changed
 
-- **VS Code extension "Run Analysis" now stamps every report and notification with the resolved saropa_lints version.** When the user clicks `Run Analysis`, the extension reads `pubspec.lock` via the existing `readInstalledVersion` helper and surfaces the resolved saropa_lints version + source in two places: (1) the `reports/<date>/<ts>_saropa_extension.md` header gains `**Extension:** vX.Y.Z` and `**saropa_lints:** X.Y.Z (hosted)` lines underneath the existing date / workspace lines, so every extension report is self-identifying; (2) the post-analysis warning popup's message prefix changes from `Saropa Lints: 14,506 issues found.` to `Saropa Lints v12.4.2: 14,506 issues found.`, so the plugin version is visible without opening a file. Source label (`hosted` / `path` / `git`) is appended for users on `dependency_overrides`: path-override runs are quietly running a local build that doesn't match `pubspec.yaml`'s constraint, and surfacing that distinction in the report prevents a whole class of "is the fix actually live?" confusion. Both the extension version and the saropa_lints version are silently omitted when unresolvable (no `pubspec.lock`, unreadable lock, or no saropa_lints block) — skipping is preferred over `unknown`, because `unknown` is exactly the misleading placeholder we're trying to eliminate. Popup formatter is `formatAnalysisIssuesMessage(total, scope?, saropaLintsVersion?)` — the new third arg is optional, so every existing call site and test continues to work without edits. Extension report helper is `flushReport(root, options?)` — same optional-object approach, no breaking change at call sites that don't care. Regression coverage in [formatAnalysisIssuesMessage.test.ts](extension/src/test/formatAnalysisIssuesMessage.test.ts): four new cases cover the version-prefix path, version + scope combination, version in the zero-count fallback, and the silent-omission path (no `v undefined` / bare `v` ghost in the message). Implemented in [setup.ts](extension/src/setup.ts) (new `resolveSaropaLintsVersion` / `resolveExtensionVersion` helpers + wired into both `runAnalysis` and `runAnalysisForFiles`) and [reportWriter.ts](extension/src/reportWriter.ts) (new `FlushReportOptions` interface).
+- Extension Run Analysis stamps extension reports and the issue popup with the resolved saropa_lints version and source (hosted / path / git) when `pubspec.lock` allows, so you can confirm which build ran without opening files. No action required.
 
 ### Fixed
 
-- **`prefer_final_locals`: no longer false-positive on reassignments inside nested blocks, control flow, and closures.** Previously the detector only walked **sibling** `ExpressionStatement`s and `ForStatement` updaters at the same block level as the declaration, so any reassignment buried inside an `if` / `else` body, a closure passed as an argument (`showDialog(onPressed: () { selected = ... })`), a `try` / `catch` / `finally`, a `switch` case, a `while` / `do-while` / for-body, or a nested `{ ... }` block was structurally invisible — the rule concluded "never reassigned" and flagged the declaration. Applying the suggested `final` modifier in any of those shapes produced a compile error, and `dart fix --dry-run` quietly offered zero fixes, making the diagnostic dead weight. Hit 148 times in one mid-size Flutter project alone. Detection is now a bounded descendant walk over the enclosing block (a `RecursiveAstVisitor` that visits every `AssignmentExpression` / `PrefixExpression` / `PostfixExpression` at offsets `>= stmt.end`) resolved by **element identity** via `SimpleIdentifier.element`. Element-based matching is shadow-safe: an inner `var name = ...` resolves to a different `LocalVariableElement`, so reassignments of an inner same-named local do not mask the outer check, and (covered by the regression fixture) the outer variable still flags when it is truly never reassigned. Implemented in [type_rules.dart](lib/src/rules/data/type_rules.dart) — the old `_assignsToName` / `_exprAssignsToName` / `_lhsName` / `_incDecTargetName` sibling scan was replaced by `_ReassignmentVisitor`. Bug report: [bugs/prefer_final_locals_false_positive_nested_assignments.md](bugs/prefer_final_locals_false_positive_nested_assignments.md). Fixture now covers all the shapes from the bug plus a shadowing regression and a "truly never reassigned" baseline: [prefer_final_locals_fixture.dart](example/lib/type/prefer_final_locals_fixture.dart).
-- **`avoid_color_only_meaning`: no longer fires on theme / platform / directionality ternaries.** WCAG 1.4.1 is about color used as an information channel the user has to decode — it does not apply to a theme's own background that adapts to dark mode or a platform-specific surface color. The rule previously flagged any `ConditionalExpression` on `color:` / `backgroundColor:` regardless of what the predicate tested, so every `ColoredBox(color: ThemeUtils.isDarkMode ? ... : ...)` in the codebase required a `// ignore:` comment. Detection now walks the ternary condition subtree and short-circuits when it encounters an environment-predicate identifier — `isDarkMode` / `isLightMode` / `isDark` / `isLight` / `brightness` / `platformBrightness` / `Brightness`, platform checks (`Platform.isIOS|isAndroid|isMacOS|isWindows|isLinux|isFuchsia`, `kIsWeb`, `defaultTargetPlatform` / `TargetPlatform`), and directionality / locale (`TextDirection`, `Directionality`, `Localizations`, `languageCode`, `countryCode`, `localeOf`). Genuine state ternaries (`isError ? red : green`, `isSelected ? blue : gray`) still fire, and the companion-walk heuristic for nearby `Icon` / `Text` / `Semantics` is preserved as the second-line check for state ternaries. Implemented in [accessibility_rules.dart](lib/src/rules/ui/accessibility_rules.dart) via a new `_EnvironmentPredicateVisitor` that scans the condition for any identifier in the allowlist — conservative by design, preferring false negatives (a missed state ternary) over false positives (a flagged theme ternary) because the latter forces ignore comments on ordinary theming code. Bug report: [bugs/avoid_color_only_meaning_false_positive_theme_dark_mode_conditional.md](bugs/avoid_color_only_meaning_false_positive_theme_dark_mode_conditional.md). Fixture populated with all six cases from the bug (dark-mode ternary, brightness comparison, platformBrightness, `Platform.isIOS`, state ternary with and without Icon companion): [avoid_color_only_meaning_fixture.dart](example/lib/accessibility/avoid_color_only_meaning_fixture.dart).
-- **Report header `Version:` field was printing `unknown` on every analyzer-plugin run, making it impossible to tell which saropa_lints build was actually running.** [project_info.dart:52](lib/src/init/project_info.dart#L52) `getPackageVersion()` read `File('.dart_tool/package_config.json')` — a **relative path** resolved against `Directory.current`. The analyzer-plugin isolate does NOT set its cwd to the consumer project; it's typically the plugin's install directory or the analyzer's working dir, neither of which contains the consumer's `.dart_tool/`. The relative lookup silently failed on every plugin run, the helper returned `'unknown'`, and the report header's `Version:` line was useless for diagnosing which version of the plugin produced a given report. Fixed by threading the consumer-project `projectRoot` (already resolved from `ProjectContext.findProjectRoot(filePath)` at plugin entry) through `_captureReportConfigSnapshot` → `getPackageVersion(projectRoot:)` → `getSaropaLintsRootUri(projectRoot:)` → `rootUriToPath(rootUri, projectRoot:)`, so every lookup now reads `<projectRoot>/.dart_tool/package_config.json` explicitly. The CLI commands (`saropa_lints:init`, `saropa_lints:write_config`) continue to call with no argument — they already run with `Directory.current` = consumer project, so the relative fallback is correct for them. Regression coverage added in [project_info_root_uri_test.dart](test/project_info_root_uri_test.dart): a positive test asserts `getPackageVersion(projectRoot: Directory.current.path)` matches a semver-like triple (not `'unknown'`) against saropa_lints' own project root, and a negative test confirms a bogus `projectRoot` still returns `'unknown'` without crashing. Why this matters right now: diagnosing whether a given `saropa_depend_on_referenced_packages` firing is coming from the fixed parser or a stale compiled cache required knowing the plugin version — which the report header was hiding behind `Version: unknown`.
+- `prefer_final_locals` no longer false-positives when a local is reassigned inside nested blocks, control flow, or closures, so the quick fix matches real code and you can rely on the rule again. No action required; details in [bugs/prefer_final_locals_false_positive_nested_assignments.md](bugs/prefer_final_locals_false_positive_nested_assignments.md).
+- `avoid_color_only_meaning` skips ordinary theme, platform, and directionality-driven color branches so theming code stays clean without ignores. No action required; details in [bugs/avoid_color_only_meaning_false_positive_theme_dark_mode_conditional.md](bugs/avoid_color_only_meaning_false_positive_theme_dark_mode_conditional.md).
+- Analyzer-plugin text reports now show a real `Version:` from your project root instead of `unknown`, so each report identifies the plugin build that produced it. No action required.
 
 ---
 
@@ -483,196 +491,8 @@ False-positive fixes across hardcoded config, dependency ordering, adoption gate
 
 ---
 
-## [10.11.0]
-
-New graph command for import visualization, a searchable command catalog in the extension, eleven pubspec validation diagnostics with quick fixes, and a batch of bug fixes. — [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
-
-### Added
-
-- **cross_file graph command**: New `dart run saropa_lints:cross_file graph` command exports the import graph in DOT format for Graphviz visualization. Use `--output-dir` to control where `import_graph.dot` is written.
-
-### Added (Extension)
-
-- **Command catalog webview**: New "Saropa Lints: Browse All Commands" command opens a searchable, categorized catalog of every extension command (117 commands across 13 categories). Features instant text search, collapsible category sections, click-to-execute, and a toggle to reveal context-menu-only commands. Accessible from the command palette, welcome views, and the getting-started walkthrough.
-- **Enablement audit**: Seven copy-as-JSON commands (`Copy Violations as JSON`, `Copy Config as JSON`, etc.) previously hidden from the command palette are now visible when a Dart project is open. Commands have unique titles so they are distinguishable in the palette.
-- **Walkthrough expansion**: Three new getting-started walkthrough steps — Package Health (dependency scanning and SBOM), TODOs & Hacks (workspace-wide marker scanning), and Browse All Commands (command catalog).
-- **Welcome view links**: Both welcome views (non-Dart project intro and no-analysis-yet prompt) now include a "Browse All Commands" link to the command catalog.
-- **Pubspec validation diagnostics**: Eleven inline checks on `pubspec.yaml`, shown in the Problems panel and as editor squiggles:
-  - `avoid_any_version` (Warning): Flags `any` version constraints in dependencies
-  - `dependencies_ordering` (Info): Flags unsorted dependency lists
-  - `prefer_caret_version_syntax` (Info): Flags bare version pins (`1.2.3`) — suggests caret syntax (`^1.2.3`)
-  - `avoid_dependency_overrides` (Warning): Flags `dependency_overrides` entries without an explanatory comment
-  - `prefer_publish_to_none` (Info): Flags pubspec files missing `publish_to: none` field
-  - `prefer_pinned_version_syntax` (Info): Stylistic opposite of `prefer_caret_version_syntax` — flags caret ranges, prefers exact pins (opt-in)
-  - `pubspec_ordering` (Info): Flags top-level fields not in recommended order (name, description, version, ...)
-  - `newline_before_pubspec_entry` (Info): Flags top-level sections without a preceding blank line
-  - `prefer_commenting_pubspec_ignores` (Info): Flags `ignored_advisories` entries without an explanatory comment
-  - `add_resolution_workspace` (Info): Flags workspace roots missing `resolution: workspace` field
-  - `prefer_l10n_yaml_config` (Info): Flags inline `generate: true` under flutter — suggests `l10n.yaml`
-- `prefer_pinned_version_syntax` and `prefer_caret_version_syntax` are mutually exclusive stylistic rules — controlled via `saropaLints.pubspecValidation.preferPinnedVersions` setting (default: off = caret preferred). Changes take effect immediately on open pubspec files.
-- **Quick-fix code actions** for 5 pubspec diagnostics: `prefer_caret_version_syntax` (add `^`), `prefer_pinned_version_syntax` (remove `^`), `prefer_publish_to_none` (insert field), `newline_before_pubspec_entry` (insert blank line), `add_resolution_workspace` (insert field). Available from the lightbulb menu and `Ctrl+.`.
-- Diagnostics update live as you edit pubspec.yaml (300ms debounce). SDK/path/git dependencies and `dependency_overrides` are handled correctly.
-- **Package vibrancy sort spacing**: Sort Dependencies now inserts blank lines between packages for readability. Related packages that share a common name prefix (e.g. `drift`, `drift_flutter`, `drift_dev`) are kept together without a separator. SDK packages are always separated from non-SDK packages.
-
-### Fixed (Extension)
-
-- **Duplicate annotation comments**: The annotate-packages feature could leave duplicate description comments above a dependency (e.g. two identical `# A composable, multi-platform...` lines) when re-run on a pubspec that already had annotations from a prior run. The scanner now removes all consecutive auto-description lines above a URL, not just the single closest one.
-
-### Fixed
-
-- **Sidebar section toggles not responding**: Clicking an "Off" sidebar toggle in Overview & options produced no feedback. Root cause: the `toggleSidebarSection` command was registered at runtime but not declared in `contributes.commands`, so VS Code silently ignored tree-item clicks. Added the command declaration and a `commandPalette` hide entry, and wrapped the handler in try/catch so config-update failures now surface as error notifications.
-- **avoid_stream_subscription_in_field**: Fixed false positive when `.listen()` is inside a conditional block (`if`/`for`) and assigned to a properly-named subscription field. The parent-walk loop now stops at closure (`FunctionExpression`) boundaries to prevent escaping into outer scopes. **Note:** this also fixes false negatives where a bare `.listen()` inside a closure was incorrectly suppressed because an outer scope had a properly-named subscription assignment — those uncaptured subscriptions will now correctly fire the lint.
-- **cross_file HTML reporter**: Fixed string interpolation bug in index page — file counts were rendered as list objects instead of numbers.
-- **cross_file --exclude**: The `--exclude` glob flag is now applied to filter results. Previously it was parsed but silently ignored.
-
-<details>
-<summary>Maintenance</summary>
-
-- **Unified pubspec.yaml listener**: Pubspec validation and SDK constraint diagnostics now share a single `registerPubspecDocListeners` helper with one debounce timer (300ms), eliminating duplicate event subscriptions. Includes error boundary — a pubspec validation failure does not block SDK diagnostics.
-- **Internal**: `parseDependencySections()` now accepts a pre-split lines array, eliminating a duplicate `content.split('\n')` call per validation run.
-- **Roadmap restructure**: Split deferred rules into focused documents in `plan/deferred/` by barrier type (cross-file, unreliable detection, external dependencies, framework limitations, compiler diagnostics, not viable). Trimmed ROADMAP.md to actionable content only. Moved cross-file CLI design to `plan/cross_file_cli_design.md`.
-- **Bug Report Guide**: Added `bugs/BUG_REPORT_GUIDE.md` — structured template and investigation checklist for filing lint rule bugs (false positives, false negatives, crashes, wrong fixes, performance)
-- **Changelog Archive**: Moved [9.9.0] and older logs to [CHANGELOG_ARCHIVE.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG_ARCHIVE.md)
-- **Plan history restore**: Restored 21 active plan/discussion/bug documents plus `deferred/` and `implementable_only_in_plugin_extension/` directories back to `plan/` root — these were incorrectly swept into `plan/history/` by the consolidation commit. Added `plan/history/INDEX.md` as a searchable index for the 1,069 history files.
-
-</details>
-
----
-
-## [10.10.0]
-
-Ten new rules targeting deprecated APIs, performance traps, and migration gotchas across Dart and Flutter. — [log](https://github.com/saropa/saropa_lints/blob/v10.10.0/CHANGELOG.md)
-
-### Added
-
-- **prefer_isnan_over_nan_equality**: Flags `x == double.nan` (always false) and `x != double.nan` (always true) — use `.isNaN` instead (IEEE 754). Includes quick fix.
-- **prefer_code_unit_at**: Flags `string.codeUnits[i]` which allocates an entire List just to read one code unit — use `string.codeUnitAt(i)` instead (Flutter 3.10, PR #120234). Includes quick fix.
-- **prefer_never_over_always_throws**: Flags the deprecated `@alwaysThrows` annotation from `package:meta` — use `Never` return type instead (Dart 2.12+).
-- **prefer_visibility_over_opacity_zero**: Flags `Opacity(opacity: 0.0, ...)` which inserts an unnecessary compositing layer — use `Visibility(visible: false, ...)` instead (Flutter 3.7, PR #112191).
-- **avoid_platform_constructor**: Flags `Platform()` constructor usage deprecated in Dart 3.1 — all useful Platform members are static.
-- **prefer_keyboard_listener_over_raw**: Flags deprecated `RawKeyboardListener` — use `KeyboardListener` which handles IME and key composition correctly (Flutter 3.18). Includes quick fix.
-- **avoid_extending_html_native_class**: Flags extending native `dart:html` classes (`HtmlElement`, `CanvasElement`, etc.) which can no longer be subclassed (Dart 3.8 breaking change).
-- **avoid_extending_security_context**: Flags extending or implementing `SecurityContext` from `dart:io` which is now `final` (Dart 3.5, breaking change #55786).
-- **avoid_deprecated_pointer_arithmetic**: Flags deprecated `Pointer.elementAt()` from `dart:ffi` — use the `+` operator instead (Dart 3.3). Includes quick fix.
-- **prefer_extracting_repeated_map_lookup**: Flags 3+ identical `map[key]` accesses in the same function body — extract into a local variable for readability and type safety (Flutter 3.10, PR #122178).
-
----
-
-## [10.9.0]
-
-Four new rules catching deprecated media query params, codec shorthand, a removed AppBar field, and iterable cast cleanup. — [log](https://github.com/saropa/saropa_lints/blob/v10.9.0/CHANGELOG.md)
-
-### Added
-
-- **prefer_iterable_cast**: Flags `Iterable.castFrom(x)` (and `List.castFrom`, `Set.castFrom`, `Map.castFrom`) and suggests the more readable `.cast<T>()` instance method (Flutter 3.24, PR #150185). Includes quick fix.
-- **avoid_deprecated_use_inherited_media_query**: Flags the deprecated `useInheritedMediaQuery` parameter on `MaterialApp`, `CupertinoApp`, and `WidgetsApp` (deprecated after Flutter 3.7). The setting is ignored. Includes quick fix to remove the argument.
-- **prefer_utf8_encode**: Flags `Utf8Encoder().convert(x)` and suggests the shorter `utf8.encode(x)` from `dart:convert` (Dart 2.18 / Flutter 3.16, PR #130567). Includes quick fix.
-- **avoid_removed_appbar_backwards_compatibility**: Flags the removed `AppBar.backwardsCompatibility` parameter (removed in Flutter 3.10, PR #120618). Includes quick fix to remove the argument.
-
-### Fixed
-
-- **avoid_global_state**: Report diagnostic at declaration level instead of individual variable nodes to prevent wrong line numbers when doc comments precede the declaration
-
----
-
-## [10.8.1]
-
-Vibrancy report polish — better empty-cell display, smarter column layouts, and clickable package names. — [log](https://github.com/saropa/saropa_lints/blob/v10.8.1/CHANGELOG.md)
-
-### Changed
-
-- **Vibrancy Report**: Empty cells now show an em-dash with an explanatory tooltip instead of blank space (stars, published date, issues, PRs, size, license, description, and other optional columns)
-- **Vibrancy Report**: Merged Health column into Category as a dimmed suffix, e.g. "Abandoned (1/10)"
-- **Vibrancy Report**: Package name now opens pubspec.yaml at the dependency entry (was: pub.dev link) and shows description as tooltip
-- **Vibrancy Report**: Published date now links to the pub.dev package page and shows the version age suffix (moved from Version column)
-- **Vibrancy Report**: "Files" column renamed to "References" — click the count to search your workspace for that package's imports
-- **Vibrancy Report**: Update column shows a dimmed en-dash instead of a checkmark when no update is available; all placeholder dashes are now dimmed
-- **Vibrancy Report**: License and Description columns are now hidden by default (Description changed from icon to plain-text column)
-
----
-
-## [10.8.0]
-
-Vibrancy report gets GitHub issue and PR counts, plus a toolbar toggle for Drift Advisor integration. — [log](https://github.com/saropa/saropa_lints/blob/v10.8.0/CHANGELOG.md)
-
-### Added
-
-- **Vibrancy Report**: New "Issues" and "PRs" columns show open GitHub issue and pull request counts, linking directly to the repository's issues and pulls pages
-- **Drift Advisor**: Toolbar toggle button in the Drift Advisor view — `$(plug)` enables integration, `$(circle-slash)` disables it. No more hunting through Settings to find `saropaLints.driftAdvisor.integration`.
-
----
-
-## [10.7.0]
-
-Vibrancy health categories renamed for clarity, report gains copy-as-JSON, file usage tracking, and clickable summary cards. — [log](https://github.com/saropa/saropa_lints/blob/v10.7.0/CHANGELOG.md)
-
-### Changed
-
-- **Vibrancy**: Renamed health categories for clarity — "Quiet" → **Stable**, "Legacy-Locked" → **Outdated**, "Stale" → **Abandoned**. Vibrant and End of Life are unchanged.
-- **Vibrancy**: Raised Abandoned threshold from score <10 to score <20 so packages untouched for 4+ years with only bonus points are correctly flagged instead of escaping into Outdated
-- **Vibrancy Report**: Overrides summary card is now clickable — filters the table to show only overridden packages
-- **Vibrancy Report**: All table column headings now have tooltips explaining what each column represents (e.g. Published = "Date the installed version was published to pub.dev")
-
-### Added
-
-- **Vibrancy Report**: Copy-as-JSON button appears on row hover — copies a detailed JSON of all package fields and links to clipboard
-- **Vibrancy Report**: New "Files" column shows how many source files import each package, with clickable file paths in the detail view that open at the exact import line
-- **Vibrancy Report**: "Single-use" summary card filters to packages imported from only one file
-- **Vibrancy Report**: Exported JSON and Markdown reports now include per-package file-usage data (file paths and line numbers)
-
-### Fixed
-
-- **Vibrancy Report**: Commented-out imports (e.g. `// import 'package:foo/foo.dart'`) are no longer counted as active usage for unused-package detection
-
-### Breaking
-
-- **Vibrancy Settings**: `budget.maxStale` renamed to `budget.maxAbandoned`; `budget.maxLegacyLocked` renamed to `budget.maxOutdated`. Users who customized these settings will need to update their config.
-- **Vibrancy Exports**: JSON/Markdown export schemas use new category keys (`stable`, `outdated`, `abandoned` instead of `quiet`, `legacy_locked`, `stale`)
-- **Generated CI scripts**: Previously generated CI workflows reference old threshold variable names. Regenerate after updating.
-
----
-
-## [10.6.1]
-
-Updated README screenshots. — [log](https://github.com/saropa/saropa_lints/blob/v10.6.1/CHANGELOG.md)
-
-### Changed
-
-Updated screenshots in [README.md](./README.md).
-
----
-
-## [10.6.0]
-
-Extension UX refinements — split workspace options into Settings and Issues sections, hide "Apply fix" for unfixable violations, and auto-expand violations tree on programmatic navigation. — [log](https://github.com/saropa/saropa_lints/blob/v10.6.0/CHANGELOG.md)
-
-### Changed
-
-- **Extension:** Overview sidebar splits the former "Workspace options" section into two focused sections: **Settings** (lint integration, tier, detected packages, config actions) and **Issues** (triage groups by violation count); Issues hides when no analysis data exists
-- **Extension:** "Apply fix" context menu item is now hidden for violations without a quick fix, instead of showing a dead-end "No quick fix available" message
-- **Extension:** Violations tree now auto-expands all levels when navigated to from settings, dashboard links, summary counts, or triage groups
-
-### Fixed
-
-- **Extension:** `rulesWithFixes` from `violations.json` was not extracted, causing all violations to appear fixable regardless of actual fix availability
-
----
-
-## [10.5.0]
-
-Replacement complexity metric — analyzes local pub cache to estimate feasibility of inlining, forking, or replacing each dependency; removed inline vibrancy summary diagnostic. — [log](https://github.com/saropa/saropa_lints/blob/v10.5.0/CHANGELOG.md)
-
-### Added
-
-- **(Extension)** Package Vibrancy: replacement complexity metric — analyzes local pub cache to count source lines in each dependency's `lib/` directory and classifies how feasible it would be to inline, fork, or replace (trivial / small / moderate / large / native). Shown in Size tree group, detail sidebar, and CodeLens for stale/end-of-life packages with feasible migration
-
-### Changed
-
-- **(Extension)** Removed the `vibrancy-summary` inline diagnostic from `pubspec.yaml` — the Package Vibrancy sidebar and report already surface this information. The `inlineDiagnostics` setting no longer offers a `"summary"` mode; the default is now `"critical"` (end-of-life packages only)
-
----
-
-## [10.4.1] and Earlier
+## [10.11.0] and Earlier
 
 > **Looking for older changes?**
-> See [CHANGELOG_ARCHIVE.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 10.4.1.
+> See [CHANGELOG_ARCHIVE.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 10.11.0.
+
