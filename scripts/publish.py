@@ -14,7 +14,7 @@ and VS Code extension). Delegates all logic to scripts/modules/:
 
 Run:  python scripts/publish.py
 Modes: full publish / audit only / fix docs / skip audit / analyze only / extension only
-
+1
 See scripts/README.md for the full architecture and module map.
 
 Version:   5.0
