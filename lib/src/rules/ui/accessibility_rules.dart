@@ -4287,6 +4287,20 @@ class AvoidColorOnlyMeaningRule extends SaropaLintRule {
         final String name = arg.name.label.name;
         if ((name == 'color' || name == 'backgroundColor') &&
             arg.expression is ConditionalExpression) {
+          // Skip theme / platform / locale / directionality ternaries.
+          // Why: WCAG 1.4.1 is about color as an *information channel* the
+          // user must decode. An environment-adaptive ternary (dark mode,
+          // platformBrightness, Platform.isIOS, TextDirection.rtl) only ever
+          // resolves to one branch for a given user session — there is no
+          // "color A vs color B" for the user to compare, so color is not
+          // conveying meaning. Reporting these produced a flood of false
+          // positives that forced `// ignore:` on every theme-adaptive
+          // background. See
+          // bugs/avoid_color_only_meaning_false_positive_theme_dark_mode_conditional.md
+          final ConditionalExpression cond =
+              arg.expression as ConditionalExpression;
+          if (_isEnvironmentPredicate(cond.condition)) continue;
+
           conditionalColorArg = arg;
           break;
         }
@@ -4298,6 +4312,33 @@ class AvoidColorOnlyMeaningRule extends SaropaLintRule {
 
       reporter.atNode(conditionalColorArg);
     });
+  }
+
+  /// Identifier names that mean "branching on environment, not user state."
+  ///
+  /// Presence of any of these names anywhere inside the ternary condition
+  /// marks it as theme / platform / locale / directionality adaptation.
+  /// Conservative by design: favor false negatives (missed state ternary)
+  /// over false positives (flagged theme ternary) because the latter forces
+  /// `// ignore:` on ordinary theming code.
+  static const Set<String> _environmentIdentifiers = <String>{
+    // Brightness / dark-mode
+    'isDarkMode', 'isLightMode', 'isDark', 'isLight',
+    'brightness', 'platformBrightness', 'platformBrightnessOf',
+    'Brightness',
+    // Platform
+    'isIOS', 'isAndroid', 'isMacOS', 'isWindows', 'isLinux', 'isFuchsia',
+    'isWeb', 'kIsWeb', 'Platform', 'defaultTargetPlatform', 'TargetPlatform',
+    // Directionality / locale
+    'TextDirection', 'Directionality', 'Localizations',
+    'languageCode', 'countryCode', 'localeOf',
+  };
+
+  bool _isEnvironmentPredicate(Expression condition) {
+    final _EnvironmentPredicateVisitor visitor =
+        _EnvironmentPredicateVisitor(_environmentIdentifiers);
+    condition.accept(visitor);
+    return visitor.matched;
   }
 
   /// Walks the child/children of this widget and up to 3 parent levels
@@ -4350,6 +4391,25 @@ class AvoidColorOnlyMeaningRule extends SaropaLintRule {
       }
     }
     return false;
+  }
+}
+
+/// Walks a ternary condition subtree and reports whether any identifier
+/// matches the environment-predicate allowlist (theme / platform / locale).
+///
+/// Used by `AvoidColorOnlyMeaningRule` to suppress false positives on
+/// theme-adaptive conditionals — the user only ever sees one branch, so
+/// color is not conveying meaning subject to WCAG 1.4.1.
+class _EnvironmentPredicateVisitor extends RecursiveAstVisitor<void> {
+  _EnvironmentPredicateVisitor(this._identifiers);
+
+  final Set<String> _identifiers;
+  bool matched = false;
+
+  @override
+  void visitSimpleIdentifier(SimpleIdentifier node) {
+    if (_identifiers.contains(node.name)) matched = true;
+    super.visitSimpleIdentifier(node);
   }
 }
 
