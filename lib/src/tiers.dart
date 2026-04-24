@@ -757,6 +757,7 @@ const Set<String> recommendedOnlyRules = <String>{
   'require_macos_notarization_ready', // macOS distribution reminder (INFO)
   'avoid_animation_rebuild_waste', // animation performance
   'prefer_listenable_builder', // Flutter 3.13+ migration — semantic clarity
+  'prefer_animation_controller_forward_from_zero', // WARNING - restart with from: 0.0 on auto-reverse controllers
   'require_deep_link_fallback', // deep link error handling
   'require_stepper_validation', // stepper form validation
   'require_immutable_bloc_state', // state immutability best practice
@@ -942,6 +943,7 @@ const Set<String> recommendedOnlyRules = <String>{
 
   // Animation
   'avoid_animation_in_build',
+  'avoid_inert_animation_value_in_build',
   'require_hero_tag_uniqueness',
 
   // Security

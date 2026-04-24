@@ -1175,6 +1175,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   // New animation rules
   RequireVsyncMixinRule.new,
   AvoidAnimationInBuildRule.new,
+  AvoidInertAnimationValueInBuildRule.new,
   RequireAnimationControllerDisposeRule.new,
   RequireHeroTagUniquenessRule.new,
   AvoidLayoutPassesRule.new,
@@ -2896,6 +2897,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidSharedPrefsSyncRaceRule.new,
   AvoidMultipleAnimationControllersRule.new,
   AvoidImplicitAnimationDisposeCastRule.new,
+  PreferAnimationControllerForwardFromZeroRule.new,
   AvoidFormValidationOnChangeRule.new,
   AvoidStackTraceInProductionRule.new,
   AvoidWebViewCorsIssuesRule.new,
