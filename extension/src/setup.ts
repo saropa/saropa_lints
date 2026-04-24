@@ -10,6 +10,7 @@ import { spawnSync } from 'node:child_process';
 import { logReport, logSection, flushReport } from './reportWriter';
 import { getProjectRoot } from './projectRoot';
 import { readViolations } from './violationsReader';
+import { readInstalledVersion } from './upgrade-checker';
 
 const SAROPA_LINTS_DEV_DEP = 'saropa_lints';
 const DEFAULT_VERSION = '^9.1.0';
@@ -266,20 +267,64 @@ async function runAnalysisAfterConfigChangeScoped(
  *
  * Exported for testing; call sites use showAnalysisIssuesNotification().
  */
-export function formatAnalysisIssuesMessage(total: number, scope?: string): string {
+/**
+ * Resolve the saropa_lints version currently pinned in the workspace's
+ * `pubspec.lock`, plus the source (`hosted`, `path`, `git`, …). Returns
+ * `undefined` for missing/unreadable/unparseable locks — silent failure
+ * is preferred over a misleading `unknown` placeholder, because the
+ * downstream `flushReport` omits the field entirely when no value is
+ * supplied.
+ *
+ * Why read `pubspec.lock` rather than `pubspec.yaml`: the yaml carries a
+ * constraint (`^12.4.0`) while the lock carries the *resolved* version
+ * (`12.4.2`) — and when diagnosing "is the plugin I expect actually
+ * running?" the resolved version is what matters. Reuses the existing
+ * `readInstalledVersion` helper so lock-parsing lives in one place.
+ */
+function resolveSaropaLintsVersion(
+  workspaceRoot: string,
+): { version: string; source: string } | undefined {
+  try {
+    const lockPath = path.join(workspaceRoot, 'pubspec.lock');
+    if (!fs.existsSync(lockPath)) return undefined;
+    const content = fs.readFileSync(lockPath, 'utf-8');
+    return readInstalledVersion(content) ?? undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/** Extension version from its own `package.json` (VSIX version). */
+function resolveExtensionVersion(): string | undefined {
+  // The extension's own manifest is reachable via the well-known
+  // publisher id; fall back silently when the extension API isn't
+  // available (e.g. unit-test environments without vscode host).
+  const self = vscode.extensions.getExtension('saropa.saropa-lints');
+  const version = (self?.packageJSON as { version?: string } | undefined)?.version;
+  return typeof version === 'string' && version.length > 0 ? version : undefined;
+}
+
+export function formatAnalysisIssuesMessage(
+  total: number,
+  scope?: string,
+  saropaLintsVersion?: string,
+): string {
   // Leading space inside the parens so the undefined branch doesn't leave a
   // stray " ()" at the end — the bug report's fixture explicitly calls this out.
   const scopeLabel = scope ? ` (${scope})` : '';
+  // Version suffix (optional): `Saropa Lints v12.4.2: 5,234 issues…`.
+  // Omitted entirely when unresolved — no `unknown` placeholder.
+  const versionLabel = saropaLintsVersion ? ` v${saropaLintsVersion}` : '';
   if (total > 0) {
     const noun = total === 1 ? 'issue' : 'issues';
     // toLocaleString for thousands separators — 5,234 reads much better than
     // 5234 in a two-line warning popup on a large project.
-    return `Saropa Lints: ${total.toLocaleString()} ${noun} found${scopeLabel}.`;
+    return `Saropa Lints${versionLabel}: ${total.toLocaleString()} ${noun} found${scopeLabel}.`;
   }
   // total === 0 path: violations.json missing/unreadable OR a zero-length list
   // accompanied by a non-zero analyze exit (e.g. analyzer crash, compile error,
   // plugin fail). Can't promise a count, so direct users to Output instead.
-  return `Saropa Lints analysis finished with a non-zero exit${scopeLabel}. See Output for details.`;
+  return `Saropa Lints${versionLabel} analysis finished with a non-zero exit${scopeLabel}. See Output for details.`;
 }
 
 /**
@@ -298,7 +343,11 @@ function showAnalysisIssuesNotification(workspaceRoot: string, scope?: string): 
   // still produce a useful number. Final fallback of 0 triggers the
   // "non-zero exit, see Output" branch in formatAnalysisIssuesMessage.
   const total = data?.summary?.totalViolations ?? data?.violations.length ?? 0;
-  const message = formatAnalysisIssuesMessage(total, scope);
+  // Surface the resolved saropa_lints version in the popup so users can tell
+  // at a glance which plugin build produced these diagnostics — previously
+  // users had to open the report file (and that field was broken too).
+  const installed = resolveSaropaLintsVersion(workspaceRoot);
+  const message = formatAnalysisIssuesMessage(total, scope, installed?.version);
 
   void vscode.window.showWarningMessage(message, 'View Violations', 'Show Output').then((choice) => {
     if (choice === 'View Violations') {
@@ -359,7 +408,17 @@ export async function runAnalysis(context: vscode.ExtensionContext): Promise<boo
         // Read the authoritative count from violations.json instead.
         showAnalysisIssuesNotification(workspaceRoot);
       }
-      flushReport(workspaceRoot);
+      // Tag the extension report with the extension version and the resolved
+      // saropa_lints version from pubspec.lock — so every
+      // `<ts>_saropa_extension.md` file is self-identifying. When a user
+      // asks "is the rule still firing 14k times?" the first useful fact is
+      // which plugin build produced the numbers.
+      const installed = resolveSaropaLintsVersion(workspaceRoot);
+      flushReport(workspaceRoot, {
+        extensionVersion: resolveExtensionVersion(),
+        saropaLintsVersion: installed?.version,
+        saropaLintsSource: installed?.source,
+      });
     },
   );
   return ok;
@@ -409,7 +468,15 @@ export async function runAnalysisForFiles(
     } else {
       logReport(`- Analysis reported issues (${cmd} analyze ${toRun.length} files)`);
     }
-    flushReport(workspaceRoot);
+    // Same reasoning as the full-workspace runAnalysis flow — stamp the
+    // extension report with the versions that produced the run, so the
+    // file is self-identifying.
+    const installed = resolveSaropaLintsVersion(workspaceRoot);
+    flushReport(workspaceRoot, {
+      extensionVersion: resolveExtensionVersion(),
+      saropaLintsVersion: installed?.version,
+      saropaLintsSource: installed?.source,
+    });
     return result.ok;
   };
 
