@@ -105,10 +105,29 @@
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
+/// Host [StatefulWidget] for fixture states (`MyWidget` in mocks is stateless).
+class _RequireAnimDisposeHostWidget extends StatefulWidget {
+  const _RequireAnimDisposeHostWidget({super.key});
+  @override
+  State<_RequireAnimDisposeHostWidget> createState() =>
+      _RequireAnimDisposeHostWidgetState();
+}
+
+class _RequireAnimDisposeHostWidgetState extends State<_RequireAnimDisposeHostWidget> {
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
+extension _RequireAnimationControllerDisposeFixtureExt
+    on AnimationController {
+  void disposeSafe() => dispose();
+  void disposeAll() {}
+}
+
 // BAD: Should trigger require_animation_controller_dispose
 // expect_lint: require_animation_controller_dispose
-class _bad31__MyState extends State<MyWidget>
-    with SingleTickerProviderStateMixin {
+class _bad31__MyState extends State<_RequireAnimDisposeHostWidget>
+    with SingleTickerProviderStateMixin<_RequireAnimDisposeHostWidget> {
   late final _controller = AnimationController(
     vsync: this,
     duration: Duration(seconds: 1),
@@ -117,8 +136,8 @@ class _bad31__MyState extends State<MyWidget>
 }
 
 // GOOD: Should NOT trigger require_animation_controller_dispose
-class _good31__MyState extends State<MyWidget>
-    with SingleTickerProviderStateMixin {
+class _good31__MyState extends State<_RequireAnimDisposeHostWidget>
+    with SingleTickerProviderStateMixin<_RequireAnimDisposeHostWidget> {
   late final _controller = AnimationController(
     vsync: this,
     duration: Duration(seconds: 1),
@@ -127,6 +146,67 @@ class _good31__MyState extends State<MyWidget>
   @override
   void dispose() {
     _controller.dispose(); // or _controller.disposeSafe();
+    super.dispose();
+  }
+}
+
+// GOOD: extension disposeSafe() satisfies disposal
+class _good32DisposeSafe extends State<_RequireAnimDisposeHostWidget>
+    with SingleTickerProviderStateMixin<_RequireAnimDisposeHostWidget> {
+  late final _controller = AnimationController(
+    vsync: this,
+    duration: Duration(seconds: 1),
+  );
+
+  @override
+  void dispose() {
+    _controller.disposeSafe();
+    super.dispose();
+  }
+}
+
+// GOOD: null-aware disposeSafe()
+class _good33NullAwareDisposeSafe extends State<_RequireAnimDisposeHostWidget>
+    with SingleTickerProviderStateMixin<_RequireAnimDisposeHostWidget> {
+  late final AnimationController? _controller = AnimationController(
+    vsync: this,
+    duration: Duration(seconds: 1),
+  );
+
+  @override
+  void dispose() {
+    _controller?.disposeSafe();
+    super.dispose();
+  }
+}
+
+// GOOD: cascade disposeSafe()
+class _good34CascadeDisposeSafe extends State<_RequireAnimDisposeHostWidget>
+    with SingleTickerProviderStateMixin<_RequireAnimDisposeHostWidget> {
+  late final _controller = AnimationController(
+    vsync: this,
+    duration: Duration(seconds: 1),
+  );
+
+  @override
+  void dispose() {
+    _controller..disposeSafe();
+    super.dispose();
+  }
+}
+
+// BAD: disposeAll is not dispose / disposeSafe — must still report
+// expect_lint: require_animation_controller_dispose
+class _bad32DisposeAllOnly extends State<_RequireAnimDisposeHostWidget>
+    with SingleTickerProviderStateMixin<_RequireAnimDisposeHostWidget> {
+  late final _controller = AnimationController(
+    vsync: this,
+    duration: Duration(seconds: 1),
+  );
+
+  @override
+  void dispose() {
+    _controller.disposeAll();
     super.dispose();
   }
 }

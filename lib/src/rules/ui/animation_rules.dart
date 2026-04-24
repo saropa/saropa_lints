@@ -275,7 +275,7 @@ class RequireAnimationControllerDisposeRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'require_animation_controller_dispose',
-    '[require_animation_controller_dispose] Neglecting to dispose of an AnimationController when a widget is removed from the tree causes memory leaks and can lead to performance degradation, as the controller continues to consume resources and tick animations in the background. This can eventually crash your app or cause unexpected behavior. Always dispose of AnimationControllers to maintain optimal app performance. See https://api.flutter.dev/flutter/animation/AnimationController/dispose.html. {v2}',
+    '[require_animation_controller_dispose] Neglecting to dispose of an AnimationController when a widget is removed from the tree causes memory leaks and can lead to performance degradation, as the controller continues to consume resources and tick animations in the background. This can eventually crash your app or cause unexpected behavior. Always dispose of AnimationControllers to maintain optimal app performance. See https://api.flutter.dev/flutter/animation/AnimationController/dispose.html. {v3}',
     correctionMessage:
         'Call dispose on your AnimationController in the widget’s dispose method to release resources and prevent memory leaks. This is a core Flutter best practice for managing animation lifecycles. See https://api.flutter.dev/flutter/animation/AnimationController/dispose.html for details.',
     severity: DiagnosticSeverity.ERROR,
@@ -341,9 +341,12 @@ class RequireAnimationControllerDisposeRule extends SaropaLintRule {
 
       // Check if controllers are disposed
       for (final String name in controllerNames) {
+        // Accept `.dispose()` and `.disposeSafe()` (extension). `isFieldCleanedUp`
+        // matches `methodName(`, so `dispose` does not match `disposeSafe(`.
         final bool isDisposed =
             disposeMethodBody != null &&
-            isFieldCleanedUp(name, 'dispose', disposeMethodBody);
+            (isFieldCleanedUp(name, 'dispose', disposeMethodBody) ||
+                isFieldCleanedUp(name, 'disposeSafe', disposeMethodBody));
 
         if (!isDisposed) {
           for (final ClassMember member in node.body.members) {
@@ -2307,13 +2310,15 @@ class PreferSingleTickerProviderStateMixinRule extends SaropaLintRule {
 // avoid_implicit_animation_dispose_cast
 // =============================================================================
 
-/// Flags `(animation as CurvedAnimation).dispose()` in [ImplicitlyAnimatedWidgetState] subclasses.
+/// Flags `(animation as CurvedAnimation).dispose()` in
+/// `ImplicitlyAnimatedWidgetState` subclasses.
 ///
 /// ## Background (Flutter 3.7+)
 ///
 /// Framework PR [flutter/flutter#111849](https://github.com/flutter/flutter/pull/111849) changed
-/// **internal** implementation only: the implicit animation field is a [CurvedAnimation], so the
-/// engine disposes it without casting. Public API (`animation` still types as [Animation]) is
+/// **internal** implementation only: the implicit animation field is a
+/// `CurvedAnimation`, so the engine disposes it without casting. Public API
+/// (`animation` still types as `Animation`) is
 /// unchanged. Some codebases still contain snippets copied from older framework sources that call
 /// `dispose()` on that animation after casting—**the base state already disposes it in
 /// `super.dispose()`**, so this is redundant and can cause double-dispose or confusing lifecycle
@@ -2322,23 +2327,25 @@ class PreferSingleTickerProviderStateMixinRule extends SaropaLintRule {
 /// ## When this rule reports
 ///
 /// - The cast target type is exactly `CurvedAnimation` (named type, not heuristic string scan).
-/// - The expression is the `animation` **getter** declared on [ImplicitlyAnimatedWidgetState]
-///   (resolved via the element model, including `this.animation`).
+/// - The expression is the `animation` **getter** declared on
+///   `ImplicitlyAnimatedWidgetState` (resolved via the element model, including
+///   `this.animation`).
 /// - The cast is the **direct** receiver of `.dispose()` (parentheses around the cast allowed).
-/// - The enclosing class **extends** [ImplicitlyAnimatedWidgetState] (any depth up to Flutter’s
-///   base, e.g. [AnimatedWidgetBaseState] subclasses).
+/// - The enclosing class **extends** `ImplicitlyAnimatedWidgetState` (any depth up to Flutter’s
+///   base, e.g. `AnimatedWidgetBaseState` subclasses).
 ///
 /// ## When this rule does **not** report (false-positive avoidance)
 ///
 /// - `(animation as CurvedAnimation).curve` or any member other than `dispose`.
-/// - Casts in classes that do not inherit [ImplicitlyAnimatedWidgetState].
+/// - Casts in classes that do not inherit `ImplicitlyAnimatedWidgetState`.
 /// - A local or field named `animation` that is **not** the framework getter (resolved element).
 ///
 /// ## Performance
 ///
-/// - [requiredPatterns] includes `as CurvedAnimation` so files without that substring skip the
-///   rule before AST callbacks.
-/// - [applicableFileTypes] is [FileType.widget] to limit analysis to widget-like paths.
+/// - [SaropaLintRule.requiredPatterns] includes `as CurvedAnimation` so files
+///   without that substring skip the rule before AST callbacks.
+/// - [SaropaLintRule.applicableFileTypes] is [FileType.widget] to limit analysis
+///   to widget-like paths.
 ///
 /// Since: v9.10.1 | Rule version: v1
 ///
@@ -2363,7 +2370,7 @@ class PreferSingleTickerProviderStateMixinRule extends SaropaLintRule {
 /// }
 /// ```
 ///
-/// **GOOD:** Cast for APIs on [CurvedAnimation] other than `dispose` is not reported.
+/// **GOOD:** Cast for APIs on `CurvedAnimation` other than `dispose` is not reported.
 /// ```dart
 /// final curve = (animation as CurvedAnimation).curve;
 /// ```
