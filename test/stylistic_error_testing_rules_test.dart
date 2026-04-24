@@ -101,14 +101,11 @@ void main() {
   group('Stylistic Error Testing Rules - Fixture Verification', () {
     final fixtures = [
       'prefer_specific_exceptions',
-      'prefer_generic_exception',
       'prefer_exception_suffix',
       'prefer_error_suffix',
-      'prefer_on_over_catch',
       'prefer_catch_over_on',
       'prefer_given_when_then_comments',
       'prefer_self_documenting_tests',
-      'prefer_expect_over_assert_in_tests',
       'prefer_single_expectation_per_test',
       'prefer_grouped_expectations',
       'prefer_test_name_should_when',

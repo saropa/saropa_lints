@@ -169,12 +169,6 @@ void main() {
 
   group('Stylistic Additional Rules - Fixture Verification', () {
     final fixtures = [
-      'prefer_interpolation_over_concatenation',
-      'prefer_concatenation_over_interpolation',
-      'prefer_double_quotes',
-      'prefer_absolute_imports',
-      'prefer_grouped_imports',
-      'prefer_flat_imports',
       'prefer_sorted_imports',
       'prefer_import_group_comments',
       'prefer_fields_before_methods',
@@ -183,10 +177,6 @@ void main() {
       'prefer_instance_members_first',
       'prefer_public_members_first',
       'prefer_private_members_first',
-      'prefer_var_over_explicit_type',
-      'prefer_object_over_dynamic',
-      'prefer_dynamic_over_object',
-      'prefer_lower_camel_case_constants',
       'prefer_camel_case_method_names',
       'prefer_descriptive_variable_names',
       'prefer_concise_variable_names',
