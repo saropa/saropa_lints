@@ -37,7 +37,7 @@ linter:
 
 plugins:
   saropa_lints:
-    version: "12.4.1"
+    version: "12.4.2"
     # ═══════════════════════════════════════════════════════════════════
     # SAROPA LINTS CONFIGURATION
     # ═══════════════════════════════════════════════════════════════════
@@ -211,7 +211,7 @@ plugins:
       prefer_utc_for_storage: true  # [WARNING] Local time stored without UTC conversion causes incorrect values when restored in different timezones. {v4}
       provide_correct_intl_args: true  # [ERROR] Intl.message args count does not match placeholders. This will cause runtime errors. {v2}
       require_android_permission_request: true  # [ERROR] Permission-gated API called without runtime permission request. Android 6+ will deny access or crash. {v2}
-      require_animation_controller_dispose: true  # [ERROR] Neglecting to dispose of an AnimationController when a widget is removed from the tree causes memory leaks and can lead to performance degradation, as the controller continues to consume resources and tick animations in the background. This can eventually crash your app or cause unexpected behavior. Always dispose of AnimationControllers to maintain optimal app performance. See https://api.flutter.dev/flutter/animation/AnimationController/dispose.html. {v2}
+      require_animation_controller_dispose: true  # [ERROR] Neglecting to dispose of an AnimationController when a widget is removed from the tree causes memory leaks and can lead to performance degradation, as the controller continues to consume resources and tick animations in the background. This can eventually crash your app or cause unexpected behavior. Always dispose of AnimationControllers to maintain optimal app performance. See https://api.flutter.dev/flutter/animation/AnimationController/dispose.html. {v3}
       require_animation_disposal: true  # [WARNING] Failing to dispose an AnimationController in the dispose() method causes it to retain resources, listeners, and animation frames, resulting in memory leaks and degraded performance. This is especially problematic in widgets that are frequently created and destroyed, such as in lists or navigation stacks, and can lead to app instability or crashes. Dispose every AnimationController to keep Flutter apps robust. {v7}
       require_animation_ticker_disposal: true  # [ERROR] If you do not stop your Ticker in dispose(), it will continue running and leak memory, causing slowdowns and error messages. This can degrade performance and lead to crashes in long-running apps. {v2}
       require_app_startup_error_handling: true  # [WARNING] runApp() is called without runZonedGuarded or FlutterError.onError. Uncaught errors during app startup will crash the application silently with no crash report sent to monitoring services. Users see a blank or frozen screen with no diagnostic information available to the development team. {v3}

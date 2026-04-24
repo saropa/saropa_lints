@@ -112,7 +112,7 @@ Compute a single 0–100 score from violations.json. This becomes the number tha
 | H4 | **Score in Code Lens** | *(done)* Per-file: "Saropa: 3 issues (2 critical) — Show in Saropa". Optional file-level health indicator. | W2 (Code Lens, already done — extend it) |
 | H5 | **Score history** | *(done)* Score persisted in `RunSnapshot.score` via `runHistory.ts`. `findPreviousScore()` shared helper. | W5 (trends), celebration, Overview |
 
-**Why this matters:** CodeScene built a business around "Code Health" — a single score with proven correlation to defect rates. Sourcery does function-level quality scores (0–100%). Neither exists for Dart. Saropa's score has a richer input signal (impact levels, OWASP, 2050+ rules) than either.
+**Why this matters:** CodeScene built a business around "Code Health" — a single score with proven correlation to defect rates. Sourcery does function-level quality scores (0–100%). Neither exists for Dart. Saropa's score has a richer input signal (impact levels, OWASP, 2100+ rules) than either.
 
 ---
 
@@ -234,7 +234,7 @@ The order follows the data pipeline: build the score first, then the features th
 | Feature | ESLint | SonarQube IDE | CodeScene | Sourcery | **Saropa Lints** |
 |---------|--------|---------------|-----------|----------|-------------------|
 | Squiggles + Problems | Yes | Yes | Yes | Yes | Yes |
-| Quick fixes | Yes | AI CodeFix | AI refactor | AI suggestions | Yes (2050+ rules) |
+| Quick fixes | Yes | AI CodeFix | AI refactor | AI suggestions | Yes (2100+ rules) |
 | Code Health Score | No | No (server only) | Yes | Per-function | **Yes (project + file)** |
 | OWASP mapping | No | Server only | No | No | **Yes (every violation)** |
 | Security Posture view | No | Server only | No | No | **Yes** |

@@ -1,12 +1,14 @@
 # BUG: `require_animation_controller_dispose` — Fires on `_controller.disposeSafe()` despite docs listing it as a valid pattern
 
-**Status: Open**
+**Status: Closed**
+
+**Resolved in:** v12.4.3 (same release line)
 
 Created: 2026-04-24
 Rule: `require_animation_controller_dispose`
 File: `lib/src/rules/ui/animation_rules.dart` (line 346)
 Severity: False positive (High — forces `// ignore:` on an officially-documented disposal pattern)
-Rule version: v2 | Since: unknown | Updated: unknown
+Rule version: v2 | Since: unknown | Updated: v3
 
 ---
 
@@ -180,13 +182,7 @@ The animation rule needs the same OR with `'disposeSafe'`.
 
 The `.dispose()`, `?.dispose()`, `..dispose()` shapes work because the regex's `(\.|\?\.)` branch handles `.` and `?.`, and `..dispose(` contains `.dispose(` as a substring so it matches. The three `disposeSafe` shapes do **not** work for the reason above. Docs were written as if both method names were checked; the implementation only checks one.
 
-A second, smaller docstring inconsistency lives at `lib/src/target_matcher_utils.dart:54`:
-
-```
-/// - Safe-call variants: `name?.disposeSafe(`
-```
-
-This implies the helper itself handles `*Safe` variants, but it does not — the caller must pass `methodName: 'disposeSafe'` explicitly.
+A second, smaller docstring inconsistency lived at `lib/src/target_matcher_utils.dart:54` (removed on fix): it implied the helper itself handles `*Safe` variants, but it does not — the caller must pass `methodName: 'disposeSafe'` explicitly.
 
 ---
 
@@ -230,13 +226,17 @@ for (final String name in controllerNames) {
 
 ## Changes Made
 
-<!-- Fill in when a fix is written. -->
+- `RequireAnimationControllerDisposeRule`: treat `disposeSafe(` like `dispose(` via a second `isFieldCleanedUp` check; bump rule message token to `{v3}`.
+- `isFieldCleanedUp` dartdoc: drop misleading safe-variant bullet; note callers pass the exact method name for extensions.
+- `example/lib/animation/require_animation_controller_dispose_fixture.dart`: extension + `.disposeSafe` / `?.disposeSafe` / `..disposeSafe` GOOD cases, `disposeAll` BAD case, local `StatefulWidget` host + typed `SingleTickerProviderStateMixin` so the file analyzes.
+- `scripts/modules/_rule_metrics.py`: exclude `BUG_REPORT_GUIDE.md` from root-level unsolved bug counts (with `INDEX.md`).
+- `analysis_options.yaml`: comment line for this rule updated to `{v3}`.
 
 ---
 
 ## Tests Added
 
-<!-- List new or updated fixture/test files and what they verify. -->
+- Fixture coverage only (`require_animation_controller_dispose_fixture.dart`).
 
 ---
 

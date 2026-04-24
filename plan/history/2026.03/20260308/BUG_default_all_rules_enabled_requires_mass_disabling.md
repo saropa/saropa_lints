@@ -26,7 +26,7 @@ severity override) are registered.
   field. `disabledRules` kept as safety net for `severities: false`.
 - **`bin/init.dart`**: Removed Section 4 (disabled rules by tier with `false`
   entries) and disabled stylistic subsection from generated YAML. Essential
-  tier YAML shrinks from ~2050 entries to ~300.
+  tier YAML shrinks from ~2100 entries to ~300.
 
 ### Fallback
 

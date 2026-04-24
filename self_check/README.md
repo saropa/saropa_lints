@@ -10,7 +10,7 @@ The root `analysis_options.yaml` includes `package:saropa_lints/tiers/pedantic.y
 dart analyze
 ```
 
-This runs all ~2050 rules on the saropa_lints codebase. To use a lower tier (fewer issues), edit the root `analysis_options.yaml` and change the `include` to e.g. `package:saropa_lints/tiers/recommended.yaml`.
+This runs all ~2100 rules on the saropa_lints codebase. To use a lower tier (fewer issues), edit the root `analysis_options.yaml` and change the `include` to e.g. `package:saropa_lints/tiers/recommended.yaml`.
 
 ## Optional: run from this package
 
