@@ -2962,6 +2962,13 @@ class RenderObject {
   void markNeedsLayout() {}
 }
 
+/// Minimal base for [RenderObjectElement] migration rules (see migration fixtures).
+class RenderObjectElement {
+  void insertRenderObjectChild(RenderObject child, Object? slot) {}
+  void moveRenderObjectChild(RenderObject child, Object? newSlot) {}
+  void removeRenderObjectChild(RenderObject child) {}
+}
+
 class CustomPainter {
   void paint(Canvas canvas, Size size) {}
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
@@ -3313,6 +3320,10 @@ class LinearProgressIndicator extends Widget {
   });
 }
 
+class ButtonBar extends Widget {
+  const ButtonBar({super.key, List<Widget>? children, dynamic alignment});
+}
+
 class OverflowBar extends Widget {
   const OverflowBar({super.key, List<Widget>? children, double? spacing});
 }
@@ -3397,8 +3408,14 @@ class ThemeData {
     dynamic scaffoldBackgroundColor,
     dynamic indicatorColor,
     dynamic tabBarTheme,
+    dynamic useMaterial3,
     dynamic buttonBarTheme,
   }) => ThemeData();
+}
+
+class SurfaceProducer {
+  void Function()? onSurfaceCleanup;
+  void Function()? onSurfaceDestroyed;
 }
 
 class _ColorScheme {
