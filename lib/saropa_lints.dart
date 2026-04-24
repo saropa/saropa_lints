@@ -3026,6 +3026,18 @@ Map<String, SaropaLintRule Function()> _buildRuleFactoriesMap() {
   }
 
   _rulesWithFixesSet = fixes;
+
+  // Publish both sets to the reporter so the TOP RULES table and the
+  // triage synthesis can classify each rule as saropa-authored /
+  // fixable without re-instantiating anything. Done here (rather than
+  // from `registerSaropaLintRules`) because this path is the single
+  // place where both sets are fully computed — the scan CLI path and
+  // the plugin path both flow through the same lazy factory build.
+  AnalysisReporter.setPluginRuleMetadata(
+    saropaRuleNames: map.keys.toSet(),
+    fixableRuleNames: fixes,
+  );
+
   return map;
 }
 
