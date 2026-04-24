@@ -155,6 +155,22 @@ export const catalogEntries: readonly CatalogEntry[] = [
     category: 'Analysis',
     icon: 'output',
   },
+  {
+    command: 'saropaLints.copyLatestReport',
+    title: 'Copy Latest Report',
+    description:
+      'Copy the most recent analysis report (reports/<date>/*_saropa_lint_report.log) to the clipboard.',
+    category: 'Analysis',
+    icon: 'clippy',
+  },
+  {
+    command: 'saropaLints.openLatestReport',
+    title: 'Open Latest Report',
+    description:
+      'Open the most recent analysis report (reports/<date>/*_saropa_lint_report.log) in an editor tab.',
+    category: 'Analysis',
+    icon: 'file-text',
+  },
 
   // ── Violations & Filtering ───────────────────────────────────────────────
 

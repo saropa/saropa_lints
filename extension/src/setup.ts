@@ -349,13 +349,32 @@ function showAnalysisIssuesNotification(workspaceRoot: string, scope?: string): 
   const installed = resolveSaropaLintsVersion(workspaceRoot);
   const message = formatAnalysisIssuesMessage(total, scope, installed?.version);
 
-  void vscode.window.showWarningMessage(message, 'View Violations', 'Show Output').then((choice) => {
-    if (choice === 'View Violations') {
-      void vscode.commands.executeCommand('saropaLints.focusIssues');
-    } else if (choice === 'Show Output') {
-      void vscode.commands.executeCommand('saropaLints.showOutput');
-    }
-  });
+  // Two new actions — "Copy Report" and "Open Report" — land alongside
+  // the existing buttons rather than replacing them, so users who relied
+  // on the sidebar / output-channel flow keep their muscle memory. The
+  // two new actions target the Dart plugin's consolidated
+  // `*_saropa_lint_report.log` (top rules, concentration, triage) since
+  // that's the report users need to copy into a chat / issue / email or
+  // scroll through themselves.
+  void vscode.window
+    .showWarningMessage(
+      message,
+      'View Violations',
+      'Copy Report',
+      'Open Report',
+      'Show Output',
+    )
+    .then((choice) => {
+      if (choice === 'View Violations') {
+        void vscode.commands.executeCommand('saropaLints.focusIssues');
+      } else if (choice === 'Copy Report') {
+        void vscode.commands.executeCommand('saropaLints.copyLatestReport');
+      } else if (choice === 'Open Report') {
+        void vscode.commands.executeCommand('saropaLints.openLatestReport');
+      } else if (choice === 'Show Output') {
+        void vscode.commands.executeCommand('saropaLints.showOutput');
+      }
+    });
 }
 
 export async function runAnalysis(context: vscode.ExtensionContext): Promise<boolean> {

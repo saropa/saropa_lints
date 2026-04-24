@@ -62,7 +62,7 @@ import {
 } from './healthScore';
 import { registerInlineAnnotations, updateAnnotationsForAllEditors, invalidateAnnotationCache } from './inlineAnnotations';
 import { writeRuleOverrides, removeRuleOverrides, invalidateDisabledRulesCache } from './configWriter';
-import { logReport, logSection, flushReport } from './reportWriter';
+import { logReport, logSection, flushReport, findLatestAnalysisReport } from './reportWriter';
 import { generateOwaspReport } from './owaspExport';
 import { getProjectRoot, invalidateProjectRoot } from './projectRoot';
 import {
@@ -1038,6 +1038,70 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       });
     }),
     vscode.commands.registerCommand('saropaLints.showOutput', showOutputChannel),
+    // "Copy Latest Report" — grabs the newest `*_saropa_lint_report.log`
+    // (the Dart plugin's consolidated analysis report with top rules,
+    // concentration, and triage sections) and puts its full contents on
+    // the clipboard. Lets users paste directly into a chat / issue /
+    // email without navigating date folders. Chosen over exporting a
+    // curated subset: the whole report is small enough (< 1 MB on the
+    // real contacts project even with 14k issues), and users who pipe
+    // into an LLM always want the full header + every section.
+    vscode.commands.registerCommand('saropaLints.copyLatestReport', async () => {
+      const root = getProjectRoot();
+      if (!root) {
+        vscode.window.showErrorMessage('No workspace folder open.');
+        return;
+      }
+      const reportPath = findLatestAnalysisReport(root);
+      if (!reportPath) {
+        vscode.window.showWarningMessage(
+          'Saropa Lints: no analysis report found under reports/. Run "Saropa Lints: Run Analysis" first.',
+        );
+        return;
+      }
+      try {
+        const content = fs.readFileSync(reportPath, 'utf-8');
+        await vscode.env.clipboard.writeText(content);
+        // Show the resolved filename so users who have multiple runs in
+        // flight can confirm which one landed on their clipboard.
+        const name = path.basename(reportPath);
+        void vscode.window.showInformationMessage(`Copied ${name} to clipboard.`);
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        void vscode.window.showErrorMessage(
+          `Saropa Lints: failed to read report — ${message}`,
+        );
+      }
+    }),
+    // "Open Latest Report" — opens the newest `*_saropa_lint_report.log`
+    // in an editor tab. Preview mode is off (preserveFocus: false, preview:
+    // false) because users who explicitly asked to open the report want
+    // a persistent tab, not a fleeting peek that gets replaced by the
+    // next file they click.
+    vscode.commands.registerCommand('saropaLints.openLatestReport', async () => {
+      const root = getProjectRoot();
+      if (!root) {
+        vscode.window.showErrorMessage('No workspace folder open.');
+        return;
+      }
+      const reportPath = findLatestAnalysisReport(root);
+      if (!reportPath) {
+        vscode.window.showWarningMessage(
+          'Saropa Lints: no analysis report found under reports/. Run "Saropa Lints: Run Analysis" first.',
+        );
+        return;
+      }
+      try {
+        const uri = vscode.Uri.file(reportPath);
+        const doc = await vscode.workspace.openTextDocument(uri);
+        await vscode.window.showTextDocument(doc, { preview: false });
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        void vscode.window.showErrorMessage(
+          `Saropa Lints: failed to open report — ${message}`,
+        );
+      }
+    }),
     // D2: Export OWASP Compliance Report as markdown.
     vscode.commands.registerCommand('saropaLints.exportOwaspReport', async () => {
       const root = getProjectRoot();
