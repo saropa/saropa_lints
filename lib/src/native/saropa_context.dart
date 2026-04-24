@@ -172,7 +172,13 @@ class SaropaContext {
     // entries from Plugin.start() also flush here.
     PluginLogger.setProjectRoot(projectRoot);
     loadNativePluginConfigFromProjectRoot(projectRoot);
-    _captureReportConfigSnapshot();
+    // Pass the resolved projectRoot so `getPackageVersion` can locate the
+    // consumer project's `.dart_tool/package_config.json`. Without this the
+    // lookup falls back to `Directory.current`, which is rarely the consumer
+    // project inside the analyzer-plugin isolate — and the report header
+    // prints `Version: unknown`, making it impossible to tell which
+    // saropa_lints version is actually producing the diagnostics.
+    _captureReportConfigSnapshot(projectRoot);
   }
 
   /// Capture the resolved rule configuration into [AnalysisReporter] so the
@@ -193,14 +199,17 @@ class SaropaContext {
   /// already calls [AnalysisReporter.setAnalysisConfig] with full data).
   /// Stored as empty lists so the existing config writer renders the
   /// known parts without guessing the unknown ones.
-  static void _captureReportConfigSnapshot() {
+  static void _captureReportConfigSnapshot(String projectRoot) {
     final enabled = SaropaLintRule.enabledRules;
     final disabled = SaropaLintRule.disabledRules;
     if (enabled == null || enabled.isEmpty) return;
 
     AnalysisReporter.setAnalysisConfig(
       ReportConfig(
-        version: getPackageVersion(),
+        // Pass projectRoot explicitly — Directory.current is NOT the
+        // consumer project inside the analyzer-plugin isolate, so the
+        // default relative lookup silently returns 'unknown'.
+        version: getPackageVersion(projectRoot: projectRoot),
         // "plugin" rather than a tier name — the analyzer plugin path
         // receives a rule set directly, never a tier enum. The scan CLI
         // path, which does resolve a tier, already sets its own config.
