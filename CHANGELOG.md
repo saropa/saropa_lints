@@ -35,6 +35,26 @@
 
 ---
 
+## [Unreleased]
+
+`saropa_depend_on_referenced_packages` has been removed. The Dart SDK already ships the same lint via `package:lints/core.yaml` and it works — saropa's parallel implementation kept false-positive-firing on legitimate imports (most recently the project's own `package:<ownPkg>/...` imports across thousands of files in real Flutter projects). Users keep the check through `flutter_lints` / `lints`; no config change required on your end.
+
+### Removed
+
+- **`saropa_depend_on_referenced_packages` rule deleted entirely.** The Dart SDK already ships `depend_on_referenced_packages` via `package:lints/core.yaml` (transitively via `package:flutter_lints/flutter.yaml`), and the SDK implementation is tested against every pubspec shape in the Dart ecosystem. Saropa's parallel implementation kept firing on legitimate imports — most recently on the project's own `package:<ownPkg>/...` imports in real Flutter projects, where the `ownName` / `hasDependency` guards were silently failing at plugin runtime despite my simulation saying they should pass. After one rename (`depend_on_referenced_packages` → `saropa_depend_on_referenced_packages`) and one parser repair (`multiLine: true`) failed to hold the fix in production, the rule is now gone: the homegrown pubspec parser underneath it is too brittle to maintain in parallel with the SDK lint, and the right thing to do is delegate. **Users still get the same check** from `flutter_lints` / `lints` if they include either — no replacement config is required. Anyone with `saropa_depend_on_referenced_packages: true` explicitly set in their `analysis_options.yaml` `plugins:` block will see the line quietly ignored by the analyzer (no error, no warning); safe to delete on your next cleanup pass. Removed from [config_rules.dart](lib/src/rules/config/config_rules.dart) (class + `LintCode` + `_packageUri` regex + runner), [saropa_lints.dart](lib/saropa_lints.dart) `_allRuleFactories`, [tiers.dart](lib/src/tiers.dart) `essentialRules`, and [config_rules_test.dart](test/config_rules_test.dart) (unit test + placeholder group). Removal comments are left in-place at each former registration site explaining the history — so a future reader doesn't reintroduce the rule and walk back into the same false-positive storm. Full Dart test suite: 8,585 passing. Full extension suite: 817 passing, 1 failing (pre-existing `saropaLints.verifyPlugin` catalog mismatch, unrelated).
+
+---
+
+## [12.4.2]
+
+<details><summary>Maintenance</summary>
+
+- **`scripts/publish.py`: Marketplace + Open VSX store-publication verification now runs at the end of every publish flow that touches the stores, not just the full pipeline.** Modes 6 (Extension only) and 7 (Publish existing .vsix) previously ended immediately after `vsce publish` returned 0, so the silent-Marketplace-drop case (expired PAT, missing scope, vsce returning success without propagation) was undetected unless the user happened to be running the full publish flow. The verification block — poll Marketplace + Open VSX every 30s for up to 10 min, warn loudly on Marketplace failure and auto-open the publisher manage page — was extracted from `run_full_publish` into a shared `_verify_marketplace_and_ovsx` helper in [_publish_workflow.py](scripts/modules/_publish_workflow.py) and wired into `run_extension_only_mode` and `run_publish_existing_vsix_mode`. Mode 7 derives the expected version from the `.vsix` filename via a new `_version_from_vsix_filename` helper rather than `extension/package.json`, because that mode is specifically used to publish an older `.vsix` while `package.json` already points at the next pre-bumped version — filename is the source of truth for what was actually packaged. No change to rule behavior, no change to the `.vsix` artifact.
+
+</details>
+
+---
+
 ## [12.4.1]
 
 The analysis report now prints the real saropa_lints version in its header instead of `Version: unknown`, so every report file is self-identifying and you can tell at a glance which plugin build produced a given diagnostic set. The VS Code extension's own report and the post-analysis notification now include the resolved saropa_lints version + source too — no more opening files to answer "which plugin build is actually running?". The post-analysis popup adds `[Copy Report]` and `[Open Report]` buttons so you can grab the full report in one click without navigating `reports/<date>/` by hand. `avoid_color_only_meaning` no longer flags theme-adaptive ternaries — `ColoredBox(color: ThemeUtils.isDarkMode ? ... : ...)` and its platform / directionality siblings pass clean, so you can stop scattering `// ignore:` comments over ordinary theming code. `prefer_final_locals` no longer fires on variables that *are* reassigned inside `if` bodies, closures, `try`/`catch`, `switch` cases, `for`/`while`/`do` bodies, or any nested block — a single-project sweep dropped 148 false positives and the rule is safe to re-enable in projects that had disabled it.
