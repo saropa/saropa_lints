@@ -8,11 +8,23 @@ import 'package:saropa_lints/src/init/display.dart';
 import 'package:saropa_lints/src/init/log_writer.dart';
 import 'package:saropa_lints/src/tiers.dart' as tiers;
 
-/// Get saropa_lints rootUri from .dart_tool/package_config.json.
+/// Get saropa_lints rootUri from `<projectRoot>/.dart_tool/package_config.json`.
+///
+/// [projectRoot] is the absolute path to the consumer project. When null,
+/// falls back to a relative lookup (which only works when `Directory.current`
+/// IS the consumer project — true for the saropa_lints CLI commands, but
+/// NOT true when the analyzer plugin isolate invokes this helper). Passing
+/// an explicit [projectRoot] is required from the plugin path — otherwise
+/// the report header prints `Version: unknown` and users can't tell which
+/// saropa_lints version produced their diagnostics.
+///
 /// Returns null if not found.
-String? getSaropaLintsRootUri() {
+String? getSaropaLintsRootUri({String? projectRoot}) {
   try {
-    final packageConfigFile = File('.dart_tool/package_config.json');
+    final String configPath = projectRoot != null && projectRoot.isNotEmpty
+        ? '$projectRoot/.dart_tool/package_config.json'
+        : '.dart_tool/package_config.json';
+    final packageConfigFile = File(configPath);
     if (!packageConfigFile.existsSync()) return null;
 
     final content = packageConfigFile.readAsStringSync();
@@ -36,12 +48,19 @@ String? getSaropaLintsRootUri() {
 ///
 /// For `file://` URIs, uses [Uri.tryParse] so malformed values return null
 /// instead of throwing (see `prefer_try_parse_for_dynamic_data`).
-String? rootUriToPath(String rootUri) {
+///
+/// For `../` relative URIs (hosted pub cache entries), resolves against
+/// `<projectRoot>/.dart_tool/` when [projectRoot] is supplied, falling
+/// back to the current directory otherwise — same cwd trap that affects
+/// [getSaropaLintsRootUri].
+String? rootUriToPath(String rootUri, {String? projectRoot}) {
   if (rootUri.startsWith('file://')) {
     final uri = Uri.tryParse(rootUri);
     return uri?.toFilePath();
   } else if (rootUri.startsWith('../')) {
-    final dartToolDir = Directory('.dart_tool').absolute.path;
+    final String dartToolDir = projectRoot != null && projectRoot.isNotEmpty
+        ? Directory('$projectRoot/.dart_tool').absolute.path
+        : Directory('.dart_tool').absolute.path;
     return Directory('$dartToolDir/$rootUri').absolute.path;
   }
 
@@ -49,12 +68,19 @@ String? rootUriToPath(String rootUri) {
 }
 
 /// Get package version by reading pubspec.yaml from package location.
-String getPackageVersion() {
+///
+/// Pass [projectRoot] (absolute path to the consumer project) from the
+/// analyzer-plugin path — without it the lookup uses `Directory.current`,
+/// which is rarely the consumer project inside a plugin isolate. The CLI
+/// commands (`saropa_lints:init`, `saropa_lints:write_config`) invoke
+/// this from a shell whose cwd IS the consumer project, so they can keep
+/// calling with no argument.
+String getPackageVersion({String? projectRoot}) {
   try {
-    final rootUri = getSaropaLintsRootUri();
+    final rootUri = getSaropaLintsRootUri(projectRoot: projectRoot);
     if (rootUri == null) return 'unknown';
 
-    final packageDir = rootUriToPath(rootUri);
+    final packageDir = rootUriToPath(rootUri, projectRoot: projectRoot);
     if (packageDir == null) return 'unknown';
 
     final pubspecFile = File('$packageDir/pubspec.yaml');
