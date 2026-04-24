@@ -16,9 +16,8 @@
 /// root is not yet known (see `config_loader`), so the log file path cannot
 /// be resolved. Early log events are buffered in memory (capped at
 /// [_maxBufferSize] entries — enough for startup diagnostics, not unbounded).
-/// Once [setProjectRoot] is called from
-/// [SaropaContext._ensureConfigLoadedFromProjectRoot] — which happens on the
-/// first visitor invocation that has a usable file path — the buffer is
+/// Once [setProjectRoot] is called after the plugin resolves the project
+/// root from the first analyzed file path, the buffer is
 /// flushed to disk and subsequent calls write directly.
 ///
 /// **What gets logged.** Config-loader silent-failure paths (missing

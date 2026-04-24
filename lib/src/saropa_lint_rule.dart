@@ -2246,7 +2246,7 @@ abstract class SaropaLintRule extends AnalysisRule {
   RuleStatus get ruleStatus => RuleStatus.ready;
 
   /// CWE identifiers this rule helps prevent or detect.
-  /// https://cwe.mitre.org/ — e.g. [798] for CWE-798 (Hardcoded Credentials).
+  /// https://cwe.mitre.org/ — e.g. CWE-798 (Hardcoded Credentials).
   List<int> get cweIds => const <int>[];
 
   /// CERT coding standard identifiers (e.g. STR02-C). Populate only where
@@ -2716,7 +2716,8 @@ abstract class SaropaLintRule extends AnalysisRule {
 
   /// Check if this rule is disabled via configuration.
   ///
-  /// Returns true if [disabledRules] contains this rule's `code.lowerCaseName` or any
+  /// Returns true if [SaropaLintRule.disabledRules] contains this rule's
+  /// `code.lowerCaseName` or any
   /// [configAliases], so config using an alias (e.g. `require_riverpod_lint_package: false`)
   /// correctly disables the rule.
   bool get isDisabled {

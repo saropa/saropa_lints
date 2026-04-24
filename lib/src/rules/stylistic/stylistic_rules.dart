@@ -4937,7 +4937,7 @@ class UseTruncatingDivisionRule extends SaropaLintRule {
 /// Flags when the same diagnostic is listed more than once in a single
 /// `// ignore:` or `// ignore_for_file:` comment (e.g. `// ignore: rule_a, rule_a`).
 ///
-/// Detection: [addCompilationUnit], scan source lines with regex for
+/// Detection: [SaropaContext.addCompilationUnit], scan source lines with regex for
 /// `// ignore:` / `// ignore_for_file:`, split trailing list by comma,
 /// normalize names (lowercase, hyphen→underscore), report if any name
 /// appears more than once. Does not honor or suppress other rules.

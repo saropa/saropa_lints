@@ -41,8 +41,8 @@ class SaropaLintsPlugin extends Plugin {
   /// from analysis_options / SAROPA env vars before rules are registered.
   ///
   /// Logs the start event via [PluginLogger] — the entry will be buffered
-  /// in memory until [SaropaContext._ensureConfigLoadedFromProjectRoot]
-  /// calls [PluginLogger.setProjectRoot] on the first analyzed file, then
+  /// in memory until [loadNativePluginConfigFromProjectRoot] runs and
+  /// [PluginLogger.setProjectRoot] is called on the first analyzed file, then
   /// flushed to `reports/.saropa_lints/plugin.log` so users have a visible
   /// surface confirming the plugin actually started.
   @override
