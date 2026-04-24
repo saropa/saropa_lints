@@ -13,6 +13,7 @@ import 'package:analyzer/dart/element/type.dart';
 
 import '../../fixes/animation/prefer_animation_controller_forward_from_zero_fix.dart';
 import '../../fixes/animation/prefer_listenable_builder_fix.dart';
+import '../../fixes/animation/prefer_single_ticker_provider_state_mixin_fix.dart';
 import '../../fixes/animation/remove_redundant_implicit_animation_dispose_fix.dart';
 import '../../implicit_animation_dispose_cast_ast.dart';
 import '../../saropa_lint_rule.dart';
@@ -2126,6 +2127,178 @@ class AvoidMultipleAnimationControllersRule extends SaropaLintRule {
       if (controllerCount >= _threshold) {
         reporter.atToken(node.namePart.typeName);
       }
+    });
+  }
+}
+
+// =============================================================================
+// prefer_single_ticker_provider_state_mixin
+// =============================================================================
+
+/// Flags `State` subclasses that mix in `TickerProviderStateMixin` but declare
+/// exactly one `AnimationController`, recommending the
+/// `SingleTickerProviderStateMixin` variant instead.
+///
+/// `TickerProviderStateMixin` carries per-instance bookkeeping for a list of
+/// tickers; `SingleTickerProviderStateMixin` stores a single nullable ticker.
+/// When only one controller exists, the plural variant allocates machinery
+/// it will never use. The Flutter framework's own documentation recommends
+/// the Single variant as the default for single-controller state — it is
+/// cheaper and intent-revealing to any reader scanning the class header.
+///
+/// Forms a staircase with its neighbors (by controller count):
+/// - 1 controller + plural mixin → **this rule** (prefer Single)
+/// - 2 controllers + plural mixin → correct, no lint
+/// - 3+ controllers → [AvoidMultipleAnimationControllersRule]
+///
+/// Since: v12.4.0 | Rule version: v1
+///
+/// **BAD:**
+/// ```dart
+/// class _MyState extends State<MyWidget>
+///     with TickerProviderStateMixin {
+///   late final AnimationController _controller; // only one controller
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class _MyState extends State<MyWidget>
+///     with SingleTickerProviderStateMixin {
+///   late final AnimationController _controller;
+/// }
+/// ```
+///
+/// **GOOD:** (plural mixin is correct when there are 2+ controllers)
+/// ```dart
+/// class _MultiState extends State<MultiWidget>
+///     with TickerProviderStateMixin {
+///   late final AnimationController _fadeController;
+///   late final AnimationController _slideController;
+/// }
+/// ```
+class PreferSingleTickerProviderStateMixinRule extends SaropaLintRule {
+  PreferSingleTickerProviderStateMixinRule() : super(code: _code);
+
+  /// Idiomatic improvement, not a correctness bug. The plural mixin allocates
+  /// a list-of-tickers per instance; the Single variant stores one nullable
+  /// ticker. Cheap perf win plus intent-revealing.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'ui', 'animation'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  /// Early-exit gate — files without the plural mixin token skip AST
+  /// registration entirely.
+  @override
+  Set<String>? get requiredPatterns => {'TickerProviderStateMixin'};
+
+  static const LintCode _code = LintCode(
+    'prefer_single_ticker_provider_state_mixin',
+    '[prefer_single_ticker_provider_state_mixin] This State class declares '
+        'only one AnimationController but mixes in TickerProviderStateMixin, '
+        'which exists for multi-ticker states and allocates a list for the '
+        'additional tickers it will never receive here. '
+        'SingleTickerProviderStateMixin is the framework default for '
+        'single-controller state — cheaper at runtime and intent-revealing to '
+        'any reader scanning the class header. {v1}',
+    correctionMessage:
+        'Replace TickerProviderStateMixin with '
+        'SingleTickerProviderStateMixin. Both live in '
+        'package:flutter/widgets.dart and expose the same "vsync: this" '
+        'protocol, so no other changes are needed.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        PreferSingleTickerProviderStateMixinFix(context: context),
+  ];
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addClassDeclaration((ClassDeclaration node) {
+      // Gate 1: must extend State<T>. Mirrors the shape already in use by
+      // AvoidMultipleAnimationControllersRule and RequireAnimationControllerDisposeRule.
+      // State without type arguments is unresolved Flutter state — skipping
+      // avoids firing on generic/abstract scaffolding.
+      final ExtendsClause? extendsClause = node.extendsClause;
+      if (extendsClause == null) return;
+      final NamedType superclass = extendsClause.superclass;
+      if (superclass.name.lexeme != 'State') return;
+      if (superclass.typeArguments == null) return;
+
+      // Gate 2: class must declare TickerProviderStateMixin in its own
+      // WithClause. We don't resolve mixins up the supertype chain — a
+      // subclass that inherits the mixin from a parent State is not this
+      // rule's target. Scope stays tight and false positives stay low.
+      final WithClause? withClause = node.withClause;
+      if (withClause == null) return;
+
+      NamedType? mixinNamedType;
+      for (final NamedType mixin in withClause.mixinTypes) {
+        if (mixin.name.lexeme == 'TickerProviderStateMixin') {
+          mixinNamedType = mixin;
+          break;
+        }
+      }
+      if (mixinNamedType == null) return;
+
+      // Gate 3: count AnimationController fields using the same heuristic as
+      // AvoidMultipleAnimationControllersRule so the staircase stays
+      // consistent. Collections naturally drop out here — `List<AnimationController>`
+      // has NamedType lexeme "List", not "AnimationController", and the
+      // inferred-type arm only matches direct `AnimationController(...)`
+      // constructor calls.
+      int controllerCount = 0;
+      for (final ClassMember member in node.body.members) {
+        if (member is! FieldDeclaration) continue;
+        final TypeAnnotation? type = member.fields.type;
+
+        if (type is NamedType) {
+          // Explicit annotation: AnimationController or AnimationController?
+          // (the nullable `?` lives on a separate token, so the name lexeme
+          // is unchanged).
+          if (type.name.lexeme == 'AnimationController') {
+            controllerCount += member.fields.variables.length;
+          }
+        } else if (type == null) {
+          // Inferred type — only count if the initializer is a direct
+          // `AnimationController(...)` constructor. This avoids counting
+          // `late final _a = otherController` aliases as new controllers.
+          for (final VariableDeclaration v in member.fields.variables) {
+            final Expression? init = v.initializer;
+            if (init is InstanceCreationExpression &&
+                init.constructorName.type.name.lexeme ==
+                    'AnimationController') {
+              controllerCount++;
+            }
+          }
+        }
+      }
+
+      // Exactly one controller is the rule's target. Zero is out of scope
+      // (dead-mixin territory, handled separately); two or more means the
+      // plural mixin is correct.
+      if (controllerCount != 1) return;
+
+      // Report at the mixin token so the squiggle lands on exactly what the
+      // user needs to change, and the quick fix rewrites just that token.
+      reporter.atNode(mixinNamedType);
     });
   }
 }

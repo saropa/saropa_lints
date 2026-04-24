@@ -128,6 +128,11 @@ void main() {
       'prefer_animation_controller_forward_from_zero',
       () => PreferAnimationControllerForwardFromZeroRule(),
     );
+    testRule(
+      'PreferSingleTickerProviderStateMixinRule',
+      'prefer_single_ticker_provider_state_mixin',
+      () => PreferSingleTickerProviderStateMixinRule(),
+    );
   });
 
   group('Animation Rules - Fixture Verification', () {
@@ -154,6 +159,7 @@ void main() {
       'avoid_multiple_animation_controllers',
       'avoid_implicit_animation_dispose_cast',
       'prefer_animation_controller_forward_from_zero',
+      'prefer_single_ticker_provider_state_mixin',
     ];
 
     for (final fixture in fixtures) {

@@ -2898,6 +2898,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidMultipleAnimationControllersRule.new,
   AvoidImplicitAnimationDisposeCastRule.new,
   PreferAnimationControllerForwardFromZeroRule.new,
+  PreferSingleTickerProviderStateMixinRule.new,
   AvoidFormValidationOnChangeRule.new,
   AvoidStackTraceInProductionRule.new,
   AvoidWebViewCorsIssuesRule.new,
