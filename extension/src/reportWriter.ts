@@ -4,6 +4,10 @@
  *
  * Mirrors the Dart init log writer pattern: accumulate lines, flush to file.
  * Report files are written to date-stamped folders under reports/ for external inspection.
+ *
+ * Also exposes [findLatestAnalysisReport] — a locator used by the post-run
+ * "Copy Report" / "Open Report" actions so users can grab the actual
+ * report without hunting through date folders.
  */
 
 import * as fs from 'fs';
@@ -79,6 +83,81 @@ export interface FlushReportOptions {
    * are running a local build that doesn't match the hosted version.
    */
   saropaLintsSource?: string;
+}
+
+/**
+ * Locate the most recently written `*_saropa_lint_report.log` under
+ * `<workspaceRoot>/reports/`. The Dart plugin writes these on every
+ * analysis run (one per isolate batch), and their filename encodes a
+ * sortable timestamp — but users can also re-run at any time, so we
+ * resolve by **file mtime** rather than filename, and we scan **every**
+ * date folder rather than just today's (runs near midnight land in the
+ * previous date folder, and "today's folder doesn't exist" should not
+ * silently fail).
+ *
+ * Returns the absolute path of the newest file, or `undefined` when:
+ *   - `<root>/reports/` is missing
+ *   - no date folder contains a `*_saropa_lint_report.log`
+ *   - any I/O error occurs mid-walk
+ *
+ * **Why not `_saropa_extension.md`**: the user's question is always
+ * "what did the *plugin* find?" — that report has the concentration /
+ * triage / top-rules content. The extension's own `_saropa_extension.md`
+ * is a thin audit trail and carries no diagnostic data.
+ *
+ * **Scan scope**: only two directory levels (`reports/<date>/*.log`). We
+ * don't recurse arbitrarily — if a user has customized their layout,
+ * we'd rather return `undefined` and let the caller surface a helpful
+ * "no report found" message than return the wrong file.
+ *
+ * Complexity is O(files-in-reports-tree); the typical project has
+ * dozens at most, so a linear scan is fine. Caching would be premature
+ * — reports change on every run anyway.
+ */
+export function findLatestAnalysisReport(workspaceRoot: string): string | undefined {
+  try {
+    const reportsDir = path.join(workspaceRoot, 'reports');
+    if (!fs.existsSync(reportsDir) || !fs.statSync(reportsDir).isDirectory()) {
+      return undefined;
+    }
+
+    let newestPath: string | undefined;
+    let newestMtimeMs = -Infinity;
+
+    for (const dateEntry of fs.readdirSync(reportsDir)) {
+      const dateFolder = path.join(reportsDir, dateEntry);
+      // Skip non-directories and hidden/system entries (`.saropa_lints`).
+      let dateStat: fs.Stats;
+      try {
+        dateStat = fs.statSync(dateFolder);
+      } catch {
+        continue;
+      }
+      if (!dateStat.isDirectory() || dateEntry.startsWith('.')) continue;
+
+      for (const fileEntry of fs.readdirSync(dateFolder)) {
+        if (!fileEntry.endsWith('_saropa_lint_report.log')) continue;
+        const filePath = path.join(dateFolder, fileEntry);
+        let fileStat: fs.Stats;
+        try {
+          fileStat = fs.statSync(filePath);
+        } catch {
+          continue;
+        }
+        if (!fileStat.isFile()) continue;
+        // Use `mtimeMs` rather than name-sort: two runs in the same second
+        // share a timestamp, and a re-written file bumps mtime but not name.
+        if (fileStat.mtimeMs > newestMtimeMs) {
+          newestMtimeMs = fileStat.mtimeMs;
+          newestPath = filePath;
+        }
+      }
+    }
+
+    return newestPath;
+  } catch {
+    return undefined;
+  }
 }
 
 /**
