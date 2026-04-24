@@ -597,6 +597,8 @@ class SizeTransition extends Widget {
 
 mixin SingleTickerProviderStateMixin<T extends StatefulWidget> on State<T> {}
 
+mixin TickerProviderStateMixin<T extends StatefulWidget> on State<T> {}
+
 // ============================================================================
 // Timer / Stream
 // ============================================================================

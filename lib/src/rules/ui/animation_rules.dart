@@ -3043,8 +3043,9 @@ class PreferAnimationControllerForwardFromZeroRule extends SaropaLintRule {
       // Gate 1: identify controllers in this class that auto-reverse on
       // completion. If none, no forward() call in the class can trip the
       // rule, so we skip the descendant walk entirely.
-      final Set<String> autoReverseControllers =
-          _collectAutoReverseControllers(classNode);
+      final Set<String> autoReverseControllers = _collectAutoReverseControllers(
+        classNode,
+      );
       if (autoReverseControllers.isEmpty) return;
 
       // Gate 2: walk descendants to find bare .forward() calls inside
@@ -3066,11 +3067,16 @@ class PreferAnimationControllerForwardFromZeroRule extends SaropaLintRule {
 /// body reverses `X` on `AnimationStatus.completed`, and returns the set of
 /// receiver sources (e.g. `_controller`, `widget.controller`) that match.
 ///
-/// We match on source text within the listener body rather than a deep
-/// AST pattern because the canonical press-and-bounce idiom is stable and
-/// a substring test is cheap and robust to small formatting variations.
-/// The receiver match (`receiver.reverse`) rules out the "listener on a
-/// different controller" false positive called out in the bug report.
+/// Detection walks the listener's function body as an AST — the earlier
+/// `bodySource.contains(...)` approach was flagged by
+/// `test/anti_pattern_detection_test.dart` because substring matching on
+/// `.toSource()` trips on identifiers embedded in comments or string
+/// literals and on lexically similar names. The AST walk (see
+/// [_ReverseOnCompletedScanner]) matches only real references to
+/// `AnimationStatus.completed` and real `reverse()` invocations whose
+/// receiver source equals the listener's receiver — preserving the same
+/// "listener on controller A can't flag forward() on controller B" guard
+/// without the false-positive surface of a text search.
 Set<String> _collectAutoReverseControllers(ClassDeclaration classNode) {
   final Set<String> result = <String>{};
   classNode.visitChildren(_AddStatusListenerVisitor(result));
@@ -3089,18 +3095,89 @@ class _AddStatusListenerVisitor extends RecursiveAstVisitor<void> {
       if (target != null && node.argumentList.arguments.length == 1) {
         final Expression arg = node.argumentList.arguments.first;
         if (arg is FunctionExpression) {
-          final String bodySource = arg.body.toSource();
           final String receiverSource = target.toSource();
-          // Must reference the SAME receiver's `.reverse` — prevents a
-          // listener on controller A from flagging forward() calls on
-          // controller B. The `.completed` check keeps us from firing
-          // when the listener reverses on `.dismissed` or some other
-          // status (different mechanism, out of scope for v1).
-          if (bodySource.contains('AnimationStatus.completed') &&
-              bodySource.contains('$receiverSource.reverse')) {
+          // Walk the listener body once with a scanner that sets two
+          // independent flags. Both must fire before the receiver is
+          // accepted: (a) AnimationStatus.completed is referenced, and
+          // (b) `reverse()` is invoked on the SAME receiver. Matching
+          // the receiver rules out the "listener on controller A
+          // flagging controller B" false positive; requiring `.completed`
+          // keeps us from firing on listeners that reverse on `.dismissed`
+          // or some other status (a different mechanism, out of scope).
+          final _ReverseOnCompletedScanner scanner =
+              _ReverseOnCompletedScanner(receiverSource);
+          arg.body.accept(scanner);
+          if (scanner.sawCompleted && scanner.sawReverseOnReceiver) {
             receivers.add(receiverSource);
           }
         }
+      }
+    }
+    super.visitMethodInvocation(node);
+  }
+}
+
+/// Visitor that sets two flags when walking a status-listener body:
+///
+/// - [sawCompleted] — a reference to `AnimationStatus.completed` as a real
+///   identifier (not inside a comment or string literal, which text-based
+///   searching could not distinguish).
+/// - [sawReverseOnReceiver] — a `reverse()` method invocation whose
+///   receiver's source text equals [receiverSource], i.e. the same object
+///   the outer `addStatusListener` call was attached to.
+///
+/// We compare receiver text via `Expression.toSource()` equality because
+/// the receiver can be any expression shape (`_controller`,
+/// `widget.controller`, `this.controller`) and the surrounding code
+/// already captured the listener's receiver as its source text. This is
+/// not the banned `.toSource().contains(...)` anti-pattern — it is an
+/// exact-string equality, which keeps the match tight and readable.
+class _ReverseOnCompletedScanner extends RecursiveAstVisitor<void> {
+  _ReverseOnCompletedScanner(this.receiverSource);
+
+  final String receiverSource;
+  bool sawCompleted = false;
+  bool sawReverseOnReceiver = false;
+
+  @override
+  void visitPrefixedIdentifier(PrefixedIdentifier node) {
+    // Canonical form: `AnimationStatus.completed` parses as a
+    // PrefixedIdentifier when it appears in an equality check such as
+    // `status == AnimationStatus.completed`. This is the overwhelmingly
+    // common shape in real-world code.
+    if (node.prefix.name == 'AnimationStatus' &&
+        node.identifier.name == 'completed') {
+      sawCompleted = true;
+    }
+    super.visitPrefixedIdentifier(node);
+  }
+
+  @override
+  void visitPropertyAccess(PropertyAccess node) {
+    // Fallback shape: in some positions (cascaded access, chained member
+    // reads) `AnimationStatus.completed` parses as a PropertyAccess
+    // instead of a PrefixedIdentifier. Catching both keeps behavior
+    // equivalent to the prior substring scan, which was parse-shape-blind.
+    final Expression? propertyTarget = node.target;
+    if (propertyTarget is SimpleIdentifier &&
+        propertyTarget.name == 'AnimationStatus' &&
+        node.propertyName.name == 'completed') {
+      sawCompleted = true;
+    }
+    super.visitPropertyAccess(node);
+  }
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    // Match `X.reverse(...)` where X's source text equals the listener's
+    // receiver. Equality (not substring) is the important guard — a
+    // substring test would also match `widget.controllerReverse(...)` or
+    // an unrelated `reverse` call on a differently-named controller.
+    if (node.methodName.name == 'reverse') {
+      final Expression? invocationTarget = node.realTarget;
+      if (invocationTarget != null &&
+          invocationTarget.toSource() == receiverSource) {
+        sawReverseOnReceiver = true;
       }
     }
     super.visitMethodInvocation(node);
@@ -3180,9 +3257,11 @@ bool _isAnimationControllerType(DartType? type) {
 /// there avoids spurious matches from helper functions defined below
 /// the class.
 bool _isInPressGestureCallback(AstNode start) {
-  for (AstNode? current = start.parent;
-      current != null;
-      current = current.parent) {
+  for (
+    AstNode? current = start.parent;
+    current != null;
+    current = current.parent
+  ) {
     if (current is ClassDeclaration) return false;
     if (current is FunctionExpression) {
       final AstNode? parent = current.parent;

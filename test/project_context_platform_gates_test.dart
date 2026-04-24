@@ -177,16 +177,20 @@ dependencies:
 
     test('Flutter project with android/ + ios/ → false (pure mobile)', () {
       // The pure-mobile canonical case: the rule should not fire here.
-      final path = writeProject(flutterPubspec,
-          platformDirs: {'android', 'ios'});
+      final path = writeProject(
+        flutterPubspec,
+        platformDirs: {'android', 'ios'},
+      );
       expect(ProjectContext.hasPointerPlatform(path), isFalse);
     });
 
     test('Flutter project with android/ + ios/ + macos/ → true', () {
       // Mixed-target project — macOS brings pointer-platform firing
       // back on, as it should.
-      final path = writeProject(flutterPubspec,
-          platformDirs: {'android', 'ios', 'macos'});
+      final path = writeProject(
+        flutterPubspec,
+        platformDirs: {'android', 'ios', 'macos'},
+      );
       expect(ProjectContext.hasPointerPlatform(path), isTrue);
     });
 
@@ -209,8 +213,10 @@ dependencies:
       // The canonical mobile-only shape. `hasWebSupport` is false (no
       // `web/`), `hasNonWebPlatform` is true (android/ios exist), and
       // `hasPointerPlatform` is false (no desktop, no web).
-      final path = writeProject(flutterPubspec,
-          platformDirs: {'android', 'ios'});
+      final path = writeProject(
+        flutterPubspec,
+        platformDirs: {'android', 'ios'},
+      );
       expect(ProjectContext.hasWebSupport(path), isFalse);
       expect(ProjectContext.hasNonWebPlatform(path), isTrue);
       expect(ProjectContext.hasPointerPlatform(path), isFalse);
@@ -224,14 +230,10 @@ dependencies:
     });
 
     test('universal project (web + desktop + mobile): all three true', () {
-      final path = writeProject(flutterPubspec, platformDirs: {
-        'web',
-        'android',
-        'ios',
-        'macos',
-        'windows',
-        'linux',
-      });
+      final path = writeProject(
+        flutterPubspec,
+        platformDirs: {'web', 'android', 'ios', 'macos', 'windows', 'linux'},
+      );
       expect(ProjectContext.hasWebSupport(path), isTrue);
       expect(ProjectContext.hasNonWebPlatform(path), isTrue);
       expect(ProjectContext.hasPointerPlatform(path), isTrue);

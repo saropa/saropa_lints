@@ -324,7 +324,10 @@ class _ProjectInfo {
       // are the safe failure mode here, since they only prevent the rule
       // from firing, not cause spurious fires.
       final deps = <String>{};
-      final depMatches = RegExp(r'^\s+(\w+):', multiLine: true).allMatches(content);
+      final depMatches = RegExp(
+        r'^\s+(\w+):',
+        multiLine: true,
+      ).allMatches(content);
       for (final match in depMatches) {
         final dep = match.group(1);
         if (dep != null) deps.add(dep);
@@ -345,12 +348,10 @@ class _ProjectInfo {
       // packages that declare a platform but have no matching directory
       // are rare enough to leave to a future refinement.
       final bool hasWebDir = Directory('$projectRoot/web').existsSync();
-      final bool hasAndroidDir =
-          Directory('$projectRoot/android').existsSync();
+      final bool hasAndroidDir = Directory('$projectRoot/android').existsSync();
       final bool hasIosDir = Directory('$projectRoot/ios').existsSync();
       final bool hasMacosDir = Directory('$projectRoot/macos').existsSync();
-      final bool hasWindowsDir =
-          Directory('$projectRoot/windows').existsSync();
+      final bool hasWindowsDir = Directory('$projectRoot/windows').existsSync();
       final bool hasLinuxDir = Directory('$projectRoot/linux').existsSync();
 
       return _ProjectInfo._(
@@ -366,7 +367,8 @@ class _ProjectInfo {
         // when the project has any non-web platform directory. Pure
         // Dart libraries default true — the library author can't
         // know the consumer's target platform.
-        hasNonWebPlatform: hasAndroidDir ||
+        hasNonWebPlatform:
+            hasAndroidDir ||
             hasIosDir ||
             hasMacosDir ||
             hasWindowsDir ||
@@ -378,8 +380,11 @@ class _ProjectInfo {
         // rules because the cursor is never visible. Pure Dart
         // libraries default true.
         hasPointerPlatform:
-            hasWebDir || hasMacosDir || hasWindowsDir || hasLinuxDir ||
-                !isFlutter,
+            hasWebDir ||
+            hasMacosDir ||
+            hasWindowsDir ||
+            hasLinuxDir ||
+            !isFlutter,
       );
     } on FormatException {
       return _ProjectInfo._(
