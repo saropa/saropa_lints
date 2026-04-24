@@ -1,5 +1,7 @@
 // Defensive coding: parameter validation, null/empty handling, and edge cases.
 
+import 'dart:io' show Directory;
+
 import 'package:saropa_lints/src/baseline/baseline_config.dart';
 import 'package:saropa_lints/src/baseline/baseline_file.dart';
 import 'package:saropa_lints/src/baseline/baseline_manager.dart';
@@ -80,6 +82,67 @@ void main() {
     });
     test('hasDependency("", "x") returns false', () {
       expect(ProjectContext.hasDependency('', 'x'), isFalse);
+    });
+
+    // Regression test for the silent "always empty" dependency parser bug: the
+    // pubspec parser's dep regex previously lacked `multiLine: true`, so `^`
+    // anchored only at position 0 of the string and `allMatches` returned zero
+    // hits on any pubspec that started with `name:` (i.e. every pubspec). That
+    // caused `hasDependency(...)` to return `false` for every query on every
+    // project, silently turning `saropa_depend_on_referenced_packages` (and
+    // every other rule that skips itself when a package IS declared) into a
+    // false-positive firehose. This test locks in real positive results so the
+    // regex cannot regress to the broken state without a loud red test.
+    //
+    // The test uses this repo's own pubspec — the test runner's working dir
+    // is the project root, so `pubspec.yaml` in `.` is saropa_lints' own
+    // pubspec, which lists `analyzer`, `path`, and `test` among its deps.
+    // (We don't pin `flutter` because saropa_lints is a pure Dart package.)
+    test('hasDependency resolves real package names from pubspec', () {
+      // `findProjectRoot` walks up from a given FILE path looking for a
+      // sibling `pubspec.yaml`. It needs an absolute path to walk — a bare
+      // relative filename has no parent chain to traverse. `Directory.current`
+      // resolves to the project root when `dart test` runs, so anchoring the
+      // probe at `<cwd>/pubspec.yaml` gives us a real file the helper can
+      // walk back from.
+      ProjectContext.clearCache();
+      final probe = '${Directory.current.path}/pubspec.yaml';
+      expect(
+        ProjectContext.hasDependency(probe, 'analyzer'),
+        isTrue,
+        reason:
+            'saropa_lints pubspec declares `analyzer` as a direct dep — if this fails, the dep regex is broken again.',
+      );
+      expect(
+        ProjectContext.hasDependency(probe, 'path'),
+        isTrue,
+        reason: 'saropa_lints declares `path:` under dependencies.',
+      );
+      expect(
+        ProjectContext.hasDependency(probe, 'test'),
+        isTrue,
+        reason:
+            'saropa_lints declares `test:` under dev_dependencies — the parser is deliberately over-inclusive across both sections.',
+      );
+      expect(
+        ProjectContext.hasDependency(probe, 'definitely_not_a_real_package'),
+        isFalse,
+        reason:
+            'Sanity: arbitrary strings must not resolve to true, otherwise the parser is eating the whole file.',
+      );
+    });
+
+    test('getPackageName resolves the project name from pubspec', () {
+      ProjectContext.clearCache();
+      final probe = '${Directory.current.path}/pubspec.yaml';
+      final root = ProjectContext.findProjectRoot(probe);
+      expect(root, isNotNull);
+      expect(
+        ProjectContext.getPackageName(root),
+        'saropa_lints',
+        reason:
+            'The `name:` field at the top of saropa_lints pubspec.yaml must parse back verbatim — if this breaks, the `skip own-package import` guard in `saropa_depend_on_referenced_packages` stops working.',
+      );
     });
   });
 

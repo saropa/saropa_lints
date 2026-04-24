@@ -671,6 +671,14 @@ class AvoidPlatformSpecificImportsRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    // The rule's entire justification is "dart:io breaks web builds". In
+    // a mobile-only Flutter project (no `web/` directory) that failure
+    // mode is structurally impossible, so every diagnostic we'd raise is
+    // noise. Bug: bugs/avoid_platform_specific_imports_false_positive_non_web_project.md.
+    // Unknown projects default to `true` inside `hasWebSupport`, so rules
+    // still fire when we can't prove the project is mobile-only.
+    if (!ProjectContext.hasWebSupport(context.filePath)) return;
+
     // Skip platform-specific directories
     final String path = context.filePath.replaceAll('\\', '/');
     for (final String dir in _platformDirs) {
@@ -1270,9 +1278,16 @@ class DependOnReferencedPackagesRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  // Rule name is prefixed with `saropa_` to avoid colliding with the Dart SDK's
+  // built-in `depend_on_referenced_packages` lint (shipped via
+  // `package:lints/core.yaml` and transitively by `package:flutter_lints`).
+  // Two emitters sharing the same `LintCode.name` produced two diagnostics for
+  // every qualifying import in projects that enabled both, inflating every
+  // downstream count (Problems panel, violations.json, report logs) by up to
+  // 2x. See bugs/depend_on_referenced_packages_name_collision_with_sdk_lint.md.
   static const LintCode _code = LintCode(
-    'depend_on_referenced_packages',
-    '[depend_on_referenced_packages] Imported package is not listed in pubspec.yaml dependencies. Using a package without declaring the dependency means builds rely on transitive resolution, which can break unexpectedly when other packages update their own dependencies. Every package import must have a corresponding entry in pubspec.yaml. {v1}',
+    'saropa_depend_on_referenced_packages',
+    '[saropa_depend_on_referenced_packages] Imported package is not listed in pubspec.yaml dependencies. Using a package without declaring the dependency means builds rely on transitive resolution, which can break unexpectedly when other packages update their own dependencies. Every package import must have a corresponding entry in pubspec.yaml. {v1}',
     correctionMessage:
         'Add the missing package to dependencies (or dev_dependencies for test files) in pubspec.yaml.',
     severity: DiagnosticSeverity.WARNING,

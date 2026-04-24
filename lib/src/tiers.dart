@@ -722,7 +722,10 @@ const Set<String> essentialRules = <String>{
   // v5.1.0 - Batch 3 (Essential)
   'avoid_connectivity_equals_internet', // WARNING - ConnectivityResult != internet
   // Additional rules (plan_additional_rules_11_through_20)
-  'depend_on_referenced_packages', // WARNING - package import not in pubspec
+  // Renamed from 'depend_on_referenced_packages' to avoid colliding with the
+  // Dart SDK's built-in lint of the same name (from package:lints). See
+  // bugs/depend_on_referenced_packages_name_collision_with_sdk_lint.md.
+  'saropa_depend_on_referenced_packages', // WARNING - package import not in pubspec
   'uri_does_not_exist', // ERROR - import/export/part URI missing
   // Additional rules (plan_additional_rules_21_through_30)
   'conflicting_constructor_and_static_member',
@@ -758,6 +761,7 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_animation_rebuild_waste', // animation performance
   'prefer_listenable_builder', // Flutter 3.13+ migration — semantic clarity
   'prefer_animation_controller_forward_from_zero', // WARNING - restart with from: 0.0 on auto-reverse controllers
+  'prefer_single_ticker_provider_state_mixin', // INFO - one-controller State should use the Single mixin variant
   'require_deep_link_fallback', // deep link error handling
   'require_stepper_validation', // stepper form validation
   'require_immutable_bloc_state', // state immutability best practice
