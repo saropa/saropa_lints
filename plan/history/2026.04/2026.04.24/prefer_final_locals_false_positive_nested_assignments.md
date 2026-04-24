@@ -56,7 +56,7 @@ void methodA() {
 
 ```dart
 void methodB() {
-  ReshareOption selectedOption = ReshareOption.cancelled; // LINT — reassigned inside closures
+  ReshareOption selectedOption = ReshareOption.canceled; // LINT — reassigned inside closures
 
   showDialogCommon(
     onButton1: () {

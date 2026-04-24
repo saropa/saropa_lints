@@ -3104,8 +3104,9 @@ class _AddStatusListenerVisitor extends RecursiveAstVisitor<void> {
           // flagging controller B" false positive; requiring `.completed`
           // keeps us from firing on listeners that reverse on `.dismissed`
           // or some other status (a different mechanism, out of scope).
-          final _ReverseOnCompletedScanner scanner =
-              _ReverseOnCompletedScanner(receiverSource);
+          final _ReverseOnCompletedScanner scanner = _ReverseOnCompletedScanner(
+            receiverSource,
+          );
           arg.body.accept(scanner);
           if (scanner.sawCompleted && scanner.sawReverseOnReceiver) {
             receivers.add(receiverSource);

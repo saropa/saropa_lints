@@ -218,7 +218,7 @@ The companion-walk heuristic (`_hasCompanionWidget` / `_subtreeHasCompanion`) is
 | `ColoredBox(color: MediaQuery.of(context).platformBrightness == Brightness.dark ? ...)` | NO lint |
 | `ColoredBox(color: Platform.isIOS ? ... : ...)` | NO lint |
 | `ColoredBox(color: isError ? red : green)` with structural child | **LINT** (regression guard) |
-| `ColoredBox(color: isSelected ? blue : grey)` with structural child | **LINT** (regression guard) |
+| `ColoredBox(color: isSelected ? blue :gray)` with structural child | **LINT** (regression guard) |
 | `ColoredBox(color: isError ? red : green, child: Icon(...))` | NO lint (companion-walk still works) |
 
 All three existing `accessibility_rules_test.dart` tests for this rule pass (`AvoidColorOnlyMeaningRule` instantiation, fixture-exists check, SHOULD-trigger / should-NOT-trigger placeholders), and the full 160-test accessibility suite remains green. `dart analyze --fatal-infos` reports no issues.

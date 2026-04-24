@@ -4335,8 +4335,9 @@ class AvoidColorOnlyMeaningRule extends SaropaLintRule {
   };
 
   bool _isEnvironmentPredicate(Expression condition) {
-    final _EnvironmentPredicateVisitor visitor =
-        _EnvironmentPredicateVisitor(_environmentIdentifiers);
+    final _EnvironmentPredicateVisitor visitor = _EnvironmentPredicateVisitor(
+      _environmentIdentifiers,
+    );
     condition.accept(visitor);
     return visitor.matched;
   }
