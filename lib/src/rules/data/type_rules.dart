@@ -2690,9 +2690,12 @@ class AvoidPrivateTypedefFunctionsRule extends SaropaLintRule {
 /// Prefer final for local variables that are never reassigned.
 ///
 /// Flags local variable declarations (var or typed) that are never reassigned
-/// in the same block. Conservative: only checks statements after the
-/// declaration in the same block; assignments in nested blocks or for-loop
-/// updaters are considered. For-in loop variables are not covered here.
+/// anywhere after the declaration within the enclosing block, INCLUDING
+/// reassignments buried inside nested `if`/`else`, `for`/`while`/`do-while`,
+/// `try`/`catch`/`finally`, `switch` cases, nested `Block`s, and closures
+/// passed as arguments. Detection resolves by element identity so an inner
+/// scope that shadows the same name does NOT mask a reassignment of the
+/// outer variable.
 ///
 /// **Bad:** `var count = items.length;` or `String message = 'Hi';` with no later assignment.
 /// **Good:** `final count = items.length;` or `final String message = 'Hi';`
@@ -2733,21 +2736,26 @@ class PreferFinalLocalsRule extends SaropaLintRule {
       final block = stmt.parent;
       if (block is! Block) return;
 
-      final statements = block.statements;
-      final idx = statements.indexOf(stmt);
-      if (idx < 0) return;
-
       for (final variable in node.variables) {
+        // Skip private-named locals — intent is to leave underscore-prefixed
+        // locals alone, matching the pre-existing policy.
         if (variable.name.lexeme.startsWith('_')) continue;
-        final name = variable.name.lexeme;
-        bool reassigned = false;
-        for (int i = idx + 1; i < statements.length; i++) {
-          if (_assignsToName(statements[i], name)) {
-            reassigned = true;
-            break;
-          }
-        }
-        if (!reassigned) {
+
+        // Element-based comparison handles shadowing: an inner-scope
+        // declaration of the same name resolves to a DIFFERENT element, so
+        // its assignments do not mask (or falsely satisfy) the outer check.
+        final Element? declaredElement = variable.declaredFragment?.element;
+        if (declaredElement == null) continue;
+
+        // Bound the search to positions after the declaration statement so
+        // the variable's own initializer — and anything syntactically prior —
+        // is excluded. `stmt.end` is one past the trailing `;`.
+        final _ReassignmentVisitor visitor = _ReassignmentVisitor(
+          declaredElement,
+          stmt.end,
+        );
+        block.accept(visitor);
+        if (!visitor.found) {
           reporter.atToken(variable.name);
         }
       }
@@ -2759,60 +2767,66 @@ class PreferFinalLocalsRule extends SaropaLintRule {
     ({required CorrectionProducerContext context}) =>
         PreferFinalLocalsFix(context: context),
   ];
+}
 
-  bool _assignsToName(Statement stmt, String name) {
-    if (stmt is ExpressionStatement) {
-      return _exprAssignsToName(stmt.expression, name);
-    }
-    if (stmt is ForStatement) {
-      final parts = stmt.forLoopParts;
-      if (parts is ForParts) {
-        if (parts.updaters.isNotEmpty) {
-          for (final u in parts.updaters) {
-            if (u is AssignmentExpression && _lhsName(u) == name) return true;
-            if (u is PrefixExpression || u is PostfixExpression) {
-              if (_incDecTargetName(u) == name) return true;
-            }
-          }
-        }
+/// Detects any write to [target] (assignment or `++`/`--`) at an offset at or
+/// after [afterOffset]. A descendant walk — not a sibling-statement scan —
+/// because reassignments commonly live inside nested control flow and closures
+/// that a shallow walk cannot see.
+class _ReassignmentVisitor extends RecursiveAstVisitor<void> {
+  _ReassignmentVisitor(this.target, this.afterOffset);
+
+  final Element target;
+  final int afterOffset;
+  bool found = false;
+
+  // Identity / equality on the resolved element gives shadow-safe matching:
+  // an inner `var name = ...` resolves to a different LocalVariableElement,
+  // so its writes do not spuriously count as reassignments of the outer.
+  bool _matches(Element? element) {
+    if (element == null) return false;
+    return identical(element, target) || element == target;
+  }
+
+  @override
+  void visitAssignmentExpression(AssignmentExpression node) {
+    if (!found && node.offset >= afterOffset) {
+      final Expression lhs = node.leftHandSide;
+      if (lhs is SimpleIdentifier && _matches(lhs.element)) {
+        found = true;
+        return;
       }
     }
-    return false;
+    super.visitAssignmentExpression(node);
   }
 
-  bool _exprAssignsToName(Expression expr, String name) {
-    if (expr is AssignmentExpression) {
-      return _lhsName(expr) == name;
-    }
-    if (expr is PrefixExpression || expr is PostfixExpression) {
-      return _incDecTargetName(expr) == name;
-    }
-    return false;
-  }
-
-  String? _lhsName(AssignmentExpression e) {
-    final left = e.leftHandSide;
-    if (left is SimpleIdentifier) return left.name;
-    return null;
-  }
-
-  String? _incDecTargetName(Expression e) {
-    if (e is PrefixExpression) {
-      if (e.operator.type == TokenType.PLUS_PLUS ||
-          e.operator.type == TokenType.MINUS_MINUS) {
-        final operand = e.operand;
-        if (operand is SimpleIdentifier) return operand.name;
+  @override
+  void visitPrefixExpression(PrefixExpression node) {
+    if (!found && _isIncDec(node.operator.type) && node.offset >= afterOffset) {
+      final Expression operand = node.operand;
+      if (operand is SimpleIdentifier && _matches(operand.element)) {
+        found = true;
+        return;
       }
     }
-    if (e is PostfixExpression) {
-      if (e.operator.type == TokenType.PLUS_PLUS ||
-          e.operator.type == TokenType.MINUS_MINUS) {
-        final operand = e.operand;
-        if (operand is SimpleIdentifier) return operand.name;
+    super.visitPrefixExpression(node);
+  }
+
+  @override
+  void visitPostfixExpression(PostfixExpression node) {
+    if (!found && _isIncDec(node.operator.type) && node.offset >= afterOffset) {
+      final Expression operand = node.operand;
+      if (operand is SimpleIdentifier && _matches(operand.element)) {
+        found = true;
+        return;
       }
     }
-    return null;
+    super.visitPostfixExpression(node);
   }
+
+  // Only `++`/`--` mutate; other unary/prefix forms (`!`, `-`, `~`) are reads.
+  bool _isIncDec(TokenType t) =>
+      t == TokenType.PLUS_PLUS || t == TokenType.MINUS_MINUS;
 }
 
 /// Warns when a final variable could be const.
