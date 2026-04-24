@@ -11,6 +11,7 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 
+import '../../fixes/animation/prefer_animation_controller_forward_from_zero_fix.dart';
 import '../../fixes/animation/prefer_listenable_builder_fix.dart';
 import '../../fixes/animation/remove_redundant_implicit_animation_dispose_fix.dart';
 import '../../implicit_animation_dispose_cast_ast.dart';
@@ -2391,6 +2392,271 @@ class PreferListenableBuilderRule extends SaropaLintRule {
   }
 }
 
+/// Flags `someAnimation.value` reads inside `build()` when the read is not
+/// wrapped by a listening builder. Reading `.value` directly in `build()`
+/// produces a static snapshot — `build()` is not re-invoked on every tick,
+/// so the animation appears wired but is visually inert. The typical
+/// real-world shape is:
+///
+/// ```dart
+/// @override
+/// Widget build(BuildContext context) {
+///   return ScaleTransition(
+///     scale: _scaleAnimation,
+///     child: widget.child.withOpacity(_opacityAnimation.value), // LINT
+///   );
+/// }
+/// ```
+///
+/// The fix is to listen: wrap with `FadeTransition`, `ScaleTransition`,
+/// `AnimatedBuilder`, or `ListenableBuilder` so the builder re-runs when
+/// the animation notifies.
+///
+/// ### Detection
+///
+/// - Registry: `addPropertyAccess` and `addPrefixedIdentifier`.
+/// - Trigger conditions (all required):
+///   1. Property name is `value`.
+///   2. Receiver's static type is `Animation<T>` or a subtype
+///      (`AnimationController`, `CurvedAnimation`, `ReverseAnimation`,
+///      `Tween.animate(...)` result).
+///   3. The read is inside a `build(BuildContext ...)` method.
+///   4. The read is NOT inside a `builder:` callback of an
+///      `AnimatedBuilder`, `ListenableBuilder`, or `ValueListenableBuilder`.
+/// - Writes (`controller.value = 0.3`) are skipped — the rule targets reads.
+///
+/// Since: v12.3.5 | Rule version: v1
+///
+/// **BAD:**
+/// ```dart
+/// @override
+/// Widget build(BuildContext context) {
+///   return Opacity(opacity: _opacityAnimation.value, child: widget.child);
+/// }
+/// ```
+///
+/// **GOOD:** listening transition widget drives its own RenderObject
+/// ```dart
+/// @override
+/// Widget build(BuildContext context) {
+///   return FadeTransition(opacity: _opacityAnimation, child: widget.child);
+/// }
+/// ```
+///
+/// **GOOD:** `AnimatedBuilder` builder re-runs on every tick
+/// ```dart
+/// @override
+/// Widget build(BuildContext context) {
+///   return AnimatedBuilder(
+///     animation: _controller,
+///     builder: (BuildContext ctx, Widget? child) =>
+///         Opacity(opacity: _opacityAnimation.value, child: child),
+///     child: widget.child,
+///   );
+/// }
+/// ```
+class AvoidInertAnimationValueInBuildRule extends SaropaLintRule {
+  AvoidInertAnimationValueInBuildRule() : super(code: _code);
+
+  /// Silent correctness bug — animation appears wired but never runs.
+  /// Misleads readers, wastes controller cycles, fails to deliver the
+  /// visual feedback the code claims to provide.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'ui', 'animation'};
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  /// Early-exit gate — only widget files that actually access `.value`
+  /// somewhere can possibly match. Files without any `.value` token skip
+  /// AST registration entirely.
+  @override
+  Set<String>? get requiredPatterns => {'.value'};
+
+  static const LintCode _code = LintCode(
+    'avoid_inert_animation_value_in_build',
+    '[avoid_inert_animation_value_in_build] Reading an Animation.value '
+        'inside build() outside of a listening builder produces a static '
+        'snapshot — the value is captured when build() runs and never '
+        'updates as the controller ticks, so the animation is visually '
+        'inert. Use FadeTransition (for opacity), ScaleTransition (for '
+        'scale), Align / SlideTransition (for offset), or wrap the '
+        'subtree in AnimatedBuilder / ListenableBuilder so the read is '
+        're-evaluated on every tick. {v1}',
+    correctionMessage:
+        'Replace the direct .value read with a listening widget: '
+        'FadeTransition(opacity: animation, child: ...), '
+        'ScaleTransition(scale: animation, child: ...), or '
+        'AnimatedBuilder(animation: animation, builder: (ctx, child) => '
+        '<widget that uses animation.value>, child: child). The listening '
+        'widget rebuilds only its own RenderObject per tick.',
+    severity: DiagnosticSeverity.ERROR,
+  );
+
+  /// Widgets whose `builder:` callback is re-invoked on every listener
+  /// notification — inside these, reading `.value` is safe. Anything else
+  /// (plain `ScaleTransition`, `Opacity`, `Transform.scale`, etc.) does
+  /// not trigger a rebuild of its children on every tick.
+  static const Set<String> _listeningBuilderWidgets = <String>{
+    'AnimatedBuilder',
+    'ListenableBuilder',
+    'ValueListenableBuilder',
+  };
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addPropertyAccess((PropertyAccess node) {
+      if (node.propertyName.name != 'value') return;
+      _checkAccess(reporter, node, node.realTarget);
+    });
+
+    context.addPrefixedIdentifier((PrefixedIdentifier node) {
+      if (node.identifier.name != 'value') return;
+      _checkAccess(reporter, node, node.prefix);
+    });
+  }
+
+  /// Shared detection path for `PropertyAccess` and `PrefixedIdentifier`
+  /// — the only difference is how we reach the receiver expression.
+  void _checkAccess(
+    SaropaDiagnosticReporter reporter,
+    AstNode accessNode,
+    Expression? receiver,
+  ) {
+    if (receiver == null) return;
+
+    // Skip writes: `controller.value = 0.3` is an assignment, not an
+    // inert read. Detecting via the parent chain is cheaper than walking
+    // up further and never reaching the receiver in most cases.
+    if (_isAssignmentTarget(accessNode)) return;
+
+    // Need a resolved type to distinguish `Animation.value` from the many
+    // other `.value` properties in the SDK (`TextEditingController`,
+    // `ValueNotifier`, custom classes). Unresolved / dynamic is skipped
+    // to avoid false positives on half-typed code.
+    final DartType? receiverType = receiver.staticType;
+    if (receiverType is! InterfaceType) return;
+    if (!_isAnimationType(receiverType)) return;
+
+    if (!_isInertReadInBuild(accessNode)) return;
+
+    reporter.atNode(accessNode);
+  }
+
+  /// Returns `true` when [node] is the left-hand side of an assignment
+  /// (`controller.value = 0.3`, `controller.value += 1`). Those are
+  /// writes, not the inert reads this rule targets.
+  static bool _isAssignmentTarget(AstNode node) {
+    final AstNode? parent = node.parent;
+    if (parent is AssignmentExpression) {
+      return identical(parent.leftHandSide, node);
+    }
+    return false;
+  }
+
+  /// Walks ancestors of [node] until it either (a) reaches a
+  /// `build(BuildContext ...)` method — inert read — or (b) passes through
+  /// a listening-builder callback first — safe read — or (c) leaves the
+  /// enclosing class/compilation unit — outside the rule's scope.
+  ///
+  /// Walk order matters: if a listening-builder callback is hit BEFORE
+  /// the build() method, the read is safe even though it's textually
+  /// inside build(). That matches runtime behavior — the builder runs on
+  /// every tick regardless of where it's written.
+  static bool _isInertReadInBuild(AstNode node) {
+    for (
+      AstNode? current = node.parent;
+      current != null;
+      current = current.parent
+    ) {
+      // Safe-read short circuit: a listening-builder callback ancestor
+      // means the subtree is re-evaluated on every tick, so reads of
+      // `.value` inside it are live, not inert.
+      if (current is FunctionExpression &&
+          _isListeningBuilderCallback(current)) {
+        return false;
+      }
+
+      if (current is MethodDeclaration) {
+        return _isWidgetBuildMethod(current);
+      }
+
+      // Leaving the class without hitting a `build` method means the
+      // read is in a field initializer, top-level code, or a nested
+      // class — v1 conservatively skips those.
+      if (current is ClassDeclaration ||
+          current is MixinDeclaration ||
+          current is ExtensionDeclaration ||
+          current is CompilationUnit) {
+        return false;
+      }
+    }
+    return false;
+  }
+
+  /// Returns `true` for a method named `build` whose parameter list
+  /// contains a `BuildContext` parameter. Matches both `StatelessWidget.build`
+  /// and `State.build`, and avoids non-Flutter methods that happen to be
+  /// named `build` (e.g. builder-pattern DSLs).
+  static bool _isWidgetBuildMethod(MethodDeclaration method) {
+    if (method.name.lexeme != 'build') return false;
+    final FormalParameterList? params = method.parameters;
+    if (params == null) return false;
+
+    for (final FormalParameter param in params.parameters) {
+      final TypeAnnotation? type = _parameterTypeAnnotation(param);
+      if (type is NamedType && type.name.lexeme == 'BuildContext') {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /// Unwraps `DefaultFormalParameter` and returns the declared
+  /// [TypeAnnotation] of a `SimpleFormalParameter`. Returns `null` for
+  /// field/super-formal parameters (their type is inherited from the
+  /// field or superclass, which we don't follow in v1).
+  static TypeAnnotation? _parameterTypeAnnotation(FormalParameter param) {
+    FormalParameter inner = param;
+    if (inner is DefaultFormalParameter) {
+      inner = inner.parameter;
+    }
+    if (inner is SimpleFormalParameter) return inner.type;
+    return null;
+  }
+
+  /// Returns `true` when [fn] is the `builder:` argument of an
+  /// `AnimatedBuilder`, `ListenableBuilder`, or `ValueListenableBuilder`
+  /// constructor call. Those widgets re-invoke their builder callback on
+  /// every listener notification, so `.value` reads inside are live.
+  static bool _isListeningBuilderCallback(FunctionExpression fn) {
+    final AstNode? namedArg = fn.parent;
+    if (namedArg is! NamedExpression) return false;
+    if (namedArg.name.label.name != 'builder') return false;
+
+    final AstNode? argList = namedArg.parent;
+    if (argList is! ArgumentList) return false;
+
+    final AstNode? creation = argList.parent;
+    if (creation is! InstanceCreationExpression) return false;
+
+    final String typeName = creation.constructorName.type.name.lexeme;
+    return _listeningBuilderWidgets.contains(typeName);
+  }
+}
+
 /// Returns `true` when [type] is `Animation<T>` or any subtype of it
 /// (`AnimationController`, `CurvedAnimation`, `ReverseAnimation`, the result
 /// of `Tween.animate(...)`, etc.).
@@ -2457,4 +2723,326 @@ bool _extendsImplicitlyAnimatedWidgetState(ClassElement classElement) {
     type = type.superclass;
   }
   return false;
+}
+
+// =============================================================================
+// prefer_animation_controller_forward_from_zero
+// =============================================================================
+
+/// Gesture callbacks that bind press/tap/click-style handlers. When a
+/// bare `.forward()` fires from one of these, it can collide with an
+/// in-flight reverse from a previous press — the sticky restart this
+/// rule targets. Drag/pan handlers are intentionally excluded: they
+/// typically drive `value` directly and don't produce the mid-reverse
+/// restart scenario.
+const Set<String> _pressGestureCallbackNames = <String>{
+  'onTap',
+  'onTapDown',
+  'onTapUp',
+  'onDoubleTap',
+  'onDoubleTapDown',
+  'onLongPress',
+  'onLongPressDown',
+  'onLongPressStart',
+  'onLongPressUp',
+  'onPressed',
+  'onSecondaryTap',
+  'onSecondaryTapDown',
+  'onSecondaryTapUp',
+  'onSecondaryLongPress',
+  'onTertiaryTapDown',
+  'onTertiaryTapUp',
+};
+
+/// Flags `AnimationController.forward()` (no args) inside a press/tap
+/// gesture callback when the controller is wired to auto-reverse on
+/// completion (`addStatusListener` → `reverse()` on
+/// `AnimationStatus.completed` — the canonical "press-and-bounce"
+/// pattern).
+///
+/// Without `from: 0.0`, a rapid re-press while the controller is still
+/// mid-reverse resumes forward from the in-flight value instead of
+/// restarting from zero, so the animation plays only the remaining
+/// fraction of its duration. The visible effect is a sticky / uneven
+/// re-press: the first press animates for the full duration, a fast
+/// second press finishes in a fraction of the time. Users feel the UI
+/// respond "slippery" on rapid taps without being able to name why.
+///
+/// Since: v12.3.5 | Rule version: v1
+///
+/// **BAD:**
+/// ```dart
+/// class _InkState extends State<InkButton>
+///     with SingleTickerProviderStateMixin {
+///   late final AnimationController _c;
+///
+///   @override
+///   void initState() {
+///     super.initState();
+///     _c = AnimationController(vsync: this, ...);
+///     _c.addStatusListener((s) {
+///       if (s == AnimationStatus.completed) _c.reverse();
+///     });
+///   }
+///
+///   @override
+///   Widget build(BuildContext context) => InkResponse(
+///         onTap: () => _c.forward(), // LINT — sticky on rapid re-press
+///         child: ...,
+///       );
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// onTap: () => _c.forward(from: 0.0),
+/// ```
+///
+/// **GOOD:** Equivalent explicit reset before forward.
+/// ```dart
+/// onTap: () {
+///   _c.reset();
+///   _c.forward();
+/// },
+/// ```
+class PreferAnimationControllerForwardFromZeroRule extends SaropaLintRule {
+  PreferAnimationControllerForwardFromZeroRule() : super(code: _code);
+
+  /// UX correctness bug: rapid re-presses render only part of the
+  /// animation, so every second tap looks different from the first.
+  /// Not a crash or leak; QA rarely catches it because the regression
+  /// is time-correlated. Narrow trigger keeps false positives low.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'ui', 'animation', 'ux'};
+
+  /// Class-body scan + descendant visitor per class; cheaper than a
+  /// full-file recursive walk but not as cheap as a single visitor
+  /// callback.
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  /// Files that never wire a status listener cannot match — skip entirely.
+  /// Single-token prefilter intentionally: `requiredPatterns` uses OR
+  /// semantics, so adding a second token would *broaden* the prefilter
+  /// (files with only `.forward(` would no longer skip). The status
+  /// listener is the strictly-required token, so it alone is the
+  /// tightest gate.
+  @override
+  Set<String>? get requiredPatterns => {'addStatusListener'};
+
+  static const LintCode _code = LintCode(
+    'prefer_animation_controller_forward_from_zero',
+    '[prefer_animation_controller_forward_from_zero] This '
+        'AnimationController is wired to auto-reverse on completion, so '
+        'calling forward() with no arguments from a gesture callback '
+        'resumes from the in-flight value when the controller is still '
+        'mid-reverse. Rapid re-presses play only part of the animation, '
+        'which feels sticky and inconsistent to users even though no '
+        'error or warning is produced. {v1}',
+    correctionMessage:
+        'Use forward(from: 0.0) so every press restarts the animation '
+        'from the beginning, or call reset() immediately before '
+        'forward() for an equivalent explicit restart.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        PreferAnimationControllerForwardFromZeroFix(context: context),
+  ];
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addClassDeclaration((ClassDeclaration classNode) {
+      // Gate 1: identify controllers in this class that auto-reverse on
+      // completion. If none, no forward() call in the class can trip the
+      // rule, so we skip the descendant walk entirely.
+      final Set<String> autoReverseControllers =
+          _collectAutoReverseControllers(classNode);
+      if (autoReverseControllers.isEmpty) return;
+
+      // Gate 2: walk descendants to find bare .forward() calls inside
+      // gesture callbacks. We scope the visitor to the class body so a
+      // status listener in an unrelated class elsewhere in the file
+      // cannot bleed into the decision here.
+      classNode.visitChildren(
+        _ForwardFromZeroVisitor(
+          reporter: reporter,
+          code: code,
+          autoReverseControllers: autoReverseControllers,
+        ),
+      );
+    });
+  }
+}
+
+/// Scans the class body for `X.addStatusListener(...)` where the listener
+/// body reverses `X` on `AnimationStatus.completed`, and returns the set of
+/// receiver sources (e.g. `_controller`, `widget.controller`) that match.
+///
+/// We match on source text within the listener body rather than a deep
+/// AST pattern because the canonical press-and-bounce idiom is stable and
+/// a substring test is cheap and robust to small formatting variations.
+/// The receiver match (`receiver.reverse`) rules out the "listener on a
+/// different controller" false positive called out in the bug report.
+Set<String> _collectAutoReverseControllers(ClassDeclaration classNode) {
+  final Set<String> result = <String>{};
+  classNode.visitChildren(_AddStatusListenerVisitor(result));
+  return result;
+}
+
+class _AddStatusListenerVisitor extends RecursiveAstVisitor<void> {
+  _AddStatusListenerVisitor(this.receivers);
+
+  final Set<String> receivers;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    if (node.methodName.name == 'addStatusListener') {
+      final Expression? target = node.realTarget;
+      if (target != null && node.argumentList.arguments.length == 1) {
+        final Expression arg = node.argumentList.arguments.first;
+        if (arg is FunctionExpression) {
+          final String bodySource = arg.body.toSource();
+          final String receiverSource = target.toSource();
+          // Must reference the SAME receiver's `.reverse` — prevents a
+          // listener on controller A from flagging forward() calls on
+          // controller B. The `.completed` check keeps us from firing
+          // when the listener reverses on `.dismissed` or some other
+          // status (different mechanism, out of scope for v1).
+          if (bodySource.contains('AnimationStatus.completed') &&
+              bodySource.contains('$receiverSource.reverse')) {
+            receivers.add(receiverSource);
+          }
+        }
+      }
+    }
+    super.visitMethodInvocation(node);
+  }
+}
+
+class _ForwardFromZeroVisitor extends RecursiveAstVisitor<void> {
+  _ForwardFromZeroVisitor({
+    required this.reporter,
+    required this.code,
+    required this.autoReverseControllers,
+  });
+
+  final SaropaDiagnosticReporter reporter;
+  final LintCode code;
+  final Set<String> autoReverseControllers;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    super.visitMethodInvocation(node);
+
+    if (node.methodName.name != 'forward') return;
+
+    // Skip any call that already has arguments. Flutter's signature is
+    // `forward({double? from})`, so any present argument means the user
+    // has deliberately chosen a starting value — including `from: 0.0`
+    // (already correct) and `from: someExpression` (intentional resume).
+    if (node.argumentList.arguments.isNotEmpty) return;
+
+    final Expression? target = node.realTarget;
+    if (target == null) return;
+
+    // Type gate: only flag calls on AnimationController. Filters out
+    // unrelated APIs that happen to expose a `forward()` method (e.g.
+    // PageController, custom classes). Skip when the analyzer cannot
+    // resolve the type — don't fire on half-typed / unresolved code.
+    if (!_isAnimationControllerType(target.staticType)) return;
+
+    // Receiver must match one of the auto-reverse controllers collected
+    // from the same class. Prevents flagging forward() on a different
+    // controller that just happens to live in the same class.
+    final String receiverSource = target.toSource();
+    if (!autoReverseControllers.contains(receiverSource)) return;
+
+    // Enclosing context must be a press/tap gesture callback. One-shot
+    // entry animations (initState, didChangeDependencies) and drag/pan
+    // handlers don't produce the mid-reverse restart scenario.
+    if (!_isInPressGestureCallback(node)) return;
+
+    // Don't flag `reset(); forward();` pairs — they are the equivalent
+    // of `forward(from: 0.0)` expressed in two steps, and are called
+    // out as a valid alternative in the rule's correction message.
+    if (_hasPrecedingReset(node, receiverSource)) return;
+
+    reporter.atNode(node, code);
+  }
+}
+
+/// Returns `true` when [type] is `AnimationController` or a subtype.
+/// Uses the element chain rather than a source-text match so subclasses
+/// (rare but legal) are still recognized. Returns `false` for
+/// unresolved types — the rule deliberately skips half-typed code to
+/// avoid firing on in-progress edits.
+bool _isAnimationControllerType(DartType? type) {
+  if (type is! InterfaceType) return false;
+  if (type.element.name == 'AnimationController') return true;
+  for (final InterfaceType sup in type.allSupertypes) {
+    if (sup.element.name == 'AnimationController') return true;
+  }
+  return false;
+}
+
+/// Walks ancestors looking for any [FunctionExpression] whose parent is
+/// a [NamedExpression] using a press-gesture callback name. Stops at
+/// the enclosing [ClassDeclaration] — past the class we cannot be
+/// inside a widget's gesture callback anymore, so returning `false`
+/// there avoids spurious matches from helper functions defined below
+/// the class.
+bool _isInPressGestureCallback(AstNode start) {
+  for (AstNode? current = start.parent;
+      current != null;
+      current = current.parent) {
+    if (current is ClassDeclaration) return false;
+    if (current is FunctionExpression) {
+      final AstNode? parent = current.parent;
+      if (parent is NamedExpression &&
+          _pressGestureCallbackNames.contains(parent.name.label.name)) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+/// Returns `true` when the statement immediately preceding [forwardCall]
+/// in its enclosing [Block] is `<receiver>.reset()`. The reset-then-
+/// forward idiom is functionally equivalent to `forward(from: 0.0)` and
+/// is the second correct pattern documented in the rule's message, so
+/// flagging it would churn valid code.
+bool _hasPrecedingReset(MethodInvocation forwardCall, String receiverSource) {
+  final Statement? statement = forwardCall.thisOrAncestorOfType<Statement>();
+  if (statement == null) return false;
+  final AstNode? block = statement.parent;
+  if (block is! Block) return false;
+
+  final List<Statement> statements = block.statements;
+  final int index = statements.indexOf(statement);
+  if (index <= 0) return false;
+
+  final Statement previous = statements[index - 1];
+  if (previous is! ExpressionStatement) return false;
+  final Expression expr = previous.expression;
+  if (expr is! MethodInvocation) return false;
+  if (expr.methodName.name != 'reset') return false;
+
+  final Expression? resetTarget = expr.realTarget;
+  return resetTarget != null && resetTarget.toSource() == receiverSource;
 }

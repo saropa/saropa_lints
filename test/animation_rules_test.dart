@@ -29,6 +29,11 @@ void main() {
       () => AvoidAnimationInBuildRule(),
     );
     testRule(
+      'AvoidInertAnimationValueInBuildRule',
+      'avoid_inert_animation_value_in_build',
+      () => AvoidInertAnimationValueInBuildRule(),
+    );
+    testRule(
       'RequireAnimationControllerDisposeRule',
       'require_animation_controller_dispose',
       () => RequireAnimationControllerDisposeRule(),
@@ -118,12 +123,18 @@ void main() {
       'avoid_implicit_animation_dispose_cast',
       () => AvoidImplicitAnimationDisposeCastRule(),
     );
+    testRule(
+      'PreferAnimationControllerForwardFromZeroRule',
+      'prefer_animation_controller_forward_from_zero',
+      () => PreferAnimationControllerForwardFromZeroRule(),
+    );
   });
 
   group('Animation Rules - Fixture Verification', () {
     final fixtures = [
       'require_vsync_mixin',
       'avoid_animation_in_build',
+      'avoid_inert_animation_value_in_build',
       'require_animation_controller_dispose',
       'require_hero_tag_uniqueness',
       'avoid_layout_passes',
@@ -142,6 +153,7 @@ void main() {
       'avoid_clip_during_animation',
       'avoid_multiple_animation_controllers',
       'avoid_implicit_animation_dispose_cast',
+      'prefer_animation_controller_forward_from_zero',
     ];
 
     for (final fixture in fixtures) {
