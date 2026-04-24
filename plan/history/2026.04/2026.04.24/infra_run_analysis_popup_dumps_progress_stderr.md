@@ -1,6 +1,6 @@
 # BUG: `Run Analysis` popup dumps progress-bar stderr — no issue count, no actions
 
-**Status: Fix Ready**
+**Status: Closed**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
@@ -10,6 +10,7 @@ File: `extension/src/setup.ts` (lines ~282–300)
 Severity: UX — High (surfaces on every non-clean run of the primary command, first thing users see)
 Rule version: N/A (extension bug, not a rule bug)
 
+<!-- cspell:ignore countr -->
 ---
 
 ## Summary
@@ -197,7 +198,7 @@ N/A — this is an extension UX bug, not a rule bug. Manual verification steps:
 
 ## Commits
 
-<!-- Add commit hashes as fixes land. -->
+- `392c4642` — fix(extension): show real issue count in Run Analysis warning popup
 
 ---
 
