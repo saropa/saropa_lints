@@ -16,6 +16,7 @@ Copyright: (c) 2025-2026 Saropa
 
 from __future__ import annotations
 
+import re
 import webbrowser
 from dataclasses import dataclass
 from pathlib import Path
@@ -272,6 +273,63 @@ def run_analyze_only(mode: str, project_dir: Path) -> int | None:
     return ExitCode.SUCCESS.value if ok else ExitCode.ANALYSIS_FAILED.value
 
 
+def _verify_marketplace_and_ovsx(
+    project_dir: Path,
+    version: str,
+    vsix_path: Path | None,
+) -> None:
+    """Poll Marketplace and Open VSX until *version* propagates.
+
+    Shared between full-publish, extension-only, and publish-existing-vsix
+    modes so every flow that touches the stores ends with a confirmation
+    that the published version is actually live. Motivating case: vsce
+    returns 0 but the Marketplace silently drops the upload (expired PAT
+    or missing scope), leaving the user thinking the publish worked when
+    it never propagated.
+    """
+    publisher, ext_name = get_extension_identity(project_dir)
+    if not (publisher and ext_name):
+        # Best-effort: if we cannot resolve identity, we can't query stores.
+        # Don't fail the run — the publish itself already succeeded.
+        print_warning(
+            "Could not resolve extension identity; "
+            "skipping store publication verification."
+        )
+        return
+    result = verify_extension_store_publication(
+        publisher=publisher,
+        extension_name=ext_name,
+        expected_version=version,
+        vsix_path=vsix_path,
+        interval_seconds=30,
+        timeout_seconds=600,
+    )
+    # Only the Marketplace failure is loud + auto-opens the manage page;
+    # Open VSX failures are surfaced inside verify_extension_store_publication
+    # but don't warrant browser launch (different remediation path).
+    if not result.marketplace_ok:
+        print_warning(
+            "ACTION REQUIRED: upload the .vsix manually to "
+            "the VS Code Marketplace."
+        )
+        try:
+            webbrowser.open(MARKETPLACE_MANAGE_URL)
+        except Exception:
+            # Browser launch is best-effort; the warning already shows the URL.
+            pass
+
+
+def _version_from_vsix_filename(vsix_path: Path) -> str | None:
+    """Extract version from a .vsix filename like 'saropa-lints-12.4.2.vsix'.
+
+    Used by the publish_existing_vsix mode where we can't trust
+    extension/package.json (it may have been auto-bumped after the last
+    publish). The filename is the source of truth for what was packaged.
+    """
+    match = re.search(r"-(\d+\.\d+\.\d+(?:[-+][\w.+-]+)?)\.vsix$", vsix_path.name)
+    return match.group(1) if match else None
+
+
 def run_extension_only_mode(
     mode: str,
     project_dir: Path,
@@ -299,6 +357,10 @@ def run_extension_only_mode(
                 "Extension publish failed",
                 ExitCode.PUBLISH_FAILED,
             )
+        # Final step: confirm the marketplace actually serves the new
+        # version. publish_extension() returning True only means vsce
+        # exited 0 — it does NOT mean the Marketplace propagated.
+        _verify_marketplace_and_ovsx(project_dir, ext_version, vsix)
     return ExitCode.SUCCESS.value
 
 
@@ -349,6 +411,19 @@ def run_publish_existing_vsix_mode(
             exit_with_error(
                 "Extension publish failed",
                 ExitCode.PUBLISH_FAILED,
+            )
+        # Derive version from the vsix filename rather than package.json:
+        # in this mode the user is intentionally publishing an older .vsix
+        # (e.g. one matching the live pub.dev release) while package.json
+        # may already point at the next pre-bumped version. Filename is
+        # the source of truth for what was actually published.
+        vsix_version = _version_from_vsix_filename(vsix)
+        if vsix_version:
+            _verify_marketplace_and_ovsx(project_dir, vsix_version, vsix)
+        else:
+            print_warning(
+                f"Could not parse version from {vsix.name}; "
+                "skipping store publication verification."
             )
     return ExitCode.SUCCESS.value
 
@@ -761,38 +836,11 @@ def run_full_publish(
 
         if extension_published:
             with timer.step("Store verification"):
-                publisher, ext_name = get_extension_identity(ctx.project_dir)
-                if publisher and ext_name:
-                    # Pass vsix_path so that, on Marketplace timeout, the
-                    # verification step can show the exact file to upload.
-                    result = verify_extension_store_publication(
-                        publisher=publisher,
-                        extension_name=ext_name,
-                        expected_version=version,
-                        vsix_path=published_vsix,
-                        interval_seconds=30,
-                        timeout_seconds=600,
-                    )
-                    # Marketplace silently failing is the motivating case
-                    # here: vsce returns 0 but the Marketplace never serves
-                    # the new version. Open the manage page so the user
-                    # can upload the .vsix by hand without hunting for it.
-                    if not result.marketplace_ok:
-                        print_warning(
-                            "ACTION REQUIRED: upload the .vsix manually to "
-                            "the VS Code Marketplace."
-                        )
-                        try:
-                            webbrowser.open(MARKETPLACE_MANAGE_URL)
-                        except Exception:
-                            # Browser launch is best-effort; the warning
-                            # text above already shows the URL.
-                            pass
-                else:
-                    print_warning(
-                        "Could not resolve extension identity; "
-                        "skipping store publication verification."
-                    )
+                # Pass vsix_path so that, on Marketplace timeout, the
+                # verification step can show the exact file to upload.
+                _verify_marketplace_and_ovsx(
+                    ctx.project_dir, version, published_vsix,
+                )
 
         try:
             webbrowser.open(
