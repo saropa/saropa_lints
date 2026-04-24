@@ -8,7 +8,8 @@
 ///
 /// Populates:
 /// - [SaropaLintRule.enabledRules] (diagnostics `true` + severity-implied enables +
-///   rule pack codes from `rule_packs.enabled`, excluding [disabledRules])
+///   rule pack codes from `rule_packs.enabled`, excluding
+///   [SaropaLintRule.disabledRules])
 /// - [SaropaLintRule.severityOverrides] and [SaropaLintRule.disabledRules]
 /// - [BaselineManager] (baseline path, enabled)
 /// - [ProgressTracker] (max_issues, file-only output)
@@ -31,7 +32,8 @@ import 'package:saropa_lints/src/string_slice_utils.dart';
 
 /// Loads all plugin configuration from yaml and environment variables.
 /// Order matters: severity overrides first, then diagnostics (enable/disable),
-/// then **rule packs** (adds enabled rule codes; skips [disabledRules]),
+/// then **rule packs** (adds enabled rule codes; skips
+/// [SaropaLintRule.disabledRules]),
 /// then baseline, banned usage, and output (max_issues, file-only).
 /// Safe to call multiple times — static fields are simply overwritten.
 /// Never throws; failures in any step are caught and the rest still run.
@@ -41,8 +43,8 @@ import 'package:saropa_lints/src/string_slice_utils.dart';
 /// analyzer-launched plugin where cwd is the analysis-server process's
 /// working directory (often the user's home or wherever the IDE was
 /// launched from). For that path, see [loadNativePluginConfigFromProjectRoot],
-/// triggered lazily by [SaropaContext._wrapCallback] once the real project
-/// root can be derived from an analyzed file path.
+/// triggered lazily from `SaropaContext` once the real project root can be
+/// derived from an analyzed file path.
 void loadNativePluginConfig() {
   _loadFromRoot(null);
 }

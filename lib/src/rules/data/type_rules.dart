@@ -2494,7 +2494,7 @@ class PreferTypeOverVarRule extends SaropaLintRule {
 /// Warns when an external field or variable has an initializer.
 ///
 /// External declarations have no Dart implementation; an initializer is invalid.
-/// Detection: [addVariableDeclarationList], first token after metadata is
+/// Detection: [SaropaContext.addVariableDeclarationList], first token after metadata is
 /// `external`, then report any variable in the list that has a non-null
 /// initializer (covers top-level and field declarations).
 ///

@@ -397,7 +397,7 @@ class _RemoveAnnotationFix extends SaropaFixProducer {
 // avoid_deprecated_expires_getter
 // ─────────────────────────────────────────────────────────────────────────────
 
-/// Detects use of the removed [Deprecated.expires] getter (Dart 3.0).
+/// Detects use of the removed `Deprecated.expires` getter (Dart 3.0).
 class AvoidDeprecatedExpiresGetterRule extends SaropaLintRule {
   AvoidDeprecatedExpiresGetterRule() : super(code: _code);
 
@@ -480,7 +480,7 @@ class _AvoidDeprecatedExpiresGetterFix extends SaropaFixProducer {
 // avoid_removed_cast_error
 // ─────────────────────────────────────────────────────────────────────────────
 
-/// Detects references to the removed [CastError] type (Dart 3.0).
+/// Detects references to the removed `CastError` type (Dart 3.0).
 ///
 /// Prefer [TypeError]; CastError was subsumed by TypeError.
 class AvoidRemovedCastErrorRule extends SaropaLintRule {
@@ -532,7 +532,7 @@ class AvoidRemovedCastErrorRule extends SaropaLintRule {
 // avoid_removed_fall_through_error
 // ─────────────────────────────────────────────────────────────────────────────
 
-/// Detects references to the removed [FallThroughError] (Dart 3.0).
+/// Detects references to the removed `FallThroughError` (Dart 3.0).
 class AvoidRemovedFallThroughErrorRule extends SaropaLintRule {
   AvoidRemovedFallThroughErrorRule() : super(code: _code);
 
@@ -575,7 +575,7 @@ class AvoidRemovedFallThroughErrorRule extends SaropaLintRule {
 // avoid_removed_abstract_class_instantiation_error
 // ─────────────────────────────────────────────────────────────────────────────
 
-/// Detects references to the removed [AbstractClassInstantiationError].
+/// Detects references to the removed `AbstractClassInstantiationError`.
 class AvoidRemovedAbstractClassInstantiationErrorRule extends SaropaLintRule {
   AvoidRemovedAbstractClassInstantiationErrorRule() : super(code: _code);
 
@@ -623,7 +623,7 @@ class AvoidRemovedAbstractClassInstantiationErrorRule extends SaropaLintRule {
 // avoid_removed_cyclic_initialization_error
 // ─────────────────────────────────────────────────────────────────────────────
 
-/// Detects references to the removed [CyclicInitializationError].
+/// Detects references to the removed `CyclicInitializationError`.
 class AvoidRemovedCyclicInitializationErrorRule extends SaropaLintRule {
   AvoidRemovedCyclicInitializationErrorRule() : super(code: _code);
 
@@ -718,7 +718,7 @@ class AvoidRemovedNoSuchMethodErrorDefaultConstructorRule
 // avoid_removed_bidirectional_iterator
 // ─────────────────────────────────────────────────────────────────────────────
 
-/// Detects references to the removed [BidirectionalIterator] interface.
+/// Detects references to the removed `BidirectionalIterator` interface.
 class AvoidRemovedBidirectionalIteratorRule extends SaropaLintRule {
   AvoidRemovedBidirectionalIteratorRule() : super(code: _code);
 
@@ -761,7 +761,7 @@ class AvoidRemovedBidirectionalIteratorRule extends SaropaLintRule {
 // avoid_removed_deferred_library
 // ─────────────────────────────────────────────────────────────────────────────
 
-/// Detects the removed [DeferredLibrary] class / annotation (Dart 3.0).
+/// Detects the removed `DeferredLibrary` class / annotation (Dart 3.0).
 ///
 /// Use `import '...' deferred as prefix` instead.
 class AvoidRemovedDeferredLibraryRule extends SaropaLintRule {
@@ -1110,7 +1110,7 @@ class AvoidDeprecatedNetworkInterfaceListSupportedRule extends SaropaLintRule {
 // avoid_removed_null_thrown_error
 // ─────────────────────────────────────────────────────────────────────────────
 
-/// Flags references to the removed [NullThrownError] type (Dart 3.0).
+/// Flags references to the removed `NullThrownError` type (Dart 3.0).
 ///
 /// **Why:** `NullThrownError` was removed in Dart 3.0.0. In null-safe code,
 /// `throw (null as dynamic)` produces a [TypeError] instead, because `null`

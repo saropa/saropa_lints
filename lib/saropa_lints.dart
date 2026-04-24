@@ -2997,7 +2997,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
 // =============================================================================
 // Built once on first access. Creates temporary instances to get rule names,
 // then discards them. Only the factory references are kept in memory.
-// This allows tier filtering without keeping all 2050+ rules in memory.
+// This allows tier filtering without keeping all 2100+ rules in memory.
 
 /// Lazy name→factory map, built once on first access.
 late final Map<String, SaropaLintRule Function()> _ruleFactories =
@@ -3007,7 +3007,7 @@ late final Map<String, SaropaLintRule Function()> _ruleFactories =
 ///
 /// Computed alongside [_ruleFactories] during the same temporary-instance
 /// pass, so there is zero additional instantiation cost.
-/// Used by [ViolationExporter] to include fix availability in the JSON
+/// Used by `ViolationExporter` to include fix availability in the JSON
 /// export, which the VS Code extension reads to disable "Apply fix" for
 /// rules without fixes.
 Set<String> get rulesWithFixes {
@@ -3053,7 +3053,7 @@ Map<String, SaropaLintRule Function()> _buildRuleFactoriesMap() {
 ///
 /// Only instantiates rules that are in the provided set.
 /// This is the key optimization - for essential tier (253 rules),
-/// only 253 rules are created instead of all 2050+.
+/// only 253 rules are created instead of all 2100+.
 /// Builds rule instances only for the given [ruleNames] (e.g. tier set).
 /// Used by the native plugin so only enabled-tier rules are instantiated.
 List<SaropaLintRule> getRulesFromRegistry(Set<String> ruleNames) {
@@ -3081,8 +3081,9 @@ List<SaropaLintRule> getRulesFromRegistry(Set<String> ruleNames) {
 /// ## Semantics
 ///
 /// - Registers **every** rule from [_ruleFactories] unconditionally. The
-///   per-rule enable gate happens at visitor-entry time in
-///   [SaropaContext._wrapCallback], NOT here. This is required because the
+///   per-rule enable gate happens at visitor-entry time in the
+///   `SaropaContext` visitor wrapper (`_wrapCallback` in source), NOT here.
+///   This is required because the
 ///   `analysis_server_plugin` API calls `Plugin.register` synchronously in
 ///   the `PluginServer` constructor — before `start()`, before any
 ///   communication channel, before any context-root information. At

@@ -232,7 +232,7 @@ class _PreferDropdownInitialValueFix extends SaropaFixProducer {
 // ─────────────────────────────────────────────────────────────────────────────
 
 /// Flags redundant `opacityAnimation!` and nullable `CurvedAnimation? opacityAnimation`
-/// on [State] subclasses for [DropdownMenuItemButton].
+/// on `State` subclasses for `DropdownMenuItemButton`.
 ///
 /// Since: Unreleased | Rule version: v1
 ///
@@ -242,7 +242,8 @@ class _PreferDropdownInitialValueFix extends SaropaFixProducer {
 /// as nullable.
 ///
 /// Detection uses resolved types (`DropdownMenuItemButton`, `State`, `CurvedAnimation`) so
-/// unrelated identifiers named `opacityAnimation` are not flagged. [requiresFlutterImport] is
+/// unrelated identifiers named `opacityAnimation` are not flagged.
+/// [SaropaLintRule.requiresFlutterImport] is
 /// false so example fixtures with mocks can be analyzed; the type graph still constrains matches.
 ///
 /// **BAD:**
@@ -1587,13 +1588,13 @@ class _PreferM3TextThemeFix extends SaropaFixProducer {
 // prefer_overflow_bar_over_button_bar
 // ─────────────────────────────────────────────────────────────────────────────
 
-/// Flags [ButtonBar], [ButtonBarThemeData], and [ThemeData.buttonBarTheme] in
-/// favor of [OverflowBar]-centric layouts (Flutter 3.13 / 3.24 migration).
+/// Flags `ButtonBar`, `ButtonBarThemeData`, and `ThemeData.buttonBarTheme` in
+/// favor of `OverflowBar`-centric layouts (Flutter 3.13 / 3.24 migration).
 ///
 /// Since: v9.10.1 | Rule version: v2
 ///
-/// Flutter recommends [OverflowBar] for horizontal action rows (PR #128437).
-/// [ButtonBar], [ButtonBarThemeData], and `ThemeData.buttonBarTheme` were
+/// Flutter recommends `OverflowBar` for horizontal action rows (PR #128437).
+/// `ButtonBar`, `ButtonBarThemeData`, and `ThemeData.buttonBarTheme` were
 /// deprecated in PR #145523 (Flutter 3.24.0).
 ///
 /// ## Detection & false-positive guards
@@ -1610,11 +1611,11 @@ class _PreferM3TextThemeFix extends SaropaFixProducer {
 ///
 /// ## Performance
 ///
-/// [requiredPatterns]: `ButtonBar` and `buttonBarTheme` for early file skip.
+/// [SaropaLintRule.requiredPatterns]: `ButtonBar` and `buttonBarTheme` for early file skip.
 ///
 /// ## Quick fix
 ///
-/// Removes `buttonBarTheme:` from [ThemeData] constructors and `copyWith` only.
+/// Removes `buttonBarTheme:` from `ThemeData` constructors and `copyWith` only.
 ///
 /// **BAD:**
 /// ```dart
@@ -1824,21 +1825,21 @@ void _reportFlutterTestBindingWindowIfDeprecated(
   reporter.atNode(property);
 }
 
-/// Flags deprecated [TestWindow] and [TestWidgetsFlutterBinding.window] from
+/// Flags deprecated `TestWindow` and `TestWidgetsFlutterBinding.window` from
 /// `package:flutter_test`.
 ///
 /// ## Context
 ///
 /// Flutter 3.10 deprecated these APIs (PR #122824) to prepare for multi-window
-/// support. [TestWindow] combined platform dispatcher and view concerns; the
-/// replacement split is [WidgetTester.platformDispatcher] /
-/// [TestPlatformDispatcher] vs [WidgetTester.view] / [WidgetTester.viewOf].
+/// support. `TestWindow` combined platform dispatcher and view concerns; the
+/// replacement split is `WidgetTester.platformDispatcher` /
+/// `TestPlatformDispatcher` vs `WidgetTester.view` / `WidgetTester.viewOf`.
 ///
 /// ## Detection strategy
 ///
 /// - **Element resolution only** — no substring heuristics on type names (see
-///   CONTRIBUTING.md, avoiding false positives). [TestWindow] and
-///   [TestWidgetsFlutterBinding.window] must resolve to declarations in
+///   CONTRIBUTING.md, avoiding false positives). `TestWindow` and
+///   `TestWidgetsFlutterBinding.window` must resolve to declarations in
 ///   `package:flutter_test`.
 /// - **[requiredPatterns]:** `package:flutter_test/` so non-test files skip the
 ///   rule before AST callbacks run.
@@ -1849,8 +1850,8 @@ void _reportFlutterTestBindingWindowIfDeprecated(
 /// ## False-positive guards
 ///
 /// - A user-defined `class TestWindow` in the app package is not flagged.
-/// - `.window` on types other than [TestWidgetsFlutterBinding] (e.g.
-///   `dart:ui` [SingletonFlutterWindow]) is not flagged unless the identifier
+/// - `.window` on types other than `TestWidgetsFlutterBinding` (e.g.
+///   `dart:ui` `SingletonFlutterWindow`) is not flagged unless the identifier
 ///   resolves to that binding's deprecated [GetterElement].
 ///
 /// ## Performance
@@ -1861,7 +1862,7 @@ void _reportFlutterTestBindingWindowIfDeprecated(
 ///
 /// ## Quick fix
 ///
-/// None — replacements need a [WidgetTester] or binding reference in scope;
+/// None — replacements need a `WidgetTester` or binding reference in scope;
 /// automated rewrites would often be wrong.
 ///
 /// ## References

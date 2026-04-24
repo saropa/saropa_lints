@@ -2373,7 +2373,7 @@ bool _expressionUsesRandomOrRng(Expression expression) {
 /// 2. **Random / RNG usage:** Initializers that use Random or RNG-like APIs:
 ///    - Any type named [Random], `RNG`, or `RandomNumberGenerator` from any
 ///      library (dart:math [Random] or project overloads/custom RNG types).
-///    - Instance methods `nextDouble`, `nextInt`, `nextBool`, [next] on such
+///    - Instance methods `nextDouble`, `nextInt`, `nextBool`, `next` on such
 ///      a type, or on a variable with a common RNG-like name (rng, random,
 ///      rand, rnd). Each call yields a different value.
 ///

@@ -51,7 +51,9 @@ bool isExactTarget(Expression target, Set<String> targets) {
 /// The regex handles:
 /// - Optional whitespace: `name . dispose (` and `name.dispose(`
 /// - Null-aware access: `name?.dispose(`
-/// - Safe-call variants: `name?.disposeSafe(`
+///
+/// Extension cleanup methods (e.g. `disposeSafe`) are not implied by the method
+/// name `dispose`; call [isFieldCleanedUp] again with the exact method name.
 ///
 /// Example:
 /// ```dart
