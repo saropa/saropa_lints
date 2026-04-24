@@ -85,13 +85,13 @@ dependencies:
       expect(
         ProjectContext.hasWebSupport(path),
         isFalse,
-        reason: 'Mobile-only Flutter project cannot emit a web build, so '
+        reason:
+            'Mobile-only Flutter project cannot emit a web build, so '
             'dart:io imports are structurally safe.',
       );
     });
 
-    test('Pure Dart library (no flutter: block) → true even without web/',
-        () {
+    test('Pure Dart library (no flutter: block) → true even without web/', () {
       // Library authors can't know their caller's platforms — a
       // browser-targeting app may consume this library, so web-compat
       // warnings still apply. This branch keeps the existing behavior for
@@ -106,8 +106,7 @@ dependencies:
       expect(ProjectContext.hasWebSupport(path), isTrue);
     });
 
-    test('null filePath → true (unknown → assume modern / assume strict)',
-        () {
+    test('null filePath → true (unknown → assume modern / assume strict)', () {
       // Matches the unknown-defaults-to-true philosophy of
       // `flutterSdkAtLeast`: when the project is un-introspectable, we
       // prefer to emit the warning and let the user silence it.
@@ -118,8 +117,7 @@ dependencies:
       expect(ProjectContext.hasWebSupport(''), isTrue);
     });
 
-    test('path with no pubspec anywhere → true (unknown → assume strict)',
-        () {
+    test('path with no pubspec anywhere → true (unknown → assume strict)', () {
       // A path that doesn't resolve to any project root. The cache lookup
       // returns null, so the predicate falls through to the default.
       final orphan = p.join(tempRoot.path, 'nowhere', 'file.dart');

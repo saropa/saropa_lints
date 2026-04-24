@@ -18,6 +18,40 @@ Use lowercase with underscores. Check existing files before creating.
 
 ---
 
+## Confirm Attribution Before Filing
+
+**Before filing a bug here, grep to prove the rule lives in `saropa_lints`.** A diagnostic's `source` / `owner` label in the VS Code Problems panel is not attribution — it is a label the emitter chose. Sibling analyzer plugins and extensions (`drift-advisor`, `drift-linter`, `Saropa Drift Advisor`, other `custom_lint`-based plugins, etc.) emit diagnostics that can look similar to `saropa_lints` rules or carry similar-looking code names. Filing here without proof forces the first fix agent to waste a round-trip discovering the bug lives elsewhere — or worse, the agent guesses and ships a half-fix in the wrong repo.
+
+### Positive attribution (required)
+
+For every rule name mentioned in the report, paste the result of:
+
+```bash
+grep -rn "'<rule_name>'" lib/src/rules/
+```
+
+Expected match: the rule is defined in `lib/src/rules/<category>/<file>.dart` (e.g., `lib/src/rules/packages/drift_rules.dart`) and registered in `lib/src/rules/all_rules.dart`. **Zero matches means the rule does not live in `saropa_lints`** — do not file here.
+
+### Negative attribution (required when multiple sources may overlap)
+
+If the diagnostic's `source` / `owner` label is ambiguous (`drift-advisor`, `Saropa Drift Advisor`, `saropa-lints`, `saropa_lints` — they all look similar to a downstream reader), also grep the suspected sibling repos to confirm the rule is NOT defined there:
+
+```bash
+grep -rn "'<rule_name>'" ../saropa_drift_advisor/lib/src/ ../saropa_drift_advisor/extension/src/
+```
+
+Paste the zero-match result. If you get a match, file the bug in that repo instead.
+
+### Reverse case: diagnostics whose emitter is not here
+
+If the report is about a diagnostic whose label resembles `saropa_lints` but the positive grep returns nothing, **stop**. The emitter lives in another plugin or extension. Name the suspected emitter, paste the positive grep from that repo, and file the bug in that repo's `bugs/` folder. Do not open a bug here on the theory that "saropa_lints probably registers it somehow" — that guess has cost us real round-trips.
+
+### Why this section exists
+
+We have had bugs misattributed in both directions — `saropa_lints` rules filed against `saropa_drift_advisor` and `drift_advisor` diagnostics filed against `saropa_lints`. In every case, the fix agent saw a label, assumed a repo, and either punted the work as "somebody else's" or shipped a fix in the wrong tree. The only defense is grep evidence pasted directly in the bug report.
+
+---
+
 ## Bug Report Template
 
 Copy the block below into a new file.
@@ -40,6 +74,26 @@ Rule version: vN | Since: vX.Y.Z | Updated: vX.Y.Z
 ## Summary
 
 One or two sentences: what happens, what should happen instead.
+
+---
+
+## Attribution Evidence
+
+Grep proof that this rule lives in `saropa_lints`. If the positive grep is empty, the bug does not belong in this repo — do not file here. See "Confirm Attribution Before Filing" in the guide.
+
+```bash
+# Positive — rule IS defined here
+grep -rn "'rule_name'" lib/src/rules/
+# Expected: lib/src/rules/<category>/<file>.dart:NN: ... 'rule_name' ...
+
+# Negative — rule is NOT in sibling repos (paste only if source label is ambiguous across projects)
+grep -rn "'rule_name'" ../saropa_drift_advisor/lib/src/ ../saropa_drift_advisor/extension/src/
+# Expected: 0 matches
+```
+
+**Emitter registration:** `lib/src/rules/<category>/<file>.dart:NN`
+**Rule class:** `XxxRule` — registered in `lib/src/rules/all_rules.dart:NN`
+**Diagnostic `source` / `owner` as seen in Problems panel:** `...`
 
 ---
 
@@ -241,6 +295,8 @@ A rule causes analysis to hang or take unreasonably long.
 
 Use this when diagnosing a new bug.
 
+- [ ] **Positive attribution grep** — `grep -rn "'rule_name'" lib/src/rules/` returns at least one match, pasted in the report. Zero matches = do not file here
+- [ ] **Negative attribution grep** — if the diagnostic's `source` / `owner` label is ambiguous across sibling repos (`drift-advisor`, `Saropa Drift Advisor`, etc.), paste the zero-match grep from each suspected sibling repo
 - [ ] **Reproduce it** — create a minimal Dart snippet that triggers the behavior
 - [ ] **Check registration** — is the rule in `all_rules.dart` and `tiers.dart`?
 - [ ] **Read the rule source** — find the `run()` method and trace the logic
@@ -259,6 +315,8 @@ These patterns have caused bugs before. Check for them during investigation.
 
 | Pitfall | Why It Breaks | Correct Pattern |
 |---------|---------------|-----------------|
+| Attributing a diagnostic by its label | `source: "drift-advisor"` does not mean "defined in `drift_advisor` repo" — it is a label the emitter chose | Grep the rule name in every plausible repo; attribution is `file:line`, not a label |
+| Filing here without positive grep | Wastes a fix agent's round-trip when the rule actually lives in a sibling plugin | `grep -rn "'rule_name'" lib/src/rules/` must return at least one match before filing |
 | String matching for types | `name.contains('Stream')` matches `upstream` | Use `staticType?.isDartAsyncStream` |
 | Unsafe parent cast | `node.parent as MethodDeclaration` crashes if parent is different | `if (node.parent is MethodDeclaration)` |
 | Missing AST node in parent walk | Loop skips `AssignmentExpression` inside `IfStatement` | Handle all intermediate node types or don't break on unknown |

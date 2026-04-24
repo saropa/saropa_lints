@@ -137,7 +137,11 @@ def verify_pubdev_publication(
     Checks every *interval_seconds* for up to *timeout_seconds*.
     Returns True when pub.dev reports *expected_version*, False on timeout.
     """
-    print_header("PUB.DEV PUBLICATION VERIFICATION")
+    # Labeled "FINAL STEP:" so it matches the parallel extension store check.
+    # The run_full_publish pipeline calls this at the very end alongside the
+    # Marketplace/Open VSX verification so both availability checks are the
+    # literal last thing the user sees before the success banner.
+    print_header("FINAL STEP: PUB.DEV AVAILABILITY CHECK")
     print_info(
         f"Polling pub.dev every {interval_seconds}s for up to "
         f"{timeout_seconds // 60} minutes..."

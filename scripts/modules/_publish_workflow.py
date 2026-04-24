@@ -200,24 +200,31 @@ def print_success_banner(
         f"/releases/tag/v{version}",
         Color.CYAN,
     )
-    # Store links only shown when the extension was actually published
+    # Item-specific Marketplace / Open VSX links only when the extension
+    # was actually published this run — linking to an unpublished item
+    # produces a 404 for the developer.
     if extension_published and publisher and extension_name:
         print_colored(
             f"      Marketplace:  https://marketplace.visualstudio.com"
             f"/items?itemName={publisher}.{extension_name}",
             Color.CYAN,
         )
-        # Publisher management console — lets the user verify the publish,
-        # re-upload a .vsix manually, or inspect stats. Surfaced here so it's
-        # a one-click hop after a successful release instead of hunting the URL.
-        print_colored(
-            f"      Manage:       https://marketplace.visualstudio.com"
-            f"/manage/publishers/{publisher}",
-            Color.CYAN,
-        )
         print_colored(
             f"      Open VSX:     https://open-vsx.org"
             f"/extension/{publisher}/{extension_name}",
+            Color.CYAN,
+        )
+    # Publisher management console — always surfaced (not gated on
+    # extension_published) because it's the single most useful URL for
+    # a developer: it works even when the extension publish was skipped
+    # or failed silently, lets the user verify the publish, re-upload a
+    # .vsix manually, and inspect download stats. Previously hidden
+    # behind extension_published, which meant the developer had to hunt
+    # for the URL exactly in the failure case where they needed it most.
+    if publisher:
+        print_colored(
+            f"      Manage:       https://marketplace.visualstudio.com"
+            f"/manage/publishers/{publisher}",
             Color.CYAN,
         )
     print()
@@ -729,10 +736,6 @@ def run_full_publish(
         )
         succeeded = True
 
-        # Verify pub.dev received the new version (non-fatal on timeout)
-        with timer.step("pub.dev verification"):
-            verify_pubdev_publication(ctx.package_name, version)
-
         run_version_bump(
             ctx.project_dir,
             ctx.pubspec_path,
@@ -745,6 +748,17 @@ def run_full_publish(
             ctx.project_dir, version, timer,
         )
         extension_published = published_vsix is not None
+
+        # FINAL STEP: consolidated store availability check.
+        # Runs both pub.dev and (when applicable) Marketplace/Open VSX
+        # verifications as the very last thing before the success banner,
+        # so the user sees availability confirmation at the end of the
+        # workflow instead of spread across earlier pipeline stages.
+        # pub.dev verification is non-fatal on timeout — the publish step
+        # itself already succeeded; this just confirms propagation.
+        with timer.step("pub.dev verification"):
+            verify_pubdev_publication(ctx.package_name, version)
+
         if extension_published:
             with timer.step("Store verification"):
                 publisher, ext_name = get_extension_identity(ctx.project_dir)

@@ -47,6 +47,28 @@ The extension is the primary setup and configuration surface:
 
 ---
 
+## Scope: Static Code vs. Runtime Data (Drift)
+
+`saropa_lints` and **[Saropa Drift Advisor](https://marketplace.visualstudio.com/items?itemName=saropa.saropa-drift-advisor)** are complementary, not overlapping. They analyze different things and should both be installed when you use Drift.
+
+|                 | `saropa_lints`                                                                                       | `saropa_drift_advisor`                                                                 |
+| --------------- | ---------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| **Analyzes**    | Dart source code (AST)                                                                               | Live database file, schema, and data statistics                                        |
+| **Runs as**     | Analyzer plugin (compile-time)                                                                       | VS Code extension + debug server (runtime)                                             |
+| **Drift rules** | 32 static code-pattern rules in [`lib/src/rules/packages/drift_rules.dart`](lib/src/rules/packages/drift_rules.dart) | Runtime/schema diagnostics — anomalies, invariants, data quality, query performance    |
+| **Examples**    | `avoid_drift_enum_index_reorder`, `avoid_drift_update_without_where`, `require_drift_database_close` | Column-value outliers, schema drift, n+1 query detection, unique-index gaps            |
+| **Sees source** | Yes                                                                                                  | No                                                                                     |
+| **Sees data**   | No                                                                                                   | Yes                                                                                    |
+
+**Rule of thumb:**
+
+- A problem with the **code** you wrote (wrong TypeConverter, missing `WHERE`, unclosed DB) → `saropa_lints`.
+- A problem with the **data** in your running DB (unexpected distribution, schema mismatch, missing migration) → `saropa_drift_advisor`.
+
+Neither project will ever subsume the other — they operate on different inputs. File Drift-rule bugs against whichever project owns the rule surface that produced the diagnostic (look at the `source` / `owner` field in the Problems panel).
+
+---
+
 ## Quick Start
 
 **Requirements:** Dart SDK `>=3.9.0 <4.0.0` (same constraint as this package’s [`pubspec.yaml`](https://github.com/saropa/saropa_lints/blob/main/pubspec.yaml)).
