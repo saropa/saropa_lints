@@ -90,8 +90,8 @@ saropa_lints:
   #   - essential      : ~300 rules (critical only)
   #   - recommended    : ~901 rules (default) ← START HERE
   #   - professional   : ~1600 rules (strict)
-  #   - comprehensive  : ~2050 rules (very strict)
-  #   - pedantic       : ~2050 rules (everything)
+  #   - comprehensive  : ~2100 rules (very strict)
+  #   - pedantic       : ~2100 rules (everything)
   tier: recommended
 
   # cspell:ignore shouldrepaint itemextent

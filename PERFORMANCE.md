@@ -10,10 +10,10 @@ Saropa Lints (v5+) runs as a **native Dart analyzer plugin**, integrated directl
 
 1. **Native integration** - Rules run inside the analyzer process, eliminating IPC overhead
 2. **Incremental analysis** - The analyzer only re-analyzes changed files
-3. **Lazy rule instantiation** - Only rules in the selected tier are created (not all 2050+)
+3. **Lazy rule instantiation** - Only rules in the selected tier are created (not all 2100+)
 4. **Compile-time constant tier sets** - No runtime set-building overhead
 
-With 2050+ rules, analysis can still be slow on large projects. The optimizations below help manage this.
+With 2100+ rules, analysis can still be slow on large projects. The optimizations below help manage this.
 
 ---
 
@@ -38,8 +38,8 @@ dart run saropa_lints:init --tier professional
 | `essential`     | ~300       | **Fastest** (baseline) |
 | `recommended`   | ~900       | ~2x slower             |
 | `professional`  | ~1600      | ~3x slower             |
-| `comprehensive` | ~2050      | ~3.5x slower           |
-| `pedantic`      | ~2050      | **Slowest**            |
+| `comprehensive` | ~2100      | ~3.5x slower           |
+| `pedantic`      | ~2100      | **Slowest**            |
 
 ### 2. Exclude Generated Code
 
@@ -133,7 +133,7 @@ Higher tiers use `.union()` on these const sets. Since the base sets are immutab
 
 ### Lazy Rule Instantiation
 
-**Problem:** Instantiating all 2050+ rules consumes ~4GB of memory.
+**Problem:** Instantiating all 2100+ rules consumes ~4GB of memory.
 
 **Solution:** Rules are stored as factory functions and only instantiated when needed:
 
@@ -259,7 +259,7 @@ Use different tiers for local development vs CI:
 # Local: Fast feedback loop (~300 rules)
 dart run saropa_lints:init --tier essential
 
-# CI: Thorough checking (~2050 rules)
+# CI: Thorough checking (~2100 rules)
 dart run saropa_lints:init --tier comprehensive -o analysis_options.ci.yaml
 ```
 

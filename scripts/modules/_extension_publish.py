@@ -8,7 +8,7 @@ propagation by polling the Marketplace and Open VSX APIs.
 Used by the unified publish.py workflow (package and extension are
 intrinsically linked).
 
-Version:   2.0
+Version:   2.1
 Author:    Saropa
 Copyright: (c) 2025-2026 Saropa
 """
@@ -294,13 +294,26 @@ def package_extension(project_dir: Path, version: str) -> Path | None:
 
 
 def publish_extension(project_dir: Path, vsix_path: Path) -> bool:
-    """Publish to Marketplace then Open VSX (if OVSX_PAT set). Returns True if both succeed or skip."""
+    """Publish to the VS Code Marketplace, then to Open VSX.
+
+    Open VSX is always attempted after the Marketplace step. A failed
+    Marketplace upload (expired vsce token, etc.) no longer blocks
+    `npx ovsx publish`, so the registry at open-vsx.org can still receive
+    the .vsix when OVSX_PAT is valid.
+
+    Returns True when Marketplace succeeded and Open VSX either published
+    or was skipped (user declined a PAT). Returns False if either required
+    publish step failed.
+    """
     marketplace_ok = publish_extension_to_marketplace(project_dir, vsix_path)
     if marketplace_ok:
         print_info(f"  Manage: {MARKETPLACE_MANAGE_URL}")
-    if not marketplace_ok:
-        return False
-    return publish_extension_to_ovsx(project_dir, vsix_path)
+    else:
+        print_warning(
+            "VS Code Marketplace publish failed — still attempting Open VSX."
+        )
+    ovsx_ok = publish_extension_to_ovsx(project_dir, vsix_path)
+    return marketplace_ok and ovsx_ok
 
 
 # =============================================================================

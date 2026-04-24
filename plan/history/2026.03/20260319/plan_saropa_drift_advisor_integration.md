@@ -6,7 +6,7 @@
 ## Summary
 
 - **saropa_drift_advisor**: Debug-only HTTP server + VS Code extension for inspecting SQLite/Drift DBs. Exposes REST API (health, tables, schema, index-suggestions, anomalies, performance, snapshots, compare). No CLI. Issues are **index suggestions** (missing indexes) and **anomalies** (data quality: nulls, empty strings, orphaned FKs, duplicates, outliers). Server has **no file/line**; the Drift Advisor extension maps table/column → Dart files via regex (class name, column getters).
-- **saropa_lints**: Dart custom lint package (2050+ rules) + VS Code extension (issues tree, config, vibrancy, TODOs & Hacks). No current reference to saropa_drift_advisor.
+- **saropa_lints**: Dart custom lint package (2100+ rules) + VS Code extension (issues tree, config, vibrancy, TODOs & Hacks). No current reference to saropa_drift_advisor.
 
 Integration is **optional**: only relevant when the user has both a Dart/Drift project and (at debug time) a running Drift Advisor server. We want **tighter** integration without hard dependencies or mandatory features.
 

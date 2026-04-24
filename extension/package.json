@@ -1,7 +1,7 @@
 {
   "name": "saropa-lints",
   "displayName": "Saropa Lints",
-  "description": "2050+ Dart/Flutter lint rules with visual analysis, plus Package Vibrancy for dependency health scoring, vulnerability scanning, and upgrade planning.",
+  "description": "2100+ Dart/Flutter lint rules with visual analysis, plus Package Vibrancy for dependency health scoring, vulnerability scanning, and upgrade planning.",
   "version": "12.4.2",
   "publisher": "saropa",
   "license": "MIT",
@@ -125,7 +125,7 @@
     "viewsWelcome": [
       {
         "view": "saropaLints.overview",
-        "contents": "Saropa Lints provides 2050+ Dart and Flutter lint rules for security, accessibility, and performance. It has two components: a pub.dev package with the rules and a VS Code extension for visual analysis and configuration.\n\nRequires a Dart or Flutter project.\n\nOpen a folder containing a `pubspec.yaml` to get started.\n\n[Learn more online](https://pub.dev/packages/saropa_lints)\n[Browse All Commands](command:saropaLints.showCommandCatalog)\n[About Saropa Lints](command:saropaLints.showAbout)\n[Getting Started](command:saropaLints.openWalkthrough)",
+        "contents": "Saropa Lints provides 2100+ Dart and Flutter lint rules for security, accessibility, and performance. It has two components: a pub.dev package with the rules and a VS Code extension for visual analysis and configuration.\n\nRequires a Dart or Flutter project.\n\nOpen a folder containing a `pubspec.yaml` to get started.\n\n[Learn more online](https://pub.dev/packages/saropa_lints)\n[Browse All Commands](command:saropaLints.showCommandCatalog)\n[About Saropa Lints](command:saropaLints.showAbout)\n[Getting Started](command:saropaLints.openWalkthrough)",
         "when": "!saropaLints.isDartProject"
       },
       {

@@ -45,7 +45,7 @@ import { buildFileRisks } from './fileRiskTree';
 import { loadSuppressions, isPathHidden, isRuleHidden } from '../suppressionsStore';
 
 const OVERVIEW_INTRO_TOOLTIP =
-    'Saropa Lints provides 2050+ Dart and Flutter lint rules for security, accessibility, and performance. '
+    'Saropa Lints provides 2100+ Dart and Flutter lint rules for security, accessibility, and performance. '
     + 'It has two components: a pub.dev package with the rules and a VS Code extension for visual analysis and configuration.';
 
 /** Collapsible group for onboarding and documentation links (always first when the tree has content). */

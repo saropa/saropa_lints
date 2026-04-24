@@ -678,12 +678,20 @@ class _BugCategory(NamedTuple):
     color: Color
 
 
+_ROOT_MD_EXCLUDED_FROM_UNSOLVED = frozenset(
+    {
+        "INDEX.MD",
+        "BUG_REPORT_GUIDE.MD",
+    },
+)
+
+
 def _collect_bug_categories(bugs_dir: Path) -> list[_BugCategory]:
     """Collect bug report counts by directory.
 
     - history/ -> GREEN (resolved)
     - Other subfolders -> YELLOW (in-progress/categorized)
-    - Root-level .md files (excl. INDEX.md) -> RED (unsolved)
+    - Root-level .md files (excl. index and meta guides) -> RED (unsolved)
     """
     if not bugs_dir.exists() or not bugs_dir.is_dir():
         return []
@@ -713,7 +721,7 @@ def _collect_bug_categories(bugs_dir: Path) -> list[_BugCategory]:
         1 for f in bugs_dir.iterdir()
         if f.is_file()
         and f.suffix.lower() == ".md"
-        and f.name.upper() != "INDEX.MD"
+        and f.name.upper() not in _ROOT_MD_EXCLUDED_FROM_UNSOLVED
     )
     if unsolved > 0:
         categories.append(

@@ -8,7 +8,7 @@ Established in 2010, **Saropa Pty Limited** is a technology firm rooted in finan
 
 | Package | Description |
 |---------|-------------|
-| **[saropa_lints](https://pub.dev/packages/saropa_lints)** | 2050+ custom lint rules. Catch memory leaks, security vulnerabilities (OWASP mapped), and runtime crashes. |
+| **[saropa_lints](https://pub.dev/packages/saropa_lints)** | 2100+ custom lint rules. Catch memory leaks, security vulnerabilities (OWASP mapped), and runtime crashes. |
 | **[saropa_dart_utils](https://pub.dev/packages/saropa_dart_utils)** | 280+ production-hardened extension methods for Strings, Dates, and Lists. |
 | **[saropa_drift_viewer](https://pub.dev/packages/saropa_drift_viewer)** | Debug-only SQLite/Drift inspector with web UI, schema export, and SQL runner. |
 
