@@ -156,7 +156,7 @@ void main() {
     });
   });
 
-  group('Rule instantiation and LintCode shape', () {
+  group('Flutter SDK Migration Rules - Rule Instantiation', () {
     test('PreferIterableCastRule', () {
       final rule = PreferIterableCastRule();
       expect(rule.code.lowerCaseName, 'prefer_iterable_cast');

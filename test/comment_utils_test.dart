@@ -9,7 +9,7 @@ import 'package:test/test.dart';
 ///
 /// Test fixtures for integration testing:
 /// - example/lib/stylistic/prefer_no_commented_out_code_fixture.dart
-/// - example/lib/stylistic/prefer_capitalized_comment_start_fixture.dart
+/// - example/lib/naming_style/prefer_capitalized_comment_start_fixture.dart
 void main() {
   group('CommentPatterns.isLikelyCode', () {
     group('should detect commented-out code', () {
