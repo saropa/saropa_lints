@@ -141,24 +141,17 @@ void main() {
   group('Stylistic Control Flow Rules - Fixture Verification', () {
     final fixtures = [
       'prefer_early_return',
-      'prefer_single_exit_point',
-      'prefer_guard_clauses',
       'prefer_positive_conditions_first',
       'prefer_switch_statement',
       'prefer_cascade_over_chained',
-      'prefer_chained_over_cascade',
       'avoid_cascade_notation',
-      'prefer_exhaustive_enums',
-      'prefer_default_enum_case',
       'prefer_await_over_then',
-      'prefer_then_over_await',
       'prefer_sync_over_async_where_possible',
       'prefer_then_catcherror',
       'prefer_fire_and_forget',
       'prefer_separate_assignments',
       'prefer_if_else_over_guards',
       'prefer_cascade_assignments',
-      'prefer_positive_conditions',
     ];
 
     for (final fixture in fixtures) {

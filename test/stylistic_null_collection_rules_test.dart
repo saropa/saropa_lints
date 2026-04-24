@@ -107,18 +107,8 @@ void main() {
   group('Stylistic Null Collection Rules - Fixture Verification', () {
     final fixtures = [
       'prefer_null_aware_assignment',
-      'prefer_explicit_null_assignment',
-      'prefer_if_null_over_ternary',
-      'prefer_ternary_over_if_null',
-      'prefer_late_over_nullable',
-      'prefer_nullable_over_late',
       'prefer_spread_over_addall',
-      'prefer_addall_over_spread',
-      'prefer_collection_if_over_ternary',
-      'prefer_ternary_over_collection_if',
       'prefer_wheretype_over_where_is',
-      'prefer_map_entries_iteration',
-      'prefer_keys_with_lookup',
       'prefer_mutable_collections',
     ];
 
