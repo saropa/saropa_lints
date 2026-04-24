@@ -51,10 +51,41 @@ export function clearReport(): void {
 }
 
 /**
+ * Optional identifying metadata attached to the extension report header so
+ * each file is self-describing: you can tell which extension build wrote
+ * it and which saropa_lints plugin version was resolved in `pubspec.lock`
+ * at the time. Missing values are skipped rather than printed as
+ * `unknown`, so a run with no resolvable lock doesn't ship misleading
+ * placeholders.
+ *
+ * Why this matters: when diagnosing "the rule is still firing thousands
+ * of times on my project", the first useful fact is *which* plugin build
+ * emitted those diagnostics — and both numbers are cheap to print at
+ * flush time. Previously the header had only date + workspace, forcing
+ * the user into cache archaeology to answer that question.
+ */
+export interface FlushReportOptions {
+  /** Version of the VS Code extension producing the report (e.g. `12.4.0`). */
+  extensionVersion?: string;
+  /**
+   * Resolved saropa_lints version from the workspace's `pubspec.lock`.
+   * May be `undefined` when the lock is missing, unreadable, or does not
+   * declare saropa_lints — no value is better than a wrong value.
+   */
+  saropaLintsVersion?: string;
+  /**
+   * Where the resolved saropa_lints came from (e.g. `hosted`, `path`,
+   * `git`). Useful for users on `dependency_overrides` / path deps who
+   * are running a local build that doesn't match the hosted version.
+   */
+  saropaLintsSource?: string;
+}
+
+/**
  * Write the accumulated report to disk and clear the buffer.
  * Returns the file path on success, undefined on failure or empty buffer.
  */
-export function flushReport(root: string): string | undefined {
+export function flushReport(root: string, options?: FlushReportOptions): string | undefined {
   if (reportLines.length === 0) return undefined;
   const ts = sessionTimestamp ?? makeTimestamp();
   // Derive date folder from the session timestamp to avoid midnight boundary mismatch
@@ -65,6 +96,17 @@ export function flushReport(root: string): string | undefined {
     `**Date:** ${new Date().toISOString()}`,
     `**Workspace:** ${root}`,
   ];
+  // Append identifying metadata only when present — skipping undefined
+  // values keeps the header honest on projects with missing lock files.
+  if (options?.extensionVersion) {
+    header.push(`**Extension:** v${options.extensionVersion}`);
+  }
+  if (options?.saropaLintsVersion) {
+    const sourceSuffix = options.saropaLintsSource
+      ? ` (${options.saropaLintsSource})`
+      : '';
+    header.push(`**saropa_lints:** ${options.saropaLintsVersion}${sourceSuffix}`);
+  }
   const content = [...header, '', ...reportLines, ''].join('\n');
   const filePath = path.join(folder, `${ts}_saropa_extension.md`);
   try {

@@ -62,4 +62,39 @@ describe('formatAnalysisIssuesMessage', () => {
       'Saropa Lints analysis finished with a non-zero exit (open editors only). See Output for details.',
     );
   });
+
+  // Pins the "which plugin version produced these diagnostics?" answer into
+  // the popup so the user doesn't have to open a report file to find out.
+  // Previously the only place the version appeared was the Dart-plugin
+  // report header's `Version:` line, and THAT was broken to `unknown`.
+  it('prepends saropa_lints version when supplied', () => {
+    assert.strictEqual(
+      formatAnalysisIssuesMessage(42, undefined, '12.4.2'),
+      'Saropa Lints v12.4.2: 42 issues found.',
+    );
+  });
+
+  it('includes saropa_lints version in the zero-count fallback too', () => {
+    assert.strictEqual(
+      formatAnalysisIssuesMessage(0, undefined, '12.4.2'),
+      'Saropa Lints v12.4.2 analysis finished with a non-zero exit. See Output for details.',
+    );
+  });
+
+  it('combines version + scope label', () => {
+    assert.strictEqual(
+      formatAnalysisIssuesMessage(5, 'open editors only', '12.4.2'),
+      'Saropa Lints v12.4.2: 5 issues found (open editors only).',
+    );
+  });
+
+  it('omits the version label when version is undefined (no "v" ghost)', () => {
+    // Covers the unresolved-lock path: pubspec.lock missing, unreadable, or
+    // doesn't declare saropa_lints. We must NOT emit `v undefined` or a bare
+    // `v` — silent omission is the intended failure mode.
+    const msg = formatAnalysisIssuesMessage(42, undefined, undefined);
+    assert.ok(!msg.includes(' v '), `unexpected bare "v" token in: ${msg}`);
+    assert.ok(!msg.includes('vundefined'), `undefined leaked into: ${msg}`);
+    assert.strictEqual(msg, 'Saropa Lints: 42 issues found.');
+  });
 });
