@@ -1607,36 +1607,98 @@ class RequirePhysicsForNestedScrollRule extends SaropaLintRule {
   }
 }
 
-/// Warns when Stack children are not wrapped in Positioned or Align.
+/// Warns when Expanded or Flexible is used outside Row, Column, or Flex.
 ///
-/// Since: v2.3.10 | Updated: v4.13.0 | Rule version: v2
+/// Since: v2.3.10 | Updated: v4.13.0 | Rule version: v7
 ///
-/// Non-first Stack children without explicit positioning use the Stack's
-/// default alignment, which may produce unexpected overlap. The first child
-/// is skipped because it typically defines the Stack's base size.
+/// Alias: expanded_outside_flex, flexible_parent
 ///
-/// Common fill widgets (Container, SizedBox, DecoratedBox) are exempt
-/// because they are frequently used as full-size overlays.
+/// Expanded and Flexible only work inside Flex widgets (Row, Column, Flex).
+/// Using them elsewhere causes runtime errors.
 ///
-/// **BAD:**
+/// ## Why This Crashes
+///
+/// Expanded, Flexible, and Spacer work by writing `FlexParentData` onto their
+/// child's render object. Only `RenderFlex` — the render object behind Row,
+/// Column, and Flex — reads that data during layout. Every other parent render
+/// object either ignores or rejects it. When Flutter detects the mismatch it
+/// throws an unrecoverable `ParentDataWidget` error that cannot be caught by
+/// try-catch.
+///
+/// The most dangerous variant is when a reusable widget returns Expanded from
+/// its `build()` method. The widget appears to work when placed directly in a
+/// Row, but the moment anyone wraps it — with Padding, LimitedBox,
+/// GestureDetector, or any other widget — the Flex→Expanded parent chain
+/// breaks and the app crashes at runtime.
+///
+/// **BAD - Inside non-Flex container:**
 /// ```dart
 /// Stack(
 ///   children: [
-///     Container(color: Colors.red),
-///     Text('Overlay'), // Positioned at topStart by default
+///     Expanded(child: Container()), // CRASH!
 ///   ],
 /// )
 /// ```
 ///
-/// **GOOD:**
+/// **BAD - Wrapped by RenderObject widgets:**
 /// ```dart
-/// Stack(
+/// class _MyWidget extends StatelessWidget {
+///   Widget build(BuildContext context) => Expanded(child: Text('Hi'));
+/// }
+/// // Usage: Row(children: [Padding(child: _MyWidget())]) // CRASH!
+/// // The Padding breaks the Flex→Expanded parent chain.
+/// ```
+///
+/// **GOOD - Direct child of Flex:**
+/// ```dart
+/// Column(
 ///   children: [
-///     Container(color: Colors.red),
-///     Positioned(bottom: 10, child: Text('Overlay')),
+///     Expanded(child: Container()),
 ///   ],
 /// )
 /// ```
+///
+/// **GOOD - Assigned to variable, used in Flex:**
+/// ```dart
+/// final content = Expanded(child: Text('Hi'));
+/// return Column(children: [content]); // OK - lint trusts variable usage
+/// ```
+///
+/// **GOOD - Helper method returning Expanded:**
+/// ```dart
+/// List<Widget> _buildChildren() {
+///   return [Expanded(child: Text('Hi'))]; // OK - trusts helper methods
+/// }
+/// Widget build(BuildContext context) => Row(children: _buildChildren());
+/// ```
+///
+/// **GOOD - Collection builders (List.generate, .map):**
+/// ```dart
+/// Column(
+///   children: List.generate(3, (i) => Expanded(child: Text('$i'))), // OK
+/// )
+/// Row(
+///   children: items.map((i) => Expanded(child: Text(i))).toList(), // OK
+/// )
+/// ```
+///
+/// ## Trusted Patterns (No False Positives)
+///
+/// The rule trusts these patterns and does not report them:
+/// - **Variable assignment**: `final x = Expanded(...);`
+/// - **Helper method returns**: Expanded in return statements of non-build methods
+/// - **Collection builders**: Expanded inside `List.generate()` or `.map()` callbacks
+///
+/// ## When to Ignore
+///
+/// Use `// ignore: avoid_expanded_outside_flex` if the widget's `build()`
+/// returns Expanded and you're certain it's only used as a direct Flex child.
+///
+/// ## Design Guidance
+///
+/// Prefer adding Expanded at the **call site** rather than inside widget
+/// definitions. This makes the flex behavior explicit and avoids crashes
+/// when the widget is wrapped with Padding, GestureDetector, etc.
 class AvoidExpandedOutsideFlexRule extends SaropaLintRule {
   AvoidExpandedOutsideFlexRule() : super(code: _code);
 
