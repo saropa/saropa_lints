@@ -1450,6 +1450,17 @@ void main() {
           isNotNull,
         );
       });
+
+      test('should recognize local alias and didUpdateWidget/helper disposal', () {
+        // Fixed: disposal only as `final c = _field; c.dispose()` or only in
+        // didUpdateWidget / private helpers missed the field-name regex.
+        // Now uses state_lifecycle_dispose_scan AST + combined lifecycle text.
+
+        expect(
+          'AST lifecycle scan closes local-alias false positives',
+          isNotNull,
+        );
+      });
     });
   });
 

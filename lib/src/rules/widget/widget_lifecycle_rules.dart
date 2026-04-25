@@ -8,27 +8,11 @@ import '../../async_context_utils.dart';
 import '../../fixes/remove_empty_set_state_fix.dart';
 import '../../fixes/widget_lifecycle/wrap_set_state_in_mounted_check_fix.dart';
 import '../../saropa_lint_rule.dart';
+import 'state_lifecycle_dispose_scan.dart';
 
 /// Shared regex for detecting private method calls (e.g., `_dispose()`).
 /// Used by multiple rules to detect calls to private helper methods.
 final RegExp _privateMethodCallPattern = RegExp(r'_(\w+)\s*\(');
-
-/// Shared regex for detecting `.dispose()` calls in dispose method bodies.
-/// Used by RequireScrollControllerDisposeRule and RequireFocusNodeDisposeRule.
-final RegExp _disposeCallPattern = RegExp(r'\.dispose\s*\(\s*\)');
-
-/// Returns true if [disposeBody] shows [name] as disposed (direct or iteration).
-/// Regexes are built here so they are not constructed inside loops.
-bool _isNameDisposedInBody(String disposeBody, String name) {
-  final directRe = RegExp(
-    '${RegExp.escape(name)}\\s*[?.]+'
-    '\\s*dispose(Safe)?\\s*\\(',
-  );
-  final iterationRe = RegExp('in\\s+${RegExp.escape(name)}(\\.values)?\\)');
-  return directRe.hasMatch(disposeBody) ||
-      (iterationRe.hasMatch(disposeBody) &&
-          _disposeCallPattern.hasMatch(disposeBody));
-}
 
 class AvoidContextInInitStateDisposeRule extends SaropaLintRule {
   AvoidContextInInitStateDisposeRule() : super(code: _code);
@@ -3522,7 +3506,7 @@ class RequireScrollControllerDisposeRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'require_scroll_controller_dispose',
-    '[require_scroll_controller_dispose] ScrollController created but not disposed. Undisposed scroll controllers retain listeners and scroll position state, causing memory leaks that accumulate as users navigate between screens with scrollable content. {v5}',
+    '[require_scroll_controller_dispose] ScrollController created but not disposed. Undisposed scroll controllers retain listeners and scroll position state, causing memory leaks that accumulate as users navigate between screens with scrollable content. {v6}',
     correctionMessage:
         'Add _controller.dispose() in the State.dispose() method before calling super.dispose() to release scroll position listeners and resources.',
     severity: DiagnosticSeverity.ERROR,
@@ -3573,19 +3557,16 @@ class RequireScrollControllerDisposeRule extends SaropaLintRule {
 
       if (controllerNames.isEmpty) return;
 
-      // Find dispose method body
-      String? disposeBody;
-      for (final ClassMember member in node.body.members) {
-        if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
-          disposeBody = member.body.toSource();
-          break;
-        }
-      }
+      final Set<String> trackedNames = controllerNames.toSet();
 
-      // Check if each controller is disposed
+      // Check if each controller is disposed (regex on dispose + didUpdateWidget,
+      // plus AST: local aliases, helpers, didUpdateWidget-only disposal).
       for (final String name in controllerNames) {
-        final bool isDisposed =
-            disposeBody != null && _isNameDisposedInBody(disposeBody, name);
+        final bool isDisposed = isTrackedFieldDisposedInStateLifecycle(
+          node,
+          name,
+          trackedNames,
+        );
 
         if (!isDisposed) {
           // Find and report the field declaration
@@ -3653,7 +3634,7 @@ class RequireFocusNodeDisposeRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'require_focus_node_dispose',
-    '[require_focus_node_dispose] FocusNode created but not disposed. Undisposed focus nodes retain listeners and focus tree references, causing memory leaks and stale focus behavior that accumulates as users navigate between screens with form inputs. {v6}',
+    '[require_focus_node_dispose] FocusNode created but not disposed. Undisposed focus nodes retain listeners and focus tree references, causing memory leaks and stale focus behavior that accumulates as users navigate between screens with form inputs. {v7}',
     correctionMessage:
         'Add _focusNode.dispose() in the State.dispose() method before calling super.dispose() to release focus tree references and listeners.',
     severity: DiagnosticSeverity.WARNING,
@@ -3706,19 +3687,16 @@ class RequireFocusNodeDisposeRule extends SaropaLintRule {
 
       if (nodeNames.isEmpty) return;
 
-      // Find dispose method body
-      String? disposeBody;
-      for (final ClassMember member in node.body.members) {
-        if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
-          disposeBody = member.body.toSource();
-          break;
-        }
-      }
+      final Set<String> trackedNames = nodeNames.toSet();
 
-      // Check if each node is disposed
+      // Check if each node is disposed (regex + AST; see
+      // [isTrackedFieldDisposedInStateLifecycle]).
       for (final String name in nodeNames) {
-        final bool isDisposed =
-            disposeBody != null && _isNameDisposedInBody(disposeBody, name);
+        final bool isDisposed = isTrackedFieldDisposedInStateLifecycle(
+          node,
+          name,
+          trackedNames,
+        );
 
         if (!isDisposed) {
           // Find and report the field declaration
