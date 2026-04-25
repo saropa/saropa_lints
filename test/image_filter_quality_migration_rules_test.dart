@@ -1,9 +1,10 @@
-import 'package:saropa_lints/saropa_lints.dart' show
-    comprehensiveOnlyRules,
-    getRulesFromRegistry,
-    LintImpact,
-    recommendedOnlyRules,
-    rulesWithFixes;
+import 'package:saropa_lints/saropa_lints.dart'
+    show
+        comprehensiveOnlyRules,
+        getRulesFromRegistry,
+        LintImpact,
+        recommendedOnlyRules,
+        rulesWithFixes;
 import 'package:saropa_lints/src/rules/widget/image_filter_quality_migration_rules.dart';
 import 'package:test/test.dart';
 
@@ -19,9 +20,12 @@ void main() {
       expect(comprehensiveOnlyRules.contains(codeName), isTrue);
     });
 
-    test('rule is not a recommended-only add-on (use comprehensive / pedantic path)', () {
-      expect(recommendedOnlyRules.contains(codeName), isFalse);
-    });
+    test(
+      'rule is not a recommended-only add-on (use comprehensive / pedantic path)',
+      () {
+        expect(recommendedOnlyRules.contains(codeName), isFalse);
+      },
+    );
 
     test('getRulesFromRegistry returns one rule for the name', () {
       final rules = getRulesFromRegistry({codeName});
@@ -35,10 +39,7 @@ void main() {
       getRulesFromRegistry({codeName});
       final rule = PreferImageFilterQualityMediumRule();
       expect(rule.code.lowerCaseName, codeName);
-      expect(
-        rule.code.problemMessage,
-        contains('[$codeName]'),
-      );
+      expect(rule.code.problemMessage, contains('[$codeName]'));
       expect(rule.code.problemMessage.length, greaterThan(80));
       expect(rule.code.correctionMessage, isNotNull);
       expect(rule.fixGenerators, isNotEmpty);
