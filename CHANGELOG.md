@@ -47,6 +47,21 @@
 
 ---
 
+## [12.5.0] - Unreleased
+
+### Added
+
+- Added `require_android_manifest_entries` to flag permission-gated Android API usage when the app manifest is missing required `android.permission.*` entries, so runtime-denied features are caught during analysis instead of on devices. Add the missing `<uses-permission>` rows in `android/app/src/main/AndroidManifest.xml` where reported.
+
+<details>
+<summary>Maintenance</summary>
+
+- Updated the open bug note for `avoid_builder_index_out_of_bounds` (itemCount and guard false positives) so it matches current rule behavior and documented detection limits instead of stale assumptions. No action required for package users.
+
+</details>
+
+---
+
 ## [12.4.4]
 
 `require_animation_controller_dispose` stops nagging when you really did tear down an `AnimationController` using a disposeSafe-style helper next to `dispose`, and the help text you read in the editor now matches what the linter reports. Rule counts and Marketplace-facing copy line up across the package and extension, publish and audit flows are a little sturdier, and you do not need new analysis_options toggles to pick any of this up. — [log](https://github.com/saropa/saropa_lints/blob/v12.4.4/CHANGELOG.md)

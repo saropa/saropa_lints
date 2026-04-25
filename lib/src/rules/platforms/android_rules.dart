@@ -8,7 +8,77 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 
+import '../../android_manifest_utils.dart';
 import '../../saropa_lint_rule.dart';
+
+// =============================================================================
+// require_android_manifest_entries
+// =============================================================================
+
+/// Requires AndroidManifest.xml permission entries for known Android APIs.
+///
+/// Since: v5.2.0 | Rule version: v1
+///
+/// This rule cross-checks Dart API usage against manifest permissions. It is
+/// intentionally conservative: it only flags APIs with a clear 1:1 permission
+/// requirement and reports when the manifest is present but missing entries.
+class RequireAndroidManifestEntriesRule extends SaropaLintRule {
+  RequireAndroidManifestEntriesRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.bug;
+
+  @override
+  Set<String> get tags => const {'flutter', 'platform', 'android'};
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'require_android_manifest_entries',
+    '[require_android_manifest_entries] Android permission-gated API is used but AndroidManifest.xml is missing the required <uses-permission> entry. This causes runtime denials on device. {v1}',
+    correctionMessage:
+        'Add the required android.permission.* entry to AndroidManifest.xml.',
+    severity: DiagnosticSeverity.ERROR,
+  );
+
+  static const Map<String, String> _apiToPermission = <String, String>{
+    'getCurrentPosition': 'ACCESS_FINE_LOCATION',
+    'getPositionStream': 'ACCESS_FINE_LOCATION',
+    'determinePosition': 'ACCESS_FINE_LOCATION',
+    'pickImage': 'READ_MEDIA_IMAGES',
+    'pickVideo': 'READ_MEDIA_VIDEO',
+    'takePicture': 'CAMERA',
+    'availableCameras': 'CAMERA',
+    'record': 'RECORD_AUDIO',
+    'startRecording': 'RECORD_AUDIO',
+  };
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    final projectInfo = ProjectContext.getProjectInfo(context.filePath);
+    if (projectInfo == null || !projectInfo.isFlutterProject) return;
+
+    final checker = AndroidManifestChecker.forFile(context.filePath);
+    if (checker == null || !checker.hasManifest) return;
+
+    context.addMethodInvocation((MethodInvocation node) {
+      final methodName = node.methodName.name;
+      final requiredPermission = _apiToPermission[methodName];
+      if (requiredPermission == null) return;
+
+      if (!checker.hasPermission(requiredPermission)) {
+        reporter.atNode(node);
+      }
+    });
+  }
+}
 
 // =============================================================================
 // require_android_permission_request

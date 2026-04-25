@@ -680,6 +680,7 @@ const Set<String> essentialRules = <String>{
   // =========================================================================
   // v4.2.0 ROADMAP ⭐ Rules - Essential
   // =========================================================================
+  'require_android_manifest_entries', // ERROR - permission-gated APIs need manifest entries
   'require_android_permission_request', // ERROR - permissions must be requested at runtime
   'prefer_pending_intent_flags', // ERROR - PendingIntent needs FLAG_IMMUTABLE/MUTABLE
   'avoid_android_cleartext_traffic', // WARNING - cleartext traffic blocked by default
@@ -3155,6 +3156,7 @@ const Set<String> iosPlatformRules = <String>{
 const Set<String> androidPlatformRules = <String>{
   // Essential
   'require_notification_channel_android',
+  'require_android_manifest_entries',
   'require_android_permission_request',
   'prefer_pending_intent_flags',
   'avoid_android_cleartext_traffic',
