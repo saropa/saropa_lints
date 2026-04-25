@@ -49,7 +49,13 @@
 
 ## [Unreleased]
 
-No new published package version yet; use this section until the next release. **Overview:** Stronger automated tests and a cleaner example fixture set for maintainers, plus follow-up hardening and doc cleanups that do not add rules or change default enablement. — [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
+Nothing queued for the next release yet.
+
+---
+
+## [12.4.4]
+
+Animation controller cleanup still honors the same disposeSafe-style pattern 12.4.3 introduced, and the on-screen rule text now matches what the linter reports so you are not fighting mismatched wording. Extension and migration guides pick up the same polish when you refresh dependencies. You do not need new analysis_options toggles for this patch. — [log](https://github.com/saropa/saropa_lints/blob/v12.4.4/CHANGELOG.md)
 
 ### Changed
 
