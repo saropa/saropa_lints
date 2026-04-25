@@ -11,6 +11,66 @@ import '../../info_plist_utils.dart';
 import '../../target_matcher_utils.dart';
 import '../../saropa_lint_rule.dart';
 
+/// Requires high-signal Info.plist permission keys for common iOS APIs.
+///
+/// This is a broad config cross-check rule complementing the narrower
+/// `require_ios_permission_description` checks.
+class RequireIosInfoPlistEntriesRule extends SaropaLintRule {
+  RequireIosInfoPlistEntriesRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'platform', 'ios'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'require_ios_info_plist_entries',
+    '[require_ios_info_plist_entries] iOS permission-gated API detected but the matching Info.plist usage-description key is missing. Apps can crash or be rejected during App Store review. {v1}',
+    correctionMessage:
+        'Add the required NS*UsageDescription key(s) to ios/Runner/Info.plist.',
+    severity: DiagnosticSeverity.ERROR,
+  );
+
+  static const Map<String, String> _methodToKey = <String, String>{
+    'getCurrentPosition': 'NSLocationWhenInUseUsageDescription',
+    'getPositionStream': 'NSLocationWhenInUseUsageDescription',
+    'pickImage': 'NSPhotoLibraryUsageDescription',
+    'pickVideo': 'NSPhotoLibraryUsageDescription',
+    'takePicture': 'NSCameraUsageDescription',
+    'startRecording': 'NSMicrophoneUsageDescription',
+    'record': 'NSMicrophoneUsageDescription',
+  };
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    final projectInfo = ProjectContext.getProjectInfo(context.filePath);
+    if (projectInfo == null || !projectInfo.isFlutterProject) return;
+
+    final checker = InfoPlistChecker.forFile(context.filePath);
+    if (checker == null || !checker.hasInfoPlist) return;
+
+    context.addMethodInvocation((MethodInvocation node) {
+      final methodName = node.methodName.name;
+      final requiredKey = _methodToKey[methodName];
+      if (requiredKey == null) return;
+
+      if (!checker.hasKey(requiredKey)) {
+        reporter.atNode(node);
+      }
+    });
+  }
+}
+
 class RequireIosPermissionDescriptionRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosPermissionDescriptionRule].
   RequireIosPermissionDescriptionRule() : super(code: _code);

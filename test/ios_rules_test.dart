@@ -56,6 +56,12 @@ void main() {
     );
 
     testRule(
+      'RequireIosInfoPlistEntriesRule',
+      'require_ios_info_plist_entries',
+      () => RequireIosInfoPlistEntriesRule(),
+    );
+
+    testRule(
       'RequireIosPermissionDescriptionRule',
       'require_ios_permission_description',
       () => RequireIosPermissionDescriptionRule(),
@@ -599,6 +605,7 @@ void main() {
       'require_ios_launch_storyboard',
       'require_ios_live_activities_setup',
       'require_ios_local_notification_permission',
+      'require_ios_info_plist_entries',
       'require_ios_low_power_mode_handling',
       'require_ios_method_channel_cleanup',
       'require_ios_minimum_version_check',
