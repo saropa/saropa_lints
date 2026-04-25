@@ -405,3 +405,14 @@ Use the date the bug was closed. Create the date folder if it does not exist.
 - Reference bugs from commits: `fix: description (rule_name false positive)`
 - Reference bugs from ROADMAP: `[bug file](bugs/rule_name_false_positive_description.md)`
 - Reference related history: `Related: plan/history/YYYY.MM/YYYYMMDD/filename.md`
+
+---
+
+## Policy Note
+
+Do not log project-specific bug findings directly in this guide again.
+
+- This file is process documentation only.
+- Every concrete issue must live in a separate bug file under `bugs/` using the naming rules above.
+- If you discover this happened again, move the content into dedicated bug files immediately and leave only this policy note.
+
