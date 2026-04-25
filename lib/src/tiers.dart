@@ -595,6 +595,7 @@ const Set<String> essentialRules = <String>{
   'require_intl_args_match', // ERROR - runtime crash
   'require_cache_key_determinism', // ERROR - memory bloat
   'require_https_for_ios', // WARNING - ATS blocking
+  'require_ios_info_plist_entries', // ERROR - Info.plist keys required for permission APIs
   'require_ios_permission_description', // WARNING - App Store rejection
   'require_ios_privacy_manifest', // WARNING - iOS 17+ requirement
 
@@ -3066,6 +3067,7 @@ Set<String> getAllDefinedRules() {
 const Set<String> iosPlatformRules = <String>{
   // Essential
   'require_https_for_ios',
+  'require_ios_info_plist_entries',
   'require_ios_permission_description',
   'require_ios_privacy_manifest',
   'require_ios_app_tracking_transparency',

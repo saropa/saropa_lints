@@ -36,7 +36,6 @@ These rules follow the **existing Info.plist pattern**: a Dart rule fires when i
 
 | Rule | Tier | Severity | Config file needed | Parser status |
 |------|------|----------|--------------------|---------------|
-| `require_ios_info_plist_entries` | Essential | ERROR | `Info.plist` | **Parser exists** (`info_plist_utils.dart`) |
 | `require_desktop_window_setup` | Professional | INFO | Platform-specific files | Needs platform parsers |
 | `avoid_audio_in_background_without_config` | Essential | ERROR | `Info.plist` + `AndroidManifest.xml` | Needs XML parser |
 | `avoid_geolocator_background_without_config` | Essential | ERROR | `Info.plist` + `AndroidManifest.xml` | Needs XML parser |

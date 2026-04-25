@@ -52,6 +52,7 @@
 ### Added
 
 - Added `require_android_manifest_entries` to flag permission-gated Android API usage when the app manifest is missing required `android.permission.*` entries, so runtime-denied features are caught during analysis instead of on devices. Add the missing `<uses-permission>` rows in `android/app/src/main/AndroidManifest.xml` where reported.
+- Added `require_ios_info_plist_entries` to report permission-gated iOS API usage when required `NS*UsageDescription` keys are absent from `Info.plist`, so App Store rejection and runtime permission crashes are caught during analysis. Add the missing key(s) to `ios/Runner/Info.plist` where reported.
 
 <details>
 <summary>Maintenance</summary>

@@ -2133,6 +2133,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   RequireIosReceiptValidationRule.new,
   RequireIosAgeRatingConsiderationRule.new,
   AvoidIosMisleadingPushNotificationsRule.new,
+  RequireIosInfoPlistEntriesRule.new,
   RequireIosPermissionDescriptionRule.new,
   RequireIosPrivacyManifestRule.new,
   RequireHttpsForIosRule.new,
