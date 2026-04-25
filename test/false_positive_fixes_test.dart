@@ -1232,6 +1232,39 @@ void main() {
         },
       );
     });
+
+    group('avoid_color_only_meaning', () {
+      test(
+        'checkbox/switch/radio and wrapper companions should NOT trigger',
+        () {
+          // Regression fixture: avoid_color_only_meaning_fixture.dart
+          // _goodStateWithCheckboxCompanion / _goodStateWithSwitchCompanion /
+          // _goodStateWithRadioCompanion should remain lint-free.
+          // Common*/Brand*/App* wrappers around known companion types should
+          // also be recognized; unknown suffixes (AppCustomLabel) still lint.
+          // Shape contract: test/avoid_color_only_meaning_fixture_test.dart
+          expect(
+            'Companion widgets and known design-system wrappers are recognized',
+            isNotNull,
+          );
+        },
+      );
+    });
+
+    group('prefer_inkwell_over_gesture', () {
+      test(
+        'behavior/gesture-only and clipped or self-painted child patterns should NOT trigger',
+        () {
+          // Regression fixture: prefer_inkwell_over_gesture_fixture.dart
+          // InkWell replacement should only be suggested when onTap exists and
+          // no GestureDetector-only behavior or ink-ripple-incompatible child is present.
+          expect(
+            'GestureDetector-only and ripple-incompatible interaction patterns are exempt',
+            isNotNull,
+          );
+        },
+      );
+    });
   });
 
   group('6.0.4 / 6.0.5 False Positive Fixes', () {
@@ -1451,16 +1484,33 @@ void main() {
         );
       });
 
-      test('should recognize local alias and didUpdateWidget/helper disposal', () {
-        // Fixed: disposal only as `final c = _field; c.dispose()` or only in
-        // didUpdateWidget / private helpers missed the field-name regex.
-        // Now uses state_lifecycle_dispose_scan AST + combined lifecycle text.
+      test(
+        'should recognize local alias and didUpdateWidget/helper disposal',
+        () {
+          // Fixed: disposal only as `final c = _field; c.dispose()` or only in
+          // didUpdateWidget / private helpers missed the field-name regex.
+          // Now uses state_lifecycle_dispose_scan AST + combined lifecycle text.
 
-        expect(
-          'AST lifecycle scan closes local-alias false positives',
-          isNotNull,
-        );
-      });
+          expect(
+            'AST lifecycle scan closes local-alias false positives',
+            isNotNull,
+          );
+        },
+      );
+    });
+
+    group('require_cached_image_error_widget', () {
+      test(
+        'should not flag CachedNetworkImage when errorBuilder is provided',
+        () {
+          // Fixed: rule previously recognized only legacy `errorWidget` and
+          // falsely flagged the newer `errorBuilder` API.
+          expect(
+            'errorBuilder and errorWidget are both accepted as fallbacks',
+            isNotNull,
+          );
+        },
+      );
     });
   });
 

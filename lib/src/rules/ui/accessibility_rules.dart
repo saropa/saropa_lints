@@ -4205,6 +4205,10 @@ class AvoidRedundantSemanticsRule extends SaropaLintRule {
 /// checks Container). It checks any widget using conditional color and
 /// verifies a companion Icon or Text exists nearby.
 ///
+/// Design-system wrappers whose type name is a known prefix (`Common`,
+/// `App`, `Brand`) plus a companion suffix (for example `CommonIcon`,
+/// `AppText`) are treated like the underlying companion for this check only.
+///
 /// **BAD:**
 /// ```dart
 /// Card(
@@ -4265,10 +4269,25 @@ class AvoidColorOnlyMeaningRule extends SaropaLintRule {
   };
 
   static const Set<String> _companionWidgets = <String>{
+    // Core visual/text/semantics companions.
     'Icon',
     'Text',
     'RichText',
     'Semantics',
+    // Stateful form controls also communicate state without color.
+    'Checkbox',
+    'Switch',
+    'Radio',
+    'CheckboxListTile',
+    'SwitchListTile',
+    'RadioListTile',
+  };
+
+  // Common design-system wrapper prefixes used by Flutter projects.
+  static const Set<String> _projectWrapperPrefixes = <String>{
+    'Common',
+    'App',
+    'Brand',
   };
 
   @override
@@ -4379,7 +4398,7 @@ class AvoidColorOnlyMeaningRule extends SaropaLintRule {
     if (identical(expr, excludeNode)) return false;
     if (expr is InstanceCreationExpression) {
       final String typeName = expr.constructorName.type.name.lexeme;
-      if (_companionWidgets.contains(typeName)) return true;
+      if (_isCompanionType(typeName)) return true;
       // Recurse into child/children
       return _subtreeHasCompanion(expr, excludeNode: excludeNode);
     }
@@ -4391,6 +4410,18 @@ class AvoidColorOnlyMeaningRule extends SaropaLintRule {
         }
       }
     }
+    return false;
+  }
+
+  bool _isCompanionType(String typeName) {
+    if (_companionWidgets.contains(typeName)) return true;
+
+    for (final String prefix in _projectWrapperPrefixes) {
+      if (!typeName.startsWith(prefix)) continue;
+      final String wrappedType = typeName.substring(prefix.length);
+      if (_companionWidgets.contains(wrappedType)) return true;
+    }
+
     return false;
   }
 }

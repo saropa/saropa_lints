@@ -49,10 +49,21 @@
 
 ## [12.5.1] - unreleased
 
+[log](https://github.com/saropa/saropa_lints/blob/v12.5.1/CHANGELOG.md)
+
 ### Fixed
 
 - **`require_change_notifier_dispose` false positive**: The rule no longer flags owned notifier fields when disposal runs on a local initialized from the field (for example capturing a nullable controller before `dispose()`). No action required.
 - `require_scroll_controller_dispose` and `require_focus_node_dispose` now treat disposal through a local copy of the field, disposal only in `didUpdateWidget`, and disposal inside private helpers called from `dispose` or `didUpdateWidget` as valid cleanup, so the common nullable-controller pattern no longer reports a leak when the controller is actually released. No action required.
+- `avoid_color_only_meaning` now treats `Checkbox`/`Switch`/`Radio` (including `*ListTile` variants) as companion state indicators, so selection rows with conditional background color are not incorrectly reported as color-only meaning. No action required.
+- `avoid_color_only_meaning` now recognizes common design-system widget names built as a short prefix plus a known companion type (for example thin `Icon`/`Text` wrappers), so conditional surface color next to an icon swap or label in those widgets is not treated as color-only meaning when the remainder matches a real companion. No action required.
+
+<details>
+<summary>Maintenance</summary>
+
+- Archived the closed `avoid_color_only_meaning` design-system wrapper companion false-positive report under `plan/history/2026.04/2026.04.25/` and removed it from `bugs/`. No action required for package users.
+
+</details>
 
 ---
 
