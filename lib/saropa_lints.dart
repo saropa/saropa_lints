@@ -1845,6 +1845,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   RequireLocationTimeoutRule.new,
   PreferCameraResolutionSelectionRule.new,
   PreferAudioSessionConfigRule.new,
+  AvoidAudioInBackgroundWithoutConfigRule.new,
   PreferDotShorthandRule.new,
   AvoidTouchOnlyGesturesRule.new,
   RequireFutureWaitErrorHandlingRule.new,
@@ -2403,6 +2404,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
 
   // Platform rules (platform_rules.dart)
   RequirePlatformCheckRule.new,
+  RequireEnvFileGitignoreRule.new,
   PreferPlatformIoConditionalRule.new,
   PreferPlatformWidgetAdaptiveRule.new,
   RequireDesktopWindowSetupRule.new,
@@ -2477,6 +2479,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
 
   // Android rules (android_rules.dart)
   RequireAndroidManifestEntriesRule.new,
+  RequireNotificationIconKeptRule.new,
   RequireAndroidPermissionRequestRule.new,
   RequireBackupExclusionRule.new,
   AvoidAndroidTaskAffinityDefaultRule.new,
@@ -2509,6 +2512,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
 
   // Geolocator rules (geolocator_rules.dart)
   RequireGeolocatorBatteryAwarenessRule.new,
+  AvoidGeolocatorBackgroundWithoutConfigRule.new,
   PreferGeolocationCoarseLocationRule.new,
 
   // DB yield rules (db_yield_rules.dart)
@@ -2522,6 +2526,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
 
   // Firebase rules (firebase_rules.dart)
   RequireFirestoreIndexRule.new,
+  RequireFirestoreSecurityRulesRule.new,
   RequireFirebaseCompositeIndexRule.new,
 
   // Notification rules (notification_rules.dart)

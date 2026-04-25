@@ -49,11 +49,20 @@
 
 ## [12.5.0] - Unreleased
 
+### Fixed
+
+- `require_intl_plural_rules` no longer treats code between string literals (for example `(hour == …)` next to AM/PM labels) as if it were text inside a quoted string, so 12-hour clock helpers are not mistaken for manual noun pluralization. No action required.
+
 ### Added
 
 - Added `require_android_manifest_entries` to flag permission-gated Android API usage when the app manifest is missing required `android.permission.*` entries, so runtime-denied features are caught during analysis instead of on devices. Add the missing `<uses-permission>` rows in `android/app/src/main/AndroidManifest.xml` where reported.
 - Added `require_ios_info_plist_entries` to report permission-gated iOS API usage when required `NS*UsageDescription` keys are absent from `Info.plist`, so App Store rejection and runtime permission crashes are caught during analysis. Add the missing key(s) to `ios/Runner/Info.plist` where reported.
 - Added `require_desktop_window_setup` to report desktop window-manager API usage when desktop runner setup files are missing, so desktop-only configuration gaps are surfaced before runtime. Ensure the relevant `windows/`, `linux/`, or `macos/` runner files are present when using desktop window APIs.
+- Added `avoid_audio_in_background_without_config` to flag background audio usage when iOS `UIBackgroundModes` audio or Android manifest foreground-service / audio declarations are missing, so store review and runtime failures are caught during analysis.
+- Added `avoid_geolocator_background_without_config` to flag `Geolocator.getPositionStream` when iOS background location or Android background location permission is not reflected in platform config files.
+- Added `require_notification_icon_kept` to warn when FCM or local notifications are used but ProGuard/R8 rules do not appear to keep notification icon resources.
+- Added `require_firestore_security_rules` to report `FirebaseFirestore` usage when no `firestore.rules` file exists at the project root.
+- Added `require_env_file_gitignore` to report `.env` / `.env.*` files at the project root that are not covered by `.gitignore` patterns.
 
 <details>
 <summary>Maintenance</summary>

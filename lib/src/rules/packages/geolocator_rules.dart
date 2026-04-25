@@ -6,8 +6,12 @@
 /// and appropriate accuracy settings.
 library;
 
+import 'dart:io';
+
 import 'package:analyzer/dart/ast/ast.dart';
 
+import '../../android_manifest_utils.dart';
+import '../../info_plist_utils.dart';
 import '../../saropa_lint_rule.dart';
 
 // =============================================================================
@@ -315,6 +319,80 @@ class AvoidContinuousLocationUpdatesRule extends SaropaLintRule {
       }
 
       reporter.atNode(node);
+    });
+  }
+}
+
+// =============================================================================
+// avoid_geolocator_background_without_config
+// =============================================================================
+
+/// Cross-checks platform config for background-capable Geolocator streaming.
+///
+/// Since: v12.5.0 | Rule version: v1
+///
+/// Continuous position streams often need background location on iOS
+/// (`UIBackgroundModes` `location`) and `ACCESS_BACKGROUND_LOCATION` on
+/// Android. Detection is limited to `Geolocator.getPositionStream`.
+class AvoidGeolocatorBackgroundWithoutConfigRule extends SaropaLintRule {
+  AvoidGeolocatorBackgroundWithoutConfigRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages', 'flutter', 'platform'};
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'avoid_geolocator_background_without_config',
+    '[avoid_geolocator_background_without_config] Geolocator.getPositionStream is used but platform config is missing background location entries (iOS UIBackgroundModes location and/or Android ACCESS_BACKGROUND_LOCATION). Updates may stop when the app is backgrounded. {v1}',
+    correctionMessage:
+        'Declare UIBackgroundModes location in Info.plist and ACCESS_BACKGROUND_LOCATION in AndroidManifest when background streams are required.',
+    severity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    final projectInfo = ProjectContext.getProjectInfo(context.filePath);
+    if (projectInfo == null || !projectInfo.isFlutterProject) return;
+    if (!ProjectContext.hasDependency(context.filePath, 'geolocator')) return;
+
+    final root = ProjectContext.findProjectRoot(context.filePath);
+    if (root == null) return;
+
+    final hasIos = Directory('$root/ios').existsSync();
+    final hasAndroid = Directory('$root/android').existsSync();
+    final plist = InfoPlistChecker.forFile(context.filePath);
+    final manifest = AndroidManifestChecker.forFile(context.filePath);
+
+    context.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'getPositionStream') return;
+      final Expression? target = node.target;
+      if (target is! SimpleIdentifier || target.name != 'Geolocator') return;
+
+      final iosMisconfigured =
+          hasIos &&
+          plist != null &&
+          plist.hasInfoPlist &&
+          !plist.hasIosBackgroundLocationConfigured;
+      final androidMisconfigured =
+          hasAndroid &&
+          manifest != null &&
+          manifest.hasManifest &&
+          !manifest.hasPermission('ACCESS_BACKGROUND_LOCATION');
+
+      if (iosMisconfigured || androidMisconfigured) {
+        reporter.atNode(node);
+      }
     });
   }
 }

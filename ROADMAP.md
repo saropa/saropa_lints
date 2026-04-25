@@ -34,13 +34,7 @@ Rules below can be implemented with existing infrastructure or moderate new work
 
 These rules follow the **existing Info.plist pattern**: a Dart rule fires when it detects API usage, then cross-checks a platform config file. `info_plist_utils.dart` already does this for iOS permission checks. The same approach works for other config files — each just needs a parser.
 
-| Rule | Tier | Severity | Config file needed | Parser status |
-|------|------|----------|--------------------|---------------|
-| `avoid_audio_in_background_without_config` | Essential | ERROR | `Info.plist` + `AndroidManifest.xml` | Needs XML parser |
-| `avoid_geolocator_background_without_config` | Essential | ERROR | `Info.plist` + `AndroidManifest.xml` | Needs XML parser |
-| `require_notification_icon_kept` | Essential | ERROR | `proguard-rules.pro` | Needs text parser |
-| `require_firestore_security_rules` | Essential | ERROR | `firestore.rules` | Needs text parser |
-| `require_env_file_gitignore` | Essential | ERROR | `.gitignore` | Needs text parser |
+Recent additions from this bucket include `avoid_audio_in_background_without_config`, `avoid_geolocator_background_without_config`, `require_notification_icon_kept`, `require_firestore_security_rules`, and `require_env_file_gitignore` (see [CHANGELOG.md](CHANGELOG.md)).
 
 **GitHub issues**: [#35](https://github.com/saropa/saropa_lints/issues/35), [#36](https://github.com/saropa/saropa_lints/issues/36), [#37](https://github.com/saropa/saropa_lints/issues/37), [#41](https://github.com/saropa/saropa_lints/issues/41)
 

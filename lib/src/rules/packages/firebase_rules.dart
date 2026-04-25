@@ -6,6 +6,8 @@
 /// unbounded queries, missing limits, and improper database usage patterns.
 library;
 
+import 'dart:io';
+
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
@@ -3241,4 +3243,57 @@ class RequireFirebaseOfflinePersistenceRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {}
+}
+
+// =============================================================================
+// require_firestore_security_rules
+// =============================================================================
+
+/// Requires a `firestore.rules` file when Cloud Firestore is used from Dart.
+///
+/// Since: v12.5.0 | Rule version: v1
+///
+/// Server-side rules are mandatory for secure Firestore access; missing rules
+/// files usually mean the project never wired Firebase CLI defaults.
+class RequireFirestoreSecurityRulesRule extends SaropaLintRule {
+  RequireFirestoreSecurityRulesRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  Set<String> get tags => const {'packages', 'security', 'firebase'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'require_firestore_security_rules',
+    '[require_firestore_security_rules] FirebaseFirestore is referenced but no firestore.rules file was found at the project root. Deploy security rules before shipping Firestore-backed features. {v1}',
+    correctionMessage:
+        'Add firestore.rules (Firebase CLI default) and deploy via firebase deploy.',
+    severity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    if (!ProjectContext.hasDependency(context.filePath, 'cloud_firestore')) {
+      return;
+    }
+    final root = ProjectContext.findProjectRoot(context.filePath);
+    if (root == null) return;
+    if (File('$root/firestore.rules').existsSync()) return;
+
+    context.addPrefixedIdentifier((PrefixedIdentifier node) {
+      if (node.prefix.name != 'FirebaseFirestore') return;
+      if (node.identifier.name != 'instance') return;
+      reporter.atNode(node);
+    });
+  }
 }

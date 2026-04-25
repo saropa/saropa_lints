@@ -36,11 +36,18 @@ void main() {
       'prefer_audio_session_config',
       () => PreferAudioSessionConfigRule(),
     );
+
+    testRule(
+      'AvoidAudioInBackgroundWithoutConfigRule',
+      'avoid_audio_in_background_without_config',
+      () => AvoidAudioInBackgroundWithoutConfigRule(),
+    );
   });
 
   group('Media Rules - Fixture Verification', () {
     final fixtures = [
       'avoid_autoplay_audio',
+      'avoid_audio_in_background_without_config',
       'prefer_camera_resolution_selection',
       'prefer_audio_session_config',
     ];

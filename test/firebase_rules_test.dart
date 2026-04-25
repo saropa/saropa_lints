@@ -143,6 +143,11 @@ void main() {
       () => RequireFirestoreIndexRule(),
     );
     testRule(
+      'RequireFirestoreSecurityRulesRule',
+      'require_firestore_security_rules',
+      () => RequireFirestoreSecurityRulesRule(),
+    );
+    testRule(
       'RequireFirebaseCompositeIndexRule',
       'require_firebase_composite_index',
       () => RequireFirebaseCompositeIndexRule(),
@@ -184,6 +189,13 @@ void main() {
     );
   });
   group('Firebase Rules - Fixture Verification', () {
+    test('require_firestore_security_rules fixture exists', () {
+      final file = File(
+        'example_packages/lib/firebase/require_firestore_security_rules_fixture.dart',
+      );
+      expect(file.existsSync(), isTrue);
+    });
+
     test('avoid_firebase_user_data_in_auth fixture exists', () {
       final file = File(
         'example_packages/lib/firebase/avoid_firebase_user_data_in_auth_fixture.dart',

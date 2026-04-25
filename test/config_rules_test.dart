@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:saropa_lints/src/rules/config/config_rules.dart';
+import 'package:saropa_lints/src/rules/config/repo_integrity_rules.dart';
 import 'package:test/test.dart';
 
 /// Tests for 11 Configuration lint rules.
@@ -107,6 +108,16 @@ void main() {
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
+    test('RequireEnvFileGitignoreRule', () {
+      final rule = RequireEnvFileGitignoreRule();
+      expect(rule.code.lowerCaseName, 'require_env_file_gitignore');
+      expect(
+        rule.code.problemMessage,
+        contains('[require_env_file_gitignore]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
     // `DependOnReferencedPackagesRule` / `saropa_depend_on_referenced_packages`
     // was REMOVED. Delegated to the Dart SDK's built-in lint of the same
     // base name, shipped via `package:lints/core.yaml` — saropa's
@@ -126,6 +137,7 @@ void main() {
       'prefer_compile_time_config',
       'prefer_flavor_configuration',
       'prefer_semver_version',
+      'require_env_file_gitignore',
     ];
 
     for (final fixture in fixtures) {
