@@ -1,12 +1,12 @@
 # BUG: `avoid_builder_index_out_of_bounds` — Reports when `itemCount` and guard already bound access
 
-**Status: Open**
+**Status: Closed (repo ≥ 12.4.5)**  
+**Archived from `bugs/`:** 2026-04-25
 
 Created: 2026-04-24  
 Rule: `avoid_builder_index_out_of_bounds`  
-File: `lib/src/rules/widget/widget_layout_constraints_rules.dart` (see `AvoidBuilderIndexOutOfBoundsRule`, ~4388–4531)  
-Severity: False positive (or ignore suppression not applied to custom_lint diagnostic)  
-Rule version: v6 (per diagnostic tag in consumer app)
+File: `lib/src/rules/widget/widget_layout_constraints_rules.dart` (`AvoidBuilderIndexOutOfBoundsRule`)  
+Rule version: **v7** (diagnostic tag in message)
 
 ---
 
@@ -16,13 +16,23 @@ In `contacts` audit panels, `ListView.builder` uses `itemCount: groups.length`, 
 
 ---
 
+## Resolution (2026-04-25)
+
+1. **Minimal reproducer** (`itemCount: groups.length`, compound guard, `groups[index]` inside `try`) was simulated against current logic: **no report** — `body.toSource()` includes the guard; `itemCount` and length-check paths both apply.
+2. **Likely real cause when a warning persists:** another list is subscripted with the same index (e.g. `ids[index]`) while only `groups` is guarded or tied to `itemCount`. The rule requires a **per-list** signal; see `test/avoid_builder_index_out_of_bounds_behavior_test.dart` (`parallel second list` case).
+3. **Consumers on a version before 12.4.5:** upgrade; older releases may lack the `itemCount: list.length` skip or other refinements.
+4. **Carousel-style APIs** using `realIndex` (third callback parameter): v7 extends subscript detection to `idx`, `realIndex`, and `itemIndex` so guarded `items[realIndex]` is recognized.
+5. **Documentation cleanup:** A duplicate `avoid_expanded_outside_flex` dartdoc block had sat above `AvoidBuilderIndexOutOfBoundsRule` in `widget_layout_constraints_rules.dart`; it was removed and the full Expanded/Flexible dartdoc was attached to `AvoidExpandedOutsideFlexRule` in `widget_layout_flex_scroll_rules.dart` (replacing an incorrect Stack-only stub there).
+
+---
+
 ## Attribution Evidence
 
 ```text
 grep -rn "'avoid_builder_index_out_of_bounds'" lib/src/rules/
-
-lib/src/rules/widget/widget_layout_constraints_rules.dart:4408:    'avoid_builder_index_out_of_bounds',
 ```
+
+Search by rule id in `widget_layout_constraints_rules.dart` (`AvoidBuilderIndexOutOfBoundsRule`).
 
 ---
 

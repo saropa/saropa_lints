@@ -67,7 +67,7 @@
 
 import 'package:flutter/widgets.dart';
 
-// BAD: No bounds check on list access
+// BAD: No bounds check on list access (no itemCount tied to this list)
 class BadListBuilderNoBoundsCheck extends StatelessWidget {
   const BadListBuilderNoBoundsCheck({super.key, required this.items});
   final List<String> items;
@@ -75,7 +75,6 @@ class BadListBuilderNoBoundsCheck extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      itemCount: items.length,
       // expect_lint: avoid_builder_index_out_of_bounds
       itemBuilder: (context, index) {
         return Text(items[index]); // items might change!
@@ -84,7 +83,7 @@ class BadListBuilderNoBoundsCheck extends StatelessWidget {
   }
 }
 
-// BAD: Using 'i' as index without bounds check
+// BAD: Using 'i' as index without bounds check (no itemCount tied to this list)
 class BadListBuilderIVariable extends StatelessWidget {
   const BadListBuilderIVariable({super.key, required this.data});
   final List<int> data;
@@ -92,7 +91,6 @@ class BadListBuilderIVariable extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      itemCount: data.length,
       // expect_lint: avoid_builder_index_out_of_bounds
       itemBuilder: (context, i) {
         return Text('${data[i]}'); // data might change!
@@ -182,7 +180,8 @@ class BadListBuilderWrongListCheck extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      itemCount: items.length,
+      // itemCount matches otherList, but we index items — not trusted for items
+      itemCount: otherList.length,
       // expect_lint: avoid_builder_index_out_of_bounds
       itemBuilder: (context, index) {
         // Bounds check on otherList, but accessing items!

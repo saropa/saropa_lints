@@ -47,10 +47,14 @@
 
 ---
 
-## [12.5.0] - Unreleased
+## [12.5.0]
+
+New rules help you catch missing Android permissions, missing iOS privacy strings, desktop window setup, and gaps around background audio and location, notifications, Firestore rules, and secrets on disk before they bite at review or runtime. A couple of noisy false positives in internationalization and iOS camera permission checks are gone, and the cross-file CLI can warn when library code has no matching test file. — [log](https://github.com/saropa/saropa_lints/blob/v12.5.0/CHANGELOG.md)
 
 ### Fixed
 
+- `avoid_builder_index_out_of_bounds` now treats `idx`, `realIndex`, and `itemIndex` inside bracket lookups like the existing `index`/`i` handling, so Carousel-style and similar builder callbacks get the same bounds heuristics. No action required unless you relied on the blind spot; add guards where the rule now applies.
+- The same rule’s DartDoc now states that each list subscripted with the builder index needs its own visible bound or matching item count when lengths are not provable from the source. No action required.
 - `require_intl_plural_rules` no longer treats code between string literals (for example `(hour == …)` next to AM/PM labels) as if it were text inside a quoted string, so 12-hour clock helpers are not mistaken for manual noun pluralization. No action required.
 - `require_image_picker_permission_ios` now reads `ios/Runner/Info.plist` through the shared plist checker so it does not warn when `NSCameraUsageDescription` is already present. No action required.
 
@@ -69,7 +73,7 @@
 <details>
 <summary>Maintenance</summary>
 
-- Updated the open bug note for `avoid_builder_index_out_of_bounds` (itemCount and guard false positives) so it matches current rule behavior and documented detection limits instead of stale assumptions. No action required for package users.
+- Archived closed `avoid_builder_index_out_of_bounds` false-positive investigation under `plan/history/2026.04/2026.04.25/` (removed duplicate from `bugs/`). No action required for package users.
 - Closed false-positive report for `require_image_picker_permission_ios` (existing `NSCameraUsageDescription`) under `plan/history/2026.04/2026.04.25/`. No action required for package users.
 
 </details>
