@@ -439,20 +439,69 @@ String? _getDisposeMethodBody(ClassDeclaration node) {
 
 // cspell:ignore xxxDisposezzz ispose
 
+/// True if [disposeBody] calls a *dispose* method on [receiver] (`r.dispose(`,
+/// `r?.dispose(`, `.disposeSafe(`, etc.).
+bool _disposeCallOnReceiver(String receiver, String disposeBody) {
+  final RegExp disposePattern = RegExp(
+    '${RegExp.escape(receiver)}\\??\\.'
+    r'\w*[Dd]ispose\w*\(',
+  );
+  return disposePattern.hasMatch(disposeBody);
+}
+
+/// Local names assigned from [fieldName] in [disposeBody] (rhs may use `this.`).
+///
+/// Covers common `final` / `var` initializer aliases. Typed `final` forms use
+/// two tokens before `=` (`final Type name = field`); inferred `final name =`
+/// uses a negative lookahead so `final ScrollController? c = field` is not
+/// parsed as inferred `ScrollController`. Reassignments are not tracked.
+Set<String> _localVariableAliasesOfField(String fieldName, String disposeBody) {
+  final Set<String> names = <String>{};
+  final String rhsField = r'(?:this\.)?' + RegExp.escape(fieldName) + r'\b';
+
+  final RegExp typedFinal = RegExp(
+    r'(?:late\s+)?final\s+\S+\s+(\w+)\s*=\s*' + rhsField,
+  );
+  for (final RegExpMatch m in typedFinal.allMatches(disposeBody)) {
+    final String? alias = m.group(1);
+    if (alias != null) names.add(alias);
+  }
+
+  final RegExp inferredFinal = RegExp(
+    r'(?:late\s+)?final\s+(?!\S+\s+\S+\s*=)(\w+)\s*=\s*' + rhsField,
+  );
+  for (final RegExpMatch m in inferredFinal.allMatches(disposeBody)) {
+    final String? alias = m.group(1);
+    if (alias != null) names.add(alias);
+  }
+
+  final RegExp varAlias = RegExp(r'var\s+(\w+)\s*=\s*' + rhsField);
+  for (final RegExpMatch m in varAlias.allMatches(disposeBody)) {
+    final String? alias = m.group(1);
+    if (alias != null) names.add(alias);
+  }
+
+  return names;
+}
+
 /// Helper to check if a field is disposed in the dispose body.
 ///
 /// Recognizes direct `.dispose()` calls and method names containing "dispose"
 /// (e.g., `.disposeSafe()`, `.safeDispose()`), with both `.` and `?.` syntax.
+/// Also recognizes disposal on locals initialized from the field
+/// (`final c = _field; c.dispose();`).
 bool _isFieldDisposed(String fieldName, String? disposeBody) {
   if (disposeBody == null) return false;
 
-  // Match fieldName.dispose( or fieldName?.dispose(
-  // Also match fieldName.xxxDisposezzz( or fieldName?.xxxDisposezzz(
-  final RegExp disposePattern = RegExp(
-    '${RegExp.escape(fieldName)}\\??\\.' // fieldName. or fieldName?.
-    r'\w*[Dd]ispose\w*\(', // any method containing "dispose"
-  );
-  return disposePattern.hasMatch(disposeBody);
+  if (_disposeCallOnReceiver(fieldName, disposeBody)) return true;
+
+  for (final String alias in _localVariableAliasesOfField(
+    fieldName,
+    disposeBody,
+  )) {
+    if (_disposeCallOnReceiver(alias, disposeBody)) return true;
+  }
+  return false;
 }
 
 /// Helper to report undisposed fields.
@@ -1241,7 +1290,7 @@ class RequireStreamSubscriptionCancelRule extends SaropaLintRule {
 
 /// Warns when an owned ChangeNotifier-derived field is not disposed.
 ///
-/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v4
+/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v5
 ///
 /// Alias: dispose_change_notifier, change_notifier_leak
 ///
@@ -1255,12 +1304,13 @@ class RequireStreamSubscriptionCancelRule extends SaropaLintRule {
 /// from callbacks, parameters, or external sources are not flagged.
 ///
 /// Disposal is recognized via direct `.dispose()` calls as well as method
-/// names containing "dispose" (e.g., `.disposeSafe()`, `.safeDispose()`).
+/// names containing "dispose" (e.g., `.disposeSafe()`, `.safeDispose()`), and
+/// via locals initialized from the field (e.g. `final c = _ctrl; c.dispose();`).
 ///
 /// **BAD:**
 /// ```dart
 /// class _MyWidgetState extends State<MyWidget> {
-///   final MyNotifier _notifier = MyNotifier();
+///   final ChangeNotifier _notifier = ChangeNotifier();
 ///   // Missing dispose — listeners leak!
 /// }
 /// ```
@@ -1268,7 +1318,7 @@ class RequireStreamSubscriptionCancelRule extends SaropaLintRule {
 /// **GOOD:**
 /// ```dart
 /// class _MyWidgetState extends State<MyWidget> {
-///   final MyNotifier _notifier = MyNotifier();
+///   final ChangeNotifier _notifier = ChangeNotifier();
 ///
 ///   @override
 ///   void dispose() {
@@ -1297,7 +1347,7 @@ class RequireChangeNotifierDisposeRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'require_change_notifier_dispose',
-    '[require_change_notifier_dispose] Failing to dispose a ChangeNotifier (or ValueNotifier, etc.) in the dispose() method causes it to retain all listeners and references in the widget tree, resulting in memory leaks and potential crashes when notifications are sent to unmounted widgets. This is a common source of subtle bugs and degraded performance in Flutter apps. {v4}',
+    '[require_change_notifier_dispose] Failing to dispose a ChangeNotifier (or ValueNotifier, etc.) in the dispose() method causes it to retain all listeners and references in the widget tree, resulting in memory leaks and potential crashes when notifications are sent to unmounted widgets. This is a common source of subtle bugs and degraded performance in Flutter apps. {v5}',
     correctionMessage:
         'Always call notifier.dispose() in your widget’s dispose() method before calling super.dispose(). This ensures all listeners are removed and resources are released. Audit your codebase for all ChangeNotifier instances and verify they are disposed properly.',
     severity: DiagnosticSeverity.ERROR,

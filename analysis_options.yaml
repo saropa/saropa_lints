@@ -37,7 +37,7 @@ linter:
 
 plugins:
   saropa_lints:
-    version: "12.4.2"
+    version: "12.5.0"
     # ═══════════════════════════════════════════════════════════════════
     # SAROPA LINTS CONFIGURATION
     # ═══════════════════════════════════════════════════════════════════
@@ -242,7 +242,7 @@ plugins:
       require_file_path_sanitization: false  # [WARNING] File path constructed from parameter without sanitization. Path traversal attack possible with ../ {v3}
       require_firebase_reauthentication: true  # [WARNING] Sensitive Firebase Auth operation (delete, updateEmail, updatePassword) used without reauthentication. Call reauthenticateWithCredential or reauthenticateWithProvider first. {v1}
       require_firebase_token_refresh: true  # [WARNING] getIdToken() result may be stored without token refresh. Use idTokenChanges().listen() or getIdToken(true). {v1}
-      require_focus_node_dispose: true  # [WARNING] FocusNode created but not disposed. Undisposed focus nodes retain listeners and focus tree references, causing memory leaks and stale focus behavior that accumulates as users navigate between screens with form inputs. {v6}
+      require_focus_node_dispose: true  # [WARNING] FocusNode created but not disposed. Undisposed focus nodes retain listeners and focus tree references, causing memory leaks and stale focus behavior that accumulates as users navigate between screens with form inputs. {v7}
       require_form_key: true  # [WARNING] Without GlobalKey, validate() and save() calls fail because FormState cannot be accessed. {v2}
       require_form_key_in_stateful_widget: true  # [WARNING] GlobalKey<FormState> created inside the build() method is re-instantiated on every widget rebuild triggered by setState(). Each rebuild creates a new key, causing the form to lose all current field values, validation state, and user input. This produces a frustrating user experience where typed data disappears unpredictably during state changes. {v2}
       require_hive_web_subdirectory: true  # [ERROR] Hive.initFlutter() called without a subDir parameter. On web platforms, Hive stores data in IndexedDB. Without an explicit subdirectory, multiple apps deployed on the same domain will share the same Hive storage namespace, causing data conflicts, overwrites, and potential data loss between applications. This is especially critical for web deployments. {v2}
@@ -280,7 +280,7 @@ plugins:
       require_purchase_restoration: true  # [ERROR] In-app purchase detected without restore functionality. App Store requires "Restore Purchases" for non-consumables. {v2}
       require_purchase_verification: true  # [ERROR] In-app purchase without server verification detected. Client-side verification can be bypassed by attackers. {v2}
       require_route_guards: true  # [ERROR] Protected route path (profile, settings, admin, payment) lacks an authentication guard. Without a redirect callback, unauthorized users can access sensitive pages directly via deep link or URL manipulation, exposing personal data, financial information, or admin controls to unauthenticated sessions. {v3}
-      require_scroll_controller_dispose: true  # [ERROR] ScrollController created but not disposed. Undisposed scroll controllers retain listeners and scroll position state, causing memory leaks that accumulate as users navigate between screens with scrollable content. {v5}
+      require_scroll_controller_dispose: true  # [ERROR] ScrollController created but not disposed. Undisposed scroll controllers retain listeners and scroll position state, causing memory leaks that accumulate as users navigate between screens with scrollable content. {v6}
       require_search_debounce: true  # [WARNING] Calling a search API on every keystroke can overwhelm your backend, degrade performance, and create a poor user experience. Without debouncing, users may see lag, rate limits, or unnecessary network traffic. {v3}
       require_secure_key_generation: true  # [ERROR] Encryption key generated from a predictable source. Key.fromLength() uses dart:math Random which is NOT cryptographically secure. Hardcoded byte arrays in Uint8List.fromList() or List.filled() produce deterministic keys extractable from compiled binaries. Predictable keys compromise all data encrypted with them and cannot be rotated without data loss. {v2}
       require_secure_password_field: true  # [WARNING] Password input fields must disable suggestions and autocorrect to prevent sensitive information from being stored in device dictionaries or suggested to users inappropriately. Failing to do so increases the risk of password leakage, accidental exposure, and poor user privacy. Always configure password fields to maximize security and user trust. {v5}
@@ -672,7 +672,7 @@ plugins:
       require_cached_image_error_widget: true  # [INFO] CachedNetworkImage without errorWidget. Broken images show nothing. Network images can fail. Always provide fallback for broken images. CachedNetworkImage is used without error widget. {v2}
       require_cached_image_placeholder: true  # [INFO] CachedNetworkImage without placeholder. User sees blank during load. Placeholders provide visual feedback while the image loads. This image handling causes excessive memory usage, visual artifacts, or slow load times. {v2}
       require_calendar_timezone_handling: true  # [WARNING] device_calendar Event is missing an explicit timeZone. This can cause events to appear at the wrong time for users in different time zones, leading to missed or misaligned appointments. {v2}
-      require_change_notifier_dispose: true  # [ERROR] Failing to dispose a ChangeNotifier (or ValueNotifier, etc.) in the dispose() method causes it to retain all listeners and references in the widget tree, resulting in memory leaks and potential crashes when notifications are sent to unmounted widgets. This is a common source of subtle bugs and degraded performance in Flutter apps. {v4}
+      require_change_notifier_dispose: true  # [ERROR] Failing to dispose a ChangeNotifier (or ValueNotifier, etc.) in the dispose() method causes it to retain all listeners and references in the widget tree, resulting in memory leaks and potential crashes when notifications are sent to unmounted widgets. This is a common source of subtle bugs and degraded performance in Flutter apps. {v5}
       require_clipboard_paste_validation: true  # [INFO] Clipboard data used without validation. Pasted content can be unexpected format or malicious. Validate clipboard data before using it. This creates a security vulnerability that attackers can exploit to compromise user data or application integrity. {v2}
       require_connectivity_error_handling: true  # [WARNING] Connectivity check without error handling. checkConnectivity() can throw platform exceptions. {v2}
       require_connectivity_subscription_cancel: true  # [ERROR] If you do not cancel your connectivity subscription, your app will leak memory and system resources. This can cause crashes, slowdowns, and unpredictable behavior, especially after repeated hot reloads or navigation. {v3}
