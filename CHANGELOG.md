@@ -47,39 +47,13 @@
 
 ---
 
-## [Unreleased]
-
-Nothing queued for the next release yet.
-
----
-
 ## [12.4.4]
 
-Animation controller cleanup still honors the same disposeSafe-style pattern 12.4.3 introduced, and the on-screen rule text now matches what the linter reports so you are not fighting mismatched wording. Extension and migration guides pick up the same polish when you refresh dependencies. You do not need new analysis_options toggles for this patch. — [log](https://github.com/saropa/saropa_lints/blob/v12.4.4/CHANGELOG.md)
-
-### Changed
-
-- `require_animation_controller_dispose` problem text and implementation stay aligned with the 12.4.3 safe-dispose behavior, including a fresh rule-message version token. No action required if you are already on 12.4.3 with `dispose(…)` or `disposeSafe(…)` in `State.dispose()`.
-
-<details>
-<summary>Maintenance</summary>
-
-- Unit tests now cover essential-tier registration and severity for compile-time syntax shape rules, and comprehensive-tier registration for the image filter quality migration rule, so tier and metadata regressions are caught early. No action required for package users.
-- The example package gained migration and SDK-migration batch fixtures and mock types (for example `ButtonBar`, `RenderObjectElement`, and `ThemeData.copyWith` fields used by those scenarios), and the Flutter SDK migration rules test uses the same “Rule Instantiation” group title pattern as other categories. No action required for package users.
-- Placeholder example fixtures under stylistic, stylistic add-on, control flow, null collection, whitespace constructor, and test rule folders were removed where they did not assert real diagnostics, and matching unit tests were trimmed so the suite does not claim behavior those files never exercised. No action required for package users.
-- Internal doc comment reference style, plan notes, extension copy, script helpers, and archive indexing were updated. No action required for package users.
-
-</details>
-
----
-
-## [12.4.3]
-
-`require_animation_controller_dispose` no longer false-positives when you use a `disposeSafe()`-style call to clean up, which matches the patterns the rule already documents. Rounded rule-count text is consistent across the package, extension, and guides, and internal publish and audit flows plus one Windows test got small hardening. — [log](https://github.com/saropa/saropa_lints/blob/v12.4.3/CHANGELOG.md)
+`require_animation_controller_dispose` stops nagging when you really did tear down an `AnimationController` using a disposeSafe-style helper next to `dispose`, and the help text you read in the editor now matches what the linter reports. Rule counts and Marketplace-facing copy line up across the package and extension, publish and audit flows are a little sturdier, and you do not need new analysis_options toggles to pick any of this up. — [log](https://github.com/saropa/saropa_lints/blob/v12.4.4/CHANGELOG.md)
 
 ### Fixed
 
-- `require_animation_controller_dispose` now treats `disposeSafe(…)` like `dispose(…)` in your `State.dispose()` so custom safe-dispose extensions are not reported. No action required; remove suppression comments you added only for this false positive.
+- `require_animation_controller_dispose` now treats `disposeSafe(…)` like `dispose(…)` in your `State.dispose()` so custom safe-dispose extensions are not reported, and the rule message was refreshed so on-screen wording stays aligned with that behavior. No action required; remove suppression comments you added only for this false positive.
 
 <details>
 <summary>Maintenance</summary>
@@ -90,6 +64,8 @@ Animation controller cleanup still honors the same disposeSafe-style pattern 12.
 - Publish work-report “unsolved bug” count excludes the bug-filing guide at repo root so only real open bug files inflate that bar. No action required for package users.
 - Clarified internal helper documentation for `isFieldCleanedUp` so extension method names are not implied by a generic `dispose` check. No action required for package users.
 - Dropped placeholder-only example rule fixtures and matching fixture-existence test entries so the suite does not imply behavioral coverage for unfilled TODO stubs. No action required for package users.
+- Follow-up removed additional stylistic and related stub fixtures, added migration and SDK-migration batch fixtures with shared mocks, and expanded unit tests for compile-time syntax and image filter tier metadata. No action required for package users.
+- Internal doc comment reference style, plan notes, extension copy, script helpers, and archive indexing were updated. No action required for package users.
 
 </details>
 
