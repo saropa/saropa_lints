@@ -1,7 +1,8 @@
 #!/usr/bin/env dart
 // ignore_for_file: avoid_print
 
-/// Cross-file analysis CLI: unused files, circular deps, import stats, graph.
+/// Cross-file analysis CLI: unused files, circular deps, mirror test gaps,
+/// import stats, graph.
 ///
 /// Usage:
 ///   dart run saropa_lints:cross_file [command] [options]
@@ -123,6 +124,7 @@ Future<int> _run(List<String> args) async {
     CrossFileBaseline(
       unusedFiles: result.unusedFiles,
       circularDependencies: result.circularDependencies,
+      missingMirrorTests: result.missingMirrorTests,
     ).save(path);
     stderr.writeln('Baseline written to $path');
     return 0;
@@ -162,13 +164,15 @@ Future<int> _run(List<String> args) async {
   }
 
   final hasIssues =
-      result.unusedFiles.isNotEmpty || result.circularDependencies.isNotEmpty;
+      result.unusedFiles.isNotEmpty ||
+      result.circularDependencies.isNotEmpty ||
+      result.missingMirrorTests.isNotEmpty;
   return hasIssues ? 1 : 0;
 }
 
 void _printUsage() {
   print('''
-Cross-file analysis (unused files, circular deps, import stats).
+Cross-file analysis (unused files, circular deps, lib/test mirror gaps, import stats).
 
 Usage: dart run saropa_lints:cross_file <command> [options]
 
@@ -188,6 +192,7 @@ Options:
   --exclude <glob>     Exclude matching paths from results (can repeat)
   -h, --help           Show this help
 
-Exit codes: 0 = no issues, 1 = issues found, 2 = configuration error
+Exit codes: 0 = no issues, 1 = issues found (unused files, circular imports,
+or lib sources without a mirror *_test.dart), 2 = configuration error
 ''');
 }

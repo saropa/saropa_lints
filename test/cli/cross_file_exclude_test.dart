@@ -25,6 +25,8 @@ void main() {
       expect(result.stats['fileCount'], 4);
       // No excludes active → includedPaths should be empty (signals "use all").
       expect(result.includedPaths, isEmpty);
+      expect(result.missingMirrorTests, hasLength(1));
+      expect(result.missingMirrorTests.single, endsWith('orphan.dart'));
     });
 
     test('excluding orphan.dart removes it from unused files', () async {
@@ -53,6 +55,11 @@ void main() {
         isFalse,
         reason: 'orphan.dart should not be in includedPaths',
       );
+      expect(
+        filtered.missingMirrorTests,
+        isEmpty,
+        reason: 'excluded orphan.dart is not scanned for lib/test mirror gaps',
+      );
     });
 
     test('excluding all files yields empty results', () async {
@@ -62,6 +69,7 @@ void main() {
       );
       expect(result.unusedFiles, isEmpty);
       expect(result.circularDependencies, isEmpty);
+      expect(result.missingMirrorTests, isEmpty);
       expect(result.includedPaths, isEmpty);
     });
 

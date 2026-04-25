@@ -8,24 +8,30 @@ import 'package:saropa_lints/src/cli/cross_file_reporter.dart';
 ///
 /// ```json
 /// {
-///   "version": 1,
+///   "version": 2,
 ///   "generated": "2026-03-17T12:00:00.000Z",
 ///   "unusedFiles": ["lib/foo.dart"],
-///   "circularDependencies": [["lib/a.dart", "lib/b.dart", "lib/a.dart"]]
+///   "circularDependencies": [["lib/a.dart", "lib/b.dart", "lib/a.dart"]],
+///   "missingMirrorTests": ["lib/foo.dart"]
 /// }
 /// ```
 class CrossFileBaseline {
   CrossFileBaseline({
     required this.unusedFiles,
     required this.circularDependencies,
+    List<String>? missingMirrorTests,
     DateTime? generated,
-  }) : generated = generated ?? DateTime.now();
+  }) : generated = generated ?? DateTime.now(),
+       missingMirrorTests = missingMirrorTests ?? const [];
 
-  static const int version = 1;
+  static const int version = 2;
 
   final DateTime generated;
   final List<String> unusedFiles;
   final List<List<String>> circularDependencies;
+
+  /// See [CrossFileResult.missingMirrorTests].
+  final List<String> missingMirrorTests;
 
   static CrossFileBaseline? load(String? path) {
     if (path == null || path.trim().isEmpty) return null;
@@ -52,7 +58,11 @@ class CrossFileBaseline {
 
   static CrossFileBaseline fromJson(Map<String, dynamic>? json) {
     if (json == null) {
-      return CrossFileBaseline(unusedFiles: [], circularDependencies: []);
+      return CrossFileBaseline(
+        unusedFiles: [],
+        circularDependencies: [],
+        missingMirrorTests: [],
+      );
     }
     final u = json['unusedFiles'];
     final unusedFiles = u is List
@@ -68,11 +78,16 @@ class CrossFileBaseline {
               )
               .toList()
         : <List<String>>[];
+    final mt = json['missingMirrorTests'];
+    final missingMirrorTests = mt is List
+        ? mt.map((e) => e is String ? e : e.toString()).toList()
+        : <String>[];
     final g = json['generated'];
     final generated = g is String ? DateTime.tryParse(g) : null;
     return CrossFileBaseline(
       unusedFiles: unusedFiles,
       circularDependencies: circularDependencies,
+      missingMirrorTests: missingMirrorTests,
       generated: generated,
     );
   }
@@ -82,6 +97,7 @@ class CrossFileBaseline {
     'generated': generated.toUtc().toIso8601String(),
     'unusedFiles': unusedFiles,
     'circularDependencies': circularDependencies,
+    'missingMirrorTests': missingMirrorTests,
   };
 
   void save(String path) {
@@ -91,19 +107,25 @@ class CrossFileBaseline {
   }
 
   /// True if [current] has no new violations compared to this baseline.
-  /// New = unused file or cycle present in current but not in baseline.
+  /// New = unused file, missing mirror test, or cycle present in current but
+  /// not in baseline.
   static bool hasNewViolations(
     CrossFileResult current,
     CrossFileBaseline? base,
   ) {
     if (base == null) {
       return current.unusedFiles.isNotEmpty ||
-          current.circularDependencies.isNotEmpty;
+          current.circularDependencies.isNotEmpty ||
+          current.missingMirrorTests.isNotEmpty;
     }
     final newUnused = current.unusedFiles.toSet().difference(
       base.unusedFiles.toSet(),
     );
     if (newUnused.isNotEmpty) return true;
+    final newMissing = current.missingMirrorTests.toSet().difference(
+      base.missingMirrorTests.toSet(),
+    );
+    if (newMissing.isNotEmpty) return true;
     final baseCycleKeys = base.circularDependencies.map(_cycleKey).toSet();
     for (final cycle in current.circularDependencies) {
       if (!baseCycleKeys.contains(_cycleKey(cycle))) return true;

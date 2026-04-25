@@ -23,6 +23,7 @@ void main() {
         final result = await runCrossFileAnalysis(projectPath: projectRoot);
         expect(result.unusedFiles, isA<List<String>>());
         expect(result.circularDependencies, isA<List<List<String>>>());
+        expect(result.missingMirrorTests, isA<List<String>>());
         expect(result.stats, isA<Map<String, dynamic>>());
         expect(result.stats['fileCount'], isA<int>());
       },
@@ -47,6 +48,7 @@ void main() {
       CrossFileReporter.report(result, format: 'text', sink: buffer);
       final out = buffer.toString();
       expect(out, contains('Unused Files'));
+      expect(out, contains('Lib sources without mirror test'));
       expect(out, contains('Circular Dependencies'));
     });
 
@@ -57,6 +59,7 @@ void main() {
       final decoded = jsonDecode(buffer.toString()) as Map<String, dynamic>;
       expect(decoded.containsKey('unusedFiles'), isTrue);
       expect(decoded.containsKey('circularDependencies'), isTrue);
+      expect(decoded.containsKey('missingMirrorTests'), isTrue);
     });
   });
 
@@ -88,5 +91,14 @@ void main() {
       expect(result.stats['fileCount'], 4);
       expect(result.stats['totalImports'], 3);
     });
+
+    test(
+      'missing mirror tests: only orphan.dart lacks test/orphan_test.dart',
+      () async {
+        final result = await runCrossFileAnalysis(projectPath: fixturePath);
+        expect(result.missingMirrorTests, hasLength(1));
+        expect(result.missingMirrorTests.single, endsWith('orphan.dart'));
+      },
+    );
   });
 }
