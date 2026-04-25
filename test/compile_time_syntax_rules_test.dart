@@ -1,11 +1,12 @@
 import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
-import 'package:saropa_lints/saropa_lints.dart' show
-    essentialRules,
-    getRulesFromRegistry,
-    rulesWithFixes,
-    LintImpact,
-    RuleType,
-    SaropaLintRule;
+import 'package:saropa_lints/saropa_lints.dart'
+    show
+        essentialRules,
+        getRulesFromRegistry,
+        rulesWithFixes,
+        LintImpact,
+        RuleType,
+        SaropaLintRule;
 import 'package:saropa_lints/src/rules/architecture/compile_time_syntax_rules.dart';
 import 'package:test/test.dart';
 
@@ -67,40 +68,49 @@ void main() {
       }
     });
 
-    test('native-shape violations: analyzer ERROR severity (matches SDK compile errors)', () {
-      for (final r in <SaropaLintRule>[
-        DuplicateConstructorRule(),
-        ConflictingConstructorAndStaticMemberRule(),
-        FieldInitializerRedirectingConstructorRule(),
-        InvalidSuperFormalParameterLocationRule(),
-        IllegalConcreteEnumMemberRule(),
-      ]) {
-        expectErrorSeverity(r);
-      }
-    });
+    test(
+      'native-shape violations: analyzer ERROR severity (matches SDK compile errors)',
+      () {
+        for (final r in <SaropaLintRule>[
+          DuplicateConstructorRule(),
+          ConflictingConstructorAndStaticMemberRule(),
+          FieldInitializerRedirectingConstructorRule(),
+          InvalidSuperFormalParameterLocationRule(),
+          IllegalConcreteEnumMemberRule(),
+        ]) {
+          expectErrorSeverity(r);
+        }
+      },
+    );
 
-    test('annotation / enum issues: WARNING severity (invalid use, not always compile error)', () {
-      for (final r in <SaropaLintRule>[
-        InvalidLiteralAnnotationRule(),
-        InvalidNonVirtualAnnotationRule(),
-        AbstractFieldInitializerRule(),
-        UndefinedEnumConstructorRule(),
-      ]) {
-        expect(
-          r.code.severity,
-          equals(DiagnosticSeverity.WARNING),
-          reason: r.code.lowerCaseName,
-        );
-      }
-    });
+    test(
+      'annotation / enum issues: WARNING severity (invalid use, not always compile error)',
+      () {
+        for (final r in <SaropaLintRule>[
+          InvalidLiteralAnnotationRule(),
+          InvalidNonVirtualAnnotationRule(),
+          AbstractFieldInitializerRule(),
+          UndefinedEnumConstructorRule(),
+        ]) {
+          expect(
+            r.code.severity,
+            equals(DiagnosticSeverity.WARNING),
+            reason: r.code.lowerCaseName,
+          );
+        }
+      },
+    );
   });
 
   group('rulesWithFixes and registration', () {
-    test('compile_time_syntax rules have no auto-fixes registered (shape-only)', () {
-      for (final n in ruleNames) {
-        expect(rulesWithFixes.contains(n), isFalse, reason: n);
-      }
-    });
+    test(
+      'compile_time_syntax rules have no auto-fixes registered (shape-only)',
+      () {
+        for (final n in ruleNames) {
+          expect(rulesWithFixes.contains(n), isFalse, reason: n);
+        }
+      },
+    );
   });
 
   group('Compile-time syntax rules - Rule Instantiation', () {
