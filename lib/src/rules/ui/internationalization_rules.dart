@@ -7,6 +7,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/visitor.dart';
 
 import '../../saropa_lint_rule.dart';
 import '../../fixes/internationalization/require_directional_widgets_fix.dart';
@@ -1811,9 +1812,45 @@ class RequireIntlCurrencyFormatRule extends SaropaLintRule {
   }
 }
 
+final RegExp _intlPluralManualWordPattern = RegExp(
+  r'\b(items?|files?|messages?|users?|days?|hours?|minutes?|'
+  r'seconds?|photos?|videos?|comments?|posts?|results?|records?|'
+  r'entries?|elements?|objects?|things?)\b',
+  caseSensitive: false,
+);
+
+class _PluralWordLiteralScanner extends RecursiveAstVisitor<void> {
+  bool found = false;
+
+  @override
+  void visitSimpleStringLiteral(SimpleStringLiteral node) {
+    if (!found && _intlPluralManualWordPattern.hasMatch(node.value)) {
+      found = true;
+      return;
+    }
+    super.visitSimpleStringLiteral(node);
+  }
+
+  @override
+  void visitStringInterpolation(StringInterpolation node) {
+    if (!found) {
+      for (final InterpolationElement element in node.elements) {
+        if (element is InterpolationString &&
+            _intlPluralManualWordPattern.hasMatch(element.value)) {
+          found = true;
+          return;
+        }
+      }
+    }
+    if (!found) {
+      super.visitStringInterpolation(node);
+    }
+  }
+}
+
 /// Warns when manual count-based string selection is used instead of Intl.plural.
 ///
-/// Since: v2.3.10 | Updated: v4.13.0 | Rule version: v2
+/// Since: v2.3.10 | Updated: v4.14.0 | Rule version: v2
 ///
 /// Alias: use_intl_plural, manual_plural
 ///
@@ -1840,6 +1877,10 @@ class RequireIntlCurrencyFormatRule extends SaropaLintRule {
 ///   );
 /// }
 /// ```
+///
+/// Plural-looking words are detected only inside string or interpolation literal
+/// fragments, not by scanning raw method text (so code like `(hour == 12)`
+/// cannot be mistaken for the word "hour" inside a string).
 class RequireIntlPluralRulesRule extends SaropaLintRule {
   RequireIntlPluralRulesRule() : super(code: _code);
 
@@ -1864,14 +1905,15 @@ class RequireIntlPluralRulesRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
-  // Cached regex patterns for performance
+  // Cached regex for counting `return '...'` / `return "..."` sites only.
   static final RegExp _returnStringPattern = RegExp(r'''return\s*['"]''');
-  static final RegExp _pluralWordPattern = RegExp(
-    r'''['"][^'"]*\b(items?|files?|messages?|users?|days?|hours?|minutes?|'''
-    r'''seconds?|photos?|videos?|comments?|posts?|results?|records?|'''
-    r'''entries?|elements?|objects?|things?)\b[^'"]*['"]''',
-    caseSensitive: false,
-  );
+
+  /// Same literal-only plural scan as production; used by unit tests.
+  static bool stringLiteralsSuggestManualPlural(FunctionBody body) {
+    final _PluralWordLiteralScanner scanner = _PluralWordLiteralScanner();
+    body.accept(scanner);
+    return scanner.found;
+  }
 
   @override
   void runWithReporter(
@@ -1936,10 +1978,10 @@ class RequireIntlPluralRulesRule extends SaropaLintRule {
       // Need at least 2 different string returns (singular/plural)
       if (returnCount < 2) return;
 
-      // Look for explicit plural patterns in strings:
-      // - Words ending in 's' that likely represent plurals
-      // - Explicit singular/plural word pairs
-      if (_pluralWordPattern.hasMatch(bodySource)) {
+      // Plural indicators must appear inside real string / interpolation
+      // fragments (regex on full bodySource can span from closing ' to the
+      // next quote and treat `(hour == …)` as containing `\bhour\b`).
+      if (stringLiteralsSuggestManualPlural(body)) {
         reporter.atNode(node);
       }
     });

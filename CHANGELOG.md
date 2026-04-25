@@ -63,6 +63,7 @@
 - Added `require_notification_icon_kept` to warn when FCM or local notifications are used but ProGuard/R8 rules do not appear to keep notification icon resources.
 - Added `require_firestore_security_rules` to report `FirebaseFirestore` usage when no `firestore.rules` file exists at the project root.
 - Added `require_env_file_gitignore` to report `.env` / `.env.*` files at the project root that are not covered by `.gitignore` patterns.
+- Extended `dart run saropa_lints:cross_file` with **missing mirror test** detection: each `lib/**/*.dart` (except `main.dart`, generated-style names, and `lib/generated/`) is checked for a matching `test/**/*_test.dart`; results appear in text/JSON output, HTML report, baselines (format version 2), and non-zero exit when present.
 
 <details>
 <summary>Maintenance</summary>

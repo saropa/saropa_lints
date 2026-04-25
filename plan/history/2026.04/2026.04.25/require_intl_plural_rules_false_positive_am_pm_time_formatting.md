@@ -1,6 +1,6 @@
 # BUG: `require_intl_plural_rules` false positive on AM/PM hour formatting
 
-**Status: Fixed** (literal-only plural scan; see `CHANGELOG.md` 12.5.0)
+**Status: Fixed** (2026-04-25)
 
 Created: 2026-04-25  
 Rule: `require_intl_plural_rules`  
@@ -37,21 +37,25 @@ This is clock-format branching, not noun pluralization.
 
 ---
 
-## Suspected Root Cause
+## Root cause (confirmed)
 
-Heuristic in `internationalization_rules.dart` appears broad:
-
-- identifies `String` methods with an `int` param,
-- checks `== 1` / `!= 1` comparison patterns,
-- then checks generic plural-word regex.
-
-This can overmatch time-display helpers and other non-plural quantity formatting.
+The plural-word check used a regex on **full method `body.toSource()`** with a `['"]…['"]`-style span. The `[^'"]*` segment does not stop at semicolons, so a match could start at the **closing** quote of a short literal (e.g. after `'12\nAM'`), consume non-quote code including `(hour == 12)`, and satisfy `\bhour\b` via the `hours?` alternation before the next opening quote.
 
 ---
 
-## Suggested Fix
+## Resolution
+
+- **Detection:** Plural-indicator words are matched only inside `SimpleStringLiteral` values and `InterpolationString` fragments (`_PluralWordLiteralScanner`), not across raw source.
+- **Tests:** `test/require_intl_plural_rules_behavior_test.dart` (wheel vs manual plural).
+- **Fixture:** `_good449_formatHourWheel` in `example/lib/internationalization/require_intl_plural_rules_fixture.dart`.
+- **Changelog:** `CHANGELOG.md` §12.5.0 Fixed.
+
+---
+
+## Suggested Fix (original)
 
 1. Tighten rule to detect pluralization intent, not any numeric branching.
 2. Exclude common time-format markers (`AM`, `PM`) and non-count labels.
 3. Add a fixture explicitly validating `_formatHour`-style methods as **OK**.
 
+Items 1 and 3 addressed by literal-only scan + fixture; item 2 not required once literals no longer false-match code between quotes.
