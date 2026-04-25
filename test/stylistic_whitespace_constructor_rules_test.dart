@@ -112,11 +112,21 @@ void main() {
 
   group('Stylistic Whitespace Constructor Rules - Fixture Verification', () {
     final fixtures = [
+      'prefer_no_blank_line_before_return',
+      'prefer_blank_line_after_declarations',
+      'prefer_compact_declarations',
+      'prefer_no_blank_line_inside_blocks',
       'prefer_blank_lines_between_members',
       'prefer_compact_class_members',
       'prefer_single_blank_line_max',
       'prefer_super_parameters',
       'prefer_initializing_formals',
+      'prefer_constructor_body_assignment',
+      'prefer_factory_for_validation',
+      'prefer_constructor_assertion',
+      'prefer_required_before_optional',
+      'prefer_grouped_by_purpose',
+      'prefer_rethrow_over_throw_e',
     ];
 
     for (final fixture in fixtures) {

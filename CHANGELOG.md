@@ -62,6 +62,7 @@
 <summary>Maintenance</summary>
 
 - Archived the closed `avoid_color_only_meaning` design-system wrapper companion false-positive report under `plan/history/2026.04/2026.04.25/` and removed it from `bugs/`. No action required for package users.
+- The publish script’s combined coverage report now treats `repo_integrity` rules as using the shared `config` example fixtures, matching where those files already live. Additional validated example fixtures cover stylistic null-and-collection rules, stylistic whitespace and constructor preferences, and `prefer_semantics_sort`, with matching mock types for analysis. No action required for package users.
 
 </details>
 
