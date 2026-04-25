@@ -1,11 +1,14 @@
 // ignore_for_file: depend_on_referenced_packages, deprecated_member_use
 
+import 'dart:io';
+
 import 'package:analyzer/dart/ast/ast.dart';
 
 import '../../conditional_import_utils.dart';
 import '../../fixes/platform/add_k_is_web_guard_fix.dart';
 import '../../fixes/platform/replace_platform_check_fix.dart';
 import '../../saropa_lint_rule.dart';
+import '../../string_slice_utils.dart';
 
 // =============================================================================
 // Platform-Specific Rules (v4.1.6)
@@ -354,5 +357,90 @@ class PreferPlatformWidgetAdaptiveRule extends SaropaLintRule {
       if (name != 'MaterialApp') return;
       reporter.atNode(node);
     });
+  }
+}
+
+/// Requires desktop runner setup files when desktop-only APIs are used.
+class RequireDesktopWindowSetupRule extends SaropaLintRule {
+  RequireDesktopWindowSetupRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'platform', 'desktop'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'require_desktop_window_setup',
+    '[require_desktop_window_setup] Desktop window APIs are used but the project appears to miss desktop runner setup files. This usually means desktop platform configuration is incomplete. {v1}',
+    correctionMessage:
+        'Ensure desktop platform folders and runner setup files exist before using desktop window APIs.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _desktopMethods = <String>{
+    'ensureInitialized',
+    'setMinimumSize',
+    'setMaximumSize',
+    'setTitle',
+    'setSize',
+    'waitUntilReadyToShow',
+  };
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    final projectInfo = ProjectContext.getProjectInfo(context.filePath);
+    if (projectInfo == null || !projectInfo.isFlutterProject) return;
+
+    context.addMethodInvocation((MethodInvocation node) {
+      final methodName = node.methodName.name;
+      if (!_desktopMethods.contains(methodName)) return;
+      final targetName = node.target?.toSource();
+      if (targetName != 'windowManager') return;
+
+      final projectRoot = _findProjectRoot(context.filePath);
+      if (projectRoot == null) return;
+      if (_hasDesktopRunnerFiles(projectRoot)) return;
+
+      reporter.atNode(node);
+    });
+  }
+
+  static bool _hasDesktopRunnerFiles(String projectRoot) {
+    const candidatePaths = <String>[
+      'windows/runner/main.cpp',
+      'linux/runner/main.cc',
+      'macos/Runner/AppDelegate.swift',
+      'macos/Runner/MainFlutterWindow.swift',
+    ];
+
+    for (final relativePath in candidatePaths) {
+      if (File('$projectRoot/$relativePath').existsSync()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  static String? _findProjectRoot(String filePath) {
+    var current = filePath.replaceAll('\\', '/');
+    while (current.contains('/')) {
+      final lastSlash = current.lastIndexOf('/');
+      if (lastSlash <= 0) break;
+      current = current.prefix(lastSlash);
+      if (File('$current/pubspec.yaml').existsSync()) {
+        return current;
+      }
+    }
+    return null;
   }
 }
