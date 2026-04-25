@@ -47,11 +47,23 @@ void main() {
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
+
+    test('RequireDesktopWindowSetupRule', () {
+      final rule = RequireDesktopWindowSetupRule();
+      expect(rule.code.lowerCaseName, 'require_desktop_window_setup');
+      expect(
+        rule.code.problemMessage,
+        contains('[require_desktop_window_setup]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
   });
 
   group('Platform Rules - Fixture Verification', () {
     final fixtures = [
       'require_android_manifest_entries',
+      'require_desktop_window_setup',
       'require_platform_check',
       'prefer_platform_io_conditional',
       'prefer_foundation_platform_check',

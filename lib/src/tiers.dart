@@ -1706,6 +1706,7 @@ const Set<String> professionalOnlyRules = <String>{
   'require_biometric_fallback',
   'require_token_refresh',
   'prefer_uuid_v4', // UUID v4 over v1 for privacy
+  'require_desktop_window_setup', // INFO - desktop runner setup for window APIs
   'require_https_only_test', // INFO - HTTP URLs in test files
   'avoid_hardcoded_config_test', // INFO - hardcoded config in test files
   'prefer_js_interop_over_dart_js', // INFO - dart:js_interop over deprecated dart:js
