@@ -52,6 +52,7 @@
 ### Fixed
 
 - `require_intl_plural_rules` no longer treats code between string literals (for example `(hour == …)` next to AM/PM labels) as if it were text inside a quoted string, so 12-hour clock helpers are not mistaken for manual noun pluralization. No action required.
+- `require_image_picker_permission_ios` now reads `ios/Runner/Info.plist` through the shared plist checker so it does not warn when `NSCameraUsageDescription` is already present. No action required.
 
 ### Added
 
@@ -69,6 +70,7 @@
 <summary>Maintenance</summary>
 
 - Updated the open bug note for `avoid_builder_index_out_of_bounds` (itemCount and guard false positives) so it matches current rule behavior and documented detection limits instead of stale assumptions. No action required for package users.
+- Closed false-positive report for `require_image_picker_permission_ios` (existing `NSCameraUsageDescription`) under `plan/history/2026.04/2026.04.25/`. No action required for package users.
 
 </details>
 

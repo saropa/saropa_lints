@@ -2,6 +2,7 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 
+import '../../info_plist_utils.dart';
 import '../../saropa_lint_rule.dart';
 
 class RequireTextOverflowHandlingRule extends SaropaLintRule {
@@ -2085,14 +2086,17 @@ class RequireWssOverWsRule extends SaropaLintRule {
 
 /// Reminder to add camera permission for image_picker on iOS.
 ///
-/// Since: v2.3.3 | Updated: v4.14.0 | Rule version: v4
+/// Since: v2.3.3 | Updated: v4.14.0 | Rule version: v5
 ///
 /// Alias: ios_camera_permission
 ///
 /// Camera access via image_picker requires NSCameraUsageDescription in
 /// Info.plist. Only fires when `ImageSource.camera` is actually used in
-/// `pickImage()` or `pickVideo()` calls. Gallery-only usage does not
-/// require a camera permission and is not flagged.
+/// `pickImage()` or `pickVideo()` calls **and** the project’s
+/// `ios/Runner/Info.plist` is readable and lacks that key (same plist gate
+/// as `InfoPlistChecker` / `require_ios_permission_description`). When no
+/// plist can be resolved, the rule does not report. Gallery-only usage does
+/// not require a camera permission and is not flagged.
 ///
 /// **BAD:**
 /// ```dart
@@ -2130,7 +2134,7 @@ class RequireImagePickerPermissionIosRule extends SaropaLintRule {
     'require_image_picker_permission_ios',
     '[require_image_picker_permission_ios] Using ImageSource.camera requires '
         'NSCameraUsageDescription in Info.plist — missing it causes a crash '
-        'or App Store rejection. Gallery-only usage does not need this. {v4}',
+        'or App Store rejection. Gallery-only usage does not need this. {v5}',
     correctionMessage:
         'Add NSCameraUsageDescription to Info.plist for camera access.',
     severity: DiagnosticSeverity.WARNING,
@@ -2144,11 +2148,18 @@ class RequireImagePickerPermissionIosRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    // Only nag when we can see a real Info.plist that omits the camera key.
+    // Matches require_ios_permission_description semantics (InfoPlistChecker).
+    final plistChecker = InfoPlistChecker.forFile(context.filePath);
+    final missingCamera =
+        plistChecker?.getMissingKeys(['NSCameraUsageDescription']) ?? [];
+
     // Fixed: previously fired on any image_picker import, causing false
     // positives for gallery-only usage. Now only fires when
     // ImageSource.camera is actually passed to pickImage/pickVideo.
     context.addMethodInvocation((MethodInvocation node) {
       if (!_cameraCapableMethods.contains(node.methodName.name)) return;
+      if (missingCamera.isEmpty) return;
 
       for (final arg in node.argumentList.arguments) {
         if (arg is NamedExpression && arg.name.label.name == 'source') {
