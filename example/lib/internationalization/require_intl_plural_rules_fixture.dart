@@ -126,3 +126,13 @@ String _good449_getMessage(int count) {
     other: '$count items',
   );
 }
+
+// OK: 12h clock labels (AM/PM), not noun pluralization — regression guard.
+String _good449_formatHourWheel(int hour) {
+  if (hour == 0) return '12\nAM';
+  if (hour == 12) return '12\nPM';
+  if (hour == 1) return '1\nAM';
+  final isPM = hour >= 12;
+  final display = hour > 12 ? hour - 12 : hour;
+  return '$display\n${isPM ? 'PM' : 'AM'}';
+}
