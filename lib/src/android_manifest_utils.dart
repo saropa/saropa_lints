@@ -50,6 +50,13 @@ class AndroidManifestChecker {
     return content.contains('android.permission.$permissionName');
   }
 
+  /// Raw substring search in manifest XML (foreground services, metadata, etc.).
+  bool containsRaw(String needle) {
+    final content = _manifestContent;
+    if (content == null) return false;
+    return content.contains(needle);
+  }
+
   static String? _findProjectRoot(String filePath) {
     var current = filePath.replaceAll('\\', '/');
     while (current.contains('/')) {

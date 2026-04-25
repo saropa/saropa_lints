@@ -682,6 +682,10 @@ const Set<String> essentialRules = <String>{
   // v4.2.0 ROADMAP ⭐ Rules - Essential
   // =========================================================================
   'require_android_manifest_entries', // ERROR - permission-gated APIs need manifest entries
+  'avoid_audio_in_background_without_config', // ERROR - background audio needs platform config
+  'avoid_geolocator_background_without_config', // ERROR - background location needs platform config
+  'require_notification_icon_kept', // ERROR - ProGuard must keep notification icons
+  'require_env_file_gitignore', // ERROR - .env must be gitignored
   'require_android_permission_request', // ERROR - permissions must be requested at runtime
   'prefer_pending_intent_flags', // ERROR - PendingIntent needs FLAG_IMMUTABLE/MUTABLE
   'avoid_android_cleartext_traffic', // WARNING - cleartext traffic blocked by default
@@ -690,6 +694,7 @@ const Set<String> essentialRules = <String>{
   'require_location_permission_rationale', // WARNING - location permission needs rationale
   'require_camera_permission_check', // ERROR - camera needs permission check
   'require_firestore_index', // ERROR - Firestore queries need composite indexes
+  'require_firestore_security_rules', // ERROR - firestore.rules must exist for Cloud Firestore projects
   'require_firebase_composite_index', // ERROR - RTDB queries need .indexOn rules
   'avoid_notification_silent_failure', // WARNING - notification failures should be handled
   'require_file_path_sanitization', // WARNING - file paths need sanitization
@@ -3159,6 +3164,7 @@ const Set<String> iosPlatformRules = <String>{
 const Set<String> androidPlatformRules = <String>{
   // Essential
   'require_notification_channel_android',
+  'require_notification_icon_kept',
   'require_android_manifest_entries',
   'require_android_permission_request',
   'prefer_pending_intent_flags',
@@ -3612,6 +3618,7 @@ const Set<String> firebasePackageRules = <String>{
   'require_firebase_error_handling',
   'avoid_firebase_realtime_in_build',
   'require_firestore_index',
+  'require_firestore_security_rules',
   'require_firebase_composite_index',
   'avoid_firestore_unbounded_query',
   'avoid_map_markers_in_build',

@@ -6,8 +6,12 @@
 /// that can cause poor user experience or platform issues.
 library;
 
+import 'dart:io';
+
 import 'package:analyzer/dart/ast/ast.dart';
 
+import '../../android_manifest_utils.dart';
+import '../../info_plist_utils.dart';
 import '../../saropa_lint_rule.dart';
 import '../../fixes/media/disable_autoplay_fix.dart';
 
@@ -244,6 +248,84 @@ class PreferAudioSessionConfigRule extends SaropaLintRule {
       }
 
       reporter.atNode(node);
+    });
+  }
+}
+
+// =============================================================================
+// avoid_audio_in_background_without_config
+// =============================================================================
+
+/// Cross-checks iOS/Android config when background-capable audio APIs are used.
+///
+/// Since: v12.5.0 | Rule version: v1
+///
+/// Background playback needs `UIBackgroundModes` audio on iOS and a
+/// foreground-service permission entry on modern Android manifests. This rule
+/// is intentionally shallow (plist/manifest substring checks).
+class AvoidAudioInBackgroundWithoutConfigRule extends SaropaLintRule {
+  AvoidAudioInBackgroundWithoutConfigRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'media', 'flutter', 'platform'};
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'avoid_audio_in_background_without_config',
+    '[avoid_audio_in_background_without_config] Audio playback stack detected but platform config is missing background audio entries (iOS UIBackgroundModes audio and/or Android FOREGROUND_SERVICE). Playback can stop or fail review. {v1}',
+    correctionMessage:
+        'Add UIBackgroundModes audio in ios/Runner/Info.plist and FOREGROUND_SERVICE entries in AndroidManifest.xml per platform docs.',
+    severity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    final projectInfo = ProjectContext.getProjectInfo(context.filePath);
+    if (projectInfo == null || !projectInfo.isFlutterProject) return;
+
+    final path = context.filePath;
+    if (!ProjectContext.hasDependency(path, 'just_audio') &&
+        !ProjectContext.hasDependency(path, 'audio_service')) {
+      return;
+    }
+
+    final root = ProjectContext.findProjectRoot(path);
+    if (root == null) return;
+
+    final hasIos = Directory('$root/ios').existsSync();
+    final hasAndroid = Directory('$root/android').existsSync();
+    final plist = InfoPlistChecker.forFile(path);
+    final manifest = AndroidManifestChecker.forFile(path);
+
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      final typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'AudioPlayer') return;
+
+      final iosMisconfigured =
+          hasIos &&
+          plist != null &&
+          plist.hasInfoPlist &&
+          !plist.hasIosBackgroundAudioConfigured;
+      final androidMisconfigured =
+          hasAndroid &&
+          manifest != null &&
+          manifest.hasManifest &&
+          !manifest.containsRaw('FOREGROUND_SERVICE');
+
+      if (iosMisconfigured || androidMisconfigured) {
+        reporter.atNode(node);
+      }
     });
   }
 }

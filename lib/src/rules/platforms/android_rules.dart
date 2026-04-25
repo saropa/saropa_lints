@@ -6,6 +6,8 @@
 /// runtime permissions, splash screens, PendingIntent flags, and more.
 library;
 
+import 'dart:io';
+
 import 'package:analyzer/dart/ast/ast.dart';
 
 import '../../android_manifest_utils.dart';
@@ -846,6 +848,91 @@ class PreferForegroundServiceAndroidRule extends SaropaLintRule {
 
       reporter.atNode(node);
     });
+  }
+}
+
+// =============================================================================
+// require_notification_icon_kept
+// =============================================================================
+
+/// Requires ProGuard keep rules for notification icons when messaging packages are used.
+///
+/// Since: v12.5.0 | Rule version: v1
+///
+/// R8 can strip small-notification drawables unless `-keep` rules retain them.
+/// This rule checks `android/app/proguard-rules.pro` (or `android/proguard-rules.pro`)
+/// for a drawable-related keep when `firebase_messaging` or
+/// `flutter_local_notifications` is imported.
+class RequireNotificationIconKeptRule extends SaropaLintRule {
+  RequireNotificationIconKeptRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {
+    'flutter',
+    'platform',
+    'android',
+    'notifications',
+  };
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'require_notification_icon_kept',
+    '[require_notification_icon_kept] Notification SDK import detected but ProGuard rules do not appear to keep notification drawable resources. Stripped icons break status-bar notifications after shrinking. {v1}',
+    correctionMessage:
+        'Add -keep rules for notification drawables (or resource keeps) in android/app/proguard-rules.pro.',
+    severity: DiagnosticSeverity.ERROR,
+  );
+
+  static const Set<String> _notificationImports = <String>{
+    'package:firebase_messaging/firebase_messaging.dart',
+    'package:flutter_local_notifications/flutter_local_notifications.dart',
+  };
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    final projectInfo = ProjectContext.getProjectInfo(context.filePath);
+    if (projectInfo == null || !projectInfo.isFlutterProject) return;
+
+    final root = ProjectContext.findProjectRoot(context.filePath);
+    if (root == null || !Directory('$root/android').existsSync()) return;
+
+    context.addImportDirective((ImportDirective node) {
+      final uri = node.uri.stringValue;
+      if (!_notificationImports.contains(uri)) return;
+      if (_proguardKeepsNotificationDrawables(root)) return;
+      reporter.atNode(node);
+    });
+  }
+
+  static bool _proguardKeepsNotificationDrawables(String projectRoot) {
+    const candidates = <String>[
+      'android/app/proguard-rules.pro',
+      'android/proguard-rules.pro',
+    ];
+    for (final relative in candidates) {
+      final file = File('$projectRoot/$relative');
+      if (!file.existsSync()) continue;
+      final text = file.readAsStringSync().toLowerCase();
+      if (!text.contains('-keep')) continue;
+      if (text.contains('drawable') ||
+          text.contains('mipmap') ||
+          text.contains('ic_') ||
+          text.contains('notification')) {
+        return true;
+      }
+    }
+    return false;
   }
 }
 

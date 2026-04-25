@@ -144,6 +144,26 @@ class InfoPlistChecker {
   static void clearCache() {
     _cache.clear();
   }
+
+  /// True when [UIBackgroundModes](https://developer.apple.com/documentation/bundleresources/information_property_list/uibackgroundmodes) includes `audio`.
+  ///
+  /// Uses substring checks on the plist XML (same approach as [hasKey]).
+  /// Returns `true` when plist is missing so analysis does not block unknown
+  /// projects.
+  bool get hasIosBackgroundAudioConfigured {
+    final c = _infoPlistContent;
+    if (c == null) return true;
+    return c.contains('<key>UIBackgroundModes</key>') &&
+        c.contains('>audio</string>');
+  }
+
+  /// True when UIBackgroundModes includes `location` (background location).
+  bool get hasIosBackgroundLocationConfigured {
+    final c = _infoPlistContent;
+    if (c == null) return true;
+    return c.contains('<key>UIBackgroundModes</key>') &&
+        c.contains('>location</string>');
+  }
 }
 
 /// Maps permission-requiring types to their required Info.plist keys.

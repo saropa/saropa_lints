@@ -26,6 +26,12 @@ void main() {
     );
 
     testRule(
+      'AvoidGeolocatorBackgroundWithoutConfigRule',
+      'avoid_geolocator_background_without_config',
+      () => AvoidGeolocatorBackgroundWithoutConfigRule(),
+    );
+
+    testRule(
       'PreferGeocodingCacheRule',
       'prefer_geocoding_cache',
       () => PreferGeocodingCacheRule(),
@@ -47,6 +53,7 @@ void main() {
   group('Geolocator Rules - Fixture Verification', () {
     final fixtures = [
       'require_geolocator_battery_awareness',
+      'avoid_geolocator_background_without_config',
       'prefer_geocoding_cache',
       'prefer_geolocation_coarse_location',
       'avoid_continuous_location_updates',
