@@ -108,17 +108,59 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger require_change_notifier_dispose
 // expect_lint: require_change_notifier_dispose
 class _bad329__MyWidgetState extends State<MyWidget> {
-  final MyNotifier _notifier = MyNotifier();
-// Missing dispose — listeners leak!
+  final ChangeNotifier _notifier = ChangeNotifier();
+  // Missing dispose — listeners leak!
 }
 
 // GOOD: Should NOT trigger require_change_notifier_dispose
 class _good329__MyWidgetState extends State<MyWidget> {
-  final MyNotifier _notifier = MyNotifier();
+  final ChangeNotifier _notifier = ChangeNotifier();
 
   @override
   void dispose() {
     _notifier.dispose();
+    super.dispose();
+  }
+}
+
+// GOOD: nullable field disposed via local alias (regression for string-only
+// `_field.dispose(` detection).
+class _good329alias__MyWidgetState extends State<MyWidget> {
+  ScrollController? _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController()..addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    final ScrollController? c = _scrollController;
+    if (c != null) {
+      c.removeListener(_onScroll);
+      c.dispose();
+    }
+    super.dispose();
+  }
+
+  void _onScroll() {}
+}
+
+// GOOD: promoted local then dispose
+class _good329bang__MyWidgetState extends State<MyWidget> {
+  ScrollController? _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+  }
+
+  @override
+  void dispose() {
+    final ScrollController c = _scrollController!;
+    c.dispose();
     super.dispose();
   }
 }

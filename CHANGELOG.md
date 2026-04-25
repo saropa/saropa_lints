@@ -47,6 +47,15 @@
 
 ---
 
+## [12.5.1] - unreleased
+
+### Fixed
+
+- **`require_change_notifier_dispose` false positive**: The rule no longer flags owned notifier fields when disposal runs on a local initialized from the field (for example capturing a nullable controller before `dispose()`). No action required.
+- `require_scroll_controller_dispose` and `require_focus_node_dispose` now treat disposal through a local copy of the field, disposal only in `didUpdateWidget`, and disposal inside private helpers called from `dispose` or `didUpdateWidget` as valid cleanup, so the common nullable-controller pattern no longer reports a leak when the controller is actually released. No action required.
+
+---
+
 ## [12.5.0]
 
 New rules help you catch missing Android permissions, missing iOS privacy strings, desktop window setup, and gaps around background audio and location, notifications, Firestore rules, and secrets on disk before they bite at review or runtime. A couple of noisy false positives in internationalization and iOS camera permission checks are gone, and the cross-file CLI can warn when library code has no matching test file. — [log](https://github.com/saropa/saropa_lints/blob/v12.5.0/CHANGELOG.md)

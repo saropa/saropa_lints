@@ -299,6 +299,34 @@ void main() {
         // Required pattern present
         expect('require_change_notifier_dispose passes', isNotNull);
       });
+
+      test(
+        'fixture GOOD covers direct dispose and local-alias / bang patterns',
+        () {
+          final path =
+              'example/lib/disposal/require_change_notifier_dispose_fixture.dart';
+          final file = File(path);
+          expect(file.existsSync(), isTrue, reason: 'Fixture must exist');
+          final content = file.readAsStringSync();
+          expect(
+            RegExp(
+              r'// expect_lint: require_change_notifier_dispose',
+            ).allMatches(content).length,
+            equals(1),
+            reason: 'Exactly one BAD case should declare expect_lint',
+          );
+          expect(
+            content.contains('_good329alias__MyWidgetState'),
+            isTrue,
+            reason: 'Local-alias dispose regression case must be present',
+          );
+          expect(
+            content.contains('_good329bang__MyWidgetState'),
+            isTrue,
+            reason: 'Bang-promoted local dispose case must be present',
+          );
+        },
+      );
     });
 
     group('require_receive_port_close', () {
