@@ -134,3 +134,30 @@ void _good824() async {
     }
   };
 }
+
+// GOOD: Should NOT trigger prefer_image_cropping (camelCase crop helper)
+void _good824CamelCaseCropHelper() async {
+  Future<void> openCropDialog(dynamic imageFile) async {}
+
+  final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+  if (image == null) return;
+  await openCropDialog(image);
+}
+
+// GOOD: Should NOT trigger prefer_image_cropping (private crop route helper)
+void _good824PrivateCropRouteHelper() async {
+  Future<void> _pushCropScreen(dynamic imageFile) async {}
+
+  final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+  if (image == null) return;
+  await _pushCropScreen(image);
+}
+
+// GOOD: Should NOT trigger prefer_image_cropping (cropper-style helper name)
+void _good824NavigateToCropper() async {
+  Future<void> navigateToCropper(dynamic imageFile) async {}
+
+  final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+  if (image == null) return;
+  await navigateToCropper(image);
+}

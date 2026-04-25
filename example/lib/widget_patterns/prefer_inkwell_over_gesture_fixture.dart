@@ -110,16 +110,95 @@ dynamic child;
 // BAD: Should trigger prefer_inkwell_over_gesture
 // expect_lint: prefer_inkwell_over_gesture
 void _bad1401() {
-  GestureDetector(
-    onTap: () {},
-    child: MyWidget(),
-  );
+  GestureDetector(onTap: () {}, child: MyWidget());
 }
 
 // GOOD: Should NOT trigger prefer_inkwell_over_gesture
 void _good1401() {
-  InkWell(
+  InkWell(onTap: () {}, child: MyWidget());
+}
+
+// BAD: Should trigger prefer_inkwell_over_gesture
+// expect_lint: prefer_inkwell_over_gesture
+void _bad1401TapAndLongPress() {
+  GestureDetector(onTap: () {}, onLongPress: () {}, child: MyWidget());
+}
+
+// GOOD: behavior cannot be represented by InkWell. Should NOT trigger.
+void _good1401OpaqueBehavior() {
+  GestureDetector(
     onTap: () {},
+    behavior: HitTestBehavior.opaque,
     child: MyWidget(),
   );
+}
+
+// GOOD: behavior cannot be represented by InkWell. Should NOT trigger.
+void _good1401TranslucentBehavior() {
+  GestureDetector(
+    onTap: () {},
+    behavior: HitTestBehavior.translucent,
+    child: MyWidget(),
+  );
+}
+
+// GOOD: InkWell does not support onDoubleTap. Should NOT trigger.
+void _good1401DoubleTap() {
+  GestureDetector(
+    onTap: () {},
+    onDoubleTap: () {},
+    onLongPress: () {},
+    child: MyWidget(),
+  );
+}
+
+// GOOD: Long-press only interaction should NOT trigger.
+void _good1401LongPressOnly() {
+  GestureDetector(onLongPress: () {}, child: MyWidget());
+}
+
+// GOOD: Shape-clipped child should NOT trigger.
+void _good1401ClipOvalChild() {
+  GestureDetector(
+    onTap: () {},
+    child: ClipOval(child: MyWidget()),
+  );
+}
+
+// GOOD: One-level wrapper around shape clip should NOT trigger.
+void _good1401SizedBoxClipOvalChild() {
+  GestureDetector(
+    onTap: () {},
+    child: SizedBox(child: ClipOval(child: MyWidget())),
+  );
+}
+
+// GOOD: ClipPath is non-rectangular and should NOT trigger.
+void _good1401ClipPathChild() {
+  GestureDetector(
+    onTap: () {},
+    child: ClipPath(child: MyWidget()),
+  );
+}
+
+// GOOD: Self-painted color container should NOT trigger.
+void _good1401ColoredContainerChild() {
+  GestureDetector(
+    onTap: () {},
+    child: Container(color: Colors.blue, child: MyWidget()),
+  );
+}
+
+// GOOD: Self-painted decoration container should NOT trigger.
+void _good1401DecoratedContainerChild() {
+  GestureDetector(
+    onTap: () {},
+    child: Container(decoration: BoxDecoration(color: Colors.red), child: MyWidget()),
+  );
+}
+
+// BAD: Plain container still should trigger.
+// expect_lint: prefer_inkwell_over_gesture
+void _bad1401PlainContainerChild() {
+  GestureDetector(onTap: () {}, child: Container(child: MyWidget()));
 }

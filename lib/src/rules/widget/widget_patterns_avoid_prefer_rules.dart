@@ -2889,7 +2889,6 @@ class PreferInkwellOverGestureRule extends SaropaLintRule {
     'onTapDown',
     'onTapUp',
     'onTapCancel',
-    'onDoubleTap',
     'onLongPress',
   };
 
@@ -2906,6 +2905,20 @@ class PreferInkwellOverGestureRule extends SaropaLintRule {
     'onVerticalDragUpdate',
   };
 
+  static const Set<String> _shapeClippingChildren = <String>{
+    'ClipOval',
+    'ClipPath',
+    'ClipRRect',
+    'ClipRSuperellipse',
+  };
+
+  static const Set<String> _passThroughWrappers = <String>{
+    'SizedBox',
+    'Center',
+    'Padding',
+    'Align',
+  };
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -2915,21 +2928,81 @@ class PreferInkwellOverGestureRule extends SaropaLintRule {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'GestureDetector') return;
 
+      bool hasOnTap = false;
       bool hasSimple = false;
       bool hasComplex = false;
+      bool hasBehavior = false;
+      bool hasDoubleTap = false;
+      Expression? childExpression;
 
       for (final Expression arg in node.argumentList.arguments) {
         if (arg is NamedExpression) {
           final String name = arg.name.label.name;
+          if (name == 'onTap') hasOnTap = true;
+          if (name == 'onDoubleTap') hasDoubleTap = true;
+          if (name == 'behavior') hasBehavior = true;
           if (_simpleGestures.contains(name)) hasSimple = true;
           if (_complexGestures.contains(name)) hasComplex = true;
+          if (name == 'child') childExpression = arg.expression;
         }
       }
 
-      if (hasSimple && !hasComplex) {
+      if (childExpression != null &&
+          _isInkWellIncompatibleChild(childExpression, depth: 0)) {
+        return;
+      }
+
+      // Recommend InkWell only for simple tap interactions that map cleanly.
+      if (hasOnTap &&
+          hasSimple &&
+          !hasComplex &&
+          !hasDoubleTap &&
+          !hasBehavior) {
         reporter.atNode(node.constructorName, code);
       }
     });
+  }
+
+  bool _isInkWellIncompatibleChild(
+    Expression expression, {
+    required int depth,
+  }) {
+    if (expression is! InstanceCreationExpression) return false;
+
+    final String typeName = expression.constructorName.type.name.lexeme;
+    if (_shapeClippingChildren.contains(typeName)) return true;
+    if (typeName == 'Container' && _containerHasVisualBackground(expression)) {
+      return true;
+    }
+
+    // Allow one wrapper level (e.g. SizedBox -> ClipOval).
+    if (depth >= 1 || !_passThroughWrappers.contains(typeName)) return false;
+    final Expression? nestedChild = _namedArgumentExpression(
+      expression,
+      'child',
+    );
+    if (nestedChild == null) return false;
+    return _isInkWellIncompatibleChild(nestedChild, depth: depth + 1);
+  }
+
+  bool _containerHasVisualBackground(InstanceCreationExpression node) {
+    for (final Expression arg in node.argumentList.arguments) {
+      if (arg is! NamedExpression) continue;
+      final String argName = arg.name.label.name;
+      if (argName == 'color' || argName == 'decoration') return true;
+    }
+    return false;
+  }
+
+  Expression? _namedArgumentExpression(
+    InstanceCreationExpression node,
+    String argumentName,
+  ) {
+    for (final Expression arg in node.argumentList.arguments) {
+      if (arg is! NamedExpression) continue;
+      if (arg.name.label.name == argumentName) return arg.expression;
+    }
+    return null;
   }
 }
 

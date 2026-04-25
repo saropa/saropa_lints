@@ -122,3 +122,24 @@ void _good430() {
     errorWidget: (context, url, error) => Icon(Icons.error),
   );
 }
+
+// GOOD: Should NOT trigger require_cached_image_error_widget
+void _good430ErrorBuilder() {
+  CachedNetworkImage(
+    imageUrl: url,
+    errorBuilder:
+        (BuildContext context, Object error, StackTrace? stackTrace) =>
+            Icon(Icons.error),
+  );
+}
+
+// GOOD: Should NOT trigger require_cached_image_error_widget
+void _good430BothErrorFallbacks() {
+  CachedNetworkImage(
+    imageUrl: url,
+    errorWidget: (context, url, error) => Icon(Icons.error),
+    errorBuilder:
+        (BuildContext context, Object error, StackTrace? stackTrace) =>
+            Icon(Icons.error),
+  );
+}

@@ -7,6 +7,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/visitor.dart';
 
 import '../../saropa_lint_rule.dart';
 import '../../target_matcher_utils.dart';
@@ -168,12 +169,6 @@ class RequireDatabaseCloseRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
-  /// Only actual invocations (openDatabase(...), Database(...), SqliteDatabase(...)).
-  /// Avoids false positives from string literals (e.g. `'openDatabase'`) and
-  /// name checks (e.g. methodName != 'openDatabase' in rule code).
-  static final RegExp _dbOpenInvocationOnly = RegExp(
-    r'openDatabase\s*\(|Database\s*\(|SqliteDatabase\s*\(',
-  );
   static final List<RegExp> _closeOrDisposePattern = <RegExp>[
     RegExp(r'\.close\s*\('),
     RegExp(r'\.closeSafe\s*\('),
@@ -201,9 +196,7 @@ class RequireDatabaseCloseRule extends SaropaLintRule {
 
       if (isOwnRuleFile) return;
 
-      // Require an actual invocation (e.g. openDatabase(...)), not just the name
-      // in a string (e.g. methodName != 'openDatabase' in rule code).
-      if (!_dbOpenInvocationOnly.hasMatch(bodySource)) {
+      if (!_hasDatabaseOpenInvocation(body)) {
         return;
       }
 
@@ -218,6 +211,42 @@ class RequireDatabaseCloseRule extends SaropaLintRule {
         reporter.atNode(node);
       }
     });
+  }
+
+  bool _hasDatabaseOpenInvocation(FunctionBody body) {
+    final _DatabaseOpenInvocationVisitor visitor =
+        _DatabaseOpenInvocationVisitor();
+    body.accept(visitor);
+    return visitor.found;
+  }
+}
+
+class _DatabaseOpenInvocationVisitor extends RecursiveAstVisitor<void> {
+  bool found = false;
+
+  static const Set<String> _databaseConstructorTypes = <String>{
+    'Database',
+    'SqliteDatabase',
+  };
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    if (!found && node.methodName.name == 'openDatabase') {
+      found = true;
+      return;
+    }
+    super.visitMethodInvocation(node);
+  }
+
+  @override
+  void visitInstanceCreationExpression(InstanceCreationExpression node) {
+    if (found) return;
+    final NamedType typeNode = node.constructorName.type;
+    if (_databaseConstructorTypes.contains(typeNode.name.lexeme)) {
+      found = true;
+      return;
+    }
+    super.visitInstanceCreationExpression(node);
   }
 }
 
