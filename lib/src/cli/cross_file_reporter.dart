@@ -3,17 +3,23 @@
 import 'dart:convert';
 import 'dart:io';
 
-/// Result shape for cross-file analysis (unused files, circular deps, stats).
+/// Result shape for cross-file analysis (unused files, circular deps,
+/// missing mirror tests, stats).
 class CrossFileResult {
   const CrossFileResult({
     required this.unusedFiles,
     required this.circularDependencies,
+    required this.missingMirrorTests,
     required this.stats,
     this.includedPaths = const {},
   });
 
   final List<String> unusedFiles;
   final List<List<String>> circularDependencies;
+
+  /// `lib/foo/bar.dart` with no `test/foo/bar_test.dart` at the project root.
+  final List<String> missingMirrorTests;
+
   final Map<String, dynamic> stats;
 
   /// All file paths that survived exclude filtering. Empty when no excludes
@@ -61,6 +67,17 @@ class CrossFileReporter {
     }
     sink.writeln('');
 
+    final m = result.missingMirrorTests;
+    sink.writeln('Lib sources without mirror test (${m.length} found):');
+    if (m.isEmpty) {
+      sink.writeln('  (none)');
+    } else {
+      for (final f in m) {
+        sink.writeln('  $f');
+      }
+    }
+    sink.writeln('');
+
     final c = result.circularDependencies;
     sink.writeln('Circular Dependencies (${c.length} found):');
     if (c.isEmpty) {
@@ -83,6 +100,7 @@ class CrossFileReporter {
     final map = <String, dynamic>{
       'unusedFiles': result.unusedFiles,
       'circularDependencies': result.circularDependencies,
+      'missingMirrorTests': result.missingMirrorTests,
       if (result.stats.isNotEmpty) 'stats': result.stats,
     };
     sink.writeln(const JsonEncoder.withIndent('  ').convert(map));

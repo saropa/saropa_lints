@@ -1,10 +1,12 @@
+import 'dart:io';
+
 import 'package:path/path.dart' as p;
 import 'package:saropa_lints/src/cli/cross_file_reporter.dart';
 import 'package:saropa_lints/src/project_context.dart';
 import 'package:saropa_lints/src/string_slice_utils.dart';
 
 /// Runs cross-file analysis: builds import graph and returns unused files,
-/// circular dependencies, and stats.
+/// circular dependencies, [missingMirrorTests], and stats.
 ///
 /// [excludeGlobs] filters out matching paths from results. Glob patterns
 /// are matched against paths relative to [projectPath] (e.g. `**/*.g.dart`).
@@ -62,14 +64,62 @@ Future<CrossFileResult> runCrossFileAnalysis({
     }
   }
 
+  final pathsToScan = excludeGlobs.isEmpty ? allPaths.toSet() : includedPaths;
+  final missingMirrorTests = _libSourcesMissingMirrorTests(
+    projectPath: projectPath,
+    pathsToScan: pathsToScan,
+  );
+
   final stats = ImportGraphCache.getStats();
   return CrossFileResult(
     unusedFiles: unusedFiles,
     circularDependencies: circularDependencies,
+    missingMirrorTests: missingMirrorTests,
     stats: stats,
     // Only populate when excludes are active; empty signals "use full graph".
     includedPaths: excludeGlobs.isEmpty ? const {} : includedPaths,
   );
+}
+
+/// Each entry is a `lib/.../*.dart` file with no matching `test/.../*_test.dart`
+/// (same relative path under [projectPath], `_test` before `.dart`).
+///
+/// Skips `main.dart`, generated-style names (`.g.dart`, etc.), and paths under
+/// `lib/generated/` — a conservative 1:1 `lib` → `test` mirror convention.
+List<String> _libSourcesMissingMirrorTests({
+  required String projectPath,
+  required Set<String> pathsToScan,
+}) {
+  final root = p.normalize(projectPath);
+  final rootPosix = root.replaceAll('\\', '/');
+  final missing = <String>[];
+
+  for (final absolute in pathsToScan) {
+    if (!absolute.endsWith('.dart')) continue;
+    final absPosix = p.normalize(absolute).replaceAll('\\', '/');
+    if (!absPosix.startsWith('$rootPosix/lib/')) continue;
+
+    final afterLib = absPosix.substring(rootPosix.length + '/lib/'.length);
+    if (afterLib.isEmpty) continue;
+    final lower = afterLib.toLowerCase();
+    if (lower.endsWith('.g.dart') ||
+        lower.endsWith('.freezed.dart') ||
+        lower.endsWith('.gr.dart')) {
+      continue;
+    }
+    if (lower.contains('/generated/')) continue;
+    if (afterLib == 'main.dart') continue;
+
+    final expectedSuffix =
+        '${afterLib.substring(0, afterLib.length - 5)}_test.dart';
+    final expectedPosix = '$rootPosix/test/$expectedSuffix';
+    final expectedPath = expectedPosix.replaceAll('/', p.separator);
+    if (!File(expectedPath).existsSync()) {
+      missing.add(absolute);
+    }
+  }
+  missing.sort();
+  return missing;
 }
 
 /// Converts a simple glob pattern to a [RegExp].
