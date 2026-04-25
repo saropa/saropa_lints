@@ -51,10 +51,10 @@ void main() {
         final content = File(
           'example/lib/accessibility/${ruleName}_fixture.dart',
         ).readAsStringSync();
-      final start = content.indexOf('void _goodStateWithCommonIconWrapper');
-      // Slice ends before the BAD regression guard (its `expect_lint` sits
-      // immediately above `void _badStateWithUnknownAppWrapper`).
-      final end = content.indexOf('// BAD: Prefix alone should not suppress');
+        final start = content.indexOf('void _goodStateWithCommonIconWrapper');
+        // Slice ends before the BAD regression guard (its `expect_lint` sits
+        // immediately above `void _badStateWithUnknownAppWrapper`).
+        final end = content.indexOf('// BAD: Prefix alone should not suppress');
         expect(start, greaterThan(-1));
         expect(end, greaterThan(start));
         final slice = content.substring(start, end);

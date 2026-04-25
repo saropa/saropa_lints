@@ -960,7 +960,7 @@ class RequireCachedImagePlaceholderRule extends SaropaLintRule {
   }
 }
 
-/// Warns when CachedNetworkImage is used without error widget.
+/// Warns when CachedNetworkImage is used without error fallback UI.
 ///
 /// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v2
 ///
@@ -975,7 +975,7 @@ class RequireCachedImagePlaceholderRule extends SaropaLintRule {
 /// ```dart
 /// CachedNetworkImage(
 ///   imageUrl: url,
-///   errorWidget: (context, url, error) => Icon(Icons.error),
+///   errorBuilder: (context, error, stackTrace) => Icon(Icons.error),
 /// )
 /// ```
 class RequireCachedImageErrorWidgetRule extends SaropaLintRule {
@@ -998,9 +998,9 @@ class RequireCachedImageErrorWidgetRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'require_cached_image_error_widget',
-    '[require_cached_image_error_widget] CachedNetworkImage without errorWidget. Broken images show nothing. Network images can fail. Always provide fallback for broken images. CachedNetworkImage is used without error widget. {v2}',
+    '[require_cached_image_error_widget] CachedNetworkImage without error fallback. Broken images show nothing. Network images can fail. Always provide fallback for broken images. CachedNetworkImage is used without errorWidget/errorBuilder. {v2}',
     correctionMessage:
-        'Add errorWidget parameter to handle failed loads. Verify the change works correctly with existing tests and add coverage for the new behavior.',
+        'Add errorBuilder (preferred) or errorWidget to handle failed loads. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -1013,16 +1013,19 @@ class RequireCachedImageErrorWidgetRule extends SaropaLintRule {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'CachedNetworkImage') return;
 
-      bool hasErrorWidget = false;
+      bool hasErrorFallback = false;
 
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'errorWidget') {
-          hasErrorWidget = true;
+        if (arg is! NamedExpression) continue;
+
+        final String argumentName = arg.name.label.name;
+        if (argumentName == 'errorWidget' || argumentName == 'errorBuilder') {
+          hasErrorFallback = true;
           break;
         }
       }
 
-      if (!hasErrorWidget) {
+      if (!hasErrorFallback) {
         reporter.atNode(node);
       }
     });

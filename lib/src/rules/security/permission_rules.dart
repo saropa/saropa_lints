@@ -7,6 +7,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/visitor.dart';
 
 import '../../saropa_lint_rule.dart';
 
@@ -385,7 +386,7 @@ class PreferImageCroppingRule extends SaropaLintRule {
       if (methodName != 'pickImage' && methodName != 'pickMultiImage') return;
 
       // Check if this is in a profile/avatar context
-      AstNode? functionBody;
+      FunctionBody? functionBody;
       MethodDeclaration? methodDeclaration;
       AstNode? current = node.parent;
 
@@ -413,16 +414,69 @@ class PreferImageCroppingRule extends SaropaLintRule {
 
       if (!isProfileContext) return;
 
-      // Check for cropping (word-boundary to avoid FP on substrings)
-      if (RegExp(r'\bcropper\b').hasMatch(bodySource) ||
-          RegExp(r'\bcrop\b').hasMatch(bodySource) ||
-          RegExp(r'\bImageCropper\b').hasMatch(bodySource) ||
-          RegExp(r'\bcropImage\b').hasMatch(bodySource)) {
+      // Use AST-based matching so camelCase helpers like _pushCropScreen are
+      // recognized as cropping evidence.
+      if (_bodyHasCroppingSignal(functionBody)) {
         return; // Has cropping
       }
 
       reporter.atNode(node);
     });
+  }
+
+  static bool _bodyHasCroppingSignal(FunctionBody body) {
+    final _CropSignalVisitor visitor = _CropSignalVisitor();
+    body.accept(visitor);
+    return visitor.hasCroppingSignal;
+  }
+}
+
+class _CropSignalVisitor extends RecursiveAstVisitor<void> {
+  bool hasCroppingSignal = false;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    if (_looksLikeCroppingIdentifier(node.methodName.name)) {
+      hasCroppingSignal = true;
+      return;
+    }
+    super.visitMethodInvocation(node);
+  }
+
+  @override
+  void visitFunctionExpressionInvocation(FunctionExpressionInvocation node) {
+    final Expression function = node.function;
+    if (function is SimpleIdentifier &&
+        _looksLikeCroppingIdentifier(function.name)) {
+      hasCroppingSignal = true;
+      return;
+    }
+    super.visitFunctionExpressionInvocation(node);
+  }
+
+  @override
+  void visitInstanceCreationExpression(InstanceCreationExpression node) {
+    final String typeName = node.constructorName.type.name.lexeme;
+    if (_looksLikeCroppingIdentifier(typeName)) {
+      hasCroppingSignal = true;
+      return;
+    }
+    super.visitInstanceCreationExpression(node);
+  }
+
+  static bool _looksLikeCroppingIdentifier(String name) {
+    final String lower = name.toLowerCase();
+    if (!lower.contains('crop')) return false;
+
+    return lower.startsWith('crop') ||
+        lower.endsWith('crop') ||
+        lower.contains('cropper') ||
+        lower.contains('cropimage') ||
+        lower.contains('imagecrop') ||
+        lower.contains('_crop') ||
+        lower.contains('crop_') ||
+        RegExp(r'[a-z0-9]Crop').hasMatch(name) ||
+        RegExp(r'Crop[A-Z0-9_]').hasMatch(name);
   }
 }
 

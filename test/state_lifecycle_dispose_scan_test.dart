@@ -27,11 +27,9 @@ class _S extends State<W> {
 }
 ''');
       expect(
-        isTrackedFieldDisposedInStateLifecycle(
-          cls,
+        isTrackedFieldDisposedInStateLifecycle(cls, '_scrollController', {
           '_scrollController',
-          {'_scrollController'},
-        ),
+        }),
         isTrue,
       );
     });
@@ -50,10 +48,7 @@ class _S extends State<W> {
   }
 }
 ''');
-      expect(
-        isTrackedFieldDisposedInStateLifecycle(cls, '_c', {'_c'}),
-        isTrue,
-      );
+      expect(isTrackedFieldDisposedInStateLifecycle(cls, '_c', {'_c'}), isTrue);
     });
 
     test('dispose only in didUpdateWidget — disposed', () {
@@ -69,10 +64,7 @@ class _S extends State<W> {
   }
 }
 ''');
-      expect(
-        isTrackedFieldDisposedInStateLifecycle(cls, '_c', {'_c'}),
-        isTrue,
-      );
+      expect(isTrackedFieldDisposedInStateLifecycle(cls, '_c', {'_c'}), isTrue);
     });
 
     test('private helper from dispose — disposed', () {
@@ -92,10 +84,7 @@ class _S extends State<W> {
   }
 }
 ''');
-      expect(
-        isTrackedFieldDisposedInStateLifecycle(cls, '_c', {'_c'}),
-        isTrue,
-      );
+      expect(isTrackedFieldDisposedInStateLifecycle(cls, '_c', {'_c'}), isTrue);
     });
 
     test('alias with removeListener only — not disposed', () {
@@ -145,7 +134,8 @@ class _S extends State<W> {
 
 ClassDeclaration _parseStateClass(String source) {
   final result = parseString(
-    content: '''
+    content:
+        '''
 class StatefulWidget {}
 class State<T> {
   void initState() {}

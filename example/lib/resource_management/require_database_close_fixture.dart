@@ -133,3 +133,26 @@ void _good966() async {
     }
   }
 }
+
+// GOOD: Should NOT trigger require_database_close
+// This calls a helper method whose name contains "Database" but does not open one.
+void _good966NameCollisionMethodCall() {
+  processCommandDatabase('SELECT 1');
+}
+
+// GOOD: Should NOT trigger require_database_close
+// This constructs a non-database type with a "Database" suffix in the name.
+void _good966NameCollisionConstructorCall() {
+  final helper = SyncDatabase('mock');
+  helper.run();
+}
+
+Future<void> processCommandDatabase(String commandText) async {}
+
+class SyncDatabase {
+  SyncDatabase(this.name);
+
+  final String name;
+
+  void run() {}
+}
