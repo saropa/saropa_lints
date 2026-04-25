@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:saropa_lints/src/rules/config/platform_rules.dart';
+import 'package:saropa_lints/src/rules/platforms/android_rules.dart';
 import 'package:test/test.dart';
 
 /// Tests for 3 Platform lint rules.
@@ -8,6 +9,17 @@ import 'package:test/test.dart';
 /// Test fixtures: example/lib/platform/*
 void main() {
   group('Platform Rules - Rule Instantiation', () {
+    test('RequireAndroidManifestEntriesRule', () {
+      final rule = RequireAndroidManifestEntriesRule();
+      expect(rule.code.lowerCaseName, 'require_android_manifest_entries');
+      expect(
+        rule.code.problemMessage,
+        contains('[require_android_manifest_entries]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+
     test('RequirePlatformCheckRule', () {
       final rule = RequirePlatformCheckRule();
       expect(rule.code.lowerCaseName, 'require_platform_check');
@@ -39,6 +51,7 @@ void main() {
 
   group('Platform Rules - Fixture Verification', () {
     final fixtures = [
+      'require_android_manifest_entries',
       'require_platform_check',
       'prefer_platform_io_conditional',
       'prefer_foundation_platform_check',

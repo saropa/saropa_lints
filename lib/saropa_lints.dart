@@ -2474,6 +2474,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   // =========================================================================
 
   // Android rules (android_rules.dart)
+  RequireAndroidManifestEntriesRule.new,
   RequireAndroidPermissionRequestRule.new,
   RequireBackupExclusionRule.new,
   AvoidAndroidTaskAffinityDefaultRule.new,
