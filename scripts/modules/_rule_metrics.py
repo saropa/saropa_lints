@@ -164,6 +164,9 @@ def _fixture_category_alias(category: str) -> str:
         return "widget_patterns"
     if category.startswith("ios_"):
         return "ios"
+    # `repo_integrity_rules.dart` shares fixtures with `example/lib/config/`.
+    if category == "repo_integrity":
+        return "config"
     return category
 
 
@@ -183,6 +186,8 @@ def _test_category_alias(category: str) -> str:
         return "widget_patterns"
     if category.startswith("ios_"):
         return "ios"
+    if category == "repo_integrity":
+        return "config"
     return category
 
 

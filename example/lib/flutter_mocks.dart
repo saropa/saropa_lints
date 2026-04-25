@@ -255,11 +255,17 @@ class Icon extends Widget {
   });
 }
 
+/// Mock sort key for `Semantics(sortKey: ...)` / `prefer_semantics_sort` fixtures.
+class OrdinalSortKey {
+  const OrdinalSortKey(double order);
+}
+
 class Semantics extends Widget {
   const Semantics({
     super.key,
     String? label,
     Widget? child,
+    dynamic sortKey,
     bool? container,
     bool? excludeSemantics,
     bool? button,

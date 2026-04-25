@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:saropa_lints/src/rules/ui/accessibility_rules.dart';
 import 'package:test/test.dart';
 
-/// Tests for 39 Accessibility lint rules.
+/// Tests for 40 Accessibility lint rules (instantiation group).
 ///
 /// Test fixtures: example/lib/accessibility/*
 void main() {
@@ -218,6 +218,11 @@ void main() {
       'avoid_color_only_meaning',
       () => AvoidColorOnlyMeaningRule(),
     );
+    testRule(
+      'PreferSemanticsSortRule',
+      'prefer_semantics_sort',
+      () => PreferSemanticsSortRule(),
+    );
   });
   group('Accessibility Rules - Fixture Verification', () {
     final fixtures = [
@@ -261,6 +266,7 @@ void main() {
       'prefer_semantics_container',
       'avoid_redundant_semantics',
       'avoid_color_only_meaning',
+      'prefer_semantics_sort',
     ];
 
     for (final fixture in fixtures) {
