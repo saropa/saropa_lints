@@ -97,9 +97,10 @@ List<String> _libSourcesMissingMirrorTests({
   for (final absolute in pathsToScan) {
     if (!absolute.endsWith('.dart')) continue;
     final absPosix = p.normalize(absolute).replaceAll('\\', '/');
-    if (!absPosix.startsWith('$rootPosix/lib/')) continue;
+    final libPrefix = '$rootPosix/lib/';
+    if (!absPosix.startsWith(libPrefix)) continue;
 
-    final afterLib = absPosix.substring(rootPosix.length + '/lib/'.length);
+    final afterLib = absPosix.afterPrefix(libPrefix);
     if (afterLib.isEmpty) continue;
     final lower = afterLib.toLowerCase();
     if (lower.endsWith('.g.dart') ||
@@ -111,7 +112,7 @@ List<String> _libSourcesMissingMirrorTests({
     if (afterLib == 'main.dart') continue;
 
     final expectedSuffix =
-        '${afterLib.substring(0, afterLib.length - 5)}_test.dart';
+        '${afterLib.slice(0, afterLib.length - 5)}_test.dart';
     final expectedPosix = '$rootPosix/test/$expectedSuffix';
     final expectedPath = expectedPosix.replaceAll('/', p.separator);
     if (!File(expectedPath).existsSync()) {
