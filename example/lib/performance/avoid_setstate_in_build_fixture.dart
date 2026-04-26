@@ -132,3 +132,38 @@ Widget _good787_build(BuildContext context) {
 
   return Container();
 }
+
+// GOOD: setState inside an event-handler closure passed during build.
+// The closure is stored as a callback by GestureDetector and only invoked
+// later by the gesture system on user tap — it does NOT run during build,
+// so there is no recursive-rebuild risk.
+// See bugs/avoid_setstate_in_build_false_positive_setstate_inside_event_handler_closure.md
+Widget _good787_onTap_build(BuildContext context) {
+  return GestureDetector(
+    onTap: () => setState(() {
+      /**/
+    }),
+  );
+}
+
+// GOOD: same pattern with onPressed on a button.
+Widget _good787_onPressed_build(BuildContext context) {
+  return ElevatedButton(
+    onPressed: () {
+      setState(() {
+        /**/
+      });
+    },
+  );
+}
+
+// GOOD: setState inside a Future.then continuation that is *scheduled*
+// during build. The continuation runs on a later microtask, not during the
+// current build pass. (The build-time scheduling itself is the concern of
+// other rules such as avoid_future_in_build, not this one.)
+Widget _good787_then_build(BuildContext context) {
+  Future.value(0).then((_) => setState(() {
+    /**/
+  }));
+  return Container();
+}

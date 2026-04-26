@@ -1149,32 +1149,26 @@ class _SetStateVisitor extends RecursiveAstVisitor<void> {
   final SaropaDiagnosticReporter reporter;
   final LintCode code;
 
+  // Closures (FunctionExpression) defer execution to whenever the framework
+  // chooses to invoke them — event delivery (`onTap:`, `onPressed:`,
+  // `onChanged:`), timers, animation ticks, post-frame callbacks, `Future.then`
+  // continuations, etc. They are NOT executed during the current build pass
+  // even though their bodies are lexically inside `build()`.
+  //
+  // Skipping the entire `FunctionExpression` subtree is the conventional
+  // pattern for "synchronous-execution" detection rules. It also subsumes
+  // every special-case (addPostFrameCallback, then, Future, scheduleMicrotask,
+  // GestureDetector callbacks bound via NamedExpression, etc.) that the
+  // previous `walk-up` logic tried — and missed — to enumerate. See
+  // bugs/avoid_setstate_in_build_false_positive_setstate_inside_event_handler_closure.md.
+  @override
+  void visitFunctionExpression(FunctionExpression node) {
+    return;
+  }
+
   @override
   void visitMethodInvocation(MethodInvocation node) {
     if (node.methodName.name == 'setState') {
-      // Check if inside a callback that's okay (like addPostFrameCallback)
-      AstNode? current = node.parent;
-      while (current != null) {
-        if (current is MethodInvocation) {
-          final String name = current.methodName.name;
-          if (name == 'addPostFrameCallback' ||
-              name == 'scheduleMicrotask' ||
-              name == 'then' ||
-              name == 'Future') {
-            // Inside async callback, okay
-            return;
-          }
-        }
-        if (current is FunctionExpression) {
-          // Check if this function is passed to an async method
-          final AstNode? funcParent = current.parent;
-          if (funcParent is ArgumentList) {
-            return; // Likely a callback, don't report
-          }
-        }
-        current = current.parent;
-      }
-
       reporter.atNode(node);
     }
     super.visitMethodInvocation(node);
