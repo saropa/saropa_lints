@@ -241,9 +241,11 @@ NSCameraUsageDescription
       expect(checker.hasKey('NSCameraUsageDescription'), isTrue);
     });
 
-    test('reloads plist when file stat snapshot changes (cache invalidation)', () {
-      final plistPath = '$projectRoot/ios/Runner/Info.plist';
-      File(plistPath).writeAsStringSync('''
+    test(
+      'reloads plist when file stat snapshot changes (cache invalidation)',
+      () {
+        final plistPath = '$projectRoot/ios/Runner/Info.plist';
+        File(plistPath).writeAsStringSync('''
 <?xml version="1.0" encoding="UTF-8"?>
 <plist version="1.0">
 <dict>
@@ -253,17 +255,17 @@ NSCameraUsageDescription
 </plist>
 ''');
 
-      final testFile = '$projectRoot/lib/test.dart';
-      File(testFile).writeAsStringSync('// test file');
+        final testFile = '$projectRoot/lib/test.dart';
+        File(testFile).writeAsStringSync('// test file');
 
-      expect(
-        InfoPlistChecker.forFile(
-          testFile,
-        )!.getMissingKeys(['NSCameraUsageDescription']),
-        ['NSCameraUsageDescription'],
-      );
+        expect(
+          InfoPlistChecker.forFile(
+            testFile,
+          )!.getMissingKeys(['NSCameraUsageDescription']),
+          ['NSCameraUsageDescription'],
+        );
 
-      File(plistPath).writeAsStringSync('''
+        File(plistPath).writeAsStringSync('''
 <?xml version="1.0" encoding="UTF-8"?>
 <plist version="1.0">
 <dict>
@@ -275,13 +277,14 @@ NSCameraUsageDescription
 </plist>
 ''');
 
-      expect(
-        InfoPlistChecker.forFile(
-          testFile,
-        )!.getMissingKeys(['NSCameraUsageDescription']),
-        isEmpty,
-      );
-    });
+        expect(
+          InfoPlistChecker.forFile(
+            testFile,
+          )!.getMissingKeys(['NSCameraUsageDescription']),
+          isEmpty,
+        );
+      },
+    );
   });
 
   group('IosPermissionMapping', () {
