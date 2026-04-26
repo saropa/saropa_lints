@@ -46,6 +46,25 @@
 -->
 
 ---
+## [Unreleased]
+
+### Fixed
+
+- `avoid_setstate_in_build` no longer fires on `setState` calls inside event-handler closures (`onTap:`, `onPressed:`, `onChanged:`, `Future.then`, etc.) passed during `build()`, since those closures are stored as callbacks and invoked later — not synchronously during the build pass. The visitor now skips `FunctionExpression` subtrees, eliminating the structural false positive while still catching genuine inline `setState` calls in `build()`. No action required.
+- `avoid_opacity_animation` no longer fires on an `Opacity` widget whose `opacity:` argument is a constant numeric literal, even when it sits inside an `AnimatedBuilder` that drives a sibling property (icon swap, color, layout). A constant value cannot animate, so the rebuild cost the rule targets does not exist; replacing it with `FadeTransition` would introduce flicker. Genuine animation-driven opacity expressions still warn. No action required.
+- `prefer_const_literals_to_create_immutables` no longer fires on collection literals whose enclosing constructor is already `const` (explicitly or via const context). The Dart language auto-promotes inner literals in that case, so adding an explicit `const` would be redundant and trigger the standard analyzer's `unnecessary_const` — leaving the user with no valid resolution. Genuine cases (non-const parent with all-const elements) still warn. No action required.
+- `require_database_close` no longer fires on opener helpers whose lifetime is owned by their caller — methods named `init*` / `_init*` / `open*` / `_open*` / `setup*` / `_setup*` that return `Future<bool>` / `Future<void>` / `bool` / `void`. A success-flag return signals the helper hands control back to a caller that closes in `try { … } finally { close(); }`, the standard pattern for background-isolate / WorkManager / migration setup. Methods returning a connection (`Future<Database>` etc.) still warn because the return type transfers ownership. No action required.
+- `prefer_extracting_repeated_map_lookup` no longer fires on assignment targets (`map[key] = value`, `map[k] += 1`) — those cannot be hoisted into a local since the `[]=` operation must remain on the map. The rule also stops conflating same-spelled variables in different scopes: `cache[uuid]` written inside three sequential `for` loops, each declaring its own `uuid`, is three independent lookups and is no longer flagged. Bucketing now uses the resolved `Element` for variable keys instead of source text. No action required.
+- `require_clipboard_paste_validation` no longer fires on reusable paste helpers that hand the pasted string to a callback parameter (`callback.call(text)`, `onPaste?.call(text)`, `(callback)(text)`) — those helpers have no semantic context to validate against, so the security boundary lives at the caller, not the paste site. Genuine cases (clipboard text written directly into a field with no validation regex nearby and no callback dispatch) still warn. No action required.
+
+<details>
+<summary>Maintenance</summary>
+
+- Archived the resolved `avoid_opacity_animation` constant-opacity false-positive report under `plan/history/2026.04/2026.04.26/` and removed it from `bugs/`. No action required for package users.
+
+</details>
+
+---
 ## [12.5.2]
 
 ### Fixed

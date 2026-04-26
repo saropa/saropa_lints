@@ -147,6 +147,54 @@ void _good966NameCollisionConstructorCall() {
   helper.run();
 }
 
+// GOOD: Should NOT trigger require_database_close
+// Open-in-helper / close-in-caller pattern. The helper returns Future<bool>
+// to signal success, and the caller (executeBackup-style) closes the handle
+// in its own finally block. Without cross-method flow analysis the rule
+// exempts init/open/setup helpers that return success flags.
+Future<bool> _initBackground() async {
+  try {
+    final db = await openDatabase('app.db');
+    if (db == null) return false;
+    return true;
+  } on Object {
+    return false;
+  }
+}
+
+// GOOD: Should NOT trigger require_database_close
+// Same pattern with Future<void> success signal.
+Future<void> setupDatabase() async {
+  final db = await openDatabase('app.db');
+  await db.exec('PRAGMA journal_mode=WAL');
+}
+
+// GOOD: Should NOT trigger require_database_close
+// Same pattern using SqliteDatabase constructor + bool success return.
+bool initSync() {
+  final db = SqliteDatabase('app.db');
+  db.prepare();
+  return true;
+}
+
+// BAD: Should still trigger — name starts with 'get', not exempt, opens DB,
+// no close. This is a genuine leak pattern.
+// expect_lint: require_database_close
+Future<dynamic> _badGetUserOpens() async {
+  final db = await openDatabase('app.db');
+  return db.query('users');
+}
+
+// BAD: Should still trigger — even though name is `openConnection`, the
+// declared return type is the connection itself (not a success flag), so
+// ownership is being handed back. The rule cannot tell whether the caller
+// closes; flagging here is the safer default.
+// expect_lint: require_database_close
+Future<dynamic> openConnection() async {
+  final db = await openDatabase('app.db');
+  return db;
+}
+
 Future<void> processCommandDatabase(String commandText) async {}
 
 class SyncDatabase {
@@ -155,4 +203,12 @@ class SyncDatabase {
   final String name;
 
   void run() {}
+}
+
+class SqliteDatabase {
+  SqliteDatabase(this.name);
+
+  final String name;
+
+  void prepare() {}
 }

@@ -116,7 +116,7 @@ class RequireFileCloseInFinallyRule extends SaropaLintRule {
 
 /// Warns when database connection is not properly closed.
 ///
-/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+/// Since: v0.1.4 | Updated: v12.5.4 | Rule version: v7
 ///
 /// Database connections are expensive resources that must be closed
 /// to prevent connection pool exhaustion.
@@ -163,7 +163,7 @@ class RequireDatabaseCloseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'require_database_close',
     '[require_database_close] Unclosed database connection leaks resources '
-        'and may exhaust connection pool, causing app failures. {v6}',
+        'and may exhaust connection pool, causing app failures. {v7}',
     correctionMessage:
         'Close database in finally block or use connection pool.',
     severity: DiagnosticSeverity.WARNING,
@@ -206,6 +206,17 @@ class RequireDatabaseCloseRule extends SaropaLintRule {
         return;
       }
 
+      // Open-in-helper / close-in-caller pattern: `init*`/`open*`/`setup*`
+      // helpers that return Future<bool>/Future<void> (or bool/void) signal
+      // success/failure to a caller that owns the lifetime via try/finally.
+      // Without cross-method flow analysis the rule cannot prove the caller
+      // closes, so this name+return-type heuristic prevents systematic FPs on
+      // background-isolate / WorkManager / migration setup helpers. Methods
+      // that actually hand back a connection (`Future<Database>` etc.) keep
+      // tripping the rule because their return type signals the caller now
+      // owns a connection — which is the leak shape we still want to catch.
+      if (_looksLikeOpenHelperManagedByCaller(node)) return;
+
       // Check for close (including *Safe extension variants)
       if (!_closeOrDisposePattern.any((re) => re.hasMatch(bodySource))) {
         reporter.atNode(node);
@@ -218,6 +229,37 @@ class RequireDatabaseCloseRule extends SaropaLintRule {
         _DatabaseOpenInvocationVisitor();
     body.accept(visitor);
     return visitor.found;
+  }
+
+  /// Whether [node] looks like an opener helper whose caller closes.
+  ///
+  /// Two signals must both hold:
+  /// 1. Name starts with `init` / `_init` / `open` / `_open` / `setup` /
+  ///    `_setup` — Saropa's convention for setup helpers across Drift / Isar
+  ///    / WorkManager backgrounds.
+  /// 2. Declared return type is `Future<bool>` / `Future<void>` / `bool` /
+  ///    `void` — a success-flag return, not a hand-off of the connection.
+  ///    Methods returning `Future<Database>` etc. still get linted because
+  ///    those genuinely transfer ownership and most callers don't close.
+  static bool _looksLikeOpenHelperManagedByCaller(MethodDeclaration node) {
+    final String name = node.name.lexeme;
+    final bool nameMatches =
+        name.startsWith('init') ||
+        name.startsWith('_init') ||
+        name.startsWith('open') ||
+        name.startsWith('_open') ||
+        name.startsWith('setup') ||
+        name.startsWith('_setup');
+    if (!nameMatches) return false;
+
+    final TypeAnnotation? returnType = node.returnType;
+    if (returnType == null) return false;
+
+    final String returnSource = returnType.toSource();
+    return returnSource == 'Future<bool>' ||
+        returnSource == 'Future<void>' ||
+        returnSource == 'bool' ||
+        returnSource == 'void';
   }
 }
 
