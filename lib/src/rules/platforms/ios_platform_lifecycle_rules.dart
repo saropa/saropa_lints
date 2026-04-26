@@ -7,6 +7,7 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 
+import '../../long_operation_method_name_match.dart';
 import '../../target_matcher_utils.dart';
 import '../../mode_constants_utils.dart';
 import '../../saropa_lint_rule.dart';
@@ -2266,6 +2267,11 @@ class AvoidLongRunningIsolatesRule extends SaropaLintRule {
 /// );
 /// await cancelNotification();
 /// ```
+///
+/// Matching uses camelCase word boundaries (not raw substring search) so
+/// names like `ImportAllowed` do not match `importAll`. Files that already
+/// show in-app progress (`onStatusUpdate`, `CircularProgressIndicator`, etc.)
+/// or use a notifications plugin are skipped.
 class RequireNotificationForLongTasksRule extends SaropaLintRule {
   /// Creates a new instance of [RequireNotificationForLongTasksRule].
   RequireNotificationForLongTasksRule() : super(code: _code);
@@ -2307,6 +2313,22 @@ class RequireNotificationForLongTasksRule extends SaropaLintRule {
     'migrateDatabase',
   };
 
+  /// Substrings that indicate progress is surfaced in-app or via a plugin, so
+  /// OS silent-kill risk is much lower than for unseen background work.
+  static const List<String> _foregroundOrNotificationSignals = [
+    'showNotification',
+    'showProgressNotification',
+    'FlutterLocalNotifications',
+    'awesome_notifications',
+    '_updateLoadingStatus',
+    'onStatusUpdate',
+    'CommonProgressIndicator',
+    'LinearProgressIndicator',
+    'CircularProgressIndicator',
+    'showSnackBar',
+    'PopupToastUtils',
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -2314,18 +2336,17 @@ class RequireNotificationForLongTasksRule extends SaropaLintRule {
   ) {
     final String fileSource = context.fileContent;
 
-    // Skip if notifications are being used
-    if (fileSource.contains('showNotification') ||
-        fileSource.contains('showProgressNotification') ||
-        fileSource.contains('FlutterLocalNotifications')) {
-      return;
+    for (final String signal in _foregroundOrNotificationSignals) {
+      if (fileSource.contains(signal)) {
+        return;
+      }
     }
 
     context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       for (final String pattern in _longOperationPatterns) {
-        if (methodName.toLowerCase().contains(pattern.toLowerCase())) {
+        if (longOperationMethodNameMatchesPattern(methodName, pattern)) {
           reporter.atNode(node);
           return;
         }

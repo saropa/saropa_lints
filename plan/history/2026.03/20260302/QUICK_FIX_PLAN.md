@@ -1247,7 +1247,7 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_ios_review_prompt_frequency
 - [ ] require_ios_scene_delegate_awareness
 - [ ] require_ios_version_check
-- [ ] require_notification_for_long_tasks
+- [x] require_notification_for_long_tasks
 - [ ] require_purchase_restoration
 - [ ] require_purchase_verification
 - [ ] require_sync_error_recovery

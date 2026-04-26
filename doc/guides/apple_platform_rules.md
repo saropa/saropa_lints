@@ -292,7 +292,7 @@ v2.4.0 adds 28 additional iOS/macOS rules covering:
 **Background Processing (5 rules)**
 - `avoid_long_running_isolates` - iOS terminates isolates after 30 seconds
 - `require_workmanager_for_background` - Use workmanager for reliable background tasks
-- `require_notification_for_long_tasks` - Show progress for long operations
+- `require_notification_for_long_tasks` - Show progress for long operations (skips files with obvious in-app progress / notification setup; uses camelCase token boundaries so `ImportAllowed`/`dbProcessAll…` are not treated as `importAll`/`processAll`)
 - `prefer_background_sync` - Use BGTaskScheduler for sync
 - `require_sync_error_recovery` - Retry failed syncs with backoff
 
