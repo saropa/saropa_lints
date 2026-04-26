@@ -40,6 +40,31 @@ String _getMessage(int count) {
       );
     });
   });
+
+  group('RequireIntlPluralRulesRule count == 1 detection', () {
+    final RegExp hourPat = RequireIntlPluralRulesRule.countComparisonPatternFor(
+      'hour',
+    );
+    final RegExp buildPat =
+        RequireIntlPluralRulesRule.countComparisonPatternFor('build');
+    final RegExp countPat =
+        RequireIntlPluralRulesRule.countComparisonPatternFor('count');
+
+    test('does not match 12, 100, or 1024 as if they were the literal 1', () {
+      expect(hourPat.hasMatch('if (hour == 12) return'), isFalse);
+      expect(hourPat.hasMatch('if (12 == hour) return'), isFalse);
+      expect(buildPat.hasMatch('if (build == 100) return'), isFalse);
+      expect(buildPat.hasMatch('if (100 == build) return'), isFalse);
+      expect(countPat.hasMatch('if (count == 1024) return'), isFalse);
+    });
+
+    test('still matches exact equality to the integer literal 1', () {
+      expect(hourPat.hasMatch('if (hour == 1) return'), isTrue);
+      expect(hourPat.hasMatch('if (1 == hour) return'), isTrue);
+      expect(hourPat.hasMatch('if (hour != 1) return'), isTrue);
+      expect(countPat.hasMatch('if (count == 1) return'), isTrue);
+    });
+  });
 }
 
 bool _literalScan(String source) {

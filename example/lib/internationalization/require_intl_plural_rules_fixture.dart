@@ -136,3 +136,19 @@ String _good449_formatHourWheel(int hour) {
   final display = hour > 12 ? hour - 12 : hour;
   return '$display\n${isPM ? 'PM' : 'AM'}';
 }
+
+// OK: only compares to 0 and 12 — must not match unanchored `1` inside `12`.
+String _good449_formatHourTwelveOnly(int hour) {
+  if (hour == 0) return '12 AM';
+  if (hour == 12) return '12 PM';
+  final isPM = hour >= 12;
+  final display = isPM ? hour - 12 : hour;
+  return '$display ${isPM ? 'PM' : 'AM'}';
+}
+
+// OK: build == 100 must not satisfy "compared to 1" heuristic.
+String _good449_versionBand(int build) {
+  if (build == 100) return 'beta';
+  if (build == 0) return 'dev';
+  return 'stable';
+}

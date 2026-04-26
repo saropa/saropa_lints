@@ -1881,6 +1881,10 @@ class _PluralWordLiteralScanner extends RecursiveAstVisitor<void> {
 /// Plural-looking words are detected only inside string or interpolation literal
 /// fragments, not by scanning raw method text (so code like `(hour == 12)`
 /// cannot be mistaken for the word "hour" inside a string).
+///
+/// Count-to-one checks require the integer literal **1** (not a leading digit of
+/// `12`, `100`, etc.), so 12-hour clocks and similar label mappers are not
+/// treated as manual plural branches solely from `== 12` / `== 100`.
 class RequireIntlPluralRulesRule extends SaropaLintRule {
   RequireIntlPluralRulesRule() : super(code: _code);
 
@@ -1913,6 +1917,16 @@ class RequireIntlPluralRulesRule extends SaropaLintRule {
     final _PluralWordLiteralScanner scanner = _PluralWordLiteralScanner();
     body.accept(scanner);
     return scanner.found;
+  }
+
+  /// Matches `param == 1` / `param != 1` / `1 == param` using the literal
+  /// integer **1**, not a `1` inside `12`, `100`, `1024`, etc.
+  static RegExp countComparisonPatternFor(String countParamName) {
+    final String escaped = RegExp.escape(countParamName);
+    return RegExp(
+      '$escaped\\s*[=!]=\\s*1(?![0-9])|'
+      '(?<![0-9])1\\s*[=!]=\\s*$escaped',
+    );
   }
 
   @override
@@ -1963,12 +1977,10 @@ class RequireIntlPluralRulesRule extends SaropaLintRule {
       // Check that the int parameter is compared to 1 (typical pluralization)
       // Only == 1 or != 1 patterns indicate pluralization logic.
       // Comparisons like <= 0 or > 2 are validation checks, not pluralization.
-      final RegExp countComparisonPattern = RegExp(
-        '${RegExp.escape(countParamName)}\\s*[=!]=\\s*1|'
-        '1\\s*[=!]=\\s*${RegExp.escape(countParamName)}',
-      );
-
-      if (!countComparisonPattern.hasMatch(bodySource)) return;
+      // Bound the literal `1` so `hour == 12` / `build == 100` do not match.
+      if (!countComparisonPatternFor(countParamName).hasMatch(bodySource)) {
+        return;
+      }
 
       // Must have multiple return statements with strings (different plurals)
       final int returnCount = _returnStringPattern
