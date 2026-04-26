@@ -1101,6 +1101,15 @@ class _PointerArithmeticFix extends SaropaFixProducer {
 /// `target[key]` pattern within a single function/method body. The first
 /// two accesses are not flagged since occasional duplicate access is normal.
 ///
+/// **Reads only.** Assignment targets (`map[key] = value`,
+/// `map[key] += 1`) are skipped — they cannot be hoisted into a local;
+/// the `[]=` operation must remain on the map.
+///
+/// **Scope-aware.** Variable keys are bucketed by the resolved
+/// `Element`, not source text — so `cache[uuid]` in three sequential
+/// `for` loops, each declaring its own `uuid`, is three independent
+/// lookups and not flagged.
+///
 /// **BAD:**
 /// ```dart
 /// void process(Map<String, int> config) {
@@ -1167,52 +1176,118 @@ void _checkBlockForRepeatedLookups(
   Block block,
   SaropaDiagnosticReporter reporter,
 ) {
-  // Collect all index expressions within this block
-  final lookupCounts = <String, List<IndexExpression>>{};
+  // Bucket lookups by a structural key (records compare component-wise,
+  // and analyzer Element instances compare by identity), not by source
+  // text. Source-text bucketing conflates `cache[uuid]` from one loop
+  // scope with `cache[uuid]` from another — they share spelling but
+  // resolve to different LocalVariableElements and refer to different
+  // values. See bugs/prefer_extracting_repeated_map_lookup_*.md.
+  final lookupCounts = <Object, List<IndexExpression>>{};
 
-  // Walk the block's statements to find index expressions
   block.visitChildren(_IndexExpressionCollector(lookupCounts));
 
-  // Report the 3rd+ occurrences
+  // Flag from the 3rd occurrence onward — the first two are not noisy
+  // enough to justify a lint, but a third repeat reads as duplication.
   for (final entry in lookupCounts.entries) {
     final nodes = entry.value;
     if (nodes.length < 3) continue;
-    // Flag from the 3rd occurrence onward
     for (var i = 2; i < nodes.length; i++) {
       reporter.atNode(nodes[i]);
     }
   }
 }
 
-/// Visitor that collects `target[key]` index expressions into a map keyed by
-/// their normalized source representation.
+/// Collects readable `target[key]` index expressions into scope-aware
+/// buckets so we only flag genuine repeated lookups.
+///
+/// Two correctness fixes vs. a naive source-text collector:
+///
+/// 1. **Skip writes.** `map[key] = value` is an `IndexExpression` on the LHS
+///    of an assignment. Assignment targets cannot be hoisted into a local —
+///    they must remain a `[]=` operation on the map. `inSetterContext()`
+///    distinguishes these from genuine reads (and also covers compound
+///    forms like `map[k] += 1`, which are also write-back assignments and
+///    therefore not extractable into a single local).
+///
+/// 2. **Element-aware bucketing for variable keys / targets.** Two
+///    `cache[uuid]` expressions in two different `for` loops, each with
+///    its own `final String? uuid = ...`, share spelling but resolve to
+///    distinct `LocalVariableElement`s referring to distinct values.
+///    Bucketing by the resolved element (not source text) keeps them in
+///    separate buckets, so the third loop is no longer reported as a
+///    repeated lookup of the first.
 class _IndexExpressionCollector extends RecursiveAstVisitor<void> {
   _IndexExpressionCollector(this._lookups);
 
-  final Map<String, List<IndexExpression>> _lookups;
+  final Map<Object, List<IndexExpression>> _lookups;
 
   @override
   void visitIndexExpression(IndexExpression node) {
     super.visitIndexExpression(node);
 
+    // Writes (`map[k] = v`, `map[k] += 1`) are not extractable into a
+    // single local — the `[]=` operation must stay on the map. Counting
+    // them as "lookups" produces unfixable false positives.
+    if (node.inSetterContext()) return;
+
     final target = node.target;
     if (target == null) return;
 
-    // Only flag map lookups where the key is a simple literal or identifier
-    final index = node.index;
-    if (index is! SimpleStringLiteral &&
-        index is! IntegerLiteral &&
-        index is! SimpleIdentifier) {
-      return;
-    }
+    // Restrict to keys we can fingerprint precisely. Anything more
+    // complex (binary expressions, method calls) is unlikely to be a
+    // good extraction candidate and is too risky to bucket.
+    final indexFingerprint = _indexFingerprint(node.index);
+    if (indexFingerprint == null) return;
 
-    // Build a canonical key from the source text
-    final key = '${target.toSource()}[${index.toSource()}]';
+    final targetFingerprint = _targetFingerprint(target);
+
+    // Records compare structurally; `Element` compares by identity, so
+    // shadowed names in different scopes land in different buckets.
+    final key = (targetFingerprint, indexFingerprint);
     _lookups.putIfAbsent(key, () => <IndexExpression>[]).add(node);
+  }
+
+  /// Fingerprint the index expression. Returns `null` for indices we
+  /// won't bucket (complex expressions, or identifiers whose element
+  /// could not be resolved — without an element, we have no scope-safe
+  /// way to know whether two same-spelled identifiers refer to the
+  /// same value).
+  Object? _indexFingerprint(Expression index) {
+    if (index is SimpleStringLiteral) {
+      // String literals with the same value are the same key, period.
+      return ('lit', index.value);
+    }
+    if (index is IntegerLiteral) {
+      return ('int', index.literal.lexeme);
+    }
+    if (index is SimpleIdentifier) {
+      // Bucket by the resolved element so `uuid` in loop A and `uuid`
+      // in loop B do not conflate. If unresolved, refuse to bucket
+      // rather than fall back to text (which would re-introduce the
+      // false positive).
+      final element = index.element;
+      if (element == null) return null;
+      return element;
+    }
+    return null;
+  }
+
+  /// Fingerprint the target. Prefer the resolved element so two
+  /// shadowed `cache` variables don't conflate; fall back to source
+  /// text for compound targets like `obj.cache` where we have no
+  /// single element to key on (text is no worse than today's
+  /// behavior, and the index fingerprint already provides scope
+  /// safety for the common false-positive shapes).
+  Object _targetFingerprint(Expression target) {
+    if (target is SimpleIdentifier) {
+      final element = target.element;
+      if (element != null) return element;
+    }
+    return ('text', target.toSource());
   }
 
   @override
   void visitFunctionExpression(FunctionExpression node) {
-    // Don't descend into nested functions — each has its own scope
+    // Each nested function has its own scope; don't pool across them.
   }
 }
