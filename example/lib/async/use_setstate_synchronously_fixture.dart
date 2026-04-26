@@ -565,3 +565,119 @@ class _BadGuardBeforeSecondAwaitState extends State<BadGuardBeforeSecondAwait> {
   @override
   Widget build(BuildContext context) => Text(_data);
 }
+
+// =========================================================================
+// Source-order tracking inside compound statements
+// =========================================================================
+// Repro for bugs/use_setstate_synchronously_false_positive_setstate_before_await_inside_try.md
+// — pre-await setState inside a try-block must NOT lint, even though the
+// try-block's body also contains a later await.
+
+// GOOD: setState BEFORE the await inside a try-block (was false positive)
+class GoodSetStateBeforeAwaitInTry extends StatefulWidget {
+  const GoodSetStateBeforeAwaitInTry({super.key});
+
+  @override
+  State<GoodSetStateBeforeAwaitInTry> createState() =>
+      _GoodSetStateBeforeAwaitInTryState();
+}
+
+class _GoodSetStateBeforeAwaitInTryState
+    extends State<GoodSetStateBeforeAwaitInTry> {
+  bool _isLoading = false;
+
+  Future<void> doWork() async {
+    try {
+      if (!mounted) return;
+      setState(() => _isLoading = true); // BEFORE any await — must NOT lint
+      await Future.value('data');
+      if (mounted) setState(() => _isLoading = false); // inline-guarded — OK
+    } on Object {
+      // ignore
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => const Text('test');
+}
+
+// MIXED: pre-await setState in try is OK; post-await unguarded one lints.
+class MixedTryWithBothPositions extends StatefulWidget {
+  const MixedTryWithBothPositions({super.key});
+
+  @override
+  State<MixedTryWithBothPositions> createState() =>
+      _MixedTryWithBothPositionsState();
+}
+
+class _MixedTryWithBothPositionsState extends State<MixedTryWithBothPositions> {
+  String _data = '';
+
+  Future<void> doWork() async {
+    try {
+      if (!mounted) return;
+      setState(() => _data = 'starting'); // BEFORE await — must NOT lint
+      final value = await Future.value('done');
+      // expect_lint: use_setstate_synchronously
+      setState(() => _data = value); // AFTER await, no guard — must lint
+    } on Object {
+      if (mounted) setState(() => _data = 'error'); // inline-guarded — OK
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => Text(_data);
+}
+
+// GOOD: setState inside an `if` body BEFORE a sibling await
+class GoodSetStateInIfBeforeAwait extends StatefulWidget {
+  const GoodSetStateInIfBeforeAwait({super.key});
+
+  @override
+  State<GoodSetStateInIfBeforeAwait> createState() =>
+      _GoodSetStateInIfBeforeAwaitState();
+}
+
+class _GoodSetStateInIfBeforeAwaitState
+    extends State<GoodSetStateInIfBeforeAwait> {
+  bool _flag = false;
+
+  Future<void> doWork({required bool cond}) async {
+    if (cond) {
+      setState(() => _flag = true); // BEFORE await — must NOT lint
+    }
+    await Future.value(null);
+  }
+
+  @override
+  Widget build(BuildContext context) => const Text('test');
+}
+
+// GOOD: post-await guard inside catch protects subsequent setState
+class GoodGuardInCatchProtectsSetState extends StatefulWidget {
+  const GoodGuardInCatchProtectsSetState({super.key});
+
+  @override
+  State<GoodGuardInCatchProtectsSetState> createState() =>
+      _GoodGuardInCatchProtectsSetStateState();
+}
+
+class _GoodGuardInCatchProtectsSetStateState
+    extends State<GoodGuardInCatchProtectsSetState> {
+  String _data = '';
+
+  Future<void> doWork() async {
+    try {
+      _data = await Future.value('value');
+    } on Object {
+      // After the await, we re-enter a fresh Block (the catch body). The
+      // negated mounted guard at the top of THIS Block must protect the
+      // subsequent setState, not just the outer block's siblings.
+      if (!mounted) return;
+      setState(() => _data = 'recovered');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => Text(_data);
+}

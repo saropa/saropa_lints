@@ -2104,7 +2104,7 @@ class UseSetStateSynchronouslyRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'use_setstate_synchronously',
-    '[use_setstate_synchronously] setState called after async gap without mounted check. Quick fix available: Wraps the setState call in if (mounted) { .. }. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption. {v9}',
+    '[use_setstate_synchronously] setState called after async gap without mounted check. Quick fix available: Wraps the setState call in if (mounted) { .. }. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption. {v10}',
     correctionMessage:
         'Check mounted before calling setState after await. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     severity: DiagnosticSeverity.WARNING,
@@ -2121,42 +2121,13 @@ class UseSetStateSynchronouslyRule extends SaropaLintRule {
       if (body is! BlockFunctionBody) return;
       if (!body.isAsynchronous) return;
 
-      bool seenAwait = false;
-      bool hasGuard = false;
-
-      for (final Statement stmt in body.block.statements) {
-        // Await found: enter danger zone, reset guard
-        // Uses shared utility from async_context_utils.dart
-        if (containsAwait(stmt)) {
-          seenAwait = true;
-          hasGuard = false;
-        }
-
-        // Early-exit guard protects subsequent code
-        // Uses shared utility from async_context_utils.dart
-        if (seenAwait && isNegatedMountedGuard(stmt)) {
-          hasGuard = true;
-          continue;
-        }
-
-        // Report unprotected setState calls after await
-        if (seenAwait && !hasGuard) {
-          _reportUnprotectedSetState(stmt, reporter);
-        }
-      }
+      // Walk the body in source order — previously we iterated only top-level
+      // statements which collapsed compound statements (try/if/for/switch) into
+      // a single iteration. That made every setState inside a try block look
+      // post-await whenever ANY descendant await existed, even ones lexically
+      // BEFORE the await. See bugs/use_setstate_synchronously_false_positive_setstate_before_await_inside_try.md.
+      body.accept(_OrderedSetStateScanner(reporter));
     });
-  }
-
-  void _reportUnprotectedSetState(
-    Statement stmt,
-    SaropaDiagnosticReporter reporter,
-  ) {
-    // Uses shared SetStateWithMountedCheckFinder from async_context_utils.dart
-    stmt.visitChildren(
-      SetStateWithMountedCheckFinder((MethodInvocation node) {
-        reporter.atNode(node);
-      }),
-    );
   }
 
   @override
@@ -2171,6 +2142,106 @@ class UseSetStateSynchronouslyRule extends SaropaLintRule {
 // - SetStateWithMountedCheckFinder
 // - AwaitFinder
 // - containsAwait(), isNegatedMountedGuard(), checksMounted(), etc.
+
+/// Visitor for `use_setstate_synchronously` that walks the function body in
+/// strict source order so the rule can tell which `setState` calls are
+/// lexically BEFORE the first `await` and which are AFTER.
+///
+/// The previous implementation iterated only the function body's top-level
+/// statements. When the body was a single compound statement (`try { ... }`
+/// being the common shape in this codebase, since every method is wrapped in
+/// mandatory error handling), it could not distinguish a `setState` lexically
+/// before the inner `await` from one after — both were reported.
+///
+/// State tracked while walking:
+/// - `_seenAwait`: monotonically true once any `AwaitExpression` is visited.
+/// - `_guardStack`: parallel to the lexical Block stack. Each entry records
+///   whether a `if (!mounted) return;` early-exit guard has fired at the
+///   top level of that Block AFTER the most recent await. Any await resets
+///   every entry (the new async gap invalidates prior guards).
+///
+/// A `setState(...)` is reported only when ALL of:
+/// - `_seenAwait` is true (lexically after at least one await), AND
+/// - no Block on the stack has an active post-await guard, AND
+/// - the call has no inline `if (mounted)` ancestor (`hasAncestorMountedCheck`).
+///
+/// Nested function expressions are skipped — they have their own async scope.
+class _OrderedSetStateScanner extends RecursiveAstVisitor<void> {
+  _OrderedSetStateScanner(this._reporter);
+
+  final SaropaDiagnosticReporter _reporter;
+
+  bool _seenAwait = false;
+
+  /// Per-Block guard tracking. Index N corresponds to the Nth enclosing Block
+  /// currently being walked. Push on enter, pop on exit. A guard set inside a
+  /// nested Block does NOT protect setState in an outer Block.
+  final List<bool> _guardStack = <bool>[];
+
+  bool get _isGuarded {
+    for (int i = 0; i < _guardStack.length; i++) {
+      if (_guardStack[i]) return true;
+    }
+    return false;
+  }
+
+  @override
+  void visitFunctionExpression(FunctionExpression node) {
+    // Skip nested function expressions / closures — they have their own async
+    // scope. The await/guard state of the enclosing function does not apply.
+  }
+
+  @override
+  void visitBlock(Block node) {
+    _guardStack.add(false);
+    try {
+      for (final Statement stmt in node.statements) {
+        // Recognize `if (!mounted) return;` only at the TOP level of a Block
+        // (not nested inside `if (cond) { if (!mounted) return; }`, where the
+        // guard does not actually control the path to subsequent siblings).
+        if (_seenAwait && isNegatedMountedGuard(stmt)) {
+          _guardStack[_guardStack.length - 1] = true;
+          // Walk the children defensively — the then-branch is just `return;`
+          // or `throw ...;` per `containsEarlyExit`, but a future relaxation
+          // of that helper might allow more, and we still want to find any
+          // setState/await inside.
+          stmt.visitChildren(this);
+          continue;
+        }
+        stmt.accept(this);
+      }
+    } finally {
+      _guardStack.removeLast();
+    }
+  }
+
+  @override
+  void visitAwaitExpression(AwaitExpression node) {
+    _seenAwait = true;
+    // A new async gap invalidates every prior guard at every enclosing scope —
+    // mounted may have flipped to false during the new await.
+    for (int i = 0; i < _guardStack.length; i++) {
+      _guardStack[i] = false;
+    }
+    super.visitAwaitExpression(node);
+  }
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    if (node.methodName.name == 'setState') {
+      // Only report if we are past the first await AND no early-exit guard
+      // is active AND this call has no inline `if (mounted)` ancestor.
+      // `hasAncestorMountedCheck` covers patterns like:
+      //   if (mounted) setState(...);
+      //   if (mounted) { setState(...); }
+      //   if (mounted && cond) { setState(...); }
+      if (_seenAwait && !_isGuarded && !hasAncestorMountedCheck(node)) {
+        _reporter.atNode(node);
+      }
+    }
+    super.visitMethodInvocation(node);
+  }
+}
 
 /// Warns when a listener is added but never removed.
 ///
