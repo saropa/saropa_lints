@@ -2,6 +2,7 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 
+import '../../android_manifest_utils.dart';
 import '../../info_plist_utils.dart';
 import '../../saropa_lint_rule.dart';
 
@@ -2086,7 +2087,7 @@ class RequireWssOverWsRule extends SaropaLintRule {
 
 /// Reminder to add camera permission for image_picker on iOS.
 ///
-/// Since: v2.3.3 | Updated: v4.14.0 | Rule version: v5
+/// Since: v2.3.3 | Updated: v4.14.0 | Rule version: v6
 ///
 /// Alias: ios_camera_permission
 ///
@@ -2134,7 +2135,7 @@ class RequireImagePickerPermissionIosRule extends SaropaLintRule {
     'require_image_picker_permission_ios',
     '[require_image_picker_permission_ios] Using ImageSource.camera requires '
         'NSCameraUsageDescription in Info.plist — missing it causes a crash '
-        'or App Store rejection. Gallery-only usage does not need this. {v5}',
+        'or App Store rejection. Gallery-only usage does not need this. {v6}',
     correctionMessage:
         'Add NSCameraUsageDescription to Info.plist for camera access.',
     severity: DiagnosticSeverity.WARNING,
@@ -2174,11 +2175,17 @@ class RequireImagePickerPermissionIosRule extends SaropaLintRule {
 
 /// Reminder to add camera permission for image_picker on Android.
 ///
-/// Since: v2.3.3 | Updated: v4.13.0 | Rule version: v3
+/// Since: v2.3.3 | Updated: v4.13.0 | Rule version: v4
 ///
 /// Alias: android_camera_permission, image_picker_manifest
 ///
-/// Camera access requires AndroidManifest.xml entry.
+/// Camera access via image_picker requires `CAMERA` in AndroidManifest.xml.
+/// Only fires when `ImageSource.camera` is passed to `pickImage()` or
+/// `pickVideo()` **and** the project’s manifest is readable and omits
+/// `android.permission.CAMERA` (same manifest gate as
+/// [AndroidManifestChecker]). When no manifest can be resolved, the rule does
+/// not report. Gallery-only usage does not require camera permission and is
+/// not flagged.
 ///
 /// **Required in android/app/src/main/AndroidManifest.xml:**
 /// ```xml
@@ -2205,21 +2212,28 @@ class RequireImagePickerPermissionAndroidRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'require_image_picker_permission_android',
     '[require_image_picker_permission_android] Missing CAMERA permission '
-        'causes SecurityException crash when user tries to take a photo. {v3}',
+        'causes SecurityException crash when user tries to take a photo. {v4}',
     correctionMessage:
         'Add <uses-permission android:name="android.permission.CAMERA"/> to manifest.',
     severity: DiagnosticSeverity.WARNING,
   );
+
+  /// Methods that accept an [ImageSource] and can use the camera.
+  static const _cameraCapableMethods = {'pickImage', 'pickVideo'};
 
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    context.addMethodInvocation((MethodInvocation node) {
-      if (node.methodName.name != 'pickImage') return;
+    // Mirror the iOS sibling: only emit when the manifest is missing CAMERA.
+    final manifest = AndroidManifestChecker.forFile(context.filePath);
+    if (manifest == null || !manifest.hasManifest) return;
+    if (manifest.hasPermission('CAMERA')) return;
 
-      // Check for ImageSource.camera
+    context.addMethodInvocation((MethodInvocation node) {
+      if (!_cameraCapableMethods.contains(node.methodName.name)) return;
+
       for (final arg in node.argumentList.arguments) {
         if (arg is NamedExpression && arg.name.label.name == 'source') {
           if (arg.expression.toSource() == 'ImageSource.camera') {

@@ -46,8 +46,17 @@
 -->
 
 ---
+## [Unreleased]
 
-## [12.5.1] - unreleased
+### Fixed
+
+- Rules that read `Info.plist` through the shared helper now re-read when the file’s size or modification time changes, match keys with whitespace-tolerant XML checks, and normalize analyzer `file:` URIs to OS paths, so `require_image_picker_permission_ios` no longer false-positives once `NSCameraUsageDescription` is present. No action required.
+- `require_image_picker_permission_android` now reads `AndroidManifest.xml` like the iOS camera rule reads `Info.plist`, so it stays silent when `android.permission.CAMERA` is already declared; it also covers `pickVideo` as well as `pickImage` for `ImageSource.camera`. No action required.
+- `prefer_foundation_platform_check` no longer reports `Platform.is*` inside `build()` when the analyzed project cannot target web (Flutter app with no `web/` directory at the package root), since the web-only rationale does not apply there. No action required.
+
+---
+
+## [12.5.1]
 
 [log](https://github.com/saropa/saropa_lints/blob/v12.5.1/CHANGELOG.md)
 

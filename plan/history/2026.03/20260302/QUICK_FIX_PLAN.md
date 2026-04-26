@@ -2134,7 +2134,7 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_https_over_http
 - [ ] require_image_dimensions
 - [ ] require_image_error_builder
-- [ ] require_image_picker_permission_android
+- [x] require_image_picker_permission_android
 - [ ] require_image_picker_permission_ios
 - [ ] require_locale_for_text
 - [ ] require_long_press_callback

@@ -1806,6 +1806,8 @@ class InAppWebView extends Widget {
 
 class ImagePicker {
   Future<dynamic> pickImage({required dynamic source}) async => null;
+
+  Future<dynamic> pickVideo({required dynamic source}) async => null;
 }
 
 class ImageSource {

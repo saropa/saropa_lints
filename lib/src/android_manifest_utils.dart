@@ -69,4 +69,9 @@ class AndroidManifestChecker {
     }
     return null;
   }
+
+  /// Clears the per-project-root cache (for tests).
+  static void clearCache() {
+    _cache.clear();
+  }
 }

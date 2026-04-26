@@ -105,13 +105,18 @@
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// BAD: Should trigger require_image_picker_permission_android
+// BAD: Manifest under example/android/ omits CAMERA; camera source should lint.
 // expect_lint: require_image_picker_permission_android
-void _bad1456() {
-  // NOTE: require_image_picker_permission_android — see rule docs for triggering pattern
+Future<void> _bad1456() async {
+  await ImagePicker().pickImage(source: ImageSource.camera);
 }
 
-// GOOD: Should NOT trigger require_image_picker_permission_android
-void _good1456() {
-  // Compliant version — see rule docs
+// GOOD: Gallery source does not need CAMERA permission.
+Future<void> _good1456Gallery() async {
+  await ImagePicker().pickImage(source: ImageSource.gallery);
+}
+
+// GOOD: pickVideo with gallery does not use the camera.
+Future<void> _good1456VideoGallery() async {
+  await ImagePicker().pickVideo(source: ImageSource.gallery);
 }

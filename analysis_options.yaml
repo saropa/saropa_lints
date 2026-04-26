@@ -37,7 +37,7 @@ linter:
 
 plugins:
   saropa_lints:
-    version: "12.5.0"
+    version: "12.5.1"
     # ═══════════════════════════════════════════════════════════════════
     # SAROPA LINTS CONFIGURATION
     # ═══════════════════════════════════════════════════════════════════
@@ -714,8 +714,8 @@ plugins:
       require_image_description: true  # [WARNING] Image without semanticLabel is announced as "image" by screen readers, providing no useful information. {v2}
       require_image_error_builder: true  # [WARNING] Network image without errorBuilder shows a broken image icon or blank space when the URL is invalid, the server is down, or the network is unavailable. This creates a poor user experience with no indication of what went wrong and no way to retry loading the image. {v3}
       require_image_loading_placeholder: true  # [INFO] Image.network without loadingBuilder shows blank space during load. Network images take time to download. Without a loading indicator, users see an empty space which creates a poor user experience. {v4}
-      require_image_picker_permission_android: true  # [WARNING] Missing CAMERA permission causes SecurityException crash when user tries to take a photo. {v3}
-      require_image_picker_permission_ios: true  # [WARNING] Using ImageSource.camera requires NSCameraUsageDescription in Info.plist — missing it causes a crash or App Store rejection. Gallery-only usage does not need this. {v4}
+      require_image_picker_permission_android: true  # [WARNING] Missing CAMERA permission causes SecurityException crash when user tries to take a photo. {v4}
+      require_image_picker_permission_ios: true  # [WARNING] Using ImageSource.camera requires NSCameraUsageDescription in Info.plist — missing it causes a crash or App Store rejection. Gallery-only usage does not need this. {v6}
       require_image_semantics: true  # [WARNING] Image constructor lacks a semanticLabel parameter. Screen readers cannot describe this image to users with visual impairments, making the content inaccessible. This violates WCAG 1.1.1 (Non-text Content) and may exclude your app from accessibility-mandated markets. {v6}
       require_integration_test_setup: true  # [WARNING] Integration test missing IntegrationTestWidgetsFlutterBinding.ensureInitialized(). Integration tests need IntegrationTestWidgetsFlutterBinding.ensureInitialized() in main(). Without it, tests hang or crash on device. {v2}
       require_integration_test_timeout: true  # [WARNING] Integration test without timeout. May hang CI indefinitely. Long-running tests without timeouts can hang CI indefinitely. Always set timeouts on integration tests to catch infinite loops. {v2}
