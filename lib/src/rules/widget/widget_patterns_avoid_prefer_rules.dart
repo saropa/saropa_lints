@@ -3138,10 +3138,38 @@ class AvoidOpacityAnimationRule extends SaropaLintRule {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Opacity') return;
 
+      // False-positive guard: the rule's purpose is to flag opacity that
+      // changes per frame (which forces a subtree rebuild). A constant
+      // numeric literal cannot animate, so even when this Opacity sits
+      // inside an AnimatedBuilder whose animation drives some sibling
+      // property (icon swap, color, layout), no per-frame opacity
+      // recomputation occurs. Replacing it with FadeTransition would
+      // introduce an animation that didn't exist before.
+      if (_hasConstantOpacity(node)) return;
+
       if (_isInsideAnimationBuilder(node)) {
         reporter.atNode(node.constructorName, code);
       }
     });
+  }
+
+  /// True when the `opacity:` argument is a compile-time numeric literal
+  /// (with optional unary minus, e.g. `-0.0`). Any expression that could
+  /// reference state, an AnimationController, or a tween value is treated
+  /// as potentially animation-driven and falls through to the existing
+  /// detection.
+  bool _hasConstantOpacity(InstanceCreationExpression node) {
+    for (final Expression arg in node.argumentList.arguments) {
+      if (arg is! NamedExpression) continue;
+      if (arg.name.label.name != 'opacity') continue;
+
+      Expression value = arg.expression;
+      if (value is PrefixExpression && value.operator.lexeme == '-') {
+        value = value.operand;
+      }
+      return value is DoubleLiteral || value is IntegerLiteral;
+    }
+    return false;
   }
 
   bool _isInsideAnimationBuilder(AstNode node) {
@@ -5220,6 +5248,14 @@ class PreferConstLiteralsToCreateImmutablesRule extends SaropaLintRule {
       final DartType? type = node.staticType;
       if (type is! InterfaceType) return;
       if (!_isImmutableType(type)) return;
+
+      // Skip when the enclosing constructor is already const (explicit keyword
+      // or via const context). In that case any inner collection literal is
+      // auto-promoted by the language; adding an explicit `const` would be
+      // redundant and the standard analyzer's `unnecessary_const` would then
+      // fire — leaving the user with no valid resolution. See bug:
+      // bugs/prefer_const_literals_to_create_immutables_false_positive_inside_const_constructor_context.md
+      if (node.isConst) return;
 
       for (final Expression arg in node.argumentList.arguments) {
         final Expression expr = arg is NamedExpression ? arg.expression : arg;
