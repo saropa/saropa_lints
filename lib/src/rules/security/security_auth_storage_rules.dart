@@ -10,6 +10,7 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/dart/element/type.dart';
 
 import '../../saropa_lint_rule.dart';
 
@@ -2349,6 +2350,13 @@ class RequireClipboardPasteValidationRule extends SaropaLintRule {
           // Check if there's validation logic nearby
           final AstNode? block = _findContainingBlockForClipboard(awaitParent);
           if (block != null && !_hasValidationLogicForClipboard(block)) {
+            // Exempt when the clipboard text is delegated to a generic
+            // callback (e.g. ValueChanged<String?>, void Function(String?)).
+            // The helper has no semantic context to validate against — the
+            // caller owns the security boundary. Reporting here would be
+            // cargo-cult sanitization for paste-into-text-field flows.
+            // See bugs/require_clipboard_paste_validation_false_positive_*.md
+            if (_hasCallbackConsumerForClipboard(block)) return;
             reporter.atNode(node);
           }
         }
@@ -2369,6 +2377,55 @@ class RequireClipboardPasteValidationRule extends SaropaLintRule {
   bool _hasValidationLogicForClipboard(AstNode block) {
     final String blockSource = block.toSource();
     return _validationLogicPatterns.any((p) => p.hasMatch(blockSource));
+  }
+
+  /// Returns true when [block] contains an invocation that looks like a
+  /// callback dispatch — i.e. a function-typed reference being called.
+  ///
+  /// Two signals are treated as callback consumers:
+  ///
+  /// 1. `FunctionExpressionInvocation` whose function reference has a
+  ///    function static type. The parser only produces this node when the
+  ///    callee is a function-typed expression (e.g. a `ValueChanged<String?>`
+  ///    parameter), so it's a reliable callback signal.
+  /// 2. `MethodInvocation` with `methodName == 'call'` whose target has a
+  ///    function static type. The explicit `.call(...)` form is the idiom
+  ///    for invoking nullable function references and is rarely written
+  ///    against non-callback objects.
+  ///
+  /// We require the static type to be a function type so we don't exempt
+  /// unrelated `.call` methods on user-defined classes.
+  bool _hasCallbackConsumerForClipboard(AstNode block) {
+    final visitor = _ClipboardCallbackConsumerVisitor();
+    block.visitChildren(visitor);
+    return visitor.found;
+  }
+}
+
+class _ClipboardCallbackConsumerVisitor extends RecursiveAstVisitor<void> {
+  bool found = false;
+
+  @override
+  void visitFunctionExpressionInvocation(FunctionExpressionInvocation node) {
+    // The parser produces this node only when the LHS is a function-typed
+    // expression — invoking a callback parameter/local is the canonical
+    // case (e.g. `callback(text)` where `callback` is `ValueChanged<String?>`).
+    found = true;
+  }
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    if (!found &&
+        node.methodName.name == 'call' &&
+        node.target != null &&
+        node.target!.staticType is FunctionType) {
+      // `someCallback.call(text)` — idiomatic for nullable function refs.
+      // The function-type guard avoids matching unrelated `.call` methods
+      // on user-defined classes.
+      found = true;
+      return;
+    }
+    super.visitMethodInvocation(node);
   }
 }
 

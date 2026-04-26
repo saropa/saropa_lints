@@ -123,3 +123,23 @@ void _good1026_pasteApiKey() async {
     _apiKey = text;
   }
 }
+
+// GOOD: callback consumer owns the validation boundary.
+// A reusable paste helper that hands the pasted string to a
+// ValueChanged<String?>-style callback has no semantic context to
+// validate against — the caller decides what's valid for its use.
+// Exempted because the call site is a function-typed reference being
+// invoked, which is a strong signal the consumer owns validation.
+void _good1026_pasteIntoCallback(void Function(String?) callback) async {
+  final data = await Clipboard.getData('text/plain');
+  final text = data?.text;
+  callback(text); // delegated — caller validates downstream
+}
+
+// GOOD: explicit `.call(...)` form on a nullable function reference,
+// the canonical idiom for invoking optional callbacks.
+void _good1026_pasteIntoCallbackCall(void Function(String?)? onPaste) async {
+  final data = await Clipboard.getData('text/plain');
+  final text = data?.text;
+  onPaste?.call(text); // delegated — caller validates downstream
+}
