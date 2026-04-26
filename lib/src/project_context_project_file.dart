@@ -91,6 +91,13 @@ class ProjectContext {
   /// prefer to warn on the cautious side rather than silently skip a
   /// real cross-platform issue.
   ///
+  /// **Analyzer timing:** When [filePath] is null or empty, this returns
+  /// `true`. Callers that obtain the path from the active analysis unit
+  /// should evaluate this inside AST visitors (once the compilation unit
+  /// path is known), not only from rule registration hooks where the
+  /// path is often still empty — otherwise mobile-only projects can be
+  /// misclassified as web-capable.
+  ///
   /// **Why this exists:** `avoid_platform_specific_imports` justifies
   /// itself with "dart:io breaks web builds". In a mobile-only Flutter
   /// app (android/ios/macos only, no `web/`) that failure mode is

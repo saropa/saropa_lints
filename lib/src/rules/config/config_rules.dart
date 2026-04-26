@@ -671,21 +671,23 @@ class AvoidPlatformSpecificImportsRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    // The rule's entire justification is "dart:io breaks web builds". In
-    // a mobile-only Flutter project (no `web/` directory) that failure
-    // mode is structurally impossible, so every diagnostic we'd raise is
-    // noise. Bug: bugs/avoid_platform_specific_imports_false_positive_non_web_project.md.
-    // Unknown projects default to `true` inside `hasWebSupport`, so rules
-    // still fire when we can't prove the project is mobile-only.
-    if (!ProjectContext.hasWebSupport(context.filePath)) return;
-
-    // Skip platform-specific directories
-    final String path = context.filePath.replaceAll('\\', '/');
-    for (final String dir in _platformDirs) {
-      if (path.contains(dir)) return;
-    }
-
+    // Web-support and path skips must run inside callbacks: at
+    // [registerNodeProcessors] time [SaropaContext.filePath] is often empty
+    // (`currentUnit` not set yet), so a top-level `hasWebSupport` check would
+    // always see "unknown → true" and never suppress mobile-only projects.
+    // See plan/history/2026.04/2026.04.26/avoid_platform_specific_imports_false_positive_mobile_only_no_web_dir.md.
     context.addImportDirective((ImportDirective node) {
+      // The rule's entire justification is "dart:io breaks web builds". In
+      // a mobile-only Flutter project (no `web/` directory) that failure
+      // mode is structurally impossible, so every diagnostic we'd raise is
+      // noise. Bug: bugs/avoid_platform_specific_imports_false_positive_non_web_project.md.
+      if (!ProjectContext.hasWebSupport(context.filePath)) return;
+
+      final String path = context.filePath.replaceAll('\\', '/');
+      for (final String dir in _platformDirs) {
+        if (path.contains(dir)) return;
+      }
+
       final String? uri = node.uri.stringValue;
       if (uri != 'dart:io') return;
 

@@ -84,13 +84,11 @@ class RequirePlatformCheckRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    // If the project can't produce a web build, `dart:io` can't throw
-    // `UnsupportedError` at runtime — the rule's entire justification
-    // does not apply. See sibling bug report
-    // bugs/platform_gate_missing_from_sibling_rules.md.
-    if (!ProjectContext.hasWebSupport(context.filePath)) return;
-
+    // `hasWebSupport` must be evaluated per compilation unit — see
+    // [AvoidPlatformSpecificImportsRule] / mobile-only-no-web-dir bug.
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      if (!ProjectContext.hasWebSupport(context.filePath)) return;
+
       final String constructorName = node.constructorName.type.name.lexeme;
 
       if (!_platformSpecificClasses.contains(constructorName)) return;
@@ -173,21 +171,16 @@ class PreferPlatformIoConditionalRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    // Non-Flutter projects never run on web — Platform.* checks are safe
-    final projectInfo = ProjectContext.getProjectInfo(context.filePath);
-    if (projectInfo == null || !projectInfo.isFlutterProject) return;
-
-    // Mobile-only / desktop-only Flutter projects (no `web/` directory)
-    // can never hit the "Platform.* throws on web" failure mode, so the
-    // kIsWeb guard the rule demands is pure ceremony. See sibling bug
-    // report bugs/platform_gate_missing_from_sibling_rules.md.
-    if (!ProjectContext.hasWebSupport(context.filePath)) return;
-
-    // Files that are the native branch of a conditional import (dart.library.io
-    // or dart.library.ffi) are never loaded on web; no need to require kIsWeb.
-    if (isNativeOnlyConditionalImportTarget(context.filePath)) return;
-
+    // Project and path gates use [context.filePath] and must run inside the
+    // visitor: at registration time the current unit path is often empty.
     context.addPrefixedIdentifier((PrefixedIdentifier node) {
+      final projectInfo = ProjectContext.getProjectInfo(context.filePath);
+      if (projectInfo == null || !projectInfo.isFlutterProject) return;
+
+      if (!ProjectContext.hasWebSupport(context.filePath)) return;
+
+      if (isNativeOnlyConditionalImportTarget(context.filePath)) return;
+
       if (node.prefix.name != 'Platform') return;
 
       final String property = node.identifier.name;
@@ -229,6 +222,11 @@ class PreferPlatformIoConditionalRule extends SaropaLintRule {
 /// In widget code, defaultTargetPlatform from foundation is safer and
 /// allows for testing overrides. Platform requires dart:io which
 /// doesn't exist on web.
+///
+/// Suppressed when [ProjectContext.hasWebSupport] is false (Flutter app
+/// with no `web/` directory at the project root): the rule's web-only
+/// rationale does not apply there. The check runs inside the visitor so
+/// [SaropaContext.filePath] is populated, matching `avoid_platform_specific_imports`.
 ///
 /// **BAD:**
 /// ```dart
@@ -286,7 +284,14 @@ class PreferFoundationPlatformCheckRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    // Web gate must run inside the visitor: at registration time
+    // [SaropaContext.filePath] is often empty, so a top-level check would
+    // default [hasWebSupport] to true and never suppress mobile-only apps.
+    // Same pattern as `avoid_platform_specific_imports`; see
+    // plan/history/2026.04/2026.04.26/prefer_foundation_platform_check_false_positive_mobile_only_no_web_dir.md.
     context.addPrefixedIdentifier((PrefixedIdentifier node) {
+      if (!ProjectContext.hasWebSupport(context.filePath)) return;
+
       if (node.prefix.name != 'Platform') return;
 
       final String property = node.identifier.name;

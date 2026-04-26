@@ -1136,13 +1136,9 @@ class AvoidIsarWebLimitationsRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    // Isar sync APIs only fail on web (IndexedDB is async-only). On a
-    // project that can't emit a web build, the sync methods are the
-    // idiomatic choice and flagging them is pure noise. See sibling bug
-    // report bugs/platform_gate_missing_from_sibling_rules.md.
-    if (!ProjectContext.hasWebSupport(context.filePath)) return;
-
     context.addMethodInvocation((MethodInvocation node) {
+      if (!ProjectContext.hasWebSupport(context.filePath)) return;
+
       final methodName = node.methodName.name;
       if (_syncMethods.contains(methodName)) {
         reporter.atNode(node.methodName, code);

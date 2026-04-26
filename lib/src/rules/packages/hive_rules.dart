@@ -2494,6 +2494,8 @@ class _HiveCompactVisitor extends RecursiveAstVisitor<void> {
 class PreferHiveWebAwareRule extends SaropaLintRule {
   PreferHiveWebAwareRule() : super(code: _code);
 
+  static final RegExp _kIsWebToken = RegExp(r'\bkIsWeb\b');
+
   @override
   LintImpact get impact => LintImpact.low;
 
@@ -2523,18 +2525,12 @@ class PreferHiveWebAwareRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    // The rule's entire value proposition is "consider kIsWeb if
-    // targeting web". A project with no `web/` directory cannot target
-    // web — the `kIsWeb` branch is dead code and the rule is noise.
-    // See sibling bug report
-    // bugs/platform_gate_missing_from_sibling_rules.md.
-    if (!ProjectContext.hasWebSupport(context.filePath)) return;
-
-    final String content = context.fileContent;
-    final bool hasWebCheck = RegExp(r'\bkIsWeb\b').hasMatch(content);
-    if (hasWebCheck) return;
-
     context.addMethodInvocation((MethodInvocation node) {
+      if (!ProjectContext.hasWebSupport(context.filePath)) return;
+
+      final String content = context.fileContent;
+      if (_kIsWebToken.hasMatch(content)) return;
+
       final String name = node.methodName.name;
       if (!name.startsWith('openBox') && !name.startsWith('openLazyBox')) {
         return;

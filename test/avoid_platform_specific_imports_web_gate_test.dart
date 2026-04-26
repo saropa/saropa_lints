@@ -16,11 +16,17 @@ import 'package:test/test.dart';
 /// directory, so cache entries can't cross tests; `ProjectContext.clearCache()`
 /// in `setUp` flushes any leftovers defensively.
 ///
-/// Regression target:
-/// `bugs/avoid_platform_specific_imports_false_positive_non_web_project.md` —
-/// the rule used to fire on every `dart:io` import regardless of whether
-/// the project could produce a web build, making it pure noise in
-/// mobile-only Flutter apps.
+/// Regression targets:
+/// - `bugs/avoid_platform_specific_imports_false_positive_non_web_project.md` —
+///   the rule used to fire on every `dart:io` import regardless of whether
+///   the project could produce a web build, making it pure noise in
+///   mobile-only Flutter apps.
+/// - `plan/history/2026.04/2026.04.26/prefer_foundation_platform_check_false_positive_mobile_only_no_web_dir.md` —
+///   `prefer_foundation_platform_check` uses the same [ProjectContext.hasWebSupport]
+///   gate as `avoid_platform_specific_imports` (see sibling rules in `platform_rules.dart`).
+/// - `plan/history/2026.04/2026.04.26/avoid_platform_specific_imports_false_positive_mobile_only_no_web_dir.md` —
+///   gate must run in AST callbacks so [context.filePath] is non-empty (registration
+///   time path was empty, so `hasWebSupport` always defaulted to strict / web-capable).
 void main() {
   group('ProjectContext.hasWebSupport', () {
     late Directory tempRoot;
@@ -114,6 +120,9 @@ dependencies:
     });
 
     test('empty filePath → true (unknown → assume strict)', () {
+      // Rules must not rely on this alone during plugin registration, when the
+      // compilation unit path is often still empty — see archived bug report
+      // in plan/history/2026.04/2026.04.26/.
       expect(ProjectContext.hasWebSupport(''), isTrue);
     });
 
