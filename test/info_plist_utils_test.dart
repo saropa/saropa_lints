@@ -196,6 +196,92 @@ void main() {
       // Should return the same cached instance.
       expect(identical(checker1, checker2), isTrue);
     });
+
+    test('hasKey matches plist keys with whitespace inside XML tags', () {
+      final plistPath = '$projectRoot/ios/Runner/Info.plist';
+      File(plistPath).writeAsStringSync('''
+<?xml version="1.0" encoding="UTF-8"?>
+<plist version="1.0">
+<dict>
+  <key>
+NSCameraUsageDescription
+</key>
+  <string>Camera</string>
+</dict>
+</plist>
+''');
+
+      final testFile = '$projectRoot/lib/test.dart';
+      File(testFile).writeAsStringSync('// test file');
+
+      final checker = InfoPlistChecker.forFile(testFile);
+      expect(checker!.hasKey('NSCameraUsageDescription'), isTrue);
+      expect(checker.getMissingKeys(['NSCameraUsageDescription']), isEmpty);
+    });
+
+    test('forFile accepts file: URI paths (analyzer-style)', () {
+      final plistPath = '$projectRoot/ios/Runner/Info.plist';
+      File(plistPath).writeAsStringSync('''
+<?xml version="1.0" encoding="UTF-8"?>
+<plist version="1.0">
+<dict>
+  <key>NSCameraUsageDescription</key>
+  <string>Camera</string>
+</dict>
+</plist>
+''');
+
+      final testFile = '$projectRoot/lib/test.dart';
+      File(testFile).writeAsStringSync('// test file');
+
+      final uriString = Uri.file(testFile).toString();
+      final checker = InfoPlistChecker.forFile(uriString);
+      expect(checker, isNotNull);
+      expect(checker!.hasInfoPlist, isTrue);
+      expect(checker.hasKey('NSCameraUsageDescription'), isTrue);
+    });
+
+    test('reloads plist when file stat snapshot changes (cache invalidation)', () {
+      final plistPath = '$projectRoot/ios/Runner/Info.plist';
+      File(plistPath).writeAsStringSync('''
+<?xml version="1.0" encoding="UTF-8"?>
+<plist version="1.0">
+<dict>
+  <key>CFBundleIdentifier</key>
+  <string>com.example</string>
+</dict>
+</plist>
+''');
+
+      final testFile = '$projectRoot/lib/test.dart';
+      File(testFile).writeAsStringSync('// test file');
+
+      expect(
+        InfoPlistChecker.forFile(
+          testFile,
+        )!.getMissingKeys(['NSCameraUsageDescription']),
+        ['NSCameraUsageDescription'],
+      );
+
+      File(plistPath).writeAsStringSync('''
+<?xml version="1.0" encoding="UTF-8"?>
+<plist version="1.0">
+<dict>
+  <key>CFBundleIdentifier</key>
+  <string>com.example</string>
+  <key>NSCameraUsageDescription</key>
+  <string>Camera</string>
+</dict>
+</plist>
+''');
+
+      expect(
+        InfoPlistChecker.forFile(
+          testFile,
+        )!.getMissingKeys(['NSCameraUsageDescription']),
+        isEmpty,
+      );
+    });
   });
 
   group('IosPermissionMapping', () {

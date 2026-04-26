@@ -14,7 +14,7 @@ void main() {
     test('rule metadata', () {
       final rule = RequireImagePickerPermissionIosRule();
       expect(rule.code.lowerCaseName, 'require_image_picker_permission_ios');
-      expect(rule.code.problemMessage, contains('{v5}'));
+      expect(rule.code.problemMessage, contains('{v6}'));
     });
 
     group('plist gate (matches rule preconditions)', () {

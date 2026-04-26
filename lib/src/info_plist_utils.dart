@@ -2,6 +2,7 @@
 
 import 'dart:developer' as developer;
 import 'dart:io';
+
 import 'package:saropa_lints/src/string_slice_utils.dart';
 
 /// Utilities for checking iOS Info.plist permission keys.
@@ -17,10 +18,25 @@ import 'package:saropa_lints/src/string_slice_utils.dart';
 /// }
 /// ```
 class InfoPlistChecker {
-  InfoPlistChecker._(this._projectRoot, this._infoPlistContent);
+  InfoPlistChecker._(
+    this._projectRoot,
+    this._infoPlistContent,
+    this._plistMtime,
+    this._plistSize,
+  );
 
   final String _projectRoot;
   final String? _infoPlistContent;
+
+  /// Last-modified time of `ios/Runner/Info.plist` from the stat used for this
+  /// snapshot; `null` when the file was absent or the stat/read failed (so the
+  /// next [forFile] call retries).
+  final DateTime? _plistMtime;
+
+  /// Byte length from the same [FileStat] as [_plistMtime]. Used with mtime so
+  /// cache invalidation still works when the OS reports identical mtimes for
+  /// back-to-back writes (common on Windows).
+  final int? _plistSize;
 
   /// Cache of [InfoPlistChecker] instances per project root.
   ///
@@ -36,36 +52,88 @@ class InfoPlistChecker {
   ///
   /// Results are cached per project root for efficiency.
   static InfoPlistChecker? forFile(String filePath) {
-    final projectRoot = _findProjectRoot(filePath);
+    final fsPath = _toFilesystemPath(filePath);
+    final projectRoot = _findProjectRoot(fsPath);
     if (projectRoot == null) return null;
 
-    // Return cached instance if available
-    if (_cache.containsKey(projectRoot)) {
-      return _cache[projectRoot];
-    }
-
-    // Try to read Info.plist
     final infoPlistPath = '$projectRoot/ios/Runner/Info.plist';
-    String? content;
+    final plistFile = File(infoPlistPath);
 
+    DateTime? currentMtime;
+    int? currentSize;
     try {
-      final file = File(infoPlistPath);
-      if (file.existsSync()) {
-        content = file.readAsStringSync();
+      if (plistFile.existsSync()) {
+        final st = plistFile.statSync();
+        currentMtime = st.modified;
+        currentSize = st.size;
       }
     } catch (e, st) {
       developer.log(
-        'Info.plist read failed',
+        'Info.plist stat failed',
         name: 'saropa_lints',
         error: e,
         stackTrace: st,
       );
-      // File doesn't exist or can't be read - that's OK
+      currentMtime = null;
+      currentSize = null;
     }
 
-    final checker = InfoPlistChecker._(projectRoot, content);
+    final cached = _cache[projectRoot];
+    if (cached != null &&
+        cached._plistMtime == currentMtime &&
+        cached._plistSize == currentSize) {
+      return cached;
+    }
+
+    String? content;
+    DateTime? storedMtime = currentMtime;
+    int? storedSize = currentSize;
+    if (currentMtime != null) {
+      try {
+        content = plistFile.readAsStringSync();
+      } catch (e, st) {
+        developer.log(
+          'Info.plist read failed',
+          name: 'saropa_lints',
+          error: e,
+          stackTrace: st,
+        );
+        content = null;
+        // Do not pin mtime/size: a transient failure should retry on next analysis.
+        storedMtime = null;
+        storedSize = null;
+      }
+    }
+
+    final checker = InfoPlistChecker._(
+      projectRoot,
+      content,
+      storedMtime,
+      storedSize,
+    );
     _cache[projectRoot] = checker;
     return checker;
+  }
+
+  /// Converts `file:` URIs from the analyzer to a path [File] can open.
+  static String _toFilesystemPath(String filePath) {
+    final trimmed = filePath.trim();
+    if (!trimmed.startsWith('file:')) return trimmed;
+    try {
+      final uri = Uri.parse(trimmed);
+      if (uri.isScheme('file')) {
+        final path = uri.toFilePath();
+        if (path.isNotEmpty) return path;
+      }
+    } catch (e, st) {
+      developer.log(
+        'InfoPlistChecker file URI parse failed',
+        name: 'saropa_lints',
+        error: e,
+        stackTrace: st,
+      );
+    }
+    return trimmed;
   }
 
   /// Finds the project root directory by looking for pubspec.yaml.
@@ -114,8 +182,8 @@ class InfoPlistChecker {
 
   /// Checks if the Info.plist contains the specified [key].
   ///
-  /// This performs a simple string search for `<key>keyName</key>` pattern,
-  /// which is reliable for standard Info.plist format.
+  /// Matches `<key>keyName</key>` with tolerant whitespace inside the tags,
+  /// which covers typical Info.plist XML formatting.
   ///
   /// Returns `true` if:
   /// - The key is found in Info.plist
@@ -127,8 +195,11 @@ class InfoPlistChecker {
     // (The app won't build for iOS anyway without proper configuration)
     if (_infoPlistContent == null) return true;
 
-    // Check for the key in plist format: <key>NSCameraUsageDescription</key>
-    return _infoPlistContent.contains('<key>$key</key>');
+    // Plist XML may use incidental whitespace inside tags; match loosely.
+    final pattern = RegExp(
+      '<\\s*key\\s*>\\s*${RegExp.escape(key)}\\s*<\\s*/\\s*key\\s*>',
+    );
+    return pattern.hasMatch(_infoPlistContent);
   }
 
   /// Checks if the Info.plist contains all specified [keys].
