@@ -2511,10 +2511,18 @@ class PreferFractionalSizingRule extends SaropaLintRule {
 
 /// Suggests LayoutBuilder for constraint-aware layout instead of MediaQuery sizing.
 ///
-/// Since: v4.13.0 | Rule version: v1
+/// Since: v4.13.0 | Rule version: v2
 ///
-/// Use LayoutBuilder when sizing widgets from constraints; MediaQuery for
-/// widget sizing causes rebuilds on any MediaQuery change.
+/// Use `LayoutBuilder` when the goal is to size from the parent’s box
+/// constraints. `MediaQuery.of`/`sizeOf` **size** (via `.size.width` /
+/// `.size.height` or `sizeOf(context).width`/`.height`) is the screen or window
+/// extent; it is not interchangeable with `LayoutBuilder` constraints when you
+/// intentionally size relative to the screen (for example a dialog width as a
+/// fraction of screen width, or a `PageView` page that should leave a peek of
+/// the next page). The rule does not flag those dimension reads when used in a
+/// multiply or divide with a numeric literal (screen fraction), nor when
+/// compared to a numeric literal (responsive breakpoints), and it does not
+/// flag `MediaQueryData.viewInsets` or other non-size fields.
 ///
 /// **Bad:**
 /// ```dart
@@ -2567,11 +2575,19 @@ class PreferLayoutBuilderForConstraintsRule extends SaropaLintRule {
       if (target == null) return;
       final String name = node.propertyName.name;
       if (name == 'size' && _isMediaQueryOf(target)) {
+        final AstNode? parent = node.parent;
+        if (parent is PropertyAccess &&
+            (parent.propertyName.name == 'width' ||
+                parent.propertyName.name == 'height')) {
+          return;
+        }
         reporter.atNode(node, _code);
         return;
       }
       if ((name == 'width' || name == 'height') &&
-          _isMediaQuerySizeAccess(target)) {
+          (_isMediaQuerySizeAccess(target) ||
+              _isMediaQuerySizeOfResult(target))) {
+        if (_isMediaQuerySizeDimensionInLiteralScaleOrBreakpoint(node)) return;
         reporter.atNode(node, _code);
       }
     });
@@ -2592,6 +2608,53 @@ class PreferLayoutBuilderForConstraintsRule extends SaropaLintRule {
     if (target.propertyName.name != 'size') return false;
     final Expression? rec = target.target;
     return rec != null && _isMediaQueryOf(rec);
+  }
+
+  /// `MediaQuery.sizeOf(context)` returning `Size`; `.width`/`.height` mirror
+  /// `.of(context).size.width` for lint purposes.
+  static bool _isMediaQuerySizeOfResult(Expression target) {
+    if (target is! MethodInvocation) return false;
+    if (target.methodName.name != 'sizeOf') return false;
+    final Expression? rec = target.target;
+    return rec is SimpleIdentifier && rec.name == 'MediaQuery';
+  }
+
+  /// True when [node] is a direct operand of `*`/`/`/`>`/`<`/`>=`/`<=` with a
+  /// numeric literal on the other side (screen fraction, division, or breakpoint).
+  static bool _isMediaQuerySizeDimensionInLiteralScaleOrBreakpoint(
+    PropertyAccess node,
+  ) {
+    AstNode cur = node;
+    while (cur.parent is ParenthesizedExpression) {
+      cur = cur.parent!;
+    }
+    final AstNode? p = cur.parent;
+    if (p is! BinaryExpression) return false;
+    if (!identical(cur, p.leftOperand) && !identical(cur, p.rightOperand)) {
+      return false;
+    }
+    final TokenType op = p.operator.type;
+    final bool scaleOrCompare =
+        op == TokenType.STAR ||
+        op == TokenType.SLASH ||
+        op == TokenType.GT ||
+        op == TokenType.LT ||
+        op == TokenType.GT_EQ ||
+        op == TokenType.LT_EQ;
+    if (!scaleOrCompare) return false;
+    final Expression sibling = identical(cur, p.leftOperand)
+        ? p.rightOperand
+        : p.leftOperand;
+    final Expression unwrapped = _unwrapOuterParentheses(sibling);
+    return unwrapped is IntegerLiteral || unwrapped is DoubleLiteral;
+  }
+
+  static Expression _unwrapOuterParentheses(Expression expr) {
+    var current = expr;
+    while (current is ParenthesizedExpression) {
+      current = current.expression;
+    }
+    return current;
   }
 }
 
