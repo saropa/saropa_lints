@@ -1502,7 +1502,7 @@ saropa_lints:
     - avoid_color_only_meaning: false                # WARNING - conditional color without companion Icon/Text (v4.16.0, quick fix)
 
     # --- Animation ---
-    - avoid_excessive_rebuilds_animation: false      # WARNING - builder callback with >5 widget constructors (v4.16.0)
+    - avoid_excessive_rebuilds_animation: false      # WARNING - AnimatedBuilder / ListenableBuilder with Animation listenable; builder >5 known widgets (v4.16.0, narrowed v2)
 
     # --- Flutter Hooks ---
     - avoid_misused_hooks: false                     # WARNING - hook called inside callback within build (v4.16.0)

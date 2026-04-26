@@ -1723,16 +1723,20 @@ class PreferSpringAnimationRule extends SaropaLintRule {
 // avoid_excessive_rebuilds_animation
 // =============================================================================
 
-/// Warns when animation builder callbacks contain too many widgets.
+/// Warns when frame-driven animation builder callbacks contain too many widgets.
 ///
-/// Since: v4.16.0 | Rule version: v1
+/// Since: v4.16.0 | Updated: 2026-04-26 | Rule version: v2
 ///
 /// Alias: animation_builder_too_large, excessive_animation_rebuilds
 ///
-/// Animation builder callbacks (AnimatedBuilder, ValueListenableBuilder,
-/// StreamBuilder, etc.) run on every frame or value change. Placing too
-/// many widget constructors inside the builder wastes CPU rebuilding
-/// static content that could be passed via the `child` parameter.
+/// Targets `AnimatedBuilder` and `ListenableBuilder` only when the
+/// listenable source resolves to an `Animation` subtype (including
+/// `AnimationController`), so the builder can run every frame. Placing too many
+/// widget constructors inside such a builder wastes CPU rebuilding static
+/// content that could be passed via the `child` parameter. Async builders
+/// (`FutureBuilder`, `StreamBuilder`), `ValueListenableBuilder`, and
+/// `ListenableBuilder` wired to a non-`Animation` `Listenable` are out of scope:
+/// their rebuild rate is not tied to the display link frame clock.
 ///
 /// **BAD:**
 /// ```dart
@@ -1785,21 +1789,13 @@ class AvoidExcessiveRebuildsAnimationRule extends SaropaLintRule {
         'times per second). This wastes CPU cycles, increases battery drain, '
         'and degrades animation smoothness. Only widgets that actually change '
         'during the animation should be inside the builder; static content '
-        'should be passed via the child parameter or moved outside. {v1}',
+        'should be passed via the child parameter or moved outside. {v2}',
     correctionMessage:
         'Extract static widgets outside the builder callback. Use the child '
         'parameter to pass non-animating subtrees through. Only keep widgets '
         'that depend on the animation value inside the builder.',
     severity: DiagnosticSeverity.WARNING,
   );
-
-  static const Set<String> _builderWidgets = <String>{
-    'AnimatedBuilder',
-    'ValueListenableBuilder',
-    'StreamBuilder',
-    'FutureBuilder',
-    'ListenableBuilder',
-  };
 
   /// Threshold: flag builders with more than this many widget constructors.
   static const int _widgetCountThreshold = 5;
@@ -1811,7 +1807,18 @@ class AvoidExcessiveRebuildsAnimationRule extends SaropaLintRule {
   ) {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
-      if (!_builderWidgets.contains(typeName)) return;
+      if (typeName != 'AnimatedBuilder' && typeName != 'ListenableBuilder') {
+        return;
+      }
+
+      final Expression? listenableSource = _listenableSourceForAnimationBuilder(
+        node,
+        typeName,
+      );
+      if (listenableSource == null ||
+          !_staticTypeIsAnimation(listenableSource)) {
+        return;
+      }
 
       // Find the builder named argument
       for (final Expression arg in node.argumentList.arguments) {
@@ -1835,6 +1842,48 @@ class AvoidExcessiveRebuildsAnimationRule extends SaropaLintRule {
     body.accept(visitor);
     return visitor.widgetCount;
   }
+}
+
+/// `AnimatedBuilder` uses `animation:`; `ListenableBuilder` uses `listenable:`
+/// in Flutter, while project fixtures use `animation:` on the mock
+/// `ListenableBuilder` (same shape as `AnimatedBuilder` for migration tests).
+Expression? _listenableSourceForAnimationBuilder(
+  InstanceCreationExpression node,
+  String typeName,
+) {
+  if (typeName == 'AnimatedBuilder') {
+    return _namedArgumentExpression(node, 'animation');
+  }
+  if (typeName == 'ListenableBuilder') {
+    return _namedArgumentExpression(node, 'listenable') ??
+        _namedArgumentExpression(node, 'animation');
+  }
+  return null;
+}
+
+Expression? _namedArgumentExpression(
+  InstanceCreationExpression node,
+  String name,
+) {
+  for (final Expression arg in node.argumentList.arguments) {
+    if (arg is NamedExpression && arg.name.label.name == name) {
+      return arg.expression;
+    }
+  }
+  return null;
+}
+
+/// True when [expr] resolves to a type that is or extends [Animation].
+///
+/// Skips unresolved / non-interface types to avoid false positives.
+bool _staticTypeIsAnimation(Expression expr) {
+  final DartType? type = expr.staticType;
+  if (type is! InterfaceType) return false;
+  if (type.element.name == 'Animation') return true;
+  for (final InterfaceType supertype in type.allSupertypes) {
+    if (supertype.element.name == 'Animation') return true;
+  }
+  return false;
 }
 
 /// Counts widget constructor invocations in a subtree.

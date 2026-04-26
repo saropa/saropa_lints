@@ -50,6 +50,7 @@
 
 ### Fixed
 
+- `avoid_excessive_rebuilds_animation` now only considers `AnimatedBuilder` and `ListenableBuilder` when the listenable resolves to an `Animation` subtype, so `FutureBuilder`, `StreamBuilder`, `ValueListenableBuilder`, and non-animation listenables no longer get a misleading “every frame” warning. No action required.
 - `require_notification_for_long_tasks` now matches long-operation tokens on camelCase boundaries (so names like `ImportAllowed` no longer hit `importAll`), skips `dbProcessAll…` DB helpers, skips the whole file when common in-app progress or notification-plugin strings appear, and splits example fixtures so BAD cases are not suppressed by GOOD escape hatches in the same file. No action required.
 - Rules that read `Info.plist` through the shared helper now re-read when the file’s size or modification time changes, match keys with whitespace-tolerant XML checks, and normalize analyzer `file:` URIs to OS paths, so `require_image_picker_permission_ios` no longer false-positives once `NSCameraUsageDescription` is present. No action required.
 - `require_image_picker_permission_android` now reads `AndroidManifest.xml` like the iOS camera rule reads `Info.plist`, so it stays silent when `android.permission.CAMERA` is already declared; it also covers `pickVideo` as well as `pickImage` for `ImageSource.camera`. No action required.
@@ -59,6 +60,7 @@
 <summary>Maintenance</summary>
 
 - Archived the closed `require_notification_for_long_tasks` foreground false-positive report under `plan/history/2026.04/2026.04.26/` and removed it from `bugs/`. No action required for package users.
+- Archived the resolved `avoid_excessive_rebuilds_animation` false-positive report under `plan/history/2026.04/2026.04.26/` and removed it from `bugs/`. No action required for package users.
 
 </details>
 
