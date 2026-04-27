@@ -17,8 +17,7 @@ import 'package:test/test.dart';
 /// has no resolved-unit API.
 void main() {
   const ruleName = 'require_clipboard_paste_validation';
-  const fixturePath =
-      'example/lib/security/${ruleName}_fixture.dart';
+  const fixturePath = 'example/lib/security/${ruleName}_fixture.dart';
 
   group('RequireClipboardPasteValidationRule fixtures', () {
     test('is registered in allSaropaRules', () {
@@ -36,9 +35,7 @@ void main() {
       final file = File(fixturePath);
       expect(file.existsSync(), isTrue, reason: 'Fixture must exist');
       final content = file.readAsStringSync();
-      final count = '// expect_lint: $ruleName'
-          .allMatches(content)
-          .length;
+      final count = '// expect_lint: $ruleName'.allMatches(content).length;
       expect(
         count,
         1,

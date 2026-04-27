@@ -261,7 +261,7 @@ The fixture should include:
 4. **`map[loopVarA]`, `map[loopVarB]`, `map[loopVarC]`** in three different loops, each declaring its own loop variable — expect NO lint *(currently false positive)*
 5. **`map['literal']`, `map['literal']`, `map['literal']`** with same literal key — expect LINT (text matching is correct here)
 6. **`mapA[k]`, `mapB[k]`, `mapC[k]`** — expect NO lint (different maps)
-7. **Two reads of `m[k]` in different `if` branches that cannot both execute** — judgement call: probably NO lint (path-sensitivity)
+7. **Two reads of `m[k]` in different `if` branches that cannot both execute** — judgment call: probably NO lint (path-sensitivity)
 
 Cases 2, 3, 4 are the contacts cases.
 

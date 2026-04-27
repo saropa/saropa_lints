@@ -149,7 +149,7 @@ The fixture should include:
 2. **`Opacity(opacity: 0.6, child: …)` inside `AnimatedBuilder` where the animation drives a sibling property only** — expect NO lint *(currently false positive)*
 3. **`Opacity(opacity: 0.6, child: …)` outside any animation context** — expect NO lint
 4. **`AnimatedOpacity(opacity: _isShown ? 1 : 0, …)`** — expect NO lint (correct usage, framework-provided)
-5. **`Opacity(opacity: ternary based on a non-animation `bool`, …)` inside `AnimatedBuilder`** — judgement call: probably NO lint, since the bool isn't tied to the animation. Currently false positive.
+5. **`Opacity(opacity: ternary based on a non-animation `bool`, …)` inside `AnimatedBuilder`** — judgment call: probably NO lint, since the bool isn't tied to the animation. Currently false positive.
 
 ---
 
