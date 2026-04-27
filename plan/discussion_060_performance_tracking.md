@@ -63,3 +63,15 @@ abstract class SaropaLintRule extends DartLintRule {
 - Print a short timing summary (top 5 slow) in default run?
 - Expose RuleTimingTracker via public API for IDE/init?
 - Document all four env vars in one place.
+
+---
+
+## 8. Review update (2026-04-27)
+
+- Core performance tracking is already implemented and operational.
+- Remaining scope is mostly contract/documentation polish rather than foundational feature work.
+
+**Execution recommendation:**
+
+1. Keep open only for docs/report format stabilization.
+2. Prioritize after smaller functional closeouts (e.g. Discussion #58).

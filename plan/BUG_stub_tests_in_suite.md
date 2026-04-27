@@ -1,8 +1,8 @@
 # BUG: 1,646 stub tests that always pass without testing anything
 
 **Severity**: High — test suite gives partial false confidence
-**Date**: 2026-03-25 (updated 2026-04-04)
-**Status**: In Progress — ~54% of original stubs converted
+**Date**: 2026-03-25 (updated 2026-04-27)
+**Status**: In Progress — guardrails added; conversion ongoing
 
 ## Summary
 
@@ -15,7 +15,7 @@ test('avoid_icon_buttons_without_tooltip SHOULD trigger', () {
 });
 ```
 
-A second pattern (`expect(true, isTrue)`) accounts for 16 additional stubs in `false_positive_fixes_test.dart`.
+A second pattern (`expect(true, isTrue)`) previously accounted for 16 additional stubs in `false_positive_fixes_test.dart` and has now been removed.
 
 ### Progress Since Discovery
 
@@ -207,3 +207,29 @@ Each stub replacement requires:
 - A fixture file in the appropriate `example*/lib/` directory (or extending an existing one)
 - Assertions against actual rule analysis output (violation count, rule name, line number)
 - Both positive (SHOULD trigger) and negative (should NOT trigger) cases
+
+## Execution Plan (updated 2026-04-27)
+
+### Phase 0 — Add anti-regression gates (done/in progress)
+
+- [x] Remove `expect(true, isTrue)` stubs from `false_positive_fixes_test.dart`.
+- [x] Add `test/stub_test_guard_test.dart` to fail CI if any new `expect(true, isTrue)` stubs are added.
+- [x] Add a ratcheting guard for `expect('<literal>', isNotNull)` so the count cannot increase while migration continues.
+
+### Phase 1 — High-risk conversion batches
+
+1. Convert stubs in files with active bug history first (`avoid_global_state`, `require_deep_link_fallback`, etc.).
+2. Convert stubs for rules with quick fixes.
+3. Batch by highest stub-density files (`widget_patterns_rules_test.dart`, `code_quality_rules_test.dart`, `ios_rules_test.dart`, `widget_layout_rules_test.dart`).
+
+#### Completed batch (2026-04-27)
+
+- `test/widget_patterns_rules_test.dart`: removed the stub-only behavior section and retained real checks (rule metadata + fixture existence).
+- `test/code_quality_rules_test.dart`: removed the stub-only behavior section and retained real checks (rule metadata + fixture existence).
+- Ratchet baseline lowered from `3561` → `3458` → `3349` literal `expect('<literal>', isNotNull)` assertions.
+
+### Definition of Done
+
+- No tautological `expect(true, isTrue)` tests.
+- No tautological `expect('<literal>', isNotNull)` tests.
+- Converted tests assert real lint behavior (trigger + non-trigger) with fixture-backed scenarios.

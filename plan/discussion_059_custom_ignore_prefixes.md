@@ -74,3 +74,15 @@ Support project-specific ignore comment styles so that:
 - Default list: ship with `ignore`, `saropa-ignore`, `tech-debt` or only `ignore` and make the rest configurable?
 - Should `ignore_for_file` have equivalent prefixes (e.g. `tech-debt_for_file: avoid_print`)?
 - Document in README and in rule docs that these prefixes are supported and how they interact with Suppression Tracking.
+
+---
+
+## 8. Review update (2026-04-27)
+
+- Current project policy emphasizes relying on analyzer-native suppression behavior and avoiding custom ignore handling.
+- As a result, this proposal has high policy conflict risk in its current form.
+
+**Execution recommendation:**
+
+1. Do not implement now.
+2. Mark as deferred/policy-blocked pending explicit project-level decision.

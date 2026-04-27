@@ -184,3 +184,16 @@ Schema documented in `lib/src/report/VIOLATIONS_JSON_SCHEMA.md`. No code changes
 Most of Discussion #55 is **already implemented**. §3a is now **done** (schema documented). The remaining gaps (§3b per-rule thresholds, §3c baseline comparison) are independent enhancements that can be prioritized individually. None require changes to `SaropaLintRule` — the original proposal to add static fields to the rule class was superseded by the better architecture of external tracking via ProgressTracker and ImpactTracker.
 
 **Recommendation:** Close Discussion #55 as complete. File separate issues for §3b and §3c if/when they become priorities.
+
+---
+
+## 9. Review update (2026-04-27)
+
+- Re-reviewed against current implementation and extension behavior.
+- Confirmed this discussion is effectively complete for its original scope.
+- Remaining work is follow-on enhancement scope, not a blocker for closing this plan.
+
+**Execution recommendation:**
+
+1. Close this discussion as complete.
+2. Track per-rule threshold gates (§3b) and baseline diff (§3c) as separate items.

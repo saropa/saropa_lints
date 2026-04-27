@@ -68,3 +68,37 @@ Conclusion: Explicit "already reported at this offset for this rule" check in th
 - Dedup by (offset, ruleName) only, or allow same rule to report different messages at same offset (e.g. include length/code)?
 - Opt-in or always-on?
 - Any rules that intentionally report multiple times at same offset?
+
+---
+
+## 8. Review update (2026-04-27)
+
+- This is the best immediate closeout candidate: self-contained, low-risk, and directly testable.
+- Expected outcome is cleaner diagnostics and more accurate counts without broad architectural changes.
+
+**Execution recommendation:**
+
+1. Implement reporter-level dedup keyed by `(rule, file, offset)`.
+2. Keep behavior always-on to avoid configuration complexity.
+3. Add targeted tests for duplicate suppression and legitimate distinct reports.
+4. Close this discussion once tests pass.
+
+---
+
+## 9. Implementation update (2026-04-27)
+
+Implemented in this workspace:
+
+- Added reporter-level dedup in `SaropaDiagnosticReporter` via `DiagnosticDedupTracker`.
+- Dedup key is `(rule, file, offset)` and applies to `atNode`, `atToken`, and `atOffset`.
+- Behavior is always-on and reporter-scoped (no new config flags).
+- Added unit coverage in `test/diagnostic_dedup_tracker_test.dart` for:
+  - duplicate key suppression,
+  - distinct offsets,
+  - same offset across files,
+  - same file/offset across different rules.
+
+Validation:
+
+- `dart analyze lib/src/saropa_lint_rule.dart test/diagnostic_dedup_tracker_test.dart` passes.
+- `dart test test/diagnostic_dedup_tracker_test.dart test/progress_tracker_dedup_test.dart` passes.

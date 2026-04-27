@@ -215,3 +215,17 @@ Three quick wins shipped as the foundation for full suppression tracking:
 - Should the extension show a suppression-rate percentage (suppressions / total) in the Overview tree, or is that too noisy?
 - Should there be a command to "go to next suppression" for cleanup workflows, similar to "go to next error"?
 - Should the sidebar section (Phase 2) show individual suppression records with click-to-navigate, or just the per-rule/per-file aggregates from violations.json?
+
+---
+
+## 9. Review update (2026-04-27)
+
+- Confirmed strong progress: counting, records, and summary integration are already in place.
+- Primary remaining value is extension UX completion (Phase 2) and export/policy surfacing (Phase 3).
+- This remains a high-value item, but it is broader than a single quick closeout.
+
+**Execution recommendation:**
+
+1. Keep open.
+2. Finish Phase 2 as a dedicated scoped implementation.
+3. Follow with Phase 3 if CI/reporting consumers need suppression governance.

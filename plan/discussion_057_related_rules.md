@@ -133,3 +133,4 @@ Conclusion: An optional `List<String> relatedRules` on the rule class is low cos
 | 2026-03-01 | Initial plan drafted from Discussion #57. |
 | 2026-03-19 | No changes; plan still speculative. |
 | 2026-04-14 | Updated: documented existing `tags` getter (2083 usages), extension surfaces (Rule Explain, hover, suggestions, rule packs), added phased implementation plan, clarified when `relatedRules` adds value beyond tags. |
+| 2026-04-27 | Re-reviewed: still low-priority metadata enhancement; useful but non-blocking and not ideal for immediate closeout compared to smaller/high-certainty work. |

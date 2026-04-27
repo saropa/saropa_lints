@@ -74,3 +74,15 @@ Conclusion: Implementing runtime tier filtering (SAROPA_TIER + per-rule tier + s
 - Should SaropaTier be an enum in the package (matching tiers.dart sets) or derived entirely from getRulesForTier?
 - Allow multiple tiers (e.g. "essential,recommended") or only one active tier (cumulative)?
 - Document SAROPA_TIER and optional analysis_options custom key in README and init flow.
+
+---
+
+## 8. Review update (2026-04-27)
+
+- Valuable idea, but implementation requires design decisions around config precedence and interaction with `analysis_options.yaml`.
+- Not a quick closeout candidate until those semantics are locked.
+
+**Execution recommendation:**
+
+1. Keep open.
+2. Finalize runtime-tier semantics in a short design note before coding.
