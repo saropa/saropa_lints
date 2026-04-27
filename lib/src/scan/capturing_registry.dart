@@ -77,7 +77,7 @@ class CapturingRuleVisitorRegistry implements RuleVisitorRegistry {
   void addBlock(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
   @override
   void addBlockClassBody(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
-  // analyzer 11: addBlockEnumBody doesn't exist (only addEnumBody)
+  @override
   void addBlockEnumBody(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
   @override
   void addBlockFunctionBody(AbstractAnalysisRule r, AstVisitor v) =>
@@ -157,12 +157,6 @@ class CapturingRuleVisitorRegistry implements RuleVisitorRegistry {
   @override
   void addDottedName(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
 
-  // analyzer 11: LibraryIdentifier and EnumBody exist in the interface
-  @override
-  void addLibraryIdentifier(AbstractAnalysisRule r, AstVisitor v) =>
-      _capture(v);
-  @override
-  void addEnumBody(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
   @override
   void addDoubleLiteral(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
   @override
@@ -172,7 +166,7 @@ class CapturingRuleVisitorRegistry implements RuleVisitorRegistry {
       _capture(v);
   @override
   void addEmptyStatement(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
-  // analyzer 11: addEmptyEnumBody doesn't exist (only addEnumBody)
+  @override
   void addEmptyEnumBody(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
   @override
   void addEnumConstantArguments(AbstractAnalysisRule r, AstVisitor v) =>

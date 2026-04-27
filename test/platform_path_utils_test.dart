@@ -1,7 +1,5 @@
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
-// Compat extension gives us ClassBody.members under analyzer 11.
-import 'package:saropa_lints/src/analyzer_compat.dart';
 import 'package:saropa_lints/src/platform_path_utils.dart';
 import 'package:test/test.dart';
 

@@ -4444,8 +4444,8 @@ class UnnecessaryLibraryNameRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addLibraryDirective((LibraryDirective node) {
-      // analyzer 11: LibraryDirective.name returns LibraryIdentifier
-      final LibraryIdentifier? name = node.name;
+      // analyzer 12+: LibraryDirective.name is DottedName (was LibraryIdentifier).
+      final DottedName? name = node.name;
       if (name == null) return;
       if (name.toSource().isEmpty) return;
       reporter.atNode(name);

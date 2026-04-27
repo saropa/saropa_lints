@@ -2770,8 +2770,8 @@ class PreferCorrectPackageNameRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addLibraryDirective((LibraryDirective node) {
-      // analyzer 11: LibraryDirective.name returns LibraryIdentifier
-      final LibraryIdentifier? libName = node.name;
+      // analyzer 12+: LibraryDirective.name is DottedName (was LibraryIdentifier).
+      final DottedName? libName = node.name;
       if (libName == null) return; // `library;` without name is valid
 
       final String libraryName = libName.toSource();
