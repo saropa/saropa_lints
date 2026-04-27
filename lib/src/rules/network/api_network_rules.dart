@@ -697,7 +697,7 @@ class RequireRequestTimeoutRule extends SaropaLintRule {
   ];
 }
 
-/// Appends [.timeout(const Duration(seconds: 30))] (same pattern as prefer rule).
+/// Appends `.timeout(const Duration(seconds: 30))` (same pattern as prefer rule).
 class _RequireRequestTimeoutFix extends SaropaFixProducer {
   _RequireRequestTimeoutFix({required super.context});
 
@@ -3559,7 +3559,7 @@ class PreferTimeoutOnRequestsRule extends SaropaLintRule {
   ];
 }
 
-/// Appends [.timeout(const Duration(seconds: 30))] after the HTTP request call.
+/// Appends `.timeout(const Duration(seconds: 30))` after the HTTP request call.
 class _PreferTimeoutOnRequestsFix extends SaropaFixProducer {
   _PreferTimeoutOnRequestsFix({required super.context});
 
