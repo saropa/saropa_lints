@@ -1,6 +1,6 @@
 # BUG: `prefer_extracting_repeated_map_lookup` — consolidated report (distinct elements + write contexts + consumer-only reproductions)
 
-**Status: Fix Ready**
+**Status: Closed** (fix landed on `main`; shipped for users as **v12.5.4** per [CHANGELOG.md](../../../../CHANGELOG.md) § [12.5.4]. Consumer should **upgrade** past 12.5.3 and re-run `dart analyze` on the reproducer files; remove temporary `// ignore:` once clean.)
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
@@ -303,7 +303,8 @@ Added/updated fixture coverage in `example/lib/sdk_migration_batch2/prefer_extra
 
 ## Commits
 
-<!-- Add commit hashes as fixes land. -->
+- `b90b1df4` — fix: tighten `prefer_extracting_repeated_map_lookup` bucketing (writes, map-like targets, resolved target fingerprints) + fixture updates.
+- Related release notes: CHANGELOG **[12.5.4]** (`prefer_extracting_repeated_map_lookup` bullet under **Fixed**).
 
 ---
 
@@ -314,6 +315,6 @@ Added/updated fixture coverage in `example/lib/sdk_migration_batch2/prefer_extra
 - Triggering files:
   - `lib/database/drift_middleware/maintenance/contact_group_admin_io.dart` (function `dbContactGroupClean`, lines 202-298 in current version) — diagnostic at line 242:11-27 (note: line numbers shift by ±1 with edits; ignore comment placement around the declaration)
   - `lib/utils/contact_group/contact_group_industry_utils.dart` (function `_resolveContactGroups`) — diagnostic at line 102:13-40
-- Suppressions added in consumer (per-site `// ignore:` with `--` rationale) — will trip `unnecessary_ignore` once a real fix lands
-- Related: [`prefer_extracting_repeated_map_lookup_false_positive_writes_still_counted_after_v12_5_3_fix.md`](./prefer_extracting_repeated_map_lookup_false_positive_writes_still_counted_after_v12_5_3_fix.md) (open investigation; same likely root cause for `number_merge_game_screen.dart` writes case)
+- Suppressions added in consumer (per-site `// ignore:` with `--` rationale) — **remove after upgrading to ≥12.5.4** once `dart analyze` is clean.
+- Related superseded note (same folder, if present elsewhere): `prefer_extracting_repeated_map_lookup_false_positive_writes_still_counted_after_v12_5_3_fix.md` — consolidated into this report; closure applies to merged scope.
 - Prior history: `plan/history/2026.04/2026.04.26/prefer_extracting_repeated_map_lookup_false_positive_writes_and_cross_scope_loop_vars.md` (closed in v12.5.3)

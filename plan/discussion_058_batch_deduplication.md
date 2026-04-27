@@ -2,7 +2,8 @@
 
 **Source:** [GitHub Discussion #58](https://github.com/saropa/saropa_lints/discussions/58)  
 **Priority:** Low  
-**ROADMAP:** Part 3 — Planned Enhancements (SaropaLintRule Base Class)
+**ROADMAP:** Part 3 — Planned Enhancements (SaropaLintRule Base Class)  
+**Status: Closed** (implemented 2026-04-27 on `main`; reporter-scoped `(ruleName, filePath, offset)` dedup — see §9. Close [Discussion #58](https://github.com/saropa/saropa_lints/discussions/58) on GitHub when convenient.)
 
 ---
 
@@ -14,8 +15,10 @@ Prevent the same issue from being reported multiple times when AST visitors trav
 
 ## 2. Current state in saropa_lints
 
-- Rules call `reporter.atNode(node, code)` or `atOffset`/`atToken`. ProgressTracker uses per-file dedup keys `ruleName:line` to avoid double-counting when the same file is re-analyzed. There is no offset-level dedup within a single pass (same rule, same offset).
-- If a rule reports twice at the same node/offset in one run, both diagnostics may appear unless the analyzer merges them.
+**Update (2026-04-27):** Reporter-level dedup for duplicate emission attempts is **implemented** (§9). The bullets below describe the pre-change baseline for context.
+
+- Rules call `reporter.atNode(node, code)` or `atOffset`/`atToken`. ProgressTracker uses per-file dedup keys `ruleName:line` to avoid double-counting when the same file is re-analyzed. Offset-level dedup within a single pass is now handled in `SaropaDiagnosticReporter` before suppression checks.
+- Previously, if a rule reported twice at the same node/offset in one run, both diagnostics could appear unless the analyzer merged them; dedup now drops the second attempt for the same rule at the same file offset.
 
 ---
 
@@ -63,11 +66,13 @@ Conclusion: Explicit "already reported at this offset for this rule" check in th
 
 ---
 
-## 7. Open questions
+## 7. Open questions → **Resolved (2026-04-27)**
 
-- Dedup by (offset, ruleName) only, or allow same rule to report different messages at same offset (e.g. include length/code)?
-- Opt-in or always-on?
-- Any rules that intentionally report multiple times at same offset?
+| Question | Decision |
+|----------|----------|
+| Key shape: offset only vs include length/code? | **`(ruleName, filePath, offset)`** — same as §9; length/code not part of v1 key. If a rule truly needs two distinct messages at the identical offset, that is treated as out of scope for this dedup (rare); revisit only with a concrete rule example. |
+| Opt-in vs always-on? | **Always-on**, reporter-scoped — no new config flags (§9). |
+| Rules that intentionally report twice at the same offset? | **None identified** during implementation; if one appears, document it and widen the key or add a rule-level opt-out. |
 
 ---
 
@@ -81,7 +86,7 @@ Conclusion: Explicit "already reported at this offset for this rule" check in th
 1. Implement reporter-level dedup keyed by `(rule, file, offset)`.
 2. Keep behavior always-on to avoid configuration complexity.
 3. Add targeted tests for duplicate suppression and legitimate distinct reports.
-4. Close this discussion once tests pass.
+4. ~~Close this discussion once tests pass.~~ **Done** — plan status set to Closed; close GitHub Discussion #58 in the UI when ready.
 
 ---
 
