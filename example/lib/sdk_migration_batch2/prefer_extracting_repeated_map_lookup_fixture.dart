@@ -100,3 +100,71 @@ void badThreeReadsLiteralKey(Map<String, int> json) {
   // expect_lint: prefer_extracting_repeated_map_lookup
   print(json['country.id']);
 }
+
+// Guard: mirrors the contacts `swipe()` shape — one extracted read plus
+// multiple assignment writes, including a write after index mutation.
+// Writes must not count as repeated lookups.
+void goodSwipeLikeReadThenWrites(List<int?> oldLine, bool positive) {
+  final List<int?> newLine = List<int?>.filled(oldLine.length, null);
+
+  int newIndex = positive ? oldLine.length - 1 : 0;
+  for (
+    int oldIndex = positive ? oldLine.length - 1 : 0;
+    positive ? oldIndex >= 0 : oldIndex < oldLine.length;
+    positive ? oldIndex-- : oldIndex++
+  ) {
+    final int? oldValue = oldLine[oldIndex];
+    if (oldValue == null) continue;
+
+    final int? currentNew = newLine[newIndex];
+    if (currentNew == null) {
+      newLine[newIndex] = oldValue;
+    } else if (currentNew == oldValue) {
+      newLine[newIndex] = currentNew * 2;
+      newIndex = positive ? newIndex - 1 : newIndex + 1;
+    } else {
+      newIndex = positive ? newIndex - 1 : newIndex + 1;
+      newLine[newIndex] = oldValue;
+    }
+  }
+}
+
+// Guard: shadowing a parameter with a block-local of the same name should
+// never trigger this rule by itself (no `[]` lookup involved).
+void goodInnerLocalShadowsParameter(List<String>? names) {
+  if (names == null) return;
+  final List<List<String>> groups = <List<String>>[names];
+  if (groups.length == 1) {
+    final List<String>? names = groups.firstOrNull;
+    if (names?.length == 1 && names?.firstOrNull == 'system') {
+      print('ok');
+    }
+  }
+}
+
+// Guard: same-spelled loop variables in sibling scopes must not conflate.
+// Writes are skipped; the single read remains below threshold.
+void goodSameNameLoopVarsInSiblingScopes(
+  List<String> contacts,
+  List<String> ids,
+) {
+  final Map<String, int> contactIndustryMap = <String, int>{};
+
+  for (final String contact in contacts) {
+    contactIndustryMap[contact] = 1;
+  }
+
+  for (final String id in ids) {
+    final String? contact = contacts.firstWhereOrNull(
+      (String c) => c == id,
+    );
+    if (contact == null) continue;
+
+    final int? types = contactIndustryMap[contact];
+    if (types != null) {
+      print(types);
+    }
+
+    contactIndustryMap[contact] = 2;
+  }
+}

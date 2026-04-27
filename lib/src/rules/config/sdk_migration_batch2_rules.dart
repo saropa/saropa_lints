@@ -1223,28 +1223,49 @@ class _IndexExpressionCollector extends RecursiveAstVisitor<void> {
 
   @override
   void visitIndexExpression(IndexExpression node) {
-    super.visitIndexExpression(node);
-
     // Writes (`map[k] = v`, `map[k] += 1`) are not extractable into a
     // single local — the `[]=` operation must stay on the map. Counting
     // them as "lookups" produces unfixable false positives.
-    if (node.inSetterContext()) return;
+    if (_isWriteContext(node)) {
+      super.visitIndexExpression(node);
+      return;
+    }
 
     final target = node.target;
-    if (target == null) return;
+    if (target == null) {
+      super.visitIndexExpression(node);
+      return;
+    }
+
+    // This rule is intentionally map-focused. Restricting to map-like
+    // targets avoids list/other-indexable false positives and keeps the
+    // lint aligned with its message and fix guidance.
+    if (!_isMapLikeTarget(target)) {
+      super.visitIndexExpression(node);
+      return;
+    }
 
     // Restrict to keys we can fingerprint precisely. Anything more
     // complex (binary expressions, method calls) is unlikely to be a
     // good extraction candidate and is too risky to bucket.
     final indexFingerprint = _indexFingerprint(node.index);
-    if (indexFingerprint == null) return;
+    if (indexFingerprint == null) {
+      super.visitIndexExpression(node);
+      return;
+    }
 
     final targetFingerprint = _targetFingerprint(target);
+    if (targetFingerprint == null) {
+      super.visitIndexExpression(node);
+      return;
+    }
 
     // Records compare structurally; `Element` compares by identity, so
     // shadowed names in different scopes land in different buckets.
     final key = (targetFingerprint, indexFingerprint);
     _lookups.putIfAbsent(key, () => <IndexExpression>[]).add(node);
+
+    super.visitIndexExpression(node);
   }
 
   /// Fingerprint the index expression. Returns `null` for indices we
@@ -1272,18 +1293,75 @@ class _IndexExpressionCollector extends RecursiveAstVisitor<void> {
     return null;
   }
 
-  /// Fingerprint the target. Prefer the resolved element so two
-  /// shadowed `cache` variables don't conflate; fall back to source
-  /// text for compound targets like `obj.cache` where we have no
-  /// single element to key on (text is no worse than today's
-  /// behavior, and the index fingerprint already provides scope
-  /// safety for the common false-positive shapes).
-  Object _targetFingerprint(Expression target) {
+  /// Fingerprint the target by resolved element identity.
+  ///
+  /// If unresolved, return `null` and skip bucketing. Falling back to source
+  /// text can conflate distinct variables across sibling scopes, which is the
+  /// exact false-positive class this rule must avoid.
+  Object? _targetFingerprint(Expression target) {
     if (target is SimpleIdentifier) {
       final element = target.element;
       if (element != null) return element;
+      return null;
     }
-    return ('text', target.toSource());
+    if (target is PrefixedIdentifier) {
+      final element = target.identifier.element;
+      if (element != null) return element;
+      return null;
+    }
+    if (target is PropertyAccess) {
+      final propertyName = target.propertyName;
+      final element = propertyName.element;
+      if (element != null) return element;
+      return null;
+    }
+    return null;
+  }
+
+  bool _isMapLikeTarget(Expression target) {
+    final targetType = target.staticType;
+    if (targetType is! InterfaceType) return false;
+
+    if (_isDartCoreMapType(targetType)) return true;
+    for (final supertype in targetType.allSupertypes) {
+      if (_isDartCoreMapType(supertype)) return true;
+    }
+    return false;
+  }
+
+  bool _isWriteContext(IndexExpression node) {
+    if (node.inSetterContext()) return true;
+
+    final parent = node.parent;
+    if (parent is AssignmentExpression && identical(parent.leftHandSide, node)) {
+      return true;
+    }
+    if (parent is PrefixExpression &&
+        identical(parent.operand, node) &&
+        parent.operator.lexeme == '++') {
+      return true;
+    }
+    if (parent is PostfixExpression &&
+        identical(parent.operand, node) &&
+        parent.operator.lexeme == '++') {
+      return true;
+    }
+    if (parent is PrefixExpression &&
+        identical(parent.operand, node) &&
+        parent.operator.lexeme == '--') {
+      return true;
+    }
+    if (parent is PostfixExpression &&
+        identical(parent.operand, node) &&
+        parent.operator.lexeme == '--') {
+      return true;
+    }
+    return false;
+  }
+
+  bool _isDartCoreMapType(InterfaceType type) {
+    return type.element.name == 'Map' &&
+        type.element.library.uri.toString() == 'dart:core';
   }
 
   @override
