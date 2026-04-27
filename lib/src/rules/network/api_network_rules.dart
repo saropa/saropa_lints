@@ -624,70 +624,105 @@ class RequireRequestTimeoutRule extends SaropaLintRule {
     RegExp(r'\bBaseOptions\b'),
   ];
 
+  /// Same conditions as [runWithReporter] for a missing per-request timeout.
+  static bool isMissingConfiguredTimeout(MethodInvocation node) {
+    final String methodName = node.methodName.name;
+
+    if (!_httpMethods.contains(methodName)) return false;
+
+    final Expression? target = node.target;
+    if (target == null) return false;
+
+    final String targetSource = target.toSource().toLowerCase();
+
+    // cspell:ignore httpclient
+    final bool isHttpCall =
+        targetSource == 'http' ||
+        targetSource == 'dio' ||
+        targetSource == 'client' ||
+        targetSource.endsWith('.http') ||
+        targetSource.endsWith('.dio') ||
+        targetSource.endsWith('.client') ||
+        targetSource == 'httpclient' ||
+        targetSource.endsWith('.httpclient');
+
+    if (!isHttpCall) return false;
+
+    final AstNode? parent = node.parent;
+    if (parent is MethodInvocation) {
+      final String parentMethod = parent.methodName.name;
+      if (parentMethod == 'timeout') return false;
+    }
+
+    if (parent is AwaitExpression) {
+      final AstNode? awaitParent = parent.parent;
+      if (awaitParent is MethodInvocation &&
+          awaitParent.methodName.name == 'timeout') {
+        return false;
+      }
+    }
+
+    AstNode? current = node.parent;
+    int depth = 0;
+    while (current != null && depth < 10) {
+      if (current is MethodDeclaration || current is FunctionDeclaration) {
+        final String bodySource = current.toSource();
+        if (_timeoutConfigPatterns.any((p) => p.hasMatch(bodySource))) {
+          return false;
+        }
+        break;
+      }
+      current = current.parent;
+      depth++;
+    }
+
+    return true;
+  }
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
     context.addMethodInvocation((MethodInvocation node) {
-      final String methodName = node.methodName.name;
-
-      // Only check HTTP methods
-      if (!_httpMethods.contains(methodName)) return;
-
-      // Check if target looks like an HTTP client
-      final Expression? target = node.target;
-      if (target == null) return;
-
-      final String targetSource = target.toSource().toLowerCase();
-
-      // cspell:ignore httpclient
-      // Check if this is an HTTP-related call using exact target patterns
-      final bool isHttpCall =
-          targetSource == 'http' ||
-          targetSource == 'dio' ||
-          targetSource == 'client' ||
-          targetSource.endsWith('.http') ||
-          targetSource.endsWith('.dio') ||
-          targetSource.endsWith('.client') ||
-          targetSource == 'httpclient' ||
-          targetSource.endsWith('.httpclient');
-
-      if (!isHttpCall) return;
-
-      // Check if .timeout() is chained on this call
-      final AstNode? parent = node.parent;
-      if (parent is MethodInvocation) {
-        final String parentMethod = parent.methodName.name;
-        if (parentMethod == 'timeout') return; // Has timeout
-      }
-
-      // Check if in await expression with timeout
-      if (parent is AwaitExpression) {
-        final AstNode? awaitParent = parent.parent;
-        if (awaitParent is MethodInvocation &&
-            awaitParent.methodName.name == 'timeout') {
-          return; // await http.get(...).timeout(...)
-        }
-      }
-
-      // Check if timeout is configured in the surrounding context
-      // (e.g., Dio with connectTimeout in options; word-boundary to avoid FP)
-      AstNode? current = node.parent;
-      int depth = 0;
-      while (current != null && depth < 10) {
-        if (current is MethodDeclaration || current is FunctionDeclaration) {
-          final String bodySource = current.toSource();
-          if (_timeoutConfigPatterns.any((p) => p.hasMatch(bodySource))) {
-            return; // Timeout likely configured at client level
-          }
-          break;
-        }
-        current = current.parent;
-        depth++;
-      }
-
+      if (!isMissingConfiguredTimeout(node)) return;
       reporter.atNode(node);
+    });
+  }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        _RequireRequestTimeoutFix(context: context),
+  ];
+}
+
+/// Appends [.timeout(const Duration(seconds: 30))] (same pattern as prefer rule).
+class _RequireRequestTimeoutFix extends SaropaFixProducer {
+  _RequireRequestTimeoutFix({required super.context});
+
+  static const _fixKind = FixKind(
+    'saropa.fix.requireRequestTimeout',
+    80,
+    "Append '.timeout(const Duration(seconds: 30))'",
+  );
+
+  @override
+  FixKind get fixKind => _fixKind;
+
+  @override
+  Future<void> compute(ChangeBuilder builder) async {
+    final node = coveringNode;
+    final inv = node is MethodInvocation
+        ? node
+        : node?.thisOrAncestorOfType<MethodInvocation>();
+    if (inv == null) return;
+    if (!RequireRequestTimeoutRule.isMissingConfiguredTimeout(inv)) return;
+
+    await builder.addDartFileEdit(file, (b) {
+      b.addInsertion(inv.end, (eb) {
+        eb.write('.timeout(const Duration(seconds: 30))');
+      });
     });
   }
 }
@@ -3427,46 +3462,82 @@ class PreferTimeoutOnRequestsRule extends SaropaLintRule {
     RegExp(r'\bDio\b'),
   ];
 
+  /// True when this HTTP client call has no [.timeout] chained (same as rule).
+  static bool isMissingRequestTimeout(MethodInvocation node) {
+    final String methodName = node.methodName.name;
+    if (!_httpMethods.contains(methodName)) return false;
+
+    final Expression? target = node.target;
+    if (target == null) return false;
+
+    final String targetSource = target.toSource();
+    if (!_httpTimeoutTargetPatterns.any((p) => p.hasMatch(targetSource))) {
+      return false;
+    }
+
+    AstNode? parent = node.parent;
+    if (parent is MethodInvocation && parent.methodName.name == 'timeout') {
+      return false;
+    }
+
+    if (parent is AwaitExpression) {
+      AstNode? awaitParent = parent.parent;
+      if (awaitParent is MethodInvocation &&
+          awaitParent.methodName.name == 'timeout') {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
     context.addMethodInvocation((MethodInvocation node) {
-      final String methodName = node.methodName.name;
-      if (!_httpMethods.contains(methodName)) return;
-
-      final Expression? target = node.target;
-      if (target == null) return;
-
-      final String targetSource = target.toSource();
-      if (!_httpTimeoutTargetPatterns.any((p) => p.hasMatch(targetSource))) {
-        return;
-      }
-
-      // Check if .timeout is chained
-      AstNode? parent = node.parent;
-      if (parent is MethodInvocation && parent.methodName.name == 'timeout') {
-        return;
-      }
-
-      // Check if wrapped in await with timeout
-      if (parent is AwaitExpression) {
-        AstNode? awaitParent = parent.parent;
-        if (awaitParent is MethodInvocation &&
-            awaitParent.methodName.name == 'timeout') {
-          return;
-        }
-      }
-
+      if (!isMissingRequestTimeout(node)) return;
       reporter.atNode(node);
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        _PreferTimeoutOnRequestsFix(context: context),
+  ];
 }
 
-/// Quick fix: adds `.timeout(const Duration(seconds: 30))` to HTTP requests.
+/// Appends [.timeout(const Duration(seconds: 30))] after the HTTP request call.
+class _PreferTimeoutOnRequestsFix extends SaropaFixProducer {
+  _PreferTimeoutOnRequestsFix({required super.context});
 
-/// Quick fix: adds `.timeout(const Duration(seconds: 60))` for slower APIs.
+  static const _fixKind = FixKind(
+    'saropa.fix.preferTimeoutOnRequests',
+    80,
+    "Append '.timeout(const Duration(seconds: 30))'",
+  );
+
+  @override
+  FixKind get fixKind => _fixKind;
+
+  @override
+  Future<void> compute(ChangeBuilder builder) async {
+    final node = coveringNode;
+    final inv = node is MethodInvocation
+        ? node
+        : node?.thisOrAncestorOfType<MethodInvocation>();
+    if (inv == null) return;
+    if (!PreferTimeoutOnRequestsRule.isMissingRequestTimeout(inv)) return;
+
+    await builder.addDartFileEdit(file, (b) {
+      b.addInsertion(inv.end, (eb) {
+        eb.write('.timeout(const Duration(seconds: 30))');
+      });
+    });
+  }
+}
 
 // =============================================================================
 // WebSocket Rules (from v4.1.7)

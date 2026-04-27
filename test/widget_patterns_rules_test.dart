@@ -564,6 +564,18 @@ void main() {
       () => RequireWssOverWsRule(),
     );
 
+    test('RequireImageErrorBuilderRule exposes a quick fix', () {
+      expect(RequireImageErrorBuilderRule().fixGenerators, isNotEmpty);
+    });
+
+    test('RequireHttpsOverHttpRule exposes a quick fix', () {
+      expect(RequireHttpsOverHttpRule().fixGenerators, isNotEmpty);
+    });
+
+    test('RequireWssOverWsRule exposes a quick fix', () {
+      expect(RequireWssOverWsRule().fixGenerators, isNotEmpty);
+    });
+
     testRule(
       'AvoidLateWithoutGuaranteeRule',
       'avoid_late_without_guarantee',

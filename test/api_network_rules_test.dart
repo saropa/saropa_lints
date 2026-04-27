@@ -53,6 +53,11 @@ void main() {
       'require_request_timeout',
       () => RequireRequestTimeoutRule(),
     );
+
+    test('RequireRequestTimeoutRule exposes a quick fix', () {
+      expect(RequireRequestTimeoutRule().fixGenerators, isNotEmpty);
+    });
+
     testRule(
       'RequireOfflineIndicatorRule',
       'require_offline_indicator',
@@ -183,6 +188,11 @@ void main() {
       'prefer_timeout_on_requests',
       () => PreferTimeoutOnRequestsRule(),
     );
+
+    test('PreferTimeoutOnRequestsRule exposes a quick fix', () {
+      expect(PreferTimeoutOnRequestsRule().fixGenerators, isNotEmpty);
+    });
+
     testRule(
       'RequireWebsocketReconnectionRule',
       'require_websocket_reconnection',

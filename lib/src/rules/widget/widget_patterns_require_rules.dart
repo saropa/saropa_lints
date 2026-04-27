@@ -1,6 +1,7 @@
 // ignore_for_file: depend_on_referenced_packages, deprecated_member_use
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/source/source_range.dart';
 
 import '../../android_manifest_utils.dart';
 import '../../info_plist_utils.dart';
@@ -172,6 +173,12 @@ class RequireImageErrorBuilderRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        _RequireImageErrorBuilderFix(context: context),
+  ];
 }
 
 /// Requires network images to specify width and height for layout stability.
@@ -2022,6 +2029,12 @@ class RequireHttpsOverHttpRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        _RequireHttpsOverHttpFix(context: context),
+  ];
 }
 
 /// Warns when ws:// URLs are used for WebSocket connections.
@@ -2083,6 +2096,12 @@ class RequireWssOverWsRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        _RequireWssOverWsFix(context: context),
+  ];
 }
 
 /// Reminder to add camera permission for image_picker on iOS.
@@ -2715,6 +2734,133 @@ class PreferOverlayPortalLayoutBuilderRule extends SaropaLintRule {
       if (RegExp(r'Overlay\.of\b').hasMatch(src) || src.startsWith('Overlay')) {
         reporter.atNode(node);
       }
+    });
+  }
+}
+
+/// Whether [value] should be upgraded from `http://` to `https://` (same as rule).
+bool _literalNeedsHttpsUpgrade(String value) {
+  return value.startsWith('http://') &&
+      !value.startsWith('http://localhost') &&
+      !value.startsWith('http://127.0.0.1') &&
+      !value.startsWith('http://10.') &&
+      !value.startsWith('http://192.168.');
+}
+
+/// Whether [value] should be upgraded from `ws://` to `wss://` (same as rule).
+bool _literalNeedsWssUpgrade(String value) {
+  return value.startsWith('ws://') &&
+      !value.startsWith('ws://localhost') &&
+      !value.startsWith('ws://127.0.0.1') &&
+      !value.startsWith('ws://10.') &&
+      !value.startsWith('ws://192.168.');
+}
+
+/// Inserts a minimal [errorBuilder] on [Image.network] (SizedBox fallback).
+class _RequireImageErrorBuilderFix extends SaropaFixProducer {
+  _RequireImageErrorBuilderFix({required super.context});
+
+  static const _fixKind = FixKind(
+    'saropa.fix.requireImageErrorBuilder',
+    80,
+    "Add 'errorBuilder' with SizedBox fallback",
+  );
+
+  @override
+  FixKind get fixKind => _fixKind;
+
+  @override
+  Future<void> compute(ChangeBuilder builder) async {
+    final node = coveringNode;
+    final creation = node is InstanceCreationExpression
+        ? node
+        : node?.thisOrAncestorOfType<InstanceCreationExpression>();
+    if (creation == null) return;
+    if (creation.constructorName.type.name.lexeme != 'Image') return;
+    if (creation.constructorName.name?.name != 'network') return;
+
+    for (final arg in creation.argumentList.arguments) {
+      if (arg is NamedExpression && arg.name.label.name == 'errorBuilder') {
+        return;
+      }
+    }
+
+    final args = creation.argumentList.arguments;
+    if (args.isEmpty) return;
+
+    final insertAt = creation.argumentList.rightParenthesis.offset;
+    final gapTrim = unitResult.content
+        .substring(args.last.end, insertAt)
+        .trim();
+    const fallback =
+        'errorBuilder: (context, error, stackTrace) => const SizedBox()';
+    // After a trailing comma, only a space is needed; otherwise insert `, `.
+    final insertion = gapTrim.isEmpty
+        ? ', $fallback'
+        : gapTrim == ','
+        ? ' $fallback'
+        : ', $fallback';
+
+    await builder.addDartFileEdit(file, (b) {
+      b.addInsertion(insertAt, (eb) {
+        eb.write(insertion);
+      });
+    });
+  }
+}
+
+/// Replaces the `http://` prefix inside a string literal with `https://`.
+class _RequireHttpsOverHttpFix extends SaropaFixProducer {
+  _RequireHttpsOverHttpFix({required super.context});
+
+  static const _fixKind = FixKind(
+    'saropa.fix.requireHttpsOverHttp',
+    80,
+    "Replace 'http://' with 'https://'",
+  );
+
+  @override
+  FixKind get fixKind => _fixKind;
+
+  @override
+  Future<void> compute(ChangeBuilder builder) async {
+    final node = coveringNode;
+    if (node is! SimpleStringLiteral) return;
+    if (!_literalNeedsHttpsUpgrade(node.value)) return;
+
+    await builder.addDartFileEdit(file, (b) {
+      b.addSimpleReplacement(
+        SourceRange(node.contentsOffset, 'http://'.length),
+        'https://',
+      );
+    });
+  }
+}
+
+/// Replaces the `ws://` prefix inside a string literal with `wss://`.
+class _RequireWssOverWsFix extends SaropaFixProducer {
+  _RequireWssOverWsFix({required super.context});
+
+  static const _fixKind = FixKind(
+    'saropa.fix.requireWssOverWs',
+    80,
+    "Replace 'ws://' with 'wss://'",
+  );
+
+  @override
+  FixKind get fixKind => _fixKind;
+
+  @override
+  Future<void> compute(ChangeBuilder builder) async {
+    final node = coveringNode;
+    if (node is! SimpleStringLiteral) return;
+    if (!_literalNeedsWssUpgrade(node.value)) return;
+
+    await builder.addDartFileEdit(file, (b) {
+      b.addSimpleReplacement(
+        SourceRange(node.contentsOffset, 'ws://'.length),
+        'wss://',
+      );
     });
   }
 }

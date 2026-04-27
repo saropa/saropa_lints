@@ -8,6 +8,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/source/source_range.dart';
 
 import '../../import_utils.dart';
 import '../../target_matcher_utils.dart';
@@ -131,6 +132,53 @@ class AvoidDriftEnumIndexReorderRule extends SaropaLintRule {
       if (node.methodName.name != 'intEnum') return;
       if (!fileImportsPackage(node, PackageImports.drift)) return;
       reporter.atNode(node);
+    });
+  }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        _DriftIntEnumToTextEnumFix(context: context),
+  ];
+}
+
+/// Replaces Drift [intEnum] with [textEnum] so enums persist by name.
+class _DriftIntEnumToTextEnumFix extends SaropaFixProducer {
+  _DriftIntEnumToTextEnumFix({required super.context});
+
+  static const _fixKind = FixKind(
+    'saropa.fix.driftIntEnumToTextEnum',
+    80,
+    "Replace 'intEnum' with 'textEnum'",
+  );
+
+  @override
+  FixKind get fixKind => _fixKind;
+
+  @override
+  Future<void> compute(ChangeBuilder builder) async {
+    final node = coveringNode;
+    MethodInvocation? inv;
+    if (node is MethodInvocation) {
+      inv = node;
+    } else if (node is SimpleIdentifier) {
+      final parent = node.parent;
+      if (parent is MethodInvocation &&
+          parent.methodName == node &&
+          node.name == 'intEnum') {
+        inv = parent;
+      }
+    }
+    if (inv == null) return;
+    if (inv.methodName.name != 'intEnum') return;
+    if (!fileImportsPackage(inv, PackageImports.drift)) return;
+    final call = inv;
+
+    await builder.addDartFileEdit(file, (b) {
+      b.addSimpleReplacement(
+        SourceRange(call.methodName.offset, call.methodName.length),
+        'textEnum',
+      );
     });
   }
 }

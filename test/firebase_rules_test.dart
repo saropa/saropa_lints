@@ -27,6 +27,11 @@ void main() {
       'avoid_firestore_unbounded_query',
       () => AvoidFirestoreUnboundedQueryRule(),
     );
+
+    test('AvoidFirestoreUnboundedQueryRule exposes a quick fix', () {
+      expect(AvoidFirestoreUnboundedQueryRule().fixGenerators, isNotEmpty);
+    });
+
     testRule(
       'AvoidDatabaseInBuildRule',
       'avoid_database_in_build',

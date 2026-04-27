@@ -25,6 +25,10 @@ void main() {
       () => AvoidDriftEnumIndexReorderRule(),
     );
 
+    test('AvoidDriftEnumIndexReorderRule exposes a quick fix', () {
+      expect(AvoidDriftEnumIndexReorderRule().fixGenerators, isNotEmpty);
+    });
+
     testRule(
       'RequireDriftDatabaseCloseRule',
       'require_drift_database_close',

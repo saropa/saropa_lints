@@ -61,43 +61,91 @@ class AvoidFirestoreUnboundedQueryRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  /// True when [.get] / [.snapshots] on a collection chain has no [limit] / doc.
+  static bool isUnboundedCollectionTerminal(MethodInvocation node) {
+    final String methodName = node.methodName.name;
+    if (methodName != 'get' && methodName != 'snapshots') return false;
+
+    bool hasCollection = false;
+    bool hasLimit = false;
+    bool hasDoc = false;
+
+    Expression? current = node.target;
+    while (current is MethodInvocation) {
+      final MethodInvocation methodCall = current;
+      final String name = methodCall.methodName.name;
+
+      if (name == 'collection' || name == 'collectionGroup') {
+        hasCollection = true;
+      }
+      if (name == 'limit' || name == 'limitToLast') {
+        hasLimit = true;
+      }
+      if (name == 'doc') {
+        hasDoc = true;
+      }
+
+      current = methodCall.target;
+    }
+
+    return hasCollection && !hasLimit && !hasDoc;
+  }
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
     context.addMethodInvocation((MethodInvocation node) {
-      // Check for .get() or .snapshots() on Firestore query
-      final String methodName = node.methodName.name;
-      if (methodName != 'get' && methodName != 'snapshots') return;
+      if (!isUnboundedCollectionTerminal(node)) return;
+      reporter.atNode(node.methodName, code);
+    });
+  }
 
-      // Walk up the method chain to check for Firestore patterns
-      bool hasCollection = false;
-      bool hasLimit = false;
-      bool hasDoc = false; // Single document queries don't need limit
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        _AvoidFirestoreUnboundedQueryFix(context: context),
+  ];
+}
 
-      Expression? current = node.target;
-      while (current is MethodInvocation) {
-        final MethodInvocation methodCall = current;
-        final String name = methodCall.methodName.name;
+/// Inserts [.limit(100)] before terminal [.get] / [.snapshots] on collection queries.
+class _AvoidFirestoreUnboundedQueryFix extends SaropaFixProducer {
+  _AvoidFirestoreUnboundedQueryFix({required super.context});
 
-        if (name == 'collection' || name == 'collectionGroup') {
-          hasCollection = true;
-        }
-        if (name == 'limit' || name == 'limitToLast') {
-          hasLimit = true;
-        }
-        if (name == 'doc') {
-          hasDoc = true;
-        }
+  static const _fixKind = FixKind(
+    'saropa.fix.avoidFirestoreUnboundedQuery',
+    80,
+    "Insert '.limit(100)' before '.get' / '.snapshots'",
+  );
 
-        current = methodCall.target;
+  @override
+  FixKind get fixKind => _fixKind;
+
+  @override
+  Future<void> compute(ChangeBuilder builder) async {
+    final node = coveringNode;
+    MethodInvocation? terminal;
+    if (node is MethodInvocation) {
+      terminal = node;
+    } else if (node is SimpleIdentifier) {
+      final parent = node.parent;
+      if (parent is MethodInvocation && parent.methodName == node) {
+        terminal = parent;
       }
+    }
+    if (terminal == null) return;
+    if (!AvoidFirestoreUnboundedQueryRule.isUnboundedCollectionTerminal(
+      terminal,
+    )) {
+      return;
+    }
 
-      // Report if we have a collection query without limit
-      if (hasCollection && !hasLimit && !hasDoc) {
-        reporter.atNode(node.methodName, code);
-      }
+    final insertAt = terminal.methodName.offset;
+    await builder.addDartFileEdit(file, (b) {
+      b.addInsertion(insertAt, (eb) {
+        eb.write('limit(100).');
+      });
     });
   }
 }

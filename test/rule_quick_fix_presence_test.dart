@@ -22,8 +22,12 @@ import 'package:saropa_lints/src/rules/stylistic/formatting_rules.dart';
 import 'package:saropa_lints/src/rules/stylistic/stylistic_additional_rules.dart';
 import 'package:saropa_lints/src/rules/stylistic/stylistic_rules.dart';
 import 'package:saropa_lints/src/rules/ui/animation_rules.dart';
+import 'package:saropa_lints/src/rules/network/api_network_rules.dart';
+import 'package:saropa_lints/src/rules/packages/drift_rules.dart';
+import 'package:saropa_lints/src/rules/packages/firebase_rules.dart';
 import 'package:saropa_lints/src/rules/widget/flutter_migration_widget_rules.dart';
 import 'package:saropa_lints/src/rules/widget/image_filter_quality_migration_rules.dart';
+import 'package:saropa_lints/src/rules/widget/widget_patterns_require_rules.dart';
 import 'package:test/test.dart';
 
 /// Unit tests that assert quick-fix registration for rules that provide fixes.
@@ -351,6 +355,28 @@ void main() {
     hasFix(
       'DeprecatedNewInCommentReferenceRule',
       () => DeprecatedNewInCommentReferenceRule(),
+    );
+
+    // Widget patterns require (3)
+    hasFix(
+      'RequireImageErrorBuilderRule',
+      () => RequireImageErrorBuilderRule(),
+    );
+    hasFix('RequireHttpsOverHttpRule', () => RequireHttpsOverHttpRule());
+    hasFix('RequireWssOverWsRule', () => RequireWssOverWsRule());
+
+    // Firebase / API network (3)
+    hasFix(
+      'AvoidFirestoreUnboundedQueryRule',
+      () => AvoidFirestoreUnboundedQueryRule(),
+    );
+    hasFix('PreferTimeoutOnRequestsRule', () => PreferTimeoutOnRequestsRule());
+    hasFix('RequireRequestTimeoutRule', () => RequireRequestTimeoutRule());
+
+    // Drift (1)
+    hasFix(
+      'AvoidDriftEnumIndexReorderRule',
+      () => AvoidDriftEnumIndexReorderRule(),
     );
   });
 }
