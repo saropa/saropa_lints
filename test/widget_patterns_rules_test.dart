@@ -318,11 +318,19 @@ void main() {
       () => RequireImageDimensionsRule(),
     );
 
+    test('RequireImageDimensionsRule exposes a quick fix', () {
+      expect(RequireImageDimensionsRule().fixGenerators, isNotEmpty);
+    });
+
     testRule(
       'RequirePlaceholderForNetworkRule',
       'require_placeholder_for_network',
       () => RequirePlaceholderForNetworkRule(),
     );
+
+    test('RequirePlaceholderForNetworkRule exposes a quick fix', () {
+      expect(RequirePlaceholderForNetworkRule().fixGenerators, isNotEmpty);
+    });
 
     testRule(
       'PreferTextThemeRule',

@@ -11,6 +11,7 @@ import 'dart:io';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
+import 'package:analyzer/source/source_range.dart';
 
 import '../../saropa_lint_rule.dart';
 
@@ -1076,6 +1077,54 @@ class IncorrectFirebaseParameterNameRule extends SaropaLintRule {
 
     // Check pattern
     return _validParamName.hasMatch(name);
+  }
+
+  /// When the only issue is hyphens in the key, returns the underscore form.
+  static String? hyphenOnlyFix(String name) {
+    for (final String prefix in _reservedPrefixes) {
+      if (name.toLowerCase().startsWith(prefix)) return null;
+    }
+    if (!name.contains('-')) return null;
+    final fixed = name.replaceAll('-', '_');
+    return _validParamName.hasMatch(fixed) ? fixed : null;
+  }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        _IncorrectFirebaseParameterNameHyphenFix(context: context),
+  ];
+}
+
+/// Replaces hyphens with underscores in Analytics parameter map keys when valid.
+class _IncorrectFirebaseParameterNameHyphenFix extends SaropaFixProducer {
+  _IncorrectFirebaseParameterNameHyphenFix({required super.context});
+
+  static const _fixKind = FixKind(
+    'saropa.fix.incorrectFirebaseParameterNameHyphens',
+    80,
+    "Replace '-' with '_' in parameter name",
+  );
+
+  @override
+  FixKind get fixKind => _fixKind;
+
+  @override
+  Future<void> compute(ChangeBuilder builder) async {
+    final node = coveringNode;
+    if (node is! SimpleStringLiteral) return;
+    final lit = node;
+    final replacement = IncorrectFirebaseParameterNameRule.hyphenOnlyFix(
+      lit.value,
+    );
+    if (replacement == null) return;
+
+    await builder.addDartFileEdit(file, (b) {
+      b.addSimpleReplacement(
+        SourceRange(lit.contentsOffset, lit.value.length),
+        replacement,
+      );
+    });
   }
 }
 

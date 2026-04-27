@@ -103,6 +103,10 @@ void main() {
       'require_websocket_error_handling',
       () => RequireWebSocketErrorHandlingRule(),
     );
+
+    test('RequireWebSocketErrorHandlingRule exposes a quick fix', () {
+      expect(RequireWebSocketErrorHandlingRule().fixGenerators, isNotEmpty);
+    });
     testRule(
       'RequireContentTypeCheckRule',
       'require_content_type_check',

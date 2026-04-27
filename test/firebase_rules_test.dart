@@ -72,6 +72,11 @@ void main() {
       'incorrect_firebase_parameter_name',
       () => IncorrectFirebaseParameterNameRule(),
     );
+
+    test('IncorrectFirebaseParameterNameRule exposes a quick fix', () {
+      expect(IncorrectFirebaseParameterNameRule().fixGenerators, isNotEmpty);
+    });
+
     testRule(
       'PreferFirestoreBatchWriteRule',
       'prefer_firestore_batch_write',

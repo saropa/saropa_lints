@@ -47,13 +47,15 @@
 
 ---
 
-## [Unreleased]
+## [12.6.1]
 
 More rules now ship IDE quick fixes for repetitive, low-risk edits (secure URL schemes, image and HTTP/Firestore/Drift call shapes), so you can apply the suggested remediation from the lightbulb menu instead of typing boilerplate by hand. Update the package and re-analyze to see new fix actions where diagnostics already appear. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
 
 ### Added
 
-- `require_image_error_builder`, `require_https_over_http`, and `require_wss_over_ws` gain quick fixes that insert a minimal `errorBuilder` or rewrite `http://` / `ws://` prefixes where the rule already fires, so common widget and URL hygiene fixes are one action in the IDE. No action required beyond updating and using the fix when offered.
+- `require_image_error_builder`, `require_image_dimensions`, `require_placeholder_for_network`, `require_https_over_http`, and `require_wss_over_ws` gain quick fixes that insert a minimal `errorBuilder`, placeholder `width`/`height`, a loading/placeholder callback, or rewrite `http://` / `ws://` prefixes where the rule already fires, so common widget and URL hygiene fixes are one action in the IDE. No action required beyond updating and using the fix when offered; adjust inserted dimensions to your layout.
+- `require_websocket_error_handling` gains a quick fix that appends a stub `onError` argument to flagged `listen` calls so you can fill in logging or reconnection logic without retyping the signature. No action required beyond updating and using the fix when offered.
+- `incorrect_firebase_parameter_name` offers a quick fix that rewrites hyphenated Analytics parameter keys to underscores when that alone satisfies Firebase’s naming rules, so common `item-id` style keys become `item_id` in one step. No action required beyond updating and using the fix when offered; reserved-prefix violations still need a manual rename.
 - `avoid_firestore_unbounded_query` offers a quick fix that inserts `limit(100).` before `.get` / `.snapshots` on flagged collection chains so you can cap reads without manually editing the method chain. Review the chosen limit for your product before shipping. No action required to adopt beyond the package update.
 - `prefer_timeout_on_requests` and `require_request_timeout` offer quick fixes that append `.timeout(const Duration(seconds: 30))` after the flagged HTTP client call when the rule applies, matching the documented remediation pattern. Tune the duration in code if 30 seconds is not right for your endpoints. No action required beyond updating and using the fix when offered.
 - `avoid_drift_enum_index_reorder` offers a quick fix that renames `intEnum` to `textEnum` on flagged Drift column builders so you can switch to name-backed enum storage in one step; you must still migrate existing stored ordinals and adjust related `TypeConverter` code the rule flags separately. No action required beyond updating and using the fix when offered.

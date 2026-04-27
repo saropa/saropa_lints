@@ -1686,36 +1686,86 @@ class RequireWebSocketErrorHandlingRule extends SaropaLintRule {
     RegExp(r'\.stream\b'),
   ];
 
+  /// Same predicate as [runWithReporter] (shared with quick fix).
+  static bool isListenMissingOnError(MethodInvocation node) {
+    if (node.methodName.name != 'listen') return false;
+
+    final Expression? target = node.target;
+    if (target == null) return false;
+
+    final String targetSource = target.toSource();
+    if (!_websocketListenTargetPatterns.any((p) => p.hasMatch(targetSource))) {
+      return false;
+    }
+
+    for (final Expression arg in node.argumentList.arguments) {
+      if (arg is NamedExpression && arg.name.label.name == 'onError') {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
     context.addMethodInvocation((MethodInvocation node) {
-      if (node.methodName.name != 'listen') return;
+      if (!isListenMissingOnError(node)) return;
+      reporter.atNode(node);
+    });
+  }
 
-      final Expression? target = node.target;
-      if (target == null) return;
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        _RequireWebSocketOnErrorFix(context: context),
+  ];
+}
 
-      final String targetSource = target.toSource();
-      if (!_websocketListenTargetPatterns.any(
-        (p) => p.hasMatch(targetSource),
-      )) {
-        return;
-      }
+/// Appends a stub [onError] named argument to [stream.listen].
+class _RequireWebSocketOnErrorFix extends SaropaFixProducer {
+  _RequireWebSocketOnErrorFix({required super.context});
 
-      // Check for onError parameter
-      bool hasOnError = false;
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'onError') {
-          hasOnError = true;
-          break;
-        }
-      }
+  static const _fixKind = FixKind(
+    'saropa.fix.requireWebSocketOnError',
+    80,
+    "Add onError: (Object e, StackTrace st) {}",
+  );
 
-      if (!hasOnError) {
-        reporter.atNode(node);
-      }
+  @override
+  FixKind get fixKind => _fixKind;
+
+  @override
+  Future<void> compute(ChangeBuilder builder) async {
+    final n = coveringNode;
+    if (n == null) return;
+    final inv = n is MethodInvocation
+        ? n
+        : n.thisOrAncestorOfType<MethodInvocation>();
+    if (inv == null) return;
+    if (!RequireWebSocketErrorHandlingRule.isListenMissingOnError(inv)) return;
+
+    final args = inv.argumentList.arguments;
+    if (args.isEmpty) return;
+
+    final insertAt = inv.argumentList.rightParenthesis.offset;
+    final gapTrim = unitResult.content
+        .substring(args.last.end, insertAt)
+        .trim();
+    final prefix = gapTrim.isEmpty
+        ? ', '
+        : gapTrim == ','
+        ? ' '
+        : ', ';
+    final insertion = '${prefix}onError: (Object e, StackTrace st) {}';
+
+    await builder.addDartFileEdit(file, (b) {
+      b.addInsertion(insertAt, (eb) {
+        eb.write(insertion);
+      });
     });
   }
 }

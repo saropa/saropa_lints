@@ -357,21 +357,34 @@ void main() {
       () => DeprecatedNewInCommentReferenceRule(),
     );
 
-    // Widget patterns require (3)
+    // Widget patterns require (5)
     hasFix(
       'RequireImageErrorBuilderRule',
       () => RequireImageErrorBuilderRule(),
     );
+    hasFix(
+      'RequirePlaceholderForNetworkRule',
+      () => RequirePlaceholderForNetworkRule(),
+    );
+    hasFix('RequireImageDimensionsRule', () => RequireImageDimensionsRule());
     hasFix('RequireHttpsOverHttpRule', () => RequireHttpsOverHttpRule());
     hasFix('RequireWssOverWsRule', () => RequireWssOverWsRule());
 
-    // Firebase / API network (3)
+    // Firebase / API network (5)
     hasFix(
       'AvoidFirestoreUnboundedQueryRule',
       () => AvoidFirestoreUnboundedQueryRule(),
     );
+    hasFix(
+      'IncorrectFirebaseParameterNameRule',
+      () => IncorrectFirebaseParameterNameRule(),
+    );
     hasFix('PreferTimeoutOnRequestsRule', () => PreferTimeoutOnRequestsRule());
     hasFix('RequireRequestTimeoutRule', () => RequireRequestTimeoutRule());
+    hasFix(
+      'RequireWebSocketErrorHandlingRule',
+      () => RequireWebSocketErrorHandlingRule(),
+    );
 
     // Drift (1)
     hasFix(

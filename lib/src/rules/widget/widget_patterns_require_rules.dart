@@ -228,68 +228,55 @@ class RequireImageDimensionsRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
-  @override
-  void runWithReporter(
-    SaropaDiagnosticReporter reporter,
-    SaropaContext context,
-  ) {
-    context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String typeName = node.constructorName.type.name.lexeme;
-      final String? constructorName = node.constructorName.name?.name;
+  /// Same predicate as the rule (used by the quick fix).
+  static bool isMissingExplicitDimensions(InstanceCreationExpression node) {
+    final String typeName = node.constructorName.type.name.lexeme;
+    final String? constructorName = node.constructorName.name?.name;
 
-      // Only check network images
-      bool isNetworkImage = false;
-      if (typeName == 'Image' && constructorName == 'network') {
-        isNetworkImage = true;
+    bool isNetworkImage = false;
+    if (typeName == 'Image' && constructorName == 'network') {
+      isNetworkImage = true;
+    }
+    if (typeName == 'CachedNetworkImage') {
+      isNetworkImage = true;
+    }
+
+    if (!isNetworkImage) return false;
+
+    bool hasWidth = false;
+    bool hasHeight = false;
+    bool hasFit = false;
+
+    for (final Expression arg in node.argumentList.arguments) {
+      if (arg is NamedExpression) {
+        final String argName = arg.name.label.name;
+        if (argName == 'width') hasWidth = true;
+        if (argName == 'height') hasHeight = true;
+        if (argName == 'fit') hasFit = true;
       }
-      if (typeName == 'CachedNetworkImage') {
-        isNetworkImage = true;
-      }
+    }
 
-      if (!isNetworkImage) return;
+    if (hasFit) return false;
+    if (hasWidth || hasHeight) return false;
+    if (_networkImageParentProvidesDimensions(node)) return false;
 
-      bool hasWidth = false;
-      bool hasHeight = false;
-      bool hasFit = false;
-
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String argName = arg.name.label.name;
-          if (argName == 'width') hasWidth = true;
-          if (argName == 'height') hasHeight = true;
-          if (argName == 'fit') hasFit = true;
-        }
-      }
-
-      // Allow if BoxFit is specified (usually means parent provides dimensions)
-      if (hasFit) return;
-
-      // Allow if has at least one dimension (aspect ratio can determine other)
-      if (hasWidth || hasHeight) return;
-
-      // Check if parent is a sizing widget (SizedBox, Container with size)
-      if (_hasParentWithDimensions(node)) return;
-
-      reporter.atNode(node.constructorName, code);
-    });
+    return true;
   }
 
   /// Checks if an ancestor provides dimensions (SizedBox, Container, etc.)
-  bool _hasParentWithDimensions(AstNode node) {
+  static bool _networkImageParentProvidesDimensions(AstNode node) {
     AstNode? current = node.parent;
     int depth = 0;
-    const int maxDepth = 5; // Don't look too far up
+    const int maxDepth = 5;
 
     while (current != null && depth < maxDepth) {
       if (current is InstanceCreationExpression) {
         final String parentType = current.constructorName.type.name.lexeme;
 
-        // SizedBox, Container, ConstrainedBox typically provide dimensions
         if (parentType == 'SizedBox' ||
             parentType == 'Container' ||
             parentType == 'ConstrainedBox' ||
             parentType == 'AspectRatio') {
-          // Check if the parent has width/height
           for (final Expression arg in current.argumentList.arguments) {
             if (arg is NamedExpression) {
               final String argName = arg.name.label.name;
@@ -303,7 +290,6 @@ class RequireImageDimensionsRule extends SaropaLintRule {
           }
         }
 
-        // Expanded/Flexible in Row/Column will provide constraints
         if (parentType == 'Expanded' || parentType == 'Flexible') {
           return true;
         }
@@ -313,6 +299,23 @@ class RequireImageDimensionsRule extends SaropaLintRule {
     }
     return false;
   }
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      if (!isMissingExplicitDimensions(node)) return;
+      reporter.atNode(node.constructorName, code);
+    });
+  }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        _RequireImageDimensionsFix(context: context),
+  ];
 }
 
 /// Requires network images to have a placeholder or loadingBuilder.
@@ -406,6 +409,12 @@ class RequirePlaceholderForNetworkRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        _RequirePlaceholderForNetworkFix(context: context),
+  ];
 }
 
 /// Requires ScrollController fields to be disposed in State classes.
@@ -2738,6 +2747,19 @@ class PreferOverlayPortalLayoutBuilderRule extends SaropaLintRule {
   }
 }
 
+/// Comma / spacing before inserting a named argument before `)`.
+String _commaBeforeNewNamedArg(
+  String unitContent,
+  InstanceCreationExpression creation,
+) {
+  final args = creation.argumentList.arguments;
+  final insertAt = creation.argumentList.rightParenthesis.offset;
+  final gapTrim = unitContent.substring(args.last.end, insertAt).trim();
+  if (gapTrim.isEmpty) return ', ';
+  if (gapTrim == ',') return ' ';
+  return ', ';
+}
+
 /// Whether [value] should be upgraded from `http://` to `https://` (same as rule).
 bool _literalNeedsHttpsUpgrade(String value) {
   return value.startsWith('http://') &&
@@ -2789,17 +2811,110 @@ class _RequireImageErrorBuilderFix extends SaropaFixProducer {
     if (args.isEmpty) return;
 
     final insertAt = creation.argumentList.rightParenthesis.offset;
-    final gapTrim = unitResult.content
-        .substring(args.last.end, insertAt)
-        .trim();
     const fallback =
         'errorBuilder: (context, error, stackTrace) => const SizedBox()';
-    // After a trailing comma, only a space is needed; otherwise insert `, `.
-    final insertion = gapTrim.isEmpty
-        ? ', $fallback'
-        : gapTrim == ','
-        ? ' $fallback'
-        : ', $fallback';
+    final insertion =
+        '${_commaBeforeNewNamedArg(unitResult.content, creation)}$fallback';
+
+    await builder.addDartFileEdit(file, (b) {
+      b.addInsertion(insertAt, (eb) {
+        eb.write(insertion);
+      });
+    });
+  }
+}
+
+/// Inserts [loadingBuilder] or [placeholder] for network images missing one.
+class _RequirePlaceholderForNetworkFix extends SaropaFixProducer {
+  _RequirePlaceholderForNetworkFix({required super.context});
+
+  static const _fixKind = FixKind(
+    'saropa.fix.requirePlaceholderForNetwork',
+    80,
+    "Add loading or placeholder callback",
+  );
+
+  @override
+  FixKind get fixKind => _fixKind;
+
+  @override
+  Future<void> compute(ChangeBuilder builder) async {
+    final node = coveringNode;
+    final creation = node is InstanceCreationExpression
+        ? node
+        : node?.thisOrAncestorOfType<InstanceCreationExpression>();
+    if (creation == null) return;
+
+    final String typeName = creation.constructorName.type.name.lexeme;
+    final String? constructorName = creation.constructorName.name?.name;
+
+    final bool isImageNetwork =
+        typeName == 'Image' && constructorName == 'network';
+    final bool isCached = typeName == 'CachedNetworkImage';
+    if (!isImageNetwork && !isCached) return;
+
+    for (final arg in creation.argumentList.arguments) {
+      if (arg is NamedExpression) {
+        final n = arg.name.label.name;
+        if (n == 'loadingBuilder' ||
+            n == 'placeholder' ||
+            n == 'progressIndicatorBuilder') {
+          return;
+        }
+      }
+    }
+
+    final args = creation.argumentList.arguments;
+    if (args.isEmpty) return;
+
+    final insertAt = creation.argumentList.rightParenthesis.offset;
+    final named = isCached
+        ? 'placeholder: (context, url) => const CircularProgressIndicator()'
+        : 'loadingBuilder: (context, child, loadingProgress) => '
+              'loadingProgress == null ? child : const CircularProgressIndicator()';
+    final insertion =
+        '${_commaBeforeNewNamedArg(unitResult.content, creation)}$named';
+
+    await builder.addDartFileEdit(file, (b) {
+      b.addInsertion(insertAt, (eb) {
+        eb.write(insertion);
+      });
+    });
+  }
+}
+
+/// Inserts placeholder [width] and [height] (tune in code) for network images.
+class _RequireImageDimensionsFix extends SaropaFixProducer {
+  _RequireImageDimensionsFix({required super.context});
+
+  static const _fixKind = FixKind(
+    'saropa.fix.requireImageDimensions',
+    80,
+    "Add width: 200, height: 200 (adjust as needed)",
+  );
+
+  @override
+  FixKind get fixKind => _fixKind;
+
+  @override
+  Future<void> compute(ChangeBuilder builder) async {
+    final n = coveringNode;
+    if (n == null) return;
+    final creation = n is InstanceCreationExpression
+        ? n
+        : n.thisOrAncestorOfType<InstanceCreationExpression>();
+    if (creation == null) return;
+    if (!RequireImageDimensionsRule.isMissingExplicitDimensions(creation)) {
+      return;
+    }
+
+    final args = creation.argumentList.arguments;
+    if (args.isEmpty) return;
+
+    final insertAt = creation.argumentList.rightParenthesis.offset;
+    const dims = 'width: 200, height: 200';
+    final insertion =
+        '${_commaBeforeNewNamedArg(unitResult.content, creation)}$dims';
 
     await builder.addDartFileEdit(file, (b) {
       b.addInsertion(insertAt, (eb) {
