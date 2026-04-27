@@ -2,6 +2,8 @@
 
 How to file, investigate, and close bugs in `saropa_lints`.
 
+**False positives are in scope.** If a rule flags code that is correct (or the diagnostic is clearly wrong), file it here under `bugs/` using the [False positive](#false-positive) naming pattern and the [template below](#bug-report-template)—not only in a downstream app’s chat or issue tracker. Downstream repos can link to the bug file once filed; the fix and fixture live in `saropa_lints`.
+
 ---
 
 ## File Naming
@@ -248,6 +250,8 @@ new code
 
 The rule fires on correct code.
 
+**How to report:** Create `bugs/rule_name_false_positive_<short_description>.md`, copy the [Bug Report Template](#bug-report-template), and complete **Reproducer** (minimal snippet) plus **Attribution Evidence** (grep). Severity is usually **High** if teams must add `// ignore:` workarounds on common patterns.
+
 **Investigation focus:**
 - What pattern does the rule fail to recognize as valid?
 - Which condition in the detection logic is too broad?
@@ -325,6 +329,9 @@ These patterns have caused bugs before. Check for them during investigation.
 | Rule fires on generated code | `.g.dart`, `.freezed.dart` files trigger false positives | Check `resolver.path` for generated file suffixes |
 | Rule fires inside test files | Test code intentionally violates patterns | Check with `ProjectContext.isTestFile` if rule should skip tests |
 | `// ignore:` on wrong line | Ignore comment is on the field but diagnostic is on `.listen()` | Report on the node that users expect to annotate |
+| Wrong line / column in Problems panel | After edits, the IDE can show a diagnostic on a stale line (e.g. doc comment or blank line) while the real node moved; `avoid_void_async` can appear offset from the actual `async` | Restart the Dart Analysis Server; confirm with `dart analyze` on the file; paste **both** the reported line:column and the actual offending snippet in the bug |
+| `// ignore:` ignored for a `saropa_lints` rule | Analyzer ignores use the registered rule id; a mismatch silences nothing | Try `// ignore: saropa_lints/<rule_name> -- reason` on the line **immediately above** the violation (same pattern as analyzer `// ignore: name`); if still ignored, file a false positive—suppression wiring may be wrong |
+| `read_lints` vs `dart analyze` disagree | Editor plugin cache or partial workspace analysis | Prefer `dart analyze` (or CI) as ground truth for the bug report; note IDE + plugin versions under **Environment** |
 
 ---
 
