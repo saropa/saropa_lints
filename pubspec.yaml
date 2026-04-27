@@ -59,11 +59,11 @@ dependencies:
   # NOTE: Must stay compatible with Flutter stable's pinned meta version.
   # analyzer 12 requires meta ^1.18.0 which conflicts with Flutter stable's
   # meta 1.17.0 pin — making saropa_lints unresolvable for Flutter consumers.
-  analyzer: ">=9.0.0 <12.0.0"
+  analyzer: ^12.1.0
 
   # A framework and support code for building plugins for the analysis server.
   # https://pub.dev/packages/analyzer_plugin
-  analyzer_plugin: ">=0.11.0 <0.14.7"
+  analyzer_plugin: ^0.14.8
 
   # Collections and utilities functions and classes related to collections.
   # https://pub.dev/packages/collection
