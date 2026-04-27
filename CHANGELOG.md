@@ -46,7 +46,36 @@
 -->
 
 ---
+
+## [Unreleased]
+
+New recommended-tier migrations cover Flutter scrollbar theme lookup and several Dart 3.2 `dart:js_interop` signature changes. The interop rules only fire when the real SDK library is resolved, so local types or extensions that reuse the same names should stay quiet, and outdated `.toDart` chains are still caught when the bool result is cast through dynamic first. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
+
+### Added
+
+- `prefer_scrollbar_theme_of` guides `ScrollbarTheme.of(context)` instead of `Theme.of(context).scrollbarTheme` so inherited scrollbar themes are not skipped. No action required until you enable or adopt the recommended tier.
+- `avoid_legacy_jsboolean_return_assumptions`, `prefer_string_for_typeof_equals`, and `prefer_int_for_jsarray_with_length` target Dart 3.2 `dart:js_interop` changes around `typeofEquals`, `instanceof`, and `JSArray.withLength`. No action required until you enable or adopt the recommended tier.
+
+### Fixed
+
+- `avoid_legacy_jsboolean_return_assumptions`, `prefer_string_for_typeof_equals`, and `prefer_int_for_jsarray_with_length` no longer treat unresolved elements or same-named user declarations as `dart:js_interop`, which removes false positives in mock-heavy code while keeping real interop call sites covered. No action required.
+
+---
+
+## [12.5.4]
+
+This release tightens a noisy repeated-map-lookup lint that could still report in code where extraction was not actually appropriate. The rule now stays out of assignment/update patterns and avoids conflating similarly named variables across different scopes when type resolution is ambiguous. If you were seeing stubborn false positives in loop-heavy or shadowed-variable code, those should now be gone. [log](https://github.com/saropa/saropa_lints/blob/v12.5.4/CHANGELOG.md)
+
+### Fixed
+
+- `prefer_extracting_repeated_map_lookup` now hard-skips write contexts (`[]=`, compound assignment, and increment/decrement), only buckets map-like targets with resolved elements, and refuses unresolved target bucketing, which prevents lingering false positives in shadowed/sibling scopes and mixed read+write loops that users could not safely "extract" anyway. No action required.
+- Diagnostics from the same rule at the same file offset are now deduplicated in reporter emission paths, which reduces duplicate warnings when multiple AST callbacks converge on one location while preserving distinct reports at different offsets or from different rules. No action required.
+
+---
+
 ## [12.5.3]
+
+This release focuses on reducing high-noise false positives in common Flutter patterns so teams can keep strict lint settings enabled without fighting the tool. Several rules now better distinguish real risks from valid callback, const-context, lifecycle, and helper-ownership code. You should see cleaner results in existing codebases with fewer diagnostics that require no meaningful code change. [log](https://github.com/saropa/saropa_lints/blob/v12.5.3/CHANGELOG.md)
 
 ### Fixed
 
@@ -66,7 +95,10 @@
 </details>
 
 ---
+
 ## [12.5.2]
+
+This release is a quality pass aimed at precision: fewer accidental matches, fewer environment-related false alarms, and better handling of real-world project layouts. Notification, animation, platform-import, and permission checks now behave more predictably in production-style code. Most users only need to update and re-run analysis to get quieter, more actionable output. [log](https://github.com/saropa/saropa_lints/blob/v12.5.2/CHANGELOG.md)
 
 ### Fixed
 
@@ -92,7 +124,7 @@
 
 ## [12.5.1]
 
-[log](https://github.com/saropa/saropa_lints/blob/v12.5.1/CHANGELOG.md)
+This release cleans up disposal and accessibility false positives that were noisy in mature widget codebases and design-system wrapper layers. The fixes improve confidence that warnings point to real leaks or UX issues instead of valid cleanup and companion-indicator patterns. If these lints were previously too chatty in your project, this update should be noticeably calmer. [log](https://github.com/saropa/saropa_lints/blob/v12.5.1/CHANGELOG.md)
 
 ### Fixed
 

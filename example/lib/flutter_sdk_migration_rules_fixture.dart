@@ -15,6 +15,8 @@
 //   - avoid_removed_appbar_backwards_compatibility (#055)
 //   - prefer_type_sync_over_is_link_sync (#079)
 //   - avoid_removed_js_number_to_dart (#090)
+//   - prefer_scrollbar_theme_of (#067)
+//   - (091–093 live in flutter_sdk_js_interop_migration_fixture.dart)
 //
 // We import Flutter mocks for widget-shaped rules and dart:convert/dart:io
 // for the SDK rules. JSNumber is referenced as an undefined identifier (the
@@ -203,6 +205,30 @@ class _LinkChecker {
 }
 
 // =============================================================================
+// prefer_scrollbar_theme_of (#067)
+// =============================================================================
+
+ScrollbarThemeData scrollbarThemeBad(BuildContext context) {
+  // expect_lint: prefer_scrollbar_theme_of
+  return Theme.of(context).scrollbarTheme;
+}
+
+ScrollbarThemeData scrollbarThemeBadNested(BuildContext context) {
+  // expect_lint: prefer_scrollbar_theme_of
+  return Theme.of(context.withTag('child')).scrollbarTheme;
+}
+
+ScrollbarThemeData scrollbarThemeGood(BuildContext context) {
+  // OK: dedicated inherited-theme accessor.
+  return ScrollbarTheme.of(context);
+}
+
+ColorScheme scrollbarThemeFalsePositive(BuildContext context) {
+  // OK: only `.scrollbarTheme` should lint.
+  return Theme.of(context).colorScheme;
+}
+
+// =============================================================================
 // avoid_removed_js_number_to_dart (#090) — .toDart on JSNumber → .toDartDouble / .toDartInt
 // =============================================================================
 //
@@ -250,4 +276,49 @@ int jsNumberToDartFalsePositive(_NotJsNumber n) {
 
 class _NotJsNumber {
   int get toDart => 0;
+}
+
+// =============================================================================
+// dart:js_interop migration rules — same-named user APIs (false positives)
+// =============================================================================
+//
+// BAD / expect_lint coverage for #091–#093 uses the real SDK in
+// flutter_sdk_js_interop_migration_fixture.dart so member resolution binds to
+// dart:js_interop. Here we only assert user-defined shapes with the same names
+// do not lint.
+
+class _UserJsObject {}
+
+class _UserJsString {}
+
+class _UserJsNumber {}
+
+class _UserJsArray {
+  _UserJsArray.withLength(_UserJsNumber length);
+}
+
+class _UserJsBoolWrapper {
+  bool get toDart => true;
+}
+
+extension _UserJsInteropNamedExtension on _UserJsObject {
+  _UserJsBoolWrapper typeofEquals(Object? _) => _UserJsBoolWrapper();
+  _UserJsBoolWrapper instanceof(Object? _) => _UserJsBoolWrapper();
+}
+
+bool userJsInteropNamed091DoesNotLint(_UserJsObject o, Object ctor) {
+  // OK: user extension — not dart:js_interop.
+  final a = o.typeofEquals(null).toDart;
+  final b = o.instanceof(ctor).toDart;
+  return a && b;
+}
+
+void userJsInteropNamed092DoesNotLint(_UserJsObject o, _UserJsString s) {
+  // OK: user typeofEquals — JSString-shaped arg must not lint here.
+  o.typeofEquals(s);
+}
+
+_UserJsArray userJsInteropNamed093DoesNotLint(_UserJsNumber n) {
+  // OK: user JSArray.withLength — must not lint.
+  return _UserJsArray.withLength(n);
 }

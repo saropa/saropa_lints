@@ -1,66 +1,80 @@
-# Plan #093
+# Plan #093 - prefer_int_for_jsarray_with_length
 
-**Source:** Dart SDK 3.2.0
-**Category:** Replacement / Migration
-**Relevance Score:** 6
-**Detected APIs:** int, JSNumber, This
+**Source:** Dart SDK 3.2.0 release notes (`dart:js_interop`)  
+**Category:** Breaking-change migration  
+**Priority:** Medium  
+**Status:** Implemented
 
----
-
-## Release Note Entry
-
-> This API now takes in an `int` instead of `JSNumber`.
+**Revision (2026-04-27):** The rule requires `JSArray` from `dart:js_interop` and a `JSNumber` length whose type resolves to that library, avoiding user-defined `JSArray` / `JSNumber` stubs.
 
 ---
 
-## Migration Analysis
+## Normalized Requirement
 
-### What Changed
+In Dart 3.2 (`dart:js_interop`), `JSArray.withLength` parameter changed:
 
-A better pattern or API is now available. The old approach still works but the new one is preferred.
+- **From:** `JSNumber`
+- **To:** `int`
 
-### APIs Involved
+Authoritative source: Dart breaking changes entry for 3.2:
+- "Changed `JSArray.withLength` to take `int` instead of `JSNumber`."
 
-- `int`
-- `JSNumber`
-- `This`
+---
+
+## Exact API Mapping
+
+- **Symbol:** `JSArray.withLength`
+- **Change:** constructor/factory length parameter `JSNumber` -> `int`
+
+### Migration intent
+
+Callers should pass Dart `int` lengths directly. Legacy `JSNumber` wrappers for
+array-length construction are obsolete in 3.2+.
 
 ---
 
 ## Proposed Lint Rule
 
-**Rule Type:** `prefer_replacement`
-**Estimated Difficulty:** medium
+- **Rule name:** `prefer_int_for_jsarray_with_length`
+- **Type:** migration
+- **Severity:** `WARNING`
+- **Impact:** `medium`
+- **Autofix:** none initially
 
-### Detection Strategy
+### Detection strategy
 
-Detect old pattern and suggest the replacement
+1. Match invocations of `JSArray.withLength(...)`.
+2. Resolve symbol to `dart:js_interop` when possible.
+3. Report argument patterns that remain JSNumber-centric (legacy wrappers or
+   conversions) where plain `int` is now expected.
 
-**Relevant AST nodes:**
-- `MethodInvocation`
-- `PropertyAccess`
-- `SimpleIdentifier`
+### False-positive guards
 
-### Fix Strategy
+- Do not report user-defined `withLength` methods.
+- Do not report already-correct `int` arguments.
+- Avoid purely lexical matching when resolved symbol disagrees.
 
-Replace old API/pattern with the new recommended approach
+---
+
+## Acceptance Criteria
+
+- [x] Concrete symbol documented with source proof.
+- [ ] Rule only targets `JSArray.withLength` from `dart:js_interop`.
+- [ ] GOOD tests include valid `int` calls and same-name non-interop APIs.
+- [x] No autofix unless a future pattern is guaranteed-safe.
 
 ---
 
 ## Implementation Checklist
 
-- [ ] Verify the API change in Flutter/Dart SDK source
-- [ ] Determine minimum SDK version requirement
-- [ ] Write detection logic (AST visitor)
-- [ ] Write quick-fix replacement
-- [ ] Create test fixture with bad/good examples
-- [ ] Add unit tests
-- [ ] Register rule in `all_rules.dart`
-- [ ] Add to tier in `tiers.dart`
-- [ ] Update ROADMAP.md
-- [ ] Update CHANGELOG.md
+- [x] Resolve exact symbol from SDK docs.
+- [x] Rewrite plan with final mapping and rule scope.
+- [x] Implement symbol-specific detector.
+- [x] Add fixture/tests + registry/tier updates.
+- [ ] Add changelog update (defer to release batching).
 
 ---
 
-**Status:** Not started
-**Generated:** From Dart SDK v3.2.0 release notes
+## Notes
+
+- Keep coordinated with #091/#092; these are related but distinct API deltas.

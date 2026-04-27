@@ -13,8 +13,14 @@ import 'package:test/test.dart';
 ///   - avoid_removed_appbar_backwards_compatibility (#055, WARNING)
 ///   - prefer_type_sync_over_is_link_sync (#079, WARNING)
 ///   - avoid_removed_js_number_to_dart (#090, WARNING)
+///   - prefer_scrollbar_theme_of (#067, INFO)
+///   - avoid_legacy_jsboolean_return_assumptions (#091, WARNING)
+///   - prefer_string_for_typeof_equals (#092, WARNING)
+///   - prefer_int_for_jsarray_with_length (#093, WARNING)
 ///
-/// Test fixture: example/lib/flutter_sdk_migration_rules_fixture.dart.
+/// Test fixtures:
+///   - example/lib/flutter_sdk_migration_rules_fixture.dart
+///   - example/lib/flutter_sdk_js_interop_migration_fixture.dart (#091–#093)
 ///
 /// **Coverage contract:** every rule listed here is registered in
 /// [recommendedOnlyRules], resolves through [getRulesFromRegistry], declares a
@@ -30,6 +36,10 @@ void main() {
     'avoid_removed_appbar_backwards_compatibility',
     'prefer_type_sync_over_is_link_sync',
     'avoid_removed_js_number_to_dart',
+    'prefer_scrollbar_theme_of',
+    'avoid_legacy_jsboolean_return_assumptions',
+    'prefer_string_for_typeof_equals',
+    'prefer_int_for_jsarray_with_length',
   };
 
   // Subset that exposes a `fixGenerators` quick fix. The remaining rules
@@ -40,27 +50,30 @@ void main() {
     'avoid_deprecated_use_inherited_media_query',
     'prefer_utf8_encode',
     'avoid_removed_appbar_backwards_compatibility',
+    'prefer_scrollbar_theme_of',
   };
 
+  const _flutterSdkMigrationFixturePaths = <String>[
+    'example/lib/flutter_sdk_migration_rules_fixture.dart',
+    'example/lib/flutter_sdk_js_interop_migration_fixture.dart',
+  ];
+
   group('flutter_sdk_migration fixture', () {
-    test('fixture file exists', () {
-      expect(
-        File(
-          'example/lib/flutter_sdk_migration_rules_fixture.dart',
-        ).existsSync(),
-        isTrue,
-      );
+    test('fixture files exist', () {
+      for (final path in _flutterSdkMigrationFixturePaths) {
+        expect(File(path).existsSync(), isTrue, reason: path);
+      }
     });
 
-    test('fixture documents an expect_lint marker for every rule', () {
-      final content = File(
-        'example/lib/flutter_sdk_migration_rules_fixture.dart',
-      ).readAsStringSync();
+    test('fixtures document an expect_lint marker for every rule', () {
+      final merged = _flutterSdkMigrationFixturePaths
+          .map((p) => File(p).readAsStringSync())
+          .join('\n');
       for (final name in flutterSdkMigrationRuleNames) {
         expect(
-          content.contains('expect_lint: $name'),
+          merged.contains('expect_lint: $name'),
           isTrue,
-          reason: 'Fixture should document a BAD case for $name',
+          reason: 'Fixtures should document a BAD case for $name',
         );
       }
     });
@@ -105,11 +118,18 @@ void main() {
         AvoidRemovedAppbarBackwardsCompatibilityRule().impact,
         LintImpact.medium,
       );
+      expect(
+        AvoidLegacyJsBooleanReturnAssumptionsRule().impact,
+        LintImpact.medium,
+      );
+      expect(PreferStringForTypeofEqualsRule().impact, LintImpact.medium);
+      expect(PreferIntForJsarrayWithLengthRule().impact, LintImpact.medium);
     });
 
     test('low impact for stylistic / dead-code migrations', () {
       expect(PreferIterableCastRule().impact, LintImpact.low);
       expect(PreferUtf8EncodeRule().impact, LintImpact.low);
+      expect(PreferScrollbarThemeOfRule().impact, LintImpact.low);
       expect(
         AvoidDeprecatedUseInheritedMediaQueryRule().impact,
         LintImpact.low,
@@ -131,6 +151,13 @@ void main() {
       );
       expect(PreferTypeSyncOverIsLinkSyncRule().requiredPatterns, isNotNull);
       expect(AvoidRemovedJsNumberToDartRule().requiredPatterns, isNotNull);
+      expect(PreferScrollbarThemeOfRule().requiredPatterns, isNotNull);
+      expect(
+        AvoidLegacyJsBooleanReturnAssumptionsRule().requiredPatterns,
+        isNotNull,
+      );
+      expect(PreferStringForTypeofEqualsRule().requiredPatterns, isNotNull);
+      expect(PreferIntForJsarrayWithLengthRule().requiredPatterns, isNotNull);
     });
 
     test('patterns are specific enough to skip irrelevant files', () {
@@ -152,6 +179,26 @@ void main() {
       expect(
         AvoidRemovedJsNumberToDartRule().requiredPatterns,
         contains('toDart'),
+      );
+      expect(
+        PreferScrollbarThemeOfRule().requiredPatterns,
+        contains('scrollbarTheme'),
+      );
+      expect(
+        AvoidLegacyJsBooleanReturnAssumptionsRule().requiredPatterns,
+        contains('typeofEquals'),
+      );
+      expect(
+        AvoidLegacyJsBooleanReturnAssumptionsRule().requiredPatterns,
+        contains('instanceof'),
+      );
+      expect(
+        PreferStringForTypeofEqualsRule().requiredPatterns,
+        contains('typeofEquals'),
+      );
+      expect(
+        PreferIntForJsarrayWithLengthRule().requiredPatterns,
+        contains('withLength'),
       );
     });
   });
@@ -222,6 +269,52 @@ void main() {
       expect(
         rule.code.problemMessage,
         contains('[avoid_removed_js_number_to_dart]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(200));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+
+    test('PreferScrollbarThemeOfRule', () {
+      final rule = PreferScrollbarThemeOfRule();
+      expect(rule.code.lowerCaseName, 'prefer_scrollbar_theme_of');
+      expect(rule.code.problemMessage, contains('[prefer_scrollbar_theme_of]'));
+      expect(rule.code.problemMessage.length, greaterThan(200));
+      expect(rule.code.correctionMessage, isNotNull);
+      expect(rule.fixGenerators, isNotEmpty);
+      expect(rule.requiresFlutterImport, isTrue);
+    });
+
+    test('AvoidLegacyJsBooleanReturnAssumptionsRule', () {
+      final rule = AvoidLegacyJsBooleanReturnAssumptionsRule();
+      expect(
+        rule.code.lowerCaseName,
+        'avoid_legacy_jsboolean_return_assumptions',
+      );
+      expect(
+        rule.code.problemMessage,
+        contains('[avoid_legacy_jsboolean_return_assumptions]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(200));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+
+    test('PreferStringForTypeofEqualsRule', () {
+      final rule = PreferStringForTypeofEqualsRule();
+      expect(rule.code.lowerCaseName, 'prefer_string_for_typeof_equals');
+      expect(
+        rule.code.problemMessage,
+        contains('[prefer_string_for_typeof_equals]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(200));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+
+    test('PreferIntForJsarrayWithLengthRule', () {
+      final rule = PreferIntForJsarrayWithLengthRule();
+      expect(rule.code.lowerCaseName, 'prefer_int_for_jsarray_with_length');
+      expect(
+        rule.code.problemMessage,
+        contains('[prefer_int_for_jsarray_with_length]'),
       );
       expect(rule.code.problemMessage.length, greaterThan(200));
       expect(rule.code.correctionMessage, isNotNull);

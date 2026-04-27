@@ -815,6 +815,10 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_removed_appbar_backwards_compatibility', // WARNING - removed in Flutter 3.10
   'prefer_type_sync_over_is_link_sync', // WARNING - FileSystemEntity.isLinkSync returns false on Windows (plan #079)
   'avoid_removed_js_number_to_dart', // WARNING - JSNumber.toDart removed in Dart 3.2 (plan #090)
+  'prefer_scrollbar_theme_of', // INFO - prefer ScrollbarTheme.of(context) over Theme.of(context).scrollbarTheme (plan #067)
+  'avoid_legacy_jsboolean_return_assumptions', // WARNING - typeofEquals/instanceof return bool in Dart 3.2 (plan #091)
+  'prefer_string_for_typeof_equals', // WARNING - typeofEquals takes String instead of JSString (plan #092)
+  'prefer_int_for_jsarray_with_length', // WARNING - JSArray.withLength takes int instead of JSNumber (plan #093)
   // SDK migration batch 2 (plan files 057–094)
   'prefer_isnan_over_nan_equality', // WARNING - == double.nan is always false (IEEE 754)
   'prefer_code_unit_at', // INFO - avoid .codeUnits[i] allocation (Flutter 3.10)

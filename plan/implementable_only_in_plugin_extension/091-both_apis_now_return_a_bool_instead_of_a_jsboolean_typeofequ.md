@@ -1,69 +1,92 @@
-# Plan #091
+# Plan #091 - avoid_legacy_jsboolean_return_assumptions
 
-**Source:** Dart SDK 3.2.0
-**Category:** Replacement / Migration
-**Relevance Score:** 6
-**Detected APIs:** bool, JSBoolean, typeofEquals, Both
+**Source:** Dart SDK 3.2.0 release notes (`dart:js_interop`)  
+**Category:** Breaking-change migration  
+**Priority:** Medium  
+**Status:** Implemented
 
----
-
-## Release Note Entry
-
-> Both APIs now return a `bool` instead of a `JSBoolean`. `typeofEquals` also
->
-> Context: now takes in a `String` instead of a `JSString`.
+**Revision (2026-04-27):** The rule only matches `typeofEquals` / `instanceof` when the invoked member resolves to `dart:js_interop`, unwraps parenthesized / cast receivers before `.toDart`, and fixture `expect_lint` coverage uses a real `dart:js_interop` import so resolution matches the SDK.
 
 ---
 
-## Migration Analysis
+## Normalized Requirement
 
-### What Changed
+In Dart 3.2 (`dart:js_interop`), these APIs changed return type:
 
-A better pattern or API is now available. The old approach still works but the new one is preferred.
+1. `typeofEquals` : `JSBoolean` -> `bool`
+2. `instanceof` : `JSBoolean` -> `bool`
 
-### APIs Involved
+Authoritative source: Dart breaking changes entry for 3.2:
+- "Changed `typeofEquals` and `instanceof` APIs to both return bool instead of `JSBoolean`."
 
-- `bool`
-- `JSBoolean`
-- `typeofEquals`
-- `Both`
+---
+
+## Exact API Mapping
+
+### Symbol table (Dart 3.1 -> 3.2)
+
+- `typeofEquals(...)`
+  - Old: returns `JSBoolean`
+  - New: returns `bool`
+- `instanceof(...)`
+  - Old: returns `JSBoolean`
+  - New: returns `bool`
+
+### Scope intent
+
+Flag usage patterns that still treat these calls as `JSBoolean` values in
+post-3.2 code paths (for example chaining JSBoolean-specific conversions).
 
 ---
 
 ## Proposed Lint Rule
 
-**Rule Type:** `prefer_replacement`
-**Estimated Difficulty:** medium
+- **Rule name:** `avoid_legacy_jsboolean_return_assumptions`
+- **Type:** migration / compatibility
+- **Severity:** `WARNING`
+- **Impact:** `medium`
+- **Autofix:** none (semantic adaptation varies by callsite)
 
-### Detection Strategy
+### Detection strategy
 
-Detect old pattern and suggest the replacement
+Detect callsites of `typeofEquals` / `instanceof` where surrounding code assumes
+the result is a `JSBoolean` (for example, JSBoolean extension-only usage).
 
-**Relevant AST nodes:**
-- `MethodInvocation`
-- `PropertyAccess`
-- `SimpleIdentifier`
+Recommended implementation shape:
 
-### Fix Strategy
+1. Match `MethodInvocation` where `methodName` in `{typeofEquals, instanceof}`.
+2. Resolve receiver/member to `dart:js_interop` when possible.
+3. Report only when the result is used in a legacy-JSBoolean way; do not report
+   plain boolean condition usage (`if (x.typeofEquals(...))` is already correct).
 
-Replace old API/pattern with the new recommended approach
+### Message guidance
+
+Explain that these APIs already return Dart `bool` in 3.2+, so JSBoolean-era
+adaptation should be removed and standard bool flow should be used.
+
+---
+
+## Acceptance Criteria
+
+- [x] Exact changed members documented with source proof.
+- [ ] Lint only fires on `typeofEquals` / `instanceof` and only on legacy usage.
+- [ ] GOOD cases include normal bool usage in conditions/expressions.
+- [x] No quick fix (semantic migration).
 
 ---
 
 ## Implementation Checklist
 
-- [ ] Verify the API change in Flutter/Dart SDK source
-- [ ] Determine minimum SDK version requirement
-- [ ] Write detection logic (AST visitor)
-- [ ] Write quick-fix replacement
-- [ ] Create test fixture with bad/good examples
-- [ ] Add unit tests
-- [ ] Register rule in `all_rules.dart`
-- [ ] Add to tier in `tiers.dart`
-- [ ] Update ROADMAP.md
-- [ ] Update CHANGELOG.md
+- [x] Resolve concrete symbols from SDK docs.
+- [x] Rewrite plan with exact signatures and scope.
+- [x] Implement detector in Flutter SDK migration rules file.
+- [x] Add fixture BAD/GOOD coverage for legacy-JSBoolean assumptions.
+- [x] Add metadata/registry/tier updates.
+- [ ] Add changelog update (defer to release batching).
 
 ---
 
-**Status:** Not started
-**Generated:** From Dart SDK v3.2.0 release notes
+## Notes
+
+- Keep this rule focused on return-type migration behavior only.
+- Coordinate with #092 and #093 to avoid duplicate reports on the same line.

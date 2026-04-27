@@ -26,6 +26,16 @@ bool _isDartConvertLibrary(LibraryElement? lib) {
   return lib.uri.toString() == 'dart:convert';
 }
 
+bool _isFlutterPackageLibrary(LibraryElement? lib) {
+  if (lib == null) {
+    return true; // unresolved during migration; allow lexical path
+  }
+  final uri = lib.uri;
+  return uri.isScheme('package') &&
+      uri.pathSegments.isNotEmpty &&
+      uri.pathSegments.first == 'flutter';
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // prefer_iterable_cast (#024)
 // ─────────────────────────────────────────────────────────────────────────────
@@ -704,6 +714,31 @@ bool _isJsInteropLibrary(LibraryElement? lib) {
   return lib.uri.toString() == 'dart:js_interop';
 }
 
+/// True only for the real `dart:js_interop` SDK library.
+///
+/// Rules #091–#093 use this (not [_isJsInteropLibrary]) so same-named user
+/// types, extensions, and unresolved elements do not produce false positives.
+bool _isResolvedDartJsInteropLibrary(LibraryElement? lib) =>
+    lib != null && lib.uri.toString() == 'dart:js_interop';
+
+/// Peels `(...)` / `as` wrappers so rules see the underlying expression, e.g.
+/// `(any.typeofEquals('x') as dynamic).toDart` after Dart 3.2 returns `bool`.
+Expression? _unwrapCastAndParentheses(Expression? expr) {
+  var e = expr;
+  while (e != null) {
+    if (e is ParenthesizedExpression) {
+      e = e.expression;
+      continue;
+    }
+    if (e is AsExpression) {
+      e = e.expression;
+      continue;
+    }
+    break;
+  }
+  return e;
+}
+
 /// True when [target]'s static type is `JSNumber` from `dart:js_interop`, or
 /// its type is unresolved (common during migration after the SDK removed the
 /// getter).
@@ -793,5 +828,402 @@ class AvoidRemovedJsNumberToDartRule extends SaropaLintRule {
       if (!_receiverIsJsNumber(node.prefix)) return;
       reporter.atNode(node.identifier);
     });
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// prefer_scrollbar_theme_of (#067)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Flags `Theme.of(context).scrollbarTheme` and suggests
+/// `ScrollbarTheme.of(context)` instead.
+///
+/// Since: Unreleased | Rule version: v1
+///
+/// Flutter 3.7 migrated Scrollbar internals to use `ScrollbarTheme.of(context)`
+/// so inherited `ScrollbarTheme` widgets in the tree are respected.
+/// `Theme.of(context).scrollbarTheme` can miss local `ScrollbarTheme`
+/// overrides. `ScrollbarTheme.of(context)` still falls back to `Theme` when no
+/// local scrollbar theme exists, so it is the more correct API in all cases.
+///
+/// **BAD:**
+/// ```dart
+/// final scrollbarTheme = Theme.of(context).scrollbarTheme;
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final scrollbarTheme = ScrollbarTheme.of(context);
+/// ```
+///
+/// See: https://github.com/flutter/flutter/pull/113237
+class PreferScrollbarThemeOfRule extends SaropaLintRule {
+  PreferScrollbarThemeOfRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'material', 'migration'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get requiresFlutterImport => true;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'scrollbarTheme'};
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        _PreferScrollbarThemeOfFix(context: context),
+  ];
+
+  static const LintCode _code = LintCode(
+    'prefer_scrollbar_theme_of',
+    '[prefer_scrollbar_theme_of] Using Theme.of(context).scrollbarTheme can '
+        'bypass a local ScrollbarTheme inherited higher in the tree. Flutter '
+        'migrated to ScrollbarTheme.of(context) (PR #113237) so Scrollbar '
+        'styling always resolves through the dedicated inherited theme first, '
+        'with Theme fallback when absent. Prefer ScrollbarTheme.of(context) '
+        'for correct theme resolution. {v1}',
+    correctionMessage:
+        "Replace 'Theme.of(context).scrollbarTheme' with "
+        "'ScrollbarTheme.of(context)'.",
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addPropertyAccess((PropertyAccess node) {
+      if (node.propertyName.name != 'scrollbarTheme') return;
+
+      final target = node.realTarget;
+      if (target is! MethodInvocation) return;
+      if (target.methodName.name != 'of') return;
+
+      final themeTarget = target.target;
+      if (themeTarget is! SimpleIdentifier || themeTarget.name != 'Theme') {
+        return;
+      }
+
+      final methodElement = target.methodName.element;
+      if (methodElement is MethodElement &&
+          !_isFlutterPackageLibrary(methodElement.library)) {
+        return;
+      }
+
+      reporter.atNode(node);
+    });
+  }
+}
+
+/// Quick fix: replace `Theme.of(context).scrollbarTheme` with
+/// `ScrollbarTheme.of(context)`.
+class _PreferScrollbarThemeOfFix extends SaropaFixProducer {
+  _PreferScrollbarThemeOfFix({required super.context});
+
+  static const _fixKind = FixKind(
+    'saropa.fix.preferScrollbarThemeOf',
+    80,
+    "Replace with 'ScrollbarTheme.of(context)'",
+  );
+
+  @override
+  FixKind get fixKind => _fixKind;
+
+  @override
+  Future<void> compute(ChangeBuilder builder) async {
+    final node = coveringNode;
+    if (node == null) return;
+
+    final property = node is PropertyAccess
+        ? node
+        : node.thisOrAncestorOfType<PropertyAccess>();
+    if (property == null || property.propertyName.name != 'scrollbarTheme') {
+      return;
+    }
+
+    final target = property.realTarget;
+    if (target is! MethodInvocation || target.methodName.name != 'of') return;
+
+    final themeTarget = target.target;
+    if (themeTarget is! SimpleIdentifier || themeTarget.name != 'Theme') {
+      return;
+    }
+
+    final args = target.argumentList.arguments;
+    if (args.length != 1) return;
+    final contextArg = args.first.toSource();
+    final replacement = 'ScrollbarTheme.of($contextArg)';
+
+    await builder.addDartFileEdit(file, (b) {
+      b.addSimpleReplacement(
+        SourceRange(property.offset, property.length),
+        replacement,
+      );
+    });
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// avoid_legacy_jsboolean_return_assumptions (#091)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Flags legacy JSBoolean-style handling of `typeofEquals` / `instanceof`
+/// return values in `dart:js_interop`.
+///
+/// Since: Unreleased | Rule version: v1
+///
+/// Dart 3.2 changed `typeofEquals` and `instanceof` to return Dart `bool`
+/// instead of `JSBoolean`. Code that still treats these results as JSBoolean
+/// (for example by chaining `.toDart`) reflects a pre-3.2 assumption and
+/// should be migrated to plain bool flow.
+///
+/// **BAD:**
+/// ```dart
+/// final ok = any.typeofEquals('object').toDart;
+/// final isInstance = obj.instanceof(ctor).toDart;
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final ok = any.typeofEquals('object');
+/// final isInstance = obj.instanceof(ctor);
+/// ```
+class AvoidLegacyJsBooleanReturnAssumptionsRule extends SaropaLintRule {
+  AvoidLegacyJsBooleanReturnAssumptionsRule() : super(code: _code);
+
+  static const Set<String> _targetMembers = {'typeofEquals', 'instanceof'};
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'dart-js-interop', 'config', 'migration'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<String>? get requiredPatterns =>
+      const <String>{'typeofEquals', 'instanceof', 'toDart'};
+
+  static const LintCode _code = LintCode(
+    'avoid_legacy_jsboolean_return_assumptions',
+    '[avoid_legacy_jsboolean_return_assumptions] In Dart 3.2, '
+        'dart:js_interop `typeofEquals` and `instanceof` return Dart bool '
+        'instead of JSBoolean. Chaining JSBoolean-era conversions (such as '
+        '`.toDart`) on these results reflects legacy assumptions and should be '
+        'removed. Use the returned bool directly in expressions and conditions. '
+        '{v1}',
+    correctionMessage:
+        "Remove JSBoolean-era conversion and use the bool returned by "
+        "'typeofEquals' / 'instanceof' directly.",
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addPropertyAccess((PropertyAccess node) {
+      if (node.propertyName.name != 'toDart') return;
+      final target = _unwrapCastAndParentheses(node.realTarget);
+      if (!_isTargetInteropBooleanMethodCall(target)) return;
+      reporter.atNode(node.propertyName);
+    });
+
+    context.addPrefixedIdentifier((PrefixedIdentifier node) {
+      if (node.identifier.name != 'toDart') return;
+      if (!_isTargetInteropBooleanMethodCall(
+            _unwrapCastAndParentheses(node.prefix),
+          )) {
+        return;
+      }
+      reporter.atNode(node.identifier);
+    });
+  }
+
+  bool _isTargetInteropBooleanMethodCall(Expression? expr) {
+    if (expr is! MethodInvocation) return false;
+    if (!_targetMembers.contains(expr.methodName.name)) return false;
+    final methodEl = expr.methodName.element;
+    return methodEl is MethodElement &&
+        _isResolvedDartJsInteropLibrary(methodEl.library);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// prefer_string_for_typeof_equals (#092)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Flags `typeofEquals` calls that still pass `JSString`-typed arguments.
+///
+/// Since: Unreleased | Rule version: v1
+///
+/// Dart 3.2 changed `typeofEquals` to take Dart `String` instead of
+/// `JSString`. Call sites should pass plain Dart strings.
+class PreferStringForTypeofEqualsRule extends SaropaLintRule {
+  PreferStringForTypeofEqualsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'dart-js-interop', 'config', 'migration'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'typeofEquals'};
+
+  static const LintCode _code = LintCode(
+    'prefer_string_for_typeof_equals',
+    '[prefer_string_for_typeof_equals] In Dart 3.2, dart:js_interop '
+        '`typeofEquals` now takes String instead of JSString. Passing '
+        'JSString-shaped arguments reflects the pre-3.2 API and should be '
+        'migrated to plain Dart strings. {v1}',
+    correctionMessage:
+        "Pass a Dart String to 'typeofEquals' (for example 'object') "
+        'instead of JSString.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'typeofEquals') return;
+      final methodEl = node.methodName.element;
+      if (methodEl is! MethodElement) return;
+      if (!_isResolvedDartJsInteropLibrary(methodEl.library)) return;
+
+      final args = node.argumentList.arguments;
+      if (args.isEmpty) return;
+      final arg = args.first;
+      if (!_isJsStringLikeExpression(arg)) return;
+
+      reporter.atNode(arg);
+    });
+  }
+
+  bool _isJsStringLikeExpression(Expression arg) {
+    final staticType = arg.staticType;
+    final element = staticType?.element;
+    if (element != null && element.name == 'JSString') {
+      return _isResolvedDartJsInteropLibrary(element.library);
+    }
+
+    if (arg is SimpleIdentifier) {
+      final el = arg.element;
+      if (el is LocalVariableElement) {
+        final t = el.type.element;
+        if (t != null && t.name == 'JSString') {
+          return _isResolvedDartJsInteropLibrary(t.library);
+        }
+      }
+    }
+    return false;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// prefer_int_for_jsarray_with_length (#093)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Flags `JSArray.withLength(...)` calls that still pass `JSNumber`-typed
+/// lengths.
+///
+/// Since: Unreleased | Rule version: v1
+///
+/// Dart 3.2 changed `JSArray.withLength` to take Dart `int` instead of
+/// `JSNumber`. Length values should now be plain Dart integers.
+class PreferIntForJsarrayWithLengthRule extends SaropaLintRule {
+  PreferIntForJsarrayWithLengthRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'dart-js-interop', 'config', 'migration'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'withLength'};
+
+  static const LintCode _code = LintCode(
+    'prefer_int_for_jsarray_with_length',
+    '[prefer_int_for_jsarray_with_length] In Dart 3.2, '
+        'dart:js_interop `JSArray.withLength` takes int instead of JSNumber. '
+        'Passing JSNumber-shaped length values reflects the pre-3.2 API and '
+        'should be migrated to plain Dart int lengths. {v1}',
+    correctionMessage:
+        "Pass a Dart int length to 'JSArray.withLength' instead of JSNumber.",
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      final typeName = node.constructorName.type.name.lexeme;
+      final named = node.constructorName.name?.name;
+      if (typeName != 'JSArray' || named != 'withLength') return;
+
+      final typeEl = node.constructorName.type.element;
+      if (!_isResolvedDartJsInteropLibrary(typeEl?.library)) return;
+
+      final args = node.argumentList.arguments;
+      if (args.isEmpty) return;
+      final lenArg = args.first;
+      if (!_isJsNumberLikeExpression(lenArg)) return;
+
+      reporter.atNode(lenArg);
+    });
+  }
+
+  bool _isJsNumberLikeExpression(Expression arg) {
+    final staticType = arg.staticType;
+    final element = staticType?.element;
+    if (element != null && element.name == 'JSNumber') {
+      return _isResolvedDartJsInteropLibrary(element.library);
+    }
+
+    if (arg is SimpleIdentifier) {
+      final el = arg.element;
+      if (el is LocalVariableElement) {
+        final t = el.type.element;
+        if (t != null && t.name == 'JSNumber') {
+          return _isResolvedDartJsInteropLibrary(t.library);
+        }
+      }
+    }
+    return false;
   }
 }

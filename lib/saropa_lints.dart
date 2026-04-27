@@ -2846,6 +2846,10 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidRemovedAppbarBackwardsCompatibilityRule.new,
   PreferTypeSyncOverIsLinkSyncRule.new,
   AvoidRemovedJsNumberToDartRule.new,
+  PreferScrollbarThemeOfRule.new,
+  AvoidLegacyJsBooleanReturnAssumptionsRule.new,
+  PreferStringForTypeofEqualsRule.new,
+  PreferIntForJsarrayWithLengthRule.new,
 
   // SDK migration batch 2 rules (plan files 057–094)
   PreferIsNanOverNanEqualityRule.new,
