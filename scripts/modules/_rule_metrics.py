@@ -687,6 +687,7 @@ _ROOT_MD_EXCLUDED_FROM_UNSOLVED = frozenset(
     {
         "INDEX.MD",
         "BUG_REPORT_GUIDE.MD",
+        "FINISH_GUIDE.MD",
     },
 )
 

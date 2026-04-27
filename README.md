@@ -764,7 +764,7 @@ For faster iteration during development:
 The tier you choose has a direct impact on analysis speed (approximate rule counts from `getRulesForTier`; stylistic rules are separate unless you pass `--stylistic-all`):
 
 - `essential`: ~300 rules → **fastest** (memory leaks, security, crashes)
-- `recommended`: ~950 rules → moderate (+ accessibility, performance)
+- `recommended`: ~1000 rules → moderate (+ accessibility, performance)
 - `professional`: ~1800 rules → slower (+ architecture, documentation)
 - `comprehensive`: ~1870 rules → stricter patterns and edge cases
 - `pedantic`: ~1880 rules → **slowest** correctness tier (everything before stylistic)

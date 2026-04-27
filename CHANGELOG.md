@@ -47,7 +47,7 @@
 
 ---
 
-## [Unreleased]
+## [12.6.0]
 
 New recommended-tier migrations cover Flutter scrollbar theme lookup and several Dart 3.2 `dart:js_interop` signature changes. The interop rules only fire when the real SDK library is resolved, so local types or extensions that reuse the same names should stay quiet, and outdated `.toDart` chains are still caught when the bool result is cast through dynamic first. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
 

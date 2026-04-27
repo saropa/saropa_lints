@@ -1576,7 +1576,9 @@ void main() {
 
     test('require_https_only has test fixture', () {
       // Located at: example/lib/security/require_https_only_fixture.dart
-      expectFixtureExists('example/lib/security/require_https_only_fixture.dart');
+      expectFixtureExists(
+        'example/lib/security/require_https_only_fixture.dart',
+      );
     });
 
     test('avoid_variable_shadowing has test fixture', () {
@@ -1617,7 +1619,9 @@ void main() {
 
     test('6.0.4 avoid_dynamic_sql has regression fixture', () {
       // example/lib/security/avoid_dynamic_sql_fixture.dart (PRAGMA, word-boundary)
-      expectFixtureExists('example/lib/security/avoid_dynamic_sql_fixture.dart');
+      expectFixtureExists(
+        'example/lib/security/avoid_dynamic_sql_fixture.dart',
+      );
     });
 
     test('6.0.4 avoid_path_traversal has regression fixture', () {
@@ -1647,7 +1651,9 @@ void main() {
 
     test('6.0.4 avoid_unsafe_reduce has regression fixture', () {
       // example/lib/collections/avoid_unsafe_reduce_fixture.dart (guarded reduce)
-      expectFixtureExists('example/lib/collections/avoid_unsafe_reduce_fixture.dart');
+      expectFixtureExists(
+        'example/lib/collections/avoid_unsafe_reduce_fixture.dart',
+      );
     });
 
     test('6.0.4 require_search_debounce has regression fixture', () {

@@ -1017,8 +1017,11 @@ class AvoidLegacyJsBooleanReturnAssumptionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  Set<String>? get requiredPatterns =>
-      const <String>{'typeofEquals', 'instanceof', 'toDart'};
+  Set<String>? get requiredPatterns => const <String>{
+    'typeofEquals',
+    'instanceof',
+    'toDart',
+  };
 
   static const LintCode _code = LintCode(
     'avoid_legacy_jsboolean_return_assumptions',
@@ -1049,8 +1052,8 @@ class AvoidLegacyJsBooleanReturnAssumptionsRule extends SaropaLintRule {
     context.addPrefixedIdentifier((PrefixedIdentifier node) {
       if (node.identifier.name != 'toDart') return;
       if (!_isTargetInteropBooleanMethodCall(
-            _unwrapCastAndParentheses(node.prefix),
-          )) {
+        _unwrapCastAndParentheses(node.prefix),
+      )) {
         return;
       }
       reporter.atNode(node.identifier);

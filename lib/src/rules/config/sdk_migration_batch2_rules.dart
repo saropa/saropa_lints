@@ -1333,7 +1333,8 @@ class _IndexExpressionCollector extends RecursiveAstVisitor<void> {
     if (node.inSetterContext()) return true;
 
     final parent = node.parent;
-    if (parent is AssignmentExpression && identical(parent.leftHandSide, node)) {
+    if (parent is AssignmentExpression &&
+        identical(parent.leftHandSide, node)) {
       return true;
     }
     if (parent is PrefixExpression &&
