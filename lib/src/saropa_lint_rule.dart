@@ -2915,6 +2915,7 @@ class SaropaDiagnosticReporter {
   // Cached file-level ignore result to avoid repeated regex per violation.
   String? _cachedFilePath;
   bool? _cachedFileIgnored;
+  final DiagnosticDedupTracker _dedupTracker = DiagnosticDedupTracker();
 
   /// Reports a diagnostic at the given [node].
   ///
@@ -2928,11 +2929,13 @@ class SaropaDiagnosticReporter {
     if (node is AnnotatedNode) {
       final adjustedOffset = node.firstTokenAfterCommentAndMetadata.offset;
       final length = node.end - adjustedOffset;
+      if (_isDuplicateAttempt(adjustedOffset)) return;
       if (_isSuppressed(adjustedOffset, node)) return;
       _rule.reportAtOffset(adjustedOffset, length);
       _trackViolation(adjustedOffset);
       return;
     }
+    if (_isDuplicateAttempt(node.offset)) return;
     if (_isSuppressed(node.offset, node)) return;
     _rule.reportAtNode(node);
     _trackViolation(node.offset);
@@ -2940,6 +2943,7 @@ class SaropaDiagnosticReporter {
 
   /// Reports a diagnostic at the given [token].
   void atToken(Token token, [LintCode? code]) {
+    if (_isDuplicateAttempt(token.offset)) return;
     if (_isBaselined(token.offset)) {
       _trackSuppression(token.offset, SuppressionKind.baseline);
       return;
@@ -2958,6 +2962,7 @@ class SaropaDiagnosticReporter {
 
   /// Reports a diagnostic at the given offset and length.
   void atOffset({required int offset, required int length}) {
+    if (_isDuplicateAttempt(offset)) return;
     if (_isBaselined(offset)) {
       _trackSuppression(offset, SuppressionKind.baseline);
       return;
@@ -3025,6 +3030,21 @@ class SaropaDiagnosticReporter {
     return _cachedFileIgnored!;
   }
 
+  /// Dedup by (rule, file, offset) within one reporter lifecycle.
+  ///
+  /// This prevents duplicate diagnostics when multiple callbacks reach the same
+  /// location through different traversal paths.
+  bool _isDuplicateAttempt(int offset) {
+    final unit = _ruleContext.currentUnit;
+    if (unit == null) return false;
+    final path = unit.file.path;
+    return !_dedupTracker.shouldReport(
+      ruleName: _ruleName,
+      filePath: path,
+      offset: offset,
+    );
+  }
+
   /// Record this violation in impact and progress trackers.
   void _trackViolation(int offset) {
     final unit = _ruleContext.currentUnit;
@@ -3066,5 +3086,21 @@ class SaropaDiagnosticReporter {
       line: line,
       kind: kind,
     );
+  }
+}
+
+/// Reporter-scoped dedup tracker for diagnostic attempts.
+class DiagnosticDedupTracker {
+  final Set<String> _seenKeys = <String>{};
+
+  bool shouldReport({
+    required String ruleName,
+    required String filePath,
+    required int offset,
+  }) {
+    final key = '$ruleName::$filePath::$offset';
+    if (_seenKeys.contains(key)) return false;
+    _seenKeys.add(key);
+    return true;
   }
 }
