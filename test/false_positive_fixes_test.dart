@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:test/test.dart';
 
 /// Tests for false positive fixes
@@ -1550,60 +1552,79 @@ void main() {
   });
 
   group('Test Fixture Coverage', () {
+    void expectFixtureExists(String path) {
+      expect(
+        File(path).existsSync(),
+        isTrue,
+        reason: 'Expected fixture to exist: $path',
+      );
+    }
+
     test('require_subscription_status_check has test fixture', () {
       // Located at: example/lib/require_subscription_status_check_example.dart
-      expect(true, isTrue);
+      expectFixtureExists(
+        'example/lib/require_subscription_status_check_example.dart',
+      );
     });
 
     test('require_deep_link_fallback has test fixture', () {
       // Located at: example/lib/navigation/require_deep_link_fallback_fixture.dart
-      expect(true, isTrue);
+      expectFixtureExists(
+        'example/lib/navigation/require_deep_link_fallback_fixture.dart',
+      );
     });
 
     test('require_https_only has test fixture', () {
       // Located at: example/lib/security/require_https_only_fixture.dart
-      expect(true, isTrue);
+      expectFixtureExists('example/lib/security/require_https_only_fixture.dart');
     });
 
     test('avoid_variable_shadowing has test fixture', () {
       // Located at: example/lib/avoid_variable_shadowing_fixture.dart
-      expect(true, isTrue);
+      expectFixtureExists('example/lib/avoid_variable_shadowing_fixture.dart');
     });
 
     test('avoid_isar_clear_in_production has test fixture', () {
       // Located at: example_packages/lib/isar/avoid_isar_clear_in_production_fixture.dart
-      expect(true, isTrue);
+      expectFixtureExists(
+        'example_packages/lib/isar/avoid_isar_clear_in_production_fixture.dart',
+      );
     });
 
     test('prefer_late_final has test fixture', () {
       // Located at: example/lib/code_quality/code_quality_fixture.dart
-      expect(true, isTrue);
+      expectFixtureExists('example/lib/code_quality/code_quality_fixture.dart');
     });
 
     test('avoid_nested_assignments has test fixture', () {
       // Located at: example/lib/avoid_nested_assignments_fixture.dart
-      expect(true, isTrue);
+      expectFixtureExists('example/lib/avoid_nested_assignments_fixture.dart');
     });
 
     test('require_websocket_reconnection has mock stubs', () {
       // Located at: example/lib/flutter_mocks.dart (WebSocket, WebSocketChannel)
       // Fixture at: example/lib/async/async_rules_fixture.dart
-      expect(true, isTrue);
+      expectFixtureExists('example/lib/flutter_mocks.dart');
+      expectFixtureExists('example/lib/async/async_rules_fixture.dart');
     });
 
     test('prefer_wheretype_over_where_is has test fixture', () {
       // Located at: example/lib/stylistic_null_collection/prefer_wheretype_over_where_is_fixture.dart
-      expect(true, isTrue);
+      expectFixtureExists(
+        'example/lib/stylistic_null_collection/prefer_wheretype_over_where_is_fixture.dart',
+      );
     });
 
     test('6.0.4 avoid_dynamic_sql has regression fixture', () {
       // example/lib/security/avoid_dynamic_sql_fixture.dart (PRAGMA, word-boundary)
-      expect(true, isTrue);
+      expectFixtureExists('example/lib/security/avoid_dynamic_sql_fixture.dart');
     });
 
     test('6.0.4 avoid_path_traversal has regression fixture', () {
       // example/lib/security/avoid_path_traversal_fixture.dart (private helper)
-      expect(true, isTrue);
+      expectFixtureExists(
+        'example/lib/security/avoid_path_traversal_fixture.dart',
+      );
     });
 
     test(
@@ -1611,28 +1632,36 @@ void main() {
       () {
         // example/lib/security/avoid_screenshot_sensitive_fixture.dart
         // Debug/tooling (viewer, webview) and WebViewScreenFromSettings must NOT trigger
-        expect(true, isTrue);
+        expectFixtureExists(
+          'example/lib/security/avoid_screenshot_sensitive_fixture.dart',
+        );
       },
     );
 
     test('6.0.4 require_file_path_sanitization has regression fixture', () {
       // example/lib/file_handling/require_file_path_sanitization_fixture.dart
-      expect(true, isTrue);
+      expectFixtureExists(
+        'example/lib/file_handling/require_file_path_sanitization_fixture.dart',
+      );
     });
 
     test('6.0.4 avoid_unsafe_reduce has regression fixture', () {
       // example/lib/collections/avoid_unsafe_reduce_fixture.dart (guarded reduce)
-      expect(true, isTrue);
+      expectFixtureExists('example/lib/collections/avoid_unsafe_reduce_fixture.dart');
     });
 
     test('6.0.4 require_search_debounce has regression fixture', () {
       // example/lib/ui_ux/require_search_debounce_fixture.dart (class field debouncer)
-      expect(true, isTrue);
+      expectFixtureExists(
+        'example/lib/ui_ux/require_search_debounce_fixture.dart',
+      );
     });
 
     test('6.0.4 require_minimum_contrast has regression fixture', () {
       // example/lib/accessibility/require_minimum_contrast_fixture.dart (unresolvable bg)
-      expect(true, isTrue);
+      expectFixtureExists(
+        'example/lib/accessibility/require_minimum_contrast_fixture.dart',
+      );
     });
   });
 }
