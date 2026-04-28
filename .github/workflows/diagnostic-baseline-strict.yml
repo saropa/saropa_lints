@@ -1,0 +1,27 @@
+name: diagnostic-baseline-strict
+
+on:
+  workflow_dispatch:
+
+jobs:
+  strict-diagnostic-baseline:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: '3.10.8'
+      - name: Install dependencies
+        run: dart pub get
+      - name: Run saropa scan (allow lint findings)
+        # scan exits 1 when issues are found; we still need the report artifact.
+        run: dart run saropa_lints:scan . || test $? -eq 1
+      - name: Require violations report (strict)
+        run: test -f reports/.saropa_lints/violations.json
+      - name: Refresh diagnostic baseline snapshot
+        run: dart run saropa_lints:diagnostic_baseline
+      - name: Upload diagnostic baseline artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: diagnostic-baseline
+          path: reports/.saropa_lints/diagnostic_baseline.json

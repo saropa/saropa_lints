@@ -32,6 +32,14 @@ jobs:
           sed -i '/^plugins:/,$d' analysis_options.yaml
       - name: Analyze
         run: dart analyze --fatal-infos
+      - name: Analyze saropa_lints_api package
+        run: |
+          cd packages/saropa_lints_api
+          dart pub get
+          dart analyze --fatal-infos
+      - name: Refresh diagnostic baseline snapshot (if available)
+        # Safe no-op when this job does not produce reports/.saropa_lints/violations.json
+        run: test -f reports/.saropa_lints/violations.json && dart run saropa_lints:diagnostic_baseline || true
       - name: Dry run (pub.dev validation)
         # Catches missing direct dependencies and other pub.dev rules; exit 65 = warnings, 66+ = errors
         run: |
@@ -67,8 +75,15 @@ jobs:
           sdk: '3.10.8'
       - name: Install dependencies
         run: dart pub get
+      - name: Stub test integrity report
+        run: dart run bin/stub_test_report.dart --write=reports/stub-test-report.json
       - name: Run tests
         run: dart test
+      - name: saropa_lints_api package tests
+        run: |
+          cd packages/saropa_lints_api
+          dart pub get
+          dart test
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"

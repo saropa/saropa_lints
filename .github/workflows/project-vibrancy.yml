@@ -1,0 +1,37 @@
+name: project-vibrancy
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - "bin/project_vibrancy.dart"
+      - "lib/src/cli/project_vibrancy.dart"
+      - "test/project_vibrancy_cli_test.dart"
+      - ".github/workflows/project-vibrancy.yml"
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: '3.10.8'
+      - name: Install dependencies
+        run: dart pub get
+      - name: Run Project Vibrancy JSON scan
+        run: |
+          mkdir -p reports
+          dart run bin/project_vibrancy.dart \
+            --path . \
+            --format json \
+            --min-grade F \
+            --max-unused 100000 \
+            --max-uncovered 100000 \
+            > reports/project-vibrancy.json
+      - name: Upload Project Vibrancy artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: project-vibrancy-report
+          path: reports/project-vibrancy.json
