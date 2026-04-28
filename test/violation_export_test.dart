@@ -609,6 +609,28 @@ void main() {
       );
     });
 
+    test('consumer contract includes supersedesRulesByRule mapping', () {
+      ViolationExporter.write(
+        projectRoot: projectRoot,
+        sessionId: 'test_session',
+        data: buildData(),
+        owaspLookup: const <String, OwaspMapping>{},
+      );
+
+      final contractFile = File(consumerContractPath());
+      final contract =
+          json.decode(contractFile.readAsStringSync()) as Map<String, dynamic>;
+      final supersedesByRule =
+          contract['supersedesRulesByRule'] as Map<String, dynamic>;
+
+      expect(supersedesByRule, isNotEmpty);
+      expect(
+        (supersedesByRule['prefer_cubit_for_simple_state'] as List<dynamic>)
+            .cast<String>(),
+        contains('prefer_cubit_for_simple'),
+      );
+    });
+
     test('config includes disabledPackages and userExclusions', () {
       final config = ReportConfig(
         version: '4.14.0',

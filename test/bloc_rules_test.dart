@@ -223,6 +223,10 @@ void main() {
       final rule = PreferCubitForSimpleStateRule();
       expect(rule.conflictingRules, contains('avoid_cubit_usage'));
     });
+    test('PreferCubitForSimpleStateRule supersedesRules', () {
+      final rule = PreferCubitForSimpleStateRule();
+      expect(rule.supersedesRules, contains('prefer_cubit_for_simple'));
+    });
     testRule(
       'PreferBlocListenerForSideEffectsRule',
       'prefer_bloc_listener_for_side_effects',

@@ -43,7 +43,12 @@ import { DriftAdvisorTreeProvider } from './driftAdvisor/driftAdvisorTree';
 import { RulePacksWebviewProvider } from './rulePacks/rulePacksWebviewProvider';
 import { openRuleExplainPanelForViolation, openRuleExplainPanel } from './views/ruleExplainView';
 import { readViolations, ViolationsData, getViolationsPath as getViolationsFilePath } from './violationsReader';
-import { setConflictingRulesMetadata, setRelatedRulesMetadata } from './ruleMetadata';
+import {
+  setConflictingRulesMetadata,
+  setRelatedRulesMetadata,
+  setRuleTagsMetadata,
+  setSupersedesRulesMetadata,
+} from './ruleMetadata';
 import { hasSaropaLintsDep } from './pubspecReader';
 import { createPubspecValidation, registerFallbackPubspecListeners } from './pubspec-validation';
 import { PubspecCodeActionProvider } from './pubspec-code-actions';
@@ -172,6 +177,8 @@ function updateIssuesBadge(view: vscode.TreeView<unknown>, issuesProvider: Issue
 function syncRuleMetadataFromViolations(data: ViolationsData | null): void {
   setRelatedRulesMetadata(data?.config?.relatedRulesByRule);
   setConflictingRulesMetadata(data?.config?.conflictingRulesByRule);
+  setSupersedesRulesMetadata(data?.config?.supersedesRulesByRule);
+  setRuleTagsMetadata(data?.config?.ruleMetadataByRule);
 }
 
 export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
@@ -736,6 +743,9 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     }),
     vscode.commands.registerCommand('saropaLints.focusView', () => {
       vscode.commands.executeCommand('saropaLints.overview.focus');
+    }),
+    vscode.commands.registerCommand('saropaLints.openRulePacks', () => {
+      void vscode.commands.executeCommand('saropaLints.rulePacks.focus');
     }),
     vscode.commands.registerCommand('saropaLints.openWalkthrough', () => {
       void vscode.commands.executeCommand(

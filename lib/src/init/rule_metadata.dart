@@ -72,6 +72,7 @@ class RuleMetadata {
     required this.hasFix,
     required this.relatedRules,
     required this.conflictingRules,
+    required this.supersedesRules,
     this.exampleBad,
     this.exampleGood,
   });
@@ -90,6 +91,9 @@ class RuleMetadata {
 
   /// Curated conflicting/opposite rules from rule metadata.
   final List<String> conflictingRules;
+
+  /// Curated migration map: this rule supersedes older rule names.
+  final List<String> supersedesRules;
 
   /// Short BAD example for CLI walkthrough (null if not provided).
   final String? exampleBad;
@@ -124,6 +128,7 @@ Map<String, RuleMetadata> getRuleMetadata() {
       hasFix: rule.fixGenerators.isNotEmpty,
       relatedRules: rule.relatedRules,
       conflictingRules: rule.conflictingRules,
+      supersedesRules: rule.supersedesRules,
       exampleBad: rule.exampleBad,
       exampleGood: rule.exampleGood,
     );
@@ -185,4 +190,9 @@ List<String> getRelatedRules(String ruleName) {
 /// Gets conflicting rules for a rule.
 List<String> getConflictingRules(String ruleName) {
   return getRuleMetadata()[ruleName]?.conflictingRules ?? const <String>[];
+}
+
+/// Gets superseded rules for a rule.
+List<String> getSupersedesRules(String ruleName) {
+  return getRuleMetadata()[ruleName]?.supersedesRules ?? const <String>[];
 }

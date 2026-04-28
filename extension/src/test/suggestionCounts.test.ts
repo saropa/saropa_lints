@@ -96,4 +96,26 @@ describe('countSuggestionItems with temp workspace', () => {
     const withoutBaselineHint = countSuggestionItems(data, dir, 'essential');
     assert.ok(withBaseline > withoutBaselineHint);
   });
+
+  it('adds a pack suggestion when multiple related candidates map to one disabled pack', () => {
+    const data: ViolationsData = {
+      violations: [{ file: 'a.dart', line: 1, rule: 'avoid_bloc_public_fields', message: 'm' }],
+      summary: {
+        totalViolations: 1,
+        issuesByRule: { avoid_bloc_public_fields: 1 },
+      },
+      config: {
+        enabledRuleNames: ['avoid_bloc_public_fields'],
+        relatedRulesByRule: {
+          avoid_bloc_public_fields: [
+            'prefer_bloc_state_suffix',
+            'prefer_bloc_event_suffix',
+          ],
+        },
+      },
+    };
+    const n = countSuggestionItems(data, dir, 'essential');
+    // baseline + related + pack + run + open
+    assert.strictEqual(n, 5);
+  });
 });

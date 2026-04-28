@@ -10,6 +10,8 @@ import { readViolations, filterDisabledFromData, type ViolationsData } from '../
 import { computeHealthScore, estimateScoreWithout } from '../healthScore';
 import { getProjectRoot } from '../projectRoot';
 import { readDisabledRules } from '../configWriter';
+import { RULE_PACK_DEFINITIONS } from '../rulePacks/rulePackDefinitions';
+import { readRulePacksEnabled } from '../rulePacks/rulePackYaml';
 
 export { countSuggestionItems } from '../suggestionCounts';
 
@@ -61,6 +63,7 @@ export class SuggestionsTreeProvider implements vscode.TreeDataProvider<Suggesti
     const relatedByRule = data?.config?.relatedRulesByRule ?? {};
     const conflictingByRule = data?.config?.conflictingRulesByRule ?? {};
     const enabledRules = new Set(data?.config?.enabledRuleNames ?? []);
+    const enabledPackIds = new Set(readRulePacksEnabled(root!));
     const total = data?.summary?.totalViolations ?? data?.violations?.length ?? 0;
     const critical = byImpact?.critical ?? 0;
     const high = byImpact?.high ?? 0;
@@ -165,6 +168,38 @@ export class SuggestionsTreeProvider implements vscode.TreeDataProvider<Suggesti
           if (items.length >= 8) break finalTopRules;
           break;
         }
+      }
+    }
+
+    // Rule pack follow-up: recommend enabling a pack when many unmet related rules
+    // cluster into the same currently-disabled pack.
+    if (items.length < 8) {
+      const candidateRelated = new Set<string>();
+      for (const sourceRule of Object.keys(issuesByRule)) {
+        for (const candidate of relatedByRule[sourceRule] ?? []) {
+          if (!candidate || enabledRules.has(candidate)) continue;
+          candidateRelated.add(candidate);
+        }
+      }
+      const packScores = RULE_PACK_DEFINITIONS
+        .filter((pack) => !enabledPackIds.has(pack.id))
+        .map((pack) => ({
+          pack,
+          relatedCount: pack.ruleCodes.filter((code) => candidateRelated.has(code)).length,
+        }))
+        .filter((row) => row.relatedCount >= 2)
+        .sort((a, b) => b.relatedCount - a.relatedCount || a.pack.label.localeCompare(b.pack.label))
+        .slice(0, 2);
+
+      for (const row of packScores) {
+        if (items.length >= 8) break;
+        items.push(
+          new SuggestionItem(
+            `Enable ${row.pack.label} rule pack`,
+            `${row.relatedCount} related rules available`,
+            'saropaLints.openRulePacks',
+          ),
+        );
       }
     }
 

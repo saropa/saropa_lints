@@ -6,7 +6,12 @@
 
 import * as vscode from 'vscode';
 import { Violation, OwaspData } from '../violationsReader';
-import { getRelatedRules, getRuleDocUrl } from '../ruleMetadata';
+import {
+  getRelatedRules,
+  getRuleDocUrl,
+  getSameTagRules,
+  getSupersedesRules,
+} from '../ruleMetadata';
 
 const VIEW_TYPE = 'saropaLints.ruleExplain';
 const PANEL_TITLE = 'Rule: ';
@@ -54,10 +59,22 @@ function buildHtml(input: RuleExplainInput): string {
   const docUrl = getRuleDocUrl(input.ruleName);
   const relatedRules = (input.relatedRules ?? getRelatedRules(input.ruleName))
     .filter((r) => r !== input.ruleName);
+  const sameTagRules = getSameTagRules(input.ruleName).filter((r) => r !== input.ruleName);
+  const supersedesRules = getSupersedesRules(input.ruleName).filter((r) => r !== input.ruleName);
   const relatedHtml = relatedRules.length
     ? `<section class="block"><h2>Related rules</h2><p>${relatedRules
         .map((r) => `<a href="#" class="related-rule" data-rule="${escapeHtml(r)}"><code>${escapeHtml(r)}</code></a>`)
         .join(', ')}</p></section>`
+    : '';
+  const sameTagHtml = sameTagRules.length
+    ? `<section class="block"><h2>Same-tag discovery</h2><p>${sameTagRules
+        .map((r) => `<a href="#" class="related-rule" data-rule="${escapeHtml(r)}"><code>${escapeHtml(r)}</code></a>`)
+        .join(', ')}</p></section>`
+    : '';
+  const supersedesHtml = supersedesRules.length
+    ? `<section class="block"><h2>Migration</h2><p>This rule supersedes ${supersedesRules
+        .map((r) => `<a href="#" class="related-rule" data-rule="${escapeHtml(r)}"><code>${escapeHtml(r)}</code></a>`)
+        .join(', ')}.</p></section>`
     : '';
 
   const owaspLines: string[] = [];
@@ -158,6 +175,8 @@ function buildHtml(input: RuleExplainInput): string {
 
   ${owaspHtml}
   ${relatedHtml}
+  ${sameTagHtml}
+  ${supersedesHtml}
 
   <section class="block">
     <h2>Documentation</h2>

@@ -2291,6 +2291,16 @@ abstract class SaropaLintRule extends AnalysisRule {
   /// Consumers should avoid recommending entries in this list as follow-ups.
   List<String> get conflictingRules => const <String>[];
 
+  /// Rule names this rule supersedes/replaces.
+  ///
+  /// Use when this rule is the preferred successor to an older or deprecated
+  /// rule so tooling can guide migrations.
+  ///
+  /// Example:
+  /// - new rule `prefer_safe_stream_usage`
+  /// - supersedes: `avoid_unsafe_stream_usage`
+  List<String> get supersedesRules => const <String>[];
+
   /// Tags for filtering and discovery (e.g. in docs, IDE, or CI).
   /// Examples: 'performance', 'accessibility', 'suspicious', 'convention'.
   Set<String> get tags => const <String>{};

@@ -114,6 +114,8 @@ export interface ViolationsData {
     relatedRulesByRule?: Record<string, string[]>;
     /** Rule name -> curated conflicting/opposite rule names. */
     conflictingRulesByRule?: Record<string, string[]>;
+    /** Rule name -> curated superseded/replaced rule names. */
+    supersedesRulesByRule?: Record<string, string[]>;
   };
 }
 
@@ -222,6 +224,19 @@ export function readViolations(workspaceRoot: string): ViolationsData | null {
               !Array.isArray(raw.config.conflictingRulesByRule)
                 ? Object.fromEntries(
                     Object.entries(raw.config.conflictingRulesByRule)
+                      .filter(([, v]) => Array.isArray(v))
+                      .map(([k, v]) => [
+                        k,
+                        (v as unknown[]).filter((x): x is string => typeof x === 'string'),
+                      ]),
+                  )
+                : undefined,
+            supersedesRulesByRule:
+              raw.config.supersedesRulesByRule &&
+              typeof raw.config.supersedesRulesByRule === 'object' &&
+              !Array.isArray(raw.config.supersedesRulesByRule)
+                ? Object.fromEntries(
+                    Object.entries(raw.config.supersedesRulesByRule)
                       .filter(([, v]) => Array.isArray(v))
                       .map(([k, v]) => [
                         k,

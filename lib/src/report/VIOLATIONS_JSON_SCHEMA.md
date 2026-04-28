@@ -39,6 +39,7 @@ Describes the analysis configuration at the time of the run.
 | `ruleMetadataByRule` | `object` | `{ "rule_name": RuleMetadata }` metadata for enabled/triggered rules (type/status/CWE/CERT/tags/accuracy target) |
 | `relatedRulesByRule` | `object` | `{ "rule_name": string[] }` — curated related-rule links for enabled rules |
 | `conflictingRulesByRule` | `object` | `{ "rule_name": string[] }` — curated opposite/conflicting rule links for enabled rules |
+| `supersedesRulesByRule` | `object` | `{ "rule_name": string[] }` — curated migration links: rule names superseded by this rule |
 | `enabledPlatforms` | `string[]` | Detected platforms (e.g. `"android"`, `"ios"`, `"web"`) |
 | `disabledPlatforms` | `string[]` | Platforms excluded by config |
 | `enabledPackages` | `string[]` | Detected packages with dedicated rule support |
@@ -182,6 +183,7 @@ Written alongside `violations.json` at `reports/.saropa_lints/consumer_contract.
 | `tierRuleSets` | `object` | `{ "essential": string[], "recommended": string[], ... }` — sorted rule names per tier |
 | `relatedRulesByRule` | `object` | `{ "rule_name": string[] }` — curated related-rule links across known rules |
 | `conflictingRulesByRule` | `object` | `{ "rule_name": string[] }` — curated opposite/conflicting rule links across known rules |
+| `supersedesRulesByRule` | `object` | `{ "rule_name": string[] }` — curated migration links across known rules |
 
 ---
 

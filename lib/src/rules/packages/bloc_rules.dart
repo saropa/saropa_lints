@@ -3648,6 +3648,11 @@ class PreferCubitForSimpleStateRule extends SaropaLintRule {
   ];
 
   @override
+  List<String> get supersedesRules => const <String>[
+    'prefer_cubit_for_simple',
+  ];
+
+  @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
     SaropaContext context,

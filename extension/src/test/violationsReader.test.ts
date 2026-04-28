@@ -93,6 +93,21 @@ describe('readViolations', () => {
     });
   });
 
+  it('parses config.supersedesRulesByRule when present', () => {
+    const root = writeJson({
+      violations: [],
+      config: {
+        supersedesRulesByRule: {
+          prefer_cubit_for_simple_state: ['prefer_cubit_for_simple'],
+        },
+      },
+    });
+    const data = readViolations(root);
+    assert.deepStrictEqual(data?.config?.supersedesRulesByRule, {
+      prefer_cubit_for_simple_state: ['prefer_cubit_for_simple'],
+    });
+  });
+
   it('returns undefined rulesWithFixes when field is absent (backward compat)', () => {
     const root = writeJson({
       violations: [],

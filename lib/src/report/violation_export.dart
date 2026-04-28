@@ -84,6 +84,9 @@ class ViolationExporter {
       final conflictingRulesByRule = _buildConflictingRulesByRule(
         tiers.getAllDefinedRules(),
       );
+      final supersedesRulesByRule = _buildSupersedesRulesByRule(
+        tiers.getAllDefinedRules(),
+      );
       final json = <String, Object>{
         'schemaVersion': _schemaVersion,
         'healthScore': <String, Object>{
@@ -93,6 +96,7 @@ class ViolationExporter {
         'tierRuleSets': tierRuleSets,
         'relatedRulesByRule': relatedRulesByRule,
         'conflictingRulesByRule': conflictingRulesByRule,
+        'supersedesRulesByRule': supersedesRulesByRule,
       };
       final encoded = const JsonEncoder.withIndent('  ').convert(json);
       _writeAtomicFile(projectRoot, _consumerContractFileName, encoded);
@@ -211,6 +215,9 @@ class ViolationExporter {
     final conflictingRulesByRule = _buildConflictingRulesByRule(
       config.enabledRuleNames,
     );
+    final supersedesRulesByRule = _buildSupersedesRulesByRule(
+      config.enabledRuleNames,
+    );
     return <String, Object>{
       'tier': config.effectiveTier,
       'enabledRuleCount': config.enabledRuleCount,
@@ -221,6 +228,7 @@ class ViolationExporter {
       'ruleMetadataByRule': _ruleMetadataLookupToJson(ruleMetadata),
       'relatedRulesByRule': relatedRulesByRule,
       'conflictingRulesByRule': conflictingRulesByRule,
+      'supersedesRulesByRule': supersedesRulesByRule,
       'enabledPlatforms': config.enabledPlatforms,
       'disabledPlatforms': config.disabledPlatforms,
       'enabledPackages': config.enabledPackages,
@@ -248,6 +256,15 @@ class ViolationExporter {
     return _buildRuleAdjacencyMap(
       ruleNames,
       referencesOf: (rule) => rule.conflictingRules,
+    );
+  }
+
+  static Map<String, List<String>> _buildSupersedesRulesByRule(
+    Iterable<String> ruleNames,
+  ) {
+    return _buildRuleAdjacencyMap(
+      ruleNames,
+      referencesOf: (rule) => rule.supersedesRules,
     );
   }
 

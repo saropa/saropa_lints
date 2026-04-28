@@ -10,6 +10,8 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import type { ViolationsData } from './violationsReader';
+import { RULE_PACK_DEFINITIONS } from './rulePacks/rulePackDefinitions';
+import { readRulePacksEnabled } from './rulePacks/rulePackYaml';
 
 /**
  * Same row count as `SuggestionsTreeProvider.getChildren` (capped at 8), for Overview sidebar toggles.
@@ -21,6 +23,7 @@ export function countSuggestionItems(data: ViolationsData, root: string, tier: s
   const relatedByRule = data.config?.relatedRulesByRule ?? {};
   const conflictingByRule = data.config?.conflictingRulesByRule ?? {};
   const enabledRules = new Set(data.config?.enabledRuleNames ?? []);
+  const enabledPackIds = new Set(readRulePacksEnabled(root));
   const total = data.summary?.totalViolations ?? data.violations.length;
   const critical = byImpact?.critical ?? 0;
   const high = byImpact?.high ?? 0;
@@ -62,6 +65,23 @@ export function countSuggestionItems(data: ViolationsData, root: string, tier: s
     if (!candidate) continue;
     if (labels.includes(`related:${candidate}`)) continue;
     labels.push(`related:${candidate}`);
+  }
+
+  const candidateRelated = new Set<string>();
+  for (const sourceRule of Object.keys(issuesByRule)) {
+    for (const candidate of relatedByRule[sourceRule] ?? []) {
+      if (!candidate || enabledRules.has(candidate)) continue;
+      candidateRelated.add(candidate);
+    }
+  }
+  const packSuggestionCount = RULE_PACK_DEFINITIONS
+    .filter((pack) => !enabledPackIds.has(pack.id))
+    .map((pack) => pack.ruleCodes.filter((code) => candidateRelated.has(code)).length)
+    .filter((count) => count >= 2)
+    .sort((a, b) => b - a)
+    .slice(0, 2).length;
+  for (let i = 0; i < packSuggestionCount && labels.length < 8; i += 1) {
+    labels.push(`pack:${i}`);
   }
 
   labels.push('run', 'open');

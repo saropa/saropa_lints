@@ -3134,6 +3134,7 @@ void registerSaropaLintRules(PluginRegistry registry) {
     if (rules.isEmpty) return;
     _logUnknownRelatedRuleReferences(rules);
     _logUnknownConflictingRuleReferences(rules);
+    _logUnknownSupersedesRuleReferences(rules);
 
     var registered = 0;
     for (final rule in rules) {
@@ -3183,6 +3184,14 @@ void _logUnknownConflictingRuleReferences(List<SaropaLintRule> rules) {
     rules,
     referencesOf: (rule) => rule.conflictingRules,
     label: 'conflicting',
+  );
+}
+
+void _logUnknownSupersedesRuleReferences(List<SaropaLintRule> rules) {
+  _logUnknownRuleReferences(
+    rules,
+    referencesOf: (rule) => rule.supersedesRules,
+    label: 'supersedes',
   );
 }
 
