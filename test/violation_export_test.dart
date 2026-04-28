@@ -291,6 +291,42 @@ void main() {
       expect(web, contains('a07'));
     });
 
+    test('includes rule metadata in config and violation entries', () {
+      final violations = <LintImpact, List<ViolationRecord>>{
+        LintImpact.critical: [
+          _violation(
+            rule: 'avoid_hardcoded_credentials',
+            file: 'lib/auth.dart',
+            line: 5,
+          ),
+        ],
+      };
+
+      ViolationExporter.write(
+        projectRoot: projectRoot,
+        sessionId: 'test_session',
+        data: buildData(violations: violations),
+        owaspLookup: const <String, OwaspMapping>{},
+      );
+
+      final parsed = readExport();
+      final config = parsed['config'] as Map<String, dynamic>;
+      final byRule =
+          config['ruleMetadataByRule'] as Map<String, dynamic>;
+      final ruleMeta =
+          byRule['avoid_hardcoded_credentials'] as Map<String, dynamic>;
+      expect(ruleMeta['ruleType'], 'vulnerability');
+      expect(ruleMeta['ruleStatus'], isNotEmpty);
+      expect((ruleMeta['cweIds'] as List<dynamic>).contains(798), isTrue);
+
+      final exported = parsed['violations'] as List<dynamic>;
+      final violation = exported.first as Map<String, dynamic>;
+      final violationMeta = violation['metadata'] as Map<String, dynamic>;
+      expect(violationMeta['ruleType'], 'vulnerability');
+      expect((violationMeta['cweIds'] as List<dynamic>).contains(798), isTrue);
+      expect(violationMeta['tags'], isA<List<dynamic>>());
+    });
+
     test('OWASP empty arrays for non-security rules', () {
       final violations = <LintImpact, List<ViolationRecord>>{
         LintImpact.low: [
@@ -530,6 +566,28 @@ void main() {
       expect(fixes, equals(fixes.toList()..sort()));
     });
 
+    test('consumer contract includes relatedRulesByRule mapping', () {
+      ViolationExporter.write(
+        projectRoot: projectRoot,
+        sessionId: 'test_session',
+        data: buildData(),
+        owaspLookup: const <String, OwaspMapping>{},
+      );
+
+      final contractFile = File(consumerContractPath());
+      final contract =
+          json.decode(contractFile.readAsStringSync()) as Map<String, dynamic>;
+      final relatedByRule =
+          contract['relatedRulesByRule'] as Map<String, dynamic>;
+
+      expect(relatedByRule, isNotEmpty);
+      expect(
+        (relatedByRule['require_secure_storage'] as List<dynamic>)
+            .cast<String>(),
+        contains('avoid_hardcoded_credentials'),
+      );
+    });
+
     test('config includes disabledPackages and userExclusions', () {
       final config = ReportConfig(
         version: '4.14.0',
@@ -609,6 +667,39 @@ void main() {
       final exported = summary['issuesByRule'] as Map<String, dynamic>;
       expect(exported['avoid_print'], 12);
       expect(exported['prefer_const'], 3);
+    });
+
+    test('summary includes byRuleType and byRuleStatus', () {
+      final byRule = {
+        'avoid_hardcoded_credentials': 2,
+        'prefer_const': 3,
+      };
+      final violations = <LintImpact, List<ViolationRecord>>{
+        LintImpact.critical: [
+          _violation(
+            rule: 'avoid_hardcoded_credentials',
+            file: 'lib/auth.dart',
+            line: 5,
+          ),
+        ],
+        LintImpact.low: [
+          _violation(rule: 'prefer_const', file: 'lib/ui.dart', line: 10),
+        ],
+      };
+
+      ViolationExporter.write(
+        projectRoot: projectRoot,
+        sessionId: 'test_session',
+        data: buildData(issuesByRule: byRule, violations: violations),
+        owaspLookup: const <String, OwaspMapping>{},
+      );
+
+      final summary = readExport()['summary'] as Map<String, dynamic>;
+      final byRuleType = summary['byRuleType'] as Map<String, dynamic>;
+      final byRuleStatus = summary['byRuleStatus'] as Map<String, dynamic>;
+
+      expect(byRuleType['vulnerability'], 2);
+      expect(byRuleStatus['ready'], 5);
     });
 
     test('summary ruleSeverities uses lowercase values', () {

@@ -17,6 +17,9 @@ import type { ViolationsData } from './violationsReader';
 export function countSuggestionItems(data: ViolationsData, root: string, tier: string): number {
   const byImpact = data.summary?.byImpact;
   const bySeverity = data.summary?.bySeverity;
+  const issuesByRule = data.summary?.issuesByRule ?? {};
+  const relatedByRule = data.config?.relatedRulesByRule ?? {};
+  const enabledRules = new Set(data.config?.enabledRuleNames ?? []);
   const total = data.summary?.totalViolations ?? data.violations.length;
   const critical = byImpact?.critical ?? 0;
   const high = byImpact?.high ?? 0;
@@ -40,6 +43,20 @@ export function countSuggestionItems(data: ViolationsData, root: string, tier: s
   if (tier === 'recommended' && total > 0) {
     labels.push('tier');
   }
+
+  // Match SuggestionsTree related-rule recommendations (up to 5 source rules).
+  for (const sourceRule of Object.entries(issuesByRule)
+    .sort((a, b) => b[1] - a[1])
+    .map(([rule]) => rule)
+    .slice(0, 5)) {
+    if (labels.length >= 8) break;
+    const related = relatedByRule[sourceRule] ?? [];
+    const candidate = related.find((r) => r && !enabledRules.has(r));
+    if (!candidate) continue;
+    if (labels.includes(`related:${candidate}`)) continue;
+    labels.push(`related:${candidate}`);
+  }
+
   labels.push('run', 'open');
   return Math.min(labels.length, 8);
 }

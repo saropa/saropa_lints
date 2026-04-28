@@ -57,6 +57,9 @@ export class SuggestionsTreeProvider implements vscode.TreeDataProvider<Suggesti
 
     const byImpact = data?.summary?.byImpact;
     const bySeverity = data?.summary?.bySeverity;
+    const issuesByRule = data?.summary?.issuesByRule ?? {};
+    const relatedByRule = data?.config?.relatedRulesByRule ?? {};
+    const enabledRules = new Set(data?.config?.enabledRuleNames ?? []);
     const total = data?.summary?.totalViolations ?? data?.violations?.length ?? 0;
     const critical = byImpact?.critical ?? 0;
     const high = byImpact?.high ?? 0;
@@ -132,6 +135,31 @@ export class SuggestionsTreeProvider implements vscode.TreeDataProvider<Suggesti
           'saropaLints.initializeConfig',
         ),
       );
+    }
+
+    // Surface curated related rules that are not enabled yet.
+    if (items.length < 8 && Object.keys(issuesByRule).length > 0) {
+      finalTopRules:
+      for (const sourceRule of Object.entries(issuesByRule)
+        .sort((a, b) => b[1] - a[1])
+        .map(([rule]) => rule)
+        .slice(0, 5)) {
+        const related = relatedByRule[sourceRule] ?? [];
+        for (const candidate of related) {
+          if (!candidate || enabledRules.has(candidate)) continue;
+          if (items.some((i) => String(i.label).includes(candidate))) continue;
+          items.push(
+            new SuggestionItem(
+              `Consider enabling ${candidate}`,
+              `Related to active rule ${sourceRule}`,
+              'saropaLints.explainRule',
+              [candidate],
+            ),
+          );
+          if (items.length >= 8) break finalTopRules;
+          break;
+        }
+      }
     }
 
     items.push(new SuggestionItem('Run analysis', 'Refresh violations', 'saropaLints.runAnalysis'));

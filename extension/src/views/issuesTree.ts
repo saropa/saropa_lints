@@ -8,7 +8,7 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 import { normalizePath, cachedFileExists, clearFileExistsCache } from '../pathUtils';
-import { getRuleDescription, getRuleDocUrl } from '../ruleMetadata';
+import { getRelatedRules, getRuleDescription, getRuleDocUrl } from '../ruleMetadata';
 import { readViolations, hasViolations, Violation } from '../violationsReader';
 import { computeHealthScore, estimateScoreWithoutViolation } from '../healthScore';
 import { logReport, logSection, flushReport } from '../reportWriter';
@@ -61,9 +61,24 @@ function getPageSize(): number {
  * 'severity' is the default (Error/Warning/Info); other modes flatten
  * across severities and group by the chosen dimension.
  */
-export type GroupByMode = 'severity' | 'file' | 'impact' | 'rule' | 'owasp';
+export type GroupByMode =
+  | 'severity'
+  | 'file'
+  | 'impact'
+  | 'rule'
+  | 'owasp'
+  | 'ruleType'
+  | 'ruleStatus';
 
-const GROUP_BY_MODES: readonly GroupByMode[] = ['severity', 'file', 'impact', 'rule', 'owasp'];
+const GROUP_BY_MODES: readonly GroupByMode[] = [
+  'severity',
+  'file',
+  'impact',
+  'rule',
+  'owasp',
+  'ruleType',
+  'ruleStatus',
+];
 
 /** Default grouping for new workspaces: impact surfaces Critical / High first. */
 export function parseViolationsGroupBy(cfg: vscode.WorkspaceConfiguration): GroupByMode {
@@ -651,6 +666,19 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
         if (desc) {
           tooltip.appendMarkdown('\n\n' + desc.replace(/]/g, '\\]'));
         }
+        const related = getRelatedRules(ruleName).filter((r) => r !== ruleName);
+        if (related.length > 0) {
+          tooltip.appendMarkdown('\n\n**See also:** ');
+          tooltip.appendMarkdown(
+            related
+              .slice(0, 3)
+              .map((r) => '`' + r.replace(/`/g, '\\`') + '`')
+              .join(', '),
+          );
+          if (related.length > 3) {
+            tooltip.appendMarkdown(`, +${related.length - 3} more`);
+          }
+        }
         tooltip.appendMarkdown('\n\n[More](' + getRuleDocUrl(ruleName) + ')');
       }
       item.tooltip = tooltip;
@@ -703,6 +731,10 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
         );
       } else if (element.mode === 'owasp') {
         item.iconPath = new vscode.ThemeIcon('shield');
+      } else if (element.mode === 'ruleStatus') {
+        item.iconPath = new vscode.ThemeIcon('versions');
+      } else if (element.mode === 'ruleType') {
+        item.iconPath = new vscode.ThemeIcon('symbol-property');
       } else {
         item.iconPath = new vscode.ThemeIcon('symbol-method');
       }
@@ -921,7 +953,7 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
         kind: 'group',
         mode: currentMode,
         groupKey: key,
-        label: currentMode === 'impact' ? key.charAt(0).toUpperCase() + key.slice(1) : key,
+        label: formatGroupLabel(currentMode, key),
         count: violations.length,
         violations,
       });
@@ -947,6 +979,8 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
     if (mode === 'impact') return [(v.impact ?? 'low').toLowerCase()];
     if (mode === 'rule') return [v.rule];
     if (mode === 'file') return [v.file];
+    if (mode === 'ruleType') return [v.metadata?.ruleType ?? 'unspecified'];
+    if (mode === 'ruleStatus') return [v.metadata?.ruleStatus ?? 'ready'];
     // OWASP: violation can map to multiple categories (e.g. both M1 and A03).
     // Use normalizeOwaspId (strip text after colon) to match the canonical IDs
     // used by securityPostureTree and owaspExport.
@@ -957,6 +991,20 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
   getParent(element: IssueTreeNode): vscode.ProviderResult<IssueTreeNode> {
     return undefined;
   }
+}
+
+function formatGroupLabel(mode: GroupByMode, key: string): string {
+  if (mode === 'impact') {
+    return key.charAt(0).toUpperCase() + key.slice(1);
+  }
+  if (mode === 'ruleType' || mode === 'ruleStatus') {
+    return key
+      .replace(/([a-z])([A-Z])/g, '$1 $2')
+      .replaceAll('_', ' ')
+      .replaceAll('-', ' ')
+      .replace(/\b\w/g, (c) => c.toUpperCase());
+  }
+  return key;
 }
 
 /** D10: Group violations by file into FileItem[], sorted by count desc then basename (matches tree labels). */

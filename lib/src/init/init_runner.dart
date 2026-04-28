@@ -452,6 +452,10 @@ Future<void> runInit(List<String> args) async {
     finalDisabled: finalDisabled,
     userCustomizations: userCustomizations,
   );
+  _printRelatedRuleHints(
+    finalEnabled: finalEnabled,
+    userCustomizations: userCustomizations,
+  );
 
   // Append rule-by-rule detail to the log file (not printed to terminal)
   appendDetailedReport(
@@ -622,6 +626,44 @@ void _printRuleSummary({
       '${InitColors.cyan}${customBySeverity['INFO'] ?? 0} info${InitColors.reset}'
       '${InitColors.dim})${InitColors.reset}',
     );
+  }
+  log.terminal('');
+}
+
+void _printRelatedRuleHints({
+  required Set<String> finalEnabled,
+  required Map<String, bool> userCustomizations,
+}) {
+  final explicitlyEnabled = userCustomizations.entries
+      .where((entry) => entry.value)
+      .map((entry) => entry.key)
+      .where(finalEnabled.contains)
+      .toList()
+    ..sort();
+  if (explicitlyEnabled.isEmpty) return;
+
+  final suggestions = <String, List<String>>{};
+  for (final rule in explicitlyEnabled) {
+    final relatedNotEnabled = getRelatedRules(
+      rule,
+    ).where((candidate) => !finalEnabled.contains(candidate)).toList();
+    if (relatedNotEnabled.isNotEmpty) {
+      suggestions[rule] = relatedNotEnabled;
+    }
+  }
+  if (suggestions.isEmpty) return;
+
+  log.terminal('${InitColors.bold}Related rules you may also want:${InitColors.reset}');
+  for (final source in suggestions.keys.take(3)) {
+    final related = suggestions[source]!;
+    log.terminal(
+      '  ${InitColors.dim}$source${InitColors.reset} → ${related.take(3).join(', ')}'
+      '${related.length > 3 ? ' ${InitColors.dim}(+${related.length - 3} more)${InitColors.reset}' : ''}',
+    );
+  }
+  final hiddenCount = suggestions.length - 3;
+  if (hiddenCount > 0) {
+    log.terminal('  ${InitColors.dim}... $hiddenCount more rule(s) with related suggestions${InitColors.reset}');
   }
   log.terminal('');
 }

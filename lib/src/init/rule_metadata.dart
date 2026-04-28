@@ -70,6 +70,7 @@ class RuleMetadata {
     required this.severity,
     required this.tier,
     required this.hasFix,
+    required this.relatedRules,
     this.exampleBad,
     this.exampleGood,
   });
@@ -82,6 +83,9 @@ class RuleMetadata {
 
   /// Whether this rule provides a quick fix in the IDE.
   final bool hasFix;
+
+  /// Curated related rules from rule metadata.
+  final List<String> relatedRules;
 
   /// Short BAD example for CLI walkthrough (null if not provided).
   final String? exampleBad;
@@ -114,6 +118,7 @@ Map<String, RuleMetadata> getRuleMetadata() {
       severity: severity,
       tier: tier,
       hasFix: rule.fixGenerators.isNotEmpty,
+      relatedRules: rule.relatedRules,
       exampleBad: rule.exampleBad,
       exampleGood: rule.exampleGood,
     );
@@ -165,4 +170,9 @@ String getRuleSeverity(String ruleName) {
 /// Gets the tier for a rule.
 RuleTier getRuleTierFromMetadata(String ruleName) {
   return getRuleMetadata()[ruleName]?.tier ?? RuleTier.professional;
+}
+
+/// Gets related rules for a rule.
+List<String> getRelatedRules(String ruleName) {
+  return getRuleMetadata()[ruleName]?.relatedRules ?? const <String>[];
 }

@@ -49,10 +49,29 @@
 
 ## [Unreleased]
 
+### Added
+
+- Related-rule guidance is now available end-to-end via exported rule metadata (`violations.json` and `consumer_contract.json`), extension surfaces (Issues tooltip, Rule Explain links, Suggestions), and init post-write hints so users can discover complementary rules faster without manual lookup. No action required.
+- Package Vibrancy now persists per-package score snapshots in workspace-local history and renders inline sparklines in the report so users can see score direction at a glance without external tracking. No action required.
+- Package Vibrancy now auto-exports Markdown and JSON reports after each successful scan, so report files are always available without manual export clicks; set `saropaLints.packageVibrancy.autoExportReportsOnScan` to `false` if you prefer manual-only exports. No action required unless you want to disable auto-export.
+
+### Changed
+
+- Extension UX now uses **Setup & triage** and **Activity bar sections** as the primary labels, with clearer not-analyzed vs no-violations copy and matching command/help text, so users can find configuration and findings without Config-vs-Options ambiguity. No action required.
+
 ### Fixed
 
 - `avoid_money_arithmetic_on_double` no longer treats a bare `*Rate` suffix as financial intent, which removes false positives for non-monetary identifiers such as frame, sample, or heart rates while preserving warnings for clearly financial names like `taxRate` and `feeRate`. No action required.
 - Rule execution profiling now records actual callback timing and exposes a stable JSON contract (`ruleName`, `totalMs`, `callCount`, `avgMs`) through `RuleTimingTracker.summaryJson`, so CI can detect performance regressions without parsing human-formatted logs. No action required unless you are consuming timing data, in which case switch to the JSON payload.
+- Diagnostic statistics now support per-rule threshold gates and baseline-diff reporting in both the analysis report and `violations.json`, so CI can fail on targeted rule regressions and track newly introduced violations without custom parsers. To adopt this workflow, generate a baseline with `dart run saropa_lints:diagnostic_baseline` and reference it under `diagnostic_statistics.baseline.file` in `analysis_options_custom.yaml`.
+
+<details>
+<summary>Maintenance</summary>
+
+- Discussion #59 (custom suppression prefixes) is now explicitly deferred as policy-blocked in its discussion document, so contributors do not accidentally implement plugin-side custom ignore parsing under current project policy. No action required for package users.
+- Added a dedicated `diagnostic-baseline-strict` GitHub Actions workflow for maintainers to fail fast when `violations.json` is missing before baseline refresh, so strict baseline regeneration can be run independently without changing default CI behavior. No action required for package users.
+
+</details>
 
 ---
 

@@ -32,11 +32,31 @@ void main() {
       'require_secure_storage',
       () => RequireSecureStorageRule(),
     );
+    test('RequireSecureStorageRule relatedRules', () {
+      final rule = RequireSecureStorageRule();
+      expect(
+        rule.relatedRules,
+        containsAll(<String>[
+          'avoid_hardcoded_credentials',
+          'require_secure_storage_for_auth',
+        ]),
+      );
+    });
     testRule(
       'AvoidHardcodedCredentialsRule',
       'avoid_hardcoded_credentials',
       () => AvoidHardcodedCredentialsRule(),
     );
+    test('AvoidHardcodedCredentialsRule relatedRules', () {
+      final rule = AvoidHardcodedCredentialsRule();
+      expect(
+        rule.relatedRules,
+        containsAll(<String>[
+          'require_secure_storage',
+          'require_secure_storage_auth_data',
+        ]),
+      );
+    });
     testRule(
       'RequireInputSanitizationRule',
       'require_input_sanitization',

@@ -1,9 +1,10 @@
 # Discussion: Related Rules (Link related rules together, suggest complementary rules)
 
 **Source:** [GitHub Discussion #57](https://github.com/saropa/saropa_lints/discussions/57)  
-**Priority:** Low  
+**Priority:** Completed  
 **ROADMAP:** Part 3 — Planned Enhancements (SaropaLintRule Base Class)  
-**Last reviewed:** 2026-04-14
+**Last reviewed:** 2026-04-28
+**Status:** Implemented (Phases 1-3 complete)
 
 ---
 
@@ -124,6 +125,8 @@ Conclusion: An optional `List<String> relatedRules` on the rule class is low cos
 2. **Tag-based auto-discovery:** Should the extension also show "rules with the same tag" alongside explicit `relatedRules`? This could be noisy for broad tags like `'performance'` (49 rules in `performance_rules.dart` alone).
 3. **Rule Packs integration:** Should rule packs auto-suggest related rules that aren't in the pack? Or is that scope creep for this discussion?
 
+These are deferred follow-ups and are out of scope for Discussion #57 completion.
+
 ---
 
 ## 9. Decision log
@@ -134,3 +137,6 @@ Conclusion: An optional `List<String> relatedRules` on the rule class is low cos
 | 2026-03-19 | No changes; plan still speculative. |
 | 2026-04-14 | Updated: documented existing `tags` getter (2083 usages), extension surfaces (Rule Explain, hover, suggestions, rule packs), added phased implementation plan, clarified when `relatedRules` adds value beyond tags. |
 | 2026-04-27 | Re-reviewed: still low-priority metadata enhancement; useful but non-blocking and not ideal for immediate closeout compared to smaller/high-certainty work. |
+| 2026-04-28 | Implemented **Phase 1** in codebase: added `SaropaLintRule.relatedRules`, plugin startup validation/logging for unknown references, and seeded curated related-rule links for disposal/state-management/security clusters with unit tests. |
+| 2026-04-28 | Implemented **Phase 2 (core surfaces)**: exported `config.relatedRulesByRule` in `violations.json`, showed related rules in Issues tooltip ("See also"), added related links to Rule Explain panel, and added Suggestions hints for related rules not currently enabled. |
+| 2026-04-28 | Implemented **Phase 3**: extended `consumer_contract.json` with `relatedRulesByRule` for downstream docs/catalog consumers, and added init CLI post-write hints that suggest related rules when users explicitly enable rule overrides. |

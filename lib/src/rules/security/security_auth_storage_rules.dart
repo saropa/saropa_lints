@@ -29,6 +29,13 @@ class RequireSecureStorageRule extends SaropaLintRule {
   Set<String> get tags => const {'security'};
 
   @override
+  List<String> get relatedRules => const <String>[
+    'avoid_hardcoded_credentials',
+    'require_secure_storage_for_auth',
+    'require_secure_storage_auth_data',
+  ];
+
+  @override
   List<int> get cweIds => const <int>[311];
   @override
   RuleCost get cost => RuleCost.low;
@@ -141,6 +148,13 @@ class AvoidHardcodedCredentialsRule extends SaropaLintRule {
 
   @override
   Set<String> get tags => const {'security'};
+
+  @override
+  List<String> get relatedRules => const <String>[
+    'require_secure_storage',
+    'require_secure_storage_for_auth',
+    'require_secure_storage_auth_data',
+  ];
 
   @override
   RuleCost get cost => RuleCost.medium;

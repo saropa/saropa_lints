@@ -30,6 +30,17 @@ void main() {
       'require_stream_controller_dispose',
       () => RequireStreamControllerDisposeRule(),
     );
+    test('RequireStreamControllerDisposeRule relatedRules', () {
+      final rule = RequireStreamControllerDisposeRule();
+      expect(
+        rule.relatedRules,
+        containsAll(<String>[
+          'require_dispose_implementation',
+          'require_animation_controller_dispose',
+          'require_mounted_check',
+        ]),
+      );
+    });
 
     testRule(
       'RequireValueNotifierDisposeRule',
@@ -42,6 +53,16 @@ void main() {
       'require_mounted_check',
       () => RequireMountedCheckRule(),
     );
+    test('RequireMountedCheckRule relatedRules', () {
+      final rule = RequireMountedCheckRule();
+      expect(
+        rule.relatedRules,
+        containsAll(<String>[
+          'require_stream_controller_dispose',
+          'require_dispose_implementation',
+        ]),
+      );
+    });
 
     testRule(
       'AvoidStatefulWithoutStateRule',

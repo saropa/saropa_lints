@@ -268,6 +268,13 @@ class RequireAnimationControllerDisposeRule extends SaropaLintRule {
   Set<String> get tags => const {'flutter', 'ui'};
 
   @override
+  List<String> get relatedRules => const <String>[
+    'require_dispose_implementation',
+    'require_stream_controller_dispose',
+    'require_animation_ticker_disposal',
+  ];
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override

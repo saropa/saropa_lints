@@ -5,8 +5,10 @@ import 'dart:developer' as developer;
 import 'dart:io' show Directory, File, stderr;
 
 import 'package:path/path.dart' as path;
-import 'package:saropa_lints/saropa_lints.dart' show rulesWithFixes;
+import 'package:saropa_lints/saropa_lints.dart'
+    show getRulesFromRegistry, rulesWithFixes;
 import 'package:saropa_lints/src/report/analysis_reporter.dart';
+import 'package:saropa_lints/src/report/diagnostic_statistics.dart';
 import 'package:saropa_lints/src/report/health_score_constants.dart';
 import 'package:saropa_lints/src/report/report_consolidator.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart';
@@ -76,6 +78,9 @@ class ViolationExporter {
         final rules = tiers.getRulesForTier(tierId).toList()..sort();
         tierRuleSets[tierId] = rules;
       }
+      final relatedRulesByRule = _buildRelatedRulesByRule(
+        tiers.getAllDefinedRules(),
+      );
       final json = <String, Object>{
         'schemaVersion': _schemaVersion,
         'healthScore': <String, Object>{
@@ -83,6 +88,7 @@ class ViolationExporter {
           'decayRate': healthScoreDecayRate,
         },
         'tierRuleSets': tierRuleSets,
+        'relatedRulesByRule': relatedRulesByRule,
       };
       final encoded = const JsonEncoder.withIndent('  ').convert(json);
       _writeAtomicFile(projectRoot, _consumerContractFileName, encoded);
@@ -159,33 +165,45 @@ class ViolationExporter {
     required Map<String, OwaspMapping> owaspLookup,
   }) {
     final config = data.config;
+    final ruleMetadata = _buildRuleMetadataLookup(
+      config: config,
+      violations: data.violations,
+    );
 
     return <String, Object>{
       'schema': _schemaVersion,
       if (config != null) 'version': config.version,
       'timestamp': DateTime.now().toUtc().toIso8601String(),
       'sessionId': sessionId,
-      'config': _buildConfig(config),
-      'summary': _buildSummary(data, projectRoot),
+      'config': _buildConfig(config, ruleMetadata),
+      'summary': _buildSummary(data, projectRoot, ruleMetadata),
       'violations': _buildViolations(
         projectRoot: projectRoot,
         violations: data.violations,
         ruleSeverities: data.ruleSeverities,
         owaspLookup: owaspLookup,
+        ruleMetadata: ruleMetadata,
       ),
     };
   }
 
   /// Build the config section.
-  static Map<String, Object> _buildConfig(ReportConfig? config) {
+  static Map<String, Object> _buildConfig(
+    ReportConfig? config,
+    Map<String, _RuleMetadataSnapshot> ruleMetadata,
+  ) {
     if (config == null) {
-      return <String, Object>{'tier': 'unknown'};
+      return <String, Object>{
+        'tier': 'unknown',
+        'ruleMetadataByRule': _ruleMetadataLookupToJson(ruleMetadata),
+      };
     }
 
     // Extension triage UI uses this to separate stylistic (opt-in) rules.
     final stylisticList = tiers.stylisticRules.toList()..sort();
     // Extension uses this to disable "Apply fix" for rules without fixes.
     final fixList = rulesWithFixes.toList()..sort();
+    final relatedRulesByRule = _buildRelatedRulesByRule(config.enabledRuleNames);
     return <String, Object>{
       'tier': config.effectiveTier,
       'enabledRuleCount': config.enabledRuleCount,
@@ -193,6 +211,8 @@ class ViolationExporter {
       'enabledRuleNames': config.enabledRuleNames,
       'stylisticRuleNames': stylisticList,
       'rulesWithFixes': fixList,
+      'ruleMetadataByRule': _ruleMetadataLookupToJson(ruleMetadata),
+      'relatedRulesByRule': relatedRulesByRule,
       'enabledPlatforms': config.enabledPlatforms,
       'disabledPlatforms': config.disabledPlatforms,
       'enabledPackages': config.enabledPackages,
@@ -205,11 +225,52 @@ class ViolationExporter {
     };
   }
 
+  static Map<String, List<String>> _buildRelatedRulesByRule(
+    Iterable<String> ruleNames,
+  ) {
+    final ruleNameList = ruleNames.toList();
+    if (ruleNameList.isEmpty) return const <String, List<String>>{};
+
+    final enabledSet = ruleNameList.toSet();
+    final relatedByRule = <String, List<String>>{};
+    final rules = getRulesFromRegistry(enabledSet);
+
+    for (final rule in rules) {
+      final source = rule.code.lowerCaseName;
+      if (source.isEmpty) continue;
+      if (rule.relatedRules.isEmpty) continue;
+
+      final normalized = <String>{};
+      for (final related in rule.relatedRules) {
+        final name = related.trim();
+        if (name.isEmpty || name == source) continue;
+        normalized.add(name);
+      }
+      if (normalized.isEmpty) continue;
+
+      final sorted = normalized.toList()..sort();
+      relatedByRule[source] = sorted;
+    }
+
+    return relatedByRule;
+  }
+
   /// Build the summary section with aggregate counts.
   static Map<String, Object> _buildSummary(
     ConsolidatedData data,
     String projectRoot,
+    Map<String, _RuleMetadataSnapshot> ruleMetadata,
   ) {
+    final diagnosticStats = DiagnosticStatisticsEvaluator.evaluate(
+      projectRoot: projectRoot,
+      issuesByRule: data.issuesByRule,
+    );
+
+    final metadataBreakdown = _buildIssueBreakdownByMetadata(
+      issuesByRule: data.issuesByRule,
+      ruleMetadata: ruleMetadata,
+    );
+
     return <String, Object>{
       'filesAnalyzed': data.filesAnalyzed,
       'filesWithIssues': data.filesWithIssues,
@@ -226,13 +287,62 @@ class ViolationExporter {
       },
       'issuesByFile': _relativizeFileKeys(data.issuesByFile, projectRoot),
       'issuesByRule': data.issuesByRule,
+      'byRuleType': metadataBreakdown.byRuleType,
+      'byRuleStatus': metadataBreakdown.byRuleStatus,
       'ruleSeverities': _lowercaseSeverities(data.ruleSeverities),
+      'thresholds': _buildThresholdSummary(diagnosticStats.thresholds),
+      'baselineDiff': _buildBaselineDiffSummary(diagnosticStats.baseline),
       // Suppression tracking: counts of diagnostics silenced by ignore
       // comments or baseline, broken down by kind, rule, and file.
       // Consumed by the extension Overview tree and available for CI.
       // Uses consolidated data from BatchData merge so multi-isolate
       // counts are accurate.
       'suppressions': _buildSuppressionSummary(data, projectRoot),
+    };
+  }
+
+  static Map<String, Object> _buildThresholdSummary(
+    ThresholdEvaluation thresholds,
+  ) {
+    final warnings = thresholds.warnings
+        .map(
+          (b) => <String, Object>{
+            'rule': b.rule,
+            'count': b.count,
+            'threshold': b.threshold,
+          },
+        )
+        .toList(growable: false);
+    final failures = thresholds.failures
+        .map(
+          (b) => <String, Object>{
+            'rule': b.rule,
+            'count': b.count,
+            'threshold': b.threshold,
+          },
+        )
+        .toList(growable: false);
+
+    return <String, Object>{
+      'configured': DiagnosticStatisticsConfig.hasThresholds,
+      'status': failures.isNotEmpty
+          ? 'fail'
+          : warnings.isNotEmpty
+          ? 'warn'
+          : 'pass',
+      'warnings': warnings,
+      'failures': failures,
+    };
+  }
+
+  static Map<String, Object> _buildBaselineDiffSummary(BaselineDiff baseline) {
+    return <String, Object>{
+      'enabled': baseline.enabled,
+      if (baseline.baselinePath != null) 'baselinePath': baseline.baselinePath!,
+      'baselineFound': baseline.baselineFound,
+      'baselineTotalViolations': baseline.baselineTotal,
+      'totalNewViolations': baseline.totalNewViolations,
+      'newViolationsByRule': baseline.byRule,
     };
   }
 
@@ -292,6 +402,28 @@ class ViolationExporter {
     };
   }
 
+  static _MetadataIssueBreakdown _buildIssueBreakdownByMetadata({
+    required Map<String, int> issuesByRule,
+    required Map<String, _RuleMetadataSnapshot> ruleMetadata,
+  }) {
+    final byRuleType = <String, int>{};
+    final byRuleStatus = <String, int>{};
+
+    for (final entry in issuesByRule.entries) {
+      final count = entry.value;
+      final metadata = ruleMetadata[entry.key];
+      final ruleType = metadata?.ruleType ?? 'unspecified';
+      final ruleStatus = metadata?.ruleStatus ?? 'ready';
+      byRuleType[ruleType] = (byRuleType[ruleType] ?? 0) + count;
+      byRuleStatus[ruleStatus] = (byRuleStatus[ruleStatus] ?? 0) + count;
+    }
+
+    return _MetadataIssueBreakdown(
+      byRuleType: byRuleType,
+      byRuleStatus: byRuleStatus,
+    );
+  }
+
   /// Relativize file path keys for cross-machine compatibility.
   static Map<String, int> _relativizeFileKeys(
     Map<String, int> issuesByFile,
@@ -312,6 +444,7 @@ class ViolationExporter {
     required Map<LintImpact, List<ViolationRecord>> violations,
     required Map<String, String> ruleSeverities,
     required Map<String, OwaspMapping> owaspLookup,
+    required Map<String, _RuleMetadataSnapshot> ruleMetadata,
   }) {
     final result = <_SortableViolation>[];
 
@@ -327,6 +460,7 @@ class ViolationExporter {
             relativePath: toRelativePath(v.file, projectRoot),
             severity: ruleSeverities[v.rule]?.toLowerCase() ?? 'info',
             owasp: owaspLookup[v.rule],
+            metadata: ruleMetadata[v.rule],
           ),
         );
       }
@@ -361,6 +495,67 @@ class ViolationExporter {
       'severity': v.severity,
       'impact': v.impact.name,
       'owasp': _owaspToJson(v.owasp),
+      'metadata': _ruleMetadataToJson(v.metadata),
+    };
+  }
+
+  static Map<String, _RuleMetadataSnapshot> _buildRuleMetadataLookup({
+    required ReportConfig? config,
+    required Map<LintImpact, List<ViolationRecord>> violations,
+  }) {
+    final ruleNames = <String>{};
+    if (config != null) {
+      ruleNames.addAll(config.enabledRuleNames);
+    }
+    for (final entries in violations.values) {
+      for (final violation in entries) {
+        ruleNames.add(violation.rule);
+      }
+    }
+    if (ruleNames.isEmpty) {
+      return const <String, _RuleMetadataSnapshot>{};
+    }
+
+    final rules = getRulesFromRegistry(ruleNames);
+    return <String, _RuleMetadataSnapshot>{
+      for (final rule in rules)
+        rule.code.lowerCaseName: _RuleMetadataSnapshot.fromRule(rule),
+    };
+  }
+
+  static Map<String, Object?> _ruleMetadataLookupToJson(
+    Map<String, _RuleMetadataSnapshot> metadata,
+  ) {
+    final sortedEntries = metadata.entries.toList()
+      ..sort((a, b) => a.key.compareTo(b.key));
+    return <String, Object?>{
+      for (final entry in sortedEntries) entry.key: entry.value.toJson(),
+    };
+  }
+
+  static Map<String, Object?> _ruleMetadataToJson(
+    _RuleMetadataSnapshot? metadata,
+  ) {
+    if (metadata == null) {
+      return const <String, Object?>{
+        'ruleType': null,
+        'ruleStatus': 'ready',
+        'cweIds': <int>[],
+        'certIds': <String>[],
+        'tags': <String>[],
+        'accuracyTarget': null,
+      };
+    }
+    return metadata.toJson();
+  }
+
+  static Map<String, Object>? _accuracyTargetToJson(AccuracyTarget? target) {
+    if (target == null) return null;
+    return <String, Object>{
+      'expectZeroFalsePositives': target.expectZeroFalsePositives,
+      if (target.minTruePositiveRate != null)
+        'minTruePositiveRate': target.minTruePositiveRate!,
+      if (target.description != null) 'description': target.description!,
     };
   }
 
@@ -408,6 +603,7 @@ class _SortableViolation {
     required this.relativePath,
     required this.severity,
     required this.owasp,
+    required this.metadata,
   });
 
   final ViolationRecord record;
@@ -415,4 +611,60 @@ class _SortableViolation {
   final String relativePath;
   final String severity;
   final OwaspMapping? owasp;
+  final _RuleMetadataSnapshot? metadata;
+}
+
+class _RuleMetadataSnapshot {
+  const _RuleMetadataSnapshot({
+    required this.ruleType,
+    required this.ruleStatus,
+    required this.cweIds,
+    required this.certIds,
+    required this.tags,
+    required this.accuracyTarget,
+  });
+
+  factory _RuleMetadataSnapshot.fromRule(SaropaLintRule rule) {
+    final cwe = rule.cweIds.toList()..sort();
+    final cert = rule.certIds.toList()..sort();
+    final tags = rule.tags.toList()..sort();
+    return _RuleMetadataSnapshot(
+      ruleType: rule.ruleType?.name,
+      ruleStatus: rule.ruleStatus.name,
+      cweIds: cwe,
+      certIds: cert,
+      tags: tags,
+      accuracyTarget: ViolationExporter._accuracyTargetToJson(
+        rule.accuracyTarget,
+      ),
+    );
+  }
+
+  final String? ruleType;
+  final String ruleStatus;
+  final List<int> cweIds;
+  final List<String> certIds;
+  final List<String> tags;
+  final Map<String, Object?>? accuracyTarget;
+
+  Map<String, Object?> toJson() {
+    return <String, Object?>{
+      'ruleType': ruleType,
+      'ruleStatus': ruleStatus,
+      'cweIds': cweIds,
+      'certIds': certIds,
+      'tags': tags,
+      'accuracyTarget': accuracyTarget,
+    };
+  }
+}
+
+class _MetadataIssueBreakdown {
+  const _MetadataIssueBreakdown({
+    required this.byRuleType,
+    required this.byRuleStatus,
+  });
+
+  final Map<String, int> byRuleType;
+  final Map<String, int> byRuleStatus;
 }

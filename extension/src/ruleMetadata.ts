@@ -5,6 +5,17 @@
 
 /** Base URL for rule documentation (ROADMAP and repo). */
 export const RULE_DOC_BASE_URL = 'https://github.com/saropa/saropa_lints/blob/main/ROADMAP.md';
+let relatedRulesByRule: Record<string, string[]> = {};
+
+export function setRelatedRulesMetadata(
+  byRule: Record<string, string[]> | undefined,
+): void {
+  relatedRulesByRule = byRule ?? {};
+}
+
+export function getRelatedRules(ruleName: string): string[] {
+  return relatedRulesByRule[ruleName] ?? [];
+}
 
 /**
  * Optional one-line description for a rule. Returns undefined if not known.

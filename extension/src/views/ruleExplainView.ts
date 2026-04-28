@@ -6,7 +6,7 @@
 
 import * as vscode from 'vscode';
 import { Violation, OwaspData } from '../violationsReader';
-import { getRuleDocUrl } from '../ruleMetadata';
+import { getRelatedRules, getRuleDocUrl } from '../ruleMetadata';
 
 const VIEW_TYPE = 'saropaLints.ruleExplain';
 const PANEL_TITLE = 'Rule: ';
@@ -20,6 +20,7 @@ export interface RuleExplainInput {
   owasp?: OwaspData;
   /** Optional location for context (e.g. "lib/main.dart:42") */
   location?: string;
+  relatedRules?: string[];
 }
 
 function fromViolation(v: Violation): RuleExplainInput {
@@ -51,6 +52,13 @@ function buildHtml(input: RuleExplainInput): string {
   const impact = input.impact ? escapeHtml(input.impact) : '';
   const location = input.location ? escapeHtml(input.location) : '';
   const docUrl = getRuleDocUrl(input.ruleName);
+  const relatedRules = (input.relatedRules ?? getRelatedRules(input.ruleName))
+    .filter((r) => r !== input.ruleName);
+  const relatedHtml = relatedRules.length
+    ? `<section class="block"><h2>Related rules</h2><p>${relatedRules
+        .map((r) => `<a href="#" class="related-rule" data-rule="${escapeHtml(r)}"><code>${escapeHtml(r)}</code></a>`)
+        .join(', ')}</p></section>`
+    : '';
 
   const owaspLines: string[] = [];
   if (input.owasp?.mobile?.length) {
@@ -149,6 +157,7 @@ function buildHtml(input: RuleExplainInput): string {
   ${correction ? `<section class="block"><h2>How to fix</h2><p>${correction}</p></section>` : ''}
 
   ${owaspHtml}
+  ${relatedHtml}
 
   <section class="block">
     <h2>Documentation</h2>
@@ -161,6 +170,12 @@ function buildHtml(input: RuleExplainInput): string {
         link.addEventListener('click', function(e) {
           e.preventDefault();
           vscode.postMessage({ type: 'openUrl', url: link.dataset.url });
+        });
+      });
+      document.querySelectorAll('a.related-rule[data-rule]').forEach(function(link) {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          vscode.postMessage({ type: 'openRule', ruleName: link.dataset.rule });
         });
       });
     })();
@@ -194,11 +209,16 @@ export function openRuleExplainPanel(input: RuleExplainInput): void {
 
   activePanel.webview.html = buildHtml(input);
 
-  activePanel.webview.onDidReceiveMessage((msg: { type: string; url?: string }) => {
+  activePanel.webview.onDidReceiveMessage(
+    (msg: { type: string; url?: string; ruleName?: string }) => {
     if (msg.type === 'openUrl' && msg.url) {
       void vscode.env.openExternal(vscode.Uri.parse(msg.url));
     }
-  });
+      if (msg.type === 'openRule' && typeof msg.ruleName === 'string') {
+        openRuleExplainPanel({ ruleName: msg.ruleName });
+      }
+    }
+  );
 
   activePanel.onDidDispose(() => {
     activePanel = undefined;

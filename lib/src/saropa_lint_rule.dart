@@ -2273,6 +2273,15 @@ abstract class SaropaLintRule extends AnalysisRule {
   /// there is a clear mapping; leave empty for most rules initially.
   List<String> get certIds => const <String>[];
 
+  /// Curated "see also" rule names for discoverability in docs/IDE tooling.
+  ///
+  /// Use canonical rule names (`code.lowerCaseName`), for example:
+  /// `require_stream_controller_dispose`.
+  ///
+  /// Keep this list intentionally small and directional (2-5 items): it is
+  /// not an auto-generated "same tag" list, but explicit pairwise guidance.
+  List<String> get relatedRules => const <String>[];
+
   /// Tags for filtering and discovery (e.g. in docs, IDE, or CI).
   /// Examples: 'performance', 'accessibility', 'suspicious', 'convention'.
   Set<String> get tags => const <String>{};

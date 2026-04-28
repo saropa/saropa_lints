@@ -3132,6 +3132,7 @@ void registerSaropaLintRules(PluginRegistry registry) {
     // rules happens in `SaropaContext._wrapCallback` at ~O(1) per visit.
     final rules = _ruleFactories.values.map((f) => f()).toList(growable: false);
     if (rules.isEmpty) return;
+    _logUnknownRelatedRuleReferences(rules);
 
     var registered = 0;
     for (final rule in rules) {
@@ -3165,6 +3166,32 @@ void registerSaropaLintRules(PluginRegistry registry) {
       error: e,
       stackTrace: st,
     );
+  }
+}
+
+void _logUnknownRelatedRuleReferences(List<SaropaLintRule> rules) {
+  final knownRuleNames = rules
+      .map((rule) => rule.code.lowerCaseName)
+      .where((name) => name.isNotEmpty)
+      .toSet();
+  final loggedUnknownPairs = <String>{};
+
+  for (final rule in rules) {
+    final sourceRuleName = rule.code.lowerCaseName;
+    if (sourceRuleName.isEmpty) continue;
+
+    for (final relatedRule in rule.relatedRules) {
+      final normalized = relatedRule.trim();
+      if (normalized.isEmpty || knownRuleNames.contains(normalized)) {
+        continue;
+      }
+      final pair = '$sourceRuleName->$normalized';
+      if (!loggedUnknownPairs.add(pair)) continue;
+
+      PluginLogger.log(
+        'Unknown related rule reference "$normalized" declared by "$sourceRuleName".',
+      );
+    }
   }
 }
 

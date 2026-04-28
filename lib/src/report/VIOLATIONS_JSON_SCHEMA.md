@@ -36,6 +36,8 @@ Describes the analysis configuration at the time of the run.
 | `enabledRuleNames` | `string[]` | Sorted list of enabled rule names |
 | `stylisticRuleNames` | `string[]` | Sorted list of opt-in stylistic rules (no tier) |
 | `rulesWithFixes` | `string[]` | Sorted list of rules that provide quick fixes |
+| `ruleMetadataByRule` | `object` | `{ "rule_name": RuleMetadata }` metadata for enabled/triggered rules (type/status/CWE/CERT/tags/accuracy target) |
+| `relatedRulesByRule` | `object` | `{ "rule_name": string[] }` — curated related-rule links for enabled rules |
 | `enabledPlatforms` | `string[]` | Detected platforms (e.g. `"android"`, `"ios"`, `"web"`) |
 | `disabledPlatforms` | `string[]` | Platforms excluded by config |
 | `enabledPackages` | `string[]` | Detected packages with dedicated rule support |
@@ -63,7 +65,11 @@ Aggregate statistics for the analysis run. **This is the primary section for CI 
 | `byImpact` | `object` | `{ "critical": int, "high": int, "medium": int, "low": int, "opinionated": int }` |
 | `issuesByFile` | `object` | `{ "relative/path.dart": int, ... }` — violation count per file, relative paths |
 | `issuesByRule` | `object` | `{ "rule_name": int, ... }` — violation count per rule |
+| `byRuleType` | `object` | `{ "vulnerability": int, "codeSmell": int, "bug": int, "securityHotspot": int, "unspecified": int }` — issue-weighted totals by metadata type |
+| `byRuleStatus` | `object` | `{ "ready": int, "beta": int, "deprecated": int }` — issue-weighted totals by lifecycle status |
 | `ruleSeverities` | `object` | `{ "rule_name": "warning", ... }` — lowercase severity per triggered rule |
+| `thresholds` | `object` | Per-rule threshold gate status and breaches (`status`, `warnings`, `failures`) |
+| `baselineDiff` | `object` | Baseline comparison result (`totalNewViolations`, `newViolationsByRule`, baseline metadata) |
 
 ### CI usage examples
 
@@ -76,6 +82,41 @@ jq -r '.summary.issuesByRule | to_entries | sort_by(-.value) | .[0:5] | .[] | "\
 
 # Fail if total violations exceed a threshold
 jq -e '.summary.totalViolations <= 200' reports/.saropa_lints/violations.json
+
+# Fail CI when any configured per-rule fail threshold is breached
+jq -e '.summary.thresholds.status != "fail"' reports/.saropa_lints/violations.json
+
+# Fail CI when PR/run introduces new violations vs baseline snapshot
+jq -e '.summary.baselineDiff.totalNewViolations == 0' reports/.saropa_lints/violations.json
+```
+
+### Create baseline snapshot for `baselineDiff`
+
+```bash
+# Generates reports/.saropa_lints/diagnostic_baseline.json
+dart run saropa_lints:diagnostic_baseline
+```
+
+Then reference it from `analysis_options_custom.yaml`:
+
+```yaml
+diagnostic_statistics:
+  baseline:
+    file: reports/.saropa_lints/diagnostic_baseline.json
+```
+
+GitHub Actions one-liner (safe no-op when `violations.json` is absent):
+
+```yaml
+- run: test -f reports/.saropa_lints/violations.json && dart run saropa_lints:diagnostic_baseline || true
+```
+
+Strict variant (fail if scan/report did not produce `violations.json`):
+
+```yaml
+- run: dart run saropa_lints:scan . || test $? -eq 1
+- run: test -f reports/.saropa_lints/violations.json
+- run: dart run saropa_lints:diagnostic_baseline
 ```
 
 ---
@@ -94,6 +135,7 @@ Individual violation records, sorted by: impact (critical first) → file (alpha
 | `severity` | `string` | `"error"`, `"warning"`, or `"info"` (lowercase) |
 | `impact` | `string` | `"critical"`, `"high"`, `"medium"`, `"low"`, or `"opinionated"` |
 | `owasp` | `object` | `{ "mobile": string[], "web": string[] }` — OWASP category IDs (lowercase), empty arrays when not applicable |
+| `metadata` | `object` | Rule metadata snapshot for this violation (`ruleType`, `ruleStatus`, `cweIds`, `certIds`, `tags`, `accuracyTarget`) |
 
 ### Example violation entry
 
@@ -109,6 +151,14 @@ Individual violation records, sorted by: impact (critical first) → file (alpha
   "owasp": {
     "mobile": ["m1"],
     "web": ["a07"]
+  },
+  "metadata": {
+    "ruleType": "vulnerability",
+    "ruleStatus": "ready",
+    "cweIds": [798],
+    "certIds": [],
+    "tags": ["security"],
+    "accuracyTarget": null
   }
 }
 ```
@@ -125,6 +175,7 @@ Written alongside `violations.json` at `reports/.saropa_lints/consumer_contract.
 | `healthScore.impactWeights` | `object` | `{ "critical": num, "high": num, ... }` — weight per impact level |
 | `healthScore.decayRate` | `num` | Exponential decay rate for health score calculation |
 | `tierRuleSets` | `object` | `{ "essential": string[], "recommended": string[], ... }` — sorted rule names per tier |
+| `relatedRulesByRule` | `object` | `{ "rule_name": string[] }` — curated related-rule links across known rules |
 
 ---
 

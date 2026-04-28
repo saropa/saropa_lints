@@ -38,6 +38,17 @@ void main() {
       'require_animation_controller_dispose',
       () => RequireAnimationControllerDisposeRule(),
     );
+    test('RequireAnimationControllerDisposeRule relatedRules', () {
+      final rule = RequireAnimationControllerDisposeRule();
+      expect(
+        rule.relatedRules,
+        containsAll(<String>[
+          'require_dispose_implementation',
+          'require_stream_controller_dispose',
+          'require_animation_ticker_disposal',
+        ]),
+      );
+    });
     testRule(
       'RequireHeroTagUniquenessRule',
       'require_hero_tag_uniqueness',

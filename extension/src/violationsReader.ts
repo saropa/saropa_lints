@@ -10,6 +10,21 @@ export interface OwaspData {
   web?: string[];
 }
 
+export interface AccuracyTargetData {
+  expectZeroFalsePositives?: boolean;
+  minTruePositiveRate?: number;
+  description?: string;
+}
+
+export interface RuleMetadataData {
+  ruleType?: string;
+  ruleStatus?: string;
+  cweIds?: number[];
+  certIds?: string[];
+  tags?: string[];
+  accuracyTarget?: AccuracyTargetData;
+}
+
 export interface Violation {
   file: string;
   line: number;
@@ -20,6 +35,8 @@ export interface Violation {
   correction?: string;
   /** OWASP categories this violation maps to (D1: Security Posture). */
   owasp?: OwaspData;
+  /** Rule metadata snapshot at export time. */
+  metadata?: RuleMetadataData;
 }
 
 export interface BySeverity {
@@ -39,6 +56,11 @@ export interface ByImpact {
 /** Per-rule violation counts for triage grouping (e.g. Group A/B/C/D by volume). */
 export interface IssuesByRule {
   [rule: string]: number;
+}
+
+/** Issue-weighted summary breakdowns by metadata. */
+export interface MetadataIssueBreakdown {
+  [key: string]: number;
 }
 
 /** Suppression counts broken down by how the diagnostic was silenced. */
@@ -70,6 +92,10 @@ export interface ViolationsData {
     byImpact?: ByImpact;
     /** Rule name → issue count. Use for triage grouping. */
     issuesByRule?: IssuesByRule;
+    /** Issue-weighted totals by semantic rule type. */
+    byRuleType?: MetadataIssueBreakdown;
+    /** Issue-weighted totals by lifecycle status. */
+    byRuleStatus?: MetadataIssueBreakdown;
     /** Counts of diagnostics suppressed by ignore comments or baseline. */
     suppressions?: SuppressionsSummary;
   };
@@ -82,6 +108,10 @@ export interface ViolationsData {
     stylisticRuleNames?: string[];
     /** Rule names that have at least one quick-fix generator. */
     rulesWithFixes?: string[];
+    /** Rule name -> metadata snapshot for enabled/triggered rules. */
+    ruleMetadataByRule?: Record<string, RuleMetadataData>;
+    /** Rule name -> curated related rule names for discoverability surfaces. */
+    relatedRulesByRule?: Record<string, string[]>;
   };
 }
 
@@ -110,6 +140,18 @@ export function readViolations(workspaceRoot: string): ViolationsData | null {
               typeof summary.issuesByRule === 'object' &&
               !Array.isArray(summary.issuesByRule)
                 ? summary.issuesByRule
+                : undefined,
+            byRuleType:
+              summary.byRuleType &&
+              typeof summary.byRuleType === 'object' &&
+              !Array.isArray(summary.byRuleType)
+                ? summary.byRuleType
+                : undefined,
+            byRuleStatus:
+              summary.byRuleStatus &&
+              typeof summary.byRuleStatus === 'object' &&
+              !Array.isArray(summary.byRuleStatus)
+                ? summary.byRuleStatus
                 : undefined,
             suppressions:
               summary.suppressions &&
@@ -153,6 +195,25 @@ export function readViolations(workspaceRoot: string): ViolationsData | null {
             rulesWithFixes: Array.isArray(raw.config.rulesWithFixes)
               ? raw.config.rulesWithFixes
               : undefined,
+            ruleMetadataByRule:
+              raw.config.ruleMetadataByRule &&
+              typeof raw.config.ruleMetadataByRule === 'object' &&
+              !Array.isArray(raw.config.ruleMetadataByRule)
+                ? raw.config.ruleMetadataByRule
+                : undefined,
+            relatedRulesByRule:
+              raw.config.relatedRulesByRule &&
+              typeof raw.config.relatedRulesByRule === 'object' &&
+              !Array.isArray(raw.config.relatedRulesByRule)
+                ? Object.fromEntries(
+                    Object.entries(raw.config.relatedRulesByRule)
+                      .filter(([, v]) => Array.isArray(v))
+                      .map(([k, v]) => [
+                        k,
+                        (v as unknown[]).filter((x): x is string => typeof x === 'string'),
+                      ]),
+                  )
+                : undefined,
           }
         : undefined,
     };
@@ -208,6 +269,32 @@ export function filterDisabledFromData(
       bySeverity,
       byImpact,
       issuesByRule,
+      byRuleType: computeByRuleType(filtered, data.config?.ruleMetadataByRule),
+      byRuleStatus: computeByRuleStatus(filtered, data.config?.ruleMetadataByRule),
     },
   };
+}
+
+function computeByRuleType(
+  violations: Violation[],
+  metadataByRule: Record<string, RuleMetadataData> | undefined,
+): MetadataIssueBreakdown {
+  const result: MetadataIssueBreakdown = {};
+  for (const v of violations) {
+    const type = metadataByRule?.[v.rule]?.ruleType ?? v.metadata?.ruleType ?? 'unspecified';
+    result[type] = (result[type] ?? 0) + 1;
+  }
+  return result;
+}
+
+function computeByRuleStatus(
+  violations: Violation[],
+  metadataByRule: Record<string, RuleMetadataData> | undefined,
+): MetadataIssueBreakdown {
+  const result: MetadataIssueBreakdown = {};
+  for (const v of violations) {
+    const status = metadataByRule?.[v.rule]?.ruleStatus ?? v.metadata?.ruleStatus ?? 'ready';
+    result[status] = (result[status] ?? 0) + 1;
+  }
+  return result;
 }

@@ -149,6 +149,13 @@ void main() {
       final rule = RequireDisposeImplementationRule();
       expect(rule.code.lowerCaseName, 'require_dispose_implementation');
       expect(
+        rule.relatedRules,
+        containsAll(<String>[
+          'require_stream_controller_dispose',
+          'require_animation_controller_dispose',
+        ]),
+      );
+      expect(
         rule.code.problemMessage,
         contains('[require_dispose_implementation]'),
       );

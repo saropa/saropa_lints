@@ -182,6 +182,13 @@ class RequireStreamControllerDisposeRule extends SaropaLintRule {
   Set<String> get tags => const {'dart-core'};
 
   @override
+  List<String> get relatedRules => const <String>[
+    'require_dispose_implementation',
+    'require_animation_controller_dispose',
+    'require_mounted_check',
+  ];
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -629,6 +636,12 @@ class RequireMountedCheckRule extends SaropaLintRule {
 
   @override
   Set<String> get tags => const {'dart-core'};
+
+  @override
+  List<String> get relatedRules => const <String>[
+    'require_stream_controller_dispose',
+    'require_dispose_implementation',
+  ];
 
   @override
   RuleCost get cost => RuleCost.medium;

@@ -2093,6 +2093,13 @@ class RequireDisposeImplementationRule extends SaropaLintRule {
   Set<String> get tags => const {'disposal', 'flutter', 'reliability'};
 
   @override
+  List<String> get relatedRules => const <String>[
+    'require_stream_controller_dispose',
+    'require_animation_controller_dispose',
+    'dispose_class_fields',
+  ];
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
