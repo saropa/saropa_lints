@@ -19,6 +19,7 @@ export function countSuggestionItems(data: ViolationsData, root: string, tier: s
   const bySeverity = data.summary?.bySeverity;
   const issuesByRule = data.summary?.issuesByRule ?? {};
   const relatedByRule = data.config?.relatedRulesByRule ?? {};
+  const conflictingByRule = data.config?.conflictingRulesByRule ?? {};
   const enabledRules = new Set(data.config?.enabledRuleNames ?? []);
   const total = data.summary?.totalViolations ?? data.violations.length;
   const critical = byImpact?.critical ?? 0;
@@ -51,7 +52,13 @@ export function countSuggestionItems(data: ViolationsData, root: string, tier: s
     .slice(0, 5)) {
     if (labels.length >= 8) break;
     const related = relatedByRule[sourceRule] ?? [];
-    const candidate = related.find((r) => r && !enabledRules.has(r));
+    const sourceConflicts = new Set(conflictingByRule[sourceRule] ?? []);
+    const candidate = related.find((r) => {
+      if (!r || enabledRules.has(r)) return false;
+      if (sourceConflicts.has(r)) return false;
+      const candidateConflicts = new Set(conflictingByRule[r] ?? []);
+      return ![...candidateConflicts].some((name) => enabledRules.has(name));
+    });
     if (!candidate) continue;
     if (labels.includes(`related:${candidate}`)) continue;
     labels.push(`related:${candidate}`);

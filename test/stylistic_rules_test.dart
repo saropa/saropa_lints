@@ -450,6 +450,11 @@ void main() {
     });
 
     group('prefer_single_quotes', () {
+      test('has conflictingRules metadata', () {
+        final rule = PreferSingleQuotesRule();
+        expect(rule.conflictingRules, contains('prefer_double_quotes'));
+      });
+
       test('prefer_single_quotes SHOULD trigger on simple double-quoted', () {
         // "John" should be flagged — no single quotes in content
         expect('prefer_single_quotes detected', isNotNull);
@@ -692,6 +697,11 @@ void main() {
     });
 
     group('prefer_straight_apostrophe', () {
+      test('has conflictingRules metadata', () {
+        final rule = PreferStraightApostropheRule();
+        expect(rule.conflictingRules, contains('prefer_curly_apostrophe'));
+      });
+
       test('prefer_straight_apostrophe SHOULD trigger', () {
         // Better alternative available: prefer straight apostrophe
         expect('prefer_straight_apostrophe detected', isNotNull);
@@ -704,6 +714,14 @@ void main() {
     });
 
     group('prefer_doc_curly_apostrophe', () {
+      test('has conflictingRules metadata', () {
+        final rule = PreferDocCurlyApostropheRule();
+        expect(
+          rule.conflictingRules,
+          contains('prefer_doc_straight_apostrophe'),
+        );
+      });
+
       test('prefer_doc_curly_apostrophe SHOULD trigger', () {
         // Better alternative available: prefer doc curly apostrophe
         expect('prefer_doc_curly_apostrophe detected', isNotNull);
@@ -716,6 +734,11 @@ void main() {
     });
 
     group('prefer_doc_straight_apostrophe', () {
+      test('has conflictingRules metadata', () {
+        final rule = PreferDocStraightApostropheRule();
+        expect(rule.conflictingRules, contains('prefer_doc_curly_apostrophe'));
+      });
+
       test('prefer_doc_straight_apostrophe SHOULD trigger', () {
         // Better alternative available: prefer doc straight apostrophe
         expect('prefer_doc_straight_apostrophe detected', isNotNull);
@@ -728,6 +751,11 @@ void main() {
     });
 
     group('prefer_curly_apostrophe', () {
+      test('has conflictingRules metadata', () {
+        final rule = PreferCurlyApostropheRule();
+        expect(rule.conflictingRules, contains('prefer_straight_apostrophe'));
+      });
+
       test('prefer_curly_apostrophe SHOULD trigger', () {
         // Better alternative available: prefer curly apostrophe
         expect('prefer_curly_apostrophe detected', isNotNull);

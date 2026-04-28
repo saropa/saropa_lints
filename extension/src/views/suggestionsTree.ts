@@ -59,6 +59,7 @@ export class SuggestionsTreeProvider implements vscode.TreeDataProvider<Suggesti
     const bySeverity = data?.summary?.bySeverity;
     const issuesByRule = data?.summary?.issuesByRule ?? {};
     const relatedByRule = data?.config?.relatedRulesByRule ?? {};
+    const conflictingByRule = data?.config?.conflictingRulesByRule ?? {};
     const enabledRules = new Set(data?.config?.enabledRuleNames ?? []);
     const total = data?.summary?.totalViolations ?? data?.violations?.length ?? 0;
     const critical = byImpact?.critical ?? 0;
@@ -147,6 +148,11 @@ export class SuggestionsTreeProvider implements vscode.TreeDataProvider<Suggesti
         const related = relatedByRule[sourceRule] ?? [];
         for (const candidate of related) {
           if (!candidate || enabledRules.has(candidate)) continue;
+          const sourceConflicts = new Set(conflictingByRule[sourceRule] ?? []);
+          if (sourceConflicts.has(candidate)) continue;
+          const candidateConflicts = new Set(conflictingByRule[candidate] ?? []);
+          const conflictsEnabled = [...candidateConflicts].some((name) => enabledRules.has(name));
+          if (conflictsEnabled) continue;
           if (items.some((i) => String(i.label).includes(candidate))) continue;
           items.push(
             new SuggestionItem(

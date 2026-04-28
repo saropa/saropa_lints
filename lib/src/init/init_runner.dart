@@ -644,9 +644,14 @@ void _printRelatedRuleHints({
 
   final suggestions = <String, List<String>>{};
   for (final rule in explicitlyEnabled) {
+    final conflicting = getConflictingRules(rule).toSet();
     final relatedNotEnabled = getRelatedRules(
       rule,
-    ).where((candidate) => !finalEnabled.contains(candidate)).toList();
+    ).where((candidate) {
+      if (finalEnabled.contains(candidate)) return false;
+      if (conflicting.contains(candidate)) return false;
+      return true;
+    }).toList();
     if (relatedNotEnabled.isNotEmpty) {
       suggestions[rule] = relatedNotEnabled;
     }

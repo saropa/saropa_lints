@@ -3133,6 +3133,7 @@ void registerSaropaLintRules(PluginRegistry registry) {
     final rules = _ruleFactories.values.map((f) => f()).toList(growable: false);
     if (rules.isEmpty) return;
     _logUnknownRelatedRuleReferences(rules);
+    _logUnknownConflictingRuleReferences(rules);
 
     var registered = 0;
     for (final rule in rules) {
@@ -3170,6 +3171,26 @@ void registerSaropaLintRules(PluginRegistry registry) {
 }
 
 void _logUnknownRelatedRuleReferences(List<SaropaLintRule> rules) {
+  _logUnknownRuleReferences(
+    rules,
+    referencesOf: (rule) => rule.relatedRules,
+    label: 'related',
+  );
+}
+
+void _logUnknownConflictingRuleReferences(List<SaropaLintRule> rules) {
+  _logUnknownRuleReferences(
+    rules,
+    referencesOf: (rule) => rule.conflictingRules,
+    label: 'conflicting',
+  );
+}
+
+void _logUnknownRuleReferences(
+  List<SaropaLintRule> rules, {
+  required Iterable<String> Function(SaropaLintRule rule) referencesOf,
+  required String label,
+}) {
   final knownRuleNames = rules
       .map((rule) => rule.code.lowerCaseName)
       .where((name) => name.isNotEmpty)
@@ -3180,8 +3201,8 @@ void _logUnknownRelatedRuleReferences(List<SaropaLintRule> rules) {
     final sourceRuleName = rule.code.lowerCaseName;
     if (sourceRuleName.isEmpty) continue;
 
-    for (final relatedRule in rule.relatedRules) {
-      final normalized = relatedRule.trim();
+    for (final referencedRule in referencesOf(rule)) {
+      final normalized = referencedRule.trim();
       if (normalized.isEmpty || knownRuleNames.contains(normalized)) {
         continue;
       }
@@ -3189,7 +3210,7 @@ void _logUnknownRelatedRuleReferences(List<SaropaLintRule> rules) {
       if (!loggedUnknownPairs.add(pair)) continue;
 
       PluginLogger.log(
-        'Unknown related rule reference "$normalized" declared by "$sourceRuleName".',
+        'Unknown $label rule reference "$normalized" declared by "$sourceRuleName".',
       );
     }
   }

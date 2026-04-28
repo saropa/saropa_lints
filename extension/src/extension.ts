@@ -1,7 +1,7 @@
 /**
  * Saropa Lints extension entry point.
  * `saropaLints.enabled` defaults on: upgrade checks and integration state.
- * Sidebar overview, config, and rule packs stay available for Dart workspaces;
+ * Sidebar overview, setup & triage, and rule packs stay available for Dart workspaces;
  * TODOs workspace scan is opt-in via `todosAndHacks.workspaceScanEnabled`.
  */
 
@@ -43,6 +43,7 @@ import { DriftAdvisorTreeProvider } from './driftAdvisor/driftAdvisorTree';
 import { RulePacksWebviewProvider } from './rulePacks/rulePacksWebviewProvider';
 import { openRuleExplainPanelForViolation, openRuleExplainPanel } from './views/ruleExplainView';
 import { readViolations, ViolationsData, getViolationsPath as getViolationsFilePath } from './violationsReader';
+import { setConflictingRulesMetadata, setRelatedRulesMetadata } from './ruleMetadata';
 import { hasSaropaLintsDep } from './pubspecReader';
 import { createPubspecValidation, registerFallbackPubspecListeners } from './pubspec-validation';
 import { PubspecCodeActionProvider } from './pubspec-code-actions';
@@ -166,6 +167,11 @@ function updateIssuesBadge(view: vscode.TreeView<unknown>, issuesProvider: Issue
   } else if (view.badge !== undefined) {
     view.badge = undefined;
   }
+}
+
+function syncRuleMetadataFromViolations(data: ViolationsData | null): void {
+  setRelatedRulesMetadata(data?.config?.relatedRulesByRule);
+  setConflictingRulesMetadata(data?.config?.conflictingRulesByRule);
 }
 
 export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
@@ -372,6 +378,8 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   );
 
   const refreshAll = () => {
+    const root = getProjectRoot();
+    syncRuleMetadataFromViolations(root ? readViolations(root) : null);
     issuesProvider.refresh();
     overviewProvider.refresh();
     summaryProvider.refresh();
@@ -461,6 +469,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       if (root) {
         const data = readViolations(root);
         if (data) {
+          syncRuleMetadataFromViolations(data);
           const { history, appended } = appendSnapshot(context.workspaceState, data);
           refreshAll();
           updateAllStatusBars(data);
@@ -470,6 +479,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         }
       }
       // Fallback: no root or no data — still refresh views.
+      syncRuleMetadataFromViolations(null);
       refreshAll();
     }, 300);
   };
@@ -487,6 +497,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     context.subscriptions.push(watcher);
   };
   watchViolations();
+  syncRuleMetadataFromViolations(root ? readViolations(root) : null);
 
   const extVersion = (context.extension.packageJSON as { version: string }).version;
 
@@ -1008,7 +1019,53 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         void vscode.commands.executeCommand('saropaLints.issues.focus');
       }),
     ),
+    // Summary metadata drill-down: filter Issues view by rules whose metadata
+    // field matches the selected value (e.g. ruleType=vulnerability).
+    vscode.commands.registerCommand(
+      'saropaLints.focusIssuesByRuleMetadata',
+      (field: 'ruleType' | 'ruleStatus', expectedValue: string) => {
+        if (!field || !expectedValue) return;
+        const root = getProjectRoot();
+        if (!root) return;
+        const data = readViolations(root);
+        if (!data) return;
+
+        const matchingRules = new Set<string>();
+        const byRule = data.config?.ruleMetadataByRule ?? {};
+        for (const [ruleName, metadata] of Object.entries(byRule)) {
+          if (!metadata || typeof metadata !== 'object') continue;
+          const candidate =
+            field === 'ruleType' ? metadata.ruleType : metadata.ruleStatus;
+          if (candidate === expectedValue) matchingRules.add(ruleName);
+        }
+        // Backfill from per-violation metadata for backward compatibility.
+        for (const violation of data.violations) {
+          const candidate =
+            field === 'ruleType'
+              ? violation.metadata?.ruleType
+              : violation.metadata?.ruleStatus;
+          if (candidate === expectedValue) matchingRules.add(violation.rule);
+        }
+
+        if (matchingRules.size === 0) return;
+        const allRules = issuesProvider.getRuleNamesFromData();
+        const toHide = new Set(allRules.filter((r) => !matchingRules.has(r)));
+        issuesProvider.setTextFilter('');
+        issuesProvider.setSeverityFilter(new Set(['error', 'warning', 'info']));
+        issuesProvider.setImpactFilter(
+          new Set(['critical', 'high', 'medium', 'low', 'opinionated']),
+        );
+        issuesProvider.setRulesToHide(toHide);
+        updateIssuesViewMessage();
+        issuesProvider.expandAll();
+        void vscode.commands.executeCommand('saropaLints.issues.focus');
+      },
+    ),
     vscode.commands.registerCommand('saropaLints.explainRule', (arg: unknown) => {
+      if (typeof arg === 'string' && arg.trim().length > 0) {
+        openRuleExplainPanel({ ruleName: arg.trim() });
+        return;
+      }
       const node = arg as IssueTreeNode | undefined;
       if (node?.kind === 'violation' && 'violation' in node) {
         openRuleExplainPanelForViolation(node.violation);
@@ -1196,6 +1253,76 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       });
       quickPick.show();
     }),
+    vscode.commands.registerCommand('saropaLints.setIssuesFilterByMetadata', async () => {
+      const root = getProjectRoot();
+      if (!root) return;
+      const data = readViolations(root);
+      if (!data) {
+        void vscode.window.showInformationMessage('No violations in current data. Run analysis first.');
+        return;
+      }
+
+      const typeCounts = data.summary?.byRuleType ?? {};
+      const statusCounts = data.summary?.byRuleStatus ?? {};
+      const metadataByRule = data.config?.ruleMetadataByRule ?? {};
+
+      // Backfill counts from per-rule metadata if summary fields are absent.
+      const mergedTypeCounts: Record<string, number> = { ...typeCounts };
+      const mergedStatusCounts: Record<string, number> = { ...statusCounts };
+      if (Object.keys(mergedTypeCounts).length === 0 || Object.keys(mergedStatusCounts).length === 0) {
+        const issueCounts = data.summary?.issuesByRule ?? {};
+        for (const [ruleName, count] of Object.entries(issueCounts)) {
+          const meta = metadataByRule[ruleName];
+          const type = meta?.ruleType ?? 'unspecified';
+          const status = meta?.ruleStatus ?? 'ready';
+          mergedTypeCounts[type] = (mergedTypeCounts[type] ?? 0) + count;
+          mergedStatusCounts[status] = (mergedStatusCounts[status] ?? 0) + count;
+        }
+      }
+
+      type MetadataPick = vscode.QuickPickItem & {
+        kindId: 'ruleType' | 'ruleStatus';
+        value: string;
+      };
+      const quickPick = vscode.window.createQuickPick<MetadataPick>();
+      quickPick.title = 'Filter by rule metadata';
+      quickPick.matchOnDescription = true;
+      quickPick.items = [
+        { label: 'Rule type', kind: vscode.QuickPickItemKind.Separator, kindId: 'ruleType', value: '' },
+        ...Object.entries(mergedTypeCounts)
+          .sort((a, b) => b[1] - a[1])
+          .map(([value, count]) => ({
+            label: value,
+            description: `${count} issue${count === 1 ? '' : 's'}`,
+            kindId: 'ruleType' as const,
+            value,
+          })),
+        { label: 'Rule status', kind: vscode.QuickPickItemKind.Separator, kindId: 'ruleStatus', value: '' },
+        ...Object.entries(mergedStatusCounts)
+          .sort((a, b) => b[1] - a[1])
+          .map(([value, count]) => ({
+            label: value,
+            description: `${count} issue${count === 1 ? '' : 's'}`,
+            kindId: 'ruleStatus' as const,
+            value,
+          })),
+      ];
+
+      quickPick.onDidAccept(() => {
+        const selected = quickPick.selectedItems[0];
+        if (!selected || !selected.value) {
+          quickPick.hide();
+          return;
+        }
+        void vscode.commands.executeCommand(
+          'saropaLints.focusIssuesByRuleMetadata',
+          selected.kindId,
+          selected.value,
+        );
+        quickPick.hide();
+      });
+      quickPick.show();
+    }),
     vscode.commands.registerCommand('saropaLints.clearIssuesFilters', () => {
       issuesProvider.clearFilters();
       updateIssuesViewMessage();
@@ -1228,6 +1355,8 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         { label: 'Impact', description: 'Critical / High first', id: 'impact' },
         { label: 'Rule', id: 'rule' },
         { label: 'OWASP Category', id: 'owasp' },
+        { label: 'Rule Type', id: 'ruleType' },
+        { label: 'Rule Status', id: 'ruleStatus' },
       ].map((m) => {
         const subtitle = 'description' in m ? m.description : undefined;
         return {
@@ -1494,7 +1623,7 @@ function registerCopyAsJsonCommands(
       copyTreeNodesToClipboard(item, selected, serializeIssueNode, (n) => issuesProvider.getChildren(n as never), 'Violations'),
     ),
     vscode.commands.registerCommand('saropaLints.config.copyAsJson', (item: unknown, selected?: unknown[]) =>
-      copyTreeNodesToClipboard(item, selected, serializeConfigNode, (n) => configProvider.getChildren(n as never), 'Config'),
+      copyTreeNodesToClipboard(item, selected, serializeConfigNode, (n) => configProvider.getChildren(n as never), 'Setup & triage'),
     ),
     vscode.commands.registerCommand('saropaLints.summary.copyAsJson', (item: unknown, selected?: unknown[]) =>
       copyTreeNodesToClipboard(item, selected, serializeSummaryNode, (n) => summaryProvider.getChildren(n as never), 'Summary'),

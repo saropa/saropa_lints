@@ -220,6 +220,69 @@ void main() {
       });
     });
 
+    test('opposite rule pairs expose conflictingRules metadata', () {
+      expect(
+        PreferInterpolationOverConcatenationRule().conflictingRules,
+        contains('prefer_concatenation_over_interpolation'),
+      );
+      expect(
+        PreferConcatenationOverInterpolationRule().conflictingRules,
+        contains('prefer_interpolation_over_concatenation'),
+      );
+      expect(
+        PreferDoubleQuotesRule().conflictingRules,
+        contains('prefer_single_quotes'),
+      );
+      expect(
+        PreferGroupedImportsRule().conflictingRules,
+        contains('prefer_flat_imports'),
+      );
+      expect(
+        PreferFlatImportsRule().conflictingRules,
+        contains('prefer_grouped_imports'),
+      );
+      expect(
+        PreferFieldsBeforeMethodsRule().conflictingRules,
+        contains('prefer_methods_before_fields'),
+      );
+      expect(
+        PreferMethodsBeforeFieldsRule().conflictingRules,
+        contains('prefer_fields_before_methods'),
+      );
+      expect(
+        PreferStaticMembersFirstRule().conflictingRules,
+        contains('prefer_instance_members_first'),
+      );
+      expect(
+        PreferInstanceMembersFirstRule().conflictingRules,
+        contains('prefer_static_members_first'),
+      );
+      expect(
+        PreferPublicMembersFirstRule().conflictingRules,
+        contains('prefer_private_members_first'),
+      );
+      expect(
+        PreferPrivateMembersFirstRule().conflictingRules,
+        contains('prefer_public_members_first'),
+      );
+      expect(
+        PreferObjectOverDynamicRule().conflictingRules,
+        contains('prefer_dynamic_over_object'),
+      );
+      expect(
+        PreferDynamicOverObjectRule().conflictingRules,
+        contains('prefer_object_over_dynamic'),
+      );
+      expect(
+        PreferImplicitBooleanComparisonRule().conflictingRules,
+        contains('prefer_explicit_boolean_comparison'),
+      );
+      expect(
+        PreferExplicitBooleanComparisonRule().conflictingRules,
+        contains('prefer_implicit_boolean_comparison'),
+      );
+    });
+
     group('prefer_double_quotes', () {
       test('prefer_double_quotes SHOULD trigger', () {
         // Better alternative available: prefer double quotes
@@ -341,6 +404,11 @@ void main() {
     });
 
     group('prefer_var_over_explicit_type', () {
+      test('has conflictingRules metadata', () {
+        final rule = PreferVarOverExplicitTypeRule();
+        expect(rule.conflictingRules, contains('prefer_type_over_var'));
+      });
+
       test('prefer_var_over_explicit_type SHOULD trigger', () {
         // Better alternative available: prefer var over explicit type
         expect('prefer_var_over_explicit_type detected', isNotNull);

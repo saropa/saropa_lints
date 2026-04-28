@@ -212,6 +212,17 @@ void main() {
       'prefer_cubit_for_simple_state',
       () => PreferCubitForSimpleStateRule(),
     );
+    test('AvoidCubitsRule conflictingRules', () {
+      final rule = AvoidCubitsRule();
+      expect(
+        rule.conflictingRules,
+        contains('prefer_cubit_for_simple_state'),
+      );
+    });
+    test('PreferCubitForSimpleStateRule conflictingRules', () {
+      final rule = PreferCubitForSimpleStateRule();
+      expect(rule.conflictingRules, contains('avoid_cubit_usage'));
+    });
     testRule(
       'PreferBlocListenerForSideEffectsRule',
       'prefer_bloc_listener_for_side_effects',

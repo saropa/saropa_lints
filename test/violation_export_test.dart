@@ -588,6 +588,27 @@ void main() {
       );
     });
 
+    test('consumer contract includes conflictingRulesByRule mapping', () {
+      ViolationExporter.write(
+        projectRoot: projectRoot,
+        sessionId: 'test_session',
+        data: buildData(),
+        owaspLookup: const <String, OwaspMapping>{},
+      );
+
+      final contractFile = File(consumerContractPath());
+      final contract =
+          json.decode(contractFile.readAsStringSync()) as Map<String, dynamic>;
+      final conflictsByRule =
+          contract['conflictingRulesByRule'] as Map<String, dynamic>;
+
+      expect(conflictsByRule, isNotEmpty);
+      expect(
+        (conflictsByRule['prefer_type_over_var'] as List<dynamic>).cast<String>(),
+        contains('prefer_var_over_explicit_type'),
+      );
+    });
+
     test('config includes disabledPackages and userExclusions', () {
       final config = ReportConfig(
         version: '4.14.0',

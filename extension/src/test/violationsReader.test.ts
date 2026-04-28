@@ -36,6 +36,63 @@ describe('readViolations', () => {
     assert.deepStrictEqual(data?.config?.rulesWithFixes, ['rule_a', 'rule_b']);
   });
 
+  it('parses summary metadata breakdowns when present', () => {
+    const root = writeJson({
+      violations: [],
+      summary: {
+        byRuleType: { vulnerability: 5, codeSmell: 3 },
+        byRuleStatus: { ready: 7, beta: 1 },
+      },
+    });
+    const data = readViolations(root);
+    assert.deepStrictEqual(data?.summary?.byRuleType, {
+      vulnerability: 5,
+      codeSmell: 3,
+    });
+    assert.deepStrictEqual(data?.summary?.byRuleStatus, {
+      ready: 7,
+      beta: 1,
+    });
+  });
+
+  it('parses config.ruleMetadataByRule when present', () => {
+    const root = writeJson({
+      violations: [],
+      config: {
+        ruleMetadataByRule: {
+          avoid_hardcoded_credentials: {
+            ruleType: 'vulnerability',
+            ruleStatus: 'ready',
+            cweIds: [798],
+            certIds: [],
+            tags: ['security'],
+            accuracyTarget: { minTruePositiveRate: 0.8 },
+          },
+        },
+      },
+    });
+    const data = readViolations(root);
+    assert.deepStrictEqual(
+      data?.config?.ruleMetadataByRule?.avoid_hardcoded_credentials?.cweIds,
+      [798],
+    );
+  });
+
+  it('parses config.conflictingRulesByRule when present', () => {
+    const root = writeJson({
+      violations: [],
+      config: {
+        conflictingRulesByRule: {
+          prefer_type_over_var: ['prefer_var_over_explicit_type'],
+        },
+      },
+    });
+    const data = readViolations(root);
+    assert.deepStrictEqual(data?.config?.conflictingRulesByRule, {
+      prefer_type_over_var: ['prefer_var_over_explicit_type'],
+    });
+  });
+
   it('returns undefined rulesWithFixes when field is absent (backward compat)', () => {
     const root = writeJson({
       violations: [],

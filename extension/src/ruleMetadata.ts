@@ -6,6 +6,7 @@
 /** Base URL for rule documentation (ROADMAP and repo). */
 export const RULE_DOC_BASE_URL = 'https://github.com/saropa/saropa_lints/blob/main/ROADMAP.md';
 let relatedRulesByRule: Record<string, string[]> = {};
+let conflictingRulesByRule: Record<string, string[]> = {};
 
 export function setRelatedRulesMetadata(
   byRule: Record<string, string[]> | undefined,
@@ -15,6 +16,16 @@ export function setRelatedRulesMetadata(
 
 export function getRelatedRules(ruleName: string): string[] {
   return relatedRulesByRule[ruleName] ?? [];
+}
+
+export function setConflictingRulesMetadata(
+  byRule: Record<string, string[]> | undefined,
+): void {
+  conflictingRulesByRule = byRule ?? {};
+}
+
+export function getConflictingRules(ruleName: string): string[] {
+  return conflictingRulesByRule[ruleName] ?? [];
 }
 
 /**

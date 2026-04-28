@@ -2282,6 +2282,15 @@ abstract class SaropaLintRule extends AnalysisRule {
   /// not an auto-generated "same tag" list, but explicit pairwise guidance.
   List<String> get relatedRules => const <String>[];
 
+  /// Curated opposite/competing rule names.
+  ///
+  /// Use this for stylistic or opinionated pairs where enabling both rules
+  /// creates contradictory guidance (for example `prefer_type_over_var`
+  /// vs `prefer_var_over_explicit_type`).
+  ///
+  /// Consumers should avoid recommending entries in this list as follow-ups.
+  List<String> get conflictingRules => const <String>[];
+
   /// Tags for filtering and discovery (e.g. in docs, IDE, or CI).
   /// Examples: 'performance', 'accessibility', 'suspicious', 'convention'.
   Set<String> get tags => const <String>{};

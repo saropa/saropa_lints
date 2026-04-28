@@ -562,6 +562,11 @@ class AvoidCubitsRule extends SaropaLintRule {
   List<String> get configAliases => const ['avoid_cubits'];
 
   @override
+  List<String> get conflictingRules => const <String>[
+    'prefer_cubit_for_simple_state',
+  ];
+
+  @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
@@ -3636,6 +3641,11 @@ class PreferCubitForSimpleStateRule extends SaropaLintRule {
         'Replace with Cubit when only one event/action is needed. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     severity: DiagnosticSeverity.INFO,
   );
+
+  @override
+  List<String> get conflictingRules => const <String>[
+    'avoid_cubit_usage',
+  ];
 
   @override
   void runWithReporter(

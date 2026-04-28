@@ -112,6 +112,8 @@ export interface ViolationsData {
     ruleMetadataByRule?: Record<string, RuleMetadataData>;
     /** Rule name -> curated related rule names for discoverability surfaces. */
     relatedRulesByRule?: Record<string, string[]>;
+    /** Rule name -> curated conflicting/opposite rule names. */
+    conflictingRulesByRule?: Record<string, string[]>;
   };
 }
 
@@ -207,6 +209,19 @@ export function readViolations(workspaceRoot: string): ViolationsData | null {
               !Array.isArray(raw.config.relatedRulesByRule)
                 ? Object.fromEntries(
                     Object.entries(raw.config.relatedRulesByRule)
+                      .filter(([, v]) => Array.isArray(v))
+                      .map(([k, v]) => [
+                        k,
+                        (v as unknown[]).filter((x): x is string => typeof x === 'string'),
+                      ]),
+                  )
+                : undefined,
+            conflictingRulesByRule:
+              raw.config.conflictingRulesByRule &&
+              typeof raw.config.conflictingRulesByRule === 'object' &&
+              !Array.isArray(raw.config.conflictingRulesByRule)
+                ? Object.fromEntries(
+                    Object.entries(raw.config.conflictingRulesByRule)
                       .filter(([, v]) => Array.isArray(v))
                       .map(([k, v]) => [
                         k,

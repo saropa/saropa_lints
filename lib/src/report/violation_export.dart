@@ -81,6 +81,9 @@ class ViolationExporter {
       final relatedRulesByRule = _buildRelatedRulesByRule(
         tiers.getAllDefinedRules(),
       );
+      final conflictingRulesByRule = _buildConflictingRulesByRule(
+        tiers.getAllDefinedRules(),
+      );
       final json = <String, Object>{
         'schemaVersion': _schemaVersion,
         'healthScore': <String, Object>{
@@ -89,6 +92,7 @@ class ViolationExporter {
         },
         'tierRuleSets': tierRuleSets,
         'relatedRulesByRule': relatedRulesByRule,
+        'conflictingRulesByRule': conflictingRulesByRule,
       };
       final encoded = const JsonEncoder.withIndent('  ').convert(json);
       _writeAtomicFile(projectRoot, _consumerContractFileName, encoded);
@@ -204,6 +208,9 @@ class ViolationExporter {
     // Extension uses this to disable "Apply fix" for rules without fixes.
     final fixList = rulesWithFixes.toList()..sort();
     final relatedRulesByRule = _buildRelatedRulesByRule(config.enabledRuleNames);
+    final conflictingRulesByRule = _buildConflictingRulesByRule(
+      config.enabledRuleNames,
+    );
     return <String, Object>{
       'tier': config.effectiveTier,
       'enabledRuleCount': config.enabledRuleCount,
@@ -213,6 +220,7 @@ class ViolationExporter {
       'rulesWithFixes': fixList,
       'ruleMetadataByRule': _ruleMetadataLookupToJson(ruleMetadata),
       'relatedRulesByRule': relatedRulesByRule,
+      'conflictingRulesByRule': conflictingRulesByRule,
       'enabledPlatforms': config.enabledPlatforms,
       'disabledPlatforms': config.disabledPlatforms,
       'enabledPackages': config.enabledPackages,
@@ -228,31 +236,51 @@ class ViolationExporter {
   static Map<String, List<String>> _buildRelatedRulesByRule(
     Iterable<String> ruleNames,
   ) {
+    return _buildRuleAdjacencyMap(
+      ruleNames,
+      referencesOf: (rule) => rule.relatedRules,
+    );
+  }
+
+  static Map<String, List<String>> _buildConflictingRulesByRule(
+    Iterable<String> ruleNames,
+  ) {
+    return _buildRuleAdjacencyMap(
+      ruleNames,
+      referencesOf: (rule) => rule.conflictingRules,
+    );
+  }
+
+  static Map<String, List<String>> _buildRuleAdjacencyMap(
+    Iterable<String> ruleNames, {
+    required Iterable<String> Function(SaropaLintRule rule) referencesOf,
+  }) {
     final ruleNameList = ruleNames.toList();
     if (ruleNameList.isEmpty) return const <String, List<String>>{};
 
     final enabledSet = ruleNameList.toSet();
-    final relatedByRule = <String, List<String>>{};
+    final byRule = <String, List<String>>{};
     final rules = getRulesFromRegistry(enabledSet);
 
     for (final rule in rules) {
       final source = rule.code.lowerCaseName;
       if (source.isEmpty) continue;
-      if (rule.relatedRules.isEmpty) continue;
+      final references = referencesOf(rule);
+      if (references.isEmpty) continue;
 
       final normalized = <String>{};
-      for (final related in rule.relatedRules) {
-        final name = related.trim();
+      for (final referenced in references) {
+        final name = referenced.trim();
         if (name.isEmpty || name == source) continue;
         normalized.add(name);
       }
       if (normalized.isEmpty) continue;
 
       final sorted = normalized.toList()..sort();
-      relatedByRule[source] = sorted;
+      byRule[source] = sorted;
     }
 
-    return relatedByRule;
+    return byRule;
   }
 
   /// Build the summary section with aggregate counts.

@@ -2457,6 +2457,11 @@ class PreferTypeOverVarRule extends SaropaLintRule {
   Set<String> get tags => const {'reliability', 'type-safety'};
 
   @override
+  List<String> get conflictingRules => const <String>[
+    'prefer_var_over_explicit_type',
+  ];
+
+  @override
   String get exampleBad => "var name = 'John';";
 
   @override

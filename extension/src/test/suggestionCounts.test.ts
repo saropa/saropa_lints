@@ -34,6 +34,47 @@ describe('countSuggestionItems', () => {
     const n = countSuggestionItems(data, os.tmpdir(), 'essential');
     assert.ok(n >= 3);
   });
+
+  it('includes related-rule hint when related rule is not enabled', () => {
+    const data: ViolationsData = {
+      violations: [{ file: 'a.dart', line: 1, rule: 'require_dispose_implementation', message: 'm' }],
+      summary: {
+        totalViolations: 1,
+        issuesByRule: { require_dispose_implementation: 1 },
+      },
+      config: {
+        enabledRuleNames: ['require_dispose_implementation'],
+        relatedRulesByRule: {
+          require_dispose_implementation: ['require_stream_controller_dispose'],
+        },
+      },
+    };
+    const n = countSuggestionItems(data, os.tmpdir(), 'essential');
+    assert.ok(n >= 3);
+  });
+
+  it('skips related-rule hint when candidate conflicts with enabled rule', () => {
+    const data: ViolationsData = {
+      violations: [{ file: 'a.dart', line: 1, rule: 'prefer_type_over_var', message: 'm' }],
+      summary: {
+        totalViolations: 1,
+        issuesByRule: { prefer_type_over_var: 1 },
+      },
+      config: {
+        enabledRuleNames: ['prefer_type_over_var'],
+        relatedRulesByRule: {
+          prefer_type_over_var: ['prefer_var_over_explicit_type'],
+        },
+        conflictingRulesByRule: {
+          prefer_type_over_var: ['prefer_var_over_explicit_type'],
+          prefer_var_over_explicit_type: ['prefer_type_over_var'],
+        },
+      },
+    };
+    const n = countSuggestionItems(data, os.tmpdir(), 'essential');
+    // Expect baseline + run + open only (no related suggestion).
+    assert.strictEqual(n, 3);
+  });
 });
 
 describe('countSuggestionItems with temp workspace', () => {

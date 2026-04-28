@@ -1866,6 +1866,11 @@ class PreferSingleQuotesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  List<String> get conflictingRules => const <String>[
+    'prefer_double_quotes',
+  ];
+
+  @override
   String get exampleBad => 'String name = "John";';
 
   @override
@@ -3791,6 +3796,11 @@ class PreferStraightApostropheRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  List<String> get conflictingRules => const <String>[
+    'prefer_curly_apostrophe',
+  ];
+
+  @override
   String get exampleBad => "It\u2019s a test  // curly apostrophe";
 
   @override
@@ -3890,6 +3900,11 @@ class PreferDocCurlyApostropheRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  List<String> get conflictingRules => const <String>[
+    'prefer_doc_straight_apostrophe',
+  ];
 
   @override
   String get exampleBad => "/// It's a doc comment  // straight apostrophe";
@@ -4021,6 +4036,11 @@ class PreferDocStraightApostropheRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  List<String> get conflictingRules => const <String>[
+    'prefer_doc_curly_apostrophe',
+  ];
+
+  @override
   String get exampleBad => "/// It\u2019s a doc comment  // curly apostrophe";
 
   @override
@@ -4141,6 +4161,11 @@ class PreferCurlyApostropheRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  List<String> get conflictingRules => const <String>[
+    'prefer_straight_apostrophe',
+  ];
 
   @override
   String get exampleBad =>

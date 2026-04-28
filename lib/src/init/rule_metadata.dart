@@ -71,6 +71,7 @@ class RuleMetadata {
     required this.tier,
     required this.hasFix,
     required this.relatedRules,
+    required this.conflictingRules,
     this.exampleBad,
     this.exampleGood,
   });
@@ -86,6 +87,9 @@ class RuleMetadata {
 
   /// Curated related rules from rule metadata.
   final List<String> relatedRules;
+
+  /// Curated conflicting/opposite rules from rule metadata.
+  final List<String> conflictingRules;
 
   /// Short BAD example for CLI walkthrough (null if not provided).
   final String? exampleBad;
@@ -119,6 +123,7 @@ Map<String, RuleMetadata> getRuleMetadata() {
       tier: tier,
       hasFix: rule.fixGenerators.isNotEmpty,
       relatedRules: rule.relatedRules,
+      conflictingRules: rule.conflictingRules,
       exampleBad: rule.exampleBad,
       exampleGood: rule.exampleGood,
     );
@@ -175,4 +180,9 @@ RuleTier getRuleTierFromMetadata(String ruleName) {
 /// Gets related rules for a rule.
 List<String> getRelatedRules(String ruleName) {
   return getRuleMetadata()[ruleName]?.relatedRules ?? const <String>[];
+}
+
+/// Gets conflicting rules for a rule.
+List<String> getConflictingRules(String ruleName) {
+  return getRuleMetadata()[ruleName]?.conflictingRules ?? const <String>[];
 }

@@ -382,6 +382,11 @@ void main() {
     });
 
     group('prefer_type_over_var', () {
+      test('has conflictingRules metadata', () {
+        final rule = PreferTypeOverVarRule();
+        expect(rule.conflictingRules, contains('prefer_var_over_explicit_type'));
+      });
+
       test('rule offers quick fix (replace var with type)', () {
         final rule = PreferTypeOverVarRule();
         expect(rule.fixGenerators, isNotEmpty);

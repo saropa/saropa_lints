@@ -38,6 +38,7 @@ Describes the analysis configuration at the time of the run.
 | `rulesWithFixes` | `string[]` | Sorted list of rules that provide quick fixes |
 | `ruleMetadataByRule` | `object` | `{ "rule_name": RuleMetadata }` metadata for enabled/triggered rules (type/status/CWE/CERT/tags/accuracy target) |
 | `relatedRulesByRule` | `object` | `{ "rule_name": string[] }` — curated related-rule links for enabled rules |
+| `conflictingRulesByRule` | `object` | `{ "rule_name": string[] }` — curated opposite/conflicting rule links for enabled rules |
 | `enabledPlatforms` | `string[]` | Detected platforms (e.g. `"android"`, `"ios"`, `"web"`) |
 | `disabledPlatforms` | `string[]` | Platforms excluded by config |
 | `enabledPackages` | `string[]` | Detected packages with dedicated rule support |
@@ -70,6 +71,10 @@ Aggregate statistics for the analysis run. **This is the primary section for CI 
 | `ruleSeverities` | `object` | `{ "rule_name": "warning", ... }` — lowercase severity per triggered rule |
 | `thresholds` | `object` | Per-rule threshold gate status and breaches (`status`, `warnings`, `failures`) |
 | `baselineDiff` | `object` | Baseline comparison result (`totalNewViolations`, `newViolationsByRule`, baseline metadata) |
+
+Threshold keys under `diagnostic_statistics.thresholds` can target either:
+- concrete rule names (for example `avoid_hardcoded_credentials`)
+- metadata aggregates using `ruleType.<type>` or `ruleStatus.<status>` (for example `ruleType.vulnerability`, `ruleStatus.beta`)
 
 ### CI usage examples
 
@@ -176,6 +181,7 @@ Written alongside `violations.json` at `reports/.saropa_lints/consumer_contract.
 | `healthScore.decayRate` | `num` | Exponential decay rate for health score calculation |
 | `tierRuleSets` | `object` | `{ "essential": string[], "recommended": string[], ... }` — sorted rule names per tier |
 | `relatedRulesByRule` | `object` | `{ "rule_name": string[] }` — curated related-rule links across known rules |
+| `conflictingRulesByRule` | `object` | `{ "rule_name": string[] }` — curated opposite/conflicting rule links across known rules |
 
 ---
 
