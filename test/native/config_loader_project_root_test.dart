@@ -142,7 +142,6 @@ plugins:
       final tempDir = Directory.systemTemp.createTempSync(
         'saropa_lints_multi_',
       );
-      final originalCwd = Directory.current;
       try {
         final repoRoot = Directory(p.join(tempDir.path, 'repo'))..createSync();
         final appA = Directory(p.join(repoRoot.path, 'apps', 'a'))
@@ -165,8 +164,9 @@ plugins:
         - drift
 ''');
 
-        // Simulate analyzer cwd not matching either application root.
-        Directory.current = repoRoot.path;
+        // loadRulePacksConfigFromProjectRoot reads config from the passed
+        // root only — do not mutate Directory.current (parallel tests use
+        // cwd-relative paths such as example/ fixtures).
         SaropaLintRule.enabledRules = null;
         SaropaLintRule.disabledRules = null;
 
@@ -194,7 +194,6 @@ plugins:
           reason: 'Prior pack contributions must be removed on root switch',
         );
       } finally {
-        Directory.current = originalCwd.path;
         tempDir.deleteSync(recursive: true);
       }
     });

@@ -1,6 +1,8 @@
 /// Canonical vocabulary for rule metadata tags.
 ///
 /// Keep this list additive and stable so external consumers can rely on it.
+library;
+
 const Set<String> knownRuleTags = <String>{
   'accessibility',
   'architecture',

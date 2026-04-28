@@ -62,6 +62,7 @@ _REQUIRED_MODULES = [
     "modules/_publish_steps.py",
     "modules/_publish_workflow.py",
     "modules/_rule_metrics.py",
+    "modules/_code_comment_metrics.py",
     "modules/_version_changelog.py",
     "modules/_us_spelling.py",
     "modules/_timing.py",

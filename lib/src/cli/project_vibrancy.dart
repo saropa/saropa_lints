@@ -288,6 +288,7 @@ Future<ProjectVibrancyReport> runProjectVibrancy(
 List<String> _collectTargetFiles(ProjectVibrancyOptions options) {
   final root = Directory(options.projectPath);
   if (!root.existsSync()) return const <String>[];
+  final rootPath = p.normalize(root.path);
   final selectedFile = options.filePath;
   final selectedFolder = options.folderPath;
   final included = options.includedFiles?.map(p.normalize).toSet();
@@ -299,8 +300,15 @@ List<String> _collectTargetFiles(ProjectVibrancyOptions options) {
     final posix = path.replaceAll('\\', '/');
     if (posix.endsWith('.g.dart') ||
         posix.endsWith('.freezed.dart') ||
-        posix.endsWith('.mocks.dart') ||
-        posix.contains('/build/')) {
+        posix.endsWith('.mocks.dart')) {
+      continue;
+    }
+    // Exclude project `build/` outputs only (relative to root). A plain
+    // substring match on `/build/` skips real packages under paths like
+    // `<repo>/build/test_tmp/.../lib/` when TMP is redirected for tests.
+    final rel = p.relative(path, from: rootPath);
+    final posixRel = rel.replaceAll('\\', '/');
+    if (posixRel.startsWith('build/') || posixRel.contains('/build/')) {
       continue;
     }
     if (!posix.contains('/lib/')) continue;

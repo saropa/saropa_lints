@@ -35,6 +35,7 @@ publish.py                      <- thin entry point (~200 lines)
   |     +-- modules/_version_changelog.py <- version prompt, sync, changelog management
   |     +-- modules/_extension_publish.py <- extension build, publish, store verification
   |     +-- modules/_rule_metrics.py     <- rule/category counts, badges, coverage
+  |     +-- modules/_code_comment_metrics.py <- comment-line stats for publish banner
   |     +-- modules/_pubdev_lint.py      <- pub.dev doc-comment lint fixes
   |     +-- modules/_timing.py           <- step timer and summary
   |

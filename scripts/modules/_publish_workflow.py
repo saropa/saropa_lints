@@ -3,7 +3,7 @@ Publish pipeline orchestration for saropa_lints.
 
 High-level workflow steps that wire together lower-level modules
 (_publish_steps, _git_ops, _version_changelog, _extension_publish,
-_rule_metrics, _pubdev_lint) into the publish pipeline. Each function
+_rule_metrics, _code_comment_metrics, _pubdev_lint) into the publish pipeline. Each function
 represents one stage of the publish process.
 
 Also contains the PublishContext dataclass (shared project state) and
@@ -63,6 +63,7 @@ from scripts.modules._publish_steps import (
     validate_changelog,
     verify_pubdev_publication,
 )
+from scripts.modules._code_comment_metrics import display_code_comment_metrics
 from scripts.modules._rule_metrics import (
     count_categories,
     count_rules,
@@ -166,6 +167,7 @@ def print_package_banner(
     print()
     display_changelog(ctx.project_dir)
     display_test_coverage(ctx.project_dir)
+    display_code_comment_metrics(ctx.project_dir)
     todo_log = display_roadmap_summary(
         ctx.project_dir, bugs_dir=ctx.bugs_dir,
     )
