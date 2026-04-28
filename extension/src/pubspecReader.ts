@@ -1,6 +1,6 @@
 /**
  * Read pubspec.yaml for platform and package detection.
- * Used to show "Detected: Riverpod, Flutter" in Config and for triage.
+ * Used to show "Detected: Riverpod, Flutter" in Triage and related views.
  */
 
 import * as fs from 'fs';

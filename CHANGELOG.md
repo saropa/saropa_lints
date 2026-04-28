@@ -62,7 +62,7 @@
 
 ### Changed
 
-- Extension UX now uses **Setup & triage** and **Activity bar sections** as the primary labels, with clearer not-analyzed vs no-violations copy and matching command/help text, so users can find configuration and findings without Config-vs-Options ambiguity. No action required.
+- Extension UX now promotes a dedicated **Config Dashboard** plus **Triage** naming, default-on Dashboard/Package Vibrancy sidebar sections, and direct open commands, so users can reach configuration and dependency-health surfaces without hunting through tree views. No action required.
 - Violations grouping now includes `Rule Type` and `Rule Status` in addition to Severity/File/Impact/Rule/OWASP, so teams can pivot directly by semantic class and lifecycle state during triage. No action required.
 - Rule-pack config parsing now tolerates quoted ids, inline comments, and spacing variations while preserving legacy `migration_packs` read compatibility and normalizing writes to canonical `rule_packs`, so mixed/older configs keep working and converge automatically; if your config still uses `migration_packs`, run init or toggle any Rule Pack once to rewrite it. No action required for already-canonical `rule_packs` setups.
 - Rule-pack ownership is now authoritative over tiers: pack-owned package/SDK migration rules are removed from tier-derived enables and only activate when their pack is enabled, so pack toggles now control those domains directly instead of inheriting tier defaults; enable the relevant packs under `plugins.saropa_lints.rule_packs.enabled` to keep package/SDK migration diagnostics active. Action required if you relied on tier-only activation for pack-owned rules.

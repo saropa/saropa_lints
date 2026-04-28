@@ -1,4 +1,4 @@
-/** I1/I2: Triage node types and data computation for the Config view. */
+/** I1/I2: Triage node types and data computation for the Triage view. */
 import * as vscode from 'vscode';
 import type { ViolationsData, IssuesByRule } from '../violationsReader';
 import { groupRulesByVolume, partitionStylistic, buildRuleImpactMap, identifyCriticalRules, getZeroIssueCount, type RuleImpactCounts } from '../triageUtils';

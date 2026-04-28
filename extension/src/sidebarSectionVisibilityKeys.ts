@@ -3,15 +3,16 @@
  * Split out so tests do not load the vscode module.
  */
 
-/** Config key + label shown in Settings and the sidebar-sections picker. */
+/** Config key + label shown in Settings and the activity-bar-sections picker. */
 export const SIDEBAR_SECTIONS: ReadonlyArray<{ readonly key: string; readonly label: string }> = [
     { key: 'sidebar.showCommandCatalog', label: 'Commands' },
     { key: 'sidebar.showOverview', label: 'Overview & options' },
     { key: 'sidebar.showFileRisk', label: 'File Risk' },
     { key: 'sidebar.showIssues', label: 'Violations' },
     { key: 'sidebar.showSummary', label: 'Summary' },
-    { key: 'sidebar.showConfig', label: 'Config' },
-    { key: 'sidebar.showRulePacks', label: 'Rule Packs' },
+    { key: 'sidebar.showSuppressions', label: 'Suppressions' },
+    { key: 'sidebar.showConfig', label: 'Triage' },
+    { key: 'sidebar.showRulePacks', label: 'Config Dashboard' },
     { key: 'sidebar.showSuggestions', label: 'Suggestions' },
     { key: 'sidebar.showSecurityPosture', label: 'Security Posture' },
     { key: 'sidebar.showPackageVibrancy', label: 'Package Vibrancy' },
@@ -32,14 +33,17 @@ export function sidebarSectionContextKey(configKey: string): string {
 
 /** Default visibility when the setting is unset (matches package.json defaults). */
 export function defaultSidebarSectionVisible(configKey: string): boolean {
-    // Commands (searchable command index), Overview, and Violations stay on by default.
+  // Commands (searchable command index), Overview, Violations, and the two web dashboards
+  // (Config Dashboard via Rule Packs + Package Vibrancy) stay on by default.
     // Package Details defaults on — its `when` clause already gates it behind
     // `packageVibrancy.hasResults`, so it only appears when there's scan data.
-    // Standalone Config is off — the same content lives under Overview & options.
+    // Standalone Triage is off — the same content lives under Overview & options.
     if (
         configKey === 'sidebar.showCommandCatalog' ||
         configKey === 'sidebar.showOverview' ||
         configKey === 'sidebar.showIssues' ||
+    configKey === 'sidebar.showRulePacks' ||
+    configKey === 'sidebar.showPackageVibrancy' ||
         configKey === 'sidebar.showPackageDetails'
     ) {
         return true;

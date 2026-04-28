@@ -1,5 +1,5 @@
 /**
- * Tree data provider for Saropa Lints Config view.
+ * Tree data provider for Saropa Lints Triage view.
  * Shows current settings, detected platform/packages, triage groups, and actions.
  *
  * I1: The triage section shows rules grouped by priority (critical, volume A–D,
@@ -49,8 +49,8 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigTreeNod
     }
     if (element) return []; // Other nodes have no children.
 
-    // Root level — standalone Config view shows everything in one flat list.
-    return [...this.buildSettingNodes(), ...this.buildTriageSection(), ...this.buildActionNodes()];
+    // Root level — keep this view focused on triage, while full configuration lives in web dashboards.
+    return [...this.buildDashboardShortcutNodes(), ...this.buildTriageSection()];
   }
 
   /** Settings + action nodes (no triage). Used by the overview "Settings" section. */
@@ -98,6 +98,14 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigTreeNod
       setting('Open analysis_options_custom.yaml', undefined, 'saropaLints.openConfig'),
       setting('Initialize / Update config', undefined, 'saropaLints.initializeConfig'),
       setting('Run analysis', undefined, 'saropaLints.runAnalysis'),
+    ];
+  }
+
+  /** Quick links to the richer web dashboards. */
+  private buildDashboardShortcutNodes(): ConfigTreeNode[] {
+    return [
+      setting('Open Config Dashboard', 'Tiers, packs, charts, docs', 'saropaLints.openConfigDashboard'),
+      setting('Open Package Vibrancy', 'Dependency health and reports', 'saropaLints.openPackageVibrancy'),
     ];
   }
 

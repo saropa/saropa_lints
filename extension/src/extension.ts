@@ -1,7 +1,7 @@
 /**
  * Saropa Lints extension entry point.
  * `saropaLints.enabled` defaults on: upgrade checks and integration state.
- * Sidebar overview, setup & triage, and rule packs stay available for Dart workspaces;
+ * Sidebar overview, triage, and rule-pack dashboards stay available for Dart workspaces;
  * TODOs workspace scan is opt-in via `todosAndHacks.workspaceScanEnabled`.
  */
 
@@ -28,6 +28,7 @@ import { IssuesTreeProvider, parseViolationsGroupBy, registerIssueCommands, type
 import { OverviewTreeProvider } from './views/overviewTree';
 import { showHelpHubQuickPick } from './views/helpHub';
 import { SummaryTreeProvider } from './views/summaryTree';
+import { SuppressionsTreeProvider } from './views/suppressionsTree';
 import { ConfigTreeProvider } from './views/configTree';
 import { SuggestionsTreeProvider } from './views/suggestionsTree';
 import { SecurityPostureTreeProvider } from './views/securityPostureTree';
@@ -35,14 +36,24 @@ import { FileRiskTreeProvider } from './views/fileRiskTree';
 import { TodosAndHacksTreeProvider } from './views/todosAndHacksTree';
 import { showAboutPanel } from './views/aboutView';
 import { showCommandCatalogPanel } from './views/commandCatalogView';
+import { showRelatedRuleTelemetryPanel } from './views/relatedRuleTelemetryView';
 import { CommandCatalogSidebarProvider, COMMAND_CATALOG_SIDEBAR_VIEW_ID } from './views/commandCatalogSidebarProvider';
 import { discoverServer } from './driftAdvisor/discovery';
 import { fetchIssues } from './driftAdvisor/client';
 import { mapIssuesToLocations } from './driftAdvisor/mapper';
 import { DriftAdvisorTreeProvider } from './driftAdvisor/driftAdvisorTree';
 import { RulePacksWebviewProvider } from './rulePacks/rulePacksWebviewProvider';
-import { openRuleExplainPanelForViolation, openRuleExplainPanel } from './views/ruleExplainView';
+import {
+  openRuleExplainPanelForViolation,
+  openRuleExplainPanel,
+  setRuleExplainTelemetry,
+} from './views/ruleExplainView';
 import { readViolations, ViolationsData, getViolationsPath as getViolationsFilePath } from './violationsReader';
+import {
+  SecurityHotspotReviewState,
+  SecurityHotspotReviewStateService,
+  isSecurityHotspotViolation,
+} from './securityHotspotReviewState';
 import {
   setConflictingRulesMetadata,
   setRelatedRulesMetadata,
@@ -89,6 +100,8 @@ import { buildSidebarSectionCountMap } from './sidebarSectionCounts';
 import { copyTreeNodesToClipboard } from './copyTreeAsJson';
 import { checkForUpgrade } from './upgrade-checker';
 import { buildStatusBarLabel } from './statusBarLabel';
+import { createRelatedRuleTelemetry } from './relatedRuleTelemetry';
+import { registerCrossFileCommands } from './cross-file-commands';
 import {
   serializeIssueNode,
   serializeConfigNode,
@@ -193,6 +206,19 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   syncDriftSidebarSuppressContext(context.workspaceState);
 
   const cfg = getConfig();
+  const relatedRuleTelemetry = createRelatedRuleTelemetry(context.workspaceState);
+  setRuleExplainTelemetry((event, props = {}) => {
+    if (event === 'open') {
+      relatedRuleTelemetry.track('ruleExplain.open', props);
+      return;
+    }
+    if (event === 'relatedClick') {
+      relatedRuleTelemetry.track('ruleExplain.relatedClick', props);
+      return;
+    }
+    relatedRuleTelemetry.track('ruleExplain.docClick', props);
+  });
+
   let enabled = cfg.get<boolean>('enabled', true) ?? true;
 
   // Auto-enable when saropa_lints is already in pubspec.yaml but the user
@@ -234,7 +260,9 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   );
 
   const issuesProvider = new IssuesTreeProvider(context.workspaceState);
-  const summaryProvider = new SummaryTreeProvider();
+  const hotspotReviewState = new SecurityHotspotReviewStateService(context.workspaceState);
+  const summaryProvider = new SummaryTreeProvider(context.workspaceState);
+  const suppressionsProvider = new SuppressionsTreeProvider();
   const configProvider = new ConfigTreeProvider();
   const overviewProvider = new OverviewTreeProvider(
     context.workspaceState,
@@ -304,6 +332,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   context.subscriptions.push(
     vscode.window.registerWebviewViewProvider(COMMAND_CATALOG_SIDEBAR_VIEW_ID, catalogSidebarProvider),
   );
+  registerCrossFileCommands(context);
   let driftAdvisorRefreshInProgress = false;
 
   let todosAndHacksSaveDebounce: ReturnType<typeof setTimeout> | undefined;
@@ -378,6 +407,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     },
     issuesView,
     vscode.window.registerTreeDataProvider('saropaLints.summary', summaryProvider),
+    vscode.window.registerTreeDataProvider('saropaLints.suppressions', suppressionsProvider),
     vscode.window.registerTreeDataProvider('saropaLints.config', configProvider),
     vscode.window.registerTreeDataProvider('saropaLints.suggestions', suggestionsProvider),
     vscode.window.registerTreeDataProvider('saropaLints.securityPosture', securityProvider),
@@ -390,6 +420,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     issuesProvider.refresh();
     overviewProvider.refresh();
     summaryProvider.refresh();
+    suppressionsProvider.refresh();
     configProvider.refresh();
     suggestionsProvider.refresh();
     securityProvider.refresh();
@@ -746,6 +777,16 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     }),
     vscode.commands.registerCommand('saropaLints.openRulePacks', () => {
       void vscode.commands.executeCommand('saropaLints.rulePacks.focus');
+    }),
+    vscode.commands.registerCommand('saropaLints.openConfigDashboard', () => {
+      void vscode.commands.executeCommand('saropaLints.rulePacks.focus');
+    }),
+    vscode.commands.registerCommand('saropaLints.openPackageVibrancy', async () => {
+      await vscode.commands.executeCommand('saropaLints.packageVibrancy.packages.focus');
+      const hasResults = getLatestResults().length > 0;
+      if (!hasResults) {
+        await vscode.commands.executeCommand('saropaLints.packageVibrancy.scan');
+      }
     }),
     vscode.commands.registerCommand('saropaLints.openWalkthrough', () => {
       void vscode.commands.executeCommand(
@@ -1104,7 +1145,29 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         else openRuleExplainPanel({ ruleName: selected });
       });
     }),
+    vscode.commands.registerCommand(
+      'saropaLints.explainRuleFromSuggestion',
+      (ruleName: unknown, sourceRule: unknown) => {
+        if (typeof ruleName !== 'string' || ruleName.trim().length === 0) return;
+        const normalizedRule = ruleName.trim();
+        const source = typeof sourceRule === 'string' ? sourceRule.trim() : '';
+        relatedRuleTelemetry.track('suggestions.relatedRuleOpen', {
+          ruleName: normalizedRule,
+          sourceRule: source,
+        });
+        openRuleExplainPanel({ ruleName: normalizedRule });
+      },
+    ),
     vscode.commands.registerCommand('saropaLints.showOutput', showOutputChannel),
+    vscode.commands.registerCommand('saropaLints.showRelatedRuleTelemetry', () => {
+      showRelatedRuleTelemetryPanel(relatedRuleTelemetry);
+    }),
+    vscode.commands.registerCommand('saropaLints.resetRelatedRuleTelemetry', () => {
+      relatedRuleTelemetry.reset();
+      void vscode.window.showInformationMessage(
+        'Saropa Lints: related rule telemetry counters reset.',
+      );
+    }),
     // "Copy Latest Report" — grabs the newest `*_saropa_lint_report.log`
     // (the Dart plugin's consolidated analysis report with top rules,
     // concentration, and triage sections) and puts its full contents on
@@ -1332,6 +1395,63 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         quickPick.hide();
       });
       quickPick.show();
+    }),
+    vscode.commands.registerCommand('saropaLints.reviewHotspotState', async (arg: unknown) => {
+      const root = getProjectRoot();
+      if (!root) return;
+      const data = readViolations(root);
+      if (!data) {
+        void vscode.window.showInformationMessage('No analysis data. Run analysis first.');
+        return;
+      }
+      const node = arg as IssueTreeNode | undefined;
+      const fromNode = node?.kind === 'violation' ? node.violation : undefined;
+      const allHotspots = data.violations.filter((violation) =>
+        isSecurityHotspotViolation(violation, data.config?.ruleMetadataByRule),
+      );
+      if (allHotspots.length === 0) {
+        void vscode.window.showInformationMessage('No security hotspots found in current report.');
+        return;
+      }
+      let target = fromNode;
+      if (
+        !target ||
+        !isSecurityHotspotViolation(target, data.config?.ruleMetadataByRule)
+      ) {
+        const picks = allHotspots.map((violation) => ({
+          label: `${violation.rule} (${violation.impact ?? 'low'})`,
+          description: `${violation.file}:${violation.line}`,
+          detail: violation.message,
+          violation,
+        }));
+        const picked = await vscode.window.showQuickPick(picks, {
+          title: 'Review security hotspot',
+          placeHolder: 'Choose a hotspot to triage',
+          matchOnDetail: true,
+        });
+        if (!picked) return;
+        target = picked.violation;
+      }
+      const current = hotspotReviewState.getEffective(target, data.config?.ruleMetadataByRule);
+      const statePicks: Array<{
+        label: string;
+        description: string;
+        state: SecurityHotspotReviewState;
+      }> = [
+          { label: 'Open', description: 'Needs review or follow-up', state: 'open' },
+          { label: 'Reviewed Safe', description: 'Reviewed and accepted as safe', state: 'reviewed-safe' },
+          { label: 'Reviewed Fixed', description: 'Issue has been fixed', state: 'reviewed-fixed' },
+        ];
+      const pickedState = await vscode.window.showQuickPick(statePicks, {
+        title: `Set hotspot state (${target.rule} @ ${target.file}:${target.line})`,
+        placeHolder: `Current: ${current}`,
+      });
+      if (!pickedState) return;
+      await hotspotReviewState.set(target, pickedState.state);
+      issuesProvider.refresh();
+      void vscode.window.showInformationMessage(
+        `Hotspot marked as ${pickedState.state}.`,
+      );
     }),
     vscode.commands.registerCommand('saropaLints.clearIssuesFilters', () => {
       issuesProvider.clearFilters();
@@ -1609,7 +1729,7 @@ async function showFirstRunNotification(
   } else if (choice === 'Run Analysis') {
     await vscode.commands.executeCommand('saropaLints.runAnalysis');
   } else if (choice === 'Configure Rules') {
-    await vscode.commands.executeCommand('saropaLints.config.focus');
+    await vscode.commands.executeCommand('saropaLints.openConfigDashboard');
   }
 }
 
@@ -1633,7 +1753,7 @@ function registerCopyAsJsonCommands(
       copyTreeNodesToClipboard(item, selected, serializeIssueNode, (n) => issuesProvider.getChildren(n as never), 'Violations'),
     ),
     vscode.commands.registerCommand('saropaLints.config.copyAsJson', (item: unknown, selected?: unknown[]) =>
-      copyTreeNodesToClipboard(item, selected, serializeConfigNode, (n) => configProvider.getChildren(n as never), 'Setup & triage'),
+      copyTreeNodesToClipboard(item, selected, serializeConfigNode, (n) => configProvider.getChildren(n as never), 'Triage'),
     ),
     vscode.commands.registerCommand('saropaLints.summary.copyAsJson', (item: unknown, selected?: unknown[]) =>
       copyTreeNodesToClipboard(item, selected, serializeSummaryNode, (n) => summaryProvider.getChildren(n as never), 'Summary'),

@@ -101,9 +101,9 @@ export function serializeIssueNode(node: unknown): JsonNode | null {
     }
 }
 
-// ─── Config Tree ──────────────────────────────────────────────────────────────
+// ─── Setup & Triage Tree ──────────────────────────────────────────────────────
 
-/** Serialize a Config tree node (setting, triage group, triage rule, info). */
+/** Serialize a Triage tree node (setting, triage group, triage rule, info). */
 export function serializeConfigNode(node: unknown): JsonNode | null {
     const n = node as ConfigTreeNode;
     if (!n || typeof n !== 'object' || !('kind' in n)) return null;
@@ -255,7 +255,7 @@ export function serializeOverviewNode(node: unknown): JsonNode | null {
         return { type: 'overviewIssuesSection', label: 'Issues' };
     }
     if (cv === 'overviewSidebarSection') {
-        return { type: 'overviewSidebarSection', label: 'Sidebar' };
+        return { type: 'overviewSidebarSection', label: 'Activity bar sections' };
     }
     return serializeTreeItemNode(node, 'overviewItem');
 }

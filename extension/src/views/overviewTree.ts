@@ -3,20 +3,20 @@
  *
  * Single sidebar view that combines onboarding copy, **Settings** (embedded
  * {@link ConfigTreeProvider} settings + actions), **Issues** (triage groups from
- * {@link ConfigTreeProvider}), **Sidebar** (per-section visibility), and the
+ * {@link ConfigTreeProvider}), **Activity bar sections** (per-section visibility), and the
  * **dashboard** (health, violations, trends) when `violations.json` exists.
  *
  * ## Behaviour contracts (for reviewers)
  *
  * - **Dart workspace:** always returns a **Help & resources** group (intro links), **Settings** (embedded config),
  *   conditionally **Issues** (when triage data exists),
- *   and **Sidebar** section toggles so users are never stuck on a bare welcome with only
+ *   and **Activity bar sections** toggles so users are never stuck on a bare welcome with only
  *   a single “Enable” affordance. `saropaLints.enabled` defaults **true**; when a user turns
  *   lint integration **off**, a **Lint integration: Off** row (warning styling) still links
  *   to **Set Up Project** so onboarding is discoverable without hiding the rest of the tree.
  * - **Non-Dart:** empty root so `viewsWelcome` can prompt to open a pubspec folder.
  * - **Embedded config:** delegates to the same `ConfigTreeProvider` instance as the
- *   standalone Config view — `refreshAll` clears triage cache once; no duplicate logic.
+ *   standalone Triage view — `refreshAll` clears triage cache once; no duplicate logic.
  * - **Recursion:** `getChildren` depth is bounded (root → settings/issues → triage groups
  *   → rules; root → sidebar → leaves). No cycles.
  * - **Type guard:** {@link isConfigTreeNode} only accepts known `ConfigTreeNode.kind`
@@ -43,6 +43,10 @@ import {
 } from './overviewSidebarTree';
 import { buildFileRisks } from './fileRiskTree';
 import { loadSuppressions, isPathHidden, isRuleHidden } from '../suppressionsStore';
+import {
+    SecurityHotspotReviewStateService,
+    countSecurityHotspotReviewStates,
+} from '../securityHotspotReviewState';
 
 const OVERVIEW_INTRO_TOOLTIP =
     'Saropa Lints provides 2100+ Dart and Flutter lint rules for security, accessibility, and performance. '
@@ -291,9 +295,27 @@ function buildDashboardItems(workspaceState: vscode.Memento, data: ViolationsDat
     const history = loadHistory(workspaceState);
     const total = data.summary?.totalViolations ?? data.violations?.length ?? 0;
     const critical = data.summary?.byImpact?.critical ?? 0;
+    const hotspotReviewState = new SecurityHotspotReviewStateService(workspaceState);
+    const hotspotCounts = countSecurityHotspotReviewStates(
+        data.violations ?? [],
+        data.config?.ruleMetadataByRule,
+        hotspotReviewState,
+    );
 
     appendHealthRow(items, history, data, total);
     appendViolationCountRow(items, total, critical);
+    if (hotspotCounts.total > 0) {
+        const reviewed = hotspotCounts.reviewedSafe + hotspotCounts.reviewedFixed;
+        const percent = Math.round((reviewed / hotspotCounts.total) * 100);
+        items.push(
+            new OverviewItem(
+                `Hotspots: ${percent}% reviewed`,
+                `${hotspotCounts.open} open, ${hotspotCounts.reviewedSafe} safe, ${hotspotCounts.reviewedFixed} fixed`,
+                'saropaLints.reviewHotspotState',
+                'shield',
+            ),
+        );
+    }
     appendSuppressionRow(items, data);
     appendTrendRow(items, history);
     appendRegressionAndMilestone(items, history, data);
@@ -424,6 +446,12 @@ function buildEmbeddedSummaryItems(workspaceState: vscode.Memento): OverviewItem
     const s = data.summary;
     const c = data.config;
     const total = s?.totalViolations ?? data.violations.length;
+    const hotspotReviewState = new SecurityHotspotReviewStateService(workspaceState);
+    const hotspotCounts = countSecurityHotspotReviewStates(
+        data.violations,
+        data.config?.ruleMetadataByRule,
+        hotspotReviewState,
+    );
 
     const items: OverviewItem[] = [
         new OverviewItem('Total violations', String(total), 'saropaLints.focusIssues', 'symbol-number'),
@@ -434,6 +462,18 @@ function buildEmbeddedSummaryItems(workspaceState: vscode.Memento): OverviewItem
     }
     if (s?.filesWithIssues != null) {
         items.push(new OverviewItem('Files with violations', String(s.filesWithIssues), undefined, 'file'));
+    }
+    if (hotspotCounts.total > 0) {
+        const reviewed = hotspotCounts.reviewedSafe + hotspotCounts.reviewedFixed;
+        const percent = Math.round((reviewed / hotspotCounts.total) * 100);
+        items.push(
+            new OverviewItem(
+                'Hotspot review',
+                `${percent}% reviewed — ${hotspotCounts.open} open, ${hotspotCounts.reviewedSafe} safe, ${hotspotCounts.reviewedFixed} fixed`,
+                'saropaLints.reviewHotspotState',
+                'shield',
+            ),
+        );
     }
 
     // Suppression count — shows how many diagnostics were silenced by

@@ -1,6 +1,6 @@
-## Triage & Config
+## Triage
 
-The **Config view** groups rules by priority:
+The **Triage** view groups rules by priority:
 
 - **Critical** (flame icon) — Rules with critical-impact violations
 - **Volume bands** A–D — Rules grouped by issue count (1–5, 6–20, 21–100, 100+)
