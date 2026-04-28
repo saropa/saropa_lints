@@ -59,8 +59,8 @@ array-length construction are obsolete in 3.2+.
 ## Acceptance Criteria
 
 - [x] Concrete symbol documented with source proof.
-- [ ] Rule only targets `JSArray.withLength` from `dart:js_interop`.
-- [ ] GOOD tests include valid `int` calls and same-name non-interop APIs.
+- [x] Rule only targets `JSArray.withLength` from `dart:js_interop`.
+- [x] GOOD tests include valid `int` calls and same-name non-interop APIs.
 - [x] No autofix unless a future pattern is guaranteed-safe.
 
 ---

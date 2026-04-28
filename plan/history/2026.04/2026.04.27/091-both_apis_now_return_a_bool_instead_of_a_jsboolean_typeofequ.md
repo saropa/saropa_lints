@@ -69,8 +69,8 @@ adaptation should be removed and standard bool flow should be used.
 ## Acceptance Criteria
 
 - [x] Exact changed members documented with source proof.
-- [ ] Lint only fires on `typeofEquals` / `instanceof` and only on legacy usage.
-- [ ] GOOD cases include normal bool usage in conditions/expressions.
+- [x] Lint only fires on `typeofEquals` / `instanceof` and only on legacy usage.
+- [x] GOOD cases include normal bool usage in conditions/expressions.
 - [x] No quick fix (semantic migration).
 
 ---
@@ -82,7 +82,7 @@ adaptation should be removed and standard bool flow should be used.
 - [x] Implement detector in Flutter SDK migration rules file.
 - [x] Add fixture BAD/GOOD coverage for legacy-JSBoolean assumptions.
 - [x] Add metadata/registry/tier updates.
-- [ ] Add changelog update (defer to release batching).
+- [x] Add changelog update.
 
 ---
 

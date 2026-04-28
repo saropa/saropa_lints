@@ -60,8 +60,8 @@ Legacy `JSString`-style argument construction/conversion should be removed.
 ## Acceptance Criteria
 
 - [x] Exact changed symbol documented with source proof.
-- [ ] Rule only targets `typeofEquals` from `dart:js_interop`.
-- [ ] GOOD tests include regular String callsites and same-name non-interop APIs.
+- [x] Rule only targets `typeofEquals` from `dart:js_interop`.
+- [x] GOOD tests include regular String callsites and same-name non-interop APIs.
 - [x] Rule message points to String argument requirement.
 
 ---
@@ -72,6 +72,7 @@ Legacy `JSString`-style argument construction/conversion should be removed.
 - [x] Rewrite plan with concrete symbol mapping.
 - [x] Implement detector in Flutter SDK migration rules file.
 - [x] Add fixture/tests and tier updates.
+- [x] Validate rule scope with same-name user API fixture coverage.
 - [ ] Add changelog update (defer to release batching).
 
 ---
