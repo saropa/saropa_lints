@@ -1,0 +1,33 @@
+# Thin API package: re-exports Saropa composite-plugin registration so
+# meta-plugins depend on this package + one Saropa version instead of reaching
+# into package:saropa_lints internals. Not published standalone (see publish_to).
+
+name: saropa_lints_api
+
+description: >-
+  Minimal export surface for composite analyzer plugins that embed Saropa Lints.
+  Re-exports registration helpers from package:saropa_lints so meta-plugins can
+  depend on this package and constrain the Saropa version in one place.
+
+version: 0.1.0
+
+# Keeps pub.dev from accepting publishes; consumers use path:/git: against the monorepo.
+publish_to: none
+
+repository: https://github.com/saropa/saropa_lints
+
+issue_tracker: https://github.com/saropa/saropa_lints/issues
+
+# Floor aligns with current Dart support policy; upper bound matches package:saropa_lints.
+environment:
+  sdk: ">=3.10.0 <4.0.0"
+
+dependencies:
+  # Composite plugins register via analysis_server_plugin; version kept in step with saropa_lints.
+  analysis_server_plugin: ^0.3.4
+  # Path so the workspace always resolves the in-tree saropa_lints (no pub.dev pin drift here).
+  saropa_lints:
+    path: ../..
+
+dev_dependencies:
+  test: ^1.25.0
