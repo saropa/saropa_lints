@@ -35,13 +35,13 @@
 
 | Phase | What ships |
 |-------|------------|
-| **0** | Lock policy (§7): tier×pack algebra, naming (`rule_packs`), defaults. |
+| **0** | Lock policy (§7): tier×pack algebra, naming (`rule_packs`), defaults. **Shipped:** ratified v1 defaults in §7. |
 | **1** | **Dart:** pack registry (`pack_id` → rule codes), `config_loader` reads `rule_packs.enabled`, merge into `register`, tests. **No extension yet.** |
 | **2** | **VS Code extension:** pack rows (§10 Phase 2), **target platforms** summary (Appendix C), toggles → `analysis_options.yaml`, YAML merge tests. |
 | **3** | **Resolver:** `pubspec.lock` / versions per project root for semver-gated pack entries. **Shipped:** `pubspec_lock_resolver`, `kRulePackDependencyGates`, `collection_compat` example; transitive-only semver UX deferred. |
 | **4** | **CLI `init`:** list applicable packs; optional `--enable-pack`. **Shipped:** `--list-packs`, `--enable-pack` on `dart run saropa_lints:init`; YAML preservation in `generatePluginsYaml`. |
-| **5** | **Bulk** assign rule codes → packs for all `lib/src/rules/packages/*` (script or codegen). |
-| **6** | **SDK / Flutter** packs + map `migration_rules.dart` entries. |
+| **5** | **Bulk** assign rule codes → packs for all `lib/src/rules/packages/*` (script or codegen). **Shipped:** generator + audit in implementation note. |
+| **6** | **SDK / Flutter** packs + map `migration_rules.dart` entries. **Substantially shipped:** SDK-gated packs from pubspec `environment` constraints (`dart_sdk_3_2`, `flutter_sdk_3_7`, `flutter_sdk_3_10`, `flutter_sdk_3_16`, `flutter_sdk_3_19`, `flutter_sdk_3_22`, `flutter_sdk_3_24`, `flutter_sdk_3_28`, `flutter_sdk_3_29`, `flutter_sdk_3_32`, `flutter_sdk_3_35`, `flutter_sdk_3_38`). |
 | **7** | **Optional:** `saropa_lints_api` + second analyzer plugin for private org rules. |
 
 Later sections (architecture, data model, §11 inventory) support **all** phases; implementation order is **0 → 1 → 2** for a vertical slice, then **3–6** as capacity allows.
@@ -180,9 +180,9 @@ flowchart LR
 
 ---
 
-## 7. Policy decisions (must resolve)
+## 7. Policy decisions (ratified for v1)
 
-Decisions below block implementation detail; pick defaults before coding.
+These defaults are now the v1 baseline and should be treated as constraints for new implementation work unless superseded by an explicit maintainer decision.
 
 ### 7.1 Tier × pack boolean algebra
 
@@ -192,7 +192,7 @@ Decisions below block implementation detail; pick defaults before coding.
 | **B — Pack filters tier** | Effective = tier ∩ pack for package families | Clear “subset of what I already enabled” | Packs empty if user uses minimal tier |
 | **C — Packs replace tiers for package rules** | Package rules **removed** from tiers; only via packs | Clean product story | **Breaking** unless major version |
 
-**Recommendation for v1:** **A** for *new* opt-in pack-only rules (semver migrations); **B** optional as “strict pack mode”; avoid **C** until a major release with migration guide.
+**v1 decision (updated):** package/SDK rules use **pack-owned behavior** in practice: pack-owned rule codes are removed from tier-derived enables and re-enabled only by `rule_packs.enabled`. This aligns with “packs replace tiers for package/migration ownership” without requiring a second plugin architecture.
 
 ### 7.2 Auto-detect: suggest vs enable
 
@@ -263,7 +263,14 @@ plugins:
       auto_enable_matching: false
 ```
 
-Use **`rule_packs`** as the canonical key: it covers **library packs** (Drift, Riverpod) and **semver migration** entries (e.g. `collection_1_19`) in one mechanism. (If we ever printed `migration_packs`, treat it as an alias only during a transition.)
+Use **`rule_packs`** as the canonical key: it covers **library packs** (Drift, Riverpod) and **semver migration** entries (e.g. `collection_1_19`) in one mechanism.
+
+**Alias policy (ratified):**
+
+- Parser accepts legacy **`migration_packs`** as a **read-only alias** for backward compatibility.
+- If both keys are present, **`rule_packs` wins**.
+- Writers (`init`, extension) should emit only **`rule_packs`**.
+- Alias support is transitional and should be removed only with a documented major-version migration note.
 
 Alternatives: per-pack booleans — avoid if hundreds of packs exist.
 
@@ -277,11 +284,11 @@ Alternatives: per-pack booleans — avoid if hundreds of packs exist.
 
 Same intent as §0; this section is **deliverables + exit criteria** per phase.
 
-### Phase 0 — Decisions & design
+### Phase 0 — Decisions & design (**shipped**)
 
 **Deliverables:** Locked answers for §7; canonical config key **`rule_packs`**; `snake_case` pack ids.
 
-**Exit:** Maintainer sign-off; no code required.
+**Exit:** Maintainer sign-off; no code required. **Complete.**
 
 ### Phase 1 — Pack registry + linter (Dart only)
 
@@ -345,13 +352,37 @@ Same intent as §0; this section is **deliverables + exit criteria** per phase.
 
 **Exit:** Coverage % tracked; remaining issues filed.
 
-### Phase 6 — SDK / Flutter packs
+### Phase 6 — SDK / Flutter packs (**in progress**)
 
 **Deliverables:**
 
 - Predicates from `environment.sdk` + Flutter version source; map `migration_rules.dart` into packs where appropriate.
 
 **Exit:** At least one `dart_sdk_*` pack end-to-end.
+
+**Implementation note (2026-04-28):** Added SDK-gated pack predicates in `rule_packs.dart` using pubspec `environment` constraints (`kRulePackSdkGates`, `packPassesSdkGate`), plus SDK packs:
+
+- `dart_sdk_3_2` → js_interop migration rules (`avoid_removed_js_number_to_dart`, `avoid_legacy_jsboolean_return_assumptions`, `prefer_string_for_typeof_equals`, `prefer_int_for_jsarray_with_length`)
+- `flutter_sdk_3_0` → Flutter migration rules (`avoid_removed_render_object_element_methods`)
+- `flutter_sdk_3_7` → Flutter migration rules (`avoid_deprecated_use_inherited_media_query`, `prefer_scrollbar_theme_of`)
+- `flutter_sdk_3_10` → Flutter migration rules (`avoid_removed_appbar_backwards_compatibility`, `avoid_deprecated_flutter_test_window`)
+- `flutter_sdk_3_16` → Flutter migration rules (`avoid_deprecated_use_material3_copy_with`, `prefer_utf8_encode`)
+- `flutter_sdk_3_18` → Flutter migration rules (`prefer_key_event`)
+- `flutter_sdk_3_19` → Flutter migration rules (`prefer_platform_menu_bar_child`, `prefer_keepalive_dispose`, `prefer_context_menu_builder`, `prefer_pan_axis`)
+- `flutter_sdk_3_22` → Flutter migration rules (`prefer_m3_text_theme`)
+- `flutter_sdk_3_24` → Flutter migration rules (`prefer_overflow_bar_over_button_bar`, `prefer_iterable_cast`)
+- `flutter_sdk_3_28` → Flutter migration rules (`prefer_button_style_icon_alignment`)
+- `flutter_sdk_3_29` → Flutter migration rules (`avoid_deprecated_on_surface_destroyed`)
+- `flutter_sdk_3_32` → Flutter migration rules (`prefer_tabbar_theme_indicator_color`, `prefer_dropdown_menu_item_button_opacity_animation`)
+- `flutter_sdk_3_35` → Flutter migration rules (`prefer_dropdown_initial_value`, `prefer_on_pop_with_result`)
+- `flutter_sdk_3_38` → Flutter migration rules (`avoid_asset_manifest_json`)
+
+Associated tests: `test/rule_packs_sdk_gates_test.dart`. Extension detection now also recognizes SDK packs from `environment.sdk` / `environment.flutter` constraints (`extension/src/rulePacks/rulePackDefinitions.ts`).
+
+**Remaining for Phase 6 close-out (small):**
+
+- Optionally split very broad SDK packs if UX requires finer granularity.
+- Final maintainer sign-off that current SDK cohorts are sufficient for v1.
 
 ### Phase 7 — Optional: external API / second analyzer plugin
 
@@ -420,7 +451,9 @@ The analyzed project sets **`plugins.acme_saropa_plugin`** (only one plugin key)
 | **Unit** | Lockfile parsing edge cases (path deps, SDK constraint, missing file). |
 | **Unit** | Predicate evaluation: version ranges, direct deps. |
 | **Integration** | Minimal project with `analysis_options.yaml` enabling one pack → only expected diagnostics / registered rules. |
+| **Integration** | Monorepo/multi-root fixture: ensure resolver + config loader use analyzed file project root (not `Directory.current`). |
 | **Regression** | No `rule_packs` section → identical behavior to pre-feature for same tier. |
+| **Regression** | Legacy `migration_packs.enabled` parses; when both keys exist, `rule_packs` takes precedence. |
 | **init** | Golden output or substring match for “applicable packs” list. |
 
 ---
@@ -525,6 +558,7 @@ Canonical **Flutter embedder / build target** identifiers (align with `flutter c
 - [ ] Extension row shows: **package/pack label**, **detected in pubspec** (yes/no), **enabled** toggle, **rule count**, **navigable list of rules** (link or command); **platform targets table** (Appendix C) for Flutter apps.
 - [ ] Toggle persists in `analysis_options.yaml`; analysis reflects change.
 - [ ] No `rule_packs` key → same behavior as today for existing projects.
+- [ ] Legacy `migration_packs.enabled` is read for compatibility; if both keys exist, canonical `rule_packs.enabled` wins.
 
 ---
 

@@ -40,6 +40,20 @@ void main() {
       mergeRulePacksIntoEnabled(enabled, null, <String>[]);
       expect(enabled, equals(<String>{'x'}));
     });
+
+    test('removes pack-owned tier rule when no packs are enabled', () {
+      final enabled = <String>{'require_provider_scope', 'x'};
+      mergeRulePacksIntoEnabled(enabled, null, const <String>[]);
+      expect(enabled.contains('require_provider_scope'), isFalse);
+      expect(enabled.contains('x'), isTrue);
+    });
+
+    test('keeps pack-owned rule only when its pack is enabled', () {
+      final enabled = <String>{'require_provider_scope', 'x'};
+      mergeRulePacksIntoEnabled(enabled, null, const <String>['riverpod']);
+      expect(enabled.contains('require_provider_scope'), isTrue);
+      expect(enabled.contains('x'), isTrue);
+    });
   });
 
   group('ruleCodesForPack', () {

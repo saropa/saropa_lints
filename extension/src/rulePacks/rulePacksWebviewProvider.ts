@@ -106,7 +106,7 @@ export class RulePacksWebviewProvider implements vscode.WebviewViewProvider {
 
     const body = `
 <h1>Rule packs</h1>
-<p class="hint">Enable extra rules per stack. Merged with your tier; see <a href="https://pub.dev/packages/saropa_lints">docs</a>.</p>
+<p class="hint">Pack-owned rules are off unless that pack is enabled. Packs control package/SDK migration domains directly; see <a href="https://pub.dev/packages/saropa_lints">docs</a>.</p>
 <table class="packs">
 <thead><tr><th>Pack</th><th>In pubspec</th><th>Enabled</th><th>Rules</th><th></th></tr></thead>
 <tbody>${rows}</tbody>

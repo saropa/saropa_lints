@@ -26,6 +26,7 @@ import '../baseline/baseline_manager.dart';
 import '../config/analysis_options_rule_packs.dart';
 import '../config/pubspec_lock_resolver.dart';
 import '../config/rule_packs.dart';
+import '../report/diagnostic_statistics.dart';
 import '../saropa_lint_rule.dart' show ProgressTracker, SaropaLintRule;
 import 'plugin_logger.dart' show PluginLogger;
 import 'package:saropa_lints/src/string_slice_utils.dart';
@@ -84,6 +85,7 @@ void _loadFromRoot(String? projectRoot) {
     _loadBaselineConfig(content);
     loadBannedUsageConfig(content);
     _loadOutputConfig(content);
+    _loadDiagnosticStatisticsConfig(content, projectRoot);
 
     // Success telemetry — visible in reports/.saropa_lints/plugin.log once
     // the project root is set. This is the primary signal users can check
@@ -96,6 +98,107 @@ void _loadFromRoot(String? projectRoot) {
   } on Object catch (e, st) {
     PluginLogger.log('loadNativePluginConfig failed', error: e, stackTrace: st);
     // Defensive: ensure plugin can still register with defaults
+  }
+}
+
+/// Parse diagnostic statistics config (threshold gates + baseline diff).
+///
+/// Supported shape in `analysis_options_custom.yaml`:
+/// ```yaml
+/// diagnostic_statistics:
+///   thresholds:
+///     avoid_hardcoded_credentials:
+///       fail: 0
+///     avoid_print:
+///       warn: 50
+///   baseline:
+///     file: reports/.saropa_lints/diagnostic_baseline.json
+/// ```
+void _loadDiagnosticStatisticsConfig(String? content, String? projectRoot) {
+  DiagnosticStatisticsConfig.reset();
+  if (content == null) return;
+
+  final sectionMatch = RegExp(
+    r'^diagnostic_statistics:\s*$',
+    multiLine: true,
+  ).firstMatch(content);
+  if (sectionMatch == null) return;
+
+  final lines = content.afterIndex(sectionMatch.end).split('\n');
+  final warn = <String, int>{};
+  final fail = <String, int>{};
+  String? baselineFile;
+
+  var inThresholds = false;
+  var inBaseline = false;
+  String? currentRule;
+
+  for (final line in lines) {
+    final trimmed = line.trim();
+    if (trimmed.isEmpty || trimmed.startsWith('#')) continue;
+    if (!line.startsWith('  ')) break;
+
+    if (RegExp(r'^\s{2}thresholds:\s*$').hasMatch(line)) {
+      inThresholds = true;
+      inBaseline = false;
+      currentRule = null;
+      continue;
+    }
+
+    if (RegExp(r'^\s{2}baseline:\s*$').hasMatch(line)) {
+      inThresholds = false;
+      inBaseline = true;
+      currentRule = null;
+      continue;
+    }
+
+    if (inThresholds) {
+      final ruleMatch = RegExp(r'^\s{4}([\w_.-]+):\s*$').firstMatch(line);
+      if (ruleMatch != null) {
+        currentRule = ruleMatch.group(1);
+        continue;
+      }
+
+      final thresholdMatch = RegExp(
+        r'^\s{6}(warn|fail):\s*(\d+)\s*$',
+      ).firstMatch(line);
+      final kind = thresholdMatch?.group(1);
+      final valueRaw = thresholdMatch?.group(2);
+      if (thresholdMatch == null ||
+          kind == null ||
+          valueRaw == null ||
+          currentRule == null) {
+        continue;
+      }
+
+      final value = int.tryParse(valueRaw);
+      if (value == null) continue;
+      if (kind == 'warn') {
+        warn[currentRule] = value;
+      } else {
+        fail[currentRule] = value;
+      }
+      continue;
+    }
+
+    if (inBaseline) {
+      final baselineMatch = RegExp(
+        r'^\s{4}file:\s*"?([^"]+)"?\s*$',
+      ).firstMatch(line);
+      final filePath = baselineMatch?.group(1);
+      if (filePath != null && filePath.isNotEmpty) {
+        baselineFile = filePath;
+      }
+    }
+  }
+
+  DiagnosticStatisticsConfig.setThresholds(warn: warn, fail: fail);
+  if (baselineFile != null) {
+    // Keep relative paths as-is so downstream consumers can resolve against
+    // the project root consistently regardless of where loading occurred.
+    DiagnosticStatisticsConfig.setBaselinePath(baselineFile);
+  } else if (projectRoot != null) {
+    DiagnosticStatisticsConfig.setBaselinePath(null);
   }
 }
 

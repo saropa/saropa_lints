@@ -9,6 +9,7 @@ export interface RulePackDefinition {
   readonly matchPubNames: readonly string[];
   readonly ruleCodes: readonly string[];
   readonly dependencyGate?: { readonly package: string; readonly constraint: string };
+  readonly sdkGate?: { readonly sdkKey: 'sdk' | 'flutter'; readonly minVersion: string };
 }
 
 export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
@@ -549,9 +550,185 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
       'avoid_collection_methods_with_unrelated_types',
     ],
   },
+  {
+    id: 'dart_sdk_3_2',
+    label: 'Dart SDK 3.2+',
+    matchPubNames: [],
+    sdkGate: { sdkKey: 'sdk', minVersion: '3.2.0' },
+    ruleCodes: [
+      'avoid_removed_js_number_to_dart',
+      'avoid_legacy_jsboolean_return_assumptions',
+      'prefer_string_for_typeof_equals',
+      'prefer_int_for_jsarray_with_length',
+    ],
+  },
+  {
+    id: 'flutter_sdk_3_7',
+    label: 'Flutter SDK 3.7+',
+    matchPubNames: [],
+    sdkGate: { sdkKey: 'flutter', minVersion: '3.7.0' },
+    ruleCodes: [
+      'avoid_deprecated_use_inherited_media_query',
+      'prefer_scrollbar_theme_of',
+      'avoid_deprecated_animated_list_typedefs',
+    ],
+  },
+  {
+    id: 'flutter_sdk_3_0',
+    label: 'Flutter SDK 3.0+',
+    matchPubNames: [],
+    sdkGate: { sdkKey: 'flutter', minVersion: '3.0.0' },
+    ruleCodes: [
+      'avoid_removed_render_object_element_methods',
+    ],
+  },
+  {
+    id: 'flutter_sdk_3_10',
+    label: 'Flutter SDK 3.10+',
+    matchPubNames: [],
+    sdkGate: { sdkKey: 'flutter', minVersion: '3.10.0' },
+    ruleCodes: [
+      'avoid_removed_appbar_backwards_compatibility',
+      'avoid_deprecated_flutter_test_window',
+    ],
+  },
+  {
+    id: 'flutter_sdk_3_16',
+    label: 'Flutter SDK 3.16+',
+    matchPubNames: [],
+    sdkGate: { sdkKey: 'flutter', minVersion: '3.16.0' },
+    ruleCodes: [
+      'avoid_deprecated_use_material3_copy_with',
+      'prefer_utf8_encode',
+    ],
+  },
+  {
+    id: 'flutter_sdk_3_18',
+    label: 'Flutter SDK 3.18+',
+    matchPubNames: [],
+    sdkGate: { sdkKey: 'flutter', minVersion: '3.18.0' },
+    ruleCodes: [
+      'prefer_key_event',
+    ],
+  },
+  {
+    id: 'flutter_sdk_3_19',
+    label: 'Flutter SDK 3.19+',
+    matchPubNames: [],
+    sdkGate: { sdkKey: 'flutter', minVersion: '3.19.0' },
+    ruleCodes: [
+      'prefer_platform_menu_bar_child',
+      'prefer_keepalive_dispose',
+      'prefer_context_menu_builder',
+      'prefer_pan_axis',
+    ],
+  },
+  {
+    id: 'flutter_sdk_3_22',
+    label: 'Flutter SDK 3.22+',
+    matchPubNames: [],
+    sdkGate: { sdkKey: 'flutter', minVersion: '3.22.0' },
+    ruleCodes: [
+      'prefer_m3_text_theme',
+    ],
+  },
+  {
+    id: 'flutter_sdk_3_24',
+    label: 'Flutter SDK 3.24+',
+    matchPubNames: [],
+    sdkGate: { sdkKey: 'flutter', minVersion: '3.24.0' },
+    ruleCodes: [
+      'prefer_overflow_bar_over_button_bar',
+      'prefer_iterable_cast',
+    ],
+  },
+  {
+    id: 'flutter_sdk_3_28',
+    label: 'Flutter SDK 3.28+',
+    matchPubNames: [],
+    sdkGate: { sdkKey: 'flutter', minVersion: '3.28.0' },
+    ruleCodes: [
+      'prefer_button_style_icon_alignment',
+    ],
+  },
+  {
+    id: 'flutter_sdk_3_29',
+    label: 'Flutter SDK 3.29+',
+    matchPubNames: [],
+    sdkGate: { sdkKey: 'flutter', minVersion: '3.29.0' },
+    ruleCodes: [
+      'avoid_deprecated_on_surface_destroyed',
+    ],
+  },
+  {
+    id: 'flutter_sdk_3_32',
+    label: 'Flutter SDK 3.32+',
+    matchPubNames: [],
+    sdkGate: { sdkKey: 'flutter', minVersion: '3.32.0' },
+    ruleCodes: [
+      'prefer_tabbar_theme_indicator_color',
+      'prefer_dropdown_menu_item_button_opacity_animation',
+    ],
+  },
+  {
+    id: 'flutter_sdk_3_35',
+    label: 'Flutter SDK 3.35+',
+    matchPubNames: [],
+    sdkGate: { sdkKey: 'flutter', minVersion: '3.35.0' },
+    ruleCodes: [
+      'prefer_dropdown_initial_value',
+      'prefer_on_pop_with_result',
+    ],
+  },
+  {
+    id: 'flutter_sdk_3_38',
+    label: 'Flutter SDK 3.38+',
+    matchPubNames: [],
+    sdkGate: { sdkKey: 'flutter', minVersion: '3.38.0' },
+    ruleCodes: [
+      'avoid_asset_manifest_json',
+    ],
+  },
 ];
 
 /** True if pubspec.yaml declares any of def.matchPubNames as a dependency entry. */
 export function isPackDetected(def: RulePackDefinition, pubspecContent: string): boolean {
+  if (def.sdkGate) {
+    return sdkConstraintAtLeast(pubspecContent, def.sdkGate.sdkKey, def.sdkGate.minVersion);
+  }
   return def.matchPubNames.some((n) => new RegExp(`^\\s+${n}\\s*:`, 'm').test(pubspecContent));
+}
+
+function sdkConstraintAtLeast(
+  pubspecContent: string,
+  sdkKey: 'sdk' | 'flutter',
+  minVersion: string,
+): boolean {
+  const envMatch = pubspecContent.match(/^environment:\s*\n((?:[ \t]+.*\n)+)/m);
+  if (!envMatch || envMatch.length < 2) return false;
+  const envBlock = envMatch[1];
+  const keyMatch = envBlock.match(
+    new RegExp(`^\\s+${sdkKey}:\\s*['"]?([^'"\\n]+)['"]?\\s*$`, 'm'),
+  );
+  if (!keyMatch || keyMatch.length < 2) return false;
+  const rawConstraint = keyMatch[1].trim();
+  if (rawConstraint.length === 0 || rawConstraint === 'any') return false;
+  const geMatch = rawConstraint.match(/>=\s*(\d+\.\d+\.\d+)/);
+  const lowerRaw = geMatch?.[1] ?? (rawConstraint.startsWith('^') ? rawConstraint.slice(1).trim() : rawConstraint);
+  const lower = extractSemver(lowerRaw);
+  const min = extractSemver(minVersion);
+  if (!lower || !min) return false;
+  return compareSemver(lower, min) >= 0;
+}
+
+function extractSemver(value: string): [number, number, number] | null {
+  const m = value.match(/^(\d+)\.(\d+)\.(\d+)/);
+  if (!m) return null;
+  return [Number(m[1]), Number(m[2]), Number(m[3])];
+}
+
+function compareSemver(a: [number, number, number], b: [number, number, number]): number {
+  if (a[0] !== b[0]) return a[0] - b[0];
+  if (a[1] !== b[1]) return a[1] - b[1];
+  return a[2] - b[2];
 }

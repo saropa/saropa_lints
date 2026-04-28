@@ -20,7 +20,7 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 import 'package:saropa_lints/saropa_lints.dart' show SaropaLintRule;
 import 'package:saropa_lints/src/native/config_loader.dart'
-    show loadNativePluginConfigFromProjectRoot;
+    show loadNativePluginConfigFromProjectRoot, loadRulePacksConfigFromProjectRoot;
 import 'package:test/test.dart';
 
 void main() {
@@ -130,6 +130,71 @@ plugins:
           reason: 'Missing config file must fail closed, not open',
         );
       } finally {
+        tempDir.deleteSync(recursive: true);
+      }
+    });
+  });
+
+  group('loadRulePacksConfigFromProjectRoot', () {
+    test('re-merges using analyzed project root in multi-root layouts', () {
+      final tempDir = Directory.systemTemp.createTempSync('saropa_lints_multi_');
+      final originalCwd = Directory.current;
+      try {
+        final repoRoot = Directory(p.join(tempDir.path, 'repo'))..createSync();
+        final appA = Directory(p.join(repoRoot.path, 'apps', 'a'))
+          ..createSync(recursive: true);
+        final appB = Directory(p.join(repoRoot.path, 'apps', 'b'))
+          ..createSync(recursive: true);
+
+        File(p.join(appA.path, 'analysis_options.yaml')).writeAsStringSync(
+          '''
+plugins:
+  saropa_lints:
+    rule_packs:
+      enabled:
+        - riverpod
+''',
+        );
+        File(p.join(appB.path, 'analysis_options.yaml')).writeAsStringSync(
+          '''
+plugins:
+  saropa_lints:
+    rule_packs:
+      enabled:
+        - drift
+''',
+        );
+
+        // Simulate analyzer cwd not matching either application root.
+        Directory.current = repoRoot.path;
+        SaropaLintRule.enabledRules = null;
+        SaropaLintRule.disabledRules = null;
+
+        loadRulePacksConfigFromProjectRoot(appA.path);
+        expect(
+          SaropaLintRule.enabledRules,
+          contains('require_provider_scope'),
+          reason: 'Expected app A riverpod pack from its project root',
+        );
+        expect(
+          SaropaLintRule.enabledRules!.contains('require_drift_database_close'),
+          isFalse,
+          reason: 'Drift rules from app B must not leak into app A config',
+        );
+
+        loadRulePacksConfigFromProjectRoot(appB.path);
+        expect(
+          SaropaLintRule.enabledRules,
+          contains('require_drift_database_close'),
+          reason: 'Expected app B drift pack from its project root',
+        );
+        expect(
+          SaropaLintRule.enabledRules!.contains('require_provider_scope'),
+          isFalse,
+          reason: 'Prior pack contributions must be removed on root switch',
+        );
+      } finally {
+        Directory.current = originalCwd.path;
         tempDir.deleteSync(recursive: true);
       }
     });

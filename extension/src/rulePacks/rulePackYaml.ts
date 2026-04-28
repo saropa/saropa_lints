@@ -5,7 +5,10 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 
-const RULE_PACK_BLOCK = /^\s{4}rule_packs:\s*\n\s{6}enabled:\s*\n(?:\s{8}-\s+\w+\s*\n)+/m;
+const RULE_PACK_BLOCK =
+  /^\s{4}rule_packs:\s*\n\s{6}enabled:\s*\n(?:\s{8}-\s+["']?\w+["']?\s*(?:#.*)?\n|\s{8}#.*\n|\s*\n)+/m;
+const LEGACY_MIGRATION_PACK_BLOCK =
+  /^\s{4}migration_packs:\s*\n\s{6}enabled:\s*\n(?:\s{8}-\s+["']?\w+["']?\s*(?:#.*)?\n|\s{8}#.*\n|\s*\n)+/m;
 
 export function readAnalysisOptionsPath(workspaceRoot: string): string {
   return path.join(workspaceRoot, 'analysis_options.yaml');
@@ -25,18 +28,63 @@ export function readRulePacksEnabled(workspaceRoot: string): string[] {
 
 export function parseRulePacksEnabled(content: string): string[] {
   const normalized = content.replaceAll('\r\n', '\n').replaceAll('\r', '\n');
-  const m = normalized.match(
-    /rule_packs:\s*\n\s*enabled:\s*\n((?:\s+-\s+\w+\s*\n)+)/m,
-  );
-  if (!m || m.length < 2) return [];
-  const block = m[1];
-  const ids: string[] = [];
-  const re = /-\s+(\w+)/g;
-  let x: RegExpExecArray | null;
-  while ((x = re.exec(block)) !== null) {
-    ids.push(x[1]);
+  const primary = parseEnabledListForKey(normalized, 'rule_packs');
+  if (primary.length > 0) return primary;
+  return parseEnabledListForKey(normalized, 'migration_packs');
+}
+
+function parseEnabledListForKey(content: string, key: string): string[] {
+  const lines = content.split('\n');
+  const keyPattern = new RegExp(`^\\s*${escapeRegex(key)}:\\s*(?:#.*)?$`);
+  const enabledPattern = /^\s*enabled:\s*(?:#.*)?$/;
+  const itemPattern = /^\s*-\s*["']?([A-Za-z0-9_]+)["']?\s*(?:#.*)?$/;
+
+  for (let i = 0; i < lines.length; i += 1) {
+    const line = lines[i];
+    if (!keyPattern.test(line)) continue;
+    const keyIndent = leadingSpaces(line);
+
+    let enabledIndex = -1;
+    let enabledIndent = -1;
+    for (let j = i + 1; j < lines.length; j += 1) {
+      const next = lines[j];
+      const trimmed = next.trim();
+      if (trimmed.length === 0 || trimmed.startsWith('#')) continue;
+      const indent = leadingSpaces(next);
+      if (indent <= keyIndent) break;
+      if (enabledPattern.test(next)) {
+        enabledIndex = j;
+        enabledIndent = indent;
+      }
+      break;
+    }
+    if (enabledIndex < 0) continue;
+
+    const ids: string[] = [];
+    for (let k = enabledIndex + 1; k < lines.length; k += 1) {
+      const row = lines[k];
+      const trimmed = row.trim();
+      if (trimmed.length === 0 || trimmed.startsWith('#')) continue;
+      const indent = leadingSpaces(row);
+      if (indent <= enabledIndent) break;
+      const match = row.match(itemPattern);
+      if (match?.[1]) ids.push(match[1]);
+    }
+    return ids;
   }
-  return ids;
+  return [];
+}
+
+function leadingSpaces(value: string): number {
+  let count = 0;
+  while (count < value.length && value.charCodeAt(count) === 32) {
+    count += 1;
+  }
+  return count;
+}
+
+function escapeRegex(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 /** Writes rule_packs block; creates file only if saropa_lints block exists. */
@@ -47,6 +95,10 @@ export function writeRulePacksEnabled(workspaceRoot: string, packIds: readonly s
   }
   try {
     let content = fs.readFileSync(p, 'utf-8');
+    // Normalize to canonical key on write: remove legacy alias block if present.
+    if (LEGACY_MIGRATION_PACK_BLOCK.test(content)) {
+      content = content.replace(LEGACY_MIGRATION_PACK_BLOCK, '');
+    }
     const blockBody =
       packIds.length === 0
         ? ''

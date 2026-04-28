@@ -16,12 +16,23 @@ plugins:
       enabled:
         - riverpod
         - drift
+        - dart_sdk_3_2
+        - flutter_sdk_3_7
 ```
 
-Unknown pack ids are ignored. Rule codes from packs are merged into the
-effective enabled set **after** `diagnostics:`; any rule set to `false` in
-`diagnostics` (or disabled via severities) **stays off** — explicit opt-out
-wins over pack opt-in.
+Unknown pack ids are ignored. Rule-pack ownership is authoritative: pack-owned
+rules are removed from tier-derived enables, then re-enabled only by
+`rule_packs.enabled`. Any rule set to `false` in `diagnostics` (or disabled via
+severities) **stays off** — explicit opt-out wins over pack opt-in.
+
+### Legacy key compatibility (`migration_packs`)
+
+`rule_packs` is the canonical key. For backward compatibility, parsers still
+read legacy `migration_packs.enabled`.
+
+- If both keys are present, `rule_packs.enabled` takes precedence.
+- Writers (`dart run saropa_lints:init` and the VS Code Rule Packs view) normalize
+  output to `rule_packs` and remove legacy `migration_packs` blocks.
 
 ## Semver-gated packs (pubspec.lock)
 
@@ -30,6 +41,27 @@ Some packs only merge when a dependency’s **resolved** version in
 `lib/src/config/rule_packs.dart`). If the lockfile is missing or the package
 is absent, those packs do **not** add rules (conservative). Ungated packs
 behave as before.
+
+## SDK-gated packs (pubspec `environment`)
+
+Some packs are gated by SDK constraints in `pubspec.yaml` `environment:`:
+
+- `dart_sdk_3_2` (requires `environment.sdk >= 3.2.0`)
+- `flutter_sdk_3_0` (requires `environment.flutter >= 3.0.0`)
+- `flutter_sdk_3_7` (requires `environment.flutter >= 3.7.0`)
+- `flutter_sdk_3_10` (requires `environment.flutter >= 3.10.0`)
+- `flutter_sdk_3_16` (requires `environment.flutter >= 3.16.0`)
+- `flutter_sdk_3_18` (requires `environment.flutter >= 3.18.0`)
+- `flutter_sdk_3_19` (requires `environment.flutter >= 3.19.0`)
+- `flutter_sdk_3_22` (requires `environment.flutter >= 3.22.0`)
+- `flutter_sdk_3_24` (requires `environment.flutter >= 3.24.0`)
+- `flutter_sdk_3_28` (requires `environment.flutter >= 3.28.0`)
+- `flutter_sdk_3_29` (requires `environment.flutter >= 3.29.0`)
+- `flutter_sdk_3_32` (requires `environment.flutter >= 3.32.0`)
+- `flutter_sdk_3_35` (requires `environment.flutter >= 3.35.0`)
+- `flutter_sdk_3_38` (requires `environment.flutter >= 3.38.0`)
+
+These packs are considered applicable from SDK constraints (not dependency markers).
 
 ## CLI (`dart run saropa_lints:init`)
 
@@ -44,7 +76,8 @@ behave as before.
 
 The **Rule Packs** sidebar view lists packs, whether dependencies appear in
 `pubspec.yaml`, toggles, rule counts, and target platforms (Flutter embedder
-folders). Toggles write the same `rule_packs` YAML.
+folders). SDK packs are detected from `environment.sdk` / `environment.flutter`
+constraints. Toggles write the same `rule_packs` YAML.
 
 ## Registry
 

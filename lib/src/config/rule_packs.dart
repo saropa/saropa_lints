@@ -49,6 +49,15 @@ class RulePackDependencyGate {
   final String constraint;
 }
 
+/// Optional SDK gate: pack is considered only when the pubspec `environment`
+/// constraint for [sdkKey] (e.g. `sdk` or `flutter`) satisfies [constraint].
+class RulePackSdkGate {
+  const RulePackSdkGate({required this.sdkKey, required this.constraint});
+
+  final String sdkKey;
+  final String constraint;
+}
+
 /// Packs that require a resolved lockfile version (Phase 3 resolver).
 const Map<String, RulePackDependencyGate> kRulePackDependencyGates = {
   // Example semver-gated pack: rules apply only when package `collection`
@@ -56,6 +65,77 @@ const Map<String, RulePackDependencyGate> kRulePackDependencyGates = {
   'collection_compat': RulePackDependencyGate(
     dependency: 'collection',
     constraint: '>=1.19.0',
+  ),
+};
+
+/// Packs that require pubspec `environment` SDK constraints (Phase 6).
+const Map<String, RulePackSdkGate> kRulePackSdkGates = {
+  // Dart 3.2 js_interop return/signature migrations.
+  'dart_sdk_3_2': RulePackSdkGate(sdkKey: 'sdk', constraint: '>=3.2.0'),
+  // Flutter 3.0 migration surface.
+  'flutter_sdk_3_0': RulePackSdkGate(
+    sdkKey: 'flutter',
+    constraint: '>=3.0.0',
+  ),
+  // Flutter 3.10 removal migrations.
+  'flutter_sdk_3_10': RulePackSdkGate(
+    sdkKey: 'flutter',
+    constraint: '>=3.10.0',
+  ),
+  // Flutter 3.16 migration surface.
+  'flutter_sdk_3_16': RulePackSdkGate(
+    sdkKey: 'flutter',
+    constraint: '>=3.16.0',
+  ),
+  // Flutter 3.18 migration surface.
+  'flutter_sdk_3_18': RulePackSdkGate(
+    sdkKey: 'flutter',
+    constraint: '>=3.18.0',
+  ),
+  // Flutter 3.19 migration surface (deprecations removed after 3.19).
+  'flutter_sdk_3_19': RulePackSdkGate(
+    sdkKey: 'flutter',
+    constraint: '>=3.19.0',
+  ),
+  // Flutter 3.22 migration surface.
+  'flutter_sdk_3_22': RulePackSdkGate(
+    sdkKey: 'flutter',
+    constraint: '>=3.22.0',
+  ),
+  // Flutter 3.7 migration surface.
+  'flutter_sdk_3_7': RulePackSdkGate(
+    sdkKey: 'flutter',
+    constraint: '>=3.7.0',
+  ),
+  // Flutter 3.28 migration surface.
+  'flutter_sdk_3_28': RulePackSdkGate(
+    sdkKey: 'flutter',
+    constraint: '>=3.28.0',
+  ),
+  // Flutter 3.24 migration surface.
+  'flutter_sdk_3_24': RulePackSdkGate(
+    sdkKey: 'flutter',
+    constraint: '>=3.24.0',
+  ),
+  // Flutter 3.29 migration surface.
+  'flutter_sdk_3_29': RulePackSdkGate(
+    sdkKey: 'flutter',
+    constraint: '>=3.29.0',
+  ),
+  // Flutter 3.32 migration surface.
+  'flutter_sdk_3_32': RulePackSdkGate(
+    sdkKey: 'flutter',
+    constraint: '>=3.32.0',
+  ),
+  // Flutter 3.35 migration surface.
+  'flutter_sdk_3_35': RulePackSdkGate(
+    sdkKey: 'flutter',
+    constraint: '>=3.35.0',
+  ),
+  // Flutter 3.38 migration surface.
+  'flutter_sdk_3_38': RulePackSdkGate(
+    sdkKey: 'flutter',
+    constraint: '>=3.38.0',
   ),
 };
 
@@ -86,10 +166,67 @@ bool packPassesDependencyGate(
   }
 }
 
+Version? _parseSdkLowerBoundFromPubspec(String pubspecYamlContent, String sdkKey) {
+  final envMatch = RegExp(
+    r'^environment:\s*\n((?:[ \t]+.*\n)+)',
+    multiLine: true,
+  ).firstMatch(pubspecYamlContent);
+  if (envMatch == null) return null;
+  final envBlock = envMatch.group(1) ?? '';
+  final sdkMatch = RegExp(
+    '^\\s+${RegExp.escape(sdkKey)}:\\s*[\'"]?([^\'"\\n]+)[\'"]?\\s*\$',
+    multiLine: true,
+  ).firstMatch(envBlock);
+  final rawConstraint = sdkMatch?.group(1)?.trim();
+  if (rawConstraint == null || rawConstraint.isEmpty || rawConstraint == 'any') {
+    return null;
+  }
+  final geMatch = RegExp(r'>=\s*(\d+\.\d+\.\d+)').firstMatch(rawConstraint);
+  final lower = geMatch?.group(1) ??
+      (rawConstraint.startsWith('^')
+          ? rawConstraint.replaceFirst('^', '').trim()
+          : rawConstraint);
+  final semver = RegExp(r'^\d+\.\d+\.\d+').firstMatch(lower)?.group(0);
+  if (semver == null) return null;
+  try {
+    return Version.parse(semver);
+  } on Object {
+    return null;
+  }
+}
+
+bool packPassesSdkGate(String packId, String pubspecYamlContent) {
+  final gate = kRulePackSdkGates[packId];
+  if (gate == null) return true;
+  final lowerBound = _parseSdkLowerBoundFromPubspec(pubspecYamlContent, gate.sdkKey);
+  if (lowerBound == null) return false;
+  try {
+    final constraint = VersionConstraint.parse(gate.constraint);
+    return constraint.allows(lowerBound);
+  } on Object catch (e, st) {
+    developer.log(
+      'packPassesSdkGate: semver parse failed for ${gate.sdkKey}',
+      name: 'saropa_lints',
+      error: e,
+      stackTrace: st,
+    );
+    return false;
+  }
+}
+
 /// Returns rule codes for [packId], or empty if unknown.
 Set<String> ruleCodesForPack(String packId) {
   final codes = kRulePackRuleCodes[packId];
   return codes == null ? <String>{} : Set<String>.from(codes);
+}
+
+/// All rule codes owned by any rule pack.
+Set<String> allRulePackCodes() {
+  final out = <String>{};
+  for (final codes in kRulePackRuleCodes.values) {
+    out.addAll(codes);
+  }
+  return out;
 }
 
 /// All known pack ids.
@@ -99,11 +236,30 @@ Set<String> get knownRulePackIds => kRulePackRuleCodes.keys.toSet();
 /// Keys match [kRulePackRuleCodes]. The `package_specific` pack may use an empty set.
 const Map<String, Set<String>> kRulePackPubspecMarkers = {
   ...kRulePackPubspecMarkersGenerated,
+  // SDK packs are primarily gated by `environment` constraints.
+  'dart_sdk_3_2': {'environment'},
+  'flutter_sdk_3_0': {'environment'},
+  'flutter_sdk_3_10': {'environment'},
+  'flutter_sdk_3_16': {'environment'},
+  'flutter_sdk_3_18': {'environment'},
+  'flutter_sdk_3_19': {'environment'},
+  'flutter_sdk_3_22': {'environment'},
+  'flutter_sdk_3_7': {'environment'},
+  'flutter_sdk_3_28': {'environment'},
+  'flutter_sdk_3_24': {'environment'},
+  'flutter_sdk_3_29': {'environment'},
+  'flutter_sdk_3_32': {'environment'},
+  'flutter_sdk_3_35': {'environment'},
+  'flutter_sdk_3_38': {'environment'},
   'collection_compat': {'collection'},
 };
 
 /// True when [pubspecYamlContent] declares any [kRulePackPubspecMarkers] entry.
 bool isRulePackSuggestedByPubspec(String packId, String pubspecYamlContent) {
+  // SDK packs are suggested from `environment` constraints instead of dependency markers.
+  if (kRulePackSdkGates.containsKey(packId)) {
+    return packPassesSdkGate(packId, pubspecYamlContent);
+  }
   final markers = kRulePackPubspecMarkers[packId];
   if (markers == null) return false;
   for (final name in markers) {
@@ -127,6 +283,7 @@ bool isRulePackApplicable(
   Map<String, String>? lockVersions,
 ) {
   if (!isRulePackSuggestedByPubspec(packId, pubspecYamlContent)) return false;
+  if (!packPassesSdkGate(packId, pubspecYamlContent)) return false;
   return packPassesDependencyGate(packId, lockVersions);
 }
 
@@ -142,6 +299,10 @@ Set<String> mergeRulePacksIntoEnabled(
   Iterable<String> packIds, {
   Map<String, String>? resolvedVersions,
 }) {
+  // Authoritative pack mode: pack-owned rules are removed from tier-derived
+  // enables first, then only enabled packs re-add their owned rules.
+  enabled.removeAll(allRulePackCodes());
+
   final contributed = <String>{};
   final disabledLc = <String>{
     for (final d in disabled ?? const <String>{}) d.toLowerCase(),
@@ -159,5 +320,60 @@ Set<String> mergeRulePacksIntoEnabled(
 /// Canonical registry: pack id → rule codes (generated from `lib/src/rules/packages/`).
 const Map<String, Set<String>> kRulePackRuleCodes = {
   ...kRulePackRuleCodesGenerated,
+  'dart_sdk_3_2': {
+    'avoid_removed_js_number_to_dart',
+    'avoid_legacy_jsboolean_return_assumptions',
+    'prefer_string_for_typeof_equals',
+    'prefer_int_for_jsarray_with_length',
+  },
+  'flutter_sdk_3_0': {
+    'avoid_removed_render_object_element_methods',
+  },
+  'flutter_sdk_3_7': {
+    'avoid_deprecated_use_inherited_media_query',
+    'prefer_scrollbar_theme_of',
+    'avoid_deprecated_animated_list_typedefs',
+  },
+  'flutter_sdk_3_10': {
+    'avoid_removed_appbar_backwards_compatibility',
+    'avoid_deprecated_flutter_test_window',
+  },
+  'flutter_sdk_3_16': {
+    'avoid_deprecated_use_material3_copy_with',
+    'prefer_utf8_encode',
+  },
+  'flutter_sdk_3_18': {
+    'prefer_key_event',
+  },
+  'flutter_sdk_3_19': {
+    'prefer_platform_menu_bar_child',
+    'prefer_keepalive_dispose',
+    'prefer_context_menu_builder',
+    'prefer_pan_axis',
+  },
+  'flutter_sdk_3_22': {
+    'prefer_m3_text_theme',
+  },
+  'flutter_sdk_3_24': {
+    'prefer_overflow_bar_over_button_bar',
+    'prefer_iterable_cast',
+  },
+  'flutter_sdk_3_28': {
+    'prefer_button_style_icon_alignment',
+  },
+  'flutter_sdk_3_29': {
+    'avoid_deprecated_on_surface_destroyed',
+  },
+  'flutter_sdk_3_32': {
+    'prefer_tabbar_theme_indicator_color',
+    'prefer_dropdown_menu_item_button_opacity_animation',
+  },
+  'flutter_sdk_3_35': {
+    'prefer_dropdown_initial_value',
+    'prefer_on_pop_with_result',
+  },
+  'flutter_sdk_3_38': {
+    'avoid_asset_manifest_json',
+  },
   'collection_compat': {'avoid_collection_methods_with_unrelated_types'},
 };
