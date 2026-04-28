@@ -20,6 +20,8 @@ export interface ReportOptions {
     readonly pubspecUri: string | null;
     /** Extension version from package.json, shown next to the report title. */
     readonly extensionVersion: string;
+    /** Optional per-package score history for inline sparkline rendering. */
+    readonly packageTrends?: ReadonlyMap<string, number[]>;
 }
 
 /** Columns that can be auto-hidden when all values are empty or off by default. */
@@ -47,11 +49,27 @@ export function buildReportHtml(options: ReportOptions): string {
     </div>
     ${buildReportSummary(options)}
     ${buildChartSection(results)}
+    ${buildNetworkSection(results)}
     ${buildToolbar(options)}
-    ${buildReportTable(results, options.overrideNames)}
+    ${buildReportTable(results, options.overrideNames, options.packageTrends)}
     <script>${buildPackageDataScript(results, options.overrideNames, buildRepoShareMap(results))}${getReportScript()}${getChartScript()}</script>
 </body>
 </html>`;
+}
+
+function buildNetworkSection(results: VibrancyResult[]): string {
+    const direct = results.filter(r => r.package.isDirect);
+    const nodes = direct.map(d => {
+        const links = (d.transitiveInfo?.transitives ?? [])
+            .filter(t => results.some(r => r.package.name === t))
+            .slice(0, 20);
+        return { name: d.package.name, links };
+    });
+    const payload = escapeHtml(JSON.stringify(nodes));
+    return `<details class="network-wrap">
+        <summary>Dependency Network</summary>
+        <div id="dep-network" data-network="${payload}" class="network-canvas"></div>
+    </details>`;
 }
 
 /**
@@ -105,10 +123,21 @@ function buildReportSummary(options: ReportOptions): string {
         ? results.reduce((s, r) => s + r.score, 0) / results.length
         : 0;
     const avgGrade = results.length > 0 ? scoreToGrade(avgScore) : '—';
-    const totalBytes = results.reduce(
+    const totalOwnBytes = results.reduce(
         (sum, r) => sum + (r.archiveSizeBytes ?? 0), 0,
     );
-    const totalSize = totalBytes > 0 ? formatSizeMB(totalBytes) : '\u2014';
+    const totalUniqueBytes = results.reduce((sum, r) => {
+        const own = r.archiveSizeBytes ?? 0;
+        const unique = r.transitiveInfo?.uniqueTransitiveSizeBytes ?? 0;
+        return sum + own + unique;
+    }, 0);
+    const totalAllBytes = results.reduce((sum, r) => {
+        const own = r.archiveSizeBytes ?? 0;
+        const unique = r.transitiveInfo?.uniqueTransitiveSizeBytes ?? 0;
+        const shared = r.transitiveInfo?.sharedTransitiveSizeBytes ?? 0;
+        return sum + own + unique + shared;
+    }, 0);
+    const totalSize = totalOwnBytes > 0 ? formatSizeMB(totalOwnBytes) : '\u2014';
     const vulnPackages = results.filter(r => r.vulnerabilities.length > 0).length;
     // "Single-use" excludes packages whose only reference is a re-export.
     // A `lib/foo.dart` that does `export 'package:bar/...';` is exposing the
@@ -119,10 +148,16 @@ function buildReportSummary(options: ReportOptions): string {
             && !hasActiveReExport(r.fileUsages),
     ).length;
 
+    const gradeTooltip = `Project grade ${avgGrade}\nAverage score: ${Math.round(avgScore)}/100\nPackages: ${results.length}\nA:${counts.vibrant} B:${counts.stable} C:${counts.outdated} E:${counts.abandoned} F:${counts.eol}`;
     return `<div class="summary">
         <div class="summary-card"><div class="count">${results.length}</div><div class="label">Packages</div></div>
-        <div class="summary-card"><div class="count">${avgGrade}</div><div class="label">Project Package Grade</div></div>
-        <div class="summary-card"><div class="count">${totalSize}</div><div class="label">Total Size*</div></div>
+        <div class="summary-card" title="${escapeHtml(gradeTooltip)}"><div class="count">${avgGrade}</div><div class="label">Project Package Grade</div></div>
+        <div class="summary-card total-size"
+            data-total-size-own="${totalOwnBytes}"
+            data-total-size-unique="${totalUniqueBytes}"
+            data-total-size-total="${totalAllBytes}">
+            <div class="count">${totalSize}</div><div class="label">Total Size*</div>
+        </div>
         <div class="summary-card vibrant" data-filter="vibrant" title="Vibrant"><div class="count">${counts.vibrant}</div><div class="label">A</div></div>
         <div class="summary-card stable" data-filter="stable" title="Stable"><div class="count">${counts.stable}</div><div class="label">B</div></div>
         <div class="summary-card outdated" data-filter="outdated" title="Outdated"><div class="count">${counts.outdated}</div><div class="label">C</div></div>
@@ -146,7 +181,9 @@ function buildToolbar(options: ReportOptions): string {
     // content (health factors, vulnerabilities, file references, full
     // transitive dep list with shared flags, links). Same per-package
     // shape as the per-row copy button, just aggregated.
-    const copyAllBtn = '<button id="copy-all" class="toolbar-btn" title="Copy entire table as JSON (all rows + expander details)">&#128203; Copy All JSON</button>';
+    const copyAllBtn = '<button id="copy-all" class="toolbar-btn" title="Copy report JSON (all rows + details)">&#128203; Copy</button>';
+    const saveBtn = '<button id="save-all" class="toolbar-btn" title="Save report JSON to reports/YYYYMMDD/...">&#128190; Save</button>';
+    const resetViewBtn = '<button id="reset-view" class="toolbar-btn" title="Reset filters, sort, and saved view state">&#8635; Reset view</button>';
     // Rescan button — invokes saropaLints.packageVibrancy.scan via the
     // webview message channel so users don't have to leave the report to
     // trigger a refresh after editing pubspec.yaml or running `pub get`.
@@ -176,13 +213,42 @@ function buildToolbar(options: ReportOptions): string {
         <input type="text" id="search-input" placeholder="Search packages\u2026" class="search-input" />
         <button type="button" id="search-clear" class="search-clear" title="Clear search" aria-label="Clear search" hidden>&times;</button>
     </div>`;
+    const ageFilter = `<div class="age-filter" title="Filter by publish age">
+        <label for="age-max">Published age</label>
+        <input id="age-max" type="range" min="0" max="240" value="240" />
+        <span id="age-max-label">All</span>
+    </div>`;
+    const presetFilter = `<div class="preset-filter" title="Apply quick filter presets">
+        <label for="filter-preset">Preset</label>
+        <select id="filter-preset">
+            <option value="none">None</option>
+            <option value="modernization">Modernization</option>
+            <option value="risk-hotspots">Risk hotspots</option>
+            <option value="cleanup-candidates">Cleanup candidates</option>
+            <option value="direct-only">Direct only</option>
+        </select>
+    </div>`;
+    const devToggle = `<label class="dev-toggle" title="Include dev dependencies in table and totals">
+        <input id="include-dev-toggle" type="checkbox" checked />
+        Include dev
+    </label>`;
     return `<div class="table-toolbar">
         ${searchField}
+        ${ageFilter}
+        ${presetFilter}
+        ${devToggle}
         ${footprintToggle}
         ${rescanBtn}
         ${openOtherBtn}
+        ${resetViewBtn}
         ${copyAllBtn}
+        ${saveBtn}
         ${pubspecBtn}
+    </div>
+    <div id="active-filters" class="active-filters" style="display:none;">
+        <span class="active-filters-label">Active filters:</span>
+        <div class="active-filters-list"></div>
+        <button id="clear-all-filters" class="clear-filter-btn" type="button">Clear all</button>
     </div>`;
 }
 
@@ -240,9 +306,11 @@ function deriveSharedDepNames(results: VibrancyResult[]): ReadonlySet<string> {
 function buildReportTable(
     results: VibrancyResult[],
     overrideNames: ReadonlySet<string>,
+    packageTrends: ReadonlyMap<string, number[]> | undefined,
 ): string {
     const hidden = getHiddenColumns(results);
     const sharedDepNames = deriveSharedDepNames(results);
+    const tablePackageNames = new Set(results.map(r => r.package.name));
     const th = (col: string, label: string, tooltip?: string) => {
         const titleAttr = tooltip ? ` title="${escapeHtml(tooltip)}"` : '';
         return `<th data-col="${col}"${titleAttr}>${label}<span class="sort-arrow"></span></th>`;
@@ -279,7 +347,7 @@ function buildReportTable(
             ${th('issues', 'Issues', 'Open GitHub issues (excludes pull requests when available)')}
             ${th('prs', 'PRs', 'Open GitHub pull requests')}
             ${th('size', 'Size', 'Archive size on pub.dev (before tree shaking)')}
-            <th title="Direct transitive dependencies \u2014 shared deps highlighted">Deps</th>
+            ${th('deps', 'Deps', 'Direct transitive dependencies \u2014 shared deps highlighted')}
             ${thOpt('files', 'References', 'Number of source files that import this package \u2014 click to search')}
             ${thOpt('transitives', 'Transitives', 'Number of transitive (indirect) dependencies this package pulls in')}
             ${thOpt('vulns', 'Vulns', 'Known security vulnerabilities from OSV and GitHub Advisory databases')}
@@ -289,7 +357,15 @@ function buildReportTable(
             ${thOpt('description', 'Description', 'Package description from pub.dev')}
         </tr></thead>
         <tbody id="pkg-body">
-            ${results.map(r => buildRow(r, hidden, overrideNames, sharedDepNames, visibleCols)).join('\n')}
+            ${results.map(r => buildRow(
+        r,
+        hidden,
+        overrideNames,
+        sharedDepNames,
+        tablePackageNames,
+        visibleCols,
+        packageTrends,
+    )).join('\n')}
         </tbody>
     </table>`;
 }
@@ -303,10 +379,15 @@ function buildRow(
     hidden: Set<HidableColumn>,
     overrideNames: ReadonlySet<string>,
     sharedDepNames: ReadonlySet<string>,
+    tablePackageNames: ReadonlySet<string>,
     colspan: number,
+    packageTrends: ReadonlyMap<string, number[]> | undefined,
 ): string {
     const name = escapeHtml(r.package.name);
     const date = r.pubDev?.publishedDate.split('T')[0] ?? '';
+    const publishedAgeMonths = computePublishedAgeMonths(
+        r.installedVersionDate ?? r.pubDev?.publishedDate ?? null,
+    );
     /* data-likes / data-downloads feed the sort logic (see report-script.ts
        sortTable). Empty string sorts as NaN → alphabetical fallback, which
        matches the prior data-stars behavior for packages missing the
@@ -330,10 +411,12 @@ function buildRow(
     return `<tr class="pkg-row" data-name="${name}" data-version="${escapeHtml(r.package.version)}"
         data-score="${r.score}" data-category="${r.category}"
         data-published="${date}" data-likes="${likes}" data-downloads="${downloads}"
+        data-age-months="${publishedAgeMonths ?? ''}"
         data-issues="${issueCount}" data-prs="${prCount}"
         data-size="${r.archiveSizeBytes ?? 0}"
         data-files="${activeFileCount}"
         data-transitives="${transitiveCount}"
+        data-deps="${transitiveCount}"
         data-vulns="${vulnCount}"
         data-license="${escapeHtml(r.license ?? '')}"
         data-update="${r.updateInfo?.updateStatus ?? 'unknown'}"
@@ -346,16 +429,16 @@ function buildRow(
         <td class="copy-cell"><span class="copy-btn" data-pkg="${name}" title="Copy row as JSON">&#128203;</span></td>
         ${buildNameCell(r)}
         ${buildVersionCell(r)}
-        ${buildCategoryCell(r)}
+        ${buildCategoryCell(r, packageTrends?.get(r.package.name) ?? [])}
         ${buildPublishedCell(r)}
         ${buildLikesCell(r)}
         ${buildDownloadsCell(r)}
         ${buildIssuesCell(r)}
         ${buildPrsCell(r)}
         ${buildSizeCell(r)}
-        ${buildDepsCell(r)}
+        ${buildDepsCell(r, tablePackageNames)}
         ${hidden.has('files') ? '' : buildReferencesCell(r)}
-        ${hidden.has('transitives') ? '' : buildTransitivesCell(r)}
+        ${hidden.has('transitives') ? '' : buildTransitivesCell(r, tablePackageNames)}
         ${hidden.has('vulns') ? '' : buildVulnsCell(r)}
         ${hidden.has('license') ? '' : buildLicenseCell(r)}
         ${buildUpdateCell(r)}
@@ -393,7 +476,17 @@ function formatAgeSuffix(isoDate: string | null | undefined): string {
     if (!isoDate) { return ''; }
     const ms = Date.parse(isoDate);
     if (isNaN(ms)) { return ''; }
-    const months = Math.max(0, Math.floor((Date.now() - ms) / (30.44 * 86_400_000)));
+    // Use calendar-month math in UTC to avoid drift from fixed-day month
+    // approximations, especially around month-end boundaries.
+    const from = new Date(ms);
+    const now = new Date();
+    const years = now.getUTCFullYear() - from.getUTCFullYear();
+    const monthsDelta = now.getUTCMonth() - from.getUTCMonth();
+    let months = years * 12 + monthsDelta;
+    if (now.getUTCDate() < from.getUTCDate()) {
+        months -= 1;
+    }
+    months = Math.max(0, months);
     // Suppress the suffix entirely for ages under a month — the previous
     // "(new)" label was misleading (recently published != fresh release of a
     // mature package), so we just omit it rather than guess a useful word.
@@ -429,10 +522,34 @@ function formatDate(isoDate: string | null | undefined): string {
 }
 
 /** Category column: letter grade badge only. Label/score surfaced via tooltip. */
-function buildCategoryCell(r: VibrancyResult): string {
+function buildCategoryCell(r: VibrancyResult, trend: number[]): string {
     const grade = categoryToGrade(r.category);
     const tooltip = buildHealthTooltip(r);
-    return `<td title="${escapeHtml(tooltip)}"><span class="grade-badge grade-${grade}">${grade}</span></td>`;
+    const color = sparklineColorForCategory(r.category);
+    const sparkline = buildSparklineSvg(trend, color);
+    return `<td title="${escapeHtml(tooltip)}"><span class="category-cell"><span class="grade-badge grade-${grade}">${grade}</span>${sparkline}</span></td>`;
+}
+
+function sparklineColorForCategory(category: VibrancyResult['category']): string {
+    if (category === 'vibrant') { return 'var(--vscode-testing-iconPassed)'; }
+    if (category === 'stable') { return 'var(--vscode-editorInfo-foreground)'; }
+    if (category === 'outdated' || category === 'abandoned') {
+        return 'var(--vscode-editorWarning-foreground)';
+    }
+    return 'var(--vscode-editorError-foreground)';
+}
+
+export function buildSparklineSvg(scores: readonly number[], color: string): string {
+    if (scores.length < 2) { return ''; }
+    const w = 40;
+    const h = 16;
+    const step = w / (scores.length - 1);
+    const points = scores.map((s, i) =>
+        `${(i * step).toFixed(1)},${(h - (Math.max(0, Math.min(100, s)) / 100) * h).toFixed(1)}`,
+    ).join(' ');
+    return `<svg width="${w}" height="${h}" class="sparkline" aria-hidden="true">
+        <polyline points="${points}" fill="none" stroke="${color}" stroke-width="1.5"/>
+    </svg>`;
 }
 
 /** Published date linking to the pub.dev package page, with age suffix. */
@@ -563,11 +680,12 @@ function buildSizeCell(r: VibrancyResult): string {
     const tooltip = r.transitiveInfo && r.transitiveInfo.transitiveCount > 0
         ? `Own: ${ownLabel}\nWith unique transitives: ${uniqueLabel}\nWith shared transitives: ${totalLabel}`
         : `Archive size: ${ownLabel}`;
+    const packageName = escapeHtml(r.package.name);
     return `<td class="cell-right size-cell" title="${escapeHtml(tooltip)}"
         data-size-own="${own}" data-size-unique="${own + uniqueT}" data-size-total="${own + uniqueT + sharedT}">`
-        + `<span class="size-own">${ownLabel}</span>`
-        + `<span class="size-unique">${uniqueLabel}</span>`
-        + `<span class="size-total">${totalLabel}</span>`
+        + `<span class="size-link size-own" data-pkg="${packageName}" title="Open local package folder">${ownLabel}</span>`
+        + `<span class="size-link size-unique" data-pkg="${packageName}" title="Open local package folder">${uniqueLabel}</span>`
+        + `<span class="size-link size-total" data-pkg="${packageName}" title="Open local package folder">${totalLabel}</span>`
         + `</td>`;
 }
 
@@ -591,18 +709,23 @@ function buildReferencesCell(r: VibrancyResult): string {
     // usage) renders as two tooltip rows so the user still sees both
     // directive locations — the count on the cell is just the file count.
     const tooltipLines: string[] = [];
+    const refEntries: Array<{ path: string; line: number; label: string }> = [];
     for (const u of active) {
         if (u.exportLine != null) {
-            tooltipLines.push(`${u.filePath}:${u.exportLine} (re-export)`);
+            const label = `${u.filePath}:${u.exportLine} (re-export)`;
+            tooltipLines.push(label);
+            refEntries.push({ path: u.filePath, line: u.exportLine, label });
         }
         if (u.importLine != null) {
-            tooltipLines.push(`${u.filePath}:${u.importLine}`);
+            const label = `${u.filePath}:${u.importLine}`;
+            tooltipLines.push(label);
+            refEntries.push({ path: u.filePath, line: u.importLine, label });
         }
         // Fallback for fixtures that don't populate the directive lines.
         if (u.exportLine == null && u.importLine == null) {
-            tooltipLines.push(
-                `${u.filePath}:${u.line}${u.isExport ? ' (re-export)' : ''}`,
-            );
+            const label = `${u.filePath}:${u.line}${u.isExport ? ' (re-export)' : ''}`;
+            tooltipLines.push(label);
+            refEntries.push({ path: u.filePath, line: u.line, label });
         }
     }
     if (isReExport) {
@@ -616,20 +739,30 @@ function buildReferencesCell(r: VibrancyResult): string {
     const reexportBadge = isReExport
         ? ' <span class="ref-reexport-badge" title="Re-exported">\u21AA</span>'
         : '';
-    return `<td class="cell-right${cls}" title="${escapeHtml(tooltip)}">`
-        + `<span class="ref-link" data-pkg="${name}">${count}</span>${reexportBadge}`
+    const refsData = encodeURIComponent(JSON.stringify(refEntries.slice(0, 50)));
+    return `<td class="cell-right refs-cell${cls}" title="${escapeHtml(tooltip)}">`
+        + `<span class="ref-link" data-pkg="${name}" data-refs="${refsData}" title="Open file references">${count}</span>${reexportBadge}`
         + `</td>`;
 }
 
-function buildTransitivesCell(r: VibrancyResult): string {
+function buildTransitivesCell(
+    r: VibrancyResult,
+    tablePackageNames: ReadonlySet<string>,
+): string {
     const count = r.transitiveInfo?.transitiveCount ?? 0;
     const flagged = r.transitiveInfo?.flaggedCount ?? 0;
-    let text: string;
-    if (count === 0) { return '<td title="No transitive dependencies"><span class="dimmed">\u2014</span></td>'; }
-    if (flagged > 0) { text = `${count} (${flagged}\u26A0)`; }
-    else { text = `${count}`; }
-    const cls = flagged > 0 ? ' class="transitive-flagged"' : '';
-    return `<td${cls}>${text}</td>`;
+    if (count === 0) {
+        return '<td class="cell-right transitives-cell" title="No transitive dependencies"><span class="dimmed">\u2014</span></td>';
+    }
+    const info = r.transitiveInfo!;
+    const depList = info.transitives
+        .filter(dep => tablePackageNames.has(dep))
+        .join(',');
+    const text = flagged > 0 ? `${count} (${flagged}\u26A0)` : `${count}`;
+    const cls = flagged > 0 ? ' transitive-flagged' : '';
+    return `<td class="cell-right transitives-cell${cls}">`
+        + `<span class="dep-list-link" data-pkg="${escapeHtml(r.package.name)}" data-deps="${escapeHtml(depList)}" title="Show transitive dependencies">${text}</span>`
+        + `</td>`;
 }
 
 function buildVulnsCell(r: VibrancyResult): string {
@@ -685,15 +818,19 @@ function buildDescCell(r: VibrancyResult): string {
 }
 
 /** Deps column: icon showing transitive dep count, with shared deps highlighted. */
-function buildDepsCell(r: VibrancyResult): string {
+function buildDepsCell(
+    r: VibrancyResult,
+    tablePackageNames: ReadonlySet<string>,
+): string {
     const info = r.transitiveInfo;
     if (!info || info.transitiveCount === 0) {
-        return '<td class="cell-right" title="No transitive dependencies"><span class="dimmed">\u2014</span></td>';
+        return '<td class="cell-right deps-cell" title="No transitive dependencies"><span class="dimmed">\u2014</span></td>';
     }
     const total = info.transitiveCount;
     const shared = info.sharedDeps.length;
+    const linkedDeps = info.transitives.filter(dep => tablePackageNames.has(dep));
     /* Build a tooltip listing all transitive deps, marking shared ones. */
-    const depLines = info.transitives.map(dep => {
+    const depLines = linkedDeps.map(dep => {
         const isShared = info.sharedDeps.includes(dep);
         return isShared ? `\u2022 ${dep} (shared)` : `\u2022 ${dep}`;
     });
@@ -702,7 +839,25 @@ function buildDepsCell(r: VibrancyResult): string {
     const sharedBadge = shared > 0
         ? ` <span class="badge-shared" title="${shared} shared with other packages">${shared}s</span>`
         : '';
-    return `<td class="cell-right" title="${escapeHtml(tooltip)}"><span class="deps-icon">\u{1F333}</span> ${total}${sharedBadge}</td>`;
+    const depList = linkedDeps.join(',');
+    return `<td class="cell-right deps-cell" title="${escapeHtml(tooltip)}">`
+        + `<span class="dep-list-link" data-pkg="${escapeHtml(r.package.name)}" data-deps="${escapeHtml(depList)}">${total}${sharedBadge}</span>`
+        + `</td>`;
+}
+
+function computePublishedAgeMonths(isoDate: string | null): number | null {
+    if (!isoDate) { return null; }
+    const ms = Date.parse(isoDate);
+    if (isNaN(ms)) { return null; }
+    const from = new Date(ms);
+    const now = new Date();
+    const years = now.getUTCFullYear() - from.getUTCFullYear();
+    const monthsDelta = now.getUTCMonth() - from.getUTCMonth();
+    let months = years * 12 + monthsDelta;
+    if (now.getUTCDate() < from.getUTCDate()) {
+        months -= 1;
+    }
+    return Math.max(0, months);
 }
 
 /** Expandable detail card shown when a row is expanded. Contains score
@@ -779,13 +934,13 @@ function buildDetailFilesSection(
         const rows: string[] = [];
         const path = escapeHtml(u.filePath);
         if (u.exportLine != null) {
-            rows.push(`<div class="file-row">${path}:${u.exportLine} (re-export)</div>`);
+            rows.push(`<div class="file-row"><span class="file-link" data-path="${path}" data-line="${u.exportLine}">${path}:${u.exportLine}</span> (re-export)</div>`);
         }
         if (u.importLine != null) {
-            rows.push(`<div class="file-row">${path}:${u.importLine}</div>`);
+            rows.push(`<div class="file-row"><span class="file-link" data-path="${path}" data-line="${u.importLine}">${path}:${u.importLine}</span></div>`);
         }
         if (u.exportLine == null && u.importLine == null) {
-            rows.push(`<div class="file-row">${path}:${u.line}</div>`);
+            rows.push(`<div class="file-row"><span class="file-link" data-path="${path}" data-line="${u.line}">${path}:${u.line}</span></div>`);
         }
         return rows;
     }).join('\n');

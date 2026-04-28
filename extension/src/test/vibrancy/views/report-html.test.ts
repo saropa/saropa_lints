@@ -1,5 +1,5 @@
 import * as assert from 'assert';
-import { buildReportHtml, ReportOptions } from '../../../vibrancy/views/report-html';
+import { buildReportHtml, buildSparklineSvg, ReportOptions } from '../../../vibrancy/views/report-html';
 import { VibrancyResult } from '../../../vibrancy/types';
 
 /** Default options with no overrides and no pubspec URI. */
@@ -106,6 +106,11 @@ describe('buildReportHtml', () => {
     it('should include sort arrows in table headers', () => {
         const html = buildReportHtml(opts([]));
         assert.ok(html.includes('class="sort-arrow"'));
+    });
+
+    it('should make Deps header sortable', () => {
+        const html = buildReportHtml(opts([]));
+        assert.ok(html.includes('data-col="deps"'));
     });
 
     it('should show unused badge for unused packages', () => {
@@ -311,6 +316,27 @@ describe('report: size in KB', () => {
     it('should show dash when no size data', () => {
         const html = buildReportHtml(opts([makeResult('http', 80)]));
         assert.ok(html.includes('cell-right'));
+    });
+
+    it('should include footprint totals for summary-size toggle', () => {
+        const result = {
+            ...makeResult('http', 80),
+            archiveSizeBytes: 1024,
+            transitiveInfo: {
+                directDep: 'http',
+                transitiveCount: 2,
+                flaggedCount: 0,
+                transitives: ['a', 'b'],
+                sharedDeps: ['b'],
+                uniqueTransitiveSizeBytes: 2048,
+                sharedTransitiveSizeBytes: 4096,
+            },
+        };
+        const html = buildReportHtml(opts([result]));
+        assert.ok(html.includes('class="summary-card total-size"'));
+        assert.ok(html.includes('data-total-size-own="1024"'));
+        assert.ok(html.includes('data-total-size-unique="3072"'));
+        assert.ok(html.includes('data-total-size-total="7168"'));
     });
 });
 
@@ -960,6 +986,7 @@ describe('report: references column (renamed from files)', () => {
         const html = buildReportHtml(opts([result]));
         assert.ok(html.includes('class="ref-link"'));
         assert.ok(html.includes('data-pkg="http"'));
+        assert.ok(html.includes('data-refs='));
     });
 
     it('should include postMessage handler for ref-link', () => {
@@ -968,7 +995,55 @@ describe('report: references column (renamed from files)', () => {
             fileUsages: [{ filePath: 'lib/main.dart', line: 1, isCommented: false }],
         };
         const html = buildReportHtml(opts([result]));
-        assert.ok(html.includes('searchImport'));
+        assert.ok(html.includes('showRefsPopover'));
+        assert.ok(html.includes('openFileRef'));
+    });
+
+    it('should render detail file references as clickable file-link entries', () => {
+        const result = {
+            ...makeResult('http', 80),
+            fileUsages: [{ filePath: 'lib/components/country/flag/country_flag.dart', line: 1, isCommented: false }],
+        };
+        const html = buildReportHtml(opts([result]));
+        assert.ok(html.includes('class="file-link"'));
+        assert.ok(html.includes('data-path="lib/components/country/flag/country_flag.dart"'));
+        assert.ok(html.includes('data-line="1"'));
+    });
+});
+
+describe('report: local navigation affordances', () => {
+    it('should render size values as clickable local source links', () => {
+        const result = { ...makeResult('http', 80), archiveSizeBytes: 2048 };
+        const html = buildReportHtml(opts([result]));
+        assert.ok(html.includes('class="size-link size-own"'));
+        assert.ok(html.includes('data-pkg="http"'));
+    });
+
+    it('should render deps cell as dependency-link launcher', () => {
+        const result = {
+            ...makeResult('http', 80),
+            transitiveInfo: {
+                directDep: 'http',
+                transitiveCount: 2,
+                flaggedCount: 0,
+                transitives: ['collection', 'meta'],
+                sharedDeps: [],
+            },
+        };
+        const transitiveRow = {
+            ...makeResult('collection', 70),
+            package: { ...makeResult('collection', 70).package, section: 'transitive' as const },
+        };
+        const html = buildReportHtml(opts([result, transitiveRow]));
+        assert.ok(html.includes('class="dep-list-link"'));
+        assert.ok(html.includes('data-deps="collection"'));
+    });
+
+    it('should include back-navigation and file-open handlers in report script', () => {
+        const html = buildReportHtml(opts([makeResult('http', 80)]));
+        assert.ok(html.includes('pkg-nav-back'));
+        assert.ok(html.includes('openSourceFolder'));
+        assert.ok(html.includes('openFileRef'));
     });
 });
 
@@ -989,5 +1064,18 @@ describe('report: update column uses dimmed hyphen', () => {
         const html = buildReportHtml(opts([result]));
         assert.ok(html.includes('update-major'));
         assert.ok(html.includes('\u2192'));
+    });
+});
+
+describe('report: sparkline rendering', () => {
+    it('should return empty string for fewer than 2 scores', () => {
+        assert.strictEqual(buildSparklineSvg([42], '#fff'), '');
+    });
+
+    it('should render svg polyline for trend data', () => {
+        const svg = buildSparklineSvg([10, 40, 80], 'var(--vscode-editorInfo-foreground)');
+        assert.ok(svg.includes('<svg'));
+        assert.ok(svg.includes('<polyline'));
+        assert.ok(svg.includes('stroke="var(--vscode-editorInfo-foreground)"'));
     });
 });

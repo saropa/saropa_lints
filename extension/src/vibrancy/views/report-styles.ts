@@ -65,6 +65,14 @@ export function getReportStyles(): string {
         .grade-D { background: var(--vscode-editorWarning-foreground); color: var(--vscode-editor-background); opacity: 0.8; }
         .grade-E { background: var(--vscode-editorWarning-foreground); color: var(--vscode-editor-background); }
         .grade-F { background: var(--vscode-editorError-foreground); color: var(--vscode-editor-background); }
+        .category-cell {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .sparkline {
+            opacity: 0.9;
+        }
 
         /* ---- Row expansion ---- */
         .col-expand { width: 24px; padding: 6px 2px; }
@@ -129,7 +137,7 @@ export function getReportStyles(): string {
             min-width: 100px; text-align: center;
         }
         .summary-card .count { font-size: 1.8em; font-weight: bold; }
-        .summary-card .label { font-size: 0.85em; opacity: 0.8; }
+        .summary-card .label { font-size: 0.85em; opacity: 0.8; min-height: 18px; }
         .summary-card[data-filter] {
             cursor: pointer; transition: box-shadow 0.2s, background 0.2s;
         }
@@ -155,6 +163,11 @@ export function getReportStyles(): string {
         .table-toolbar {
             display: flex; gap: 12px; align-items: center;
             margin: 12px 0 8px;
+            flex-wrap: wrap;
+            padding: 8px 10px;
+            border: 1px solid var(--vscode-widget-border);
+            border-radius: 6px;
+            background: var(--vscode-editor-inactiveSelectionBackground);
         }
         /* Relative wrapper anchors the absolutely-positioned clear (X)
            button inside the search field. inline-flex keeps the wrapper
@@ -204,7 +217,7 @@ export function getReportStyles(): string {
         .toolbar-btn {
             background: var(--vscode-button-secondaryBackground);
             color: var(--vscode-button-secondaryForeground);
-            border: none;
+            border: 1px solid transparent;
             padding: 4px 10px;
             border-radius: 3px;
             cursor: pointer;
@@ -212,6 +225,75 @@ export function getReportStyles(): string {
         }
         .toolbar-btn:hover {
             background: var(--vscode-button-secondaryHoverBackground);
+        }
+        .toolbar-btn:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+        }
+        #pkg-nav-back { min-width: 82px; }
+        .age-filter {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8em;
+            padding-right: 6px;
+            border-right: 1px solid var(--vscode-widget-border);
+        }
+        .age-filter input[type="range"] { width: 120px; }
+        .preset-filter {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.82em;
+        }
+        .preset-filter select {
+            border: 1px solid var(--vscode-input-border);
+            background: var(--vscode-input-background);
+            color: var(--vscode-input-foreground);
+            border-radius: 3px;
+            padding: 2px 6px;
+            font-size: 0.95em;
+        }
+        .dev-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85em;
+            white-space: nowrap;
+        }
+        .active-filters {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 6px 0 2px;
+            padding: 6px 10px;
+            border: 1px dashed var(--vscode-widget-border);
+            border-radius: 6px;
+            background: var(--vscode-editor-inactiveSelectionBackground);
+        }
+        .active-filters-label {
+            font-size: 0.82em;
+            opacity: 0.8;
+            white-space: nowrap;
+        }
+        .active-filters-list {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+            flex: 1;
+        }
+        .active-filter-chip {
+            background: var(--vscode-badge-background);
+            color: var(--vscode-badge-foreground);
+            border: 1px solid var(--vscode-widget-border);
+            border-radius: 999px;
+            padding: 2px 8px;
+            font-size: 0.78em;
+            cursor: pointer;
+        }
+        .active-filter-chip:hover {
+            filter: brightness(1.08);
         }
 
         /* ---- Footprint mode toggle ---- */
@@ -289,6 +371,7 @@ export function getReportStyles(): string {
         /* ---- Right-aligned numeric cells ---- */
         /* nowrap so size/count values stay on one line in narrow viewports. */
         .cell-right { text-align: right; white-space: nowrap; }
+        .deps-cell, .transitives-cell, .refs-cell { text-align: right; }
 
         /* ---- File usage count styling ---- */
         .file-single { color: var(--vscode-descriptionForeground); }
@@ -359,6 +442,112 @@ export function getReportStyles(): string {
             color: var(--vscode-textLink-foreground);
         }
         .ref-link:hover { text-decoration: underline; }
+        .size-link {
+            cursor: pointer;
+            color: var(--vscode-textLink-foreground);
+        }
+        .size-link:hover { text-decoration: underline; }
+        .file-link {
+            cursor: pointer;
+            color: var(--vscode-textLink-foreground);
+        }
+        .file-link:hover { text-decoration: underline; }
+        .dep-list-link {
+            cursor: pointer;
+            color: var(--vscode-textLink-foreground);
+        }
+        .dep-list-link:hover { text-decoration: underline; }
+        .pkg-row.pkg-nav-focus {
+            outline: 2px solid var(--vscode-focusBorder);
+            outline-offset: -2px;
+        }
+        .dep-popover {
+            position: fixed;
+            z-index: 1000;
+            min-width: 220px;
+            max-width: 420px;
+            max-height: 280px;
+            overflow: auto;
+            padding: 8px;
+            border: 1px solid var(--vscode-widget-border);
+            border-radius: 6px;
+            background: var(--vscode-editorWidget-background);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.35);
+        }
+        .dep-popover-title {
+            font-size: 0.8em;
+            opacity: 0.75;
+            margin-bottom: 6px;
+            position: sticky;
+            top: 0;
+            background: var(--vscode-editorWidget-background);
+            padding-bottom: 4px;
+        }
+        .dep-popover .dep-nav-link {
+            display: block;
+            margin: 2px 0;
+            color: var(--vscode-textLink-foreground);
+            text-decoration: none;
+        }
+        .dep-popover .dep-nav-link:hover { text-decoration: underline; }
+        .dep-popover .ref-nav-link {
+            display: block;
+            margin: 2px 0;
+            color: var(--vscode-textLink-foreground);
+            text-decoration: none;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+        .dep-popover .ref-nav-link:hover { text-decoration: underline; }
+        .network-wrap {
+            margin-top: 10px;
+            margin-bottom: 6px;
+            border: 1px solid var(--vscode-widget-border);
+            border-radius: 6px;
+            padding: 6px 10px;
+            background: var(--vscode-editor-inactiveSelectionBackground);
+        }
+        .network-wrap summary {
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .network-canvas {
+            margin-top: 8px;
+            overflow: auto;
+            max-height: 320px;
+            border-top: 1px solid var(--vscode-widget-border);
+            padding-top: 8px;
+        }
+        .network-svg { width: 100%; height: auto; }
+        .network-edge {
+            stroke: var(--vscode-widget-border);
+            stroke-width: 1;
+            opacity: 0.8;
+        }
+        .network-edge-link { cursor: pointer; }
+        .network-node {
+            fill: var(--vscode-foreground);
+            font-size: 10px;
+            font-family: var(--vscode-font-family);
+        }
+        .network-node-link {
+            cursor: pointer;
+        }
+        .network-node-link:hover,
+        .network-node-link:focus {
+            fill: var(--vscode-textLink-foreground);
+            text-decoration: underline;
+            outline: none;
+        }
+        .network-node-link.network-selected,
+        .network-edge-link.network-selected {
+            stroke: var(--vscode-textLink-foreground);
+            fill: var(--vscode-textLink-foreground);
+            opacity: 1;
+            stroke-width: 1.6;
+        }
+        .network-node.direct { font-weight: 700; }
+        .network-node.transitive { opacity: 0.85; }
 
         /* ---- Copy-row button ---- */
         .col-copy { width: 28px; padding: 6px 4px; }

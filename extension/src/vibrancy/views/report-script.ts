@@ -6,11 +6,16 @@ export function getReportScript(): string {
         /* ---- Sorting state ---- */
         var sortCol = 'score';
         var sortAsc = true;
+        var isRestoringState = false;
 
         /* ---- Filter state (shared across card, chart, and search filters) ---- */
         var activeCardFilter = null;
         var chartFilterPackage = null;
         var excludeSharedTransitives = false;
+        var includeDevDependencies = true;
+        var maxAgeMonths = Number.POSITIVE_INFINITY;
+        var activePreset = 'none';
+        var packageNavHistory = [];
 
         /* Footprint mode controls which size value the Size column shows
            and which size the size sort uses: 'own' | 'unique' | 'total'. */
@@ -18,8 +23,10 @@ export function getReportScript(): string {
 
         /* ---- Sorting ---- */
 
-        function sortTable(col) {
-            if (sortCol === col) { sortAsc = !sortAsc; }
+        function sortTable(col, keepDirection) {
+            if (keepDirection) {
+                sortCol = col;
+            } else if (sortCol === col) { sortAsc = !sortAsc; }
             else { sortCol = col; sortAsc = true; }
             var tbody = document.getElementById('pkg-body');
             /* Guard: bail if table body is not in the DOM yet. */
@@ -27,6 +34,17 @@ export function getReportScript(): string {
             /* Only sort package rows; detail rows follow their parent. */
             var pkgRows = Array.from(tbody.querySelectorAll('tr.pkg-row'));
             pkgRows.sort(function(a, b) {
+                // Category requires deterministic lexical ordering by category
+                // label, then package name as a tie-breaker.
+                if (col === 'score') {
+                    var ac = a.dataset.category || '';
+                    var bc = b.dataset.category || '';
+                    var byCategory = sortAsc ? ac.localeCompare(bc) : bc.localeCompare(ac);
+                    if (byCategory !== 0) { return byCategory; }
+                    var aname = a.dataset.name || '';
+                    var bname = b.dataset.name || '';
+                    return aname.localeCompare(bname);
+                }
                 /* The Size column has three precomputed values per cell;
                    sort using whichever footprint mode is active. */
                 var av, bv;
@@ -45,7 +63,11 @@ export function getReportScript(): string {
                 var an = parseFloat(av);
                 var bn = parseFloat(bv);
                 if (!isNaN(an) && !isNaN(bn)) {
-                    return sortAsc ? an - bn : bn - an;
+                    var delta = sortAsc ? an - bn : bn - an;
+                    if (delta !== 0) { return delta; }
+                    var anameNum = a.dataset.name || '';
+                    var bnameNum = b.dataset.name || '';
+                    return anameNum.localeCompare(bnameNum);
                 }
                 return sortAsc ? av.localeCompare(bv) : bv.localeCompare(av);
             });
@@ -56,6 +78,7 @@ export function getReportScript(): string {
                 if (detail) { tbody.appendChild(detail); }
             });
             updateArrows();
+            saveUIState();
         }
 
         function updateArrows() {
@@ -93,6 +116,8 @@ export function getReportScript(): string {
                     row.classList.remove('expanded');
                 }
             });
+            updateActiveFiltersUI(searchVal);
+            saveUIState();
         }
 
         function matchesAllFilters(row, searchVal) {
@@ -100,6 +125,16 @@ export function getReportScript(): string {
                 return false;
             }
             if (activeCardFilter && !matchesCardFilter(row, activeCardFilter)) {
+                return false;
+            }
+            if (!includeDevDependencies && row.dataset.section === 'dev_dependencies') {
+                return false;
+            }
+            var ageMonths = parseFloat(row.dataset.ageMonths || '');
+            if (Number.isFinite(maxAgeMonths) && !isNaN(ageMonths) && ageMonths > maxAgeMonths) {
+                return false;
+            }
+            if (!matchesPresetFilter(row)) {
                 return false;
             }
             if (chartFilterPackage && row.dataset.name !== chartFilterPackage) {
@@ -110,6 +145,58 @@ export function getReportScript(): string {
             // other direct deps, so removing any single dep won't help.
             if (excludeSharedTransitives && row.dataset.sharedTransitive === 'yes') {
                 return false;
+            }
+            return true;
+        }
+
+        function saveUIState() {
+            if (isRestoringState) { return; }
+            var searchInput = document.getElementById('search-input');
+            var ageSlider = document.getElementById('age-max');
+            var includeDevToggle = document.getElementById('include-dev-toggle');
+            var presetSelect = document.getElementById('filter-preset');
+            var excludeSharedToggle = document.getElementById('exclude-shared-transitives');
+            vscode.setState({
+                sortCol: sortCol,
+                sortAsc: sortAsc,
+                footprintMode: footprintMode,
+                activeCardFilter: activeCardFilter,
+                chartFilterPackage: chartFilterPackage,
+                excludeSharedTransitives: excludeSharedTransitives,
+                includeDevDependencies: includeDevToggle ? !!includeDevToggle.checked : includeDevDependencies,
+                maxAgeMonths: Number.isFinite(maxAgeMonths) ? maxAgeMonths : null,
+                activePreset: presetSelect ? (presetSelect.value || 'none') : activePreset,
+                search: searchInput ? (searchInput.value || '') : '',
+                excludeSharedToggleChecked: excludeSharedToggle ? !!excludeSharedToggle.checked : excludeSharedTransitives,
+                ageSliderValue: ageSlider ? parseInt(ageSlider.value || '240', 10) : 240,
+            });
+        }
+
+        function matchesPresetFilter(row) {
+            if (activePreset === 'none') { return true; }
+            var category = row.dataset.category || '';
+            var update = row.dataset.update || '';
+            var status = row.dataset.status || '';
+            var section = row.dataset.section || '';
+            var files = parseInt(row.dataset.files || '0', 10);
+            var vulns = parseInt(row.dataset.vulns || '0', 10);
+            var reexport = row.dataset.reexport === 'yes';
+            var ageMonths = parseFloat(row.dataset.ageMonths || '0');
+            var hasUpdates = update !== 'up-to-date' && update !== 'unknown';
+            if (activePreset === 'modernization') {
+                return hasUpdates && ageMonths >= 12;
+            }
+            if (activePreset === 'risk-hotspots') {
+                return vulns > 0
+                    || category === 'abandoned'
+                    || category === 'end-of-life'
+                    || ageMonths >= 36;
+            }
+            if (activePreset === 'cleanup-candidates') {
+                return status === 'unused' || (files === 1 && !reexport);
+            }
+            if (activePreset === 'direct-only') {
+                return section !== 'transitive';
             }
             return true;
         }
@@ -189,12 +276,255 @@ export function getReportScript(): string {
             }
         }
 
+        function getAgeLabelForValue(v) {
+            if (v >= 240) { return 'All'; }
+            if (v >= 24) { return (Math.round((v / 12) * 10) / 10) + 'y'; }
+            return v + 'mo';
+        }
+
+        function restoreUIState() {
+            var state = vscode.getState();
+            if (!state || typeof state !== 'object') { return; }
+            isRestoringState = true;
+            if (state.sortCol === 'name' || state.sortCol === 'score' || state.sortCol === 'version'
+                || state.sortCol === 'update' || state.sortCol === 'published' || state.sortCol === 'size'
+                || state.sortCol === 'deps' || state.sortCol === 'transitives' || state.sortCol === 'files'
+                || state.sortCol === 'status' || state.sortCol === 'vulns') {
+                sortCol = state.sortCol;
+            }
+            if (typeof state.sortAsc === 'boolean') {
+                sortAsc = state.sortAsc;
+            }
+            if (state.footprintMode === 'own' || state.footprintMode === 'unique' || state.footprintMode === 'total') {
+                footprintMode = state.footprintMode;
+            }
+            if (typeof state.activeCardFilter === 'string' || state.activeCardFilter === null) {
+                activeCardFilter = state.activeCardFilter;
+            }
+            if (typeof state.chartFilterPackage === 'string' || state.chartFilterPackage === null) {
+                chartFilterPackage = state.chartFilterPackage;
+            }
+            excludeSharedTransitives = state.excludeSharedTransitives === true;
+            includeDevDependencies = state.includeDevDependencies !== false;
+            if (typeof state.maxAgeMonths === 'number') {
+                maxAgeMonths = state.maxAgeMonths;
+            } else {
+                maxAgeMonths = Number.POSITIVE_INFINITY;
+            }
+            if (typeof state.activePreset === 'string' && state.activePreset) {
+                activePreset = state.activePreset;
+            }
+            var searchInput = document.getElementById('search-input');
+            if (searchInput && typeof state.search === 'string') {
+                searchInput.value = state.search;
+            }
+            var includeDevToggle = document.getElementById('include-dev-toggle');
+            if (includeDevToggle) {
+                includeDevToggle.checked = includeDevDependencies;
+            }
+            var ageSlider = document.getElementById('age-max');
+            var ageLabel = document.getElementById('age-max-label');
+            if (ageSlider) {
+                var ageValue = 240;
+                if (typeof state.ageSliderValue === 'number' && state.ageSliderValue >= 0) {
+                    ageValue = Math.max(0, Math.min(240, Math.round(state.ageSliderValue)));
+                    ageSlider.value = String(ageValue);
+                } else if (Number.isFinite(maxAgeMonths)) {
+                    ageValue = Math.max(0, Math.min(240, Math.round(maxAgeMonths)));
+                    ageSlider.value = String(ageValue);
+                }
+                if (ageLabel) { ageLabel.textContent = getAgeLabelForValue(ageValue); }
+            }
+            var presetSelect = document.getElementById('filter-preset');
+            if (presetSelect) {
+                var opt = Array.from(presetSelect.options).some(function(o) { return o.value === activePreset; });
+                presetSelect.value = opt ? activePreset : 'none';
+                activePreset = presetSelect.value || 'none';
+            }
+            var excludeSharedToggle = document.getElementById('exclude-shared-transitives');
+            if (excludeSharedToggle) {
+                excludeSharedToggle.checked = state.excludeSharedToggleChecked === true;
+                excludeSharedTransitives = excludeSharedToggle.checked;
+            }
+            updateCardStyles();
+            updateChartFilterIndicator();
+            updateSearchClearVisibility();
+            setFootprintMode(footprintMode);
+            sortTable(sortCol, true);
+            applyFilters();
+            isRestoringState = false;
+            saveUIState();
+        }
+
+        function clearCardFilter() {
+            activeCardFilter = null;
+            updateCardStyles();
+            applyFilters();
+        }
+
+        function clearChartFilter() {
+            chartFilterPackage = null;
+            updateChartFilterIndicator();
+            applyFilters();
+        }
+
+        function updateActiveFiltersUI(searchVal) {
+            var host = document.getElementById('active-filters');
+            if (!host) { return; }
+            var list = host.querySelector('.active-filters-list');
+            if (!list) { return; }
+            var chips = [];
+            if (searchVal) {
+                chips.push({ key: 'search', label: 'Search: ' + searchVal });
+            }
+            if (!includeDevDependencies) {
+                chips.push({ key: 'dev', label: 'Dev: excluded' });
+            }
+            if (Number.isFinite(maxAgeMonths)) {
+                chips.push({ key: 'age', label: 'Age <= ' + getAgeLabelForValue(maxAgeMonths) });
+            }
+            if (activePreset !== 'none') {
+                chips.push({ key: 'preset', label: 'Preset: ' + activePreset.replace('-', ' ') });
+            }
+            if (activeCardFilter) {
+                chips.push({ key: 'card', label: 'Card: ' + activeCardFilter });
+            }
+            if (chartFilterPackage) {
+                chips.push({ key: 'chart', label: 'Chart: ' + chartFilterPackage });
+            }
+            if (excludeSharedTransitives) {
+                chips.push({ key: 'shared', label: 'Shared transitives: excluded' });
+            }
+            if (chips.length === 0) {
+                host.style.display = 'none';
+                list.innerHTML = '';
+                return;
+            }
+            host.style.display = 'flex';
+            list.innerHTML = chips.map(function(chip) {
+                return '<button type="button" class="active-filter-chip" data-filter-key="' + chip.key
+                    + '" title="Clear this filter">' + chip.label + ' <span aria-hidden="true">&times;</span></button>';
+            }).join('');
+            list.querySelectorAll('.active-filter-chip').forEach(function(chipEl) {
+                chipEl.addEventListener('click', function() {
+                    clearFilterByKey(chipEl.dataset.filterKey || '');
+                });
+            });
+        }
+
+        function clearFilterByKey(key) {
+            if (key === 'search') {
+                var searchInputEl = document.getElementById('search-input');
+                if (searchInputEl) { searchInputEl.value = ''; }
+                updateSearchClearVisibility();
+            } else if (key === 'dev') {
+                includeDevDependencies = true;
+                var devToggle = document.getElementById('include-dev-toggle');
+                if (devToggle) { devToggle.checked = true; }
+            } else if (key === 'age') {
+                maxAgeMonths = Number.POSITIVE_INFINITY;
+                var ageMax = document.getElementById('age-max');
+                var ageLabel = document.getElementById('age-max-label');
+                if (ageMax) { ageMax.value = '240'; }
+                if (ageLabel) { ageLabel.textContent = 'All'; }
+            } else if (key === 'preset') {
+                activePreset = 'none';
+                var presetSelect = document.getElementById('filter-preset');
+                if (presetSelect) { presetSelect.value = 'none'; }
+            } else if (key === 'card') {
+                activeCardFilter = null;
+                updateCardStyles();
+            } else if (key === 'chart') {
+                clearChartFilter();
+                return;
+            } else if (key === 'shared') {
+                excludeSharedTransitives = false;
+                var exclToggle = document.getElementById('exclude-shared-transitives');
+                if (exclToggle) { exclToggle.checked = false; }
+            }
+            applyFilters();
+        }
+
+        function clearAllFilters() {
+            var searchInputEl = document.getElementById('search-input');
+            if (searchInputEl) { searchInputEl.value = ''; }
+            updateSearchClearVisibility();
+            includeDevDependencies = true;
+            var devToggle = document.getElementById('include-dev-toggle');
+            if (devToggle) { devToggle.checked = true; }
+            maxAgeMonths = Number.POSITIVE_INFINITY;
+            var ageMaxEl = document.getElementById('age-max');
+            var ageLabelEl = document.getElementById('age-max-label');
+            if (ageMaxEl) { ageMaxEl.value = '240'; }
+            if (ageLabelEl) { ageLabelEl.textContent = 'All'; }
+            activePreset = 'none';
+            var presetEl = document.getElementById('filter-preset');
+            if (presetEl) { presetEl.value = 'none'; }
+            activeCardFilter = null;
+            updateCardStyles();
+            chartFilterPackage = null;
+            updateChartFilterIndicator();
+            excludeSharedTransitives = false;
+            var exclToggle = document.getElementById('exclude-shared-transitives');
+            if (exclToggle) { exclToggle.checked = false; }
+            applyFilters();
+        }
+
+        function resetViewState() {
+            isRestoringState = true;
+            sortCol = 'score';
+            sortAsc = true;
+            footprintMode = 'own';
+            activeCardFilter = null;
+            chartFilterPackage = null;
+            excludeSharedTransitives = false;
+            includeDevDependencies = true;
+            maxAgeMonths = Number.POSITIVE_INFINITY;
+            activePreset = 'none';
+            packageNavHistory = [];
+
+            var searchInputEl = document.getElementById('search-input');
+            if (searchInputEl) { searchInputEl.value = ''; }
+            updateSearchClearVisibility();
+
+            var devToggle = document.getElementById('include-dev-toggle');
+            if (devToggle) { devToggle.checked = true; }
+            var ageMaxEl = document.getElementById('age-max');
+            var ageLabelEl = document.getElementById('age-max-label');
+            if (ageMaxEl) { ageMaxEl.value = '240'; }
+            if (ageLabelEl) { ageLabelEl.textContent = 'All'; }
+            var presetEl = document.getElementById('filter-preset');
+            if (presetEl) { presetEl.value = 'none'; }
+            var exclToggle = document.getElementById('exclude-shared-transitives');
+            if (exclToggle) { exclToggle.checked = false; }
+
+            updateCardStyles();
+            updateChartFilterIndicator();
+            updateBackButtonState();
+            setFootprintMode('own');
+            sortTable('score', true);
+            applyFilters();
+            isRestoringState = false;
+            vscode.setState({});
+            saveUIState();
+        }
+
         var clearChartBtn = document.getElementById('clear-chart-filter');
         if (clearChartBtn) {
             clearChartBtn.addEventListener('click', function() {
-                chartFilterPackage = null;
-                applyFilters();
-                updateChartFilterIndicator();
+                clearChartFilter();
+            });
+        }
+        var clearAllFiltersBtn = document.getElementById('clear-all-filters');
+        if (clearAllFiltersBtn) {
+            clearAllFiltersBtn.addEventListener('click', function() {
+                clearAllFilters();
+            });
+        }
+        var resetViewBtn = document.getElementById('reset-view');
+        if (resetViewBtn) {
+            resetViewBtn.addEventListener('click', function() {
+                resetViewState();
             });
         }
 
@@ -217,6 +547,7 @@ export function getReportScript(): string {
                 table.classList.remove('fp-own', 'fp-unique', 'fp-total');
                 table.classList.add('fp-' + mode);
             }
+            updateTotalSizeSummary(mode);
             document.querySelectorAll('.footprint-btn').forEach(function(btn) {
                 btn.classList.toggle('active', btn.dataset.footprint === mode);
             });
@@ -235,6 +566,31 @@ export function getReportScript(): string {
         /* Default: own — set the class so CSS reveals the right span. */
         var initialTable = document.querySelector('table');
         if (initialTable) { initialTable.classList.add('fp-own'); }
+        updateTotalSizeSummary('own');
+        restoreUIState();
+
+        function formatBytesAsMB(bytes) {
+            if (!Number.isFinite(bytes) || bytes <= 0) { return '\\u2014'; }
+            return (bytes / (1024 * 1024)).toFixed(1).replace(/\\.0$/, '') + ' MB';
+        }
+
+        function updateTotalSizeSummary(mode) {
+            var card = document.querySelector('.summary-card.total-size');
+            if (!card) { return; }
+            var countEl = card.querySelector('.count');
+            var labelEl = card.querySelector('.label');
+            if (!countEl) { return; }
+            var attr = 'totalSizeOwn';
+            if (mode === 'unique') { attr = 'totalSizeUnique'; }
+            else if (mode === 'total') { attr = 'totalSizeTotal'; }
+            var raw = parseFloat(card.dataset[attr] || '0');
+            countEl.textContent = formatBytesAsMB(raw);
+            if (labelEl) {
+                if (mode === 'own') { labelEl.textContent = 'Total Size*'; }
+                else if (mode === 'unique') { labelEl.textContent = 'Total Size* (+unique)'; }
+                else { labelEl.textContent = 'Total Size* (+all)'; }
+            }
+        }
 
         /* ---- Search box ---- */
 
@@ -314,6 +670,50 @@ export function getReportScript(): string {
             });
         }
 
+        var saveAllBtn = document.getElementById('save-all');
+        if (saveAllBtn) {
+            var saveLabel = saveAllBtn.innerHTML;
+            saveAllBtn.addEventListener('click', function() {
+                if (saveAllBtn.disabled) { return; }
+                saveAllBtn.disabled = true;
+                var all = Object.keys(packageData).map(function(k) { return packageData[k]; });
+                vscode.postMessage({ type: 'saveReportJson', data: all });
+                saveAllBtn.innerHTML = '\\u23F3 Saving...';
+                setTimeout(function() {
+                    saveAllBtn.disabled = false;
+                    saveAllBtn.innerHTML = saveLabel;
+                }, 2000);
+            });
+        }
+
+        var ageMax = document.getElementById('age-max');
+        var ageLabel = document.getElementById('age-max-label');
+        if (ageMax) {
+            ageMax.addEventListener('input', function() {
+                var v = parseInt(ageMax.value || '240', 10);
+                maxAgeMonths = v >= 240 ? Number.POSITIVE_INFINITY : v;
+                if (ageLabel) {
+                    ageLabel.textContent = getAgeLabelForValue(v);
+                }
+                applyFilters();
+            });
+        }
+
+        var includeDevToggle = document.getElementById('include-dev-toggle');
+        if (includeDevToggle) {
+            includeDevToggle.addEventListener('change', function() {
+                includeDevDependencies = !!includeDevToggle.checked;
+                applyFilters();
+            });
+        }
+        var presetSelect = document.getElementById('filter-preset');
+        if (presetSelect) {
+            presetSelect.addEventListener('change', function() {
+                activePreset = presetSelect.value || 'none';
+                applyFilters();
+            });
+        }
+
         /* ---- Open pubspec.yaml ---- */
 
         var pubspecBtn = document.getElementById('open-pubspec');
@@ -365,13 +765,197 @@ export function getReportScript(): string {
             });
         });
 
-        /* ---- References click -> search for package imports ---- */
+        /* ---- References click -> file-reference popover (fallback: search) ---- */
 
         document.querySelectorAll('.ref-link').forEach(function(el) {
-            el.addEventListener('click', function() {
-                vscode.postMessage({ type: 'searchImport', package: el.dataset.pkg });
+            el.addEventListener('click', function(e) {
+                e.stopPropagation();
+                var refsData = el.dataset.refs || '';
+                if (refsData) {
+                    showRefsPopover(el, refsData);
+                } else {
+                    vscode.postMessage({ type: 'searchImport', package: el.dataset.pkg });
+                }
             });
         });
+
+        /* ---- Open local package folder from Size cell ---- */
+        document.querySelectorAll('.size-link').forEach(function(el) {
+            el.addEventListener('click', function(e) {
+                e.stopPropagation();
+                if (!el.dataset.pkg) { return; }
+                vscode.postMessage({ type: 'openSourceFolder', package: el.dataset.pkg });
+            });
+        });
+
+        /* ---- Open file reference from detail section ---- */
+        document.querySelectorAll('.file-link').forEach(function(el) {
+            el.addEventListener('click', function(e) {
+                e.stopPropagation();
+                var path = el.dataset.path;
+                var line = parseInt(el.dataset.line || '1', 10);
+                if (!path) { return; }
+                vscode.postMessage({ type: 'openFileRef', path: path, line: line });
+            });
+        });
+
+        /* ---- Dependency navigation popover + row jump history ---- */
+        var navPopover = document.createElement('div');
+        navPopover.className = 'dep-popover';
+        navPopover.style.display = 'none';
+        document.body.appendChild(navPopover);
+
+        function hideNavPopover() {
+            navPopover.style.display = 'none';
+            navPopover.innerHTML = '';
+        }
+
+        function positionPopover(anchorEl) {
+            var rect = anchorEl.getBoundingClientRect();
+            var top = rect.bottom + 6;
+            var left = Math.max(8, rect.left);
+            navPopover.style.left = left + 'px';
+            navPopover.style.top = top + 'px';
+            navPopover.style.maxWidth = Math.max(220, window.innerWidth - left - 12) + 'px';
+            var popRect = navPopover.getBoundingClientRect();
+            if (popRect.right > window.innerWidth - 8) {
+                navPopover.style.left = Math.max(8, window.innerWidth - popRect.width - 8) + 'px';
+            }
+            if (popRect.bottom > window.innerHeight - 8) {
+                navPopover.style.top = Math.max(8, rect.top - popRect.height - 6) + 'px';
+            }
+        }
+
+        function showDepPopover(anchorEl, ownerPkg, depListRaw) {
+            var deps = (depListRaw || '').split(',').map(function(d) {
+                return d.trim();
+            }).filter(Boolean);
+            if (deps.length === 0) { return; }
+            var links = deps.map(function(dep) {
+                return '<a href="#" class="dep-nav-link" data-owner="' + ownerPkg + '" data-target="' + dep + '">' + dep + '</a>';
+            }).join('');
+            navPopover.innerHTML = '<div class="dep-popover-title">Dependencies</div>' + links;
+            navPopover.style.display = 'block';
+            positionPopover(anchorEl);
+            navPopover.querySelectorAll('.dep-nav-link').forEach(function(linkEl) {
+                linkEl.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    var target = linkEl.dataset.target;
+                    var owner = linkEl.dataset.owner;
+                    if (!target) { return; }
+                    navigateToPackageRow(target, owner || null);
+                    hideNavPopover();
+                });
+            });
+        }
+
+        function showRefsPopover(anchorEl, refsDataRaw) {
+            var refs = [];
+            try {
+                refs = JSON.parse(decodeURIComponent(refsDataRaw || '[]'));
+            } catch (_err) {
+                refs = [];
+            }
+            if (!Array.isArray(refs) || refs.length === 0) { return; }
+            var links = refs.map(function(ref) {
+                if (!ref || !ref.path) { return ''; }
+                var line = parseInt(ref.line || '1', 10);
+                var label = ref.label || (ref.path + ':' + line);
+                return '<a href="#" class="ref-nav-link" data-path="' + ref.path + '" data-line="' + line + '">' + label + '</a>';
+            }).join('');
+            navPopover.innerHTML = '<div class="dep-popover-title">File references</div>' + links;
+            navPopover.style.display = 'block';
+            positionPopover(anchorEl);
+            navPopover.querySelectorAll('.ref-nav-link').forEach(function(linkEl) {
+                linkEl.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    var path = linkEl.dataset.path;
+                    var line = parseInt(linkEl.dataset.line || '1', 10);
+                    if (!path) { return; }
+                    vscode.postMessage({ type: 'openFileRef', path: path, line: line });
+                    hideNavPopover();
+                });
+            });
+        }
+
+        document.querySelectorAll('.dep-list-link').forEach(function(el) {
+            el.addEventListener('click', function(e) {
+                e.stopPropagation();
+                var owner = el.dataset.pkg || '';
+                showDepPopover(el, owner, el.dataset.deps || '');
+            });
+        });
+
+        document.addEventListener('click', function(e) {
+            if (navPopover.style.display !== 'none' && !navPopover.contains(e.target)) {
+                hideNavPopover();
+            }
+        });
+
+        function ensureBackButton() {
+            if (document.getElementById('pkg-nav-back')) { return; }
+            var toolbar = document.querySelector('.table-toolbar');
+            if (!toolbar) { return; }
+            var btn = document.createElement('button');
+            btn.id = 'pkg-nav-back';
+            btn.className = 'toolbar-btn';
+            btn.textContent = '\u2190 Back';
+            btn.title = 'Back to previous package';
+            btn.disabled = true;
+            btn.addEventListener('click', function() {
+                goBackPackageNav();
+            });
+            toolbar.insertBefore(btn, toolbar.firstChild);
+        }
+
+        function updateBackButtonState() {
+            var btn = document.getElementById('pkg-nav-back');
+            if (!btn) { return; }
+            btn.disabled = packageNavHistory.length === 0;
+            btn.title = packageNavHistory.length === 0
+                ? 'No previous package'
+                : 'Back to previous package';
+        }
+
+        function highlightPackageRow(row) {
+            document.querySelectorAll('.pkg-row.pkg-nav-focus').forEach(function(r) {
+                r.classList.remove('pkg-nav-focus');
+            });
+            row.classList.add('pkg-nav-focus');
+            row.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        }
+
+        function navigateToPackageRow(targetPkg, fromPkg) {
+            var targetRow = document.querySelector('.pkg-row[data-name="' + targetPkg + '"]');
+            if (!targetRow) { return; }
+            if (fromPkg) {
+                var fromRow = document.querySelector('.pkg-row[data-name="' + fromPkg + '"]');
+                if (fromRow) {
+                    packageNavHistory.push({ name: fromPkg, scrollY: window.scrollY });
+                }
+            }
+            highlightPackageRow(targetRow);
+            updateBackButtonState();
+        }
+
+        function goBackPackageNav() {
+            var prev = packageNavHistory.pop();
+            if (!prev) {
+                updateBackButtonState();
+                return;
+            }
+            var prevRow = document.querySelector('.pkg-row[data-name="' + prev.name + '"]');
+            if (prevRow) {
+                highlightPackageRow(prevRow);
+                if (typeof prev.scrollY === 'number') {
+                    window.scrollTo({ top: prev.scrollY, behavior: 'smooth' });
+                }
+            }
+            updateBackButtonState();
+        }
+
+        ensureBackButton();
+        updateBackButtonState();
 
         /* ---- Radial gauge animation ---- */
         /* Trigger the CSS transition after the DOM is painted by setting
@@ -384,6 +968,80 @@ export function getReportScript(): string {
                 gaugeFill.setAttribute('stroke-dasharray', target + ' ' + (arc * 2));
             }
         });
+
+        /* ---- Lightweight dependency network diagram ---- */
+        (function renderNetwork() {
+            var host = document.getElementById('dep-network');
+            if (!host) { return; }
+            var raw = host.dataset.network || '[]';
+            var nodes = [];
+            try { nodes = JSON.parse(raw); } catch (_err) { nodes = []; }
+            if (!Array.isArray(nodes) || nodes.length === 0) {
+                host.textContent = 'No dependency relationship data.';
+                return;
+            }
+            var width = 860;
+            var height = Math.max(220, 90 + nodes.length * 26);
+            var leftX = 140;
+            var rightX = 680;
+            var svg = '<svg viewBox="0 0 ' + width + ' ' + height + '" class="network-svg">';
+            nodes.forEach(function(n, i) {
+                var y = 40 + i * 28;
+                svg += '<text x="' + leftX + '" y="' + y + '" class="network-node direct network-node-link" data-owner="' + n.name + '" data-target="' + n.name + '" role="button" tabindex="0">' + n.name + '</text>';
+                var links = Array.isArray(n.links) ? n.links : [];
+                links.slice(0, 6).forEach(function(dep, j) {
+                    var y2 = y + (j - 2) * 14;
+                    svg += '<line x1="' + (leftX + 12) + '" y1="' + (y - 4) + '" x2="' + (rightX - 12) + '" y2="' + (y2 - 4) + '" class="network-edge network-edge-link" data-owner="' + n.name + '" data-target="' + dep + '" />';
+                    svg += '<text x="' + rightX + '" y="' + y2 + '" class="network-node transitive network-node-link" data-owner="' + n.name + '" data-target="' + dep + '" role="button" tabindex="0">' + dep + '</text>';
+                });
+            });
+            svg += '</svg>';
+            host.innerHTML = svg;
+            function clearNetworkSelection() {
+                host.querySelectorAll('.network-selected').forEach(function(el) {
+                    el.classList.remove('network-selected');
+                });
+            }
+            function highlightNetworkPath(owner, target) {
+                clearNetworkSelection();
+                host.querySelectorAll('.network-node-link[data-owner="' + owner + '"][data-target="' + target + '"]').forEach(function(el) {
+                    el.classList.add('network-selected');
+                });
+                host.querySelectorAll('.network-edge-link[data-owner="' + owner + '"][data-target="' + target + '"]').forEach(function(el) {
+                    el.classList.add('network-selected');
+                });
+                if (owner === target) {
+                    host.querySelectorAll('.network-node-link[data-owner="' + owner + '"][data-target="' + owner + '"]').forEach(function(el) {
+                        el.classList.add('network-selected');
+                    });
+                }
+            }
+            host.querySelectorAll('.network-node-link').forEach(function(nodeEl) {
+                function runNavigation() {
+                    var owner = nodeEl.dataset.owner || '';
+                    var target = nodeEl.dataset.target || '';
+                    if (!target) { return; }
+                    if (owner) { highlightNetworkPath(owner, target); }
+                    navigateToPackageRow(target, owner && owner !== target ? owner : null);
+                }
+                nodeEl.addEventListener('click', runNavigation);
+                nodeEl.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        runNavigation();
+                    }
+                });
+            });
+            host.querySelectorAll('.network-edge-link').forEach(function(edgeEl) {
+                edgeEl.addEventListener('click', function() {
+                    var owner = edgeEl.dataset.owner || '';
+                    var target = edgeEl.dataset.target || '';
+                    if (!owner || !target) { return; }
+                    highlightNetworkPath(owner, target);
+                    navigateToPackageRow(target, owner);
+                });
+            });
+        })();
 
         /* ---- Row expansion (chevron click toggles detail row) ---- */
 
@@ -448,11 +1106,15 @@ export function getReportScript(): string {
                 }
             } else if (e.key === 'Escape') {
                 /* Collapse all expanded rows and clear focus. */
+                hideNavPopover();
                 document.querySelectorAll('.pkg-row.expanded').forEach(function(row) {
                     toggleDetail(row);
                 });
                 focusedRowIdx = -1;
                 highlightRow(rows);
+            } else if (e.altKey && e.key === 'ArrowLeft') {
+                e.preventDefault();
+                goBackPackageNav();
             }
         });
 
