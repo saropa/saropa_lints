@@ -116,9 +116,22 @@ LintImpact get impact => LintImpact.critical; // Memory leak - each one matters
 
 **DO NOT default to `medium` without thought.** Consider the real-world consequence of 1000 violations of your rule.
 
-#### Optional: Semantic metadata (`ruleType`, `tags`, `cweIds`, …)
+#### Optional: Semantic metadata (`ruleType`, `tags`, `cweIds`, ...)
 
-`SaropaLintRule` includes optional getters (see [lib/src/rule_metadata.dart](lib/src/rule_metadata.dart)): **`ruleType`** (bug / vulnerability / codeSmell / securityHotspot), **`tags`**, **`cweIds`**, **`certIds`**, **`accuracyTarget`**, **`ruleStatus`**. Folder-level defaults were applied with [scripts/bulk_rule_metadata.py](scripts/bulk_rule_metadata.py). For new or security-sensitive rules, set **`RuleType.securityHotspot`** and tag **`review-required`** when the finding may be intentional; add **CWE** IDs where the mapping is clear ([MITRE CWE](https://cwe.mitre.org/)). Progress and conventions: [bugs/discussion/RULE_METADATA_BULK_STATUS.md](bugs/discussion/RULE_METADATA_BULK_STATUS.md).
+`SaropaLintRule` includes optional getters (see [lib/src/rule_metadata.dart](lib/src/rule_metadata.dart)):
+
+- **Classification:** `ruleType` (bug / vulnerability / codeSmell / securityHotspot), `accuracyTarget`, `ruleStatus`
+- **Taxonomy:** `tags`, `cweIds`, `certIds`
+- **Discovery relationships:** `relatedRules`, `conflictingRules`, `supersedesRules`
+
+Relationship metadata guidance:
+
+- Keep curated lists short (usually 2-5 entries).
+- Use `relatedRules` for directional "see also" recommendations, not broad same-tag grouping.
+- Use `conflictingRules` for mutually exclusive style/opinionated alternatives.
+- Use `supersedesRules` when a newer rule replaces or migrates from older guidance.
+
+Folder-level defaults were applied with [scripts/bulk_rule_metadata.py](scripts/bulk_rule_metadata.py). For new or security-sensitive rules, set **`RuleType.securityHotspot`** and tag **`review-required`** when the finding may be intentional; add **CWE** IDs where the mapping is clear ([MITRE CWE](https://cwe.mitre.org/)). Progress and conventions: [bugs/discussion/RULE_METADATA_BULK_STATUS.md](bugs/discussion/RULE_METADATA_BULK_STATUS.md).
 
 ### 3. Set performance optimizations (optional but recommended)
 

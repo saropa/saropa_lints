@@ -71,7 +71,7 @@ The CLI tool (`dart run saropa_lints:cross_file`) is functional but can be impro
 
 ### Project Vibrancy (planning)
 
-Project-level code health scoring and surfacing plan lives in [plan/project_vibrancy_report.md](plan/project_vibrancy_report.md). For execution order, see the **MVP Slice (first ship)** section in that document (collectors + scoring + CLI first, UI later).
+Project-level code health scoring and surfacing plan snapshot lives in [plan/history/2026.04/2026.04.28/project_vibrancy_report.md](plan/history/2026.04/2026.04.28/project_vibrancy_report.md). For execution order, see the **MVP Slice (first ship)** section in that document (collectors + scoring + CLI first, UI later).
 
 | Initiative | Status |
 |------------|--------|

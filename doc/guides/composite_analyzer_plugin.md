@@ -38,9 +38,23 @@ Your meta-plugin’s `Plugin.name` should return `acme_saropa` so it matches the
 | `registerSaropaLintRules` | Register Saropa rules and fixes on the registry (call from `register`). |
 | `SaropaLintRule`, Saropa rule patterns in this repo | Extend for rules in Saropa’s pipeline; or use analyzer `AbstractAnalysisRule` per [Dart analyzer plugins](https://dart.dev/tools/analyzer-plugins). |
 
-## `dart run saropa_lints:init`
+### Optional facade: `package:saropa_lints_api`
 
-Init currently generates `plugins.saropa_lints`. For a composite setup you will **hand-edit** or script YAML until init grows a template flag.
+The repository ships a tiny sibling package, **`saropa_lints_api`** (`packages/saropa_lints_api/`), that **re-exports** the same composite-plugin symbols (`registerSaropaLintRules`, the config loaders, `SaropaLintRule`). Meta-plugins may depend on `saropa_lints_api` instead of declaring `saropa_lints` directly if you want a narrow import surface and a single place to bump the Saropa constraint.
+
+## `dart run saropa_lints:init` and VS Code
+
+Init still generates `plugins.saropa_lints` for normal setups. For a composite plugin:
+
+**VS Code (recommended):** Command palette → **“Saropa Lints: Create Composite Analyzer Plugin (scaffold)”**, or **Saropa Lints → Config** sidebar → **Composite analyzer plugin (scaffold)**. You will be prompted for a workspace-relative folder (default `packages/composite_saropa_plugin`).
+
+**CLI:**
+
+```bash
+dart run saropa_lints:init --emit-composite-plugin-scaffold [dir]
+```
+
+Both paths write a minimal `pubspec.yaml` + `lib/main.dart` + `README.md` under the chosen folder (CLI: default `composite_saropa_plugin` relative to `--target` when the path is omitted). Adjust the generated `Plugin.name` / package name to match your `analysis_options.yaml` key, then add your rules in `register`.
 
 ## See also
 
