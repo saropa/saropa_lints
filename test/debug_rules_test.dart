@@ -106,91 +106,55 @@ void main() {
 
   group('Debug - Avoidance Rules', () {
     group('avoid_debug_print', () {
-      test('debugPrint in production code SHOULD trigger', () {
-        expect('debugPrint in production code', isNotNull);
-      });
+      test('debugPrint in production code SHOULD trigger', () {});
 
-      test('logger instead of debugPrint should NOT trigger', () {
-        expect('logger instead of debugPrint', isNotNull);
-      });
+      test('logger instead of debugPrint should NOT trigger', () {});
     });
     group('avoid_unguarded_debug', () {
-      test('debug code without kDebugMode check SHOULD trigger', () {
-        expect('debug code without kDebugMode check', isNotNull);
-      });
+      test('debug code without kDebugMode check SHOULD trigger', () {});
 
-      test('guarded debug statements should NOT trigger', () {
-        expect('guarded debug statements', isNotNull);
-      });
+      test('guarded debug statements should NOT trigger', () {});
     });
     group('avoid_print_in_release', () {
-      test('print() reachable in release SHOULD trigger', () {
-        expect('print() reachable in release', isNotNull);
-      });
+      test('print() reachable in release SHOULD trigger', () {});
 
-      test('guarded print statements should NOT trigger', () {
-        expect('guarded print statements', isNotNull);
-      });
+      test('guarded print statements should NOT trigger', () {});
     });
     group('avoid_sensitive_in_logs', () {
-      test('PII or tokens in log output SHOULD trigger', () {
-        expect('PII or tokens in log output', isNotNull);
-      });
+      test('PII or tokens in log output SHOULD trigger', () {});
 
-      test('sanitized log messages should NOT trigger', () {
-        expect('sanitized log messages', isNotNull);
-      });
+      test('sanitized log messages should NOT trigger', () {});
     });
   });
 
   group('Debug - Requirement Rules', () {
     group('require_structured_logging', () {
-      test('unstructured log messages SHOULD trigger', () {
-        expect('unstructured log messages', isNotNull);
-      });
+      test('unstructured log messages SHOULD trigger', () {});
 
-      test('structured key-value logging should NOT trigger', () {
-        expect('structured key-value logging', isNotNull);
-      });
+      test('structured key-value logging should NOT trigger', () {});
     });
     group('require_log_level_for_production', () {
-      test('missing log level classification SHOULD trigger', () {
-        expect('missing log level classification', isNotNull);
-      });
+      test('missing log level classification SHOULD trigger', () {});
 
-      test('proper log levels should NOT trigger', () {
-        expect('proper log levels', isNotNull);
-      });
+      test('proper log levels should NOT trigger', () {});
     });
   });
 
   group('Debug - Preference Rules', () {
     group('prefer_fail_test_case', () {
-      test('test with no assertion SHOULD trigger', () {
-        expect('test with no assertion', isNotNull);
-      });
+      test('test with no assertion SHOULD trigger', () {});
 
-      test('explicit fail() for unfinished tests should NOT trigger', () {
-        expect('explicit fail() for unfinished tests', isNotNull);
-      });
+      test('explicit fail() for unfinished tests should NOT trigger', () {});
     });
     group('prefer_commenting_analyzer_ignores', () {
-      test('bare // ignore: without reason SHOULD trigger', () {
-        expect('bare // ignore: without reason', isNotNull);
-      });
+      test('bare // ignore: without reason SHOULD trigger', () {});
 
-      test('commented analyzer ignores should NOT trigger', () {
-        expect('commented analyzer ignores', isNotNull);
-      });
+      test('commented analyzer ignores should NOT trigger', () {});
     });
     group('prefer_debug_print', () {
-      test('print() for debug output SHOULD trigger', () {
-        expect('print() for debug output', isNotNull);
-      });
+      test('print() for debug output SHOULD trigger', () {});
 
-      test('debugPrint for throttled output should NOT trigger', () {
-        expect('debugPrint for throttled output', isNotNull);
-      });
+      test('debugPrint for throttled output should NOT trigger', () {});
     });
   });
 }

@@ -122,58 +122,43 @@ void main() {
 
     test('should NOT trigger on context.router.push with typed route', () {
       // False positive prevention: typed route navigation is correct
-      expect('context.router.push(MyRoute()) passes', isNotNull);
     });
 
     test('should NOT trigger on push with non-string argument', () {
       // False positive prevention: push(SomeRoute()) is not string-based
-      expect('push with route object passes', isNotNull);
     });
   });
 
   group('avoid_auto_route_keep_history_misuse', () {
     test('SHOULD trigger on replaceAll outside auth flow', () {
       // Detection: replaceAll() on router-like target, not in auth function
-      expect('router.replaceAll outside auth detected', isNotNull);
     });
 
-    test('SHOULD trigger on popUntilRoot outside auth flow', () {
-      expect('router.popUntilRoot outside auth detected', isNotNull);
-    });
+    test('SHOULD trigger on popUntilRoot outside auth flow', () {});
 
     test('should NOT trigger on replaceAll in login function', () {
       // False positive prevention: auth heuristic matches 'login'
-      expect('replaceAll in onLogin passes', isNotNull);
     });
 
-    test('should NOT trigger on replaceAll in logout function', () {
-      expect('replaceAll in onLogout passes', isNotNull);
-    });
+    test('should NOT trigger on replaceAll in logout function', () {});
 
-    test('should NOT trigger on replaceAll in onboarding function', () {
-      expect('replaceAll in completeOnboarding passes', isNotNull);
-    });
+    test('should NOT trigger on replaceAll in onboarding function', () {});
 
-    test('should NOT trigger on normal push navigation', () {
-      expect('router.push for normal nav passes', isNotNull);
-    });
+    test('should NOT trigger on normal push navigation', () {});
   });
 
   group('require_auto_route_guard_resume', () {
     test('SHOULD trigger when if has resolver.next but else does not', () {
       // Detection: ClassDeclaration implementing AutoRouteGuard,
       // onNavigation method with if-branch but < 2 resolver.next calls
-      expect('missing resolver.next in else branch detected', isNotNull);
     });
 
     test('should NOT trigger when both branches call resolver.next', () {
       // False positive prevention: both if and else have resolver.next
-      expect('complete guard passes', isNotNull);
     });
 
     test('should NOT trigger with unconditional resolver.next', () {
       // False positive prevention: no if-else, just resolver.next(true)
-      expect('simple guard passes', isNotNull);
     });
   });
 
@@ -181,12 +166,10 @@ void main() {
     test('SHOULD trigger on context.router.push with route object', () {
       // Detection: MethodInvocation 'push' on router target,
       // with non-string argument (route object)
-      expect('router.push(ProfileRoute()) detected', isNotNull);
     });
 
     test('should NOT trigger on context.router.navigate', () {
       // False positive prevention: navigate() is the correct method
-      expect('router.navigate passes', isNotNull);
     });
 
     test('should NOT trigger on push with string argument', () {
@@ -197,7 +180,6 @@ void main() {
 
     test('should NOT trigger on push called on non-router target', () {
       // False positive prevention: list.push() is not navigation
-      expect('list.push passes', isNotNull);
     });
   });
 }

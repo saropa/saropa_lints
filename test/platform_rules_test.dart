@@ -79,25 +79,17 @@ void main() {
 
   group('Platform - Requirement Rules', () {
     group('require_platform_check', () {
-      test('platform-specific code without check SHOULD trigger', () {
-        expect('platform-specific code without check', isNotNull);
-      });
+      test('platform-specific code without check SHOULD trigger', () {});
 
-      test('Platform.isX guard should NOT trigger', () {
-        expect('Platform.isX guard', isNotNull);
-      });
+      test('Platform.isX guard should NOT trigger', () {});
     });
   });
 
   group('Platform - Preference Rules', () {
     group('prefer_platform_io_conditional', () {
-      test('manual platform string check SHOULD trigger', () {
-        expect('manual platform string check', isNotNull);
-      });
+      test('manual platform string check SHOULD trigger', () {});
 
-      test('Platform.isX property should NOT trigger', () {
-        expect('Platform.isX property', isNotNull);
-      });
+      test('Platform.isX property should NOT trigger', () {});
 
       test(
         'files that are dart.library.io/ffi conditional import targets do not report (see conditional_import_utils_test)',
@@ -110,13 +102,9 @@ void main() {
       );
     });
     group('prefer_foundation_platform_check', () {
-      test('dart:io Platform in Flutter SHOULD trigger', () {
-        expect('dart:io Platform in Flutter', isNotNull);
-      });
+      test('dart:io Platform in Flutter SHOULD trigger', () {});
 
-      test('foundation defaultTargetPlatform should NOT trigger', () {
-        expect('foundation defaultTargetPlatform', isNotNull);
-      });
+      test('foundation defaultTargetPlatform should NOT trigger', () {});
     });
   });
 }

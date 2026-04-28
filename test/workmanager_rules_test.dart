@@ -57,31 +57,19 @@ void main() {
 
   group('WorkManager - Requirement Rules', () {
     group('require_workmanager_constraints', () {
-      test('background task without constraints SHOULD trigger', () {
-        expect('background task without constraints', isNotNull);
-      });
+      test('background task without constraints SHOULD trigger', () {});
 
-      test('network/battery constraints should NOT trigger', () {
-        expect('network/battery constraints', isNotNull);
-      });
+      test('network/battery constraints should NOT trigger', () {});
     });
     group('require_workmanager_result_return', () {
-      test('workmanager callback without result SHOULD trigger', () {
-        expect('workmanager callback without result', isNotNull);
-      });
+      test('workmanager callback without result SHOULD trigger', () {});
 
-      test('explicit Result return should NOT trigger', () {
-        expect('explicit Result return', isNotNull);
-      });
+      test('explicit Result return should NOT trigger', () {});
     });
     group('require_workmanager_for_background', () {
-      test('Timer for background work SHOULD trigger', () {
-        expect('Timer for background work', isNotNull);
-      });
+      test('Timer for background work SHOULD trigger', () {});
 
-      test('Workmanager for reliable background should NOT trigger', () {
-        expect('Workmanager for reliable background', isNotNull);
-      });
+      test('Workmanager for reliable background should NOT trigger', () {});
     });
   });
 }

@@ -21,6 +21,11 @@
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
+class _ExternalTickerConsumer {
+  _ExternalTickerConsumer({required this.vsync});
+  final TickerProvider vsync;
+}
+
 // ============================================================================
 // BAD: Should trigger prefer_single_ticker_provider_state_mixin
 // ============================================================================
@@ -113,6 +118,38 @@ class _GoodZeroControllers extends State<StatefulWidget>
 class _GoodControllerList extends State<StatefulWidget>
     with TickerProviderStateMixin {
   final List<AnimationController> _controllers = [];
+
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
+// OK: External helper receives `vsync: this` so this State is not single-ticker.
+class _GoodExternalVsyncHandoff extends State<StatefulWidget>
+    with TickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final _ExternalTickerConsumer _consumer;
+
+  @override
+  void initState() {
+    super.initState();
+    _consumer = _ExternalTickerConsumer(vsync: this);
+  }
+
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
+// OK: Collection of external helpers each receive `vsync: this`.
+class _GoodExternalVsyncHandoffInList extends State<StatefulWidget>
+    with TickerProviderStateMixin {
+  late final AnimationController _controller;
+  final List<_ExternalTickerConsumer> _consumers = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _consumers.add(_ExternalTickerConsumer(vsync: this));
+  }
 
   @override
   Widget build(BuildContext context) => Container();

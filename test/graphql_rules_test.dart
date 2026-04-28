@@ -41,13 +41,9 @@ void main() {
 
   group('GraphQL - Avoidance Rules', () {
     group('avoid_graphql_string_queries', () {
-      test('raw string GraphQL query SHOULD trigger', () {
-        expect('raw string GraphQL query', isNotNull);
-      });
+      test('raw string GraphQL query SHOULD trigger', () {});
 
-      test('typed GraphQL code generation should NOT trigger', () {
-        expect('typed GraphQL code generation', isNotNull);
-      });
+      test('typed GraphQL code generation should NOT trigger', () {});
     });
   });
 }

@@ -20,7 +20,9 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 import 'package:saropa_lints/saropa_lints.dart' show SaropaLintRule;
 import 'package:saropa_lints/src/native/config_loader.dart'
-    show loadNativePluginConfigFromProjectRoot, loadRulePacksConfigFromProjectRoot;
+    show
+        loadNativePluginConfigFromProjectRoot,
+        loadRulePacksConfigFromProjectRoot;
 import 'package:test/test.dart';
 
 void main() {
@@ -137,7 +139,9 @@ plugins:
 
   group('loadRulePacksConfigFromProjectRoot', () {
     test('re-merges using analyzed project root in multi-root layouts', () {
-      final tempDir = Directory.systemTemp.createTempSync('saropa_lints_multi_');
+      final tempDir = Directory.systemTemp.createTempSync(
+        'saropa_lints_multi_',
+      );
       final originalCwd = Directory.current;
       try {
         final repoRoot = Directory(p.join(tempDir.path, 'repo'))..createSync();
@@ -146,24 +150,20 @@ plugins:
         final appB = Directory(p.join(repoRoot.path, 'apps', 'b'))
           ..createSync(recursive: true);
 
-        File(p.join(appA.path, 'analysis_options.yaml')).writeAsStringSync(
-          '''
+        File(p.join(appA.path, 'analysis_options.yaml')).writeAsStringSync('''
 plugins:
   saropa_lints:
     rule_packs:
       enabled:
         - riverpod
-''',
-        );
-        File(p.join(appB.path, 'analysis_options.yaml')).writeAsStringSync(
-          '''
+''');
+        File(p.join(appB.path, 'analysis_options.yaml')).writeAsStringSync('''
 plugins:
   saropa_lints:
     rule_packs:
       enabled:
         - drift
-''',
-        );
+''');
 
         // Simulate analyzer cwd not matching either application root.
         Directory.current = repoRoot.path;

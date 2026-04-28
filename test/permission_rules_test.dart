@@ -76,70 +76,46 @@ void main() {
 
   group('Permission - Avoidance Rules', () {
     group('avoid_permission_handler_null_safety', () {
-      test('nullable permission status unchecked SHOULD trigger', () {
-        expect('nullable permission status unchecked', isNotNull);
-      });
+      test('nullable permission status unchecked SHOULD trigger', () {});
 
-      test('null-safe permission handling should NOT trigger', () {
-        expect('null-safe permission handling', isNotNull);
-      });
+      test('null-safe permission handling should NOT trigger', () {});
     });
   });
 
   group('Permission - Requirement Rules', () {
     group('require_location_permission_rationale', () {
-      test('location request without rationale SHOULD trigger', () {
-        expect('location request without rationale', isNotNull);
-      });
+      test('location request without rationale SHOULD trigger', () {});
 
-      test('user-facing rationale should NOT trigger', () {
-        expect('user-facing rationale', isNotNull);
-      });
+      test('user-facing rationale should NOT trigger', () {});
     });
     group('require_camera_permission_check', () {
-      test('camera access without permission check SHOULD trigger', () {
-        expect('camera access without permission check', isNotNull);
-      });
+      test('camera access without permission check SHOULD trigger', () {});
 
-      test('permission check before camera should NOT trigger', () {
-        expect('permission check before camera', isNotNull);
-      });
+      test('permission check before camera should NOT trigger', () {});
     });
   });
 
   group('Permission - Loop Avoidance Rules', () {
     group('avoid_permission_request_loop', () {
-      test('permission request in a loop SHOULD trigger', () {
-        expect('permission request in a loop', isNotNull);
-      });
+      test('permission request in a loop SHOULD trigger', () {});
 
       test(
         'single permission request with result check should NOT trigger',
-        () {
-          expect('single permission request with result check', isNotNull);
-        },
+        () {},
       );
     });
   });
 
   group('Permission - Preference Rules', () {
     group('prefer_image_cropping', () {
-      test('full-resolution image without crop option SHOULD trigger', () {
-        expect('full-resolution image without crop option', isNotNull);
-      });
+      test('full-resolution image without crop option SHOULD trigger', () {});
 
-      test('image cropping capability should NOT trigger', () {
-        expect('image cropping capability', isNotNull);
-      });
+      test('image cropping capability should NOT trigger', () {});
     });
     group('prefer_permission_request_in_context', () {
-      test('permission request outside user flow SHOULD trigger', () {
-        expect('permission request outside user flow', isNotNull);
-      });
+      test('permission request outside user flow SHOULD trigger', () {});
 
-      test('contextual permission request should NOT trigger', () {
-        expect('contextual permission request', isNotNull);
-      });
+      test('contextual permission request should NOT trigger', () {});
     });
   });
 }

@@ -208,126 +208,10 @@ void main() {
   });
 
   group('Collection - Avoidance Rules', () {
-    group('avoid_collection_equality_checks', () {
-      test('avoid_collection_equality_checks SHOULD trigger', () {
-        // Pattern that should be avoided: avoid collection equality checks
-        expect('avoid_collection_equality_checks detected', isNotNull);
-      });
-
-      test('avoid_collection_equality_checks should NOT trigger', () {
-        // Avoidance pattern not present
-        expect('avoid_collection_equality_checks passes', isNotNull);
-      });
-    });
-
     group('avoid_duplicate_map_keys', () {
       test('rule offers quick fix (remove duplicate entry)', () {
         final rule = AvoidDuplicateMapKeysRule();
         expect(rule.fixGenerators, isNotEmpty);
-      });
-
-      test('avoid_duplicate_map_keys SHOULD trigger', () {
-        // Pattern that should be avoided: avoid duplicate map keys
-        expect('avoid_duplicate_map_keys detected', isNotNull);
-      });
-
-      test('avoid_duplicate_map_keys should NOT trigger', () {
-        // Avoidance pattern not present
-        expect('avoid_duplicate_map_keys passes', isNotNull);
-      });
-    });
-
-    group('avoid_map_keys_contains', () {
-      test('avoid_map_keys_contains SHOULD trigger', () {
-        // Pattern that should be avoided: avoid map keys contains
-        expect('avoid_map_keys_contains detected', isNotNull);
-      });
-
-      test('avoid_map_keys_contains should NOT trigger', () {
-        // Avoidance pattern not present
-        expect('avoid_map_keys_contains passes', isNotNull);
-      });
-    });
-
-    group('avoid_unnecessary_collections', () {
-      test('avoid_unnecessary_collections SHOULD trigger', () {
-        // Pattern that should be avoided: avoid unnecessary collections
-        expect('avoid_unnecessary_collections detected', isNotNull);
-      });
-
-      test('avoid_unnecessary_collections should NOT trigger', () {
-        // Avoidance pattern not present
-        expect('avoid_unnecessary_collections passes', isNotNull);
-      });
-    });
-
-    group('avoid_unsafe_collection_methods', () {
-      test('avoid_unsafe_collection_methods SHOULD trigger', () {
-        // Pattern that should be avoided: avoid unsafe collection methods
-        expect('avoid_unsafe_collection_methods detected', isNotNull);
-      });
-
-      test('avoid_unsafe_collection_methods should NOT trigger', () {
-        // Avoidance pattern not present
-        expect('avoid_unsafe_collection_methods passes', isNotNull);
-      });
-
-      test('.first guarded by length == 1 should NOT trigger (regression)', () {
-        // if (parts.length == 1) { return parts.first; }
-        expect('length guard is recognized', isNotNull);
-      });
-
-      test('.first in onSelectionChanged should NOT trigger (regression)', () {
-        // SegmentedButton.onSelectionChanged guarantees non-empty Set
-        // onSelectionChanged: (selection) { selection.first; }
-        expect('SegmentedButton callback recognized as non-empty', isNotNull);
-      });
-
-      test(
-        '.first after isEmpty early return should NOT trigger (regression)',
-        () {
-          // if (segments.isEmpty) return; ... segments.first
-          // Also covers: if (total == 0) return; pattern
-          expect('early return guard recognized', isNotNull);
-        },
-      );
-    });
-
-    group('avoid_unsafe_reduce', () {
-      test('avoid_unsafe_reduce SHOULD trigger', () {
-        // Pattern that should be avoided: avoid unsafe reduce
-        expect('avoid_unsafe_reduce detected', isNotNull);
-      });
-
-      test('avoid_unsafe_reduce should NOT trigger', () {
-        // Avoidance pattern not present
-        expect('avoid_unsafe_reduce passes', isNotNull);
-      });
-
-      test('reduce after length < 2 early return should NOT trigger '
-          '(regression)', () {
-        // if (data.length < 2) return; data.reduce(...)
-        expect('length guard for reduce recognized', isNotNull);
-      });
-
-      test(
-        'reduce inside isNotEmpty if block should NOT trigger (regression)',
-        () {
-          // if (data.isNotEmpty) { data.reduce(...) }
-          expect('isNotEmpty wrapper for reduce recognized', isNotNull);
-        },
-      );
-    });
-
-    group('avoid_unsafe_where_methods', () {
-      test('avoid_unsafe_where_methods SHOULD trigger', () {
-        // Pattern that should be avoided: avoid unsafe where methods
-        expect('avoid_unsafe_where_methods detected', isNotNull);
-      });
-
-      test('avoid_unsafe_where_methods should NOT trigger', () {
-        // Avoidance pattern not present
-        expect('avoid_unsafe_where_methods passes', isNotNull);
       });
     });
 
@@ -336,16 +220,6 @@ void main() {
         final rule = AvoidDuplicateNumberElementsRule();
         expect(rule.fixGenerators, isNotEmpty);
       });
-
-      test('avoid_duplicate_number_elements SHOULD trigger', () {
-        // Pattern that should be avoided: avoid duplicate number elements
-        expect('avoid_duplicate_number_elements detected', isNotNull);
-      });
-
-      test('avoid_duplicate_number_elements should NOT trigger', () {
-        // Avoidance pattern not present
-        expect('avoid_duplicate_number_elements passes', isNotNull);
-      });
     });
 
     group('avoid_duplicate_string_elements', () {
@@ -353,32 +227,12 @@ void main() {
         final rule = AvoidDuplicateStringElementsRule();
         expect(rule.fixGenerators, isNotEmpty);
       });
-
-      test('avoid_duplicate_string_elements SHOULD trigger', () {
-        // Pattern that should be avoided: avoid duplicate string elements
-        expect('avoid_duplicate_string_elements detected', isNotNull);
-      });
-
-      test('avoid_duplicate_string_elements should NOT trigger', () {
-        // Avoidance pattern not present
-        expect('avoid_duplicate_string_elements passes', isNotNull);
-      });
     });
 
     group('avoid_duplicate_object_elements', () {
       test('rule offers quick fix (remove duplicate element)', () {
         final rule = AvoidDuplicateObjectElementsRule();
         expect(rule.fixGenerators, isNotEmpty);
-      });
-
-      test('avoid_duplicate_object_elements SHOULD trigger', () {
-        // Pattern that should be avoided: avoid duplicate object elements
-        expect('avoid_duplicate_object_elements detected', isNotNull);
-      });
-
-      test('avoid_duplicate_object_elements should NOT trigger', () {
-        // Avoidance pattern not present
-        expect('avoid_duplicate_object_elements passes', isNotNull);
       });
     });
 
@@ -388,237 +242,10 @@ void main() {
         expect(rule.fixGenerators, isNotEmpty);
       });
     });
-
-    group('avoid_unreachable_for_loop', () {
-      test('avoid_unreachable_for_loop SHOULD trigger', () {
-        // Pattern that should be avoided: avoid unreachable for loop
-        expect('avoid_unreachable_for_loop detected', isNotNull);
-      });
-
-      test('avoid_unreachable_for_loop should NOT trigger', () {
-        // Avoidance pattern not present
-        expect('avoid_unreachable_for_loop passes', isNotNull);
-      });
-    });
   });
 
-  group('Collection - Preference Rules', () {
-    group('prefer_where_or_null', () {
-      test('prefer_where_or_null SHOULD trigger', () {
-        // Better alternative available: prefer where or null
-        expect('prefer_where_or_null detected', isNotNull);
-      });
-
-      test('prefer_where_or_null should NOT trigger', () {
-        // Preferred pattern used correctly
-        expect('prefer_where_or_null passes', isNotNull);
-      });
-    });
-
-    group('prefer_list_contains', () {
-      test('prefer_list_contains SHOULD trigger', () {
-        // Better alternative available: prefer list contains
-        expect('prefer_list_contains detected', isNotNull);
-      });
-
-      test('prefer_list_contains should NOT trigger', () {
-        // Preferred pattern used correctly
-        expect('prefer_list_contains passes', isNotNull);
-      });
-    });
-
-    group('prefer_list_first', () {
-      test('prefer_list_first SHOULD trigger', () {
-        // Better alternative available: prefer list first
-        expect('prefer_list_first detected', isNotNull);
-      });
-
-      test('prefer_list_first should NOT trigger', () {
-        // Preferred pattern used correctly
-        expect('prefer_list_first passes', isNotNull);
-      });
-
-      test('should NOT trigger on sibling index accesses', () {
-        // list[0] alongside list[1] in same scope → suppressed
-        expect('prefer_list_first suppressed for siblings', isNotNull);
-      });
-
-      test('should NOT trigger on assignment target', () {
-        // list[0] = value → suppressed
-        expect('prefer_list_first suppressed for assignment', isNotNull);
-      });
-
-      test('should NOT trigger on String subscript', () {
-        // string[0] → String has no .first getter
-        expect('prefer_list_first suppressed for String', isNotNull);
-      });
-
-      test('should NOT trigger on Map subscript', () {
-        // map[0] → Map int key, not index
-        expect('prefer_list_first suppressed for Map', isNotNull);
-      });
-
-      test('should NOT trigger with loop variable index', () {
-        // list[0] init + list[i] in loop → suppressed
-        expect('prefer_list_first suppressed for loop', isNotNull);
-      });
-    });
-
-    group('prefer_iterable_of', () {
-      test('prefer_iterable_of SHOULD trigger', () {
-        // Better alternative available: prefer iterable of
-        expect('prefer_iterable_of detected', isNotNull);
-      });
-
-      test('prefer_iterable_of should NOT trigger', () {
-        // Preferred pattern used correctly
-        expect('prefer_iterable_of passes', isNotNull);
-      });
-    });
-
-    group('prefer_list_last', () {
-      test('prefer_list_last SHOULD trigger', () {
-        // Better alternative available: prefer list last
-        expect('prefer_list_last detected', isNotNull);
-      });
-
-      test('prefer_list_last should NOT trigger', () {
-        // Preferred pattern used correctly
-        expect('prefer_list_last passes', isNotNull);
-      });
-
-      test('should NOT trigger on assignment target', () {
-        // list[list.length - 1] = value → suppressed
-        expect('prefer_list_last suppressed for assignment', isNotNull);
-      });
-
-      test('should NOT trigger with sibling index accesses', () {
-        // list[0] alongside list[list.length - 1] → suppressed
-        expect('prefer_list_last suppressed for siblings', isNotNull);
-      });
-    });
-
-    group('prefer_add_all', () {
-      test('prefer_add_all SHOULD trigger', () {
-        // Better alternative available: prefer add all
-        expect('prefer_add_all detected', isNotNull);
-      });
-
-      test('prefer_add_all should NOT trigger', () {
-        // Preferred pattern used correctly
-        expect('prefer_add_all passes', isNotNull);
-      });
-    });
-
-    group('prefer_set_for_lookup', () {
-      test('prefer_set_for_lookup SHOULD trigger', () {
-        // Better alternative available: prefer set for lookup
-        expect('prefer_set_for_lookup detected', isNotNull);
-      });
-
-      test('prefer_set_for_lookup should NOT trigger', () {
-        // Preferred pattern used correctly
-        expect('prefer_set_for_lookup passes', isNotNull);
-      });
-    });
-
-    group('prefer_correct_for_loop_increment', () {
-      test('prefer_correct_for_loop_increment SHOULD trigger', () {
-        // Better alternative available: prefer correct for loop increment
-        expect('prefer_correct_for_loop_increment detected', isNotNull);
-      });
-
-      test('prefer_correct_for_loop_increment should NOT trigger', () {
-        // Preferred pattern used correctly
-        expect('prefer_correct_for_loop_increment passes', isNotNull);
-      });
-
-      test('prefer_correct_for_loop_increment comment exemption', () {
-        // Non-standard increment with explanatory comment on same line or line
-        // above should NOT trigger (see fixture _good253CommentExemption).
-        expect(
-          'prefer_correct_for_loop_increment comment exemption',
-          isNotNull,
-        );
-      });
-
-      test(
-        'prefer_correct_for_loop_increment unrelated comment still triggers',
-        () {
-          // Unrelated comment (e.g. "Fix later") on line above does NOT exempt;
-          // see fixture _bad253UnrelatedComment (expect_lint).
-          expect(
-            'prefer_correct_for_loop_increment unrelated comment still triggers',
-            isNotNull,
-          );
-        },
-      );
-
-      test(
-        'prefer_correct_for_loop_increment comment two lines above still triggers',
-        () {
-          // Comment exemption only applies to same line or immediately above;
-          // see fixture _bad253CommentTooFarAbove (expect_lint).
-          expect(
-            'prefer_correct_for_loop_increment comment two lines above still triggers',
-            isNotNull,
-          );
-        },
-      );
-    });
-
-    group('prefer_null_aware_elements', () {
-      test('prefer_null_aware_elements SHOULD trigger', () {
-        // Better alternative available: prefer null aware elements
-        expect('prefer_null_aware_elements detected', isNotNull);
-      });
-
-      test('prefer_null_aware_elements should NOT trigger', () {
-        // Preferred pattern used correctly
-        expect('prefer_null_aware_elements passes', isNotNull);
-      });
-    });
-
-    group('prefer_iterable_operations', () {
-      test('prefer_iterable_operations SHOULD trigger', () {
-        // Better alternative available: prefer iterable operations
-        expect('prefer_iterable_operations detected', isNotNull);
-      });
-
-      test('prefer_iterable_operations should NOT trigger', () {
-        // Preferred pattern used correctly
-        expect('prefer_iterable_operations passes', isNotNull);
-      });
-    });
-  });
-
-  group('Collection - General Rules', () {
-    group('map_keys_ordering', () {
-      test('map_keys_ordering SHOULD trigger', () {
-        // Detected violation: map keys ordering
-        expect('map_keys_ordering detected', isNotNull);
-      });
-
-      test('map_keys_ordering should NOT trigger', () {
-        // Compliant code passes
-        expect('map_keys_ordering passes', isNotNull);
-      });
-    });
-  });
-
-  group('Collection - Requirement Rules', () {
-    group('require_key_for_collection', () {
-      test('require_key_for_collection SHOULD trigger', () {
-        // Required pattern missing: require key for collection
-        expect('require_key_for_collection detected', isNotNull);
-      });
-
-      test('require_key_for_collection should NOT trigger', () {
-        // Required pattern present
-        expect('require_key_for_collection passes', isNotNull);
-      });
-    });
-  });
+  // Stub-only behavior tests were removed from this file. Keep rule metadata,
+  // fixture verification, and targeted quick-fix checks.
 
   group('Collection - Map Rules', () {
     group('prefer_for_elements_to_map_from_iterable', () {
@@ -634,26 +261,6 @@ void main() {
         );
         expect(rule.code.problemMessage.length, greaterThan(50));
         expect(rule.code.correctionMessage, isNotNull);
-      });
-
-      test('Map.fromIterable with key/value closures SHOULD trigger', () {
-        // Map.fromIterable(items, key: (e) => e.id, value: (e) => e.name)
-        expect('fromIterable with simple closures triggers', isNotNull);
-      });
-
-      test('Map.fromIterable without key/value should NOT trigger', () {
-        // Map.fromIterable(items) without named key/value args
-        expect('fromIterable without closures does not trigger', isNotNull);
-      });
-
-      test('Map.fromIterable with block body should NOT trigger', () {
-        // key: (e) { return e.id; } — block body, not simple closure
-        expect('block body closure does not trigger', isNotNull);
-      });
-
-      test('Map.fromEntries should NOT trigger (false positive)', () {
-        // Different constructor — only fromIterable is flagged
-        expect('fromEntries does not trigger', isNotNull);
       });
     });
   });

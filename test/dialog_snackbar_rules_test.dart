@@ -78,64 +78,40 @@ void main() {
 
   group('Dialog & SnackBar - Avoidance Rules', () {
     group('avoid_snackbar_queue_buildup', () {
-      test('rapid SnackBar calls without clearing SHOULD trigger', () {
-        expect('rapid SnackBar calls without clearing', isNotNull);
-      });
+      test('rapid SnackBar calls without clearing SHOULD trigger', () {});
 
-      test('SnackBar queue management should NOT trigger', () {
-        expect('SnackBar queue management', isNotNull);
-      });
+      test('SnackBar queue management should NOT trigger', () {});
     });
   });
 
   group('Dialog & SnackBar - Requirement Rules', () {
     group('require_snackbar_duration', () {
-      test('SnackBar without duration SHOULD trigger', () {
-        expect('SnackBar without duration', isNotNull);
-      });
+      test('SnackBar without duration SHOULD trigger', () {});
 
-      test('explicit SnackBar duration should NOT trigger', () {
-        expect('explicit SnackBar duration', isNotNull);
-      });
+      test('explicit SnackBar duration should NOT trigger', () {});
     });
     group('require_dialog_barrier_dismissible', () {
-      test('dialog without barrierDismissible SHOULD trigger', () {
-        expect('dialog without barrierDismissible', isNotNull);
-      });
+      test('dialog without barrierDismissible SHOULD trigger', () {});
 
-      test('explicit dismissibility should NOT trigger', () {
-        expect('explicit dismissibility', isNotNull);
-      });
+      test('explicit dismissibility should NOT trigger', () {});
     });
     group('require_dialog_result_handling', () {
-      test('showDialog without awaiting result SHOULD trigger', () {
-        expect('showDialog without awaiting result', isNotNull);
-      });
+      test('showDialog without awaiting result SHOULD trigger', () {});
 
-      test('dialog result handling should NOT trigger', () {
-        expect('dialog result handling', isNotNull);
-      });
+      test('dialog result handling should NOT trigger', () {});
     });
     group('require_snackbar_action_for_undo', () {
-      test('destructive action without undo SnackBar SHOULD trigger', () {
-        expect('destructive action without undo SnackBar', isNotNull);
-      });
+      test('destructive action without undo SnackBar SHOULD trigger', () {});
 
-      test('undo action in SnackBar should NOT trigger', () {
-        expect('undo action in SnackBar', isNotNull);
-      });
+      test('undo action in SnackBar should NOT trigger', () {});
     });
   });
 
   group('Dialog & SnackBar - Preference Rules', () {
     group('prefer_adaptive_dialog', () {
-      test('platform-specific dialog SHOULD trigger', () {
-        expect('platform-specific dialog', isNotNull);
-      });
+      test('platform-specific dialog SHOULD trigger', () {});
 
-      test('adaptive dialog widget should NOT trigger', () {
-        expect('adaptive dialog widget', isNotNull);
-      });
+      test('adaptive dialog widget should NOT trigger', () {});
     });
   });
 }

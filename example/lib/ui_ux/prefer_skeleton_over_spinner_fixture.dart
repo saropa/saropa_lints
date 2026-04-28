@@ -122,3 +122,25 @@ void _good1261() {
     return ShimmerLoading(child: ContentSkeleton());
   }
 }
+
+// GOOD: Determinate progress ring should NOT trigger
+void _goodDeterminateCircular(double progress) {
+  if (progress > 0 && progress < 1) {
+    return CircularProgressIndicator(value: progress, strokeWidth: 3);
+  }
+}
+
+// GOOD: Determinate linear progress should NOT trigger
+void _goodDeterminateLinear(double progress) {
+  if (progress >= 0 && progress <= 1) {
+    return LinearProgressIndicator(value: progress);
+  }
+}
+
+// BAD: null value is indeterminate and should still trigger
+// expect_lint: prefer_skeleton_over_spinner
+void _badIndeterminateNullValue(double? progress) {
+  if (progress == null) {
+    return CircularProgressIndicator(value: null);
+  }
+}

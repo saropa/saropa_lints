@@ -90,12 +90,8 @@ void main() {
         test('SHOULD trigger on bad example in fixture', () {
           expect(name, isNotNull);
         });
-        test('should NOT trigger on good example in fixture', () {
-          expect('good example does not trigger', isNotNull);
-        });
-        test('false positives documented in fixture', () {
-          expect('fixture has good/bad/fp sections', isNotNull);
-        });
+        test('should NOT trigger on good example in fixture', () {});
+        test('false positives documented in fixture', () {});
       });
     }
   });

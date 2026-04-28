@@ -123,7 +123,9 @@ void main() {
 
   group('fixture: cross_file_features_fixture (feature-deps)', () {
     test('detects cross-feature imports and builds adjacency map', () async {
-      final result = await runCrossFileAnalysis(projectPath: featureFixturePath);
+      final result = await runCrossFileAnalysis(
+        projectPath: featureFixturePath,
+      );
       expect(result.featureDependencies, isNotEmpty);
       expect(result.featureDependencies['feature_a'], contains('feature_b'));
       expect(
@@ -137,7 +139,9 @@ void main() {
     });
 
     test('text reporter includes feature dependency matrix', () async {
-      final result = await runCrossFileAnalysis(projectPath: featureFixturePath);
+      final result = await runCrossFileAnalysis(
+        projectPath: featureFixturePath,
+      );
       final buffer = StringBuffer();
       CrossFileReporter.report(result, format: 'text', sink: buffer);
       final out = buffer.toString();
@@ -165,25 +169,27 @@ void main() {
       expect(allUnused, isNot(contains('_privateCandidate')));
     });
 
-    test('forceHeuristic skips analyzer and still matches fixture expectations',
-        () async {
-      final result = await runCrossFileAnalysis(
-        projectPath: unusedSymbolsFixturePath,
-        unusedSymbolsOptions: const UnusedSymbolsOptions(forceHeuristic: true),
-      );
-      final allUnused = result.unusedSymbols.values.expand((s) => s).toList();
-      expect(allUnused, contains('UnusedClass'));
-      expect(allUnused, isNot(contains('UsedClass')));
-      expect(allUnused, isNot(contains('usedTopLevelFunction')));
-      expect(allUnused, isNot(contains('usedConstValue')));
-    });
+    test(
+      'forceHeuristic skips analyzer and still matches fixture expectations',
+      () async {
+        final result = await runCrossFileAnalysis(
+          projectPath: unusedSymbolsFixturePath,
+          unusedSymbolsOptions: const UnusedSymbolsOptions(
+            forceHeuristic: true,
+          ),
+        );
+        final allUnused = result.unusedSymbols.values.expand((s) => s).toList();
+        expect(allUnused, contains('UnusedClass'));
+        expect(allUnused, isNot(contains('UsedClass')));
+        expect(allUnused, isNot(contains('usedTopLevelFunction')));
+        expect(allUnused, isNot(contains('usedConstValue')));
+      },
+    );
 
     test('includePrivate option surfaces private unused symbols', () async {
       final result = await runCrossFileAnalysis(
         projectPath: unusedSymbolsFixturePath,
-        unusedSymbolsOptions: const UnusedSymbolsOptions(
-          includePrivate: true,
-        ),
+        unusedSymbolsOptions: const UnusedSymbolsOptions(includePrivate: true),
       );
       final allUnused = result.unusedSymbols.values.expand((s) => s).toList();
       expect(allUnused, contains('_privateCandidate'));
@@ -191,18 +197,44 @@ void main() {
   });
 
   group('fixture: cross_file_dead_imports_fixture (dead-imports)', () {
-    test('reports likely dead relative imports with alias/show/hide support', () async {
-      final result = await runCrossFileAnalysis(projectPath: deadImportsFixturePath);
-      expect(result.deadImports, isNotEmpty);
-      expect(result.deadImports['lib/consumer.dart'], isNotNull);
-      expect(result.deadImports['lib/consumer.dart'], contains('unused_dep.dart'));
-      expect(result.deadImports['lib/consumer.dart'], contains('show_only_dead.dart'));
-      expect(result.deadImports['lib/consumer.dart'], isNot(contains('used_dep.dart')));
-      expect(result.deadImports['lib/consumer.dart'], isNot(contains('show_hide_dep.dart')));
-      expect(result.deadImports['lib/consumer.dart'], isNot(contains('hide_dep.dart')));
-      expect(result.deadImports['lib/consumer.dart'], isNot(contains('reexport_barrel.dart')));
-      expect(result.deadImports['lib/consumer.dart'], isNot(contains('deferred_dep.dart')));
-    });
+    test(
+      'reports likely dead relative imports with alias/show/hide support',
+      () async {
+        final result = await runCrossFileAnalysis(
+          projectPath: deadImportsFixturePath,
+        );
+        expect(result.deadImports, isNotEmpty);
+        expect(result.deadImports['lib/consumer.dart'], isNotNull);
+        expect(
+          result.deadImports['lib/consumer.dart'],
+          contains('unused_dep.dart'),
+        );
+        expect(
+          result.deadImports['lib/consumer.dart'],
+          contains('show_only_dead.dart'),
+        );
+        expect(
+          result.deadImports['lib/consumer.dart'],
+          isNot(contains('used_dep.dart')),
+        );
+        expect(
+          result.deadImports['lib/consumer.dart'],
+          isNot(contains('show_hide_dep.dart')),
+        );
+        expect(
+          result.deadImports['lib/consumer.dart'],
+          isNot(contains('hide_dep.dart')),
+        );
+        expect(
+          result.deadImports['lib/consumer.dart'],
+          isNot(contains('reexport_barrel.dart')),
+        );
+        expect(
+          result.deadImports['lib/consumer.dart'],
+          isNot(contains('deferred_dep.dart')),
+        );
+      },
+    );
   });
 
   group('watch diff helpers', () {

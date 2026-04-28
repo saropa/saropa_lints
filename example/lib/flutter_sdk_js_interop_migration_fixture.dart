@@ -37,3 +37,14 @@ void preferIntForJsarrayWithLengthBad(JSNumber n) {
 void preferIntForJsarrayWithLengthGood(int n) {
   JSArray<JSAny?>.withLength(n);
 }
+
+class LocalJsNumber {}
+
+class LocalJsArray<T> {
+  LocalJsArray.withLength(LocalJsNumber length);
+}
+
+void preferIntForJsarrayWithLengthUserDefinedGood(LocalJsNumber n) {
+  // Same API shape, but not `dart:js_interop`; should stay lint-free.
+  LocalJsArray<Object?>.withLength(n);
+}

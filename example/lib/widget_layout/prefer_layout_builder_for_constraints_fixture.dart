@@ -64,6 +64,43 @@ class BadDoubleWidthAccess extends StatelessWidget {
   }
 }
 
+class BadAnimatedBuilderCallbackDimension extends StatefulWidget {
+  const BadAnimatedBuilderCallbackDimension({super.key});
+
+  @override
+  State<BadAnimatedBuilderCallbackDimension> createState() =>
+      _BadAnimatedBuilderCallbackDimensionState();
+}
+
+class _BadAnimatedBuilderCallbackDimensionState
+    extends State<BadAnimatedBuilderCallbackDimension>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 300),
+  )..repeat(reverse: true);
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return SizedBox(
+          // expect_lint: prefer_layout_builder_for_constraints
+          width: MediaQuery.of(context).size.width,
+          child: child ?? const Placeholder(),
+        );
+      },
+    );
+  }
+}
+
 // GOOD: intentional screen-relative sizing (not replaceable by LayoutBuilder)
 class OkScreenFraction extends StatelessWidget {
   const OkScreenFraction({super.key});
@@ -114,5 +151,51 @@ class GoodLayoutBuilder extends StatelessWidget {
       builder: (context, constraints) =>
           SizedBox(width: constraints.maxWidth, height: constraints.maxHeight),
     );
+  }
+}
+
+// GOOD: lifecycle method snapshots should not require LayoutBuilder.
+class OkDidChangeDependenciesSnapshot extends StatefulWidget {
+  const OkDidChangeDependenciesSnapshot({super.key});
+
+  @override
+  State<OkDidChangeDependenciesSnapshot> createState() =>
+      _OkDidChangeDependenciesSnapshotState();
+}
+
+class _OkDidChangeDependenciesSnapshotState
+    extends State<OkDidChangeDependenciesSnapshot> {
+  bool _isInitialized = false;
+  double? _screenHeight;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_isInitialized) return;
+    _captureScreenSize();
+    _isInitialized = true;
+  }
+
+  void _captureScreenSize() {
+    _screenHeight = MediaQuery.of(context).size.height;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Text('h: ${_screenHeight ?? 0}');
+  }
+}
+
+// GOOD: callback without BuildContext parameter is not a build scope.
+class OkAsyncCallbackSnapshot extends StatelessWidget {
+  const OkAsyncCallbackSnapshot({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    Future<void>.delayed(const Duration(milliseconds: 10), () {
+      final double width = MediaQuery.of(context).size.width;
+      debugPrint('captured width: $width');
+    });
+    return const SizedBox();
   }
 }

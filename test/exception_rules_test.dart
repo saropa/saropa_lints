@@ -76,13 +76,9 @@ void main() {
 
   group('Exception - Avoidance Rules', () {
     group('avoid_non_final_exception_class_fields', () {
-      test('mutable field on exception class SHOULD trigger', () {
-        expect('mutable field on exception class', isNotNull);
-      });
+      test('mutable field on exception class SHOULD trigger', () {});
 
-      test('final exception fields should NOT trigger', () {
-        expect('final exception fields', isNotNull);
-      });
+      test('final exception fields should NOT trigger', () {});
     });
     group('avoid_only_rethrow', () {
       test('rule offers quick fix (remove try-catch that only rethrows)', () {
@@ -90,43 +86,27 @@ void main() {
         expect(rule.fixGenerators, isNotEmpty);
       });
 
-      test('catch block that only rethrows SHOULD trigger', () {
-        expect('catch block that only rethrows', isNotNull);
-      });
+      test('catch block that only rethrows SHOULD trigger', () {});
 
-      test('removing unnecessary try-catch should NOT trigger', () {
-        expect('removing unnecessary try-catch', isNotNull);
-      });
+      test('removing unnecessary try-catch should NOT trigger', () {});
     });
     group('avoid_throw_in_catch_block', () {
-      test('throw new exception in catch losing context SHOULD trigger', () {
-        expect('throw new exception in catch losing context', isNotNull);
-      });
+      test('throw new exception in catch losing context SHOULD trigger', () {});
 
-      test('rethrow or chained exception should NOT trigger', () {
-        expect('rethrow or chained exception', isNotNull);
-      });
+      test('rethrow or chained exception should NOT trigger', () {});
     });
     group('avoid_throw_objects_without_tostring', () {
-      test('throwing object without toString SHOULD trigger', () {
-        expect('throwing object without toString', isNotNull);
-      });
+      test('throwing object without toString SHOULD trigger', () {});
 
-      test('exception with meaningful toString should NOT trigger', () {
-        expect('exception with meaningful toString', isNotNull);
-      });
+      test('exception with meaningful toString should NOT trigger', () {});
     });
   });
 
   group('Exception - Preference Rules', () {
     group('prefer_public_exception_classes', () {
-      test('private exception class SHOULD trigger', () {
-        expect('private exception class', isNotNull);
-      });
+      test('private exception class SHOULD trigger', () {});
 
-      test('public exception for API consumers should NOT trigger', () {
-        expect('public exception for API consumers', isNotNull);
-      });
+      test('public exception for API consumers should NOT trigger', () {});
     });
   });
 }

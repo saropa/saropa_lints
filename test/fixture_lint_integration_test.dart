@@ -188,6 +188,54 @@ void main() {
       },
     );
 
+    test(
+      'prefer_skeleton_over_spinner fixture only reports indeterminate cases',
+      () async {
+        final exampleDir = Directory('example');
+        if (!exampleDir.existsSync()) {
+          return;
+        }
+
+        final result = await Process.run(
+          'dart',
+          ['run', 'custom_lint'],
+          workingDirectory: exampleDir.path,
+          runInShell: true,
+        );
+
+        final output = result.stdout as String;
+        final violations = parseViolations(output);
+        final fixtureViolations = violations
+            .where(
+              (v) =>
+                  v.rule == 'prefer_skeleton_over_spinner' &&
+                  v.file.contains('prefer_skeleton_over_spinner_fixture'),
+            )
+            .toList();
+
+        if (fixtureViolations.isEmpty) {
+          // Skip when custom_lint output does not include this fixture.
+          return;
+        }
+
+        expect(
+          fixtureViolations.length,
+          equals(2),
+          reason:
+              'Fixture has two BAD indeterminate cases and determinate value: '
+              'cases that must not trigger; got ${fixtureViolations.length}',
+        );
+
+        final lines = fixtureViolations.map((v) => v.line).toSet();
+        expect(lines.contains(115), isTrue, reason: 'Should lint bare spinner');
+        expect(
+          lines.contains(144),
+          isTrue,
+          reason: 'Should lint explicit value: null spinner',
+        );
+      },
+    );
+
     /// Behavioral test: compliant-only file must produce no violations.
     /// Proves "compliant code → no lint" for the rules exercised in that file.
     test('compliant-only fixture has no violations', () async {

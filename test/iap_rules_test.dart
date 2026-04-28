@@ -69,13 +69,9 @@ void main() {
 
   group('In-App Purchase - Avoidance Rules', () {
     group('avoid_purchase_in_sandbox_production', () {
-      test('sandbox purchase logic in production SHOULD trigger', () {
-        expect('sandbox purchase logic in production', isNotNull);
-      });
+      test('sandbox purchase logic in production SHOULD trigger', () {});
 
-      test('environment-aware IAP flow should NOT trigger', () {
-        expect('environment-aware IAP flow', isNotNull);
-      });
+      test('environment-aware IAP flow should NOT trigger', () {});
     });
   });
 
@@ -155,37 +151,25 @@ void main() {
     });
 
     group('require_price_localization', () {
-      test('hardcoded price string SHOULD trigger', () {
-        expect('hardcoded price string', isNotNull);
-      });
+      test('hardcoded price string SHOULD trigger', () {});
 
-      test('localized price from store should NOT trigger', () {
-        expect('localized price from store', isNotNull);
-      });
+      test('localized price from store should NOT trigger', () {});
     });
   });
 
   group('In-App Purchase - Server Verification Rules', () {
     group('avoid_entitlement_without_server', () {
-      test('client-only entitlement check SHOULD trigger', () {
-        expect('client-only entitlement check', isNotNull);
-      });
+      test('client-only entitlement check SHOULD trigger', () {});
 
-      test('server-verified entitlement should NOT trigger', () {
-        expect('server-verified entitlement', isNotNull);
-      });
+      test('server-verified entitlement should NOT trigger', () {});
     });
   });
 
   group('In-App Purchase - Preference Rules', () {
     group('prefer_grace_period_handling', () {
-      test('instant access revocation on expiry SHOULD trigger', () {
-        expect('instant access revocation on expiry', isNotNull);
-      });
+      test('instant access revocation on expiry SHOULD trigger', () {});
 
-      test('grace period for subscription lapse should NOT trigger', () {
-        expect('grace period for subscription lapse', isNotNull);
-      });
+      test('grace period for subscription lapse should NOT trigger', () {});
     });
   });
 }

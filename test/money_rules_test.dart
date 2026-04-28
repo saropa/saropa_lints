@@ -48,25 +48,17 @@ void main() {
 
   group('Money/Currency - Avoidance Rules', () {
     group('avoid_double_for_money', () {
-      test('double for currency amount SHOULD trigger', () {
-        expect('double for currency amount', isNotNull);
-      });
+      test('double for currency amount SHOULD trigger', () {});
 
-      test('int cents or Decimal type should NOT trigger', () {
-        expect('int cents or Decimal type', isNotNull);
-      });
+      test('int cents or Decimal type should NOT trigger', () {});
     });
   });
 
   group('Money/Currency - Requirement Rules', () {
     group('require_currency_code_with_amount', () {
-      test('amount without currency code SHOULD trigger', () {
-        expect('amount without currency code', isNotNull);
-      });
+      test('amount without currency code SHOULD trigger', () {});
 
-      test('currency code alongside amount should NOT trigger', () {
-        expect('currency code alongside amount', isNotNull);
-      });
+      test('currency code alongside amount should NOT trigger', () {});
     });
   });
 }

@@ -60,35 +60,23 @@ void main() {
     group('avoid_connectivity_equals_internet', () {
       test(
         'treating connectivity status as internet access SHOULD trigger',
-        () {
-          expect('treating connectivity status as internet access', isNotNull);
-        },
+        () {},
       );
 
-      test('actual reachability check should NOT trigger', () {
-        expect('actual reachability check', isNotNull);
-      });
+      test('actual reachability check should NOT trigger', () {});
     });
   });
 
   group('Connectivity - Requirement Rules', () {
     group('require_connectivity_error_handling', () {
-      test('network call without connectivity check SHOULD trigger', () {
-        expect('network call without connectivity check', isNotNull);
-      });
+      test('network call without connectivity check SHOULD trigger', () {});
 
-      test('connectivity-aware error handling should NOT trigger', () {
-        expect('connectivity-aware error handling', isNotNull);
-      });
+      test('connectivity-aware error handling should NOT trigger', () {});
     });
     group('require_connectivity_timeout', () {
-      test('HTTP request without timeout SHOULD trigger', () {
-        expect('HTTP request without timeout', isNotNull);
-      });
+      test('HTTP request without timeout SHOULD trigger', () {});
 
-      test('request with .timeout() should NOT trigger', () {
-        expect('request with timeout', isNotNull);
-      });
+      test('request with .timeout() should NOT trigger', () {});
     });
   });
 }

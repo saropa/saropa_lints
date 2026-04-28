@@ -228,6 +228,21 @@ ColorScheme scrollbarThemeFalsePositive(BuildContext context) {
   return Theme.of(context).colorScheme;
 }
 
+_UserScrollbarThemeData scrollbarThemeUserThemeFalsePositive(BuildContext context) {
+  // OK: user-defined Theme-like APIs must not lint.
+  return _UserTheme.of(context).scrollbarTheme;
+}
+
+class _UserTheme {
+  static _UserThemeData of(BuildContext context) => _UserThemeData();
+}
+
+class _UserThemeData {
+  _UserScrollbarThemeData get scrollbarTheme => _UserScrollbarThemeData();
+}
+
+class _UserScrollbarThemeData {}
+
 // =============================================================================
 // avoid_removed_js_number_to_dart (#090) — .toDart on JSNumber → .toDartDouble / .toDartInt
 // =============================================================================

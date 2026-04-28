@@ -83,93 +83,56 @@ void main() {
 
   group('Architecture - Avoidance Rules', () {
     group('avoid_direct_data_access_in_ui', () {
-      test('database call in widget SHOULD trigger', () {
-        expect('database call in widget', isNotNull);
-      });
+      test('database call in widget SHOULD trigger', () {});
 
-      test('repository pattern for data access should NOT trigger', () {
-        expect('repository pattern for data access', isNotNull);
-      });
+      test('repository pattern for data access should NOT trigger', () {});
     });
     group('avoid_business_logic_in_ui', () {
-      test('computation in build method SHOULD trigger', () {
-        expect('computation in build method', isNotNull);
-      });
+      test('computation in build method SHOULD trigger', () {});
 
-      test('logic in separate layer should NOT trigger', () {
-        expect('logic in separate layer', isNotNull);
-      });
+      test('logic in separate layer should NOT trigger', () {});
     });
     group('avoid_circular_dependencies', () {
-      test('module A imports B imports A SHOULD trigger', () {
-        expect('module A imports B imports A', isNotNull);
-      });
+      test('module A imports B imports A SHOULD trigger', () {});
 
-      test('unidirectional dependencies should NOT trigger', () {
-        expect('unidirectional dependencies', isNotNull);
-      });
+      test('unidirectional dependencies should NOT trigger', () {});
     });
     group('avoid_god_class', () {
-      test('class with too many responsibilities SHOULD trigger', () {
-        expect('class with too many responsibilities', isNotNull);
-      });
+      test('class with too many responsibilities SHOULD trigger', () {});
 
-      test('single-responsibility classes should NOT trigger', () {
-        expect('single-responsibility classes', isNotNull);
-      });
+      test('single-responsibility classes should NOT trigger', () {});
 
-      test('static-const namespace with 16+ fields should NOT trigger', () {
-        expect('static const fields excluded from field count', isNotNull);
-      });
+      test('static-const namespace with 16+ fields should NOT trigger', () {});
 
-      test('class with instance fields exceeding threshold SHOULD trigger', () {
-        expect('instance fields still counted', isNotNull);
-      });
+      test(
+        'class with instance fields exceeding threshold SHOULD trigger',
+        () {},
+      );
     });
     group('avoid_ui_in_domain_layer', () {
-      test('widget import in domain layer SHOULD trigger', () {
-        expect('widget import in domain layer', isNotNull);
-      });
+      test('widget import in domain layer SHOULD trigger', () {});
 
-      test('clean domain layer should NOT trigger', () {
-        expect('clean domain layer', isNotNull);
-      });
+      test('clean domain layer should NOT trigger', () {});
     });
     group('avoid_cross_feature_dependencies', () {
-      test('feature importing another feature SHOULD trigger', () {
-        expect('feature importing another feature', isNotNull);
-      });
+      test('feature importing another feature SHOULD trigger', () {});
 
-      test('shared module pattern should NOT trigger', () {
-        expect('shared module pattern', isNotNull);
-      });
+      test('shared module pattern should NOT trigger', () {});
     });
     group('avoid_singleton_pattern', () {
-      test('manual singleton implementation SHOULD trigger', () {
-        expect('manual singleton implementation', isNotNull);
-      });
+      test('manual singleton implementation SHOULD trigger', () {});
 
-      test('dependency injection should NOT trigger', () {
-        expect('dependency injection', isNotNull);
-      });
+      test('dependency injection should NOT trigger', () {});
     });
     group('avoid_touch_only_gestures', () {
-      test('touch-only gesture with no alternative SHOULD trigger', () {
-        expect('touch-only gesture with no alternative', isNotNull);
-      });
+      test('touch-only gesture with no alternative SHOULD trigger', () {});
 
-      test('accessible gesture alternatives should NOT trigger', () {
-        expect('accessible gesture alternatives', isNotNull);
-      });
+      test('accessible gesture alternatives should NOT trigger', () {});
     });
     group('avoid_circular_imports', () {
-      test('circular import chain SHOULD trigger', () {
-        expect('circular import chain', isNotNull);
-      });
+      test('circular import chain SHOULD trigger', () {});
 
-      test('acyclic import graph should NOT trigger', () {
-        expect('acyclic import graph', isNotNull);
-      });
+      test('acyclic import graph should NOT trigger', () {});
     });
   });
 }

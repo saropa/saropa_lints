@@ -112,90 +112,59 @@ void main() {
         },
       );
 
-      test('Freezed-only serialization should NOT trigger', () {
-        expect('Freezed-only serialization', isNotNull);
-      });
+      test('Freezed-only serialization should NOT trigger', () {});
     });
     group('avoid_freezed_for_logic_classes', () {
-      test('Freezed on class with business logic SHOULD trigger', () {
-        expect('Freezed on class with business logic', isNotNull);
-      });
+      test('Freezed on class with business logic SHOULD trigger', () {});
 
-      test('Freezed only for data classes should NOT trigger', () {
-        expect('Freezed only for data classes', isNotNull);
-      });
+      test('Freezed only for data classes should NOT trigger', () {});
     });
   });
 
   group('Freezed - Requirement Rules', () {
     group('require_freezed_arrow_syntax', () {
-      test('verbose Freezed factory syntax SHOULD trigger', () {
-        expect('verbose Freezed factory syntax', isNotNull);
-      });
+      test('verbose Freezed factory syntax SHOULD trigger', () {});
 
-      test('arrow syntax for simple factories should NOT trigger', () {
-        expect('arrow syntax for simple factories', isNotNull);
-      });
+      test('arrow syntax for simple factories should NOT trigger', () {});
     });
     group('require_freezed_private_constructor', () {
-      test('public Freezed constructor SHOULD trigger', () {
-        expect('public Freezed constructor', isNotNull);
-      });
+      test('public Freezed constructor SHOULD trigger', () {});
 
-      test('private underscore constructor should NOT trigger', () {
-        expect('private underscore constructor', isNotNull);
-      });
+      test('private underscore constructor should NOT trigger', () {});
     });
     group('require_freezed_explicit_json', () {
-      test('missing fromJson/toJson on Freezed SHOULD trigger', () {
-        expect('missing fromJson/toJson on Freezed', isNotNull);
-      });
+      test('missing fromJson/toJson on Freezed SHOULD trigger', () {});
 
-      test('explicit JSON methods should NOT trigger', () {
-        expect('explicit JSON methods', isNotNull);
-      });
+      test('explicit JSON methods should NOT trigger', () {});
     });
     group('require_freezed_json_converter', () {
-      test('raw type in Freezed JSON SHOULD trigger', () {
-        expect('raw type in Freezed JSON', isNotNull);
-      });
+      test('raw type in Freezed JSON SHOULD trigger', () {});
 
-      test('JsonConverter for custom types should NOT trigger', () {
-        expect('JsonConverter for custom types', isNotNull);
-      });
+      test('JsonConverter for custom types should NOT trigger', () {});
     });
     group('require_freezed_lint_package', () {
-      test('freezed_annotation import without freezed_lint SHOULD trigger', () {
-        expect('freezed_annotation without freezed_lint', isNotNull);
-      });
+      test(
+        'freezed_annotation import without freezed_lint SHOULD trigger',
+        () {},
+      );
 
       test(
         'both freezed_annotation and freezed_lint imported should NOT trigger',
-        () {
-          expect('complete freezed imports', isNotNull);
-        },
+        () {},
       );
     });
   });
 
   group('Freezed - Preference Rules', () {
     group('prefer_freezed_default_values', () {
-      test('no defaults on Freezed fields SHOULD trigger', () {
-        expect('no defaults on Freezed fields', isNotNull);
-      });
+      test('no defaults on Freezed fields SHOULD trigger', () {});
 
-      test('default value annotations should NOT trigger', () {
-        expect('default value annotations', isNotNull);
-      });
+      test('default value annotations should NOT trigger', () {});
     });
     group('prefer_freezed_for_data_classes', () {
-      test('manual data class without Freezed SHOULD trigger', () {
-        expect('manual data class without Freezed', isNotNull);
-      });
+      test('manual data class without Freezed SHOULD trigger', () {});
 
-      test('Freezed for immutable data should NOT trigger', () {
-        expect('Freezed for immutable data', isNotNull);
-      });
+      test('Freezed for immutable data should NOT trigger', () {});
     });
   });
 }

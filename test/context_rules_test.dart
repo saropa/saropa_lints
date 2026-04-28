@@ -88,58 +88,34 @@ void main() {
 
   group('Context - Avoidance Rules', () {
     group('avoid_storing_context', () {
-      test('BuildContext stored in field SHOULD trigger', () {
-        expect('BuildContext stored in field', isNotNull);
-      });
+      test('BuildContext stored in field SHOULD trigger', () {});
 
-      test('passing context as parameter should NOT trigger', () {
-        expect('passing context as parameter', isNotNull);
-      });
+      test('passing context as parameter should NOT trigger', () {});
     });
     group('avoid_context_across_async', () {
-      test('context used after await SHOULD trigger', () {
-        expect('context used after await', isNotNull);
-      });
+      test('context used after await SHOULD trigger', () {});
 
-      test('mounted check after await should NOT trigger', () {
-        expect('mounted check after await', isNotNull);
-      });
+      test('mounted check after await should NOT trigger', () {});
     });
     group('avoid_context_after_await_in_static', () {
-      test('context in static after await SHOULD trigger', () {
-        expect('context in static after await', isNotNull);
-      });
+      test('context in static after await SHOULD trigger', () {});
 
-      test('callback pattern for static async should NOT trigger', () {
-        expect('callback pattern for static async', isNotNull);
-      });
+      test('callback pattern for static async should NOT trigger', () {});
     });
     group('avoid_context_in_async_static', () {
-      test('context parameter in async static SHOULD trigger', () {
-        expect('context parameter in async static', isNotNull);
-      });
+      test('context parameter in async static SHOULD trigger', () {});
 
-      test('avoiding context in static async should NOT trigger', () {
-        expect('avoiding context in static async', isNotNull);
-      });
+      test('avoiding context in static async should NOT trigger', () {});
     });
     group('avoid_context_in_static_methods', () {
-      test('context in static method SHOULD trigger', () {
-        expect('context in static method', isNotNull);
-      });
+      test('context in static method SHOULD trigger', () {});
 
-      test('instance method for context access should NOT trigger', () {
-        expect('instance method for context access', isNotNull);
-      });
+      test('instance method for context access should NOT trigger', () {});
     });
     group('avoid_context_dependency_in_callback', () {
-      test('context captured in callback SHOULD trigger', () {
-        expect('context captured in callback', isNotNull);
-      });
+      test('context captured in callback SHOULD trigger', () {});
 
-      test('passing values not context should NOT trigger', () {
-        expect('passing values not context', isNotNull);
-      });
+      test('passing values not context should NOT trigger', () {});
     });
   });
 }

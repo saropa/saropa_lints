@@ -193,133 +193,20 @@ void main() {
           reason: 'static final field + method local should each expect_lint',
         );
       });
-
-      test('configuration value in source SHOULD trigger', () {
-        expect('configuration value in source', isNotNull);
-      });
-
-      test('external configuration should NOT trigger', () {
-        expect('external configuration', isNotNull);
-      });
-    });
-    group('avoid_hardcoded_config_test', () {
-      test('test config not isolated SHOULD trigger', () {
-        expect('test config not isolated', isNotNull);
-      });
-
-      test('test-specific configuration should NOT trigger', () {
-        expect('test-specific configuration', isNotNull);
-      });
-    });
-    group('avoid_mixed_environments', () {
-      test('dev and prod config mixed SHOULD trigger', () {
-        expect('dev and prod config mixed', isNotNull);
-      });
-
-      test('environment-separated config should NOT trigger', () {
-        expect('environment-separated config', isNotNull);
-      });
-    });
-  });
-
-  group('Configuration - Platform & Environment Rules', () {
-    group('avoid_string_env_parsing', () {
-      test('string-based environment variable parsing SHOULD trigger', () {
-        expect('string-based environment variable parsing', isNotNull);
-      });
-
-      test('typed environment config should NOT trigger', () {
-        expect('typed environment config', isNotNull);
-      });
-    });
-    group('avoid_platform_specific_imports', () {
-      test('platform-specific import in shared code SHOULD trigger', () {
-        expect('platform-specific import in shared code', isNotNull);
-      });
-
-      test('conditional import should NOT trigger', () {
-        expect('conditional import', isNotNull);
-      });
-    });
-  });
-
-  group('Configuration - Requirement Rules', () {
-    group('require_feature_flag_type_safety', () {
-      test('stringly-typed feature flag SHOULD trigger', () {
-        expect('stringly-typed feature flag', isNotNull);
-      });
-
-      test('type-safe feature flags should NOT trigger', () {
-        expect('type-safe feature flags', isNotNull);
-      });
     });
   });
 
   group('Configuration - Pubspec Rules', () {
-    group('package_names', () {
-      test('non-conforming package name SHOULD trigger', () {
-        // name: MyPackage or name: my-package violates convention
-        expect('non-conforming package name triggers rule', isNotNull);
-      });
-
-      test('lowercase_with_underscores name should NOT trigger', () {
-        // name: my_package is the correct convention
-        expect('valid package name does not trigger', isNotNull);
-      });
-
-      test('quoted package name should NOT trigger false positive', () {
-        // name: "my_package" — quotes should be stripped before validation
-        expect('quoted valid name does not trigger', isNotNull);
-      });
-
-      test('reports at most once per project (dedup by root)', () {
-        // Static _reportedRoots prevents duplicate reports across files
-        expect('per-project dedup via _reportedRoots', isNotNull);
-      });
-    });
-
-    group('sort_pub_dependencies', () {
-      test('unsorted dependencies SHOULD trigger', () {
-        // http before args alphabetically is wrong
-        expect('unsorted deps trigger rule', isNotNull);
-      });
-
-      test('sorted dependencies should NOT trigger', () {
-        // args before http is correct
-        expect('sorted deps do not trigger', isNotNull);
-      });
-
-      test('also checks dependency_overrides section', () {
-        // dependency_overrides should be sorted too
-        expect('dependency_overrides section is checked', isNotNull);
-      });
-
-      test('single dependency should NOT trigger', () {
-        // Cannot be unsorted with only one entry
-        expect('single dep does not trigger', isNotNull);
-      });
-    });
-
     group('secure_pubspec_urls', () {
-      test('http:// in dependency URL SHOULD trigger', () {
-        // Insecure URL in dependency source
-        expect('insecure dep URL triggers rule', isNotNull);
-      });
-
-      test('https:// URL should NOT trigger', () {
-        // Secure URL is fine
-        expect('secure URL does not trigger', isNotNull);
-      });
-
-      test('http:// in homepage should NOT trigger (false positive)', () {
-        // Only dependency sections are checked, not metadata fields
-        expect('homepage http skipped', isNotNull);
-      });
-
       test('ruleType is securityHotspot', () {
         final rule = SecurePubspecUrlsRule();
         expect(rule.ruleType, isNotNull);
         expect(rule.ruleType.toString(), contains('securityHotspot'));
+      });
+
+      test('metadata includes CWE-494', () {
+        final rule = SecurePubspecUrlsRule();
+        expect(rule.cweIds, contains(494));
       });
     });
 

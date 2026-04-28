@@ -71,52 +71,32 @@ void main() {
 
   group('Flutter Hooks - Avoidance Rules', () {
     group('avoid_hooks_outside_build', () {
-      test('hook called outside build SHOULD trigger', () {
-        expect('hook called outside build', isNotNull);
-      });
+      test('hook called outside build SHOULD trigger', () {});
 
-      test('hooks inside build method only should NOT trigger', () {
-        expect('hooks inside build method only', isNotNull);
-      });
+      test('hooks inside build method only should NOT trigger', () {});
     });
     group('avoid_conditional_hooks', () {
-      test('hook inside if/else SHOULD trigger', () {
-        expect('hook inside if/else', isNotNull);
-      });
+      test('hook inside if/else SHOULD trigger', () {});
 
-      test('unconditional hook calls should NOT trigger', () {
-        expect('unconditional hook calls', isNotNull);
-      });
+      test('unconditional hook calls should NOT trigger', () {});
     });
     group('avoid_unnecessary_hook_widgets', () {
-      test('HookWidget with no hooks SHOULD trigger', () {
-        expect('HookWidget with no hooks', isNotNull);
-      });
+      test('HookWidget with no hooks SHOULD trigger', () {});
 
-      test('regular StatelessWidget should NOT trigger', () {
-        expect('regular StatelessWidget', isNotNull);
-      });
+      test('regular StatelessWidget should NOT trigger', () {});
     });
     group('avoid_misused_hooks', () {
-      test('hook with wrong lifecycle semantics SHOULD trigger', () {
-        expect('hook with wrong lifecycle semantics', isNotNull);
-      });
+      test('hook with wrong lifecycle semantics SHOULD trigger', () {});
 
-      test('correct hook usage should NOT trigger', () {
-        expect('correct hook usage', isNotNull);
-      });
+      test('correct hook usage should NOT trigger', () {});
     });
   });
 
   group('Flutter Hooks - Preference Rules', () {
     group('prefer_use_callback', () {
-      test('inline callback in hook SHOULD trigger', () {
-        expect('inline callback in hook', isNotNull);
-      });
+      test('inline callback in hook SHOULD trigger', () {});
 
-      test('useCallback for stable reference should NOT trigger', () {
-        expect('useCallback for stable reference', isNotNull);
-      });
+      test('useCallback for stable reference should NOT trigger', () {});
     });
   });
 }

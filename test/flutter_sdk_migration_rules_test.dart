@@ -77,6 +77,23 @@ void main() {
         );
       }
     });
+
+    test(
+      'prefer_scrollbar_theme_of keeps user-defined Theme.of false-positive guard',
+      () {
+        final fixture = File(
+          'example/lib/flutter_sdk_migration_rules_fixture.dart',
+        ).readAsStringSync();
+
+        expect(
+          fixture.contains('_UserTheme.of(context).scrollbarTheme'),
+          isTrue,
+          reason:
+              'Fixture should retain a non-Flutter Theme.of(...).scrollbarTheme '
+              'example that must remain a GOOD case.',
+        );
+      },
+    );
   });
 
   group('tier and registry', () {

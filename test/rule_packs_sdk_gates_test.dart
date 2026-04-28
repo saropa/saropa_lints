@@ -21,6 +21,15 @@ environment:
       expect(packPassesSdkGate('dart_sdk_3_2', pubspec), isFalse);
     });
 
+    test('dart_sdk_3_4 passes when sdk lower bound is >= 3.4.0', () {
+      const pubspec = '''
+name: demo
+environment:
+  sdk: ">=3.4.0 <4.0.0"
+''';
+      expect(packPassesSdkGate('dart_sdk_3_4', pubspec), isTrue);
+    });
+
     test('flutter_sdk_3_7 passes when flutter lower bound is >= 3.7.0', () {
       const pubspec = '''
 name: demo
@@ -103,6 +112,7 @@ environment:
   flutter: ">=3.7.0"
 ''';
       expect(isRulePackApplicable('dart_sdk_3_2', pubspec, null), isTrue);
+      expect(isRulePackApplicable('dart_sdk_3_4', pubspec, null), isFalse);
       expect(isRulePackApplicable('flutter_sdk_3_0', pubspec, null), isTrue);
       expect(isRulePackApplicable('flutter_sdk_3_7', pubspec, null), isTrue);
       expect(isRulePackApplicable('flutter_sdk_3_10', pubspec, null), isFalse);

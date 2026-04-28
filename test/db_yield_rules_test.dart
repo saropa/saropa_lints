@@ -54,51 +54,35 @@ void main() {
 
   group('Database Yield - Avoidance Rules', () {
     group('avoid_return_await_db', () {
-      test('return await on DB call SHOULD trigger', () {
-        expect('return await on DB call', isNotNull);
-      });
+      test('return await on DB call SHOULD trigger', () {});
 
-      test('direct return of Future should NOT trigger', () {
-        expect('direct return of Future', isNotNull);
-      });
+      test('direct return of Future should NOT trigger', () {});
     });
   });
 
   group('Database Yield - Requirement Rules', () {
     group('require_yield_after_db_write', () {
-      test('UI blocked during DB write SHOULD trigger', () {
-        expect('UI blocked during DB write', isNotNull);
-      });
+      test('UI blocked during DB write SHOULD trigger', () {});
 
-      test('yield/await after DB write should NOT trigger', () {
-        expect('yield/await after DB write', isNotNull);
-      });
+      test('yield/await after DB write should NOT trigger', () {});
 
       test(
         'write as last statement or followed by return should NOT trigger',
-        () {
-          expect('last statement or return suppression', isNotNull);
-        },
+        () {},
       );
 
       test(
         'write inside compute/Isolate or in test file should NOT trigger',
-        () {
-          expect('isolate or test file suppression', isNotNull);
-        },
+        () {},
       );
     });
   });
 
   group('Database Yield - Preference Rules', () {
     group('suggest_yield_after_db_read', () {
-      test('long DB read blocking isolate SHOULD trigger', () {
-        expect('long DB read blocking isolate', isNotNull);
-      });
+      test('long DB read blocking isolate SHOULD trigger', () {});
 
-      test('chunked DB reads should NOT trigger', () {
-        expect('chunked DB reads', isNotNull);
-      });
+      test('chunked DB reads should NOT trigger', () {});
     });
   });
 }

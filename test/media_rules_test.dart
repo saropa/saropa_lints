@@ -62,34 +62,22 @@ void main() {
 
   group('Media - Avoidance Rules', () {
     group('avoid_autoplay_audio', () {
-      test('audio playing without user action SHOULD trigger', () {
-        expect('audio playing without user action', isNotNull);
-      });
+      test('audio playing without user action SHOULD trigger', () {});
 
-      test('user-initiated audio playback should NOT trigger', () {
-        expect('user-initiated audio playback', isNotNull);
-      });
+      test('user-initiated audio playback should NOT trigger', () {});
     });
   });
 
   group('Media - Preference Rules', () {
     group('prefer_camera_resolution_selection', () {
-      test('camera at max resolution always SHOULD trigger', () {
-        expect('camera at max resolution always', isNotNull);
-      });
+      test('camera at max resolution always SHOULD trigger', () {});
 
-      test('configurable camera resolution should NOT trigger', () {
-        expect('configurable camera resolution', isNotNull);
-      });
+      test('configurable camera resolution should NOT trigger', () {});
     });
     group('prefer_audio_session_config', () {
-      test('audio without session configuration SHOULD trigger', () {
-        expect('audio without session configuration', isNotNull);
-      });
+      test('audio without session configuration SHOULD trigger', () {});
 
-      test('AudioSession category setup should NOT trigger', () {
-        expect('AudioSession category setup', isNotNull);
-      });
+      test('AudioSession category setup should NOT trigger', () {});
     });
   });
 }

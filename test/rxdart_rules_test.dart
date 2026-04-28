@@ -37,27 +37,22 @@ void main() {
     test('SHOULD trigger on .value inside isClosed true-branch', () {
       // Detection: PropertyAccess for .value on a BehaviorSubject target,
       // inside the then-branch of if (subject.isClosed)
-      expect('_subject.value in isClosed branch detected', isNotNull);
     });
 
     test('SHOULD trigger on .value inside isClosed == true branch', () {
       // Detection: Same check with explicit == true comparison
-      expect('_subject.value in isClosed == true detected', isNotNull);
     });
 
     test('should NOT trigger on .value when NOT closed', () {
       // False positive prevention: !subject.isClosed guards properly
-      expect('_subject.value in !isClosed passes', isNotNull);
     });
 
     test('should NOT trigger on .value outside isClosed check', () {
       // False positive prevention: no isClosed context
-      expect('unconditional .value access passes', isNotNull);
     });
 
     test('should NOT trigger on .value in else-branch of isClosed', () {
       // False positive prevention: else-branch means subject is open
-      expect('_subject.value in else passes', isNotNull);
     });
   });
 }

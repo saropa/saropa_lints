@@ -1,6 +1,8 @@
 import 'dart:convert' show json;
 import 'dart:io' show Directory, File, Platform;
 
+import 'package:saropa_lints/src/baseline/baseline_config.dart';
+import 'package:saropa_lints/src/baseline/baseline_manager.dart';
 import 'package:saropa_lints/src/report/analysis_reporter.dart';
 import 'package:saropa_lints/src/report/report_consolidator.dart';
 import 'package:saropa_lints/src/report/violation_export.dart';
@@ -17,6 +19,7 @@ void main() {
   });
 
   tearDown(() {
+    BaselineManager.reset();
     if (tempDir.existsSync()) {
       tempDir.deleteSync(recursive: true);
     }
@@ -311,8 +314,7 @@ void main() {
 
       final parsed = readExport();
       final config = parsed['config'] as Map<String, dynamic>;
-      final byRule =
-          config['ruleMetadataByRule'] as Map<String, dynamic>;
+      final byRule = config['ruleMetadataByRule'] as Map<String, dynamic>;
       final ruleMeta =
           byRule['avoid_hardcoded_credentials'] as Map<String, dynamic>;
       expect(ruleMeta['ruleType'], 'vulnerability');
@@ -323,8 +325,11 @@ void main() {
       final violation = exported.first as Map<String, dynamic>;
       final violationMeta = violation['metadata'] as Map<String, dynamic>;
       expect(violationMeta['ruleType'], 'vulnerability');
+      expect(violationMeta['requiresReview'], isFalse);
+      expect(violationMeta['defaultReviewState'], isNull);
       expect((violationMeta['cweIds'] as List<dynamic>).contains(798), isTrue);
       expect(violationMeta['tags'], isA<List<dynamic>>());
+      expect(violationMeta['accuracyTarget'], isA<Map<String, dynamic>>());
     });
 
     test('OWASP empty arrays for non-security rules', () {
@@ -604,7 +609,8 @@ void main() {
 
       expect(conflictsByRule, isNotEmpty);
       expect(
-        (conflictsByRule['prefer_type_over_var'] as List<dynamic>).cast<String>(),
+        (conflictsByRule['prefer_type_over_var'] as List<dynamic>)
+            .cast<String>(),
         contains('prefer_var_over_explicit_type'),
       );
     });
@@ -713,10 +719,7 @@ void main() {
     });
 
     test('summary includes byRuleType and byRuleStatus', () {
-      final byRule = {
-        'avoid_hardcoded_credentials': 2,
-        'prefer_const': 3,
-      };
+      final byRule = {'avoid_hardcoded_credentials': 2, 'prefer_const': 3};
       final violations = <LintImpact, List<ViolationRecord>>{
         LintImpact.critical: [
           _violation(
@@ -743,6 +746,38 @@ void main() {
 
       expect(byRuleType['vulnerability'], 2);
       expect(byRuleStatus['ready'], 5);
+    });
+
+    test('summary includes date-based newCode metrics when configured', () {
+      BaselineManager.initialize(
+        BaselineConfig(date: DateTime.utc(2025, 1, 1)),
+        projectRoot: projectRoot,
+      );
+
+      final violations = <LintImpact, List<ViolationRecord>>{
+        LintImpact.medium: [
+          _violation(rule: 'prefer_const', file: 'lib/ui.dart', line: 10),
+        ],
+      };
+
+      ViolationExporter.write(
+        projectRoot: projectRoot,
+        sessionId: 'test_session',
+        data: buildData(violations: violations),
+        owaspLookup: const <String, OwaspMapping>{},
+      );
+
+      final summary = readExport()['summary'] as Map<String, dynamic>;
+      final newCode = summary['newCode'] as Map<String, dynamic>;
+      expect(newCode['configured'], isTrue);
+      expect(newCode['strategy'], 'date');
+      expect(newCode['since'], '2025-01-01');
+      expect(newCode['countsSource'], 'reportedViolations');
+      expect(newCode['totalViolations'], 1);
+
+      final byImpact = newCode['byImpact'] as Map<String, dynamic>;
+      expect(byImpact['medium'], 1);
+      expect(byImpact['critical'], 0);
     });
 
     test('summary ruleSeverities uses lowercase values', () {

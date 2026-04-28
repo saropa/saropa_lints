@@ -94,43 +94,27 @@ void main() {
 
   group('Web - Avoidance Rules', () {
     group('avoid_platform_channel_on_web', () {
-      test('Platform channel call on web SHOULD trigger', () {
-        expect('Platform channel call on web', isNotNull);
-      });
+      test('Platform channel call on web SHOULD trigger', () {});
 
-      test('web-compatible alternatives should NOT trigger', () {
-        expect('web-compatible alternatives', isNotNull);
-      });
+      test('web-compatible alternatives should NOT trigger', () {});
     });
     group('avoid_web_only_dependencies', () {
-      test('web-only package in shared code SHOULD trigger', () {
-        expect('web-only package in shared code', isNotNull);
-      });
+      test('web-only package in shared code SHOULD trigger', () {});
 
-      test('platform-agnostic dependencies should NOT trigger', () {
-        expect('platform-agnostic dependencies', isNotNull);
-      });
+      test('platform-agnostic dependencies should NOT trigger', () {});
     });
   });
 
   group('Web - Requirement Rules', () {
     group('require_cors_handling', () {
-      test('HTTP request without CORS config SHOULD trigger', () {
-        expect('HTTP request without CORS config', isNotNull);
-      });
+      test('HTTP request without CORS config SHOULD trigger', () {});
 
-      test('CORS headers/proxy setup should NOT trigger', () {
-        expect('CORS headers/proxy setup', isNotNull);
-      });
+      test('CORS headers/proxy setup should NOT trigger', () {});
     });
     group('require_web_renderer_awareness', () {
-      test('rendering code without renderer check SHOULD trigger', () {
-        expect('rendering code without renderer check', isNotNull);
-      });
+      test('rendering code without renderer check SHOULD trigger', () {});
 
-      test('renderer-aware rendering should NOT trigger', () {
-        expect('renderer-aware rendering', isNotNull);
-      });
+      test('renderer-aware rendering should NOT trigger', () {});
     });
   });
 
@@ -178,22 +162,14 @@ void main() {
       });
     });
     group('prefer_deferred_loading_web', () {
-      test('eager import of large web module SHOULD trigger', () {
-        expect('eager import of large web module', isNotNull);
-      });
+      test('eager import of large web module SHOULD trigger', () {});
 
-      test('deferred import for web should NOT trigger', () {
-        expect('deferred import for web', isNotNull);
-      });
+      test('deferred import for web should NOT trigger', () {});
     });
     group('prefer_url_strategy_for_web', () {
-      test('hash-based URL routing on web SHOULD trigger', () {
-        expect('hash-based URL routing on web', isNotNull);
-      });
+      test('hash-based URL routing on web SHOULD trigger', () {});
 
-      test('path URL strategy should NOT trigger', () {
-        expect('path URL strategy', isNotNull);
-      });
+      test('path URL strategy should NOT trigger', () {});
     });
     group('prefer_schedule_microtask_over_window_postmessage', () {
       test('problemMessage cites skwasm / postMessage cost', () {

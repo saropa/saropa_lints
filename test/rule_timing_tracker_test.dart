@@ -21,7 +21,10 @@ void main() {
 
       expect(json, hasLength(2));
       expect(json.first['ruleName'], 'slow_rule');
-      expect(json.first.keys, containsAll(['ruleName', 'totalMs', 'callCount', 'avgMs']));
+      expect(
+        json.first.keys,
+        containsAll(['ruleName', 'totalMs', 'callCount', 'avgMs']),
+      );
       expect(json.first['callCount'], 2);
       expect(json.first['totalMs'], 11.5);
       expect(json.first['avgMs'], 5.75);
@@ -30,7 +33,8 @@ void main() {
     test('summaryJson mirrors sortedTimingsJson payload', () {
       RuleTimingTracker.record('one_rule', const Duration(milliseconds: 3));
 
-      final decoded = jsonDecode(RuleTimingTracker.summaryJson) as List<dynamic>;
+      final decoded =
+          jsonDecode(RuleTimingTracker.summaryJson) as List<dynamic>;
       expect(decoded, hasLength(1));
 
       final first = decoded.first as Map<String, dynamic>;

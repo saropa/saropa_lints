@@ -56,14 +56,15 @@ void main() {
       }
     });
 
-    test('normalizes legacy migration_packs to canonical rule_packs on write', () {
-      final dir = Directory.systemTemp.createTempSync('write_config_test');
-      try {
-        final outputFile = File(
-          '${dir.path}${Platform.pathSeparator}analysis_options.yaml',
-        );
-        outputFile.writeAsStringSync(
-          '''
+    test(
+      'normalizes legacy migration_packs to canonical rule_packs on write',
+      () {
+        final dir = Directory.systemTemp.createTempSync('write_config_test');
+        try {
+          final outputFile = File(
+            '${dir.path}${Platform.pathSeparator}analysis_options.yaml',
+          );
+          outputFile.writeAsStringSync('''
 plugins:
   saropa_lints:
     version: "9.0.0"
@@ -72,22 +73,22 @@ plugins:
         - drift
     diagnostics:
       avoid_debug_print: true
-''',
-        );
+''');
 
-        final result = runWriteConfig(
-          WriteConfigOptions(targetDir: dir.path, tier: 'recommended'),
-        );
-        expect(result.ok, isTrue);
+          final result = runWriteConfig(
+            WriteConfigOptions(targetDir: dir.path, tier: 'recommended'),
+          );
+          expect(result.ok, isTrue);
 
-        final content = outputFile.readAsStringSync();
-        expect(content.contains('migration_packs:'), isFalse);
-        expect(content.contains('rule_packs:'), isTrue);
-        expect(parseRulePacksEnabledList(content), contains('drift'));
-      } finally {
-        dir.deleteSync(recursive: true);
-      }
-    });
+          final content = outputFile.readAsStringSync();
+          expect(content.contains('migration_packs:'), isFalse);
+          expect(content.contains('rule_packs:'), isTrue);
+          expect(parseRulePacksEnabledList(content), contains('drift'));
+        } finally {
+          dir.deleteSync(recursive: true);
+        }
+      },
+    );
 
     test(
       'read-write-read flow preserves packs after legacy migration_packs normalization',
@@ -97,8 +98,7 @@ plugins:
           final outputFile = File(
             '${dir.path}${Platform.pathSeparator}analysis_options.yaml',
           );
-          outputFile.writeAsStringSync(
-            '''
+          outputFile.writeAsStringSync('''
 plugins:
   saropa_lints:
     version: "9.0.0"
@@ -109,8 +109,7 @@ plugins:
         - drift # db
     diagnostics:
       avoid_debug_print: true
-''',
-          );
+''');
 
           final before = outputFile.readAsStringSync();
           expect(parseRulePacksEnabledList(before), ['riverpod', 'drift']);

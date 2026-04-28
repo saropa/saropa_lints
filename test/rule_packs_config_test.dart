@@ -67,6 +67,30 @@ void main() {
         expect(enabled.contains('x'), isTrue);
       },
     );
+
+    test(
+      'sdk/flutter pack migration codes require an enabled pack (not tier-only)',
+      () {
+        final sdkCodes = kRulePackRuleCodes.keys
+            .where(
+              (id) =>
+                  id.startsWith('dart_sdk_') || id.startsWith('flutter_sdk_'),
+            )
+            .expand((id) => kRulePackRuleCodes[id] ?? const <String>{})
+            .toSet();
+        expect(sdkCodes, isNotEmpty);
+        for (final code in sdkCodes) {
+          final enabled = <String>{code};
+          mergeRulePacksIntoEnabled(enabled, null, const <String>[]);
+          expect(
+            enabled.contains(code),
+            isFalse,
+            reason:
+                'Pack-owned SDK migration code $code must require an enabled pack',
+          );
+        }
+      },
+    );
   });
 
   group('ruleCodesForPack', () {

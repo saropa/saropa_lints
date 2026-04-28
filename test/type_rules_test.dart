@@ -189,202 +189,14 @@ void main() {
     }
   });
 
-  group('Type - Avoidance Rules', () {
-    group('avoid_casting_to_extension_type', () {
-      test('avoid_casting_to_extension_type SHOULD trigger', () {
-        // Pattern that should be avoided: avoid casting to extension type
-        expect('avoid_casting_to_extension_type detected', isNotNull);
-      });
-
-      test('avoid_casting_to_extension_type should NOT trigger', () {
-        // Avoidance pattern not present
-        expect('avoid_casting_to_extension_type passes', isNotNull);
-      });
-    });
-
-    group('avoid_collection_methods_with_unrelated_types', () {
-      test('avoid_collection_methods_with_unrelated_types SHOULD trigger', () {
-        // Pattern that should be avoided: avoid collection methods with unrelated types
-        expect(
-          'avoid_collection_methods_with_unrelated_types detected',
-          isNotNull,
-        );
-      });
-
-      test(
-        'avoid_collection_methods_with_unrelated_types should NOT trigger',
-        () {
-          // Avoidance pattern not present
-          expect(
-            'avoid_collection_methods_with_unrelated_types passes',
-            isNotNull,
-          );
-        },
-      );
-    });
-
-    group('avoid_dynamic_type', () {
-      test('SHOULD trigger for dynamic parameter type', () {
-        // void foo(dynamic value) — avoid
-        expect('dynamic param type detected', isNotNull);
-      });
-
-      test('SHOULD trigger for dynamic variable type', () {
-        // dynamic x = 'hello' — avoid
-        expect('dynamic variable type detected', isNotNull);
-      });
-
-      test('SHOULD trigger for List<dynamic>', () {
-        // List<dynamic> is not Map value type — still flagged
-        expect('List<dynamic> detected', isNotNull);
-      });
-
-      test('should NOT trigger for Map<String, dynamic>', () {
-        // Canonical Dart JSON type — exempt
-        expect('Map<String, dynamic> is exempt', isNotNull);
-      });
-
-      test('should NOT trigger for nested Map<String, dynamic>', () {
-        // List<Map<String, dynamic>> — dynamic is Map value type
-        expect('nested Map<String, dynamic> is exempt', isNotNull);
-      });
-    });
-
-    group('avoid_implicitly_nullable_extension_types', () {
-      test('avoid_implicitly_nullable_extension_types SHOULD trigger', () {
-        // Pattern that should be avoided: avoid implicitly nullable extension types
-        expect('avoid_implicitly_nullable_extension_types detected', isNotNull);
-      });
-
-      test('avoid_implicitly_nullable_extension_types should NOT trigger', () {
-        // Avoidance pattern not present
-        expect('avoid_implicitly_nullable_extension_types passes', isNotNull);
-      });
-    });
-
-    group('avoid_nullable_interpolation', () {
-      test('avoid_nullable_interpolation SHOULD trigger', () {
-        // Pattern that should be avoided: avoid nullable interpolation
-        expect('avoid_nullable_interpolation detected', isNotNull);
-      });
-
-      test('avoid_nullable_interpolation should NOT trigger', () {
-        // Avoidance pattern not present
-        expect('avoid_nullable_interpolation passes', isNotNull);
-      });
-    });
-
-    group('avoid_nullable_parameters_with_default_values', () {
-      test('avoid_nullable_parameters_with_default_values SHOULD trigger', () {
-        // Pattern that should be avoided: avoid nullable parameters with default values
-        expect(
-          'avoid_nullable_parameters_with_default_values detected',
-          isNotNull,
-        );
-      });
-
-      test(
-        'avoid_nullable_parameters_with_default_values should NOT trigger',
-        () {
-          // Avoidance pattern not present
-          expect(
-            'avoid_nullable_parameters_with_default_values passes',
-            isNotNull,
-          );
-        },
-      );
-    });
-
-    group('avoid_nullable_tostring', () {
-      test('avoid_nullable_tostring SHOULD trigger', () {
-        // Pattern that should be avoided: avoid nullable tostring
-        expect('avoid_nullable_tostring detected', isNotNull);
-      });
-
-      test('avoid_nullable_tostring should NOT trigger', () {
-        // Avoidance pattern not present
-        expect('avoid_nullable_tostring passes', isNotNull);
-      });
-    });
-
-    group('avoid_null_assertion', () {
-      test('avoid_null_assertion SHOULD trigger', () {
-        // Pattern that should be avoided: avoid null assertion
-        expect('avoid_null_assertion detected', isNotNull);
-      });
-
-      test('avoid_null_assertion should NOT trigger', () {
-        // Avoidance pattern not present
-        expect('avoid_null_assertion passes', isNotNull);
-      });
-    });
-
-    group('avoid_unnecessary_type_assertions', () {
-      test('avoid_unnecessary_type_assertions SHOULD trigger', () {
-        // Pattern that should be avoided: avoid unnecessary type assertions
-        expect('avoid_unnecessary_type_assertions detected', isNotNull);
-      });
-
-      test('avoid_unnecessary_type_assertions should NOT trigger', () {
-        // Avoidance pattern not present
-        expect('avoid_unnecessary_type_assertions passes', isNotNull);
-      });
-    });
-
-    group('avoid_unnecessary_type_casts', () {
-      test('avoid_unnecessary_type_casts SHOULD trigger', () {
-        // Pattern that should be avoided: avoid unnecessary type casts
-        expect('avoid_unnecessary_type_casts detected', isNotNull);
-      });
-
-      test('avoid_unnecessary_type_casts should NOT trigger', () {
-        // Avoidance pattern not present
-        expect('avoid_unnecessary_type_casts passes', isNotNull);
-      });
-    });
-
-    group('avoid_unrelated_type_assertions', () {
-      test('avoid_unrelated_type_assertions SHOULD trigger', () {
-        // Pattern that should be avoided: avoid unrelated type assertions
-        expect('avoid_unrelated_type_assertions detected', isNotNull);
-      });
-
-      test('avoid_unrelated_type_assertions should NOT trigger', () {
-        // Avoidance pattern not present
-        expect('avoid_unrelated_type_assertions passes', isNotNull);
-      });
-    });
-  });
-
   group('Type - Preference Rules', () {
-    group('prefer_correct_type_name', () {
-      test('prefer_correct_type_name SHOULD trigger', () {
-        // Better alternative available: prefer correct type name
-        expect('prefer_correct_type_name detected', isNotNull);
-      });
-
-      test('prefer_correct_type_name should NOT trigger', () {
-        // Preferred pattern used correctly
-        expect('prefer_correct_type_name passes', isNotNull);
-      });
-    });
-
-    group('prefer_explicit_function_type', () {
-      test('prefer_explicit_function_type SHOULD trigger', () {
-        // Better alternative available: prefer explicit function type
-        expect('prefer_explicit_function_type detected', isNotNull);
-      });
-
-      test('prefer_explicit_function_type should NOT trigger', () {
-        // Preferred pattern used correctly
-        expect('prefer_explicit_function_type passes', isNotNull);
-      });
-    });
-
     group('prefer_type_over_var', () {
       test('has conflictingRules metadata', () {
         final rule = PreferTypeOverVarRule();
-        expect(rule.conflictingRules, contains('prefer_var_over_explicit_type'));
+        expect(
+          rule.conflictingRules,
+          contains('prefer_var_over_explicit_type'),
+        );
       });
 
       test('rule offers quick fix (replace var with type)', () {
@@ -403,16 +215,6 @@ void main() {
           rule.code.correctionMessage,
           isNot(contains('Verify the change works')),
         );
-      });
-
-      test('prefer_type_over_var SHOULD trigger', () {
-        // Better alternative available: prefer type over var
-        expect('prefer_type_over_var detected', isNotNull);
-      });
-
-      test('prefer_type_over_var should NOT trigger', () {
-        // Preferred pattern used correctly
-        expect('prefer_type_over_var passes', isNotNull);
       });
     });
 
@@ -446,42 +248,9 @@ void main() {
         expect(rule.code.problemMessage.length, greaterThan(50));
         expect(rule.code.correctionMessage, isNotNull);
       });
-
-      test('@visibleOutsideTemplate on top-level function SHOULD trigger', () {
-        // Annotation only valid on instance members of @Component classes
-        expect('top-level function triggers rule', isNotNull);
-      });
-
-      test('@visibleOutsideTemplate on static member SHOULD trigger', () {
-        // Static members are not instance members
-        expect('static member triggers rule', isNotNull);
-      });
-
-      test('@visibleOutsideTemplate on constructor SHOULD trigger', () {
-        // Constructors are not instance members
-        expect('constructor triggers rule', isNotNull);
-      });
-
-      test(
-        '@visibleOutsideTemplate on ExtensionTypeDeclaration SHOULD trigger',
-        () {
-          // Extension types are top-level, not component classes
-          expect('extension type declaration triggers rule', isNotNull);
-        },
-      );
-
-      test(
-        '@visibleOutsideTemplate on @Component instance member should NOT trigger',
-        () {
-          // Correct usage: instance member of a @Component class
-          expect('component instance member does not trigger', isNotNull);
-        },
-      );
-
-      test('other annotations should NOT trigger (false positive)', () {
-        // @override, @deprecated, etc. are not visibleOutsideTemplate
-        expect('non-visibleOutsideTemplate annotations ignored', isNotNull);
-      });
     });
   });
+
+  // Stub-only behavior tests were removed from this file. Keep rule metadata,
+  // fixture verification, and targeted non-stub metadata checks.
 }

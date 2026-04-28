@@ -113,3 +113,25 @@ double discount = amount * 0.15; // Rounding errors compound
 // GOOD: Should NOT trigger avoid_money_arithmetic_on_double
 int _good813_totalCents = priceCents * quantity;
 Decimal total = Decimal.parse('10.00') * quantity;
+
+// GOOD: Non-financial "*Rate" identifiers should not be treated as money.
+double frameRate = 60.0;
+double sampleRate = 44.1;
+double heartRate = 72.0;
+double growthRate = 1.05;
+double flatRate = 2.0;
+double tailRate = 0.5;
+
+double _good813_frameCalc = frames / frameRate;
+double _good813_sampleCalc = samples / sampleRate;
+double _good813_heartCalc = beats * heartRate;
+double _good813_growthCalc = baseValue * growthRate;
+double _good813_flatCalc = inputValue * flatRate;
+double _good813_tailCalc = remaining * tailRate;
+
+// BAD: Financially qualified rates should still trigger.
+// expect_lint: avoid_money_arithmetic_on_double
+double taxRate = 0.08;
+double feeRate = 0.02;
+double _bad813_taxCalc = amount * taxRate;
+double _bad813_feeCalc = amount * feeRate;

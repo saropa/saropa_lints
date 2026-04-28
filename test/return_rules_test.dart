@@ -102,13 +102,9 @@ void main() {
         expect(rule.fixGenerators, isNotEmpty);
       });
 
-      test('returning cascade expression SHOULD trigger', () {
-        expect('returning cascade expression', isNotNull);
-      });
+      test('returning cascade expression SHOULD trigger', () {});
 
-      test('separate variable for cascades should NOT trigger', () {
-        expect('separate variable for cascades', isNotNull);
-      });
+      test('separate variable for cascades should NOT trigger', () {});
     });
     group('avoid_returning_void', () {
       test('rule offers quick fix (remove return from void expression)', () {
@@ -116,22 +112,14 @@ void main() {
         expect(rule.fixGenerators, isNotEmpty);
       });
 
-      test('explicit return of void expression SHOULD trigger', () {
-        expect('explicit return of void expression', isNotNull);
-      });
+      test('explicit return of void expression SHOULD trigger', () {});
 
-      test('void function without return should NOT trigger', () {
-        expect('void function without return', isNotNull);
-      });
+      test('void function without return should NOT trigger', () {});
     });
     group('avoid_unnecessary_return', () {
-      test('return at end of void function SHOULD trigger', () {
-        expect('return at end of void function', isNotNull);
-      });
+      test('return at end of void function SHOULD trigger', () {});
 
-      test('implicit void return should NOT trigger', () {
-        expect('implicit void return', isNotNull);
-      });
+      test('implicit void return should NOT trigger', () {});
     });
     group('avoid_returning_this', () {
       test('rule offers quick fix (replace return this with return)', () {
@@ -155,13 +143,9 @@ void main() {
 
   group('Return - Preference Rules', () {
     group('prefer_immediate_return', () {
-      test('variable assigned then immediately returned SHOULD trigger', () {
-        expect('variable assigned then immediately returned', isNotNull);
-      });
+      test('variable assigned then immediately returned SHOULD trigger', () {});
 
-      test('direct return of expression should NOT trigger', () {
-        expect('direct return of expression', isNotNull);
-      });
+      test('direct return of expression should NOT trigger', () {});
     });
     group('prefer_returning_shorthands', () {
       test('rule offers quick fix (convert to expression body)', () {
@@ -169,13 +153,9 @@ void main() {
         expect(rule.fixGenerators, isNotEmpty);
       });
 
-      test('single-expression body with return SHOULD trigger', () {
-        expect('single-expression body with return', isNotNull);
-      });
+      test('single-expression body with return SHOULD trigger', () {});
 
-      test('arrow function syntax should NOT trigger', () {
-        expect('arrow function syntax', isNotNull);
-      });
+      test('arrow function syntax should NOT trigger', () {});
     });
   });
 }

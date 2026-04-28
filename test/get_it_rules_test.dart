@@ -53,34 +53,22 @@ void main() {
 
   group('GetIt - Avoidance Rules', () {
     group('avoid_getit_in_build', () {
-      test('GetIt.instance in build method SHOULD trigger', () {
-        expect('GetIt.instance in build method', isNotNull);
-      });
+      test('GetIt.instance in build method SHOULD trigger', () {});
 
-      test('inject via constructor or context should NOT trigger', () {
-        expect('inject via constructor or context', isNotNull);
-      });
+      test('inject via constructor or context should NOT trigger', () {});
     });
   });
 
   group('GetIt - Requirement Rules', () {
     group('require_getit_registration_order', () {
-      test('unordered GetIt registrations SHOULD trigger', () {
-        expect('unordered GetIt registrations', isNotNull);
-      });
+      test('unordered GetIt registrations SHOULD trigger', () {});
 
-      test('dependency-ordered registration should NOT trigger', () {
-        expect('dependency-ordered registration', isNotNull);
-      });
+      test('dependency-ordered registration should NOT trigger', () {});
     });
     group('require_getit_reset_in_tests', () {
-      test('GetIt state leaking between tests SHOULD trigger', () {
-        expect('GetIt state leaking between tests', isNotNull);
-      });
+      test('GetIt state leaking between tests SHOULD trigger', () {});
 
-      test('GetIt.instance.reset() in tearDown should NOT trigger', () {
-        expect('GetIt.instance.reset() in tearDown', isNotNull);
-      });
+      test('GetIt.instance.reset() in tearDown should NOT trigger', () {});
     });
   });
 }

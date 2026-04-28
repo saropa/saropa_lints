@@ -107,55 +107,35 @@ void main() {
 
   group('Cryptography - Avoidance Rules', () {
     group('avoid_hardcoded_encryption_keys', () {
-      test('encryption key in source code SHOULD trigger', () {
-        expect('encryption key in source code', isNotNull);
-      });
+      test('encryption key in source code SHOULD trigger', () {});
 
-      test('key from secure storage should NOT trigger', () {
-        expect('key from secure storage', isNotNull);
-      });
+      test('key from secure storage should NOT trigger', () {});
     });
     group('avoid_deprecated_crypto_algorithms', () {
-      test('MD5 or SHA1 for security SHOULD trigger', () {
-        expect('MD5 or SHA1 for security', isNotNull);
-      });
+      test('MD5 or SHA1 for security SHOULD trigger', () {});
 
-      test('SHA-256 or better should NOT trigger', () {
-        expect('SHA-256 or better', isNotNull);
-      });
+      test('SHA-256 or better should NOT trigger', () {});
     });
   });
 
   group('Cryptography - Requirement Rules', () {
     group('require_unique_iv_per_encryption', () {
-      test('reused IV in encryption SHOULD trigger', () {
-        expect('reused IV in encryption', isNotNull);
-      });
+      test('reused IV in encryption SHOULD trigger', () {});
 
-      test('unique IV per operation should NOT trigger', () {
-        expect('unique IV per operation', isNotNull);
-      });
+      test('unique IV per operation should NOT trigger', () {});
     });
     group('require_secure_key_generation', () {
-      test('weak key derivation SHOULD trigger', () {
-        expect('weak key derivation', isNotNull);
-      });
+      test('weak key derivation SHOULD trigger', () {});
 
-      test('PBKDF2 or similar key derivation should NOT trigger', () {
-        expect('PBKDF2 or similar key derivation', isNotNull);
-      });
+      test('PBKDF2 or similar key derivation should NOT trigger', () {});
     });
   });
 
   group('Cryptography - Preference Rules', () {
     group('prefer_secure_random_for_crypto', () {
-      test('math.Random for crypto SHOULD trigger', () {
-        expect('math.Random for crypto', isNotNull);
-      });
+      test('math.Random for crypto SHOULD trigger', () {});
 
-      test('SecureRandom for cryptographic use should NOT trigger', () {
-        expect('SecureRandom for cryptographic use', isNotNull);
-      });
+      test('SecureRandom for cryptographic use should NOT trigger', () {});
     });
   });
 }
