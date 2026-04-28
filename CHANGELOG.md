@@ -99,6 +99,7 @@
 - `prefer_single_ticker_provider_state_mixin` now skips State classes that hand off `vsync: this` to external helpers, which prevents unsafe suggestions to downgrade to `SingleTickerProviderStateMixin` when multiple ticker consumers exist. No action required.
 - Rule execution profiling now records actual callback timing and exposes a stable JSON contract (`ruleName`, `totalMs`, `callCount`, `avgMs`) through `RuleTimingTracker.summaryJson`, so CI can detect performance regressions without parsing human-formatted logs. No action required unless you are consuming timing data, in which case switch to the JSON payload.
 - Diagnostic statistics now support per-rule threshold gates and baseline-diff reporting in both the analysis report and `violations.json`, so CI can fail on targeted rule regressions and track newly introduced violations without custom parsers. To adopt this workflow, generate a baseline with `dart run saropa_lints:diagnostic_baseline` and reference it under `diagnostic_statistics.baseline.file` in `analysis_options_custom.yaml`.
+- Project Vibrancy scoring entry points defend JSON, git stdout, and LCOV parsing more carefully and print short stderr diagnostics when the on-disk vibrancy cache cannot be loaded instead of failing silently. No action required.
 
 <details>
 <summary>Maintenance</summary>
@@ -107,6 +108,7 @@
 - Added a dedicated `diagnostic-baseline-strict` GitHub Actions workflow for maintainers to fail fast when `violations.json` is missing before baseline refresh, so strict baseline regeneration can be run independently without changing default CI behavior. No action required for package users.
 - Added a dedicated Project Vibrancy GitHub Actions workflow that emits a JSON artifact for pull requests and manual runs, so maintainers can inspect code-health snapshots from CI without running the CLI locally. No action required for package users.
 - Added sidebar UI-state regression checks for Project Vibrancy scope badge/count and persisted filter wiring, so future extension refactors are less likely to silently break the primary filtering flow. No action required for package users.
+- Removed tautological string-literal `isNotNull` expectations from package tests (CI already enforces stub integrity), preserving rule instantiation, fixture checks, and substantive assertions such as fix metadata and AST-backed tests. No action required for pub.dev or Marketplace users.
 
 </details>
 
