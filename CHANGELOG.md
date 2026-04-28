@@ -47,6 +47,15 @@
 
 ---
 
+## [Unreleased]
+
+### Fixed
+
+- `avoid_money_arithmetic_on_double` no longer treats a bare `*Rate` suffix as financial intent, which removes false positives for non-monetary identifiers such as frame, sample, or heart rates while preserving warnings for clearly financial names like `taxRate` and `feeRate`. No action required.
+- Rule execution profiling now records actual callback timing and exposes a stable JSON contract (`ruleName`, `totalMs`, `callCount`, `avgMs`) through `RuleTimingTracker.summaryJson`, so CI can detect performance regressions without parsing human-formatted logs. No action required unless you are consuming timing data, in which case switch to the JSON payload.
+
+---
+
 ## [12.6.1]
 
 More rules now ship IDE quick fixes for repetitive, low-risk edits (secure URL schemes, image and HTTP/Firestore/Drift call shapes), so you can apply the suggested remediation from the lightbulb menu instead of typing boilerplate by hand. Update the package and re-analyze to see new fix actions where diagnostics already appear. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)

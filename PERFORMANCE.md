@@ -172,6 +172,17 @@ Enable timing instrumentation to identify slow rules:
 SAROPA_LINTS_PROFILE=true dart analyze
 ```
 
+### Performance Environment Variables
+
+Use these toggles when profiling or splitting slow-rule work:
+
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `SAROPA_LINTS_PROFILE` | `false` | Captures per-rule execution timing and logs slow callbacks (>10ms). |
+| `SAROPA_LINTS_REPORT` | `false` | Enables report writer output and also captures timing data for reports. |
+| `SAROPA_LINTS_DEFER` | `false` | Defers historically slow rules (>50ms) from the first pass. |
+| `SAROPA_LINTS_DEFERRED` | `false` | Runs only the deferred slow-rule set (second pass workflow). |
+
 ### What You'll See
 
 Rules taking >10ms are logged immediately:
@@ -197,6 +208,9 @@ for (final timing in RuleTimingTracker.sortedTimings) {
       '${timing.callCount} calls, '
       '${timing.averageTime.inMilliseconds}ms avg');
 }
+
+// Get stable JSON payload for CI tooling
+print(RuleTimingTracker.summaryJson);
 
 // Reset timing data
 RuleTimingTracker.reset();

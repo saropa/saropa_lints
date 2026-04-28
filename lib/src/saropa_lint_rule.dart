@@ -1,6 +1,7 @@
 // ignore_for_file: always_specify_types, depend_on_referenced_packages, unused_element, unused_field, unused_import
 
 import 'dart:collection' show LinkedHashSet;
+import 'dart:convert' show jsonEncode;
 import 'dart:developer' as developer;
 import 'dart:io' show Directory, File, Platform, stderr;
 import 'dart:math' show max;
@@ -1183,6 +1184,15 @@ class RuleTimingTracker {
     }).toList();
   }
 
+  /// Stable machine-readable timing payload (slowest first).
+  ///
+  /// Intended for CI checks and tooling that needs deterministic keys.
+  static List<Map<String, Object>> get sortedTimingsJson =>
+      sortedTimings.map((timing) => timing.toJson()).toList(growable: false);
+
+  /// JSON-encoded equivalent of [sortedTimingsJson].
+  static String get summaryJson => jsonEncode(sortedTimingsJson);
+
   /// Get a summary of the slowest rules.
   static String get summary {
     final timings = sortedTimings.take(20).toList();
@@ -1244,6 +1254,16 @@ class RuleTimingRecord {
   final Duration totalTime;
   final int callCount;
   final Duration averageTime;
+
+  /// Stable JSON shape for CI and post-processing scripts.
+  ///
+  /// Keys are fixed: ruleName, totalMs, callCount, avgMs.
+  Map<String, Object> toJson() => <String, Object>{
+    'ruleName': ruleName,
+    'totalMs': totalTime.inMicroseconds / 1000,
+    'callCount': callCount,
+    'avgMs': averageTime.inMicroseconds / 1000,
+  };
 }
 
 // =============================================================================

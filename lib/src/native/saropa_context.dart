@@ -24,7 +24,8 @@ import '../init/project_info.dart' show getPackageVersion;
 import '../project_context.dart' show FileTypeDetector, ProjectContext;
 import '../report/analysis_reporter.dart' show AnalysisReporter, ReportConfig;
 import '../report/import_graph_tracker.dart' show ImportGraphTracker;
-import '../saropa_lint_rule.dart' show ProgressTracker, SaropaLintRule;
+import '../saropa_lint_rule.dart'
+    show ProgressTracker, ReportWriter, RuleTimingTracker, SaropaLintRule;
 import 'compat_visitor.dart';
 import 'config_loader.dart' show loadNativePluginConfigFromProjectRoot;
 import 'plugin_logger.dart' show PluginLogger;
@@ -50,6 +51,15 @@ class SaropaContext {
   /// Typed reference for per-file filtering. Null if rule is not a
   /// [SaropaLintRule] (e.g. the PoC rules used [SaropaAnalysisRule]).
   final SaropaLintRule? _saropaRule;
+
+  // Keep timing overhead opt-in: only measure callback execution when
+  // profiling or report generation was explicitly enabled by the user.
+  static const bool _timingEnabled =
+      bool.fromEnvironment('SAROPA_LINTS_PROFILE') ||
+      bool.fromEnvironment('SAROPA_LINTS_REPORT') ||
+      String.fromEnvironment('SAROPA_LINTS_PROFILE') == 'true' ||
+      String.fromEnvironment('SAROPA_LINTS_REPORT') == 'true';
+  static const int _slowRuleThresholdMs = 10;
 
   // ===========================================================================
   // File access
@@ -132,7 +142,28 @@ class SaropaContext {
     return (T node) {
       _ensureConfigLoadedFromProjectRoot();
       if (_shouldSkipCurrentFile()) return;
-      callback(node);
+      if (!_timingEnabled) {
+        callback(node);
+        return;
+      }
+
+      final rule = _saropaRule;
+
+      final stopwatch = Stopwatch()..start();
+      try {
+        callback(node);
+      } finally {
+        stopwatch.stop();
+        final elapsed = stopwatch.elapsed;
+        RuleTimingTracker.record(rule.code.lowerCaseName, elapsed);
+        if (elapsed.inMilliseconds >= _slowRuleThresholdMs) {
+          ReportWriter.recordSlowRule(
+            rule.code.lowerCaseName,
+            filePath,
+            elapsed.inMilliseconds,
+          );
+        }
+      }
     };
   }
 
