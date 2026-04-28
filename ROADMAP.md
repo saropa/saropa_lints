@@ -8,6 +8,8 @@
 
 See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (2107 implemented, 93 remaining).
 
+> **Clarification**: `remaining` is the arithmetic gap to the package goal (`goal - implemented`), not the number of items explicitly listed in this roadmap and not the number of plan documents.
+
 > **When implementing**: Remove from ROADMAP, add to CHANGELOG, register in `all_rules.dart` + `tiers.dart`. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 > **Deferred rules**: Rules we cannot implement today are documented with full justification in [plan/deferred/](plan/deferred/). Do not re-propose rules listed there without addressing the stated barrier.
@@ -22,7 +24,18 @@ The `SaropaLintRule` base class provides enhanced features for all lint rules.
 
 #### Planned Enhancements
 
-Details and design notes for each enhancement are in [bugs/discussion/](bugs/discussion/) (one file per discussion: `discussion_055_diagnostic_statistics.md` through `discussion_061_tier_based_filtering.md`).
+Details and design notes for each enhancement are in the plan docs:
+`plan/discussion_056_suppression_tracking.md`, `plan/discussion_061_tier_based_filtering.md`,
+`plan/deferred/discussion_059_custom_ignore_prefixes.md`, and historical snapshots in
+`plan/history/` (including `discussion_055_diagnostic_statistics.md`,
+`discussion_057_related_rules.md`, `discussion_058_batch_deduplication.md`, and
+`discussion_060_performance_tracking.md`).
+
+| Enhancement | Status | Notes |
+|-------------|--------|-------|
+| Suppression tracking and governance ([Discussion #56](plan/discussion_056_suppression_tracking.md)) | Done | Plugin tracking, extension Suppressions sidebar, overview suppression-rate metric, and CI/export schema/reporting are complete. |
+| Tier-based filtering ([Discussion #61](plan/discussion_061_tier_based_filtering.md)) | Planned | Still tracked as future base-class enhancement work. |
+| Custom suppression prefixes ([Discussion #59](plan/deferred/discussion_059_custom_ignore_prefixes.md)) | Deferred | Policy-blocked; do not implement custom ignore parsing under current project policy. |
 
 ---
 
@@ -50,11 +63,20 @@ The CLI tool (`dart run saropa_lints:cross_file`) is functional but can be impro
 | HTML reports | Done |
 | Baseline integration | Done |
 | CI exit codes | Done |
-| Watch mode | Planned |
-| Unused symbols detection | Planned |
-| Cross-feature dependency analysis | Planned |
-| Dead import detection | Planned |
-| Extension UI integration (sidebar views) | Planned |
+| Watch mode | In progress |
+| Unused symbols detection (top-level) | Done |
+| Cross-feature dependency analysis | Done |
+| Dead import detection | In progress |
+| Extension UI integration (commands + walkthrough + catalog) | Done |
+
+### Project Vibrancy (planning)
+
+Project-level code health scoring and surfacing plan lives in [plan/project_vibrancy_report.md](plan/project_vibrancy_report.md). For execution order, see the **MVP Slice (first ship)** section in that document (collectors + scoring + CLI first, UI later).
+
+| Initiative | Status |
+|------------|--------|
+| Project Vibrancy MVP (collectors + scoring + CLI) | In progress (CLI JSON/text, scoped scans, CI gates including coverage-quality counts; analyzer-element usage + full plan parity ongoing — see plan snapshot) |
+| Project Vibrancy UI surfaces (tree/editor/HTML/history) | In progress (sidebar + full report webviews, filters, coverage-quality quick slices; native tree, editor overlays, history/trends pending — see plan snapshot) |
 
 ---
 

@@ -72,7 +72,7 @@ These match the table in [ROADMAP.md — Part 2 — Platform Config Cross-Refere
 
 **Why here:** [plan/deferred/cross_file_analysis.md](plan/deferred/cross_file_analysis.md) documents that the **analyzer plugin is per-file**; these need **project-wide graphs** or **test layout** knowledge.
 
-**Where to implement first:** [lib/src/project_context_import_location.dart](lib/src/project_context_import_location.dart) (`ImportGraphCache`, `getImporters()`, `detectCircularImports()`), [lib/src/cli/cross_file_analyzer.dart](lib/src/cli/cross_file_analyzer.dart), [bin/cross_file.dart](bin/cross_file.dart), design notes in [plan/cross_file_cli_design.md](plan/cross_file_cli_design.md) (planned: unused symbols, dead imports, watch mode). [ROADMAP.md](ROADMAP.md) “Cross-File CLI Improvements” lists **Unused symbols detection**, **Cross-feature dependency analysis**, **Dead import detection**, **Extension UI integration** — these rules align with that roadmap.
+**Where to implement first:** [lib/src/project_context_import_location.dart](lib/src/project_context_import_location.dart) (`ImportGraphCache`, `getImporters()`, `detectCircularImports()`), [lib/src/cli/cross_file_analyzer.dart](lib/src/cli/cross_file_analyzer.dart), [bin/cross_file.dart](bin/cross_file.dart), design notes in [plan/cross_file_cli_design.md](plan/cross_file_cli_design.md). Top-level **unused symbols** and **cross-feature** analysis ship in the cross-file CLI; **dead imports** and **watch** remain iterative. [ROADMAP.md](ROADMAP.md) “Cross-File CLI Improvements” tracks remaining CLI work — these deferred **rules** still need plugin-safe designs.
 
 ### Provider / navigation (4)
 

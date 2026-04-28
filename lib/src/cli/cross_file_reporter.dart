@@ -3,6 +3,23 @@
 import 'dart:convert';
 import 'dart:io';
 
+/// Options for cross-file `unused-symbols` analysis.
+class UnusedSymbolsOptions {
+  const UnusedSymbolsOptions({
+    this.includePrivate = false,
+    this.excludePublicApi = false,
+    this.forceHeuristic = false,
+  });
+
+  final bool includePrivate;
+
+  final bool excludePublicApi;
+
+  /// When true, skip analyzer-backed semantic resolution and use the regex
+  /// heuristic only.
+  final bool forceHeuristic;
+}
+
 /// Result shape for cross-file analysis (unused files, circular deps,
 /// missing mirror tests, stats).
 class CrossFileResult {
@@ -11,6 +28,10 @@ class CrossFileResult {
     required this.circularDependencies,
     required this.missingMirrorTests,
     required this.stats,
+    required this.featureDependencies,
+    required this.crossFeatureImports,
+    required this.deadImports,
+    this.unusedSymbols = const <String, List<String>>{},
     this.includedPaths = const {},
   });
 
@@ -21,6 +42,18 @@ class CrossFileResult {
   final List<String> missingMirrorTests;
 
   final Map<String, dynamic> stats;
+
+  /// Feature-level adjacency list for `lib/features/<name>/...` imports.
+  /// Key = source feature, value = sorted list of target features.
+  final Map<String, List<String>> featureDependencies;
+
+  /// Relative import edges crossing feature boundaries.
+  /// Example: `lib/features/a/x.dart -> lib/features/b/y.dart`.
+  final List<String> crossFeatureImports;
+  final Map<String, List<String>> deadImports;
+
+  /// Unused top-level symbols grouped by defining file path.
+  final Map<String, List<String>> unusedSymbols;
 
   /// All file paths that survived exclude filtering. Empty when no excludes
   /// were applied (callers should fall back to the full graph in that case).
@@ -94,6 +127,73 @@ class CrossFileReporter {
       sink.writeln('  fileCount: ${result.stats['fileCount'] ?? 0}');
       sink.writeln('  totalImports: ${result.stats['totalImports'] ?? 0}');
     }
+    sink.writeln('');
+
+    final featureDeps = result.featureDependencies;
+    final crossImports = result.crossFeatureImports;
+    sink.writeln(
+      'Feature Dependencies (${featureDeps.length} feature(s), ${crossImports.length} cross-feature import(s)):',
+    );
+    if (featureDeps.isEmpty) {
+      sink.writeln('  (none)');
+      return;
+    }
+    final sortedFeatures = featureDeps.keys.toList()..sort();
+    for (final feature in sortedFeatures) {
+      final targets = featureDeps[feature] ?? const <String>[];
+      if (targets.isEmpty) continue;
+      sink.writeln('  $feature -> ${targets.join(', ')}');
+    }
+    sink.writeln('');
+    sink.writeln('Feature dependency matrix (from \\ to):');
+    _writeFeatureDependencyMatrix(
+      sink: sink,
+      featureDeps: featureDeps,
+    );
+
+    sink.writeln('');
+    if (crossImports.isNotEmpty) {
+      sink.writeln('Cross-feature imports:');
+      for (final edge in crossImports) {
+        sink.writeln('  $edge');
+      }
+      sink.writeln('');
+    }
+
+    final deadImports = result.deadImports;
+    final deadImportCount = deadImports.values.fold<int>(0, (sum, values) => sum + values.length);
+    sink.writeln('Dead Imports ($deadImportCount found):');
+    if (deadImportCount == 0) {
+      sink.writeln('  (none)');
+    } else {
+      final files = deadImports.keys.toList()..sort();
+      for (final file in files) {
+        final imports = deadImports[file] ?? const <String>[];
+        if (imports.isEmpty) continue;
+        sink.writeln('  $file');
+        for (final imp in imports) {
+          sink.writeln('    - $imp');
+        }
+      }
+    }
+    sink.writeln('');
+
+    final unusedSymbols = result.unusedSymbols;
+    final totalUnused = unusedSymbols.values.fold<int>(0, (sum, symbols) => sum + symbols.length);
+    sink.writeln('Unused Symbols ($totalUnused found):');
+    if (totalUnused == 0) {
+      sink.writeln('  (none)');
+      return;
+    }
+    final files = unusedSymbols.keys.toList()..sort();
+    for (final file in files) {
+      final symbols = unusedSymbols[file] ?? const <String>[];
+      if (symbols.isEmpty) continue;
+      sink.writeln('  $file');
+      for (final symbol in symbols) {
+        sink.writeln('    - $symbol');
+      }
+    }
   }
 
   static void _reportJson(CrossFileResult result, StringSink sink) {
@@ -101,8 +201,50 @@ class CrossFileReporter {
       'unusedFiles': result.unusedFiles,
       'circularDependencies': result.circularDependencies,
       'missingMirrorTests': result.missingMirrorTests,
+      'featureDependencies': result.featureDependencies,
+      'crossFeatureImports': result.crossFeatureImports,
+      'deadImports': result.deadImports,
+      'unusedSymbols': result.unusedSymbols,
       if (result.stats.isNotEmpty) 'stats': result.stats,
     };
     sink.writeln(const JsonEncoder.withIndent('  ').convert(map));
+  }
+
+  static void _writeFeatureDependencyMatrix({
+    required StringSink sink,
+    required Map<String, List<String>> featureDeps,
+  }) {
+    final allFeatures = <String>{
+      ...featureDeps.keys,
+      for (final targets in featureDeps.values) ...targets,
+    }.toList()
+      ..sort();
+    if (allFeatures.isEmpty) {
+      sink.writeln('  (none)');
+      return;
+    }
+    const colWidth = 12;
+    final header = StringBuffer(''.padRight(colWidth));
+    for (final col in allFeatures) {
+      header.write(_trimLabel(col).padRight(colWidth));
+    }
+    sink.writeln('  ${header.toString().trimRight()}');
+    for (final from in allFeatures) {
+      final row = StringBuffer(_trimLabel(from).padRight(colWidth));
+      final targets = featureDeps[from]?.toSet() ?? const <String>{};
+      for (final to in allFeatures) {
+        if (from == to) {
+          row.write('-'.padRight(colWidth));
+        } else {
+          row.write((targets.contains(to) ? 'X' : '.').padRight(colWidth));
+        }
+      }
+      sink.writeln('  ${row.toString().trimRight()}');
+    }
+  }
+
+  static String _trimLabel(String value) {
+    if (value.length <= 10) return value;
+    return '${value.split('').take(9).join()}~';
   }
 }

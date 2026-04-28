@@ -27,7 +27,7 @@ Developed by [Saropa](https://saropa.com) to make the world of Dart & Flutter be
 
 **Install the [Saropa Lints VS Code extension](https://marketplace.visualstudio.com/items?itemName=saropa.saropa-lints)** for the full experience. Also on [Open VSX](https://open-vsx.org/extension/saropa/saropa-lints) (Cursor, VSCodium).
 
-Lint integration defaults **on** for Dart workspaces (`saropaLints.enabled`). Overview, Config, and Rule Packs stay available even when integration is off; turn it off with **Saropa Lints: Turn Off Lint Integration** if you only want the sidebar without analyzer runs.
+Lint integration defaults **on** for Dart workspaces (`saropaLints.enabled`). Overview, Setup & triage, and Rule Packs stay available even when integration is off; turn it off with **Saropa Lints: Turn Off Lint Integration** if you only want the sidebar without analyzer runs.
 
 The extension is the primary setup and configuration surface:
 
@@ -37,6 +37,7 @@ The extension is the primary setup and configuration surface:
 - **Triage** — Disable noisy rules from the UI; see estimated score impact before acting
 - **Rule Packs** — Enable stack bundles (Riverpod, Drift, …) from the sidebar webview (per-pack toggles, rule lists, target platforms when embedder folders exist); see [`doc/guides/rule_packs.md`](doc/guides/rule_packs.md)
 - **Package Vibrancy** — Dependency health, alerts, and optional **version-gap** PR/issue triage (enable with `saropaLints.packageVibrancy.enableVersionGap`; a GitHub token improves results)
+- **Project Vibrancy** — Project code-health scoring for your own Dart source (sidebar filters, quick unused/uncovered slices, and full report webview)
 - **TODOs & Hacks** — Sidebar scan for TODO/FIXME/HACK-style markers; full-workspace scan is **opt-in** (`saropaLints.todosAndHacks.workspaceScanEnabled`, default off) via **TODOs & Hacks: Enable workspace scan**
 - **File Risk** — Files ranked by violation density; focus on the riskiest first
 - **Trends** — Score progression over time with milestone celebrations
@@ -79,7 +80,7 @@ Neither project will ever subsume the other — they operate on different inputs
 2. Open the **Saropa Lints** sidebar (checklist icon in the activity bar)
 3. Run **Saropa Lints: Set Up Project** (or use the equivalent control in the Overview) to add the package and analysis config
 
-The extension adds `saropa_lints` to your project, configures analysis options, and runs analysis. Use the Config view to change tier, disable rules, and manage platforms/packages. Run **Saropa Lints: Getting Started** from the command palette for a guided tour.
+The extension adds `saropa_lints` to your project, configures analysis options, and runs analysis. Use the Setup & triage view to change tier, disable rules, and manage platforms/packages. Run **Saropa Lints: Getting Started** from the command palette for a guided tour.
 
 ### Option B — Tier preset (zero-config, no extension)
 
@@ -108,6 +109,41 @@ dart run saropa_lints:init --tier recommended --enable-pack riverpod --enable-pa
 ```
 
 > **Note:** The CLI init is headless-only as of v9 — no interactive prompts. For interactive setup, use the VS Code extension.
+
+### Rule configuration cheatsheet
+
+Use this mental model:
+
+- **Tier** = broad baseline (`essential` → `pedantic`)
+- **Packs** = domain/version bundles (library and SDK migration groups)
+
+Current behavior:
+
+- Pack-owned package/SDK migration rules are **off unless their pack is enabled**.
+- Tier selection still controls non-pack-owned rules.
+- Explicit `diagnostics: rule_name: false` still disables a rule.
+
+Minimal setup pattern:
+
+```yaml
+plugins:
+  saropa_lints:
+    version: "x.y.z"
+    rule_packs:
+      enabled:
+        - riverpod
+        - flutter_sdk_3_32
+```
+
+Quick commands:
+
+```bash
+dart run saropa_lints:init --tier recommended
+dart run saropa_lints:init --list-packs
+dart run saropa_lints:init --tier recommended --enable-pack riverpod --enable-pack flutter_sdk_3_32
+```
+
+If users are unsure, start with a tier only and enable packs later.
 
 This updates (or creates) two files:
 
@@ -144,7 +180,7 @@ violations.json        ───►  Health Score, Issues, Security,
                              File Risk, Trends, Inline Annotations
 ```
 
-The **Dart package** provides **2134** lint rules via the native analyzer plugin. The **VS Code extension** reads `violations.json` and provides the UI: Health Score, Issues tree, Security Posture, File Risk, Config/Triage, and related views. Optional **Drift Advisor** integration shows index suggestions and data-quality anomalies from a running Drift Advisor server in a dedicated sidebar view and in Problems. Both are published together and versioned in sync.
+The **Dart package** provides **2134** lint rules via the native analyzer plugin. The **VS Code extension** reads `violations.json` and provides the UI: Health Score, Issues tree, Security Posture, File Risk, Setup & triage, and related views. Optional **Drift Advisor** integration shows index suggestions and data-quality anomalies from a running Drift Advisor server in a dedicated sidebar view and in Problems. Both are published together and versioned in sync.
 
 **Rule metadata:** Each rule can expose optional semantics—`RuleType` (bug, vulnerability, code smell, security hotspot), `tags`, MITRE **CWE** IDs, and `RuleStatus` (e.g. beta)—for compliance and future quality gates. Defaults are backward compatible; see [CONTRIBUTING.md](CONTRIBUTING.md) and [bugs/discussion/RULE_METADATA_BULK_STATUS.md](bugs/discussion/RULE_METADATA_BULK_STATUS.md).
 
@@ -333,7 +369,7 @@ Pick the tier that matches your team's needs. Each tier builds on the previous o
 
 **[175+ stylistic rules](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md)** for formatting, ordering, and naming conventions.
 
-Enable stylistic rules individually in your config, or use the VS Code extension's Config/Triage view to enable/disable them with estimated score impact.
+Enable stylistic rules individually in your config, or use the VS Code extension's Setup & triage view to enable/disable them with estimated score impact.
 
 For CI/scripting, use `--no-stylistic` (default) or `--stylistic-all` to bulk-enable:
 
@@ -654,12 +690,16 @@ dart run saropa_lints:baseline --help        # See all options
 
 ### Cross-file analysis CLI
 
-Find unused files and circular import chains (no IDE integration; CLI only):
+Find unused files, circular imports, and related project-wide checks (CLI only; the extension also exposes cross-file commands):
 
 ```bash
 dart run saropa_lints:cross_file unused-files   # Files not imported by any other file
 dart run saropa_lints:cross_file circular-deps  # Circular import chains
 dart run saropa_lints:cross_file import-stats   # Import graph statistics
+dart run saropa_lints:cross_file feature-deps   # Cross-feature imports (lib/features/…)
+dart run saropa_lints:cross_file unused-symbols # Top-level symbols unused outside defining file
+dart run saropa_lints:cross_file dead-imports     # Likely dead relative imports (heuristic)
+dart run saropa_lints:cross_file watch          # Re-run a command on lib/test changes
 dart run saropa_lints:cross_file report         # HTML report (default: reports/)
 dart run saropa_lints:cross_file graph          # DOT import graph for Graphviz
 dart run saropa_lints:cross_file --help
@@ -672,7 +712,108 @@ dart run saropa_lints:cross_file unused-files --update-baseline
 dot -Tsvg reports/import_graph.dot -o reports/import_graph.svg
 ```
 
-Options: `--path <dir>`, `--output text|json`, `--output-dir <path>` (for report/graph), `--baseline <file>`, `--update-baseline`, `--exclude <glob>`. Exit codes: 0 = no issues, 1 = issues found, 2 = error. [Example GitHub Actions workflow](doc/cross_file_ci_example.md) for CI. See [ROADMAP Part 3](ROADMAP.md).
+Options: `--path <dir>`, `--output text|json`, `--output-dir <path>` (for report/graph), `--baseline <file>`, `--update-baseline`, `--exclude <glob>`, plus command-specific flags (e.g. `unused-symbols`: `--include-private`, `--exclude-public-api`, `--heuristic-unused-symbols`). Exit codes: 0 = no issues, 1 = issues found, 2 = error. [Example GitHub Actions workflow](doc/cross_file_ci_example.md) for CI. See [ROADMAP](ROADMAP.md#cross-file-cli-improvements) cross-file table.
+
+### Project Vibrancy CLI
+
+Score health of your own project functions (age, coverage, usage, complexity, docs) and emit CI-friendly JSON:
+
+```bash
+dart run bin/project_vibrancy.dart --path . --format json
+dart run bin/project_vibrancy.dart --path . --format text
+dart run bin/project_vibrancy.dart --path . --format json --since main
+dart run bin/project_vibrancy.dart --path . --file lib/src/foo.dart
+dart run bin/project_vibrancy.dart --path . --folder lib/src/rules
+```
+
+Gate options for CI:
+
+```bash
+dart run bin/project_vibrancy.dart \
+  --path . \
+  --format json \
+  --min-grade C \
+  --max-unused 20 \
+  --max-uncovered 30 \
+  --max-stub-tested 5 \
+  --max-suspicious-coverage 10 \
+  --max-test-drift 8
+```
+
+Exit code is non-zero when any configured gate is violated. A sample workflow is available at `.github/workflows/project-vibrancy.yml`.
+
+JSON summary includes `stubTestedCount`, `suspiciousCoverageCount`, and `testDriftCount` (see `plan/project_vibrancy_report.md` for flag semantics; LCOV lacks per-test attribution, so flags use importer + trivial-assertion heuristics).
+
+### Quality gate CLI (new-code focused)
+
+Use the structured `violations.json` summary to enforce pass/fail conditions in CI:
+
+```bash
+# 1) Run analysis so violations.json is produced
+dart analyze
+
+# 2) Copy and adjust the sample gate config
+cp saropa_quality_gate.yaml.example saropa_quality_gate.yaml
+
+# 3) Evaluate gate conditions
+dart run saropa_lints:quality_gate \
+  --report reports/.saropa_lints/violations.json \
+  --config saropa_quality_gate.yaml
+```
+
+Supported operators: `eq`, `ne`, `gt`, `ge`, `lt`, `le`.
+
+Common metrics:
+
+- `new_critical_issues`
+- `new_vulnerabilities`
+- `new_security_hotspots`
+- `new_code_smells`
+- `new_bugs`
+- `overall_critical_issues`
+- `overall_high_issues`
+- `overall_vulnerabilities`
+
+`violations.json` suppression schema (for CI/report tooling):
+
+```json
+{
+  "summary": {
+    "totalViolations": 120,
+    "suppressions": {
+      "total": 14,
+      "byKind": { "ignore": 8, "ignoreForFile": 4, "baseline": 2 },
+      "byRule": { "avoid_print": 5, "require_https": 3 },
+      "byFile": { "lib/app.dart": 7, "lib/api.dart": 4 }
+    }
+  }
+}
+```
+
+- `summary.suppressions.total`: total suppressed diagnostics.
+- `summary.suppressions.byKind`: suppression mechanism breakdown.
+- `summary.suppressions.byRule`: suppressed count by rule name.
+- `summary.suppressions.byFile`: suppressed count by relative file path.
+
+Exit codes:
+
+- `0`: pass (or warn-only breaches)
+- `1`: fail breach(es)
+- `2`: invalid input/config
+
+GitHub Actions example:
+
+```yaml
+- name: Analyze
+  run: dart analyze
+
+- name: Quality gate
+  run: |
+    cp saropa_quality_gate.yaml.example saropa_quality_gate.yaml
+    dart run saropa_lints:quality_gate \
+      --report reports/.saropa_lints/violations.json \
+      --config saropa_quality_gate.yaml
+```
 
 ### Standalone Scanner
 
@@ -731,7 +872,7 @@ JSON output (from `--format json` or `scanDiagnosticsToJson`) includes `version`
 
 ## Stylistic Rules
 
-175+ rules for team preferences — not included in any correctness tier. Enable individually in your config, via the VS Code extension's Config/Triage view, or use `--stylistic-all` to bulk-enable.
+175+ rules for team preferences — not included in any correctness tier. Enable individually in your config, via the VS Code extension's Setup & triage view, or use `--stylistic-all` to bulk-enable.
 
 Examples: `prefer_relative_imports`, `prefer_single_quotes`, `prefer_arrow_functions`, `prefer_trailing_comma_always`, `prefer_for_in`, `prefer_boolean_prefixes_for_params`
 

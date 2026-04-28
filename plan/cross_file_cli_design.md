@@ -126,13 +126,13 @@ Circular Dependencies (1 found):
 
 | Issue | Location | Severity |
 |-------|----------|----------|
-| `--exclude` flag parsed but not applied | `cross_file_analyzer.dart:12` — comment says "not yet applied" | Low — no user impact until advertised |
-| HTML reporter string interpolation bug | `cross_file_html_reporter.dart:37` — `$u.length` should be `${u.length}`, same on line 38 for `$c.length` | Medium — HTML index page shows list object instead of count |
-| Doc comment lists 3 commands, code has 4 | `bin/cross_file.dart:10` vs line 70 — `report` command missing from library doc comment | Low — cosmetic |
+| ~~`--exclude` not applied~~ | — | Resolved — see Phase 2 deliverables |
+| ~~HTML `$u.length` interpolation~~ | — | Resolved — see Phase 3 deliverables |
+| Library doc comment may lag commands | `bin/cross_file.dart` top-of-file list vs `--help` | Low — prefer `--help` as source of truth |
 
 ---
 
-## Phase 2: Enhanced Analysis — 🔲 NOT STARTED
+## Phase 2: Enhanced Analysis — ⚠️ PARTIALLY COMPLETE
 
 **Goal**: Deeper analysis with symbol-level tracking.
 
@@ -150,6 +150,7 @@ Options:
   --include-private    Include private symbols (default: false)
   --exclude-public-api Exclude package public API (default: false)
   --exclude-overrides  Exclude overridden members (default: true)
+  --heuristic-unused-symbols  Regex-only mode (skip analyzer resolution)
 ```
 
 **Implementation approach**:
@@ -160,6 +161,8 @@ Options:
 5. Exclude entry points (main functions, exported API)
 
 **Risk**: This is the highest-complexity command. Symbol resolution across large projects can be slow. Consider incremental analysis or file-level caching.
+
+**Status**: Top-level `unused-symbols` uses analyzer resolution (`AnalysisContextCollection`) with regex heuristic fallback and `--heuristic-unused-symbols` for the legacy path; `--include-private` / `--exclude-public-api` and annotation-aware retention for `@visibleForTesting`/`@protected`/`@override` apply to both. Method-level unused members remain future work.
 
 ### 2B. Cross-Feature Dependencies
 
@@ -180,6 +183,8 @@ Options:
 3. Build adjacency matrix (feature → feature)
 4. Report violations: feature A importing directly from feature B internals
 
+**Status**: ✅ Implemented via `feature-deps` output (`featureDependencies`, `crossFeatureImports`).
+
 ### 2C. Dead Import Detection
 
 Find imports that are declared but no symbols from them are used:
@@ -196,12 +201,14 @@ dart run saropa_lints:cross_file dead-imports [options]
 
 **Note**: `dart analyze` already reports `unused_import` for single files. This command adds value only if it catches cases the native analyzer misses (e.g., transitive re-exports). Validate the gap before implementing.
 
+**Status**: ⚠️ First pass implemented as `dead-imports` (relative-import heuristic with `as`/`show`/`hide`, local re-export awareness, and deferred `loadLibrary()` handling). Analyzer-backed semantic resolution remains future work.
+
 ### Deliverables
-- [ ] `unused-symbols` command — symbol-to-usage map, annotation-aware filtering
-- [ ] `feature-deps` command — feature boundary detection, dependency matrix
-- [ ] `dead-imports` command — verify gap vs native `unused_import` first
-- [ ] Dependency matrix visualization (text table)
-- [ ] Performance benchmarks for large projects (1000+ files)
+- [x] `unused-symbols` command — first pass top-level symbol-to-usage map
+- [x] `feature-deps` command — feature boundary detection, dependency matrix
+- [x] `dead-imports` command — first pass for likely dead relative imports
+- [x] Dependency matrix visualization (text table)
+- [x] Performance benchmark harness for large projects (`tool/cross_file_benchmark.dart`)
 - [x] Implement `--exclude` glob filtering in `cross_file_analyzer.dart`
 
 ---
@@ -243,29 +250,31 @@ Exit codes: `0` = no issues, `1` = issues found, `2` = configuration error.
 
 `doc/cross_file_ci_example.md` — complete workflow template.
 
-### Watch Mode — 🔲 NOT STARTED
+### Watch Mode — ⚠️ FIRST PASS IMPLEMENTED
 
 ```
 dart run saropa_lints:cross_file watch
 ```
 
-Re-runs analysis on file changes. Requires a file watcher (e.g., `package:watcher`).
+Re-runs analysis on file changes.
 
 **Implementation approach:**
-1. Add `package:watcher` dependency
-2. Watch `lib/` directory for `.dart` file changes
-3. Debounce changes (e.g., 500ms) to avoid rapid re-analysis
-4. Re-run `runCrossFileAnalysis()` and display incremental diff
-5. Support `--command` flag to restrict which analysis runs
+1. Watch project files (`lib/`, `test/`) for `.dart` changes
+2. Debounce changes to avoid rapid re-analysis storms
+3. Re-run `runCrossFileAnalysis()` and print refreshed output
+4. Support `--command` flag to restrict which analysis runs
+5. Add incremental diff presentation in a later iteration
 
 **Priority**: Low — CI/CD is the primary use case, not interactive watching.
+
+**Status**: ⚠️ First pass implemented as `watch` command with debounced reruns, `--command` support, and incremental added/resolved diff summaries; richer progress UI remains future work.
 
 ### Deliverables
 - [x] HTML report generation (`cross_file_html_reporter.dart`)
 - [x] Baseline integration (`cross_file_baseline.dart`)
 - [x] CI-friendly exit codes (0/1/2)
 - [x] GitHub Actions example workflow (`doc/cross_file_ci_example.md`)
-- [ ] Watch mode — low priority, consider deferring
+- [x] Watch mode — first pass (`watch` + `--command` + `--watch-debounce-ms`)
 - [x] Fix HTML reporter string interpolation bug
 
 ---
@@ -313,7 +322,7 @@ if (crossFile.isSymbolUnused(node.name)) {
 
 ---
 
-## Phase 5: VS Code Extension Integration — 🔲 NOT STARTED — ⚠️ CRITICAL
+## Phase 5: VS Code Extension Integration — ✅ COMPLETE
 
 **Goal**: Expose all cross-file CLI commands through the VS Code extension so users can actually discover and use them.
 
@@ -430,14 +439,14 @@ This would follow the same pattern as `saropaLints.todosAndHacks` or `saropaLint
 
 ### Deliverables
 
-- [ ] `extension/src/cross-file-commands.ts` — handler implementations for all 5 cross-file commands
-- [ ] `extension/package.json` — 5 new command registrations with `enablement` conditions
-- [ ] `extension/src/extension.ts` — call `registerCrossFileCommands(context)` from `activate()`
-- [ ] Walkthrough step for cross-file analysis (package.json + `media/walkthrough-cross-file.md`)
-- [ ] Output routing — text results to output channel, file results opened in editor
-- [ ] Status bar feedback — summary message after each command completes
-- [ ] Error handling — no workspace, CLI not found, non-zero exit code
-- [ ] Register cross-file commands in the command catalog registry (see [extension_command_discoverability.md](extension_command_discoverability.md))
+- [x] `extension/src/cross-file-commands.ts` — handler implementations for all 5 cross-file commands
+- [x] `extension/package.json` — 5 new command registrations with `enablement` conditions
+- [x] `extension/src/extension.ts` — call `registerCrossFileCommands(context)` from `activate()`
+- [x] Walkthrough step for cross-file analysis (package.json + `media/walkthrough-cross-file.md`)
+- [x] Output routing — text results to output channel, file results opened in editor
+- [x] Status bar feedback — summary message after each command completes
+- [x] Error handling — no workspace, missing `saropa_lints` dependency, non-zero exit code
+- [x] Register cross-file commands in the command catalog registry (see [extension_command_discoverability.md](extension_command_discoverability.md))
 
 ### Known Risks
 
@@ -454,10 +463,10 @@ This would follow the same pattern as `saropaLints.todosAndHacks` or `saropaLint
 
 ```
 Phase 1 ████████████████████ COMPLETE
-Phase 2 █░░░░░░░░░░░░░░░░░░ 17% (--exclude done, commands not started)
+Phase 2 ██████████████░░░░░░ 70% (`--exclude` + `feature-deps` + semantic top-level `unused-symbols` + first-pass `dead-imports`)
 Phase 3 ██████████████████░░ 90% (watch mode remains)
 Phase 4 █████░░░░░░░░░░░░░░ 25% (graph done, 3 remaining)
-Phase 5 ░░░░░░░░░░░░░░░░░░░  0% (extension integration — CRITICAL)
+Phase 5 ████████████████████ 100% (extension integration complete)
 ```
 
 ### Suggested Next Steps (in order)
@@ -465,10 +474,8 @@ Phase 5 ░░░░░░░░░░░░░░░░░░░  0% (extension
 1. ~~**Fix Phase 3 HTML bug**~~ — ✅ Done
 2. ~~**Implement `--exclude` filtering**~~ — ✅ Done
 3. ~~**Phase 4: `graph` command**~~ — ✅ Done
-4. **⚠️ Phase 5: Extension integration** — CRITICAL, do this before any new CLI commands; without it, existing commands are invisible to extension users
-5. **Phase 2B: `feature-deps`** — medium complexity, uses existing ImportGraphCache
-6. **Phase 2A: `unused-symbols`** — high complexity, needs AnalysisContextCollection
-7. **Phase 2C: `dead-imports`** — validate gap vs native `unused_import` first
+4. ~~**Phase 2A follow-up** — upgrade `unused-symbols` to semantic resolver (`AnalysisContextCollection`) with annotation-aware filtering~~ — ✅ Done for top-level declarations (heuristic fallback + `--heuristic-unused-symbols`)
+5. **Phase 2C follow-up** — semantic `dead-imports` (re-export + deferred support + analyzer-backed symbol resolution)
 8. **Phase 4: `unused-l10n`** — medium complexity, Flutter-specific
 9. **Phase 3: watch mode** — low priority, defer unless user demand
 10. **Phase 4: `duplicates`** — high complexity, defer
@@ -516,6 +523,7 @@ cross_file:
 |------|-------|---------|
 | `bin/cross_file.dart` | 1 | CLI entry point, arg parsing, command routing |
 | `lib/src/cli/cross_file_analyzer.dart` | 1 | Core analysis logic, `runCrossFileAnalysis()` |
+| `lib/src/cli/cross_file_unused_symbols_semantic.dart` | 2 | Analyzer-backed unused top-level symbol detection |
 | `lib/src/cli/cross_file_reporter.dart` | 1 | Text/JSON output, `CrossFileResult` data class |
 | `lib/src/cli/cross_file_html_reporter.dart` | 3 | HTML report generation |
 | `lib/src/cli/cross_file_baseline.dart` | 3 | Baseline JSON load/save/compare |

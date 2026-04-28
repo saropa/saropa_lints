@@ -13,18 +13,17 @@ The analyzer plugin runs rules **one Dart file at a time**. Each rule receives t
 
 ### Existing cross-file infrastructure
 
-A **CLI tool** already exists (`dart run saropa_lints:cross_file`) that builds a project-wide import graph via `ImportGraphCache`. It supports `unused-files`, `circular-deps`, and `import-stats` commands. However:
+A **CLI tool** already exists (`dart run saropa_lints:cross_file`) that builds a project-wide import graph via `ImportGraphCache` and adds symbol/import/feature checks (`unused-symbols` uses the analyzer for top-level references, with heuristic fallback). The VS Code extension exposes cross-file commands, but:
 
-- CLI output is **terminal/JSON only** — no IDE PROBLEMS panel integration
+- CLI output is **terminal/JSON/HTML** — not the native IDE PROBLEMS panel
 - CLI results do **not** appear as squiggles in the editor
-- CLI does **not** provide quick fixes
-- The extension does **not** yet surface CLI results in its sidebar views
+- CLI does **not** provide quick fixes for cross-file findings
 
 ### What would unblock these rules
 
 1. **Extension UI integration**: Surface `cross_file` CLI results in extension sidebar views (unused files, circular deps). This is buildable today — moderate effort.
 2. **Analyzer API change**: If the Dart analysis server or `custom_lint` exposed a multi-file analysis phase, rules could query cross-file state. No timeline for this.
-3. **Symbol-level CLI**: Extend the CLI to detect unused symbols, not just unused files. Requires `AnalysisContextCollection` for full type resolution — high effort.
+3. **Symbol-level CLI**: Top-level unused symbols are covered in the CLI via `AnalysisContextCollection`; method-level / deeper unused-member analysis remains future work for the CLI (these deferred **rules** still need per-diagnostic plugin integration if ever added as lints).
 
 ---
 

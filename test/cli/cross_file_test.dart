@@ -5,6 +5,7 @@ import 'package:path/path.dart' as p;
 import 'package:saropa_lints/src/cli/cross_file_analyzer.dart';
 import 'package:saropa_lints/src/cli/cross_file_reporter.dart';
 import 'package:test/test.dart';
+import '../../bin/cross_file.dart' as cross_file_bin;
 
 /// Unit tests for cross-file CLI: analyzer result shape, reporter, and fixture-based behavior.
 void main() {
@@ -14,6 +15,24 @@ void main() {
     'test',
     'fixtures',
     'cross_file_fixture',
+  );
+  final featureFixturePath = p.join(
+    projectRoot,
+    'test',
+    'fixtures',
+    'cross_file_features_fixture',
+  );
+  final unusedSymbolsFixturePath = p.join(
+    projectRoot,
+    'test',
+    'fixtures',
+    'cross_file_unused_symbols_fixture',
+  );
+  final deadImportsFixturePath = p.join(
+    projectRoot,
+    'test',
+    'fixtures',
+    'cross_file_dead_imports_fixture',
   );
 
   group('runCrossFileAnalysis', () {
@@ -100,5 +119,147 @@ void main() {
         expect(result.missingMirrorTests.single, endsWith('orphan.dart'));
       },
     );
+  });
+
+  group('fixture: cross_file_features_fixture (feature-deps)', () {
+    test('detects cross-feature imports and builds adjacency map', () async {
+      final result = await runCrossFileAnalysis(projectPath: featureFixturePath);
+      expect(result.featureDependencies, isNotEmpty);
+      expect(result.featureDependencies['feature_a'], contains('feature_b'));
+      expect(
+        result.crossFeatureImports.any(
+          (edge) =>
+              edge.contains('lib/features/feature_a/data/a_impl.dart') &&
+              edge.contains('lib/features/feature_b/data/b_impl.dart'),
+        ),
+        isTrue,
+      );
+    });
+
+    test('text reporter includes feature dependency matrix', () async {
+      final result = await runCrossFileAnalysis(projectPath: featureFixturePath);
+      final buffer = StringBuffer();
+      CrossFileReporter.report(result, format: 'text', sink: buffer);
+      final out = buffer.toString();
+      expect(out, contains('Feature dependency matrix (from \\ to):'));
+      expect(out, contains('feature_a'));
+      expect(out, contains('feature_b'));
+      expect(out, contains('X'));
+    });
+  });
+
+  group('fixture: cross_file_unused_symbols_fixture (unused-symbols)', () {
+    test('finds unused top-level symbols and skips used ones', () async {
+      final result = await runCrossFileAnalysis(
+        projectPath: unusedSymbolsFixturePath,
+        unusedSymbolsOptions: const UnusedSymbolsOptions(),
+      );
+      final allUnused = result.unusedSymbols.values.expand((s) => s).toList();
+      expect(allUnused, contains('UnusedClass'));
+      expect(allUnused, contains('unusedTopLevelFunction'));
+      expect(allUnused, contains('unusedConstValue'));
+      expect(allUnused, isNot(contains('UsedClass')));
+      expect(allUnused, isNot(contains('usedTopLevelFunction')));
+      expect(allUnused, isNot(contains('usedConstValue')));
+      expect(allUnused, isNot(contains('helperForTests')));
+      expect(allUnused, isNot(contains('_privateCandidate')));
+    });
+
+    test('forceHeuristic skips analyzer and still matches fixture expectations',
+        () async {
+      final result = await runCrossFileAnalysis(
+        projectPath: unusedSymbolsFixturePath,
+        unusedSymbolsOptions: const UnusedSymbolsOptions(forceHeuristic: true),
+      );
+      final allUnused = result.unusedSymbols.values.expand((s) => s).toList();
+      expect(allUnused, contains('UnusedClass'));
+      expect(allUnused, isNot(contains('UsedClass')));
+      expect(allUnused, isNot(contains('usedTopLevelFunction')));
+      expect(allUnused, isNot(contains('usedConstValue')));
+    });
+
+    test('includePrivate option surfaces private unused symbols', () async {
+      final result = await runCrossFileAnalysis(
+        projectPath: unusedSymbolsFixturePath,
+        unusedSymbolsOptions: const UnusedSymbolsOptions(
+          includePrivate: true,
+        ),
+      );
+      final allUnused = result.unusedSymbols.values.expand((s) => s).toList();
+      expect(allUnused, contains('_privateCandidate'));
+    });
+  });
+
+  group('fixture: cross_file_dead_imports_fixture (dead-imports)', () {
+    test('reports likely dead relative imports with alias/show/hide support', () async {
+      final result = await runCrossFileAnalysis(projectPath: deadImportsFixturePath);
+      expect(result.deadImports, isNotEmpty);
+      expect(result.deadImports['lib/consumer.dart'], isNotNull);
+      expect(result.deadImports['lib/consumer.dart'], contains('unused_dep.dart'));
+      expect(result.deadImports['lib/consumer.dart'], contains('show_only_dead.dart'));
+      expect(result.deadImports['lib/consumer.dart'], isNot(contains('used_dep.dart')));
+      expect(result.deadImports['lib/consumer.dart'], isNot(contains('show_hide_dep.dart')));
+      expect(result.deadImports['lib/consumer.dart'], isNot(contains('hide_dep.dart')));
+      expect(result.deadImports['lib/consumer.dart'], isNot(contains('reexport_barrel.dart')));
+      expect(result.deadImports['lib/consumer.dart'], isNot(contains('deferred_dep.dart')));
+    });
+  });
+
+  group('watch diff helpers', () {
+    test('unused-files diff reports added/resolved counts', () {
+      const prev = CrossFileResult(
+        unusedFiles: ['a.dart', 'b.dart'],
+        circularDependencies: [],
+        missingMirrorTests: [],
+        stats: {'fileCount': 2, 'totalImports': 1},
+        featureDependencies: {},
+        crossFeatureImports: [],
+        deadImports: {},
+      );
+      const curr = CrossFileResult(
+        unusedFiles: ['b.dart', 'c.dart'],
+        circularDependencies: [],
+        missingMirrorTests: [],
+        stats: {'fileCount': 2, 'totalImports': 1},
+        featureDependencies: {},
+        crossFeatureImports: [],
+        deadImports: {},
+      );
+      final msg = cross_file_bin.buildWatchDiffForTest(
+        previous: prev,
+        current: curr,
+        command: 'unused-files',
+      );
+      expect(msg, contains('+1 new'));
+      expect(msg, contains('-1 resolved'));
+    });
+
+    test('import-stats diff reports deltas', () {
+      const prev = CrossFileResult(
+        unusedFiles: [],
+        circularDependencies: [],
+        missingMirrorTests: [],
+        stats: {'fileCount': 4, 'totalImports': 6},
+        featureDependencies: {},
+        crossFeatureImports: [],
+        deadImports: {},
+      );
+      const curr = CrossFileResult(
+        unusedFiles: [],
+        circularDependencies: [],
+        missingMirrorTests: [],
+        stats: {'fileCount': 5, 'totalImports': 3},
+        featureDependencies: {},
+        crossFeatureImports: [],
+        deadImports: {},
+      );
+      final msg = cross_file_bin.buildWatchDiffForTest(
+        previous: prev,
+        current: curr,
+        command: 'import-stats',
+      );
+      expect(msg, contains('files +1'));
+      expect(msg, contains('imports -3'));
+    });
   });
 }
