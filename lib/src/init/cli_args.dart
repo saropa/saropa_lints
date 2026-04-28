@@ -42,6 +42,7 @@ class CliArgs {
     required this.tier,
     required this.listPacksOnly,
     required this.enablePackIds,
+    this.emitCompositePluginScaffold,
     this.targetDir,
   });
 
@@ -64,6 +65,10 @@ class CliArgs {
 
   /// `--enable-pack <id>` (repeatable); merged into `rule_packs.enabled`.
   final List<String> enablePackIds;
+
+  /// Optional output directory for `--emit-composite-plugin-scaffold` (relative
+  /// to `--target` or cwd when not absolute). Default basename when flag has no value.
+  final String? emitCompositePluginScaffold;
 
   /// Target project directory. `null` means current working directory.
   final String? targetDir;
@@ -144,6 +149,17 @@ CliArgs parseArguments(List<String> args) {
     }
   }
 
+  String? emitCompositePluginScaffold;
+  final int scaffoldIdx = args.indexOf('--emit-composite-plugin-scaffold');
+  if (scaffoldIdx != -1) {
+    if (scaffoldIdx + 1 < args.length &&
+        !args[scaffoldIdx + 1].startsWith('-')) {
+      emitCompositePluginScaffold = args[scaffoldIdx + 1];
+    } else {
+      emitCompositePluginScaffold = 'composite_saropa_plugin';
+    }
+  }
+
   return CliArgs(
     isShowHelp: showHelp,
     isDryRun: dryRun,
@@ -155,6 +171,7 @@ CliArgs parseArguments(List<String> args) {
     tier: requestedTier,
     listPacksOnly: listPacksOnly,
     enablePackIds: enablePackIds,
+    emitCompositePluginScaffold: emitCompositePluginScaffold,
     targetDir: targetDir,
   );
 }

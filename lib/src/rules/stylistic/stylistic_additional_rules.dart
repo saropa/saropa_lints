@@ -220,9 +220,7 @@ class PreferDoubleQuotesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  List<String> get conflictingRules => const <String>[
-    'prefer_single_quotes',
-  ];
+  List<String> get conflictingRules => const <String>['prefer_single_quotes'];
 
   @override
   String get exampleBad => "String name = 'John';";
@@ -375,9 +373,7 @@ class PreferGroupedImportsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  List<String> get conflictingRules => const <String>[
-    'prefer_flat_imports',
-  ];
+  List<String> get conflictingRules => const <String>['prefer_flat_imports'];
 
   @override
   String get exampleBad =>
@@ -469,9 +465,7 @@ class PreferFlatImportsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  List<String> get conflictingRules => const <String>[
-    'prefer_grouped_imports',
-  ];
+  List<String> get conflictingRules => const <String>['prefer_grouped_imports'];
 
   @override
   String get exampleBad =>
@@ -1230,9 +1224,7 @@ class PreferVarOverExplicitTypeRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  List<String> get conflictingRules => const <String>[
-    'prefer_type_over_var',
-  ];
+  List<String> get conflictingRules => const <String>['prefer_type_over_var'];
 
   @override
   String get exampleBad => "String name = 'John';";

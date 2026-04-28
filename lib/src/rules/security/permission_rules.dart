@@ -65,6 +65,9 @@ class RequireLocationPermissionRationaleRule extends SaropaLintRule {
   Set<String> get tags => const {'security'};
 
   @override
+  List<int> get cweIds => const <int>[285];
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -186,6 +189,9 @@ class RequireCameraPermissionCheckRule extends SaropaLintRule {
 
   @override
   Set<String> get tags => const {'security'};
+
+  @override
+  List<int> get cweIds => const <int>[862];
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -343,6 +349,9 @@ class PreferImageCroppingRule extends SaropaLintRule {
 
   @override
   Set<String> get tags => const {'security'};
+
+  @override
+  List<int> get cweIds => const <int>[200];
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -523,6 +532,9 @@ class AvoidPermissionHandlerNullSafetyRule extends SaropaLintRule {
   Set<String> get tags => const {'security'};
 
   @override
+  List<int> get cweIds => const <int>[477];
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -640,6 +652,9 @@ class PreferPermissionRequestInContextRule extends SaropaLintRule {
   Set<String> get tags => const {'security'};
 
   @override
+  List<int> get cweIds => const <int>[285];
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -744,6 +759,9 @@ class AvoidPermissionRequestLoopRule extends SaropaLintRule {
   Set<String> get tags => const {'security'};
 
   @override
+  List<int> get cweIds => const <int>[285];
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -816,6 +834,9 @@ class PreferPermissionMinimalRequestRule extends SaropaLintRule {
   Set<String> get tags => const {'security'};
 
   @override
+  List<int> get cweIds => const <int>[250];
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -858,6 +879,9 @@ class RequirePermissionLifecycleObserverRule extends SaropaLintRule {
 
   @override
   Set<String> get tags => const {'security'};
+
+  @override
+  List<int> get cweIds => const <int>[285];
 
   @override
   RuleCost get cost => RuleCost.low;

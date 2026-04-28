@@ -1150,6 +1150,9 @@ class SecurePubspecUrlsRule extends SaropaLintRule {
   RuleType? get ruleType => RuleType.securityHotspot;
 
   @override
+  List<int> get cweIds => const <int>[494];
+
+  @override
   Set<String> get tags => const {'security', 'config', 'pubspec'};
 
   @override

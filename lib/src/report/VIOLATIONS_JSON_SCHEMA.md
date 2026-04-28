@@ -70,8 +70,10 @@ Aggregate statistics for the analysis run. **This is the primary section for CI 
 | `byRuleType` | `object` | `{ "vulnerability": int, "codeSmell": int, "bug": int, "securityHotspot": int, "unspecified": int }` — issue-weighted totals by metadata type |
 | `byRuleStatus` | `object` | `{ "ready": int, "beta": int, "deprecated": int }` — issue-weighted totals by lifecycle status |
 | `ruleSeverities` | `object` | `{ "rule_name": "warning", ... }` — lowercase severity per triggered rule |
+| `newCode` | `object` | Date-based new-code metrics block. When configured: `{ "configured": true, "strategy": "date", "since": "YYYY-MM-DD", "countsSource": "reportedViolations", "totalViolations": int, "byImpact": object, "byRuleType": object, "byRuleStatus": object }`; otherwise `{ "configured": false, "strategy": "date" }` |
 | `thresholds` | `object` | Per-rule threshold gate status and breaches (`status`, `warnings`, `failures`) |
 | `baselineDiff` | `object` | Baseline comparison result (`totalNewViolations`, `newViolationsByRule`, baseline metadata) |
+| `suppressions` | `object` | `{ "total": int, "byKind": { "ignore": int, "ignoreForFile": int, "baseline": int }, "byRule": { "rule_name": int, ... }, "byFile": { "relative/path.dart": int, ... } }` — counts of silenced diagnostics merged across analysis isolates (same source as the extension suppressions views) |
 
 Threshold keys under `diagnostic_statistics.thresholds` can target either:
 - concrete rule names (for example `avoid_hardcoded_credentials`)
@@ -94,6 +96,9 @@ jq -e '.summary.thresholds.status != "fail"' reports/.saropa_lints/violations.js
 
 # Fail CI when PR/run introduces new violations vs baseline snapshot
 jq -e '.summary.baselineDiff.totalNewViolations == 0' reports/.saropa_lints/violations.json
+
+# Surface suppression volume (ignore / ignore_for_file / baseline)
+jq '.summary.suppressions' reports/.saropa_lints/violations.json
 ```
 
 ### Create baseline snapshot for `baselineDiff`
@@ -141,7 +146,7 @@ Individual violation records, sorted by: impact (critical first) → file (alpha
 | `severity` | `string` | `"error"`, `"warning"`, or `"info"` (lowercase) |
 | `impact` | `string` | `"critical"`, `"high"`, `"medium"`, `"low"`, or `"opinionated"` |
 | `owasp` | `object` | `{ "mobile": string[], "web": string[] }` — OWASP category IDs (lowercase), empty arrays when not applicable |
-| `metadata` | `object` | Rule metadata snapshot for this violation (`ruleType`, `ruleStatus`, `cweIds`, `certIds`, `tags`, `accuracyTarget`) |
+| `metadata` | `object` | Rule metadata snapshot for this violation (`ruleType`, `ruleStatus`, `requiresReview`, `defaultReviewState`, `cweIds`, `certIds`, `tags`, `accuracyTarget`) |
 
 ### Example violation entry
 
@@ -161,6 +166,8 @@ Individual violation records, sorted by: impact (critical first) → file (alpha
   "metadata": {
     "ruleType": "vulnerability",
     "ruleStatus": "ready",
+    "requiresReview": false,
+    "defaultReviewState": null,
     "cweIds": [798],
     "certIds": [],
     "tags": ["security"],

@@ -4,9 +4,11 @@ library;
 import 'dart:developer' as dev;
 import 'dart:io';
 
+import 'package:saropa_lints/saropa_lints.dart' show RuleStatus;
 import 'package:saropa_lints/src/config/analysis_options_rule_packs.dart';
 import 'package:saropa_lints/src/config/rule_packs.dart';
 import 'package:saropa_lints/src/init/cli_args.dart';
+import 'package:saropa_lints/src/init/composite_plugin_scaffold.dart';
 import 'package:saropa_lints/src/init/config_reader.dart';
 import 'package:saropa_lints/src/init/config_writer.dart';
 import 'package:saropa_lints/src/init/custom_overrides_core.dart';
@@ -21,6 +23,7 @@ import 'package:saropa_lints/src/init/project_info.dart';
 import 'package:saropa_lints/src/init/rule_metadata.dart';
 import 'package:saropa_lints/src/init/tier_ui.dart';
 import 'package:saropa_lints/src/init/validation.dart';
+import 'package:path/path.dart' as p;
 import 'package:saropa_lints/src/init/whats_new.dart'
     show AnsiColors, formatWhatsNew;
 import 'package:saropa_lints/src/tiers.dart' as tiers;
@@ -136,6 +139,22 @@ Future<void> runInit(List<String> args) async {
     return;
   }
 
+  if (cliArgs.emitCompositePluginScaffold != null) {
+    final String raw = cliArgs.emitCompositePluginScaffold!;
+    final String outPath = p.isAbsolute(raw)
+        ? p.normalize(raw)
+        : p.normalize(p.join(targetDir, raw));
+    emitCompositePluginScaffold(Directory(outPath));
+    // ignore: avoid_print
+    print('Wrote composite analyzer plugin scaffold to: $outPath');
+    // ignore: avoid_print
+    print(
+      'See doc/guides/composite_analyzer_plugin.md for analysis_options.yaml wiring.',
+    );
+
+    return;
+  }
+
   if (cliArgs.enablePackIds.isNotEmpty) {
     for (final String id in cliArgs.enablePackIds) {
       if (!knownRulePackIds.contains(id)) {
@@ -227,6 +246,33 @@ Future<void> runInit(List<String> args) async {
     // not in the main diagnostics block. Keep them out of tier output.
     finalEnabled = finalEnabled.difference(tiers.stylisticRules);
     finalDisabled = finalDisabled.union(tiers.stylisticRules);
+  }
+
+  // Lifecycle defaults: beta/deprecated rules are excluded from fresh tier
+  // output unless users explicitly opt in via persistent overrides.
+  final lifecycleFiltered = <String>{};
+  for (final rule in finalEnabled) {
+    final status = getRuleStatusFromMetadata(rule);
+    if (status == RuleStatus.beta || status == RuleStatus.deprecated) {
+      lifecycleFiltered.add(rule);
+    }
+  }
+  if (lifecycleFiltered.isNotEmpty) {
+    finalEnabled = finalEnabled.difference(lifecycleFiltered);
+    finalDisabled = finalDisabled.union(lifecycleFiltered);
+    final betaCount = lifecycleFiltered
+        .where((r) => getRuleStatusFromMetadata(r) == RuleStatus.beta)
+        .length;
+    final deprecatedCount = lifecycleFiltered.length - betaCount;
+    log.terminal(
+      '${InitColors.yellow}Lifecycle filtered:${InitColors.reset} '
+      '${lifecycleFiltered.length} rules '
+      '${InitColors.dim}(beta: $betaCount, deprecated: $deprecatedCount)${InitColors.reset}',
+    );
+    log.terminal(
+      '${InitColors.dim}Enable specific lifecycle-filtered rules in '
+      'analysis_options_custom.yaml RULE OVERRIDES if needed.${InitColors.reset}',
+    );
   }
 
   // Read or create custom overrides file (survives --reset)
@@ -634,20 +680,19 @@ void _printRelatedRuleHints({
   required Set<String> finalEnabled,
   required Map<String, bool> userCustomizations,
 }) {
-  final explicitlyEnabled = userCustomizations.entries
-      .where((entry) => entry.value)
-      .map((entry) => entry.key)
-      .where(finalEnabled.contains)
-      .toList()
-    ..sort();
+  final explicitlyEnabled =
+      userCustomizations.entries
+          .where((entry) => entry.value)
+          .map((entry) => entry.key)
+          .where(finalEnabled.contains)
+          .toList()
+        ..sort();
   if (explicitlyEnabled.isEmpty) return;
 
   final suggestions = <String, List<String>>{};
   for (final rule in explicitlyEnabled) {
     final conflicting = getConflictingRules(rule).toSet();
-    final relatedNotEnabled = getRelatedRules(
-      rule,
-    ).where((candidate) {
+    final relatedNotEnabled = getRelatedRules(rule).where((candidate) {
       if (finalEnabled.contains(candidate)) return false;
       if (conflicting.contains(candidate)) return false;
       return true;
@@ -657,7 +702,9 @@ void _printRelatedRuleHints({
     }
   }
   if (suggestions.isNotEmpty) {
-    log.terminal('${InitColors.bold}Related rules you may also want:${InitColors.reset}');
+    log.terminal(
+      '${InitColors.bold}Related rules you may also want:${InitColors.reset}',
+    );
     for (final source in suggestions.keys.take(3)) {
       final related = suggestions[source]!;
       log.terminal(
@@ -667,7 +714,9 @@ void _printRelatedRuleHints({
     }
     final hiddenCount = suggestions.length - 3;
     if (hiddenCount > 0) {
-      log.terminal('  ${InitColors.dim}... $hiddenCount more rule(s) with related suggestions${InitColors.reset}');
+      log.terminal(
+        '  ${InitColors.dim}... $hiddenCount more rule(s) with related suggestions${InitColors.reset}',
+      );
     }
     log.terminal('');
   }
@@ -680,7 +729,9 @@ void _printRelatedRuleHints({
   }
   if (migrationHints.isEmpty) return;
 
-  log.terminal('${InitColors.bold}Migration hints (supersedes):${InitColors.reset}');
+  log.terminal(
+    '${InitColors.bold}Migration hints (supersedes):${InitColors.reset}',
+  );
   for (final replacement in migrationHints.keys.take(3)) {
     final replacedRules = migrationHints[replacement]!;
     log.terminal(
@@ -690,7 +741,9 @@ void _printRelatedRuleHints({
   }
   final hiddenMigrations = migrationHints.length - 3;
   if (hiddenMigrations > 0) {
-    log.terminal('  ${InitColors.dim}... $hiddenMigrations more superseding rule(s)${InitColors.reset}');
+    log.terminal(
+      '  ${InitColors.dim}... $hiddenMigrations more superseding rule(s)${InitColors.reset}',
+    );
   }
   log.terminal('');
 }

@@ -7,7 +7,9 @@
 ///    and `kRulePackPubspecMarkersGenerated`, derived from `LintCode('...')` names in each
 ///    `*_rules.dart` under `lib/src/rules/packages/`, then [applyCompositeRulePacks].
 /// 2. **`extension/src/rulePacks/rulePackDefinitions.ts`** — sidebar UI metadata
-///    (`RULE_PACK_DEFINITIONS`, `isPackDetected`) so VS Code matches the analyzer.
+///    (`RULE_PACK_DEFINITIONS`, `isPackDetected`) aligned to [kRulePackRuleCodes] /
+///    [kRulePackPubspecMarkers] / SDK + dependency gates in `rule_packs.dart` (not only
+///    `lib/src/rules/packages/` extraction).
 ///
 /// **[kPubspecMarkersByPack]** must contain exactly one entry per extracted pack id
 /// (empty set allowed for `package_specific`). The script prints WARN lines for mismatches
@@ -20,6 +22,8 @@
 library;
 
 import 'dart:io';
+
+import 'package:saropa_lints/src/config/rule_packs.dart' as packs;
 
 import 'rule_pack_audit.dart'
     show applyCompositeRulePacks, extractFromPackagesDir;
@@ -86,6 +90,28 @@ const Map<String, String> kPackUiLabels = {
   'workmanager': 'workmanager',
 };
 
+String _uiLabelForPackId(String pack) {
+  final mapped = kPackUiLabels[pack];
+  if (mapped != null) return mapped;
+
+  const dartPrefix = 'dart_sdk_';
+  if (pack.startsWith(dartPrefix)) {
+    final tail = pack.split(dartPrefix).skip(1).join('').replaceAll('_', '.');
+    return 'Dart SDK $tail';
+  }
+  const flutterPrefix = 'flutter_sdk_';
+  if (pack.startsWith(flutterPrefix)) {
+    final tail = pack
+        .split(flutterPrefix)
+        .skip(1)
+        .join('')
+        .replaceAll('_', '.');
+    return 'Flutter SDK $tail';
+  }
+
+  return pack;
+}
+
 String _dartSetLiteral(Set<String> codes) {
   final sorted = codes.toList()..sort();
   final buf = StringBuffer();
@@ -107,6 +133,10 @@ void main() {
 
   final sortedPacks = extracted.keys.toList()..sort();
 
+  final registryOnlyPacks = packs.kRulePackRuleCodes.keys
+      .where((id) => !extracted.containsKey(id))
+      .toSet();
+
   final warnings = <String>[];
   for (final pack in sortedPacks) {
     if (!kPubspecMarkersByPack.containsKey(pack)) {
@@ -114,7 +144,7 @@ void main() {
     }
   }
   for (final pack in kPubspecMarkersByPack.keys) {
-    if (!extracted.containsKey(pack)) {
+    if (!extracted.containsKey(pack) && !registryOnlyPacks.contains(pack)) {
       warnings.add('kPubspecMarkersByPack has unused pack: $pack');
     }
   }
@@ -158,22 +188,16 @@ void main() {
   outFile.writeAsStringSync(buf.toString());
   print('Wrote ${outFile.path} (${sortedPacks.length} packs)');
 
-  _writeRulePackDefinitionsTs(
-    root: root,
-    sortedPacks: sortedPacks,
-    extracted: extracted,
-  );
+  _writeRulePackDefinitionsTs(root: root);
 
   for (final w in warnings) {
     print('WARN: $w');
   }
 }
 
-void _writeRulePackDefinitionsTs({
-  required Directory root,
-  required List<String> sortedPacks,
-  required Map<String, Set<String>> extracted,
-}) {
+void _writeRulePackDefinitionsTs({required Directory root}) {
+  final sortedAllPackIds = packs.kRulePackRuleCodes.keys.toList()..sort();
+
   final tsFile = File(
     '${root.path}/extension/src/rulePacks/rulePackDefinitions.ts',
   );
@@ -193,17 +217,25 @@ void _writeRulePackDefinitionsTs({
   sb.writeln(
     '  readonly dependencyGate?: { readonly package: string; readonly constraint: string };',
   );
+  sb.writeln(
+    '  readonly sdkGate?: { readonly sdkKey: string; readonly constraint: string };',
+  );
   sb.writeln('}');
   sb.writeln();
   sb.writeln(
     'export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [',
   );
 
-  for (final pack in sortedPacks) {
-    final label = kPackUiLabels[pack] ?? pack;
-    final markers = (kPubspecMarkersByPack[pack] ?? {}).toList()..sort();
-    final codes = extracted[pack]!.toList()..sort();
+  for (final pack in sortedAllPackIds) {
+    final label = _uiLabelForPackId(pack);
+    final markers =
+        (packs.kRulePackPubspecMarkers[pack] ?? const <String>{}).toList()
+          ..sort();
+    final codes = (packs.kRulePackRuleCodes[pack] ?? const <String>{}).toList()
+      ..sort();
     final markersJs = markers.map((s) => "'$s'").join(', ');
+    final depGate = packs.kRulePackDependencyGates[pack];
+    final sdkGate = packs.kRulePackSdkGates[pack];
     sb.writeln('  {');
     sb.writeln("    id: '$pack',");
     sb.writeln("    label: '${label.replaceAll("'", r"\'")}',");
@@ -213,30 +245,92 @@ void _writeRulePackDefinitionsTs({
       sb.writeln("      '$c',");
     }
     sb.writeln('    ],');
+    if (depGate != null) {
+      sb.writeln(
+        "    dependencyGate: { package: '${depGate.dependency.replaceAll("'", r"\'")}', constraint: '${depGate.constraint.replaceAll("'", r"\'")}' },",
+      );
+    }
+    if (sdkGate != null) {
+      sb.writeln(
+        "    sdkGate: { sdkKey: '${sdkGate.sdkKey.replaceAll("'", r"\'")}', constraint: '${sdkGate.constraint.replaceAll("'", r"\'")}' },",
+      );
+    }
     sb.writeln('  },');
   }
 
-  sb.writeln('  {');
-  sb.writeln("    id: 'collection_compat',");
-  sb.writeln("    label: 'Collection (semver)',");
-  sb.writeln("    matchPubNames: ['collection'],");
-  sb.writeln(
-    "    dependencyGate: { package: 'collection', constraint: '>=1.19.0' },",
-  );
-  sb.writeln('    ruleCodes: [');
-  sb.writeln("      'avoid_collection_methods_with_unrelated_types',");
-  sb.writeln('    ],');
-  sb.writeln('  },');
   sb.writeln('];');
   sb.writeln();
+  sb.writeln('function _compareSemver(a: string, b: string): number {');
+  sb.writeln('  const pa = a.split(".").map((x) => Number.parseInt(x, 10));');
+  sb.writeln('  const pb = b.split(".").map((x) => Number.parseInt(x, 10));');
+  sb.writeln('  const n = Math.max(pa.length, pb.length);');
+  sb.writeln('  for (let i = 0; i < n; i++) {');
+  sb.writeln('    const da = Number.isFinite(pa[i]) ? pa[i] : 0;');
+  sb.writeln('    const db = Number.isFinite(pb[i]) ? pb[i] : 0;');
+  sb.writeln('    if (da !== db) return da < db ? -1 : 1;');
+  sb.writeln('  }');
+  sb.writeln('  return 0;');
+  sb.writeln('}');
+  sb.writeln();
   sb.writeln(
-    '/** True if pubspec.yaml declares any of def.matchPubNames as a dependency entry. */',
+    'function _parseSdkLowerBoundFromPubspec(pubspecYamlContent: string, sdkKey: string): string | null {',
+  );
+  sb.writeln(
+    "  const envMatch = /^environment:\\s*\\n((?:[ \\t]+.*\\n)+)/m.exec(pubspecYamlContent);",
+  );
+  sb.writeln('  if (!envMatch) return null;');
+  sb.writeln('  const envBlock = envMatch[1] ?? "";');
+  sb.writeln('  for (const line of envBlock.split("\\n")) {');
+  sb.writeln('    const trimmed = line.trimStart();');
+  sb.writeln("    if (!trimmed.startsWith(sdkKey + ':')) continue;");
+  sb.writeln("    const raw = trimmed.slice(sdkKey.length + 1).trim();");
+  sb.writeln(
+    "    const rawConstraint = raw.replace(/^['\"]/, '').replace(/['\"]\\s*\$/, '');",
+  );
+  sb.writeln(
+    '    if (!rawConstraint || rawConstraint.length === 0 || rawConstraint === "any") return null;',
+  );
+  sb.writeln(
+    '    const geMatch = />=\\s*(\\d+\\.\\d+\\.\\d+)/.exec(rawConstraint);',
+  );
+  sb.writeln(
+    '    const lower = geMatch?.[1] ?? (rawConstraint.startsWith("^") ? rawConstraint.slice(1).trim() : rawConstraint);',
+  );
+  sb.writeln('    const semver = /^\\d+\\.\\d+\\.\\d+/.exec(lower)?.[0];');
+  sb.writeln('    if (semver) return semver;');
+  sb.writeln('  }');
+  sb.writeln('  return null;');
+  sb.writeln('}');
+  sb.writeln();
+  sb.writeln(
+    'function _constraintAllowsLowerBound(constraint: string, lowerBound: string): boolean {',
+  );
+  sb.writeln('  const c = constraint.trim();');
+  sb.writeln('  if (c.startsWith(">=")) {');
+  sb.writeln('    const min = /^>=\\s*(\\d+\\.\\d+\\.\\d+)/.exec(c)?.[1];');
+  sb.writeln('    if (!min) return false;');
+  sb.writeln('    return _compareSemver(lowerBound, min) >= 0;');
+  sb.writeln('  }');
+  sb.writeln('  return false;');
+  sb.writeln('}');
+  sb.writeln();
+  sb.writeln(
+    '/** True when pubspec markers / environment gates suggest the pack applies. */',
   );
   sb.writeln(
     'export function isPackDetected(def: RulePackDefinition, pubspecContent: string): boolean {',
   );
+  sb.writeln('  if (def.sdkGate) {');
   sb.writeln(
-    "  return def.matchPubNames.some((n) => new RegExp(\`^\\\\s+\${n}\\\\s*:\`, 'm').test(pubspecContent));",
+    '    const lower = _parseSdkLowerBoundFromPubspec(pubspecContent, def.sdkGate.sdkKey);',
+  );
+  sb.writeln('    if (!lower) return false;');
+  sb.writeln(
+    '    return _constraintAllowsLowerBound(def.sdkGate.constraint, lower);',
+  );
+  sb.writeln('  }');
+  sb.writeln(
+    "  return def.matchPubNames.some((n) => new RegExp('^\\\\s+' + n + '\\\\s*:', 'm').test(pubspecContent));",
   );
   sb.writeln('}');
 

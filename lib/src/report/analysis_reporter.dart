@@ -5,7 +5,9 @@ import 'dart:developer' as developer;
 import 'dart:io' show Directory, File, Platform, stderr;
 import 'dart:math' show Random;
 
+import 'package:saropa_lints/saropa_lints.dart' show getRulesFromRegistry;
 import 'package:saropa_lints/src/report/batch_data.dart';
+import 'package:saropa_lints/src/report/diagnostic_statistics.dart';
 import 'package:saropa_lints/src/report/import_graph_tracker.dart';
 import 'package:saropa_lints/src/report/report_consolidator.dart';
 import 'package:saropa_lints/src/report/report_synthesis.dart';
@@ -319,6 +321,7 @@ class AnalysisReporter {
 
   /// Write the consolidated report (summary + full violation list).
   static void _writeCombinedReport(String path, ConsolidatedData data) {
+    final resolvedProjectRoot = _projectRoot ?? Directory.current.path;
     if (data.mergedRawImports.isNotEmpty) {
       ImportGraphTracker.applyMergedImportSnapshot(data.mergedRawImports);
     }
@@ -348,6 +351,10 @@ class AnalysisReporter {
       hasFileImportance: hasFileImportance,
     );
     final delta = _findRunDelta(path, data.total);
+    final diagnosticStats = DiagnosticStatisticsEvaluator.evaluate(
+      projectRoot: resolvedProjectRoot,
+      issuesByRule: data.issuesByRule,
+    );
 
     _writeHeader(buf, config, data.batchCount);
     _writeSynthesisSections(
@@ -362,6 +369,7 @@ class AnalysisReporter {
     _writeImpactSection(buf, data.impactCounts, data.total);
     _writeSeveritySubsection(buf, data);
     _writeTopRulesTable(buf, rows);
+    _writeDiagnosticStatisticsSection(buf, diagnosticStats);
     _writeFileImportance(buf, data.issuesByFile);
     _writePrioritizedViolations(buf, data.violations);
     _writeProjectStructure(buf);
@@ -370,6 +378,69 @@ class AnalysisReporter {
     buf.writeln('Total: ${data.total} issues');
 
     File(path).writeAsStringSync(buf.toString());
+
+    _logThresholdGateWarnings(diagnosticStats.thresholds);
+  }
+
+  static void _writeDiagnosticStatisticsSection(
+    StringBuffer buf,
+    DiagnosticStatisticsEvaluation stats,
+  ) {
+    if (!stats.thresholds.hasBreaches && !stats.baseline.enabled) {
+      return;
+    }
+
+    buf.writeln('DIAGNOSTIC STATISTICS');
+
+    if (stats.thresholds.hasBreaches) {
+      if (stats.thresholds.failures.isNotEmpty) {
+        buf.writeln('  Threshold failures:');
+        for (final breach in stats.thresholds.failures) {
+          buf.writeln(
+            '    - ${breach.rule}: ${breach.count} > fail ${breach.threshold}',
+          );
+        }
+      }
+      if (stats.thresholds.warnings.isNotEmpty) {
+        buf.writeln('  Threshold warnings:');
+        for (final breach in stats.thresholds.warnings) {
+          buf.writeln(
+            '    - ${breach.rule}: ${breach.count} > warn ${breach.threshold}',
+          );
+        }
+      }
+    } else if (DiagnosticStatisticsConfig.hasThresholds) {
+      buf.writeln('  Thresholds: configured, no breaches.');
+    }
+
+    if (stats.baseline.enabled) {
+      if (!stats.baseline.baselineFound) {
+        buf.writeln(
+          '  Baseline: file not found (${stats.baseline.baselinePath ?? 'unknown path'})',
+        );
+      } else {
+        buf.writeln(
+          '  Baseline: +${stats.baseline.totalNewViolations} new violations '
+          '(vs ${stats.baseline.baselineTotal} baseline issues).',
+        );
+        if (stats.baseline.byRule.isNotEmpty) {
+          final topDeltas = stats.baseline.byRule.entries.toList()
+            ..sort((a, b) => b.value.compareTo(a.value));
+          for (final entry in topDeltas.take(5)) {
+            buf.writeln('    - ${entry.key}: +${entry.value}');
+          }
+        }
+      }
+    }
+    buf.writeln();
+  }
+
+  static void _logThresholdGateWarnings(ThresholdEvaluation thresholds) {
+    if (thresholds.failures.isEmpty) return;
+    stderr.writeln(
+      '[saropa_lints] Threshold gate failed for '
+      '${thresholds.failures.length} rule(s).',
+    );
   }
 
   /// Find the previous run's total for the `CHANGE SINCE LAST RUN` section.
@@ -552,7 +623,50 @@ class AnalysisReporter {
     buf.writeln('  Files analyzed:     ${data.filesAnalyzed}');
     buf.writeln('  Files with issues:  ${data.filesWithIssues}');
     buf.writeln('  Rules triggered:    ${data.issuesByRule.length}');
+    final metadata = _buildMetadataIssueBreakdown(data.issuesByRule);
+    if (metadata.byRuleType.isNotEmpty) {
+      buf.writeln(
+        '  By rule type:      ${_formatMetadataBreakdown(metadata.byRuleType)}',
+      );
+    }
+    if (metadata.byRuleStatus.isNotEmpty) {
+      buf.writeln(
+        '  By rule status:    ${_formatMetadataBreakdown(metadata.byRuleStatus)}',
+      );
+    }
     buf.writeln();
+  }
+
+  static _MetadataIssueBreakdown _buildMetadataIssueBreakdown(
+    Map<String, int> issuesByRule,
+  ) {
+    if (issuesByRule.isEmpty) {
+      return const _MetadataIssueBreakdown(
+        byRuleType: <String, int>{},
+        byRuleStatus: <String, int>{},
+      );
+    }
+    final byRuleType = <String, int>{};
+    final byRuleStatus = <String, int>{};
+    final rules = getRulesFromRegistry(issuesByRule.keys.toSet());
+    for (final rule in rules) {
+      final ruleName = rule.code.lowerCaseName;
+      final count = issuesByRule[ruleName];
+      if (count == null || count <= 0) continue;
+      final ruleType = rule.ruleType?.name ?? 'unspecified';
+      final ruleStatus = rule.ruleStatus.name;
+      byRuleType[ruleType] = (byRuleType[ruleType] ?? 0) + count;
+      byRuleStatus[ruleStatus] = (byRuleStatus[ruleStatus] ?? 0) + count;
+    }
+    return _MetadataIssueBreakdown(
+      byRuleType: byRuleType,
+      byRuleStatus: byRuleStatus,
+    );
+  }
+
+  static String _formatMetadataBreakdown(Map<String, int> counts) {
+    final sorted = counts.entries.toList()..sort((a, b) => b.value - a.value);
+    return sorted.map((entry) => '${entry.key}=${entry.value}').join(', ');
   }
 
   /// Write the analysis configuration section.
@@ -1053,4 +1167,14 @@ class AnalysisReporter {
     _debounceTimer?.cancel();
     _debounceTimer = null;
   }
+}
+
+class _MetadataIssueBreakdown {
+  const _MetadataIssueBreakdown({
+    required this.byRuleType,
+    required this.byRuleStatus,
+  });
+
+  final Map<String, int> byRuleType;
+  final Map<String, int> byRuleStatus;
 }

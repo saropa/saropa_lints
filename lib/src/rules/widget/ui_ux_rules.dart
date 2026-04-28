@@ -902,6 +902,12 @@ class PreferSkeletonOverSpinnerRule extends SaropaLintRule {
         return;
       }
 
+      // Determinate progress indicators (value != null) communicate progress,
+      // not placeholder loading, so skip this skeleton-loader recommendation.
+      if (_hasDeterminateValue(node)) {
+        return;
+      }
+
       // Check if inside conditional (loading state)
       AstNode? current = node.parent;
       while (current != null) {
@@ -919,6 +925,24 @@ class PreferSkeletonOverSpinnerRule extends SaropaLintRule {
         current = current.parent;
       }
     });
+  }
+
+  bool _hasDeterminateValue(InstanceCreationExpression node) {
+    for (final arg
+        in node.argumentList.arguments.whereType<NamedExpression>()) {
+      if (arg.name.label.name != 'value') {
+        continue;
+      }
+
+      final expression = arg.expression;
+      if (expression is NullLiteral) {
+        return false;
+      }
+
+      return true;
+    }
+
+    return false;
   }
 }
 

@@ -2522,7 +2522,9 @@ class PreferFractionalSizingRule extends SaropaLintRule {
 /// the next page). The rule does not flag those dimension reads when used in a
 /// multiply or divide with a numeric literal (screen fraction), nor when
 /// compared to a numeric literal (responsive breakpoints), and it does not
-/// flag `MediaQueryData.viewInsets` or other non-size fields.
+/// flag `MediaQueryData.viewInsets` or other non-size fields. It also skips
+/// non-build scopes such as lifecycle/setup methods and callbacks that are not
+/// builder functions taking a `BuildContext`.
 ///
 /// **Bad:**
 /// ```dart
@@ -2581,6 +2583,7 @@ class PreferLayoutBuilderForConstraintsRule extends SaropaLintRule {
                 parent.propertyName.name == 'height')) {
           return;
         }
+        if (_isInNonBuildScope(node)) return;
         reporter.atNode(node, _code);
         return;
       }
@@ -2588,10 +2591,21 @@ class PreferLayoutBuilderForConstraintsRule extends SaropaLintRule {
           (_isMediaQuerySizeAccess(target) ||
               _isMediaQuerySizeOfResult(target))) {
         if (_isMediaQuerySizeDimensionInLiteralScaleOrBreakpoint(node)) return;
+        if (_isInNonBuildScope(node)) return;
         reporter.atNode(node, _code);
       }
     });
   }
+
+  static const Set<String> _nonBuildLifecycleMethods = <String>{
+    'initState',
+    'didChangeDependencies',
+    'didUpdateWidget',
+    'dispose',
+    'reassemble',
+    'deactivate',
+    'activate',
+  };
 
   static bool _isMediaQueryOf(Expression target) {
     if (target is MethodInvocation) {
@@ -2655,6 +2669,38 @@ class PreferLayoutBuilderForConstraintsRule extends SaropaLintRule {
       current = current.expression;
     }
     return current;
+  }
+
+  static bool _isInNonBuildScope(AstNode node) {
+    for (AstNode? cur = node; cur != null; cur = cur.parent) {
+      if (cur is MethodDeclaration) {
+        final String methodName = cur.name.lexeme;
+        if (methodName == 'build') return false;
+        if (_nonBuildLifecycleMethods.contains(methodName)) return true;
+        return !_declaresBuildContextParameter(cur.parameters);
+      }
+      if (cur is FunctionExpression) {
+        final FormalParameterList? parameters = cur.parameters;
+        if (!_declaresBuildContextParameter(parameters)) return true;
+      }
+    }
+    return false;
+  }
+
+  static bool _declaresBuildContextParameter(FormalParameterList? parameters) {
+    if (parameters == null) return false;
+    for (final FormalParameter parameter in parameters.parameters) {
+      final FormalParameter normalized = switch (parameter) {
+        DefaultFormalParameter() => parameter.parameter,
+        _ => parameter,
+      };
+      if (normalized is! SimpleFormalParameter) continue;
+      final TypeAnnotation? type = normalized.type;
+      if (type is NamedType && type.name.lexeme == 'BuildContext') {
+        return true;
+      }
+    }
+    return false;
   }
 }
 

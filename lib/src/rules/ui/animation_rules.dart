@@ -2355,10 +2355,35 @@ class PreferSingleTickerProviderStateMixinRule extends SaropaLintRule {
       // plural mixin is correct.
       if (controllerCount != 1) return;
 
+      // Guard: if this State hands `vsync: this` to any external constructor
+      // or helper call, there is at least one additional ticker consumer.
+      // Downgrading to SingleTickerProviderStateMixin can then break at
+      // runtime on the second createTicker call.
+      final _VsyncThisHandoffVisitor handoffVisitor =
+          _VsyncThisHandoffVisitor();
+      node.body.accept(handoffVisitor);
+      if (handoffVisitor.hasVsyncThisHandoff) return;
+
       // Report at the mixin token so the squiggle lands on exactly what the
       // user needs to change, and the quick fix rewrites just that token.
       reporter.atNode(mixinNamedType);
     });
+  }
+}
+
+class _VsyncThisHandoffVisitor extends RecursiveAstVisitor<void> {
+  bool hasVsyncThisHandoff = false;
+
+  @override
+  void visitNamedExpression(NamedExpression node) {
+    if (hasVsyncThisHandoff) return;
+
+    if (node.name.label.name == 'vsync' && node.expression is ThisExpression) {
+      hasVsyncThisHandoff = true;
+      return;
+    }
+
+    super.visitNamedExpression(node);
   }
 }
 

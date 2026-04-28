@@ -11,7 +11,7 @@ import 'package:path/path.dart' as p;
 ///
 /// Standard Dart `lcov.info` does not attribute hits per test; importer + triviality
 /// is an approximation aligned with
-/// [plan/history/2026.04/2026.04.28/project_vibrancy_report.md].
+/// `plan/history/2026.04/2026.04.28/project_vibrancy_report.md`.
 class ProjectCoverageQualityIndex {
   ProjectCoverageQualityIndex({
     required this.testsImportingLib,
@@ -97,11 +97,13 @@ Future<int?> gitLastCommitEpochSec({
   final root = p.normalize(projectRoot);
   final abs = p.normalize(absoluteDartPath);
   final rel = p.relative(abs, from: root);
-  final proc = await Process.run(
-    'git',
-    <String>['log', '-1', '--format=%ct', '--', rel],
-    workingDirectory: root,
-  );
+  final proc = await Process.run('git', <String>[
+    'log',
+    '-1',
+    '--format=%ct',
+    '--',
+    rel,
+  ], workingDirectory: root);
   if (proc.exitCode != 0) return null;
   final out = proc.stdout;
   if (out is! String) return null;

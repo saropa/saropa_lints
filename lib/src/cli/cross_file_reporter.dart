@@ -146,10 +146,7 @@ class CrossFileReporter {
     }
     sink.writeln('');
     sink.writeln('Feature dependency matrix (from \\ to):');
-    _writeFeatureDependencyMatrix(
-      sink: sink,
-      featureDeps: featureDeps,
-    );
+    _writeFeatureDependencyMatrix(sink: sink, featureDeps: featureDeps);
 
     sink.writeln('');
     if (crossImports.isNotEmpty) {
@@ -161,7 +158,10 @@ class CrossFileReporter {
     }
 
     final deadImports = result.deadImports;
-    final deadImportCount = deadImports.values.fold<int>(0, (sum, values) => sum + values.length);
+    final deadImportCount = deadImports.values.fold<int>(
+      0,
+      (sum, values) => sum + values.length,
+    );
     sink.writeln('Dead Imports ($deadImportCount found):');
     if (deadImportCount == 0) {
       sink.writeln('  (none)');
@@ -179,7 +179,10 @@ class CrossFileReporter {
     sink.writeln('');
 
     final unusedSymbols = result.unusedSymbols;
-    final totalUnused = unusedSymbols.values.fold<int>(0, (sum, symbols) => sum + symbols.length);
+    final totalUnused = unusedSymbols.values.fold<int>(
+      0,
+      (sum, symbols) => sum + symbols.length,
+    );
     sink.writeln('Unused Symbols ($totalUnused found):');
     if (totalUnused == 0) {
       sink.writeln('  (none)');
@@ -217,8 +220,7 @@ class CrossFileReporter {
     final allFeatures = <String>{
       ...featureDeps.keys,
       for (final targets in featureDeps.values) ...targets,
-    }.toList()
-      ..sort();
+    }.toList()..sort();
     if (allFeatures.isEmpty) {
       sink.writeln('  (none)');
       return;

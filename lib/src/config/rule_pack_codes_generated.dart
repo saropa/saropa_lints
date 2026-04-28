@@ -91,6 +91,7 @@ const Map<String, Set<String>> kRulePackRuleCodesGenerated = {
     'avoid_drift_enum_index_reorder',
     'avoid_drift_foreign_key_in_migration',
     'avoid_drift_get_single_without_unique',
+    'avoid_drift_insert_missing_conflict_target',
     'avoid_drift_lazy_database',
     'avoid_drift_log_statements_production',
     'avoid_drift_missing_updates_param',
@@ -168,6 +169,7 @@ const Map<String, Set<String>> kRulePackRuleCodesGenerated = {
     'require_firebase_reauthentication',
     'require_firebase_token_refresh',
     'require_firestore_index',
+    'require_firestore_security_rules',
     'require_map_idle_callback',
   },
   'flame': {'avoid_creating_vector_in_update', 'avoid_redundant_async_on_load'},
@@ -180,6 +182,7 @@ const Map<String, Set<String>> kRulePackRuleCodesGenerated = {
   },
   'geolocator': {
     'avoid_continuous_location_updates',
+    'avoid_geolocator_background_without_config',
     'prefer_geocoding_cache',
     'prefer_geolocation_coarse_location',
     'require_geolocator_battery_awareness',

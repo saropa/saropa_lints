@@ -2,7 +2,7 @@
 library;
 
 import 'package:saropa_lints/saropa_lints.dart'
-    show RuleTier, SaropaLintRule, allSaropaRules;
+    show RuleStatus, RuleTier, SaropaLintRule, allSaropaRules;
 // ignore: implementation_imports
 import 'package:saropa_lints/src/tiers.dart' as tiers;
 import 'package:saropa_lints/src/string_slice_utils.dart';
@@ -69,6 +69,7 @@ class RuleMetadata {
     required this.correctionMessage,
     required this.severity,
     required this.tier,
+    required this.ruleStatus,
     required this.hasFix,
     required this.relatedRules,
     required this.conflictingRules,
@@ -82,6 +83,7 @@ class RuleMetadata {
   final String correctionMessage;
   final String severity; // 'ERROR', 'WARNING', 'INFO'
   final RuleTier tier;
+  final RuleStatus ruleStatus;
 
   /// Whether this rule provides a quick fix in the IDE.
   final bool hasFix;
@@ -125,6 +127,7 @@ Map<String, RuleMetadata> getRuleMetadata() {
       correctionMessage: correction,
       severity: severity,
       tier: tier,
+      ruleStatus: rule.ruleStatus,
       hasFix: rule.fixGenerators.isNotEmpty,
       relatedRules: rule.relatedRules,
       conflictingRules: rule.conflictingRules,
@@ -135,6 +138,11 @@ Map<String, RuleMetadata> getRuleMetadata() {
   }
 
   return cache;
+}
+
+/// Gets the lifecycle status for a rule.
+RuleStatus getRuleStatusFromMetadata(String ruleName) {
+  return getRuleMetadata()[ruleName]?.ruleStatus ?? RuleStatus.ready;
 }
 
 /// Gets the problem message for a rule (for YAML comment).

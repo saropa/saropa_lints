@@ -3157,6 +3157,9 @@ class RequireWebviewUserAgentRule extends SaropaLintRule {
   Set<String> get tags => const {'security'};
 
   @override
+  List<int> get cweIds => const <int>[16];
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(

@@ -26,6 +26,9 @@ Options:
   -o, --output <file>   Output file (default: analysis_options.yaml)
   --target <path>       Target project directory (default: current directory)
   --list-packs          List applicable rule packs from pubspec.lock, then exit
+  --emit-composite-plugin-scaffold [dir]
+                        Write a minimal meta-plugin package (Saropa + your rules hook).
+                        Default dir: composite_saropa_plugin (under --target when relative)
   --enable-pack <id>    Add pack to rule_packs.enabled (repeatable); merged with existing
   --stylistic-all       Bulk-enable all stylistic rules
   --no-stylistic        Exclude stylistic rules (default)
@@ -46,6 +49,7 @@ Examples:
   dart run saropa_lints:init --tier recommended --stylistic-all
   dart run saropa_lints:init --dry-run --tier recommended
   dart run saropa_lints:init --list-packs
+  dart run saropa_lints:init --emit-composite-plugin-scaffold packages/acme_saropa_plugin
   dart run saropa_lints:init --tier recommended --enable-pack riverpod
 
 After generating, run `dart analyze` to verify.

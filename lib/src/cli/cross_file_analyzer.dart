@@ -138,7 +138,9 @@ Map<String, List<String>> _analyzeDeadImports({
 }) {
   final root = p.normalize(projectPath).replaceAll('\\', '/');
   final result = <String, List<String>>{};
-  final exportNameResolver = _LocalExportNameResolver(includedPaths: includedPaths);
+  final exportNameResolver = _LocalExportNameResolver(
+    includedPaths: includedPaths,
+  );
 
   final dartFiles = includedPaths.where((path) => path.endsWith('.dart'));
   final importPattern = RegExp(
@@ -162,7 +164,9 @@ Map<String, List<String>> _analyzeDeadImports({
       if (uri == null) continue;
       if (uri.startsWith('dart:') || uri.startsWith('package:')) continue;
 
-      final importedPath = p.normalize(p.join(p.dirname(filePath), uri)).replaceAll('\\', '/');
+      final importedPath = p
+          .normalize(p.join(p.dirname(filePath), uri))
+          .replaceAll('\\', '/');
       if (!includedPaths.contains(importedPath)) continue;
       final importedFile = File(importedPath);
       if (!importedFile.existsSync()) continue;
@@ -245,12 +249,17 @@ class _LocalExportNameResolver {
     final content = file.readAsStringSync();
     final names = _collectTopLevelExportedNames(content);
 
-    final exportPattern = RegExp(r'''^\s*export\s+['"]([^'"]+)['"]''', multiLine: true);
+    final exportPattern = RegExp(
+      r'''^\s*export\s+['"]([^'"]+)['"]''',
+      multiLine: true,
+    );
     for (final match in exportPattern.allMatches(content)) {
       final uri = match.group(1);
       if (uri == null) continue;
       if (uri.startsWith('dart:') || uri.startsWith('package:')) continue;
-      final target = p.normalize(p.join(p.dirname(filePath), uri)).replaceAll('\\', '/');
+      final target = p
+          .normalize(p.join(p.dirname(filePath), uri))
+          .replaceAll('\\', '/');
       if (!includedPaths.contains(target)) continue;
       names.addAll(collect(target, visiting: seen));
     }
@@ -289,9 +298,7 @@ _ImportTailSpec _parseImportTail(String tail) {
       ..write(r'\b')
       ..write(RegExp.escape(keyword))
       ..write(r'\s+([^;]+?)(?=\b(?:show|hide|as)\b|$)');
-    final match = RegExp(
-      pattern.toString(),
-    ).firstMatch(tail);
+    final match = RegExp(pattern.toString()).firstMatch(tail);
     if (match == null) return;
     final raw = match.group(1);
     if (raw == null) return;
@@ -352,7 +359,11 @@ Set<String> _collectTopLevelExportedNames(String content) {
     final name = m.group(1);
     if (name == null) continue;
     if (name.startsWith('_')) continue;
-    if (name == 'main' || name == 'if' || name == 'for' || name == 'while' || name == 'switch') {
+    if (name == 'main' ||
+        name == 'if' ||
+        name == 'for' ||
+        name == 'while' ||
+        name == 'switch') {
       continue;
     }
     names.add(name);
@@ -400,11 +411,15 @@ Map<String, List<String>> _analyzeUnusedTopLevelSymbolsHeuristic({
   for (final filePath in symbolsByFile.keys) {
     final content = fileContents[filePath] ?? '';
     final exports = <String>{};
-    for (final m in RegExp(r'''export\s+['"]([^'"]+)['"]''').allMatches(content)) {
+    for (final m in RegExp(
+      r'''export\s+['"]([^'"]+)['"]''',
+    ).allMatches(content)) {
       final raw = m.group(1);
       if (raw == null) continue;
       if (raw.startsWith('dart:') || raw.startsWith('package:')) continue;
-      final resolved = p.normalize(p.join(p.dirname(filePath), raw)).replaceAll('\\', '/');
+      final resolved = p
+          .normalize(p.join(p.dirname(filePath), raw))
+          .replaceAll('\\', '/');
       exports.add(resolved);
     }
     exportsByFile[filePath] = exports;
@@ -484,7 +499,11 @@ void _collectTopLevelSymbols({
   for (final m in functionLike.allMatches(content)) {
     final name = m.group(1);
     if (name == null) continue;
-    if (name == 'main' || name == 'if' || name == 'for' || name == 'while' || name == 'switch') {
+    if (name == 'main' ||
+        name == 'if' ||
+        name == 'for' ||
+        name == 'while' ||
+        name == 'switch') {
       continue;
     }
     if (_hasRetainedAnnotation(content, m.start, retainedAnnotations)) continue;

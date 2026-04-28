@@ -2088,9 +2088,25 @@ abstract class SaropaLintRule extends AnalysisRule {
   static const String? _noExample = null;
   static const OwaspMapping? _noOwasp = null;
   static const RuleType? _noRuleType = null;
-  static const AccuracyTarget? _noAccuracyTarget = null;
   static const Set<FileType>? _noApplicableFileTypes = null;
   static const Set<String>? _noRequiredPatterns = null;
+  static const AccuracyTarget _bugAccuracyTarget = AccuracyTarget(
+    expectZeroFalsePositives: true,
+    description: 'Bug rule default target: zero false positives.',
+  );
+  static const AccuracyTarget _codeSmellAccuracyTarget = AccuracyTarget(
+    expectZeroFalsePositives: true,
+    description: 'Code smell default target: zero false positives.',
+  );
+  static const AccuracyTarget _vulnerabilityAccuracyTarget = AccuracyTarget(
+    minTruePositiveRate: 0.8,
+    description: 'Vulnerability default target: >= 80% true positives.',
+  );
+  static const AccuracyTarget _securityHotspotAccuracyTarget = AccuracyTarget(
+    minTruePositiveRate: 0.8,
+    description:
+        'Security hotspot default target: >= 80% resolved after review.',
+  );
 
   /// The lint code for this rule.
   LintCode get code => _lintCode;
@@ -2258,8 +2274,18 @@ abstract class SaropaLintRule extends AnalysisRule {
 
   /// Optional accuracy target for this rule (for documentation and tooling).
   /// Does not enforce; used by reports and rule-audit scripts.
-  // Named sentinel instead of literal `null` — see _noExample above for rationale.
-  AccuracyTarget? get accuracyTarget => _noAccuracyTarget;
+  ///
+  /// Defaults are derived from [ruleType] to reduce per-rule boilerplate:
+  /// - bug/codeSmell: zero false positives target
+  /// - vulnerability/securityHotspot: >=80% true-positive/review target
+  /// - unspecified (`ruleType == null`): no explicit target
+  AccuracyTarget? get accuracyTarget => switch (ruleType) {
+    RuleType.bug => _bugAccuracyTarget,
+    RuleType.codeSmell => _codeSmellAccuracyTarget,
+    RuleType.vulnerability => _vulnerabilityAccuracyTarget,
+    RuleType.securityHotspot => _securityHotspotAccuracyTarget,
+    null => null,
+  };
 
   /// Lifecycle status. Default [RuleStatus.ready]. Use [RuleStatus.beta] for
   /// new or heuristic-heavy rules; [RuleStatus.deprecated] for sunset.

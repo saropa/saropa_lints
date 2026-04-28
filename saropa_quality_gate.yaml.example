@@ -1,0 +1,25 @@
+quality_gate:
+  conditions:
+    # Block CI when new critical issues are introduced.
+    - metric: new_critical_issues
+      op: eq
+      value: 0
+      on_fail: fail
+
+    # Block CI when new vulnerabilities are introduced.
+    - metric: new_vulnerabilities
+      op: eq
+      value: 0
+      on_fail: fail
+
+    # Keep hotspots visible but non-blocking until triaged.
+    - metric: new_security_hotspots
+      op: le
+      value: 5
+      on_fail: warn
+
+    # Optional overall budget signal.
+    - metric: overall_high_issues
+      op: le
+      value: 25
+      on_fail: warn

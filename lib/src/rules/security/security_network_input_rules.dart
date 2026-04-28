@@ -1502,6 +1502,9 @@ class PreferTypedDataRule extends SaropaLintRule {
   Set<String> get tags => const {'security'};
 
   @override
+  List<int> get cweIds => const <int>[400];
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -1581,6 +1584,9 @@ class AvoidUnnecessaryToListRule extends SaropaLintRule {
 
   @override
   Set<String> get tags => const {'security'};
+
+  @override
+  List<int> get cweIds => const <int>[400];
 
   @override
   RuleCost get cost => RuleCost.low;

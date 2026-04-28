@@ -56,7 +56,9 @@ Future<Map<String, List<String>>> analyzeUnusedTopLevelSymbolsSemantic({
   for (final filePath in libDartFiles) {
     final content = fileContents[filePath] ?? '';
     final exports = <String>{};
-    for (final m in RegExp(r'''export\s+['"]([^'"]+)['"]''').allMatches(content)) {
+    for (final m in RegExp(
+      r'''export\s+['"]([^'"]+)['"]''',
+    ).allMatches(content)) {
       final raw = m.group(1);
       if (raw == null) continue;
       if (raw.startsWith('dart:') || raw.startsWith('package:')) continue;
@@ -97,7 +99,9 @@ Future<Map<String, List<String>>> analyzeUnusedTopLevelSymbolsSemantic({
     }
 
     final externallyReferenced = <Element>{};
-    for (final filePath in includedNorm.where((path) => path.endsWith('.dart'))) {
+    for (final filePath in includedNorm.where(
+      (path) => path.endsWith('.dart'),
+    )) {
       final file = File(filePath);
       if (!file.existsSync()) continue;
       final ctx = collection.contextFor(filePath);
@@ -118,7 +122,9 @@ Future<Map<String, List<String>>> analyzeUnusedTopLevelSymbolsSemantic({
       if (externallyReferenced.contains(element)) continue;
       final name = element.name;
       if (name == null || name.isEmpty) continue;
-      unusedByFile.putIfAbsent(_relativePath(rootPosix, definingFile), () => <String>[]).add(name);
+      unusedByFile
+          .putIfAbsent(_relativePath(rootPosix, definingFile), () => <String>[])
+          .add(name);
     }
 
     for (final list in unusedByFile.values) {
@@ -225,7 +231,8 @@ Element _normalizeReferencedElement(Element e) {
 }
 
 bool _pathsEqual(String a, String b) =>
-    p.normalize(a).replaceAll('\\', '/') == p.normalize(b).replaceAll('\\', '/');
+    p.normalize(a).replaceAll('\\', '/') ==
+    p.normalize(b).replaceAll('\\', '/');
 
 String _relativePath(String rootPosix, String absolutePath) {
   final normalized = p.normalize(absolutePath).replaceAll('\\', '/');

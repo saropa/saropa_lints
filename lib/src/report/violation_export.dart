@@ -7,10 +7,12 @@ import 'dart:io' show Directory, File, stderr;
 import 'package:path/path.dart' as path;
 import 'package:saropa_lints/saropa_lints.dart'
     show getRulesFromRegistry, rulesWithFixes;
+import 'package:saropa_lints/src/baseline/baseline_manager.dart';
 import 'package:saropa_lints/src/report/analysis_reporter.dart';
 import 'package:saropa_lints/src/report/diagnostic_statistics.dart';
 import 'package:saropa_lints/src/report/health_score_constants.dart';
 import 'package:saropa_lints/src/report/report_consolidator.dart';
+import 'package:saropa_lints/src/rule_tags.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart';
 import 'package:saropa_lints/src/tiers.dart' as tiers;
 import 'package:saropa_lints/src/string_slice_utils.dart';
@@ -211,7 +213,9 @@ class ViolationExporter {
     final stylisticList = tiers.stylisticRules.toList()..sort();
     // Extension uses this to disable "Apply fix" for rules without fixes.
     final fixList = rulesWithFixes.toList()..sort();
-    final relatedRulesByRule = _buildRelatedRulesByRule(config.enabledRuleNames);
+    final relatedRulesByRule = _buildRelatedRulesByRule(
+      config.enabledRuleNames,
+    );
     final conflictingRulesByRule = _buildConflictingRulesByRule(
       config.enabledRuleNames,
     );
@@ -335,6 +339,7 @@ class ViolationExporter {
       'byRuleType': metadataBreakdown.byRuleType,
       'byRuleStatus': metadataBreakdown.byRuleStatus,
       'ruleSeverities': _lowercaseSeverities(data.ruleSeverities),
+      'newCode': _buildNewCodeSummary(data, metadataBreakdown),
       'thresholds': _buildThresholdSummary(diagnosticStats.thresholds),
       'baselineDiff': _buildBaselineDiffSummary(diagnosticStats.baseline),
       // Suppression tracking: counts of diagnostics silenced by ignore
@@ -378,6 +383,49 @@ class ViolationExporter {
       'warnings': warnings,
       'failures': failures,
     };
+  }
+
+  static Map<String, Object> _buildNewCodeSummary(
+    ConsolidatedData data,
+    _MetadataIssueBreakdown metadataBreakdown,
+  ) {
+    final baselineConfig = BaselineManager.config;
+    final baselineDate = baselineConfig?.date;
+    if (baselineDate == null) {
+      return const <String, Object>{'configured': false, 'strategy': 'date'};
+    }
+
+    final hasAdditionalFilters =
+        (baselineConfig?.file != null) ||
+        (baselineConfig?.paths.isNotEmpty ?? false) ||
+        (baselineConfig?.onlyImpacts.isNotEmpty ?? false);
+
+    return <String, Object>{
+      'configured': true,
+      'strategy': 'date',
+      'since': _formatDateOnly(baselineDate),
+      // V1 scope: classify within reported diagnostics only; this keeps output
+      // deterministic without introducing a second analysis pass.
+      'countsSource': 'reportedViolations',
+      'totalViolations': data.total,
+      'byImpact': <String, int>{
+        for (final impact in LintImpact.values)
+          impact.name: data.impactCounts[impact] ?? 0,
+      },
+      'byRuleType': metadataBreakdown.byRuleType,
+      'byRuleStatus': metadataBreakdown.byRuleStatus,
+      if (hasAdditionalFilters)
+        'note':
+            'Additional baseline filters are active (file/paths/onlyImpacts); '
+            'newCode metrics are still based on reported violations.',
+    };
+  }
+
+  static String _formatDateOnly(DateTime value) {
+    final yyyy = value.year.toString().padLeft(4, '0');
+    final mm = value.month.toString().padLeft(2, '0');
+    final dd = value.day.toString().padLeft(2, '0');
+    return '$yyyy-$mm-$dd';
   }
 
   static Map<String, Object> _buildBaselineDiffSummary(BaselineDiff baseline) {
@@ -663,6 +711,8 @@ class _RuleMetadataSnapshot {
   const _RuleMetadataSnapshot({
     required this.ruleType,
     required this.ruleStatus,
+    required this.requiresReview,
+    required this.defaultReviewState,
     required this.cweIds,
     required this.certIds,
     required this.tags,
@@ -672,10 +722,15 @@ class _RuleMetadataSnapshot {
   factory _RuleMetadataSnapshot.fromRule(SaropaLintRule rule) {
     final cwe = rule.cweIds.toList()..sort();
     final cert = rule.certIds.toList()..sort();
-    final tags = rule.tags.toList()..sort();
+    final tags = normalizeRuleTags(rule.tags);
+    final requiresReview =
+        rule.ruleType == RuleType.securityHotspot ||
+        tags.contains('review-required');
     return _RuleMetadataSnapshot(
       ruleType: rule.ruleType?.name,
       ruleStatus: rule.ruleStatus.name,
+      requiresReview: requiresReview,
+      defaultReviewState: requiresReview ? 'open' : null,
       cweIds: cwe,
       certIds: cert,
       tags: tags,
@@ -687,6 +742,8 @@ class _RuleMetadataSnapshot {
 
   final String? ruleType;
   final String ruleStatus;
+  final bool requiresReview;
+  final String? defaultReviewState;
   final List<int> cweIds;
   final List<String> certIds;
   final List<String> tags;
@@ -696,6 +753,8 @@ class _RuleMetadataSnapshot {
     return <String, Object?>{
       'ruleType': ruleType,
       'ruleStatus': ruleStatus,
+      'requiresReview': requiresReview,
+      'defaultReviewState': defaultReviewState,
       'cweIds': cweIds,
       'certIds': certIds,
       'tags': tags,

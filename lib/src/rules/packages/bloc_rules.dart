@@ -3643,14 +3643,10 @@ class PreferCubitForSimpleStateRule extends SaropaLintRule {
   );
 
   @override
-  List<String> get conflictingRules => const <String>[
-    'avoid_cubit_usage',
-  ];
+  List<String> get conflictingRules => const <String>['avoid_cubit_usage'];
 
   @override
-  List<String> get supersedesRules => const <String>[
-    'prefer_cubit_for_simple',
-  ];
+  List<String> get supersedesRules => const <String>['prefer_cubit_for_simple'];
 
   @override
   void runWithReporter(

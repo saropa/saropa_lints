@@ -3769,7 +3769,8 @@ class AvoidMoneyArithmeticOnDoubleRule extends SaropaLintRule {
     'balance',
     'payment',
     'fee',
-    'rate',
+    // Keep "rate" out of standalone money words: most *Rate identifiers
+    // (frameRate, sampleRate, heartRate) are non-financial in practice.
     'salary',
     'wage',
     'revenue',

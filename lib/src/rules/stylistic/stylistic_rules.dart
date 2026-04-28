@@ -1866,9 +1866,7 @@ class PreferSingleQuotesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  List<String> get conflictingRules => const <String>[
-    'prefer_double_quotes',
-  ];
+  List<String> get conflictingRules => const <String>['prefer_double_quotes'];
 
   @override
   String get exampleBad => 'String name = "John";';
