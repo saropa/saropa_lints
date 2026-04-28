@@ -108,6 +108,24 @@ describe('status-classifier', () => {
             assert.strictEqual(cat, 'vibrant');
         });
 
+        it('should cap vibrant to stable when commits and releases are stale for 90+ days', () => {
+            const cat = classifyStatus({
+                score: 85, knownIssue: null, pubDev: null,
+                daysSinceLastCommit: 120,
+                daysSinceLastPublish: 130,
+            });
+            assert.strictEqual(cat, 'stable');
+        });
+
+        it('should cap stable to outdated when commits and releases are stale for 180+ days', () => {
+            const cat = classifyStatus({
+                score: 55, knownIssue: null, pubDev: null,
+                daysSinceLastCommit: 220,
+                daysSinceLastPublish: 300,
+            });
+            assert.strictEqual(cat, 'outdated');
+        });
+
         it('should upgrade stable to vibrant for firebase.google.com (trusted publisher)', () => {
             const cat = classifyStatus({
                 score: 55,

@@ -125,6 +125,27 @@ describe('buildDetailViewHtml', () => {
         assert.ok(html.includes('📋 45 issues'));
     });
 
+    it('should show latest release age in community section', () => {
+        const html = buildDetailViewHtml(makeResult('http', 80));
+        assert.ok(html.includes('Latest release:'), 'detail view should include release activity row');
+    });
+
+    it('should show dormancy warning when commit and release are stale', () => {
+        const result: VibrancyResult = {
+            ...makeResult('http', 80),
+            github: {
+                ...makeResult('http', 80).github!,
+                daysSinceLastCommit: 220,
+            },
+            pubDev: {
+                ...makeResult('http', 80).pubDev!,
+                publishedDate: '2024-01-01T00:00:00Z',
+            },
+        };
+        const html = buildDetailViewHtml(result);
+        assert.ok(html.includes('No commits and no releases in 6+ months'));
+    });
+
     it('should show pub points', () => {
         const html = buildDetailViewHtml(makeResult('http', 80));
         assert.ok(html.includes('140/160 pub points'));

@@ -132,6 +132,14 @@ export const catalogEntries: readonly CatalogEntry[] = [
     icon: 'layers',
   },
   {
+    command: 'saropaLints.emitCompositePluginScaffold',
+    title: 'Composite Analyzer Plugin (scaffold)',
+    description:
+      'Generate a minimal meta-plugin package (Saropa + your rules hook) under a workspace-relative folder.',
+    category: 'Setup & Configuration',
+    icon: 'new-folder',
+  },
+  {
     command: 'saropaLints.createSaropaInstructions',
     title: 'Create AI Agent Instructions',
     description: 'Generate a Saropa Lints instruction file for AI coding assistants.',
@@ -168,6 +176,27 @@ export const catalogEntries: readonly CatalogEntry[] = [
     description: 'Show cross-file import graph totals like file count and import edges.',
     category: 'Analysis',
     icon: 'graph',
+  },
+  {
+    command: 'saropaLints.crossFile.featureDeps',
+    title: 'Cross-File — Show Feature Dependencies',
+    description: 'Show feature-to-feature import relationships for projects using lib/features.',
+    category: 'Analysis',
+    icon: 'organization',
+  },
+  {
+    command: 'saropaLints.crossFile.unusedSymbols',
+    title: 'Cross-File — Find Unused Symbols',
+    description: 'Report likely unused top-level symbols across project files.',
+    category: 'Analysis',
+    icon: 'symbol-method',
+  },
+  {
+    command: 'saropaLints.crossFile.deadImports',
+    title: 'Cross-File — Find Dead Imports',
+    description: 'Report likely dead relative imports where no imported symbols are used.',
+    category: 'Analysis',
+    icon: 'symbol-namespace',
   },
   {
     command: 'saropaLints.crossFile.graph',
@@ -610,6 +639,29 @@ export const catalogEntries: readonly CatalogEntry[] = [
     description: 'Open the full vibrancy report webview with charts and details.',
     category: 'Package Vibrancy',
     icon: 'graph',
+  },
+  {
+    command: 'saropaLints.openProjectVibrancyReport',
+    title: 'Open Project Vibrancy Report',
+    description:
+      'Run a project vibrancy scan (LCOV + analyzer) using Project Vibrancy settings and open the full report.',
+    category: 'Package Vibrancy',
+    icon: 'graph',
+  },
+  {
+    command: 'saropaLints.refreshProjectVibrancySidebar',
+    title: 'Refresh Project Vibrancy Sidebar',
+    description: 'Refresh project-level vibrancy summary data shown in the sidebar.',
+    category: 'Package Vibrancy',
+    icon: 'refresh',
+    internal: true,
+  },
+  {
+    command: 'saropaLints.openProjectVibrancySettings',
+    title: 'Open Project Vibrancy Settings',
+    description: 'Open Settings filtered to saropaLints.projectVibrancy (LCOV path and quality gates).',
+    category: 'Package Vibrancy',
+    icon: 'settings-gear',
   },
   {
     command: 'saropaLints.packageVibrancy.clearCache',

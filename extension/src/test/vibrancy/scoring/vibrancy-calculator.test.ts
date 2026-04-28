@@ -5,6 +5,7 @@ import {
     calcEngagementLevel,
     calcPopularity,
     calcPublishRecency,
+    calcCommitRecency,
     calcFlaggedIssuePenalty,
     calcPublisherTrust,
     calcPubQualityBonus,
@@ -140,6 +141,23 @@ describe('vibrancy-calculator', () => {
             const without = calcEngagementLevel(metrics);
             assert.strictEqual(withUndef, without);
         });
+
+        it('should penalize stale commits even when updated_at is fresh', () => {
+            const baseline = calcEngagementLevel(makeMetrics({
+                avgCommentsPerIssue: 2,
+                daysSinceLastUpdate: 2,
+            }));
+            const withStaleCommits = calcEngagementLevel(
+                makeMetrics({
+                    avgCommentsPerIssue: 2,
+                    daysSinceLastUpdate: 2,
+                }),
+                undefined,
+                120,
+            );
+            assert.ok(withStaleCommits < baseline,
+                `stale commits should reduce engagement: ${withStaleCommits} < ${baseline}`);
+        });
     });
 
     describe('calcPublishRecency', () => {
@@ -155,6 +173,17 @@ describe('vibrancy-calculator', () => {
         it('should return 0 for packages older than 365 days', () => {
             assert.strictEqual(calcPublishRecency(365), 0);
             assert.strictEqual(calcPublishRecency(500), 0);
+        });
+    });
+
+    describe('calcCommitRecency', () => {
+        it('should return 100 for just-committed packages', () => {
+            assert.strictEqual(calcCommitRecency(0), 100);
+        });
+
+        it('should return 0 at and after 90 days', () => {
+            assert.strictEqual(calcCommitRecency(90), 0);
+            assert.strictEqual(calcCommitRecency(180), 0);
         });
     });
 

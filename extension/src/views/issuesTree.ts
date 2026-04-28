@@ -10,6 +10,10 @@ import * as path from 'path';
 import { normalizePath, cachedFileExists, clearFileExistsCache } from '../pathUtils';
 import { getRelatedRules, getRuleDescription, getRuleDocUrl } from '../ruleMetadata';
 import { readViolations, hasViolations, Violation } from '../violationsReader';
+import {
+  SecurityHotspotReviewStateService,
+  isSecurityHotspotViolation,
+} from '../securityHotspotReviewState';
 import { computeHealthScore, estimateScoreWithoutViolation } from '../healthScore';
 import { logReport, logSection, flushReport } from '../reportWriter';
 import {
@@ -258,11 +262,13 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
   private totalUnfiltered = 0;
   /** Rules that have quick-fix generators. Null = unknown (older analyzer), treat all as fixable. */
   private rulesWithFixesSet: Set<string> | null = null;
+  private readonly securityHotspotReviewState: SecurityHotspotReviewStateService;
   /** When true, getTreeItem() returns Expanded instead of Collapsed for all collapsible nodes. */
   private _expandAllOverride = false;
 
   constructor(workspaceState: vscode.Memento) {
     this.workspaceState = workspaceState;
+    this.securityHotspotReviewState = new SecurityHotspotReviewStateService(workspaceState);
     this.suppressions = loadSuppressions(workspaceState);
     this.groupBy = parseViolationsGroupBy(vscode.workspace.getConfiguration('saropaLints'));
   }
@@ -634,6 +640,10 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
       const v = element.violation;
       const absPath = path.join(wsRoot, v.file);
       const exists = cachedFileExists(absPath);
+      const hotspot = isSecurityHotspotViolation(v);
+      const hotspotState = hotspot
+        ? this.securityHotspotReviewState.getEffective(v)
+        : undefined;
       const item = new vscode.TreeItem(
         violationLabel(v),
         vscode.TreeItemCollapsibleState.None,
@@ -655,6 +665,9 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
         tooltip.appendMarkdown('**File not found** — re-run analysis to update.\n\n---\n\n');
       }
       tooltip.appendMarkdown((v.message ?? '').replace(/]/g, '\\]'));
+      if (hotspot && hotspotState) {
+        tooltip.appendMarkdown('\n\n**Hotspot review:** `' + hotspotState + '`');
+      }
       if (v.correction) {
         tooltip.appendMarkdown('\n\n**Fix:** ');
         tooltip.appendMarkdown(v.correction.replace(/]/g, '\\]'));
@@ -686,7 +699,16 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
       // default to fixable for backward compat with older analyzer output.
       // Stale violations are not fixable — the file no longer exists.
       const hasFix = exists && (this.rulesWithFixesSet === null || this.rulesWithFixesSet.has(v.rule));
-      item.contextValue = hasFix ? 'violationFixable' : 'violation';
+      if (hotspot) {
+        item.description = hotspotState;
+      }
+      if (hotspot && hasFix) {
+        item.contextValue = 'violationHotspotFixable';
+      } else if (hotspot) {
+        item.contextValue = 'violationHotspot';
+      } else {
+        item.contextValue = hasFix ? 'violationFixable' : 'violation';
+      }
       item.accessibilityInformation = {
         label: `Line ${v.line} ${v.rule}, ${(v.message ?? '').slice(0, 40)}`,
         role: 'button',

@@ -116,6 +116,12 @@
           "when": "saropaLints.packageVibrancy.hasResults && saropaLints.sidebar.showPackageDetails"
         },
         {
+          "id": "saropaLints.projectVibrancy",
+          "name": "Project Vibrancy",
+          "type": "webview",
+          "when": "saropaLints.isDartProject"
+        },
+        {
           "id": "saropaLints.todosAndHacks",
           "name": "TODOs & Hacks",
           "when": "saropaLints.sidebar.showTodosAndHacks"
@@ -162,6 +168,10 @@
         "title": "Saropa Lints: Initialize / Update Analysis Options"
       },
       {
+        "command": "saropaLints.emitCompositePluginScaffold",
+        "title": "Saropa Lints: Create Composite Analyzer Plugin (scaffold)"
+      },
+      {
         "command": "saropaLints.openConfig",
         "title": "Saropa Lints: Open Analysis Options"
       },
@@ -172,6 +182,18 @@
       {
         "command": "saropaLints.openPackageVibrancy",
         "title": "Saropa Lints: Open Package Vibrancy"
+      },
+      {
+        "command": "saropaLints.openProjectVibrancyReport",
+        "title": "Saropa Lints: Open Project Vibrancy Report"
+      },
+      {
+        "command": "saropaLints.refreshProjectVibrancySidebar",
+        "title": "Saropa Lints: Refresh Project Vibrancy Sidebar"
+      },
+      {
+        "command": "saropaLints.openProjectVibrancySettings",
+        "title": "Saropa Lints: Open Project Vibrancy Settings"
       },
       {
         "command": "saropaLints.crossFile.unusedFiles",
@@ -189,6 +211,24 @@
         "command": "saropaLints.crossFile.importStats",
         "title": "Saropa Lints: Cross-File — Show Import Statistics",
         "icon": "$(graph)",
+        "enablement": "saropaLints.isDartProject"
+      },
+      {
+        "command": "saropaLints.crossFile.featureDeps",
+        "title": "Saropa Lints: Cross-File — Show Feature Dependencies",
+        "icon": "$(organization)",
+        "enablement": "saropaLints.isDartProject"
+      },
+      {
+        "command": "saropaLints.crossFile.unusedSymbols",
+        "title": "Saropa Lints: Cross-File — Find Unused Symbols",
+        "icon": "$(symbol-method)",
+        "enablement": "saropaLints.isDartProject"
+      },
+      {
+        "command": "saropaLints.crossFile.deadImports",
+        "title": "Saropa Lints: Cross-File — Find Dead Imports",
+        "icon": "$(symbol-namespace)",
         "enablement": "saropaLints.isDartProject"
       },
       {
@@ -879,6 +919,11 @@
           "group": "navigation"
         },
         {
+          "command": "saropaLints.openProjectVibrancyReport",
+          "when": "view == saropaLints.overview && saropaLints.isDartProject",
+          "group": "navigation"
+        },
+        {
           "command": "saropaLints.refresh",
           "when": "view == saropaLints.overview",
           "group": "navigation"
@@ -906,6 +951,11 @@
         {
           "command": "saropaLints.openPackageVibrancy",
           "when": "view == saropaLints.config",
+          "group": "navigation"
+        },
+        {
+          "command": "saropaLints.openProjectVibrancyReport",
+          "when": "view == saropaLints.config && saropaLints.isDartProject",
           "group": "navigation"
         },
         {
@@ -957,6 +1007,21 @@
           "command": "saropaLints.packageVibrancy.showReport",
           "when": "view == saropaLints.packageVibrancy.packages && saropaLints.packageVibrancy.hasResults",
           "group": "navigation@6"
+        },
+        {
+          "command": "saropaLints.refreshProjectVibrancySidebar",
+          "when": "view == saropaLints.projectVibrancy && saropaLints.isDartProject",
+          "group": "navigation@1"
+        },
+        {
+          "command": "saropaLints.openProjectVibrancyReport",
+          "when": "view == saropaLints.projectVibrancy && saropaLints.isDartProject",
+          "group": "navigation@2"
+        },
+        {
+          "command": "saropaLints.openProjectVibrancySettings",
+          "when": "view == saropaLints.projectVibrancy && saropaLints.isDartProject",
+          "group": "navigation@3"
         },
         {
           "command": "saropaLints.packageVibrancy.filterBySeverity",
@@ -1291,11 +1356,35 @@
           "when": "saropaLints.isDartProject"
         },
         {
+          "command": "saropaLints.crossFile.featureDeps",
+          "when": "saropaLints.isDartProject"
+        },
+        {
+          "command": "saropaLints.crossFile.unusedSymbols",
+          "when": "saropaLints.isDartProject"
+        },
+        {
+          "command": "saropaLints.crossFile.deadImports",
+          "when": "saropaLints.isDartProject"
+        },
+        {
           "command": "saropaLints.crossFile.graph",
           "when": "saropaLints.isDartProject"
         },
         {
           "command": "saropaLints.crossFile.report",
+          "when": "saropaLints.isDartProject"
+        },
+        {
+          "command": "saropaLints.openProjectVibrancyReport",
+          "when": "saropaLints.isDartProject"
+        },
+        {
+          "command": "saropaLints.refreshProjectVibrancySidebar",
+          "when": "saropaLints.isDartProject"
+        },
+        {
+          "command": "saropaLints.openProjectVibrancySettings",
           "when": "saropaLints.isDartProject"
         },
         {
@@ -1446,6 +1535,59 @@
             "type": "boolean",
             "default": false,
             "markdownDescription": "When **on**, pubspec validation prefers exact version pins (`1.2.3`) and flags caret ranges (`^1.2.3`). When **off** (default), it prefers caret syntax and flags bare versions — matching `dart pub add` behavior. Only one mode is active at a time."
+          }
+        }
+      },
+      {
+        "title": "Project Vibrancy",
+        "properties": {
+          "saropaLints.projectVibrancy.lcovPath": {
+            "type": "string",
+            "default": "coverage/lcov.info",
+            "markdownDescription": "LCOV file path for **Project Vibrancy** scans from the sidebar and full report (relative to the project root, or absolute). Same as CLI `--lcov` — configure here so you never rely on CLI-only runs."
+          },
+          "saropaLints.projectVibrancy.minGrade": {
+            "type": "string",
+            "enum": [
+              "A",
+              "B",
+              "C",
+              "D",
+              "E",
+              "F"
+            ],
+            "default": "F",
+            "description": "Minimum average grade (A=best). F disables this gate for extension scans. Non-zero gate failures still show a banner and copyable JSON."
+          },
+          "saropaLints.projectVibrancy.maxUnused": {
+            "type": "number",
+            "default": 0,
+            "minimum": 0,
+            "markdownDescription": "Fail the scan when unused function count exceeds this value. **0** = do not apply this gate (same as omitting `--max-unused`)."
+          },
+          "saropaLints.projectVibrancy.maxUncovered": {
+            "type": "number",
+            "default": 0,
+            "minimum": 0,
+            "markdownDescription": "Fail when uncovered function count exceeds this value. **0** = off."
+          },
+          "saropaLints.projectVibrancy.maxStubTested": {
+            "type": "number",
+            "default": 0,
+            "minimum": 0,
+            "markdownDescription": "Fail when `stub_tested` function count exceeds this value. **0** = off."
+          },
+          "saropaLints.projectVibrancy.maxSuspiciousCoverage": {
+            "type": "number",
+            "default": 0,
+            "minimum": 0,
+            "markdownDescription": "Fail when `suspicious_coverage` function count exceeds this value. **0** = off."
+          },
+          "saropaLints.projectVibrancy.maxTestDrift": {
+            "type": "number",
+            "default": 0,
+            "minimum": 0,
+            "markdownDescription": "Fail when `test_drift` function count exceeds this value. **0** = off."
           }
         }
       },
@@ -2130,7 +2272,7 @@
           {
             "id": "saropaLints.walkthrough.crossFile",
             "title": "Cross-File Analysis",
-            "description": "Run project-wide checks that single-file analysis cannot do: unused files, circular dependencies, import stats, graph export, and HTML report.\n\n[Find Unused Files](command:saropaLints.crossFile.unusedFiles) · [Generate Cross-File HTML Report](command:saropaLints.crossFile.report)",
+            "description": "Run project-wide checks that single-file analysis cannot do: unused files, circular dependencies, import stats, feature dependencies, dead imports, unused symbols, graph export, and HTML report.\n\n[Find Unused Files](command:saropaLints.crossFile.unusedFiles) · [Generate Cross-File HTML Report](command:saropaLints.crossFile.report)",
             "media": {
               "markdown": "media/walkthrough-cross-file.md"
             },
@@ -2171,7 +2313,7 @@
     "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
     "package": "npm run precompile && npm run check-types && node esbuild.js --production",
     "lint": "tsc --noEmit -p ./",
-    "test": "tsc -p tsconfig.test.json && node node_modules/mocha/bin/mocha \"out-test/test/todosAndHacks/**/*.test.js\" \"out-test/test/driftAdvisor/**/*.test.js\" \"out-test/test/vibrancy/category-dictionary.test.js\" \"out-test/test/vibrancy/vscode-mock.test.js\" \"out-test/test/vibrancy/scan-helpers.test.js\" \"out-test/test/vibrancy/services/review-state.test.js\" \"out-test/test/vibrancy/services/scan-logger.test.js\" \"out-test/test/vibrancy/services/github-api.test.js\" \"out-test/test/vibrancy/services/import-scanner.test.js\" \"out-test/test/vibrancy/services/startup-gate.test.js\" \"out-test/test/vibrancy/services/vibrancy-history.test.js\" \"out-test/test/vibrancy/scoring/status-classifier.test.js\" \"out-test/test/vibrancy/scoring/vibrancy-calculator.test.js\" \"out-test/test/vibrancy/scoring/bloat-calculator.test.js\" \"out-test/test/vibrancy/scoring/override-analyzer.test.js\" \"out-test/test/vibrancy/views/report-html.test.js\" \"out-test/test/vibrancy/views/report-webview.test.js\" \"out-test/test/vibrancy/views/html-utils.test.js\" \"out-test/test/vibrancy/views/detail-view-html.test.js\" \"out-test/test/vibrancy/providers/tree-items.test.js\" \"out-test/test/vibrancy/providers/hover-provider.test.js\" \"out-test/test/rulePacks/**/*.test.js\" \"out-test/test/sidebarSectionVisibilityKeys.test.js\" \"out-test/test/sidebarToggleCommand.test.js\" \"out-test/test/sidebarToggleLabel.test.js\" \"out-test/test/overviewEmbeddedConfigKinds.test.js\" \"out-test/test/treeSerializers.test.js\" \"out-test/test/copyTreeAsJson.test.js\" \"out-test/test/suggestionCounts.test.js\" \"out-test/test/sidebarSectionCounts.test.js\" \"out-test/test/pathUtils.test.js\" \"out-test/test/formatAnalysisIssuesMessage.test.js\" \"out-test/test/findLatestAnalysisReport.test.js\" \"out-test/test/violationsReader.test.js\" \"out-test/test/violationsReaderFilter.test.js\" \"out-test/test/configWriterDisabledRules.test.js\" \"out-test/test/views/**/*.test.js\" \"out-test/test/pubspec-validation.test.js\" \"out-test/test/pubspec-code-actions.test.js\" \"out-test/test/vibrancy/services/pubspec-sorter.test.js\" \"out-test/test/vibrancy/providers/annotate-command.test.js\" \"out-test/test/vibrancy/providers/adoption-gate.test.js\" \"out-test/test/commandCatalogRegistry.test.js\" \"out-test/test/commandCatalogSidebar.test.js\" \"out-test/test/fileRiskData.test.js\" --timeout 10000"
+    "test": "tsc -p tsconfig.test.json && node node_modules/mocha/bin/mocha \"out-test/test/todosAndHacks/**/*.test.js\" \"out-test/test/driftAdvisor/**/*.test.js\" \"out-test/test/vibrancy/category-dictionary.test.js\" \"out-test/test/vibrancy/vscode-mock.test.js\" \"out-test/test/vibrancy/scan-helpers.test.js\" \"out-test/test/vibrancy/services/review-state.test.js\" \"out-test/test/vibrancy/services/scan-logger.test.js\" \"out-test/test/vibrancy/services/github-api.test.js\" \"out-test/test/vibrancy/services/import-scanner.test.js\" \"out-test/test/vibrancy/services/startup-gate.test.js\" \"out-test/test/vibrancy/services/vibrancy-history.test.js\" \"out-test/test/vibrancy/scoring/status-classifier.test.js\" \"out-test/test/vibrancy/scoring/vibrancy-calculator.test.js\" \"out-test/test/vibrancy/scoring/bloat-calculator.test.js\" \"out-test/test/vibrancy/scoring/override-analyzer.test.js\" \"out-test/test/vibrancy/views/report-html.test.js\" \"out-test/test/vibrancy/views/report-webview.test.js\" \"out-test/test/vibrancy/views/html-utils.test.js\" \"out-test/test/vibrancy/views/detail-view-html.test.js\" \"out-test/test/vibrancy/providers/tree-items.test.js\" \"out-test/test/vibrancy/providers/hover-provider.test.js\" \"out-test/test/rulePacks/**/*.test.js\" \"out-test/test/sidebarSectionVisibilityKeys.test.js\" \"out-test/test/sidebarToggleCommand.test.js\" \"out-test/test/sidebarToggleLabel.test.js\" \"out-test/test/overviewEmbeddedConfigKinds.test.js\" \"out-test/test/treeSerializers.test.js\" \"out-test/test/copyTreeAsJson.test.js\" \"out-test/test/suggestionCounts.test.js\" \"out-test/test/sidebarSectionCounts.test.js\" \"out-test/test/pathUtils.test.js\" \"out-test/test/formatAnalysisIssuesMessage.test.js\" \"out-test/test/findLatestAnalysisReport.test.js\" \"out-test/test/owaspExport.test.js\" \"out-test/test/violationsReader.test.js\" \"out-test/test/violationsReaderFilter.test.js\" \"out-test/test/configWriterDisabledRules.test.js\" \"out-test/test/views/**/*.test.js\" \"out-test/test/pubspec-validation.test.js\" \"out-test/test/pubspec-code-actions.test.js\" \"out-test/test/vibrancy/services/pubspec-sorter.test.js\" \"out-test/test/vibrancy/providers/annotate-command.test.js\" \"out-test/test/vibrancy/providers/adoption-gate.test.js\" \"out-test/test/commandCatalogRegistry.test.js\" \"out-test/test/commandCatalogSidebar.test.js\" \"out-test/test/fileRiskData.test.js\" --timeout 10000"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.10",

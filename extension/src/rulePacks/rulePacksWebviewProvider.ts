@@ -41,6 +41,44 @@ interface PackChartRow {
   detected: boolean;
 }
 
+export function isSdkPackId(id: string): boolean {
+  return id.startsWith('dart_sdk_') || id.startsWith('flutter_sdk_');
+}
+
+export function sdkPackRiskKind(def: { id: string; ruleCodes: readonly string[] }): 'breaking' | 'deprecation' | 'none' {
+  if (!isSdkPackId(def.id)) return 'none';
+  return def.ruleCodes.some((code) => code.startsWith('avoid_removed_')) ? 'breaking' : 'deprecation';
+}
+
+export function compareSdkPackRowsByRisk(
+  a: { label: string; risk: 'breaking' | 'deprecation' | 'none' },
+  b: { label: string; risk: 'breaking' | 'deprecation' | 'none' },
+): number {
+  const rank = (risk: 'breaking' | 'deprecation' | 'none'): number => {
+    if (risk === 'breaking') return 0;
+    if (risk === 'deprecation') return 1;
+    return 2;
+  };
+  const byRisk = rank(a.risk) - rank(b.risk);
+  if (byRisk !== 0) return byRisk;
+  return a.label.localeCompare(b.label);
+}
+
+type SdkRiskSelection = 'all' | 'breaking' | 'deprecation';
+
+export function sdkPackMatchesSelection(
+  def: { id: string; ruleCodes: readonly string[] },
+  selection: SdkRiskSelection,
+): boolean {
+  if (!isSdkPackId(def.id)) return false;
+  if (selection === 'all') return true;
+  return sdkPackRiskKind(def) === selection;
+}
+
+function isBreakingSdkPack(def: { id: string; ruleCodes: readonly string[] }): boolean {
+  return sdkPackRiskKind(def) === 'breaking';
+}
+
 export function computePackDashboardStats(rows: readonly PackChartRow[]): PackDashboardStats {
   let enabledPacks = 0;
   let detectedPacks = 0;
@@ -141,15 +179,30 @@ export class RulePacksWebviewProvider implements vscode.WebviewViewProvider {
         rules: count,
       };
     });
+    const detectedSdkPacks = RULE_PACK_DEFINITIONS.filter(
+      (def) => isSdkPackId(def.id) && isPackDetected(def, pubspecContent),
+    );
+    const detectedBreakingSdkPacks = detectedSdkPacks.filter((def) => isBreakingSdkPack(def));
+    const detectedSdkLabels = detectedSdkPacks.map((def) => def.label).sort((a, b) => a.localeCompare(b));
+    const detectedBreakingSdkLabels = detectedBreakingSdkPacks
+      .map((def) => def.label)
+      .sort((a, b) => a.localeCompare(b));
     const stats = computePackDashboardStats(packRows);
     const maxRules = Math.max(1, ...packRows.map((row) => row.rules));
 
-    const rows = packRows.map((row) => {
+    const renderRows = (rowsToRender: typeof packRows) => rowsToRender.map((row) => {
       const def = RULE_PACK_DEFINITIONS.find((d) => d.id === row.id)!;
       const detLabel = row.detected ? 'Yes' : 'No';
       const detClass = row.detected ? 'ok' : 'muted';
+      const riskKind = sdkPackRiskKind(def);
+      const riskBadge = riskKind === 'none'
+        ? ''
+        : `<span class="risk-badge ${riskKind}">${riskKind === 'breaking' ? 'breaking' : 'deprecation'}</span>`;
+      const sdkBadge = isSdkPackId(def.id) ? '<span class="risk-badge sdk">sdk</span>' : '';
       const gateLine = def.dependencyGate
         ? `<div class="gate">${escapeHtml(def.dependencyGate.package)} ${escapeHtml(def.dependencyGate.constraint)} in pubspec.lock</div>`
+        : def.sdkGate
+          ? `<div class="gate">${escapeHtml(def.sdkGate.sdkKey)} ${escapeHtml(def.sdkGate.constraint)} (pubspec environment) ${sdkBadge}${riskBadge}</div>`
         : '';
       return `<tr data-pack="${escapeHtml(row.id)}">
   <td class="pack-name">${escapeHtml(def.label)}${gateLine}</td>
@@ -159,6 +212,20 @@ export class RulePacksWebviewProvider implements vscode.WebviewViewProvider {
   <td><a href="#" class="rules-link" data-pack="${escapeHtml(row.id)}">Rules</a></td>
 </tr>`;
     }).join('\n');
+    const sdkRowsSorted = [...packRows]
+      .filter((row) => isSdkPackId(row.id))
+      .sort((a, b) => {
+        const defA = RULE_PACK_DEFINITIONS.find((d) => d.id === a.id);
+        const defB = RULE_PACK_DEFINITIONS.find((d) => d.id === b.id);
+        const riskA = defA ? sdkPackRiskKind(defA) : 'none';
+        const riskB = defB ? sdkPackRiskKind(defB) : 'none';
+        return compareSdkPackRowsByRisk(
+          { label: a.label, risk: riskA },
+          { label: b.label, risk: riskB },
+        );
+      });
+    const sdkRows = renderRows(sdkRowsSorted);
+    const packageRows = renderRows(packRows.filter((row) => !isSdkPackId(row.id)));
 
     const chartRows = [...packRows]
       .sort((a, b) => b.rules - a.rules || a.label.localeCompare(b.label))
@@ -191,14 +258,28 @@ export class RulePacksWebviewProvider implements vscode.WebviewViewProvider {
   <button class="action-btn" data-command="setTier">Set tier</button>
   <button class="action-btn" data-command="openConfig">Open config YAML</button>
   <button class="action-btn" data-command="runAnalysis">Run analysis</button>
+  <button class="action-btn" data-command="enableDetectedSdkPacks">Enable applicable SDK packs</button>
+  <button class="action-btn" data-command="enableDetectedBreakingSdkPacks">Enable applicable breaking SDK packs</button>
+  <button class="action-btn" data-command="enableDetectedDeprecationSdkPacks">Enable applicable deprecation SDK packs</button>
   <button class="action-btn" data-command="openVibrancy">Open Package Vibrancy</button>
 </div>
+<p class="hint">Rollout preview (all SDK): ${escapeHtml(detectedSdkLabels.join(', ') || 'none detected')}</p>
+<p class="hint">Rollout preview (breaking SDK): ${escapeHtml(detectedBreakingSdkLabels.join(', ') || 'none detected')}</p>
+<p class="hint">Rollout preview (deprecation SDK): ${escapeHtml(
+  detectedSdkPacks
+    .filter((def) => sdkPackRiskKind(def) === 'deprecation')
+    .map((def) => def.label)
+    .sort((a, b) => a.localeCompare(b))
+    .join(', ') || 'none detected',
+)}</p>
 
 <div class="kpis">
   <div class="kpi-card"><div class="kpi-label">Tier</div><div class="kpi-value">${escapeHtml(currentTier)}</div></div>
   <div class="kpi-card"><div class="kpi-label">Enabled packs</div><div class="kpi-value">${stats.enabledPacks}/${stats.totalPacks}</div></div>
   <div class="kpi-card"><div class="kpi-label">Detected packs</div><div class="kpi-value">${stats.detectedPacks}/${stats.totalPacks}</div></div>
   <div class="kpi-card"><div class="kpi-label">Enabled rules (pack-owned)</div><div class="kpi-value">${stats.enabledRules}</div></div>
+  <div class="kpi-card"><div class="kpi-label">Applicable SDK packs</div><div class="kpi-value">${detectedSdkPacks.length}</div></div>
+  <div class="kpi-card"><div class="kpi-label">Applicable breaking SDK packs</div><div class="kpi-value">${detectedBreakingSdkPacks.length}</div></div>
 </div>
 
 <h2>Tiers</h2>
@@ -208,10 +289,17 @@ export class RulePacksWebviewProvider implements vscode.WebviewViewProvider {
 <h2>Pack coverage chart</h2>
 <div class="chart">${chartRows}</div>
 
-<h2>Rule packs</h2>
+<h2>SDK migration packs</h2>
 <table class="packs">
 <thead><tr><th>Pack</th><th>In pubspec</th><th>Enabled</th><th>Rules</th><th></th></tr></thead>
-<tbody>${rows}</tbody>
+<tbody>${sdkRows}</tbody>
+</table>
+<p class="hint">SDK pack labels include <span class="risk-badge sdk">sdk</span> and risk kind tags for quick rollout decisions.</p>
+
+<h2>Package rule packs</h2>
+<table class="packs">
+<thead><tr><th>Pack</th><th>In pubspec</th><th>Enabled</th><th>Rules</th><th></th></tr></thead>
+<tbody>${packageRows}</tbody>
 </table>
 <p class="hint">Detected rules in pubspec domains: ${stats.detectedRules}. Enabled rules via packs: ${stats.enabledRules}.</p>
 
@@ -281,6 +369,10 @@ a { color: var(--vscode-textLink-foreground); cursor: pointer; }
 input:checked + .slider:before { transform: translateX(14px); opacity: 1; }
 .plat th { width: 40%; }
 .gate { font-size: 10px; opacity: 0.7; margin-top: 2px; font-weight: normal; }
+.risk-badge { display: inline-block; margin-left: 6px; border: 1px solid var(--vscode-widget-border); border-radius: 999px; padding: 0 6px; font-size: 10px; line-height: 16px; opacity: 0.95; }
+.risk-badge.sdk { border-color: var(--vscode-textLink-foreground); color: var(--vscode-textLink-foreground); }
+.risk-badge.breaking { border-color: var(--vscode-testing-iconFailed); color: var(--vscode-testing-iconFailed); }
+.risk-badge.deprecation { border-color: var(--vscode-testing-iconQueued); color: var(--vscode-testing-iconQueued); }
 .actions { display: flex; gap: 6px; margin: 8px 0 12px 0; flex-wrap: wrap; }
 .action-btn { border: 1px solid var(--vscode-button-border, var(--vscode-widget-border)); background: var(--vscode-button-secondaryBackground, var(--vscode-editorWidget-background)); color: var(--vscode-button-secondaryForeground, var(--vscode-foreground)); border-radius: 6px; padding: 4px 8px; cursor: pointer; }
 .action-btn:hover { background: var(--vscode-button-secondaryHoverBackground, var(--vscode-list-hoverBackground)); }
@@ -356,6 +448,96 @@ input:checked + .slider:before { transform: translateX(14px); opacity: 1; }
       await vscode.commands.executeCommand('saropaLints.openPackageVibrancy');
       return;
     }
+    if (id === 'enableDetectedSdkPacks') {
+      await this._enableDetectedSdkPacks({ selection: 'all' });
+      return;
+    }
+    if (id === 'enableDetectedBreakingSdkPacks') {
+      await this._enableDetectedSdkPacks({ selection: 'breaking' });
+      return;
+    }
+    if (id === 'enableDetectedDeprecationSdkPacks') {
+      await this._enableDetectedSdkPacks({ selection: 'deprecation' });
+      return;
+    }
+  }
+
+  private async _enableDetectedSdkPacks(options: { selection: SdkRiskSelection }): Promise<void> {
+    const root = getProjectRoot();
+    if (!root) return;
+    const pubspecPath = path.join(root, 'pubspec.yaml');
+    let pubspecContent = '';
+    try {
+      pubspecContent = fs.readFileSync(pubspecPath, 'utf-8');
+    } catch {
+      void vscode.window.showErrorMessage('Saropa Lints: could not read pubspec.yaml.');
+      return;
+    }
+
+    const currentEnabled = new Set(readRulePacksEnabled(root));
+    const detectedSdkDefs = RULE_PACK_DEFINITIONS.filter((def) => {
+      if (!sdkPackMatchesSelection(def, options.selection)) return false;
+      if (!isPackDetected(def, pubspecContent)) return false;
+      return true;
+    });
+    const toEnable = detectedSdkDefs.filter((def) => !currentEnabled.has(def.id));
+    if (toEnable.length === 0) {
+      void vscode.window.showInformationMessage('Saropa Lints: no additional applicable SDK packs to enable.');
+      return;
+    }
+    const confirmed = await this._confirmSdkBulkEnable(options.selection, toEnable.map((def) => def.label));
+    if (!confirmed) return;
+
+    let added = 0;
+    for (const def of detectedSdkDefs) {
+      if (!currentEnabled.has(def.id)) {
+        currentEnabled.add(def.id);
+        added += 1;
+      }
+    }
+    const ok = writeRulePacksEnabled(root, [...currentEnabled].sort((a, b) => a.localeCompare(b)));
+    if (!ok) {
+      void vscode.window.showErrorMessage('Saropa Lints: could not write analysis_options.yaml (rule_packs).');
+      return;
+    }
+
+    const run = vscode.workspace.getConfiguration('saropaLints').get<boolean>('runAnalysisAfterConfigChange');
+    if (run !== false) {
+      await vscode.commands.executeCommand('saropaLints.runAnalysis');
+    }
+    const modeLabel =
+      options.selection === 'breaking'
+        ? 'breaking SDK'
+        : options.selection === 'deprecation'
+          ? 'deprecation SDK'
+          : 'SDK';
+    void vscode.window.showInformationMessage(
+      `Saropa Lints: enabled ${added} applicable ${modeLabel} pack(s).`,
+    );
+    this.refresh();
+  }
+
+  private async _confirmSdkBulkEnable(
+    selection: SdkRiskSelection,
+    packLabels: readonly string[],
+  ): Promise<boolean> {
+    const modeLabel =
+      selection === 'breaking'
+        ? 'breaking SDK'
+        : selection === 'deprecation'
+          ? 'deprecation SDK'
+          : 'SDK';
+    const preview = packLabels.slice(0, 5).join(', ');
+    const suffix = packLabels.length > 5 ? `, +${packLabels.length - 5} more` : '';
+    const choice = await vscode.window.showWarningMessage(
+      `Enable ${packLabels.length} ${modeLabel} pack(s)?`,
+      {
+        modal: true,
+        detail: `This updates rule_packs.enabled in analysis_options.yaml. ${preview}${suffix}`,
+      },
+      'Enable',
+    );
+    return choice === 'Enable';
   }
 }
 

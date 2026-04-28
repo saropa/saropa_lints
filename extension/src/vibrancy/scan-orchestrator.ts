@@ -108,6 +108,9 @@ export async function analyzePackage(
 
     const repoUrl = resolveRepoUrl(dep.name, pubDev?.repositoryUrl, params);
     const { github, repoInfo } = await fetchGitHubData(repoUrl, params);
+    const daysSincePublish = pubDev?.publishedDate
+        ? daysSince(pubDev.publishedDate)
+        : undefined;
 
     const pubPoints = metrics.pubPoints;
     const scores = computeScores({
@@ -121,6 +124,8 @@ export async function analyzePackage(
     const category = classifyStatus({
         score: scores.score, knownIssue, pubDev: pubDevWithPoints,
         isArchived: github?.isArchived,
+        daysSinceLastCommit: github?.daysSinceLastCommit,
+        daysSinceLastPublish: daysSincePublish,
     });
 
     log?.score({
@@ -316,7 +321,11 @@ function computeScores(params: {
     // When GitHub data is unavailable, use publish recency as engagement proxy.
     // Halve it to match calcEngagementLevel's (commentScore + recency) / 2 formula.
     const engagementLevel = github
-        ? calcEngagementLevel(github, daysSincePublish)
+        ? calcEngagementLevel(
+            github,
+            daysSincePublish,
+            github.daysSinceLastCommit,
+        )
         : daysSincePublish !== undefined
             ? calcPublishRecency(daysSincePublish) / 2
             : 0;

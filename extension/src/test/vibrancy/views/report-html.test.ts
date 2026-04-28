@@ -752,6 +752,77 @@ describe('report: health tooltip (score breakdown)', () => {
 
 });
 
+describe('report: activity column', () => {
+    it('should render sortable Activity header', () => {
+        const html = buildReportHtml(opts([makeResult('http', 80)]));
+        assert.ok(html.includes('data-col="activity"'));
+        assert.ok(html.includes('>Activity<'));
+    });
+
+    it('should include activity sort value on row data attributes', () => {
+        const result = makeResult('http', 80);
+        (result as any).github = {
+            ...result.github,
+            daysSinceLastCommit: 10,
+        };
+        const html = buildReportHtml(opts([result]));
+        const row = html.match(/<tr[^>]*data-name="http"[^>]*>/);
+        assert.ok(row);
+        assert.ok(row![0].includes('data-activity="'));
+    });
+
+    it('should render activity grade badge when commit and publish dates exist', () => {
+        const result = makeResult('http', 80);
+        (result as any).github = {
+            ...result.github,
+            daysSinceLastCommit: 15,
+        };
+        const html = buildReportHtml(opts([result]));
+        assert.ok(html.includes('grade-badge grade-'));
+    });
+
+    it('should render dash in Activity column when commit data is missing', () => {
+        const result = makeResult('http', 80);
+        const html = buildReportHtml(opts([result]));
+        assert.ok(html.includes('Activity grade unavailable (missing commit or release data)'));
+    });
+
+    it('should include activity thresholds legend in summary caveat', () => {
+        const html = buildReportHtml(opts([makeResult('http', 80)]));
+        assert.ok(html.includes('Activity thresholds: 90d = stale, 180d = dormant'));
+    });
+});
+
+describe('report: dormancy messaging', () => {
+    it('should show 3+ month dormancy message in tooltip', () => {
+        const result = makeResult('http', 80);
+        (result as any).github = {
+            ...result.github,
+            daysSinceLastCommit: 120,
+        };
+        (result as any).pubDev = {
+            ...result.pubDev,
+            publishedDate: '2025-01-01T00:00:00Z',
+        };
+        const html = buildReportHtml(opts([result]));
+        assert.ok(html.includes('No commits and no releases in 3+ months'));
+    });
+
+    it('should show 6+ month dormancy message in tooltip', () => {
+        const result = makeResult('http', 80);
+        (result as any).github = {
+            ...result.github,
+            daysSinceLastCommit: 220,
+        };
+        (result as any).pubDev = {
+            ...result.pubDev,
+            publishedDate: '2024-01-01T00:00:00Z',
+        };
+        const html = buildReportHtml(opts([result]));
+        assert.ok(html.includes('No commits and no releases in 6+ months'));
+    });
+});
+
 describe('report: empty-cell dash with explanatory tooltip', () => {
     /** Extract the <td> cells from the first <tr> row in the HTML table body. */
     function rowCells(html: string): string[] {

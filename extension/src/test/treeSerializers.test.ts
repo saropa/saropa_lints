@@ -23,7 +23,7 @@ describe('serializeOverviewNode', () => {
         });
         assert.deepStrictEqual(serializeOverviewNode({ contextValue: 'overviewSidebarSection' }), {
             type: 'overviewSidebarSection',
-            label: 'Sidebar',
+            label: 'Activity bar sections',
         });
     });
 

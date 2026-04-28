@@ -169,7 +169,7 @@ function buildReportSummary(options: ReportOptions): string {
         <div class="summary-card vulns" data-filter="vulns"><div class="count">${vulnPackages}</div><div class="label">Vulnerable</div></div>
         <div class="summary-card overrides" data-filter="overrides"><div class="count">${overrideCount}</div><div class="label">Overrides</div></div>
     </div>
-    <p class="caveat">*Archive sizes before tree shaking. Actual app size will be smaller.</p>`;
+    <p class="caveat">*Archive sizes before tree shaking. Actual app size will be smaller.<br>Activity thresholds: 90d = stale, 180d = dormant (commit + release timelines).</p>`;
 }
 
 /** Toolbar with search box and pubspec link, placed between chart and table. */
@@ -320,13 +320,13 @@ function buildReportTable(
 
     /* Count visible columns so the detail row can span them all.
        Base columns: expand + copy + name + version + category + published +
-       likes + downloads + issues + prs + size + deps + update = 13.
+       activity + likes + downloads + issues + prs + size + deps + update = 14.
        (Stars used to be a column; it was replaced by Likes because GitHub
        stars apply to the whole repo — monorepo siblings all reported the
        same number — while pub.dev likes are per-package. Downloads were
        added as a second package-specific trust signal from the same
        source.) */
-    const visibleCols = 13
+    const visibleCols = 14
         + (hidden.has('files') ? 0 : 1)
         + (hidden.has('transitives') ? 0 : 1)
         + (hidden.has('vulns') ? 0 : 1)
@@ -342,6 +342,7 @@ function buildReportTable(
             ${th('version', 'Version', 'Installed version from pubspec.lock')}
             ${th('score', 'Category', 'Vibrancy classification and health score (0\u201310)')}
             ${th('published', 'Published', 'Date the installed version was published to pub.dev')}
+            ${th('activity', 'Activity', 'Code-and-release activity grade from commit + publish recency')}
             ${th('likes', 'Likes', 'pub.dev likes \u2014 click to open the package score page')}
             ${th('downloads', 'Downloads', 'pub.dev downloads in the last 30 days \u2014 click to open the package score page')}
             ${th('issues', 'Issues', 'Open GitHub issues (excludes pull requests when available)')}
@@ -396,6 +397,7 @@ function buildRow(
     const downloads = r.downloadCount30Days ?? '';
     const issueCount = r.github?.trueOpenIssues ?? r.github?.openIssues ?? '';
     const prCount = r.github?.openPullRequests ?? '';
+    const activity = computeActivitySignal(r);
     const activeFileCount = activeFileUsages(r.fileUsages).length;
     const transitiveCount = r.transitiveInfo?.transitiveCount ?? 0;
     const vulnCount = r.vulnerabilities.length;
@@ -411,6 +413,7 @@ function buildRow(
     return `<tr class="pkg-row" data-name="${name}" data-version="${escapeHtml(r.package.version)}"
         data-score="${r.score}" data-category="${r.category}"
         data-published="${date}" data-likes="${likes}" data-downloads="${downloads}"
+        data-activity="${activity.sortValue}"
         data-age-months="${publishedAgeMonths ?? ''}"
         data-issues="${issueCount}" data-prs="${prCount}"
         data-size="${r.archiveSizeBytes ?? 0}"
@@ -431,6 +434,7 @@ function buildRow(
         ${buildVersionCell(r)}
         ${buildCategoryCell(r, packageTrends?.get(r.package.name) ?? [])}
         ${buildPublishedCell(r)}
+        ${buildActivityCell(r)}
         ${buildLikesCell(r)}
         ${buildDownloadsCell(r)}
         ${buildIssuesCell(r)}
@@ -563,9 +567,20 @@ function buildPublishedCell(r: VibrancyResult): string {
     return `<td><a href="${url}">${date}</a>${ageSuffix}</td>`;
 }
 
+function buildActivityCell(r: VibrancyResult): string {
+    const activity = computeActivitySignal(r);
+    if (activity.grade === null) {
+        return '<td title="Activity grade unavailable (missing commit or release data)"><span class="dimmed">\u2014</span></td>';
+    }
+    const title = activity.message ?? 'Activity based on recent commits and releases';
+    return `<td title="${escapeHtml(title)}"><span class="grade-badge grade-${activity.grade}">${activity.grade}</span></td>`;
+}
+
 /** Build a multi-line tooltip explaining the vibrancy score breakdown. */
 function buildHealthTooltip(r: VibrancyResult): string {
     const fmt = (v: number) => Math.round(v);
+    const publishAgeDays = daysSinceIsoDate(r.pubDev?.publishedDate);
+    const commitAgeDays = r.github?.daysSinceLastCommit;
     /* The leading "Vibrancy Score: n/10" line was removed — the cell
        already shows the letter grade and a numeric restatement adds no
        new information. The factor rows that remain are distinct signals,
@@ -578,6 +593,16 @@ function buildHealthTooltip(r: VibrancyResult): string {
         `Popularity: ${fmt(r.popularity)}`,
         `Publisher Trust: ${fmt(r.publisherTrust)}`,
     ];
+    if (commitAgeDays !== undefined) {
+        lines.push(`Code commits: ${formatAgeFromDays(commitAgeDays)} ago`);
+    }
+    if (publishAgeDays !== undefined) {
+        lines.push(`Latest release: ${formatAgeFromDays(publishAgeDays)} ago`);
+    }
+    const dormancy = buildDormancyStatus(commitAgeDays, publishAgeDays);
+    if (dormancy) {
+        lines.push('', `Activity signal: ${dormancy}`);
+    }
     return lines.join('\n');
 }
 
@@ -893,6 +918,19 @@ function buildDetailCard(r: VibrancyResult): string {
 function buildDetailScoreSection(r: VibrancyResult): string {
     const fmt = (v: number) => Math.round(v);
     const grade = categoryToGrade(r.category);
+    const publishAgeDays = daysSinceIsoDate(r.pubDev?.publishedDate);
+    const commitAgeDays = r.github?.daysSinceLastCommit;
+    const activityRows: string[] = [];
+    if (commitAgeDays !== undefined) {
+        activityRows.push(`<span class="detail-label">Code Commit Activity</span><span>${escapeHtml(formatAgeFromDays(commitAgeDays))} ago</span>`);
+    }
+    if (publishAgeDays !== undefined) {
+        activityRows.push(`<span class="detail-label">Release Activity</span><span>${escapeHtml(formatAgeFromDays(publishAgeDays))} ago</span>`);
+    }
+    const dormancy = buildDormancyStatus(commitAgeDays, publishAgeDays);
+    if (dormancy) {
+        activityRows.push(`<span class="detail-label">Dormancy Signal</span><span>${escapeHtml(dormancy)}</span>`);
+    }
     /* The "Overall" numeric row was removed — it was the same info as the
        header grade letter, just shown as a /10. The factor rows below stay
        because they're distinct dimensions, not the same aggregate. */
@@ -903,8 +941,68 @@ function buildDetailScoreSection(r: VibrancyResult): string {
             <span class="detail-label">Engagement Level</span><span>${fmt(r.engagementLevel)}</span>
             <span class="detail-label">Popularity</span><span>${fmt(r.popularity)}</span>
             <span class="detail-label">Publisher Trust</span><span>${fmt(r.publisherTrust)}</span>
+            ${activityRows.join('')}
         </div>
     </div>`;
+}
+
+function daysSinceIsoDate(isoDate: string | null | undefined): number | undefined {
+    if (!isoDate) { return undefined; }
+    const ms = Date.parse(isoDate);
+    if (isNaN(ms)) { return undefined; }
+    return Math.max(0, Math.floor((Date.now() - ms) / 86_400_000));
+}
+
+function formatAgeFromDays(days: number): string {
+    if (days < 30) { return `${days}d`; }
+    if (days < 365) { return `${Math.floor(days / 30)}mo`; }
+    return `${Math.floor(days / 365)}y`;
+}
+
+function buildDormancyStatus(
+    commitAgeDays: number | undefined,
+    publishAgeDays: number | undefined,
+): string | null {
+    if (commitAgeDays === undefined || publishAgeDays === undefined) {
+        return null;
+    }
+    if (commitAgeDays >= 180 && publishAgeDays >= 180) {
+        return 'No commits and no releases in 6+ months';
+    }
+    if (commitAgeDays >= 90 && publishAgeDays >= 90) {
+        return 'No commits and no releases in 3+ months';
+    }
+    if (commitAgeDays >= 90 && publishAgeDays < 90) {
+        return 'Release active, code inactive (3+ months without commits)';
+    }
+    if (commitAgeDays < 90 && publishAgeDays >= 90) {
+        return 'Code active, release cadence is slower (3+ months)';
+    }
+    return null;
+}
+
+function computeActivitySignal(r: VibrancyResult): {
+    score: number | null;
+    grade: ReturnType<typeof scoreToGrade> | null;
+    message: string | null;
+    sortValue: string;
+} {
+    const publishAgeDays = daysSinceIsoDate(r.pubDev?.publishedDate);
+    const commitAgeDays = r.github?.daysSinceLastCommit;
+    if (publishAgeDays === undefined || commitAgeDays === undefined) {
+        return { score: null, grade: null, message: null, sortValue: '' };
+    }
+    // Activity score focuses on "is code/release work still happening now?"
+    // so both timelines use a 90-day decay and the worst leg dominates.
+    const commitScore = Math.max(0, 100 - (commitAgeDays * 100 / 90));
+    const releaseScore = Math.max(0, 100 - (publishAgeDays * 100 / 90));
+    const score = Math.round(Math.min(commitScore, releaseScore));
+    const grade = scoreToGrade(score);
+    const dormancy = buildDormancyStatus(commitAgeDays, publishAgeDays);
+    const message = dormancy
+        ? `${dormancy} (activity grade ${grade})`
+        : `Code and release activity is healthy (activity grade ${grade})`;
+    return { score, grade, message, sortValue: String(score) };
 }
 
 function buildDetailVulnSection(r: VibrancyResult): string {
@@ -1039,6 +1137,7 @@ function buildPackageJson(
     const encoded = encodeURIComponent(name);
     const activeFiles = activeFileUsages(r.fileUsages);
     const repoBase = resolveRepoUrl(r) ?? null;
+    const activity = computeActivitySignal(r);
     return {
         name,
         version: r.package.version,
@@ -1052,6 +1151,8 @@ function buildPackageJson(
             engagementLevel: Math.round(r.engagementLevel),
             popularity: Math.round(r.popularity),
             publisherTrust: Math.round(r.publisherTrust),
+            activityScore: activity.score,
+            activityGrade: activity.grade,
         },
         category: categoryLabel(r.category),
         published: r.pubDev?.publishedDate.split('T')[0] ?? null,

@@ -16,6 +16,22 @@ function encode(text: string): Uint8Array {
     return new TextEncoder().encode(text);
 }
 
+function normalizePath(path: string): string {
+    return path.replace(/\\/g, '/');
+}
+
+function uriPathLike(uri: vscode.Uri): string {
+    const raw = (uri as unknown as { path?: string; fsPath?: string }).path
+        ?? (uri as unknown as { fsPath?: string }).fsPath
+        ?? '';
+    return normalizePath(raw);
+}
+
+function directoryTypeValue(): number {
+    return ((vscode as unknown as { FileType?: { Directory?: number } }).FileType?.Directory
+        ?? 2);
+}
+
 describe('classifyLines', () => {
     it('should count pure code lines', () => {
         const result = classifyLines(
@@ -228,11 +244,13 @@ describe('resolvePackagePaths', () => {
                     name: 'http',
                     rootUri: 'file:///C:/Users/test/.pub-cache/hosted/pub.dev/http-1.2.0',
                     packageUri: 'lib/',
+                    source: 'hosted',
                 },
                 {
                     name: 'path',
                     rootUri: 'file:///C:/Users/test/.pub-cache/hosted/pub.dev/path-1.9.0',
                     packageUri: 'lib/',
+                    source: 'hosted',
                 },
             ],
         });
@@ -240,7 +258,10 @@ describe('resolvePackagePaths', () => {
 
         const result = await resolvePackagePaths(makeUri('/proj'));
         assert.strictEqual(result.size, 2);
-        assert.ok(result.has('http'));
+        const http = result.get('http');
+        assert.ok(http);
+        assert.strictEqual(http?.source, 'hosted');
+        assert.ok(http?.rootUri.fsPath.includes('http-1.2.0'));
         assert.ok(result.has('path'));
     });
 
@@ -282,30 +303,29 @@ describe('analyzePackageCode', () => {
     const originalFindFiles = vscode.workspace.findFiles;
     const originalReadFile = vscode.workspace.fs.readFile;
     const originalStat = vscode.workspace.fs.stat;
+    const originalFileType = (vscode as any).FileType;
 
     afterEach(() => {
         (vscode.workspace as any).findFiles = originalFindFiles;
         (vscode.workspace as any).fs.readFile = originalReadFile;
         (vscode.workspace as any).fs.stat = originalStat;
+        (vscode as any).FileType = originalFileType;
     });
 
     it('should count code and comment lines in lib/', async () => {
+        (vscode as any).FileType = { Directory: directoryTypeValue() };
         // Stub stat to succeed for lib/ and fail for example/
         (vscode.workspace as any).fs.stat = async (uri: vscode.Uri) => {
-            if (uri.path.endsWith('/lib') || uri.path.endsWith('/lib/')) {
-                return { type: vscode.FileType.Directory };
+            const path = uriPathLike(uri);
+            if (path.endsWith('/lib') || path.endsWith('/lib/')) {
+                return { type: directoryTypeValue() };
             }
             // native platform dirs + example/ should not exist
             throw new Error('ENOENT');
         };
 
         const libFile = makeUri('/cache/pkg/lib/src/main.dart');
-        (vscode.workspace as any).findFiles = async (pattern: vscode.RelativePattern) => {
-            if (pattern.baseUri.path.endsWith('/lib')) {
-                return [libFile];
-            }
-            return [];
-        };
+        (vscode.workspace as any).findFiles = async (_pattern: vscode.RelativePattern) => [libFile];
 
         (vscode.workspace as any).fs.readFile = async () =>
             encode('/// Dartdoc\nclass Foo {\n  final int x;\n}\n');
@@ -319,10 +339,11 @@ describe('analyzePackageCode', () => {
     });
 
     it('should detect native platforms', async () => {
+        (vscode as any).FileType = { Directory: directoryTypeValue() };
         (vscode.workspace as any).fs.stat = async (uri: vscode.Uri) => {
-            const path = uri.path;
+            const path = uriPathLike(uri);
             if (path.endsWith('/lib') || path.endsWith('/ios') || path.endsWith('/android')) {
-                return { type: vscode.FileType.Directory };
+                return { type: directoryTypeValue() };
             }
             throw new Error('ENOENT');
         };

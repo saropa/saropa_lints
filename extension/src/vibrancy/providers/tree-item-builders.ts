@@ -40,6 +40,41 @@ function replacementEmoji(level: import('../services/package-code-analyzer').Rep
     }
 }
 
+function daysSinceIsoDate(isoDate: string | null | undefined): number | undefined {
+    if (!isoDate) { return undefined; }
+    const ms = Date.parse(isoDate);
+    if (isNaN(ms)) { return undefined; }
+    return Math.max(0, Math.floor((Date.now() - ms) / 86_400_000));
+}
+
+function formatAgeFromDays(days: number): string {
+    if (days < 30) { return `${days}d`; }
+    if (days < 365) { return `${Math.floor(days / 30)}mo`; }
+    return `${Math.floor(days / 365)}y`;
+}
+
+function buildDormancyStatus(
+    commitAgeDays: number | undefined,
+    publishAgeDays: number | undefined,
+): string | null {
+    if (commitAgeDays === undefined || publishAgeDays === undefined) {
+        return null;
+    }
+    if (commitAgeDays >= 180 && publishAgeDays >= 180) {
+        return 'No commits and no releases in 6+ months';
+    }
+    if (commitAgeDays >= 90 && publishAgeDays >= 90) {
+        return 'No commits and no releases in 3+ months';
+    }
+    if (commitAgeDays >= 90 && publishAgeDays < 90) {
+        return 'Release active, code inactive (3+ months without commits)';
+    }
+    if (commitAgeDays < 90 && publishAgeDays >= 90) {
+        return 'Code active, release cadence is slower (3+ months)';
+    }
+    return null;
+}
+
 /** Build grouped child items for a package node. */
 export function buildGroupItems(result: VibrancyResult): GroupItem[] {
     const groups: GroupItem[] = [];
@@ -178,6 +213,8 @@ function appendChangelogItems(
 
 function buildCommunityGroup(result: VibrancyResult): GroupItem | null {
     const items: DetailItem[] = [];
+    const publishAgeDays = daysSinceIsoDate(result.pubDev?.publishedDate);
+    let commitAgeDays: number | undefined;
     if (result.github) {
         const gh = result.github;
         const repoUrl = (gh.repoUrl ?? result.pubDev?.repositoryUrl)
@@ -205,6 +242,7 @@ function buildCommunityGroup(result: VibrancyResult): GroupItem | null {
             ));
         }
         if (gh.daysSinceLastCommit !== undefined) {
+            commitAgeDays = gh.daysSinceLastCommit;
             items.push(new DetailItem(
                 '📅 Last Commit', formatRelativeTime(gh.daysSinceLastCommit),
             ));
@@ -217,6 +255,15 @@ function buildCommunityGroup(result: VibrancyResult): GroupItem | null {
         items.push(new DetailItem(
             '📊 Pub Points', `${result.pubDev.pubPoints}/160`,
         ));
+    }
+    if (publishAgeDays !== undefined) {
+        items.push(new DetailItem(
+            '🚀 Latest Release', `${formatAgeFromDays(publishAgeDays)} ago`,
+        ));
+    }
+    const dormancy = buildDormancyStatus(commitAgeDays, publishAgeDays);
+    if (dormancy) {
+        items.push(new DetailItem('⏱️ Activity Signal', dormancy));
     }
     if (result.reverseDependencyCount !== null && result.reverseDependencyCount > 0) {
         const count = result.reverseDependencyCount;

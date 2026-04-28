@@ -193,6 +193,35 @@ describe('VibrancyHoverProvider', () => {
         assert.ok(md.value.includes('Stars'), 'hover should include stars row');
     });
 
+    it('should include latest release row in COMMUNITY section', () => {
+        const result = makeResult('http', 85);
+        provider.updateResults([result]);
+        const doc = makeMockDocument('  http: ^1.0.0');
+        const hover = provider.provideHover(doc, new vscode.Position(0, 2));
+        const md = hover!.contents as unknown as vscode.MarkdownString;
+        assert.ok(md.value.includes('Latest Release'), 'hover should include release activity row');
+    });
+
+    it('should include activity signal when commit and release are both stale', () => {
+        const result: VibrancyResult = {
+            ...makeResult('http', 85),
+            github: {
+                ...makeResult('http', 85).github!,
+                daysSinceLastCommit: 220,
+            },
+            pubDev: {
+                ...makeResult('http', 85).pubDev!,
+                publishedDate: '2024-01-01T00:00:00Z',
+            },
+        };
+        provider.updateResults([result]);
+        const doc = makeMockDocument('  http: ^1.0.0');
+        const hover = provider.provideHover(doc, new vscode.Position(0, 2));
+        const md = hover!.contents as unknown as vscode.MarkdownString;
+        assert.ok(md.value.includes('Activity Signal'));
+        assert.ok(md.value.includes('No commits and no releases in 6+ months'));
+    });
+
     it('should include category label in header, not letter grade', () => {
         provider.updateResults([makeResult('http', 85)]);
         const doc = makeMockDocument('  http: ^1.0.0');

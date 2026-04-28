@@ -30,6 +30,10 @@ export function classifyStatus(params: {
     pubDev: PubDevPackageInfo | null;
     /** Archived GitHub repos are definitively end-of-life. */
     isArchived?: boolean;
+    /** Days since last code commit (GitHub pushed_at). */
+    daysSinceLastCommit?: number;
+    /** Days since last package publish. */
+    daysSinceLastPublish?: number;
 }): VibrancyCategory {
     // Hard overrides: only truly dead packages get 'end-of-life'
     if (params.knownIssue?.status === 'end_of_life') { return 'end-of-life'; }
@@ -49,6 +53,21 @@ export function classifyStatus(params: {
     // 'outdated' at worst — not abandoned. Hard EOL signals (known_issues,
     // discontinued, archived) already returned early above and are unaffected.
     if (category === 'abandoned' && (params.pubDev?.pubPoints ?? 0) >= 140) {
+        category = 'outdated';
+    }
+
+    // Dormancy cap: recent release and/or recent commits can mask inactivity
+    // in pure score terms. If neither code nor releases moved for >=90 days,
+    // a package cannot be "vibrant". If both are stale for >=180 days, it
+    // cannot be better than "outdated".
+    const commitDormant90 = (params.daysSinceLastCommit ?? -1) >= 90;
+    const publishDormant90 = (params.daysSinceLastPublish ?? -1) >= 90;
+    if (commitDormant90 && publishDormant90 && category === 'vibrant') {
+        category = 'stable';
+    }
+    const commitDormant180 = (params.daysSinceLastCommit ?? -1) >= 180;
+    const publishDormant180 = (params.daysSinceLastPublish ?? -1) >= 180;
+    if (commitDormant180 && publishDormant180 && category === 'stable') {
         category = 'outdated';
     }
 

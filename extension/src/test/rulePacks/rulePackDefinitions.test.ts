@@ -27,6 +27,44 @@ environment:
     assert.strictEqual(isPackDetected(def('dart_sdk_3_2'), pubspec), true);
   });
 
+  it('detects dart_sdk_3_4 from environment sdk constraint', () => {
+    const pubspec = `
+name: demo
+environment:
+  sdk: ">=3.4.0 <4.0.0"
+`;
+    assert.strictEqual(isPackDetected(def('dart_sdk_3_4'), pubspec), true);
+    assert.strictEqual(isPackDetected(def('dart_sdk_3_2'), pubspec), true);
+  });
+
+  it('includes js_interop migration rules in dart_sdk_3_2 pack', () => {
+    const dartSdkPack = def('dart_sdk_3_2');
+    assert.ok(
+      dartSdkPack.ruleCodes.includes('avoid_legacy_jsboolean_return_assumptions'),
+      'expected avoid_legacy_jsboolean_return_assumptions in dart_sdk_3_2',
+    );
+    assert.ok(
+      dartSdkPack.ruleCodes.includes('prefer_string_for_typeof_equals'),
+      'expected prefer_string_for_typeof_equals in dart_sdk_3_2',
+    );
+    assert.ok(
+      dartSdkPack.ruleCodes.includes('prefer_int_for_jsarray_with_length'),
+      'expected prefer_int_for_jsarray_with_length in dart_sdk_3_2',
+    );
+  });
+
+  it('includes dart 3.4 migration rules in dart_sdk_3_4 pack', () => {
+    const dartSdkPack = def('dart_sdk_3_4');
+    assert.ok(
+      dartSdkPack.ruleCodes.includes('avoid_deprecated_file_system_delete_event_is_directory'),
+      'expected avoid_deprecated_file_system_delete_event_is_directory in dart_sdk_3_4',
+    );
+    assert.ok(
+      dartSdkPack.ruleCodes.includes('avoid_removed_null_thrown_error'),
+      'expected avoid_removed_null_thrown_error in dart_sdk_3_4',
+    );
+  });
+
   it('keeps dependency-based detection for package packs', () => {
     const pubspec = `
 name: demo

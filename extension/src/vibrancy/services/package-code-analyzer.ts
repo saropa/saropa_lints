@@ -29,6 +29,12 @@ export interface ReplacementComplexity {
     readonly summary: string;
 }
 
+/** Resolved package path plus source metadata from package_config.json. */
+export interface PackagePathInfo {
+    readonly rootUri: vscode.Uri;
+    readonly source: string | null;
+}
+
 /** Known native/platform directories that indicate non-Dart code. */
 const NATIVE_DIRS = ['ios', 'android', 'macos', 'linux', 'windows', 'web'] as const;
 
@@ -41,7 +47,7 @@ const NATIVE_DIRS = ['ios', 'android', 'macos', 'linux', 'windows', 'web'] as co
  */
 export async function resolvePackagePaths(
     workspaceRoot: vscode.Uri,
-): Promise<ReadonlyMap<string, vscode.Uri>> {
+): Promise<ReadonlyMap<string, PackagePathInfo>> {
     const configUri = vscode.Uri.joinPath(
         workspaceRoot, '.dart_tool', 'package_config.json',
     );
@@ -62,13 +68,16 @@ export async function resolvePackagePaths(
     }
 
     const packages: any[] = json.packages ?? [];
-    const result = new Map<string, vscode.Uri>();
+    const result = new Map<string, PackagePathInfo>();
 
     for (const pkg of packages) {
         if (!pkg.name || !pkg.rootUri) { continue; }
         const rootUri = resolveRootUri(pkg.rootUri, configUri);
         if (rootUri) {
-            result.set(pkg.name, rootUri);
+            result.set(pkg.name, {
+                rootUri,
+                source: typeof pkg.source === 'string' ? pkg.source : null,
+            });
         }
     }
 
@@ -362,21 +371,35 @@ export async function enrichReplacementComplexity(
 /** Resolve replacement complexity for a single package, using cache when available. */
 async function resolveComplexity(
     result: VibrancyResult,
-    packagePaths: ReadonlyMap<string, vscode.Uri>,
+    packagePaths: ReadonlyMap<string, PackagePathInfo>,
     cache?: CacheService,
     logger?: ScanLogger,
 ): Promise<ReplacementComplexity | null> {
-    const cacheKey = `code.complexity.${result.package.name}@${result.package.version}`;
-    const cached = cache?.get<ReplacementComplexity>(cacheKey);
-    if (cached) { return cached; }
+    const pkgPath = packagePaths.get(result.package.name);
+    if (!pkgPath) { return null; }
 
-    const localPath = packagePaths.get(result.package.name);
-    if (!localPath) { return null; }
+    // SDK packages are not replaceable and should not get a complexity badge.
+    if (pkgPath.source === 'sdk' || result.package.source === 'sdk') {
+        return null;
+    }
+
+    // Cache only hosted dependencies. Path/git dependencies can change in-place
+    // without a version bump, so long-lived cache entries would go stale.
+    const canUseCache = result.package.source === 'hosted';
+    const cacheKey = `code.complexity.${result.package.name}@${result.package.version}`;
+    if (canUseCache) {
+        const cached = cache?.get<ReplacementComplexity>(cacheKey);
+        if (cached) { return cached; }
+    }
+
+    const localPath = pkgPath.rootUri;
 
     try {
         const metrics = await analyzePackageCode(localPath);
         const complexity = classifyReplacement(metrics);
-        await cache?.set(cacheKey, complexity);
+        if (canUseCache) {
+            await cache?.set(cacheKey, complexity);
+        }
         return complexity;
     } catch {
         logger?.error(`Failed to analyze code for ${result.package.name}`);

@@ -97,6 +97,11 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigTreeNod
     return [
       setting('Open analysis_options_custom.yaml', undefined, 'saropaLints.openConfig'),
       setting('Initialize / Update config', undefined, 'saropaLints.initializeConfig'),
+      setting(
+        'Composite analyzer plugin (scaffold)',
+        'Meta-plugin package for org + Saropa',
+        'saropaLints.emitCompositePluginScaffold',
+      ),
       setting('Run analysis', undefined, 'saropaLints.runAnalysis'),
     ];
   }

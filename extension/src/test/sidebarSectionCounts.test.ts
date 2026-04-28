@@ -51,7 +51,7 @@ describe('buildSidebarSectionCountMap', () => {
           { file: 'lib/a.dart', line: 1, rule: 'test_rule', message: 'x' },
           { file: 'lib/b.dart', line: 2, rule: 'test_rule', message: 'y' },
         ],
-        summary: { totalViolations: 2 },
+        summary: { totalViolations: 2, suppressions: { total: 6 } },
         config: { enabledRuleCount: 42 },
       };
       const m = buildSidebarSectionCountMap({
@@ -64,6 +64,7 @@ describe('buildSidebarSectionCountMap', () => {
       });
       assert.strictEqual(m.get('sidebar.showIssues'), 2);
       assert.strictEqual(m.get('sidebar.showSummary'), 2);
+      assert.strictEqual(m.get('sidebar.showSuppressions'), 6);
       assert.strictEqual(m.get('sidebar.showFileRisk'), 2);
       assert.strictEqual(m.get('sidebar.showPackageVibrancy'), 3);
       assert.strictEqual(m.get('sidebar.showTodosAndHacks'), 5);

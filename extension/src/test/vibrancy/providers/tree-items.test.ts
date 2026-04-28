@@ -197,6 +197,38 @@ describe('buildCommunityGroup URLs', () => {
             community.children[1].url, 'https://github.com/dart-lang/http/issues',
         );
     });
+
+    it('should include Latest Release activity item', () => {
+        const result = {
+            ...makeResult('http', 80),
+            github: {
+                ...stubGithub,
+                daysSinceLastCommit: 10,
+            },
+            pubDev: stubPubDev('https://github.com/dart-lang/http'),
+        };
+        const community = buildGroupItems(result).find(g => g.label === '📊 Community')!;
+        const labels = community.children.map(c => c.label);
+        assert.ok(labels.includes('🚀 Latest Release'));
+    });
+
+    it('should include Activity Signal item when commit and release are stale', () => {
+        const result = {
+            ...makeResult('http', 80),
+            github: {
+                ...stubGithub,
+                daysSinceLastCommit: 220,
+            },
+            pubDev: {
+                ...stubPubDev('https://github.com/dart-lang/http'),
+                publishedDate: '2024-01-01T00:00:00Z',
+            },
+        };
+        const community = buildGroupItems(result).find(g => g.label === '📊 Community')!;
+        const activityItem = community.children.find(c => c.label === '⏱️ Activity Signal');
+        assert.ok(activityItem, 'expected activity signal row in community group');
+        assert.ok(String((activityItem as DetailItem).description).includes('6+ months'));
+    });
 });
 
 describe('flagged issue URLs', () => {

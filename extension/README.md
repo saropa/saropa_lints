@@ -52,6 +52,29 @@ The **Triage** view focuses on rule groups by impact/volume and quick enable/dis
 
 The **Logs** view lists analysis reports from `reports/`. Each log shows a parsed hint (e.g. violation counts, init tier). A "Run Analysis" action appears when the latest report is over 1 hour old.
 
+## Package Vibrancy activity signal
+
+The Package Vibrancy report includes an **Activity** grade column (**A-F**) that reflects maintenance activity separately from overall vibrancy.
+
+- Uses both **code activity** (last commit from GitHub `pushed_at`) and **release activity** (latest pub.dev publish date).
+- Activity score uses a 90-day decay for both timelines and takes the weaker side.
+- Report surfaces dormancy hints:
+  - **90+ days** with no commits and no releases: stale
+  - **180+ days** with no commits and no releases: dormant
+
+This helps distinguish "not recently released but still actively maintained" from "no recent release and no recent code changes."
+
+## Project Vibrancy (code health for your own source)
+
+The extension now includes a **Project Vibrancy** sidebar webview for project-code risk surfacing (separate from Package Vibrancy, which scores dependencies).
+
+- Scans your Dart code with the project vibrancy CLI and shows the worst function hotspots.
+- Includes quick filters (text, grade, flags) and quick slices for `unused`, `uncovered`, and coverage-quality flags (`stub_tested`, `suspicious_coverage`, `test_drift`).
+- Supports scoped scans via git reference (`--since`) directly from the sidebar.
+- Persists sidebar filter state across refresh/reopen and shows active scan scope + visible row counts.
+- Provides a full report command: **Saropa Lints: Open Project Vibrancy Report**.
+- Sidebar command: **Saropa Lints: Refresh Project Vibrancy Sidebar** for explicit rescans from command palette or view toolbar.
+
 ## Settings
 
 | Setting | Default | Description |

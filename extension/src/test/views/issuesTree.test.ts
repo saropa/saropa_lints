@@ -15,6 +15,7 @@ import * as projectRoot from '../../projectRoot';
 import * as suppressionsStore from '../../suppressionsStore';
 import * as violationsReader from '../../violationsReader';
 import * as pathUtils from '../../pathUtils';
+import { setRelatedRulesMetadata } from '../../ruleMetadata';
 
 import { IssuesTreeProvider, type IssueTreeNode } from '../../views/issuesTree';
 import { clearTestConfig, setTestConfig } from '../vibrancy/vscode-mock';
@@ -59,10 +60,12 @@ describe('IssuesTreeProvider expand-all', () => {
     });
 
     provider = new IssuesTreeProvider(new MockMemento() as any);
+    setRelatedRulesMetadata(undefined);
   });
 
   afterEach(() => {
     sinon.restore();
+    setRelatedRulesMetadata(undefined);
   });
 
   it('defaults to Collapsed for severity nodes', () => {
@@ -349,6 +352,97 @@ describe('IssuesTreeProvider permanent help row', () => {
   });
 });
 
+describe('IssuesTreeProvider metadata grouping modes', () => {
+  let readViolationsStub: sinon.SinonStub;
+
+  beforeEach(() => {
+    clearTestConfig();
+    sinon.stub(projectRoot, 'getProjectRoot').returns('/fake/root');
+    sinon.stub(suppressionsStore, 'loadSuppressions').returns({
+      hiddenFolders: [],
+      hiddenFiles: [],
+      hiddenRules: [],
+      hiddenRuleInFile: {},
+      hiddenSeverities: [],
+      hiddenImpacts: [],
+    });
+    readViolationsStub = sinon.stub(violationsReader, 'readViolations');
+  });
+
+  afterEach(() => {
+    sinon.restore();
+    clearTestConfig();
+  });
+
+  it('groups root nodes by ruleType when configured', async () => {
+    setTestConfig('saropaLints', 'violationsGroupBy', 'ruleType');
+    readViolationsStub.returns({
+      violations: [
+        {
+          file: 'lib/a.dart',
+          line: 1,
+          rule: 'avoid_hardcoded_credentials',
+          message: 'm',
+          severity: 'warning',
+          impact: 'critical',
+          metadata: { ruleType: 'vulnerability' },
+        },
+        {
+          file: 'lib/b.dart',
+          line: 2,
+          rule: 'prefer_const',
+          message: 'm',
+          severity: 'info',
+          impact: 'low',
+          metadata: { ruleType: 'codeSmell' },
+        },
+      ],
+      summary: { totalViolations: 2 },
+    });
+    const provider = new IssuesTreeProvider(new MockMemento() as any);
+    const root = await provider.getChildren();
+    assert.ok(root.length >= 3);
+    assert.strictEqual(root[0].kind, 'help');
+    assert.strictEqual(root[1].kind, 'group');
+    assert.strictEqual((root[1] as { groupKey: string }).groupKey, 'codeSmell');
+    assert.strictEqual((root[2] as { groupKey: string }).groupKey, 'vulnerability');
+  });
+
+  it('groups root nodes by ruleStatus when configured', async () => {
+    setTestConfig('saropaLints', 'violationsGroupBy', 'ruleStatus');
+    readViolationsStub.returns({
+      violations: [
+        {
+          file: 'lib/a.dart',
+          line: 1,
+          rule: 'avoid_hardcoded_credentials',
+          message: 'm',
+          severity: 'warning',
+          impact: 'critical',
+          metadata: { ruleStatus: 'ready' },
+        },
+        {
+          file: 'lib/b.dart',
+          line: 2,
+          rule: 'beta_rule',
+          message: 'm',
+          severity: 'warning',
+          impact: 'medium',
+          metadata: { ruleStatus: 'beta' },
+        },
+      ],
+      summary: { totalViolations: 2 },
+    });
+    const provider = new IssuesTreeProvider(new MockMemento() as any);
+    const root = await provider.getChildren();
+    assert.ok(root.length >= 3);
+    assert.strictEqual(root[0].kind, 'help');
+    assert.strictEqual(root[1].kind, 'group');
+    assert.strictEqual((root[1] as { groupKey: string }).groupKey, 'beta');
+    assert.strictEqual((root[2] as { groupKey: string }).groupKey, 'ready');
+  });
+});
+
 /**
  * Regression: clicking an existing-file row in the Violations view did
  * nothing because FileItem only set resourceUri, never the `vscode.open`
@@ -371,10 +465,12 @@ describe('IssuesTreeProvider file item open-on-click', () => {
       hiddenImpacts: [],
     });
     cachedFileExistsStub = sinon.stub(pathUtils, 'cachedFileExists');
+    setRelatedRulesMetadata(undefined);
   });
 
   afterEach(() => {
     sinon.restore();
+    setRelatedRulesMetadata(undefined);
   });
 
   it('attaches vscode.open command when file exists on disk', () => {
@@ -410,5 +506,28 @@ describe('IssuesTreeProvider file item open-on-click', () => {
     // No command — otherwise clicking would surface a confusing
     // "file not found" error. Tooltip explains the stale state instead.
     assert.strictEqual(item.command, undefined);
+  });
+
+  it('shows related rules in violation tooltip when metadata is present', () => {
+    cachedFileExistsStub.returns(true);
+    setRelatedRulesMetadata({
+      avoid_hardcoded_credentials: ['require_secure_storage', 'require_secure_storage_for_auth'],
+    });
+    const provider = new IssuesTreeProvider(new MockMemento() as any);
+    const violationNode: IssueTreeNode = {
+      kind: 'violation',
+      violation: {
+        file: 'lib/a.dart',
+        line: 12,
+        rule: 'avoid_hardcoded_credentials',
+        message: 'Hardcoded credentials',
+        severity: 'warning',
+      },
+    };
+
+    const item = provider.getTreeItem(violationNode);
+    const tooltipValue = (item.tooltip as { value?: string } | undefined)?.value ?? '';
+    assert.ok(tooltipValue.includes('See also'));
+    assert.ok(tooltipValue.includes('require_secure_storage'));
   });
 });

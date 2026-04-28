@@ -37,6 +37,12 @@ import {
     saveFingerprint,
     serialiseParsedDeps,
 } from './services/startup-gate';
+import {
+    appendSnapshot as appendVibrancySnapshot,
+    backfillFromLegacyReports,
+    getPackageTrend,
+    readHistory,
+} from './services/vibrancy-history';
 import { scanDartImportsDetailed, activePackageNames } from './services/import-scanner';
 import { enrichReplacementComplexity } from './services/package-code-analyzer';
 import { detectUnused } from './scoring/unused-detector';
@@ -126,6 +132,7 @@ let saveTaskRunner: SaveTaskRunner | null = null;
 let registryService: RegistryService | null = null;
 let vibrancyStatusCallback: VibrancyStatusCallback | null = null;
 const problemRegistry: ProblemRegistry = new ProblemRegistry();
+const HISTORY_BACKFILL_DONE_KEY = 'saropaLints.packageVibrancy.historyBackfillDone';
 
 /** Lightweight vibrancy data for the unified status bar. */
 export interface VibrancyStatusData {
@@ -368,6 +375,11 @@ function registerConfigListener(
             }
         }),
     );
+}
+
+function getAutoExportReportsEnabled(): boolean {
+    const cfg = vscode.workspace.getConfiguration('saropaLints.packageVibrancy');
+    return cfg.get<boolean>('autoExportReportsOnScan', true);
 }
 
 function registerTreeView(
@@ -619,13 +631,30 @@ function registerCommands(
         ),
         vscode.commands.registerCommand(
             'saropaLints.packageVibrancy.showReport',
-            () => VibrancyReportPanel.createOrShow({
-                results: latestResults,
-                overrideCount: lastOverrideAnalyses.length,
-                overrideNames: new Set(lastOverrideAnalyses.map(a => a.entry.name)),
-                pubspecUri: lastParsedDeps?.yamlUri?.toString() ?? null,
-                extensionVersion: (context.extension.packageJSON as { version: string }).version,
-            }),
+            async () => {
+                const extensionVersion = (context.extension.packageJSON as { version: string }).version;
+                const workspaceRoot = lastParsedDeps
+                    ? vscode.Uri.joinPath(lastParsedDeps.yamlUri, '..').fsPath
+                    : null;
+                const history = workspaceRoot
+                    ? await readHistory(workspaceRoot)
+                    : { schemaVersion: 1, snapshots: [] };
+                const packageTrends = new Map<string, number[]>();
+                for (const result of latestResults) {
+                    packageTrends.set(
+                        result.package.name,
+                        getPackageTrend(history, result.package.name),
+                    );
+                }
+                VibrancyReportPanel.createOrShow({
+                    results: latestResults,
+                    overrideCount: lastOverrideAnalyses.length,
+                    overrideNames: new Set(lastOverrideAnalyses.map(a => a.entry.name)),
+                    pubspecUri: lastParsedDeps?.yamlUri?.toString() ?? null,
+                    extensionVersion,
+                    packageTrends,
+                });
+            },
         ),
         vscode.commands.registerCommand(
             'saropaLints.packageVibrancy.clearCache',
@@ -1134,6 +1163,23 @@ async function runScanInner(
             latestResults = results;
             lastParsedDeps = parsed;
             lastScanMeta = await buildScanMeta(startTime);
+            const extensionVersion = vscode.extensions.getExtension('saropa.saropa-lints')
+                ?.packageJSON?.version as string | undefined;
+            if (extensionVersion) {
+                const workspaceRoot = vscode.Uri.joinPath(parsed.yamlUri, '..').fsPath;
+                await maybeRunOneTimeHistoryBackfill(workspaceRoot, targets.workspaceState);
+            }
+            if (getAutoExportReportsEnabled()) {
+                try {
+                    await exportReports(results, lastScanMeta);
+                } catch {
+                    // Auto-export is best-effort; scan results should still succeed.
+                }
+            }
+            if (extensionVersion) {
+                const workspaceRoot = vscode.Uri.joinPath(parsed.yamlUri, '..').fsPath;
+                await appendVibrancySnapshot(workspaceRoot, results, extensionVersion);
+            }
 
             const counts = countByCategory(results);
             logger.info(
@@ -1167,6 +1213,37 @@ async function runScanInner(
             }
         },
     );
+}
+
+async function maybeRunOneTimeHistoryBackfill(
+    workspaceRoot: string,
+    workspaceState: vscode.Memento,
+): Promise<void> {
+    const alreadyDone = workspaceState.get<boolean>(HISTORY_BACKFILL_DONE_KEY, false);
+    if (alreadyDone) { return; }
+    const imported = await vscode.window.withProgress(
+        {
+            location: vscode.ProgressLocation.Notification,
+            title: 'Package Vibrancy: one-time history backfill',
+            cancellable: false,
+        },
+        async (progress) => {
+            progress.report({ message: 'Checking existing report files...' });
+            const count = await backfillFromLegacyReports(workspaceRoot);
+            if (count > 0) {
+                progress.report({ message: `Imported ${count} historical snapshots.` });
+            } else {
+                progress.report({ message: 'No legacy snapshots found to import.' });
+            }
+            return count;
+        },
+    );
+    await workspaceState.update(HISTORY_BACKFILL_DONE_KEY, true);
+    if (imported > 0) {
+        vscode.window.showInformationMessage(
+            `Package Vibrancy: one-time history backfill complete (${imported} snapshots imported).`,
+        );
+    }
 }
 
 function getSuppressedSet(): Set<string> {

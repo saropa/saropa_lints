@@ -16,6 +16,18 @@ import {
 const VIEW_TYPE = 'saropaLints.ruleExplain';
 const PANEL_TITLE = 'Rule: ';
 
+type RuleExplainTelemetryEvent = 'open' | 'relatedClick' | 'docClick';
+type RuleExplainTelemetry = (
+  event: RuleExplainTelemetryEvent,
+  props?: Record<string, string>,
+) => void;
+
+let ruleExplainTelemetry: RuleExplainTelemetry | undefined;
+
+export function setRuleExplainTelemetry(telemetry?: RuleExplainTelemetry): void {
+  ruleExplainTelemetry = telemetry;
+}
+
 export interface RuleExplainInput {
   ruleName: string;
   message?: string;
@@ -63,17 +75,17 @@ function buildHtml(input: RuleExplainInput): string {
   const supersedesRules = getSupersedesRules(input.ruleName).filter((r) => r !== input.ruleName);
   const relatedHtml = relatedRules.length
     ? `<section class="block"><h2>Related rules</h2><p>${relatedRules
-        .map((r) => `<a href="#" class="related-rule" data-rule="${escapeHtml(r)}"><code>${escapeHtml(r)}</code></a>`)
+        .map((r) => `<a href="#" class="related-rule" data-section="related" data-rule="${escapeHtml(r)}"><code>${escapeHtml(r)}</code></a>`)
         .join(', ')}</p></section>`
     : '';
   const sameTagHtml = sameTagRules.length
     ? `<section class="block"><h2>Same-tag discovery</h2><p>${sameTagRules
-        .map((r) => `<a href="#" class="related-rule" data-rule="${escapeHtml(r)}"><code>${escapeHtml(r)}</code></a>`)
+        .map((r) => `<a href="#" class="related-rule" data-section="sameTag" data-rule="${escapeHtml(r)}"><code>${escapeHtml(r)}</code></a>`)
         .join(', ')}</p></section>`
     : '';
   const supersedesHtml = supersedesRules.length
     ? `<section class="block"><h2>Migration</h2><p>This rule supersedes ${supersedesRules
-        .map((r) => `<a href="#" class="related-rule" data-rule="${escapeHtml(r)}"><code>${escapeHtml(r)}</code></a>`)
+        .map((r) => `<a href="#" class="related-rule" data-section="supersedes" data-rule="${escapeHtml(r)}"><code>${escapeHtml(r)}</code></a>`)
         .join(', ')}.</p></section>`
     : '';
 
@@ -188,13 +200,18 @@ function buildHtml(input: RuleExplainInput): string {
       document.querySelectorAll('a.doc-link[data-url]').forEach(function(link) {
         link.addEventListener('click', function(e) {
           e.preventDefault();
-          vscode.postMessage({ type: 'openUrl', url: link.dataset.url });
+          vscode.postMessage({ type: 'openUrl', url: link.dataset.url, ruleName: ${JSON.stringify(input.ruleName)} });
         });
       });
       document.querySelectorAll('a.related-rule[data-rule]').forEach(function(link) {
         link.addEventListener('click', function(e) {
           e.preventDefault();
-          vscode.postMessage({ type: 'openRule', ruleName: link.dataset.rule });
+          vscode.postMessage({
+            type: 'openRule',
+            ruleName: link.dataset.rule,
+            sourceRule: ${JSON.stringify(input.ruleName)},
+            section: link.dataset.section,
+          });
         });
       });
     })();
@@ -210,6 +227,7 @@ let activePanel: vscode.WebviewPanel | undefined;
  * rule details. Reuses the existing panel if already open (updates title and content).
  */
 export function openRuleExplainPanel(input: RuleExplainInput): void {
+  ruleExplainTelemetry?.('open', { ruleName: input.ruleName });
   const title = PANEL_TITLE + input.ruleName;
 
   if (activePanel) {
@@ -229,11 +247,25 @@ export function openRuleExplainPanel(input: RuleExplainInput): void {
   activePanel.webview.html = buildHtml(input);
 
   activePanel.webview.onDidReceiveMessage(
-    (msg: { type: string; url?: string; ruleName?: string }) => {
+    (msg: {
+      type: string;
+      url?: string;
+      ruleName?: string;
+      sourceRule?: string;
+      section?: string;
+    }) => {
     if (msg.type === 'openUrl' && msg.url) {
+      ruleExplainTelemetry?.('docClick', {
+        ruleName: msg.ruleName ?? input.ruleName,
+      });
       void vscode.env.openExternal(vscode.Uri.parse(msg.url));
     }
       if (msg.type === 'openRule' && typeof msg.ruleName === 'string') {
+        ruleExplainTelemetry?.('relatedClick', {
+          sourceRule: msg.sourceRule ?? input.ruleName,
+          targetRule: msg.ruleName,
+          section: msg.section ?? 'unknown',
+        });
         openRuleExplainPanel({ ruleName: msg.ruleName });
       }
     }

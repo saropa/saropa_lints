@@ -178,6 +178,8 @@ function appendHoverVersion(md: vscode.MarkdownString, r: VibrancyResult): void 
 
 function appendHoverCommunity(md: vscode.MarkdownString, r: VibrancyResult): void {
     const rows: string[] = [];
+    const publishAgeDays = daysSinceIsoDate(r.pubDev?.publishedDate);
+    let commitAgeDays: number | undefined;
     if (r.github) {
         const gh = r.github;
         rows.push(`| Stars | ${gh.stars} |`);
@@ -191,8 +193,16 @@ function appendHoverCommunity(md: vscode.MarkdownString, r: VibrancyResult): voi
             rows.push(`| Activity (90d) | ${gh.closedIssuesLast90d} closed, ${gh.mergedPrsLast90d} merged |`);
         }
         if (gh.daysSinceLastCommit !== undefined) {
+            commitAgeDays = gh.daysSinceLastCommit;
             rows.push(`| Last Commit | ${formatRelativeTime(gh.daysSinceLastCommit)} |`);
         }
+    }
+    if (publishAgeDays !== undefined) {
+        rows.push(`| Latest Release | ${formatAgeFromDays(publishAgeDays)} ago |`);
+    }
+    const dormancy = buildDormancyStatus(commitAgeDays, publishAgeDays);
+    if (dormancy) {
+        rows.push(`| Activity Signal | ${dormancy} |`);
     }
     if (r.pubDev?.pubPoints !== undefined) {
         rows.push(`| Pub Points | ${r.pubDev.pubPoints}/160 |`);
@@ -208,6 +218,41 @@ function appendHoverCommunity(md: vscode.MarkdownString, r: VibrancyResult): voi
     if (rows.length > 0) {
         md.appendMarkdown(`**COMMUNITY**\n\n| | |\n|---|---|\n${rows.join('\n')}\n\n`);
     }
+}
+
+function daysSinceIsoDate(isoDate: string | null | undefined): number | undefined {
+    if (!isoDate) { return undefined; }
+    const ms = Date.parse(isoDate);
+    if (isNaN(ms)) { return undefined; }
+    return Math.max(0, Math.floor((Date.now() - ms) / 86_400_000));
+}
+
+function formatAgeFromDays(days: number): string {
+    if (days < 30) { return `${days}d`; }
+    if (days < 365) { return `${Math.floor(days / 30)}mo`; }
+    return `${Math.floor(days / 365)}y`;
+}
+
+function buildDormancyStatus(
+    commitAgeDays: number | undefined,
+    publishAgeDays: number | undefined,
+): string | null {
+    if (commitAgeDays === undefined || publishAgeDays === undefined) {
+        return null;
+    }
+    if (commitAgeDays >= 180 && publishAgeDays >= 180) {
+        return 'No commits and no releases in 6+ months';
+    }
+    if (commitAgeDays >= 90 && publishAgeDays >= 90) {
+        return 'No commits and no releases in 3+ months';
+    }
+    if (commitAgeDays >= 90 && publishAgeDays < 90) {
+        return 'Release active, code inactive (3+ months without commits)';
+    }
+    if (commitAgeDays < 90 && publishAgeDays >= 90) {
+        return 'Code active, release cadence is slower (3+ months)';
+    }
+    return null;
 }
 
 function appendHoverSize(md: vscode.MarkdownString, r: VibrancyResult): void {

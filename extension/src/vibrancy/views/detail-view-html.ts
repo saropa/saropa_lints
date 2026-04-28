@@ -183,6 +183,8 @@ function buildSuggestionSection(r: VibrancyResult): string {
 
 function buildCommunitySection(r: VibrancyResult): string {
     const parts: string[] = [];
+    const publishAgeDays = daysSinceIsoDate(r.pubDev?.publishedDate);
+    let commitAgeDays: number | undefined;
 
     if (r.github) {
         const gh = r.github;
@@ -203,6 +205,7 @@ function buildCommunitySection(r: VibrancyResult): string {
             parts.push(`<div class="detail-row muted">90d: ${gh.closedIssuesLast90d} issues closed, ${gh.mergedPrsLast90d} PRs merged</div>`);
         }
         if (gh.daysSinceLastCommit !== undefined) {
+            commitAgeDays = gh.daysSinceLastCommit;
             parts.push(`<div class="detail-row muted">Last commit: ${formatRelativeTime(gh.daysSinceLastCommit)}</div>`);
         }
         if (gh.isArchived) {
@@ -212,6 +215,13 @@ function buildCommunitySection(r: VibrancyResult): string {
 
     if (r.pubDev?.pubPoints !== undefined) {
         parts.push(`<div class="detail-row">${r.pubDev.pubPoints}/160 pub points</div>`);
+    }
+    if (publishAgeDays !== undefined) {
+        parts.push(`<div class="detail-row muted">Latest release: ${formatAgeFromDays(publishAgeDays)} ago</div>`);
+    }
+    const dormancy = buildDormancyStatus(commitAgeDays, publishAgeDays);
+    if (dormancy) {
+        parts.push(`<div class="detail-row warning">⏱️ ${escapeHtml(dormancy)}</div>`);
     }
 
     if (r.reverseDependencyCount !== null && r.reverseDependencyCount > 0) {
@@ -227,6 +237,41 @@ function buildCommunitySection(r: VibrancyResult): string {
     }
 
     return buildSection('📊 COMMUNITY', parts);
+}
+
+function daysSinceIsoDate(isoDate: string | null | undefined): number | undefined {
+    if (!isoDate) { return undefined; }
+    const ms = Date.parse(isoDate);
+    if (isNaN(ms)) { return undefined; }
+    return Math.max(0, Math.floor((Date.now() - ms) / 86_400_000));
+}
+
+function formatAgeFromDays(days: number): string {
+    if (days < 30) { return `${days}d`; }
+    if (days < 365) { return `${Math.floor(days / 30)}mo`; }
+    return `${Math.floor(days / 365)}y`;
+}
+
+function buildDormancyStatus(
+    commitAgeDays: number | undefined,
+    publishAgeDays: number | undefined,
+): string | null {
+    if (commitAgeDays === undefined || publishAgeDays === undefined) {
+        return null;
+    }
+    if (commitAgeDays >= 180 && publishAgeDays >= 180) {
+        return 'No commits and no releases in 6+ months';
+    }
+    if (commitAgeDays >= 90 && publishAgeDays >= 90) {
+        return 'No commits and no releases in 3+ months';
+    }
+    if (commitAgeDays >= 90 && publishAgeDays < 90) {
+        return 'Release active, code inactive (3+ months without commits)';
+    }
+    if (commitAgeDays < 90 && publishAgeDays >= 90) {
+        return 'Code active, release cadence is slower (3+ months)';
+    }
+    return null;
 }
 
 function buildDependenciesSection(r: VibrancyResult): string {

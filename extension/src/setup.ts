@@ -377,6 +377,43 @@ function showAnalysisIssuesNotification(workspaceRoot: string, scope?: string): 
     });
 }
 
+/**
+ * Add suppression stats to the extension action report so exported markdown
+ * includes suppression debt context alongside issue counts.
+ */
+function logSuppressionSummary(workspaceRoot: string): void {
+  const data = readViolations(workspaceRoot);
+  const sup = data?.summary?.suppressions;
+  const total = sup?.total ?? 0;
+  if (total <= 0) return;
+
+  logSection('Suppressions');
+  logReport(`- Total: ${total}`);
+  if (sup?.byKind) {
+    const byKind = Object.entries(sup.byKind)
+      .sort((a, b) => (b[1] ?? 0) - (a[1] ?? 0))
+      .map(([kind, count]) => `${kind}=${count}`)
+      .join(', ');
+    if (byKind) logReport(`- By kind: ${byKind}`);
+  }
+  if (sup?.byRule) {
+    const topRules = Object.entries(sup.byRule)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([rule, count]) => `${rule} (${count})`)
+      .join(', ');
+    if (topRules) logReport(`- Top rules: ${topRules}`);
+  }
+  if (sup?.byFile) {
+    const topFiles = Object.entries(sup.byFile)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([file, count]) => `${file} (${count})`)
+      .join(', ');
+    if (topFiles) logReport(`- Top files: ${topFiles}`);
+  }
+}
+
 export async function runAnalysis(context: vscode.ExtensionContext): Promise<boolean> {
   const workspaceRoot = getProjectRoot();
   if (!workspaceRoot) {
@@ -427,6 +464,7 @@ export async function runAnalysis(context: vscode.ExtensionContext): Promise<boo
         // Read the authoritative count from violations.json instead.
         showAnalysisIssuesNotification(workspaceRoot);
       }
+      logSuppressionSummary(workspaceRoot);
       // Tag the extension report with the extension version and the resolved
       // saropa_lints version from pubspec.lock — so every
       // `<ts>_saropa_extension.md` file is self-identifying. When a user
@@ -487,6 +525,7 @@ export async function runAnalysisForFiles(
     } else {
       logReport(`- Analysis reported issues (${cmd} analyze ${toRun.length} files)`);
     }
+    logSuppressionSummary(workspaceRoot);
     // Same reasoning as the full-workspace runAnalysis flow — stamp the
     // extension report with the versions that produced the run, so the
     // file is self-identifying.
@@ -541,6 +580,111 @@ export async function runInitializeConfig(context: vscode.ExtensionContext, titl
         logReport(`- write_config FAILED: ${result.stderr || '(no details)'}`);
         flushReport(workspaceRoot);
         vscode.window.showErrorMessage(`Config write failed. ${result.stderr || 'Check Output.'}`);
+      }
+    },
+  );
+  return ok;
+}
+
+/** Workspace-relative path must stay under the project root (no `..` segments). */
+function isSafeCompositeScaffoldRelativePath(rel: string): boolean {
+  if (!rel.trim()) return false;
+  if (path.isAbsolute(rel)) return false;
+  const segments = rel.replaceAll('\\', '/').split('/');
+  return !segments.some((s) => s === '..');
+}
+
+/**
+ * Runs `dart run saropa_lints:init --emit-composite-plugin-scaffold` in the
+ * workspace so users can create a composite meta-plugin from the IDE.
+ */
+export async function runEmitCompositePluginScaffold(): Promise<boolean> {
+  const workspaceRoot = getProjectRoot();
+  if (!workspaceRoot) {
+    void vscode.window.showErrorMessage('No workspace folder open.');
+    return false;
+  }
+
+  const defaultRel = 'packages/composite_saropa_plugin';
+  const rel = await vscode.window.showInputBox({
+    title: 'Composite analyzer plugin folder',
+    prompt:
+      'Workspace-relative folder for the generated package (pubspec.yaml + lib/main.dart + README).',
+    value: defaultRel,
+    validateInput: (v) => {
+      const t = v.trim();
+      if (!t) return 'Enter a relative path.';
+      if (!isSafeCompositeScaffoldRelativePath(t)) {
+        return 'Use a workspace-relative path without .. segments (no absolute paths).';
+      }
+      return undefined;
+    },
+  });
+  if (rel === undefined) return false;
+
+  const trimmed = rel.trim();
+  const outAbs = path.resolve(workspaceRoot, trimmed);
+  const rootResolved = path.resolve(workspaceRoot);
+  if (outAbs !== rootResolved && !outAbs.startsWith(rootResolved + path.sep)) {
+    void vscode.window.showErrorMessage('Scaffold path must be inside the workspace folder.');
+    return false;
+  }
+
+  if (fs.existsSync(outAbs)) {
+    const pick = await vscode.window.showWarningMessage(
+      `Folder already exists: ${trimmed}. Files may be added or overwritten. Continue?`,
+      { modal: true },
+      'Continue',
+    );
+    if (pick !== 'Continue') return false;
+  }
+
+  let ok = false;
+  await vscode.window.withProgress(
+    {
+      location: vscode.ProgressLocation.Notification,
+      title: 'Creating composite analyzer plugin scaffold',
+      cancellable: false,
+    },
+    async () => {
+      logSection('Composite plugin scaffold');
+      const args = [
+        'run',
+        'saropa_lints:init',
+        '--emit-composite-plugin-scaffold',
+        trimmed,
+        '--target',
+        workspaceRoot,
+      ];
+      const result = runInWorkspace(workspaceRoot, 'dart', args);
+      ok = result.ok;
+      if (ok) {
+        logReport(`- Wrote scaffold under ${trimmed}`);
+        flushReport(workspaceRoot);
+        const action = await vscode.window.showInformationMessage(
+          'Composite plugin scaffold created. Open generated main.dart?',
+          'Open main.dart',
+          'Open README',
+        );
+        if (action === 'Open main.dart') {
+          const mainPath = path.join(outAbs, 'lib', 'main.dart');
+          if (fs.existsSync(mainPath)) {
+            const doc = await vscode.workspace.openTextDocument(vscode.Uri.file(mainPath));
+            await vscode.window.showTextDocument(doc);
+          }
+        } else if (action === 'Open README') {
+          const readmePath = path.join(outAbs, 'README.md');
+          if (fs.existsSync(readmePath)) {
+            const doc = await vscode.workspace.openTextDocument(vscode.Uri.file(readmePath));
+            await vscode.window.showTextDocument(doc);
+          }
+        }
+      } else {
+        logReport(`- scaffold FAILED: ${result.stderr || '(no details)'}`);
+        flushReport(workspaceRoot);
+        void vscode.window.showErrorMessage(
+          `Scaffold failed. ${result.stderr || 'Ensure saropa_lints is in dev_dependencies and run pub get.'}`,
+        );
       }
     },
   );

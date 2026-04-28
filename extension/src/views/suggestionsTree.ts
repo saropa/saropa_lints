@@ -161,8 +161,8 @@ export class SuggestionsTreeProvider implements vscode.TreeDataProvider<Suggesti
             new SuggestionItem(
               `Consider enabling ${candidate}`,
               `Related to active rule ${sourceRule}`,
-              'saropaLints.explainRule',
-              [candidate],
+              'saropaLints.explainRuleFromSuggestion',
+              [candidate, sourceRule],
             ),
           );
           if (items.length >= 8) break finalTopRules;

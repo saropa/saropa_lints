@@ -62,6 +62,7 @@ export function buildSidebarSectionCountMap(inputs: SidebarSectionCountInputs): 
         const total = data.summary?.totalViolations ?? data.violations.length;
         m.set('sidebar.showIssues', total);
         m.set('sidebar.showSummary', total);
+        m.set('sidebar.showSuppressions', data.summary?.suppressions?.total ?? 0);
         m.set('sidebar.showFileRisk', countFilesWithViolations(data.violations));
         m.set('sidebar.showSecurityPosture', countOwaspMappedViolations(data.violations));
         m.set('sidebar.showSuggestions', countSuggestionItems(data, root, inputs.tier));

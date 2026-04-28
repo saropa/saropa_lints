@@ -223,6 +223,9 @@ function appendSuppressionRow(items: OverviewItem[], data: ViolationsData): void
     const sup = data.summary?.suppressions;
     const total = sup?.total ?? 0;
     if (total <= 0) return;
+    const violationsTotal = data.summary?.totalViolations ?? data.violations?.length ?? 0;
+    const denominator = violationsTotal + total;
+    const rate = denominator > 0 ? Math.round((total / denominator) * 1000) / 10 : 0;
 
     // Build a short breakdown description, e.g. "5 ignore, 3 file-level, 2 baseline"
     const parts: string[] = [];
@@ -230,6 +233,9 @@ function appendSuppressionRow(items: OverviewItem[], data: ViolationsData): void
     if (byKind?.ignore) parts.push(`${byKind.ignore} ignore`);
     if (byKind?.ignoreForFile) parts.push(`${byKind.ignoreForFile} file-level`);
     if (byKind?.baseline) parts.push(`${byKind.baseline} baseline`);
+    if (denominator > 0) {
+        parts.push(`${rate}% suppression rate`);
+    }
     const desc = parts.length > 0 ? parts.join(', ') : 'View details';
 
     items.push(
@@ -482,11 +488,14 @@ function buildEmbeddedSummaryItems(workspaceState: vscode.Memento): OverviewItem
     if (supTotal > 0) {
         const ruleCount = Object.keys(s?.suppressions?.byRule ?? {}).length;
         const fileCount = Object.keys(s?.suppressions?.byFile ?? {}).length;
+        const denominator = total + supTotal;
+        const rate = denominator > 0 ? Math.round((supTotal / denominator) * 1000) / 10 : 0;
         // e.g. "across 5 rules in 3 files"
         const detail = ruleCount > 0
             ? `across ${ruleCount} rule${ruleCount === 1 ? '' : 's'} in ${fileCount} file${fileCount === 1 ? '' : 's'}`
             : undefined;
-        items.push(new OverviewItem('Suppressed', `${supTotal}${detail ? ` — ${detail}` : ''}`, undefined, 'eye-closed'));
+        const rateSuffix = denominator > 0 ? ` (${rate}%)` : '';
+        items.push(new OverviewItem('Suppressed', `${supTotal}${rateSuffix}${detail ? ` — ${detail}` : ''}`, undefined, 'eye-closed'));
     }
 
     // Severity breakdown — each item filters the Violations view.

@@ -1,5 +1,6 @@
 /**
- * Activity-bar section visibility toggles shown under **Overview & options → Sidebar**.
+ * Activity-bar section visibility toggles shown under
+ * **Overview & options -> Activity bar sections**.
  *
  * **Label format:** `{section label} ({count})` when the section count is a finite number;
  * otherwise the base label only. **Description:** `On` or `Off` (counts are not duplicated
@@ -14,10 +15,10 @@ import { defaultSidebarSectionVisible, SIDEBAR_SECTIONS } from '../sidebarSectio
 
 export class OverviewSidebarSectionParent extends vscode.TreeItem {
     constructor() {
-        super('Sidebar', vscode.TreeItemCollapsibleState.Expanded);
+        super('Activity bar sections', vscode.TreeItemCollapsibleState.Expanded);
         this.contextValue = 'overviewSidebarSection';
         this.iconPath = new vscode.ThemeIcon('layout-panel');
-        this.tooltip = 'Show or hide sections in the Saropa Lints activity bar';
+        this.tooltip = 'Default place to show or hide Saropa activity bar sections';
     }
 }
 

@@ -86,6 +86,30 @@ describe('filterDisabledFromData', () => {
     assert.deepStrictEqual(result.summary?.issuesByRule, { rule_b: 1 });
   });
 
+  it('recomputes byRuleType and byRuleStatus from filtered violations', () => {
+    const data: ViolationsData = {
+      violations: [
+        {
+          ...v('rule_a'),
+          metadata: { ruleType: 'vulnerability', ruleStatus: 'ready' },
+        },
+        {
+          ...v('rule_b'),
+          metadata: { ruleType: 'codeSmell', ruleStatus: 'beta' },
+        },
+      ],
+      config: {
+        ruleMetadataByRule: {
+          rule_a: { ruleType: 'vulnerability', ruleStatus: 'ready' },
+          rule_b: { ruleType: 'codeSmell', ruleStatus: 'beta' },
+        },
+      },
+    };
+    const result = filterDisabledFromData(data, new Set(['rule_a']));
+    assert.deepStrictEqual(result.summary?.byRuleType, { codeSmell: 1 });
+    assert.deepStrictEqual(result.summary?.byRuleStatus, { beta: 1 });
+  });
+
   it('preserves config and timestamp fields', () => {
     const data: ViolationsData = {
       timestamp: '2026-01-01T00:00:00Z',

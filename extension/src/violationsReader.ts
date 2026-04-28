@@ -22,6 +22,8 @@ export interface RuleMetadataData {
   cweIds?: number[];
   certIds?: string[];
   tags?: string[];
+  requiresReview?: boolean;
+  defaultReviewState?: string;
   accuracyTarget?: AccuracyTargetData;
 }
 

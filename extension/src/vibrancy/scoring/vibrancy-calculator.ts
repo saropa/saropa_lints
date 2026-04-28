@@ -77,17 +77,31 @@ export function calcPublishRecency(daysSinceLastPublish: number): number {
     return clamp(100 - (daysSinceLastPublish * 100 / 365));
 }
 
+/** Commit recency on a 90-day window (older than ~3 months is stale). */
+export function calcCommitRecency(daysSinceLastCommit: number): number {
+    return clamp(100 - (daysSinceLastCommit * 100 / 90));
+}
+
 /** Engagement Level: comment volume + recency. */
 export function calcEngagementLevel(
     metrics: GitHubMetrics,
     daysSinceLastPublish?: number,
+    daysSinceLastCommit?: number,
 ): number {
     const commentScore = normalize(metrics.avgCommentsPerIssue, 10);
     const gitRecency = clamp(100 - metrics.daysSinceLastUpdate);
     const pubRecency = daysSinceLastPublish !== undefined
         ? calcPublishRecency(daysSinceLastPublish)
         : 0;
-    const recencyScore = Math.max(gitRecency, pubRecency);
+    // "updated_at" includes issue/comment activity; commit recency is the
+    // stronger "is code still moving?" signal. Clamp git recency by commit
+    // recency when commit data is available, then allow recent releases to
+    // lift recency for package-first workflows.
+    const commitRecency = daysSinceLastCommit !== undefined
+        ? calcCommitRecency(daysSinceLastCommit)
+        : gitRecency;
+    const codeActivityRecency = Math.min(gitRecency, commitRecency);
+    const recencyScore = Math.max(codeActivityRecency, pubRecency);
     return clamp((commentScore + recencyScore) / 2);
 }
 

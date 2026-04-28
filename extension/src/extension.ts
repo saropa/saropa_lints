@@ -14,6 +14,7 @@ import {
   runAnalysis as runAnalysisCommand,
   runAnalysisForFiles as runAnalysisForFilesCommand,
   runInitializeConfig,
+  runEmitCompositePluginScaffold,
   openConfig,
   runRepairConfig,
   runSetTier,
@@ -37,6 +38,11 @@ import { TodosAndHacksTreeProvider } from './views/todosAndHacksTree';
 import { showAboutPanel } from './views/aboutView';
 import { showCommandCatalogPanel } from './views/commandCatalogView';
 import { showRelatedRuleTelemetryPanel } from './views/relatedRuleTelemetryView';
+import { openProjectVibrancyReport } from './views/projectVibrancyReportView';
+import {
+  PROJECT_VIBRANCY_VIEW_ID,
+  ProjectVibrancySidebarProvider,
+} from './views/projectVibrancySidebarProvider';
 import { CommandCatalogSidebarProvider, COMMAND_CATALOG_SIDEBAR_VIEW_ID } from './views/commandCatalogSidebarProvider';
 import { discoverServer } from './driftAdvisor/discovery';
 import { fetchIssues } from './driftAdvisor/client';
@@ -329,8 +335,10 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // Command catalog sidebar — searchable index of every extension command.
   // Sits at the top of the sidebar so it is the first thing users see.
   const catalogSidebarProvider = new CommandCatalogSidebarProvider(context.extensionUri, context);
+  const projectVibrancySidebarProvider = new ProjectVibrancySidebarProvider();
   context.subscriptions.push(
     vscode.window.registerWebviewViewProvider(COMMAND_CATALOG_SIDEBAR_VIEW_ID, catalogSidebarProvider),
+    vscode.window.registerWebviewViewProvider(PROJECT_VIBRANCY_VIEW_ID, projectVibrancySidebarProvider),
   );
   registerCrossFileCommands(context);
   let driftAdvisorRefreshInProgress = false;
@@ -741,6 +749,9 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         updateContext(getConfig().get<boolean>('enabled', true) ?? true, issuesProvider.hasViolations());
       }
     }),
+    vscode.commands.registerCommand('saropaLints.emitCompositePluginScaffold', async () => {
+      await runEmitCompositePluginScaffold();
+    }),
     vscode.commands.registerCommand('saropaLints.openConfig', openConfig),
     vscode.commands.registerCommand('saropaLints.toggleSidebarSection', async (key: unknown) => {
       if (typeof key !== 'string') {
@@ -787,6 +798,16 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       if (!hasResults) {
         await vscode.commands.executeCommand('saropaLints.packageVibrancy.scan');
       }
+    }),
+    vscode.commands.registerCommand('saropaLints.openProjectVibrancyReport', async () => {
+      await openProjectVibrancyReport();
+    }),
+    vscode.commands.registerCommand('saropaLints.refreshProjectVibrancySidebar', async () => {
+      await projectVibrancySidebarProvider.refresh();
+      await vscode.commands.executeCommand('saropaLints.projectVibrancy.focus');
+    }),
+    vscode.commands.registerCommand('saropaLints.openProjectVibrancySettings', async () => {
+      await vscode.commands.executeCommand('workbench.action.openSettings', 'saropaLints.projectVibrancy');
     }),
     vscode.commands.registerCommand('saropaLints.openWalkthrough', () => {
       void vscode.commands.executeCommand(
