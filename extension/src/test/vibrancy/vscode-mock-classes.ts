@@ -177,12 +177,22 @@ export class TreeItem {
 }
 
 export class MockWebviewPanel {
-    webview = { html: '', postMessage: async () => true };
+    private _onDidReceiveMessage = new EventEmitter();
+    webview = {
+        html: '',
+        postMessage: async () => true,
+        onDidReceiveMessage: (listener: (msg: unknown) => void) =>
+            this._onDidReceiveMessage.event(listener),
+    };
     private _onDidDispose = new EventEmitter();
     revealed = false;
 
     onDidDispose(listener: () => void) {
         return this._onDidDispose.event(listener);
+    }
+
+    fireMessage(msg: unknown): void {
+        this._onDidReceiveMessage.fire(msg);
     }
 
     reveal() { this.revealed = true; }

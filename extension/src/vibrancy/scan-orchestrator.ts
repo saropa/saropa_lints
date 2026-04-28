@@ -43,6 +43,45 @@ interface AnalyzeParams {
     readonly existingPackages?: readonly string[];
 }
 
+function normalizeVersionKey(version: string): string {
+    const trimmed = version.trim();
+    const noPrefix = trimmed.replace(/^[vV]/, '');
+    const plusIdx = noPrefix.indexOf('+');
+    return plusIdx >= 0 ? noPrefix.slice(0, plusIdx) : noPrefix;
+}
+
+/**
+ * Resolve publish date for the installed version with fallbacks for
+ * common lockfile/version-map mismatches.
+ */
+export function resolveInstalledVersionDate(
+    installedVersion: string,
+    versionDates: Readonly<Record<string, string>>,
+    latestVersion?: string | null,
+    latestPublishedDate?: string | null,
+): string | null {
+    const direct = versionDates[installedVersion];
+    if (direct) { return direct; }
+
+    const normalizedInstalled = normalizeVersionKey(installedVersion);
+    if (!normalizedInstalled) { return null; }
+
+    for (const [version, date] of Object.entries(versionDates)) {
+        if (normalizeVersionKey(version) === normalizedInstalled) {
+            return date;
+        }
+    }
+
+    if (latestVersion && latestPublishedDate) {
+        const normalizedLatest = normalizeVersionKey(latestVersion);
+        if (normalizedInstalled === normalizedLatest) {
+            return latestPublishedDate;
+        }
+    }
+
+    return null;
+}
+
 /** Analyze a single package and compute its vibrancy result. */
 export async function analyzePackage(
     dep: PackageDependency,
@@ -60,7 +99,12 @@ export async function analyzePackage(
     ]);
     const pubDev = pubDevResult.info;
     const prereleaseInfo = pubDevResult.prerelease;
-    const installedVersionDate = pubDevResult.versionDates[dep.version] ?? null;
+    const installedVersionDate = resolveInstalledVersionDate(
+        dep.version,
+        pubDevResult.versionDates,
+        pubDev?.latestVersion ?? null,
+        pubDev?.publishedDate ?? null,
+    );
 
     const repoUrl = resolveRepoUrl(dep.name, pubDev?.repositoryUrl, params);
     const { github, repoInfo } = await fetchGitHubData(repoUrl, params);

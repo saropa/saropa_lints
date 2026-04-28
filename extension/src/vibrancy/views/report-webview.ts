@@ -51,7 +51,7 @@ export class VibrancyReportPanel {
     }
 
     private async _handleMessage(
-        msg: { type: string; package?: string },
+        msg: { type: string; package?: string; path?: string; line?: number; data?: unknown },
     ): Promise<void> {
         if (msg.type === 'openPubspec' && this._pubspecUri) {
             try {
@@ -109,6 +109,73 @@ export class VibrancyReportPanel {
                _updateContent, so the rescan button resets naturally. */
             await vscode.commands.executeCommand('saropaLints.packageVibrancy.scan');
             await vscode.commands.executeCommand('saropaLints.packageVibrancy.showReport');
+        }
+
+        else if (msg.type === 'openSourceFolder' && msg.package) {
+            await vscode.commands.executeCommand(
+                'saropaLints.packageVibrancy.openSourceFolder',
+                msg.package,
+            );
+        }
+
+        else if (msg.type === 'openFileRef' && msg.path) {
+            await this._openFileReference(msg.path, msg.line);
+        }
+
+        else if (msg.type === 'saveReportJson' && Array.isArray(msg.data)) {
+            await this._saveReportJson(msg.data);
+        }
+    }
+
+    private async _openFileReference(filePath: string, line?: number): Promise<void> {
+        try {
+            const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+            if (!workspaceFolder) { return; }
+            const isAbsolute = /^[a-zA-Z]:[\\/]/.test(filePath) || filePath.startsWith('/');
+            const uri = isAbsolute
+                ? vscode.Uri.file(filePath)
+                : vscode.Uri.joinPath(workspaceFolder.uri, filePath);
+            const doc = await vscode.workspace.openTextDocument(uri);
+            const editor = await vscode.window.showTextDocument(doc);
+            const targetLine = Math.max(0, (line ?? 1) - 1);
+            const pos = new vscode.Position(targetLine, 0);
+            editor.selection = new vscode.Selection(pos, pos);
+            editor.revealRange(
+                new vscode.Range(pos, pos),
+                vscode.TextEditorRevealType.InCenter,
+            );
+        } catch {
+            vscode.window.showErrorMessage(`Could not open file reference: ${filePath}`);
+        }
+    }
+
+    private async _saveReportJson(rows: unknown[]): Promise<void> {
+        try {
+            const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+            if (!workspaceFolder) { return; }
+            const now = new Date();
+            const y = now.getFullYear().toString();
+            const m = String(now.getMonth() + 1).padStart(2, '0');
+            const d = String(now.getDate()).padStart(2, '0');
+            const hh = String(now.getHours()).padStart(2, '0');
+            const mm = String(now.getMinutes()).padStart(2, '0');
+            const ss = String(now.getSeconds()).padStart(2, '0');
+            const ymd = `${y}${m}${d}`;
+            const timestamp = `${hh}${mm}${ss}`;
+            const dir = vscode.Uri.joinPath(workspaceFolder.uri, 'reports', ymd);
+            await vscode.workspace.fs.createDirectory(dir);
+            const file = vscode.Uri.joinPath(
+                dir,
+                `${ymd}_${timestamp}pubspec_vibrancy.json`,
+            );
+            const content = JSON.stringify(rows, null, 2);
+            await vscode.workspace.fs.writeFile(
+                file,
+                new TextEncoder().encode(content),
+            );
+            vscode.window.showInformationMessage(`Saved report JSON: ${file.fsPath}`);
+        } catch {
+            vscode.window.showErrorMessage('Could not save report JSON.');
         }
     }
 

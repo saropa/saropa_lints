@@ -154,6 +154,7 @@ export const workspace: Record<string, any> = {
     fs: {
         readFile: async () => new Uint8Array(),
         writeFile: async () => { /* no-op */ },
+        createDirectory: async () => { /* no-op */ },
     },
     onDidSaveTextDocument: (_listener: (doc: any) => void) => ({
         dispose: () => { /* no-op */ },
@@ -223,6 +224,13 @@ export enum ViewColumn {
     Active = -1,
     Beside = -2,
     One = 1,
+}
+
+export enum TextEditorRevealType {
+    Default = 0,
+    InCenter = 1,
+    InCenterIfOutsideViewport = 2,
+    AtTop = 3,
 }
 
 export enum ProgressLocation {

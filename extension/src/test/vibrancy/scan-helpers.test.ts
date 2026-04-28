@@ -122,3 +122,45 @@ describe('scanPackages', () => {
         assert.strictEqual(reports[1].increment, 50);
     });
 });
+
+describe('resolveInstalledVersionDate', () => {
+    it('returns direct version-date match when available', () => {
+        const result = scanOrchestrator.resolveInstalledVersionDate(
+            '4.3.3',
+            { '4.3.3': '2024-09-29T00:00:00Z' },
+            '4.3.3',
+            '2024-09-29T00:00:00Z',
+        );
+        assert.strictEqual(result, '2024-09-29T00:00:00Z');
+    });
+
+    it('matches when only build metadata differs', () => {
+        const result = scanOrchestrator.resolveInstalledVersionDate(
+            '4.3.3+2',
+            { '4.3.3': '2024-09-29T00:00:00Z' },
+            '4.3.3',
+            '2024-09-29T00:00:00Z',
+        );
+        assert.strictEqual(result, '2024-09-29T00:00:00Z');
+    });
+
+    it('falls back to latest publish date when installed matches latest', () => {
+        const result = scanOrchestrator.resolveInstalledVersionDate(
+            '1.2.0+hotfix',
+            {},
+            '1.2.0',
+            '2025-12-01T00:00:00Z',
+        );
+        assert.strictEqual(result, '2025-12-01T00:00:00Z');
+    });
+
+    it('returns null when no version date can be resolved', () => {
+        const result = scanOrchestrator.resolveInstalledVersionDate(
+            '2.0.0',
+            { '1.9.9': '2024-01-01T00:00:00Z' },
+            '3.0.0',
+            '2025-01-01T00:00:00Z',
+        );
+        assert.strictEqual(result, null);
+    });
+});
