@@ -352,7 +352,7 @@ Same intent as §0; this section is **deliverables + exit criteria** per phase.
 
 **Exit:** Coverage % tracked; remaining issues filed.
 
-### Phase 6 — SDK / Flutter packs (**in progress**)
+### Phase 6 — SDK / Flutter packs (**substantially shipped**)
 
 **Deliverables:**
 
@@ -381,8 +381,14 @@ Associated tests: `test/rule_packs_sdk_gates_test.dart`. Extension detection now
 
 **Remaining for Phase 6 close-out (small):**
 
-- Optionally split very broad SDK packs if UX requires finer granularity.
 - Final maintainer sign-off that current SDK cohorts are sufficient for v1.
+
+**Phase 6 maintainer sign-off checklist (v1):**
+
+- [ ] SDK pack inventory reviewed (`dart_sdk_3_2`, `flutter_sdk_3_0` … `flutter_sdk_3_38`) and accepted as the v1 baseline.
+- [ ] `test/rule_packs_sdk_gates_test.dart` and `test/rule_packs_migration_membership_test.dart` passing in CI.
+- [ ] No migration rules currently in SDK packs are left tier-only without explicit pack ownership.
+- [ ] Any intentionally deferred splits/granularity changes are captured as follow-up issues (post-v1).
 
 ### Phase 7 — Optional: external API / second analyzer plugin
 
@@ -553,12 +559,11 @@ Canonical **Flutter embedder / build target** identifiers (align with `flutter c
 
 ### Phase 1–2 acceptance (package packs + UI)
 
-- [ ] With `rule_packs.enabled: [riverpod]` and a Riverpod-only rule in the registry, that rule runs even if not in the tier selection (per §7.1 option A).
-- [ ] `diagnostics: rule_x: false` still disables `rule_x` if pack would include it (override order documented).
-- [ ] Extension row shows: **package/pack label**, **detected in pubspec** (yes/no), **enabled** toggle, **rule count**, **navigable list of rules** (link or command); **platform targets table** (Appendix C) for Flutter apps.
-- [ ] Toggle persists in `analysis_options.yaml`; analysis reflects change.
-- [ ] No `rule_packs` key → same behavior as today for existing projects.
-- [ ] Legacy `migration_packs.enabled` is read for compatibility; if both keys exist, canonical `rule_packs.enabled` wins.
+- [x] With `rule_packs.enabled: [riverpod]` and a Riverpod-owned rule in the registry, that rule is enabled even when tiers alone would not include it (authoritative pack ownership).
+- [x] `diagnostics: rule_x: false` still disables `rule_x` if a pack would include it (override order documented and tested).
+- [x] Extension row shows: **package/pack label**, **detected in pubspec** (yes/no), **enabled** toggle, **rule count**, and a **navigable list of rules**.
+- [x] Toggle persists in `analysis_options.yaml`; analysis reflects change.
+- [x] Legacy `migration_packs.enabled` is read for compatibility; if both keys exist, canonical `rule_packs.enabled` wins.
 
 ---
 

@@ -54,6 +54,19 @@ void main() {
       expect(enabled.contains('require_provider_scope'), isTrue);
       expect(enabled.contains('x'), isTrue);
     });
+
+    test(
+      'pack-owned diagnostics true is ignored unless owning pack is enabled',
+      () {
+        // Simulates diagnostics: require_provider_scope: true with no pack
+        // selected. In authoritative pack mode, pack-owned rules are only
+        // active when their owning pack is enabled.
+        final enabled = <String>{'require_provider_scope', 'x'};
+        mergeRulePacksIntoEnabled(enabled, null, const <String>[]);
+        expect(enabled.contains('require_provider_scope'), isFalse);
+        expect(enabled.contains('x'), isTrue);
+      },
+    );
   });
 
   group('ruleCodesForPack', () {
