@@ -1,7 +1,7 @@
 # Project Vibrancy Report
 
-> **Last reviewed:** 2026-04-20
-> **Status:** Proposed — not started
+> **Last reviewed:** 2026-04-29
+> **Status:** In progress — CLI + primary extension webviews + partial coverage-quality flags shipped; analyzer-native usage, full trivial/LCOV join, tree/editor/history, and baseline CI remain
 
 <!-- cspell:disable -->
 ## Goal
@@ -145,6 +145,15 @@ Default weights (tunable via settings, same pattern as `saropaLints.packageVibra
 
 Weights sum to 1.00. Changing weights does **not** bust the signals cache — only the final scores recompute.
 
+### Weight calibration protocol
+
+Default weights ship as sensible priors, not universal truth. Calibration is explicit and periodic:
+- **Cadence:** quarterly (or after any major incident cluster).
+- **Sample:** last 20 production incidents + top 50 lowest-scoring functions + top 50 flagged-but-dismissed functions.
+- **Objective:** maximize precision@K for "would have been worth manual review" while keeping false-positive review load bounded.
+- **Guardrail:** no single quarter changes any weight by more than ±0.10 without a documented rationale.
+- **Audit trail:** write each calibration decision (before/after weights + rationale) to a changelog entry in the plan/history docs.
+
 Penalties (hard deductions, cap at −30):
 - Function >50 lines: −5
 - Function params >3: −5
@@ -203,6 +212,15 @@ Flag rollup: a class/file/directory's flag count is the sum of flagged functions
 3. **VS Code sidebar** — primary interactive UI, a `Project Vibrancy` treeview alongside `Package Vibrancy`. Details in the [UI](#ui) section below.
 4. **History sparkline** — reuse the `sparkline_vibrancy_history.md` model. Key by function signature (file path + name + arity). Cap snapshots the same way.
 
+### CI baseline and rollout policy
+
+To prevent noisy adoption, CI gates roll out in stages:
+- **Bootstrap mode (first run):** generate baseline artifact on default branch (`project-vibrancy-baseline.json`) and publish as CI artifact/cache key.
+- **Soft gate (2-4 weeks):** job always reports deltas in PR comments but does not fail builds.
+- **Hard gate:** fail only when configurable thresholds are exceeded vs baseline (grade drop, new `unused`/`uncovered`/`stub_tested` counts, and regressed top-K functions).
+- **Rebaseline controls:** allowed only on default branch with explicit `--rebaseline` flag; PR branches cannot silently rewrite baseline.
+- **Monorepo safety:** CI command accepts explicit Dart roots; non-Dart directories are ignored and reported as skipped.
+
 ## Scale
 
 The report has to work on a 1M-line codebase without turning the IDE into a brick. The controlling insight: a full cold scan is expensive, but 99% of subsequent scans only touch files whose git blob SHA changed. Everything in this section is designed around that.
@@ -216,6 +234,7 @@ Per-file signals are content-local: age, coverage, complexity, documentation all
 - **Key:** `<blob-sha>-<collector-version>-<exclusion-set-hash>`. Blob SHA gives per-file content identity; collector version busts on code change; exclusion-set hash busts if the user edits the generated-file or entry-point patterns.
 - **Value:** the per-file collected signals *except* usage. Weights changing do **not** bust this cache — only signals are stored; scores recompute cheaply.
 - **Invalidation:** additive-only; stale entries age out on a size-capped LRU (default 500 MB).
+- **Schema/versioning:** each cache payload includes `schemaVersion` and `collectorVersion`. Unknown/newer schema triggers safe ignore + recompute, never partial decode.
 
 **Tier 2 — project-level reverse-reference map:**
 - **Store:** `.saropa/project-vibrancy-cache/usage/<tree-sha>.json` and a rolling `latest.json` symlink/pointer.
@@ -224,6 +243,7 @@ Per-file signals are content-local: age, coverage, complexity, documentation all
 - **Incremental rebuild:** on any scan, compute the set of dirty files (blob SHA changed since last tree). For each dirty file: (a) remove its outgoing edges from the map, (b) re-walk it, (c) add its new outgoing edges. Incoming-edge invalidation for any symbol whose declaring file was dirty is handled by a second pass over the reverse-caller set of that symbol. The map is never rebuilt from scratch on normal scans.
 - **Why tree-SHA not blob-SHA:** a single blob change can invalidate dozens of functions in other files; only a whole-tree identifier captures that state.
 - **Cold-start cost:** full reverse-reference walk is the most expensive collector. Acceptable once; not acceptable per scan.
+- **Corruption handling:** invalid JSON/checksum mismatch forces rebuild of Tier 2 map for current tree SHA; tool logs one warning and continues.
 
 **One cache root for all scan shapes.** Single-file, single-folder, paused/resumed, full, and CI scans all read and write the same store. A single-file rescan updates Tier 1 for that file and patches Tier 2 incrementally for any symbols whose outgoing or incoming edges touched that file.
 
@@ -231,6 +251,7 @@ Per-file signals are content-local: age, coverage, complexity, documentation all
 
 - `git ls-files -s <path>...` returns the blob SHA for every tracked file in one call (~50 ms on 50k files). Diff against the cache to decide which files need re-collection.
 - Uncommitted changes: `git status --porcelain` finds dirty files; we hash their working-tree bytes with `git hash-object --stdin` so dirty and committed versions of the same path never collide in the cache.
+- Persisted JSON maps are written with deterministic key ordering so same inputs produce byte-stable outputs.
 
 ### Scoped scans
 
@@ -339,6 +360,9 @@ Tree is home. Heatmap / delta / flag inbox are linked from the tree toolbar and 
 
 Every in-editor indicator is independently toggleable. No single "one true" editor surface — different developers have different noise tolerance, so the choice is theirs. Settings namespace: `saropaLints.projectVibrancy.editor.*`.
 
+Privacy toggle:
+- `saropaLints.projectVibrancy.editor.showAuthorMetadata` (default `off`): controls display of author name and commit SHA in hover/details. When off, show age only ("last touched 847d ago") without identity.
+
 | Surface | Setting | Default | Behavior |
 |---|---|---|---|
 | **Gutter icon** | `gutter` | `on` | Small colored circle in the left gutter beside each function declaration. Color = grade (A green → F red). Clicking jumps to that function's node in the tree, pre-expanded. |
@@ -385,6 +409,16 @@ Design principles:
 
 ## Implementation Phases
 
+### Delivery ownership and acceptance (minimum plan)
+
+| Phase | Owner | Estimate | Primary blockers | Acceptance test |
+|---|---|---|---|---|
+| 1. Collectors | Extension core + analyzer integration | 1-2 weeks | analyzer memory behavior, test fixture breadth | Fixture suite passes for all five collectors, including trivial-assertion cases |
+| 2. Join + score | Scoring/runtime | 3-5 days | function ID stability across refactors | Deterministic scores on golden fixtures; no nondeterministic diff |
+| 3. Surfaces | VS Code UX | 1-2 weeks | tree perf on large snapshots | Tree interactive under load; CLI/HTML parity checks pass |
+| 4. History + trends | CI/release infra | 3-5 days | baseline artifact portability | PR delta report stable on repeated runs |
+| 5. Flight-risk research | Research/quality | 1 week research spike | incident corpus quality | Report comparing prediction quality vs naive baseline |
+
 ### Phase 1 — Collectors (parallel, independent)
 - **git-age collector:** shell out to `git blame --line-porcelain` and `git log`, parse to `Map<filePath, Map<lineNumber, epochSeconds>>`.
 - **lcov collector:** parse `coverage/lcov.info` (simple line-oriented format, no library needed). Second pass: run the trivial-assertion AST filter over every test file referenced in LCOV, discard hits from trivial-only tests, set `stub_tested` flag where all contributing tests were filtered.
@@ -393,6 +427,21 @@ Design principles:
 - **documentation collector:** AST walk over doc comments and in-body comments, try-parse each comment body as Dart to classify as prose or commented-out-code, emit `Map<functionId, DocMetrics>` with doc-presence / density / word-ratio.
 
 Each collector is independently testable against fixture projects. The trivial-assertion filter in the lcov collector needs its own fixture suite covering every pattern from the [Trivial-assertion filter](#trivial-assertion-filter) list plus variations.
+
+#### Validation matrix for false-positive control (required before default-on)
+
+- **Framework entry points:** Flutter (`build`, lifecycle hooks), Riverpod providers/notifiers, Bloc lifecycle callbacks, isolate entry points (`@pragma('vm:entry-point')`), CLI `main()`.
+- **Reflection/dynamic invocation:** known runtime-invoked targets in fixture apps must not be flagged `unused`.
+- **Mock-heavy tests:** mocktail/mockito suites with `verify`-based assertions must not be downgraded to trivial.
+- **Custom matcher suites:** project-defined `Matcher` helpers and assertion identifiers must preserve coverage credit.
+- **Pass criteria:** `unused` precision target >= 0.90 on curated fixtures; trivial-assertion filter false-positive rate <= 5% on assertion-bearing tests.
+
+#### Degrade-safe behavior for assertion analysis
+
+If test AST/type resolution is partial or fails (syntax errors, missing package graph, analyzer timeout), the collector must fail open:
+- Do **not** suppress LCOV hits from unresolved tests.
+- Emit a `assertion_analysis_partial` scan warning with affected test files.
+- Mark affected rows with a neutral note rather than `stub_tested`.
 
 ### Phase 2 — Join + Score
 - Function ID = `file:class:name(arity)` canonical string.
@@ -408,6 +457,49 @@ Each collector is independently testable against fixture projects. The trivial-a
 - Append to `.saropa/project-vibrancy-history.json` on each scan.
 - Sparklines only after a meaningful baseline accumulates.
 - **PR delta gate:** GitHub Action that runs `--since <base>`, diffs against cached baseline on `main`, posts PR comment with regressed functions + new flags + grade delta. Gate thresholds (max grade drop, max new flags) configurable per repo.
+
+### Phase 6 — Launch and rollback controls
+
+- **Feature flag stages:** `off` (default for new installs) -> `preview` (opt-in) -> `on` (default-on after validation targets met).
+- **Kill switch:** single setting `saropaLints.projectVibrancy.enabled=false` disables all collectors and editor surfaces instantly.
+- **Collector isolation toggles:** each signal collector can be disabled independently for incident mitigation.
+- **Rollback rule:** if false-positive reports exceed threshold or scan latency SLO is breached for two consecutive releases, revert to previous stage.
+
+## MVP Slice (first ship)
+
+The first production slice is intentionally narrow to validate signal quality before UI complexity:
+
+- **In scope:** Phase 1 (all collectors), Phase 2 (join + score), and CLI JSON output from Phase 3.
+- **Out of scope for MVP:** VS Code tree/editor decorations, HTML export, history sparkline, PR comments UI polish, and flight-risk research.
+- **Primary command:** `saropa_lints project-vibrancy --format=json --all` (+ `--since` for CI).
+- **MVP quality gates:**
+  - Deterministic JSON on repeat runs for unchanged inputs.
+  - Validation matrix thresholds met (`unused` precision and trivial-filter false-positive targets).
+  - Scan duration on this repo within the Success Criteria budget.
+  - No extension-host stability regressions (usage collector remains subprocess-only).
+- **Exit criteria to unlock full UI surfaces:** two consecutive releases meeting MVP quality gates with no Sev1 regressions and acceptable feedback volume on false positives.
+
+### Current implementation snapshot (2026-04-29)
+
+- **Implemented (matches shipped code today):**
+  - **CLI:** `bin/project_vibrancy.dart` — JSON + text, deterministic ordering, `--path`, `--lcov`, `--file`, `--folder`, `--since`, gates (`--min-grade`, `--max-unused`, `--max-uncovered`, `--max-stub-tested`, `--max-suspicious-coverage`, `--max-test-drift`), summary counts in JSON.
+  - **Collectors (MVP subset):** per-function age from `git blame` (line porcelain, `-w`; **not** yet `--ignore-revs-file` or mass-edit warnings per plan), LCOV line hits, cyclomatic complexity + documentation heuristics, **name-based** cross-file usage with **test + integration_test** sources included so call-only-from-test symbols are not mis-flagged `unused`.
+  - **Cache:** single MVP JSON store for blame/LCOV fingerprints (not the full two-tier blob + tree-SHA usage cache from § Scale).
+  - **Extension:** `Project Vibrancy` sidebar webview (text/grade/flag filters, quick slices including coverage-quality flags, `--since` scoping, scope badge, filtered row count, persisted filter state); full report webview (summary + worst functions, open file at line); commands wired in `package.json`.
+  - **Coverage-quality flags (partial vs plan):** `stub_tested`, `suspicious_coverage`, and `test_drift` are emitted per function and in summary/CLI gates/UI **using heuristics** (direct test→`lib/` import graph + simplified trivial-assertion AST + git commit ages on linked tests). Standard Dart `lcov.info` does **not** attribute hits per test; the plan’s **line-level discard of hits from trivial-only tests** and **distinct `test()` blocks touching a function** are **not** fully implemented — see **§ Test Coverage (LCOV + trivial-assertion detection)** and **§ Suspicious-coverage flag** above.
+
+- **Not started or materially incomplete vs this document:**
+  - **Usage:** analyzer **element** reference map, narrow **entry-point exclusions** (`main`, `build`, `@pragma`, framework lifecycles), **Tier‑2 usage cache** (tree SHA + incremental invalidation), **cascading unused** enrichment, **usage collector in isolated subprocess** with NDJSON streaming (§ Analyzer isolation).
+  - **Git age:** `--ignore-revs-file=.git-blame-ignore-revs`, **suspect mass-edit** warnings (§ Mass-format resilience).
+  - **Coverage:** full trivial-assertion matrix (`when` without `verify`, invoke-but-don’t-check, typed `Matcher`, `assertionIdentifiers` setting), **LCOV second pass** that drops hits from trivial-only tests, **`assertion_analysis_partial`** fail-open path (§ Degrade-safe behavior for assertion analysis), **linked test file list** on each row in UI/export.
+  - **Scoring:** configurable **weights**, **penalties**, **hard fresh override**, **`oversized`** flag as specified (§ Composite Score, § Categories).
+  - **Rollups:** class / file / directory / project and flag rollups (§ Aggregation Units).
+  - **UI (plan):** native **TreeDataProvider** tree, checkboxes for “include in totals”, category/delta/fuzzy filters, context menus, heatmap / delta / flag-inbox / scatterplot panels, **editor** gutter/minimap/CodeLens/hover/settings (§ UI).
+  - **History & CI:** `.saropa` history file + sparklines + **PR delta** workflow; **baseline bootstrap / soft-hard gate / `--rebaseline`** story (§ CI baseline and rollout policy, Phase 4).
+  - **Governance:** validation matrix thresholds, feature-flag / kill-switch / per-collector toggles (Phase 6).
+  - **Flight-risk (Phase 5):** research-only until docs + validation exist (Phase 5).
+
+- **Doc hygiene:** treat the rows above as the living gap list until each section links to a closed issue or release note; update this snapshot when behavior crosses from partial to spec-complete.
 
 ### Phase 5 — Flight-Risk (research, gated on Phase 1 documentation collector)
 
@@ -437,6 +529,7 @@ flight_risk = (age_factor × complexity_factor × churn_factor × lone_author_fa
 - **Not** a replacement for existing lint rules. The function-length / param-count / nesting checks in `self-reviewer` stay where they are. The report consumes them as signals; it does not duplicate them.
 - **Not** a code quality score in the abstract sense (no style, no naming, no "readability"). Five concrete signals only: age, coverage, usage, complexity, documentation.
 - **Not** cross-language. Dart-only, same as the existing package scope.
+- **Not** a whole-repo quality index for polyglot monorepos. Non-Dart files/folders are explicitly skipped; only configured Dart roots participate in scoring.
 - **Not** a replacement for per-file analyzer diagnostics. The report runs on demand or in CI, not on save.
 - **No LLM-generated narrative, summary, or recommendation.** Copying raw JSON of issues/status is the only export format besides HTML. If users want prose, they write it.
 - **No auto-generated test skeletons** for uncovered functions. Stub tests create a false sense of security — the coverage signal already penalizes them (see `stub_tested`). Shipping a generator that produces the exact shape we penalize would be contradictory.
@@ -469,3 +562,5 @@ These were open questions at draft time; the answers are now folded into the pla
 - Runs locally in under the time of a full `dart analyze` on this project.
 - JSON output is stable enough to diff between runs (same input → same output, ordered deterministically).
 - At least one real finding on this project that the existing lint rules do not already surface. If the report tells the user nothing new, it has failed.
+- **Interactive SLOs:** first visible tree results in <= 5s after scan start on warm cache; tree expand/filter actions <= 100 ms p95 on 50k-function snapshots.
+- **Memory SLOs:** extension host memory overhead <= 300 MB during scan; analyzer subprocess constrained independently and killable without impacting editor session.

@@ -3,7 +3,7 @@
 **Source:** [GitHub Discussion #56](https://github.com/saropa/saropa_lints/discussions/56)  
 **Priority:** High  
 **ROADMAP:** Part 3 — Planned Enhancements (SaropaLintRule Base Class)  
-**Last reviewed:** 2026-04-14
+**Last reviewed:** 2026-04-28
 
 ---
 
@@ -17,31 +17,52 @@ Record every time a lint is suppressed (via `// ignore:`, `// ignore_for_file:`,
 
 ---
 
-## 2. Current state in saropa_lints (as of 2026-04-14)
+## 2. Current state in saropa_lints (as of 2026-04-28)
 
 ### Dart plugin side
 
 - **IgnoreUtils** (`lib/src/ignore_utils.dart`): Parses `// ignore: rule_name` and `// ignore_for_file: rule_name` with hyphen/underscore flexibility. Handles leading comments, trailing same-line comments, ancestor chains, and special cases (MethodInvocation mid-chain, PropertyAccess, CatchClause).
 - **SaropaDiagnosticReporter** (`lib/src/saropa_lint_rule.dart:2651`): Central reporter wrapping the native `AnalysisRule` reporting. Three reporting methods (`atNode`, `atToken`, `atOffset`) each check suppression before reporting. The private `_isSuppressed()` method checks baseline, file-level ignore, and node-level ignore in sequence.
-- **Violation tracking already exists:** When a violation is *not* suppressed, `_trackViolation()` records it via both `ImpactTracker.record()` and `ProgressTracker.recordViolation()`. These write to `violations.json` and impact/progress outputs. **No equivalent tracking exists for suppressions** — when `_isSuppressed()` returns true, the method simply returns without recording anything.
+- **Suppression tracking is implemented:** Suppression paths now call `_trackSuppression(...)` and flow into `SuppressionTracker`. Suppression records are merged cross-isolate and included in exported summary data.
 - **BaselineManager** (`lib/src/baseline/baseline_manager.dart`): Handles baselining existing violations. Baseline suppressions are distinct from ignore-comment suppressions but both are checked in the reporter's `_isSuppressed()` path.
 
 ### VS Code extension side
 
 - **suppressionsStore.ts** (`extension/src/suppressionsStore.ts`): Manages *UI-level view suppressions* (hidden folders, files, rules, severities, impacts in the Issues tree). This is unrelated to code-level `// ignore:` tracking — it controls what the user sees in the sidebar, not what the analyzer suppresses.
-- **violationsReader.ts**: Reads `violations.json` produced by the plugin. Currently only contains reported (non-suppressed) violations.
+- **violationsReader.ts**: Reads `violations.json` produced by the plugin, including suppression summary data (`total`, `byKind`, `byRule`, `byFile`) used by extension views.
 - **Issues tree, Security Posture tree, Overview tree**: Existing sidebar trees that display violations. A "Suppressions" tree or section could integrate here.
 - **reportWriter.ts / owaspExport.ts**: Existing report export infrastructure that could include suppression data.
 
 ### Gap
 
-There is no central record of "rule X was suppressed at file F, line L" persisted for later reporting or auditing. The suppression decision happens silently inside `_isSuppressed()` / `_isBaselined()` / `_isIgnoredForFile()` and is not recorded anywhere.
+Core recording and summary aggregation are now in place. The primary gaps are:
+
+- Extension UX completion (dedicated Suppressions section with navigation and grouping).
+- Report/export and policy surfacing (text report, OWASP/security views, CI-facing schema documentation).
 
 ---
 
-## 3. Proposed design
+## 3. Architecture and data contract
 
-### 3.1 Dart plugin: SuppressionRecord and SuppressionTracker
+### 3.1 Canonical output contract (current)
+
+The canonical output remains `violations.json` (not a separate `suppressions.json`). Suppression data is emitted under the summary payload and consumed by the extension.
+
+```json
+{
+  "summary": {
+    "totalViolations": 120,
+    "suppressions": {
+      "total": 14,
+      "byKind": { "ignore": 8, "ignoreForFile": 4, "baseline": 2 },
+      "byRule": { "avoid_print": 5, "require_https": 3 },
+      "byFile": { "lib/app.dart": 7, "lib/api.dart": 4 }
+    }
+  }
+}
+```
+
+### 3.2 Dart plugin model (implemented)
 
 ```dart
 /// A single suppressed diagnostic.
@@ -75,12 +96,12 @@ class SuppressionTracker {
     records.add(SuppressionRecord(rule: rule, file: file, line: line, kind: kind));
   }
 
-  /// Write to suppressions.json alongside violations.json.
+  /// Records are merged into consolidated analysis data and exported via violations.json.
   static void flush(String outputDir) { /* ... */ }
 }
 ```
 
-### 3.2 Hook point: SaropaDiagnosticReporter
+### 3.3 Hook point: SaropaDiagnosticReporter
 
 The natural insertion point is `_isSuppressed()`, `_isBaselined()`, `_isIgnoredForFile()`, and the individual `atToken`/`atOffset` methods where ignore checks happen inline. When any check returns true, call `SuppressionTracker.record()` before returning.
 
@@ -101,32 +122,18 @@ if (IgnoreUtils.hasIgnoreComment(node, _ruleName)) {
 return false;
 ```
 
-### 3.3 Output: suppressions.json
-
-Write a `suppressions.json` file alongside the existing `violations.json`, using the same output directory and flush timing. Format:
-
-```json
-{
-  "suppressions": [
-    { "rule": "avoid_print", "file": "lib/app.dart", "line": 42, "kind": "ignore" },
-    { "rule": "require_https", "file": "lib/api.dart", "line": 10, "kind": "ignoreForFile" }
-  ],
-  "summary": {
-    "totalSuppressions": 14,
-    "byKind": { "ignore": 8, "ignoreForFile": 4, "baseline": 2 },
-    "byRule": { "avoid_print": 5, "require_https": 3 }
-  }
-}
-```
-
 ### 3.4 VS Code extension: Suppressions sidebar section
 
-- **New tree provider** or section within the existing Issues tree that reads `suppressions.json`.
+- **New tree provider** or section within the existing Issues tree that reads suppression data from `violations.json`.
 - **Group by:** rule name (default), file, suppression kind, or severity/impact.
 - **Click-to-navigate:** Each suppression entry navigates to the file and line.
 - **Counts in sidebar header:** "Suppressions (14)" similar to existing issue counts in `sidebarSectionCounts.ts`.
-- **Filter/hide controls:** Reuse the existing `suppressionsStore.ts` pattern for UI-level hiding, or add new filter dimensions (by kind, by rule).
+- **Filter/hide controls:** Reuse `suppressionsStore.ts` UX patterns only (do not reuse it as the data source for code suppressions); add filter dimensions by kind/rule/file as needed.
 - **Report export:** Include suppression data in the existing report infrastructure (`reportWriter.ts`), and optionally in OWASP exports for security-relevant suppressions.
+
+### 3.5 Historical note (superseded)
+
+Earlier drafts proposed a separate `suppressions.json`. That approach is superseded by the shipped `violations.json`-based contract to keep extension/report ingestion centralized.
 
 ---
 
@@ -137,7 +144,7 @@ Write a `suppressions.json` file alongside the existing `violations.json`, using
 | Cleanup campaigns | Generate list of all ignores so teams can fix and remove them. Extension shows clickable list. |
 | Security audits | Report "security rules suppressed N times" and list files/lines. Filter by OWASP-mapped rules. |
 | Tech debt tracking | Report suppressions (e.g. tech-debt prefix) separately; dedicated sidebar section. |
-| Policy compliance | Enforce "no suppressions for rule X" or "all suppressions must have ticket." CI reads suppressions.json. |
+| Policy compliance | Enforce "no suppressions for rule X" or "all suppressions must have ticket." CI reads `violations.json` suppression summary. |
 | Metrics | Track suppression rate (suppressions / (suppressions + violations)). Show in Overview tree. |
 | Baseline burn-down | Track how many baseline suppressions remain vs. initial count. Show trend over time. |
 
@@ -190,12 +197,14 @@ Three quick wins shipped as the foundation for full suppression tracking:
 
 ### Phase 3: Reporting and CI
 
-1. Include suppression summary in text report exports (`reportWriter.ts`).
-2. Include security-rule suppressions in OWASP export (`owaspExport.ts`).
-3. Document the `violations.json` suppressions schema for CI consumption.
-4. Add suppression-rate metric (suppressions / total) to Overview tree.
+1. ✅ Include suppression summary in text report exports (`reportWriter.ts`).
+2. ✅ Include security-rule suppressions in OWASP export (`owaspExport.ts`).
+3. ✅ Document the `violations.json` suppressions schema for CI consumption (`README.md` Quality gate section).
+4. ✅ Add suppression-rate metric (suppressions / total) to Overview tree.
 
 ### Phase 4: Custom prefixes (depends on Discussion #59)
+
+Status is tracked in `plan/deferred/discussion_059_custom_ignore_prefixes.md` (deferred/policy-blocked).
 
 1. When custom ignore prefixes land, add a `prefix` field to `SuppressionRecord`.
 2. Support filtering by prefix in the extension UI and reports.
@@ -229,3 +238,12 @@ Three quick wins shipped as the foundation for full suppression tracking:
 1. Keep open.
 2. Finish Phase 2 as a dedicated scoped implementation.
 3. Follow with Phase 3 if CI/reporting consumers need suppression governance.
+
+## 10. Progress update (2026-04-28)
+
+- Phase 2 completed: dedicated **Suppressions** sidebar section added in the extension (`saropaLints.suppressions`) with grouping by kind/rule/file and navigation commands.
+- Phase 3 completed:
+  - Extension action reports now include suppression summary and top suppressed rules/files.
+  - OWASP export now includes a suppression governance section, including security-related suppression counts.
+  - README documents the canonical `violations.json` suppression schema for CI consumers.
+  - Overview now shows suppression rate alongside suppression counts.

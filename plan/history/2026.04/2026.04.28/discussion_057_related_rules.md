@@ -2,9 +2,9 @@
 
 **Source:** [GitHub Discussion #57](https://github.com/saropa/saropa_lints/discussions/57)  
 **Priority:** Completed  
-**ROADMAP:** Part 3 — Planned Enhancements (SaropaLintRule Base Class)  
+**ROADMAP:** Part 3 — Implemented Enhancements (SaropaLintRule Base Class)  
 **Last reviewed:** 2026-04-28
-**Status:** Implemented (Phases 1-3 + follow-on enhancements complete)
+**Status:** Implemented (Phases 1-3 and follow-on enhancements complete)
 
 ---
 
@@ -88,21 +88,21 @@ Conclusion: An optional `List<String> relatedRules` on the rule class is low cos
 
 ---
 
-## 6. Implementation plan
+## 6. Implemented scope
 
-### Phase 1: Dart-side metadata (low complexity)
+### Phase 1: Dart-side metadata
 
 1. **Add `relatedRules` getter to `SaropaLintRule`** — default empty `const <String>[]`, same pattern as `cweIds`.
 2. **Add startup validation** — during plugin init, warn if any name in `relatedRules` doesn't exist in the rule registry. Log warning, don't crash.
 3. **Populate selectively** — start with a few obvious clusters (disposal rules, security credential rules, async rules). Do NOT attempt to populate all 2100+ rules at once.
 
-### Phase 2: Extension surfaces (low-medium complexity)
+### Phase 2: Extension surfaces
 
 4. **Rule Explain panel** — add a "Related rules" section to the HTML, with clickable links that open the explain panel for each related rule.
 5. **Hover provider** — if a violation's rule has `relatedRules`, append a brief "See also: ..." line to the hover card.
 6. **Suggestions tree** — when a related rule is disabled, surface it as a suggestion ("Consider enabling X").
 
-### Phase 3: Documentation (low complexity)
+### Phase 3: Documentation and CLI
 
 7. **Docs generation** — include "Related rules" in any generated markdown/JSON rule catalog.
 8. **Init CLI** — during `dart run saropa_lints:init`, after enabling a rule, mention related rules the user hasn't enabled.
@@ -119,13 +119,13 @@ Conclusion: An optional `List<String> relatedRules` on the rule class is low cos
 
 ---
 
-## 8. Open questions
+## 8. Resolved follow-ons
 
-1. **Relationship types:** Should we distinguish "related" from "conflicts with" (e.g. `prefer_single_quotes` vs `prefer_double_quotes`) and "supersedes" (for deprecated/renamed rules)? Or keep a single flat `relatedRules` list and handle conflicts via a separate `conflictsWith` getter later?
-2. **Tag-based auto-discovery:** Should the extension also show "rules with the same tag" alongside explicit `relatedRules`? This could be noisy for broad tags like `'performance'` (49 rules in `performance_rules.dart` alone).
-3. **Rule Packs integration:** Should rule packs auto-suggest related rules that aren't in the pack? Or is that scope creep for this discussion?
+1. **Relationship types:** Added dedicated metadata for `conflictingRules` and `supersedesRules`.
+2. **Tag-based auto-discovery:** Added same-tag discovery in Rule Explain with ranked relatedness.
+3. **Rule Packs integration:** Added Rule Packs-aware suggestion hints for related-rule clusters.
 
-All follow-on questions were implemented on 2026-04-28:
+All follow-on items were implemented on 2026-04-28:
 - Added `conflictingRules` metadata and conflict-aware suggestions.
 - Added `supersedesRules` metadata for migration guidance.
 - Added same-tag discovery in Rule Explain.
@@ -133,7 +133,41 @@ All follow-on questions were implemented on 2026-04-28:
 
 ---
 
-## 9. Decision log
+## 9. Verification checklist
+
+- [x] `SaropaLintRule` exposes `relatedRules` metadata with empty default.
+- [x] Startup validation warns on unknown related/conflicting/superseded rule references.
+- [x] Rule metadata is exported in machine-readable contracts for extension/consumers.
+- [x] Rule Explain UI renders curated related links and same-tag discovery links.
+- [x] Hover/tooltip and suggestions surfaces include related-rule guidance.
+- [x] Suggestions avoid contradictory recommendations via `conflictingRules`.
+- [x] Init CLI prints actionable related-rule hints after explicit rule overrides.
+- [x] Unit tests cover metadata export, rendering, and suggestion behavior.
+
+---
+
+## 10. Implementation kickoff (next increments)
+
+This discussion is implemented. New work should focus on hardening and adoption:
+
+1. **Telemetry and UX tuning**
+   - Track whether users click related-rule links or apply suggested enablements.
+   - Tune thresholds for pack-cluster suggestions to reduce noisy prompts.
+
+2. **Data quality maintenance**
+   - Add periodic checks to prevent stale curated relationships as rules evolve.
+   - Prefer curated links only where they add directional value beyond shared tags.
+
+3. **Docs polish**
+   - Mirror metadata semantics in contributor docs (how to add `relatedRules`, `conflictingRules`, `supersedesRules`).
+   - Include examples for symmetric vs directional relationships.
+
+4. **Validation tightening**
+   - Consider upgrading selected startup warnings to CI checks once relationship data stabilizes.
+
+---
+
+## 11. Decision log
 
 | Date | Decision |
 |------|----------|

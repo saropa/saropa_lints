@@ -1,12 +1,12 @@
 # Plan: Rule Metadata, Standards Mapping, and Quality System
 
-**Status:** Draft (partially implemented — see [RULE_METADATA_BULK_STATUS.md](RULE_METADATA_BULK_STATUS.md))  
+**Status:** Implemented (2026-04-28) — see [RULE_METADATA_BULK_STATUS.md](RULE_METADATA_BULK_STATUS.md) for rollout details.  
 **Priority:** Medium (incremental adoption)  
 **Scope:** Rule base class, reporting, tooling, documentation  
 
 **Review note:** Plan only; no runtime code in this file. Check alignment with CONTRIBUTING, CODEBASE_INDEX, and ROADMAP.
 
-**Implementation note (2026-03-19):** Base types and `SaropaLintRule` getters are in place; bulk `ruleType`/`tags`; security CWE + hotspot pass expanded (WebView/redirect hotspots + `cweIds` population). **Not done:** quality gates CLI, new-code metrics reporting, `requiresReview` on diagnostics, full CWE coverage (permission rules/helpers left empty), `accuracyTarget` population.
+**Implementation note (2026-03-19, updated 2026-04-28):** Base metadata types and `SaropaLintRule` getters are in place; bulk `ruleType`/`tags`; security CWE + hotspot pass expanded (including full manual CWE population and `cweIds` coverage); quality-gate CLI (YAML/JSON); deterministic date-based `newCode` reporting; canonical tag normalization; lifecycle-aware init filtering (`beta`/`deprecated` excluded by default); default accuracy targets derived from `ruleType`; hotspot review metadata (`requiresReview`, default `open` state) in `violations.json`; and extension-side persisted hotspot review workflow (`open`, `reviewed-safe`, `reviewed-fixed`) with Issues actions plus Summary/Overview progress surfacing. Plan implementation is complete.
 
 ---
 
@@ -184,30 +184,18 @@ Distinguish security findings that require an immediate fix from those that requ
 - In docs and extension UI, explain: “Security hotspot: review this code; it may be intentional. Resolve as ‘safe’ or apply a fix.”
 - No new API; reporting and gates treat `securityHotspot` differently (e.g. gate fails on new vulnerabilities, warns or does not fail on new hotspots until “reviewed”).
 
-**3.3.2 Option B: Explicit “review required” severity or flag**
+**3.3.2 V1 scope boundary (implementation-safe)**
 
-Add a way to mark a diagnostic as “review required” so the IDE/extension can show a different treatment (e.g. different icon or action label):
+Do **not** add a new analyzer/custom_lint diagnostic API field such as
+`requiresReview` in v1. That would require upstream analyzer protocol/UI support
+outside this repository and risks non-portable behavior.
 
-```dart
-// In LintCode or reporter API (conceptual)
-class LintCode {
-  // ...
-  /// If true, this finding is a security hotspot: developer should review
-  /// and resolve as "safe" or "fixed" rather than auto-applying a fix.
-  bool get requiresReview => false;
-}
-```
+Instead, implement review semantics in repo-owned surfaces:
 
-Or at report time:
-
-```dart
-reporter.atNode(node, code, requiresReview: true);
-```
-
-Then:
-
-- **Vulnerability:** `requiresReview: false` (default) — “Fix this.”
-- **Security hotspot:** `requiresReview: true` — “Review this; confirm safe or fix.”
+- `ruleType: RuleType.securityHotspot` as the canonical marker.
+- Optional `review-required` tag in metadata exports.
+- Extension/report UX that treats hotspots as “review required” while leaving
+  analyzer diagnostics unchanged.
 
 **3.3.3 Example rule classification**
 
@@ -227,8 +215,12 @@ Then:
 
 ### 3.5 Implementation notes
 
-- Phase 1: Use `RuleType.securityHotspot` only (Option A); document and use in reporting/gates.
-- Phase 2: If the extension or IDE supports a “review” workflow, add `requiresReview` (or equivalent) in the diagnostic/reporter layer (Option B).
+- Phase 1: Use `RuleType.securityHotspot` as the source of truth; document and
+  use it in reporting/gates.
+- Phase 2: Add extension-side review workflow states (`open`, `reviewed-safe`,
+  `reviewed-fixed`) keyed by finding fingerprint; avoid analyzer API changes.
+- Phase 3 (optional): Revisit diagnostic-level flagging only if upstream APIs
+  support it natively.
 - Reclassify existing security rules in batches; start with 3–5 clear hotspot candidates.
 
 ---
@@ -321,9 +313,9 @@ Attach a set of tags to each rule so users and tooling can filter and discover r
 Set<String> get tags => const {};
 ```
 
-**Tag vocabulary (controlled set recommended):**
+**Tag vocabulary (controlled and canonical):**
 
-- **Domain:** `security`, `accessibility`, `performance`, `testing`, `i18n`, `a11y`, `network`, `storage`, `ui`, `state-management`.
+- **Domain:** `security`, `accessibility`, `performance`, `testing`, `i18n`, `network`, `storage`, `ui`, `state-management`.
 - **Nature:** `suspicious`, `convention`, `bad-practice`, `pitfall`, `design`, `maintainability`, `reliability`.
 - **Context:** `flutter`, `dart-core`, `async`, `disposal`, `crypto`.
 
@@ -340,7 +332,7 @@ Set<String> get tags => const {'security', 'suspicious'};
 
 // prefer_semantics_label
 @override
-Set<String> get tags => const {'accessibility', 'a11y', 'flutter'};
+Set<String> get tags => const {'accessibility', 'flutter'};
 
 // require_item_extent_for_large_lists
 @override
@@ -359,7 +351,9 @@ Set<String> get tags => const {'performance', 'flutter', 'ui'};
 ### 5.5 Implementation notes
 
 - Add `Set<String> get tags => const {}` to `SaropaLintRule`.
-- Prefer a controlled vocabulary (e.g. in `lib/src/rule_tags.dart` as `const Set<String> allowedTags`) to avoid typo proliferation; lint or tests can warn on unknown tags.
+- Add a canonical vocabulary (e.g. `lib/src/rule_tags.dart`) and normalize
+  aliases (`a11y` -> `accessibility`) at export/report boundaries.
+- Add tests that fail on unknown tags so typo drift is caught in CI.
 - Populate tags in batches (e.g. by folder first: all `security/*` get `security` plus more specific tags).
 
 ---
@@ -450,13 +444,17 @@ Define “new code” (e.g. lines or files changed since a baseline date or bran
 
 ### 7.3 Proposed design
 
-**7.3.1 Definition of “new code”**
+**7.3.1 Definition of “new code” (v1 canonical)**
 
-- **Option A — Date-based:** Same as baseline: “new” = lines (or files) with last change (git blame) after a configured date (e.g. `new_code_date: 2025-01-01` or `new_code_since: 30d`).
-- **Option B — Branch-based:** “New” = lines changed in the current branch vs a target ref (e.g. `main`). Requires diff/blame and a ref.
-- **Option C — Baseline file:** “New” = violations not listed in the baseline file; “existing” = listed in baseline. So “new” = any violation not in the baseline.
+- **V1 default (required): Date-based.**
+  “New” = lines with last change (git blame) after a configured date
+  (`new_code_date: YYYY-MM-DD`).
+- **Future optional modes (not v1):**
+  - Branch-based (`diff` against target ref).
+  - Baseline-delta (`all - baseline`).
 
-We already have date-based logic in `BaselineManager` and path-based baselines; reuse for “new code” range.
+We already have date-based logic in `BaselineManager`; v1 reuses that same
+computation path so gate/report behavior is deterministic across CLI/CI.
 
 **7.3.2 New-code report output**
 
@@ -492,9 +490,11 @@ Gate conditions (§6) reference “new” metrics (e.g. `new_critical_issues`, `
 
 ### 7.5 Implementation notes
 
-- Reuse `BaselineDate` / git-blame logic for date-based “new code”; add a dedicated “new code report” path that does not suppress diagnostics but only classifies them for reporting.
-- If we use “violations not in baseline” as “new,” we need a way to run analysis and produce both “all violations” and “violations in baseline” so that “new” = all − baseline.
-- Document the chosen definition (date vs branch vs baseline) in the user guide and gate docs.
+- Reuse `BaselineDate` / git-blame logic for date-based “new code”; add a
+  dedicated “new code report” path that does not suppress diagnostics but only
+  classifies them for reporting.
+- Keep v1 strict: one default definition in CLI + docs + extension.
+- Add optional strategy flag only after date-based mode ships and is validated.
 
 ---
 
@@ -547,6 +547,13 @@ RuleStatus get ruleStatus => RuleStatus.deprecated;
 - **Extension:** Optional filter “Hide deprecated” or “Show only ready.”
 - **Deprecation:** When status is deprecated, include in message or docs: “This rule is deprecated and will be removed in vX.Y. Prefer ….”
 
+**Enablement semantics (required):**
+
+- `ready`: included in normal tier selection.
+- `beta`: included only when explicitly enabled by config or beta profile.
+- `deprecated`: excluded from new init profiles; still runnable for compatibility
+  until removal version.
+
 ### 8.4 Use cases
 
 - **New rules:** Ship as beta; promote to ready after feedback and tuning.
@@ -557,7 +564,8 @@ RuleStatus get ruleStatus => RuleStatus.deprecated;
 
 - Default `ruleStatus => RuleStatus.ready` for backward compatibility.
 - Add `ruleStatus` to any JSON/CSV export and to docs generation so the website and init wizard can show or filter by status.
-- For deprecated rules, consider emitting a single “deprecation” info diagnostic per file or per run (to avoid noise) and document removal version in CHANGELOG.
+- For deprecated rules, emit at most one deprecation notice per run and always
+  include replacement + planned removal version in docs/CHANGELOG.
 
 ---
 
@@ -568,7 +576,7 @@ Suggested order to minimize rework and allow incremental delivery:
 | Phase | Items | Rationale |
 |-------|--------|-----------|
 | 1 | Rule type (§1), Rule status (§8) | Pure metadata on rules; no new infra. Enables reporting and docs. |
-| 2 | Accuracy targets doc (§2), Security hotspot workflow (§3) | Doc + convention and optional `requiresReview`; builds on rule type. |
+| 2 | Accuracy targets doc (§2), Security hotspot workflow (§3) | Doc + convention + extension-side review workflow; builds on rule type. |
 | 3 | CWE mapping (§4), Tags (§5) | More metadata; reporting and filtering. |
 | 4 | New-code metrics (§7) | Reuse baseline/date logic; needed for gates. |
 | 5 | Quality gates (§6) | Depends on new-code and rule type; script first, then optional extension/CI. |
@@ -578,10 +586,11 @@ Suggested order to minimize rework and allow incremental delivery:
 ## 10. Open questions
 
 - **Rule type default:** When `ruleType` is null, should reporting treat the rule as “unspecified” or infer from folder (e.g. `security/` → vulnerability)?
-- **Security hotspot in analyzer:** Can the Dart analyzer / IDE represent “review required” in a way that doesn’t look like a normal fix? If not, we may rely on rule type + docs and extension-only “review” UX.
+- **Security hotspot in analyzer:** Keep analyzer diagnostics unchanged in v1;
+  review workflow lives in extension/report surfaces.
 - **Gate config location:** Should gate conditions live in `analysis_options.yaml` under the plugin, in a separate `saropa_quality_gate.yaml`, or in the extension’s workspace settings?
-- **New-code default:** Prefer date-based, branch-based, or “violations not in baseline” as the default “new code” definition for the first release of new-code reporting?
-- **Tags vocabulary:** Strict enum/const set vs free-form strings with recommended list in docs?
+- **New-code default:** locked to date-based in v1; branch/baseline are later optional modes.
+- **Tags vocabulary:** canonical constants + alias normalization + CI validation.
 
 ---
 
@@ -591,7 +600,7 @@ Suggested order to minimize rework and allow incremental delivery:
 |---|-------------|---------------|----------------------------|
 | 1 | Rule type | `RuleType? get ruleType => null` | null = unspecified |
 | 2 | Accuracy targets | Doc + optional `AccuracyTarget? get accuracyTarget => null` | Doc only first |
-| 3 | Security hotspot | `RuleType.securityHotspot` + optional `requiresReview` | No change to existing rules until reclassified |
+| 3 | Security hotspot | `RuleType.securityHotspot` + extension/report review workflow | Analyzer diagnostics unchanged in v1 |
 | 4 | CWE/CERT | `List<int> get cweIds`, `List<String> get certIds` | `const []` |
 | 5 | Tags | `Set<String> get tags => const {}` | empty set |
 | 6 | Quality gates | Script + config (YAML) | Opt-in; no change to analyze exit code by default |

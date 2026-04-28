@@ -42,7 +42,7 @@
 | **4** | **CLI `init`:** list applicable packs; optional `--enable-pack`. **Shipped:** `--list-packs`, `--enable-pack` on `dart run saropa_lints:init`; YAML preservation in `generatePluginsYaml`. |
 | **5** | **Bulk** assign rule codes → packs for all `lib/src/rules/packages/*` (script or codegen). **Shipped:** generator + audit in implementation note. |
 | **6** | **SDK / Flutter** packs + map `migration_rules.dart` entries. **Substantially shipped:** SDK-gated packs from pubspec `environment` constraints (`dart_sdk_3_2`, `flutter_sdk_3_7`, `flutter_sdk_3_10`, `flutter_sdk_3_16`, `flutter_sdk_3_19`, `flutter_sdk_3_22`, `flutter_sdk_3_24`, `flutter_sdk_3_28`, `flutter_sdk_3_29`, `flutter_sdk_3_32`, `flutter_sdk_3_35`, `flutter_sdk_3_38`). |
-| **7** | **Optional:** `saropa_lints_api` + second analyzer plugin for private org rules. |
+| **7** | **Optional:** `saropa_lints_api` facade + init composite scaffold; orgs still ship their own meta-plugin. |
 
 Later sections (architecture, data model, §11 inventory) support **all** phases; implementation order is **0 → 1 → 2** for a vertical slice, then **3–6** as capacity allows.
 
@@ -363,6 +363,7 @@ Same intent as §0; this section is **deliverables + exit criteria** per phase.
 **Implementation note (2026-04-28):** Added SDK-gated pack predicates in `rule_packs.dart` using pubspec `environment` constraints (`kRulePackSdkGates`, `packPassesSdkGate`), plus SDK packs:
 
 - `dart_sdk_3_2` → js_interop migration rules (`avoid_removed_js_number_to_dart`, `avoid_legacy_jsboolean_return_assumptions`, `prefer_string_for_typeof_equals`, `prefer_int_for_jsarray_with_length`)
+- `dart_sdk_3_4` → Dart 3.4 deprecations/removals (`avoid_deprecated_file_system_delete_event_is_directory`, `avoid_removed_null_thrown_error`, and related core removals)
 - `flutter_sdk_3_0` → Flutter migration rules (`avoid_removed_render_object_element_methods`)
 - `flutter_sdk_3_7` → Flutter migration rules (`avoid_deprecated_use_inherited_media_query`, `prefer_scrollbar_theme_of`)
 - `flutter_sdk_3_10` → Flutter migration rules (`avoid_removed_appbar_backwards_compatibility`, `avoid_deprecated_flutter_test_window`)
@@ -377,22 +378,32 @@ Same intent as §0; this section is **deliverables + exit criteria** per phase.
 - `flutter_sdk_3_35` → Flutter migration rules (`prefer_dropdown_initial_value`, `prefer_on_pop_with_result`)
 - `flutter_sdk_3_38` → Flutter migration rules (`avoid_asset_manifest_json`)
 
-Associated tests: `test/rule_packs_sdk_gates_test.dart`. Extension detection now also recognizes SDK packs from `environment.sdk` / `environment.flutter` constraints (`extension/src/rulePacks/rulePackDefinitions.ts`).
+Associated tests: `test/rule_packs_sdk_gates_test.dart`, `test/rule_packs_migration_membership_test.dart`. Extension detection now also recognizes SDK packs from `environment.sdk` / `environment.flutter` constraints (`extension/src/rulePacks/rulePackDefinitions.ts`). Config Dashboard quick actions now include one-click enablement for detected SDK packs and detected breaking SDK packs.
 
 **Remaining for Phase 6 close-out (small):**
 
-- Final maintainer sign-off that current SDK cohorts are sufficient for v1.
+- Final maintainer sign-off that current SDK cohorts are sufficient for v1 (process; not automatable here).
 
 **Phase 6 maintainer sign-off checklist (v1):**
 
-- [ ] SDK pack inventory reviewed (`dart_sdk_3_2`, `flutter_sdk_3_0` … `flutter_sdk_3_38`) and accepted as the v1 baseline.
-- [ ] `test/rule_packs_sdk_gates_test.dart` and `test/rule_packs_migration_membership_test.dart` passing in CI.
-- [ ] No migration rules currently in SDK packs are left tier-only without explicit pack ownership.
-- [ ] Any intentionally deferred splits/granularity changes are captured as follow-up issues (post-v1).
+- [x] SDK pack inventory reviewed (`dart_sdk_3_2`, `dart_sdk_3_4`, `flutter_sdk_3_0` … `flutter_sdk_3_38`) and accepted as the v1 baseline (see `rule_packs.dart` + extension registry generator).
+- [x] `test/rule_packs_sdk_gates_test.dart`, `test/rule_packs_migration_membership_test.dart`, and `test/rule_packs_config_test.dart` cover SDK gates, migration membership, and authoritative pack merge (run in CI).
+- [x] No migration rules in SDK/flutter packs are tier-only: `mergeRulePacksIntoEnabled` strips all pack-owned codes (including SDK packs) unless an owning pack is enabled (`test/rule_packs_config_test.dart`).
+- [ ] Any intentionally deferred splits/granularity changes are captured as follow-up issues (post-v1) — file GitHub issues when deferring further pack splits.
+
+**Phase 6 verification command (copy/paste):**
+
+`dart test test/rule_packs_migration_membership_test.dart test/rule_packs_sdk_gates_test.dart test/rule_packs_config_test.dart`
+
+**Expected coverage from this command:**
+
+- SDK gate semantics (`packPassesSdkGate`, `isRulePackApplicable`) across Dart/Flutter lower bounds.
+- SDK pack membership guardrails for migration rule ownership.
+- Authoritative pack behavior (pack-owned rules require owning pack; diagnostics `false` still wins).
 
 ### Phase 7 — Optional: external API / second analyzer plugin
 
-**Status: registrar shipped; thin API package still optional.** There is **no** separate `saropa_lints_api` package yet. Consumers can depend on `package:saropa_lints` and call **`registerSaropaLintRules`** + **`loadNativePluginConfig`** from a **composite** analyzer plugin (see `doc/guides/composite_analyzer_plugin.md`). There is still **no** second analyzer plugin *shipped by this repo* — orgs author their own meta-plugin package.
+**Status: registrar shipped; `saropa_lints_api` facade + init scaffold shipped.** Consumers can depend on `package:saropa_lints` **or** `package:saropa_lints_api` (repository path: `packages/saropa_lints_api/`) and call **`registerSaropaLintRules`** + **`loadNativePluginConfig`** from a **composite** analyzer plugin (see `doc/guides/composite_analyzer_plugin.md`). There is still **no** second analyzer plugin *shipped by this repo* — orgs author their own meta-plugin package; use **`dart run saropa_lints:init --emit-composite-plugin-scaffold [dir]`** for a starter tree.
 
 **Why org-specific rules (e.g. “use `CommonText` instead of `Text`”) are not a separate “Saropa plugin” today**
 
@@ -416,8 +427,8 @@ The analyzed project sets **`plugins.acme_saropa_plugin`** (only one plugin key)
 |------|---------|
 | Export a **public registrar** (`registerSaropaLintRules(PluginRegistry registry)`) refactored out of `lib/main.dart` | **Done** — `package:saropa_lints/saropa_lints.dart`; `lib/main.dart` delegates. |
 | **Document** composite-plugin setup, `analysis_options.yaml` shape, and “restart analysis server” | **Done** — `doc/guides/composite_analyzer_plugin.md`. |
-| **Optional:** `saropa_lints_api` — minimal types / mixins only if we need a stable surface that custom-rule packages depend on **without** depending on all of `saropa_lints` | Reduces version coupling; not strictly required if custom rules live in a package that already depends on `saropa_lints` |
-| **Init / extension (later):** teach `init` or docs to generate or link a template facade when `--with-custom-plugin` or similar | UX |
+| **`saropa_lints_api`** — re-exports `registerSaropaLintRules`, config loaders, `SaropaLintRule` | **Done** — `packages/saropa_lints_api/` (path / future pub publish). |
+| **Init / VS Code:** `--emit-composite-plugin-scaffold [dir]` and **Saropa Lints: Create Composite Analyzer Plugin (scaffold)** write a minimal meta-plugin package | **Done** — `lib/src/init/composite_plugin_scaffold.dart`, Config sidebar + command palette, composite guide. |
 
 **Not a good bet without major R&D:** true **runtime** discovery of arbitrary packages from YAML (dynamic `import`) — Dart AOT/analyzer isolates do not offer a supported way to load unknown rule classes by name without codegen or a predeclared dependency edge.
 
@@ -575,7 +586,7 @@ Canonical **Flutter embedder / build target** identifiers (align with `flutter c
 
 **Implementation note (2026-03-21):** **Phase 5 (bulk pack registry)** — `tool/generate_rule_pack_registry.dart` emits `rule_pack_codes_generated.dart` and `extension/.../rulePackDefinitions.ts` from `lib/src/rules/packages/*_rules.dart`; `rule_packs.dart` merges generated maps with `collection_compat`. `tool/rule_pack_audit.dart` validates extraction (including `applyCompositeRulePacks` for rules listed in multiple packs).
 
-**Implementation note (Phase 7):** **`registerSaropaLintRules`** and **re-exported** `loadNativePluginConfig` / `loadOutputConfigFromProjectRoot` / `loadRulePacksConfigFromProjectRoot` are public on `package:saropa_lints/saropa_lints.dart`; `lib/main.dart` delegates to `registerSaropaLintRules`. Optional **`saropa_lints_api`** (types-only dependency for custom-rule packages) not started.
+**Implementation note (Phase 7):** **`registerSaropaLintRules`** and **re-exported** `loadNativePluginConfig` / `loadOutputConfigFromProjectRoot` / `loadRulePacksConfigFromProjectRoot` are public on `package:saropa_lints/saropa_lints.dart`; `lib/main.dart` delegates to `registerSaropaLintRules`. **`saropa_lints_api`** (`packages/saropa_lints_api/`) re-exports that surface for composite meta-plugins; **`dart run saropa_lints:init --emit-composite-plugin-scaffold`** writes a starter plugin package.
 
 ---
 

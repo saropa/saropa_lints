@@ -31,7 +31,7 @@ Persist vibrancy scan history per-package so the report can render inline sparkl
 ### Append rules
 
 - On each completed scan, compare the new results to the most recent snapshot.
-- **Only append** if at least one package changed version, was added, or was removed.
+- **Only append** if at least one package changed any tracked field (`version`, `score`, `category`, or `grade`), or a package was added/removed.
 - Cap history at 50 snapshots. Drop the oldest when the limit is exceeded.
 - Never overwrite or merge snapshots; each is immutable once written.
 
@@ -40,7 +40,7 @@ Persist vibrancy scan history per-package so the report can render inline sparkl
 1. After `runScan()` completes and `latestResults` is populated, call `appendVibrancySnapshot(results)`.
 2. Read the existing history file (create if missing).
 3. Build a new snapshot from `latestResults`.
-4. Diff against `snapshots[snapshots.length - 1]` — skip write if packages + versions are identical.
+4. Diff against `snapshots[snapshots.length - 1]` — skip write only when package names and all tracked fields are identical.
 5. Append and write atomically (write to `.tmp`, rename).
 
 ### New file
@@ -76,7 +76,7 @@ Key functions:
 
 1. On report build, load history and pass trend arrays into `ReportOptions`.
 2. In `buildRow()`, render an inline SVG sparkline in the score/category cell.
-3. Sparkline: 40x16px, polyline, color matches the current category grade.
+3. Sparkline: 40x16px, polyline, color maps from the current `category` (keep `grade` as text/badge semantics).
 
 ### SVG sparkline helper
 
@@ -96,7 +96,7 @@ function buildSparklineSvg(scores: number[], color: string): string {
 
 ## Gitignore
 
-Add `.saropa/` to the project's `.gitignore` template or document that users should gitignore it. The history file contains no secrets but is workspace-local state.
+Add `.saropa/vibrancy-history.json` to the project's `.gitignore` template or document that users should gitignore it. The history file contains no secrets but is workspace-local state.
 
 ## Testing
 
@@ -106,7 +106,7 @@ Add `.saropa/` to the project's `.gitignore` template or document that users sho
 
 ## Migration
 
-- If `schemaVersion` does not match, discard and start fresh (v1 is the first version, no migration needed yet).
+- If `schemaVersion` does not match, log a warning with old/new versions, optionally back up the old file (e.g. `vibrancy-history.v<old>.bak.json`), then start fresh (v1 is the first version, no migration needed yet).
 
 ## Future extensions
 

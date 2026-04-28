@@ -3,6 +3,16 @@
 **Source:** [GitHub Discussion #59](https://github.com/saropa/saropa_lints/discussions/59)  
 **Priority:** Low  
 **ROADMAP:** Part 3 — Planned Enhancements (SaropaLintRule Base Class)
+**Status:** Deferred (policy-blocked) — not implemented in plugin behavior
+
+## Decision (2026-04-28)
+
+This discussion is now treated as deferred and policy-blocked:
+
+- We will continue relying on analyzer-native suppression comments only (`ignore:` and `ignore_for_file:`).
+- We will not add plugin-side custom suppression parsing for prefixes like `saropa-ignore:` or `tech-debt:`.
+- Revisit only after an explicit project-level policy change.
+- **Status note moved from Discussion #56:** Phase 4 (custom prefixes) is not implemented by design because it depends on Discussion #59, which is currently deferred/policy-blocked.
 
 ---
 

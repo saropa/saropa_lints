@@ -44,11 +44,12 @@ Split **options** into three layers so users know where to look:
 |--------|-----------|--------|
 | **Visibility of activity bar sections** | `saropaLints.sidebar.show*` | Mirrors VS Code’s native “hide view” but **named and portable** across machines if synced. |
 
-**UX rule:** This is **only** “what appears in the Saropa activity bar,” not rule tiers or analysis. Prefer **one** entry point to edit these:
+**UX rule:** This is **only** “what appears in the Saropa activity bar,” not rule tiers or analysis.
 
-- **Recommended:** A dedicated **“Sidebar layout…”** command that opens a **single** focused UI (Quick Pick or simple webview) listing sections with checkboxes — *or* keep Overview → **Sidebar** expander but **rename** the parent to **“Activity bar sections”** and add a one-line description: *“Show or hide views here; does not change analysis or rules.”*
-
-- **Avoid:** Duplicating the same toggles in three places without copy that explains equivalence (Settings JSON = Overview toggles).
+- **Primary (canonical):** Overview → **Activity bar sections** (renamed from Sidebar) is the main place to manage visibility.
+- **Secondary (advanced mirror):** Settings `saropaLints.sidebar.show*` remains available for JSON/workspace-sync users, but should be treated as an implementation detail.
+- **Copy requirement:** Add one-line help text in both surfaces clarifying they edit the same underlying state.
+- **Avoid:** Presenting multiple equivalent controls as peers without naming the canonical path.
 
 ### Layer C — Project lint setup & triage (today’s “Config” view)
 
@@ -96,27 +97,56 @@ Split **options** into three layers so users know where to look:
 
 ## 5. Recommended implementation order (product)
 
-1. **Rename “Config” view** (display name only or + view id if breaking change acceptable) to **Setup & triage** (or agreed label) + tooltip.
+1. **Rename “Config” view** (display name only) to **Setup & triage** (or agreed label) + tooltip.
 2. **Rename Overview “Sidebar” expander** → **Activity bar sections** + short description (Layer B vs C).
-3. **Walkthrough + README** — Add § “Where are options?” mapping Layers A/B/C; add § Violations vs Problems (one paragraph).
-4. **Violations empty state** — Copy pass for “not analyzed” vs “0 violations.”
-5. **(Optional)** Single **Sidebar layout** command replacing or supplementing per-section Settings rows for discoverability.
+3. **Define canonical language in copy** — In Overview/README/Walkthrough, explicitly state “Activity bar sections is the default place to manage visibility; Settings is an advanced mirror.”
+4. **Walkthrough + README** — Add § “Where are options?” mapping Layers A/B/C; add § Violations vs Problems (one paragraph).
+5. **Violations empty state** — Copy pass for “not analyzed” vs “0 violations.”
+6. **(Optional, later)** Single **Sidebar layout** command only if discoverability remains poor after the rename/copy pass.
 
 ---
 
-## 6. Out of scope for this plan
+## 6. Decision defaults (this phase)
+
+- **Sidebar visibility source of truth (UX):** `Activity bar sections` is the canonical entry point.
+- **Settings role:** Keep `saropaLints.sidebar.show*` for advanced usage, but de-emphasize in user-facing guidance.
+- **Rename safety:** Do not change view ids or command ids in this phase.
+- **Scope control:** Ship naming + copy + empty states first, then reassess with user feedback.
+
+### Success criteria (ship-now, no telemetry required)
+
+- **Naming consistency:** No user-facing primary UX labels use ambiguous `Config` wording for the renamed surface; the standalone view label is **Setup & triage**.
+- **Canonical path clarity:** User-facing copy states that **Overview -> Activity bar sections** is the default place to show/hide sections; Settings `sidebar.show*` is treated as an advanced mirror.
+- **Violations state clarity:** Empty states are explicitly distinct:
+  - **Not analyzed yet:** prompts to **Run analysis**.
+  - **No violations:** shows an **all clear** state.
+- **Regression protection:** Automated tests assert the key labels and view registrations (rename + Activity bar sections wording), and extension tests pass.
+
+### Manual QA checklist (same-day)
+
+- Open the extension sidebar and confirm the view title reads **Setup & triage** (not Config).
+- Open **Overview & options** and confirm the section label reads **Activity bar sections**.
+- In Settings, confirm the group label and descriptions reflect the canonical/default path language.
+- Verify `viewsWelcome` and Violations tree empty states show different copy for:
+  - no analysis report yet
+  - no violations found
+- Run extension unit tests and confirm they pass after these UX changes.
+
+---
+
+## 7. Out of scope for this plan
 
 - Package Vibrancy / Rule Packs / Drift Advisor product design (each deserves its own short “who is this for?” blurb).
 - Changing analyzer pipeline or `violations.json` format.
 
 ---
 
-## 7. Summary
+## 8. Summary
 
 | Area | User question | Answer we want them to have |
 |------|----------------|----------------------------|
 | **Options** | “Where do I change behavior?” | **Settings → Saropa Lints** |
-| **Options** | “Where do I hide sidebar panels?” | **Activity bar sections** (Overview) **or** Settings `sidebar.show*` |
+| **Options** | “Where do I hide sidebar panels?” | **Activity bar sections** (Overview) as default; Settings `sidebar.show*` is advanced mirror |
 | **Options** | “Where do I change tier / triage rules?” | **Setup & triage** view (renamed Config), not “Options” |
 | **Violations** | “Where do I fix lint findings?” | **Violations** view first; Problems for raw diagnostics; link between them |
 
