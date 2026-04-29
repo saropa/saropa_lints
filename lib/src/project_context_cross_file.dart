@@ -58,14 +58,28 @@ CrossFileSnapshotData? loadCrossFileSnapshot(String? projectRoot) {
     return _crossFileSnap;
   }
   try {
-    final m = jsonDecode(f.readAsStringSync()) as Map<String, dynamic>;
+    final Object? raw = jsonDecode(f.readAsStringSync());
+    if (raw is! Map<String, dynamic>) return null;
+    final m = raw;
     if ((m['version'] as num?)?.toInt() != crossFileSnapshotFormatVersion) {
       return null;
     }
     _crossFileSnapKey = key;
     _crossFileSnap = CrossFileSnapshotData._(m);
     return _crossFileSnap;
-  } on Object {
+  } on FormatException catch (e, st) {
+    developer.log(
+      'cross_file snapshot: invalid JSON',
+      error: e,
+      stackTrace: st,
+    );
+    return null;
+  } on Object catch (e, st) {
+    developer.log(
+      'cross_file snapshot: load failed',
+      error: e,
+      stackTrace: st,
+    );
     return null;
   }
 }

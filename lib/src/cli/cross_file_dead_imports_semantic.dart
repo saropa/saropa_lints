@@ -11,8 +11,9 @@ import 'package:saropa_lints/src/string_slice_utils.dart';
 
 /// Relative dead imports using the analyzer's unused-import diagnostics
 /// (semantic; respects resolution). Only `dart:` / `package:` imports are
-/// excluded by definition; this maps [HintCode.UNUSED_IMPORT] on relative
-/// `import '...';` directives to the same result shape as the regex heuristic.
+/// excluded by definition; this maps diagnostics whose
+/// [Diagnostic.diagnosticCode] is `unused_import` on relative `import '...';`
+/// directives to the same result shape as the regex heuristic.
 Future<Map<String, List<String>>> analyzeDeadImportsSemantic({
   required String projectPath,
   required Set<String> includedPaths,
@@ -62,8 +63,9 @@ Future<Map<String, List<String>>> analyzeDeadImportsSemantic({
   } finally {
     try {
       await collection.dispose();
-    } on Object {
+    } on Object catch (e) {
       // Best-effort: driver disposal can fail if the context was left inconsistent.
+      stderr.writeln('cross_file dead-imports: context dispose failed: $e');
     }
   }
 }

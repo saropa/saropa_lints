@@ -72,8 +72,8 @@ List<String> _discoverArbPaths(String projectPath, String? override) {
           return _discoverArbPaths(projectPath, arbDir);
         }
       }
-    } on Object {
-      /* ignore malformed l10n.yaml */
+    } on Object catch (e) {
+      stderr.writeln('cross_file unused-l10n: skipped malformed l10n.yaml: $e');
     }
   }
   final candidates = [
@@ -92,12 +92,19 @@ List<String> _discoverArbPaths(String projectPath, String? override) {
 
 Set<String> _readArbKeys(String arbPath) {
   final text = File(arbPath).readAsStringSync();
-  final decoded = jsonDecode(text);
-  if (decoded is! Map<String, dynamic>) return const {};
+  final Object? decoded;
+  try {
+    decoded = jsonDecode(text);
+  } on FormatException catch (e) {
+    stderr.writeln('cross_file unused-l10n: malformed JSON in $arbPath: $e');
+    return const {};
+  }
+  if (decoded is! Map) return const {};
   final keys = <String>{};
   for (final entry in decoded.entries) {
-    if (entry.key.startsWith('@')) continue;
-    keys.add(entry.key);
+    final k = entry.key;
+    if (k is! String || k.startsWith('@')) continue;
+    keys.add(k);
   }
   return keys;
 }
