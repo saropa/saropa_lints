@@ -5007,12 +5007,28 @@ class AvoidVoidAsyncRule extends SaropaLintRule {
   ];
 }
 
+/// True when static analysis can tell [type] is awaitable: [Future], [FutureOr],
+/// [Stream], or a class that implements or extends them (e.g. builders that
+/// `implements Future<T>`).
+bool _staticTypeIsAwaitable(DartType type) {
+  if (type.isDartAsyncFuture) return true;
+  if (type.isDartAsyncFutureOr) return true;
+  if (type.isDartAsyncStream) return true;
+  if (type is! InterfaceType) return false;
+  return type.allSupertypes.any(
+    (DartType t) =>
+        t.isDartAsyncFuture || t.isDartAsyncFutureOr || t.isDartAsyncStream,
+  );
+}
+
 /// Warns when `await` is used on a non-Future expression.
 ///
-/// Since: v5.1.0 | Rule version: v1
+/// Since: v5.1.0 | Rule version: v2
 ///
-/// Awaiting a value that is not a Future, FutureOr, or Stream is a no-op
-/// that adds misleading indirection and a microtask scheduling delay.
+/// Awaiting a value whose static type is not a real asynchronous value
+/// (`Future`, `FutureOr`, `Stream`, or a class that implements one of them)
+/// is a no-op that adds misleading indirection and a microtask scheduling
+/// delay.
 ///
 /// ### Example
 ///
@@ -5048,7 +5064,7 @@ class AvoidRedundantAwaitRule extends SaropaLintRule {
         'and misleading. It wraps the value in a resolved Future only to '
         'immediately unwrap it, adding an unnecessary microtask delay and '
         'confusing readers who expect asynchronous behavior. Remove the '
-        'await keyword to clarify that the expression is synchronous. {v1}',
+        'await keyword to clarify that the expression is synchronous. {v2}',
     correctionMessage: 'Remove the redundant await keyword.',
     severity: DiagnosticSeverity.INFO,
   );
@@ -5066,10 +5082,9 @@ class AvoidRedundantAwaitRule extends SaropaLintRule {
       if (type is DynamicType) return;
       if (type.isDartCoreObject) return;
 
-      // Allow Future, FutureOr, and Stream
-      if (type.isDartAsyncFuture) return;
-      if (type.isDartAsyncFutureOr) return;
-      if (type.isDartAsyncStream) return;
+      // Allow Future, FutureOr, Stream, and types that implement them (e.g.
+      // PostgrestBuilder implements Future<T>).
+      if (_staticTypeIsAwaitable(type)) return;
 
       // Skip type parameters — T could be a Future at runtime
       if (type is TypeParameterType) return;

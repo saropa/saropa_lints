@@ -322,6 +322,22 @@ void main() {
     });
   });
 
+  group('AvoidRedundantAwaitRule', () {
+    test('diagnostic text is v2 (Future/Stream implementers)', () {
+      final rule = AvoidRedundantAwaitRule();
+      expect(rule.code.problemMessage, contains('{v2}'));
+    });
+
+    test('fixture keeps BAD expect_lint and Future-implementer regression', () {
+      final source = File(
+        'example/lib/async/avoid_redundant_await_fixture.dart',
+      ).readAsStringSync();
+      expect(source, contains('// expect_lint: avoid_redundant_await'));
+      expect(source, contains('_DelegatingFuture'));
+      expect(source, contains('goodImplementsFuture'));
+    });
+  });
+
   // Stub-only behavior tests were removed from this file. Keep rule metadata,
   // fixture verification, and targeted metadata checks while migrating to
   // analyzer-backed behavior tests.

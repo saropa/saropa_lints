@@ -1594,7 +1594,7 @@ saropa_lints:
 
     # --- Async ---
     - avoid_void_async: false                          # WARNING - async void instead of Future<void> (v5.1.0)
-    - avoid_redundant_await: false                     # INFO - await on non-Future expression (v5.1.0)
+    - avoid_redundant_await: false                     # INFO - await on non-Future expression (v5.1.0, supertype walk v2)
 
     # --- Constructor ---
     - avoid_unused_constructor_parameters: false       # WARNING - unused constructor params (v5.1.0)

@@ -47,6 +47,20 @@
 
 ---
 
+## [Unreleased]
+
+### Fixed
+
+- **`avoid_redundant_await`** no longer flags `await` when the expression’s static type is a class that implements `Future` or `Stream` (e.g. Postgrest/Supabase builder APIs) instead of the plain `Future<…>` type, so legitimate awaits are not misreported as redundant. Remove any temporary `// ignore` workarounds you added for that pattern.
+
+<details><summary>Maintenance</summary>
+
+- Tag-publish and CI analyze jobs run nested `dart pub get` (discovered under `packages/`, with the same retries as the root install) before `dart analyze` so nested packages resolve on fresh checkouts. No action for pub.dev or extension users.
+
+</details>
+
+---
+
 ## [12.8.0]
 
 ### Fixed
