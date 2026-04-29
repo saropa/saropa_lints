@@ -165,18 +165,20 @@ class AvoidShrinkWrapInScrollViewRule extends SaropaLintRule {
   }
 }
 
-/// Warns when nested scrollables don't have explicit physics.
+/// Warns when same-axis nested scrollables omit an explicit `physics`
+/// argument.
 ///
-/// Since: v1.7.9 | Updated: v4.13.0 | Rule version: v3
+/// Since: v1.7.9 | Updated: v4.13.0 | Rule version: v4
 ///
-/// Nested scrollable widgets cause gesture conflicts. The inner
-/// scrollable should have NeverScrollableScrollPhysics to let the
-/// outer one handle scrolling.
+/// Nesting scrollables on the **same** axis (e.g. vertical inside
+/// vertical) can cause gesture conflicts unless the inner scrollable
+/// sets explicit `physics`. Cross-axis nesting (e.g. horizontal inside vertical)
+/// does not have that conflict: Flutter routes drags by axis.
 ///
 /// **BAD:**
 /// ```dart
 /// SingleChildScrollView(
-///   child: ListView(...), // Conflicts with parent!
+///   child: ListView(...), // Same axis as parent — conflicts!
 /// )
 /// ```
 ///
@@ -187,6 +189,16 @@ class AvoidShrinkWrapInScrollViewRule extends SaropaLintRule {
 ///     physics: NeverScrollableScrollPhysics(),
 ///     shrinkWrap: true,
 ///     ...
+///   ),
+/// )
+/// ```
+///
+/// **OK (cross-axis):**
+/// ```dart
+/// SingleChildScrollView(
+///   child: SingleChildScrollView(
+///     scrollDirection: Axis.horizontal,
+///     child: Text('overflow label'),
 ///   ),
 /// )
 /// ```
@@ -207,9 +219,9 @@ class AvoidNestedScrollablesConflictRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'avoid_nested_scrollables_conflict',
-    '[avoid_nested_scrollables_conflict] Nested scrollable without explicit physics causes gesture conflicts. Nested scrollable widgets cause gesture conflicts. The inner scrollable must have NeverScrollableScrollPhysics to let the outer one handle scrolling. {v3}',
+    '[avoid_nested_scrollables_conflict] Same-axis nested scrollable without explicit physics can cause gesture conflicts. When the inner scroll axis matches the nearest outer scrollable, set explicit physics (often NeverScrollableScrollPhysics) on the inner widget. Cross-axis nesting is not reported. {v4}',
     correctionMessage:
-        'Add physics: NeverScrollableScrollPhysics() to inner scrollable. Verify the change works correctly with existing tests and add coverage for the new behavior.',
+        'For same-axis nesting, add explicit physics on the inner scrollable (often NeverScrollableScrollPhysics). Cross-axis nesting does not need this. Verify with tests after changing scroll physics.',
     severity: DiagnosticSeverity.WARNING,
   );
 
@@ -262,11 +274,20 @@ class _NestedScrollableVisitor extends RecursiveAstVisitor<void> {
   void _checkScrollable(AstNode node, String typeName, ArgumentList args) {
     if (!scrollableTypes.contains(typeName)) return;
 
-    // Check if inside another scrollable
-    if (!_isInsideScrollable(node)) return;
+    final AstNode? outerScrollable = _findNearestScrollableAncestor(node);
+    if (outerScrollable == null) return;
 
-    // Check if physics is specified
-    bool hasPhysics = false;
+    final bool? innerHorizontal = _horizontalAxisOrUnknown(typeName, args);
+    final bool? outerHorizontal = _horizontalAxisOfScrollableNode(
+      outerScrollable,
+    );
+    if (innerHorizontal != null &&
+        outerHorizontal != null &&
+        innerHorizontal != outerHorizontal) {
+      return;
+    }
+
+    var hasPhysics = false;
     for (final Expression arg in args.arguments) {
       if (arg is NamedExpression && arg.name.label.name == 'physics') {
         hasPhysics = true;
@@ -279,22 +300,60 @@ class _NestedScrollableVisitor extends RecursiveAstVisitor<void> {
     }
   }
 
-  bool _isInsideScrollable(AstNode node) {
+  /// Nearest scrollable strictly above [node] in the parent chain.
+  AstNode? _findNearestScrollableAncestor(AstNode node) {
     AstNode? current = node.parent;
     while (current != null) {
       if (current is InstanceCreationExpression) {
-        final String typeName = current.constructorName.type.name.lexeme;
-        if (scrollableTypes.contains(typeName)) {
-          return true;
+        final String ancestorType = current.constructorName.type.name.lexeme;
+        if (scrollableTypes.contains(ancestorType)) {
+          return current;
         }
       } else if (current is MethodInvocation) {
         if (scrollableTypes.contains(current.methodName.name)) {
-          return true;
+          return current;
         }
       }
       current = current.parent;
     }
-    return false;
+    return null;
+  }
+
+  /// `true` = horizontal, `false` = vertical, `null` = unknown (caller
+  /// treats as potential same-axis conflict).
+  bool? _horizontalAxisOfScrollableNode(AstNode node) {
+    if (node is InstanceCreationExpression) {
+      return _horizontalAxisOrUnknown(
+        node.constructorName.type.name.lexeme,
+        node.argumentList,
+      );
+    }
+    if (node is MethodInvocation) {
+      return _horizontalAxisOrUnknown(node.methodName.name, node.argumentList);
+    }
+    return null;
+  }
+
+  static bool _defaultHorizontalForType(String typeName) =>
+      typeName == 'PageView';
+
+  /// Resolves `scrollDirection` when it is `Axis.horizontal` /
+  /// `Axis.vertical`; otherwise returns `null` so the rule stays conservative.
+  static bool? _horizontalAxisOrUnknown(String typeName, ArgumentList args) {
+    for (final Expression arg in args.arguments) {
+      if (arg is! NamedExpression) continue;
+      if (arg.name.label.name != 'scrollDirection') continue;
+      return _literalHorizontalFromAxisExpression(arg.expression);
+    }
+    return _defaultHorizontalForType(typeName);
+  }
+
+  static bool? _literalHorizontalFromAxisExpression(Expression expr) {
+    if (expr is PrefixedIdentifier && expr.prefix.name == 'Axis') {
+      if (expr.identifier.name == 'horizontal') return true;
+      if (expr.identifier.name == 'vertical') return false;
+    }
+    return null;
   }
 }
 
