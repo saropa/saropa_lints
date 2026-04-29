@@ -11,6 +11,8 @@
 ///
 /// **Performance:** resolves analysis context once per run; skips gracefully when analyzer or lcov
 /// is missing. See `bin/project_vibrancy.dart` for CLI exit-code mapping.
+library;
+
 import 'dart:convert';
 import 'dart:io';
 

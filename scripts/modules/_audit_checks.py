@@ -18,6 +18,8 @@ from pathlib import Path
 
 from scripts.modules._utils import (
     Color,
+    OutputLevel,
+    get_output_level,
     print_colored,
     print_error,
     print_info,
@@ -1039,35 +1041,24 @@ def print_contains_audit_status(
 
     If status is provided (e.g. from run_full_audit), it is used;
     otherwise status is computed from project_dir.
+
+    When the baseline is empty and no file exceeds its cap, prints nothing
+    (the main audit already prints a single pass for this). Detailed counts
+    are reserved for in-progress baselines at ``OutputLevel.VERBOSE``, or for
+    failures and warnings.
     """
     if status is None:
         status = get_contains_audit_status(project_dir)
     baseline = status["baseline"]
-    actual = status["actual"]
     total_remaining = status["total_remaining"]
     over_baseline = status["over_baseline"]
     stale_baseline = status["stale_baseline"]
     files_at_zero = status["files_at_zero"]
     n_in_baseline = len(baseline)
-    n_rule_files = len(actual)
+    n_rule_files = len(status["actual"])
 
-    print_subheader("False-positive reduction (.contains() audit)")
-    print(
-        "    Source: test/anti_pattern_detection_test.dart (baseline) + "
-        "lib/src/rules/**/*.dart (counts)."
-    )
-    print_stat(
-        "Rule files with 0 dangerous .contains()",
-        len(files_at_zero),
-        Color.GREEN,
-    )
-    print_stat(
-        "Rule files still in baseline (remaining work)",
-        n_in_baseline,
-        Color.YELLOW,
-    )
-    print_stat("Total violations across baseline files", total_remaining, Color.YELLOW)
     if over_baseline:
+        print_subheader("False-positive reduction (.contains() audit)")
         print_error(
             f"{len(over_baseline)} file(s) exceed baseline (CI would fail)"
         )
@@ -1075,16 +1066,57 @@ def print_contains_audit_status(
             print(f"      {f}: actual={a}, baseline={b}")
         if len(over_baseline) > 5:
             print(f"      ... and {len(over_baseline) - 5} more")
+        return
+
+    if n_in_baseline == 0:
+        # Pass line is emitted with other quality checks (run_full_audit).
+        if get_output_level().value >= OutputLevel.VERBOSE.value:
+            print_subheader("False-positive reduction (.contains() audit)")
+            print(
+                "    Source: test/anti_pattern_detection_test.dart (baseline) + "
+                "lib/src/rules/**/*.dart (counts)."
+            )
+            print_stat(
+                "Rule files with 0 dangerous .contains()",
+                len(files_at_zero),
+                Color.GREEN,
+            )
+            print_stat("Rule files still in baseline (remaining work)", 0, Color.GREEN)
+            print_stat("Total violations across baseline files", 0, Color.GREEN)
+            print_stat("Rule files scanned", n_rule_files, Color.CYAN)
+        return
+
     if stale_baseline:
         print_warning(
             f"{len(stale_baseline)} baseline entry(ies) can be removed "
             f"(file at 0): {', '.join(sorted(stale_baseline)[:5])}"
             + (f" +{len(stale_baseline)-5} more" if len(stale_baseline) > 5 else "")
         )
-    if not over_baseline and n_in_baseline == 0:
-        print_success("All rule files at 0; no baseline entries (audit complete).")
-    elif not over_baseline:
-        print_info(
-            f"Next: reduce violations in baseline files or remove entries "
-            f"when a file reaches 0 (see test/anti_pattern_detection_test.dart)."
+
+    print_info(
+        f"Baseline has {n_in_baseline} file(s), {total_remaining} violation(s); "
+        "reduce counts or remove entries when a file reaches 0 "
+        "(test/anti_pattern_detection_test.dart)."
+    )
+
+    if get_output_level().value >= OutputLevel.VERBOSE.value:
+        print(
+            "    Source: test/anti_pattern_detection_test.dart (baseline) + "
+            "lib/src/rules/**/*.dart (counts)."
         )
+        print_stat(
+            "Rule files with 0 dangerous .contains()",
+            len(files_at_zero),
+            Color.GREEN,
+        )
+        print_stat(
+            "Rule files still in baseline (remaining work)",
+            n_in_baseline,
+            Color.YELLOW,
+        )
+        print_stat(
+            "Total violations across baseline files",
+            total_remaining,
+            Color.YELLOW,
+        )
+        print_stat("Rule files scanned", n_rule_files, Color.CYAN)
