@@ -38,7 +38,9 @@ TRAIL = re.compile(
 
 
 def tidy_bullet(body: str) -> str:
+    """Normalize one changelog bullet: strip links/paths, trim, optionally cap length."""
     s = body.strip()
+    # Repeatedly strip markdown links until fixed point (nested or duplicate patterns).
     prev = None
     while prev != s:
         prev = s
@@ -47,6 +49,7 @@ def tidy_bullet(body: str) -> str:
     s = INLINE_PATH.sub("", s)
     s = TRAIL.sub("", s)
     s = re.sub(r" {2,}", " ", s).strip()
+    # Soft-cap: prefer breaking at last sentence in the head window to avoid mid-word cuts.
     if len(s) > 360:
         chunk = s[:340]
         if "." in chunk:
@@ -55,6 +58,7 @@ def tidy_bullet(body: str) -> str:
             chunk = chunk.rsplit(" ", 1)[0] + "."
         s = chunk
     low = s.lower()
+    # Boilerplate "no action" only when the bullet is informational (not migration/breaking).
     if "no action required" not in low and not re.search(
         r"\b(update|rename|migrate|breaking|must|need to)\b", low
     ):
@@ -66,12 +70,14 @@ def tidy_bullet(body: str) -> str:
 
 
 def process(text: str) -> str:
+    """Single pass over [CHANGELOG_ARCHIVE.md] lines; mutates list bullets inside release sections."""
     lines = text.splitlines()
     out: list[str] = []
     in_list = False
     skip_children = False
 
     for line in lines:
+        # Version headers and collapsible blocks end any active bullet list context.
         if VERSION_OR_DETAILS.match(line):
             in_list = False
             skip_children = False
@@ -105,6 +111,7 @@ def process(text: str) -> str:
         if in_list and line.startswith("- "):
             skip_children = False
             body = line[2:]
+            # Collapse verbose pubspec-validation sub-bullets into one summary line.
             if "**Pubspec validation" in body or "pubspec validation diagnostics" in body.lower():
                 merged = (
                     "**Pubspec validation diagnostics**: Eleven inline checks on `pubspec.yaml` "

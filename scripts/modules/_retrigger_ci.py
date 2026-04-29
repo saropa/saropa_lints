@@ -4,7 +4,8 @@ Re-trigger failed GitHub Actions workflows.
 Lists recent failed workflow runs and re-runs them. Optionally
 watches until all re-triggered runs complete.
 
-# CLI uses `gh` (GitHub CLI); requires auth and repo context. Exit codes map to [ExitCode] helpers.
+Requires the ``gh`` CLI (authenticated) and a git working tree. Exit codes use
+[ExitCode] from ``_utils`` for consistent publish/standalone behavior.
 
 Usage:
     python -m scripts.modules._retrigger_ci   # standalone. Publish also calls offer_retrigger_ci after push.
@@ -148,9 +149,11 @@ def _filter_recent_same_branch(
     cutoff = datetime.now(timezone.utc) - timedelta(minutes=max_age_minutes)
     out: list[dict] = []
     for r in runs:
+        # When branch is known, ignore failures from other branches (typical publish flow).
         if branch is not None and r.get("headBranch") != branch:
             continue
         created = _parse_created_at(r.get("createdAt"))
+        # Runs with missing/stale timestamps are kept (created None skips cutoff filter).
         if created is not None and created < cutoff:
             continue
         out.append(r)
@@ -287,17 +290,19 @@ def _watch_runs(run_ids: list[int]) -> bool:
 
     print_info("Watching runs for completion...")
     print_info("  (Ctrl+C stops watching; publish continues with tag and packaging.)")
+    # Poll each pending run_id until gh reports status completed; Ctrl+C aborts watch only.
     while pending:
         try:
             time.sleep(5)
         except KeyboardInterrupt:
             print()
             print_warning(
-                "CI watch cancelled — continuing with release steps "
+                "CI watch canceled — continuing with release steps "
                 "(tag, pub.dev, extension packaging).",
             )
             return False
         for run_id in list(pending):
+            # Snapshot pending to avoid mutating the set while iterating.
             result = subprocess.run(
                 [
                     "gh", "run", "view", str(run_id),
@@ -318,6 +323,7 @@ def _watch_runs(run_ids: list[int]) -> bool:
                 continue
             name = data.get("workflowName", run_id)
             pending.discard(run_id)
+            # completed + success clears the row; any other conclusion counts as failure for summary.
             if data.get("conclusion") == "success":
                 print_success(f"{name} (#{run_id}) passed")
             else:
@@ -339,6 +345,7 @@ def main() -> None:
 
     _check_gh_cli()
 
+    # Interactive path: user picks how many recent runs to inspect for failures.
     limit = _prompt_limit()
     print_info(f"Checking last {limit} workflow runs...")
     failed_runs = _get_failed_runs(limit)

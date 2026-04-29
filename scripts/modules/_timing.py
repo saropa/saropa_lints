@@ -4,12 +4,13 @@ Step timing tracker for publish workflow.
 Records duration and pass/fail status for each workflow step,
 then renders a timing summary table with proportional bar charts.
 
+Uses monotonic clocks for elapsed time and respects [OutputLevel.SILENT] so CI logs
+stay quiet when the publish driver requests it.
+
 Version:   1.0
 Author:    Saropa
 Copyright: (c) 2025-2026 Saropa
 """
-
-# Records each publish.py step duration and pass/fail for the timing summary table.
 
 from __future__ import annotations
 
@@ -72,7 +73,7 @@ def _print_timing_row(
 
 @dataclass
 class _StepRecord:
-    """A single timed step result."""
+    """One completed [StepTimer.step] span: display name, elapsed seconds, success flag."""
 
     name: str
     duration: float
@@ -91,6 +92,7 @@ class StepTimer:
     """
 
     def __init__(self) -> None:
+        # _start anchors "Total" wall-ish span; steps use per-context manager deltas.
         self._steps: list[_StepRecord] = []
         self._start: float = time.monotonic()
 
@@ -106,6 +108,7 @@ class StepTimer:
         try:
             yield
         except BaseException:
+            # Any exception counts as a failed step for the summary icon/color.
             success = False
             raise
         finally:
@@ -127,6 +130,7 @@ class StepTimer:
         print_colored("  Timing", Color.CYAN)
         print_colored("=" * 60, Color.CYAN)
 
+        # One row per recorded step; bar length scales to longest step (cap visual noise).
         for s in self._steps:
             _print_timing_row(s.name, s.duration, max_dur, s.success)
 

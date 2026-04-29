@@ -2,9 +2,12 @@
 Approximate source comment coverage for publish-time reporting.
 
 Scans Dart (lib/test/bin/packages), TypeScript (extension/src), and Python
-(scripts) with string-aware heuristics so `//` inside strings does not count.
-Template literals and `${...}` are handled for TypeScript; Dart string
+(scripts) with string-aware heuristics so ``//`` inside strings does not count.
+Template literals and ``${...}`` are handled for TypeScript; Dart string
 interpolation uses the same brace-aware skip.
+
+Python counts ``tokenize.COMMENT`` only (docstrings are not counted); callers use
+this module as a coarse queue signal, not as proof of documentation quality.
 
 Version:   1.0
 Author:    Saropa
@@ -23,7 +26,7 @@ from scripts.modules._utils import Color, print_colored
 
 @dataclass(frozen=True)
 class _BucketScan:
-    """Aggregated stats for one language/root slice."""
+    """Aggregated stats for one language/root slice (e.g. ``Dart (lib/)``)."""
 
     label: str
     files: int
@@ -33,6 +36,7 @@ class _BucketScan:
 
 
 def _physical_line_count(text: str) -> int:
+    """Return physical newline count (``0`` for empty file)."""
     if not text:
         return 0
     return len(text.splitlines())
@@ -514,6 +518,7 @@ _SKIP_DIR_NAMES = frozenset(
 
 
 def _iter_files(root: Path, suffix: str) -> list[Path]:
+    """All files under *root* ending with *suffix*, excluding junk directory names."""
     if not root.exists():
         return []
     out: list[Path] = []
@@ -525,6 +530,7 @@ def _iter_files(root: Path, suffix: str) -> list[Path]:
 
 
 def _skip_dart_artifact(path: Path) -> bool:
+    """True for codegen outputs that should not skew human-maintained comment ratios."""
     name = path.name
     if name.endswith(".g.dart"):
         return True
@@ -539,6 +545,7 @@ def _scan_bucket_dart(
     *,
     templates: bool,
 ) -> _BucketScan | None:
+    """Aggregate line counts and comment-line union for Dart or TS paths."""
     if not paths:
         return None
     total_lines = 0
@@ -565,6 +572,7 @@ def _scan_bucket_dart(
 
 
 def _scan_bucket_python(paths: list[Path], label: str) -> _BucketScan | None:
+    """Same as [_scan_bucket_dart] but uses [#]-only comment detection via tokenize."""
     if not paths:
         return None
     total_lines = 0
@@ -592,6 +600,7 @@ def collect_comment_metric_buckets(project_dir: Path) -> list[_BucketScan]:
     """Scan primary source trees and return per-bucket stats (non-empty only)."""
     buckets: list[_BucketScan] = []
 
+    # Each block below aggregates one root; empty roots are skipped (no _BucketScan entry).
     lib_dart = [
         p
         for p in _iter_files(project_dir / "lib", ".dart")
