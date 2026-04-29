@@ -269,6 +269,14 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   const hotspotReviewState = new SecurityHotspotReviewStateService(context.workspaceState);
   const summaryProvider = new SummaryTreeProvider(context.workspaceState);
   const suppressionsProvider = new SuppressionsTreeProvider();
+  // Register early: matches Violations/Drift/TODOs. Late `registerTreeDataProvider` for new views
+  // can race the workbench after extension update / extension-host restart (VS Code "No view is
+  // registered with id" from extHostTreeViews).
+  const suppressionsView = vscode.window.createTreeView('saropaLints.suppressions', {
+    treeDataProvider: suppressionsProvider,
+    showCollapseAll: true,
+  });
+  context.subscriptions.push(suppressionsView);
   const configProvider = new ConfigTreeProvider();
   const overviewProvider = new OverviewTreeProvider(
     context.workspaceState,
@@ -415,7 +423,6 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     },
     issuesView,
     vscode.window.registerTreeDataProvider('saropaLints.summary', summaryProvider),
-    vscode.window.registerTreeDataProvider('saropaLints.suppressions', suppressionsProvider),
     vscode.window.registerTreeDataProvider('saropaLints.config', configProvider),
     vscode.window.registerTreeDataProvider('saropaLints.suggestions', suggestionsProvider),
     vscode.window.registerTreeDataProvider('saropaLints.securityPosture', securityProvider),

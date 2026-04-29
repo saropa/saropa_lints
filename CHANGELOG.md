@@ -47,6 +47,16 @@
 
 ---
 
+## [12.8.2]
+
+The VS Code extension registers the **Suppressions** sidebar at activation so you are less likely to see a “no view registered” error after an update or host restart. No config change. — [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
+
+### Fixed (Extension)
+
+- The **Suppressions** tree binds at activation like other first-class sidebar trees, which avoids intermittent registration failures for that view. No action required; if a one-off error persists from an older session, use **Developer: Reload Window**.
+
+---
+
 ## [12.8.1]
 
 ### Fixed
