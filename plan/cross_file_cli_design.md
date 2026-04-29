@@ -219,7 +219,7 @@ dart run saropa_lints:cross_file dead-imports [options]
 
 ### HTML Reports — ✅ Done
 
-`lib/src/cli/cross_file_html_reporter.dart` — generates `index.html`, `unused-files.html`, `circular-deps.html`.
+`lib/src/cli/cross_file_html_reporter.dart` (+ `cross_file_html_reporter_part.dart`) — generates `report.css` (shared light/dark variables), `index.html`, `unused-files.html`, `missing-mirror-tests.html`, `circular-deps.html`, and `feature-deps.html` (adjacency, matrix, cross-feature edges).
 
 ```
 dart run saropa_lints:cross_file report --output-dir reports/
@@ -227,9 +227,9 @@ dart run saropa_lints:cross_file report --output-dir reports/
 
 **Improvement opportunities:**
 - ~~Fix string interpolation bug (`$u.length` → `${u.length}`)~~ — Fixed
-- Add CSS theming / dark mode
+- ~~Light/dark~~ — `report.css` uses `prefers-color-scheme: dark` and shared CSS variables
+- ~~Feature dependency matrix in HTML~~ — `feature-deps.html` included in the report bundle
 - Add dependency graph visualization (SVG or canvas-based)
-- Add a dedicated HTML page for the feature dependency matrix (Phase 2B is implemented in CLI/text; surface it in `report` output)
 
 ### Baseline Support — ✅ Done
 
@@ -515,7 +515,7 @@ cross_file:
 | `lib/src/cli/cross_file_analyzer.dart` | 1 | Core analysis logic, `runCrossFileAnalysis()` |
 | `lib/src/cli/cross_file_unused_symbols_semantic.dart` | 2 | Analyzer-backed unused top-level symbol detection |
 | `lib/src/cli/cross_file_reporter.dart` | 1 | Text/JSON output, `CrossFileResult` data class |
-| `lib/src/cli/cross_file_html_reporter.dart` | 3 | HTML report generation |
+| `lib/src/cli/cross_file_html_reporter.dart` (+ part) | 3 | HTML report + `report.css`; feature matrix page |
 | `lib/src/cli/cross_file_baseline.dart` | 3 | Baseline JSON load/save/compare |
 | `lib/src/cli/cross_file_dot_reporter.dart` | 4 | DOT graph export for Graphviz |
 | `test/cli/cross_file_test.dart` | 1 | Unit tests (3 groups, fixture-based) |

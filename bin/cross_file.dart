@@ -1,21 +1,9 @@
 #!/usr/bin/env dart
 // ignore_for_file: avoid_print
 
-/// Cross-file analysis CLI: unused files, circular deps, mirror test gaps,
-/// import stats, graph.
+/// Cross-file analysis CLI (unused files, circular deps, feature deps, etc.).
 ///
-/// Usage:
-///   dart run saropa_lints:cross_file [command] [options]
-///
-/// Commands:
-///   unused-files   Find files not imported by any other file
-///   circular-deps  Detect circular import chains
-///   import-stats   Show import graph statistics
-///   feature-deps   Show cross-feature dependency imports
-///   dead-imports   Find likely dead relative imports
-///   watch          Re-run cross-file analysis on file changes
-///   report         Write HTML report (use --output-dir)
-///   graph          Export import graph in DOT format (use --output-dir)
+/// Run `dart run saropa_lints:cross_file --help` for commands and options.
 library;
 
 import 'dart:io';
@@ -121,10 +109,14 @@ Future<int> _run(List<String> args) async {
   }
 
   final resolvedOutputDir = outputDir ?? 'reports';
-  final normalizedWatchDebounceMs = watchDebounceMs < 100 ? 100 : watchDebounceMs;
+  final normalizedWatchDebounceMs = watchDebounceMs < 100
+      ? 100
+      : watchDebounceMs;
 
   if (command == 'watch') {
-    final watchTarget = watchCommand.trim().isEmpty ? 'import-stats' : watchCommand;
+    final watchTarget = watchCommand.trim().isEmpty
+        ? 'import-stats'
+        : watchCommand;
     const forbidden = {'watch', 'report', 'graph'};
     if (forbidden.contains(watchTarget)) {
       stderr.writeln(

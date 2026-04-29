@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:path/path.dart' as p;
 import 'package:saropa_lints/src/cli/cross_file_analyzer.dart';
+import 'package:saropa_lints/src/cli/cross_file_html_reporter.dart';
 import 'package:saropa_lints/src/cli/cross_file_reporter.dart';
 import 'package:test/test.dart';
 import '../../bin/cross_file.dart' as cross_file_bin;
@@ -292,6 +293,40 @@ void main() {
       );
       expect(msg, contains('files +1'));
       expect(msg, contains('imports -3'));
+    });
+  });
+
+  group('reportToHtml', () {
+    test('writes report.css, feature-deps.html, and links stylesheet from index', () {
+      final tmp = Directory.systemTemp.createTempSync('cf_html_');
+      try {
+        const result = CrossFileResult(
+          unusedFiles: ['x.dart'],
+          circularDependencies: [],
+          missingMirrorTests: [],
+          stats: {'fileCount': 1, 'totalImports': 0},
+          featureDependencies: {'auth': ['profile']},
+          crossFeatureImports: ['lib/f/a.dart -> lib/f/b.dart'],
+          deadImports: {},
+        );
+        reportToHtml(result, tmp.path);
+        expect(
+          File(p.join(tmp.path, 'report.css')).readAsStringSync(),
+          contains('--bg'),
+        );
+        final index = File(p.join(tmp.path, 'index.html')).readAsStringSync();
+        expect(index, contains('href="report.css"'));
+        expect(index, contains('feature-deps.html'));
+        final featureHtml =
+            File(p.join(tmp.path, 'feature-deps.html')).readAsStringSync();
+        expect(featureHtml, contains('Feature dependencies'));
+        expect(featureHtml, contains('Matrix'));
+        expect(featureHtml, contains('href="report.css"'));
+      } finally {
+        if (tmp.existsSync()) {
+          tmp.deleteSync(recursive: true);
+        }
+      }
     });
   });
 }

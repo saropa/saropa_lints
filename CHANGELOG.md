@@ -47,6 +47,18 @@
 
 ---
 
+## [Unreleased]
+
+### Added
+
+- Optional **runtime tier cap** lets you set `SAROPA_TIER` to `essential`, `recommended`, `professional`, `comprehensive`, or `pedantic` so analysis skips rules above that cumulative band without editing generated rule lists, or set the same value as `saropa_tier` in `analysis_options_custom.yaml` or as `runtime_tier` / `saropa_tier` under `plugins.saropa_lints` when you prefer file-based config; the environment variable wins if both are set. No action required until you want CI or local runs to enforce a lower band than your YAML enables.
+
+### Changed
+
+- Cross-file `dart run saropa_lints:cross_file report` now adds `feature-deps.html` and shared `report.css` (light and dark via the browser) to the generated report folder, and the README explains that the CLI analyzes one package root at a time so monorepo users know to run it per package. Re-run `report` if you want the new pages in an existing output directory; no config changes.
+
+---
+
 ## [12.7.0]
 
 ### Added

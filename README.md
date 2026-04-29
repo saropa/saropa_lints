@@ -150,6 +150,8 @@ This updates (or creates) two files:
 - **`analysis_options.yaml`** — the `plugins: saropa_lints: diagnostics:` section is regenerated with every rule set to `true`/`false` for your tier. All other sections are preserved.
 - **`analysis_options_custom.yaml`** — your project settings (platforms, analysis output). Created on first run; never overwritten.
 
+**Optional runtime tier cap:** to enforce a stricter cumulative band than the rules still listed as enabled in YAML (for example in CI), set the `SAROPA_TIER` environment variable to `essential`, `recommended`, `professional`, `comprehensive`, or `pedantic`, or set `saropa_tier` in `analysis_options_custom.yaml` or `runtime_tier` / `saropa_tier` under `plugins.saropa_lints` in `analysis_options.yaml` — when both env and file are set, the environment variable wins.
+
 ### Run analysis
 
 ```bash
@@ -690,7 +692,9 @@ dart run saropa_lints:baseline --help        # See all options
 
 ### Cross-file analysis CLI
 
-Find unused files, circular imports, and related project-wide checks (CLI only; the extension also exposes cross-file commands):
+Find unused files, circular imports, and related project-wide checks (CLI only; the extension also exposes cross-file commands).
+
+**Monorepos:** `--path` is a single package root (one `pubspec.yaml`). If the repository has several Dart packages, run cross-file **per package** (from each package directory or with `--path` pointed at that package), or run separate CI jobs per package. One invocation does not span unrelated sibling packages.
 
 ```bash
 dart run saropa_lints:cross_file unused-files   # Files not imported by any other file
