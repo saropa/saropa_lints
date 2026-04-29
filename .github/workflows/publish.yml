@@ -38,6 +38,43 @@ jobs:
             sleep 10
           done
 
+      # Nested packages are analyzed by `dart analyze` (SDK 3.11+); each needs its own
+      # resolution so `package:<name>/...` URIs resolve (root `pub get` alone is not enough).
+      # Discovers every `packages/*/pubspec.yaml` so new workspace packages do not require
+      # workflow edits; uses the same retry pattern as root `pub get`.
+      - name: Install nested package dependencies
+        run: |
+          set -euo pipefail
+          nested_pub_get() {
+            local dir="$1"
+            for attempt in 1 2 3; do
+              echo "Attempt $attempt/3: dart pub get --directory=$dir"
+              if dart pub get --directory="$dir"; then
+                echo "dart pub get --directory=$dir succeeded"
+                return 0
+              fi
+              if [ "$attempt" -eq 3 ]; then
+                echo "::error::dart pub get failed for $dir after 3 attempts"
+                return 1
+              fi
+              echo "::warning::dart pub get failed for $dir, retrying in 10s..."
+              sleep 10
+            done
+          }
+          if [ ! -d packages ]; then
+            echo "No packages/ directory; skipping nested pub get."
+            exit 0
+          fi
+          shopt -s nullglob
+          pkgs=(packages/*/pubspec.yaml)
+          if [ ${#pkgs[@]} -eq 0 ]; then
+            echo "No nested packages under packages/; nothing to do."
+            exit 0
+          fi
+          for pubspec in "${pkgs[@]}"; do
+            nested_pub_get "$(dirname "$pubspec")"
+          done
+
       - name: Strip self-plugin reference
         # The tier include file also contains a plugins: section that would
         # re-enable custom lint rules even after stripping the local one.
