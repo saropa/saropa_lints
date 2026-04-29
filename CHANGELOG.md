@@ -46,13 +46,13 @@
 
 ## [Unreleased]
 
-### Changed (Extension)
+### Removed (Extension)
 
-- The Project Vibrancy sidebar is now a compact summary with refresh, open full report, copy JSON, settings, and a short top-risk list instead of a wide table and filters, so it stays readable in a narrow panel and matches how you use the full report for deep review. No action required.
+- The Project Vibrancy sidebar view and its refresh command are removed so function-level vibrancy lives only in the editor-area report, which removes duplicate UI and avoids cramped sidebar layouts. Use **Saropa Lints: Open Project Vibrancy Report** (Command Palette or Saropa navigation where offered). No config change.
 
 ### Fixed (Extension)
 
-- Opening a file from Project Vibrancy results (sidebar or full report) now resolves report paths against the workspace root on Windows and mixed path styles, so jump-to-file from a hit works reliably instead of failing on path shape. No action required.
+- Opening a file from the Project Vibrancy report now resolves report paths against the workspace root on Windows and mixed path styles, so jump-to-file from a hit works reliably instead of failing on path shape. No action required.
 
 <details><summary>Maintenance</summary>
 

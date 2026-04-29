@@ -76,7 +76,7 @@ Project-level code health scoring and surfacing plan snapshot lives in [plan/his
 | Initiative | Status |
 |------------|--------|
 | Project Vibrancy MVP (collectors + scoring + CLI) | In progress (CLI JSON/text, scoped scans, CI gates including coverage-quality counts; analyzer-element usage + full plan parity ongoing — see plan snapshot) |
-| Project Vibrancy UI surfaces (tree/editor/HTML/history) | In progress (sidebar + full report webviews, filters, coverage-quality quick slices; native tree, editor overlays, history/trends pending — see plan snapshot) |
+| Project Vibrancy UI surfaces (tree/editor/HTML/history) | In progress (full report webview; native tree, editor overlays, history/trends pending — see plan snapshot) |
 
 ---
 

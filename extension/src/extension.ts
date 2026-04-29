@@ -36,13 +36,10 @@ import { SecurityPostureTreeProvider } from './views/securityPostureTree';
 import { FileRiskTreeProvider } from './views/fileRiskTree';
 import { TodosAndHacksTreeProvider } from './views/todosAndHacksTree';
 import { showAboutPanel } from './views/aboutView';
+import { registerIssuesViewCommands } from './commands/issuesViewCommands';
 import { showCommandCatalogPanel } from './views/commandCatalogView';
 import { showRelatedRuleTelemetryPanel } from './views/relatedRuleTelemetryView';
 import { openProjectVibrancyReport } from './views/projectVibrancyReportView';
-import {
-  PROJECT_VIBRANCY_VIEW_ID,
-  ProjectVibrancySidebarProvider,
-} from './views/projectVibrancySidebarProvider';
 import { CommandCatalogSidebarProvider, COMMAND_CATALOG_SIDEBAR_VIEW_ID } from './views/commandCatalogSidebarProvider';
 import { discoverServer } from './driftAdvisor/discovery';
 import { fetchIssues } from './driftAdvisor/client';
@@ -56,9 +53,7 @@ import {
 } from './views/ruleExplainView';
 import { readViolations, ViolationsData, getViolationsPath as getViolationsFilePath } from './violationsReader';
 import {
-  SecurityHotspotReviewState,
   SecurityHotspotReviewStateService,
-  isSecurityHotspotViolation,
 } from './securityHotspotReviewState';
 import {
   setConflictingRulesMetadata,
@@ -103,20 +98,11 @@ import {
 } from './driftAdvisor/driftAdvisorUiState';
 import { SIDEBAR_SECTION_CONFIG_KEYS, defaultSidebarSectionVisible, sidebarSectionContextKey } from './sidebarSectionVisibilityKeys';
 import { buildSidebarSectionCountMap } from './sidebarSectionCounts';
-import { copyTreeNodesToClipboard } from './copyTreeAsJson';
 import { checkForUpgrade } from './upgrade-checker';
 import { buildStatusBarLabel } from './statusBarLabel';
 import { createRelatedRuleTelemetry } from './relatedRuleTelemetry';
 import { registerCrossFileCommands } from './cross-file-commands';
-import {
-  serializeIssueNode,
-  serializeConfigNode,
-  serializeSummaryNode,
-  serializeSecurityNode,
-  serializeFileRiskNode,
-  serializeOverviewNode,
-  serializeSuggestionNode,
-} from './treeSerializers';
+import { registerCopyAsJsonCommands } from './extensionCopyAsJsonCommands';
 
 function getConfig() {
   return vscode.workspace.getConfiguration('saropaLints');
@@ -343,10 +329,8 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // Command catalog sidebar — searchable index of every extension command.
   // Sits at the top of the sidebar so it is the first thing users see.
   const catalogSidebarProvider = new CommandCatalogSidebarProvider(context.extensionUri, context);
-  const projectVibrancySidebarProvider = new ProjectVibrancySidebarProvider();
   context.subscriptions.push(
     vscode.window.registerWebviewViewProvider(COMMAND_CATALOG_SIDEBAR_VIEW_ID, catalogSidebarProvider),
-    vscode.window.registerWebviewViewProvider(PROJECT_VIBRANCY_VIEW_ID, projectVibrancySidebarProvider),
   );
   registerCrossFileCommands(context);
   let driftAdvisorRefreshInProgress = false;
@@ -809,10 +793,6 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     vscode.commands.registerCommand('saropaLints.openProjectVibrancyReport', async () => {
       await openProjectVibrancyReport();
     }),
-    vscode.commands.registerCommand('saropaLints.refreshProjectVibrancySidebar', async () => {
-      await projectVibrancySidebarProvider.refresh();
-      await vscode.commands.executeCommand('saropaLints.projectVibrancy.focus');
-    }),
     vscode.commands.registerCommand('saropaLints.openProjectVibrancySettings', async () => {
       await vscode.commands.executeCommand('workbench.action.openSettings', 'saropaLints.projectVibrancy');
     }),
@@ -907,6 +887,8 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         return;
       }
       const relative = path.relative(root, editor.document.uri.fsPath).replaceAll('\\', '/');
+      // Reuse text filter path matching instead of adding a second "file-only"
+      // code path inside IssuesTreeProvider.
       issuesProvider.setTextFilter(relative);
       updateIssuesViewMessage();
       issuesProvider.expandAll();
@@ -1284,253 +1266,12 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       logReport(`- Exported to ${filePath}`);
       flushReport(root);
     }),
-    vscode.commands.registerCommand('saropaLints.setIssuesFilter', async () => {
-      const state = issuesProvider.getFilterState();
-      const value = await vscode.window.showInputBox({
-        title: 'Filter issues',
-        placeHolder: 'Search file path, rule, or message',
-        value: state.textFilter,
-        prompt: 'Leave empty to show all. Case-insensitive substring match.',
-      });
-      if (value !== undefined) {
-        issuesProvider.setTextFilter(value);
-        updateIssuesViewMessage();
-      }
-    }),
-    vscode.commands.registerCommand('saropaLints.setIssuesFilterByType', async () => {
-      const typeState = issuesProvider.getTypeFilterState();
-      const severityIds = ['error', 'warning', 'info'];
-      const impactIds = ['critical', 'high', 'medium', 'low', 'opinionated'];
-      const quickPick = vscode.window.createQuickPick();
-      quickPick.title = 'Filter by severity and impact';
-      quickPick.canSelectMany = true;
-      quickPick.items = [
-        { label: 'Severity', kind: vscode.QuickPickItemKind.Separator },
-        ...severityIds.map((s) => ({
-          label: s.charAt(0).toUpperCase() + s.slice(1),
-          description: s,
-          picked: typeState.severitiesToShow.has(s),
-        })),
-        { label: 'Impact', kind: vscode.QuickPickItemKind.Separator },
-        ...impactIds.map((s) => ({
-          label: s.charAt(0).toUpperCase() + s.slice(1),
-          description: s,
-          picked: typeState.impactsToShow.has(s),
-        })),
-      ];
-      quickPick.onDidAccept(() => {
-        const selected = new Set(quickPick.selectedItems.map((it) => it.description ?? '').filter(Boolean));
-        const severities = new Set(severityIds.filter((s) => selected.has(s)));
-        const impacts = new Set(impactIds.filter((s) => selected.has(s)));
-        issuesProvider.setSeverityFilter(severities.size > 0 ? severities : new Set(severityIds));
-        issuesProvider.setImpactFilter(impacts.size > 0 ? impacts : new Set(impactIds));
-        updateIssuesViewMessage();
-        quickPick.hide();
-      });
-      quickPick.show();
-    }),
-    vscode.commands.registerCommand('saropaLints.setIssuesFilterByRule', async () => {
-      const ruleNames = issuesProvider.getRuleNamesFromData();
-      if (ruleNames.length === 0) {
-        void vscode.window.showInformationMessage('No violations in current data. Run analysis first.');
-        return;
-      }
-      const rulesToHide = issuesProvider.getRulesToHide();
-      const quickPick = vscode.window.createQuickPick();
-      quickPick.title = 'Filter by rule (deselect to hide)';
-      quickPick.canSelectMany = true;
-      quickPick.matchOnDescription = true;
-      quickPick.items = ruleNames.map((rule) => ({
-        label: rule,
-        description: rule,
-        picked: !rulesToHide.has(rule),
-      }));
-      quickPick.onDidAccept(() => {
-        const selected = new Set(quickPick.selectedItems.map((it) => it.label));
-        const toHide = new Set(ruleNames.filter((r) => !selected.has(r)));
-        issuesProvider.setRulesToHide(toHide);
-        updateIssuesViewMessage();
-        quickPick.hide();
-      });
-      quickPick.show();
-    }),
-    vscode.commands.registerCommand('saropaLints.setIssuesFilterByMetadata', async () => {
-      const root = getProjectRoot();
-      if (!root) return;
-      const data = readViolations(root);
-      if (!data) {
-        void vscode.window.showInformationMessage('No violations in current data. Run analysis first.');
-        return;
-      }
-
-      const typeCounts = data.summary?.byRuleType ?? {};
-      const statusCounts = data.summary?.byRuleStatus ?? {};
-      const metadataByRule = data.config?.ruleMetadataByRule ?? {};
-
-      // Backfill counts from per-rule metadata if summary fields are absent.
-      const mergedTypeCounts: Record<string, number> = { ...typeCounts };
-      const mergedStatusCounts: Record<string, number> = { ...statusCounts };
-      if (Object.keys(mergedTypeCounts).length === 0 || Object.keys(mergedStatusCounts).length === 0) {
-        const issueCounts = data.summary?.issuesByRule ?? {};
-        for (const [ruleName, count] of Object.entries(issueCounts)) {
-          const meta = metadataByRule[ruleName];
-          const type = meta?.ruleType ?? 'unspecified';
-          const status = meta?.ruleStatus ?? 'ready';
-          mergedTypeCounts[type] = (mergedTypeCounts[type] ?? 0) + count;
-          mergedStatusCounts[status] = (mergedStatusCounts[status] ?? 0) + count;
-        }
-      }
-
-      type MetadataPick = vscode.QuickPickItem & {
-        kindId: 'ruleType' | 'ruleStatus';
-        value: string;
-      };
-      const quickPick = vscode.window.createQuickPick<MetadataPick>();
-      quickPick.title = 'Filter by rule metadata';
-      quickPick.matchOnDescription = true;
-      quickPick.items = [
-        { label: 'Rule type', kind: vscode.QuickPickItemKind.Separator, kindId: 'ruleType', value: '' },
-        ...Object.entries(mergedTypeCounts)
-          .sort((a, b) => b[1] - a[1])
-          .map(([value, count]) => ({
-            label: value,
-            description: `${count} issue${count === 1 ? '' : 's'}`,
-            kindId: 'ruleType' as const,
-            value,
-          })),
-        { label: 'Rule status', kind: vscode.QuickPickItemKind.Separator, kindId: 'ruleStatus', value: '' },
-        ...Object.entries(mergedStatusCounts)
-          .sort((a, b) => b[1] - a[1])
-          .map(([value, count]) => ({
-            label: value,
-            description: `${count} issue${count === 1 ? '' : 's'}`,
-            kindId: 'ruleStatus' as const,
-            value,
-          })),
-      ];
-
-      quickPick.onDidAccept(() => {
-        const selected = quickPick.selectedItems[0];
-        if (!selected || !selected.value) {
-          quickPick.hide();
-          return;
-        }
-        void vscode.commands.executeCommand(
-          'saropaLints.focusIssuesByRuleMetadata',
-          selected.kindId,
-          selected.value,
-        );
-        quickPick.hide();
-      });
-      quickPick.show();
-    }),
-    vscode.commands.registerCommand('saropaLints.reviewHotspotState', async (arg: unknown) => {
-      const root = getProjectRoot();
-      if (!root) return;
-      const data = readViolations(root);
-      if (!data) {
-        void vscode.window.showInformationMessage('No analysis data. Run analysis first.');
-        return;
-      }
-      const node = arg as IssueTreeNode | undefined;
-      const fromNode = node?.kind === 'violation' ? node.violation : undefined;
-      const allHotspots = data.violations.filter((violation) =>
-        isSecurityHotspotViolation(violation, data.config?.ruleMetadataByRule),
-      );
-      if (allHotspots.length === 0) {
-        void vscode.window.showInformationMessage('No security hotspots found in current report.');
-        return;
-      }
-      let target = fromNode;
-      if (
-        !target ||
-        !isSecurityHotspotViolation(target, data.config?.ruleMetadataByRule)
-      ) {
-        const picks = allHotspots.map((violation) => ({
-          label: `${violation.rule} (${violation.impact ?? 'low'})`,
-          description: `${violation.file}:${violation.line}`,
-          detail: violation.message,
-          violation,
-        }));
-        const picked = await vscode.window.showQuickPick(picks, {
-          title: 'Review security hotspot',
-          placeHolder: 'Choose a hotspot to triage',
-          matchOnDetail: true,
-        });
-        if (!picked) return;
-        target = picked.violation;
-      }
-      const current = hotspotReviewState.getEffective(target, data.config?.ruleMetadataByRule);
-      const statePicks: Array<{
-        label: string;
-        description: string;
-        state: SecurityHotspotReviewState;
-      }> = [
-          { label: 'Open', description: 'Needs review or follow-up', state: 'open' },
-          { label: 'Reviewed Safe', description: 'Reviewed and accepted as safe', state: 'reviewed-safe' },
-          { label: 'Reviewed Fixed', description: 'Issue has been fixed', state: 'reviewed-fixed' },
-        ];
-      const pickedState = await vscode.window.showQuickPick(statePicks, {
-        title: `Set hotspot state (${target.rule} @ ${target.file}:${target.line})`,
-        placeHolder: `Current: ${current}`,
-      });
-      if (!pickedState) return;
-      await hotspotReviewState.set(target, pickedState.state);
-      issuesProvider.refresh();
-      void vscode.window.showInformationMessage(
-        `Hotspot marked as ${pickedState.state}.`,
-      );
-    }),
-    vscode.commands.registerCommand('saropaLints.clearIssuesFilters', () => {
-      issuesProvider.clearFilters();
-      updateIssuesViewMessage();
-    }),
-    vscode.commands.registerCommand('saropaLints.clearSuppressions', () => {
-      issuesProvider.clearSuppressionsAndRefresh();
-      updateIssuesViewMessage();
-    }),
-    // W7: Focus mode — show only one file's violations in the Issues tree.
-    vscode.commands.registerCommand('saropaLints.focusFile', (element: unknown) => {
-      if (element && typeof element === 'object' && 'kind' in element && (element as { kind: string }).kind === 'file') {
-        const filePath = (element as unknown as { filePath: string }).filePath;
-        issuesProvider.setFocusedFile(filePath);
-        updateIssuesViewMessage();
-      }
-    }),
-    vscode.commands.registerCommand('saropaLints.clearFocusFile', () => {
-      issuesProvider.clearFocusedFile();
-      updateIssuesViewMessage();
-    }),
-    // D10: Group-by picker for the Violations tree.
-    vscode.commands.registerCommand('saropaLints.setGroupBy', async () => {
-      const current = issuesProvider.getGroupBy();
-      interface GroupByPickItem extends vscode.QuickPickItem {
-        id: import('./views/issuesTree').GroupByMode;
-      }
-      const items: GroupByPickItem[] = [
-        { label: 'Severity', id: 'severity' },
-        { label: 'File', id: 'file' },
-        { label: 'Impact', description: 'Critical / High first', id: 'impact' },
-        { label: 'Rule', id: 'rule' },
-        { label: 'OWASP Category', id: 'owasp' },
-        { label: 'Rule Type', id: 'ruleType' },
-        { label: 'Rule Status', id: 'ruleStatus' },
-      ].map((m) => {
-        const subtitle = 'description' in m ? m.description : undefined;
-        return {
-          label: m.id === current ? `$(check) ${m.label}` : m.label,
-          description: m.id === current ? 'Current' : subtitle,
-          id: m.id as import('./views/issuesTree').GroupByMode,
-        };
-      });
-      const pick = await vscode.window.showQuickPick(items, {
-        title: 'Group violations by',
-        placeHolder: `Current: ${current}`,
-      });
-      if (pick) {
-        issuesProvider.setGroupBy(pick.id);
-        updateIssuesViewMessage();
-      }
+    ...registerIssuesViewCommands({
+      issuesProvider,
+      updateIssuesViewMessage,
+      getProjectRoot,
+      readViolations,
+      hotspotReviewState,
     }),
     // I2: Triage actions — disable/enable rules via analysis_options_custom.yaml overrides.
     // Shared helper extracts rule names from string[] (TreeItem click) or node (context menu).
@@ -1759,82 +1500,6 @@ async function showFirstRunNotification(
   } else if (choice === 'Configure Rules') {
     await vscode.commands.executeCommand('saropaLints.openConfigDashboard');
   }
-}
-
-/** Register "Copy as JSON" commands for all lints tree views (not vibrancy — handled separately). */
-function registerCopyAsJsonCommands(
-  context: vscode.ExtensionContext,
-  providers: {
-    issuesProvider: IssuesTreeProvider;
-    configProvider: ConfigTreeProvider;
-    summaryProvider: SummaryTreeProvider;
-    securityProvider: SecurityPostureTreeProvider;
-    fileRiskProvider: FileRiskTreeProvider;
-    overviewProvider: OverviewTreeProvider;
-    suggestionsProvider: SuggestionsTreeProvider;
-  },
-): void {
-  const { issuesProvider, configProvider, summaryProvider, securityProvider, fileRiskProvider, overviewProvider, suggestionsProvider } = providers;
-
-  context.subscriptions.push(
-    vscode.commands.registerCommand('saropaLints.issues.copyAsJson', (item: unknown, selected?: unknown[]) =>
-      copyTreeNodesToClipboard(item, selected, serializeIssueNode, (n) => issuesProvider.getChildren(n as never), 'Violations'),
-    ),
-    vscode.commands.registerCommand('saropaLints.config.copyAsJson', (item: unknown, selected?: unknown[]) =>
-      copyTreeNodesToClipboard(item, selected, serializeConfigNode, (n) => configProvider.getChildren(n as never), 'Triage'),
-    ),
-    vscode.commands.registerCommand('saropaLints.summary.copyAsJson', (item: unknown, selected?: unknown[]) =>
-      copyTreeNodesToClipboard(item, selected, serializeSummaryNode, (n) => summaryProvider.getChildren(n as never), 'Summary'),
-    ),
-    vscode.commands.registerCommand('saropaLints.securityPosture.copyAsJson', (item: unknown, selected?: unknown[]) =>
-      copyTreeNodesToClipboard(item, selected, serializeSecurityNode, (n) => securityProvider.getChildren(n as never), 'Security Posture'),
-    ),
-    vscode.commands.registerCommand('saropaLints.fileRisk.copyAsJson', (item: unknown, selected?: unknown[]) =>
-      copyTreeNodesToClipboard(item, selected, serializeFileRiskNode, (n) => fileRiskProvider.getChildren(n as never), 'File Risk'),
-    ),
-    vscode.commands.registerCommand('saropaLints.overview.copyAsJson', (item: unknown, selected?: unknown[]) =>
-      copyTreeNodesToClipboard(
-        item,
-        selected,
-        serializeOverviewNode,
-        (n) => overviewProvider.getChildren(n as never),
-        'Overview & options',
-      ),
-    ),
-    vscode.commands.registerCommand('saropaLints.suggestions.copyAsJson', (item: unknown, selected?: unknown[]) =>
-      copyTreeNodesToClipboard(item, selected, serializeSuggestionNode, (n) => suggestionsProvider.getChildren(), 'Suggestions'),
-    ),
-
-    // File Risk context menu: show violations for this file (filter without opening).
-    vscode.commands.registerCommand('saropaLints.fileRisk.showViolations', (element: unknown) => {
-      const filePath = extractFileRiskPath(element);
-      if (filePath) void vscode.commands.executeCommand('saropaLints.focusIssuesForFile', filePath);
-    }),
-
-    // File Risk context menu: hide file (suppress from violations view).
-    vscode.commands.registerCommand('saropaLints.fileRisk.hideFile', (element: unknown) => {
-      const filePath = extractFileRiskPath(element);
-      if (!filePath) return;
-      issuesProvider.addSuppressionFile(filePath);
-      // Refresh file risk tree so the hidden file disappears from ranking.
-      fileRiskProvider.refresh();
-      vscode.window.setStatusBarMessage('File hidden. Clear suppressions in Violations to show again.', 3000);
-    }),
-
-    // File Risk context menu: copy relative file path.
-    vscode.commands.registerCommand('saropaLints.fileRisk.copyPath', (element: unknown) => {
-      const filePath = extractFileRiskPath(element);
-      if (filePath) void vscode.env.clipboard.writeText(filePath);
-    }),
-  );
-}
-
-/** Extract the relative file path from a FileRiskNode tree element. */
-function extractFileRiskPath(element: unknown): string | undefined {
-  if (!element || typeof element !== 'object') return undefined;
-  const node = element as { kind?: string; risk?: { filePath?: string } };
-  if (node.kind !== 'file' || !node.risk?.filePath) return undefined;
-  return node.risk.filePath;
 }
 
 export function deactivate(): void {

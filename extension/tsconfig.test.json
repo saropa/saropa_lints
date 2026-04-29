@@ -98,9 +98,7 @@
     "src/test/commandCatalogRegistry.test.ts",
     "src/views/commandCatalogSidebarProvider.ts",
     "src/test/commandCatalogSidebar.test.ts",
-    "src/views/projectVibrancySidebarProvider.ts",
-    "src/test/views/projectVibrancySidebar.test.ts",
-    "src/test/views/projectVibrancySidebarUiState.test.ts",
+    "src/test/views/projectVibrancyContributions.test.ts",
     "src/test/fileRiskData.test.ts"
   ],
   "exclude": ["node_modules", ".vscode-test", "out", "dist"]

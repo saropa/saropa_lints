@@ -116,12 +116,6 @@
           "when": "saropaLints.packageVibrancy.hasResults && saropaLints.sidebar.showPackageDetails"
         },
         {
-          "id": "saropaLints.projectVibrancy",
-          "name": "Project Vibrancy",
-          "type": "webview",
-          "when": "saropaLints.isDartProject"
-        },
-        {
           "id": "saropaLints.todosAndHacks",
           "name": "TODOs & Hacks",
           "when": "saropaLints.sidebar.showTodosAndHacks"
@@ -186,10 +180,6 @@
       {
         "command": "saropaLints.openProjectVibrancyReport",
         "title": "Saropa Lints: Open Project Vibrancy Report"
-      },
-      {
-        "command": "saropaLints.refreshProjectVibrancySidebar",
-        "title": "Saropa Lints: Refresh Project Vibrancy Sidebar"
       },
       {
         "command": "saropaLints.openProjectVibrancySettings",
@@ -1027,21 +1017,6 @@
           "group": "navigation@6"
         },
         {
-          "command": "saropaLints.refreshProjectVibrancySidebar",
-          "when": "view == saropaLints.projectVibrancy && saropaLints.isDartProject",
-          "group": "navigation@1"
-        },
-        {
-          "command": "saropaLints.openProjectVibrancyReport",
-          "when": "view == saropaLints.projectVibrancy && saropaLints.isDartProject",
-          "group": "navigation@2"
-        },
-        {
-          "command": "saropaLints.openProjectVibrancySettings",
-          "when": "view == saropaLints.projectVibrancy && saropaLints.isDartProject",
-          "group": "navigation@3"
-        },
-        {
           "command": "saropaLints.packageVibrancy.filterBySeverity",
           "when": "view == saropaLints.packageVibrancy.packages && saropaLints.packageVibrancy.hasResults",
           "group": "1_filter@1"
@@ -1407,10 +1382,6 @@
         },
         {
           "command": "saropaLints.openProjectVibrancyReport",
-          "when": "saropaLints.isDartProject"
-        },
-        {
-          "command": "saropaLints.refreshProjectVibrancySidebar",
           "when": "saropaLints.isDartProject"
         },
         {

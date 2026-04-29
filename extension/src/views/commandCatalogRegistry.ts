@@ -670,14 +670,6 @@ export const catalogEntries: readonly CatalogEntry[] = [
     icon: 'graph',
   },
   {
-    command: 'saropaLints.refreshProjectVibrancySidebar',
-    title: 'Refresh Project Vibrancy Sidebar',
-    description: 'Refresh project-level vibrancy summary data shown in the sidebar.',
-    category: 'Package Vibrancy',
-    icon: 'refresh',
-    internal: true,
-  },
-  {
     command: 'saropaLints.openProjectVibrancySettings',
     title: 'Open Project Vibrancy Settings',
     description: 'Open Settings filtered to saropaLints.projectVibrancy (LCOV path and quality gates).',

@@ -5,8 +5,8 @@ import { runProjectVibrancyScan } from './projectVibrancyCliRunner';
 import type { ProjectVibrancyPayload } from './projectVibrancyTypes';
 
 /**
- * **Full-column report** webview: same [runProjectVibrancyScan] JSON as the sidebar, rendered as HTML
- * in an editor-area panel. Manages singleton `currentPanel`, reuses last stdout for diff/debug, and
+ * **Project Vibrancy report** webview: runs [runProjectVibrancyScan], renders JSON as HTML in an
+ * editor-area panel. Manages singleton `currentPanel`, reuses last stdout for copy/debug, and
  * registers disposal when the tab closes.
  */
 
