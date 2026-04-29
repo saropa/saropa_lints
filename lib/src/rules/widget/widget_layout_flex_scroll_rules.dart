@@ -4,8 +4,30 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/type.dart';
 
 import '../../saropa_lint_rule.dart';
+import '../../fixes/widget_layout/add_automatic_keep_alive_client_mixin_fix.dart';
+import '../../fixes/widget_layout/add_clamping_scroll_physics_fix.dart';
+import '../../fixes/widget_layout/add_item_extent_placeholder_fix.dart';
+import '../../fixes/widget_layout/add_never_scrollable_physics_fix.dart';
+import '../../fixes/widget_layout/prepend_sliver_to_class_name_fix.dart';
+import '../../fixes/widget_layout/replace_expanded_empty_child_with_spacer_fix.dart';
+import '../../fixes/widget_layout/replace_row_constructor_with_wrap_fix.dart';
+import '../../fixes/widget_layout/replace_sliver_child_list_delegate_with_builder_delegate_fix.dart';
+import '../../fixes/widget_layout/replace_shrink_wrap_true_with_false_fix.dart';
+import '../../fixes/widget_layout/single_child_scrollview_column_to_listview_fix.dart';
+import '../../fixes/widget_layout/unwrap_expanded_or_flexible_child_fix.dart';
+import '../../fixes/widget_layout/unwrap_single_child_column_or_row_fix.dart';
+import '../../fixes/widget_layout/wrap_listview_in_sliver_to_box_adapter_fix.dart';
+import '../../fixes/widget_layout/wrap_scrollable_in_expanded_fix.dart';
+import '../../fixes/widget_layout/wrap_scrollable_in_sized_box_height_fix.dart';
+
 
 class AvoidExpandedAsSpacerRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceExpandedEmptyChildWithSpacerFix(context: context),
+  ];
   AvoidExpandedAsSpacerRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
@@ -91,6 +113,12 @@ class AvoidExpandedAsSpacerRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidFlexibleOutsideFlexRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        UnwrapExpandedOrFlexibleChildFix(context: context),
+  ];
   AvoidFlexibleOutsideFlexRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
@@ -174,6 +202,12 @@ class AvoidFlexibleOutsideFlexRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidShrinkWrapInListsRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceShrinkWrapTrueWithFalseFix(context: context),
+  ];
   AvoidShrinkWrapInListsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -242,6 +276,12 @@ class AvoidShrinkWrapInListsRule extends SaropaLintRule {
 /// Text('Hello')  // or use Align/Center if alignment needed
 /// ```
 class AvoidSingleChildColumnRowRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        UnwrapSingleChildColumnOrRowFix(context: context),
+  ];
   AvoidSingleChildColumnRowRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
@@ -332,6 +372,12 @@ class AvoidSingleChildColumnRowRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferSliverPrefixRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        PrependSliverToClassNameFix(context: context),
+  ];
   PreferSliverPrefixRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
@@ -450,6 +496,12 @@ class PreferSliverPrefixRule extends SaropaLintRule {
 /// ListView(children: items)
 /// ```
 class PreferUsingListViewRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        SingleChildScrollViewColumnToListViewFix(context: context),
+  ];
   PreferUsingListViewRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -516,6 +568,12 @@ class PreferUsingListViewRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidListViewWithoutItemExtentRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        AddItemExtentPlaceholderFix(context: context),
+  ];
   AvoidListViewWithoutItemExtentRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -580,6 +638,12 @@ class AvoidListViewWithoutItemExtentRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferSliverListDelegateRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceSliverChildListDelegateWithBuilderDelegateFix(context: context),
+  ];
   PreferSliverListDelegateRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
@@ -654,6 +718,12 @@ class PreferSliverListDelegateRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidSingleChildScrollViewWithColumnRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        AddNeverScrollablePhysicsFix(context: context),
+  ];
   AvoidSingleChildScrollViewWithColumnRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
@@ -744,6 +814,12 @@ class AvoidSingleChildScrollViewWithColumnRule extends SaropaLintRule {
 /// CachedNetworkImage(imageUrl: 'https://example.com/image.png')
 /// ```
 class PreferListViewBuilderRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        AddItemExtentPlaceholderFix(context: context),
+  ];
   PreferListViewBuilderRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
@@ -823,6 +899,12 @@ class PreferListViewBuilderRule extends SaropaLintRule {
 /// FadeTransition(opacity: _ctrl, child: child)
 /// ```
 class AvoidNestedScrollablesRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        AddNeverScrollablePhysicsFix(context: context),
+  ];
   AvoidNestedScrollablesRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
@@ -935,6 +1017,12 @@ class AvoidNestedScrollablesRule extends SaropaLintRule {
 /// Container(margin: EdgeInsets.only(left: context.spacing.large));
 /// ```
 class RequireScrollPhysicsRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        AddClampingScrollPhysicsFix(context: context),
+  ];
   RequireScrollPhysicsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
@@ -1020,6 +1108,12 @@ class RequireScrollPhysicsRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferSliverListRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        WrapListViewInSliverToBoxAdapterFix(context: context),
+  ];
   PreferSliverListRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
@@ -1103,6 +1197,12 @@ class PreferSliverListRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferKeepAliveRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        AddAutomaticKeepAliveClientMixinFix(context: context),
+  ];
   PreferKeepAliveRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
@@ -1197,6 +1297,12 @@ class PreferKeepAliveRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferWrapOverOverflowRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceRowConstructorWithWrapFix(context: context),
+  ];
   PreferWrapOverOverflowRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
@@ -1281,6 +1387,12 @@ class PreferWrapOverOverflowRule extends SaropaLintRule {
 /// Image.asset('assets/logo.png')
 /// ```
 class AvoidLayoutBuilderInScrollableRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        WrapScrollableInSizedBoxHeightFix(context: context),
+  ];
   AvoidLayoutBuilderInScrollableRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
@@ -1365,6 +1477,12 @@ class AvoidLayoutBuilderInScrollableRule extends SaropaLintRule {
 /// )
 /// ```
 class RequireScrollControllerRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        AddClampingScrollPhysicsFix(context: context),
+  ];
   RequireScrollControllerRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1426,6 +1544,12 @@ class RequireScrollControllerRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidShrinkWrapInScrollRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceShrinkWrapTrueWithFalseFix(context: context),
+  ];
   AvoidShrinkWrapInScrollRule() : super(code: _code);
 
   /// Stylistic preference. Large counts are acceptable.
@@ -1534,6 +1658,12 @@ class AvoidShrinkWrapInScrollRule extends SaropaLintRule {
 /// }
 /// ```
 class RequirePhysicsForNestedScrollRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        AddNeverScrollablePhysicsFix(context: context),
+  ];
   RequirePhysicsForNestedScrollRule() : super(code: _code);
 
   @override
@@ -1700,6 +1830,12 @@ class RequirePhysicsForNestedScrollRule extends SaropaLintRule {
 /// definitions. This makes the flex behavior explicit and avoids crashes
 /// when the widget is wrapped with Padding, GestureDetector, etc.
 class AvoidExpandedOutsideFlexRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        UnwrapExpandedOrFlexibleChildFix(context: context),
+  ];
   AvoidExpandedOutsideFlexRule() : super(code: _code);
 
   /// Expanded/Flexible outside Flex causes runtime crash.
@@ -1903,6 +2039,12 @@ class AvoidExpandedOutsideFlexRule extends SaropaLintRule {
 /// Use `// ignore: prefer_expanded_at_call_site` if the widget is intentionally
 /// designed to always be a direct Flex child and will never be wrapped.
 class PreferExpandedAtCallSiteRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        UnwrapExpandedOrFlexibleChildFix(context: context),
+  ];
   PreferExpandedAtCallSiteRule() : super(code: _code);
 
   /// Expanded/Flexible/Spacer in build() causes runtime crash if misused.
@@ -2144,6 +2286,12 @@ const Set<String> _constraintWrappers = <String>{
 };
 
 class AvoidSpacerInWrapRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        UnwrapExpandedOrFlexibleChildFix(context: context),
+  ];
   AvoidSpacerInWrapRule() : super(code: _code);
 
   @override
@@ -2228,6 +2376,12 @@ class AvoidSpacerInWrapRule extends SaropaLintRule {
 /// SizedBox(height: 200, child: ListView(...))
 /// ```
 class AvoidScrollableInIntrinsicRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        WrapScrollableInSizedBoxHeightFix(context: context),
+  ];
   AvoidScrollableInIntrinsicRule() : super(code: _code);
 
   @override
@@ -2319,6 +2473,12 @@ class AvoidScrollableInIntrinsicRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidUnboundedListviewInColumnRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        WrapScrollableInExpandedFix(context: context),
+  ];
   AvoidUnboundedListviewInColumnRule() : super(code: _code);
 
   @override
@@ -2451,6 +2611,12 @@ class AvoidUnboundedListviewInColumnRule extends SaropaLintRule {
 /// Row(children: [Icon(Icons.search), Expanded(child: TextField())])
 /// ```
 class PreferFlexForComplexLayoutRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        AddClampingScrollPhysicsFix(context: context),
+  ];
   PreferFlexForComplexLayoutRule() : super(code: _code);
 
   @override
@@ -2487,6 +2653,12 @@ class PreferFlexForComplexLayoutRule extends SaropaLintRule {
 
 /// Prefer findChildIndexCallback in ListView.builder for stable indices.
 class PreferFindChildIndexCallbackRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        AddItemExtentPlaceholderFix(context: context),
+  ];
   PreferFindChildIndexCallbackRule() : super(code: _code);
 
   @override
@@ -2517,8 +2689,3 @@ class PreferFindChildIndexCallbackRule extends SaropaLintRule {
   ) {}
 }
 
-// =========================================================================
-// Shared quick fix: Wrap in Expanded
-// =========================================================================
-
-/// Shared quick fix that wraps a widget in `Expanded(child: ...)`.

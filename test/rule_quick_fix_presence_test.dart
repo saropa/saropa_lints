@@ -25,8 +25,10 @@ import 'package:saropa_lints/src/rules/ui/animation_rules.dart';
 import 'package:saropa_lints/src/rules/network/api_network_rules.dart';
 import 'package:saropa_lints/src/rules/packages/drift_rules.dart';
 import 'package:saropa_lints/src/rules/packages/firebase_rules.dart';
+import 'package:saropa_lints/src/rules/packages/getx_rules.dart';
 import 'package:saropa_lints/src/rules/widget/flutter_migration_widget_rules.dart';
 import 'package:saropa_lints/src/rules/widget/image_filter_quality_migration_rules.dart';
+import 'package:saropa_lints/src/rules/widget/widget_layout_flex_scroll_rules.dart';
 import 'package:saropa_lints/src/rules/widget/widget_patterns_require_rules.dart';
 import 'package:test/test.dart';
 
@@ -390,6 +392,153 @@ void main() {
     hasFix(
       'AvoidDriftEnumIndexReorderRule',
       () => AvoidDriftEnumIndexReorderRule(),
+    );
+
+    // Widget layout — flex / scroll (26)
+    hasFix('AvoidExpandedAsSpacerRule', () => AvoidExpandedAsSpacerRule());
+    hasFix('AvoidFlexibleOutsideFlexRule', () => AvoidFlexibleOutsideFlexRule());
+    hasFix('AvoidShrinkWrapInListsRule', () => AvoidShrinkWrapInListsRule());
+    hasFix(
+      'AvoidSingleChildColumnRowRule',
+      () => AvoidSingleChildColumnRowRule(),
+    );
+    hasFix('PreferSliverPrefixRule', () => PreferSliverPrefixRule());
+    hasFix('PreferUsingListViewRule', () => PreferUsingListViewRule());
+    hasFix(
+      'AvoidListViewWithoutItemExtentRule',
+      () => AvoidListViewWithoutItemExtentRule(),
+    );
+    hasFix(
+      'PreferSliverListDelegateRule',
+      () => PreferSliverListDelegateRule(),
+    );
+    hasFix(
+      'AvoidSingleChildScrollViewWithColumnRule',
+      () => AvoidSingleChildScrollViewWithColumnRule(),
+    );
+    hasFix('PreferListViewBuilderRule', () => PreferListViewBuilderRule());
+    hasFix('AvoidNestedScrollablesRule', () => AvoidNestedScrollablesRule());
+    hasFix('RequireScrollPhysicsRule', () => RequireScrollPhysicsRule());
+    hasFix('PreferSliverListRule', () => PreferSliverListRule());
+    hasFix('PreferKeepAliveRule', () => PreferKeepAliveRule());
+    hasFix('PreferWrapOverOverflowRule', () => PreferWrapOverOverflowRule());
+    hasFix(
+      'AvoidLayoutBuilderInScrollableRule',
+      () => AvoidLayoutBuilderInScrollableRule(),
+    );
+    hasFix(
+      'RequireScrollControllerRule',
+      () => RequireScrollControllerRule(),
+    );
+    hasFix(
+      'AvoidShrinkWrapInScrollRule',
+      () => AvoidShrinkWrapInScrollRule(),
+    );
+    hasFix(
+      'RequirePhysicsForNestedScrollRule',
+      () => RequirePhysicsForNestedScrollRule(),
+    );
+    hasFix(
+      'AvoidExpandedOutsideFlexRule',
+      () => AvoidExpandedOutsideFlexRule(),
+    );
+    hasFix(
+      'PreferExpandedAtCallSiteRule',
+      () => PreferExpandedAtCallSiteRule(),
+    );
+    hasFix('AvoidSpacerInWrapRule', () => AvoidSpacerInWrapRule());
+    hasFix(
+      'AvoidScrollableInIntrinsicRule',
+      () => AvoidScrollableInIntrinsicRule(),
+    );
+    hasFix(
+      'AvoidUnboundedListviewInColumnRule',
+      () => AvoidUnboundedListviewInColumnRule(),
+    );
+    hasFix(
+      'PreferFlexForComplexLayoutRule',
+      () => PreferFlexForComplexLayoutRule(),
+    );
+    hasFix(
+      'PreferFindChildIndexCallbackRule',
+      () => PreferFindChildIndexCallbackRule(),
+    );
+
+    // GetX (24)
+    hasFix(
+      'RequireGetxWorkerDisposeRule',
+      () => RequireGetxWorkerDisposeRule(),
+    );
+    hasFix(
+      'RequireGetxPermanentCleanupRule',
+      () => RequireGetxPermanentCleanupRule(),
+    );
+    hasFix(
+      'AvoidGetxContextOutsideWidgetRule',
+      () => AvoidGetxContextOutsideWidgetRule(),
+    );
+    hasFix(
+      'AvoidGetxGlobalNavigationRule',
+      () => AvoidGetxGlobalNavigationRule(),
+    );
+    hasFix(
+      'RequireGetxBindingRoutesRule',
+      () => RequireGetxBindingRoutesRule(),
+    );
+    hasFix(
+      'AvoidGetxDialogSnackbarInControllerRule',
+      () => AvoidGetxDialogSnackbarInControllerRule(),
+    );
+    hasFix('RequireGetxLazyPutRule', () => RequireGetxLazyPutRule());
+    hasFix('AvoidGetFindInBuildRule', () => AvoidGetFindInBuildRule());
+    hasFix(
+      'RequireGetxControllerDisposeRule',
+      () => RequireGetxControllerDisposeRule(),
+    );
+    hasFix(
+      'AvoidObsOutsideControllerRule',
+      () => AvoidObsOutsideControllerRule(),
+    );
+    hasFix('ProperGetxSuperCallsRule', () => ProperGetxSuperCallsRule());
+    hasFix(
+      'AlwaysRemoveGetxListenerRule',
+      () => AlwaysRemoveGetxListenerRule(),
+    );
+    hasFix(
+      'AvoidGetxRxInsideBuildRule',
+      () => AvoidGetxRxInsideBuildRule(),
+    );
+    hasFix(
+      'AvoidMutableRxVariablesRule',
+      () => AvoidMutableRxVariablesRule(),
+    );
+    hasFix('DisposeGetxFieldsRule', () => DisposeGetxFieldsRule());
+    hasFix('PreferGetxBuilderRule', () => PreferGetxBuilderRule());
+    hasFix('RequireGetxBindingRule', () => RequireGetxBindingRule());
+    hasFix(
+      'AvoidGetxGlobalStateRule',
+      () => AvoidGetxGlobalStateRule(),
+    );
+    hasFix(
+      'AvoidGetxStaticContextRule',
+      () => AvoidGetxStaticContextRule(),
+    );
+    hasFix(
+      'AvoidTightCouplingWithGetxRule',
+      () => AvoidTightCouplingWithGetxRule(),
+    );
+    hasFix('AvoidGetxStaticGetRule', () => AvoidGetxStaticGetRule());
+    hasFix(
+      'AvoidGetxBuildContextBypassRule',
+      () => AvoidGetxBuildContextBypassRule(),
+    );
+    hasFix(
+      'AvoidGetxRxNestedObsRule',
+      () => AvoidGetxRxNestedObsRule(),
+    );
+    hasFix(
+      'PreferGetxBuilderOverObxRule',
+      () => PreferGetxBuilderOverObxRule(),
     );
   });
 }

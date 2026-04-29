@@ -11,6 +11,9 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
 
 import '../../saropa_lint_rule.dart';
+import '../../fixes/packages/insert_getx_super_lifecycle_call_fix.dart';
+import '../../fixes/security/replace_with_https_fix.dart';
+
 import '../../target_matcher_utils.dart';
 
 // =============================================================================
@@ -61,6 +64,12 @@ import '../../target_matcher_utils.dart';
 /// }
 /// ```
 class RequireGetxWorkerDisposeRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceWithHttpsFix(context: context),
+  ];
   RequireGetxWorkerDisposeRule() : super(code: _code);
 
   @override
@@ -199,6 +208,12 @@ class RequireGetxWorkerDisposeRule extends SaropaLintRule {
 /// Get.put(GlobalConfig(), permanent: true);
 /// ```
 class RequireGetxPermanentCleanupRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceWithHttpsFix(context: context),
+  ];
   RequireGetxPermanentCleanupRule() : super(code: _code);
 
   @override
@@ -355,6 +370,12 @@ class RequireGetxPermanentCleanupRule extends SaropaLintRule {
 /// });
 /// ```
 class AvoidGetxContextOutsideWidgetRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceWithHttpsFix(context: context),
+  ];
   AvoidGetxContextOutsideWidgetRule() : super(code: _code);
 
   @override
@@ -513,6 +534,12 @@ class AvoidGetxContextOutsideWidgetRule extends SaropaLintRule {
 /// // Or use GoRouter, AutoRoute, etc.
 /// ```
 class AvoidGetxGlobalNavigationRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceWithHttpsFix(context: context),
+  ];
   AvoidGetxGlobalNavigationRule() : super(code: _code);
 
   /// Testability and navigation predictability issues.
@@ -599,6 +626,12 @@ class AvoidGetxGlobalNavigationRule extends SaropaLintRule {
 /// )
 /// ```
 class RequireGetxBindingRoutesRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceWithHttpsFix(context: context),
+  ];
   RequireGetxBindingRoutesRule() : super(code: _code);
 
   /// DI and lifecycle management consistency.
@@ -685,6 +718,12 @@ class RequireGetxBindingRoutesRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidGetxDialogSnackbarInControllerRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceWithHttpsFix(context: context),
+  ];
   AvoidGetxDialogSnackbarInControllerRule() : super(code: _code);
 
   @override
@@ -779,6 +818,12 @@ class AvoidGetxDialogSnackbarInControllerRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireGetxLazyPutRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceWithHttpsFix(context: context),
+  ];
   RequireGetxLazyPutRule() : super(code: _code);
 
   @override
@@ -878,6 +923,12 @@ class RequireGetxLazyPutRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidGetFindInBuildRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceWithHttpsFix(context: context),
+  ];
   AvoidGetFindInBuildRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
@@ -975,6 +1026,12 @@ class _GetFindVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class RequireGetxControllerDisposeRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceWithHttpsFix(context: context),
+  ];
   RequireGetxControllerDisposeRule() : super(code: _code);
 
   @override
@@ -1087,6 +1144,12 @@ class RequireGetxControllerDisposeRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidObsOutsideControllerRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceWithHttpsFix(context: context),
+  ];
   AvoidObsOutsideControllerRule() : super(code: _code);
 
   @override
@@ -1193,6 +1256,14 @@ class AvoidObsOutsideControllerRule extends SaropaLintRule {
 /// }
 /// ```
 class ProperGetxSuperCallsRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        InsertGetxSuperLifecycleCallFix(context: context),
+    ({required CorrectionProducerContext context}) =>
+        ReplaceWithHttpsFix(context: context),
+  ];
   ProperGetxSuperCallsRule() : super(code: _code);
 
   /// Critical - broken lifecycle management.
@@ -1308,6 +1379,12 @@ class _SuperCallVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class AlwaysRemoveGetxListenerRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceWithHttpsFix(context: context),
+  ];
   AlwaysRemoveGetxListenerRule() : super(code: _code);
 
   /// High impact - memory leak prevention.
@@ -1387,6 +1464,12 @@ class AlwaysRemoveGetxListenerRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidGetxRxInsideBuildRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceWithHttpsFix(context: context),
+  ];
   AvoidGetxRxInsideBuildRule() : super(code: _code);
 
   @override
@@ -1463,6 +1546,12 @@ class _ObsVisitor extends RecursiveAstVisitor<void> {
 /// count(5); // Or use callable syntax
 /// ```
 class AvoidMutableRxVariablesRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceWithHttpsFix(context: context),
+  ];
   AvoidMutableRxVariablesRule() : super(code: _code);
 
   @override
@@ -1561,6 +1650,12 @@ class AvoidMutableRxVariablesRule extends SaropaLintRule {
 /// }
 /// ```
 class DisposeGetxFieldsRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceWithHttpsFix(context: context),
+  ];
   DisposeGetxFieldsRule() : super(code: _code);
 
   @override
@@ -1686,6 +1781,12 @@ class _DisposeVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class PreferGetxBuilderRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceWithHttpsFix(context: context),
+  ];
   PreferGetxBuilderRule() : super(code: _code);
 
   /// Accessing .obs without Obx won't trigger UI rebuilds.
@@ -1792,6 +1893,12 @@ class PreferGetxBuilderRule extends SaropaLintRule {
 /// GetPage(name: '/my', page: () => MyPage(), binding: MyBinding());
 /// ```
 class RequireGetxBindingRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceWithHttpsFix(context: context),
+  ];
   RequireGetxBindingRule() : super(code: _code);
 
   /// Architecture issue - improper dependency management.
@@ -1873,6 +1980,12 @@ class RequireGetxBindingRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidGetxGlobalStateRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceWithHttpsFix(context: context),
+  ];
   AvoidGetxGlobalStateRule() : super(code: _code);
 
   /// Testing difficulty.
@@ -1956,6 +2069,12 @@ class AvoidGetxGlobalStateRule extends SaropaLintRule {
 /// // Inject NavigationService for testability
 /// ```
 class AvoidGetxStaticContextRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceWithHttpsFix(context: context),
+  ];
   AvoidGetxStaticContextRule() : super(code: _code);
 
   @override
@@ -2039,6 +2158,12 @@ class AvoidGetxStaticContextRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidTightCouplingWithGetxRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceWithHttpsFix(context: context),
+  ];
   AvoidTightCouplingWithGetxRule() : super(code: _code);
 
   @override
@@ -2129,6 +2254,12 @@ class AvoidTightCouplingWithGetxRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidGetxStaticGetRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceWithHttpsFix(context: context),
+  ];
   AvoidGetxStaticGetRule() : super(code: _code);
 
   @override
@@ -2200,6 +2331,12 @@ class AvoidGetxStaticGetRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidGetxBuildContextBypassRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceWithHttpsFix(context: context),
+  ];
   AvoidGetxBuildContextBypassRule() : super(code: _code);
 
   /// Using Get.context hides widget tree dependencies and breaks testability.
@@ -2266,6 +2403,12 @@ class AvoidGetxBuildContextBypassRule extends SaropaLintRule {
 /// final items = RxList<String>([]);          // flat reactive list
 /// ```
 class AvoidGetxRxNestedObsRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceWithHttpsFix(context: context),
+  ];
   AvoidGetxRxNestedObsRule() : super(code: _code);
 
   @override
@@ -2346,6 +2489,12 @@ class AvoidGetxRxNestedObsRule extends SaropaLintRule {
 /// GetBuilder<MyController>(builder: (_) => Text(controller.label));
 /// ```
 class PreferGetxBuilderOverObxRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceWithHttpsFix(context: context),
+  ];
   PreferGetxBuilderOverObxRule() : super(code: _code);
 
   @override
