@@ -1,3 +1,8 @@
+/// Unit tests for cross-file analysis: [runCrossFileAnalysis], reporters, HTML export, watch diffs.
+///
+/// Mixes live analysis on the repo root (shape-only), curated fixtures under
+/// `test/fixtures/cross_file_*`, and temp dirs for HTML output. Paths are built with
+/// [p.join] for portability.
 import 'dart:convert';
 import 'dart:io';
 
@@ -8,8 +13,8 @@ import 'package:saropa_lints/src/cli/cross_file_reporter.dart';
 import 'package:test/test.dart';
 import '../../bin/cross_file.dart' as cross_file_bin;
 
-/// Unit tests for cross-file CLI: analyzer result shape, reporter, and fixture-based behavior.
 void main() {
+  // Repo root for coarse integration checks; fixtures use absolute paths below.
   final projectRoot = Directory.current.path;
   final fixturePath = p.join(
     projectRoot,
@@ -297,36 +302,42 @@ void main() {
   });
 
   group('reportToHtml', () {
-    test('writes report.css, feature-deps.html, and links stylesheet from index', () {
-      final tmp = Directory.systemTemp.createTempSync('cf_html_');
-      try {
-        const result = CrossFileResult(
-          unusedFiles: ['x.dart'],
-          circularDependencies: [],
-          missingMirrorTests: [],
-          stats: {'fileCount': 1, 'totalImports': 0},
-          featureDependencies: {'auth': ['profile']},
-          crossFeatureImports: ['lib/f/a.dart -> lib/f/b.dart'],
-          deadImports: {},
-        );
-        reportToHtml(result, tmp.path);
-        expect(
-          File(p.join(tmp.path, 'report.css')).readAsStringSync(),
-          contains('--bg'),
-        );
-        final index = File(p.join(tmp.path, 'index.html')).readAsStringSync();
-        expect(index, contains('href="report.css"'));
-        expect(index, contains('feature-deps.html'));
-        final featureHtml =
-            File(p.join(tmp.path, 'feature-deps.html')).readAsStringSync();
-        expect(featureHtml, contains('Feature dependencies'));
-        expect(featureHtml, contains('Matrix'));
-        expect(featureHtml, contains('href="report.css"'));
-      } finally {
-        if (tmp.existsSync()) {
-          tmp.deleteSync(recursive: true);
+    test(
+      'writes report.css, feature-deps.html, and links stylesheet from index',
+      () {
+        final tmp = Directory.systemTemp.createTempSync('cf_html_');
+        try {
+          const result = CrossFileResult(
+            unusedFiles: ['x.dart'],
+            circularDependencies: [],
+            missingMirrorTests: [],
+            stats: {'fileCount': 1, 'totalImports': 0},
+            featureDependencies: {
+              'auth': ['profile'],
+            },
+            crossFeatureImports: ['lib/f/a.dart -> lib/f/b.dart'],
+            deadImports: {},
+          );
+          reportToHtml(result, tmp.path);
+          expect(
+            File(p.join(tmp.path, 'report.css')).readAsStringSync(),
+            contains('--bg'),
+          );
+          final index = File(p.join(tmp.path, 'index.html')).readAsStringSync();
+          expect(index, contains('href="report.css"'));
+          expect(index, contains('feature-deps.html'));
+          final featureHtml = File(
+            p.join(tmp.path, 'feature-deps.html'),
+          ).readAsStringSync();
+          expect(featureHtml, contains('Feature dependencies'));
+          expect(featureHtml, contains('Matrix'));
+          expect(featureHtml, contains('href="report.css"'));
+        } finally {
+          if (tmp.existsSync()) {
+            tmp.deleteSync(recursive: true);
+          }
         }
-      }
-    });
+      },
+    );
   });
 }

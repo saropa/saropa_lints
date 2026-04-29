@@ -1,11 +1,13 @@
+/// Tests [isTrackedFieldDisposedInStateLifecycle] on synthetic `State` subclasses.
+///
+/// Stubs Flutter types in-parse string so the helper sees realistic dispose / alias /
+/// helper-call patterns without depending on the Flutter SDK in the analyzer session.
 import 'package:analyzer/dart/analysis/features.dart';
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:saropa_lints/src/rules/widget/state_lifecycle_dispose_scan.dart';
 import 'package:test/test.dart';
-
-// state_lifecycle_dispose_scan: whether tracked fields are disposed in State.dispose.
 
 void main() {
   group('isTrackedFieldDisposedInStateLifecycle', () {
@@ -134,6 +136,7 @@ class _S extends State<W> {
   });
 }
 
+/// Parses [source] as class `_S` inside a minimal Flutter-like prelude; fails if `_S` missing.
 ClassDeclaration _parseStateClass(String source) {
   final result = parseString(
     content:
@@ -164,9 +167,11 @@ $source
   return found!;
 }
 
+/// Invokes [onClass] for every class declaration (used to capture `_S` by side effect).
 class _PickClassDeclaration extends RecursiveAstVisitor<void> {
   _PickClassDeclaration(this.onClass);
 
+  /// Callback receiving each [ClassDeclaration] in visit order.
   final void Function(ClassDeclaration node) onClass;
 
   @override

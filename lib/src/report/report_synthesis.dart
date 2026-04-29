@@ -493,7 +493,7 @@ const Set<String> _dartLintsRuleNames = <String>{
   'close_sinks',
   'constant_identifier_names',
   'deprecated_consistency',
-  'document_ignores',
+  'document_analyzer_ignore_rationale',
   'empty_catches',
   'empty_constructor_bodies',
   'empty_statements',

@@ -1,11 +1,13 @@
+/// Tests [ReportConsolidator]: path deduplication, per-isolate import merge, [BatchData] JSON.
+///
+/// Uses a temp directory as `projectRoot`; [tearDown] calls [ReportConsolidator.cleanupSession]
+/// and deletes the tree so session files never leak between tests.
 import 'dart:io' show Directory, Platform;
 
 import 'package:saropa_lints/src/report/batch_data.dart';
 import 'package:saropa_lints/src/report/report_consolidator.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart';
 import 'package:test/test.dart';
-
-// ReportConsolidator: batch/session aggregation and cleanup on temp project roots.
 
 void main() {
   late Directory tempDir;

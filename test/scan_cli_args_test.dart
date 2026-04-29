@@ -1,9 +1,11 @@
+/// Tests `saropa_lints:scan` argv parsing ([parseScanArgs]) and one process-level guard.
+///
+/// The process test shells out to `dart run` so flag errors match real CLI behavior;
+/// pure parser cases stay in-memory for speed.
 import 'dart:io';
 
 import 'package:saropa_lints/src/scan/scan_cli_args.dart';
 import 'package:test/test.dart';
-
-// saropa_lints:scan CLI process exit codes and flag validation.
 
 void main() {
   group('scan CLI (process)', () {

@@ -1,4 +1,7 @@
 #!/usr/bin/env dart
+
+/// CLI for [QualityGateEvaluator]: reads `violations.json` summary and gate config,
+/// prints PASS / FAIL / WARN, exits 0 (pass or no config), 1 (breach with fail), 2 (errors).
 // ignore_for_file: avoid_print
 
 library;
@@ -14,6 +17,7 @@ Future<void> main(List<String> args) async {
     return;
   }
 
+  // Defaults match typical saropa_lints report layout and repo-root config file.
   final reportPath =
       _readOption(args, '--report') ??
       _readOption(args, '-r') ??
@@ -30,6 +34,7 @@ Future<void> main(List<String> args) async {
     exit(2);
   }
 
+  // Expect top-level JSON with a `summary` object (same shape CI uses).
   final summary = _readSummary(reportFile);
   if (summary == null) {
     print('Error: invalid report format. Missing summary object.');
@@ -41,6 +46,7 @@ Future<void> main(List<String> args) async {
     configPath: configPath,
   );
   if (config.isEmpty) {
+    // Missing file or empty conditions: not an error (nothing to enforce).
     print(
       'No quality gate conditions configured. '
       'Expected YAML/JSON with quality_gate.conditions in $configPath',
@@ -48,8 +54,12 @@ Future<void> main(List<String> args) async {
     exit(0);
   }
 
-  final result = QualityGateEvaluator.evaluate(summary: summary, config: config);
+  final result = QualityGateEvaluator.evaluate(
+    summary: summary,
+    config: config,
+  );
 
+  // Config errors (e.g. bad operator) are fatal like missing report.
   if (result.configErrors.isNotEmpty) {
     print('Quality gate configuration errors:');
     for (final err in result.configErrors) {
@@ -63,6 +73,7 @@ Future<void> main(List<String> args) async {
     exit(0);
   }
 
+  // Split breaches so `fail` drives exit 1; `warn`-only exits 0 with WARN banner.
   final failures = result.breaches.where((b) => b.condition.onFail == 'fail');
   final warnings = result.breaches.where((b) => b.condition.onFail == 'warn');
 
@@ -84,6 +95,7 @@ Future<void> main(List<String> args) async {
   exit(0);
 }
 
+/// Extract `summary` from violations JSON; returns null on parse errors or wrong shape.
 Map<String, dynamic>? _readSummary(File reportFile) {
   try {
     final decoded = jsonDecode(reportFile.readAsStringSync());
@@ -97,6 +109,7 @@ Map<String, dynamic>? _readSummary(File reportFile) {
   }
 }
 
+/// Reads `--key value` style argv; returns null if key missing or no following token.
 String? _readOption(List<String> args, String key) {
   final index = args.indexOf(key);
   if (index < 0 || index + 1 >= args.length) return null;

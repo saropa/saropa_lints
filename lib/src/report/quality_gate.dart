@@ -1,12 +1,19 @@
+/// Loads `saropa_quality_gate.yaml` (or JSON), parses conditions, and evaluates
+/// them against a violations report **summary** map (not full issue list).
+///
+/// Used by the `quality_gate` executable. Metric names and operators are matched
+/// explicitly in [QualityGateEvaluator._resolveMetric] and [_supportedOperators];
+/// unknown metrics resolve to `0` so mis-typed keys fail closed only if the
+/// condition compares away from zero.
+library;
+
 import 'dart:convert' show jsonDecode;
 import 'dart:io' show File;
 
 import 'package:path/path.dart' as path;
 import 'package:yaml/yaml.dart';
 
-// Evaluates saropa_quality_gate.yaml (metric thresholds and operators) against diagnostic stats.
-// Used by the quality_gate CLI; operator and metric names are matched explicitly below.
-
+/// One threshold row from config: which metric, comparison, bound, and severity.
 class QualityGateCondition {
   const QualityGateCondition({
     required this.metric,
@@ -15,20 +22,31 @@ class QualityGateCondition {
     required this.onFail,
   });
 
+  /// Summary key family, e.g. `new_critical_issues`, `overall_bugs`.
   final String metric;
+
+  /// Short operator token: `eq`, `ne`, `gt`, `ge`, `lt`, `le`.
   final String operatorName;
+
+  /// Right-hand side of the comparison (numeric).
   final num value;
+
+  /// `fail` exits non-zero on breach; `warn` prints but may still pass overall.
   final String onFail;
 }
 
+/// Parsed `quality_gate.conditions` list (possibly empty).
 class QualityGateConfig {
   const QualityGateConfig({required this.conditions});
 
+  /// Ordered conditions; invalid entries are dropped at parse time.
   final List<QualityGateCondition> conditions;
 
+  /// True when there is nothing to evaluate (treated as pass by callers).
   bool get isEmpty => conditions.isEmpty;
 }
 
+/// A single failed condition after evaluation against live summary numbers.
 class QualityGateBreach {
   const QualityGateBreach({
     required this.condition,
@@ -36,24 +54,36 @@ class QualityGateBreach {
     required this.message,
   });
 
+  /// The condition that was not satisfied.
   final QualityGateCondition condition;
+
+  /// Observed metric value from the summary (left-hand side).
   final num actualValue;
+
+  /// Human-readable message for logs / CI.
   final String message;
 }
 
+/// Full evaluation outcome: breaches plus parse-time config errors.
 class QualityGateResult {
   const QualityGateResult({required this.breaches, required this.configErrors});
 
+  /// Failed conditions (empty if all passed).
   final List<QualityGateBreach> breaches;
+
+  /// Unsupported operators or other config issues (non-empty ⇒ treat as failure).
   final List<String> configErrors;
 
+  /// True if any breach has `on_fail: fail` or any config error exists.
   bool get hasFailures =>
       breaches.any((b) => b.condition.onFail == 'fail') ||
       configErrors.isNotEmpty;
 
+  /// True when there are only `warn` breaches and no failures/errors.
   bool get hasWarnings =>
       breaches.any((b) => b.condition.onFail == 'warn') && !hasFailures;
 
+  /// Coarse status string for APIs: `fail`, `warn`, or `pass`.
   String get status => hasFailures
       ? 'fail'
       : hasWarnings
@@ -61,9 +91,11 @@ class QualityGateResult {
       : 'pass';
 }
 
+/// Static helpers: parse config from YAML/JSON map or file, then [evaluate].
 class QualityGateEvaluator {
   QualityGateEvaluator._();
 
+  /// Operators accepted in config; anything else becomes a [configErrors] entry.
   static const Set<String> _supportedOperators = <String>{
     'eq',
     'ne',
@@ -73,6 +105,7 @@ class QualityGateEvaluator {
     'le',
   };
 
+  /// Display symbols for breach messages (fallback to raw token if missing).
   static const Map<String, String> _operatorSymbols = <String, String>{
     'eq': '==',
     'ne': '!=',
@@ -82,6 +115,9 @@ class QualityGateEvaluator {
     'le': '<=',
   };
 
+  /// Parse `quality_gate` from an already-decoded JSON-like map.
+  ///
+  /// Skips list entries missing metric, op, numeric value, or valid `on_fail`.
   static QualityGateConfig parseConfigMap(Map<String, dynamic> rawConfig) {
     final root = rawConfig['quality_gate'];
     if (root is! Map) return const QualityGateConfig(conditions: []);
@@ -117,6 +153,9 @@ class QualityGateEvaluator {
     return QualityGateConfig(conditions: conditions);
   }
 
+  /// Load config from [configPath] relative to [projectRoot] unless absolute.
+  ///
+  /// Returns empty config if file missing or unreadable (callers may exit 0).
   static QualityGateConfig parseConfigFile({
     required String projectRoot,
     required String configPath,
@@ -152,11 +191,13 @@ class QualityGateEvaluator {
     }
   }
 
+  /// Heuristic: extension decides YAML vs JSON decode path.
   static bool _isLikelyYaml(String configPath) {
     final lower = configPath.toLowerCase();
     return lower.endsWith('.yaml') || lower.endsWith('.yml');
   }
 
+  /// Recursively convert [YamlMap] to plain `Map<String, dynamic>` for parsing.
   static Map<String, dynamic> _yamlMapToPlainMap(YamlMap yamlMap) {
     final result = <String, dynamic>{};
     for (final entry in yamlMap.entries) {
@@ -173,6 +214,7 @@ class QualityGateEvaluator {
     return result;
   }
 
+  /// Nested YAML lists to plain Dart lists (maps inside lists recurse).
   static List<dynamic> _yamlListToPlainList(YamlList yamlList) {
     return yamlList
         .map((value) {
@@ -183,6 +225,7 @@ class QualityGateEvaluator {
         .toList(growable: false);
   }
 
+  /// Evaluate every condition; unsupported ops append to [configErrors] instead of breaching.
   static QualityGateResult evaluate({
     required Map<String, dynamic> summary,
     required QualityGateConfig config,
@@ -224,6 +267,7 @@ class QualityGateEvaluator {
     return QualityGateResult(breaches: breaches, configErrors: configErrors);
   }
 
+  /// Map a metric name to a number from nested summary sections (`byImpact`, `newCode`, …).
   static num _resolveMetric(Map<String, dynamic> summary, String metric) {
     final byImpact = (summary['byImpact'] as Map?) ?? const <String, dynamic>{};
     final byRuleType =
@@ -282,6 +326,7 @@ class QualityGateEvaluator {
 
   static num _asNum(Object? value) => value is num ? value : 0;
 
+  /// Compare [actual] to [expected] using [operatorName]; unknown op returns true (no breach).
   static bool _compare(num actual, String operatorName, num expected) {
     switch (operatorName) {
       case 'eq':

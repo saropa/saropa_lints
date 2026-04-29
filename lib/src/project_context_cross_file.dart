@@ -75,11 +75,7 @@ CrossFileSnapshotData? loadCrossFileSnapshot(String? projectRoot) {
     );
     return null;
   } on Object catch (e, st) {
-    developer.log(
-      'cross_file snapshot: load failed',
-      error: e,
-      stackTrace: st,
-    );
+    developer.log('cross_file snapshot: load failed', error: e, stackTrace: st);
     return null;
   }
 }

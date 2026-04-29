@@ -1,10 +1,12 @@
+/// Unit tests for [runWriteConfig]: tier validation, emitted YAML shape, legacy pack migration.
+///
+/// Each case uses a fresh temp directory; `finally` blocks remove it after assertions.
 import 'dart:io';
 
 import 'package:saropa_lints/src/config/analysis_options_rule_packs.dart';
 import 'package:saropa_lints/src/init/write_config_runner.dart';
 import 'package:test/test.dart';
 
-/// Unit tests for headless config writer (write_config).
 void main() {
   group('runWriteConfig', () {
     test('invalid tier returns error', () {
