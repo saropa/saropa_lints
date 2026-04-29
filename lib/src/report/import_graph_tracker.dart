@@ -59,6 +59,12 @@ class ImportGraphTracker {
   /// corresponding key in [_rawImports].
   static final Map<String, String> _registeredKeyByCanonical = {};
 
+  /// Fast lookup for [_canonicalTrackedPath] (O(1) after [compute]).
+  static final Map<String, String> _pathKeyToRegistered = {};
+
+  /// Unmodifiable snapshot of [allFiles] (after [compute]).
+  static Set<String>? _allFilesSetCache;
+
   static bool _isComputed = false;
   static String? _projectRoot;
   static String? _packageName;
@@ -171,6 +177,17 @@ class ImportGraphTracker {
         'classify=${swClassify?.elapsedMilliseconds ?? 0}ms',
       );
     }
+    _buildPathKeyToRegistered();
+    _allFilesSetCache = Set.unmodifiable(_rawImports.keys.toSet());
+  }
+
+  static void _buildPathKeyToRegistered() {
+    _pathKeyToRegistered
+      ..clear()
+      ..addAll(_registeredKeyByCanonical);
+    for (final k in _rawImports.keys) {
+      _pathKeyToRegistered[_canonicalPathKey(_toRelative(k))] = k;
+    }
   }
 
   // ══════════════════════════════════════════════════════════════════
@@ -178,7 +195,11 @@ class ImportGraphTracker {
   // ══════════════════════════════════════════════════════════════════
 
   /// All files seen during analysis.
-  static Set<String> get allFiles => Set.unmodifiable(_rawImports.keys.toSet());
+  static Set<String> get allFiles {
+    final c = _allFilesSetCache;
+    if (c != null) return c;
+    return Set.unmodifiable(_rawImports.keys.toSet());
+  }
 
   /// Total import edges in the resolved graph.
   static int get totalEdges =>
@@ -270,6 +291,10 @@ class ImportGraphTracker {
   static String? _canonicalTrackedPath(String path) {
     if (path.isEmpty) return null;
     if (_rawImports.containsKey(path)) return path;
+    final c = _canonicalPathKey(path);
+    final r = _pathKeyToRegistered[c];
+    if (r != null) return r;
+    // Fallback: relative path as returned by the analyzer.
     final norm = path.replaceAll('\\', '/');
     for (final k in _rawImports.keys) {
       if (_toRelative(k) == norm) return k;
@@ -290,6 +315,8 @@ class ImportGraphTracker {
     _layers.clear();
     _layerWeights.clear();
     _registeredKeyByCanonical.clear();
+    _pathKeyToRegistered.clear();
+    _allFilesSetCache = null;
     _isComputed = false;
     // Keep _projectRoot and _packageName — they're config, not state.
   }

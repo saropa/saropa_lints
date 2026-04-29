@@ -78,7 +78,7 @@ The custom config also duplicates what can be inferred:
 ## Data Flow
 
 1. **Enable Saropa Lints** (extension): ensure `pubspec.yaml` has `saropa_lints` and `analysis_options.yaml` references the plugin (one-click setup).
-2. **Run analysis** (extension): user clicks "Run analysis"; extension triggers Dart analysis (e.g. run `dart analyze` or rely on Dart extension); plugin produces `violations.json`. If analysis fails or is still running, the extension should avoid presenting triage based on a missing or **stale** `violations.json` (show status / retry instead).
+2. **Run analysis** (extension): user clicks "Run analysis"; extension triggers Dart analysis (e.g. run `dart analyze` or rely on Dart extension); plugin produces `violations.json`. The Triage view **blocks** group-level triage when the export is missing, older than the configured window (default four hours), or lacks `summary.issuesByRule`, and shows a **Run analysis** row instead.
 3. **Load triage data**: extension reads `violations.json` and (if needed) rule metadata (tier, category, impact, stylistic flag). Compute per-rule counts.
 4. **Present triage** in extension UI (Overview + Config):
    - Critical: always on; show count and link to Issues (filter by critical).
@@ -185,7 +185,7 @@ Deduplication must land first. Prioritization on duplicated data is meaningless.
 - **Tests:** `test/import_graph_tracker_test.dart` (package edge resolution, idempotent collect).
 - **Done (2026-03 follow-up):** Batch JSON field `ig` + `ConsolidatedData.mergedRawImports` + merge in `ReportConsolidator`; report hydrates graph from merged snapshot when non-empty. Relative vs absolute file paths aligned for FIX PRIORITY / FILE IMPORTANCE issue column.
 - **Done (correctness):** Progress/report counts are deduplicated by `(ruleName, offset)` and the consolidated report omits the legacy flat `ALL VIOLATIONS` section.
-- **Benchmarked (2026-03 follow-up):** Added `test/import_graph_tracker_perf_test.dart` to measure synthetic overhead for `ImportGraphTracker.compute()` plus ordering/traversal work. On this machine, the synthetic “200 files chain + 500 violations” case took ~60-80ms, so the “<20ms” target still needs optimization.
+- **Benchmarked (2026-03 follow-up):** `test/import_graph_tracker_perf_test.dart` measures `ImportGraphTracker.compute()` plus ordering/traversal work. After a path-key index and cached `allFiles` (2026-04), the same synthetic “200 files chain + 500 violations” case often lands around **~30–40ms** total on dev hardware (was ~60–80ms), but the “<20ms” stretch goal may still need further algorithm work on hot machines.
 
 ## Known limitations (priority ordering)
 
@@ -342,7 +342,7 @@ In `ImportGraphTracker.getPriority`, `file_importance` is the internal `_importa
 | URI resolution | ~0.01ms per import | Once, during `compute()` |
 | Reverse graph + BFS | ~5ms for 200 files | Once, during `compute()` |
 | Tree rendering | ~10ms for 200 files | Once, during report write |
-| **Total overhead** | **~61ms observed** for synthetic “200-file chain” case in unit perf test | Needs optimization to meet “< 20ms per report” |
+| **Total overhead** | **Often ~30–40ms** for the same synthetic case after path index + `allFiles` cache (varies by machine) | “< 20ms per report” is still a stretch goal |
 
 ## Edge cases (priority ordering)
 
@@ -367,7 +367,7 @@ In `ImportGraphTracker.getPriority`, `file_importance` is the internal `_importa
 - [x] Priority score formula: `impact_numeric * (importance + 1) * layer_weight` (with `importance` = `file_importance` / `getImportance`; not raw direct-importer count only)
 - [x] Circular imports detected and marked, don't cause infinite loops *(tree uses `[shown above]` for revisits)*
 - [x] Standalone files (fan-in 0) listed separately in structure tree
-- [ ] Performance overhead < 20ms per report write *(benchmarked locally: ~60-80ms for synthetic “200-file chain” case; optimization required to reliably meet <20ms)*
+- [ ] Performance overhead < 20ms per report write *(synthetic case often ~30–40ms after path index + `allFiles` cache; <20ms not yet reliable)*
 - [x] No changes to Problems tab output (report file only)
 - [x] `ImportGraphTracker.reset()` called in session reset to prevent stale data
 

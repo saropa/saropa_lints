@@ -125,6 +125,50 @@ export function getViolationsPath(workspaceRoot: string): string {
   return path.join(workspaceRoot, 'reports', '.saropa_lints', 'violations.json');
 }
 
+/**
+ * Triage UIs (volume groups, zero-issue, stylistic) need a fresh
+ * `summary.issuesByRule` and a recent export file. Missing file, old mtime, or
+ * a legacy export without per-rule keys should not drive group-level toggles
+ * (misleading).
+ */
+export const VIOLATIONS_EXPORT_STALE_MS = 4 * 60 * 60 * 1000;
+
+export type ViolationsTriageState =
+  | { kind: 'ok' }
+  | { kind: 'missing' }
+  | { kind: 'stale'; ageMs: number }
+  | { kind: 'incomplete'; reason: 'no_per_rule' | 'unreadable' };
+
+/**
+ * How suitable `violations.json` is for triage (group enable/disable) vs
+ * read-only surfaces (raw violation list) that tolerate older exports.
+ */
+export function getViolationsTriageState(
+  workspaceRoot: string,
+  data: ViolationsData | null,
+): { fileMtimeMs: number | null; triage: ViolationsTriageState } {
+  const p = getViolationsPath(workspaceRoot);
+  if (!fs.existsSync(p)) {
+    return { fileMtimeMs: null, triage: { kind: 'missing' } };
+  }
+  let mtime: number;
+  try {
+    mtime = fs.statSync(p).mtimeMs;
+  } catch {
+    return { fileMtimeMs: null, triage: { kind: 'incomplete', reason: 'unreadable' } };
+  }
+  if (data == null) {
+    return { fileMtimeMs: mtime, triage: { kind: 'incomplete', reason: 'unreadable' } };
+  }
+  if (Date.now() - mtime > VIOLATIONS_EXPORT_STALE_MS) {
+    return { fileMtimeMs: mtime, triage: { kind: 'stale', ageMs: Date.now() - mtime } };
+  }
+  if (data.summary?.issuesByRule == null) {
+    return { fileMtimeMs: mtime, triage: { kind: 'incomplete', reason: 'no_per_rule' } };
+  }
+  return { fileMtimeMs: mtime, triage: { kind: 'ok' } };
+}
+
 export function readViolations(workspaceRoot: string): ViolationsData | null {
   const p = getViolationsPath(workspaceRoot);
   if (!fs.existsSync(p)) return null;

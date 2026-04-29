@@ -793,7 +793,7 @@ export class OverviewTreeProvider implements vscode.TreeDataProvider<OverviewTre
                 sidebarParent,
                 new OverviewItem(
                     'No analysis yet',
-                    'Run analysis to populate the dashboard',
+                    'Run Saropa Lints analysis first; then the dashboard, triage, and Issues list fill in.',
                     'saropaLints.runAnalysis',
                     'beaker',
                 ),

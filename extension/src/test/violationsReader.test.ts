@@ -2,7 +2,9 @@ import * as assert from 'node:assert';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
-import { readViolations } from '../violationsReader';
+import { getViolationsTriageState, readViolations, VIOLATIONS_EXPORT_STALE_MS } from '../violationsReader';
+
+// Resolves .saropa_lints/reports/violations.json paths and normalizes issues.
 
 describe('readViolations', () => {
   let tmpDir: string;
@@ -247,5 +249,57 @@ describe('readViolations', () => {
     const data = readViolations(root);
     assert.strictEqual(data?.summary?.suppressions?.byRule, undefined);
     assert.strictEqual(data?.summary?.suppressions?.byFile, undefined);
+  });
+});
+
+describe('getViolationsTriageState', () => {
+  let tmpDir: string;
+
+  function writeAtPath(root: string, data: unknown): string {
+    const reportDir = path.join(root, 'reports', '.saropa_lints');
+    fs.mkdirSync(reportDir, { recursive: true });
+    const p = path.join(reportDir, 'violations.json');
+    fs.writeFileSync(p, JSON.stringify(data));
+    return p;
+  }
+
+  beforeEach(() => {
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'saropa-vr-triage-'));
+  });
+
+  afterEach(() => {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  });
+
+  it('is ok for a fresh file with issuesByRule', () => {
+    writeAtPath(tmpDir, {
+      violations: [],
+      summary: { issuesByRule: {}, totalViolations: 0 },
+    });
+    const data = readViolations(tmpDir);
+    const s = getViolationsTriageState(tmpDir, data);
+    assert.strictEqual(s.triage.kind, 'ok');
+  });
+
+  it('is stale when mtime is older than the export window', () => {
+    const p = writeAtPath(tmpDir, {
+      violations: [],
+      summary: { issuesByRule: { a: 1 } },
+    });
+    const old = new Date(Date.now() - VIOLATIONS_EXPORT_STALE_MS - 60_000);
+    fs.utimesSync(p, old, old);
+    const data = readViolations(tmpDir);
+    const s = getViolationsTriageState(tmpDir, data);
+    assert.strictEqual(s.triage.kind, 'stale');
+    if (s.triage.kind === 'stale') {
+      assert.ok(s.triage.ageMs > VIOLATIONS_EXPORT_STALE_MS);
+    }
+  });
+
+  it('is incomplete when summary.issuesByRule is absent', () => {
+    writeAtPath(tmpDir, { violations: [], summary: { totalViolations: 0 } });
+    const data = readViolations(tmpDir);
+    const s = getViolationsTriageState(tmpDir, data);
+    assert.deepStrictEqual(s.triage, { kind: 'incomplete', reason: 'no_per_rule' });
   });
 });

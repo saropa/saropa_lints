@@ -10,7 +10,7 @@
 import * as vscode from 'vscode';
 import { readPubspec } from '../pubspecReader';
 import { getProjectRoot } from '../projectRoot';
-import { readViolations } from '../violationsReader';
+import { getViolationsTriageState, readViolations } from '../violationsReader';
 import {
   type ConfigTreeNode,
   type ConfigSettingNode,
@@ -120,12 +120,69 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigTreeNod
     if (!root) return [];
 
     const data = readViolations(root);
-    if (!data) return [];
+    const { triage: tri } = getViolationsTriageState(root, data);
+
+    if (tri.kind === 'missing' || (tri.kind === 'incomplete' && tri.reason === 'unreadable')) {
+      this.cachedTriage = null;
+      return this.buildTriageGuardNodes(
+        'Run Saropa Lints analysis first',
+        'No violations.json yet, or the file is unreadable. Triage needs a current export.',
+        false,
+      );
+    }
+    if (tri.kind === 'stale') {
+      this.cachedTriage = null;
+      return this.buildTriageGuardNodes(
+        'Triage data may be outdated',
+        `Run analysis to refresh. Export is ${this.formatAge(tri.ageMs)} old.`,
+        true,
+      );
+    }
+    if (tri.kind === 'incomplete' && tri.reason === 'no_per_rule') {
+      this.cachedTriage = null;
+      return this.buildTriageGuardNodes(
+        'Re-run analysis for full triage export',
+        'This violations.json is missing per-rule summary (issuesByRule). Triage is disabled until you re-analyze with a current plugin.',
+        true,
+      );
+    }
+    if (!data) {
+      this.cachedTriage = null;
+      return [];
+    }
 
     this.cachedTriage = buildTriageData(data, root);
-    if (!this.cachedTriage) return [];
+    if (!this.cachedTriage) {
+      this.cachedTriage = null;
+      return this.buildTriageGuardNodes(
+        'Re-run analysis for full triage export',
+        'Could not build triage from this export. Run a fresh Saropa Lints analysis.',
+        true,
+      );
+    }
 
     return this.buildTriageNodes(this.cachedTriage);
+  }
+
+  private formatAge(ageMs: number): string {
+    const h = Math.floor(ageMs / (60 * 60 * 1000));
+    if (h >= 24) return `${Math.floor(h / 24)}d`;
+    if (h > 0) return `${h}h`;
+    const m = Math.floor(ageMs / (60 * 1000));
+    return `${m}m`;
+  }
+
+  /** Blocked state: triage should not use stale or incomplete exports. */
+  private buildTriageGuardNodes(label: string, description: string, warning: boolean): ConfigTreeNode[] {
+    return [
+      {
+        kind: 'triageInfo' as const,
+        label,
+        description,
+        triageInfoVariant: warning ? 'warning' : 'default',
+        commandId: 'saropaLints.runAnalysis',
+      },
+    ];
   }
 
   /** Build the flat list of triage group nodes for the root level. */

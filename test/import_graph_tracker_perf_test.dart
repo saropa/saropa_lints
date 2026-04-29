@@ -11,7 +11,8 @@ void main() {
     //
     // This is intentionally not a strict CI gate on <20ms because machine
     // load varies; we still assert a generous upper bound to catch regressions.
-    // The plan doc is updated with the measured timing from this run.
+    // Typical run on dev hardware after path-index + allFiles cache (~30–40ms
+    // total for this scenario); still above the <20ms stretch goal in many cases.
 
     final tempDir = Directory.systemTemp.createTempSync('import_graph_perf_');
     try {

@@ -31,6 +31,10 @@ export interface TriageInfoNode {
   kind: 'triageInfo';
   label: string;
   description?: string;
+  /** 'warning' for blocked / stale triage (stronger icon). */
+  triageInfoVariant?: 'default' | 'warning';
+  /** Optional CTA (e.g. run analysis) when triage is blocked. */
+  commandId?: string;
 }
 
 export type ConfigTreeNode = ConfigSettingNode | TriageGroupNode | TriageRuleNode | TriageInfoNode;
@@ -178,7 +182,16 @@ export function renderTreeItem(node: ConfigTreeNode): vscode.TreeItem {
     case 'triageInfo': {
       const item = new vscode.TreeItem(node.label, vscode.TreeItemCollapsibleState.None);
       item.description = node.description;
-      item.iconPath = new vscode.ThemeIcon('pass', new vscode.ThemeColor('testing.iconPassed'));
+      if (node.triageInfoVariant === 'warning') {
+        item.iconPath = new vscode.ThemeIcon('warning', new vscode.ThemeColor('list.warningForeground'));
+      } else if (node.triageInfoVariant === 'default') {
+        item.iconPath = new vscode.ThemeIcon('info', new vscode.ThemeColor('textLinkForeground'));
+      } else {
+        item.iconPath = new vscode.ThemeIcon('pass', new vscode.ThemeColor('testing.iconPassed'));
+      }
+      if (node.commandId) {
+        item.command = { command: node.commandId, title: node.label, arguments: [] };
+      }
       // contextValue enables context menu actions (e.g. "Copy as JSON").
       item.contextValue = 'triageInfo';
       return item;
