@@ -1,13 +1,11 @@
-// Implements the Rule Packs view: load pubspec, toggles, and `rule_packs` config.
+// Implements the Rule Packs / Config Dashboard UI: load pubspec, toggles, and `rule_packs` config.
 /**
- * VS Code **Rule Packs** sidebar (`saropaLints.rulePacks`).
+ * **Config Dashboard** editor webview: rule packs table, tier chips, SDK rollout actions,
+ * and Flutter embedder rows from {@link readPubspec}.
  *
- * Renders a table: pack label, pubspec detection, enable toggle, rule count,
- * and a Quick Pick of rule codes. For Flutter apps, shows embedder platform
- * rows (android/, ios/, …) from {@link readPubspec}.
- *
- * Writes `plugins.saropa_lints.rule_packs.enabled` (see `rulePackYaml.ts`).
- * Refreshes when the user saves `analysis_options.yaml` or when global refresh runs.
+ * Opens as a {@link vscode.WebviewPanel} (full editor column), not a sidebar webview, so the
+ * layout stays usable. Writes `plugins.saropa_lints.rule_packs.enabled` (see `rulePackYaml.ts`).
+ * Refreshes when the user saves `analysis_options.yaml` or when the extension calls {@link refresh}.
  *
  * **Concurrency:** toggle handler is async; YAML is written synchronously then
  * analysis may run — no recursive refresh loop (refresh after write is intentional).
@@ -21,7 +19,7 @@ import { readPubspec, FLUTTER_EMBEDDER_PLATFORMS } from '../pubspecReader';
 import { RULE_PACK_DEFINITIONS, isPackDetected } from './rulePackDefinitions';
 import { readRulePacksEnabled, writeRulePacksEnabled } from './rulePackYaml';
 
-const VIEW_ID = 'saropaLints.rulePacks';
+const CONFIG_DASHBOARD_PANEL_TYPE = 'saropaLints.configDashboard';
 const TIERS = ['essential', 'recommended', 'professional', 'comprehensive', 'pedantic'] as const;
 
 type TierName = (typeof TIERS)[number];
@@ -111,23 +109,32 @@ export function buildTierChips(currentTier: string): string {
   }).join('');
 }
 
-export class RulePacksWebviewProvider implements vscode.WebviewViewProvider {
-  private _view?: vscode.WebviewView;
+export class RulePacksWebviewProvider {
+  private _panel?: vscode.WebviewPanel;
 
   constructor(private readonly _extensionUri: vscode.Uri) {}
 
-  resolveWebviewView(
-    webviewView: vscode.WebviewView,
-    _context: vscode.WebviewViewResolveContext,
-    _token: vscode.CancellationToken,
-  ): void {
-    this._view = webviewView;
-    webviewView.webview.options = {
-      enableScripts: true,
-      localResourceRoots: [this._extensionUri],
-    };
+  /** Opens or focuses the Config Dashboard in the editor area and rebuilds HTML. */
+  openEditorPanel(): void {
+    if (this._panel) {
+      this._panel.reveal(vscode.ViewColumn.One, true);
+      this.refresh();
+      return;
+    }
 
-    webviewView.webview.onDidReceiveMessage((msg: { type: string; packId?: string; enabled?: boolean; id?: string }) => {
+    const panel = vscode.window.createWebviewPanel(
+      CONFIG_DASHBOARD_PANEL_TYPE,
+      'Config Dashboard',
+      vscode.ViewColumn.One,
+      {
+        enableScripts: true,
+        localResourceRoots: [this._extensionUri],
+        retainContextWhenHidden: true,
+      },
+    );
+    this._panel = panel;
+
+    panel.webview.onDidReceiveMessage((msg: { type: string; packId?: string; enabled?: boolean; id?: string }) => {
       if (msg.type === 'toggle' && msg.packId !== undefined && msg.enabled !== undefined) {
         void this._handleToggle(msg.packId, msg.enabled);
       }
@@ -142,12 +149,19 @@ export class RulePacksWebviewProvider implements vscode.WebviewViewProvider {
       }
     });
 
+    panel.onDidDispose(() => {
+      this._panel = undefined;
+    });
+
     this.refresh();
   }
 
   refresh(): void {
-    if (!this._view) return;
-    this._view.webview.html = this._buildHtml();
+    const webview = this._panel?.webview;
+    if (!webview) {
+      return;
+    }
+    webview.html = this._buildHtml();
   }
 
   private _buildHtml(): string {
@@ -351,7 +365,7 @@ ${platSection}
     return `<!DOCTYPE html>
 <html><head><meta charset="UTF-8"><meta http-equiv="Content-Security-Policy" content="${csp}">
 <style>
-body { font-family: var(--vscode-font-family); font-size: 12px; color: var(--vscode-foreground); padding: 8px; }
+body { font-family: var(--vscode-font-family); font-size: 12px; color: var(--vscode-foreground); padding: 16px; max-width: 1200px; margin: 0 auto; }
 h1 { font-size: 13px; margin: 0 0 8px 0; }
 h2 { font-size: 12px; margin: 16px 0 8px 0; }
 table { width: 100%; border-collapse: collapse; }
@@ -550,4 +564,5 @@ function escapeHtml(s: string): string {
     .replaceAll('"', '&quot;');
 }
 
-export const RULE_PACKS_VIEW_ID = VIEW_ID;
+/** Panel `viewType` for the Config Dashboard webview panel (editor area). */
+export const CONFIG_DASHBOARD_PANEL_ID = CONFIG_DASHBOARD_PANEL_TYPE;

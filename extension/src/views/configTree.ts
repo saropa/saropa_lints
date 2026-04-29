@@ -109,7 +109,7 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigTreeNod
   /** Quick links to the richer web dashboards. */
   private buildDashboardShortcutNodes(): ConfigTreeNode[] {
     return [
-      setting('Open Config Dashboard', 'Tiers, packs, charts, docs', 'saropaLints.openConfigDashboard'),
+      setting('Open Config Dashboard', 'Editor tab: tiers, packs, charts, docs', 'saropaLints.openConfigDashboard'),
       setting('Open Package Vibrancy', 'Dependency health and reports', 'saropaLints.openPackageVibrancy'),
     ];
   }

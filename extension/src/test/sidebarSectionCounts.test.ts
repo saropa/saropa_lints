@@ -37,7 +37,6 @@ describe('buildSidebarSectionCountMap', () => {
       });
       assert.strictEqual(m.get('sidebar.showIssues'), undefined);
       assert.strictEqual(m.get('sidebar.showDriftAdvisor'), 2);
-      assert.strictEqual(m.get('sidebar.showRulePacks'), 0);
     } finally {
       fs.rmSync(dir, { recursive: true, force: true });
     }

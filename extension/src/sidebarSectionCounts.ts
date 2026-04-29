@@ -11,7 +11,6 @@
  */
 
 import type { Violation, ViolationsData } from './violationsReader';
-import { readRulePacksEnabled } from './rulePacks/rulePackYaml';
 import { countSuggestionItems } from './suggestionCounts';
 
 function countOwaspMappedViolations(violations: readonly Violation[]): number {
@@ -50,8 +49,6 @@ export function buildSidebarSectionCountMap(inputs: SidebarSectionCountInputs): 
     if (!root) {
         return m;
     }
-
-    m.set('sidebar.showRulePacks', readRulePacksEnabled(root).length);
 
     const vibrancyPackages = inputs.vibrancyPackageCount;
     m.set('sidebar.showPackageVibrancy', vibrancyPackages);

@@ -74,10 +74,10 @@ These packs are considered applicable from SDK constraints (not dependency marke
 
 ## VS Code
 
-The **Rule Packs** sidebar view lists packs, whether dependencies appear in
+**Saropa Lints: Open Config Dashboard** opens an **editor tab** (not a narrow sidebar) that lists packs, whether dependencies appear in
 `pubspec.yaml`, toggles, rule counts, and target platforms (Flutter embedder
 folders). SDK packs are detected from `environment.sdk` / `environment.flutter`
-constraints. Toggles write the same `rule_packs` YAML.
+constraints. Toggles write the same `rule_packs` YAML. The **Issues** view title also exposes this command in Dart workspaces.
 
 ## Registry
 

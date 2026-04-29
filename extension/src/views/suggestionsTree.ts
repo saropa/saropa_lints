@@ -197,7 +197,7 @@ export class SuggestionsTreeProvider implements vscode.TreeDataProvider<Suggesti
           new SuggestionItem(
             `Enable ${row.pack.label} rule pack`,
             `${row.relatedCount} related rules available`,
-            'saropaLints.openRulePacks',
+            'saropaLints.openConfigDashboard',
           ),
         );
       }

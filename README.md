@@ -27,7 +27,7 @@ Developed by [Saropa](https://saropa.com) to make the world of Dart & Flutter be
 
 **Install the [Saropa Lints VS Code extension](https://marketplace.visualstudio.com/items?itemName=saropa.saropa-lints)** for the full experience. Also on [Open VSX](https://open-vsx.org/extension/saropa/saropa-lints) (Cursor, VSCodium).
 
-Lint integration defaults **on** for Dart workspaces (`saropaLints.enabled`). Overview, Setup & triage, and Rule Packs stay available even when integration is off; turn it off with **Saropa Lints: Turn Off Lint Integration** if you only want the sidebar without analyzer runs.
+Lint integration defaults **on** for Dart workspaces (`saropaLints.enabled`). Overview and setup stay available even when integration is off; turn it off with **Saropa Lints: Turn Off Lint Integration** if you only want the sidebar without analyzer runs.
 
 The extension is the primary setup and configuration surface:
 
@@ -35,7 +35,7 @@ The extension is the primary setup and configuration surface:
 - **Issues tree** — Violations grouped by severity and file, with Error Lens-style inline annotations; multi-select works with **Copy as JSON**
 - **Security Posture** — OWASP Top 10 coverage matrix, compliance export
 - **Triage** — Disable noisy rules from the UI; see estimated score impact before acting
-- **Rule Packs** — Enable stack bundles (Riverpod, Drift, …) from the sidebar webview (per-pack toggles, rule lists, target platforms when embedder folders exist); see [`doc/guides/rule_packs.md`](doc/guides/rule_packs.md)
+- **Rule packs / Config Dashboard** — Enable stack bundles (Riverpod, Drift, …) from **Saropa Lints: Open Config Dashboard** (editor tab: per-pack toggles, rule lists, target platforms when embedder folders exist); see [`doc/guides/rule_packs.md`](doc/guides/rule_packs.md)
 - **Package Vibrancy** — Dependency health, alerts, and optional **version-gap** PR/issue triage (enable with `saropaLints.packageVibrancy.enableVersionGap`; a GitHub token improves results)
 - **Project Vibrancy** — Project code-health scoring for your own Dart source via **Open Project Vibrancy Report** (editor-area webview; same scan as the CLI JSON output); use the graph icon on **Issues**, **Overview**, **Config**, or **Package Vibrancy** view titles, or the Command Palette
 - **TODOs & Hacks** — Sidebar scan for TODO/FIXME/HACK-style markers; full-workspace scan is **opt-in** (`saropaLints.todosAndHacks.workspaceScanEnabled`, default off) via **TODOs & Hacks: Enable workspace scan**

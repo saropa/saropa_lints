@@ -53,6 +53,8 @@
 ### Changed (Extension)
 
 - **Open Package Vibrancy**, **Open Project Vibrancy Report**, and **Open Project Vibrancy Settings** now have toolbar icons, and the **Issues** and **Package Vibrancy** view title bars include **Open Package Vibrancy** and **Open Project Vibrancy Report** in Dart workspaces so the main vibrancy webviews stay one click away from the sidebar. No config change.
+- **Config Dashboard** (rule packs, tiers, charts) opens as an **editor tab** instead of a Saropa sidebar webview so the layout matches a real dashboard width. No action required.
+- **Open Config Dashboard** has a toolbar icon and is on the **Issues** view title in Dart workspaces (Overview and Config titles unchanged); the `saropaLints.sidebar.showRulePacks` setting is removed because that sidebar section no longer exists—delete the key from settings JSON if you set it explicitly. No other migration.
 
 ### Fixed (Extension)
 

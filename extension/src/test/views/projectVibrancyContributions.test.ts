@@ -9,7 +9,7 @@ interface PackageJsonView {
   when?: string;
 }
 
-/** package.json: Project Vibrancy is report-only (no duplicate sidebar webview). */
+/** package.json: heavy webviews are editor-area, not cramped sidebar webviews. */
 
 function loadPackageJsonViews(): PackageJsonView[] {
   const pkgPath = path.resolve(__dirname, '..', '..', '..', 'package.json');
@@ -39,5 +39,20 @@ describe('projectVibrancyContributions', () => {
     assert.ok(commands.includes('saropaLints.openProjectVibrancyReport'));
     assert.ok(commands.includes('saropaLints.openProjectVibrancySettings'));
     assert.ok(!commands.includes('saropaLints.refreshProjectVibrancySidebar'));
+  });
+});
+
+describe('configDashboardContributions', () => {
+  const removedRulePacksViewId = 'saropaLints.rulePacks';
+
+  it('does not register Config Dashboard as a sidebar webview', () => {
+    const pkgPath = path.resolve(__dirname, '..', '..', '..', 'package.json');
+    const raw = fs.readFileSync(pkgPath, 'utf-8');
+    const pkg = JSON.parse(raw) as {
+      contributes: { views: { saropaLints: PackageJsonView[] } };
+    };
+    const views = pkg.contributes.views.saropaLints;
+    const view = views.find((v) => v.id === removedRulePacksViewId);
+    assert.strictEqual(view, undefined, 'Config Dashboard should open as an editor tab, not a sidebar webview');
   });
 });

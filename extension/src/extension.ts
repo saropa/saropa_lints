@@ -3,6 +3,12 @@
  * `saropaLints.enabled` defaults on: upgrade checks and integration state.
  * Sidebar overview, triage, and rule-pack dashboards stay available for Dart workspaces;
  * TODOs workspace scan is opt-in via `todosAndHacks.workspaceScanEnabled`.
+ *
+ * Activation registers tree providers and command handlers in dependency order:
+ * violations/overview trees read `reports/.saropa_lints/violations.json` written by
+ * the analyzer plugin; drift advisor and vibrancy commands coordinate with workspace
+ * memento keys documented on their providers. Prefer small focused modules under
+ * `views/` and `commands/` over growing this file when adding features.
  */
 
 import * as vscode from 'vscode';
@@ -322,9 +328,6 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   );
 
   const rulePacksWebviewProvider = new RulePacksWebviewProvider(context.extensionUri);
-  context.subscriptions.push(
-    vscode.window.registerWebviewViewProvider('saropaLints.rulePacks', rulePacksWebviewProvider),
-  );
 
   // Command catalog sidebar — searchable index of every extension command.
   // Sits at the top of the sidebar so it is the first thing users see.
@@ -778,10 +781,10 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       vscode.commands.executeCommand('saropaLints.overview.focus');
     }),
     vscode.commands.registerCommand('saropaLints.openRulePacks', () => {
-      void vscode.commands.executeCommand('saropaLints.rulePacks.focus');
+      rulePacksWebviewProvider.openEditorPanel();
     }),
     vscode.commands.registerCommand('saropaLints.openConfigDashboard', () => {
-      void vscode.commands.executeCommand('saropaLints.rulePacks.focus');
+      rulePacksWebviewProvider.openEditorPanel();
     }),
     vscode.commands.registerCommand('saropaLints.openPackageVibrancy', async () => {
       await vscode.commands.executeCommand('saropaLints.packageVibrancy.packages.focus');

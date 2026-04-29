@@ -10,7 +10,7 @@ import {
 // Counts and context keys for sidebar section visibility must match package.json.
 describe('sidebarSectionVisibilityKeys', () => {
     it('keeps config and context keys in sync with package.json sidebar settings', () => {
-        assert.strictEqual(SIDEBAR_SECTION_COUNT, 14);
+        assert.strictEqual(SIDEBAR_SECTION_COUNT, 13);
         assert.strictEqual(SIDEBAR_SECTION_CONFIG_KEYS.length, SIDEBAR_SECTION_COUNT);
     });
 
@@ -25,7 +25,6 @@ describe('sidebarSectionVisibilityKeys', () => {
         assert.strictEqual(defaultSidebarSectionVisible('sidebar.showCommandCatalog'), true);
         assert.strictEqual(defaultSidebarSectionVisible('sidebar.showOverview'), true);
         assert.strictEqual(defaultSidebarSectionVisible('sidebar.showIssues'), true);
-        assert.strictEqual(defaultSidebarSectionVisible('sidebar.showRulePacks'), true);
         assert.strictEqual(defaultSidebarSectionVisible('sidebar.showPackageVibrancy'), true);
         assert.strictEqual(defaultSidebarSectionVisible('sidebar.showConfig'), false);
         // Package Details defaults on — when clause gates it behind hasResults.

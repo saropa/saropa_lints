@@ -3,6 +3,11 @@
  *
  * Maintenance: when adding or removing a command in package.json, update this
  * registry to match. A test validates that the two stay in sync.
+ *
+ * Most of this file is the `catalogEntries` literal: titles align with
+ * `package.json` `contributes.commands` labels so the palette and catalog stay
+ * consistent. Descriptions stay short; the webview search field concatenates
+ * title, id, and description for matching.
  */
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -106,7 +111,7 @@ export const catalogEntries: readonly CatalogEntry[] = [
   {
     command: 'saropaLints.openConfigDashboard',
     title: 'Open Config Dashboard',
-    description: 'Open the Config Dashboard webview for tiers, packs, and config guidance.',
+    description: 'Open the Config Dashboard in an editor tab for tiers, packs, and config guidance.',
     category: 'Setup & Configuration',
     icon: 'dashboard',
   },
