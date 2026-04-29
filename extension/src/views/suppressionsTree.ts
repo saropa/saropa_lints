@@ -5,6 +5,11 @@
 
 import * as vscode from 'vscode';
 import { readViolations, filterDisabledFromData } from '../violationsReader';
+import {
+  countNormalizedNumericEntries,
+  formatKeyedCountBreakdown,
+  sortedNumericCountEntries,
+} from '../keyedCountBreakdown';
 import { getProjectRoot } from '../projectRoot';
 import { readDisabledRules } from '../configWriter';
 
@@ -54,19 +59,19 @@ export class SuppressionsTreeProvider implements vscode.TreeDataProvider<Suppres
         new SuppressionsItem('Total suppressions', String(sup.total ?? 0), vscode.TreeItemCollapsibleState.None, undefined, 'saropaLints.focusIssues'),
         new SuppressionsItem(
           'By kind',
-          formatCountDescription(sup.byKind),
+          formatKeyedCountBreakdown(sup.byKind),
           vscode.TreeItemCollapsibleState.Collapsed,
           'byKind',
         ),
         new SuppressionsItem(
           'By rule',
-          `${Object.keys(sup.byRule ?? {}).length} rules`,
+          `${countNormalizedNumericEntries(sup.byRule)} rules`,
           vscode.TreeItemCollapsibleState.Collapsed,
           'byRule',
         ),
         new SuppressionsItem(
           'By file',
-          `${Object.keys(sup.byFile ?? {}).length} files`,
+          `${countNormalizedNumericEntries(sup.byFile)} files`,
           vscode.TreeItemCollapsibleState.Collapsed,
           'byFile',
         ),
@@ -74,46 +79,36 @@ export class SuppressionsTreeProvider implements vscode.TreeDataProvider<Suppres
     }
 
     if (element.nodeId === 'byKind') {
-      return Object.entries(sup.byKind ?? {})
-        .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
-        .map(([kind, count]) => new SuppressionsItem(prettifyToken(kind), String(count)));
+      return sortedNumericCountEntries(sup.byKind).map(([kind, count]) =>
+        new SuppressionsItem(prettifyToken(kind), String(count)),
+      );
     }
     if (element.nodeId === 'byRule') {
-      return Object.entries(sup.byRule ?? {})
-        .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
-        .map(([rule, count]) =>
-          new SuppressionsItem(
-            rule,
-            String(count),
-            vscode.TreeItemCollapsibleState.None,
-            undefined,
-            'saropaLints.focusIssuesForRules',
-            [[rule]],
-          ),
-        );
+      return sortedNumericCountEntries(sup.byRule).map(([rule, count]) =>
+        new SuppressionsItem(
+          rule,
+          String(count),
+          vscode.TreeItemCollapsibleState.None,
+          undefined,
+          'saropaLints.focusIssuesForRules',
+          [[rule]],
+        ),
+      );
     }
     if (element.nodeId === 'byFile') {
-      return Object.entries(sup.byFile ?? {})
-        .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
-        .map(([filePath, count]) =>
-          new SuppressionsItem(
-            filePath,
-            String(count),
-            vscode.TreeItemCollapsibleState.None,
-            undefined,
-            'saropaLints.openFileAndFocusIssues',
-            [filePath],
-          ),
-        );
+      return sortedNumericCountEntries(sup.byFile).map(([filePath, count]) =>
+        new SuppressionsItem(
+          filePath,
+          String(count),
+          vscode.TreeItemCollapsibleState.None,
+          undefined,
+          'saropaLints.openFileAndFocusIssues',
+          [filePath],
+        ),
+      );
     }
     return [];
   }
-}
-
-function formatCountDescription(entries: Record<string, number> | undefined): string {
-  if (!entries) return '—';
-  const sorted = Object.entries(entries).sort((a, b) => b[1] - a[1]);
-  return sorted.map(([k, v]) => `${k} ${v}`).join(', ');
 }
 
 function prettifyToken(token: string): string {

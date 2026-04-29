@@ -64,6 +64,8 @@
     "src/test/suggestionCounts.test.ts",
     "src/test/sidebarSectionCounts.test.ts",
     "src/pathUtils.ts",
+    "src/keyedCountBreakdown.ts",
+    "src/test/keyedCountBreakdown.test.ts",
     "src/test/pathUtils.test.ts",
     "src/setup.ts",
     "src/cross-file-commands.ts",

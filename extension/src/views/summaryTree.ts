@@ -4,7 +4,13 @@
  */
 
 import * as vscode from 'vscode';
-import { readViolations, filterDisabledFromData } from '../violationsReader';
+import { readViolations, filterDisabledFromData, type SuppressionsSummary } from '../violationsReader';
+import {
+  countNormalizedNumericEntries,
+  formatKeyedCountBreakdown,
+  normalizeNonNegativeInteger,
+  sortedNumericCountEntries,
+} from '../keyedCountBreakdown';
 import { getProjectRoot } from '../projectRoot';
 import { readDisabledRules } from '../configWriter';
 import {
@@ -116,7 +122,7 @@ export class SummaryTreeProvider implements vscode.TreeDataProvider<SummaryItem>
         items.push(
           new SummaryItem(
             'By rule type',
-            formatBreakdownDescription(s.byRuleType),
+            formatKeyedCountBreakdown(s.byRuleType),
             vscode.TreeItemCollapsibleState.Expanded,
             'byRuleType',
           ),
@@ -126,7 +132,7 @@ export class SummaryTreeProvider implements vscode.TreeDataProvider<SummaryItem>
         items.push(
           new SummaryItem(
             'By rule status',
-            formatBreakdownDescription(s.byRuleStatus),
+            formatKeyedCountBreakdown(s.byRuleStatus),
             vscode.TreeItemCollapsibleState.Expanded,
             'byRuleStatus',
           ),
@@ -135,9 +141,12 @@ export class SummaryTreeProvider implements vscode.TreeDataProvider<SummaryItem>
       if ((s?.suppressions?.total ?? 0) > 0) {
         const byKind = s?.suppressions?.byKind;
         const parts: string[] = [];
-        if ((byKind?.ignore ?? 0) > 0) parts.push(`${byKind?.ignore ?? 0} ignore`);
-        if ((byKind?.ignoreForFile ?? 0) > 0) parts.push(`${byKind?.ignoreForFile ?? 0} file-level`);
-        if ((byKind?.baseline ?? 0) > 0) parts.push(`${byKind?.baseline ?? 0} baseline`);
+        const nIgnore = normalizeNonNegativeInteger(byKind?.ignore) ?? 0;
+        const nFile = normalizeNonNegativeInteger(byKind?.ignoreForFile) ?? 0;
+        const nBaseline = normalizeNonNegativeInteger(byKind?.baseline) ?? 0;
+        if (nIgnore > 0) parts.push(`${nIgnore} ignore`);
+        if (nFile > 0) parts.push(`${nFile} file-level`);
+        if (nBaseline > 0) parts.push(`${nBaseline} baseline`);
         const desc = parts.length > 0 ? parts.join(', ') : `${s?.suppressions?.total ?? 0} total`;
         items.push(
           new SummaryItem(
@@ -169,35 +178,31 @@ export class SummaryTreeProvider implements vscode.TreeDataProvider<SummaryItem>
       ];
     }
     if ((element.nodeId === 'byRuleType' || element.label === 'By rule type') && s?.byRuleType) {
-      return Object.entries(s.byRuleType)
-        .sort((a, b) => b[1] - a[1])
-        .map(([ruleType, count]) =>
-          new SummaryItem(
-            prettifyToken(ruleType),
-            String(count),
-            vscode.TreeItemCollapsibleState.None,
-            undefined,
-            'saropaLints.focusIssuesByRuleMetadata',
-            ['ruleType', ruleType],
-          ),
-        );
+      return sortedNumericCountEntries(s.byRuleType).map(([ruleType, count]) =>
+        new SummaryItem(
+          prettifyToken(ruleType),
+          String(count),
+          vscode.TreeItemCollapsibleState.None,
+          undefined,
+          'saropaLints.focusIssuesByRuleMetadata',
+          ['ruleType', ruleType],
+        ),
+      );
     }
     if (
       (element.nodeId === 'byRuleStatus' || element.label === 'By rule status') &&
       s?.byRuleStatus
     ) {
-      return Object.entries(s.byRuleStatus)
-        .sort((a, b) => b[1] - a[1])
-        .map(([ruleStatus, count]) =>
-          new SummaryItem(
-            prettifyToken(ruleStatus),
-            String(count),
-            vscode.TreeItemCollapsibleState.None,
-            undefined,
-            'saropaLints.focusIssuesByRuleMetadata',
-            ['ruleStatus', ruleStatus],
-          ),
-        );
+      return sortedNumericCountEntries(s.byRuleStatus).map(([ruleStatus, count]) =>
+        new SummaryItem(
+          prettifyToken(ruleStatus),
+          String(count),
+          vscode.TreeItemCollapsibleState.None,
+          undefined,
+          'saropaLints.focusIssuesByRuleMetadata',
+          ['ruleStatus', ruleStatus],
+        ),
+      );
     }
     if (element.nodeId === 'suppressions' && s?.suppressions) {
       return buildSuppressionGroupChildren(s.suppressions);
@@ -231,33 +236,35 @@ function isSuppressionGroupNodeId(value: string): value is SuppressionsGroupNode
   return value === 'suppressionsByKind' || value === 'suppressionsByRule' || value === 'suppressionsByFile';
 }
 
-function buildSuppressionGroupChildren(suppressions: NonNullable<NonNullable<ReturnType<typeof readViolations>>['summary']>['suppressions']): SummaryItem[] {
+function buildSuppressionGroupChildren(suppressions: SuppressionsSummary): SummaryItem[] {
   const children: SummaryItem[] = [];
-  if (suppressions.byKind && Object.keys(suppressions.byKind).length > 0) {
+  if (countNormalizedNumericEntries(suppressions.byKind) > 0) {
     children.push(
       new SummaryItem(
         'By kind',
-        formatBreakdownDescription(suppressions.byKind),
+        formatKeyedCountBreakdown(suppressions.byKind),
         vscode.TreeItemCollapsibleState.Collapsed,
         'suppressionsByKind',
       ),
     );
   }
-  if (suppressions.byRule && Object.keys(suppressions.byRule).length > 0) {
+  const ruleEntryCount = countNormalizedNumericEntries(suppressions.byRule);
+  if (ruleEntryCount > 0) {
     children.push(
       new SummaryItem(
         'By rule',
-        `${Object.keys(suppressions.byRule).length} rules`,
+        `${ruleEntryCount} rules`,
         vscode.TreeItemCollapsibleState.Collapsed,
         'suppressionsByRule',
       ),
     );
   }
-  if (suppressions.byFile && Object.keys(suppressions.byFile).length > 0) {
+  const fileEntryCount = countNormalizedNumericEntries(suppressions.byFile);
+  if (fileEntryCount > 0) {
     children.push(
       new SummaryItem(
         'By file',
-        `${Object.keys(suppressions.byFile).length} files`,
+        `${fileEntryCount} files`,
         vscode.TreeItemCollapsibleState.Collapsed,
         'suppressionsByFile',
       ),
@@ -271,45 +278,35 @@ function buildSuppressionGroupChildren(suppressions: NonNullable<NonNullable<Ret
 
 function buildSuppressionEntries(
   nodeId: SuppressionsGroupNodeId,
-  suppressions: NonNullable<NonNullable<ReturnType<typeof readViolations>>['summary']>['suppressions'],
+  suppressions: SuppressionsSummary,
 ): SummaryItem[] {
   if (nodeId === 'suppressionsByKind') {
-    return Object.entries(suppressions.byKind ?? {})
-      .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
-      .map(([kind, count]) => new SummaryItem(prettifyToken(kind), String(count)));
+    return sortedNumericCountEntries(suppressions.byKind).map(([kind, count]) =>
+      new SummaryItem(prettifyToken(kind), String(count)),
+    );
   }
   if (nodeId === 'suppressionsByRule') {
-    return Object.entries(suppressions.byRule ?? {})
-      .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
-      .map(([rule, count]) =>
-        new SummaryItem(
-          rule,
-          String(count),
-          vscode.TreeItemCollapsibleState.None,
-          undefined,
-          'saropaLints.focusIssuesForRules',
-          [[rule]],
-        ),
-      );
-  }
-  return Object.entries(suppressions.byFile ?? {})
-    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
-    .map(([filePath, count]) =>
+    return sortedNumericCountEntries(suppressions.byRule).map(([rule, count]) =>
       new SummaryItem(
-        filePath,
+        rule,
         String(count),
         vscode.TreeItemCollapsibleState.None,
         undefined,
-        'saropaLints.openFileAndFocusIssues',
-        [filePath],
+        'saropaLints.focusIssuesForRules',
+        [[rule]],
       ),
     );
-}
-
-function formatBreakdownDescription(entries: Record<string, number>): string {
-  const sorted = Object.entries(entries).sort((a, b) => b[1] - a[1]);
-  if (sorted.length === 0) return '—';
-  return sorted.map(([k, v]) => `${k} ${v}`).join(', ');
+  }
+  return sortedNumericCountEntries(suppressions.byFile).map(([filePath, count]) =>
+    new SummaryItem(
+      filePath,
+      String(count),
+      vscode.TreeItemCollapsibleState.None,
+      undefined,
+      'saropaLints.openFileAndFocusIssues',
+      [filePath],
+    ),
+  );
 }
 
 function prettifyToken(token: string): string {
