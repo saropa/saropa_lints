@@ -24,6 +24,12 @@ format_output*.txt
 *format_output*.txt
 *format_errors*.txt
 
+# One-off agent / comment-coverage batch scratch (do not commit)
+scripts/comment_coverage_batch/
+/agent_next100_paths.txt
+/agent_tofill_*.txt
+/agent_diff_paths.py
+
 # IDE
 .idea/
 *.iml
