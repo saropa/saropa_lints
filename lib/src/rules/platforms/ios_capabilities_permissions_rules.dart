@@ -10,12 +10,20 @@ import 'package:analyzer/dart/ast/ast.dart';
 import '../../info_plist_utils.dart';
 import '../../target_matcher_utils.dart';
 import '../../saropa_lint_rule.dart';
+import '../../fixes/platforms/ios/replace_http_with_https_fix.dart';
+
 
 /// Requires high-signal Info.plist permission keys for common iOS APIs.
 ///
 /// This is a broad config cross-check rule complementing the narrower
 /// `require_ios_permission_description` checks.
 class RequireIosInfoPlistEntriesRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceHttpWithHttpsFix(context: context),
+  ];
   RequireIosInfoPlistEntriesRule() : super(code: _code);
 
   @override
@@ -72,6 +80,12 @@ class RequireIosInfoPlistEntriesRule extends SaropaLintRule {
 }
 
 class RequireIosPermissionDescriptionRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceHttpWithHttpsFix(context: context),
+  ];
   /// Creates a new instance of [RequireIosPermissionDescriptionRule].
   RequireIosPermissionDescriptionRule() : super(code: _code);
 
@@ -270,6 +284,12 @@ enum _ImageSource { gallery, camera, unknown }
 ///
 /// @see [Privacy Manifest](https://developer.apple.com/documentation/bundleresources/privacy_manifest_files)
 class RequireIosPrivacyManifestRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceHttpWithHttpsFix(context: context),
+  ];
   /// Creates a new instance of [RequireIosPrivacyManifestRule].
   RequireIosPrivacyManifestRule() : super(code: _code);
 
@@ -386,6 +406,12 @@ class RequireIosPrivacyManifestRule extends SaropaLintRule {
 /// @see [App Store Review Guidelines 4.8](https://developer.apple.com/app-store/review/guidelines/#sign-in-with-apple)
 /// @see [sign_in_with_apple package](https://pub.dev/packages/sign_in_with_apple)
 class RequireIosBackgroundModeRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceHttpWithHttpsFix(context: context),
+  ];
   /// Creates a new instance of [RequireIosBackgroundModeRule].
   RequireIosBackgroundModeRule() : super(code: _code);
 
@@ -487,6 +513,12 @@ class RequireIosBackgroundModeRule extends SaropaLintRule {
 ///
 /// @see [UIWebView deprecation](https://developer.apple.com/documentation/uikit/uiwebview)
 class RequireIosAppTrackingTransparencyRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceHttpWithHttpsFix(context: context),
+  ];
   /// Creates a new instance of [RequireIosAppTrackingTransparencyRule].
   RequireIosAppTrackingTransparencyRule() : super(code: _code);
 
@@ -620,6 +652,12 @@ class RequireIosAppTrackingTransparencyRule extends SaropaLintRule {
 /// @see [LocalAuthentication](https://developer.apple.com/documentation/localauthentication)
 /// @see [local_auth package](https://pub.dev/packages/local_auth)
 class RequireIosFaceIdUsageDescriptionRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceHttpWithHttpsFix(context: context),
+  ];
   /// Creates a new instance of [RequireIosFaceIdUsageDescriptionRule].
   RequireIosFaceIdUsageDescriptionRule() : super(code: _code);
 
@@ -736,6 +774,12 @@ class RequireIosFaceIdUsageDescriptionRule extends SaropaLintRule {
 ///
 /// @see [PHPhotoLibrary](https://developer.apple.com/documentation/photokit/phphotolibrary)
 class RequireIosPhotoLibraryAddUsageRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceHttpWithHttpsFix(context: context),
+  ];
   /// Creates a new instance of [RequireIosPhotoLibraryAddUsageRule].
   RequireIosPhotoLibraryAddUsageRule() : super(code: _code);
 
@@ -829,6 +873,12 @@ class RequireIosPhotoLibraryAddUsageRule extends SaropaLintRule {
 /// @see [Google OAuth policy](https://developers.googleblog.com/2016/08/modernizing-oauth-interactions-in-native-apps.html)
 /// @see [flutter_appauth package](https://pub.dev/packages/flutter_appauth)
 class RequireIosPushNotificationCapabilityRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceHttpWithHttpsFix(context: context),
+  ];
   /// Creates a new instance of [RequireIosPushNotificationCapabilityRule].
   RequireIosPushNotificationCapabilityRule() : super(code: _code);
 
@@ -942,6 +992,12 @@ class RequireIosPushNotificationCapabilityRule extends SaropaLintRule {
 ///
 /// @see [App Transport Security](https://developer.apple.com/documentation/security/preventing_insecure_network_connections)
 class RequireIosLocalNotificationPermissionRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceHttpWithHttpsFix(context: context),
+  ];
   /// Creates a new instance of [RequireIosLocalNotificationPermissionRule].
   RequireIosLocalNotificationPermissionRule() : super(code: _code);
 
@@ -1042,6 +1098,12 @@ class RequireIosLocalNotificationPermissionRule extends SaropaLintRule {
 ///
 /// @see [device_info_plus](https://pub.dev/packages/device_info_plus)
 class RequireIosAppGroupCapabilityRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceHttpWithHttpsFix(context: context),
+  ];
   /// Creates a new instance of [RequireIosAppGroupCapabilityRule].
   RequireIosAppGroupCapabilityRule() : super(code: _code);
 
@@ -1151,6 +1213,12 @@ class RequireIosAppGroupCapabilityRule extends SaropaLintRule {
 /// @see [HealthKit](https://developer.apple.com/documentation/healthkit)
 /// @see [health package](https://pub.dev/packages/health)
 class RequireIosHealthKitAuthorizationRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceHttpWithHttpsFix(context: context),
+  ];
   /// Creates a new instance of [RequireIosHealthKitAuthorizationRule].
   RequireIosHealthKitAuthorizationRule() : super(code: _code);
 
@@ -1246,6 +1314,12 @@ class RequireIosHealthKitAuthorizationRule extends SaropaLintRule {
 /// @see [SiriKit](https://developer.apple.com/documentation/sirikit)
 /// @see [flutter_siri_shortcuts](https://pub.dev/packages/flutter_siri_shortcuts)
 class RequireIosSiriIntentDefinitionRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceHttpWithHttpsFix(context: context),
+  ];
   /// Creates a new instance of [RequireIosSiriIntentDefinitionRule].
   RequireIosSiriIntentDefinitionRule() : super(code: _code);
 
@@ -1350,6 +1424,12 @@ class RequireIosSiriIntentDefinitionRule extends SaropaLintRule {
 /// @see [WidgetKit](https://developer.apple.com/documentation/widgetkit)
 /// @see [home_widget package](https://pub.dev/packages/home_widget)
 class RequireIosWidgetExtensionCapabilityRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceHttpWithHttpsFix(context: context),
+  ];
   /// Creates a new instance of [RequireIosWidgetExtensionCapabilityRule].
   RequireIosWidgetExtensionCapabilityRule() : super(code: _code);
 
@@ -1458,6 +1538,12 @@ class RequireIosWidgetExtensionCapabilityRule extends SaropaLintRule {
 /// @see [in_app_purchase](https://pub.dev/packages/in_app_purchase)
 /// @see [Validating Receipts](https://developer.apple.com/documentation/storekit/in-app_purchase/original_api_for_in-app_purchase/validating_receipts_with_the_app_store)
 class RequireIosBackgroundAudioCapabilityRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceHttpWithHttpsFix(context: context),
+  ];
   /// Creates a new instance of [RequireIosBackgroundAudioCapabilityRule].
   RequireIosBackgroundAudioCapabilityRule() : super(code: _code);
 
@@ -1535,6 +1621,12 @@ class RequireIosBackgroundAudioCapabilityRule extends SaropaLintRule {
 /// await InAppPurchase.instance.buyNonConsumable(...);
 /// ```
 class RequireIosAppClipSizeLimitRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceHttpWithHttpsFix(context: context),
+  ];
   /// Creates a new instance of [RequireIosAppClipSizeLimitRule].
   RequireIosAppClipSizeLimitRule() : super(code: _code);
 
@@ -1627,6 +1719,12 @@ class RequireIosAppClipSizeLimitRule extends SaropaLintRule {
 /// );
 /// ```
 class RequireIosShareSheetUtiDeclarationRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceHttpWithHttpsFix(context: context),
+  ];
   /// Creates a new instance of [RequireIosShareSheetUtiDeclarationRule].
   RequireIosShareSheetUtiDeclarationRule() : super(code: _code);
 
@@ -1688,6 +1786,12 @@ class RequireIosShareSheetUtiDeclarationRule extends SaropaLintRule {
 /// - Don't store large data structures
 /// - Handle conflicts (last write wins)
 class RequireIosAccessibilityLabelsRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceHttpWithHttpsFix(context: context),
+  ];
   /// Creates a new instance of [RequireIosAccessibilityLabelsRule].
   RequireIosAccessibilityLabelsRule() : super(code: _code);
 
@@ -1756,6 +1860,12 @@ class RequireIosAccessibilityLabelsRule extends SaropaLintRule {
 /// - UISupportedInterfaceOrientations (iPhone)
 /// - UISupportedInterfaceOrientations~ipad (iPad)
 class RequireIosNfcCapabilityCheckRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceHttpWithHttpsFix(context: context),
+  ];
   /// Creates a new instance of [RequireIosNfcCapabilityCheckRule].
   RequireIosNfcCapabilityCheckRule() : super(code: _code);
 
@@ -1842,6 +1952,12 @@ class RequireIosNfcCapabilityCheckRule extends SaropaLintRule {
 /// - CXCallController for outgoing calls
 /// - Push notifications for VoIP
 class RequireIosCallkitIntegrationRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceHttpWithHttpsFix(context: context),
+  ];
   /// Creates a new instance of [RequireIosCallkitIntegrationRule].
   RequireIosCallkitIntegrationRule() : super(code: _code);
 
@@ -1952,6 +2068,12 @@ class RequireIosCallkitIntegrationRule extends SaropaLintRule {
 /// - CPTemplateApplicationSceneDelegate
 /// - Limited UI templates
 class RequireIosCarplaySetupRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceHttpWithHttpsFix(context: context),
+  ];
   /// Creates a new instance of [RequireIosCarplaySetupRule].
   RequireIosCarplaySetupRule() : super(code: _code);
 
@@ -2017,6 +2139,12 @@ class RequireIosCarplaySetupRule extends SaropaLintRule {
 /// - Widget Extension with ActivityConfiguration
 /// - Proper push notification setup for remote updates
 class RequireIosLiveActivitiesSetupRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceHttpWithHttpsFix(context: context),
+  ];
   /// Creates a new instance of [RequireIosLiveActivitiesSetupRule].
   RequireIosLiveActivitiesSetupRule() : super(code: _code);
 
@@ -2093,6 +2221,12 @@ class RequireIosLiveActivitiesSetupRule extends SaropaLintRule {
 /// iPhone 13 Pro and later have ProMotion displays (120Hz).
 /// Apps should use CADisplayLink for smooth animations on these devices.
 class RequireIosPromotionDisplaySupportRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceHttpWithHttpsFix(context: context),
+  ];
   /// Creates a new instance of [RequireIosPromotionDisplaySupportRule].
   RequireIosPromotionDisplaySupportRule() : super(code: _code);
 
@@ -2144,6 +2278,12 @@ class RequireIosPromotionDisplaySupportRule extends SaropaLintRule {
 /// iOS 14+ supports limited photo library access. Apps should handle
 /// the case where user only grants access to selected photos.
 class RequireIosPhotoLibraryLimitedAccessRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceHttpWithHttpsFix(context: context),
+  ];
   /// Creates a new instance of [RequireIosPhotoLibraryLimitedAccessRule].
   RequireIosPhotoLibraryLimitedAccessRule() : super(code: _code);
 
@@ -2228,6 +2368,12 @@ class RequireIosPhotoLibraryLimitedAccessRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireIosPasteboardPrivacyHandlingRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceHttpWithHttpsFix(context: context),
+  ];
   /// Creates a new instance of [RequireIosPasteboardPrivacyHandlingRule].
   RequireIosPasteboardPrivacyHandlingRule() : super(code: _code);
 
@@ -2283,6 +2429,12 @@ class RequireIosPasteboardPrivacyHandlingRule extends SaropaLintRule {
 /// - Application delegate handles `application:performFetchWithCompletionHandler:`
 /// - Background refresh must complete within 30 seconds
 class RequireIosBackgroundRefreshDeclarationRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceHttpWithHttpsFix(context: context),
+  ];
   /// Creates a new instance of [RequireIosBackgroundRefreshDeclarationRule].
   RequireIosBackgroundRefreshDeclarationRule() : super(code: _code);
 
@@ -2351,6 +2503,12 @@ class RequireIosBackgroundRefreshDeclarationRule extends SaropaLintRule {
 /// - sceneDidEnterBackground
 /// - sceneWillEnterForeground
 class RequireIosBiometricFallbackRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceHttpWithHttpsFix(context: context),
+  ];
   /// Creates a new instance of [RequireIosBiometricFallbackRule].
   RequireIosBiometricFallbackRule() : super(code: _code);
 
@@ -2406,6 +2564,12 @@ class RequireIosBiometricFallbackRule extends SaropaLintRule {
 /// Apple rejects apps that send push notifications unrelated to
 /// the user's interests or that spam users.
 class RequireIosAccessibilityLargeTextRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceHttpWithHttpsFix(context: context),
+  ];
   /// Creates a new instance of [RequireIosAccessibilityLargeTextRule].
   RequireIosAccessibilityLargeTextRule() : super(code: _code);
 
@@ -2519,6 +2683,12 @@ class RequireIosAccessibilityLargeTextRule extends SaropaLintRule {
 ///
 /// @see [CupertinoContextMenu](https://api.flutter.dev/flutter/cupertino/CupertinoContextMenu-class.html)
 class RequireIosQuickNoteAwarenessRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceHttpWithHttpsFix(context: context),
+  ];
   /// Creates a new instance of [RequireIosQuickNoteAwarenessRule].
   RequireIosQuickNoteAwarenessRule() : super(code: _code);
 
@@ -2607,6 +2777,12 @@ class RequireIosQuickNoteAwarenessRule extends SaropaLintRule {
 ///
 /// @see [viewInsets](https://api.flutter.dev/flutter/widgets/MediaQueryData/viewInsets.html)
 class RequireIosVoiceoverGestureCompatibilityRule extends SaropaLintRule {
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceHttpWithHttpsFix(context: context),
+  ];
   /// Creates a new instance of [RequireIosVoiceoverGestureCompatibilityRule].
   RequireIosVoiceoverGestureCompatibilityRule() : super(code: _code);
 
