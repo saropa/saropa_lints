@@ -32,8 +32,7 @@ class WrapScrollableInSizedBoxHeightFix extends SaropaFixProducer {
     if (parent is! InstanceCreationExpression) return;
     final ice = parent;
 
-    final wrapped =
-        'SizedBox(height: 200, child: ${ice.toSource()})';
+    final wrapped = 'SizedBox(height: 200, child: ${ice.toSource()})';
 
     await builder.addDartFileEdit(file, (builder) {
       builder.addSimpleReplacement(

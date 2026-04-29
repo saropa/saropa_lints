@@ -202,7 +202,9 @@ void main() {
         expect(end, greaterThan(start));
         final slice = content.substring(start, end);
         expect(
-          slice.contains('expect_lint: annotate_inherited_member_redeclaration'),
+          slice.contains(
+            'expect_lint: annotate_inherited_member_redeclaration',
+          ),
           isFalse,
         );
       },

@@ -20,9 +20,7 @@ import '../../fixes/widget_layout/wrap_listview_in_sliver_to_box_adapter_fix.dar
 import '../../fixes/widget_layout/wrap_scrollable_in_expanded_fix.dart';
 import '../../fixes/widget_layout/wrap_scrollable_in_sized_box_height_fix.dart';
 
-
 class AvoidExpandedAsSpacerRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -113,7 +111,6 @@ class AvoidExpandedAsSpacerRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidFlexibleOutsideFlexRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -202,7 +199,6 @@ class AvoidFlexibleOutsideFlexRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidShrinkWrapInListsRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -276,7 +272,6 @@ class AvoidShrinkWrapInListsRule extends SaropaLintRule {
 /// Text('Hello')  // or use Align/Center if alignment needed
 /// ```
 class AvoidSingleChildColumnRowRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -372,7 +367,6 @@ class AvoidSingleChildColumnRowRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferSliverPrefixRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -496,7 +490,6 @@ class PreferSliverPrefixRule extends SaropaLintRule {
 /// ListView(children: items)
 /// ```
 class PreferUsingListViewRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -568,7 +561,6 @@ class PreferUsingListViewRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidListViewWithoutItemExtentRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -638,7 +630,6 @@ class AvoidListViewWithoutItemExtentRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferSliverListDelegateRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -718,7 +709,6 @@ class PreferSliverListDelegateRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidSingleChildScrollViewWithColumnRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -814,7 +804,6 @@ class AvoidSingleChildScrollViewWithColumnRule extends SaropaLintRule {
 /// CachedNetworkImage(imageUrl: 'https://example.com/image.png')
 /// ```
 class PreferListViewBuilderRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -899,7 +888,6 @@ class PreferListViewBuilderRule extends SaropaLintRule {
 /// FadeTransition(opacity: _ctrl, child: child)
 /// ```
 class AvoidNestedScrollablesRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -1017,7 +1005,6 @@ class AvoidNestedScrollablesRule extends SaropaLintRule {
 /// Container(margin: EdgeInsets.only(left: context.spacing.large));
 /// ```
 class RequireScrollPhysicsRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -1108,7 +1095,6 @@ class RequireScrollPhysicsRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferSliverListRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -1197,7 +1183,6 @@ class PreferSliverListRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferKeepAliveRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -1297,7 +1282,6 @@ class PreferKeepAliveRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferWrapOverOverflowRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -1387,7 +1371,6 @@ class PreferWrapOverOverflowRule extends SaropaLintRule {
 /// Image.asset('assets/logo.png')
 /// ```
 class AvoidLayoutBuilderInScrollableRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -1477,7 +1460,6 @@ class AvoidLayoutBuilderInScrollableRule extends SaropaLintRule {
 /// )
 /// ```
 class RequireScrollControllerRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -1544,7 +1526,6 @@ class RequireScrollControllerRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidShrinkWrapInScrollRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -1658,7 +1639,6 @@ class AvoidShrinkWrapInScrollRule extends SaropaLintRule {
 /// }
 /// ```
 class RequirePhysicsForNestedScrollRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -1830,7 +1810,6 @@ class RequirePhysicsForNestedScrollRule extends SaropaLintRule {
 /// definitions. This makes the flex behavior explicit and avoids crashes
 /// when the widget is wrapped with Padding, GestureDetector, etc.
 class AvoidExpandedOutsideFlexRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -2039,7 +2018,6 @@ class AvoidExpandedOutsideFlexRule extends SaropaLintRule {
 /// Use `// ignore: prefer_expanded_at_call_site` if the widget is intentionally
 /// designed to always be a direct Flex child and will never be wrapped.
 class PreferExpandedAtCallSiteRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -2286,7 +2264,6 @@ const Set<String> _constraintWrappers = <String>{
 };
 
 class AvoidSpacerInWrapRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -2376,7 +2353,6 @@ class AvoidSpacerInWrapRule extends SaropaLintRule {
 /// SizedBox(height: 200, child: ListView(...))
 /// ```
 class AvoidScrollableInIntrinsicRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -2473,7 +2449,6 @@ class AvoidScrollableInIntrinsicRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidUnboundedListviewInColumnRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -2611,7 +2586,6 @@ class AvoidUnboundedListviewInColumnRule extends SaropaLintRule {
 /// Row(children: [Icon(Icons.search), Expanded(child: TextField())])
 /// ```
 class PreferFlexForComplexLayoutRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -2653,7 +2627,6 @@ class PreferFlexForComplexLayoutRule extends SaropaLintRule {
 
 /// Prefer findChildIndexCallback in ListView.builder for stable indices.
 class PreferFindChildIndexCallbackRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -2688,4 +2661,3 @@ class PreferFindChildIndexCallbackRule extends SaropaLintRule {
     SaropaContext context,
   ) {}
 }
-

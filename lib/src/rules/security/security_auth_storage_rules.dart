@@ -15,9 +15,7 @@ import 'package:analyzer/dart/element/type.dart';
 import '../../saropa_lint_rule.dart';
 import '../../fixes/security/replace_with_https_fix.dart';
 
-
 class RequireSecureStorageRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -141,7 +139,6 @@ class RequireSecureStorageRule extends SaropaLintRule {
 /// final password = await secureStorage.read(key: 'password');
 /// ```
 class AvoidHardcodedCredentialsRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -273,7 +270,6 @@ class AvoidHardcodedCredentialsRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireBiometricFallbackRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -372,7 +368,6 @@ class RequireBiometricFallbackRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidStoringPasswordsRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -471,7 +466,6 @@ class AvoidStoringPasswordsRule extends SaropaLintRule {
 /// db.query('users', where: 'id = ?', whereArgs: [userId]);
 /// ```
 class RequireAuthCheckRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -731,7 +725,6 @@ class RequireAuthCheckRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireTokenRefreshRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -865,7 +858,6 @@ class RequireTokenRefreshRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidJwtDecodeClientRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -990,7 +982,6 @@ class AvoidJwtDecodeClientRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireLogoutCleanupRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -1097,7 +1088,6 @@ class RequireLogoutCleanupRule extends SaropaLintRule {
 /// );
 /// ```
 class AvoidAuthInQueryParamsRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -1221,7 +1211,6 @@ class AvoidAuthInQueryParamsRule extends SaropaLintRule {
 ///
 /// Fixture: `example/lib/security/require_data_encryption_fixture.dart`.
 class RequireDataEncryptionRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -1351,7 +1340,6 @@ class RequireDataEncryptionRule extends SaropaLintRule {
 /// Text(maskPhoneNumber(user.phoneNumber)); // Custom masking
 /// ```
 class RequireSecurePasswordFieldRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -1474,7 +1462,6 @@ class RequireSecurePasswordFieldRule extends SaropaLintRule {
 ///
 /// See also: `require_file_path_sanitization` for a similar rule.
 class RequireSecureStorageForAuthRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -1592,7 +1579,6 @@ class RequireSecureStorageForAuthRule extends SaropaLintRule {
 /// http.get(url);
 /// ```
 class PreferLocalAuthRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -1700,7 +1686,6 @@ class PreferLocalAuthRule extends SaropaLintRule {
 /// await storage.write(key: 'jwt', value: token);  // Encrypted
 /// ```
 class RequireSecureStorageAuthDataRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -1840,7 +1825,6 @@ class RequireSecureStorageAuthDataRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidStoringSensitiveUnencryptedRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -2009,7 +1993,6 @@ class AvoidStoringSensitiveUnencryptedRule extends SaropaLintRule {
 ///   };
 /// ```
 class RequireSecureStorageErrorHandlingRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -2119,7 +2102,6 @@ class RequireSecureStorageErrorHandlingRule extends SaropaLintRule {
 /// await secureStorage.write(key: 'token', value: token);
 /// ```
 class AvoidSecureStorageLargeDataRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -2226,7 +2208,6 @@ class AvoidSecureStorageLargeDataRule extends SaropaLintRule {
 /// );
 /// ```
 class PreferBiometricProtectionRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -2337,7 +2318,6 @@ class PreferBiometricProtectionRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidSensitiveDataInClipboardRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -2427,7 +2407,6 @@ class AvoidSensitiveDataInClipboardRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireClipboardPasteValidationRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -2598,7 +2577,6 @@ class _ClipboardCallbackConsumerVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class AvoidEncryptionKeyInMemoryRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -2684,7 +2662,6 @@ class AvoidEncryptionKeyInMemoryRule extends SaropaLintRule {
 /// );
 /// ```
 class PreferOauthPkceRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -2822,7 +2799,6 @@ class PreferOauthPkceRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireSessionTimeoutRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -2994,7 +2970,6 @@ class RequireSessionTimeoutRule extends SaropaLintRule {
 ///
 /// **Good:** Use root_checker or similar and gate sensitive features.
 class PreferRootDetectionRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -3072,7 +3047,6 @@ class PreferRootDetectionRule extends SaropaLintRule {
 /// - Does not trace controllers across files or through factories; only
 ///   same-file configuration is considered.
 class PreferWebviewSandboxRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -3226,7 +3200,6 @@ class _WebViewSandboxConfigVisitor extends RecursiveAstVisitor<void> {
 
 /// Suggests whitelist (allowlist) validation over blacklist for input.
 class PreferWhitelistValidationRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -3267,7 +3240,6 @@ class PreferWhitelistValidationRule extends SaropaLintRule {
 // =============================================================================
 
 class RequireKeychainAccessRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -3309,7 +3281,6 @@ class RequireKeychainAccessRule extends SaropaLintRule {
 // =============================================================================
 
 class RequireWebviewUserAgentRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -3352,7 +3323,6 @@ class RequireWebviewUserAgentRule extends SaropaLintRule {
 // =============================================================================
 
 class RequireMultiFactorRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>

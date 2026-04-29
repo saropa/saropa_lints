@@ -396,7 +396,10 @@ void main() {
 
     // Widget layout — flex / scroll (26)
     hasFix('AvoidExpandedAsSpacerRule', () => AvoidExpandedAsSpacerRule());
-    hasFix('AvoidFlexibleOutsideFlexRule', () => AvoidFlexibleOutsideFlexRule());
+    hasFix(
+      'AvoidFlexibleOutsideFlexRule',
+      () => AvoidFlexibleOutsideFlexRule(),
+    );
     hasFix('AvoidShrinkWrapInListsRule', () => AvoidShrinkWrapInListsRule());
     hasFix(
       'AvoidSingleChildColumnRowRule',
@@ -426,14 +429,8 @@ void main() {
       'AvoidLayoutBuilderInScrollableRule',
       () => AvoidLayoutBuilderInScrollableRule(),
     );
-    hasFix(
-      'RequireScrollControllerRule',
-      () => RequireScrollControllerRule(),
-    );
-    hasFix(
-      'AvoidShrinkWrapInScrollRule',
-      () => AvoidShrinkWrapInScrollRule(),
-    );
+    hasFix('RequireScrollControllerRule', () => RequireScrollControllerRule());
+    hasFix('AvoidShrinkWrapInScrollRule', () => AvoidShrinkWrapInScrollRule());
     hasFix(
       'RequirePhysicsForNestedScrollRule',
       () => RequirePhysicsForNestedScrollRule(),
@@ -504,25 +501,13 @@ void main() {
       'AlwaysRemoveGetxListenerRule',
       () => AlwaysRemoveGetxListenerRule(),
     );
-    hasFix(
-      'AvoidGetxRxInsideBuildRule',
-      () => AvoidGetxRxInsideBuildRule(),
-    );
-    hasFix(
-      'AvoidMutableRxVariablesRule',
-      () => AvoidMutableRxVariablesRule(),
-    );
+    hasFix('AvoidGetxRxInsideBuildRule', () => AvoidGetxRxInsideBuildRule());
+    hasFix('AvoidMutableRxVariablesRule', () => AvoidMutableRxVariablesRule());
     hasFix('DisposeGetxFieldsRule', () => DisposeGetxFieldsRule());
     hasFix('PreferGetxBuilderRule', () => PreferGetxBuilderRule());
     hasFix('RequireGetxBindingRule', () => RequireGetxBindingRule());
-    hasFix(
-      'AvoidGetxGlobalStateRule',
-      () => AvoidGetxGlobalStateRule(),
-    );
-    hasFix(
-      'AvoidGetxStaticContextRule',
-      () => AvoidGetxStaticContextRule(),
-    );
+    hasFix('AvoidGetxGlobalStateRule', () => AvoidGetxGlobalStateRule());
+    hasFix('AvoidGetxStaticContextRule', () => AvoidGetxStaticContextRule());
     hasFix(
       'AvoidTightCouplingWithGetxRule',
       () => AvoidTightCouplingWithGetxRule(),
@@ -532,10 +517,7 @@ void main() {
       'AvoidGetxBuildContextBypassRule',
       () => AvoidGetxBuildContextBypassRule(),
     );
-    hasFix(
-      'AvoidGetxRxNestedObsRule',
-      () => AvoidGetxRxNestedObsRule(),
-    );
+    hasFix('AvoidGetxRxNestedObsRule', () => AvoidGetxRxNestedObsRule());
     hasFix(
       'PreferGetxBuilderOverObxRule',
       () => PreferGetxBuilderOverObxRule(),

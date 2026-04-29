@@ -9,7 +9,9 @@ import '../../native/saropa_fix.dart';
 /// that indexes into the same widget expressions.
 class ReplaceSliverChildListDelegateWithBuilderDelegateFix
     extends SaropaFixProducer {
-  ReplaceSliverChildListDelegateWithBuilderDelegateFix({required super.context});
+  ReplaceSliverChildListDelegateWithBuilderDelegateFix({
+    required super.context,
+  });
 
   static const _fixKind = FixKind(
     'saropa.fix.replaceSliverChildListDelegateWithBuilderDelegateFix',

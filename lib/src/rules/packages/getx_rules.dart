@@ -64,7 +64,6 @@ import '../../target_matcher_utils.dart';
 /// }
 /// ```
 class RequireGetxWorkerDisposeRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -208,7 +207,6 @@ class RequireGetxWorkerDisposeRule extends SaropaLintRule {
 /// Get.put(GlobalConfig(), permanent: true);
 /// ```
 class RequireGetxPermanentCleanupRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -370,7 +368,6 @@ class RequireGetxPermanentCleanupRule extends SaropaLintRule {
 /// });
 /// ```
 class AvoidGetxContextOutsideWidgetRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -534,7 +531,6 @@ class AvoidGetxContextOutsideWidgetRule extends SaropaLintRule {
 /// // Or use GoRouter, AutoRoute, etc.
 /// ```
 class AvoidGetxGlobalNavigationRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -626,7 +622,6 @@ class AvoidGetxGlobalNavigationRule extends SaropaLintRule {
 /// )
 /// ```
 class RequireGetxBindingRoutesRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -718,7 +713,6 @@ class RequireGetxBindingRoutesRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidGetxDialogSnackbarInControllerRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -818,7 +812,6 @@ class AvoidGetxDialogSnackbarInControllerRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireGetxLazyPutRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -923,7 +916,6 @@ class RequireGetxLazyPutRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidGetFindInBuildRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -1026,7 +1018,6 @@ class _GetFindVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class RequireGetxControllerDisposeRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -1144,7 +1135,6 @@ class RequireGetxControllerDisposeRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidObsOutsideControllerRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -1256,7 +1246,6 @@ class AvoidObsOutsideControllerRule extends SaropaLintRule {
 /// }
 /// ```
 class ProperGetxSuperCallsRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -1379,7 +1368,6 @@ class _SuperCallVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class AlwaysRemoveGetxListenerRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -1464,7 +1452,6 @@ class AlwaysRemoveGetxListenerRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidGetxRxInsideBuildRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -1546,7 +1533,6 @@ class _ObsVisitor extends RecursiveAstVisitor<void> {
 /// count(5); // Or use callable syntax
 /// ```
 class AvoidMutableRxVariablesRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -1650,7 +1636,6 @@ class AvoidMutableRxVariablesRule extends SaropaLintRule {
 /// }
 /// ```
 class DisposeGetxFieldsRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -1781,7 +1766,6 @@ class _DisposeVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class PreferGetxBuilderRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -1893,7 +1877,6 @@ class PreferGetxBuilderRule extends SaropaLintRule {
 /// GetPage(name: '/my', page: () => MyPage(), binding: MyBinding());
 /// ```
 class RequireGetxBindingRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -1980,7 +1963,6 @@ class RequireGetxBindingRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidGetxGlobalStateRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -2069,7 +2051,6 @@ class AvoidGetxGlobalStateRule extends SaropaLintRule {
 /// // Inject NavigationService for testability
 /// ```
 class AvoidGetxStaticContextRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -2158,7 +2139,6 @@ class AvoidGetxStaticContextRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidTightCouplingWithGetxRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -2254,7 +2234,6 @@ class AvoidTightCouplingWithGetxRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidGetxStaticGetRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -2331,7 +2310,6 @@ class AvoidGetxStaticGetRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidGetxBuildContextBypassRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -2403,7 +2381,6 @@ class AvoidGetxBuildContextBypassRule extends SaropaLintRule {
 /// final items = RxList<String>([]);          // flat reactive list
 /// ```
 class AvoidGetxRxNestedObsRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -2489,7 +2466,6 @@ class AvoidGetxRxNestedObsRule extends SaropaLintRule {
 /// GetBuilder<MyController>(builder: (_) => Text(controller.label));
 /// ```
 class PreferGetxBuilderOverObxRule extends SaropaLintRule {
-
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
