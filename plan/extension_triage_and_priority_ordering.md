@@ -20,9 +20,15 @@ Both rely on the same violation data (export, deduplication). Triage gets you to
 
 ## Design Principles (shared)
 
-1. **Extension-first.** Setup, analysis, and triage happen in the extension. Users do not run `dart run saropa_lints:init` (or any init CLI). The extension owns the experience.
-2. **Analyze first, then decide.** Data drives decisions: run analysis, get per-rule counts (and later priority scores), then present triage and fix order in the UI/report.
+1. **Extension-first (interactive).** Setup, triage, and one-click config are extension-driven. **End users** do not run an interactive `dart run saropa_lints:init` wizard. Non-interactive `init` / `write_config` may remain for CI and scripts (see [Init policy](#init-policy) below). The extension owns the normal user experience.
+2. **Analyze first, then decide.** Data drives decisions: run analysis, get per-rule counts (and later priority scores in UI, if linked), then present triage and fix order in the UI/report.
 3. **Same triage model.** Critical rules always on; zero-issue rules auto-enabled; remaining rules grouped by volume (e.g. Group A/B/C/D) with group-level or per-rule choices; stylistic rules triaged separately and opt-in.
+
+### Init policy
+
+- **End users / interactive flow:** No terminal wizard. Use the extension plus `write_config` for generated `analysis_options.yaml` as implemented.
+- **Automation / CI:** `dart run saropa_lints:init` (headless) or other non-interactive entry points can remain; they are not the primary setup path in docs or onboarding.
+- **Naming:** "No init" in this plan means "no *interactive* CLI init for humans," not "no Dart entrypoint in `bin/`."
 
 ---
 
@@ -67,12 +73,12 @@ The custom config also duplicates what can be inferred:
 | **Platform/package detection** | Extension (or a small headless library/script the extension calls) reads `pubspec.yaml` and sets platform/package context. No manual config for these. |
 | **User overrides** | Minimal `analysis_options_custom.yaml`: only explicit rule overrides (rule_name: true/false). Optional override UI in Config view. |
 
-So: **no init command line**. The extension runs analysis, reads violation data, and drives triage and config writing. CLI init is deprecated or removed; the extension is the only supported path for setup and triage.
+**Summary:** The extension runs analysis, reads violation data, and drives triage and config writing. Interactive setup is extension-only; headless/CI entry points are separate ([Init policy](#init-policy)).
 
 ## Data Flow
 
 1. **Enable Saropa Lints** (extension): ensure `pubspec.yaml` has `saropa_lints` and `analysis_options.yaml` references the plugin (one-click setup).
-2. **Run analysis** (extension): user clicks "Run analysis"; extension triggers Dart analysis (e.g. run `dart analyze` or rely on Dart extension); plugin produces `violations.json`.
+2. **Run analysis** (extension): user clicks "Run analysis"; extension triggers Dart analysis (e.g. run `dart analyze` or rely on Dart extension); plugin produces `violations.json`. If analysis fails or is still running, the extension should avoid presenting triage based on a missing or **stale** `violations.json` (show status / retry instead).
 3. **Load triage data**: extension reads `violations.json` and (if needed) rule metadata (tier, category, impact, stylistic flag). Compute per-rule counts.
 4. **Present triage** in extension UI (Overview + Config):
    - Critical: always on; show count and link to Issues (filter by critical).
@@ -92,7 +98,7 @@ So: **no init command line**. The extension runs analysis, reads violation data,
 ## Triage Logic (unchanged from original design, applied in extension)
 
 - **Critical rules** (essential tier, security, crash, memory): always enabled; show counts and link to Issues.
-- **Auto-enable zero-issue rules**: Rules with 0 issues in current analysis → set to `true`; they catch future violations.
+- **Auto-enable zero-issue rules**: Rules with 0 issues in current analysis → set to `true`; they catch future violations. *Product note:* this can **expand** the enabled rule set on the next run (more diagnostics). UX should set expectations; optional future guardrails: cap batch size, tier cap, or “enable safe/zero-issue only in Essential” if feedback shows overload.
 - **Bulk triage by volume**: Remaining rules grouped by issue count (e.g. A: 1–5, B: 6–20, C: 21–100, D: 100+). User makes group-level Enable all / Disable all; for smaller groups, optional "Review list" with per-rule toggles.
 - **Stylistic**: Same grouping, separate section; opt-in; option to disable all stylistic.
 - **Re-run behavior**: New rules in new version → triage like above. Disabled rules that now have 0 issues → offer to auto-enable. User overrides (from custom config) preserved.
@@ -118,7 +124,7 @@ Migration: If an existing `analysis_options_custom.yaml` is present, extension (
 
 ## CLI and Backend
 
-- **Init CLI**: **Removed or deprecated.** Extension is the only supported way to do setup and triage. If we keep a headless "apply triage" for scripts/CI, it should be an implementation detail (e.g. library or a non-interactive script that reads violations + decisions and writes YAML), not the main user-facing init.
+- **Init CLI (interactive):** **Removed** as a user-facing path. **Headless** `init` and **`write_config`** remain for scripts/CI; see [Init policy](#init-policy). Any future "apply triage" helper for scripts should read `violations.json` + policy and write YAML without prompts.
 - **Analysis**: Still performed by Dart analyzer + saropa_lints plugin. Extension triggers analysis (via Dart extension or `dart analyze`) and consumes `violations.json`.
 - **Status**: No separate CLI status command; extension Overview and Summary provide status and progress.
 
@@ -147,7 +153,7 @@ Migration: If an existing `analysis_options_custom.yaml` is present, extension (
 
 ## Success Criteria (triage)
 
-- Users never need to run an init command; the extension is the single place for setup and triage.
+- **End users** do not need an **interactive** init command; the extension (and `write_config` where applicable) is the path for normal setup and triage.
 - "Run analysis" and "Configure rules" (triage) are clear in the extension (Overview + Config).
 - Triage is data-driven: critical always on, zero-issue auto-enabled, rest by volume groups and stylistic opt-in.
 - analysis_options (and minimal custom overrides) are written by the extension; behavior matches VSCODE_EXTENSION_COHESION_WOW_PLAN (one-click setup, init from UI, config actions in place).
@@ -180,6 +186,14 @@ Deduplication must land first. Prioritization on duplicated data is meaningless.
 - **Done (2026-03 follow-up):** Batch JSON field `ig` + `ConsolidatedData.mergedRawImports` + merge in `ReportConsolidator`; report hydrates graph from merged snapshot when non-empty. Relative vs absolute file paths aligned for FIX PRIORITY / FILE IMPORTANCE issue column.
 - **Done (correctness):** Progress/report counts are deduplicated by `(ruleName, offset)` and the consolidated report omits the legacy flat `ALL VIOLATIONS` section.
 - **Benchmarked (2026-03 follow-up):** Added `test/import_graph_tracker_perf_test.dart` to measure synthetic overhead for `ImportGraphTracker.compute()` plus ordering/traversal work. On this machine, the synthetic “200 files chain + 500 violations” case took ~60-80ms, so the “<20ms” target still needs optimization.
+
+## Known limitations (priority ordering)
+
+These clarify acceptance criteria and avoid confusion with older drafts.
+
+1. **Multi-isolate / consolidated reports:** Each analyzer isolate collects `ImportGraphTracker` data in memory. Batches include a per-file import snapshot (`ig` / merged map); `ReportConsolidator` merges so the **final** report graph spans the whole session, not a single isolate.
+2. **Output size:** `PROJECT STRUCTURE`, `FILE IMPORTANCE`, and `FIX PRIORITY` can **cap** how many lines appear when limits are hit; the full graph is used for **ordering** of what is shown. (Exact caps live in `analysis_reporter` / config.) This replaces an older “print every file always” idea for very large projects.
+3. **Formula vs labels:** The numeric `file_importance` (fan-in with transitive weight) drives scoring. The “Critical / High / …” table in the scoring section is a **reader’s guide** to magnitudes, not a separate discretization in code.
 
 ## What the developer sees (end state)
 
@@ -241,7 +255,7 @@ Files with zero issues still appear — they show which high-importance files ar
 Replaces the current flat `ALL VIOLATIONS` list. Every violation, sorted by priority score descending. The developer starts at the top and works down.
 
 ```text
-FIX PRIORITY (19 violations, sorted by priority = impact * importance * layer)
+FIX PRIORITY (19 violations, sorted by combined priority — same formula as “Combined priority score” below)
 
   Priority | Impact   | File                                  | Line | Rule                         | Summary
   ---------+----------+---------------------------------------+------+------------------------------+--------
@@ -261,8 +275,8 @@ Same violations as the current report. Completely different order. The developer
 file_importance = direct_importers + (indirect_importers * 0.3)
 ```
 
-| Importance | Score  | Meaning |
-|------------|--------|---------|
+| Label (illustrative) | Typical `file_importance` | Reading the score |
+|----------------------|---------------------------|----------------------|
 | Critical   | 20+    | Core utilities, base services, shared widgets |
 | High       | 10-19  | Main screens, state management, data layer |
 | Moderate   | 3-9    | Feature screens, feature-specific components |
@@ -273,9 +287,9 @@ file_importance = direct_importers + (indirect_importers * 0.3)
 
 Classify by directory path. First match wins.
 
-| Layer        | Path patterns | Weight |
-|--------------|--------------|--------|
-| Entry        | `main.dart`, `app.dart` | 5 |
+| Layer        | Path patterns (first match; see `_layerRules` in code) | Weight |
+|--------------|--------------------------------------------------------|--------|
+| Entry        | file name `main.dart` | 5 |
 | Routing      | `routes/`, `router/`, `navigation/` | 4 |
 | State        | `bloc/`, `provider/`, `riverpod/`, `store/`, `cubit/` | 4 |
 | Data         | `database/`, `repository/`, `api/`, `service/` | 3 |
@@ -302,104 +316,23 @@ Classify by directory path. First match wins.
 priority = lint_impact_numeric * (file_importance + 1) * layer_weight
 ```
 
-The `+1` prevents standalone files (importance 0) from zeroing out the score.
+In `ImportGraphTracker.getPriority`, `file_importance` is the internal `_importanceScores` value (direct importers + `0.3` × indirect transitive importers). The same value is what acceptance criteria call **`fan_in`** in shorthand. The `+1` prevents standalone files (importance 0) from zeroing out the score.
 
-## Implementation (priority ordering)
+## As implemented (priority ordering)
 
-### New class: ImportGraphTracker
+| Location | Role |
+|----------|------|
+| `lib/src/report/import_graph_tracker.dart` | `ImportGraphTracker`: regex for `import` and `export` (single- or double-quoted URI), per-file collection, `setProjectInfo`, `compute`, transitive fan-in (DAG or SCC fallback), `getPriority` / `getFileScore`, batch snapshot helpers, `reset` |
+| `lib/src/native/saropa_context.dart` | `ImportGraphTracker.collectImports(filePath, fileContent)` after `ProgressTracker.recordFile` (same content the analyzer used) |
+| `lib/src/report/analysis_reporter.dart` | `initialize` → `setProjectInfo`; `compute` after merged import snapshot; `PROJECT STRUCTURE` / `FILE IMPORTANCE` / `FIX PRIORITY` sections |
+| `lib/src/report/report_consolidator.dart` | Merged raw imports for consolidated report — see [Known limitations](#known-limitations-priority-ordering) |
 
-Add to `lib/src/saropa_lint_rule.dart`. Collects import edges during analysis, computes scores at report time.
+**Do not** follow early drafts that placed the tracker in `SaropaLintRule.run` or `saropa_lint_rule.dart`; wiring is via `SaropaContext` as in the table above.
 
-**Data structures**:
+### Report generation (high level)
 
-```dart
-class ImportGraphTracker {
-  ImportGraphTracker._();
-
-  /// file_path -> set of import URIs (raw strings from import directives)
-  static final Map<String, Set<String>> _rawImports = {};
-
-  /// file_path -> set of resolved absolute paths this file imports
-  static final Map<String, Set<String>> _importsOf = {};
-
-  /// file_path -> set of files that import this file (reverse graph)
-  static final Map<String, Set<String>> _importedBy = {};
-
-  /// Computed importance scores (populated by compute())
-  static final Map<String, double> _importanceScores = {};
-
-  /// Layer classifications (populated by compute())
-  static final Map<String, String> _layers = {};
-
-  static bool _computed = false;
-}
-```
-
-**Collection** — in `SaropaLintRule.run()`, after `ProgressTracker.recordFile(path)`, on first visit only:
-
-```dart
-if (wasFirstVisit) {
-  ImportGraphTracker.collectImports(path, content);
-}
-```
-
-Extract imports using regex on the already-loaded content string:
-
-```dart
-static final _importRe = RegExp(r"^import\s+'([^']+)'\s*;", multiLine: true);
-
-static void collectImports(String filePath, String content) {
-  if (_rawImports.containsKey(filePath)) return;
-  final uris = <String>{};
-  for (final match in _importRe.allMatches(content)) {
-    uris.add(match.group(1)!);
-  }
-  _rawImports[filePath] = uris;
-}
-```
-
-This is reliable for Dart (import syntax is strict). Runs once per file. No AST needed. Operates on the raw content string already loaded by the analyzer.
-
-**Resolution** — convert import URIs to absolute file paths:
-
-- Relative imports (`../foo.dart`): resolve against the importing file's directory
-- Package self-imports (`package:myapp/foo.dart`): resolve via the project's `lib/` directory
-- `package:` imports of other packages: ignore (external dependencies, not in the project graph)
-- `dart:` imports: ignore (SDK, not in the project graph)
-
-**Computation** — called once in `_writeReport()`, before rendering:
-
-```dart
-static void compute() {
-  if (_computed) return;
-  _computed = true;
-
-  _resolveAllImports();    // raw URIs -> absolute paths
-  _buildReverseGraph();    // _importedBy from _importsOf
-  _computeFanIn();         // direct + 0.3 * indirect
-  _classifyLayers();       // path-based layer assignment
-}
-```
-
-**Fan-in** — direct count from `_importedBy[path].length`. Indirect count via BFS/DFS on the reverse graph, counting all transitive importers.
-
-**Layer** — match file path against the layer table. First directory segment match wins. `main.dart` and `app.dart` match by filename regardless of directory.
-
-### Report generation changes
-
-In `AnalysisReporter._writeCombinedReport()`:
-
-1. Call `ImportGraphTracker.compute()` at the top
-2. Add `_writeProjectStructure()` — depth-first tree walk from entry points (files with `void main(` in content or fan-in 0). Show every file with layer tag, fan-in, and fan-out. Mark circular imports with `[circular -> file]`. List standalone files (fan-in 0, no `main()`) at the end.
-3. Replace `_writeTopFiles()` with `_writeFileImportance()` — all files sorted by `(file_importance + 1) * layer_weight`, with score/fan-in/layer/issues columns.
-4. Replace `_writeViolationList()` with `_writePrioritizedViolations()` — all violations sorted by combined priority score descending. Columns: priority, impact, file, line, rule, summary (truncated problem message).
-
-### Files to modify (priority)
-
-| File | Change |
-|------|--------|
-| `lib/src/saropa_lint_rule.dart` | Add `ImportGraphTracker` class (~150 lines). Add `collectImports()` call in `SaropaLintRule.run()` for first-visit files. Expose `wasFirstVisit` from `ProgressTracker.recordFile()` return value. |
-| `lib/src/report/analysis_reporter.dart` | Call `ImportGraphTracker.compute()`. Add `_writeProjectStructure()`, `_writeFileImportance()`, `_writePrioritizedViolations()`. Replace `_writeTopFiles()` and `_writeViolationList()`. |
+- `ImportGraphTracker.compute()` before writing sections (after batch merge when present).
+- Project tree from graph roots, cycles marked without infinite walk; `FILE IMPORTANCE` uses `getFileScore`; `FIX PRIORITY` sorts by `getPriority` per violation.
 
 ### Performance budget
 
@@ -422,16 +355,16 @@ In `AnalysisReporter._writeCombinedReport()`:
 | `export` directives | Track as dependency edges alongside imports. A file that exports another creates a graph edge. |
 | Generated files (`.g.dart`, `.freezed.dart`) | Exclude from graph (already skipped by `skipGeneratedCode`). |
 | Conditional imports (`dart.library.io`) | Use the first URI. Platform-specific resolution not needed for scoring. |
-| Very large projects (1000+ files) | Output everything. The report is a reference document. |
+| Very large projects (1000+ files) | Graph still computed for ordering; **rendered** sections may be capped (see [Known limitations](#known-limitations-priority-ordering)). |
 | No `main.dart` found | Use all files with fan-in 0 as tree roots. |
 | Files outside `lib/` | Include if analyzed. Classify `bin/` as entry, `test/` as test layer. |
 
 ## Acceptance criteria (priority ordering)
 
-- [x] Report includes `PROJECT STRUCTURE` section showing full import tree *(per isolate; see limitation above)*
+- [x] Report includes `PROJECT STRUCTURE` section showing the import tree *(merged across isolates for consolidated run; [Known limitations](#known-limitations-priority-ordering) apply to caps)*
 - [x] Report includes `FILE IMPORTANCE` section with every analyzed file ranked *(capped rows + “omitted” line when over limit)*
 - [x] Report includes `FIX PRIORITY` section with all violations sorted by combined priority score *(capped inline rows when over limit)*
-- [x] Priority score formula: `impact_numeric * (fan_in + 1) * layer_weight`
+- [x] Priority score formula: `impact_numeric * (importance + 1) * layer_weight` (with `importance` = `file_importance` / `getImportance`; not raw direct-importer count only)
 - [x] Circular imports detected and marked, don't cause infinite loops *(tree uses `[shown above]` for revisits)*
 - [x] Standalone files (fan-in 0) listed separately in structure tree
 - [ ] Performance overhead < 20ms per report write *(benchmarked locally: ~60-80ms for synthetic “200-file chain” case; optimization required to reliably meet <20ms)*
@@ -454,6 +387,7 @@ In `AnalysisReporter._writeCombinedReport()`:
 
 - [violation_deduplication.md](violation_deduplication.md) — prerequisite for priority ordering; fix duplicate violations in ImpactTracker
 - [report_session_management.md](report_session_management.md) — prerequisite for clean per-build session boundaries (fixed)
-- [VSCODE_EXTENSION_COHESION_WOW_PLAN.md](VSCODE_EXTENSION_COHESION_WOW_PLAN.md) — extension design and cohesion
-- VIOLATION_EXPORT_API.md (if present) — violation export contract
-- Issues tree and views: Extension plan for Issues tree by severity and structure
+- [plan/history/2026.03/20260314/VSCODE_EXTENSION_COHESION_WOW_PLAN.md](history/2026.03/20260314/VSCODE_EXTENSION_COHESION_WOW_PLAN.md) — extension design and cohesion
+- [VIOLATION_EXPORT_API.md](../VIOLATION_EXPORT_API.md) — violation export contract (repo root)
+- [lib/src/report/VIOLATIONS_JSON_SCHEMA.md](../lib/src/report/VIOLATIONS_JSON_SCHEMA.md) — JSON shape for exports
+- Issues tree and views: extension plans for Issues tree by severity and structure (see `plan/history/` extension design docs)
