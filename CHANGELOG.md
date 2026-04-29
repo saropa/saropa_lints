@@ -42,6 +42,23 @@
     **Maintenance entries** — Anything with **no end-user impact** (publish/CI tooling, internal refactors, test harness tweaks, plan-folder housekeeping, developer-only scripts) goes INSIDE a collapsed `<details><summary>Maintenance</summary>...</details>` block at the *bottom* of its version section — NOT in `### Added` / `### Changed` / `### Fixed`, which are reserved for user-visible changes that ship in the `.dart` / `.vsix` artifacts. Rule of thumb: if a pub.dev / Marketplace user running the published package would notice the difference, it belongs in a top-level section; otherwise it belongs in the Maintenance expander.
 
 -->
+---
+
+## [Unreleased]
+
+### Changed (Extension)
+
+- The Project Vibrancy sidebar is now a compact summary with refresh, open full report, copy JSON, settings, and a short top-risk list instead of a wide table and filters, so it stays readable in a narrow panel and matches how you use the full report for deep review. No action required.
+
+### Fixed (Extension)
+
+- Opening a file from Project Vibrancy results (sidebar or full report) now resolves report paths against the workspace root on Windows and mixed path styles, so jump-to-file from a hit works reliably instead of failing on path shape. No action required.
+
+<details><summary>Maintenance</summary>
+
+- VS Code Project Vibrancy scan startup now resolves the Dart executable per platform (`dart.bat` on Windows, `dart` elsewhere) and surfaces the underlying spawn error in the notification when startup fails, which prevents false “Dart SDK missing” messages on Windows PATH setups.
+
+</details>
 
 ---
 
@@ -468,228 +485,8 @@ Hotfix: tier-based `scan` and similar flows no longer crash on the second file w
 
 ---
 
-## [12.3.0]
-
-Windows vibrancy scans run again, footprint sizes reflect transitive packages, the analyzer plugin logs to `reports/.saropa_lints/plugin.log` and no longer goes silent when the server cwd differs from your project, the vibrancy report toolbar adds rescan / open-project / copy-all-json, and `prefer_listenable_builder` nudges `AnimatedBuilder` uses that should be `ListenableBuilder`. [log](https://github.com/saropa/saropa_lints/blob/v12.3.0/CHANGELOG.md)
-
-### Added
-
-- Plugin log file at `reports/.saropa_lints/plugin.log` surfaces startup and config-load issues without digging in Dart server logs. No action required.
-- `prefer_listenable_builder` (recommended, info) with quick fix for `Listenable` sources that are not `Animation`, gated below Flutter 3.13. No action required; see [plan/054-prefer_listenable_builder_over_animated_builder.md](plan/054-prefer_listenable_builder_over_animated_builder.md).
-- `ProjectContext.flutterSdkAtLeast` lets future rules respect declared Flutter lower bounds. No action required.
-- Vibrancy report toolbar adds Copy All JSON, Rescan, and Open Another Project for side-by-side scans. No action required.
-
-### Changed
-
-- Vibrancy commands are grouped under the Saropa palette with shorter titles; command IDs unchanged. No action required.
-- Stars column becomes Likes + Downloads (per-package signals) with JSON fields updated accordingly. No action required.
-- Update column right-aligns with other numeric columns. No action required.
-
-### Fixed
-
-- Extension vibrancy CLI on Windows now resolves `dart.bat` via the shell so pub graph and outdated data load instead of failing quietly. No action required.
-- Footprint modes now include sizes for transitives pulled from pub cache so Own / +Unique / +All differ when deps exist. No action required.
-- Analyzer plugin registers all rules then honors `diagnostics:` from the real project root, so IDE sessions no longer show zero saropa diagnostics when config was read from the wrong cwd. No action required.
-- Import+export on the same file counts once in References, with both line locations preserved in tooltips and exports. No action required.
-- Report and Known Issues search trims whitespace and adds a clear control so pasted names match rows. No action required.
-- Header gauge fill renders correctly after CSS fix. No action required.
-- Violations tree filenames open the editor on click when the file exists. No action required.
-
----
-
-## [12.2.1]
-
-Publish script now verifies Marketplace and Open VSX separately, so an expired Marketplace token surfaces a concrete ACTION REQUIRED warning and auto-opens the manage page instead of a silent 0-exit. [log](https://github.com/saropa/saropa_lints/blob/v12.2.1/CHANGELOG.md)
-
-<details>
-<summary>Maintenance</summary>
-
-- Publish script verifies Marketplace and Open VSX separately with actionable warnings when a store never shows the new version. No action required for package users.
-
-</details>
-
----
-
-## [12.2.0]
-
-Letter grades replace fractional scores across the vibrancy report, tree, exports, and related UI, and footprint views clarify unique versus shared transitive size. Ten new quick fixes land for common style rules, plus two new Dart rules for symlink checks and JS interop migration. [log](https://github.com/saropa/saropa_lints/blob/v12.2.0/CHANGELOG.md)
-
-### Added
-
-- Ten new quick fixes cover record wildcards, `const`/`final` tweaks, `unawaited`, doc `new` cleanup, and related style nags so lightbulb workflows cover more rules. No action required.
-- `prefer_type_sync_over_is_link_sync` (recommended, warning) steers you off Windows-broken `isLinkSync` toward `typeSync` link detection. No action required.
-- `avoid_removed_js_number_to_dart` (recommended, warning) flags removed `JSNumber.toDart` and points to typed `toDartDouble` / `toDartInt`. No action required.
-- Vibrancy report adds footprint toggles, true-footprint detail, re-export-aware single-use logic, optional startup-scan skip with settings, wired cache TTL, and clear-cache resets the skip fingerprint. No action required.
-
-### Changed
-
-- Vibrancy surfaces grades (A–F) instead of `n/10` in reports, cards, gauge, tooltips, CodeLens, diagnostics, exports (JSON still carries numeric score), and logger output for consistent scanning. No action required.
-
-### Fixed
-
-- Dense report headers stay on one line with nowrap layout, and the “(new)” age suffix under one month is dropped as misleading. No action required.
-
----
-
-## [12.1.0]
-
-The vibrancy report adds a radial gauge, letter-grade badges, expandable per-package detail, keyboard navigation, and a Deps column that highlights shared transitives. [log](https://github.com/saropa/saropa_lints/blob/v12.1.0/CHANGELOG.md)
-
-### Added
-
-- Saropa Package Vibrancy report shows version, gauge, A–F badges, expandable rows with full package context, keyboard navigation, and a Deps column with shared-transitive emphasis so dependency risk is obvious at a glance. No action required.
-
-### Fixed
-
-- Gauge thresholds match category cutoffs; sorting and filtering keep detail rows attached to their parent so expanded cards never orphan. No action required.
-
----
-
-## [12.0.3]
-
-Package upgrade plans skip constraints you cannot bump via semver, show real resolver errors, and keep iterating after a single package fails. [log](https://github.com/saropa/saropa_lints/blob/v12.0.3/CHANGELOG.md)
-
-### Fixed
-
-- Upgrade planner omits git/path/SDK entries that cannot be semver-bumped, prints concrete pub errors instead of generic “pub get failed,” and advances to the next package after each rollback. No action required.
-
----
-
-## [12.0.2]
-
-Size Distribution splits unique versus shared transitives and adds “Exclude shared” so apparent package weight reflects deps you do not already carry. [log](https://github.com/saropa/saropa_lints/blob/v12.0.2/CHANGELOG.md)
-
-### Added
-
-- Size Distribution chart separates unique and shared transitive weight with an optional hide-shared toggle so bar, donut, and table percentages reflect removable cost. No action required.
-
----
-
-## [12.0.1]
-
-Overview shows a Set Up Project banner and activation toast when `saropa_lints` is missing from `pubspec.yaml`, so onboarding is one click. [log](https://github.com/saropa/saropa_lints/blob/v12.0.1/CHANGELOG.md)
-
-### Changed
-
-- Extension surfaces setup banner plus activation toast for Dart workspaces without saropa_lints so install/configure is obvious. No action required.
-
----
-
-## [12.0.0]
-
-Analyzer 11 compatibility is restored so saropa_lints resolves on current Flutter stable (analyzer 12 required `meta` versions Flutter does not ship yet). Rule and quick-fix counts are unchanged from the prior release line. [log](https://github.com/saropa/saropa_lints/blob/v12.0.0/CHANGELOG.md)
-
-### Fixed
-
-- Dependency stack pins `analyzer` and `analyzer_plugin` to ranges compatible with Flutter stable’s pinned `meta`, fixing pub resolution failures. No action required; see [bugs/infra_meta_pin_flutter_incompatible.md](bugs/infra_meta_pin_flutter_incompatible.md).
-- Small compatibility shim keeps class-body iteration working on analyzer 11. No action required.
-
-
----
-
-## [11.1.0]
-
-Ten new quick fixes cover library names, `late` patterns, `unawaited`, `toString`, `@useResult`, and positional booleans so more saropa rules are one-click fixable in the IDE. [log](https://github.com/saropa/saropa_lints/blob/v11.1.0/CHANGELOG.md)
-
-### Added
-
-- Quick fixes ship for `unnecessary_library_name`, `avoid_late_for_nullable`, `prefer_late_final`, `prefer_abstract_final_static_class`, `avoid_async_call_in_sync_function`, `avoid_default_tostring`, `missing_use_result_annotation`, `avoid_unnecessary_local_late`, `avoid_unnecessary_late_fields`, and `avoid_positional_boolean_parameters`, reducing manual cleanup. No action required.
-
-### Changed
-
-- `RemoveLateKeywordFix` also covers local variable statements used by `avoid_unnecessary_local_late`. No action required.
-
-<details>
-<summary>Maintenance</summary>
-
-- Extension npm overrides pin `serialize-javascript` to a patched release for a transitive CVE. No action required for Dart-only consumers.
-
-</details>
-
----
-
-## [11.0.0]
-
-Extension Overview gains command search, embedded health and risk summaries, richer vibrancy package detail (logos, README shots, adoption bonus), unique-vs-shared dependency insight, File Risk workflow polish, and suppression records exported with violations for auditing. [log](https://github.com/saropa/saropa_lints/blob/v11.0.0/CHANGELOG.md)
-
-### Added
-
-- Command catalog sidebar, embedded health/risk cards, richer vibrancy detail (topics, likes, docs, README imagery with CSP updates), reverse-dependency scoring bonus, and plugin suppression tracking in `violations.json` so ignored diagnostics are measurable. No action required.
-
-### Changed
-
-- Vibrancy charts and trees highlight unique vs shared transitives; File Risk moves up with JSON export, click-to-open, diagnostics-aware hiding, persistent disable actions, cleaner labels, and richer pubspec hovers with outbound links. No action required.
-
-### Fixed
-
-- Violations tree survives transient `violations.json` read gaps; pubspec diagnostics dedupe on startup; stale-override detection respects active SDK-pin overrides. No action required.
-
-<details>
-<summary>Maintenance</summary>
-
-- Example fixture packages consolidated from seven layouts to two to reduce repo maintenance. No action required for package users.
-
-</details>
-
----
-
-## [10.12.2]
-
-Pubspec lines can opt out of specific saropa pubspec checks with inline comments, `prefer_l10n_yaml_config` stops false-positiveing split l10n setups, and vibrancy scan logging is calmer. [log](https://github.com/saropa/saropa_lints/blob/v10.12.2/CHANGELOG.md)
-
-### Added
-
-- `# saropa_lints:ignore <codes>` on pubspec lines suppresses individual pubspec validation hits without turning rules off globally. No action required.
-
-### Fixed
-
-- `prefer_l10n_yaml_config` ignores the normal `generate: true` + `l10n.yaml` combo. No action required.
-- Vibrancy scan logs debounce, append per day, and skip duplicate runs instead of spawning endless log files. No action required.
-
----
-
-## [10.12.1]
-
-CI publish unblocked by removing a stray `publish_to: "none"` placeholder from the package manifest. [log](https://github.com/saropa/saropa_lints/blob/v10.12.1/CHANGELOG.md)
-
-### Fixed
-
-- Repository `pubspec.yaml` no longer carries a template `publish_to: "none"` so automated pub publish succeeds. No action required for consumers.
-
----
-
-## [10.12.0]
-
-Pubspec and adoption tooling see fewer false positives, diagnostics pick up a consistent `[saropa_lints]` prefix, plugin self-fire guards work per-file, Help hub and command catalog UX improve, and dependency sort preserves comments. [log](https://github.com/saropa/saropa_lints/blob/v10.12.0/CHANGELOG.md)
-
-### Fixed
-
-- `avoid_hardcoded_config`, pubspec ordering, adoption badges, `prefer_publish_to_none`, and prefixed pubspec diagnostics trim false positives on normal Flutter/SDK layouts. No action required.
-- Plugin self-source checks run per-file so rules no longer fire on their own fixture literals. No action required.
-
-### Added (Extension)
-
-- Help hub command plus Overview/Violations entry points surface onboarding, catalog, and pub.dev links without hunting the palette. No action required.
-
-### Fixed (Extension)
-
-- Sort Dependencies keeps per-entry comments and trailing section banners instead of deleting them. No action required.
-
-### Changed (Extension)
-
-- Command catalog gains refreshed layout, codicons, recent-command replay, tighter toolbars, and better search ordering for narrow layouts. No action required.
-
-<details>
-<summary>Maintenance</summary>
-
-- Shared SDK package name list deduped for annotate/unused/sort paths with missing SDK entries restored. No action required for package users.
-
-</details>
-
----
-
-## [10.11.0] and Earlier
+## [12.3.0] and Earlier
 
 > **Looking for older changes?**
-> See [CHANGELOG_ARCHIVE.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 10.11.0.
+> See [CHANGELOG_ARCHIVE.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 12.3.0.
 

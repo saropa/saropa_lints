@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import * as nodePath from 'node:path';
 import { getProjectRoot } from '../projectRoot';
 import { runProjectVibrancyScan } from './projectVibrancyCliRunner';
 import type { ProjectVibrancyPayload } from './projectVibrancyTypes';
@@ -25,7 +26,7 @@ export async function openProjectVibrancyReport(): Promise<void> {
       title: 'Project Vibrancy: scanning functions...',
       cancellable: false,
     },
-    async () => runProjectVibrancyScan(projectRoot, {}),
+    async () => runProjectVibrancyScan(projectRoot),
   );
 
   if (!scan.payload) {
@@ -84,7 +85,7 @@ async function openFileAtLine(relativePath: string, line: number): Promise<void>
     return;
   }
   try {
-    const uri = vscode.Uri.joinPath(vscode.Uri.file(root), relativePath);
+    const uri = resolveReportFileUri(root, relativePath);
     const doc = await vscode.workspace.openTextDocument(uri);
     const editor = await vscode.window.showTextDocument(doc);
     const targetLine = Math.max(0, line - 1);
@@ -94,6 +95,20 @@ async function openFileAtLine(relativePath: string, line: number): Promise<void>
   } catch {
     void vscode.window.showErrorMessage(`Could not open file: ${relativePath}`);
   }
+}
+
+function resolveReportFileUri(root: string, filePathFromReport: string): vscode.Uri {
+  const raw = filePathFromReport.trim();
+  const windowsAbsolute = /^[a-zA-Z]:[\\/]/.test(raw);
+  const posixAbsolute = raw.startsWith('/');
+  if (windowsAbsolute || posixAbsolute) {
+    return vscode.Uri.file(raw);
+  }
+  const normalizedRelative = raw
+    .replaceAll('\\', '/')
+    .replace(/^(\.\/)+/, '')
+    .replace(/^\/+/, '');
+  return vscode.Uri.file(nodePath.resolve(root, normalizedRelative));
 }
 
 function buildHtml(payload: ProjectVibrancyPayload): string {

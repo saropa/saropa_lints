@@ -8,7 +8,15 @@ export interface ProjectVibrancyScanResult {
   readonly exitCode: number;
 }
 
+function dartCommandForPlatform(): string {
+  // On Windows, Flutter-distributed Dart is commonly exposed as dart.bat.
+  // Spawning plain "dart" with shell:false can fail even when SDK is present.
+  return process.platform === 'win32' ? 'dart.bat' : 'dart';
+}
+
 function normalizeMinGrade(value: string | undefined): string {
+  // Keep gate input bounded to known report grades so invalid settings fail
+  // closed (strictest default) rather than silently widening acceptance.
   const u = (value ?? 'F').toUpperCase().trim();
   return /^[A-F]$/.test(u) ? u : 'F';
 }
@@ -22,11 +30,8 @@ function readOptionalPositiveGate(key: string): number {
   return Math.floor(n);
 }
 
-/** Options passed to `dart run bin/project_vibrancy.dart` from workspace settings (no CLI-only workflow). */
-export function buildProjectVibrancyDartArgs(
-  projectRoot: string,
-  options: { readonly since?: string },
-): string[] {
+/** Builds argv for `dart run bin/project_vibrancy.dart` from workspace settings (extension host only). */
+export function buildProjectVibrancyDartArgs(projectRoot: string): string[] {
   const c = vscode.workspace.getConfiguration('saropaLints');
   const lcovRaw = c.get<string>('projectVibrancy.lcovPath');
   const lcovPath = (lcovRaw ?? '').trim().length > 0 ? lcovRaw!.trim() : 'coverage/lcov.info';
@@ -37,6 +42,8 @@ export function buildProjectVibrancyDartArgs(
   const maxSuspiciousCoverage = readOptionalPositiveGate('projectVibrancy.maxSuspiciousCoverage');
   const maxTestDrift = readOptionalPositiveGate('projectVibrancy.maxTestDrift');
 
+  // Build a deterministic base command so telemetry/logging and tests can
+  // compare stable argument order across runs.
   const args = [
     'run',
     'bin/project_vibrancy.dart',
@@ -49,10 +56,6 @@ export function buildProjectVibrancyDartArgs(
     '--min-grade',
     minGrade,
   ];
-  const since = options.since?.trim();
-  if (since && since.length > 0) {
-    args.push('--since', since);
-  }
   if (maxUnused > 0) {
     args.push('--max-unused', String(maxUnused));
   }
@@ -71,13 +74,12 @@ export function buildProjectVibrancyDartArgs(
   return args;
 }
 
-export function runProjectVibrancyScan(
-  projectRoot: string,
-  options: { readonly since?: string },
-): Promise<ProjectVibrancyScanResult> {
+export function runProjectVibrancyScan(projectRoot: string): Promise<ProjectVibrancyScanResult> {
   return new Promise((resolve) => {
-    const args = buildProjectVibrancyDartArgs(projectRoot, options);
-    const child = spawn('dart', args, { cwd: projectRoot, shell: false });
+    const args = buildProjectVibrancyDartArgs(projectRoot);
+    const command = dartCommandForPlatform();
+    // shell:false avoids command interpolation and ensures args are passed as-is.
+    const child = spawn(command, args, { cwd: projectRoot, shell: false });
     let stdout = '';
     let stderr = '';
     child.stdout.on('data', (chunk: Buffer | string) => {
@@ -86,9 +88,14 @@ export function runProjectVibrancyScan(
     child.stderr.on('data', (chunk: Buffer | string) => {
       stderr += chunk.toString();
     });
-    child.on('error', () => {
+    child.on('error', (err: NodeJS.ErrnoException) => {
+      // Startup failures happen before exit/close when the runtime is missing
+      // or non-executable in PATH.
+      const details = err?.message?.trim();
       void vscode.window.showErrorMessage(
-        'Project Vibrancy scan failed to start. Ensure Dart SDK is installed.',
+        details && details.length > 0
+          ? `Project Vibrancy scan failed to start (${command}): ${details}`
+          : 'Project Vibrancy scan failed to start. Ensure Dart SDK is installed.',
       );
       resolve({ payload: null, rawStdout: '', exitCode: -1 });
     });
@@ -96,6 +103,8 @@ export function runProjectVibrancyScan(
       const exitCode = code ?? -1;
       const raw = stdout;
       if (exitCode !== 0 && raw.trim().length === 0) {
+        // Prefer stderr details when available; otherwise keep a generic
+        // user-facing message for non-diagnostic failures.
         const details = stderr.trim();
         void vscode.window.showErrorMessage(
           details.length === 0
@@ -108,6 +117,8 @@ export function runProjectVibrancyScan(
       try {
         const payload = JSON.parse(raw) as ProjectVibrancyPayload;
         if (payload.gates?.pass === false) {
+          // Gate failures still return a valid payload; warn instead of error
+          // so users can inspect violations without re-running.
           void vscode.window.showWarningMessage(
             'Project Vibrancy: configured quality gates failed. Open Project Vibrancy settings or copy JSON to inspect gates.violations.',
           );
