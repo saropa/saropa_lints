@@ -1,3 +1,6 @@
+/**
+ * Tests semver-ish prerelease helpers: detection, tag extraction, filtering, ordering.
+ */
 import * as assert from 'assert';
 import {
     isPrerelease,

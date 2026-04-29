@@ -1,4 +1,10 @@
-/** Client-side JavaScript for the package detail webview panel. */
+/**
+ * Returns the bundled client script string for the Package Vibrancy detail webview.
+ *
+ * Handles section collapse, gap-table filter/sort, review status + debounced notes,
+ * and delegated clicks that `postMessage` to the extension (`openUrl`, `openFile`, etc.).
+ * Scoped queries (per `.section` / table) keep multiple gap blocks independent.
+ */
 export function getPackageDetailScript(): string {
     return `
         const vscode = acquireVsCodeApi();

@@ -1,8 +1,15 @@
+/**
+ * Code actions for Package Vibrancy diagnostics: curated replacements, alternatives,
+ * suppress-by-name command, SDK constraint quick-fixes, and stale override removal.
+ *
+ * [provideCodeActions] is O(diagnostics); [seen] dedupes per package name within one request.
+ */
 import * as vscode from 'vscode';
 import { VibrancyResult, AlternativeSuggestion } from '../types';
 import { findKnownIssue, isReplacementPackageName } from '../scoring/known-issues';
 import { findOverrideRange } from '../services/override-parser';
 
+/** Normalizes [vscode.Diagnostic.code] whether it is a string, number, or `{ value }` object. */
 function getDiagnosticCode(diag: vscode.Diagnostic): string | number | undefined {
     const c = diag.code;
     if (c === undefined || c === null) { return c; }
@@ -11,8 +18,10 @@ function getDiagnosticCode(diag: vscode.Diagnostic): string | number | undefined
 }
 
 export class VibrancyCodeActionProvider implements vscode.CodeActionProvider {
+    /** Latest vibrancy scan keyed by package name for alternative suggestions. */
     private _results = new Map<string, VibrancyResult>();
 
+    /** Replace cached results (typically after a full workspace vibrancy run). */
     updateResults(results: VibrancyResult[]): void {
         this._results.clear();
         for (const r of results) {
@@ -29,6 +38,7 @@ export class VibrancyCodeActionProvider implements vscode.CodeActionProvider {
         const seen = new Set<string>();
 
         for (const diag of context.diagnostics) {
+            // Only handle diagnostics produced by this extension's vibrancy analyzer.
             if (diag.source !== 'Package Vibrancy') { continue; }
             const code = getDiagnosticCode(diag);
             if (code === 'sdk-constraint') {

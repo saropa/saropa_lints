@@ -1,11 +1,14 @@
+/**
+ * Tests [classifyUpgradeStatus] and [findBlockers]: pub outdated rows, semver edges,
+ * and synthetic [VibrancyResult] rows for graph-derived blocker messages.
+ */
 import * as assert from 'assert';
 import {
     classifyUpgradeStatus, findBlockers,
 } from '../../../vibrancy/scoring/blocker-analyzer';
 import { PubOutdatedEntry, DepEdge, VibrancyResult } from '../../../vibrancy/types';
 
-/** Blocker analyzer: upgrade status and dependency graph blockers for vibrancy. */
-
+/** Builds a [PubOutdatedEntry] with sane defaults; override fields per case. */
 function makeEntry(overrides: Partial<PubOutdatedEntry> & { package: string }): PubOutdatedEntry {
     return {
         current: '1.0.0',
@@ -16,6 +19,7 @@ function makeEntry(overrides: Partial<PubOutdatedEntry> & { package: string }): 
     };
 }
 
+/** Minimal [VibrancyResult] for a direct hosted dependency with given vibrancy score. */
 function makeResult(name: string, score: number): VibrancyResult {
     return {
         package: {

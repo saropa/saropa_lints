@@ -1,8 +1,12 @@
+/**
+ * Tests [DetailLogger] output channel formatting (package lines, sections, edge cases).
+ */
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { DetailLogger, DETAIL_CHANNEL_NAME } from '../../../vibrancy/services/detail-logger';
 import { VibrancyResult } from '../../../vibrancy/types';
 
+/** Rich [VibrancyResult] with pub.dev + github blocks populated for log layout tests. */
 function makeResult(
     name: string,
     score: number,
@@ -59,6 +63,7 @@ function makeResult(
     };
 }
 
+/** Sinon stubs standing in for [vscode.OutputChannel]. */
 function createMockChannel(): { appendLine: sinon.SinonStub; show: sinon.SinonStub; clear: sinon.SinonStub } {
     return {
         appendLine: sinon.stub(),

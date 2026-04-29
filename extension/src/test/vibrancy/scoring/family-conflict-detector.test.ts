@@ -1,9 +1,11 @@
+/**
+ * Tests [detectFamilySplits]: same-ecosystem packages on different majors surface as splits.
+ */
 import * as assert from 'assert';
 import { detectFamilySplits } from '../../../vibrancy/scoring/family-conflict-detector';
 import { VibrancyResult } from '../../../vibrancy/types';
 
-/** Family conflict detection when multiple packages share a logical family name. */
-
+/** Minimal hosted dependency row for family grouping tests. */
 function makeResult(
     name: string,
     version: string,

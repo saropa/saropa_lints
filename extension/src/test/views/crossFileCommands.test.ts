@@ -1,3 +1,9 @@
+/**
+ * Extension tests for cross-file commands: argv passed to `dart run saropa_lints:cross_file`,
+ * workspace root / dependency guards, and opening generated snapshot/graph/HTML artifacts.
+ *
+ * VS Code APIs and `runInWorkspace` are stubbed; asserts lock the CLI argument shape.
+ */
 import '../vibrancy/register-vscode-mock';
 
 import * as assert from 'node:assert';
@@ -13,8 +19,7 @@ import * as pubspecReader from '../../pubspecReader';
 import * as setup from '../../setup';
 import { messageMock, resetMocks, envMock } from '../vibrancy/vscode-mock';
 
-/** Cross-file analyzer commands: registration, workspace root, and setup hooks (mocked). */
-
+/** Minimal [vscode.ExtensionContext] for command registration (subscriptions only). */
 function makeContext(): vscode.ExtensionContext {
   return { subscriptions: [] } as unknown as vscode.ExtensionContext;
 }

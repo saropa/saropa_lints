@@ -1,9 +1,11 @@
+/**
+ * Tests CycloneDX SBOM output from vibrancy scan rows: metadata, components, serialization.
+ */
 import * as assert from 'assert';
 import { generateSbom, serializeSbom, SbomMetadata } from '../../../vibrancy/services/sbom-generator';
 import { VibrancyResult } from '../../../vibrancy/types';
 
-/** SBOM generation and serialization from vibrancy scan rows. */
-
+/** Factory for a hosted direct dependency with optional field overrides. */
 function makeResult(
     name: string,
     overrides: Partial<VibrancyResult> = {},

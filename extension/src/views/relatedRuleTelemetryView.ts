@@ -1,13 +1,18 @@
+/**
+ * Related-rule telemetry webview: builds static HTML + inline script to post messages
+ * back to the extension (`refresh`, `copy`, `reset`). Single panel instance reused
+ * via [currentPanel]; disposal clears the handle so a new panel can open later.
+ */
 import * as vscode from 'vscode';
 import type {
   RelatedRuleTelemetry,
   TelemetryStore,
 } from '../relatedRuleTelemetry';
 
-/** Webview panel: renders related-rule telemetry snapshot as HTML rows. */
-
+/** Active panel reference; undefined after dispose or before first open. */
 let currentPanel: vscode.WebviewPanel | undefined;
 
+/** Escape text for safe insertion into HTML text nodes and `<code>`. */
 function escapeHtml(text: string): string {
   return text
     .replaceAll('&', '&amp;')
@@ -16,6 +21,7 @@ function escapeHtml(text: string): string {
     .replaceAll('"', '&quot;');
 }
 
+/** One table row per known telemetry event key; missing counters default to 0. */
 function renderRows(snapshot: TelemetryStore): string {
   const events = [
     'ruleExplain.open',
@@ -32,6 +38,7 @@ function renderRows(snapshot: TelemetryStore): string {
     .join('');
 }
 
+/** Full HTML document with CSP allowing inline script for webview message bridge. */
 function buildHtml(snapshot: TelemetryStore): string {
   const lastEventAt = snapshot.lastEventAt
     ? escapeHtml(snapshot.lastEventAt)
@@ -126,11 +133,13 @@ function buildHtml(snapshot: TelemetryStore): string {
 </html>`;
 }
 
+/** Replaces webview HTML from latest [telemetry.snapshot] if a panel is open. */
 function refreshPanel(telemetry: RelatedRuleTelemetry): void {
   if (!currentPanel) return;
   currentPanel.webview.html = buildHtml(telemetry.snapshot());
 }
 
+/** Opens or focuses the telemetry panel and wires message handlers for user actions. */
 export function showRelatedRuleTelemetryPanel(
   telemetry: RelatedRuleTelemetry,
 ): void {
@@ -149,6 +158,7 @@ export function showRelatedRuleTelemetryPanel(
 
   refreshPanel(telemetry);
 
+  // Bridge: webview buttons only send types; all mutations go through [telemetry] service.
   currentPanel.webview.onDidReceiveMessage((message: { type?: string }) => {
     if (message.type === 'refresh') {
       refreshPanel(telemetry);

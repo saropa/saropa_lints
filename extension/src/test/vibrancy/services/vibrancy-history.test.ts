@@ -1,3 +1,6 @@
+/**
+ * Tests on-disk vibrancy history JSON: append dedupe, reads, trends, legacy migration.
+ */
 import * as assert from 'assert';
 import * as fs from 'node:fs/promises';
 import * as os from 'node:os';
@@ -5,8 +8,7 @@ import * as path from 'node:path';
 import { appendSnapshot, backfillFromLegacyReports, getPackageTrend, readHistory } from '../../../vibrancy/services/vibrancy-history';
 import { VibrancyResult } from '../../../vibrancy/types';
 
-/** On-disk vibrancy history: append, read trends, legacy backfill. */
-
+/** Synthetic scan row for a single package with explicit version/category/score. */
 function makeResult(
     name: string,
     version: string,
