@@ -1,10 +1,13 @@
+/// Unit tests for [isNativeOnlyConditionalImportTarget].
+///
+/// Verifies that only the native branch of `dart.library.io` / `dart.library.ffi`
+/// conditional imports is classified as native-only, using isolated temp packages so
+/// [findProjectRoot] does not resolve to the saropa_lints monorepo.
 import 'dart:io';
 
 import 'package:path/path.dart' as p;
 import 'package:saropa_lints/src/conditional_import_utils.dart';
 import 'package:test/test.dart';
-
-// conditional_import_utils: native-only import targets and path normalization.
 
 void main() {
   group('isNativeOnlyConditionalImportTarget', () {
@@ -130,6 +133,7 @@ import 'package:test_package/stub.dart' if (dart.library.io) 'package:test_packa
   });
 }
 
+/// Writes `pubspec.yaml`, stub/native impl files, and [importerContent] under [projectRoot]/lib.
 void _createTempProject(String projectRoot, {required String importerContent}) {
   final libDir = Directory(p.join(projectRoot, 'lib'));
   libDir.createSync(recursive: true);

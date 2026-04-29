@@ -81,7 +81,7 @@ saropa_lints:
     # Explicitly enable documentation rules for testing
     - verify_documented_parameters_exist: true
     # Compile-time shape rules (plan_additional_rules_21_30 fixture)
-    - duplicate_constructor: true
+    - duplicate_constructor_declarations: true
     - conflicting_constructor_and_static_member: true
     - duplicate_field_name: true
     - field_initializer_redirecting_constructor: true

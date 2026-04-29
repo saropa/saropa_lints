@@ -14,7 +14,7 @@ import 'package:test/test.dart';
 /// (`lib/src/rules/architecture/compile_time_syntax_rules.dart`).
 void main() {
   const ruleNames = <String>{
-    'duplicate_constructor',
+    'duplicate_constructor_declarations',
     'conflicting_constructor_and_static_member',
     'field_initializer_redirecting_constructor',
     'invalid_super_formal_parameter_location',
@@ -116,8 +116,11 @@ void main() {
   group('Compile-time syntax rules - Rule Instantiation', () {
     test('DuplicateConstructorRule', () {
       final rule = DuplicateConstructorRule();
-      expect(rule.code.lowerCaseName, 'duplicate_constructor');
-      expect(rule.code.problemMessage, contains('[duplicate_constructor]'));
+      expect(rule.code.lowerCaseName, 'duplicate_constructor_declarations');
+      expect(
+        rule.code.problemMessage,
+        contains('[duplicate_constructor_declarations]'),
+      );
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });

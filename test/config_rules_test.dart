@@ -89,8 +89,11 @@ void main() {
     });
     test('PackageNamesRule', () {
       final rule = PackageNamesRule();
-      expect(rule.code.lowerCaseName, 'package_names');
-      expect(rule.code.problemMessage, contains('[package_names]'));
+      expect(rule.code.lowerCaseName, 'pubspec_package_name_convention');
+      expect(
+        rule.code.problemMessage,
+        contains('[pubspec_package_name_convention]'),
+      );
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });

@@ -1,7 +1,6 @@
 import 'dart:io';
 
-import 'package:saropa_lints/src/rules/platforms/web_rules.dart';
-import 'package:saropa_lints/src/saropa_lint_rule.dart' show LintImpact;
+import 'package:saropa_lints/saropa_lints.dart';
 import 'package:test/test.dart';
 
 /// Tests for Web lint rules.
@@ -183,6 +182,13 @@ void main() {
         final rule = PreferScheduleMicrotaskOverWindowPostmessageRule();
         expect(rule.impact, LintImpact.low);
         expect(rule.requiredPatterns, contains('postMessage'));
+      });
+
+      test('rule id is in professional cumulative tier', () {
+        expect(
+          getRulesForTier('professional'),
+          contains('prefer_schedule_microtask_over_window_postmessage'),
+        );
       });
     });
   });

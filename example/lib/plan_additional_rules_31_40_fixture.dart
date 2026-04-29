@@ -41,21 +41,21 @@ void _badEnumCtor() {
   _EnumCtor.missing(1); // expect_lint: undefined_enum_constructor
 }
 
-// ========== annotate_redeclares ==========
+// ========== annotate_inherited_member_redeclaration ==========
 class _RedeclareParent {
   void redeclareMe() {}
 }
 
 class _RedeclareChild extends _RedeclareParent {
-  void redeclareMe() {} // expect_lint: annotate_redeclares
+  void redeclareMe() {} // expect_lint: annotate_inherited_member_redeclaration
 }
 
 // ========== deprecated_new_in_comment_reference ==========
 /// See [new Object] in docs. // expect_lint: deprecated_new_in_comment_reference
 class _DeprecatedNewDoc {}
 
-// ========== document_ignores ==========
-// expect_lint: document_ignores
+// ========== document_analyzer_ignore_rationale ==========
+// expect_lint: document_analyzer_ignore_rationale
 // ignore: dead_code
 void _bareIgnore() {
   return;

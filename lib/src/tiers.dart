@@ -738,7 +738,7 @@ const Set<String> essentialRules = <String>{
   'uri_does_not_exist', // ERROR - import/export/part URI missing
   // Additional rules (plan_additional_rules_21_through_30)
   'conflicting_constructor_and_static_member',
-  'duplicate_constructor',
+  'duplicate_constructor_declarations',
   'duplicate_field_name',
   'field_initializer_redirecting_constructor',
   'illegal_concrete_enum_member',
@@ -750,9 +750,9 @@ const Set<String> essentialRules = <String>{
   // Additional rules (plan_additional_rules_31_through_40)
   'abstract_field_initializer',
   'abi_specific_integer_invalid',
-  'annotate_redeclares',
+  'annotate_inherited_member_redeclaration',
   'deprecated_new_in_comment_reference',
-  'document_ignores',
+  'document_analyzer_ignore_rationale',
   'non_constant_map_element',
   'return_in_generator',
   'subtype_of_disallowed_type',
@@ -1649,7 +1649,7 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_shared_prefs_sync_race', // WARNING - un-awaited SharedPreferences writes
   'avoid_stack_trace_in_production', // WARNING - stack trace exposed to users
   // Additional rules (plan_additional_rules_11_through_20)
-  'package_names', // WARNING - package name convention
+  'pubspec_package_name_convention', // WARNING - package name convention
   'secure_pubspec_urls', // WARNING - insecure URLs in pubspec
 };
 
@@ -1719,6 +1719,7 @@ const Set<String> professionalOnlyRules = <String>{
   'require_https_only_test', // INFO - HTTP URLs in test files
   'avoid_hardcoded_config_test', // INFO - hardcoded config in test files
   'prefer_js_interop_over_dart_js', // INFO - dart:js_interop over deprecated dart:js
+  'prefer_schedule_microtask_over_window_postmessage', // INFO - deferral: microtask vs window.postMessage hack
   // Batch 3 High-importance (REMAINING_ROADMAP)
   'require_error_message_clarity',
   'require_error_recovery',

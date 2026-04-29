@@ -7,10 +7,10 @@ extension _Plan2130Ext on int {
   void m() {}
 }
 
-// ========== duplicate_constructor ==========
+// ========== duplicate_constructor_declarations ==========
 class _DupCtor {
-  _DupCtor(); // expect_lint: duplicate_constructor
-  _DupCtor(); // expect_lint: duplicate_constructor
+  _DupCtor(); // expect_lint: duplicate_constructor_declarations
+  _DupCtor(); // expect_lint: duplicate_constructor_declarations
 }
 
 // ========== conflicting_constructor_and_static_member ==========

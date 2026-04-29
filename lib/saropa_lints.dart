@@ -2931,6 +2931,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidFieldInitializersInConstClassesRule.new,
   AvoidFunctionLiteralsInForeachCallsRule.new,
   AvoidJsRoundedIntsRule.new,
+  PreferScheduleMicrotaskOverWindowPostmessageRule.new,
   AvoidPositionalBooleanParametersRule.new,
   AvoidPrivateTypedefFunctionsRule.new,
   NoRuntimeTypeToStringRule.new,

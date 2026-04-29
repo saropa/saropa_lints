@@ -674,7 +674,7 @@ saropa_lints:
     # Essential-tier mirrors for analyzer compile errors; see CHANGELOG.
     # =========================================================================
     - conflicting_constructor_and_static_member: false
-    - duplicate_constructor: false
+    - duplicate_constructor_declarations: false
     - duplicate_field_name: false
     - field_initializer_redirecting_constructor: false
     - illegal_concrete_enum_member: false
@@ -685,9 +685,9 @@ saropa_lints:
     - invalid_super_formal_parameter_location: false
     - abstract_field_initializer: false
     - abi_specific_integer_invalid: false
-    - annotate_redeclares: false
+    - annotate_inherited_member_redeclaration: false
     - deprecated_new_in_comment_reference: false
-    - document_ignores: false
+    - document_analyzer_ignore_rationale: false
     - non_constant_map_element: false
     - return_in_generator: false
     - subtype_of_disallowed_type: false

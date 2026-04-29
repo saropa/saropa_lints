@@ -878,7 +878,7 @@ class RequireConfigValidationRule extends SaropaLintRule {
 }
 
 // =============================================================================
-// package_names
+// pubspec_package_name_convention
 // =============================================================================
 
 /// Warns when the pubspec package name does not follow conventions.
@@ -908,8 +908,8 @@ class PackageNamesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    'package_names',
-    '[package_names] Package name in pubspec.yaml does not follow the lowercase_with_underscores convention. Non-conforming names cause issues with pub.dev publishing, make imports harder to read, and violate the Dart ecosystem naming standard that all published packages follow. {v1}',
+    'pubspec_package_name_convention',
+    '[pubspec_package_name_convention] Package name in pubspec.yaml does not follow the lowercase_with_underscores convention. Non-conforming names cause issues with pub.dev publishing, make imports harder to read, and violate the Dart ecosystem naming standard that all published packages follow. {v1}',
     correctionMessage:
         'Rename the package to use only lowercase letters, digits, and underscores (e.g. my_package).',
     severity: DiagnosticSeverity.WARNING,

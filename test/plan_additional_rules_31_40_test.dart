@@ -18,9 +18,9 @@ void main() {
   const ruleNames = <String>[
     'abstract_field_initializer',
     'abi_specific_integer_invalid',
-    'annotate_redeclares',
+    'annotate_inherited_member_redeclaration',
     'deprecated_new_in_comment_reference',
-    'document_ignores',
+    'document_analyzer_ignore_rationale',
     'non_constant_map_element',
     'return_in_generator',
     'subtype_of_disallowed_type',
@@ -84,14 +84,14 @@ void main() {
       ]);
       expectPatterns('return_in_generator', <String>['async*', 'sync*']);
       expectPatterns('yield_in_non_generator', <String>['yield']);
-      expectPatterns('document_ignores', <String>['ignore:']);
+      expectPatterns('document_analyzer_ignore_rationale', <String>['ignore:']);
       expectPatterns('deprecated_new_in_comment_reference', <String>['[new ']);
     });
   });
 
   group('Plan 31–40 heuristics (false-positive guards)', () {
     test(
-      'document_ignores: bare ignore line matches; explained line does not',
+      'document_analyzer_ignore_rationale: bare ignore line matches; explained line does not',
       () {
         expect(_bareIgnoreLineTest.hasMatch('// ignore: dead_code'), isTrue);
         expect(
@@ -191,7 +191,7 @@ void main() {
     });
 
     test(
-      'GOOD: @override redeclare has no annotate_redeclares expect_lint',
+      'GOOD: @override redeclare has no annotate_inherited_member_redeclaration expect_lint',
       () {
         final content = File(
           'example/lib/plan_additional_rules_31_40_fixture.dart',
@@ -201,7 +201,10 @@ void main() {
         final end = content.indexOf('/// Uses [Object]');
         expect(end, greaterThan(start));
         final slice = content.substring(start, end);
-        expect(slice.contains('expect_lint: annotate_redeclares'), isFalse);
+        expect(
+          slice.contains('expect_lint: annotate_inherited_member_redeclaration'),
+          isFalse,
+        );
       },
     );
 

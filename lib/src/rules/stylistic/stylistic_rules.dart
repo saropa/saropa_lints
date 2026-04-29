@@ -5039,7 +5039,7 @@ class DuplicateIgnoreRule extends SaropaLintRule {
 }
 
 // =============================================================================
-// annotate_redeclares
+// annotate_inherited_member_redeclaration
 // =============================================================================
 
 /// Instance member that hides a super-interface member should use `@override`
@@ -5083,8 +5083,8 @@ class AnnotateRedeclaresRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    'annotate_redeclares',
-    '[annotate_redeclares] This member hides an inherited instance member with the same name. Add @override if it is an override, or document why the name is reused intentionally. {v1}',
+    'annotate_inherited_member_redeclaration',
+    '[annotate_inherited_member_redeclaration] This member hides an inherited instance member with the same name. Add @override if it is an override, or document why the name is reused intentionally. {v1}',
     correctionMessage:
         'Add @override when overriding, or a doc comment that states the redeclaration is intentional.',
     severity: DiagnosticSeverity.INFO,
@@ -5166,7 +5166,7 @@ ExecutableElement? _lookupMemberForRedeclare(
 }
 
 // =============================================================================
-// document_ignores
+// document_analyzer_ignore_rationale
 // =============================================================================
 
 /// `// ignore:` / `// ignore_for_file:` should include an on-line explanation
@@ -5211,8 +5211,8 @@ class DocumentIgnoresRule extends SaropaLintRule {
   );
 
   static const LintCode _code = LintCode(
-    'document_ignores',
-    '[document_ignores] Ignore directive lists only rule names with no explanation. Add a short rationale on the same line (for example after `--`) so future readers know why the ignore exists. {v1}',
+    'document_analyzer_ignore_rationale',
+    '[document_analyzer_ignore_rationale] Ignore directive lists only rule names with no explanation. Add a short rationale on the same line (for example after `--`) so future readers know why the ignore exists. {v1}',
     correctionMessage:
         'Append an explanation on the same line, e.g. `// ignore: rule_name -- reason here`.',
     severity: DiagnosticSeverity.INFO,

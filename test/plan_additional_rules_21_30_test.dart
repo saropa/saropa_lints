@@ -7,7 +7,7 @@ import 'package:test/test.dart';
 void main() {
   const ruleNames = <String>[
     'conflicting_constructor_and_static_member',
-    'duplicate_constructor',
+    'duplicate_constructor_declarations',
     'duplicate_field_name',
     'field_initializer_redirecting_constructor',
     'illegal_concrete_enum_member',
@@ -52,7 +52,7 @@ void main() {
       final file = File('example/lib/plan_additional_rules_21_30_fixture.dart');
       final content = file.readAsStringSync();
       const withExpectLint = <String>[
-        'duplicate_constructor',
+        'duplicate_constructor_declarations',
         'conflicting_constructor_and_static_member',
         'duplicate_field_name',
         'field_initializer_redirecting_constructor',
@@ -91,7 +91,7 @@ void main() {
           matches.length,
           equals(11),
           reason:
-              'Two duplicate_constructor, two conflicting_constructor…, plus seven single-site rules',
+              'Two duplicate_constructor_declarations, two conflicting_constructor…, plus seven single-site rules',
         );
       },
     );

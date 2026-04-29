@@ -165,7 +165,7 @@ void _reportIllegalConcreteEnumMember(
 }
 
 // =============================================================================
-// duplicate_constructor
+// duplicate_constructor_declarations
 // =============================================================================
 
 /// More than one unnamed constructor or duplicate same-named constructor.
@@ -203,8 +203,8 @@ class DuplicateConstructorRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    'duplicate_constructor',
-    '[duplicate_constructor] Class or enum declares more than one constructor with the same name (including more than one unnamed constructor). Duplicate constructors are invalid Dart and prevent compilation. {v1}',
+    'duplicate_constructor_declarations',
+    '[duplicate_constructor_declarations] Class or enum declares more than one constructor with the same name (including more than one unnamed constructor). Duplicate constructors are invalid Dart and prevent compilation. {v1}',
     correctionMessage:
         'Remove or rename duplicate constructors so each constructor name is unique.',
     severity: DiagnosticSeverity.ERROR,
