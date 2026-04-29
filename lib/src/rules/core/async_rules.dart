@@ -5021,6 +5021,22 @@ bool _staticTypeIsAwaitable(DartType type) {
   );
 }
 
+bool _isAnimationControllerTickerAwait(Expression expression) {
+  if (expression is! MethodInvocation) return false;
+  final String methodName = expression.methodName.name;
+  if (methodName != 'forward' && methodName != 'reverse') return false;
+
+  final DartType? targetType = expression.realTarget?.staticType;
+  if (targetType == null) return false;
+
+  // Flutter's AnimationController.forward()/reverse() return TickerFuture.
+  // Awaiting these calls is intentional for animation sequencing.
+  final String targetTypeName = targetType.getDisplayString(
+    withNullability: false,
+  );
+  return targetTypeName == 'AnimationController';
+}
+
 /// Warns when `await` is used on a non-Future expression.
 ///
 /// Since: v5.1.0 | Rule version: v2
@@ -5077,6 +5093,10 @@ class AvoidRedundantAwaitRule extends SaropaLintRule {
     context.addAwaitExpression((AwaitExpression node) {
       final DartType? type = node.expression.staticType;
       if (type == null) return;
+
+      // AnimationController.forward()/reverse() return TickerFuture and are
+      // intentionally awaited to coordinate animation flow.
+      if (_isAnimationControllerTickerAwait(node.expression)) return;
 
       // Skip dynamic and Object — could be a Future at runtime
       if (type is DynamicType) return;

@@ -221,6 +221,10 @@ void main() {
         );
         expect(
           result.deadImports['lib/consumer.dart'],
+          contains('unused_deferred_dep.dart'),
+        );
+        expect(
+          result.deadImports['lib/consumer.dart'],
           isNot(contains('used_dep.dart')),
         );
         expect(

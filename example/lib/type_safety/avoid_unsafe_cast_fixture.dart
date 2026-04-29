@@ -125,3 +125,24 @@ void _good1235() {
     // Use widget
   }
 }
+
+// GOOD: setupParentData guarantees the cast type in RenderObject workflows.
+class _FixtureRenderObject {
+  dynamic parentData;
+}
+
+class _FixtureMultiSliverParentData {}
+
+class _FixtureRenderHost {
+  void setupParentData(_FixtureRenderObject child) {
+    if (child.parentData is! _FixtureMultiSliverParentData) {
+      child.parentData = _FixtureMultiSliverParentData();
+    }
+  }
+
+  void update(_FixtureRenderObject child) {
+    final _FixtureMultiSliverParentData data =
+        child.parentData! as _FixtureMultiSliverParentData;
+    data.toString();
+  }
+}

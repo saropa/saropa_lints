@@ -79,6 +79,10 @@ class AvoidUnsafeCastRule extends SaropaLintRule {
       // Skip provably safe casts
       if (_isSafeCast(node)) return;
 
+      // In RenderObject subclasses, setupParentData can guarantee the runtime
+      // type for subsequent parentData casts.
+      if (_isGuardedRenderObjectParentDataCast(node)) return;
+
       final AstNode? parent = node.parent;
       if (parent == null) return;
 
@@ -111,6 +115,142 @@ class AvoidUnsafeCastRule extends SaropaLintRule {
     }
 
     return false;
+  }
+
+  bool _isGuardedRenderObjectParentDataCast(AsExpression node) {
+    final String targetName = node.type.toSource().replaceAll('?', '');
+    if (!targetName.endsWith('ParentData')) return false;
+
+    final Expression expression = _unwrapNullCheck(node.expression);
+    if (!_isParentDataAccess(expression)) return false;
+
+    final ClassDeclaration? classNode = node.thisOrAncestorOfType<ClassDeclaration>();
+    if (classNode == null) return false;
+
+    for (final ClassMember member in classNode.body.members) {
+      if (member is! MethodDeclaration || member.name.lexeme != 'setupParentData') {
+        continue;
+      }
+
+      final FormalParameterList? params = member.parameters;
+      if (params == null || params.parameters.isEmpty) continue;
+
+      final String? paramName = _parameterName(params.parameters.first);
+      if (paramName == null) continue;
+
+      if (_setupParentDataGuaranteesType(member, paramName, targetName)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  bool _setupParentDataGuaranteesType(
+    MethodDeclaration setupParentData,
+    String paramName,
+    String targetName,
+  ) {
+    final FunctionBody body = setupParentData.body;
+    if (body is! BlockFunctionBody) return false;
+
+    for (final Statement statement in body.block.statements) {
+      if (statement is! IfStatement) continue;
+      if (!_isParentDataTypeGuard(statement.expression, paramName, targetName)) {
+        continue;
+      }
+
+      if (_hasMatchingParentDataAssignment(
+        statement.thenStatement,
+        paramName,
+        targetName,
+      )) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  bool _isParentDataTypeGuard(
+    Expression expression,
+    String paramName,
+    String targetName,
+  ) {
+    final Expression condition = _unwrapParenthesized(expression);
+    if (condition is! IsExpression || condition.notOperator == null) return false;
+    if (condition.type.toSource().replaceAll('?', '') != targetName) return false;
+    return _isParentDataOnParameter(condition.expression, paramName);
+  }
+
+  bool _hasMatchingParentDataAssignment(
+    Statement statement,
+    String paramName,
+    String targetName,
+  ) {
+    if (statement is Block) {
+      for (final Statement inner in statement.statements) {
+        if (_hasMatchingParentDataAssignment(inner, paramName, targetName)) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    if (statement is! ExpressionStatement) return false;
+    final Expression expression = statement.expression;
+    if (expression is! AssignmentExpression || expression.operator.lexeme != '=') {
+      return false;
+    }
+
+    if (!_isParentDataOnParameter(expression.leftHandSide, paramName)) return false;
+
+    final Expression rhs = _unwrapParenthesized(expression.rightHandSide);
+    if (rhs is! InstanceCreationExpression) return false;
+
+    final String createdTypeName = rhs.constructorName.type.toSource().replaceAll(
+      '?',
+      '',
+    );
+    return createdTypeName == targetName;
+  }
+
+  Expression _unwrapNullCheck(Expression expression) {
+    var current = expression;
+    while (current is PostfixExpression && current.operator.lexeme == '!') {
+      current = current.operand;
+    }
+    return _unwrapParenthesized(current);
+  }
+
+  Expression _unwrapParenthesized(Expression expression) {
+    var current = expression;
+    while (current is ParenthesizedExpression) {
+      current = current.expression;
+    }
+    return current;
+  }
+
+  bool _isParentDataAccess(Expression expression) =>
+      expression is PropertyAccess && expression.propertyName.name == 'parentData';
+
+  String? _parameterName(FormalParameter parameter) {
+    if (parameter is SimpleFormalParameter) return parameter.name?.lexeme;
+    if (parameter is DefaultFormalParameter) {
+      return _parameterName(parameter.parameter);
+    }
+    if (parameter is FieldFormalParameter) return parameter.name.lexeme;
+    if (parameter is SuperFormalParameter) return parameter.name.lexeme;
+    if (parameter is FunctionTypedFormalParameter) return parameter.name.lexeme;
+    return null;
+  }
+
+  bool _isParentDataOnParameter(Expression expression, String paramName) {
+    final Expression target = _unwrapParenthesized(expression);
+    return target is PropertyAccess &&
+        target.propertyName.name == 'parentData' &&
+        target.target is SimpleIdentifier &&
+        (target.target! as SimpleIdentifier).name == paramName;
   }
 }
 

@@ -5,6 +5,7 @@ import 'hide_dep.dart' hide hiddenDead;
 import 'show_only_dead.dart' show onlyDead;
 import 'reexport_barrel.dart';
 import 'deferred_dep.dart' deferred as deferred_dep;
+import 'unused_deferred_dep.dart' deferred as unused_deferred_dep;
 
 String callUsed() => used_alias.usedFromDep();
 

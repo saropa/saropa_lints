@@ -231,7 +231,7 @@ packages:
       path: "../.."
       relative: true
     source: path
-    version: "12.8.0"
+    version: "12.8.1"
   shelf:
     dependency: transitive
     description:

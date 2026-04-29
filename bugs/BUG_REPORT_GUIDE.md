@@ -4,6 +4,14 @@ How to file, investigate, and close bugs in `saropa_lints`.
 
 **False positives are in scope.** If a rule flags code that is correct (or the diagnostic is clearly wrong), file it here under `bugs/` using the [False positive](#false-positive) naming pattern and the [template below](#bug-report-template)—not only in a downstream app’s chat or issue tracker. Downstream repos can link to the bug file once filed; the fix and fixture live in `saropa_lints`.
 
+## Raised Reports (2026-04-29)
+
+- `avoid_inert_animation_value_in_build_false_positive_animatedbuilder_child_reads.md`
+- `avoid_redundant_await_false_positive_animationcontroller_forward_reverse.md`
+- `avoid_unassigned_late_fields_false_positive_parent_data_render_object.md`
+- `avoid_memory_intensive_operations_false_positive_non_string_loop_math.md`
+- `avoid_unsafe_cast_false_positive_render_object_parent_data_cast.md`
+
 ---
 
 ## File Naming

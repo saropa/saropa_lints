@@ -244,10 +244,16 @@ class PreferTryParseForDynamicDataRule extends SaropaLintRule {
       if (target is! SimpleIdentifier) return;
       if (!_parseTypes.contains(target.name)) return;
 
-      // Check if inside try-catch
-      if (!_isInsideTryCatch(node)) {
-        reporter.atNode(node);
+      if (_isInsideTryCatch(node)) return;
+      if (_isProvablyParseableArgument(
+        node,
+        parseType: target.name,
+        argument: node.argumentList.arguments,
+      )) {
+        return;
       }
+
+      reporter.atNode(node);
     });
   }
 
@@ -267,6 +273,320 @@ class PreferTryParseForDynamicDataRule extends SaropaLintRule {
     }
     return false;
   }
+
+  bool _isProvablyParseableArgument(
+    MethodInvocation parseCall, {
+    required String parseType,
+    required NodeList<Expression> argument,
+  }) {
+    if (argument.length != 1) return false;
+    final Expression raw = _unwrapExpression(argument.first);
+    return _isValidLiteralForParseType(raw, parseType: parseType) ||
+        _isDigitOnlyRegexCapture(raw, parseCall) ||
+        _isRegexValidatedSubstring(raw, parseCall);
+  }
+
+  Expression _unwrapExpression(Expression expression) {
+    Expression current = expression;
+    while (true) {
+      if (current is ParenthesizedExpression) {
+        current = current.expression;
+        continue;
+      }
+      if (current is PostfixExpression && current.operator.lexeme == '!') {
+        current = current.operand;
+        continue;
+      }
+      if (current is AsExpression) {
+        current = current.expression;
+        continue;
+      }
+      return current;
+    }
+  }
+
+  bool _isValidLiteralForParseType(
+    Expression argument, {
+    required String parseType,
+  }) {
+    if (argument is! StringLiteral) return false;
+    final String? value = argument.stringValue;
+    if (value == null) return false;
+
+    switch (parseType) {
+      case 'int':
+      case 'BigInt':
+        return int.tryParse(value) != null;
+      case 'double':
+        return double.tryParse(value) != null;
+      case 'num':
+        return num.tryParse(value) != null;
+      case 'Uri':
+        return Uri.tryParse(value) != null;
+      default:
+        return false;
+    }
+  }
+
+  bool _isDigitOnlyRegexCapture(Expression argument, MethodInvocation parseCall) {
+    final _CaptureAccess? capture = _captureAccessFromExpression(argument);
+    if (capture == null) return false;
+    final String? pattern = _findRegexPatternForVariable(
+      parseCall,
+      variableName: capture.variableName,
+      methodName: 'firstMatch',
+    );
+    if (pattern == null) return false;
+    final String? groupPattern = _captureGroupPattern(
+      pattern,
+      capture.groupIndex,
+    );
+    if (groupPattern == null) return false;
+    return _isDigitOnlyGroupPattern(groupPattern);
+  }
+
+  bool _isRegexValidatedSubstring(Expression argument, MethodInvocation parseCall) {
+    if (argument is! MethodInvocation) return false;
+    if (argument.methodName.name != 'substring') return false;
+    final Expression? target = argument.target;
+    if (target is! SimpleIdentifier) return false;
+
+    final IfStatement? guard = _findMatchingRegexGuard(
+      parseCall,
+      variableName: target.name,
+    );
+    if (guard == null) return false;
+    final String? regexVariableName = _regexVariableNameFromGuard(guard);
+    if (regexVariableName == null) return false;
+    final String? pattern = _findRegexPatternForVariable(
+      parseCall,
+      variableName: regexVariableName,
+      methodName: 'hasMatch',
+    );
+    if (pattern == null) return false;
+    return _isDigitOnlyWholePattern(pattern);
+  }
+
+  _CaptureAccess? _captureAccessFromExpression(Expression expression) {
+    if (expression is IndexExpression) {
+      final Expression? target = expression.target;
+      final Expression index = expression.index;
+      if (target is SimpleIdentifier && index is IntegerLiteral) {
+        final int? groupIndex = index.value;
+        if (groupIndex != null && groupIndex > 0) {
+          return _CaptureAccess(target.name, groupIndex);
+        }
+      }
+      return null;
+    }
+
+    if (expression is MethodInvocation &&
+        expression.methodName.name == 'group' &&
+        expression.target is SimpleIdentifier &&
+        expression.argumentList.arguments.length == 1) {
+      final Expression groupArg = expression.argumentList.arguments.first;
+      if (groupArg is IntegerLiteral) {
+        final int? groupIndex = groupArg.value;
+        if (groupIndex != null && groupIndex > 0) {
+          return _CaptureAccess(
+            (expression.target! as SimpleIdentifier).name,
+            groupIndex,
+          );
+        }
+      }
+    }
+    return null;
+  }
+
+  IfStatement? _findMatchingRegexGuard(
+    MethodInvocation parseCall, {
+    required String variableName,
+  }) {
+    final Statement? parseStatement = parseCall.thisOrAncestorOfType<Statement>();
+    final Block? block = parseCall.thisOrAncestorOfType<Block>();
+    if (parseStatement == null || block == null) return null;
+
+    final int parseIndex = block.statements.indexOf(parseStatement);
+    if (parseIndex <= 0) return null;
+
+    for (int i = parseIndex - 1; i >= 0; i--) {
+      final Statement candidate = block.statements[i];
+      if (candidate is! IfStatement) continue;
+      if (_isNegativeRegexGuardForVariable(candidate, variableName: variableName)) {
+        return candidate;
+      }
+    }
+    return null;
+  }
+
+  bool _isNegativeRegexGuardForVariable(
+    IfStatement statement, {
+    required String variableName,
+  }) {
+    final Expression condition = statement.expression;
+    if (condition is! PrefixExpression || condition.operator.lexeme != '!') {
+      return false;
+    }
+    final Expression operand = _unwrapExpression(condition.operand);
+    if (operand is! MethodInvocation || operand.methodName.name != 'hasMatch') {
+      return false;
+    }
+
+    if (operand.argumentList.arguments.length != 1) return false;
+    final Expression arg = _unwrapExpression(operand.argumentList.arguments.first);
+    if (arg is! SimpleIdentifier || arg.name != variableName) return false;
+
+    final Statement thenBranch = statement.thenStatement;
+    if (thenBranch is ContinueStatement || thenBranch is ReturnStatement) {
+      return true;
+    }
+    if (thenBranch is Block && thenBranch.statements.length == 1) {
+      final Statement only = thenBranch.statements.first;
+      return only is ContinueStatement || only is ReturnStatement;
+    }
+    return false;
+  }
+
+  String? _regexVariableNameFromGuard(IfStatement statement) {
+    final Expression condition = statement.expression;
+    if (condition is! PrefixExpression || condition.operator.lexeme != '!') {
+      return null;
+    }
+    final Expression operand = _unwrapExpression(condition.operand);
+    if (operand is! MethodInvocation || operand.methodName.name != 'hasMatch') {
+      return null;
+    }
+    final Expression? target = operand.target;
+    if (target is SimpleIdentifier) return target.name;
+    return null;
+  }
+
+  String? _findRegexPatternForVariable(
+    MethodInvocation node, {
+    required String variableName,
+    required String methodName,
+  }) {
+    final Statement? statement = node.thisOrAncestorOfType<Statement>();
+    final Block? block = node.thisOrAncestorOfType<Block>();
+    if (statement == null || block == null) return null;
+
+    final int statementIndex = block.statements.indexOf(statement);
+    if (statementIndex <= 0) return null;
+
+    for (int i = statementIndex - 1; i >= 0; i--) {
+      final Statement candidate = block.statements[i];
+      if (candidate is! VariableDeclarationStatement) continue;
+      for (final VariableDeclaration declaration in candidate.variables.variables) {
+        if (declaration.name.lexeme != variableName) continue;
+        final Expression? initializer = declaration.initializer;
+        if (initializer is! InstanceCreationExpression &&
+            initializer is! MethodInvocation) {
+          return null;
+        }
+
+        if (methodName == 'hasMatch' && initializer is InstanceCreationExpression) {
+          final String typeName = initializer.constructorName.type.name.lexeme;
+          if (typeName != 'RegExp') return null;
+          return _extractPatternFromRegExpArgs(initializer.argumentList.arguments);
+        }
+
+        if (methodName == 'firstMatch' && initializer is MethodInvocation) {
+          if (initializer.methodName.name != 'firstMatch') return null;
+          final Expression? target = initializer.target;
+          if (target is! SimpleIdentifier) return null;
+          final String regExpName = target.name;
+          return _findRegexPatternForVariable(
+            node,
+            variableName: regExpName,
+            methodName: 'hasMatch',
+          );
+        }
+      }
+    }
+    return null;
+  }
+
+  String? _extractPatternFromRegExpArgs(NodeList<Expression> args) {
+    if (args.isEmpty) return null;
+    final Expression first = _unwrapExpression(args.first);
+    if (first is! StringLiteral) return null;
+    return first.stringValue;
+  }
+
+  String? _captureGroupPattern(String pattern, int groupIndex) {
+    final List<String> groups = <String>[];
+    final StringBuffer current = StringBuffer();
+    bool inGroup = false;
+    bool escaped = false;
+    int depth = 0;
+
+    for (int i = 0; i < pattern.length; i++) {
+      final String ch = pattern[i];
+      if (escaped) {
+        if (inGroup) current.write(ch);
+        escaped = false;
+        continue;
+      }
+      if (ch == r'\') {
+        if (inGroup) current.write(ch);
+        escaped = true;
+        continue;
+      }
+
+      if (ch == '(') {
+        final bool isCapturing =
+            i + 1 >= pattern.length ||
+            pattern[i + 1] != '?' ||
+            (i + 2 < pattern.length &&
+                (pattern[i + 2] == '<' ||
+                    pattern[i + 2] == '\'' ||
+                    pattern[i + 2] == 'P'));
+        if (isCapturing && depth == 0) {
+          inGroup = true;
+          current.clear();
+        } else if (inGroup) {
+          current.write(ch);
+        }
+        depth++;
+        continue;
+      }
+
+      if (ch == ')') {
+        if (depth == 0) continue;
+        depth--;
+        if (inGroup && depth == 0) {
+          groups.add(current.toString());
+          inGroup = false;
+          continue;
+        }
+        if (inGroup) current.write(ch);
+        continue;
+      }
+
+      if (inGroup) current.write(ch);
+    }
+
+    final int index = groupIndex - 1;
+    if (index < 0 || index >= groups.length) return null;
+    return groups[index];
+  }
+
+  bool _isDigitOnlyGroupPattern(String groupPattern) {
+    final String normalized = groupPattern.replaceAll(' ', '');
+    return RegExp(r'^\\d(?:\{\d+(?:,\d+)?\}|[+*?])?$').hasMatch(normalized);
+  }
+
+  bool _isDigitOnlyWholePattern(String pattern) {
+    final String normalized = pattern.replaceAll(' ', '');
+    return RegExp(r'^\^?\\d(?:\{\d+(?:,\d+)?\}|[+*?])\$?$').hasMatch(normalized);
+  }
+}
+
+class _CaptureAccess {
+  const _CaptureAccess(this.variableName, this.groupIndex);
+
+  final String variableName;
+  final int groupIndex;
 }
 
 /// Warns when Duration constructor can use cleaner units.

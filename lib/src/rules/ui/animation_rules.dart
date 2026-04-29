@@ -2812,6 +2812,7 @@ class AvoidInertAnimationValueInBuildRule extends SaropaLintRule {
     if (!_isAnimationType(receiverType)) return;
 
     if (!_isInertReadInBuild(accessNode)) return;
+    if (_isReadInListeningBuilderRebuiltWidget(accessNode, receiver)) return;
 
     reporter.atNode(accessNode);
   }
@@ -2915,6 +2916,140 @@ class AvoidInertAnimationValueInBuildRule extends SaropaLintRule {
 
     final String typeName = creation.constructorName.type.name.lexeme;
     return _listeningBuilderWidgets.contains(typeName);
+  }
+
+  /// Returns `true` when [receiver].value is read inside a widget build that is
+  /// itself rebuilt by a listening builder callback (`AnimatedBuilder`,
+  /// `ListenableBuilder`, `ValueListenableBuilder`).
+  ///
+  /// This handles patterns where the `.value` read happens in a child widget's
+  /// `build()` while the parent creates that widget inside a listening builder.
+  /// In that case the child build is re-run per tick, so the read is live.
+  static bool _isReadInListeningBuilderRebuiltWidget(
+    AstNode accessNode,
+    Expression receiver,
+  ) {
+    final String? receiverName = _receiverName(receiver);
+    if (receiverName == null) return false;
+
+    final ClassDeclaration? classDecl = _enclosingClassDeclaration(accessNode);
+    if (classDecl == null) return false;
+    if (!_classDefinesField(classDecl, receiverName)) return false;
+
+    final CompilationUnit? unit = accessNode.thisOrAncestorOfType<CompilationUnit>();
+    if (unit == null) return false;
+
+    final ClassElement? classElement = classDecl.declaredFragment?.element;
+    final String? className = classElement?.name;
+    if (className == null || className.isEmpty) return false;
+
+    final _ListeningBuilderInstantiationVisitor visitor =
+        _ListeningBuilderInstantiationVisitor(
+          className: className,
+          receiverName: receiverName,
+        );
+    unit.accept(visitor);
+    return visitor.hasListeningBuilderInstantiation &&
+        !visitor.hasNonListeningBuilderInstantiation;
+  }
+
+  /// Extracts the receiver identifier from `foo.value` or `this.foo.value`.
+  static String? _receiverName(Expression receiver) {
+    if (receiver is SimpleIdentifier) return receiver.name;
+    if (receiver is PropertyAccess) {
+      final Expression? target = receiver.realTarget;
+      if (target is ThisExpression) return receiver.propertyName.name;
+    }
+    return null;
+  }
+
+  /// Returns `true` when [classDecl] declares a field named [fieldName].
+  static bool _classDefinesField(ClassDeclaration classDecl, String fieldName) {
+    final _ClassFieldNameVisitor visitor = _ClassFieldNameVisitor(fieldName);
+    classDecl.visitChildren(visitor);
+    return visitor.found;
+  }
+}
+
+class _ClassFieldNameVisitor extends RecursiveAstVisitor<void> {
+  _ClassFieldNameVisitor(this.targetFieldName);
+
+  final String targetFieldName;
+  bool found = false;
+
+  @override
+  void visitFieldDeclaration(FieldDeclaration node) {
+    if (found) return;
+    for (final VariableDeclaration variable in node.fields.variables) {
+      if (variable.name.lexeme == targetFieldName) {
+        found = true;
+        return;
+      }
+    }
+    super.visitFieldDeclaration(node);
+  }
+
+  @override
+  void visitClassDeclaration(ClassDeclaration node) {
+    // Keep lookup scoped to the current class body.
+  }
+}
+
+class _ListeningBuilderInstantiationVisitor extends RecursiveAstVisitor<void> {
+  _ListeningBuilderInstantiationVisitor({
+    required this.className,
+    required this.receiverName,
+  });
+
+  final String className;
+  final String receiverName;
+  bool hasListeningBuilderInstantiation = false;
+  bool hasNonListeningBuilderInstantiation = false;
+
+  @override
+  void visitInstanceCreationExpression(InstanceCreationExpression node) {
+    final String createdType = node.constructorName.type.name.lexeme;
+    if (createdType != className) {
+      super.visitInstanceCreationExpression(node);
+      return;
+    }
+
+    // Only treat this as the same data flow when the animation field is passed
+    // via a named argument with the same identifier.
+    NamedExpression? receiverArg;
+    for (final Expression arg in node.argumentList.arguments) {
+      if (arg is NamedExpression && arg.name.label.name == receiverName) {
+        receiverArg = arg;
+        break;
+      }
+    }
+    if (receiverArg == null) {
+      hasNonListeningBuilderInstantiation = true;
+      super.visitInstanceCreationExpression(node);
+      return;
+    }
+
+    final Expression argExpression = receiverArg.expression;
+    final DartType? argType = argExpression.staticType;
+    final bool isAnimationArg = argType is InterfaceType && _isAnimationType(argType);
+    if (!isAnimationArg) {
+      hasNonListeningBuilderInstantiation = true;
+      super.visitInstanceCreationExpression(node);
+      return;
+    }
+
+    final FunctionExpression? enclosingFn =
+        node.thisOrAncestorOfType<FunctionExpression>();
+    if (enclosingFn != null &&
+        AvoidInertAnimationValueInBuildRule._isListeningBuilderCallback(
+          enclosingFn,
+        )) {
+      hasListeningBuilderInstantiation = true;
+    } else {
+      hasNonListeningBuilderInstantiation = true;
+    }
+
+    super.visitInstanceCreationExpression(node);
   }
 }
 

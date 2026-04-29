@@ -10,6 +10,7 @@ library;
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/dart/element/type.dart';
 
 import '../../async_context_utils.dart';
 import '../../fixes/performance/prefer_const_widgets_fix.dart';
@@ -2486,21 +2487,21 @@ class _StringConcatVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitAssignmentExpression(AssignmentExpression node) {
-    // Check for += with strings
-    if (node.operator.type == TokenType.PLUS_EQ) {
-      final Expression left = node.leftHandSide;
-      if (left is SimpleIdentifier) {
-        // Simple heuristic - variable names suggesting strings
-        final String name = left.name.toLowerCase();
-        if (name.contains('str') ||
-            name.contains('text') ||
-            name.contains('result') ||
-            name.contains('output')) {
-          reporter.atNode(node);
-        }
-      }
+    // Report only when += is operating on string data.
+    if (node.operator.type == TokenType.PLUS_EQ &&
+        _isStringLikeExpression(node.leftHandSide, fallback: true) &&
+        _isStringLikeExpression(node.rightHandSide)) {
+      reporter.atNode(node);
     }
     super.visitAssignmentExpression(node);
+  }
+
+  bool _isStringLikeExpression(Expression expression, {bool fallback = false}) {
+    final DartType? expressionType = expression.staticType;
+    if (expressionType is InterfaceType && expressionType.isDartCoreString) {
+      return true;
+    }
+    return fallback;
   }
 }
 

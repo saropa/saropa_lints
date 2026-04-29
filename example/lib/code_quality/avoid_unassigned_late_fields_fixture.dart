@@ -120,3 +120,13 @@ class _GoodClass201 {
     name = n; // late field is eventually assigned
   }
 }
+
+class ParentData {}
+
+class SliverPhysicalParentData extends ParentData {}
+
+// GOOD: Should NOT trigger avoid_unassigned_late_fields.
+// ParentData fields are often initialized by RenderObject layout logic.
+class _GoodParentDataClass201 extends SliverPhysicalParentData {
+  late double mainAxisPosition;
+}

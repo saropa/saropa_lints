@@ -28,22 +28,19 @@ class _DelegatingFuture implements Future<int> {
   Future<int> catchError(
     Function onError, {
     bool Function(Object error)? test,
-  }) =>
-      _inner.catchError(onError, test: test);
+  }) => _inner.catchError(onError, test: test);
 
   @override
   Future<R> then<R>(
     FutureOr<R> Function(int value) onValue, {
     Function? onError,
-  }) =>
-      _inner.then(onValue, onError: onError);
+  }) => _inner.then(onValue, onError: onError);
 
   @override
   Future<int> timeout(
     Duration timeLimit, {
     FutureOr<int> Function()? onTimeout,
-  }) =>
-      _inner.timeout(timeLimit, onTimeout: onTimeout);
+  }) => _inner.timeout(timeLimit, onTimeout: onTimeout);
 
   @override
   Future<int> whenComplete(FutureOr<void> Function() action) =>
@@ -54,6 +51,20 @@ class _DelegatingFuture implements Future<int> {
 Future<void> goodImplementsFuture() async {
   final v = await _DelegatingFuture(Future.value(1));
   print(v);
+}
+
+class TickerFuture {}
+
+class AnimationController {
+  TickerFuture forward() => TickerFuture();
+  TickerFuture reverse() => TickerFuture();
+}
+
+// OK: awaiting AnimationController sequencing calls is intentional.
+Future<void> goodAnimationControllerAwaits() async {
+  final controller = AnimationController();
+  await controller.forward();
+  await controller.reverse();
 }
 
 void main() {}

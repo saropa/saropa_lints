@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:analyzer/dart/analysis/analysis_context_collection.dart';
 import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/diagnostic/diagnostic.dart';
 import 'package:analyzer/file_system/physical_file_system.dart';
 import 'package:path/path.dart' as p;
@@ -93,6 +94,7 @@ List<String> _unusedRelativeImportsFromDiagnostics({
       }
     }
     if (directive == null) continue;
+    if (_isUsedDeferredImport(directive: directive, unit: unit)) continue;
     final uri = directive.uri.stringValue;
     if (uri == null || uri.startsWith('dart:') || uri.startsWith('package:')) {
       continue;
@@ -111,6 +113,73 @@ bool _isUnusedImportDiagnostic(Diagnostic diag) {
 }
 
 int? _diagOffset(Diagnostic diag) => diag.offset;
+
+bool _isUsedDeferredImport({
+  required ImportDirective directive,
+  required CompilationUnit unit,
+}) {
+  if (directive.deferredKeyword == null) return false;
+  final prefix = directive.prefix?.name;
+  if (prefix == null || prefix.isEmpty) {
+    // `deferred as <prefix>` should always include a prefix, but be defensive.
+    return false;
+  }
+  final visitor = _DeferredPrefixUsageVisitor(
+    prefix: prefix,
+    importDirectiveOffset: directive.offset,
+  );
+  unit.visitChildren(visitor);
+  return visitor.isUsed;
+}
+
+class _DeferredPrefixUsageVisitor extends RecursiveAstVisitor<void> {
+  _DeferredPrefixUsageVisitor({
+    required this.prefix,
+    required this.importDirectiveOffset,
+  });
+
+  final String prefix;
+  final int importDirectiveOffset;
+  var isUsed = false;
+
+  @override
+  void visitImportDirective(ImportDirective node) {
+    // Import directives are declarations, not usage sites.
+  }
+
+  @override
+  void visitPrefixedIdentifier(PrefixedIdentifier node) {
+    if (isUsed) return;
+    if (node.offset == importDirectiveOffset) return;
+    if (node.prefix.name == prefix) {
+      isUsed = true;
+      return;
+    }
+    super.visitPrefixedIdentifier(node);
+  }
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    if (isUsed) return;
+    final target = node.target;
+    if (target is SimpleIdentifier && target.name == prefix) {
+      isUsed = true;
+      return;
+    }
+    super.visitMethodInvocation(node);
+  }
+
+  @override
+  void visitPropertyAccess(PropertyAccess node) {
+    if (isUsed) return;
+    final target = node.target;
+    if (target is SimpleIdentifier && target.name == prefix) {
+      isUsed = true;
+      return;
+    }
+    super.visitPropertyAccess(node);
+  }
+}
 
 String _relativePath(String rootPosix, String absolutePath) {
   final normalized = p.normalize(absolutePath).replaceAll('\\', '/');

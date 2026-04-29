@@ -236,6 +236,116 @@ void main() {
       },
     );
 
+    test(
+      'prefer_try_parse_for_dynamic_data skips provably safe regex/literal inputs',
+      () async {
+        final exampleDir = Directory('example');
+        if (!exampleDir.existsSync()) {
+          return;
+        }
+
+        final result = await Process.run(
+          'dart',
+          ['run', 'custom_lint'],
+          workingDirectory: exampleDir.path,
+          runInShell: true,
+        );
+
+        final output = result.stdout as String;
+        final violations = parseViolations(output);
+        final fixtureViolations = violations
+            .where(
+              (v) =>
+                  v.rule == 'prefer_try_parse_for_dynamic_data' &&
+                  v.file.contains(
+                    'json_datetime/prefer_try_parse_for_dynamic_data_fixture',
+                  ),
+            )
+            .toList();
+
+        if (fixtureViolations.isEmpty) {
+          // Skip when custom_lint output does not include this fixture.
+          return;
+        }
+
+        final lines = fixtureViolations.map((v) => v.line).toSet();
+        expect(lines.contains(7), isTrue, reason: 'dynamic input should lint');
+        expect(
+          lines.contains(12),
+          isTrue,
+          reason: 'invalid numeric literal should lint',
+        );
+        expect(
+          lines.contains(16),
+          isFalse,
+          reason: 'valid literal parse should not lint',
+        );
+        expect(
+          lines.contains(24),
+          isFalse,
+          reason: 'digit-only regex capture should not lint',
+        );
+        expect(
+          lines.contains(25),
+          isFalse,
+          reason: 'digit-only regex group() should not lint',
+        );
+        expect(
+          lines.contains(36),
+          isFalse,
+          reason: 'substring after digit-only hasMatch guard should not lint',
+        );
+      },
+    );
+
+    test(
+      'avoid_memory_intensive_operations fixture only reports string concat in loop',
+      () async {
+        final exampleDir = Directory('example');
+        if (!exampleDir.existsSync()) {
+          return;
+        }
+
+        final result = await Process.run(
+          'dart',
+          ['run', 'custom_lint'],
+          workingDirectory: exampleDir.path,
+          runInShell: true,
+        );
+
+        final output = result.stdout as String;
+        final violations = parseViolations(output);
+        final fixtureViolations = violations
+            .where(
+              (v) =>
+                  v.rule == 'avoid_memory_intensive_operations' &&
+                  v.file.contains(
+                    'avoid_memory_intensive_operations_fixture',
+                  ),
+            )
+            .toList();
+
+        if (fixtureViolations.isEmpty) {
+          // Skip when custom_lint output does not include this fixture.
+          return;
+        }
+
+        expect(
+          fixtureViolations.length,
+          equals(1),
+          reason:
+              'Fixture has one BAD string concat line and GOOD numeric += '
+              'accumulation that must not trigger; got '
+              '${fixtureViolations.length}',
+        );
+        expect(
+          fixtureViolations.single.line,
+          equals(117),
+          reason: 'Violation should be on result += item.toString();',
+        );
+      },
+    );
+
     /// Behavioral test: compliant-only file must produce no violations.
     /// Proves "compliant code → no lint" for the rules exercised in that file.
     test('compliant-only fixture has no violations', () async {

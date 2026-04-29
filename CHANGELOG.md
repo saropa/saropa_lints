@@ -17,9 +17,7 @@
 
     Dates are not included in version headers — [pub.dev](https://pub.dev/packages/saropa_lints/changelog) displays publish dates separately.
 
-    Each release (and [Unreleased]) opens with a short plain-language **overview** for humans — user-facing only, casual wording, 2–4 sentences max. Summarize what changed from the user's point of view; do NOT restate implementation details from the `### Added/Changed/Fixed` sections below. Hard bans in the overview: line numbers, file paths, regex snippets, internal flag names (`multiLine: true`, `requiredPatterns`, etc.), specific counts/percentages from particular projects ("22,695 issues on project X", "96.8% of the backlog"), AST/visitor terminology. If a reader would have to open the code to understand a phrase, it belongs in the detailed section — not the overview. End the overview with:
-    [log](https://github.com/saropa/saropa_lints/blob/vX.Y.Z/CHANGELOG.md)
-    substituting X.Y.Z.
+    Each release (and [Unreleased]) opens with a short plain-language **overview** for humans — user-facing only, casual wording, 2–4 sentences max. Summarize what changed from the user's point of view; do NOT restate implementation details from the `### Added/Changed/Fixed` sections below. Hard bans in the overview: line numbers, file paths, regex snippets, internal flag names (`multiLine: true`, `requiredPatterns`, etc.), specific counts/percentages from particular projects ("22,695 issues on project X", "96.8% of the backlog"), AST/visitor terminology. If a reader would have to open the code to understand a phrase, it belongs in the detailed section — not the overview. End the overview (no linebreak) with: [log](https://github.com/saropa/saropa_lints/blob/vX.Y.Z/CHANGELOG.md) substituting X.Y.Z.
 
     **Bullet density (HARD RULE — applies to every entry under `### Added` / `### Changed` / `### Fixed` / `### Removed`, including `### Added (Extension)` / `### Fixed (Extension)` / `### Changed (Extension)` and similar)** — One sentence per bullet. That sentence answers, in order: *what changed* → *why the user cares* → *what the user must do* (say "No action required" explicitly when true). A second sentence is allowed ONLY when a concrete user action (migration step, config line to remove) cannot fit in the first. Three-sentence bullets are forbidden — split into multiple bullets, or move the detail to the commit message, PR description, bug report, or inline code comment. When a bullet genuinely needs more context, LINK OUT to those places; do not inline the explanation. Concision edits may touch historical sections on purpose.
 
@@ -47,21 +45,31 @@
 
 ---
 
-## [12.8.2]
+## [12.8.3]
 
-The VS Code extension registers the **Suppressions** sidebar at activation so you are less likely to see a “no view registered” error after an update or host restart. No config change. — [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
+This patch release focuses on reducing noisy false positives so everyday Flutter and Dart code reads cleaner in the editor. Common animation flows, validated parsing paths, numeric loop accumulation, and parent-data lifecycle field patterns should now lint the way you expect. No config updates are needed; re-run analysis and you should see fewer distracting reports. [log](https://github.com/saropa/saropa_lints/blob/v12.8.3/CHANGELOG.md)
 
-### Fixed (Extension)
+### Fixed
 
-- The **Suppressions** tree binds at activation like other first-class sidebar trees, which avoids intermittent registration failures for that view. No action required; if a one-off error persists from an older session, use **Developer: Reload Window**.
+- **`avoid_redundant_await`** no longer flags `await` on `AnimationController.forward()` and `.reverse()` sequencing calls that return `TickerFuture`, so valid animation orchestration is not misreported as redundant. No action required.
+- **`prefer_try_parse_for_dynamic_data`** now skips `parse(...)` calls when the input is provably safe (valid numeric literals and digit-only regex-validated captures/substrings), so common validated parsing paths are no longer false positives. Remove any temporary local suppressions you added for those patterns.
+- **`avoid_memory_intensive_operations`** now reports loop `+=` only when the operation is on strings, so numeric accumulation patterns no longer produce false positives. No action required.
+- `avoid_unassigned_late_fields` no longer reports `late` fields declared on RenderObject parent-data classes (types in the `ParentData` inheritance chain), so lifecycle-initialized layout fields are not misclassified as unassigned. No action required.
 
 ---
 
-## [12.8.1]
+## [12.8.2]
+
+The VS Code extension now registers the **Suppressions** sidebar at startup, so you should see fewer “view not registered” glitches after an update or a full window reload. **avoid_redundant_await** also stops mis-flagging `await` on some third-party async builder-style APIs. No config change. [log](https://github.com/saropa/saropa_lints/blob/v12.8.2/CHANGELOG.md)
 
 ### Fixed
 
 - **`avoid_redundant_await`** no longer flags `await` when the expression’s static type is a class that implements `Future` or `Stream` (e.g. Postgrest/Supabase builder APIs) instead of the plain `Future<…>` type, so legitimate awaits are not misreported as redundant. Remove any temporary `// ignore` workarounds you added for that pattern.
+- **`avoid_inert_animation_value_in_build`** no longer reports `Animation.value` reads inside child widget `build()` methods when that child is instantiated from a listening builder callback (for example `AnimatedBuilder`), so tick-driven subtrees are not misclassified as inert snapshots. No action required.
+
+### Fixed (Extension)
+
+- The **Suppressions** tree binds at activation like other first-class sidebar trees, which avoids intermittent registration failures for that view. No action required; if a one-off error persists from an older session, use **Developer: Reload Window**.
 
 <details><summary>Maintenance</summary>
 
@@ -72,6 +80,8 @@ The VS Code extension registers the **Suppressions** sidebar at activation so yo
 ---
 
 ## [12.8.0]
+
+Cross-file and snapshot loading forgive bad JSON or YAML on disk, so one broken l10n file should not take down a whole run. Many rules now offer IDE quick fixes where a mechanical edit is safe, and you can cap which cumulative tier runs with an environment variable or plugin config if you do not want to hand-edit huge rule lists. A handful of rules were renamed for clarity, and exports plus the extension **Issues** view prioritize and label findings a bit more helpfully—re-run analysis if you rely on `violations.json`. [log](https://github.com/saropa/saropa_lints/blob/v12.8.0/CHANGELOG.md)
 
 ### Fixed
 
@@ -103,6 +113,8 @@ The VS Code extension registers the **Suppressions** sidebar at activation so yo
 ---
 
 ## [12.7.0]
+
+Package Vibrancy and cross-file analysis get proper extension UI and several new CLI modes, metadata-rich exports make related rules and triage easier, and security hotspots plus suppressions are more workable end-to-end. This is a big extension-focused drop—update the VS Code side if you use those panels or vibrancy. Most Dart-only users still just upgrade the package and re-run analysis. [log](https://github.com/saropa/saropa_lints/blob/v12.7.0/CHANGELOG.md)
 
 ### Added
 
@@ -171,7 +183,7 @@ The VS Code extension registers the **Suppressions** sidebar at activation so yo
 
 ## [12.6.1]
 
-More rules now ship IDE quick fixes for repetitive, low-risk edits (secure URL schemes, image and HTTP/Firestore/Drift call shapes), so you can apply the suggested remediation from the lightbulb menu instead of typing boilerplate by hand. Update the package and re-analyze to see new fix actions where diagnostics already appear. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
+More rules now ship IDE quick fixes for repetitive, low-risk edits (secure URL schemes, image and HTTP/Firestore/Drift call shapes), so you can apply the suggested remediation from the lightbulb menu instead of typing boilerplate by hand. Update the package and re-analyze to see new fix actions where diagnostics already appear. [log](https://github.com/saropa/saropa_lints/blob/v12.6.1/CHANGELOG.md)
 
 ### Added
 
@@ -186,7 +198,7 @@ More rules now ship IDE quick fixes for repetitive, low-risk edits (secure URL s
 
 ## [12.6.0]
 
-New recommended-tier migrations cover Flutter scrollbar theme lookup and several Dart 3.2 `dart:js_interop` signature changes. The interop rules only fire when the real SDK library is resolved, so local types or extensions that reuse the same names should stay quiet, and outdated `.toDart` chains are still caught when the bool result is cast through dynamic first. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
+New recommended-tier migrations cover Flutter scrollbar theme lookup and several Dart 3.2 `dart:js_interop` signature changes. The interop rules only fire when the real SDK library is resolved, so local types or extensions that reuse the same names should stay quiet, and outdated `.toDart` chains are still caught when the bool result is cast through dynamic first. [log](https://github.com/saropa/saropa_lints/blob/v12.6.0/CHANGELOG.md)
 
 ### Added
 
@@ -282,7 +294,7 @@ This release cleans up disposal and accessibility false positives that were nois
 
 ## [12.5.0]
 
-New rules help you catch missing Android permissions, missing iOS privacy strings, desktop window setup, and gaps around background audio and location, notifications, Firestore rules, and secrets on disk before they bite at review or runtime. A couple of noisy false positives in internationalization and iOS camera permission checks are gone, and the cross-file CLI can warn when library code has no matching test file. — [log](https://github.com/saropa/saropa_lints/blob/v12.5.0/CHANGELOG.md)
+New rules help you catch missing Android permissions, missing iOS privacy strings, desktop window setup, and gaps around background audio and location, notifications, Firestore rules, and secrets on disk before they bite at review or runtime. A couple of noisy false positives in internationalization and iOS camera permission checks are gone, and the cross-file CLI can warn when library code has no matching test file. [log](https://github.com/saropa/saropa_lints/blob/v12.5.0/CHANGELOG.md)
 
 ### Fixed
 
@@ -315,7 +327,7 @@ New rules help you catch missing Android permissions, missing iOS privacy string
 
 ## [12.4.4]
 
-`require_animation_controller_dispose` stops nagging when you really did tear down an `AnimationController` using a disposeSafe-style helper next to `dispose`, and the help text you read in the editor now matches what the linter reports. Rule counts and Marketplace-facing copy line up across the package and extension, publish and audit flows are a little sturdier, and you do not need new analysis_options toggles to pick any of this up. — [log](https://github.com/saropa/saropa_lints/blob/v12.4.4/CHANGELOG.md)
+`require_animation_controller_dispose` stops nagging when you really did tear down an `AnimationController` using a disposeSafe-style helper next to `dispose`, and the help text you read in the editor now matches what the linter reports. Rule counts and Marketplace-facing copy line up across the package and extension, publish and audit flows are a little sturdier, and you do not need new analysis_options toggles to pick any of this up. [log](https://github.com/saropa/saropa_lints/blob/v12.4.4/CHANGELOG.md)
 
 ### Fixed
 
@@ -339,7 +351,7 @@ New rules help you catch missing Android permissions, missing iOS privacy string
 
 ## [12.4.2]
 
-`saropa_depend_on_referenced_packages` is removed because the Dart SDK already ships the same check via `lints` / `flutter_lints`, and saropa’s copy kept false-positiveing on legitimate imports. You still get the behavior from the SDK; nothing breaks if you leave old config in place. — [log](https://github.com/saropa/saropa_lints/blob/v12.4.2/CHANGELOG.md)
+`saropa_depend_on_referenced_packages` is removed because the Dart SDK already ships the same check via `lints` / `flutter_lints`, and saropa’s copy kept false-positiveing on legitimate imports. You still get the behavior from the SDK; nothing breaks if you leave old config in place. [log](https://github.com/saropa/saropa_lints/blob/v12.4.2/CHANGELOG.md)
 
 ### Removed
 
@@ -355,7 +367,7 @@ New rules help you catch missing Android permissions, missing iOS privacy string
 
 ## [12.4.1]
 
-Analysis reports and the Run Analysis popup now show which saropa_lints build ran, and the popup can copy or open the latest consolidated report without digging through folders. Theme- and platform-driven color branches no longer trip `avoid_color_only_meaning`, and `prefer_final_locals` stops suggesting `final` where the variable is reassigned inside nested blocks or closures. — [log](https://github.com/saropa/saropa_lints/blob/v12.4.1/CHANGELOG.md)
+Analysis reports and the Run Analysis popup now show which saropa_lints build ran, and the popup can copy or open the latest consolidated report without digging through folders. Theme- and platform-driven color branches no longer trip `avoid_color_only_meaning`, and `prefer_final_locals` stops suggesting `final` where the variable is reassigned inside nested blocks or closures. [log](https://github.com/saropa/saropa_lints/blob/v12.4.1/CHANGELOG.md)
 
 ### Added
 
@@ -375,7 +387,7 @@ Analysis reports and the Run Analysis popup now show which saropa_lints build ra
 
 ## [12.4.0]
 
-Three animation-focused rules catch inert `Animation.value` reads in `build`, mis-matched ticker mixins, and press-and-bounce `forward()` without `from: 0.0`. Several platform rules and `avoid_platform_specific_imports` quiet down when the project cannot hit the failure mode (for example mobile-only apps without `web/`). Pubspec dependency discovery works again, saropa’s import rule is renamed to `saropa_depend_on_referenced_packages` so it no longer doubles the SDK lint, large reports open with triage-oriented sections, and Run Analysis popups show real issue counts. — [log](https://github.com/saropa/saropa_lints/blob/v12.4.0/CHANGELOG.md)
+Three animation-focused rules catch inert `Animation.value` reads in `build`, mis-matched ticker mixins, and press-and-bounce `forward()` without `from: 0.0`. Several platform rules and `avoid_platform_specific_imports` quiet down when the project cannot hit the failure mode (for example mobile-only apps without `web/`). Pubspec dependency discovery works again, saropa’s import rule is renamed to `saropa_depend_on_referenced_packages` so it no longer doubles the SDK lint, large reports open with triage-oriented sections, and Run Analysis popups show real issue counts. [log](https://github.com/saropa/saropa_lints/blob/v12.4.0/CHANGELOG.md)
 
 ### Added
 
@@ -407,7 +419,7 @@ Three animation-focused rules catch inert `Animation.value` reads in `build`, mi
 
 ## [12.3.4]
 
-New `avoid_drift_insert_missing_conflict_target` flags Drift inserts that omit the right `onConflict` target on tables with a non-primary unique index, matching the class of SQLite `UNIQUE` failures you otherwise hit at runtime. — [log](https://github.com/saropa/saropa_lints/blob/v12.3.4/CHANGELOG.md)
+New `avoid_drift_insert_missing_conflict_target` flags Drift inserts that omit the right `onConflict` target on tables with a non-primary unique index, matching the class of SQLite `UNIQUE` failures you otherwise hit at runtime. [log](https://github.com/saropa/saropa_lints/blob/v12.3.4/CHANGELOG.md)
 
 ### Added
 
@@ -417,7 +429,7 @@ New `avoid_drift_insert_missing_conflict_target` flags Drift inserts that omit t
 
 ## [12.3.3]
 
-Path-safety rules ignore clearly safe literal-only helpers and common Dart SDK path sources, `avoid_null_assertion` skips typical `RegExpMatch.group(n)!` after a match, and `prefer_debug_print` stops recommending Flutter-only APIs in pure Dart packages. — [log](https://github.com/saropa/saropa_lints/blob/v12.3.3/CHANGELOG.md)
+Path-safety rules ignore clearly safe literal-only helpers and common Dart SDK path sources, `avoid_null_assertion` skips typical `RegExpMatch.group(n)!` after a match, and `prefer_debug_print` stops recommending Flutter-only APIs in pure Dart packages. [log](https://github.com/saropa/saropa_lints/blob/v12.3.3/CHANGELOG.md)
 
 ### Fixed
 
@@ -429,7 +441,7 @@ Path-safety rules ignore clearly safe literal-only helpers and common Dart SDK p
 
 ## [12.3.2]
 
-`saropa_lints` itself passes `dart analyze --fatal-infos` again thanks to dogfood-only disables and small plugin fixes; publish script gains a publish-existing-.vsix mode. — [log](https://github.com/saropa/saropa_lints/blob/v12.3.2/CHANGELOG.md)
+`saropa_lints` itself passes `dart analyze --fatal-infos` again thanks to dogfood-only disables and small plugin fixes; publish script gains a publish-existing-.vsix mode. [log](https://github.com/saropa/saropa_lints/blob/v12.3.2/CHANGELOG.md)
 
 ### Fixed
 
@@ -446,7 +458,7 @@ Path-safety rules ignore clearly safe literal-only helpers and common Dart SDK p
 
 ## [12.3.1]
 
-Hotfix: tier-based `scan` and similar flows no longer crash on the second file when rule packs merge into an unmodifiable tier set. — [log](https://github.com/saropa/saropa_lints/blob/v12.3.1/CHANGELOG.md)
+Hotfix: tier-based `scan` and similar flows no longer crash on the second file when rule packs merge into an unmodifiable tier set. [log](https://github.com/saropa/saropa_lints/blob/v12.3.1/CHANGELOG.md)
 
 ### Fixed
 
@@ -456,7 +468,7 @@ Hotfix: tier-based `scan` and similar flows no longer crash on the second file w
 
 ## [12.3.0]
 
-Windows vibrancy scans run again, footprint sizes reflect transitive packages, the analyzer plugin logs to `reports/.saropa_lints/plugin.log` and no longer goes silent when the server cwd differs from your project, the vibrancy report toolbar adds rescan / open-project / copy-all-json, and `prefer_listenable_builder` nudges `AnimatedBuilder` uses that should be `ListenableBuilder`. — [log](https://github.com/saropa/saropa_lints/blob/v12.3.0/CHANGELOG.md)
+Windows vibrancy scans run again, footprint sizes reflect transitive packages, the analyzer plugin logs to `reports/.saropa_lints/plugin.log` and no longer goes silent when the server cwd differs from your project, the vibrancy report toolbar adds rescan / open-project / copy-all-json, and `prefer_listenable_builder` nudges `AnimatedBuilder` uses that should be `ListenableBuilder`. [log](https://github.com/saropa/saropa_lints/blob/v12.3.0/CHANGELOG.md)
 
 ### Added
 
@@ -485,7 +497,7 @@ Windows vibrancy scans run again, footprint sizes reflect transitive packages, t
 
 ## [12.2.1]
 
-Publish script now verifies Marketplace and Open VSX separately, so an expired Marketplace token surfaces a concrete ACTION REQUIRED warning and auto-opens the manage page instead of a silent 0-exit. — [log](https://github.com/saropa/saropa_lints/blob/v12.2.1/CHANGELOG.md)
+Publish script now verifies Marketplace and Open VSX separately, so an expired Marketplace token surfaces a concrete ACTION REQUIRED warning and auto-opens the manage page instead of a silent 0-exit. [log](https://github.com/saropa/saropa_lints/blob/v12.2.1/CHANGELOG.md)
 
 <details>
 <summary>Maintenance</summary>
@@ -498,7 +510,7 @@ Publish script now verifies Marketplace and Open VSX separately, so an expired M
 
 ## [12.2.0]
 
-Letter grades replace fractional scores across the vibrancy report, tree, exports, and related UI, and footprint views clarify unique versus shared transitive size. Ten new quick fixes land for common style rules, plus two new Dart rules for symlink checks and JS interop migration. — [log](https://github.com/saropa/saropa_lints/blob/v12.2.0/CHANGELOG.md)
+Letter grades replace fractional scores across the vibrancy report, tree, exports, and related UI, and footprint views clarify unique versus shared transitive size. Ten new quick fixes land for common style rules, plus two new Dart rules for symlink checks and JS interop migration. [log](https://github.com/saropa/saropa_lints/blob/v12.2.0/CHANGELOG.md)
 
 ### Added
 
@@ -519,7 +531,7 @@ Letter grades replace fractional scores across the vibrancy report, tree, export
 
 ## [12.1.0]
 
-The vibrancy report adds a radial gauge, letter-grade badges, expandable per-package detail, keyboard navigation, and a Deps column that highlights shared transitives. — [log](https://github.com/saropa/saropa_lints/blob/v12.1.0/CHANGELOG.md)
+The vibrancy report adds a radial gauge, letter-grade badges, expandable per-package detail, keyboard navigation, and a Deps column that highlights shared transitives. [log](https://github.com/saropa/saropa_lints/blob/v12.1.0/CHANGELOG.md)
 
 ### Added
 
@@ -533,7 +545,7 @@ The vibrancy report adds a radial gauge, letter-grade badges, expandable per-pac
 
 ## [12.0.3]
 
-Package upgrade plans skip constraints you cannot bump via semver, show real resolver errors, and keep iterating after a single package fails. — [log](https://github.com/saropa/saropa_lints/blob/v12.0.3/CHANGELOG.md)
+Package upgrade plans skip constraints you cannot bump via semver, show real resolver errors, and keep iterating after a single package fails. [log](https://github.com/saropa/saropa_lints/blob/v12.0.3/CHANGELOG.md)
 
 ### Fixed
 
@@ -543,7 +555,7 @@ Package upgrade plans skip constraints you cannot bump via semver, show real res
 
 ## [12.0.2]
 
-Size Distribution splits unique versus shared transitives and adds “Exclude shared” so apparent package weight reflects deps you do not already carry. — [log](https://github.com/saropa/saropa_lints/blob/v12.0.2/CHANGELOG.md)
+Size Distribution splits unique versus shared transitives and adds “Exclude shared” so apparent package weight reflects deps you do not already carry. [log](https://github.com/saropa/saropa_lints/blob/v12.0.2/CHANGELOG.md)
 
 ### Added
 
@@ -553,7 +565,7 @@ Size Distribution splits unique versus shared transitives and adds “Exclude sh
 
 ## [12.0.1]
 
-Overview shows a Set Up Project banner and activation toast when `saropa_lints` is missing from `pubspec.yaml`, so onboarding is one click. — [log](https://github.com/saropa/saropa_lints/blob/v12.0.1/CHANGELOG.md)
+Overview shows a Set Up Project banner and activation toast when `saropa_lints` is missing from `pubspec.yaml`, so onboarding is one click. [log](https://github.com/saropa/saropa_lints/blob/v12.0.1/CHANGELOG.md)
 
 ### Changed
 
@@ -563,7 +575,7 @@ Overview shows a Set Up Project banner and activation toast when `saropa_lints` 
 
 ## [12.0.0]
 
-Analyzer 11 compatibility is restored so saropa_lints resolves on current Flutter stable (analyzer 12 required `meta` versions Flutter does not ship yet). Rule and quick-fix counts are unchanged from the prior release line. — [log](https://github.com/saropa/saropa_lints/blob/v12.0.0/CHANGELOG.md)
+Analyzer 11 compatibility is restored so saropa_lints resolves on current Flutter stable (analyzer 12 required `meta` versions Flutter does not ship yet). Rule and quick-fix counts are unchanged from the prior release line. [log](https://github.com/saropa/saropa_lints/blob/v12.0.0/CHANGELOG.md)
 
 ### Fixed
 
@@ -575,7 +587,7 @@ Analyzer 11 compatibility is restored so saropa_lints resolves on current Flutte
 
 ## [11.1.0]
 
-Ten new quick fixes cover library names, `late` patterns, `unawaited`, `toString`, `@useResult`, and positional booleans so more saropa rules are one-click fixable in the IDE. — [log](https://github.com/saropa/saropa_lints/blob/v11.1.0/CHANGELOG.md)
+Ten new quick fixes cover library names, `late` patterns, `unawaited`, `toString`, `@useResult`, and positional booleans so more saropa rules are one-click fixable in the IDE. [log](https://github.com/saropa/saropa_lints/blob/v11.1.0/CHANGELOG.md)
 
 ### Added
 
@@ -596,7 +608,7 @@ Ten new quick fixes cover library names, `late` patterns, `unawaited`, `toString
 
 ## [11.0.0]
 
-Extension Overview gains command search, embedded health and risk summaries, richer vibrancy package detail (logos, README shots, adoption bonus), unique-vs-shared dependency insight, File Risk workflow polish, and suppression records exported with violations for auditing. — [log](https://github.com/saropa/saropa_lints/blob/v11.0.0/CHANGELOG.md)
+Extension Overview gains command search, embedded health and risk summaries, richer vibrancy package detail (logos, README shots, adoption bonus), unique-vs-shared dependency insight, File Risk workflow polish, and suppression records exported with violations for auditing. [log](https://github.com/saropa/saropa_lints/blob/v11.0.0/CHANGELOG.md)
 
 ### Added
 
@@ -621,7 +633,7 @@ Extension Overview gains command search, embedded health and risk summaries, ric
 
 ## [10.12.2]
 
-Pubspec lines can opt out of specific saropa pubspec checks with inline comments, `prefer_l10n_yaml_config` stops false-positiveing split l10n setups, and vibrancy scan logging is calmer. — [log](https://github.com/saropa/saropa_lints/blob/v10.12.2/CHANGELOG.md)
+Pubspec lines can opt out of specific saropa pubspec checks with inline comments, `prefer_l10n_yaml_config` stops false-positiveing split l10n setups, and vibrancy scan logging is calmer. [log](https://github.com/saropa/saropa_lints/blob/v10.12.2/CHANGELOG.md)
 
 ### Added
 
@@ -636,7 +648,7 @@ Pubspec lines can opt out of specific saropa pubspec checks with inline comments
 
 ## [10.12.1]
 
-CI publish unblocked by removing a stray `publish_to: "none"` placeholder from the package manifest. — [log](https://github.com/saropa/saropa_lints/blob/v10.12.1/CHANGELOG.md)
+CI publish unblocked by removing a stray `publish_to: "none"` placeholder from the package manifest. [log](https://github.com/saropa/saropa_lints/blob/v10.12.1/CHANGELOG.md)
 
 ### Fixed
 
@@ -646,7 +658,7 @@ CI publish unblocked by removing a stray `publish_to: "none"` placeholder from t
 
 ## [10.12.0]
 
-Pubspec and adoption tooling see fewer false positives, diagnostics pick up a consistent `[saropa_lints]` prefix, plugin self-fire guards work per-file, Help hub and command catalog UX improve, and dependency sort preserves comments. — [log](https://github.com/saropa/saropa_lints/blob/v10.12.0/CHANGELOG.md)
+Pubspec and adoption tooling see fewer false positives, diagnostics pick up a consistent `[saropa_lints]` prefix, plugin self-fire guards work per-file, Help hub and command catalog UX improve, and dependency sort preserves comments. [log](https://github.com/saropa/saropa_lints/blob/v10.12.0/CHANGELOG.md)
 
 ### Fixed
 

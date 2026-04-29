@@ -1369,6 +1369,10 @@ class AvoidUnassignedLateFieldsRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
+      // ParentData fields are commonly initialized during the render/layout
+      // lifecycle rather than in constructors or regular methods.
+      if (_isRenderObjectParentDataClass(node)) return;
+
       final Set<String> assignedFields = <String>{};
       final Map<String, Token> lateFields = <String, Token>{};
 
@@ -1409,6 +1413,22 @@ class AvoidUnassignedLateFieldsRule extends SaropaLintRule {
     });
   }
 }
+
+bool _isRenderObjectParentDataClass(ClassDeclaration node) {
+  final ClassElement? classElement = node.declaredFragment?.element;
+  if (classElement == null) return false;
+
+  if (_isParentDataTypeName(classElement.name)) return true;
+
+  for (final InterfaceType supertype in classElement.allSupertypes) {
+    if (_isParentDataTypeName(supertype.element.name)) return true;
+  }
+
+  return false;
+}
+
+bool _isParentDataTypeName(String? typeName) =>
+    typeName == 'ParentData' || (typeName?.endsWith('ParentData') ?? false);
 
 /// Warns when late is used but field is assigned in constructor.
 ///

@@ -283,6 +283,102 @@ def run_analyze_only(mode: str, project_dir: Path) -> int | None:
     return ExitCode.SUCCESS.value if ok else ExitCode.ANALYSIS_FAILED.value
 
 
+def run_ci_fallback_mode(
+    mode: str,
+    project_dir: Path,
+    pubspec_path: Path,
+) -> int | None:
+    """If mode is ci_fallback, print manual publish fallback checklist and return.
+
+    This mode is intentionally read-only: it prints exact commands, URLs, and
+    file locations so a maintainer can publish when GitHub Actions publish
+    fails (for example flaky CI, Actions outage, token/scopes, or runner
+    regressions).
+    """
+    if mode != "ci_fallback":
+        return None
+
+    package_name = get_package_name(pubspec_path)
+    version = get_version_from_pubspec(pubspec_path)
+    repo_path = extract_repo_path(get_remote_url(project_dir))
+    tag_name = f"v{version}"
+    release_url = f"https://github.com/{repo_path}/releases/tag/{tag_name}"
+    actions_url = f"https://github.com/{repo_path}/actions"
+    tag_push_url = f"https://github.com/{repo_path}/actions/workflows/publish.yml"
+    pub_url = f"https://pub.dev/packages/{package_name}"
+    pub_score_url = f"https://pub.dev/packages/{package_name}/score"
+    ext_vsix = extension_vsix_path(project_dir, version)
+
+    print_header("CI FALLBACK PLAYBOOK (MANUAL RELEASE)")
+    print_warning(
+        "Use this when tag-triggered GitHub Actions publish fails."
+    )
+    print()
+
+    print_colored("  1) Verify local release state", Color.WHITE)
+    print_colored("      dart --version", Color.CYAN)
+    print_colored("      dart pub get", Color.CYAN)
+    print_colored("      dart analyze --fatal-infos", Color.CYAN)
+    print_colored("      dart test", Color.CYAN)
+    print_colored("      dart pub publish --dry-run", Color.CYAN)
+    print()
+
+    print_colored("  2) Publish package directly to pub.dev", Color.WHITE)
+    print_colored("      dart pub publish", Color.CYAN)
+    print_colored("      Package URL:", Color.DIM)
+    print_colored(f"        {pub_url}", Color.CYAN)
+    print_colored("      Score URL:", Color.DIM)
+    print_colored(f"        {pub_score_url}", Color.CYAN)
+    print()
+
+    print_colored("  3) Ensure tag + GitHub release exist", Color.WHITE)
+    print_colored(f"      git tag {tag_name}", Color.CYAN)
+    print_colored(f"      git push origin {tag_name}", Color.CYAN)
+    print_colored(
+        f"      gh release create {tag_name} --title \"Release {tag_name}\" --notes-file CHANGELOG.md",
+        Color.CYAN,
+    )
+    print_colored("      Release URL:", Color.DIM)
+    print_colored(f"        {release_url}", Color.CYAN)
+    print()
+
+    print_colored("  4) Extension fallback (if applicable)", Color.WHITE)
+    print_colored(
+        "      python scripts/publish.py   # choose: 6) Extension only",
+        Color.CYAN,
+    )
+    print_colored("      OR upload existing VSIX manually in Marketplace UI.", Color.CYAN)
+    print_colored("      Required file to upload:", Color.DIM)
+    if ext_vsix.is_file():
+        print_colored(f"        {ext_vsix}", Color.CYAN)
+    else:
+        print_colored(
+            f"        {ext_vsix}  (missing; run mode 6 to generate)",
+            Color.YELLOW,
+        )
+    print_colored("      Marketplace manage URL:", Color.DIM)
+    print_colored(f"        {MARKETPLACE_MANAGE_URL}", Color.CYAN)
+    publisher, ext_name = get_extension_identity(project_dir)
+    if publisher and ext_name:
+        print_colored("      Extension listing URLs:", Color.DIM)
+        print_colored(
+            f"        https://marketplace.visualstudio.com/items?itemName={publisher}.{ext_name}",
+            Color.CYAN,
+        )
+        print_colored(
+            f"        https://open-vsx.org/extension/{publisher}/{ext_name}",
+            Color.CYAN,
+        )
+    print()
+
+    print_colored("  5) CI triage URLs", Color.WHITE)
+    print_colored(f"      Actions: {actions_url}", Color.CYAN)
+    print_colored(f"      Publish workflow: {tag_push_url}", Color.CYAN)
+    print()
+    print_info("Fallback playbook printed. No files changed.")
+    return ExitCode.SUCCESS.value
+
+
 def _verify_marketplace_and_ovsx(
     project_dir: Path,
     version: str,

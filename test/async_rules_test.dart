@@ -335,6 +335,9 @@ void main() {
       expect(source, contains('// expect_lint: avoid_redundant_await'));
       expect(source, contains('_DelegatingFuture'));
       expect(source, contains('goodImplementsFuture'));
+      expect(source, contains('goodAnimationControllerAwaits'));
+      expect(source, contains('await controller.forward();'));
+      expect(source, contains('await controller.reverse();'));
     });
   });
 

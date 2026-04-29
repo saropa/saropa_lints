@@ -198,3 +198,33 @@ class _GoodAssignment extends State<MyWidget>
     return const Text('x');
   }
 }
+
+// ─── GOOD: child widget read remains live when instantiated inside a listening
+//          builder callback. Parent AnimatedBuilder re-runs subtree per tick. ─
+
+class _GoodAnimatedBuilderChildReads extends State<MyWidget>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _opacityAnimation;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (BuildContext context, Widget? _) => _GoodDisplayWidget(
+        opacityAnimation: _opacityAnimation,
+      ),
+    );
+  }
+}
+
+class _GoodDisplayWidget extends StatelessWidget {
+  const _GoodDisplayWidget({required this.opacityAnimation});
+
+  final Animation<double> opacityAnimation;
+
+  @override
+  Widget build(BuildContext context) {
+    return Opacity(opacity: opacityAnimation.value, child: const Text('x'));
+  }
+}

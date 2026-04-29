@@ -12,7 +12,7 @@ through an interactive, step-by-step pipeline.
 python scripts/publish.py
 ```
 
-No flags. Prompts for one of six modes:
+No flags. Prompts for one of eight modes:
 
 | # | Mode | What it does |
 |---|------|--------------|
@@ -22,6 +22,8 @@ No flags. Prompts for one of six modes:
 | 4 | Skip audit | Full publish minus the audit step |
 | 5 | Analyze only | Run `dart analyze`, write log, exit |
 | 6 | Extension only | Package .vsix, optionally publish to stores |
+| 7 | Publish existing .vsix | Publish newest `extension/*.vsix` without re-packaging |
+| 8 | CI fallback playbook | Print manual release commands, URLs, and upload file paths |
 
 ## Architecture
 

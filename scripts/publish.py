@@ -128,6 +128,7 @@ from scripts.modules._publish_workflow import (
     build_publish_context,
     print_package_banner,
     run_analyze_only,
+    run_ci_fallback_mode,
     run_extension_only_mode,
     run_fix_docs_mode,
     run_full_publish,
@@ -137,7 +138,7 @@ from scripts.modules._publish_workflow import (
 
 
 def _prompt_publish_mode() -> str:
-    """Ask user for run mode via interactive menu (1-7)."""
+    """Ask user for run mode via interactive menu (1-8)."""
     print_header("PUBLISH OPTIONS")
     print(
         "  1) Full publish (audit \u2192 format \u2192 analysis \u2192 tests \u2192 version \u2192 release)"
@@ -148,6 +149,7 @@ def _prompt_publish_mode() -> str:
     print("  5) Analyze only (run dart analyze, write log; then exit)")
     print("  6) Extension only (package .vsix, optionally publish to Marketplace/Open VSX)")
     print("  7) Publish existing .vsix (skip packaging; newest in extension/)")
+    print("  8) CI fallback playbook (manual publish URLs, commands, upload files)")
     try:
         raw = input("  Choice [1]: ").strip() or "1"
         n = int(raw)
@@ -163,6 +165,8 @@ def _prompt_publish_mode() -> str:
             return "extension_only"
         if n == 7:
             return "publish_existing_vsix"
+        if n == 8:
+            return "ci_fallback"
     except (ValueError, EOFError, KeyboardInterrupt):
         pass
     return "full"
@@ -175,7 +179,7 @@ def main(
     """Run publish workflow. Returns exit code (0 = success).
 
     Args:
-        mode: 'full' | 'audit_only' | 'fix_docs' | 'full_skip_audit' | 'analyze_only' | 'extension_only'.
+        mode: 'full' | 'audit_only' | 'fix_docs' | 'full_skip_audit' | 'analyze_only' | 'extension_only' | 'publish_existing_vsix' | 'ci_fallback'.
               If None, prompts the user interactively (after displaying the logo so
               the Saropa brand always appears first — see "logo ALWAYS first" rule).
         output_level: Verbosity level (defaults to VERBOSE).
@@ -198,6 +202,7 @@ def main(
     # Early exits for alternative modes
     for handler in (
         lambda: run_analyze_only(mode, project_dir),
+        lambda: run_ci_fallback_mode(mode, project_dir, pubspec_path),
         lambda: run_extension_only_mode(mode, project_dir, pubspec_path),
         lambda: run_publish_existing_vsix_mode(mode, project_dir),
         lambda: run_fix_docs_mode(mode, project_dir),

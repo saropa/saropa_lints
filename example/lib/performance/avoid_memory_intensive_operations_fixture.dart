@@ -127,3 +127,26 @@ void _good800() {
 
   final result = buffer.toString();
 }
+
+// GOOD: Numeric accumulation in loops should not be treated as string concat.
+void _good800_numericAccumulation() {
+  double maxScrollObstructionExtent = 0;
+  final children = <dynamic>[
+    _GeometryHolder(const _Geometry(1)),
+    _GeometryHolder(const _Geometry(2)),
+  ];
+
+  for (final child in children) {
+    maxScrollObstructionExtent += child.geometry.maxScrollObstructionExtent;
+  }
+}
+
+class _GeometryHolder {
+  _GeometryHolder(this.geometry);
+  final _Geometry geometry;
+}
+
+class _Geometry {
+  const _Geometry(this.maxScrollObstructionExtent);
+  final double maxScrollObstructionExtent;
+}
