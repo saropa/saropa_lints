@@ -2,6 +2,8 @@ import * as assert from 'assert';
 import * as vscode from 'vscode';
 import { ContextState } from '../../../vibrancy/state/context-state';
 
+/** Context key toggles and command execution wiring for vibrancy UI state. */
+
 describe('ContextState', () => {
     const testKey = 'test.contextState';
     let executedCommands: { id: string; args: any[] }[] = [];

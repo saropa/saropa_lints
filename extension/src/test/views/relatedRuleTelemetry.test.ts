@@ -1,6 +1,8 @@
 import * as assert from 'node:assert';
 import { createRelatedRuleTelemetry } from '../../relatedRuleTelemetry';
 
+/** Related-rule telemetry store: memento-backed increment and snapshot shape. */
+
 class MockMemento {
   private readonly store = new Map<string, unknown>();
 

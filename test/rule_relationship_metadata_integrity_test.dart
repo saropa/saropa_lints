@@ -1,6 +1,8 @@
 import 'package:saropa_lints/saropa_lints.dart';
 import 'package:test/test.dart';
 
+// Rule graph metadata: related_to / supersedes references must point at real rules.
+
 void main() {
   group('Rule relationship metadata integrity', () {
     final rules = allSaropaRules;

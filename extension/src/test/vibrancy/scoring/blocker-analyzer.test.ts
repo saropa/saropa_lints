@@ -4,6 +4,8 @@ import {
 } from '../../../vibrancy/scoring/blocker-analyzer';
 import { PubOutdatedEntry, DepEdge, VibrancyResult } from '../../../vibrancy/types';
 
+/** Blocker analyzer: upgrade status and dependency graph blockers for vibrancy. */
+
 function makeEntry(overrides: Partial<PubOutdatedEntry> & { package: string }): PubOutdatedEntry {
     return {
         current: '1.0.0',

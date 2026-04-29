@@ -4,6 +4,8 @@ import {
     getCategoryIndicator, getIndicator, formatIndicator,
 } from '../../../vibrancy/services/indicator-config';
 
+/** Tree/status indicator strings from workspace config + defaults. */
+
 describe('indicator-config', () => {
     beforeEach(() => {
         clearIndicatorCache();

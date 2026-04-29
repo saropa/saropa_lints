@@ -4,6 +4,8 @@ import { escapeHtml } from './html-utils';
 import { isWinnerForDimension } from '../scoring/comparison-ranker';
 import { CATEGORY_DICTIONARY, scoreToGrade } from '../category-dictionary';
 
+/** Self-contained HTML/CSS for the package comparison panel inside vibrancy webviews. */
+
 function getComparisonStyles(): string {
     return `
         body {

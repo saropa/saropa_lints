@@ -2,6 +2,8 @@ import * as assert from 'assert';
 import { generateSbom, serializeSbom, SbomMetadata } from '../../../vibrancy/services/sbom-generator';
 import { VibrancyResult } from '../../../vibrancy/types';
 
+/** SBOM generation and serialization from vibrancy scan rows. */
+
 function makeResult(
     name: string,
     overrides: Partial<VibrancyResult> = {},

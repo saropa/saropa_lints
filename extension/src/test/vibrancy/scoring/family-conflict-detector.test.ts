@@ -2,6 +2,8 @@ import * as assert from 'assert';
 import { detectFamilySplits } from '../../../vibrancy/scoring/family-conflict-detector';
 import { VibrancyResult } from '../../../vibrancy/types';
 
+/** Family conflict detection when multiple packages share a logical family name. */
+
 function makeResult(
     name: string,
     version: string,

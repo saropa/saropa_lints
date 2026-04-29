@@ -1,6 +1,8 @@
 import 'package:saropa_lints/src/config/rule_packs.dart';
 import 'package:test/test.dart';
 
+// Ensures rule pack SDK gates (e.g. dart_sdk_3_2) match pubspec environment constraints.
+
 void main() {
   group('packPassesSdkGate', () {
     test('dart_sdk_3_2 passes when sdk lower bound is >= 3.2.0', () {

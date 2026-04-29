@@ -2,6 +2,8 @@ import 'package:saropa_lints/src/saropa_lint_rule.dart'
     show DiagnosticDedupTracker;
 import 'package:test/test.dart';
 
+// DiagnosticDedupTracker: suppress duplicate diagnostics for same rule/location.
+
 void main() {
   group('DiagnosticDedupTracker', () {
     test('dedups same rule/file/offset', () {

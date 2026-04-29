@@ -2,6 +2,8 @@ import * as assert from 'assert';
 import * as vscode from 'vscode';
 import { VibrancyCodeActionProvider } from '../../../vibrancy/providers/code-action-provider';
 
+/** Code actions from vibrancy diagnostics (e.g. EOL package hints on pubspec). */
+
 function makeMockDocument(): vscode.TextDocument {
     return {
         uri: vscode.Uri.file('/test/pubspec.yaml'),

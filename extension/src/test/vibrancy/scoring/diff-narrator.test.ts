@@ -2,6 +2,8 @@ import * as assert from 'assert';
 import { summarizeDiff, narrateDiff } from '../../../vibrancy/scoring/diff-narrator';
 import { LockDiff } from '../../../vibrancy/services/lock-diff';
 
+/** Human-readable summaries for pubspec.lock diffs (add/remove/upgrade). */
+
 function makeDiff(overrides: Partial<LockDiff> = {}): LockDiff {
     return {
         added: [],

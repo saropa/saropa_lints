@@ -3,6 +3,8 @@ import 'dart:convert' show jsonDecode;
 import 'package:saropa_lints/saropa_lints.dart';
 import 'package:test/test.dart';
 
+// RuleTimingTracker JSON shape for perf telemetry export.
+
 void main() {
   group('RuleTimingTracker JSON contract', () {
     setUp(() {

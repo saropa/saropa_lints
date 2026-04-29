@@ -1,5 +1,7 @@
 import 'package:saropa_lints/src/saropa_lint_rule.dart';
 
+/// One lint finding (file, line, column, rule id, message) for reporters and the extension.
+
 class Violation {
   Violation({
     required this.file,

@@ -9,6 +9,8 @@ interface PackageJsonView {
   when?: string;
 }
 
+/** package.json: Project Vibrancy sidebar view id and visibility clauses. */
+
 function loadPackageJsonViews(): PackageJsonView[] {
   const pkgPath = path.resolve(__dirname, '..', '..', '..', 'package.json');
   const raw = fs.readFileSync(pkgPath, 'utf-8');

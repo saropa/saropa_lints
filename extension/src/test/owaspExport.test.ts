@@ -2,6 +2,8 @@ import * as assert from 'node:assert';
 import { generateOwaspReport } from '../owaspExport';
 import type { ViolationsData } from '../violationsReader';
 
+/** OWASP-oriented Markdown export from violations snapshot (suppressions section). */
+
 describe('generateOwaspReport', () => {
   it('includes suppression governance with security-related suppressions', () => {
     const data: ViolationsData = {

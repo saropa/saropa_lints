@@ -1,6 +1,8 @@
 import 'package:saropa_lints/src/config/analysis_options_rule_packs.dart';
 import 'package:test/test.dart';
 
+// analysis_options rule_packs enabled list parsing and serialization.
+
 void main() {
   group('parseRulePacksEnabledList', () {
     test('parses enabled ids', () {

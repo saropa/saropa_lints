@@ -1,6 +1,8 @@
 import * as vscode from 'vscode';
 import { RuleMetadataData, Violation } from './violationsReader';
 
+/** Memento-backed review state (open / safe / fixed) for security-hotspot fingerprints. */
+
 export type SecurityHotspotReviewState = 'open' | 'reviewed-safe' | 'reviewed-fixed';
 
 interface StoredSecurityHotspotReviewState {

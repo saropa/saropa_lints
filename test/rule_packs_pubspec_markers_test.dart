@@ -1,6 +1,8 @@
 import 'package:saropa_lints/src/config/rule_packs.dart';
 import 'package:test/test.dart';
 
+// rule_packs: pubspec marker keys align with pack ids for detection.
+
 void main() {
   test('every pack id has a pubspec markers map entry', () {
     expect(

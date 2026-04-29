@@ -1,6 +1,8 @@
 import * as assert from 'node:assert';
 import { formatAge } from '../../views/fileRiskTree';
 
+/** fileRiskTree formatAge: relative labels and stale threshold for file-risk tree. */
+
 describe('formatAge', () => {
   it('returns "just now" for timestamps less than 60 seconds old', () => {
     const recent = new Date(Date.now() - 30_000).toISOString();

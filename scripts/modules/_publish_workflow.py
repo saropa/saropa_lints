@@ -74,6 +74,7 @@ from scripts.modules._rule_metrics import (
 from scripts.modules._extension_publish import (
     MARKETPLACE_MANAGE_URL,
     extension_exists,
+    extension_vsix_path,
     get_extension_identity,
     install_extension,
     package_extension,
@@ -179,6 +180,7 @@ def print_success_banner(
     package_name: str, version: str, repo_path: str,
     publisher: str, extension_name: str,
     extension_published: bool,
+    extension_vsix_relative: str | None = None,
 ) -> None:
     """Print final success banner with pub.dev, CI, release, and store URLs plus pubspec snippet."""
     print_colored(
@@ -186,6 +188,12 @@ def print_success_banner(
         Color.GREEN,
     )
     print()
+    if extension_vsix_relative:
+        print_colored(
+            f"      VSIX:         {extension_vsix_relative}",
+            Color.CYAN,
+        )
+        print()
     print_colored(
         f"      Package:      https://pub.dev/packages/{package_name}",
         Color.CYAN,
@@ -712,40 +720,44 @@ def run_version_bump(
 
 def run_extension_after_publish(
     project_dir: Path, version: str, timer: StepTimer,
-) -> Path | None:
-    """Package .vsix, optionally install and publish.
+) -> tuple[Path | None, bool]:
+    """Package extension/saropa-lints-{version}.vsix, optionally install and publish.
+
+    When ``extension/`` exists, full publish **must** leave that exact filename
+    on disk before the workflow can succeed; otherwise this exits with an error.
 
     Returns:
-        Path to the .vsix when the extension was published to stores,
-        otherwise None. The path is used by the downstream store-verification
-        step to tell the user which file to upload manually if Marketplace
-        propagation fails.
+        ``(vsix_path, published_to_stores)``. ``vsix_path`` is ``None`` only when
+        there is no extension directory. ``published_to_stores`` is True only if
+        Marketplace/Open VSX publish succeeded.
     """
     if not extension_exists(project_dir):
-        return None
+        return None, False
     with timer.step("Extension"):
-        vsix = package_extension(project_dir, version)
-        if not vsix:
-            print_warning(
-                "Extension packaging failed — .vsix was not created. "
-                "Check compile errors above."
+        package_extension(project_dir, version)
+        expected = extension_vsix_path(project_dir, version)
+        if not expected.is_file():
+            exit_with_error(
+                "Full publish requires extension/"
+                f"{expected.name} (run vsce package successfully). "
+                "Fix compile or packaging errors and re-run.",
+                ExitCode.VALIDATION_FAILED,
             )
-            return None
         if not _prompt_extension_install_and_publish(
-            vsix,
+            expected,
             skip_publish_msg=(
                 "Extension NOT published to Marketplace. "
                 "Run option 6 (extension only) to publish later."
             ),
         ):
-            return None
-        if publish_extension(project_dir, vsix):
-            return vsix
+            return expected, False
+        if publish_extension(project_dir, expected):
+            return expected, True
         print_warning(
             "Extension publish to Marketplace/Open VSX failed. "
             "Check output above for details."
         )
-        return None
+        return expected, False
 
 
 # =============================================================================
@@ -768,6 +780,7 @@ def run_full_publish(
     version = ctx.pubspec_version
     succeeded = False
     extension_published = False
+    published_vsix: Path | None = None
 
     try:
         code = run_audit_step(
@@ -821,10 +834,9 @@ def run_full_publish(
             ctx.branch,
             timer,
         )
-        published_vsix = run_extension_after_publish(
+        published_vsix, extension_published = run_extension_after_publish(
             ctx.project_dir, version, timer,
         )
-        extension_published = published_vsix is not None
 
         # FINAL STEP: consolidated store availability check.
         # Runs both pub.dev and (when applicable) Marketplace/Open VSX
@@ -857,6 +869,9 @@ def run_full_publish(
     if succeeded:
         repo_path = extract_repo_path(ctx.remote_url)
         publisher, ext_name = get_extension_identity(ctx.project_dir)
+        vsix_rel: str | None = None
+        if published_vsix is not None:
+            vsix_rel = str(published_vsix.relative_to(ctx.project_dir))
         print_success_banner(
             ctx.package_name,
             version,
@@ -864,5 +879,6 @@ def run_full_publish(
             publisher,
             ext_name,
             extension_published,
+            extension_vsix_relative=vsix_rel,
         )
     return ExitCode.SUCCESS.value

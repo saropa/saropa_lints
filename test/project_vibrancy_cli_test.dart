@@ -5,6 +5,8 @@ import 'package:path/path.dart' as p;
 import 'package:saropa_lints/src/cli/project_vibrancy.dart';
 import 'package:test/test.dart';
 
+// Exercises project_vibrancy CLI on temp workspaces (coverage JSON, pubspec, synthetic Dart).
+
 void main() {
   group('project vibrancy mvp', () {
     late Directory tempDir;

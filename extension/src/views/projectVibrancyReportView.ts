@@ -3,6 +3,8 @@ import { getProjectRoot } from '../projectRoot';
 import { runProjectVibrancyScan } from './projectVibrancyCliRunner';
 import type { ProjectVibrancyPayload } from './projectVibrancyTypes';
 
+/** Full editor-column HTML report using the same CLI scan output as the sidebar vibrancy view. */
+
 let currentPanel: vscode.WebviewPanel | undefined;
 let lastReportRawStdout = '';
 

@@ -3,6 +3,8 @@ import * as sinon from 'sinon';
 import { MockSecretStorage } from '../vscode-mock';
 import { RegistryService } from '../../../vibrancy/services/registry-service';
 
+/** VS Code commands for private registry URL capture and secret storage. */
+
 describe('Registry Commands', () => {
     let secretStorage: MockSecretStorage;
     let service: RegistryService;

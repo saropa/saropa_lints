@@ -2,6 +2,8 @@ import * as assert from 'assert';
 import { MockSecretStorage } from '../vscode-mock';
 import { RegistryService } from '../../../vibrancy/services/registry-service';
 
+/** Private registry URL resolution and secret storage lifecycle. */
+
 describe('RegistryService', () => {
     let secretStorage: MockSecretStorage;
     let service: RegistryService;

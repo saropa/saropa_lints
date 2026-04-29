@@ -4,6 +4,8 @@ import 'package:saropa_lints/src/init/cli_args.dart';
 import 'package:saropa_lints/src/init/composite_plugin_scaffold.dart';
 import 'package:test/test.dart';
 
+// composite_plugin_scaffold: emitted custom_lint plugin package layout on disk.
+
 void main() {
   test('emitCompositePluginScaffold writes plugin package files', () {
     final dir = Directory.systemTemp.createTempSync('saropa_composite_');

@@ -7,6 +7,8 @@ import {
   writeRulePacksEnabled,
 } from '../../rulePacks/rulePackYaml';
 
+/** analysis_options rule_packs enabled list read/write round-trips. */
+
 describe('rulePackYaml', () => {
   it('parseRulePacksEnabled reads enabled list', () => {
     const yaml = `

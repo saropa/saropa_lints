@@ -4,6 +4,8 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:saropa_lints/src/rules/widget/flutter_migration_widget_detection.dart';
 import 'package:test/test.dart';
 
+// Parses synthetic Flutter widget sources and asserts flutter_migration_widget_detection visitors.
+
 CompilationUnit _parse(String code) => parseString(content: code).unit;
 
 ClassDeclaration _singleClass(CompilationUnit unit) {

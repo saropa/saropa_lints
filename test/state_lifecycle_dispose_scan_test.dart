@@ -5,6 +5,8 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:saropa_lints/src/rules/widget/state_lifecycle_dispose_scan.dart';
 import 'package:test/test.dart';
 
+// state_lifecycle_dispose_scan: whether tracked fields are disposed in State.dispose.
+
 void main() {
   group('isTrackedFieldDisposedInStateLifecycle', () {
     test('local alias then dispose in dispose() — disposed', () {

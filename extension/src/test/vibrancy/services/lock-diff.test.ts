@@ -1,6 +1,8 @@
 import * as assert from 'assert';
 import { diffVersionMaps } from '../../../vibrancy/services/lock-diff';
 
+/** Version map diff: added, removed, upgraded, downgraded package sets. */
+
 describe('lock-diff', () => {
     describe('diffVersionMaps', () => {
         it('should detect added packages', () => {

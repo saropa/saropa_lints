@@ -4,6 +4,8 @@ import * as vscode from 'vscode';
 import { setTestConfig, clearTestConfig, resetMocks } from '../vscode-mock';
 import { SaveTaskRunner } from '../../../vibrancy/services/save-task-runner';
 
+/** Debounced save listener that runs vibrancy refresh after pubspec edits. */
+
 describe('save-task-runner', () => {
     let sandbox: sinon.SinonSandbox;
 

@@ -5,6 +5,8 @@ import * as path from 'node:path';
 import { appendSnapshot, backfillFromLegacyReports, getPackageTrend, readHistory } from '../../../vibrancy/services/vibrancy-history';
 import { VibrancyResult } from '../../../vibrancy/types';
 
+/** On-disk vibrancy history: append, read trends, legacy backfill. */
+
 function makeResult(
     name: string,
     version: string,

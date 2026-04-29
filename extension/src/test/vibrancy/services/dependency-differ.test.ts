@@ -1,6 +1,8 @@
 import * as assert from 'assert';
 import { hasDependencyChanges, getDependencyChangeSummary } from '../../../vibrancy/services/dependency-differ';
 
+/** Pubspec dependency diff: add/remove/constraint changes between two YAML bodies. */
+
 describe('dependency-differ', () => {
     describe('hasDependencyChanges', () => {
         it('should detect added dependency', () => {

@@ -1,6 +1,8 @@
 import * as assert from 'assert';
 import { parseStableReleases } from '../../../vibrancy/services/flutter-releases';
 
+/** Flutter SDK releases JSON: stable-only filter and ordering. */
+
 describe('flutter-releases', () => {
     describe('parseStableReleases', () => {
         it('should filter to stable channel only', () => {

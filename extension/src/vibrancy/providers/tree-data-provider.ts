@@ -20,6 +20,8 @@ import { arePrereleasesEnabled, getPrereleaseTagFilter } from '../ui/prerelease-
 import { VibrancyFilterManager, VibrancyFilterState, VibrancyViewMode } from './vibrancy-filter-state';
 import { ProblemSeverity, ProblemType } from '../problems/problem-types';
 
+/** Builds the Project Vibrancy explorer tree from scan results, overrides, and problem actions. */
+
 type TreeNode =
     | PackageItem | GroupItem | DetailItem | SourceCodeItem
     | SuppressedGroupItem | FamilyConflictGroupItem | FamilySplitItem

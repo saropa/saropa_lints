@@ -5,6 +5,8 @@ import {
     RawOpenIssue,
 } from '../../../vibrancy/scoring/issue-signals';
 
+/** Text heuristics for issue/changelog signals (deprecated, obsolete, breaking, etc.). */
+
 describe('issue-signals', () => {
     describe('detectIssueSignals', () => {
         it('should detect deprecated keyword', () => {

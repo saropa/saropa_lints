@@ -3,6 +3,8 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:saropa_lints/src/element_identifier_utils.dart';
 import 'package:test/test.dart';
 
+// element_identifier_utils: AST identifier to element without full resolution.
+
 void main() {
   group('elementFromAstIdentifier', () {
     test('returns null for null id', () {

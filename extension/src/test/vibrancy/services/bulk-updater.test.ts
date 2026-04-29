@@ -3,6 +3,8 @@ import { resetMocks, messageMock, setTestConfig, clearTestConfig } from '../vsco
 import { getUpdatablePackages, formatFilterLabel, UpdateEntry } from '../../../vibrancy/services/bulk-updater';
 import { VibrancyResult } from '../../../vibrancy/types';
 
+/** Bulk updater: which packages are safe to bump from scan results and filter labels. */
+
 describe('bulk-updater', () => {
     beforeEach(() => {
         resetMocks();

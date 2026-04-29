@@ -4,6 +4,8 @@ import { CacheEntry } from '../types';
 const DEFAULT_TTL_MS = 24 * 60 * 60 * 1000;
 const KEY_PREFIX = 'spv.';
 
+/** Typed get/set with TTL over vscode.Memento for vibrancy scan snapshots. */
+
 export class CacheService {
     constructor(
         private readonly _state: vscode.Memento,

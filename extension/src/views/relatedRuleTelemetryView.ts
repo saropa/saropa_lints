@@ -4,6 +4,8 @@ import type {
   TelemetryStore,
 } from '../relatedRuleTelemetry';
 
+/** Webview panel: renders related-rule telemetry snapshot as HTML rows. */
+
 let currentPanel: vscode.WebviewPanel | undefined;
 
 function escapeHtml(text: string): string {

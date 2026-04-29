@@ -3,6 +3,8 @@ import { getProjectRoot } from '../projectRoot';
 import { runProjectVibrancyScan } from './projectVibrancyCliRunner';
 import type { ProjectVibrancyPayload } from './projectVibrancyTypes';
 
+/** Sidebar webview: runs the vibrancy CLI, renders JSON payload HTML, handles refresh and messages. */
+
 export const PROJECT_VIBRANCY_VIEW_ID = 'saropaLints.projectVibrancy';
 
 export class ProjectVibrancySidebarProvider implements vscode.WebviewViewProvider {

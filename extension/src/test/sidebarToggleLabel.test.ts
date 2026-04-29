@@ -2,6 +2,8 @@ import * as assert from 'node:assert';
 import { formatSidebarToggleLabel } from '../sidebarToggleLabel';
 import { buildStatusBarLabel } from '../statusBarLabel';
 
+/** Sidebar activity-bar labels with optional issue counts (finite / NaN edge cases). */
+
 describe('formatSidebarToggleLabel', () => {
     it('returns base label when count is undefined', () => {
         assert.strictEqual(formatSidebarToggleLabel('Package Vibrancy', undefined), 'Package Vibrancy');

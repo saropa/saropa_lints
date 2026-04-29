@@ -10,6 +10,8 @@ import {
 
 const fixturesDir = path.join(__dirname, '..', '..', '..', 'src', 'test', 'fixtures');
 
+/** Pubspec/lock YAML parsing: ranges, overrides, and fixture-driven edge cases. */
+
 describe('pubspec-parser', () => {
     let yamlContent: string;
     let lockContent: string;

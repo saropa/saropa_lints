@@ -13,6 +13,8 @@ import * as pubspecReader from '../../pubspecReader';
 import * as setup from '../../setup';
 import { messageMock, resetMocks, envMock } from '../vibrancy/vscode-mock';
 
+/** Cross-file analyzer commands: registration, workspace root, and setup hooks (mocked). */
+
 function makeContext(): vscode.ExtensionContext {
   return { subscriptions: [] } as unknown as vscode.ExtensionContext;
 }

@@ -1,6 +1,8 @@
 import 'package:saropa_lints/src/cli/project_vibrancy_coverage_quality.dart';
 import 'package:test/test.dart';
 
+// project_vibrancy_coverage_quality: test-vs-prod staleness heuristics.
+
 void main() {
   group('computeTestDriftFlag', () {
     test('flags when prod is 1–30d old and tests are stale enough', () {

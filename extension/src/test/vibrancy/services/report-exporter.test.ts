@@ -3,6 +3,8 @@ import { VibrancyResult, VibrancyCategory } from '../../../vibrancy/types';
 import { ReportMetadata } from '../../../vibrancy/services/report-exporter';
 import { countByCategory } from '../../../vibrancy/scoring/status-classifier';
 
+/** Report exporter metadata and category rollups from vibrancy results. */
+
 function makeResult(overrides: Partial<VibrancyResult> = {}): VibrancyResult {
     return {
         package: { name: 'test_pkg', version: '1.0.0', constraint: '^1.0.0', source: 'hosted', isDirect: true, section: 'dependencies' },

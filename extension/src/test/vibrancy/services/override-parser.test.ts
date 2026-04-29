@@ -9,6 +9,8 @@ import {
 
 const fixturesDir = path.join(__dirname, '..', '..', '..', 'src', 'test', 'fixtures');
 
+/** dependency_overrides section parsing and range finding in pubspec YAML. */
+
 describe('override-parser', () => {
     let yamlWithOverrides: string;
 

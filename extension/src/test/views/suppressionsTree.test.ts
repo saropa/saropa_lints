@@ -7,6 +7,8 @@ import * as projectRoot from '../../projectRoot';
 import * as violationsReader from '../../violationsReader';
 import * as configWriter from '../../configWriter';
 
+/** Suppressions tree: disabled rules and inline ignores from violations + config. */
+
 describe('SuppressionsTreeProvider', () => {
   beforeEach(() => {
     sinon.stub(projectRoot, 'getProjectRoot').returns('/fake/root');

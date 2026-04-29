@@ -1,6 +1,8 @@
 import * as assert from 'assert';
 import { RULE_PACK_DEFINITIONS, isPackDetected } from '../../rulePacks/rulePackDefinitions';
 
+/** Static pack definitions vs pubspec environment (SDK / Flutter gates). */
+
 function def(id: string) {
   const match = RULE_PACK_DEFINITIONS.find((d) => d.id === id);
   assert.ok(match, `missing pack definition for ${id}`);

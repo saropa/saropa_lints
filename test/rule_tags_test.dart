@@ -1,6 +1,8 @@
 import 'package:saropa_lints/src/rule_tags.dart';
 import 'package:test/test.dart';
 
+// rule_tags: canonical tag strings for OWASP / category groupings.
+
 void main() {
   group('rule tags', () {
     test('canonicalizeRuleTag normalizes aliases', () {

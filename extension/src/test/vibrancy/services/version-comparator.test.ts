@@ -8,6 +8,8 @@ import {
 import { VibrancyResult } from '../../../vibrancy/types';
 import * as pubDevApi from '../../../vibrancy/services/pub-dev-api';
 
+/** Version comparator: watch list, detect new versions vs memento/cache, pub.dev interaction. */
+
 describe('version-comparator', () => {
     let memento: MockMemento;
     let cache: CacheService;

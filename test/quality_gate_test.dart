@@ -3,6 +3,8 @@ import 'dart:io' show Directory, File;
 import 'package:saropa_lints/src/report/quality_gate.dart';
 import 'package:test/test.dart';
 
+// Quality gate YAML evaluation: operators, metrics, and temp-file config loading.
+
 void main() {
   late Directory tempDir;
 

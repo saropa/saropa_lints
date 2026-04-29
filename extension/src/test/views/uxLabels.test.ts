@@ -26,6 +26,8 @@ interface PackageJsonShape {
   };
 }
 
+/** package.json contributes: view names, commands, welcome copy (UX contract). */
+
 function loadPackageJson(): PackageJsonShape {
   const pkgPath = path.resolve(__dirname, '..', '..', '..', 'package.json');
   return JSON.parse(fs.readFileSync(pkgPath, 'utf8')) as PackageJsonShape;

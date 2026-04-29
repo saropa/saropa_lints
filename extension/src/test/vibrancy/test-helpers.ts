@@ -1,5 +1,7 @@
 import { VibrancyResult, VibrancyCategory, DependencySection } from '../../vibrancy/types';
 
+/** Shared minimal VibrancyResult builders for vibrancy unit tests. */
+
 export interface MakeResultOptions {
     readonly name?: string;
     readonly version?: string;

@@ -7,6 +7,8 @@ import {
   sdkPackRiskKind,
 } from '../../rulePacks/rulePacksWebviewProvider';
 
+/** Rule pack webview: tier chips, SDK row ordering, dashboard stats helpers. */
+
 describe('rulePacksWebviewProvider dashboard helpers', () => {
   it('computes enabled and detected pack/rule totals', () => {
     const stats = computePackDashboardStats([

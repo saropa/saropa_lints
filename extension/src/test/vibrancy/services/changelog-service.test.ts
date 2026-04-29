@@ -13,6 +13,8 @@ import {
 
 const fixturesDir = path.join(__dirname, '..', '..', '..', 'src', 'test', 'fixtures');
 
+/** Changelog-service: version compare, constraint checks, parse/fetch, and update info builders. */
+
 describe('changelog-service', () => {
     describe('compareVersions', () => {
         it('should return up-to-date for equal versions', () => {

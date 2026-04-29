@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
+// Scans test/*.dart for absurd expect() anti-patterns; writes optional JSON report; non-zero if found.
+
 void main(List<String> args) {
   final outputPath = _parseOutputPath(args);
   final report = _buildReport();

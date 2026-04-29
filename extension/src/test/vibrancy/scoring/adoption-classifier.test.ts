@@ -1,6 +1,8 @@
 import * as assert from 'assert';
 import { classifyAdoption, AdoptionInput } from '../../../vibrancy/scoring/adoption-classifier';
 
+/** Pub.dev adoption signals (points, publisher, discontinued) into vibrancy labels. */
+
 function makeInput(overrides: Partial<AdoptionInput> = {}): AdoptionInput {
     return {
         pubPoints: 0,

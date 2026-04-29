@@ -3,6 +3,8 @@ import {
     classifyLicense, licenseEmoji, LicenseTier,
 } from '../../../vibrancy/scoring/license-classifier';
 
+/** SPDX-ish license strings to permissive / weak-copyleft / strong-copyleft tiers. */
+
 describe('license-classifier', () => {
     describe('classifyLicense', () => {
         it('should classify MIT as permissive', () => {

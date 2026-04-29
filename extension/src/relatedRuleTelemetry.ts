@@ -1,5 +1,7 @@
 import * as vscode from 'vscode';
 
+/** Memento-backed counters for rule-explain / suggestions related-rule usage (local only). */
+
 const TELEMETRY_KEY = 'saropaLints.relatedRuleTelemetry.v1';
 
 export type RelatedRuleTelemetryEvent =

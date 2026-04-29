@@ -5,6 +5,8 @@ import 'package:saropa_lints/src/rules/widget/image_filter_quality_migration_rul
 import 'package:saropa_lints/saropa_lints.dart' show LintImpact;
 import 'package:test/test.dart';
 
+// Covers ImageFilterQualityLowDetection and migration helpers on parsed analyzer AST snippets.
+
 CompilationUnit _parse(String code) => parseString(content: code).unit;
 
 NamedExpression? _filterQualityViolationFromStatement(Expression expr) {

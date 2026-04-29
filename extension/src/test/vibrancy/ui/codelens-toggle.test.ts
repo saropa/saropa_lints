@@ -1,6 +1,8 @@
 import * as assert from 'assert';
 import { CodeLensToggle } from '../../../vibrancy/ui/codelens-toggle';
 
+/** CodeLens enable/disable state for vibrancy hints on pubspec. */
+
 describe('CodeLensToggle', () => {
     let toggle: CodeLensToggle;
 

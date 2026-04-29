@@ -2,6 +2,8 @@ import * as assert from 'assert';
 import { MockMemento } from '../vscode-mock';
 import { CacheService } from '../../../vibrancy/services/cache-service';
 
+/** Memento-backed vibrancy cache TTL and key prefix behavior. */
+
 describe('CacheService', () => {
     let memento: MockMemento;
     let cache: CacheService;

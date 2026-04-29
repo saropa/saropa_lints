@@ -7,6 +7,8 @@ import * as projectRoot from '../../projectRoot';
 import * as violationsReader from '../../violationsReader';
 import * as configWriter from '../../configWriter';
 
+/** Summary tree nodes for security hotspot review state (mocked memento + reader). */
+
 class MockMemento {
   private readonly store = new Map<string, unknown>();
 

@@ -1,6 +1,8 @@
 import * as assert from 'assert';
 import { matchFamily } from '../../../vibrancy/data/package-families';
 
+/** Maps pub package names to versioned families (or null for independent tracks). */
+
 describe('package-families', () => {
     describe('matchFamily', () => {
         it('should return null for firebase_core (independent version tracks)', () => {

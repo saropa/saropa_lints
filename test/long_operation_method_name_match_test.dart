@@ -1,6 +1,8 @@
 import 'package:saropa_lints/src/long_operation_method_name_match.dart';
 import 'package:test/test.dart';
 
+// long_operation_method_name_match: substring false positives on allowed method names.
+
 void main() {
   group('longOperationMethodNameMatchesPattern', () {
     test('rejects importAll inside ImportAllowed-style names (regression)', () {

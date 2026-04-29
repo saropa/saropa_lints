@@ -8,6 +8,8 @@ import {
     VulnerabilityProblem, LicenseRiskProblem,
 } from '../../../vibrancy/problems';
 
+/** Problem-actions: best action, resolution chains, unlocked packages, and formatting. */
+
 function makeUnhealthyProblem(name: string): UnhealthyPackageProblem {
     return {
         id: generateProblemId(name, 'unhealthy'),

@@ -2,6 +2,8 @@ import * as assert from 'assert';
 import { buildAlternatives } from '../../../vibrancy/services/pub-dev-search';
 import { AlternativeSuggestion } from '../../../vibrancy/types';
 
+/** Alternative package suggestions: curated vs search thresholds. */
+
 describe('alternatives scoring', () => {
     describe('threshold logic', () => {
         it('should show curated replacement regardless of score', () => {

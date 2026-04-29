@@ -7,6 +7,8 @@ import {
     fetchPubDevChangelog,
 } from '../../../vibrancy/services/pubdev-changelog';
 
+/** pub.dev changelog HTML parse and fetch (fixtures + stubbed network). */
+
 const fixturesDir = path.join(__dirname, '..', '..', '..', 'src', 'test', 'fixtures');
 
 describe('pubdev-changelog', () => {

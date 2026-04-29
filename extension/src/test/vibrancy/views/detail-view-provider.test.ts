@@ -3,6 +3,8 @@ import { DetailViewProvider, DETAIL_VIEW_ID } from '../../../vibrancy/views/deta
 import { VibrancyResult } from '../../../vibrancy/types';
 import * as vscode from 'vscode';
 
+/** Detail webview provider: HTML from vibrancy result rows and tree selection. */
+
 function makeResult(
     name: string,
     score: number,

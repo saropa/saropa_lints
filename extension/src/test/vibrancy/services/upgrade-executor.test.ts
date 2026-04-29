@@ -4,6 +4,8 @@ import {
 } from '../../../vibrancy/services/upgrade-executor';
 import { UpgradeStep, UpgradeReport } from '../../../vibrancy/types';
 
+/** Formatted upgrade plan/report strings from structured upgrade steps. */
+
 function makeStep(name: string, order: number, opts?: {
     updateType?: string; familyId?: string | null; mayResolveOverride?: string | null;
 }): UpgradeStep {

@@ -1,6 +1,8 @@
 import * as assert from 'assert';
 import { buildPurl } from '../../../vibrancy/scoring/purl-builder';
 
+/** Package URL (PURL) strings for OSV / vulnerability lookups. */
+
 describe('purl-builder', () => {
     it('should build basic pub PURL', () => {
         assert.strictEqual(buildPurl('http', '1.2.0'), 'pkg:pub/http@1.2.0');

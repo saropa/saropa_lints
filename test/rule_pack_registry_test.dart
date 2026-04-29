@@ -1,6 +1,8 @@
 import 'package:saropa_lints/src/config/rule_packs.dart';
 import 'package:test/test.dart';
 
+// rule_packs registry: composite packs and generated rule membership.
+
 void main() {
   group('generated registry + composite packs', () {
     test('avoid_isar_import_with_drift is in both drift and isar packs', () {

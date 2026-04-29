@@ -5,6 +5,8 @@ import 'package:path/path.dart' as path;
 import 'package:saropa_lints/src/report/diagnostic_statistics.dart';
 import 'package:test/test.dart';
 
+// diagnostic_statistics: severity counts, config reset, and temp violations.json handling.
+
 void main() {
   group('DiagnosticStatisticsEvaluator', () {
     late Directory tempDir;

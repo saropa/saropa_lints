@@ -2,6 +2,8 @@ import * as assert from 'assert';
 import { snapshotVersions } from '../../../vibrancy/services/lock-diff-notifier';
 import { VibrancyResult } from '../../../vibrancy/types';
 
+/** Lock diff notifier: snapshot package versions before/after lock changes. */
+
 function makeResult(
     name: string,
     version: string,

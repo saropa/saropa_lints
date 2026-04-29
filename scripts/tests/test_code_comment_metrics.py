@@ -1,5 +1,7 @@
 """Unit tests for scripts.modules._code_comment_metrics."""
 
+# Covers Dart/TS/Python comment-line heuristics used by the publish banner metrics.
+
 from __future__ import annotations
 
 import tempfile

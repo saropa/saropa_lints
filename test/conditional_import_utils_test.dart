@@ -4,6 +4,8 @@ import 'package:path/path.dart' as p;
 import 'package:saropa_lints/src/conditional_import_utils.dart';
 import 'package:test/test.dart';
 
+// conditional_import_utils: native-only import targets and path normalization.
+
 void main() {
   group('isNativeOnlyConditionalImportTarget', () {
     test('returns false for null or empty path', () {

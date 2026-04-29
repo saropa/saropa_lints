@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:saropa_lints/src/scan/scan_cli_args.dart';
 import 'package:test/test.dart';
 
+// saropa_lints:scan CLI process exit codes and flag validation.
+
 void main() {
   group('scan CLI (process)', () {
     test('--tier with no value exits with 2', () async {

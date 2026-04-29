@@ -5,6 +5,8 @@ import {
     UnusedProblem,
 } from '../../../vibrancy/problems';
 
+/** ProblemRegistry ranking, dedupe, and aggregation for unhealthy/unused/blocked problems. */
+
 function makeUnhealthyProblem(name: string, score: number): UnhealthyPackageProblem {
     return {
         id: generateProblemId(name, 'unhealthy'),

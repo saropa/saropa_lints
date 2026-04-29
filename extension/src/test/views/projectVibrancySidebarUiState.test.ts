@@ -2,6 +2,8 @@ import * as assert from 'node:assert';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 
+/** Static checks on sidebar provider source (webview enablement, script CSP hints). */
+
 function loadSidebarSource(): string {
   const sourcePath = path.resolve(
     __dirname,

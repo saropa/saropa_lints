@@ -5,6 +5,8 @@ import {
 } from '../../../vibrancy/scoring/version-increment';
 import { VibrancyResult } from '../../../vibrancy/types';
 
+/** Semver bump classification (major/minor/patch) and vibrancy result filtering. */
+
 describe('version-increment', () => {
     describe('classifyIncrement', () => {
         it('detects major increment', () => {

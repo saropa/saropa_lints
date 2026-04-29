@@ -1,6 +1,8 @@
 import 'package:saropa_lints/src/config/rule_packs.dart';
 import 'package:test/test.dart';
 
+// Rule pack dependency gates vs pubspec version constraints.
+
 void main() {
   group('packPassesDependencyGate', () {
     test('ungated pack always passes', () {

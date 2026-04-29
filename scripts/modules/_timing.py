@@ -9,6 +9,8 @@ Author:    Saropa
 Copyright: (c) 2025-2026 Saropa
 """
 
+# Records each publish.py step duration and pass/fail for the timing summary table.
+
 from __future__ import annotations
 
 import time

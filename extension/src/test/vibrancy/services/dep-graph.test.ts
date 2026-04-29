@@ -3,6 +3,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { parseDepGraphJson, buildReverseDeps, DepGraphPackage } from '../../../vibrancy/services/dep-graph';
 
+/** pub deps JSON fixture: parse graph and reverse dependency index. */
+
 const fixturesDir = path.join(
     __dirname, '..', '..', '..', 'src', 'test', 'fixtures',
 );

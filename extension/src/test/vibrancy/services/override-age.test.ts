@@ -1,6 +1,8 @@
 import * as assert from 'assert';
 import { calculateAgeDays, formatAge } from '../../../vibrancy/services/override-age';
 
+/** Staleness of dependency_overrides entries (days since publish / label). */
+
 describe('override-age', () => {
     describe('calculateAgeDays', () => {
         it('should return null for null date', () => {

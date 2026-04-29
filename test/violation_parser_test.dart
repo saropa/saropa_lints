@@ -2,6 +2,8 @@ import 'package:saropa_lints/src/models/violation.dart';
 import 'package:saropa_lints/src/violation_parser.dart';
 import 'package:test/test.dart';
 
+// Regression tests for parseViolations() line format (analyzer-style diagnostic text).
+
 void main() {
   group('parseViolations', () {
     test('parses single violation line', () {

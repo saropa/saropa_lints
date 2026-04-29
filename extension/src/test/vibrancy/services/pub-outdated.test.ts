@@ -3,6 +3,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { parsePubOutdatedJson } from '../../../vibrancy/services/pub-outdated';
 
+/** Parses `dart pub outdated --json` fixture into structured outdated rows. */
+
 const fixturesDir = path.join(
     __dirname, '..', '..', '..', 'src', 'test', 'fixtures',
 );

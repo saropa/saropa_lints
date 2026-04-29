@@ -3,6 +3,8 @@ import 'package:saropa_lints/src/rules/security/security_auth_storage_rules.dart
 import 'package:saropa_lints/src/rules/security/security_network_input_rules.dart';
 import 'package:test/test.dart';
 
+// Security rules expose CWE ids and securityHotspot typing as documented metadata.
+
 void main() {
   group('Security Rules - metadata (CWE, ruleType)', () {
     test('WebView JS enabled is a securityHotspot with CWE-79', () {

@@ -3,6 +3,8 @@ import { collectProblemsForPackage } from '../../../vibrancy/problems/problem-co
 import { ProblemRegistry } from '../../../vibrancy/problems/problem-registry';
 import { makeMinimalResult } from '../test-helpers';
 
+/** Maps a single package scan row into ProblemRegistry entries (unused, etc.). */
+
 describe('ProblemCollector', () => {
     describe('collectProblemsForPackage', () => {
         it('should add unused problem when isUnused and section is dependencies', () => {

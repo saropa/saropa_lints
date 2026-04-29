@@ -1,3 +1,5 @@
+/** JSON payload types produced by the project_vibrancy CLI for the extension webviews. */
+
 export interface ProjectVibrancyFunctionRow {
   readonly file: string;
   readonly name: string;

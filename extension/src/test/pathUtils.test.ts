@@ -8,6 +8,8 @@ import {
   clearFileExistsCache,
 } from '../pathUtils';
 
+/** Path normalization and cached file existence (cross-platform). */
+
 describe('normalizePath', () => {
   it('converts backslashes to forward slashes', () => {
     assert.strictEqual(normalizePath('a\\b\\c'), 'a/b/c');

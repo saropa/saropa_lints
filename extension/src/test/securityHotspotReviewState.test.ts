@@ -6,6 +6,8 @@ import {
 } from '../securityHotspotReviewState';
 import { Violation } from '../violationsReader';
 
+/** Security hotspot review persistence and hotspot classification helpers. */
+
 class MockMemento {
   private readonly store = new Map<string, unknown>();
 

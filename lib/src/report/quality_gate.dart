@@ -4,6 +4,9 @@ import 'dart:io' show File;
 import 'package:path/path.dart' as path;
 import 'package:yaml/yaml.dart';
 
+// Evaluates saropa_quality_gate.yaml (metric thresholds and operators) against diagnostic stats.
+// Used by the quality_gate CLI; operator and metric names are matched explicitly below.
+
 class QualityGateCondition {
   const QualityGateCondition({
     required this.metric,

@@ -3,6 +3,8 @@ import 'dart:io' show Directory, Platform;
 import 'package:saropa_lints/src/saropa_lint_rule.dart' show ProgressTracker;
 import 'package:test/test.dart';
 
+// ProgressTracker file-level dedup of repeated diagnostics.
+
 void main() {
   late Directory tempDir;
   late String filePath;
