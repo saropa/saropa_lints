@@ -1,8 +1,12 @@
 # Discussion: Tier-Based Filtering (Enable/disable rules by tier at runtime)
 
+**Archive:** Moved from `plan/discussion_061_tier_based_filtering.md` (2026-04-28).
+
 **Source:** [GitHub Discussion #61](https://github.com/saropa/saropa_lints/discussions/61)  
 **Priority:** Medium  
 **ROADMAP:** Part 3 — Planned Enhancements (SaropaLintRule Base Class)
+
+**Status (2026-04-28):** Runtime cumulative tier cap is implemented (`SAROPA_TIER`, optional YAML keys); see `lib/src/config/runtime_tier_cap.dart` and package library docs in `lib/saropa_lints.dart`. Per-rule `shouldRunForTier` on `SaropaLintRule` was not added — filtering uses shared tier membership from `tiers.dart` (same source as init metadata).
 
 ---
 

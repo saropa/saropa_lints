@@ -25,7 +25,7 @@ The `SaropaLintRule` base class provides enhanced features for all lint rules.
 #### Planned Enhancements
 
 Details and design notes for each enhancement are in the plan docs:
-`plan/discussion_056_suppression_tracking.md`, `plan/discussion_061_tier_based_filtering.md`,
+`plan/discussion_056_suppression_tracking.md`, `plan/history/2026.04/2026.04.28/discussion_061_tier_based_filtering.md`,
 `plan/deferred/discussion_059_custom_ignore_prefixes.md`, and historical snapshots in
 `plan/history/` (including `discussion_055_diagnostic_statistics.md`,
 `discussion_057_related_rules.md`, `discussion_058_batch_deduplication.md`, and
@@ -34,7 +34,7 @@ Details and design notes for each enhancement are in the plan docs:
 | Enhancement | Status | Notes |
 |-------------|--------|-------|
 | Suppression tracking and governance ([Discussion #56](plan/discussion_056_suppression_tracking.md)) | Done | Plugin tracking, extension Suppressions sidebar, overview suppression-rate metric, and CI/export schema/reporting are complete. |
-| Tier-based filtering ([Discussion #61](plan/discussion_061_tier_based_filtering.md)) | Planned | Still tracked as future base-class enhancement work. |
+| Tier-based filtering ([Discussion #61](plan/history/2026.04/2026.04.28/discussion_061_tier_based_filtering.md)) | Done | Runtime cap via `SAROPA_TIER` / YAML (`saropa_tier`, `runtime_tier`); filters enabled set and visitor execution. |
 | Custom suppression prefixes ([Discussion #59](plan/deferred/discussion_059_custom_ignore_prefixes.md)) | Deferred | Policy-blocked; do not implement custom ignore parsing under current project policy. |
 
 ---
