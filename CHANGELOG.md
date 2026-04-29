@@ -50,6 +50,10 @@
 
 - The Project Vibrancy sidebar view and its refresh command are removed so function-level vibrancy lives only in the editor-area report, which removes duplicate UI and avoids cramped sidebar layouts. Use **Saropa Lints: Open Project Vibrancy Report** (Command Palette or Saropa navigation where offered). No config change.
 
+### Changed (Extension)
+
+- **Open Package Vibrancy**, **Open Project Vibrancy Report**, and **Open Project Vibrancy Settings** now have toolbar icons, and the **Issues** and **Package Vibrancy** view title bars include **Open Package Vibrancy** and **Open Project Vibrancy Report** in Dart workspaces so the main vibrancy webviews stay one click away from the sidebar. No config change.
+
 ### Fixed (Extension)
 
 - Opening a file from the Project Vibrancy report now resolves report paths against the workspace root on Windows and mixed path styles, so jump-to-file from a hit works reliably instead of failing on path shape. No action required.

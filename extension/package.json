@@ -175,15 +175,18 @@
       },
       {
         "command": "saropaLints.openPackageVibrancy",
-        "title": "Saropa Lints: Open Package Vibrancy"
+        "title": "Saropa Lints: Open Package Vibrancy",
+        "icon": "$(package)"
       },
       {
         "command": "saropaLints.openProjectVibrancyReport",
-        "title": "Saropa Lints: Open Project Vibrancy Report"
+        "title": "Saropa Lints: Open Project Vibrancy Report",
+        "icon": "$(graph)"
       },
       {
         "command": "saropaLints.openProjectVibrancySettings",
-        "title": "Saropa Lints: Open Project Vibrancy Settings"
+        "title": "Saropa Lints: Open Project Vibrancy Settings",
+        "icon": "$(settings-gear)"
       },
       {
         "command": "saropaLints.crossFile.unusedFiles",
@@ -907,6 +910,16 @@
           "group": "navigation"
         },
         {
+          "command": "saropaLints.openPackageVibrancy",
+          "when": "view == saropaLints.issues && saropaLints.isDartProject",
+          "group": "1_vibrancy@1"
+        },
+        {
+          "command": "saropaLints.openProjectVibrancyReport",
+          "when": "view == saropaLints.issues && saropaLints.isDartProject",
+          "group": "1_vibrancy@2"
+        },
+        {
           "command": "saropaLints.createSaropaInstructions",
           "when": "view == saropaLints.overview",
           "group": "navigation"
@@ -1015,6 +1028,11 @@
           "command": "saropaLints.packageVibrancy.showReport",
           "when": "view == saropaLints.packageVibrancy.packages && saropaLints.packageVibrancy.hasResults",
           "group": "navigation@6"
+        },
+        {
+          "command": "saropaLints.openProjectVibrancyReport",
+          "when": "view == saropaLints.packageVibrancy.packages && saropaLints.isDartProject",
+          "group": "navigation@7"
         },
         {
           "command": "saropaLints.packageVibrancy.filterBySeverity",

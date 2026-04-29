@@ -37,7 +37,7 @@ The extension is the primary setup and configuration surface:
 - **Triage** — Disable noisy rules from the UI; see estimated score impact before acting
 - **Rule Packs** — Enable stack bundles (Riverpod, Drift, …) from the sidebar webview (per-pack toggles, rule lists, target platforms when embedder folders exist); see [`doc/guides/rule_packs.md`](doc/guides/rule_packs.md)
 - **Package Vibrancy** — Dependency health, alerts, and optional **version-gap** PR/issue triage (enable with `saropaLints.packageVibrancy.enableVersionGap`; a GitHub token improves results)
-- **Project Vibrancy** — Project code-health scoring for your own Dart source via the **Open Project Vibrancy Report** command (editor-area webview; same scan as the CLI JSON output)
+- **Project Vibrancy** — Project code-health scoring for your own Dart source via **Open Project Vibrancy Report** (editor-area webview; same scan as the CLI JSON output); use the graph icon on **Issues**, **Overview**, **Config**, or **Package Vibrancy** view titles, or the Command Palette
 - **TODOs & Hacks** — Sidebar scan for TODO/FIXME/HACK-style markers; full-workspace scan is **opt-in** (`saropaLints.todosAndHacks.workspaceScanEnabled`, default off) via **TODOs & Hacks: Enable workspace scan**
 - **File Risk** — Files ranked by violation density; focus on the riskiest first
 - **Trends** — Score progression over time with milestone celebrations
