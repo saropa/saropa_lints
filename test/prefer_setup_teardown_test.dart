@@ -2,13 +2,16 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
-/// Tests for prefer_setup_teardown false-positive fix.
+/// Tests for prefer_setup_teardown false-positive fixes.
 ///
-/// Validates two fixes:
+/// Validates:
 /// 1. Assertion/verification calls (expect, verify, fail, etc.) are excluded
 ///    from setup-code signatures — they are test body, not initialization.
 /// 2. Signature counting is scoped per group() block — tests in different
 ///    groups no longer inflate each other's duplicate count.
+/// 3. Simple local inits (`const`, literals) are included in the signature
+///    preface so parameterized SUT calls with the same call shape do not
+///    false-positive (rule v7).
 ///
 /// Test fixture:
 /// - example/lib/testing/testing_rules_additional_fixture.dart
@@ -95,6 +98,33 @@ void main() {
       test('fewer than 3 matches should NOT trigger', () {
         // Threshold is 3 — 2 identical patterns do not fire the rule
       });
+    });
+
+    const ruleName = 'prefer_setup_teardown';
+
+    test('fixture: BAD block documents one expect_lint', () {
+      final path = 'example/lib/testing_best_practices/${ruleName}_fixture.dart';
+      final content = File(path).readAsStringSync();
+      expect(
+        '// expect_lint: $ruleName'.allMatches(content).length,
+        equals(1),
+        reason: 'Single BAD case should pin the diagnostic for custom_lint',
+      );
+    });
+
+    test('fixture: GOOD parameterized group has no expect_lint', () {
+      final path = 'example/lib/testing_best_practices/${ruleName}_fixture.dart';
+      final content = File(path).readAsStringSync();
+      final start = content.indexOf('void _goodPreferSetupTeardownParameterized');
+      final end = content.indexOf('class _DupRepo');
+      expect(start, greaterThan(-1));
+      expect(end, greaterThan(start));
+      final slice = content.substring(start, end);
+      expect(
+        slice.contains('expect_lint: $ruleName'),
+        isFalse,
+        reason: 'Parameterized const arrange + SUT must not be flagged',
+      );
     });
   });
 }

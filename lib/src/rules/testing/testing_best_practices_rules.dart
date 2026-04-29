@@ -2956,19 +2956,23 @@ class PreferTestFindByKeyRule extends SaropaLintRule {
 
 /// Warns when test setup code is duplicated instead of using setUp/tearDown.
 ///
-/// Since: v2.5.0 | Updated: v4.14.5 | Rule version: v6
+/// Since: v2.5.0 | Updated: v4.14.5 | Rule version: v7
 ///
 /// Alias: setup_teardown, test_setup, dry_tests
 ///
 /// Repeated setup code in tests violates DRY and makes maintenance harder.
 /// Use setUp() and tearDown() for common test initialization.
 ///
-/// The rule compares the first 1-2 meaningful statements of each test body
-/// within the same `group()` scope. When 3+ tests share the same setup
-/// pattern, the rule fires on the first match.
+/// The rule compares a normalized signature built from each test body within
+/// the same `group()` scope: simple local inits (`const`, literals) are
+/// collected as a preface (so different parameterized inputs do not collide),
+/// then the first 1-2 non-assertion statements. When 3+ tests share the same
+/// signature, the rule fires on the first match.
 ///
-/// **Excluded from setup signatures:**
+/// **Not counted as the first setup statements (but included in the preface):**
 /// - Simple local variable initializations (literals, constants)
+///
+/// **Excluded entirely from signatures:**
 /// - Test assertions: `expect`, `expectLater`, `expectAsync0..6`, `fail`
 /// - Mock verifications: `verify`, `verifyInOrder`, `verifyNever`,
 ///   `verifyNoMoreInteractions`, `verifyZeroInteractions`
@@ -3022,6 +3026,24 @@ class PreferTestFindByKeyRule extends SaropaLintRule {
 ///   });
 /// });
 /// ```
+///
+/// **GOOD (parameterized arrange — same SUT call shape, different consts):**
+/// ```dart
+/// group('namesForDate', () {
+///   test('Swedish Jan 1', () {
+///     const NameCal calendar = NameCal.swedish;
+///     const int month = 1, day = 1;
+///     final r = namesForDate(calendar: calendar, month: month, day: day);
+///     expect(r, isNotNull);
+///   });
+///   test('Finnish Jan 1', () {
+///     const NameCal calendar = NameCal.finnish;
+///     const int month = 1, day = 1;
+///     final r = namesForDate(calendar: calendar, month: month, day: day);
+///     expect(r, isNotNull);
+///   });
+/// });
+/// ```
 class PreferSetupTeardownRule extends SaropaLintRule {
   PreferSetupTeardownRule() : super(code: _code);
 
@@ -3043,7 +3065,7 @@ class PreferSetupTeardownRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'prefer_setup_teardown',
-    '[prefer_setup_teardown] Duplicated test setup code. Use setUp()/tearDown(). Repeated setup code in tests violates DRY and makes maintenance harder. Use setUp() and tearDown() for common test initialization. {v6}',
+    '[prefer_setup_teardown] Duplicated test setup code. Use setUp()/tearDown(). Repeated setup code in tests violates DRY and makes maintenance harder. Use setUp() and tearDown() for common test initialization. {v7}',
     correctionMessage:
         'Move common initialization to setUp() and cleanup to tearDown(). Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
     severity: DiagnosticSeverity.INFO,
@@ -3132,20 +3154,40 @@ class PreferSetupTeardownRule extends SaropaLintRule {
     return _buildSetupSignature(statements);
   }
 
-  /// Builds a normalized signature from the first 1-2 meaningful statements,
-  /// skipping simple local initializations (primitives, constants, literals)
-  /// and test assertion/verification calls (expect, verify, fail, etc.).
-  /// Returns null if no meaningful setup statements remain.
+  /// Builds a normalized signature from the first 1-2 non-assertion statements
+  /// that are not simple local inits, plus a [preface] of every skipped simple
+  /// local init encountered along the way (in source order).
+  ///
+  /// Including const/literal initializer text prevents false positives when
+  /// several tests share the same SUT call shape but differ only in preceding
+  /// `const` / literal locals (parameterized arrange–act–assert).
+  ///
+  /// Skips assertion calls (see [_isAssertionCall]). Returns null if no setup
+  /// statements remain.
   String? _buildSetupSignature(NodeList<Statement> statements) {
-    final meaningful = statements
-        .where((s) => !_isSimpleLocalInit(s) && !_isAssertionCall(s))
-        .take(2)
-        .toList();
-    if (meaningful.isEmpty) return null;
+    final preface = <String>[];
+    final body = <Statement>[];
+    for (final statement in statements) {
+      if (_isSimpleLocalInit(statement)) {
+        preface.add(_normalizedSetupStatement(statement));
+        continue;
+      }
+      if (_isAssertionCall(statement)) {
+        continue;
+      }
+      body.add(statement);
+      if (body.length >= 2) {
+        break;
+      }
+    }
+    if (body.isEmpty) {
+      return null;
+    }
+    return [...preface, ...body.map(_normalizedSetupStatement)].join(';');
+  }
 
-    return meaningful
-        .map((s) => s.toSource().replaceAll(RegExp(r'\s+'), ' '))
-        .join(';');
+  static String _normalizedSetupStatement(Statement statement) {
+    return statement.toSource().replaceAll(RegExp(r'\s+'), ' ');
   }
 
   /// Returns true if the statement is a test assertion or verification call
