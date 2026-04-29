@@ -9,6 +9,7 @@ import 'package:saropa_lints/src/rules/code_quality/code_quality_variables_rules
 
 /// Tests for 101 code quality lint rules.
 ///
+// See group names for sub-suites; example fixtures under example/lib/code_quality.
 /// These rules cover type safety, null handling, dead code detection,
 /// pattern matching, collection best practices, string handling,
 /// switch expressions, and code maintainability.

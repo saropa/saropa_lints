@@ -2,6 +2,10 @@ import * as assert from 'assert';
 import { VibrancyResult, VibrancyCategory } from '../../../vibrancy/types';
 import { suggestThresholds, formatThresholdsSummary } from '../../../vibrancy/services/threshold-suggester';
 
+/**
+ * Tests **threshold-suggester**: proposes default caps from a scan distribution, [formatThresholdsSummary]
+ * for settings UI, using [makeResult] factories for controlled category mixes.
+ */
 function makeResult(overrides: Partial<VibrancyResult> = {}): VibrancyResult {
     return {
         package: { name: 'test_pkg', version: '1.0.0', constraint: '^1.0.0', source: 'hosted', isDirect: true, section: 'dependencies' },

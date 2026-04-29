@@ -9,6 +9,7 @@ import {
 } from '../../../vibrancy/scoring/transitive-analyzer';
 import { KnownIssue } from '../../../vibrancy/types';
 
+// Dep-graph fixtures: shared deps, risk flags, and transitive rollups.
 const fixturesDir = path.join(
     __dirname, '..', '..', '..', 'src', 'test', 'fixtures',
 );

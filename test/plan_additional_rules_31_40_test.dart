@@ -5,7 +5,7 @@ import 'package:test/test.dart';
 
 /// Registration, tier, fixture, and false-positive guard tests for
 /// [plan_additional_rules_31_through_40](plan/history/20260323/plan_additional_rules_31_through_40.md).
-
+// False-positive and registration guards for the batch-31–40 rules (see plan doc).
 /// Mirrors [DocumentIgnoresRule] bare-line detection (keep in sync).
 final RegExp _bareIgnoreLineTest = RegExp(
   r'^\s*//\s*ignore(?:_for_file)?:\s*((?:[^\s,]+)(?:\s*,\s*[^\s,]+)*)\s*$',

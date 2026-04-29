@@ -6,6 +6,7 @@ import 'package:test/test.dart';
 /// Tests for 8 Return lint rules.
 ///
 /// Test fixtures: example/lib/return/*
+// Return value style (cascades, async gaps) with small focused examples.
 void main() {
   group('Return Rules - Rule Instantiation', () {
     test('AvoidReturningCascadesRule', () {

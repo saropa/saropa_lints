@@ -7,6 +7,7 @@ import 'package:test/test.dart';
 /// Tests for 5 Cryptography lint rules.
 ///
 /// Test fixtures: example/lib/crypto/*
+// Random, hashing, and key material patterns; security-focused small cases.
 void main() {
   group('Cryptography Rules - Rule Instantiation', () {
     test('AvoidHardcodedEncryptionKeysRule', () {

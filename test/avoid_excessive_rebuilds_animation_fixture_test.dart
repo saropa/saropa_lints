@@ -4,6 +4,7 @@ import 'package:saropa_lints/saropa_lints.dart';
 import 'package:test/test.dart';
 
 /// Registration and fixture markers for `avoid_excessive_rebuilds_animation`.
+// End-to-end registration smoke + example fixture paths for animation rule.
 void main() {
   const ruleName = 'avoid_excessive_rebuilds_animation';
 

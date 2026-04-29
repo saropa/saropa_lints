@@ -16,6 +16,8 @@ import {
 } from '../../../vibrancy/scoring/vibrancy-calculator';
 import { GitHubMetrics } from '../../../vibrancy/types';
 
+// Unit tests for score factors and the aggregate computeVibrancyScore.
+
 function makeMetrics(overrides: Partial<GitHubMetrics> = {}): GitHubMetrics {
     return {
         stars: 100,

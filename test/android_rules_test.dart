@@ -7,6 +7,7 @@ import 'package:saropa_lints/src/rules/platforms/android_rules.dart';
 /// Tests for Android platform lint rules.
 ///
 /// Test fixtures: example/lib/android/
+// Gradle, manifest, and platform channel snippets from example/lib/android.
 void main() {
   group('Android Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {

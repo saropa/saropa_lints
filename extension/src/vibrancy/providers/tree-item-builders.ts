@@ -8,6 +8,7 @@ import { formatRelativeTime } from '../scoring/time-formatter';
 import { severityEmoji, severityLabel, worstSeverity } from '../scoring/vuln-classifier';
 import { DetailItem, GroupItem, SourceCodeItem } from './tree-item-classes';
 
+/** Tree group/detail builders: version rows, community, licenses, dep graph items. */
 // Builder functions for tree item group nodes (Version, Update, Community, etc.).
 // Detail-level builders live in tree-item-detail-builders.ts and are
 // re-exported here so existing callers keep working.

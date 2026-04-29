@@ -1,6 +1,8 @@
 import * as assert from 'assert';
 import { resolveRepoUrl } from '../../../vibrancy/views/html-utils';
 
+/** Pick repository URL for webview (GitHub vs pub.dev homepage). */
+
 describe('resolveRepoUrl', () => {
     it('should prefer GitHub URL over pub.dev URL', () => {
         assert.strictEqual(

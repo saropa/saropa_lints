@@ -7,6 +7,7 @@ import 'package:saropa_lints/src/rules/testing/testing_best_practices_rules.dart
 /// Tests for 35 Testing Best Practices lint rules.
 ///
 /// Test fixtures: example/lib/testing_best_practices/*
+// testWidgets, mocks, and async test hygiene; see fixtures for each rule.
 void main() {
   group('Testing Best Practices Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {

@@ -2,6 +2,8 @@ import { Problem, problemMessage, severityIcon, problemLabel } from './problem-t
 import { SuggestedAction, formatAction } from './problem-actions';
 import { ProblemRegistry } from './problem-registry';
 
+// Rich hover: problems, suggested actions, and severities for a package.
+
 /**
  * Build a markdown string for displaying problems in a hover tooltip.
  */

@@ -3,6 +3,8 @@ import * as vscode from 'vscode';
 import { VibrancyCodeLensProvider } from '../../../vibrancy/providers/codelens-provider';
 import { VibrancyResult } from '../../../vibrancy/types';
 
+/** CodeLenses on pubspec for EOL/upgrade actions from vibrancy scan rows. */
+
 function makeResult(
     name: string,
     overrides: Partial<VibrancyResult> = {},

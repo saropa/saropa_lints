@@ -8,6 +8,8 @@ import {
     PackageCodeMetrics,
 } from '../../../vibrancy/services/package-code-analyzer';
 
+// Per-file metrics and replacement heuristics for vibrancy’s “package code” scan.
+
 function makeUri(path: string): vscode.Uri {
     return vscode.Uri.file(path) as vscode.Uri;
 }

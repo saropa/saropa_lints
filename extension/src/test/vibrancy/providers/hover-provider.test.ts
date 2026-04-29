@@ -4,6 +4,10 @@ import * as vscode from 'vscode';
 import { VibrancyHoverProvider } from '../../../vibrancy/providers/hover-provider';
 import { VibrancyResult } from '../../../vibrancy/types';
 
+/**
+ * Tests **VibrancyHoverProvider** markdown hovers: package score breakdown, badges, links, and edge cases
+ * when `pubDev` / GitHub fields are null. Uses `register-vscode-mock` for `Hover` API.
+ */
 function makeResult(name: string, score: number): VibrancyResult {
     return {
         package: { name, version: '1.0.0', constraint: '^1.0.0', source: 'hosted', isDirect: true, section: 'dependencies' },

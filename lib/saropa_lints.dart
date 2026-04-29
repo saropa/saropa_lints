@@ -16,7 +16,13 @@
 /// ```
 ///
 /// This generates `analysis_options.yaml` with explicit rule lists.
-/// See `BROKEN_TIERS.md` for why YAML-based tier config is not supported.
+///
+/// **Runtime tier cap (optional):** set `SAROPA_TIER` to one of the tier
+/// names below to skip rules above that cumulative band during analysis even
+/// when they stay enabled in YAML, or set `saropa_tier` in
+/// `analysis_options_custom.yaml`, or `runtime_tier` / `saropa_tier` under
+/// `plugins.saropa_lints`; when both env and file specify a cap, the env value
+/// wins.
 ///
 /// Available tiers: `essential` (1), `recommended` (2),
 /// `professional` (3), `comprehensive` (4), `pedantic` (5).

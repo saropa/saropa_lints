@@ -4,6 +4,8 @@ import { VibrancyDiagnostics } from '../../../vibrancy/providers/diagnostics';
 import { VibrancyResult } from '../../../vibrancy/types';
 import { MockDiagnosticCollection, setTestConfig, clearTestConfig } from '../vscode-mock';
 
+/** Vibrancy publishDiagnostics: package rows map to line-level pubspec issues. */
+
 const PUBSPEC_CONTENT = `dependencies:
   http: ^1.0.0
   flutter_bloc: ^8.0.0

@@ -6,6 +6,7 @@ import 'package:test/test.dart';
 /// Tests for 13 Memory Management lint rules.
 ///
 /// Test fixtures: example/lib/memory_management/*
+// Image cache, big blobs in state, and disposal of native/controller handles.
 void main() {
   group('Memory Management Rules - Rule Instantiation', () {
     test('AvoidLargeObjectsInStateRule', () {

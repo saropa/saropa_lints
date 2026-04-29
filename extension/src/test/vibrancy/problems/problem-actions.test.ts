@@ -8,7 +8,10 @@ import {
     VulnerabilityProblem, LicenseRiskProblem,
 } from '../../../vibrancy/problems';
 
-/** Problem-actions: best action, resolution chains, unlocked packages, and formatting. */
+/**
+ * Tests **problem-actions**: `determineBestAction`, resolution chains, unlocked package sets,
+ * priority ordering, and user-visible `formatAction` / icon helpers across all [Problem] variants.
+ */
 
 function makeUnhealthyProblem(name: string): UnhealthyPackageProblem {
     return {

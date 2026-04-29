@@ -1,3 +1,10 @@
+/**
+ * CSS for the **single-package detail** webview (version gap, trust, license, links, review notes).
+ * Typography mirrors the editor; spacing is tuned for narrow sidebar widths as well as full editor columns.
+ *
+ * **Components:** action links (command bridge), section headers, tables for transitive issues,
+ * and muted helper text for empty states. Hover/focus states use theme link colors for accessibility.
+ */
 /** CSS styles for the package detail webview panel. */
 export function getPackageDetailStyles(): string {
     return `

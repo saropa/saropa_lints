@@ -7,6 +7,7 @@ import 'package:saropa_lints/src/rules/ui/internationalization_rules.dart';
 /// Tests for 26 Internationalization lint rules.
 ///
 /// Test fixtures: example/lib/internationalization/*
+// intl, ARB, and plural/gender rules with small example messages.
 void main() {
   group('Internationalization Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {

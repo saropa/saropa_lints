@@ -5,7 +5,10 @@ import {
     RawOpenIssue,
 } from '../../../vibrancy/scoring/issue-signals';
 
-/** Text heuristics for issue/changelog signals (deprecated, obsolete, breaking, etc.). */
+/**
+ * Tests **issue-signals** heuristics: [detectIssueSignals] keyword buckets, [flagHighSignalIssues]
+ * thresholds, and [RawOpenIssue] merge behavior for changelog/issue bodies.
+ */
 
 describe('issue-signals', () => {
     describe('detectIssueSignals', () => {

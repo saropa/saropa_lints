@@ -11,6 +11,7 @@ import 'package:path/path.dart' as p;
 import 'package:saropa_lints/src/cli/cross_file_reporter.dart';
 import 'package:saropa_lints/src/string_slice_utils.dart';
 
+// Cross-file “unused” via analyzer; pairs with cross_file_reporter and CLI flags.
 /// Resolves the project with the analyzer and reports top-level declarations
 /// that have no references from other compilation units in [includedPaths].
 ///

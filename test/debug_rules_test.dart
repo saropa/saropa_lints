@@ -6,6 +6,7 @@ import 'package:test/test.dart';
 /// Tests for 9 Debug lint rules.
 ///
 /// Test fixtures: example/lib/debug/*
+// Test-only print/debug patterns and fail helpers in example fixtures.
 void main() {
   group('Debug Rules - Rule Instantiation', () {
     test('AlwaysFailRule (prefer_fail_test_case)', () {

@@ -1,3 +1,8 @@
+/// Analyzer-driven tests for **image filter quality** rules: low-quality `FilterQuality` arguments,
+/// migration helpers in [ImageFilterQualityMigrationRules], and named-arg extraction on both
+/// [InstanceCreationExpression] and [MethodInvocation] shapes.
+library;
+
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:saropa_lints/src/rules/widget/image_filter_quality_detection.dart';
@@ -5,8 +10,7 @@ import 'package:saropa_lints/src/rules/widget/image_filter_quality_migration_rul
 import 'package:saropa_lints/saropa_lints.dart' show LintImpact;
 import 'package:test/test.dart';
 
-// Covers ImageFilterQualityLowDetection and migration helpers on parsed analyzer AST snippets.
-
+/// Parses [code] into a [CompilationUnit] for visitor probes.
 CompilationUnit _parse(String code) => parseString(content: code).unit;
 
 NamedExpression? _filterQualityViolationFromStatement(Expression expr) {

@@ -1,3 +1,4 @@
+// Single scan pass: pub.dev, GitHub, issues, scores, and problem suggestions per package.
 import {
     VibrancyResult, PackageDependency, GitHubMetrics, KnownIssue,
     PubDevMetrics, AlternativeSuggestion,

@@ -6,6 +6,7 @@ import 'package:test/test.dart';
 /// Tests for 26 Forms lint rules.
 ///
 /// Test fixtures: example/lib/forms/*
+// TextFormField, validation, and form controller usage in example widgets.
 void main() {
   group('Forms Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {

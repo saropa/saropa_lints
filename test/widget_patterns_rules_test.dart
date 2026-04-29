@@ -12,6 +12,7 @@ import 'package:saropa_lints/src/rules/widget/widget_patterns_ux_rules.dart';
 /// form handling, image patterns, gesture handling, and platform integration.
 ///
 /// Test fixtures: example/lib/widget_patterns/*
+// Long file: use group() names and // LINT to jump between rule families.
 void main() {
   group('Widget Patterns Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {

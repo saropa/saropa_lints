@@ -6,6 +6,7 @@ import 'package:test/test.dart';
 /// Tests for 8 Notification lint rules.
 ///
 /// Test fixtures: example/lib/notification/*
+// Android channels, FCM, and local notification API usage in examples.
 void main() {
   group('Notification Rules - Rule Instantiation', () {
     test('RequireNotificationChannelAndroidRule', () {

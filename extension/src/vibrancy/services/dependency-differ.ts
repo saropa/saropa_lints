@@ -1,3 +1,4 @@
+// Diff current vs target pubspec constraints (per section) for upgrade display.
 const DEPENDENCY_SECTIONS = ['dependencies', 'dev_dependencies', 'dependency_overrides'];
 
 interface ParsedDependencies {

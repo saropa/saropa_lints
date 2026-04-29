@@ -13,7 +13,11 @@ import {
 
 const fixturesDir = path.join(__dirname, '..', '..', '..', 'src', 'test', 'fixtures');
 
-/** Changelog-service: version compare, constraint checks, parse/fetch, and update info builders. */
+/**
+ * Tests **changelog-service**: semver compare, pub constraint satisfaction, repo subpath extraction,
+ * markdown changelog parsing, HTTP fetch stubbing (sinon), and `buildUpdateInfo` merge logic.
+ * Fixture files live under `extension/src/test/fixtures` when disk reads are required.
+ */
 
 describe('changelog-service', () => {
     describe('compareVersions', () => {

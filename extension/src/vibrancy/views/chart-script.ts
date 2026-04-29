@@ -1,3 +1,8 @@
+/**
+ * Inline **chart** script for the vibrancy report donut/bar views: tooltip positioning, segment
+ * draw-in animation (stroke-dasharray reset across rAF), click-to-filter wiring, and shared-transitive toggles.
+ * Emitted as a string for CSP `script-src 'unsafe-inline'` in the webview.
+ */
 /** Client-side JavaScript for chart interactivity (tooltips, highlights, filter). */
 export function getChartScript(): string {
     return `

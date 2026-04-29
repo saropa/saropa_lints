@@ -1,6 +1,8 @@
 import * as assert from 'node:assert';
 import { detectUnused } from '../../../vibrancy/scoring/unused-detector';
 
+/** Declared pubspec deps vs import graph: unused dependency detection. */
+
 describe('unused-detector', () => {
     describe('detectUnused', () => {
         it('should return empty when all deps are imported', () => {

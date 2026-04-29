@@ -1,6 +1,7 @@
 /// Init tool orchestration — main workflow logic.
 library;
 
+// Pre-write checks, pack merge, `analysis_options.yaml`, migration, and logs.
 import 'dart:developer' as dev;
 import 'dart:io';
 

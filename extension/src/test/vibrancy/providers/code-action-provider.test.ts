@@ -2,7 +2,10 @@ import * as assert from 'assert';
 import * as vscode from 'vscode';
 import { VibrancyCodeActionProvider } from '../../../vibrancy/providers/code-action-provider';
 
-/** Code actions from vibrancy diagnostics (e.g. EOL package hints on pubspec). */
+/**
+ * Tests [VibrancyCodeActionProvider]: maps diagnostics (EOL, unhealthy, etc.) to quick fixes on
+ * `pubspec.yaml` and other documents; uses lightweight vscode API mocks.
+ */
 
 function makeMockDocument(): vscode.TextDocument {
     return {

@@ -1,5 +1,6 @@
 import * as assert from 'assert';
 
+// Ordering keys, SDK bucket, and key-value stability for pubspec sort.
 describe('pubspec-sorter', () => {
     describe('SDK_PACKAGES detection', () => {
         const SDK_PACKAGES = new Set([

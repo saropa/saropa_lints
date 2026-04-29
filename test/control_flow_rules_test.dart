@@ -6,6 +6,7 @@ import 'package:test/test.dart';
 /// Tests for 31 Control Flow lint rules.
 ///
 /// Test fixtures: example/lib/control_flow/*
+// Loops, early return, and guard-style control flow; example fixtures for LINTs.
 void main() {
   group('Control Flow Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {

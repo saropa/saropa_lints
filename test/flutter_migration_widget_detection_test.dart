@@ -1,11 +1,15 @@
+/// AST-level tests for `flutter_migration_widget_detection` visitors: **super key**, widget patterns,
+/// and migration heuristics. Each test parses a **minimal** `CompilationUnit` string (no Flutter SDK
+/// link required beyond analyzer stubs) and calls static helpers on [PreferSuperKeyDetection] et al.
+library;
+
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:saropa_lints/src/rules/widget/flutter_migration_widget_detection.dart';
 import 'package:test/test.dart';
 
-// Parses synthetic Flutter widget sources and asserts flutter_migration_widget_detection visitors.
-
+/// Parses [code] as a standalone compilation unit for visitor probes.
 CompilationUnit _parse(String code) => parseString(content: code).unit;
 
 ClassDeclaration _singleClass(CompilationUnit unit) {

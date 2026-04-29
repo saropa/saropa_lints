@@ -6,6 +6,7 @@ import 'package:test/test.dart';
 /// Tests for 38 Api Network lint rules.
 ///
 /// Test fixtures: example/lib/api_network/*
+// HTTP client, interceptors, and transport security rules; see fixtures for LINTs.
 void main() {
   group('Api Network Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {

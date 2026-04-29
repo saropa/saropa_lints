@@ -2,7 +2,10 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { searchAlternatives, buildAlternatives } from '../../../vibrancy/services/pub-dev-search';
 
-/** pub.dev topic search for alternative packages (fetch stubbed in tests). */
+/**
+ * Tests **pub-dev-search**: topic-based [searchAlternatives], [buildAlternatives] ranking heuristics,
+ * and offline `fetch` stubs for JSON API responses.
+ */
 
 describe('pub-dev-search', () => {
     let fetchStub: sinon.SinonStub;

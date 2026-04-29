@@ -7,6 +7,11 @@ import { escapeHtml, resolveRepoUrl } from './html-utils';
 import { getDetailStyles } from './detail-view-styles';
 import { getDetailScript } from './detail-view-script';
 
+/**
+ * Assembles **sidebar package detail** HTML: placeholder when `result` is null, otherwise full panel
+ * with styles from [getDetailStyles], script from [getDetailScript], and escaped fields from [escapeHtml].
+ * Uses [categoryLabel] / [categoryToGrade] and known-issue replacement hints for advisory copy.
+ */
 /** Build HTML for the package detail view in the sidebar. */
 export function buildDetailViewHtml(result: VibrancyResult | null): string {
     if (!result) {

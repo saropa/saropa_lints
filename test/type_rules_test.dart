@@ -6,6 +6,7 @@ import 'package:test/test.dart';
 /// Tests for 19 Type lint rules.
 ///
 /// Test fixtures: example/lib/type/*
+// is / as / type aliases and inference edge cases in small fixtures.
 void main() {
   group('Type Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {

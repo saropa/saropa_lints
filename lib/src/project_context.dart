@@ -9,16 +9,20 @@
 library;
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer' as developer;
 import 'dart:io';
 import 'dart:isolate';
 import 'dart:typed_data';
 
 import 'package:path/path.dart' as p;
+import 'package:saropa_lints/src/cli/cross_file_snapshot.dart'
+    show crossFileSnapshotFormatVersion;
 import 'package:saropa_lints/src/string_slice_utils.dart';
 
 part 'project_context_path_bloom_git.dart';
 part 'project_context_project_file.dart';
+part 'project_context_cross_file.dart';
 part 'project_context_pattern_metrics.dart';
 part 'project_context_incremental_priority.dart';
 part 'project_context_ast_violations.dart';

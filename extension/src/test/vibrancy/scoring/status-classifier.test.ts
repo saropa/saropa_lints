@@ -7,6 +7,10 @@ import {
     categoryToGrade,
 } from '../../../vibrancy/scoring/status-classifier';
 
+/**
+ * Tests **status-classifier** exports: score → category (`vibrant` / `stable` / …), icons, labels,
+ * severity mapping for diagnostics, and grade strings used in HTML reports.
+ */
 describe('status-classifier', () => {
     describe('classifyStatus', () => {
         it('should classify high scores as vibrant', () => {

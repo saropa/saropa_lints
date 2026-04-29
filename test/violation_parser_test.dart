@@ -1,9 +1,12 @@
+/// Regression tests for [parseViolations]: analyzer-style `file:line:col` diagnostic lines, multi-line
+/// batches, and edge cases for rule name vs message extraction into [Violation] models.
+library;
+
 import 'package:saropa_lints/src/models/violation.dart';
 import 'package:saropa_lints/src/violation_parser.dart';
 import 'package:test/test.dart';
 
-// Regression tests for parseViolations() line format (analyzer-style diagnostic text).
-
+/// Entry: each `group` covers one parser edge (single line, multi, malformed).
 void main() {
   group('parseViolations', () {
     test('parses single violation line', () {

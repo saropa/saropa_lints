@@ -3,6 +3,10 @@
 
 library;
 
+// `bin/project_vibrancy.dart` — CLI for the **project vibrancy** scan (`lib/src/cli/project_vibrancy.dart`).
+// Parses flags (`--path`, `--format`, `--lcov`, `--file`, `--folder`, `--since`, grade/coverage caps),
+// runs [runProjectVibrancy], prints JSON or text, and maps thresholds to **non-zero exit codes** for CI.
+// `--since` narrows analysis to git-changed Dart files (see [_changedDartFilesSince]).
 import 'dart:convert';
 import 'dart:io';
 

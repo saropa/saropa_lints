@@ -101,6 +101,29 @@ function prependIssuesHelpRow(nodes: IssueTreeNode[]): IssueTreeNode[] {
   return [ISSUES_HELP_ROOT, ...nodes];
 }
 
+function violationNumericPriority(v: Violation): number {
+  if (typeof v.priority === 'number' && Number.isFinite(v.priority)) {
+    return v.priority;
+  }
+  return -1;
+}
+
+/** Same ordering intent as violations.json after export: higher priority first, then line. */
+function sortViolationsByReportPriority(a: Violation, b: Violation): number {
+  const pa = violationNumericPriority(a);
+  const pb = violationNumericPriority(b);
+  if (pa !== pb) return pb - pa;
+  return (a.line ?? 0) - (b.line ?? 0);
+}
+
+function maxViolationPriority(list: Violation[]): number {
+  let m = -1;
+  for (const v of list) {
+    m = Math.max(m, violationNumericPriority(v));
+  }
+  return m;
+}
+
 /** Discriminated union for all node types in the Issues tree. */
 export type IssueTreeNode =
     | IssuesHelpItem
@@ -210,6 +233,11 @@ function buildFilteredIndex(
     const list = byFile.get(v.file) ?? [];
     list.push(v);
     byFile.set(v.file, list);
+  }
+  for (const byFile of bySeverity.values()) {
+    for (const list of byFile.values()) {
+      list.sort(sortViolationsByReportPriority);
+    }
   }
   return bySeverity;
 }
@@ -909,7 +937,7 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
   /** Build children for a file node from its embedded violations array. */
   private _buildFileChildren(element: FileItem): IssueTreeNode[] {
     const list = element.violations;
-    const sorted = [...list].sort((a, b) => a.line - b.line);
+    const sorted = [...list].sort(sortViolationsByReportPriority);
     const pageSize = getPageSize();
     const page = sorted.slice(0, pageSize);
     const result: IssueTreeNode[] = page.map((v) => ({ kind: 'violation', violation: v }));
@@ -1039,10 +1067,13 @@ function buildFileItems(violations: Violation[]): FileItem[] {
   }
   const items: FileItem[] = [];
   for (const [filePath, list] of byFile) {
-    items.push({ kind: 'file', severity: '', filePath, violations: list });
+    const sorted = [...list].sort(sortViolationsByReportPriority);
+    items.push({ kind: 'file', severity: '', filePath, violations: sorted });
   }
-  // Count desc, then basename asc (primary label), then full path for duplicate basenames.
+  // Max FIX PRIORITY in file, then count desc, then basename asc, then full path.
   items.sort((a, b) => {
+    const byPrio = maxViolationPriority(b.violations) - maxViolationPriority(a.violations);
+    if (byPrio !== 0) return byPrio;
     const byCount = b.violations.length - a.violations.length;
     if (byCount !== 0) return byCount;
     const baseCmp = path.basename(a.filePath).localeCompare(path.basename(b.filePath));

@@ -6,6 +6,7 @@ import 'package:test/test.dart';
 /// Tests for 14 Complexity lint rules.
 ///
 /// Test fixtures: example/lib/complexity/*
+// Cyclomatic hints, bitwise-on-bool, and small control-flow complexity cases.
 void main() {
   group('Complexity Rules - Rule Instantiation', () {
     test('AvoidBitwiseOperatorsWithBooleansRule', () {

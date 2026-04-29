@@ -6,6 +6,7 @@ import 'package:test/test.dart';
 /// Tests for 36 Navigation lint rules.
 ///
 /// Test fixtures: example/lib/navigation/*
+// GoRouter, Navigator, and route parameter patterns in example/lib/navigation.
 void main() {
   group('Navigation Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {

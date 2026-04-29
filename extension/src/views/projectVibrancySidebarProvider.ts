@@ -3,6 +3,11 @@ import { getProjectRoot } from '../projectRoot';
 import { runProjectVibrancyScan } from './projectVibrancyCliRunner';
 import type { ProjectVibrancyPayload } from './projectVibrancyTypes';
 
+/**
+ * **Sidebar webview** host for the project vibrancy report: shells out to [runProjectVibrancyScan],
+ * parses stdout into [ProjectVibrancyPayload], renders HTML with theme-safe CSP, and wires `postMessage`
+ * handlers (refresh, copy, open paths). Shows progress while the CLI runs on the workspace root.
+ */
 /** Sidebar webview: runs the vibrancy CLI, renders JSON payload HTML, handles refresh and messages. */
 
 export const PROJECT_VIBRANCY_VIEW_ID = 'saropaLints.projectVibrancy';

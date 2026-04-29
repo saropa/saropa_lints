@@ -4,6 +4,7 @@ import { buildComparisonHtml } from './comparison-html';
 import { rankPackages } from '../scoring/comparison-ranker';
 import { findPubspecYaml } from '../services/pubspec-editor';
 
+// Side-by-side package comparison webview (add package, rank, HTML from buildComparisonHtml).
 interface AddPackageMessage {
     type: 'addPackage';
     name: string;

@@ -9,6 +9,8 @@ Author:    Saropa
 Copyright: (c) 2025-2026 Saropa
 """
 
+# Commits, tags, pushes, and GitHub releases used by publish.py (retry + message cleanup).
+
 from __future__ import annotations
 
 import re

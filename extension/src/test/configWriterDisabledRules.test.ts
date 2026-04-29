@@ -4,6 +4,10 @@ import * as path from 'path';
 import * as os from 'os';
 import { readDisabledRules, invalidateDisabledRulesCache } from '../configWriter';
 
+/**
+ * Tests **configWriter** disabled-rule discovery: temp saropa config trees, cache invalidation between
+ * cases, and empty vs populated `disabled` rule sets read from disk.
+ */
 describe('readDisabledRules', () => {
   let tmpDir: string;
 

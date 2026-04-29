@@ -1,3 +1,4 @@
+// Single webview: rule text, impact, related rules, and external doc links.
 /**
  * "Explain rule" panel: opens a webview tab beside the editor with full rule details
  * (message, correction, severity, impact, OWASP, doc link). Invoked from Issues tree

@@ -1,4 +1,5 @@
 import '../register-vscode-mock';
+// Pubspec rewrite helpers: version bumps, section headers, override markers (unit-tested).
 import * as assert from 'assert';
 import {
     formatAnnotation,

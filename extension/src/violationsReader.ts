@@ -32,6 +32,8 @@ export interface Violation {
   line: number;
   rule: string;
   message: string;
+  /** FIX PRIORITY score from export (same formula as report); absent in older exports. */
+  priority?: number;
   severity?: string;
   impact?: string;
   correction?: string;

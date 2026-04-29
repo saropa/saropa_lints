@@ -8,7 +8,10 @@ import {
 import { NewVersionNotification, VibrancyResult } from '../../../vibrancy/types';
 import * as versionComparator from '../../../vibrancy/services/version-comparator';
 
-/** FreshnessWatcher: new-version notifications, memento, and interaction with cache + comparator. */
+/**
+ * Tests **FreshnessWatcher**: debounced new-version detection, memento persistence, notification copy/actions,
+ * and stubs for [CacheService] + [versionComparator] to avoid network.
+ */
 
 describe('FreshnessWatcher', () => {
     let memento: MockMemento;

@@ -2,6 +2,8 @@ import * as assert from 'assert';
 import { buildDetailViewHtml } from '../../../vibrancy/views/detail-view-html';
 import { VibrancyResult } from '../../../vibrancy/types';
 
+// Snapshot tests for buildDetailViewHtml (sections, scripts, and edge data).
+
 function makeResult(
     name: string,
     score: number,

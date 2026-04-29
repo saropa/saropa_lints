@@ -1,3 +1,4 @@
+// Hand-rolled test doubles; keep in sync with vscode-mock’s surface.
 /**
  * Mock classes for the vscode API — used by vscode-mock.ts.
  */

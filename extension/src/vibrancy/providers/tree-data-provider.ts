@@ -20,6 +20,11 @@ import { arePrereleasesEnabled, getPrereleaseTagFilter } from '../ui/prerelease-
 import { VibrancyFilterManager, VibrancyFilterState, VibrancyViewMode } from './vibrancy-filter-state';
 import { ProblemSeverity, ProblemType } from '../problems/problem-types';
 
+/**
+ * **Explorer tree** for Package Vibrancy: maps [VibrancyResult] rows, family splits, override analysis,
+ * dependency graph summary, insights, budgets, and [ProblemRegistry] entries into [TreeNode] items.
+ * Handles filter state, prerelease toggles, and lazy detail children for large workspaces.
+ */
 /** Builds the Project Vibrancy explorer tree from scan results, overrides, and problem actions. */
 
 type TreeNode =

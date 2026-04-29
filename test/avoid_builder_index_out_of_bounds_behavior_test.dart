@@ -4,6 +4,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:test/test.dart';
 
+// Mirrors rule regex/heuristics so golden behavior stays aligned with the rule.
 /// Behavioral checks for [AvoidBuilderIndexOutOfBoundsRule] heuristics.
 ///
 /// Regex and extraction logic must stay aligned with

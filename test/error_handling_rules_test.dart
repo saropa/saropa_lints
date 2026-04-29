@@ -9,6 +9,7 @@ import 'package:test/test.dart';
 /// preservation, and production error safety.
 ///
 /// Test fixtures: example/lib/error_handling/*
+// Split between instantiation and integration-style cases in groups below.
 void main() {
   group('Error Handling Rules - Rule Instantiation', () {
     test('AvoidSwallowingExceptionsRule', () {

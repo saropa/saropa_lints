@@ -201,12 +201,12 @@ dart run saropa_lints:cross_file dead-imports [options]
 
 **Note**: `dart analyze` already reports `unused_import` for single files. This command adds value only if it catches cases the native analyzer misses (e.g., transitive re-exports). Validate the gap before implementing.
 
-**Status**: ⚠️ First pass implemented as `dead-imports` (relative-import heuristic with `as`/`show`/`hide`, local re-export awareness, and deferred `loadLibrary()` handling). Analyzer-backed semantic resolution remains future work.
+**Status**: `dead-imports` combines a relative-import **heuristic** (with `as`/`show`/`hide`, local re-export awareness, deferred `loadLibrary()` handling) and **analyzer `unused_import` diagnostics** per resolved unit; if semantic results are empty (e.g. hints off) or a file fails to resolve, results fall back to the heuristic. Use **`--heuristic-dead-imports`** to skip semantic resolution.
 
 ### Deliverables
 - [x] `unused-symbols` command — first pass top-level symbol-to-usage map
 - [x] `feature-deps` command — feature boundary detection, dependency matrix
-- [x] `dead-imports` command — first pass for likely dead relative imports
+- [x] `dead-imports` command — heuristic plus semantic `unused_import` layer with fallback and `--heuristic-dead-imports`
 - [x] Dependency matrix visualization (text table)
 - [x] Performance benchmark harness for large projects (`tool/cross_file_benchmark.dart`)
 - [x] Implement `--exclude` glob filtering in `cross_file_analyzer.dart`
@@ -267,7 +267,7 @@ Re-runs analysis on file changes.
 
 **Priority**: Low — CI/CD is the primary use case, not interactive watching.
 
-**Status**: ⚠️ First pass implemented as `watch` command with debounced reruns, `--command` support, and incremental added/resolved diff summaries; richer progress UI remains future work.
+**Status**: ⚠️ First pass implemented as `watch` command with debounced reruns, `--command` support, incremental added/resolved diff summaries, and **`--watch-verbose`** (ISO UTC line per run). Richer progress UI remains future work.
 
 ### Deliverables
 - [x] HTML report generation (`cross_file_html_reporter.dart`)
@@ -288,18 +288,18 @@ Re-runs analysis on file changes.
 | Command | Description | Implementation | Status |
 |---------|-------------|----------------|--------|
 | `graph` | DOT format dependency graph export | Convert ImportGraphCache to DOT syntax | ✅ Done |
-| `unused-l10n` | Unused localization keys | Compare ARB keys against Dart usage | 🔲 Not started |
-| `duplicates` | Code duplication detection | AST-based comparison using normalized token streams | 🔲 Not started |
+| `unused-l10n` | Unused localization keys | ARB key set vs `\bkey\b` in `lib/` + `test/` `.dart` (skips `@*` metadata keys) | ✅ First pass (`--l10n-arb-dir` override) |
+| `duplicates` | Code duplication detection | Normalized **line-block** sliding window; **`--min-duplicate-lines`** (default 5, min 2); reports blocks in ≥2 files | ✅ First pass (not full AST/token similarity) |
 
 **Acceptance criteria (draft):**
-- **`unused-l10n`:** Inputs from `l10n.yaml` / `pubspec` `flutter: generate` as applicable; compare ARB key set to `S` / `AppLocalizations` usage in `lib/`; respect exclude globs; document false positives (dynamic keys, codegen-only references).
-- **`duplicates`:** Configurable min token count / similarity threshold; report file pairs with line ranges; performance budget for large packages (or opt-in path filter).
+- **`unused-l10n`:** ~~Inputs from `l10n.yaml`~~ — `l10n.yaml` `arb-dir` or `lib/l10n` / `l10n`; heuristic string scan (not `AppLocalizations` type-aware); document false positives (dynamic keys, codegen-only references, non-identifier key usage).
+- **`duplicates`:** ~~AST token streams~~ — shipped as line-block hashing for speed; future work: token/AST similarity, path filter, performance budgets for huge trees.
 
 ### Priority Assessment
 
 1. ~~**`graph` (DOT export)**~~ — ✅ Implemented. Exports DOT digraph with relative-path labels, respects `--exclude`.
-2. **`unused-l10n`** — medium complexity, high value for Flutter projects. Only relevant if project uses ARB-based l10n.
-3. **`duplicates`** — highest complexity, lowest immediate value. AST normalization and similarity detection is a significant undertaking. Consider whether this belongs in the CLI or as a separate tool.
+2. ~~**`unused-l10n`**~~ — ✅ First pass implemented (ARB discovery + heuristic Dart scan).
+3. **`duplicates` (advanced)** — line-block MVP shipped; AST normalization / similarity remains optional follow-up.
 
 ### ProjectContext Integration
 
@@ -318,11 +318,13 @@ if (crossFile.isSymbolUnused(node.name)) {
 - Staleness: cache may be out of date if files changed since last CLI run — **invalidation** options: content hash or mtime of included Dart files, CLI/package version in the cache header, or "cache ignored if older than X minutes" (last resort)
 - Alternative: run CLI as a pre-build step, plugin reads the output
 
+**Status (first pass):** `dart run saropa_lints:cross_file snapshot [--snapshot-out <path>]` writes versioned JSON (`cross_file_snapshot.dart`). `ProjectContext.crossFileSnapshotForPath` / `loadCrossFileSnapshot` read it with mtime-based in-memory cache; rules can consume snapshot fields as they are wired in.
+
 ### Deliverables
 - [x] DOT graph export (`graph` command) — `cross_file_dot_reporter.dart`, respects `--exclude` via `includedPaths`
-- [ ] Unused localization detection (`unused-l10n` command)
-- [ ] Duplicate code detection (`duplicates` command) — defer until others prove the pattern
-- [ ] ProjectContext integration for lint rules — requires architecture decision on caching
+- [x] Unused localization detection (`unused-l10n` command) — first-pass heuristic
+- [x] Duplicate line-block detection (`duplicates` command) — sliding-window line blocks
+- [x] ProjectContext snapshot loader — `snapshot` CLI + `project_context_cross_file.dart` (staleness: file mtime + format version)
 
 ---
 
@@ -330,7 +332,7 @@ if (crossFile.isSymbolUnused(node.name)) {
 
 **Goal**: Expose all cross-file CLI commands through the VS Code extension so users can actually discover and use them.
 
-**Why this is critical**: CLI-only features are hard to discover. The extension surfaces the cross-file CLI as named commands (unused files, cycles, stats, feature deps, dead imports, unused symbols, DOT graph, HTML report) so users do not have to memorize `dart run` invocations. This phase is **complete**; the tables below document the intended mapping and patterns.
+**Why this is critical**: CLI-only features are hard to discover. The extension surfaces the cross-file CLI as named commands (unused files, cycles, stats, feature deps, dead imports, unused symbols, unused l10n, duplicates, snapshot JSON, DOT graph, HTML report) so users do not have to memorize `dart run` invocations. This phase is **complete**; the tables below document the intended mapping and patterns.
 
 ### Existing Extension Patterns to Follow
 
@@ -351,19 +353,22 @@ The extension already has established patterns for CLI execution and report gene
 | `saropaLints.crossFile.featureDeps` | `feature-deps` | Output channel; status bar (features / cross-feature imports) |
 | `saropaLints.crossFile.deadImports` | `dead-imports` | Output channel; status bar (likely dead import count) |
 | `saropaLints.crossFile.unusedSymbols` | `unused-symbols` | Output channel; status bar (symbol count) |
+| `saropaLints.crossFile.unusedL10n` | `unused-l10n` | Output channel; status bar (unused key count) |
+| `saropaLints.crossFile.duplicates` | `duplicates` | Output channel; status bar (duplicate block count) |
+| `saropaLints.crossFile.snapshot` | `snapshot --snapshot-out <path>` | Writes JSON under `reports/.saropa_lints/`, opens in editor |
 | `saropaLints.crossFile.graph` | `graph --output-dir <dir>` | DOT under `reports/.saropa_lints/cross_file/`, open in editor |
 | `saropaLints.crossFile.report` | `report --output-dir <dir>` | HTML under `reports/.saropa_lints/cross_file/`, open in browser or editor |
 
 **Implementation approach** for each command:
 1. Get workspace root via `getProjectRoot()` (bail if none)
-2. Build args: `['run', 'saropa_lints:cross_file', '--path', root, '--output', 'json', '<subcommand>', ...]`
+2. Build args: `['run', 'saropa_lints:cross_file', '--path', root, '--output', 'json', '<subcommand>', ...]` (omit `--output json` for `snapshot`, `graph`, `report`)
 3. Call `runInWorkspace(root, 'dart', args)`
 4. For JSON-output commands: parse stdout for status bar; full JSON still in output channel
-5. For `graph` / `report`: pass `--output-dir`, then open generated file(s) as above
+5. For `graph` / `report` / `snapshot`: pass file output flags, then open generated file(s) as above
 
 ### 5B. Package.json registration
 
-All eight `saropaLints.crossFile.*` commands are registered in `extension/package.json` under `contributes.commands` (with titles, icons, and `enablement`). The snippet below is **representative**; use `package.json` as the source of truth for exact titles and any future additions.
+All `saropaLints.crossFile.*` commands (JSON summaries + `snapshot` + `graph` + `report`) are registered in `extension/package.json` under `contributes.commands` (with titles, icons, and `enablement`). The snippet below is **representative**; use `package.json` as the source of truth for exact titles and any future additions.
 
 ```json
 { "command": "saropaLints.crossFile.unusedFiles", "title": "Saropa Lints: Cross-File — Find Unused Files" },
@@ -372,6 +377,9 @@ All eight `saropaLints.crossFile.*` commands are registered in `extension/packag
 { "command": "saropaLints.crossFile.featureDeps", "title": "Saropa Lints: Cross-File — Show Feature Dependencies" },
 { "command": "saropaLints.crossFile.unusedSymbols", "title": "Saropa Lints: Cross-File — Find Unused Symbols" },
 { "command": "saropaLints.crossFile.deadImports", "title": "Saropa Lints: Cross-File — Find Dead Imports" },
+{ "command": "saropaLints.crossFile.unusedL10n", "title": "Saropa Lints: Cross-File — Find Unused l10n Keys" },
+{ "command": "saropaLints.crossFile.duplicates", "title": "Saropa Lints: Cross-File — Find Duplicate Line Blocks" },
+{ "command": "saropaLints.crossFile.snapshot", "title": "Saropa Lints: Cross-File — Write Project Snapshot (JSON)" },
 { "command": "saropaLints.crossFile.graph", "title": "Saropa Lints: Cross-File — Export Import Graph (DOT)" },
 { "command": "saropaLints.crossFile.report", "title": "Saropa Lints: Cross-File — Generate HTML Report" }
 ```
@@ -393,11 +401,12 @@ Create `extension/src/cross-file-commands.ts` with:
 //   4. Display results (output channel, status bar, or open generated file)
 ```
 
-**Commands that use JSON for summaries** (CLI invoked with `--output json`): `unused-files`, `circular-deps`, `import-stats`, `feature-deps`, `dead-imports`, `unused-symbols` — stdout is parsed for counts/messages; output channel still shows full output from `runInWorkspace`.
+**Commands that use JSON for summaries** (CLI invoked with `--output json`): `unused-files`, `circular-deps`, `import-stats`, `feature-deps`, `dead-imports`, `unused-symbols`, `unused-l10n`, `duplicates` — stdout is parsed for counts/messages; output channel still shows full output from `runInWorkspace`.
 
-**Commands that produce files** (`graph`, `report`):
-- Pass `--output-dir` pointing to `reports/.saropa_lints/`
-- On success: open generated file in editor (DOT) or show "Open in browser?" prompt (HTML)
+**Commands that produce files** (`snapshot`, `graph`, `report`):
+- `snapshot`: pass `--snapshot-out` under `reports/.saropa_lints/`, open JSON in editor on success
+- `graph` / `report`: pass `--output-dir` pointing to `reports/.saropa_lints/cross_file/`
+- On success: open generated file in editor (DOT / JSON) or show "Open in browser?" prompt (HTML)
 - On failure: show error message with stderr
 
 ### 5D. Discoverability
@@ -411,7 +420,7 @@ Cross-file-specific requirements from that plan:
 
 ### 5E. JSON output mode for structured results
 
-The extension runs the CLI with `--output json` for the six subcommands in 5A that need programmatic summaries. Handlers parse stdout into a small `CrossFileSummary` (counts, key arrays) for the status bar; the raw JSON remains visible in the output channel. A future tree view could reuse the same parse step instead of scraping text.
+The extension runs the CLI with `--output json` for the eight JSON-oriented subcommands in 5A. Handlers parse stdout into a small `CrossFileSummary` (counts, key arrays) for the status bar; the raw JSON remains visible in the output channel. A future tree view could reuse the same parse step instead of scraping text.
 
 ### 5F. Future: Cross-File Tree View
 
@@ -424,8 +433,8 @@ This would follow the same pattern as `saropaLints.todosAndHacks` or `saropaLint
 
 ### Deliverables
 
-- [x] `extension/src/cross-file-commands.ts` — handler implementations for all cross-file subcommands (JSON summaries + `graph` / `report` file open)
-- [x] `extension/package.json` — command registrations and walkthrough; see 5B for the eight `saropaLints.crossFile.*` commands
+- [x] `extension/src/cross-file-commands.ts` — handler implementations for all cross-file subcommands (JSON summaries + `snapshot` / `graph` / `report` file open)
+- [x] `extension/package.json` — command registrations and walkthrough; see 5B for all `saropaLints.crossFile.*` commands
 - [x] `extension/src/extension.ts` — call `registerCrossFileCommands(context)` from `activate()`
 - [x] Walkthrough step for cross-file analysis (package.json + `media/walkthrough-cross-file.md`)
 - [x] Output routing — text results to output channel, file results opened in editor
@@ -448,10 +457,10 @@ This would follow the same pattern as `saropaLints.todosAndHacks` or `saropaLint
 
 ```
 Phase 1 ████████████████████ COMPLETE
-Phase 2 ██████████████░░░░░░ 70% (`--exclude` + `feature-deps` + semantic top-level `unused-symbols` + first-pass `dead-imports`)
-Phase 3 ███████████████████░ 95% (watch: first pass done; optional UI polish)
-Phase 4 █████░░░░░░░░░░░░░░ 25% (graph done, 3 remaining)
-Phase 5 ████████████████████ 100% (extension integration complete)
+Phase 2 ██████████████████░░ 90% (`--exclude` + `feature-deps` + semantic `unused-symbols` + `dead-imports` semantic+heuristic)
+Phase 3 ███████████████████░ 95% (watch + `--watch-verbose`; optional UI polish)
+Phase 4 ████████████████░░░░ 80% (graph + `unused-l10n` + line-block `duplicates` + snapshot for ProjectContext)
+Phase 5 ████████████████████ 100% (extension wraps CLI including new commands)
 ```
 
 ### Suggested next steps (in order)
@@ -460,11 +469,11 @@ Phase 5 ████████████████████ 100% (exten
 2. ~~**Implement `--exclude` filtering**~~ — ✅ Done
 3. ~~**Phase 4: `graph` command**~~ — ✅ Done
 4. ~~**Phase 2A follow-up** — upgrade `unused-symbols` to semantic resolver (`AnalysisContextCollection`) with annotation-aware filtering~~ — ✅ Done for top-level declarations (heuristic fallback + `--heuristic-unused-symbols`)
-5. **Phase 2C follow-up** — semantic `dead-imports` (re-export + deferred support + analyzer-backed symbol resolution)
-6. **Phase 4: `unused-l10n`** — medium complexity, Flutter-specific; see acceptance criteria above
-7. **Phase 3: watch mode** — low priority: optional richer progress UI and tuning unless user demand
-8. **Phase 4: `duplicates`** — high complexity, defer; see acceptance criteria above
-9. **Phase 4: ProjectContext integration** — only after cache format and invalidation story is decided
+5. ~~**Phase 2C follow-up** — semantic `dead-imports` (`unused_import` diagnostics + heuristic fallback + `--heuristic-dead-imports`)~~ — ✅ Done (first pass)
+6. ~~**Phase 4: `unused-l10n`**~~ — ✅ Done (first pass; refine for `flutter gen-l10n` edge cases as needed)
+7. ~~**Phase 3: watch mode** — `--watch-verbose` timestamps~~ — ✅ Done
+8. ~~**Phase 4: `duplicates`** (line-block MVP)~~ — ✅ Done; optional later: AST/token similarity
+9. ~~**Phase 4: ProjectContext integration** (snapshot file + loader)~~ — ✅ Done (first pass); extend rule consumption as rules need it
 
 ---
 
@@ -518,13 +527,18 @@ cross_file:
 | `lib/src/cli/cross_file_html_reporter.dart` (+ part) | 3 | HTML report + `report.css`; feature matrix page |
 | `lib/src/cli/cross_file_baseline.dart` | 3 | Baseline JSON load/save/compare |
 | `lib/src/cli/cross_file_dot_reporter.dart` | 4 | DOT graph export for Graphviz |
+| `lib/src/cli/cross_file_dead_imports_semantic.dart` | 2 | Semantic dead imports via `unused_import` diagnostics |
+| `lib/src/cli/cross_file_unused_l10n.dart` | 4 | ARB key discovery vs Dart identifier heuristic scan |
+| `lib/src/cli/cross_file_duplicates.dart` | 4 | Duplicate normalized line blocks across files |
+| `lib/src/cli/cross_file_snapshot.dart` | 4 | Versioned JSON snapshot writer for `snapshot` command |
+| `lib/src/project_context_cross_file.dart` | 4 | Snapshot load + mtime cache for `ProjectContext` |
 | `test/cli/cross_file_test.dart` | 1 | Unit tests (3 groups, fixture-based) |
 | `test/cli/cross_file_exclude_test.dart` | 2 | `--exclude` glob filtering tests |
 | `test/cli/cross_file_dot_test.dart` | 4 | DOT graph export tests |
 | `test/fixtures/cross_file_fixture/` | 1 | 4-file test fixture (orphan + a→b→c→a cycle) |
 | `doc/cross_file_ci_example.md` | 3 | GitHub Actions workflow template |
-| `extension/src/cross-file-commands.ts` | 5 | VS Code command handlers (eight commands: six JSON + graph + report) |
-| `extension/package.json` | 5 | `saropaLints.crossFile.*` command registrations (eight commands) |
+| `extension/src/cross-file-commands.ts` | 5 | VS Code command handlers (JSON commands + snapshot + graph + report) |
+| `extension/package.json` | 5 | `saropaLints.crossFile.*` command registrations |
 | `extension/src/extension.ts` | 5 | `registerCrossFileCommands()` call from `activate()` |
 
 ### References

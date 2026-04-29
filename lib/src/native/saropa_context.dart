@@ -20,6 +20,7 @@ import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/source/line_info.dart';
 
+import '../config/runtime_tier_cap.dart';
 import '../init/project_info.dart' show getPackageVersion;
 import '../project_context.dart' show FileTypeDetector, ProjectContext;
 import '../report/analysis_reporter.dart' show AnalysisReporter, ReportConfig;
@@ -141,13 +142,15 @@ class SaropaContext {
     if (_saropaRule == null) return callback;
     return (T node) {
       _ensureConfigLoadedFromProjectRoot();
+      final rule = _saropaRule;
+      if (!RuntimeTierCap.ruleAllowedByCap(rule.code.lowerCaseName)) {
+        return;
+      }
       if (_shouldSkipCurrentFile()) return;
       if (!_timingEnabled) {
         callback(node);
         return;
       }
-
-      final rule = _saropaRule;
 
       final stopwatch = Stopwatch()..start();
       try {
@@ -244,7 +247,11 @@ class SaropaContext {
         // "plugin" rather than a tier name — the analyzer plugin path
         // receives a rule set directly, never a tier enum. The scan CLI
         // path, which does resolve a tier, already sets its own config.
-        effectiveTier: 'plugin',
+        effectiveTier: () {
+          final cap = RuntimeTierCap.activeCapLabel;
+          if (cap == null) return 'plugin';
+          return 'plugin (runtime cap: $cap)';
+        }(),
         enabledRuleCount: enabled.length,
         enabledRuleNames: enabled.toList(growable: false),
         enabledPlatforms: const <String>[],

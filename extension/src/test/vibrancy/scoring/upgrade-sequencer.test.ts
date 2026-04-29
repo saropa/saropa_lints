@@ -2,6 +2,8 @@ import * as assert from 'assert';
 import { buildUpgradeOrder } from '../../../vibrancy/scoring/upgrade-sequencer';
 import { VibrancyResult, DepEdge, UpdateStatus } from '../../../vibrancy/types';
 
+// Topological upgrade order and blocked edges from buildUpgradeOrder.
+
 function makeResult(
     name: string,
     opts: {

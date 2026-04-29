@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { RegistryService } from '../services/registry-service';
 
+// Add/remove/list private pub registry credentials in VS Code.
 /**
  * Register registry authentication commands.
  */

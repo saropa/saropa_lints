@@ -7,6 +7,7 @@ import 'package:saropa_lints/src/rules/security/permission_rules.dart';
 /// Tests for 6 Permission lint rules.
 ///
 /// Test fixtures: example/lib/permission/*
+// Runtime permission APIs and handler wiring in small examples.
 void main() {
   group('Permission Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {

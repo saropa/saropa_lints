@@ -1,7 +1,10 @@
 import * as assert from 'assert';
 import { hasDependencyChanges, getDependencyChangeSummary } from '../../../vibrancy/services/dependency-differ';
 
-/** Pubspec dependency diff: add/remove/constraint changes between two YAML bodies. */
+/**
+ * Tests **dependency-differ** on synthetic `pubspec.yaml` fragments: added/removed deps, constraint bumps,
+ * dev vs hosted sections, overrides, and human-readable [getDependencyChangeSummary] strings.
+ */
 
 describe('dependency-differ', () => {
     describe('hasDependencyChanges', () => {

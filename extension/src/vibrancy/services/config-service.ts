@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { ScoringWeights } from '../scoring/vibrancy-calculator';
 
+// Typed reads of `saropaLints.packageVibrancy` workspace settings.
 /**
  * Centralized configuration service.
  * Provides typed access to all extension settings.

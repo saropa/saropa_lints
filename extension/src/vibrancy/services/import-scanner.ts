@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 
+// Walks .dart files for import/export lines; dedupes refs for the vibrancy grid.
 // Match both `import` and `export` directives — re-exported packages are used too.
 // Capture group 1 = directive (import|export); group 2 = package name. Distinguishing
 // the two matters for downstream classification: an `export` is a public-API surface,

@@ -4,6 +4,10 @@ import { VibrancyStateManager, STATE_KEYS } from '../../../vibrancy/state/vibran
 import { VibrancyResult } from '../../../vibrancy/types';
 import { clearTestConfig, setTestConfig } from '../vscode-mock';
 
+/**
+ * Tests **VibrancyStateManager** and `STATE_KEYS`: persists scan summaries, drives `setContext` for
+ * sidebar visibility, and restores state across reloads using vscode memento mocks.
+ */
 describe('VibrancyStateManager', () => {
     let manager: VibrancyStateManager;
     let contextValues: Record<string, any> = {};

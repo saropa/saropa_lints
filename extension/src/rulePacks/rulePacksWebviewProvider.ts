@@ -1,3 +1,4 @@
+// Implements the Rule Packs view: load pubspec, toggles, and `rule_packs` config.
 /**
  * VS Code **Rule Packs** sidebar (`saropaLints.rulePacks`).
  *

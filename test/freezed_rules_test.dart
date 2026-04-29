@@ -6,6 +6,7 @@ import 'package:test/test.dart';
 /// Tests for 10 Freezed lint rules.
 ///
 /// Test fixtures: example_packages/lib/freezed/*
+// @freezed / union patterns; use example_packages for package-resolution tests.
 void main() {
   group('Freezed Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {

@@ -5,6 +5,7 @@ import { isReplacementPackageName, getReplacementDisplayText } from '../scoring/
 import { formatSizeMB } from '../scoring/bloat-calculator';
 import { formatRelativeTime } from '../scoring/time-formatter';
 
+// Human-readable package detail lines (pub.dev, issues, size) to the output channel.
 /** Output channel name for package details logging. */
 export const DETAIL_CHANNEL_NAME = 'Vibrancy Details';
 

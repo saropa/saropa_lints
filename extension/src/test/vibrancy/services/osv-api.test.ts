@@ -2,6 +2,10 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { queryVulnerabilities } from '../../../vibrancy/services/osv-api';
 
+/**
+ * Tests **osv-api** [queryVulnerabilities]: batch POST to OSV, response normalization, cache behavior,
+ * and stubbed `fetch` for offline assertions (empty list short-circuits network).
+ */
 describe('osv-api', () => {
     let fetchStub: sinon.SinonStub;
 

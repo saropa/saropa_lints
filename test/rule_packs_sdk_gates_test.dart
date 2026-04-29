@@ -1,8 +1,11 @@
+/// Validates [packPassesSdkGate] and related helpers: SDK lower bounds in `pubspec.yaml` `environment`
+/// must satisfy each pack's declared `sdkGate` before the pack is offered in UI or config.
+library;
+
 import 'package:saropa_lints/src/config/rule_packs.dart';
 import 'package:test/test.dart';
 
-// Ensures rule pack SDK gates (e.g. dart_sdk_3_2) match pubspec environment constraints.
-
+/// Table-driven checks per pack id (`dart_sdk_*`, `flutter_sdk_*`, …).
 void main() {
   group('packPassesSdkGate', () {
     test('dart_sdk_3_2 passes when sdk lower bound is >= 3.2.0', () {

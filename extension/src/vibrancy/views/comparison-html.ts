@@ -4,6 +4,11 @@ import { escapeHtml } from './html-utils';
 import { isWinnerForDimension } from '../scoring/comparison-ranker';
 import { CATEGORY_DICTIONARY, scoreToGrade } from '../category-dictionary';
 
+/**
+ * HTML builder for **side-by-side package comparison** (scores, dimension winners, size, recommendations).
+ * Embeds CSS via [getComparisonStyles] and uses [escapeHtml] for any user- or registry-derived text.
+ * Renders [RankedComparison] rows and highlights per-dimension winners using [isWinnerForDimension].
+ */
 /** Self-contained HTML/CSS for the package comparison panel inside vibrancy webviews. */
 
 function getComparisonStyles(): string {

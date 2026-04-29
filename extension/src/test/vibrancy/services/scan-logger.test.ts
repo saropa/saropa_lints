@@ -3,6 +3,10 @@ import {
     ScanLogger, lastNonEmptyLine, extractScanSummary,
 } from '../../../vibrancy/services/scan-logger';
 
+/**
+ * Tests [ScanLogger] line buffer, [lastNonEmptyLine] trimming, and [extractScanSummary] heuristics
+ * used when surfacing CLI vibrancy output in the UI.
+ */
 describe('ScanLogger', () => {
     let logger: ScanLogger;
 

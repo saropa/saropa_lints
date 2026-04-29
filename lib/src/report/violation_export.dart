@@ -10,6 +10,7 @@ import 'package:saropa_lints/saropa_lints.dart'
 import 'package:saropa_lints/src/baseline/baseline_manager.dart';
 import 'package:saropa_lints/src/report/analysis_reporter.dart';
 import 'package:saropa_lints/src/report/diagnostic_statistics.dart';
+import 'package:saropa_lints/src/report/import_graph_tracker.dart';
 import 'package:saropa_lints/src/report/health_score_constants.dart';
 import 'package:saropa_lints/src/report/report_consolidator.dart';
 import 'package:saropa_lints/src/rule_tags.dart';
@@ -546,6 +547,7 @@ class ViolationExporter {
       if (list == null) continue;
 
       for (final v in list) {
+        final priority = ImportGraphTracker.getPriority(v.file, impact);
         result.add(
           _SortableViolation(
             record: v,
@@ -554,6 +556,7 @@ class ViolationExporter {
             severity: ruleSeverities[v.rule]?.toLowerCase() ?? 'info',
             owasp: owaspLookup[v.rule],
             metadata: ruleMetadata[v.rule],
+            priority: priority,
           ),
         );
       }
@@ -564,8 +567,11 @@ class ViolationExporter {
     return result.map(_violationToJson).toList();
   }
 
-  /// Compare violations for sorting: impact → file → line.
+  /// Compare violations for sorting: FIX PRIORITY score (desc) → impact → file → line.
   static int _compareViolations(_SortableViolation a, _SortableViolation b) {
+    final p = b.priority.compareTo(a.priority);
+    if (p != 0) return p;
+
     final impactCmp = a.impact.index.compareTo(b.impact.index);
     if (impactCmp != 0) return impactCmp;
 
@@ -587,6 +593,7 @@ class ViolationExporter {
       if (v.record.correction != null) 'correction': v.record.correction!,
       'severity': v.severity,
       'impact': v.impact.name,
+      'priority': v.priority,
       'owasp': _owaspToJson(v.owasp),
       'metadata': _ruleMetadataToJson(v.metadata),
     };
@@ -697,6 +704,7 @@ class _SortableViolation {
     required this.severity,
     required this.owasp,
     required this.metadata,
+    required this.priority,
   });
 
   final ViolationRecord record;
@@ -705,6 +713,9 @@ class _SortableViolation {
   final String severity;
   final OwaspMapping? owasp;
   final _RuleMetadataSnapshot? metadata;
+
+  /// Same combined score as report `FIX PRIORITY` ([ImportGraphTracker.getPriority]).
+  final double priority;
 }
 
 class _RuleMetadataSnapshot {

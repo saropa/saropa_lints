@@ -6,6 +6,7 @@ import 'package:test/test.dart';
 /// Tests for 17 Disposal lint rules.
 ///
 /// Test fixtures: example/lib/disposal/*
+// Controllers, streams, and focus disposal patterns in examples.
 void main() {
   group('Disposal Rules - Rule Instantiation', () {
     test('RequireMediaPlayerDisposeRule', () {

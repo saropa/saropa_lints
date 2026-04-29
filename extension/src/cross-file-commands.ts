@@ -5,6 +5,7 @@ import { runInWorkspace, getSharedOutputChannel } from './setup';
 import { getProjectRoot } from './projectRoot';
 import { hasSaropaLintsDep } from './pubspecReader';
 
+// Extension commands for cross_file analyzer (JSON summary, output channel).
 type CrossFileSummary = {
   unusedFiles?: unknown[];
   circularDependencies?: unknown[];
@@ -13,6 +14,9 @@ type CrossFileSummary = {
   deadImports?: Record<string, unknown[]>;
   unusedSymbols?: Record<string, unknown[]>;
   missingMirrorTests?: unknown[];
+  unusedL10nKeys?: unknown[];
+  arbPaths?: unknown[];
+  duplicateBlocks?: unknown[];
   stats?: {
     fileCount?: number;
     totalImports?: number;
@@ -35,6 +39,8 @@ export function registerCrossFileCommands(context: vscode.ExtensionContext): voi
     { id: 'saropaLints.crossFile.featureDeps', command: 'feature-deps', title: 'Feature dependencies' },
     { id: 'saropaLints.crossFile.deadImports', command: 'dead-imports', title: 'Dead imports' },
     { id: 'saropaLints.crossFile.unusedSymbols', command: 'unused-symbols', title: 'Unused symbols' },
+    { id: 'saropaLints.crossFile.unusedL10n', command: 'unused-l10n', title: 'Unused l10n keys' },
+    { id: 'saropaLints.crossFile.duplicates', command: 'duplicates', title: 'Duplicate line blocks' },
   ];
 
   for (const spec of commandSpecs) {
@@ -149,6 +155,39 @@ export function registerCrossFileCommands(context: vscode.ExtensionContext): voi
       await vscode.window.showTextDocument(doc, { preview: false });
     }),
   );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('saropaLints.crossFile.snapshot', async () => {
+      const root = getWorkspaceRootOrError();
+      if (!root) return;
+      if (!ensureSaropaDependency(root)) return;
+
+      const outPath = path.join(root, 'reports', '.saropa_lints', 'cross_file_snapshot.json');
+      const args = [
+        'run',
+        'saropa_lints:cross_file',
+        '--path',
+        root,
+        'snapshot',
+        '--snapshot-out',
+        outPath,
+      ];
+      const result = runInWorkspace(root, 'dart', args, true);
+      getSharedOutputChannel().show(true);
+      if (!result.ok) {
+        const message = summarizeError(result.stderr);
+        void vscode.window.showErrorMessage(`Cross-file snapshot failed: ${message}`);
+        return;
+      }
+      if (!fs.existsSync(outPath)) {
+        void vscode.window.showWarningMessage('Cross-file snapshot completed but JSON file was not found.');
+        return;
+      }
+      const doc = await vscode.workspace.openTextDocument(vscode.Uri.file(outPath));
+      await vscode.window.showTextDocument(doc, { preview: false });
+      void vscode.window.showInformationMessage('Cross-file snapshot written to reports/.saropa_lints/cross_file_snapshot.json');
+    }),
+  );
 }
 
 function getWorkspaceRootOrError(): string | null {
@@ -218,6 +257,12 @@ function buildStatusMessage(command: string, summary: CrossFileSummary | null): 
     const values = Object.values(summary.deadImports ?? {});
     const total = values.reduce((sum, items) => sum + (Array.isArray(items) ? items.length : 0), 0);
     return `${total} likely dead import(s)`;
+  }
+  if (command === 'unused-l10n') {
+    return `${count(summary.unusedL10nKeys)} unused l10n key(s)`;
+  }
+  if (command === 'duplicates') {
+    return `${count(summary.duplicateBlocks)} duplicate block(s)`;
   }
   return null;
 }

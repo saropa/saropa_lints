@@ -13,6 +13,7 @@ import 'package:saropa_lints/src/rules/platforms/ios_ui_security_rules.dart';
 /// and Apple platform integration.
 ///
 /// Test fixtures: example/lib/ios/
+// Large iOS ruleset: instantiation + example fixture coverage in nested groups.
 void main() {
   group('Ios Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {

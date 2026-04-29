@@ -2,6 +2,8 @@ import * as crypto from 'crypto';
 import { VibrancyResult } from '../types';
 import { buildPurl } from '../scoring/purl-builder';
 
+/** CycloneDX JSON from vibrancy scan rows (packages as components, PURLs, hashes). */
+
 export interface SbomMetadata {
     readonly projectName: string;
     readonly projectVersion: string;

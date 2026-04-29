@@ -10,7 +10,10 @@ import {
     getAvailablePlatforms,
 } from '../../../vibrancy/services/ci-generator';
 
-/** CI generator: GitHub Actions, GitLab, shell script output from vibrancy thresholds. */
+/**
+ * Golden-style tests for **ci-generator**: workflow YAML / shell snippets for each [CiPlatform],
+ * default output paths, display names, and threshold wiring from [CiThresholds].
+ */
 
 describe('ci-generator', () => {
     const defaultThresholds: CiThresholds = {

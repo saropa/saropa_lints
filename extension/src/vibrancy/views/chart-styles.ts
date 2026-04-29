@@ -1,3 +1,7 @@
+/**
+ * CSS string for **vibrancy report charts** (donut / bar): CSS variables for segment colors, section spacing,
+ * and distinct hues for unique vs shared transitive dependency slices. Injected next to [getChartScript].
+ */
 /** CSS for size distribution charts in the vibrancy report webview. */
 export function getChartStyles(): string {
     return `

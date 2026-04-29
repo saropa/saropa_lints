@@ -10,6 +10,8 @@ import {
 import { DetailItem, PackageItem } from '../../../vibrancy/providers/tree-items';
 import { VibrancyResult } from '../../../vibrancy/types';
 
+/** Tree commands: jump to pubspec, copy, upgrade flows (mocked workspace + messages). */
+
 function makeResult(
     name: string, score: number, latestVersion?: string,
 ): VibrancyResult {

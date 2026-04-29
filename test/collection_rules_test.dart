@@ -6,6 +6,7 @@ import 'package:test/test.dart';
 /// Tests for 27 Collection lint rules.
 ///
 /// Test fixtures: example/lib/collection/*
+// List/Set/Map idioms; large instantiation table then optional integration cases.
 void main() {
   group('Collection Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {

@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { buildKnownIssuesHtml } from './known-issues-html';
 
+// Webview host for the static “known issues library” HTML panel.
 /** Singleton webview panel for browsing the known issues library. */
 export class KnownIssuesPanel {
     public static currentPanel: KnownIssuesPanel | undefined;

@@ -1,3 +1,4 @@
+/** Per-dimension extractors and ranking for two-package vibrancy comparison. */
 import { ComparisonData, DimensionWinner, RankedComparison } from '../types';
 import { formatSizeMB } from './bloat-calculator';
 import { scoreToGrade } from './status-classifier';

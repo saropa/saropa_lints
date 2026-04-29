@@ -20,6 +20,7 @@ import 'package:analyzer/file_system/physical_file_system.dart';
 import 'package:analyzer/src/string_source.dart';
 import 'package:path/path.dart' as p;
 
+import '../config/runtime_tier_cap.dart';
 import '../init/cli_args.dart' show tierOrder;
 import '../../saropa_lints.dart';
 import 'capturing_registry.dart';
@@ -87,9 +88,11 @@ class ScanRunner {
   /// Returns `null` if no configuration was found and no [tier] was set (caller should tell
   /// the user to run `init` first), or if [tier] was set to an unknown value.
   List<ScanDiagnostic>? run() {
-    final ruleNames = _resolveRuleNames();
-    if (ruleNames == null) return null;
+    reloadRuntimeTierCapFromProject(p.absolute(targetPath));
+    final resolved = _resolveRuleNames();
+    if (resolved == null) return null;
 
+    final ruleNames = RuntimeTierCap.filterRuleSet(resolved);
     if (ruleNames.isEmpty) {
       _out('All rules are disabled in the configuration.');
       return const [];

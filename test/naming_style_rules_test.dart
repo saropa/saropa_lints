@@ -6,6 +6,7 @@ import 'package:test/test.dart';
 /// Tests for 28 Naming Style lint rules.
 ///
 /// Test fixtures: example/lib/naming_style/*
+// Rule instantiation and message checks; fixtures under example/lib/naming_style.
 void main() {
   group('Naming Style Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {

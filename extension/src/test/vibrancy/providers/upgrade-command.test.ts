@@ -1,6 +1,7 @@
 import * as assert from 'assert';
 import * as treeCommands from '../../../vibrancy/providers/tree-commands';
 
+// Pure helpers: pubspec line detection and version read used by upgrade command.
 /** Create a minimal fake TextDocument from lines of text. */
 function makeFakeDoc(line: string): {
     lineCount: number;

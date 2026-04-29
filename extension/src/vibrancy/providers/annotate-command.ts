@@ -12,6 +12,7 @@ import {
 } from './annotate-headers';
 import { SDK_PACKAGES } from '../sdk-packages';
 
+// Command: inject/refresh vibrancy section comments and dep metadata in pubspec.
 const FETCH_CONCURRENCY = 3;
 
 let annotateInProgress = false;

@@ -1,11 +1,13 @@
 import 'dart:io';
 
 import 'package:path/path.dart' as p;
+import 'package:saropa_lints/src/cli/cross_file_dead_imports_semantic.dart';
 import 'package:saropa_lints/src/cli/cross_file_reporter.dart';
 import 'package:saropa_lints/src/cli/cross_file_unused_symbols_semantic.dart';
 import 'package:saropa_lints/src/project_context.dart';
 import 'package:saropa_lints/src/string_slice_utils.dart';
 
+// cross_file CLI entry: import graph, unused paths, cycles, optional semantic symbol scan.
 /// Runs cross-file analysis: builds import graph and returns unused files,
 /// circular dependencies, [missingMirrorTests], and stats.
 ///
@@ -15,6 +17,7 @@ Future<CrossFileResult> runCrossFileAnalysis({
   required String projectPath,
   List<String> excludeGlobs = const [],
   UnusedSymbolsOptions? unusedSymbolsOptions,
+  bool forceHeuristicDeadImports = false,
 }) async {
   await ImportGraphCache.buildFromDirectory(projectPath);
 
@@ -77,9 +80,10 @@ Future<CrossFileResult> runCrossFileAnalysis({
     projectPath: projectPath,
     includedPaths: includedPaths,
   );
-  final deadImports = _analyzeDeadImports(
+  final deadImports = await _resolveDeadImports(
     projectPath: projectPath,
     includedPaths: includedPaths,
+    forceHeuristic: forceHeuristicDeadImports,
   );
   final unusedSymbols = unusedSymbolsOptions == null
       ? const <String, List<String>>{}
@@ -131,6 +135,40 @@ Future<Map<String, List<String>>> _unusedSymbolsForOptions({
     );
   }
 }
+
+Future<Map<String, List<String>>> _resolveDeadImports({
+  required String projectPath,
+  required Set<String> includedPaths,
+  required bool forceHeuristic,
+}) async {
+  final heuristic = _analyzeDeadImports(
+    projectPath: projectPath,
+    includedPaths: includedPaths,
+  );
+  if (forceHeuristic) {
+    return heuristic;
+  }
+  try {
+    final semantic = await analyzeDeadImportsSemantic(
+      projectPath: projectPath,
+      includedPaths: includedPaths,
+    );
+    // When analyzer emits no unused_import diagnostics (hints off or clean),
+    // keep heuristic results so CLI/fixtures stay useful.
+    if (_deadImportEntryCount(semantic) == 0) {
+      return heuristic;
+    }
+    return semantic;
+  } on Object catch (e) {
+    stderr.writeln(
+      'dead-imports: semantic analysis failed, using heuristic. $e',
+    );
+    return heuristic;
+  }
+}
+
+int _deadImportEntryCount(Map<String, List<String>> m) =>
+    m.values.fold<int>(0, (sum, list) => sum + list.length);
 
 Map<String, List<String>> _analyzeDeadImports({
   required String projectPath,

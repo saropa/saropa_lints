@@ -232,6 +232,24 @@
         "enablement": "saropaLints.isDartProject"
       },
       {
+        "command": "saropaLints.crossFile.unusedL10n",
+        "title": "Saropa Lints: Cross-File — Find Unused l10n Keys",
+        "icon": "$(symbol-string)",
+        "enablement": "saropaLints.isDartProject"
+      },
+      {
+        "command": "saropaLints.crossFile.duplicates",
+        "title": "Saropa Lints: Cross-File — Find Duplicate Line Blocks",
+        "icon": "$(copy)",
+        "enablement": "saropaLints.isDartProject"
+      },
+      {
+        "command": "saropaLints.crossFile.snapshot",
+        "title": "Saropa Lints: Cross-File — Write Project Snapshot (JSON)",
+        "icon": "$(database)",
+        "enablement": "saropaLints.isDartProject"
+      },
+      {
         "command": "saropaLints.crossFile.graph",
         "title": "Saropa Lints: Cross-File — Export Import Graph (DOT)",
         "icon": "$(type-hierarchy)",
@@ -1368,6 +1386,18 @@
           "when": "saropaLints.isDartProject"
         },
         {
+          "command": "saropaLints.crossFile.unusedL10n",
+          "when": "saropaLints.isDartProject"
+        },
+        {
+          "command": "saropaLints.crossFile.duplicates",
+          "when": "saropaLints.isDartProject"
+        },
+        {
+          "command": "saropaLints.crossFile.snapshot",
+          "when": "saropaLints.isDartProject"
+        },
+        {
           "command": "saropaLints.crossFile.graph",
           "when": "saropaLints.isDartProject"
         },
@@ -2272,7 +2302,7 @@
           {
             "id": "saropaLints.walkthrough.crossFile",
             "title": "Cross-File Analysis",
-            "description": "Run project-wide checks that single-file analysis cannot do: unused files, circular dependencies, import stats, feature dependencies, dead imports, unused symbols, graph export, and HTML report.\n\n[Find Unused Files](command:saropaLints.crossFile.unusedFiles) · [Generate Cross-File HTML Report](command:saropaLints.crossFile.report)",
+            "description": "Run project-wide checks that single-file analysis cannot do: unused files, circular dependencies, import stats, feature dependencies, dead imports, unused symbols, unused l10n keys, duplicate blocks, snapshot JSON, graph export, and HTML report.\n\n[Find Unused Files](command:saropaLints.crossFile.unusedFiles) · [Generate Cross-File HTML Report](command:saropaLints.crossFile.report)",
             "media": {
               "markdown": "media/walkthrough-cross-file.md"
             },

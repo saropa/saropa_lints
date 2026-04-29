@@ -6,6 +6,7 @@ import 'package:test/test.dart';
 /// Tests for 6 Context lint rules.
 ///
 /// Test fixtures: example/lib/context/*
+// BuildContext storage and async gap patterns in widget code.
 void main() {
   group('Context Rules - Rule Instantiation', () {
     test('AvoidStoringContextRule', () {

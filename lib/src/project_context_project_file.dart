@@ -177,9 +177,17 @@ class ProjectContext {
     return current.isAtLeast(_FlutterSdkVersion(major, minor, patch));
   }
 
+  /// Optional cross-file snapshot from `dart run saropa_lints:cross_file snapshot`
+  /// (`reports/.saropa_lints/cross_file_snapshot.json`). May be stale vs disk;
+  /// mtime-based reload is handled internally.
+  static CrossFileSnapshotData? crossFileSnapshotForPath(String? filePath) {
+    return loadCrossFileSnapshot(findProjectRoot(filePath));
+  }
+
   /// Clear the project cache (useful for testing).
   static void clearCache() {
     _projectCache.clear();
+    clearCrossFileSnapshotCache();
   }
 }
 

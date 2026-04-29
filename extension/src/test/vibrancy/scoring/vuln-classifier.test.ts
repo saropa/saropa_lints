@@ -10,7 +10,10 @@ import {
 } from '../../../vibrancy/scoring/vuln-classifier';
 import { Vulnerability, VulnSeverity } from '../../../vibrancy/types';
 
-/** Vulnerability severity labels, penalties, and filtering for vibrancy scoring. */
+/**
+ * Tests **vuln-classifier**: [classifySeverity], [worstSeverity], emoji/label strings, [countBySeverity],
+ * [filterBySeverity], and [calcVulnPenalty] against synthetic [Vulnerability] rows from [makeVuln].
+ */
 
 function makeVuln(severity: VulnSeverity, id: string = 'TEST-001'): Vulnerability {
     return {

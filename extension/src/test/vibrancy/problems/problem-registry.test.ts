@@ -5,7 +5,10 @@ import {
     UnusedProblem,
 } from '../../../vibrancy/problems';
 
-/** ProblemRegistry ranking, dedupe, and aggregation for unhealthy/unused/blocked problems. */
+/**
+ * Tests **ProblemRegistry**: insertion order, severity ranking, dedupe keys, and aggregation helpers for
+ * unhealthy, unused, and blocked-upgrade problems built via `makeUnhealthyProblem` factories.
+ */
 
 function makeUnhealthyProblem(name: string, score: number): UnhealthyPackageProblem {
     return {

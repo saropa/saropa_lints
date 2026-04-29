@@ -7,6 +7,7 @@ import 'package:test/test.dart';
 /// Tests for 10 Formatting lint rules.
 ///
 /// Test fixtures: example/lib/formatting/*
+// Trailing comma, brace style, and dart format-adjacent stylistic lints.
 void main() {
   group('Formatting Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {

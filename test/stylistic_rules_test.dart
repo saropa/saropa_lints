@@ -8,6 +8,7 @@ import 'package:saropa_lints/src/saropa_lint_rule.dart';
 /// Tests for 28 Stylistic lint rules.
 ///
 /// Test fixtures: example/lib/stylistic/*
+// Large suite: instantiation + message checks; fixtures under example/lib/stylistic.
 void main() {
   group('Stylistic Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {

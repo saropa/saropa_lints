@@ -1,5 +1,10 @@
 /**
- * HTML, CSS, and client script for the command catalog webview.
+ * HTML, CSS, and client script for the **command catalog** webview: searchable list of extension
+ * commands grouped by category, codicon fonts from extension media, CSP nonce for inline script,
+ * and optional history records for "recent" navigation.
+ *
+ * Entry: [buildCommandCatalogHtml] consumes [entriesByCategory] and [buildCatalogSearchBlob] for
+ * client-side filter without round-trips to the extension host until a command is picked.
  */
 
 import * as vscode from 'vscode';

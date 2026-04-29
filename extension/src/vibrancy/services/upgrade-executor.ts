@@ -4,6 +4,7 @@ import { UpgradeStep, UpgradeStepResult, UpgradeReport } from '../types';
 import { runPubGet, runFlutterTest } from './flutter-cli';
 import { buildVersionEdit, readVersionConstraint, findPubspecYaml } from './pubspec-editor';
 
+// Runs ordered upgrade steps (pub get / test) with optional commit between steps.
 interface ExecutorConfig {
     readonly skipTests: boolean;
     readonly maxSteps: number;

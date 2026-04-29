@@ -4,6 +4,7 @@ import { ScanLogger } from './scan-logger';
 import { fetchWithRetry } from './fetch-retry';
 import { classifySeverity } from '../scoring/vuln-classifier';
 
+// OSV batch queries with per-package cache; maps API payload to Vulnerability.
 const OSV_BATCH_URL = 'https://api.osv.dev/v1/querybatch';
 const CACHE_KEY_PREFIX = 'osv.vulns';
 

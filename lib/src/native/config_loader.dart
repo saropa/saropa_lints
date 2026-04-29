@@ -26,6 +26,7 @@ import '../baseline/baseline_manager.dart';
 import '../config/analysis_options_rule_packs.dart';
 import '../config/pubspec_lock_resolver.dart';
 import '../config/rule_packs.dart';
+import '../config/runtime_tier_cap.dart';
 import '../report/diagnostic_statistics.dart';
 import '../saropa_lint_rule.dart' show ProgressTracker, SaropaLintRule;
 import 'plugin_logger.dart' show PluginLogger;
@@ -86,6 +87,9 @@ void _loadFromRoot(String? projectRoot) {
     loadBannedUsageConfig(content);
     _loadOutputConfig(content);
     _loadDiagnosticStatisticsConfig(content, projectRoot);
+
+    reloadRuntimeTierCapFromProject(projectRoot);
+    RuntimeTierCap.applyCapToEnabledRuleSet();
 
     // Success telemetry — visible in reports/.saropa_lints/plugin.log once
     // the project root is set. This is the primary signal users can check

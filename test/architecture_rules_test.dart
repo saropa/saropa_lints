@@ -6,6 +6,7 @@ import 'package:test/test.dart';
 /// Tests for 9 Architecture lint rules.
 ///
 /// Test fixtures: example/lib/architecture/*
+// Feature folders, DDD-style boundaries, and “wrong layer” imports in fixtures.
 void main() {
   group('Architecture Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {

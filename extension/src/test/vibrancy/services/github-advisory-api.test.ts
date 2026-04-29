@@ -6,6 +6,10 @@ import {
 } from '../../../vibrancy/services/github-advisory-api';
 import { Vulnerability } from '../../../vibrancy/types';
 
+/**
+ * Tests **github-advisory-api**: GraphQL/GitHub REST fetch paths, [mergeVulnerabilities] dedupe by ID,
+ * and severity normalization with stubbed `fetch`.
+ */
 describe('github-advisory-api', () => {
     let fetchStub: sinon.SinonStub;
 

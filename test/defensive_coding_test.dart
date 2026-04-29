@@ -1,4 +1,9 @@
-// Defensive coding: parameter validation, null/empty handling, and edge cases.
+/// Regression tests for **defensive helpers** used across linting and baseline code: path normalization,
+/// bloom-filter edge cases, baseline path helpers, banned-usage parsing, comment/ignore parsing corners,
+/// and [ProjectContext] construction on synthetic directories.
+///
+/// Each `group` targets one helper family; failures usually mean a null/empty guard regressed.
+library;
 
 import 'dart:io' show Directory;
 
@@ -12,6 +17,7 @@ import 'package:saropa_lints/src/ignore_utils.dart';
 import 'package:saropa_lints/src/project_context.dart';
 import 'package:test/test.dart';
 
+/// Runs all defensive-coding groups serially (no `parallel`); temp dirs are local to tests that need them.
 void main() {
   group('normalizePath', () {
     test('returns empty string for null', () {

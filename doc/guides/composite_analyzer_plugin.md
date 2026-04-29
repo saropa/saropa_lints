@@ -28,6 +28,8 @@ plugins:
 
 Your meta-plugin’s `Plugin.name` should return `acme_saropa` so it matches the YAML key.
 
+**Runtime tier cap:** use `SAROPA_TIER` or `saropa_tier` in `analysis_options_custom.yaml` (project root). The plugin-block key that carries `runtime_tier` is read as `plugins.saropa_lints` only; for a custom `plugins.*` name, set the cap via environment or the custom file.
+
 ## API surface (from `package:saropa_lints/saropa_lints.dart`)
 
 | Symbol | Use |

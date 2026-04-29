@@ -4,6 +4,7 @@ import { categoryLabel, categoryToGrade, countByCategory } from '../scoring/stat
 import { formatSizeMB } from '../scoring/bloat-calculator';
 import { resolveReportFolder, formatTimestamp } from './report-utils';
 
+// Writes scan markdown/JSON under .saropa_lints/reports with a timestamp.
 /**
  * Export scan results as timestamped markdown and JSON files
  * to a report/ directory in the workspace.

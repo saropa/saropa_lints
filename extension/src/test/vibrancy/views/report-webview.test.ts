@@ -9,6 +9,8 @@ import { ReportOptions } from '../../../vibrancy/views/report-html';
 import { VibrancyReportPanel } from '../../../vibrancy/views/report-webview';
 import { createdPanels, messageMock, resetMocks } from '../vscode-mock';
 
+/** Unit tests for VibrancyReportPanel (webviews, postMessage, refresh, options). */
+
 function makeResult(
     name: string,
     score: number,

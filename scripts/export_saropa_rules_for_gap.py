@@ -11,6 +11,7 @@ of {"name": "rule_name", "category": "category"} for comparison with external
 Dart rules. See bugs/discussion/GAP_ANALYSIS_EXTERNAL_DART.md.
 """
 
+# Emits a JSON list of {name, category} for diffing against external rule sets.
 from __future__ import annotations
 
 import argparse

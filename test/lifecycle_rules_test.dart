@@ -6,6 +6,7 @@ import 'package:test/test.dart';
 /// Tests for 6 Lifecycle lint rules.
 ///
 /// Test fixtures: example/lib/lifecycle/*
+// App/activity lifecycle and paused-state work in small widget examples.
 void main() {
   group('Lifecycle Rules - Rule Instantiation', () {
     test('AvoidWorkInPausedStateRule', () {

@@ -66,6 +66,11 @@ def extension_exists(project_dir: Path) -> bool:
     return ext.is_dir() and (ext / "package.json").is_file()
 
 
+def extension_vsix_path(project_dir: Path, version: str) -> Path:
+    """Path to the packaged VSIX for this version (saropa-lints-x.y.z.vsix)."""
+    return _extension_dir(project_dir) / f"saropa-lints-{version}.vsix"
+
+
 def copy_changelog_to_extension(project_dir: Path) -> bool:
     """Copy root CHANGELOG.md to extension/CHANGELOG.md for the .vsix (single source of truth).
 

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:saropa_lints/saropa_lints.dart';
 import 'package:test/test.dart';
 
+// Registry and fixture coverage for “removed in Dart 3” migration lints.
 /// Tests for Dart SDK 3.0 removed-API migration rules.
 ///
 /// **Registry:** rules must appear in [recommendedOnlyRules] and

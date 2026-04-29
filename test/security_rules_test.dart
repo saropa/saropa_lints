@@ -10,6 +10,7 @@ import 'package:test/test.dart';
 /// WebView security, authentication, data protection, and OWASP compliance.
 ///
 /// Test fixtures: example/lib/security/*
+// OWASP-oriented rules: metadata checks + fixture-based triggers in subgroups.
 void main() {
   group('Security Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {

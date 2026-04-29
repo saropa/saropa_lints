@@ -1,5 +1,6 @@
 import { CiThresholds, CiPlatform } from '../types';
 
+// Stubs for GitHub Actions, GitLab CI, and shell from vibrancy thresholds.
 /** Generate CI workflow content for the specified platform. */
 export function generateCiWorkflow(
     platform: CiPlatform,

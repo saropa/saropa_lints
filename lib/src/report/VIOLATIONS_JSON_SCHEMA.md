@@ -134,7 +134,7 @@ Strict variant (fail if scan/report did not produce `violations.json`):
 
 ## `violations` array
 
-Individual violation records, sorted by: impact (critical first) → file (alpha, case-insensitive) → line (ascending).
+Individual violation records, sorted by: **FIX PRIORITY** score (descending, same formula as the markdown report) → impact (critical first) → file (alpha, case-insensitive) → line (ascending).
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -145,6 +145,7 @@ Individual violation records, sorted by: impact (critical first) → file (alpha
 | `correction` | `string?` | Correction message (omitted when not available) |
 | `severity` | `string` | `"error"`, `"warning"`, or `"info"` (lowercase) |
 | `impact` | `string` | `"critical"`, `"high"`, `"medium"`, `"low"`, or `"opinionated"` |
+| `priority` | `number` | Combined FIX PRIORITY score (`impact × (importance+1) × layer`); present when export is built after import graph compute (normal plugin run). Omit in hand-crafted minimal JSON. |
 | `owasp` | `object` | `{ "mobile": string[], "web": string[] }` — OWASP category IDs (lowercase), empty arrays when not applicable |
 | `metadata` | `object` | Rule metadata snapshot for this violation (`ruleType`, `ruleStatus`, `requiresReview`, `defaultReviewState`, `cweIds`, `certIds`, `tags`, `accuracyTarget`) |
 
@@ -159,6 +160,7 @@ Individual violation records, sorted by: impact (critical first) → file (alpha
   "correction": "Use environment variables or a secrets manager.",
   "severity": "warning",
   "impact": "critical",
+  "priority": 540.0,
   "owasp": {
     "mobile": ["m1"],
     "web": ["a07"]

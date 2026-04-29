@@ -35,7 +35,8 @@ publish.py                      <- thin entry point (~200 lines)
   |     +-- modules/_version_changelog.py <- version prompt, sync, changelog management
   |     +-- modules/_extension_publish.py <- extension build, publish, store verification
   |     +-- modules/_rule_metrics.py     <- rule/category counts, badges, coverage
-  |     +-- modules/_code_comment_metrics.py <- comment-line stats for publish banner
+  |     +-- modules/_code_comment_metrics.py <- aggregate comment-line stats (publish banner)
+  |     +-- modules/_comment_coverage_report.py <- per-file worst list + scan progress bar
   |     +-- modules/_pubdev_lint.py      <- pub.dev doc-comment lint fixes
   |     +-- modules/_timing.py           <- step timer and summary
   |
@@ -101,6 +102,14 @@ Scripts in this directory that can run independently:
 | `list_rules_without_fixes.py` | Query rules lacking quick fixes |
 
 Historical scripts in `scripts/historical/` are not part of the build.
+
+## Python script tests
+
+From the repo root (no extra packages; uses `unittest`, same as CI):
+
+```bash
+python -m unittest discover -s scripts/tests -t . -v
+```
 
 ## Troubleshooting
 

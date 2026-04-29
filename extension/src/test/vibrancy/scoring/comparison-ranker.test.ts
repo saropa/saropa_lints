@@ -2,6 +2,8 @@ import * as assert from 'assert';
 import { rankPackages, resultToComparisonData, isWinnerForDimension } from '../../../vibrancy/scoring/comparison-ranker';
 import { ComparisonData, VibrancyCategory, DimensionWinner } from '../../../vibrancy/types';
 
+/** Two-package comparison ranking, dimension winners, and vibrancy score ordering. */
+
 function makePackage(overrides: Partial<ComparisonData>): ComparisonData {
     return {
         name: 'test-pkg',

@@ -2,6 +2,11 @@ import * as assert from 'assert';
 import knownIssuesData from '../../../vibrancy/data/known_issues.json';
 import { findKnownIssue, allKnownIssues, isReplacementPackageName, getReplacementDisplayText } from '../../../vibrancy/scoring/known-issues';
 
+/**
+ * Tests **known-issues** registry: JSON integrity, version applicability, replacement package naming,
+ * and [getReplacementDisplayText] edge cases. Imports bundled `known_issues.json` fixture data.
+ */
+
 /** Flatten grouped map into a flat array of [name, issue] pairs. */
 function flatEntries(): [string, { status: string; replacement?: string; migrationNotes?: string; archiveSizeBytes?: number }][] {
     const result: [string, any][] = [];

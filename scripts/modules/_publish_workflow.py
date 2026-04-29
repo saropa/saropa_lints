@@ -3,7 +3,7 @@ Publish pipeline orchestration for saropa_lints.
 
 High-level workflow steps that wire together lower-level modules
 (_publish_steps, _git_ops, _version_changelog, _extension_publish,
-_rule_metrics, _code_comment_metrics, _pubdev_lint) into the publish pipeline. Each function
+_rule_metrics, _code_comment_metrics, _comment_coverage_report, _pubdev_lint) into the publish pipeline. Each function
 represents one stage of the publish process.
 
 Also contains the PublishContext dataclass (shared project state) and
@@ -63,7 +63,7 @@ from scripts.modules._publish_steps import (
     validate_changelog,
     verify_pubdev_publication,
 )
-from scripts.modules._code_comment_metrics import display_code_comment_metrics
+from scripts.modules._comment_coverage_report import display_full_comment_coverage_report
 from scripts.modules._rule_metrics import (
     count_categories,
     count_rules,
@@ -168,7 +168,7 @@ def print_package_banner(
     print()
     display_changelog(ctx.project_dir)
     display_test_coverage(ctx.project_dir)
-    display_code_comment_metrics(ctx.project_dir)
+    display_full_comment_coverage_report(ctx.project_dir)
     todo_log = display_roadmap_summary(
         ctx.project_dir, bugs_dir=ctx.bugs_dir,
     )
@@ -733,7 +733,7 @@ def run_extension_after_publish(
     """
     if not extension_exists(project_dir):
         return None, False
-    with timer.step("Extension"):
+    with timer.step("Extension (install & stores)"):
         package_extension(project_dir, version)
         expected = extension_vsix_path(project_dir, version)
         if not expected.is_file():
@@ -821,6 +821,19 @@ def run_full_publish(
             ctx.project_dir, version, ctx.rule_count, timer,
         )
         run_final_ci_gate(ctx.project_dir, timer)
+        # Package the VSIX before the optional re-run+watch in commit/release, so
+        # stopping the watch (or losing the process to a tool timeout) does not
+        # mean "no .vsix on disk" when the extension compiles.
+        if extension_exists(ctx.project_dir):
+            with timer.step("Extension package"):
+                package_extension(ctx.project_dir, version)
+                expected = extension_vsix_path(ctx.project_dir, version)
+                if not expected.is_file():
+                    exit_with_error(
+                        f"Release requires extension/{expected.name} after "
+                        "package. Fix compile/vsce errors and re-run.",
+                        ExitCode.VALIDATION_FAILED,
+                    )
         run_commit_tag_publish_release(
             ctx.project_dir, version, ctx.branch, release_notes, timer,
         )

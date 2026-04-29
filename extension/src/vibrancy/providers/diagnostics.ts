@@ -11,6 +11,7 @@ import { buildExceededDiagnostics } from '../scoring/budget-checker';
 import { filterBySeverity } from '../scoring/vuln-classifier';
 import { isReplacementPackageName, getReplacementDisplayText } from '../scoring/known-issues';
 
+// Maps scan results to VS Code diagnostics (budget, vulns, EOL, known issues).
 const SEVERITY_MAP: Record<number, vscode.DiagnosticSeverity> = {
     1: vscode.DiagnosticSeverity.Warning,
     2: vscode.DiagnosticSeverity.Information,

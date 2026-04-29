@@ -1,14 +1,20 @@
+/// End-to-end tests for **violation export** and reporting pipeline: temp projects, baseline manager,
+/// [AnalysisReporter] / [ReportConsolidator] wiring, [ViolationExport] JSON shape, and [ImportGraphTracker] resets.
+library;
+
 import 'dart:convert' show json;
 import 'dart:io' show Directory, File, Platform;
 
 import 'package:saropa_lints/src/baseline/baseline_config.dart';
 import 'package:saropa_lints/src/baseline/baseline_manager.dart';
 import 'package:saropa_lints/src/report/analysis_reporter.dart';
+import 'package:saropa_lints/src/report/import_graph_tracker.dart';
 import 'package:saropa_lints/src/report/report_consolidator.dart';
 import 'package:saropa_lints/src/report/violation_export.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart';
 import 'package:test/test.dart';
 
+/// Runs export scenarios under isolated `tempDir` workspaces with `setUp`/`tearDown`.
 void main() {
   late Directory tempDir;
   late String projectRoot;
@@ -16,6 +22,7 @@ void main() {
   setUp(() {
     tempDir = Directory.systemTemp.createTempSync('violation_export_test_');
     projectRoot = tempDir.path;
+    ImportGraphTracker.reset();
   });
 
   tearDown(() {

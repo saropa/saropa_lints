@@ -3,6 +3,8 @@ import { buildComparisonHtml } from '../../../vibrancy/views/comparison-html';
 import { rankPackages } from '../../../vibrancy/scoring/comparison-ranker';
 import { ComparisonData, RankedComparison, DimensionWinner } from '../../../vibrancy/types';
 
+/** HTML output from buildComparisonHtml + rankPackages integration. */
+
 function makePackage(overrides: Partial<ComparisonData>): ComparisonData {
     return {
         name: 'test-pkg',

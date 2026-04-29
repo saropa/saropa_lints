@@ -1,3 +1,10 @@
+/**
+ * CSS for the **inline / panel detail view** that mirrors package-detail HTML but may run in a
+ * slimmer host (e.g. sidebar webview). Defines `:root` font fallbacks when VS Code vars are absent.
+ *
+ * **States:** `.placeholder` centers loading/empty messaging; `.empty-state` uses description foreground
+ * for de-emphasized copy. Keeps contrast sane on `sideBar-background` instead of editor background.
+ */
 /** CSS styles for the package detail view. */
 export function getDetailStyles(): string {
     return `

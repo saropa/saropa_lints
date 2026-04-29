@@ -1,6 +1,7 @@
 /// Writes a minimal composite analyzer-plugin package (Saropa + TODO hooks).
 library;
 
+// Filesystem output for a composite `custom_lint` + analyzer_plugin wrapper.
 import 'dart:io';
 
 import 'package:path/path.dart' as p;

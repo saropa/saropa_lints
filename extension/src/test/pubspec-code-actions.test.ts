@@ -1,4 +1,5 @@
 // Must be first import — redirects 'vscode' to the local mock
+// Pubspec code actions: quick fixes and commands when saropa lints the manifest.
 import './vibrancy/register-vscode-mock';
 
 import * as assert from 'node:assert';

@@ -11,6 +11,7 @@ import 'package:saropa_lints/src/rules/widget/widget_layout_flex_scroll_rules.da
 /// alternatives, nesting depth, responsive design, and layout performance.
 ///
 /// Test fixtures: example/lib/widget_layout/*
+// Layout/flex/scroll rules: see example/lib/widget_layout for BAD/GOOD pairs.
 void main() {
   group('Widget Layout Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {

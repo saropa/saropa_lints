@@ -12,6 +12,8 @@ import { escapeHtml, resolveRepoUrl } from './html-utils';
 import { getPackageDetailStyles } from './package-detail-styles';
 import { getPackageDetailScript } from './package-detail-script';
 
+// Single-package drill-down HTML (versions, review, license, links).
+
 /**
  * Build the full HTML for the package detail webview panel.
  * All sections are rendered — version-gap section shows spinner if data is pending.

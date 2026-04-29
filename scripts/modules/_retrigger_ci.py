@@ -4,6 +4,8 @@ Re-trigger failed GitHub Actions workflows.
 Lists recent failed workflow runs and re-runs them. Optionally
 watches until all re-triggered runs complete.
 
+# CLI uses `gh` (GitHub CLI); requires auth and repo context. Exit codes map to [ExitCode] helpers.
+
 Usage:
     python -m scripts.modules._retrigger_ci   # standalone. Publish also calls offer_retrigger_ci after push.
 
@@ -284,8 +286,17 @@ def _watch_runs(run_ids: list[int]) -> bool:
     failed: list[int] = []
 
     print_info("Watching runs for completion...")
+    print_info("  (Ctrl+C stops watching; publish continues with tag and packaging.)")
     while pending:
-        time.sleep(5)
+        try:
+            time.sleep(5)
+        except KeyboardInterrupt:
+            print()
+            print_warning(
+                "CI watch cancelled — continuing with release steps "
+                "(tag, pub.dev, extension packaging).",
+            )
+            return False
         for run_id in list(pending):
             result = subprocess.run(
                 [

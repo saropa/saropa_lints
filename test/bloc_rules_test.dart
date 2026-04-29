@@ -9,6 +9,7 @@ import 'package:test/test.dart';
 /// architectural best practices, naming conventions, and common anti-patterns.
 ///
 /// Test fixtures: example_packages/lib/bloc/*
+// Bloc/Cubit and flutter_bloc patterns; large rule instantiation table.
 void main() {
   group('Bloc Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {

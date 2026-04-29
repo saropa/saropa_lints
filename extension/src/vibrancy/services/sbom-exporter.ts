@@ -3,6 +3,7 @@ import { VibrancyResult } from '../types';
 import { generateSbom, serializeSbom, SbomMetadata } from './sbom-generator';
 import { resolveReportFolder, formatTimestamp } from './report-utils';
 
+// Writes CycloneDX JSON next to other vibrancy reports under .saropa_lints/reports.
 /** Export SBOM to a timestamped file in the report/ directory. */
 export async function exportSbomReport(
     results: readonly VibrancyResult[],

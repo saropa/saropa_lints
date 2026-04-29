@@ -4,6 +4,7 @@ import { getReportStyles } from './report-styles';
 import { getKnownIssuesScript } from './known-issues-script';
 import { escapeHtml } from './html-utils';
 
+// Static HTML for browsing curated “known issues” and replacement guidance.
 /** Build the full HTML for the known issues library browser. */
 export function buildKnownIssuesHtml(): string {
     const issues = Array.from(allKnownIssues().values()).flat();

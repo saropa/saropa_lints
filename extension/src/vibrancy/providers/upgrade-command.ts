@@ -5,6 +5,8 @@ import {
 } from '../services/pubspec-editor';
 import { PackageItem } from './tree-items';
 
+/** Pubspec version bumps, pub get, and flutter test for a selected package row. */
+
 const outputChannel = vscode.window.createOutputChannel('Saropa: Upgrade & Test');
 let upgradeInProgress = false;
 

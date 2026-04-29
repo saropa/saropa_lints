@@ -6,6 +6,7 @@ import 'package:test/test.dart';
 /// Tests for 31 Drift database lint rules.
 ///
 /// Test fixtures: example_packages/lib/drift/*
+// Drift schema, SQL, and migration patterns; uses example_packages Drift package.
 void main() {
   group('Drift Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {

@@ -4,6 +4,7 @@ import {
     findPackageLines, buildBackupUri,
 } from '../../../vibrancy/services/pubspec-editor';
 
+// Version constraint edits, dependency line find, and backup URI for pubspec.
 /** Create a minimal fake TextDocument from raw text. */
 function makeFakeDoc(text: string): any {
     const lines = text.split('\n');

@@ -3,7 +3,11 @@ import { getProjectRoot } from '../projectRoot';
 import { runProjectVibrancyScan } from './projectVibrancyCliRunner';
 import type { ProjectVibrancyPayload } from './projectVibrancyTypes';
 
-/** Full editor-column HTML report using the same CLI scan output as the sidebar vibrancy view. */
+/**
+ * **Full-column report** webview: same [runProjectVibrancyScan] JSON as the sidebar, rendered as HTML
+ * in an editor-area panel. Manages singleton `currentPanel`, reuses last stdout for diff/debug, and
+ * registers disposal when the tab closes.
+ */
 
 let currentPanel: vscode.WebviewPanel | undefined;
 let lastReportRawStdout = '';

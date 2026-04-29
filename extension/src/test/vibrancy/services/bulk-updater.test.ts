@@ -3,7 +3,10 @@ import { resetMocks, messageMock, setTestConfig, clearTestConfig } from '../vsco
 import { getUpdatablePackages, formatFilterLabel, UpdateEntry } from '../../../vibrancy/services/bulk-updater';
 import { VibrancyResult } from '../../../vibrancy/types';
 
-/** Bulk updater: which packages are safe to bump from scan results and filter labels. */
+/**
+ * Tests **bulk-updater**: [getUpdatablePackages] eligibility from synthetic [VibrancyResult] rows,
+ * semver ceiling checks, and [formatFilterLabel] strings for quick-pick UX.
+ */
 
 describe('bulk-updater', () => {
     beforeEach(() => {

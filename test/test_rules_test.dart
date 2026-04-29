@@ -7,6 +7,7 @@ import 'package:saropa_lints/src/rules/testing/test_rules.dart';
 /// Tests for 30 Test Rules lint rules.
 ///
 /// Test fixtures: example/lib/test/*
+// test/ / group / setUpAll patterns; matcher and async test style in examples.
 void main() {
   group('Test Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {

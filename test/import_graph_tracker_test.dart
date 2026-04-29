@@ -4,6 +4,8 @@ import 'package:saropa_lints/src/report/import_graph_tracker.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart' show LintImpact;
 import 'package:test/test.dart';
 
+// import_graph_tracker: per-edit dedupe of import edges for cross-file reporting.
+
 void main() {
   late Directory tempDir;
   late String projectRoot;

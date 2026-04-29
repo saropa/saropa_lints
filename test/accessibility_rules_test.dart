@@ -6,6 +6,7 @@ import 'package:test/test.dart';
 /// Tests for 40 Accessibility lint rules (instantiation group).
 ///
 /// Test fixtures: example/lib/accessibility/*
+// Semantics, focus, and screen-reader related widget rules; fixtures under example/.
 void main() {
   group('Accessibility Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {

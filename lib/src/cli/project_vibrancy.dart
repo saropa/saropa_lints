@@ -1,3 +1,16 @@
+/// **Project vibrancy** scan: reads a Dart/Flutter workspace, parses `pubspec.yaml` and Dart units,
+/// correlates `coverage/lcov.info` (when present), and emits a JSON report of per-function signals
+/// (coverage %, usage heuristics, complexity, documentation hints, and quality flags such as
+/// `unused`, `uncovered`, `stub_tested`, `suspicious_coverage`, `test_drift`).
+///
+/// **Inputs:** [ProjectVibrancyOptions] selects project root, optional single-file or folder scope,
+/// optional `includedFiles` set (e.g. git-changed paths), and lcov location.
+///
+/// **Outputs:** [ProjectVibrancyReport] with UTC `generatedAt` and flat [ProjectVibrancyFunctionResult]
+/// rows suitable for the extension webview and CLI thresholds (`--min-grade`, unused caps, …).
+///
+/// **Performance:** resolves analysis context once per run; skips gracefully when analyzer or lcov
+/// is missing. See `bin/project_vibrancy.dart` for CLI exit-code mapping.
 import 'dart:convert';
 import 'dart:io';
 
@@ -7,6 +20,7 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:path/path.dart' as p;
 import 'package:saropa_lints/src/cli/project_vibrancy_coverage_quality.dart';
 
+/// CLI and library entry options for [runProjectVibrancy].
 class ProjectVibrancyOptions {
   const ProjectVibrancyOptions({
     required this.projectPath,
@@ -25,6 +39,7 @@ class ProjectVibrancyOptions {
   final String? cachePath;
 }
 
+/// One function-level row in the vibrancy report (scores, grades, and string `flags`).
 class ProjectVibrancyFunctionResult {
   const ProjectVibrancyFunctionResult({
     required this.id,
@@ -87,6 +102,7 @@ class ProjectVibrancyFunctionResult {
   };
 }
 
+/// Full report payload returned by [runProjectVibrancy].
 class ProjectVibrancyReport {
   const ProjectVibrancyReport({
     required this.generatedAt,

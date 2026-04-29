@@ -11,6 +11,7 @@ import 'package:saropa_lints/src/rules/stylistic/stylistic_control_flow_rules.da
 /// Tests for 14 Stylistic Control Flow lint rules.
 ///
 /// Test fixtures: example/lib/stylistic_control_flow/*
+// Control flow style rules: for/else/try patterns; see fixtures for LINT cases.
 void main() {
   group('Stylistic Control Flow Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {

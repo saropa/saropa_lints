@@ -56,6 +56,71 @@ describe('cross-file commands', () => {
     ]);
   });
 
+  it('runs unused-l10n via cross_file with json output', async () => {
+    (vscode.window as unknown as { setStatusBarMessage: (...args: unknown[]) => void }).setStatusBarMessage = () => undefined;
+    const runStub = sandbox.stub(setup, 'runInWorkspace').returns({
+      ok: true,
+      stdout: JSON.stringify({ unusedL10nKeys: ['oldGreeting'], arbPaths: ['lib/l10n/app_en.arb'] }),
+      stderr: '',
+    });
+
+    await vscode.commands.executeCommand('saropaLints.crossFile.unusedL10n');
+
+    assert.strictEqual(runStub.callCount, 1);
+    assert.deepStrictEqual(runStub.firstCall.args, [
+      '/repo',
+      'dart',
+      ['run', 'saropa_lints:cross_file', '--path', '/repo', '--output', 'json', 'unused-l10n'],
+      true,
+    ]);
+  });
+
+  it('runs duplicates via cross_file with json output', async () => {
+    (vscode.window as unknown as { setStatusBarMessage: (...args: unknown[]) => void }).setStatusBarMessage = () => undefined;
+    const runStub = sandbox.stub(setup, 'runInWorkspace').returns({
+      ok: true,
+      stdout: JSON.stringify({
+        duplicateBlocks: [{ lineCount: 3, occurrences: [{ path: 'lib/a.dart', startLine: 1 }] }],
+      }),
+      stderr: '',
+    });
+
+    await vscode.commands.executeCommand('saropaLints.crossFile.duplicates');
+
+    assert.strictEqual(runStub.callCount, 1);
+    assert.deepStrictEqual(runStub.firstCall.args, [
+      '/repo',
+      'dart',
+      ['run', 'saropa_lints:cross_file', '--path', '/repo', '--output', 'json', 'duplicates'],
+      true,
+    ]);
+  });
+
+  it('opens generated snapshot json for snapshot command', async () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'saropa-crossfile-'));
+    (projectRoot.getProjectRoot as sinon.SinonStub).returns(root);
+    const outPath = path.join(root, 'reports', '.saropa_lints', 'cross_file_snapshot.json');
+    fs.mkdirSync(path.dirname(outPath), { recursive: true });
+    fs.writeFileSync(outPath, '{}', 'utf8');
+
+    const runStub = sandbox.stub(setup, 'runInWorkspace').returns({
+      ok: true,
+      stdout: '',
+      stderr: '',
+    });
+    const openDocStub = sandbox.stub(vscode.workspace, 'openTextDocument').resolves({} as vscode.TextDocument);
+    const showDocStub = sandbox.stub(vscode.window, 'showTextDocument').resolves({} as vscode.TextEditor);
+
+    await vscode.commands.executeCommand('saropaLints.crossFile.snapshot');
+
+    assert.strictEqual(runStub.callCount, 1);
+    const args = runStub.firstCall.args[2] as string[];
+    assert.ok(args.includes('snapshot'));
+    assert.ok(args.includes('--snapshot-out'));
+    assert.ok(openDocStub.calledOnce);
+    assert.ok(showDocStub.calledOnce);
+  });
+
   it('runs dead-imports via cross_file with json output', async () => {
     (vscode.window as unknown as { setStatusBarMessage: (...args: unknown[]) => void }).setStatusBarMessage = () => undefined;
     const runStub = sandbox.stub(setup, 'runInWorkspace').returns({

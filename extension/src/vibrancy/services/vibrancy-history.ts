@@ -3,6 +3,7 @@ import * as path from 'node:path';
 import { categoryToGrade } from '../scoring/status-classifier';
 import { VibrancyResult } from '../types';
 
+/** On-disk .saropa_lints history: append snapshots, trends, optional legacy migration. */
 const SCHEMA_VERSION = 1;
 const MAX_SNAPSHOTS = 50;
 

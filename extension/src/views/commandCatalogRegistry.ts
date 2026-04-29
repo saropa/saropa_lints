@@ -199,6 +199,27 @@ export const catalogEntries: readonly CatalogEntry[] = [
     icon: 'symbol-namespace',
   },
   {
+    command: 'saropaLints.crossFile.unusedL10n',
+    title: 'Cross-File — Find Unused l10n Keys',
+    description: 'Compare ARB keys to identifier usage in lib/ and test/ (heuristic; may miss dynamic keys).',
+    category: 'Analysis',
+    icon: 'symbol-string',
+  },
+  {
+    command: 'saropaLints.crossFile.duplicates',
+    title: 'Cross-File — Find Duplicate Line Blocks',
+    description: 'Find repeated normalized multi-line blocks across Dart files (line-based, not AST).',
+    category: 'Analysis',
+    icon: 'copy',
+  },
+  {
+    command: 'saropaLints.crossFile.snapshot',
+    title: 'Cross-File — Write Project Snapshot (JSON)',
+    description: 'Run full cross-file analysis and write cross_file_snapshot.json for ProjectContext consumers.',
+    category: 'Analysis',
+    icon: 'database',
+  },
+  {
     command: 'saropaLints.crossFile.graph',
     title: 'Cross-File — Export Import Graph (DOT)',
     description: 'Export the cross-file import graph as a Graphviz DOT file.',

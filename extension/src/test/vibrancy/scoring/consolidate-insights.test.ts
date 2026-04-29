@@ -5,6 +5,11 @@ import {
 } from '../../../vibrancy/scoring/consolidate-insights';
 import { VibrancyResult, OverrideAnalysis, FamilySplit } from '../../../vibrancy/types';
 
+/**
+ * Unit tests for **consolidate-insights**: merges per-package problems, combined risk, suggested actions,
+ * and “unlocked” upgrade candidates. Uses small synthetic [VibrancyResult] builders (`makeResult`) so
+ * each `it` isolates one scoring branch without running a full scan.
+ */
 const makeResult = (
     name: string,
     score: number,

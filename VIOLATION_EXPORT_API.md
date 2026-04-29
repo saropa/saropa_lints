@@ -38,7 +38,7 @@ The `.saropa_lints` directory is created automatically under the project's `repo
 | `sessionId` | `string` | Yes | Analysis session identifier (format: `YYYYMMDD_HHMMSS`) |
 | `config` | `object` | Yes | [Config object](#config-object) |
 | `summary` | `object` | Yes | [Summary object](#summary-object) |
-| `violations` | `array` | Yes | Array of [Violation objects](#violation-object), sorted by impact then file then line |
+| `violations` | `array` | Yes | Array of [Violation objects](#violation-object), sorted by FIX PRIORITY score (desc) then impact, file, line |
 
 ### Example (minimal)
 
@@ -199,14 +199,16 @@ Each element in the `violations` array represents a single lint violation.
 | `correction` | `string` | No | Suggested fix. Absent (not `null`) when the rule has no correction message |
 | `severity` | `string` | Yes | Dart analyzer severity: `"error"`, `"warning"`, or `"info"` (always lowercase) |
 | `impact` | `string` | Yes | saropa_lints impact level: `"critical"`, `"high"`, `"medium"`, `"low"`, or `"opinionated"` (always lowercase) |
+| `priority` | `number` | Yes | Combined FIX PRIORITY score (same formula as the markdown report’s FIX PRIORITY section); enables extension/UI ordering without re-running the graph |
 | `owasp` | `object` | Yes | [OWASP mapping object](#owasp-object) |
 
 ### Sort Order
 
 Violations are sorted by:
-1. **Impact** (critical first, opinionated last) — by enum ordinal
-2. **File** (alphabetical, case-insensitive)
-3. **Line** (ascending)
+1. **`priority`** (descending) — import-graph + layer + impact combined score
+2. **Impact** (critical first, opinionated last) — by enum ordinal
+3. **File** (alphabetical, case-insensitive)
+4. **Line** (ascending)
 
 ### Example
 
@@ -219,6 +221,7 @@ Violations are sorted by:
   "correction": "Use environment variables or a secure vault instead.",
   "severity": "error",
   "impact": "critical",
+  "priority": 540.0,
   "owasp": {
     "mobile": ["m1"],
     "web": ["a02", "a07"]

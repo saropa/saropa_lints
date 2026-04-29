@@ -1,8 +1,15 @@
 import * as vscode from 'vscode';
 import { hasDependencyChanges, getDependencyChangeSummary } from './dependency-differ';
 
+/**
+ * **Pubspec save → task** bridge for Package Vibrancy. Subscribes to save/open events, tracks
+ * `pubspec.yaml` snapshots, and invokes a workspace task when constraints change.
+ */
+
+/** Which pubspec edits should trigger the configured on-save task. */
 export type DetectionMode = 'any' | 'dependencies';
 
+/** User settings: shell task id (or label) and detection mode. */
 export interface SaveTaskConfig {
     readonly command: string;
     readonly detection: DetectionMode;
@@ -13,6 +20,12 @@ const STATUS_DISPLAY_MS = 3000;
 const TASK_TIMEOUT_MS = 300000; // 5 minutes max for VS Code tasks
 const TASK_PREFIX = 'task:';
 
+/**
+ * Runs a user-configured VS Code **task** after `pubspec.yaml` saves when dependency text changed.
+ * Caches prior pubspec contents per workspace folder, debounces rapid saves, and surfaces status +
+ * output channel logs for failures/timeouts. `DEBOUNCE_MS` coalesces rapid saves; `TASK_TIMEOUT_MS`
+ * guards hung task executions.
+ */
 export class SaveTaskRunner implements vscode.Disposable {
     private readonly _contentCache = new Map<string, string>();
     private readonly _debounceTimers = new Map<string, ReturnType<typeof setTimeout>>();

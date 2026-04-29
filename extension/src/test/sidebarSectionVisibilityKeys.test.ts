@@ -7,6 +7,7 @@ import {
     sidebarSectionContextKey,
 } from '../sidebarSectionVisibilityKeys';
 
+// Counts and context keys for sidebar section visibility must match package.json.
 describe('sidebarSectionVisibilityKeys', () => {
     it('keeps config and context keys in sync with package.json sidebar settings', () => {
         assert.strictEqual(SIDEBAR_SECTION_COUNT, 14);

@@ -5,6 +5,10 @@ import {
 } from '../../../vibrancy/scoring/budget-checker';
 import { VibrancyResult, BudgetConfig, VibrancyCategory, BudgetResult } from '../../../vibrancy/types';
 
+/**
+ * Tests **budget-checker**: caps on dependency counts, size MB, category counts, diagnostic formatting,
+ * and helpers `hasBudgets` / `readBudgetConfig` against synthetic [VibrancyResult] rows (`makeResult`).
+ */
 const NO_BUDGET: BudgetConfig = {
     maxDependencies: null, maxTotalSizeMB: null, minAverageVibrancy: null,
     maxAbandoned: null, maxEndOfLife: null, maxOutdated: null, maxUnused: null,

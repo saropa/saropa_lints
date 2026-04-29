@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { FamilySplit } from '../types';
 import { DetailItem } from './tree-items';
 
+// TreeItem subclasses for “family” version conflicts in the vibrancy view.
 export class FamilyConflictGroupItem extends vscode.TreeItem {
     constructor(public readonly splits: readonly FamilySplit[]) {
         super(

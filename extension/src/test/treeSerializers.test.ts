@@ -1,6 +1,8 @@
 import * as assert from 'node:assert';
 import { serializeOverviewNode, serializeVibrancyNode } from '../treeSerializers';
 
+/** JSON tree nodes for webview copy and overview sidebar (vibrancy + config). */
+
 describe('serializeOverviewNode', () => {
     it('serializes embedded configSetting nodes', () => {
         const j = serializeOverviewNode({

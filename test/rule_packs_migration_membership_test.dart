@@ -1,3 +1,4 @@
+// Consistency: SDK pack rule lists vs generated codes in kRulePacks* sources.
 import 'dart:io';
 
 import 'package:saropa_lints/src/config/rule_packs.dart';
