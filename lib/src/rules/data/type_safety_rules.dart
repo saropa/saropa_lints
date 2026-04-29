@@ -124,11 +124,13 @@ class AvoidUnsafeCastRule extends SaropaLintRule {
     final Expression expression = _unwrapNullCheck(node.expression);
     if (!_isParentDataAccess(expression)) return false;
 
-    final ClassDeclaration? classNode = node.thisOrAncestorOfType<ClassDeclaration>();
+    final ClassDeclaration? classNode = node
+        .thisOrAncestorOfType<ClassDeclaration>();
     if (classNode == null) return false;
 
     for (final ClassMember member in classNode.body.members) {
-      if (member is! MethodDeclaration || member.name.lexeme != 'setupParentData') {
+      if (member is! MethodDeclaration ||
+          member.name.lexeme != 'setupParentData') {
         continue;
       }
 
@@ -156,7 +158,11 @@ class AvoidUnsafeCastRule extends SaropaLintRule {
 
     for (final Statement statement in body.block.statements) {
       if (statement is! IfStatement) continue;
-      if (!_isParentDataTypeGuard(statement.expression, paramName, targetName)) {
+      if (!_isParentDataTypeGuard(
+        statement.expression,
+        paramName,
+        targetName,
+      )) {
         continue;
       }
 
@@ -178,8 +184,14 @@ class AvoidUnsafeCastRule extends SaropaLintRule {
     String targetName,
   ) {
     final Expression condition = _unwrapParenthesized(expression);
-    if (condition is! IsExpression || condition.notOperator == null) return false;
-    if (condition.type.toSource().replaceAll('?', '') != targetName) return false;
+    if (condition is! IsExpression || condition.notOperator == null) {
+      return false;
+    }
+
+    if (condition.type.toSource().replaceAll('?', '') != targetName) {
+      return false;
+    }
+
     return _isParentDataOnParameter(condition.expression, paramName);
   }
 
@@ -199,19 +211,21 @@ class AvoidUnsafeCastRule extends SaropaLintRule {
 
     if (statement is! ExpressionStatement) return false;
     final Expression expression = statement.expression;
-    if (expression is! AssignmentExpression || expression.operator.lexeme != '=') {
+    if (expression is! AssignmentExpression ||
+        expression.operator.lexeme != '=') {
       return false;
     }
 
-    if (!_isParentDataOnParameter(expression.leftHandSide, paramName)) return false;
+    if (!_isParentDataOnParameter(expression.leftHandSide, paramName)) {
+      return false;
+    }
 
     final Expression rhs = _unwrapParenthesized(expression.rightHandSide);
     if (rhs is! InstanceCreationExpression) return false;
 
-    final String createdTypeName = rhs.constructorName.type.toSource().replaceAll(
-      '?',
-      '',
-    );
+    final String createdTypeName = rhs.constructorName.type
+        .toSource()
+        .replaceAll('?', '');
     return createdTypeName == targetName;
   }
 
@@ -232,7 +246,8 @@ class AvoidUnsafeCastRule extends SaropaLintRule {
   }
 
   bool _isParentDataAccess(Expression expression) =>
-      expression is PropertyAccess && expression.propertyName.name == 'parentData';
+      expression is PropertyAccess &&
+      expression.propertyName.name == 'parentData';
 
   String? _parameterName(FormalParameter parameter) {
     if (parameter is SimpleFormalParameter) return parameter.name?.lexeme;

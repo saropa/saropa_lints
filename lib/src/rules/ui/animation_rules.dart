@@ -2936,7 +2936,8 @@ class AvoidInertAnimationValueInBuildRule extends SaropaLintRule {
     if (classDecl == null) return false;
     if (!_classDefinesField(classDecl, receiverName)) return false;
 
-    final CompilationUnit? unit = accessNode.thisOrAncestorOfType<CompilationUnit>();
+    final CompilationUnit? unit = accessNode
+        .thisOrAncestorOfType<CompilationUnit>();
     if (unit == null) return false;
 
     final ClassElement? classElement = classDecl.declaredFragment?.element;
@@ -3031,15 +3032,16 @@ class _ListeningBuilderInstantiationVisitor extends RecursiveAstVisitor<void> {
 
     final Expression argExpression = receiverArg.expression;
     final DartType? argType = argExpression.staticType;
-    final bool isAnimationArg = argType is InterfaceType && _isAnimationType(argType);
+    final bool isAnimationArg =
+        argType is InterfaceType && _isAnimationType(argType);
     if (!isAnimationArg) {
       hasNonListeningBuilderInstantiation = true;
       super.visitInstanceCreationExpression(node);
       return;
     }
 
-    final FunctionExpression? enclosingFn =
-        node.thisOrAncestorOfType<FunctionExpression>();
+    final FunctionExpression? enclosingFn = node
+        .thisOrAncestorOfType<FunctionExpression>();
     if (enclosingFn != null &&
         AvoidInertAnimationValueInBuildRule._isListeningBuilderCallback(
           enclosingFn,

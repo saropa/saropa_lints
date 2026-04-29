@@ -328,7 +328,10 @@ class PreferTryParseForDynamicDataRule extends SaropaLintRule {
     }
   }
 
-  bool _isDigitOnlyRegexCapture(Expression argument, MethodInvocation parseCall) {
+  bool _isDigitOnlyRegexCapture(
+    Expression argument,
+    MethodInvocation parseCall,
+  ) {
     final _CaptureAccess? capture = _captureAccessFromExpression(argument);
     if (capture == null) return false;
     final String? pattern = _findRegexPatternForVariable(
@@ -345,7 +348,10 @@ class PreferTryParseForDynamicDataRule extends SaropaLintRule {
     return _isDigitOnlyGroupPattern(groupPattern);
   }
 
-  bool _isRegexValidatedSubstring(Expression argument, MethodInvocation parseCall) {
+  bool _isRegexValidatedSubstring(
+    Expression argument,
+    MethodInvocation parseCall,
+  ) {
     if (argument is! MethodInvocation) return false;
     if (argument.methodName.name != 'substring') return false;
     final Expression? target = argument.target;
@@ -402,7 +408,8 @@ class PreferTryParseForDynamicDataRule extends SaropaLintRule {
     MethodInvocation parseCall, {
     required String variableName,
   }) {
-    final Statement? parseStatement = parseCall.thisOrAncestorOfType<Statement>();
+    final Statement? parseStatement = parseCall
+        .thisOrAncestorOfType<Statement>();
     final Block? block = parseCall.thisOrAncestorOfType<Block>();
     if (parseStatement == null || block == null) return null;
 
@@ -412,7 +419,10 @@ class PreferTryParseForDynamicDataRule extends SaropaLintRule {
     for (int i = parseIndex - 1; i >= 0; i--) {
       final Statement candidate = block.statements[i];
       if (candidate is! IfStatement) continue;
-      if (_isNegativeRegexGuardForVariable(candidate, variableName: variableName)) {
+      if (_isNegativeRegexGuardForVariable(
+        candidate,
+        variableName: variableName,
+      )) {
         return candidate;
       }
     }
@@ -433,7 +443,9 @@ class PreferTryParseForDynamicDataRule extends SaropaLintRule {
     }
 
     if (operand.argumentList.arguments.length != 1) return false;
-    final Expression arg = _unwrapExpression(operand.argumentList.arguments.first);
+    final Expression arg = _unwrapExpression(
+      operand.argumentList.arguments.first,
+    );
     if (arg is! SimpleIdentifier || arg.name != variableName) return false;
 
     final Statement thenBranch = statement.thenStatement;
@@ -476,7 +488,8 @@ class PreferTryParseForDynamicDataRule extends SaropaLintRule {
     for (int i = statementIndex - 1; i >= 0; i--) {
       final Statement candidate = block.statements[i];
       if (candidate is! VariableDeclarationStatement) continue;
-      for (final VariableDeclaration declaration in candidate.variables.variables) {
+      for (final VariableDeclaration declaration
+          in candidate.variables.variables) {
         if (declaration.name.lexeme != variableName) continue;
         final Expression? initializer = declaration.initializer;
         if (initializer is! InstanceCreationExpression &&
@@ -484,10 +497,13 @@ class PreferTryParseForDynamicDataRule extends SaropaLintRule {
           return null;
         }
 
-        if (methodName == 'hasMatch' && initializer is InstanceCreationExpression) {
+        if (methodName == 'hasMatch' &&
+            initializer is InstanceCreationExpression) {
           final String typeName = initializer.constructorName.type.name.lexeme;
           if (typeName != 'RegExp') return null;
-          return _extractPatternFromRegExpArgs(initializer.argumentList.arguments);
+          return _extractPatternFromRegExpArgs(
+            initializer.argumentList.arguments,
+          );
         }
 
         if (methodName == 'firstMatch' && initializer is MethodInvocation) {
@@ -578,7 +594,9 @@ class PreferTryParseForDynamicDataRule extends SaropaLintRule {
 
   bool _isDigitOnlyWholePattern(String pattern) {
     final String normalized = pattern.replaceAll(' ', '');
-    return RegExp(r'^\^?\\d(?:\{\d+(?:,\d+)?\}|[+*?])\$?$').hasMatch(normalized);
+    return RegExp(
+      r'^\^?\\d(?:\{\d+(?:,\d+)?\}|[+*?])\$?$',
+    ).hasMatch(normalized);
   }
 }
 

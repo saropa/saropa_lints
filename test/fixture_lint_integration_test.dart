@@ -319,9 +319,7 @@ void main() {
             .where(
               (v) =>
                   v.rule == 'avoid_memory_intensive_operations' &&
-                  v.file.contains(
-                    'avoid_memory_intensive_operations_fixture',
-                  ),
+                  v.file.contains('avoid_memory_intensive_operations_fixture'),
             )
             .toList();
 

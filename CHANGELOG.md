@@ -47,14 +47,16 @@
 
 ## [12.8.3]
 
-This patch release focuses on reducing noisy false positives so everyday Flutter and Dart code reads cleaner in the editor. Common animation flows, validated parsing paths, numeric loop accumulation, and parent-data lifecycle field patterns should now lint the way you expect. No config updates are needed; re-run analysis and you should see fewer distracting reports. [log](https://github.com/saropa/saropa_lints/blob/v12.8.3/CHANGELOG.md)
+This patch release focuses on reducing noisy false positives so everyday Flutter and Dart code reads cleaner in the editor. Common animation flows, validated parsing paths, numeric loop accumulation, parent-data lifecycle field patterns, and guarded render-object parentData casts should now lint the way you expect. No config updates are needed; re-run analysis and you should see fewer distracting reports. [log](https://github.com/saropa/saropa_lints/blob/v12.8.3/CHANGELOG.md)
 
 ### Fixed
 
 - **`avoid_redundant_await`** no longer flags `await` on `AnimationController.forward()` and `.reverse()` sequencing calls that return `TickerFuture`, so valid animation orchestration is not misreported as redundant. No action required.
+- **`avoid_inert_animation_value_in_build`** no longer reports `Animation.value` reads inside child widget `build()` methods when that child is instantiated from a listening builder callback (for example `AnimatedBuilder`), so tick-driven subtrees are not misclassified as inert snapshots. No action required.
 - **`prefer_try_parse_for_dynamic_data`** now skips `parse(...)` calls when the input is provably safe (valid numeric literals and digit-only regex-validated captures/substrings), so common validated parsing paths are no longer false positives. Remove any temporary local suppressions you added for those patterns.
 - **`avoid_memory_intensive_operations`** now reports loop `+=` only when the operation is on strings, so numeric accumulation patterns no longer produce false positives. No action required.
-- `avoid_unassigned_late_fields` no longer reports `late` fields declared on RenderObject parent-data classes (types in the `ParentData` inheritance chain), so lifecycle-initialized layout fields are not misclassified as unassigned. No action required.
+- **`avoid_unassigned_late_fields`** no longer reports `late` fields declared on RenderObject parent-data classes (types in the `ParentData` inheritance chain), so lifecycle-initialized layout fields are not misclassified as unassigned. No action required.
+- **`avoid_unsafe_cast`** no longer flags guarded `RenderObject.parentData` casts to `*ParentData` types when the enclosing class safely initializes that parent data shape in `setupParentData(...)`, so valid render-object parent-data workflows are not misclassified as unsafe casts. No action required.
 
 ---
 

@@ -24,23 +24,20 @@ void main() {
       expect(File(fixturePath).existsSync(), isTrue);
     });
 
-    test(
-      'GOOD AnimatedBuilder builder block has no expect_lint marker',
-      () {
-        final content = File(fixturePath).readAsStringSync();
-        final start = content.indexOf('class _GoodAnimatedBuilderChildReads');
-        final end = content.indexOf('class _GoodDisplayWidget');
-        expect(start, greaterThan(-1));
-        expect(end, greaterThan(start));
-        final slice = content.substring(start, end);
-        expect(
-          slice.contains('// expect_lint: $ruleName'),
-          isFalse,
-          reason:
-              'AnimatedBuilder callback rebuilding child widget should be treated as live',
-        );
-      },
-    );
+    test('GOOD AnimatedBuilder builder block has no expect_lint marker', () {
+      final content = File(fixturePath).readAsStringSync();
+      final start = content.indexOf('class _GoodAnimatedBuilderChildReads');
+      final end = content.indexOf('class _GoodDisplayWidget');
+      expect(start, greaterThan(-1));
+      expect(end, greaterThan(start));
+      final slice = content.substring(start, end);
+      expect(
+        slice.contains('// expect_lint: $ruleName'),
+        isFalse,
+        reason:
+            'AnimatedBuilder callback rebuilding child widget should be treated as live',
+      );
+    });
 
     test('GOOD child widget build has no expect_lint marker', () {
       final content = File(fixturePath).readAsStringSync();
