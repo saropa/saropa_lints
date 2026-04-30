@@ -876,7 +876,7 @@ saropa_lints:
     - avoid_auth_state_in_prefs: false
     - prefer_encrypted_prefs: false
     - require_deep_link_validation: false
-    - require_data_encryption: false   # WARNING — sensitive keywords in write args; `pin` avoids `Mapping` false positives
+    - require_data_encryption: false   # WARNING — write args: sensitive keywords; `pin` avoids `Mapping` FP; v6 skips arg text that signals pre-encrypted values (e.g. encrypted*/cipher*/aes*), …Encrypted(…)
     - prefer_data_masking: false
     - avoid_screenshot_sensitive: false
     - require_secure_password_field: false

@@ -112,6 +112,22 @@ final key = 'key';
 dynamic prefs;
 final secureStorage = FlutterSecureStorage();
 dynamic value;
+dynamic driftDb;
+dynamic plainPrivateKey;
+dynamic encryptedPrivateKey;
+dynamic cipherText;
+dynamic aesEncodedToken;
+
+// BAD: Drift-style `write` with sensitive field name and plaintext value
+// expect_lint: require_data_encryption
+void _badDriftPlaintextPrivateKey1010() {
+  driftDb.write(
+    _DriftLikeCompanion(
+      privateKey: _DriftValue(plainPrivateKey),
+      publicKey: _DriftValue(''),
+    ),
+  );
+}
 
 // BAD: Should trigger require_data_encryption
 // expect_lint: require_data_encryption
@@ -127,6 +143,55 @@ void _good1010() async {
   await encryptedBox.put('ssn', socialSecurityNumber);
   final encrypted = await encrypter.encrypt(data);
   await file.writeAsBytes(encrypted);
+}
+
+// GOOD: Schema field is still `privateKey:` but value is ciphertext by naming
+void _goodDriftEncryptedValue1010() {
+  driftDb.write(
+    _DriftLikeCompanion(
+      privateKey: _DriftValue(encryptedPrivateKey),
+      publicKey: _DriftValue(''),
+    ),
+  );
+}
+
+// GOOD: `insert` with cipher* / aes* value identifiers
+void _goodDriftInsertCipherAndAes1010() {
+  driftDb.insert(
+    _DriftLikeCompanion(
+      token: _DriftValue(cipherText),
+      other: 1,
+    ),
+  );
+  driftDb.insert(
+    _DriftLikeCompanion(
+      token: _DriftValue(aesEncodedToken),
+    ),
+  );
+}
+
+String toFirebaseEncrypted(String? x) => '';
+
+// GOOD: Encryption in method name (…Encrypted(…)) even when args reference key material
+void _goodEncryptedMethodCallOnPrivateKey1010() {
+  driftDb.write(
+    _DriftLikeCompanion(
+      privateKey: _DriftValue(toFirebaseEncrypted(plainPrivateKey)),
+    ),
+  );
+}
+
+class _DriftValue {
+  _DriftValue(this.x);
+  final dynamic x;
+}
+
+class _DriftLikeCompanion {
+  _DriftLikeCompanion({this.privateKey, this.publicKey, this.token, this.other});
+  final dynamic privateKey;
+  final dynamic publicKey;
+  final dynamic token;
+  final dynamic other;
 }
 
 /// Regression: type names such as [OwaspMapping] contain the substring `pin`

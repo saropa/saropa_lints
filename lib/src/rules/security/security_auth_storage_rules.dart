@@ -1182,7 +1182,7 @@ class AvoidAuthInQueryParamsRule extends SaropaLintRule {
 /// Warns when common persistence APIs receive arguments that suggest sensitive
 /// data is being written without encryption.
 ///
-/// Since: v1.7.8 | Updated: v4.13.0 | Rule version: v5
+/// Since: v1.7.8 | Updated: v4.13.0 | Rule version: v6
 ///
 /// Detection is intentionally lightweight: it visits a small set of methods
 /// (`setString`, `put`, `write`, `writeAsString`, `writeAsBytes`, `insert`) on
@@ -1190,6 +1190,13 @@ class AvoidAuthInQueryParamsRule extends SaropaLintRule {
 /// containing `secure` or `encrypt`). It lowercases the **argument list**
 /// source only—never the full invocation—so receiver identifiers such as
 /// `encryptedBox` do not suppress legitimate findings on insecure targets.
+///
+/// **Not flagged (arguments):** If the **argument** text matches the same
+/// secure-encryption heuristics (e.g. a variable or method named
+/// `encryptedPassword`, a call `…Encrypted(`, or identifiers with `cipher` /
+/// `aes` prefixes), the write is treated as already carrying ciphertext, even
+/// when a schema field is named with a sensitive keyword (e.g. `privateKey:` in
+/// Drift `Companion` writes).
 ///
 /// **Heuristic — `pin`:** Substring `pin` alone matched inside longer tokens
 /// (for example the `…p-p-i-n…` inside `Mapping` / `OwaspMapping`), producing
@@ -1241,7 +1248,7 @@ class RequireDataEncryptionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'require_data_encryption',
     '[require_data_encryption] Unencrypted sensitive data exposes '
-        'credentials to attackers via device access or backup extraction. {v5}',
+        'credentials to attackers via device access or backup extraction. {v6}',
     correctionMessage:
         'Use flutter_secure_storage, encrypted Hive box, or AES encryption.',
     severity: DiagnosticSeverity.WARNING,
@@ -1276,6 +1283,21 @@ class RequireDataEncryptionRule extends SaropaLintRule {
     RegExp(r'\bencryptedbox\b'),
   ];
 
+  /// If the **argument** source (same lowercased string as the sensitive scan)
+  /// also signals pre-encrypted or ciphertext, skip reporting: symmetric to the
+  /// receiver check above, and needed when Drift/ORM field names (e.g.
+  /// `privateKey:`) force sensitive keywords in the same text as the value
+  /// (`Value(encryptedPrivateKey)`). Does not use a lookbehind that would match
+  /// the `…encrypted` substring inside `unencrypted` as an identifier.
+  static final List<RegExp> _argumentEncryptionSignalPatterns = <RegExp>[
+    ..._secureStorageTargetPatterns,
+    RegExp(r'\bencrypted\w*'),
+    RegExp(r'\bcipher\w*'),
+    RegExp(r'\baes\w*'),
+    // Method names ending in Encrypted(…)
+    RegExp(r'encrypted\('),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -1304,6 +1326,11 @@ class RequireDataEncryptionRule extends SaropaLintRule {
       // Check if arguments contain sensitive data (not the full node source,
       // which includes target/receiver names that may incidentally match).
       final String argsSource = node.argumentList.toSource().toLowerCase();
+
+      if (_argumentEncryptionSignalPatterns
+          .any((RegExp p) => p.hasMatch(argsSource))) {
+        return;
+      }
 
       if (_pinKeywordPattern.hasMatch(argsSource)) {
         reporter.atNode(node);

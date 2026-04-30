@@ -4,6 +4,22 @@ import 'package:test/test.dart';
 /// `_pinKeywordPattern` in security_auth_storage_rules.dart.
 final RegExp _pinKeywordPattern = RegExp(r'(?<![a-zA-Z])pin');
 
+/// Mirrors `_argumentEncryptionSignalPatterns` in security_auth_storage_rules.dart.
+final List<RegExp> _argumentEncryptionSignalPatterns = <RegExp>[
+  RegExp(r'\bsecure\b'),
+  RegExp(r'\bencrypt\b'),
+  RegExp(r'\bencryptedbox\b'),
+  RegExp(r'\bencrypted\w*'),
+  RegExp(r'\bcipher\w*'),
+  RegExp(r'\baes\w*'),
+  RegExp(r'encrypted\('),
+];
+
+bool _argsHaveEncryptionSignal(String argsSource) {
+  final String lower = argsSource.toLowerCase();
+  return _argumentEncryptionSignalPatterns.any((RegExp p) => p.hasMatch(lower));
+}
+
 void main() {
   group('require_data_encryption pin keyword guard', () {
     test('does not match pin inside OwaspMapping / mapping (regression)', () {
@@ -60,6 +76,45 @@ void main() {
 
     test('matches pin preceded by digit (digit is not a letter)', () {
       expect(_pinKeywordPattern.hasMatch('code1234pin: x'), isTrue);
+    });
+  });
+
+  group('require_data_encryption argument encryption signal', () {
+    test('matches Drift-style companion with encrypted* value', () {
+      const args =
+          '_driftlikecompanion(privatekey: _driftvalue(encryptedprivatekey), publickey: _driftvalue(""))';
+      expect(_argsHaveEncryptionSignal(args), isTrue);
+    });
+
+    test('matches …encrypted( method name on arg text', () {
+      expect(
+        _argsHaveEncryptionSignal(
+          '_driftlikecompanion(privatekey: _driftvalue(tofirebaseencrypted(x)))',
+        ),
+        isTrue,
+      );
+    });
+
+    test('matches cipher* and aes* identifiers', () {
+      expect(
+        _argsHaveEncryptionSignal('x(ciphertext, y)'),
+        isTrue,
+      );
+      expect(
+        _argsHaveEncryptionSignal('token: value(aesencodedtoken)'),
+        isTrue,
+      );
+    });
+
+    test('does not match unencrypted as a single identifier (no false escape)', () {
+      expect(
+        _argsHaveEncryptionSignal('privatekey: value(unencrypted)'),
+        isFalse,
+      );
+    });
+
+    test('matches secure/encrypt in args (symmetric with receiver check)', () {
+      expect(_argsHaveEncryptionSignal('key: x, value: secure'), isTrue);
     });
   });
 }
