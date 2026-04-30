@@ -173,7 +173,7 @@ Optionally, also document for downstream users that the recommended naming conve
 
 ## Commits
 
-- `8b0a2f11` — `fix: require_data_encryption v6 skip pre-encrypted arg text`
+- `84b97a64` — `fix: require_data_encryption v6 skip pre-encrypted arg text`
 
 ---
 
