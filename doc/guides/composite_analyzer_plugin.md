@@ -48,7 +48,7 @@ The repository ships a tiny sibling package, **`saropa_lints_api`** (`packages/s
 
 Init still generates `plugins.saropa_lints` for normal setups. For a composite plugin:
 
-**VS Code (recommended):** Command palette → **“Saropa Lints: Create Composite Analyzer Plugin (scaffold)”**, or **Saropa Lints → Config** sidebar → **Composite analyzer plugin (scaffold)**. You will be prompted for a workspace-relative folder (default `packages/composite_saropa_plugin`).
+**VS Code (recommended):** Command palette → **“Saropa Lints: Create Composite Analyzer Plugin (scaffold)”**, or **Saropa Lints → Config** sidebar → **Composite analyzer plugin (scaffold)**. The extension shows a short preflight notification (**Continue** / **Open guide**) so you can read what will happen or open this guide before choosing a workspace-relative folder (default `packages/composite_saropa_plugin`).
 
 **CLI:**
 

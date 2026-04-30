@@ -68,6 +68,7 @@
     "src/test/keyedCountBreakdown.test.ts",
     "src/test/pathUtils.test.ts",
     "src/setup.ts",
+    "src/test/setupCompositeScaffoldGate.test.ts",
     "src/cross-file-commands.ts",
     "src/test/formatAnalysisIssuesMessage.test.ts",
     "src/test/findLatestAnalysisReport.test.ts",

@@ -5,6 +5,10 @@
  * Quick-pick tests drive `window.showQuickPick` via `setQuickPickNextResult`. The
  * exported `quickPickNextResult` is a const `{ value }` object so we avoid
  * `export let` while still resetting state in `resetMocks()`.
+ *
+ * Information notifications: push button labels (or `undefined` for dismiss) onto
+ * `informationMessageMockQueue`; each `showInformationMessage` call `shift`s one
+ * return value. `showInputBox` uses `inputBoxMockQueue` the same way.
  */
 
 export {
@@ -67,6 +71,17 @@ export function setQuickPickNextResult(value: unknown): void {
     quickPickNextResult.value = value;
 }
 
+/** Return values for successive `window.showInformationMessage` calls (FIFO). */
+export const informationMessageMockQueue: Array<string | undefined> = [];
+
+/** Return values for successive `window.showInputBox` calls (FIFO). */
+export const inputBoxMockQueue: Array<string | undefined> = [];
+
+/** Workspace folders for `getWorkspaceRoot` / `getProjectRoot` tests (empty/undefined = none). */
+export const mockWorkspaceFolders: { value: Array<{ uri: { fsPath: string } }> | undefined } = {
+    value: undefined,
+};
+
 export const window = {
     createWebviewPanel: (
         _viewType: string,
@@ -95,8 +110,18 @@ export const window = {
     }),
     withProgress: async (_options: any, task: (progress: any) => Promise<any>) =>
         task({ report: () => { /* no-op */ } }),
-    showInformationMessage: async (msg: string) => {
+    showInformationMessage: async (msg: string, ..._rest: unknown[]) => {
         messageMock.infos.push(msg);
+        if (informationMessageMockQueue.length > 0) {
+            return informationMessageMockQueue.shift() as string | undefined;
+        }
+        return undefined;
+    },
+    showInputBox: async (_options?: unknown) => {
+        if (inputBoxMockQueue.length > 0) {
+            return inputBoxMockQueue.shift() as string | undefined;
+        }
+        return undefined;
     },
     showWarningMessage: async (msg: string) => {
         messageMock.warnings.push(msg);
@@ -135,6 +160,11 @@ export function clearTestConfig(): void {
 }
 
 export const workspace: Record<string, any> = {
+    get workspaceFolders() {
+        const v = mockWorkspaceFolders.value;
+        if (!v || v.length === 0) return undefined;
+        return v;
+    },
     getConfiguration: (section?: string) => ({
         get: <T>(key: string, defaultValue?: T): T | undefined => {
             const fullKey = section ? `${section}.${key}` : key;
@@ -256,6 +286,9 @@ export function resetMocks(): void {
     messageMock.reset();
     envMock.reset();
     quickPickNextResult.value = undefined;
+    informationMessageMockQueue.length = 0;
+    inputBoxMockQueue.length = 0;
+    mockWorkspaceFolders.value = undefined;
     for (const key of Object.keys(registeredCommands)) {
         delete registeredCommands[key];
     }

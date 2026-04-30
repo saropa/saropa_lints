@@ -15,6 +15,10 @@ import { readInstalledVersion } from './upgrade-checker';
 const SAROPA_LINTS_DEV_DEP = 'saropa_lints';
 const DEFAULT_VERSION = '^9.1.0';
 
+/** Composite meta-plugin guide (browser); stable for marketplace installs. */
+const COMPOSITE_PLUGIN_SCAFFOLD_GUIDE_URL =
+  'https://github.com/saropa/saropa_lints/blob/main/doc/guides/composite_analyzer_plugin.md';
+
 const OUTPUT_CHANNEL_NAME = 'Saropa Lints';
 
 // Lazily-initialized singleton to avoid creating multiple channel objects.
@@ -597,11 +601,33 @@ function isSafeCompositeScaffoldRelativePath(rel: string): boolean {
 /**
  * Runs `dart run saropa_lints:init --emit-composite-plugin-scaffold` in the
  * workspace so users can create a composite meta-plugin from the IDE.
+ *
+ * Shows a preflight notification (Continue / Open guide) so users understand
+ * disk writes and can open documentation before choosing an output folder.
  */
 export async function runEmitCompositePluginScaffold(): Promise<boolean> {
   const workspaceRoot = getProjectRoot();
   if (!workspaceRoot) {
     void vscode.window.showErrorMessage('No workspace folder open.');
+    return false;
+  }
+
+  const gate = await vscode.window.showInformationMessage(
+    'Composite analyzer plugin scaffold',
+    {
+      detail:
+        'This writes a new Dart package under your workspace (pubspec.yaml, lib/main.dart, README): one custom_lint plugin that registers Saropa and leaves hooks for your own rules.\n\n' +
+        'Only use this when you ship custom analyzer rules together with Saropa. Normal Saropa-only projects can skip it—the analyzer allows a single plugin entry per context.\n\n' +
+        'Next: pick a workspace-relative folder. If that folder already exists, you are asked before anything is overwritten.',
+    },
+    'Continue',
+    'Open guide',
+  );
+  if (gate === 'Open guide') {
+    await vscode.env.openExternal(vscode.Uri.parse(COMPOSITE_PLUGIN_SCAFFOLD_GUIDE_URL));
+    return false;
+  }
+  if (gate !== 'Continue') {
     return false;
   }
 
