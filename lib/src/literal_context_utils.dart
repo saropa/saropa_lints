@@ -119,6 +119,20 @@ bool _looksLikeRegex(String value) {
   return regexIndicators.any((pattern) => value.contains(pattern));
 }
 
+/// True when [expr] is or contains a raw [SimpleStringLiteral] (`r'...'`).
+///
+/// `+` with raw literals is idiomatic for composing regex fragments with
+/// escaped input; rules that recommend interpolation should not flag it.
+bool expressionContainsRawStringLiteral(Expression expr) {
+  if (expr is SimpleStringLiteral && expr.isRaw) return true;
+  if (expr is AdjacentStrings) {
+    for (final StringLiteral part in expr.strings) {
+      if (expressionContainsRawStringLiteral(part)) return true;
+    }
+  }
+  return false;
+}
+
 /// Checks if a string literal is a test description.
 ///
 /// Test descriptions are the first argument to test framework methods like:

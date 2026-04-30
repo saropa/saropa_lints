@@ -9,4 +9,7 @@ String bad(String name) => 'Hello, ' + name + '!';
 // GOOD: String interpolation
 String good(String name) => 'Hello, $name!';
 
+// GOOD: Raw literal + expression — keep r'' for regex/backslashes
+String goodRawRegex(String escaped) => r'\s*' + escaped;
+
 void main() {}

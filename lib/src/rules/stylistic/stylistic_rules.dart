@@ -8,6 +8,7 @@ import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/source/line_info.dart';
 
 import '../../comment_utils.dart';
+import '../../literal_context_utils.dart';
 import '../../saropa_lint_rule.dart';
 import '../../fixes/stylistic/convert_to_single_quotes_fix.dart';
 import '../../fixes/stylistic/capitalize_comment_fix.dart';
@@ -4750,6 +4751,10 @@ class PreferInterpolationToComposeRule extends SaropaLintRule {
           right is StringInterpolation ||
           right is AdjacentStrings;
       if (!leftLiteral && !rightLiteral) return;
+      if (expressionContainsRawStringLiteral(left) ||
+          expressionContainsRawStringLiteral(right)) {
+        return;
+      }
       final parent = node.parent;
       if (parent is BinaryExpression) {
         if (parent.operator.type == TokenType.PLUS &&

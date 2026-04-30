@@ -9,6 +9,7 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 
 import '../../analyzer_metadata_compat_utils.dart';
+import '../../literal_context_utils.dart';
 import '../../banned_usage_config.dart' as banned_usage_config;
 import '../../element_identifier_utils.dart';
 import '../../fixes/code_quality/avoid_substring_todo_fix.dart';
@@ -3369,6 +3370,11 @@ class AvoidMissingInterpolationRule extends SaropaLintRule {
       final bool leftIsLiteral = node.leftOperand is StringLiteral;
       final bool rightIsLiteral = node.rightOperand is StringLiteral;
       if (!leftIsLiteral && !rightIsLiteral) return;
+
+      if (expressionContainsRawStringLiteral(node.leftOperand) ||
+          expressionContainsRawStringLiteral(node.rightOperand)) {
+        return;
+      }
 
       // Skip if this is a child of another + expression (report only root)
       final AstNode? parent = node.parent;

@@ -121,3 +121,15 @@ void _good238() {
   final greeting = 'Hello, $name!';
   final path = '$baseUrl/api/$endpoint';
 }
+
+// GOOD: Raw-string literal + computed fragment — regex composition (no FP)
+void _goodRawStringConcat() {
+  final tag = '#tag';
+  final _ = RegExp(r'\s*' + RegExp.escape(tag));
+  final domain = 'example.com';
+  final _ = RegExp(r'https?:\/\/[^\s]*' + RegExp.escape(domain));
+  final suffix = 'tail';
+  final _ = r'^\d+\$' + suffix;
+  final _ = suffix + r'\s*';
+  final _ = 'prefix' + r'\w+';
+}
