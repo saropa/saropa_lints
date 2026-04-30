@@ -48,13 +48,22 @@
 
 ### Removed (Extension)
 
+- The **Violations** activity-bar tree view and the `saropaLints.sidebar.showIssues` setting are removed so lint findings live in the **Findings Dashboard** editor tab and the status-bar chip instead of a duplicate sidebar panel. Use **Saropa Lints: Open Findings Dashboard** or the `$(warning)` status item; remove `sidebar.showIssues` from settings JSON if you set it explicitly. No action otherwise.
 - The Project Vibrancy sidebar view and its refresh command are removed so function-level vibrancy lives only in the editor-area report, which removes duplicate UI and avoids cramped sidebar layouts. Use **Saropa Lints: Open Project Vibrancy Report** (Command Palette or Saropa navigation where offered). No config change.
 
 ### Changed (Extension)
 
-- **Open Package Vibrancy**, **Open Project Vibrancy Report**, and **Open Project Vibrancy Settings** now have toolbar icons, and the **Issues** and **Package Vibrancy** view title bars include **Open Package Vibrancy** and **Open Project Vibrancy Report** in Dart workspaces so the main vibrancy webviews stay one click away from the sidebar. No config change.
+- Package Vibrancy timestamped JSON, Markdown, and SBOM exports now save under **`<workspace>/reports/`** instead of **`report/`**, matching cross_file CLI defaults and other Saropa on-disk report paths. No action required if you only use extension commands and webviews.
+- Automation that consumed **`report/*_saropa_vibrancy.*`** must use **`reports/`**; first-time vibrancy history backfill still scans legacy **`report/`** when importing old timestamped JSON into `.saropa/vibrancy-history.json`.
+- The **Dashboards** hub lists editor dashboards only (the extra “Violations sidebar” jump row is removed because that tree no longer exists). No action required.
+- The **Findings Dashboard** adds a compact **More commands** row (palette actions for filters, help, vibrancy, config, and **Copy tree JSON**) so shortcuts that lived on the old Violations title bar stay one click away in the editor tab. No action required.
+- **Help & resources** includes **Create project instructions** so that command stays visible after the hub trim. No action required.
+- The **Findings Dashboard** editor tab now includes **Suppressions (export)** (same breakdown as the violations export summary) and **Issues view hides** (workspace list filters) with actions to clear filters, drill by rule or file, and clear view hides, so you can review suppressions without a separate Violations tree. No action required.
+- The **Config Dashboard** shows a read-only **Suppressions (export)** strip (totals and by-kind snapshot from the current report, after the disabled-rule filter) plus **Open Findings Dashboard** for the full breakdown; browse, clear view hides, and drill-down stay on Findings. No action required.
+- Package Vibrancy user-facing text now refers to the **activity-bar list**, **Saropa Package Dashboard**, and **CodeLens** instead of generic “tree view” wording; **Saropa Lints: Open Package Dashboard** is the palette title for `saropaLints.packageVibrancy.showReport` (same command id). No config change.
+- **Open Package Vibrancy**, **Open Project Vibrancy Report**, and **Open Project Vibrancy Settings** now have toolbar icons, and the **Dashboards** hub title bar includes **Open Package Vibrancy** and **Open Project Vibrancy Report** in Dart workspaces so the main vibrancy webviews stay one click away from the activity bar. No config change.
 - **Config Dashboard** (rule packs, tiers, charts) opens as an **editor tab** instead of a Saropa sidebar webview so the layout matches a real dashboard width. No action required.
-- **Open Config Dashboard** has a toolbar icon and is on the **Issues** view title in Dart workspaces (Overview and Config titles unchanged); the `saropaLints.sidebar.showRulePacks` setting is removed because that sidebar section no longer exists—delete the key from settings JSON if you set it explicitly. No other migration.
+- **Open Config Dashboard** has a toolbar icon on the **Dashboards** hub in Dart workspaces (Overview title unchanged); the `saropaLints.sidebar.showRulePacks` setting is removed because that sidebar section no longer exists—delete the key from settings JSON if you set it explicitly. No other migration.
 
 ### Fixed (Extension)
 

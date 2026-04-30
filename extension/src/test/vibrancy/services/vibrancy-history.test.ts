@@ -100,7 +100,7 @@ describe('vibrancy-history', () => {
     });
 
     it('backfills from legacy report JSON files once', async () => {
-        const reportDir = path.join(workspaceRoot, 'report');
+        const reportDir = path.join(workspaceRoot, 'reports');
         await fs.mkdir(reportDir, { recursive: true });
         await fs.writeFile(
             path.join(reportDir, '2026-04-28_10-00-00_saropa_vibrancy.json'),
@@ -137,5 +137,29 @@ describe('vibrancy-history', () => {
 
         const secondRun = await backfillFromLegacyReports(workspaceRoot);
         assert.strictEqual(secondRun, 0);
+    });
+
+    it('backfills from pre-rename report/ directory', async () => {
+        const legacyDir = path.join(workspaceRoot, 'report');
+        await fs.mkdir(legacyDir, { recursive: true });
+        await fs.writeFile(
+            path.join(legacyDir, '2026-04-28_12-00-00_saropa_vibrancy.json'),
+            JSON.stringify({
+                audit_metadata: { timestamp: '2026-04-28T12:00:00.000Z' },
+                packages: [{
+                    name: 'dio',
+                    installed_version: '5.0.0',
+                    vibrancy_score: 80,
+                    status: 'Vibrant',
+                }],
+            }),
+            'utf8',
+        );
+
+        const imported = await backfillFromLegacyReports(workspaceRoot);
+        assert.strictEqual(imported, 1);
+        const history = await readHistory(workspaceRoot);
+        assert.strictEqual(history.snapshots.length, 1);
+        assert.deepStrictEqual(getPackageTrend(history, 'dio'), [80]);
     });
 });

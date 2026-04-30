@@ -42,6 +42,34 @@ const EMPTY_HISTORY: VibrancyHistory = {
     snapshots: [],
 };
 
+/** Timestamped vibrancy JSON written by the extension export. */
+const LEGACY_VIBRANCY_JSON =
+    /^\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}_saropa_vibrancy\.json$/;
+
+/** Full paths under `reports/` then legacy `report/`, basename deduped (reports wins). */
+async function listLegacyVibrancyJsonPaths(workspaceRoot: string): Promise<string[]> {
+    const seenNames = new Set<string>();
+    const paths: string[] = [];
+    for (const subdir of ['reports', 'report'] as const) {
+        const dir = path.join(workspaceRoot, subdir);
+        let files: string[];
+        try {
+            files = await fs.readdir(dir);
+        } catch {
+            continue;
+        }
+        for (const name of files) {
+            if (!LEGACY_VIBRANCY_JSON.test(name) || seenNames.has(name)) {
+                continue;
+            }
+            seenNames.add(name);
+            paths.push(path.join(dir, name));
+        }
+    }
+    paths.sort((a, b) => path.basename(a).localeCompare(path.basename(b)));
+    return paths;
+}
+
 function historyPath(workspaceRoot: string): string {
     return path.join(workspaceRoot, '.saropa', 'vibrancy-history.json');
 }
@@ -234,22 +262,13 @@ export async function backfillFromLegacyReports(workspaceRoot: string): Promise<
     // Backfill only into an empty history file to keep this a one-time migration.
     if (history.snapshots.length > 0) { return 0; }
 
-    const reportDir = path.join(workspaceRoot, 'report');
-    let files: string[];
-    try {
-        files = await fs.readdir(reportDir);
-    } catch {
-        return 0;
-    }
-    const legacyJsonFiles = files
-        .filter((name) => /^\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}_saropa_vibrancy\.json$/.test(name))
-        .sort();
-    if (legacyJsonFiles.length === 0) { return 0; }
+    const jsonPaths = await listLegacyVibrancyJsonPaths(workspaceRoot);
+    if (jsonPaths.length === 0) { return 0; }
 
     const imported: HistorySnapshot[] = [];
-    for (const fileName of legacyJsonFiles) {
+    for (const filePath of jsonPaths) {
         try {
-            const raw = await fs.readFile(path.join(reportDir, fileName), 'utf8');
+            const raw = await fs.readFile(filePath, 'utf8');
             const parsed = JSON.parse(raw) as LegacyVibrancyReport;
             const snapshot = snapshotFromLegacyReport(parsed);
             if (!snapshot) { continue; }
