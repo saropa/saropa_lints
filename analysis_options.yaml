@@ -37,7 +37,7 @@ linter:
 
 plugins:
   saropa_lints:
-    version: "12.6.1"
+    version: "12.8.3"
     # ═══════════════════════════════════════════════════════════════════
     # SAROPA LINTS CONFIGURATION
     # ═══════════════════════════════════════════════════════════════════
@@ -78,7 +78,7 @@ plugins:
       #
       # --- TIER 1: ESSENTIAL (222 rules) ---
       #
-      always_remove_listener: true  # [WARNING] Listener added via addListener() but no matching removeListener() call found in dispose(). Orphaned listeners retain references to the widget, preventing garbage collection and causing memory leaks that accumulate as users navigate between screens. {v3}
+      always_remove_listener: true  # [WARNING] Listener added via addListener() but no matching removeListener() call found in dispose(). Orphaned listeners retain references to the widget, preventing garbage collection and causing memory leaks that accumulate as users navigate between screens. {v4}
       avoid_android_cleartext_traffic: true  # [WARNING] HTTP URL detected. Android 9+ blocks cleartext traffic by default. This request will fail silently. {v2}
       avoid_api_key_in_code: true  # [ERROR] Hardcoded keys are extractable from app binaries, enabling unauthorized API access and billing abuse. {v3}
       avoid_app_links_sensitive_params: true  # [ERROR] Deep link params are logged by OS and analytics, exposing tokens in crash reports and logs. {v2}
@@ -437,7 +437,7 @@ plugins:
       avoid_nested_assignments: false  # [INFO] Assignment expression embedded inside another expression (e.g. condition, argument, or return). Nested assignments obscure the data flow and make it unclear whether the intent is comparison, assignment, or both, increasing the risk of logic errors. {v7}
       avoid_nested_routes_without_parent: true  # [WARNING] context.go() navigates to a path with 3+ segments, which places users deep in the route hierarchy without parent routes on the stack. The back button skips intermediate screens, breaking expected navigation flow and disorienting users. {v2}
       avoid_nested_scrollables: true  # [WARNING] Nested scrollable widgets can cause scroll conflicts. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v2}
-      avoid_nested_scrollables_conflict: true  # [WARNING] Nested scrollable without explicit physics causes gesture conflicts. Nested scrollable widgets cause gesture conflicts. The inner scrollable must have NeverScrollableScrollPhysics to let the outer one handle scrolling. {v3}
+      avoid_nested_scrollables_conflict: true  # [WARNING] Same-axis nested scrollable without explicit physics can cause gesture conflicts. Cross-axis nesting is not reported. {v4}
       avoid_non_final_exception_class_fields: true  # [WARNING] Mutable exception fields allow modification after throw, corrupting error data for handlers. {v4}
       avoid_not_encodable_in_to_json: true  # [WARNING] Value is not JSON-encodable and will cause runtime error. {v2}
       avoid_notification_payload_sensitive: true  # [WARNING] Sensitive data in notifications exposes passwords, tokens, or PII on the lock screen. Anyone nearby can read this information without unlocking the device, creating a security vulnerability. {v4}
@@ -458,7 +458,7 @@ plugins:
       avoid_rebuild_on_scroll: true  # [WARNING] Scroll listener registered inside build() is re-added on every widget rebuild without removing the previous one. Duplicate listeners accumulate over time, firing multiple callbacks per scroll event, causing memory leaks, compounding performance degradation, and eventually crashes from excessive callback execution. {v3}
       # Plugin-dogfood disable: single occurrence in a future-returning API contract where the async keyword is intentional for interface compatibility.
       avoid_redundant_async: false  # [INFO] Declaring a function async without using await adds unnecessary Future wrapping and microtask scheduling overhead. This can make code harder to read, debug, and maintain, and may introduce subtle timing bugs. {v7}
-      avoid_redundant_await: true  # [INFO] Awaiting a non-Future expression is redundant and misleading. It wraps the value in a resolved Future only to immediately unwrap it, adding an unnecessary microtask delay and confusing readers who expect asynchronous behavior. Remove the await keyword to clarify that the expression is synchronous. {v2}
+      avoid_redundant_await: true  # [INFO] Awaiting a non-Future expression is redundant and misleading. It wraps the value in a resolved Future only to immediately unwrap it, adding an unnecessary microtask delay and confusing readers who expect asynchronous behavior. Remove the await keyword to clarify that the expression is synchronous. {v3}
       avoid_redundant_null_check: true  # [INFO] Comparing a non-nullable value to null is redundant because the result is always the same at compile time. This often indicates a type signature that should be nullable, or dead code that can be removed. With sound null safety, the compiler already guarantees non-nullable variables cannot be null. {v1}
       avoid_referencing_discarded_variables: true  # [WARNING] Variable prefixed with underscore is referenced after declaration. The underscore prefix signals that the value is intentionally discarded, so reading it later contradicts the naming convention and confuses developers who expect underscore-prefixed variables to be unused. {v5}
       avoid_refresh_without_await: true  # [WARNING] RefreshIndicator onRefresh callback must return a Future that completes when data loading finishes. Without awaiting async operations, the refresh spinner dismisses immediately while data is still loading, leaving users confused about whether the refresh succeeded or failed and showing stale content. {v4}

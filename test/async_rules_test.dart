@@ -323,10 +323,13 @@ void main() {
   });
 
   group('AvoidRedundantAwaitRule', () {
-    test('diagnostic text is v2 (Future/Stream implementers)', () {
-      final rule = AvoidRedundantAwaitRule();
-      expect(rule.code.problemMessage, contains('{v2}'));
-    });
+    test(
+      'diagnostic text is v3 (AnimationController TickerFuture methods)',
+      () {
+        final rule = AvoidRedundantAwaitRule();
+        expect(rule.code.problemMessage, contains('{v3}'));
+      },
+    );
 
     test('fixture keeps BAD expect_lint and Future-implementer regression', () {
       final source = File(
@@ -338,6 +341,12 @@ void main() {
       expect(source, contains('goodAnimationControllerAwaits'));
       expect(source, contains('await controller.forward();'));
       expect(source, contains('await controller.reverse();'));
+      expect(source, contains('await controller.animateTo('));
+      expect(source, contains('await controller.animateBack('));
+      expect(source, contains('await controller.animateWith('));
+      expect(source, contains('await controller.repeat();'));
+      expect(source, contains('await controller.fling();'));
+      expect(source, contains('await someInt'));
     });
   });
 

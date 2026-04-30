@@ -8,6 +8,8 @@ import 'dart:async';
 // expect_lint: avoid_redundant_await
 Future<void> bad() async {
   await 1;
+  final someInt = 1;
+  await someInt;
 }
 
 // GOOD: Await only on Future
@@ -55,9 +57,17 @@ Future<void> goodImplementsFuture() async {
 
 class TickerFuture {}
 
+class _DummySimulation {}
+
 class AnimationController {
   TickerFuture forward() => TickerFuture();
   TickerFuture reverse() => TickerFuture();
+  TickerFuture animateTo(double target, {Duration? duration}) => TickerFuture();
+  TickerFuture animateBack(double target, {Duration? duration}) =>
+      TickerFuture();
+  TickerFuture animateWith(_DummySimulation simulation) => TickerFuture();
+  TickerFuture repeat() => TickerFuture();
+  TickerFuture fling() => TickerFuture();
 }
 
 // OK: awaiting AnimationController sequencing calls is intentional.
@@ -65,6 +75,11 @@ Future<void> goodAnimationControllerAwaits() async {
   final controller = AnimationController();
   await controller.forward();
   await controller.reverse();
+  await controller.animateTo(1.0, duration: const Duration(milliseconds: 200));
+  await controller.animateBack(0.0);
+  await controller.animateWith(_DummySimulation());
+  await controller.repeat();
+  await controller.fling();
 }
 
 void main() {}
