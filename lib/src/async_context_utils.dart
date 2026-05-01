@@ -206,6 +206,82 @@ String? getBuildContextParamName(FormalParameter param) {
 }
 
 // ---------------------------------------------------------------------------
+// Mounted-Guarded Condition Helpers (shared by ContextUsageFinder and
+// _StaticContextUsageFinder)
+// ---------------------------------------------------------------------------
+
+/// Returns true if [child] is the same node as [parent] or a transitive
+/// descendant via `parent` links.
+///
+/// AST equality here is reference equality (the analyzer reuses node
+/// instances within a single parse), so this is safe for the
+/// "is the candidate node inside this subtree" question used by the
+/// mounted-guard helpers.
+bool isAstDescendant(AstNode child, AstNode parent) {
+  AstNode? current = child;
+  while (current != null) {
+    if (current == parent) return true;
+    current = current.parent;
+  }
+  return false;
+}
+
+/// Returns true when [node] is one operand of a `!=` `BinaryExpression`
+/// whose OTHER operand is a `NullLiteral` — i.e. the structural shape of
+/// `<node> != null` or `null != <node>`.
+///
+/// The caller is responsible for filtering by identifier name (e.g.
+/// limiting matches to tracked `BuildContext` parameter names). Operand
+/// identity comparison uses [identical] so a same-named identifier
+/// elsewhere in the expression cannot satisfy the predicate.
+bool isNullCheckOperand(SimpleIdentifier node, BinaryExpression binary) {
+  if (binary.operator.type != TokenType.BANG_EQ) return false;
+  if (identical(binary.leftOperand, node) &&
+      binary.rightOperand is NullLiteral) {
+    return true;
+  }
+  if (identical(binary.rightOperand, node) &&
+      binary.leftOperand is NullLiteral) {
+    return true;
+  }
+  return false;
+}
+
+/// Walks up from [node] to find the nearest enclosing
+/// `ConditionalExpression` or `IfStatement`, then returns true only if
+/// [node] sits inside THAT node's CONDITION (not its body/branches) AND
+/// [isMountedCheck] returns true on the condition expression.
+///
+/// Stops at function boundaries (`FunctionExpression` / `MethodDeclaration`)
+/// because the lifetime of `mounted` is bounded by the enclosing function:
+/// a mounted guard in an outer function does not protect code in a
+/// nested closure.
+///
+/// Used to skip an LHS like `context` in `context != null && context.mounted`
+/// — the null check there is part of a compound guard, not a context
+/// usage. Each visitor passes its own [isMountedCheck] so per-rule rules
+/// like the static-method param-name filter stay scoped.
+bool isInsideMountedGuardedCondition(
+  AstNode node,
+  bool Function(Expression) isMountedCheck,
+) {
+  AstNode? current = node.parent;
+  while (current != null) {
+    if (current is ConditionalExpression) {
+      return isAstDescendant(node, current.condition) &&
+          isMountedCheck(current.condition);
+    }
+    if (current is IfStatement) {
+      return isAstDescendant(node, current.expression) &&
+          isMountedCheck(current.expression);
+    }
+    if (current is FunctionExpression || current is MethodDeclaration) break;
+    current = current.parent;
+  }
+  return false;
+}
+
+// ---------------------------------------------------------------------------
 // Private helpers
 // ---------------------------------------------------------------------------
 
@@ -271,6 +347,20 @@ class ContextUsageFinder extends RecursiveAstVisitor<void> {
         return;
       }
 
+      // Skip if `context` is one operand of `context != null` (or
+      // `null != context`) and that null check sits inside a mounted-guarded
+      // condition — e.g. `context != null && context.mounted ? context : null`.
+      // The null check there is a guard, not a usage: reaching the
+      // then-branch proves both `!= null` AND `mounted` evaluated true.
+      // Without this skip the LHS `context` is misreported even though no
+      // dereference happens (idiomatic safe form for nullable BuildContext).
+      if (parent is BinaryExpression &&
+          isNullCheckOperand(node, parent) &&
+          isInsideMountedGuardedCondition(parent, _isMountedCheck)) {
+        super.visitSimpleIdentifier(node);
+        return;
+      }
+
       // Skip if inside a mounted guard: if (context.mounted) { ... }
       // This handles nested guards inside other statements, e.g.:
       //   if (someCondition) { if (context.mounted) context.doThing(); }
@@ -300,7 +390,7 @@ class ContextUsageFinder extends RecursiveAstVisitor<void> {
     while (current != null) {
       if (current is ConditionalExpression) {
         // Check if this node is in the then-expression
-        if (_isDescendantOf(node, current.thenExpression)) {
+        if (isAstDescendant(node, current.thenExpression)) {
           // Check if condition is a mounted check
           if (_isMountedCheck(current.condition)) {
             return true;
@@ -321,6 +411,9 @@ class ContextUsageFinder extends RecursiveAstVisitor<void> {
   /// - `context.mounted` (PrefixedIdentifier)
   /// - `mounted` (SimpleIdentifier in State class)
   /// - `context?.mounted ?? false` (nullable-safe pattern)
+  /// - `A && B` where either operand recurses to a mounted check
+  ///   (e.g. `context != null && context.mounted`, the idiomatic guard
+  ///   for nullable `BuildContext?` parameters)
   bool _isMountedCheck(Expression expr) {
     // context.mounted
     if (expr is PrefixedIdentifier && expr.identifier.name == 'mounted') {
@@ -341,15 +434,16 @@ class ContextUsageFinder extends RecursiveAstVisitor<void> {
         }
       }
     }
-    return false;
-  }
-
-  /// Checks if child is a descendant of parent.
-  bool _isDescendantOf(AstNode child, AstNode parent) {
-    AstNode? current = child;
-    while (current != null) {
-      if (current == parent) return true;
-      current = current.parent;
+    // Compound `&&`: any operand being a mounted check is sufficient. Mirrors
+    // the rule's own docstring at context_rules.dart:424 ("Compound conditions"
+    // for if-form guards) and keeps ternary detection symmetric with
+    // `checksMounted` used by if-form guards. Required to recognize
+    // `context != null && context.mounted ? context : null` for nullable
+    // `BuildContext?` parameters.
+    if (expr is BinaryExpression &&
+        expr.operator.type == TokenType.AMPERSAND_AMPERSAND) {
+      return _isMountedCheck(expr.leftOperand) ||
+          _isMountedCheck(expr.rightOperand);
     }
     return false;
   }

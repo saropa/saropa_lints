@@ -48,7 +48,7 @@
 
 ### Fixed
 
-- **`avoid_context_across_async`** no longer reports the idiomatic compound nullable guard `context != null && context.mounted ? context : null` (used by extension methods and helpers that take a `BuildContext?` parameter); both the null-check `context` and the then-branch `context` are now recognized as part of the guard. Remove any temporary `// ignore` workarounds you added for that pattern.
+- **`avoid_context_across_async`** and **`avoid_context_after_await_in_static`** no longer report the idiomatic compound nullable guard `context != null && context.mounted ? context : null` (used by extension methods and static helpers that take a `BuildContext?` parameter); both the null-check `context` and the then-branch `context` are now recognized as part of the guard. Remove any temporary `// ignore` workarounds you added for that pattern.
 
 ### Removed (Extension)
 

@@ -157,7 +157,7 @@ class AvoidStoringContextRule extends SaropaLintRule {
 
 /// Warns when BuildContext is used after an await without a mounted check.
 ///
-/// Since: v2.3.10 | Updated: v4.13.0 | Rule version: v6
+/// Since: v2.3.10 | Updated: v13.0.0 | Rule version: v7
 ///
 /// Alias: async_context, stale_context,
 ///        avoid_using_context_after_dispose
@@ -181,11 +181,19 @@ class AvoidStoringContextRule extends SaropaLintRule {
 /// ## Recognized Mounted Guards
 ///
 /// ```dart
-/// if (!mounted) return;           // Early exit guard
-/// if (!context.mounted) return;   // Flutter 3.7+ style
-/// if (mounted == false) return;   // Explicit comparison
-/// if (mounted) { ... }            // Positive block guard
+/// if (!mounted) return;                                // Early exit guard
+/// if (!context.mounted) return;                        // Flutter 3.7+ style
+/// if (mounted == false) return;                        // Explicit comparison
+/// if (mounted) { ... }                                 // Positive block guard
+/// if (context != null && context.mounted) { ... }      // Compound `&&` guard
+/// context.mounted ? context : null                     // Guarded ternary
+/// context != null && context.mounted ? context : null  // Compound ternary
 /// ```
+///
+/// The compound `&&` ternary form is the idiomatic safe pattern for nullable
+/// `BuildContext?` parameters (extension methods, helpers). The rule treats
+/// `context != null` inside such a compound as a guard, not a usage — neither
+/// the LHS nor the then-branch `context` is reported.
 ///
 /// **BAD:**
 /// ```dart
@@ -242,7 +250,7 @@ class AvoidContextAcrossAsyncRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'avoid_context_across_async',
     '[avoid_context_across_async] BuildContext used after await crashes '
-        'if widget was disposed during the async gap. Check mounted first. {v6}',
+        'if widget was disposed during the async gap. Check mounted first. {v7}',
     correctionMessage: 'Check "if (!mounted) return;" before using context.',
     severity: DiagnosticSeverity.ERROR,
   );
@@ -405,7 +413,7 @@ class AvoidContextAcrossAsyncRule extends SaropaLintRule {
 
 /// Warns when BuildContext is used after await in async static methods.
 ///
-/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v4
+/// Since: v2.4.0 | Updated: v13.0.0 | Rule version: v5
 ///
 /// Alias: context_after_await_static, async_static_context_danger
 ///
@@ -418,12 +426,18 @@ class AvoidContextAcrossAsyncRule extends SaropaLintRule {
 /// when context is properly guarded:
 ///
 /// ```dart
-/// if (!context.mounted) return;        // Early exit guard
-/// if (context.mounted == false) return; // Explicit comparison
-/// if (context.mounted) { ... }          // Positive block guard
-/// if (context.mounted && other) { ... } // Compound conditions
-/// context.mounted ? context : null      // Guarded ternary
+/// if (!context.mounted) return;                          // Early exit guard
+/// if (context.mounted == false) return;                  // Explicit comparison
+/// if (context.mounted) { ... }                           // Positive block guard
+/// if (context.mounted && other) { ... }                  // Compound conditions
+/// context.mounted ? context : null                       // Guarded ternary
+/// context != null && context.mounted ? context : null    // Compound ternary
 /// ```
+///
+/// The compound `&&` ternary is the idiomatic safe pattern for nullable
+/// `BuildContext?` static-method parameters: `context != null` inside such
+/// a compound is treated as a guard, not a usage — neither the LHS nor the
+/// then-branch `context` is reported.
 ///
 /// See also:
 /// - [AvoidContextInAsyncStaticRule] for any async static with context
@@ -485,7 +499,7 @@ class AvoidContextAfterAwaitInStaticRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'avoid_context_after_await_in_static',
     '[avoid_context_after_await_in_static] BuildContext used after await in static method. Context may be '
-        'invalid after async gap. {v4}',
+        'invalid after async gap. {v5}',
     correctionMessage:
         'Pass an isMounted callback, use a navigator key, or restructure '
         'to avoid context after await.',
@@ -785,6 +799,24 @@ class _StaticContextUsageFinder extends RecursiveAstVisitor<void> {
         return;
       }
 
+      // Safe: `param != null` (or `null != param`) inside the condition of
+      // an enclosing mounted-guarded ternary or `if`. The null check there
+      // is part of the compound guard for nullable `BuildContext?` params,
+      // not a usage. Without this skip the LHS `param` is misreported even
+      // though no dereference happens — same FP as
+      // `avoid_context_across_async`'s compound-ternary guard fix.
+      // The structural test lives in the shared helpers; we only have to
+      // confirm the identifier is one of our tracked context param names
+      // (the shared helper is param-name agnostic by design — its callers
+      // own that filter).
+      if (parent is BinaryExpression &&
+          contextParamNames.contains(node.name) &&
+          isNullCheckOperand(node, parent) &&
+          isInsideMountedGuardedCondition(parent, _isMountedCheck)) {
+        super.visitSimpleIdentifier(node);
+        return;
+      }
+
       // Safe: context in then-branch of `context.mounted ? context : ...`
       if (_isInMountedGuardedTernary(node)) {
         super.visitSimpleIdentifier(node);
@@ -839,7 +871,7 @@ class _StaticContextUsageFinder extends RecursiveAstVisitor<void> {
     while (current != null) {
       if (current is ConditionalExpression) {
         // Check if this node is in the then-expression
-        if (_isDescendantOf(node, current.thenExpression)) {
+        if (isAstDescendant(node, current.thenExpression)) {
           // Check if condition is a mounted check
           if (_isMountedCheck(current.condition)) {
             return true;
@@ -858,6 +890,9 @@ class _StaticContextUsageFinder extends RecursiveAstVisitor<void> {
   /// - `context.mounted` (PrefixedIdentifier)
   /// - `mounted` (SimpleIdentifier in State class)
   /// - `context?.mounted ?? false` (nullable-safe pattern)
+  /// - `A && B` where either operand recurses to a mounted check
+  ///   (e.g. `context != null && context.mounted` — idiomatic guard for
+  ///   nullable `BuildContext?` parameters in static helpers)
   bool _isMountedCheck(Expression expr) {
     if (expr is PrefixedIdentifier && expr.identifier.name == 'mounted') {
       return contextParamNames.contains(expr.prefix.name);
@@ -880,15 +915,15 @@ class _StaticContextUsageFinder extends RecursiveAstVisitor<void> {
         }
       }
     }
-    return false;
-  }
-
-  /// Checks if child is a descendant of parent.
-  bool _isDescendantOf(AstNode child, AstNode parent) {
-    AstNode? current = child;
-    while (current != null) {
-      if (current == parent) return true;
-      current = current.parent;
+    // Compound `&&`: any operand being a mounted check is sufficient. Mirrors
+    // the statement-level `_checksContextMounted` recursion so ternary
+    // detection matches if-form detection. Required to recognize
+    // `param != null && param.mounted ? param : null` for nullable
+    // `BuildContext?` static-method parameters.
+    if (expr is BinaryExpression &&
+        expr.operator.type == TokenType.AMPERSAND_AMPERSAND) {
+      return _isMountedCheck(expr.leftOperand) ||
+          _isMountedCheck(expr.rightOperand);
     }
     return false;
   }
