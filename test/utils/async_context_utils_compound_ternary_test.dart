@@ -53,38 +53,43 @@ Object f(Object? context) {
       },
     );
 
-    test('mounted on left of `&&`: `context.mounted && other ? context : null`',
-        () {
-      final reported = _walk('''
+    test(
+      'mounted on left of `&&`: `context.mounted && other ? context : null`',
+      () {
+        final reported = _walk('''
 Object f(Object context, bool other) {
   return context.mounted && other ? context : null;
 }
 ''');
-      expect(reported, isEmpty);
-    });
+        expect(reported, isEmpty);
+      },
+    );
 
-    test('mounted on right of `&&`: `other && context.mounted ? context : null`',
-        () {
-      final reported = _walk('''
+    test(
+      'mounted on right of `&&`: `other && context.mounted ? context : null`',
+      () {
+        final reported = _walk('''
 Object f(Object context, bool other) {
   return other && context.mounted ? context : null;
 }
 ''');
-      expect(reported, isEmpty);
-    });
+        expect(reported, isEmpty);
+      },
+    );
 
     test(
-        'unguarded ternary still reports: `other ? context : null` is not safe',
-        () {
-      final reported = _walk('''
+      'unguarded ternary still reports: `other ? context : null` is not safe',
+      () {
+        final reported = _walk('''
 Object f(Object context, bool other) {
   return other ? context : null;
 }
 ''');
-      // Sanity check that the new skips are scoped — without a mounted
-      // operand in the condition, the then-branch context is still flagged.
-      expect(reported, equals(['context']));
-    });
+        // Sanity check that the new skips are scoped — without a mounted
+        // operand in the condition, the then-branch context is still flagged.
+        expect(reported, equals(['context']));
+      },
+    );
 
     test(
       'unguarded `context != null` outside a mounted compound still reports the LHS',
@@ -305,8 +310,10 @@ _Probe _findEqEqProbe({required String source}) {
   final binary = cond as BinaryExpression;
   return _Probe(
     isInsideGuard: false,
-    isNullCheck:
-        isNullCheckOperand(binary.leftOperand as SimpleIdentifier, binary),
+    isNullCheck: isNullCheckOperand(
+      binary.leftOperand as SimpleIdentifier,
+      binary,
+    ),
   );
 }
 
@@ -334,9 +341,7 @@ List<String> _walk(String unitSource) {
   final reported = <SimpleIdentifier>[];
   result.unit.accept(
     _BodyVisitor((body) {
-      body.visitChildren(
-        ContextUsageFinder(onContextFound: reported.add),
-      );
+      body.visitChildren(ContextUsageFinder(onContextFound: reported.add));
     }),
   );
   return reported.map((n) => n.name).toList();

@@ -96,22 +96,22 @@ void main() {
     });
 
     test('matches cipher* and aes* identifiers', () {
-      expect(
-        _argsHaveEncryptionSignal('x(ciphertext, y)'),
-        isTrue,
-      );
+      expect(_argsHaveEncryptionSignal('x(ciphertext, y)'), isTrue);
       expect(
         _argsHaveEncryptionSignal('token: value(aesencodedtoken)'),
         isTrue,
       );
     });
 
-    test('does not match unencrypted as a single identifier (no false escape)', () {
-      expect(
-        _argsHaveEncryptionSignal('privatekey: value(unencrypted)'),
-        isFalse,
-      );
-    });
+    test(
+      'does not match unencrypted as a single identifier (no false escape)',
+      () {
+        expect(
+          _argsHaveEncryptionSignal('privatekey: value(unencrypted)'),
+          isFalse,
+        );
+      },
+    );
 
     test('matches secure/encrypt in args (symmetric with receiver check)', () {
       expect(_argsHaveEncryptionSignal('key: x, value: secure'), isTrue);

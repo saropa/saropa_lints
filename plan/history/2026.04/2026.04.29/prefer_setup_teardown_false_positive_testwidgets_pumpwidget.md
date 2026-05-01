@@ -42,7 +42,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('FacebookAuthFailureReason userMessage', () {
-    testWidgets('cancelled returns localized message', (WidgetTester tester) async {
+    testWidgets('canceled returns localized message', (WidgetTester tester) async {
       await tester.pumpWidget(const MaterialApp(home: SizedBox.shrink())); // LINT (FP)
       await tester.pumpAndSettle();
       expect(true, isTrue);
@@ -88,7 +88,7 @@ CompilationUnit
               └─ MethodInvocation (group "FacebookAuthFailureReason userMessage")
                   └─ FunctionExpression
                       └─ Block
-                          ├─ MethodInvocation (testWidgets "cancelled ...")  ← reported here
+                          ├─ MethodInvocation (testWidgets "canceled ...")  ← reported here
                           │   └─ FunctionExpression(WidgetTester tester) async {
                           │       └─ AwaitExpression
                           │           └─ MethodInvocation (tester.pumpWidget(...))

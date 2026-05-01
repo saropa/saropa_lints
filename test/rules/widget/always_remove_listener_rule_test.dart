@@ -14,13 +14,12 @@ void main() {
     });
 
     test('fixture: BAD case declares expect_lint', () {
-      final file = File('example/lib/widget_lifecycle/${ruleName}_fixture.dart');
+      final file = File(
+        'example/lib/widget_lifecycle/${ruleName}_fixture.dart',
+      );
       expect(file.existsSync(), isTrue);
       final content = file.readAsStringSync();
-      expect(
-        content.contains('// expect_lint: $ruleName'),
-        isTrue,
-      );
+      expect(content.contains('// expect_lint: $ruleName'), isTrue);
     });
 
     test('fixture: GOOD block has no expect_lint', () {
@@ -29,7 +28,11 @@ void main() {
       ).readAsStringSync();
       const goodMarker = '// GOOD: Should NOT trigger always_remove_listener';
       final start = content.indexOf(goodMarker);
-      expect(start, greaterThan(-1), reason: 'GOOD marker missing from fixture');
+      expect(
+        start,
+        greaterThan(-1),
+        reason: 'GOOD marker missing from fixture',
+      );
       final goodBlock = content.substring(start);
       expect(
         goodBlock.contains('expect_lint: $ruleName'),

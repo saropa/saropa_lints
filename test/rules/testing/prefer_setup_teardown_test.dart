@@ -103,7 +103,8 @@ void main() {
     const ruleName = 'prefer_setup_teardown';
 
     test('fixture: BAD block documents one expect_lint', () {
-      final path = 'example/lib/testing_best_practices/${ruleName}_fixture.dart';
+      final path =
+          'example/lib/testing_best_practices/${ruleName}_fixture.dart';
       final content = File(path).readAsStringSync();
       expect(
         '// expect_lint: $ruleName'.allMatches(content).length,
@@ -113,9 +114,12 @@ void main() {
     });
 
     test('fixture: GOOD parameterized group has no expect_lint', () {
-      final path = 'example/lib/testing_best_practices/${ruleName}_fixture.dart';
+      final path =
+          'example/lib/testing_best_practices/${ruleName}_fixture.dart';
       final content = File(path).readAsStringSync();
-      final start = content.indexOf('void _goodPreferSetupTeardownParameterized');
+      final start = content.indexOf(
+        'void _goodPreferSetupTeardownParameterized',
+      );
       final end = content.indexOf('class _DupRepo');
       expect(start, greaterThan(-1));
       expect(end, greaterThan(start));

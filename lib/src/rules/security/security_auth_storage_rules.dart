@@ -1327,8 +1327,9 @@ class RequireDataEncryptionRule extends SaropaLintRule {
       // which includes target/receiver names that may incidentally match).
       final String argsSource = node.argumentList.toSource().toLowerCase();
 
-      if (_argumentEncryptionSignalPatterns
-          .any((RegExp p) => p.hasMatch(argsSource))) {
+      if (_argumentEncryptionSignalPatterns.any(
+        (RegExp p) => p.hasMatch(argsSource),
+      )) {
         return;
       }
 
