@@ -72,7 +72,12 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigTreeNod
 
     const items: ConfigTreeNode[] = [
       setting('Lint integration', enabled ? 'On' : 'Off', enabled ? 'saropaLints.disable' : 'saropaLints.enable'),
-      setting('Tier', tier, 'saropaLints.setTier'),
+      // Tier click → Lints Config dashboard. The dashboard's tier control is a
+      // visual segmented radio (Essential → Pedantic) with rule counts and
+      // descriptions per tier — far richer than the bare quickpick the row
+      // used to launch (`saropaLints.setTier`). Users get the full context of
+      // each option instead of guessing from a one-line label.
+      setting('Tier', tier, 'saropaLints.openConfigDashboard'),
       // Each settings row needs a click target — the user expects every visible
       // sidebar item to navigate somewhere. Toggling a boolean in one click
       // beats opening the Settings UI just to flip a checkbox.

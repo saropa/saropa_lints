@@ -469,16 +469,27 @@ function isRedundantSettingsAction(node: ConfigTreeNode): boolean {
         || cmd === 'saropaLints.emitCompositePluginScaffold';
 }
 
+/**
+ * Settings + Triage rows merged into one panel. Settings come first
+ * (lint integration toggle, tier, run-after-config, detected packages),
+ * then triage rows (per-rule volume groups, "X rules disabled by override",
+ * "X rules with zero issues") when triage data is available.
+ *
+ * Why merged: Settings and Triage are both "what does my project's lint
+ * configuration look like" — splitting them into two panels forced the
+ * user to expand twice to see the full configuration story, and many
+ * triage rows now route to the Lints Config dashboard which is reached
+ * from Settings as well.
+ */
 function buildSettingsItems(configProvider: ConfigTreeProvider): SectionNode[] {
-    return configProvider
+    const settings = configProvider
         .getSettingAndActionNodes()
         .filter((n) => !isRedundantSettingsAction(n));
-}
-
-function buildTriageItems(configProvider: ConfigTreeProvider): SectionNode[] {
-    // Triage groups themselves carry collapsibleState in renderTreeItem; we
-    // override to None so no chevron renders inside the panel.
-    return configProvider.getTriageNodes();
+    // Triage rows render flat; renderTreeItem may set collapsibleState on
+    // group nodes, but `getTreeItem` overrides it back to None so no chevrons
+    // appear next to any row inside this panel.
+    const triage = configProvider.getTriageNodes();
+    return [...settings, ...triage];
 }
 
 // ── Provider class ────────────────────────────────────────────────────────
@@ -527,13 +538,16 @@ export const SECTION_VIEW_IDS = {
     editorDashboards: 'saropaLints.editorDashboards',
     actions: 'saropaLints.actions',
     status: 'saropaLints.status',
+    // Settings now also hosts the triage rows (rules grouped by violation
+    // count, plus "X rules disabled by override" / "X rules with zero issues").
+    // The standalone Triage view was merged in: the user wanted a single panel
+    // describing the project's lint configuration in one place.
     settings: 'saropaLints.settings',
-    triage: 'saropaLints.triage',
     help: 'saropaLints.help',
 } as const;
 
 /**
- * Build all six section providers wired to the shared dependencies.
+ * Build all section providers wired to the shared dependencies.
  *
  * Returned in render order (top → bottom in the activity bar). The caller
  * is responsible for `vscode.window.createTreeView(viewId, { treeDataProvider })`
@@ -550,7 +564,6 @@ export function createSidebarSectionProviders(
         new FlatSectionProvider(SECTION_VIEW_IDS.actions, () => buildActionItems()),
         new FlatSectionProvider(SECTION_VIEW_IDS.status, () => buildStatusItems(workspaceState)),
         new FlatSectionProvider(SECTION_VIEW_IDS.settings, () => buildSettingsItems(configProvider)),
-        new FlatSectionProvider(SECTION_VIEW_IDS.triage, () => buildTriageItems(configProvider)),
         new FlatSectionProvider(SECTION_VIEW_IDS.help, () => buildHelpItems()),
     ];
 }
@@ -559,23 +572,19 @@ export function createSidebarSectionProviders(
  * Compute and push the context keys gating each section view's visibility.
  * Call this whenever the underlying data (violations / pubspec / triage)
  * changes; the values feed each view's `when` clause in `package.json`.
+ *
+ * `saropaLints.hasTriage` is no longer set — Triage is no longer its own
+ * view; its rows render inside the always-visible Settings panel.
  */
 export function updateSidebarSectionContext(workspaceState: vscode.Memento): void {
     const root = getProjectRoot();
     if (!root) {
         void vscode.commands.executeCommand('setContext', 'saropaLints.needsBanner', false);
-        void vscode.commands.executeCommand('setContext', 'saropaLints.hasTriage', false);
         return;
     }
     const cfg = vscode.workspace.getConfiguration('saropaLints');
     const enabled = cfg.get<boolean>('enabled', true) ?? true;
     const needsBanner = !hasSaropaLintsDep(root) || !enabled;
     void vscode.commands.executeCommand('setContext', 'saropaLints.needsBanner', needsBanner);
-
-    // Triage view shown only when ConfigTreeProvider would actually return rows.
-    // Cheap proxy: violations.json must exist; ConfigTreeProvider does its own
-    // freshness/completeness checks downstream when assembling the rows.
-    const hasViolations = readViolations(root) !== null;
-    void vscode.commands.executeCommand('setContext', 'saropaLints.hasTriage', hasViolations);
     invalidateSharedCache();
 }

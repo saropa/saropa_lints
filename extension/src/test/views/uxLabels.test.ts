@@ -34,24 +34,26 @@ function loadPackageJson(): PackageJsonShape {
 }
 
 describe('UX labels in package.json', () => {
-  it('registers the seven sectioned panels in the saropaLints activity bar', () => {
+  it('registers the six sectioned panels in the saropaLints activity bar', () => {
     const pkg = loadPackageJson();
     const views = pkg.contributes.views.saropaLints;
     // Each section is its own VS Code view (collapsible panel via title bar).
     // Adding or removing a section here means updating SECTION_VIEW_IDS too.
+    // Triage was merged into Settings — there is no longer a standalone
+    // saropaLints.triage view. Triage rows render inside the Settings panel.
     const expected = [
       'saropaLints.banner',
       'saropaLints.editorDashboards',
       'saropaLints.actions',
       'saropaLints.status',
       'saropaLints.settings',
-      'saropaLints.triage',
       'saropaLints.help',
     ].sort();
     const actual = views.map((v) => v.id).sort();
-    assert.deepStrictEqual(actual, expected, 'sidebar must contain exactly the seven section panels');
+    assert.deepStrictEqual(actual, expected, 'sidebar must contain exactly the six section panels');
     assert.ok(!views.some((v) => v.id === 'saropaLints.overview'), 'monolithic overview view removed');
     assert.ok(!views.some((v) => v.id === 'saropaLints.dashboardHub'), 'dashboardHub view removed');
+    assert.ok(!views.some((v) => v.id === 'saropaLints.triage'), 'triage view merged into settings');
   });
 
   it('renames config copy command to Triage wording', () => {

@@ -1,8 +1,12 @@
 /**
  * Pins the multi-panel sidebar contract for the Saropa Lints activity-bar
  * container. Each section is its own VS Code view (Banner / Editor dashboards
- * / Actions / Status / Settings / Triage / Help), and inside every section
- * the rows are flat clickable leaves only — no chevrons, no nested expansion.
+ * / Actions / Status / Settings / Help), and inside every section the rows
+ * are flat clickable leaves only — no chevrons, no nested expansion.
+ *
+ * Triage was merged into Settings; the panel renders settings rows (lint
+ * integration, tier, run-after-config, detected packages) followed by triage
+ * rows when triage data exists.
  *
  * Regression guards:
  *   - View IDs match what package.json declares.
@@ -86,7 +90,7 @@ describe('Saropa Lints sidebar — multi-panel section providers', () => {
     sinon.restore();
   });
 
-  it('package.json declares exactly the seven section views in the saropaLints container', () => {
+  it('package.json declares exactly the six section views in the saropaLints container', () => {
     const pkg = loadPackageJson();
     const views = pkg.contributes.views.saropaLints;
     const ids = views.map((v) => v.id).sort();
