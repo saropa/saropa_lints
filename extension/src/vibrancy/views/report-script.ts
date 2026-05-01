@@ -123,10 +123,13 @@ export function getReportScript(): string {
             rows.forEach(function(row) {
                 var show = matchesAllFilters(row, searchVal);
                 row.style.display = show ? '' : 'none';
-                /* When a package row is hidden, also hide its detail row. */
+                /* When a package row is hidden, also hide its detail row.
+                 * Use the HTML5 hidden boolean property — the inline
+                 * style="display:none" pattern is mishandled by some webview
+                 * renderers on table rows (see toggleDetail() below). */
                 var detailRow = document.querySelector('tr[data-detail-for="' + row.dataset.name + '"]');
                 if (detailRow && !show) {
-                    detailRow.style.display = 'none';
+                    detailRow.hidden = true;
                     row.classList.remove('expanded');
                 }
             });
@@ -1088,10 +1091,15 @@ export function getReportScript(): string {
             var isExpanded = pkgRow.classList.contains('expanded');
             if (isExpanded) {
                 pkgRow.classList.remove('expanded');
-                detailRow.style.display = 'none';
+                /* HTML5 hidden boolean property — more portable than
+                 * style.display='none' on table rows. Some webview renderers
+                 * (notably Cursor in certain builds) ignore inline display:none
+                 * on <tr>, so the detail-row stays visible while the chevron
+                 * stays right-pointing — exactly the bug this fixes. */
+                detailRow.hidden = true;
             } else {
                 pkgRow.classList.add('expanded');
-                detailRow.style.display = '';
+                detailRow.hidden = false;
             }
         }
 

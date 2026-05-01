@@ -449,7 +449,7 @@ function buildRow(
         ${hidden.has('status') ? '' : buildStatusCell(r)}
         ${hidden.has('description') ? '' : buildDescCell(r)}
     </tr>
-    <tr class="detail-row" data-detail-for="${name}" style="display:none">
+    <tr class="detail-row" data-detail-for="${name}" hidden>
         <td colspan="${colspan}">${buildDetailCard(r)}</td>
     </tr>`;
 }
