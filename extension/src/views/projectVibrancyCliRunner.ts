@@ -8,10 +8,18 @@ export interface ProjectVibrancyScanResult {
   readonly exitCode: number;
 }
 
+// Routing through the OS shell on Windows lets PATHEXT resolve `dart.bat`
+// the way a user terminal does, AND satisfies Node's CVE-2024-27980
+// mitigation (Node 18.20+/20.12+/22+ refuses to spawn .bat/.cmd unless
+// shell:true). Args here come from buildProjectVibrancyDartArgs (controlled
+// flag values + projectRoot) — no untrusted user shell text — so cmd-quoting
+// remains safe.
+const SPAWN_USE_SHELL = process.platform === 'win32';
+
 function dartCommandForPlatform(): string {
-  // On Windows, Flutter-distributed Dart is commonly exposed as dart.bat.
-  // Spawning plain "dart" with shell:false can fail even when SDK is present.
-  return process.platform === 'win32' ? 'dart.bat' : 'dart';
+  // With shell:true on Windows, plain "dart" works because the shell consults
+  // PATHEXT; on POSIX it's just the binary name.
+  return 'dart';
 }
 
 function normalizeMinGrade(value: string | undefined): string {
@@ -30,7 +38,7 @@ function readOptionalPositiveGate(key: string): number {
   return Math.floor(n);
 }
 
-/** Builds argv for `dart run bin/project_vibrancy.dart` from workspace settings (extension host only). */
+/** Builds argv for `dart run saropa_lints:project_vibrancy` from workspace settings (extension host only). */
 export function buildProjectVibrancyDartArgs(projectRoot: string): string[] {
   const c = vscode.workspace.getConfiguration('saropaLints');
   const lcovRaw = c.get<string>('projectVibrancy.lcovPath');
@@ -42,11 +50,16 @@ export function buildProjectVibrancyDartArgs(projectRoot: string): string[] {
   const maxSuspiciousCoverage = readOptionalPositiveGate('projectVibrancy.maxSuspiciousCoverage');
   const maxTestDrift = readOptionalPositiveGate('projectVibrancy.maxTestDrift');
 
-  // Build a deterministic base command so telemetry/logging and tests can
-  // compare stable argument order across runs.
+  // Invoke via the registered package executable (`saropa_lints:project_vibrancy`)
+  // rather than the source path `bin/project_vibrancy.dart`. The source path only
+  // resolves when cwd happens to be the saropa_lints repo, so the previous form
+  // failed in every consumer workspace ("Could not find file bin/...").
+  // Requires `project_vibrancy: project_vibrancy` to be listed under
+  // `executables:` in pubspec.yaml — without that registration, this call also
+  // fails. See pubspec.yaml.
   const args = [
     'run',
-    'bin/project_vibrancy.dart',
+    'saropa_lints:project_vibrancy',
     '--path',
     projectRoot,
     '--format',
@@ -78,8 +91,9 @@ export function runProjectVibrancyScan(projectRoot: string): Promise<ProjectVibr
   return new Promise((resolve) => {
     const args = buildProjectVibrancyDartArgs(projectRoot);
     const command = dartCommandForPlatform();
-    // shell:false avoids command interpolation and ensures args are passed as-is.
-    const child = spawn(command, args, { cwd: projectRoot, shell: false });
+    // shell:true on Windows is required for .bat/.cmd resolution; see
+    // SPAWN_USE_SHELL comment above for the CVE-2024-27980 reason.
+    const child = spawn(command, args, { cwd: projectRoot, shell: SPAWN_USE_SHELL });
     let stdout = '';
     let stderr = '';
     child.stdout.on('data', (chunk: Buffer | string) => {

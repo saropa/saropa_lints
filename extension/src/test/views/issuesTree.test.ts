@@ -285,7 +285,7 @@ describe('IssuesTreeProvider self-contained element children', () => {
   });
 });
 
-describe('IssuesTreeProvider permanent help row', () => {
+describe('IssuesTreeProvider root rows (no help chrome)', () => {
   let readViolationsStub: sinon.SinonStub;
 
   beforeEach(() => {
@@ -308,7 +308,7 @@ describe('IssuesTreeProvider permanent help row', () => {
     clearTestConfig();
   });
 
-  it('prepends kind "help" before severity groups when violations exist (after: stable entry point)', async () => {
+  it('starts with severity groups when violations exist', async () => {
     readViolationsStub.returns({
       violations: [
         { file: 'lib/a.dart', line: 1, rule: 'r1', message: 'm', severity: 'warning' },
@@ -317,38 +317,19 @@ describe('IssuesTreeProvider permanent help row', () => {
     });
     const provider = new IssuesTreeProvider(new MockMemento() as any);
     const root = await provider.getChildren();
-    assert.ok(root.length >= 2, 'expected help row + at least one severity group');
-    assert.strictEqual(root[0].kind, 'help');
-    assert.strictEqual(root[1].kind, 'severity');
+    assert.ok(root.length >= 1, 'expected at least one severity group');
+    assert.strictEqual(root[0].kind, 'severity');
   });
 
-  it('prepends kind "help" before the empty-state placeholder when there are zero violations', async () => {
+  it('uses only the empty-state placeholder when there are zero violations', async () => {
     readViolationsStub.returns({
       violations: [],
       summary: { totalViolations: 0 },
     });
     const provider = new IssuesTreeProvider(new MockMemento() as any);
     const root = await provider.getChildren();
-    assert.strictEqual(root.length, 2);
-    assert.strictEqual(root[0].kind, 'help');
-    assert.strictEqual((root[1] as IssueTreeNode & { kind: string }).kind, 'placeholder');
-  });
-
-  it('getTreeItem(help) wires openHelpHub', () => {
-    readViolationsStub.returns(null);
-    const provider = new IssuesTreeProvider(new MockMemento() as any);
-    const item = provider.getTreeItem({ kind: 'help' });
-    assert.strictEqual(item.command?.command, 'saropaLints.openHelpHub');
-  });
-
-  it('getChildren(help) returns no children', async () => {
-    readViolationsStub.returns({
-      violations: [{ file: 'lib/a.dart', line: 1, rule: 'r', message: 'm', severity: 'error' }],
-      summary: { totalViolations: 1 },
-    });
-    const provider = new IssuesTreeProvider(new MockMemento() as any);
-    const nested = await provider.getChildren({ kind: 'help' });
-    assert.deepStrictEqual(nested, []);
+    assert.strictEqual(root.length, 1);
+    assert.strictEqual((root[0] as IssueTreeNode & { kind: string }).kind, 'placeholder');
   });
 });
 
@@ -401,11 +382,11 @@ describe('IssuesTreeProvider metadata grouping modes', () => {
     });
     const provider = new IssuesTreeProvider(new MockMemento() as any);
     const root = await provider.getChildren();
-    assert.ok(root.length >= 3);
-    assert.strictEqual(root[0].kind, 'help');
+    assert.ok(root.length >= 2);
+    assert.strictEqual(root[0].kind, 'group');
     assert.strictEqual(root[1].kind, 'group');
-    assert.strictEqual((root[1] as { groupKey: string }).groupKey, 'codeSmell');
-    assert.strictEqual((root[2] as { groupKey: string }).groupKey, 'vulnerability');
+    assert.strictEqual((root[0] as { groupKey: string }).groupKey, 'codeSmell');
+    assert.strictEqual((root[1] as { groupKey: string }).groupKey, 'vulnerability');
   });
 
   it('groups root nodes by ruleStatus when configured', async () => {
@@ -435,11 +416,11 @@ describe('IssuesTreeProvider metadata grouping modes', () => {
     });
     const provider = new IssuesTreeProvider(new MockMemento() as any);
     const root = await provider.getChildren();
-    assert.ok(root.length >= 3);
-    assert.strictEqual(root[0].kind, 'help');
+    assert.ok(root.length >= 2);
+    assert.strictEqual(root[0].kind, 'group');
     assert.strictEqual(root[1].kind, 'group');
-    assert.strictEqual((root[1] as { groupKey: string }).groupKey, 'beta');
-    assert.strictEqual((root[2] as { groupKey: string }).groupKey, 'ready');
+    assert.strictEqual((root[0] as { groupKey: string }).groupKey, 'beta');
+    assert.strictEqual((root[1] as { groupKey: string }).groupKey, 'ready');
   });
 });
 

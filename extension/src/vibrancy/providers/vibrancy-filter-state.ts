@@ -2,7 +2,7 @@ import { ProblemSeverity, ProblemType } from '../problems/problem-types';
 import { ProblemRegistry } from '../problems/problem-registry';
 import { VibrancyCategory, DependencySection, VibrancyResult } from '../types';
 
-/** View modes for the unified package tree. */
+/** View modes for the Package Vibrancy dependency list. */
 export type VibrancyViewMode = 'all' | 'problems-only';
 
 /** All known problem severities for filter defaults. */
@@ -38,7 +38,7 @@ export interface VibrancyFilterState {
 }
 
 /**
- * Manages filter state for the unified vibrancy tree.
+ * Manages filter state for Package Vibrancy (activity-bar list + shared scan data).
  *
  * Defaults have all values enabled (= no filtering).
  * Setting a filter narrows the visible set.

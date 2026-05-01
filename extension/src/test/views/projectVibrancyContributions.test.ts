@@ -29,6 +29,12 @@ describe('projectVibrancyContributions', () => {
     assert.strictEqual(view, undefined, 'Project Vibrancy should not duplicate the report in a sidebar view');
   });
 
+  it('does not register Package Vibrancy sidebar tree or details webview', () => {
+    const views = loadPackageJsonViews();
+    assert.strictEqual(views.find((v) => v.id === 'saropaLints.packageVibrancy.packages'), undefined);
+    assert.strictEqual(views.find((v) => v.id === 'saropaLints.packageVibrancy.details'), undefined);
+  });
+
   it('exposes report and settings commands without sidebar refresh', () => {
     const pkgPath = path.resolve(__dirname, '..', '..', '..', 'package.json');
     const raw = fs.readFileSync(pkgPath, 'utf-8');

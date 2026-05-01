@@ -3,3 +3,4 @@ out/
 out-test/
 dist/
 media/codicons/
+.watcher.log

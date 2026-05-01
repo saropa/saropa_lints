@@ -7,7 +7,7 @@ import * as vscode from 'vscode';
 import { VibrancyResult } from '../../../vibrancy/types';
 import { ReportOptions } from '../../../vibrancy/views/report-html';
 import { VibrancyReportPanel } from '../../../vibrancy/views/report-webview';
-import { createdPanels, messageMock, resetMocks } from '../vscode-mock';
+import { createdPanels, messageMock, mockWorkspaceFolders, resetMocks } from '../vscode-mock';
 
 /** Unit tests for VibrancyReportPanel (webviews, postMessage, refresh, options). */
 
@@ -100,7 +100,7 @@ describe('report-webview message handling', () => {
 
     it('opens relative file reference at requested line', async () => {
         const rootUri = vscode.Uri.file('D:/workspace');
-        (vscode.workspace as any).workspaceFolders = [{ uri: rootUri }];
+        mockWorkspaceFolders.value = [{ uri: rootUri }];
 
         const openedUris: string[] = [];
         (vscode.workspace as any).openTextDocument = async (uri: { fsPath: string }) => {
@@ -132,7 +132,7 @@ describe('report-webview message handling', () => {
 
     it('opens absolute file reference without re-joining workspace path', async () => {
         const rootUri = vscode.Uri.file('D:/workspace');
-        (vscode.workspace as any).workspaceFolders = [{ uri: rootUri }];
+        mockWorkspaceFolders.value = [{ uri: rootUri }];
 
         const openedUris: string[] = [];
         (vscode.workspace as any).openTextDocument = async (uri: { fsPath: string }) => {
@@ -158,7 +158,7 @@ describe('report-webview message handling', () => {
 
     it('shows error when file reference cannot be opened', async () => {
         const rootUri = vscode.Uri.file('D:/workspace');
-        (vscode.workspace as any).workspaceFolders = [{ uri: rootUri }];
+        mockWorkspaceFolders.value = [{ uri: rootUri }];
         (vscode.workspace as any).openTextDocument = async () => {
             throw new Error('missing');
         };
@@ -179,7 +179,7 @@ describe('report-webview message handling', () => {
 
     it('saves report json to dated reports folder', async () => {
         const rootUri = vscode.Uri.file('D:/workspace');
-        (vscode.workspace as any).workspaceFolders = [{ uri: rootUri }];
+        mockWorkspaceFolders.value = [{ uri: rootUri }];
 
         const createdDirs: string[] = [];
         const writtenFiles: Array<{ path: string; size: number }> = [];

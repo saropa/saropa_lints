@@ -102,7 +102,7 @@ describe('VibrancyCodeLensProvider', () => {
         assert.strictEqual(lenses[0].range.start.line, 2);
     });
 
-    it('should set focusPackageInTree command on status lens', () => {
+    it('should wire status CodeLens to focusPackageInTree command', () => {
         provider.updateResults([makeResult('http')]);
         const doc = makeMockDocument(PUBSPEC_CONTENT);
         const lenses = provider.provideCodeLenses(doc);

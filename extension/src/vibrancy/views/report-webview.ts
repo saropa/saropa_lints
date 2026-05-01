@@ -20,7 +20,7 @@ export class VibrancyReportPanel {
 
         const panel = vscode.window.createWebviewPanel(
             'saropaVibrancyReport',
-            'Saropa Package Vibrancy',
+            'Saropa Package Dashboard',
             vscode.ViewColumn.One,
             { enableScripts: true, retainContextWhenHidden: true },
         );
@@ -106,8 +106,14 @@ export class VibrancyReportPanel {
             /* Run the scan, then reopen the report so the panel refreshes
                with the fresh results. showReport calls createOrShow which
                detects the existing panel and rebuilds its HTML via
-               _updateContent, so the rescan button resets naturally. */
-            await vscode.commands.executeCommand('saropaLints.packageVibrancy.scan');
+               _updateContent, so the rescan button resets naturally.
+
+               Use the `rescan` command (not `scan`) so the per-package
+               pub.dev cache is cleared first.  Without this the 24h TTL
+               makes "Rescan" a no-op for any package whose entry is still
+               within the window — users clicking the button see the same
+               stale versions and conclude the button is broken. */
+            await vscode.commands.executeCommand('saropaLints.packageVibrancy.rescan');
             await vscode.commands.executeCommand('saropaLints.packageVibrancy.showReport');
         }
 

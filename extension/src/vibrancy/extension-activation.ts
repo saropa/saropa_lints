@@ -14,7 +14,6 @@ import { KnownIssuesPanel } from './views/known-issues-webview';
 import { ComparisonPanel } from './views/comparison-webview';
 import { PackageDetailPanel } from './views/package-detail-panel';
 import { ReviewStateService } from './services/review-state';
-import { DetailViewProvider, DETAIL_VIEW_ID } from './views/detail-view-provider';
 import { DetailLogger, DETAIL_CHANNEL_NAME } from './services/detail-logger';
 import { exportReports, ReportMetadata } from './services/report-exporter';
 import { exportSbomReport } from './services/sbom-exporter';
@@ -122,7 +121,6 @@ let lastFlutterReleases: readonly import('./services/flutter-releases').FlutterR
 let sdkDiagnostics: SdkDiagnostics | null = null;
 let freshnessWatcher: FreshnessWatcher | null = null;
 let stateManager: VibrancyStateManager | null = null;
-let detailViewProvider: DetailViewProvider | null = null;
 let reviewStateService: ReviewStateService | null = null;
 /** Abort controller for the active scan — used to cancel from UI or supersede with a new scan. */
 let activeScanAbort: AbortController | null = null;
@@ -242,20 +240,17 @@ export function runActivation(
         workspaceState: context.workspaceState,
     };
 
-    detailViewProvider = new DetailViewProvider(context.extensionUri);
-    context.subscriptions.push(
-        vscode.window.registerWebviewViewProvider(DETAIL_VIEW_ID, detailViewProvider),
-    );
-
     detailChannel = vscode.window.createOutputChannel(DETAIL_CHANNEL_NAME);
     detailLogger = new DetailLogger(detailChannel);
     context.subscriptions.push(detailChannel);
 
-    registerTreeView(context, treeProvider);
     registerProviders(context, hoverProvider, codeLensProvider, codeActionProvider);
     registerCommands(context, targets);
     registerFilterCommands(context, treeProvider);
-    registerTreeCommands(context, treeProvider, detailViewProvider, detailLogger);
+    registerTreeCommands(context, treeProvider, detailLogger);
+
+    // Package Vibrancy sidebar tree and details webview removed — use Package Dashboard
+    // (`saropaLints.packageVibrancy.showReport`) and pubspec hovers instead.
     registerUpgradeCommand(context);
     registerAnnotateCommand(context);
     registerRegistryCommands(context, registryService);
@@ -380,68 +375,6 @@ function registerConfigListener(
 function getAutoExportReportsEnabled(): boolean {
     const cfg = vscode.workspace.getConfiguration('saropaLints.packageVibrancy');
     return cfg.get<boolean>('autoExportReportsOnScan', true);
-}
-
-function registerTreeView(
-    context: vscode.ExtensionContext,
-    provider: VibrancyTreeProvider,
-): void {
-    const tv = vscode.window.createTreeView(
-        'saropaLints.packageVibrancy.packages',
-        { treeDataProvider: provider, showCollapseAll: true },
-    );
-    tv.description = `v${context.extension.packageJSON.version}`;
-    context.subscriptions.push(tv);
-
-    context.subscriptions.push(
-        vscode.commands.registerCommand(
-            'saropaLints.packageVibrancy.expandAll',
-            () => provider.expandAll(),
-        ),
-    );
-
-    syncDetailOnSelection(tv, item => {
-        if ('result' in (item as object)) {
-            return (item as { result: VibrancyResult }).result;
-        }
-        if ('insight' in (item as object)) {
-            return provider.getResultByName(
-                (item as { insight: { name: string } }).insight.name,
-            );
-        }
-        if ('analysis' in (item as object)) {
-            return provider.getResultByName(
-                (item as { analysis: { entry: { name: string } } }).analysis.entry.name,
-            );
-        }
-        // Problem child nodes (ProblemItem, SuggestionItem) carry a packageName field
-        if ('packageName' in (item as object)) {
-            return provider.getResultByName(
-                (item as { packageName: string }).packageName,
-            );
-        }
-        return undefined;
-    });
-}
-
-/** Wire a tree view selection to the Package Details panel. */
-function syncDetailOnSelection(
-    tv: vscode.TreeView<unknown>,
-    resolve: (item: unknown) => VibrancyResult | undefined,
-): void {
-    tv.onDidChangeSelection(e => {
-        if (!detailViewProvider) { return; }
-        if (e.selection.length !== 1) {
-            detailViewProvider.clear();
-            return;
-        }
-        const result = resolve(e.selection[0]);
-        if (result) {
-            detailViewProvider.update(result);
-        } else {
-            detailViewProvider.clear();
-        }
-    });
 }
 
 function registerProviders(
@@ -629,6 +562,15 @@ function registerCommands(
             'saropaLints.packageVibrancy.scan',
             () => runScan(targets),
         ),
+        // Explicit "fetch fresh" path: clears the per-package pub.dev cache
+        // before scanning so the report reflects current pub.dev state even
+        // when the 24h TTL has not expired.  The cached `scan` command stays
+        // unchanged for the file watcher and startup paths where speed matters
+        // and stale-by-up-to-24h is acceptable.
+        vscode.commands.registerCommand(
+            'saropaLints.packageVibrancy.rescan',
+            () => runScan(targets, { forceRefresh: true }),
+        ),
         vscode.commands.registerCommand(
             'saropaLints.packageVibrancy.showReport',
             async () => {
@@ -654,6 +596,16 @@ function registerCommands(
                     extensionVersion,
                     packageTrends,
                 });
+            },
+        ),
+        // Stale UI / keybindings still call `{viewId}.focus` for the removed Package Vibrancy sidebar.
+        vscode.commands.registerCommand('saropaLints.packageVibrancy.focus', async () => {
+            await vscode.commands.executeCommand('saropaLints.packageVibrancy.showReport');
+        }),
+        vscode.commands.registerCommand(
+            'saropaLints.packageVibrancy.expandAll',
+            async () => {
+                await vscode.commands.executeCommand('saropaLints.packageVibrancy.showReport');
             },
         ),
         vscode.commands.registerCommand(
@@ -920,12 +872,26 @@ function showStartupSkipStatusBar(scanTimestamp: number): void {
     setTimeout(() => item.dispose(), 10_000);
 }
 
-async function runScan(targets: ScanTargets): Promise<void> {
+async function runScan(
+    targets: ScanTargets,
+    opts?: { forceRefresh?: boolean },
+): Promise<void> {
     // Cancel any in-progress scan so this one takes over
     activeScanAbort?.abort();
 
     const controller = new AbortController();
     activeScanAbort = controller;
+
+    // forceRefresh: explicit user-triggered rescan from the report webview
+    // (or any future caller that wants fresh pub.dev data).  Without this the
+    // 24h cache silently returns stale package metadata — a user who clicked
+    // "Rescan" expecting fresh versions saw the same out-of-date numbers.
+    // Clearing here is preferred over plumbing a flag through scanPackages
+    // → fetchPackageInfoWithPrerelease because it also evicts orphaned
+    // entries (packages no longer in pubspec) and Flutter-release cache.
+    if (opts?.forceRefresh) {
+        await targets.cache.clear();
+    }
 
     targets.state.startScanning();
     try {

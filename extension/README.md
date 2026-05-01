@@ -72,7 +72,7 @@ The extension now includes a **Project Vibrancy** sidebar webview for project-co
 - Includes quick filters (text, grade, flags) and quick slices for `unused`, `uncovered`, and coverage-quality flags (`stub_tested`, `suspicious_coverage`, `test_drift`).
 - Supports scoped scans via git reference (`--since`) directly from the sidebar.
 - Persists sidebar filter state across refresh/reopen and shows active scan scope + visible row counts.
-- Provides a full report command: **Saropa Lints: Open Project Vibrancy Report**.
+- Provides a full report command: **Saropa Lints: Open Code Health Dashboard** (Command Palette category **Saropa Lints**).
 - Sidebar command: **Saropa Lints: Refresh Project Vibrancy Sidebar** for explicit rescans from command palette or view toolbar.
 
 ## Settings
@@ -86,7 +86,7 @@ The extension now includes a **Project Vibrancy** sidebar webview for project-co
 | `saropaLints.issuesPageSize` | `100` | Max violations shown per file in the Violations tree (1–1000). Remaining appear as “and N more…”. |
 | `saropaLints.violationsGroupBy` | `impact` | Default tree grouping: `impact`, `severity`, `file`, `rule`, `owasp`, `ruleType`, or `ruleStatus`. `impact` lists Critical / High first. Change anytime from the Violations toolbar. |
 
-**Sidebar defaults:** **Commands** (searchable index of every command), **Overview & options**, **Violations**, **Config Dashboard**, and **Package Vibrancy** show in the activity bar by default. Overview includes embedded Health Summary, Next Steps, and Riskiest Files groups when violations exist. **Package Details** appears automatically after a Vibrancy scan. Turn on standalone **Triage**, Summary, Security, File Risk, TODOs, etc. from **Overview & options -> Activity bar sections** (default path) or Settings (`saropaLints.sidebar.show*` advanced mirror).
+**Sidebar defaults:** **Commands** (searchable index of every command), **Overview & options**, **Violations**, **Config Dashboard**, and **Package Vibrancy** show in the activity bar by default. Use **Saropa: Open Package Dashboard** for the full dependency report in an editor tab. Overview includes embedded Health Summary, Next Steps, and Riskiest Files groups when violations exist. **Package Details** appears automatically after a Vibrancy scan. Turn on standalone **Triage**, Summary, Security, File Risk, TODOs, etc. from **Overview & options -> Activity bar sections** (default path) or Settings (`saropaLints.sidebar.show*` advanced mirror).
 
 | **TODOs & Hacks** | | |
 | `saropaLints.todosAndHacks.workspaceScanEnabled` | `false` | When **true**, the view scans the workspace for comment markers (resource-intensive). |
@@ -116,7 +116,7 @@ The extension now includes a **Project Vibrancy** sidebar webview for project-co
 - **Fix all in this file** — On a file in the Violations tree (context menu): run all available quick fixes for that file bottom-up.
 - **TODOs & Hacks: Refresh** — Refresh the TODOs & Hacks view (full rescan only when workspace scan is enabled).
 - **TODOs & Hacks: Enable workspace scan** — Turn on `workspaceScanEnabled` so marker search can run.
-- **Create Saropa Lints Instructions for AI Agents** — Create `.cursor/rules/saropa_lints_instructions.mdc` in the workspace from the bundled template (Overview title bar or Command Palette). Gives AI agents project guidelines for working on saropa_lints.
+- **Create Saropa Lints Instructions for AI Agents** — Create `.cursor/rules/saropa_lints_instructions.mdc` in the workspace from the bundled template (**Overview & options → Help & resources** or Command Palette). Gives AI agents project guidelines for working on saropa_lints.
 - **TODOs & Hacks: Toggle group by tag / folder** — Switch between grouping by folder→file→line and by tag→file→line (view toolbar).
 
 ### Violation context menu: Hide options

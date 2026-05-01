@@ -1,9 +1,16 @@
 import { execFile } from 'child_process';
 
+// Windows installs dart/flutter as .bat shims. Node 18.20+/20.12+/22+ refuses
+// to spawn .bat/.cmd without shell:true (CVE-2024-27980 mitigation), and even
+// before that, execFile bypasses PATHEXT so plain "dart" returns ENOENT.
+// Routing through cmd.exe via shell:true on Windows fixes both. Args here are
+// hardcoded ('--version'); no injection surface.
+const USE_SHELL = process.platform === 'win32';
+
 /** Run a command and return stdout, or empty string on failure. */
 function runCommand(cmd: string, args: string[], timeout: number): Promise<string> {
     return new Promise((resolve) => {
-        execFile(cmd, args, { encoding: 'utf-8', timeout }, (err, stdout, stderr) => {
+        execFile(cmd, args, { encoding: 'utf-8', timeout, shell: USE_SHELL }, (err, stdout, stderr) => {
             resolve(err ? (stderr || '') : (stdout || stderr || ''));
         });
     });

@@ -93,7 +93,7 @@ export class TodosAndHacksTreeProvider implements vscode.TreeDataProvider<TodoTr
     if (element.kind === 'enableWorkspaceScan') {
       const item = new vscode.TreeItem('Enable workspace scan…', vscode.TreeItemCollapsibleState.None);
       item.description = 'TODO/FIXME search (resource-intensive)';
-      item.tooltip = 'Turn on to scan files for comment markers (up to saropaLints.todosAndHacks.maxFilesToScan). Off by default.';
+      item.tooltip = 'Turn on to scan files for comment markers (up to saropaLints.todosAndHacks.maxFilesToScan). Workspace scan stays off until you enable it.';
       item.contextValue = 'todosEnableScan';
       item.command = {
         command: 'saropaLints.todosAndHacks.enableWorkspaceScan',

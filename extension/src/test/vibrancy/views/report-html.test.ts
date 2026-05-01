@@ -56,6 +56,14 @@ describe('buildReportHtml', () => {
         assert.ok(html.includes('</html>'));
     });
 
+    it('should use nonce-based CSP and nonce attributes on style and script', () => {
+        const html = buildReportHtml(opts([]));
+        assert.match(html, /script-src 'nonce-[^']+'/);
+        assert.match(html, /style-src 'nonce-[^']+'/);
+        assert.ok(html.includes('<style nonce="'));
+        assert.ok(html.includes('<script nonce="'));
+    });
+
     it('should show package count and project grade', () => {
         const html = buildReportHtml(opts([
             makeResult('http', 80),
@@ -425,7 +433,7 @@ describe('report: column heading tooltips', () => {
     });
 
     it('should hide description column header by default', () => {
-        /* Description column is off by default — header should not be rendered */
+        /* Description column starts collapsed — header should not be rendered */
         const html = buildReportHtml(opts([]));
         assert.ok(!html.includes('data-col="description"'));
     });
@@ -484,7 +492,7 @@ describe('report: description on package name', () => {
     });
 
     it('should hide description text column by default', () => {
-        /* Description column is off by default — no desc-text cells rendered */
+        /* Description column starts collapsed — no desc-text cells rendered */
         const result = makeResult('http', 80);
         (result as { pubDev: any }).pubDev = {
             ...result.pubDev,
@@ -888,13 +896,13 @@ describe('report: empty-cell dash with explanatory tooltip', () => {
     });
 
     it('should hide license column by default (no license cell rendered)', () => {
-        /* License column is off by default — tooltip should not appear */
+        /* License column starts collapsed — tooltip should not appear */
         const html = buildReportHtml(opts([makeResult('http', 80)]));
         assert.ok(!html.includes('title="License not specified on pub.dev"'));
     });
 
     it('should hide description column by default (no description cell rendered)', () => {
-        /* Description column is off by default — no desc-text cells rendered */
+        /* Description column starts collapsed — no desc-text cells rendered */
         const html = buildReportHtml(opts([makeResult('http', 80)]));
         assert.ok(!html.includes('class="desc-text"'));
     });

@@ -74,7 +74,7 @@ export function showCommandCatalogPanel(context: vscode.ExtensionContext): void 
 
   currentPanel = vscode.window.createWebviewPanel(
     'saropaLints.commandCatalog',
-    'Saropa Lints: Command Catalog',
+    'Saropa Command Catalog',
     vscode.ViewColumn.One,
     {
       enableScripts: true,

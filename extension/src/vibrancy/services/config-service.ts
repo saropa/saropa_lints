@@ -44,7 +44,7 @@ export function getStartupScanSkipTtlMinutes(): number {
 /**
  * When the startup scan is skipped (cached results were rehydrated), show
  * a brief status-bar indicator so the user knows why no progress
- * notification appeared. Off by default — silent rehydrate is the point.
+ * notification appeared. Without this flag, rehydrate stays silent.
  */
 export function getShowStartupScanSkipStatusBar(): boolean {
     return getConfig().get<boolean>('showStartupScanSkipStatusBar', false);

@@ -10,7 +10,6 @@ import {
 import { DetailItem, PackageItem } from './tree-items';
 import { copyTreeNodesToClipboard } from '../../copyTreeAsJson';
 import { serializeVibrancyNode } from '../../treeSerializers';
-import { DetailViewProvider } from '../views/detail-view-provider';
 import { DetailLogger } from '../services/detail-logger';
 import { getLatestResults, getScannedPubspecUri } from '../extension-activation';
 import { UpdateFromCodeLensArgs } from './codelens-provider';
@@ -21,7 +20,6 @@ import { resolvePackagePaths } from '../services/package-code-analyzer';
 // Re-export for backward compatibility
 export { findPubspecYaml, buildVersionEdit, findPackageLines, readVersionConstraint };
 
-let _detailViewProvider: DetailViewProvider | null = null;
 let _detailLogger: DetailLogger | null = null;
 
 /**
@@ -34,7 +32,7 @@ function requirePackageItem(
 ): item is PackageItem {
     if (item?.result?.package?.name) { return true; }
     vscode.window.showWarningMessage(
-        `${actionLabel} is only available for package items in the Packages view.`,
+        `${actionLabel} needs a package row from the Package Dashboard (editor tab).`,
     );
     return false;
 }
@@ -43,10 +41,8 @@ function requirePackageItem(
 export function registerTreeCommands(
     context: vscode.ExtensionContext,
     treeProvider: { getChildren(element?: unknown): unknown[] },
-    detailViewProvider?: DetailViewProvider | null,
     detailLogger?: DetailLogger | null,
 ): void {
-    _detailViewProvider = detailViewProvider ?? null;
     _detailLogger = detailLogger ?? null;
 
     // Bind getChildren for the copy command to use for recursive serialization.
@@ -220,11 +216,9 @@ async function deleteUnused(item: PackageItem | undefined): Promise<void> {
     );
 }
 
-/** Focus the package details view in the sidebar. */
-function focusDetails(): void {
-    if (_detailViewProvider) {
-        _detailViewProvider.focus();
-    }
+/** Open Package Dashboard (sidebar package tree removed; dashboard-first). */
+async function focusDetails(): Promise<void> {
+    await vscode.commands.executeCommand('saropaLints.packageVibrancy.showReport');
 }
 
 /** Log a package's details to the output channel. */
@@ -290,20 +284,10 @@ async function updateFromCodeLens(args: UpdateFromCodeLensArgs): Promise<void> {
     }
 }
 
-/** Focus a package in the tree view and show its details. */
+/** CodeLens entry: open the package dashboard (dependency list is editor-first). */
 async function focusPackageInTree(packageName: string): Promise<void> {
     if (!packageName) { return; }
-
-    await vscode.commands.executeCommand(
-        'saropaLints.packageVibrancy.packages.focus',
-    );
-
-    const results = getLatestResults();
-    const result = results.find(r => r.package.name === packageName);
-
-    if (result && _detailViewProvider) {
-        _detailViewProvider.update(result);
-    }
+    await vscode.commands.executeCommand('saropaLints.packageVibrancy.showReport');
 }
 
 /** Compare selected packages in a side-by-side view. */

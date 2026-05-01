@@ -295,7 +295,7 @@ function buildSizeGroup(result: VibrancyResult): GroupItem | null {
     if (result.replacementComplexity) {
         const rc = result.replacementComplexity;
         const emoji = replacementEmoji(rc.level);
-        // Short description for tree view; full summary in tooltip
+        // Short description for the sidebar row; full summary in tooltip
         const shortDesc = formatShortSourceDesc(rc.metrics);
         items.push(new SourceCodeItem(
             emoji, shortDesc, rc.summary, result.package.name,
@@ -306,7 +306,7 @@ function buildSizeGroup(result: VibrancyResult): GroupItem | null {
     return new GroupItem('📏 Size', items);
 }
 
-/** Format a compact source description for the tree view. */
+/** Format a compact source description for the Package Vibrancy sidebar row. */
 function formatShortSourceDesc(
     m: import('../services/package-code-analyzer').PackageCodeMetrics,
 ): string {

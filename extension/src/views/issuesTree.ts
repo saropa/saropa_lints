@@ -1,7 +1,7 @@
 /**
- * Tree data provider for the Violations view (lint findings from violations.json).
- * Structure: Severity (Error, Warning, Info) → folder path tree → file → violations (capped).
- * Supports text/type filters and suppressions (hide folder, file, rule). Scale-safe for 65k+ issues.
+ * Headless tree data for lint findings (`violations.json`): same shape the Findings Dashboard uses
+ * for filters, JSON export, and palette-driven actions (no activity-bar tree view).
+ * Structure: Severity → folder path → file → violations (capped); supports suppressions and filters.
  */
 
 import * as vscode from 'vscode';
@@ -90,15 +90,8 @@ export function parseViolationsGroupBy(cfg: vscode.WorkspaceConfiguration): Grou
   return (GROUP_BY_MODES as readonly string[]).includes(raw) ? (raw as GroupByMode) : 'impact';
 }
 
-/** Permanent root row: opens the same help quick pick as the Overview toolbar. */
-export interface IssuesHelpItem {
-  kind: 'help';
-}
-
-const ISSUES_HELP_ROOT: IssuesHelpItem = { kind: 'help' };
-
 function prependIssuesHelpRow(nodes: IssueTreeNode[]): IssueTreeNode[] {
-  return [ISSUES_HELP_ROOT, ...nodes];
+  return nodes;
 }
 
 function violationNumericPriority(v: Violation): number {
@@ -126,7 +119,6 @@ function maxViolationPriority(list: Violation[]): number {
 
 /** Discriminated union for all node types in the Issues tree. */
 export type IssueTreeNode =
-    | IssuesHelpItem
     | SeverityItem
     | FolderItem
     | FileItem
@@ -560,21 +552,6 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
 
   getTreeItem(element: IssueTreeNode): vscode.TreeItem {
     const wsRoot = getProjectRoot() ?? '';
-    if (element.kind === 'help') {
-      const item = new vscode.TreeItem(
-        'Help & resources',
-        vscode.TreeItemCollapsibleState.None,
-      );
-      item.iconPath = new vscode.ThemeIcon('question');
-      item.command = {
-        command: 'saropaLints.openHelpHub',
-        title: 'Open Help',
-        arguments: [],
-      };
-      item.tooltip = 'Walkthrough, About, commands, and pub.dev';
-      item.contextValue = 'issuesHelp';
-      return item;
-    }
     if (element.kind === 'placeholder') {
       const item = new vscode.TreeItem(
         element.label,
@@ -796,10 +773,6 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
   }
 
   async getChildren(element?: IssueTreeNode): Promise<IssueTreeNode[]> {
-    if (element?.kind === 'help') {
-      return [];
-    }
-
     // Self-contained elements: these carry their own data and don't need
     // a disk read. Handle them first so a temporarily unavailable
     // violations.json (write lock during scan, etc.) can't make
@@ -821,7 +794,7 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
 
     const violations = data.violations ?? [];
     // Zero violations after analysis — show a clean-state item (not empty,
-    // because viewsWelcome would misleadingly say "No analysis results yet").
+    // so JSON export and tests still see an explicit placeholder root).
     if (violations.length === 0 && !element) {
       return prependIssuesHelpRow([
         {

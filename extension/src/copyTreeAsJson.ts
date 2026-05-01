@@ -4,8 +4,7 @@
  * **VS Code command contract:** tree context-menu commands receive `(clickedItem, selectedItems?)`.
  * When the hosting `TreeView` has `canSelectMany: true` and the user selects multiple rows,
  * `selectedItems` is a non-empty array and must take precedence over `clickedItem` alone.
- * The Violations (`saropaLints.issues`) view sets `canSelectMany` in `extension.ts` specifically
- * so this path is reachable from the UI.
+ * Headless providers (no visible tree) use {@link copyWholeTreeFromProviderRoots} for palette export.
  *
  * **Output shape:** one serialized root → a single JSON object; multiple roots → a JSON array.
  * Each node is serialized recursively (see `serializeNode`) so exporting a file row includes its
@@ -33,7 +32,7 @@ export interface JsonNode {
  * @param serialize - View-specific function that converts a node to a JsonNode (without children).
  * @param getChildren - The provider's getChildren bound to resolve child nodes.
  */
-async function serializeNode(
+export async function serializeNode(
     node: unknown,
     serialize: (node: unknown) => JsonNode | null,
     getChildren: (node: unknown) => unknown[] | Promise<unknown[]>,
@@ -100,5 +99,34 @@ export async function copyTreeNodesToClipboard(
     const noun = count === 1 ? 'node' : 'nodes';
     vscode.window.showInformationMessage(
         `Copied ${count} ${viewLabel} ${noun} to clipboard as JSON`,
+    );
+}
+
+/**
+ * Serializes every root node from a headless `TreeDataProvider` (e.g. Violations with no sidebar view).
+ */
+export async function copyWholeTreeFromProviderRoots(
+    getChildren: (element?: unknown) => unknown[] | Promise<unknown[]>,
+    serialize: (node: unknown) => JsonNode | null,
+    viewLabel: string,
+): Promise<void> {
+    const roots = await getChildren(undefined);
+    if (roots.length === 0) {
+        await vscode.window.showWarningMessage('Nothing to export.');
+        return;
+    }
+    const results: JsonNode[] = [];
+    for (const root of roots) {
+        const json = await serializeNode(root, serialize, (n) => getChildren(n));
+        if (json) results.push(json);
+    }
+    if (results.length === 0) {
+        await vscode.window.showWarningMessage('Could not serialize tree.');
+        return;
+    }
+    const output = results.length === 1 ? results[0] : results;
+    await vscode.env.clipboard.writeText(JSON.stringify(output, null, 2));
+    vscode.window.showInformationMessage(
+        `Copied full ${viewLabel} tree (${roots.length} root branch${roots.length === 1 ? '' : 'es'}) as JSON`,
     );
 }

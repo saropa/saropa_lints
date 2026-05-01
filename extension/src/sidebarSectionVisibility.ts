@@ -1,6 +1,7 @@
 /**
- * Maps Settings → VS Code context keys so each Saropa Lints sidebar view's
- * `when` clause can include `saropaLints.sidebar.show*`.
+ * Mirrors `saropaLints.sidebar.show*` into VS Code context keys when section toggles exist.
+ * After the dashboard migration, {@link SIDEBAR_SECTION_CONFIG_KEYS} is empty; **Overview**
+ * visibility uses `config.saropaLints.sidebar.showOverview` directly in `package.json`.
  */
 
 import * as vscode from 'vscode';

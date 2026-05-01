@@ -7,8 +7,8 @@ Scan every dependency in `pubspec.yaml` for health signals:
 - **Known issues** — common problems from the built-in issues library
 - **Security** — export a CycloneDX SBOM for supply-chain audits
 
-Results appear in the **Package Vibrancy** sidebar tree and as **code lens badges** above each dependency in `pubspec.yaml`.
+Results appear as **CodeLens** above each dependency in `pubspec.yaml`, in the **Package Vibrancy** section of the activity bar, and in the **Package Dashboard** (editor tab).
 
 Use **Plan & Execute Upgrades** to interactively update dependencies with test verification.
 
-Open the command palette and type "Saropa" to find all package vibrancy commands, or use **Browse All Commands** for the full catalog.
+Open the command palette and type "Saropa" to find all package vibrancy commands, or open the **Command Catalog** for the full list (editor tab).

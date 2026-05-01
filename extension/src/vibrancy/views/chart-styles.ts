@@ -177,5 +177,12 @@ export function getChartStyles(): string {
         @media (max-width: 600px) {
             .chart-container { flex-direction: column; }
         }
+
+        @media (prefers-reduced-motion: reduce) {
+            .bar-fill { animation: none !important; width: var(--bar-pct) !important; }
+            .bar-row { transition: none; }
+            .donut-segment { transition: none !important; }
+            .chart-tooltip { transition: none; }
+        }
     `;
 }

@@ -7,36 +7,22 @@ import {
     sidebarSectionContextKey,
 } from '../sidebarSectionVisibilityKeys';
 
-// Counts and context keys for sidebar section visibility must match package.json.
 describe('sidebarSectionVisibilityKeys', () => {
-    it('keeps config and context keys in sync with package.json sidebar settings', () => {
-        assert.strictEqual(SIDEBAR_SECTION_COUNT, 13);
-        assert.strictEqual(SIDEBAR_SECTION_CONFIG_KEYS.length, SIDEBAR_SECTION_COUNT);
+    it('has no activity-bar section toggles after dashboard migration', () => {
+        assert.strictEqual(SIDEBAR_SECTION_COUNT, 0);
+        assert.strictEqual(SIDEBAR_SECTION_CONFIG_KEYS.length, 0);
+        assert.strictEqual(SIDEBAR_SECTIONS.length, 0);
     });
 
-    it('builds setContext keys', () => {
+    it('builds setContext keys for programmatic toggles', () => {
         assert.strictEqual(
-            sidebarSectionContextKey('sidebar.showPackageDetails'),
-            'saropaLints.sidebar.showPackageDetails',
+            sidebarSectionContextKey('sidebar.showOverview'),
+            'saropaLints.sidebar.showOverview',
         );
     });
 
-    it('defaults core sidebar on and secondary panels off', () => {
-        assert.strictEqual(defaultSidebarSectionVisible('sidebar.showCommandCatalog'), true);
+    it('defaultSidebarSectionVisible keeps overview on by default', () => {
         assert.strictEqual(defaultSidebarSectionVisible('sidebar.showOverview'), true);
-        assert.strictEqual(defaultSidebarSectionVisible('sidebar.showIssues'), true);
-        assert.strictEqual(defaultSidebarSectionVisible('sidebar.showPackageVibrancy'), true);
-        assert.strictEqual(defaultSidebarSectionVisible('sidebar.showConfig'), false);
-        // Package Details defaults on — when clause gates it behind hasResults.
-        assert.strictEqual(defaultSidebarSectionVisible('sidebar.showPackageDetails'), true);
-        assert.strictEqual(defaultSidebarSectionVisible('sidebar.showDriftAdvisor'), false);
         assert.strictEqual(defaultSidebarSectionVisible('sidebar.showSummary'), false);
-        assert.strictEqual(defaultSidebarSectionVisible('sidebar.showSuppressions'), false);
-        assert.strictEqual(defaultSidebarSectionVisible('sidebar.showTodosAndHacks'), false);
-    });
-
-    it('uses Triage label for sidebar.showConfig', () => {
-        const configSection = SIDEBAR_SECTIONS.find((section) => section.key === 'sidebar.showConfig');
-        assert.strictEqual(configSection?.label, 'Triage');
     });
 });
