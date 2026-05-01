@@ -124,9 +124,14 @@ def _collect_category_rules(rules_dir: Path) -> list[_CategoryInfo]:
 
 
 def _status_for_percentage(pct: float) -> tuple[Color, str]:
-    """Map a coverage percentage to a (color, label) pair."""
+    """Map a coverage percentage to a (color, label) pair.
+
+    Test/fixture coverage is a quality signal, not a build break — even 0%
+    coverage is treated as a YELLOW warning rather than a RED critical so
+    the publish report doesn't conflate "missing tests" with "broken build".
+    """
     if pct < 10:
-        return Color.RED, "CRITICAL"
+        return Color.YELLOW, "WARNING"
     if pct < 30:
         return Color.YELLOW, "LOW"
     if pct < 70:
@@ -471,7 +476,8 @@ def display_test_coverage(project_dir: Path) -> None:
                 row_color,
             )
 
-    # Missing unit test files
+    # Missing unit test files — coverage gaps are warnings, never critical,
+    # so all rows render YELLOW regardless of how many rules are uncovered.
     if unit_untested:
         print()
         print_colored("    Missing test files:", Color.WHITE)
@@ -479,7 +485,7 @@ def display_test_coverage(project_dir: Path) -> None:
             print_colored(
                 f"    {category:<14s} ({rules:>3d} rules) "
                 f"needs test/{category}_rules_test.dart",
-                Color.RED if rules > 20 else Color.YELLOW,
+                Color.YELLOW,
             )
 
     # Missing Rule Instantiation (test file exists but no group)

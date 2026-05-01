@@ -215,9 +215,36 @@ def _strip_ai_attribution_from_head(project_dir: Path, use_shell: bool) -> None:
 def _push_with_retry(
     project_dir: Path, branch: str, max_retries: int = 2
 ) -> bool:
-    """Push to remote, pulling and retrying if rejected."""
+    """Push to remote, pulling and retrying if rejected.
+
+    On hard failure (missing remote, auth error, network outage),
+    prompt the dev to fix the underlying issue and retry instead
+    of aborting the entire publish. Without the prompt, a transient
+    git error mid-release leaves the dev with a release commit and
+    no clean recovery path.
+    """
     use_shell = get_shell_mode()
 
+    # Outer loop = interactive retry after dev fixes a hard failure.
+    # Inner loop = automatic rebase-retry when push is rejected as
+    # non-fast-forward. Reset the rebase counter on each outer retry.
+    while True:
+        outcome = _attempt_push_with_rebase(
+            project_dir, branch, use_shell, max_retries
+        )
+        if outcome:
+            return True
+        if not _prompt_retry_or_abort("Push failed"):
+            return False
+
+
+def _attempt_push_with_rebase(
+    project_dir: Path,
+    branch: str,
+    use_shell: bool,
+    max_retries: int,
+) -> bool:
+    """Single push attempt with auto-rebase on non-fast-forward."""
     for attempt in range(max_retries + 1):
         print_info(f"Pushing to {branch}...")
         result = subprocess.run(
@@ -260,6 +287,28 @@ def _push_with_retry(
         return False
 
     return False
+
+
+def _prompt_retry_or_abort(context: str) -> bool:
+    """Ask the dev to retry the failed step or abort the publish.
+
+    Returns True to retry, False to abort. Empty input defaults to
+    retry so the dev can fix the underlying issue (e.g. re-add a
+    missing remote, fix auth) then mash Enter. EOF and Ctrl+C abort.
+    """
+    print()
+    try:
+        raw = input(
+            f"  {context}. [r]etry after fixing the issue, "
+            f"or [a]bort? [r]: "
+        ).strip().lower()
+    except (EOFError, KeyboardInterrupt):
+        print()
+        return False
+    if raw in ("a", "abort", "n", "no"):
+        return False
+    print_info("Retrying...")
+    return True
 
 
 def create_git_tag(project_dir: Path, version: str) -> bool:
