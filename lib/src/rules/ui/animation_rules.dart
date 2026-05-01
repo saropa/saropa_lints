@@ -3294,7 +3294,7 @@ class PreferAnimationControllerForwardFromZeroRule extends SaropaLintRule {
 ///
 /// Detection walks the listener's function body as an AST — the earlier
 /// `bodySource.contains(...)` approach was flagged by
-/// `test/anti_pattern_detection_test.dart` because substring matching on
+/// `test/integrity/anti_pattern_detection_test.dart` because substring matching on
 /// `.toSource()` trips on identifiers embedded in comments or string
 /// literals and on lexically similar names. The AST walk (see
 /// [_ReverseOnCompletedScanner]) matches only real references to

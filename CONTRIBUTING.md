@@ -355,13 +355,13 @@ When adding fixes, prioritize by impact:
 
 #### Test contract for new fix producers
 
-Every new `SaropaFixProducer` subclass must add at least one entry to [`test/fix_application_smoke_test.dart`](test/fix_application_smoke_test.dart). The smoke test catches the most common breakage modes without requiring full analyzer scaffolding:
+Every new `SaropaFixProducer` subclass must add at least one entry to [`test/scan/fix_application_smoke_test.dart`](test/scan/fix_application_smoke_test.dart). The smoke test catches the most common breakage modes without requiring full analyzer scaffolding:
 
 - **Class reachable** — assert the producer class symbol resolves (catches file moves and renames).
 - **`fixKind` stable** — assert id, priority, and human-readable message constants. A drift here changes the lightbulb label users see.
 - **Applicability** — only assert if you override the `singleLocation` default.
 
-End-to-end "the rewrite produces the right source" coverage lives in [`test/fix_application_dart_fix_dry_run_test.dart`](test/fix_application_dart_fix_dry_run_test.dart) (runs `dart fix --dry-run` over `example/`) and the manual VS Code verification checklist in [`plan/TESTING_AND_RELEASE.md`](plan/TESTING_AND_RELEASE.md) §10 E. Diff-asserting unit tests are deferred — see plan §10 D-followup.
+End-to-end "the rewrite produces the right source" coverage lives in [`test/scan/fix_application_dart_fix_dry_run_test.dart`](test/scan/fix_application_dart_fix_dry_run_test.dart) (runs `dart fix --dry-run` over `example/`) and the manual VS Code verification checklist in [`plan/TESTING_AND_RELEASE.md`](plan/TESTING_AND_RELEASE.md) §10 E. Diff-asserting unit tests are deferred — see plan §10 D-followup.
 
 ### 8. Add tests
 
@@ -497,7 +497,7 @@ the most common `.contains()` anti-patterns:
 | `bodySource.contains('$name.dispose(')` | `isFieldCleanedUp(name, 'dispose', body)` |
 | Checking only direct args for `.timeout()` | `hasChainedMethod(node, 'timeout')` |
 
-A CI guard test (`test/anti_pattern_detection_test.dart`) will fail if new
+A CI guard test (`test/integrity/anti_pattern_detection_test.dart`) will fail if new
 `.contains()` anti-patterns are added to rule files.
 
 ### What TO do
@@ -519,7 +519,7 @@ Ask yourself:
 
 **If you must use heuristics:** Use word-boundary matching (split camelCase/snake_case into words) and test extensively with real codebases.
 
-Root causes and safeguards are summarized in this section; use `target_matcher_utils`, `import_utils`, and the CI guard in `test/anti_pattern_detection_test.dart`.
+Root causes and safeguards are summarized in this section; use `target_matcher_utils`, `import_utils`, and the CI guard in `test/integrity/anti_pattern_detection_test.dart`.
 
 ## Rule Naming Conventions
 

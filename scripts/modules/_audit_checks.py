@@ -914,7 +914,7 @@ def print_orphan_analysis(
 # =============================================================================
 # Reports status of dangerous .contains() usage in rule files. Used by
 # run_full_audit() and the publish script. Status is derived from code only:
-# test/anti_pattern_detection_test.dart (_baselineCounts) and
+# test/integrity/anti_pattern_detection_test.dart (_baselineCounts) and
 # lib/src/rules/**/*.dart (line counts). No dependency on bugs/ docs.
 # Patterns and skip rules (comment/import/export) must match the Dart test.
 
@@ -933,7 +933,7 @@ _DANGEROUS_CONTAINS_PATTERNS = [
 
 
 def _parse_baseline_counts(test_path: Path) -> dict[str, int]:
-    """Parse _baselineCounts from test/anti_pattern_detection_test.dart."""
+    """Parse _baselineCounts from test/integrity/anti_pattern_detection_test.dart."""
     if not test_path.exists():
         return {}
     text = test_path.read_text(encoding="utf-8")
@@ -995,7 +995,7 @@ def _count_dangerous_contains(file_path: Path) -> int:
 def get_contains_audit_status(project_dir: Path) -> dict:
     """Compute false-positive reduction status from code only.
 
-    Reads baseline from test/anti_pattern_detection_test.dart and scans
+    Reads baseline from test/integrity/anti_pattern_detection_test.dart and scans
     lib/src/rules/**/*.dart for dangerous .contains() patterns. Returns
     a dict with:
       - baseline: dict[str, int] from test file
@@ -1007,7 +1007,7 @@ def get_contains_audit_status(project_dir: Path) -> dict:
       - stale_baseline: list of files in baseline with actual 0 (can remove)
     """
     rules_dir = project_dir / "lib" / "src" / "rules"
-    test_path = project_dir / "test" / "anti_pattern_detection_test.dart"
+    test_path = project_dir / "test" / "integrity" / "anti_pattern_detection_test.dart"
     baseline = _parse_baseline_counts(test_path)
     actual: dict[str, int] = {}
     for path in sorted(rules_dir.rglob("*.dart")):
@@ -1073,7 +1073,7 @@ def print_contains_audit_status(
         if get_output_level().value >= OutputLevel.VERBOSE.value:
             print_subheader("False-positive reduction (.contains() audit)")
             print(
-                "    Source: test/anti_pattern_detection_test.dart (baseline) + "
+                "    Source: test/integrity/anti_pattern_detection_test.dart (baseline) + "
                 "lib/src/rules/**/*.dart (counts)."
             )
             print_stat(
@@ -1096,12 +1096,12 @@ def print_contains_audit_status(
     print_info(
         f"Baseline has {n_in_baseline} file(s), {total_remaining} violation(s); "
         "reduce counts or remove entries when a file reaches 0 "
-        "(test/anti_pattern_detection_test.dart)."
+        "(test/integrity/anti_pattern_detection_test.dart)."
     )
 
     if get_output_level().value >= OutputLevel.VERBOSE.value:
         print(
-            "    Source: test/anti_pattern_detection_test.dart (baseline) + "
+            "    Source: test/integrity/anti_pattern_detection_test.dart (baseline) + "
             "lib/src/rules/**/*.dart (counts)."
         )
         print_stat(

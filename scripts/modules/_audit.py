@@ -708,7 +708,7 @@ def run_full_audit(
     else:
         checks.append((
             _PASS,
-            ".contains() counts within baseline (test/anti_pattern_detection_test.dart)",
+            ".contains() counts within baseline (test/integrity/anti_pattern_detection_test.dart)",
             [],
         ))
 

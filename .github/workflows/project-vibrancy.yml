@@ -7,7 +7,7 @@ on:
     paths:
       - "bin/project_vibrancy.dart"
       - "lib/src/cli/project_vibrancy.dart"
-      - "test/project_vibrancy_cli_test.dart"
+      - "test/cli/project_vibrancy_cli_test.dart"
       - ".github/workflows/project-vibrancy.yml"
 
 jobs:

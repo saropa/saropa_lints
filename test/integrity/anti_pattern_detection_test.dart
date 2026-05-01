@@ -75,7 +75,7 @@ void main() {
           'target_matcher_utils.dart instead.\n\n'
           '${newViolations.join('\n')}\n\n'
           'If this is intentional, update _baselineCounts in '
-          'test/anti_pattern_detection_test.dart.',
+          'test/integrity/anti_pattern_detection_test.dart.',
         );
       }
 

@@ -12,7 +12,7 @@ Checks performed:
   4. Opinionated    - prefer_* rules with LintImpact.opinionated
                       must be in stylisticRules
 
-These checks mirror the Dart tests in test/saropa_lints_test.dart
+These checks mirror the Dart tests in test/integrity/saropa_lints_test.dart
 but run as a pre-publish gate in the Python workflow. Defense in
 depth: the Dart tests catch issues during development, and this
 script catches them before publishing.
