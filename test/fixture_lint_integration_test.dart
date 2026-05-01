@@ -1,7 +1,45 @@
 import 'dart:io';
 
+import 'package:saropa_lints/saropa_lints.dart';
+import 'package:saropa_lints/src/models/violation.dart';
 import 'package:saropa_lints/src/violation_parser.dart';
 import 'package:test/test.dart';
+
+final Set<String> _saropaRuleCodes = allSaropaRules
+    .map((r) => r.code.lowerCaseName)
+    .toSet();
+
+/// Runs `dart analyze` and `dart run custom_lint` in [exampleDir], parses both,
+/// and returns the **union** of violations (deduped by file/line/column/rule).
+Future<List<Violation>> _violationsForExample(Directory exampleDir) async {
+  final analyzeResult = await Process.run(
+    'dart',
+    ['analyze'],
+    workingDirectory: exampleDir.path,
+    runInShell: true,
+  );
+  final analyzeOut = '${analyzeResult.stdout}${analyzeResult.stderr}';
+  final fromAnalyze = parseDartAnalyzeHumanOutput(analyzeOut);
+
+  final customLintResult = await Process.run(
+    'dart',
+    ['run', 'custom_lint'],
+    workingDirectory: exampleDir.path,
+    runInShell: true,
+  );
+  final fromCustom = parseViolations(customLintResult.stdout as String);
+
+  final byKey = <String, Violation>{};
+  void addAll(List<Violation> list) {
+    for (final v in list) {
+      byKey['${v.file}|${v.line}|${v.column}|${v.rule}'] = v;
+    }
+  }
+
+  addAll(fromAnalyze);
+  addAll(fromCustom);
+  return byKey.values.toList();
+}
 
 /// Integration test: run custom_lint on an example package and assert
 /// output is parseable and fixtures produce expected rule diagnostics.
@@ -12,63 +50,83 @@ void main() {
   // Process.run('dart', ['run', 'custom_lint']) can hang if the analyzer
   // plugin stalls or package resolution deadlocks — cap each test.
   group('Fixture lint integration', timeout: const Timeout(Duration(minutes: 2)), () {
-    test('custom_lint on example produces parseable violations', () async {
-      final exampleDir = Directory('example');
-      if (!exampleDir.existsSync()) {
-        return; // Skip when example not present (e.g. in some CI)
-      }
+    test(
+      'dart analyze (or custom_lint) on example produces parseable violations',
+      () async {
+        final exampleDir = Directory('example');
+        if (!exampleDir.existsSync()) {
+          return; // Skip when example not present (e.g. in some CI)
+        }
 
-      final result = await Process.run(
-        'dart',
-        ['run', 'custom_lint'],
-        workingDirectory: exampleDir.path,
-        runInShell: true,
-      );
-
-      // custom_lint may exit with 1 when there are lint issues
-      final output = result.stdout as String;
-      final errors = result.stderr as String;
-      final violations = parseViolations(output);
-
-      // Should be able to parse output without throwing
-      expect(violations, isA<List>());
-
-      // If there are lint issues, we should see some violations from our rules
-      if (result.exitCode == 1 && output.isNotEmpty) {
-        expect(
-          violations.isNotEmpty || errors.contains('custom_lint'),
-          isTrue,
-          reason: 'Expected parseable lint output or custom_lint message',
-        );
-      }
-    });
+        final violations = await _violationsForExample(exampleDir);
+        expect(violations, isA<List>());
+        if (violations.isEmpty) {
+          return;
+        }
+        expect(violations.first.file, isNotEmpty);
+      },
+    );
 
     /// Behavioral test: run linter on example and assert specific rules
-    /// fire on fixture code (proves linter-on-code when custom_lint runs).
-    /// When custom_lint cannot run (e.g. resolver conflict) or reports no
-    /// violations, we skip per-rule assertions so the test still passes.
-    test('custom_lint on example reports expected rules from fixtures', () async {
+    /// fire on fixture code (proves linter-on-code when `dart analyze` or
+    /// `dart run custom_lint` runs). When neither yields parseable violations,
+    /// skip per-rule assertions so the test still passes.
+    test('example analysis reports expected rules from fixtures', () async {
       final exampleDir = Directory('example');
       if (!exampleDir.existsSync()) {
         return;
       }
 
-      final result = await Process.run(
+      final analyzeResult = await Process.run(
+        'dart',
+        ['analyze'],
+        workingDirectory: exampleDir.path,
+        runInShell: true,
+      );
+      final fromAnalyze = parseDartAnalyzeHumanOutput(
+        '${analyzeResult.stdout}${analyzeResult.stderr}',
+      );
+
+      final customLintResult = await Process.run(
         'dart',
         ['run', 'custom_lint'],
         workingDirectory: exampleDir.path,
         runInShell: true,
       );
+      final fromCustom = parseViolations(customLintResult.stdout as String);
 
-      final output = result.stdout as String;
-      final violations = parseViolations(output);
-      if (violations.isEmpty) {
-        // custom_lint may not have run (e.g. version solve failure) or reported
-        // in a format we don't parse; skip strict assertions.
+      if (fromAnalyze.isEmpty && fromCustom.isEmpty) {
         return;
       }
 
-      final ruleCodes = violations.map((v) => v.rule).toSet();
+      final ruleCodes = {
+        ...fromAnalyze.map((v) => v.rule),
+        ...fromCustom.map((v) => v.rule),
+      };
+
+      // When `dart run custom_lint` is unavailable, only compile-time plan
+      // fixtures are asserted (native `dart analyze` output).
+      const expectedCompileTimeFromDartAnalyze = [
+        'abi_specific_integer_invalid',
+        'abstract_field_initializer',
+        'conflicting_constructor_and_static_member',
+        'deprecated_new_in_comment_reference',
+        'duplicate_field_name',
+        'external_with_initializer',
+        'field_initializer_redirecting_constructor',
+        'illegal_concrete_enum_member',
+        'invalid_extension_argument_count',
+        'invalid_literal_annotation',
+        'invalid_super_formal_parameter_location',
+        'non_constant_map_element',
+        'return_in_generator',
+        'subtype_of_disallowed_type',
+        'type_check_with_null',
+        'uri_does_not_exist',
+        'wrong_number_of_parameters_for_setter',
+        'yield_in_non_generator',
+      ];
+
       // Fixtures in example/lib with expect_lint for these rules;
       // assert they appear when custom_lint runs (behavioral coverage).
       // Priority: async, error_handling, security (see UNIT_TEST_COVERAGE_REVIEW.md §4).
@@ -130,14 +188,54 @@ void main() {
         'avoid_widget_creation_in_loop',
         'require_item_extent_for_large_lists',
         'avoid_screenshot_sensitive',
+        // Plan §10 C1-C10 — async fixtures.
+        'avoid_future_ignore',
+        'avoid_future_in_build',
+        'avoid_future_tostring',
+        'avoid_multiple_stream_listeners',
+        'avoid_nested_futures',
+        'avoid_redundant_async',
+        'avoid_sequential_awaits',
+        'avoid_stream_sync_events',
+        'avoid_stream_tostring',
+        'avoid_sync_on_every_change',
+        // Plan §10 C11-C15 — disposal fixtures.
+        'dispose_class_fields',
+        'prefer_dispose_before_new_instance',
+        'require_change_notifier_dispose',
+        'require_text_editing_controller_dispose',
+        'require_video_player_controller_dispose',
+        // Plan §10 C16-C19 — error_handling fixtures.
+        'avoid_swallowing_exceptions',
+        'avoid_generic_exceptions',
+        'prefer_result_pattern',
+        'require_app_startup_error_handling',
+        // Plan §10 C20-C24 — security fixtures.
+        'avoid_hardcoded_credentials',
+        'avoid_token_in_url',
+        'avoid_path_traversal',
+        'avoid_jwt_decode_client',
+        'prefer_local_auth',
       ];
+
+      for (final rule in expectedCompileTimeFromDartAnalyze) {
+        expect(
+          ruleCodes.contains(rule),
+          isTrue,
+          reason: 'Rule $rule should appear in dart analyze output for example',
+        );
+      }
+
+      if (fromCustom.isEmpty) {
+        return;
+      }
 
       final expectedSet = expectedFromFixtures.toSet();
       for (final rule in expectedSet) {
         expect(
           ruleCodes.contains(rule),
           isTrue,
-          reason: 'Rule $rule should fire on example fixtures',
+          reason: 'Rule $rule should fire on example fixtures (custom_lint)',
         );
       }
     });
@@ -152,15 +250,7 @@ void main() {
           return;
         }
 
-        final result = await Process.run(
-          'dart',
-          ['run', 'custom_lint'],
-          workingDirectory: exampleDir.path,
-          runInShell: true,
-        );
-
-        final output = result.stdout as String;
-        final violations = parseViolations(output);
+        final violations = await _violationsForExample(exampleDir);
         final fixtureViolations = violations
             .where(
               (v) =>
@@ -196,15 +286,7 @@ void main() {
           return;
         }
 
-        final result = await Process.run(
-          'dart',
-          ['run', 'custom_lint'],
-          workingDirectory: exampleDir.path,
-          runInShell: true,
-        );
-
-        final output = result.stdout as String;
-        final violations = parseViolations(output);
+        final violations = await _violationsForExample(exampleDir);
         final fixtureViolations = violations
             .where(
               (v) =>
@@ -244,22 +326,12 @@ void main() {
           return;
         }
 
-        final result = await Process.run(
-          'dart',
-          ['run', 'custom_lint'],
-          workingDirectory: exampleDir.path,
-          runInShell: true,
-        );
-
-        final output = result.stdout as String;
-        final violations = parseViolations(output);
+        final violations = await _violationsForExample(exampleDir);
         final fixtureViolations = violations
             .where(
               (v) =>
                   v.rule == 'prefer_try_parse_for_dynamic_data' &&
-                  v.file.contains(
-                    'json_datetime/prefer_try_parse_for_dynamic_data_fixture',
-                  ),
+                  v.file.contains('prefer_try_parse_for_dynamic_data_fixture'),
             )
             .toList();
 
@@ -306,15 +378,7 @@ void main() {
           return;
         }
 
-        final result = await Process.run(
-          'dart',
-          ['run', 'custom_lint'],
-          workingDirectory: exampleDir.path,
-          runInShell: true,
-        );
-
-        final output = result.stdout as String;
-        final violations = parseViolations(output);
+        final violations = await _violationsForExample(exampleDir);
         final fixtureViolations = violations
             .where(
               (v) =>
@@ -352,17 +416,10 @@ void main() {
         return;
       }
 
-      final result = await Process.run(
-        'dart',
-        ['run', 'custom_lint'],
-        workingDirectory: exampleDir.path,
-        runInShell: true,
-      );
-
-      final output = result.stdout as String;
-      final violations = parseViolations(output);
+      final violations = await _violationsForExample(exampleDir);
       final compliantFileViolations = violations
           .where((v) => v.file.contains('behavioral_test_compliant_only.dart'))
+          .where((v) => _saropaRuleCodes.contains(v.rule))
           .toList();
 
       expect(

@@ -38,7 +38,7 @@ The extension is the primary setup and configuration surface:
 - **Rule packs / Config Dashboard** — Enable stack bundles (Riverpod, Drift, …) from **Saropa Lints: Open Config Dashboard** (editor tab: per-pack toggles, rule lists, target platforms when embedder folders exist); see [`doc/guides/rule_packs.md`](doc/guides/rule_packs.md)
 - **Package Vibrancy** — Dependency health, alerts, and optional **version-gap** PR/issue triage (enable with `saropaLints.packageVibrancy.enableVersionGap`; a GitHub token improves results)
 - **Project Vibrancy** — Project code-health scoring for your own Dart source via **Open Project Vibrancy Report** (editor-area webview; same scan as the CLI JSON output); use the graph icon on **Issues**, **Overview**, **Config**, or **Package Vibrancy** view titles, or the Command Palette
-- **TODOs & Hacks** — Sidebar scan for TODO/FIXME/HACK-style markers; full-workspace scan is **opt-in** (`saropaLints.todosAndHacks.workspaceScanEnabled`, default off) via **TODOs & Hacks: Enable workspace scan**
+- **TODOs & Hacks** — Sidebar scan for TODO/FIXME/HACK-style markers; full-workspace scan is **opt-in** (`saropaLints.todosAndHacks.workspaceScanEnabled`; leave `false` until you need it) via **TODOs & Hacks: Enable workspace scan**
 - **File Risk** — Files ranked by violation density; focus on the riskiest first
 - **Trends** — Score progression over time with milestone celebrations
 
@@ -1023,6 +1023,10 @@ Saropa Lints uses the native Dart analyzer plugin system. Issues appear directly
 1. Run `dart pub get` (or `flutter pub get`)
 2. Restart your IDE (VS Code: `Ctrl+Shift+P` → "Developer: Reload Window")
 3. Check **View → Output → Dart Analysis Server** for errors
+
+## Supported Versions
+
+The current major (`12.x`) is the actively maintained line — new rules, fixes, and quick fixes land here. Earlier majors are no longer updated except for security-impacting issues; if you need a backport of a security fix to a prior major, [open an issue](https://github.com/saropa/saropa_lints/issues/new) tagged `backport-request` with the rule code and the affected version. There is no fixed support window — older lines are evaluated case-by-case based on the severity of the report and the size of the diff. See also [Troubleshooting](#troubleshooting) and [doc/troubleshooting.md](doc/troubleshooting.md) for IDE-specific issues.
 
 ## Troubleshooting
 

@@ -108,6 +108,14 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 dynamic event;
 final name = 'example';
 
+// Local MyEvent with a const constructor so the GOOD subclass below can be
+// const itself (the rule's compliant shape is "immutable event class").
+// Without `const MyEvent()` the const subclass triggers
+// const_constructor_with_non_const_super and hides the actual rule under test.
+abstract class MyEvent {
+  const MyEvent();
+}
+
 // BAD: Should trigger avoid_bloc_event_mutation
 // expect_lint: avoid_bloc_event_mutation
 class _bad554_UpdateEvent extends MyEvent {
@@ -119,10 +127,9 @@ void _bad554_usage() {
   event.name = 'changed'; // Mutating after dispatch!
 }
 
-// HACK: TODO restore when available to testing
-
-// // GOOD: Should NOT trigger avoid_bloc_event_mutation
-// class _good554_UpdateEvent extends MyEvent {
-//   final String name; // Immutable
-//   const _good554_UpdateEvent(this.name);
-// }
+// GOOD: Should NOT trigger avoid_bloc_event_mutation.
+// Restored after declaring `MyEvent` with a const constructor above.
+class _good554_UpdateEvent extends MyEvent {
+  const _good554_UpdateEvent(this.name);
+  final String name; // Immutable
+}

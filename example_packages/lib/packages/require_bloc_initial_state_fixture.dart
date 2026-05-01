@@ -105,18 +105,40 @@
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// HACK: TODO restore when available to testing
+// Local mock of the Bloc/Event/State surface so the BAD case can compile
+// without forcing super(state). The real `package:bloc/bloc.dart` Bloc
+// requires a positional `state` argument, which would mask the rule under
+// test by raising `implicit_super_initializer_missing_arguments` instead.
+// The optional positional parameter on `Bloc()` lets the BAD case omit the
+// super call entirely (which is exactly what the rule should catch).
+class Bloc<E, S> {
+  Bloc([S? _]);
+  void on<T>(void Function(T event, dynamic emit) handler) {}
+}
 
-// // BAD: Should trigger require_bloc_initial_state
-// // expect_lint: require_bloc_initial_state
-// class _bad578_MyBloc extends Bloc<MyEvent, MyState> {
-//   _bad578_MyBloc() {
-//     // Missing super call!
-//     on<MyEvent>(_onEvent);
-//   }
-// }
+class MyEvent {
+  const MyEvent();
+}
 
-// GOOD: Should NOT trigger require_bloc_initial_state
+class MyState {
+  const MyState();
+}
+
+class MyInitialState extends MyState {
+  const MyInitialState();
+}
+
+void _onEvent(MyEvent event, dynamic emit) {}
+
+// BAD: Should trigger require_bloc_initial_state — no super initializer.
+// expect_lint: require_bloc_initial_state
+class _bad578_MyBloc extends Bloc<MyEvent, MyState> {
+  _bad578_MyBloc() {
+    on<MyEvent>(_onEvent);
+  }
+}
+
+// GOOD: Should NOT trigger require_bloc_initial_state.
 class _good578_MyBloc extends Bloc<MyEvent, MyState> {
   _good578_MyBloc() : super(MyInitialState()) {
     on<MyEvent>(_onEvent);

@@ -107,15 +107,23 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 final name = 'example';
 
+// Local Parent (positional constructor) so super.name shorthand can resolve;
+// the rule under test compares the BAD `super(name)` redirect against the
+// GOOD super-formal-parameter form on the same shape of superclass.
+class Parent {
+  Parent(this.name);
+  final String name;
+}
+
 // BAD: Should trigger prefer_redirecting_superclass_constructor
 // expect_lint: prefer_redirecting_superclass_constructor
 class _bad233_Child extends Parent {
   _bad233_Child(String name) : super(name);
 }
 
-// HACK: TODO restore when available to testing
-
-// // GOOD: Should NOT trigger prefer_redirecting_superclass_constructor
-// class _good233_Child extends Parent {
-//   _good233_Child(super.name);
-// }
+// GOOD: Should NOT trigger prefer_redirecting_superclass_constructor.
+// Restored after adding a local Parent with the positional constructor that
+// the super-formal-parameter shorthand needs.
+class _good233_Child extends Parent {
+  _good233_Child(super.name);
+}

@@ -1,0 +1,8 @@
+ERROR|COMPILE_TIME_ERROR|URI_DOES_NOT_EXIST|D:\\src\\saropa_lints\\example_packages\\lib\\firebase\\require_firestore_security_rules_fixture.dart|3|8|46|Target of URI doesn't exist: 'package:cloud_firestore/cloud_firestore.dart'.
+ERROR|COMPILE_TIME_ERROR|UNDEFINED_IDENTIFIER|D:\\src\\saropa_lints\\example_packages\\lib\\firebase\\require_firestore_security_rules_fixture.dart|8|13|17|Undefined name 'FirebaseFirestore'.
+ERROR|COMPILE_TIME_ERROR|URI_DOES_NOT_EXIST|D:\\src\\saropa_lints\\example_packages\\lib\\geolocator\\avoid_geolocator_background_without_config_fixture.dart|3|8|36|Target of URI doesn't exist: 'package:geolocator/geolocator.dart'.
+ERROR|COMPILE_TIME_ERROR|UNDEFINED_IDENTIFIER|D:\\src\\saropa_lints\\example_packages\\lib\\geolocator\\avoid_geolocator_background_without_config_fixture.dart|8|10|10|Undefined name 'Geolocator'.
+ERROR|COMPILE_TIME_ERROR|UNDEFINED_GETTER|D:\\src\\saropa_lints\\example_packages\\lib\\getx\\avoid_getx_rx_nested_obs_fixture.dart|7|15|3|The getter 'obs' isn't defined for the type 'int'.
+ERROR|COMPILE_TIME_ERROR|UNDEFINED_GETTER|D:\\src\\saropa_lints\\example_packages\\lib\\getx\\avoid_getx_rx_nested_obs_fixture.dart|10|16|3|The getter 'obs' isn't defined for the type 'int'.
+ERROR|COMPILE_TIME_ERROR|UNDEFINED_FUNCTION|D:\\src\\saropa_lints\\example_packages\\lib\\riverpod\\avoid_riverpod_string_provider_name_fixture.dart|7|13|8|The function 'Provider' isn't defined.
+ERROR|COMPILE_TIME_ERROR|UNDEFINED_FUNCTION|D:\\src\\saropa_lints\\example_packages\\lib\\riverpod\\avoid_riverpod_string_provider_name_fixture.dart|10|14|8|The function 'Provider' isn't defined.

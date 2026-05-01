@@ -353,6 +353,16 @@ When adding fixes, prioritize by impact:
 4. **Remove fixes**: Comment out problematic code (preserves history)
 5. **Last resort**: Skip the fix entirely — document why in the rule's doc comment
 
+#### Test contract for new fix producers
+
+Every new `SaropaFixProducer` subclass must add at least one entry to [`test/fix_application_smoke_test.dart`](test/fix_application_smoke_test.dart). The smoke test catches the most common breakage modes without requiring full analyzer scaffolding:
+
+- **Class reachable** — assert the producer class symbol resolves (catches file moves and renames).
+- **`fixKind` stable** — assert id, priority, and human-readable message constants. A drift here changes the lightbulb label users see.
+- **Applicability** — only assert if you override the `singleLocation` default.
+
+End-to-end "the rewrite produces the right source" coverage lives in [`test/fix_application_dart_fix_dry_run_test.dart`](test/fix_application_dart_fix_dry_run_test.dart) (runs `dart fix --dry-run` over `example/`) and the manual VS Code verification checklist in [`plan/TESTING_AND_RELEASE.md`](plan/TESTING_AND_RELEASE.md) §10 E. Diff-asserting unit tests are deferred — see plan §10 D-followup.
+
 ### 8. Add tests
 
 **No stub fixtures.** Do not add a fixture file for a rule until the rule is implemented and the fixture is validated. A "stub" (a file with `// expect_lint` and placeholder BAD/GOOD code when the rule does not actually run or report on that code) is prohibited—it only inflates coverage without testing anything.
