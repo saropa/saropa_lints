@@ -143,6 +143,43 @@ describe('violationsDashboardHtml', () => {
     assert.ok(html.includes('data-kpi-value="error"'));
   });
 
+  it('splits Critical and High into separate KPI cards (different threat models)', () => {
+    /* critical encodes per-occurrence harm; high encodes compound harm.
+       Lumping them into one card hides that distinction. */
+    const html = renderViolationsDashboardHtml(
+      minimalInput({
+        impactCounts: { critical: 1, high: 12, medium: 0, low: 0, opinionated: 0 },
+        totalRawAfterDisable: 13,
+        filteredCount: 13,
+      }),
+    );
+    assert.ok(html.includes('data-kpi-value="critical"'));
+    assert.ok(html.includes('data-kpi-value="high"'));
+    /* Old combined value is gone. */
+    assert.ok(!html.includes('data-kpi-value="critical,high"'));
+    /* high crosses the 10+ "systemic" threshold from LintImpact docs. */
+    assert.ok(html.includes('systemic'));
+  });
+
+  it('orders KPI cards by importance (Visible > Errors > Critical > High > Warnings > scope)', () => {
+    const html = renderViolationsDashboardHtml(
+      minimalInput({
+        severityCounts: { error: 1, warning: 1, info: 0 },
+        impactCounts: { critical: 1, high: 1, medium: 0, low: 0, opinionated: 0 },
+        filesAffected: 5,
+        totalRawAfterDisable: 2,
+        filteredCount: 2,
+      }),
+    );
+    const order = ['visible', 'errors', 'critical', 'high', 'warnings', 'files'];
+    let cursor = -1;
+    for (const key of order) {
+      const idx = html.indexOf(`data-kpi="${key}"`);
+      assert.ok(idx > cursor, `KPI '${key}' must come after the previous card; got idx=${idx}, cursor=${cursor}`);
+      cursor = idx;
+    }
+  });
+
   it('shows an active-filters chip strip when filters diverge from defaults', () => {
     const html = renderViolationsDashboardHtml(
       minimalInput({ textFilter: 'foo', severities: ['error'], impacts: ['critical', 'high'] }),

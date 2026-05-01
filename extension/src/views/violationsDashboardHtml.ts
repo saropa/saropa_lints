@@ -265,10 +265,28 @@ function buildKpiCards(input: ViolationsDashboardHtmlInput): string {
   return `<div class="kpi-row">${cards.map(renderKpiCard).join('')}</div>`;
 }
 
+/**
+ * KPI card order is **importance-descending**, with critical and high as
+ * separate cards because they encode different threat models — not two
+ * sizes of the same threat:
+ *
+ * - `critical` (saropa_lint_rule.dart §LintImpact) is *per-occurrence*
+ *   harmful (memory leaks, security holes, crashes). Count of 1 still
+ *   demands action.
+ * - `high` is *compound* harm — a handful is manageable, 10+ is systemic.
+ *
+ * Lumping them under one "Critical + High" card hid that distinction.
+ *
+ * Order: Visible (anchor) → Errors → Critical → High → Warnings →
+ * Files affected → Top rule. Severity and impact axes are interleaved
+ * intentionally so the user reads "worst severity, worst impact, second
+ * impact, second severity" before the scope/leverage cards.
+ */
 function collectKpiCards(input: ViolationsDashboardHtmlInput): KpiSpec[] {
   const errors = input.severityCounts.error ?? 0;
   const warnings = input.severityCounts.warning ?? 0;
-  const critHigh = (input.impactCounts.critical ?? 0) + (input.impactCounts.high ?? 0);
+  const critical = input.impactCounts.critical ?? 0;
+  const high = input.impactCounts.high ?? 0;
   const cards: KpiSpec[] = [];
   cards.push({
     key: 'visible',
@@ -291,6 +309,28 @@ function collectKpiCards(input: ViolationsDashboardHtmlInput): KpiSpec[] {
     title: 'Filter findings to errors only',
   });
   cards.push({
+    key: 'critical',
+    label: 'Critical',
+    value: String(critical),
+    /* Single-occurrence critical issues already demand action — call that
+       out in the subtitle instead of treating the count like a threshold. */
+    sub: critical > 0 ? 'each one demands action' : 'none — clear',
+    classes: 'crit',
+    filter: { kind: 'imp', value: 'critical' },
+    title: 'Filter findings to critical impact (each occurrence is independently harmful)',
+  });
+  cards.push({
+    key: 'high',
+    label: 'High',
+    value: String(high),
+    /* Reflect the threshold language from the LintImpact docs: "a handful
+       is manageable, 10+ indicates systemic problems". */
+    sub: high === 0 ? 'none — clear' : high < 10 ? 'manageable volume' : 'systemic — needs attention',
+    classes: 'high',
+    filter: { kind: 'imp', value: 'high' },
+    title: 'Filter findings to high impact (compound harm — 10+ is systemic)',
+  });
+  cards.push({
     key: 'warnings',
     label: 'Warnings',
     value: String(warnings),
@@ -298,15 +338,6 @@ function collectKpiCards(input: ViolationsDashboardHtmlInput): KpiSpec[] {
     classes: 'warnings',
     filter: { kind: 'sev', value: 'warning' },
     title: 'Filter findings to warnings only',
-  });
-  cards.push({
-    key: 'crit',
-    label: 'Critical + High',
-    value: String(critHigh),
-    sub: critHigh > 0 ? 'click to focus on highest impact' : 'none at top impact',
-    classes: 'crit',
-    filter: { kind: 'imp', value: 'critical,high' },
-    title: 'Filter findings to critical or high impact',
   });
   if (typeof input.filesAffected === 'number') {
     cards.push({
@@ -333,15 +364,19 @@ function collectKpiCards(input: ViolationsDashboardHtmlInput): KpiSpec[] {
 }
 
 function renderKpiCard(c: KpiSpec): string {
+  /* `data-kpi` is the card identifier (always emitted so DOM tests and
+     analytics can find a card by key), independent of whether the card
+     is interactive. Filter-specific attrs only render when the card
+     has an associated filter behavior. */
   const interactive = c.filter ? ' interactive' : '';
   const role = c.filter ? ' role="button" tabindex="0"' : '';
-  const dataAttrs = c.filter
-    ? ` data-kpi="${escapeHtml(c.key)}" data-kpi-kind="${escapeHtml(c.filter.kind)}"${
+  const filterAttrs = c.filter
+    ? ` data-kpi-kind="${escapeHtml(c.filter.kind)}"${
         c.filter.value !== undefined ? ` data-kpi-value="${escapeHtml(c.filter.value)}"` : ''
       }`
     : '';
   const title = c.title ? ` title="${escapeHtml(c.title)}"` : '';
-  return `<div class="kpi-card ${escapeHtml(c.classes)}${interactive}"${role}${dataAttrs}${title}>
+  return `<div class="kpi-card ${escapeHtml(c.classes)}${interactive}"${role} data-kpi="${escapeHtml(c.key)}"${filterAttrs}${title}>
     <div class="kpi-k">${escapeHtml(c.label)}</div>
     <div class="kpi-v">${escapeHtml(c.value)}</div>
     <div class="kpi-sub">${escapeHtml(c.sub)}</div>

@@ -431,6 +431,7 @@ export function getViolationsDashboardStyles(): string {
     .kpi-card.errors .kpi-v   { color: var(--accent-error); }
     .kpi-card.warnings .kpi-v { color: var(--accent-warning); }
     .kpi-card.crit .kpi-v     { color: var(--accent-critical); }
+    .kpi-card.high .kpi-v     { color: var(--accent-high); }
     .kpi-card.todos .kpi-v    { color: var(--accent-info); }
 
     /* ============================================================
