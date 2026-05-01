@@ -40,6 +40,11 @@ executables:
   impact_report: impact_report
   scan: scan
   quality_gate: quality_gate
+  # Registered so the VS Code extension (and any consumer project) can invoke
+  # `dart run saropa_lints:project_vibrancy` instead of needing the source path
+  # `bin/project_vibrancy.dart`, which only resolves inside this repo and broke
+  # the Code Health Dashboard for every downstream workspace.
+  project_vibrancy: project_vibrancy
 
 # Dart SDK constraint (pure Dart package; Flutter topic tag provides discoverability)
 environment:

@@ -60,3 +60,53 @@ List<Violation> parseViolations(String output) {
 
   return violations;
 }
+
+/// Parses human-readable `dart analyze` CLI output into [Violation] rows.
+///
+/// Each matched line looks like:
+/// `  error - lib\path\file.dart:12:3 - Message text here - diagnostic_code`
+///
+/// The trailing segment after the last ` - ` is treated as [Violation.rule].
+/// Impact is resolved via [_ruleImpacts] when the code is a saropa rule name.
+List<Violation> parseDartAnalyzeHumanOutput(String output) {
+  final violations = <Violation>[];
+  final linePattern = RegExp(
+    r'^(error|warning|info)\s+-\s+(.+?):(\d+):(\d+)\s+-\s',
+  );
+
+  for (final rawLine in output.split(RegExp(r'\r?\n'))) {
+    final trimmed = rawLine.trimLeft();
+    final m = linePattern.firstMatch(trimmed);
+    if (m == null) {
+      continue;
+    }
+    final path = m.group(2)!;
+    final lineNum = int.tryParse(m.group(3)!) ?? 0;
+    final column = int.tryParse(m.group(4)!) ?? 0;
+    final rest = trimmed.replaceRange(0, m.end, '');
+    final parts = rest.split(' - ');
+    if (parts.length < 2) {
+      continue;
+    }
+    final rule = parts.removeLast().trim();
+    final message = parts.join(' - ');
+    if (rule.isEmpty) {
+      continue;
+    }
+
+    final impact = _ruleImpacts[rule] ?? LintImpact.medium;
+
+    violations.add(
+      Violation(
+        file: path,
+        line: lineNum,
+        column: column,
+        rule: rule,
+        message: message,
+        impact: impact,
+      ),
+    );
+  }
+
+  return violations;
+}
