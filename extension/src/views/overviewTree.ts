@@ -57,10 +57,6 @@ import {
     countSecurityHotspotReviewStates,
 } from '../securityHotspotReviewState';
 
-const OVERVIEW_INTRO_TOOLTIP =
-    'Saropa Lints provides 2100+ Dart and Flutter lint rules for security, accessibility, and performance. '
-    + 'It has two components: a pub.dev package with the rules and a VS Code extension for visual analysis and configuration.';
-
 /** Format an ISO timestamp as a human-readable relative time. */
 function formatTimeAgo(iso: string): string {
     const ms = Date.now() - new Date(iso).getTime();
@@ -187,18 +183,10 @@ function buildActionItems(): OverviewItem[] {
 }
 
 function buildHelpItems(): OverviewItem[] {
-    // Help links. The lone duplicate from earlier was `Getting Started` /
-    // `About` / `pub.dev` appearing in both Dashboards and Help; keep the canonical
-    // copy here.
-    const summary = new OverviewItem(
-        'Lints',
-        'Package + extension for Dart/Flutter',
-        undefined,
-        'info',
-    );
-    summary.tooltip = OVERVIEW_INTRO_TOOLTIP;
+    // Help leaves. Every row clicks through to a real destination — the prior
+    // "Lints" info row was removed because it had no click target and the same
+    // intro copy lives on the About panel and pub.dev page anyway.
     return [
-        summary,
         new OverviewItem('Getting Started', 'Walkthrough', 'saropaLints.openWalkthrough', 'compass'),
         new OverviewItem('About Saropa Lints', 'Documentation', 'saropaLints.showAbout', 'book'),
         new OverviewItem(
@@ -492,7 +480,37 @@ function isConfigTreeNode(node: OverviewTreeNode): node is ConfigTreeNode {
     return typeof k === 'string' && OVERVIEW_EMBEDDED_CONFIG_KINDS.has(k);
 }
 
-export type OverviewTreeNode = OverviewItem | ConfigTreeNode;
+/**
+ * Collapsible section header. Owns a list of leaves (or triage data nodes) that
+ * the provider returns when this section is expanded. Sections are the ONLY
+ * level of nesting in the sidebar — leaves below them never expand further.
+ *
+ * The user wants logical grouping (Editor dashboards / Actions / Status /
+ * Settings / Triage / Help) without a multi-level tree, so a section + flat
+ * leaves is the right shape.
+ */
+class OverviewSection extends vscode.TreeItem {
+    constructor(
+        public readonly slug: string,
+        label: string,
+        description: string,
+        iconId: string,
+        public readonly children: ReadonlyArray<OverviewItem | ConfigTreeNode>,
+        defaultExpanded: boolean,
+    ) {
+        super(
+            label,
+            defaultExpanded
+                ? vscode.TreeItemCollapsibleState.Expanded
+                : vscode.TreeItemCollapsibleState.Collapsed,
+        );
+        this.iconPath = new vscode.ThemeIcon(iconId);
+        this.tooltip = description;
+        this.contextValue = `overviewSection:${slug}`;
+    }
+}
+
+export type OverviewTreeNode = OverviewItem | OverviewSection | ConfigTreeNode;
 
 export class OverviewTreeProvider implements vscode.TreeDataProvider<OverviewTreeNode> {
     private readonly _onDidChangeTreeData = new vscode.EventEmitter<OverviewTreeNode | undefined | void>();
@@ -509,6 +527,7 @@ export class OverviewTreeProvider implements vscode.TreeDataProvider<OverviewTre
     }
 
     getTreeItem(element: OverviewTreeNode): vscode.TreeItem {
+        if (element instanceof OverviewSection) return element;
         if (isConfigTreeNode(element)) {
             return renderTreeItem(element);
         }
@@ -516,9 +535,15 @@ export class OverviewTreeProvider implements vscode.TreeDataProvider<OverviewTre
     }
 
     async getChildren(element?: OverviewTreeNode): Promise<OverviewTreeNode[]> {
-        // Triage groups are the only expandable rows; delegate to ConfigTreeProvider.
+        // Sections own their child rows; the only level of nesting.
+        if (element instanceof OverviewSection) {
+            return [...element.children];
+        }
+        // Triage groups intentionally do NOT expand here — the user wants flat
+        // leaves under section headers, not a nested tree. Each triage group
+        // already has a click action that reveals the rule list in Findings.
         if (element !== undefined && isConfigTreeNode(element)) {
-            return this.configProvider.getChildren(element);
+            return [];
         }
         if (element !== undefined) {
             return [];
@@ -531,13 +556,14 @@ export class OverviewTreeProvider implements vscode.TreeDataProvider<OverviewTre
 
         const cfg = vscode.workspace.getConfiguration('saropaLints');
         const enabled = cfg.get<boolean>('enabled', true) ?? true;
-        const items: OverviewTreeNode[] = [];
+        const sections: OverviewTreeNode[] = [];
 
         // Setup banner — primary onboarding affordance when saropa_lints is not in
-        // pubspec.yaml. Must be impossible to miss so new users do not get stuck.
+        // pubspec.yaml. Sits ABOVE all sections (no parent header) so new users
+        // cannot miss it; the warning styling carries the urgency.
         const needsSetup = !hasSaropaLintsDep(root);
         if (needsSetup) {
-            items.push(new OverviewItem(
+            sections.push(new OverviewItem(
                 'Set Up Project',
                 'Add saropa_lints to pubspec + configure analysis',
                 'saropaLints.enable',
@@ -545,9 +571,7 @@ export class OverviewTreeProvider implements vscode.TreeDataProvider<OverviewTre
                 new vscode.ThemeColor('list.warningForeground'),
             ));
         } else if (!enabled) {
-            // Pubspec is fine but the user explicitly disabled integration —
-            // show the warning row pointing at the same setup command.
-            items.push(new OverviewItem(
+            sections.push(new OverviewItem(
                 'Lint integration: Off',
                 'Set up pubspec + analysis_options',
                 'saropaLints.enable',
@@ -556,16 +580,38 @@ export class OverviewTreeProvider implements vscode.TreeDataProvider<OverviewTre
             ));
         }
 
-        items.push(...buildEditorDashboardItems());
-        items.push(...buildActionItems());
+        sections.push(new OverviewSection(
+            'editorDashboards',
+            'Editor dashboards',
+            'Open the full-width Saropa dashboards in editor tabs',
+            'layout-sidebar-right',
+            buildEditorDashboardItems(),
+            true,
+        ));
+
+        sections.push(new OverviewSection(
+            'actions',
+            'Actions',
+            'Run analyzer, open Findings, edit config, scaffold composite plugin',
+            'rocket',
+            buildActionItems(),
+            true,
+        ));
 
         const data = readFilteredViolationsOrNull(this.workspaceState);
         if (data) {
-            items.push(...buildStatusItems(this.workspaceState, data));
+            sections.push(new OverviewSection(
+                'status',
+                'Status',
+                'Health, violations, suppressions, trends, last run',
+                'pulse',
+                buildStatusItems(this.workspaceState, data),
+                true,
+            ));
         } else {
-            // No analysis yet — keep the inline cue so users know what unlocks the
-            // status rows. Welcome view only fires for non-Dart projects.
-            items.push(new OverviewItem(
+            // No analysis yet — single inline cue (no section header) since one
+            // row alone does not need a collapsible group.
+            sections.push(new OverviewItem(
                 'No analysis yet',
                 'Run analysis first; status rows fill in.',
                 'saropaLints.runAnalysis',
@@ -573,18 +619,45 @@ export class OverviewTreeProvider implements vscode.TreeDataProvider<OverviewTre
             ));
         }
 
-        // Settings rows: lint integration / tier / run-after-config / detected.
-        // `Run analysis` is intentionally excluded here — already in Actions.
-        items.push(...this.configProvider
+        // Settings — keep the dynamic rows from ConfigTreeProvider (Lint
+        // integration / Tier / Run-after-config / Detected) and filter the
+        // duplicate command rows that are already represented in Actions.
+        const settingsRows = this.configProvider
             .getSettingAndActionNodes()
-            .filter((n) => !isRedundantSettingsAction(n)));
+            .filter((n) => !isRedundantSettingsAction(n));
+        sections.push(new OverviewSection(
+            'settings',
+            'Settings',
+            'Lint integration, tier, analysis behavior, detected packages',
+            'settings-gear',
+            settingsRows,
+            false,
+        ));
 
-        // Triage groups (data, not structure) — expandable to member rules.
-        items.push(...this.configProvider.getTriageNodes());
+        // Triage — only render the section if there is real triage data;
+        // otherwise an empty section header would just look broken.
+        const triageRows = this.configProvider.getTriageNodes();
+        if (triageRows.length > 0) {
+            sections.push(new OverviewSection(
+                'triage',
+                'Triage',
+                'Rules grouped by violation count and override status',
+                'list-filter',
+                triageRows,
+                false,
+            ));
+        }
 
-        items.push(...buildHelpItems());
+        sections.push(new OverviewSection(
+            'help',
+            'Help',
+            'Walkthrough, About, pub.dev, AI agent template',
+            'question',
+            buildHelpItems(),
+            false,
+        ));
 
-        return items;
+        return sections;
     }
 }
 

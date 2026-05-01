@@ -73,7 +73,10 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigTreeNod
     const items: ConfigTreeNode[] = [
       setting('Lint integration', enabled ? 'On' : 'Off', enabled ? 'saropaLints.disable' : 'saropaLints.enable'),
       setting('Tier', tier, 'saropaLints.setTier'),
-      setting('Run analysis after config change', runAfter ? 'Yes' : 'No'),
+      // Each settings row needs a click target — the user expects every visible
+      // sidebar item to navigate somewhere. Toggling a boolean in one click
+      // beats opening the Settings UI just to flip a checkbox.
+      setting('Run analysis after config change', runAfter ? 'Yes' : 'No', 'saropaLints.toggleRunAnalysisAfterConfigChange'),
     ];
 
     // Detected platform/packages from pubspec.
@@ -86,7 +89,9 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigTreeNod
         const pkgs = pubspec.packages.slice(0, 5).join(', ');
         parts.push(pubspec.packages.length > 5 ? pkgs + '…' : pkgs);
       }
-      if (parts.length > 0) items.push(setting('Detected', parts.join(' · ')));
+      // The Detected row summarizes what's in pubspec.yaml — clicking should
+      // open that file so the user can edit it directly.
+      if (parts.length > 0) items.push(setting('Detected', parts.join(' · '), 'saropaLints.openPubspec'));
     }
 
     return items;
@@ -109,7 +114,7 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigTreeNod
   /** Quick links to the richer web dashboards. */
   private buildDashboardShortcutNodes(): ConfigTreeNode[] {
     return [
-      setting('Open Config Dashboard', 'Editor tab: tiers, packs, charts, docs', 'saropaLints.openConfigDashboard'),
+      setting('Open Lints Config', 'Editor tab: tiers, packs, charts, docs', 'saropaLints.openConfigDashboard'),
       setting('Open Package Vibrancy', 'Dependency health and reports', 'saropaLints.openPackageVibrancy'),
     ];
   }
@@ -195,6 +200,9 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigTreeNod
         kind: 'triageInfo',
         label: `${triage.zeroIssueCount} rules with zero issues`,
         description: 'auto-enabled',
+        // Clickable: jump to the Lints Config dashboard, which lists every
+        // enabled rule (including the ones with zero current violations).
+        commandId: 'saropaLints.openConfigDashboard',
       });
     }
     // I2: Show count of rules explicitly disabled by user overrides.
@@ -202,6 +210,9 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigTreeNod
       nodes.push({
         kind: 'triageInfo',
         label: `${triage.disabledOverrideCount} rules disabled by override`,
+        // Clickable: jump straight to analysis_options_custom.yaml where the
+        // override is defined so the user can review or unblock rules.
+        commandId: 'saropaLints.openConfig',
       });
     }
     if (triage.stylisticGroup) nodes.push(triage.stylisticGroup);

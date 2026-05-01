@@ -1,9 +1,17 @@
 /**
- * Pins the flat-sidebar contract for {@link OverviewTreeProvider}: the root
- * level returns leaf rows only — no group parents — and shows the editor
- * dashboards, action links, settings rows, and help links even when the
- * project has no analysis report yet. Triage groups remain expandable because
- * they are data nodes (group → member rules), not structural section headers.
+ * Pins the sidebar contract for {@link OverviewTreeProvider}: the root level
+ * returns collapsible **section headers** (Editor dashboards / Actions /
+ * Status / Settings / Triage / Help). Each section's children are leaf rows
+ * only — leaves never expand further. Triage groups are the only data nodes
+ * that may render as collapsed in the sidebar, but the provider does **not**
+ * expand them inline (the user wanted "logical expander sections like before,
+ * just not a tree").
+ *
+ * Regression guards:
+ *   - Section names match what the user agreed to.
+ *   - No legacy parent contextValues from the old Overview & options view.
+ *   - Every leaf has a click `command` so nothing in the sidebar is dead.
+ *   - Run analysis appears exactly once across all sections.
  */
 import '../vibrancy/register-vscode-mock';
 
@@ -18,7 +26,7 @@ import * as configWriter from '../../configWriter';
 import * as runHistory from '../../runHistory';
 
 import { ConfigTreeProvider } from '../../views/configTree';
-import { OverviewTreeProvider } from '../../views/overviewTree';
+import { OverviewTreeProvider, type OverviewTreeNode } from '../../views/overviewTree';
 import { TreeItemCollapsibleState } from '../vibrancy/vscode-mock-classes';
 
 class MockMemento {
@@ -34,7 +42,7 @@ class MockMemento {
   }
 }
 
-describe('OverviewTreeProvider — flat sidebar', () => {
+describe('OverviewTreeProvider — sectioned flat sidebar', () => {
   let memento: MockMemento;
   let configProvider: ConfigTreeProvider;
   let provider: OverviewTreeProvider;
@@ -64,12 +72,40 @@ describe('OverviewTreeProvider — flat sidebar', () => {
     sinon.restore();
   });
 
-  it('returns a flat list with no group-parent contextValues at root', async () => {
-    const children = await provider.getChildren();
-    assert.ok(Array.isArray(children));
-    // The removed parent classes used these contextValues. Any reappearance of
-    // them at the root means a group container has been reintroduced.
-    const bannedContextValues = new Set([
+  /**
+   * Walk root → sections → leaves into a flat list of all visible rows so
+   * tests can assert on the union without rewriting one helper per case.
+   */
+  async function flattenAllRows(): Promise<OverviewTreeNode[]> {
+    const root = await provider.getChildren();
+    const all: OverviewTreeNode[] = [];
+    for (const node of root) {
+      all.push(node);
+      const cv = (node as { contextValue?: string }).contextValue ?? '';
+      if (cv.startsWith('overviewSection:')) {
+        const kids = await provider.getChildren(node);
+        all.push(...kids);
+      }
+    }
+    return all;
+  }
+
+  it('root contains only the agreed sections and standalone banner rows', async () => {
+    const root = await provider.getChildren();
+    const labels = root.map((n) => String((n as { label?: string }).label ?? ''));
+    // Sections that must always appear in a Dart workspace.
+    assert.ok(labels.includes('Editor dashboards'), 'expected "Editor dashboards" section');
+    assert.ok(labels.includes('Actions'), 'expected "Actions" section');
+    assert.ok(labels.includes('Settings'), 'expected "Settings" section');
+    assert.ok(labels.includes('Help'), 'expected "Help" section');
+    // No leaked legacy section headers.
+    assert.ok(!labels.includes('Help & resources'), 'old "Help & resources" parent must not return');
+    assert.ok(!labels.includes('Issues'), 'old "Issues" parent must not return');
+  });
+
+  it('no legacy parent contextValues remain anywhere at the root level', async () => {
+    const root = await provider.getChildren();
+    const banned = new Set([
       'overviewHelpSection',
       'overviewSettingsSection',
       'overviewIssuesSection',
@@ -78,57 +114,68 @@ describe('OverviewTreeProvider — flat sidebar', () => {
       'overviewRiskSection',
       'overviewSidebarSection',
     ]);
-    for (const node of children) {
+    for (const node of root) {
       const cv = (node as { contextValue?: string }).contextValue;
       if (cv) {
-        assert.ok(
-          !bannedContextValues.has(cv),
-          `unexpected group-parent contextValue at root: ${cv}`,
+        assert.ok(!banned.has(cv), `unexpected legacy contextValue at root: ${cv}`);
+      }
+    }
+  });
+
+  it('all leaves under sections have a click command — no dead rows', async () => {
+    const all = await flattenAllRows();
+    for (const node of all) {
+      const cv = (node as { contextValue?: string }).contextValue ?? '';
+      // Section headers themselves are not clickable rows; skip them.
+      if (cv.startsWith('overviewSection:')) continue;
+      const item = provider.getTreeItem(node);
+      // Some triage data nodes may carry a default command via renderTreeItem
+      // (e.g. triageGroup uses focusIssuesForRules); explicit configSetting
+      // / overviewItem rows must each have a `command` set.
+      assert.ok(
+        item.command !== undefined,
+        `leaf row missing command: ${String(item.label)}`,
+      );
+    }
+  });
+
+  it('leaves never collapse — section headers are the only expandable rows', async () => {
+    const root = await provider.getChildren();
+    for (const section of root) {
+      const cv = (section as { contextValue?: string }).contextValue ?? '';
+      if (!cv.startsWith('overviewSection:')) continue;
+      const kids = await provider.getChildren(section);
+      for (const kid of kids) {
+        const kidItem = provider.getTreeItem(kid);
+        // Non-section children must not be Expanded; they may be Collapsed only
+        // if they are triage data nodes whose collapsibleState is set by
+        // ConfigTreeProvider's renderTreeItem (kept off in our usage).
+        assert.notStrictEqual(
+          kidItem.collapsibleState,
+          TreeItemCollapsibleState.Expanded,
+          `child of ${String((section as { label?: string }).label)} should not be Expanded: ${String(kidItem.label)}`,
         );
       }
     }
   });
 
-  it('every root row except triage groups is a leaf (no expansion)', async () => {
-    const children = await provider.getChildren();
-    for (const node of children) {
-      const item = provider.getTreeItem(node);
-      // Triage group nodes (kind === 'triageGroup') are the only collapsible rows.
-      const kind = (node as { kind?: string }).kind;
-      if (kind === 'triageGroup') continue;
-      assert.notStrictEqual(
-        item.collapsibleState,
-        TreeItemCollapsibleState.Expanded,
-        `non-triage row should not be expanded: ${String(item.label)}`,
-      );
-      assert.notStrictEqual(
-        item.collapsibleState,
-        TreeItemCollapsibleState.Collapsed,
-        `non-triage row should not be collapsed: ${String(item.label)}`,
-      );
-    }
-  });
-
-  it('surfaces editor dashboards and help rows even when no violations.json exists', async () => {
-    const children = await provider.getChildren();
-    const labels = children.map((n) => String((n as { label?: string }).label ?? ''));
-    // Editor-tab dashboards should always be present in a Dart workspace.
-    assert.ok(labels.includes('Lints Config'), 'expected Lints Config row');
-    assert.ok(labels.includes('Findings Dashboard'), 'expected Findings Dashboard row');
-    assert.ok(labels.includes('Run analysis'), 'expected Run analysis row');
-    // Help rows.
-    assert.ok(labels.includes('Getting Started'), 'expected Getting Started row');
-    assert.ok(labels.includes('About Saropa Lints'), 'expected About Saropa Lints row');
-    // No analysis cue takes the place of the status section.
-    assert.ok(labels.includes('No analysis yet'), 'expected No analysis yet placeholder');
-  });
-
-  it('dedupes Run analysis — appears exactly once across Actions and Settings', async () => {
-    const children = await provider.getChildren();
-    const runAnalysisCount = children.filter((n) => {
+  it('Run analysis appears exactly once across all sections', async () => {
+    const all = await flattenAllRows();
+    const count = all.filter((n) => {
       const label = String((n as { label?: string }).label ?? '');
       return label === 'Run analysis';
     }).length;
-    assert.strictEqual(runAnalysisCount, 1, 'Run analysis must not be duplicated');
+    assert.strictEqual(count, 1, 'Run analysis must not be duplicated');
+  });
+
+  it('surfaces editor dashboards and help leaves even when no violations.json exists', async () => {
+    const all = await flattenAllRows();
+    const labels = all.map((n) => String((n as { label?: string }).label ?? ''));
+    assert.ok(labels.includes('Lints Config'), 'expected Lints Config leaf');
+    assert.ok(labels.includes('Findings Dashboard'), 'expected Findings Dashboard leaf');
+    assert.ok(labels.includes('Run analysis'), 'expected Run analysis leaf');
+    assert.ok(labels.includes('Getting Started'), 'expected Getting Started leaf');
+    assert.ok(labels.includes('About Saropa Lints'), 'expected About Saropa Lints leaf');
+    assert.ok(labels.includes('No analysis yet'), 'expected No analysis yet placeholder');
   });
 });

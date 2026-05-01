@@ -96,6 +96,14 @@
         "title": "Saropa Lints: Open Analysis Options"
       },
       {
+        "command": "saropaLints.openPubspec",
+        "title": "Saropa Lints: Open pubspec.yaml"
+      },
+      {
+        "command": "saropaLints.toggleRunAnalysisAfterConfigChange",
+        "title": "Saropa Lints: Toggle Run Analysis After Config Change"
+      },
+      {
         "command": "saropaLints.openConfigDashboard",
         "title": "Saropa Lints: Open Lints Config",
         "icon": "$(layout-panel)"

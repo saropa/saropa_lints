@@ -109,6 +109,20 @@ export const catalogEntries: readonly CatalogEntry[] = [
     icon: 'go-to-file',
   },
   {
+    command: 'saropaLints.openPubspec',
+    title: 'Open pubspec.yaml',
+    description: 'Open the project root pubspec.yaml in the editor.',
+    category: 'Setup & Configuration',
+    icon: 'go-to-file',
+  },
+  {
+    command: 'saropaLints.toggleRunAnalysisAfterConfigChange',
+    title: 'Toggle Run Analysis After Config Change',
+    description: 'Flip the saropaLints.runAnalysisAfterConfigChange setting in one click.',
+    category: 'Setup & Configuration',
+    icon: 'sync',
+  },
+  {
     command: 'saropaLints.openConfigDashboard',
     title: 'Open Lints Config',
     description: 'Open the Lints Config dashboard in an editor tab for tiers, packs, and config guidance.',
