@@ -124,9 +124,9 @@ export function getReportScript(): string {
                 var show = matchesAllFilters(row, searchVal);
                 row.style.display = show ? '' : 'none';
                 /* When a package row is hidden, also hide its detail row.
-                 * Use the HTML5 hidden boolean property — the inline
-                 * style="display:none" pattern is mishandled by some webview
-                 * renderers on table rows (see toggleDetail() below). */
+                 * Use the HTML5 hidden boolean property so the default-collapsed
+                 * state survives every renderer that respects the spec — see
+                 * toggleDetail() below for the rationale. */
                 var detailRow = document.querySelector('tr[data-detail-for="' + row.dataset.name + '"]');
                 if (detailRow && !show) {
                     detailRow.hidden = true;
@@ -413,11 +413,17 @@ export function getReportScript(): string {
                 chips.push({ key: 'shared', label: 'Shared transitives: excluded' });
             }
             if (chips.length === 0) {
-                host.style.display = 'none';
+                /* HTML5 hidden attribute paired with .active-filters[hidden]{display:none!important}
+                 * in report-styles. The prior inline style.display='none' could be defeated by any
+                 * later style write that cleared inline styles, leaving an empty
+                 * "Active filters: ... Clear all" strip showing with no chips. */
+                host.hidden = true;
+                host.style.display = '';
                 list.innerHTML = '';
                 return;
             }
-            host.style.display = 'flex';
+            host.hidden = false;
+            host.style.display = '';
             list.innerHTML = chips.map(function(chip) {
                 return '<button type="button" class="active-filter-chip" data-filter-key="' + chip.key
                     + '" title="Clear this filter">' + chip.label + ' <span aria-hidden="true">&times;</span></button>';
@@ -752,8 +758,10 @@ export function getReportScript(): string {
 
         /* ---- Rescan ---- */
         /* Sends a message to the extension host which runs the
-           saropaLints.packageVibrancy.scan command. Button is disabled
-           while the request is in flight to prevent duplicate scans. */
+           saropaLints.packageVibrancy.rescan command (clears the per-package
+           pub.dev cache first so the report reflects current pub.dev state).
+           Button is disabled while the request is in flight to prevent
+           duplicate scans. */
         var rescanBtn = document.getElementById('rescan');
         if (rescanBtn) {
             var rescanOriginal = rescanBtn.innerHTML;
@@ -1093,9 +1101,9 @@ export function getReportScript(): string {
                 pkgRow.classList.remove('expanded');
                 /* HTML5 hidden boolean property — more portable than
                  * style.display='none' on table rows. Some webview renderers
-                 * (notably Cursor in certain builds) ignore inline display:none
-                 * on <tr>, so the detail-row stays visible while the chevron
-                 * stays right-pointing — exactly the bug this fixes. */
+                 * (notably the Cursor IDE in certain builds) ignore inline
+                 * display:none on <tr>, leaving the detail visible while the
+                 * chevron stays right-pointing — exactly the bug this fixes. */
                 detailRow.hidden = true;
             } else {
                 pkgRow.classList.add('expanded');

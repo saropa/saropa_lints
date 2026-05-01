@@ -2,7 +2,88 @@
 
 <!-- cspell:disable -->
 
-Archived releases 0.1.0 through 10.11.0. See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md) for the latest versions.
+Archived releases 0.1.0 through 12.4.0. See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md) for the latest versions.
+
+---
+
+## [12.4.0]
+
+Three animation-focused rules catch inert `Animation.value` reads in `build`, mis-matched ticker mixins, and press-and-bounce `forward()` without `from: 0.0`. Several platform rules and `avoid_platform_specific_imports` quiet down when the project cannot hit the failure mode (for example mobile-only apps without `web/`). Pubspec dependency discovery works again, saropa’s import rule is renamed to `saropa_depend_on_referenced_packages` so it no longer doubles the SDK lint, large reports open with triage-oriented sections, and Run Analysis popups show real issue counts. [log](https://github.com/saropa/saropa_lints/blob/v12.4.0/CHANGELOG.md)
+
+### Added
+
+- Added `avoid_inert_animation_value_in_build` (recommended, error) so you catch opacity and other reads that never refresh because `build` does not rerun on ticks, without noise on listening builders. No action required; see [bugs/infra_propose_avoid_inert_animation_value_in_build.md](bugs/infra_propose_avoid_inert_animation_value_in_build.md).
+- Added `prefer_single_ticker_provider_state_mixin` (recommended, info) so single-controller states use the lighter mixin and intent is obvious. No action required; see [bugs/infra_propose_prefer_single_ticker_provider_state_mixin.md](bugs/infra_propose_prefer_single_ticker_provider_state_mixin.md).
+- Added `prefer_animation_controller_forward_from_zero` (recommended, warning) with a quick fix so press-and-bounce gestures always restart from zero and feel consistent on rapid taps. No action required.
+
+### Changed
+
+- Consolidated analysis logs now lead with concentration, delta-since-last-run, and triage hints on large backlogs, and the top-rules table adds share, source, and fixable columns so you can prioritize work. No action required; see [bugs/infra_analysis_report_insufficient_for_large_backlogs.md](bugs/infra_analysis_report_insufficient_for_large_backlogs.md).
+
+### Fixed
+
+- Several “wrong platform” rules now bail when the repo cannot build the platform they warn about, so mobile-only and similar setups stop getting irrelevant noise. No action required; see [bugs/platform_gate_missing_from_sibling_rules.md](bugs/platform_gate_missing_from_sibling_rules.md).
+- `avoid_platform_specific_imports` stays silent when the Flutter app has no `web/` tree, since `dart:io` web breakage is not applicable there. No action required; see [bugs/avoid_platform_specific_imports_false_positive_non_web_project.md](bugs/avoid_platform_specific_imports_false_positive_non_web_project.md).
+- Pubspec dependency names parse correctly again so `hasDependency`-gated rules and import checks behave; this removes the flood of bogus “not in pubspec” findings. No action required; see [bugs/depend_on_referenced_packages_name_collision_with_sdk_lint.md](bugs/depend_on_referenced_packages_name_collision_with_sdk_lint.md).
+- Renamed saropa’s duplicate lint to `saropa_depend_on_referenced_packages` so counts and ignores align with the SDK’s `depend_on_referenced_packages`. Use `// ignore: saropa_depend_on_referenced_packages` or disable that code in `plugins: saropa_lints` if you only want to silence saropa’s copy; `// ignore: depend_on_referenced_packages` still targets the SDK lint only.
+- Analyzer-plugin reports populate the configuration block instead of showing “not captured,” so reports stay self-describing. No action required.
+- Extension Run Analysis warning popups show the real issue count from `violations.json` instead of a slice of progress stderr. No action required; see [bugs/infra_run_analysis_popup_dumps_progress_stderr.md](bugs/infra_run_analysis_popup_dumps_progress_stderr.md).
+
+<details>
+<summary>Maintenance</summary>
+
+- Internal tweak to `prefer_animation_controller_forward_from_zero` detection so publish CI anti-pattern gates stay satisfied; rule behavior unchanged. No action required for consumers.
+
+</details>
+
+---
+
+## [12.3.4]
+
+New `avoid_drift_insert_missing_conflict_target` flags Drift inserts that omit the right `onConflict` target on tables with a non-primary unique index, matching the class of SQLite `UNIQUE` failures you otherwise hit at runtime. [log](https://github.com/saropa/saropa_lints/blob/v12.3.4/CHANGELOG.md)
+
+### Added
+
+- Added `avoid_drift_insert_missing_conflict_target` (essential, error) so Drift inserts declare the correct conflict target when a non-PK unique index exists and you avoid silent `SqliteException` failures. No action required; see [bugs/infra_new_rule_drift_insert_missing_conflict_target.md](bugs/infra_new_rule_drift_insert_missing_conflict_target.md).
+
+---
+
+## [12.3.3]
+
+Path-safety rules ignore clearly safe literal-only helpers and common Dart SDK path sources, `avoid_null_assertion` skips typical `RegExpMatch.group(n)!` after a match, and `prefer_debug_print` stops recommending Flutter-only APIs in pure Dart packages. [log](https://github.com/saropa/saropa_lints/blob/v12.3.3/CHANGELOG.md)
+
+### Fixed
+
+- `avoid_path_traversal` and `require_file_path_sanitization` no longer flag private helpers fed only literals or paths resolved via trusted SDK entry points, so asset helpers and similar code stay clean while real taint stays covered. No action required; see [bugs/avoid_path_traversal_false_positive_internal_resolver_parameter.md](bugs/avoid_path_traversal_false_positive_internal_resolver_parameter.md) and [bugs/require_file_path_sanitization_false_positive_internal_resolver_parameter.md](bugs/require_file_path_sanitization_false_positive_internal_resolver_parameter.md).
+- `prefer_debug_print` is skipped for non-Flutter packages so you are not told to import Flutter just to silence `print` guidance. No action required; see [bugs/prefer_debug_print_false_positive_pure_dart_package.md](bugs/prefer_debug_print_false_positive_pure_dart_package.md).
+- `avoid_null_assertion` allows `RegExpMatch.group(n)!` on matched regex results so you are not pushed into dead null-fallbacks for common parsing loops. No action required; see [bugs/avoid_null_assertion_false_positive_regex_match_group.md](bugs/avoid_null_assertion_false_positive_regex_match_group.md).
+
+---
+
+## [12.3.2]
+
+`saropa_lints` itself passes `dart analyze --fatal-infos` again thanks to dogfood-only disables and small plugin fixes; publish script gains a publish-existing-.vsix mode. [log](https://github.com/saropa/saropa_lints/blob/v12.3.2/CHANGELOG.md)
+
+### Fixed
+
+- `dart analyze --fatal-infos` is clean on saropa_lints itself via targeted code fixes plus dogfood-only disables in this repo’s `analysis_options.yaml`, so maintainers can ship without thousands of self-applied rule hits while published consumer behavior is unchanged. No action required for package users.
+
+<details>
+<summary>Maintenance</summary>
+
+- Publish script adds mode 7 to publish the newest packaged `.vsix` without repackaging after `pubspec`/`package.json` post-publish bumps, avoiding version skew when finishing a partial extension release. No action required for package users.
+
+</details>
+
+---
+
+## [12.3.1]
+
+Hotfix: tier-based `scan` and similar flows no longer crash on the second file when rule packs merge into an unmodifiable tier set. [log](https://github.com/saropa/saropa_lints/blob/v12.3.1/CHANGELOG.md)
+
+### Fixed
+
+- Rule-pack reload now copies enabled-rule sets before mutating them, so `scan` with `essential`/`recommended` tiers and pack merges no longer throws on the second analyzed file. No action required.
 
 ---
 

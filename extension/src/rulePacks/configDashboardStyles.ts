@@ -94,13 +94,35 @@ function packTableSpecifics(): string {
 function disabledRulesStyles(): string {
   return `
 .disabled-rules { margin-bottom: 14px; }
-.disabled-rules h3 {
-  font-size: 0.95em;
+/* Group heading sits inside the expander (rule packs already use h2 in the summary).
+   Lower visual weight than h2 so the section heading still anchors the block. */
+.disabled-rules-group { margin: 8px 0 0; }
+.disabled-rules-group-heading {
+  font-size: 0.85em;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--muted);
-  margin: 0 0 6px;
+  margin: 0 0 4px;
   font-weight: 600;
+}
+.disabled-rules-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 6px 0 8px;
+}
+.disabled-rules-search {
+  flex: 0 1 320px;
+  padding: 4px 8px;
+  font: inherit;
+  color: var(--vscode-input-foreground);
+  background: var(--vscode-input-background);
+  border: 1px solid var(--vscode-input-border, var(--border));
+  border-radius: 4px;
+}
+.disabled-rules-search:focus {
+  outline: 1px solid var(--vscode-focusBorder);
+  outline-offset: -1px;
 }
 .disabled-rules-list {
   list-style: none;
@@ -123,6 +145,44 @@ function disabledRulesStyles(): string {
 }
 .disabled-rule-row:hover { background: var(--vscode-list-hoverBackground); }
 .disabled-rule-row code { font-size: 0.92em; flex: 1; min-width: 0; }
+
+/* ------ Section expander chrome (Rule packs + Disabled rules) ------
+   Native <details> with a styled summary so the user can collapse long sections.
+   Hide the default disclosure marker and supply a custom rotating chevron so the
+   summary aligns with the existing .section h2 visual. */
+details.expander { margin-bottom: 14px; }
+details.expander > summary {
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0 0 8px;
+  font-size: 1.05em;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+details.expander > summary::-webkit-details-marker { display: none; }
+details.expander > summary::before {
+  content: '▶';
+  display: inline-block;
+  font-size: 0.7em;
+  width: 0.9em;
+  color: var(--muted);
+  transition: transform 0.15s ease;
+}
+details.expander[open] > summary::before { transform: rotate(90deg); }
+details.expander > summary .muted {
+  font-size: 0.82em;
+  font-weight: 500;
+  color: var(--muted);
+}
+details.expander > summary:focus-visible {
+  outline: 1px solid var(--vscode-focusBorder);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
 `;
 }
 

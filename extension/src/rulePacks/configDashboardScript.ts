@@ -1,0 +1,412 @@
+/**
+ * Client script for the **Lints Config** webview (postMessage bridge).
+ *
+ * Wires:
+ * - tier radio control (posts `setTier`)
+ * - pack toggle switches (posts `toggle`)
+ * - rule list links (posts `showRules`)
+ * - toolbar action buttons (posts `command`)
+ * - native `<details class="more">` overflow menu for "Enable applicable packs"
+ *   (matches the Findings dashboard's overflow-trigger pattern)
+ * - KPI cards as preset filters (§14.8)
+ * - chart bars + donut segments as preset filters (§6.2)
+ * - text search, type select, detected/enabled segmented control
+ * - sortable column headers
+ * - active filter chip strip rendering (§8.5, §14.10)
+ *
+ * Selectors track the shared chrome class names from `views/dashboardChromeStyles.ts`
+ * (.btn, .chip-strip, .chip, .seg, .seg-btn, .menu .menu-item, .bar-row, .donut .seg) so
+ * the dashboard behaves the same as Findings and Code Health where the same selectors apply.
+ */
+export function getConfigDashboardScript(): string {
+  return [
+    SCRIPT_PREAMBLE,
+    SCRIPT_TIER_AND_TOGGLES,
+    SCRIPT_TOOLBAR_ACTIONS,
+    SCRIPT_FILTER_STATE,
+    SCRIPT_FILTER_APPLY,
+    SCRIPT_SORT,
+    SCRIPT_KPI_AND_CHART,
+    SCRIPT_DISABLED_RULES_SEARCH,
+    SCRIPT_INIT,
+  ].join('\n');
+}
+
+/** Acquire the VS Code API and stash filter state on a single object. */
+const SCRIPT_PREAMBLE = `
+(function() {
+  const vscode = acquireVsCodeApi();
+  const state = {
+    search: '',
+    type: 'all',
+    detectedOnly: false,
+    enabledOnly: false,
+    sortKey: 'rules',
+    sortDir: 'desc',
+    /** When set, rows are filtered to a single pack — used by chart-bar/donut-segment clicks. */
+    barPack: null,
+    /** When set, KPI preset filter is active ('enabled' or 'applicable-sdk'). */
+    kpi: null,
+  };
+`;
+
+/** Tier radio control + toggle switches + rules link wiring. */
+const SCRIPT_TIER_AND_TOGGLES = `
+  document.querySelectorAll('.tier-btn[data-tier]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      const tier = btn.getAttribute('data-tier');
+      if (tier) vscode.postMessage({ type: 'setTier', tier: tier });
+    });
+    btn.addEventListener('keydown', function(e) {
+      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+      e.preventDefault();
+      const buttons = Array.from(document.querySelectorAll('.tier-btn[data-tier]'));
+      const idx = buttons.indexOf(btn);
+      if (idx < 0) return;
+      const next = (e.key === 'ArrowRight' ? idx + 1 : idx - 1 + buttons.length) % buttons.length;
+      buttons[next].focus();
+      buttons[next].click();
+    });
+  });
+
+  document.querySelectorAll('input[type=checkbox][data-pack]').forEach(function(el) {
+    el.addEventListener('change', function() {
+      vscode.postMessage({ type: 'toggle', packId: el.getAttribute('data-pack'), enabled: el.checked });
+    });
+  });
+
+  document.querySelectorAll('a.rules-link').forEach(function(a) {
+    a.addEventListener('click', function(e) {
+      e.preventDefault();
+      const id = a.getAttribute('data-pack');
+      vscode.postMessage({ type: 'showRules', packId: id });
+    });
+  });
+`;
+
+/**
+ * Toolbar action buttons + overflow menu items. Matches the Findings dashboard's pattern:
+ * `.btn[data-command]` for primary/secondary actions; `.menu .menu-item[data-command]` for
+ * items inside the native `<details class="more">` overflow menu (which closes on its own
+ * when the user clicks outside since `<details>` handles open/close natively).
+ */
+const SCRIPT_TOOLBAR_ACTIONS = `
+  document.querySelectorAll('.btn[data-command], .menu-item[data-command]').forEach(function(el) {
+    el.addEventListener('click', function() {
+      if (el.disabled) return;
+      vscode.postMessage({ type: 'command', id: el.getAttribute('data-command') });
+      // After a menu-item click, close the overflow so the next user action is unambiguous.
+      const containingDetails = el.closest('details.more');
+      if (containingDetails) containingDetails.removeAttribute('open');
+    });
+  });
+  // Click anywhere else on the page closes any open overflow menu (matches macOS / Windows
+  // menu conventions).
+  document.addEventListener('click', function(e) {
+    document.querySelectorAll('details.more[open]').forEach(function(d) {
+      if (!d.contains(e.target)) d.removeAttribute('open');
+    });
+  });
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('details.more[open]').forEach(function(d) { d.removeAttribute('open'); });
+    }
+  });
+`;
+
+/** Search field, type select, and the segmented-control toggles wired to {@link state}. */
+const SCRIPT_FILTER_STATE = `
+  const searchInput = document.getElementById('pack-search');
+  const typeSelect = document.getElementById('type-filter');
+
+  if (searchInput) {
+    searchInput.addEventListener('input', function() {
+      state.search = (searchInput.value || '').toLowerCase();
+      applyFilters();
+    });
+  }
+  if (typeSelect) {
+    typeSelect.addEventListener('change', function() {
+      state.type = typeSelect.value || 'all';
+      applyFilters();
+    });
+  }
+  // Segmented toggles for "detected only" / "enabled only". Matches the Findings dashboard's
+  // segmented-control pattern instead of bare checkboxes so the visual language is shared.
+  document.querySelectorAll('.seg-btn[data-toggle-filter]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      const key = btn.getAttribute('data-toggle-filter');
+      const pressed = btn.getAttribute('aria-pressed') === 'true';
+      btn.setAttribute('aria-pressed', pressed ? 'false' : 'true');
+      if (key === 'detected') state.detectedOnly = !pressed;
+      else if (key === 'enabled') state.enabledOnly = !pressed;
+      applyFilters();
+    });
+  });
+`;
+
+/** Apply current filter state to rows + render the active-filter chip strip. */
+const SCRIPT_FILTER_APPLY = `
+  function applyFilters() {
+    const tbody = document.getElementById('packs-tbody');
+    if (!tbody) return;
+    const rows = Array.from(tbody.querySelectorAll('tr[data-pack]'));
+    let visible = 0;
+    rows.forEach(function(row) {
+      const label = row.getAttribute('data-label') || '';
+      const type = row.getAttribute('data-type') || '';
+      const detected = row.getAttribute('data-detected') === '1';
+      const enabled = row.getAttribute('data-enabled') === '1';
+      const pack = row.getAttribute('data-pack') || '';
+      let show = true;
+      if (state.search && label.indexOf(state.search) === -1) show = false;
+      if (state.type !== 'all' && state.type !== type) show = false;
+      if (state.detectedOnly && !detected) show = false;
+      if (state.enabledOnly && !enabled) show = false;
+      if (state.barPack && state.barPack !== pack) show = false;
+      if (state.kpi === 'enabled' && !enabled) show = false;
+      if (state.kpi === 'applicable-sdk' && !(type === 'sdk' && detected)) show = false;
+      row.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+    renderEmptyRow(visible);
+    renderFilterStrip();
+  }
+
+  function renderEmptyRow(visible) {
+    const tbody = document.getElementById('packs-tbody');
+    if (!tbody) return;
+    let empty = tbody.querySelector('tr.empty-row');
+    if (visible > 0) {
+      if (empty) empty.remove();
+      return;
+    }
+    if (!empty) {
+      empty = document.createElement('tr');
+      empty.className = 'empty-row';
+      empty.innerHTML = '<td colspan="7">No packs match the current filters. ' +
+        '<button type="button" class="reset-link" id="reset-filters-btn">Reset filters</button></td>';
+      tbody.appendChild(empty);
+      const btn = document.getElementById('reset-filters-btn');
+      if (btn) btn.addEventListener('click', resetFilters);
+    }
+  }
+
+  function resetFilters() {
+    state.search = '';
+    state.type = 'all';
+    state.detectedOnly = false;
+    state.enabledOnly = false;
+    state.barPack = null;
+    state.kpi = null;
+    if (searchInput) searchInput.value = '';
+    if (typeSelect) typeSelect.value = 'all';
+    document.querySelectorAll('.seg-btn[data-toggle-filter]').forEach(function(b) {
+      b.setAttribute('aria-pressed', 'false');
+    });
+    document.querySelectorAll('.kpi-card.active').forEach(function(c) { c.classList.remove('active'); });
+    document.querySelectorAll('.bar-row.active, .donut .seg.active').forEach(function(b) {
+      b.classList.remove('active');
+    });
+    const donut = document.querySelector('.donut');
+    if (donut) donut.removeAttribute('data-has-active');
+    applyFilters();
+  }
+
+  function renderFilterStrip() {
+    const strip = document.getElementById('filter-strip');
+    if (!strip) return;
+    const chips = [];
+    if (state.search) chips.push({ key: 'search', label: 'search: "' + escapeHtml(state.search) + '"' });
+    if (state.type !== 'all') chips.push({ key: 'type', label: 'type: ' + state.type });
+    if (state.detectedOnly) chips.push({ key: 'detected', label: 'detected only' });
+    if (state.enabledOnly) chips.push({ key: 'enabled', label: 'enabled only' });
+    if (state.barPack) chips.push({ key: 'bar', label: 'pack: ' + escapeHtml(state.barPack) });
+    if (state.kpi === 'enabled') chips.push({ key: 'kpi-enabled', label: 'KPI: enabled' });
+    if (state.kpi === 'applicable-sdk') chips.push({ key: 'kpi-applicable-sdk', label: 'KPI: applicable SDK' });
+    if (chips.length === 0) {
+      strip.hidden = true;
+      strip.innerHTML = '';
+      return;
+    }
+    strip.hidden = false;
+    const html = ['<span class="lbl">Active filters:</span>'];
+    chips.forEach(function(chip) {
+      html.push('<span class="chip">' + chip.label +
+        '<button type="button" class="x" data-chip="' + chip.key + '" aria-label="Remove ' + chip.key + '">×</button></span>');
+    });
+    html.push('<button type="button" class="clear-all" id="clear-all-filters">Clear all</button>');
+    strip.innerHTML = html.join('');
+    strip.querySelectorAll('.chip .x').forEach(function(btn) {
+      btn.addEventListener('click', function() { removeChip(btn.getAttribute('data-chip')); });
+    });
+    const clearBtn = document.getElementById('clear-all-filters');
+    if (clearBtn) clearBtn.addEventListener('click', resetFilters);
+  }
+
+  function removeChip(key) {
+    if (key === 'search') { state.search = ''; if (searchInput) searchInput.value = ''; }
+    else if (key === 'type') { state.type = 'all'; if (typeSelect) typeSelect.value = 'all'; }
+    else if (key === 'detected') {
+      state.detectedOnly = false;
+      const b = document.querySelector('.seg-btn[data-toggle-filter="detected"]');
+      if (b) b.setAttribute('aria-pressed', 'false');
+    }
+    else if (key === 'enabled') {
+      state.enabledOnly = false;
+      const b = document.querySelector('.seg-btn[data-toggle-filter="enabled"]');
+      if (b) b.setAttribute('aria-pressed', 'false');
+    }
+    else if (key === 'bar') {
+      state.barPack = null;
+      document.querySelectorAll('.bar-row.active, .donut .seg.active').forEach(function(b) {
+        b.classList.remove('active');
+      });
+      const donut = document.querySelector('.donut');
+      if (donut) donut.removeAttribute('data-has-active');
+    }
+    else if (key === 'kpi-enabled' || key === 'kpi-applicable-sdk') {
+      state.kpi = null;
+      document.querySelectorAll('.kpi-card.active').forEach(function(c) { c.classList.remove('active'); });
+    }
+    applyFilters();
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+`;
+
+/** Sortable column headers — toggles direction; numeric vs text sort by data-sort key. */
+const SCRIPT_SORT = `
+  document.querySelectorAll('th.sortable[data-sort]').forEach(function(th) {
+    th.addEventListener('click', function() {
+      const key = th.getAttribute('data-sort');
+      if (!key) return;
+      if (state.sortKey === key) {
+        state.sortDir = state.sortDir === 'asc' ? 'desc' : 'asc';
+      } else {
+        state.sortKey = key;
+        state.sortDir = key === 'rules' ? 'desc' : 'asc';
+      }
+      applySort();
+    });
+  });
+
+  function applySort() {
+    const tbody = document.getElementById('packs-tbody');
+    if (!tbody) return;
+    const rows = Array.from(tbody.querySelectorAll('tr[data-pack]'));
+    const numericKeys = { rules: true, detected: true, enabled: true };
+    rows.sort(function(a, b) {
+      const av = a.getAttribute('data-' + state.sortKey) || '';
+      const bv = b.getAttribute('data-' + state.sortKey) || '';
+      let cmp;
+      if (numericKeys[state.sortKey]) {
+        cmp = (parseInt(av, 10) || 0) - (parseInt(bv, 10) || 0);
+      } else {
+        cmp = av.localeCompare(bv);
+      }
+      return state.sortDir === 'asc' ? cmp : -cmp;
+    });
+    rows.forEach(function(r) { tbody.appendChild(r); });
+    document.querySelectorAll('th.sortable').forEach(function(h) {
+      h.setAttribute('aria-sort',
+        h.getAttribute('data-sort') === state.sortKey
+          ? (state.sortDir === 'asc' ? 'ascending' : 'descending')
+          : 'none');
+    });
+  }
+`;
+
+/** KPI cards and chart bars/donut segments wired as preset filters (§14.8, §6.2). */
+const SCRIPT_KPI_AND_CHART = `
+  document.querySelectorAll('.kpi-card.interactive[data-kpi-filter]').forEach(function(card) {
+    card.addEventListener('click', function() {
+      const key = card.getAttribute('data-kpi-filter');
+      const wasActive = card.classList.contains('active');
+      document.querySelectorAll('.kpi-card.active').forEach(function(c) { c.classList.remove('active'); });
+      state.kpi = wasActive ? null : key;
+      if (state.kpi) card.classList.add('active');
+      applyFilters();
+    });
+  });
+
+  // Bars and donut segments share one click contract: any element with [data-bar-pack] toggles
+  // the same pack filter and cross-highlights the matching elements in the other visualization.
+  document.querySelectorAll('[data-bar-pack]').forEach(function(target) {
+    function trigger() {
+      const pack = target.getAttribute('data-bar-pack');
+      const wasActive = state.barPack === pack;
+      document.querySelectorAll('.bar-row.active, .donut .seg.active').forEach(function(b) {
+        b.classList.remove('active');
+      });
+      state.barPack = wasActive ? null : pack;
+      const donut = document.querySelector('.donut');
+      if (state.barPack) {
+        document.querySelectorAll('[data-bar-pack="' + cssEscape(pack) + '"]').forEach(function(el) {
+          el.classList.add('active');
+        });
+        if (donut) donut.setAttribute('data-has-active', '1');
+      } else if (donut) {
+        donut.removeAttribute('data-has-active');
+      }
+      applyFilters();
+      const tbl = document.getElementById('packs-table');
+      if (tbl && state.barPack) tbl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    target.addEventListener('click', trigger);
+    target.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); trigger(); }
+    });
+  });
+
+  function cssEscape(s) {
+    if (window.CSS && typeof window.CSS.escape === 'function') return window.CSS.escape(s);
+    return String(s).replace(/[^a-zA-Z0-9_-]/g, '\\\\$&');
+  }
+`;
+
+/** Initial render. */
+/**
+ * Live-filter the Disabled rules section by rule name (substring match, case-insensitive).
+ * Hides empty groups and shows an inline empty-state hint when no rule matches the query.
+ *
+ * Why a separate filter instead of reusing the packs filter state: the disabled-rules block
+ * is a different dataset (individual rule codes, not packs) and lives in its own expander —
+ * sharing the packs search would surprise users who only want to narrow one of the two.
+ */
+const SCRIPT_DISABLED_RULES_SEARCH = `
+  function applyDisabledRulesSearch() {
+    const input = document.getElementById('disabled-rules-search');
+    if (!input) return;
+    const q = (input.value || '').trim().toLowerCase();
+    let totalVisible = 0;
+    document.querySelectorAll('.disabled-rules-group').forEach(function(group) {
+      let groupVisible = 0;
+      group.querySelectorAll('.disabled-rule-row').forEach(function(row) {
+        const name = (row.getAttribute('data-rule') || '').toLowerCase();
+        const show = !q || name.indexOf(q) !== -1;
+        row.style.display = show ? '' : 'none';
+        if (show) groupVisible++;
+      });
+      // Hide the whole group (including its heading) when no rule survives the filter,
+      // so the user does not see lonely group headings with empty lists below.
+      group.style.display = groupVisible === 0 ? 'none' : '';
+      totalVisible += groupVisible;
+    });
+    const emptyHint = document.getElementById('disabled-rules-empty-hint');
+    if (emptyHint) emptyHint.hidden = totalVisible !== 0 || !q;
+  }
+  (function wireDisabledRulesSearch() {
+    const input = document.getElementById('disabled-rules-search');
+    if (!input) return;
+    input.addEventListener('input', applyDisabledRulesSearch);
+  })();
+`;
+
+const SCRIPT_INIT = `
+  applySort();
+  applyFilters();
+})();
+`;

@@ -270,7 +270,11 @@ export class RulePacksWebviewProvider {
   /** Opens or focuses the Config Dashboard in the editor area and rebuilds HTML. */
   openEditorPanel(): void {
     if (this._panel) {
-      this._panel.reveal(vscode.ViewColumn.One, true);
+      // preserveFocus=false: reclicking the sidebar entry must move focus into
+      // the dashboard so keyboard users can immediately interact with it. The
+      // previous `true` left focus on the sidebar tree row, which made the
+      // reclick feel like a no-op.
+      this._panel.reveal(vscode.ViewColumn.One, false);
       this.refresh();
       return;
     }
@@ -661,14 +665,19 @@ export class RulePacksWebviewProvider {
   </div>`;
   }
 
-  /** Combined packs table — one schema, Type column, sortable headers, sticky header (§14.13). */
+  /** Combined packs table — one schema, Type column, sortable headers, sticky header (§14.13).
+   *
+   * Wrapped in `<details open>` so the user can collapse the (long) packs table when they want
+   * to focus on the Disabled rules block below. Defaulted open because the packs table is the
+   * primary content of the dashboard.
+   */
   private _buildPackTable(ctx: DashboardContext): string {
     const rows = [...ctx.packRows]
       .sort((a, b) => b.rules - a.rules || a.label.localeCompare(b.label))
       .map((row) => this._buildPackRow(row))
       .join('\n');
-    return `<section class="section" aria-label="Rule packs">
-  <h2>Rule packs</h2>
+    return `<details class="section expander" aria-label="Rule packs" open>
+  <summary><span class="expander-title">Rule packs</span> <span class="muted">(${ctx.packRows.length})</span></summary>
   <div class="dash-table-wrap">
     <table class="dash-table packs" id="packs-table">
       <thead>
@@ -685,7 +694,7 @@ export class RulePacksWebviewProvider {
       <tbody id="packs-tbody">${rows}</tbody>
     </table>
   </div>
-</section>`;
+</details>`;
   }
 
   /**
@@ -834,25 +843,69 @@ export class RulePacksWebviewProvider {
    */
   private _buildDisabledRulesSection(ctx: DashboardContext): string {
     const count = ctx.disabledRules.length;
-    const heading = `<h3>Disabled rules <span class="muted">(${count})</span></h3>`;
+    const summary = `<summary><span class="expander-title">Disabled rules</span> <span class="muted">(${count})</span></summary>`;
     if (count === 0) {
-      return `<section class="disabled-rules" aria-label="Disabled rules">
-  ${heading}
+      // Collapsed by default even when empty: empty state rarely needs immediate attention,
+      // and keeping the same `<details>` shell avoids a visual jump if a rule is later disabled.
+      return `<details class="section expander disabled-rules" aria-label="Disabled rules">
+  ${summary}
   <p class="hint">No rules are currently disabled by override. When you disable a rule (right-click in Issues, or the Triage panel), it appears here with a one-click re-enable.</p>
-</section>`;
+</details>`;
     }
-    const rows = ctx.disabledRules.map((rule) => {
-      const id = `enableRule:${rule}`;
-      return `<li class="disabled-rule-row">
-    <code>${escapeHtml(rule)}</code>
-    <button type="button" class="btn tier-3" data-command="${escapeHtml(id)}" title="Re-enable ${escapeHtml(rule)}">Re-enable</button>
+    // Build rule → owning pack labels map. A rule may belong to multiple packs; the first
+    // pack (alphabetical by RULE_PACK_DEFINITIONS order) wins for grouping so each rule
+    // appears exactly once in the UI. Rules not in any pack land in a "Tier-only" bucket.
+    const ruleToPack = new Map<string, string>();
+    for (const def of RULE_PACK_DEFINITIONS) {
+      for (const code of def.ruleCodes) {
+        if (!ruleToPack.has(code)) ruleToPack.set(code, def.label);
+      }
+    }
+    const TIER_ONLY = 'Tier-only (no pack)';
+    const groups = new Map<string, string[]>();
+    for (const rule of ctx.disabledRules) {
+      const groupName = ruleToPack.get(rule) ?? TIER_ONLY;
+      const list = groups.get(groupName);
+      if (list) {
+        list.push(rule);
+      } else {
+        groups.set(groupName, [rule]);
+      }
+    }
+    // Sort: real packs alphabetically first, then "Tier-only" bucket last so the catch-all
+    // doesn't outrank named packs in the visual hierarchy.
+    const sortedGroupNames = [...groups.keys()].sort((a, b) => {
+      if (a === TIER_ONLY) return 1;
+      if (b === TIER_ONLY) return -1;
+      return a.localeCompare(b);
+    });
+    const groupHtml = sortedGroupNames.map((groupName) => {
+      const rules = groups.get(groupName)!;
+      const rows = rules.map((rule) => {
+        const id = `enableRule:${rule}`;
+        const ruleEsc = escapeHtml(rule);
+        return `<li class="disabled-rule-row" data-rule="${ruleEsc}">
+    <code>${ruleEsc}</code>
+    <button type="button" class="btn tier-3" data-command="${escapeHtml(id)}" title="Re-enable ${ruleEsc}">Re-enable</button>
   </li>`;
-    }).join('\n');
-    return `<section class="disabled-rules" aria-label="Disabled rules">
-  ${heading}
-  <p class="hint">These rules are turned off via overrides in <code>analysis_options_custom.yaml</code>. Re-enable a rule below; the file is managed by the extension — no manual editing required.</p>
+      }).join('\n');
+      const groupEsc = escapeHtml(groupName);
+      return `<div class="disabled-rules-group" data-group="${groupEsc}">
+  <h4 class="disabled-rules-group-heading">${groupEsc} <span class="muted">(${rules.length})</span></h4>
   <ul class="disabled-rules-list">${rows}</ul>
-</section>`;
+</div>`;
+    }).join('\n');
+    return `<details class="section expander disabled-rules" aria-label="Disabled rules">
+  ${summary}
+  <p class="hint">These rules are turned off via overrides in <code>analysis_options_custom.yaml</code>. Re-enable a rule below; the file is managed by the extension — no manual editing required.</p>
+  <div class="disabled-rules-toolbar">
+    <input type="search" id="disabled-rules-search" class="disabled-rules-search" placeholder="Search disabled rules…" aria-label="Search disabled rules" autocomplete="off" spellcheck="false" />
+    <span class="muted disabled-rules-empty-hint" id="disabled-rules-empty-hint" hidden>No disabled rules match.</span>
+  </div>
+  <div class="disabled-rules-groups">
+    ${groupHtml}
+  </div>
+</details>`;
   }
 
   /** Diagnostics band: suppressions, target platforms, docs (§14.7 step 6, §14.14). */
@@ -894,9 +947,14 @@ export class RulePacksWebviewProvider {
 
   private _wrapHtml(body: string, scripts: boolean): string {
     const nonce = createWebviewCspNonce();
+    // 'unsafe-inline' on style-src: hero coverage gauge sets dynamic CSS vars
+    // (--gauge-target, --gauge-arc, --gauge-color) via inline style="..." attributes.
+    // CSP nonces only authorize <style> blocks, not style attributes — without
+    // 'unsafe-inline' the vars are dropped, the dasharray falls back to 0, and the
+    // gauge renders as a tiny dot.
     const csp = [
       "default-src 'none'",
-      `style-src 'nonce-${nonce}'`,
+      `style-src 'nonce-${nonce}' 'unsafe-inline'`,
       scripts ? `script-src 'nonce-${nonce}'` : '',
     ]
       .filter(Boolean)

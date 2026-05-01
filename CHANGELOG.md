@@ -67,18 +67,7 @@ This release rebuilds the VS Code extension around a single dashboard look so th
 - The **Saropa Known Issues** library now treats its summary cards as click-to-filter presets (Showing / Total / Has replacement / No replacement) and replaces the binary checkbox with a multi-toggle segmented control, so each card maps to a distinct filter state instead of acting as decoration. No action required.
 - The **Saropa Package Comparison** panel moves the recommendation summary below the comparison table — the user's reason for opening the panel is the data, not the synthesis — and the empty-state still leads with the Saropa-prefixed hero so the page identity is visible before content arrives. No action required.
 - The **Saropa Related Rule Telemetry** panel adopts the shared toolbar band, KPI-style empty state, and `Refresh / Copy JSON / Reset counters` density tiers (one primary, two secondary, destructive last) so it stops looking like a one-off debug page and matches the rest of the editor surfaces. No action required.
-
-### Removed (Extension)
-
-- The **Composite analyzer plugin (scaffold)** row is removed from the Saropa Lints sidebar (both the **Config** tree and the sectioned sidebar) because the action only applies to teams that ship their own custom analyzer rules alongside Saropa, and the term was jargon for the typical user. The action stays available via the command palette (`Saropa Lints: Create Composite Analyzer Plugin (scaffold)`), `Saropa Lints: Show All Commands`, the CLI flag `dart run saropa_lints:init --emit-composite-plugin-scaffold`, and `doc/guides/composite_analyzer_plugin.md`. No action required.
-- The palette entry **Saropa Lints: Focus Violations View** (`saropaLints.focusView`) is removed because it did not focus a violations tree and duplicated **Open Overview** behavior; the main Saropa status bar still opens the Overview view via the same underlying focus command. No action unless you referenced `saropaLints.focusView` in keybindings or tasks—use `saropaLints.overview.focus` instead.
-- The **Violations** activity-bar tree (`saropaLints.issues`) is **removed from the extension manifest** so lint findings are not hosted in a duplicate sidebar; use the **Findings Dashboard** editor tab and the `$(warning)` status item. The **`saropaLints.sidebar.showIssues`** setting is removed—delete it from JSON if present.
-- The **Commands** sidebar webview (`saropaLints.commandCatalogSidebar`) and **`saropaLints.sidebar.showCommandCatalog`** are removed; **Browse All Commands** / **Command Catalog** open the **editor tab** only.
-- The Project Vibrancy sidebar view and its refresh command are removed so function-level vibrancy lives only in the editor-area report, which removes duplicate UI and avoids cramped sidebar layouts. Use **Saropa Lints: Open Code Health Dashboard** (Command Palette or Saropa navigation where offered). No config change.
-- **Summary**, **Suppressions**, **Suggestions**, **Security Posture**, **File Risk**, **TODOs & Hacks**, **Drift Advisor**, **Package Vibrancy** (dependency tree), and **Package Details** (sidebar webview) are **removed from the Saropa activity bar**; use the **Findings Dashboard**, **Lints Config**, **Package Dashboard**, and Command Palette instead. Delete **`saropaLints.sidebar.showSummary`** through **`saropaLints.sidebar.showDriftAdvisor`** from settings JSON if you set them explicitly—only **`saropaLints.sidebar.showOverview`** remains under Activity bar.
-
-### Changed (Extension)
-
+- The **Saropa Package Dashboard** and **Saropa Command Catalog** hero bands now match the Findings dashboard's contained, rounded panel with focus-tinted border, soft radial gradient over the editor-widget surface, and a short fade-in on mount — replacing the bare flex container and the full-bleed gradient stripe respectively, so all four editor dashboards open with the same visual signature. No action required.
 - The **Command Catalog** editor tab is redesigned around the editor-dashboard guidelines so the 156-command list no longer reads as one uniform wall: the marketing subtitle is replaced with a real status line (commands, categories, recent count, internal-hidden), search and the context-menu toggle live in one sticky toolbar band with an inline (×) clear and an active-filter chip strip, the **Recent** strip caps at six chips behind **+N more** above a new usage-ranked **Frequent** band, rows are slimmed to icon + title + one-line description with the command id revealed via a hover-only **copy** affordance and tooltip, category cards lose their borders for sticky uppercase microlabel headers, count badges become click-to-jump anchors that flash the target section, and Up/Down/Home/End navigate visible rows for keyboard-first browsing. No action required.
 - The Saropa activity bar now hosts a **single flat sidebar** named **Saropa Lints** instead of the previous **Dashboards** + **Overview & options** split, with no in-panel group headers; editor-tab dashboards, run/discover actions, project status rows, settings toggles, triage groups, and help links all sit at the top level so duplicate copies of **Run analysis**, **Getting Started**, **About**, and **pub.dev** are gone. No action required; if you set `saropaLints.sidebar.showOverview` to `false` it now hides the unified view.
 - The **Dashboards** activity-bar hub drops the **Violations tools** row group; the same filter, grouping, suppression, and navigation commands remain on the **Findings Dashboard** tab (toolbar + **More commands**) and in the Command Palette. No config change.
@@ -103,9 +92,27 @@ This release rebuilds the VS Code extension around a single dashboard look so th
 - Editor-area dashboards (**Package Vibrancy**, **Package Details**, **Telemetry**, **Command Catalog**) now use a consistent pill-shaped button style with secondary-button theme tokens, so the toolbar / action buttons read the same across these dashboards and contrast correctly in light, dark, and high-contrast themes. No action required.
 - Improved readability of detail and summary panels in the **Package Vibrancy** report and **Package Details** view: bumped tiny 0.8–0.85em text to 0.9–0.95em and replaced low `opacity: 0.6` muting on labels with the theme-aware `descriptionForeground` token, so panels like **Health Score**, summary cards, and gap-table cards stay legible (and WCAG-compliant) in light, dark, and high-contrast themes. No action required.
 - The **Findings Dashboard** **Severity mix** and **Impact mix** charts hide rows whose count is zero (and show a single muted **No findings.** line when every bucket is empty) so empty tracks no longer pad the chart cards. No action required.
+- The **Lints Config** *Rule packs* table and *Disabled rules* block are now collapsible expanders — packs open by default, the (previously wall-of-text) disabled-rules block starts collapsed — so the dashboard reads as two intentional sections instead of one long scroll. No action required.
+- The **Lints Config** *Disabled rules* block now ships with a search input and groups rules by their owning rule pack (with a *Tier-only (no pack)* bucket last), so triaging large override lists is one search box instead of an alphabetical scroll. No action required.
+
+### Removed (Extension)
+
+- The **Composite analyzer plugin (scaffold)** row is removed from the Saropa Lints sidebar (both the **Config** tree and the sectioned sidebar) because the action only applies to teams that ship their own custom analyzer rules alongside Saropa, and the term was jargon for the typical user. The action stays available via the command palette (`Saropa Lints: Create Composite Analyzer Plugin (scaffold)`), `Saropa Lints: Show All Commands`, the CLI flag `dart run saropa_lints:init --emit-composite-plugin-scaffold`, and `doc/guides/composite_analyzer_plugin.md`. No action required.
+- The palette entry **Saropa Lints: Focus Violations View** (`saropaLints.focusView`) is removed because it did not focus a violations tree and duplicated **Open Overview** behavior; the main Saropa status bar still opens the Overview view via the same underlying focus command. No action unless you referenced `saropaLints.focusView` in keybindings or tasks—use `saropaLints.overview.focus` instead.
+- The **Violations** activity-bar tree (`saropaLints.issues`) is **removed from the extension manifest** so lint findings are not hosted in a duplicate sidebar; use the **Findings Dashboard** editor tab and the `$(warning)` status item. The **`saropaLints.sidebar.showIssues`** setting is removed—delete it from JSON if present.
+- The **Commands** sidebar webview (`saropaLints.commandCatalogSidebar`) and **`saropaLints.sidebar.showCommandCatalog`** are removed; **Browse All Commands** / **Command Catalog** open the **editor tab** only.
+- The Project Vibrancy sidebar view and its refresh command are removed so function-level vibrancy lives only in the editor-area report, which removes duplicate UI and avoids cramped sidebar layouts. Use **Saropa Lints: Open Code Health Dashboard** (Command Palette or Saropa navigation where offered). No config change.
+- **Summary**, **Suppressions**, **Suggestions**, **Security Posture**, **File Risk**, **TODOs & Hacks**, **Drift Advisor**, **Package Vibrancy** (dependency tree), and **Package Details** (sidebar webview) are **removed from the Saropa activity bar**; use the **Findings Dashboard**, **Lints Config**, **Package Dashboard**, and Command Palette instead. Delete **`saropaLints.sidebar.showSummary`** through **`saropaLints.sidebar.showDriftAdvisor`** from settings JSON if you set them explicitly—only **`saropaLints.sidebar.showOverview`** remains under Activity bar.
+
+### Fixed
+
+- **`avoid_context_across_async`** and **`avoid_context_after_await_in_static`** no longer report the idiomatic compound nullable guard `context != null && context.mounted ? context : null` (used by extension methods and static helpers that take a `BuildContext?` parameter); both the null-check `context` and the then-branch `context` are now recognized as part of the guard. Remove any temporary `// ignore` workarounds you added for that pattern.
 
 ### Fixed (Extension)
 
+- The **Package Dashboard**'s *Active filters:* strip no longer renders as an empty "Active filters: Clear all" band when no filters are active. The strip now uses the HTML5 `hidden` attribute (paired with a `[hidden] { display: none !important }` rule) instead of an inline `style.display="none"` that any later style write could clear. No action required.
+- Reclicking the **Lints Config** entry in the Saropa sidebar when the dashboard tab is already open now moves keyboard focus into the dashboard, instead of leaving focus on the sidebar tree row (which made the reclick feel like a no-op). No action required.
+- Header gauges on the **Findings**, **Lints Config**, **Code Health**, and **Package** dashboards now render their arc at the correct level and animate on first paint instead of showing only a tiny green dot next to the grade letter. The webview Content-Security-Policy was blocking the inline `style` attribute that carries the gauge's score variable, and the chrome rule used a CSS transition (which only fires on value change) rather than a keyframe (which runs on initial render). No action required.
 - The **Rescan** button in the Package Vibrancy report now clears the per-package pub.dev cache before scanning, so the report reflects current pub.dev versions instead of silently re-using cached entries within the 24-hour TTL. A new **Saropa: Rescan Packages (Fresh)** command exposes the same behavior from the Command Palette; the existing **Scan Packages** command stays cache-friendly for the file watcher and startup paths. No action required.
 - **Dashboards** hub rows no longer show stale **Saropa**-prefixed labels after the quick-actions split (**Full-width tabs**, **Lints Config**, **Package Dashboard**, **Project Dashboard**, and quick-action descriptions without redundant **Saropa** wording); reload the window after upgrading the VSIX or dev build to pick up the tree provider. No config change.
 - Opening a file from the Project Vibrancy report now resolves report paths against the workspace root on Windows and mixed path styles, so jump-to-file from a hit works reliably instead of failing on path shape. No action required.
@@ -470,89 +477,8 @@ Analysis reports and the Run Analysis popup now show which saropa_lints build ra
 
 ---
 
-## [12.4.0]
-
-Three animation-focused rules catch inert `Animation.value` reads in `build`, mis-matched ticker mixins, and press-and-bounce `forward()` without `from: 0.0`. Several platform rules and `avoid_platform_specific_imports` quiet down when the project cannot hit the failure mode (for example mobile-only apps without `web/`). Pubspec dependency discovery works again, saropa’s import rule is renamed to `saropa_depend_on_referenced_packages` so it no longer doubles the SDK lint, large reports open with triage-oriented sections, and Run Analysis popups show real issue counts. [log](https://github.com/saropa/saropa_lints/blob/v12.4.0/CHANGELOG.md)
-
-### Added
-
-- Added `avoid_inert_animation_value_in_build` (recommended, error) so you catch opacity and other reads that never refresh because `build` does not rerun on ticks, without noise on listening builders. No action required; see [bugs/infra_propose_avoid_inert_animation_value_in_build.md](bugs/infra_propose_avoid_inert_animation_value_in_build.md).
-- Added `prefer_single_ticker_provider_state_mixin` (recommended, info) so single-controller states use the lighter mixin and intent is obvious. No action required; see [bugs/infra_propose_prefer_single_ticker_provider_state_mixin.md](bugs/infra_propose_prefer_single_ticker_provider_state_mixin.md).
-- Added `prefer_animation_controller_forward_from_zero` (recommended, warning) with a quick fix so press-and-bounce gestures always restart from zero and feel consistent on rapid taps. No action required.
-
-### Changed
-
-- Consolidated analysis logs now lead with concentration, delta-since-last-run, and triage hints on large backlogs, and the top-rules table adds share, source, and fixable columns so you can prioritize work. No action required; see [bugs/infra_analysis_report_insufficient_for_large_backlogs.md](bugs/infra_analysis_report_insufficient_for_large_backlogs.md).
-
-### Fixed
-
-- Several “wrong platform” rules now bail when the repo cannot build the platform they warn about, so mobile-only and similar setups stop getting irrelevant noise. No action required; see [bugs/platform_gate_missing_from_sibling_rules.md](bugs/platform_gate_missing_from_sibling_rules.md).
-- `avoid_platform_specific_imports` stays silent when the Flutter app has no `web/` tree, since `dart:io` web breakage is not applicable there. No action required; see [bugs/avoid_platform_specific_imports_false_positive_non_web_project.md](bugs/avoid_platform_specific_imports_false_positive_non_web_project.md).
-- Pubspec dependency names parse correctly again so `hasDependency`-gated rules and import checks behave; this removes the flood of bogus “not in pubspec” findings. No action required; see [bugs/depend_on_referenced_packages_name_collision_with_sdk_lint.md](bugs/depend_on_referenced_packages_name_collision_with_sdk_lint.md).
-- Renamed saropa’s duplicate lint to `saropa_depend_on_referenced_packages` so counts and ignores align with the SDK’s `depend_on_referenced_packages`. Use `// ignore: saropa_depend_on_referenced_packages` or disable that code in `plugins: saropa_lints` if you only want to silence saropa’s copy; `// ignore: depend_on_referenced_packages` still targets the SDK lint only.
-- Analyzer-plugin reports populate the configuration block instead of showing “not captured,” so reports stay self-describing. No action required.
-- Extension Run Analysis warning popups show the real issue count from `violations.json` instead of a slice of progress stderr. No action required; see [bugs/infra_run_analysis_popup_dumps_progress_stderr.md](bugs/infra_run_analysis_popup_dumps_progress_stderr.md).
-
-<details>
-<summary>Maintenance</summary>
-
-- Internal tweak to `prefer_animation_controller_forward_from_zero` detection so publish CI anti-pattern gates stay satisfied; rule behavior unchanged. No action required for consumers.
-
-</details>
-
----
-
-## [12.3.4]
-
-New `avoid_drift_insert_missing_conflict_target` flags Drift inserts that omit the right `onConflict` target on tables with a non-primary unique index, matching the class of SQLite `UNIQUE` failures you otherwise hit at runtime. [log](https://github.com/saropa/saropa_lints/blob/v12.3.4/CHANGELOG.md)
-
-### Added
-
-- Added `avoid_drift_insert_missing_conflict_target` (essential, error) so Drift inserts declare the correct conflict target when a non-PK unique index exists and you avoid silent `SqliteException` failures. No action required; see [bugs/infra_new_rule_drift_insert_missing_conflict_target.md](bugs/infra_new_rule_drift_insert_missing_conflict_target.md).
-
----
-
-## [12.3.3]
-
-Path-safety rules ignore clearly safe literal-only helpers and common Dart SDK path sources, `avoid_null_assertion` skips typical `RegExpMatch.group(n)!` after a match, and `prefer_debug_print` stops recommending Flutter-only APIs in pure Dart packages. [log](https://github.com/saropa/saropa_lints/blob/v12.3.3/CHANGELOG.md)
-
-### Fixed
-
-- `avoid_path_traversal` and `require_file_path_sanitization` no longer flag private helpers fed only literals or paths resolved via trusted SDK entry points, so asset helpers and similar code stay clean while real taint stays covered. No action required; see [bugs/avoid_path_traversal_false_positive_internal_resolver_parameter.md](bugs/avoid_path_traversal_false_positive_internal_resolver_parameter.md) and [bugs/require_file_path_sanitization_false_positive_internal_resolver_parameter.md](bugs/require_file_path_sanitization_false_positive_internal_resolver_parameter.md).
-- `prefer_debug_print` is skipped for non-Flutter packages so you are not told to import Flutter just to silence `print` guidance. No action required; see [bugs/prefer_debug_print_false_positive_pure_dart_package.md](bugs/prefer_debug_print_false_positive_pure_dart_package.md).
-- `avoid_null_assertion` allows `RegExpMatch.group(n)!` on matched regex results so you are not pushed into dead null-fallbacks for common parsing loops. No action required; see [bugs/avoid_null_assertion_false_positive_regex_match_group.md](bugs/avoid_null_assertion_false_positive_regex_match_group.md).
-
----
-
-## [12.3.2]
-
-`saropa_lints` itself passes `dart analyze --fatal-infos` again thanks to dogfood-only disables and small plugin fixes; publish script gains a publish-existing-.vsix mode. [log](https://github.com/saropa/saropa_lints/blob/v12.3.2/CHANGELOG.md)
-
-### Fixed
-
-- `dart analyze --fatal-infos` is clean on saropa_lints itself via targeted code fixes plus dogfood-only disables in this repo’s `analysis_options.yaml`, so maintainers can ship without thousands of self-applied rule hits while published consumer behavior is unchanged. No action required for package users.
-
-<details>
-<summary>Maintenance</summary>
-
-- Publish script adds mode 7 to publish the newest packaged `.vsix` without repackaging after `pubspec`/`package.json` post-publish bumps, avoiding version skew when finishing a partial extension release. No action required for package users.
-
-</details>
-
----
-
-## [12.3.1]
-
-Hotfix: tier-based `scan` and similar flows no longer crash on the second file when rule packs merge into an unmodifiable tier set. [log](https://github.com/saropa/saropa_lints/blob/v12.3.1/CHANGELOG.md)
-
-### Fixed
-
-- Rule-pack reload now copies enabled-rule sets before mutating them, so `scan` with `essential`/`recommended` tiers and pack merges no longer throws on the second analyzed file. No action required.
-
----
-
-## [12.3.0] and Earlier
+## [12.4.0] and Earlier
 
 > **Looking for older changes?**
-> See [CHANGELOG_ARCHIVE.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 12.3.0.
+> See [CHANGELOG_ARCHIVE.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 12.4.0.
 

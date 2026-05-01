@@ -382,6 +382,12 @@ export function getReportStyles(): string {
             border-radius: 6px;
             background: var(--vscode-editor-inactiveSelectionBackground);
         }
+        /* The HTML5 [hidden] attribute is set by JS when chips.length === 0; without
+           this rule the .active-filters display:flex above wins and the strip
+           re-appears empty (label + Clear all with no chips). */
+        .active-filters[hidden] {
+            display: none !important;
+        }
         .active-filters-label {
             font-size: 0.82em;
             opacity: 0.8;

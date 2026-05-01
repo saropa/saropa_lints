@@ -56,8 +56,13 @@ export function buildReportHtml(options: ReportOptions): string {
 <head>
     <title>Saropa Package Dashboard</title>
     <meta charset="UTF-8">
+    <!-- 'unsafe-inline' on style-src: radial gauge sets dynamic CSS vars
+         (--gauge-target, --gauge-arc) via inline style="..." attributes. CSP
+         nonces only authorize <style> blocks, not style attributes — without
+         'unsafe-inline' the vars are dropped, the dasharray falls back to 0,
+         and the gauge renders as a tiny dot. -->
     <meta http-equiv="Content-Security-Policy"
-        content="default-src 'none'; style-src 'nonce-${cspNonce}'; script-src 'nonce-${cspNonce}';">
+        content="default-src 'none'; style-src 'nonce-${cspNonce}' 'unsafe-inline'; script-src 'nonce-${cspNonce}';">
     <style nonce="${cspNonce}">${getPillButtonStyles()}${getReportStyles()}${getChartStyles()}</style>
 </head>
 <body>
@@ -269,7 +274,7 @@ function buildToolbar(options: ReportOptions): string {
         ${saveBtn}
         ${pubspecBtn}
     </div>
-    <div id="active-filters" class="active-filters" style="display:none;">
+    <div id="active-filters" class="active-filters" hidden>
         <span class="active-filters-label">Active filters:</span>
         <div class="active-filters-list"></div>
         <button id="clear-all-filters" class="clear-filter-btn" type="button">Clear all</button>
