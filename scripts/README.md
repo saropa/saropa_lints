@@ -12,7 +12,18 @@ through an interactive, step-by-step pipeline.
 python scripts/publish.py
 ```
 
-No flags. Prompts for one of eight modes:
+### Run VS Code extension locally (Extension Development Host)
+
+```bash
+python scripts/run_extension_local.py
+python scripts/run_extension_local.py --compile-only --no-logo
+```
+
+Uses `scripts/modules/_utils` (Saropa logo, colors, progress), validates Node 18+ / npm / `dist/extension.js`,
+runs `npm ci` when `extension/package-lock.json` exists, then launches VS Code (or Cursor) with
+`--extensionDevelopmentPath` and **opens this repo** as the host folder (`--new-window` so the folder is not lost to an empty restored session). See `python scripts/run_extension_local.py --help`.
+
+`publish.py` has no CLI flags; it prompts for one of eight modes:
 
 | # | Mode | What it does |
 |---|------|--------------|

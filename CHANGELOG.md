@@ -44,16 +44,21 @@
 -->
 ---
 
-## [Unreleased]
+## [13.0.0] - Unreleased
 
 ### Removed (Extension)
 
 - The palette entry **Saropa Lints: Focus Violations View** (`saropaLints.focusView`) is removed because it did not focus a violations tree and duplicated **Open Overview** behavior; the main Saropa status bar still opens the Overview view via the same underlying focus command. No action unless you referenced `saropaLints.focusView` in keybindings or tasks—use `saropaLints.overview.focus` instead.
-- The **Violations** activity-bar tree view and the `saropaLints.sidebar.showIssues` setting are removed so lint findings live in the **Findings Dashboard** editor tab and the status-bar chip instead of a duplicate sidebar panel. Use **Saropa Lints: Open Findings Dashboard** or the `$(warning)` status item; remove `sidebar.showIssues` from settings JSON if you set it explicitly. No action otherwise.
+- The **Violations** activity-bar tree (`saropaLints.issues`) is **removed from the extension manifest** so lint findings are not hosted in a duplicate sidebar; use the **Findings Dashboard** editor tab and the `$(warning)` status item. The **`saropaLints.sidebar.showIssues`** setting is removed—delete it from JSON if present.
+- The **Commands** sidebar webview (`saropaLints.commandCatalogSidebar`) and **`saropaLints.sidebar.showCommandCatalog`** are removed; **Browse All Commands** / **Saropa Command Catalog** open the **editor tab** only.
 - The Project Vibrancy sidebar view and its refresh command are removed so function-level vibrancy lives only in the editor-area report, which removes duplicate UI and avoids cramped sidebar layouts. Use **Saropa Lints: Open Project Vibrancy Report** (Command Palette or Saropa navigation where offered). No config change.
+- **Summary**, **Suppressions**, **Suggestions**, **Security Posture**, **File Risk**, **TODOs & Hacks**, **Drift Advisor**, **Package Vibrancy** (dependency tree), and **Package Details** (sidebar webview) are **removed from the Saropa activity bar**; use the **Findings Dashboard**, **Lints Config**, **Package Dashboard**, and Command Palette instead. Delete **`saropaLints.sidebar.showSummary`** through **`saropaLints.sidebar.showDriftAdvisor`** from settings JSON if you set them explicitly—only **`saropaLints.sidebar.showOverview`** remains under Activity bar.
 
 ### Changed (Extension)
 
+- The **Dashboards** activity-bar hub drops the **Violations tools** row group; the same filter, grouping, suppression, and navigation commands remain on the **Findings Dashboard** tab (toolbar + **More commands**) and in the Command Palette. No config change.
+- The **Findings Dashboard** adds **Refresh extension** (full `saropaLints.refresh`: trees, annotations, report-backed views) next to **Refresh from disk**. No config change.
+- The Saropa activity bar keeps **Dashboards** and **Overview & options** only; per-section `saropaLints.sidebar.show*` toggles under Overview were removed with the migrated views. **`saropaLints.exportOwaspReport`** is available from the Command Palette when the workspace has violations.
 - **Dashboards** hub tree labels and the main dashboard-opening palette commands use short titles with the **Saropa** category (for example **Saropa: Open Package Dashboard**) instead of repeating **Saropa Lints:** in every command name. No config change.
 - Editor-tab titles and primary headings on those dashboards still include **Saropa** so full-width views stay clearly branded. No action required.
 - Package Vibrancy timestamped JSON, Markdown, and SBOM exports now save under **`<workspace>/reports/`** instead of **`report/`**, matching cross_file CLI defaults and other Saropa on-disk report paths. No action required if you only use extension commands and webviews.
@@ -71,12 +76,18 @@
 
 ### Fixed (Extension)
 
+- **Dashboards** hub rows no longer show stale **Saropa**-prefixed labels after the quick-actions split (**Full-width tabs**, **Lints Config**, **Package Dashboard**, **Project Dashboard**, and quick-action descriptions without redundant **Saropa** wording); reload the window after upgrading the VSIX or dev build to pick up the tree provider. No config change.
 - Opening a file from the Project Vibrancy report now resolves report paths against the workspace root on Windows and mixed path styles, so jump-to-file from a hit works reliably instead of failing on path shape. No action required.
 - Hardened three editor-area webview panels against script injection: the **Package Details** panel now uses a nonce-based Content-Security-Policy instead of `'unsafe-inline'`, the **About** panel rejects `javascript:` / `data:` / `vbscript:` / `file:` URIs in markdown links (rendered as plain text instead of an anchor), and the **Explain Rule** panel escapes `</script>` and U+2028/U+2029 in rule-name strings interpolated into its inline script. No action required.
 
 <details><summary>Maintenance</summary>
 
 - VS Code Project Vibrancy scan startup now resolves the Dart executable per platform (`dart.bat` on Windows, `dart` elsewhere) and surfaces the underlying spawn error in the notification when startup fails, which prevents false “Dart SDK missing” messages on Windows PATH setups.
+- Added `scripts/run_extension_local.py` to compile `extension/` and launch an Extension Development Host (shared `scripts/modules/_utils` branding, step progress, Node/npm/`dist` checks); see `scripts/README.md`. No action for pub.dev or Marketplace users.
+- Recorded the native-plugin quick-fix migration as structurally complete in [`plan/TESTING_AND_RELEASE.md`](plan/TESTING_AND_RELEASE.md) §3 — `lib/` has 0 `extends DartFix` and 221 `extends SaropaFixProducer` files; remaining work is end-to-end verification, not migration.
+- Added [`doc/troubleshooting.md`](doc/troubleshooting.md) covering the three IDE-specific failure modes (custom_lint not running, rules absent from Problems panel, missing lightbulb fix), separate from the broader README §Troubleshooting.
+- Added a "Supported Versions" note to [`README.md`](README.md) describing the active 12.x line and security-only backport policy for earlier majors.
+- `scripts/run_extension_local.py` auto-detect now prefers `code` (VS Code) over `code-insiders` and other VS Code-compatible CLIs, so devs with both editors installed get the VS Code Extension Development Host by default; override with `--editor <name>` or `SAROPA_VSCODE_CLI`.
 
 </details>
 
