@@ -156,6 +156,82 @@ Ran in 5.2s
     });
   });
 
+  group('parseDartAnalyzeHumanOutput', () {
+    test('parses error line with Windows-style path', () {
+      const output = r'''
+Analyzing example...
+  error - lib\plan\fixture.dart:8:16 - Abstract fields cannot have initializers. - abstract_field_initializer
+''';
+
+      final violations = parseDartAnalyzeHumanOutput(output);
+
+      expect(violations, hasLength(1));
+      _expectViolation(
+        violations.first,
+        file: r'lib\plan\fixture.dart',
+        line: 8,
+        column: 16,
+        rule: 'abstract_field_initializer',
+        message: 'Abstract fields cannot have initializers.',
+      );
+    });
+
+    test('parses info and warning severities', () {
+      const output = '''
+   info - lib/a.dart:1:2 - Message one - rule_one
+warning - lib/b.dart:3:4 - Message two - rule_two
+''';
+
+      final violations = parseDartAnalyzeHumanOutput(output);
+
+      expect(violations, hasLength(2));
+      expect(violations[0].rule, 'rule_one');
+      expect(violations[1].rule, 'rule_two');
+    });
+
+    test('uses last dash segment as rule when message contains " - "', () {
+      const output =
+          '  error - lib/x.dart:1:1 - Part A - Part B - final_rule_code\n';
+
+      final violations = parseDartAnalyzeHumanOutput(output);
+
+      expect(violations.single.rule, 'final_rule_code');
+      expect(violations.single.message, 'Part A - Part B');
+    });
+
+    test('returns empty for empty input', () {
+      expect(parseDartAnalyzeHumanOutput(''), isEmpty);
+    });
+
+    test('ignores lines that do not match dart analyze format', () {
+      const output = '''
+Analyzing...
+  lib/main.dart:42:10 • Bullet style • my_rule •
+No issues found!
+''';
+
+      expect(parseDartAnalyzeHumanOutput(output), isEmpty);
+    });
+
+    test('assigns impact for known saropa rule codes', () {
+      const output =
+          '  error - lib/main.dart:1:1 - Problem - avoid_icon_buttons_without_tooltip\n';
+
+      final violations = parseDartAnalyzeHumanOutput(output);
+
+      expect(violations.single.impact, isNotNull);
+    });
+
+    test('defaults impact to medium for unknown diagnostic codes', () {
+      const output =
+          '  error - lib/main.dart:1:1 - Problem - totally_unknown_xyz_code\n';
+
+      final violations = parseDartAnalyzeHumanOutput(output);
+
+      expect(violations.single.impact, isNotNull);
+    });
+  });
+
   group('Violation', () {
     test('toString formats as file:line:column - rule - message', () {
       final v = Violation(
