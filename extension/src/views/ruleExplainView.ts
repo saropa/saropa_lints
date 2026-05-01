@@ -6,7 +6,9 @@
  */
 
 import * as vscode from 'vscode';
+import { createWebviewCspNonce, jsonForScriptBlock } from '../vibrancy/views/html-utils';
 import { Violation, OwaspData } from '../violationsReader';
+import { getRuleExplainPanelStyles } from './ruleExplainPanelStyles';
 import {
   getRelatedRules,
   getRuleDocUrl,
@@ -101,75 +103,15 @@ function buildHtml(input: RuleExplainInput): string {
     ? `<section class="block"><h3>OWASP</h3><p>${owaspLines.map((l) => escapeHtml(l)).join('</p><p>')}</p></section>`
     : '';
 
+  const cspNonce = createWebviewCspNonce();
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline';">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'nonce-${cspNonce}'; script-src 'nonce-${cspNonce}';">
   <title>${rule}</title>
-  <style>
-    body {
-      font-family: var(--vscode-font-family);
-      font-size: var(--vscode-font-size);
-      color: var(--vscode-foreground);
-      background: var(--vscode-editor-background);
-      padding: 1rem 1.5rem;
-      line-height: 1.5;
-      margin: 0;
-    }
-    h1 {
-      font-size: 1.25rem;
-      font-weight: 600;
-      margin: 0 0 0.5rem 0;
-      word-break: break-all;
-    }
-    h2, h3 {
-      font-size: 0.9rem;
-      font-weight: 600;
-      margin: 1rem 0 0.4rem 0;
-      color: var(--vscode-descriptionForeground);
-    }
-    .meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.75rem 1.5rem;
-      margin-bottom: 1rem;
-      font-size: 0.85rem;
-      color: var(--vscode-descriptionForeground);
-    }
-    .meta span {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.25rem;
-    }
-    .meta .badge {
-      padding: 0.15rem 0.5rem;
-      border-radius: 4px;
-      background: var(--vscode-badge-background);
-      color: var(--vscode-badge-foreground);
-    }
-    section.block {
-      margin-top: 1rem;
-      padding-top: 1rem;
-      border-top: 1px solid var(--vscode-widget-border);
-    }
-    section.block p {
-      margin: 0.25rem 0 0 0;
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
-    a {
-      color: var(--vscode-textLink-foreground);
-    }
-    a:hover {
-      color: var(--vscode-textLink-activeForeground);
-    }
-    .empty {
-      color: var(--vscode-descriptionForeground);
-      font-style: italic;
-    }
-  </style>
+  <style nonce="${cspNonce}">${getRuleExplainPanelStyles()}</style>
 </head>
 <body>
   <h1>${rule}</h1>
@@ -195,13 +137,17 @@ function buildHtml(input: RuleExplainInput): string {
     <h2>Documentation</h2>
     <p><a href="${escapeHtml(docUrl)}" data-url="${escapeHtml(docUrl)}" class="doc-link">View in ROADMAP</a></p>
   </section>
-  <script>
+  <script nonce="${cspNonce}">
     (function() {
       const vscode = acquireVsCodeApi();
+      // jsonForScriptBlock instead of bare JSON.stringify: a rule name containing
+      // the substring "</script>" would otherwise terminate this script block and
+      // let the rest parse as HTML. JSON.stringify does not escape that sequence.
+      const sourceRuleName = ${jsonForScriptBlock(input.ruleName)};
       document.querySelectorAll('a.doc-link[data-url]').forEach(function(link) {
         link.addEventListener('click', function(e) {
           e.preventDefault();
-          vscode.postMessage({ type: 'openUrl', url: link.dataset.url, ruleName: ${JSON.stringify(input.ruleName)} });
+          vscode.postMessage({ type: 'openUrl', url: link.dataset.url, ruleName: sourceRuleName });
         });
       });
       document.querySelectorAll('a.related-rule[data-rule]').forEach(function(link) {
@@ -210,7 +156,7 @@ function buildHtml(input: RuleExplainInput): string {
           vscode.postMessage({
             type: 'openRule',
             ruleName: link.dataset.rule,
-            sourceRule: ${JSON.stringify(input.ruleName)},
+            sourceRule: sourceRuleName,
             section: link.dataset.section,
           });
         });

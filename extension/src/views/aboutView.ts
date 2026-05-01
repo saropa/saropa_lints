@@ -93,13 +93,29 @@ function escapeHtml(text: string): string {
   return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
+/**
+ * Allow-list of URL schemes / forms permitted in markdown links. Anything else
+ * (notably `javascript:`, `data:`, `vbscript:`, `file:`) is downgraded to plain
+ * text so a malicious link in `about-saropa.md` cannot execute script in the
+ * webview context. `escapeHtml` does NOT defend against this — `javascript:alert(1)`
+ * has no characters that need escaping.
+ */
+const SAFE_LINK_SCHEME = /^(https?:\/\/|mailto:|#|\.{0,2}\/)/i;
+
 /** Convert inline markdown (bold, italic, links, inline code) to HTML. */
 function inlineToHtml(text: string): string {
   return escapeHtml(text)
     .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
     .replace(/(?<!\w)_([^_]+)_(?!\w)/g, '<em>$1</em>')
     .replace(/`([^`]+)`/g, '<code>$1</code>')
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_m, lab: string, href: string) => {
+      // Reject unsafe schemes by emitting the label as plain text rather than an anchor;
+      // preserves human-readable content and removes the click target entirely.
+      if (!SAFE_LINK_SCHEME.test(href)) { return lab; }
+      const ext = /^https?:\/\//i.test(href);
+      const extra = ext ? ' target="_blank" rel="noopener noreferrer"' : '';
+      return `<a href="${href}"${extra}>${lab}</a>`;
+    });
 }
 
 /**

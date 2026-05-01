@@ -8,7 +8,7 @@ import { classifyLicense, licenseEmoji } from '../scoring/license-classifier';
 import { worstSeverity, severityEmoji, severityLabel } from '../scoring/vuln-classifier';
 import { formatRelativeTime } from '../scoring/time-formatter';
 import { formatPrereleaseTag } from '../scoring/prerelease-classifier';
-import { escapeHtml, resolveRepoUrl } from './html-utils';
+import { createWebviewCspNonce, escapeHtml, resolveRepoUrl } from './html-utils';
 import { getPackageDetailStyles } from './package-detail-styles';
 import { getPackageDetailScript } from './package-detail-script';
 
@@ -593,19 +593,24 @@ function truncate(text: string, max: number): string {
 }
 
 function wrapHtml(title: string, body: string): string {
+    // Nonce-based CSP instead of `'unsafe-inline'`. With `unsafe-inline` any
+    // registry-supplied string that escapes `escapeHtml` (e.g. via an attribute-context
+    // edge case) can execute as script; a nonce blocks that fallback. Every other
+    // editor-area panel in this extension uses the same nonce pattern — see html-utils.ts.
+    const nonce = createWebviewCspNonce();
     return `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="Content-Security-Policy"
-          content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src https:;">
+          content="default-src 'none'; style-src 'nonce-${nonce}'; script-src 'nonce-${nonce}'; img-src https:;">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${escapeHtml(title)}</title>
-    <style>${getPackageDetailStyles()}</style>
+    <style nonce="${nonce}">${getPackageDetailStyles()}</style>
 </head>
 <body>
     ${body}
-    <script>${getPackageDetailScript()}</script>
+    <script nonce="${nonce}">${getPackageDetailScript()}</script>
 </body>
 </html>`;
 }

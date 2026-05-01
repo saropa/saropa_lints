@@ -72,6 +72,7 @@
 ### Fixed (Extension)
 
 - Opening a file from the Project Vibrancy report now resolves report paths against the workspace root on Windows and mixed path styles, so jump-to-file from a hit works reliably instead of failing on path shape. No action required.
+- Hardened three editor-area webview panels against script injection: the **Package Details** panel now uses a nonce-based Content-Security-Policy instead of `'unsafe-inline'`, the **About** panel rejects `javascript:` / `data:` / `vbscript:` / `file:` URIs in markdown links (rendered as plain text instead of an anchor), and the **Explain Rule** panel escapes `</script>` and U+2028/U+2029 in rule-name strings interpolated into its inline script. No action required.
 
 <details><summary>Maintenance</summary>
 
