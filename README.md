@@ -35,9 +35,9 @@ The extension is the primary setup and configuration surface:
 - **Issues tree** — Violations grouped by severity and file, with Error Lens-style inline annotations; multi-select works with **Copy as JSON**
 - **Security Posture** — OWASP Top 10 coverage matrix, compliance export
 - **Triage** — Disable noisy rules from the UI; see estimated score impact before acting
-- **Rule packs / Config Dashboard** — Enable stack bundles (Riverpod, Drift, …) from **Saropa Lints: Open Config Dashboard** (editor tab: per-pack toggles, rule lists, target platforms when embedder folders exist); see [`doc/guides/rule_packs.md`](doc/guides/rule_packs.md)
+- **Rule packs / Lints Config** — Enable stack bundles (Riverpod, Drift, …) from **Saropa Lints: Open Lints Config** (editor tab: per-pack toggles, rule lists, target platforms when embedder folders exist); see [`doc/guides/rule_packs.md`](doc/guides/rule_packs.md)
 - **Package Vibrancy** — Dependency health, alerts, and optional **version-gap** PR/issue triage (enable with `saropaLints.packageVibrancy.enableVersionGap`; a GitHub token improves results)
-- **Project Vibrancy** — Project code-health scoring for your own Dart source via **Open Project Vibrancy Report** (editor-area webview; same scan as the CLI JSON output); use the graph icon on **Issues**, **Overview**, **Config**, or **Package Vibrancy** view titles, or the Command Palette
+- **Project Vibrancy** — Project code-health scoring for your own Dart source via **Open Code Health Dashboard** (editor-area webview; same scan as the CLI JSON output); use the graph icon on **Issues**, **Overview**, **Config**, or **Package Vibrancy** view titles, or the Command Palette
 - **TODOs & Hacks** — Sidebar scan for TODO/FIXME/HACK-style markers; full-workspace scan is **opt-in** (`saropaLints.todosAndHacks.workspaceScanEnabled`; leave `false` until you need it) via **TODOs & Hacks: Enable workspace scan**
 - **File Risk** — Files ranked by violation density; focus on the riskiest first
 - **Trends** — Score progression over time with milestone celebrations

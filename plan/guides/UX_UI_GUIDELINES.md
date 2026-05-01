@@ -6,6 +6,8 @@ This document describes the **gold-standard** interaction and visual language us
 
 **UI catalog:** [Section 8](#8-affordance-catalog) spells out titles, links, counts, sorting, filtering, tooltips, icons, expanders, sections, buttons, and related patterns in one place.
 
+<!-- cspell:disable -->
+
 ---
 
 ## 1. Design principles
