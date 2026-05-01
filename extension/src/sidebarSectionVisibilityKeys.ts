@@ -3,22 +3,13 @@
  * Split out so tests do not load the vscode module.
  */
 
-/** Config key + label shown in Settings and the activity-bar-sections picker. */
-export const SIDEBAR_SECTIONS: ReadonlyArray<{ readonly key: string; readonly label: string }> = [
-    { key: 'sidebar.showCommandCatalog', label: 'Commands' },
-    { key: 'sidebar.showOverview', label: 'Overview & options' },
-    { key: 'sidebar.showFileRisk', label: 'File Risk' },
-    { key: 'sidebar.showIssues', label: 'Violations' },
-    { key: 'sidebar.showSummary', label: 'Summary' },
-    { key: 'sidebar.showSuppressions', label: 'Suppressions' },
-    { key: 'sidebar.showConfig', label: 'Triage' },
-    { key: 'sidebar.showSuggestions', label: 'Suggestions' },
-    { key: 'sidebar.showSecurityPosture', label: 'Security Posture' },
-    { key: 'sidebar.showPackageVibrancy', label: 'Package Vibrancy' },
-    { key: 'sidebar.showPackageDetails', label: 'Package Details' },
-    { key: 'sidebar.showTodosAndHacks', label: 'TODOs & Hacks' },
-    { key: 'sidebar.showDriftAdvisor', label: 'Drift Advisor' },
-];
+/**
+ * Per-section activity-bar toggles. Empty after the flat-sidebar refactor:
+ * duplicate trees (Summary, File Risk, Package Vibrancy sidebar, etc.) plus the
+ * old Dashboards / Overview split were removed in favor of one flat
+ * **Saropa Lints** view.
+ */
+export const SIDEBAR_SECTIONS: ReadonlyArray<{ readonly key: string; readonly label: string }> = [];
 
 export const SIDEBAR_SECTION_COUNT = SIDEBAR_SECTIONS.length;
 
@@ -32,17 +23,7 @@ export function sidebarSectionContextKey(configKey: string): string {
 
 /** Default visibility when the setting is unset (matches package.json defaults). */
 export function defaultSidebarSectionVisible(configKey: string): boolean {
-  // Commands (searchable command index), Overview, Violations, and Package Vibrancy stay on by default.
-    // Package Details defaults on — its `when` clause already gates it behind
-    // `packageVibrancy.hasResults`, so it only appears when there's scan data.
-    // Standalone Triage is off — the same content lives under Overview & options.
-    if (
-        configKey === 'sidebar.showCommandCatalog' ||
-        configKey === 'sidebar.showOverview' ||
-        configKey === 'sidebar.showIssues' ||
-    configKey === 'sidebar.showPackageVibrancy' ||
-        configKey === 'sidebar.showPackageDetails'
-    ) {
+    if (configKey === 'sidebar.showOverview') {
         return true;
     }
     return false;

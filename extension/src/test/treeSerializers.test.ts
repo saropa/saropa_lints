@@ -14,19 +14,15 @@ describe('serializeOverviewNode', () => {
         assert.strictEqual(j?.label, 'Tier');
     });
 
-    it('serializes overview section parents by contextValue', () => {
-        assert.deepStrictEqual(serializeOverviewNode({ contextValue: 'overviewSettingsSection' }), {
-            type: 'overviewSettingsSection',
-            label: 'Settings',
-        });
-        assert.deepStrictEqual(serializeOverviewNode({ contextValue: 'overviewIssuesSection' }), {
-            type: 'overviewIssuesSection',
-            label: 'Issues',
-        });
-        assert.deepStrictEqual(serializeOverviewNode({ contextValue: 'overviewSidebarSection' }), {
-            type: 'overviewSidebarSection',
-            label: 'Activity bar sections',
-        });
+    it('flat sidebar: removed section parent contextValues fall through to generic items', () => {
+        // Regression: after the flat-sidebar refactor (single Saropa Lints view, no
+        // Settings / Issues / Activity-bar group headers) these contextValues must
+        // not match any special branch. They serialize as ordinary `overviewItem`
+        // rows so any historical TreeItem instances still copy as JSON cleanly.
+        for (const cv of ['overviewSettingsSection', 'overviewIssuesSection', 'overviewSidebarSection']) {
+            const j = serializeOverviewNode({ contextValue: cv, label: cv });
+            assert.strictEqual(j?.type, 'overviewItem', `${cv} should fall through to overviewItem`);
+        }
     });
 
     it('falls through to TreeItem JSON for toggle-like rows', () => {

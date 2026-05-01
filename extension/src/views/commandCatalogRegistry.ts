@@ -110,15 +110,32 @@ export const catalogEntries: readonly CatalogEntry[] = [
   },
   {
     command: 'saropaLints.openConfigDashboard',
-    title: 'Open Config Dashboard',
-    description: 'Open the Config Dashboard in an editor tab for tiers, packs, and config guidance.',
+    title: 'Open Lints Config',
+    description: 'Open the Lints Config dashboard in an editor tab for tiers, packs, and config guidance.',
     category: 'Setup & Configuration',
     icon: 'dashboard',
   },
   {
+    command: 'saropaLints.openViolationsWideReport',
+    title: 'Open Findings Dashboard',
+    description:
+      'Open the Findings Dashboard in an editor tab (violations, TODOs, Drift Advisor snapshot).',
+    category: 'Setup & Configuration',
+    icon: 'warning',
+  },
+  {
+    command: 'saropaLints.revealFindingsDashboard',
+    title: 'Open Findings Dashboard (preserve filters)',
+    description:
+      'Same editor tab as Open Findings Dashboard; preserves current filters (does not clear first).',
+    category: 'Setup & Configuration',
+    icon: 'warning',
+  },
+  {
     command: 'saropaLints.openPackageVibrancy',
     title: 'Open Package Vibrancy',
-    description: 'Focus Package Vibrancy and auto-scan when no results are loaded yet.',
+    description:
+      'Focus the Package Vibrancy activity-bar section and run a scan when no dependency results are loaded yet.',
     category: 'Setup & Configuration',
     icon: 'package',
   },
@@ -302,10 +319,10 @@ export const catalogEntries: readonly CatalogEntry[] = [
 
   {
     command: 'saropaLints.focusView',
-    title: 'Focus Violations View',
-    description: 'Bring the violations sidebar panel into view.',
+    title: 'Focus Saropa Lints Sidebar',
+    description: 'Reveal the unified Saropa Lints view in the activity bar (editor dashboards, actions, status, settings, triage, help).',
     category: 'Violations & Filtering',
-    icon: 'list-unordered',
+    icon: 'list-tree',
   },
   {
     command: 'saropaLints.focusIssues',
@@ -653,6 +670,13 @@ export const catalogEntries: readonly CatalogEntry[] = [
     icon: 'refresh',
   },
   {
+    command: 'saropaLints.packageVibrancy.rescan',
+    title: 'Rescan Packages (Fresh)',
+    description: 'Clear the per-package pub.dev cache and re-fetch health data — use when the report shows stale versions.',
+    category: 'Package Vibrancy',
+    icon: 'refresh',
+  },
+  {
     command: 'saropaLints.packageVibrancy.openOtherProject',
     title: 'Scan Another Project...',
     description: 'Open a pubspec.yaml from another project in a new VS Code window to run a vibrancy scan there.',
@@ -661,16 +685,32 @@ export const catalogEntries: readonly CatalogEntry[] = [
   },
   {
     command: 'saropaLints.packageVibrancy.showReport',
-    title: 'Show Report',
-    description: 'Open the full vibrancy report webview with charts and details.',
+    title: 'Open Package Dashboard',
+    description: 'Open the Package Dashboard in an editor tab with charts and dependency details.',
     category: 'Package Vibrancy',
     icon: 'graph',
   },
   {
-    command: 'saropaLints.openProjectVibrancyReport',
-    title: 'Open Project Vibrancy Report',
+    command: 'saropaLints.packageVibrancy.focus',
+    title: 'Open Package Dashboard (compat)',
     description:
-      'Run a project vibrancy scan (LCOV + analyzer) using Project Vibrancy settings and open the full report.',
+      'Backward-compatible handler for old `{viewId}.focus` calls on the removed Package Vibrancy sidebar; opens the Package Dashboard tab.',
+    category: 'Package Vibrancy',
+    icon: 'graph',
+    internal: true,
+  },
+  {
+    command: 'saropaLints.focusPackageVibrancyPackages',
+    title: 'Focus Package Vibrancy Tree',
+    description: 'Focus the Package Vibrancy sidebar tree (dependency list).',
+    category: 'Package Vibrancy',
+    icon: 'package',
+  },
+  {
+    command: 'saropaLints.openProjectVibrancyReport',
+    title: 'Open Code Health Dashboard',
+    description:
+      'Run a project vibrancy scan (LCOV + analyzer) using Project Vibrancy settings and open the Code Health Dashboard.',
     category: 'Package Vibrancy',
     icon: 'graph',
   },
@@ -909,8 +949,9 @@ export const catalogEntries: readonly CatalogEntry[] = [
   },
   {
     command: 'saropaLints.packageVibrancy.focusPackageInTree',
-    title: 'Show Package in Tree View',
-    description: 'Reveal and select a package node in the vibrancy tree.',
+    title: 'Show Package in Sidebar',
+    description:
+      'Focus Package Vibrancy in the activity bar, reveal this dependency, and open package details when available.',
     category: 'Package Vibrancy',
     icon: 'list-tree',
     internal: true,
@@ -954,14 +995,14 @@ export const catalogEntries: readonly CatalogEntry[] = [
   {
     command: 'saropaLints.packageVibrancy.showPrereleases',
     title: 'Show Prerelease Versions',
-    description: 'Include prerelease versions in the vibrancy tree.',
+    description: 'Include prerelease versions in CodeLens and Package Vibrancy.',
     category: 'Package Vibrancy — Updates',
     icon: 'beaker',
   },
   {
     command: 'saropaLints.packageVibrancy.hidePrereleases',
     title: 'Hide Prerelease Versions',
-    description: 'Exclude prerelease versions from the vibrancy tree.',
+    description: 'Exclude prerelease versions from CodeLens and Package Vibrancy.',
     category: 'Package Vibrancy — Updates',
     icon: 'eye-closed',
   },
@@ -983,7 +1024,7 @@ export const catalogEntries: readonly CatalogEntry[] = [
   {
     command: 'saropaLints.packageVibrancy.compareSelected',
     title: 'Compare Selected Packages',
-    description: 'Compare two packages already selected in the tree view.',
+    description: 'Compare packages after multi-selecting them in Package Vibrancy.',
     category: 'Package Vibrancy',
     icon: 'diff',
     internal: true,
@@ -1024,7 +1065,7 @@ export const catalogEntries: readonly CatalogEntry[] = [
   {
     command: 'saropaLints.packageVibrancy.search',
     title: 'Search Packages',
-    description: 'Type a query to find packages in the vibrancy tree.',
+    description: 'Filter packages in Package Vibrancy by text.',
     category: 'Package Vibrancy — Filters',
     icon: 'search',
   },
@@ -1073,7 +1114,7 @@ export const catalogEntries: readonly CatalogEntry[] = [
   {
     command: 'saropaLints.packageVibrancy.expandAll',
     title: 'Expand All',
-    description: 'Expand all nodes in the package vibrancy tree.',
+    description: 'Expand every row in Package Vibrancy (activity bar).',
     category: 'Package Vibrancy — Filters',
     icon: 'expand-all',
   },
@@ -1175,8 +1216,8 @@ export const catalogEntries: readonly CatalogEntry[] = [
   },
   {
     command: 'saropaLints.showAbout',
-    title: 'About Saropa Lints',
-    description: 'Open the About panel with version and product information.',
+    title: 'About',
+    description: 'Open the About Saropa Lints panel with version and product information.',
     category: 'Views & Navigation',
     icon: 'info',
   },

@@ -58,11 +58,9 @@
     "src/treeSerializers.ts",
     "src/test/treeSerializers.test.ts",
     "src/suggestionCounts.ts",
-    "src/sidebarSectionCounts.ts",
     "src/violationsReader.ts",
     "src/rulePacks/rulePackYaml.ts",
     "src/test/suggestionCounts.test.ts",
-    "src/test/sidebarSectionCounts.test.ts",
     "src/pathUtils.ts",
     "src/keyedCountBreakdown.ts",
     "src/test/keyedCountBreakdown.test.ts",
@@ -88,6 +86,7 @@
     "src/suppressionsStore.ts",
     "src/projectRoot.ts",
     "src/test/views/helpHub.test.ts",
+    "src/test/views/violationsDashboardHtml.test.ts",
     "src/test/views/issuesTree.test.ts",
     "src/test/views/crossFileCommands.test.ts",
     "src/test/views/uxLabels.test.ts",
@@ -97,10 +96,15 @@
     "src/test/pubspec-code-actions.test.ts",
     "src/views/commandCatalogRegistry.ts",
     "src/test/commandCatalogRegistry.test.ts",
-    "src/views/commandCatalogSidebarProvider.ts",
-    "src/test/commandCatalogSidebar.test.ts",
     "src/test/views/projectVibrancyContributions.test.ts",
-    "src/test/fileRiskData.test.ts"
+    "src/test/fileRiskData.test.ts",
+    "src/runHistory.ts",
+    "src/securityHotspotReviewState.ts",
+    "src/pubspecReader.ts",
+    "src/views/triageTree.ts",
+    "src/views/configTree.ts",
+    "src/views/overviewTree.ts",
+    "src/test/views/overviewTreeFlat.test.ts"
   ],
   "exclude": ["node_modules", ".vscode-test", "out", "dist"]
 }

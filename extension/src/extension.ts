@@ -46,7 +46,6 @@ import { registerIssuesViewCommands } from './commands/issuesViewCommands';
 import { showCommandCatalogPanel } from './views/commandCatalogView';
 import { showRelatedRuleTelemetryPanel } from './views/relatedRuleTelemetryView';
 import { openProjectVibrancyReport } from './views/projectVibrancyReportView';
-import { CommandCatalogSidebarProvider, COMMAND_CATALOG_SIDEBAR_VIEW_ID } from './views/commandCatalogSidebarProvider';
 import { discoverServer } from './driftAdvisor/discovery';
 import { fetchIssues } from './driftAdvisor/client';
 import { mapIssuesToLocations } from './driftAdvisor/mapper';
@@ -57,7 +56,12 @@ import {
   openRuleExplainPanel,
   setRuleExplainTelemetry,
 } from './views/ruleExplainView';
-import { readViolations, ViolationsData, getViolationsPath as getViolationsFilePath } from './violationsReader';
+import {
+  readViolations,
+  hasViolations,
+  ViolationsData,
+  getViolationsPath as getViolationsFilePath,
+} from './violationsReader';
 import {
   SecurityHotspotReviewStateService,
 } from './securityHotspotReviewState';
@@ -97,18 +101,16 @@ import {
 } from './vibrancy/extension-activation';
 import { registerSidebarSectionVisibility, updateSidebarSectionVisibility } from './sidebarSectionVisibility';
 import {
-  applyDriftSidebarToggle,
   onDriftAdvisorDisconnected,
   setDriftAdvisorServerConnected,
-  syncDriftSidebarSuppressContext,
 } from './driftAdvisor/driftAdvisorUiState';
 import { SIDEBAR_SECTION_CONFIG_KEYS, defaultSidebarSectionVisible, sidebarSectionContextKey } from './sidebarSectionVisibilityKeys';
-import { buildSidebarSectionCountMap } from './sidebarSectionCounts';
 import { checkForUpgrade } from './upgrade-checker';
 import { buildStatusBarLabel } from './statusBarLabel';
 import { createRelatedRuleTelemetry } from './relatedRuleTelemetry';
 import { registerCrossFileCommands } from './cross-file-commands';
 import { registerCopyAsJsonCommands } from './extensionCopyAsJsonCommands';
+import { openViolationsWideReport, refreshFindingsDashboardIfOpen } from './views/violationsWideReportView';
 
 function getConfig() {
   return vscode.workspace.getConfiguration('saropaLints');
@@ -169,20 +171,26 @@ function updateContext(enabled: boolean, hasViolations: boolean) {
   void vscode.commands.executeCommand('setContext', 'saropaLints.hasViolations', hasViolations);
 }
 
-function updateIssuesBadge(view: vscode.TreeView<unknown>, issuesProvider: IssuesTreeProvider) {
+/** Compact status entry: opens the Findings Dashboard (replaces the Violations tree badge). */
+function updateFindingsStatusBar(item: vscode.StatusBarItem, dartProject: boolean): void {
   const root = getProjectRoot();
-  if (!root) return;
+  if (!root || !dartProject) {
+    item.hide();
+    return;
+  }
   const data = readViolations(root);
   const total = data?.summary?.totalViolations ?? data?.violations?.length ?? 0;
   const critical = data?.summary?.byImpact?.critical ?? 0;
-  if (total > 0 && view.badge !== undefined) {
-    view.badge = {
-      value: critical > 0 ? critical : total,
-      tooltip: critical > 0 ? `${critical} critical, ${total} total` : `${total} violations`,
-    };
-  } else if (view.badge !== undefined) {
-    view.badge = undefined;
+  if (total <= 0) {
+    item.hide();
+    return;
   }
+  item.text = critical > 0 ? `$(warning) ${critical}` : `$(warning) ${total}`;
+  item.tooltip = critical > 0
+    ? `${critical} critical of ${total} total — Open Findings Dashboard`
+    : `${total} violation(s) — Open Findings Dashboard`;
+  item.command = 'saropaLints.openViolationsWideReport';
+  item.show();
 }
 
 function syncRuleMetadataFromViolations(data: ViolationsData | null): void {
@@ -201,7 +209,6 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   void vscode.commands.executeCommand('setContext', 'saropaLints.isDartProject', isDartProject);
   updateSidebarSectionVisibility();
   registerSidebarSectionVisibility(context);
-  syncDriftSidebarSuppressContext(context.workspaceState);
 
   const cfg = getConfig();
   const relatedRuleTelemetry = createRelatedRuleTelemetry(context.workspaceState);
@@ -220,9 +227,8 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   let enabled = cfg.get<boolean>('enabled', true) ?? true;
 
   // Auto-enable when saropa_lints is already in pubspec.yaml but the user
-  // hasn't explicitly toggled the setting. This avoids the "off by default"
-  // friction for projects that already depend on the package — no files are
-  // touched, we just flip the workspace flag.
+  // has not explicitly set `saropaLints.enabled`, so existing adopters are not
+  // left with integration inactive — no files are touched; we flip the workspace flag.
   if (!enabled && isDartProject) {
     const inspection = cfg.inspect<boolean>('enabled');
     const explicitlySet = inspection?.workspaceValue !== undefined
@@ -234,7 +240,8 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     }
   }
 
-  updateContext(enabled, false);
+  // Match disk-backed violation report so `saropaLints.hasViolations` is correct on first tick.
+  updateContext(enabled, root ? hasViolations(root) : false);
 
   const todosAndHacksProvider = new TodosAndHacksTreeProvider();
   const driftAdvisorDiagCollection = vscode.languages.createDiagnosticCollection('Saropa Drift Advisor');
@@ -258,32 +265,18 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   );
 
   const issuesProvider = new IssuesTreeProvider(context.workspaceState);
+  const findingsStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 99);
+  findingsStatusBarItem.name = 'Saropa Findings';
+  context.subscriptions.push(findingsStatusBarItem);
   const hotspotReviewState = new SecurityHotspotReviewStateService(context.workspaceState);
   const summaryProvider = new SummaryTreeProvider(context.workspaceState);
   const suppressionsProvider = new SuppressionsTreeProvider();
-  // Register early: matches Violations/Drift/TODOs. Late `registerTreeDataProvider` for new views
-  // can race the workbench after extension update / extension-host restart (VS Code "No view is
-  // registered with id" from extHostTreeViews).
-  const suppressionsView = vscode.window.createTreeView('saropaLints.suppressions', {
-    treeDataProvider: suppressionsProvider,
-    showCollapseAll: true,
-  });
-  context.subscriptions.push(suppressionsView);
   const configProvider = new ConfigTreeProvider();
+  // Single flat sidebar — replaced the prior Dashboards / Overview & options
+  // pair. The sidebar-section count map is no longer needed because the flat
+  // tree has no Activity bar section toggles (`SIDEBAR_SECTION_COUNT === 0`).
   const overviewProvider = new OverviewTreeProvider(
     context.workspaceState,
-    () =>
-      buildSidebarSectionCountMap({
-        workspaceRoot: getProjectRoot(),
-        tier: getConfig().get<string>('tier', 'recommended') ?? 'recommended',
-        violations: (() => {
-          const r = getProjectRoot();
-          return r ? readViolations(r) : null;
-        })(),
-        todosMarkerCount: todosAndHacksProvider.getCachedMarkerCount(),
-        driftIssueCount: driftAdvisorProvider.getIssueCount(),
-        vibrancyPackageCount: getLatestResults().length,
-      }),
     configProvider,
   );
   const suggestionsProvider = new SuggestionsTreeProvider();
@@ -306,19 +299,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     }),
   );
 
-  const todosAndHacksView = vscode.window.createTreeView('saropaLints.todosAndHacks', {
-    treeDataProvider: todosAndHacksProvider,
-    showCollapseAll: true,
-  });
-  context.subscriptions.push(todosAndHacksView);
-
-  const driftAdvisorView = vscode.window.createTreeView('saropaLints.driftAdvisor', {
-    treeDataProvider: driftAdvisorProvider,
-    showCollapseAll: true,
-  });
-  // Single push keeps disposal batching obvious for static analysis (avoid back-to-back push).
   context.subscriptions.push(
-    driftAdvisorView,
     todosAndHacksProvider.onDidChangeTreeData(() => {
       overviewProvider.refresh();
     }),
@@ -329,12 +310,6 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
 
   const rulePacksWebviewProvider = new RulePacksWebviewProvider(context.extensionUri);
 
-  // Command catalog sidebar — searchable index of every extension command.
-  // Sits at the top of the sidebar so it is the first thing users see.
-  const catalogSidebarProvider = new CommandCatalogSidebarProvider(context.extensionUri, context);
-  context.subscriptions.push(
-    vscode.window.registerWebviewViewProvider(COMMAND_CATALOG_SIDEBAR_VIEW_ID, catalogSidebarProvider),
-  );
   registerCrossFileCommands(context);
   let driftAdvisorRefreshInProgress = false;
 
@@ -359,27 +334,9 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       todosAndHacksSaveDebounce = setTimeout(() => {
         todosAndHacksSaveDebounce = undefined;
         todosAndHacksProvider.refresh();
-        todosAndHacksView.message = undefined;
       }, 600);
     }),
   );
-
-  /**
-   * Violations (Issues) sidebar tree.
-   *
-   * `canSelectMany` must stay **true** so users can Ctrl/Cmd+click multiple folders/files and run
-   * **Copy as JSON** once; `copyTreeNodesToClipboard` (see `copyTreeAsJson.ts`) takes the full
-   * selection from VS Code’s second command argument. Without this flag, only one row can be
-   * selected and bulk export from the tree is impossible.
-   *
-   * For full-project data at scale, `reports/.saropa_lints/violations.json` remains the source of truth.
-   */
-  const issuesView = vscode.window.createTreeView('saropaLints.issues', {
-    treeDataProvider: issuesProvider,
-    showCollapseAll: true,
-    canSelectMany: true,
-  });
-  updateIssuesBadge(issuesView, issuesProvider);
 
   function updateIssuesViewMessage(): void {
     const state = issuesProvider.getFilterState();
@@ -387,34 +344,34 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     void vscode.commands.executeCommand('setContext', 'saropaLints.hasIssuesFilter', state.hasActiveFilters);
     void vscode.commands.executeCommand('setContext', 'saropaLints.hasSuppressions', state.hasSuppressions);
     void vscode.commands.executeCommand('setContext', 'saropaLints.hasFocusedFile', focused !== undefined);
-    if (focused) {
-      const basename = focused.split('/').pop() ?? focused;
-      issuesView.message = `Focused: ${basename} \u2014 Showing ${state.filteredCount} of ${state.totalUnfiltered}`;
-    } else if (state.hasActiveFilters || state.hasSuppressions) {
-      issuesView.message = `Showing ${state.filteredCount} of ${state.totalUnfiltered}`;
-    } else {
-      issuesView.message = undefined;
+    updateFindingsStatusBar(findingsStatusBarItem, isDartProject);
+    const filterHint = focused
+      ? `List: focused on ${focused.split('/').pop() ?? focused} (${state.filteredCount}/${state.totalUnfiltered})`
+      : state.hasActiveFilters || state.hasSuppressions
+        ? `List: filtered ${state.filteredCount}/${state.totalUnfiltered}`
+        : `List: ${state.filteredCount} visible (of ${state.totalUnfiltered})`;
+    if (findingsStatusBarItem.tooltip) {
+      findingsStatusBarItem.tooltip = `${findingsStatusBarItem.tooltip}\n${filterHint}`;
     }
   }
   updateIssuesViewMessage();
+
+  context.subscriptions.push(
+    issuesProvider.onDidChangeTreeData(() => {
+      refreshFindingsDashboardIfOpen(context);
+      updateIssuesViewMessage();
+    }),
+  );
 
   registerIssueCommands(issuesProvider, context);
   registerCodeLensProvider(context);
   registerInlineAnnotations(context);
 
-  context.subscriptions.push(
-    {
-      dispose: () => {
-        if (todosAndHacksSaveDebounce) clearTimeout(todosAndHacksSaveDebounce);
-      },
+  context.subscriptions.push({
+    dispose: () => {
+      if (todosAndHacksSaveDebounce) clearTimeout(todosAndHacksSaveDebounce);
     },
-    issuesView,
-    vscode.window.registerTreeDataProvider('saropaLints.summary', summaryProvider),
-    vscode.window.registerTreeDataProvider('saropaLints.config', configProvider),
-    vscode.window.registerTreeDataProvider('saropaLints.suggestions', suggestionsProvider),
-    vscode.window.registerTreeDataProvider('saropaLints.securityPosture', securityProvider),
-    vscode.window.registerTreeDataProvider('saropaLints.fileRisk', fileRiskProvider),
-  );
+  });
 
   const refreshAll = () => {
     const root = getProjectRoot();
@@ -429,7 +386,6 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     fileRiskProvider.refresh();
     rulePacksWebviewProvider.refresh();
     invalidateCodeLenses();
-    updateIssuesBadge(issuesView, issuesProvider);
     updateIssuesViewMessage();
     // D3: Invalidate cache then refresh inline annotations for new data.
     invalidateAnnotationCache();
@@ -476,7 +432,6 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       refreshAll();
       if (e.affectsConfiguration('saropaLints.todosAndHacks')) {
         todosAndHacksProvider.refresh();
-        todosAndHacksView.message = undefined;
       }
       // Status bars must update when config changes (e.g. tier changed via Settings UI).
       updateAllStatusBars();
@@ -577,7 +532,16 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // when the caller already has it (e.g. debouncedRefresh).
   const updateAllStatusBars = (preloadedData?: ViolationsData) => {
     if (!isDartProject) {
-      statusBarItem.hide();
+      // Surface the version even outside a Dart workspace so users can verify
+      // that a fresh build has loaded — previously the bar was hidden here and
+      // the only version readout was a tooltip on a tree that itself required
+      // a Dart project to render. That made "is my build live?" unanswerable
+      // before opening a project.
+      statusBarItem.text = `$(checklist) Saropa Lints v${extVersion}`;
+      statusBarItem.tooltip = `Saropa Lints v${extVersion} — open a folder containing pubspec.yaml to enable analysis.`;
+      statusBarItem.backgroundColor = undefined;
+      statusBarItem.command = 'saropaLints.showAbout';
+      statusBarItem.show();
       return;
     }
     const en = getConfig().get<boolean>('enabled', true) ?? true;
@@ -620,7 +584,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       statusBarItem.tooltip = `Saropa Lints v${extVersion} — Disabled`;
       statusBarItem.backgroundColor = undefined;
     }
-    statusBarItem.command = 'saropaLints.focusView';
+    statusBarItem.command = 'saropaLints.overview.focus';
     statusBarItem.show();
   };
   updateAllStatusBars();
@@ -761,11 +725,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         const target = vscode.workspace.workspaceFolders?.length
           ? vscode.ConfigurationTarget.Workspace
           : vscode.ConfigurationTarget.Global;
-        if (key === 'sidebar.showDriftAdvisor') {
-          await applyDriftSidebarToggle(context.workspaceState, cfg, next, target);
-        } else {
-          await cfg.update(key, next, target);
-        }
+        await cfg.update(key, next, target);
         updateSidebarSectionVisibility();
         overviewProvider.refresh();
       } catch (err) {
@@ -777,9 +737,6 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         );
       }
     }),
-    vscode.commands.registerCommand('saropaLints.focusView', () => {
-      vscode.commands.executeCommand('saropaLints.overview.focus');
-    }),
     vscode.commands.registerCommand('saropaLints.openRulePacks', () => {
       rulePacksWebviewProvider.openEditorPanel();
     }),
@@ -787,11 +744,16 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       rulePacksWebviewProvider.openEditorPanel();
     }),
     vscode.commands.registerCommand('saropaLints.openPackageVibrancy', async () => {
-      await vscode.commands.executeCommand('saropaLints.packageVibrancy.packages.focus');
-      const hasResults = getLatestResults().length > 0;
-      if (!hasResults) {
+      await vscode.commands.executeCommand('saropaLints.packageVibrancy.showReport');
+      if (getLatestResults().length === 0) {
         await vscode.commands.executeCommand('saropaLints.packageVibrancy.scan');
       }
+    }),
+    vscode.commands.registerCommand('saropaLints.openViolationsWideReport', async () => {
+      await openViolationsWideReport(context);
+    }),
+    vscode.commands.registerCommand('saropaLints.revealFindingsDashboard', async () => {
+      await openViolationsWideReport(context);
     }),
     vscode.commands.registerCommand('saropaLints.openProjectVibrancyReport', async () => {
       await openProjectVibrancyReport();
@@ -850,12 +812,20 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         void vscode.window.showErrorMessage(`Failed to create Saropa Lints instructions: ${msg}`);
       }
     }),
+    vscode.commands.registerCommand('saropaLints.focusView', async () => {
+      // After consolidating Dashboards + Overview into a single flat view,
+      // `focusView` is a backwards-compat alias for revealing the unified sidebar.
+      await vscode.commands.executeCommand('saropaLints.overview.focus');
+    }),
+    vscode.commands.registerCommand('saropaLints.focusPackageVibrancyPackages', async () => {
+      await vscode.commands.executeCommand('saropaLints.packageVibrancy.showReport');
+    }),
     // Show all findings: clear filters and focus Violations view (e.g. from Summary "Total violations").
     vscode.commands.registerCommand('saropaLints.focusIssues', () => {
       issuesProvider.clearFilters();
       updateIssuesViewMessage();
       issuesProvider.expandAll();
-      void vscode.commands.executeCommand('saropaLints.issues.focus');
+      void vscode.commands.executeCommand('saropaLints.revealFindingsDashboard');
     }),
     // Focus Violations view filtered to a single file (Code Lens, Problems view "Show in Saropa Lints").
     vscode.commands.registerCommand('saropaLints.focusIssuesForFile', (filePath: string) => {
@@ -864,7 +834,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       issuesProvider.setTextFilter(normalized);
       updateIssuesViewMessage();
       issuesProvider.expandAll();
-      void vscode.commands.executeCommand('saropaLints.issues.focus');
+      void vscode.commands.executeCommand('saropaLints.revealFindingsDashboard');
     }),
     // Open file in editor AND filter Violations view (File Risk tree click).
     vscode.commands.registerCommand('saropaLints.openFileAndFocusIssues', (filePath: string) => {
@@ -895,7 +865,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       issuesProvider.setTextFilter(relative);
       updateIssuesViewMessage();
       issuesProvider.expandAll();
-      void vscode.commands.executeCommand('saropaLints.issues.focus');
+      void vscode.commands.executeCommand('saropaLints.revealFindingsDashboard');
     }),
     vscode.commands.registerCommand('saropaLints.focusIssuesWithImpactFilter', (impact: string) => {
       if (impact && typeof impact === 'string') {
@@ -903,7 +873,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         issuesProvider.setSeverityFilter(new Set(['error', 'warning', 'info']));
         updateIssuesViewMessage();
         issuesProvider.expandAll();
-        void vscode.commands.executeCommand('saropaLints.issues.focus');
+        void vscode.commands.executeCommand('saropaLints.revealFindingsDashboard');
       }
     }),
     vscode.commands.registerCommand('saropaLints.focusIssuesWithSeverityFilter', (severity: string) => {
@@ -912,7 +882,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         issuesProvider.setImpactFilter(new Set(['critical', 'high', 'medium', 'low', 'opinionated']));
         updateIssuesViewMessage();
         issuesProvider.expandAll();
-        void vscode.commands.executeCommand('saropaLints.issues.focus');
+        void vscode.commands.executeCommand('saropaLints.revealFindingsDashboard');
       }
     }),
     vscode.commands.registerCommand('saropaLints.refresh', () => {
@@ -923,11 +893,10 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     vscode.commands.registerCommand('saropaLints.todosAndHacks.refresh', () => {
       const tcfg = vscode.workspace.getConfiguration('saropaLints.todosAndHacks');
       if (tcfg.get<boolean>('workspaceScanEnabled', false)) {
-        todosAndHacksView.message = 'Scanning…';
+        void vscode.window.setStatusBarMessage('Saropa TODOs & Hacks: scanning…', 4000);
       }
       todosAndHacksProvider.refresh();
-      void vscode.commands.executeCommand('saropaLints.todosAndHacks.focus');
-      setTimeout(() => { todosAndHacksView.message = undefined; }, 4000);
+      void vscode.commands.executeCommand('saropaLints.revealFindingsDashboard');
     }),
     vscode.commands.registerCommand('saropaLints.todosAndHacks.toggleGroupByTag', async () => {
       const cfg = vscode.workspace.getConfiguration('saropaLints.todosAndHacks');
@@ -935,17 +904,16 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       const current = cfg.get<boolean>('groupByTag', false);
       await cfg.update('groupByTag', !current, vscode.ConfigurationTarget.Workspace);
       if (scanOn) {
-        todosAndHacksView.message = 'Scanning…';
+        void vscode.window.setStatusBarMessage('Saropa TODOs & Hacks: scanning…', 4000);
       }
       todosAndHacksProvider.refresh();
-      void vscode.commands.executeCommand('saropaLints.todosAndHacks.focus');
-      setTimeout(() => { todosAndHacksView.message = undefined; }, 4000);
+      void vscode.commands.executeCommand('saropaLints.revealFindingsDashboard');
     }),
     vscode.commands.registerCommand('saropaLints.todosAndHacks.enableWorkspaceScan', async () => {
       const tcfg = vscode.workspace.getConfiguration('saropaLints.todosAndHacks');
       await tcfg.update('workspaceScanEnabled', true, vscode.ConfigurationTarget.Workspace);
       todosAndHacksProvider.refresh();
-      void vscode.commands.executeCommand('saropaLints.todosAndHacks.focus');
+      void vscode.commands.executeCommand('saropaLints.revealFindingsDashboard');
     }),
     vscode.commands.registerCommand('saropaLints.driftAdvisor.refresh', async () => {
       const cfg = vscode.workspace.getConfiguration('saropaLints.driftAdvisor');
@@ -958,7 +926,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       }
       if (driftAdvisorRefreshInProgress) return;
       driftAdvisorRefreshInProgress = true;
-      driftAdvisorView.message = 'Discovering…';
+      void vscode.window.setStatusBarMessage('Saropa Drift Advisor: discovering server…', 4000);
       driftAdvisorProvider.setLoading(true);
       const portRange = cfg.get<number[]>('portRange', [8642, 8649]);
       const portMin = Array.isArray(portRange) && portRange.length >= 1 ? Math.max(1, portRange[0]) : 8642;
@@ -969,21 +937,20 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
           driftAdvisorProvider.setState(null, []);
           await onDriftAdvisorDisconnected(context.workspaceState);
           void vscode.commands.executeCommand('setContext', 'saropaLints.driftAdvisor.connected', false);
-          driftAdvisorView.message = 'No server found';
+          void vscode.window.setStatusBarMessage('Saropa Drift Advisor: no server found', 5000);
           return;
         }
         const issues = await fetchIssues(server);
         const mapped = await mapIssuesToLocations(issues);
         driftAdvisorProvider.setState(server, mapped);
         setDriftAdvisorServerConnected(true);
-        syncDriftSidebarSuppressContext(context.workspaceState);
         void vscode.commands.executeCommand('setContext', 'saropaLints.driftAdvisor.connected', true);
-        driftAdvisorView.message = undefined;
+        void vscode.window.setStatusBarMessage('Saropa Drift Advisor: connected', 3000);
       } catch {
         driftAdvisorProvider.setState(null, []);
         await onDriftAdvisorDisconnected(context.workspaceState);
         void vscode.commands.executeCommand('setContext', 'saropaLints.driftAdvisor.connected', false);
-        driftAdvisorView.message = 'Error fetching issues';
+        void vscode.window.setStatusBarMessage('Saropa Drift Advisor: error fetching issues', 5000);
       } finally {
         driftAdvisorRefreshInProgress = false;
         overviewProvider.refresh();
@@ -1080,7 +1047,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         issuesProvider.setRulesToHide(toHide);
         updateIssuesViewMessage();
         issuesProvider.expandAll();
-        void vscode.commands.executeCommand('saropaLints.issues.focus');
+        void vscode.commands.executeCommand('saropaLints.revealFindingsDashboard');
       }),
     ),
     // Summary metadata drill-down: filter Issues view by rules whose metadata
@@ -1122,7 +1089,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         issuesProvider.setRulesToHide(toHide);
         updateIssuesViewMessage();
         issuesProvider.expandAll();
-        void vscode.commands.executeCommand('saropaLints.issues.focus');
+        void vscode.commands.executeCommand('saropaLints.revealFindingsDashboard');
       },
     ),
     vscode.commands.registerCommand('saropaLints.explainRule', (arg: unknown) => {
@@ -1318,7 +1285,6 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // Each view gets its own command so context menus target the right view.
   registerCopyAsJsonCommands(context, {
     issuesProvider,
-    configProvider,
     summaryProvider,
     securityProvider,
     fileRiskProvider,
@@ -1435,13 +1401,13 @@ async function showTierChangeNotification(info: TierChangeNotification): Promise
       + `Showing ${info.criticalPlusHigh} critical + high — fix these first.`;
     const choice = await vscode.window.showInformationMessage(msg, 'View Violations', 'Show All');
     if (choice === 'View Violations') {
-      // Use issues.focus (not focusIssues) to preserve the auto-filter that was
+      // Use revealFindingsDashboard (not focusIssues) to preserve the auto-filter that was
       // applied by the handler — focusIssues calls clearFilters() first.
-      await vscode.commands.executeCommand('saropaLints.issues.focus');
+      await vscode.commands.executeCommand('saropaLints.revealFindingsDashboard');
     } else if (choice === 'Show All') {
       // User wants to see everything — clear the auto-filter via the existing command.
       await vscode.commands.executeCommand('saropaLints.clearIssuesFilters');
-      await vscode.commands.executeCommand('saropaLints.issues.focus');
+      await vscode.commands.executeCommand('saropaLints.revealFindingsDashboard');
     }
   } else {
     // Downgrade, small upgrade, or zero critical+high — simple confirmation.
@@ -1450,7 +1416,7 @@ async function showTierChangeNotification(info: TierChangeNotification): Promise
       : `Tier changed to ${info.tierLabel} (${deltaText} violations).`;
     const choice = await vscode.window.showInformationMessage(msg, 'View Violations');
     if (choice === 'View Violations') {
-      await vscode.commands.executeCommand('saropaLints.issues.focus');
+      await vscode.commands.executeCommand('saropaLints.revealFindingsDashboard');
     }
   }
 }

@@ -241,21 +241,17 @@ export function serializeFileRiskNode(node: unknown): JsonNode | null {
 
 // ─── Overview Tree ────────────────────────────────────────────────────────────
 
-/** Serialize an Overview tree node (intro rows, section parents, toggles, embedded config nodes). */
+/**
+ * Serialize a Saropa Lints sidebar node — embedded triage / config rows or flat
+ * `OverviewItem` rows. The earlier section-parent contextValues
+ * (`overviewSettingsSection`, `overviewIssuesSection`, `overviewSidebarSection`)
+ * are gone after the flat-sidebar refactor, so only the embedded-config and
+ * leaf paths remain.
+ */
 export function serializeOverviewNode(node: unknown): JsonNode | null {
     if (node && typeof node === 'object' && 'kind' in node) {
         const embedded = serializeConfigNode(node);
         if (embedded) return embedded;
-    }
-    const cv = (node as { contextValue?: string }).contextValue;
-    if (cv === 'overviewSettingsSection') {
-        return { type: 'overviewSettingsSection', label: 'Settings' };
-    }
-    if (cv === 'overviewIssuesSection') {
-        return { type: 'overviewIssuesSection', label: 'Issues' };
-    }
-    if (cv === 'overviewSidebarSection') {
-        return { type: 'overviewSidebarSection', label: 'Activity bar sections' };
     }
     return serializeTreeItemNode(node, 'overviewItem');
 }
@@ -270,7 +266,7 @@ export function serializeSuggestionNode(node: unknown): JsonNode | null {
 // ─── Vibrancy Packages Tree ──────────────────────────────────────────────────
 // Matchers run in `serializeVibrancyNode` top-to-bottom; keep that list aligned with helpers here.
 
-/** Loose shape of vibrancy tree items for JSON copy (mirrors package vibrancy tree nodes). */
+/** Loose shape of Package Vibrancy sidebar items for JSON copy (mirrors vibrancy node shapes). */
 type VibrancyTreeItem = {
     contextValue?: string;
     result?: Record<string, unknown>;

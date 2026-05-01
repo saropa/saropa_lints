@@ -34,11 +34,19 @@ function loadPackageJson(): PackageJsonShape {
 }
 
 describe('UX labels in package.json', () => {
-  it('renames Config view to Triage', () => {
+  it('registers a single flat Saropa Lints view in the activity bar', () => {
     const pkg = loadPackageJson();
-    const configView = pkg.contributes.views.saropaLints.find((view) => view.id === 'saropaLints.config');
-    assert.ok(configView, 'expected saropaLints.config to exist');
-    assert.strictEqual(configView?.name, 'Triage');
+    const views = pkg.contributes.views.saropaLints;
+    // Flat-sidebar refactor: Dashboards + Overview & options collapsed into one
+    // unified view. Any second view would reintroduce the structural split the
+    // refactor exists to remove.
+    assert.strictEqual(views.length, 1, 'expected exactly one Saropa view');
+    const overview = views.find((view) => view.id === 'saropaLints.overview');
+    assert.ok(overview, 'expected saropaLints.overview');
+    assert.strictEqual(overview!.name, 'Saropa Lints');
+    assert.ok(!views.some((v) => v.id === 'saropaLints.dashboardHub'), 'dashboardHub view removed');
+    assert.ok(!views.some((v) => v.id === 'saropaLints.issues'), 'Violations tree view removed');
+    assert.ok(!views.some((v) => v.id === 'saropaLints.summary'), 'Summary view removed');
   });
 
   it('renames config copy command to Triage wording', () => {
@@ -48,23 +56,23 @@ describe('UX labels in package.json', () => {
     assert.strictEqual(cmd?.title, 'Copy Triage as JSON');
   });
 
-  it('uses Activity bar sections settings group title', () => {
+  it('uses Activity bar settings group title', () => {
     const pkg = loadPackageJson();
-    const hasGroup = pkg.contributes.configuration.some((section) => section.title === 'Activity bar sections');
-    assert.strictEqual(hasGroup, true, 'expected configuration title "Activity bar sections"');
+    const hasGroup = pkg.contributes.configuration.some((section) => section.title === 'Activity bar');
+    assert.strictEqual(hasGroup, true, 'expected configuration title "Activity bar"');
   });
 
-  it('distinguishes no-analysis welcome state from no-violations state copy', () => {
+  it('contributes viewsWelcome on the unified view for non-Dart projects', () => {
     const pkg = loadPackageJson();
-    const issuesWelcome = pkg.contributes.viewsWelcome.find((entry) => entry.view === 'saropaLints.issues');
-    assert.ok(issuesWelcome, 'expected viewsWelcome entry for saropaLints.issues');
+    // After the flat-sidebar refactor the Dart-but-no-report case is handled
+    // inline by the provider (setup banner + action rows + status placeholder),
+    // so the only remaining welcome is the non-Dart prompt.
+    const welcome = pkg.contributes.viewsWelcome.filter((entry) => entry.view === 'saropaLints.overview');
+    assert.strictEqual(welcome.length, 1);
+    assert.strictEqual(welcome[0]!.contents.includes('pubspec.yaml'), true);
     assert.ok(
-      issuesWelcome?.contents.includes('No analysis report yet.'),
-      'issues welcome copy should communicate not-analyzed-yet state',
-    );
-    assert.ok(
-      issuesWelcome?.contents.includes('[Run Analysis](command:saropaLints.runAnalysis)'),
-      'issues welcome copy should include Run Analysis CTA',
+      !pkg.contributes.viewsWelcome.some((entry) => entry.view === 'saropaLints.dashboardHub'),
+      'dashboardHub welcome removed',
     );
   });
 
