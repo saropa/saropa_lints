@@ -37,15 +37,39 @@ export function getViolationsDashboardStyles(): string {
     }
 
     * { box-sizing: border-box; }
+    /* Content max-width with full-width override (guideline §4). Editor panes can be 4000+px
+       wide on ultrawide monitors — long-line text and dense KPI strips become unreadable past
+       ~1300px. Body[data-full-width="true"] removes the cap when the user clicks the toggle. */
     body {
-      margin: 0;
+      margin: 0 auto;
       padding: 18px 18px 28px;
+      max-width: 1280px;
       font-family: var(--vscode-font-family);
       font-size: 13px;
       line-height: 1.45;
       color: var(--vscode-foreground);
       background: var(--surface-1);
     }
+    body[data-full-width="true"] { max-width: none; }
+    .full-width-toggle {
+      flex: 0 0 auto;
+      width: 26px; height: 26px;
+      display: inline-flex; align-items: center; justify-content: center;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--surface-3);
+      color: var(--vscode-foreground);
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 0.12s, border-color 0.12s;
+    }
+    .full-width-toggle:hover { background: var(--vscode-list-hoverBackground); border-color: var(--border-strong); }
+    .full-width-toggle:focus-visible { outline: 1px solid var(--vscode-focusBorder); outline-offset: 2px; }
+    body[data-full-width="true"] .full-width-toggle {
+      background: var(--vscode-list-activeSelectionBackground);
+      border-color: var(--vscode-focusBorder);
+    }
+    .status-line .full-width-toggle { margin-left: auto; }
 
     /* ============================================================
        HERO — title, status line, hero gauge, version stamp.
@@ -207,6 +231,9 @@ export function getViolationsDashboardStyles(): string {
       color: var(--muted);
       font-size: .9em;
     }
+    /* Inverted toggle visual model (guideline §14.15): pressed = quiet (default state),
+       unpressed = ghosted (the diverged state). Pressed state never borrows primary-button
+       colors — primary-button vocabulary is reserved for tier-1 actions in the same toolbar. */
     .seg .seg-btn {
       border: 1px solid transparent;
       border-radius: 999px;
@@ -218,21 +245,38 @@ export function getViolationsDashboardStyles(): string {
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 5px;
+      gap: 6px;
+      transition: opacity 0.12s, color 0.12s;
     }
     .seg .seg-btn .swatch {
       width: 9px; height: 9px; border-radius: 50%;
       background: var(--accent-info);
       border: 1px solid color-mix(in srgb, var(--vscode-foreground) 20%, transparent);
+      transition: opacity 0.12s, transform 0.12s;
     }
+    /* Pressed = INCLUDED — the default, quiet state. Plain text + colored swatch. */
     .seg .seg-btn[aria-pressed="true"] {
-      background: var(--vscode-button-background);
-      color: var(--vscode-button-foreground);
-      border-color: var(--vscode-button-background);
+      color: var(--vscode-foreground);
+      font-weight: 500;
+      opacity: 1;
     }
-    .seg .seg-btn:hover { background: var(--vscode-list-hoverBackground); }
-    .seg .seg-btn[aria-pressed="true"]:hover { background: var(--vscode-button-hoverBackground, var(--vscode-button-background)); }
-    .seg .seg-btn:focus-visible { outline: 1px solid var(--vscode-focusBorder); outline-offset: 2px; }
+    /* Unpressed = EXCLUDED — the diverged state. Ghosted, strike-through, desaturated swatch.
+       This is the loud signal: "you have actively removed this category from the view." */
+    .seg .seg-btn[aria-pressed="false"] {
+      color: var(--muted);
+      opacity: 0.5;
+      text-decoration: line-through;
+      text-decoration-color: color-mix(in srgb, var(--muted) 60%, transparent);
+    }
+    .seg .seg-btn[aria-pressed="false"] .swatch {
+      opacity: 0.4;
+      transform: scale(0.85);
+    }
+    .seg .seg-btn:hover {
+      opacity: 1;
+      background: color-mix(in srgb, var(--vscode-list-hoverBackground) 60%, transparent);
+    }
+    .seg .seg-btn:focus-visible { outline: 1px solid var(--vscode-focusBorder); outline-offset: 1px; }
 
     /* Button tiers (§8.10).
        Tier 1: one primary per region. Tier 2: secondary, icon+text.

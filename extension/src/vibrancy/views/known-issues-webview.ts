@@ -16,7 +16,7 @@ export class KnownIssuesPanel {
 
         const panel = vscode.window.createWebviewPanel(
             'saropaKnownIssuesBrowser',
-            'Known Issues Library',
+            'Saropa Known Issues',
             vscode.ViewColumn.One,
             { enableScripts: true, retainContextWhenHidden: true },
         );

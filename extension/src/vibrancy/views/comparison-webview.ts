@@ -27,7 +27,7 @@ export class ComparisonPanel {
 
         const panel = vscode.window.createWebviewPanel(
             'saropaPackageComparison',
-            'Package Comparison',
+            'Saropa Package Comparison',
             vscode.ViewColumn.One,
             { enableScripts: true, retainContextWhenHidden: true },
         );

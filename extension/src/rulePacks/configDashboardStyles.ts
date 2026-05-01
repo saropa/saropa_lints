@@ -40,12 +40,17 @@ export function getConfigDashboardStyles(): string {
 function tierControlStyles(): string {
   // §14.1 fix: was inert <span>s, now real <button role="radio">.
   return `
+/* Tier control — radio segmented control (exactly one tier active at a time).
+   Per guideline §14.15 the active button does NOT borrow primary-button colors —
+   primary-button vocabulary is reserved for tier-1 actions in the same toolbar.
+   Active option gets an inactive-selection backdrop tint; inactive options stay
+   transparent at slightly reduced opacity. The track band groups them. */
 .tier-control {
   display: inline-flex;
   border: 1px solid var(--border);
   border-radius: 999px;
   padding: 2px;
-  background: var(--surface-2);
+  background: var(--surface-3);
   gap: 2px;
 }
 .tier-btn {
@@ -58,17 +63,20 @@ function tierControlStyles(): string {
   border-radius: 999px;
   cursor: pointer;
   white-space: nowrap;
-  transition: background 0.15s, color 0.15s;
+  opacity: 0.7;
+  transition: background 0.15s, opacity 0.15s;
 }
-.tier-btn:hover { background: var(--vscode-list-hoverBackground); }
+.tier-btn:hover { opacity: 1; }
 .tier-btn:focus-visible {
   outline: 2px solid var(--vscode-focusBorder);
   outline-offset: 1px;
+  opacity: 1;
 }
 .tier-btn[aria-checked="true"] {
-  background: var(--vscode-button-background);
-  color: var(--vscode-button-foreground);
+  background: var(--vscode-list-activeSelectionBackground);
+  color: var(--vscode-list-activeSelectionForeground);
   font-weight: 600;
+  opacity: 1;
 }
 `;
 }

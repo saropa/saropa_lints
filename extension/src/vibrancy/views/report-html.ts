@@ -5,11 +5,13 @@ import {
 import { formatSizeMB, formatSizeKB } from '../scoring/bloat-calculator';
 import { worstSeverity, severityEmoji, severityLabel } from '../scoring/vuln-classifier';
 import { getReportStyles } from './report-styles';
+import { getPillButtonStyles } from './pill-button-styles';
 import { getReportScript } from './report-script';
-import { escapeHtml } from './html-utils';
+import { createWebviewCspNonce, escapeHtml } from './html-utils';
 import { buildChartSection } from './chart-html';
 import { getChartStyles } from './chart-styles';
 import { getChartScript } from './chart-script';
+import { buildFullWidthToggle, buildStatusLine, getFullWidthToggleScript } from '../../views/dashboardHero';
 
 /** Options passed to the report builder beyond just results. */
 export interface ReportOptions {
@@ -24,27 +26,46 @@ export interface ReportOptions {
     readonly packageTrends?: ReadonlyMap<string, number[]>;
 }
 
-/** Columns that can be auto-hidden when all values are empty or off by default. */
+/** Columns that can be auto-hidden when all values are empty or start collapsed. */
 type HidableColumn = 'transitives' | 'vulns' | 'status' | 'files' | 'license' | 'description';
 
 /** Build the full HTML for the vibrancy report webview. */
 export function buildReportHtml(options: ReportOptions): string {
     const { results } = options;
+    const cspNonce = createWebviewCspNonce();
     /* Average score for the radial gauge (0-100 raw scale). */
     const avg = results.length > 0
         ? Math.round(results.reduce((s, r) => s + r.score, 0) / results.length)
         : 0;
+    // Status line carries the highest-signal facts the dashboard knows: total packages,
+    // direct vs transitive breakdown, vibrant count, and any flagged categories. The user
+    // gets a single muted sentence instead of having to scan the full table to gauge health.
+    const directCount = results.filter(r => r.package.isDirect).length;
+    const totalCount = results.length;
+    const transitives = totalCount - directCount;
+    const byCat = countByCategory(results);
+    const eolCount = byCat.eol + byCat.abandoned;
+    const overallGrade = scoreToGrade(avg);
+    const statusLineHtml = buildStatusLine([
+        { glyph: '📦', label: `${totalCount} packages`, title: `${directCount} direct, ${transitives} transitive` },
+        { label: `Grade ${overallGrade} · ${avg}/100`, tone: avg >= 75 ? 'good' : avg >= 50 ? 'warn' : 'bad' },
+        ...(eolCount > 0 ? [{ label: `${eolCount} flagged`, tone: 'bad' as const, title: 'Abandoned or end-of-life' }] : []),
+    ]);
     return `<!DOCTYPE html>
 <html lang="en">
 <head>
+    <title>Saropa Package Dashboard</title>
     <meta charset="UTF-8">
     <meta http-equiv="Content-Security-Policy"
-        content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline';">
-    <style>${getReportStyles()}${getChartStyles()}</style>
+        content="default-src 'none'; style-src 'nonce-${cspNonce}'; script-src 'nonce-${cspNonce}';">
+    <style nonce="${cspNonce}">${getPillButtonStyles()}${getReportStyles()}${getChartStyles()}</style>
 </head>
 <body>
     <div class="report-header">
-        <h1>Saropa Package Vibrancy <span class="header-version">v${escapeHtml(options.extensionVersion)}</span></h1>
+        <div class="hero-text">
+          <h1>Saropa Package Dashboard <span class="header-version">v${escapeHtml(options.extensionVersion)}</span></h1>
+          ${statusLineHtml.replace('</p>', `${buildFullWidthToggle()}</p>`)}
+        </div>
         ${buildRadialGauge(avg)}
     </div>
     ${buildReportSummary(options)}
@@ -52,7 +73,7 @@ export function buildReportHtml(options: ReportOptions): string {
     ${buildNetworkSection(results)}
     ${buildToolbar(options)}
     ${buildReportTable(results, options.overrideNames, options.packageTrends)}
-    <script>${buildPackageDataScript(results, options.overrideNames, buildRepoShareMap(results))}${getReportScript()}${getChartScript()}</script>
+    <script nonce="${cspNonce}">${buildPackageDataScript(results, options.overrideNames, buildRepoShareMap(results))}${getReportScript()}${getChartScript()}(function(){${getFullWidthToggleScript()}})();</script>
 </body>
 </html>`;
 }
@@ -184,10 +205,13 @@ function buildToolbar(options: ReportOptions): string {
     const copyAllBtn = '<button id="copy-all" class="toolbar-btn" title="Copy report JSON (all rows + details)">&#128203; Copy</button>';
     const saveBtn = '<button id="save-all" class="toolbar-btn" title="Save report JSON to reports/YYYYMMDD/...">&#128190; Save</button>';
     const resetViewBtn = '<button id="reset-view" class="toolbar-btn" title="Reset filters, sort, and saved view state">&#8635; Reset view</button>';
-    // Rescan button — invokes saropaLints.packageVibrancy.scan via the
+    // Rescan button — invokes saropaLints.packageVibrancy.rescan via the
     // webview message channel so users don't have to leave the report to
     // trigger a refresh after editing pubspec.yaml or running `pub get`.
-    const rescanBtn = '<button id="rescan" class="toolbar-btn" title="Rescan packages (runs Package Vibrancy: Scan)">&#128260; Rescan</button>';
+    // The `rescan` command (not `scan`) clears the per-package pub.dev
+    // cache first so the report shows current pub.dev state — without it
+    // the 24h cache TTL made the button a silent no-op for fresh entries.
+    const rescanBtn = '<button id="rescan" class="toolbar-btn" title="Rescan packages — clears the pub.dev cache and re-fetches versions">&#128260; Rescan</button>';
     // Open another project — file picker → opens the selected
     // pubspec.yaml's folder in a new VS Code window. Useful for
     // diagnosing multiple projects without swapping workspace roots.
@@ -265,7 +289,7 @@ function getHiddenColumns(results: VibrancyResult[]): Set<HidableColumn> {
     if (!hasUnused) { hidden.add('status'); }
     const hasFileUsages = results.some(r => r.fileUsages.length > 0);
     if (!hasFileUsages) { hidden.add('files'); }
-    /* License and description are off by default — no toggle UI yet. */
+    /* License and description start collapsed — no toggle UI yet. */
     hidden.add('license');
     hidden.add('description');
     return hidden;
@@ -835,7 +859,7 @@ function buildStatusCell(r: VibrancyResult): string {
     return '<td title="Package is in use"><span class="dimmed">\u2014</span></td>';
 }
 
-/** Plain-text description cell (hidable, off by default). */
+/** Plain-text description cell (hidable, starts collapsed). */
 function buildDescCell(r: VibrancyResult): string {
     const desc = r.pubDev?.description;
     if (!desc) { return '<td class="desc-text"><span class="dimmed">\u2014</span></td>'; }

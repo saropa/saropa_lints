@@ -45,9 +45,28 @@ describe('buildKnownIssuesHtml', () => {
         assert.ok(html.includes('id="search-input"'));
     });
 
-    it('should include filter checkbox', () => {
+    it('should include replacement filter as a segmented multi-toggle', () => {
+        // Replaces the prior boolean checkbox ("filter-has-replacement"); each KPI card
+        // now maps to a distinct filter state, so a tri-state multi-toggle is required
+        // — see known-issues-script.ts setFilterState() and applyFilters().
         const html = buildKnownIssuesHtml();
-        assert.ok(html.includes('id="filter-has-replacement"'));
+        assert.ok(html.includes('data-filter="has"'), 'expected Has replacement seg-btn');
+        assert.ok(html.includes('data-filter="no"'), 'expected None replacement seg-btn');
+    });
+
+    it('should expose summary cards as interactive preset filters', () => {
+        const html = buildKnownIssuesHtml();
+        // KPI cards (guideline §4.2 / §14.8): role="button" + data-kpi-action drive
+        // the filter via known-issues-script.ts.
+        assert.ok(html.includes('data-kpi-action="reset"'));
+        assert.ok(html.includes('data-kpi-action="filter-has"'));
+        assert.ok(html.includes('data-kpi-action="filter-no"'));
+    });
+
+    it('should be Saropa-prefixed in the document title', () => {
+        // Editor-area dashboards prefix h1 + <title> with "Saropa" (guideline §8.1).
+        const html = buildKnownIssuesHtml();
+        assert.ok(html.includes('<title>Saropa Known Issues</title>'));
     });
 
     it('should include sort arrows in table headers', () => {

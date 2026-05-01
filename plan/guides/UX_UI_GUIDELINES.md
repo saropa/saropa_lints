@@ -67,6 +67,7 @@ Always pair chart color with **non-color cues** (labels, order, legend, tooltips
 ## 4. Spacing, shape, and layout
 
 - **Page padding**: Comfortable outer margin (e.g. 16px) so content does not touch the panel edge.
+- **Content max-width with full-width override**: Editor-area dashboards must constrain primary content to a readable max-width (~1100–1300px) centered in the pane. Tables, KPI rows, charts, and prose all inherit the same wrapper — the editor pane can be 4000+px wide on ultrawide monitors, and a 90-character paragraph stretched to 4000px is unreadable. Pair the constraint with a **Full width** toggle (off by default, persisted per-pane) for users who genuinely want the panel to fill the editor — large tables, side-by-side comparisons, and chart-heavy reports can all benefit from the override. Without the toggle, max-width feels like a cage; without max-width, the constraint feels like an oversight.
 - **Radius**: Small consistent rounding (roughly 3–8px) on cards, inputs, buttons, and popovers; slightly larger on inset “detail cards.”
 - **Vertical rhythm**: Clear separation between **header**, **summary strip**, **chart block**, **toolbar**, **filter chips row**, and **table** using margin rather than heavy divider lines except where grouping needs a bordered band.
 
@@ -185,6 +186,7 @@ One-page reference for the concrete UI elements the gold-standard dashboard uses
 | Element | Guideline |
 |--------|------------|
 | **Page title** (`h1`) | Single primary name for the report; largest type scale in the document (e.g. ~1.4em). |
+| **Product prefix** (editor only) | Editor-area dashboard `<h1>` **and** the document `<title>` are prefixed with `Saropa ` (e.g. *Saropa Findings Dashboard*, *Saropa Code Health*, *Saropa Package Comparison*). The prefix earns the editor pane the user opened from the host command palette. Sidebar webviews, tree views, and quick-open palettes are **not** prefixed — they live inside the host's own activity-bar container which already supplies the product context, and prefixing them would just repeat the parent container's name in every row. Treat the prefix as a contract: any new editor-area panel must adopt it before merging. |
 | **Build / version stamp** | Inline next to title, smaller (e.g. ~0.55em of title size), normal weight, **muted opacity** (~0.5)—reads as metadata, not a second headline. |
 | **Band subtitles** (`h2`) | Use for major blocks (e.g. chart section); slightly above body size (~1.1em), optional opacity (~0.9) so they sit below the page title hierarchy. |
 | **Card / panel micro-titles** | Uppercase or small label style with reduced opacity for “Packages”, “Updates”, etc.; pair with a **large numeric** primary. |
@@ -278,7 +280,7 @@ Escape all dynamic URL segments and query text in HTML builders.
 | **Primary** | The single most-likely-next action (e.g. *Run analysis*). One per toolbar at most. Uses primary button tokens. |
 | **Secondary** (`toolbar-btn`) | Default for “Open manifest”, “Copy”, “Save”, “Rescan”, “Reset”—host secondary button tokens; hover darkens slightly. |
 | **Tertiary / palette** | Lower-emphasis actions that should not compete with the primary: smaller padding, lighter background (e.g. `--vscode-editor-inactiveSelectionBackground`), 1px border. Reserved for navigation-style commands or settings shortcuts. |
-| **Primary / active toggle** | Footprint or mode toggle: **active** segment uses primary button background to show which mode is on. |
+| **Toggle (segmented control)** | Mode and filter toggles use a **segmented track** (`.seg` band, [§14.15](#1415-toggle-visual-model-inverted-by-default)), not a `.btn`. Toggles **never** borrow primary-button colors for their pressed state — the primary button vocabulary is reserved for actual actions ("Run analysis", "Save report"). A pressed-state pill that looks identical to a tier-1 action button is the most common source of "buttons I clicked did nothing" complaints. See [§14.15](#1415-toggle-visual-model-inverted-by-default) for the visual model. |
 | **Disabled** | Reduced opacity + `cursor: not-allowed`; still explain why in `title` if the reason is non-obvious. **Buttons whose action targets an empty set MUST render disabled with a `title` explaining why.** A button labeled *Enable applicable SDK packs* that fires on click despite zero applicable packs is a silent-failure trap — the user clicks, nothing perceivable happens, trust drops. The disabled state is not a polish concern; it is the only honest signal that this row of buttons cannot help right now. |
 | **Destructive** | Rare in read-only dashboards; if present, use error/warning token—not the same as secondary gray. |
 | **Icon + text** | Prefer short label text with icon for infrequent actions; icon-only allowed only with strong `title` / `aria-label`. |
@@ -541,3 +543,38 @@ Documentation links, target-platform tables, methodology footnotes, and "About t
 **Failure mode:** the page advertises *what it is* before showing *what it knows*. First-time users may need the docs, but every-day users — the dominant traffic — pay the scroll cost on every visit.
 
 **Fix:** reference content goes into a **bottom band** (after the primary table) or behind a single help-icon affordance in the header. Marketing subtitles, link lists to external docs, and pure-Dart-vs-Flutter platform tables belong below the data, not above it. The status line under `<h1>` carries the only above-the-fold meta the dashboard owes the user ([§4.1](#41-header-region)).
+
+### 14.15 Toggle visual model (inverted by default)
+
+A multi-select toggle whose default state is "all on" — severity filter, impact filter, include-dev-deps — should look **quietest** in its default state and louder only when the user has diverged from defaults. The naive implementation does the opposite: every toggle in the on-state renders as a filled primary-button pill, so a dashboard with all filters at defaults greets the user with a **wall of blue pills**. Every pill looks like a primary action; none of them are actions. The eye has nowhere to land, and the pressed-state vocabulary collides with the actual action buttons in the same toolbar.
+
+**Failure mode:** users learn that on this surface, "looks like a primary button" is unreliable. Trust drops on every click affordance — including the real ones.
+
+**Fix — invert the visual model:**
+
+- **Pressed (included)**: plain text label + the semantic swatch (severity color, impact color, etc.) + slight bold weight or `✓` glyph. **No primary-button background.** This is the resting state, so it must be quiet.
+- **Unpressed (excluded)**: ghosted — reduced opacity (~0.5), strike-through *or* a dashed outline + muted swatch. The exclusion is the news; the chrome should advertise it.
+- **Track band** (`.seg`): subtle inactive-selection background with a 1px border so the user can see toggle membership at a glance. The track is the toggle's container; the buttons inside it inherit shape from the track, not from the action-button vocabulary.
+
+**Concrete vocabulary separation:**
+
+| Element | Default state | Active/changed state | Background |
+|--------|---|---|---|
+| **Action button** (`.btn.tier-1`) | always emphasized | n/a (button has no toggle state) | `var(--vscode-button-background)` |
+| **Action button** (`.btn`, secondary) | always visible | hover only | `var(--vscode-button-secondaryBackground)` |
+| **Toggle in segmented control** (`.seg .seg-btn`) | quiet (text + swatch) | quiet (text + swatch + ✓) — diverged toggles are the exception | transparent inside the `.seg` track |
+| **Excluded toggle** | ghosted (opacity 0.5, strike-through) | n/a | transparent |
+
+The contract: **the primary-button color is reserved for "click me to do something." It does not mean "this filter includes this value."** Filter inclusion is the resting state — a quiet UI is doing its job.
+
+This rule covers severity/impact filters, dev-deps inclusion checkboxes, group-by selectors that render as button rows, and any other multi-select affordance that the user toggles to shape the table or chart below.
+
+**Radio toggles are different.** A toggle where exactly one option is active at a time — footprint mode (own / unique / total), tier selection (Essential / Recommended / …), preset chooser — must NOT use the inverted strike-through model, because two of the three options would always read as ghosted, which is louder than the active one. Radio toggles use a softer pattern: the active option gets an **inactive-selection backdrop tint** (`--vscode-list-activeSelectionBackground`); inactive options stay transparent text at slightly reduced opacity (~0.6). The user picks out the active option by its subtle tinted backdrop, not by a shouting blue pill. The track band still groups the options visually, and the primary-button color is still off-limits.
+
+| Toggle kind | Default | Active state | Inactive state |
+|---|---|---|---|
+| Multi-select inclusion (severity, impact, dev-deps) | all pressed = all included | text + colored swatch, opacity 1 | strike-through, opacity 0.5, desaturated swatch |
+| Radio (footprint, tier, preset) | one selected | text + inactive-selection backdrop | transparent, opacity 0.6 |
+| Additive filter (`Show detected`, `Show enabled`) | none pressed = no constraint | text + inactive-selection backdrop, weight 600 | plain text, opacity 0.85 |
+
+**Diverged state is the loud one — but loud never means primary-button colors.** All three patterns share the rule that the pressed state must NOT use `--vscode-button-background`. The active vocabulary for radio + additive is the inactive-selection backdrop tint; the active vocabulary for multi-select is "stay quiet, let the strike-through on the unpressed siblings do the talking." Primary-button colors are reserved for tier-1 actions in the same toolbar.

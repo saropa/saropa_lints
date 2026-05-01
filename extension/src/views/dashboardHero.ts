@@ -1,0 +1,151 @@
+/**
+ * Shared builders for the gold-standard editor-area dashboard hero band (guideline §4.1).
+ *
+ * Every editor-area dashboard renders the same hero shape:
+ *
+ *   ┌─────────────────────────────────────────────────────────┐
+ *   │  Saropa <Title> v<version>            [↔]   [Gauge]     │
+ *   │  ⟳ Last run … · N findings · …                          │
+ *   └─────────────────────────────────────────────────────────┘
+ *
+ * Dashboards supply their own status pills and (optionally) a radial gauge SVG. The
+ * "Saropa " prefix on the title is enforced here — pass the bare product noun
+ * ("Findings Dashboard", "Package Dashboard", "Code Health") and the helper prepends
+ * the brand prefix per guideline §8.1. Sidebar webviews and tree views must NOT use
+ * this helper.
+ *
+ * The full-width toggle (`[↔]`) flips `body[data-full-width]` so users on ultrawide
+ * monitors can override the body max-width set in dashboardChromeStyles.ts. The
+ * toggle is wired by the inline script returned from `getFullWidthToggleScript()`.
+ */
+
+/** Inputs for the shared dashboard hero builder. */
+export interface DashboardHeroInput {
+  /**
+   * Bare product noun for the page title; the helper prepends "Saropa " (guideline §8.1).
+   * Pass "Findings Dashboard", NOT "Saropa Findings Dashboard". The full-document
+   * `<title>` is the same string the helper builds for `<h1>`.
+   */
+  title: string;
+  /** Extension/build version (without the "v" prefix). Rendered as a muted stamp. */
+  version?: string;
+  /** Pre-built status-pill HTML (use `buildStatusLine`). Empty string suppresses the line. */
+  statusLineHtml?: string;
+  /** Pre-built gauge HTML (radial SVG). Empty string places no gauge in the hero. */
+  gaugeHtml?: string;
+  /** When true, renders the full-width toggle button. Defaults to true. */
+  showFullWidthToggle?: boolean;
+}
+
+/** One status-line pill: a muted facts cell rendered in a row under the title. */
+export interface StatusPill {
+  /** Plain text label (no HTML; will be escaped). */
+  label: string;
+  /** Optional tone — `good` / `warn` / `bad` / `neutral` (default). */
+  tone?: 'good' | 'warn' | 'bad' | 'neutral';
+  /** Optional `title` tooltip. Plain text only — escaped. */
+  title?: string;
+  /** Optional leading glyph (e.g. `⟳`). Single character; not escaped, kept raw. */
+  glyph?: string;
+}
+
+function escape(s: string): string {
+  return s
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;');
+}
+
+/** Render a row of status pills as the muted under-title status line (guideline §4.1). */
+export function buildStatusLine(pills: readonly StatusPill[]): string {
+  if (pills.length === 0) return '';
+  const parts = pills.map((p) => {
+    const toneClass = p.tone && p.tone !== 'neutral' ? ` ${p.tone}` : '';
+    const titleAttr = p.title ? ` title="${escape(p.title)}"` : '';
+    const glyph = p.glyph ? `${p.glyph} ` : '';
+    return `<span class="pill${toneClass}"${titleAttr}>${glyph}${escape(p.label)}</span>`;
+  });
+  return `<p class="status-line">${parts.join('<span class="dot">·</span>')}</p>`;
+}
+
+/** Render the full-width toggle icon button. Wired by `getFullWidthToggleScript()`. */
+export function buildFullWidthToggle(): string {
+  // The arrow glyph (↔) telegraphs "expand horizontally". The active state styling
+  // (when body[data-full-width="true"]) lives in dashboardChromeStyles.ts.
+  return `<button type="button" class="full-width-toggle" id="dashFullWidthToggle"
+    title="Toggle full-width layout" aria-label="Toggle full-width layout"
+    aria-pressed="false">↔</button>`;
+}
+
+/**
+ * Render the gold-standard hero band: title (Saropa-prefixed), version stamp, status line,
+ * full-width toggle, and optional gauge. Guideline §4.1 + §8.1.
+ *
+ * The full-width toggle is appended to the status line (right-aligned via `margin-left:auto`)
+ * rather than dropped into a separate hero cell — that keeps the existing 2-column hero
+ * grid (text | gauge) intact and avoids collision with the gauge in dashboards that have one.
+ */
+export function buildDashboardHero(input: DashboardHeroInput): string {
+  const stamp = input.version
+    ? `<span class="stamp">v${escape(input.version)}</span>`
+    : '';
+  const gauge = input.gaugeHtml ?? '';
+  const toggle = input.showFullWidthToggle === false ? '' : buildFullWidthToggle();
+  const status = input.statusLineHtml ?? '';
+  // If there's no status line, render a bare row that just holds the toggle. This keeps
+  // the toggle reachable on dashboards that opt out of status pills (About, etc.).
+  const statusWithToggle = status
+    ? status.replace('</p>', `${toggle}</p>`)
+    : (toggle ? `<p class="status-line">${toggle}</p>` : '');
+  const title = `Saropa ${input.title}`;
+  return `<header class="dash-hero">
+    <div class="hero-text">
+      <h1>${escape(title)}${stamp}</h1>
+      ${statusWithToggle}
+    </div>
+    ${gauge}
+  </header>`;
+}
+
+/** Build the document `<title>` string with the Saropa prefix applied (guideline §8.1). */
+export function buildDocumentTitle(productNoun: string): string {
+  return `Saropa ${productNoun}`;
+}
+
+/**
+ * Inline script that wires the full-width toggle.
+ * Idempotent: silently does nothing if `#dashFullWidthToggle` isn't in the DOM, so
+ * dashboards that opt out of the toggle don't need to strip the script.
+ */
+export function getFullWidthToggleScript(): string {
+  return `(function() {
+    var btn = document.getElementById('dashFullWidthToggle');
+    if (!btn) return;
+    function setState(on) {
+      document.body.setAttribute('data-full-width', on ? 'true' : 'false');
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    }
+    btn.addEventListener('click', function() {
+      var on = document.body.getAttribute('data-full-width') === 'true';
+      setState(!on);
+    });
+  })();`;
+}
+
+/** Format a UTC ISO 8601 timestamp as a relative duration ("just now", "2m ago", "3d ago"). */
+export function formatRelativeTimestamp(iso: string | undefined): string | undefined {
+  if (!iso) return undefined;
+  const t = Date.parse(iso);
+  if (!Number.isFinite(t)) return undefined;
+  const diffMs = Date.now() - t;
+  if (diffMs < 0) return 'just now';
+  const sec = Math.floor(diffMs / 1000);
+  if (sec < 45) return 'just now';
+  const min = Math.floor(sec / 60);
+  if (min < 60) return `${min}m ago`;
+  const hr = Math.floor(min / 60);
+  if (hr < 24) return `${hr}h ago`;
+  const day = Math.floor(hr / 24);
+  return `${day}d ago`;
+}

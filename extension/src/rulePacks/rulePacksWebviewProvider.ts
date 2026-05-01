@@ -573,36 +573,45 @@ export class RulePacksWebviewProvider {
   /**
    * Toolbar band with density tiers (§4.3, §14.4).
    *
-   * Tier 1 primary: Run analysis. Tier 2 secondary: Open config YAML, Open Package Vibrancy,
-   * Refresh. Tier 3 split-button: Enable applicable packs ▾ (all / breaking / deprecation) — disabled
-   * with `title` when zero detected (§8.10). Search / filter inputs share the band.
+   * Tier 1 primary: Run analysis. Tier 2 secondary: Open config YAML, Copy config, Package
+   * Vibrancy, Refresh. Tier 3 overflow `details.more`: Enable applicable SDK packs (all /
+   * breaking / deprecation) — items disabled with `title` when zero detected (§8.10). Search /
+   * filter inputs share the band on a second row.
    */
   private _buildToolbar(ctx: DashboardContext): string {
-    return `<section class="toolbar" role="toolbar" aria-label="Lints config actions">
-  ${this._buildPrimaryActions()}
-  ${this._buildEnableSplitButton(ctx)}
-  <span class="toolbar-spacer"></span>
-  ${this._buildToolbarFilters()}
+    return `<section class="toolbar-band" role="toolbar" aria-label="Lints config actions">
+  <div class="toolbar-row spread">
+    ${this._buildPrimaryActions()}
+    ${this._buildEnableOverflow(ctx)}
+  </div>
+  <div class="toolbar-row">
+    ${this._buildToolbarFilters()}
+  </div>
 </section>`;
   }
 
   private _buildPrimaryActions(): string {
-    return `<div class="toolbar-group">
-    <button class="action-btn primary" data-command="runAnalysis"
+    return `<div class="toolbar-row" style="gap:6px;">
+    <button class="btn tier-1" data-command="runAnalysis"
       title="Run dart analyze and refresh the dashboard.">Run analysis</button>
-    <button class="action-btn" data-command="openConfig"
+    <button class="btn" data-command="openConfig"
       title="Open analysis_options.yaml in the editor.">Open config YAML</button>
-    <button class="action-btn" data-command="copyConfigSnippet"
+    <button class="btn" data-command="copyConfigSnippet"
       title="Copy a paste-ready YAML snippet of the current tier + enabled packs to the clipboard.">Copy config</button>
-    <button class="action-btn" data-command="openVibrancy"
+    <button class="btn" data-command="openVibrancy"
       title="Open the Package Vibrancy report.">Package Vibrancy</button>
-    <button class="action-btn icon-only" data-command="refresh"
+    <button class="btn icon-only" data-command="refresh"
       title="Reload the dashboard from disk." aria-label="Refresh">⟳</button>
   </div>`;
   }
 
-  /** Enable-applicable split button — disabled when no detected SDK packs (§8.10). */
-  private _buildEnableSplitButton(ctx: DashboardContext): string {
+  /**
+   * Overflow trigger for the SDK enable variants. Uses the shared chrome's `details.more`
+   * pattern (also used by the Findings dashboard) so the menu visual + open/close behavior
+   * matches across all three dashboards. The trigger is disabled when nothing is applicable
+   * (§8.10) — disabled state communicates "no work to do here" before the user has to click.
+   */
+  private _buildEnableOverflow(ctx: DashboardContext): string {
     const total = ctx.detectedSdkPacks.length;
     const breaking = ctx.detectedBreakingSdkCount;
     const deprecation = ctx.detectedDeprecationSdkCount;
@@ -611,40 +620,44 @@ export class RulePacksWebviewProvider {
     const buildItem = (id: string, label: string, count: number): string => {
       const disabled = count === 0;
       const itemTitle = disabled ? noneTitle : `${count} pack${count === 1 ? '' : 's'} match`;
-      return `<button type="button" class="split-menu-item" data-command="${id}"${disabled ? ' disabled' : ''} title="${escapeHtml(itemTitle)}">${escapeHtml(label)} (${count})</button>`;
+      return `<button type="button" class="menu-item" data-command="${id}"${disabled ? ' disabled' : ''} title="${escapeHtml(itemTitle)}">${escapeHtml(label)} <span class="kbd">${count}</span></button>`;
     };
-    return `<div class="toolbar-group split-button">
-    <button class="action-btn" data-command="enableDetectedSdkPacks"
-      ${noneDetected ? `disabled title="${escapeHtml(noneTitle)}"` : `title="Enable all ${total} applicable SDK packs."`}>Enable applicable packs</button>
-    <button class="action-btn split-toggle" type="button" data-split-toggle="enable-sdk"
-      ${noneDetected ? `disabled title="${escapeHtml(noneTitle)}"` : 'title="Choose breaking-only or deprecation-only."'} aria-haspopup="menu" aria-expanded="false">▾</button>
-    <div class="split-menu" id="split-menu-enable-sdk" role="menu" hidden>
+    if (noneDetected) {
+      return `<button type="button" class="btn" disabled title="${escapeHtml(noneTitle)}">Enable applicable packs ▾</button>`;
+    }
+    return `<details class="more">
+    <summary class="btn" title="Choose all applicable, breaking-only, or deprecation-only.">
+      Enable applicable packs <span class="chev">▾</span>
+    </summary>
+    <div class="menu" role="menu">
       ${buildItem('enableDetectedSdkPacks', 'All applicable', total)}
       ${buildItem('enableDetectedBreakingSdkPacks', 'Breaking only', breaking)}
       ${buildItem('enableDetectedDeprecationSdkPacks', 'Deprecation only', deprecation)}
     </div>
-  </div>`;
+  </details>`;
   }
 
-  /** Toolbar filter cluster: search, type select, and detected/enabled-only checkboxes. */
+  /** Toolbar filter cluster: search field, type select, detected/enabled-only segmented control. */
   private _buildToolbarFilters(): string {
-    return `<div class="toolbar-group">
+    return `<label class="field" title="Filter packs by name.">
+    <span class="glyph">🔎</span>
     <label class="sr-only" for="pack-search">Search packs</label>
-    <input id="pack-search" class="search-input" type="search" placeholder="Search packs…"
-      autocomplete="off" />
+    <input id="pack-search" type="search" placeholder="Search packs…" autocomplete="off" />
+  </label>
+  <label class="field">
     <label class="sr-only" for="type-filter">Filter by type</label>
-    <select id="type-filter" class="type-select"
-      title="Filter by pack type (SDK migration vs package rule).">
+    <select id="type-filter" title="Filter by pack type (SDK migration vs package rule).">
       <option value="all">All types</option>
       <option value="sdk">SDK migration</option>
       <option value="package">Package</option>
     </select>
-    <label class="toolbar-checkbox" title="Show only packs whose pubspec gate is satisfied.">
-      <input type="checkbox" id="filter-detected" /> Detected only
-    </label>
-    <label class="toolbar-checkbox" title="Show only packs already enabled in analysis_options.yaml.">
-      <input type="checkbox" id="filter-enabled" /> Enabled only
-    </label>
+  </label>
+  <div class="seg additive" role="group" aria-label="Pack visibility">
+    <span class="seg-label">Show</span>
+    <button type="button" class="seg-btn" data-toggle-filter="detected" aria-pressed="false"
+      title="Show only packs whose pubspec gate is satisfied.">Detected</button>
+    <button type="button" class="seg-btn" data-toggle-filter="enabled" aria-pressed="false"
+      title="Show only packs already enabled in analysis_options.yaml.">Enabled</button>
   </div>`;
   }
 
@@ -654,18 +667,18 @@ export class RulePacksWebviewProvider {
       .sort((a, b) => b.rules - a.rules || a.label.localeCompare(b.label))
       .map((row) => this._buildPackRow(row))
       .join('\n');
-    return `<section aria-label="Rule packs">
+    return `<section class="section" aria-label="Rule packs">
   <h2>Rule packs</h2>
-  <div class="packs-wrap">
-    <table class="packs" id="packs-table">
+  <div class="dash-table-wrap">
+    <table class="dash-table packs" id="packs-table">
       <thead>
         <tr>
-          <th class="sortable" data-sort="label" aria-sort="none">Pack <span class="sort-arrow">▲</span></th>
-          <th class="sortable" data-sort="type" aria-sort="none">Type <span class="sort-arrow">▲</span></th>
-          <th class="sortable" data-sort="risk" aria-sort="none">Risk <span class="sort-arrow">▲</span></th>
-          <th class="sortable" data-sort="detected" aria-sort="none" title="Pack gate is satisfied by this workspace's pubspec.">In pubspec <span class="sort-arrow">▲</span></th>
-          <th class="sortable" data-sort="enabled" aria-sort="none">Enabled <span class="sort-arrow">▲</span></th>
-          <th class="sortable num" data-sort="rules" aria-sort="descending">Rules <span class="sort-arrow">▼</span></th>
+          <th class="sortable" data-sort="label" aria-sort="none">Pack <span class="arrow">▲</span></th>
+          <th class="sortable" data-sort="type" aria-sort="none">Type <span class="arrow">▲</span></th>
+          <th class="sortable" data-sort="risk" aria-sort="none">Risk <span class="arrow">▲</span></th>
+          <th class="sortable" data-sort="detected" aria-sort="none" title="Pack gate is satisfied by this workspace's pubspec.">In pubspec <span class="arrow">▲</span></th>
+          <th class="sortable" data-sort="enabled" aria-sort="none">Enabled <span class="arrow">▲</span></th>
+          <th class="sortable num" data-sort="rules" aria-sort="descending">Rules <span class="arrow">▼</span></th>
           <th></th>
         </tr>
       </thead>
@@ -731,24 +744,27 @@ export class RulePacksWebviewProvider {
       .slice(0, 8);
     const bars = this._buildChartBars(top);
     const donut = this._buildChartDonut(top);
-    return `<section class="chart-section" aria-label="Pack coverage">
-  <div class="chart-head">
-    <h2>Pack coverage</h2>
+    return `<section class="section chart-card" aria-label="Pack coverage">
+  <h3>Pack coverage <span class="meta">
     <span class="chart-legend">
       <span class="chart-legend-item"><span class="legend-swatch" aria-hidden="true"></span>available</span>
       <span class="chart-legend-item"><span class="legend-swatch detected" aria-hidden="true"></span>detected</span>
       <span class="chart-legend-item"><span class="legend-swatch enabled" aria-hidden="true"></span>enabled</span>
     </span>
-  </div>
-  <div class="chart-grid">
-    <div class="chart">${bars}</div>
+  </span></h3>
+  <div class="body">
+    <div>${bars}</div>
     ${donut}
   </div>
   <p class="hint">Top 8 packs by rule count. Click a bar or donut segment to filter the table.</p>
 </section>`;
   }
 
-  /** Render the horizontal-bar list (one row per pack). */
+  /**
+   * Render the horizontal-bar list (one row per pack) using the shared `.bar-row` grid layout
+   * (label / track / value). Width is set via `--bar-width` CSS variable so the shared keyframe
+   * animation in dashboardChromeStyles takes effect on first render.
+   */
   private _buildChartBars(top: readonly PackChartRow[]): string {
     const maxRules = Math.max(1, ...top.map((r) => r.rules));
     return top
@@ -756,9 +772,10 @@ export class RulePacksWebviewProvider {
         const width = Math.round((row.rules / maxRules) * 100);
         const cls = `${row.enabled ? 'enabled' : ''} ${row.detected ? 'detected' : ''}`.trim();
         const tip = `${row.rules} rule${row.rules === 1 ? '' : 's'}; ${row.detected ? 'detected' : 'not detected'}; ${row.enabled ? 'enabled' : 'not enabled'}`;
-        return `<div class="bar-row" role="button" tabindex="0" data-bar-pack="${escapeHtml(row.id)}" title="${escapeHtml(tip)}">
-    <div class="bar-head"><span>${escapeHtml(row.label)}</span><span>${row.rules}</span></div>
-    <div class="bar-track"><div class="bar-fill ${cls}" style="width:${width}%"></div></div>
+        return `<div class="bar-row" role="button" tabindex="0" data-bar-pack="${escapeHtml(row.id)}" title="${escapeHtml(tip)}" style="--bar-width:${width}%;">
+    <span class="bar-label">${escapeHtml(row.label)}</span>
+    <div class="bar-track"><div class="bar-fill ${cls}"></div></div>
+    <span class="bar-value">${row.rules}</span>
   </div>`;
       })
       .join('\n');
@@ -780,7 +797,7 @@ export class RulePacksWebviewProvider {
     const circles = segments
       .map((seg, i) => {
         const tip = `${escapeHtml(seg.label)}: ${seg.length.toFixed(1)}% of top ${segments.length} pack rules`;
-        return `<circle class="donut-seg" cx="50" cy="50" r="35" pathLength="100"
+        return `<circle class="seg" cx="50" cy="50" r="35" pathLength="100"
       stroke-dasharray="${seg.length} ${100 - seg.length}"
       stroke-dashoffset="${(100 - seg.offset) % 100}"
       style="--seg-color: var(--chart-hue-${i % 10});"
@@ -791,12 +808,14 @@ export class RulePacksWebviewProvider {
       })
       .join('\n      ');
     return `<div class="donut-wrap" aria-label="Pack rule proportions">
-    <svg class="donut" viewBox="0 0 100 100" width="160" height="160">
+    <svg class="donut" viewBox="0 0 100 100">
       <circle class="donut-track" cx="50" cy="50" r="35" pathLength="100"></circle>
       ${circles}
-      <text class="donut-center-num" x="50" y="48" text-anchor="middle">${total}</text>
-      <text class="donut-center-label" x="50" y="60" text-anchor="middle">rules</text>
     </svg>
+    <div class="donut-legend">
+      <span class="total">${total}</span>
+      <span class="lbl">rules</span>
+    </div>
   </div>`;
   }
 
@@ -826,7 +845,7 @@ export class RulePacksWebviewProvider {
       const id = `enableRule:${rule}`;
       return `<li class="disabled-rule-row">
     <code>${escapeHtml(rule)}</code>
-    <button type="button" class="action-btn" data-command="${escapeHtml(id)}" title="Re-enable ${escapeHtml(rule)}">Re-enable</button>
+    <button type="button" class="btn tier-3" data-command="${escapeHtml(id)}" title="Re-enable ${escapeHtml(rule)}">Re-enable</button>
   </li>`;
     }).join('\n');
     return `<section class="disabled-rules" aria-label="Disabled rules">

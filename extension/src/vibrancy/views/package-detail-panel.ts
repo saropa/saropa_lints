@@ -66,7 +66,7 @@ export class PackageDetailPanel {
 
         const panel = vscode.window.createWebviewPanel(
             PANEL_ID,
-            `${result.package.name} — Details`,
+            `Saropa Package: ${result.package.name}`,
             vscode.ViewColumn.One,
             { enableScripts: true, retainContextWhenHidden: true },
         );

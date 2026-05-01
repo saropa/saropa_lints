@@ -15,9 +15,18 @@ import {
   getSameTagRules,
   getSupersedesRules,
 } from '../ruleMetadata';
+import { getDashboardChromeStyles } from './dashboardChromeStyles';
+import {
+  buildDashboardHero,
+  buildDocumentTitle,
+  buildStatusLine,
+  getFullWidthToggleScript,
+} from './dashboardHero';
 
 const VIEW_TYPE = 'saropaLints.ruleExplain';
-const PANEL_TITLE = 'Rule: ';
+// Tab label includes the rule name so the user can scan tabs by rule. The hero `<h1>`
+// is Saropa-prefixed via the shared helper (guideline §8.1) — both contracts honored.
+const PANEL_TITLE = 'Saropa Rule: ';
 
 type RuleExplainTelemetryEvent = 'open' | 'relatedClick' | 'docClick';
 type RuleExplainTelemetry = (
@@ -104,22 +113,31 @@ function buildHtml(input: RuleExplainInput): string {
     : '';
 
   const cspNonce = createWebviewCspNonce();
+  // Status line carries the rule's identity facts: where it was triggered, severity, impact.
+  // These are the highest-signal facts the panel knows; the existing `.meta` row was
+  // visually unstyled and read as a stray string, not as the page's freshness/identity strip.
+  const statusPills = [
+    ...(location ? [{ glyph: '📍', label: input.location ?? '', title: input.location }] : []),
+    ...(severity ? [{ label: `severity: ${input.severity ?? ''}`, tone: severityTone(input.severity) }] : []),
+    ...(impact ? [{ label: `impact: ${input.impact ?? ''}`, tone: impactTone(input.impact) }] : []),
+    { label: input.ruleName, title: 'Rule identifier' },
+  ];
+  const statusLineHtml = buildStatusLine(statusPills);
+  const heroHtml = buildDashboardHero({
+    title: `Rule: ${input.ruleName}`,
+    statusLineHtml,
+  });
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'nonce-${cspNonce}'; script-src 'nonce-${cspNonce}';">
-  <title>${rule}</title>
-  <style nonce="${cspNonce}">${getRuleExplainPanelStyles()}</style>
+  <title>${escapeHtml(buildDocumentTitle(`Rule: ${input.ruleName}`))}</title>
+  <style nonce="${cspNonce}">${getDashboardChromeStyles()}${getRuleExplainPanelStyles()}</style>
 </head>
 <body>
-  <h1>${rule}</h1>
-  <div class="meta">
-    ${location ? `<span>📍 ${location}</span>` : ''}
-    ${severity ? `<span><span class="badge">${severity}</span></span>` : ''}
-    ${impact ? `<span><span class="badge">${impact}</span></span>` : ''}
-  </div>
+  ${heroHtml}
 
   <section class="block">
     <h2>Problem</h2>
@@ -161,10 +179,29 @@ function buildHtml(input: RuleExplainInput): string {
           });
         });
       });
+      ${getFullWidthToggleScript()}
     })();
   </script>
 </body>
 </html>`;
+}
+
+/** Map analyzer severity tokens to status-pill tones for the hero status line. */
+function severityTone(severity: string | undefined): 'good' | 'warn' | 'bad' | 'neutral' {
+  if (!severity) return 'neutral';
+  const s = severity.toLowerCase();
+  if (s === 'error') return 'bad';
+  if (s === 'warning') return 'warn';
+  return 'neutral';
+}
+
+/** Map analyzer impact tokens to status-pill tones — critical/high call out the worst cases. */
+function impactTone(impact: string | undefined): 'good' | 'warn' | 'bad' | 'neutral' {
+  if (!impact) return 'neutral';
+  const s = impact.toLowerCase();
+  if (s === 'critical') return 'bad';
+  if (s === 'high') return 'warn';
+  return 'neutral';
 }
 
 let activePanel: vscode.WebviewPanel | undefined;

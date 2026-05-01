@@ -33,7 +33,9 @@ export function showAboutPanel(extensionUri: vscode.Uri, version: string): void 
 function buildHtml(extensionUri: vscode.Uri, version: string): string {
   const bodyHtml = markdownToHtml(readMarkdown(extensionUri));
   const nonce = getNonce();
-
+  // About panel uses a stripped hero (title + version stamp, no status pills, no gauge,
+  // no full-width toggle since this panel runs with enableScripts:false). The Saropa
+  // prefix is satisfied by the explicit "Saropa Lints" h1 — guideline §8.1.
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -41,15 +43,15 @@ function buildHtml(extensionUri: vscode.Uri, version: string): string {
   <meta http-equiv="Content-Security-Policy"
     content="default-src 'none'; style-src 'nonce-${nonce}';">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>About Saropa Lints</title>
+  <title>Saropa Lints — About</title>
   <style nonce="${nonce}">
     body {
       font-family: var(--vscode-font-family);
       font-size: var(--vscode-font-size);
       color: var(--vscode-foreground);
-      max-width: 720px;
+      max-width: 760px;
       margin: 0 auto;
-      padding: 20px 24px;
+      padding: 20px 24px 28px;
       line-height: 1.6;
     }
     a { color: var(--vscode-textLink-foreground); text-decoration: none; }
@@ -61,19 +63,38 @@ function buildHtml(extensionUri: vscode.Uri, version: string): string {
     }
     th { background: var(--vscode-editor-inactiveSelectionBackground); }
     hr { border: none; border-top: 1px solid var(--vscode-panel-border); margin: 20px 0; }
+    /* Stripped hero — title row with a muted version stamp anchored inline. */
+    .dash-hero {
+      display: flex; align-items: baseline;
+      gap: 12px;
+      padding: 16px 20px;
+      margin-bottom: 16px;
+      border: 1px solid var(--vscode-widget-border);
+      border-radius: 12px;
+      background: var(--vscode-editorWidget-background);
+    }
+    .dash-hero h1 {
+      margin: 0;
+      font-size: 1.55em;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+    }
+    .dash-hero .stamp {
+      font-size: 0.55em;
+      font-weight: 400;
+      opacity: 0.55;
+      letter-spacing: 0.4px;
+    }
     h1 { font-size: 1.5em; margin: 0 0 4px; }
     h2 { font-size: 1.25em; margin: 20px 0 8px; }
     h3 { font-size: 1.1em; margin: 16px 0 6px; }
     ul { margin: 6px 0; padding-left: 22px; }
-    .version {
-      font-size: 0.9em;
-      color: var(--vscode-descriptionForeground);
-      margin-bottom: 16px;
-    }
   </style>
 </head>
 <body>
-  <div class="version">Saropa Lints v${escapeHtml(version)}</div>
+  <header class="dash-hero">
+    <h1>Saropa Lints<span class="stamp">v${escapeHtml(version)}</span></h1>
+  </header>
   ${bodyHtml}
 </body>
 </html>`;

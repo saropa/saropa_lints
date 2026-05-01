@@ -18,6 +18,7 @@ import type { Violation } from '../violationsReader';
 import { getFindingsEmptyStateStyles, getViolationsDashboardStyles } from './violationsDashboardStyles';
 import type { DashboardSection } from './issuesTreeModel';
 import { VIOLATIONS_GROUP_BY_MODES, type GroupByMode } from './issuesTreeGrouping';
+import { buildFullWidthToggle, getFullWidthToggleScript } from './dashboardHero';
 
 /** Analyzer-side suppression counts from `violations.json` (same source as the Suppressions tree). */
 export interface AnalyzerSuppressionsSlice {
@@ -229,7 +230,9 @@ function buildStatusLine(input: ViolationsDashboardHtmlInput): string {
   if (typeof input.enabledRuleCount === 'number' && input.enabledRuleCount > 0) {
     parts.push(`<span class="pill" title="Enabled rules in current tier">${input.enabledRuleCount} rules</span>`);
   }
-  return `<p class="status-line">${parts.join('<span class="dot">·</span>')}</p>`;
+  // Full-width toggle is appended after the pills so it right-aligns via margin-left:auto
+  // (see .status-line .full-width-toggle in dashboardChromeStyles.ts / violationsDashboardStyles.ts).
+  return `<p class="status-line">${parts.join('<span class="dot">·</span>')}${buildFullWidthToggle()}</p>`;
 }
 
 function buildHero(input: ViolationsDashboardHtmlInput): string {
@@ -1244,6 +1247,10 @@ function buildScript(): string {
     var el = document.getElementById(id);
     if (el) el.addEventListener('click', fn);
   }
+
+  /* Full-width toggle (guideline §4) — flips body[data-full-width] so users on ultrawide
+     monitors can opt out of the readability max-width set in the stylesheet. */
+  ${getFullWidthToggleScript()}
 })();`;
 }
 

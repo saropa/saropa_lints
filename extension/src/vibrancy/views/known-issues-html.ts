@@ -1,69 +1,101 @@
 import { KnownIssue } from '../types';
 import { allKnownIssues } from '../scoring/known-issues';
+import { createWebviewCspNonce, escapeHtml } from './html-utils';
 import { getReportStyles } from './report-styles';
 import { getKnownIssuesScript } from './known-issues-script';
-import { escapeHtml } from './html-utils';
+import { getDashboardChromeStyles } from '../../views/dashboardChromeStyles';
+import {
+    buildDashboardHero,
+    buildDocumentTitle,
+    buildStatusLine,
+} from '../../views/dashboardHero';
 
-// Static HTML for browsing curated “known issues” and replacement guidance.
+// Static HTML for browsing curated "known issues" and replacement guidance.
 /** Build the full HTML for the known issues library browser. */
 export function buildKnownIssuesHtml(): string {
     const issues = Array.from(allKnownIssues().values()).flat();
     const withReplacement = issues.filter(i => i.replacement).length;
+    const noReplacement = issues.length - withReplacement;
+    const nonce = createWebviewCspNonce();
+
+    const statusLineHtml = buildStatusLine([
+        { glyph: '📚', label: `${issues.length} curated issues` },
+        { label: `${withReplacement} with replacement`, tone: 'good' },
+        { label: `${noReplacement} without`, tone: noReplacement > 0 ? 'warn' : 'neutral' },
+    ]);
+    const heroHtml = buildDashboardHero({
+        title: 'Known Issues',
+        statusLineHtml,
+    });
 
     return `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <title>${escapeHtml(buildDocumentTitle('Known Issues'))}</title>
     <meta http-equiv="Content-Security-Policy"
-        content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline';">
-    <style>${getReportStyles()}${getExtraStyles()}</style>
+        content="default-src 'none'; style-src 'nonce-${nonce}'; script-src 'nonce-${nonce}';">
+    <style nonce="${nonce}">${getReportStyles()}${getDashboardChromeStyles()}${getExtraStyles()}</style>
 </head>
 <body>
-    <h1>Known Issues Library</h1>
+    ${heroHtml}
     ${buildSummaryCards(issues.length, withReplacement)}
     ${buildToolbar()}
     ${buildTable(issues)}
-    <script>${getKnownIssuesScript()}</script>
+    <script nonce="${nonce}">${getKnownIssuesScript()}</script>
 </body>
 </html>`;
 }
 
 function buildSummaryCards(total: number, withReplacement: number): string {
-    return `<div class="summary">
-        <div class="summary-card">
-            <div class="count" id="visible-count">${total}</div>
-            <div class="label">Showing</div>
+    /* KPI cards as preset filters (guideline §4.2 / §14.8): clicking a card sets the
+       replacement filter to the matching state. Showing & Total reset; Has & No drive
+       the filter to "has" / "no". The filter element used to be a binary checkbox; it
+       is now a tri-state segmented control so all four cards have a unique target. */
+    return `<div class="summary ki-summary-strip">
+        <div class="summary-card kpi-card interactive" role="button" tabindex="0"
+             data-kpi="visible" data-kpi-action="reset" title="Click to clear filters">
+            <div class="kpi-k">Showing</div>
+            <div class="kpi-v" id="visible-count">${total}</div>
         </div>
-        <div class="summary-card eol">
-            <div class="count">${total}</div>
-            <div class="label">Total</div>
+        <div class="summary-card kpi-card interactive ki-metric-total" role="button" tabindex="0"
+             data-kpi="total" data-kpi-action="reset" title="Click to clear filters">
+            <div class="kpi-k">Total</div>
+            <div class="kpi-v">${total}</div>
         </div>
-        <div class="summary-card vibrant">
-            <div class="count">${withReplacement}</div>
-            <div class="label">Has Replacement</div>
+        <div class="summary-card kpi-card interactive ki-metric-positive" role="button" tabindex="0"
+             data-kpi="has" data-kpi-action="filter-has" title="Filter to packages with a replacement">
+            <div class="kpi-k">Has Replacement</div>
+            <div class="kpi-v">${withReplacement}</div>
         </div>
-        <div class="summary-card legacy">
-            <div class="count">${total - withReplacement}</div>
-            <div class="label">No Replacement</div>
+        <div class="summary-card kpi-card interactive ki-metric-gap" role="button" tabindex="0"
+             data-kpi="no" data-kpi-action="filter-no" title="Filter to packages without a replacement">
+            <div class="kpi-k">No Replacement</div>
+            <div class="kpi-v">${total - withReplacement}</div>
         </div>
     </div>`;
 }
 
 function buildToolbar(): string {
-    // Search field wrapped so we can absolutely position a clear (X) button
-    // inside it; the button stays hidden until the user types, then clears
-    // the input + re-runs filters on click. See known-issues-script.ts.
-    return `<div class="toolbar">
-        <div class="search-wrapper">
-            <input id="search-input" type="text"
-                placeholder="Search packages..." autocomplete="off">
-            <button type="button" id="search-clear" class="search-clear"
-                title="Clear search" aria-label="Clear search" hidden>&times;</button>
+    // Search field wrapped so we can absolutely position a clear (X) button inside it.
+    // The replacement filter is now a tri-state segmented control (`.seg`) instead of a
+    // binary checkbox so the four KPI cards each map to a distinct filter state.
+    return `<div class="known-issues-toolbar toolbar-band">
+        <div class="toolbar-row">
+            <div class="search-wrapper">
+                <input id="search-input" type="text"
+                    placeholder="Search packages..." autocomplete="off">
+                <button type="button" id="search-clear" class="search-clear"
+                    title="Clear search" aria-label="Clear search" hidden>&times;</button>
+            </div>
+            <span class="seg" role="group" aria-label="Replacement filter">
+                <span class="seg-label">Replacement</span>
+                <button type="button" class="seg-btn" data-filter="has" aria-pressed="true"
+                        title="Include packages with a replacement">Has</button>
+                <button type="button" class="seg-btn" data-filter="no" aria-pressed="true"
+                        title="Include packages without a replacement">None</button>
+            </span>
         </div>
-        <label class="filter-label">
-            <input id="filter-has-replacement" type="checkbox">
-            Has replacement
-        </label>
     </div>`;
 }
 
@@ -122,7 +154,10 @@ function formatReplacement(text: string): string {
 
 function getExtraStyles(): string {
     return `
-        .toolbar {
+        .ki-metric-total .count { color: var(--vscode-foreground); }
+        .ki-metric-positive .count { color: var(--vscode-testing-iconPassed); }
+        .ki-metric-gap .count { color: var(--vscode-editorWarning-foreground); }
+        .known-issues-toolbar {
             display: flex; gap: 16px; align-items: center;
             margin-bottom: 12px;
         }

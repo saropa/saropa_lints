@@ -10,24 +10,71 @@
 /** CSS for the vibrancy report webview, using VS Code theme variables. */
 export function getReportStyles(): string {
     return `
+        /* Content max-width with full-width override (guideline §4). Editor panes can be 4000+px
+           wide on ultrawide monitors — long-line text and dense tables become unreadable past
+           ~1300px. Body[data-full-width="true"] removes the cap when the user clicks the toggle. */
         body {
             font-family: var(--vscode-font-family);
             color: var(--vscode-foreground);
             background: var(--vscode-editor-background);
             padding: 16px;
-            margin: 0;
+            margin: 0 auto;
+            max-width: 1280px;
         }
+        body[data-full-width="true"] { max-width: none; }
         h1 { font-size: 1.4em; margin-bottom: 8px; }
 
         /* ---- Report header with floating gauge ---- */
         .report-header {
             display: flex; align-items: flex-start;
             justify-content: space-between;
+            gap: 16px;
         }
+        .report-header .hero-text { flex: 1; min-width: 0; }
         .header-version {
             font-size: 0.55em; font-weight: normal;
             opacity: 0.5; margin-left: 8px;
             vertical-align: middle;
+        }
+        /* Status line (guideline §4.1) — muted facts row under the title. */
+        .status-line {
+            margin: 0 0 12px;
+            color: var(--vscode-descriptionForeground);
+            font-size: 0.92em;
+            display: flex; flex-wrap: wrap; gap: 4px 10px;
+            align-items: center;
+        }
+        .status-line .dot { opacity: 0.55; }
+        .status-line .pill {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 1px 8px;
+            border-radius: 999px;
+            background: var(--vscode-editor-inactiveSelectionBackground);
+            color: var(--vscode-foreground);
+            font-size: 0.95em;
+        }
+        .status-line .pill.good { color: var(--vscode-testing-iconPassed); }
+        .status-line .pill.bad  { color: var(--vscode-editorError-foreground); }
+        .status-line .pill.warn { color: var(--vscode-editorWarning-foreground); }
+        /* Full-width toggle (guideline §4) — flips body[data-full-width]. */
+        .full-width-toggle {
+            flex: 0 0 auto;
+            width: 26px; height: 26px;
+            display: inline-flex; align-items: center; justify-content: center;
+            border: 1px solid var(--vscode-widget-border);
+            border-radius: 6px;
+            background: var(--vscode-editor-inactiveSelectionBackground);
+            color: var(--vscode-foreground);
+            font-size: 13px;
+            cursor: pointer;
+            margin-left: auto;
+            transition: background 0.12s, border-color 0.12s;
+        }
+        .full-width-toggle:hover { background: var(--vscode-list-hoverBackground); }
+        .full-width-toggle:focus-visible { outline: 1px solid var(--vscode-focusBorder); outline-offset: 2px; }
+        body[data-full-width="true"] .full-width-toggle {
+            background: var(--vscode-list-activeSelectionBackground);
+            border-color: var(--vscode-focusBorder);
         }
 
         /* ---- Radial gauge ---- */
@@ -330,35 +377,49 @@ export function getReportStyles(): string {
             filter: brightness(1.08);
         }
 
-        /* ---- Footprint mode toggle ---- */
-        /* Three buttons that swap the Size column between own / +unique /
-           +all transitive footprint. Active button gets a brighter bg. */
+        /* ---- Footprint mode toggle (radio-style segmented control) ----
+           Three buttons that swap the Size column between own / +unique / +all transitive
+           footprint. Per guideline §14.15 the active button does NOT borrow primary-button
+           colors — primary-button vocabulary is reserved for tier-1 actions (Rescan, Run).
+           For a radio toggle (exactly one active), the active option gets an inactive-selection
+           backdrop tint; inactive options stay transparent. The user picks out the active
+           option by its subtle tinted backdrop, not by a shouting blue pill. */
         .footprint-toggle {
-            display: inline-flex; align-items: center; gap: 4px;
-            padding: 2px 6px;
+            display: inline-flex; align-items: center; gap: 2px;
+            padding: 2px 4px;
             border: 1px solid var(--vscode-widget-border);
-            border-radius: 3px;
+            border-radius: 999px;
+            background: var(--vscode-editor-inactiveSelectionBackground);
         }
         .footprint-toggle .toggle-label {
             font-size: 0.75em; opacity: 0.7;
-            margin-right: 2px;
+            margin-right: 4px;
+            padding-left: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
         }
         .toggle-btn {
             background: transparent;
             color: var(--vscode-foreground);
             border: 1px solid transparent;
-            padding: 2px 8px;
-            border-radius: 2px;
+            padding: 2px 10px;
+            border-radius: 999px;
             cursor: pointer;
-            font-size: 0.8em;
+            font-size: 0.85em;
             white-space: nowrap;
+            opacity: 0.6;
+            transition: opacity 0.12s, background 0.12s;
         }
-        .toggle-btn:hover {
-            background: var(--vscode-list-hoverBackground);
+        .toggle-btn:hover { opacity: 1; }
+        .toggle-btn:focus-visible {
+            outline: 1px solid var(--vscode-focusBorder);
+            outline-offset: 1px;
+            opacity: 1;
         }
         .toggle-btn.active {
-            background: var(--vscode-button-background);
-            color: var(--vscode-button-foreground);
+            background: var(--vscode-list-activeSelectionBackground);
+            color: var(--vscode-list-activeSelectionForeground);
+            opacity: 1;
         }
 
         /* Size column: only the span matching the active footprint mode

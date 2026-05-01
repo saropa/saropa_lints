@@ -12,6 +12,13 @@ import { createWebviewCspNonce, escapeHtml, resolveRepoUrl } from './html-utils'
 import { getPackageDetailStyles } from './package-detail-styles';
 import { getPillButtonStyles } from './pill-button-styles';
 import { getPackageDetailScript } from './package-detail-script';
+import { getDashboardChromeStyles } from '../../views/dashboardChromeStyles';
+import {
+    buildDashboardHero,
+    buildDocumentTitle,
+    buildStatusLine,
+    getFullWidthToggleScript,
+} from '../../views/dashboardHero';
 
 // Single-package drill-down HTML (versions, review, license, links).
 
@@ -49,14 +56,11 @@ export function buildPackageDetailHtml(
 // ---------------------------------------------------------------------------
 
 function buildHeader(r: VibrancyResult): string {
-    const badgeClass = categoryBadgeClass(r.category);
     const grade = categoryToGrade(r.category);
-    /* Letter grade only in the header badge; full category label lives in the title tooltip. */
-    const cat = escapeHtml(categoryLabel(r.category));
-    const license = r.license ? escapeHtml(r.license) : '';
+    const cat = categoryLabel(r.category);
+    const license = r.license ?? '';
     const pubUrl = `https://pub.dev/packages/${encodeURIComponent(r.package.name)}`;
     const repoUrl = resolveRepoUrl(r.github?.repoUrl, r.pubDev?.repositoryUrl);
-
     const docUrl = `https://pub.dev/documentation/${encodeURIComponent(r.package.name)}/latest/`;
 
     const links: string[] = [];
@@ -70,21 +74,44 @@ function buildHeader(r: VibrancyResult): string {
         links.push(actionLink(`${repoUrl}/issues/new`, 'Report Issue'));
     }
 
-    // Show package logo from README if available (lazy-loaded)
+    // Logo (when available) takes the gauge slot in the hero band — it's the visual focal
+    // anchor for a single-package view and parallels how the package dashboard uses a gauge.
     const logoHtml = r.readme?.logoUrl
-        ? `<img class="package-logo" src="${escapeHtml(r.readme.logoUrl)}" alt="${escapeHtml(r.package.name)} logo" />`
+        ? `<div class="hero-gauge package-logo-frame"><img class="package-logo" src="${escapeHtml(r.readme.logoUrl)}" alt="${escapeHtml(r.package.name)} logo" /></div>`
         : '';
 
-    return `
-        <div class="header">
-            ${logoHtml}<h1>${escapeHtml(r.package.name)}</h1>
-            <span>v${escapeHtml(r.package.version)}</span>
-            <span class="badge ${badgeClass}" title="${cat}">${grade}</span>
-            <div class="header-meta">
-                ${license ? `${license} &middot; ` : ''}${links.join(' &middot; ')}
-            </div>
-        </div>
-    `;
+    // Status line carries the package's identity facts: vibrancy grade, version, license,
+    // category. These were buried below the title in the old layout and now sit on the same
+    // line as the title where the user expects to see them at a glance (guideline §4.1).
+    const statusLineHtml = buildStatusLine([
+        { glyph: '🏆', label: `Grade ${grade}`, title: cat, tone: gradeTone(grade) },
+        { label: `v${r.package.version}` },
+        ...(license ? [{ label: license, title: 'License' }] : []),
+        ...(r.pubDev?.publishedDate ? [{ label: `Published ${r.pubDev.publishedDate.split('T')[0]}` }] : []),
+    ]);
+    const heroHtml = buildDashboardHero({
+        title: `Package: ${r.package.name}`,
+        statusLineHtml,
+        gaugeHtml: logoHtml,
+    });
+
+    // External-link strip moved out of the hero per §14.14 — reference content (doc/repo
+    // links) lives below the data, not above it. We render it as a compact "Links" row
+    // immediately below the hero so it stays reachable without dominating the fold.
+    const linksRow = `<div class="links-row" aria-label="External resources">
+        ${links.join(' &middot; ')}
+    </div>`;
+
+    return `${heroHtml}${linksRow}`;
+}
+
+/** Map letter grade to status-pill tone for the hero status line. */
+function gradeTone(grade: string): 'good' | 'warn' | 'bad' | 'neutral' {
+    if (grade === 'A' || grade === 'A+') return 'good';
+    if (grade === 'B') return 'neutral';
+    if (grade === 'C') return 'warn';
+    if (grade === 'D' || grade === 'F') return 'bad';
+    return 'neutral';
 }
 
 function buildDescriptionSection(r: VibrancyResult): string {
@@ -580,15 +607,6 @@ function alertItem(html: string, severity: 'critical' | 'info'): string {
     return `<div class="alert-item ${severity}">${html}</div>`;
 }
 
-function categoryBadgeClass(cat: string): string {
-    if (cat === 'vibrant') { return 'badge-vibrant'; }
-    if (cat === 'stable') { return 'badge-stable'; }
-    if (cat === 'outdated') { return 'badge-outdated'; }
-    if (cat === 'abandoned') { return 'badge-abandoned'; }
-    if (cat === 'end-of-life') { return 'badge-eol'; }
-    return '';
-}
-
 function truncate(text: string, max: number): string {
     return text.length > max ? text.substring(0, max - 3) + '...' : text;
 }
@@ -599,6 +617,7 @@ function wrapHtml(title: string, body: string): string {
     // edge case) can execute as script; a nonce blocks that fallback. Every other
     // editor-area panel in this extension uses the same nonce pattern — see html-utils.ts.
     const nonce = createWebviewCspNonce();
+    const docTitle = escapeHtml(buildDocumentTitle(`Package: ${title}`));
     return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -606,12 +625,15 @@ function wrapHtml(title: string, body: string): string {
     <meta http-equiv="Content-Security-Policy"
           content="default-src 'none'; style-src 'nonce-${nonce}'; script-src 'nonce-${nonce}'; img-src https:;">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${escapeHtml(title)}</title>
-    <style nonce="${nonce}">${getPillButtonStyles()}${getPackageDetailStyles()}</style>
+    <title>${docTitle}</title>
+    <style nonce="${nonce}">${getDashboardChromeStyles()}${getPillButtonStyles()}${getPackageDetailStyles()}</style>
 </head>
 <body>
     ${body}
-    <script nonce="${nonce}">${getPackageDetailScript()}</script>
+    <script nonce="${nonce}">
+        ${getPackageDetailScript()}
+        (function() { ${getFullWidthToggleScript()} })();
+    </script>
 </body>
 </html>`;
 }

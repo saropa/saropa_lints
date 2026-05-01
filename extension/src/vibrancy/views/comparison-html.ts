@@ -1,8 +1,15 @@
 import { ComparisonData, DimensionWinner, RankedComparison, VibrancyCategory } from '../types';
 import { formatSizeMB } from '../scoring/bloat-calculator';
-import { escapeHtml } from './html-utils';
+import { createWebviewCspNonce, escapeHtml } from './html-utils';
 import { isWinnerForDimension } from '../scoring/comparison-ranker';
 import { CATEGORY_DICTIONARY, scoreToGrade } from '../category-dictionary';
+import { getDashboardChromeStyles } from '../../views/dashboardChromeStyles';
+import {
+    buildDashboardHero,
+    buildDocumentTitle,
+    buildStatusLine,
+    getFullWidthToggleScript,
+} from '../../views/dashboardHero';
 
 /**
  * HTML builder for **side-by-side package comparison** (scores, dimension winners, size, recommendations).
@@ -13,22 +20,18 @@ import { CATEGORY_DICTIONARY, scoreToGrade } from '../category-dictionary';
 
 function getComparisonStyles(): string {
     return `
-        body {
-            font-family: var(--vscode-font-family);
-            color: var(--vscode-foreground);
-            background: var(--vscode-editor-background);
-            padding: 16px;
-            margin: 0;
-        }
-        h1 { font-size: 1.4em; margin-bottom: 16px; }
+        ${getDashboardChromeStyles()}
+        /* Comparison-specific overrides on top of the shared chrome. */
         .recommendation {
-            background: var(--vscode-editor-inactiveSelectionBackground);
-            border-radius: 6px;
+            background: var(--surface-3);
+            border: 1px solid var(--border);
+            border-radius: 8px;
             padding: 12px 16px;
-            margin-bottom: 16px;
+            margin-top: 16px;
             line-height: 1.5;
+            animation: rec-in 280ms ease-out;
         }
-        .recommendation strong { color: var(--vscode-textLink-foreground); }
+        .recommendation strong { color: var(--link); }
         table {
             width: 100%;
             border-collapse: collapse;
@@ -87,6 +90,13 @@ function getComparisonStyles(): string {
         .eol { color: var(--vscode-editorError-foreground); }
         .verified { color: var(--vscode-testing-iconPassed); }
         .platforms { font-size: 0.9em; }
+        @keyframes rec-in {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .recommendation { animation: none; }
+        }
     `;
 }
 
@@ -247,33 +257,69 @@ function buildComparisonTable(
 export function buildComparisonHtml(ranked: RankedComparison): string {
     const { packages, winners, recommendation } = ranked;
 
+    const nonce = createWebviewCspNonce();
+    const cspWithScript = `default-src 'none'; style-src 'nonce-${nonce}'; script-src 'nonce-${nonce}';`;
+    const docTitle = escapeHtml(buildDocumentTitle('Package Comparison'));
+
     if (packages.length === 0) {
+        // Empty state inherits the same chrome + hero so the page still telegraphs
+        // "Saropa Package Comparison" before showing the empty-state message.
+        const heroEmpty = buildDashboardHero({
+            title: 'Package Comparison',
+            statusLineHtml: buildStatusLine([
+                { glyph: '📦', label: '0 packages selected', tone: 'warn' },
+            ]),
+        });
         return `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <style>${getComparisonStyles()}</style>
+    <title>${docTitle}</title>
+    <meta http-equiv="Content-Security-Policy" content="${cspWithScript}">
+    <style nonce="${nonce}">${getComparisonStyles()}</style>
 </head>
 <body>
-    <h1>Package Comparison</h1>
-    <p>No packages selected for comparison.</p>
+    ${heroEmpty}
+    <section class="section" aria-label="No packages">
+        <p class="muted">No packages selected for comparison. Right-click two or more packages in the Package dashboard and choose <strong>Compare</strong>.</p>
+    </section>
+    <script nonce="${nonce}">(function(){${getFullWidthToggleScript()}})();</script>
 </body>
 </html>`;
     }
 
+    // Status line carries the page's identity facts: how many packages, how many dimensions
+    // have a winner, and the names of the packages being compared (truncated to keep the line short).
+    const dimensionsWithWinners = winners.length;
+    const statusLineHtml = buildStatusLine([
+        { glyph: '📦', label: `${packages.length} packages compared` },
+        { label: `${dimensionsWithWinners} dimension${dimensionsWithWinners === 1 ? '' : 's'} ranked` },
+        {
+            label: packages.map(p => p.name).slice(0, 3).join(' vs ') + (packages.length > 3 ? ` +${packages.length - 3} more` : ''),
+            title: packages.map(p => p.name).join(', '),
+        },
+    ]);
+    const heroHtml = buildDashboardHero({
+        title: 'Package Comparison',
+        statusLineHtml,
+    });
+
+    // Recommendation box moved BELOW the table per §14.7 — the comparison data is the
+    // primary content and should sit above the fold; the recommendation summary is a
+    // helpful synthesis but not the user's reason for opening this panel.
     return `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="Content-Security-Policy"
-        content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline';">
-    <style>${getComparisonStyles()}</style>
+    <title>${docTitle}</title>
+    <meta http-equiv="Content-Security-Policy" content="${cspWithScript}">
+    <style nonce="${nonce}">${getComparisonStyles()}</style>
 </head>
 <body>
-    <h1>Package Comparison</h1>
-    <div class="recommendation">${recommendation}</div>
+    ${heroHtml}
     ${buildComparisonTable(packages, winners)}
-    <script>${getComparisonScript()}</script>
+    <div class="recommendation">${recommendation}</div>
+    <script nonce="${nonce}">${getComparisonScript()}(function(){${getFullWidthToggleScript()}})();</script>
 </body>
 </html>`;
 }

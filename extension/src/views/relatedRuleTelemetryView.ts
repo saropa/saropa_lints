@@ -9,6 +9,14 @@ import type {
   RelatedRuleTelemetry,
   TelemetryStore,
 } from '../relatedRuleTelemetry';
+import { getDashboardChromeStyles } from './dashboardChromeStyles';
+import {
+  buildDashboardHero,
+  buildDocumentTitle,
+  buildStatusLine,
+  formatRelativeTimestamp,
+  getFullWidthToggleScript,
+} from './dashboardHero';
 
 /** Active panel reference; undefined after dispose or before first open. */
 let currentPanel: vscode.WebviewPanel | undefined;
@@ -49,98 +57,108 @@ function buildHtml(snapshot: TelemetryStore): string {
     ? escapeHtml(JSON.stringify(snapshot.lastProperties, null, 2))
     : '{}';
 
+  // Status line carries the highest-signal facts: how recent the data is, how many
+  // events fired, when the last event landed. Plain "Never" if nothing has fired.
+  const totalEvents = Object.values(snapshot.counters).reduce((n, v) => n + (v ?? 0), 0);
+  const relative = formatRelativeTimestamp(snapshot.lastEventAt);
+  const statusLineHtml = buildStatusLine([
+    {
+      glyph: '⟳',
+      label: relative ? `Last event ${relative}` : 'No events recorded',
+      tone: relative ? 'neutral' : 'warn',
+      title: snapshot.lastEventAt ?? 'Never',
+    },
+    { label: `${totalEvents} total event${totalEvents === 1 ? '' : 's'}` },
+  ]);
+  const heroHtml = buildDashboardHero({
+    title: 'Related Rule Telemetry',
+    statusLineHtml,
+  });
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'nonce-${nonce}'; script-src 'nonce-${nonce}';">
-  <title>Related Rule Telemetry</title>
+  <title>${escapeHtml(buildDocumentTitle('Related Rule Telemetry'))}</title>
   <style nonce="${nonce}">
-    body {
-      font-family: var(--vscode-font-family);
-      font-size: var(--vscode-font-size);
-      color: var(--vscode-foreground);
-      background: var(--vscode-editor-background);
-      margin: 0;
-      padding: 16px;
-      line-height: 1.45;
-    }
-    h1 { margin: 0 0 12px; font-size: 1.2rem; }
-    .toolbar { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
-    /* Pill shape consistent with the canonical .saropa-pill-button helper. */
-    button {
-      background: var(--vscode-button-secondaryBackground);
-      color: var(--vscode-button-secondaryForeground);
-      border: 1px solid var(--vscode-button-border, transparent);
-      border-radius: 999px;
-      padding: 6px 12px;
-      cursor: pointer;
-      transition: background 0.12s ease, border-color 0.12s ease;
-    }
-    button:hover {
-      background: var(--vscode-button-secondaryHoverBackground, var(--vscode-button-secondaryBackground));
-      border-color: color-mix(in srgb, var(--vscode-focusBorder) 55%, var(--vscode-button-border, transparent));
-    }
-    button:focus-visible { outline: 1px solid var(--vscode-focusBorder); outline-offset: 2px; }
-    table {
+    ${getDashboardChromeStyles()}
+    table.tel-table {
       border-collapse: collapse;
       width: 100%;
-      max-width: 720px;
       margin-bottom: 14px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
     }
-    th, td {
-      border: 1px solid var(--vscode-panel-border);
-      padding: 8px 10px;
+    table.tel-table th, table.tel-table td {
+      padding: 8px 12px;
       text-align: left;
+      border-bottom: 1px solid var(--border);
     }
-    th {
-      background: var(--vscode-editor-inactiveSelectionBackground);
-      position: sticky;
-      top: 0;
-      z-index: 1;
+    table.tel-table tbody tr:last-child td { border-bottom: 0; }
+    table.tel-table th {
+      background: var(--surface-3);
+      font-weight: 600;
+      font-size: 0.82em;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      color: var(--muted);
     }
-    .meta {
-      color: var(--vscode-descriptionForeground);
-      font-size: 0.9rem;
-      margin-bottom: 10px;
-    }
-    pre {
-      background: var(--vscode-textBlockQuote-background);
-      border-left: 2px solid var(--vscode-panel-border);
-      padding: 10px;
+    pre.tel-pre {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-left: 2px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 10px 12px;
       overflow: auto;
-      max-width: 720px;
     }
   </style>
 </head>
 <body>
-  <h1>Related Rule Telemetry</h1>
-  <div class="toolbar">
-    <button id="refresh">Refresh</button>
-    <button id="copy">Copy JSON</button>
-    <button id="reset">Reset Counters</button>
-  </div>
-  <div class="meta">Last event: ${lastEventAt}</div>
-  <table>
-    <thead><tr><th>Event</th><th>Count</th></tr></thead>
-    <tbody>
-      ${renderRows(snapshot)}
-    </tbody>
-  </table>
-  <div class="meta">Last event properties</div>
-  <pre>${lastProps}</pre>
+  ${heroHtml}
+  <section class="toolbar-band" aria-label="Telemetry actions">
+    <div class="toolbar-row">
+      <button type="button" class="btn tier-1" id="refresh" title="Reload telemetry counters from disk">
+        <span class="glyph">⟳</span>Refresh
+      </button>
+      <button type="button" class="btn" id="copy" title="Copy snapshot as JSON">
+        <span class="glyph">⎘</span>Copy JSON
+      </button>
+      <button type="button" class="btn danger" id="reset" title="Reset all counters">
+        <span class="glyph">⊘</span>Reset counters
+      </button>
+    </div>
+  </section>
+  <section class="section" aria-label="Counters">
+    <h2>Event counters</h2>
+    <table class="tel-table">
+      <thead><tr><th>Event</th><th>Count</th></tr></thead>
+      <tbody>
+        ${renderRows(snapshot)}
+      </tbody>
+    </table>
+  </section>
+  <section class="section" aria-label="Last event properties">
+    <h2>Last event properties</h2>
+    <pre class="tel-pre">${lastProps}</pre>
+  </section>
   <script nonce="${nonce}">
-    const vscode = acquireVsCodeApi();
-    document.getElementById('refresh').addEventListener('click', () => {
-      vscode.postMessage({ type: 'refresh' });
-    });
-    document.getElementById('copy').addEventListener('click', () => {
-      vscode.postMessage({ type: 'copy' });
-    });
-    document.getElementById('reset').addEventListener('click', () => {
-      vscode.postMessage({ type: 'reset' });
-    });
+    (function () {
+      const vscode = acquireVsCodeApi();
+      document.getElementById('refresh').addEventListener('click', () => {
+        vscode.postMessage({ type: 'refresh' });
+      });
+      document.getElementById('copy').addEventListener('click', () => {
+        vscode.postMessage({ type: 'copy' });
+      });
+      document.getElementById('reset').addEventListener('click', () => {
+        vscode.postMessage({ type: 'reset' });
+      });
+      ${getFullWidthToggleScript()}
+    })();
   </script>
 </body>
 </html>`;
