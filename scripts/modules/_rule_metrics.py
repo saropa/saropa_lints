@@ -5,7 +5,7 @@ Provides rule/category/fixture counts, a visual coverage report,
 roadmap remaining items summary, and automatic README.md badge
 synchronisation used by the publish workflow.
 
-Version:   2.1
+Version:   2.2
 Author:    Saropa
 Copyright: (c) 2025-2026 Saropa
 """
@@ -191,6 +191,10 @@ def _test_category_alias(category: str) -> str:
     return category
 
 
+# Shared flat fixture directory for split `code_quality_*_rules.dart` files.
+_CODE_QUALITY_FIXTURE_DIR = "code_quality"
+
+
 def _count_fixtures_for_category(
     example_dirs: list[Path],
     category: str,
@@ -198,6 +202,23 @@ def _count_fixtures_for_category(
     rule_names: list[str] | None = None,
 ) -> int:
     """Count fixture files for a category across all sub-packages."""
+    # `code_quality_avoid`, `code_quality_prefer`, `code_quality_control_flow`,
+    # and `code_quality_variables` share one folder (`example/lib/code_quality/`).
+    # Each category must count only fixtures whose basename matches that file's
+    # rule codes — never the directory-wide total (which would repeat across rows).
+    if category.startswith("code_quality_") and rule_names:
+        want = frozenset(rule_names)
+        for lib_dir in example_dirs:
+            fixture_dir = lib_dir / _CODE_QUALITY_FIXTURE_DIR
+            if not fixture_dir.is_dir():
+                continue
+            basenames = {
+                p.stem.replace("_fixture", "")
+                for p in fixture_dir.glob("*_fixture.dart")
+            }
+            return len(want & basenames)
+        return 0
+
     fixture_category = _fixture_category_alias(category)
 
     # Primary: exact directory match (e.g., lib/ios/, lib/scroll/)

@@ -8,7 +8,9 @@ Pipeline (default run, no flags)
 2. Install npm dependencies under ``extension/`` (``npm ci`` when ``package-lock.json`` exists).
 3. Run ``npm outdated --json`` for an advisory upgrade summary (never blocks success).
 4. Run ``npm run compile`` (TypeScript + esbuild → ``dist/extension.js``).
-5. Sanity-check the bundle size, then spawn VS Code (or Cursor) with ``--extensionDevelopmentPath``.
+5. Sanity-check the bundle size.
+6. Start ``npm run watch`` detached so esbuild + tsc rebuild on save (skip with ``--no-watch``).
+7. Spawn VS Code (or Cursor) with ``--extensionDevelopmentPath``.
 
 The editor is started with this **repository root** as the opened folder unless you pass a
 different path, ``--bare``, or ``--compile-only``. That keeps Saropa Lints (Dart/custom_lint)
@@ -29,6 +31,7 @@ Usage (from repository root):
     python scripts/run_extension_local.py --editor code
     python scripts/run_extension_local.py --no-logo --quiet
     python scripts/run_extension_local.py --verbose-npm
+    python scripts/run_extension_local.py --no-watch
 
 Environment:
 
@@ -39,7 +42,7 @@ Prerequisites:
     - Node.js 18+ and npm on PATH
     - extension/package-lock.json (recommended; enables npm ci)
 
-Version:   2.1
+Version:   2.2
 Author:    Saropa
 Copyright: (c) 2025-2026 Saropa
 
@@ -87,7 +90,7 @@ from scripts.modules._utils import (  # noqa: E402  # late import after sys.path
 )
 
 # Bumped when launch/install UX or validation rules change materially (shown in banner).
-SCRIPT_VERSION = "2.1"
+SCRIPT_VERSION = "2.2"
 
 # VS Code’s extension host and current @types/vscode targets expect a reasonably modern Node;
 # 18 matches common engine fields in extension ecosystems; older majors often break esbuild/tsc.
@@ -386,6 +389,109 @@ def _run_npm(
     return True
 
 
+def _kill_stale_node_modules_processes() -> int:
+    """Windows: terminate any process whose executable lives under ``extension/node_modules``.
+
+    ``npm ci`` fails on Windows with EPERM ("operation not permitted, unlink … esbuild.exe") when
+    a leftover process — usually the esbuild helper spawned by a previous **detached** watcher —
+    still has a binary mapped. Windows refuses to unlink an executable image while any process
+    holds it open, unlike POSIX where ``unlink`` while-open is fine; this routine is a no-op on
+    POSIX and bails immediately.
+
+    We match strictly by ``ExecutablePath`` under *this* extension tree's absolute path, so other
+    ``node`` / ``esbuild`` processes on the machine (e.g. another project's watcher, or VS Code's
+    own renderer) are untouched. The kill is forceful (``taskkill /F /T``) because the target is
+    by definition stuck on a binary we are about to overwrite — a graceful shutdown only delays
+    the inevitable, and ``/T`` covers child processes in case the watcher tree (node → esbuild
+    service) is still live.
+
+    Returns the number of PIDs killed. A short post-kill sleep is required because Windows
+    releases file handles asynchronously: ``npm ci`` immediately after kill can still race the
+    OS cleanup and reproduce the same EPERM otherwise.
+    """
+    # POSIX file semantics make this whole class of failure impossible — skip the cost.
+    if sys.platform != "win32":
+        return 0
+    nm_dir = _EXTENSION_DIR / "node_modules"
+    if not nm_dir.is_dir():
+        # First install (or a freshly cleaned tree) has nothing to lock — skip the PowerShell hop.
+        return 0
+
+    # Trailing separator so prefix match is path-segment safe (won't match a hypothetical
+    # sibling like ``node_modules_backup``).
+    nm_prefix = str(nm_dir.resolve()) + os.sep
+    # PowerShell **single-quoted** strings are literal — no escape processing — which is exactly
+    # what we want for raw Windows paths full of backslashes. An earlier attempt double-quoted
+    # the literal via ``json.dumps``: that emits ``\\`` for every ``\``, but PS double-quoted
+    # strings keep ``\\`` as TWO backslashes, so the comparison never matched real ``Path``
+    # values (which use single backslash separators). The only thing that needs escaping inside
+    # PS single quotes is a single quote itself — doubled per the PS escape rule.
+    escaped_prefix = nm_prefix.replace("'", "''")
+    # -NoProfile dodges slow user profile loads (and profile errors); -ExecutionPolicy Bypass
+    # works around restrictive machine policies on locked-down dev boxes / CI agents.
+    # SilentlyContinue swallows the harmless "couldn't read protected process" noise from
+    # System / protected processes that we can't (and don't want to) inspect.
+    ps_script = (
+        "$ErrorActionPreference='SilentlyContinue';"
+        f"Get-Process | Where-Object {{ $_.Path -and $_.Path.StartsWith('{escaped_prefix}') }} "
+        "| Select-Object Id,Path | ConvertTo-Json -Compress"
+    )
+    try:
+        r = subprocess.run(
+            ["powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", ps_script],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            timeout=20,
+            check=False,
+        )
+    except OSError:
+        # If PowerShell is missing or unreachable, fall back to "do nothing"; the subsequent
+        # npm ci will surface the original EPERM and the user can intervene manually.
+        return 0
+    raw = (r.stdout or "").strip()
+    if not raw:
+        return 0
+    try:
+        data = json.loads(raw)
+    except json.JSONDecodeError:
+        return 0
+    # ConvertTo-Json emits a bare object for one match and a list for multiple — normalize.
+    if isinstance(data, dict):
+        data = [data]
+    if not isinstance(data, list) or not data:
+        return 0
+
+    killed = 0
+    for item in data:
+        if not isinstance(item, dict):
+            continue
+        pid = item.get("Id")
+        path = item.get("Path") or ""
+        if not isinstance(pid, int):
+            continue
+        print_warning(f"Releasing stale process PID {pid}: {path}")
+        try:
+            subprocess.run(
+                ["taskkill", "/F", "/T", "/PID", str(pid)],
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                timeout=10,
+                check=False,
+            )
+            killed += 1
+        except OSError:
+            continue
+    if killed:
+        # Empirically ~1s is enough for esbuild.exe handle release on modern Win11; shorter
+        # waits intermittently still fail the unlink. Tune up if EPERM resurfaces in the wild.
+        time.sleep(1.0)
+    return killed
+
+
 def _run_install(npm_exe: str, skip: bool, *, verbose_npm: bool) -> bool:
     """Install ``extension/node_modules`` unless ``--skip-install`` (then require existing tree)."""
     if skip:
@@ -395,6 +501,18 @@ def _run_install(npm_exe: str, skip: bool, *, verbose_npm: bool) -> bool:
         print_info("Skipping install dependencies (--skip-install).")
         _flush_out()
         return True
+
+    # Pre-flight: a previous detached watcher's esbuild.exe (and friends) commonly outlive the
+    # script, locking files that npm ci must unlink. Release them BEFORE npm runs rather than
+    # waiting for the EPERM and bailing — this is the difference between a self-contained script
+    # and one that requires manual taskkill between runs.
+    released = _kill_stale_node_modules_processes()
+    if released:
+        print_info(
+            f"Released {released} stale process(es) holding files under extension/node_modules.",
+        )
+        _flush_out()
+
     action = (
         "Installing extension dependencies from lockfile (npm ci)"
         if _LOCKFILE.is_file()
@@ -470,6 +588,72 @@ def _report_dependency_upgrades(npm_exe: str) -> bool:
         print_info(f"  · … and {len(rows) - 10} more (cd extension && npm outdated)")
     print_info("  To upgrade later: cd extension && npm update  (or bump package.json / npm install <pkg>)")
     return True
+
+
+def _start_watcher_background(npm_exe: str) -> subprocess.Popen | None:
+    """Spawn ``npm run watch`` detached so esbuild + tsc rebuild ``dist/extension.js`` on save.
+
+    Without a watcher the bundle stays frozen at whatever the one-shot ``npm run compile`` above
+    produced — so every ``.ts`` edit silently goes stale until someone re-runs this script. The
+    Extension Development Host loads ``dist/extension.js``, not the TypeScript source, so without
+    rebuilds **Reload Window** is a no-op for code changes.
+
+    **Detached on purpose** — this script exits after launching the editor, but the dev loop
+    continues. New process group (Windows) / new session (POSIX) so the watcher survives the
+    script exit and Ctrl+C in the parent terminal does not kill it. The user stops it explicitly
+    via the printed PID.
+
+    **Output goes to ``extension/.watcher.log``** rather than the parent stdout. The script
+    prints the launch summary and exits; if watcher output inherited stdout it would land in a
+    detached session looking like noise. A log file lets ``tail -f`` debug TS errors after edits.
+    """
+    print_section("Start watcher (esbuild + tsc)")
+    log_path = _EXTENSION_DIR / ".watcher.log"
+    print_info(f"npm run watch  →  detached  ·  log: {log_path}")
+    _flush_out()
+    cmd = [npm_exe, "run", "watch"]
+    shell = get_shell_mode()
+    try:
+        # Line-buffered so `tail -f` shows each "build finished" line as it lands rather than
+        # in 4KB chunks (default block buffering on a non-TTY file handle).
+        log_fh = open(log_path, "w", encoding="utf-8", buffering=1)  # noqa: SIM115
+    except OSError as e:
+        print_warning(f"Could not open watcher log {log_path}: {e}")
+        return None
+    try:
+        kwargs: dict = {
+            "cwd": str(_EXTENSION_DIR),
+            "shell": shell,
+            "stdout": log_fh,
+            "stderr": subprocess.STDOUT,
+        }
+        # cspell:ignore creationflags
+        if sys.platform == "win32":
+            # CREATE_NEW_PROCESS_GROUP detaches from the parent's Ctrl+C signal so closing this
+            # script (or pressing Ctrl+C in its console) does not also terminate the watcher.
+            kwargs["creationflags"] = subprocess.CREATE_NEW_PROCESS_GROUP
+        else:
+            # New session: SIGHUP from the parent terminal does not propagate, so the watcher
+            # survives if you close the terminal that launched this script.
+            kwargs["start_new_session"] = True
+        proc = subprocess.Popen(cmd, **kwargs)  # noqa: S603  # argv built from this script
+    except OSError as e:
+        print_warning(f"Could not start watcher: {e}")
+        log_fh.close()
+        return None
+    print_success(
+        f"Watcher started (PID {proc.pid}); .ts saves now rebuild dist/extension.js automatically.",
+    )
+    print_colored(
+        "  After saves: Command Palette → 'Developer: Reload Window' (the bundle is fresh).",
+        Color.DIM,
+    )
+    print_colored(f"  Logs: tail -f {log_path}", Color.DIM)
+    if sys.platform == "win32":
+        print_colored(f"  To stop: taskkill /pid {proc.pid} /t /f", Color.DIM)
+    else:
+        print_colored(f"  To stop: kill {proc.pid}", Color.DIM)
+    return proc
 
 
 def _run_launch(editor_cli: str, host_folder: Path | None) -> int:
@@ -578,6 +762,11 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
         help="Stream full npm stdout/stderr (install + compile); shows raw npm output and deprecation lines.",
     )
     p.add_argument(
+        "--no-watch",
+        action="store_true",
+        help="Don't start the esbuild+tsc watcher after compile. Default: a detached watcher rebuilds dist/extension.js on save so 'Developer: Reload Window' picks up new code without re-running this script.",
+    )
+    p.add_argument(
         "--version",
         action="version",
         version=f"%(prog)s {SCRIPT_VERSION}",
@@ -613,10 +802,11 @@ def main(argv: list[str] | None = None) -> int:
     print()
     _flush_out()
 
-    # ── ``--launch-only``: trust existing ``dist/``; 5 progress steps ───────────
+    # ── ``--launch-only``: trust existing ``dist/`` (5 steps base, +1 with watcher) ─────
     if args.launch_only:
-        total_steps = 5
-        # Step map: 1 layout, 2 dist bundle, 3 resolve editor, 4 workspace hints, 5 launch.
+        # Watcher runs by default so subsequent ``.ts`` edits rebuild the bundle without
+        # re-running this script; ``--no-watch`` returns the script to its prior 5-step shape.
+        total_steps = 5 if args.no_watch else 6
         cur = 0
 
         def v1() -> bool:
@@ -656,12 +846,30 @@ def main(argv: list[str] | None = None) -> int:
         _warn_workspace_activation(host, args.bare)
         print_success("Workspace path OK")
 
+        if not args.no_watch:
+            # Start the watcher BEFORE launch so the EDH's first activation already has a fresh
+            # build pipeline behind it; npm CLI must exist (validated in the full path; here we
+            # need a separate guard because ``--launch-only`` skips toolchain validation).
+            npm_for_watch = shutil.which("npm")
+            if npm_for_watch is None:
+                print_warning("npm not on PATH — skipping watcher (saves will not auto-rebuild).")
+            else:
+                cur += 1
+                _print_step_bar(cur, total_steps, "Start watcher")
+                _start_watcher_background(npm_for_watch)
+
         cur += 1
         _print_step_bar(cur, total_steps, "Launch")
         return _run_launch(editor_cli, host)
 
-    # ── Full pipeline: 6 steps if ``--compile-only``, else 7 (adds launch) ─────
-    total_steps = 7 if not args.compile_only else 6
+    # ── Full pipeline: 6 steps base; +1 for launch, +1 for watcher (default on with launch) ─
+    # Watcher only fires when an editor is launched — there's no point watching for a
+    # ``--compile-only`` invocation that exits before any EDH consumes the rebuilds.
+    total_steps = 6
+    if not args.compile_only:
+        total_steps += 1  # launch
+        if not args.no_watch:
+            total_steps += 1  # watcher
     cur = 0
 
     def v_layout() -> bool:
@@ -725,6 +933,14 @@ def main(argv: list[str] | None = None) -> int:
 
     _warn_workspace_activation(host_lp, args.bare)
     print_success("Ready to launch")
+
+    if not args.no_watch:
+        # Start watcher AFTER compile/validate but BEFORE launch so the very first .ts save in
+        # the EDH session triggers a rebuild — no race window where the user edits and Reload
+        # Window pulls a stale bundle. Watcher PID is printed so the user can stop it later.
+        cur += 1
+        _print_step_bar(cur, total_steps, "Start watcher")
+        _start_watcher_background(npm)
 
     print()
     cur += 1
