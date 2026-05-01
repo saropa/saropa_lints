@@ -120,17 +120,30 @@ function inlineToHtml(text: string): string {
 
 /**
  * Convert the controlled markdown from about-saropa.md to HTML.
- * Handles: headers, bold, italic, links, tables, unordered lists, horizontal rules.
- * Not a general-purpose converter — scoped to the constructs in the file.
+ * Handles: headers, bold, italic, links, tables, unordered lists (with
+ * indent-based nesting), horizontal rules. Not a general-purpose converter —
+ * scoped to the constructs in the file. Exported for unit testing of the
+ * nested-list rendering path.
  */
-function markdownToHtml(md: string): string {
+export function markdownToHtml(md: string): string {
   const lines = md.split('\n');
   const out: string[] = [];
   let inTable = false;
-  let inList = false;
+  // Stack of indent widths (in spaces) for currently-open <ul> levels. Each
+  // entry represents one nested <ul> whose <li> at the top of the stack is
+  // still open and not yet terminated with </li>. We close the trailing <li>
+  // lazily — either when the next sibling/dedent appears, or in closeLists().
+  const listIndents: number[] = [];
+
+  const closeLists = () => {
+    while (listIndents.length > 0) {
+      out.push('</li></ul>');
+      listIndents.pop();
+    }
+  };
 
   const closeBlocks = () => {
-    if (inList) { out.push('</ul>'); inList = false; }
+    closeLists();
     if (inTable) { out.push('</tbody></table>'); inTable = false; }
   };
 
@@ -155,7 +168,7 @@ function markdownToHtml(md: string): string {
 
     // Table rows: | col | col |
     if (trimmed.startsWith('|')) {
-      if (inList) { out.push('</ul>'); inList = false; }
+      closeLists();
       // Skip separator rows (|---|---|)
       if (/^\|[\s\-:|]+\|$/.test(trimmed)) continue;
       if (!inTable) { out.push('<table><tbody>'); inTable = true; }
@@ -165,13 +178,41 @@ function markdownToHtml(md: string): string {
     }
     if (inTable) { out.push('</tbody></table>'); inTable = false; }
 
-    // List items (top-level and nested)
-    if (/^\s*- /.test(line)) {
-      if (!inList) { out.push('<ul>'); inList = true; }
-      out.push(`<li>${inlineToHtml(trimmed.replace(/^- /, ''))}</li>`);
+    // List items — support nesting via leading-space indent. The about-saropa.md
+    // file uses 2-space indents for sub-bullets (e.g. "Smart Features" children,
+    // "VS Code Extensions" descriptions). The previous flat handling rendered
+    // every "- " line as a sibling, which made the parent/child relationship
+    // disappear in the webview.
+    const listMatch = line.match(/^(\s*)- (.+)$/);
+    if (listMatch) {
+      const indent = listMatch[1].length;
+      const content = inlineToHtml(listMatch[2]);
+
+      if (listIndents.length === 0) {
+        // First bullet: open the outermost <ul>.
+        out.push('<ul>');
+        listIndents.push(indent);
+      } else if (indent > listIndents[listIndents.length - 1]) {
+        // Deeper indent: nest a new <ul> *inside* the still-open parent <li>.
+        // The parent <li> intentionally has no </li> emitted yet for this reason.
+        out.push('<ul>');
+        listIndents.push(indent);
+      } else {
+        // Same or shallower indent: close the previous sibling's <li>, then
+        // unwind back to the matching level by closing each deeper <ul></li>.
+        out.push('</li>');
+        while (listIndents.length > 1 && indent < listIndents[listIndents.length - 1]) {
+          out.push('</ul></li>');
+          listIndents.pop();
+        }
+      }
+
+      // Open the new <li> without closing it — a following nested bullet may
+      // need to embed a <ul> here. closeLists()/sibling handling closes it.
+      out.push(`<li>${content}`);
       continue;
     }
-    if (inList) { out.push('</ul>'); inList = false; }
+    closeLists();
 
     // Blank line
     if (trimmed === '') continue;

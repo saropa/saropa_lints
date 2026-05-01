@@ -104,7 +104,9 @@
     "src/views/triageTree.ts",
     "src/views/configTree.ts",
     "src/views/sectionedSidebar.ts",
-    "src/test/views/overviewTreeFlat.test.ts"
+    "src/test/views/overviewTreeFlat.test.ts",
+    "src/views/aboutView.ts",
+    "src/test/views/aboutView.test.ts"
   ],
   "exclude": ["node_modules", ".vscode-test", "out", "dist"]
 }
