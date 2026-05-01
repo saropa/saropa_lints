@@ -52,16 +52,46 @@
     "views": {
       "saropaLints": [
         {
-          "id": "saropaLints.overview",
+          "id": "saropaLints.banner",
           "name": "Saropa Lints",
-          "when": "config.saropaLints.sidebar.showOverview"
+          "when": "saropaLints.needsBanner || !saropaLints.isDartProject"
+        },
+        {
+          "id": "saropaLints.editorDashboards",
+          "name": "Editor dashboards",
+          "when": "saropaLints.isDartProject"
+        },
+        {
+          "id": "saropaLints.actions",
+          "name": "Actions",
+          "when": "saropaLints.isDartProject"
+        },
+        {
+          "id": "saropaLints.status",
+          "name": "Status",
+          "when": "saropaLints.isDartProject && saropaLints.hasViolations"
+        },
+        {
+          "id": "saropaLints.settings",
+          "name": "Settings",
+          "when": "saropaLints.isDartProject"
+        },
+        {
+          "id": "saropaLints.triage",
+          "name": "Triage",
+          "when": "saropaLints.isDartProject && saropaLints.hasTriage"
+        },
+        {
+          "id": "saropaLints.help",
+          "name": "Help",
+          "when": "saropaLints.isDartProject"
         }
       ]
     },
     "viewsWelcome": [
       {
-        "view": "saropaLints.overview",
-        "contents": "**Saropa Lints v12.8.3**\n\nSaropa Lints provides 2100+ Dart and Flutter lint rules for security, accessibility, and performance. It has two components: a pub.dev package with the rules and a VS Code extension for visual analysis and configuration.\n\nRequires a Dart or Flutter project.\n\nOpen a folder containing a `pubspec.yaml` to get started.\n\n[Learn more online](https://pub.dev/packages/saropa_lints)\n[Browse All Commands](command:saropaLints.showCommandCatalog)\n[About Saropa Lints](command:saropaLints.showAbout)\n[Getting Started](command:saropaLints.openWalkthrough)",
+        "view": "saropaLints.banner",
+        "contents": "**Saropa Lints**\n\n2100+ Dart and Flutter lint rules for security, accessibility, and performance.\n\nRequires a Dart or Flutter project.\n\nOpen a folder containing a `pubspec.yaml` to get started.\n\n[Learn more online](https://pub.dev/packages/saropa_lints)\n[Browse All Commands](command:saropaLints.showCommandCatalog)\n[About Saropa Lints](command:saropaLints.showAbout)\n[Getting Started](command:saropaLints.openWalkthrough)",
         "when": "!saropaLints.isDartProject"
       }
     ],
@@ -814,43 +844,13 @@
     "menus": {
       "view/title": [
         {
-          "command": "saropaLints.showCommandCatalog",
-          "when": "view == saropaLints.overview",
-          "group": "navigation@0"
-        },
-        {
-          "command": "saropaLints.openHelpHub",
-          "when": "view == saropaLints.overview",
-          "group": "navigation@0"
-        },
-        {
-          "command": "saropaLints.createSaropaInstructions",
-          "when": "view == saropaLints.overview",
+          "command": "saropaLints.refresh",
+          "when": "view == saropaLints.editorDashboards",
           "group": "navigation"
         },
         {
           "command": "saropaLints.runAnalysis",
-          "when": "view == saropaLints.overview && saropaLints.isDartProject",
-          "group": "navigation"
-        },
-        {
-          "command": "saropaLints.openConfigDashboard",
-          "when": "view == saropaLints.overview && saropaLints.isDartProject",
-          "group": "navigation"
-        },
-        {
-          "command": "saropaLints.openPackageVibrancy",
-          "when": "view == saropaLints.overview && saropaLints.isDartProject",
-          "group": "navigation"
-        },
-        {
-          "command": "saropaLints.openProjectVibrancyReport",
-          "when": "view == saropaLints.overview && saropaLints.isDartProject",
-          "group": "navigation"
-        },
-        {
-          "command": "saropaLints.refresh",
-          "when": "view == saropaLints.overview",
+          "when": "view == saropaLints.actions && saropaLints.isDartProject",
           "group": "navigation"
         }
       ],
@@ -859,11 +859,6 @@
           "command": "saropaLints.focusIssuesForActiveFile",
           "when": "view == workbench.panel.markers.view",
           "group": "navigation"
-        },
-        {
-          "command": "saropaLints.overview.copyAsJson",
-          "when": "view == saropaLints.overview && viewItem == overviewItem",
-          "group": "9_copy@1"
         }
       ],
       "editor/title": [
@@ -1753,12 +1748,12 @@
           {
             "id": "saropaLints.walkthrough.trends",
             "title": "File Risk & Trends",
-            "description": "**File Risk** ranks files by violation density — riskiest first.\n\nOverview shows score progression over time. Regression alerts and milestone celebrations keep you on track.\n\n[View Overview](command:saropaLints.overview.focus)",
+            "description": "**File Risk** ranks files by violation density — riskiest first.\n\nThe Status panel shows score progression over time. Regression alerts and milestone celebrations keep you on track.\n\n[Show Status panel](command:saropaLints.status.focus)",
             "media": {
               "markdown": "media/walkthrough-trends.md"
             },
             "completionEvents": [
-              "onView:saropaLints.overview"
+              "onView:saropaLints.status"
             ]
           },
           {

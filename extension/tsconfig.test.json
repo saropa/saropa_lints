@@ -103,7 +103,7 @@
     "src/pubspecReader.ts",
     "src/views/triageTree.ts",
     "src/views/configTree.ts",
-    "src/views/overviewTree.ts",
+    "src/views/sectionedSidebar.ts",
     "src/test/views/overviewTreeFlat.test.ts"
   ],
   "exclude": ["node_modules", ".vscode-test", "out", "dist"]

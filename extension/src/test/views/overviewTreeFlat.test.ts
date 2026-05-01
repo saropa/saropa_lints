@@ -1,15 +1,13 @@
 /**
- * Pins the sidebar contract for {@link OverviewTreeProvider}: the root level
- * returns collapsible **section headers** (Editor dashboards / Actions /
- * Status / Settings / Triage / Help). Each section's children are leaf rows
- * only — leaves never expand further. Triage groups are the only data nodes
- * that may render as collapsed in the sidebar, but the provider does **not**
- * expand them inline (the user wanted "logical expander sections like before,
- * just not a tree").
+ * Pins the multi-panel sidebar contract for the Saropa Lints activity-bar
+ * container. Each section is its own VS Code view (Banner / Editor dashboards
+ * / Actions / Status / Settings / Triage / Help), and inside every section
+ * the rows are flat clickable leaves only — no chevrons, no nested expansion.
  *
  * Regression guards:
- *   - Section names match what the user agreed to.
- *   - No legacy parent contextValues from the old Overview & options view.
+ *   - View IDs match what package.json declares.
+ *   - Every leaf returned by every provider has `CollapsibleState.None`
+ *     (no chevrons inside any section).
  *   - Every leaf has a click `command` so nothing in the sidebar is dead.
  *   - Run analysis appears exactly once across all sections.
  */
@@ -17,6 +15,8 @@ import '../vibrancy/register-vscode-mock';
 
 import * as assert from 'node:assert';
 import * as sinon from 'sinon';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 
 import * as projectRoot from '../../projectRoot';
 import * as pubspecReader from '../../pubspecReader';
@@ -26,7 +26,11 @@ import * as configWriter from '../../configWriter';
 import * as runHistory from '../../runHistory';
 
 import { ConfigTreeProvider } from '../../views/configTree';
-import { OverviewTreeProvider, type OverviewTreeNode } from '../../views/overviewTree';
+import {
+  createSidebarSectionProviders,
+  SECTION_VIEW_IDS,
+  type FlatSectionProvider,
+} from '../../views/sectionedSidebar';
 import { TreeItemCollapsibleState } from '../vibrancy/vscode-mock-classes';
 
 class MockMemento {
@@ -42,16 +46,26 @@ class MockMemento {
   }
 }
 
-describe('OverviewTreeProvider — sectioned flat sidebar', () => {
+interface PackageJsonShape {
+  contributes: {
+    views: { saropaLints: Array<{ id: string; name: string; when?: string }> };
+  };
+}
+
+function loadPackageJson(): PackageJsonShape {
+  const pkgPath = path.resolve(__dirname, '..', '..', '..', 'package.json');
+  return JSON.parse(fs.readFileSync(pkgPath, 'utf8')) as PackageJsonShape;
+}
+
+describe('Saropa Lints sidebar — multi-panel section providers', () => {
   let memento: MockMemento;
   let configProvider: ConfigTreeProvider;
-  let provider: OverviewTreeProvider;
+  let providers: FlatSectionProvider[];
 
   beforeEach(() => {
     sinon.restore();
     sinon.stub(projectRoot, 'getProjectRoot').returns('/fake/root');
     sinon.stub(pubspecReader, 'hasSaropaLintsDep').returns(true);
-    // No analysis report — the provider should still surface dashboards/actions/help.
     sinon.stub(violationsReader, 'readViolations').returns(null);
     sinon.stub(suppressionsStore, 'loadSuppressions').returns({
       hiddenFiles: [],
@@ -65,117 +79,98 @@ describe('OverviewTreeProvider — sectioned flat sidebar', () => {
     sinon.stub(runHistory, 'loadHistory').returns([]);
     memento = new MockMemento();
     configProvider = new ConfigTreeProvider();
-    provider = new OverviewTreeProvider(memento, configProvider);
+    providers = createSidebarSectionProviders(memento, configProvider);
   });
 
   afterEach(() => {
     sinon.restore();
   });
 
-  /**
-   * Walk root → sections → leaves into a flat list of all visible rows so
-   * tests can assert on the union without rewriting one helper per case.
-   */
-  async function flattenAllRows(): Promise<OverviewTreeNode[]> {
-    const root = await provider.getChildren();
-    const all: OverviewTreeNode[] = [];
-    for (const node of root) {
-      all.push(node);
-      const cv = (node as { contextValue?: string }).contextValue ?? '';
-      if (cv.startsWith('overviewSection:')) {
-        const kids = await provider.getChildren(node);
-        all.push(...kids);
-      }
-    }
-    return all;
-  }
-
-  it('root contains only the agreed sections and standalone banner rows', async () => {
-    const root = await provider.getChildren();
-    const labels = root.map((n) => String((n as { label?: string }).label ?? ''));
-    // Sections that must always appear in a Dart workspace.
-    assert.ok(labels.includes('Editor dashboards'), 'expected "Editor dashboards" section');
-    assert.ok(labels.includes('Actions'), 'expected "Actions" section');
-    assert.ok(labels.includes('Settings'), 'expected "Settings" section');
-    assert.ok(labels.includes('Help'), 'expected "Help" section');
-    // No leaked legacy section headers.
-    assert.ok(!labels.includes('Help & resources'), 'old "Help & resources" parent must not return');
-    assert.ok(!labels.includes('Issues'), 'old "Issues" parent must not return');
+  it('package.json declares exactly the seven section views in the saropaLints container', () => {
+    const pkg = loadPackageJson();
+    const views = pkg.contributes.views.saropaLints;
+    const ids = views.map((v) => v.id).sort();
+    const expected = Object.values(SECTION_VIEW_IDS).sort();
+    assert.deepStrictEqual(ids, expected, 'view IDs in package.json must match SECTION_VIEW_IDS exactly');
   });
 
-  it('no legacy parent contextValues remain anywhere at the root level', async () => {
-    const root = await provider.getChildren();
-    const banned = new Set([
-      'overviewHelpSection',
-      'overviewSettingsSection',
-      'overviewIssuesSection',
-      'overviewSummarySection',
-      'overviewSuggestionsSection',
-      'overviewRiskSection',
-      'overviewSidebarSection',
-    ]);
-    for (const node of root) {
-      const cv = (node as { contextValue?: string }).contextValue;
-      if (cv) {
-        assert.ok(!banned.has(cv), `unexpected legacy contextValue at root: ${cv}`);
-      }
-    }
+  it('the legacy single saropaLints.overview view is no longer registered', () => {
+    const pkg = loadPackageJson();
+    const ids = pkg.contributes.views.saropaLints.map((v) => v.id);
+    assert.ok(!ids.includes('saropaLints.overview'), 'monolithic overview view must not return');
+    assert.ok(!ids.includes('saropaLints.dashboardHub'), 'dashboardHub view must not return');
   });
 
-  it('all leaves under sections have a click command — no dead rows', async () => {
-    const all = await flattenAllRows();
-    for (const node of all) {
-      const cv = (node as { contextValue?: string }).contextValue ?? '';
-      // Section headers themselves are not clickable rows; skip them.
-      if (cv.startsWith('overviewSection:')) continue;
-      const item = provider.getTreeItem(node);
-      // Some triage data nodes may carry a default command via renderTreeItem
-      // (e.g. triageGroup uses focusIssuesForRules); explicit configSetting
-      // / overviewItem rows must each have a `command` set.
-      assert.ok(
-        item.command !== undefined,
-        `leaf row missing command: ${String(item.label)}`,
-      );
-    }
-  });
-
-  it('leaves never collapse — section headers are the only expandable rows', async () => {
-    const root = await provider.getChildren();
-    for (const section of root) {
-      const cv = (section as { contextValue?: string }).contextValue ?? '';
-      if (!cv.startsWith('overviewSection:')) continue;
-      const kids = await provider.getChildren(section);
-      for (const kid of kids) {
-        const kidItem = provider.getTreeItem(kid);
-        // Non-section children must not be Expanded; they may be Collapsed only
-        // if they are triage data nodes whose collapsibleState is set by
-        // ConfigTreeProvider's renderTreeItem (kept off in our usage).
-        assert.notStrictEqual(
-          kidItem.collapsibleState,
-          TreeItemCollapsibleState.Expanded,
-          `child of ${String((section as { label?: string }).label)} should not be Expanded: ${String(kidItem.label)}`,
+  it('every leaf rendered by every provider is CollapsibleState.None (no chevrons inside any panel)', () => {
+    for (const provider of providers) {
+      const items = provider.getChildren();
+      // getChildren may be async in TS but the implementation here is sync.
+      const rows = items as Array<unknown>;
+      for (const node of rows) {
+        const item = provider.getTreeItem(node as never);
+        assert.strictEqual(
+          item.collapsibleState,
+          TreeItemCollapsibleState.None,
+          `view ${provider.viewId} renders a non-leaf row: ${String(item.label)}`,
         );
       }
     }
   });
 
-  it('Run analysis appears exactly once across all sections', async () => {
-    const all = await flattenAllRows();
-    const count = all.filter((n) => {
-      const label = String((n as { label?: string }).label ?? '');
-      return label === 'Run analysis';
-    }).length;
+  it('every leaf has a click command — nothing dead in the sidebar', () => {
+    for (const provider of providers) {
+      const rows = provider.getChildren() as Array<unknown>;
+      for (const node of rows) {
+        const item = provider.getTreeItem(node as never);
+        assert.ok(
+          item.command !== undefined,
+          `${provider.viewId} leaf "${String(item.label)}" has no command`,
+        );
+      }
+    }
+  });
+
+  it('non-root getChildren() always returns [] — no second level of nesting', () => {
+    for (const provider of providers) {
+      const rows = provider.getChildren() as Array<unknown>;
+      for (const node of rows) {
+        const grandkids = provider.getChildren(node as never);
+        assert.deepStrictEqual(
+          grandkids,
+          [],
+          `${provider.viewId} leaf "${String((node as { label?: unknown }).label)}" returned children — must stay flat`,
+        );
+      }
+    }
+  });
+
+  it('Run analysis appears exactly once across all sections', () => {
+    let count = 0;
+    for (const provider of providers) {
+      const rows = provider.getChildren() as Array<unknown>;
+      for (const node of rows) {
+        const label = String((node as { label?: unknown }).label ?? '');
+        if (label === 'Run analysis') count += 1;
+      }
+    }
     assert.strictEqual(count, 1, 'Run analysis must not be duplicated');
   });
 
-  it('surfaces editor dashboards and help leaves even when no violations.json exists', async () => {
-    const all = await flattenAllRows();
-    const labels = all.map((n) => String((n as { label?: string }).label ?? ''));
-    assert.ok(labels.includes('Lints Config'), 'expected Lints Config leaf');
-    assert.ok(labels.includes('Findings Dashboard'), 'expected Findings Dashboard leaf');
-    assert.ok(labels.includes('Run analysis'), 'expected Run analysis leaf');
-    assert.ok(labels.includes('Getting Started'), 'expected Getting Started leaf');
-    assert.ok(labels.includes('About Saropa Lints'), 'expected About Saropa Lints leaf');
-    assert.ok(labels.includes('No analysis yet'), 'expected No analysis yet placeholder');
+  it('Editor dashboards section surfaces the five expected dashboards', () => {
+    const editor = providers.find((p) => p.viewId === SECTION_VIEW_IDS.editorDashboards)!;
+    const labels = editor.getChildren().map((n) => String((n as { label?: unknown }).label ?? ''));
+    assert.ok(labels.includes('Lints Config'));
+    assert.ok(labels.includes('Package Dashboard'));
+    assert.ok(labels.includes('Code Health Dashboard'));
+    assert.ok(labels.includes('Findings Dashboard'));
+    assert.ok(labels.includes('Command Catalog'));
+  });
+
+  it('Help section omits the dead "Lints" info row that had no command', () => {
+    const help = providers.find((p) => p.viewId === SECTION_VIEW_IDS.help)!;
+    const labels = help.getChildren().map((n) => String((n as { label?: unknown }).label ?? ''));
+    assert.ok(!labels.includes('Lints'), 'Lints info row was removed (no click target)');
+    assert.ok(labels.includes('Getting Started'));
+    assert.ok(labels.includes('About Saropa Lints'));
   });
 });

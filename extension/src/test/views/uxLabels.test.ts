@@ -34,19 +34,24 @@ function loadPackageJson(): PackageJsonShape {
 }
 
 describe('UX labels in package.json', () => {
-  it('registers a single flat Saropa Lints view in the activity bar', () => {
+  it('registers the seven sectioned panels in the saropaLints activity bar', () => {
     const pkg = loadPackageJson();
     const views = pkg.contributes.views.saropaLints;
-    // Flat-sidebar refactor: Dashboards + Overview & options collapsed into one
-    // unified view. Any second view would reintroduce the structural split the
-    // refactor exists to remove.
-    assert.strictEqual(views.length, 1, 'expected exactly one Saropa view');
-    const overview = views.find((view) => view.id === 'saropaLints.overview');
-    assert.ok(overview, 'expected saropaLints.overview');
-    assert.strictEqual(overview!.name, 'Saropa Lints');
+    // Each section is its own VS Code view (collapsible panel via title bar).
+    // Adding or removing a section here means updating SECTION_VIEW_IDS too.
+    const expected = [
+      'saropaLints.banner',
+      'saropaLints.editorDashboards',
+      'saropaLints.actions',
+      'saropaLints.status',
+      'saropaLints.settings',
+      'saropaLints.triage',
+      'saropaLints.help',
+    ].sort();
+    const actual = views.map((v) => v.id).sort();
+    assert.deepStrictEqual(actual, expected, 'sidebar must contain exactly the seven section panels');
+    assert.ok(!views.some((v) => v.id === 'saropaLints.overview'), 'monolithic overview view removed');
     assert.ok(!views.some((v) => v.id === 'saropaLints.dashboardHub'), 'dashboardHub view removed');
-    assert.ok(!views.some((v) => v.id === 'saropaLints.issues'), 'Violations tree view removed');
-    assert.ok(!views.some((v) => v.id === 'saropaLints.summary'), 'Summary view removed');
   });
 
   it('renames config copy command to Triage wording', () => {
@@ -62,14 +67,18 @@ describe('UX labels in package.json', () => {
     assert.strictEqual(hasGroup, true, 'expected configuration title "Activity bar"');
   });
 
-  it('contributes viewsWelcome on the unified view for non-Dart projects', () => {
+  it('contributes viewsWelcome on the Banner view for non-Dart projects', () => {
     const pkg = loadPackageJson();
-    // After the flat-sidebar refactor the Dart-but-no-report case is handled
-    // inline by the provider (setup banner + action rows + status placeholder),
-    // so the only remaining welcome is the non-Dart prompt.
-    const welcome = pkg.contributes.viewsWelcome.filter((entry) => entry.view === 'saropaLints.overview');
+    // The Banner view stays visible whenever a banner is needed OR the
+    // workspace is not a Dart project; its welcome content prompts for a
+    // pubspec folder when the project type is wrong.
+    const welcome = pkg.contributes.viewsWelcome.filter((entry) => entry.view === 'saropaLints.banner');
     assert.strictEqual(welcome.length, 1);
     assert.strictEqual(welcome[0]!.contents.includes('pubspec.yaml'), true);
+    assert.ok(
+      !pkg.contributes.viewsWelcome.some((entry) => entry.view === 'saropaLints.overview'),
+      'old overview welcome removed',
+    );
     assert.ok(
       !pkg.contributes.viewsWelcome.some((entry) => entry.view === 'saropaLints.dashboardHub'),
       'dashboardHub welcome removed',

@@ -32,7 +32,10 @@ import { verifyPluginLiveness, surfaceLivenessResult } from './pluginLiveness';
 import type { SaropaLintsApi } from './api';
 import { invalidateCodeLenses, registerCodeLensProvider } from './codeLensProvider';
 import { IssuesTreeProvider, parseViolationsGroupBy, registerIssueCommands, type IssueTreeNode } from './views/issuesTree';
-import { OverviewTreeProvider } from './views/overviewTree';
+import {
+  createSidebarSectionProviders,
+  updateSidebarSectionContext,
+} from './views/sectionedSidebar';
 import { showHelpHubQuickPick } from './views/helpHub';
 import { SummaryTreeProvider } from './views/summaryTree';
 import { SuppressionsTreeProvider } from './views/suppressionsTree';
@@ -298,39 +301,47 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   const summaryProvider = new SummaryTreeProvider(context.workspaceState);
   const suppressionsProvider = new SuppressionsTreeProvider();
   const configProvider = new ConfigTreeProvider();
-  // Single flat sidebar — replaced the prior Dashboards / Overview & options
-  // pair. The sidebar-section count map is no longer needed because the flat
-  // tree has no Activity bar section toggles (`SIDEBAR_SECTION_COUNT === 0`).
-  const overviewProvider = new OverviewTreeProvider(
-    context.workspaceState,
-    configProvider,
-  );
+  // Sectioned sidebar: each VS Code view (Banner / Editor dashboards / Actions /
+  // Status / Settings / Triage / Help) is its own collapsible panel. Items
+  // inside each panel are flat leaves only — the panel title bar is the
+  // only collapse handle, no chevrons appear next to rows.
+  const sectionProviders = createSidebarSectionProviders(context.workspaceState, configProvider);
+  const refreshAllSections = (): void => {
+    for (const p of sectionProviders) p.refresh();
+    updateSidebarSectionContext(context.workspaceState);
+  };
+  for (const provider of sectionProviders) {
+    context.subscriptions.push(
+      vscode.window.registerTreeDataProvider(provider.viewId, provider),
+    );
+  }
+  updateSidebarSectionContext(context.workspaceState);
+
   const suggestionsProvider = new SuggestionsTreeProvider();
   const securityProvider = new SecurityPostureTreeProvider();
   const fileRiskProvider = new FileRiskTreeProvider(context.workspaceState);
 
   context.subscriptions.push(
-    vscode.window.registerTreeDataProvider('saropaLints.overview', overviewProvider),
     vscode.workspace.onDidChangeConfiguration((e) => {
       if (
         SIDEBAR_SECTION_CONFIG_KEYS.some((rel) =>
           e.affectsConfiguration(sidebarSectionContextKey(rel)),
         )
       ) {
-        overviewProvider.refresh();
+        refreshAllSections();
       }
       if (e.affectsConfiguration('saropaLints.enabled') || e.affectsConfiguration('saropaLints.tier')) {
-        overviewProvider.refresh();
+        refreshAllSections();
       }
     }),
   );
 
   context.subscriptions.push(
     todosAndHacksProvider.onDidChangeTreeData(() => {
-      overviewProvider.refresh();
+      refreshAllSections();
     }),
     driftAdvisorProvider.onDidChangeTreeData(() => {
-      overviewProvider.refresh();
+      refreshAllSections();
     }),
   );
 
@@ -403,7 +414,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     const root = getProjectRoot();
     syncRuleMetadataFromViolations(root ? readViolations(root) : null);
     issuesProvider.refresh();
-    overviewProvider.refresh();
+    refreshAllSections();
     summaryProvider.refresh();
     suppressionsProvider.refresh();
     configProvider.refresh();
@@ -610,7 +621,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       statusBarItem.tooltip = `Saropa Lints v${extVersion} — Disabled`;
       statusBarItem.backgroundColor = undefined;
     }
-    statusBarItem.command = 'saropaLints.overview.focus';
+    statusBarItem.command = 'saropaLints.editorDashboards.focus';
     statusBarItem.show();
   };
   updateAllStatusBars();
@@ -634,7 +645,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       updateAllStatusBars(data ?? undefined);
 
       // I5: Auto-focus Overview to show Health Score immediately.
-      await vscode.commands.executeCommand('saropaLints.overview.focus');
+      await vscode.commands.executeCommand('saropaLints.editorDashboards.focus');
 
       // I5: Show score-aware notification with actionable buttons.
       const health = data ? computeHealthScore(data) : null;
@@ -711,7 +722,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         updateAllStatusBars();
         updateContext(getConfig().get<boolean>('enabled', true) ?? true, issuesProvider.hasViolations());
         // C7: Focus Overview after analysis to show Health Score delta.
-        await vscode.commands.executeCommand('saropaLints.overview.focus');
+        await vscode.commands.executeCommand('saropaLints.editorDashboards.focus');
         // C7: Include score in completion message when available.
         const root = getProjectRoot();
         const postData = root ? readViolations(root) : null;
@@ -764,7 +775,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         ? vscode.ConfigurationTarget.Workspace
         : vscode.ConfigurationTarget.Global;
       await cfg.update('runAnalysisAfterConfigChange', !cur, target);
-      overviewProvider.refresh();
+      refreshAllSections();
     }),
     vscode.commands.registerCommand('saropaLints.toggleSidebarSection', async (key: unknown) => {
       if (typeof key !== 'string') {
@@ -782,7 +793,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
           : vscode.ConfigurationTarget.Global;
         await cfg.update(key, next, target);
         updateSidebarSectionVisibility();
-        overviewProvider.refresh();
+        refreshAllSections();
       } catch (err) {
         // Surface config-update failures so the user sees feedback.
         const msg = err instanceof Error ? err.message : String(err);
@@ -875,7 +886,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     vscode.commands.registerCommand('saropaLints.focusView', async () => {
       // After consolidating Dashboards + Overview into a single flat view,
       // `focusView` is a backwards-compat alias for revealing the unified sidebar.
-      await vscode.commands.executeCommand('saropaLints.overview.focus');
+      await vscode.commands.executeCommand('saropaLints.editorDashboards.focus');
     }),
     vscode.commands.registerCommand('saropaLints.focusPackageVibrancyPackages', async () => {
       await vscode.commands.executeCommand('saropaLints.packageVibrancy.showReport');
@@ -981,7 +992,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         driftAdvisorProvider.setState(null, []);
         await onDriftAdvisorDisconnected(context.workspaceState);
         void vscode.commands.executeCommand('setContext', 'saropaLints.driftAdvisor.connected', false);
-        overviewProvider.refresh();
+        refreshAllSections();
         return;
       }
       if (driftAdvisorRefreshInProgress) return;
@@ -1013,7 +1024,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         void vscode.window.setStatusBarMessage('Saropa Drift Advisor: error fetching issues', 5000);
       } finally {
         driftAdvisorRefreshInProgress = false;
-        overviewProvider.refresh();
+        refreshAllSections();
       }
     }),
     vscode.commands.registerCommand('saropaLints.driftAdvisor.openInBrowser', () => {
@@ -1336,7 +1347,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         refreshAll();
         updateAllStatusBars();
         updateContext(getConfig().get<boolean>('enabled', true) ?? true, issuesProvider.hasViolations());
-        await vscode.commands.executeCommand('saropaLints.overview.focus');
+        await vscode.commands.executeCommand('saropaLints.editorDashboards.focus');
       }),
     ),
   );
@@ -1348,7 +1359,6 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     summaryProvider,
     securityProvider,
     fileRiskProvider,
-    overviewProvider,
     suggestionsProvider,
   });
 
@@ -1359,7 +1369,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     runVibrancyActivation(context, (data) => {
       vibrancyData = data;
       updateAllStatusBars();
-      overviewProvider.refresh();
+      refreshAllSections();
     }, pubspecValidator);
   } catch (err) {
     console.error('[Saropa Lints] Package Vibrancy activation failed:', err);
