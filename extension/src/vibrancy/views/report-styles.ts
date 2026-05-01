@@ -223,17 +223,30 @@ export function getReportStyles(): string {
             opacity: 1;
             background: var(--vscode-toolbar-hoverBackground);
         }
+        /* Pill shape (border-radius 999px) shared with the canonical
+         * .saropa-pill-button helper in pill-button-styles.ts. Tokens are
+         * already secondary-button pair; the shape change makes this
+         * panel's toolbar visually consistent with every other Saropa
+         * dashboard. New primary CTAs should use the explicit
+         * .saropa-pill-button + .saropa-pill-button-icon markup for the
+         * chip-with-icon-circle look. */
         .toolbar-btn {
             background: var(--vscode-button-secondaryBackground);
             color: var(--vscode-button-secondaryForeground);
-            border: 1px solid transparent;
-            padding: 4px 10px;
-            border-radius: 3px;
+            border: 1px solid var(--vscode-button-border, transparent);
+            padding: 6px 12px;
+            border-radius: 999px;
             cursor: pointer;
             font-size: 0.85em;
+            transition: background 0.12s ease, border-color 0.12s ease;
         }
         .toolbar-btn:hover {
-            background: var(--vscode-button-secondaryHoverBackground);
+            background: var(--vscode-button-secondaryHoverBackground, var(--vscode-button-secondaryBackground));
+            border-color: color-mix(in srgb, var(--vscode-focusBorder) 55%, var(--vscode-button-border, transparent));
+        }
+        .toolbar-btn:focus-visible {
+            outline: 1px solid var(--vscode-focusBorder);
+            outline-offset: 2px;
         }
         .toolbar-btn:disabled {
             opacity: 0.65;
@@ -585,5 +598,17 @@ export function getReportStyles(): string {
             font-size: 0.85em;
         }
         .clear-filter-btn:hover { text-decoration: underline; }
+
+        @media (prefers-reduced-motion: reduce) {
+            .gauge-fill { animation: none !important;
+                stroke-dasharray: var(--gauge-target, 0) var(--gauge-arc, 999) !important; }
+            .expand-chevron { transition: none; }
+            .copy-btn { transition: none; }
+            .summary-card[data-filter] { transition: none; }
+            .active-filter-chip { transition: none; }
+            .bar-row { transition: none; }
+            .search-clear { transition: none; }
+            .footprint-toggle .toggle-btn { transition: none; }
+        }
     `;
 }

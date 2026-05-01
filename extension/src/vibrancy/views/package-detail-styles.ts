@@ -11,8 +11,8 @@ export function getPackageDetailStyles(): string {
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            font-family: var(--vscode-editor-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
-            font-size: var(--vscode-editor-font-size, 13px);
+            font-family: var(--vscode-font-family);
+            font-size: var(--vscode-font-size, var(--vscode-editor-font-size, 13px));
             color: var(--vscode-foreground);
             background: var(--vscode-editor-background);
             padding: 16px 24px;
@@ -111,24 +111,39 @@ export function getPackageDetailStyles(): string {
             white-space: nowrap;
         }
 
+        /* Pill shape (border-radius 999px) shared with the canonical
+         * .saropa-pill-button helper in pill-button-styles.ts. Removed the
+         * hard-coded dark-only fallbacks (#fff, #ccc, #3a3d41) — those broke
+         * in light + high-contrast themes. The button-{,secondary} token pairs
+         * are spec-guaranteed to contrast in any theme; the dark hex defaults
+         * were paper over a problem that does not exist with proper tokens. */
         .action-btn {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 4px;
-            border: none;
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            border-radius: 999px;
+            border: 1px solid var(--vscode-button-border, transparent);
             cursor: pointer;
             font-size: 0.9em;
             background: var(--vscode-button-background);
-            color: var(--vscode-button-foreground, #fff);
+            color: var(--vscode-button-foreground);
             margin-right: 8px;
             margin-top: 6px;
+            transition: background 0.12s ease, border-color 0.12s ease;
         }
         .action-btn:hover {
-            background: var(--vscode-button-hoverBackground);
+            background: var(--vscode-button-hoverBackground, var(--vscode-button-background));
+        }
+        .action-btn:focus-visible {
+            outline: 1px solid var(--vscode-focusBorder);
+            outline-offset: 2px;
         }
         .action-btn.secondary {
-            background: var(--vscode-button-secondaryBackground, #3a3d41);
-            color: var(--vscode-button-secondaryForeground, #ccc);
+            background: var(--vscode-button-secondaryBackground);
+            color: var(--vscode-button-secondaryForeground);
+        }
+        .action-btn.secondary:hover {
+            background: var(--vscode-button-secondaryHoverBackground, var(--vscode-button-secondaryBackground));
         }
 
         /* Version-gap section */

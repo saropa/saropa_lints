@@ -10,6 +10,7 @@ import { formatRelativeTime } from '../scoring/time-formatter';
 import { formatPrereleaseTag } from '../scoring/prerelease-classifier';
 import { createWebviewCspNonce, escapeHtml, resolveRepoUrl } from './html-utils';
 import { getPackageDetailStyles } from './package-detail-styles';
+import { getPillButtonStyles } from './pill-button-styles';
 import { getPackageDetailScript } from './package-detail-script';
 
 // Single-package drill-down HTML (versions, review, license, links).
@@ -606,7 +607,7 @@ function wrapHtml(title: string, body: string): string {
           content="default-src 'none'; style-src 'nonce-${nonce}'; script-src 'nonce-${nonce}'; img-src https:;">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${escapeHtml(title)}</title>
-    <style nonce="${nonce}">${getPackageDetailStyles()}</style>
+    <style nonce="${nonce}">${getPillButtonStyles()}${getPackageDetailStyles()}</style>
 </head>
 <body>
     ${body}

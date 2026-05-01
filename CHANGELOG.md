@@ -73,6 +73,7 @@
 - **Config Dashboard** (rule packs, tiers, charts) opens as an **editor tab** instead of a Saropa sidebar webview so the layout matches a real dashboard width. No action required.
 - **Open Config Dashboard** has a toolbar icon on the **Dashboards** hub in Dart workspaces (Overview title unchanged); the `saropaLints.sidebar.showRulePacks` setting is removed because that sidebar section no longer exists—delete the key from settings JSON if you set it explicitly. No other migration.
 - **Composite analyzer plugin scaffold** shows an explanatory notification with **Continue** and **Open guide** before the folder prompt so the flow is obvious; **Open guide** opens the composite-plugin documentation in the browser without writing files. No action required.
+- Editor-area dashboards (**Package Vibrancy**, **Package Details**, **Telemetry**, **Command Catalog**) now use a consistent pill-shaped button style with secondary-button theme tokens, so the toolbar / action buttons read the same across these dashboards and contrast correctly in light, dark, and high-contrast themes. No action required.
 
 ### Fixed (Extension)
 

@@ -4,6 +4,7 @@
  * via [currentPanel]; disposal clears the handle so a new panel can open later.
  */
 import * as vscode from 'vscode';
+import { createWebviewCspNonce } from '../vibrancy/views/html-utils';
 import type {
   RelatedRuleTelemetry,
   TelemetryStore,
@@ -40,6 +41,7 @@ function renderRows(snapshot: TelemetryStore): string {
 
 /** Full HTML document with CSP allowing inline script for webview message bridge. */
 function buildHtml(snapshot: TelemetryStore): string {
+  const nonce = createWebviewCspNonce();
   const lastEventAt = snapshot.lastEventAt
     ? escapeHtml(snapshot.lastEventAt)
     : 'Never';
@@ -52,9 +54,9 @@ function buildHtml(snapshot: TelemetryStore): string {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline';">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'nonce-${nonce}'; script-src 'nonce-${nonce}';">
   <title>Related Rule Telemetry</title>
-  <style>
+  <style nonce="${nonce}">
     body {
       font-family: var(--vscode-font-family);
       font-size: var(--vscode-font-size);
@@ -65,16 +67,22 @@ function buildHtml(snapshot: TelemetryStore): string {
       line-height: 1.45;
     }
     h1 { margin: 0 0 12px; font-size: 1.2rem; }
-    .toolbar { display: flex; gap: 8px; margin-bottom: 14px; }
+    .toolbar { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+    /* Pill shape consistent with the canonical .saropa-pill-button helper. */
     button {
-      background: var(--vscode-button-background);
-      color: var(--vscode-button-foreground);
-      border: none;
-      border-radius: 4px;
-      padding: 6px 10px;
+      background: var(--vscode-button-secondaryBackground);
+      color: var(--vscode-button-secondaryForeground);
+      border: 1px solid var(--vscode-button-border, transparent);
+      border-radius: 999px;
+      padding: 6px 12px;
       cursor: pointer;
+      transition: background 0.12s ease, border-color 0.12s ease;
     }
-    button:hover { background: var(--vscode-button-hoverBackground); }
+    button:hover {
+      background: var(--vscode-button-secondaryHoverBackground, var(--vscode-button-secondaryBackground));
+      border-color: color-mix(in srgb, var(--vscode-focusBorder) 55%, var(--vscode-button-border, transparent));
+    }
+    button:focus-visible { outline: 1px solid var(--vscode-focusBorder); outline-offset: 2px; }
     table {
       border-collapse: collapse;
       width: 100%;
@@ -86,7 +94,12 @@ function buildHtml(snapshot: TelemetryStore): string {
       padding: 8px 10px;
       text-align: left;
     }
-    th { background: var(--vscode-editor-inactiveSelectionBackground); }
+    th {
+      background: var(--vscode-editor-inactiveSelectionBackground);
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
     .meta {
       color: var(--vscode-descriptionForeground);
       font-size: 0.9rem;
@@ -117,7 +130,7 @@ function buildHtml(snapshot: TelemetryStore): string {
   </table>
   <div class="meta">Last event properties</div>
   <pre>${lastProps}</pre>
-  <script>
+  <script nonce="${nonce}">
     const vscode = acquireVsCodeApi();
     document.getElementById('refresh').addEventListener('click', () => {
       vscode.postMessage({ type: 'refresh' });

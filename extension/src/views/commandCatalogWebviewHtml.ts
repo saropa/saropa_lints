@@ -12,6 +12,7 @@ import type { CatalogCategory, CatalogEntry } from './commandCatalogRegistry';
 import { entriesByCategory } from './commandCatalogRegistry';
 import { buildCatalogSearchBlob } from './commandCatalogSearch';
 import type { CatalogHistoryRecord } from './commandCatalogHistory';
+import { getPillButtonStyles } from '../vibrancy/views/pill-button-styles';
 
 export function buildCommandCatalogHtml(
   webview: vscode.Webview,
@@ -44,7 +45,7 @@ export function buildCommandCatalogHtml(
   <meta http-equiv="Content-Security-Policy" content="${csp}">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="${codiconCss}">
-  <title>Command Catalog</title>
+  <title>Saropa Command Catalog</title>
   <style nonce="${nonce}">
     ${getStyles()}
   </style>
@@ -52,7 +53,7 @@ export function buildCommandCatalogHtml(
 <body>
   <div class="hero">
     <div class="hero-inner">
-      <h1 class="hero-title">Command Catalog</h1>
+      <h1 class="hero-title">Saropa Command Catalog</h1>
       <p class="hero-sub">${totalCount} commands · Search, browse, run</p>
       <div class="search-row">
         <span class="search-icon codicon codicon-search" aria-hidden="true"></span>
@@ -154,6 +155,8 @@ function buildEntryHtml(entry: CatalogEntry): string {
 
 function getStyles(): string {
   return `
+    ${getPillButtonStyles()}
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
@@ -290,50 +293,13 @@ function getStyles(): string {
       gap: 8px;
     }
 
-    .history-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 10px 6px 8px;
-      border-radius: 999px;
-      border: 1px solid var(--vscode-widget-border);
-      background: var(--vscode-editor-inactiveSelectionBackground);
-      cursor: pointer;
-      font-size: 0.88em;
-      max-width: 100%;
-      transition: background 0.12s ease, border-color 0.12s ease;
-    }
-
-    .history-chip:hover {
-      background: var(--vscode-list-hoverBackground);
-      border-color: color-mix(in srgb, var(--vscode-focusBorder) 55%, var(--vscode-widget-border));
-    }
-
-    .history-chip:focus-visible {
-      outline: 1px solid var(--vscode-focusBorder);
-      outline-offset: 2px;
-    }
-
-    .history-chip .chip-icon {
-      width: 22px;
-      height: 22px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 50%;
-      background: color-mix(in srgb, var(--vscode-button-background) 35%, transparent);
-      flex-shrink: 0;
-    }
-
-    .history-chip .chip-icon .codicon {
-      font-size: 13px;
-    }
-
-    .history-chip .chip-title {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
+    /* Catalog "Recent" chips reuse the shared .saropa-pill-button look (see
+     * pill-button-styles.ts). Class names below remain for layout-only overrides
+     * (mobile width, motion media query) so the JS in getScript() does not need
+     * to change. The visual tokens come from the shared helper. */
+    .history-chip { /* aliased on top of .saropa-pill-button */ }
+    .history-chip .chip-icon { /* aliased on top of .saropa-pill-button-icon */ }
+    .history-chip .chip-title { /* aliased on top of .saropa-pill-button-title */ }
 
     .catalog {
       max-width: 880px;
@@ -505,11 +471,10 @@ function getStyles(): string {
     .no-results p { font-size: 1.05em; }
 
     .search-hint {
-      font-size: 0.82em;
+      font-size: 0.9em;
       color: var(--vscode-descriptionForeground);
       margin-top: 10px;
       line-height: 1.45;
-      max-width: 42em;
     }
 
     .search-hint kbd {
@@ -581,6 +546,11 @@ function getStyles(): string {
         text-overflow: unset;
       }
     }
+
+    @media (prefers-reduced-motion: reduce) {
+      .collapse-icon { transition: none; }
+      .history-chip { transition: none; }
+    }
   `;
 }
 
@@ -615,15 +585,15 @@ function getScript(): string {
         for (const item of items) {
           const chip = document.createElement('button');
           chip.type = 'button';
-          chip.className = 'history-chip';
+          chip.className = 'saropa-pill-button history-chip';
           chip.dataset.command = item.command;
           const wrap = document.createElement('span');
-          wrap.className = 'chip-icon';
+          wrap.className = 'saropa-pill-button-icon chip-icon';
           const ic = document.createElement('span');
           ic.className = 'codicon codicon-' + safeIcon(item.icon);
           wrap.appendChild(ic);
           const title = document.createElement('span');
-          title.className = 'chip-title';
+          title.className = 'saropa-pill-button-title chip-title';
           title.textContent = item.title;
           chip.appendChild(wrap);
           chip.appendChild(title);
