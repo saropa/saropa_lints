@@ -24,17 +24,47 @@ export function getReportStyles(): string {
         body[data-full-width="true"] { max-width: none; }
         h1 { font-size: 1.4em; margin-bottom: 8px; }
 
-        /* ---- Report header with floating gauge ---- */
+        /* ---- Report header with floating gauge ----
+           Matches the Findings dashboard hero (the gold standard): gradient tint, rounded
+           panel surface, padding, mount-in animation. The CSS vars used here mirror the
+           chrome's tokens so the hero reads identically across the three editor surfaces
+           (Findings, Code Health, Lints Config) and the vibrancy panels. */
         .report-header {
-            display: flex; align-items: flex-start;
-            justify-content: space-between;
-            gap: 16px;
+            position: relative;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 18px;
+            align-items: center;
+            padding: 18px 20px;
+            margin-bottom: 14px;
+            border: 1px solid color-mix(in srgb, var(--vscode-focusBorder) 35%, var(--vscode-widget-border));
+            border-radius: 12px;
+            background:
+                radial-gradient(900px 220px at 0% 0%,
+                    color-mix(in srgb, var(--vscode-textLink-foreground) 14%, transparent),
+                    transparent 60%),
+                var(--vscode-editorWidget-background);
+            animation: hero-in 360ms ease-out;
         }
         .report-header .hero-text { flex: 1; min-width: 0; }
+        .report-header h1 {
+            margin: 0 0 4px;
+            font-size: 1.55em;
+            font-weight: 600;
+            letter-spacing: 0.2px;
+        }
         .header-version {
             font-size: 0.55em; font-weight: normal;
-            opacity: 0.5; margin-left: 8px;
+            opacity: 0.5; margin-left: 10px;
             vertical-align: middle;
+            letter-spacing: 0.4px;
+        }
+        @keyframes hero-in {
+            from { opacity: 0; transform: translateY(-4px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .report-header { animation: none; }
         }
         /* Status line (guideline §4.1) — muted facts row under the title. */
         .status-line {
