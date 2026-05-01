@@ -198,7 +198,15 @@ function chromeHeroAndGauge(): string {
   stroke-width: 10;
   stroke-linecap: round;
   stroke-dasharray: var(--gauge-target, 0) var(--gauge-arc, 100);
-  transition: stroke-dasharray 1.1s ease-out, stroke 0.3s;
+  /* Keyframe (not transition) so the arc fills on first paint. CSS transitions
+     only fire on value change — on initial render the dasharray is already at
+     its target, so a transition produces no animation. */
+  animation: gauge-fill-in 1.1s ease-out;
+  transition: stroke 0.3s;
+}
+@keyframes gauge-fill-in {
+  from { stroke-dasharray: 0 var(--gauge-arc, 100); }
+  to   { stroke-dasharray: var(--gauge-target, 0) var(--gauge-arc, 100); }
 }
 .gauge-label {
   position: absolute; inset: 0;
@@ -211,7 +219,10 @@ function chromeHeroAndGauge(): string {
 .gauge-label .sm { font-size: 0.7em; opacity: 0.7; margin-top: 2px; }
 @media (prefers-reduced-motion: reduce) {
   .dash-hero { animation: none; }
-  .hero-gauge .gauge-fill { transition: none; }
+  /* Disable the fill-in keyframe but keep the resting dasharray so the arc
+     still renders at its target value (without 'animation: none' the resting
+     rule above already drives the static state). */
+  .hero-gauge .gauge-fill { animation: none; transition: none; }
 }
 `;
 }

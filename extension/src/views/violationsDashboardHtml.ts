@@ -1264,7 +1264,11 @@ export function renderViolationsDashboardHtml(input: ViolationsDashboardHtmlInpu
 <html lang="en"><head>
   <meta charset="UTF-8" />
   <title>Saropa Findings Dashboard</title>
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'nonce-${nonce}'; script-src 'nonce-${nonce}';" />
+  <!-- 'unsafe-inline' on style-src: hero gauge sets dynamic CSS vars (--gauge-target,
+       --gauge-arc, --gauge-color) via inline style="..." attributes. CSP nonces only
+       authorize <style> blocks, not style attributes — without 'unsafe-inline' the vars
+       are dropped, the dasharray falls back to 0, and the gauge renders as a tiny dot. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'nonce-${nonce}' 'unsafe-inline'; script-src 'nonce-${nonce}';" />
   <style nonce="${nonce}">${getViolationsDashboardStyles()}</style>
 </head><body>
   ${buildHero(input)}
@@ -1286,7 +1290,10 @@ export function buildFindingsEmptyStateHtml(message: string): string {
   return `<!DOCTYPE html>
 <html lang="en"><head>
   <meta charset="UTF-8"/>
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'nonce-${nonce}'; script-src 'nonce-${nonce}';"/>
+  <!-- 'unsafe-inline' on style-src: kept consistent with the populated dashboard CSP
+       so future inline-style additions (e.g. gauges, sparklines) work without a CSP
+       regression that re-creates the gauge-renders-as-a-dot bug. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'nonce-${nonce}' 'unsafe-inline'; script-src 'nonce-${nonce}';"/>
   <style nonce="${nonce}">${getFindingsEmptyStateStyles()}</style>
 </head><body>
   <div class="empty-hero">
