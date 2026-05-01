@@ -259,12 +259,16 @@ function buildActionItems(): LeafItem[] {
             'saropaLints.openConfig',
             'file-code',
         ),
-        new LeafItem(
-            'Composite analyzer plugin (scaffold)',
-            'Meta-plugin package for org + Saropa',
-            'saropaLints.emitCompositePluginScaffold',
-            'extensions',
-        ),
+        // Composite analyzer plugin scaffold is intentionally NOT exposed
+        // here. The action targets a tiny audience (teams shipping their own
+        // custom analyzer rules alongside Saropa) and the term is jargon to
+        // everyone else. It remains discoverable via the command palette
+        // (`Saropa Lints: Create Composite Analyzer Plugin (scaffold)`),
+        // `Saropa Lints: Show All Commands`, the CLI
+        // (`dart run saropa_lints:init --emit-composite-plugin-scaffold`),
+        // and `doc/guides/composite_analyzer_plugin.md`. Keeping it out of
+        // the sidebar avoids confusing the 99% of users who only want
+        // Saropa rules.
     ];
 }
 

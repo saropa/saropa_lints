@@ -173,4 +173,44 @@ describe('Saropa Lints sidebar — multi-panel section providers', () => {
     assert.ok(labels.includes('Getting Started'));
     assert.ok(labels.includes('About Saropa Lints'));
   });
+
+  // Pin removal of the composite analyzer plugin scaffold row.
+  // The action targets a tiny audience (teams shipping their own custom
+  // analyzer rules) and the term is jargon for the typical Saropa user.
+  // It must remain reachable only via the command palette, the command
+  // catalog, the CLI flag, and the guide — never as a sidebar row.
+  // Asserting on the command id (not the label) keeps the guard robust
+  // against future copy edits.
+  it('Actions section does not surface the composite analyzer plugin scaffold', () => {
+    const actions = providers.find((p) => p.viewId === SECTION_VIEW_IDS.actions)!;
+    for (const node of actions.getChildren()) {
+      const item = actions.getTreeItem(node as never);
+      assert.notStrictEqual(
+        item.command?.command,
+        'saropaLints.emitCompositePluginScaffold',
+        'composite scaffold must not be a sidebar row — keep it in the command palette',
+      );
+    }
+  });
+
+  it('Config tree does not surface the composite analyzer plugin scaffold', () => {
+    type CommandShape = { command?: { command?: string } };
+    const rows = configProvider.getChildren() as Array<unknown>;
+    const collect = (nodes: Array<unknown>): CommandShape[] => {
+      const acc: CommandShape[] = [];
+      for (const n of nodes) {
+        acc.push(configProvider.getTreeItem(n as never) as unknown as CommandShape);
+        const kids = configProvider.getChildren(n as never) as Array<unknown> | undefined;
+        if (Array.isArray(kids) && kids.length > 0) acc.push(...collect(kids));
+      }
+      return acc;
+    };
+    for (const item of collect(rows)) {
+      assert.notStrictEqual(
+        item.command?.command,
+        'saropaLints.emitCompositePluginScaffold',
+        'composite scaffold must not appear in the Config tree',
+      );
+    }
+  });
 });
