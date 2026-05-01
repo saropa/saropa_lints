@@ -164,7 +164,7 @@ export function getPackageDetailStyles(): string {
             font-weight: 700;
         }
         .gap-card .label {
-            font-size: 0.8em;
+            font-size: 0.9em;
             color: var(--vscode-descriptionForeground);
         }
 
@@ -308,12 +308,12 @@ export function getPackageDetailStyles(): string {
             font-size: 0.9em;
         }
         .file-usage-item.commented {
-            opacity: 0.6;
+            color: var(--vscode-descriptionForeground);
             font-style: italic;
         }
         .file-usage-commented {
             padding: 6px 8px 2px;
-            font-size: 0.85em;
+            font-size: 0.92em;
             color: var(--vscode-descriptionForeground);
         }
         /* Re-export badge — small inline pill to flag public-API surface
@@ -329,7 +329,7 @@ export function getPackageDetailStyles(): string {
             vertical-align: middle;
         }
         .reexport-note {
-            font-size: 0.8em;
+            font-size: 0.9em;
             color: var(--vscode-descriptionForeground);
             font-weight: normal;
         }

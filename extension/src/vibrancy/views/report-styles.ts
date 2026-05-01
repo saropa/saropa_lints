@@ -101,20 +101,30 @@ export function getReportStyles(): string {
             display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 12px;
         }
+        /* Detail-card content was at 0.85em with opacity 0.6 on labels — too small
+         * and too dim to read in many themes (the value-side numbers stayed full
+         * opacity, so the label/value contrast inside the same row was harsh).
+         * Now: 0.95em body for readability, descriptionForeground token for muted
+         * labels (theme-aware, WCAG-correct), and h4 at full opacity since opacity
+         * stacks against the card background instead of pairing cleanly. */
         .detail-section h4 {
-            margin: 0 0 6px; font-size: 0.85em;
-            opacity: 0.8; border-bottom: 1px solid var(--vscode-widget-border);
+            margin: 0 0 6px; font-size: 0.95em; font-weight: 600;
+            color: var(--vscode-foreground);
+            border-bottom: 1px solid var(--vscode-widget-border);
             padding-bottom: 4px;
         }
         .detail-grid {
             display: grid; grid-template-columns: auto 1fr;
-            gap: 2px 12px; font-size: 0.85em;
+            gap: 4px 14px; font-size: 0.95em;
         }
-        .detail-label { opacity: 0.6; }
-        .vuln-row { font-size: 0.85em; margin: 2px 0; }
-        .file-row { font-size: 0.8em; opacity: 0.8; font-family: monospace; }
-        .detail-links .link-list { font-size: 0.85em; }
-        .detail-search-link { cursor: pointer; font-size: 0.85em; }
+        .detail-label { color: var(--vscode-descriptionForeground); }
+        .vuln-row { font-size: 0.95em; margin: 2px 0; }
+        .file-row {
+            font-size: 0.9em; font-family: var(--vscode-editor-font-family, monospace);
+            color: var(--vscode-descriptionForeground);
+        }
+        .detail-links .link-list { font-size: 0.95em; }
+        .detail-search-link { cursor: pointer; font-size: 0.95em; }
 
         /* ---- Deps column ---- */
         .deps-icon { font-size: 0.85em; margin-right: 2px; }
@@ -146,7 +156,9 @@ export function getReportStyles(): string {
             min-width: 100px; text-align: center;
         }
         .summary-card .count { font-size: 1.8em; font-weight: bold; }
-        .summary-card .label { font-size: 0.85em; opacity: 0.8; min-height: 18px; }
+        /* Summary-card label: was 0.85em + opacity 0.8 — small and washed-out.
+         * descriptionForeground gives proper muted contrast in any theme. */
+        .summary-card .label { font-size: 0.9em; color: var(--vscode-descriptionForeground); min-height: 18px; }
         .summary-card[data-filter] {
             cursor: pointer; transition: box-shadow 0.2s, background 0.2s;
         }
@@ -166,7 +178,7 @@ export function getReportStyles(): string {
         .unused .count { color: var(--vscode-editorWarning-foreground); }
         .vulns .count { color: var(--vscode-editorError-foreground); }
         .overrides .count { color: var(--vscode-descriptionForeground); }
-        .caveat { font-size: 0.8em; opacity: 0.6; margin-top: 4px; }
+        .caveat { font-size: 0.85em; color: var(--vscode-descriptionForeground); margin-top: 4px; }
 
         /* ---- Toolbar (search + pubspec button) ---- */
         .table-toolbar {

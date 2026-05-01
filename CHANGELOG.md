@@ -74,6 +74,7 @@
 - **Open Config Dashboard** has a toolbar icon on the **Dashboards** hub in Dart workspaces (Overview title unchanged); the `saropaLints.sidebar.showRulePacks` setting is removed because that sidebar section no longer exists—delete the key from settings JSON if you set it explicitly. No other migration.
 - **Composite analyzer plugin scaffold** shows an explanatory notification with **Continue** and **Open guide** before the folder prompt so the flow is obvious; **Open guide** opens the composite-plugin documentation in the browser without writing files. No action required.
 - Editor-area dashboards (**Package Vibrancy**, **Package Details**, **Telemetry**, **Command Catalog**) now use a consistent pill-shaped button style with secondary-button theme tokens, so the toolbar / action buttons read the same across these dashboards and contrast correctly in light, dark, and high-contrast themes. No action required.
+- Improved readability of detail and summary panels in the **Package Vibrancy** report and **Package Details** view: bumped tiny 0.8–0.85em text to 0.9–0.95em and replaced low `opacity: 0.6` muting on labels with the theme-aware `descriptionForeground` token, so panels like **Health Score**, summary cards, and gap-table cards stay legible (and WCAG-compliant) in light, dark, and high-contrast themes. No action required.
 
 ### Fixed (Extension)
 
