@@ -1,0 +1,165 @@
+/**
+ * Smoke tests for Findings dashboard HTML (suppressions block and core markers).
+ */
+
+import * as assert from 'node:assert';
+import {
+  renderViolationsDashboardHtml,
+  type AnalyzerSuppressionsSlice,
+  type ViewSuppressionsSlice,
+} from '../../views/violationsDashboardHtml';
+import type { DashboardSection } from '../../views/issuesTreeModel'; // type-only: no vscode at runtime
+
+const emptyTodoHack = { enabled: false, capped: false, todos: [], hacks: [] };
+const emptyDrift = { integrationEnabled: false, connected: false, issues: [] as [] };
+
+const baseAnalyzer: AnalyzerSuppressionsSlice = {
+  total: 0,
+  byKind: [],
+  byRule: [],
+  byFile: [],
+};
+
+const baseView: ViewSuppressionsSlice = {
+  active: false,
+  folderCount: 0,
+  fileCount: 0,
+  ruleCount: 0,
+  ruleInFileEntryCount: 0,
+  severityCount: 0,
+  impactCount: 0,
+  sampleFolders: [],
+  sampleFiles: [],
+  sampleRules: [],
+  sampleRuleInFileLines: [],
+};
+
+function minimalInput(overrides: Partial<Parameters<typeof renderViolationsDashboardHtml>[0]>) {
+  return {
+    exportViolations: [],
+    totalRawAfterDisable: 0,
+    filteredCount: 0,
+    truncatedSource: false,
+    maxSourceViolations: 4000,
+    pageSize: 50,
+    groupBy: 'severity' as const,
+    textFilter: '',
+    severities: ['error', 'warning', 'info'],
+    impacts: ['critical', 'high', 'medium', 'low', 'opinionated'],
+    sections: [] as DashboardSection[],
+    analyzerSuppressions: baseAnalyzer,
+    viewSuppressions: baseView,
+    todoHackSnapshot: emptyTodoHack,
+    driftAdvisorSnapshot: emptyDrift,
+    severityCounts: { error: 0, warning: 0, info: 0 },
+    impactCounts: { critical: 0, high: 0, medium: 0, low: 0, opinionated: 0 },
+    ...overrides,
+  };
+}
+
+describe('violationsDashboardHtml', () => {
+  it('includes suppressions block and export zero copy', () => {
+    const html = renderViolationsDashboardHtml(minimalInput({}));
+    assert.ok(html.includes('id="suppressions-block"'));
+    assert.ok(html.includes('Suppressions (export)'));
+    assert.ok(html.includes('Issues view hides'));
+  });
+
+  it('exposes full extension refresh on the toolbar', () => {
+    const html = renderViolationsDashboardHtml(minimalInput({}));
+    /* The visible toolbar collapses the palette into a "More actions ▾" menu
+       (§4.3 density tiers) so we no longer expose a top-level Refresh-extension
+       button. The hidden compatibility shim with that id stays for keyboard /
+       legacy bindings, plus the saropaLints.refresh command id is present in
+       both the menu and the hidden shim. */
+    assert.ok(html.includes('id="btn-refresh-extension"'));
+    assert.ok(html.includes("commandId: 'saropaLints.refresh'"));
+  });
+
+  it('renders analyzer suppressions with rule rows and focus-issues control', () => {
+    const slice: AnalyzerSuppressionsSlice = {
+      total: 3,
+      byKind: [['ignore_for_file', 2]],
+      byRule: [['my_rule', 3]],
+      byFile: [['lib/a.dart', 1]],
+    };
+    const html = renderViolationsDashboardHtml(minimalInput({ analyzerSuppressions: slice }));
+    assert.ok(html.includes('data-sup="focus-issues"'));
+    assert.ok(html.includes('data-sup="rule"'));
+    assert.ok(html.includes('my_rule'));
+    assert.ok(html.includes('data-sup="file"'));
+  });
+
+  it('shows clear button when view suppressions are active', () => {
+    const v: ViewSuppressionsSlice = {
+      active: true,
+      folderCount: 1,
+      fileCount: 0,
+      ruleCount: 0,
+      ruleInFileEntryCount: 0,
+      severityCount: 0,
+      impactCount: 0,
+      sampleFolders: ['lib/generated'],
+      sampleFiles: [],
+      sampleRules: [],
+      sampleRuleInFileLines: [],
+    };
+    const html = renderViolationsDashboardHtml(minimalInput({ viewSuppressions: v }));
+    assert.ok(html.includes('btn-clear-view-sup'));
+    assert.ok(html.includes('lib/generated'));
+  });
+
+  it('renders the hero status line and last-run pill when a timestamp is supplied', () => {
+    const recent = new Date(Date.now() - 90_000).toISOString();
+    const html = renderViolationsDashboardHtml(
+      minimalInput({ reportTimestamp: recent, extensionVersion: '1.2.3' }),
+    );
+    assert.ok(html.includes('class="status-line"'));
+    assert.ok(html.includes('Last run'));
+    assert.ok(html.includes('v1.2.3'));
+  });
+
+  it('omits the chart card when every severity and impact slot is zero', () => {
+    /* §8.16 / §14.3: do not render an empty chart frame. */
+    const html = renderViolationsDashboardHtml(minimalInput({}));
+    assert.ok(!html.includes('Severity mix'));
+    assert.ok(!html.includes('Impact mix'));
+  });
+
+  it('renders the chart card when at least one severity bucket has data', () => {
+    const html = renderViolationsDashboardHtml(
+      minimalInput({ severityCounts: { error: 2, warning: 0, info: 1 } }),
+    );
+    assert.ok(html.includes('Severity mix'));
+    assert.ok(html.includes('class="bar-fill sev-error"'));
+  });
+
+  it('renders KPI cards as preset filters (interactive, role=button)', () => {
+    const html = renderViolationsDashboardHtml(
+      minimalInput({ severityCounts: { error: 5, warning: 2, info: 0 }, totalRawAfterDisable: 7, filteredCount: 7 }),
+    );
+    assert.ok(html.includes('class="kpi-row"'));
+    assert.ok(html.includes('data-kpi-kind="sev"'));
+    assert.ok(html.includes('data-kpi-value="error"'));
+  });
+
+  it('shows an active-filters chip strip when filters diverge from defaults', () => {
+    const html = renderViolationsDashboardHtml(
+      minimalInput({ textFilter: 'foo', severities: ['error'], impacts: ['critical', 'high'] }),
+    );
+    assert.ok(html.includes('id="chipStrip"'));
+    assert.ok(html.includes('Active filters'));
+    assert.ok(html.includes('contains'));
+  });
+
+  it('hides the chip strip at default filter state', () => {
+    const html = renderViolationsDashboardHtml(minimalInput({}));
+    assert.ok(!html.includes('id="chipStrip"'));
+  });
+
+  it('exposes Save report alongside Copy JSON in the toolbar', () => {
+    const html = renderViolationsDashboardHtml(minimalInput({}));
+    assert.ok(html.includes('id="btn-save"'));
+    assert.ok(html.includes('id="btn-copy"'));
+  });
+});
