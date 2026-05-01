@@ -11,6 +11,7 @@ import { logReport, logSection, flushReport } from './reportWriter';
 import { getProjectRoot } from './projectRoot';
 import { readViolations } from './violationsReader';
 import { readInstalledVersion } from './upgrade-checker';
+import { pickWorkspaceFolder } from './workspaceFolderPicker';
 
 const SAROPA_LINTS_DEV_DEP = 'saropa_lints';
 const DEFAULT_VERSION = '^9.1.0';
@@ -718,8 +719,16 @@ export async function runEmitCompositePluginScaffold(): Promise<boolean> {
 }
 
 export async function openConfig(): Promise<void> {
-  const workspaceRoot = getProjectRoot();
-  if (!workspaceRoot) return;
+  // Multi-root: never default to `workspaceFolders[0]`; resolve via the
+  // shared picker so the active editor's folder wins, with a fallback prompt
+  // if there is genuine ambiguity. Previously this opened the wrong project's
+  // analysis_options_custom.yaml whenever a sibling project (e.g.
+  // saropa_drift_advisor) was first in the workspace folders list.
+  const folder = await pickWorkspaceFolder({
+    placeHolder: 'Choose the project whose analysis options to open',
+  });
+  if (!folder) return;
+  const workspaceRoot = folder.uri.fsPath;
   const customPath = path.join(workspaceRoot, 'analysis_options_custom.yaml');
   const uri = fs.existsSync(customPath)
     ? vscode.Uri.file(customPath)

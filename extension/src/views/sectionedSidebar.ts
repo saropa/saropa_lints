@@ -253,22 +253,19 @@ function buildActionItems(): LeafItem[] {
             'saropaLints.initializeConfig',
             'gear',
         ),
-        new LeafItem(
-            'Open analysis_options_custom.yaml',
-            undefined,
-            'saropaLints.openConfig',
-            'file-code',
-        ),
-        // Composite analyzer plugin scaffold is intentionally NOT exposed
+        // `Open analysis_options_custom.yaml` was intentionally REMOVED from the
+        // sidebar. The generated file carries a "DO NOT EDIT MANUALLY — use the
+        // Saropa Lints VS Code extension" banner, so a sidebar row pointing
+        // straight to it directly contradicted that guidance. Users who genuinely
+        // need to view the file have the command palette (`Saropa Lints: Open
+        // Analysis Options`); rule overrides are now managed graphically in the
+        // Lints Config dashboard's Disabled rules section.
+        //
+        // Composite analyzer plugin scaffold is also intentionally NOT exposed
         // here. The action targets a tiny audience (teams shipping their own
         // custom analyzer rules alongside Saropa) and the term is jargon to
-        // everyone else. It remains discoverable via the command palette
-        // (`Saropa Lints: Create Composite Analyzer Plugin (scaffold)`),
-        // `Saropa Lints: Show All Commands`, the CLI
-        // (`dart run saropa_lints:init --emit-composite-plugin-scaffold`),
-        // and `doc/guides/composite_analyzer_plugin.md`. Keeping it out of
-        // the sidebar avoids confusing the 99% of users who only want
-        // Saropa rules.
+        // everyone else. It remains discoverable via the command palette,
+        // the command catalog, the CLI flag, and the guide.
     ];
 }
 

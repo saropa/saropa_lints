@@ -214,9 +214,12 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigTreeNod
       nodes.push({
         kind: 'triageInfo',
         label: `${triage.disabledOverrideCount} rules disabled by override`,
-        // Clickable: jump straight to analysis_options_custom.yaml where the
-        // override is defined so the user can review or unblock rules.
-        commandId: 'saropaLints.openConfig',
+        // Click → Lints Config dashboard. The dashboard now has a "Disabled
+        // rules" section listing each one with a re-enable button. The raw
+        // analysis_options_custom.yaml file carries a "do not edit manually"
+        // banner, so sending users there directly is the wrong UX — the
+        // dashboard is the canonical management surface.
+        commandId: 'saropaLints.openConfigDashboard',
       });
     }
     if (triage.stylisticGroup) nodes.push(triage.stylisticGroup);

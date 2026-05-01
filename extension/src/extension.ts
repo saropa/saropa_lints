@@ -114,6 +114,7 @@ import { createRelatedRuleTelemetry } from './relatedRuleTelemetry';
 import { registerCrossFileCommands } from './cross-file-commands';
 import { registerCopyAsJsonCommands } from './extensionCopyAsJsonCommands';
 import { openViolationsWideReport, refreshFindingsDashboardIfOpen } from './views/violationsWideReportView';
+import { pickWorkspaceFolder } from './workspaceFolderPicker';
 
 function getConfig() {
   return vscode.workspace.getConfiguration('saropaLints');
@@ -201,32 +202,6 @@ function syncRuleMetadataFromViolations(data: ViolationsData | null): void {
   setConflictingRulesMetadata(data?.config?.conflictingRulesByRule);
   setSupersedesRulesMetadata(data?.config?.supersedesRulesByRule);
   setRuleTagsMetadata(data?.config?.ruleMetadataByRule);
-}
-
-/**
- * Choose which workspace folder a write-to-disk command should target.
- *
- * Hard rule: a sidebar row in the Saropa Lints view must never write into a
- * sibling project just because that project happens to be `workspaceFolders[0]`.
- * Strategy:
- *   1. Single-folder workspace — use it.
- *   2. Active editor open — use the folder containing that editor's file.
- *   3. Fall back to VS Code's built-in workspace folder picker so the user
- *      makes the choice explicitly. Returns `undefined` if they cancel.
- */
-async function pickWorkspaceFolderForWrite(): Promise<vscode.WorkspaceFolder | undefined> {
-  const folders = vscode.workspace.workspaceFolders;
-  if (!folders || folders.length === 0) return undefined;
-  if (folders.length === 1) return folders[0];
-
-  const activeUri = vscode.window.activeTextEditor?.document.uri;
-  if (activeUri) {
-    const ws = vscode.workspace.getWorkspaceFolder(activeUri);
-    if (ws) return ws;
-  }
-  return vscode.window.showWorkspaceFolderPick({
-    placeHolder: 'Choose the project that should receive the Saropa Lints AI agent instructions',
-  });
 }
 
 export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
@@ -750,13 +725,13 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     vscode.commands.registerCommand('saropaLints.openConfig', openConfig),
     // Open pubspec.yaml — paired with the sidebar "Detected" row so a click on
     // that row takes the user to the file whose contents it summarizes.
+    // Same multi-root guard as openConfig: never default to workspaceFolders[0].
     vscode.commands.registerCommand('saropaLints.openPubspec', async () => {
-      const root = getProjectRoot();
-      if (!root) {
-        void vscode.window.showInformationMessage('No Dart project root found.');
-        return;
-      }
-      const uri = vscode.Uri.file(path.join(root, 'pubspec.yaml'));
+      const folder = await pickWorkspaceFolder({
+        placeHolder: 'Choose the project whose pubspec.yaml to open',
+      });
+      if (!folder) return;
+      const uri = vscode.Uri.file(path.join(folder.uri.fsPath, 'pubspec.yaml'));
       try {
         const doc = await vscode.workspace.openTextDocument(uri);
         await vscode.window.showTextDocument(doc);
@@ -853,7 +828,9 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       // (e.g. saropa_drift_advisor) rather than the project the user was
       // actually working on. Pick the active editor's folder when available;
       // otherwise prompt so the user controls the destination explicitly.
-      const folder = await pickWorkspaceFolderForWrite();
+      const folder = await pickWorkspaceFolder({
+        placeHolder: 'Choose the project that should receive the Saropa Lints AI agent instructions',
+      });
       if (!folder) {
         void vscode.window.showErrorMessage('Open a workspace folder first.');
         return;

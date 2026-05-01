@@ -1,7 +1,8 @@
 // Implements the Rule Packs / Config Dashboard UI: load pubspec, toggles, and `rule_packs` config.
 /**
  * **Config Dashboard** editor webview: rule packs table, tier chips, SDK rollout actions,
- * and Flutter embedder rows from {@link readPubspec}.
+ * a read-only export suppressions snapshot strip (totals from `violations.json`), and Flutter
+ * embedder rows from {@link readPubspec}.
  *
  * Opens as a {@link vscode.WebviewPanel} (full editor column), not a sidebar webview, so the
  * layout stays usable. Writes `plugins.saropa_lints.rule_packs.enabled` (see `rulePackYaml.ts`).
@@ -15,8 +16,14 @@ import * as vscode from 'vscode';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { getProjectRoot } from '../projectRoot';
+import { readDisabledRules } from '../configWriter';
 import { readPubspec, FLUTTER_EMBEDDER_PLATFORMS } from '../pubspecReader';
+import { readViolations, filterDisabledFromData } from '../violationsReader';
+import { buildSuppressionsExportSnapshotStripHtml } from '../views/configDashboardSuppressionsStrip';
 import { RULE_PACK_DEFINITIONS, isPackDetected } from './rulePackDefinitions';
+import { createWebviewCspNonce } from '../vibrancy/views/html-utils';
+import { getConfigDashboardScript } from './configDashboardScript';
+import { getConfigDashboardStyles } from './configDashboardStyles';
 import { readRulePacksEnabled, writeRulePacksEnabled } from './rulePackYaml';
 
 const CONFIG_DASHBOARD_PANEL_TYPE = 'saropaLints.configDashboard';
@@ -38,6 +45,30 @@ interface PackChartRow {
   rules: number;
   enabled: boolean;
   detected: boolean;
+}
+
+/**
+ * Bundled dashboard inputs collected once per render. Computing this in one place keeps the
+ * builder methods free of repeated I/O and gives every section a consistent view of the data.
+ */
+interface DashboardContext {
+  pubspecInfo: ReturnType<typeof readPubspec>;
+  currentTier: string;
+  packRows: readonly PackChartRow[];
+  stats: PackDashboardStats;
+  detectedSdkPacks: ReadonlyArray<(typeof RULE_PACK_DEFINITIONS)[number]>;
+  detectedBreakingSdkCount: number;
+  detectedDeprecationSdkCount: number;
+  /** ISO timestamp from violations.json — drives the status-line freshness label. */
+  analysisTimestamp: string | undefined;
+  suppressionsStripHtml: string;
+  /**
+   * Rules currently disabled via `analysis_options_custom.yaml` overrides.
+   * Surfacing them here is the user's only graphical way to see and re-enable
+   * what they previously turned off; the file itself carries a "do not edit"
+   * banner directing readers back to the extension.
+   */
+  disabledRules: readonly string[];
 }
 
 export function isSdkPackId(id: string): boolean {
@@ -102,11 +133,133 @@ export function computePackDashboardStats(rows: readonly PackChartRow[]): PackDa
   };
 }
 
-export function buildTierChips(currentTier: string): string {
-  return TIERS.map((tier) => {
+/**
+ * Renders the tier segmented control as real `<button role="radio">` elements.
+ *
+ * UX_UI_GUIDELINES §14.1 fix: previously rendered as inert `<span class="tier-chip">` that looked
+ * interactive but did nothing — the user had to click a separate "Set tier" toolbar button. The
+ * new control posts `setTier` messages on click, removing the bait-and-switch pattern.
+ */
+export function buildTierControl(currentTier: string): string {
+  const buttons = TIERS.map((tier) => {
     const active = tier === currentTier;
-    return `<span class="tier-chip ${active ? 'active' : ''}">${escapeHtml(tier)}${active ? ' (current)' : ''}</span>`;
+    const label = active ? `${escapeHtml(tier)} (current)` : escapeHtml(tier);
+    return [
+      '<button type="button" class="tier-btn"',
+      ` role="radio" aria-checked="${active ? 'true' : 'false'}"`,
+      ` data-tier="${escapeHtml(tier)}"`,
+      ` tabindex="${active ? '0' : '-1'}">`,
+      label,
+      '</button>',
+    ].join('');
   }).join('');
+  return `<div class="tier-control" role="radiogroup" aria-label="Lint tier">${buttons}</div>`;
+}
+
+/**
+ * Formats an ISO timestamp into a short relative-time label for the status line.
+ * Returns 'never run' for null input. Granularity drops as time passes so the line stays compact.
+ */
+export function formatRelativeFreshness(iso: string | undefined, now: number = Date.now()): string {
+  if (!iso) return 'never run';
+  const t = Date.parse(iso);
+  if (Number.isNaN(t)) return 'never run';
+  const sec = Math.max(0, Math.floor((now - t) / 1000));
+  if (sec < 60) return 'just now';
+  if (sec < 3600) return `${Math.floor(sec / 60)}m ago`;
+  if (sec < 86400) return `${Math.floor(sec / 3600)}h ago`;
+  const days = Math.floor(sec / 86400);
+  if (days < 7) return `${days}d ago`;
+  return `${Math.floor(days / 7)}w ago`;
+}
+
+/**
+ * Decides whether the pack coverage chart should render. Per UX_UI_GUIDELINES §14.3/§14.5/§8.16:
+ * the chart is omitted when no pack is enabled or detected — an all-grey chart is decoration.
+ */
+export function shouldRenderPackCoverageChart(rows: readonly PackChartRow[]): boolean {
+  return rows.some((row) => row.enabled || row.detected);
+}
+
+/**
+ * Score the workspace's lint configuration coverage on a 0–100 scale for the header gauge.
+ *
+ * Definition: of the packs whose pubspec gate is satisfied (detected), what fraction has the
+ * user actually enabled? This is the actionable metric — *"are you taking advantage of the
+ * tooling that applies to your code?"*. If nothing is detected, fall back to enabled/total so
+ * the gauge still rewards a configured tier-only workspace; if the catalogue itself is empty
+ * (defensive), return 0.
+ */
+export function computePackCoverageScore(stats: PackDashboardStats): number {
+  if (stats.detectedPacks > 0) {
+    const overlap = Math.min(stats.enabledPacks, stats.detectedPacks);
+    return Math.round((overlap / stats.detectedPacks) * 100);
+  }
+  if (stats.totalPacks === 0) return 0;
+  return Math.round((stats.enabledPacks / stats.totalPacks) * 100);
+}
+
+/**
+ * Map a 0–100 coverage score to an HSL hue along red → amber → green per §2.3 (ordinal
+ * spectrum). The result is consumed inline as a CSS string, so the helper returns the full
+ * `hsl(...)` form, not just the hue number.
+ */
+export function hslForCoverageScore(score: number): string {
+  const clamped = Math.max(0, Math.min(100, score));
+  // 0 → red (0deg), 50 → amber (~60deg), 100 → green (~130deg). Linear interpolation is
+  // fine for a small range and avoids the perceptual dead zones of HSV.
+  const hue = Math.round((clamped / 100) * 130);
+  return `hsl(${hue}, 70%, 50%)`;
+}
+
+/**
+ * Compute donut segment offsets for the pack coverage donut companion (§6.1).
+ *
+ * Returns one segment per row in input order with `length` (stroke-dasharray) and `offset`
+ * (cumulative starting offset around the circle), both expressed as a fraction of 100 so the
+ * SVG can use `pathLength="100"` and skip arithmetic at render time.
+ */
+export interface DonutSegment {
+  id: string;
+  label: string;
+  length: number;
+  offset: number;
+}
+
+export function computeDonutSegments(rows: readonly PackChartRow[]): DonutSegment[] {
+  const total = rows.reduce((acc, r) => acc + r.rules, 0);
+  if (total <= 0) return [];
+  let acc = 0;
+  return rows.map((row) => {
+    const length = (row.rules / total) * 100;
+    const seg: DonutSegment = { id: row.id, label: row.label, length, offset: acc };
+    acc += length;
+    return seg;
+  });
+}
+
+/**
+ * Build a paste-ready YAML snippet of the current Lints Config (tier + enabled rule packs) for
+ * the *Copy config* toolbar action. The snippet matches the analyzer's expected `analysis_options`
+ * layout so the user can paste it under their existing `analyzer:` / `plugins:` block in another
+ * project. Inputs are sanitized: tier is whitelisted; pack ids are sorted and pre-filtered to the
+ * known catalogue by callers, so this helper just formats — it does not validate.
+ */
+export function buildConfigSnippetYaml(tier: string, enabledPackIds: readonly string[]): string {
+  const safeTier = (TIERS as readonly string[]).includes(tier) ? tier : 'recommended';
+  const sortedIds = [...enabledPackIds].sort((a, b) => a.localeCompare(b));
+  const packsBlock =
+    sortedIds.length === 0
+      ? '      enabled: []'
+      : ['      enabled:', ...sortedIds.map((id) => `        - ${id}`)].join('\n');
+  return [
+    '# Saropa Lints — copy into your analysis_options.yaml under saropa_lints / plugins.',
+    'saropa_lints:',
+    `  tier: ${safeTier}`,
+    '  rule_packs:',
+    packsBlock,
+    '',
+  ].join('\n');
 }
 
 export class RulePacksWebviewProvider {
@@ -124,7 +277,10 @@ export class RulePacksWebviewProvider {
 
     const panel = vscode.window.createWebviewPanel(
       CONFIG_DASHBOARD_PANEL_TYPE,
-      'Config Dashboard',
+      // Editor-tab title keeps the "Saropa" prefix even though the sidebar row drops it —
+      // the prefix is the only signal that lets users find this tab in Quick Open / Recent
+      // Files / the editor tab dropdown when many unrelated tabs are open.
+      'Saropa Lints Config',
       vscode.ViewColumn.One,
       {
         enableScripts: true,
@@ -134,20 +290,27 @@ export class RulePacksWebviewProvider {
     );
     this._panel = panel;
 
-    panel.webview.onDidReceiveMessage((msg: { type: string; packId?: string; enabled?: boolean; id?: string }) => {
-      if (msg.type === 'toggle' && msg.packId !== undefined && msg.enabled !== undefined) {
-        void this._handleToggle(msg.packId, msg.enabled);
-      }
-      if (msg.type === 'showRules' && msg.packId !== undefined) {
-        void this._showRulesList(msg.packId);
-      }
-      if (msg.type === 'command' && typeof msg.id === 'string') {
-        void this._runDashboardCommand(msg.id);
-      }
-      if (msg.type === 'refresh') {
-        this.refresh();
-      }
-    });
+    panel.webview.onDidReceiveMessage(
+      (msg: { type: string; packId?: string; enabled?: boolean; id?: string; tier?: string }) => {
+        if (msg.type === 'toggle' && msg.packId !== undefined && msg.enabled !== undefined) {
+          void this._handleToggle(msg.packId, msg.enabled);
+        }
+        if (msg.type === 'showRules' && msg.packId !== undefined) {
+          void this._showRulesList(msg.packId);
+        }
+        if (msg.type === 'command' && typeof msg.id === 'string') {
+          void this._runDashboardCommand(msg.id);
+        }
+        // setTier is fired by the in-page tier radio control — replaces the old "Set tier"
+        // toolbar button + quickpick round-trip with a single click on the active tier.
+        if (msg.type === 'setTier' && typeof msg.tier === 'string') {
+          void this._handleSetTier(msg.tier);
+        }
+        if (msg.type === 'refresh') {
+          this.refresh();
+        }
+      },
+    );
 
     panel.onDidDispose(() => {
       this._panel = undefined;
@@ -164,6 +327,13 @@ export class RulePacksWebviewProvider {
     webview.html = this._buildHtml();
   }
 
+  /**
+   * Build the Lints Config webview body.
+   *
+   * Layout per UX_UI_GUIDELINES §14.7 (density-first ordering): header → KPIs → tier → toolbar →
+   * filter strip → primary table → conditional chart → diagnostics. Suppressions, target platforms,
+   * and docs are bottom-band reference content (§14.14 fix), not above-the-fold.
+   */
   private _buildHtml(): string {
     const root = getProjectRoot();
     if (!root) {
@@ -178,237 +348,546 @@ export class RulePacksWebviewProvider {
       return this._wrapHtml('<p>No pubspec.yaml in workspace.</p>', false);
     }
 
-    const info = readPubspec(root);
-    const enabledIds = new Set(readRulePacksEnabled(root));
-    const currentTier = vscode.workspace.getConfiguration('saropaLints').get<string>('tier', 'recommended') ?? 'recommended';
-
-    const packRows = RULE_PACK_DEFINITIONS.map((def) => {
-      const detected = isPackDetected(def, pubspecContent);
-      const enabled = enabledIds.has(def.id);
-      const count = def.ruleCodes.length;
-      return {
-        id: def.id,
-        label: def.label,
-        detected,
-        enabled,
-        rules: count,
-      };
-    });
-    const detectedSdkPacks = RULE_PACK_DEFINITIONS.filter(
-      (def) => isSdkPackId(def.id) && isPackDetected(def, pubspecContent),
-    );
-    const detectedBreakingSdkPacks = detectedSdkPacks.filter((def) => isBreakingSdkPack(def));
-    const detectedSdkLabels = detectedSdkPacks.map((def) => def.label).sort((a, b) => a.localeCompare(b));
-    const detectedBreakingSdkLabels = detectedBreakingSdkPacks
-      .map((def) => def.label)
-      .sort((a, b) => a.localeCompare(b));
-    const stats = computePackDashboardStats(packRows);
-    const maxRules = Math.max(1, ...packRows.map((row) => row.rules));
-
-    const renderRows = (rowsToRender: typeof packRows) => rowsToRender.map((row) => {
-      const def = RULE_PACK_DEFINITIONS.find((d) => d.id === row.id)!;
-      const detLabel = row.detected ? 'Yes' : 'No';
-      const detClass = row.detected ? 'ok' : 'muted';
-      const riskKind = sdkPackRiskKind(def);
-      const riskBadge = riskKind === 'none'
-        ? ''
-        : `<span class="risk-badge ${riskKind}">${riskKind === 'breaking' ? 'breaking' : 'deprecation'}</span>`;
-      const sdkBadge = isSdkPackId(def.id) ? '<span class="risk-badge sdk">sdk</span>' : '';
-      const gateLine = def.dependencyGate
-        ? `<div class="gate">${escapeHtml(def.dependencyGate.package)} ${escapeHtml(def.dependencyGate.constraint)} in pubspec.lock</div>`
-        : def.sdkGate
-          ? `<div class="gate">${escapeHtml(def.sdkGate.sdkKey)} ${escapeHtml(def.sdkGate.constraint)} (pubspec environment) ${sdkBadge}${riskBadge}</div>`
-        : '';
-      return `<tr data-pack="${escapeHtml(row.id)}">
-  <td class="pack-name">${escapeHtml(def.label)}${gateLine}</td>
-  <td class="${detClass}">${detLabel}</td>
-  <td><label class="switch"><input type="checkbox" data-pack="${escapeHtml(row.id)}" ${row.enabled ? 'checked' : ''} /><span class="slider"></span></label></td>
-  <td class="num">${row.rules}</td>
-  <td><a href="#" class="rules-link" data-pack="${escapeHtml(row.id)}">Rules</a></td>
-</tr>`;
-    }).join('\n');
-    const sdkRowsSorted = [...packRows]
-      .filter((row) => isSdkPackId(row.id))
-      .sort((a, b) => {
-        const defA = RULE_PACK_DEFINITIONS.find((d) => d.id === a.id);
-        const defB = RULE_PACK_DEFINITIONS.find((d) => d.id === b.id);
-        const riskA = defA ? sdkPackRiskKind(defA) : 'none';
-        const riskB = defB ? sdkPackRiskKind(defB) : 'none';
-        return compareSdkPackRowsByRisk(
-          { label: a.label, risk: riskA },
-          { label: b.label, risk: riskB },
-        );
-      });
-    const sdkRows = renderRows(sdkRowsSorted);
-    const packageRows = renderRows(packRows.filter((row) => !isSdkPackId(row.id)));
-
-    const chartRows = [...packRows]
-      .sort((a, b) => b.rules - a.rules || a.label.localeCompare(b.label))
-      .slice(0, 8)
-      .map((row) => {
-        const width = Math.round((row.rules / maxRules) * 100);
-        return `<div class="bar-row">
-  <div class="bar-head"><span>${escapeHtml(row.label)}</span><span>${row.rules}</span></div>
-  <div class="bar-track"><div class="bar-fill ${row.enabled ? 'enabled' : ''} ${row.detected ? 'detected' : ''}" style="width:${width}%"></div></div>
-</div>`;
-      })
-      .join('\n');
-
-    const platRows = FLUTTER_EMBEDDER_PLATFORMS.map((p) => {
-      const present = info.platforms.includes(p);
-      return `<tr><td>${escapeHtml(p)}</td><td class="${present ? 'ok' : 'muted'}">${present ? 'Yes' : 'No'}</td></tr>`;
-    }).join('\n');
-
-    const platSection = info.isFlutter
-      ? `<h2>Target platforms</h2>
-<table class="plat"><thead><tr><th>Platform</th><th>Present</th></tr></thead><tbody>${platRows}</tbody></table>
-<p class="hint">Detected from embedder folders (android/, ios/, …).</p>`
-      : `<p class="hint dart-only">Pure Dart package — no Flutter embedder targets.</p>`;
-
-    const body = `
-<h1>Config Dashboard</h1>
-<p class="hint">Pack-owned rules are off unless that pack is enabled. Tiers control broad baselines; packs control package/SDK migration domains.</p>
-
-<div class="actions">
-  <button class="action-btn" data-command="setTier">Set tier</button>
-  <button class="action-btn" data-command="openConfig">Open config YAML</button>
-  <button class="action-btn" data-command="runAnalysis">Run analysis</button>
-  <button class="action-btn" data-command="enableDetectedSdkPacks">Enable applicable SDK packs</button>
-  <button class="action-btn" data-command="enableDetectedBreakingSdkPacks">Enable applicable breaking SDK packs</button>
-  <button class="action-btn" data-command="enableDetectedDeprecationSdkPacks">Enable applicable deprecation SDK packs</button>
-  <button class="action-btn" data-command="openVibrancy">Open Package Vibrancy</button>
-</div>
-<p class="hint">Rollout preview (all SDK): ${escapeHtml(detectedSdkLabels.join(', ') || 'none detected')}</p>
-<p class="hint">Rollout preview (breaking SDK): ${escapeHtml(detectedBreakingSdkLabels.join(', ') || 'none detected')}</p>
-<p class="hint">Rollout preview (deprecation SDK): ${escapeHtml(
-  detectedSdkPacks
-    .filter((def) => sdkPackRiskKind(def) === 'deprecation')
-    .map((def) => def.label)
-    .sort((a, b) => a.localeCompare(b))
-    .join(', ') || 'none detected',
-)}</p>
-
-<div class="kpis">
-  <div class="kpi-card"><div class="kpi-label">Tier</div><div class="kpi-value">${escapeHtml(currentTier)}</div></div>
-  <div class="kpi-card"><div class="kpi-label">Enabled packs</div><div class="kpi-value">${stats.enabledPacks}/${stats.totalPacks}</div></div>
-  <div class="kpi-card"><div class="kpi-label">Detected packs</div><div class="kpi-value">${stats.detectedPacks}/${stats.totalPacks}</div></div>
-  <div class="kpi-card"><div class="kpi-label">Enabled rules (pack-owned)</div><div class="kpi-value">${stats.enabledRules}</div></div>
-  <div class="kpi-card"><div class="kpi-label">Applicable SDK packs</div><div class="kpi-value">${detectedSdkPacks.length}</div></div>
-  <div class="kpi-card"><div class="kpi-label">Applicable breaking SDK packs</div><div class="kpi-value">${detectedBreakingSdkPacks.length}</div></div>
-</div>
-
-<h2>Tiers</h2>
-<div class="tier-row">${buildTierChips(currentTier)}</div>
-<p class="hint">Tier sets broad defaults. Pack-owned migration rules require pack enablement.</p>
-
-<h2>Pack coverage chart</h2>
-<div class="chart">${chartRows}</div>
-
-<h2>SDK migration packs</h2>
-<table class="packs">
-<thead><tr><th>Pack</th><th>In pubspec</th><th>Enabled</th><th>Rules</th><th></th></tr></thead>
-<tbody>${sdkRows}</tbody>
-</table>
-<p class="hint">SDK pack labels include <span class="risk-badge sdk">sdk</span> and risk kind tags for quick rollout decisions.</p>
-
-<h2>Package rule packs</h2>
-<table class="packs">
-<thead><tr><th>Pack</th><th>In pubspec</th><th>Enabled</th><th>Rules</th><th></th></tr></thead>
-<tbody>${packageRows}</tbody>
-</table>
-<p class="hint">Detected rules in pubspec domains: ${stats.detectedRules}. Enabled rules via packs: ${stats.enabledRules}.</p>
-
-<h2>Docs</h2>
-<ul class="docs">
-  <li><a href="https://pub.dev/packages/saropa_lints">Package docs</a></li>
-  <li><a href="https://github.com/saropa/saropa_lints/blob/main/doc/guides/rule_packs.md">Rule pack guide</a></li>
-  <li><a href="https://github.com/saropa/saropa_lints#rule-configuration-cheatsheet">Tier + pack cheatsheet</a></li>
-</ul>
-${platSection}
-`;
+    const ctx = this._collectDashboardContext(root, pubspecContent);
+    const body = [
+      this._buildHeader(ctx),
+      this._buildKpiStrip(ctx),
+      this._buildTierSection(ctx),
+      this._buildToolbar(ctx),
+      // Empty placeholder; the script populates it whenever filter state diverges from defaults.
+      // Per §8.5 / §14.10 the strip must exist in the DOM so it can render synchronously.
+      '<div class="chip-strip" id="filter-strip" hidden></div>',
+      this._buildPackTable(ctx),
+      // Disabled-rules section sits directly under the pack table because both
+      // edit the same effective rule set: packs + tier set the baseline, and
+      // these overrides remove individual rules from it. Users coming from
+      // the sidebar's "X rules disabled by override" row land here.
+      this._buildDisabledRulesSection(ctx),
+      this._buildChartSection(ctx),
+      this._buildDiagnostics(ctx),
+    ].join('\n');
 
     return this._wrapHtml(body, true);
   }
 
+  /** Resolve the pubspec, tier, violations snapshot, and pack rows in one pass. */
+  private _collectDashboardContext(root: string, pubspecContent: string): DashboardContext {
+    const info = readPubspec(root);
+    const enabledIds = new Set(readRulePacksEnabled(root));
+    const currentTier =
+      vscode.workspace.getConfiguration('saropaLints').get<string>('tier', 'recommended') ??
+      'recommended';
+    const packRows: PackChartRow[] = RULE_PACK_DEFINITIONS.map((def) => ({
+      id: def.id,
+      label: def.label,
+      detected: isPackDetected(def, pubspecContent),
+      enabled: enabledIds.has(def.id),
+      rules: def.ruleCodes.length,
+    }));
+    const detectedSdkPacks = RULE_PACK_DEFINITIONS.filter(
+      (def) => isSdkPackId(def.id) && isPackDetected(def, pubspecContent),
+    );
+    const stats = computePackDashboardStats(packRows);
+    const violationsRaw = readViolations(root);
+    const violationsForStrip = violationsRaw
+      ? filterDisabledFromData(violationsRaw, readDisabledRules(root))
+      : null;
+    // Rules currently disabled via overrides. Rendered as a dashboard
+    // section so users have a graphical way to review and re-enable —
+    // the underlying file (`analysis_options_custom.yaml`) carries a
+    // "do not edit manually" banner pointing back to this extension.
+    const disabledRules = [...readDisabledRules(root)].sort();
+    return {
+      pubspecInfo: info,
+      currentTier,
+      packRows,
+      stats,
+      detectedSdkPacks,
+      detectedBreakingSdkCount: detectedSdkPacks.filter((d) => isBreakingSdkPack(d)).length,
+      detectedDeprecationSdkCount: detectedSdkPacks.filter((d) => sdkPackRiskKind(d) === 'deprecation')
+        .length,
+      analysisTimestamp: violationsRaw?.timestamp,
+      suppressionsStripHtml: buildSuppressionsExportSnapshotStripHtml(violationsForStrip),
+      disabledRules,
+    };
+  }
+
+  /**
+   * Header band with status line and hero coverage gauge.
+   *
+   * §4.1 / §14.9: replaces the marketing subtitle with one muted sentence carrying tier, pack
+   * coverage, applicable SDK migrations, and analysis freshness. The methodology copy that used
+   * to be the subtitle moves into a help-icon `title` so it stays reachable but doesn't compete
+   * with the data the user came for.
+   *
+   * §6.3: a partial-arc gauge anchors the right side of the header — score-derived HSL fill,
+   * centered numeric grade, neutral track. Animates from empty on first render so the
+   * orientation is unambiguous. The arc fills from CSS variables to keep the initial keyframe
+   * from fighting inline geometry (per §5).
+   */
+  private _buildHeader(ctx: DashboardContext): string {
+    const sdkApplicable = ctx.detectedSdkPacks.length;
+    const freshness = formatRelativeFreshness(ctx.analysisTimestamp);
+    const parts = [
+      `Tier: <strong>${escapeHtml(ctx.currentTier)}</strong>`,
+      `${ctx.stats.enabledPacks}/${ctx.stats.totalPacks} packs enabled`,
+      `${ctx.stats.detectedPacks}/${ctx.stats.totalPacks} detected`,
+      `${sdkApplicable} applicable SDK migration${sdkApplicable === 1 ? '' : 's'}`,
+      `last analysis ${freshness}`,
+    ];
+    const statusLine = parts
+      .map((p, i) => (i === 0 ? `<span>${p}</span>` : `<span class="dot">·</span><span>${p}</span>`))
+      .join('');
+    const helpTitle =
+      'Pack-owned rules are off unless that pack is enabled. Tiers control broad baselines; ' +
+      'packs control package- and SDK-migration domains.';
+    return `<header class="dash-hero">
+  <div class="hero-text">
+    <h1>Saropa Lints Config <button type="button" class="help-icon" title="${escapeHtml(helpTitle)}" aria-label="About this dashboard">?</button></h1>
+    <p class="status-line">${statusLine}</p>
+  </div>
+  ${this._buildCoverageGauge(ctx)}
+</header>`;
+  }
+
+  /**
+   * Hero coverage gauge: enabled / detected as a percentage. Uses the shared `.hero-gauge`
+   * chrome from `dashboardChromeStyles.ts` so this gauge looks identical to the Findings and
+   * Code Health gauges. Hidden if the catalogue is empty (defensive) — otherwise always
+   * rendered, including at 0%, because the user needs to see the gauge in its zero state to
+   * understand what the page is measuring.
+   */
+  private _buildCoverageGauge(ctx: DashboardContext): string {
+    if (ctx.stats.totalPacks === 0) return '';
+    const score = computePackCoverageScore(ctx.stats);
+    const hsl = hslForCoverageScore(score);
+    const denom = ctx.stats.detectedPacks > 0 ? ctx.stats.detectedPacks : ctx.stats.totalPacks;
+    const numerator = Math.min(ctx.stats.enabledPacks, denom);
+    const tooltipBase =
+      ctx.stats.detectedPacks > 0
+        ? `${numerator} of ${denom} detected packs are enabled.`
+        : `${numerator} of ${denom} packs in the catalogue are enabled (no packs detected in this pubspec).`;
+    const tooltip = `Pack coverage ${score}%. ${tooltipBase}`;
+    // pathLength="100" + `--gauge-target` / `--gauge-arc` follows the shared-chrome contract
+    // used by all three dashboards' hero gauges. `--gauge-color` carries the score-derived hue.
+    return `<div class="hero-gauge" role="img"
+    aria-label="${escapeHtml(`Pack coverage ${score} percent`)}"
+    title="${escapeHtml(tooltip)}"
+    style="--gauge-target:${score};--gauge-arc:100;--gauge-color:${hsl};">
+    <svg viewBox="0 0 100 100" aria-hidden="true">
+      <path class="gauge-track" d="M 15 80 A 45 45 0 1 1 85 80" pathLength="100"></path>
+      <path class="gauge-fill" d="M 15 80 A 45 45 0 1 1 85 80" pathLength="100"></path>
+    </svg>
+    <div class="gauge-label">
+      <span class="lg">${score}<span class="muted" style="font-size:0.55em;">%</span></span>
+      <span class="sm">coverage</span>
+    </div>
+  </div>`;
+  }
+
+  /**
+   * KPI strip with collapsed identical twins (§14.11) and preset-filter affordance (§14.8).
+   *
+   * Cards are real `<button>`s so they're keyboard-reachable; the script wires `data-filter-*`
+   * to the table filter state. Numbers use the hero scale (1.8em) per §4.2.
+   */
+  private _buildKpiStrip(ctx: DashboardContext): string {
+    const cards = [
+      this._buildCoverageCard(ctx),
+      this._buildSdkApplicableCard(ctx),
+      this._buildEnabledRulesCard(ctx),
+    ].join('');
+    return `<section class="kpi-row" aria-label="Overview">${cards}</section>`;
+  }
+
+  /** Coverage card collapses the old "enabled vs detected" twins into one (§14.11). */
+  private _buildCoverageCard(ctx: DashboardContext): string {
+    const { enabledPacks, detectedPacks, totalPacks } = ctx.stats;
+    const ratio = totalPacks > 0 ? Math.round((enabledPacks / totalPacks) * 100) : 0;
+    const detail =
+      enabledPacks === detectedPacks
+        ? `${detectedPacks} detected in pubspec`
+        : `${detectedPacks} detected · ${enabledPacks} active`;
+    const title =
+      'Packs you have enabled in analysis_options.yaml versus the total pack catalogue. ' +
+      'Click to filter the table to enabled packs.';
+    return [
+      '<button type="button" class="kpi-card interactive" data-kpi-filter="enabled"',
+      ` title="${escapeHtml(title)}">`,
+      '<span class="kpi-k">Packs enabled</span>',
+      `<span class="kpi-v">${enabledPacks}<span class="muted" style="font-size:0.6em;">/${totalPacks}</span></span>`,
+      `<span class="kpi-sub">${escapeHtml(detail)}</span>`,
+      `<span class="kpi-progress" aria-hidden="true"><span style="width:${ratio}%"></span></span>`,
+      '</button>',
+    ].join('');
+  }
+
+  /** SDK-applicable card: collapses {all, breaking, deprecation} when they all match (§14.11). */
+  private _buildSdkApplicableCard(ctx: DashboardContext): string {
+    const total = ctx.detectedSdkPacks.length;
+    const breaking = ctx.detectedBreakingSdkCount;
+    const deprecation = ctx.detectedDeprecationSdkCount;
+    const detail =
+      total === 0
+        ? 'no SDK migrations in this pubspec'
+        : breaking === total && deprecation === 0
+          ? 'all are breaking changes'
+          : `${breaking} breaking · ${deprecation} deprecation`;
+    const title =
+      'SDK migration packs whose constraint matches this workspace\'s pubspec environment. ' +
+      'Click to filter the table to applicable SDK packs.';
+    return [
+      '<button type="button" class="kpi-card interactive" data-kpi-filter="applicable-sdk"',
+      ` title="${escapeHtml(title)}">`,
+      '<span class="kpi-k">Applicable SDK migrations</span>',
+      `<span class="kpi-v">${total}</span>`,
+      `<span class="kpi-sub">${escapeHtml(detail)}</span>`,
+      '</button>',
+    ].join('');
+  }
+
+  /** Enabled rules card. Independent number; no twin. Static (no preset filter). */
+  private _buildEnabledRulesCard(ctx: DashboardContext): string {
+    const title =
+      'Total rules contributed by enabled packs. Tier rules are not counted here — packs are an ' +
+      'overlay on top of the tier baseline.';
+    return [
+      '<div class="kpi-card"',
+      ` title="${escapeHtml(title)}">`,
+      '<span class="kpi-k">Pack rules enabled</span>',
+      `<span class="kpi-v">${ctx.stats.enabledRules}</span>`,
+      `<span class="kpi-sub">${ctx.stats.detectedRules} would activate if all detected packs were enabled</span>`,
+      '</div>',
+    ].join('');
+  }
+
+  /** Tier control section: real radio buttons replace the inert chips. */
+  private _buildTierSection(ctx: DashboardContext): string {
+    return `<section aria-label="Tier">
+  <h2>Tier</h2>
+  ${buildTierControl(ctx.currentTier)}
+  <p class="hint">Tier sets broad defaults. Pack-owned migration rules require pack enablement.</p>
+</section>`;
+  }
+
+  /**
+   * Toolbar band with density tiers (§4.3, §14.4).
+   *
+   * Tier 1 primary: Run analysis. Tier 2 secondary: Open config YAML, Open Package Vibrancy,
+   * Refresh. Tier 3 split-button: Enable applicable packs ▾ (all / breaking / deprecation) — disabled
+   * with `title` when zero detected (§8.10). Search / filter inputs share the band.
+   */
+  private _buildToolbar(ctx: DashboardContext): string {
+    return `<section class="toolbar" role="toolbar" aria-label="Lints config actions">
+  ${this._buildPrimaryActions()}
+  ${this._buildEnableSplitButton(ctx)}
+  <span class="toolbar-spacer"></span>
+  ${this._buildToolbarFilters()}
+</section>`;
+  }
+
+  private _buildPrimaryActions(): string {
+    return `<div class="toolbar-group">
+    <button class="action-btn primary" data-command="runAnalysis"
+      title="Run dart analyze and refresh the dashboard.">Run analysis</button>
+    <button class="action-btn" data-command="openConfig"
+      title="Open analysis_options.yaml in the editor.">Open config YAML</button>
+    <button class="action-btn" data-command="copyConfigSnippet"
+      title="Copy a paste-ready YAML snippet of the current tier + enabled packs to the clipboard.">Copy config</button>
+    <button class="action-btn" data-command="openVibrancy"
+      title="Open the Package Vibrancy report.">Package Vibrancy</button>
+    <button class="action-btn icon-only" data-command="refresh"
+      title="Reload the dashboard from disk." aria-label="Refresh">⟳</button>
+  </div>`;
+  }
+
+  /** Enable-applicable split button — disabled when no detected SDK packs (§8.10). */
+  private _buildEnableSplitButton(ctx: DashboardContext): string {
+    const total = ctx.detectedSdkPacks.length;
+    const breaking = ctx.detectedBreakingSdkCount;
+    const deprecation = ctx.detectedDeprecationSdkCount;
+    const noneDetected = total === 0;
+    const noneTitle = 'No applicable SDK packs detected in this pubspec.';
+    const buildItem = (id: string, label: string, count: number): string => {
+      const disabled = count === 0;
+      const itemTitle = disabled ? noneTitle : `${count} pack${count === 1 ? '' : 's'} match`;
+      return `<button type="button" class="split-menu-item" data-command="${id}"${disabled ? ' disabled' : ''} title="${escapeHtml(itemTitle)}">${escapeHtml(label)} (${count})</button>`;
+    };
+    return `<div class="toolbar-group split-button">
+    <button class="action-btn" data-command="enableDetectedSdkPacks"
+      ${noneDetected ? `disabled title="${escapeHtml(noneTitle)}"` : `title="Enable all ${total} applicable SDK packs."`}>Enable applicable packs</button>
+    <button class="action-btn split-toggle" type="button" data-split-toggle="enable-sdk"
+      ${noneDetected ? `disabled title="${escapeHtml(noneTitle)}"` : 'title="Choose breaking-only or deprecation-only."'} aria-haspopup="menu" aria-expanded="false">▾</button>
+    <div class="split-menu" id="split-menu-enable-sdk" role="menu" hidden>
+      ${buildItem('enableDetectedSdkPacks', 'All applicable', total)}
+      ${buildItem('enableDetectedBreakingSdkPacks', 'Breaking only', breaking)}
+      ${buildItem('enableDetectedDeprecationSdkPacks', 'Deprecation only', deprecation)}
+    </div>
+  </div>`;
+  }
+
+  /** Toolbar filter cluster: search, type select, and detected/enabled-only checkboxes. */
+  private _buildToolbarFilters(): string {
+    return `<div class="toolbar-group">
+    <label class="sr-only" for="pack-search">Search packs</label>
+    <input id="pack-search" class="search-input" type="search" placeholder="Search packs…"
+      autocomplete="off" />
+    <label class="sr-only" for="type-filter">Filter by type</label>
+    <select id="type-filter" class="type-select"
+      title="Filter by pack type (SDK migration vs package rule).">
+      <option value="all">All types</option>
+      <option value="sdk">SDK migration</option>
+      <option value="package">Package</option>
+    </select>
+    <label class="toolbar-checkbox" title="Show only packs whose pubspec gate is satisfied.">
+      <input type="checkbox" id="filter-detected" /> Detected only
+    </label>
+    <label class="toolbar-checkbox" title="Show only packs already enabled in analysis_options.yaml.">
+      <input type="checkbox" id="filter-enabled" /> Enabled only
+    </label>
+  </div>`;
+  }
+
+  /** Combined packs table — one schema, Type column, sortable headers, sticky header (§14.13). */
+  private _buildPackTable(ctx: DashboardContext): string {
+    const rows = [...ctx.packRows]
+      .sort((a, b) => b.rules - a.rules || a.label.localeCompare(b.label))
+      .map((row) => this._buildPackRow(row))
+      .join('\n');
+    return `<section aria-label="Rule packs">
+  <h2>Rule packs</h2>
+  <div class="packs-wrap">
+    <table class="packs" id="packs-table">
+      <thead>
+        <tr>
+          <th class="sortable" data-sort="label" aria-sort="none">Pack <span class="sort-arrow">▲</span></th>
+          <th class="sortable" data-sort="type" aria-sort="none">Type <span class="sort-arrow">▲</span></th>
+          <th class="sortable" data-sort="risk" aria-sort="none">Risk <span class="sort-arrow">▲</span></th>
+          <th class="sortable" data-sort="detected" aria-sort="none" title="Pack gate is satisfied by this workspace's pubspec.">In pubspec <span class="sort-arrow">▲</span></th>
+          <th class="sortable" data-sort="enabled" aria-sort="none">Enabled <span class="sort-arrow">▲</span></th>
+          <th class="sortable num" data-sort="rules" aria-sort="descending">Rules <span class="sort-arrow">▼</span></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="packs-tbody">${rows}</tbody>
+    </table>
+  </div>
+</section>`;
+  }
+
+  /**
+   * One table row.
+   *
+   * §14.12 fix: each "is this applicable?" signal lives in exactly one column. The methodology
+   * (gate package + version constraint) goes into the `title` of the *In pubspec* cell, not as a
+   * second visible footnote on the row.
+   */
+  private _buildPackRow(row: PackChartRow): string {
+    const def = RULE_PACK_DEFINITIONS.find((d) => d.id === row.id)!;
+    const isSdk = isSdkPackId(def.id);
+    const riskKind = sdkPackRiskKind(def);
+    const typeBadge = `<span class="type-badge">${isSdk ? 'SDK' : 'Package'}</span>`;
+    const riskBadge =
+      riskKind === 'none'
+        ? '<span class="risk-badge none" title="Not applicable to this pack type.">—</span>'
+        : `<span class="risk-badge ${riskKind}">${riskKind === 'breaking' ? 'breaking' : 'deprecation'}</span>`;
+    const gateText = this._gateMethodologyText(def);
+    const detectedCell = `<td class="${row.detected ? 'ok' : 'muted'}" title="${escapeHtml(gateText)}" data-detected="${row.detected ? '1' : '0'}">${row.detected ? 'Yes' : 'No'}</td>`;
+    const id = escapeHtml(row.id);
+    return `<tr data-pack="${id}" data-type="${isSdk ? 'sdk' : 'package'}" data-risk="${riskKind}" data-detected="${row.detected ? '1' : '0'}" data-enabled="${row.enabled ? '1' : '0'}" data-rules="${row.rules}" data-label="${escapeHtml(def.label.toLowerCase())}">
+  <td class="pack-name">${escapeHtml(def.label)}</td>
+  <td>${typeBadge}</td>
+  <td>${riskBadge}</td>
+  ${detectedCell}
+  <td><label class="switch"><input type="checkbox" data-pack="${id}" ${row.enabled ? 'checked' : ''} aria-label="Enable ${escapeHtml(def.label)}" /><span class="slider"></span></label></td>
+  <td class="num">${row.rules}</td>
+  <td><a href="#" class="rules-link" data-pack="${id}" title="View the ${row.rules} rule${row.rules === 1 ? '' : 's'} in this pack.">View</a></td>
+</tr>`;
+  }
+
+  /** One-line methodology text used as a tooltip on the "In pubspec" cell (§14.12). */
+  private _gateMethodologyText(def: { dependencyGate?: { package: string; constraint: string }; sdkGate?: { sdkKey: string; constraint: string } }): string {
+    if (def.dependencyGate) {
+      return `Gate: ${def.dependencyGate.package} ${def.dependencyGate.constraint} in pubspec.lock`;
+    }
+    if (def.sdkGate) {
+      return `Gate: ${def.sdkGate.sdkKey} ${def.sdkGate.constraint} in pubspec environment`;
+    }
+    return 'No applicability gate; this pack is always available.';
+  }
+
+  /**
+   * Pack coverage chart — only when at least one pack is enabled or detected (§14.3/§14.5/§8.16).
+   *
+   * Bar chart + donut companion side-by-side per §6.1: bars communicate rank by rule count,
+   * donut communicates proportion. Both share the same dataset and the same click contract —
+   * clicking a bar OR a donut segment filters the table to that pack (§6.2, §14.8). Legend
+   * explains the three visual states so color is paired with non-color cues (§2.3).
+   */
+  private _buildChartSection(ctx: DashboardContext): string {
+    if (!shouldRenderPackCoverageChart(ctx.packRows)) return '';
+    const top = [...ctx.packRows]
+      .sort((a, b) => b.rules - a.rules || a.label.localeCompare(b.label))
+      .slice(0, 8);
+    const bars = this._buildChartBars(top);
+    const donut = this._buildChartDonut(top);
+    return `<section class="chart-section" aria-label="Pack coverage">
+  <div class="chart-head">
+    <h2>Pack coverage</h2>
+    <span class="chart-legend">
+      <span class="chart-legend-item"><span class="legend-swatch" aria-hidden="true"></span>available</span>
+      <span class="chart-legend-item"><span class="legend-swatch detected" aria-hidden="true"></span>detected</span>
+      <span class="chart-legend-item"><span class="legend-swatch enabled" aria-hidden="true"></span>enabled</span>
+    </span>
+  </div>
+  <div class="chart-grid">
+    <div class="chart">${bars}</div>
+    ${donut}
+  </div>
+  <p class="hint">Top 8 packs by rule count. Click a bar or donut segment to filter the table.</p>
+</section>`;
+  }
+
+  /** Render the horizontal-bar list (one row per pack). */
+  private _buildChartBars(top: readonly PackChartRow[]): string {
+    const maxRules = Math.max(1, ...top.map((r) => r.rules));
+    return top
+      .map((row) => {
+        const width = Math.round((row.rules / maxRules) * 100);
+        const cls = `${row.enabled ? 'enabled' : ''} ${row.detected ? 'detected' : ''}`.trim();
+        const tip = `${row.rules} rule${row.rules === 1 ? '' : 's'}; ${row.detected ? 'detected' : 'not detected'}; ${row.enabled ? 'enabled' : 'not enabled'}`;
+        return `<div class="bar-row" role="button" tabindex="0" data-bar-pack="${escapeHtml(row.id)}" title="${escapeHtml(tip)}">
+    <div class="bar-head"><span>${escapeHtml(row.label)}</span><span>${row.rules}</span></div>
+    <div class="bar-track"><div class="bar-fill ${cls}" style="width:${width}%"></div></div>
+  </div>`;
+      })
+      .join('\n');
+  }
+
+  /**
+   * Render the donut companion. Each `<circle>` segment carries the same `data-bar-pack`
+   * attribute as the bars so the script's chart-bar handler picks them up uniformly — one
+   * filter contract for both visualizations.
+   *
+   * pathLength="100" lets each segment's stroke-dasharray be expressed as a percent without
+   * arithmetic at render time. The `--seg-color` CSS variable rotates through the categorical
+   * hue slots defined in the chart styles (§2.3).
+   */
+  private _buildChartDonut(top: readonly PackChartRow[]): string {
+    const segments = computeDonutSegments(top);
+    if (segments.length === 0) return '';
+    const total = top.reduce((acc, r) => acc + r.rules, 0);
+    const circles = segments
+      .map((seg, i) => {
+        const tip = `${escapeHtml(seg.label)}: ${seg.length.toFixed(1)}% of top ${segments.length} pack rules`;
+        return `<circle class="donut-seg" cx="50" cy="50" r="35" pathLength="100"
+      stroke-dasharray="${seg.length} ${100 - seg.length}"
+      stroke-dashoffset="${(100 - seg.offset) % 100}"
+      style="--seg-color: var(--chart-hue-${i % 10});"
+      data-bar-pack="${escapeHtml(seg.id)}"
+      tabindex="0" role="button"
+      aria-label="${escapeHtml(seg.label)}"
+      title="${tip}"></circle>`;
+      })
+      .join('\n      ');
+    return `<div class="donut-wrap" aria-label="Pack rule proportions">
+    <svg class="donut" viewBox="0 0 100 100" width="160" height="160">
+      <circle class="donut-track" cx="50" cy="50" r="35" pathLength="100"></circle>
+      ${circles}
+      <text class="donut-center-num" x="50" y="48" text-anchor="middle">${total}</text>
+      <text class="donut-center-label" x="50" y="60" text-anchor="middle">rules</text>
+    </svg>
+  </div>`;
+  }
+
+  /**
+   * Disabled rules section — graphical review and re-enable for everything
+   * the user previously turned off via `analysis_options_custom.yaml`.
+   *
+   * The buttons post `command` messages with `id="enableRule:<ruleName>"`;
+   * `_runDashboardCommand` parses the prefix, validates the rule name shape,
+   * and forwards to `saropaLints.enableRules`. Unknown / unsafe shapes are
+   * dropped because the message arrives over postMessage and the rule name
+   * flows into a config write.
+   *
+   * Empty state shows an explanatory blurb instead of an empty list so the
+   * section explains what it would normally show.
+   */
+  private _buildDisabledRulesSection(ctx: DashboardContext): string {
+    const count = ctx.disabledRules.length;
+    const heading = `<h3>Disabled rules <span class="muted">(${count})</span></h3>`;
+    if (count === 0) {
+      return `<section class="disabled-rules" aria-label="Disabled rules">
+  ${heading}
+  <p class="hint">No rules are currently disabled by override. When you disable a rule (right-click in Issues, or the Triage panel), it appears here with a one-click re-enable.</p>
+</section>`;
+    }
+    const rows = ctx.disabledRules.map((rule) => {
+      const id = `enableRule:${rule}`;
+      return `<li class="disabled-rule-row">
+    <code>${escapeHtml(rule)}</code>
+    <button type="button" class="action-btn" data-command="${escapeHtml(id)}" title="Re-enable ${escapeHtml(rule)}">Re-enable</button>
+  </li>`;
+    }).join('\n');
+    return `<section class="disabled-rules" aria-label="Disabled rules">
+  ${heading}
+  <p class="hint">These rules are turned off via overrides in <code>analysis_options_custom.yaml</code>. Re-enable a rule below; the file is managed by the extension — no manual editing required.</p>
+  <ul class="disabled-rules-list">${rows}</ul>
+</section>`;
+  }
+
+  /** Diagnostics band: suppressions, target platforms, docs (§14.7 step 6, §14.14). */
+  private _buildDiagnostics(ctx: DashboardContext): string {
+    return `<section class="diagnostics" aria-label="Diagnostics and references">
+  <div>
+    <h3>Suppressions snapshot</h3>
+    ${ctx.suppressionsStripHtml}
+  </div>
+  ${this._buildPlatformsBlock(ctx)}
+  <div>
+    <h3>Docs</h3>
+    <ul class="docs">
+      <li><a href="https://pub.dev/packages/saropa_lints">Package on pub.dev</a></li>
+      <li><a href="https://github.com/saropa/saropa_lints/blob/main/doc/guides/rule_packs.md">Rule pack guide</a></li>
+      <li><a href="https://github.com/saropa/saropa_lints#rule-configuration-cheatsheet">Tier and pack cheatsheet</a></li>
+    </ul>
+  </div>
+</section>`;
+  }
+
+  private _buildPlatformsBlock(ctx: DashboardContext): string {
+    if (!ctx.pubspecInfo.isFlutter) {
+      return `<div>
+    <h3>Target platforms</h3>
+    <p class="hint">Pure Dart package — no Flutter embedder targets.</p>
+  </div>`;
+    }
+    const platRows = FLUTTER_EMBEDDER_PLATFORMS.map((p) => {
+      const present = ctx.pubspecInfo.platforms.includes(p);
+      return `<tr><td>${escapeHtml(p)}</td><td class="${present ? 'ok' : 'muted'}">${present ? 'Yes' : 'No'}</td></tr>`;
+    }).join('');
+    return `<div>
+    <h3>Target platforms</h3>
+    <table class="plat"><thead><tr><th>Platform</th><th>Present</th></tr></thead><tbody>${platRows}</tbody></table>
+    <p class="hint">Detected from embedder folders (android/, ios/, …).</p>
+  </div>`;
+  }
+
   private _wrapHtml(body: string, scripts: boolean): string {
+    const nonce = createWebviewCspNonce();
     const csp = [
       "default-src 'none'",
-      "style-src 'unsafe-inline'",
-      scripts ? "script-src 'unsafe-inline'" : '',
+      `style-src 'nonce-${nonce}'`,
+      scripts ? `script-src 'nonce-${nonce}'` : '',
     ]
       .filter(Boolean)
       .join('; ');
     const script = scripts
-      ? `<script>
-(function() {
-  const vscode = acquireVsCodeApi();
-  document.querySelectorAll('button.action-btn[data-command]').forEach(function(el) {
-    el.addEventListener('click', function() {
-      vscode.postMessage({ type: 'command', id: el.getAttribute('data-command') });
-    });
-  });
-  document.querySelectorAll('input[type=checkbox][data-pack]').forEach(function(el) {
-    el.addEventListener('change', function() {
-      vscode.postMessage({ type: 'toggle', packId: el.getAttribute('data-pack'), enabled: el.checked });
-    });
-  });
-  document.querySelectorAll('a.rules-link').forEach(function(a) {
-    a.addEventListener('click', function(e) {
-      e.preventDefault();
-      const id = a.getAttribute('data-pack');
-      vscode.postMessage({ type: 'showRules', packId: id });
-    });
-  });
-})();
-</script>`
+      ? `<script nonce="${nonce}">${getConfigDashboardScript()}</script>`
       : '';
     return `<!DOCTYPE html>
-<html><head><meta charset="UTF-8"><meta http-equiv="Content-Security-Policy" content="${csp}">
-<style>
-body { font-family: var(--vscode-font-family); font-size: 12px; color: var(--vscode-foreground); padding: 16px; max-width: 1200px; margin: 0 auto; }
-h1 { font-size: 13px; margin: 0 0 8px 0; }
-h2 { font-size: 12px; margin: 16px 0 8px 0; }
-table { width: 100%; border-collapse: collapse; }
-th, td { text-align: left; padding: 4px 6px; border-bottom: 1px solid var(--vscode-widget-border); }
-th { font-weight: 600; opacity: 0.9; }
-.ok { color: var(--vscode-testing-iconPassed); }
-.muted { opacity: 0.55; }
-.num { text-align: right; }
-.hint { font-size: 11px; opacity: 0.75; margin-top: 8px; }
-.dart-only { margin-top: 12px; }
-a { color: var(--vscode-textLink-foreground); cursor: pointer; }
-.switch { position: relative; display: inline-block; width: 32px; height: 18px; vertical-align: middle; }
-.switch input { opacity: 0; width: 0; height: 0; }
-.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: var(--vscode-input-background); border-radius: 10px; border: 1px solid var(--vscode-widget-border); }
-.slider:before { position: absolute; content: ""; height: 12px; width: 12px; left: 2px; bottom: 2px; background: var(--vscode-foreground); border-radius: 50%; opacity: 0.5; transition: .15s; }
-input:checked + .slider:before { transform: translateX(14px); opacity: 1; }
-.plat th { width: 40%; }
-.gate { font-size: 10px; opacity: 0.7; margin-top: 2px; font-weight: normal; }
-.risk-badge { display: inline-block; margin-left: 6px; border: 1px solid var(--vscode-widget-border); border-radius: 999px; padding: 0 6px; font-size: 10px; line-height: 16px; opacity: 0.95; }
-.risk-badge.sdk { border-color: var(--vscode-textLink-foreground); color: var(--vscode-textLink-foreground); }
-.risk-badge.breaking { border-color: var(--vscode-testing-iconFailed); color: var(--vscode-testing-iconFailed); }
-.risk-badge.deprecation { border-color: var(--vscode-testing-iconQueued); color: var(--vscode-testing-iconQueued); }
-.actions { display: flex; gap: 6px; margin: 8px 0 12px 0; flex-wrap: wrap; }
-.action-btn { border: 1px solid var(--vscode-button-border, var(--vscode-widget-border)); background: var(--vscode-button-secondaryBackground, var(--vscode-editorWidget-background)); color: var(--vscode-button-secondaryForeground, var(--vscode-foreground)); border-radius: 6px; padding: 4px 8px; cursor: pointer; }
-.action-btn:hover { background: var(--vscode-button-secondaryHoverBackground, var(--vscode-list-hoverBackground)); }
-.kpis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 8px 0 14px 0; }
-.kpi-card { border: 1px solid var(--vscode-widget-border); border-radius: 8px; padding: 8px; background: var(--vscode-editorWidget-background); }
-.kpi-label { font-size: 10px; opacity: 0.75; margin-bottom: 4px; }
-.kpi-value { font-size: 15px; font-weight: 700; }
-.tier-row { display: flex; gap: 6px; flex-wrap: wrap; }
-.tier-chip { border: 1px solid var(--vscode-widget-border); border-radius: 999px; padding: 2px 8px; font-size: 11px; opacity: 0.85; }
-.tier-chip.active { border-color: var(--vscode-focusBorder); color: var(--vscode-textLink-foreground); font-weight: 600; }
-.chart { border: 1px solid var(--vscode-widget-border); border-radius: 8px; padding: 8px; }
-.bar-row { margin-bottom: 8px; }
-.bar-row:last-child { margin-bottom: 0; }
-.bar-head { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 2px; }
-.bar-track { height: 8px; border-radius: 999px; background: var(--vscode-input-background); border: 1px solid var(--vscode-widget-border); overflow: hidden; }
-.bar-fill { height: 100%; background: var(--vscode-progressBar-background); opacity: 0.5; }
-.bar-fill.enabled { opacity: 0.95; }
-.bar-fill.detected { box-shadow: inset 0 0 0 1px var(--vscode-testing-iconPassed); }
-.docs { padding-left: 16px; margin: 6px 0 8px 0; }
-.docs li { margin-bottom: 4px; }
-</style></head><body>${body}${script}</body></html>`;
+<html><head><meta charset="UTF-8"><title>Saropa Lints Config</title><meta http-equiv="Content-Security-Policy" content="${csp}">
+<style nonce="${nonce}">${getConfigDashboardStyles()}</style></head><body>${body}${script}</body></html>`;
   }
 
   private async _handleToggle(packId: string, enabled: boolean): Promise<void> {
@@ -447,6 +926,9 @@ input:checked + .slider:before { transform: translateX(14px); opacity: 1; }
   }
 
   private async _runDashboardCommand(id: string): Promise<void> {
+    // The legacy 'setTier' id is preserved for any toolbar entry points that still post it (e.g.
+    // command palette callers); the in-page tier radio control posts a typed `setTier` message
+    // instead, handled by `_handleSetTier`.
     if (id === 'setTier') {
       await vscode.commands.executeCommand('saropaLints.setTier');
       return;
@@ -459,8 +941,20 @@ input:checked + .slider:before { transform: translateX(14px); opacity: 1; }
       await vscode.commands.executeCommand('saropaLints.runAnalysis');
       return;
     }
+    if (id === 'refresh') {
+      this.refresh();
+      return;
+    }
+    if (id === 'copyConfigSnippet') {
+      await this._copyConfigSnippet();
+      return;
+    }
     if (id === 'openVibrancy') {
       await vscode.commands.executeCommand('saropaLints.openPackageVibrancy');
+      return;
+    }
+    if (id === 'openFindingsDashboard') {
+      await vscode.commands.executeCommand('saropaLints.openViolationsWideReport');
       return;
     }
     if (id === 'enableDetectedSdkPacks') {
@@ -474,6 +968,69 @@ input:checked + .slider:before { transform: translateX(14px); opacity: 1; }
     if (id === 'enableDetectedDeprecationSdkPacks') {
       await this._enableDetectedSdkPacks({ selection: 'deprecation' });
       return;
+    }
+    // Per-rule re-enable from the Disabled rules section. The id arrives as
+    // `enableRule:<ruleName>`; validate the shape before forwarding because
+    // postMessage is untrusted and the rule name reaches a config write.
+    if (id.startsWith('enableRule:')) {
+      const ruleName = id.slice('enableRule:'.length);
+      // Lint rule names are conventionally snake_case identifiers; reject
+      // anything that does not match so we never write garbage to the
+      // overrides file.
+      if (!/^[a-z][a-z0-9_]*$/.test(ruleName)) return;
+      await vscode.commands.executeCommand('saropaLints.enableRules', [ruleName]);
+      this.refresh();
+      return;
+    }
+  }
+
+  /**
+   * Copy the current Lints Config (tier + enabled packs) to the clipboard as a paste-ready
+   * YAML snippet. Falls back to a notification if clipboard access fails (rare in webview hosts
+   * but possible behind certain remote-extension configurations).
+   */
+  private async _copyConfigSnippet(): Promise<void> {
+    const root = getProjectRoot();
+    if (!root) {
+      void vscode.window.showWarningMessage('Saropa Lints: open a workspace folder before copying the config.');
+      return;
+    }
+    const tier =
+      vscode.workspace.getConfiguration('saropaLints').get<string>('tier', 'recommended') ??
+      'recommended';
+    const enabled = readRulePacksEnabled(root);
+    const snippet = buildConfigSnippetYaml(tier, enabled);
+    try {
+      await vscode.env.clipboard.writeText(snippet);
+      const packsLine =
+        enabled.length === 0 ? 'no packs enabled' : `${enabled.length} pack${enabled.length === 1 ? '' : 's'}`;
+      void vscode.window.showInformationMessage(
+        `Saropa Lints: copied config snippet (tier: ${tier}, ${packsLine}).`,
+      );
+    } catch (err) {
+      void vscode.window.showErrorMessage(
+        `Saropa Lints: could not copy to clipboard — ${err instanceof Error ? err.message : String(err)}.`,
+      );
+    }
+  }
+
+  /**
+   * Persist a tier change posted by the in-page radio control.
+   *
+   * Validates against the {@link TIERS} whitelist before writing — the message arrives over
+   * postMessage and must not be trusted with arbitrary configuration writes. Refresh after the
+   * write so the new active tier renders without waiting for the analyzer to complete.
+   */
+  private async _handleSetTier(tier: string): Promise<void> {
+    if (!(TIERS as readonly string[]).includes(tier)) return;
+    const config = vscode.workspace.getConfiguration('saropaLints');
+    const current = config.get<string>('tier', 'recommended');
+    if (current === tier) return;
+    await config.update('tier', tier, vscode.ConfigurationTarget.Workspace);
+    this.refresh();
+    const run = config.get<boolean>('runAnalysisAfterConfigChange');
+    if (run !== false) {
+      await vscode.commands.executeCommand('saropaLints.runAnalysis');
     }
   }
 
