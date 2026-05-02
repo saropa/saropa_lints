@@ -1167,6 +1167,19 @@ export function registerIssueCommands(
         vscode.window.setStatusBarMessage('Rule hidden. Clear suppressions to show again.', 3000);
       }
     }),
+    /* Programmatic equivalent of `hideRule` that takes a rule name string
+       directly instead of a tree-node element. The Findings Dashboard's
+       Top Rules table calls this — its rows are HTML, not IssueTreeNodes,
+       so it can't reach `addSuppressionRule` through the element-based
+       command above. */
+    vscode.commands.registerCommand('saropaLints.suppressRuleByName', (ruleArg: unknown) => {
+      if (typeof ruleArg !== 'string' || ruleArg.length === 0) return;
+      provider.addSuppressionRule(ruleArg);
+      vscode.window.setStatusBarMessage(
+        `Rule "${ruleArg}" hidden. Clear suppressions to show again.`,
+        3000,
+      );
+    }),
     vscode.commands.registerCommand('saropaLints.hideRuleInFile', (element: unknown) => {
       if (element && typeof element === 'object' && 'kind' in element && (element as IssueTreeNode).kind === 'violation') {
         const v = (element as ViolationItem).violation;

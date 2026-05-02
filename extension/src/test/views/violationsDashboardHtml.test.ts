@@ -199,4 +199,60 @@ describe('violationsDashboardHtml', () => {
     assert.ok(html.includes('id="btn-save"'));
     assert.ok(html.includes('id="btn-copy"'));
   });
+
+  it('renders the Top Rules triage table with per-row Hide buttons when topRules are supplied', () => {
+    const html = renderViolationsDashboardHtml(
+      minimalInput({
+        filteredCount: 95,
+        totalRawAfterDisable: 95,
+        severityCounts: { error: 5, warning: 30, info: 60 },
+        topRules: [
+          { name: 'prefer_no_commented_out_code', count: 60, severity: 'info' },
+          { name: 'avoid_print_in_release', count: 25, severity: 'error' },
+          { name: 'avoid_unawaited_future', count: 10, severity: 'warning' },
+        ],
+      }),
+    );
+    /* Section + table chrome present. */
+    assert.ok(html.includes('top-rules-table'));
+    assert.ok(html.includes('Top 3 rules'));
+    assert.ok(html.includes('aria-label="Top rules by count"'));
+    /* Each rule row carries the rule name (HTML-encoded) and a Hide button
+       wired with data-row-action="hide-rule" plus a percent-encoded rule id
+       so the script can decode it before posting suppressRule. */
+    assert.ok(html.includes('data-rule="prefer_no_commented_out_code"'));
+    assert.ok(html.includes('data-rule-enc="prefer_no_commented_out_code"'));
+    assert.ok(html.includes('data-row-action="hide-rule"'));
+    /* Severity pill is rendered next to each rule for triage context. */
+    assert.ok(html.includes('sev-pill sev-info'));
+    assert.ok(html.includes('sev-pill sev-error'));
+    /* Script wires the Hide button to a suppressRule message. */
+    assert.ok(html.includes("type: 'suppressRule'"));
+  });
+
+  it('omits the Top Rules table when there are no findings to triage', () => {
+    /* Avoids an empty triage shell next to the empty-state findings block.
+       Use `aria-label="Top rules by count"` (only emitted by the section
+       wrapper) to avoid false matches on the CSS class name in <style> /
+       script blocks, which always ship in the page. */
+    const html = renderViolationsDashboardHtml(
+      minimalInput({
+        filteredCount: 0,
+        topRules: [{ name: 'should_not_render', count: 1, severity: 'info' }],
+      }),
+    );
+    assert.ok(!html.includes('aria-label="Top rules by count"'));
+  });
+
+  it('omits the Top Rules table when topRules is empty', () => {
+    const html = renderViolationsDashboardHtml(
+      minimalInput({
+        filteredCount: 5,
+        totalRawAfterDisable: 5,
+        severityCounts: { error: 5, warning: 0, info: 0 },
+        topRules: [],
+      }),
+    );
+    assert.ok(!html.includes('aria-label="Top rules by count"'));
+  });
 });

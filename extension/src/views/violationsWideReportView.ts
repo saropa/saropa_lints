@@ -262,6 +262,10 @@ async function rebuildDashboardHtml(
     reportTimestamp: raw.timestamp,
     extensionVersion: getExtensionVersion(context),
     topRule: pickTopRule(afterDisabled.violations),
+    /* Top-N rules table is computed from `lastExportViolations` (post-filter,
+       post-suppress) so the ranking matches what the user is seeing in the
+       findings table below — already-hidden rules don't reappear here. */
+    topRules: pickTopRules(lastExportViolations, TOP_RULES_LIMIT),
     filesAffected: countDistinctFiles(afterDisabled.violations),
     enabledRuleCount: raw.config?.enabledRuleCount,
   });
@@ -297,6 +301,37 @@ function pickTopRule(violations: readonly Violation[]): { name: string; count: n
     if (!best || count > best.count) best = { name, count };
   }
   return best;
+}
+
+/** Cap on rows in the noisy-rule triage table — matches the summary report. */
+const TOP_RULES_LIMIT = 20;
+
+/**
+ * Top-N rules by violation count, paired with the severity emitted on the
+ * first occurrence (a rule has a single LintCode severity, so first-seen is
+ * deterministic). Sorted by count desc; ties broken by rule name for stable
+ * rendering between rebuilds.
+ */
+function pickTopRules(
+  violations: readonly Violation[],
+  limit: number,
+): Array<{ name: string; count: number; severity: string }> {
+  if (violations.length === 0) return [];
+  const counts = new Map<string, number>();
+  const severities = new Map<string, string>();
+  for (const v of violations) {
+    counts.set(v.rule, (counts.get(v.rule) ?? 0) + 1);
+    if (!severities.has(v.rule)) {
+      severities.set(v.rule, (v.severity ?? 'info').toLowerCase());
+    }
+  }
+  const all = Array.from(counts, ([name, count]) => ({
+    name,
+    count,
+    severity: severities.get(name) ?? 'info',
+  }));
+  all.sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+  return all.slice(0, limit);
 }
 
 function countDistinctFiles(violations: readonly Violation[]): number {
@@ -545,6 +580,18 @@ function getOrCreatePanel(context: vscode.ExtensionContext): vscode.WebviewPanel
       await vscode.commands.executeCommand('saropaLints.clearSuppressions');
       if (currentPanel) {
         await rebuildDashboardHtml(context, currentPanel);
+      }
+      return;
+    }
+    if (data.type === 'suppressRule') {
+      /* Triggered by the Top Rules table's per-row Hide button. The command
+         applies a workspace-level rule hide (same as the Issues tree's
+         "Hide rule" — reversible via Clear Suppressions), then the
+         issuesProvider's onDidChangeTreeData fires and rebuilds this panel
+         automatically (extension.ts wires that). No manual rebuild here. */
+      const rule = (data as { rule?: unknown }).rule;
+      if (typeof rule === 'string' && rule.length > 0) {
+        await vscode.commands.executeCommand('saropaLints.suppressRuleByName', rule);
       }
       return;
     }

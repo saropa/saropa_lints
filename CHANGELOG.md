@@ -47,6 +47,10 @@
 
 ## [Unreleased]
 
+### Added (Extension)
+
+- The **Findings Dashboard** now shows a **Top Rules** triage table above the findings list, ranking the noisiest rules by count with severity and a per-row Hide button so a single click suppresses a rule across the workspace findings (same hide as the Issues tree's "Hide rule", reversible via Clear Suppressions). No action required — open the Findings Dashboard to use it.
+
 ### Fixed (Extension)
 
 - The **Code Health Dashboard** scan no longer stacks parallel `dart run` processes when the command fires repeatedly (sidebar item, rescan button, command palette) — concurrent invocations now share one in-flight scan, and the progress notification is cancellable so a runaway scan can be stopped from the toast. No action required.

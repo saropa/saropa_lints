@@ -717,6 +717,52 @@ export function getViolationsDashboardStyles(): string {
     .findings-table tr.frow:hover .row-action,
     .findings-table tr.frow:focus-within .row-action { visibility: visible; }
 
+    /* Top Rules triage table — same chrome as the findings table but the
+       Hide button is always-visible (primary affordance, not hover-only). */
+    .top-rules-table { width: 100%; border-collapse: collapse; font-size: .92em; }
+    .top-rules-table thead th {
+      background: var(--surface-3);
+      text-align: left;
+      font-weight: 600;
+      font-size: .82em;
+      letter-spacing: .3px;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 6px 10px;
+      border-bottom: 1px solid var(--border);
+      user-select: none;
+      white-space: nowrap;
+    }
+    .top-rules-table tr.trow { border-bottom: 1px solid var(--border); }
+    .top-rules-table tr.trow:nth-child(odd) { background: color-mix(in srgb, var(--surface-3) 35%, transparent); }
+    .top-rules-table tr.trow:hover { background: var(--vscode-list-hoverBackground); }
+    .top-rules-table td { padding: 6px 10px; vertical-align: middle; }
+    .top-rules-table .col-rank   { width: 36px; color: var(--muted); font-variant-numeric: tabular-nums; text-align: right; }
+    .top-rules-table .col-rule   { }
+    .top-rules-table .col-count  { width: 80px; text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+    .top-rules-table .col-sev    { width: 100px; white-space: nowrap; }
+    .top-rules-table .col-actions { width: 80px; text-align: right; }
+    /* Always-visible Hide button. \`.danger\` styling signals the destructive
+       intent (rule disappears from view) without committing to red until
+       hover — keeps the table readable at scan distance. */
+    .top-rules-table .row-action.danger {
+      visibility: visible;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 2px 10px;
+      color: var(--fg);
+      background: var(--surface-3);
+    }
+    .top-rules-table .row-action.danger:hover {
+      background: color-mix(in srgb, var(--accent-error) 18%, transparent);
+      color: var(--accent-error);
+      border-color: var(--accent-error);
+    }
+    .top-rules-table .row-action.danger:focus-visible {
+      outline: 2px solid var(--vscode-focusBorder);
+      outline-offset: 1px;
+    }
+
     .overflow-note {
       padding: 8px 12px;
       border-top: 1px solid var(--border);

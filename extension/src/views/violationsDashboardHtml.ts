@@ -83,6 +83,14 @@ export interface ViolationsDashboardHtmlInput {
   filesAffected?: number;
   /** Count of enabled rules in the current tier; powers status-line breadth pill. */
   enabledRuleCount?: number;
+  /**
+   * Top-N rules by violation count for the noisy-rule triage table.
+   * Sourced from `exportViolations` so the ranking reflects what the user
+   * is currently seeing in the findings table (post-disable, post-suppress,
+   * post-filter). Each row carries severity so the user can decide whether
+   * the noise is from an INFO-level stylistic rule or a real WARNING.
+   */
+  topRules?: ReadonlyArray<{ name: string; count: number; severity: string }>;
 }
 
 const DEFAULT_SEVERITIES: readonly string[] = ['error', 'warning', 'info'];
@@ -502,6 +510,64 @@ function buildChip(kind: string, label: string, dropToken: string): string {
     ${escapeHtml(label)}
     <button type="button" class="x" aria-label="Remove filter">×</button>
   </span>`;
+}
+
+/* ============================================================================
+ * Top Rules table — noisy-rule triage with one-click workspace hide.
+ * Sits above the Findings table so users can suppress dominant rules before
+ * scrolling. Suppression is the same workspace "hide" used by the Issues
+ * tree view (reversible via Clear Suppressions), not a config-level disable.
+ * ========================================================================= */
+
+function buildTopRulesTable(input: ViolationsDashboardHtmlInput): string {
+  const rows = input.topRules ?? [];
+  // Hide the section entirely when there are no findings — avoids an empty
+  // shell next to the "no findings" empty state in the findings block.
+  if (rows.length === 0 || input.filteredCount === 0) return '';
+  const totalShown = rows.reduce((n, r) => n + r.count, 0);
+  const share = input.filteredCount > 0
+    ? Math.round((totalShown / input.filteredCount) * 100)
+    : 0;
+  // Body is built once on render; suppressing a rule reloads the panel via
+  // the issuesProvider tree-data event, so client-side row removal is not
+  // needed (and would diverge from the rebuilt findings table below).
+  const body = rows.map((r, i) => {
+    const sev = (r.severity || 'info').toLowerCase();
+    const ruleAttr = encodeURIComponent(r.name);
+    return `<tr class="trow" data-rule="${escapeHtml(r.name)}" data-rule-enc="${ruleAttr}">
+      <td class="col-rank">${i + 1}</td>
+      <td class="col-rule"><span class="rule-tag">${escapeHtml(r.name)}</span></td>
+      <td class="col-count">${r.count}</td>
+      <td class="col-sev"><span class="sev-pill sev-${escapeHtml(sev)}">${escapeHtml(sev)}</span></td>
+      <td class="col-actions">
+        <button type="button" class="row-action danger" data-row-action="hide-rule"
+                title="Hide this rule from the workspace findings (reversible via Clear Suppressions)">
+          Hide
+        </button>
+      </td>
+    </tr>`;
+  }).join('');
+  return `<section class="section" aria-label="Top rules by count">
+    <div class="findings-wrap">
+      <div class="findings-toolbar">
+        <span class="meta-line" style="margin:0">
+          Top ${rows.length} rule${rows.length === 1 ? '' : 's'} · ${totalShown} of ${input.filteredCount} findings (${share}%) · click <strong>Hide</strong> to suppress in this workspace
+        </span>
+      </div>
+      <table class="top-rules-table" role="grid">
+        <thead>
+          <tr>
+            <th class="col-rank" scope="col">#</th>
+            <th class="col-rule" scope="col">Rule</th>
+            <th class="col-count" scope="col">Count</th>
+            <th class="col-sev" scope="col">Severity</th>
+            <th class="col-actions" aria-label="Row actions" scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>${body}</tbody>
+      </table>
+    </div>
+  </section>`;
 }
 
 /* ============================================================================
@@ -1207,6 +1273,22 @@ function buildScript(): string {
     } catch (e) { /* ignore */ }
   }
 
+  /* Top Rules table — Hide button posts a suppressRule message. The dashboard
+     rebuilds automatically when the issuesProvider fires onDidChangeTreeData
+     after the suppression is applied, so we don't manipulate the DOM here. */
+  document.querySelectorAll('.top-rules-table tr.trow').forEach(function (row) {
+    var btn = row.querySelector('button[data-row-action="hide-rule"]');
+    if (!btn) return;
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var enc = row.getAttribute('data-rule-enc') || '';
+      var rule = '';
+      try { rule = decodeURIComponent(enc); } catch (err) { rule = ''; }
+      if (!rule) return;
+      vscode.postMessage({ type: 'suppressRule', rule: rule });
+    });
+  });
+
   /* TODOs / Drift section action bindings */
   bindClick('btn-enable-todos-scan', function () { vscode.postMessage({ type: 'enableTodosScan' }); });
   bindClick('btn-drift-refresh', function () { vscode.postMessage({ type: 'driftRefresh' }); });
@@ -1274,6 +1356,7 @@ export function renderViolationsDashboardHtml(input: ViolationsDashboardHtmlInpu
   ${buildHero(input)}
   ${buildKpiCards(input)}
   ${buildToolbar(input)}
+  ${buildTopRulesTable(input)}
   ${buildFindingsBlock(input)}
   ${buildTodoHackBlock(input)}
   ${buildDriftBlock(input.driftAdvisorSnapshot)}
