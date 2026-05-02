@@ -43,6 +43,7 @@ from scripts.modules._pubdev_lint import (
     fix_doc_references,
 )
 from scripts.modules._version_changelog import (
+    get_version_from_pubspec,
     validate_changelog_version,
 )
 
@@ -237,6 +238,29 @@ def _try_fix_stale_plugin_cache(
         return False
 
     pkg_name, stale_ver = stale
+
+    # Publish-flow guard: when analysis_options.yaml's plugin version matches
+    # the local pubspec.yaml, the user is mid-publish bumping toward a version
+    # pub.dev hasn't seen yet. Offering to "downgrade" to pub.dev's latest
+    # would silently undo the release commit's version bump. Skip the prompt
+    # entirely in that case — the cache will resolve once the new version is
+    # published. Only surface the prompt when analysis_options.yaml truly
+    # disagrees with both the local pubspec and pub.dev (real typo / drift).
+    pubspec_path = project_dir / "pubspec.yaml"
+    pubspec_ver: str | None = None
+    if pubspec_path.exists() and pkg_name == "saropa_lints":
+        try:
+            pubspec_ver = get_version_from_pubspec(pubspec_path)
+        except (ValueError, OSError):
+            pubspec_ver = None
+    if pubspec_ver is not None and pubspec_ver == stale_ver:
+        print_warning(
+            f"Stale analyzer-plugin cache: {pkg_name} {stale_ver} matches "
+            f"local pubspec.yaml — pub.dev will catch up after publish. "
+            f"Skipping downgrade prompt.",
+        )
+        return False
+
     print_warning(
         f"Stale analyzer-plugin cache: plugin requires "
         f"{pkg_name} {stale_ver} which is not available."

@@ -69,6 +69,12 @@ This release polishes the VS Code extension's editor-tab dashboards and side pan
 - The **Size Distribution** chart in the Package Vibrancy report now draws each bar at a length proportional to its percentage — previously every bar rendered at the full track width regardless of the package's share, making the visualization unreadable. No action required — reopen the report after updating.
 - The **Command Catalog** category-jump flash (the brief tint that highlights a section after you click its count badge) now reliably appears in webview environments where CSS `var()` references inside `@keyframes` fail to resolve — the highlight previously did nothing on those builds. No action required.
 
+<details><summary>Maintenance</summary>
+
+- Publish script (`scripts/modules/_publish_steps.py`) no longer offers to downgrade `analysis_options.yaml` mid-publish when its plugin version matches the local `pubspec.yaml` but is newer than pub.dev's latest. Picking the previous *Fix* option would silently undo the release commit's version bump; the prompt now only appears when the version truly disagrees with both the local pubspec and pub.dev. No action for package or extension users.
+
+</details>
+
 ---
 
 ## [13.0.2]
