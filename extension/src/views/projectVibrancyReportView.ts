@@ -181,14 +181,6 @@ function buildHtml(payload: ProjectVibrancyPayload): string {
   const rows = [...(payload.functions ?? [])].sort((a, b) => a.score - b.score).slice(0, 200);
   const nonce = createWebviewCspNonce();
   const gateFailed = payload.gates?.pass === false;
-  const body = [
-    buildHero(payload, summary),
-    gateFailed ? buildGateBanner(payload) : '',
-    buildKpiRow(summary),
-    buildToolbar(),
-    '<div class="chip-strip" id="filter-strip" hidden></div>',
-    buildTable(rows),
-  ].join('\n');
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -202,7 +194,18 @@ function buildHtml(payload: ProjectVibrancyPayload): string {
   <style nonce="${nonce}">${getProjectVibrancyReportStyles()}</style>
 </head>
 <body>
-${body}
+<a href="#pvTable" class="skip-link">Skip to functions table</a>
+<div id="announcer" role="status" aria-live="polite" aria-atomic="true"></div>
+<header>
+${buildHero(payload, summary)}
+</header>
+${gateFailed ? buildGateBanner(payload) : ''}
+${buildKpiRow(summary)}
+${buildToolbar()}
+<div class="chip-strip" id="filter-strip" hidden></div>
+<main id="pv-main">
+${buildTable(rows)}
+</main>
 <script nonce="${nonce}">${buildClientScript()}</script>
 </body>
 </html>`;
@@ -449,7 +452,9 @@ function buildClientScript(): string {
 
   function applyFilters() {
     let visible = 0;
+    let total = 0;
     Array.from(tbody.querySelectorAll('tr')).forEach(function(tr) {
+      total++;
       const hay = (tr.dataset.search || '').toLowerCase();
       const flagsArr = (tr.dataset.flags || '').split(/\\s+/);
       let show = true;
@@ -464,6 +469,16 @@ function buildClientScript(): string {
     // condition handled by the upstream "no data" path, not by reset.
     if (emptyEl) emptyEl.hidden = !(visible === 0 && tbody.children.length > 0);
     renderStrip();
+    // §15.3 — announce filter result count to screen readers.
+    announce(visible + ' of ' + total + ' rows visible');
+  }
+
+  // §15.3 — polite live-region announcer.
+  function announce(message) {
+    var el = document.getElementById('announcer');
+    if (!el) { return; }
+    el.textContent = '';
+    setTimeout(function() { el.textContent = message; }, 50);
   }
 
   function renderStrip() {

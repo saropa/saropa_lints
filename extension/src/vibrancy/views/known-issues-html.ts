@@ -38,12 +38,16 @@ export function buildKnownIssuesHtml(): string {
     <style nonce="${nonce}">${getReportStyles()}${getDashboardChromeStyles()}${getExtraStyles()}</style>
 </head>
 <body>
-    ${heroHtml}
+    <a href="#known-issues-main" class="skip-link">Skip to issues table</a>
+    <div id="announcer" role="status" aria-live="polite" aria-atomic="true"></div>
+    <header>${heroHtml}</header>
     ${buildSummaryCards(issues.length, withReplacement)}
     ${buildToolbar()}
     ${buildChipStrip()}
+    <main id="known-issues-main" tabindex="-1">
     ${buildTable(issues)}
     ${buildEmptyState()}
+    </main>
     <script nonce="${nonce}">${getKnownIssuesScript()}</script>
 </body>
 </html>`;

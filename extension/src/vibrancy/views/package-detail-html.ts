@@ -628,7 +628,11 @@ function wrapHtml(title: string, body: string): string {
     <style nonce="${nonce}">${getDashboardChromeStyles()}${getPillButtonStyles()}${getPackageDetailStyles()}</style>
 </head>
 <body>
+    <a href="#package-detail-main" class="skip-link">Skip to package details</a>
+    <div id="announcer" role="status" aria-live="polite" aria-atomic="true"></div>
+    <main id="package-detail-main" tabindex="-1">
     ${body}
+    </main>
     <script nonce="${nonce}">
         ${getPackageDetailScript()}
         (function() { ${getFullWidthToggleScript()} })();

@@ -169,20 +169,23 @@ function buildHtml(snapshot: TelemetryStore): string {
   </style>
 </head>
 <body>
-  ${heroHtml}
+  <a href="#tel-main" class="skip-link">Skip to telemetry counters</a>
+  <div id="announcer" role="status" aria-live="polite" aria-atomic="true"></div>
+  <header>${heroHtml}</header>
   <section class="toolbar-band" aria-label="Telemetry actions">
     <div class="toolbar-row">
       <button type="button" class="btn" id="refresh" title="Reload telemetry counters from disk">
-        <span class="glyph">⟳</span>Refresh
+        <span class="glyph" aria-hidden="true">⟳</span>Refresh
       </button>
       <button type="button" class="btn" id="copy" title="Copy snapshot as JSON">
-        <span class="glyph">⎘</span>Copy JSON
+        <span class="glyph" aria-hidden="true">⎘</span>Copy JSON
       </button>
       <button type="button" class="btn danger" id="reset"${resetAttrs}>
-        <span class="glyph">⊘</span>Reset counters
+        <span class="glyph" aria-hidden="true">⊘</span>Reset counters
       </button>
     </div>
   </section>
+  <main id="tel-main" tabindex="-1">
   <section class="section" aria-label="Counters">
     <h2>Event counters</h2>
     ${totalEvents === 0
@@ -206,6 +209,7 @@ function buildHtml(snapshot: TelemetryStore): string {
     <h2>Last event properties</h2>
     <pre class="tel-pre">${lastProps}</pre>
   </section>
+  </main>
   <script nonce="${nonce}">
     (function () {
       const vscode = acquireVsCodeApi();

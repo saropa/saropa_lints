@@ -18,7 +18,13 @@ import type { Violation } from '../violationsReader';
 import { getFindingsEmptyStateStyles, getViolationsDashboardStyles } from './violationsDashboardStyles';
 import type { DashboardSection } from './issuesTreeModel';
 import { VIOLATIONS_GROUP_BY_MODES, type GroupByMode } from './issuesTreeGrouping';
-import { buildFullWidthToggle, getFullWidthToggleScript } from './dashboardHero';
+import {
+  buildAnnouncer,
+  buildFullWidthToggle,
+  buildSkipLink,
+  getAnnouncerScript,
+  getFullWidthToggleScript,
+} from './dashboardHero';
 import { pluralize } from './webview-format';
 
 /** Analyzer-side suppression counts from `violations.json` (same source as the Suppressions tree). */
@@ -1026,6 +1032,9 @@ function buildScript(): string {
   var vscode = acquireVsCodeApi();
   var filterDebounce = null;
 
+  // §15.3 — polite live-region announcer for filter / sort state changes.
+  ${getAnnouncerScript()}
+
   function readState() {
     var gb = document.getElementById('groupBy');
     var tf = document.getElementById('textFilter');
@@ -1048,8 +1057,32 @@ function buildScript(): string {
 
   function pushState(immediate) {
     if (filterDebounce) { clearTimeout(filterDebounce); filterDebounce = null; }
-    if (immediate) { vscode.postMessage(readState()); return; }
-    filterDebounce = setTimeout(function () { vscode.postMessage(readState()); }, 220);
+    if (immediate) { vscode.postMessage(readState()); announceFilterState(); return; }
+    filterDebounce = setTimeout(function () {
+      vscode.postMessage(readState());
+      announceFilterState();
+    }, 220);
+  }
+
+  // §15.3 — describe the current filter state to screen readers so users
+  // navigating without a mouse know which constraints are active.
+  function announceFilterState() {
+    var s = readState();
+    var parts = [];
+    if (s.textFilter) { parts.push('search ' + s.textFilter); }
+    var sevDefaults = ${JSON.stringify(DEFAULT_SEVERITIES)}.length;
+    if (s.severities.length !== sevDefaults) {
+      parts.push(s.severities.length + ' severities');
+    }
+    var impDefaults = ${JSON.stringify(DEFAULT_IMPACTS)}.length;
+    if (s.impacts.length !== impDefaults) {
+      parts.push(s.impacts.length + ' impacts');
+    }
+    if (parts.length === 0) {
+      announce('All filters cleared');
+    } else {
+      announce('Filters: ' + parts.join(', '));
+    }
   }
 
   /* Filter inputs */
@@ -1399,15 +1432,21 @@ export function renderViolationsDashboardHtml(input: ViolationsDashboardHtmlInpu
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'nonce-${nonce}' 'unsafe-inline'; script-src 'nonce-${nonce}';" />
   <style nonce="${nonce}">${getViolationsDashboardStyles()}</style>
 </head><body>
-  ${buildHero(input)}
+  ${buildSkipLink('findings-table', 'Skip to findings')}
+  ${buildAnnouncer()}
+  <header>${buildHero(input)}</header>
   ${buildKpiCards(input)}
   ${buildToolbar(input)}
-  ${buildTopRulesTable(input)}
-  ${buildFindingsBlock(input)}
-  ${buildTodoHackBlock(input)}
-  ${buildDriftBlock(input.driftAdvisorSnapshot)}
-  ${buildChartsBlock(input)}
-  ${buildSuppressionsBlock(input)}
+  <main id="findings-table" tabindex="-1">
+    ${buildTopRulesTable(input)}
+    ${buildFindingsBlock(input)}
+  </main>
+  <aside aria-label="Secondary diagnostics">
+    ${buildTodoHackBlock(input)}
+    ${buildDriftBlock(input.driftAdvisorSnapshot)}
+    ${buildChartsBlock(input)}
+    ${buildSuppressionsBlock(input)}
+  </aside>
   <script nonce="${nonce}">${buildScript()}</script>
 </body></html>`;
 }

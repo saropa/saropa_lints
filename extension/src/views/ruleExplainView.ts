@@ -155,8 +155,10 @@ function buildHtml(input: RuleExplainInput): string {
   <style nonce="${cspNonce}">${getDashboardChromeStyles()}${getRuleExplainPanelStyles()}</style>
 </head>
 <body>
-  ${heroHtml}
+  <a href="#rule-detail" class="skip-link">Skip to rule details</a>
+  <header>${heroHtml}</header>
 
+  <main id="rule-detail" tabindex="-1">
   ${
     // §8.16 / §14.3 — Omit the Problem section entirely when there is no
     // message instead of rendering a *No message* placeholder card. Sections
@@ -173,7 +175,9 @@ function buildHtml(input: RuleExplainInput): string {
   ${sameTagHtml}
   ${supersedesHtml}
 
-  <section class="block">
+  </main>
+
+  <section class="block" aria-label="Documentation links">
     <h4>Documentation</h4>
     <!-- §8.10 — Render the doc link as a tier-2 button so the panel has one
          emphasized affordance the user's eye can land on for the likely next

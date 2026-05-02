@@ -65,6 +65,16 @@ export function getKnownIssuesScript(): string {
             if (emptyEl) {
                 emptyEl.hidden = !(visible === 0 && totalRows > 0);
             }
+            // §15.3 — announce filter state to screen readers.
+            announce(visible + ' of ' + totalRows + ' packages visible');
+        }
+
+        // §15.3 — polite live-region announcer.
+        function announce(message) {
+            const el = document.getElementById('announcer');
+            if (!el) { return; }
+            el.textContent = '';
+            setTimeout(() => { el.textContent = message; }, 50);
         }
 
         function syncActiveKpiCard(query, includeHas, includeNo) {

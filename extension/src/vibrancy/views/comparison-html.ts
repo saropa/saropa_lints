@@ -110,11 +110,20 @@ function getComparisonScript(): string {
     return `
         const vscode = acquireVsCodeApi();
 
+        // §15.3 — announcer helper for confirming Add to Project actions.
+        function announce(message) {
+            const el = document.getElementById('announcer');
+            if (!el) { return; }
+            el.textContent = '';
+            setTimeout(() => { el.textContent = message; }, 50);
+        }
+
         document.querySelectorAll('.add-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const name = btn.dataset.package;
                 const version = btn.dataset.version;
                 vscode.postMessage({ type: 'addPackage', name, version });
+                announce('Adding ' + name + ' to project');
             });
         });
 
@@ -344,11 +353,17 @@ export function buildComparisonHtml(ranked: RankedComparison): string {
     <style nonce="${nonce}">${getComparisonStyles()}</style>
 </head>
 <body>
-    ${heroHtml}
+    <a href="#comparison-table" class="skip-link">Skip to comparison table</a>
+    <div id="announcer" role="status" aria-live="polite" aria-atomic="true"></div>
+    <header>${heroHtml}</header>
     ${kpiRowHtml}
     ${toolbarHtml}
-    ${buildComparisonTable(packages, winners)}
-    <div class="recommendation">${recommendation}</div>
+    <main id="comparison-table" tabindex="-1">
+        ${buildComparisonTable(packages, winners)}
+    </main>
+    <aside aria-label="Recommendation">
+        <div class="recommendation">${recommendation}</div>
+    </aside>
     <script nonce="${nonce}">${getComparisonScript()}(function(){${getFullWidthToggleScript()}})();</script>
 </body>
 </html>`;

@@ -79,6 +79,8 @@ export function buildCommandCatalogHtml(
   </style>
 </head>
 <body>
+  <a href="#catalog-main" class="skip-link">Skip to command catalog</a>
+  <div id="announcer" role="status" aria-live="polite" aria-atomic="true"></div>
   <header class="hero">
     <div class="hero-inner">
       <h1 class="hero-title">Saropa Command Catalog</h1>
@@ -175,7 +177,7 @@ export function buildCommandCatalogHtml(
     <button type="button" class="text-btn history-more" id="historyMore" hidden></button>
   </section>
 
-  <main id="catalog" class="catalog">
+  <main id="catalog-main" class="catalog">
     ${sectionsHtml}
   </main>
   <div class="no-results" id="noResults" hidden>
@@ -1012,7 +1014,7 @@ function getScript(): string {
       const searchCountEl = document.getElementById('searchCount');
       const noResultsEl = document.getElementById('noResults');
       const resetFromEmptyBtn = document.getElementById('resetFromEmpty');
-      const catalogEl = document.getElementById('catalog');
+      const catalogEl = document.getElementById('catalog-main');
       const internalCheckbox = document.getElementById('showInternal');
       const toggleAllBtn = document.getElementById('toggleAll');
       const filterChipStrip = document.getElementById('filterChips');
