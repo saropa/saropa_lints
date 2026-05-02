@@ -47,6 +47,8 @@
 
 ## [13.0.2]
 
+The Top Rules table in the Findings Dashboard now lets you choose between hiding a noisy rule just for yourself or disabling it across the whole project — two buttons per row, side by side, so the commitment is obvious before you click. Hide stays personal and reversible; Disable writes the rule into your project config and re-runs analysis on the spot. [log](https://github.com/saropa/saropa_lints/blob/v13.0.2/CHANGELOG.md)
+
 ### Added (Extension)
 
 - Each row in the **Findings Dashboard** Top Rules table now has a **Disable** button next to the existing **Hide** button — Hide is workspace-only (per-user, reversible via Clear Suppressions) while Disable writes the rule to `analysis_options_custom.yaml` so the whole project stops running it (team-shared, persistent, re-runs analysis automatically). No action required — open the Findings Dashboard to use it.
@@ -54,6 +56,8 @@
 ---
 
 ## [13.0.1]
+
+The Findings Dashboard gets a Top Rules table that ranks the noisiest rules by count and gives you a one-click Hide button per row, so a screen full of repeated INFO lints stops drowning out the warnings you actually need to see. Behind the scenes the Code Health Dashboard scan no longer stacks parallel processes when you click rescan in quick succession, and every visible label, toast, and Command Catalog entry now uses the on-screen "Code Health" name instead of the older "Project Vibrancy" wording. [log](https://github.com/saropa/saropa_lints/blob/v13.0.1/CHANGELOG.md)
 
 ### Added (Extension)
 
