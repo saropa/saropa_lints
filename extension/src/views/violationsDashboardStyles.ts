@@ -741,24 +741,37 @@ export function getViolationsDashboardStyles(): string {
     .top-rules-table .col-rule   { }
     .top-rules-table .col-count  { width: 80px; text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
     .top-rules-table .col-sev    { width: 100px; white-space: nowrap; }
-    .top-rules-table .col-actions { width: 80px; text-align: right; }
-    /* Always-visible Hide button. \`.danger\` styling signals the destructive
-       intent (rule disappears from view) without committing to red until
-       hover — keeps the table readable at scan distance. */
-    .top-rules-table .row-action.danger {
+    .top-rules-table .col-actions { width: 152px; text-align: right; white-space: nowrap; }
+    /* Two always-visible action buttons per row. They share base chrome but
+       diverge on hover so the commitment difference (workspace Hide vs.
+       project-wide Disable) reads at scan distance:
+         • neutral hover — subtle link-foreground tint, signals reversible
+           per-user action.
+         • danger hover  — error-foreground tint, signals persistent
+           team-shared action that writes the YAML config. */
+    .top-rules-table .row-action {
       visibility: visible;
       border: 1px solid var(--border);
       border-radius: 4px;
       padding: 2px 10px;
+      margin-left: 4px;
       color: var(--fg);
       background: var(--surface-3);
+      font: inherit;
+      font-size: .9em;
+      cursor: pointer;
+    }
+    .top-rules-table .row-action.neutral:hover {
+      background: color-mix(in srgb, var(--link) 14%, transparent);
+      color: var(--link);
+      border-color: var(--link);
     }
     .top-rules-table .row-action.danger:hover {
       background: color-mix(in srgb, var(--accent-error) 18%, transparent);
       color: var(--accent-error);
       border-color: var(--accent-error);
     }
-    .top-rules-table .row-action.danger:focus-visible {
+    .top-rules-table .row-action:focus-visible {
       outline: 2px solid var(--vscode-focusBorder);
       outline-offset: 1px;
     }

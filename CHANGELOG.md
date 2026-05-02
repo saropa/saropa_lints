@@ -49,7 +49,7 @@
 
 ### Added (Extension)
 
-- The **Findings Dashboard** now shows a **Top Rules** triage table above the findings list, ranking the noisiest rules by count with severity and a per-row Hide button so a single click suppresses a rule across the workspace findings (same hide as the Issues tree's "Hide rule", reversible via Clear Suppressions). No action required — open the Findings Dashboard to use it.
+- The **Findings Dashboard** now shows a **Top Rules** triage table above the findings list, ranking the noisiest rules by count with severity and two per-row buttons: **Hide** suppresses the rule in the workspace findings only (per-user, reversible via Clear Suppressions), and **Disable** writes the rule to `analysis_options_custom.yaml` so the whole project stops running it (team-shared, persistent, re-runs analysis automatically). No action required — open the Findings Dashboard to use it.
 
 ### Fixed (Extension)
 

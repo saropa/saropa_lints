@@ -200,7 +200,7 @@ describe('violationsDashboardHtml', () => {
     assert.ok(html.includes('id="btn-copy"'));
   });
 
-  it('renders the Top Rules triage table with per-row Hide buttons when topRules are supplied', () => {
+  it('renders the Top Rules triage table with per-row Hide and Disable buttons when topRules are supplied', () => {
     const html = renderViolationsDashboardHtml(
       minimalInput({
         filteredCount: 95,
@@ -217,17 +217,19 @@ describe('violationsDashboardHtml', () => {
     assert.ok(html.includes('top-rules-table'));
     assert.ok(html.includes('Top 3 rules'));
     assert.ok(html.includes('aria-label="Top rules by count"'));
-    /* Each rule row carries the rule name (HTML-encoded) and a Hide button
-       wired with data-row-action="hide-rule" plus a percent-encoded rule id
-       so the script can decode it before posting suppressRule. */
+    /* Each rule row carries the rule name (HTML-encoded) plus a percent-
+       encoded rule id so the script can decode it before posting messages. */
     assert.ok(html.includes('data-rule="prefer_no_commented_out_code"'));
     assert.ok(html.includes('data-rule-enc="prefer_no_commented_out_code"'));
+    /* Hide → workspace suppress. Disable → project config (writes YAML). */
     assert.ok(html.includes('data-row-action="hide-rule"'));
+    assert.ok(html.includes('data-row-action="disable-rule"'));
     /* Severity pill is rendered next to each rule for triage context. */
     assert.ok(html.includes('sev-pill sev-info'));
     assert.ok(html.includes('sev-pill sev-error'));
-    /* Script wires the Hide button to a suppressRule message. */
+    /* Script wires Hide → suppressRule and Disable → disableRule messages. */
     assert.ok(html.includes("type: 'suppressRule'"));
+    assert.ok(html.includes("type: 'disableRule'"));
   });
 
   it('omits the Top Rules table when there are no findings to triage', () => {

@@ -595,6 +595,18 @@ function getOrCreatePanel(context: vscode.ExtensionContext): vscode.WebviewPanel
       }
       return;
     }
+    if (data.type === 'disableRule') {
+      /* Triggered by the Top Rules table's per-row Disable button. Reuses
+         the existing saropaLints.disableRules command, which writes
+         analysis_options_custom.yaml, re-initializes config, and re-runs
+         analysis (when runAnalysisAfterConfigChange is on). The command
+         takes an array of rule names; we wrap the single rule in [rule]. */
+      const rule = (data as { rule?: unknown }).rule;
+      if (typeof rule === 'string' && rule.length > 0) {
+        await vscode.commands.executeCommand('saropaLints.disableRules', [rule]);
+      }
+      return;
+    }
     if (data.type === 'paletteCommand') {
       const cmd = (data as { commandId?: unknown }).commandId;
       if (typeof cmd !== 'string' || !cmd.startsWith('saropaLints.')) {

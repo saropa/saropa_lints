@@ -513,10 +513,15 @@ function buildChip(kind: string, label: string, dropToken: string): string {
 }
 
 /* ============================================================================
- * Top Rules table — noisy-rule triage with one-click workspace hide.
- * Sits above the Findings table so users can suppress dominant rules before
- * scrolling. Suppression is the same workspace "hide" used by the Issues
- * tree view (reversible via Clear Suppressions), not a config-level disable.
+ * Top Rules table — noisy-rule triage with two suppression flavors per row:
+ *   • Hide    — workspace-only, per-user, reversible via Clear Suppressions
+ *               (same path as the Issues tree's "Hide rule").
+ *   • Disable — project-wide, writes to analysis_options_custom.yaml and
+ *               re-runs analysis (team-shared, persistent).
+ * Sits above the Findings table so users can clean dominant noise before
+ * scrolling. Two buttons over a split menu: scannable at a glance, and the
+ * commitment difference (personal triage vs. team config) is encoded in the
+ * label, not buried behind a chevron.
  * ========================================================================= */
 
 function buildTopRulesTable(input: ViolationsDashboardHtmlInput): string {
@@ -540,9 +545,13 @@ function buildTopRulesTable(input: ViolationsDashboardHtmlInput): string {
       <td class="col-count">${r.count}</td>
       <td class="col-sev"><span class="sev-pill sev-${escapeHtml(sev)}">${escapeHtml(sev)}</span></td>
       <td class="col-actions">
-        <button type="button" class="row-action danger" data-row-action="hide-rule"
-                title="Hide this rule from the workspace findings (reversible via Clear Suppressions)">
+        <button type="button" class="row-action neutral" data-row-action="hide-rule"
+                title="Hide for me only — workspace-level, reversible via Clear Suppressions">
           Hide
+        </button>
+        <button type="button" class="row-action danger" data-row-action="disable-rule"
+                title="Disable for the whole project — writes analysis_options_custom.yaml and re-runs analysis">
+          Disable
         </button>
       </td>
     </tr>`;
@@ -551,7 +560,9 @@ function buildTopRulesTable(input: ViolationsDashboardHtmlInput): string {
     <div class="findings-wrap">
       <div class="findings-toolbar">
         <span class="meta-line" style="margin:0">
-          Top ${rows.length} rule${rows.length === 1 ? '' : 's'} · ${totalShown} of ${input.filteredCount} findings (${share}%) · click <strong>Hide</strong> to suppress in this workspace
+          Top ${rows.length} rule${rows.length === 1 ? '' : 's'} · ${totalShown} of ${input.filteredCount} findings (${share}%) ·
+          <strong>Hide</strong> = workspace only ·
+          <strong>Disable</strong> = project config (writes <code>analysis_options_custom.yaml</code>)
         </span>
       </div>
       <table class="top-rules-table" role="grid">
@@ -1273,20 +1284,29 @@ function buildScript(): string {
     } catch (e) { /* ignore */ }
   }
 
-  /* Top Rules table — Hide button posts a suppressRule message. The dashboard
-     rebuilds automatically when the issuesProvider fires onDidChangeTreeData
-     after the suppression is applied, so we don't manipulate the DOM here. */
+  /* Top Rules table — Hide and Disable buttons post different message types.
+     Both rely on the dashboard rebuilding via the issuesProvider tree-data
+     event (Hide) or the post-disable analysis re-run (Disable), so we don't
+     manipulate the DOM directly here. */
   document.querySelectorAll('.top-rules-table tr.trow').forEach(function (row) {
-    var btn = row.querySelector('button[data-row-action="hide-rule"]');
-    if (!btn) return;
-    btn.addEventListener('click', function (e) {
-      e.stopPropagation();
-      var enc = row.getAttribute('data-rule-enc') || '';
-      var rule = '';
-      try { rule = decodeURIComponent(enc); } catch (err) { rule = ''; }
-      if (!rule) return;
-      vscode.postMessage({ type: 'suppressRule', rule: rule });
-    });
+    var enc = row.getAttribute('data-rule-enc') || '';
+    var rule = '';
+    try { rule = decodeURIComponent(enc); } catch (err) { rule = ''; }
+    if (!rule) return;
+    var hideBtn = row.querySelector('button[data-row-action="hide-rule"]');
+    if (hideBtn) {
+      hideBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        vscode.postMessage({ type: 'suppressRule', rule: rule });
+      });
+    }
+    var disableBtn = row.querySelector('button[data-row-action="disable-rule"]');
+    if (disableBtn) {
+      disableBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        vscode.postMessage({ type: 'disableRule', rule: rule });
+      });
+    }
   });
 
   /* TODOs / Drift section action bindings */
