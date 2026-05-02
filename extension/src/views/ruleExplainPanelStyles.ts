@@ -1,68 +1,74 @@
-/** CSS for the **Rule explain** editor webview (`ruleExplainView.ts`). */
+/**
+ * CSS for the **Rule explain** editor webview (`ruleExplainView.ts`).
+ *
+ * Body / hero / button / status-line styling all come from the shared chrome
+ * (`getDashboardChromeStyles()`) — this stylesheet only adds patterns the chrome
+ * does not own: the inset detail-card section block (§7.2), the OWASP definition
+ * list (§7.2), and the link-hover underline (§8.2).
+ *
+ * Previously this file shipped its own `body`, `h1`, `h2/h3`, and `.meta` rules
+ * that overrode the chrome and broke the body max-width / full-width-toggle
+ * (§4) and the gold-standard h-hierarchy (§8.1). Those overrides are gone;
+ * the panel now inherits the same chrome the Findings / Code Health
+ * dashboards use.
+ */
 export function getRuleExplainPanelStyles(): string {
     return `
-    body {
-      font-family: var(--vscode-font-family);
-      font-size: var(--vscode-font-size);
-      color: var(--vscode-foreground);
-      background: var(--vscode-editor-background);
-      padding: 1rem 1.5rem;
-      line-height: 1.5;
-      margin: 0;
-    }
-    h1 {
-      font-size: 1.25rem;
-      font-weight: 600;
-      margin: 0 0 0.5rem 0;
-      word-break: break-all;
-    }
-    h2, h3 {
-      font-size: 0.9rem;
-      font-weight: 600;
-      margin: 1rem 0 0.4rem 0;
-      color: var(--vscode-descriptionForeground);
-    }
-    .meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.75rem 1.5rem;
-      margin-bottom: 1rem;
-      font-size: 0.85rem;
-      color: var(--vscode-descriptionForeground);
-    }
-    .meta span {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.25rem;
-    }
-    .meta .badge {
-      padding: 0.15rem 0.5rem;
-      border-radius: 4px;
-      background: var(--vscode-badge-background);
-      color: var(--vscode-badge-foreground);
-    }
+    /* §7.2 / §14.6 — section.block is an inset detail card, not a flat
+       top-bordered band. Layered surface depth lets the eye separate the
+       hero from the section bodies without relying on heading weight alone. */
     section.block {
-      margin-top: 1rem;
-      padding-top: 1rem;
-      border-top: 1px solid var(--vscode-widget-border);
+      margin: 0 0 12px 0;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--surface-2);
+    }
+    section.block h4 {
+      margin: 0 0 6px 0;
+      font-size: 0.92em;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+      color: var(--muted);
+      text-transform: uppercase;
     }
     section.block p {
-      margin: 0.25rem 0 0 0;
+      margin: 0;
       white-space: pre-wrap;
       word-break: break-word;
     }
+    /* §7.2 — OWASP label/value pairs as a definition list. The grid keeps
+       *Mobile* / *Web* labels aligned with their values regardless of value
+       length. */
+    .owasp-dl {
+      display: grid;
+      grid-template-columns: max-content 1fr;
+      gap: 4px 12px;
+      margin: 0;
+    }
+    .owasp-dl dt {
+      font-weight: 600;
+      color: var(--muted);
+    }
+    .owasp-dl dd { margin: 0; word-break: break-word; }
+    /* §8.2 — external links: no underline by default, underline on hover. The
+       chrome's .btn rule covers the *Documentation* CTA which now uses the
+       .btn class for §8.10 emphasis; .doc-link.btn keeps button shape but
+       still wires through the data-url postMessage. */
     a {
       color: var(--vscode-textLink-foreground);
+      text-decoration: none;
     }
     a:hover {
       color: var(--vscode-textLink-activeForeground);
+      text-decoration: underline;
     }
-    .empty {
-      color: var(--vscode-descriptionForeground);
-      font-style: italic;
-    }
-    @media (prefers-reduced-motion: reduce) {
-      a { transition: none; }
+    a.doc-link.btn:hover { text-decoration: none; }
+    /* Inline rule-name links inside section blocks read better as monospace
+       chips than as plain text — they are rule identifiers, not prose. */
+    section.block code {
+      font-family: var(--vscode-editor-font-family, ui-monospace, monospace);
+      font-size: 0.92em;
     }
   `;
 }

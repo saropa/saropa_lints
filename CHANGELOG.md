@@ -54,6 +54,8 @@
 - The **Code Health Dashboard** KPI strip now suppresses zero-count categories and collapses to a single muted *all clear* line when every category is zero, instead of greeting healthy projects with a row of identical zeros. No action required — categories reappear as their counts grow.
 - The **Code Health Dashboard** filtered table now shows an empty-state banner with a *Reset filters* button when search or a flag-card filter narrows it to zero rows, instead of leaving the user staring at an empty table with no cue. No action required — the banner appears and disappears with the filter state.
 - The **Code Health Dashboard** gate-failure banner now carries an *Open Code Health settings* button so the user can act on a failing quality gate from inside the banner; previously it offered only explanatory text. No action required.
+- The **Rule Explain panel** now renders each section as an inset card with consistent `<h4>` subsection headings, OWASP labels as a definition list, and the *Documentation* link as a tier-2 button — so the panel inherits the same visual depth and CTA emphasis as the Findings and Code Health dashboards. The panel also drops its private body styles so it picks up the shared `max-width` and full-width toggle. No action required.
+- The **Rule Explain panel** now omits the *Problem* section entirely when a rule carries no message, instead of advertising a *No message* placeholder card. No action required.
 
 ### Fixed (Extension)
 

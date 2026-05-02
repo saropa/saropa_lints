@@ -73,6 +73,16 @@ function escapeHtml(s: string): string {
     .replaceAll('"', '&quot;');
 }
 
+/**
+ * Compose the rule explain panel HTML. Exported so unit tests can assert the
+ * rendered structure (heading hierarchy, inset card layout, OWASP definition
+ * list, doc-link button, omitted-Problem fallback) without standing up a
+ * real VS Code webview.
+ */
+export function buildRuleExplainHtml(input: RuleExplainInput): string {
+  return buildHtml(input);
+}
+
 function buildHtml(input: RuleExplainInput): string {
   const rule = escapeHtml(input.ruleName);
   const message = input.message ? escapeHtml(input.message) : '';
@@ -85,31 +95,39 @@ function buildHtml(input: RuleExplainInput): string {
     .filter((r) => r !== input.ruleName);
   const sameTagRules = getSameTagRules(input.ruleName).filter((r) => r !== input.ruleName);
   const supersedesRules = getSupersedesRules(input.ruleName).filter((r) => r !== input.ruleName);
+  // §8.1 — sub-section headings inside a single detail panel are <h4> per the
+  // *Expander detail headings* rule. <h2> is reserved for major page bands;
+  // every block in the rule explain panel is a sibling sub-section of the hero.
   const relatedHtml = relatedRules.length
-    ? `<section class="block"><h2>Related rules</h2><p>${relatedRules
+    ? `<section class="block"><h4>Related rules</h4><p>${relatedRules
         .map((r) => `<a href="#" class="related-rule" data-section="related" data-rule="${escapeHtml(r)}"><code>${escapeHtml(r)}</code></a>`)
         .join(', ')}</p></section>`
     : '';
   const sameTagHtml = sameTagRules.length
-    ? `<section class="block"><h2>Same-tag discovery</h2><p>${sameTagRules
+    ? `<section class="block"><h4>Same-tag discovery</h4><p>${sameTagRules
         .map((r) => `<a href="#" class="related-rule" data-section="sameTag" data-rule="${escapeHtml(r)}"><code>${escapeHtml(r)}</code></a>`)
         .join(', ')}</p></section>`
     : '';
   const supersedesHtml = supersedesRules.length
-    ? `<section class="block"><h2>Migration</h2><p>This rule supersedes ${supersedesRules
+    ? `<section class="block"><h4>Migration</h4><p>This rule supersedes ${supersedesRules
         .map((r) => `<a href="#" class="related-rule" data-section="supersedes" data-rule="${escapeHtml(r)}"><code>${escapeHtml(r)}</code></a>`)
         .join(', ')}.</p></section>`
     : '';
 
-  const owaspLines: string[] = [];
+  // §7.2 — label/value pairs inside a detail card render as a definition list,
+  // not as paragraphs. <dl> aligns the *Mobile* / *Web* labels with the
+  // muted-label / value-grid pattern used elsewhere in the gold-standard.
+  const owaspEntries: Array<{ label: string; value: string }> = [];
   if (input.owasp?.mobile?.length) {
-    owaspLines.push(`Mobile: ${input.owasp.mobile.join(', ')}`);
+    owaspEntries.push({ label: 'Mobile', value: input.owasp.mobile.join(', ') });
   }
   if (input.owasp?.web?.length) {
-    owaspLines.push(`Web: ${input.owasp.web.join(', ')}`);
+    owaspEntries.push({ label: 'Web', value: input.owasp.web.join(', ') });
   }
-  const owaspHtml = owaspLines.length
-    ? `<section class="block"><h3>OWASP</h3><p>${owaspLines.map((l) => escapeHtml(l)).join('</p><p>')}</p></section>`
+  const owaspHtml = owaspEntries.length
+    ? `<section class="block"><h4>OWASP</h4><dl class="owasp-dl">${owaspEntries
+        .map((e) => `<dt>${escapeHtml(e.label)}</dt><dd>${escapeHtml(e.value)}</dd>`)
+        .join('')}</dl></section>`
     : '';
 
   const cspNonce = createWebviewCspNonce();
@@ -139,12 +157,16 @@ function buildHtml(input: RuleExplainInput): string {
 <body>
   ${heroHtml}
 
-  <section class="block">
-    <h2>Problem</h2>
-    <p>${message || '<span class="empty">No message</span>'}</p>
-  </section>
+  ${
+    // §8.16 / §14.3 — Omit the Problem section entirely when there is no
+    // message instead of rendering a *No message* placeholder card. Sections
+    // are earned by having data; an empty card just advertises absence.
+    message ? `<section class="block">
+    <h4>Problem</h4>
+    <p>${message}</p>
+  </section>` : ''}
 
-  ${correction ? `<section class="block"><h2>How to fix</h2><p>${correction}</p></section>` : ''}
+  ${correction ? `<section class="block"><h4>How to fix</h4><p>${correction}</p></section>` : ''}
 
   ${owaspHtml}
   ${relatedHtml}
@@ -152,8 +174,12 @@ function buildHtml(input: RuleExplainInput): string {
   ${supersedesHtml}
 
   <section class="block">
-    <h2>Documentation</h2>
-    <p><a href="${escapeHtml(docUrl)}" data-url="${escapeHtml(docUrl)}" class="doc-link">View in ROADMAP</a></p>
+    <h4>Documentation</h4>
+    <!-- §8.10 — Render the doc link as a tier-2 button so the panel has one
+         emphasized affordance the user's eye can land on for the likely next
+         action. The plain-text anchor previously gave the panel no visual
+         CTA at all. -->
+    <p><a href="${escapeHtml(docUrl)}" data-url="${escapeHtml(docUrl)}" class="doc-link btn">View in ROADMAP</a></p>
   </section>
   <script nonce="${cspNonce}">
     (function() {
