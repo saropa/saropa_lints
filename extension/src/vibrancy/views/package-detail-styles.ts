@@ -10,14 +10,21 @@ export function getPackageDetailStyles(): string {
     return `
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
+        /* §4 — page padding + max-width matched to the chrome's gold-standard
+           (~1280px). The full-width toggle in the hero (§4) flips
+           body[data-full-width="true"] which the chrome already styles to
+           drop the cap; this rule sets the cap that toggle reverses. */
         body {
             font-family: var(--vscode-font-family);
             font-size: var(--vscode-font-size, var(--vscode-editor-font-size, 13px));
             color: var(--vscode-foreground);
             background: var(--vscode-editor-background);
             padding: 16px 24px;
+            margin: 0 auto;
+            max-width: 1280px;
             line-height: 1.5;
         }
+        body[data-full-width="true"] { max-width: none; }
 
         a {
             color: var(--vscode-textLink-foreground);
@@ -25,13 +32,23 @@ export function getPackageDetailStyles(): string {
         }
         a:hover { text-decoration: underline; }
 
-        /* Action links look like styled hyperlinks — underlined and link-colored */
+        /* §8.2 — distinguish external URLs from in-panel file-open actions.
+           External links (data-action="openUrl") follow the gold-standard
+           "no underline default, underline on hover" pattern. In-panel
+           file-open links (data-action="openFile") keep the underline
+           always so they read clearly as navigation targets inside the
+           same surface. */
         .action-link {
-            text-decoration: underline;
             cursor: pointer;
         }
-        .action-link:hover {
-            color: var(--vscode-textLink-activeForeground, var(--vscode-textLink-foreground));
+        a[data-action="openUrl"] { text-decoration: none; }
+        a[data-action="openUrl"]:hover {
+            color: var(--vscode-textLink-activeForeground);
+            text-decoration: underline;
+        }
+        a[data-action="openFile"] { text-decoration: underline; }
+        a[data-action="openFile"]:hover {
+            color: var(--vscode-textLink-activeForeground);
         }
 
         h1 {
@@ -47,7 +64,7 @@ export function getPackageDetailStyles(): string {
             flex-wrap: wrap;
             margin-bottom: 16px;
             padding-bottom: 12px;
-            border-bottom: 1px solid var(--vscode-widget-border, #333);
+            border-bottom: 1px solid var(--vscode-widget-border);
         }
 
         .header-meta {
@@ -66,21 +83,26 @@ export function getPackageDetailStyles(): string {
             font-weight: 600;
         }
 
-        .badge-vibrant { background: var(--vscode-testing-iconPassed, #388e3c); color: #fff; }
-        .badge-quiet { background: var(--vscode-editorInfo-foreground, #1976d2); color: #fff; }
-        .badge-legacy { background: var(--vscode-editorWarning-foreground, #f9a825); color: #000; }
-        .badge-stale { background: var(--vscode-editorWarning-foreground, #e65100); color: #fff; }
-        .badge-eol { background: var(--vscode-editorError-foreground, #d32f2f); color: #fff; }
+        .badge-vibrant { background: var(--vscode-testing-iconPassed); color: #fff; }
+        .badge-quiet { background: var(--vscode-editorInfo-foreground); color: #fff; }
+        .badge-legacy { background: var(--vscode-editorWarning-foreground); color: #000; }
+        .badge-stale { background: var(--vscode-editorWarning-foreground); color: #fff; }
+        .badge-eol { background: var(--vscode-editorError-foreground); color: #fff; }
 
+        /* §7.2 / §14.6 — sections render as inset detail cards with a
+           secondary background tone so the page reads as layered surfaces
+           (page → card → header) rather than a flat sequence of text bands
+           sharing the page background. */
         .section {
             margin-bottom: 16px;
-            border: 1px solid var(--vscode-widget-border, #333);
-            border-radius: 4px;
+            border: 1px solid var(--vscode-widget-border);
+            border-radius: 6px;
             overflow: hidden;
+            background: var(--vscode-editorWidget-background);
         }
 
         .section-header {
-            background: var(--vscode-sideBarSectionHeader-background, #252526);
+            background: var(--vscode-sideBarSectionHeader-background);
             padding: 8px 12px;
             font-weight: 600;
             font-size: 0.95em;
@@ -88,7 +110,7 @@ export function getPackageDetailStyles(): string {
             user-select: none;
         }
         .section-header:hover {
-            background: var(--vscode-list-hoverBackground, #2a2d2e);
+            background: var(--vscode-list-hoverBackground);
         }
 
         .section-body {
@@ -103,7 +125,7 @@ export function getPackageDetailStyles(): string {
         }
         .metrics-table td {
             padding: 4px 8px;
-            border-bottom: 1px solid var(--vscode-widget-border, #333);
+            border-bottom: 1px solid var(--vscode-widget-border);
         }
         .metrics-table td:first-child {
             color: var(--vscode-descriptionForeground);
@@ -156,11 +178,14 @@ export function getPackageDetailStyles(): string {
         .gap-card {
             padding: 8px 16px;
             border-radius: 4px;
-            background: var(--vscode-sideBarSectionHeader-background, #252526);
+            background: var(--vscode-sideBarSectionHeader-background);
             text-align: center;
         }
+        /* §4.2 — hero numbers are the largest typographic element after the
+           page title; bump from 1.5em to 1.8em so the count reads as a KPI,
+           not body text. */
         .gap-card .count {
-            font-size: 1.5em;
+            font-size: 1.8em;
             font-weight: 700;
         }
         .gap-card .label {
@@ -179,29 +204,45 @@ export function getPackageDetailStyles(): string {
             flex: 1;
             max-width: 300px;
             padding: 4px 8px;
-            border: 1px solid var(--vscode-widget-border, #333);
+            border: 1px solid var(--vscode-widget-border);
             border-radius: 4px;
-            background: var(--vscode-input-background, #1e1e1e);
-            color: var(--vscode-input-foreground, #ccc);
+            background: var(--vscode-input-background);
+            color: var(--vscode-input-foreground);
             font-size: 0.9em;
         }
         .gap-toolbar input:focus {
             outline: none;
-            border-color: var(--vscode-focusBorder, #007acc);
+            border-color: var(--vscode-focusBorder);
+        }
+        /* §4.3 — radio-style segmented control band. The .seg wrapper groups
+           the four filter buttons so they read as a single control surface,
+           matching the chrome's segmented pattern used elsewhere. */
+        .gap-toolbar .seg {
+            display: inline-flex;
+            border: 1px solid var(--vscode-widget-border);
+            border-radius: 6px;
+            overflow: hidden;
+            background: var(--vscode-editor-inactiveSelectionBackground);
         }
         .gap-toolbar .filter-btn {
-            padding: 3px 10px;
-            border: 1px solid var(--vscode-widget-border, #333);
-            border-radius: 4px;
+            padding: 4px 12px;
+            border: 0;
             background: transparent;
             color: var(--vscode-foreground);
             cursor: pointer;
             font-size: 0.85em;
+            opacity: 0.7;
         }
+        .gap-toolbar .filter-btn:hover { opacity: 1; }
+        /* §14.15 — radio active state uses inactive-selection backdrop, NOT
+           the primary-button color. Primary-button vocabulary is reserved
+           for tier-1 actions (*Upgrade*); a filter selection is the resting
+           state, so it must read quietly. */
         .gap-toolbar .filter-btn.active {
-            background: var(--vscode-button-background);
-            color: var(--vscode-button-foreground, #fff);
-            border-color: var(--vscode-button-background);
+            background: var(--vscode-list-activeSelectionBackground);
+            color: var(--vscode-list-activeSelectionForeground);
+            opacity: 1;
+            font-weight: 600;
         }
 
         .gap-table {
@@ -212,7 +253,7 @@ export function getPackageDetailStyles(): string {
         .gap-table th {
             text-align: left;
             padding: 6px 8px;
-            border-bottom: 2px solid var(--vscode-widget-border, #333);
+            border-bottom: 2px solid var(--vscode-widget-border);
             color: var(--vscode-descriptionForeground);
             font-weight: 600;
             cursor: pointer;
@@ -224,42 +265,42 @@ export function getPackageDetailStyles(): string {
         }
         .gap-table td {
             padding: 6px 8px;
-            border-bottom: 1px solid var(--vscode-widget-border, #333);
+            border-bottom: 1px solid var(--vscode-widget-border);
             vertical-align: top;
         }
         .gap-table tr:hover {
-            background: var(--vscode-list-hoverBackground, #2a2d2e);
+            background: var(--vscode-list-hoverBackground);
         }
 
-        .type-pr { color: var(--vscode-testing-iconPassed, #388e3c); }
-        .type-issue { color: var(--vscode-editorInfo-foreground, #1976d2); }
+        .type-pr { color: var(--vscode-testing-iconPassed); }
+        .type-issue { color: var(--vscode-editorInfo-foreground); }
 
         .review-select {
             padding: 2px 4px;
-            border: 1px solid var(--vscode-widget-border, #333);
+            border: 1px solid var(--vscode-widget-border);
             border-radius: 3px;
-            background: var(--vscode-input-background, #1e1e1e);
-            color: var(--vscode-input-foreground, #ccc);
+            background: var(--vscode-input-background);
+            color: var(--vscode-input-foreground);
             font-size: 0.85em;
         }
 
-        .review-applicable { color: var(--vscode-testing-iconPassed, #388e3c); font-weight: 600; }
+        .review-applicable { color: var(--vscode-testing-iconPassed); font-weight: 600; }
         .review-not-applicable { color: var(--vscode-descriptionForeground); }
-        .review-reviewed { color: var(--vscode-editorInfo-foreground, #1976d2); }
+        .review-reviewed { color: var(--vscode-editorInfo-foreground); }
 
         .notes-input {
             width: 100%;
             padding: 3px 6px;
-            border: 1px solid var(--vscode-widget-border, #333);
+            border: 1px solid var(--vscode-widget-border);
             border-radius: 3px;
-            background: var(--vscode-input-background, #1e1e1e);
-            color: var(--vscode-input-foreground, #ccc);
+            background: var(--vscode-input-background);
+            color: var(--vscode-input-foreground);
             font-size: 0.85em;
             margin-top: 4px;
         }
         .notes-input:focus {
             outline: none;
-            border-color: var(--vscode-focusBorder, #007acc);
+            border-color: var(--vscode-focusBorder);
         }
 
         .gap-footer {
@@ -280,25 +321,25 @@ export function getPackageDetailStyles(): string {
             gap: 12px;
             margin-top: 16px;
             padding-top: 12px;
-            border-top: 1px solid var(--vscode-widget-border, #333);
+            border-top: 1px solid var(--vscode-widget-border);
         }
 
         .alert-item {
             padding: 6px 8px;
             margin-bottom: 6px;
             border-radius: 4px;
-            border-left: 3px solid var(--vscode-editorWarning-foreground, #e65100);
+            border-left: 3px solid var(--vscode-editorWarning-foreground);
         }
         .alert-item.critical {
-            border-left-color: var(--vscode-editorError-foreground, #d32f2f);
+            border-left-color: var(--vscode-editorError-foreground);
         }
         .alert-item.info {
-            border-left-color: var(--vscode-editorInfo-foreground, #1976d2);
+            border-left-color: var(--vscode-editorInfo-foreground);
         }
 
-        .vuln-severity-critical { color: var(--vscode-editorError-foreground, #d32f2f); font-weight: 700; }
-        .vuln-severity-high { color: var(--vscode-editorError-foreground, #e65100); font-weight: 600; }
-        .vuln-severity-medium { color: var(--vscode-editorWarning-foreground, #f9a825); }
+        .vuln-severity-critical { color: var(--vscode-editorError-foreground); font-weight: 700; }
+        .vuln-severity-high { color: var(--vscode-editorError-foreground); font-weight: 600; }
+        .vuln-severity-medium { color: var(--vscode-editorWarning-foreground); }
         .vuln-severity-low { color: var(--vscode-descriptionForeground); }
 
         /* ---- File usages section ---- */
@@ -353,8 +394,8 @@ export function getPackageDetailStyles(): string {
             display: inline-block;
             padding: 2px 10px;
             border-radius: 12px;
-            background: var(--vscode-badge-background, #4d4d4d);
-            color: var(--vscode-badge-foreground, #fff);
+            background: var(--vscode-badge-background);
+            color: var(--vscode-badge-foreground);
             font-size: 0.8em;
             text-decoration: none;
             cursor: pointer;
@@ -374,15 +415,15 @@ export function getPackageDetailStyles(): string {
             display: inline-block;
             padding: 2px 10px;
             border-radius: 12px;
-            border: 1px solid var(--vscode-widget-border, #333);
-            background: var(--vscode-sideBarSectionHeader-background, #252526);
+            border: 1px solid var(--vscode-widget-border);
+            background: var(--vscode-sideBarSectionHeader-background);
             color: var(--vscode-foreground);
             font-size: 0.8em;
             text-decoration: none;
             cursor: pointer;
         }
         .dep-chip:hover {
-            background: var(--vscode-list-hoverBackground, #2a2d2e);
+            background: var(--vscode-list-hoverBackground);
             text-decoration: none;
         }
 
@@ -407,11 +448,11 @@ export function getPackageDetailStyles(): string {
             max-height: 150px;
             object-fit: contain;
             border-radius: 4px;
-            border: 1px solid var(--vscode-widget-border, #333);
+            border: 1px solid var(--vscode-widget-border);
             cursor: pointer;
         }
         .image-gallery img:hover {
-            border-color: var(--vscode-focusBorder, #007acc);
+            border-color: var(--vscode-focusBorder);
         }
     `;
 }

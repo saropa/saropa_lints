@@ -39,6 +39,7 @@
     "src/test/vibrancy/views/report-webview.test.ts",
     "src/test/vibrancy/views/html-utils.test.ts",
     "src/test/vibrancy/views/detail-view-html.test.ts",
+    "src/test/vibrancy/views/package-detail-html.test.ts",
     "src/test/vibrancy/views/known-issues-html.test.ts",
     "src/test/vibrancy/providers/tree-items.test.ts",
     "src/test/vibrancy/providers/hover-provider.test.ts",

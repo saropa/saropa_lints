@@ -59,20 +59,6 @@ function buildHeader(r: VibrancyResult): string {
     const grade = categoryToGrade(r.category);
     const cat = categoryLabel(r.category);
     const license = r.license ?? '';
-    const pubUrl = `https://pub.dev/packages/${encodeURIComponent(r.package.name)}`;
-    const repoUrl = resolveRepoUrl(r.github?.repoUrl, r.pubDev?.repositoryUrl);
-    const docUrl = `https://pub.dev/documentation/${encodeURIComponent(r.package.name)}/latest/`;
-
-    const links: string[] = [];
-    links.push(actionLink(pubUrl, 'pub.dev'));
-    links.push(actionLink(docUrl, 'Documentation'));
-    links.push(actionLink(`${pubUrl}/changelog`, 'Changelog'));
-    links.push(actionLink(`${pubUrl}/versions`, 'Versions'));
-    if (repoUrl) {
-        links.push(actionLink(repoUrl, 'Repository'));
-        links.push(actionLink(`${repoUrl}/issues`, 'Open Issues'));
-        links.push(actionLink(`${repoUrl}/issues/new`, 'Report Issue'));
-    }
 
     // Logo (when available) takes the gauge slot in the hero band — it's the visual focal
     // anchor for a single-package view and parallels how the package dashboard uses a gauge.
@@ -89,20 +75,22 @@ function buildHeader(r: VibrancyResult): string {
         ...(license ? [{ label: license, title: 'License' }] : []),
         ...(r.pubDev?.publishedDate ? [{ label: `Published ${r.pubDev.publishedDate.split('T')[0]}` }] : []),
     ]);
+    // §8.1 — pass the bare package name; the helper prepends "Saropa ". The
+    // previous "Package: ${name}" title double-noun'd the heading
+    // ("Saropa Package: foo"), pushing the actual identifier behind two
+    // labels that add no information.
     const heroHtml = buildDashboardHero({
-        title: `Package: ${r.package.name}`,
+        title: r.package.name,
         statusLineHtml,
         gaugeHtml: logoHtml,
     });
 
-    // External-link strip moved out of the hero per §14.14 — reference content (doc/repo
-    // links) lives below the data, not above it. We render it as a compact "Links" row
-    // immediately below the hero so it stays reachable without dominating the fold.
-    const linksRow = `<div class="links-row" aria-label="External resources">
-        ${links.join(' &middot; ')}
-    </div>`;
-
-    return `${heroHtml}${linksRow}`;
+    // §14.14 — external-link strip used to render here, immediately below the
+    // hero, AND again at the bottom of the page via buildLinksRow. The user
+    // saw the same row of doc / repo / pub.dev links twice on every visit.
+    // Drop the header copy; the bottom band is reference content per §14.14
+    // and stays the single source of truth for navigation links.
+    return heroHtml;
 }
 
 /** Map letter grade to status-pill tone for the hero status line. */
@@ -442,13 +430,21 @@ function buildVersionGapSection(
         </div>
     `;
 
+    // §4.3 / §14.15 — radio-style segmented control. Buttons share a .seg
+    // band so they read as a single control surface, and the active state
+    // uses the inactive-selection backdrop tint instead of the primary-
+    // button vocabulary (which is reserved for tier-1 actions like
+    // *Upgrade*). One option is always selected; *All* is the resting
+    // default.
     const toolbar = `
         <div class="gap-toolbar" data-section="${sectionId}">
             <input type="text" class="gap-search" placeholder="Search PRs and issues...">
-            <button class="filter-btn active" data-filter="all">All</button>
-            <button class="filter-btn" data-filter="unreviewed">Unreviewed</button>
-            <button class="filter-btn" data-filter="prs">PRs</button>
-            <button class="filter-btn" data-filter="issues">Issues</button>
+            <span class="seg" role="radiogroup" aria-label="Filter by category">
+                <button class="filter-btn active" role="radio" aria-checked="true" data-filter="all">All</button>
+                <button class="filter-btn" role="radio" aria-checked="false" data-filter="unreviewed">Unreviewed</button>
+                <button class="filter-btn" role="radio" aria-checked="false" data-filter="prs">PRs</button>
+                <button class="filter-btn" role="radio" aria-checked="false" data-filter="issues">Issues</button>
+            </span>
         </div>
     `;
 
@@ -617,7 +613,10 @@ function wrapHtml(title: string, body: string): string {
     // edge case) can execute as script; a nonce blocks that fallback. Every other
     // editor-area panel in this extension uses the same nonce pattern — see html-utils.ts.
     const nonce = createWebviewCspNonce();
-    const docTitle = escapeHtml(buildDocumentTitle(`Package: ${title}`));
+    // §8.1 — pass the bare package name; buildDocumentTitle prepends
+    // "Saropa ". Previously this string read "Saropa Package: foo" — two
+    // nouns in front of the actual package identifier.
+    const docTitle = escapeHtml(buildDocumentTitle(title));
     return `<!DOCTYPE html>
 <html lang="en">
 <head>

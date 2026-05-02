@@ -48,10 +48,17 @@ export function getPackageDetailScript(): string {
                 searchInput.addEventListener('input', applyFilters);
             }
 
+            // §4.3 / §14.15 — radio-group: exactly one button is active at a
+            // time. Toggle aria-checked alongside .active so screen readers
+            // and the chrome's .seg styling both reflect the selected state.
             filterBtns.forEach(btn => {
                 btn.addEventListener('click', () => {
-                    filterBtns.forEach(b => b.classList.remove('active'));
+                    filterBtns.forEach(b => {
+                        b.classList.remove('active');
+                        b.setAttribute('aria-checked', 'false');
+                    });
                     btn.classList.add('active');
+                    btn.setAttribute('aria-checked', 'true');
                     applyFilters();
                 });
             });
