@@ -50,6 +50,7 @@
 ### Fixed (Extension)
 
 - The **Code Health Dashboard** scan no longer stacks parallel `dart run` processes when the command fires repeatedly (sidebar item, rescan button, command palette) — concurrent invocations now share one in-flight scan, and the progress notification is cancellable so a runaway scan can be stopped from the toast. No action required.
+- Toasts fired by the **Code Health Dashboard** scan (progress, copy-confirm, errors, gate-failure warning) now say "Code Health" to match the dashboard panel title and command palette entry, instead of the older "Project Vibrancy" wording that confused users about which screen the notification belonged to. The settings group is still titled "Project Vibrancy" (its setting keys cannot be renamed without breaking existing user `settings.json` files), so toasts that direct you to that group still name it explicitly. No action required.
 
 ---
 

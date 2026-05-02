@@ -123,10 +123,14 @@ export function runProjectVibrancyScan(
       // Startup failures happen before exit/close when the runtime is missing
       // or non-executable in PATH.
       const details = err?.message?.trim();
+      // User-facing wording matches the "Code Health Dashboard" panel name —
+      // see projectVibrancyReportView.ts. The CLI tool, settings group, and
+      // setting keys are still "project_vibrancy" / "Project Vibrancy" by
+      // design (renaming the keys would break user settings.json files).
       void vscode.window.showErrorMessage(
         details && details.length > 0
-          ? `Project Vibrancy scan failed to start (${command}): ${details}`
-          : 'Project Vibrancy scan failed to start. Ensure Dart SDK is installed.',
+          ? `Code Health scan failed to start (${command}): ${details}`
+          : 'Code Health scan failed to start. Ensure Dart SDK is installed.',
       );
       resolve({ payload: null, rawStdout: '', exitCode: -1 });
     });
@@ -146,8 +150,8 @@ export function runProjectVibrancyScan(
         const details = stderr.trim();
         void vscode.window.showErrorMessage(
           details.length === 0
-            ? 'Project Vibrancy scan failed.'
-            : `Project Vibrancy scan failed: ${details}`,
+            ? 'Code Health scan failed.'
+            : `Code Health scan failed: ${details}`,
         );
         resolve({ payload: null, rawStdout: raw, exitCode });
         return;
@@ -157,13 +161,17 @@ export function runProjectVibrancyScan(
         if (payload.gates?.pass === false) {
           // Gate failures still return a valid payload; warn instead of error
           // so users can inspect violations without re-running.
+          // "Project Vibrancy settings" is preserved here because that is
+          // the literal title of the settings group in package.json — telling
+          // users to open something with a different name than what they'd
+          // search for in Settings would be a worse inconsistency.
           void vscode.window.showWarningMessage(
-            'Project Vibrancy: configured quality gates failed. Open Project Vibrancy settings or copy JSON to inspect gates.violations.',
+            'Code Health: configured quality gates failed. Open Project Vibrancy settings or copy JSON to inspect gates.violations.',
           );
         }
         resolve({ payload, rawStdout: raw, exitCode });
       } catch {
-        void vscode.window.showErrorMessage('Project Vibrancy returned invalid JSON output.');
+        void vscode.window.showErrorMessage('Code Health returned invalid JSON output.');
         resolve({ payload: null, rawStdout: raw, exitCode });
       }
     });

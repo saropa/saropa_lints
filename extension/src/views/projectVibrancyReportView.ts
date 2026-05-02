@@ -49,7 +49,13 @@ async function runScanAndRender(projectRoot: string): Promise<void> {
   const scan = await vscode.window.withProgress(
     {
       location: vscode.ProgressLocation.Notification,
-      title: 'Project Vibrancy: scanning functions...',
+      // Toast wording mirrors the on-screen dashboard name ("Saropa Code
+      // Health Dashboard") so users don't see a "Project Vibrancy" toast
+      // while looking at a "Code Health" panel. The underlying scoring
+      // concept and the settings group are still named "Project Vibrancy"
+      // (see package.json's configuration section + setting keys), but the
+      // user-facing surface for the dashboard scan is Code Health.
+      title: 'Code Health: scanning functions...',
       // Cancellable so a runaway scan can be killed from the notification
       // instead of waiting for the dart process to finish on its own.
       cancellable: true,
@@ -88,7 +94,7 @@ async function handlePanelMessage(msg: unknown): Promise<void> {
       return;
     }
     await vscode.env.clipboard.writeText(lastReportRawStdout);
-    void vscode.window.showInformationMessage('Project Vibrancy JSON copied to clipboard.');
+    void vscode.window.showInformationMessage('Code Health JSON copied to clipboard.');
     return;
   }
   if (data.type === 'openProjectVibrancySettings') {
