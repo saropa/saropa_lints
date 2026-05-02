@@ -20,6 +20,7 @@ export type CatalogCategory =
   | 'Rules & Fixes'
   | 'Reporting & Export'
   | 'Security Posture'
+  | 'Code Health'
   | 'Package Vibrancy'
   | 'Package Vibrancy — Filters'
   | 'Package Vibrancy — Updates'
@@ -65,6 +66,7 @@ export const catalogCategoryOrder: readonly CatalogCategory[] = [
   'Rules & Fixes',
   'Security Posture',
   'Reporting & Export',
+  'Code Health',
   'Package Vibrancy',
   'Package Vibrancy — Filters',
   'Package Vibrancy — Updates',
@@ -724,15 +726,18 @@ export const catalogEntries: readonly CatalogEntry[] = [
     command: 'saropaLints.openProjectVibrancyReport',
     title: 'Open Code Health Dashboard',
     description:
-      'Run a project vibrancy scan (LCOV + analyzer) using Project Vibrancy settings and open the Code Health Dashboard.',
-    category: 'Package Vibrancy',
+      'Run a Code Health scan (LCOV + analyzer) using Code Health settings and open the dashboard.',
+    category: 'Code Health',
     icon: 'graph',
   },
   {
     command: 'saropaLints.openProjectVibrancySettings',
-    title: 'Open Project Vibrancy Settings',
+    title: 'Open Code Health Settings',
+    // Setting key prefix is still `saropaLints.projectVibrancy` from the
+    // pre-rename Project Vibrancy era — stays so existing user settings.json
+    // entries keep working. The Settings filter passes that exact prefix.
     description: 'Open Settings filtered to saropaLints.projectVibrancy (LCOV path and quality gates).',
-    category: 'Package Vibrancy',
+    category: 'Code Health',
     icon: 'settings-gear',
   },
   {

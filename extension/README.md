@@ -64,16 +64,15 @@ The Package Vibrancy report includes an **Activity** grade column (**A-F**) that
 
 This helps distinguish "not recently released but still actively maintained" from "no recent release and no recent code changes."
 
-## Project Vibrancy (code health for your own source)
+## Code Health (your own source)
 
-The extension now includes a **Project Vibrancy** sidebar webview for project-code risk surfacing (separate from Package Vibrancy, which scores dependencies).
+The **Code Health Dashboard** scores the functions in your own Dart code (separate from Package Vibrancy, which scores dependencies).
 
-- Scans your Dart code with the project vibrancy CLI and shows the worst function hotspots.
-- Includes quick filters (text, grade, flags) and quick slices for `unused`, `uncovered`, and coverage-quality flags (`stub_tested`, `suspicious_coverage`, `test_drift`).
-- Supports scoped scans via git reference (`--since`) directly from the sidebar.
-- Persists sidebar filter state across refresh/reopen and shows active scan scope + visible row counts.
-- Provides a full report command: **Saropa Lints: Open Code Health Dashboard** (Command Palette category **Saropa Lints**).
-- Sidebar command: **Saropa Lints: Refresh Project Vibrancy Sidebar** for explicit rescans from command palette or view toolbar.
+- Scans your project with `dart run saropa_lints:project_vibrancy` and shows the worst function hotspots in an editor-tab dashboard.
+- KPI cards double as one-click filters for `unused`, `uncovered`, `stub_tested`, `suspicious_coverage`, and `test_drift`.
+- Free-text search filter, sortable table, and active-filter chip strip.
+- Quality gates (min grade, max-unused, max-uncovered, etc.) configured under **Code Health** settings — failures show a banner and are surfaced as a warning toast.
+- Run from the Command Palette via **Saropa Lints: Open Code Health Dashboard**, from the Saropa Lints sidebar entry **Code Health Dashboard**, or from the in-dashboard **Rescan** button.
 
 ## Settings
 

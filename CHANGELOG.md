@@ -50,7 +50,9 @@
 ### Fixed (Extension)
 
 - The **Code Health Dashboard** scan no longer stacks parallel `dart run` processes when the command fires repeatedly (sidebar item, rescan button, command palette) — concurrent invocations now share one in-flight scan, and the progress notification is cancellable so a runaway scan can be stopped from the toast. No action required.
-- Toasts fired by the **Code Health Dashboard** scan (progress, copy-confirm, errors, gate-failure warning) now say "Code Health" to match the dashboard panel title and command palette entry, instead of the older "Project Vibrancy" wording that confused users about which screen the notification belonged to. The settings group is still titled "Project Vibrancy" (its setting keys cannot be renamed without breaking existing user `settings.json` files), so toasts that direct you to that group still name it explicitly. No action required.
+- Renamed every user-facing **Project Vibrancy** label to **Code Health** so toasts, banners, tooltips, the toolbar settings button, the Settings group title, the README section, and the Command Catalog all match the dashboard panel name. The setting keys (`saropaLints.projectVibrancy.*`) and the underlying CLI executable (`saropa_lints:project_vibrancy`) are unchanged so existing `settings.json` files keep working. The old name still appears once in the LCOV-path setting description as a migration breadcrumb so users searching for "Project Vibrancy" still find it. No action required.
+- Moved the **Open Code Health Dashboard** and **Open Code Health Settings** entries in the Command Catalog from the **Package Vibrancy** category to a new **Code Health** category — Code Health scores your own source, Package Vibrancy scores your dependencies, and they should not appear under the same heading.
+- Removed two factually wrong claims from the README's Code Health section: the dashboard is an editor tab (not a sidebar webview, which was removed in v13.0.0), and the **Refresh Project Vibrancy Sidebar** command no longer exists. The section now describes the editor-tab dashboard, the KPI-card filters, and the actual ways to launch a scan.
 
 ---
 

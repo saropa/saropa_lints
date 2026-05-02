@@ -25,7 +25,6 @@ import { ProblemSeverity, ProblemType } from '../problems/problem-types';
  * dependency graph summary, insights, budgets, and [ProblemRegistry] entries into [TreeNode] items.
  * Handles filter state, prerelease toggles, and lazy detail children for large workspaces.
  */
-/** Builds the Project Vibrancy explorer tree from scan results, overrides, and problem actions. */
 
 type TreeNode =
     | PackageItem | GroupItem | DetailItem | SourceCodeItem

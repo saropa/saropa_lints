@@ -123,10 +123,11 @@ export function runProjectVibrancyScan(
       // Startup failures happen before exit/close when the runtime is missing
       // or non-executable in PATH.
       const details = err?.message?.trim();
-      // User-facing wording matches the "Code Health Dashboard" panel name —
-      // see projectVibrancyReportView.ts. The CLI tool, settings group, and
-      // setting keys are still "project_vibrancy" / "Project Vibrancy" by
-      // design (renaming the keys would break user settings.json files).
+      // User-facing wording matches the "Code Health Dashboard" panel name.
+      // The CLI tool stays `saropa_lints:project_vibrancy` (pubspec executable
+      // name) and the setting keys stay `saropaLints.projectVibrancy.*` so
+      // existing user settings.json entries keep working — neither is shown
+      // to the user.
       void vscode.window.showErrorMessage(
         details && details.length > 0
           ? `Code Health scan failed to start (${command}): ${details}`
@@ -161,12 +162,8 @@ export function runProjectVibrancyScan(
         if (payload.gates?.pass === false) {
           // Gate failures still return a valid payload; warn instead of error
           // so users can inspect violations without re-running.
-          // "Project Vibrancy settings" is preserved here because that is
-          // the literal title of the settings group in package.json — telling
-          // users to open something with a different name than what they'd
-          // search for in Settings would be a worse inconsistency.
           void vscode.window.showWarningMessage(
-            'Code Health: configured quality gates failed. Open Project Vibrancy settings or copy JSON to inspect gates.violations.',
+            'Code Health: configured quality gates failed. Open Code Health settings or copy JSON to inspect gates.violations.',
           );
         }
         resolve({ payload, rawStdout: raw, exitCode });

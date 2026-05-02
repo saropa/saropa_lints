@@ -49,12 +49,10 @@ async function runScanAndRender(projectRoot: string): Promise<void> {
   const scan = await vscode.window.withProgress(
     {
       location: vscode.ProgressLocation.Notification,
-      // Toast wording mirrors the on-screen dashboard name ("Saropa Code
-      // Health Dashboard") so users don't see a "Project Vibrancy" toast
-      // while looking at a "Code Health" panel. The underlying scoring
-      // concept and the settings group are still named "Project Vibrancy"
-      // (see package.json's configuration section + setting keys), but the
-      // user-facing surface for the dashboard scan is Code Health.
+      // User-facing wording is "Code Health" everywhere. The underlying
+      // scoring CLI is still `saropa_lints:project_vibrancy` and the setting
+      // key prefix is still `saropaLints.projectVibrancy.*` — both kept for
+      // pubspec/settings.json compatibility, neither is user-visible.
       title: 'Code Health: scanning functions...',
       // Cancellable so a runaway scan can be killed from the notification
       // instead of waiting for the dart process to finish on its own.
@@ -252,8 +250,8 @@ function buildGateBanner(payload: ProjectVibrancyPayload): string {
   const violations = payload.gates?.violations ?? [];
   const summary =
     violations.length === 0
-      ? 'Open Project Vibrancy settings to inspect thresholds.'
-      : `${violations.length} gate${violations.length === 1 ? '' : 's'} failing — open Project Vibrancy settings to adjust thresholds, or copy the JSON to inspect <code>gates.violations</code>.`;
+      ? 'Open Code Health settings to inspect thresholds.'
+      : `${violations.length} gate${violations.length === 1 ? '' : 's'} failing — open Code Health settings to adjust thresholds, or copy the JSON to inspect <code>gates.violations</code>.`;
   return `<div class="gate-warn" role="alert"><span class="glyph">⚠</span><span>${summary}</span></div>`;
 }
 
@@ -332,11 +330,11 @@ function buildToolbar(): string {
   <div class="toolbar-row spread">
     <div class="toolbar-row" style="gap:6px;">
       <button class="btn tier-1" id="rescan" type="button"
-        title="Re-run the project vibrancy scan and refresh this dashboard.">Rescan</button>
+        title="Re-run the Code Health scan and refresh this dashboard.">Rescan</button>
       <button class="btn" id="copyJson" type="button"
-        title="Copy the raw project vibrancy JSON to the clipboard.">Copy JSON</button>
+        title="Copy the raw Code Health JSON to the clipboard.">Copy JSON</button>
       <button class="btn" id="openPvSettings" type="button"
-        title="Open the Project Vibrancy settings.">Project Vibrancy settings</button>
+        title="Open the Code Health settings.">Code Health settings</button>
     </div>
     <label class="field" title="Filter rows by name, file, or flag.">
       <span class="glyph">🔎</span>

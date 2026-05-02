@@ -145,7 +145,7 @@
       },
       {
         "command": "saropaLints.openProjectVibrancySettings",
-        "title": "Saropa Lints: Open Project Vibrancy Settings",
+        "title": "Saropa Lints: Open Code Health Settings",
         "icon": "$(settings-gear)"
       },
       {
@@ -1108,12 +1108,12 @@
         }
       },
       {
-        "title": "Project Vibrancy",
+        "title": "Code Health",
         "properties": {
           "saropaLints.projectVibrancy.lcovPath": {
             "type": "string",
             "default": "coverage/lcov.info",
-            "markdownDescription": "LCOV file path for **Project Vibrancy** scans from the sidebar and full report (relative to the project root, or absolute). Same as CLI `--lcov` — configure here so you never rely on CLI-only runs."
+            "markdownDescription": "LCOV file path for **Code Health** scans from the dashboard (relative to the project root, or absolute). Same as CLI `--lcov` — configure here so you never rely on CLI-only runs. Setting key kept as `projectVibrancy.*` so existing user settings keep working after the dashboard was renamed from Project Vibrancy."
           },
           "saropaLints.projectVibrancy.minGrade": {
             "type": "string",
