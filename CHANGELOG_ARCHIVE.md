@@ -2,7 +2,121 @@
 
 <!-- cspell:disable -->
 
-Archived releases 0.1.0 through 12.4.0. See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md) for the latest versions.
+Archived releases 0.1.0 through 12.5.1. See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md) for the latest versions.
+
+---
+
+## [12.5.1]
+
+This release cleans up disposal and accessibility false positives that were noisy in mature widget codebases and design-system wrapper layers. The fixes improve confidence that warnings point to real leaks or UX issues instead of valid cleanup and companion-indicator patterns. If these lints were previously too chatty in your project, this update should be noticeably calmer. [log](https://github.com/saropa/saropa_lints/blob/v12.5.1/CHANGELOG.md)
+
+### Fixed
+
+- **`require_change_notifier_dispose` false positive**: The rule no longer flags owned notifier fields when disposal runs on a local initialized from the field (for example capturing a nullable controller before `dispose()`). No action required.
+- `require_scroll_controller_dispose` and `require_focus_node_dispose` now treat disposal through a local copy of the field, disposal only in `didUpdateWidget`, and disposal inside private helpers called from `dispose` or `didUpdateWidget` as valid cleanup, so the common nullable-controller pattern no longer reports a leak when the controller is actually released. No action required.
+- `avoid_color_only_meaning` now treats `Checkbox`/`Switch`/`Radio` (including `*ListTile` variants) as companion state indicators, so selection rows with conditional background color are not incorrectly reported as color-only meaning. No action required.
+- `avoid_color_only_meaning` now recognizes common design-system widget names built as a short prefix plus a known companion type (for example thin `Icon`/`Text` wrappers), so conditional surface color next to an icon swap or label in those widgets is not treated as color-only meaning when the remainder matches a real companion. No action required.
+
+<details>
+<summary>Maintenance</summary>
+
+- Archived the closed `avoid_color_only_meaning` design-system wrapper companion false-positive report under `plan/history/2026.04/2026.04.25/` and removed it from `bugs/`. No action required for package users.
+- The publish script’s combined coverage report now treats `repo_integrity` rules as using the shared `config` example fixtures, matching where those files already live. Additional validated example fixtures cover stylistic null-and-collection rules, stylistic whitespace and constructor preferences, and `prefer_semantics_sort`, with matching mock types for analysis. No action required for package users.
+
+</details>
+
+---
+
+## [12.5.0]
+
+New rules help you catch missing Android permissions, missing iOS privacy strings, desktop window setup, and gaps around background audio and location, notifications, Firestore rules, and secrets on disk before they bite at review or runtime. A couple of noisy false positives in internationalization and iOS camera permission checks are gone, and the cross-file CLI can warn when library code has no matching test file. [log](https://github.com/saropa/saropa_lints/blob/v12.5.0/CHANGELOG.md)
+
+### Fixed
+
+- `avoid_builder_index_out_of_bounds` now treats `idx`, `realIndex`, and `itemIndex` inside bracket lookups like the existing `index`/`i` handling, so Carousel-style and similar builder callbacks get the same bounds heuristics. No action required unless you relied on the blind spot; add guards where the rule now applies.
+- The same rule’s DartDoc now states that each list subscripted with the builder index needs its own visible bound or matching item count when lengths are not provable from the source. No action required.
+- `require_intl_plural_rules` no longer treats code between string literals (for example `(hour == …)` next to AM/PM labels) as if it were text inside a quoted string, so 12-hour clock helpers are not mistaken for manual noun pluralization. No action required.
+- `require_image_picker_permission_ios` now reads `ios/Runner/Info.plist` through the shared plist checker so it does not warn when `NSCameraUsageDescription` is already present. No action required.
+
+### Added
+
+- Added `require_android_manifest_entries` to flag permission-gated Android API usage when the app manifest is missing required `android.permission.*` entries, so runtime-denied features are caught during analysis instead of on devices. Add the missing `<uses-permission>` rows in `android/app/src/main/AndroidManifest.xml` where reported.
+- Added `require_ios_info_plist_entries` to report permission-gated iOS API usage when required `NS*UsageDescription` keys are absent from `Info.plist`, so App Store rejection and runtime permission crashes are caught during analysis. Add the missing key(s) to `ios/Runner/Info.plist` where reported.
+- Added `require_desktop_window_setup` to report desktop window-manager API usage when desktop runner setup files are missing, so desktop-only configuration gaps are surfaced before runtime. Ensure the relevant `windows/`, `linux/`, or `macos/` runner files are present when using desktop window APIs.
+- Added `avoid_audio_in_background_without_config` to flag background audio usage when iOS `UIBackgroundModes` audio or Android manifest foreground-service / audio declarations are missing, so store review and runtime failures are caught during analysis.
+- Added `avoid_geolocator_background_without_config` to flag `Geolocator.getPositionStream` when iOS background location or Android background location permission is not reflected in platform config files.
+- Added `require_notification_icon_kept` to warn when FCM or local notifications are used but ProGuard/R8 rules do not appear to keep notification icon resources.
+- Added `require_firestore_security_rules` to report `FirebaseFirestore` usage when no `firestore.rules` file exists at the project root.
+- Added `require_env_file_gitignore` to report `.env` / `.env.*` files at the project root that are not covered by `.gitignore` patterns.
+- Extended `dart run saropa_lints:cross_file` with **missing mirror test** detection: each `lib/**/*.dart` (except `main.dart`, generated-style names, and `lib/generated/`) is checked for a matching `test/**/*_test.dart`; results appear in text/JSON output, HTML report, baselines (format version 2), and non-zero exit when present.
+
+<details>
+<summary>Maintenance</summary>
+
+- Archived closed `avoid_builder_index_out_of_bounds` false-positive investigation under `plan/history/2026.04/2026.04.25/` (removed duplicate from `bugs/`). No action required for package users.
+- Closed false-positive report for `require_image_picker_permission_ios` (existing `NSCameraUsageDescription`) under `plan/history/2026.04/2026.04.25/`. No action required for package users.
+
+</details>
+
+---
+
+## [12.4.4]
+
+`require_animation_controller_dispose` stops nagging when you really did tear down an `AnimationController` using a disposeSafe-style helper next to `dispose`, and the help text you read in the editor now matches what the linter reports. Rule counts and Marketplace-facing copy line up across the package and extension, publish and audit flows are a little sturdier, and you do not need new analysis_options toggles to pick any of this up. [log](https://github.com/saropa/saropa_lints/blob/v12.4.4/CHANGELOG.md)
+
+### Fixed
+
+- `require_animation_controller_dispose` now treats `disposeSafe(…)` like `dispose(…)` in your `State.dispose()` so custom safe-dispose extensions are not reported, and the rule message was refreshed so on-screen wording stays aligned with that behavior. No action required; remove suppression comments you added only for this false positive.
+
+<details>
+<summary>Maintenance</summary>
+
+- Deferred SDK plan notes consolidated under `plan/deferred/`; publish audit spelling prompt now retry/ignore; publish menu shows logo first; Windows temp-dir teardown hardened in one integration test. No action required for package users.
+- Rounded rule-count messaging is aligned to **2100+** / **~2100** everywhere (pub.dev description, extension listings, walkthrough, tier headers, and guides) so numbers match the current rule set. No action required.
+- Extension publish still tries Open VSX after a failed VS Code Marketplace upload, so the Open VSX listing can move forward when Marketplace auth fails but your Open VSX token is fine. No action required for package users.
+- Publish work-report “unsolved bug” count excludes the bug-filing guide at repo root so only real open bug files inflate that bar. No action required for package users.
+- Clarified internal helper documentation for `isFieldCleanedUp` so extension method names are not implied by a generic `dispose` check. No action required for package users.
+- Dropped placeholder-only example rule fixtures and matching fixture-existence test entries so the suite does not imply behavioral coverage for unfilled TODO stubs. No action required for package users.
+- Follow-up removed additional stylistic and related stub fixtures, added migration and SDK-migration batch fixtures with shared mocks, and expanded unit tests for compile-time syntax and image filter tier metadata. No action required for package users.
+- Internal doc comment reference style, plan notes, extension copy, script helpers, and archive indexing were updated. No action required for package users.
+
+</details>
+
+---
+
+## [12.4.2]
+
+`saropa_depend_on_referenced_packages` is removed because the Dart SDK already ships the same check via `lints` / `flutter_lints`, and saropa’s copy kept false-positiveing on legitimate imports. You still get the behavior from the SDK; nothing breaks if you leave old config in place. [log](https://github.com/saropa/saropa_lints/blob/v12.4.2/CHANGELOG.md)
+
+### Removed
+
+- Removed `saropa_depend_on_referenced_packages` so duplicate / noisy import checks go away while the SDK lint keeps the same coverage for you. No action required; delete any `saropa_depend_on_referenced_packages` entry from `analysis_options.yaml` when you tidy config.
+
+<details><summary>Maintenance</summary>
+
+- Publish script: extension-only and publish-existing-.vsix modes now run the same Marketplace + Open VSX verification as the full flow so a “successful” store publish cannot slip through undetected. No action required for package or rule users.
+
+</details>
+
+---
+
+## [12.4.1]
+
+Analysis reports and the Run Analysis popup now show which saropa_lints build ran, and the popup can copy or open the latest consolidated report without digging through folders. Theme- and platform-driven color branches no longer trip `avoid_color_only_meaning`, and `prefer_final_locals` stops suggesting `final` where the variable is reassigned inside nested blocks or closures. [log](https://github.com/saropa/saropa_lints/blob/v12.4.1/CHANGELOG.md)
+
+### Added
+
+- Run Analysis popup adds Copy Report and Open Report (plus palette commands) so you can share or open the latest `*_saropa_lint_report.log` in one step instead of browsing dated folders under `reports/`. No action required.
+
+### Changed
+
+- Extension Run Analysis stamps extension reports and the issue popup with the resolved saropa_lints version and source (hosted / path / git) when `pubspec.lock` allows, so you can confirm which build ran without opening files. No action required.
+
+### Fixed
+
+- `prefer_final_locals` no longer false-positives when a local is reassigned inside nested blocks, control flow, or closures, so the quick fix matches real code and you can rely on the rule again. No action required; details in [bugs/prefer_final_locals_false_positive_nested_assignments.md](bugs/prefer_final_locals_false_positive_nested_assignments.md).
+- `avoid_color_only_meaning` skips ordinary theme, platform, and directionality-driven color branches so theming code stays clean without ignores. No action required; details in [bugs/avoid_color_only_meaning_false_positive_theme_dark_mode_conditional.md](bugs/avoid_color_only_meaning_false_positive_theme_dark_mode_conditional.md).
+- Analyzer-plugin text reports now show a real `Version:` from your project root instead of `unknown`, so each report identifies the plugin build that produced it. No action required.
 
 ---
 
