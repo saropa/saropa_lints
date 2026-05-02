@@ -97,9 +97,15 @@ export function getChartStyles(): string {
             overflow: hidden;
         }
         .bar-fill {
+            /* Static width must be on the element itself — relying solely on
+               var(--bar-pct) inside @keyframes (with animation-fill-mode:
+               forwards) leaves bars at 100% of the track when var() in
+               keyframes fails to resolve, which manifests as all bars looking
+               identical regardless of percentage. */
             height: 100%;
+            width: var(--bar-pct);
             border-radius: 3px;
-            animation: bar-grow 0.6s ease-out forwards;
+            animation: bar-grow 0.6s ease-out;
         }
         .bar-value {
             width: 110px;

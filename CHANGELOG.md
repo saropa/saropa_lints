@@ -45,6 +45,14 @@
 
 ---
 
+## [Unreleased]
+
+### Fixed (Extension)
+
+- The **Size Distribution** chart in the Package Vibrancy report now draws each bar at a length proportional to its percentage — previously every bar rendered at the full track width regardless of the package's share, making the visualization unreadable. No action required — reopen the report after updating.
+
+---
+
 ## [13.0.2]
 
 The Top Rules table in the Findings Dashboard now lets you choose between hiding a noisy rule just for yourself or disabling it across the whole project — two buttons per row, side by side, so the commitment is obvious before you click. Hide stays personal and reversible; Disable writes the rule into your project config and re-runs analysis on the spot. [log](https://github.com/saropa/saropa_lints/blob/v13.0.2/CHANGELOG.md)
