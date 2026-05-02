@@ -39,12 +39,23 @@ function renderRows(snapshot: TelemetryStore): string {
     'suggestions.relatedRuleOpen',
   ];
 
+  // §7.1 / §8.3 — count column is right-aligned and nowrap so wide integers
+  // do not wrap mid-number on narrow panes; the .num class hooks the CSS.
   return events
     .map((event) => {
       const value = snapshot.counters[event] ?? 0;
-      return `<tr><td><code>${escapeHtml(event)}</code></td><td>${value}</td></tr>`;
+      return `<tr><td><code>${escapeHtml(event)}</code></td><td class="num">${value}</td></tr>`;
     })
     .join('');
+}
+
+/**
+ * Compose the Related Rule Telemetry HTML. Exported so unit tests can assert
+ * the rendered structure (numeric column alignment, button tier hierarchy,
+ * disabled-Reset state, empty-state CTA) without standing up a real webview.
+ */
+export function buildRelatedRuleTelemetryHtml(snapshot: TelemetryStore): string {
+  return buildHtml(snapshot);
 }
 
 /** Full HTML document with CSP allowing inline script for webview message bridge. */
@@ -74,6 +85,17 @@ function buildHtml(snapshot: TelemetryStore): string {
     title: 'Related Rule Telemetry',
     statusLineHtml,
   });
+
+  // §8.10 — *Reset* targets an empty set when no events have fired; render
+  // it disabled with a tooltip explaining why instead of letting the click
+  // fire silently. *Refresh* drops its tier-1 styling: on a counter table
+  // no action dominates strongly enough to deserve primary emphasis, so
+  // every action is a tier-2 .btn and tier-1 stays unused (§8.10's
+  // "one emphasized button per region" — zero is also valid).
+  const resetDisabled = totalEvents === 0;
+  const resetAttrs = resetDisabled
+    ? ' disabled aria-disabled="true" title="No counters to reset."'
+    : ' title="Reset all counters"';
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -107,6 +129,15 @@ function buildHtml(snapshot: TelemetryStore): string {
       letter-spacing: 0.3px;
       color: var(--muted);
     }
+    /* §7.1 / §8.3 — numeric columns right-align with nowrap so wide
+       integers (1.2M, 12.3k) stay readable in narrow panes. */
+    table.tel-table th:last-child,
+    table.tel-table td.num {
+      text-align: right;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+      width: 96px;
+    }
     pre.tel-pre {
       background: var(--surface-2);
       border: 1px solid var(--border);
@@ -115,31 +146,60 @@ function buildHtml(snapshot: TelemetryStore): string {
       padding: 10px 12px;
       overflow: auto;
     }
+    /* §8.16 — empty-state pattern: dashed border + centered CTA so the
+       block is clearly an actionable empty state, not absent content. */
+    .empty-cta {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      padding: 24px 16px;
+      margin: 0 0 12px;
+      border: 1px dashed var(--border);
+      border-radius: 6px;
+      background: var(--surface-2);
+    }
+    .empty-cta .empty-msg {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.95em;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
   ${heroHtml}
   <section class="toolbar-band" aria-label="Telemetry actions">
     <div class="toolbar-row">
-      <button type="button" class="btn tier-1" id="refresh" title="Reload telemetry counters from disk">
+      <button type="button" class="btn" id="refresh" title="Reload telemetry counters from disk">
         <span class="glyph">⟳</span>Refresh
       </button>
       <button type="button" class="btn" id="copy" title="Copy snapshot as JSON">
         <span class="glyph">⎘</span>Copy JSON
       </button>
-      <button type="button" class="btn danger" id="reset" title="Reset all counters">
+      <button type="button" class="btn danger" id="reset"${resetAttrs}>
         <span class="glyph">⊘</span>Reset counters
       </button>
     </div>
   </section>
   <section class="section" aria-label="Counters">
     <h2>Event counters</h2>
-    <table class="tel-table">
+    ${totalEvents === 0
+      ? `<!-- §8.16 — empty-state CTA replaces the blank counter table when
+              no events have fired. The Findings Dashboard is the natural
+              place users open rules from, which is what generates the
+              ruleExplain.* counters tracked here. -->
+         <div class="empty-cta" role="status">
+           <p class="empty-msg">No telemetry events recorded yet — open a rule from the Findings Dashboard to start capturing counters.</p>
+           <button type="button" class="btn tier-1" id="openFindings"
+             title="Open the Saropa Findings Dashboard.">Open Findings Dashboard</button>
+         </div>`
+      : `<table class="tel-table">
       <thead><tr><th>Event</th><th>Count</th></tr></thead>
       <tbody>
         ${renderRows(snapshot)}
       </tbody>
-    </table>
+    </table>`}
   </section>
   <section class="section" aria-label="Last event properties">
     <h2>Last event properties</h2>
@@ -154,9 +214,23 @@ function buildHtml(snapshot: TelemetryStore): string {
       document.getElementById('copy').addEventListener('click', () => {
         vscode.postMessage({ type: 'copy' });
       });
-      document.getElementById('reset').addEventListener('click', () => {
-        vscode.postMessage({ type: 'reset' });
-      });
+      // §8.10 — Reset is rendered disabled when totalEvents === 0; the
+      // listener must guard against the disabled click slipping through
+      // (some hosts dispatch click on disabled buttons via keyboard).
+      const resetBtn = document.getElementById('reset');
+      if (resetBtn) {
+        resetBtn.addEventListener('click', () => {
+          if (resetBtn.hasAttribute('disabled')) return;
+          vscode.postMessage({ type: 'reset' });
+        });
+      }
+      // §8.16 — Empty-state CTA. Only rendered when totalEvents === 0.
+      const openFindings = document.getElementById('openFindings');
+      if (openFindings) {
+        openFindings.addEventListener('click', () => {
+          vscode.postMessage({ type: 'openFindingsDashboard' });
+        });
+      }
       ${getFullWidthToggleScript()}
     })();
   </script>
@@ -209,6 +283,14 @@ export function showRelatedRuleTelemetryPanel(
       void vscode.window.showInformationMessage(
         'Saropa Lints: related rule telemetry counters reset.',
       );
+      return;
+    }
+    if (message.type === 'openFindingsDashboard') {
+      // §8.16 — empty-state CTA dispatches the same command the sidebar
+      // *Findings Dashboard* tree node uses; reusing the registered
+      // command keeps a single open path so any future telemetry around
+      // dashboard opens fires consistently regardless of entry point.
+      void vscode.commands.executeCommand('saropaLints.openViolationsWideReport');
     }
   });
 
