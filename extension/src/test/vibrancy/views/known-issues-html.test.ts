@@ -92,4 +92,34 @@ describe('buildKnownIssuesHtml', () => {
         assert.ok(html.includes('data-reason='));
         assert.ok(!html.includes('data-reason="<'));
     });
+
+    /* ────────────────────────────────────────────────────────────────────
+     * §15 audit fixes — pin the new behavior.
+     * ──────────────────────────────────────────────────────────────────── */
+
+    it('renders the active-filter chip strip element so the script can populate it (§8.5 / §14.10)', () => {
+        const html = buildKnownIssuesHtml();
+        assert.ok(html.includes('id="ki-chip-strip"'));
+        assert.ok(html.includes('id="ki-chip-body"'));
+        assert.ok(html.includes('id="ki-clear-all"'));
+    });
+
+    it('renders the empty-state CTA with a tier-1 Reset filters button (§8.16)', () => {
+        const html = buildKnownIssuesHtml();
+        assert.ok(html.includes('id="ki-empty"'));
+        assert.ok(html.includes('id="ki-reset-filters"'));
+        assert.ok(html.includes('class="btn tier-1"'));
+        assert.ok(html.includes('Reset filters'));
+        // Hidden by default — only revealed by the script when visible === 0.
+        assert.ok(html.match(/<div id="ki-empty"[^>]*hidden/));
+    });
+
+    it('script has a syncActiveKpiCard function so cards reflect filter state (§4.2 / §14.8)', () => {
+        // The script is embedded in the HTML; assert the function name appears so
+        // the active-state sync is wired (and therefore .kpi-card.active is
+        // toggled at runtime).
+        const html = buildKnownIssuesHtml();
+        assert.ok(html.includes('syncActiveKpiCard'));
+        assert.ok(html.includes("classList.add('active')"));
+    });
 });

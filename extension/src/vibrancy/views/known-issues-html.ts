@@ -41,10 +41,40 @@ export function buildKnownIssuesHtml(): string {
     ${heroHtml}
     ${buildSummaryCards(issues.length, withReplacement)}
     ${buildToolbar()}
+    ${buildChipStrip()}
     ${buildTable(issues)}
+    ${buildEmptyState()}
     <script nonce="${nonce}">${getKnownIssuesScript()}</script>
 </body>
 </html>`;
+}
+
+/**
+ * §8.5 / §14.10 — Active filter chip strip. Hidden by default; the script
+ * reveals it and populates chips when filter state diverges from defaults
+ * (both replacement buckets pressed). Each chip has a remove [×]; the
+ * *Clear all* control resets the filter state.
+ */
+function buildChipStrip(): string {
+    return `<div class="chip-strip" id="ki-chip-strip" hidden>
+        <span class="lbl">Active filters:</span>
+        <span id="ki-chip-body"></span>
+        <button type="button" class="clear-all" id="ki-clear-all">Clear all</button>
+    </div>`;
+}
+
+/**
+ * §8.16 / §14.2 — Empty-state CTA shown when search/filter narrows the
+ * table to zero rows. Carries a tier-1 *Reset filters* button so the user
+ * is not stranded looking at an empty table with no cue for the next
+ * action. Hidden by default; the script toggles visibility.
+ */
+function buildEmptyState(): string {
+    return `<div id="ki-empty" class="empty-cta" role="status" hidden>
+        <p class="empty-msg">No packages match the current filters.</p>
+        <button type="button" class="btn tier-1" id="ki-reset-filters"
+            title="Clear the search and filter selection.">Reset filters</button>
+    </div>`;
 }
 
 function buildSummaryCards(total: number, withReplacement: number): string {
@@ -209,6 +239,25 @@ function getExtraStyles(): string {
         .filter-label {
             font-size: 0.9em; cursor: pointer;
             display: flex; align-items: center; gap: 4px;
+        }
+        /* §8.16 — empty-state banner shown when search/filter narrows the
+           table to zero rows. Centered card with a tier-1 CTA so the
+           user has an actionable next step. */
+        .empty-cta {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            padding: 24px 16px;
+            margin: 12px 0;
+            border: 1px dashed var(--border, var(--vscode-widget-border));
+            border-radius: 6px;
+            background: var(--surface-2, var(--vscode-editorWidget-background));
+        }
+        .empty-cta .empty-msg {
+            margin: 0;
+            color: var(--muted, var(--vscode-descriptionForeground));
+            font-size: 0.95em;
         }
     `;
 }
