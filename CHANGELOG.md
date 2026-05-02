@@ -45,6 +45,16 @@
 
 ---
 
+## [Unreleased]
+
+<details><summary>Maintenance</summary>
+
+- Phase 1 of UX-guidelines compliance work landed shared chrome primitives in `dashboardChromeStyles.ts` (`.empty-cta`, `.error-banner`, `.error-fallback`, `.partial-banner`, `.sr-only`, `.skip-link`, `#announcer`, `@media print` block, chrome-level `prefers-reduced-motion` overrides) so per-surface stylesheets stop shipping their own copies. Added shared helper modules `webview-format.ts` (`pluralize`, `formatNumber`, `formatCompact`, `formatPercent`, relative + absolute timestamp formatters) and `webview-strings.ts` (centralized user-facing string table for future i18n). Added `keyboard-shortcuts.ts` builder pair for the `?`-key shortcuts overlay. Added structural-snapshot harness under `extension/src/test/views/snapshots/` plus a token-coverage-matrix generator script under `extension/scripts/`. Internal foundations only — no user-facing change in this slice; Phase 2 / 3 sweeps consume the new primitives.
+
+</details>
+
+---
+
 ## [13.1.0]
 
 This release polishes the VS Code extension's editor-tab dashboards and side panels so they read as one consistent product instead of a stack of one-off pages. KPI strips collapse cleanly when there is nothing to report, empty states offer a real next-action button instead of staring back blank, secondary buttons step out of overflow menus so the primary action stays obvious, and the Rule Explain, Command Catalog, Related Rule Telemetry, Single-package detail, Package Comparison, and Known Issues panels pick up the same inset-card chrome already used on the main dashboards. Two long-standing rendering bugs are also fixed: the Package Vibrancy size-distribution bars now scale to their actual share, and the Command Catalog jump-to-section highlight reliably appears in webview environments where it previously did nothing. [log](https://github.com/saropa/saropa_lints/blob/v13.1.0/CHANGELOG.md)

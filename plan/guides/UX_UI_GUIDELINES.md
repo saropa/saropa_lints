@@ -1,12 +1,53 @@
 # UX / UI guidelines — editor-area data dashboards
 
+> **Last reviewed:** 2026-05-02
+> **Owner:** Most recent contributor to `extension/src/vibrancy/views/report-*.ts` (the gold-standard Package Dashboard).
+> **Open issues / proposals:** Discussion thread in the project tracker; tag with `ux-guidelines`.
+
 This document describes the **gold-standard** interaction and visual language used by the full-width **package dependency dashboard** webview (editor tab): rich tables, summary metrics, charts, and deep drill-down. Wording is **generic** so the same patterns can be reused for other dashboards, reports, and embedded HTML surfaces inside a desktop IDE or similar host.
+
+**Vocabulary:** [Section 0](#0-vocabulary) carries the canonical definitions for tier-1, preset filter, segmented control, inset card, chip strip, and the rest of the recurring terms in this document. Read it once before §1.
 
 **Code map:** [Section 13](#13-implementation-map-package-dashboard) lists the Saropa extension files that implement this dashboard so maintainers can jump from guideline to implementation.
 
 **UI catalog:** [Section 8](#8-affordance-catalog) spells out titles, links, counts, sorting, filtering, tooltips, icons, expanders, sections, buttons, and related patterns in one place.
 
+**Coverage requirements:** [Section 15](#15-accessibility-a11y) (a11y), [Section 16](#16-performance-budgets) (perf), [Section 17](#17-state-persistence-and-session-memory) (state), [Section 19](#19-theme-verification-process) (theme verification) apply to **every** new dashboard — there is no opt-out.
+
 <!-- cspell:disable -->
+
+## Changelog
+
+- **2026-05-02** — §0 Vocabulary, §15 Accessibility, §16 Performance budgets, §17 State persistence and session memory, §18 Internationalization / pluralization / formatting, §19 Theme verification process, §20 CSS architecture conventions, §21 Webview ↔ host messaging contract, §22 Print / export / onboarding, §23 RTL support, §24 Document governance. §5 motion enriched with easing-curves library and reduced-motion implementation pattern; §7 grew §7.3 multi-select, §7.4 multi-column sort, §7.5 virtualization, §7.6 column resize/reorder; §8.5 grew §8.5.1 debounce/throttle table and §8.5.2 search behavior; §8.16 split into eight subsections (empty / loading / partial / error / offline / stale / retry-backoff / error-boundary). §14 anti-pattern catalog grew with §14.16 hex fallbacks mask theme-token gaps, §14.17 doubled freshness indicators, §14.18 action-emphasis tint bleeding into content tiles.
+- **2026-04-XX** — Initial publication of §1–§14 with the gold-standard Package Dashboard as the reference implementation.
+
+---
+
+## 0. Vocabulary
+
+Canonical definitions for the terms this document uses. If a future contributor coins a synonym, replace it with the term below — every other section relies on these names. Plain language, one row per term, with a canonical example so the definition is unambiguous.
+
+| Term | Definition | Canonical example |
+|------|------------|-------------------|
+| **Tier-1 / primary action** | The single emphasized action per region — at most one per toolbar, banner, or empty state. Uses the host primary-button background. | *Run analysis* in the Findings toolbar. |
+| **Tier-2 / secondary action** | Always-visible companion actions tied to the current data. Multiple allowed (≤4). Uses host secondary-button tokens. | *Refresh*, *Copy JSON*, *Save report*. |
+| **Tier-3 / overflow action** | Lower-emphasis actions hidden behind a *More actions ▾* trigger. No visible-row cap because they are collapsed by default. | Palette-style command shortcuts in the More menu. |
+| **Preset filter** | A clickable summary card or chip that applies a saved filter combination on click. Active state shows a focus-ring + active-selection background ([§8.5](#85-filtering)). | KPI card *Errors* setting `severity = error`. |
+| **Segmented control** | A row of mutually-related buttons inside a single bordered band (`.seg`) that read as one control. Used for multi-select inclusion (severity), radio (footprint mode), or additive (*Show enabled*). Visual model: [§14.15](#1415-toggle-visual-model-inverted-by-default). | The severity / impact filter row in the Findings Dashboard. |
+| **Multi-select toggle** | A segmented control where any subset of options can be active. Default state is *all on*; the news is what the user *excluded*. | Severity filter (Errors / Warnings / Info). |
+| **Radio toggle** | A segmented control where exactly one option is active at a time. Active option shows the inactive-selection backdrop tint, never primary-button colors. | Footprint mode (own / unique / total). |
+| **Additive filter** | A toggle row where *no* button pressed = no constraint; pressing one adds a filter. Default state shows zero pressed. | *Show detected*, *Show enabled*. |
+| **Inset card** | A rounded surface with a secondary background tone, sitting visually inside another section. Used for detail rows, sub-sections in single-rule panels, and multi-panel grids ([§7.2](#72-detail-row-expander)). | The expander row body in the package table. |
+| **Chip strip** | A bordered row of removable filter chips that appears whenever filter state diverges from defaults ([§8.5](#85-filtering)). Each chip carries the constraint name + value + `[×]`; trailing *Clear all* link. | The active-filter band that appears below the toolbar when the user types a search. |
+| **KPI card** | A summary card with a hero number, short label, and optional sublabel; doubles as a preset filter when interactive ([§4.2](#42-summary-cards), [§14.8](#148-inert-kpi-cards)). | The five Severity / Impact cards above the Findings table. |
+| **Status line** | A muted one-line strip under the page `<h1>` carrying freshness + the highest-signal facts ([§4.1](#41-header-region), [§14.9](#149-status-line-absence)). | *Last run 2m ago · 0 violations · 4 TODOs · Drift offline*. |
+| **Hero band** | The header region: title, optional version stamp, status line, and (when present) a focal visual like a radial gauge or logo. Always rounded with a stronger accent than the body. | The top band of the Findings or Code Health dashboard. |
+| **Toolbar band** | A bordered, rounded strip behind search + buttons + selectors so the controls read as one unit ([§4.3](#43-toolbar)). Multiple flat rows of controls bleeding into the page do not count. | The sticky band above the findings table. |
+| **Expander / disclosure** | A row or section that toggles a hidden child. Implemented as either a table row + sibling detail row, or a native `<details><summary>` ([§4.5](#45-collapsible-sections), [§8.8](#88-expanders-rows-and-disclosures)). | Per-row file-usage detail in the package table. |
+| **Popover** | A fixed-position overlay anchored to a trigger, with high z-index, scrollable body, and dismissal on outside-click or Escape ([§8.12](#812-popovers-and-overlays)). | The "shared dependencies" list expanded from a count cell. |
+| **Focus ring** | Outline applied via `var(--vscode-focusBorder)` with `outline-offset` so it sits inside the row bounds and does not clip. Distinct from hover-state hue shift. | Keyboard focus on a sortable header. |
+| **Swatch** | A small colored square paired with a label inside a multi-select toggle to encode severity / impact / category in addition to text ([§14.15](#1415-toggle-visual-model-inverted-by-default)). | The red square next to *Errors* in the severity filter. |
+| **Affordance** | A visual cue that something is interactive — pointer cursor, link color, focus ring, hover background, button shape. The contract: *if it looks interactive, it must behave interactively* ([§14.1](#141-bait-and-switch-interactives-rows-chips-badges-cards)). | The chevron rotation on an expanded row. |
 
 ---
 
@@ -124,6 +165,52 @@ Always pair chart color with **non-color cues** (labels, order, legend, tooltips
 
 **Principles:** Motion explains **state change** or **orientation** (what opened, what is selected), not decoration. Respect **reduced motion** preferences if the host exposes them (degrade to instant or near-instant updates).
 
+### 5.1 Easing curves library
+
+Pick from this small set; do not invent new curves per surface. Consistency across dashboards lets users predict how long a transition will take, which makes the surface feel responsive instead of laggy.
+
+| Token | `cubic-bezier()` | When to use |
+|-------|------------------|-------------|
+| `ease-out-default` | `cubic-bezier(0.0, 0.0, 0.2, 1)` | Element entering view (gauge fill, bar grow, expander opening). Decelerates into rest position. |
+| `ease-in-default` | `cubic-bezier(0.4, 0.0, 1, 1)` | Element leaving view or being dismissed (rare; prefer instant for dismissal). |
+| `ease-in-out-default` | `cubic-bezier(0.4, 0.0, 0.2, 1)` | Two-state transitions where neither side dominates (segmented toggle press, sort-arrow rotation). |
+| `linear` | `linear` | Mechanical state flips — chevron rotation, opacity dissolve. Avoid for size/position changes. |
+
+**Duration scale** — `0.15s` (micro: opacity fade-in, hover background), `0.2s` (small: chevron rotation, summary card hover), `0.6s` (medium: bar chart grow), `1.2s` (large: hero gauge arc fill, animation that explains a calculation). Anything longer than `1.2s` is decoration; cut it.
+
+### 5.2 Reduced-motion implementation pattern
+
+Wrap every animation that exceeds `0.2s` in a `prefers-reduced-motion` media query. Do not assume the cascade alone is enough — JavaScript-driven animations bypass CSS, so guard those with `matchMedia`:
+
+```css
+@keyframes hero-gauge-fill {
+  from { stroke-dasharray: 0 100; }
+  to   { stroke-dasharray: var(--gauge-target) 100; }
+}
+.hero-gauge .gauge-fill {
+  animation: hero-gauge-fill 1.2s cubic-bezier(0.0, 0.0, 0.2, 1) forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-gauge .gauge-fill {
+    animation: none;
+    stroke-dasharray: var(--gauge-target) 100;
+  }
+}
+```
+
+```js
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function applyChartGrow(el, target) {
+  if (prefersReducedMotion) {
+    el.style.width = `${target}%`;
+    return;
+  }
+  el.animate([{ width: '0%' }, { width: `${target}%` }], { duration: 600, easing: 'cubic-bezier(0.0, 0.0, 0.2, 1)', fill: 'forwards' });
+}
+```
+
+The contract: when reduced-motion is on, the animation's *end state* must still apply. Skipping the animation entirely AND leaving the element at its start state is a regression — the user with reduced-motion sees a broken empty bar where animated users see a filled one.
+
 ---
 
 ## 6. Charts and large visuals
@@ -176,6 +263,67 @@ Always pair chart color with **non-color cues** (labels, order, legend, tooltips
 - Full-width **inset card**: multi-column CSS grid of sections.
 - Section titles: small heading, bottom border, slight opacity.
 - **Definition lists** inside sections: label / value grid with muted labels.
+
+### 7.3 Multi-select and bulk actions
+
+When a table grows to the point where a user wants to act on N rows at once (suppress all, copy all, hide all, export selected), introduce row selection — but only when there is a real bulk action. Adding a checkbox column to a read-only table is dead weight.
+
+| Pattern | Guideline |
+|---------|-----------|
+| **Checkbox column** | Leftmost narrow column. Header carries the *select-all-visible* checkbox (intermediate state when partial). Visible-rows-only — never select rows hidden by filter. |
+| **Range select** | `Shift` + click extends from the last clicked row through the current row; respects the visible-row order at the moment of click. |
+| **Toggle select** | `Ctrl` / `Cmd` + click toggles a single row without affecting others. |
+| **Bulk-action toolbar** | Slides in (or replaces the toolbar contents) when selection ≥ 1. Carries the selection count + applicable bulk verbs (e.g. *Suppress 3 rules*, *Copy 12 findings*, *Clear*). |
+| **Selection count display** | `1 selected / 47 in view / 3,200 total` in the toolbar — three numbers because *visible* and *post-filter total* and *grand total* often diverge. Match the disambiguation rule from [§14.11](#1411-identical-twin-kpi-cards). |
+| **Selection survival** | Selection clears on filter change unless the row is still visible after the filter applies. State this contract explicitly so the user is never surprised. |
+| **Keyboard** | `Space` toggles row at focus; `Shift+Space` extends; `Esc` clears selection. |
+| **Empty-state CTA** | Bulk-action toolbars appearing on a 1-row selection still show the count (*1 selected*) — do not hide the toolbar at low counts unless the action is genuinely meaningless under threshold. |
+
+**When NOT to add multi-select.** Single-action tables (one *View* per row) do not need it. If the only bulk action is *Copy as JSON*, *Copy filtered as JSON* in the toolbar already covers the case without per-row selection.
+
+### 7.4 Multi-column sort
+
+Single-column sort is the default. Multi-column sort earns its complexity only when users actually have stable secondary criteria (e.g. *severity desc, then file asc*).
+
+- **Activation**: `Shift` + click on a second sortable header adds it as a tiebreaker. Plain click on any header collapses back to single-column sort by that column.
+- **Indicator**: Numbered badges on each active sort column header (`1`, `2`, `3`) plus the direction arrow. No badges in single-sort mode.
+- **Default direction per column type** — pick once and codify so users do not have to think:
+
+| Column type | Default | Reasoning |
+|-------------|---------|-----------|
+| Numeric (count, score, size) | descending | Largest is usually the most interesting. |
+| Severity / impact / status (enum) | descending by enum order | Critical / Error first, Info / Note last. |
+| Date | descending | Newest first; most projects care about recent. |
+| Text / name | ascending | Alphabetical, predictable. |
+| Boolean | true first | The "yes" bucket is usually the actionable one. |
+
+- **Stable sort fallback**: when two rows tie on every active column, preserve insertion order. Never let the visible order shuffle on each re-render.
+- **Missing values**: `null` / empty string sorts *last* in both directions (defaulting them to "smallest" or "largest" creates surprising clusters when half the data is missing).
+
+### 7.5 Virtualization and pagination
+
+Editor-area tables can render 5,000+ rows on a real project. The `<tbody>` becomes the bottleneck before the data does. Pin thresholds so a future contributor doesn't ship a slow surface.
+
+| Threshold | Strategy |
+|-----------|----------|
+| **≤ 300 rows** | Render every row in the DOM. No virtualization needed; sort/filter is in-memory; the browser's compositor keeps up. |
+| **300 – 2,000 rows** | Render all rows in DOM, but apply `content-visibility: auto` per row (skips off-screen layout/paint cost). Still no virtualization. |
+| **> 2,000 rows** | Virtualize (windowing) — render only ~50 rows around the viewport, recycle DOM nodes on scroll. Carry a fixed-height row contract so the windowing math stays cheap. |
+| **> 10,000 rows** | Add server-side or worker-side filtering before render. The webview shouldn't see all the rows; the host bridge should pre-filter and stream pages. |
+
+**Pagination vs infinite scroll** — prefer infinite scroll (with a fixed-height window) for read-mostly dashboards because it preserves keyboard navigation and `Find in page`. Use pagination only when the dataset has natural page boundaries (e.g. *one page per project version*).
+
+**"Showing N of M" disclosure** — every virtualized or filtered table renders an explicit count strip near the table foot: *Showing 200 of 4,712 (filtered from 5,000)*. The strip carries the filter context so the user is never confused about whether they are seeing the real total.
+
+### 7.6 Column resize and reorder
+
+Optional. Add only when the surface has wide variation in column-content width across projects (e.g. file paths in monorepos). When you do add it:
+
+- **Resize**: Drag the column-header right edge; double-click to auto-fit. Persist widths to `workspaceState` per surface.
+- **Reorder**: Drag the column-header label (not the resize handle); ghost preview during drag. Persist the order alongside the widths.
+- **Reset**: A *Reset columns* control in the More menu wipes the persistence so users can recover from broken layouts.
+
+Skip both if the table already fits comfortably with `auto`-sized columns. Resize/reorder is one of the most-shipped features that nobody actually uses — do not add it as defensive scope.
 
 ---
 
@@ -236,6 +384,32 @@ Escape all dynamic URL segments and query text in HTML builders.
 | **Combine rules** | Document how AND/OR works (typically all active constraints **AND**); edge cases (e.g. “single-use” definition) belong in tooltips or footnotes. |
 
 **Active filter strip is mandatory whenever the filter state diverges from defaults.** This is not optional polish — it is the only way the user can tell *what* is filtering the table without re-reading every checkbox, slider, and search field. Each chip carries the constraint name, the value, and a `[×]` to remove just that constraint; a *Clear all* link sits at the end. Without this strip, the user is left to reconstruct filter state from scattered control values, which they will get wrong.
+
+#### 8.5.1 Debounce / throttle table
+
+Filter inputs that require parsing or DOM updates need rate-limiting so the UI stays smooth during fast typing. Pin numbers so contributors don't re-pick every time:
+
+| Input | Rate | Reasoning |
+|-------|------|-----------|
+| **Free-text search** | `150ms` debounce | Long enough to coalesce a typing burst, short enough that the table feels live. Anything ≥ `300ms` reads as laggy. |
+| **Numeric range slider** | `100ms` throttle | Continuous gesture; throttle (not debounce) so the table updates *during* the drag, not after release. |
+| **Checkbox / segmented toggle** | `0ms` (instant) | Discrete state change; the user just committed; no need to wait. |
+| **`<select>` preset dropdown** | `0ms` | Same as checkbox. |
+| **Sort-header click** | `0ms` | Discrete. |
+| **Resize / reorder column** | `100ms` throttle on visual update; `300ms` debounce on persistence write | Visual must feel live; the persistence write to `workspaceState` can lag the gesture. |
+
+**Apply implicitly, never via *Apply* button** — typed-text and checkbox changes auto-apply per the rates above. An explicit *Apply* button is acceptable only when applying the filter is genuinely expensive (e.g. re-runs a CLI scan), and even then the affordance should read *Run scan* / *Save view*, not *Apply*.
+
+#### 8.5.2 Search behavior
+
+| Pattern | Guideline |
+|---------|-----------|
+| **Default scope** | Search across visible-cell text plus key data-attributes (rule name, file path, message). Document the scope in the input's `placeholder` or `title` (*"Filter by file, rule, or message…"*). |
+| **Match style** | **Substring, case-insensitive** by default. Prefix-only or full-word match needs an opt-in toggle. Fuzzy match (Levenshtein) is overkill for editor-area dashboards; reserve for command palettes. |
+| **Tokenization** | Spaces in the query are treated as multiple AND-tokens (e.g. *"run analysis"* matches rows with both *run* and *analysis* anywhere). Quoted phrases match literally. |
+| **Result highlighting** | Matched substrings get a `<mark>` wrap with a host-token background. Highlight only in the column the match came from to avoid noise. |
+| **Recent searches** | After ≥ 5 distinct queries, show a *Recent ▾* affordance below the search input that lists the last 5 (most recent first). Persist to `workspaceState`. Skip until the heuristic count fires — pre-emptive history is clutter. |
+| **No-results state** | When the search yields zero rows, the empty-state CTA names the search query in the message ("No findings match *foo bar*") and offers *Clear search* as the tier-1 button. |
 
 ### 8.6 Tooltips
 
@@ -324,13 +498,75 @@ Escape all dynamic URL segments and query text in HTML builders.
 
 ### 8.16 Empty, loading, and error states
 
-- **Empty chart**: Omit the section entirely if there is no size data—do not show a broken chart frame. *"No findings."* in a card frame is worse than no card at all: it advertises the absence of data instead of using the space for something useful.
+Six distinct conditions, all surfaced through the same chrome but with different messaging contracts. Treat them as separate states — collapsing two of them into one banner is the most common source of misleading UI.
+
+#### 8.16.1 Empty (no data ever)
+
+- **Empty chart**: Omit the section entirely if there is no size data — do not show a broken chart frame. *"No findings."* in a card frame is worse than no card at all: it advertises the absence of data instead of using the space for something useful.
 - **Empty optional sections**: Sections that have no data **and** carry no current configuration (e.g. *"Issues view hides — none"*, *"Drift Advisor — integration off"*) collapse to a single muted footer line at most, or are omitted entirely. Never render full-height bordered bands whose only content is "nothing is happening here". Render them at full size only when they have data the user can act on.
 - **Skeleton vs omit**: For chart axes that need to keep their slots even at zero (e.g. all severity buckets so the user sees the categories that exist), render zero-width bars rather than omit individual rows. The rule is: **omit the whole card when no data exists; keep the skeleton when partial data exists.**
 - **One empty state per emptiness**: Do not render a top-level *"No violations"* banner *and* a child *"No violations match the current filters"* banner for the same condition. Pick one location — the highest one in the hierarchy where the message still has all the context it needs — and suppress the duplicates.
 - **Empty-state CTA**: Every empty state names the next action (*Run analysis*, *Reset filters*, *Enable integration*) and renders it as a tier-1 button. Empty banners with no CTA are dead UI.
-- **Loading**: Prefer host progress (notification / status bar) while generating HTML; webview can show a static “Run scan first” if opened with no data.
-- **Errors**: Banner using input-validation error tokens (border-left accent, background, foreground); actionable next step (open settings, rescan).
+
+#### 8.16.2 Loading (in flight)
+
+- **Prefer host progress** for long-running scans — the VS Code notification or status-bar progress is more discoverable than an in-webview spinner and survives panel hide/show.
+- **In-webview skeleton** is acceptable for short hops (< 1s) where the host channel would feel laggy. Skeleton rows mirror the real row shape so the layout doesn't reflow when data arrives.
+- **Verb on the spinner label**: *Thinking…*, *Preparing…*, *Checking…*, *Fetching…*, *Working…*. Never *Loading…* (banned filler — the user already knows it's loading).
+- **Cancel affordance**: any loading state expected to exceed 5 seconds renders a *Cancel* button alongside the spinner. The host bridge must honor it (kill the dart process, abort the fetch).
+
+#### 8.16.3 Partial (some data, some failed)
+
+When a multi-source scan succeeds for some sources and fails for others, the page must render the successful data fully *and* surface the failures inline.
+
+- **Banner above the table**: *"5 of 7 packages loaded. 2 failed: foo, bar."* with a *Retry failed* tier-2 button.
+- **Per-row markers**: rows whose data is missing because of the partial failure render with a `⚠` glyph in the affected cells and a `title` explaining ("pub.dev fetch failed; retry to load").
+- **Never silently drop the failed rows.** If the row exists in the source list, it must render even if its data is incomplete; otherwise the user thinks the project shrank.
+
+#### 8.16.4 Error (load failed)
+
+- **Banner styling**: input-validation error tokens (border-left accent, background, foreground). Lives at the top of the body, above the toolbar.
+- **Message**: name the error class in plain language (*Could not reach pub.dev*, *Workspace has no pubspec.yaml*) — never just *Error*. Include the proximate cause if useful (*HTTP 503*, *file not found*) on a second line.
+- **Actionable next step**: tier-1 button driving the obvious recovery (*Retry*, *Open settings*, *Pick workspace*). If no recovery exists, the button reads *Reload* (full webview re-render) — never an inert banner.
+- **Stack traces stay out** of user-facing surfaces. Log to host output channel; surface a *Copy details* tier-3 button if developers need to reach them.
+
+#### 8.16.5 Offline (no network)
+
+- **Distinct from generic error.** "Offline" earns its own banner because the recovery is the user's network, not the user's settings.
+- **Cached-data fallback**: if a previous scan's data is on disk, render it with a *Stale: last successful run …* badge ([§8.16.6](#8166-stale-cached-data)) plus an *Offline — reconnect to refresh* footer line. Don't blank the page just because the network dropped.
+- **Auto-retry policy**: poll the network on a 30s exponential backoff (capped at 5 min) and update the banner state without user action. The user should see *Online again — refresh available* when the network returns, not silent re-success.
+
+#### 8.16.6 Stale (cached data)
+
+When the page is rendering data from a previous run because a refresh failed or hasn't fired yet, the user must know.
+
+- **Status-line warning** ([§4.1](#41-header-region)): replace *Last run 2m ago* with *Last successful run 2h ago — refresh failed* in a `warn` tone pill.
+- **Per-cell freshness** is overkill for editor dashboards; one banner covers the page.
+- **Refresh button always reachable** even when stale — never lock the user into the cached view.
+
+#### 8.16.7 Retry / backoff pattern
+
+For any recoverable error, follow this contract:
+
+| Attempt | Delay before retry | UI feedback |
+|---------|-------------------|-------------|
+| 1 (manual) | 0 — fires when user clicks *Retry* | Spinner replaces the button |
+| 2 | 1 s after attempt 1 fails | "Retrying…" |
+| 3 | 4 s after attempt 2 fails | "Retrying…" |
+| 4+ | doubling, capped at 60 s | "Retrying in Ns" with countdown |
+| stop | after 6 attempts | "Could not reach … — try again later" + *Retry* button |
+
+Exponential backoff with the cap; never hammer a failing host endpoint at 100ms intervals.
+
+#### 8.16.8 Error boundary fallback (sub-component)
+
+If one section of the page throws while rendering (a chart fails, a sub-table errors), the rest of the page must keep rendering. Wrap each top-level section in a try/catch that:
+
+1. Logs the underlying error to the host output channel.
+2. Renders an inline `.error-fallback` band in the section's slot: *"This section couldn't render. Reload the panel."* + tier-2 *Reload* button.
+3. Does NOT throw further up — the rest of the page is still useful and the user shouldn't lose unrelated context.
+
+The contract: **a single sub-component failure must not turn the whole dashboard into a blank page.**
 
 ---
 
@@ -580,3 +816,548 @@ This rule covers severity/impact filters, dev-deps inclusion checkboxes, group-b
 | Additive filter (`Show detected`, `Show enabled`) | none pressed = no constraint | text + inactive-selection backdrop, weight 600 | plain text, opacity 0.85 |
 
 **Diverged state is the loud one — but loud never means primary-button colors.** All three patterns share the rule that the pressed state must NOT use `--vscode-button-background`. The active vocabulary for radio + additive is the inactive-selection backdrop tint; the active vocabulary for multi-select is "stay quiet, let the strike-through on the unpressed siblings do the talking." Primary-button colors are reserved for tier-1 actions in the same toolbar.
+
+### 14.16 Hex fallbacks in `var(--vscode-*, #hex)` mask theme-token gaps
+
+The defensive form `var(--vscode-widget-border, #333)` looks careful but is the worst of both worlds: a missing host token now silently falls back to a *dark-only* hex (`#333` is invisible on a light theme background), so the surface looks fine in the developer's Dark+ theme and breaks the moment any user switches to Light+ or High Contrast. The fallback hides the bug — the developer never sees the broken state, the bug ships.
+
+**Failure mode:** the hex was picked once for the dark theme during initial development. Months later, a contributor running Light+ files an issue: "section borders disappear on light theme". Diagnosis takes hours because the dev's own VS Code (Dark+) renders correctly.
+
+**Fix:** drop the hex fallback. Trust the host to define `--vscode-*` tokens (it always does, across every supported VS Code version). If a token genuinely might be undefined in some context, fall back to **another theme-bound token**, never a literal hex:
+
+```css
+/* Wrong */
+border: 1px solid var(--vscode-widget-border, #333);
+background: var(--vscode-input-background, #1e1e1e);
+
+/* Right */
+border: 1px solid var(--vscode-widget-border);
+background: var(--vscode-input-background);
+
+/* Acceptable when the primary token may be missing in older VS Code versions: */
+background: var(--vscode-button-secondaryHoverBackground, var(--vscode-button-secondaryBackground));
+```
+
+The rule: **every fallback in a `var()` expression must itself be theme-bound** (another `var(--vscode-*)` token). Hex literals belong only in pre-defined chrome tokens (`--surface-1`, `--accent-error`, etc.) where the dev consciously chose the value as intentional non-theme-bound color.
+
+### 14.17 Doubled freshness indicators
+
+The status line under `<h1>` carries *Last run 2m ago*. The chart tooltip on the worst-package bar also says *(Scanned 2 minutes ago)*. The toolbar's *Refresh* button has a tooltip *Reload — last refreshed 2m ago*. Three reports of the same fact.
+
+**Failure mode:** the user sees the time three times, can't tell whether the three numbers are tracking different events ("scan time" vs "fetch time" vs "render time"), and starts triangulating. They are all the same number. The redundancy taught them to distrust each one.
+
+**Fix:** the status line is the single source of truth for freshness. Remove the chart-tooltip timestamp and the refresh-button timestamp. If a chart bar genuinely has its own freshness (e.g. the network call that populated *that one bar* is older than the rest of the page), surface it as a per-cell warning glyph with a `title`, not as a duplicate of the page-level timestamp.
+
+### 14.18 Action-emphasis tint bleeding into content tiles
+
+The toolbar's tier-1 *Run analysis* button uses `--vscode-button-background`. A row of *Frequent* tiles below the toolbar uses `color-mix(in srgb, var(--vscode-button-background) 12%, var(--vscode-editor-background))` — a 12% tint of the same primary color. The tiles read as "almost actions". The user's eye lands on them with the same weight as the actual button, and the tier-1 emphasis dilutes.
+
+This is the same root cause as [§14.15](#1415-toggle-visual-model-inverted-by-default) — primary-button color leaking into content vocabulary — but with content cards / KPI tiles / category badges instead of toggles.
+
+**Failure mode:** every "softer" use of the primary color erodes the contract that primary = "click me to do something." After a few of these, the user no longer knows which pixels are actions and which are decoration.
+
+**Fix:** the primary-button color belongs to one place only — the tier-1 button. Content surfaces (tiles, KPI cards, badges, category counts) use:
+
+- `var(--vscode-editor-inactiveSelectionBackground)` for default tile backgrounds
+- `var(--vscode-list-activeSelectionBackground)` for *selected* / *active filter* state
+- `var(--vscode-badge-background)` for count badges
+- `var(--surface-2)` / `--surface-3` for layered card depth
+
+If a tile genuinely needs a slight color treatment to feel interactive, add a `:hover` outline using `--vscode-focusBorder` — never a tint of `--vscode-button-background`. The action-color vocabulary stays reserved.
+
+---
+
+## 15. Accessibility (a11y)
+
+Treat accessibility as a coverage requirement on every dashboard, not a polish pass at the end. VS Code is used by developers who rely on screen readers, keyboard-only navigation, high-contrast themes, and reduced-motion preferences. Every section below applies to **every** dashboard — there is no "internal tool, skip a11y" exception.
+
+### 15.1 Contrast targets
+
+Bind to host theme tokens ([§2](#2-color-system)) and the host enforces contrast for chrome. For decorative or computed colors (chart hues, score gauges, semantic accents), pin explicit ratios:
+
+| Use | Minimum contrast (WCAG) | When |
+|-----|-------------------------|------|
+| **Body text on background** | 4.5:1 (AA) | All copy. AAA (7:1) preferred for long-form prose. |
+| **Large text** (≥18pt or ≥14pt bold) | 3:1 (AA) | Section headings, KPI numbers. |
+| **Active UI components** (buttons, focus rings, form borders) | 3:1 against adjacent | Required for non-text cues. |
+| **Decorative graphics** | No requirement | Chart segments paired with non-color cues per [§2.3](#23-data-specific-color-charts-and-gauges). |
+| **Disabled state** | No requirement | But never less readable than 3:1 if the disabled label still carries meaning the user must read. |
+
+**Verify in all four default themes** — Dark+, Light+, High Contrast Dark, High Contrast Light — for every new surface ([§19](#19-theme-verification-process)). Computed colors (HSL gauges, chart hues) need explicit verification because no host token guards them.
+
+### 15.2 Keyboard navigation
+
+Every interactive element must be reachable, operable, and visible from the keyboard alone.
+
+| Pattern | Rule |
+|---------|------|
+| **Tab order** | Follows visual reading order: hero → status line → KPI cards → toolbar → table headers → table body → footer. Never use `tabindex` > 0 to reorder; use DOM order instead. |
+| **Skip links** | Long pages (chart-heavy or table-dense) include a hidden *"Skip to table"* link as the first focusable element. Visible only on focus. |
+| **Focus visible** | Every interactive element shows the host focus ring (`outline: 1px solid var(--vscode-focusBorder); outline-offset: 2px`). Never `outline: none` without an immediate replacement. |
+| **Focus traps** | Popovers, dialogs, and overlays trap focus inside while open; `Esc` releases the trap and returns focus to the trigger. |
+| **Activation keys** | `Enter` and `Space` activate buttons, role="button" cards, and chevron expanders. `Arrow` keys navigate inside segmented controls and grid cells. |
+| **Range selection** | `Shift + Arrow` extends selection in tables that support multi-select ([§7.3](#73-multi-select-and-bulk-actions)). |
+| **Escape contract** | `Esc` consistently means: close popover → clear search → blur input → cancel selection. Document the order so users learn it. |
+| **Discoverable shortcuts** | A *Keyboard shortcuts* link in the help-icon overlay or footer lists every page-level shortcut. The user shouldn't have to read source to find them. |
+
+### 15.3 Screen reader patterns
+
+| Pattern | Rule |
+|---------|------|
+| **Heading hierarchy** | Strict `h1` → `h2` → `h3` → `h4` with no skips. Section depth must match the visual depth ([§8.1](#81-titles-and-subtitles)). One `h1` per page. |
+| **Landmark regions** | Wrap major bands in semantic elements: `<header>` for hero, `<nav>` for toolbar (when it carries navigation links), `<main>` for the primary table, `<footer>` for metadata. Only one `<main>` per page. |
+| **`aria-label` / `aria-labelledby`** | Every region without a visible heading carries `aria-label`. Icon-only buttons always carry `aria-label`. |
+| **`aria-describedby`** | Pair input fields and complex controls with their helper text via `aria-describedby` so the screen reader reads both label and hint. |
+| **`aria-live` regions** | Filter / sort changes that update visible row counts announce via a single `aria-live="polite"` region (`#announcer`) — *"47 of 200 rows visible"*. Pre-emptively announcing every keystroke is noise; debounce to ≥ 300ms. |
+| **`aria-busy`** | Long-running region updates (≥ 1s) toggle `aria-busy="true"` so screen readers know to wait. |
+| **`role="status"`** | Empty-state, error, and partial-state banners get `role="status"` so they announce on first render. |
+| **`role="alert"`** | Reserve for genuinely critical errors that interrupt the user's flow. Overuse trains the reader to ignore alerts. |
+| **Hidden text for context** | Add `<span class="sr-only">` text to icon-only cells when the icon's meaning isn't obvious from the column header. |
+
+### 15.4 Touch targets and pointer affordances
+
+Even though desktop is the primary form factor, follow touch-target sizing because (a) VS Code runs on touch laptops and tablets, (b) accessibility guidance applies regardless of input method.
+
+- **Minimum 44 × 44 CSS pixels** for any pointer / touch target. Smaller affordances (e.g. row chevrons) compensate by enlarging the *click region* via padding, even when the visual glyph is small.
+- **Hit-area padding** never visually extends beyond the surrounding row — extend the target via transparent padding inside the cell.
+- **Hover states** must not depend on hover alone for meaning — hover-only affordances are invisible to touch and keyboard users. Pair every hover state with a focus state.
+
+### 15.5 Reduced motion
+
+Already covered in [§5.2](#52-reduced-motion-implementation-pattern). Restated here for completeness because it's an a11y requirement, not a polish concern: every animation longer than `0.2s` must respect `prefers-reduced-motion: reduce` and degrade to instant *while preserving the end state*.
+
+### 15.6 Forms and inputs
+
+| Pattern | Rule |
+|---------|------|
+| **Label association** | Every input has a `<label for="...">` (or `aria-label` if visually hidden). Placeholder text is NOT a substitute for a label — placeholder vanishes on focus and is invisible to autofill. |
+| **Required fields** | Mark with both visual cue (`*`) and `aria-required="true"`. The `*` alone is invisible to screen readers; the attribute alone is invisible to sighted users. |
+| **Validation feedback** | Errors render inline below the field, with `aria-describedby` linking field to error message and `aria-invalid="true"` set. Toast-only validation is inaccessible — sighted users without focus on the toast miss it; screen readers announce only on the next role change. |
+| **Error summary** | At the top of a form with multiple errors, render a summary list with anchor links to each erroneous field. Allows keyboard users to jump to fixes without re-tabbing. |
+
+### 15.7 Color independence
+
+Never encode meaning by color alone ([§2.3](#23-data-specific-color-charts-and-gauges) restated):
+
+- **Severity badges** carry both color AND text (*Error* / *Warning* / *Info*). Never just color.
+- **Chart segments** carry color AND order AND label in tooltip / legend. Never just color.
+- **Win / loss columns** carry color AND glyph (*✓ winner* / *— loser*). Never just color.
+- **Status pills** carry color AND tone-appropriate language (*passing* / *failing*). Never just color.
+
+Run every new chart through a grayscale screenshot test ([§19](#19-theme-verification-process)). If the meaning survives in grayscale, you're done; if it collapses, add the missing non-color cue.
+
+---
+
+## 16. Performance budgets
+
+Editor-area dashboards are not "free" rendering surfaces — webview HTML lives in a Chromium process that competes with VS Code's main thread. Pin numeric targets so the surface stays fast as feature scope grows.
+
+### 16.1 Time budgets
+
+| Stage | Target | Hard cap |
+|-------|--------|----------|
+| **Time to first paint** (panel reveal → first pixel rendered) | ≤ 100 ms | ≤ 300 ms |
+| **Time to interactive** (panel reveal → toolbar buttons clickable) | ≤ 300 ms | ≤ 1 s |
+| **Filter input → table updated** | ≤ 50 ms (after the [§8.5.1](#851-debounce--throttle-table) debounce settles) | ≤ 200 ms |
+| **Sort header click → table reordered** | ≤ 50 ms | ≤ 200 ms |
+| **Initial scan kickoff** (CLI / dart process) | Run async via host bridge; show *Run analysis* tier-1 button or in-flight status. Never block panel render on scan completion. |
+
+Target = "expected good case"; hard cap = "investigate as a perf bug".
+
+### 16.2 DOM budget
+
+| Element | Target | Hard cap |
+|---------|--------|----------|
+| **Total DOM nodes per panel** | ≤ 5,000 | ≤ 20,000 |
+| **Table rows in DOM** | ≤ 300 (full render) | ≤ 2,000 (with `content-visibility: auto`); ≥ 2,000 must virtualize ([§7.5](#75-virtualization-and-pagination)) |
+| **Inline `<style>` block size** | ≤ 30 KB after gzip | ≤ 100 KB — split into composed stylesheets if exceeded |
+| **Inline `<script>` block size** | ≤ 20 KB after gzip | Beyond this, move to a webview asset (`extension.uri`) |
+
+### 16.3 Network and CPU
+
+- **No synchronous fetches.** All network I/O happens on the host side; the webview receives data via `postMessage`. Webviews must never `fetch()` directly except for static assets the host has whitelisted in CSP.
+- **Worker offload threshold**: any computation taking ≥ 50ms per call (sort, filter, transform) on a 300-row table moves to a worker. Above that, the main thread visibly stutters.
+- **Animation budget**: ≤ 60 FPS for sustained motion. Use `transform` / `opacity` properties (compositor-only); avoid animating `width` / `height` / `top` / `left` (force layout).
+- **Lazy-load images and SVGs**: any image > 10 KB uses `loading="lazy"`. Network graphs, README image galleries, and package logos all qualify.
+
+### 16.4 Webview lifecycle
+
+| Setting | Default | When to override |
+|---------|---------|------------------|
+| `retainContextWhenHidden` | `false` (default) | Set `true` only when reconstruction cost exceeds memory cost — large analytical dashboards with expensive client state. The panel keeps DOM + script alive across hide/show. |
+| `enableScripts` | `true` for interactive dashboards | Set `false` for pure read-only panels (About) — eliminates a CSP attack surface. |
+| `localResourceRoots` | Restrict to `media/`, `dist/` | Never grant the entire workspace; CSP and resource-roots enforce the boundary. |
+
+Document the choice in the panel constructor with a one-line `// retainContextWhenHidden: true — DOM rebuild costs ~600ms on large projects` so future readers know the tradeoff.
+
+### 16.5 Measurement gate
+
+Every new dashboard surface ships with a one-time measurement against the budget above:
+
+1. Open the panel against a representative project (or a synthetic 5,000-row fixture).
+2. Use `performance.mark` / `performance.measure` to capture *time to first paint*, *time to interactive*, *filter latency on a 300-row table*.
+3. Record the numbers in the surface's PR description.
+4. If any number exceeds the *target*, document why; if it exceeds the *hard cap*, do not merge.
+
+---
+
+## 17. State persistence and session memory
+
+Users move between dashboards constantly. Consistent, predictable state persistence is what makes the surface feel like a tool instead of a series of one-shot views.
+
+### 17.1 Persistence policy table
+
+| State | Survives | Where it lives |
+|-------|----------|----------------|
+| **Filter state** (severity, impact, search query) | Across panel close → reopen within session | `vscode.setState()` (ephemeral webview state) |
+| **Sort column / direction** | Across panel close → reopen within session | `vscode.setState()` |
+| **Expanded rows** | Across panel hide → show; reset on panel close | In-memory only (set on `<tr>` data attribute) |
+| **Full-width toggle** | Across panel close → reopen, per-panel | `vscode.setState()` keyed by panel type |
+| **Search query** | Within session only — clears on panel close | `vscode.setState()` (intentionally not persisted across reload) |
+| **Column resize / reorder** | Across sessions, per-workspace | `workspaceState` keyed by `<panelType>.columns` |
+| **Saved view / preset** | Across sessions, per-workspace | `workspaceState` keyed by `<panelType>.views` |
+| **Recent searches** | Across sessions, per-workspace | `workspaceState` ([§8.5.2](#852-search-behavior)) |
+| **Theme override / density preference** | Across sessions, per-machine | `globalState` |
+| **Telemetry opt-in** | Across sessions, per-machine | `globalState` |
+| **Selection (multi-select)** | Within session, clears on filter change ([§7.3](#73-multi-select-and-bulk-actions)) | In-memory only |
+| **Scroll position** | Across panel hide → show only with `retainContextWhenHidden: true`; else resets | Browser state |
+
+### 17.2 Reset semantics
+
+A *Reset view* control exists in every dashboard's More menu and clears:
+
+- Filter state, sort, search query, expanded rows.
+- Does NOT clear: column widths, saved presets, telemetry settings, theme overrides.
+
+The user expects *Reset view* to give them the panel-as-shipped (default filters, sort, layout). It must not nuke their saved presets or column widths — those are deliberate customizations.
+
+### 17.3 Session memory rules
+
+- **Never persist sensitive data** to `globalState` / `workspaceState`. PII, credentials, project file paths that include user names — none of this belongs in persisted state. The webview can hold them in-memory but must not write them to disk via the persistence APIs.
+- **Schema versioning**: every persisted state object carries a `version` field. On read, if the version is older than expected, migrate or discard — never attempt to merge mismatched schemas blindly.
+- **Quota awareness**: `workspaceState` and `globalState` are not infinite. Cap recent-search histories at 25, saved presets at 50, etc. Document the cap inline.
+
+---
+
+## 18. Internationalization, pluralization, and formatting
+
+Even though Saropa Lints is English-first, strings, numbers, and dates need consistent treatment so a future i18n pass — or even just a copy edit — doesn't have to refactor 14 surfaces.
+
+### 18.1 String externalization
+
+Every user-facing string in the webview HTML / CSS / script gets routed through a single localization helper rather than inlined. Centralize the helper now even if every key currently maps to English; the externalization point is what makes a future translation tractable.
+
+```ts
+// webview-l10n.ts (host side, embedded into the webview as a JSON blob via postMessage)
+export const STRINGS = {
+  toolbar: {
+    runAnalysis: 'Run analysis',
+    refresh: 'Refresh',
+  },
+  empty: {
+    noFindings: 'No findings.',
+    resetFilters: 'Reset filters',
+  },
+  // …
+} as const;
+```
+
+Banned: `${count} finding${count === 1 ? '' : 's'}` inline. Use a plural-aware helper ([§18.2](#182-pluralization-rules)).
+
+### 18.2 Pluralization rules
+
+JavaScript's `Intl.PluralRules` handles plural forms across languages including those with more than two forms (Arabic, Russian, Polish):
+
+```ts
+const pr = new Intl.PluralRules('en-US');
+function pluralize(count: number, forms: { one: string; other: string }): string {
+  return forms[pr.select(count)] ?? forms.other;
+}
+// Usage:
+pluralize(count, { one: '{count} finding', other: '{count} findings' })
+  .replace('{count}', count.toLocaleString());
+```
+
+Even for English, route every count through this helper so future locale support is one PR away. Inline ternaries (`count === 1 ? '' : 's'`) are banned because they force a refactor when the helper arrives.
+
+### 18.3 Number formatting
+
+| Pattern | Rule |
+|---------|------|
+| **Integers in tables** | `value.toLocaleString()` — adds locale-correct thousands separators (`1,234,567` in en-US, `1.234.567` in de-DE). |
+| **Compact display** | `Intl.NumberFormat(locale, { notation: 'compact' }).format(n)` for cells where space is tight (download counts, stars). Render the full value in `title`. |
+| **Percentages** | `Intl.NumberFormat(locale, { style: 'percent', maximumFractionDigits: 1 }).format(0.123)` → `12.3%`. Never `${n * 100}%` — locale gets the decimal separator wrong. |
+| **File sizes** | Use IEC units (KiB / MiB / GiB) for technical contexts (archive sizes, bundle sizes); SI units (KB / MB / GB) for download speeds. Be consistent within a column. |
+| **Decimals** | Pin a max-fraction-digits per column (e.g. score = 1, percentage = 1, money = 2). Drift causes columns to misalign. |
+
+### 18.4 Date and time formatting
+
+| Pattern | Rule |
+|---------|------|
+| **Relative time** | *2m ago*, *3h ago*, *4d ago*, *2w ago*. Use a single helper (`formatRelativeTimestamp`) so the breakpoints are consistent. |
+| **Absolute time** | ISO 8601 (`2026-04-12T14:23:00Z`) in tooltips and exports. `Intl.DateTimeFormat` for display: `2026-04-12 14:23` in tables. |
+| **Pair them** | Visible cell shows relative ("2m ago"); `title` tooltip shows absolute ("2026-04-12 14:23 UTC"). The user gets quick context plus precision on hover. |
+| **Time zones** | Store and transmit UTC. Display in the user's local zone (per `Intl.DateTimeFormat`'s default behavior). Never display server-time without a TZ suffix. |
+| **"Just now"** | < 45 seconds. Above that, switch to *Ns ago* / *Nm ago*. Below that, "just now" reads as fresh. |
+
+---
+
+## 19. Theme verification process
+
+VS Code ships four default themes; the host supports thousands more from the marketplace. Every new dashboard must verify against the four defaults at minimum.
+
+### 19.1 The four required themes
+
+| Theme | Background tone | Notable token differences |
+|-------|----------------|---------------------------|
+| **Dark+ (default dark)** | Near-black | The dev's likely default — if the surface only works here, it ships broken. |
+| **Light+ (default light)** | Near-white | Catches `color: #fff` errors and dark-only hex fallbacks ([§14.16](#1416-hex-fallbacks-in-var--vscode---hex-mask-theme-token-gaps)). |
+| **High Contrast Dark** | Pure black | Catches missing focus rings, insufficient contrast on accent colors, transparent borders. |
+| **High Contrast Light** | Pure white | Catches the same as HC Dark, in the opposite direction. |
+
+Verify in this order: Dark+ → Light+ → HC Dark → HC Light. If a surface breaks in HC, it almost certainly has at least one un-tokenized color, and fixing HC fixes the other three.
+
+### 19.2 Verification checklist
+
+For every new dashboard, run through this list once before merge and on every PR that touches CSS:
+
+- [ ] Hero title legible (contrast ≥ 4.5:1)
+- [ ] Status line pills legible at all four tones (good / warn / bad / neutral)
+- [ ] KPI card numbers legible
+- [ ] KPI card *active* state visibly distinct from default
+- [ ] Toolbar tier-1 button distinguishable from tier-2
+- [ ] Search input border visible on focus
+- [ ] Sortable header hover background visible
+- [ ] Sortable header *active sort* arrow visible
+- [ ] Table row hover background visible
+- [ ] Table row focus outline visible
+- [ ] Expander chevron visible in collapsed AND expanded states
+- [ ] Empty-state banner border + button distinguishable
+- [ ] Error banner left-border accent visible
+- [ ] Chart segments distinguishable in grayscale (color-independence per [§15.7](#157-color-independence))
+- [ ] Disabled buttons readable but clearly distinct from enabled
+- [ ] Links visible, underline visible on hover
+- [ ] Focus ring visible on all interactive elements
+
+### 19.3 Visual snapshot tests
+
+For each surface, capture one representative screenshot per theme (4 screenshots) and commit them under `extension/test/visual-snapshots/<surface>-<theme>.png`. CI compares snapshots against the stored baseline; a diff > 1% fails the build. Update baselines deliberately when an intentional visual change ships.
+
+The screenshots themselves are reference artifacts — do not pixel-perfect them, do not gate on tiny anti-aliasing differences. The 1% threshold catches structural regressions (a missing border, a swapped color) without false-positiving on font-rendering noise.
+
+### 19.4 Token coverage matrix
+
+Maintain a per-surface matrix tracking which `--vscode-*` tokens the surface uses. When a surface adds a new token, add a row. When VS Code deprecates a token, the matrix tells you which surfaces need migration:
+
+| Token | Findings | Code Health | Rule Explain | … |
+|-------|----------|-------------|--------------|---|
+| `--vscode-button-background` | ✓ | ✓ | ✓ | |
+| `--vscode-list-activeSelectionBackground` | ✓ | ✓ | — | |
+| `--vscode-editorWidget-background` | — | ✓ | ✓ | |
+
+Generated from a static-analysis pass over the styles files — keep automated rather than hand-maintained.
+
+---
+
+## 20. CSS architecture conventions
+
+Every dashboard imports the shared chrome (`getDashboardChromeStyles()`) and adds surface-specific rules on top. The chrome owns visual primitives shared across surfaces; per-surface stylesheets own surface-specific layout. Drift between the two is the most common source of "the new dashboard doesn't quite look like the old ones".
+
+### 20.1 What lives in the chrome
+
+| Pattern | In chrome? |
+|---------|------------|
+| Body padding, max-width, full-width override | Yes |
+| Hero band visual (title size, status-line styling, gauge layout) | Yes |
+| KPI card primitives (`.kpi-row`, `.kpi-card`, `.kpi-k`, `.kpi-v`) | Yes |
+| Toolbar band, segmented control track | Yes |
+| `.btn` / `.btn.tier-1` / `.btn.tier-3` / `.btn.danger` | Yes |
+| Chip strip (`.chip-strip`, `.chip`) | Yes |
+| Sortable table base (`.dash-table`, `.sortable`, sticky headers) | Yes |
+| Surface-specific column widths and row layout | No — per-surface |
+| Surface-specific badge colors (e.g. severity pills) | No — per-surface |
+| Empty-state CTA card (`.empty-cta`) | **Should be** chrome — currently duplicated across 3+ surfaces; lift on next refactor |
+
+### 20.2 Naming conventions
+
+- **Class prefix `.dash-*`** for chrome-owned regions (`.dash-hero`, `.dash-table`). Signals "this lives in chrome; do not redefine locally."
+- **No prefix** for primitive utilities (`.btn`, `.seg`, `.chip`, `.muted`, `.sr-only`). These are short by design.
+- **Surface-specific classes** use a surface-specific prefix when there's any naming-collision risk: `.ki-chip-strip` (Known Issues), `.pv-empty` (Project Vibrancy). Avoids stomping the chrome's generic class.
+- **IDs are unique per panel**. Within a single webview, an `id` is a hard handle — never reuse. Across panels, IDs may repeat (different webviews are isolated).
+
+### 20.3 Specificity discipline
+
+- **Never use `!important`** in production CSS. If a rule needs to override the chrome, increase specificity by qualifying the selector (e.g. `.findings-dash .btn` instead of `.btn !important`). `!important` masks the cascade and turns future tweaks into a war.
+- **Single-class selectors preferred** over deeply nested chains. Three classes is the practical ceiling — beyond that, refactor the markup.
+- **Avoid element-tag selectors** for components (`.kpi-card` not `button.kpi-card`). The component should work whether rendered as `<button>` or `<div>`; locking it to a tag forces refactoring when semantics change.
+
+### 20.4 CSS variable conventions
+
+- **Chrome defines tokens once** in `:root` (`--surface-1`, `--accent-error`, etc.). Per-surface stylesheets consume them; per-surface stylesheets do NOT redefine them.
+- **Component-scoped variables** for runtime values: `style="--gauge-target: 75"` on the SVG, then `stroke-dasharray: var(--gauge-target) 100` in the rule. Drives animation from CSS variables instead of inline `style` attributes whenever possible.
+- **Inline `style="color: …"` is banned** for theme-bound color. The cascade can't reach inline styles, so a theme switch leaves the inline color stale. Use a class + token instead.
+
+### 20.5 File structure
+
+The Package Dashboard's split-file pattern is the contract for new surfaces:
+
+```
+extension/src/views/<surface>/
+  <surface>-html.ts       — HTML builder (markup)
+  <surface>-styles.ts     — CSS (returns a string)
+  <surface>-script.ts     — Webview script (postMessage bridge)
+  <surface>-panel.ts      — VS Code WebviewPanel wrapper, message routing
+```
+
+Avoid monolithic `buildHtml.ts` files that intermix HTML, CSS, and script. The split is what makes per-section review (and per-section testing) tractable.
+
+---
+
+## 21. Webview ↔ host messaging contract
+
+Every interactive dashboard sends messages from the webview to the host (and sometimes back). Drift in message-shape conventions across surfaces is the most common cause of "I added a button and it dispatched the wrong handler."
+
+### 21.1 Message-type naming
+
+- **camelCase verbs** for action types: `runAnalysis`, `copyFilteredJson`, `openFile`, `openUrl`, `resetFilters`, `paletteCommand`.
+- **Domain prefixes** when a surface has many distinct messages: `kpi.click`, `kpi.reset`, `findings.suppress`. Use only if the un-prefixed type would collide.
+- **No verbs as nouns**: `runAnalysis` (verb) not `analysisRun` (gerund). The type names what the user wants to happen.
+
+### 21.2 Dispatch patterns
+
+| Pattern | When to use |
+|---------|-------------|
+| **Per-button `id` + `bindClick`** | Single, unique action that takes no parameters. Three of these in a script is fine; ten is a smell. |
+| **`data-cmd="<commandId>"` on the element + delegated listener** | Generic palette command dispatch. The host registered the command; the webview just names it. Reusable across any button. |
+| **`data-action="<verb>" data-<key>="<value>"`** | Action that takes parameters from the row (file, line, package name). The handler reads the dataset and posts a message. |
+| **`message.type` switch in host** | Explicit typed handlers in the panel's `onDidReceiveMessage`. Prefer over a generic dispatcher when the verbs are few and stable. |
+
+Prefer `data-cmd` and `data-action` over per-button `id` for new surfaces — they scale to N buttons without proportional script growth.
+
+### 21.3 Schema versioning
+
+- **Every message carries an implicit schema version** through its `type` string. To evolve a message shape, ship a new type (`copyFilteredJson` → `copyFilteredJsonV2`); never silently change the payload of an existing type.
+- **The host treats unknown message types as warnings**, not errors. A webview from a previous extension version may still be running in a hidden panel; killing the host on unknown types breaks reload.
+- **Backward compatibility window**: keep the old type handler for one full release cycle after introducing a replacement. Document the deprecation in the panel's source comments.
+
+### 21.4 Payload conventions
+
+- **Strings are escaped at the host boundary**, not the webview. The webview sends raw values; the host's `escapeHtml` / `JSON.stringify` is the trust boundary. Reverse direction: the webview never trusts host-supplied HTML — always escape via `html-utils.ts` before injecting.
+- **Prefer flat payloads** over deep objects. `{ type: 'openFile', path: 'lib/foo.dart', line: 42 }` is easier to debug than `{ type: 'fileNav', target: { uri: { fsPath: …, line: … } } }`.
+- **Validate at the host**. Every `onDidReceiveMessage` handler validates `message.type` and `message.<field>` shape before acting. Untrusted webviews (theoretically) could send malformed messages; the host shouldn't crash on them.
+
+---
+
+## 22. Print, export, and onboarding
+
+### 22.1 Print and PDF export
+
+Editor-area dashboards are occasionally printed or exported as PDF for share-out. A surface need not be print-perfect, but it should not actively break:
+
+- **Print stylesheet** (`@media print`) hides the toolbar, full-width toggle, hover affordances, and any sticky headers (sticky printing leaves a duplicate band on each page). Renders the table with `border-collapse: collapse` and a `1px solid` border so cells are visible on plain paper.
+- **Page break hints**: `tr { break-inside: avoid; }` so a single row doesn't split across pages.
+- **Background colors**: respect `print-color-adjust: exact` on KPI cards and severity pills so the user's intent (a colored severity badge) survives the print engine's default of stripping background colors.
+- **Long text**: rely on `word-wrap: break-word` for file paths and rule names. Print handles overflow poorly.
+
+### 22.2 CSV / JSON export
+
+Every dashboard's *Save report* action exports the underlying dataset, not the rendered HTML.
+
+| Pattern | Rule |
+|---------|------|
+| **CSV header row** | One row, column names match the visible table headers exactly. |
+| **CSV escaping** | Quote any value containing `,`, `"`, newline. Escape embedded `"` as `""`. Use `\r\n` line endings for Windows compatibility. |
+| **JSON shape** | One object per row keyed by column name; preserve null vs empty-string distinction; numbers stay numbers (don't stringify). |
+| **Filename convention** | `<surface>-<YYYYMMDD>-<HHMM>.csv` saved to `<workspace>/reports/.saropa_lints/`. Date-stamped so consecutive exports don't overwrite each other. |
+| **Encoding** | UTF-8 with no BOM for JSON; UTF-8 with BOM for CSV (Excel needs the BOM to detect UTF-8 correctly). |
+
+### 22.3 First-run / onboarding
+
+- **No-project state**: when the user opens a dashboard with no Dart workspace open, render a dedicated empty state (different from "no findings"). Message: *"Open a Flutter or Dart project to see findings."* + tier-1 *Open folder* button that triggers `vscode.openFolder`. Never render a blank table on no-project.
+- **No-data state** (project open, scan never run): tier-1 *Run analysis* button and a one-line muted explainer.
+- **What-is-this disclosure**: a small `?` icon in the hero (next to the version stamp) toggles a short popover describing the surface's purpose. Helpful for first-timers, invisible to everyone else. Use sparingly — most dashboards earn discoverability through their content, not through tour overlays.
+
+---
+
+## 23. Right-to-left (RTL) support
+
+Even though the source language is English, write CSS so an RTL-locale flip works without reflow surgery. The ROI is high (one-time discipline) and the cost of retrofitting later is high (every flex direction, every margin, every chevron).
+
+### 23.1 Logical properties over physical
+
+| Use | Don't use |
+|-----|-----------|
+| `margin-inline-start` | `margin-left` |
+| `margin-inline-end` | `margin-right` |
+| `padding-inline` | `padding-left` / `padding-right` |
+| `border-inline-start` | `border-left` |
+| `inset-inline-start` | `left` |
+| `text-align: start` | `text-align: left` |
+
+Logical properties auto-flip in `dir="rtl"` containers. Physical properties don't.
+
+### 23.2 Direction-aware glyphs
+
+- **Chevrons**: row expanders use a triangle (`▸` / `▾`) that's already directionally neutral on the vertical axis. Horizontal chevrons (back arrow `‹`, forward `›`) flip with `transform: scaleX(-1)` inside RTL containers — never hard-code `‹` for "back".
+- **Sort arrows**: `▲` / `▼` (vertical) stay the same in RTL. Avoid `→` / `←`.
+
+### 23.3 Charts
+
+- **Horizontal bar charts** flip in RTL: bars grow from right to left, labels right-align. Use `direction: rtl` on the chart container and let the flex direction handle it.
+- **Donut charts** rotate counterclockwise in RTL; this is usually fine because order doesn't carry meaning, but verify that legend matching still reads correctly.
+
+### 23.4 Numbers in RTL
+
+Numbers themselves stay LTR even in RTL contexts. Use `<bdo dir="ltr">1,234</bdo>` for any number that might display next to RTL text and risk reordering.
+
+Don't ship full RTL support yet — but write CSS as if you are, so the eventual locale switch is a config change and not a refactor.
+
+---
+
+## 24. Document governance
+
+A guidelines document that nobody owns becomes a museum. Keep this one alive.
+
+### 24.1 Header metadata
+
+The top of this document carries:
+
+- **Last reviewed**: YYYY-MM-DD — when a maintainer last walked the doc end-to-end.
+- **Owner**: handle of the person responsible for keeping it current. Default to the most recent contributor to the gold-standard surface (Package Dashboard).
+- **Open issues**: link to a tracking ticket where guideline-evolution discussions live.
+
+Update *Last reviewed* every time you read the doc cover-to-cover and find nothing to fix; that itself is a signal.
+
+### 24.2 Changelog
+
+Add a brief changelog at the top of the doc:
+
+```markdown
+## Changelog
+
+- **2026-05-02** — §0 Vocabulary, §15 Accessibility, §16 Performance budgets,
+  §17 State persistence, §18 i18n, §19 Theme verification, §20 CSS architecture,
+  §21 Webview messaging, §22 Print/export/onboarding, §23 RTL, §24 Governance.
+  §5 motion enriched with easing curves; §7 with multi-select / multi-column sort
+  / virtualization; §8.5 with debounce numbers; §8.16 split into 8 sub-states.
+  §14 anti-pattern catalog grew with hex-fallback / doubled-freshness / action-tint
+  entries.
+- **2026-04-XX** — Initial publication of §1–§14.
+```
+
+Never silently rewrite history. If a guideline reverses, add an entry explaining why; do not edit the original section to read as if it always said the new thing.
+
+### 24.3 Review cadence
+
+- **Quarterly**: walk the full doc, update *Last reviewed*, prune anti-patterns the codebase no longer commits.
+- **On every audit**: surface findings into §14's anti-pattern catalog so the lesson outlives the dashboard that prompted it.
+- **On every chrome change**: update §13 (implementation map) and §20 (CSS architecture) so the codebase and the doc don't drift.
+
+### 24.4 Contributing
+
+A new contributor adding a guideline:
+
+1. Picks the lowest-numbered section that already covers the topic; appends a new sub-section (`§N.M`) rather than creating a top-level entry.
+2. New top-level entries are reserved for genuinely new categories (a new device class, a new accessibility regulation, a new chrome capability).
+3. Every new guideline carries: the **rule**, a one-line **why** (the failure mode it prevents), a one-line **how to apply** (when the rule kicks in). Anti-pattern entries additionally carry the **fix**.
+4. Cross-link with `§N.M` references — the doc's value compounds when sections reach back and forth.

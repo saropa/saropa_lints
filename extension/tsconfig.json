@@ -19,6 +19,7 @@
     "out",
     "dist",
     "src/test",
-    "media/codicons"
+    "media/codicons",
+    "scripts"
   ]
 }

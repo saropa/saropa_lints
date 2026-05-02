@@ -149,3 +149,59 @@ export function formatRelativeTimestamp(iso: string | undefined): string | undef
   const day = Math.floor(hr / 24);
   return `${day}d ago`;
 }
+
+/* ──────────────────────────────────────────────────────────────────────
+ * §15 — Accessibility scaffolding.
+ *
+ * Three reusable HTML fragments every dashboard should compose into its
+ * body so a11y patterns are consistent across surfaces:
+ *
+ *   - [buildSkipLink] — visible-on-focus link that jumps the user past
+ *     the hero / toolbar to the primary content (§15.2).
+ *   - [buildAnnouncer] — single polite live region for filter / sort
+ *     change announcements (§15.3); script wires it via [announce].
+ *   - [getAnnouncerScript] — client-side helper that surface scripts
+ *     can include to update the announcer text safely.
+ * ──────────────────────────────────────────────────────────────────── */
+
+/**
+ * Render a "Skip to {target}" keyboard-only affordance. The link is hidden
+ * off-screen by default and only becomes visible when keyboard-focused.
+ *
+ * @param targetId — id of the element the skip link jumps to. Surfaces
+ *   typically point at the primary table or the data section the user
+ *   cares about (e.g. `findings-table`, `pvBody`).
+ * @param label — the visible-on-focus text. Defaults to "Skip to content".
+ */
+export function buildSkipLink(targetId: string, label = 'Skip to content'): string {
+  return `<a href="#${escape(targetId)}" class="skip-link">${escape(label)}</a>`;
+}
+
+/**
+ * Render the polite live-region announcer that surfaces inject filter /
+ * sort / count change messages into (§15.3). Single instance per page.
+ *
+ * Place once near the top of the body, after the skip link. Pair with
+ * [getAnnouncerScript] so client code can call `announce('47 of 200 rows visible')`.
+ */
+export function buildAnnouncer(): string {
+  return `<div id="announcer" role="status" aria-live="polite" aria-atomic="true"></div>`;
+}
+
+/**
+ * Inline script that exposes a global `announce(message)` helper writing
+ * to `#announcer`. Idempotent — multiple includes on the same page are
+ * harmless because the function checks for the element each call.
+ *
+ * Surfaces should debounce ≥ 300ms before calling so a typing burst does
+ * not produce one announcement per keystroke (§15.3).
+ */
+export function getAnnouncerScript(): string {
+  return `function announce(message) {
+    var el = document.getElementById('announcer');
+    if (!el) { return; }
+    // Re-set to empty first so consecutive identical announcements still fire.
+    el.textContent = '';
+    setTimeout(function() { el.textContent = message; }, 50);
+  }`;
+}
