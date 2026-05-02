@@ -42,9 +42,18 @@
     **Maintenance entries** — Anything with **no end-user impact** (publish/CI tooling, internal refactors, test harness tweaks, plan-folder housekeeping, developer-only scripts) goes INSIDE a collapsed `<details><summary>Maintenance</summary>...</details>` block at the *bottom* of its version section — NOT in `### Added` / `### Changed` / `### Fixed`, which are reserved for user-visible changes that ship in the `.dart` / `.vsix` artifacts. Rule of thumb: if a pub.dev / Marketplace user running the published package would notice the difference, it belongs in a top-level section; otherwise it belongs in the Maintenance expander.
 
 -->
+
 ---
 
-## [13.0.0] - Unreleased
+## [Unreleased]
+
+### Fixed (Extension)
+
+- The **Code Health Dashboard** scan no longer stacks parallel `dart run` processes when the command fires repeatedly (sidebar item, rescan button, command palette) — concurrent invocations now share one in-flight scan, and the progress notification is cancellable so a runaway scan can be stopped from the toast. No action required.
+
+---
+
+## [13.0.0]
 
 This release rebuilds the VS Code extension around a single dashboard look so the **Findings**, **Lints Config**, **Code Health Dashboard**, **Package Dashboard**, **Known Issues**, and **Package Comparison** editor tabs all share the same hero band, status line, KPI cards that double as filters, sticky toolbars, and sortable tables. The Saropa activity bar collapses into one flat **Saropa Lints** sidebar — many duplicate tree views are gone in favor of the editor tabs they were always pointing at, so there is one obvious place to land for each task. A common nullable build-context guard pattern no longer trips the after-await context lints, and a handful of webview, path-resolution, and cache fixes round things out. [log](https://github.com/saropa/saropa_lints/blob/v13.0.0/CHANGELOG.md)
 

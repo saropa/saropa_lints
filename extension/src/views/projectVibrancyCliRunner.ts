@@ -87,7 +87,10 @@ export function buildProjectVibrancyDartArgs(projectRoot: string): string[] {
   return args;
 }
 
-export function runProjectVibrancyScan(projectRoot: string): Promise<ProjectVibrancyScanResult> {
+export function runProjectVibrancyScan(
+  projectRoot: string,
+  cancellationToken?: vscode.CancellationToken,
+): Promise<ProjectVibrancyScanResult> {
   return new Promise((resolve) => {
     const args = buildProjectVibrancyDartArgs(projectRoot);
     const command = dartCommandForPlatform();
@@ -96,6 +99,19 @@ export function runProjectVibrancyScan(projectRoot: string): Promise<ProjectVibr
     const child = spawn(command, args, { cwd: projectRoot, shell: SPAWN_USE_SHELL });
     let stdout = '';
     let stderr = '';
+    let cancelled = false;
+    // Wire user cancellation to a real process kill — without this the dart
+    // run keeps consuming CPU even after the progress notification is dismissed,
+    // which is exactly the "non-stop scanning" pile-up symptom we're guarding
+    // against.
+    const cancelSubscription = cancellationToken?.onCancellationRequested(() => {
+      cancelled = true;
+      try {
+        child.kill();
+      } catch {
+        // Best-effort: child may have already exited between the check and the kill.
+      }
+    });
     child.stdout.on('data', (chunk: Buffer | string) => {
       stdout += chunk.toString();
     });
@@ -103,6 +119,7 @@ export function runProjectVibrancyScan(projectRoot: string): Promise<ProjectVibr
       stderr += chunk.toString();
     });
     child.on('error', (err: NodeJS.ErrnoException) => {
+      cancelSubscription?.dispose();
       // Startup failures happen before exit/close when the runtime is missing
       // or non-executable in PATH.
       const details = err?.message?.trim();
@@ -114,8 +131,15 @@ export function runProjectVibrancyScan(projectRoot: string): Promise<ProjectVibr
       resolve({ payload: null, rawStdout: '', exitCode: -1 });
     });
     child.on('close', (code) => {
+      cancelSubscription?.dispose();
       const exitCode = code ?? -1;
       const raw = stdout;
+      // Suppress error toasts when we killed the child ourselves — the user
+      // already chose to cancel, surfacing "scan failed" on top would be noise.
+      if (cancelled) {
+        resolve({ payload: null, rawStdout: raw, exitCode });
+        return;
+      }
       if (exitCode !== 0 && raw.trim().length === 0) {
         // Prefer stderr details when available; otherwise keep a generic
         // user-facing message for non-diagnostic failures.

@@ -19,20 +19,42 @@ import { getProjectVibrancyReportStyles } from './projectVibrancyReportStyles';
 
 let currentPanel: vscode.WebviewPanel | undefined;
 let lastReportRawStdout = '';
+// Single-flight guard: a project vibrancy scan spawns a full-project AST walk
+// via `dart run`, which is heavy. Without this, every command invocation
+// (sidebar item, rescan button, command palette) starts a fresh dart process
+// in parallel — N rapid clicks pin N CPU cores. Subsequent calls while a scan
+// is in progress reuse the in-flight promise so they share the same panel
+// update instead of stacking.
+let inflightScan: Promise<void> | undefined;
 
 export async function openProjectVibrancyReport(): Promise<void> {
+  if (inflightScan) {
+    // Reveal the panel if it already exists so a re-click feels responsive
+    // even though we're not starting a new scan.
+    currentPanel?.reveal(vscode.ViewColumn.One);
+    return inflightScan;
+  }
   const projectRoot = getProjectRoot();
   if (!projectRoot) {
     void vscode.window.showErrorMessage('Open a Dart/Flutter workspace first.');
     return;
   }
+  inflightScan = runScanAndRender(projectRoot).finally(() => {
+    inflightScan = undefined;
+  });
+  return inflightScan;
+}
+
+async function runScanAndRender(projectRoot: string): Promise<void> {
   const scan = await vscode.window.withProgress(
     {
       location: vscode.ProgressLocation.Notification,
       title: 'Project Vibrancy: scanning functions...',
-      cancellable: false,
+      // Cancellable so a runaway scan can be killed from the notification
+      // instead of waiting for the dart process to finish on its own.
+      cancellable: true,
     },
-    async () => runProjectVibrancyScan(projectRoot),
+    async (_progress, token) => runProjectVibrancyScan(projectRoot, token),
   );
   if (!scan.payload) return;
   lastReportRawStdout = scan.rawStdout;
