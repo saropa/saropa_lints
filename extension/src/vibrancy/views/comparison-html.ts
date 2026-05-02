@@ -72,17 +72,22 @@ function getComparisonStyles(): string {
             font-size: 0.75em;
             margin-left: 6px;
         }
+        /* §8.10 — multiple per-package *Add to Project* buttons used to render
+           with the primary --vscode-button-background, so every header cell
+           shouted "primary action!" The secondary tokens demote them to a
+           supporting role so the eye can land on the toolbar's tier-1
+           action (when present) instead of being scattered across cells. */
         .add-btn {
-            background: var(--vscode-button-background);
-            color: var(--vscode-button-foreground);
-            border: none;
+            background: var(--vscode-button-secondaryBackground);
+            color: var(--vscode-button-secondaryForeground);
+            border: 1px solid var(--vscode-button-border, transparent);
             padding: 4px 12px;
             border-radius: 3px;
             cursor: pointer;
             font-size: 0.85em;
             margin-top: 4px;
         }
-        .add-btn:hover { background: var(--vscode-button-hoverBackground); }
+        .add-btn:hover { background: var(--vscode-button-secondaryHoverBackground, var(--vscode-button-secondaryBackground)); }
         .vibrant { color: var(--vscode-testing-iconPassed); }
         .stable { color: var(--vscode-editorInfo-foreground); }
         .outdated { color: var(--vscode-editorWarning-foreground); }
@@ -111,6 +116,15 @@ function getComparisonScript(): string {
                 vscode.postMessage({ type: 'addPackage', name, version });
             });
         });
+
+        // §4.3 — toolbar action: hop to the Package Dashboard so the user
+        // can pick more packages to compare without closing this panel.
+        const openDashBtn = document.getElementById('openPkgDashboard');
+        if (openDashBtn) {
+            openDashBtn.addEventListener('click', () => {
+                vscode.postMessage({ type: 'openPackageDashboard' });
+            });
+        }
     `;
 }
 
@@ -270,6 +284,10 @@ export function buildComparisonHtml(ranked: RankedComparison): string {
                 { glyph: '📦', label: '0 packages selected', tone: 'warn' },
             ]),
         });
+        // §8.16 — every empty state names the next action with a tier-1 CTA.
+        // The natural action from this empty page is to open the Package
+        // dashboard where comparisons are initiated; a muted instruction
+        // line alone left the user with nothing to click.
         return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -280,10 +298,17 @@ export function buildComparisonHtml(ranked: RankedComparison): string {
 </head>
 <body>
     ${heroEmpty}
-    <section class="section" aria-label="No packages">
+    <section class="section empty-state-card" aria-label="No packages">
         <p class="muted">No packages selected for comparison. Right-click two or more packages in the Package dashboard and choose <strong>Compare</strong>.</p>
+        <button type="button" class="btn tier-1" id="openPackageDashboard"
+            title="Open the Saropa Package Dashboard.">Open Package Dashboard</button>
     </section>
-    <script nonce="${nonce}">(function(){${getFullWidthToggleScript()}})();</script>
+    <script nonce="${nonce}">(function(){
+        const vscode = acquireVsCodeApi();
+        const btn = document.getElementById('openPackageDashboard');
+        if (btn) btn.addEventListener('click', () => vscode.postMessage({ type: 'openPackageDashboard' }));
+        ${getFullWidthToggleScript()}
+    })();</script>
 </body>
 </html>`;
     }
@@ -303,6 +328,8 @@ export function buildComparisonHtml(ranked: RankedComparison): string {
         title: 'Package Comparison',
         statusLineHtml,
     });
+    const kpiRowHtml = buildKpiRow(packages, winners);
+    const toolbarHtml = buildToolbar();
 
     // Recommendation box moved BELOW the table per §14.7 — the comparison data is the
     // primary content and should sit above the fold; the recommendation summary is a
@@ -317,9 +344,78 @@ export function buildComparisonHtml(ranked: RankedComparison): string {
 </head>
 <body>
     ${heroHtml}
+    ${kpiRowHtml}
+    ${toolbarHtml}
     ${buildComparisonTable(packages, winners)}
     <div class="recommendation">${recommendation}</div>
     <script nonce="${nonce}">${getComparisonScript()}(function(){${getFullWidthToggleScript()}})();</script>
 </body>
 </html>`;
+}
+
+/**
+ * §4.2 / §14.8 — KPI cards summarizing the comparison: which package leads
+ * (most dimension wins), the runner-up's name, and the count of dimensions
+ * ranked. Cards are non-interactive on this surface (the table itself is the
+ * data view; there are no rows to filter), so they read as informational
+ * KPIs rather than preset filters.
+ */
+function buildKpiRow(
+    packages: readonly ComparisonData[],
+    winners: readonly DimensionWinner[],
+): string {
+    // Tally dimension wins per package: each DimensionWinner names one
+    // winner (winnerName) and lists all values, any of which may carry
+    // isWinner=true for ties. Count every isWinner mention so a tied
+    // dimension credits both packages.
+    const winsByPkg = new Map<string, number>();
+    for (const w of winners) {
+        for (const v of w.allValues) {
+            if (v.isWinner) {
+                winsByPkg.set(v.name, (winsByPkg.get(v.name) ?? 0) + 1);
+            }
+        }
+    }
+    const ranked = [...winsByPkg.entries()].sort((a, b) => b[1] - a[1]);
+    const leader = ranked[0];
+    const leaderName = leader ? leader[0] : '—';
+    const leaderWins = leader ? leader[1] : 0;
+    const totalDimensions = winners.length;
+
+    return `<section class="kpi-row" aria-label="Comparison summary">
+        <div class="kpi-card" title="Package leading by most dimension wins.">
+            <span class="kpi-k">Leading</span>
+            <span class="kpi-v" style="font-size: 1.4em;">${escapeHtml(leaderName)}</span>
+            <span class="kpi-sub">${leaderWins} dimension win${leaderWins === 1 ? '' : 's'}</span>
+        </div>
+        <div class="kpi-card" title="Number of packages compared side-by-side.">
+            <span class="kpi-k">Packages</span>
+            <span class="kpi-v">${packages.length}</span>
+            <span class="kpi-sub">in comparison</span>
+        </div>
+        <div class="kpi-card" title="Number of dimensions where a winner could be ranked.">
+            <span class="kpi-k">Dimensions</span>
+            <span class="kpi-v">${totalDimensions}</span>
+            <span class="kpi-sub">ranked</span>
+        </div>
+    </section>`;
+}
+
+/**
+ * §4.3 — Toolbar band for the comparison view. The dominant action is
+ * adding a package back to the project (handled per-row by .add-btn after
+ * its primary-button-color demotion in §8.10), so the toolbar carries
+ * supporting actions only: copy the comparison output, open the package
+ * dashboard to add more comparisons. No tier-1 — none of these dominates
+ * strongly enough to deserve primary emphasis on this surface.
+ */
+function buildToolbar(): string {
+    return `<section class="toolbar-band" aria-label="Comparison actions">
+        <div class="toolbar-row">
+            <button type="button" class="btn" id="openPkgDashboard"
+                title="Open the Package Dashboard to compare more packages.">
+                <span class="glyph">📦</span>Package Dashboard
+            </button>
+        </div>
+    </section>`;
 }

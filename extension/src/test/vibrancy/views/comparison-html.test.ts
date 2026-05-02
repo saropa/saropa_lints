@@ -267,4 +267,51 @@ describe('buildComparisonHtml', () => {
         assert.ok(html.includes('postMessage'));
         assert.ok(html.includes('addPackage'));
     });
+
+    /* ────────────────────────────────────────────────────────────────────
+     * §15 audit fixes — pin the new behavior.
+     * ──────────────────────────────────────────────────────────────────── */
+
+    it('renders an empty-state CTA with a tier-1 Open Package Dashboard button (§8.16)', () => {
+        const html = buildComparisonHtml(makeRankedComparison([]));
+        assert.ok(html.includes('class="btn tier-1"'));
+        assert.ok(html.includes('id="openPackageDashboard"'));
+        assert.ok(html.includes('Open Package Dashboard'));
+    });
+
+    it('renders a KPI summary row when packages are present (§4.2 / §14.8)', () => {
+        const ranked = makeRankedComparison([
+            makePackage({ name: 'http' }),
+            makePackage({ name: 'dio' }),
+        ]);
+        const html = buildComparisonHtml(ranked);
+        assert.ok(html.includes('class="kpi-row"'));
+        assert.ok(html.includes('Leading'));
+        assert.ok(html.includes('Packages'));
+        assert.ok(html.includes('Dimensions'));
+    });
+
+    it('renders a toolbar band with a Package Dashboard action (§4.3)', () => {
+        const ranked = makeRankedComparison([
+            makePackage({ name: 'http' }),
+            makePackage({ name: 'dio' }),
+        ]);
+        const html = buildComparisonHtml(ranked);
+        assert.ok(html.includes('class="toolbar-band"'));
+        assert.ok(html.includes('id="openPkgDashboard"'));
+    });
+
+    it('demotes .add-btn out of the primary-button color (§8.10)', () => {
+        const ranked = makeRankedComparison([
+            makePackage({ name: 'http', inProject: false }),
+            makePackage({ name: 'dio', inProject: false }),
+        ]);
+        const html = buildComparisonHtml(ranked);
+        // The .add-btn rule must use the secondary-background token, not the primary.
+        assert.ok(html.includes('var(--vscode-button-secondaryBackground)'));
+        // Sanity: the rule under .add-btn { ... } must NOT include the primary token.
+        const addBtnRule = html.match(/\.add-btn\s*\{[^}]+\}/);
+        assert.ok(addBtnRule, '.add-btn rule must exist');
+        assert.ok(!addBtnRule![0].includes('var(--vscode-button-background)'));
+    });
 });

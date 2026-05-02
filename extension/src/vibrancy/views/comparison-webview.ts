@@ -11,6 +11,12 @@ interface AddPackageMessage {
     version: string;
 }
 
+interface OpenPackageDashboardMessage {
+    type: 'openPackageDashboard';
+}
+
+type ComparisonMessage = AddPackageMessage | OpenPackageDashboardMessage;
+
 /** Singleton webview panel for package comparison. */
 export class ComparisonPanel {
     public static currentPanel: ComparisonPanel | undefined;
@@ -56,11 +62,19 @@ export class ComparisonPanel {
         this._panel.webview.html = buildComparisonHtml(ranked);
     }
 
-    private async _handleMessage(message: AddPackageMessage): Promise<void> {
-        if (message.type !== 'addPackage') { return; }
-
-        const { name, version } = message;
-        await addPackageToPubspec(name, version);
+    private async _handleMessage(message: ComparisonMessage): Promise<void> {
+        if (message.type === 'addPackage') {
+            const { name, version } = message;
+            await addPackageToPubspec(name, version);
+            return;
+        }
+        if (message.type === 'openPackageDashboard') {
+            // §4.3 / §8.16 — toolbar action and empty-state CTA both dispatch
+            // here; reusing the registered command keeps a single open path
+            // so any future telemetry around dashboard opens fires
+            // consistently regardless of entry point.
+            await vscode.commands.executeCommand('saropaLints.openPackageVibrancy');
+        }
     }
 
     private _dispose(): void {
