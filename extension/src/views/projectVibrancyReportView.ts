@@ -166,6 +166,15 @@ function formatRelativeFreshness(iso: string | undefined): string {
   return `${Math.floor(days / 7)}w ago`;
 }
 
+/**
+ * Compose the Code Health Dashboard HTML document. Exported so unit tests can
+ * assert the rendered structure (KPI behavior, empty-state CTA, gate banner)
+ * without standing up a real VS Code webview.
+ */
+export function buildProjectVibrancyHtml(payload: ProjectVibrancyPayload): string {
+  return buildHtml(payload);
+}
+
 function buildHtml(payload: ProjectVibrancyPayload): string {
   const summary = payload.summary ?? {};
   const rows = [...(payload.functions ?? [])].sort((a, b) => a.score - b.score).slice(0, 200);
@@ -250,54 +259,45 @@ function buildGateBanner(payload: ProjectVibrancyPayload): string {
   const violations = payload.gates?.violations ?? [];
   const summary =
     violations.length === 0
-      ? 'Open Code Health settings to inspect thresholds.'
-      : `${violations.length} gate${violations.length === 1 ? '' : 's'} failing — open Code Health settings to adjust thresholds, or copy the JSON to inspect <code>gates.violations</code>.`;
-  return `<div class="gate-warn" role="alert"><span class="glyph">⚠</span><span>${summary}</span></div>`;
+      ? 'Quality gates failed — review thresholds in Code Health settings.'
+      : `${violations.length} gate${violations.length === 1 ? '' : 's'} failing — review thresholds, or copy the JSON to inspect <code>gates.violations</code>.`;
+  // §8.16 — empty/error states must name the next action with a tier-1 button.
+  // Previously this banner only carried explanatory text; the user had to
+  // hunt for the *Code Health settings* toolbar button to act on it. The
+  // tier-1 button inside the banner closes that gap; #openPvSettings is
+  // the same id wired in the toolbar so the existing click handler reaches
+  // it too (querySelector picks up either occurrence on dispatch).
+  return `<div class="gate-warn" role="alert">
+    <span class="glyph">⚠</span>
+    <span class="gate-msg">${summary}</span>
+    <button type="button" class="btn tier-1" data-cmd="openProjectVibrancySettings"
+      title="Open the Code Health settings to adjust thresholds.">Open Code Health settings</button>
+  </div>`;
 }
 
 /**
  * KPI strip: clickable preset-filter cards (§14.8) for the actionable flag types, plus a
  * static average grade card. Clicking a flag card sets the table to show only rows that
  * carry that flag.
+ *
+ * §14.11 — cards whose value is zero are suppressed so a healthy project
+ * does not greet the user with five identical-twin "0 / 0 / 0 / 0 / 0"
+ * boxes. When every category is zero, the row collapses to a single muted
+ * line acknowledging the all-clear state without occupying card real estate.
  */
 function buildKpiRow(summary: NonNullable<ProjectVibrancyPayload['summary']>): string {
-  const cards = [
-    kpiCard({
-      flag: 'unused',
-      label: 'Unused',
-      value: summary.unusedCount ?? 0,
-      sub: 'functions referenced nowhere',
-      classes: 'crit',
-    }),
-    kpiCard({
-      flag: 'uncovered',
-      label: 'Uncovered',
-      value: summary.uncoveredCount ?? 0,
-      sub: 'no LCOV coverage',
-      classes: 'errors',
-    }),
-    kpiCard({
-      flag: 'stub_tested',
-      label: 'Stub-tested',
-      value: summary.stubTestedCount ?? 0,
-      sub: 'tests exist but assert little',
-      classes: 'warnings',
-    }),
-    kpiCard({
-      flag: 'suspicious_coverage',
-      label: 'Suspicious coverage',
-      value: summary.suspiciousCoverageCount ?? 0,
-      sub: 'coverage looks fabricated',
-      classes: 'warnings',
-    }),
-    kpiCard({
-      flag: 'test_drift',
-      label: 'Test drift',
-      value: summary.testDriftCount ?? 0,
-      sub: 'tests lag the function',
-      classes: 'todos',
-    }),
-  ].join('');
+  const specs: KpiInput[] = [
+    { flag: 'unused', label: 'Unused', value: summary.unusedCount ?? 0, sub: 'functions referenced nowhere', classes: 'crit' },
+    { flag: 'uncovered', label: 'Uncovered', value: summary.uncoveredCount ?? 0, sub: 'no LCOV coverage', classes: 'errors' },
+    { flag: 'stub_tested', label: 'Stub-tested', value: summary.stubTestedCount ?? 0, sub: 'tests exist but assert little', classes: 'warnings' },
+    { flag: 'suspicious_coverage', label: 'Suspicious coverage', value: summary.suspiciousCoverageCount ?? 0, sub: 'coverage looks fabricated', classes: 'warnings' },
+    { flag: 'test_drift', label: 'Test drift', value: summary.testDriftCount ?? 0, sub: 'tests lag the function', classes: 'todos' },
+  ];
+  const live = specs.filter((s) => s.value > 0);
+  if (live.length === 0) {
+    return `<p class="kpi-allclear" aria-label="Code health summary">No flagged functions across any category — all clear.</p>`;
+  }
+  const cards = live.map(kpiCard).join('');
   return `<section class="kpi-row" aria-label="Code health summary">${cards}</section>`;
 }
 
@@ -367,6 +367,15 @@ function buildTable(rows: readonly ProjectVibrancyFunctionRow[]): string {
       </thead>
       <tbody id="pvBody">${tbodyRows}</tbody>
     </table>
+    <!-- §8.16 — empty-state banner shown by the script when text-filter or
+         flag-filter narrows the visible row count to zero. Carries a tier-1
+         *Reset filters* button so the user is not stranded looking at an
+         empty table with no cue for the next action. -->
+    <div id="pvEmpty" class="empty-cta" role="status" hidden>
+      <p class="empty-msg">No functions match the current filters.</p>
+      <button type="button" class="btn tier-1" id="pvResetFilters"
+        title="Clear the search and any active flag filter.">Reset filters</button>
+    </div>
   </div>
   <p class="hint">Showing the worst 200 functions by score. Use the search field to narrow further.</p>
 </section>`;
@@ -406,10 +415,19 @@ function buildClientScript(): string {
   document.getElementById('rescan').addEventListener('click', function() { postCmd('rescan'); });
   document.getElementById('copyJson').addEventListener('click', function() { postCmd('copyJson'); });
   document.getElementById('openPvSettings').addEventListener('click', function() { postCmd('openProjectVibrancySettings'); });
+  // The gate-failure banner now exposes its own tier-1 *Open Code Health
+  // settings* button (§8.16). Wire any [data-cmd] button on the page so
+  // future banner / empty-state CTAs reuse the same dispatch path.
+  document.querySelectorAll('[data-cmd]').forEach(function(b) {
+    b.addEventListener('click', function() { postCmd(b.getAttribute('data-cmd')); });
+  });
 
   const tbody = document.getElementById('pvBody');
   const searchEl = document.getElementById('pvSearch');
   const stripEl = document.getElementById('filter-strip');
+  const emptyEl = document.getElementById('pvEmpty');
+  const resetEmptyBtn = document.getElementById('pvResetFilters');
+  if (resetEmptyBtn) resetEmptyBtn.addEventListener('click', resetFilters);
 
   searchEl.addEventListener('input', function() {
     state.search = (searchEl.value || '').trim().toLowerCase();
@@ -429,6 +447,7 @@ function buildClientScript(): string {
   });
 
   function applyFilters() {
+    let visible = 0;
     Array.from(tbody.querySelectorAll('tr')).forEach(function(tr) {
       const hay = (tr.dataset.search || '').toLowerCase();
       const flagsArr = (tr.dataset.flags || '').split(/\\s+/);
@@ -436,7 +455,13 @@ function buildClientScript(): string {
       if (state.search && hay.indexOf(state.search) === -1) show = false;
       if (state.flag && flagsArr.indexOf(state.flag) === -1) show = false;
       tr.style.display = show ? '' : 'none';
+      if (show) visible++;
     });
+    // §8.16 — show the empty-state CTA only when filters reduced the table
+    // to zero rows. If there were no rows to begin with (e.g. fresh project,
+    // no scan data) we leave the table alone — that is a different empty
+    // condition handled by the upstream "no data" path, not by reset.
+    if (emptyEl) emptyEl.hidden = !(visible === 0 && tbody.children.length > 0);
     renderStrip();
   }
 

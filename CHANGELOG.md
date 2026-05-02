@@ -51,6 +51,9 @@
 
 - The **Findings Dashboard** title now reads *Saropa Findings Dashboard* in the page heading (previously only the editor tab carried the *Saropa* prefix), and the toolbar's Copy JSON / Save report buttons have moved into the **More actions ▾** overflow menu so the visible action row stays scannable. No action required — both exports remain reachable from the same overflow menu that already housed the rest of the palette.
 - The **Findings Dashboard** suppressions list now renders rule names with the same monospace tag style used in the findings table; previously the two surfaces used different elements (`<code>` vs. `<span class="rule-tag">`) which made suppression rows look pre-highlighted. No action required.
+- The **Code Health Dashboard** KPI strip now suppresses zero-count categories and collapses to a single muted *all clear* line when every category is zero, instead of greeting healthy projects with a row of identical zeros. No action required — categories reappear as their counts grow.
+- The **Code Health Dashboard** filtered table now shows an empty-state banner with a *Reset filters* button when search or a flag-card filter narrows it to zero rows, instead of leaving the user staring at an empty table with no cue. No action required — the banner appears and disappears with the filter state.
+- The **Code Health Dashboard** gate-failure banner now carries an *Open Code Health settings* button so the user can act on a failing quality gate from inside the banner; previously it offered only explanatory text. No action required.
 
 ### Fixed (Extension)
 

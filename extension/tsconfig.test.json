@@ -105,6 +105,7 @@
     "src/views/projectVibrancyReportStyles.ts",
     "src/views/projectVibrancyTypes.ts",
     "src/test/views/projectVibrancyInflight.test.ts",
+    "src/test/views/projectVibrancyReportHtml.test.ts",
     "src/test/fileRiskData.test.ts",
     "src/runHistory.ts",
     "src/securityHotspotReviewState.ts",

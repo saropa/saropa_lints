@@ -19,6 +19,7 @@ export function getProjectVibrancyReportStyles(): string {
     codeHealthTableStyles(),
     gradeAndFlagPillStyles(),
     gateBannerStyles(),
+    healthSummaryStateStyles(),
   ].join('\n');
 }
 
@@ -95,5 +96,48 @@ function gateBannerStyles(): string {
   font-size: 0.92em;
 }
 .gate-warn .glyph { font-size: 1.1em; }
+.gate-warn .gate-msg { flex: 1 1 auto; }
+.gate-warn .btn { flex: 0 0 auto; }
+`;
+}
+
+/**
+ * Empty / all-clear states for the KPI strip and the filtered table.
+ *
+ * §14.11 — when every KPI category is zero we collapse the row to a single
+ * muted line; without dedicated styling that line would inherit body weight
+ * and read as content rather than as an "all clear" acknowledgement.
+ *
+ * §8.16 — the empty-state CTA shown when filters reduce the table to zero
+ * rows shares the visual vocabulary of empty states elsewhere (centered
+ * text + tier-1 button) so users do not learn a new pattern per surface.
+ */
+function healthSummaryStateStyles(): string {
+  return `
+.kpi-allclear {
+  margin: 0 0 12px 0;
+  padding: 10px 14px;
+  font-size: 0.92em;
+  color: var(--muted);
+  border: 1px dashed var(--border);
+  border-radius: 6px;
+  background: transparent;
+}
+.empty-cta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 24px 16px;
+  margin: 12px 0;
+  border: 1px dashed var(--border);
+  border-radius: 6px;
+  background: var(--surface-2);
+}
+.empty-cta .empty-msg {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.95em;
+}
 `;
 }
