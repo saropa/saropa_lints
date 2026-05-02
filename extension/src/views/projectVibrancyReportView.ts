@@ -5,6 +5,7 @@ import { getProjectRoot } from '../projectRoot';
 import { runProjectVibrancyScan } from './projectVibrancyCliRunner';
 import type { ProjectVibrancyFunctionRow, ProjectVibrancyPayload } from './projectVibrancyTypes';
 import { getProjectVibrancyReportStyles } from './projectVibrancyReportStyles';
+import { pluralize } from './webview-format';
 
 /**
  * **Code Health Dashboard** webview: runs [runProjectVibrancyScan], renders JSON as HTML in an
@@ -216,7 +217,7 @@ function buildHero(payload: ProjectVibrancyPayload, summary: NonNullable<Project
   const gateFailed = payload.gates?.pass === false;
   const parts = [
     `Generated <strong>${escapeHtml(generated)}</strong>`,
-    `${fnCount} function${fnCount === 1 ? '' : 's'}`,
+    pluralize(fnCount, { one: '{count} function', other: '{count} functions' }),
     `avg ${escapeHtml(avgScore.toFixed(1))} (${escapeHtml(avgGrade)})`,
     gateFailed
       ? '<span class="pill bad">gates failing</span>'
@@ -260,7 +261,7 @@ function buildGateBanner(payload: ProjectVibrancyPayload): string {
   const summary =
     violations.length === 0
       ? 'Quality gates failed — review thresholds in Code Health settings.'
-      : `${violations.length} gate${violations.length === 1 ? '' : 's'} failing — review thresholds, or copy the JSON to inspect <code>gates.violations</code>.`;
+      : `${pluralize(violations.length, { one: '{count} gate failing', other: '{count} gates failing' })} — review thresholds, or copy the JSON to inspect <code>gates.violations</code>.`;
   // §8.16 — empty/error states must name the next action with a tier-1 button.
   // Previously this banner only carried explanatory text; the user had to
   // hunt for the *Code Health settings* toolbar button to act on it. The

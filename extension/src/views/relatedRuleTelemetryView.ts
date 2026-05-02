@@ -17,6 +17,7 @@ import {
   formatRelativeTimestamp,
   getFullWidthToggleScript,
 } from './dashboardHero';
+import { pluralize } from './webview-format';
 
 /** Active panel reference; undefined after dispose or before first open. */
 let currentPanel: vscode.WebviewPanel | undefined;
@@ -79,7 +80,7 @@ function buildHtml(snapshot: TelemetryStore): string {
       tone: relative ? 'neutral' : 'warn',
       title: snapshot.lastEventAt ?? 'Never',
     },
-    { label: `${totalEvents} total event${totalEvents === 1 ? '' : 's'}` },
+    { label: pluralize(totalEvents, { one: '{count} total event', other: '{count} total events' }) },
   ]);
   const heroHtml = buildDashboardHero({
     title: 'Related Rule Telemetry',

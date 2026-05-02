@@ -19,6 +19,7 @@ import { getFindingsEmptyStateStyles, getViolationsDashboardStyles } from './vio
 import type { DashboardSection } from './issuesTreeModel';
 import { VIOLATIONS_GROUP_BY_MODES, type GroupByMode } from './issuesTreeGrouping';
 import { buildFullWidthToggle, getFullWidthToggleScript } from './dashboardHero';
+import { pluralize } from './webview-format';
 
 /** Analyzer-side suppression counts from `violations.json` (same source as the Suppressions tree). */
 export interface AnalyzerSuppressionsSlice {
@@ -221,7 +222,7 @@ function buildStatusLine(input: ViolationsDashboardHtmlInput): string {
   }
   const findings = input.totalRawAfterDisable;
   const findingsClass = findings === 0 ? 'good' : findings > 100 ? 'bad' : 'warn';
-  parts.push(`<span class="pill ${findingsClass}" title="Total findings after disabled-rule filter">${findings} finding${findings === 1 ? '' : 's'}</span>`);
+  parts.push(`<span class="pill ${findingsClass}" title="Total findings after disabled-rule filter">${pluralize(findings, { one: '{count} finding', other: '{count} findings' })}</span>`);
   const todos = input.todoHackSnapshot.todos.length;
   const hacks = input.todoHackSnapshot.hacks.length;
   if (input.todoHackSnapshot.enabled) {
@@ -569,7 +570,7 @@ function buildTopRulesTable(input: ViolationsDashboardHtmlInput): string {
     <div class="findings-wrap">
       <div class="findings-toolbar">
         <span class="meta-line" style="margin:0">
-          Top ${rows.length} rule${rows.length === 1 ? '' : 's'} · ${totalShown} of ${input.filteredCount} findings (${share}%) ·
+          ${pluralize(rows.length, { one: 'Top {count} rule', other: 'Top {count} rules' })} · ${totalShown} of ${input.filteredCount} findings (${share}%) ·
           <strong>Hide</strong> = workspace only ·
           <strong>Disable</strong> = project config (writes <code>analysis_options_custom.yaml</code>)
         </span>

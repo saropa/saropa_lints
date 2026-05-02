@@ -10,6 +10,7 @@ import {
     buildStatusLine,
     getFullWidthToggleScript,
 } from '../../views/dashboardHero';
+import { pluralize } from '../../views/webview-format';
 
 /**
  * HTML builder for **side-by-side package comparison** (scores, dimension winners, size, recommendations).
@@ -318,7 +319,7 @@ export function buildComparisonHtml(ranked: RankedComparison): string {
     const dimensionsWithWinners = winners.length;
     const statusLineHtml = buildStatusLine([
         { glyph: '📦', label: `${packages.length} packages compared` },
-        { label: `${dimensionsWithWinners} dimension${dimensionsWithWinners === 1 ? '' : 's'} ranked` },
+        { label: pluralize(dimensionsWithWinners, { one: '{count} dimension ranked', other: '{count} dimensions ranked' }) },
         {
             label: packages.map(p => p.name).slice(0, 3).join(' vs ') + (packages.length > 3 ? ` +${packages.length - 3} more` : ''),
             title: packages.map(p => p.name).join(', '),
@@ -386,7 +387,7 @@ function buildKpiRow(
         <div class="kpi-card" title="Package leading by most dimension wins.">
             <span class="kpi-k">Leading</span>
             <span class="kpi-v" style="font-size: 1.4em;">${escapeHtml(leaderName)}</span>
-            <span class="kpi-sub">${leaderWins} dimension win${leaderWins === 1 ? '' : 's'}</span>
+            <span class="kpi-sub">${pluralize(leaderWins, { one: '{count} dimension win', other: '{count} dimension wins' })}</span>
         </div>
         <div class="kpi-card" title="Number of packages compared side-by-side.">
             <span class="kpi-k">Packages</span>

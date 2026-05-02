@@ -12,22 +12,31 @@ export function getChartScript(): string {
 
     /* --- Donut draw-in animation ---
      * Store each segment's final dasharray, reset to "0 C", then restore
-     * after two rAF frames so the CSS transition animates the draw-in. */
+     * after two rAF frames so the CSS transition animates the draw-in.
+     *
+     * §5.2 — reduced-motion users skip the reset+restore entirely so the
+     * segments render in their final state immediately. The end state is
+     * preserved either way; only the in-flight animation differs. */
     var segments = document.querySelectorAll('.donut-segment');
-    var finalDash = [];
-    segments.forEach(function(seg, i) {
-        finalDash[i] = seg.getAttribute('stroke-dasharray');
-        var r = parseFloat(seg.getAttribute('r'));
-        var circ = 2 * Math.PI * r;
-        seg.setAttribute('stroke-dasharray', '0 ' + circ);
-    });
-    requestAnimationFrame(function() {
+    var prefersReducedMotion =
+        window.matchMedia &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!prefersReducedMotion) {
+        var finalDash = [];
+        segments.forEach(function(seg, i) {
+            finalDash[i] = seg.getAttribute('stroke-dasharray');
+            var r = parseFloat(seg.getAttribute('r'));
+            var circ = 2 * Math.PI * r;
+            seg.setAttribute('stroke-dasharray', '0 ' + circ);
+        });
         requestAnimationFrame(function() {
-            segments.forEach(function(seg, i) {
-                seg.setAttribute('stroke-dasharray', finalDash[i]);
+            requestAnimationFrame(function() {
+                segments.forEach(function(seg, i) {
+                    seg.setAttribute('stroke-dasharray', finalDash[i]);
+                });
             });
         });
-    });
+    }
 
     /* --- Tooltip helpers ---
      * Uses DOM construction instead of innerHTML to prevent XSS from

@@ -110,7 +110,7 @@ body[data-full-width="true"] { max-width: none; }
 .full-width-toggle:hover { background: var(--vscode-list-hoverBackground); border-color: var(--border-strong); }
 .full-width-toggle:focus-visible { outline: 1px solid var(--vscode-focusBorder); outline-offset: 2px; }
 body[data-full-width="true"] .full-width-toggle { background: var(--vscode-list-activeSelectionBackground); border-color: var(--vscode-focusBorder); }
-.status-line .full-width-toggle { margin-left: auto; }
+.status-line .full-width-toggle { margin-inline-start: auto; }
 `;
 }
 
@@ -140,7 +140,7 @@ function chromeHeroAndGauge(): string {
   letter-spacing: 0.2px;
 }
 .hero-text h1 .stamp {
-  margin-left: 10px;
+  margin-inline-start: 10px;
   font-size: 0.55em;
   font-weight: 400;
   opacity: 0.55;
@@ -540,7 +540,7 @@ function chromeChipStrip(): string {
   background: color-mix(in srgb, var(--surface-3) 65%, transparent);
 }
 .chip-strip[hidden] { display: none; }
-.chip-strip .lbl { color: var(--muted); font-size: 0.9em; margin-right: 2px; }
+.chip-strip .lbl { color: var(--muted); font-size: 0.9em; margin-inline-end: 2px; }
 .chip {
   display: inline-flex; align-items: center;
   gap: 4px;
@@ -564,7 +564,7 @@ function chromeChipStrip(): string {
   background: rgba(0, 0, 0, 0.18);
 }
 .chip-strip .clear-all {
-  margin-left: auto;
+  margin-inline-start: auto;
   color: var(--link);
   background: transparent;
   border: 0;
@@ -783,7 +783,7 @@ function chromeTableBase(): string {
   white-space: nowrap;
 }
 .dash-table thead th.sortable { cursor: pointer; }
-.dash-table thead th .arrow { opacity: 0.4; margin-left: 4px; }
+.dash-table thead th .arrow { opacity: 0.4; margin-inline-start: 4px; }
 .dash-table thead th[aria-sort="ascending"]  .arrow { opacity: 1; }
 .dash-table thead th[aria-sort="descending"] .arrow { opacity: 1; }
 .dash-table tbody tr { border-bottom: 1px solid var(--border); }
@@ -841,7 +841,7 @@ code, .mono {
   color: var(--muted);
   font-weight: 500;
 }
-.section > h2 .meta { margin-left: auto; font-weight: 400; }
+.section > h2 .meta { margin-inline-start: auto; font-weight: 400; }
 @keyframes hero-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes card-in { from { opacity: 0; transform: translateY(4px); }  to { opacity: 1; transform: translateY(0); } }
 @keyframes chip-in { from { opacity: 0; transform: scale(0.92); }       to { opacity: 1; transform: scale(1); } }
@@ -895,7 +895,7 @@ function chromeEmptyAndError(): string {
   margin: 0 0 12px;
   padding: 8px 12px;
   border-radius: 6px;
-  border-left: 3px solid var(--vscode-inputValidation-errorBorder);
+  border-inline-start: 3px solid var(--vscode-inputValidation-errorBorder);
   background: var(--vscode-inputValidation-errorBackground);
   color: var(--vscode-inputValidation-errorForeground);
   font-size: 0.92em;

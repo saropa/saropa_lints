@@ -78,7 +78,7 @@ h1 {
 
 section {
     margin-bottom: 16px;
-    border: 1px solid var(--vscode-widget-border, var(--vscode-editorWidget-border, #333));
+    border: 1px solid var(--vscode-widget-border, var(--vscode-editorWidget-border));
     border-radius: 4px;
     overflow: hidden;
 }
@@ -223,7 +223,7 @@ section[data-expanded="false"] .section-content {
     flex-direction: column;
     gap: 6px;
     padding-top: 8px;
-    border-top: 1px solid var(--vscode-widget-border, #333);
+    border-top: 1px solid var(--vscode-widget-border);
     margin-top: 8px;
 }
 
@@ -268,8 +268,8 @@ section[data-expanded="false"] .section-content {
     display: inline-block;
     padding: 1px 8px;
     border-radius: 10px;
-    background: var(--vscode-badge-background, #4d4d4d);
-    color: var(--vscode-badge-foreground, #fff);
+    background: var(--vscode-badge-background);
+    color: var(--vscode-badge-foreground);
     font-size: 10px;
     text-decoration: none;
     cursor: pointer;
@@ -290,7 +290,7 @@ section[data-expanded="false"] .section-content {
     display: inline-block;
     padding: 1px 8px;
     border-radius: 10px;
-    border: 1px solid var(--vscode-widget-border, #333);
+    border: 1px solid var(--vscode-widget-border);
     color: var(--vscode-foreground);
     font-size: 10px;
     text-decoration: none;
@@ -298,7 +298,7 @@ section[data-expanded="false"] .section-content {
 }
 
 .sidebar-dep-chip:hover {
-    background: var(--vscode-list-hoverBackground, #2a2d2e);
+    background: var(--vscode-list-hoverBackground);
 }
 
 /* ---- Sidebar image gallery ---- */
@@ -313,12 +313,12 @@ section[data-expanded="false"] .section-content {
     max-height: 90px;
     object-fit: contain;
     border-radius: 3px;
-    border: 1px solid var(--vscode-widget-border, #333);
+    border: 1px solid var(--vscode-widget-border);
     cursor: pointer;
 }
 
 .sidebar-gallery img:hover {
-    border-color: var(--vscode-focusBorder, #007acc);
+    border-color: var(--vscode-focusBorder);
 }
 `;
 }
