@@ -56,6 +56,7 @@
 - The **Code Health Dashboard** gate-failure banner now carries an *Open Code Health settings* button so the user can act on a failing quality gate from inside the banner; previously it offered only explanatory text. No action required.
 - The **Rule Explain panel** now renders each section as an inset card with consistent `<h4>` subsection headings, OWASP labels as a definition list, and the *Documentation* link as a tier-2 button — so the panel inherits the same visual depth and CTA emphasis as the Findings and Code Health dashboards. The panel also drops its private body styles so it picks up the shared `max-width` and full-width toggle. No action required.
 - The **Rule Explain panel** now omits the *Problem* section entirely when a rule carries no message, instead of advertising a *No message* placeholder card. No action required.
+- The **Command Catalog** panel cleans up its toolbar surface: the search-tokenization hint moves below the toolbar band as a one-line muted note (it previously lived inside the toolbar and ate vertical space), the *Frequent* tiles drop their primary-button tint in favor of the editor's inactive-selection tone (so toolbar buttons keep visual primacy), and category-count badges now show a focus/hover outline so the click target is visible before commit. No action required.
 
 ### Fixed (Extension)
 

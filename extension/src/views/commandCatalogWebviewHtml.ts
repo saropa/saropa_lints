@@ -133,12 +133,17 @@ export function buildCommandCatalogHtml(
           </button>
         </div>
       </div>
-      <p class="search-hint" id="searchHint">
-        Matches each command's <strong>title</strong>, <strong>description</strong>, and <strong>id</strong>
-        (id tokens are spaced too — type <kbd>run analysis</kbd> without dots).
-      </p>
     </div>
   </div>
+  <!-- §4.3 — search hint moved out of .toolbar-wrap so the toolbar band reads
+       as a control surface, not a control surface plus a help paragraph.
+       The hint is a one-line muted sentence below the band; full kbd-style
+       formatting still renders in the same #searchHint element so any
+       script that touched it keeps working. -->
+  <p class="search-hint search-hint-below" id="searchHint">
+    Matches each command's <strong>title</strong>, <strong>description</strong>, and <strong>id</strong>
+    (id tokens are spaced too — type <kbd>run analysis</kbd> without dots).
+  </p>
 
   <div
     class="filter-chip-strip"
@@ -475,6 +480,16 @@ function getStyles(): string {
       line-height: 1.45;
     }
 
+    /* §4.3 — single-line variant rendered BELOW the toolbar band so the
+       toolbar reads as a pure control surface. Centered to mirror the
+       toolbar's max-width and indented to read as supporting copy. */
+    .search-hint-below {
+      max-width: 880px;
+      margin: 6px auto 0;
+      padding: 0 14px;
+      font-size: 0.78em;
+    }
+
     .search-hint kbd {
       font-family: var(--vscode-editor-font-family);
       font-size: 0.92em;
@@ -599,6 +614,13 @@ function getStyles(): string {
       gap: 10px;
     }
 
+    /* §8.10 — frequent tiles previously used a 12% --vscode-button-background
+       tint that visually outweighed the actual tier-1/tier-2 toolbar buttons.
+       The action-button color vocabulary belongs to actions, not to content
+       cards; tiles drop to the editor's inactive-selection tone so the user's
+       eye lands on the search input and toolbar buttons first. The hover
+       state still lifts the tile via a subtle button-color brush so the
+       affordance reads as interactive without competing for emphasis. */
     .frequent-tile {
       display: flex;
       align-items: center;
@@ -606,7 +628,7 @@ function getStyles(): string {
       padding: 10px 12px;
       border-radius: 8px;
       border: 1px solid var(--vscode-widget-border);
-      background: color-mix(in srgb, var(--vscode-button-background) 12%, var(--vscode-editor-background));
+      background: var(--vscode-editor-inactiveSelectionBackground);
       cursor: pointer;
       text-align: left;
       color: inherit;
@@ -614,7 +636,7 @@ function getStyles(): string {
     }
 
     .frequent-tile:hover {
-      background: color-mix(in srgb, var(--vscode-button-background) 22%, var(--vscode-editor-background));
+      background: color-mix(in srgb, var(--vscode-button-background) 8%, var(--vscode-editor-inactiveSelectionBackground));
       border-color: color-mix(in srgb, var(--vscode-focusBorder) 50%, var(--vscode-widget-border));
     }
 
@@ -759,9 +781,19 @@ function getStyles(): string {
        * count badges first-class actions, not inert decoration). */
     }
 
+    /* §14.1 — count badges had cursor:pointer but no visible focus/hover
+       outline, so they read as semi-static decoration at first glance.
+       The outline announces "this is a click target" before the user
+       commits, matching the chrome's affordance-discovery pattern. */
     .category-count:hover {
       background: var(--vscode-list-activeSelectionBackground);
       color: var(--vscode-list-activeSelectionForeground);
+      outline: 1px solid var(--vscode-focusBorder);
+      outline-offset: 2px;
+    }
+    .category-count:focus-visible {
+      outline: 1px solid var(--vscode-focusBorder);
+      outline-offset: 2px;
     }
 
     .category-body { padding: 4px 0 8px; }
