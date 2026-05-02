@@ -706,13 +706,28 @@ function getStyles(): string {
       text-transform: uppercase;
     }
 
-    .category.flash .category-header {
+    /* Flash overlay — color is set in a static rule (var() resolves reliably
+       outside keyframes) and the keyframe animates only opacity, so the
+       flash still appears when var() in @keyframes fails to resolve in the
+       VS Code webview (the same Chromium quirk that left chart bars all at
+       100% width). The pseudo sits over the header content; pointer-events:
+       none keeps clicks flowing through to the underlying button. */
+    .category-header::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: color-mix(in srgb, var(--vscode-focusBorder) 35%, transparent);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .category.flash .category-header::after {
       animation: badge-flash 0.9s ease-out;
     }
 
     @keyframes badge-flash {
-      0%   { background: color-mix(in srgb, var(--vscode-focusBorder) 35%, transparent); }
-      100% { background: var(--vscode-editor-background); }
+      from { opacity: 1; }
+      to   { opacity: 0; }
     }
 
     .collapse-icon {
@@ -948,7 +963,7 @@ function getStyles(): string {
     @media (prefers-reduced-motion: reduce) {
       .collapse-icon,
       .entry-copy { transition: none; }
-      .category.flash .category-header { animation: none; }
+      .category.flash .category-header::after { animation: none; }
     }
   `;
 }
