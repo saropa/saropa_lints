@@ -250,7 +250,7 @@ function buildHero(input: ViolationsDashboardHtmlInput): string {
     : '';
   return `<header class="dash-hero">
     <div class="hero-text">
-      <h1>Findings Dashboard${stamp}</h1>
+      <h1>Saropa Findings Dashboard${stamp}</h1>
       ${buildStatusLine(input)}
     </div>
     ${buildGauge(score)}
@@ -419,13 +419,7 @@ function buildToolbar(input: ViolationsDashboardHtmlInput): string {
       <button type="button" class="btn" id="btn-refresh" title="Reload violations.json from disk">
         <span class="glyph">⟳</span>Refresh
       </button>
-      <button type="button" class="btn" id="btn-copy" title="Copy filtered violations as JSON (${exportCount})">
-        <span class="glyph">⎘</span>Copy JSON
-      </button>
-      <button type="button" class="btn" id="btn-save" title="Save filtered violations as JSON to reports/YYYYMMDD/">
-        <span class="glyph">⤓</span>Save report
-      </button>
-      ${buildMoreActionsMenu()}
+      ${buildMoreActionsMenu(exportCount)}
     </div>
     <div class="toolbar-row">
       <span class="seg" role="group" aria-label="Severity filter">
@@ -441,7 +435,7 @@ function buildToolbar(input: ViolationsDashboardHtmlInput): string {
   </section>`;
 }
 
-function buildMoreActionsMenu(): string {
+function buildMoreActionsMenu(exportCount: number): string {
   const items: Array<[string, string, string]> = [
     ['saropaLints.openHelpHub', 'Help', 'F1'],
     ['saropaLints.setGroupBy', 'Group by…', ''],
@@ -467,13 +461,28 @@ function buildMoreActionsMenu(): string {
       </button>`,
     )
     .join('');
+  // Copy JSON / Save report were tier-2 toolbar buttons but pushed the visible
+  // control row past the §14.4 ~6-button budget. They are filtered-export
+  // operations users reach for occasionally, not on every visit, so they
+  // belong in the overflow menu. IDs are preserved so existing test
+  // contracts and message handlers keep working without script changes.
   // Hidden id="btn-refresh-extension" preserves the existing test contract
   // and keyboard binding without polluting the visible toolbar.
   return `<details class="more">
     <summary class="btn" title="More actions" aria-label="More actions">
       <span class="glyph">⋯</span>More <span class="chev">▾</span>
     </summary>
-    <div class="menu" role="menu">${itemsHtml}</div>
+    <div class="menu" role="menu">
+      <button type="button" class="menu-item" id="btn-copy" title="Copy filtered violations as JSON (${exportCount})">
+        <span><span class="glyph">⎘</span>Copy JSON</span>
+        <span class="kbd"></span>
+      </button>
+      <button type="button" class="menu-item" id="btn-save" title="Save filtered violations as JSON to reports/YYYYMMDD/">
+        <span><span class="glyph">⤓</span>Save report</span>
+        <span class="kbd"></span>
+      </button>
+      ${itemsHtml}
+    </div>
   </details>
   <button type="button" id="btn-refresh-extension" hidden aria-hidden="true" tabindex="-1"></button>`;
 }
@@ -988,7 +997,12 @@ function buildViewBody(v: ViewSuppressionsSlice): string {
 
 function renderListBlock(title: string, items: readonly string[]): string {
   if (items.length === 0) return '';
-  const lis = items.map((s) => `<li><code>${escapeHtml(s)}</code></li>`).join('');
+  // §7.1 — Same data type (rule names / file paths) must use the same element
+  // across rows. The findings table renders rule names as <span class="rule-tag">,
+  // so the suppressions list must too. <code> carries a default monospace +
+  // background tint that made suppression rows look pre-highlighted compared
+  // to findings rows of the same shape.
+  const lis = items.map((s) => `<li><span class="rule-tag">${escapeHtml(s)}</span></li>`).join('');
   return `<p class="footer-line"><strong>${escapeHtml(title)}</strong></p><ul class="sup-ul">${lis}</ul>`;
 }
 
@@ -1057,8 +1071,19 @@ function buildScript(): string {
   /* Toolbar primary actions */
   bindClick('btn-run', function () { vscode.postMessage({ type: 'runAnalysis' }); });
   bindClick('btn-refresh', function () { vscode.postMessage({ type: 'refresh' }); });
-  bindClick('btn-copy', function () { vscode.postMessage({ type: 'copyFilteredJson' }); });
-  bindClick('btn-save', function () { vscode.postMessage({ type: 'saveFilteredJson' }); });
+  // Copy JSON / Save report now live inside the More-actions overflow menu
+  // (§14.4 toolbar budget). Auto-close the menu after click so the user is
+  // not left with an open dropdown obscuring the table.
+  bindClick('btn-copy', function () {
+    vscode.postMessage({ type: 'copyFilteredJson' });
+    var det = document.querySelector('details.more');
+    if (det) det.removeAttribute('open');
+  });
+  bindClick('btn-save', function () {
+    vscode.postMessage({ type: 'saveFilteredJson' });
+    var det = document.querySelector('details.more');
+    if (det) det.removeAttribute('open');
+  });
   bindClick('btn-refresh-extension', function () {
     vscode.postMessage({ type: 'paletteCommand', commandId: 'saropaLints.refresh' });
   });

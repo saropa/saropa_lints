@@ -194,7 +194,11 @@ describe('violationsDashboardHtml', () => {
     assert.ok(!html.includes('id="chipStrip"'));
   });
 
-  it('exposes Save report alongside Copy JSON in the toolbar', () => {
+  it('exposes Save report alongside Copy JSON inside the More-actions overflow menu', () => {
+    // §14.4 — Copy JSON and Save report were moved out of the visible toolbar
+    // row into the overflow menu so the visible-button budget stays within ~6.
+    // The IDs must still render so existing message handlers and test contracts
+    // keep working.
     const html = renderViolationsDashboardHtml(minimalInput({}));
     assert.ok(html.includes('id="btn-save"'));
     assert.ok(html.includes('id="btn-copy"'));

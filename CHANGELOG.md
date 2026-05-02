@@ -47,6 +47,11 @@
 
 ## [Unreleased]
 
+### Changed (Extension)
+
+- The **Findings Dashboard** title now reads *Saropa Findings Dashboard* in the page heading (previously only the editor tab carried the *Saropa* prefix), and the toolbar's Copy JSON / Save report buttons have moved into the **More actions ▾** overflow menu so the visible action row stays scannable. No action required — both exports remain reachable from the same overflow menu that already housed the rest of the palette.
+- The **Findings Dashboard** suppressions list now renders rule names with the same monospace tag style used in the findings table; previously the two surfaces used different elements (`<code>` vs. `<span class="rule-tag">`) which made suppression rows look pre-highlighted. No action required.
+
 ### Fixed (Extension)
 
 - The **Size Distribution** chart in the Package Vibrancy report now draws each bar at a length proportional to its percentage — previously every bar rendered at the full track width regardless of the package's share, making the visualization unreadable. No action required — reopen the report after updating.
