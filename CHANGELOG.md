@@ -45,7 +45,7 @@
 
 ---
 
-## [Unreleased]
+## [13.0.1]
 
 ### Added (Extension)
 
