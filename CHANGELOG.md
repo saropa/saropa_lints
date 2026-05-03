@@ -45,9 +45,9 @@
 
 ---
 
-## [Unreleased]
+## [13.3.0]
 
-This release is an accessibility, theming, and reading-quality pass on the editor-area dashboards. Keyboard users can now skip past the hero and toolbar to land directly on the data, screen readers announce filter and sort state changes through a polite live region, and every dashboard exposes proper landmark navigation. Light and High Contrast theme rendering is fixed in places where dark-only color fallbacks were leaking through, the Package Vibrancy donut chart respects the OS *Reduce motion* setting, and several dashboards pick up plural-aware counts so "1 finding" reads naturally. Dashboards also print cleanly via your browser or OS print dialog. Saropa lint rules now skip files under your package's `bin/` directory so CLI executables you write stop producing Flutter-only print and sync-I/O warnings.
+This release rolls the keyboard-shortcut overlay out to the remaining editor-area dashboards (Command Catalog, Rule Explain, Telemetry, Comparison, Single-package detail, Package Dashboard), introduces inline match highlighting and recent-search dropdowns on the most-used search fields, and surfaces a partial-fetch banner with a Retry button on the Single-package detail panel when README or version-gap data fails to load. Logical CSS positioning brings the dashboards a step closer to right-to-left readiness. Saropa lint rules now skip files under your package's `bin/` directory so CLI executables you write stop producing Flutter-only print and sync-I/O warnings.
 
 ### Fixed
 
@@ -55,10 +55,36 @@ This release is an accessibility, theming, and reading-quality pass on the edito
 
 ### Added (Extension)
 
+- The keyboard-shortcut overlay now ships on every editor-area dashboard. Press `?` on Command Catalog, Rule Explain, Telemetry, Comparison, Single-package detail, or Package Dashboard to see the page-level bindings. The Package Dashboard overlay documents the existing arrow-key / `j` / `k` row navigation, `Enter` / `Space` row expansion, and `Alt + ←` back navigation; Command Catalog adds `/` to refocus the search and `Esc` to clear it. No action required — every dashboard has the same `?` affordance.
+- Findings, Known Issues, Package Dashboard, and Command Catalog searches now highlight matched substrings inline. Each match is wrapped in a host-themed highlight that survives Dark+, Light+, and both High Contrast themes; multi-word queries on the Command Catalog highlight every matched token. No action required.
+- Findings, Known Issues, and Command Catalog now show a **Recent searches** dropdown when the search field is focused empty. The dropdown lists the last ten searches from the current panel session; click an entry to re-apply it, click the per-row × to remove a single entry, or click *Clear* to drop the whole list. Persistence is in-session for now; cross-session persistence is tracked as follow-up work in `plan/UX_GUIDELINES_REMAINING.md`. No action required.
+- The **Single-package detail** panel now renders a partial-fetch banner at the top of the page when README, version-gap PRs and issues, or the reverse dependency count fails to load. The banner names which sections are missing data and offers a single **Retry** button that re-runs the failed fetches; rapid clicks are throttled to one retry every two seconds so the panel can't spam pubdev or GitHub. No action required — the banner self-hides when every fetch is clean.
+
+### Changed (Extension)
+
+- The Findings Dashboard's text filter and the Command Catalog's search field bind their `?` overlay trigger to the same hero slot that already houses the full-width toggle, so the trailing actions of every dashboard line up consistently. No action required.
+
+<details><summary>Maintenance</summary>
+
+- Position-based CSS offsets on dropdowns, popovers, the skip link, and search-clear buttons migrated to the logical `inset-inline-start` / `inset-inline-end` pair so More-actions menus open from the trailing edge in either reading direction. The slider knob in the Lints Config dashboard kept its physical `left` because its on-state animation uses `transform: translateX`; full RTL support for the slider is tracked in `plan/UX_GUIDELINES_REMAINING.md`.
+- Tier A polish from `plan/UX_GUIDELINES_REMAINING.md` is complete and recorded against the matching items there. Tiers B / C / D remain earned-scope work and stay in the backlog plan.
+
+</details>
+
+---
+
+## [13.2.0]
+
+This release is an accessibility, theming, and reading-quality pass on the editor-area dashboards. Keyboard users can now skip past the hero and toolbar to land directly on the data, screen readers announce filter and sort state changes through a polite live region, and every dashboard exposes proper landmark navigation. The Findings, Code Health, and Known Issues dashboards pick up a `?` keyboard-shortcut overlay so the affordances they already supported (`/` to focus search, `Esc` to clear) become discoverable instead of secret. Light and High Contrast theme rendering is fixed in places where dark-only color fallbacks were leaking through, the Package Vibrancy donut chart respects the OS *Reduce motion* setting, and several dashboards pick up plural-aware counts so "1 finding" reads naturally. Dashboards also print cleanly via your browser or OS print dialog. [log](https://github.com/saropa/saropa_lints/blob/v13.2.0/CHANGELOG.md)
+
+### Added (Extension)
+
 - Every editor-area dashboard now exposes a **Skip to content** keyboard link as the first focusable element so keyboard users can bypass the hero and toolbar to land directly on the primary data. The link stays hidden until focused, then appears at the top-left for one tab cycle. No action required — press Tab on any dashboard to see it.
 - Every editor-area dashboard now reports filter and sort state changes to screen readers through a polite live region. Findings, Code Health, and Known Issues announce visible-row counts on every filter change; Package Comparison announces the package being added when you click an Add button. No action required.
 - Every editor-area dashboard now wraps its content in proper landmark regions (header / main / aside) so assistive tech can navigate by section instead of tabbing through every element. No action required.
 - Editor-area dashboards now print cleanly via the OS print dialog. The print stylesheet hides toolbars and sticky headers, preserves severity and KPI colors so on-paper severity reads correctly, and prevents table rows from splitting across pages. No action required — print from the dashboard tab as you normally would.
+- Findings, Code Health, and Known Issues now expose a **keyboard-shortcut overlay**: press `?` (or click the `?` button next to the full-width toggle) for a popup listing the page-level shortcuts. The overlay also documents `/` to focus the search field and `Esc` to clear a focused, non-empty search — bindings that now work consistently across these three dashboards. No action required.
+- Every webview search input now carries a properly-associated label for screen readers. Inputs that previously relied on placeholder text alone (Known Issues, Single-package detail's PR-and-issues filter, Package Dashboard) now announce their purpose to assistive technology even when the placeholder is hidden during typing. No action required — visual appearance is unchanged.
 
 ### Fixed (Extension)
 
@@ -69,7 +95,11 @@ This release is an accessibility, theming, and reading-quality pass on the edito
 <details><summary>Maintenance</summary>
 
 - Foundation work for an internal UX-guideline compliance sweep: shared empty-state, error-banner, print, and reduced-motion CSS primitives lifted into the chrome stylesheet so new dashboards inherit them automatically. Helper modules introduced for centralized number / pluralization / timestamp formatting (so a future internationalization pass becomes a config switch instead of a refactor across N surfaces). Structural-snapshot test harness and token-coverage matrix tool added for tracking visual drift. Layout primitives in the chrome use logical CSS properties so the dashboards are ready for right-to-left locales when that work is scheduled. The Command Catalog panel's main content region id changes from `catalog` to `catalog-main` for skip-link targeting (no impact unless external automation pinned the previous id). The compliance plan and per-surface status table live in `plan/UX_GUIDELINES_COMPLIANCE.md`.
+- Per-surface stylesheets now use logical CSS properties (`margin-inline-start` / `margin-inline-end` / `padding-inline-start` / `padding-inline-end` / `border-inline-start` / `border-inline-end`) instead of physical `*-left` / `*-right` directions. Visual layout is identical in left-to-right locales; the dashboards are now closer to right-to-left ready when that work is scheduled. Position-based `left:` / `right:` (absolute / fixed positioning) is intentionally untouched and tracked in `plan/UX_GUIDELINES_REMAINING.md`.
+- Backlog plan added at `plan/UX_GUIDELINES_REMAINING.md` covering the deferred guideline work (multi-column sort, multi-select, virtualization, column resize, offline / stale states, theme verification automation, and others), each with a sketch and an explicit *Earn it when* trigger so the items don't drift into "implement everything" scope creep.
 - Historical release notes rewritten for readability — older releases were revised in this version to drop code-internal vocabulary (HTML element names, CSS class names, em values, hex codes, internal tier-N button vocabulary) and reframe each bullet around what the user sees. Substance preserved across every entry; only the phrasing changes. Affected releases: 13.1.0 and earlier where applicable.
+- Publish script (`scripts/modules/_publish_steps.py`) now treats the mid-publish stale-plugin error as analyze-passed, removing two interactive prompts that previously fired on every release. When `analysis_options.yaml`'s plugin pin matches the local `pubspec.yaml` but is newer than pub.dev's latest (the normal state of a release commit before `dart pub publish` lands), the audit recognizes this as a transient resolution error rather than a real lint failure and proceeds without surfacing the *Fix / Skip* downgrade prompt or the *Ignore / Retry / Abort* failure prompt. The downgrade prompt still appears for genuine drift (pin disagrees with both pubspec and pub.dev). No action for package or extension users.
+- Root `analysis_options.yaml` no longer pins the `saropa_lints` plugin to a hard-coded version. The pin used to chase the local `pubspec.yaml` version on every release, which made `dart analyze` fail in this repo whenever the bumped version had not yet propagated to pub.dev. Without the pin the analyzer resolves the plugin from the workspace source itself (the package has no self-dependency in `pubspec.yaml`), so the chicken-and-egg between version bump and publish is gone. Consumer projects regenerating their config via `dart run saropa_lints:init` continue to receive a `version:` pin matching their installed package — only the in-repo dogfood file is affected. No action for package or extension users.
 
 </details>
 
@@ -98,12 +128,6 @@ This release polishes the VS Code extension's editor-tab dashboards and side pan
 
 - The **Size Distribution** chart in the Package Vibrancy report now draws each bar at a length proportional to its percentage — previously every bar rendered at the full track width regardless of the package's share, making the visualization unreadable. No action required — reopen the report after updating.
 - The **Command Catalog** category-jump flash (the brief tint that highlights a section after you click its count badge) now reliably appears in webview environments where CSS `var()` references inside `@keyframes` fail to resolve — the highlight previously did nothing on those builds. No action required.
-
-<details><summary>Maintenance</summary>
-
-- Publish script (`scripts/modules/_publish_steps.py`) now treats the mid-publish stale-plugin error as analyze-passed, removing two interactive prompts that previously fired on every release. When `analysis_options.yaml`'s plugin pin matches the local `pubspec.yaml` but is newer than pub.dev's latest (the normal state of a release commit before `dart pub publish` lands), the audit recognizes this as a transient resolution error rather than a real lint failure and proceeds without surfacing the *Fix / Skip* downgrade prompt or the *Ignore / Retry / Abort* failure prompt. The downgrade prompt still appears for genuine drift (pin disagrees with both pubspec and pub.dev). No action for package or extension users.
-
-</details>
 
 ---
 
