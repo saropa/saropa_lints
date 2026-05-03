@@ -2767,16 +2767,52 @@ class RequireRtlLayoutSupportRule extends SaropaLintRule {
       // TextAlign.left or TextAlign.right
       if (prefix == 'TextAlign' &&
           (identifier == 'left' || identifier == 'right')) {
+        // Skip identity enum-mapper arms — see [_isIdentityEnumMapperArm].
+        if (_isIdentityEnumMapperArm(node, identifier)) return;
         reporter.atNode(node);
         return;
       }
 
       // Alignment.centerLeft, Alignment.topRight, etc.
       if (prefix == 'Alignment' && _alignmentLeftRight.contains(identifier)) {
+        // Skip identity enum-mapper arms — see [_isIdentityEnumMapperArm].
+        if (_isIdentityEnumMapperArm(node, identifier)) return;
         reporter.atNode(node);
         return;
       }
     });
+  }
+
+  // Recognize the physical-corner / physical-side enum-mapper pattern, e.g.
+  // `AlignmentOption.topLeft => Alignment.topLeft`. When an enum's member name
+  // commits the public API to physical-direction semantics, mapping it to
+  // `AlignmentDirectional.*Start/*End` (or the directional `TextAlign`) would
+  // silently flip the result under RTL — the opposite of the API contract.
+  // Reporting on these arms forces every consumer to suppress, and Dart's
+  // line-immediate `// ignore:` cannot suppress the four sibling arms with a
+  // single directive (see bugs/require_rtl_layout_support_false_positive_*.md).
+  //
+  // Only skips when the lint target IS the case's expression and the case's
+  // constant pattern is a same-named enum constant — leaves any non-identity
+  // mapping (e.g. `MyEnum.start => Alignment.topLeft`) reportable.
+  static bool _isIdentityEnumMapperArm(
+    PrefixedIdentifier node,
+    String identifier,
+  ) {
+    final AstNode? parent = node.parent;
+    if (parent is! SwitchExpressionCase) return false;
+    // Guard against cases where `node` is nested in a larger expression
+    // (e.g. `MyEnum.x => Alignment.topLeft.add(...)`); only the bare-RHS
+    // identity mapping carries the API-contract guarantee.
+    if (!identical(parent.expression, node)) return false;
+
+    final DartPattern pattern = parent.guardedPattern.pattern;
+    if (pattern is! ConstantPattern) return false;
+
+    final Expression patternExpr = pattern.expression;
+    if (patternExpr is! PrefixedIdentifier) return false;
+
+    return patternExpr.identifier.name == identifier;
   }
 }
 
