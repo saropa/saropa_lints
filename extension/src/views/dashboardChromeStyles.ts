@@ -490,7 +490,10 @@ details.more > summary .chev { display: inline-block; transition: transform 0.15
 details.more .menu {
   position: absolute;
   top: calc(100% + 6px);
-  right: 0;
+  /* §23.1 — anchor to the inline-end edge of the trigger so the dropdown
+     opens leftward in LTR (its natural direction) and rightward in RTL.
+     inset-inline-end:0 flips automatically with the dir attribute. */
+  inset-inline-end: 0;
   min-width: 220px;
   max-width: 320px;
   padding: 6px;
@@ -976,7 +979,10 @@ function chromeAccessibility(): string {
 .skip-link {
   position: absolute;
   top: -100px;
-  left: 8px;
+  /* §23.1 — anchor at the inline-start edge so the focused skip link
+     pops in from the natural reading-direction corner (top-left in LTR,
+     top-right in RTL). */
+  inset-inline-start: 8px;
   z-index: 1000;
   padding: 6px 12px;
   background: var(--vscode-button-background);

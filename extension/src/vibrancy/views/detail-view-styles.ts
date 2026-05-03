@@ -59,7 +59,7 @@ h1 {
     color: var(--vscode-foreground);
     word-break: break-word;
     flex: 1;
-    margin-right: 8px;
+    margin-inline-end: 8px;
 }
 
 .score {
@@ -244,7 +244,7 @@ section[data-expanded="false"] .section-content {
     height: 32px;
     object-fit: contain;
     border-radius: 4px;
-    margin-right: 8px;
+    margin-inline-end: 8px;
     flex-shrink: 0;
 }
 

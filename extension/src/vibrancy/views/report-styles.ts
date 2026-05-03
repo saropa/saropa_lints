@@ -55,7 +55,7 @@ export function getReportStyles(): string {
         }
         .header-version {
             font-size: 0.55em; font-weight: normal;
-            opacity: 0.5; margin-left: 10px;
+            opacity: 0.5; margin-inline-start: 10px;
             vertical-align: middle;
             letter-spacing: 0.4px;
         }
@@ -97,7 +97,7 @@ export function getReportStyles(): string {
             color: var(--vscode-foreground);
             font-size: 13px;
             cursor: pointer;
-            margin-left: auto;
+            margin-inline-start: auto;
             transition: background 0.12s, border-color 0.12s;
         }
         .full-width-toggle:hover { background: var(--vscode-list-hoverBackground); }
@@ -143,7 +143,7 @@ export function getReportStyles(): string {
             width: 20px; height: 20px; line-height: 20px;
             text-align: center; border-radius: 4px;
             font-size: 0.75em; font-weight: bold;
-            margin-right: 4px; vertical-align: middle;
+            margin-inline-end: 4px; vertical-align: middle;
         }
         .grade-A { background: var(--vscode-testing-iconPassed); color: var(--vscode-editor-background); }
         .grade-B { background: var(--vscode-editorInfo-foreground); color: var(--vscode-editor-background); }
@@ -204,22 +204,22 @@ export function getReportStyles(): string {
         .detail-search-link { cursor: pointer; font-size: 0.95em; }
 
         /* ---- Deps column ---- */
-        .deps-icon { font-size: 0.85em; margin-right: 2px; }
+        .deps-icon { font-size: 0.85em; margin-inline-end: 2px; }
         .badge-shared {
             background: var(--vscode-editorInfo-foreground);
             color: var(--vscode-editor-background);
             padding: 1px 4px; border-radius: 3px;
-            font-size: 0.7em; margin-left: 4px;
+            font-size: 0.7em; margin-inline-start: 4px;
             vertical-align: middle;
         }
         .badge-shared-sm {
             background: var(--vscode-editorInfo-foreground);
             color: var(--vscode-editor-background);
             padding: 0 3px; border-radius: 2px;
-            font-size: 0.65em; margin-left: 3px;
+            font-size: 0.65em; margin-inline-start: 3px;
         }
         .dep-cloud { font-size: 0.8em; line-height: 1.8; }
-        .dep-cloud span { margin-right: 6px; }
+        .dep-cloud span { margin-inline-end: 6px; }
         .dep-shared { font-weight: bold; color: var(--vscode-editorInfo-foreground); }
 
         /* ---- Summary cards ---- */
@@ -293,7 +293,10 @@ export function getReportStyles(): string {
            the input value is non-empty after trim. */
         .search-clear {
             position: absolute;
-            right: 4px;
+            /* §23.1 — clear-X anchors to the trailing edge of the input so
+               it stays at end-of-line whether the writing direction is LTR
+               or RTL. */
+            inset-inline-end: 4px;
             top: 50%;
             transform: translateY(-50%);
             width: 16px;
@@ -347,8 +350,8 @@ export function getReportStyles(): string {
             align-items: center;
             gap: 6px;
             font-size: 0.8em;
-            padding-right: 6px;
-            border-right: 1px solid var(--vscode-widget-border);
+            padding-inline-end: 6px;
+            border-inline-end: 1px solid var(--vscode-widget-border);
         }
         .age-filter input[type="range"] { width: 120px; }
         .preset-filter {
@@ -429,8 +432,8 @@ export function getReportStyles(): string {
         }
         .footprint-toggle .toggle-label {
             font-size: 0.75em; opacity: 0.7;
-            margin-right: 4px;
-            padding-left: 4px;
+            margin-inline-end: 4px;
+            padding-inline-start: 4px;
             text-transform: uppercase;
             letter-spacing: 0.4px;
         }
@@ -492,7 +495,7 @@ export function getReportStyles(): string {
             outline: 2px solid var(--vscode-focusBorder);
             outline-offset: -2px;
         }
-        .sort-arrow { margin-left: 4px; opacity: 0.6; }
+        .sort-arrow { margin-inline-start: 4px; opacity: 0.6; }
         a {
             color: var(--vscode-textLink-foreground);
             text-decoration: none;
@@ -513,14 +516,14 @@ export function getReportStyles(): string {
         .ref-reexport-badge {
             color: var(--vscode-editorInfo-foreground);
             font-weight: bold;
-            margin-left: 2px;
+            margin-inline-start: 2px;
         }
 
         /* ---- Version age suffix ---- */
         .version-age {
             color: var(--vscode-descriptionForeground);
             font-size: 0.85em;
-            margin-left: 2px;
+            margin-inline-start: 2px;
         }
 
         /* ---- Update status colors ---- */
@@ -538,13 +541,13 @@ export function getReportStyles(): string {
             background: var(--vscode-editorInfo-foreground);
             color: var(--vscode-editor-background);
             padding: 1px 5px; border-radius: 3px; font-size: 0.75em;
-            margin-left: 6px; vertical-align: middle;
+            margin-inline-start: 6px; vertical-align: middle;
         }
         .badge-transitive {
             background: var(--vscode-descriptionForeground);
             color: var(--vscode-editor-background);
             padding: 1px 5px; border-radius: 3px; font-size: 0.75em;
-            margin-left: 6px; vertical-align: middle;
+            margin-inline-start: 6px; vertical-align: middle;
         }
 
         /* ---- Dimmed placeholder text (dashes, hyphens) ---- */

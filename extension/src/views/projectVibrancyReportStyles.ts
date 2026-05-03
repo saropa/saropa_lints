@@ -90,7 +90,7 @@ function gateBannerStyles(): string {
   margin: 0 0 12px 0;
   padding: 8px 12px;
   border-radius: 6px;
-  border-left: 3px solid var(--vscode-inputValidation-errorBorder);
+  border-inline-start: 3px solid var(--vscode-inputValidation-errorBorder);
   background: var(--vscode-inputValidation-errorBackground);
   color: var(--vscode-inputValidation-errorForeground);
   font-size: 0.92em;

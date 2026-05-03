@@ -163,7 +163,7 @@ export function buildTriageDashboardStyles(): string {
 .triage-table th, .triage-table td { padding: 6px 8px; border-bottom: 1px solid var(--vscode-widget-border); text-align: left; }
 .triage-n { text-align: right; white-space: nowrap; width: 56px; }
 .triage-row-actions { white-space: nowrap; text-align: right; }
-.triage-row-actions .linkish { background: none; border: none; color: var(--vscode-textLink-foreground); cursor: pointer; margin-left: 8px; padding: 0; font-size: 11px; }
+.triage-row-actions .linkish { background: none; border: none; color: var(--vscode-textLink-foreground); cursor: pointer; margin-inline-start: 8px; padding: 0; font-size: 11px; }
 .triage-row-actions .linkish:hover { text-decoration: underline; }
 `;
 }
