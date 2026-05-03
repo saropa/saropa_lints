@@ -94,6 +94,39 @@ class _GradientVisitor extends GeneralizingAstVisitor<void> {
   final LintCode code;
   final Set<String> gradientTypes;
 
+  // Closures whose body runs at paint time, not build time.
+  //
+  // Why: gradients allocated inside these closures are not recreated on every
+  // build — the framework stores the closure on the render object and invokes
+  // it when painting, with arguments (e.g. `Rect bounds`) that are only known
+  // at paint time. There is no "outside build()" location to hoist them to.
+  //
+  // How to apply: when visiting a `FunctionExpression` passed as a named
+  // argument with one of these names, do not recurse into its body — any
+  // gradient construction inside is paint-time, not build-time.
+  //
+  // Sources: ShaderMask.shaderCallback, ImageFiltered/ColorFiltered shader
+  // builders, RawImage.shaderCallback, custom widgets that follow the
+  // ShaderCallback (Shader Function(Rect)) signature convention.
+  static const Set<String> _paintTimeCallbackNames = <String>{
+    'shaderCallback',
+  };
+
+  @override
+  void visitFunctionExpression(FunctionExpression node) {
+    // Stop the walk at paint-time callback boundaries. Without this gate,
+    // any LinearGradient/RadialGradient/SweepGradient constructed inside a
+    // ShaderMask.shaderCallback closure (which depends on per-paint `bounds`
+    // and per-frame animation values) would be flagged with a correction
+    // message that is impossible to satisfy.
+    final AstNode? parent = node.parent;
+    if (parent is NamedExpression &&
+        _paintTimeCallbackNames.contains(parent.name.label.name)) {
+      return;
+    }
+    super.visitFunctionExpression(node);
+  }
+
   @override
   void visitInstanceCreationExpression(InstanceCreationExpression node) {
     final String typeName =
