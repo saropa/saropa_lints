@@ -63,14 +63,17 @@ class BaselineDate {
       if (lineDate == null) return false;
 
       return lineDate.isBefore(baselineDate);
-    } catch (e, st) {
+    }
+    // Catch Object (not bare `catch`) so the analyzer can verify error/stack
+    // types. Git blame can fail for many reasons (not a git repo, file not
+    // tracked, process unavailable); none of those should suppress the lint.
+    on Object catch (e, st) {
       developer.log(
         'isOlderThanBaseline failed',
         name: 'saropa_lints',
         error: e,
         stackTrace: st,
       );
-      // If git blame fails (not a git repo, file not tracked, etc.), don't suppress
       return false;
     }
   }
@@ -110,7 +113,9 @@ class BaselineDate {
     if (filePath.isEmpty || line < 1) return null;
 
     try {
-      final workDir = projectRoot ?? _findGitRoot(filePath);
+      // Await the lookup separately — `projectRoot ?? _findGitRoot(...)` would
+      // produce an `Object` (mixing `String?` with `Future<String?>`).
+      final workDir = projectRoot ?? await _findGitRoot(filePath);
       if (workDir == null || workDir.isEmpty) return null;
 
       // Make path relative to git root
@@ -131,14 +136,17 @@ class BaselineDate {
       // Parse the porcelain output to find committer-time
       final output = result.stdout?.toString() ?? '';
       return _parseCommitterTime(output);
-    } catch (e, st) {
+    }
+    // Catch Object (not bare `catch`) so the analyzer can verify error/stack
+    // types. Process.run can throw on a missing git binary or platform error;
+    // returning null lets the caller treat the line as undatable.
+    on Object catch (e, st) {
       developer.log(
         '_runGitBlame failed',
         name: 'saropa_lints',
         error: e,
         stackTrace: st,
       );
-      // Git unavailable or process error
       return null;
     }
   }
@@ -172,11 +180,15 @@ class BaselineDate {
   }
 
   /// Find the git repository root for a file.
-  String? _findGitRoot(String filePath) {
+  ///
+  /// Async because this runs inside the analyzer's main isolate; sync
+  /// `existsSync()` would block the analysis loop while walking ancestor
+  /// directories looking for a `.git` entry (avoid_blocking_main_thread).
+  Future<String?> _findGitRoot(String filePath) async {
     var dir = Directory(filePath).parent;
     while (dir.path != dir.parent.path) {
       final gitDir = Directory('${dir.path}/.git');
-      if (gitDir.existsSync()) {
+      if (await gitDir.exists()) {
         return dir.path;
       }
       dir = dir.parent;
@@ -214,7 +226,9 @@ class BaselineDate {
     if (filePath == null || filePath.isEmpty) return;
 
     try {
-      final workDir = projectRoot ?? _findGitRoot(filePath);
+      // Await the lookup separately — `projectRoot ?? _findGitRoot(...)` would
+      // produce an `Object` (mixing `String?` with `Future<String?>`).
+      final workDir = projectRoot ?? await _findGitRoot(filePath);
       if (workDir == null || workDir.isEmpty) return;
 
       final relativePath = _makeRelative(filePath, workDir);
@@ -233,14 +247,17 @@ class BaselineDate {
       final lineDates = _parseFullBlame(output);
 
       _cache[filePath] = _FileDateCache()..lineDates.addAll(lineDates);
-    } catch (e, st) {
+    }
+    // Catch Object (not bare `catch`) so the analyzer can verify error/stack
+    // types. Failure to preload is non-fatal — per-line blame in
+    // _runGitBlame remains available as a fallback.
+    on Object catch (e, st) {
       developer.log(
         'preloadFile git blame failed',
         name: 'saropa_lints',
         error: e,
         stackTrace: st,
       );
-      // Git not available or file not in repo
     }
   }
 
