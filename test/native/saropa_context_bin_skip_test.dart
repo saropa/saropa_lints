@@ -5,7 +5,7 @@
 // many rules already gate on `isFlutterProject`, but the analyzer-plugin
 // worker-isolate pool occasionally serves stale `_projectCache` entries
 // that bypass the gate (manifests as 75+ `avoid_print_in_release` errors
-// firing on bin/baseline.dart in non-Flutter projects). Centralising
+// firing on bin/baseline.dart in non-Flutter projects). Centralizing
 // the skip means the noise is dropped uniformly regardless of the
 // per-rule guard's cache state.
 //

@@ -45,9 +45,13 @@
 
 ---
 
-## [Unreleased]
+## [13.3.2]
 
-Clicking **Upgrade** on the Saropa Lints update notification no longer locks up VS Code while `pub get` runs, and the progress popup now has a working **Cancel** button. The same fix applies to the **Initialize / Update Analysis Options** command. The **?** keyboard-shortcuts overlay on the editor-area dashboards now closes properly via Esc, the × button, or backdrop-click. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
+`saropa_lints` is installable again on Flutter stable. Versions 12.6.0 through 13.3.1 silently broke `flutter pub add saropa_lints` on every Flutter stable channel because the package required a newer `meta` than Flutter ships — Flutter consumers were stuck on 12.5.x. This release relaxes the analyzer constraint so resolution succeeds. Clicking **Upgrade** on the Saropa Lints update notification no longer locks up VS Code while `pub get` runs, and the progress popup now has a working **Cancel** button. The same fix applies to the **Initialize / Update Analysis Options** command. The **?** keyboard-shortcuts overlay on the editor-area dashboards now closes properly via Esc, the × button, or backdrop-click. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
+
+### Fixed
+
+- `flutter pub add saropa_lints` now resolves successfully on Flutter stable. Versions 12.6.0 through 13.3.1 required `analyzer ^12.1.0` (which transitively requires `meta ^1.18.0`), but Flutter stable's SDK pins `meta` at 1.17.0 — so every Flutter consumer hit a resolution failure and was forced to pin to `<= 12.5.3`. The constraint is now `>=9.0.0 <12.0.0`, matching the package's documented compatibility contract. No action required — re-run `flutter pub upgrade saropa_lints` to pick up the fix.
 
 ### Fixed (Extension)
 
@@ -65,7 +69,6 @@ Clicking **Upgrade** on the Saropa Lints update notification no longer locks up 
 ---
 
 ## [13.3.0]
-
 This release rolls the keyboard-shortcut overlay out to the remaining editor-area dashboards (Command Catalog, Rule Explain, Telemetry, Comparison, Single-package detail, Package Dashboard), introduces inline match highlighting and recent-search dropdowns on the most-used search fields, and surfaces a partial-fetch banner with a Retry button on the Single-package detail panel when README or version-gap data fails to load. Logical CSS positioning brings the dashboards a step closer to right-to-left readiness. Saropa lint rules now skip files under your package's `bin/` directory so CLI executables you write stop producing Flutter-only print and sync-I/O warnings.
 
 ### Fixed

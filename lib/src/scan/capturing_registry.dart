@@ -77,8 +77,13 @@ class CapturingRuleVisitorRegistry implements RuleVisitorRegistry {
   void addBlock(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
   @override
   void addBlockClassBody(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
+  // analyzer 11 has a single addEnumBody (covers both block and empty enum
+  // bodies). analyzer 12 split it into addBlockEnumBody + addEmptyEnumBody and
+  // dropped addEnumBody. We pin to analyzer <12 (Flutter stable's meta 1.17.0
+  // forces this), so addEnumBody is what we override; the 12-only split
+  // methods are not present in this file.
   @override
-  void addBlockEnumBody(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
+  void addEnumBody(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
   @override
   void addBlockFunctionBody(AbstractAnalysisRule r, AstVisitor v) =>
       _capture(v);
@@ -156,7 +161,6 @@ class CapturingRuleVisitorRegistry implements RuleVisitorRegistry {
       _capture(v);
   @override
   void addDottedName(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
-
   @override
   void addDoubleLiteral(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
   @override
@@ -166,8 +170,8 @@ class CapturingRuleVisitorRegistry implements RuleVisitorRegistry {
       _capture(v);
   @override
   void addEmptyStatement(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
-  @override
-  void addEmptyEnumBody(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
+  // analyzer 12-only: addEmptyEnumBody was removed (analyzer 11 handles it via
+  // addEnumBody above). Removed entirely so the class isn't abstract.
   @override
   void addEnumConstantArguments(AbstractAnalysisRule r, AstVisitor v) =>
       _capture(v);
@@ -293,6 +297,11 @@ class CapturingRuleVisitorRegistry implements RuleVisitorRegistry {
   void addLabeledStatement(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
   @override
   void addLibraryDirective(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
+  // analyzer 11 keeps addLibraryIdentifier (LibraryDirective.name typed as
+  // LibraryIdentifier?). analyzer 12 dropped this in favor of addDottedName.
+  @override
+  void addLibraryIdentifier(AbstractAnalysisRule r, AstVisitor v) =>
+      _capture(v);
   @override
   void addListLiteral(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
   @override

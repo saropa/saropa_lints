@@ -175,7 +175,10 @@ String _resolveVersion() {
       multiLine: true,
     ).firstMatch(pubspec.readAsStringSync());
     return versionMatch?.group(1)?.trim() ?? 'unknown';
-  } catch (e, st) {
+  } on Object catch (e, st) {
+    // Explicit `on Object` per avoid_catch_all rule's correctionMessage.
+    // Sync getter contract — any IO/format/regex failure must degrade
+    // gracefully to 'unknown' rather than crash the analyzer plugin.
     developer.log(
       'readVersionFromPubspec failed',
       name: 'saropa_lints',
@@ -3443,14 +3446,16 @@ void _loadAnalysisConfig() {
       }
       outputFromEnv = true;
     }
-  } catch (e, st) {
+  } on Object catch (e, st) {
+    // Explicit `on Object` per avoid_catch_all rule's correctionMessage.
+    // Platform.environment may throw on some sandboxed runtimes — log
+    // and fall through to yaml-based config rather than crash startup.
     developer.log(
       'loadFromEnv output config failed',
       name: 'saropa_lints',
       error: e,
       stackTrace: st,
     );
-    // Platform.environment may throw on some platforms
   }
 
   // Fall back to yaml for any settings not set by env vars

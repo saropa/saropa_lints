@@ -19,7 +19,13 @@ ClassDeclaration _singleClass(CompilationUnit unit) {
 }
 
 ConstructorDeclaration _firstConstructor(ClassDeclaration cls) {
-  final ctors = cls.body.members.whereType<ConstructorDeclaration>().toList();
+  // analyzer 11: ClassDeclaration.body returns the sealed ClassBody, which
+  // splits into BlockClassBody (has `members`) and EmptyClassBody (no body).
+  // Test fixtures always declare `{...}` so the body is BlockClassBody.
+  // analyzer 12 unified members onto ClassBody — we pin to analyzer <12 to
+  // stay compatible with Flutter stable's meta 1.17.0 pin (see pubspec).
+  final body = cls.body as BlockClassBody;
+  final ctors = body.members.whereType<ConstructorDeclaration>().toList();
   expect(ctors, isNotEmpty);
   return ctors.first;
 }

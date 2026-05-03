@@ -113,7 +113,7 @@ class AssetServer {
 ''',
       ).unit;
       final ClassDeclaration cls = unit.declarations.first as ClassDeclaration;
-      final MethodDeclaration send = cls.body.members
+      final MethodDeclaration send = (cls.body as BlockClassBody).members
           .whereType<MethodDeclaration>()
           .firstWhere((m) => m.name.lexeme == '_send');
       final BlockFunctionBody body = send.body as BlockFunctionBody;
@@ -141,7 +141,7 @@ class Mixed {
 ''',
       ).unit;
       final ClassDeclaration cls = unit.declarations.first as ClassDeclaration;
-      final MethodDeclaration open = cls.body.members
+      final MethodDeclaration open = (cls.body as BlockClassBody).members
           .whereType<MethodDeclaration>()
           .firstWhere((m) => m.name.lexeme == '_open');
       final BlockFunctionBody body = open.body as BlockFunctionBody;
@@ -166,7 +166,7 @@ class Lonely {
       ).unit;
       final ClassDeclaration cls = unit.declarations.first as ClassDeclaration;
       final MethodDeclaration helper =
-          cls.body.members.first as MethodDeclaration;
+          (cls.body as BlockClassBody).members.first as MethodDeclaration;
       final BlockFunctionBody body = helper.body as BlockFunctionBody;
 
       expect(
@@ -189,7 +189,7 @@ class Pub {
 ''',
       ).unit;
       final ClassDeclaration cls = unit.declarations.first as ClassDeclaration;
-      final MethodDeclaration open = cls.body.members
+      final MethodDeclaration open = (cls.body as BlockClassBody).members
           .whereType<MethodDeclaration>()
           .firstWhere((m) => m.name.lexeme == 'open');
       final BlockFunctionBody body = open.body as BlockFunctionBody;
@@ -212,7 +212,7 @@ class Adj {
 ''',
       ).unit;
       final ClassDeclaration cls = unit.declarations.first as ClassDeclaration;
-      final MethodDeclaration helper = cls.body.members
+      final MethodDeclaration helper = (cls.body as BlockClassBody).members
           .whereType<MethodDeclaration>()
           .firstWhere((m) => m.name.lexeme == '_helper');
       final BlockFunctionBody body = helper.body as BlockFunctionBody;
@@ -235,7 +235,7 @@ class Named {
 ''',
       ).unit;
       final ClassDeclaration cls = unit.declarations.first as ClassDeclaration;
-      final MethodDeclaration helper = cls.body.members
+      final MethodDeclaration helper = (cls.body as BlockClassBody).members
           .whereType<MethodDeclaration>()
           .firstWhere((m) => m.name.lexeme == '_helper');
       final BlockFunctionBody body = helper.body as BlockFunctionBody;
@@ -263,7 +263,7 @@ class Interp {
 ''',
       ).unit;
       final ClassDeclaration cls = unit.declarations.first as ClassDeclaration;
-      final MethodDeclaration helper = cls.body.members
+      final MethodDeclaration helper = (cls.body as BlockClassBody).members
           .whereType<MethodDeclaration>()
           .firstWhere((m) => m.name.lexeme == '_helper');
       final BlockFunctionBody body = helper.body as BlockFunctionBody;

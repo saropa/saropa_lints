@@ -4444,8 +4444,10 @@ class UnnecessaryLibraryNameRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addLibraryDirective((LibraryDirective node) {
-      // analyzer 12+: LibraryDirective.name is DottedName (was LibraryIdentifier).
-      final DottedName? name = node.name;
+      // analyzer 11: LibraryDirective.name is LibraryIdentifier?.
+      // analyzer 12 renamed this to DottedName. We pin to analyzer <12 to
+      // stay compatible with Flutter stable's meta 1.17.0 pin (see pubspec).
+      final LibraryIdentifier? name = node.name;
       if (name == null) return;
       if (name.toSource().isEmpty) return;
       reporter.atNode(name);
