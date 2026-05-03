@@ -89,6 +89,46 @@ class SaropaContext {
     return normalized.contains('/rules/') || normalized.contains('/fixes/');
   }
 
+  /// Whether the current file lives directly under the package's `bin/`
+  /// directory — i.e. is a Dart CLI executable.
+  ///
+  /// Why a hard skip here, in [SaropaContext], rather than per-rule guards:
+  ///   - `bin/` scripts are pure command-line code by Dart convention.
+  ///     `print()` is the legitimate output mechanism, sync I/O is fine,
+  ///     and rules whose remediation requires Flutter (e.g.
+  ///     `avoid_print_in_release` recommending `kDebugMode`,
+  ///     `prefer_debug_print` recommending `debugPrint()`) are
+  ///     unactionable in a CLI script even when the host package itself
+  ///     uses Flutter.
+  ///   - Each affected rule already carries an `isFlutterProject` gate,
+  ///     but the analyzer-plugin worker-isolate pool occasionally serves
+  ///     stale `_projectCache` entries that bypass the gate. The
+  ///     consumer-visible failure mode is 75+ `avoid_print_in_release`
+  ///     errors firing on `bin/baseline.dart` and similar tools in
+  ///     non-Flutter packages. Centralising the skip here removes the
+  ///     noise regardless of cache state.
+  ///
+  /// Matches **only** files under the enclosing package's own `bin/` —
+  /// not `/bin/` substrings appearing deeper in third-party paths
+  /// (pub-cache, system tooling, etc). Computed against the project root
+  /// resolved from the file's path.
+  bool get isCliBinScript {
+    return isPathUnderProjectBin(filePath);
+  }
+
+  /// Static, dependency-free implementation of [isCliBinScript] for tests
+  /// and any caller that has a file path but not a [SaropaContext]. Resolves
+  /// the project root via [ProjectContext.findProjectRoot] and matches only
+  /// files at `<projectRoot>/bin/...`.
+  static bool isPathUnderProjectBin(String filePath) {
+    if (filePath.isEmpty) return false;
+    final root = ProjectContext.findProjectRoot(filePath);
+    if (root == null || root.isEmpty) return false;
+    final normalized = filePath.replaceAll('\\', '/');
+    final normalizedRoot = root.replaceAll('\\', '/');
+    return normalized.startsWith('$normalizedRoot/bin/');
+  }
+
   /// Line info for the current file.
   ///
   /// Provides line/column lookup via `lineInfo.getLocation(offset)`.
@@ -283,6 +323,13 @@ class SaropaContext {
     // trigger self-referential false positives (e.g. OAuth URL strings in
     // AvoidIosInAppBrowserForAuthRule matching its own detection patterns).
     if (isLintPluginSource) return _wasLastFileSkipped = true;
+
+    // Skip CLI executables under the package's `bin/` directory. See
+    // [isCliBinScript] for the failure mode this prevents (Flutter-only
+    // print/log rules firing on legitimate command-line scripts when the
+    // analyzer plugin's `_projectCache` is poisoned by isolate-pool
+    // races). Centralising here covers every saropa rule uniformly.
+    if (isCliBinScript) return _wasLastFileSkipped = true;
 
     final rule = _saropaRule;
     if (rule == null) return false;

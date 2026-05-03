@@ -47,7 +47,11 @@
 
 ## [Unreleased]
 
-This release is an accessibility, theming, and reading-quality pass on the editor-area dashboards. Keyboard users can now skip past the hero and toolbar to land directly on the data, screen readers announce filter and sort state changes through a polite live region, and every dashboard exposes proper landmark navigation. Light and High Contrast theme rendering is fixed in places where dark-only color fallbacks were leaking through, the Package Vibrancy donut chart respects the OS *Reduce motion* setting, and several dashboards pick up plural-aware counts so "1 finding" reads naturally. Dashboards also print cleanly via your browser or OS print dialog.
+This release is an accessibility, theming, and reading-quality pass on the editor-area dashboards. Keyboard users can now skip past the hero and toolbar to land directly on the data, screen readers announce filter and sort state changes through a polite live region, and every dashboard exposes proper landmark navigation. Light and High Contrast theme rendering is fixed in places where dark-only color fallbacks were leaking through, the Package Vibrancy donut chart respects the OS *Reduce motion* setting, and several dashboards pick up plural-aware counts so "1 finding" reads naturally. Dashboards also print cleanly via your browser or OS print dialog. Saropa lint rules now skip files under your package's `bin/` directory so CLI executables you write stop producing Flutter-only print and sync-I/O warnings.
+
+### Fixed
+
+- Saropa rules now skip files directly under your package's `bin/` directory. CLI executables are pure command-line code where `print()` and synchronous I/O are legitimate, so Flutter-only rules like `avoid_print_in_release` and `avoid_blocking_main_thread` no longer flag them. No action required.
 
 ### Added (Extension)
 

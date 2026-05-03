@@ -31,13 +31,27 @@ analyzer:
     - "example_packages/**"
     - "test/fixtures/**"
     - "self_check/**"
+    # CLI scripts in bin/ are pure command-line code: print() and sync I/O
+    # are legitimate. The plugin itself now skips bin/ files in
+    # SaropaContext._shouldSkipCurrentFile, but `dart analyze` here loads
+    # a cached plugin snapshot from outside the workspace and won't pick
+    # up that change until the cache rebuilds. Belt-and-braces: this
+    # `analyzer.exclude` entry stops the noise at the host level too.
+    - "bin/**"
 linter:
   rules:
     - curly_braces_in_flow_control_structures
 
 plugins:
   saropa_lints:
-    version: "13.1.0"
+    # No `version:` pin: the analyzer plugin sandbox would resolve it from
+    # pub.dev, which fails every release because the local pubspec.yaml has
+    # already been bumped to a version pub.dev hasn't seen yet. Without a
+    # version, the analyzer resolves from the host project's pubspec — for
+    # this repo there is no self-dependency, so the plugin loads from the
+    # workspace source itself. Consumer projects regenerate this file via
+    # `dart run saropa_lints:init` which adds back the `version:` pin
+    # matching their installed `saropa_lints` package.
     # ═══════════════════════════════════════════════════════════════════
     # SAROPA LINTS CONFIGURATION
     # ═══════════════════════════════════════════════════════════════════
