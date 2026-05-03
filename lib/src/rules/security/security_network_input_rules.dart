@@ -3553,6 +3553,70 @@ class RequireHttpsOnlyRule extends SaropaLintRule {
     return first.value == 'http://' && second.value == 'https://';
   }
 
+  /// Returns true when the literal is being used as a search/comparison
+  /// pattern rather than as a URL being requested.
+  ///
+  /// Two shapes are recognized:
+  ///
+  /// 1. **String-inspection method needles** — first argument to
+  ///    `startsWith`, `endsWith`, `contains`, `indexOf`, `lastIndexOf`,
+  ///    or `split`. e.g. `url.startsWith('http://')`.
+  /// 2. **Equality comparisons** — `==` / `!=` against a string variable.
+  ///    e.g. `prefix == 'http://'`.
+  ///
+  /// Why: in both shapes the literal is being **searched for** or
+  /// **compared against**, not requested over the network. Flagging these
+  /// forced rule authors and security-detection code (including this very
+  /// file's `_isSafeReplacementPattern` body — `first.value == 'http://'`
+  /// — and `value.startsWith('http://')` callers in
+  /// `lib/src/rules/platforms/ios_ui_security_rules.dart`) to either reach
+  /// for `// ignore:` (banned in this repo) or to refactor pattern strings
+  /// into constants. Neither addresses the actual MITM risk this rule
+  /// targets.
+  ///
+  /// Scope is intentionally narrow. URL construction (`Uri.parse('http://…')`,
+  /// hardcoded HTTP endpoints, arguments to `http.get` / `dio.get`) still
+  /// fires because those literals are neither method needles nor `==`
+  /// operands.
+  static bool _isStringInspectionPattern(SimpleStringLiteral node) {
+    final AstNode? parent = node.parent;
+
+    // Shape 1: needle argument to an inspection method.
+    if (parent is ArgumentList) {
+      final AstNode? grandparent = parent.parent;
+      if (grandparent is! MethodInvocation) return false;
+
+      const Set<String> inspectionMethods = <String>{
+        'startsWith',
+        'endsWith',
+        'contains',
+        'indexOf',
+        'lastIndexOf',
+        'split',
+      };
+      if (!inspectionMethods.contains(grandparent.methodName.name)) {
+        return false;
+      }
+
+      // The literal must be the first (pattern/needle) argument. Guards
+      // against shapes like `text.contains(other, http_literal)` where the
+      // literal is not the search pattern.
+      final NodeList<Expression> args = parent.arguments;
+      return args.isNotEmpty && identical(args.first, node);
+    }
+
+    // Shape 2: operand of an equality / inequality comparison. Compare on
+    // operator lexeme to avoid pulling in `package:_fe_analyzer_shared` for
+    // a TokenType import — only two operators qualify and both are stable
+    // single-token punctuation.
+    if (parent is BinaryExpression) {
+      final String op = parent.operator.lexeme;
+      return op == '==' || op == '!=';
+    }
+
+    return false;
+  }
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -3583,6 +3647,10 @@ class RequireHttpsOnlyRule extends SaropaLintRule {
 
       // Allow safe http→https replacement patterns
       if (_isSafeReplacementPattern(node)) return;
+
+      // Allow string-inspection patterns (startsWith/contains/etc): the
+      // literal is a needle being searched for, not a URL being requested.
+      if (_isStringInspectionPattern(node)) return;
 
       onViolation(node);
     });

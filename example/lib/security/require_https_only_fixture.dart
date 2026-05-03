@@ -126,6 +126,51 @@ class SafeHttpUpgrade {
   }
 }
 
+// FALSE POSITIVE TEST: String-inspection patterns where 'http://' is the
+// needle (not a network request) should NOT trigger. Defensive code that
+// detects HTTP URLs is exactly what users should be writing.
+class HttpDetectionPatterns {
+  // OK: startsWith — checking if a URL is HTTP, not requesting one
+  bool isInsecureUrl(String url) {
+    return url.startsWith('http://');
+  }
+
+  // OK: endsWith — pattern match, not a URL
+  bool endsWithHttpPrefix(String text) {
+    return text.endsWith('http://');
+  }
+
+  // OK: contains — searching for HTTP within content
+  bool containsHttpReference(String body) {
+    return body.contains('http://');
+  }
+
+  // OK: indexOf — locating a pattern, not requesting it
+  int findHttpPosition(String text) {
+    return text.indexOf('http://');
+  }
+
+  // OK: lastIndexOf — locating a pattern, not requesting it
+  int findLastHttpPosition(String text) {
+    return text.lastIndexOf('http://');
+  }
+
+  // OK: split — separator pattern, not a URL
+  List<String> splitOnHttp(String text) {
+    return text.split('http://');
+  }
+
+  // OK: equality comparison — comparing a prefix to the literal, not requesting
+  bool prefixIsHttp(String prefix) {
+    return prefix == 'http://';
+  }
+
+  // OK: inequality comparison — same shape on the != side
+  bool prefixIsNotHttp(String prefix) {
+    return prefix != 'http://';
+  }
+}
+
 // ALLOWED: Localhost and development URLs
 class LocalhostUsage {
   void connectToLocalhost() {
