@@ -35,7 +35,7 @@ These are foundational changes to `dashboardChromeStyles.ts` and shared helpers.
 - [x] **Build helper module `webview-strings.ts`** — `2abb3bcd`. `STRINGS` const + `format(template, params)` helper.
 - [x] **Visual-snapshot test infrastructure** (§19.3) — `2abb3bcd`. Structural-snapshot harness under `extension/src/test/views/snapshots/` with `normalizeForSnapshot` + `assertSnapshot`. README documents Layer 1 (in-tree, fast) vs Layer 2 (manual screenshots, periodic). Playwright integration deferred — docs the drop-in path.
 - [x] **Token coverage matrix tool** (§19.4) — `2abb3bcd` (script) + Phase 4 (first generated output). 66 tokens × 13 surfaces in `extension/src/test/views/snapshots/token-matrix.md`.
-- [x] **Keyboard-shortcut overlay component** (§15.2) — `2abb3bcd`. `keyboard-shortcuts.ts` ships builder + script + styles. Per-dashboard wiring deferred to opportunistic adoption — no surface currently has page-level shortcuts urgent enough to gate.
+- [x] **Keyboard-shortcut overlay component** (§15.2) — `2abb3bcd`. `keyboard-shortcuts.ts` ships builder + script + styles. Wired into Findings, Code Health, and Known Issues with `/`, `Esc`, `Enter`/`Space`, and `?` bindings (quick-win pass after the structural compliance work). Other surfaces adopt opportunistically.
 
 ---
 
@@ -47,7 +47,7 @@ Greppable patterns that need consistent treatment. After Phase 1, these are mech
 - [x] **Reduced-motion guard sweep** (§5.2) — `40f2e7cb`. All `@keyframes` already had per-file guards; chart-script.ts JS donut animation now wraps `requestAnimationFrame` reset+restore in `matchMedia` check.
 - [x] **Pluralization sweep** (§18.2) — `40f2e7cb`. Findings, Code Health, Comparison, Telemetry surfaces now use `pluralize()`.
 - [x] **Loading-verb sweep** (§8.16.2) — `40f2e7cb`. No "Loading…" literals found in user-facing strings.
-- [~] **Logical-property sweep** (§23.1) — chrome covered (`40f2e7cb`); per-surface stylesheets still have ~70 occurrences total. Deferred to a Phase 4+ RTL-readiness pass since the chrome is the highest-leverage win.
+- [x] **Logical-property sweep** (§23.1) — quick-win pass after structural compliance: every `margin-left` / `margin-right` / `padding-left` / `padding-right` / `border-left:` / `border-right:` in `extension/src/**/*.ts` migrated to the `*-inline-start` / `*-inline-end` equivalents. Inline-style strings inside HTML builders included. Position-based `left:` / `right:` (absolute/fixed positioning) intentionally left for the dedicated RTL-readiness pass — those need per-call review of whether the offset should mirror or stay anchored.
 - [ ] **Inline `style="color: …"` sweep** (§20.4) — verified empty: only `style="--gauge-target: …"` and `style="font-size: 1.4em"` remain, neither violates the theme-bound-color contract.
 - [x] **CSV export hardening** (§22.2) — N/A. Current export paths emit JSON + Markdown only; CSV will adopt §22.2 conventions when the feature is introduced.
 - [x] **Plural-correct count strings audit** — covered by the pluralization sweep above.
@@ -64,7 +64,7 @@ For each dashboard, complete the §15 a11y checklist, the §16.5 perf measuremen
 - [ ] §7.5 virtualization decision (deferred — needs real-project measurement first)
 - [ ] §15.7 grayscale verification (manual review during release-readiness, not gateable in unit tests)
 - [ ] §17 state-persistence policy verification (deferred — state survives via webview retain; explicit `vscode.setState` audit is opportunistic)
-- [ ] §15.6 search input explicit `<label>` (deferred polish; current placeholder + aria-label is functional)
+- [x] §15.6 search input explicit `<label>` — sweep covered: every webview search input now carries a `<label>` (visually hidden via `.sr-only` where needed). Inputs touched: `known-issues-html` `#search-input`, `report-html` `#search-input`, `package-detail-html` `.gap-search`. Inputs that already carried `<label>` (`pvSearch`, `pack-search`, `disabled-rules-search`) or an `aria-label` (`#textFilter`, `#search`) verified.
 - [x] §22.3 no-data CTA verified — `buildFindingsEmpty` includes a tier-1 *Run analysis* CTA
 
 ### Code Health Dashboard — `b5bdbde7`
