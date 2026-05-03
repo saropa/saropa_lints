@@ -6,7 +6,7 @@ import 'package:test/test.dart';
 
 /// Regression tests for the `avoid_gradient_in_build` ShaderCallback gate.
 ///
-/// Bug: `bugs/avoid_gradient_in_build_false_positive_shadermask_shadercallback.md`
+/// Bug: `plan/history/2026.05/2026.05.03/avoid_gradient_in_build_false_positive_shadermask_shadercallback.md`
 ///
 /// The rule reports non-const `LinearGradient` / `RadialGradient` /
 /// `SweepGradient` constructors found inside a `build` method body. It must

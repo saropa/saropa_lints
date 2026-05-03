@@ -58,7 +58,7 @@ Widget _goodConstGradientBuild(BuildContext context) {
 // time with the layout `Rect bounds` — there is no "outside build" location
 // to hoist it to (and the animation value changes every frame). Rule must
 // not fire here. Regression coverage for:
-//   bugs/avoid_gradient_in_build_false_positive_shadermask_shadercallback.md
+//   plan/history/2026.05/2026.05.03/avoid_gradient_in_build_false_positive_shadermask_shadercallback.md
 Widget _goodShaderCallbackBuild(BuildContext context) {
   return ShaderMask(
     shaderCallback: (Rect bounds) {
