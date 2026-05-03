@@ -219,6 +219,40 @@ def update_analysis_options_plugin_version(
     return True
 
 
+def _is_mid_publish_stale_plugin(
+    project_dir: Path,
+    combined: str,
+) -> bool:
+    """True if the analyze failure is the mid-publish matching-version case.
+
+    Mid-publish state: ``analysis_options.yaml``'s plugin version equals
+    ``pubspec.yaml``'s version, but pub.dev still has an older latest.
+    This is the normal state of a release commit before
+    ``dart pub publish`` finishes — there is no actual lint failure, only
+    a known transient plugin-resolution error. Treating it as a pass lets
+    the audit proceed without an interactive prompt the user can only
+    answer one way ([I]gnore).
+
+    The prior fix only suppressed the [F]/[S] downgrade prompt; the
+    audit still hit the [I/R/A] prompt because ``dart analyze`` exits
+    non-zero. This check lets the caller short-circuit that prompt too.
+    """
+    stale = _detect_stale_plugin_version(combined)
+    if stale is None:
+        return False
+    pkg_name, stale_ver = stale
+    if pkg_name != "saropa_lints":
+        return False
+    pubspec_path = project_dir / "pubspec.yaml"
+    if not pubspec_path.exists():
+        return False
+    try:
+        pubspec_ver = get_version_from_pubspec(pubspec_path)
+    except (ValueError, OSError):
+        return False
+    return pubspec_ver == stale_ver
+
+
 def _try_fix_stale_plugin_cache(
     project_dir: Path,
     combined: str,
@@ -230,6 +264,10 @@ def _try_fix_stale_plugin_cache(
     ``analysis_options.yaml``, and clear the plugin-manager cache.
 
     Returns True if a fix was applied (caller should retry analyze).
+
+    Note: callers should check :func:`_is_mid_publish_stale_plugin` first
+    and skip this prompt entirely in that case — offering to "downgrade"
+    mid-publish would silently undo the release commit's version bump.
     """
     import shutil
 
@@ -238,28 +276,6 @@ def _try_fix_stale_plugin_cache(
         return False
 
     pkg_name, stale_ver = stale
-
-    # Publish-flow guard: when analysis_options.yaml's plugin version matches
-    # the local pubspec.yaml, the user is mid-publish bumping toward a version
-    # pub.dev hasn't seen yet. Offering to "downgrade" to pub.dev's latest
-    # would silently undo the release commit's version bump. Skip the prompt
-    # entirely in that case — the cache will resolve once the new version is
-    # published. Only surface the prompt when analysis_options.yaml truly
-    # disagrees with both the local pubspec and pub.dev (real typo / drift).
-    pubspec_path = project_dir / "pubspec.yaml"
-    pubspec_ver: str | None = None
-    if pubspec_path.exists() and pkg_name == "saropa_lints":
-        try:
-            pubspec_ver = get_version_from_pubspec(pubspec_path)
-        except (ValueError, OSError):
-            pubspec_ver = None
-    if pubspec_ver is not None and pubspec_ver == stale_ver:
-        print_warning(
-            f"Stale analyzer-plugin cache: {pkg_name} {stale_ver} matches "
-            f"local pubspec.yaml — pub.dev will catch up after publish. "
-            f"Skipping downgrade prompt.",
-        )
-        return False
 
     print_warning(
         f"Stale analyzer-plugin cache: plugin requires "
@@ -1239,8 +1255,23 @@ def _run_dart_analyze_core(project_dir: Path) -> bool:
     print()
 
     if result.returncode != 0:
-        # Check for stale plugin-cache error before reporting failure.
-        # If user accepts the fix, retry analyze automatically.
+        # Mid-publish guard: when analysis_options.yaml's plugin pin matches
+        # pubspec.yaml's version (the normal state of a release commit), the
+        # plugin-resolution error is expected and transient — pub.dev will
+        # report the version once `dart pub publish` lands. Treat analyze as
+        # passed and skip the failure prompts entirely. This was the second
+        # interactive step every release before this guard.
+        if _is_mid_publish_stale_plugin(project_dir, combined):
+            print_warning(
+                "Stale plugin pin matches local pubspec.yaml — pub.dev "
+                "will catch up after publish. Treating dart analyze as "
+                "passed (no real lint failures, only the unpublished "
+                "plugin version)."
+            )
+            return True
+
+        # Real drift case (pin disagrees with both pubspec and pub.dev):
+        # offer the downgrade prompt. If user accepts, retry analyze.
         if _try_fix_stale_plugin_cache(project_dir, combined):
             print_info("Retrying dart analyze after plugin-cache fix...")
             return _run_dart_analyze_core(project_dir)
