@@ -157,6 +157,25 @@ class AvoidIosHardcodedStatusBarRule extends SaropaLintRule {
   /// - 59: Dynamic Island (iPhone 14 Pro, 15 Pro)
   static final Set<int> _statusBarHeights = <int>{20, 44, 47, 59};
 
+  /// Widget types that, used as a `SizedBox` child, indicate the SizedBox is
+  /// a fixed icon hitbox / progress indicator container — not a status-bar
+  /// offset spacer. Status-bar offsets virtually never wrap an Icon.
+  ///
+  /// Why: the values 20 (badge / small icon), 44 (Material/Cupertino touch
+  /// target), and 47/59 (less common but possible icon dimensions) all
+  /// collide with the iOS status-bar set. Bug:
+  /// `bugs/avoid_ios_hardcoded_status_bar_false_positive_sizedbox_icon_dimensions.md`
+  /// — `SizedBox(width: 20, height: 20, child: CommonIcon(...))` was always
+  /// flagging because the rule had no surrounding-context check.
+  static const Set<String> _iconLikeChildTypes = <String>{
+    'Icon',
+    'ImageIcon',
+    'FaIcon',
+    'CircularProgressIndicator',
+    'CupertinoActivityIndicator',
+    'Image',
+  };
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -171,8 +190,12 @@ class AvoidIosHardcodedStatusBarRule extends SaropaLintRule {
         }
       }
 
-      // Check SizedBox(height: XX)
-      if (node.typeName == 'SizedBox') {
+      // Check SizedBox(height: XX) — but skip cases that are clearly NOT a
+      // status-bar offset (icon hitboxes, sized containers). A status-bar
+      // offset is virtually always a pure vertical spacer: `height` only,
+      // no `width`, no `child`. Anything else is too noisy — especially
+      // 20 (icon dimension) and 44 (HIG minimum touch target).
+      if (node.typeName == 'SizedBox' && !_isLikelyIconContainer(node)) {
         _checkNumericArgument(node, 'height', reporter);
       }
 
@@ -189,6 +212,34 @@ class AvoidIosHardcodedStatusBarRule extends SaropaLintRule {
         }
       }
     });
+  }
+
+  /// Returns true when the SizedBox looks like a deliberate icon hitbox
+  /// or fixed-size container rather than a status-bar offset spacer.
+  ///
+  /// Two signals, either of which excludes the lint:
+  /// 1. `width` is also set — a status-bar offset only sets `height`;
+  ///    setting both dimensions means the box is sizing something
+  ///    specific (typical icon containers: 20×20, 24×24, 44×44).
+  /// 2. `child` is an Icon / progress indicator / image / custom *Icon
+  ///    class — the user is sizing the child's hitbox. Covers `Icon`,
+  ///    `ImageIcon`, `FaIcon`, `CircularProgressIndicator`,
+  ///    `CupertinoActivityIndicator`, `Image`, and any class whose name
+  ///    ends in `Icon` (e.g. `CommonIcon`, `MaterialIcon`).
+  bool _isLikelyIconContainer(InstanceCreationExpression node) {
+    if (node.getNamedParameterValue('width') != null) {
+      return true;
+    }
+
+    final Expression? child = node.getNamedParameterValue('child');
+    if (child is InstanceCreationExpression) {
+      final String childType = child.typeName;
+      if (_iconLikeChildTypes.contains(childType)) return true;
+      // Catch project-specific icon wrappers like `CommonIcon`,
+      // `FaIcon`, `MdiIcon`, etc. without enumerating every package.
+      if (childType.endsWith('Icon')) return true;
+    }
+    return false;
   }
 
   /// Checks if a named parameter has a hardcoded status bar height value.

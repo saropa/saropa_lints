@@ -120,10 +120,37 @@ void _bad836() {
 
 // GOOD: Should NOT trigger avoid_ios_hardcoded_status_bar
 void _good836() {
-  Padding(
-    padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
-  );
+  Padding(padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top));
 
   // Or use SafeArea which handles this automatically
   SafeArea(child: YourWidget());
+}
+
+// GOOD: SizedBox sized for an icon hitbox — width AND height set, child is
+// an Icon. This is a Material/Cupertino tap target, not a status-bar offset.
+// Regression guard for
+// bugs/avoid_ios_hardcoded_status_bar_false_positive_sizedbox_icon_dimensions.md
+void _goodIconHitbox() {
+  // Width set + Icon child: classic 20×20 / 24×24 / 44×44 icon container.
+  SizedBox(width: 20, height: 20, child: Icon(null));
+  SizedBox(width: 44, height: 44, child: Icon(null));
+
+  // Height-only SizedBox wrapping an Icon — also an icon container, just
+  // letting the parent constrain horizontally.
+  SizedBox(height: 44, child: Icon(null));
+
+  // Project-specific icon wrappers ending in `Icon` (e.g. CommonIcon,
+  // FaIcon, MdiIcon) — the heuristic matches by suffix.
+  SizedBox(width: 20, height: 20, child: CommonIcon());
+
+  // Progress indicators sized to a small box are also not status-bar
+  // offsets.
+  SizedBox(width: 20, height: 20, child: CircularProgressIndicator());
+}
+
+// BAD: pure vertical spacer with no width and no Icon-like child — still
+// flagged because this IS the shape of a hardcoded status-bar offset.
+// expect_lint: avoid_ios_hardcoded_status_bar
+void _badPureSpacer() {
+  SizedBox(height: 47); // Only works on iPhone 12/13/14 standard.
 }
