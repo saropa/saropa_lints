@@ -25,6 +25,16 @@ export class PackageDetailPanel {
     private readonly _cache: CacheService | undefined;
     /** Timer handle for debouncing rapid sequential re-renders from lazy fetches. */
     private _renderTimer: ReturnType<typeof setTimeout> | undefined;
+    /**
+     * Per-fetch error state surfaced via the partial-state banner (§8.16.3).
+     * Each lazy fetch independently sets its flag on catch; the banner shows
+     * when any flag is true. Reset by `retryFetches`.
+     */
+    private _fetchErrors: { readme: boolean; gap: boolean; reverseDeps: boolean } = {
+        readme: false, gap: false, reverseDeps: false,
+    };
+    /** Last retry timestamp for spam-protection (§A5 risk note: 2s debounce). */
+    private _lastRetryAt = 0;
 
     private constructor(
         panel: vscode.WebviewPanel,
@@ -105,7 +115,7 @@ export class PackageDetailPanel {
 
         this._panel.title = `${this._result.package.name} — Details`;
         this._panel.webview.html = buildPackageDetailHtml(
-            this._result, reviews, summary,
+            this._result, reviews, summary, this._fetchErrors,
         );
     }
 
@@ -143,10 +153,15 @@ export class PackageDetailPanel {
 
             if (count !== null) {
                 this._result = { ...this._result, reverseDependencyCount: count };
+                this._fetchErrors = { ...this._fetchErrors, reverseDeps: false };
                 this._scheduleRender();
             }
         } catch {
-            // Silently fail — panel still shows everything except reverse deps
+            // §8.16.3 — surface the failure via the partial-state banner
+            // instead of silently dropping it. The retry button on the
+            // banner re-runs all lazy fetches.
+            this._fetchErrors = { ...this._fetchErrors, reverseDeps: true };
+            this._scheduleRender();
         }
     }
 
@@ -177,10 +192,13 @@ export class PackageDetailPanel {
 
             if (readme) {
                 this._result = { ...this._result, readme };
+                this._fetchErrors = { ...this._fetchErrors, readme: false };
                 this._scheduleRender();
             }
         } catch {
-            // Silently fail — panel still shows everything except README images
+            // §8.16.3 — surface README fetch failures via the banner.
+            this._fetchErrors = { ...this._fetchErrors, readme: true };
+            this._scheduleRender();
         }
     }
 
@@ -224,14 +242,21 @@ export class PackageDetailPanel {
 
             // Update the result with gap data and re-render
             this._result = { ...this._result, versionGap: gap };
+            this._fetchErrors = { ...this._fetchErrors, gap: false };
             this._scheduleRender();
         } catch {
-            // Silently fail — panel still shows everything except gap section
+            // §8.16.3 — surface gap fetch failures via the banner.
+            this._fetchErrors = { ...this._fetchErrors, gap: true };
+            this._scheduleRender();
         }
     }
 
     private async _handleMessage(message: PanelMessage): Promise<void> {
         switch (message.type) {
+            case 'retryFetches':
+                this._handleRetryFetches();
+                break;
+
             case 'openUrl':
                 if (message.url) {
                     await vscode.env.openExternal(vscode.Uri.parse(message.url));
@@ -282,6 +307,19 @@ export class PackageDetailPanel {
                 }
                 break;
         }
+    }
+
+    /**
+     * §8.16.3 — Retry the lazy fetches that previously failed. Debounced to
+     * 2s so a runaway click on the banner doesn't spam pubdev or GitHub.
+     */
+    private _handleRetryFetches(): void {
+        const now = Date.now();
+        if (now - this._lastRetryAt < 2000) { return; }
+        this._lastRetryAt = now;
+        this._fetchErrors = { readme: false, gap: false, reverseDeps: false };
+        this._scheduleRender();
+        this._fetchLazyData();
     }
 
     private _dispose(): void {

@@ -19,8 +19,30 @@ import {
     buildStatusLine,
     getFullWidthToggleScript,
 } from '../../views/dashboardHero';
+import {
+    buildKeyboardShortcutsButton,
+    buildKeyboardShortcutsOverlay,
+    getKeyboardShortcutsScript,
+    getKeyboardShortcutsStyles,
+} from '../../views/keyboard-shortcuts';
 
 // Single-package drill-down HTML (versions, review, license, links).
+
+/**
+ * Per-fetch error flags surfaced via the partial-state banner (§8.16.3). A
+ * lazy fetch sets its flag in `package-detail-panel.ts` on `catch`; the
+ * banner renders when any flag is true and offers a single Retry button
+ * that re-runs all lazy fetches via `postMessage({ type: 'retryFetches' })`.
+ */
+export interface PackageDetailFetchErrors {
+    readonly readme: boolean;
+    readonly gap: boolean;
+    readonly reverseDeps: boolean;
+}
+
+const NO_FETCH_ERRORS: PackageDetailFetchErrors = {
+    readme: false, gap: false, reverseDeps: false,
+};
 
 /**
  * Build the full HTML for the package detail webview panel.
@@ -30,9 +52,11 @@ export function buildPackageDetailHtml(
     result: VibrancyResult,
     reviews: readonly ReviewEntry[],
     reviewSummary: ReviewSummary | null,
+    fetchErrors: PackageDetailFetchErrors = NO_FETCH_ERRORS,
 ): string {
     const parts = [
         buildHeader(result),
+        buildPartialFetchBanner(fetchErrors),
         buildDescriptionSection(result),
         buildTopicsSection(result),
         buildVersionSection(result),
@@ -49,6 +73,30 @@ export function buildPackageDetailHtml(
     ];
 
     return wrapHtml(result.package.name, parts.join('\n'));
+}
+
+/**
+ * §8.16.3 — Partial-state banner. Shows when any lazy fetch has failed so the
+ * user can see why a section is missing data and retry. Hidden entirely
+ * (returns empty string) when every fetch is clean.
+ */
+function buildPartialFetchBanner(errors: PackageDetailFetchErrors): string {
+    const failed: string[] = [];
+    if (errors.readme) { failed.push('README and logo'); }
+    if (errors.gap) { failed.push('version-gap PRs and issues'); }
+    if (errors.reverseDeps) { failed.push('reverse dependency count'); }
+    if (failed.length === 0) { return ''; }
+    const list = failed.length === 1
+        ? failed[0]
+        : failed.length === 2
+            ? `${failed[0]} and ${failed[1]}`
+            : failed.slice(0, -1).join(', ') + ', and ' + failed[failed.length - 1];
+    return `<div class="partial-banner" role="status" aria-live="polite">
+        <span class="glyph" aria-hidden="true">⚠</span>
+        <span class="partial-msg">Some sections couldn't load: ${escapeHtml(list)}.</span>
+        <button type="button" class="btn tier-2" id="retry-fetches"
+            title="Retry the failed fetches.">Retry</button>
+    </div>`;
 }
 
 // ---------------------------------------------------------------------------
@@ -83,6 +131,7 @@ function buildHeader(r: VibrancyResult): string {
         title: r.package.name,
         statusLineHtml,
         gaugeHtml: logoHtml,
+        extraToggleHtml: buildKeyboardShortcutsButton(),
     });
 
     // §14.14 — external-link strip used to render here, immediately below the
@@ -438,7 +487,8 @@ function buildVersionGapSection(
     // default.
     const toolbar = `
         <div class="gap-toolbar" data-section="${sectionId}">
-            <input type="text" class="gap-search" placeholder="Search PRs and issues...">
+            <label class="sr-only" for="gap-search-${sectionId}">Search PRs and issues</label>
+            <input type="text" id="gap-search-${sectionId}" class="gap-search" placeholder="Search PRs and issues...">
             <span class="seg" role="radiogroup" aria-label="Filter by category">
                 <button class="filter-btn active" role="radio" aria-checked="true" data-filter="all">All</button>
                 <button class="filter-btn" role="radio" aria-checked="false" data-filter="unreviewed">Unreviewed</button>
@@ -625,7 +675,7 @@ function wrapHtml(title: string, body: string): string {
           content="default-src 'none'; style-src 'nonce-${nonce}'; script-src 'nonce-${nonce}'; img-src https:;">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${docTitle}</title>
-    <style nonce="${nonce}">${getDashboardChromeStyles()}${getPillButtonStyles()}${getPackageDetailStyles()}</style>
+    <style nonce="${nonce}">${getDashboardChromeStyles()}${getPillButtonStyles()}${getPackageDetailStyles()}${getKeyboardShortcutsStyles()}</style>
 </head>
 <body>
     <a href="#package-detail-main" class="skip-link">Skip to package details</a>
@@ -633,9 +683,13 @@ function wrapHtml(title: string, body: string): string {
     <main id="package-detail-main" tabindex="-1">
     ${body}
     </main>
+    ${buildKeyboardShortcutsOverlay([
+        { key: '?', label: 'Show this shortcut overlay' },
+        { key: 'Esc', label: 'Close the keyboard-shortcut overlay' },
+    ])}
     <script nonce="${nonce}">
         ${getPackageDetailScript()}
-        (function() { ${getFullWidthToggleScript()} })();
+        (function() { ${getFullWidthToggleScript()} ${getKeyboardShortcutsScript()} })();
     </script>
 </body>
 </html>`;

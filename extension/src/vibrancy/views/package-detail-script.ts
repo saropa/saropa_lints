@@ -181,5 +181,15 @@ export function getPackageDetailScript(): string {
                 });
             }
         });
+
+        // §8.16.3 — partial-fetch banner retry button. Re-runs the lazy
+        // fetches host-side. Host debounces to 2s so a runaway click can't
+        // spam pubdev / GitHub.
+        const retryBtn = document.getElementById('retry-fetches');
+        if (retryBtn) {
+            retryBtn.addEventListener('click', () => {
+                vscode.postMessage({ type: 'retryFetches' });
+            });
+        }
     `;
 }

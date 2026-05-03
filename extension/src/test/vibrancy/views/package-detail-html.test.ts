@@ -103,4 +103,51 @@ describe('Package Detail Panel HTML', () => {
         assert.ok(html.includes('class="action-btn secondary"'));
         assert.ok(html.includes('View Changelog'));
     });
+
+    it('exposes the keyboard-shortcut overlay trigger and dialog (§15.2)', () => {
+        const html = buildPackageDetailHtml(makeResult('http'), [], null);
+        assert.ok(
+            html.includes('id="kbdShortcutsToggle"'),
+            'expected kbd-shortcut overlay trigger button',
+        );
+        assert.ok(
+            html.includes('id="kbdShortcutsOverlay"'),
+            'expected kbd-shortcut overlay dialog markup',
+        );
+    });
+
+    it('omits the partial-fetch banner when every lazy fetch is clean (§8.16.3)', () => {
+        // The banner is hidden entirely (returns empty string) when no fetch
+        // has failed — the "everything loaded" state never advertises itself.
+        const html = buildPackageDetailHtml(makeResult('http'), [], null);
+        assert.ok(
+            !html.includes('class="partial-banner"'),
+            'partial banner should not render when fetch errors are absent',
+        );
+        assert.ok(
+            !html.includes('id="retry-fetches"'),
+            'retry button should not render without partial state',
+        );
+    });
+
+    it('renders the partial-fetch banner with a Retry button when a lazy fetch fails (§8.16.3)', () => {
+        // Default value of `fetchErrors` is "no errors"; callers explicitly
+        // pass per-fetch flags. Asserting the failure path keeps the banner's
+        // copy and the retry-button id stable for the script wiring.
+        const html = buildPackageDetailHtml(makeResult('http'), [], null, {
+            readme: true, gap: false, reverseDeps: false,
+        });
+        assert.ok(
+            html.includes('class="partial-banner"'),
+            'partial banner should render when README fetch failed',
+        );
+        assert.ok(
+            html.includes('id="retry-fetches"'),
+            'retry button should be wired so the script can postMessage retryFetches',
+        );
+        assert.ok(
+            html.includes('README and logo'),
+            'banner should name the failed fetch in user-facing language',
+        );
+    });
 });

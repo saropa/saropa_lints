@@ -149,7 +149,7 @@ export function getPackageDetailStyles(): string {
             font-size: 0.9em;
             background: var(--vscode-button-background);
             color: var(--vscode-button-foreground);
-            margin-right: 8px;
+            margin-inline-end: 8px;
             margin-top: 6px;
             transition: background 0.12s ease, border-color 0.12s ease;
         }
@@ -328,13 +328,13 @@ export function getPackageDetailStyles(): string {
             padding: 6px 8px;
             margin-bottom: 6px;
             border-radius: 4px;
-            border-left: 3px solid var(--vscode-editorWarning-foreground);
+            border-inline-start: 3px solid var(--vscode-editorWarning-foreground);
         }
         .alert-item.critical {
-            border-left-color: var(--vscode-editorError-foreground);
+            border-inline-start-color: var(--vscode-editorError-foreground);
         }
         .alert-item.info {
-            border-left-color: var(--vscode-editorInfo-foreground);
+            border-inline-start-color: var(--vscode-editorInfo-foreground);
         }
 
         .vuln-severity-critical { color: var(--vscode-editorError-foreground); font-weight: 700; }
@@ -362,7 +362,7 @@ export function getPackageDetailStyles(): string {
         .file-usage-reexport {
             display: inline-block;
             padding: 0 4px;
-            margin-left: 6px;
+            margin-inline-start: 6px;
             border-radius: 2px;
             font-size: 0.75em;
             background: var(--vscode-editorInfo-foreground);
@@ -433,7 +433,7 @@ export function getPackageDetailStyles(): string {
             height: 48px;
             object-fit: contain;
             border-radius: 6px;
-            margin-right: 12px;
+            margin-inline-end: 12px;
             vertical-align: middle;
         }
 
