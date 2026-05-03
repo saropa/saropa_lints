@@ -50,6 +50,7 @@
 ### Fixed
 
 - `avoid_ios_hardcoded_status_bar` no longer flags `SizedBox` instances that are clearly icon hitboxes or fixed-size containers — the rule now skips a SizedBox whenever `width` is also set or the `child` is an Icon-like widget (`Icon`, `ImageIcon`, `FaIcon`, `CircularProgressIndicator`, `CupertinoActivityIndicator`, `Image`, or any class whose name ends in `Icon`). Pure vertical spacers (`SizedBox(height: 20|44|47|59)` with no `width` and no Icon child) still lint as before. No action required — remove any local suppressions you added for `SizedBox(width: X, height: X, child: Icon(...))` patterns.
+- `require_data_encryption` no longer flags denormalized search-index columns whose Drift-generated field name contains "tokens" (`searchTokens`, `lexerTokens`, `parserTokens`, `wordTokens`, `nGramTokens`, `routeTokens`, `cspTokens`) — these are NLP / parser / routing material derived from public data, not credentials. The same fix retires `auth` substring false positives on `author` / `authority` / `authorship` / `authored` / `authoring` (publishing & governance terms). Real credential identifiers — `authToken`, `apiToken`, `accessToken`, `refreshToken`, `bearerToken`, `jwtToken`, `csrfToken`, `sessionToken`, `oauthToken`, `idToken`, `authorize`, `authorization`, `unauthorized`, `authentication` — still match. No action required — remove any local `tokens` → `searchIndex` renames you added to silence the rule.
 
 ---
 

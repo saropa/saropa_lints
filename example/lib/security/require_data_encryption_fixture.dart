@@ -216,3 +216,123 @@ void _goodOwaspMappingTypeArg1010() {
     owaspLookup: const <String, OwaspMappingFixture1010>{},
   );
 }
+
+// Regression: bug `require_data_encryption_false_positive_search_index_tokens`.
+// `searchTokens` / `searchIndex` / `lexerTokens` / `parserTokens` /
+// `wordTokens` / `nGramTokens` / `routeTokens` / `cspTokens` are NOT
+// credentials — they are denormalized search-index / NLP / parser / routing
+// material derived from public data.
+class _SearchIndexCompanion1010 {
+  _SearchIndexCompanion1010({
+    this.searchTokens,
+    this.searchIndex,
+    this.lexerTokens,
+    this.parserTokens,
+    this.wordTokens,
+    this.nGramTokens,
+    this.routeTokens,
+    this.cspTokens,
+  });
+  final dynamic searchTokens;
+  final dynamic searchIndex;
+  final dynamic lexerTokens;
+  final dynamic parserTokens;
+  final dynamic wordTokens;
+  final dynamic nGramTokens;
+  final dynamic routeTokens;
+  final dynamic cspTokens;
+}
+
+// GOOD: Drift-style write of denormalized search-index column. The bare
+// `tokens` value variable holds a `|`-separated lowercase search index, NOT
+// an auth token. The field name `searchTokens:` disambiguates intent.
+void _goodSearchIndexTokens1010() {
+  final String tokens = 'foo|bar|baz';
+  driftDb.write(
+    _SearchIndexCompanion1010(searchTokens: _DriftValue(tokens)),
+  );
+}
+
+// GOOD: Compiler / NLP / routing token lists. None require encryption.
+void _goodCompilerAndNlpTokens1010() {
+  driftDb.write(
+    _SearchIndexCompanion1010(
+      lexerTokens: _DriftValue(<String>['IDENT', 'EQUAL']),
+      parserTokens: _DriftValue(<String>['Stmt', 'Expr']),
+      wordTokens: _DriftValue(<String>['the', 'quick', 'brown']),
+      nGramTokens: _DriftValue(<String>['th', 'he', 'qu']),
+      routeTokens: _DriftValue(<String>['users', 'profile']),
+      cspTokens: _DriftValue(<String>["'self'", 'https:']),
+    ),
+  );
+}
+
+// GOOD: shared-prefs key written for a search-index lookup.
+void _goodSharedPrefsSearchIndex1010() async {
+  await prefs.setString('searchTokens', 'a|b|c');
+}
+
+// Regression: `auth` substring match flagged `authorship` / `authority` /
+// `authored` / `authoring` — publishing & governance terms with no auth
+// meaning. The bug-report's downstream cases include attribution metadata
+// columns and governmental-jurisdiction lookups.
+class _AuthorshipCompanion1010 {
+  _AuthorshipCompanion1010({
+    this.authorshipMetadata,
+    this.authorPrefix,
+    this.authority,
+    this.authoredAt,
+    this.authoringTool,
+  });
+  final dynamic authorshipMetadata;
+  final dynamic authorPrefix;
+  final dynamic authority; // governmental jurisdiction
+  final dynamic authoredAt;
+  final dynamic authoringTool;
+}
+
+// GOOD: Authorship / authority columns are NOT credentials.
+void _goodAuthorshipMetadata1010() {
+  driftDb.write(
+    _AuthorshipCompanion1010(
+      authorshipMetadata: _DriftValue('cc-by-sa'),
+      authorPrefix: _DriftValue('Dr.'),
+      authority: _DriftValue('NSW'),
+      authoredAt: _DriftValue(DateTime.now()),
+      authoringTool: _DriftValue('claude-code'),
+    ),
+  );
+}
+
+// BAD: Real credential identifiers must STILL trigger after the FP fix.
+// Each of these uses a credential-context prefix (auth, api, access, refresh,
+// bearer, jwt, csrf, session, oauth, id, authorize, authentication) that the
+// regex deliberately preserves.
+// expect_lint: require_data_encryption
+void _badCredentialTokensStillTrigger1010() async {
+  await prefs.setString('authToken', 'abc.def.ghi');
+}
+
+// expect_lint: require_data_encryption
+void _badApiTokenStillTriggers1010() async {
+  await prefs.setString('apiToken', 'sk_live_xxx');
+}
+
+// expect_lint: require_data_encryption
+void _badAccessTokenStillTriggers1010() async {
+  await prefs.setString('accessToken', 'eyJhbGciOi');
+}
+
+// expect_lint: require_data_encryption
+void _badAuthorizeStillTriggers1010() async {
+  // `authorize` matches _authKeywordPattern via the `or(?!iz)` lookahead
+  // exception. No other sensitive keyword in the call.
+  await prefs.setString('authorize_endpoint', 'value');
+}
+
+// expect_lint: require_data_encryption
+void _badAuthenticationStillTriggers1010() async {
+  // `authentication` matches _authKeywordPattern (no `or` follows `auth`).
+  // No other sensitive keyword in the call.
+  await prefs.setString('authentication_state', 'value');
+}

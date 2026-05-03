@@ -1248,17 +1248,21 @@ class RequireDataEncryptionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'require_data_encryption',
     '[require_data_encryption] Unencrypted sensitive data exposes '
-        'credentials to attackers via device access or backup extraction. {v6}',
+        'credentials to attackers via device access or backup extraction. {v7}',
     correctionMessage:
         'Use flutter_secure_storage, encrypted Hive box, or AES encryption.',
     severity: DiagnosticSeverity.WARNING,
   );
 
+  /// Substring-matched keywords. Each entry is specific enough that a plain
+  /// `contains` check rarely fires on non-credential identifiers. Ambiguous
+  /// keywords (`token`, `auth`, `pin`) are matched via dedicated regexes
+  /// below — see `_tokenKeywordPattern`, `_authKeywordPattern`,
+  /// `_pinKeywordPattern`.
   static const Set<String> _sensitiveKeywords = {
     'password',
     'passwd',
     'secret',
-    'token',
     'api_key',
     'apikey',
     'credit',
@@ -1268,7 +1272,6 @@ class RequireDataEncryptionRule extends SaropaLintRule {
     'bank',
     'account_number',
     'cvv',
-    'auth',
     'credential',
     'private_key',
     'privatekey',
@@ -1277,6 +1280,77 @@ class RequireDataEncryptionRule extends SaropaLintRule {
   /// [pin] is matched with a letter lookbehind so substrings like `Mapping`
   /// (OwaspMapping) do not false-positive on `…p-p-i-n…`.
   static final RegExp _pinKeywordPattern = RegExp(r'(?<![a-zA-Z])pin');
+
+  /// `token` matched as a bare substring caught search-index identifiers
+  /// (`searchTokens`, `lexerTokens`, `parserTokens`, `wordTokens`,
+  /// `nGramTokens`, `routeTokens`, `cspTokens`, `indexTokens`, `ftsTokens`,
+  /// `stopTokens`) — none of which are credentials. The denormalized search
+  /// column case is documented in
+  /// `bugs/require_data_encryption_false_positive_search_index_tokens.md`.
+  ///
+  /// Strategy: match `token` / `tokens` only when NOT preceded by one of the
+  /// known non-credential prefixes. Real credential identifiers (`authToken`,
+  /// `apiToken`, `accessToken`, `refreshToken`, `bearerToken`, `jwtToken`,
+  /// `csrfToken`, `sessionToken`, `oauthToken`, `idToken`, plain `'token'`)
+  /// still match because none of their prefixes appear in the exclusion list.
+  static final RegExp _tokenKeywordPattern = RegExp(
+    r'(?<!search)'
+    r'(?<!lexer)'
+    r'(?<!parser)'
+    r'(?<!word)'
+    r'(?<!gram)'
+    r'(?<!route)'
+    r'(?<!csp)'
+    r'(?<!index)'
+    r'(?<!fts)'
+    r'(?<!stop)'
+    r'(?<!nlp)'
+    r'(?<!lex)'
+    r'tokens?',
+  );
+
+  /// `auth` matched as a bare substring caught `author`, `authority`,
+  /// `authorship`, `authored`, `authoring` — publishing / governance /
+  /// attribution terms with no credential meaning.
+  ///
+  /// Strategy: match `auth` only when NOT followed by `or` that is NOT the
+  /// `oriz`/`oriza` of `authorize`/`authorization` (which IS auth-related and
+  /// MUST still match). Truth table for the negative lookahead
+  /// `(?!or(?!iz))`:
+  ///   - `auth` (bare)            → no `or` next                → match ✓
+  ///   - `authToken`              → no `or` next                → match ✓
+  ///   - `authentic` / `authentication` → no `or` next          → match ✓
+  ///   - `authorize` / `authorization`  → `or` followed by `iz` → match ✓
+  ///   - `unauthorized`           → `or` followed by `iz`       → match ✓
+  ///   - `author` / `authored` / `authoring` / `authorship`     → no match ✓
+  ///   - `authority` / `authoritarian`                          → no match ✓
+  static final RegExp _authKeywordPattern = RegExp(r'auth(?!or(?!iz))');
+
+  /// Search-index / parser / NLP / routing context anywhere in the call's
+  /// args means the data being stored is non-credential text-search material,
+  /// even when the value is held in a bare variable named `tokens`. Skip the
+  /// rule entirely in that case.
+  ///
+  /// Symmetric to [_argumentEncryptionSignalPatterns]: a positive signal that
+  /// the args are non-sensitive. Catches the exact pattern from the bug
+  /// report — `Companion(searchTokens: Value(tokens))` — where the field
+  /// name disambiguates the bare value variable's intent.
+  static final List<RegExp> _argumentSearchIndexContextPatterns = <RegExp>[
+    RegExp(r'searchtokens?\b'),
+    RegExp(r'searchindex(?:es)?\b'),
+    RegExp(r'lookuptokens?\b'),
+    RegExp(r'lookupindex(?:es)?\b'),
+    RegExp(r'lexertokens?\b'),
+    RegExp(r'parsertokens?\b'),
+    RegExp(r'wordtokens?\b'),
+    RegExp(r'(?:n)?gramtokens?\b'),
+    RegExp(r'routetokens?\b'),
+    RegExp(r'csptokens?\b'),
+    RegExp(r'indextokens?\b'),
+    RegExp(r'ftstokens?\b'),
+    RegExp(r'stoptokens?\b'),
+    RegExp(r'nlptokens?\b'),
+  ];
   static final List<RegExp> _secureStorageTargetPatterns = [
     RegExp(r'\bsecure\b'),
     RegExp(r'\bencrypt\b'),
@@ -1333,7 +1407,25 @@ class RequireDataEncryptionRule extends SaropaLintRule {
         return;
       }
 
+      // Skip when the args contain unambiguous search-index / parser / NLP
+      // identifiers. In such calls a bare `tokens` value variable holds
+      // non-credential text-search material, not an auth token. See
+      // bugs/require_data_encryption_false_positive_search_index_tokens.md.
+      if (_argumentSearchIndexContextPatterns.any(
+        (RegExp p) => p.hasMatch(argsSource),
+      )) {
+        return;
+      }
+
       if (_pinKeywordPattern.hasMatch(argsSource)) {
+        reporter.atNode(node);
+        return;
+      }
+      if (_tokenKeywordPattern.hasMatch(argsSource)) {
+        reporter.atNode(node);
+        return;
+      }
+      if (_authKeywordPattern.hasMatch(argsSource)) {
         reporter.atNode(node);
         return;
       }
