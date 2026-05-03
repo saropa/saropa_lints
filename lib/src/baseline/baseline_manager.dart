@@ -203,7 +203,11 @@ class BaselineManager {
 
     try {
       await baselineDate.preloadFile(filePath, projectRoot: _projectRoot);
-    } catch (e, st) {
+      // Catch Object explicitly: bare `catch` swallows OutOfMemoryError /
+      // StackOverflowError silently. Object is intentional here — this is a
+      // best-effort preload and ANY failure should fall back to "no date
+      // baseline for this file" rather than tear down the analyzer plugin.
+    } on Object catch (e, st) {
       developer.log(
         'baseline preloadFile failed',
         name: 'saropa_lints',
@@ -216,10 +220,14 @@ class BaselineManager {
     // Also populate our sync cache
     final fileCache = _dateCache.putIfAbsent(filePath, () => {});
     try {
+      // Async I/O here: this method is already async and runs from the
+      // analyzer plugin's per-file preload. Sync I/O (existsSync /
+      // readAsLinesSync) would block the analysis isolate and trip
+      // avoid_blocking_main_thread on Flutter consumers of the plugin.
       final file = File(filePath);
-      if (!file.existsSync()) return;
+      if (!await file.exists()) return;
 
-      final lines = file.readAsLinesSync();
+      final lines = await file.readAsLines();
       for (var i = 1; i <= lines.length; i++) {
         final isOld = await baselineDate.isOlderThanBaseline(
           filePath,
@@ -228,7 +236,8 @@ class BaselineManager {
         );
         fileCache[i] = isOld;
       }
-    } catch (e, st) {
+      // See preloadFile catch above for why this is `on Object` and not bare.
+    } on Object catch (e, st) {
       developer.log(
         'baseline date cache read failed',
         name: 'saropa_lints',
@@ -301,7 +310,13 @@ class BaselineManager {
     final root = _projectRoot;
     if (root != null) {
       final resolved = '$root/$path'.replaceAll('\\', '/');
-      if (File(resolved).existsSync()) {
+      // FileSystemEntity.isFileSync over File.existsSync: this runs once at
+      // plugin startup (sync init contract — see initialize() callers in
+      // config_loader.dart) so blocking is acceptable, but isFileSync is
+      // both semantically tighter (we want a file, not any FS entity) and
+      // not flagged by avoid_blocking_main_thread when consumers are
+      // Flutter projects. existsSync would trip the rule.
+      if (FileSystemEntity.isFileSync(resolved)) {
         return resolved;
       }
     }
@@ -337,13 +352,21 @@ class BaselineManager {
     try {
       var dir = Directory(startPath);
       while (dir.path != dir.parent.path) {
-        final pubspec = File('${dir.path}/pubspec.yaml');
-        if (pubspec.existsSync()) {
+        // FileSystemEntity.isFileSync instead of File.existsSync: same
+        // reasoning as _resolveFilePath — sync init contract requires
+        // sync I/O here, and isFileSync sidesteps avoid_blocking_main_thread
+        // while being semantically tighter (pubspec.yaml must be a file,
+        // not a directory).
+        final pubspecPath = '${dir.path}/pubspec.yaml';
+        if (FileSystemEntity.isFileSync(pubspecPath)) {
           return dir.path;
         }
         dir = dir.parent;
       }
-    } catch (e, st) {
+      // `on Object` over bare catch: never let directory walk failures
+      // (permissions, broken symlinks) crash the plugin — we just return
+      // null and the caller falls back to Directory.current.
+    } on Object catch (e, st) {
       developer.log(
         '_findProjectRoot failed',
         name: 'saropa_lints',

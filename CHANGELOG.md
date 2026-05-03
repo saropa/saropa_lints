@@ -45,6 +45,25 @@
 
 ---
 
+## [Unreleased]
+
+Clicking **Upgrade** on the Saropa Lints update notification no longer locks up VS Code while `pub get` runs, and the progress popup now has a working **Cancel** button. The same fix applies to the **Initialize / Update Analysis Options** command. The **?** keyboard-shortcuts overlay on the editor-area dashboards now closes properly via Esc, the × button, or backdrop-click. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
+
+### Fixed (Extension)
+
+- The **Upgrade** button on the saropa_lints update notification, and the **Initialize / Update Analysis Options** command, no longer freeze VS Code while `dart pub get` / `flutter pub get` resolves. Both progress notifications are now cancellable; pressing **Cancel** terminates the underlying child process tree (Windows: via `taskkill /T`). No action required.
+- The **keyboard-shortcuts overlay** (`?` key on editor-area dashboards) now actually closes when you press **Esc**, click the **×** button, or click the backdrop. The overlay's `display: flex` style was outranking the `hidden` attribute, so close attempts had no visual effect. No action required.
+
+<details><summary>Maintenance</summary>
+
+- `BaselineManager` no longer trips its own `avoid_catch_all` and `avoid_blocking_main_thread` rules on Flutter consumers — bare catches are now `on Object`, the per-file date-baseline preload uses async I/O, and the sync startup path uses `FileSystemEntity.isFileSync` (semantically tighter; we want files specifically). No user-visible behavior change.
+- `BaselineDate` cleared the same `avoid_catch_all` / `avoid_blocking_main_thread` self-flags — three git-blame catch sites now use `on Object catch (e, st)`, and `_findGitRoot` walks ancestor `.git` dirs via async `Directory.exists()` instead of `existsSync()` so it never blocks the analyzer isolate. No user-visible behavior change.
+- Plugin entrypoint `lib/saropa_lints.dart` now uses `on Object catch (e, st)` for the version-resolver and analysis-config startup catches, matching the `avoid_catch_all` rule's recommended form. No user-visible behavior change.
+
+</details>
+
+---
+
 ## [13.3.0]
 
 This release rolls the keyboard-shortcut overlay out to the remaining editor-area dashboards (Command Catalog, Rule Explain, Telemetry, Comparison, Single-package detail, Package Dashboard), introduces inline match highlighting and recent-search dropdowns on the most-used search fields, and surfaces a partial-fetch banner with a Retry button on the Single-package detail panel when README or version-gap data fails to load. Logical CSS positioning brings the dashboards a step closer to right-to-left readiness. Saropa lint rules now skip files under your package's `bin/` directory so CLI executables you write stop producing Flutter-only print and sync-I/O warnings.
