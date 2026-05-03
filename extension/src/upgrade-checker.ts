@@ -15,7 +15,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { fetchWithRetry } from './vibrancy/services/fetch-retry';
 import { compareVersions } from './vibrancy/services/changelog-service';
-import { runInWorkspace, hasFlutterDep } from './setup';
+import { runInWorkspaceAsync, hasFlutterDep } from './setup';
 
 // ── Constants ────────────────────────────────────────────────────────────
 
@@ -210,9 +210,13 @@ async function performUpgrade(
     {
       location: vscode.ProgressLocation.Notification,
       title: `Upgrading Saropa Lints to ${latestVersion}`,
-      cancellable: false,
+      // Cancellable: the prior `cancellable: false` combined with a synchronous
+      // `spawnSync` for `pub get` blocked the extension host event loop for the
+      // full duration of pub resolution (often 30s+), locking up VS Code with no
+      // way out. The token below kills the child process tree on cancel.
+      cancellable: true,
     },
-    async () => {
+    async (_progress, token) => {
       // Step 1: Update the version constraint in pubspec.yaml.
       const pubspecPath = path.join(workspaceRoot, 'pubspec.yaml');
       if (!updatePubspecConstraint(pubspecPath, latestVersion)) {
@@ -222,10 +226,25 @@ async function performUpgrade(
         return;
       }
 
-      // Step 2: Run pub get to resolve the new version.
+      // Step 2: Run pub get to resolve the new version. Async + cancellable so the
+      // extension host stays responsive while pub fetches and resolves the graph.
       const useFlutter = hasFlutterDep(pubspecPath);
       const pubCmd = useFlutter ? 'flutter' : 'dart';
-      const { ok, stderr } = runInWorkspace(workspaceRoot, pubCmd, ['pub', 'get']);
+      const { ok, stderr, cancelled } = await runInWorkspaceAsync(
+        workspaceRoot,
+        pubCmd,
+        ['pub', 'get'],
+        { token },
+      );
+      if (cancelled) {
+        // pubspec.yaml constraint already changed; tell the user how to recover.
+        // We deliberately don't auto-revert \u2014 they may want to retry pub get.
+        void vscode.window.showWarningMessage(
+          'Saropa Lints upgrade cancelled. pubspec.yaml was updated to '
+          + `^${latestVersion}; run \`${pubCmd} pub get\` to finish, or revert the change.`,
+        );
+        return;
+      }
       if (!ok) {
         void vscode.window.showErrorMessage(
           `Saropa Lints: pub get failed. ${stderr || 'Check Output.'}`,
@@ -233,8 +252,12 @@ async function performUpgrade(
         return;
       }
 
+      // Bail before kicking off config init if the user cancelled between steps.
+      if (token.isCancellationRequested) return;
+
       // Step 3: Re-initialize config so analysis_options.yaml reflects
       // any new rules or changes in the updated package version.
+      // (`initializeConfig` is itself cancellable and async \u2014 see setup.ts.)
       await vscode.commands.executeCommand('saropaLints.initializeConfig');
 
       void vscode.window.showInformationMessage(

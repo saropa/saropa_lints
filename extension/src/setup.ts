@@ -6,7 +6,7 @@
 import * as vscode from 'vscode';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { spawnSync } from 'node:child_process';
+import { spawn, spawnSync, type ChildProcess } from 'node:child_process';
 import { logReport, logSection, flushReport } from './reportWriter';
 import { getProjectRoot } from './projectRoot';
 import { readViolations } from './violationsReader';
@@ -108,6 +108,111 @@ export function runInWorkspace(workspaceRoot: string, command: string, args: str
     stderr,
     stdout,
   };
+}
+
+/**
+ * Recursively kills a child process and its descendants.
+ *
+ * Why: `spawn(..., { shell: true })` runs the requested command (e.g. `dart pub get`)
+ * as a *grandchild* of the Node process — Node spawns a shell, the shell spawns dart.
+ * `child.kill()` only signals the shell. On POSIX the kernel propagates SIGTERM to the
+ * process group; on Windows nothing propagates and dart.exe is orphaned, still holding
+ * the .dart_tool lock. `taskkill /T` walks the tree and kills everything.
+ */
+function killProcessTree(child: ChildProcess): void {
+  if (!child.pid) return;
+  if (process.platform === 'win32') {
+    // /T = tree, /F = force. Best-effort: if taskkill itself fails we have nothing
+    // better to fall back to, so swallow the error rather than crash the host.
+    try {
+      spawnSync('taskkill', ['/pid', String(child.pid), '/T', '/F'], { shell: false });
+    } catch {
+      // Already gone or taskkill missing — give up silently.
+    }
+    return;
+  }
+  try {
+    child.kill('SIGTERM');
+  } catch {
+    // Already exited.
+  }
+}
+
+/**
+ * Async sibling of `runInWorkspace` — does NOT block the extension host event loop.
+ *
+ * Why this exists: the synchronous `spawnSync` version freezes the entire extension
+ * host (and therefore VS Code's UI thread for any extension-mediated interaction)
+ * for the full duration of the child process. Long-running commands like
+ * `dart pub get` or `flutter pub get` can take 30s+, which manifests as a complete
+ * lockup. Use this variant for any command invoked from a user-facing flow.
+ *
+ * Cancellation: pass a `CancellationToken` to wire the progress UI's Cancel button
+ * to `taskkill /T` (Windows) / `SIGTERM` (POSIX). Without a token the call runs to
+ * completion regardless of UI state.
+ */
+export async function runInWorkspaceAsync(
+  workspaceRoot: string,
+  command: string,
+  args: string[],
+  options: { logToOutput?: boolean; token?: vscode.CancellationToken } = {},
+): Promise<{ ok: boolean; stderr: string; stdout: string; cancelled: boolean }> {
+  const { logToOutput = true, token } = options;
+  const ch = logToOutput ? getOutputChannel() : undefined;
+  ch?.appendLine(`$ ${command} ${args.join(' ')}`);
+
+  return new Promise((resolve) => {
+    const child = spawn(command, args, {
+      cwd: workspaceRoot,
+      shell: true,
+    });
+
+    let stdout = '';
+    let stderr = '';
+    let cancelled = false;
+
+    // Stream output so the user sees progress in the Output channel during long
+    // commands instead of one delayed dump at the end. `append` (not `appendLine`)
+    // preserves the child's own line breaks.
+    child.stdout?.on('data', (chunk: Buffer) => {
+      const text = chunk.toString('utf-8');
+      stdout += text;
+      ch?.append(text);
+    });
+    child.stderr?.on('data', (chunk: Buffer) => {
+      const text = chunk.toString('utf-8');
+      stderr += text;
+      ch?.append(text);
+    });
+
+    const cancelSub = token?.onCancellationRequested(() => {
+      cancelled = true;
+      ch?.appendLine('\n[cancelled by user]');
+      killProcessTree(child);
+    });
+
+    // ENOENT or other spawn-time failure (e.g. `dart` not on PATH).
+    child.on('error', (err) => {
+      cancelSub?.dispose();
+      resolve({
+        ok: false,
+        stderr: stderr + err.message,
+        stdout,
+        cancelled,
+      });
+    });
+
+    // Resolve on `close` (not `exit`) so stdout/stderr pipes are fully flushed.
+    child.on('close', (code) => {
+      cancelSub?.dispose();
+      resolve({
+        ok: !cancelled && code === 0,
+        stderr: cancelled && !stderr ? 'Cancelled by user.' : stderr,
+        stdout,
+        cancelled,
+      });
+    });
+  });
 }
 
 export async function runEnable(context: vscode.ExtensionContext): Promise<boolean> {
@@ -571,12 +676,24 @@ export async function runInitializeConfig(context: vscode.ExtensionContext, titl
     {
       location: vscode.ProgressLocation.Notification,
       title: title ?? 'Initializing Saropa Lints config',
-      cancellable: false,
+      // Cancellable so a wedged `dart` invocation doesn't lock VS Code. The token
+      // is forwarded to `runInWorkspaceAsync` which kills the child process tree.
+      cancellable: true,
     },
-    async () => {
+    async (_progress, token) => {
       logSection('Initialize Config');
-      const result = runInWorkspace(workspaceRoot, 'dart', buildWriteConfigArgs(workspaceRoot, tier));
+      const result = await runInWorkspaceAsync(
+        workspaceRoot,
+        'dart',
+        buildWriteConfigArgs(workspaceRoot, tier),
+        { token },
+      );
       ok = result.ok;
+      if (result.cancelled) {
+        logReport('- Initialize Config cancelled by user');
+        flushReport(workspaceRoot);
+        return;
+      }
       if (ok) {
         logReport(`- Config initialized (tier: ${tier})`);
         flushReport(workspaceRoot);
