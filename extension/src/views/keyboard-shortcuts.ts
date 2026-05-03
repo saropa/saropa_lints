@@ -191,6 +191,12 @@ export function getKeyboardShortcutsStyles(): string {
       justify-content: center;
       background: color-mix(in srgb, var(--vscode-editor-background) 70%, transparent);
     }
+    /* Author-level display:flex above outranks the UA stylesheet's [hidden]{display:none},
+       so without this rule overlay.hidden = true has no visual effect — the modal would
+       stay open and look like close/Esc/backdrop-click were broken. */
+    .kbd-shortcuts-overlay[hidden] {
+      display: none;
+    }
     .kbd-shortcuts-card {
       max-width: 480px;
       width: 90%;
