@@ -17,8 +17,7 @@
 import 'dart:io';
 
 import 'package:path/path.dart' as p;
-import 'package:saropa_lints/src/native/saropa_context.dart'
-    show SaropaContext;
+import 'package:saropa_lints/src/native/saropa_context.dart' show SaropaContext;
 import 'package:test/test.dart';
 
 void main() {
@@ -32,7 +31,9 @@ void main() {
     // Without this the helper bails out early returning false, which would
     // mask a real regression — every test below would pass for the wrong
     // reason.
-    File(p.join(tempRoot, 'pubspec.yaml')).writeAsStringSync('name: bin_skip_fixture\n');
+    File(
+      p.join(tempRoot, 'pubspec.yaml'),
+    ).writeAsStringSync('name: bin_skip_fixture\n');
   });
 
   tearDown(() {
@@ -46,7 +47,7 @@ void main() {
     });
 
     test('returns true for files nested deeper under bin/', () {
-      // Some packages organise CLI helpers in subdirectories under bin/.
+      // Some packages organize CLI helpers in subdirectories under bin/.
       // The skip should still apply — the directory is still part of the
       // CLI executables surface.
       final path = p.join(tempRoot, 'bin', 'tools', 'helper.dart');
@@ -77,7 +78,7 @@ void main() {
 
     test('handles Windows backslash separators', () {
       // The analyzer surfaces paths in the platform's native form. On
-      // Windows that is backslash-separated, so the helper must normalise
+      // Windows that is backslash-separated, so the helper must normalize
       // before comparing. Build the path explicitly with backslashes
       // (instead of `p.join`, which uses native separators) to exercise
       // this branch on every platform.
