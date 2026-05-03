@@ -1114,6 +1114,32 @@ export function getReportScript(): string {
         /* ---- Keyboard navigation ---- */
 
         document.addEventListener('keydown', function(e) {
+            var searchEl = document.getElementById('search-input');
+            var typingInSearch = document.activeElement && document.activeElement.id === 'search-input';
+
+            /* §15.2 — '/' focuses the search input from anywhere on the page.
+               Skip when the user is already typing in any input so the slash
+               key still types a literal slash inside text fields. */
+            var tag = e.target && e.target.tagName ? e.target.tagName.toLowerCase() : '';
+            var inEditable = tag === 'input' || tag === 'textarea' || tag === 'select';
+            if (e.key === '/' && !inEditable) {
+                e.preventDefault();
+                if (searchEl) { searchEl.focus(); searchEl.select && searchEl.select(); }
+                return;
+            }
+
+            /* §15.2 — Esc on a focused, non-empty search clears the value first;
+               the broader Esc-collapses-rows handler below still fires on a
+               second Esc when the search is already empty. Clearing the input
+               by hand keeps the existing input dispatch path running so filters
+               re-apply normally. */
+            if (e.key === 'Escape' && typingInSearch && searchEl && searchEl.value) {
+                e.preventDefault();
+                searchEl.value = '';
+                searchEl.dispatchEvent(new Event('input', { bubbles: true }));
+                return;
+            }
+
             var rows = Array.from(document.querySelectorAll('.pkg-row'));
             /* Only visible rows */
             rows = rows.filter(function(r) { return r.style.display !== 'none'; });
@@ -1129,7 +1155,7 @@ export function getReportScript(): string {
                 highlightRow(rows);
             } else if (e.key === 'Enter' || e.key === ' ') {
                 /* Don't intercept if the user is typing in the search box. */
-                if (document.activeElement && document.activeElement.id === 'search-input') { return; }
+                if (typingInSearch) { return; }
                 e.preventDefault();
                 if (focusedRowIdx >= 0 && focusedRowIdx < rows.length) {
                     toggleDetail(rows[focusedRowIdx]);

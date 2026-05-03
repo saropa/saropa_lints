@@ -69,7 +69,7 @@ export function getViolationsDashboardStyles(): string {
       background: var(--vscode-list-activeSelectionBackground);
       border-color: var(--vscode-focusBorder);
     }
-    .status-line .full-width-toggle { margin-left: auto; }
+    .status-line .full-width-toggle { margin-inline-start: auto; }
 
     /* ============================================================
        HERO — title, status line, hero gauge, version stamp.
@@ -99,7 +99,7 @@ export function getViolationsDashboardStyles(): string {
       letter-spacing: .2px;
     }
     .hero-text h1 .stamp {
-      margin-left: 10px;
+      margin-inline-start: 10px;
       font-size: .55em;
       font-weight: 400;
       opacity: .55;
@@ -337,7 +337,9 @@ export function getViolationsDashboardStyles(): string {
     details.more .menu {
       position: absolute;
       top: calc(100% + 6px);
-      right: 0;
+      /* §23.1 — anchor to inline-end so the dropdown opens leftward in
+         LTR (its natural direction) and rightward in RTL. */
+      inset-inline-end: 0;
       min-width: 220px;
       max-width: 320px;
       padding: 6px;
@@ -386,7 +388,7 @@ export function getViolationsDashboardStyles(): string {
       border-radius: 8px;
       background: color-mix(in srgb, var(--surface-3) 65%, transparent);
     }
-    .chip-strip .lbl { color: var(--muted); font-size: .9em; margin-right: 2px; }
+    .chip-strip .lbl { color: var(--muted); font-size: .9em; margin-inline-end: 2px; }
     .chip {
       display: inline-flex;
       align-items: center;
@@ -410,7 +412,7 @@ export function getViolationsDashboardStyles(): string {
     }
     .chip .x:hover { opacity: 1; background: rgba(0,0,0,.18); }
     .chip-strip .clear-all {
-      margin-left: auto;
+      margin-inline-start: auto;
       color: var(--link);
       background: transparent;
       border: 0;
@@ -502,7 +504,7 @@ export function getViolationsDashboardStyles(): string {
       font-size: .82em;
       color: var(--muted);
       font-weight: 400;
-      margin-left: auto;
+      margin-inline-start: auto;
     }
     .section .meta-line {
       margin: 0 0 8px;
@@ -626,7 +628,7 @@ export function getViolationsDashboardStyles(): string {
       border-bottom: 1px solid var(--border);
       background: var(--surface-3);
     }
-    .findings-toolbar .actions { margin-left: auto; display: flex; gap: 6px; }
+    .findings-toolbar .actions { margin-inline-start: auto; display: flex; gap: 6px; }
     .findings-toolbar .mini-btn {
       border: 0;
       background: transparent;
@@ -654,7 +656,7 @@ export function getViolationsDashboardStyles(): string {
       user-select: none;
       white-space: nowrap;
     }
-    .findings-table thead th .arrow { opacity: .4; margin-left: 4px; }
+    .findings-table thead th .arrow { opacity: .4; margin-inline-start: 4px; }
     .findings-table thead th[aria-sort="ascending"]  .arrow { opacity: 1; }
     .findings-table thead th[aria-sort="descending"] .arrow { opacity: 1; }
     .findings-table tr.group-row td {
@@ -667,7 +669,7 @@ export function getViolationsDashboardStyles(): string {
     .findings-table tr.group-row .gtitle { display: inline-flex; align-items: center; gap: 6px; }
     .findings-table tr.group-row .chev { display: inline-block; transition: transform .15s linear; }
     .findings-table tr.group-row[aria-expanded="false"] .chev { transform: rotate(-90deg); }
-    .findings-table tr.group-row .gcount { color: var(--muted); font-weight: 500; margin-left: 6px; }
+    .findings-table tr.group-row .gcount { color: var(--muted); font-weight: 500; margin-inline-start: 6px; }
 
     .findings-table tr.frow { border-bottom: 1px solid var(--border); cursor: pointer; }
     .findings-table tr.frow:nth-child(odd of .frow) { background: color-mix(in srgb, var(--surface-3) 35%, transparent); }
@@ -754,7 +756,7 @@ export function getViolationsDashboardStyles(): string {
       border: 1px solid var(--border);
       border-radius: 4px;
       padding: 2px 10px;
-      margin-left: 4px;
+      margin-inline-start: 4px;
       color: var(--fg);
       background: var(--surface-3);
       font: inherit;
@@ -878,7 +880,7 @@ export function getViolationsDashboardStyles(): string {
     .sup-disclosure > summary::before {
       content: '▸';
       display: inline-block;
-      margin-right: 6px;
+      margin-inline-end: 6px;
       transition: transform .12s linear;
     }
     .sup-disclosure[open] > summary::before { transform: rotate(90deg); }
@@ -891,8 +893,89 @@ export function getViolationsDashboardStyles(): string {
     }
 
     /* ============================================================
-       MICRO — links, code, focus rings, motion.
+       MICRO — links, code, focus rings, motion, recent-searches popover.
        ============================================================ */
+    /* §8.5.2 — recent-filters popover anchored under the textFilter input. */
+    .text-filter-field { position: relative; }
+    .findings-recent {
+      position: absolute;
+      top: calc(100% + 4px);
+      inset-inline-start: 0;
+      inset-inline-end: 0;
+      z-index: 50;
+      max-height: 220px;
+      overflow-y: auto;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    .findings-recent-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .findings-recent-title {
+      font-size: 0.8em;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .findings-recent-clear {
+      background: none;
+      border: 0;
+      padding: 0;
+      cursor: pointer;
+      color: var(--link);
+      font-size: 0.85em;
+    }
+    .findings-recent-clear:hover { text-decoration: underline; }
+    .findings-recent-list {
+      list-style: none;
+      margin: 0;
+      padding: 4px 0;
+    }
+    .findings-recent-list li {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 0;
+    }
+    .findings-recent-list .recent-pick {
+      flex: 1;
+      text-align: start;
+      background: none;
+      border: 0;
+      padding: 4px 10px;
+      color: var(--vscode-foreground);
+      cursor: pointer;
+      font: inherit;
+    }
+    .findings-recent-list .recent-pick:hover,
+    .findings-recent-list .recent-pick:focus-visible {
+      background: var(--vscode-list-hoverBackground);
+      outline: none;
+    }
+    .findings-recent-list .recent-remove {
+      width: 22px;
+      height: 22px;
+      margin-inline-end: 6px;
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      opacity: 0.6;
+      border-radius: 2px;
+      font-size: 14px;
+    }
+    .findings-recent-list .recent-remove:hover,
+    .findings-recent-list .recent-remove:focus-visible {
+      opacity: 1;
+      background: var(--vscode-toolbar-hoverBackground, var(--vscode-list-hoverBackground));
+    }
+
     .link {
       color: var(--link);
       cursor: pointer;

@@ -17,6 +17,12 @@ import {
   formatRelativeTimestamp,
   getFullWidthToggleScript,
 } from './dashboardHero';
+import {
+  buildKeyboardShortcutsButton,
+  buildKeyboardShortcutsOverlay,
+  getKeyboardShortcutsScript,
+  getKeyboardShortcutsStyles,
+} from './keyboard-shortcuts';
 import { pluralize } from './webview-format';
 
 /** Active panel reference; undefined after dispose or before first open. */
@@ -85,6 +91,7 @@ function buildHtml(snapshot: TelemetryStore): string {
   const heroHtml = buildDashboardHero({
     title: 'Related Rule Telemetry',
     statusLineHtml,
+    extraToggleHtml: buildKeyboardShortcutsButton(),
   });
 
   // §8.10 — *Reset* targets an empty set when no events have fired; render
@@ -142,7 +149,7 @@ function buildHtml(snapshot: TelemetryStore): string {
     pre.tel-pre {
       background: var(--surface-2);
       border: 1px solid var(--border);
-      border-left: 2px solid var(--border-strong);
+      border-inline-start: 2px solid var(--border-strong);
       border-radius: 8px;
       padding: 10px 12px;
       overflow: auto;
@@ -166,6 +173,7 @@ function buildHtml(snapshot: TelemetryStore): string {
       font-size: 0.95em;
       text-align: center;
     }
+    ${getKeyboardShortcutsStyles()}
   </style>
 </head>
 <body>
@@ -210,6 +218,10 @@ function buildHtml(snapshot: TelemetryStore): string {
     <pre class="tel-pre">${lastProps}</pre>
   </section>
   </main>
+  ${buildKeyboardShortcutsOverlay([
+    { key: '?', label: 'Show this shortcut overlay' },
+    { key: 'Esc', label: 'Close the keyboard-shortcut overlay' },
+  ])}
   <script nonce="${nonce}">
     (function () {
       const vscode = acquireVsCodeApi();
@@ -237,6 +249,7 @@ function buildHtml(snapshot: TelemetryStore): string {
         });
       }
       ${getFullWidthToggleScript()}
+      ${getKeyboardShortcutsScript()}
     })();
   </script>
 </body>

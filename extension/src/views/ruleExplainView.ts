@@ -22,6 +22,12 @@ import {
   buildStatusLine,
   getFullWidthToggleScript,
 } from './dashboardHero';
+import {
+  buildKeyboardShortcutsButton,
+  buildKeyboardShortcutsOverlay,
+  getKeyboardShortcutsScript,
+  getKeyboardShortcutsStyles,
+} from './keyboard-shortcuts';
 
 const VIEW_TYPE = 'saropaLints.ruleExplain';
 // Tab label includes the rule name so the user can scan tabs by rule. The hero `<h1>`
@@ -144,6 +150,7 @@ function buildHtml(input: RuleExplainInput): string {
   const heroHtml = buildDashboardHero({
     title: `Rule: ${input.ruleName}`,
     statusLineHtml,
+    extraToggleHtml: buildKeyboardShortcutsButton(),
   });
   return `<!DOCTYPE html>
 <html lang="en">
@@ -152,7 +159,7 @@ function buildHtml(input: RuleExplainInput): string {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'nonce-${cspNonce}'; script-src 'nonce-${cspNonce}';">
   <title>${escapeHtml(buildDocumentTitle(`Rule: ${input.ruleName}`))}</title>
-  <style nonce="${cspNonce}">${getDashboardChromeStyles()}${getRuleExplainPanelStyles()}</style>
+  <style nonce="${cspNonce}">${getDashboardChromeStyles()}${getRuleExplainPanelStyles()}${getKeyboardShortcutsStyles()}</style>
 </head>
 <body>
   <a href="#rule-detail" class="skip-link">Skip to rule details</a>
@@ -185,6 +192,10 @@ function buildHtml(input: RuleExplainInput): string {
          CTA at all. -->
     <p><a href="${escapeHtml(docUrl)}" data-url="${escapeHtml(docUrl)}" class="doc-link btn">View in ROADMAP</a></p>
   </section>
+  ${buildKeyboardShortcutsOverlay([
+    { key: '?', label: 'Show this shortcut overlay' },
+    { key: 'Esc', label: 'Close the keyboard-shortcut overlay' },
+  ])}
   <script nonce="${cspNonce}">
     (function() {
       const vscode = acquireVsCodeApi();
@@ -210,6 +221,7 @@ function buildHtml(input: RuleExplainInput): string {
         });
       });
       ${getFullWidthToggleScript()}
+      ${getKeyboardShortcutsScript()}
     })();
   </script>
 </body>

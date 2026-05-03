@@ -6,6 +6,12 @@ import { runProjectVibrancyScan } from './projectVibrancyCliRunner';
 import type { ProjectVibrancyFunctionRow, ProjectVibrancyPayload } from './projectVibrancyTypes';
 import { getProjectVibrancyReportStyles } from './projectVibrancyReportStyles';
 import { pluralize } from './webview-format';
+import {
+  buildKeyboardShortcutsButton,
+  buildKeyboardShortcutsOverlay,
+  getKeyboardShortcutsScript,
+  getKeyboardShortcutsStyles,
+} from './keyboard-shortcuts';
 
 /**
  * **Code Health Dashboard** webview: runs [runProjectVibrancyScan], renders JSON as HTML in an
@@ -191,7 +197,7 @@ function buildHtml(payload: ProjectVibrancyPayload): string {
        authorize <style> blocks, not style attributes — without 'unsafe-inline' the vars
        are dropped, the dasharray falls back to 0, and the gauge renders as a tiny dot. -->
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'nonce-${nonce}' 'unsafe-inline'; script-src 'nonce-${nonce}';">
-  <style nonce="${nonce}">${getProjectVibrancyReportStyles()}</style>
+  <style nonce="${nonce}">${getProjectVibrancyReportStyles()}${getKeyboardShortcutsStyles()}</style>
 </head>
 <body>
 <a href="#pvTable" class="skip-link">Skip to functions table</a>
@@ -206,6 +212,13 @@ ${buildToolbar()}
 <main id="pv-main">
 ${buildTable(rows)}
 </main>
+${buildKeyboardShortcutsOverlay([
+  { key: '/', label: 'Focus the row filter' },
+  { key: 'Esc', label: 'Clear the focused row filter' },
+  { key: 'Enter', label: 'Activate focused KPI card' },
+  { key: 'Space', label: 'Activate focused KPI card' },
+  { key: '?', label: 'Show this shortcut overlay' },
+])}
 <script nonce="${nonce}">${buildClientScript()}</script>
 </body>
 </html>`;
@@ -229,10 +242,15 @@ function buildHero(payload: ProjectVibrancyPayload, summary: NonNullable<Project
   const statusLine = parts
     .map((p, i) => (i === 0 ? `<span>${p}</span>` : `<span class="dot">·</span><span>${p}</span>`))
     .join('');
+  // §15.2 — keyboard-shortcut overlay trigger appended to the status line so
+  // it sits in the hero's trailing-actions slot, consistent with the
+  // full-width toggle position on other dashboards. This dashboard does not
+  // expose the full-width toggle, so the kbd button is the sole trailing
+  // action here.
   return `<header class="dash-hero">
   <div class="hero-text">
     <h1>Saropa Code Health Dashboard</h1>
-    <p class="status-line">${statusLine}</p>
+    <p class="status-line">${statusLine}${buildKeyboardShortcutsButton()}</p>
   </div>
   ${buildHeroGauge(avgScore, avgGrade)}
 </header>`;
@@ -564,6 +582,23 @@ function buildClientScript(): string {
   function escapeHtml(s) {
     return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
+
+  // §15.2 — page-level keyboard shortcuts advertised in the overlay.
+  // '/' focuses the row filter; 'Esc' on a focused, non-empty filter clears it.
+  document.addEventListener('keydown', function(e) {
+    var tag = e.target && e.target.tagName ? e.target.tagName.toLowerCase() : '';
+    var isEditable = tag === 'input' || tag === 'textarea' || tag === 'select';
+    if (e.key === '/' && !isEditable) {
+      e.preventDefault();
+      if (searchEl) { searchEl.focus(); searchEl.select && searchEl.select(); }
+    } else if (e.key === 'Escape' && e.target === searchEl && searchEl && searchEl.value) {
+      e.preventDefault();
+      searchEl.value = '';
+      state.search = '';
+      applyFilters();
+    }
+  });
+  ${getKeyboardShortcutsScript()}
 })();
 `;
 }

@@ -25,6 +25,12 @@ import {
   getAnnouncerScript,
   getFullWidthToggleScript,
 } from './dashboardHero';
+import {
+  buildKeyboardShortcutsButton,
+  buildKeyboardShortcutsOverlay,
+  getKeyboardShortcutsScript,
+  getKeyboardShortcutsStyles,
+} from './keyboard-shortcuts';
 import { pluralize } from './webview-format';
 
 /** Analyzer-side suppression counts from `violations.json` (same source as the Suppressions tree). */
@@ -245,9 +251,12 @@ function buildStatusLine(input: ViolationsDashboardHtmlInput): string {
   if (typeof input.enabledRuleCount === 'number' && input.enabledRuleCount > 0) {
     parts.push(`<span class="pill" title="Enabled rules in current tier">${input.enabledRuleCount} rules</span>`);
   }
-  // Full-width toggle is appended after the pills so it right-aligns via margin-left:auto
+  // Full-width toggle is appended after the pills so it right-aligns via margin-inline-start:auto
   // (see .status-line .full-width-toggle in dashboardChromeStyles.ts / violationsDashboardStyles.ts).
-  return `<p class="status-line">${parts.join('<span class="dot">·</span>')}${buildFullWidthToggle()}</p>`;
+  // The keyboard-shortcut overlay trigger sits left of the toggle so the toggle
+  // remains the rightmost action across all dashboards (sticky muscle memory).
+  const trailing = `${buildKeyboardShortcutsButton()}${buildFullWidthToggle()}`;
+  return `<p class="status-line">${parts.join('<span class="dot">·</span>')}${trailing}</p>`;
 }
 
 function buildHero(input: ViolationsDashboardHtmlInput): string {
@@ -415,10 +424,23 @@ function buildToolbar(input: ViolationsDashboardHtmlInput): string {
         <label for="groupBy">Group by</label>
         <select id="groupBy" aria-label="Group by">${groupBySelectOptions(input.groupBy)}</select>
       </span>
-      <span class="field" title="Filter findings by file path, rule, or message text">
+      <span class="field text-filter-field" title="Filter findings by file path, rule, or message text">
         <span class="glyph">⌕</span>
         <input type="text" id="textFilter" placeholder="Filter by file, rule, or message…" value="${tf}" aria-label="Text filter" />
         <button type="button" class="clear-btn" id="textFilterClear" title="Clear text filter" aria-label="Clear text filter">×</button>
+        <!-- §8.5.2 — recent-searches popover for the Findings filter.
+             Persistence: sessionStorage. Cross-session persistence via
+             workspaceState is tracked in plan/UX_GUIDELINES_REMAINING.md. -->
+        <div id="findings-recent" class="findings-recent" hidden>
+          <div class="findings-recent-head">
+            <span class="findings-recent-title">Recent filters</span>
+            <button type="button" id="findings-recent-clear"
+              class="findings-recent-clear"
+              title="Clear all recent filters">Clear</button>
+          </div>
+          <ul id="findings-recent-list" class="findings-recent-list"
+            role="listbox" aria-label="Recent filters"></ul>
+        </div>
       </span>
       <button type="button" class="btn tier-1" id="btn-run" title="Run Saropa Lints analysis">
         <span class="glyph">▶</span>Run analysis
@@ -931,7 +953,7 @@ function buildSuppressionsBlock(input: ViolationsDashboardHtmlInput): string {
   return `<section class="section" id="suppressions-block" aria-label="Suppressions">
     <h2>Suppressions (export) <span class="count">${a.total}</span>${kindBreakdown ? ` <span class="meta">${kindBreakdown}</span>` : ''}</h2>
     <div class="sup-band">${buildAnalyzerBody(a)}</div>
-    <h3 style="margin:14px 0 6px;font-size:.98em;font-weight:600">Issues view hides <span class="meta" style="margin-left:8px;color:var(--vscode-descriptionForeground)">${v.active ? 'active' : 'none'}</span></h3>
+    <h3 style="margin:14px 0 6px;font-size:.98em;font-weight:600">Issues view hides <span class="meta" style="margin-inline-start:8px;color:var(--vscode-descriptionForeground)">${v.active ? 'active' : 'none'}</span></h3>
     <div class="sup-band">${buildViewBody(v)}</div>
   </section>`;
 }
@@ -1089,10 +1111,115 @@ function buildScript(): string {
   var gb = document.getElementById('groupBy');
   if (gb) gb.addEventListener('change', function () { pushState(true); });
   var tf = document.getElementById('textFilter');
-  if (tf) tf.addEventListener('input', function () { pushState(false); });
+
+  /* §8.5.2 — recent-filters popover. Stored in sessionStorage so the list
+     survives within the current panel session; cross-session persistence
+     is tracked in plan/UX_GUIDELINES_REMAINING.md. */
+  var recentEl = document.getElementById('findings-recent');
+  var recentListEl = document.getElementById('findings-recent-list');
+  var recentClearAllEl = document.getElementById('findings-recent-clear');
+  var RECENT_KEY = 'saropa.findings.recentFilters';
+  var RECENT_CAP = 10;
+  var RECENT_DEBOUNCE_MS = 800;
+  var recentTimer = null;
+
+  function recentLoad() {
+    try {
+      var raw = sessionStorage.getItem(RECENT_KEY);
+      if (!raw) return [];
+      var parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed.filter(function (s) { return typeof s === 'string'; }) : [];
+    } catch (e) { return []; }
+  }
+  function recentSave(list) {
+    try { sessionStorage.setItem(RECENT_KEY, JSON.stringify(list)); } catch (e) { /* best-effort */ }
+  }
+  function recentRecord(q) {
+    var t = (q || '').trim();
+    if (!t) return;
+    var existing = recentLoad().filter(function (s) { return s.toLowerCase() !== t.toLowerCase(); });
+    existing.unshift(t);
+    recentSave(existing.slice(0, RECENT_CAP));
+  }
+  function recentRemove(q) {
+    recentSave(recentLoad().filter(function (s) { return s !== q; }));
+    recentRender();
+  }
+  function recentClearAll() { recentSave([]); recentRender(); recentHide(); }
+  function recentEsc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  function recentRender() {
+    if (!recentListEl) return;
+    var list = recentLoad();
+    if (list.length === 0) { recentListEl.innerHTML = ''; return; }
+    recentListEl.innerHTML = list.map(function (q) {
+      var s = recentEsc(q);
+      return '<li>' +
+        '<button type="button" class="recent-pick" data-query="' + s + '">' + s + '</button>' +
+        '<button type="button" class="recent-remove" data-query="' + s +
+        '" aria-label="Remove ' + s + '" title="Remove">&times;</button>' +
+        '</li>';
+    }).join('');
+  }
+  function recentShow() {
+    if (!recentEl) return;
+    var list = recentLoad();
+    if (list.length === 0) { recentEl.hidden = true; return; }
+    recentRender();
+    recentEl.hidden = false;
+  }
+  function recentHide() { if (recentEl) recentEl.hidden = true; }
+  function recentMaybeShow() {
+    if (!tf) return;
+    if (document.activeElement === tf && !tf.value.trim()) recentShow();
+    else recentHide();
+  }
+
+  if (tf) {
+    tf.addEventListener('input', function () {
+      pushState(false);
+      recentMaybeShow();
+      // Debounced commit so transient keystrokes don't spam the recent list.
+      if (recentTimer) clearTimeout(recentTimer);
+      var snapshot = tf.value;
+      recentTimer = setTimeout(function () {
+        recentTimer = null;
+        if (snapshot && tf.value === snapshot) recentRecord(snapshot);
+      }, RECENT_DEBOUNCE_MS);
+    });
+    tf.addEventListener('focus', recentMaybeShow);
+    tf.addEventListener('blur', function () { setTimeout(recentHide, 120); });
+    tf.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' && tf.value.trim()) { recentRecord(tf.value); recentHide(); }
+      else if (e.key === 'Escape' && recentEl && !recentEl.hidden) { e.preventDefault(); recentHide(); }
+    });
+  }
+  if (recentListEl) {
+    recentListEl.addEventListener('click', function (e) {
+      var t = e.target;
+      if (!t || !t.dataset || !t.dataset.query) return;
+      var q = t.dataset.query;
+      if (t.classList.contains('recent-pick')) {
+        if (tf) { tf.value = q; pushState(true); recentRecord(q); recentHide(); tf.focus(); }
+      } else if (t.classList.contains('recent-remove')) {
+        e.stopPropagation();
+        recentRemove(q);
+        if (tf) tf.focus();
+      }
+    });
+  }
+  if (recentClearAllEl) recentClearAllEl.addEventListener('click', recentClearAll);
+  document.addEventListener('click', function (e) {
+    if (!recentEl || recentEl.hidden) return;
+    var wrapper = tf && tf.closest ? tf.closest('.text-filter-field') : null;
+    if (wrapper && !wrapper.contains(e.target)) recentHide();
+  });
+
   var tfClear = document.getElementById('textFilterClear');
   if (tfClear) tfClear.addEventListener('click', function () {
-    if (tf) { tf.value = ''; pushState(true); }
+    if (tf) { tf.value = ''; pushState(true); recentMaybeShow(); }
   });
   document.querySelectorAll('.seg-btn[data-sev], .seg-btn[data-imp]').forEach(function (btn) {
     btn.addEventListener('click', function () {
@@ -1412,6 +1539,26 @@ function buildScript(): string {
   /* Full-width toggle (guideline §4) — flips body[data-full-width] so users on ultrawide
      monitors can opt out of the readability max-width set in the stylesheet. */
   ${getFullWidthToggleScript()}
+
+  /* §15.2 — page-level keyboard shortcuts advertised in the overlay.
+     '/' focuses the text filter from anywhere; 'Esc' on a focused, non-empty
+     filter clears it. Skip when the user is already typing in another input
+     so the global handler doesn't steal the slash key from a search box on a
+     popover or future modal. */
+  document.addEventListener('keydown', function (e) {
+    var tag = e.target && e.target.tagName ? e.target.tagName.toLowerCase() : '';
+    var isEditable = tag === 'input' || tag === 'textarea' || tag === 'select';
+    if (e.key === '/' && !isEditable) {
+      e.preventDefault();
+      var input = document.getElementById('textFilter');
+      if (input) { input.focus(); input.select && input.select(); }
+    } else if (e.key === 'Escape' && e.target === tf && tf && tf.value) {
+      e.preventDefault();
+      tf.value = '';
+      pushState(true);
+    }
+  });
+  ${getKeyboardShortcutsScript()}
 })();`;
 }
 
@@ -1430,7 +1577,7 @@ export function renderViolationsDashboardHtml(input: ViolationsDashboardHtmlInpu
        authorize <style> blocks, not style attributes — without 'unsafe-inline' the vars
        are dropped, the dasharray falls back to 0, and the gauge renders as a tiny dot. -->
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'nonce-${nonce}' 'unsafe-inline'; script-src 'nonce-${nonce}';" />
-  <style nonce="${nonce}">${getViolationsDashboardStyles()}</style>
+  <style nonce="${nonce}">${getViolationsDashboardStyles()}${getKeyboardShortcutsStyles()}</style>
 </head><body>
   ${buildSkipLink('findings-table', 'Skip to findings')}
   ${buildAnnouncer()}
@@ -1447,6 +1594,13 @@ export function renderViolationsDashboardHtml(input: ViolationsDashboardHtmlInpu
     ${buildChartsBlock(input)}
     ${buildSuppressionsBlock(input)}
   </aside>
+  ${buildKeyboardShortcutsOverlay([
+    { key: '/', label: 'Focus the text filter' },
+    { key: 'Esc', label: 'Clear the focused text filter' },
+    { key: 'Enter', label: 'Activate focused KPI card or chart bar' },
+    { key: 'Space', label: 'Activate focused KPI card or chart bar' },
+    { key: '?', label: 'Show this shortcut overlay' },
+  ])}
   <script nonce="${nonce}">${buildScript()}</script>
 </body></html>`;
 }

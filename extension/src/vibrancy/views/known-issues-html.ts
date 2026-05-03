@@ -9,6 +9,12 @@ import {
     buildDocumentTitle,
     buildStatusLine,
 } from '../../views/dashboardHero';
+import {
+    buildKeyboardShortcutsButton,
+    buildKeyboardShortcutsOverlay,
+    getKeyboardShortcutsScript,
+    getKeyboardShortcutsStyles,
+} from '../../views/keyboard-shortcuts';
 
 // Static HTML for browsing curated "known issues" and replacement guidance.
 /** Build the full HTML for the known issues library browser. */
@@ -26,7 +32,18 @@ export function buildKnownIssuesHtml(): string {
     const heroHtml = buildDashboardHero({
         title: 'Known Issues',
         statusLineHtml,
+        extraToggleHtml: buildKeyboardShortcutsButton(),
     });
+
+    // §15.2 — surface-level keyboard shortcuts. The overlay lists every
+    // affordance the script binds (search focus, Esc to clear, sort keys)
+    // so users don't have to discover them by experiment.
+    const shortcuts = [
+        { key: '/', label: 'Focus the search field' },
+        { key: 'Esc', label: 'Clear search and reset filters' },
+        { key: 'Enter', label: 'Activate focused KPI card or filter button' },
+        { key: '?', label: 'Show this shortcut overlay' },
+    ];
 
     return `<!DOCTYPE html>
 <html lang="en">
@@ -35,7 +52,7 @@ export function buildKnownIssuesHtml(): string {
     <title>${escapeHtml(buildDocumentTitle('Known Issues'))}</title>
     <meta http-equiv="Content-Security-Policy"
         content="default-src 'none'; style-src 'nonce-${nonce}'; script-src 'nonce-${nonce}';">
-    <style nonce="${nonce}">${getReportStyles()}${getDashboardChromeStyles()}${getExtraStyles()}</style>
+    <style nonce="${nonce}">${getReportStyles()}${getDashboardChromeStyles()}${getExtraStyles()}${getKeyboardShortcutsStyles()}</style>
 </head>
 <body>
     <a href="#known-issues-main" class="skip-link">Skip to issues table</a>
@@ -48,7 +65,8 @@ export function buildKnownIssuesHtml(): string {
     ${buildTable(issues)}
     ${buildEmptyState()}
     </main>
-    <script nonce="${nonce}">${getKnownIssuesScript()}</script>
+    ${buildKeyboardShortcutsOverlay(shortcuts)}
+    <script nonce="${nonce}">${getKnownIssuesScript()}${getKeyboardShortcutsScript()}</script>
 </body>
 </html>`;
 }
@@ -117,10 +135,25 @@ function buildToolbar(): string {
     return `<div class="known-issues-toolbar toolbar-band">
         <div class="toolbar-row">
             <div class="search-wrapper">
+                <label class="sr-only" for="search-input">Search packages</label>
                 <input id="search-input" type="text"
                     placeholder="Search packages..." autocomplete="off">
                 <button type="button" id="search-clear" class="search-clear"
                     title="Clear search" aria-label="Clear search" hidden>&times;</button>
+                <!-- §8.5.2 — recent-searches popover. Shown when the search
+                     input is focused empty AND there are stored entries.
+                     Persistence: sessionStorage (in-session only); cross-session
+                     persistence is tracked in plan/UX_GUIDELINES_REMAINING.md. -->
+                <div id="recent-searches" class="recent-searches" hidden>
+                    <div class="recent-searches-head">
+                        <span class="recent-searches-title">Recent searches</span>
+                        <button type="button" id="recent-searches-clear"
+                            class="recent-searches-clear-all"
+                            title="Clear all recent searches">Clear</button>
+                    </div>
+                    <ul id="recent-searches-list" class="recent-searches-list"
+                        role="listbox" aria-label="Recent searches"></ul>
+                </div>
             </div>
             <span class="seg" role="group" aria-label="Replacement filter">
                 <span class="seg-label">Replacement</span>
@@ -221,7 +254,10 @@ function getExtraStyles(): string {
            when the input value is non-empty after trim. */
         .search-clear {
             position: absolute;
-            right: 6px;
+            /* §23.1 — clear-X stays at the trailing edge of the input;
+               LTR puts it on the right (end-of-line), RTL puts it on
+               the left (still end-of-line because the inline axis flips). */
+            inset-inline-end: 6px;
             top: 50%;
             transform: translateY(-50%);
             width: 18px;
@@ -262,6 +298,102 @@ function getExtraStyles(): string {
             margin: 0;
             color: var(--muted, var(--vscode-descriptionForeground));
             font-size: 0.95em;
+        }
+        /* §8.5.2 — search hit highlights. Bind to host find-match token so
+           the highlight is visible across all four default themes; the
+           foreground stays inherited so contrast against the row text
+           continues to come from the host theme. */
+        mark.search-hit {
+            background: var(--vscode-editor-findMatchHighlightBackground,
+                var(--vscode-editor-selectionBackground));
+            color: inherit;
+            padding: 0 1px;
+            border-radius: 2px;
+        }
+        /* §8.5.2 — recent-searches popover. Anchored under the search input.
+           Shown only when the input is focused empty AND the list has
+           entries. Click an item to fill the search; X to remove a single
+           entry; *Clear* to drop the whole history. */
+        .recent-searches {
+            position: absolute;
+            top: calc(100% + 4px);
+            inset-inline-start: 0;
+            inset-inline-end: 0;
+            z-index: 50;
+            max-height: 220px;
+            overflow-y: auto;
+            background: var(--surface-2, var(--vscode-editorWidget-background));
+            border: 1px solid var(--border, var(--vscode-widget-border));
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        .recent-searches-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 4px 8px;
+            border-bottom: 1px solid var(--border, var(--vscode-widget-border));
+        }
+        .recent-searches-title {
+            font-size: 0.8em;
+            color: var(--muted, var(--vscode-descriptionForeground));
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+        .recent-searches-clear-all {
+            background: none;
+            border: 0;
+            padding: 0;
+            cursor: pointer;
+            color: var(--vscode-textLink-foreground);
+            font-size: 0.85em;
+        }
+        .recent-searches-clear-all:hover {
+            text-decoration: underline;
+        }
+        .recent-searches-list {
+            list-style: none;
+            margin: 0;
+            padding: 4px 0;
+        }
+        .recent-searches-list li {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 0;
+        }
+        .recent-searches-list .recent-pick {
+            flex: 1;
+            text-align: start;
+            background: none;
+            border: 0;
+            padding: 4px 10px;
+            color: var(--vscode-foreground);
+            cursor: pointer;
+            font: inherit;
+        }
+        .recent-searches-list .recent-pick:hover,
+        .recent-searches-list .recent-pick:focus-visible {
+            background: var(--vscode-list-hoverBackground);
+            outline: none;
+        }
+        .recent-searches-list .recent-remove {
+            width: 22px;
+            height: 22px;
+            margin-inline-end: 6px;
+            border: 0;
+            background: transparent;
+            color: var(--muted, var(--vscode-descriptionForeground));
+            cursor: pointer;
+            opacity: 0.6;
+            border-radius: 2px;
+            font-size: 14px;
+        }
+        .recent-searches-list .recent-remove:hover,
+        .recent-searches-list .recent-remove:focus-visible {
+            opacity: 1;
+            background: var(--vscode-toolbar-hoverBackground,
+                var(--vscode-list-hoverBackground));
         }
     `;
 }

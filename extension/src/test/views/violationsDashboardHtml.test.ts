@@ -261,4 +261,29 @@ describe('violationsDashboardHtml', () => {
     );
     assert.ok(!html.includes('aria-label="Top rules by count"'));
   });
+
+  it('exposes the keyboard-shortcut overlay trigger and dialog (§15.2)', () => {
+    // §15.2 requires page-level shortcuts to be discoverable. The overlay
+    // documents `/`, `Esc`, `Enter`, `Space`, and `?` — all bindings the
+    // dashboard's inline script wires.
+    const html = renderViolationsDashboardHtml(
+      minimalInput({
+        filteredCount: 1,
+        totalRawAfterDisable: 1,
+        severityCounts: { error: 1, warning: 0, info: 0 },
+      }),
+    );
+    assert.ok(
+      html.includes('id="kbdShortcutsToggle"'),
+      'expected kbd-shortcut overlay trigger button',
+    );
+    assert.ok(
+      html.includes('id="kbdShortcutsOverlay"'),
+      'expected kbd-shortcut overlay dialog markup',
+    );
+    assert.ok(
+      html.includes('aria-modal="true"'),
+      'overlay should be marked as a modal dialog for screen readers',
+    );
+  });
 });

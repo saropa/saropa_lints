@@ -12,6 +12,12 @@ import { buildChartSection } from './chart-html';
 import { getChartStyles } from './chart-styles';
 import { getChartScript } from './chart-script';
 import { buildFullWidthToggle, buildStatusLine, getFullWidthToggleScript } from '../../views/dashboardHero';
+import {
+    buildKeyboardShortcutsButton,
+    buildKeyboardShortcutsOverlay,
+    getKeyboardShortcutsScript,
+    getKeyboardShortcutsStyles,
+} from '../../views/keyboard-shortcuts';
 
 /** Options passed to the report builder beyond just results. */
 export interface ReportOptions {
@@ -63,13 +69,13 @@ export function buildReportHtml(options: ReportOptions): string {
          and the gauge renders as a tiny dot. -->
     <meta http-equiv="Content-Security-Policy"
         content="default-src 'none'; style-src 'nonce-${cspNonce}' 'unsafe-inline'; script-src 'nonce-${cspNonce}';">
-    <style nonce="${cspNonce}">${getPillButtonStyles()}${getReportStyles()}${getChartStyles()}</style>
+    <style nonce="${cspNonce}">${getPillButtonStyles()}${getReportStyles()}${getChartStyles()}${getKeyboardShortcutsStyles()}</style>
 </head>
 <body>
     <div class="report-header">
         <div class="hero-text">
           <h1>Saropa Package Dashboard <span class="header-version">v${escapeHtml(options.extensionVersion)}</span></h1>
-          ${statusLineHtml.replace('</p>', `${buildFullWidthToggle()}</p>`)}
+          ${statusLineHtml.replace('</p>', `${buildKeyboardShortcutsButton()}${buildFullWidthToggle()}</p>`)}
         </div>
         ${buildRadialGauge(avg)}
     </div>
@@ -78,7 +84,16 @@ export function buildReportHtml(options: ReportOptions): string {
     ${buildNetworkSection(results)}
     ${buildToolbar(options)}
     ${buildReportTable(results, options.overrideNames, options.packageTrends)}
-    <script nonce="${cspNonce}">${buildPackageDataScript(results, options.overrideNames, buildRepoShareMap(results))}${getReportScript()}${getChartScript()}(function(){${getFullWidthToggleScript()}})();</script>
+    ${buildKeyboardShortcutsOverlay([
+        { key: '/', label: 'Focus the search field' },
+        { key: '↓ / j', label: 'Highlight the next package row' },
+        { key: '↑ / k', label: 'Highlight the previous package row' },
+        { key: 'Enter / Space', label: 'Toggle the highlighted package detail expander' },
+        { key: 'Esc', label: 'Clear focused search; second Esc collapses all expanded rows' },
+        { key: 'Alt + ←', label: 'Go back through the package navigation history' },
+        { key: '?', label: 'Show this shortcut overlay' },
+    ])}
+    <script nonce="${cspNonce}">${buildPackageDataScript(results, options.overrideNames, buildRepoShareMap(results))}${getReportScript()}${getChartScript()}(function(){${getFullWidthToggleScript()}${getKeyboardShortcutsScript()}})();</script>
 </body>
 </html>`;
 }
@@ -239,6 +254,7 @@ function buildToolbar(options: ReportOptions): string {
     // inside it; the button stays hidden until the user types something, and
     // a click clears the input + re-runs filters.
     const searchField = `<div class="search-wrapper">
+        <label class="sr-only" for="search-input">Search packages</label>
         <input type="text" id="search-input" placeholder="Search packages\u2026" class="search-input" />
         <button type="button" id="search-clear" class="search-clear" title="Clear search" aria-label="Clear search" hidden>&times;</button>
     </div>`;

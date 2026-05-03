@@ -122,4 +122,73 @@ describe('buildKnownIssuesHtml', () => {
         assert.ok(html.includes('syncActiveKpiCard'));
         assert.ok(html.includes("classList.add('active')"));
     });
+
+    it('associates the search input with a screen-reader label (§15.6)', () => {
+        // §15.6 requires every input to carry a <label>; placeholder text alone
+        // is invisible to autofill and vanishes on focus. The visible placeholder
+        // stays for sighted users; the sr-only label adds the missing
+        // assistive-tech association.
+        const html = buildKnownIssuesHtml();
+        assert.ok(
+            html.includes('<label class="sr-only" for="search-input">'),
+            'expected sr-only label associated to #search-input',
+        );
+    });
+
+    it('exposes the keyboard-shortcut overlay trigger and dialog (§15.2)', () => {
+        // §15.2 calls for a discoverable shortcut list. The trigger sits in the
+        // hero status line; the overlay markup is hidden until ? or click.
+        const html = buildKnownIssuesHtml();
+        assert.ok(
+            html.includes('id="kbdShortcutsToggle"'),
+            'expected kbd-shortcut overlay trigger button',
+        );
+        assert.ok(
+            html.includes('id="kbdShortcutsOverlay"'),
+            'expected kbd-shortcut overlay dialog markup',
+        );
+        assert.ok(
+            html.includes('aria-modal="true"'),
+            'overlay should be marked as a modal dialog for screen readers',
+        );
+    });
+
+    it('renders the recent-searches popover scaffolding hidden by default (§8.5.2)', () => {
+        // §8.5.2 — recent-searches dropdown is hidden until the input is
+        // focused empty AND there are stored entries. The script populates
+        // it from sessionStorage at runtime; we only verify the markup is
+        // present with the expected ids so the script can wire to it.
+        const html = buildKnownIssuesHtml();
+        assert.ok(
+            html.includes('id="recent-searches"'),
+            'expected the recent-searches popover container',
+        );
+        assert.ok(
+            html.includes('id="recent-searches-list"'),
+            'expected the recent-searches list element',
+        );
+        assert.ok(
+            html.includes('id="recent-searches-clear"'),
+            'expected the recent-searches Clear-all button',
+        );
+        assert.ok(
+            html.match(/<div id="recent-searches"[^>]*hidden/),
+            'recent-searches container must be hidden in the initial render',
+        );
+    });
+
+    it('embeds the search-hit highlight stylesheet (§8.5.2)', () => {
+        // The script wraps matched substrings in <mark class="search-hit"> at
+        // runtime; the stylesheet binds the fill to the host find-match token
+        // so highlights survive theme changes.
+        const html = buildKnownIssuesHtml();
+        assert.ok(
+            html.includes('mark.search-hit'),
+            'expected search-hit highlight rule in the inline stylesheet',
+        );
+        assert.ok(
+            html.includes('--vscode-editor-findMatchHighlightBackground'),
+            'highlight background should bind to the host find-match token',
+        );
+    });
 });

@@ -33,6 +33,12 @@ import { catalogEntries, entriesByCategory } from './commandCatalogRegistry';
 import { buildCatalogSearchBlob } from './commandCatalogSearch';
 import type { CatalogHistoryRecord } from './commandCatalogHistory';
 import { getPillButtonStyles } from '../vibrancy/views/pill-button-styles';
+import {
+  buildKeyboardShortcutsButton,
+  buildKeyboardShortcutsOverlay,
+  getKeyboardShortcutsScript,
+  getKeyboardShortcutsStyles,
+} from './keyboard-shortcuts';
 
 /** Cap on Recent chips visible by default before "+N more" overflow (§8.10). */
 const RECENT_VISIBLE_DEFAULT = 6;
@@ -76,6 +82,7 @@ export function buildCommandCatalogHtml(
   <title>Saropa Command Catalog</title>
   <style nonce="${nonce}">
     ${getStyles()}
+    ${getKeyboardShortcutsStyles()}
   </style>
 </head>
 <body>
@@ -96,6 +103,7 @@ export function buildCommandCatalogHtml(
         <span data-stat="internal" class="status-dim" id="statInternal">
           ${internalCount} context-menu only (hidden)
         </span>
+        ${buildKeyboardShortcutsButton()}
       </p>
     </div>
   </header>
@@ -124,6 +132,19 @@ export function buildCommandCatalogHtml(
             <span class="codicon codicon-close" aria-hidden="true"></span>
           </button>
           <span class="search-count" id="searchCount" aria-live="polite"></span>
+          <!-- §8.5.2 — recent-searches popover. Stored in sessionStorage;
+               cross-session persistence is tracked in
+               plan/UX_GUIDELINES_REMAINING.md. -->
+          <div id="catalog-recent" class="catalog-recent" hidden>
+            <div class="catalog-recent-head">
+              <span class="catalog-recent-title">Recent searches</span>
+              <button type="button" id="catalog-recent-clear"
+                class="catalog-recent-clear"
+                title="Clear all recent searches">Clear</button>
+            </div>
+            <ul id="catalog-recent-list" class="catalog-recent-list"
+              role="listbox" aria-label="Recent searches"></ul>
+          </div>
         </div>
         <div class="toolbar-controls">
           <label class="checkbox-control">
@@ -185,11 +206,20 @@ export function buildCommandCatalogHtml(
     <p>No commands match your search.</p>
     <button type="button" class="text-btn" id="resetFromEmpty">Reset filters</button>
   </div>
+  ${buildKeyboardShortcutsOverlay([
+    { key: '/', label: 'Focus the search field' },
+    { key: '↓ / ↑', label: 'Navigate visible command rows' },
+    { key: 'Home / End', label: 'Jump to the first or last visible row' },
+    { key: 'Enter', label: 'Run the focused command' },
+    { key: 'Esc', label: 'Clear search and reset filters' },
+    { key: '?', label: 'Show this shortcut overlay' },
+  ])}
   <script nonce="${nonce}">
     window.__INITIAL_HISTORY__ = ${JSON.stringify(history)};
     window.__RECENT_VISIBLE_DEFAULT__ = ${RECENT_VISIBLE_DEFAULT};
     window.__FREQUENT_TILE_LIMIT__ = ${FREQUENT_TILE_LIMIT};
     ${getScript()}
+    ${getKeyboardShortcutsScript()}
   </script>
 </body>
 </html>`;
@@ -877,6 +907,99 @@ function getStyles(): string {
       -webkit-box-orient: vertical;
     }
 
+    /* §8.5.2 — search hit highlights inside title and description text.
+       Uses the host find-match token so the highlight is visible across
+       all four default themes; the foreground inherits so contrast against
+       the row text stays bound to the host theme. */
+    .entry mark.search-hit {
+      background: var(--vscode-editor-findMatchHighlightBackground,
+          var(--vscode-editor-selectionBackground));
+      color: inherit;
+      padding: 0 1px;
+      border-radius: 2px;
+    }
+
+    /* §8.5.2 — recent-searches popover anchored under the catalog search field. */
+    .search-row { position: relative; }
+    .catalog-recent {
+      position: absolute;
+      top: calc(100% + 4px);
+      inset-inline-start: 0;
+      inset-inline-end: 0;
+      z-index: 50;
+      max-height: 220px;
+      overflow-y: auto;
+      background: var(--vscode-editorWidget-background);
+      border: 1px solid var(--vscode-widget-border);
+      border-radius: 4px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    .catalog-recent-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 8px;
+      border-bottom: 1px solid var(--vscode-widget-border);
+    }
+    .catalog-recent-title {
+      font-size: 0.8em;
+      color: var(--vscode-descriptionForeground);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .catalog-recent-clear {
+      background: none;
+      border: 0;
+      padding: 0;
+      cursor: pointer;
+      color: var(--vscode-textLink-foreground);
+      font-size: 0.85em;
+    }
+    .catalog-recent-clear:hover { text-decoration: underline; }
+    .catalog-recent-list {
+      list-style: none;
+      margin: 0;
+      padding: 4px 0;
+    }
+    .catalog-recent-list li {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 0;
+    }
+    .catalog-recent-list .recent-pick {
+      flex: 1;
+      text-align: start;
+      background: none;
+      border: 0;
+      padding: 4px 10px;
+      color: var(--vscode-foreground);
+      cursor: pointer;
+      font: inherit;
+    }
+    .catalog-recent-list .recent-pick:hover,
+    .catalog-recent-list .recent-pick:focus-visible {
+      background: var(--vscode-list-hoverBackground);
+      outline: none;
+    }
+    .catalog-recent-list .recent-remove {
+      width: 22px;
+      height: 22px;
+      margin-inline-end: 6px;
+      border: 0;
+      background: transparent;
+      color: var(--vscode-descriptionForeground);
+      cursor: pointer;
+      opacity: 0.6;
+      border-radius: 2px;
+      font-size: 14px;
+    }
+    .catalog-recent-list .recent-remove:hover,
+    .catalog-recent-list .recent-remove:focus-visible {
+      opacity: 1;
+      background: var(--vscode-toolbar-hoverBackground, var(--vscode-list-hoverBackground));
+    }
+
     /* Copy-id button only fades in on row hover/focus (§8.14). The id
      * itself is not in the row body anymore — that was the single biggest
      * source of visual noise across 156 rows. The full id remains in the
@@ -965,8 +1088,8 @@ function getStyles(): string {
       }
       .band,
       .catalog {
-        padding-left: 12px;
-        padding-right: 12px;
+        padding-inline-start: 12px;
+        padding-inline-end: 12px;
       }
       .hero-title { font-size: 1.22em; }
       .frequent-grid {
@@ -1341,8 +1464,138 @@ function getScript(): string {
         applySearch();
       });
 
-      searchInput.addEventListener('input', applySearch);
+      /* §8.5.2 — recent-searches storage and popover wiring for the catalog
+         search input. Stored in sessionStorage; cross-session persistence is
+         tracked in plan/UX_GUIDELINES_REMAINING.md. */
+      var catalogRecentEl = document.getElementById('catalog-recent');
+      var catalogRecentListEl = document.getElementById('catalog-recent-list');
+      var catalogRecentClearEl = document.getElementById('catalog-recent-clear');
+      var CAT_RECENT_KEY = 'saropa.commandCatalog.recentSearches';
+      var CAT_RECENT_CAP = 10;
+      var CAT_RECENT_DEBOUNCE_MS = 800;
+      var catalogRecentTimer = null;
+
+      function catRecentLoad() {
+        try {
+          var raw = sessionStorage.getItem(CAT_RECENT_KEY);
+          if (!raw) return [];
+          var p = JSON.parse(raw);
+          return Array.isArray(p) ? p.filter(function (s) { return typeof s === 'string'; }) : [];
+        } catch (e) { return []; }
+      }
+      function catRecentSave(list) {
+        try { sessionStorage.setItem(CAT_RECENT_KEY, JSON.stringify(list)); } catch (e) { /* best-effort */ }
+      }
+      function catRecentRecord(q) {
+        var t = (q || '').trim();
+        if (!t) return;
+        var existing = catRecentLoad().filter(function (s) { return s.toLowerCase() !== t.toLowerCase(); });
+        existing.unshift(t);
+        catRecentSave(existing.slice(0, CAT_RECENT_CAP));
+      }
+      function catRecentRemove(q) {
+        catRecentSave(catRecentLoad().filter(function (s) { return s !== q; }));
+        catRecentRender();
+      }
+      function catRecentClearAll() { catRecentSave([]); catRecentRender(); catRecentHide(); }
+      function catEsc(s) {
+        return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      }
+      function catRecentRender() {
+        if (!catalogRecentListEl) return;
+        var list = catRecentLoad();
+        if (list.length === 0) { catalogRecentListEl.innerHTML = ''; return; }
+        catalogRecentListEl.innerHTML = list.map(function (q) {
+          var s = catEsc(q);
+          return '<li>' +
+            '<button type="button" class="recent-pick" data-query="' + s + '">' + s + '</button>' +
+            '<button type="button" class="recent-remove" data-query="' + s +
+            '" aria-label="Remove ' + s + '" title="Remove">&times;</button>' +
+            '</li>';
+        }).join('');
+      }
+      function catRecentShow() {
+        if (!catalogRecentEl) return;
+        var list = catRecentLoad();
+        if (list.length === 0) { catalogRecentEl.hidden = true; return; }
+        catRecentRender();
+        catalogRecentEl.hidden = false;
+      }
+      function catRecentHide() { if (catalogRecentEl) catalogRecentEl.hidden = true; }
+      function catRecentMaybeShow() {
+        if (document.activeElement === searchInput && !searchInput.value.trim()) catRecentShow();
+        else catRecentHide();
+      }
+
+      searchInput.addEventListener('input', function () {
+        applySearch();
+        catRecentMaybeShow();
+        if (catalogRecentTimer) clearTimeout(catalogRecentTimer);
+        var snap = searchInput.value;
+        catalogRecentTimer = setTimeout(function () {
+          catalogRecentTimer = null;
+          if (snap && searchInput.value === snap) catRecentRecord(snap);
+        }, CAT_RECENT_DEBOUNCE_MS);
+      });
+      searchInput.addEventListener('focus', catRecentMaybeShow);
+      searchInput.addEventListener('blur', function () { setTimeout(catRecentHide, 120); });
+      searchInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' && searchInput.value.trim()) {
+          catRecentRecord(searchInput.value);
+          catRecentHide();
+        } else if (e.key === 'Escape' && catalogRecentEl && !catalogRecentEl.hidden) {
+          e.preventDefault();
+          catRecentHide();
+        }
+      });
+      if (catalogRecentListEl) {
+        catalogRecentListEl.addEventListener('click', function (e) {
+          var t = e.target;
+          if (!t || !t.dataset || !t.dataset.query) return;
+          var q = t.dataset.query;
+          if (t.classList.contains('recent-pick')) {
+            searchInput.value = q;
+            applySearch();
+            catRecentRecord(q);
+            catRecentHide();
+            searchInput.focus();
+          } else if (t.classList.contains('recent-remove')) {
+            e.stopPropagation();
+            catRecentRemove(q);
+            searchInput.focus();
+          }
+        });
+      }
+      if (catalogRecentClearEl) catalogRecentClearEl.addEventListener('click', catRecentClearAll);
+      document.addEventListener('click', function (e) {
+        if (!catalogRecentEl || catalogRecentEl.hidden) return;
+        var row = searchInput.closest ? searchInput.closest('.search-row') : null;
+        if (row && !row.contains(e.target)) catRecentHide();
+      });
+
       searchInput.focus();
+
+      /* §15.2 — page-level shortcuts. '/' refocuses the search from anywhere
+         (the user clicks into a row, then '/' brings them back). 'Esc' on a
+         focused, non-empty search clears the value; the keyboard-shortcut
+         overlay's own Esc handler does not fire while it's hidden, so the
+         two listeners do not collide. */
+      document.addEventListener('keydown', function (e) {
+        var tag = e.target && e.target.tagName ? e.target.tagName.toLowerCase() : '';
+        var inEditable = tag === 'input' || tag === 'textarea' || tag === 'select';
+        if (e.key === '/' && !inEditable) {
+          e.preventDefault();
+          searchInput.focus();
+          searchInput.select && searchInput.select();
+          return;
+        }
+        if (e.key === 'Escape' && e.target === searchInput && searchInput.value) {
+          e.preventDefault();
+          searchInput.value = '';
+          applySearch();
+        }
+      });
 
       if (searchClearBtn) {
         searchClearBtn.addEventListener('click', function () {
@@ -1413,10 +1666,72 @@ function getScript(): string {
         });
       }
 
+      /* §8.5.2 — search-highlight helpers. The entry's title and description
+         are the only text the user reads for matches; highlight token-by-token
+         (the search blob is tokenized too) so multi-word queries reflect each
+         hit. Wrapping happens in text nodes only — every other element stays
+         intact. Stripped each pass before re-applying. */
+      function clearCatalogHighlights() {
+        const marks = document.querySelectorAll('.entry mark.search-hit');
+        const parents = new Set();
+        marks.forEach(m => {
+          const parent = m.parentNode;
+          parent.replaceChild(document.createTextNode(m.textContent), m);
+          parents.add(parent);
+        });
+        parents.forEach(p => p.normalize());
+      }
+
+      function highlightCatalogEntry(entry, tokens) {
+        const targets = entry.querySelectorAll('.entry-title, .entry-desc');
+        targets.forEach(el => {
+          tokens.forEach(tok => {
+            if (!tok) return;
+            const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null, false);
+            const candidates = [];
+            let n = walker.nextNode();
+            while (n) {
+              if (n.parentElement && n.parentElement.tagName === 'MARK') { n = walker.nextNode(); continue; }
+              if (n.nodeValue.toLowerCase().indexOf(tok) !== -1) candidates.push(n);
+              n = walker.nextNode();
+            }
+            candidates.forEach(node => wrapCatalogMatches(node, tok));
+          });
+        });
+      }
+
+      function wrapCatalogMatches(textNode, lowerTok) {
+        const text = textNode.nodeValue;
+        const lower = text.toLowerCase();
+        const parent = textNode.parentNode;
+        const tokLen = lowerTok.length;
+        let lastIdx = 0;
+        let idx = lower.indexOf(lowerTok);
+        while (idx !== -1) {
+          if (idx > lastIdx) {
+            parent.insertBefore(document.createTextNode(text.substring(lastIdx, idx)), textNode);
+          }
+          const mark = document.createElement('mark');
+          mark.className = 'search-hit';
+          mark.textContent = text.substr(idx, tokLen);
+          parent.insertBefore(mark, textNode);
+          lastIdx = idx + tokLen;
+          idx = lower.indexOf(lowerTok, lastIdx);
+        }
+        if (lastIdx < text.length) {
+          parent.insertBefore(document.createTextNode(text.substring(lastIdx)), textNode);
+        }
+        parent.removeChild(textNode);
+      }
+
       function applySearch() {
-        const query = searchInput.value.toLowerCase().trim().split(/\s+/).join(' ');
+        const rawQuery = searchInput.value.toLowerCase().trim();
+        const tokens = rawQuery ? rawQuery.split(/\s+/).filter(Boolean) : [];
+        const query = tokens.join(' ');
         const showInternal = internalCheckbox.checked;
         let visibleCount = 0;
+
+        clearCatalogHighlights();
 
         for (const section of document.querySelectorAll('.category')) {
           let sectionVisible = 0;
@@ -1428,7 +1743,10 @@ function getScript(): string {
             const visible = matchesSearch && (!isInternal || showInternal);
 
             entry.classList.toggle('search-hidden', !visible);
-            if (visible) sectionVisible++;
+            if (visible) {
+              sectionVisible++;
+              if (tokens.length > 0) highlightCatalogEntry(entry, tokens);
+            }
           }
 
           section.classList.toggle('search-hidden', sectionVisible === 0);

@@ -10,6 +10,12 @@ import {
     buildStatusLine,
     getFullWidthToggleScript,
 } from '../../views/dashboardHero';
+import {
+    buildKeyboardShortcutsButton,
+    buildKeyboardShortcutsOverlay,
+    getKeyboardShortcutsScript,
+    getKeyboardShortcutsStyles,
+} from '../../views/keyboard-shortcuts';
 import { pluralize } from '../../views/webview-format';
 
 /**
@@ -71,7 +77,7 @@ function getComparisonStyles(): string {
             padding: 2px 6px;
             border-radius: 3px;
             font-size: 0.75em;
-            margin-left: 6px;
+            margin-inline-start: 6px;
         }
         /* §8.10 — multiple per-package *Add to Project* buttons used to render
            with the primary --vscode-button-background, so every header cell
@@ -337,6 +343,7 @@ export function buildComparisonHtml(ranked: RankedComparison): string {
     const heroHtml = buildDashboardHero({
         title: 'Package Comparison',
         statusLineHtml,
+        extraToggleHtml: buildKeyboardShortcutsButton(),
     });
     const kpiRowHtml = buildKpiRow(packages, winners);
     const toolbarHtml = buildToolbar();
@@ -350,7 +357,7 @@ export function buildComparisonHtml(ranked: RankedComparison): string {
     <meta charset="UTF-8">
     <title>${docTitle}</title>
     <meta http-equiv="Content-Security-Policy" content="${cspWithScript}">
-    <style nonce="${nonce}">${getComparisonStyles()}</style>
+    <style nonce="${nonce}">${getComparisonStyles()}${getKeyboardShortcutsStyles()}</style>
 </head>
 <body>
     <a href="#comparison-table" class="skip-link">Skip to comparison table</a>
@@ -364,7 +371,11 @@ export function buildComparisonHtml(ranked: RankedComparison): string {
     <aside aria-label="Recommendation">
         <div class="recommendation">${recommendation}</div>
     </aside>
-    <script nonce="${nonce}">${getComparisonScript()}(function(){${getFullWidthToggleScript()}})();</script>
+    ${buildKeyboardShortcutsOverlay([
+        { key: '?', label: 'Show this shortcut overlay' },
+        { key: 'Esc', label: 'Close the keyboard-shortcut overlay' },
+    ])}
+    <script nonce="${nonce}">${getComparisonScript()}(function(){${getFullWidthToggleScript()}${getKeyboardShortcutsScript()}})();</script>
 </body>
 </html>`;
 }

@@ -35,6 +35,13 @@ export interface DashboardHeroInput {
   gaugeHtml?: string;
   /** When true, renders the full-width toggle button. Defaults to true. */
   showFullWidthToggle?: boolean;
+  /**
+   * Extra inline HTML rendered alongside the full-width toggle at the
+   * trailing edge of the status line. Used for surface-specific affordances
+   * like the keyboard-shortcut overlay trigger (§15.2). Already-escaped
+   * HTML — surfaces that pass dynamic strings must escape themselves.
+   */
+  extraToggleHtml?: string;
 }
 
 /** One status-line pill: a muted facts cell rendered in a row under the title. */
@@ -82,7 +89,7 @@ export function buildFullWidthToggle(): string {
  * Render the gold-standard hero band: title (Saropa-prefixed), version stamp, status line,
  * full-width toggle, and optional gauge. Guideline §4.1 + §8.1.
  *
- * The full-width toggle is appended to the status line (right-aligned via `margin-left:auto`)
+ * The full-width toggle is appended to the status line (right-aligned via `margin-inline-start:auto`)
  * rather than dropped into a separate hero cell — that keeps the existing 2-column hero
  * grid (text | gauge) intact and avoids collision with the gauge in dashboards that have one.
  */
@@ -92,12 +99,18 @@ export function buildDashboardHero(input: DashboardHeroInput): string {
     : '';
   const gauge = input.gaugeHtml ?? '';
   const toggle = input.showFullWidthToggle === false ? '' : buildFullWidthToggle();
+  const extra = input.extraToggleHtml ?? '';
+  // Trailing actions: full-width toggle + any surface-specific buttons (e.g. the
+  // keyboard-shortcut overlay trigger, §15.2). Order is fixed (extra before toggle)
+  // so the toggle stays at the far right edge — that position is sticky in muscle
+  // memory across all dashboards.
+  const trailing = `${extra}${toggle}`;
   const status = input.statusLineHtml ?? '';
-  // If there's no status line, render a bare row that just holds the toggle. This keeps
-  // the toggle reachable on dashboards that opt out of status pills (About, etc.).
+  // If there's no status line, render a bare row that just holds the trailing actions.
+  // This keeps the toggle reachable on dashboards that opt out of status pills (About, etc.).
   const statusWithToggle = status
-    ? status.replace('</p>', `${toggle}</p>`)
-    : (toggle ? `<p class="status-line">${toggle}</p>` : '');
+    ? status.replace('</p>', `${trailing}</p>`)
+    : (trailing ? `<p class="status-line">${trailing}</p>` : '');
   const title = `Saropa ${input.title}`;
   return `<header class="dash-hero">
     <div class="hero-text">
