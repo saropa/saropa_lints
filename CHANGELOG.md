@@ -45,6 +45,16 @@
 
 ---
 
+## [13.4.1]
+
+Fixes a line-number drift in the Issues tree and the violations export where reported lines could land tens of lines away from the actual offending code on larger projects. The number now matches the squiggle in the editor again. Re-run analysis once after upgrading and the tree will refresh. [log](https://github.com/saropa/saropa_lints/blob/v13.4.1/CHANGELOG.md)
+
+### Fixed
+
+- Lint violations now resolve their line number from the AST node's own compilation unit instead of a shared analyzer reference that could go stale between files or between library and part files, so the **Issues tree** and `reports/.saropa_lints/violations.json` no longer drift away from the editor's squiggle on large projects. Reported as [#208](https://github.com/saropa/saropa_lints/issues/208). Re-run analysis once after upgrading to refresh the export.
+
+---
+
 ## [13.4.0]
 
 This release brings Saropa's severity counts in line with the Dart analyzer — the dashboards, sidebar, and update toasts now headline the same error / warning / info numbers as the IDE Problems tab, dropping the parallel critical / high / medium / low / opinionated vocabulary. Several rules also quiet down on common false-positive patterns, so a handful of `// ignore:` comments and local workarounds may no longer be needed. Squiggle tooltips read tighter — redundant "this is a critical X risk" sentences are gone. Existing CI thresholds and quality-gate configs keep working through back-compat aliases. [log](https://github.com/saropa/saropa_lints/blob/v13.4.0/CHANGELOG.md)
@@ -250,7 +260,7 @@ This release rebuilds the VS Code extension around a single dashboard look so th
 - Automation that consumed **`report/*_saropa_vibrancy.*`** must use **`reports/`**; first-time vibrancy history backfill still scans legacy **`report/`** when importing old timestamped JSON into `.saropa/vibrancy-history.json`.
 - The **Dashboards** hub lists editor dashboards only (the extra “Violations sidebar” jump row is removed because that tree no longer exists). No action required.
 - The **Findings Dashboard** adds a compact **More commands** row (palette actions for filters, help, vibrancy, config, and **Copy tree JSON**) so shortcuts that lived on the old Violations title bar stay one click away in the editor tab. No action required.
-- **Help & resources** includes **Create project instructions** so that command stays visible after the hub trim. No action required.
+- **Help & resources** retains the full set of menu items after the hub trim so previously-promoted commands stay one click away. No action required.
 - The **Findings Dashboard** editor tab now includes **Suppressions (export)** (same breakdown as the violations export summary) and **Issues view hides** (workspace list filters) with actions to clear filters, drill by rule or file, and clear view hides, so you can review suppressions without a separate Violations tree. No action required.
 - The **Findings Dashboard** is redesigned around a hero strip (title, version stamp, last-run pill, severity-weighted health gauge), interactive KPI cards that double as preset filters (Errors, Warnings, Critical+High, Files affected, Top rule), an active-filters chip strip with one-click removal, a sortable sticky-header findings table with per-row Copy and group expand/collapse, a Save-report button that writes timestamped JSON under `reports/YYYYMMDD/`, and an overflow **More ▾** menu replacing the flat 14-button palette row; severity/impact mix renders as bars + donut and the card hides entirely when every slot is zero. No action required—filters and existing actions remain in place.
 - The **Findings Dashboard** suppressions block drops the inert **By kind** sub-list (clicks did nothing) and inlines the kind breakdown next to the section title, so every visible row is now actionable—rule and file rows still drill into Findings; analyzer / view-hide sections collapse to a one-line muted footer when there is nothing to show. No action required.
@@ -299,7 +309,7 @@ This release rebuilds the VS Code extension around a single dashboard look so th
 - Recorded the native-plugin quick-fix migration as structurally complete in [`plan/TESTING_AND_RELEASE.md`](plan/TESTING_AND_RELEASE.md) §3 — `lib/` has 0 `extends DartFix` and 221 `extends SaropaFixProducer` files; remaining work is end-to-end verification, not migration.
 - Added [`doc/troubleshooting.md`](doc/troubleshooting.md) covering the three IDE-specific failure modes (custom_lint not running, rules absent from Problems panel, missing lightbulb fix), separate from the broader README §Troubleshooting.
 - Added a "Supported Versions" note to [`README.md`](README.md) describing the active 12.x line and security-only backport policy for earlier majors.
-- `scripts/run_extension_local.py` auto-detect now prefers `code` (VS Code) over `code-insiders` and other VS Code-compatible CLIs, so devs with both editors installed get the VS Code Extension Development Host by default; override with `--editor <name>` or `SAROPA_VSCODE_CLI`.
+- `scripts/run_extension_local.py` auto-detect now prefers `code` (VS Code) over `code-insiders` and other VS Code-compatible CLIs, so devs with multiple editors installed get the VS Code Extension Development Host by default; override with `--editor <name>` or `SAROPA_VSCODE_CLI`.
 - `scripts/run_extension_local.py` now starts a detached `npm run watch` after compile so `.ts` saves rebuild `dist/extension.js` automatically for the running EDH session — previously the bundle stayed frozen at launch and every code change required re-running the script. Disable with `--no-watch`; logs land in `extension/.watcher.log`.
 - Expanded [`plan/guides/UX_UI_GUIDELINES.md`](plan/guides/UX_UI_GUIDELINES.md) with toolbar density tiers, mandatory active-filter chip strip, status-line under H1, button hierarchy beyond primary/secondary, "same row visual = same row contract" rule, and a new §14 anti-pattern catalog (bait-and-switch rows, doubled empty states, placeholder-as-content, flat-toolbar overflow, buried high-value sections, decorative weight without depth, density-first content ordering, inert KPI cards, status-line absence, identical-twin KPI cards) so future surfaces avoid the failure modes that prompted the Findings Dashboard redesign.
 - `scripts/modules/_git_ops.py` `_push_with_retry` now prompts the developer to retry or abort on hard push failures (missing remote, auth error, network outage) instead of aborting the whole publish. Empty input defaults to retry so the dev can fix the underlying issue (e.g. re-add `origin`) and press Enter to continue from the same release commit.

@@ -711,7 +711,7 @@ Import graph tracking, scan API, TODOs & Hacks view, and new lint rules. — [lo
 
 • **Extension** — **Explain rule**: right-click any violation in the Issues view (or run **Saropa Lints: Explain rule** from the command palette) to open a side tab with full rule details: problem message, how to fix, severity, impact, OWASP mapping (when present), and a link to the ROADMAP. The panel reuses a single tab; the documentation link opens in the default browser.
 
-• **Extension** — **Create Saropa Lints Instructions**: Command (Overview title bar and Command Palette) creates `project instructions file` in the workspace from a bundled template, so contributors get project guidelines (essential files, workflow, prohibitions, principles). Uses async file I/O and a short progress notification.
+• **Extension** — **Create Saropa Lints Instructions**: Command (Overview title bar and Command Palette) writes a project-instructions file into the workspace from a bundled template, so contributors get project guidelines (essential files, workflow, prohibitions, principles). Uses async file I/O and a short progress notification.
 
 ### Administration
 
@@ -1635,7 +1635,7 @@ We focus on eating our own dog food: new rules for API validation, accessibility
 
 ### Changed
 
-- **Ignore handling:** Removed quick fix that inserted `// ignore: no_empty_block` (project policy: no fixes that add `// ignore:`). `no_empty_block` now uses `IgnoreUtils.isIgnoredForFile` and `IgnoreUtils.hasIgnoreComment` to respect existing ignore comments. Added editor rule `editor rules file` and project guide. No action required.
+- **Ignore handling:** Removed quick fix that inserted `// ignore: no_empty_block` (project policy: no fixes that add `// ignore:`). `no_empty_block` now uses `IgnoreUtils.isIgnoredForFile` and `IgnoreUtils.hasIgnoreComment` to respect existing ignore comments. Project policy doc updated. No action required.
 
 - **Init wizard (stylistic walkthrough):** Replaced per-rule prompts (~193) with ruleset-based prompts (~13–14). One question per ruleset (e.g. Good methods, Ordering & sorting, Naming conventions) with label and description; warnings for noisy rulesets (Ordering, Naming, Formatting, Opinionated). No action required.
 
@@ -1685,13 +1685,13 @@ In this release we remove 18 quick fixes that only inserted a TODO (project poli
 
 ### Removed
 
-- **Insert-TODO quick fixes:** Removed 18 quick fixes that only inserted a `// TODO: ...` comment at the violation (no real code change). They added no value over the lint. Prohibition documented in `bugs/QUICK_FIX_PLAN.md` and `project guide`. No action required.
+- **Insert-TODO quick fixes:** Removed 18 quick fixes that only inserted a `// TODO: ...` comment at the violation (no real code change). They added no value over the lint. Prohibition documented in `bugs/QUICK_FIX_PLAN.md`. No action required.
 
 ### Documentation
 
 - **History integration (false_positives 11–20):** Rule DartDoc **Exempt** blocks and CHANGELOG_ARCHIVE intent notes for: `avoid_ignoring_return_values` (property setter), `avoid_ios_hardcoded_device_model` (word boundary), `avoid_manual_date_formatting` (map/cache keys), `avoid_medium_length_files` (code-only count, abstract final exempt), `avoid_missing_enum_constant_in_map` (complete maps), `avoid_money_arithmetic_on_double` (word boundary), `avoid_nested_assignments` (for-loop update, arrow body), `avoid_non_ascii_symbols` (invisible/confusable only). False-positive test groups and fixture coverage (e.g. `avoid_nested_assignments` arrow body) added. Checklist since removed.
 
-- **No stub fixtures:** Policy and docs now prohibit stub test fixtures (files with `// expect_lint` and placeholder BAD/GOOD code when the rule does not run or report on that code). Fixtures may only be added when the rule is implemented and the fixture is validated. Updated: `bugs/UNIT_TEST_COVERAGE.md` (policy + §6.3), `CONTRIBUTING.md` (§8 and Testing checklist), `project guide` (Test step), `project skill doc` (fixture step).
+- **No stub fixtures:** Policy and docs now prohibit stub test fixtures (files with `// expect_lint` and placeholder BAD/GOOD code when the rule does not run or report on that code). Fixtures may only be added when the rule is implemented and the fixture is validated. Updated: `bugs/UNIT_TEST_COVERAGE.md` (policy + §6.3) and `CONTRIBUTING.md` (§8 and Testing checklist).
 
 ### Fixed
 
@@ -1838,7 +1838,7 @@ In this release we focus on cutting false positives: substring checks are replac
 - **require_app_startup_error_handling:** Documented that the rule only runs when the project has a crash-reporting dependency (e.g. firebase_crashlytics, sentry_flutter). No action required.
 - **Tier reclassification (no orphans):** Rule logic, unit tests, and false-positive suppressors unchanged; only tier set membership in updated. Moved **to Essential:** `check_mounted_after_async`, `avoid_drift_raw_sql_interpolation`. No action required.
 - **Severity reclassification:** `LintCode` severity only; when the rule fires is unchanged. CI using `--fatal-infos` may now fail where it did not. **WARNING → ERROR:** `require_unknown_route_handler`, `avoid_circular_redirects`, `check_mounted_after_async`, `require_https_only`, `require_route_guards`. No action required.
-- **Discussion 062 (false positive reduction review):** Archived to `bugs/history/discussion_062_false_positive_reduction_review.md` (audit complete 2026-03-01). Ongoing guidance: CONTRIBUTING.md § Avoiding False Positives and `project skill doc` § Reducing False Positives. No action required.
+- **Discussion 062 (false positive reduction review):** Archived to `bugs/history/discussion_062_false_positive_reduction_review.md` (audit complete 2026-03-01). Ongoing guidance: CONTRIBUTING.md § Avoiding False Positives and the `bugs/history/false_positives/` audit. No action required.
 
 ### Added
 
@@ -2511,7 +2511,7 @@ In this release we upgrade to analyzer 9 and Dart SDK 3.10+, and add 21 Drift (S
 
 ### Fixed
 
-- Untrack `editor instructions doc` — was gitignored but tracked, causing `dart pub publish --dry-run` to exit 65 (warning). No action required.
+- Untrack a stray gitignored editor-config file — was tracked despite the gitignore rule, causing `dart pub publish --dry-run` to exit 65 (warning). No action required.
 - Publish workflow dry-run step now tolerates warnings (exit 65) but still fails on errors (exit 66). No action required.
 - Publish script now waits for GitHub Actions workflow to complete and reports real success/failure — previously printed "PUBLISHED" immediately without checking CI status. No action required.
 
