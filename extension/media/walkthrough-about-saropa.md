@@ -16,7 +16,6 @@ Established in 2010, **Saropa Pty Limited** is a technology firm rooted in finan
 
 - **[Saropa Log Capture](https://marketplace.visualstudio.com/items?itemName=Saropa.saropa-log-capture)** — Auto-saves Debug Console output to persistent log files.
 - **[Saropa Drift Viewer](https://marketplace.visualstudio.com/items?itemName=Saropa.drift-viewer)** — Inspect Drift/SQLite tables, run SQL, export data.
-- **[Saropa Claude Guard](https://marketplace.visualstudio.com/items?itemName=Saropa.saropa-claude-guard)** — Track Claude API costs and enforce budgets from the status bar.
 
 ### Consumer Apps
 
