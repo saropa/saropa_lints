@@ -1,8 +1,8 @@
 # Token coverage matrix
 
-Generated: 2026-05-02T14:29:39.064Z
+Generated: 2026-05-04T15:49:18.125Z
 
-Scanned 13 surface files; 66 unique tokens referenced.
+Scanned 13 surface files; 67 unique tokens referenced.
 
 ## Index — surfaces
 
@@ -25,7 +25,6 @@ Scanned 13 surface files; 66 unique tokens referenced.
 | Token | Used by (surface index) |
 |-------|--------------------------|
 | `--accent-` | 13 |
-| `--bar-pct` | 2 |
 | `--border` | 4, 6 |
 | `--chart-color-0` | 2 |
 | `--chart-color-1` | 2 |
@@ -59,9 +58,11 @@ Scanned 13 surface files; 66 unique tokens referenced.
 | `--vscode-charts-green` | 3 |
 | `--vscode-descriptionForeground` | 2, 3, 5, 6, 7, 10, 13 |
 | `--vscode-editor-background` | 1, 2, 3, 7, 10, 12 |
+| `--vscode-editor-findMatchHighlightBackground` | 3, 6 |
 | `--vscode-editor-font-family` | 3, 5, 7, 10 |
 | `--vscode-editor-font-size` | 5, 7 |
 | `--vscode-editor-inactiveSelectionBackground` | 2, 3, 4, 7, 10 |
+| `--vscode-editor-selectionBackground` | 3, 6 |
 | `--vscode-editorError-foreground` | 4, 5, 7, 9, 10 |
 | `--vscode-editorHoverWidget-background` | 2 |
 | `--vscode-editorHoverWidget-border` | 2 |
@@ -80,14 +81,14 @@ Scanned 13 surface files; 66 unique tokens referenced.
 | `--vscode-input-placeholderForeground` | 3 |
 | `--vscode-list-activeSelectionBackground` | 3, 7, 10 |
 | `--vscode-list-activeSelectionForeground` | 3, 7, 10 |
-| `--vscode-list-hoverBackground` | 2, 3, 5, 7, 10 |
+| `--vscode-list-hoverBackground` | 2, 3, 5, 6, 7, 10 |
 | `--vscode-list-warningForeground` | 12 |
 | `--vscode-sideBar-background` | 3, 5 |
 | `--vscode-sideBarSectionHeader-background` | 5, 7, 12 |
 | `--vscode-sideBarSectionHeader-foreground` | 5 |
 | `--vscode-testing-iconPassed` | 3, 4, 5, 6, 7, 9, 10 |
 | `--vscode-textLink-activeForeground` | 5, 7 |
-| `--vscode-textLink-foreground` | 3, 4, 5, 7, 10, 12 |
+| `--vscode-textLink-foreground` | 3, 4, 5, 6, 7, 10, 12 |
 | `--vscode-toolbar-hoverBackground` | 3, 6, 10 |
 | `--vscode-widget-border` | 2, 3, 4, 5, 6, 7, 9, 10, 12 |
 

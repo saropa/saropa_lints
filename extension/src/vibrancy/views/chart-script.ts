@@ -199,7 +199,10 @@ export function getChartScript(): string {
             var pct = totalSize > 0 ? (item.size / totalSize) * 100 : 0;
             var fill = item.el.querySelector('.bar-fill');
             if (fill) {
-                fill.style.setProperty('--bar-pct', barWidth.toFixed(1) + '%');
+                /* Inline width matches the initial-render path in chart-html.ts
+                   (style="width: N%"). The static CSS no longer reads
+                   --bar-pct, so setting that variable here would be a no-op. */
+                fill.style.width = barWidth.toFixed(1) + '%';
                 /* Reset animation so bars re-grow to new width */
                 fill.style.animation = 'none';
                 fill.offsetHeight; /* force reflow */

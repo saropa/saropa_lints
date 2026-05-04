@@ -219,7 +219,7 @@ function buildBarChart(segments: ChartSegment[]): string {
             <div class="bar-label" title="${safeName}">${safeName}</div>
             <div class="bar-track">
                 <div class="bar-fill bar-color-${seg.colorIndex}"
-                     style="--bar-pct: ${barWidth.toFixed(1)}%"></div>
+                     style="width: ${barWidth.toFixed(1)}%"></div>
             </div>
             <div class="bar-value">${sizeLabel} (${pctLabel}%)</div>
         </div>`;

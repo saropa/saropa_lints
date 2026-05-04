@@ -97,14 +97,17 @@ export function getChartStyles(): string {
             overflow: hidden;
         }
         .bar-fill {
-            /* Static width must be on the element itself — relying solely on
-               var(--bar-pct) inside @keyframes (with animation-fill-mode:
-               forwards) leaves bars at 100% of the track when var() in
-               keyframes fails to resolve, which manifests as all bars looking
-               identical regardless of percentage. */
+            /* Width is set inline via style="width: N%" on each bar (highest
+               CSS specificity — beats any class selector and cannot be
+               overridden by cascade order). The animation grows the bar in
+               via transform: scaleX(0 → 1), which is a pure number animation
+               with no var() reference in @keyframes — earlier attempts that
+               put the percentage inside the keyframe (to { width: var(...) })
+               left every bar at 100% of the track in webview environments
+               where var() failed to resolve inside @keyframes. */
             height: 100%;
-            width: var(--bar-pct);
             border-radius: 3px;
+            transform-origin: left center;
             animation: bar-grow 0.6s ease-out;
         }
         .bar-value {
@@ -114,10 +117,9 @@ export function getChartStyles(): string {
             color: var(--vscode-descriptionForeground);
             white-space: nowrap;
         }
-        /* var() in keyframes requires Chromium; safe for VS Code webview. */
         @keyframes bar-grow {
-            from { width: 0; }
-            to { width: var(--bar-pct); }
+            from { transform: scaleX(0); }
+            to   { transform: scaleX(1); }
         }
 
         /* Bar colors */
@@ -185,7 +187,7 @@ export function getChartStyles(): string {
         }
 
         @media (prefers-reduced-motion: reduce) {
-            .bar-fill { animation: none !important; width: var(--bar-pct) !important; }
+            .bar-fill { animation: none !important; transform: scaleX(1) !important; }
             .bar-row { transition: none; }
             .donut-segment { transition: none !important; }
             .chart-tooltip { transition: none; }
