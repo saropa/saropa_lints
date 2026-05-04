@@ -57,6 +57,7 @@
 
 <details><summary>Maintenance</summary>
 
+- Removed two orphan extension commands — `saropaLints.config.copyAsJson` ("Copy Triage as JSON") and `saropaLints.overview.copyAsJson` ("Copy Overview as JSON") — that were declared in `package.json` and listed in the command catalog but had no runtime handler after the Triage and Overview trees were merged into Settings/dashboards. Invoking them from the palette previously failed with `command not found`; the entries are now gone.
 - Version 13.4.2 was bumped in `pubspec.yaml` but never tagged or published — the v13.4.3 publish run jumped past it. No 13.4.2 artifact exists on pub.dev or the Marketplace; consumers go directly from 13.4.1 to 13.4.3.
 - `scripts/modules/_version_changelog.py` now refuses to publish when any `## [X.Y.Z]` section in `CHANGELOG.md` has an empty body — that was the exact shape that caused the rename-collision recovery in `apply_version_and_rename_unreleased` to silently skip 13.4.2 and bump straight to 13.4.3. Authors must now either delete the orphan stub or fill in its release notes before re-running publish.
 - `scripts/modules/_rule_metrics.py` now finds nested rule tests under `test/rules/{group}/`, fixing the gap report that falsely listed `widget_patterns_avoid_prefer`, `structure`, `async`, `bloc`, and `performance` as missing. The previous flat `test/*_test.dart` glob saw zero rule-category tests; coverage is now reported correctly (116/116 categories tested, 1095 test calls).

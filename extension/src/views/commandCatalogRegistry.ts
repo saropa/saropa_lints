@@ -634,13 +634,6 @@ export const catalogEntries: readonly CatalogEntry[] = [
     icon: 'clippy',
   },
   {
-    command: 'saropaLints.config.copyAsJson',
-    title: 'Copy Triage as JSON',
-    description: 'Copy the Triage tree data to the clipboard as JSON.',
-    category: 'Reporting & Export',
-    icon: 'clippy',
-  },
-  {
     command: 'saropaLints.summary.copyAsJson',
     title: 'Copy Summary as JSON',
     description: 'Copy the summary tree data to the clipboard as JSON.',
@@ -658,13 +651,6 @@ export const catalogEntries: readonly CatalogEntry[] = [
     command: 'saropaLints.fileRisk.copyAsJson',
     title: 'Copy File Risk as JSON',
     description: 'Copy the file risk tree data to the clipboard as JSON.',
-    category: 'Reporting & Export',
-    icon: 'clippy',
-  },
-  {
-    command: 'saropaLints.overview.copyAsJson',
-    title: 'Copy Overview as JSON',
-    description: 'Copy the overview tree data to the clipboard as JSON.',
     category: 'Reporting & Export',
     icon: 'clippy',
   },

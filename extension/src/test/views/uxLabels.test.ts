@@ -56,11 +56,19 @@ describe('UX labels in package.json', () => {
     assert.ok(!views.some((v) => v.id === 'saropaLints.triage'), 'triage view merged into settings');
   });
 
-  it('renames config copy command to Triage wording', () => {
+  it('removes orphan copyAsJson commands without runtime handlers', () => {
+    // saropaLints.config.copyAsJson and saropaLints.overview.copyAsJson were
+    // declared in package.json but never registered with vscode.commands.
+    // The Triage and Overview trees they targeted were merged into Settings
+    // and the dashboards; their JSON-export commands were left behind as
+    // dead palette entries until this cleanup removed them.
     const pkg = loadPackageJson();
-    const cmd = pkg.contributes.commands.find((entry) => entry.command === 'saropaLints.config.copyAsJson');
-    assert.ok(cmd, 'expected saropaLints.config.copyAsJson command to exist');
-    assert.strictEqual(cmd?.title, 'Copy Triage as JSON');
+    const orphan = pkg.contributes.commands.find(
+      (entry) =>
+        entry.command === 'saropaLints.config.copyAsJson' ||
+        entry.command === 'saropaLints.overview.copyAsJson',
+    );
+    assert.strictEqual(orphan, undefined, 'orphan copyAsJson commands must stay deleted');
   });
 
   it('uses Activity bar settings group title', () => {

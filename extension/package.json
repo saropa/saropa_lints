@@ -369,11 +369,6 @@
         "icon": "$(clippy)"
       },
       {
-        "command": "saropaLints.config.copyAsJson",
-        "title": "Copy Triage as JSON",
-        "icon": "$(clippy)"
-      },
-      {
         "command": "saropaLints.summary.copyAsJson",
         "title": "Copy Summary as JSON",
         "icon": "$(clippy)"
@@ -399,11 +394,6 @@
       {
         "command": "saropaLints.fileRisk.copyPath",
         "title": "Copy Path"
-      },
-      {
-        "command": "saropaLints.overview.copyAsJson",
-        "title": "Copy Overview as JSON",
-        "icon": "$(clippy)"
       },
       {
         "command": "saropaLints.suggestions.copyAsJson",
@@ -1006,10 +996,6 @@
         },
         {
           "command": "saropaLints.fileRisk.copyAsJson",
-          "when": "saropaLints.isDartProject"
-        },
-        {
-          "command": "saropaLints.overview.copyAsJson",
           "when": "saropaLints.isDartProject"
         },
         {
