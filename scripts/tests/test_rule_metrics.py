@@ -159,7 +159,7 @@ class ExtractRuleMessagesPathTests(unittest.TestCase):
        (missing) instead of `<repo>/lib/src/rules/`. rglob on a missing
        path silently returns nothing, masking the path mistake.
 
-    These tests pin both behaviours by importing the module's resolved
+    These tests pin both behaviors by importing the module's resolved
     constants and asserting they reach the real rules tree.
     """
 
