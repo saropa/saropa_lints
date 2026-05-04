@@ -6,8 +6,26 @@ import 'package:test/test.dart';
 /// Tests for 49 Performance lint rules.
 ///
 /// Test fixtures: example/lib/performance/*
+///
+/// Two test patterns live here:
+///   1. Rule instantiation pin — every rule's class constructs without
+///      throwing AND its [code] field carries a problem message ≥50
+///      chars containing the canonical `[rule_name]` prefix. This
+///      catches typos in either the constructor or the message string
+///      that would otherwise only fail at user-facing analysis time.
+///   2. Fixture-presence checks — each rule has a corresponding
+///      `example/lib/performance/<rule>_fixture.dart` that the analyzer
+///      uses for golden tests. Missing fixture = silent regression.
+///
+/// Length 50 chars is intentional: the registry's `[rule_name]` prefix
+/// alone is around 25 chars, so requiring 50+ guarantees a meaningful
+/// human description follows the prefix.
 void main() {
   group('Performance Rules - Rule Instantiation', () {
+    // Reusable runner: each call produces one `test()`. Closing over
+    // the factory lets the rule type stay private to the call — we
+    // never instantiate the rule outside the test body, so a slow
+    // constructor only affects its own test.
     void testRule(String name, String codeName, dynamic Function() create) {
       test(name, () {
         final rule = create();

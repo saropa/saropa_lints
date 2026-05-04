@@ -47,6 +47,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Quick fix coverage extended to ten more rules (Batch 13). Each rule now offers a one-step IDE correction so the lint can be cleared without manual edits — no action required if you already had these rules enabled. The newly-fixable rules are `prefer_raw_strings`, `prefer_period_after_doc`, `format_comment_style`, `prefer_const_border_radius`, `prefer_const_widgets_in_lists`, `avoid_redundant_async_on_load`, `avoid_single_cascade_in_expression_statements`, `avoid_escaping_inner_quotes`, `avoid_types_on_closure_parameters`, and `prefer_expression_body_getters`.
+
 ### Fixed (Extension)
 
 - Upgrade-check throttle now lets a newly-published `saropa_lints` version break through the dismiss memory immediately instead of being suppressed for up to 24 hours. The previous gate was a single 24h timer, so a release published the morning after a dismiss stayed invisible until that timer elapsed; the gate is now a 1-hour anti-thrash window combined with a per-version dismiss memory, so a new pub.dev version always re-prompts even within the same day. Legacy state self-heals on the next write — no user action required.
@@ -58,6 +62,7 @@
 - `scripts/modules/_rule_metrics.py` now finds nested rule tests under `test/rules/{group}/`, fixing the gap report that falsely listed `widget_patterns_avoid_prefer`, `structure`, `async`, `bloc`, and `performance` as missing. The previous flat `test/*_test.dart` glob saw zero rule-category tests; coverage is now reported correctly (116/116 categories tested, 1095 test calls).
 - `scripts/modules/_extract_rule_messages.py` now extracts all 2165 rules instead of producing an empty JSON dump. Two bugs landed when the script was moved into `scripts/modules/`: the flat `glob("*_rules.dart")` only matched the barrel export (zero LintCodes), and the `parent.parent` walk pointed at `scripts/lib/src/rules/` — a non-existent path — so even fixing the glob alone would have returned zero. The CLI body is now guarded by `if __name__ == "__main__":` so importing the module no longer mkdirs `reports/` or writes a JSON file as a side effect.
 - Moved release notes for `12.5.2` through `12.6.1` from `CHANGELOG.md` to `CHANGELOG_ARCHIVE.md` so the active changelog stays focused on the current `13.x` series. No action required for package users.
+- Added file-level doc headers and per-test WHY comments to four low-coverage test files surfaced by the publish-time comment-coverage scan: `test/integrity/plan_additional_rules_21_30_test.dart`, `test/rules/architecture/compile_time_syntax_rules_test.dart`, `test/rules/core/performance_rules_test.dart`, and `extension/src/test/vibrancy/services/dep-graph.test.ts`. Headers explain the contract under test (registration + tier + fixture invariants for the rule packs; two-output shape for the dep-graph parser) so a future reader can change a rule without first decoding what each `it()` was guarding. No action required — no source, severity, tier, message, or fix changed.
 
 </details>
 

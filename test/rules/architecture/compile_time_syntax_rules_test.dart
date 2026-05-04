@@ -12,6 +12,14 @@ import 'package:test/test.dart';
 
 /// Unit tests for compile-time syntax shape rules
 /// (`lib/src/rules/architecture/compile_time_syntax_rules.dart`).
+///
+/// All nine rules in this file detect Dart compile-time errors that the
+/// analyzer normally surfaces with confusing error messages — the lints
+/// reframe them as actionable warnings, but they share metadata: every
+/// rule is `errorSeverity: ERROR`, `RuleType.bug`, `LintImpact.medium`,
+/// and ships without an auto-fix (the right repair depends on author
+/// intent, not a mechanical rewrite). The shared-metadata group below
+/// pins those invariants for the whole file.
 void main() {
   const ruleNames = <String>{
     'duplicate_constructor_declarations',

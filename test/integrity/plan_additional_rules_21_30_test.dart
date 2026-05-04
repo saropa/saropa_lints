@@ -1,9 +1,26 @@
+// Integrity guard for the rules added in plan items 21–30 (a batch of
+// Dart-spec compliance lints: duplicate constructor / field detection,
+// invalid annotation usage, illegal enum members, etc.). Three things
+// must stay in sync:
+//
+//   1. Each rule registered in `allSaropaRules`. Without this, the
+//      rule never runs in user projects.
+//   2. Each rule lives in the `essential` tier. The plan ships these
+//      as essentials because they catch hard compile errors.
+//   3. The shared fixture `plan_additional_rules_21_30_fixture.dart`
+//      contains an `// expect_lint:` marker for each implemented BAD
+//      case — except `invalid_field_name`, where the parser rejects
+//      the keyword-as-label code before any lint can fire.
+//
+// Tests read the fixture by string match rather than running the
+// analyzer to keep the suite fast (no isolate startup) and stable
+// (no analyzer version drift).
+
 import 'dart:io';
 
 import 'package:saropa_lints/saropa_lints.dart';
 import 'package:test/test.dart';
 
-/// Registration, tier, and fixture checks for plan_additional_rules_21_through_30.
 void main() {
   const ruleNames = <String>[
     'conflicting_constructor_and_static_member',

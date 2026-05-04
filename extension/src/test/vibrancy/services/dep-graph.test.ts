@@ -1,9 +1,22 @@
+// Tests for the dep-graph service. Two responsibilities:
+//
+//   parseDepGraphJson — turn `dart pub deps --json` output into a
+//     normalized graph (root + packages with name, version, kind,
+//     dependencies). Defensive against three real-world failures:
+//       * `dart pub deps` sometimes emits warnings before the JSON
+//         payload (the "leading non-JSON text" case).
+//       * Older Flutter SDKs return malformed entries.
+//       * Empty / invalid input must collapse to a usable empty graph
+//         rather than throw.
+//
+//   buildReverseDeps — flip the graph so callers can ask "who depends
+//     on X?" without a full re-walk. Used for the "remove this
+//     package" affordance to flag indirect consumers.
+
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as path from 'path';
 import { parseDepGraphJson, buildReverseDeps, DepGraphPackage } from '../../../vibrancy/services/dep-graph';
-
-/** pub deps JSON fixture: parse graph and reverse dependency index. */
 
 const fixturesDir = path.join(
     __dirname, '..', '..', '..', 'src', 'test', 'fixtures',
@@ -49,6 +62,10 @@ describe('dep-graph', () => {
             assert.deepStrictEqual(result.packages, []);
         });
 
+        // Real `dart pub deps` output sometimes prepends a "Warning:"
+        // line about analysis state. The parser must locate the JSON
+        // payload past any such prefix or the user gets an empty graph
+        // for what looks like a successful pub run.
         it('should handle leading non-JSON text', () => {
             const json = 'Warning: something\n' + JSON.stringify({
                 root: 'app',
