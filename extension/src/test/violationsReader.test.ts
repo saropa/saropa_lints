@@ -2,7 +2,12 @@ import * as assert from 'node:assert';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
-import { getViolationsTriageState, readViolations, VIOLATIONS_EXPORT_STALE_MS } from '../violationsReader';
+import {
+  getViolationsTriageState,
+  normalizeLegacyImpact,
+  readViolations,
+  VIOLATIONS_EXPORT_STALE_MS,
+} from '../violationsReader';
 
 // Resolves .saropa_lints/reports/violations.json paths and normalizes issues.
 
@@ -249,6 +254,109 @@ describe('readViolations', () => {
     const data = readViolations(root);
     assert.strictEqual(data?.summary?.suppressions?.byRule, undefined);
     assert.strictEqual(data?.summary?.suppressions?.byFile, undefined);
+  });
+
+  // Issue #208 follow-up: pre-13.4.x violations.json has 5-bucket impacts
+  // (critical/high/medium/low/opinionated). The dashboard's filter only
+  // accepts {error, warning, info}, so without normalization every legacy
+  // finding gets filtered out — symptom: status pill shows "401 findings",
+  // findings table shows "No violations match the current filters".
+  describe('legacy impact normalization (issue #208 regression)', () => {
+    it('rewrites violation.impact from 5-bucket to 3-bucket vocabulary', () => {
+      const root = writeJson({
+        violations: [
+          { file: 'lib/a.dart', line: 1, rule: 'r1', message: 'm', impact: 'critical' },
+          { file: 'lib/a.dart', line: 2, rule: 'r2', message: 'm', impact: 'high' },
+          { file: 'lib/a.dart', line: 3, rule: 'r3', message: 'm', impact: 'medium' },
+          { file: 'lib/a.dart', line: 4, rule: 'r4', message: 'm', impact: 'low' },
+          { file: 'lib/a.dart', line: 5, rule: 'r5', message: 'm', impact: 'opinionated' },
+        ],
+      });
+      const data = readViolations(root);
+      assert.deepStrictEqual(
+        data?.violations.map((v) => v.impact),
+        ['error', 'warning', 'warning', 'info', 'info'],
+      );
+    });
+
+    it('leaves already-normalized impacts untouched (post-13.4.x happy path)', () => {
+      const root = writeJson({
+        violations: [
+          { file: 'lib/a.dart', line: 1, rule: 'r1', message: 'm', impact: 'error' },
+          { file: 'lib/a.dart', line: 2, rule: 'r2', message: 'm', impact: 'warning' },
+          { file: 'lib/a.dart', line: 3, rule: 'r3', message: 'm', impact: 'info' },
+        ],
+      });
+      const data = readViolations(root);
+      assert.deepStrictEqual(
+        data?.violations.map((v) => v.impact),
+        ['error', 'warning', 'info'],
+      );
+    });
+
+    it('merges summary.byImpact counts where two legacy keys collapse onto one', () => {
+      // critical → error (1)
+      // high (3) + medium (4) → warning (7)
+      // low (5) + opinionated (2) → info (7)
+      const root = writeJson({
+        violations: [],
+        summary: {
+          byImpact: { critical: 1, high: 3, medium: 4, low: 5, opinionated: 2 },
+        },
+      });
+      const data = readViolations(root);
+      assert.deepStrictEqual(data?.summary?.byImpact, {
+        error: 1,
+        warning: 7,
+        info: 7,
+      });
+    });
+
+    it('returns empty byImpact when summary.byImpact is absent', () => {
+      const root = writeJson({ violations: [], summary: { totalViolations: 0 } });
+      const data = readViolations(root);
+      assert.strictEqual(data?.summary?.byImpact, undefined);
+    });
+
+    it('passes unknown impact strings through (lowercased) without dropping', () => {
+      // Forward-compat: a future LintImpact value should not be silently
+      // erased by this layer; downstream filters can decide how to render it.
+      const root = writeJson({
+        violations: [
+          { file: 'lib/a.dart', line: 1, rule: 'r1', message: 'm', impact: 'CRITICAL' },
+          { file: 'lib/a.dart', line: 2, rule: 'r2', message: 'm', impact: 'novel' },
+        ],
+      });
+      const data = readViolations(root);
+      assert.strictEqual(data?.violations[0].impact, 'error');
+      assert.strictEqual(data?.violations[1].impact, 'novel');
+    });
+  });
+});
+
+describe('normalizeLegacyImpact', () => {
+  it('maps each 5-bucket value to its 3-bucket replacement', () => {
+    assert.strictEqual(normalizeLegacyImpact('critical'), 'error');
+    assert.strictEqual(normalizeLegacyImpact('high'), 'warning');
+    assert.strictEqual(normalizeLegacyImpact('medium'), 'warning');
+    assert.strictEqual(normalizeLegacyImpact('low'), 'info');
+    assert.strictEqual(normalizeLegacyImpact('opinionated'), 'info');
+  });
+
+  it('passes the post-collapse vocabulary through unchanged', () => {
+    assert.strictEqual(normalizeLegacyImpact('error'), 'error');
+    assert.strictEqual(normalizeLegacyImpact('warning'), 'warning');
+    assert.strictEqual(normalizeLegacyImpact('info'), 'info');
+  });
+
+  it('returns undefined for null/undefined input', () => {
+    assert.strictEqual(normalizeLegacyImpact(undefined), undefined);
+    assert.strictEqual(normalizeLegacyImpact(null), undefined);
+  });
+
+  it('lowercases mixed-case input', () => {
+    assert.strictEqual(normalizeLegacyImpact('Critical'), 'error');
+    assert.strictEqual(normalizeLegacyImpact('HIGH'), 'warning');
   });
 });
 

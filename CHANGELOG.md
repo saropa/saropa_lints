@@ -45,6 +45,18 @@
 
 ---
 
+## [Unreleased]
+
+### Fixed (Extension)
+
+- Findings Dashboard no longer reads "401 findings" with an empty findings table when `reports/.saropa_lints/violations.json` was written by an older saropa_lints plugin (any version <13.4.x with the legacy `critical/high/medium/low/opinionated` impact vocabulary). The reader now normalizes those values to the current `error/warning/info` buckets so the impact filter matches them. No action required after upgrading. Reported as a follow-up to [#208](https://github.com/saropa/saropa_lints/issues/208).
+
+---
+
+## [13.4.2]
+
+---
+
 ## [13.4.1]
 
 Fixes a line-number drift in the Issues tree and the violations export where reported lines could land tens of lines away from the actual offending code on larger projects. The number now matches the squiggle in the editor again. Re-run analysis once after upgrading and the tree will refresh. [log](https://github.com/saropa/saropa_lints/blob/v13.4.1/CHANGELOG.md)

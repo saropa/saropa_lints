@@ -134,6 +134,70 @@ export function getViolationsPath(workspaceRoot: string): string {
 }
 
 /**
+ * Map a legacy 5-bucket impact value onto the 3-bucket severity vocabulary.
+ *
+ * **Why this exists.** On 2026-05-03 the analyzer-side `LintImpact` enum
+ * collapsed from `critical/high/medium/low/opinionated` to `error/warning/
+ * info` (commit f6fdba5d, plan/COLLAPSE_LINT_IMPACT_TO_SEVERITY.md). The
+ * dashboard's default `impactsToShow` filter is now
+ * `{error, warning, info}` — if a user has a `violations.json` left over
+ * from a saropa_lints plugin <13.4.x (or upgraded the extension before
+ * re-running analysis with the new plugin), every violation has
+ * `impact: critical|high|medium|low|opinionated` and the new filter
+ * excludes 100% of them. Symptom: the status pill shows "401 findings"
+ * (totalRawAfterDisable, computed before the impact filter) but the
+ * Findings table is empty with "No violations match the current filters."
+ * Reported as a v13.4.x regression on issue #208.
+ *
+ * **Mapping.** Mirrors the analyzer-side collapse exactly:
+ *  - critical → error
+ *  - high, medium → warning
+ *  - low, opinionated → info
+ *
+ * Leaves already-normalized values (`error`, `warning`, `info`) untouched
+ * and passes unknown strings through so future taxonomies don't silently
+ * drop. Returns `undefined` for `undefined`/`null` so callers can fall
+ * back to their own default the way they did before normalization.
+ */
+export function normalizeLegacyImpact(value: string | undefined | null): string | undefined {
+  if (value == null) return undefined;
+  switch (value.toLowerCase()) {
+    case 'critical':
+      return 'error';
+    case 'high':
+    case 'medium':
+      return 'warning';
+    case 'low':
+    case 'opinionated':
+      return 'info';
+    default:
+      return value.toLowerCase();
+  }
+}
+
+/**
+ * Apply [normalizeLegacyImpact] to a `byImpact`-shaped count map, merging
+ * counts where two legacy keys collapse onto one new key (e.g. `low` +
+ * `opinionated` both becoming `info`). Used at read time so the dashboard
+ * KPI card and donut see the new vocabulary regardless of which plugin
+ * version wrote the export.
+ */
+function normalizeByImpactKeys(
+  raw: Record<string, unknown> | undefined,
+): ByImpact | undefined {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return undefined;
+  const out: ByImpact = {};
+  for (const [k, v] of Object.entries(raw)) {
+    if (typeof v !== 'number') continue;
+    const norm = normalizeLegacyImpact(k);
+    if (!norm) continue;
+    const key = norm as keyof ByImpact;
+    out[key] = (out[key] ?? 0) + v;
+  }
+  return out;
+}
+
+/**
  * Triage UIs (volume groups, zero-issue, stylistic) need a fresh
  * `summary.issuesByRule` and a recent export file. Missing file, old mtime, or
  * a legacy export without per-rule keys should not drive group-level toggles
@@ -183,16 +247,34 @@ export function readViolations(workspaceRoot: string): ViolationsData | null {
   try {
     const raw = JSON.parse(fs.readFileSync(p, 'utf-8'));
     const summary = raw.summary;
+    // Normalize each violation's `impact` to the 3-bucket vocabulary so
+    // `violations.json` files written by saropa_lints <13.4.x (legacy
+    // 5-bucket impacts: critical/high/medium/low/opinionated) still flow
+    // through the dashboard's `impactsToShow = {error, warning, info}`
+    // filter. Without this, upgrading the extension before re-running
+    // analysis produces "401 findings shown / 0 in the table" — see
+    // [normalizeLegacyImpact] for the full rationale.
+    const violations: Violation[] = Array.isArray(raw.violations)
+      ? (raw.violations as Violation[]).map((v) => {
+          const norm = normalizeLegacyImpact(v.impact);
+          // Only allocate a new object when normalization actually changes
+          // the field — keeps the post-2026-05-03 happy path zero-cost.
+          return norm === v.impact ? v : { ...v, impact: norm };
+        })
+      : [];
     return {
       timestamp: typeof raw.timestamp === 'string' ? raw.timestamp : undefined,
-      violations: Array.isArray(raw.violations) ? raw.violations : [],
+      violations,
       summary: summary
         ? {
             totalViolations: summary.totalViolations,
             filesAnalyzed: summary.filesAnalyzed,
             filesWithIssues: summary.filesWithIssues,
             bySeverity: summary.bySeverity,
-            byImpact: summary.byImpact,
+            // Re-key the legacy 5-bucket `byImpact` map onto the 3-bucket
+            // vocabulary so KPI cards and the donut/bar mix chart agree
+            // with the filtered findings table. See [normalizeByImpactKeys].
+            byImpact: normalizeByImpactKeys(summary.byImpact),
             issuesByRule:
               summary.issuesByRule &&
               typeof summary.issuesByRule === 'object' &&
