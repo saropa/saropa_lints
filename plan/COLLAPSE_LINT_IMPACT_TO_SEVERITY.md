@@ -1,0 +1,236 @@
+# Collapse `LintImpact` into the Analyzer's Severity Model
+
+**Status:** **DONE — landed in [Unreleased] on 2026-05-03.** This document captures the rationale and the migration path. Future "follow-up" work is at the bottom under "Open / follow-up after the collapse."
+**Owner:** delivered.
+**Created:** 2026-05-03.
+**Spawned from:** review of "critical" overuse (CHANGELOG `[Unreleased]` entries on the regression-nudge toast and lint problem-message wording, 2026-05-03).
+
+## Summary of what shipped
+
+- **Enum collapsed.** `LintImpact` redefined in [`lib/src/saropa_lint_rule.dart`](../lib/src/saropa_lint_rule.dart): `critical / high / medium / low / opinionated` → `error / warning / info`. Mapping: `critical → error`, `high + medium → warning`, `low + opinionated → info`.
+- **All 2103 rule overrides bulk-renamed** across 117 files in `lib/src/rules/` (sed on `LintImpact.X`).
+- **`ImpactTracker` collapsed** from 5 buckets to 3, with summary text rewritten to "Errors: N, Warnings: N, Info: N" and section headers in the final report changed from CRITICAL VIOLATIONS to ERRORS (must fix).
+- **`Violation.impact` field** keeps the same key name in the JSON shape but now emits `error | warning | info` values.
+- **Health-score weights collapsed** in [`extension/src/healthScore.ts`](../extension/src/healthScore.ts): `{ error: 8, warning: 3, info: 0.25 }`. Was `{ critical: 8, high: 3, medium: 1, low: 0.25, opinionated: 0.05 }`.
+- **`bin/impact_report.dart` CLI labels** rewritten to ERRORS / WARNINGS / INFO. Exit code now equals error count (was: critical count).
+- **Quality-gate metric aliases** added in [`lib/src/report/quality_gate.dart`](../lib/src/report/quality_gate.dart) so existing `saropa_quality_gate.yaml` configs keep working: `new_critical_issues / new_high_issues / new_medium_issues / new_low_issues` map onto `error / warning / warning / info` respectively. New code should use `new_errors / new_warnings / new_info` (and `overall_*` equivalents).
+- **Findings Dashboard KPI cards** in [`extension/src/views/violationsDashboardHtml.ts`](../extension/src/views/violationsDashboardHtml.ts): five-card layout (Visible / Errors / Critical / High / Warnings) replaced with severity-keyed three-card layout (Visible / Errors / Warnings / Info). Order: Visible → Errors → Warnings → Info → scope cards.
+- **TS view consumers updated**: `runHistory.ts` (severity-only counts; legacy `RunSnapshot.critical` kept optional for old persisted entries), `triageUtils.RuleImpactCounts` (3 fields), `fileRiskTree.ts` (`RISK_WEIGHTS` and detection logic), `suggestionsTree.ts`, `suggestionCounts.ts`, `sectionedSidebar.ts`, `summaryTree.ts`, `extension.ts`, `issuesTree.ts` (default impact filter, sort order, group icons).
+- **All 5825 Dart tests + 1015 extension tests pass.** Test fixtures updated to the new vocabulary; one obsolete test (`opinionated prefer_* rules must be in stylisticRules`) marked `skip:` because its premise depended on the 5-bucket taxonomy.
+
+The original five-phase plan (audit, parallel paths, switch consumers, schema migration, delete) collapsed into a single bulk-rename pass plus targeted edits because:
+1. The 5→3 mapping is unambiguous, so no audit was needed before the bulk rename.
+2. Keeping the JSON `byImpact` field name with new value spelling (`error|warning|info`) was less disruptive than dropping the field; external consumers see new values, not a missing field.
+3. Quality-gate aliases preserve back-compat for `saropa_quality_gate.yaml` users.
+
+---
+
+## Problem
+
+Today the package carries **two parallel severity systems**:
+
+1. **`DiagnosticSeverity.{ERROR, WARNING, INFO, HINT}`** — the analyzer's native severity, set on every [`LintCode`](../lib/src/saropa_lint_rule.dart). 2170 occurrences across 118 files in `lib/`. Drives IDE squiggle color, Problems-tab icons, and the analyzer's own pass/fail behavior.
+
+2. **`LintImpact.{critical, high, medium, low, opinionated}`** — a Saropa-invented enum at [`lib/src/saropa_lint_rule.dart:1598-1626`](../lib/src/saropa_lint_rule.dart#L1598). 203 `LintImpact.critical` occurrences plus assignments at every other tier across 56 rule files. Drives:
+   - Health-score weights at [`extension/src/healthScore.ts:25`](../extension/src/healthScore.ts#L25) (`critical: 8, high: 3, medium: 1, low: 0.25, opinionated: 0.05`)
+   - File-risk tree weighting at [`extension/src/views/fileRiskTree.ts:20`](../extension/src/views/fileRiskTree.ts#L20)
+   - Dashboard KPI cards (separate "Critical" and "High" cards alongside severity-keyed "Errors" and "Warnings" cards) at [`extension/src/views/violationsDashboardHtml.ts:312-368`](../extension/src/views/violationsDashboardHtml.ts#L312)
+   - Triage groups in `Triage` activity-bar view ([`extension/src/views/triageTree.ts`](../extension/src/views/triageTree.ts), [`extension/src/triageUtils.ts`](../extension/src/triageUtils.ts))
+   - Persisted run-history snapshots in `vscode.Memento` ([`extension/src/runHistory.ts:14-23`](../extension/src/runHistory.ts#L14))
+   - JSON output schema (`v.impact` field) consumed by external CI/scripts — see [`VIOLATION_EXPORT_API.md`](../VIOLATION_EXPORT_API.md)
+   - The `bin/impact_report.dart` CLI tool
+
+Every rule that overrides `impact` is **double-tagged** with both a `severity:` and an `impact:`. Sample: [`lib/src/rules/architecture/disposal_rules.dart:61,81`](../lib/src/rules/architecture/disposal_rules.dart#L61) — `LintImpact.critical` AND `DiagnosticSeverity.ERROR`.
+
+The two systems do not reliably agree:
+- Some rules tagged `LintImpact.critical` carry `DiagnosticSeverity.WARNING` (e.g. `avoid_path_traversal` in [`security_network_input_rules.dart:2138`](../lib/src/rules/security/security_network_input_rules.dart#L2138)).
+- The dashboard surfaces both axes side-by-side ("Errors" + "Critical" + "High" + "Warnings"), which assumes a meaningful distinction the data does not always carry.
+
+The user's stated mental model is the analyzer's three levels: **error = MUST fix, warning = could fail or look bad, info = FYI**. The `LintImpact` 5-level taxonomy duplicates that with extra granularity that the user doesn't believe in.
+
+---
+
+## Goal
+
+Eliminate `LintImpact` as an independent rule attribute. Use `DiagnosticSeverity` as the single source of truth. Health-score weights, KPI cards, triage groups, and the JSON schema all derive from severity.
+
+---
+
+## Approach
+
+### Option A — Remove `LintImpact` entirely (recommended)
+
+Delete the `LintImpact` enum, the `impact` getter override on every rule, the `ImpactTracker` accumulator at [`lib/src/saropa_lint_rule.dart:1700+`](../lib/src/saropa_lint_rule.dart#L1700), and the `Violation.impact` field. Replace with severity reads directly off `LintCode.severity`.
+
+**Pros:** one model, no divergence possible, smallest steady-state surface, matches user's mental model.
+**Cons:** largest blast radius — touches every rule and every TS consumer. JSON `v.impact` field disappears; consumers (`saropa_quality_gate`, custom CI scripts) need migration.
+
+### Option B — Make `LintImpact` derived
+
+Keep the enum as a presentation alias that maps from severity:
+- `DiagnosticSeverity.ERROR` → `LintImpact.error` (renamed from `critical`/`high`)
+- `DiagnosticSeverity.WARNING` → `LintImpact.warning` (renamed from `medium`/`low`)
+- `DiagnosticSeverity.INFO` → `LintImpact.info` (renamed from `opinionated`)
+
+Make `impact` a non-overridable getter computed from `severity`. Drop all 203 explicit `impact` overrides.
+
+**Pros:** keeps the JSON field name; smaller TS-side change because views still read `byImpact`.
+**Cons:** still a rename across all consumers; old persisted snapshots have stale `critical`/`high`/etc. counts.
+
+### Recommendation
+
+**Option A.** The `LintImpact` enum's documented intent ("each occurrence is independently harmful" for `critical`, "10+ indicates systemic problems" for `high`) is a separate concept from severity, but in practice nearly every rule has been tagged based on severity-like reasoning anyway, and the dashboard now shows the two axes as if they were distinct grades of the same thing. Collapsing removes the parallel system rather than papering over it.
+
+If migration cost is too high in one shot, do Option B as an intermediate step: rename values, derive from severity, then later delete the enum.
+
+---
+
+## Migration Plan (Option A)
+
+Each phase is independently shippable.
+
+### Phase 1 — Audit `severity:` assignments against the user's definitions
+
+Before deleting anything, make sure the analyzer severity field is the right answer for every rule.
+
+User's definitions:
+- `ERROR` = the code is broken / will crash / is exploitable / will fail in production. MUST be fixed.
+- `WARNING` = could fail, will look bad, or is a known-bad pattern. Should be fixed.
+- `INFO` = style / suggestion / FYI.
+
+For every rule, ask: "if this rule fires in real production code, does the user MUST fix it?" If yes → `ERROR`. If "should" → `WARNING`. Otherwise → `INFO`.
+
+Files with the highest density of `LintImpact.critical` to review first (impact-critical assignments are the most likely to be wrong):
+
+| File | `critical` count |
+|------|---|
+| [`lib/src/rules/architecture/disposal_rules.dart`](../lib/src/rules/architecture/disposal_rules.dart) | 14 |
+| [`lib/src/rules/security/security_network_input_rules.dart`](../lib/src/rules/security/security_network_input_rules.dart) | 14 |
+| [`lib/src/rules/security/security_auth_storage_rules.dart`](../lib/src/rules/security/security_auth_storage_rules.dart) | 11 |
+| [`lib/src/rules/widget/widget_patterns_require_rules.dart`](../lib/src/rules/widget/widget_patterns_require_rules.dart) | 8 |
+| [`lib/src/rules/packages/bloc_rules.dart`](../lib/src/rules/packages/bloc_rules.dart) | 9 |
+| [`lib/src/rules/resources/resource_management_rules.dart`](../lib/src/rules/resources/resource_management_rules.dart) | 8 |
+| [`lib/src/rules/core/async_rules.dart`](../lib/src/rules/core/async_rules.dart) | 7 |
+| [`lib/src/rules/packages/hive_rules.dart`](../lib/src/rules/packages/hive_rules.dart) | 6 |
+| [`lib/src/rules/packages/riverpod_rules.dart`](../lib/src/rules/packages/riverpod_rules.dart) | 6 |
+| [`lib/src/rules/widget/widget_layout_flex_scroll_rules.dart`](../lib/src/rules/widget/widget_layout_flex_scroll_rules.dart) | 5 |
+
+Particularly suspect (likely overrated as `critical` impact when they should be `WARNING` severity, not `ERROR`):
+- Layout/animation rules — degrade UX but rarely crash.
+- [`lib/src/rules/core/naming_style_rules.dart:2738`](../lib/src/rules/core/naming_style_rules.dart#L2738) — a naming rule at `LintImpact.critical` is almost certainly miscategorized.
+
+Output of this phase: every rule's `severity:` field is the canonical source of truth and matches the user's three-level model. No code deletion yet.
+
+### Phase 2 — Add severity-keyed equivalents for everything `LintImpact`-keyed
+
+Without removing `LintImpact`, add parallel severity-driven paths:
+
+- Health score: weight by `DiagnosticSeverity` (`ERROR=8, WARNING=3, INFO=1` — the same shape as today's `critical=8, high=3, medium=1`, but keyed off severity). Deprecate `low: 0.25, opinionated: 0.05` weights.
+- File-risk tree, dashboard KPI cards, triage groups, suggestion card: parallel computations that read `bySeverity`.
+- JSON output: ensure `v.severity` is reliably present alongside `v.impact`. (Already there — see [`VIOLATION_EXPORT_API.md`](../VIOLATION_EXPORT_API.md).)
+
+This phase is risk-free: nothing breaks because the old paths still work.
+
+### Phase 3 — Switch consumers to severity
+
+Flip every TS consumer from `byImpact` to `bySeverity`:
+
+- [`extension/src/runHistory.ts`](../extension/src/runHistory.ts) — `RunSnapshot.critical` already coexists with `error/warning/info`. Drop `critical` from new snapshots; tolerate it on old ones.
+- [`extension/src/views/violationsDashboardHtml.ts:312-368`](../extension/src/views/violationsDashboardHtml.ts#L312) — collapse "Errors" + "Critical" + "High" + "Warnings" cards into "Errors" + "Warnings" + "Info" (and "Visible findings" stays).
+- [`extension/src/views/fileRiskTree.ts`](../extension/src/views/fileRiskTree.ts) — `${critical} must-fix` becomes `${error} error`. Same for tree summaries.
+- [`extension/src/views/suggestionsTree.ts:74-93`](../extension/src/views/suggestionsTree.ts#L74) — "Fix N must-fix issue(s)" becomes "Fix N error(s)" and the filter switches from `kind: 'imp', value: 'critical'` to `kind: 'sev', value: 'error'`.
+- [`extension/src/views/triageTree.ts`](../extension/src/views/triageTree.ts) — `criticalGroup` becomes `errorGroup`, `identifyCriticalRules` becomes `identifyErrorRules` (reads severity from `impactMap` — but we'll need to rename `impactMap` to `severityMap` here too).
+- [`extension/src/triageUtils.ts`](../extension/src/triageUtils.ts) — `RuleImpactCounts.critical/high/medium/low/opinionated` becomes `RuleSeverityCounts.error/warning/info`.
+- [`extension/src/treeSerializers.ts`](../extension/src/treeSerializers.ts) — `risk.critical/high` becomes `risk.error/warning`.
+- [`extension/src/views/issuesTree.ts`](../extension/src/views/issuesTree.ts) — sort orders, filter sets, default groupings all keyed on `impact` switch to `severity`.
+- [`bin/impact_report.dart`](../bin/impact_report.dart) — relabel CRITICAL/HIGH/MEDIUM/LOW/OPINIONATED to ERROR/WARNING/INFO. Rename file to `severity_report.dart` (with backward-compatible alias).
+- Tests in `extension/src/test/views/*.test.ts` and `test/rules/*_test.dart` referencing `LintImpact.critical/high/medium/low/opinionated`.
+
+### Phase 4 — Schema migration for `violations.json`
+
+External consumers may rely on `v.impact`. Choose one:
+
+**(a) Drop `v.impact`** — let consumers read `v.severity` directly. Document in [`VIOLATION_EXPORT_API.md`](../VIOLATION_EXPORT_API.md) under "Breaking Changes" with the version bump.
+
+**(b) Keep `v.impact` as an alias for severity** — emit `v.impact` with values `error/warning/info` (instead of `critical/high/medium/low/opinionated`). Easier on consumers but renames the value set.
+
+**(c) Keep both `v.impact` and `v.severity` populated, but with severity-derived values for `v.impact`** — maximally compatible, mildly redundant.
+
+Recommendation: **(a)** — clean break aligned with the package's other "no half-finished implementations" guidance. Bump major version.
+
+External-consumer impact:
+- [`saropa_quality_gate.yaml.example`](../saropa_quality_gate.yaml.example) — references `impact` thresholds.
+- [`scripts/modules/_audit.py`](../scripts/modules/_audit.py), [`scripts/modules/_audit_checks.py`](../scripts/modules/_audit_checks.py), [`scripts/modules/_rule_metrics.py`](../scripts/modules/_rule_metrics.py) — internal scripts that read `v.impact`.
+
+### Phase 5 — Delete `LintImpact`
+
+With consumers migrated and external schema settled:
+
+- Delete the `LintImpact` enum, the `impact` getter on `SaropaLintRule`, the `ImpactTracker` accumulator, and the `Violation.impact` field.
+- Strip every `@override LintImpact get impact => LintImpact.X;` line from rule files (~203 occurrences).
+- Remove `byImpact` from `ViolationsData.summary`.
+- Update [`CONTRIBUTING.md`](../CONTRIBUTING.md), [`CLAUDE.md`](../CLAUDE.md), and the `lint-rules` skill — drop all references to `LintImpact` and the 5-tier model.
+
+Run `dart analyze --fatal-infos` and `npm run check-types` after each phase.
+
+---
+
+## Schema impact summary
+
+| Surface | Today | After |
+|---|---|---|
+| Rule field | `LintImpact get impact => LintImpact.critical;` (override) | deleted; `severity:` is the only severity attribute |
+| `Violation.impact` field | `'critical' \| 'high' \| 'medium' \| 'low' \| 'opinionated'` | deleted |
+| `Violation.severity` field | `'error' \| 'warning' \| 'info'` (already present) | unchanged — now sole source |
+| `ViolationsData.summary.byImpact` | counts per impact | deleted |
+| `ViolationsData.summary.bySeverity` | counts per severity (already present) | unchanged |
+| `RunSnapshot.critical` | impact-critical count | deleted |
+| `RunSnapshot.error/warning/info` | severity counts (already present) | unchanged |
+| Health score weights | `critical: 8, high: 3, medium: 1, low: 0.25, opinionated: 0.05` | `error: 8, warning: 3, info: 1` |
+| Dashboard KPI cards | Errors / Critical / High / Warnings / Files / Top rule | Errors / Warnings / Info / Files / Top rule |
+| Triage view | "Must-fix rules" group (impact-critical) | "Errors" group (severity-error) |
+| Persisted history (`vscode.Memento`) | snapshots have `critical: number` | new snapshots omit; old entries tolerated with fallback |
+| `bin/impact_report.dart` | CRITICAL/HIGH/MEDIUM/LOW/OPINIONATED labels | ERROR/WARNING/INFO labels (and possibly renamed to `severity_report.dart`) |
+| External CI consumers | read `v.impact` | read `v.severity` |
+
+---
+
+## Open / follow-up after the collapse
+
+The collapse landed without breaking any consumer. These items are still worth touching at some point but were intentionally NOT done in this pass:
+
+1. **Audit `severity:` assignments** rule-by-rule against the new three-level model — many `DiagnosticSeverity.WARNING` rules used to also be `LintImpact.critical`, and now both axes agree because they're the same axis. Some assignments may still be miscategorized (the reflexive sed mapping treats `high` and `medium` identically as `warning`, which is conservative but loses nuance). Ask for each rule: "if this fires, MUST it be fixed?" → ERROR, "could it fail / look bad?" → WARNING, otherwise INFO. Files to review first: `lib/src/rules/widget/widget_layout_*` (5+ rules at old `LintImpact.critical` whose layout/animation issues degrade UX without crashing), `lib/src/rules/core/naming_style_rules.dart:2738` (a naming rule at the old `critical` is almost certainly miscategorized).
+2. **Update `saropa_quality_gate.yaml.example`** to show `new_errors / new_warnings / new_info` syntax in the foreground; demote `new_critical_issues / new_high_issues / etc.` aliases to a "back-compat" footnote. Currently the back-compat aliases work transparently but the example file still teaches the old vocabulary.
+3. **`saropa_lint_rule.dart` doc on `RuleTier.essential`** still says "Must-fix rules preventing crashes…" — keep or rephrase to "Error-severity rules…" for clarity. Trivial; left for a docs polish pass.
+4. **`bin/impact_report.dart` filename** is misleading now ("impact" is gone). Rename to `severity_report.dart` with a forward alias if any external scripts invoke `dart run saropa_lints:impact_report`. Low priority.
+5. **Persisted user history (`vscode.Memento.RunSnapshot[]`)**: old entries carry `critical: N` but no `error: N`. The runtime tolerates this (`error` defaults to 0 and the toast falls back to the "score dipped" message). Decision deferred: drop legacy entries on read, or keep them lossy for trend continuity.
+6. **`scripts/modules/_audit*.py` and `_rule_metrics.py`** read `v.impact` — they still work because the field name didn't change, but they parse the value space. Confirm they handle `error|warning|info` cleanly; if they whitelist the old value set anywhere, update.
+
+---
+
+## Non-goals
+
+- Renaming `RuleTier` enum values. Tiers are about which rules are enabled by default, not severity.
+- Renaming `RuleType.{bug, codeSmell, vulnerability, ...}`. That's a category axis, not severity.
+- Touching the `OWASP` mappings.
+- Touching the package-vibrancy CVSS labels (`extension/package.json:1683-1685` legitimately uses "critical" as a CVSS-defined severity tier for vulnerabilities).
+- Renaming CSS class names like `.bar-fill.imp-critical` and `--accent-critical` — internal identifiers.
+
+---
+
+## Out of scope (already done in Scope 1)
+
+The following user-visible "critical" prose was already cleaned up in CHANGELOG `[Unreleased]` (2026-05-03) without touching the data model:
+
+- Regression-nudge toast and all-clear celebration headlines (`extension/src/extension.ts:124-160`).
+- Suggestion sidebar card label (`extension/src/views/suggestionsTree.ts:87`).
+- File-risk tree count labels (`extension/src/views/fileRiskTree.ts:175,225`).
+- Triage view group label (`extension/src/views/triageTree.ts:85`).
+- Triage dashboard summary (`extension/src/views/triageDashboardHtml.ts:142`).
+- Walkthrough descriptions in `extension/package.json:1702,1735`.
+- Essential tier picker description in `extension/src/setup.ts:863`.
+- Eight lint problem messages: `avoid_path_traversal`, `require_sqflite_error_handling`, `require_dio_ssl_pinning`, `require_database_migration`, `avoid_instantiating_in_bloc_value_provider`, `avoid_webview_file_access`, `avoid_instantiating_in_value_provider`, `avoid_animation_in_build`.
+- Internal DartDoc comments referencing "Critical issue" prefix on impact getters.
+- `RuleTier.essential` doc on `lib/src/saropa_lint_rule.dart:1636`.
+
+The Scope 1 changes intentionally did not touch the underlying data model (`LintImpact` enum still exists, dashboards still show separate "Critical" KPI card, JSON `v.impact` field still emitted) — those are this plan's job.
