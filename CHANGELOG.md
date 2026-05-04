@@ -50,6 +50,7 @@
 ### Fixed (Extension)
 
 - Findings Dashboard no longer reads "401 findings" with an empty findings table when `reports/.saropa_lints/violations.json` was written by an older saropa_lints plugin (any version <13.4.x with the legacy `critical/high/medium/low/opinionated` impact vocabulary). The reader now normalizes those values to the current `error/warning/info` buckets so the impact filter matches them. No action required after upgrading. Reported as a follow-up to [#208](https://github.com/saropa/saropa_lints/issues/208).
+- The "no analysis report" notification now classifies the cause precisely — missing pubspec.yaml, missing `saropa_lints` dev-dependency, missing `analysis_options.yaml`, malformed YAML in `analysis_options.yaml`, or a bare top-level `saropa_lints:` key that doesn't enrol the plugin — and surfaces a one-click **Set Up Project** button as a modal that explicitly states configuration is required and the dashboard cannot show findings without it. The bare-key case (the issue #208 reporter's exact state) shows the valid `include: package:saropa_lints/tiers/recommended.yaml` line inline so users can hand-fix without losing custom analyzer settings. The "no pubspec.yaml" and "exclude list too aggressive" cases stay non-modal — those need user judgement and Set Up Project would either be premature or clobber their customizations.
 
 ---
 

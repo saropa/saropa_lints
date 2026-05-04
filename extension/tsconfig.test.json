@@ -70,6 +70,8 @@
     "src/test/pathUtils.test.ts",
     "src/setup.ts",
     "src/test/setupCompositeScaffoldGate.test.ts",
+    "src/pluginLiveness.ts",
+    "src/test/pluginLiveness.test.ts",
     "src/cross-file-commands.ts",
     "src/test/formatAnalysisIssuesMessage.test.ts",
     "src/test/findLatestAnalysisReport.test.ts",
