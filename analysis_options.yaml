@@ -83,6 +83,14 @@ analyzer:
     # up that change until the cache rebuilds. Belt-and-braces: this
     # `analyzer.exclude` entry stops the noise at the host level too.
     - "bin/**"
+    # Same rationale for tool/ — repo-local CLI utilities (codegen,
+    # audits, benchmarks, ad-hoc maintenance). They never run on a
+    # Flutter UI isolate, so `avoid_blocking_main_thread` and
+    # `avoid_print_in_release` are unactionable there. The plugin's
+    # `SaropaContext.isCliToolScript` skip handles this in-process, but
+    # the cached plugin snapshot lags local edits until the analyzer
+    # cache rebuilds, so exclude here as belt-and-braces.
+    - "tool/**"
 linter:
   rules:
     - curly_braces_in_flow_control_structures

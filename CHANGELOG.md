@@ -47,9 +47,14 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- `avoid_blocking_main_thread` (and other UI-thread rules) no longer fire on scripts under `tool/` — repo-local CLI utilities run via `dart run` and never execute on a Flutter UI isolate, so sync I/O is legitimate there. Mirrors the existing skip for `bin/`. No action required.
+
 <details><summary>Maintenance</summary>
 
 - `tool/rule_pack_audit.dart` and `tool/generate_rule_pack_registry.dart` — `applyCompositeRulePacks` now returns a new map instead of mutating its argument, clearing the `avoid_parameter_mutation` lint. Both call sites updated to consume the returned map. No change to extracted pack contents or generator output.
+- Plugin self-source `analysis_options.yaml` excludes `tool/**` belt-and-braces, matching the existing `bin/**` exclusion. The cached plugin snapshot lags local edits to `SaropaContext.isCliToolScript`, so the host-level exclude prevents `dart analyze` noise during the cache rebuild window.
 
 </details>
 

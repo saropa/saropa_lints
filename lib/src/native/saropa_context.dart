@@ -133,17 +133,49 @@ class SaropaContext {
     return isPathUnderProjectBin(filePath);
   }
 
+  /// Whether the current file lives under the package's `tool/` directory.
+  ///
+  /// Same rationale as [isCliBinScript]: by Dart convention, `tool/`
+  /// scripts are repo-local CLI utilities run via `dart run tool/foo.dart`
+  /// (codegen, audits, benchmarks, ad-hoc maintenance). They never run on
+  /// a Flutter UI isolate, so rules that warn about UI-thread blocking
+  /// (`avoid_blocking_main_thread`, `avoid_print_in_release`, etc.) are
+  /// false positives there. The `isFlutterProject` gate that several
+  /// rules carry would normally suppress these, but as documented on
+  /// [isCliBinScript] the analyzer-plugin worker-isolate pool can serve
+  /// stale `_projectCache` entries that bypass the gate. Centralising the
+  /// skip removes the noise uniformly across every saropa rule.
+  ///
+  /// Matches only files under the enclosing package's own `tool/` —
+  /// not arbitrary `/tool/` substrings (pub-cache, third-party paths).
+  bool get isCliToolScript {
+    return isPathUnderProjectTool(filePath);
+  }
+
   /// Static, dependency-free implementation of [isCliBinScript] for tests
   /// and any caller that has a file path but not a [SaropaContext]. Resolves
   /// the project root via [ProjectContext.findProjectRoot] and matches only
   /// files at `<projectRoot>/bin/...`.
   static bool isPathUnderProjectBin(String filePath) {
+    return _isPathUnderProjectDir(filePath, 'bin');
+  }
+
+  /// Static, dependency-free implementation of [isCliToolScript]. Same
+  /// shape as [isPathUnderProjectBin] but anchored on `<projectRoot>/tool/`.
+  static bool isPathUnderProjectTool(String filePath) {
+    return _isPathUnderProjectDir(filePath, 'tool');
+  }
+
+  /// Shared helper for [isPathUnderProjectBin] / [isPathUnderProjectTool].
+  /// Anchors on `<projectRoot>/<dirName>/` so substrings like `lib/binary/`
+  /// or `lib/tooling/` can't false-match the prefix.
+  static bool _isPathUnderProjectDir(String filePath, String dirName) {
     if (filePath.isEmpty) return false;
     final root = ProjectContext.findProjectRoot(filePath);
     if (root == null || root.isEmpty) return false;
     final normalized = filePath.replaceAll('\\', '/');
     final normalizedRoot = root.replaceAll('\\', '/');
-    return normalized.startsWith('$normalizedRoot/bin/');
+    return normalized.startsWith('$normalizedRoot/$dirName/');
   }
 
   /// Line info for the current file.
@@ -347,6 +379,13 @@ class SaropaContext {
     // analyzer plugin's `_projectCache` is poisoned by isolate-pool
     // races). Centralising here covers every saropa rule uniformly.
     if (isCliBinScript) return _wasLastFileSkipped = true;
+
+    // Same skip for `tool/` — repo-local CLI utilities (codegen, audits,
+    // benchmarks). UI-thread rules like `avoid_blocking_main_thread` and
+    // print-in-release rules fire there because the per-rule
+    // `isFlutterProject` gate is bypassed when the worker-isolate pool
+    // serves stale `_projectCache` entries. See [isCliToolScript].
+    if (isCliToolScript) return _wasLastFileSkipped = true;
 
     final rule = _saropaRule;
     if (rule == null) return false;
