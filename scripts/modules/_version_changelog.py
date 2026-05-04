@@ -110,6 +110,74 @@ def get_latest_changelog_version(changelog_path: Path) -> str | None:
     return match.group(1) if match else None
 
 
+def find_empty_version_sections(changelog_path: Path) -> list[str]:
+    """Return version numbers whose ``## [X.Y.Z]`` section has no body content.
+
+    A section is "empty" if everything between its heading line and the next
+    ``## `` heading (or EOF) consists of nothing but blank lines and ``---``
+    separators. These stubs must never reach the publish path:
+
+      * They cause ``rename_unreleased_to_version`` to raise on a perceived
+        collision when the user chose the same version, which the loop then
+        silently recovers from by suggesting the *next* patch — that is how
+        v13.4.2 was skipped on its way to v13.4.3 (commit 0c5950aa wrote the
+        empty stub; ``scripts/publish.py`` ran and jumped past it).
+      * Even when no collision fires, the orphan stub lingers in the file
+        forever between two real releases, implying a published version that
+        never existed (no git tag, no pub.dev artifact).
+
+    Returns the bare version strings (e.g. ``["13.4.2"]``); ``[Unreleased]``
+    is intentionally NOT flagged here — emptiness on the unreleased header
+    is the normal state right after a release.
+    """
+    if not changelog_path.exists():
+        return []
+    content = changelog_path.read_text(encoding="utf-8")
+    # Match each `## [X.Y.Z]` heading and capture its body up to the next
+    # `## ` heading or EOF. Headings inside HTML comment blocks would
+    # match too, but the project's MAINTENANCE NOTES comment only quotes
+    # `[Unreleased]` and not bare `## [X.Y.Z]` headings, so this is safe.
+    pattern = re.compile(
+        rf"^##\s*\[({_VERSION_RE})\][^\n]*\n(.*?)(?=^##\s|\Z)",
+        re.MULTILINE | re.DOTALL,
+    )
+    empty: list[str] = []
+    for match in pattern.finditer(content):
+        version = match.group(1)
+        body = match.group(2)
+        # Strip blank lines and `---` separator lines; whatever remains is
+        # the real prose / bullets / details. Empty body == orphan stub.
+        stripped = re.sub(r"^\s*(?:---\s*)?$", "", body, flags=re.MULTILINE)
+        if not stripped.strip():
+            empty.append(version)
+    return empty
+
+
+def assert_no_empty_changelog_sections(changelog_path: Path) -> None:
+    """Abort the publish if CHANGELOG.md has any empty ``## [X.Y.Z]`` sections.
+
+    Guards against the silent-skip class of bugs described in
+    ``find_empty_version_sections``. The recovery is always manual — the
+    author needs to either delete the stub (if it was never released) or
+    fill in its release notes — so we exit hard rather than auto-edit.
+    """
+    empty = find_empty_version_sections(changelog_path)
+    if not empty:
+        return
+    versions = ", ".join(f"[{v}]" for v in empty)
+    print_warning(
+        f"CHANGELOG.md has {len(empty)} empty version section(s): {versions}. "
+        f"Empty stubs cause publish-time rename collisions and silent "
+        f"version skips (see find_empty_version_sections doc). Either delete "
+        f"the stub (if the version was never released) or fill in its "
+        f"release notes before re-running publish."
+    )
+    exit_with_error(
+        "Empty version section(s) in CHANGELOG.md — fix manually and retry.",
+        ExitCode.CHANGELOG_FAILED,
+    )
+
+
 def validate_changelog_version(
     project_dir: Path, version: str
 ) -> str | None:
@@ -533,6 +601,7 @@ def sync_version_with_changelog(
     """Update pubspec/CHANGELOG with chosen version; reconcile; handle tag clash.
 
     Full version synchronization workflow:
+    0. Refuse to proceed if any ``## [X.Y.Z]`` section is empty (silent-skip guard)
     1. Apply version and rename [Unreleased] heading
     2. Reconcile any pubspec/CHANGELOG version mismatch
     3. Bump if the git tag already exists on remote
@@ -540,6 +609,11 @@ def sync_version_with_changelog(
     Returns:
         The final resolved version string.
     """
+    # Guard upstream of every rename / reconcile path — an orphan empty
+    # `## [X.Y.Z]` stub is exactly what let v13.4.2 get skipped past during
+    # the v13.4.3 publish (the rename collision triggered the auto-suggest-
+    # next-patch recovery in apply_version_and_rename_unreleased).
+    assert_no_empty_changelog_sections(changelog_path)
     version_to_sync = apply_version_and_rename_unreleased(
         pubspec_path, changelog_path, pubspec_version, version,
     )
