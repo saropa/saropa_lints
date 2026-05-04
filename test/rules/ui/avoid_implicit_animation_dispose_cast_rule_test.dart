@@ -43,7 +43,7 @@ void main() {
       expect(rule.fixGenerators, isNotEmpty);
       expect(rule.requiredPatterns, contains('as CurvedAnimation'));
       expect(rule.applicableFileTypes, equals({FileType.widget}));
-      expect(rule.impact, LintImpact.high);
+      expect(rule.impact, LintImpact.warning);
     });
 
     test('fixture: BAD case has expect_lint before violation', () {

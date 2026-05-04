@@ -356,7 +356,7 @@ void main() {
       });
 
       test('impact is opinionated', () {
-        expect(rule.impact, LintImpact.opinionated);
+        expect(rule.impact, LintImpact.info);
       });
 
       test('does not conflict with relaxed variant name', () {
@@ -385,7 +385,7 @@ void main() {
       });
 
       test('impact is opinionated', () {
-        expect(rule.impact, LintImpact.opinionated);
+        expect(rule.impact, LintImpact.info);
       });
 
       test('higher threshold than strict variant', () {

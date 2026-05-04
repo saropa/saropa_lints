@@ -28,7 +28,7 @@ void main() {
 
     test('metadata and quick fix', () {
       final rule = PreferOverflowBarOverButtonBarRule();
-      expect(rule.impact, LintImpact.low);
+      expect(rule.impact, LintImpact.info);
       expect(rule.requiresFlutterImport, isTrue);
       expect(
         rule.requiredPatterns,

@@ -51,20 +51,20 @@ void main() {
     test('high impact for removed API (RenderObjectElement)', () {
       expect(
         AvoidRemovedRenderObjectElementMethodsRule().impact,
-        LintImpact.high,
+        LintImpact.warning,
       );
     });
 
     test('medium impact for deprecated APIs', () {
       expect(
         AvoidDeprecatedAnimatedListTypedefsRule().impact,
-        LintImpact.medium,
+        LintImpact.warning,
       );
       expect(
         AvoidDeprecatedUseMaterial3CopyWithRule().impact,
-        LintImpact.medium,
+        LintImpact.warning,
       );
-      expect(AvoidDeprecatedOnSurfaceDestroyedRule().impact, LintImpact.medium);
+      expect(AvoidDeprecatedOnSurfaceDestroyedRule().impact, LintImpact.warning);
     });
   });
 

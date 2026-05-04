@@ -180,7 +180,7 @@ void main() {
 
       test('impact is low; requiredPatterns include postMessage', () {
         final rule = PreferScheduleMicrotaskOverWindowPostmessageRule();
-        expect(rule.impact, LintImpact.low);
+        expect(rule.impact, LintImpact.info);
         expect(rule.requiredPatterns, contains('postMessage'));
       });
 

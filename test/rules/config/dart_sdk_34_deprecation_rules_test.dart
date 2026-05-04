@@ -76,7 +76,7 @@ void main() {
     test('low impact for deprecated property', () {
       expect(
         AvoidDeprecatedFileSystemDeleteEventIsDirectoryRule().impact,
-        LintImpact.low,
+        LintImpact.info,
       );
     });
   });

@@ -129,7 +129,7 @@ void main() {
     test('rule metadata is correct', () {
       final rule = PreferTabbarThemeIndicatorColorRule();
       // Deprecation migration = medium impact (tech debt, not crash)
-      expect(rule.impact.name, 'medium');
+      expect(rule.impact.name, 'warning');
       expect(rule.cost.name, 'low');
       expect(rule.tags, contains('config'));
     });
@@ -168,7 +168,7 @@ void main() {
 
     test('rule metadata is correct', () {
       final rule = PreferPlatformMenuBarChildRule();
-      expect(rule.impact.name, 'medium');
+      expect(rule.impact.name, 'warning');
       expect(rule.cost.name, 'low');
       expect(rule.tags, contains('config'));
     });
@@ -202,7 +202,7 @@ void main() {
 
     test('rule metadata is correct', () {
       final rule = PreferKeepaliveDisposeRule();
-      expect(rule.impact.name, 'medium');
+      expect(rule.impact.name, 'warning');
       expect(rule.cost.name, 'low');
       expect(rule.tags, contains('config'));
     });
@@ -245,7 +245,7 @@ void main() {
 
     test('rule metadata is correct', () {
       final rule = PreferContextMenuBuilderRule();
-      expect(rule.impact.name, 'medium');
+      expect(rule.impact.name, 'warning');
       expect(rule.cost.name, 'low');
       expect(rule.tags, contains('config'));
     });
@@ -278,7 +278,7 @@ void main() {
 
     test('rule metadata is correct', () {
       final rule = PreferPanAxisRule();
-      expect(rule.impact.name, 'medium');
+      expect(rule.impact.name, 'warning');
       expect(rule.cost.name, 'low');
       expect(rule.tags, contains('config'));
     });
@@ -317,7 +317,7 @@ void main() {
 
     test('rule metadata is correct', () {
       final rule = PreferButtonStyleIconAlignmentRule();
-      expect(rule.impact.name, 'medium');
+      expect(rule.impact.name, 'warning');
       expect(rule.cost.name, 'low');
       expect(rule.tags, contains('config'));
     });
@@ -351,7 +351,7 @@ void main() {
     test('rule metadata is correct', () {
       final rule = PreferKeyEventRule();
       // High impact: entire keyboard event system deprecated
-      expect(rule.impact.name, 'high');
+      expect(rule.impact.name, 'warning');
       expect(rule.cost.name, 'low');
       expect(rule.tags, contains('config'));
     });
@@ -380,7 +380,7 @@ void main() {
 
     test('rule metadata is correct', () {
       final rule = PreferM3TextThemeRule();
-      expect(rule.impact.name, 'medium');
+      expect(rule.impact.name, 'warning');
       expect(rule.cost.name, 'low');
       expect(rule.tags, contains('config'));
     });
@@ -429,7 +429,7 @@ void main() {
 
     test('rule metadata is correct', () {
       final rule = AvoidDeprecatedFlutterTestWindowRule();
-      expect(rule.impact.name, 'medium');
+      expect(rule.impact.name, 'warning');
       expect(rule.cost.name, 'low');
       expect(rule.tags, contains('config'));
       expect(rule.tags, contains('flutter'));

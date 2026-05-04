@@ -126,30 +126,30 @@ void main() {
   group('LintImpact (severity-of-bug heuristic)', () {
     test('high impact for hard SDK breaks (removed APIs)', () {
       // JSNumber.toDart was removed — calling sites fail to compile on 3.2+.
-      expect(AvoidRemovedJsNumberToDartRule().impact, LintImpact.high);
+      expect(AvoidRemovedJsNumberToDartRule().impact, LintImpact.warning);
     });
 
     test('medium impact for portability bugs and removed widget params', () {
-      expect(PreferTypeSyncOverIsLinkSyncRule().impact, LintImpact.medium);
+      expect(PreferTypeSyncOverIsLinkSyncRule().impact, LintImpact.warning);
       expect(
         AvoidRemovedAppbarBackwardsCompatibilityRule().impact,
-        LintImpact.medium,
+        LintImpact.warning,
       );
       expect(
         AvoidLegacyJsBooleanReturnAssumptionsRule().impact,
-        LintImpact.medium,
+        LintImpact.warning,
       );
-      expect(PreferStringForTypeofEqualsRule().impact, LintImpact.medium);
-      expect(PreferIntForJsarrayWithLengthRule().impact, LintImpact.medium);
+      expect(PreferStringForTypeofEqualsRule().impact, LintImpact.warning);
+      expect(PreferIntForJsarrayWithLengthRule().impact, LintImpact.warning);
     });
 
     test('low impact for stylistic / dead-code migrations', () {
-      expect(PreferIterableCastRule().impact, LintImpact.low);
-      expect(PreferUtf8EncodeRule().impact, LintImpact.low);
-      expect(PreferScrollbarThemeOfRule().impact, LintImpact.low);
+      expect(PreferIterableCastRule().impact, LintImpact.info);
+      expect(PreferUtf8EncodeRule().impact, LintImpact.info);
+      expect(PreferScrollbarThemeOfRule().impact, LintImpact.info);
       expect(
         AvoidDeprecatedUseInheritedMediaQueryRule().impact,
-        LintImpact.low,
+        LintImpact.info,
       );
     });
   });

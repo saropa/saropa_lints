@@ -143,7 +143,7 @@ void main() {
     group('prefer_blank_line_before_else', () {
       test('is stylistic rule (opinionated impact)', () {
         final rule = NewlineBeforeElseRule();
-        expect(rule.impact, LintImpact.opinionated);
+        expect(rule.impact, LintImpact.info);
       });
 
       test('rule offers quick fix (add blank line before else)', () {
@@ -197,7 +197,7 @@ void main() {
     group('prefer_blank_line_after_loop', () {
       test('is stylistic rule (opinionated impact)', () {
         final rule = NewlineAfterLoopRule();
-        expect(rule.impact, LintImpact.opinionated);
+        expect(rule.impact, LintImpact.info);
       });
 
       test('rule offers quick fix (add blank line after loop)', () {

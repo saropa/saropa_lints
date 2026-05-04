@@ -133,39 +133,39 @@ void main() {
 
   group('LintImpact (compile-failure vs cleanup)', () {
     test('high impact for hard SDK breaks', () {
-      expect(AvoidDeprecatedListConstructorRule().impact, LintImpact.high);
-      expect(AvoidRemovedCastErrorRule().impact, LintImpact.high);
+      expect(AvoidDeprecatedListConstructorRule().impact, LintImpact.warning);
+      expect(AvoidRemovedCastErrorRule().impact, LintImpact.warning);
       expect(
         AvoidRemovedNoSuchMethodErrorDefaultConstructorRule().impact,
-        LintImpact.high,
+        LintImpact.warning,
       );
-      expect(AvoidRemovedDeferredLibraryRule().impact, LintImpact.high);
-      expect(AvoidRemovedMaxUserTagsConstantRule().impact, LintImpact.high);
-      expect(AvoidRemovedDartDeveloperMetricsRule().impact, LintImpact.high);
-      expect(AvoidRemovedNullThrownErrorRule().impact, LintImpact.high);
+      expect(AvoidRemovedDeferredLibraryRule().impact, LintImpact.warning);
+      expect(AvoidRemovedMaxUserTagsConstantRule().impact, LintImpact.warning);
+      expect(AvoidRemovedDartDeveloperMetricsRule().impact, LintImpact.warning);
+      expect(AvoidRemovedNullThrownErrorRule().impact, LintImpact.warning);
     });
 
     test('medium impact for removed error types / BidirectionalIterator', () {
-      expect(AvoidRemovedFallThroughErrorRule().impact, LintImpact.medium);
+      expect(AvoidRemovedFallThroughErrorRule().impact, LintImpact.warning);
       expect(
         AvoidRemovedAbstractClassInstantiationErrorRule().impact,
-        LintImpact.medium,
+        LintImpact.warning,
       );
       expect(
         AvoidRemovedCyclicInitializationErrorRule().impact,
-        LintImpact.medium,
+        LintImpact.warning,
       );
-      expect(AvoidRemovedBidirectionalIteratorRule().impact, LintImpact.medium);
-      expect(AvoidDeprecatedHasNextIteratorRule().impact, LintImpact.medium);
+      expect(AvoidRemovedBidirectionalIteratorRule().impact, LintImpact.warning);
+      expect(AvoidDeprecatedHasNextIteratorRule().impact, LintImpact.warning);
     });
 
     test('low impact for no-op annotations and Deprecated.expires', () {
-      expect(AvoidRemovedProxyAnnotationRule().impact, LintImpact.low);
-      expect(AvoidRemovedProvisionalAnnotationRule().impact, LintImpact.low);
-      expect(AvoidDeprecatedExpiresGetterRule().impact, LintImpact.low);
+      expect(AvoidRemovedProxyAnnotationRule().impact, LintImpact.info);
+      expect(AvoidRemovedProvisionalAnnotationRule().impact, LintImpact.info);
+      expect(AvoidDeprecatedExpiresGetterRule().impact, LintImpact.info);
       expect(
         AvoidDeprecatedNetworkInterfaceListSupportedRule().impact,
-        LintImpact.low,
+        LintImpact.info,
       );
     });
   });

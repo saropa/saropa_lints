@@ -27,7 +27,7 @@ void main() {
       expect(rule.code.problemMessage.length, greaterThan(80));
       expect(rule.code.correctionMessage, isNotNull);
       expect(rule.fixGenerators, isNotEmpty);
-      expect(rule.impact, LintImpact.medium);
+      expect(rule.impact, LintImpact.warning);
     });
 
     test('AvoidChipDeleteInkWellCircleBorderRule', () {

@@ -61,7 +61,7 @@ void main() {
         UndefinedEnumConstructorRule(),
       ];
       for (final r in rules) {
-        expect(r.impact, LintImpact.medium, reason: r.code.lowerCaseName);
+        expect(r.impact, LintImpact.warning, reason: r.code.lowerCaseName);
         expect(r.ruleType, RuleType.bug, reason: r.code.lowerCaseName);
         expect(r.requiredPatterns, isNull, reason: r.code.lowerCaseName);
         expect(r.fixGenerators, isEmpty, reason: r.code.lowerCaseName);

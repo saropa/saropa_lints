@@ -44,7 +44,7 @@ void main() {
             'Early-exit pattern must be the widget name so unrelated files skip AST work',
       );
       expect(rule.applicableFileTypes, equals({FileType.widget}));
-      expect(rule.impact, LintImpact.low);
+      expect(rule.impact, LintImpact.info);
     });
 
     test('fixture: BAD cases mark expect_lint for plain Listenables', () {

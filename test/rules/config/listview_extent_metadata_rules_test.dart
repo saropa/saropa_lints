@@ -105,7 +105,7 @@ void f() {
   group('PreferOverflowBarOverButtonBarRule (metadata + AST)', () {
     test('uses low impact, Flutter gating, and ButtonBar pattern index', () {
       final rule = PreferOverflowBarOverButtonBarRule();
-      expect(rule.impact, LintImpact.low);
+      expect(rule.impact, LintImpact.info);
       expect(rule.requiresFlutterImport, isTrue);
       expect(
         rule.requiredPatterns,

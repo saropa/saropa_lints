@@ -44,7 +44,7 @@ void main() {
       expect(rule.code.correctionMessage, isNotNull);
       expect(rule.fixGenerators, isNotEmpty);
       expect(rulesWithFixes.contains(codeName), isTrue);
-      expect(rule.impact, LintImpact.low);
+      expect(rule.impact, LintImpact.info);
     });
   });
 }
