@@ -109,7 +109,6 @@ Scripts in this directory that can run independently:
 
 | Script | Purpose |
 |--------|---------|
-| `apply_security_metadata_cwe_hotspots.py` | Bulk security metadata application |
 | `bulk_rule_metadata.py` | Bulk metadata operations |
 | `export_saropa_rules_for_gap.py` | Export rules for external tools |
 | `list_rules_without_fixes.py` | Query rules lacking quick fixes |
