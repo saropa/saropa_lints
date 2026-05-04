@@ -72,6 +72,8 @@
     "src/test/setupCompositeScaffoldGate.test.ts",
     "src/pluginLiveness.ts",
     "src/test/pluginLiveness.test.ts",
+    "src/upgrade-checker.ts",
+    "src/test/upgradeChecker.test.ts",
     "src/cross-file-commands.ts",
     "src/test/formatAnalysisIssuesMessage.test.ts",
     "src/test/findLatestAnalysisReport.test.ts",

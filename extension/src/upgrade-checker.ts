@@ -20,18 +20,77 @@ import { runInWorkspaceAsync, hasFlutterDep } from './setup';
 // ── Constants ────────────────────────────────────────────────────────────
 
 const STATE_KEY = 'saropaLints.upgradeCheck';
-const CHECK_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24 hours
-const RETRY_INTERVAL_MS = 60 * 60 * 1000;      // 1 hour (network failure cooldown)
+/**
+ * Minimum gap between successive pub.dev fetches per workspace.
+ *
+ * **Why this is short (1h) and not 24h.** Earlier the gate was 24h, which
+ * meant the extension would not even *fetch* pub.dev within 24 hours of a
+ * dismiss — so a brand-new version published the next morning was invisible
+ * until the timer expired. The version-aware skip below
+ * (`lastKnownLatest === latestVersion`) already prevents re-prompting for
+ * the *same* version after dismiss, so the time gate's only remaining job
+ * is anti-thrash on rapid VS Code reloads. 1h is plenty for that.
+ */
+const ANTI_THRASH_INTERVAL_MS = 60 * 60 * 1000; // 1 hour
+/** Network-failure cooldown — slightly shorter than ANTI_THRASH so we recover quickly. */
+const RETRY_INTERVAL_MS = 30 * 60 * 1000;       // 30 minutes
 const PUB_API_URL = 'https://pub.dev/api/packages/saropa_lints';
 const CHANGELOG_URL = 'https://pub.dev/packages/saropa_lints/changelog';
 
 // ── Throttle state ───────────────────────────────────────────────────────
 
 interface UpgradeCheckState {
-  /** Timestamp (ms) when the next check is allowed. */
+  /**
+   * Timestamp (ms) of the most recent successful fetch, used purely as an
+   * anti-thrash floor for the *next* fetch (not a "don't notify until"
+   * gate). Renamed in concept from the earlier `nextCheckDueMs` because
+   * the throttle is now "per anti-thrash window OR per newly-published
+   * version" — the latter always bypasses the former (see
+   * [shouldFetchNow] and [shouldPromptForVersion]).
+   */
   nextCheckDueMs: number;
   /** Latest version seen on pub.dev — prevents re-notifying after dismiss. */
   lastKnownLatest: string;
+}
+
+/**
+ * Whether enough time has elapsed since the last fetch to fetch again.
+ * Pure for testability — no `Date.now()` or vscode dependencies inside.
+ *
+ * Returns `true` when we have no prior state (first run) or the
+ * `nextCheckDueMs` deadline has passed. The "did the version change"
+ * question is answered AFTER the fetch (see [shouldPromptForVersion])
+ * — we cannot answer that without contacting pub.dev, so the only
+ * thing this gate guards is "don't hammer pub.dev on rapid VS Code
+ * reloads."
+ *
+ * Legacy state written under the old 24h throttle stays in effect
+ * until its deadline elapses (one-time degraded wait of up to 24h);
+ * the next write replaces it with the new 1h semantics, so this is a
+ * self-healing migration.
+ */
+export function shouldFetchNow(
+  saved: UpgradeCheckState | undefined,
+  now: number,
+): boolean {
+  if (!saved) return true;
+  return now >= saved.nextCheckDueMs;
+}
+
+/**
+ * Whether to prompt the user about [latestVersion] given prior state.
+ * Returns `false` when the user has already dismissed exactly this
+ * version (we know because `lastKnownLatest` matches), `true`
+ * otherwise. A newly-published version naturally returns `true` here
+ * because it cannot match the previously-dismissed value — that is the
+ * "per version" half of the throttle promise.
+ */
+export function shouldPromptForVersion(
+  saved: UpgradeCheckState | undefined,
+  latestVersion: string,
+): boolean {
+  if (!saved) return true;
+  return saved.lastKnownLatest !== latestVersion;
 }
 
 // ── Exported helpers (also used in tests) ────────────────────────────────
@@ -118,9 +177,13 @@ export async function checkForUpgrade(
     .get<boolean>('checkForUpdates', true);
   if (!enabled) return;
 
-  // Throttle: skip if the next check isn't due yet.
+  // Anti-thrash gate: skip the fetch if we made one within the last
+  // ANTI_THRASH_INTERVAL_MS. This is NOT "don't notify until X" — once
+  // the fetch runs, [shouldPromptForVersion] decides whether to prompt
+  // based on the version itself, so a freshly-published release breaks
+  // through even if the user dismissed an older version recently.
   const saved = context.workspaceState.get<UpgradeCheckState>(STATE_KEY);
-  if (saved && Date.now() < saved.nextCheckDueMs) {
+  if (!shouldFetchNow(saved, Date.now())) {
     return;
   }
 
@@ -140,34 +203,37 @@ export async function checkForUpgrade(
   try {
     const resp = await fetchWithRetry(PUB_API_URL);
     if (!resp.ok) {
-      // Non-fatal: set a shorter cooldown so we retry sooner.
-      await persistState(context, RETRY_INTERVAL_MS, installed.version);
+      // Non-fatal: shorter cooldown so we retry sooner. Preserve any
+      // previously-known latest so a transient outage doesn't erase the
+      // dismiss memory.
+      await persistState(context, RETRY_INTERVAL_MS, saved?.lastKnownLatest ?? installed.version);
       return;
     }
     const json: any = await resp.json();
     latestVersion = json?.latest?.version;
     if (!latestVersion) return;
   } catch {
-    // Network failure: set a shorter cooldown.
-    await persistState(context, RETRY_INTERVAL_MS, installed.version);
+    // Network failure: same preserve-the-dismiss-memory pattern as above.
+    await persistState(context, RETRY_INTERVAL_MS, saved?.lastKnownLatest ?? installed.version);
     return;
   }
 
   // Compare versions.
   const status = compareVersions(installed.version, latestVersion);
   if (status === 'up-to-date' || status === 'unknown') {
-    await persistState(context, CHECK_INTERVAL_MS, latestVersion);
+    await persistState(context, ANTI_THRASH_INTERVAL_MS, latestVersion);
     return;
   }
 
-  // Don't re-notify if user already dismissed this version.
-  if (saved?.lastKnownLatest === latestVersion) {
-    await persistState(context, CHECK_INTERVAL_MS, latestVersion);
+  // Already dismissed THIS exact version — quiet, but record latest seen.
+  // A newer version will fail this check naturally and re-prompt.
+  if (!shouldPromptForVersion(saved, latestVersion)) {
+    await persistState(context, ANTI_THRASH_INTERVAL_MS, latestVersion);
     return;
   }
 
   // Persist before showing notification so concurrent activations don't double-fire.
-  await persistState(context, CHECK_INTERVAL_MS, latestVersion);
+  await persistState(context, ANTI_THRASH_INTERVAL_MS, latestVersion);
 
   // Show notification.
   const updateLabel = status === 'major' ? 'Major update'

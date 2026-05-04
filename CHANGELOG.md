@@ -47,6 +47,10 @@
 
 ## [Unreleased]
 
+### Fixed (Extension)
+
+- Upgrade-check throttle now lets a newly-published `saropa_lints` version break through the dismiss memory immediately instead of being suppressed for up to 24 hours. The previous gate was a single 24h timer, so a release published the morning after a dismiss stayed invisible until that timer elapsed; the gate is now a 1-hour anti-thrash window combined with a per-version dismiss memory, so a new pub.dev version always re-prompts even within the same day. Legacy state self-heals on the next write — no user action required.
+
 <details><summary>Maintenance</summary>
 
 - Version 13.4.2 was bumped in `pubspec.yaml` but never tagged or published — the v13.4.3 publish run jumped past it. No 13.4.2 artifact exists on pub.dev or the Marketplace; consumers go directly from 13.4.1 to 13.4.3.
@@ -58,6 +62,8 @@
 ---
 
 ## [13.4.3]
+
+Brings the Findings Dashboard back for projects whose report file was last produced by an older saropa_lints plugin — counts and the findings table agree again, no re-analysis needed. The "no analysis report" notice is also clearer: it spells out which piece of project setup is actually missing (pubspec, dev-dependency, analyzer config, or a top-level `saropa_lints:` key that doesn't enrol the plugin) and offers a one-click Set Up Project action for the common cases. [log](https://github.com/saropa/saropa_lints/blob/v13.4.3/CHANGELOG.md)
 
 ### Fixed (Extension)
 
