@@ -54,7 +54,7 @@ void main() {
         ruleSeverities: {'test_rule': 'WARNING'},
         severityCounts: const SeverityCounts(error: 0, warning: 1, info: 0),
         violations: {
-          LintImpact.high: [violationRel],
+          LintImpact.warning: [violationRel],
         },
       );
       final batch2 = BatchData(
@@ -68,7 +68,7 @@ void main() {
         ruleSeverities: {'test_rule': 'WARNING'},
         severityCounts: const SeverityCounts(error: 0, warning: 1, info: 0),
         violations: {
-          LintImpact.high: [violationAbs],
+          LintImpact.warning: [violationAbs],
         },
       );
 
@@ -85,7 +85,7 @@ void main() {
       expect(consolidated.filesWithIssues, 1);
       expect(consolidated.filesAnalyzed, 1);
 
-      final list = consolidated.violations[LintImpact.high];
+      final list = consolidated.violations[LintImpact.warning];
       expect(list, isNotNull);
       // Fix: hasLength matcher yields clearer diagnostics than raw int.
       expect(list!, hasLength(1));

@@ -1483,11 +1483,11 @@ class ReportWriter {
     buffer.writeln(ImpactTracker.detailedSummary);
     buffer.writeln('');
 
-    // List critical violations
-    final critical = ImpactTracker.violations[LintImpact.critical];
-    if (critical != null && critical.isNotEmpty) {
-      buffer.writeln('CRITICAL VIOLATIONS (fix immediately):');
-      for (final v in critical) {
+    // List error violations (must-fix).
+    final errors = ImpactTracker.violations[LintImpact.error];
+    if (errors != null && errors.isNotEmpty) {
+      buffer.writeln('ERRORS (must fix):');
+      for (final v in errors) {
         buffer.writeln('  ${v.file}:${v.line} - ${v.rule}');
       }
     }
@@ -1588,42 +1588,43 @@ extension InstanceCreationExpressionUtils on InstanceCreationExpression {
   }
 }
 
-/// Impact classification for lint rules.
+/// Severity classification for lint rules — three levels mirroring the
+/// analyzer's native model.
 ///
-/// Helps teams understand the practical severity of violations:
-/// - [critical]: Each occurrence is a serious bug. Even 1-2 is unacceptable.
-/// - [high]: Significant issues. 10+ should trigger immediate action.
-/// - [medium]: Quality issues. 100+ suggests technical debt.
-/// - [low]: Style/consistency. Large numbers are acceptable in legacy code.
+/// - [error]: MUST be fixed. The code is broken, will crash, or is exploitable.
+/// - [warning]: COULD be an error or is embarrassing. Compounds into systemic
+///   problems if ignored.
+/// - [info]: FYI. Style, consistency, opinionated guidance.
+///
+/// Replaces the prior 5-level taxonomy (critical/high/medium/low/opinionated).
+/// The old `critical` mapped to [error]; `high` and `medium` collapsed into
+/// [warning]; `low` and `opinionated` collapsed into [info]. The word
+/// "critical" was retired because it dramatized the same fact that "error"
+/// already states in the analyzer's native model.
 enum LintImpact {
-  /// Each occurrence is independently harmful. Memory leaks, security holes,
-  /// crashes. Even 1-2 in production code is unacceptable.
+  /// MUST be fixed. The code is broken, will crash, is exploitable, or
+  /// fails in production. Maps to `DiagnosticSeverity.ERROR`.
   ///
-  /// Examples: undisposed controllers, hardcoded credentials, null crashes
-  critical,
+  /// Examples: undisposed controllers, hardcoded credentials, null crashes,
+  /// path traversal, always-failing casts.
+  error,
 
-  /// Significant issues that compound. A handful is manageable, but 10+
-  /// indicates systemic problems requiring immediate attention.
+  /// COULD be an error, or is embarrassing. Patterns that may break under
+  /// the wrong conditions, compound into systemic problems, or fail audits
+  /// (accessibility, security pinning, anti-patterns). Maps to
+  /// `DiagnosticSeverity.WARNING`.
   ///
-  /// Examples: missing accessibility labels, performance anti-patterns
-  high,
+  /// Examples: missing accessibility labels, performance anti-patterns,
+  /// missing error handling, complex conditionals, code duplication.
+  warning,
 
-  /// Code quality issues. Individual instances are minor, but 100+ suggests
-  /// accumulated technical debt worth addressing.
+  /// FYI. Style, consistency, opinionated guidance — not correctness or
+  /// performance issues. Teams may opt-in or downgrade freely. Maps to
+  /// `DiagnosticSeverity.INFO`.
   ///
-  /// Examples: missing error handling, complex conditionals, code duplication
-  medium,
-
-  /// Style and consistency issues. Large counts are normal in legacy codebases.
-  /// Focus enforcement on new code; address existing violations opportunistically.
-  ///
-  /// Examples: naming conventions, hardcoded strings, missing documentation
-  low,
-
-  /// Opinionated guidance. Preferential patterns that improve consistency but
-  /// are not inherently correctness or performance issues. Teams may opt-in or
-  /// downgrade freely.
-  opinionated,
+  /// Examples: naming conventions, hardcoded strings, missing documentation,
+  /// preferred-pattern suggestions.
+  info,
 }
 
 /// The tier at which a rule is enabled by default.
@@ -1633,7 +1634,7 @@ enum LintImpact {
 ///
 /// Tiers are cumulative: higher tiers include all rules from lower tiers.
 enum RuleTier {
-  /// Critical rules preventing crashes, security holes, memory leaks.
+  /// Must-fix rules preventing crashes, security holes, memory leaks.
   /// Must be enabled for all projects.
   essential,
 
@@ -1693,29 +1694,31 @@ enum TestRelevance {
   testOnly,
 }
 
-/// Tracks lint violations by impact level for summary reporting.
+/// Tracks lint violations by severity level for summary reporting.
 ///
 /// Usage:
 /// ```dart
 /// // After running analysis:
 /// print(ImpactTracker.summary);
-/// // Output: "Critical: 3, High: 12, Medium: 156, Low: 892"
+/// // Output: "Errors: 3, Warnings: 12, Info: 892"
 ///
 /// // Get detailed breakdown:
 /// final violations = ImpactTracker.violations;
-/// for (final v in violations[LintImpact.critical]!) {
+/// for (final v in violations[LintImpact.error]!) {
 ///   print('${v.file}:${v.line} - ${v.rule}');
 /// }
 /// ```
 class ImpactTracker {
   ImpactTracker._();
 
+  // Three buckets — error, warning, info — match the analyzer's native model
+  // and the user-facing summary text. The prior 5-bucket taxonomy
+  // (critical/high/medium/low/opinionated) collapsed into these on
+  // 2026-05-03; see plan/COLLAPSE_LINT_IMPACT_TO_SEVERITY.md.
   static final Map<LintImpact, LinkedHashSet<ViolationRecord>> _violations = {
-    LintImpact.critical: LinkedHashSet<ViolationRecord>(),
-    LintImpact.high: LinkedHashSet<ViolationRecord>(),
-    LintImpact.medium: LinkedHashSet<ViolationRecord>(),
-    LintImpact.low: LinkedHashSet<ViolationRecord>(),
-    LintImpact.opinionated: LinkedHashSet<ViolationRecord>(),
+    LintImpact.error: LinkedHashSet<ViolationRecord>(),
+    LintImpact.warning: LinkedHashSet<ViolationRecord>(),
+    LintImpact.info: LinkedHashSet<ViolationRecord>(),
   };
 
   /// Record a violation. Duplicates (same file + line + rule) are ignored.
@@ -1741,43 +1744,39 @@ class ImpactTracker {
     }
   }
 
-  /// Get all violations grouped by impact.
+  /// Get all violations grouped by severity.
   static Map<LintImpact, List<ViolationRecord>> get violations => {
     for (final entry in _violations.entries) entry.key: entry.value.toList(),
   };
 
-  /// Get count of violations by impact level.
+  /// Get count of violations by severity level.
   static Map<LintImpact, int> get counts => {
-    LintImpact.critical: _violations[LintImpact.critical]?.length ?? 0,
-    LintImpact.high: _violations[LintImpact.high]?.length ?? 0,
-    LintImpact.medium: _violations[LintImpact.medium]?.length ?? 0,
-    LintImpact.low: _violations[LintImpact.low]?.length ?? 0,
-    LintImpact.opinionated: _violations[LintImpact.opinionated]?.length ?? 0,
+    LintImpact.error: _violations[LintImpact.error]?.length ?? 0,
+    LintImpact.warning: _violations[LintImpact.warning]?.length ?? 0,
+    LintImpact.info: _violations[LintImpact.info]?.length ?? 0,
   };
 
   /// Get total violation count.
   static int get total =>
       _violations.values.fold(0, (sum, v) => sum + v.length);
 
-  /// Returns true if there are any critical violations.
-  static bool get hasCritical {
-    final set = _violations[LintImpact.critical];
+  /// Returns true if there are any error-severity violations (must-fix).
+  static bool get hasErrors {
+    final set = _violations[LintImpact.error];
     return set != null && set.isNotEmpty;
   }
 
   /// Get a summary string suitable for display.
   ///
-  /// Format: "Critical: 3, High: 12, Medium: 156, Low: 892"
+  /// Format: `"Errors: 3, Warnings: 12, Info: 892"`
   static String get summary {
     final c = counts;
-    // Use '?? 0' fallbacks (avoid_nullable_interpolation): Map<K,V> returns a
+    // '?? 0' fallbacks (avoid_nullable_interpolation): Map<K,V> returns a
     // nullable value for missing keys, and printing literal 'null' would be
-    // misleading here — missing impact categories mean zero violations.
-    return 'Critical: ${c[LintImpact.critical] ?? 0}, '
-        'High: ${c[LintImpact.high] ?? 0}, '
-        'Medium: ${c[LintImpact.medium] ?? 0}, '
-        'Low: ${c[LintImpact.low] ?? 0}, '
-        'Opinionated: ${c[LintImpact.opinionated] ?? 0}';
+    // misleading here — missing severities mean zero violations.
+    return 'Errors: ${c[LintImpact.error] ?? 0}, '
+        'Warnings: ${c[LintImpact.warning] ?? 0}, '
+        'Info: ${c[LintImpact.info] ?? 0}';
   }
 
   /// Get a detailed summary with guidance.
@@ -1786,30 +1785,22 @@ class ImpactTracker {
     final buffer = StringBuffer();
 
     buffer.writeln('');
-    buffer.writeln('Impact Summary');
-    buffer.writeln('==============');
+    buffer.writeln('Severity Summary');
+    buffer.writeln('================');
 
-    // Use '?? 0' fallbacks for nullable map lookups (avoid_nullable_interpolation):
+    // '?? 0' fallbacks for nullable map lookups (avoid_nullable_interpolation):
     // Even though the if-guard proves non-null, the rule inspects interpolation
     // type not flow, so an explicit default is required.
-    if ((c[LintImpact.critical] ?? 0) > 0) {
+    if ((c[LintImpact.error] ?? 0) > 0) {
+      buffer.writeln('ERRORS:   ${c[LintImpact.error] ?? 0} (must fix)');
+    }
+    if ((c[LintImpact.warning] ?? 0) > 0) {
       buffer.writeln(
-        'CRITICAL: ${c[LintImpact.critical] ?? 0} (fix immediately!)',
+        'WARNINGS: ${c[LintImpact.warning] ?? 0} (could fail or look bad)',
       );
     }
-    if ((c[LintImpact.high] ?? 0) > 0) {
-      buffer.writeln('HIGH:     ${c[LintImpact.high] ?? 0} (address soon)');
-    }
-    if ((c[LintImpact.medium] ?? 0) > 0) {
-      buffer.writeln('MEDIUM:   ${c[LintImpact.medium] ?? 0} (tech debt)');
-    }
-    if ((c[LintImpact.low] ?? 0) > 0) {
-      buffer.writeln('LOW:      ${c[LintImpact.low] ?? 0} (style)');
-    }
-    if ((c[LintImpact.opinionated] ?? 0) > 0) {
-      buffer.writeln(
-        'OPINIONATED: ${c[LintImpact.opinionated] ?? 0} (team preference)',
-      );
+    if ((c[LintImpact.info] ?? 0) > 0) {
+      buffer.writeln('INFO:     ${c[LintImpact.info] ?? 0} (FYI)');
     }
 
     if (total == 0) {
@@ -1819,7 +1810,7 @@ class ImpactTracker {
     return buffer.toString();
   }
 
-  /// Get violations sorted by impact (critical first).
+  /// Get violations sorted by severity (errors first, then warnings, then info).
   static List<ViolationRecord> get sortedViolations {
     final result = <ViolationRecord>[];
     for (final impact in LintImpact.values) {
@@ -2144,13 +2135,13 @@ abstract class SaropaLintRule extends AnalysisRule {
   /// The business impact of this rule's violations.
   ///
   /// Override to specify the impact level for your rule:
-  /// - [LintImpact.critical]: Even 1-2 occurrences is serious (memory leaks, security)
-  /// - [LintImpact.high]: 10+ requires immediate action (accessibility, performance)
-  /// - [LintImpact.medium]: 100+ indicates tech debt (error handling, complexity)
-  /// - [LintImpact.low]: Large counts acceptable (style, naming conventions)
+  /// - [LintImpact.error]: Even 1-2 occurrences is serious (memory leaks, security)
+  /// - [LintImpact.warning]: 10+ requires immediate action (accessibility, performance)
+  /// - [LintImpact.warning]: 100+ indicates tech debt (error handling, complexity)
+  /// - [LintImpact.info]: Large counts acceptable (style, naming conventions)
   ///
-  /// Default: [LintImpact.medium]
-  LintImpact get impact => LintImpact.medium;
+  /// Default: [LintImpact.warning]
+  LintImpact get impact => LintImpact.warning;
 
   // ============================================================
   // Config Key Aliases

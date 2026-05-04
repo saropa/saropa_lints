@@ -144,33 +144,24 @@ void main() {
       );
     });
 
-    test('opinionated prefer_* rules must be in stylisticRules', () {
-      final List<String> misclassified = <String>[];
-
-      for (final SaropaLintRule rule in allSaropaRules) {
-        if (rule.impact != LintImpact.opinionated) continue;
-
-        final String name = rule.code.lowerCaseName;
-        // All prefer_* opinionated rules are stylistic, no exceptions.
-        // Non-prefer opinionated rules (avoid_*, require_*) are case-by-case.
-        if (!name.startsWith('prefer_')) continue;
-        if (!stylisticRules.contains(name)) {
-          misclassified.add(name);
-        }
-      }
-
-      misclassified.sort();
-
-      expect(
-        misclassified,
-        isEmpty,
-        reason:
-            'Opinionated prefer_* rules must be in '
-            'stylisticRules, not a tier set:\n'
-            '${misclassified.map((n) => '  $n').join('\n')}\n\n'
-            'Move these rules to stylisticRules in lib/src/tiers.dart.',
-      );
-    });
+    // The original assertion: any prefer_* rule with the lowest impact tier
+    // (LintImpact.opinionated) must live in stylisticRules. After the
+    // 2026-05-03 collapse of the 5-bucket impact taxonomy
+    // (critical/high/medium/low/opinionated) into the 3-bucket severity model
+    // (error/warning/info), the lowest bucket — LintImpact.info — also
+    // absorbs everything that was LintImpact.low (legitimate non-opinionated
+    // style hints). Many prefer_* rules sat at the old LintImpact.low and now
+    // appear under info, so the prior implication
+    // "info + prefer_* ⇒ must be stylistic" no longer holds.
+    // Skipped pending a redesign that uses an explicit "opinionated" signal
+    // independent of impact tier — see plan/COLLAPSE_LINT_IMPACT_TO_SEVERITY.md.
+    test(
+      'opinionated prefer_* rules must be in stylisticRules',
+      () {},
+      skip:
+          'Pending redesign post LintImpact 5→3 collapse '
+          '(plan/COLLAPSE_LINT_IMPACT_TO_SEVERITY.md, 2026-05-03).',
+    );
   });
 
   group('Package Rule Set Validation', () {

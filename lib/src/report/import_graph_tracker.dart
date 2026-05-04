@@ -9,11 +9,9 @@ import 'package:saropa_lints/src/string_slice_utils.dart';
 extension _LintImpactNumeric on LintImpact {
   /// Numeric value for priority calculations.
   double get numericValue => switch (this) {
-    LintImpact.critical => 5.0,
-    LintImpact.high => 4.0,
-    LintImpact.medium => 2.0,
-    LintImpact.low => 1.0,
-    LintImpact.opinionated => 0.5,
+    LintImpact.error => 5.0,
+    LintImpact.warning => 4.0,
+    LintImpact.info => 1.0,
   };
 }
 

@@ -40,8 +40,8 @@ void main() {
     expect(ImportGraphTracker.importersOf(libB), contains(libA));
     // b.dart is imported by a.dart → higher fan-in → higher fix priority.
     expect(
-      ImportGraphTracker.getPriority(libB, LintImpact.high),
-      greaterThan(ImportGraphTracker.getPriority(libA, LintImpact.high)),
+      ImportGraphTracker.getPriority(libB, LintImpact.warning),
+      greaterThan(ImportGraphTracker.getPriority(libA, LintImpact.warning)),
     );
   });
 
@@ -64,8 +64,8 @@ void main() {
     final relA = 'lib/a.dart';
     final relB = 'lib/b.dart';
     expect(
-      ImportGraphTracker.getPriority(relB, LintImpact.high),
-      greaterThan(ImportGraphTracker.getPriority(relA, LintImpact.high)),
+      ImportGraphTracker.getPriority(relB, LintImpact.warning),
+      greaterThan(ImportGraphTracker.getPriority(relA, LintImpact.warning)),
     );
   });
 }

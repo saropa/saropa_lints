@@ -160,7 +160,7 @@ void main() {
       // Config has maxIssues=1, but export should contain all 3
       final config = _defaultConfig(maxIssues: 1);
       final violations = <LintImpact, List<ViolationRecord>>{
-        LintImpact.high: [
+        LintImpact.warning: [
           _violation(rule: 'rule_a', file: 'lib/a.dart', line: 1),
           _violation(rule: 'rule_b', file: 'lib/b.dart', line: 2),
           _violation(rule: 'rule_c', file: 'lib/c.dart', line: 3),
@@ -193,7 +193,7 @@ void main() {
 
     test('path normalization converts Windows backslashes', () {
       final violations = <LintImpact, List<ViolationRecord>>{
-        LintImpact.medium: [
+        LintImpact.warning: [
           _violation(
             rule: 'test_rule',
             file: '$projectRoot\\lib\\main.dart',
@@ -219,8 +219,8 @@ void main() {
 
     test('violations sorted by impact then file then line', () {
       final violations = <LintImpact, List<ViolationRecord>>{
-        LintImpact.low: [_violation(rule: 'r1', file: 'lib/z.dart', line: 1)],
-        LintImpact.critical: [
+        LintImpact.info: [_violation(rule: 'r1', file: 'lib/z.dart', line: 1)],
+        LintImpact.error: [
           _violation(rule: 'r2', file: 'lib/b.dart', line: 20),
           _violation(rule: 'r3', file: 'lib/a.dart', line: 5),
           _violation(rule: 'r4', file: 'lib/a.dart', line: 1),
@@ -237,16 +237,16 @@ void main() {
       final exported = readExport()['violations'] as List<dynamic>;
       expect(exported, hasLength(4));
 
-      // Critical first, then sorted by file (a before b), then line
+      // Errors first, then sorted by file (a before b), then line.
       final impacts = exported
           .map((v) => (v as Map<String, dynamic>)['impact'] as String)
           .toList();
-      expect(impacts[0], 'critical');
-      expect(impacts[1], 'critical');
-      expect(impacts[2], 'critical');
-      expect(impacts[3], 'low');
+      expect(impacts[0], 'error');
+      expect(impacts[1], 'error');
+      expect(impacts[2], 'error');
+      expect(impacts[3], 'info');
 
-      // Within critical: a.dart:1, a.dart:5, b.dart:20
+      // Within errors: a.dart:1, a.dart:5, b.dart:20
       final files = exported
           .take(3)
           .map((v) => (v as Map<String, dynamic>)['file'] as String)
@@ -265,7 +265,7 @@ void main() {
 
     test('OWASP populated for security rules', () {
       final violations = <LintImpact, List<ViolationRecord>>{
-        LintImpact.critical: [
+        LintImpact.error: [
           _violation(
             rule: 'avoid_hardcoded_credentials',
             file: 'lib/auth.dart',
@@ -303,7 +303,7 @@ void main() {
 
     test('includes rule metadata in config and violation entries', () {
       final violations = <LintImpact, List<ViolationRecord>>{
-        LintImpact.critical: [
+        LintImpact.error: [
           _violation(
             rule: 'avoid_hardcoded_credentials',
             file: 'lib/auth.dart',
@@ -341,7 +341,7 @@ void main() {
 
     test('OWASP empty arrays for non-security rules', () {
       final violations = <LintImpact, List<ViolationRecord>>{
-        LintImpact.low: [
+        LintImpact.info: [
           _violation(rule: 'prefer_const', file: 'lib/a.dart', line: 1),
         ],
       };
@@ -364,7 +364,7 @@ void main() {
 
     test('correction field present when available', () {
       final violations = <LintImpact, List<ViolationRecord>>{
-        LintImpact.medium: [
+        LintImpact.warning: [
           _violation(
             rule: 'test_rule',
             file: 'lib/a.dart',
@@ -388,7 +388,7 @@ void main() {
 
     test('correction field absent when not available', () {
       final violations = <LintImpact, List<ViolationRecord>>{
-        LintImpact.medium: [
+        LintImpact.warning: [
           _violation(rule: 'test_rule', file: 'lib/a.dart', line: 1),
         ],
       };
@@ -444,10 +444,10 @@ void main() {
 
     test('summary counts match violation data', () {
       final violations = <LintImpact, List<ViolationRecord>>{
-        LintImpact.critical: [
+        LintImpact.error: [
           _violation(rule: 'r1', file: 'lib/a.dart', line: 1),
         ],
-        LintImpact.high: [
+        LintImpact.warning: [
           _violation(rule: 'r2', file: 'lib/b.dart', line: 2),
           _violation(rule: 'r3', file: 'lib/c.dart', line: 3),
         ],
@@ -464,13 +464,13 @@ void main() {
       expect(summary['totalViolations'], 3);
 
       final byImpact = summary['byImpact'] as Map<String, dynamic>;
-      expect(byImpact['critical'], 1);
-      expect(byImpact['high'], 2);
+      expect(byImpact['error'], 1);
+      expect(byImpact['warning'], 2);
     });
 
     test('severity uses lowercase values', () {
       final violations = <LintImpact, List<ViolationRecord>>{
-        LintImpact.critical: [
+        LintImpact.error: [
           _violation(rule: 'test_rule', file: 'lib/a.dart', line: 1),
         ],
       };
@@ -728,14 +728,14 @@ void main() {
     test('summary includes byRuleType and byRuleStatus', () {
       final byRule = {'avoid_hardcoded_credentials': 2, 'prefer_const': 3};
       final violations = <LintImpact, List<ViolationRecord>>{
-        LintImpact.critical: [
+        LintImpact.error: [
           _violation(
             rule: 'avoid_hardcoded_credentials',
             file: 'lib/auth.dart',
             line: 5,
           ),
         ],
-        LintImpact.low: [
+        LintImpact.info: [
           _violation(rule: 'prefer_const', file: 'lib/ui.dart', line: 10),
         ],
       };
@@ -762,7 +762,7 @@ void main() {
       );
 
       final violations = <LintImpact, List<ViolationRecord>>{
-        LintImpact.medium: [
+        LintImpact.warning: [
           _violation(rule: 'prefer_const', file: 'lib/ui.dart', line: 10),
         ],
       };
@@ -783,8 +783,8 @@ void main() {
       expect(newCode['totalViolations'], 1);
 
       final byImpact = newCode['byImpact'] as Map<String, dynamic>;
-      expect(byImpact['medium'], 1);
-      expect(byImpact['critical'], 0);
+      expect(byImpact['warning'], 1);
+      expect(byImpact['error'], 0);
     });
 
     test('summary ruleSeverities uses lowercase values', () {

@@ -97,7 +97,9 @@ class ReportConsolidator {
       try {
         final content = sessionFile.readAsStringSync().trim();
         if (content.isNotEmpty) return content;
-      } catch (e, st) {
+        // Catch on Object (not bare): excludes synchronous control-flow
+        // exceptions like OutOfMemoryError that should propagate.
+      } on Object catch (e, st) {
         developer.log(
           'initSession read session file failed',
           name: 'saropa_lints',
@@ -167,7 +169,9 @@ class ReportConsolidator {
       if (batchDir.existsSync()) {
         batchDir.deleteSync(recursive: true);
       }
-    } catch (e, st) {
+      // Catch on Object (not bare): cleanup is non-critical, but bare catch
+      // would also swallow OutOfMemoryError / StackOverflowError.
+    } on Object catch (e, st) {
       developer.log(
         'cleanupSession failed',
         name: 'saropa_lints',
@@ -200,7 +204,9 @@ class ReportConsolidator {
       if (batchDir.existsSync()) {
         batchDir.deleteSync(recursive: true);
       }
-    } catch (e, st) {
+      // Catch on Object: stale-session cleanup is best-effort; we still
+      // want fatal errors (OOM, stack overflow) to propagate.
+    } on Object catch (e, st) {
       developer.log(
         '_cleanupStaleSessions failed',
         name: 'saropa_lints',
@@ -258,7 +264,9 @@ class ReportConsolidator {
           final content = entity.readAsStringSync();
           final batch = BatchData.fromJsonString(content);
           if (batch != null) batches.add(batch);
-        } catch (e, st) {
+          // Catch on Object: a corrupt or locked batch file should be
+          // skipped, but a fatal VM error should still propagate.
+        } on Object catch (e, st) {
           developer.log(
             '_readAllBatches batch file read failed',
             name: 'saropa_lints',
@@ -268,7 +276,9 @@ class ReportConsolidator {
           // Skip corrupted or locked files.
         }
       }
-    } catch (e, st) {
+      // Catch on Object: directory listing failure returns what we have,
+      // but fatal VM errors must still propagate.
+    } on Object catch (e, st) {
       developer.log(
         '_readAllBatches list directory failed',
         name: 'saropa_lints',

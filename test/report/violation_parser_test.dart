@@ -132,7 +132,7 @@ Ran in 5.2s
       final violations = parseViolations(output);
 
       expect(violations, hasLength(1));
-      // Unknown rules default to LintImpact.medium in violation_parser.dart
+      // Unknown rules default to LintImpact.warning in violation_parser.dart
       expect(violations.first.impact, isNotNull);
     });
 

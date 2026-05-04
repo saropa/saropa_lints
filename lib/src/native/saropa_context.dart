@@ -55,11 +55,15 @@ class SaropaContext {
 
   // Keep timing overhead opt-in: only measure callback execution when
   // profiling or report generation was explicitly enabled by the user.
+  // Explicit defaults silence avoid_string_env_parsing: when neither
+  // --dart-define is set, we want timing OFF — make that intent visible
+  // rather than relying on the implicit type-default.
   static const bool _timingEnabled =
-      bool.fromEnvironment('SAROPA_LINTS_PROFILE') ||
-      bool.fromEnvironment('SAROPA_LINTS_REPORT') ||
-      String.fromEnvironment('SAROPA_LINTS_PROFILE') == 'true' ||
-      String.fromEnvironment('SAROPA_LINTS_REPORT') == 'true';
+      bool.fromEnvironment('SAROPA_LINTS_PROFILE', defaultValue: false) ||
+      bool.fromEnvironment('SAROPA_LINTS_REPORT', defaultValue: false) ||
+      String.fromEnvironment('SAROPA_LINTS_PROFILE', defaultValue: '') ==
+          'true' ||
+      String.fromEnvironment('SAROPA_LINTS_REPORT', defaultValue: '') == 'true';
   static const int _slowRuleThresholdMs = 10;
 
   // ===========================================================================
@@ -84,9 +88,22 @@ class SaropaContext {
   /// false positives). Files under `/rules/` or `/fixes/` directories contain
   /// detection patterns as string literals that would otherwise trigger the
   /// very rules that define them.
+  ///
+  /// Also covers plugin internals under `/lib/src/native/` and
+  /// `/lib/src/report/` — these host analyzer integration, telemetry, and
+  /// CLI-style report writers. They legitimately use sync I/O, bare
+  /// `Platform.is*` checks, and method names that collide with
+  /// permission-gated APIs (e.g. `RuleTimingTracker.record`). Treating them
+  /// as plugin source removes ~30 self-firing diagnostics that the
+  /// per-rule `isFlutterProject`/web-guard gates miss when the plugin is
+  /// analyzed in VS Code (which bypasses `analyzer.exclude` for the
+  /// currently-opened file).
   bool get isLintPluginSource {
     final normalized = filePath.replaceAll('\\', '/');
-    return normalized.contains('/rules/') || normalized.contains('/fixes/');
+    return normalized.contains('/rules/') ||
+        normalized.contains('/fixes/') ||
+        normalized.contains('/lib/src/native/') ||
+        normalized.contains('/lib/src/report/');
   }
 
   /// Whether the current file lives directly under the package's `bin/`

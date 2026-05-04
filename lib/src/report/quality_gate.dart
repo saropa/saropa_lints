@@ -283,14 +283,17 @@ class QualityGateEvaluator {
         (newCode['byRuleStatus'] as Map?) ?? const <String, dynamic>{};
 
     switch (metric) {
-      case 'new_critical_issues':
-        return _asNum(newByImpact['critical']);
-      case 'new_high_issues':
-        return _asNum(newByImpact['high']);
-      case 'new_medium_issues':
-        return _asNum(newByImpact['medium']);
-      case 'new_low_issues':
-        return _asNum(newByImpact['low']);
+      // New severity-keyed metrics (post-LintImpact-collapse, 2026-05-03).
+      case 'new_errors':
+      case 'new_critical_issues': // Back-compat alias for the old 5-bucket name.
+        return _asNum(newByImpact['error']);
+      case 'new_warnings':
+      case 'new_high_issues': // Back-compat alias.
+      case 'new_medium_issues': // Back-compat alias (medium merged into warning).
+        return _asNum(newByImpact['warning']);
+      case 'new_info':
+      case 'new_low_issues': // Back-compat alias (low merged into info).
+        return _asNum(newByImpact['info']);
       case 'new_vulnerabilities':
         return _asNum(newByRuleType['vulnerability']);
       case 'new_security_hotspots':
@@ -299,14 +302,16 @@ class QualityGateEvaluator {
         return _asNum(newByRuleType['codeSmell']);
       case 'new_bugs':
         return _asNum(newByRuleType['bug']);
-      case 'overall_critical_issues':
-        return _asNum(byImpact['critical']);
-      case 'overall_high_issues':
-        return _asNum(byImpact['high']);
-      case 'overall_medium_issues':
-        return _asNum(byImpact['medium']);
-      case 'overall_low_issues':
-        return _asNum(byImpact['low']);
+      case 'overall_errors':
+      case 'overall_critical_issues': // Back-compat alias.
+        return _asNum(byImpact['error']);
+      case 'overall_warnings':
+      case 'overall_high_issues': // Back-compat alias.
+      case 'overall_medium_issues': // Back-compat alias.
+        return _asNum(byImpact['warning']);
+      case 'overall_info':
+      case 'overall_low_issues': // Back-compat alias.
+        return _asNum(byImpact['info']);
       case 'overall_vulnerabilities':
         return _asNum(byRuleType['vulnerability']);
       case 'overall_security_hotspots':

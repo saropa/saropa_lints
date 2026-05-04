@@ -56,6 +56,10 @@ void main() {
     });
 
     test('fails when fail-threshold breaches', () {
+      // Verifies both: (1) the new severity-keyed JSON schema (`error` rather
+      // than `critical`) and (2) the back-compat metric alias
+      // `new_critical_issues` from the impact-taxonomy collapse on
+      // 2026-05-03 — config files written before the collapse keep working.
       final config = QualityGateConfig(
         conditions: const <QualityGateCondition>[
           QualityGateCondition(
@@ -68,7 +72,7 @@ void main() {
       );
 
       final result = QualityGateEvaluator.evaluate(
-        summary: _summary(newByImpact: const {'critical': 2}),
+        summary: _summary(newByImpact: const {'error': 2}),
         config: config,
       );
 

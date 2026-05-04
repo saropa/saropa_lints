@@ -44,7 +44,7 @@ List<Violation> parseViolations(String output) {
     final rule = g5;
 
     // Look up impact for this rule
-    final impact = _ruleImpacts[rule] ?? LintImpact.medium;
+    final impact = _ruleImpacts[rule] ?? LintImpact.warning;
 
     violations.add(
       Violation(
@@ -94,7 +94,7 @@ List<Violation> parseDartAnalyzeHumanOutput(String output) {
       continue;
     }
 
-    final impact = _ruleImpacts[rule] ?? LintImpact.medium;
+    final impact = _ruleImpacts[rule] ?? LintImpact.warning;
 
     violations.add(
       Violation(

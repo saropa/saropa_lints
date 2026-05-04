@@ -1,7 +1,7 @@
 #!/usr/bin/env dart
 // ignore_for_file: avoid_print
 
-// CLI tool to run dart analyze and display impact summary.
+// CLI tool to run dart analyze and display severity summary.
 //
 // Usage:
 //   dart run saropa_lints:impact_report [path]
@@ -10,8 +10,8 @@
 // This tool:
 // 1. Runs `dart analyze` on your project
 // 2. Parses the output to extract violations
-// 3. Displays a summary grouped by impact level
-// 4. Shows critical issues first
+// 3. Displays a summary grouped by severity (error / warning / info)
+// 4. Shows errors first
 
 import 'dart:io';
 
@@ -31,7 +31,6 @@ Future<void> main(List<String> args) async {
   print('Running lint analysis...');
   print('');
 
-  // Run dart analyze
   final result = await Process.run(
     'dart',
     ['analyze'],
@@ -48,30 +47,26 @@ Future<void> main(List<String> args) async {
     exit(1);
   }
 
-  // Parse violations
   final violations = parseViolations(output);
 
   if (violations.isEmpty) {
     print('No issues found!');
     print('');
-    print('Impact Summary');
-    print('==============');
-    print('CRITICAL: 0');
-    print('HIGH:     0');
-    print('MEDIUM:   0');
-    print('LOW:      0');
-    print('OPINIONATED: 0');
+    print('Severity Summary');
+    print('================');
+    print('ERRORS:   0');
+    print('WARNINGS: 0');
+    print('INFO:     0');
 
     return;
   }
 
-  // Group by impact
+  // Group by severity (3 buckets — error/warning/info — collapsed from the
+  // prior 5-bucket impact taxonomy on 2026-05-03).
   final byImpact = <LintImpact, List<Violation>>{
-    LintImpact.critical: [],
-    LintImpact.high: [],
-    LintImpact.medium: [],
-    LintImpact.low: [],
-    LintImpact.opinionated: [],
+    LintImpact.error: [],
+    LintImpact.warning: [],
+    LintImpact.info: [],
   };
 
   for (final v in violations) {
@@ -82,7 +77,7 @@ Future<void> main(List<String> args) async {
     }
   }
 
-  // Print violations sorted by impact (critical first)
+  // Print violations sorted by severity (errors first).
   var printed = false;
   for (final impact in LintImpact.values) {
     final list = byImpact[impact] ?? [];
@@ -98,72 +93,57 @@ Future<void> main(List<String> args) async {
     }
   }
 
-  // Print summary
   print('');
-  print('Impact Summary');
-  print('==============');
+  print('Severity Summary');
+  print('================');
 
-  final criticalCount = (byImpact[LintImpact.critical] ?? []).length;
-  final highCount = (byImpact[LintImpact.high] ?? []).length;
-  final mediumCount = (byImpact[LintImpact.medium] ?? []).length;
-  final lowCount = (byImpact[LintImpact.low] ?? []).length;
-  final opinionatedCount = (byImpact[LintImpact.opinionated] ?? []).length;
+  final errorCount = (byImpact[LintImpact.error] ?? []).length;
+  final warningCount = (byImpact[LintImpact.warning] ?? []).length;
+  final infoCount = (byImpact[LintImpact.info] ?? []).length;
 
-  if (criticalCount > 0) {
-    print('CRITICAL: $criticalCount (fix immediately!)');
+  if (errorCount > 0) {
+    print('ERRORS:   $errorCount (must fix)');
   } else {
-    print('CRITICAL: 0');
+    print('ERRORS:   0');
   }
 
-  if (highCount > 0) {
-    print('HIGH:     $highCount (address soon)');
+  if (warningCount > 0) {
+    print('WARNINGS: $warningCount (could fail or look bad)');
   } else {
-    print('HIGH:     0');
+    print('WARNINGS: 0');
   }
 
-  if (mediumCount > 0) {
-    print('MEDIUM:   $mediumCount (tech debt)');
+  if (infoCount > 0) {
+    print('INFO:     $infoCount (FYI)');
   } else {
-    print('MEDIUM:   0');
-  }
-
-  if (lowCount > 0) {
-    print('LOW:      $lowCount (style)');
-  } else {
-    print('LOW:      0');
-  }
-
-  if (opinionatedCount > 0) {
-    print('OPINIONATED: $opinionatedCount (style)');
-  } else {
-    print('OPINIONATED: 0');
+    print('INFO:     0');
   }
 
   print('');
   print('Total: ${violations.length} issues');
 
-  // Exit with code = number of critical issues (capped)
-  if (criticalCount > 0) {
+  // Exit with code = number of errors (capped at 125 to fit a POSIX byte).
+  if (errorCount > 0) {
     print('');
-    print('WARNING: $criticalCount critical issue(s) found!');
-    exit(criticalCount > 125 ? 125 : criticalCount);
+    print('$errorCount error(s) found.');
+    exit(errorCount > 125 ? 125 : errorCount);
   }
 }
 
 void _printUsage() {
-  print('saropa_lints Impact Report');
+  print('saropa_lints Severity Report');
   print('');
   print('Usage: dart run saropa_lints:impact_report [path]');
   print('');
-  print('Runs dart analyze and displays results grouped by impact level.');
-  print('Critical issues are shown first, followed by high, medium, and low.');
+  print('Runs dart analyze and displays results grouped by severity.');
+  print('Errors are shown first, then warnings, then info.');
   print('');
   print('Options:');
   print('  --help, -h    Show this help message');
   print('');
   print('Exit codes:');
-  print('  0             No critical issues');
-  print('  1-125         Number of critical issues found');
+  print('  0             No errors');
+  print('  1-125         Number of errors found');
   print('');
   print('Example:');
   print('  dart run saropa_lints:impact_report');
