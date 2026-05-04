@@ -444,9 +444,7 @@ void main() {
 
     test('summary counts match violation data', () {
       final violations = <LintImpact, List<ViolationRecord>>{
-        LintImpact.error: [
-          _violation(rule: 'r1', file: 'lib/a.dart', line: 1),
-        ],
+        LintImpact.error: [_violation(rule: 'r1', file: 'lib/a.dart', line: 1)],
         LintImpact.warning: [
           _violation(rule: 'r2', file: 'lib/b.dart', line: 2),
           _violation(rule: 'r3', file: 'lib/c.dart', line: 3),

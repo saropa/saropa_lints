@@ -108,9 +108,7 @@ class _GradientVisitor extends GeneralizingAstVisitor<void> {
   // Sources: ShaderMask.shaderCallback, ImageFiltered/ColorFiltered shader
   // builders, RawImage.shaderCallback, custom widgets that follow the
   // ShaderCallback (Shader Function(Rect)) signature convention.
-  static const Set<String> _paintTimeCallbackNames = <String>{
-    'shaderCallback',
-  };
+  static const Set<String> _paintTimeCallbackNames = <String>{'shaderCallback'};
 
   @override
   void visitFunctionExpression(FunctionExpression node) {

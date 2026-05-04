@@ -141,9 +141,7 @@ class _CountingGradientVisitor extends GeneralizingAstVisitor<void> {
     'SweepGradient',
   };
 
-  static const Set<String> _paintTimeCallbackNames = <String>{
-    'shaderCallback',
-  };
+  static const Set<String> _paintTimeCallbackNames = <String>{'shaderCallback'};
 
   @override
   void visitFunctionExpression(FunctionExpression node) {
@@ -160,8 +158,7 @@ class _CountingGradientVisitor extends GeneralizingAstVisitor<void> {
     final String typeName =
         node.constructorName.type.element?.name ??
         node.constructorName.type.name.lexeme;
-    if (_gradientTypes.contains(typeName) &&
-        node.keyword?.lexeme != 'const') {
+    if (_gradientTypes.contains(typeName) && node.keyword?.lexeme != 'const') {
       reported = true;
     }
     super.visitInstanceCreationExpression(node);

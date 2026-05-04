@@ -73,7 +73,9 @@ void main() {
       }
 
       final priorities = violations
-          .map((v) => ImportGraphTracker.getPriority(v.file, LintImpact.warning))
+          .map(
+            (v) => ImportGraphTracker.getPriority(v.file, LintImpact.warning),
+          )
           .toList(growable: false);
       priorities.sort((a, b) => b.compareTo(a));
       swPriority.stop();

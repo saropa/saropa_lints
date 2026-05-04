@@ -271,10 +271,7 @@ void main() {
         ),
         isTrue,
       );
-      expect(
-        _argsHaveSearchIndexContext("'searchindex', 'a|b|c'"),
-        isTrue,
-      );
+      expect(_argsHaveSearchIndexContext("'searchindex', 'a|b|c'"), isTrue);
       expect(
         _argsHaveSearchIndexContext('companion(searchindexes: value(x))'),
         isTrue,

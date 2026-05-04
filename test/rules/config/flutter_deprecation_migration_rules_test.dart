@@ -64,7 +64,10 @@ void main() {
         AvoidDeprecatedUseMaterial3CopyWithRule().impact,
         LintImpact.warning,
       );
-      expect(AvoidDeprecatedOnSurfaceDestroyedRule().impact, LintImpact.warning);
+      expect(
+        AvoidDeprecatedOnSurfaceDestroyedRule().impact,
+        LintImpact.warning,
+      );
     });
   });
 

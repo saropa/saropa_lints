@@ -155,7 +155,10 @@ void main() {
         AvoidRemovedCyclicInitializationErrorRule().impact,
         LintImpact.warning,
       );
-      expect(AvoidRemovedBidirectionalIteratorRule().impact, LintImpact.warning);
+      expect(
+        AvoidRemovedBidirectionalIteratorRule().impact,
+        LintImpact.warning,
+      );
       expect(AvoidDeprecatedHasNextIteratorRule().impact, LintImpact.warning);
     });
 
