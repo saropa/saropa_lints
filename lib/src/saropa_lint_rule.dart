@@ -3091,7 +3091,8 @@ class SaropaDiagnosticReporter {
         // scan command parses with parseString); fall back to the
         // currentUnit-supplied path in that narrow case so suppression
         // and tracker records still carry a usable file string.
-        final path = root.declaredFragment?.source.fullName ??
+        final path =
+            root.declaredFragment?.source.fullName ??
             _ruleContext.currentUnit?.file.path;
         if (path != null) return (path: path, line: line);
       }
@@ -3181,11 +3182,7 @@ class SaropaDiagnosticReporter {
   /// [node] threads through so suppression records are computed against
   /// the same CompilationUnit as the violation would have been (keeps
   /// suppression line numbers comparable to violation line numbers).
-  void _trackSuppression(
-    int offset,
-    SuppressionKind kind, {
-    AstNode? node,
-  }) {
+  void _trackSuppression(int offset, SuppressionKind kind, {AstNode? node}) {
     final loc = _resolveLocation(offset, node);
     if (loc == null) return;
 
