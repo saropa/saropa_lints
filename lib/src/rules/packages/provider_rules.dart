@@ -43,7 +43,7 @@ class AvoidWatchInCallbacksRule extends SaropaLintRule {
 
   /// Significant issue. Address when count exceeds 10.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -113,7 +113,7 @@ class RequireUpdateShouldNotifyRule extends SaropaLintRule {
 
   /// Significant issue. Address when count exceeds 10.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -205,7 +205,7 @@ class AvoidProviderOfInBuildRule extends SaropaLintRule {
 
   /// Significant issue. Address when count exceeds 10.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -316,7 +316,7 @@ class AvoidProviderRecreateRule extends SaropaLintRule {
 
   /// Significant issue. Address when count exceeds 10.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -423,7 +423,7 @@ class AvoidProviderInWidgetRule extends SaropaLintRule {
 
   /// Significant issue. Address when count exceeds 10.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -531,7 +531,7 @@ class AvoidChangeNotifierInWidgetRule extends SaropaLintRule {
 
   /// Significant issue. Address when count exceeds 10.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -636,7 +636,7 @@ class RequireProviderDisposeRule extends SaropaLintRule {
 
   /// Significant issue. Address when count exceeds 10.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -737,7 +737,7 @@ class RequireMultiProviderRule extends SaropaLintRule {
   RequireMultiProviderRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -841,7 +841,7 @@ class AvoidNestedProvidersRule extends SaropaLintRule {
   AvoidNestedProvidersRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -975,7 +975,7 @@ class PreferMultiProviderRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1070,7 +1070,7 @@ class AvoidInstantiatingInValueProviderRule extends SaropaLintRule {
 
   /// Critical - lifecycle management issue.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1086,7 +1086,7 @@ class AvoidInstantiatingInValueProviderRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'avoid_instantiating_in_value_provider',
-    '[avoid_instantiating_in_value_provider] Creating a new instance inside Provider.value prevents proper lifecycle management, leading to memory leaks, resource retention, and unpredictable behavior. This is a critical issue for stateful objects like ChangeNotifiers and ValueListenables. {v2}',
+    '[avoid_instantiating_in_value_provider] Creating a new instance inside Provider.value prevents proper lifecycle management, leading to memory leaks, resource retention, and unpredictable behavior. Stateful objects like ChangeNotifiers and ValueListenables suffer most because their dispose() never runs when the framework does not own instantiation. {v2}',
     correctionMessage:
         'Always use Provider(create: ...) to create new instances, or pass an existing instance variable to Provider.value. Never instantiate objects directly inside Provider.value.',
     severity: DiagnosticSeverity.ERROR,
@@ -1157,7 +1157,7 @@ class DisposeProvidersRule extends SaropaLintRule {
 
   /// High impact - memory leak prevention.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1237,7 +1237,7 @@ class PreferProviderExtensionsRule extends SaropaLintRule {
   PreferProviderExtensionsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1311,7 +1311,7 @@ class DisposeProvidedInstancesRule extends SaropaLintRule {
   DisposeProvidedInstancesRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1417,7 +1417,7 @@ class PreferNullableProviderTypesRule extends SaropaLintRule {
   PreferNullableProviderTypesRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1522,7 +1522,7 @@ class PreferConsumerOverProviderOfRule extends SaropaLintRule {
 
   /// Provider.of causes unnecessary rebuilds compared to Consumer.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1591,7 +1591,7 @@ class RequireProviderGenericTypeRule extends SaropaLintRule {
   RequireProviderGenericTypeRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1664,7 +1664,7 @@ class AvoidProviderInInitStateRule extends SaropaLintRule {
   AvoidProviderInInitStateRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1763,7 +1763,7 @@ class PreferContextReadInCallbacksRule extends SaropaLintRule {
   ];
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1864,7 +1864,7 @@ class PreferProxyProviderRule extends SaropaLintRule {
   PreferProxyProviderRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1997,7 +1997,7 @@ class RequireUpdateCallbackRule extends SaropaLintRule {
   RequireUpdateCallbackRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2144,7 +2144,7 @@ class PreferSelectorOverConsumerRule extends SaropaLintRule {
   PreferSelectorOverConsumerRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2247,7 +2247,7 @@ class AvoidProviderValueRebuildRule extends SaropaLintRule {
 
   /// Significant issue. Address when count exceeds 10.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2334,7 +2334,7 @@ class PreferChangeNotifierProxyRule extends SaropaLintRule {
 
   /// Performance issue. Causes unnecessary rebuilds.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2476,7 +2476,7 @@ class PreferSelectorWidgetRule extends SaropaLintRule {
 
   /// Performance improvement suggestion.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2586,7 +2586,7 @@ class PreferChangeNotifierProxyProviderRule extends SaropaLintRule {
   PreferChangeNotifierProxyProviderRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2669,7 +2669,7 @@ class AvoidProviderListenFalseInBuildRule extends SaropaLintRule {
   AvoidProviderListenFalseInBuildRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2741,7 +2741,7 @@ class RequireProviderUpdateShouldNotifyRule extends SaropaLintRule {
   RequireProviderUpdateShouldNotifyRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

@@ -104,7 +104,7 @@ class PreferDedicatedMediaQueryMethodRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -183,7 +183,7 @@ class PreferEnumsByNameRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -264,7 +264,7 @@ class PreferExtractingFunctionCallbacksRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -335,7 +335,7 @@ class PreferNullAwareSpreadRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -432,7 +432,7 @@ class PreferVisibleForTestingOnMembersRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -530,7 +530,7 @@ class PreferAnyOrEveryRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -602,7 +602,7 @@ class PreferForInRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -707,7 +707,7 @@ class PreferBytesBuilderRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -768,7 +768,7 @@ class PreferPushingConditionalExpressionsRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -851,7 +851,7 @@ class PreferShorthandsWithConstructorsRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -925,7 +925,7 @@ class PreferShorthandsWithEnumsRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -989,7 +989,7 @@ class PreferShorthandsWithStaticFieldsRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1118,7 +1118,7 @@ class PassOptionalArgumentRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1289,7 +1289,7 @@ class PreferTestMatchersRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1403,7 +1403,7 @@ class PreferUnwrappingFutureOrRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1614,7 +1614,7 @@ class PreferTypedefsForCallbacksRule extends SaropaLintRule {
   PreferTypedefsForCallbacksRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1674,7 +1674,7 @@ class PreferRedirectingSuperclassConstructorRule extends SaropaLintRule {
   PreferRedirectingSuperclassConstructorRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1751,7 +1751,7 @@ class PreferUsePrefixRule extends SaropaLintRule {
   PreferUsePrefixRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1887,7 +1887,7 @@ class PreferDotShorthandRule extends SaropaLintRule {
 
   /// Code style preference.
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1995,7 +1995,7 @@ class NoBooleanLiteralCompareRule extends SaropaLintRule {
 
   /// Code style improvement.
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2103,7 +2103,7 @@ class PreferReturningConditionalExpressionsRule extends SaropaLintRule {
 
   /// Code quality improvement. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2207,7 +2207,7 @@ class PreferNamedBoolParamsRule extends SaropaLintRule {
   PreferNamedBoolParamsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

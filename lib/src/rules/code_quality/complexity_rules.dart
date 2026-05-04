@@ -37,7 +37,7 @@ class AvoidBitwiseOperatorsWithBooleansRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -112,7 +112,7 @@ class AvoidCascadeAfterIfNullRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -178,7 +178,7 @@ class AvoidComplexArithmeticExpressionsRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -264,7 +264,7 @@ class AvoidComplexConditionsRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -358,7 +358,7 @@ class AvoidDuplicateCascadesRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -431,7 +431,7 @@ class AvoidExcessiveExpressionsRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -596,7 +596,7 @@ class AvoidImmediatelyInvokedFunctionsRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -649,7 +649,7 @@ class AvoidNestedShorthandsRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -725,7 +725,7 @@ class AvoidMultiAssignmentRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -771,7 +771,7 @@ class BinaryExpressionOperandOrderRule extends SaropaLintRule {
 
   /// Stylistic preference only. No performance or correctness benefit.
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -828,7 +828,7 @@ class PreferMovingToVariableRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -923,7 +923,7 @@ class PreferParenthesesWithIfNullRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1026,7 +1026,7 @@ class AvoidDeepNestingRule extends SaropaLintRule {
   AvoidDeepNestingRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1132,7 +1132,7 @@ class AvoidHighCyclomaticComplexityRule extends SaropaLintRule {
   AvoidHighCyclomaticComplexityRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

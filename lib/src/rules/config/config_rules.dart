@@ -42,7 +42,7 @@ class AvoidHardcodedConfigRule extends SaropaLintRule {
   AvoidHardcodedConfigRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -182,7 +182,7 @@ class AvoidHardcodedConfigTestRule extends SaropaLintRule {
   AvoidHardcodedConfigTestRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -294,7 +294,7 @@ class AvoidMixedEnvironmentsRule extends SaropaLintRule {
   AvoidMixedEnvironmentsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -412,7 +412,7 @@ class RequireFeatureFlagTypeSafetyRule extends SaropaLintRule {
   RequireFeatureFlagTypeSafetyRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -538,7 +538,7 @@ class AvoidStringEnvParsingRule extends SaropaLintRule {
 
   /// Missing defaults cause subtle production bugs.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -625,7 +625,7 @@ class AvoidPlatformSpecificImportsRule extends SaropaLintRule {
 
   /// Platform incompatibilities block entire build targets.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -714,7 +714,7 @@ class PreferSemverVersionRule extends SaropaLintRule {
   PreferSemverVersionRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -779,7 +779,7 @@ class PreferCompileTimeConfigRule extends SaropaLintRule {
   PreferCompileTimeConfigRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -816,7 +816,7 @@ class PreferFlavorConfigurationRule extends SaropaLintRule {
   PreferFlavorConfigurationRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -852,7 +852,7 @@ class RequireConfigValidationRule extends SaropaLintRule {
   RequireConfigValidationRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -896,7 +896,7 @@ class PackageNamesRule extends SaropaLintRule {
   PackageNamesRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1001,7 +1001,7 @@ class SortPubDependenciesRule extends SaropaLintRule {
   SortPubDependenciesRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1141,7 +1141,7 @@ class SecurePubspecUrlsRule extends SaropaLintRule {
   SecurePubspecUrlsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   /// Security-sensitive — insecure dependency URLs enable MITM attacks.
   /// Classified as hotspot: http:// in homepage/description is benign,

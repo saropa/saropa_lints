@@ -46,7 +46,7 @@ class AvoidShrinkWrapInScrollViewRule extends SaropaLintRule {
   AvoidShrinkWrapInScrollViewRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -206,7 +206,7 @@ class AvoidNestedScrollablesConflictRule extends SaropaLintRule {
   AvoidNestedScrollablesConflictRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -383,7 +383,7 @@ class AvoidListViewChildrenForLargeListsRule extends SaropaLintRule {
   AvoidListViewChildrenForLargeListsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -459,7 +459,7 @@ class AvoidExcessiveBottomNavItemsRule extends SaropaLintRule {
   AvoidExcessiveBottomNavItemsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -543,7 +543,7 @@ class RequireTabControllerLengthSyncRule extends SaropaLintRule {
   RequireTabControllerLengthSyncRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -670,7 +670,7 @@ class AvoidRefreshWithoutAwaitRule extends SaropaLintRule {
   AvoidRefreshWithoutAwaitRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -748,7 +748,7 @@ class AvoidMultipleAutofocusRule extends SaropaLintRule {
   AvoidMultipleAutofocusRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -839,7 +839,7 @@ class RequireRefreshIndicatorOnListsRule extends SaropaLintRule {
 
   /// UX improvement - standard mobile pattern.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -936,7 +936,7 @@ class AvoidShrinkWrapExpensiveRule extends SaropaLintRule {
   AvoidShrinkWrapExpensiveRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1056,7 +1056,7 @@ class PreferItemExtentRule extends SaropaLintRule {
   PreferItemExtentRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1139,7 +1139,7 @@ class PreferPrototypeItemRule extends SaropaLintRule {
   PreferPrototypeItemRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1227,7 +1227,7 @@ class RequireKeyForReorderableRule extends SaropaLintRule {
   RequireKeyForReorderableRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1406,7 +1406,7 @@ class RequireAddAutomaticKeepAlivesOffRule extends SaropaLintRule {
   ];
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1513,7 +1513,7 @@ class PreferSliverFillRemainingForEmptyRule extends SaropaLintRule {
   PreferSliverFillRemainingForEmptyRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1649,7 +1649,7 @@ class AvoidInfiniteScrollDuplicateRequestsRule extends SaropaLintRule {
   AvoidInfiniteScrollDuplicateRequestsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1747,7 +1747,7 @@ class PreferInfiniteScrollPreloadRule extends SaropaLintRule {
   PreferInfiniteScrollPreloadRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1853,7 +1853,7 @@ class RequirePaginationForLargeListsRule extends SaropaLintRule {
   RequirePaginationForLargeListsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1993,7 +1993,7 @@ class PreferCacheExtentRule extends SaropaLintRule {
   PreferCacheExtentRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2064,7 +2064,7 @@ class PreferSliverForMixedScrollRule extends SaropaLintRule {
   PreferSliverForMixedScrollRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

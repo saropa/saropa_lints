@@ -51,7 +51,7 @@ class AvoidIsarEnumFieldRule extends SaropaLintRule {
 
   /// Data corruption risk: renaming/reordering enums breaks persisted rows.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -231,7 +231,7 @@ class RequireIsarCollectionAnnotationRule extends SaropaLintRule {
   RequireIsarCollectionAnnotationRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -317,7 +317,7 @@ class RequireIsarIdFieldRule extends SaropaLintRule {
   RequireIsarIdFieldRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -411,7 +411,7 @@ class RequireIsarCloseOnDisposeRule extends SaropaLintRule {
   RequireIsarCloseOnDisposeRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -504,7 +504,7 @@ class PreferIsarAsyncWritesRule extends SaropaLintRule {
   PreferIsarAsyncWritesRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -575,7 +575,7 @@ class AvoidIsarTransactionNestingRule extends SaropaLintRule {
   AvoidIsarTransactionNestingRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -663,7 +663,7 @@ class PreferIsarBatchOperationsRule extends SaropaLintRule {
   PreferIsarBatchOperationsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -730,7 +730,7 @@ class AvoidIsarFloatEqualityQueriesRule extends SaropaLintRule {
   AvoidIsarFloatEqualityQueriesRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -795,7 +795,7 @@ class RequireIsarInspectorDebugOnlyRule extends SaropaLintRule {
   RequireIsarInspectorDebugOnlyRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -868,7 +868,7 @@ class AvoidIsarClearInProductionRule extends SaropaLintRule {
   AvoidIsarClearInProductionRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -944,7 +944,7 @@ class RequireIsarLinksLoadRule extends SaropaLintRule {
   RequireIsarLinksLoadRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1030,7 +1030,7 @@ class PreferIsarQueryStreamRule extends SaropaLintRule {
   PreferIsarQueryStreamRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1099,7 +1099,7 @@ class AvoidIsarWebLimitationsRule extends SaropaLintRule {
   AvoidIsarWebLimitationsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1176,7 +1176,7 @@ class PreferIsarIndexForQueriesRule extends SaropaLintRule {
   PreferIsarIndexForQueriesRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1252,7 +1252,7 @@ class AvoidIsarEmbeddedLargeObjectsRule extends SaropaLintRule {
   AvoidIsarEmbeddedLargeObjectsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1331,7 +1331,7 @@ class PreferIsarLazyLinksRule extends SaropaLintRule {
   PreferIsarLazyLinksRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1385,7 +1385,7 @@ class AvoidIsarSchemaBreakingChangesRule extends SaropaLintRule {
   AvoidIsarSchemaBreakingChangesRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1460,7 +1460,7 @@ class AvoidIsarSchemaBreakingChangesRule extends SaropaLintRule {
 //   RequireIsarNonNullableMigrationRule() : super(code: _code);
 
 //   @override
-//   LintImpact get impact => LintImpact.high;
+//   LintImpact get impact => LintImpact.warning;
 
 //   @override
 //   RuleCost get cost => RuleCost.medium;
@@ -1543,7 +1543,7 @@ class RequireIsarNullableFieldRule extends SaropaLintRule {
   RequireIsarNullableFieldRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1646,7 +1646,7 @@ class PreferIsarCompositeIndexRule extends SaropaLintRule {
   PreferIsarCompositeIndexRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1719,7 +1719,7 @@ class AvoidIsarStringContainsWithoutIndexRule extends SaropaLintRule {
   AvoidIsarStringContainsWithoutIndexRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1803,7 +1803,7 @@ class AvoidIsarStringContainsWithoutIndexRule extends SaropaLintRule {
 /// - (Planned) Will offer to inline the offending stream expression directly into the nearest StreamBuilder or listener.
 ///
 /// # Impact
-/// - LintImpact.high (runtime crash risk)
+/// - LintImpact.warning (runtime crash risk)
 /// - RuleCost.medium (simple pattern match, low analysis cost)
 ///
 /// # Aliases
@@ -1820,7 +1820,7 @@ class AvoidIsarStringContainsWithoutIndexRule extends SaropaLintRule {
 /// ```
 class AvoidCachedIsarStreamRule extends SaropaLintRule {
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1882,7 +1882,7 @@ class PreferIsarForComplexQueriesRule extends SaropaLintRule {
   PreferIsarForComplexQueriesRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

@@ -32,7 +32,7 @@ class AvoidImageRebuildOnScrollRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -142,7 +142,7 @@ class RequireAvatarFallbackRule extends SaropaLintRule {
 
   /// Significant issue. Address when count exceeds 10.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -232,7 +232,7 @@ class PreferVideoLoadingPlaceholderRule extends SaropaLintRule {
 
   /// Minor improvement. Track for later review.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -318,7 +318,7 @@ class PreferImageSizeConstraintsRule extends SaropaLintRule {
 
   /// Performance optimization.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -401,7 +401,7 @@ class RequireImageErrorFallbackRule extends SaropaLintRule {
   RequireImageErrorFallbackRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -479,7 +479,7 @@ class RequireImageLoadingPlaceholderRule extends SaropaLintRule {
   RequireImageLoadingPlaceholderRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -556,7 +556,7 @@ class RequireMediaLoadingStateRule extends SaropaLintRule {
   RequireMediaLoadingStateRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -654,7 +654,7 @@ class RequirePdfLoadingIndicatorRule extends SaropaLintRule {
   RequirePdfLoadingIndicatorRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -742,7 +742,7 @@ class PreferClipboardFeedbackRule extends SaropaLintRule {
   PreferClipboardFeedbackRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -838,7 +838,7 @@ class RequireCachedImageDimensionsRule extends SaropaLintRule {
   RequireCachedImageDimensionsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -914,7 +914,7 @@ class RequireCachedImagePlaceholderRule extends SaropaLintRule {
   RequireCachedImagePlaceholderRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -982,7 +982,7 @@ class RequireCachedImageErrorWidgetRule extends SaropaLintRule {
   RequireCachedImageErrorWidgetRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1064,7 +1064,7 @@ class RequireExifHandlingRule extends SaropaLintRule {
 
   /// Visual issue - images may display rotated.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1158,7 +1158,7 @@ class PreferCachedImageFadeAnimationRule extends SaropaLintRule {
 
   /// Low impact - style suggestion, not a bug.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1264,7 +1264,7 @@ class RequireImageStreamDisposeRule extends SaropaLintRule {
   RequireImageStreamDisposeRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1394,7 +1394,7 @@ class PreferImagePickerRequestFullMetadataRule extends SaropaLintRule {
 
   /// Privacy consideration - unnecessary metadata collection.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1497,7 +1497,7 @@ class AvoidImagePickerLargeFilesRule extends SaropaLintRule {
 
   /// Performance issue - large files waste bandwidth and memory.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1598,7 +1598,7 @@ class PreferCachedImageCacheManagerRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1669,7 +1669,7 @@ class RequireImageCacheDimensionsRule extends SaropaLintRule {
 
   /// Significant issue. Address when count exceeds 10.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1751,7 +1751,7 @@ class RequireCachedImageDevicePixelRatioRule extends SaropaLintRule {
   RequireCachedImageDevicePixelRatioRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1858,7 +1858,7 @@ class AvoidCachedImageUnboundedListRule extends SaropaLintRule {
   AvoidCachedImageUnboundedListRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1978,7 +1978,7 @@ class AvoidCachedImageWebRule extends SaropaLintRule {
   AvoidCachedImageWebRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2068,7 +2068,7 @@ class RequireImageMemoryCacheLimitRule extends SaropaLintRule {
   RequireImageMemoryCacheLimitRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

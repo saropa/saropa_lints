@@ -21,7 +21,7 @@ class AlwaysFailRule extends SaropaLintRule {
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -87,7 +87,7 @@ class AvoidDebugPrintRule extends SaropaLintRule {
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -170,7 +170,7 @@ class AvoidUnguardedDebugRule extends SaropaLintRule {
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -368,7 +368,7 @@ class PreferCommentingAnalyzerIgnoresRule extends SaropaLintRule {
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -516,7 +516,7 @@ class PreferDebugPrintRule extends SaropaLintRule {
   PreferDebugPrintRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -612,7 +612,7 @@ class AvoidPrintInReleaseRule extends SaropaLintRule {
   AvoidPrintInReleaseRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -708,7 +708,7 @@ class RequireStructuredLoggingRule extends SaropaLintRule {
   RequireStructuredLoggingRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -823,7 +823,7 @@ class AvoidSensitiveInLogsRule extends SaropaLintRule {
   ];
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1029,7 +1029,7 @@ class RequireLogLevelForProductionRule extends SaropaLintRule {
   RequireLogLevelForProductionRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1142,7 +1142,7 @@ class PreferConditionalLoggingRule extends SaropaLintRule {
   PreferConditionalLoggingRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1211,7 +1211,7 @@ class PreferLogLevelsRule extends SaropaLintRule {
   PreferLogLevelsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1297,7 +1297,7 @@ class PreferLogTimestampRule extends SaropaLintRule {
   PreferLogTimestampRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

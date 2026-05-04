@@ -57,7 +57,7 @@ class AvoidDriftEnumIndexReorderRule extends SaropaLintRule {
   AvoidDriftEnumIndexReorderRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -240,7 +240,7 @@ class RequireDriftDatabaseCloseRule extends SaropaLintRule {
   RequireDriftDatabaseCloseRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -338,7 +338,7 @@ class AvoidDriftUpdateWithoutWhereRule extends SaropaLintRule {
   AvoidDriftUpdateWithoutWhereRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -476,7 +476,7 @@ class AvoidDriftInsertMissingConflictTargetRule extends SaropaLintRule {
   AvoidDriftInsertMissingConflictTargetRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -868,7 +868,7 @@ class RequireAwaitInDriftTransactionRule extends SaropaLintRule {
   RequireAwaitInDriftTransactionRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1008,7 +1008,7 @@ class RequireDriftForeignKeyPragmaRule extends SaropaLintRule {
   RequireDriftForeignKeyPragmaRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1084,7 +1084,7 @@ class AvoidDriftRawSqlInterpolationRule extends SaropaLintRule {
   AvoidDriftRawSqlInterpolationRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1175,7 +1175,7 @@ class PreferDriftBatchOperationsRule extends SaropaLintRule {
   PreferDriftBatchOperationsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1288,7 +1288,7 @@ class RequireDriftStreamCancelRule extends SaropaLintRule {
   RequireDriftStreamCancelRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1384,7 +1384,7 @@ class AvoidDriftDatabaseOnMainIsolateRule extends SaropaLintRule {
   AvoidDriftDatabaseOnMainIsolateRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1482,7 +1482,7 @@ class AvoidDriftLogStatementsProductionRule extends SaropaLintRule {
   AvoidDriftLogStatementsProductionRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1552,7 +1552,7 @@ class AvoidDriftGetSingleWithoutUniqueRule extends SaropaLintRule {
   AvoidDriftGetSingleWithoutUniqueRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1633,7 +1633,7 @@ class PreferDriftUseColumnsFalseRule extends SaropaLintRule {
   PreferDriftUseColumnsFalseRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1718,7 +1718,7 @@ class AvoidDriftLazyDatabaseRule extends SaropaLintRule {
   AvoidDriftLazyDatabaseRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1796,7 +1796,7 @@ class PreferDriftIsolateSharingRule extends SaropaLintRule {
   PreferDriftIsolateSharingRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1891,7 +1891,7 @@ class AvoidDriftQueryInMigrationRule extends SaropaLintRule {
   AvoidDriftQueryInMigrationRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1994,7 +1994,7 @@ class RequireDriftSchemaVersionBumpRule extends SaropaLintRule {
   RequireDriftSchemaVersionBumpRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2099,7 +2099,7 @@ class AvoidDriftForeignKeyInMigrationRule extends SaropaLintRule {
   AvoidDriftForeignKeyInMigrationRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2187,7 +2187,7 @@ class RequireDriftReadsFromRule extends SaropaLintRule {
   RequireDriftReadsFromRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2266,7 +2266,7 @@ class AvoidDriftUnsafeWebStorageRule extends SaropaLintRule {
   AvoidDriftUnsafeWebStorageRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2347,7 +2347,7 @@ class AvoidDriftCloseStreamsInTestsRule extends SaropaLintRule {
   AvoidDriftCloseStreamsInTestsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2452,7 +2452,7 @@ class AvoidDriftNullableConverterMismatchRule extends SaropaLintRule {
   AvoidDriftNullableConverterMismatchRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2546,7 +2546,7 @@ class AvoidDriftValueNullVsAbsentRule extends SaropaLintRule {
   AvoidDriftValueNullVsAbsentRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2621,7 +2621,7 @@ class RequireDriftEqualsValueRule extends SaropaLintRule {
   RequireDriftEqualsValueRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2715,7 +2715,7 @@ class RequireDriftReadTableOrNullRule extends SaropaLintRule {
   RequireDriftReadTableOrNullRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2800,7 +2800,7 @@ class RequireDriftCreateAllInOnCreateRule extends SaropaLintRule {
   RequireDriftCreateAllInOnCreateRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2874,7 +2874,7 @@ class AvoidDriftValidateSchemaProductionRule extends SaropaLintRule {
   AvoidDriftValidateSchemaProductionRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2960,7 +2960,7 @@ class AvoidDriftReplaceWithoutAllColumnsRule extends SaropaLintRule {
   AvoidDriftReplaceWithoutAllColumnsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3038,7 +3038,7 @@ class AvoidDriftMissingUpdatesParamRule extends SaropaLintRule {
   AvoidDriftMissingUpdatesParamRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3130,7 +3130,7 @@ class AvoidIsarImportWithDriftRule extends SaropaLintRule {
   AvoidIsarImportWithDriftRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3219,7 +3219,7 @@ class PreferDriftForeignKeyDeclarationRule extends SaropaLintRule {
   PreferDriftForeignKeyDeclarationRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3344,7 +3344,7 @@ class RequireDriftOnUpgradeHandlerRule extends SaropaLintRule {
   RequireDriftOnUpgradeHandlerRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

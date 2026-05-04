@@ -62,7 +62,7 @@ class RequireGeolocatorBatteryAwarenessRule extends SaropaLintRule {
   RequireGeolocatorBatteryAwarenessRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -183,7 +183,7 @@ class PreferGeocodingCacheRule extends SaropaLintRule {
   PreferGeocodingCacheRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -275,7 +275,7 @@ class AvoidContinuousLocationUpdatesRule extends SaropaLintRule {
   AvoidContinuousLocationUpdatesRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -338,7 +338,7 @@ class AvoidGeolocatorBackgroundWithoutConfigRule extends SaropaLintRule {
   AvoidGeolocatorBackgroundWithoutConfigRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -430,7 +430,7 @@ class PreferGeolocationCoarseLocationRule extends SaropaLintRule {
   ];
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

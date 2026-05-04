@@ -49,7 +49,7 @@ class AvoidCollectionEqualityChecksRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -132,7 +132,7 @@ class AvoidDuplicateMapKeysRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -202,7 +202,7 @@ class AvoidMapKeysContainsRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -271,7 +271,7 @@ class AvoidUnnecessaryCollectionsRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -356,7 +356,7 @@ class AvoidUnsafeCollectionMethodsRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -950,7 +950,7 @@ class AvoidUnsafeReduceRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1024,7 +1024,7 @@ class PreferFoldOverReduceRule extends SaropaLintRule {
   List<String> get configAliases => const <String>['fold'];
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1093,7 +1093,7 @@ class PreferForeachRule extends SaropaLintRule {
   PreferForeachRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1159,7 +1159,7 @@ class PreferForeachOverMapEntriesRule extends SaropaLintRule {
   PreferForeachOverMapEntriesRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1221,7 +1221,7 @@ class PreferConstructorOverLiteralsRule extends SaropaLintRule {
   PreferConstructorOverLiteralsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1291,7 +1291,7 @@ class AvoidUnsafeWhereMethodsRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1383,7 +1383,7 @@ class PreferWhereOrNullRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1481,7 +1481,7 @@ class MapKeysOrderingRule extends SaropaLintRule {
   MapKeysOrderingRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1559,7 +1559,7 @@ class PreferContainsRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1633,7 +1633,7 @@ class PreferFirstRule extends SaropaLintRule {
   PreferFirstRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1779,7 +1779,7 @@ class PreferIterableOfRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1858,7 +1858,7 @@ class PreferLastRule extends SaropaLintRule {
   PreferLastRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1966,7 +1966,7 @@ class PreferAddAllRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2089,7 +2089,7 @@ class AvoidDuplicateNumberElementsRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2170,7 +2170,7 @@ class AvoidDuplicateStringElementsRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2250,7 +2250,7 @@ class AvoidDuplicateObjectElementsRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2314,7 +2314,7 @@ class RequireConstListItemsRule extends SaropaLintRule {
   RequireConstListItemsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2377,7 +2377,7 @@ class PreferAsmapOverIndexedIterationRule extends SaropaLintRule {
   PreferAsmapOverIndexedIterationRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2542,7 +2542,7 @@ class PreferSetForLookupRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2616,7 +2616,7 @@ class PreferCorrectForLoopIncrementRule extends SaropaLintRule {
   PreferCorrectForLoopIncrementRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2749,7 +2749,7 @@ class AvoidUnreachableForLoopRule extends SaropaLintRule {
   AvoidUnreachableForLoopRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2890,7 +2890,7 @@ class PreferNullAwareElementsRule extends SaropaLintRule {
 
   /// Code style improvement.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2984,7 +2984,7 @@ class PreferIterableOperationsRule extends SaropaLintRule {
 
   /// Performance improvement for large collections.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3069,7 +3069,7 @@ class RequireKeyForCollectionRule extends SaropaLintRule {
   RequireKeyForCollectionRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3213,7 +3213,7 @@ class AvoidFunctionLiteralsInForeachCallsRule extends SaropaLintRule {
   AvoidFunctionLiteralsInForeachCallsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3276,7 +3276,7 @@ class PreferInlinedAddsRule extends SaropaLintRule {
   PreferInlinedAddsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3365,7 +3365,7 @@ class PreferForElementsToMapFromIterableRule extends SaropaLintRule {
   PreferForElementsToMapFromIterableRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3470,7 +3470,7 @@ class NonConstantMapElementRule extends SaropaLintRule {
   NonConstantMapElementRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.bug;

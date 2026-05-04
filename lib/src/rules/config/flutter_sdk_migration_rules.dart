@@ -69,7 +69,7 @@ class PreferIterableCastRule extends SaropaLintRule {
   PreferIterableCastRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -223,7 +223,7 @@ class AvoidDeprecatedUseInheritedMediaQueryRule extends SaropaLintRule {
   AvoidDeprecatedUseInheritedMediaQueryRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -354,7 +354,7 @@ class PreferUtf8EncodeRule extends SaropaLintRule {
   PreferUtf8EncodeRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -494,7 +494,7 @@ class AvoidRemovedAppbarBackwardsCompatibilityRule extends SaropaLintRule {
   AvoidRemovedAppbarBackwardsCompatibilityRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -634,7 +634,7 @@ class PreferTypeSyncOverIsLinkSyncRule extends SaropaLintRule {
   PreferTypeSyncOverIsLinkSyncRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.bug;
@@ -780,7 +780,7 @@ class AvoidRemovedJsNumberToDartRule extends SaropaLintRule {
   AvoidRemovedJsNumberToDartRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -861,7 +861,7 @@ class PreferScrollbarThemeOfRule extends SaropaLintRule {
   PreferScrollbarThemeOfRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1005,7 +1005,7 @@ class AvoidLegacyJsBooleanReturnAssumptionsRule extends SaropaLintRule {
   static const Set<String> _targetMembers = {'typeofEquals', 'instanceof'};
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1083,7 +1083,7 @@ class PreferStringForTypeofEqualsRule extends SaropaLintRule {
   PreferStringForTypeofEqualsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1164,7 +1164,7 @@ class PreferIntForJsarrayWithLengthRule extends SaropaLintRule {
   PreferIntForJsarrayWithLengthRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

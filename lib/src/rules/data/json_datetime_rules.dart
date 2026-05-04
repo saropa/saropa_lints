@@ -37,7 +37,7 @@ class RequireJsonDecodeTryCatchRule extends SaropaLintRule {
   RequireJsonDecodeTryCatchRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -124,7 +124,7 @@ class AvoidDateTimeParseUnvalidatedRule extends SaropaLintRule {
   AvoidDateTimeParseUnvalidatedRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -205,7 +205,7 @@ class PreferTryParseForDynamicDataRule extends SaropaLintRule {
   PreferTryParseForDynamicDataRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -634,7 +634,7 @@ class PreferDurationConstantsRule extends SaropaLintRule {
 
   /// Stylistic preference only. No performance or correctness benefit.
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -723,7 +723,7 @@ class AvoidDatetimeNowInTestsRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -805,9 +805,9 @@ class AvoidDatetimeNowInTestsRule extends SaropaLintRule {
 class AvoidNotEncodableInToJsonRule extends SaropaLintRule {
   AvoidNotEncodableInToJsonRule() : super(code: _code);
 
-  /// Critical issue - causes runtime crashes when encoding JSON.
+  /// Non-encodable fields in toJson() cause runtime crashes during JSON encode.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1018,7 +1018,7 @@ class RequireDateFormatSpecificationRule extends SaropaLintRule {
   RequireDateFormatSpecificationRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1090,7 +1090,7 @@ class PreferIso8601DatesRule extends SaropaLintRule {
   PreferIso8601DatesRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1162,7 +1162,7 @@ class AvoidOptionalFieldCrashRule extends SaropaLintRule {
   AvoidOptionalFieldCrashRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1258,7 +1258,7 @@ class PreferExplicitJsonKeysRule extends SaropaLintRule {
   PreferExplicitJsonKeysRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1369,7 +1369,7 @@ class RequireJsonSchemaValidationRule extends SaropaLintRule {
   RequireJsonSchemaValidationRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1492,7 +1492,7 @@ class PreferJsonSerializableRule extends SaropaLintRule {
   PreferJsonSerializableRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1595,7 +1595,7 @@ class RequireTimezoneDisplayRule extends SaropaLintRule {
   RequireTimezoneDisplayRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1710,7 +1710,7 @@ class PreferCorrectJsonCastsRule extends SaropaLintRule {
   PreferCorrectJsonCastsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1762,7 +1762,7 @@ class PreferJsonCodegenRule extends SaropaLintRule {
   PreferJsonCodegenRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1835,7 +1835,7 @@ class RequireJsonDateFormatConsistencyRule extends SaropaLintRule {
   RequireJsonDateFormatConsistencyRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

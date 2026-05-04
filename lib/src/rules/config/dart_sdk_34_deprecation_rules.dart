@@ -70,7 +70,7 @@ class AvoidDeprecatedFileSystemDeleteEventIsDirectoryRule
   AvoidDeprecatedFileSystemDeleteEventIsDirectoryRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

@@ -79,7 +79,7 @@ class PreferIsNanOverNanEqualityRule extends SaropaLintRule {
   PreferIsNanOverNanEqualityRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.bug;
@@ -222,7 +222,7 @@ class PreferCodeUnitAtRule extends SaropaLintRule {
   PreferCodeUnitAtRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -364,7 +364,7 @@ class PreferNeverOverAlwaysThrowsRule extends SaropaLintRule {
   PreferNeverOverAlwaysThrowsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -446,7 +446,7 @@ class PreferVisibilityOverOpacityZeroRule extends SaropaLintRule {
   PreferVisibilityOverOpacityZeroRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -536,7 +536,7 @@ class AvoidPlatformConstructorRule extends SaropaLintRule {
   AvoidPlatformConstructorRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -620,7 +620,7 @@ class PreferKeyboardListenerOverRawRule extends SaropaLintRule {
   PreferKeyboardListenerOverRawRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -754,7 +754,7 @@ class AvoidExtendingHtmlNativeClassRule extends SaropaLintRule {
   AvoidExtendingHtmlNativeClassRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.bug;
@@ -884,7 +884,7 @@ class AvoidExtendingSecurityContextRule extends SaropaLintRule {
   AvoidExtendingSecurityContextRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.bug;
@@ -977,7 +977,7 @@ class AvoidDeprecatedPointerArithmeticRule extends SaropaLintRule {
   AvoidDeprecatedPointerArithmeticRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1134,7 +1134,7 @@ class PreferExtractingRepeatedMapLookupRule extends SaropaLintRule {
   PreferExtractingRepeatedMapLookupRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

@@ -23,7 +23,7 @@ class RequireEnvFileGitignoreRule extends SaropaLintRule {
   RequireEnvFileGitignoreRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;

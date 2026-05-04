@@ -46,7 +46,7 @@ class RequireNotifyListenersRule extends SaropaLintRule {
 
   /// Significant issue. Address when count exceeds 10.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -173,7 +173,7 @@ class RequireStreamControllerDisposeRule extends SaropaLintRule {
 
   /// Significant issue. Address when count exceeds 10.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -330,7 +330,7 @@ class RequireValueNotifierDisposeRule extends SaropaLintRule {
 
   /// Significant issue. Address when count exceeds 10.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -629,7 +629,7 @@ class RequireMountedCheckRule extends SaropaLintRule {
 
   /// Significant issue. Address when count exceeds 10.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -818,7 +818,7 @@ class AvoidStatefulWithoutStateRule extends SaropaLintRule {
 
   /// Significant issue. Address when count exceeds 10.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -953,7 +953,7 @@ class AvoidGlobalKeyInBuildRule extends SaropaLintRule {
 
   /// Significant issue. Address when count exceeds 10.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1064,7 +1064,7 @@ class AvoidSetStateInLargeStateClassRule extends SaropaLintRule {
 
   /// Performance issue in large state classes. May require refactoring.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1175,7 +1175,7 @@ class PreferImmutableSelectorValueRule extends SaropaLintRule {
   PreferImmutableSelectorValueRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1253,7 +1253,7 @@ class AvoidStaticStateRule extends SaropaLintRule {
   AvoidStaticStateRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1371,7 +1371,7 @@ class PreferOptimisticUpdatesRule extends SaropaLintRule {
   PreferOptimisticUpdatesRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1485,7 +1485,7 @@ class AvoidCollectionMutatingMethodsRule extends SaropaLintRule {
   AvoidCollectionMutatingMethodsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

@@ -41,7 +41,7 @@ class AvoidLargeObjectsInStateRule extends SaropaLintRule {
   /// Large unbounded data in state can cause OOM errors.
   /// Review for potential memory issues.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -140,7 +140,7 @@ class RequireImageDisposalRule extends SaropaLintRule {
   /// Undisposed images leak native memory and cause OOM crashes.
   /// Each occurrence is a memory leak.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -250,7 +250,7 @@ class AvoidCapturingThisInCallbacksRule extends SaropaLintRule {
   /// Captured references prevent garbage collection and leak memory.
   /// Review long-lived callbacks for proper lifecycle management.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -349,7 +349,7 @@ class RequireCacheEvictionPolicyRule extends SaropaLintRule {
   /// Unbounded caches grow indefinitely and cause OOM errors.
   /// Each occurrence is a potential memory leak.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -432,7 +432,7 @@ class PreferWeakReferencesForCacheRule extends SaropaLintRule {
   /// Strong references in caches prevent GC under memory pressure.
   /// Consider for memory-sensitive applications.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -515,7 +515,7 @@ class AvoidExpandoCircularReferencesRule extends SaropaLintRule {
   /// Circular references in Expando prevent garbage collection.
   /// Each occurrence is a memory leak.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -597,7 +597,7 @@ class AvoidLargeIsolateCommunicationRule extends SaropaLintRule {
   /// Large isolate copies cause temporary memory spikes.
   /// Performance issue, not a memory leak.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -705,7 +705,7 @@ class RequireCacheExpirationRule extends SaropaLintRule {
   RequireCacheExpirationRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -811,7 +811,7 @@ class AvoidUnboundedCacheGrowthRule extends SaropaLintRule {
   AvoidUnboundedCacheGrowthRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1050,7 +1050,7 @@ class RequireCacheKeyUniquenessRule extends SaropaLintRule {
   RequireCacheKeyUniquenessRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1162,7 +1162,7 @@ class AvoidRetainingDisposedWidgetsRule extends SaropaLintRule {
 
   /// Retaining disposed widgets causes memory leaks and crashes.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1288,7 +1288,7 @@ class AvoidClosureCaptureLeaksRule extends SaropaLintRule {
   AvoidClosureCaptureLeaksRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1439,7 +1439,7 @@ class RequireExpandoCleanupRule extends SaropaLintRule {
   RequireExpandoCleanupRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1494,7 +1494,7 @@ class PreferLruCacheRule extends SaropaLintRule {
   PreferLruCacheRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1540,7 +1540,7 @@ class PreferWeakReferencesRule extends SaropaLintRule {
   PreferWeakReferencesRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

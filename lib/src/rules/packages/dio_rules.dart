@@ -44,7 +44,7 @@ class RequireDioTimeoutRule extends SaropaLintRule {
   RequireDioTimeoutRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -121,7 +121,7 @@ class RequireDioErrorHandlingRule extends SaropaLintRule {
   RequireDioErrorHandlingRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -205,7 +205,7 @@ class RequireDioInterceptorErrorHandlerRule extends SaropaLintRule {
   RequireDioInterceptorErrorHandlerRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -272,7 +272,7 @@ class PreferDioCancelTokenRule extends SaropaLintRule {
   PreferDioCancelTokenRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -352,7 +352,7 @@ class RequireDioSslPinningRule extends SaropaLintRule {
   RequireDioSslPinningRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -365,7 +365,7 @@ class RequireDioSslPinningRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'require_dio_ssl_pinning',
-    '[require_dio_ssl_pinning] Making authentication or sensitive API requests with Dio without SSL pinning exposes your app to man-in-the-middle (MITM) attacks, where attackers can intercept or modify network traffic. This is a critical security risk for login, registration, and token endpoints. Always configure SSL pinning for all sensitive endpoints to protect user credentials and data. See https://pub.dev/packages/dio#ssl-pinning. {v3}',
+    '[require_dio_ssl_pinning] Making authentication or sensitive API requests with Dio without SSL pinning exposes your app to man-in-the-middle (MITM) attacks, where attackers can intercept or modify network traffic. Always configure SSL pinning for login, registration, and token endpoints to protect user credentials and data. See https://pub.dev/packages/dio#ssl-pinning. {v3}',
     correctionMessage:
         'Set up SSL pinning in Dio by configuring httpClientAdapter with certificate validation for all authentication and sensitive endpoints. This prevents MITM attacks and protects user data. See https://pub.dev/packages/dio#ssl-pinning.',
     severity: DiagnosticSeverity.WARNING,
@@ -440,7 +440,7 @@ class AvoidDioFormDataLeakRule extends SaropaLintRule {
   AvoidDioFormDataLeakRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -517,7 +517,7 @@ class AvoidDioDebugPrintProductionRule extends SaropaLintRule {
   AvoidDioDebugPrintProductionRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -620,7 +620,7 @@ class RequireDioSingletonRule extends SaropaLintRule {
   RequireDioSingletonRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -699,7 +699,7 @@ class PreferDioBaseOptionsRule extends SaropaLintRule {
   PreferDioBaseOptionsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -778,7 +778,7 @@ class AvoidDioWithoutBaseUrlRule extends SaropaLintRule {
   AvoidDioWithoutBaseUrlRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -855,7 +855,7 @@ class PreferDioOverHttpRule extends SaropaLintRule {
 
   /// Minor improvement. Track for later review.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -916,7 +916,7 @@ class RequireDioResponseTypeRule extends SaropaLintRule {
 
   /// Binary data corruption if wrong response type used.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1004,7 +1004,7 @@ class RequireDioRetryInterceptorRule extends SaropaLintRule {
 
   /// User experience degradation from transient failures.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1076,7 +1076,7 @@ class PreferDioTransformerRule extends SaropaLintRule {
 
   /// UI jank from main thread JSON parsing.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

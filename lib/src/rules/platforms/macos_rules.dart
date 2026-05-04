@@ -89,7 +89,7 @@ class PreferMacosMenuBarIntegrationRule extends SaropaLintRule {
 
   /// Missing menu bar is a UX issue, not critical.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -195,7 +195,7 @@ class PreferMacosKeyboardShortcutsRule extends SaropaLintRule {
 
   /// Missing shortcuts is a UX issue, not critical.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -296,7 +296,7 @@ class RequireMacosWindowSizeConstraintsRule extends SaropaLintRule {
 
   /// Missing constraints affects UX but isn't critical.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -395,7 +395,7 @@ class RequireMacosFileAccessIntentRule extends SaropaLintRule {
 
   /// Sandbox violations cause silent failures.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -482,7 +482,7 @@ class AvoidMacosDeprecatedSecurityApisRule extends SaropaLintRule {
 
   /// Deprecated APIs may cause notarization issues.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -572,7 +572,7 @@ class RequireMacosHardenedRuntimeRule extends SaropaLintRule {
 
   /// Hardened Runtime issues block notarization.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -682,7 +682,7 @@ class AvoidMacosCatalystUnsupportedApisRule extends SaropaLintRule {
 
   /// Unsupported APIs crash on Mac Catalyst.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -766,7 +766,7 @@ class RequireMacosWindowRestorationRule extends SaropaLintRule {
   RequireMacosWindowRestorationRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -828,7 +828,7 @@ class AvoidMacosFullDiskAccessRule extends SaropaLintRule {
   AvoidMacosFullDiskAccessRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -894,7 +894,7 @@ class RequireMacosSandboxEntitlementsRule extends SaropaLintRule {
   RequireMacosSandboxEntitlementsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -982,7 +982,7 @@ class RequireMacosSandboxExceptionsRule extends SaropaLintRule {
   RequireMacosSandboxExceptionsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1080,7 +1080,7 @@ class AvoidMacosHardenedRuntimeViolationsRule extends SaropaLintRule {
   AvoidMacosHardenedRuntimeViolationsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1159,7 +1159,7 @@ class RequireMacosAppTransportSecurityRule extends SaropaLintRule {
   RequireMacosAppTransportSecurityRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1238,7 +1238,7 @@ class RequireMacosNotarizationReadyRule extends SaropaLintRule {
   RequireMacosNotarizationReadyRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1323,7 +1323,7 @@ class RequireMacosEntitlementsRule extends SaropaLintRule {
   RequireMacosEntitlementsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

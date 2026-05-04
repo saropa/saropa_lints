@@ -32,7 +32,7 @@ class RequireQrScanFeedbackRule extends SaropaLintRule {
 
   /// UX improvement, not critical.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -131,7 +131,7 @@ class AvoidQrScannerAlwaysActiveRule extends SaropaLintRule {
 
   /// Battery optimization issue.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -250,7 +250,7 @@ class RequireQrContentValidationRule extends SaropaLintRule {
 
   /// Security issue - can lead to phishing or malicious redirects.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

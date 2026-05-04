@@ -47,7 +47,7 @@ class AvoidHooksOutsideBuildRule extends SaropaLintRule {
 
   /// Critical - runtime error.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -129,7 +129,7 @@ class AvoidConditionalHooksRule extends SaropaLintRule {
 
   /// Critical - runtime error.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -241,7 +241,7 @@ class AvoidUnnecessaryHookWidgetsRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -377,7 +377,7 @@ class PreferUseCallbackRule extends SaropaLintRule {
   PreferUseCallbackRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -526,7 +526,7 @@ class AvoidMisusedHooksRule extends SaropaLintRule {
   AvoidMisusedHooksRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

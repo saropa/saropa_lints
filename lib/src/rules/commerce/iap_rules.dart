@@ -50,7 +50,7 @@ class AvoidPurchaseInSandboxProductionRule extends SaropaLintRule {
   AvoidPurchaseInSandboxProductionRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -190,7 +190,7 @@ class RequireSubscriptionStatusCheckRule extends SaropaLintRule {
   RequireSubscriptionStatusCheckRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -315,7 +315,7 @@ class RequirePriceLocalizationRule extends SaropaLintRule {
   RequirePriceLocalizationRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -426,7 +426,7 @@ class PreferGracePeriodHandlingRule extends SaropaLintRule {
   PreferGracePeriodHandlingRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -526,9 +526,9 @@ class PreferGracePeriodHandlingRule extends SaropaLintRule {
 class AvoidEntitlementWithoutServerRule extends SaropaLintRule {
   AvoidEntitlementWithoutServerRule() : super(code: _code);
 
-  /// Client-only IAP verification is a critical security flaw.
+  /// Client-only IAP verification lets attackers grant entitlements without paying — server-side validation is mandatory.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

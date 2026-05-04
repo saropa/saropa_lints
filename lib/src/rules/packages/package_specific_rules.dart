@@ -47,7 +47,7 @@ class RequireGoogleSigninErrorHandlingRule extends SaropaLintRule {
   RequireGoogleSigninErrorHandlingRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -153,7 +153,7 @@ class RequireAppleSigninNonceRule extends SaropaLintRule {
   RequireAppleSigninNonceRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -247,7 +247,7 @@ class RequireWebviewSslErrorHandlingRule extends SaropaLintRule {
   RequireWebviewSslErrorHandlingRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -339,7 +339,7 @@ class AvoidWebviewFileAccessRule extends SaropaLintRule {
 
   // WARNING severity with high impact - security concern but not crash-causing
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -352,7 +352,7 @@ class AvoidWebviewFileAccessRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'avoid_webview_file_access',
-    '[avoid_webview_file_access] WebView file access enabled (allowFileAccess: true) creates a critical security vulnerability. Malicious web content loaded in the WebView can read local files including user data, cached credentials, and app configuration, then exfiltrate them to attacker-controlled servers without user consent or visible indication. {v3}',
+    '[avoid_webview_file_access] WebView file access enabled (allowFileAccess: true) lets malicious web content read local files including user data, cached credentials, and app configuration, then exfiltrate them to attacker-controlled servers without user consent or visible indication. {v3}',
     correctionMessage:
         'Remove allowFileAccess: true or explicitly set it to false. If file access is required, restrict it to specific directories and validate all file paths.',
     severity: DiagnosticSeverity.WARNING,
@@ -443,7 +443,7 @@ class RequireCalendarTimezoneHandlingRule extends SaropaLintRule {
   RequireCalendarTimezoneHandlingRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -555,7 +555,7 @@ class RequireKeyboardVisibilityDisposeRule extends SaropaLintRule {
   RequireKeyboardVisibilityDisposeRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -672,7 +672,7 @@ class RequireSpeechStopOnDisposeRule extends SaropaLintRule {
   RequireSpeechStopOnDisposeRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -785,7 +785,7 @@ class AvoidAppLinksSensitiveParamsRule extends SaropaLintRule {
   AvoidAppLinksSensitiveParamsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -897,7 +897,7 @@ class RequireEnviedObfuscationRule extends SaropaLintRule {
   RequireEnviedObfuscationRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1013,7 +1013,7 @@ class AvoidOpenaiKeyInCodeRule extends SaropaLintRule {
   AvoidOpenaiKeyInCodeRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1085,7 +1085,7 @@ class RequireOpenaiErrorHandlingRule extends SaropaLintRule {
   RequireOpenaiErrorHandlingRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1179,7 +1179,7 @@ class RequireSvgErrorHandlerRule extends SaropaLintRule {
 
   // Medium impact - UI fallback, not crash-causing
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1265,7 +1265,7 @@ class RequireGoogleFontsFallbackRule extends SaropaLintRule {
 
   // Medium impact - UI fallback, not crash-causing
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1337,7 +1337,7 @@ class PreferUuidV4Rule extends SaropaLintRule {
   PreferUuidV4Rule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1436,7 +1436,7 @@ class PreferImagePickerMaxDimensionsRule extends SaropaLintRule {
 
   /// High impact - OOM crashes affect user experience significantly.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1540,7 +1540,7 @@ class RequireUrlLauncherModeRule extends SaropaLintRule {
 
   /// Medium impact - inconsistent behavior, but not a crash.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1624,7 +1624,7 @@ class PreferGeolocatorDistanceFilterRule extends SaropaLintRule {
 
   /// High impact - affects battery life significantly.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1774,7 +1774,7 @@ class AvoidImagePickerQuickSuccessionRule extends SaropaLintRule {
   AvoidImagePickerQuickSuccessionRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1870,7 +1870,7 @@ class RequireAnalyticsErrorHandlingRule extends SaropaLintRule {
   RequireAnalyticsErrorHandlingRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

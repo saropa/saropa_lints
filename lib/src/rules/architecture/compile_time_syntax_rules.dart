@@ -191,7 +191,7 @@ class DuplicateConstructorRule extends SaropaLintRule {
   DuplicateConstructorRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.bug;
@@ -271,7 +271,7 @@ class ConflictingConstructorAndStaticMemberRule extends SaropaLintRule {
   ConflictingConstructorAndStaticMemberRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.bug;
@@ -361,7 +361,7 @@ class FieldInitializerRedirectingConstructorRule extends SaropaLintRule {
   FieldInitializerRedirectingConstructorRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.bug;
@@ -416,7 +416,7 @@ class InvalidSuperFormalParameterLocationRule extends SaropaLintRule {
   InvalidSuperFormalParameterLocationRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.bug;
@@ -458,7 +458,7 @@ class IllegalConcreteEnumMemberRule extends SaropaLintRule {
   IllegalConcreteEnumMemberRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.bug;
@@ -513,7 +513,7 @@ class InvalidLiteralAnnotationRule extends SaropaLintRule {
   InvalidLiteralAnnotationRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.bug;
@@ -559,7 +559,7 @@ class InvalidNonVirtualAnnotationRule extends SaropaLintRule {
   InvalidNonVirtualAnnotationRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.bug;
@@ -650,7 +650,7 @@ class AbstractFieldInitializerRule extends SaropaLintRule {
   AbstractFieldInitializerRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.bug;
@@ -708,7 +708,7 @@ class UndefinedEnumConstructorRule extends SaropaLintRule {
   UndefinedEnumConstructorRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.bug;

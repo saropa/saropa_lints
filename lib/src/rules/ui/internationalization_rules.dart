@@ -35,7 +35,7 @@ class AvoidHardcodedStringsInUiRule extends SaropaLintRule {
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -218,7 +218,7 @@ class RequireLocaleAwareFormattingRule extends SaropaLintRule {
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -297,7 +297,7 @@ class RequireDirectionalWidgetsRule extends SaropaLintRule {
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -400,7 +400,7 @@ class RequirePluralHandlingRule extends SaropaLintRule {
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -510,7 +510,7 @@ class AvoidHardcodedLocaleRule extends SaropaLintRule {
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -594,7 +594,7 @@ class AvoidStringConcatenationInUiRule extends SaropaLintRule {
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -671,7 +671,7 @@ class AvoidTextInImagesRule extends SaropaLintRule {
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -754,7 +754,7 @@ class AvoidHardcodedAppNameRule extends SaropaLintRule {
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -828,7 +828,7 @@ class PreferDateFormatRule extends SaropaLintRule {
   PreferDateFormatRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -910,7 +910,7 @@ class PreferIntlNameRule extends SaropaLintRule {
   PreferIntlNameRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -993,7 +993,7 @@ class PreferProvidingIntlDescriptionRule extends SaropaLintRule {
   PreferProvidingIntlDescriptionRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1081,7 +1081,7 @@ class PreferProvidingIntlExamplesRule extends SaropaLintRule {
   PreferProvidingIntlExamplesRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1188,7 +1188,7 @@ class RequireIntlLocaleInitializationRule extends SaropaLintRule {
 
   /// Medium impact - affects formatting but not crashes.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1310,7 +1310,7 @@ class RequireIntlDateFormatLocaleRule extends SaropaLintRule {
   RequireIntlDateFormatLocaleRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1417,7 +1417,7 @@ class RequireNumberFormatLocaleRule extends SaropaLintRule {
   RequireNumberFormatLocaleRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1535,7 +1535,7 @@ class AvoidManualDateFormattingRule extends SaropaLintRule {
   AvoidManualDateFormattingRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1693,7 +1693,7 @@ class RequireIntlCurrencyFormatRule extends SaropaLintRule {
   RequireIntlCurrencyFormatRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1890,7 +1890,7 @@ class RequireIntlPluralRulesRule extends SaropaLintRule {
 
   /// Significant issue. Address when count exceeds 10.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2033,7 +2033,7 @@ class RequireIntlArgsMatchRule extends SaropaLintRule {
 
   /// Mismatched args cause runtime errors in translations.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2133,7 +2133,7 @@ class AvoidStringConcatenationForL10nRule extends SaropaLintRule {
 
   /// Concatenation breaks translations in RTL and complex languages.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2212,7 +2212,7 @@ class PreferNumberFormatRule extends SaropaLintRule {
   PreferNumberFormatRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2315,7 +2315,7 @@ class ProvideCorrectIntlArgsRule extends SaropaLintRule {
   ProvideCorrectIntlArgsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2416,7 +2416,7 @@ class AvoidStringConcatenationL10nRule extends SaropaLintRule {
   AvoidStringConcatenationL10nRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2517,7 +2517,7 @@ class PreferIntlMessageDescriptionRule extends SaropaLintRule {
   PreferIntlMessageDescriptionRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2587,7 +2587,7 @@ class AvoidHardcodedLocaleStringsRule extends SaropaLintRule {
   AvoidHardcodedLocaleStringsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2707,7 +2707,7 @@ class RequireRtlLayoutSupportRule extends SaropaLintRule {
   RequireRtlLayoutSupportRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2824,7 +2824,7 @@ class RequireRtlSupportRule extends SaropaLintRule {
   RequireRtlSupportRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

@@ -41,7 +41,7 @@ class AvoidCastingToExtensionTypeRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -108,7 +108,7 @@ class AvoidCollectionMethodsWithUnrelatedTypesRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -235,7 +235,7 @@ class AvoidDynamicRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -347,7 +347,7 @@ class AvoidImplicitlyNullableExtensionTypesRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -402,7 +402,7 @@ class AvoidNullableInterpolationRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -464,7 +464,7 @@ class AvoidNullableParametersWithDefaultValuesRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -532,7 +532,7 @@ class AvoidNullableToStringRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -620,7 +620,7 @@ class AvoidNullAssertionRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1706,7 +1706,7 @@ class AvoidUnnecessaryTypeAssertionsRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1785,7 +1785,7 @@ class AvoidUnnecessaryTypeCastsRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1864,7 +1864,7 @@ class AvoidUnrelatedTypeAssertionsRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1950,7 +1950,7 @@ class TypeCheckWithNullRule extends SaropaLintRule {
   TypeCheckWithNullRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2006,7 +2006,7 @@ class InvalidRuntimeCheckWithJsInteropTypesRule extends SaropaLintRule {
   InvalidRuntimeCheckWithJsInteropTypesRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2077,7 +2077,7 @@ class ArgumentMustBeNativeRule extends SaropaLintRule {
   ArgumentMustBeNativeRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2181,7 +2181,7 @@ class PreferCorrectTypeNameRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2284,7 +2284,7 @@ class PreferExplicitFunctionTypeRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2336,7 +2336,7 @@ class PreferInlineFunctionTypesRule extends SaropaLintRule {
   PreferInlineFunctionTypesRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2391,7 +2391,7 @@ class PreferResultTypeRule extends SaropaLintRule {
   PreferResultTypeRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2448,7 +2448,7 @@ class PreferTypeOverVarRule extends SaropaLintRule {
 
   /// Stylistic preference only. Conflicts with prefer_var_over_explicit_type.
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2517,7 +2517,7 @@ class ExternalWithInitializerRule extends SaropaLintRule {
   ExternalWithInitializerRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2581,7 +2581,7 @@ class AvoidShadowingTypeParametersRule extends SaropaLintRule {
   AvoidShadowingTypeParametersRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2659,7 +2659,7 @@ class AvoidPrivateTypedefFunctionsRule extends SaropaLintRule {
   AvoidPrivateTypedefFunctionsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2708,7 +2708,7 @@ class PreferFinalLocalsRule extends SaropaLintRule {
   PreferFinalLocalsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2853,7 +2853,7 @@ class PreferConstDeclarationsRule extends SaropaLintRule {
   PreferConstDeclarationsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2948,7 +2948,7 @@ class InvalidVisibleOutsideTemplateAnnotationRule extends SaropaLintRule {
   InvalidVisibleOutsideTemplateAnnotationRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3046,7 +3046,7 @@ class DuplicateRecordFieldNameRule extends SaropaLintRule {
   DuplicateRecordFieldNameRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.bug;
@@ -3125,7 +3125,7 @@ class InvalidRecordFieldNameRule extends SaropaLintRule {
   InvalidRecordFieldNameRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.bug;
@@ -3194,7 +3194,7 @@ class InvalidExtensionArgumentCountRule extends SaropaLintRule {
   InvalidExtensionArgumentCountRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.bug;
@@ -3248,7 +3248,7 @@ class SubtypeOfDisallowedTypeRule extends SaropaLintRule {
   SubtypeOfDisallowedTypeRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.bug;
@@ -3346,7 +3346,7 @@ class AbiSpecificIntegerInvalidRule extends SaropaLintRule {
   Set<String>? get requiredPatterns => const {'AbiSpecificInteger'};
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.bug;

@@ -59,7 +59,7 @@ class AvoidHardcodedUnixPathsRule extends SaropaLintRule {
   AvoidHardcodedUnixPathsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -144,7 +144,7 @@ class PreferXdgDirectoryConventionRule extends SaropaLintRule {
   PreferXdgDirectoryConventionRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -230,7 +230,7 @@ class AvoidX11OnlyAssumptionsRule extends SaropaLintRule {
   AvoidX11OnlyAssumptionsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -353,7 +353,7 @@ class RequireLinuxFontFallbackRule extends SaropaLintRule {
   RequireLinuxFontFallbackRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -479,7 +479,7 @@ class AvoidSudoShellCommandsRule extends SaropaLintRule {
   AvoidSudoShellCommandsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

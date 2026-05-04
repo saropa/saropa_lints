@@ -49,7 +49,7 @@ class RequireFileCloseInFinallyRule extends SaropaLintRule {
   /// Unclosed file handles leak system resources.
   /// Each occurrence is a resource leak.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -149,7 +149,7 @@ class RequireDatabaseCloseRule extends SaropaLintRule {
   /// Unclosed database connections exhaust connection pools.
   /// Each occurrence is a resource leak.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -328,7 +328,7 @@ class RequireHttpClientCloseRule extends SaropaLintRule {
   /// Unclosed HttpClient holds connection pools and leaks sockets.
   /// Each occurrence is a resource leak.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -404,7 +404,7 @@ class RequireNativeResourceCleanupRule extends SaropaLintRule {
   /// Unfreed native memory leaks outside Dart's garbage collector.
   /// Each occurrence is a memory leak.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -499,7 +499,7 @@ class RequireWebSocketCloseRule extends SaropaLintRule {
   /// Unclosed WebSocket connections leak sockets and may cause errors.
   /// Each occurrence is a resource leak.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -604,7 +604,7 @@ class RequirePlatformChannelCleanupRule extends SaropaLintRule {
   /// Platform channel handlers prevent garbage collection of State.
   /// Each occurrence is a memory leak.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -707,7 +707,7 @@ class RequireIsolateKillRule extends SaropaLintRule {
   /// Orphaned isolates consume memory and CPU resources.
   /// Each occurrence is a resource leak.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -795,7 +795,7 @@ class RequireCameraDisposeRule extends SaropaLintRule {
   /// Undisposed CameraController locks the camera and leaks native memory.
   /// Each occurrence is a critical resource leak.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -907,7 +907,7 @@ class RequireImageCompressionRule extends SaropaLintRule {
   /// Uncompressed camera images waste bandwidth and storage.
   /// Performance issue, not a bug.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -996,7 +996,7 @@ class PreferCoarseLocationRule extends SaropaLintRule {
   /// High-precision GPS uses more battery than necessary.
   /// Optimization suggestion, not a bug.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1071,7 +1071,7 @@ class AvoidImagePickerWithoutSourceRule extends SaropaLintRule {
   /// Missing source shows blank picker on some devices.
   /// UX bug that affects user experience.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1149,7 +1149,7 @@ class PreferGeolocatorAccuracyAppropriateRule extends SaropaLintRule {
 
   /// Battery drain from excessive GPS usage.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1225,7 +1225,7 @@ class PreferGeolocatorLastKnownRule extends SaropaLintRule {
 
   /// Battery optimization opportunity.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1309,7 +1309,7 @@ class PreferImagePickerMultiSelectionRule extends SaropaLintRule {
 
   /// Poor UX from repeated picker dialogs.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1362,7 +1362,7 @@ class PreferUsingForTempResourcesRule extends SaropaLintRule {
   PreferUsingForTempResourcesRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

@@ -96,7 +96,7 @@ class AvoidHardcodedDriveLettersRule extends SaropaLintRule {
   AvoidHardcodedDriveLettersRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -183,7 +183,7 @@ class AvoidForwardSlashPathAssumptionRule extends SaropaLintRule {
   AvoidForwardSlashPathAssumptionRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -281,7 +281,7 @@ class AvoidCaseSensitivePathComparisonRule extends SaropaLintRule {
   AvoidCaseSensitivePathComparisonRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -383,7 +383,7 @@ class RequireWindowsSingleInstanceCheckRule extends SaropaLintRule {
   RequireWindowsSingleInstanceCheckRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -503,7 +503,7 @@ class AvoidMaxPathRiskRule extends SaropaLintRule {
   AvoidMaxPathRiskRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

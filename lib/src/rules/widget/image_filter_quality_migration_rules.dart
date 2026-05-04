@@ -10,7 +10,7 @@
 /// keep work bounded (no unit-wide scans, no recursion).
 ///
 /// For maintainers: tier is **Comprehensive** (INFO) alongside other optional
-/// Flutter style/migration hints; [LintImpact.low] reflects optional visual
+/// Flutter style/migration hints; [LintImpact.info] reflects optional visual
 /// defaults, not correctness or security.
 library;
 
@@ -56,7 +56,7 @@ class PreferImageFilterQualityMediumRule extends SaropaLintRule {
   PreferImageFilterQualityMediumRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

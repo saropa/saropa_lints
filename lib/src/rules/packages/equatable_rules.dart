@@ -75,7 +75,7 @@ class ExtendEquatableRule extends SaropaLintRule {
 
   /// Maintainability issue. Cleaner equality pattern available.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -186,7 +186,7 @@ class ListAllEquatableFieldsRule extends SaropaLintRule {
 
   /// Potential bug. Missing field in equality comparison.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -324,7 +324,7 @@ class PreferEquatableMixinRule extends SaropaLintRule {
 
   /// Style preference. Consider mixin for flexibility.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -418,7 +418,7 @@ class PreferEquatableStringifyRule extends SaropaLintRule {
 
   /// Style preference. Improves debugging output.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -503,7 +503,7 @@ class PreferImmutableAnnotationRule extends SaropaLintRule {
 
   /// Style preference. Documents immutability intent.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -583,7 +583,7 @@ class PreferRecordOverEquatableRule extends SaropaLintRule {
 
   /// Style preference. Records are more concise.
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -720,7 +720,7 @@ class AvoidMutableFieldInEquatableRule extends SaropaLintRule {
   AvoidMutableFieldInEquatableRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -804,7 +804,7 @@ class RequireEquatableCopyWithRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -881,7 +881,7 @@ class RequireCopyWithNullHandlingRule extends SaropaLintRule {
 
   /// copyWith that can't set null makes state management difficult.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -990,7 +990,7 @@ class RequireDeepEqualityCollectionsRule extends SaropaLintRule {
 
   /// State comparison bugs from reference equality.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1100,7 +1100,7 @@ class AvoidEquatableDatetimeRule extends SaropaLintRule {
 
   /// Flaky equality from microsecond precision.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1209,7 +1209,7 @@ class PreferUnmodifiableCollectionsRule extends SaropaLintRule {
 
   /// State mutation bugs from mutable collections.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1327,7 +1327,7 @@ class RequireEquatablePropsOverrideRule extends SaropaLintRule {
   RequireEquatablePropsOverrideRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1406,7 +1406,7 @@ class AvoidEquatableNestedEqualityRule extends SaropaLintRule {
   AvoidEquatableNestedEqualityRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

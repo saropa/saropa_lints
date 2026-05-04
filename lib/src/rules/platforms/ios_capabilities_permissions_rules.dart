@@ -25,7 +25,7 @@ class RequireIosInfoPlistEntriesRule extends SaropaLintRule {
   RequireIosInfoPlistEntriesRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -89,7 +89,7 @@ class RequireIosPermissionDescriptionRule extends SaropaLintRule {
 
   /// Missing permission descriptions cause App Store rejection.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -293,7 +293,7 @@ class RequireIosPrivacyManifestRule extends SaropaLintRule {
 
   /// Missing privacy manifest can cause App Store rejection (iOS 17+).
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -415,7 +415,7 @@ class RequireIosBackgroundModeRule extends SaropaLintRule {
 
   /// Background violations can cause app termination.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -522,7 +522,7 @@ class RequireIosAppTrackingTransparencyRule extends SaropaLintRule {
 
   /// ATT is required for App Store approval.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -661,7 +661,7 @@ class RequireIosFaceIdUsageDescriptionRule extends SaropaLintRule {
 
   /// Missing Face ID description causes crashes and rejection.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -783,7 +783,7 @@ class RequireIosPhotoLibraryAddUsageRule extends SaropaLintRule {
 
   /// Missing permission causes crashes.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -882,7 +882,7 @@ class RequireIosPushNotificationCapabilityRule extends SaropaLintRule {
 
   /// Missing push configuration causes silent failures.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1001,7 +1001,7 @@ class RequireIosLocalNotificationPermissionRule extends SaropaLintRule {
 
   /// Notifications without permission fail silently.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1107,7 +1107,7 @@ class RequireIosAppGroupCapabilityRule extends SaropaLintRule {
 
   /// Missing App Groups causes silent data sharing failures.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1222,7 +1222,7 @@ class RequireIosHealthKitAuthorizationRule extends SaropaLintRule {
 
   /// HealthKit access without authorization fails silently.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1323,7 +1323,7 @@ class RequireIosSiriIntentDefinitionRule extends SaropaLintRule {
 
   /// Missing Siri intent definition causes silent failures.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1433,7 +1433,7 @@ class RequireIosWidgetExtensionCapabilityRule extends SaropaLintRule {
 
   /// Missing widget extension setup causes silent failures.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1546,7 +1546,7 @@ class RequireIosBackgroundAudioCapabilityRule extends SaropaLintRule {
   RequireIosBackgroundAudioCapabilityRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1629,7 +1629,7 @@ class RequireIosAppClipSizeLimitRule extends SaropaLintRule {
   RequireIosAppClipSizeLimitRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1727,7 +1727,7 @@ class RequireIosShareSheetUtiDeclarationRule extends SaropaLintRule {
   RequireIosShareSheetUtiDeclarationRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1794,7 +1794,7 @@ class RequireIosAccessibilityLabelsRule extends SaropaLintRule {
   RequireIosAccessibilityLabelsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1868,7 +1868,7 @@ class RequireIosNfcCapabilityCheckRule extends SaropaLintRule {
   RequireIosNfcCapabilityCheckRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1960,7 +1960,7 @@ class RequireIosCallkitIntegrationRule extends SaropaLintRule {
   RequireIosCallkitIntegrationRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2076,7 +2076,7 @@ class RequireIosCarplaySetupRule extends SaropaLintRule {
   RequireIosCarplaySetupRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2147,7 +2147,7 @@ class RequireIosLiveActivitiesSetupRule extends SaropaLintRule {
   RequireIosLiveActivitiesSetupRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2229,7 +2229,7 @@ class RequireIosPromotionDisplaySupportRule extends SaropaLintRule {
   RequireIosPromotionDisplaySupportRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2286,7 +2286,7 @@ class RequireIosPhotoLibraryLimitedAccessRule extends SaropaLintRule {
   RequireIosPhotoLibraryLimitedAccessRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2376,7 +2376,7 @@ class RequireIosPasteboardPrivacyHandlingRule extends SaropaLintRule {
   RequireIosPasteboardPrivacyHandlingRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2437,7 +2437,7 @@ class RequireIosBackgroundRefreshDeclarationRule extends SaropaLintRule {
   RequireIosBackgroundRefreshDeclarationRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2511,7 +2511,7 @@ class RequireIosBiometricFallbackRule extends SaropaLintRule {
   RequireIosBiometricFallbackRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2572,7 +2572,7 @@ class RequireIosAccessibilityLargeTextRule extends SaropaLintRule {
   RequireIosAccessibilityLargeTextRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2691,7 +2691,7 @@ class RequireIosQuickNoteAwarenessRule extends SaropaLintRule {
   RequireIosQuickNoteAwarenessRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2785,7 +2785,7 @@ class RequireIosVoiceoverGestureCompatibilityRule extends SaropaLintRule {
   RequireIosVoiceoverGestureCompatibilityRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

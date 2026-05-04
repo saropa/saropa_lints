@@ -46,7 +46,7 @@ class RequireWorkmanagerConstraintsRule extends SaropaLintRule {
   RequireWorkmanagerConstraintsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -137,7 +137,7 @@ class RequireWorkmanagerResultReturnRule extends SaropaLintRule {
   RequireWorkmanagerResultReturnRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -228,7 +228,7 @@ class RequireWorkmanagerForBackgroundRule extends SaropaLintRule {
   RequireWorkmanagerForBackgroundRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

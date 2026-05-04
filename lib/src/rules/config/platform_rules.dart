@@ -42,7 +42,7 @@ class RequirePlatformCheckRule extends SaropaLintRule {
   RequirePlatformCheckRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -141,7 +141,7 @@ class PreferPlatformIoConditionalRule extends SaropaLintRule {
   PreferPlatformIoConditionalRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -251,7 +251,7 @@ class PreferFoundationPlatformCheckRule extends SaropaLintRule {
   PreferFoundationPlatformCheckRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -332,7 +332,7 @@ class PreferPlatformWidgetAdaptiveRule extends SaropaLintRule {
   PreferPlatformWidgetAdaptiveRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -370,7 +370,7 @@ class RequireDesktopWindowSetupRule extends SaropaLintRule {
   RequireDesktopWindowSetupRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

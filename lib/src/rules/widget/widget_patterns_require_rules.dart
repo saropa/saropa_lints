@@ -12,7 +12,7 @@ class RequireTextOverflowHandlingRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -124,7 +124,7 @@ class RequireImageErrorBuilderRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -348,7 +348,7 @@ class RequirePlaceholderForNetworkRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -449,7 +449,7 @@ class RequireHoverStatesRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -537,7 +537,7 @@ class RequireButtonLoadingStateRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -650,7 +650,7 @@ class RequireRefreshIndicatorRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -749,7 +749,7 @@ class RequireDefaultTextStyleRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -833,7 +833,7 @@ class RequireDisabledStateRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -928,7 +928,7 @@ class RequireDragFeedbackRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1077,7 +1077,7 @@ class RequireErrorWidgetRule extends SaropaLintRule {
 
   /// Significant issue. Address when count exceeds 10.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1240,7 +1240,7 @@ class RequireThemeColorFromSchemeRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1452,7 +1452,7 @@ class RequireWindowSizeConstraintsRule extends SaropaLintRule {
   /// Window can resize to unusable dimensions without constraints.
   /// Users may accidentally make window too small to use.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1553,7 +1553,7 @@ class RequireOrientationHandlingRule extends SaropaLintRule {
 
   /// UX issue - broken layouts in certain orientations.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1645,7 +1645,7 @@ class RequireTextFormFieldInFormRule extends SaropaLintRule {
   RequireTextFormFieldInFormRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1745,7 +1745,7 @@ class RequireWebViewNavigationDelegateRule extends SaropaLintRule {
   RequireWebViewNavigationDelegateRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1845,7 +1845,7 @@ class RequireAnimatedBuilderChildRule extends SaropaLintRule {
   RequireAnimatedBuilderChildRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1923,7 +1923,7 @@ class RequireRethrowPreserveStackRule extends SaropaLintRule {
   RequireRethrowPreserveStackRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2000,7 +2000,7 @@ class RequireHttpsOverHttpRule extends SaropaLintRule {
   RequireHttpsOverHttpRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2067,7 +2067,7 @@ class RequireWssOverWsRule extends SaropaLintRule {
   RequireWssOverWsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2145,7 +2145,7 @@ class RequireImagePickerPermissionIosRule extends SaropaLintRule {
   RequireImagePickerPermissionIosRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2223,7 +2223,7 @@ class RequireImagePickerPermissionAndroidRule extends SaropaLintRule {
   RequireImagePickerPermissionAndroidRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2290,7 +2290,7 @@ class RequirePermissionManifestAndroidRule extends SaropaLintRule {
   RequirePermissionManifestAndroidRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2349,7 +2349,7 @@ class RequirePermissionPlistIosRule extends SaropaLintRule {
   RequirePermissionPlistIosRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2410,7 +2410,7 @@ class RequireUrlLauncherQueriesAndroidRule extends SaropaLintRule {
   RequireUrlLauncherQueriesAndroidRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2473,7 +2473,7 @@ class RequireUrlLauncherSchemesIosRule extends SaropaLintRule {
   RequireUrlLauncherSchemesIosRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2548,7 +2548,7 @@ class RequireLocaleForTextRule extends SaropaLintRule {
   RequireLocaleForTextRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2647,7 +2647,7 @@ class RequireDialogBarrierConsiderationRule extends SaropaLintRule {
   RequireDialogBarrierConsiderationRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2710,7 +2710,7 @@ class PreferOverlayPortalLayoutBuilderRule extends SaropaLintRule {
   PreferOverlayPortalLayoutBuilderRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

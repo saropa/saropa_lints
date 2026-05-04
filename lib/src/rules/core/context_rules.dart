@@ -56,7 +56,7 @@ class AvoidStoringContextRule extends SaropaLintRule {
 
   /// Storing context can cause crashes when widget is disposed.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -230,7 +230,7 @@ class AvoidContextAcrossAsyncRule extends SaropaLintRule {
 
   /// Context after await can crash when widget is disposed.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -483,9 +483,9 @@ class AvoidContextAcrossAsyncRule extends SaropaLintRule {
 class AvoidContextAfterAwaitInStaticRule extends SaropaLintRule {
   AvoidContextAfterAwaitInStaticRule() : super(code: _code);
 
-  /// Critical issue - causes crashes.
+  /// Using BuildContext after an await in a static method causes crashes when the widget unmounts mid-await.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -977,7 +977,7 @@ class AvoidContextInAsyncStaticRule extends SaropaLintRule {
 
   /// Risky pattern that can lead to crashes.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1074,7 +1074,7 @@ class AvoidContextInStaticMethodsRule extends SaropaLintRule {
 
   /// Discouraged pattern but generally safe for sync methods.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1151,7 +1151,7 @@ class AvoidContextDependencyInCallbackRule extends SaropaLintRule {
   AvoidContextDependencyInCallbackRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1242,7 +1242,7 @@ class PreferClosestContextRule extends SaropaLintRule {
   PreferClosestContextRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1278,7 +1278,7 @@ class RequireContextInBuildDescendantsRule extends SaropaLintRule {
   RequireContextInBuildDescendantsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1311,7 +1311,7 @@ class UseClosestBuildContextRule extends SaropaLintRule {
   UseClosestBuildContextRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

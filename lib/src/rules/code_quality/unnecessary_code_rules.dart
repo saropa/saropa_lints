@@ -39,7 +39,7 @@ class AvoidEmptySpreadRule extends SaropaLintRule {
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -96,7 +96,7 @@ class AvoidUnnecessaryNullAwareElementsRule extends SaropaLintRule {
   AvoidUnnecessaryNullAwareElementsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -161,7 +161,7 @@ class AvoidUnnecessaryBlockRule extends SaropaLintRule {
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -232,7 +232,7 @@ class AvoidUnnecessaryCallRule extends SaropaLintRule {
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -300,7 +300,7 @@ class AvoidUnnecessaryConstructorRule extends SaropaLintRule {
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -391,7 +391,7 @@ class AvoidUnnecessaryEnumArgumentsRule extends SaropaLintRule {
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -450,7 +450,7 @@ class AvoidUnnecessaryEnumPrefixRule extends SaropaLintRule {
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -529,7 +529,7 @@ class AvoidUnnecessaryExtendsRule extends SaropaLintRule {
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -601,7 +601,7 @@ class AvoidUnnecessaryGetterRule extends SaropaLintRule {
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -705,7 +705,7 @@ class AvoidUnnecessaryLengthCheckRule extends SaropaLintRule {
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -816,7 +816,7 @@ class AvoidUnnecessaryNegationsRule extends SaropaLintRule {
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -902,7 +902,7 @@ class AvoidUnnecessarySuperRule extends SaropaLintRule {
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -965,7 +965,7 @@ class NoEmptyBlockRule extends SaropaLintRule {
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1063,7 +1063,7 @@ class NoEmptyStringRule extends SaropaLintRule {
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

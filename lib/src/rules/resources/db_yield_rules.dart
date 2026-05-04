@@ -354,7 +354,7 @@ class RequireYieldAfterDbWriteRule extends SaropaLintRule {
   RequireYieldAfterDbWriteRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -415,7 +415,7 @@ class SuggestYieldAfterDbReadRule extends SaropaLintRule {
   SuggestYieldAfterDbReadRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -498,7 +498,7 @@ class AvoidReturnAwaitDbRule extends SaropaLintRule {
   AvoidReturnAwaitDbRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

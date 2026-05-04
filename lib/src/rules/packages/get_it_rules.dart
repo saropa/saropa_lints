@@ -50,7 +50,7 @@ class AvoidGetItInBuildRule extends SaropaLintRule {
   AvoidGetItInBuildRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -144,7 +144,7 @@ class RequireGetItRegistrationOrderRule extends SaropaLintRule {
 
   /// Wrong registration order crashes at startup.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -343,7 +343,7 @@ class RequireGetItResetInTestsRule extends SaropaLintRule {
   RequireGetItResetInTestsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -437,7 +437,7 @@ class PreferInjectablePackageRule extends SaropaLintRule {
   PreferInjectablePackageRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -497,7 +497,7 @@ class RequireGetitDisposeRegistrationRule extends SaropaLintRule {
   RequireGetitDisposeRegistrationRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

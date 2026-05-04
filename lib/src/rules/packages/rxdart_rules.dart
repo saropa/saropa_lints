@@ -42,7 +42,7 @@ class AvoidBehaviorSubjectLastValueRule extends SaropaLintRule {
   AvoidBehaviorSubjectLastValueRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -144,7 +144,7 @@ class PreferRxdartForComplexStreamsRule extends SaropaLintRule {
   PreferRxdartForComplexStreamsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

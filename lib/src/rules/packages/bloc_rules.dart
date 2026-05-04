@@ -41,7 +41,7 @@ class AvoidBlocEventInConstructorRule extends SaropaLintRule {
 
   /// Significant issue. Address when count exceeds 10.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -144,7 +144,7 @@ class RequireBlocCloseRule extends SaropaLintRule {
 
   /// Significant issue. Address when count exceeds 10.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -300,7 +300,7 @@ class RequireImmutableBlocStateRule extends SaropaLintRule {
 
   /// Significant issue. Address when count exceeds 10.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -451,7 +451,7 @@ class PreferCubitForSimpleRule extends SaropaLintRule {
 
   /// Significant issue. Address when count exceeds 10.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -522,7 +522,7 @@ class AvoidCubitsRule extends SaropaLintRule {
   AvoidCubitsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -630,7 +630,7 @@ class RequireBlocObserverRule extends SaropaLintRule {
 
   /// Significant issue. Address when count exceeds 10.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -718,7 +718,7 @@ class AvoidBlocEventMutationRule extends SaropaLintRule {
 
   /// Significant issue. Address when count exceeds 10.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -783,7 +783,7 @@ class PreferCopyWithForStateRule extends SaropaLintRule {
 
   /// Significant issue. Address when count exceeds 10.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -850,7 +850,7 @@ class AvoidBlocListenInBuildRule extends SaropaLintRule {
 
   /// Significant issue. Address when count exceeds 10.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -942,7 +942,7 @@ class RequireInitialStateRule extends SaropaLintRule {
 
   /// Significant issue. Address when count exceeds 10.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1022,7 +1022,7 @@ class RequireErrorStateRule extends SaropaLintRule {
 
   /// Significant issue. Address when count exceeds 10.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1117,7 +1117,7 @@ class AvoidBlocInBlocRule extends SaropaLintRule {
 
   /// Significant issue. Address when count exceeds 10.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1225,7 +1225,7 @@ class PreferSealedEventsRule extends SaropaLintRule {
 
   /// Significant issue. Address when count exceeds 10.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1301,7 +1301,7 @@ class RequireBlocTransformerRule extends SaropaLintRule {
   RequireBlocTransformerRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1414,7 +1414,7 @@ class AvoidLongEventHandlersRule extends SaropaLintRule {
   AvoidLongEventHandlersRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1494,7 +1494,7 @@ class PreferMultiBlocProviderRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1575,7 +1575,7 @@ class AvoidInstantiatingInBlocValueProviderRule extends SaropaLintRule {
 
   /// Critical - memory leak potential.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1591,7 +1591,7 @@ class AvoidInstantiatingInBlocValueProviderRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'avoid_instantiating_in_bloc_value_provider',
-    '[avoid_instantiating_in_bloc_value_provider] Creating a new bloc instance inside BlocProvider.value prevents the bloc from being automatically closed, leading to memory leaks and unpredictable state. This is a critical resource management issue that can degrade app performance and reliability. {v2}',
+    '[avoid_instantiating_in_bloc_value_provider] Creating a new bloc instance inside BlocProvider.value prevents the bloc from being automatically closed, leading to memory leaks and unpredictable state. Bloc lifecycle management depends on the framework owning instantiation, so the new instance never gets close() called and degrades app performance and reliability over time. {v2}',
     correctionMessage:
         'Always use BlocProvider(create: ...) to create new bloc instances, or pass an existing bloc variable to BlocProvider.value. Never instantiate a bloc directly inside BlocProvider.value.',
     severity: DiagnosticSeverity.ERROR,
@@ -1660,7 +1660,7 @@ class AvoidExistingInstancesInBlocProviderRule extends SaropaLintRule {
 
   /// Critical - unexpected bloc closure.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1749,7 +1749,7 @@ class PreferCorrectBlocProviderRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1840,7 +1840,7 @@ class CheckIsNotClosedAfterAsyncGapRule extends SaropaLintRule {
 
   /// Critical bug. Emit after close causes crash.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1973,7 +1973,7 @@ class AvoidDuplicateBlocEventHandlersRule extends SaropaLintRule {
 
   /// Critical bug. Duplicate handlers cause unexpected behavior.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2092,7 +2092,7 @@ class PreferImmutableBlocEventsRule extends SaropaLintRule {
 
   /// Bug risk. Mutable events can cause unexpected behavior.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2167,7 +2167,7 @@ class PreferImmutableBlocStateRule extends SaropaLintRule {
 
   /// Bug risk. Mutable state breaks bloc pattern.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2245,7 +2245,7 @@ class PreferSealedBlocEventsRule extends SaropaLintRule {
 
   /// Code quality. Sealed classes improve type safety.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2321,7 +2321,7 @@ class PreferSealedBlocStateRule extends SaropaLintRule {
 
   /// Code quality. Sealed classes improve type safety.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2397,7 +2397,7 @@ class PreferBlocEventSuffixRule extends SaropaLintRule {
   PreferBlocEventSuffixRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2474,7 +2474,7 @@ class PreferBlocStateSuffixRule extends SaropaLintRule {
   PreferBlocStateSuffixRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2555,7 +2555,7 @@ class AvoidYieldInOnEventRule extends SaropaLintRule {
 
   /// Using yield in Bloc handlers is deprecated and broken.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2621,7 +2621,7 @@ class EmitNewBlocStateInstancesRule extends SaropaLintRule {
 
   /// State mutation breaks Bloc equality and causes bugs.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2694,7 +2694,7 @@ class AvoidBlocPublicFieldsRule extends SaropaLintRule {
 
   /// Public fields expose Bloc internals and break encapsulation.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2773,7 +2773,7 @@ class AvoidBlocPublicMethodsRule extends SaropaLintRule {
 
   /// Public methods bypass Bloc's event-driven architecture.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2869,7 +2869,7 @@ class RequireBlocSelectorRule extends SaropaLintRule {
 
   /// BlocSelector provides more targeted rebuilds.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2975,7 +2975,7 @@ class AvoidBlocEmitAfterCloseRule extends SaropaLintRule {
   AvoidBlocEmitAfterCloseRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3085,7 +3085,7 @@ class AvoidBlocStateMutationRule extends SaropaLintRule {
   AvoidBlocStateMutationRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3170,7 +3170,7 @@ class RequireBlocInitialStateRule extends SaropaLintRule {
   RequireBlocInitialStateRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3253,7 +3253,7 @@ class RequireBlocLoadingStateRule extends SaropaLintRule {
   RequireBlocLoadingStateRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3353,7 +3353,7 @@ class RequireBlocErrorStateRule extends SaropaLintRule {
   RequireBlocErrorStateRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3446,7 +3446,7 @@ class RequireBlocManualDisposeRule extends SaropaLintRule {
   RequireBlocManualDisposeRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3618,7 +3618,7 @@ class PreferCubitForSimpleStateRule extends SaropaLintRule {
   PreferCubitForSimpleStateRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3729,7 +3729,7 @@ class PreferBlocListenerForSideEffectsRule extends SaropaLintRule {
   PreferBlocListenerForSideEffectsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3833,7 +3833,7 @@ class RequireBlocConsumerWhenBothRule extends SaropaLintRule {
   RequireBlocConsumerWhenBothRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3927,7 +3927,7 @@ class AvoidBlocContextDependencyRule extends SaropaLintRule {
 
   /// Significant issue. Address when count exceeds 10.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -4019,7 +4019,7 @@ class AvoidBlocBusinessLogicInUiRule extends SaropaLintRule {
 
   /// Blocs with UI code are hard to test and violate separation.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -4112,7 +4112,7 @@ class RequireBlocEventSealedRule extends SaropaLintRule {
 
   /// Type safety improvement.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -4196,7 +4196,7 @@ class RequireBlocRepositoryAbstractionRule extends SaropaLintRule {
 
   /// Architecture improvement.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -4310,7 +4310,7 @@ class PreferBlocTransformRule extends SaropaLintRule {
 
   /// Performance suggestion.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -4430,7 +4430,7 @@ class AvoidPassingBlocToBlocRule extends SaropaLintRule {
   AvoidPassingBlocToBlocRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -4543,7 +4543,7 @@ class AvoidPassingBuildContextToBlocsRule extends SaropaLintRule {
   AvoidPassingBuildContextToBlocsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -4645,7 +4645,7 @@ class AvoidReturningValueFromCubitMethodsRule extends SaropaLintRule {
   AvoidReturningValueFromCubitMethodsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -4759,7 +4759,7 @@ class RequireBlocRepositoryInjectionRule extends SaropaLintRule {
   RequireBlocRepositoryInjectionRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -4893,7 +4893,7 @@ class PreferBlocHydrationRule extends SaropaLintRule {
   PreferBlocHydrationRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -5008,7 +5008,7 @@ class AvoidLargeBlocRule extends SaropaLintRule {
   AvoidLargeBlocRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -5090,7 +5090,7 @@ class AvoidOverengineeredBlocStatesRule extends SaropaLintRule {
   AvoidOverengineeredBlocStatesRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -5172,7 +5172,7 @@ class PreferBlocExtensionsRule extends SaropaLintRule {
   PreferBlocExtensionsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

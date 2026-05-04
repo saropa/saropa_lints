@@ -52,7 +52,7 @@ class PreferNullAwareAssignmentRule extends SaropaLintRule {
   PreferNullAwareAssignmentRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -149,7 +149,7 @@ class PreferExplicitNullAssignmentRule extends SaropaLintRule {
   PreferExplicitNullAssignmentRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -218,7 +218,7 @@ class PreferIfNullOverTernaryRule extends SaropaLintRule {
   PreferIfNullOverTernaryRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -329,7 +329,7 @@ class PreferTernaryOverIfNullRule extends SaropaLintRule {
   PreferTernaryOverIfNullRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -408,7 +408,7 @@ class PreferLateOverNullableRule extends SaropaLintRule {
   PreferLateOverNullableRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -501,7 +501,7 @@ class PreferNullableOverLateRule extends SaropaLintRule {
   PreferNullableOverLateRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -601,7 +601,7 @@ class PreferSpreadOverAddAllRule extends SaropaLintRule {
   PreferSpreadOverAddAllRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -670,7 +670,7 @@ class PreferAddAllOverSpreadRule extends SaropaLintRule {
   PreferAddAllOverSpreadRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -744,7 +744,7 @@ class PreferCollectionIfOverTernaryRule extends SaropaLintRule {
   PreferCollectionIfOverTernaryRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -831,7 +831,7 @@ class PreferTernaryOverCollectionIfRule extends SaropaLintRule {
   PreferTernaryOverCollectionIfRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -898,7 +898,7 @@ class PreferWhereTypeOverWhereIsRule extends SaropaLintRule {
   PreferWhereTypeOverWhereIsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -994,7 +994,7 @@ class PreferMapEntriesIterationRule extends SaropaLintRule {
   PreferMapEntriesIterationRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1095,7 +1095,7 @@ class PreferKeysIterationRule extends SaropaLintRule {
   PreferKeysIterationRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1168,7 +1168,7 @@ class PreferMutableCollectionsRule extends SaropaLintRule {
   PreferMutableCollectionsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

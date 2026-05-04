@@ -25,7 +25,7 @@ class AvoidBluetoothScanWithoutTimeoutRule extends SaropaLintRule {
 
   /// Significant issue for battery life.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -105,7 +105,7 @@ class RequireBluetoothStateCheckRule extends SaropaLintRule {
 
   /// Critical for robust Bluetooth apps.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -221,7 +221,7 @@ class RequireBleDisconnectHandlingRule extends SaropaLintRule {
 
   /// Critical for robust Bluetooth apps.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -321,7 +321,7 @@ class RequireAudioFocusHandlingRule extends SaropaLintRule {
 
   /// Important for proper audio behavior.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -430,7 +430,7 @@ class RequireQrPermissionCheckRule extends SaropaLintRule {
 
   /// Critical for app store compliance.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -527,7 +527,7 @@ class RequireGeolocatorPermissionCheckRule extends SaropaLintRule {
   RequireGeolocatorPermissionCheckRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -610,7 +610,7 @@ class RequireGeolocatorServiceEnabledRule extends SaropaLintRule {
   RequireGeolocatorServiceEnabledRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -693,7 +693,7 @@ class RequireGeolocatorStreamCancelRule extends SaropaLintRule {
   RequireGeolocatorStreamCancelRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -764,7 +764,7 @@ class RequireGeolocatorErrorHandlingRule extends SaropaLintRule {
   RequireGeolocatorErrorHandlingRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -842,7 +842,7 @@ class PreferBleMtuNegotiationRule extends SaropaLintRule {
 
   /// Important for BLE performance.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

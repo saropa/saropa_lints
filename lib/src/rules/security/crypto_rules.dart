@@ -61,7 +61,7 @@ class AvoidHardcodedEncryptionKeysRule extends SaropaLintRule {
   AvoidHardcodedEncryptionKeysRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -191,7 +191,7 @@ class PreferSecureRandomForCryptoRule extends SaropaLintRule {
   PreferSecureRandomForCryptoRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -319,7 +319,7 @@ class AvoidDeprecatedCryptoAlgorithmsRule extends SaropaLintRule {
   AvoidDeprecatedCryptoAlgorithmsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -427,7 +427,7 @@ class RequireUniqueIvPerEncryptionRule extends SaropaLintRule {
   RequireUniqueIvPerEncryptionRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -481,6 +481,42 @@ class RequireUniqueIvPerEncryptionRule extends SaropaLintRule {
     return RegExp(r'[a-z]I[Vv]').hasMatch(originalName);
   }
 
+  /// True iff the field's *type annotation* or *initializer expressions*
+  /// reference the `IV` identifier as code (not as text inside a string
+  /// literal).
+  ///
+  /// Why this exists: the previous implementation used
+  /// `node.toSource().contains('IV.')`, which matched the literal
+  /// `'Use IV.fromSecureRandom(16)'` inside `FixKind` constructor calls in
+  /// the plugin's own fix-class definitions and fired the rule on its own
+  /// source. AST-walking the *non-string-literal* descendants restores
+  /// precision: real IV usage (typed as `IV` or initialized via `IV.x(...)`
+  /// / `IV(...)`) still flags, but message strings that happen to mention
+  /// the `IV.` substring no longer trigger.
+  static bool _fieldReferencesIvIdentifier(FieldDeclaration node) {
+    final TypeAnnotation? type = node.fields.type;
+    if (type is NamedType && type.name.lexeme == 'IV') return true;
+
+    for (final VariableDeclaration variable in node.fields.variables) {
+      final Expression? init = variable.initializer;
+      if (init == null) continue;
+      if (_containsIvIdentifier(init)) return true;
+    }
+    return false;
+  }
+
+  /// Recursively checks for a `SimpleIdentifier` named `IV`, but does NOT
+  /// descend into `StringLiteral` nodes (whose contents are payload text,
+  /// not code).
+  static bool _containsIvIdentifier(AstNode node) {
+    if (node is StringLiteral) return false;
+    if (node is SimpleIdentifier && node.name == 'IV') return true;
+    for (final entity in node.childEntities) {
+      if (entity is AstNode && _containsIvIdentifier(entity)) return true;
+    }
+    return false;
+  }
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -491,19 +527,19 @@ class RequireUniqueIvPerEncryptionRule extends SaropaLintRule {
       final bool isStatic = node.isStatic;
       if (!isStatic) return;
 
+      // Type/initializer check is computed once per field (not per
+      // variable) — it walks the AST excluding string literals so message
+      // strings like 'Use IV.fromSecureRandom(16)' inside FixKind
+      // constructors no longer self-trigger this rule.
+      final bool hasIvClass = _fieldReferencesIvIdentifier(node);
+
       for (final VariableDeclaration variable in node.fields.variables) {
-        // Check variable name for IV-related patterns
         final String originalName = variable.name.lexeme;
         final String lowerName = originalName.toLowerCase();
         final bool hasIvName =
             lowerName == 'iv' ||
             lowerName == 'nonce' ||
             _isIvVariableName(originalName);
-
-        // Check if type or initializer references IV class
-        final String fieldSource = node.toSource();
-        final bool hasIvClass =
-            fieldSource.contains('IV.') || fieldSource.contains('IV(');
 
         if (hasIvName || hasIvClass) {
           reporter.atNode(variable);
@@ -592,9 +628,9 @@ class RequireUniqueIvPerEncryptionRule extends SaropaLintRule {
 class RequireSecureKeyGenerationRule extends SaropaLintRule {
   RequireSecureKeyGenerationRule() : super(code: _code);
 
-  /// Predictable keys are extractable from binaries — critical security flaw.
+  /// Predictable keys are extractable from binaries — keys must come from a CSPRNG.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;

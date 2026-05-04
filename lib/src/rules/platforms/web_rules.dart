@@ -63,7 +63,7 @@ class AvoidPlatformChannelOnWebRule extends SaropaLintRule {
   AvoidPlatformChannelOnWebRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -159,7 +159,7 @@ class RequireCorsHandlingRule extends SaropaLintRule {
   RequireCorsHandlingRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -253,7 +253,7 @@ class PreferDeferredLoadingWebRule extends SaropaLintRule {
   PreferDeferredLoadingWebRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -343,7 +343,7 @@ class AvoidWebOnlyDependenciesRule extends SaropaLintRule {
   AvoidWebOnlyDependenciesRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -412,7 +412,7 @@ class AvoidWebOnlyDependenciesRule extends SaropaLintRule {
 /// [ImportDirective.uri], so there are no heuristics and no false positives
 /// from similar-looking URIs (e.g. `package:foo/dart_js.dart` or strings
 /// containing "dart:js"). One callback per file via `addImportDirective`;
-/// no recursion and no full AST traversal. Impact is [LintImpact.medium]:
+/// no recursion and no full AST traversal. Impact is [LintImpact.warning]:
 /// migrating off deprecated APIs is a maintainability concern, not a crash.
 ///
 /// Since: v4.x | Rule version: v1
@@ -432,7 +432,7 @@ class PreferJsInteropOverDartJsRule extends SaropaLintRule {
   PreferJsInteropOverDartJsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -503,7 +503,7 @@ class PreferUrlStrategyForWebRule extends SaropaLintRule {
   /// Hash URLs hurt SEO and look unprofessional.
   /// App works but may rank lower in search results.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -593,7 +593,7 @@ class RequireWebRendererAwarenessRule extends SaropaLintRule {
 
   /// Platform compatibility issue.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -687,7 +687,7 @@ class AvoidJsRoundedIntsRule extends SaropaLintRule {
   AvoidJsRoundedIntsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -816,7 +816,7 @@ class PreferScheduleMicrotaskOverWindowPostmessageRule extends SaropaLintRule {
   PreferScheduleMicrotaskOverWindowPostmessageRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -892,7 +892,7 @@ class PreferCsrfProtectionRule extends SaropaLintRule {
   PreferCsrfProtectionRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

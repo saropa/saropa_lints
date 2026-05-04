@@ -43,7 +43,7 @@ class AvoidFirestoreUnboundedQueryRule extends SaropaLintRule {
 
   /// Significant issue. Address when count exceeds 10.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -193,7 +193,7 @@ class AvoidDatabaseInBuildRule extends SaropaLintRule {
 
   /// Significant issue. Address when count exceeds 10.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -317,7 +317,7 @@ class AvoidSecureStorageOnWebRule extends SaropaLintRule {
 
   /// Significant issue. Address when count exceeds 10.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -419,7 +419,7 @@ class RequireFirebaseInitBeforeUseRule extends SaropaLintRule {
 
   /// Each occurrence is a serious issue that should be fixed immediately.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -519,7 +519,7 @@ class RequireDatabaseMigrationRule extends SaropaLintRule {
   RequireDatabaseMigrationRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -532,7 +532,7 @@ class RequireDatabaseMigrationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'require_database_migration',
-    '[require_database_migration] Database models must support versioned migrations to handle schema changes safely. Without migration logic, updates to the schema can break data, cause runtime errors, and result in data loss or corruption. This is a critical reliability and maintainability issue for any persistent storage solution. {v4}',
+    '[require_database_migration] Database models must support versioned migrations to handle schema changes safely. Without migration logic, updates to the schema can break data, cause runtime errors, and result in data loss or corruption. Versioned migrations are required for any persistent storage solution to remain forward-compatible across releases. {v4}',
     correctionMessage:
         'Implement versioned migrations for all database schema changes. Document migration steps and test upgrades to ensure data integrity and smooth user updates.',
     severity: DiagnosticSeverity.WARNING,
@@ -631,7 +631,7 @@ class RequireDatabaseIndexRule extends SaropaLintRule {
   RequireDatabaseIndexRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -745,7 +745,7 @@ class PreferTransactionForBatchRule extends SaropaLintRule {
   PreferTransactionForBatchRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -890,9 +890,9 @@ class _DatabaseWriteCounter extends RecursiveAstVisitor<void> {
 class IncorrectFirebaseEventNameRule extends SaropaLintRule {
   IncorrectFirebaseEventNameRule() : super(code: _code);
 
-  /// Critical issue. Invalid event names are silently dropped.
+  /// Invalid event names are silently dropped — analytics data is lost.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -997,9 +997,9 @@ class IncorrectFirebaseEventNameRule extends SaropaLintRule {
 class IncorrectFirebaseParameterNameRule extends SaropaLintRule {
   IncorrectFirebaseParameterNameRule() : super(code: _code);
 
-  /// Critical issue. Invalid parameter names are silently dropped.
+  /// Invalid parameter names are silently dropped — analytics data is lost.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1156,7 +1156,7 @@ class PreferFirestoreBatchWriteRule extends SaropaLintRule {
   PreferFirestoreBatchWriteRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1251,7 +1251,7 @@ class AvoidFirestoreInWidgetBuildRule extends SaropaLintRule {
   AvoidFirestoreInWidgetBuildRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1355,7 +1355,7 @@ class PreferFirebaseRemoteConfigDefaultsRule extends SaropaLintRule {
   PreferFirebaseRemoteConfigDefaultsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1441,7 +1441,7 @@ class RequireFcmTokenRefreshHandlerRule extends SaropaLintRule {
   RequireFcmTokenRefreshHandlerRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1529,7 +1529,7 @@ class RequireBackgroundMessageHandlerRule extends SaropaLintRule {
   RequireBackgroundMessageHandlerRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1620,7 +1620,7 @@ class AvoidMapMarkersInBuildRule extends SaropaLintRule {
   AvoidMapMarkersInBuildRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1698,7 +1698,7 @@ class RequireMapIdleCallbackRule extends SaropaLintRule {
   RequireMapIdleCallbackRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1780,7 +1780,7 @@ class PreferMarkerClusteringRule extends SaropaLintRule {
   PreferMarkerClusteringRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1849,7 +1849,7 @@ class RequireCrashlyticsUserIdRule extends SaropaLintRule {
 
   /// Debugging improvement - not critical but helpful.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1947,7 +1947,7 @@ class RequireFirebaseAppCheckRule extends SaropaLintRule {
 
   /// Security improvement - protects backend from abuse.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2047,7 +2047,7 @@ class AvoidStoringUserDataInAuthRule extends SaropaLintRule {
 
   /// Architectural issue - misuse of custom claims.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2152,7 +2152,7 @@ class PreferFirebaseAuthPersistenceRule extends SaropaLintRule {
 
   /// Medium impact - affects user experience on web.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2272,7 +2272,7 @@ class RequireFirebaseErrorHandlingRule extends SaropaLintRule {
   RequireFirebaseErrorHandlingRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2410,7 +2410,7 @@ class AvoidFirebaseRealtimeInBuildRule extends SaropaLintRule {
   AvoidFirebaseRealtimeInBuildRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2520,7 +2520,7 @@ class RequireFirestoreIndexRule extends SaropaLintRule {
   RequireFirestoreIndexRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2667,7 +2667,7 @@ class RequireFirebaseCompositeIndexRule extends SaropaLintRule {
   RequireFirebaseCompositeIndexRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2776,7 +2776,7 @@ class AvoidFirebaseUserDataInAuthRule extends SaropaLintRule {
   AvoidFirebaseUserDataInAuthRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2868,7 +2868,7 @@ class RequireFirebaseAppCheckProductionRule extends SaropaLintRule {
   RequireFirebaseAppCheckProductionRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2940,7 +2940,7 @@ class RequireFirebaseReauthenticationRule extends SaropaLintRule {
   RequireFirebaseReauthenticationRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3057,7 +3057,7 @@ class RequireFirebaseTokenRefreshRule extends SaropaLintRule {
   RequireFirebaseTokenRefreshRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3165,7 +3165,7 @@ class PreferFirebaseTransactionForCountersRule extends SaropaLintRule {
   PreferFirebaseTransactionForCountersRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3204,7 +3204,7 @@ class PreferCorrectTopicsRule extends SaropaLintRule {
   PreferCorrectTopicsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3239,7 +3239,7 @@ class PreferDeepLinkAuthRule extends SaropaLintRule {
   PreferDeepLinkAuthRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3274,7 +3274,7 @@ class RequireFirebaseEmailEnumerationProtectionRule extends SaropaLintRule {
   RequireFirebaseEmailEnumerationProtectionRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3310,7 +3310,7 @@ class RequireFirebaseOfflinePersistenceRule extends SaropaLintRule {
   RequireFirebaseOfflinePersistenceRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3352,7 +3352,7 @@ class RequireFirestoreSecurityRulesRule extends SaropaLintRule {
   RequireFirestoreSecurityRulesRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;

@@ -41,7 +41,7 @@ class AvoidAutoRouteContextNavigationRule extends SaropaLintRule {
   AvoidAutoRouteContextNavigationRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -149,7 +149,7 @@ class AvoidAutoRouteKeepHistoryMisuseRule extends SaropaLintRule {
   AvoidAutoRouteKeepHistoryMisuseRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -298,7 +298,7 @@ class RequireAutoRouteGuardResumeRule extends SaropaLintRule {
   RequireAutoRouteGuardResumeRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -382,7 +382,7 @@ class RequireAutoRouteFullHierarchyRule extends SaropaLintRule {
   RequireAutoRouteFullHierarchyRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -455,7 +455,7 @@ class PreferAutoRoutePathParamsSimpleRule extends SaropaLintRule {
   PreferAutoRoutePathParamsSimpleRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -523,7 +523,7 @@ class PreferAutoRouteTypedArgsRule extends SaropaLintRule {
   PreferAutoRouteTypedArgsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -582,7 +582,7 @@ class RequireAutoRouteDeepLinkConfigRule extends SaropaLintRule {
   RequireAutoRouteDeepLinkConfigRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

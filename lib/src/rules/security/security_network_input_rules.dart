@@ -22,7 +22,7 @@ class AvoidLoggingSensitiveDataRule extends SaropaLintRule {
   /// Logging PII exposes sensitive data in crash reports and logs.
   /// Each occurrence is a potential data breach.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.securityHotspot;
@@ -196,7 +196,7 @@ class RequireInputSanitizationRule extends SaropaLintRule {
   /// Unsanitized input enables injection attacks.
   /// Each occurrence is a potential security exploit.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -299,7 +299,7 @@ class AvoidWebViewJavaScriptEnabledRule extends SaropaLintRule {
   /// JavaScript in WebView can enable XSS attacks with untrusted content.
   /// Review each occurrence for security implications.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.securityHotspot;
@@ -391,7 +391,7 @@ class AvoidEvalLikePatternsRule extends SaropaLintRule {
   /// Dynamic code execution enables code injection attacks.
   /// Each occurrence is a serious security vulnerability.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -488,9 +488,9 @@ class AvoidDynamicCodeLoadingRule extends SaropaLintRule {
   AvoidDynamicCodeLoadingRule() : super(code: _code);
 
   /// Runtime code loading enables supply chain attacks.
-  /// Each occurrence is a critical security vulnerability.
+  /// Each occurrence is a security vulnerability.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -644,7 +644,7 @@ class AvoidUnverifiedNativeLibraryRule extends SaropaLintRule {
 
   /// Loading unverified native code enables supply chain attacks.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -739,7 +739,7 @@ class AvoidHardcodedSigningConfigRule extends SaropaLintRule {
 
   /// Signing config in source code aids reverse engineering.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -869,7 +869,7 @@ class RequireCertificatePinningRule extends SaropaLintRule {
   /// Missing certificate pinning enables man-in-the-middle attacks.
   /// Important for apps handling sensitive data.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -950,7 +950,7 @@ class AvoidTokenInUrlRule extends SaropaLintRule {
   /// Tokens in URLs are logged and visible in browser history.
   /// Each occurrence exposes credentials.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -1033,7 +1033,7 @@ class AvoidClipboardSensitiveRule extends SaropaLintRule {
   /// Clipboard data is accessible by other apps and persists.
   /// Each occurrence risks credential exposure.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.securityHotspot;
@@ -1125,9 +1125,9 @@ class AvoidDynamicSqlRule extends SaropaLintRule {
   AvoidDynamicSqlRule() : super(code: _code);
 
   /// String interpolation in SQL enables SQL injection attacks.
-  /// Each occurrence is a critical security vulnerability.
+  /// Each occurrence is a security vulnerability.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -1278,7 +1278,7 @@ class AvoidGenericKeyInUrlRule extends SaropaLintRule {
   /// Generic key parameters in URLs may contain sensitive data.
   /// Review for potential credential exposure.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -1358,7 +1358,7 @@ class PreferSecureRandomRule extends SaropaLintRule {
   /// Random() is predictable and unsuitable for security.
   /// Use Random.secure() for tokens and crypto operations.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -1493,7 +1493,7 @@ class PreferTypedDataRule extends SaropaLintRule {
   /// `List<int>` for binary data is inefficient but functional.
   /// Optimization suggestion, not a bug.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -1577,7 +1577,7 @@ class AvoidUnnecessaryToListRule extends SaropaLintRule {
   /// Unnecessary toList() is inefficient but functional.
   /// Performance optimization, not a bug.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -1694,7 +1694,7 @@ class RequireDeepLinkValidationRule extends SaropaLintRule {
 
   /// Deep links without validation enable injection attacks.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.securityHotspot;
@@ -1848,7 +1848,7 @@ class PreferDataMaskingRule extends SaropaLintRule {
   PreferDataMaskingRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.securityHotspot;
@@ -1974,7 +1974,7 @@ class AvoidScreenshotSensitiveRule extends SaropaLintRule {
   AvoidScreenshotSensitiveRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.securityHotspot;
@@ -2111,7 +2111,7 @@ class AvoidPathTraversalRule extends SaropaLintRule {
   AvoidPathTraversalRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -2132,7 +2132,7 @@ class AvoidPathTraversalRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'avoid_path_traversal',
-    '[avoid_path_traversal] File paths constructed from user input may allow path traversal attacks (e.g., "../"), enabling access to sensitive files outside the intended directory. This is a critical security risk. {v8}',
+    '[avoid_path_traversal] File paths constructed from user input may allow path traversal attacks (e.g., "../"), enabling access to sensitive files outside the intended directory. Validate and canonicalize paths before file access, and reject any input containing parent-directory segments. {v8}',
     correctionMessage:
         'Sanitize and validate file paths to prevent traversal (e.g., remove "../", use path package), and restrict access to allowed directories only.',
     severity: DiagnosticSeverity.WARNING,
@@ -2276,7 +2276,7 @@ class PreferHtmlEscapeRule extends SaropaLintRule {
   PreferHtmlEscapeRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -2397,7 +2397,7 @@ class RequireUrlValidationRule extends SaropaLintRule {
 
   /// Security vulnerability - unvalidated URLs can be exploited.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -2518,7 +2518,7 @@ class AvoidRedirectInjectionRule extends SaropaLintRule {
 
   /// Security vulnerability - open redirects enable phishing.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.securityHotspot;
@@ -2700,7 +2700,7 @@ class AvoidExternalStorageSensitiveRule extends SaropaLintRule {
 
   /// Security vulnerability - sensitive data exposed.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -2832,7 +2832,7 @@ class PreferWebViewJavaScriptDisabledRule extends SaropaLintRule {
   /// JavaScript in WebView increases XSS attack surface.
   /// Review each occurrence for security implications.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.securityHotspot;
@@ -2947,7 +2947,7 @@ class AvoidWebViewInsecureContentRule extends SaropaLintRule {
   /// Mixed content bypasses HTTPS encryption.
   /// Critical security vulnerability.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.securityHotspot;
@@ -3071,7 +3071,7 @@ class RequireWebViewErrorHandlingRule extends SaropaLintRule {
 
   /// Missing error handling creates poor UX on network failures.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.securityHotspot;
@@ -3178,7 +3178,7 @@ class AvoidApiKeyInCodeRule extends SaropaLintRule {
 
   /// Hardcoded API keys can be extracted from builds.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -3332,7 +3332,7 @@ class AvoidIgnoringSslErrorsRule extends SaropaLintRule {
   /// Ignoring SSL errors enables man-in-the-middle attacks.
   /// Critical security vulnerability.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -3479,7 +3479,7 @@ class RequireHttpsOnlyRule extends SaropaLintRule {
   /// HTTP traffic is unencrypted and can be intercepted.
   /// Critical for any network communication.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -3700,7 +3700,7 @@ class RequireHttpsOnlyTestRule extends SaropaLintRule {
   RequireHttpsOnlyTestRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -3798,7 +3798,7 @@ class AvoidUnsafeDeserializationRule extends SaropaLintRule {
 
   /// Untrusted deserialization can lead to data integrity issues.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -3993,7 +3993,7 @@ class AvoidUserControlledUrlsRule extends SaropaLintRule {
   /// SSRF can expose internal services and data.
   /// Critical vulnerability in server-facing applications.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.securityHotspot;
@@ -4232,7 +4232,7 @@ class RequireCatchLoggingRule extends SaropaLintRule {
 
   /// Silent exception swallowing hides security-relevant errors.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.securityHotspot;
@@ -4423,7 +4423,7 @@ class AvoidStackTraceInProductionRule extends SaropaLintRule {
 
   /// Stack trace leaks expose internal architecture to attackers.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.securityHotspot;
@@ -4576,7 +4576,7 @@ class AvoidWebViewCorsIssuesRule extends SaropaLintRule {
   AvoidWebViewCorsIssuesRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.securityHotspot;
@@ -4670,7 +4670,7 @@ class RequireInputValidationRule extends SaropaLintRule {
   RequireInputValidationRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;

@@ -58,7 +58,7 @@ class RequireMediaPlayerDisposeRule extends SaropaLintRule {
   RequireMediaPlayerDisposeRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.bug;
@@ -203,7 +203,7 @@ class RequireTabControllerDisposeRule extends SaropaLintRule {
   RequireTabControllerDisposeRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.bug;
@@ -573,7 +573,7 @@ class RequireTextEditingControllerDisposeRule extends SaropaLintRule {
   RequireTextEditingControllerDisposeRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.bug;
@@ -654,7 +654,7 @@ class RequirePageControllerDisposeRule extends SaropaLintRule {
   RequirePageControllerDisposeRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.bug;
@@ -755,7 +755,7 @@ class RequireLifecycleObserverRule extends SaropaLintRule {
 
   /// Important for battery life and app stability.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.bug;
@@ -861,7 +861,7 @@ class AvoidWebsocketMemoryLeakRule extends SaropaLintRule {
   AvoidWebsocketMemoryLeakRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.bug;
@@ -984,7 +984,7 @@ class RequireVideoPlayerControllerDisposeRule extends SaropaLintRule {
   RequireVideoPlayerControllerDisposeRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.bug;
@@ -1131,7 +1131,7 @@ class RequireStreamSubscriptionCancelRule extends SaropaLintRule {
   RequireStreamSubscriptionCancelRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.bug;
@@ -1331,7 +1331,7 @@ class RequireChangeNotifierDisposeRule extends SaropaLintRule {
   RequireChangeNotifierDisposeRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.bug;
@@ -1437,7 +1437,7 @@ class RequireReceivePortCloseRule extends SaropaLintRule {
   RequireReceivePortCloseRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.bug;
@@ -1552,7 +1552,7 @@ class RequireSocketCloseRule extends SaropaLintRule {
   RequireSocketCloseRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.bug;
@@ -1691,7 +1691,7 @@ class RequireDebouncerCancelRule extends SaropaLintRule {
   RequireDebouncerCancelRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.bug;
@@ -1819,7 +1819,7 @@ class RequireIntervalTimerCancelRule extends SaropaLintRule {
   RequireIntervalTimerCancelRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.bug;
@@ -1951,7 +1951,7 @@ class RequireFileHandleCloseRule extends SaropaLintRule {
   RequireFileHandleCloseRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.bug;
@@ -2084,7 +2084,7 @@ class RequireDisposeImplementationRule extends SaropaLintRule {
 
   /// Critical - resources leak without dispose.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.bug;
@@ -2236,7 +2236,7 @@ class PreferDisposeBeforeNewInstanceRule extends SaropaLintRule {
 
   /// Critical - old resources leak on reassignment.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.bug;
@@ -2437,7 +2437,7 @@ class DisposeClassFieldsRule extends SaropaLintRule {
   DisposeClassFieldsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.bug;
@@ -2590,7 +2590,7 @@ class PreferDeactivateForCleanupRule extends SaropaLintRule {
   PreferDeactivateForCleanupRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.bug;

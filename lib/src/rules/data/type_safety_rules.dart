@@ -48,7 +48,7 @@ class AvoidUnsafeCastRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -294,7 +294,7 @@ class PreferConstrainedGenericsRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -357,7 +357,7 @@ class RequireCovariantDocumentationRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -435,7 +435,7 @@ class RequireSafeJsonParsingRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -511,7 +511,7 @@ class RequireNullSafeExtensionsRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -574,7 +574,7 @@ class PreferSpecificNumericTypesRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -643,7 +643,7 @@ class AvoidNonNullAssertionRule extends SaropaLintRule {
   AvoidNonNullAssertionRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -705,7 +705,7 @@ class AvoidTypeCastsRule extends SaropaLintRule {
   AvoidTypeCastsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -756,7 +756,7 @@ class RequireFutureOrDocumentationRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -819,7 +819,7 @@ class PreferExplicitTypeArgumentsRule extends SaropaLintRule {
   PreferExplicitTypeArgumentsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -951,9 +951,9 @@ class PreferExplicitTypeArgumentsRule extends SaropaLintRule {
 class AvoidUnrelatedTypeCastsRule extends SaropaLintRule {
   AvoidUnrelatedTypeCastsRule() : super(code: _code);
 
-  /// Critical issue - always-failing cast causes runtime crash.
+  /// Always-failing cast causes runtime crash.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1059,7 +1059,7 @@ class AvoidDynamicJsonAccessRule extends SaropaLintRule {
 
   /// High impact - null access causes runtime crash.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1152,9 +1152,9 @@ class AvoidDynamicJsonAccessRule extends SaropaLintRule {
 class RequireNullSafeJsonAccessRule extends SaropaLintRule {
   RequireNullSafeJsonAccessRule() : super(code: _code);
 
-  /// Critical issue - null access causes crash.
+  /// Null access on JSON fields causes runtime crash.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1251,9 +1251,9 @@ class RequireNullSafeJsonAccessRule extends SaropaLintRule {
 class AvoidDynamicJsonChainsRule extends SaropaLintRule {
   AvoidDynamicJsonChainsRule() : super(code: _code);
 
-  /// Critical issue - deep chains are fragile and crash on missing keys.
+  /// Deep dynamic JSON chains are fragile and crash on missing keys.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1344,7 +1344,7 @@ class RequireEnumUnknownValueRule extends SaropaLintRule {
 
   /// High impact - crashes on new API values.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1465,9 +1465,9 @@ class RequireEnumUnknownValueRule extends SaropaLintRule {
 class RequireValidatorReturnNullRule extends SaropaLintRule {
   RequireValidatorReturnNullRule() : super(code: _code);
 
-  /// Critical issue - forms never validate successfully.
+  /// Forms never validate successfully without a null return on success.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1568,7 +1568,7 @@ class AvoidRedundantNullCheckRule extends SaropaLintRule {
   AvoidRedundantNullCheckRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

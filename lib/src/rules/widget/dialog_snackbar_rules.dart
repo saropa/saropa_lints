@@ -33,7 +33,7 @@ class RequireSnackbarDurationRule extends SaropaLintRule {
 
   /// Minor improvement. Track for later review.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -106,7 +106,7 @@ class RequireDialogBarrierDismissibleRule extends SaropaLintRule {
 
   /// Minor improvement. Track for later review.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -189,7 +189,7 @@ class RequireDialogResultHandlingRule extends SaropaLintRule {
 
   /// Minor improvement. Track for later review.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -267,7 +267,7 @@ class AvoidSnackbarQueueBuildupRule extends SaropaLintRule {
 
   /// Minor improvement. Track for later review.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -371,7 +371,7 @@ class PreferAdaptiveDialogRule extends SaropaLintRule {
 
   /// UX improvement - native platform feel.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -473,7 +473,7 @@ class RequireSnackbarActionForUndoRule extends SaropaLintRule {
 
   /// UX improvement - allows recovery from accidents.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

@@ -56,7 +56,7 @@ class RequireLocationPermissionRationaleRule extends SaropaLintRule {
   RequireLocationPermissionRationaleRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -182,7 +182,7 @@ class RequireCameraPermissionCheckRule extends SaropaLintRule {
   RequireCameraPermissionCheckRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -342,7 +342,7 @@ class PreferImageCroppingRule extends SaropaLintRule {
   PreferImageCroppingRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -523,7 +523,7 @@ class AvoidPermissionHandlerNullSafetyRule extends SaropaLintRule {
 
   /// Using deprecated APIs causes compile errors after migration.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -643,7 +643,7 @@ class PreferPermissionRequestInContextRule extends SaropaLintRule {
   PreferPermissionRequestInContextRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -750,7 +750,7 @@ class AvoidPermissionRequestLoopRule extends SaropaLintRule {
 
   /// Permission loops annoy users and get auto-denied by the OS.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -825,7 +825,7 @@ class PreferPermissionMinimalRequestRule extends SaropaLintRule {
   PreferPermissionMinimalRequestRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -872,7 +872,7 @@ class RequirePermissionLifecycleObserverRule extends SaropaLintRule {
   RequirePermissionLifecycleObserverRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;

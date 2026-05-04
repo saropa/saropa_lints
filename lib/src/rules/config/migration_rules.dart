@@ -52,7 +52,7 @@ class AvoidAssetManifestJsonRule extends SaropaLintRule {
   AvoidAssetManifestJsonRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -140,7 +140,7 @@ class PreferDropdownInitialValueRule extends SaropaLintRule {
   PreferDropdownInitialValueRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -271,7 +271,7 @@ class PreferDropdownMenuItemButtonOpacityAnimationRule extends SaropaLintRule {
   PreferDropdownMenuItemButtonOpacityAnimationRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -429,7 +429,7 @@ class PreferOnPopWithResultRule extends SaropaLintRule {
   PreferOnPopWithResultRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -576,7 +576,7 @@ class PreferTabbarThemeIndicatorColorRule extends SaropaLintRule {
   PreferTabbarThemeIndicatorColorRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -751,7 +751,7 @@ class PreferPlatformMenuBarChildRule extends SaropaLintRule {
   PreferPlatformMenuBarChildRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -870,7 +870,7 @@ class PreferKeepaliveDisposeRule extends SaropaLintRule {
   PreferKeepaliveDisposeRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -998,7 +998,7 @@ class PreferContextMenuBuilderRule extends SaropaLintRule {
   PreferContextMenuBuilderRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1090,7 +1090,7 @@ class PreferPanAxisRule extends SaropaLintRule {
   PreferPanAxisRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1185,7 +1185,7 @@ class PreferButtonStyleIconAlignmentRule extends SaropaLintRule {
   PreferButtonStyleIconAlignmentRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1289,7 +1289,7 @@ class PreferKeyEventRule extends SaropaLintRule {
   PreferKeyEventRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1416,7 +1416,7 @@ class PreferM3TextThemeRule extends SaropaLintRule {
   PreferM3TextThemeRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1635,7 +1635,7 @@ class PreferOverflowBarOverButtonBarRule extends SaropaLintRule {
   PreferOverflowBarOverButtonBarRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1886,7 +1886,7 @@ class AvoidDeprecatedFlutterTestWindowRule extends SaropaLintRule {
   AvoidDeprecatedFlutterTestWindowRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1985,7 +1985,7 @@ class AvoidRemovedRenderObjectElementMethodsRule extends SaropaLintRule {
   };
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2154,7 +2154,7 @@ class AvoidDeprecatedAnimatedListTypedefsRule extends SaropaLintRule {
   };
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2275,7 +2275,7 @@ class AvoidDeprecatedUseMaterial3CopyWithRule extends SaropaLintRule {
   AvoidDeprecatedUseMaterial3CopyWithRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2418,7 +2418,7 @@ class AvoidDeprecatedOnSurfaceDestroyedRule extends SaropaLintRule {
   AvoidDeprecatedOnSurfaceDestroyedRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

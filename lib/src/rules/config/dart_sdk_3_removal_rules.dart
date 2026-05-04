@@ -154,7 +154,7 @@ class AvoidDeprecatedListConstructorRule extends SaropaLintRule {
   AvoidDeprecatedListConstructorRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -252,7 +252,7 @@ class AvoidRemovedProxyAnnotationRule extends SaropaLintRule {
   AvoidRemovedProxyAnnotationRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -302,7 +302,7 @@ class AvoidRemovedProvisionalAnnotationRule extends SaropaLintRule {
   AvoidRemovedProvisionalAnnotationRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -402,7 +402,7 @@ class AvoidDeprecatedExpiresGetterRule extends SaropaLintRule {
   AvoidDeprecatedExpiresGetterRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -487,7 +487,7 @@ class AvoidRemovedCastErrorRule extends SaropaLintRule {
   AvoidRemovedCastErrorRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -537,7 +537,7 @@ class AvoidRemovedFallThroughErrorRule extends SaropaLintRule {
   AvoidRemovedFallThroughErrorRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -580,7 +580,7 @@ class AvoidRemovedAbstractClassInstantiationErrorRule extends SaropaLintRule {
   AvoidRemovedAbstractClassInstantiationErrorRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -628,7 +628,7 @@ class AvoidRemovedCyclicInitializationErrorRule extends SaropaLintRule {
   AvoidRemovedCyclicInitializationErrorRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -676,7 +676,7 @@ class AvoidRemovedNoSuchMethodErrorDefaultConstructorRule
   AvoidRemovedNoSuchMethodErrorDefaultConstructorRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -723,7 +723,7 @@ class AvoidRemovedBidirectionalIteratorRule extends SaropaLintRule {
   AvoidRemovedBidirectionalIteratorRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -768,7 +768,7 @@ class AvoidRemovedDeferredLibraryRule extends SaropaLintRule {
   AvoidRemovedDeferredLibraryRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -845,7 +845,7 @@ class AvoidDeprecatedHasNextIteratorRule extends SaropaLintRule {
   AvoidDeprecatedHasNextIteratorRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -905,7 +905,7 @@ class AvoidRemovedMaxUserTagsConstantRule extends SaropaLintRule {
   AvoidRemovedMaxUserTagsConstantRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1001,7 +1001,7 @@ class AvoidRemovedDartDeveloperMetricsRule extends SaropaLintRule {
   };
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1071,7 +1071,7 @@ class AvoidDeprecatedNetworkInterfaceListSupportedRule extends SaropaLintRule {
   AvoidDeprecatedNetworkInterfaceListSupportedRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1138,7 +1138,7 @@ class AvoidRemovedNullThrownErrorRule extends SaropaLintRule {
   AvoidRemovedNullThrownErrorRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

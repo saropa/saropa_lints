@@ -57,7 +57,7 @@ class PreferNoBlankLineBeforeReturnRule extends SaropaLintRule {
   PreferNoBlankLineBeforeReturnRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -151,7 +151,7 @@ class PreferBlankLineAfterDeclarationsRule extends SaropaLintRule {
   PreferBlankLineAfterDeclarationsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -249,7 +249,7 @@ class PreferCompactDeclarationsRule extends SaropaLintRule {
   PreferCompactDeclarationsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -340,7 +340,7 @@ class PreferBlankLinesBetweenMembersRule extends SaropaLintRule {
   PreferBlankLinesBetweenMembersRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -435,7 +435,7 @@ class PreferCompactClassMembersRule extends SaropaLintRule {
   PreferCompactClassMembersRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -520,7 +520,7 @@ class PreferNoBlankLineInsideBlocksRule extends SaropaLintRule {
   PreferNoBlankLineInsideBlocksRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -633,7 +633,7 @@ class PreferSingleBlankLineMaxRule extends SaropaLintRule {
   PreferSingleBlankLineMaxRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -729,7 +729,7 @@ class PreferSuperParametersRule extends SaropaLintRule {
   PreferSuperParametersRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -821,7 +821,7 @@ class PreferInitializingFormalsRule extends SaropaLintRule {
   PreferInitializingFormalsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -908,7 +908,7 @@ class PreferConstructorBodyAssignmentRule extends SaropaLintRule {
   PreferConstructorBodyAssignmentRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -991,7 +991,7 @@ class PreferFactoryForValidationRule extends SaropaLintRule {
   PreferFactoryForValidationRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1098,7 +1098,7 @@ class PreferConstructorAssertionRule extends SaropaLintRule {
   PreferConstructorAssertionRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1190,7 +1190,7 @@ class PreferRequiredBeforeOptionalRule extends SaropaLintRule {
   PreferRequiredBeforeOptionalRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1268,7 +1268,7 @@ class PreferGroupedByPurposeRule extends SaropaLintRule {
   PreferGroupedByPurposeRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1364,7 +1364,7 @@ class PreferRethrowOverThrowERule extends SaropaLintRule {
   PreferRethrowOverThrowERule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

@@ -38,7 +38,7 @@ class RequireDarkModeTestingRule extends SaropaLintRule {
 
   /// Dark mode support is an accessibility requirement.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -126,7 +126,7 @@ class AvoidElevationOpacityInDarkRule extends SaropaLintRule {
 
   /// Visual issues in dark mode affect user experience.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -219,7 +219,7 @@ class PreferThemeExtensionsRule extends SaropaLintRule {
 
   /// Maintainability issue for theming architecture.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -336,7 +336,7 @@ class RequireSemanticColorsRule extends SaropaLintRule {
   RequireSemanticColorsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -438,7 +438,7 @@ class PreferDarkModeColorsRule extends SaropaLintRule {
   PreferDarkModeColorsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -492,7 +492,7 @@ class PreferHighContrastModeRule extends SaropaLintRule {
   PreferHighContrastModeRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

@@ -45,7 +45,7 @@ class RequireUrlLauncherCanLaunchCheckRule extends SaropaLintRule {
   static final RegExp _canLaunchPattern = RegExp(r'\bcanLaunch(Url)?\b');
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -147,7 +147,7 @@ class AvoidUrlLauncherSimulatorTestsRule extends SaropaLintRule {
   AvoidUrlLauncherSimulatorTestsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -287,7 +287,7 @@ class PreferUrlLauncherFallbackRule extends SaropaLintRule {
   );
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

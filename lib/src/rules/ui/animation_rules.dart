@@ -54,7 +54,7 @@ class RequireVsyncMixinRule extends SaropaLintRule {
   /// Missing vsync causes visual glitches and sync issues.
   /// Each occurrence is a bug that should be fixed.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -132,7 +132,7 @@ class AvoidAnimationInBuildRule extends SaropaLintRule {
   /// Creating controllers in build() causes resource leaks on every rebuild.
   /// Each occurrence is a memory leak bug.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -145,7 +145,7 @@ class AvoidAnimationInBuildRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'avoid_animation_in_build',
-    '[avoid_animation_in_build] Creating an AnimationController inside the build() method causes a new controller to be instantiated on every widget rebuild, leading to severe memory leaks, degraded animation performance, and unpredictable UI behavior. Previous controllers are never disposed, which can crash your app or exhaust system resources. AnimationControllers must be long-lived and managed at the widget level, not recreated per frame. This is a critical resource management issue in Flutter. {v2}',
+    '[avoid_animation_in_build] Creating an AnimationController inside the build() method causes a new controller to be instantiated on every widget rebuild, leading to severe memory leaks, degraded animation performance, and unpredictable UI behavior. Previous controllers are never disposed, which can crash your app or exhaust system resources. AnimationControllers must be long-lived and managed at the widget level, not recreated per frame. {v2}',
     correctionMessage:
         'Always create AnimationController instances in initState() and store them as fields in your State class. Dispose of them in the dispose() method to release resources and prevent leaks. Audit your codebase for AnimationController usage and refactor any controllers created in build() to follow this pattern. See Flutter documentation for best practices on animation lifecycle management.',
     severity: DiagnosticSeverity.ERROR,
@@ -259,7 +259,7 @@ class RequireAnimationControllerDisposeRule extends SaropaLintRule {
   /// Undisposed controllers cause memory leaks. Each occurrence leaks memory
   /// and prevents garbage collection. Even 1-2 is serious in production.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -401,7 +401,7 @@ class RequireHeroTagUniquenessRule extends SaropaLintRule {
   /// Duplicate Hero tags cause runtime crashes during navigation.
   /// Each occurrence is a crash waiting to happen.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -505,7 +505,7 @@ class AvoidLayoutPassesRule extends SaropaLintRule {
   /// Double layout passes hurt performance, especially in lists.
   /// A few is okay, but 10+ in hot paths causes noticeable jank.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -575,7 +575,7 @@ class AvoidHardcodedDurationRule extends SaropaLintRule {
   /// Hardcoded durations affect maintainability, not correctness.
   /// 1000+ is fine in legacy code; enforce on new code only.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -678,7 +678,7 @@ class RequireAnimationCurveRule extends SaropaLintRule {
   /// Missing curves affect UX polish, not functionality.
   /// Address when improving animation quality; not urgent.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -778,7 +778,7 @@ class PreferImplicitAnimationsRule extends SaropaLintRule {
   /// Code simplification suggestion. Explicit animations work fine.
   /// Address during refactoring; not a bug.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -892,7 +892,7 @@ class RequireStaggeredAnimationDelaysRule extends SaropaLintRule {
   /// UX polish suggestion. Non-staggered animations work but look less polished.
   /// Address when improving animation quality; not urgent.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -992,7 +992,7 @@ class PreferTweenSequenceRule extends SaropaLintRule {
   PreferTweenSequenceRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1067,7 +1067,7 @@ class RequireAnimationStatusListenerRule extends SaropaLintRule {
   RequireAnimationStatusListenerRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1202,7 +1202,7 @@ class AvoidOverlappingAnimationsRule extends SaropaLintRule {
   AvoidOverlappingAnimationsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1344,7 +1344,7 @@ class AvoidAnimationRebuildWasteRule extends SaropaLintRule {
   AvoidAnimationRebuildWasteRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1432,7 +1432,7 @@ class PreferPhysicsSimulationRule extends SaropaLintRule {
   PreferPhysicsSimulationRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1550,7 +1550,7 @@ class RequireAnimationTickerDisposalRule extends SaropaLintRule {
 
   /// Ticker leaks cause memory issues and error messages.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1672,7 +1672,7 @@ class PreferSpringAnimationRule extends SaropaLintRule {
   PreferSpringAnimationRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1777,7 +1777,7 @@ class AvoidExcessiveRebuildsAnimationRule extends SaropaLintRule {
   AvoidExcessiveRebuildsAnimationRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1986,7 +1986,7 @@ class AvoidClipDuringAnimationRule extends SaropaLintRule {
   AvoidClipDuringAnimationRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2116,7 +2116,7 @@ class AvoidMultipleAnimationControllersRule extends SaropaLintRule {
 
   /// Complex animation state is hard to maintain and dispose correctly.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2243,7 +2243,7 @@ class PreferSingleTickerProviderStateMixinRule extends SaropaLintRule {
   /// a list-of-tickers per instance; the Single variant stores one nullable
   /// ticker. Cheap perf win plus intent-revealing.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2460,7 +2460,7 @@ class AvoidImplicitAnimationDisposeCastRule extends SaropaLintRule {
 
   /// Double-dispose / wrong lifecycle ordering on framework-owned animation.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2561,7 +2561,7 @@ class PreferListenableBuilderRule extends SaropaLintRule {
 
   /// Code smell / migration hint — not a correctness bug, so low impact.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2723,7 +2723,7 @@ class AvoidInertAnimationValueInBuildRule extends SaropaLintRule {
   /// Misleads readers, wastes controller cycles, fails to deliver the
   /// visual feedback the code claims to provide.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3211,7 +3211,7 @@ class PreferAnimationControllerForwardFromZeroRule extends SaropaLintRule {
   /// Not a crash or leak; QA rarely catches it because the regression
   /// is time-correlated. Narrow trigger keeps false positives low.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

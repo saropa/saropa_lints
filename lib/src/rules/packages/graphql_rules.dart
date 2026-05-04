@@ -40,7 +40,7 @@ class AvoidGraphqlStringQueriesRule extends SaropaLintRule {
 
   /// Medium impact - maintainability and type safety issue.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

@@ -69,7 +69,7 @@ class PreferInterpolationOverConcatenationRule extends SaropaLintRule {
   PreferInterpolationOverConcatenationRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -143,7 +143,7 @@ class PreferConcatenationOverInterpolationRule extends SaropaLintRule {
   PreferConcatenationOverInterpolationRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -208,7 +208,7 @@ class PreferDoubleQuotesRule extends SaropaLintRule {
   PreferDoubleQuotesRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -289,7 +289,7 @@ class PreferAbsoluteImportsRule extends SaropaLintRule {
   PreferAbsoluteImportsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -361,7 +361,7 @@ class PreferGroupedImportsRule extends SaropaLintRule {
   PreferGroupedImportsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -453,7 +453,7 @@ class PreferFlatImportsRule extends SaropaLintRule {
   PreferFlatImportsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -543,7 +543,7 @@ class PreferSortedImportsRule extends SaropaLintRule {
   PreferSortedImportsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -643,7 +643,7 @@ class PreferImportGroupCommentsRule extends SaropaLintRule {
   PreferImportGroupCommentsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -759,7 +759,7 @@ class PreferFieldsBeforeMethodsRule extends SaropaLintRule {
   PreferFieldsBeforeMethodsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -831,7 +831,7 @@ class PreferMethodsBeforeFieldsRule extends SaropaLintRule {
   PreferMethodsBeforeFieldsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -911,7 +911,7 @@ class PreferStaticMembersFirstRule extends SaropaLintRule {
   PreferStaticMembersFirstRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -985,7 +985,7 @@ class PreferInstanceMembersFirstRule extends SaropaLintRule {
   PreferInstanceMembersFirstRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1059,7 +1059,7 @@ class PreferPublicMembersFirstRule extends SaropaLintRule {
   PreferPublicMembersFirstRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1133,7 +1133,7 @@ class PreferPrivateMembersFirstRule extends SaropaLintRule {
   PreferPrivateMembersFirstRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1212,7 +1212,7 @@ class PreferVarOverExplicitTypeRule extends SaropaLintRule {
   PreferVarOverExplicitTypeRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1290,7 +1290,7 @@ class PreferObjectOverDynamicRule extends SaropaLintRule {
   PreferObjectOverDynamicRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1368,7 +1368,7 @@ class PreferDynamicOverObjectRule extends SaropaLintRule {
   PreferDynamicOverObjectRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1450,7 +1450,7 @@ class PreferLowerCamelCaseConstantsRule extends SaropaLintRule {
   PreferLowerCamelCaseConstantsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1532,7 +1532,7 @@ class PreferCamelCaseMethodNamesRule extends SaropaLintRule {
   PreferCamelCaseMethodNamesRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1631,7 +1631,7 @@ class PreferDescriptiveVariableNamesRule extends SaropaLintRule {
   PreferDescriptiveVariableNamesRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1733,7 +1733,7 @@ class PreferConciseVariableNamesRule extends SaropaLintRule {
   PreferConciseVariableNamesRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1804,7 +1804,7 @@ class PreferExplicitThisRule extends SaropaLintRule {
   PreferExplicitThisRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1890,7 +1890,7 @@ class PreferImplicitBooleanComparisonRule extends SaropaLintRule {
   PreferImplicitBooleanComparisonRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1966,7 +1966,7 @@ class PreferExplicitBooleanComparisonRule extends SaropaLintRule {
   PreferExplicitBooleanComparisonRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

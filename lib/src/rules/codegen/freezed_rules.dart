@@ -45,7 +45,7 @@ class AvoidFreezedJsonSerializableConflictRule extends SaropaLintRule {
   AvoidFreezedJsonSerializableConflictRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -115,7 +115,7 @@ class AvoidFreezedInvalidAnnotationTargetRule extends SaropaLintRule {
   AvoidFreezedInvalidAnnotationTargetRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -177,7 +177,7 @@ class RequireFreezedArrowSyntaxRule extends SaropaLintRule {
   RequireFreezedArrowSyntaxRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -258,7 +258,7 @@ class RequireFreezedPrivateConstructorRule extends SaropaLintRule {
   RequireFreezedPrivateConstructorRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -362,7 +362,7 @@ class RequireFreezedExplicitJsonRule extends SaropaLintRule {
 
   /// Potential bug. Nested objects may not serialize correctly.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -530,7 +530,7 @@ class PreferFreezedDefaultValuesRule extends SaropaLintRule {
 
   /// Style preference. Clearer intent for optional fields.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -647,7 +647,7 @@ class RequireFreezedJsonConverterRule extends SaropaLintRule {
 
   /// JSON serialization failures at runtime.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -775,7 +775,7 @@ class RequireFreezedLintPackageRule extends SaropaLintRule {
 
   /// Missing specialized linting for Freezed patterns.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -844,7 +844,7 @@ class AvoidFreezedForLogicClassesRule extends SaropaLintRule {
   AvoidFreezedForLogicClassesRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -964,7 +964,7 @@ class PreferFreezedForDataClassesRule extends SaropaLintRule {
   PreferFreezedForDataClassesRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1073,7 +1073,7 @@ class AvoidFreezedAnyMapIssueRule extends SaropaLintRule {
   AvoidFreezedAnyMapIssueRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1167,7 +1167,7 @@ class PreferFreezedUnionTypesRule extends SaropaLintRule {
   PreferFreezedUnionTypesRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

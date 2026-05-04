@@ -62,7 +62,7 @@ class RequireNotificationChannelAndroidRule extends SaropaLintRule {
   /// Missing channel means notifications won't display on Android 8.0+.
   /// Critical functionality bug affecting most Android users.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -160,7 +160,7 @@ class AvoidNotificationPayloadSensitiveRule extends SaropaLintRule {
   /// Sensitive data visible on lock screen exposes user credentials.
   /// Privacy/security issue that can expose passwords, tokens, PII.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -332,7 +332,7 @@ class RequireNotificationInitializePerPlatformRule extends SaropaLintRule {
 
   /// High impact - notifications fail silently, hard to debug.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -423,7 +423,7 @@ class RequireNotificationTimezoneAwarenessRule extends SaropaLintRule {
 
   /// Medium impact - notifications may fire at wrong time, but not a crash.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -570,7 +570,7 @@ class AvoidNotificationSameIdRule extends SaropaLintRule {
 
   /// Significant issue. Address when count exceeds 10.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -688,7 +688,7 @@ class PreferNotificationGroupingRule extends SaropaLintRule {
   PreferNotificationGroupingRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -791,7 +791,7 @@ class AvoidNotificationSilentFailureRule extends SaropaLintRule {
   AvoidNotificationSilentFailureRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -895,7 +895,7 @@ class PreferLocalNotificationForImmediateRule extends SaropaLintRule {
   PreferLocalNotificationForImmediateRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -958,7 +958,7 @@ class PreferNotificationCustomSoundRule extends SaropaLintRule {
   PreferNotificationCustomSoundRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

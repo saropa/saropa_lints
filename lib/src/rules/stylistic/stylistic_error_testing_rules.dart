@@ -48,7 +48,7 @@ class PreferSpecificExceptionsRule extends SaropaLintRule {
   PreferSpecificExceptionsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -119,7 +119,7 @@ class PreferGenericExceptionRule extends SaropaLintRule {
   PreferGenericExceptionRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -199,7 +199,7 @@ class PreferExceptionSuffixRule extends SaropaLintRule {
   PreferExceptionSuffixRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -281,7 +281,7 @@ class PreferErrorSuffixRule extends SaropaLintRule {
   PreferErrorSuffixRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -374,7 +374,7 @@ class PreferOnOverCatchRule extends SaropaLintRule {
   PreferOnOverCatchRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -456,7 +456,7 @@ class PreferCatchOverOnRule extends SaropaLintRule {
   PreferCatchOverOnRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -598,7 +598,7 @@ class PreferGivenWhenThenCommentsRule extends SaropaLintRule {
   PreferGivenWhenThenCommentsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -704,7 +704,7 @@ class PreferSelfDocumentingTestsRule extends SaropaLintRule {
   PreferSelfDocumentingTestsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -802,7 +802,7 @@ class PreferExpectOverAssertInTestsRule extends SaropaLintRule {
   PreferExpectOverAssertInTestsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -885,7 +885,7 @@ class PreferSingleExpectationPerTestRule extends SaropaLintRule {
   PreferSingleExpectationPerTestRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -999,7 +999,7 @@ class PreferGroupedExpectationsRule extends SaropaLintRule {
   PreferGroupedExpectationsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1105,7 +1105,7 @@ class PreferTestNameShouldWhenRule extends SaropaLintRule {
   PreferTestNameShouldWhenRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1186,7 +1186,7 @@ class PreferTestNameDescriptiveRule extends SaropaLintRule {
   PreferTestNameDescriptiveRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

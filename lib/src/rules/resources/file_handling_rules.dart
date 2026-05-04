@@ -33,7 +33,7 @@ class RequireFileExistsCheckRule extends SaropaLintRule {
 
   /// Important for robust file handling.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -146,7 +146,7 @@ class RequirePdfErrorHandlingRule extends SaropaLintRule {
 
   /// Important for robust PDF handling.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -248,7 +248,7 @@ class RequireGraphqlErrorHandlingRule extends SaropaLintRule {
 
   /// Critical for robust GraphQL apps.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -349,7 +349,7 @@ class RequireSqfliteWhereArgsRule extends SaropaLintRule {
   RequireSqfliteWhereArgsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -468,7 +468,7 @@ class RequireSqfliteTransactionRule extends SaropaLintRule {
   RequireSqfliteTransactionRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -584,7 +584,7 @@ class RequireSqfliteErrorHandlingRule extends SaropaLintRule {
   RequireSqfliteErrorHandlingRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -597,7 +597,7 @@ class RequireSqfliteErrorHandlingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'require_sqflite_error_handling',
-    '[require_sqflite_error_handling] All database operations (insert, update, query, etc.) must handle errors such as disk full, corruption, or constraint violations. Unhandled database errors will crash the app, cause data loss, and make recovery difficult. This is a critical reliability and data integrity issue. {v5}',
+    '[require_sqflite_error_handling] All database operations (insert, update, query, etc.) must handle errors such as disk full, corruption, or constraint violations. Unhandled database errors will crash the app, cause data loss, and make recovery difficult. {v5}',
     correctionMessage:
         'Wrap all database operations in try-catch blocks to handle DatabaseException and related errors. Provide user feedback and fallback logic to maintain app stability.',
     severity: DiagnosticSeverity.WARNING,
@@ -676,7 +676,7 @@ class PreferSqfliteBatchRule extends SaropaLintRule {
   PreferSqfliteBatchRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -775,7 +775,7 @@ class RequireSqfliteCloseRule extends SaropaLintRule {
   RequireSqfliteCloseRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -889,7 +889,7 @@ class AvoidSqfliteReservedWordsRule extends SaropaLintRule {
   AvoidSqfliteReservedWordsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1145,7 +1145,7 @@ class AvoidSqfliteReadAllColumnsRule extends SaropaLintRule {
 
   /// Medium impact - performance issue, not a crash.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1251,7 +1251,7 @@ class AvoidLoadingFullPdfInMemoryRule extends SaropaLintRule {
 
   /// High impact - can cause OOM crashes on mobile devices.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1374,7 +1374,7 @@ class PreferSqfliteSingletonRule extends SaropaLintRule {
 
   /// Database connection overhead and potential locking.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1467,7 +1467,7 @@ class PreferSqfliteColumnConstantsRule extends SaropaLintRule {
 
   /// Runtime errors from column name typos.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1574,7 +1574,7 @@ class PreferStreamingForLargeFilesRule extends SaropaLintRule {
   PreferStreamingForLargeFilesRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1703,7 +1703,7 @@ class RequireFilePathSanitizationRule extends SaropaLintRule {
   RequireFilePathSanitizationRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

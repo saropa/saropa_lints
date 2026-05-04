@@ -40,7 +40,7 @@ class AvoidAdjacentStringsRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -84,7 +84,7 @@ class AvoidEnumValuesByIndexRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -156,7 +156,7 @@ class AvoidIncorrectUriRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -256,7 +256,7 @@ class AvoidLateKeywordRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -323,7 +323,7 @@ class AvoidMissedCallsRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -430,7 +430,7 @@ class AvoidMisusedSetLiteralsRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -509,7 +509,7 @@ class AvoidPassingSelfAsArgumentRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -590,7 +590,7 @@ class AvoidRecursiveCallsRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -693,7 +693,7 @@ class AvoidRecursiveToStringRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -788,7 +788,7 @@ class AvoidReferencingDiscardedVariablesRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -876,7 +876,7 @@ class AvoidRedundantPragmaInlineRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -967,7 +967,7 @@ class AvoidSubstringRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -994,13 +994,82 @@ class AvoidSubstringRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addMethodInvocation((MethodInvocation node) {
-      if (node.methodName.name == 'substring') {
-        final DartType? targetType = node.realTarget?.staticType;
-        if (targetType != null && targetType.isDartCoreString) {
-          reporter.atNode(node);
-        }
-      }
+      if (node.methodName.name != 'substring') return;
+      final DartType? targetType = node.realTarget?.staticType;
+      if (targetType == null || !targetType.isDartCoreString) return;
+      // Skip when an enclosing if-statement or conditional-expression
+      // already proves the receiver is long enough (startsWith / endsWith /
+      // explicit `.length` check on the same receiver). Without this, the
+      // rule fires on safe idioms like
+      //   `s.startsWith('v') ? s.substring(1) : s`
+      // and forces callers to reach for `// ignore:`.
+      if (_isGuardedByLengthCheck(node)) return;
+      reporter.atNode(node);
     });
+  }
+
+  /// True when [substringCall] sits inside a true-branch (if-then or
+  /// `?:` then-expression) whose condition guarantees the receiver is long
+  /// enough — by calling `startsWith` / `endsWith` on the same receiver, or
+  /// by an explicit `<receiver>.length` comparison.
+  static bool _isGuardedByLengthCheck(MethodInvocation substringCall) {
+    final Expression? receiver = substringCall.realTarget;
+    if (receiver == null) return false;
+    final String receiverSource = receiver.toSource();
+
+    AstNode? prev = substringCall;
+    AstNode? current = substringCall.parent;
+    while (current != null) {
+      if (current is IfStatement) {
+        // A substring inside the IfStatement's then-block is guarded by
+        // its condition. (Else-branch guards are the inverse — out of
+        // scope; we conservatively don't claim them.)
+        if (_isInThen(current, prev)) {
+          if (_conditionGuardsLength(current.expression, receiverSource)) {
+            return true;
+          }
+        }
+      } else if (current is ConditionalExpression) {
+        if (current.thenExpression == prev) {
+          if (_conditionGuardsLength(current.condition, receiverSource)) {
+            return true;
+          }
+        }
+      } else if (current is FunctionBody) {
+        // Crossed a function boundary — guards above don't apply here.
+        return false;
+      }
+      prev = current;
+      current = current.parent;
+    }
+    return false;
+  }
+
+  static bool _isInThen(IfStatement ifStmt, AstNode? prev) {
+    return ifStmt.thenStatement == prev;
+  }
+
+  static bool _conditionGuardsLength(
+    Expression condition,
+    String receiverSource,
+  ) {
+    final source = condition.toSource();
+    // Word-boundary RegExp rather than String.contains — substring matching on
+    // identifier-bearing source text is this project's #1 false-positive
+    // source (see test/integrity/anti_pattern_detection_test.dart). Escape
+    // the receiver in case it contains regex metacharacters.
+    final guardCheck = RegExp(
+      '${RegExp.escape(receiverSource)}\\.(startsWith|endsWith)\\(',
+    );
+    if (guardCheck.hasMatch(source)) {
+      return true;
+    }
+    // Explicit length comparison: `s.length >= N`, `s.length > N`,
+    // `s.length == N`, etc. The lookahead allows whitespace + comparator.
+    final lengthCheck = RegExp(
+      '${RegExp.escape(receiverSource)}\\.length\\s*[<>=!]',
+    );
+    return lengthCheck.hasMatch(source);
   }
 
   @override
@@ -1114,7 +1183,7 @@ class AvoidUnusedParametersRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1231,7 +1300,7 @@ class AvoidWeakCryptographicAlgorithmsRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1366,7 +1435,7 @@ class NoObjectDeclarationRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1437,7 +1506,7 @@ class AvoidAlwaysNullParametersRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1609,7 +1678,7 @@ class AvoidAsyncCallInSyncFunctionRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1888,7 +1957,7 @@ class AvoidIdenticalExceptionHandlingBlocksRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1953,7 +2022,7 @@ class AvoidMissingCompleterStackTraceRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2003,7 +2072,7 @@ class AvoidSimilarNamesRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2133,7 +2202,7 @@ class AvoidAccessingCollectionsByConstantIndexRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2204,7 +2273,7 @@ class AvoidDefaultToStringRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2322,7 +2391,7 @@ class AvoidDuplicateInitializersRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2391,7 +2460,7 @@ class AvoidUnnecessaryOverridesRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2480,7 +2549,7 @@ class AvoidUnnecessaryStatementsRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2602,7 +2671,7 @@ class AvoidSlowCollectionMethodsRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2686,7 +2755,7 @@ class AvoidInferrableTypeArgumentsRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2792,7 +2861,7 @@ class AvoidPassingDefaultValuesRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2942,7 +3011,7 @@ class AvoidDuplicateStringLiteralsRule extends SaropaLintRule {
 
   /// Style/consistency issue. Large counts acceptable in legacy code.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3079,7 +3148,7 @@ class AvoidDuplicateStringLiteralsPairRule extends SaropaLintRule {
 
   /// Style/consistency issue. Large counts acceptable in legacy code.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3187,7 +3256,7 @@ class AvoidExpensiveLogStringConstructionRule extends SaropaLintRule {
   AvoidExpensiveLogStringConstructionRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3244,7 +3313,7 @@ class AvoidEmptyBuildWhenRule extends SaropaLintRule {
   AvoidEmptyBuildWhenRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3331,7 +3400,7 @@ class AvoidMissingInterpolationRule extends SaropaLintRule {
   AvoidMissingInterpolationRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3429,7 +3498,7 @@ class AvoidIgnoringReturnValuesRule extends SaropaLintRule {
   AvoidIgnoringReturnValuesRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3579,7 +3648,7 @@ class AvoidDeprecatedUsageRule extends SaropaLintRule {
   AvoidDeprecatedUsageRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3705,7 +3774,7 @@ class AvoidPositionalBooleanParametersRule extends SaropaLintRule {
   AvoidPositionalBooleanParametersRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3780,7 +3849,7 @@ class BannedUsageRule extends SaropaLintRule {
   BannedUsageRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3842,7 +3911,7 @@ class UseSpecificDeprecationRule extends SaropaLintRule {
   UseSpecificDeprecationRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

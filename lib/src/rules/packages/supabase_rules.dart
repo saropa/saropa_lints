@@ -44,7 +44,7 @@ class RequireSupabaseErrorHandlingRule extends SaropaLintRule {
   RequireSupabaseErrorHandlingRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -121,7 +121,7 @@ class AvoidSupabaseAnonKeyInCodeRule extends SaropaLintRule {
   AvoidSupabaseAnonKeyInCodeRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -220,7 +220,7 @@ class RequireSupabaseRealtimeUnsubscribeRule extends SaropaLintRule {
   RequireSupabaseRealtimeUnsubscribeRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

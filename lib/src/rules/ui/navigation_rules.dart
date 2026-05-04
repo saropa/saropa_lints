@@ -55,7 +55,7 @@ class RequireUnknownRouteHandlerRule extends SaropaLintRule {
 
   /// Significant issue. Address when count exceeds 10.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -143,7 +143,7 @@ class AvoidContextAfterNavigationRule extends SaropaLintRule {
 
   /// Significant issue. Address when count exceeds 10.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -296,7 +296,7 @@ class RequireRouteTransitionConsistencyRule extends SaropaLintRule {
 
   /// Significant issue. Address when count exceeds 10.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -387,7 +387,7 @@ class AvoidNavigatorPushUnnamedRule extends SaropaLintRule {
 
   /// Significant issue. Address when count exceeds 10.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -474,7 +474,7 @@ class RequireRouteGuardsRule extends SaropaLintRule {
 
   /// Significant issue. Address when count exceeds 10.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -584,7 +584,7 @@ class AvoidCircularRedirectsRule extends SaropaLintRule {
 
   /// Significant issue. Address when count exceeds 10.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -673,7 +673,7 @@ class AvoidPopWithoutResultRule extends SaropaLintRule {
 
   /// Significant issue. Address when count exceeds 10.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -791,7 +791,7 @@ class PreferShellRouteForPersistentUiRule extends SaropaLintRule {
 
   /// Significant issue. Address when count exceeds 10.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -907,7 +907,7 @@ class RequireDeepLinkFallbackRule extends SaropaLintRule {
   RequireDeepLinkFallbackRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1138,7 +1138,7 @@ class AvoidDeepLinkSensitiveParamsRule extends SaropaLintRule {
   AvoidDeepLinkSensitiveParamsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1233,7 +1233,7 @@ class PreferTypedRouteParamsRule extends SaropaLintRule {
   PreferTypedRouteParamsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1331,7 +1331,7 @@ class RequireStepperValidationRule extends SaropaLintRule {
   RequireStepperValidationRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1414,7 +1414,7 @@ class RequireStepCountIndicatorRule extends SaropaLintRule {
   RequireStepCountIndicatorRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1499,7 +1499,7 @@ class AvoidGoRouterInlineCreationRule extends SaropaLintRule {
   AvoidGoRouterInlineCreationRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1565,7 +1565,7 @@ class RequireGoRouterErrorHandlerRule extends SaropaLintRule {
   RequireGoRouterErrorHandlerRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1642,7 +1642,7 @@ class RequireGoRouterRefreshListenableRule extends SaropaLintRule {
   RequireGoRouterRefreshListenableRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1713,7 +1713,7 @@ class AvoidGoRouterStringPathsRule extends SaropaLintRule {
   AvoidGoRouterStringPathsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1819,7 +1819,7 @@ class PreferGoRouterRedirectAuthRule extends SaropaLintRule {
   PreferGoRouterRedirectAuthRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1908,7 +1908,7 @@ class RequireGoRouterTypedParamsRule extends SaropaLintRule {
   RequireGoRouterTypedParamsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2022,7 +2022,7 @@ class PreferGoRouterExtraTypedRule extends SaropaLintRule {
 
   /// Code quality issue - type safety for navigation.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2154,7 +2154,7 @@ class PreferMaybePopRule extends SaropaLintRule {
   PreferMaybePopRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2282,7 +2282,7 @@ class PreferUrlLauncherUriOverStringRule extends SaropaLintRule {
 
   /// Crash path - malformed URI throws FormatException at runtime.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2354,7 +2354,7 @@ class AvoidGoRouterPushReplacementConfusionRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2461,7 +2461,7 @@ class RequireUrlLauncherEncodingRule extends SaropaLintRule {
 
   /// Unencoded URLs fail or cause injection vulnerabilities.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2551,7 +2551,7 @@ class AvoidNestedRoutesWithoutParentRule extends SaropaLintRule {
 
   /// Broken back button navigation frustrates users.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2634,7 +2634,7 @@ class PreferShellRouteSharedLayoutRule extends SaropaLintRule {
 
   /// Code duplication and maintenance burden.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2711,7 +2711,7 @@ class RequireStatefulShellRouteTabsRule extends SaropaLintRule {
 
   /// Tab state loss on navigation.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2792,7 +2792,7 @@ class RequireGoRouterFallbackRouteRule extends SaropaLintRule {
 
   /// User-facing errors on invalid navigation.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2886,7 +2886,7 @@ class PreferRouteSettingsNameRule extends SaropaLintRule {
   PreferRouteSettingsNameRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2972,7 +2972,7 @@ class AvoidNavigatorContextIssueRule extends SaropaLintRule {
   AvoidNavigatorContextIssueRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3094,7 +3094,7 @@ class RequirePopResultTypeRule extends SaropaLintRule {
   RequirePopResultTypeRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3180,7 +3180,7 @@ class AvoidPushReplacementMisuseRule extends SaropaLintRule {
   AvoidPushReplacementMisuseRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3289,7 +3289,7 @@ class AvoidNestedNavigatorsMisuseRule extends SaropaLintRule {
   AvoidNestedNavigatorsMisuseRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3385,7 +3385,7 @@ class RequireDeepLinkTestingRule extends SaropaLintRule {
   RequireDeepLinkTestingRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3468,7 +3468,7 @@ class RequireNavigationResultHandlingRule extends SaropaLintRule {
   RequireNavigationResultHandlingRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3563,7 +3563,7 @@ class PreferGoRouterRedirectRule extends SaropaLintRule {
   PreferGoRouterRedirectRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3627,7 +3627,7 @@ class PreferGoRouterBuilderRule extends SaropaLintRule {
   PreferGoRouterBuilderRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3682,7 +3682,7 @@ class PreferBranchIoOrFirebaseLinksRule extends SaropaLintRule {
   PreferBranchIoOrFirebaseLinksRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3729,7 +3729,7 @@ class RequireAutoRoutePageSuffixRule extends SaropaLintRule {
   RequireAutoRoutePageSuffixRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3808,7 +3808,7 @@ class PreferNamedRoutesForDeepLinksRule extends SaropaLintRule {
   PreferNamedRoutesForDeepLinksRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3872,7 +3872,7 @@ class RequireWillPopScopeRule extends SaropaLintRule {
   RequireWillPopScopeRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

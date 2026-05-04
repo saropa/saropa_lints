@@ -50,7 +50,7 @@ class AvoidRefReadInsideBuildRule extends SaropaLintRule {
   AvoidRefReadInsideBuildRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -138,7 +138,7 @@ class AvoidRefWatchOutsideBuildRule extends SaropaLintRule {
   AvoidRefWatchOutsideBuildRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -277,7 +277,7 @@ class AvoidRefInsideStateDisposeRule extends SaropaLintRule {
   AvoidRefInsideStateDisposeRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -357,7 +357,7 @@ class UseRefReadSynchronouslyRule extends SaropaLintRule {
   UseRefReadSynchronouslyRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -448,7 +448,7 @@ class UseRefAndStateSynchronouslyRule extends SaropaLintRule {
   UseRefAndStateSynchronouslyRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -544,7 +544,7 @@ class AvoidAssigningNotifiersRule extends SaropaLintRule {
   AvoidAssigningNotifiersRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -707,7 +707,7 @@ class AvoidNotifierConstructorsRule extends SaropaLintRule {
   AvoidNotifierConstructorsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -802,7 +802,7 @@ class PreferImmutableProviderArgumentsRule extends SaropaLintRule {
   PreferImmutableProviderArgumentsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -866,7 +866,7 @@ class AvoidUnnecessaryConsumerWidgetsRule extends SaropaLintRule {
   AvoidUnnecessaryConsumerWidgetsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -965,7 +965,7 @@ class AvoidNullableAsyncValuePatternRule extends SaropaLintRule {
   AvoidNullableAsyncValuePatternRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1052,7 +1052,7 @@ class RequireRiverpodErrorHandlingRule extends SaropaLintRule {
   RequireRiverpodErrorHandlingRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1131,7 +1131,7 @@ class AvoidRiverpodStateMutationRule extends SaropaLintRule {
   AvoidRiverpodStateMutationRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1223,7 +1223,7 @@ class PreferRiverpodSelectRule extends SaropaLintRule {
   PreferRiverpodSelectRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1299,7 +1299,7 @@ class RequireFlutterRiverpodPackageRule extends SaropaLintRule {
   RequireFlutterRiverpodPackageRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1366,7 +1366,7 @@ class PreferRiverpodAutoDisposeRule extends SaropaLintRule {
 
   /// Memory leaks from retained providers.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1459,7 +1459,7 @@ class PreferRiverpodFamilyForParamsRule extends SaropaLintRule {
 
   /// Improves type safety and cache behavior.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1536,7 +1536,7 @@ class AvoidGlobalRiverpodProvidersRule extends SaropaLintRule {
 
   /// Significant issue. Address when count exceeds 10.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1636,7 +1636,7 @@ class PreferConsumerWidgetRule extends SaropaLintRule {
 
   /// Significant issue. Address when count exceeds 10.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1724,7 +1724,7 @@ class RequireAutoDisposeRule extends SaropaLintRule {
 
   /// Significant issue. Address when count exceeds 10.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1827,7 +1827,7 @@ class AvoidRiverpodStringProviderNameRule extends SaropaLintRule {
   AvoidRiverpodStringProviderNameRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1919,7 +1919,7 @@ class AvoidRefInBuildBodyRule extends SaropaLintRule {
 
   /// Significant issue. Address when count exceeds 10.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2071,7 +2071,7 @@ class RequireProviderScopeRule extends SaropaLintRule {
 
   /// Significant issue. Address when count exceeds 10.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2163,7 +2163,7 @@ class PreferSelectForPartialRule extends SaropaLintRule {
 
   /// Significant issue. Address when count exceeds 10.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2297,7 +2297,7 @@ class PreferFamilyForParamsRule extends SaropaLintRule {
 
   /// Significant issue. Address when count exceeds 10.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2378,7 +2378,7 @@ class PreferRefWatchOverReadRule extends SaropaLintRule {
   /// ref.read in build() won't trigger rebuilds when provider changes.
   /// UI will show stale data until something else triggers a rebuild.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2462,7 +2462,7 @@ class AvoidCircularProviderDepsRule extends SaropaLintRule {
   AvoidCircularProviderDepsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2614,7 +2614,7 @@ class RequireErrorHandlingInAsyncRule extends SaropaLintRule {
   RequireErrorHandlingInAsyncRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2711,7 +2711,7 @@ class PreferNotifierOverStateRule extends SaropaLintRule {
   PreferNotifierOverStateRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2815,7 +2815,7 @@ class RequireRiverpodLintRule extends SaropaLintRule {
   RequireRiverpodLintRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2921,7 +2921,7 @@ class AvoidListenInAsyncRule extends SaropaLintRule {
 
   /// watch() in async callbacks causes subscription leaks.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3007,7 +3007,7 @@ class RequireAsyncValueOrderRule extends SaropaLintRule {
 
   /// Consistent ordering improves code readability.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3081,7 +3081,7 @@ class PreferSelectorRule extends SaropaLintRule {
 
   /// select() provides more granular rebuild control.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3160,7 +3160,7 @@ class AvoidRiverpodNotifierInBuildRule extends SaropaLintRule {
 
   /// State is lost on every rebuild.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3257,7 +3257,7 @@ class RequireRiverpodAsyncValueGuardRule extends SaropaLintRule {
 
   /// AsyncValue.guard provides consistent error state handling.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3346,7 +3346,7 @@ class RequireFlutterRiverpodNotRiverpodRule extends SaropaLintRule {
   RequireFlutterRiverpodNotRiverpodRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3421,7 +3421,7 @@ class AvoidRiverpodNavigationRule extends SaropaLintRule {
   AvoidRiverpodNavigationRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3558,7 +3558,7 @@ class AvoidRiverpodForNetworkOnlyRule extends SaropaLintRule {
   AvoidRiverpodForNetworkOnlyRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3627,7 +3627,7 @@ class PreferRiverpodCodeGenRule extends SaropaLintRule {
   PreferRiverpodCodeGenRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -3704,7 +3704,7 @@ class PreferRiverpodKeepAliveRule extends SaropaLintRule {
   PreferRiverpodKeepAliveRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

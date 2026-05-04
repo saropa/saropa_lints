@@ -47,7 +47,7 @@ class RequireConnectivityErrorHandlingRule extends SaropaLintRule {
   RequireConnectivityErrorHandlingRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -160,7 +160,7 @@ class AvoidConnectivityEqualsInternetRule extends SaropaLintRule {
 
   /// Trusting transport type as internet causes silent failures.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -245,7 +245,7 @@ class RequireConnectivityTimeoutRule extends SaropaLintRule {
   RequireConnectivityTimeoutRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -330,7 +330,7 @@ class PreferConnectivityDebounceRule extends SaropaLintRule {
   PreferConnectivityDebounceRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -374,7 +374,7 @@ class PreferInternetConnectionCheckerRule extends SaropaLintRule {
   PreferInternetConnectionCheckerRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -420,7 +420,7 @@ class RequireConnectivityResumeCheckRule extends SaropaLintRule {
   RequireConnectivityResumeCheckRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

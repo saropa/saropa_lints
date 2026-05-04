@@ -28,7 +28,7 @@ class RequireAndroidManifestEntriesRule extends SaropaLintRule {
   RequireAndroidManifestEntriesRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.bug;
@@ -115,7 +115,7 @@ class RequireAndroidPermissionRequestRule extends SaropaLintRule {
   RequireAndroidPermissionRequestRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -164,6 +164,43 @@ class RequireAndroidPermissionRequestRule extends SaropaLintRule {
   static final RegExp _isGrantedRegex = RegExp(r'\.isGranted\b');
   static final RegExp _checkPermissionRegex = RegExp(r'\bcheckPermission\b');
 
+  /// Suffixes that mark a class as telemetry/logging/metrics infrastructure
+  /// rather than an audio recorder. Matched only for ambiguous method names
+  /// (currently `record`, `startRecording`) — the rest of the gated map
+  /// (e.g. `getCurrentPosition`, `pickImage`) is unambiguous.
+  ///
+  /// Why suffix-match and not exact-match: avoids enumerating every
+  /// telemetry class downstream consumers may invent (`RuleTimingTracker`,
+  /// `MetricsTracker`, `BuildLogger`, `EventTracer`, …) while still
+  /// flagging real audio receivers like `Record` / `AudioRecorder` /
+  /// `FlutterSoundRecorder` (whose names end in `Record` / `Recorder`,
+  /// not `Tracker` / `Logger` / `Tracer`).
+  static const Set<String> _nonAudioReceiverSuffixes = <String>{
+    'Tracker',
+    'Logger',
+    'Tracer',
+    'Reporter',
+    'Metrics',
+    'Telemetry',
+    'Stats',
+  };
+
+  /// Method names that collide with non-audio APIs and must be skipped when
+  /// the receiver looks like telemetry. Other entries in [_permissionGatedApis]
+  /// (e.g. `getCurrentPosition`) are unique enough to flag unconditionally.
+  static const Set<String> _ambiguousAudioMethods = <String>{
+    'record',
+    'startRecording',
+  };
+
+  static bool _isNonAudioReceiverName(String receiverName, String methodName) {
+    if (!_ambiguousAudioMethods.contains(methodName)) return false;
+    for (final suffix in _nonAudioReceiverSuffixes) {
+      if (receiverName.endsWith(suffix)) return true;
+    }
+    return false;
+  }
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -178,6 +215,20 @@ class RequireAndroidPermissionRequestRule extends SaropaLintRule {
 
       // Check if this is a permission-gated API
       if (!_permissionGatedApis.containsKey(methodName)) return;
+
+      // Receiver-aware skip: bare method-name matches like `record` collide
+      // with non-audio APIs (telemetry/logging trackers, transcript record
+      // models, immutable Record types). Skip when the static receiver
+      // class name clearly isn't an audio recorder. Examples we silence:
+      //   `RuleTimingTracker.record(...)` — telemetry, no microphone use.
+      //   `MetricsLogger.record(...)`     — logging, no microphone use.
+      // Real audio recorders (`Record`, `AudioRecorder`, `FlutterSound...`)
+      // still flag because their class names don't end in these tokens.
+      final Expression? target = node.realTarget;
+      if (target is Identifier) {
+        final String receiverName = target.name;
+        if (_isNonAudioReceiverName(receiverName, methodName)) return;
+      }
 
       // Check if there's a permission request in the same function
       AstNode? functionBody;
@@ -270,7 +321,7 @@ class AvoidAndroidTaskAffinityDefaultRule extends SaropaLintRule {
   AvoidAndroidTaskAffinityDefaultRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -348,7 +399,7 @@ class RequireAndroid12SplashRule extends SaropaLintRule {
   RequireAndroid12SplashRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -428,7 +479,7 @@ class PreferPendingIntentFlagsRule extends SaropaLintRule {
   PreferPendingIntentFlagsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -516,7 +567,7 @@ class AvoidAndroidCleartextTrafficRule extends SaropaLintRule {
   AvoidAndroidCleartextTrafficRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -618,7 +669,7 @@ class RequireAndroidBackupRulesRule extends SaropaLintRule {
   RequireAndroidBackupRulesRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -763,7 +814,7 @@ class PreferForegroundServiceAndroidRule extends SaropaLintRule {
   PreferForegroundServiceAndroidRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -867,7 +918,7 @@ class RequireNotificationIconKeptRule extends SaropaLintRule {
   RequireNotificationIconKeptRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -945,7 +996,7 @@ class RequireBackupExclusionRule extends SaropaLintRule {
   RequireBackupExclusionRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

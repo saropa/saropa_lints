@@ -26,7 +26,7 @@ class RequireSecureStorageRule extends SaropaLintRule {
   /// Plain text storage of credentials is readable on rooted devices.
   /// Each occurrence exposes sensitive data.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -149,7 +149,7 @@ class AvoidHardcodedCredentialsRule extends SaropaLintRule {
   /// Hardcoded credentials will be committed to version control.
   /// Each occurrence is a security vulnerability.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -280,7 +280,7 @@ class RequireBiometricFallbackRule extends SaropaLintRule {
   /// Missing biometric fallback is a usability issue, not a security risk.
   /// Address for better UX on devices without biometrics.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -378,7 +378,7 @@ class AvoidStoringPasswordsRule extends SaropaLintRule {
   /// Passwords in SharedPreferences are stored as plain text.
   /// Each occurrence exposes user credentials.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -476,7 +476,7 @@ class RequireAuthCheckRule extends SaropaLintRule {
   /// Missing auth check exposes protected endpoints.
   /// Each occurrence is an unauthorized access risk.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -735,7 +735,7 @@ class RequireTokenRefreshRule extends SaropaLintRule {
   /// Missing token refresh causes unexpected logouts.
   /// UX issue rather than security vulnerability.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -868,7 +868,7 @@ class AvoidJwtDecodeClientRule extends SaropaLintRule {
   /// Client-decoded JWTs can be manipulated for authorization bypass.
   /// Each occurrence risks privilege escalation.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -992,7 +992,7 @@ class RequireLogoutCleanupRule extends SaropaLintRule {
   /// Incomplete logout cleanup leaves sensitive data accessible.
   /// Each occurrence risks data leakage after logout.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -1098,7 +1098,7 @@ class AvoidAuthInQueryParamsRule extends SaropaLintRule {
   /// Auth tokens in query params are logged and leak via referrers.
   /// Each occurrence exposes credentials.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -1226,7 +1226,7 @@ class RequireDataEncryptionRule extends SaropaLintRule {
   RequireDataEncryptionRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -1468,7 +1468,7 @@ class RequireSecurePasswordFieldRule extends SaropaLintRule {
   RequireSecurePasswordFieldRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -1592,7 +1592,7 @@ class RequireSecureStorageForAuthRule extends SaropaLintRule {
   /// Storing auth tokens in SharedPreferences exposes credentials.
   /// Critical security vulnerability.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -1708,7 +1708,7 @@ class PreferLocalAuthRule extends SaropaLintRule {
 
   /// Security best practice for sensitive operations.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -1814,7 +1814,7 @@ class RequireSecureStorageAuthDataRule extends SaropaLintRule {
   RequireSecureStorageAuthDataRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -1954,7 +1954,7 @@ class AvoidStoringSensitiveUnencryptedRule extends SaropaLintRule {
 
   /// Unencrypted sensitive data is readable on rooted/jailbroken devices.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -2121,7 +2121,7 @@ class RequireSecureStorageErrorHandlingRule extends SaropaLintRule {
   RequireSecureStorageErrorHandlingRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -2230,7 +2230,7 @@ class AvoidSecureStorageLargeDataRule extends SaropaLintRule {
   AvoidSecureStorageLargeDataRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -2337,7 +2337,7 @@ class PreferBiometricProtectionRule extends SaropaLintRule {
 
   /// Sensitive data without biometric gate is a security gap.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -2446,7 +2446,7 @@ class AvoidSensitiveDataInClipboardRule extends SaropaLintRule {
   AvoidSensitiveDataInClipboardRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.securityHotspot;
@@ -2535,7 +2535,7 @@ class RequireClipboardPasteValidationRule extends SaropaLintRule {
   RequireClipboardPasteValidationRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -2705,7 +2705,7 @@ class AvoidEncryptionKeyInMemoryRule extends SaropaLintRule {
   AvoidEncryptionKeyInMemoryRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -2790,7 +2790,7 @@ class PreferOauthPkceRule extends SaropaLintRule {
   PreferOauthPkceRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -2927,7 +2927,7 @@ class RequireSessionTimeoutRule extends SaropaLintRule {
   RequireSessionTimeoutRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -3098,7 +3098,7 @@ class PreferRootDetectionRule extends SaropaLintRule {
   PreferRootDetectionRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -3175,7 +3175,7 @@ class PreferWebviewSandboxRule extends SaropaLintRule {
   PreferWebviewSandboxRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.securityHotspot;
@@ -3328,7 +3328,7 @@ class PreferWhitelistValidationRule extends SaropaLintRule {
   PreferWhitelistValidationRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -3368,7 +3368,7 @@ class RequireKeychainAccessRule extends SaropaLintRule {
   RequireKeychainAccessRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -3409,7 +3409,7 @@ class RequireWebviewUserAgentRule extends SaropaLintRule {
   RequireWebviewUserAgentRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;
@@ -3451,7 +3451,7 @@ class RequireMultiFactorRule extends SaropaLintRule {
   RequireMultiFactorRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.vulnerability;

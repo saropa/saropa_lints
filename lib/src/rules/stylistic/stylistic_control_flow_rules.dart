@@ -119,7 +119,7 @@ class PreferEarlyReturnRule extends SaropaLintRule {
   PreferEarlyReturnRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -227,7 +227,7 @@ class PreferSingleExitPointRule extends SaropaLintRule {
   PreferSingleExitPointRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -356,7 +356,7 @@ class PreferGuardClausesRule extends SaropaLintRule {
   PreferGuardClausesRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -445,7 +445,7 @@ class PreferPositiveConditionsFirstRule extends SaropaLintRule {
   PreferPositiveConditionsFirstRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -550,7 +550,7 @@ class PreferSwitchStatementRule extends SaropaLintRule {
   PreferSwitchStatementRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -663,7 +663,7 @@ class PreferCascadeOverChainedRule extends SaropaLintRule {
   PreferCascadeOverChainedRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -774,7 +774,7 @@ class PreferChainedOverCascadeRule extends SaropaLintRule {
   PreferChainedOverCascadeRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -835,7 +835,7 @@ class AvoidCascadesRule extends SaropaLintRule {
   AvoidCascadesRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -911,7 +911,7 @@ class PreferExhaustiveEnumsRule extends SaropaLintRule {
   PreferExhaustiveEnumsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1009,7 +1009,7 @@ class PreferDefaultEnumCaseRule extends SaropaLintRule {
   PreferDefaultEnumCaseRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1138,7 +1138,7 @@ class PreferAwaitOverThenRule extends SaropaLintRule {
   PreferAwaitOverThenRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1207,7 +1207,7 @@ class PreferThenOverAwaitRule extends SaropaLintRule {
   PreferThenOverAwaitRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1277,7 +1277,7 @@ class PreferSyncOverAsyncWhereSimpleRule extends SaropaLintRule {
   PreferSyncOverAsyncWhereSimpleRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1352,7 +1352,7 @@ class PreferThenCatchErrorRule extends SaropaLintRule {
   PreferThenCatchErrorRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1414,7 +1414,7 @@ class PreferFireAndForgetRule extends SaropaLintRule {
   PreferFireAndForgetRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1470,7 +1470,7 @@ class PreferSeparateAssignmentsRule extends SaropaLintRule {
   PreferSeparateAssignmentsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1535,7 +1535,7 @@ class PreferIfElseOverGuardsRule extends SaropaLintRule {
   PreferIfElseOverGuardsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1626,7 +1626,7 @@ class PreferCascadeAssignmentsRule extends SaropaLintRule {
   PreferCascadeAssignmentsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1772,7 +1772,7 @@ class PreferPositiveConditionsRule extends SaropaLintRule {
   PreferPositiveConditionsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

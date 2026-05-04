@@ -82,7 +82,7 @@ class RequireHiveInitializationRule extends SaropaLintRule {
   /// It serves as a reminder to ensure init is called somewhere.
   /// Impact is low since this is informational, not a definite bug.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -156,7 +156,7 @@ class RequireHiveTypeAdapterRule extends SaropaLintRule {
   RequireHiveTypeAdapterRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -258,7 +258,7 @@ class RequireHiveBoxCloseRule extends SaropaLintRule {
   RequireHiveBoxCloseRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -351,7 +351,7 @@ class PreferHiveEncryptionRule extends SaropaLintRule {
   PreferHiveEncryptionRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -439,7 +439,7 @@ class RequireHiveEncryptionKeySecureRule extends SaropaLintRule {
   RequireHiveEncryptionKeySecureRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -530,7 +530,7 @@ class RequireHiveDatabaseCloseRule extends SaropaLintRule {
   RequireHiveDatabaseCloseRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -610,7 +610,7 @@ class RequireTypeAdapterRegistrationRule extends SaropaLintRule {
   RequireTypeAdapterRegistrationRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -711,7 +711,7 @@ class PreferLazyBoxForLargeRule extends SaropaLintRule {
   PreferLazyBoxForLargeRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -837,7 +837,7 @@ class RequireHiveTypeIdManagementRule extends SaropaLintRule {
 
   // INFO severity - advisory rule to encourage documentation, not a crash risk
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -924,7 +924,7 @@ class AvoidHiveFieldIndexReuseRule extends SaropaLintRule {
   AvoidHiveFieldIndexReuseRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1041,7 +1041,7 @@ class RequireHiveFieldDefaultValueRule extends SaropaLintRule {
 
   /// Missing defaults cause crashes when reading existing data.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1135,7 +1135,7 @@ class RequireHiveAdapterRegistrationOrderRule extends SaropaLintRule {
 
   /// Wrong order causes runtime crash.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1256,7 +1256,7 @@ class RequireHiveNestedObjectAdapterRule extends SaropaLintRule {
 
   /// Missing nested adapter causes runtime crash.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1348,7 +1348,7 @@ class AvoidHiveBoxNameCollisionRule extends SaropaLintRule {
   /// that are likely to cause collisions. Cross-file detection
   /// requires static analysis of the entire codebase.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1445,7 +1445,7 @@ class PreferHiveValueListenableRule extends SaropaLintRule {
 
   /// UI may not update after Hive changes.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1518,7 +1518,7 @@ class PreferHiveLazyBoxRule extends SaropaLintRule {
   PreferHiveLazyBoxRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1642,7 +1642,7 @@ class AvoidHiveBinaryStorageRule extends SaropaLintRule {
   AvoidHiveBinaryStorageRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1753,7 +1753,7 @@ class RequireHiveMigrationStrategyRule extends SaropaLintRule {
   RequireHiveMigrationStrategyRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1882,7 +1882,7 @@ class AvoidHiveSynchronousInUiRule extends SaropaLintRule {
   AvoidHiveSynchronousInUiRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1975,7 +1975,7 @@ class RequireHiveWebSubdirectoryRule extends SaropaLintRule {
 
   /// Missing subDir causes data conflicts between web apps on same domain.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2063,7 +2063,7 @@ class AvoidHiveDatetimeLocalRule extends SaropaLintRule {
   AvoidHiveDatetimeLocalRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2158,7 +2158,7 @@ class AvoidHiveTypeModificationRule extends SaropaLintRule {
   AvoidHiveTypeModificationRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2254,7 +2254,7 @@ class AvoidHiveLargeSingleEntryRule extends SaropaLintRule {
   AvoidHiveLargeSingleEntryRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2349,7 +2349,7 @@ class PreferHiveCompactPeriodicallyRule extends SaropaLintRule {
   PreferHiveCompactPeriodicallyRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2403,7 +2403,7 @@ class PreferHiveCompactRule extends SaropaLintRule {
   PreferHiveCompactRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2497,7 +2497,7 @@ class PreferHiveWebAwareRule extends SaropaLintRule {
   static final RegExp _kIsWebToken = RegExp(r'\bkIsWeb\b');
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

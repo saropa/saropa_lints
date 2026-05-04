@@ -46,7 +46,7 @@ class PreferSizedBoxOverContainerRule extends SaropaLintRule {
   PreferSizedBoxOverContainerRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -135,7 +135,7 @@ class PreferContainerOverSizedBoxRule extends SaropaLintRule {
   PreferContainerOverSizedBoxRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -216,7 +216,7 @@ class PreferTextRichOverRichTextRule extends SaropaLintRule {
   PreferTextRichOverRichTextRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -288,7 +288,7 @@ class PreferRichTextOverTextRichRule extends SaropaLintRule {
   PreferRichTextOverTextRichRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -363,7 +363,7 @@ class PreferEdgeInsetsSymmetricRule extends SaropaLintRule {
   PreferEdgeInsetsSymmetricRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -470,7 +470,7 @@ class PreferEdgeInsetsOnlyRule extends SaropaLintRule {
   PreferEdgeInsetsOnlyRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -546,7 +546,7 @@ class PreferBorderRadiusCircularRule extends SaropaLintRule {
   PreferBorderRadiusCircularRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -635,7 +635,7 @@ class PreferExpandedOverFlexibleRule extends SaropaLintRule {
   PreferExpandedOverFlexibleRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -719,7 +719,7 @@ class PreferFlexibleOverExpandedRule extends SaropaLintRule {
   PreferFlexibleOverExpandedRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -794,7 +794,7 @@ class PreferMaterialThemeColorsRule extends SaropaLintRule {
   PreferMaterialThemeColorsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -892,7 +892,7 @@ class PreferExplicitColorsRule extends SaropaLintRule {
   PreferExplicitColorsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -989,7 +989,7 @@ class PreferClipRSuperellipseRule extends SaropaLintRule {
   PreferClipRSuperellipseRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1078,7 +1078,7 @@ class PreferClipRSuperellipseClipperRule extends SaropaLintRule {
   PreferClipRSuperellipseClipperRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.opinionated;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

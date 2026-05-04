@@ -39,7 +39,7 @@ class AvoidDoubleForMoneyRule extends SaropaLintRule {
   AvoidDoubleForMoneyRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -191,7 +191,7 @@ class RequireCurrencyCodeWithAmountRule extends SaropaLintRule {
   RequireCurrencyCodeWithAmountRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

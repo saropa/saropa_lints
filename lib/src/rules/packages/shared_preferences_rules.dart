@@ -52,7 +52,7 @@ class AvoidPrefsForLargeDataRule extends SaropaLintRule {
 
   /// Significant issue. Address when count exceeds 10.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -147,7 +147,7 @@ class RequireSharedPrefsPrefixRule extends SaropaLintRule {
   RequireSharedPrefsPrefixRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -212,7 +212,7 @@ class PreferSharedPrefsAsyncApiRule extends SaropaLintRule {
   PreferSharedPrefsAsyncApiRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -278,7 +278,7 @@ class AvoidSharedPrefsInIsolateRule extends SaropaLintRule {
   AvoidSharedPrefsInIsolateRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -411,7 +411,7 @@ class PreferTypedPrefsWrapperRule extends SaropaLintRule {
   PreferTypedPrefsWrapperRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -497,7 +497,7 @@ class AvoidAuthStateInPrefsRule extends SaropaLintRule {
   /// Auth tokens in SharedPreferences are stored as plain text.
   /// Each occurrence exposes credentials on rooted devices.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -610,7 +610,7 @@ class PreferEncryptedPrefsRule extends SaropaLintRule {
   /// Sensitive data in SharedPreferences is unencrypted.
   /// Each occurrence exposes personal data.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -719,7 +719,7 @@ class AvoidSharedPrefsSensitiveDataRule extends SaropaLintRule {
   AvoidSharedPrefsSensitiveDataRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -833,7 +833,7 @@ class RequireSharedPrefsNullHandlingRule extends SaropaLintRule {
   /// Null assertion on SharedPreferences getter causes runtime crash
   /// when key doesn't exist - a common source of production crashes.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -915,7 +915,7 @@ class RequireSharedPrefsKeyConstantsRule extends SaropaLintRule {
   RequireSharedPrefsKeyConstantsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1009,7 +1009,7 @@ class AvoidSharedPrefsLargeDataRule extends SaropaLintRule {
   AvoidSharedPrefsLargeDataRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1111,7 +1111,7 @@ class AvoidSharedPrefsSyncRaceRule extends SaropaLintRule {
 
   /// Race conditions cause silent data loss.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

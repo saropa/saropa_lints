@@ -72,7 +72,7 @@ class RequireGetxWorkerDisposeRule extends SaropaLintRule {
   RequireGetxWorkerDisposeRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -215,7 +215,7 @@ class RequireGetxPermanentCleanupRule extends SaropaLintRule {
   RequireGetxPermanentCleanupRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -376,7 +376,7 @@ class AvoidGetxContextOutsideWidgetRule extends SaropaLintRule {
   AvoidGetxContextOutsideWidgetRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -540,7 +540,7 @@ class AvoidGetxGlobalNavigationRule extends SaropaLintRule {
 
   /// Testability and navigation predictability issues.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -631,7 +631,7 @@ class RequireGetxBindingRoutesRule extends SaropaLintRule {
 
   /// DI and lifecycle management consistency.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -721,7 +721,7 @@ class AvoidGetxDialogSnackbarInControllerRule extends SaropaLintRule {
   AvoidGetxDialogSnackbarInControllerRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -820,7 +820,7 @@ class RequireGetxLazyPutRule extends SaropaLintRule {
   RequireGetxLazyPutRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -925,7 +925,7 @@ class AvoidGetFindInBuildRule extends SaropaLintRule {
 
   /// Significant issue. Address when count exceeds 10.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1026,7 +1026,7 @@ class RequireGetxControllerDisposeRule extends SaropaLintRule {
   RequireGetxControllerDisposeRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1143,7 +1143,7 @@ class AvoidObsOutsideControllerRule extends SaropaLintRule {
   AvoidObsOutsideControllerRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1257,7 +1257,7 @@ class ProperGetxSuperCallsRule extends SaropaLintRule {
 
   /// Critical - broken lifecycle management.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1377,7 +1377,7 @@ class AlwaysRemoveGetxListenerRule extends SaropaLintRule {
 
   /// High impact - memory leak prevention.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1460,7 +1460,7 @@ class AvoidGetxRxInsideBuildRule extends SaropaLintRule {
   AvoidGetxRxInsideBuildRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1541,7 +1541,7 @@ class AvoidMutableRxVariablesRule extends SaropaLintRule {
   AvoidMutableRxVariablesRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1644,7 +1644,7 @@ class DisposeGetxFieldsRule extends SaropaLintRule {
   DisposeGetxFieldsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1775,7 +1775,7 @@ class PreferGetxBuilderRule extends SaropaLintRule {
 
   /// Accessing .obs without Obx won't trigger UI rebuilds.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1886,7 +1886,7 @@ class RequireGetxBindingRule extends SaropaLintRule {
 
   /// Architecture issue - improper dependency management.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1972,7 +1972,7 @@ class AvoidGetxGlobalStateRule extends SaropaLintRule {
 
   /// Testing difficulty.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2059,7 +2059,7 @@ class AvoidGetxStaticContextRule extends SaropaLintRule {
   AvoidGetxStaticContextRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2147,7 +2147,7 @@ class AvoidTightCouplingWithGetxRule extends SaropaLintRule {
   AvoidTightCouplingWithGetxRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2242,7 +2242,7 @@ class AvoidGetxStaticGetRule extends SaropaLintRule {
   AvoidGetxStaticGetRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2319,7 +2319,7 @@ class AvoidGetxBuildContextBypassRule extends SaropaLintRule {
 
   /// Using Get.context hides widget tree dependencies and breaks testability.
   @override
-  LintImpact get impact => LintImpact.critical;
+  LintImpact get impact => LintImpact.error;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2389,7 +2389,7 @@ class AvoidGetxRxNestedObsRule extends SaropaLintRule {
   AvoidGetxRxNestedObsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2474,7 +2474,7 @@ class PreferGetxBuilderOverObxRule extends SaropaLintRule {
   PreferGetxBuilderOverObxRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

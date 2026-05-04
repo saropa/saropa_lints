@@ -26,7 +26,7 @@ class RequireResponsiveBreakpointsRule extends SaropaLintRule {
 
   /// Minor improvement. Track for later review.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -130,7 +130,7 @@ class PreferCachedPaintObjectsRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -217,7 +217,7 @@ class RequireCustomPainterShouldRepaintRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -303,7 +303,7 @@ class RequireCurrencyFormattingLocaleRule extends SaropaLintRule {
 
   /// Minor improvement. Track for later review.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -383,7 +383,7 @@ class RequireNumberFormattingLocaleRule extends SaropaLintRule {
 
   /// Minor improvement. Track for later review.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -478,7 +478,7 @@ class RequireGraphqlOperationNamesRule extends SaropaLintRule {
 
   /// Minor improvement. Track for later review.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -551,7 +551,7 @@ class AvoidBadgeWithoutMeaningRule extends SaropaLintRule {
 
   /// Minor UX improvement.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -630,7 +630,7 @@ class PreferLoggerOverPrintRule extends SaropaLintRule {
 
   /// Code quality improvement.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -706,7 +706,7 @@ class PreferItemExtentWhenKnownRule extends SaropaLintRule {
 
   /// Performance optimization suggestion.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -792,7 +792,7 @@ class RequireTabStatePreservationRule extends SaropaLintRule {
 
   /// UX issue - form state loss frustrates users.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -870,7 +870,7 @@ class PreferSkeletonOverSpinnerRule extends SaropaLintRule {
 
   /// UX improvement, not a bug. Track for later.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -975,7 +975,7 @@ class RequireEmptyResultsStateRule extends SaropaLintRule {
 
   /// UX issue that confuses users.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1091,7 +1091,7 @@ class RequireSearchLoadingIndicatorRule extends SaropaLintRule {
 
   /// UX issue that confuses users.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1186,7 +1186,7 @@ class RequireSearchDebounceRule extends SaropaLintRule {
 
   /// Performance and cost issue from excessive API calls.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1332,7 +1332,7 @@ class RequirePaginationLoadingStateRule extends SaropaLintRule {
 
   /// UX issue affecting user experience during loading.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1463,7 +1463,7 @@ class RequirePaginationErrorRecoveryRule extends SaropaLintRule {
   RequirePaginationErrorRecoveryRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1601,7 +1601,7 @@ class RequireWebViewProgressIndicatorRule extends SaropaLintRule {
 
   /// Missing loading indicator creates poor UX.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1736,7 +1736,7 @@ class AvoidLoadingFlashRule extends SaropaLintRule {
   AvoidLoadingFlashRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1836,7 +1836,7 @@ class PreferAvatarLoadingPlaceholderRule extends SaropaLintRule {
   PreferAvatarLoadingPlaceholderRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1919,7 +1919,7 @@ class PreferAdaptiveIconsRule extends SaropaLintRule {
   PreferAdaptiveIconsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1974,7 +1974,7 @@ class PreferAdaptiveIconsRule extends SaropaLintRule {
 class PreferMasterDetailForLargeRule extends SaropaLintRule {
   PreferMasterDetailForLargeRule() : super(code: _code);
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2021,7 +2021,7 @@ class PreferOutlinedIconsRule extends SaropaLintRule {
   PreferOutlinedIconsRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;

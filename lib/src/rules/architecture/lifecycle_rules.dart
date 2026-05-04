@@ -50,7 +50,7 @@ class AvoidWorkInPausedStateRule extends SaropaLintRule {
 
   /// Battery drain and unexpected behavior in background.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -186,7 +186,7 @@ class RequireResumeStateRefreshRule extends SaropaLintRule {
 
   /// Stale data after returning from background.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -271,7 +271,7 @@ class RequireDidUpdateWidgetCheckRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -388,7 +388,7 @@ class RequireLateInitializationInInitStateRule extends SaropaLintRule {
   RequireLateInitializationInInitStateRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -520,7 +520,7 @@ class RequireAppLifecycleHandlingRule extends SaropaLintRule {
   RequireAppLifecycleHandlingRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -647,7 +647,7 @@ class RequireConflictResolutionStrategyRule extends SaropaLintRule {
   RequireConflictResolutionStrategyRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.warning;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
