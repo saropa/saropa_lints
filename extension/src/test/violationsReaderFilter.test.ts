@@ -2,7 +2,7 @@ import * as assert from 'node:assert';
 import { filterDisabledFromData, type ViolationsData, type Violation } from '../violationsReader';
 
 /** Build a minimal Violation for testing. */
-function v(rule: string, severity = 'warning', impact = 'medium', file = 'lib/a.dart'): Violation {
+function v(rule: string, severity = 'warning', impact = 'warning', file = 'lib/a.dart'): Violation {
   return { file, line: 1, rule, message: `msg for ${rule}`, severity, impact };
 }
 
@@ -37,11 +37,13 @@ describe('filterDisabledFromData', () => {
   });
 
   it('recomputes bySeverity from filtered violations', () => {
+    // Severity-keyed (the 5-bucket impact taxonomy critical/high/medium/low/
+    // opinionated collapsed into error/warning/info on 2026-05-03).
     const data: ViolationsData = {
       violations: [
-        v('rule_a', 'error', 'critical'),
-        v('rule_b', 'warning', 'high'),
-        v('rule_c', 'info', 'low'),
+        v('rule_a', 'error', 'error'),
+        v('rule_b', 'warning', 'warning'),
+        v('rule_c', 'info', 'info'),
       ],
       summary: { bySeverity: { error: 1, warning: 1, info: 1 } },
     };
@@ -55,20 +57,20 @@ describe('filterDisabledFromData', () => {
   it('recomputes byImpact from filtered violations', () => {
     const data: ViolationsData = {
       violations: [
-        v('rule_a', 'error', 'critical'),
-        v('rule_b', 'warning', 'high'),
+        v('rule_a', 'error', 'error'),
+        v('rule_b', 'warning', 'warning'),
       ],
     };
     const result = filterDisabledFromData(data, new Set(['rule_a']));
-    assert.strictEqual(result.summary?.byImpact?.critical, undefined);
-    assert.strictEqual(result.summary?.byImpact?.high, 1);
+    assert.strictEqual(result.summary?.byImpact?.error, undefined);
+    assert.strictEqual(result.summary?.byImpact?.warning, 1);
   });
 
   it('recomputes filesWithIssues from filtered violations', () => {
     const data: ViolationsData = {
       violations: [
-        v('rule_a', 'warning', 'medium', 'lib/a.dart'),
-        v('rule_b', 'warning', 'medium', 'lib/b.dart'),
+        v('rule_a', 'warning', 'warning', 'lib/a.dart'),
+        v('rule_b', 'warning', 'warning', 'lib/b.dart'),
       ],
       summary: { filesWithIssues: 2 },
     };

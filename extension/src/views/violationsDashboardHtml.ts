@@ -107,9 +107,12 @@ export interface ViolationsDashboardHtmlInput {
 }
 
 const DEFAULT_SEVERITIES: readonly string[] = ['error', 'warning', 'info'];
-const DEFAULT_IMPACTS: readonly string[] = ['critical', 'high', 'medium', 'low', 'opinionated'];
+// Three-bucket severity model — collapsed from the prior 5-bucket
+// (critical/high/medium/low/opinionated) impact taxonomy on 2026-05-03;
+// see plan/COLLAPSE_LINT_IMPACT_TO_SEVERITY.md.
+const DEFAULT_IMPACTS: readonly string[] = ['error', 'warning', 'info'];
 const SEVERITY_ORDER: readonly string[] = ['error', 'warning', 'info'];
-const IMPACT_ORDER: readonly string[] = ['critical', 'high', 'medium', 'low', 'opinionated'];
+const IMPACT_ORDER: readonly string[] = ['error', 'warning', 'info'];
 
 function escapeHtml(s: string): string {
   return s
@@ -293,27 +296,21 @@ function buildKpiCards(input: ViolationsDashboardHtmlInput): string {
 }
 
 /**
- * KPI card order is **importance-descending**, with critical and high as
- * separate cards because they encode different threat models — not two
- * sizes of the same threat:
+ * KPI card order is **importance-descending** and now matches the
+ * analyzer's three-level severity model. The previous five-card layout
+ * (Errors / Critical / High / Warnings / Info) was driven by the
+ * 5-bucket LintImpact taxonomy that collapsed on 2026-05-03 — see
+ * plan/COLLAPSE_LINT_IMPACT_TO_SEVERITY.md. Critical/High/Medium have
+ * folded into Errors/Warnings; Low/Opinionated into Info.
  *
- * - `critical` (saropa_lint_rule.dart §LintImpact) is *per-occurrence*
- *   harmful (memory leaks, security holes, crashes). Count of 1 still
- *   demands action.
- * - `high` is *compound* harm — a handful is manageable, 10+ is systemic.
- *
- * Lumping them under one "Critical + High" card hid that distinction.
- *
- * Order: Visible (anchor) → Errors → Critical → High → Warnings →
- * Files affected → Top rule. Severity and impact axes are interleaved
- * intentionally so the user reads "worst severity, worst impact, second
- * impact, second severity" before the scope/leverage cards.
+ * Order: Visible (anchor) → Errors → Warnings → Info → Files → Top rule.
  */
 function collectKpiCards(input: ViolationsDashboardHtmlInput): KpiSpec[] {
-  const errors = input.severityCounts.error ?? 0;
-  const warnings = input.severityCounts.warning ?? 0;
-  const critical = input.impactCounts.critical ?? 0;
-  const high = input.impactCounts.high ?? 0;
+  // Severity axis is the only axis now — `impactCounts` is the same data
+  // re-keyed for back-compat (see ByImpact in violationsReader.ts).
+  const errorCount = input.severityCounts.error ?? input.impactCounts.error ?? 0;
+  const warningCount = input.severityCounts.warning ?? input.impactCounts.warning ?? 0;
+  const infoCount = input.severityCounts.info ?? input.impactCounts.info ?? 0;
   const cards: KpiSpec[] = [];
   cards.push({
     key: 'visible',
@@ -329,42 +326,29 @@ function collectKpiCards(input: ViolationsDashboardHtmlInput): KpiSpec[] {
   cards.push({
     key: 'errors',
     label: 'Errors',
-    value: String(errors),
-    sub: errors > 0 ? 'click to focus on errors' : 'no errors',
+    value: String(errorCount),
+    sub: errorCount > 0 ? 'must fix' : 'none — clear',
     classes: 'errors',
     filter: { kind: 'sev', value: 'error' },
-    title: 'Filter findings to errors only',
-  });
-  cards.push({
-    key: 'critical',
-    label: 'Critical',
-    value: String(critical),
-    /* Single-occurrence critical issues already demand action — call that
-       out in the subtitle instead of treating the count like a threshold. */
-    sub: critical > 0 ? 'each one demands action' : 'none — clear',
-    classes: 'crit',
-    filter: { kind: 'imp', value: 'critical' },
-    title: 'Filter findings to critical impact (each occurrence is independently harmful)',
-  });
-  cards.push({
-    key: 'high',
-    label: 'High',
-    value: String(high),
-    /* Reflect the threshold language from the LintImpact docs: "a handful
-       is manageable, 10+ indicates systemic problems". */
-    sub: high === 0 ? 'none — clear' : high < 10 ? 'manageable volume' : 'systemic — needs attention',
-    classes: 'high',
-    filter: { kind: 'imp', value: 'high' },
-    title: 'Filter findings to high impact (compound harm — 10+ is systemic)',
+    title: 'Filter findings to errors (must fix — broken / will crash / exploitable)',
   });
   cards.push({
     key: 'warnings',
     label: 'Warnings',
-    value: String(warnings),
-    sub: warnings > 0 ? 'click to focus on warnings' : 'no warnings',
+    value: String(warningCount),
+    sub: warningCount > 0 ? 'could fail or look bad' : 'none — clear',
     classes: 'warnings',
     filter: { kind: 'sev', value: 'warning' },
-    title: 'Filter findings to warnings only',
+    title: 'Filter findings to warnings (could fail or look bad)',
+  });
+  cards.push({
+    key: 'info',
+    label: 'Info',
+    value: String(infoCount),
+    sub: infoCount > 0 ? 'FYI — style / suggestions' : 'none',
+    classes: 'info',
+    filter: { kind: 'sev', value: 'info' },
+    title: 'Filter findings to info (FYI — style and suggestions)',
   });
   if (typeof input.filesAffected === 'number') {
     cards.push({

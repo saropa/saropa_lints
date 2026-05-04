@@ -122,10 +122,16 @@ function getConfig() {
 
 /** D8: Show regression nudge when score dipped below a threshold; offers "View Violations" action. */
 function showRegressionNudge(crossing: { threshold: number }, curr: RunSnapshot): void {
-  const criticalSuffix = curr.critical === 1 ? '' : 's';
+  // Headline the toast on `error` (DiagnosticSeverity.ERROR \u2014 must be fixed),
+  // not on the saropa-invented `LintImpact.critical` count. "Critical" was
+  // doing PR work that "error" already does in the analyzer's native model,
+  // and the resulting count was alarmist and ambiguous. ERROR maps to the
+  // user's mental model: error = MUST fix, warning = could/embarrassing,
+  // info = FYI. RunSnapshot already carries the error count (runHistory.ts).
+  const errorSuffix = curr.error === 1 ? '' : 's';
   const msg =
-    curr.critical > 0
-      ? `${curr.critical} critical issue${criticalSuffix} \u2014 view.`
+    curr.error > 0
+      ? `${curr.error} error${errorSuffix} \u2014 view.`
       : `Score dipped below ${crossing.threshold} \u2014 view issues.`;
   vscode.window.showInformationMessage(`Saropa Lints: ${msg}`, 'View Violations').then((choice) => {
     if (choice === 'View Violations') {
@@ -151,8 +157,11 @@ function runCelebrationIfNeeded(root: string, history: RunSnapshot[], appended: 
       5000,
     );
   }
-  if (prev.critical > 0 && curr.critical === 0) {
-    vscode.window.showInformationMessage('Saropa Lints: No critical issues!');
+  // Celebrate clearing all ERROR-severity diagnostics (must-fix). Was
+  // previously gated on LintImpact.critical, which is a parallel saropa
+  // count; the analyzer's native error severity is the right zero-target.
+  if (prev.error > 0 && curr.error === 0) {
+    vscode.window.showInformationMessage('Saropa Lints: No errors!');
   }
   if (curr.score === undefined) return;
   const crossing = detectThresholdCrossing(curr.score, findPreviousScore(history));
@@ -184,14 +193,16 @@ function updateFindingsStatusBar(item: vscode.StatusBarItem, dartProject: boolea
   }
   const data = readViolations(root);
   const total = data?.summary?.totalViolations ?? data?.violations?.length ?? 0;
-  const critical = data?.summary?.byImpact?.critical ?? 0;
+  // Status-bar badge headlines errors (must-fix). Was previously keyed on
+  // LintImpact.critical (5-bucket taxonomy retired 2026-05-03).
+  const errorCount = data?.summary?.byImpact?.error ?? 0;
   if (total <= 0) {
     item.hide();
     return;
   }
-  item.text = critical > 0 ? `$(warning) ${critical}` : `$(warning) ${total}`;
-  item.tooltip = critical > 0
-    ? `${critical} critical of ${total} total — Open Findings Dashboard`
+  item.text = errorCount > 0 ? `$(warning) ${errorCount}` : `$(warning) ${total}`;
+  item.tooltip = errorCount > 0
+    ? `${errorCount} error(s) of ${total} total — Open Findings Dashboard`
     : `${total} violation(s) — Open Findings Dashboard`;
   item.command = 'saropaLints.openViolationsWideReport';
   item.show();

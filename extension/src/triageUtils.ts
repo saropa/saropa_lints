@@ -68,17 +68,22 @@ export function partitionStylistic(
   return { stylistic, nonStylistic };
 }
 
-/** Per-impact violation counts for a single rule. */
+/**
+ * Per-severity violation counts for a single rule.
+ *
+ * Three buckets — error / warning / info — match the analyzer's native
+ * severity model. Collapsed from the prior 5-bucket impact taxonomy
+ * (critical/high/medium/low/opinionated) on 2026-05-03; see
+ * plan/COLLAPSE_LINT_IMPACT_TO_SEVERITY.md.
+ */
 export interface RuleImpactCounts {
-  critical: number;
-  high: number;
-  medium: number;
-  low: number;
-  opinionated: number;
+  error: number;
+  warning: number;
+  info: number;
 }
 
 /**
- * Single O(n) scan of violations to build per-rule impact breakdown.
+ * Single O(n) scan of violations to build per-rule severity breakdown.
  * Returned map is reused by all triage groups for score estimation,
  * avoiding repeated scans of a potentially large violations array.
  */
@@ -89,10 +94,10 @@ export function buildRuleImpactMap(
   for (const v of violations) {
     let counts = map.get(v.rule);
     if (!counts) {
-      counts = { critical: 0, high: 0, medium: 0, low: 0, opinionated: 0 };
+      counts = { error: 0, warning: 0, info: 0 };
       map.set(v.rule, counts);
     }
-    const impact = v.impact ?? 'low';
+    const impact = v.impact ?? 'info';
     if (impact in counts) {
       counts[impact as keyof RuleImpactCounts] += 1;
     }
@@ -101,8 +106,12 @@ export function buildRuleImpactMap(
 }
 
 /**
- * Rules that have at least one critical-impact violation.
- * These are "always on" in the triage — users should fix, not disable.
+ * Rules that have at least one error-severity violation. These are
+ * "always on" in the triage — users should fix, not disable.
+ *
+ * Function name preserved for back-compat with existing callers; the
+ * underlying signal is now `LintImpact.error` (= what was `LintImpact.critical`
+ * in the prior 5-bucket taxonomy).
  */
 export function identifyCriticalRules(
   impactMap: Map<string, RuleImpactCounts>,
@@ -110,8 +119,8 @@ export function identifyCriticalRules(
 ): { ruleName: string; issueCount: number }[] {
   const result: { ruleName: string; issueCount: number }[] = [];
   for (const [rule, counts] of impactMap) {
-    if (counts.critical > 0) {
-      result.push({ ruleName: rule, issueCount: issuesByRule[rule] ?? counts.critical });
+    if (counts.error > 0) {
+      result.push({ ruleName: rule, issueCount: issuesByRule[rule] ?? counts.error });
     }
   }
   // Sort by issue count descending for display priority.

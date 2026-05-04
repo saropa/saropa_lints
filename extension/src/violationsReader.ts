@@ -49,12 +49,18 @@ export interface BySeverity {
   info?: number;
 }
 
+/**
+ * Severity-keyed counts. Three buckets matching the analyzer's native model.
+ * Collapsed from the prior 5-bucket impact taxonomy (critical/high/medium/
+ * low/opinionated) on 2026-05-03; see plan/COLLAPSE_LINT_IMPACT_TO_SEVERITY.md.
+ *
+ * The interface is named `ByImpact` (not `BySeverity`) for back-compat with
+ * the JSON `byImpact` field name; the underlying values now mirror severity.
+ */
 export interface ByImpact {
-  critical?: number;
-  high?: number;
-  medium?: number;
-  low?: number;
-  opinionated?: number;
+  error?: number;
+  warning?: number;
+  info?: number;
 }
 
 /** Per-rule violation counts for triage grouping (e.g. Group A/B/C/D by volume). */
@@ -330,7 +336,10 @@ export function filterDisabledFromData(
     const sev = (v.severity ?? 'info').toLowerCase() as keyof BySeverity;
     bySeverity[sev] = (bySeverity[sev] ?? 0) + 1;
 
-    const imp = (v.impact ?? 'low').toLowerCase() as keyof ByImpact;
+    // Default to 'info' (was 'low' under the 5-bucket taxonomy) — same idea:
+    // the lowest, least-urgent bucket is the safe fallback for rules that
+    // didn't tag themselves explicitly.
+    const imp = (v.impact ?? 'info').toLowerCase() as keyof ByImpact;
     byImpact[imp] = (byImpact[imp] ?? 0) + 1;
 
     issuesByRule[v.rule] = (issuesByRule[v.rule] ?? 0) + 1;

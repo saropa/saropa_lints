@@ -17,7 +17,12 @@ export interface RunSnapshot {
   error: number;
   warning: number;
   info: number;
-  critical: number;
+  /**
+   * Legacy field — kept optional so user `vscode.Memento` history written
+   * before the 2026-05-03 LintImpact 5→3 collapse still parses cleanly.
+   * New snapshots no longer populate this; consumers should read `error`.
+   */
+  critical?: number;
   /** Health score (0–100) at time of snapshot. Absent in old history entries. */
   score?: number;
 }
@@ -55,10 +60,12 @@ export function appendSnapshot(
   const total = data.summary?.totalViolations ?? data.violations.length;
   const last = history.length > 0 ? history[history.length - 1] : undefined;
 
+  // After the 2026-05-03 LintImpact 5→3 collapse, byImpact and bySeverity
+  // carry the same three buckets. Read severity directly; the byImpact field
+  // is retained in JSON for back-compat but no longer adds information.
   const errorCount = data.summary?.bySeverity?.error ?? 0;
   const warningCount = data.summary?.bySeverity?.warning ?? 0;
   const infoCount = data.summary?.bySeverity?.info ?? 0;
-  const criticalCount = data.summary?.byImpact?.critical ?? 0;
   const healthResult = computeHealthScore(data);
 
   // Skip duplicate — same total, severity breakdown, AND score as last snapshot.
@@ -69,7 +76,6 @@ export function appendSnapshot(
     last.error === errorCount &&
     last.warning === warningCount &&
     last.info === infoCount &&
-    last.critical === criticalCount &&
     (last.score ?? -1) === (healthResult?.score ?? -1)
   ) {
     return { history, appended: false };
@@ -81,7 +87,6 @@ export function appendSnapshot(
     error: errorCount,
     warning: warningCount,
     info: infoCount,
-    critical: criticalCount,
     score: healthResult?.score,
   };
 

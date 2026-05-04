@@ -65,17 +65,20 @@ export class SuggestionsTreeProvider implements vscode.TreeDataProvider<Suggesti
     const enabledRules = new Set(data?.config?.enabledRuleNames ?? []);
     const enabledPackIds = new Set(readRulePacksEnabled(root!));
     const total = data?.summary?.totalViolations ?? data?.violations?.length ?? 0;
-    const critical = byImpact?.critical ?? 0;
-    const high = byImpact?.high ?? 0;
+    // Severity-keyed counts (was: critical/high under the 5-bucket impact
+    // taxonomy retired on 2026-05-03). The bySeverity field still exists for
+    // analyzer-error focus suggestions.
+    const errorCount = byImpact?.error ?? 0;
+    const warningCount = byImpact?.warning ?? 0;
     const errors = bySeverity?.error ?? 0;
 
-    // C3: Compute current score and projected scores for impact suggestions.
+    // Compute current score and projected scores for severity suggestions.
     const currentScore = computeHealthScore(data)?.score;
 
-    if (critical > 0) {
-      // C3: Show estimated score gain from fixing all critical issues.
-      // Skip score message when gain is zero ("+0 points" is not useful).
-      const projected = estimateScoreWithout(data, 'critical');
+    if (errorCount > 0) {
+      // Show estimated score gain from fixing all error-severity findings.
+      // Skip the "+0 points" message when projected gain is zero.
+      const projected = estimateScoreWithout(data, 'error');
       const gain = (currentScore !== undefined && projected !== null)
         ? projected - currentScore
         : null;
@@ -84,15 +87,15 @@ export class SuggestionsTreeProvider implements vscode.TreeDataProvider<Suggesti
         : 'Show in Issues';
       items.push(
         new SuggestionItem(
-          `Fix ${critical} critical issue(s)`,
+          `Fix ${errorCount} error(s)`,
           desc,
           'saropaLints.focusIssuesWithImpactFilter',
-          ['critical'],
+          ['error'],
         ),
       );
     }
-    if (high > 0 && items.length < 3) {
-      const projected = estimateScoreWithout(data, 'high');
+    if (warningCount > 0 && items.length < 3) {
+      const projected = estimateScoreWithout(data, 'warning');
       const gain = (currentScore !== undefined && projected !== null)
         ? projected - currentScore
         : null;
@@ -101,10 +104,10 @@ export class SuggestionsTreeProvider implements vscode.TreeDataProvider<Suggesti
         : 'Show in Issues';
       items.push(
         new SuggestionItem(
-          `Address ${high} high-impact issue(s)`,
+          `Address ${warningCount} warning(s)`,
           desc,
           'saropaLints.focusIssuesWithImpactFilter',
-          ['high'],
+          ['warning'],
         ),
       );
     }

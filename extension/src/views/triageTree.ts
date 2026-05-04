@@ -80,9 +80,15 @@ export function buildTriageData(data: ViolationsData, root?: string): TriageData
 
   const volumeGroups = groupRulesByVolume(volumeIssues);
 
-  // Build group nodes with score estimates.
+  // Build group nodes with score estimates. Group label is "Must-fix rules"
+  // (was "Critical rules" pre-2026-05-03); the underlying rules are now
+  // identified by LintImpact.error after the 5-bucket impact taxonomy
+  // collapsed into the analyzer's three-level severity model — see
+  // plan/COLLAPSE_LINT_IMPACT_TO_SEVERITY.md. The TypeScript identifier
+  // `criticalGroup` and groupId `'critical'` stay because they are external
+  // contract surfaces (consumers detect this group by id).
   const criticalGroup = criticalRules.length > 0
-    ? buildGroupNode('critical', 'Critical rules', criticalRules.map((r) => r.ruleName),
+    ? buildGroupNode('critical', 'Must-fix rules', criticalRules.map((r) => r.ruleName),
         criticalRules.reduce((s, r) => s + r.issueCount, 0), data, impactMap)
     : null;
 

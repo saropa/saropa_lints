@@ -139,7 +139,7 @@ export function buildTriageDashboardSectionHtml(root: string): string {
 
   const body = renderTriageBody(data, triage);
   return `<details class="triage-dash" open>
-<summary>Rule triage (volume / critical / stylistic)</summary>
+<summary>Rule triage (volume / must-fix / stylistic)</summary>
 <p class="hint">Same grouping as the Triage activity-bar tree: filter Issues, or disable/enable rules in <code>analysis_options_custom.yaml</code>. Large groups may ask for confirmation.</p>
 ${body}
 </details>`;

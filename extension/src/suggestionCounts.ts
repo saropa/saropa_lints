@@ -25,18 +25,22 @@ export function countSuggestionItems(data: ViolationsData, root: string, tier: s
   const enabledRules = new Set(data.config?.enabledRuleNames ?? []);
   const enabledPackIds = new Set(readRulePacksEnabled(root));
   const total = data.summary?.totalViolations ?? data.violations.length;
-  const critical = byImpact?.critical ?? 0;
-  const high = byImpact?.high ?? 0;
+  // Severity-keyed counts (was: critical/high under the 5-bucket impact
+  // taxonomy retired on 2026-05-03).
+  const errorCount = byImpact?.error ?? 0;
+  const warningCount = byImpact?.warning ?? 0;
   const errors = bySeverity?.error ?? 0;
 
   const labels: string[] = [];
-  if (critical > 0) {
-    labels.push('critical');
+  if (errorCount > 0) {
+    labels.push('errors');
   }
-  if (high > 0 && labels.length < 3) {
-    labels.push('high');
+  if (warningCount > 0 && labels.length < 3) {
+    labels.push('warnings');
   }
-  if (errors > 0 && !labels.some((l) => l.includes('error'))) {
+  // Mirrored analyzer-error suggestion stays even when the impact-error label
+  // already pushed (the two come from different summary fields).
+  if (errors > 0 && labels.length < 3 && !labels.includes('errors')) {
     labels.push('errors');
   }
 

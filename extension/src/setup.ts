@@ -860,7 +860,7 @@ export async function runRepairConfig(context: vscode.ExtensionContext): Promise
 
 /** Tier metadata for the picker — labels, cumulative rule counts, short descriptions. */
 const TIER_INFO = [
-  { id: 'essential', label: 'Essential', rules: 297, desc: 'Security and critical issues only' },
+  { id: 'essential', label: 'Essential', rules: 297, desc: 'Security and must-fix errors only' },
   { id: 'recommended', label: 'Recommended', rules: 895, desc: 'Best practices for most projects' },
   { id: 'professional', label: 'Professional', rules: 1834, desc: 'Comprehensive coverage for teams' },
   { id: 'comprehensive', label: 'Comprehensive', rules: 1959, desc: 'Thorough analysis with minor rules' },

@@ -203,7 +203,9 @@ function buildFilteredIndex(
     // Focus mode: exact file match takes priority over all other filters.
     if (focusedFile && v.file !== focusedFile) continue;
     const severity = (v.severity ?? 'info').toLowerCase();
-    const impact = (v.impact ?? 'low').toLowerCase();
+    // Default fallback is 'info' (was 'low' under the 5-bucket impact
+    // taxonomy retired 2026-05-03 — both are the lowest-priority bucket).
+    const impact = (v.impact ?? 'info').toLowerCase();
     if (!severitiesToShow.has(severity) || !impactsToShow.has(impact)) continue;
     if (suppressions.hiddenSeverities.includes(severity) || suppressions.hiddenImpacts.includes(impact)) continue;
     if (rulesToHide.has(v.rule)) continue;
@@ -271,7 +273,9 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
   private suppressions: Suppressions;
   private textFilter = '';
   private severitiesToShow = new Set<string>(SEVERITY_ORDER);
-  private impactsToShow = new Set<string>(['critical', 'high', 'medium', 'low', 'opinionated']);
+  // Three-bucket severity model (post-collapse, 2026-05-03 — see
+  // plan/COLLAPSE_LINT_IMPACT_TO_SEVERITY.md).
+  private impactsToShow = new Set<string>(['error', 'warning', 'info']);
   private rulesToHide = new Set<string>();
   /** Rules disabled in analysis_options.yaml / analysis_options_custom.yaml.
    *  Merged with user-set rulesToHide when filtering violations. */
@@ -451,7 +455,8 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
   clearFilters(): void {
     this.textFilter = '';
     this.severitiesToShow = new Set(SEVERITY_ORDER);
-    this.impactsToShow = new Set(['critical', 'high', 'medium', 'low', 'opinionated']);
+    // Three-bucket severity model (post-collapse, 2026-05-03).
+    this.impactsToShow = new Set(['error', 'warning', 'info']);
     this.rulesToHide = new Set();
     this.focusedFile = undefined;
     this.cachedIndex = null;
@@ -750,11 +755,13 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
         `${element.label} (${element.count})`,
         this.collapsedOrExpanded,
       );
-      // D10: Mode-aware icon — reads from element.mode (snapshot at creation) to avoid stale this.groupBy.
+      // Mode-aware icon — reads from element.mode (snapshot at creation) so
+      // `this.groupBy` changing mid-render doesn't mismatch the icon.
+      // Three-bucket severity model (was 5 buckets pre-2026-05-03).
       if (element.mode === 'impact') {
         const k = element.groupKey;
         item.iconPath = new vscode.ThemeIcon(
-          k === 'critical' ? 'error' : k === 'high' ? 'warning' : k === 'medium' ? 'info' : 'circle-outline',
+          k === 'error' ? 'error' : k === 'warning' ? 'warning' : k === 'info' ? 'info' : 'circle-outline',
         );
       } else if (element.mode === 'owasp') {
         item.iconPath = new vscode.ThemeIcon('shield');
@@ -982,9 +989,10 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
       });
     }
 
-    // Impact uses severity-like predefined order; others sort by count desc with name tie-breaker.
+    // Impact mode uses severity-keyed order (was 5-bucket order pre-2026-05-03);
+    // other modes sort by count desc with name tie-breaker.
     if (currentMode === 'impact') {
-      const order = ['critical', 'high', 'medium', 'low', 'opinionated'];
+      const order = ['error', 'warning', 'info'];
       items.sort((a, b) => order.indexOf(a.groupKey) - order.indexOf(b.groupKey));
     } else {
       items.sort((a, b) => b.count - a.count || a.groupKey.localeCompare(b.groupKey));
@@ -999,7 +1007,7 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
    * Accepts explicit mode parameter so callers use the snapshot, not live this.groupBy.
    */
   private extractGroupKeys(v: Violation, mode: GroupByMode): string[] {
-    if (mode === 'impact') return [(v.impact ?? 'low').toLowerCase()];
+    if (mode === 'impact') return [(v.impact ?? 'info').toLowerCase()];
     if (mode === 'rule') return [v.rule];
     if (mode === 'file') return [v.file];
     if (mode === 'ruleType') return [v.metadata?.ruleType ?? 'unspecified'];
@@ -1195,7 +1203,7 @@ export function registerIssueCommands(
     }),
     vscode.commands.registerCommand('saropaLints.hideImpact', (element: unknown) => {
       if (element && typeof element === 'object' && 'kind' in element && (element as IssueTreeNode).kind === 'violation') {
-        const impact = ((element as ViolationItem).violation.impact ?? 'low').toLowerCase();
+        const impact = ((element as ViolationItem).violation.impact ?? 'info').toLowerCase();
         provider.addSuppressionImpact(impact);
         vscode.window.setStatusBarMessage('Impact hidden. Clear suppressions to show again.', 3000);
       }
@@ -1225,7 +1233,9 @@ export function registerIssueCommands(
 
       // D4: Estimate score delta before applying fix.
       const data = readViolations(root);
-      const estimate = data ? estimateScoreWithoutViolation(data, v.impact ?? 'medium') : null;
+      // Default to 'warning' (was 'medium' under the 5-bucket impact taxonomy
+      // retired 2026-05-03 — both are the middle bucket for unspecified rules).
+      const estimate = data ? estimateScoreWithoutViolation(data, v.impact ?? 'warning') : null;
 
       const applied = await vscode.window.withProgress(
         { location: vscode.ProgressLocation.Notification, title: 'Applying fix…', cancellable: false },

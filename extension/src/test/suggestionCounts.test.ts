@@ -20,16 +20,18 @@ describe('countSuggestionItems', () => {
   it('does not treat zero total as “has issues” for baseline/tier hints', () => {
     const data: ViolationsData = {
       violations: [],
-      summary: { totalViolations: 0, byImpact: { critical: 0 }, bySeverity: { error: 0 } },
+      summary: { totalViolations: 0, byImpact: { error: 0 }, bySeverity: { error: 0 } },
     };
     const n = countSuggestionItems(data, os.tmpdir(), 'recommended');
     assert.strictEqual(n, 2);
   });
 
-  it('includes critical row when critical > 0', () => {
+  it('includes error row when error > 0', () => {
+    // Severity-keyed (was: { critical: 1 } / impact: 'critical' under the
+    // 5-bucket impact taxonomy retired on 2026-05-03).
     const data: ViolationsData = {
-      violations: [{ file: 'a.dart', line: 1, rule: 'r', message: 'm', impact: 'critical' }],
-      summary: { totalViolations: 1, byImpact: { critical: 1 } },
+      violations: [{ file: 'a.dart', line: 1, rule: 'r', message: 'm', impact: 'error' }],
+      summary: { totalViolations: 1, byImpact: { error: 1 } },
     };
     const n = countSuggestionItems(data, os.tmpdir(), 'essential');
     assert.ok(n >= 3);

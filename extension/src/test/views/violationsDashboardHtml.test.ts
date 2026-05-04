@@ -45,14 +45,15 @@ function minimalInput(overrides: Partial<Parameters<typeof renderViolationsDashb
     groupBy: 'severity' as const,
     textFilter: '',
     severities: ['error', 'warning', 'info'],
-    impacts: ['critical', 'high', 'medium', 'low', 'opinionated'],
+    // Three-bucket severity model (post-collapse, 2026-05-03).
+    impacts: ['error', 'warning', 'info'],
     sections: [] as DashboardSection[],
     analyzerSuppressions: baseAnalyzer,
     viewSuppressions: baseView,
     todoHackSnapshot: emptyTodoHack,
     driftAdvisorSnapshot: emptyDrift,
     severityCounts: { error: 0, warning: 0, info: 0 },
-    impactCounts: { critical: 0, high: 0, medium: 0, low: 0, opinionated: 0 },
+    impactCounts: { error: 0, warning: 0, info: 0 },
     ...overrides,
   };
 }
@@ -143,35 +144,38 @@ describe('violationsDashboardHtml', () => {
     assert.ok(html.includes('data-kpi-value="error"'));
   });
 
-  it('splits Critical and High into separate KPI cards (different threat models)', () => {
-    /* critical encodes per-occurrence harm; high encodes compound harm.
-       Lumping them into one card hides that distinction. */
+  // Replaces the old "splits Critical and High into separate KPI cards" test.
+  // After the LintImpact 5→3 collapse on 2026-05-03 the dashboard exposes
+  // the analyzer's three severities as separate cards (Errors / Warnings /
+  // Info) — Critical and High no longer have their own cards because they
+  // collapsed into Errors and Warnings respectively.
+  it('exposes one KPI card per severity (errors / warnings / info)', () => {
     const html = renderViolationsDashboardHtml(
       minimalInput({
-        impactCounts: { critical: 1, high: 12, medium: 0, low: 0, opinionated: 0 },
+        impactCounts: { error: 1, warning: 12, info: 0 },
         totalRawAfterDisable: 13,
         filteredCount: 13,
       }),
     );
-    assert.ok(html.includes('data-kpi-value="critical"'));
-    assert.ok(html.includes('data-kpi-value="high"'));
-    /* Old combined value is gone. */
-    assert.ok(!html.includes('data-kpi-value="critical,high"'));
-    /* high crosses the 10+ "systemic" threshold from LintImpact docs. */
-    assert.ok(html.includes('systemic'));
+    assert.ok(html.includes('data-kpi="errors"'));
+    assert.ok(html.includes('data-kpi="warnings"'));
+    assert.ok(html.includes('data-kpi="info"'));
+    // Old per-impact-tier cards must be gone.
+    assert.ok(!html.includes('data-kpi="critical"'));
+    assert.ok(!html.includes('data-kpi="high"'));
   });
 
-  it('orders KPI cards by importance (Visible > Errors > Critical > High > Warnings > scope)', () => {
+  it('orders KPI cards by importance (Visible > Errors > Warnings > Info > scope)', () => {
     const html = renderViolationsDashboardHtml(
       minimalInput({
         severityCounts: { error: 1, warning: 1, info: 0 },
-        impactCounts: { critical: 1, high: 1, medium: 0, low: 0, opinionated: 0 },
+        impactCounts: { error: 1, warning: 1, info: 0 },
         filesAffected: 5,
         totalRawAfterDisable: 2,
         filteredCount: 2,
       }),
     );
-    const order = ['visible', 'errors', 'critical', 'high', 'warnings', 'files'];
+    const order = ['visible', 'errors', 'warnings', 'info', 'files'];
     let cursor = -1;
     for (const key of order) {
       const idx = html.indexOf(`data-kpi="${key}"`);
@@ -182,7 +186,7 @@ describe('violationsDashboardHtml', () => {
 
   it('shows an active-filters chip strip when filters diverge from defaults', () => {
     const html = renderViolationsDashboardHtml(
-      minimalInput({ textFilter: 'foo', severities: ['error'], impacts: ['critical', 'high'] }),
+      minimalInput({ textFilter: 'foo', severities: ['error'], impacts: ['error', 'warning'] }),
     );
     assert.ok(html.includes('id="chipStrip"'));
     assert.ok(html.includes('Active filters'));

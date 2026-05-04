@@ -108,11 +108,13 @@ export class SummaryTreeProvider implements vscode.TreeDataProvider<SummaryItem>
         );
       }
       if (s?.byImpact) {
+        // Three severity buckets — collapsed from the prior 5-bucket impact
+        // taxonomy on 2026-05-03 (plan/COLLAPSE_LINT_IMPACT_TO_SEVERITY.md).
         const bi = s.byImpact;
         items.push(
           new SummaryItem(
-            'By impact',
-            `critical ${bi.critical ?? 0}, high ${bi.high ?? 0}, medium ${bi.medium ?? 0}, low ${bi.low ?? 0}, opinionated ${bi.opinionated ?? 0}`,
+            'By severity',
+            `${bi.error ?? 0} error, ${bi.warning ?? 0} warning, ${bi.info ?? 0} info`,
             vscode.TreeItemCollapsibleState.Expanded,
             'byImpact',
           ),
@@ -168,13 +170,13 @@ export class SummaryTreeProvider implements vscode.TreeDataProvider<SummaryItem>
         new SummaryItem('Info', String(s.bySeverity.info ?? 0), vscode.TreeItemCollapsibleState.None, undefined, 'saropaLints.focusIssuesWithSeverityFilter', ['info']),
       ];
     }
-    if ((element.nodeId === 'byImpact' || element.label === 'By impact') && s?.byImpact) {
+    if ((element.nodeId === 'byImpact' || element.label === 'By severity') && s?.byImpact) {
+      // Three children mirror the new 3-bucket severity model (was: 5 buckets
+      // critical/high/medium/low/opinionated, retired 2026-05-03).
       return [
-        new SummaryItem('Critical', String(s.byImpact.critical ?? 0), vscode.TreeItemCollapsibleState.None, undefined, 'saropaLints.focusIssuesWithImpactFilter', ['critical']),
-        new SummaryItem('High', String(s.byImpact.high ?? 0), vscode.TreeItemCollapsibleState.None, undefined, 'saropaLints.focusIssuesWithImpactFilter', ['high']),
-        new SummaryItem('Medium', String(s.byImpact.medium ?? 0), vscode.TreeItemCollapsibleState.None, undefined, 'saropaLints.focusIssuesWithImpactFilter', ['medium']),
-        new SummaryItem('Low', String(s.byImpact.low ?? 0), vscode.TreeItemCollapsibleState.None, undefined, 'saropaLints.focusIssuesWithImpactFilter', ['low']),
-        new SummaryItem('Opinionated', String(s.byImpact.opinionated ?? 0), vscode.TreeItemCollapsibleState.None, undefined, 'saropaLints.focusIssuesWithImpactFilter', ['opinionated']),
+        new SummaryItem('Error', String(s.byImpact.error ?? 0), vscode.TreeItemCollapsibleState.None, undefined, 'saropaLints.focusIssuesWithImpactFilter', ['error']),
+        new SummaryItem('Warning', String(s.byImpact.warning ?? 0), vscode.TreeItemCollapsibleState.None, undefined, 'saropaLints.focusIssuesWithImpactFilter', ['warning']),
+        new SummaryItem('Info', String(s.byImpact.info ?? 0), vscode.TreeItemCollapsibleState.None, undefined, 'saropaLints.focusIssuesWithImpactFilter', ['info']),
       ];
     }
     if ((element.nodeId === 'byRuleType' || element.label === 'By rule type') && s?.byRuleType) {

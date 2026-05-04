@@ -131,7 +131,9 @@ function defaultDashboardState(cfg: vscode.WorkspaceConfiguration): DashboardSta
     groupBy: parseViolationsGroupBy(cfg),
     textFilter: '',
     severitiesToShow: new Set(['error', 'warning', 'info']),
-    impactsToShow: new Set(['critical', 'high', 'medium', 'low', 'opinionated']),
+    // Three-bucket severity model (was: critical/high/medium/low/opinionated;
+    // collapsed 2026-05-03 — see plan/COLLAPSE_LINT_IMPACT_TO_SEVERITY.md).
+    impactsToShow: new Set(['error', 'warning', 'info']),
   };
 }
 
@@ -280,12 +282,12 @@ function countBySeverity(violations: readonly Violation[]): Record<string, numbe
 }
 
 function countByImpact(violations: readonly Violation[]): Record<string, number> {
+  // Three-bucket severity model (was: 5-bucket critical/high/medium/low/
+  // opinionated taxonomy; collapsed 2026-05-03).
   return {
-    critical: violations.filter((v) => (v.impact ?? 'low').toLowerCase() === 'critical').length,
-    high: violations.filter((v) => (v.impact ?? 'low').toLowerCase() === 'high').length,
-    medium: violations.filter((v) => (v.impact ?? 'low').toLowerCase() === 'medium').length,
-    low: violations.filter((v) => (v.impact ?? 'low').toLowerCase() === 'low').length,
-    opinionated: violations.filter((v) => (v.impact ?? 'low').toLowerCase() === 'opinionated').length,
+    error: violations.filter((v) => (v.impact ?? 'info').toLowerCase() === 'error').length,
+    warning: violations.filter((v) => (v.impact ?? 'info').toLowerCase() === 'warning').length,
+    info: violations.filter((v) => (v.impact ?? 'info').toLowerCase() === 'info').length,
   };
 }
 
@@ -515,7 +517,8 @@ function getOrCreatePanel(context: vscode.ExtensionContext): vscode.WebviewPanel
       const cur = getDashboardState(cfg);
       cur.textFilter = '';
       cur.severitiesToShow = new Set(['error', 'warning', 'info']);
-      cur.impactsToShow = new Set(['critical', 'high', 'medium', 'low', 'opinionated']);
+      // Three-bucket severity model (post-collapse, 2026-05-03).
+      cur.impactsToShow = new Set(['error', 'warning', 'info']);
       if (currentPanel) {
         await rebuildDashboardHtml(context, currentPanel);
       }

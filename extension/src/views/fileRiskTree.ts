@@ -12,24 +12,30 @@ import { readDisabledRules } from '../configWriter';
 import { loadSuppressions, isPathHidden, isRuleHidden } from '../suppressionsStore';
 
 /**
- * Impact weights matching healthScore.ts so that risk ranking is
- * consistent with the health score formula. A single critical violation
- * outweighs 8 medium ones in the weighted score.
+ * Severity weights matching healthScore.ts so that risk ranking is consistent
+ * with the health score formula. Three buckets — collapsed from the prior
+ * 5-bucket impact taxonomy on 2026-05-03 (see
+ * plan/COLLAPSE_LINT_IMPACT_TO_SEVERITY.md).
  */
 const RISK_WEIGHTS: Record<string, number> = {
-  critical: 8,
-  high: 3,
-  medium: 1,
-  low: 0.25,
-  opinionated: 0.05,
+  error: 8,
+  warning: 3,
+  info: 0.25,
 };
 
 const MAX_FILES = 30;
 
+/**
+ * Per-file risk breakdown. Field names retain `critical`/`high` for back-compat
+ * with the JSON shape consumed by `treeSerializers.ts` (Copy-as-JSON output);
+ * the underlying counts now reflect error and warning severities.
+ */
 export interface FileRisk {
   filePath: string;
   total: number;
+  /** Count of error-severity violations (was: LintImpact.critical pre-2026-05-03). */
   critical: number;
+  /** Count of warning-severity violations (was: LintImpact.high pre-2026-05-03). */
   high: number;
   riskScore: number;
 }
@@ -46,9 +52,11 @@ export function buildFileRisks(violations: Violation[]): FileRisk[] {
   for (const v of violations) {
     const entry = byFile.get(v.file) ?? { total: 0, critical: 0, high: 0, weighted: 0 };
     entry.total++;
-    const impact = (v.impact ?? 'medium').toLowerCase();
-    if (impact === 'critical') entry.critical++;
-    if (impact === 'high') entry.high++;
+    // Default to 'warning' (was 'medium' under the 5-bucket taxonomy) — both
+    // are the middle bucket for unspecified rules.
+    const impact = (v.impact ?? 'warning').toLowerCase();
+    if (impact === 'error') entry.critical++;
+    if (impact === 'warning') entry.high++;
     entry.weighted += RISK_WEIGHTS[impact] ?? 1;
     byFile.set(v.file, entry);
   }
@@ -172,7 +180,11 @@ export class FileRiskTreeProvider implements vscode.TreeDataProvider<FileRiskNod
 
     // Build tooltip with breakdown.
     const parts: string[] = [`${r.total} violation${r.total === 1 ? '' : 's'}`];
-    if (r.critical > 0) parts.push(`${r.critical} critical`);
+    // Label "must-fix" rather than "critical" — drops alarmist tier
+    // wording while pointing at the same impact-critical count. Underlying
+    // field name stays `critical` until Scope 2 collapses the parallel
+    // impact taxonomy.
+    if (r.critical > 0) parts.push(`${r.critical} must-fix`);
     if (r.high > 0) parts.push(`${r.high} high`);
     item.tooltip = `${r.filePath}\n${parts.join(', ')}\nRisk score: ${Math.round(r.riskScore)}`;
 
@@ -206,7 +218,7 @@ export class FileRiskTreeProvider implements vscode.TreeDataProvider<FileRiskNod
       if (isRuleHidden(suppressions, v.file, v.rule)) return false;
       const severity = (v.severity ?? 'info').toLowerCase();
       if (suppressions.hiddenSeverities.includes(severity)) return false;
-      const impact = (v.impact ?? 'low').toLowerCase();
+      const impact = (v.impact ?? 'info').toLowerCase();
       if (suppressions.hiddenImpacts.includes(impact)) return false;
       return true;
     });
@@ -222,9 +234,9 @@ export class FileRiskTreeProvider implements vscode.TreeDataProvider<FileRiskNod
     const totalCritical = risks.reduce((s, r) => s + r.critical, 0);
     const totalHigh = risks.reduce((s, r) => s + r.high, 0);
     const parts: string[] = [`${risks.length} file${risks.length === 1 ? '' : 's'}`];
-    if (totalCritical > 0) parts.push(`${totalCritical} critical`);
+    if (totalCritical > 0) parts.push(`${totalCritical} must-fix`);
     if (totalHigh > 0) parts.push(`${totalHigh} high`);
-    // Only show total violations when there are medium/low beyond critical+high.
+    // Only show total violations when there are medium/low beyond must-fix+high.
     const otherCount = totalViolations - totalCritical - totalHigh;
     if (otherCount > 0) parts.push(`${otherCount} other`);
     items.push({

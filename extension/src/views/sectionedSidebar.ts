@@ -148,11 +148,12 @@ function rebuildSummary(
             info: bySeverity['info'] ?? 0,
         },
         byImpact: {
-            critical: byImpact['critical'] ?? 0,
-            high: byImpact['high'] ?? 0,
-            medium: byImpact['medium'] ?? 0,
-            low: byImpact['low'] ?? 0,
-            opinionated: byImpact['opinionated'] ?? 0,
+            // Three severity buckets — the 5-bucket
+            // (critical/high/medium/low/opinionated) taxonomy collapsed on
+            // 2026-05-03 (plan/COLLAPSE_LINT_IMPACT_TO_SEVERITY.md).
+            error: byImpact['error'] ?? 0,
+            warning: byImpact['warning'] ?? 0,
+            info: byImpact['info'] ?? 0,
         },
     };
 }
@@ -373,10 +374,12 @@ function appendRegressionAndMilestone(
 ): void {
     const regression = detectScoreRegression(history);
     if (regression) {
-        const criticalCount = data.summary?.byImpact?.critical ?? 0;
-        const plural = criticalCount === 1 ? '' : 's';
-        const regDesc = criticalCount > 0
-            ? `${criticalCount} critical violation${plural}`
+        // Headline regression on errors (must-fix). Was previously keyed on
+        // LintImpact.critical (5-bucket taxonomy retired 2026-05-03).
+        const errorCount = data.summary?.byImpact?.error ?? 0;
+        const plural = errorCount === 1 ? '' : 's';
+        const regDesc = errorCount > 0
+            ? `${errorCount} error${plural}`
             : 'View issues';
         items.push(new LeafItem(
             `Score dropped ${regression.previousScore} → ${regression.currentScore}`,
@@ -410,7 +413,8 @@ function buildStatusItems(workspaceState: vscode.Memento): SectionNode[] {
     const items: LeafItem[] = [];
     const history = loadHistory(workspaceState);
     const total = data.summary?.totalViolations ?? data.violations?.length ?? 0;
-    const critical = data.summary?.byImpact?.critical ?? 0;
+    // Was data.summary.byImpact.critical (5-bucket taxonomy retired 2026-05-03).
+    const critical = data.summary?.byImpact?.error ?? 0;
     const hotspotReviewState = new SecurityHotspotReviewStateService(workspaceState);
     const hotspotCounts = countSecurityHotspotReviewStates(
         data.violations ?? [],

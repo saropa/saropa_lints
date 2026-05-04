@@ -1699,7 +1699,7 @@
           {
             "id": "saropaLints.walkthrough.healthScore",
             "title": "Health Score",
-            "description": "Your project's quality at a glance: a **0–100 score** in the status bar and Overview view.\n\nGreen (80+), yellow (50–79), red (<50). Critical issues penalize heavily.\n\n[Run analysis](command:saropaLints.runAnalysis) · [Set up project](command:saropaLints.enable)",
+            "description": "Your project's quality at a glance: a **0–100 score** in the status bar and Overview view.\n\nGreen (80+), yellow (50–79), red (<50). Errors penalize heavily.\n\n[Run analysis](command:saropaLints.runAnalysis) · [Set up project](command:saropaLints.enable)",
             "media": {
               "markdown": "media/walkthrough-health-score.md"
             },
@@ -1732,7 +1732,7 @@
           {
             "id": "saropaLints.walkthrough.triage",
             "title": "Triage",
-            "description": "Rules grouped by priority — critical, volume bands, and stylistic. Each group shows **estimated score impact**.\n\nUse **Lints Config** to enable or disable rules; changes write to YAML and re-run analysis.\n\n[Open Lints Config](command:saropaLints.openConfigDashboard)",
+            "description": "Rules grouped by priority — errors, volume bands, and stylistic. Each group shows **estimated score impact**.\n\nUse **Lints Config** to enable or disable rules; changes write to YAML and re-run analysis.\n\n[Open Lints Config](command:saropaLints.openConfigDashboard)",
             "media": {
               "markdown": "media/walkthrough-triage.md"
             },

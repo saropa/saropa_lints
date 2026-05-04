@@ -218,8 +218,8 @@ describe('IssuesTreeProvider self-contained element children', () => {
   it('group node returns file children from embedded violations', async () => {
     readViolationsStub.returns({
       violations: [
-        { file: 'lib/a.dart', line: 1, rule: 'r1', message: 'm', severity: 'warning', impact: 'high' },
-        { file: 'lib/b.dart', line: 2, rule: 'r2', message: 'm', severity: 'warning', impact: 'high' },
+        { file: 'lib/a.dart', line: 1, rule: 'r1', message: 'm', severity: 'warning', impact: 'warning' },
+        { file: 'lib/b.dart', line: 2, rule: 'r2', message: 'm', severity: 'warning', impact: 'warning' },
       ],
       summary: { totalViolations: 2 },
     });
@@ -231,8 +231,8 @@ describe('IssuesTreeProvider self-contained element children', () => {
       label: 'High',
       count: 2,
       violations: [
-        { file: 'lib/a.dart', line: 1, rule: 'r1', message: 'm', severity: 'warning', impact: 'high' },
-        { file: 'lib/b.dart', line: 2, rule: 'r2', message: 'm', severity: 'warning', impact: 'high' },
+        { file: 'lib/a.dart', line: 1, rule: 'r1', message: 'm', severity: 'warning', impact: 'warning' },
+        { file: 'lib/b.dart', line: 2, rule: 'r2', message: 'm', severity: 'warning', impact: 'warning' },
       ],
     };
     const children = await provider.getChildren(groupNode);
@@ -251,7 +251,7 @@ describe('IssuesTreeProvider self-contained element children', () => {
       label: 'High',
       count: 1,
       violations: [
-        { file: 'lib/a.dart', line: 1, rule: 'r1', message: 'm', severity: 'warning', impact: 'high' },
+        { file: 'lib/a.dart', line: 1, rule: 'r1', message: 'm', severity: 'warning', impact: 'warning' },
       ],
     };
     const children = await provider.getChildren(groupNode);
@@ -365,7 +365,7 @@ describe('IssuesTreeProvider metadata grouping modes', () => {
           rule: 'avoid_hardcoded_credentials',
           message: 'm',
           severity: 'warning',
-          impact: 'critical',
+          impact: 'error',
           metadata: { ruleType: 'vulnerability' },
         },
         {
@@ -374,7 +374,7 @@ describe('IssuesTreeProvider metadata grouping modes', () => {
           rule: 'prefer_const',
           message: 'm',
           severity: 'info',
-          impact: 'low',
+          impact: 'info',
           metadata: { ruleType: 'codeSmell' },
         },
       ],
@@ -399,7 +399,7 @@ describe('IssuesTreeProvider metadata grouping modes', () => {
           rule: 'avoid_hardcoded_credentials',
           message: 'm',
           severity: 'warning',
-          impact: 'critical',
+          impact: 'error',
           metadata: { ruleStatus: 'ready' },
         },
         {
@@ -408,7 +408,7 @@ describe('IssuesTreeProvider metadata grouping modes', () => {
           rule: 'beta_rule',
           message: 'm',
           severity: 'warning',
-          impact: 'medium',
+          impact: 'warning',
           metadata: { ruleStatus: 'beta' },
         },
       ],
