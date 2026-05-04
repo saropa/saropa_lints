@@ -2997,13 +2997,13 @@ class SaropaDiagnosticReporter {
       if (_isDuplicateAttempt(adjustedOffset)) return;
       if (_isSuppressed(adjustedOffset, node)) return;
       _rule.reportAtOffset(adjustedOffset, length);
-      _trackViolation(adjustedOffset);
+      _trackViolation(adjustedOffset, node: node);
       return;
     }
     if (_isDuplicateAttempt(node.offset)) return;
     if (_isSuppressed(node.offset, node)) return;
     _rule.reportAtNode(node);
-    _trackViolation(node.offset);
+    _trackViolation(node.offset, node: node);
   }
 
   /// Reports a diagnostic at the given [token].
@@ -3050,31 +3050,69 @@ class SaropaDiagnosticReporter {
   /// When a suppression is detected, records it in [SuppressionTracker]
   /// so the summary log and violations.json include suppression counts.
   bool _isSuppressed(int offset, AstNode node) {
-    if (_isBaselined(offset)) {
-      _trackSuppression(offset, SuppressionKind.baseline);
+    if (_isBaselined(offset, node: node)) {
+      _trackSuppression(offset, SuppressionKind.baseline, node: node);
       return true;
     }
     if (_isIgnoredForFile()) {
-      _trackSuppression(offset, SuppressionKind.ignoreForFile);
+      _trackSuppression(offset, SuppressionKind.ignoreForFile, node: node);
       return true;
     }
     if (IgnoreUtils.hasIgnoreComment(node, _ruleName)) {
-      _trackSuppression(offset, SuppressionKind.ignore);
+      _trackSuppression(offset, SuppressionKind.ignore, node: node);
       return true;
     }
     return false;
   }
 
-  /// Check if this violation is suppressed by the baseline.
-  bool _isBaselined(int offset) {
-    if (!BaselineManager.isEnabled) return false;
+  /// Resolves the (file path, line number) for a diagnostic offset.
+  ///
+  /// **Why prefer [node] over `_ruleContext.currentUnit`.** The plugin's
+  /// `RuleContext` exposes a single mutable `currentUnit` that the analyzer
+  /// updates as it walks files. Bug report: line numbers in
+  /// `reports/.saropa_lints/violations.json` were off by tens of lines —
+  /// the symptom of `currentUnit.lineInfo` being from a different unit
+  /// than the AST node that produced the offset (stale across isolate
+  /// batches, or pointing at a library's defining unit while the node
+  /// lives in a part). See https://github.com/saropa/saropa_lints/issues/208.
+  ///
+  /// Walking up to `node.root` gets us the `CompilationUnit` that the
+  /// node was actually parsed from; its `LineInfo` is guaranteed to
+  /// match the offsets it produced. The shared mutable `currentUnit` is
+  /// only consulted when no node is available (token / raw-offset
+  /// reporting paths) or as a fallback for unresolved scan ASTs whose
+  /// `declaredFragment` is null.
+  ({String path, int line})? _resolveLocation(int offset, AstNode? node) {
+    if (node != null) {
+      final root = node.root;
+      if (root is CompilationUnit) {
+        final line = root.lineInfo.getLocation(offset).lineNumber;
+        // declaredFragment is null for unresolved ASTs (the standalone
+        // scan command parses with parseString); fall back to the
+        // currentUnit-supplied path in that narrow case so suppression
+        // and tracker records still carry a usable file string.
+        final path = root.declaredFragment?.source.fullName ??
+            _ruleContext.currentUnit?.file.path;
+        if (path != null) return (path: path, line: line);
+      }
+    }
     final unit = _ruleContext.currentUnit;
-    if (unit == null) return false;
-    final line = unit.unit.lineInfo.getLocation(offset).lineNumber;
+    if (unit == null) return null;
+    return (
+      path: unit.file.path,
+      line: unit.unit.lineInfo.getLocation(offset).lineNumber,
+    );
+  }
+
+  /// Check if this violation is suppressed by the baseline.
+  bool _isBaselined(int offset, {AstNode? node}) {
+    if (!BaselineManager.isEnabled) return false;
+    final loc = _resolveLocation(offset, node);
+    if (loc == null) return false;
     return BaselineManager.isBaselined(
-      unit.file.path,
+      loc.path,
       _ruleName,
-      line,
+      loc.line,
       impact: impact.name,
     );
   }
@@ -3111,17 +3149,20 @@ class SaropaDiagnosticReporter {
   }
 
   /// Record this violation in impact and progress trackers.
-  void _trackViolation(int offset) {
-    final unit = _ruleContext.currentUnit;
-    if (unit == null) return;
-    final path = unit.file.path;
-    final line = unit.unit.lineInfo.getLocation(offset).lineNumber;
+  ///
+  /// Pass [node] when the caller has the AST node that produced [offset]
+  /// — line/path then resolve from the node's own CompilationUnit
+  /// instead of the shared mutable `currentUnit` (see [_resolveLocation]
+  /// for the rationale and the issue this prevents).
+  void _trackViolation(int offset, {AstNode? node}) {
+    final loc = _resolveLocation(offset, node);
+    if (loc == null) return;
 
     ImpactTracker.record(
       impact: impact,
       rule: _ruleName,
-      file: path,
-      line: line,
+      file: loc.path,
+      line: loc.line,
       message: lintCode.problemMessage,
       correction: lintCode.correctionMessage,
     );
@@ -3129,7 +3170,7 @@ class SaropaDiagnosticReporter {
     ProgressTracker.recordViolation(
       severity: lintCode.severity.name,
       ruleName: _ruleName,
-      line: line,
+      line: loc.line,
       offset: offset,
     );
   }
@@ -3137,18 +3178,21 @@ class SaropaDiagnosticReporter {
   /// Record a suppression in [SuppressionTracker] with full location data.
   ///
   /// Mirrors [_trackViolation] but for diagnostics that were silenced.
-  /// Resolves file path and line number from [_ruleContext] the same way
-  /// violation tracking does, so suppression records are comparable.
-  void _trackSuppression(int offset, SuppressionKind kind) {
-    final unit = _ruleContext.currentUnit;
-    if (unit == null) return;
-    final path = unit.file.path;
-    final line = unit.unit.lineInfo.getLocation(offset).lineNumber;
+  /// [node] threads through so suppression records are computed against
+  /// the same CompilationUnit as the violation would have been (keeps
+  /// suppression line numbers comparable to violation line numbers).
+  void _trackSuppression(
+    int offset,
+    SuppressionKind kind, {
+    AstNode? node,
+  }) {
+    final loc = _resolveLocation(offset, node);
+    if (loc == null) return;
 
     SuppressionTracker.record(
       rule: _ruleName,
-      file: path,
-      line: line,
+      file: loc.path,
+      line: loc.line,
       kind: kind,
     );
   }
