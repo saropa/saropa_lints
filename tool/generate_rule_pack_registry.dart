@@ -1,5 +1,8 @@
 #!/usr/bin/env dart
-// ignore_for_file: avoid_print
+// CLI tool — print() is the standard mechanism for command-line output; both
+// the SDK rule (avoid_print) and the saropa_lints v3 rule (avoid_print_in_release)
+// fire here as false positives because this script never runs in a release app.
+// ignore_for_file: avoid_print, avoid_print_in_release
 
 /// **Rule pack registry generator (Phase 5)** — single entry point to refresh:
 ///
@@ -128,8 +131,9 @@ void main() {
     '${root.path}/lib/src/config/rule_pack_codes_generated.dart',
   );
 
-  final extracted = extractFromPackagesDir(packagesDir);
-  applyCompositeRulePacks(extracted);
+  final extracted = applyCompositeRulePacks(
+    extractFromPackagesDir(packagesDir),
+  );
 
   final sortedPacks = extracted.keys.toList()..sort();
 

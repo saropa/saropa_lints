@@ -45,6 +45,16 @@
 
 ---
 
+## [Unreleased]
+
+<details><summary>Maintenance</summary>
+
+- `tool/rule_pack_audit.dart` and `tool/generate_rule_pack_registry.dart` — `applyCompositeRulePacks` now returns a new map instead of mutating its argument, clearing the `avoid_parameter_mutation` lint. Both call sites updated to consume the returned map. No change to extracted pack contents or generator output.
+
+</details>
+
+---
+
 ## [13.4.4]
 
 ### Added

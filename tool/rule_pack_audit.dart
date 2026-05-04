@@ -1,5 +1,8 @@
 #!/usr/bin/env dart
-// ignore_for_file: avoid_print
+// CLI tool — print() is the standard mechanism for command-line output; both
+// the SDK rule (avoid_print) and the saropa_lints v3 rule (avoid_print_in_release)
+// fire here as false positives because this script never runs in a release app.
+// ignore_for_file: avoid_print, avoid_print_in_release
 
 /// **Rule pack registry audit** — verifies that every `LintCode` name under
 /// `lib/src/rules/packages/*_rules.dart` is reflected in the merged
@@ -33,13 +36,25 @@ const Map<String, List<String>> kCompositeRulePackIds = {
   'avoid_isar_import_with_drift': ['drift', 'isar'],
 };
 
-void applyCompositeRulePacks(Map<String, Set<String>> extracted) {
+/// Returns a new map with composite-pack codes layered on top of [extracted].
+///
+/// Returns rather than mutates so callers keep the input map intact (avoids
+/// the avoid_parameter_mutation lint and makes the dataflow obvious at the
+/// call site: `final result = applyCompositeRulePacks(extracted);`).
+Map<String, Set<String>> applyCompositeRulePacks(
+  Map<String, Set<String>> extracted,
+) {
+  final result = {
+    for (final entry in extracted.entries)
+      entry.key: Set<String>.from(entry.value),
+  };
   for (final entry in kCompositeRulePackIds.entries) {
     final rule = entry.key;
     for (final pack in entry.value) {
-      extracted.putIfAbsent(pack, () => <String>{}).add(rule);
+      result.putIfAbsent(pack, () => <String>{}).add(rule);
     }
   }
+  return result;
 }
 
 /// `{stem}_rules.dart` → pack id (e.g. dio_rules → dio).
@@ -80,8 +95,9 @@ void main(List<String> args) {
     return;
   }
 
-  final extracted = extractFromPackagesDir(packagesDir);
-  applyCompositeRulePacks(extracted);
+  final extracted = applyCompositeRulePacks(
+    extractFromPackagesDir(packagesDir),
+  );
   final sortedPacks = extracted.keys.toList()..sort();
 
   var mismatch = false;
