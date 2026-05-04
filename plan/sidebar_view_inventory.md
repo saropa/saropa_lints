@@ -1,54 +1,72 @@
 # Saropa Lints — sidebar & affordance inventory
 
-**Activity-bar view slots** in `package.json` → `contributes.views.saropaLints` are **nine** in the current manifest (hub + Overview + optional violation-adjacent trees + TODOs). The product surface also includes **~100 contributed commands**, **`view/title` toolbar bindings**, **`view/item/context` rows**, **HTML dashboard buttons**, etc.; counts below are approximate and drift with releases.
+**Activity-bar view slots** in `package.json` → `contributes.views.saropaLints` are **six** in the current manifest (banner + Editor dashboards + Actions + Status + Settings + Help). The product surface also includes **154 contributed commands**; menu wiring is now minimal (most commands are reached via tree leaves, the command palette, or the dashboards).
 
-Counts below are from `extension/package.json` / code (`rg`/hand audit, Apr 2026). They move when menus change.
+Counts below are from `extension/package.json` and `extension/src/views/sectionedSidebar.ts` (post-`b1ec4ffd` orphan-removal commit, audited 2026-05-04). They move when menus change.
 
-| Bucket | Approx. count | Notes |
-|--------|----------------|-------|
-| `saropaLints.*` contributed **commands** | **100** | `rg '"command": "saropaLints'` in `package.json` |
-| Menu `when` clauses referencing **`view == …`** | **53** | Title bars, context menus, etc. |
-| **`view/title`** rows (all Saropa sidebar views) | **~32** | Overview refresh, Package Vibrancy toolbar block, Drift, TODOs, … |
-| **`view/item/context`** rows | **~30+** | Violations alone is 10+; File Risk, Package Vibrancy, … |
-| **Findings Dashboard** / editor HTML command rows | **varies** | Buttons and “More commands” rows change with dashboards; re-count when editing HTML providers. |
-| **Dashboard hub** tree **leaves** | **5** | Single **Editor dashboards** group (`DASHBOARD_HUB_LEAF_COUNT` in `dashboardHubSidebarProvider.ts`): Lints Config, Package Dashboard, Code Health Dashboard, Findings Dashboard, Command Catalog. |
-| Editor **HTML** buttons (cross-nav + triage + issues glance, …) | **Not counted here** | Each dashboard is its own bundle |
+| Bucket | Count | Notes |
+|--------|-------|-------|
+| `saropaLints.*` contributed **commands** | **154** | Declarations in the `contributes.commands` array |
+| Menu `when` clauses referencing **`view == …`** | **3** | `editorDashboards`, `actions`, and the markers panel |
+| **`view/title`** rows (all Saropa sidebar views) | **2** | Refresh on `editorDashboards`, Run analysis on `actions` |
+| **`view/item/context`** rows | **1** | `focusIssuesForActiveFile` on the markers panel |
+| `editor/title` rows | **2** | Package Vibrancy CodeLens toggles on `pubspec.yaml` |
+| `editor/context` rows | **1** | `packageVibrancy.sortDependencies` on `pubspec.yaml` |
+| `commandPalette` entries | **39** | Mostly visibility/enablement gates for palette entries (was 40 before `b1ec4ffd`) |
+| **Editor dashboards** tree **leaves** | **5** | See `buildEditorDashboardItems` in [sectionedSidebar.ts](../extension/src/views/sectionedSidebar.ts) |
+| Editor **HTML** dashboard buttons | **Not counted here** | Each dashboard is its own bundle |
 
 ---
 
 ## Activity-bar **view sections** (one row per `views.saropaLints` entry)
 
-| View id | Label | Type | Default / gate |
-|---------|-------|------|----------------|
-| `saropaLints.dashboardHub` | Dashboards | **tree** (one collapsible group) | Always on in Dart workspace |
-| `saropaLints.overview` | Overview & options | tree | `sidebar.showOverview` |
-| `saropaLints.fileRisk` | File Risk | tree | opt-in + has violations |
-| `saropaLints.summary` | Summary | tree | opt-in + has violations |
-| `saropaLints.suppressions` | Suppressions | tree | opt-in + has violations |
-| `saropaLints.suggestions` | Suggestions | tree | opt-in + has violations |
-| `saropaLints.securityPosture` | Security Posture | tree | opt-in + has violations |
-| `saropaLints.todosAndHacks` | TODOs & Hacks | tree | opt-in |
+All six views are flat `TreeDataProvider`s built by `createSidebarSectionProviders` in [sectionedSidebar.ts](../extension/src/views/sectionedSidebar.ts).
 
-Package Vibrancy, Findings, Drift, and the command catalog are **commands / editor tabs / CodeLens**, not additional `contributes.views.saropaLints` slots in current `package.json`. The former **Violations** activity-bar tree (`saropaLints.issues`) and **command-catalog sidebar** webview are gone — see CHANGELOG [Unreleased].
+| View id | Label | Type | `when` gate |
+|---------|-------|------|-------------|
+| `saropaLints.banner` | Saropa Lints | tree (welcome) | `saropaLints.needsBanner \|\| !saropaLints.isDartProject` |
+| `saropaLints.editorDashboards` | Editor dashboards | tree (flat) | `saropaLints.isDartProject` |
+| `saropaLints.actions` | Actions | tree (flat) | `saropaLints.isDartProject` |
+| `saropaLints.status` | Status | tree (flat) | `saropaLints.isDartProject && saropaLints.hasViolations` |
+| `saropaLints.settings` | Settings | tree (flat) | `saropaLints.isDartProject` |
+| `saropaLints.help` | Help | tree (flat) | `saropaLints.isDartProject` |
+
+The earlier per-concern trees (`overview`, `fileRisk`, `summary`, `suppressions`, `suggestions`, `securityPosture`, `todosAndHacks`, and the legacy `issues` activity-bar tree) are gone. Their data now lives in the **Findings Dashboard** editor tab and the **Settings** panel (which also absorbed the standalone Triage view). Package Vibrancy, Drift, and the command catalog remain commands / editor tabs / CodeLens, not separate `views.saropaLints` slots.
 
 ---
 
-## Dashboard hub — **tree view** shape
+## Editor dashboards — tree shape
 
-The hub is a **native `TreeDataProvider`** (not a webview). Root shows **one expandable group** — **Editor dashboards** — with five command rows (config dashboard, package dashboard, code health dashboard, Findings Dashboard, command catalog). Run analysis, walkthrough, about, pub.dev, and **Create AI agent instructions** are **not** duplicated here; they live under **Overview & options** (Help & resources / Settings).
+`buildEditorDashboardItems` returns **five leaves** (no nested groups, flat list):
 
-So you get **one disclosure triangle + nested rows**, not a flat list of buttons only.
+1. **Lints Config** → `saropaLints.openConfigDashboard`
+2. **Package Dashboard** → `saropaLints.packageVibrancy.showReport`
+3. **Code Health Dashboard** → `saropaLints.openProjectVibrancyReport`
+4. **Findings Dashboard** → `saropaLints.openViolationsWideReport`
+5. **Command Catalog** → `saropaLints.showCommandCatalog`
+
+Run analysis, walkthrough, about, pub.dev, and Create AI agent instructions live under **Actions** / **Help**, not under Editor dashboards.
 
 ---
 
 ## Why not literally everything on HTML dashboards?
 
 - **Findings Dashboard** filters and grouping operate in the editor-tab webview state machine; keeping parity with any future sidebar state would mean **duplicating or proxying** logic (large change, easy drift).
-- **Other sidebars** (Package Vibrancy list, Drift, TODOs) have **their own** providers and **view/title** toolbars; they were not part of the “move Violations title icons” pass.
+- **Other surfaces** (Package Vibrancy CodeLens, Drift, command catalog) have their own providers; they were intentionally not folded back into a sidebar tree.
 - **Cross-links** between dashboards (HTML buttons) remain for **navigation** between editor tabs, not to replace every tree.
 
 ---
 
 ## Violations / Findings affordances
 
-The **`saropaLints.issues`** activity-bar tree is removed; palette, status bar, **Findings Dashboard**, and **Overview** carry run/focus/filter/help actions instead (see CHANGELOG [Unreleased] extension notes).
+The legacy `saropaLints.issues` activity-bar tree is removed; palette, status bar, the **Findings Dashboard**, and the new **Status** + **Actions** sidebar sections carry run/focus/filter/help actions instead.
+
+---
+
+## Palette-only `*.copyAsJson` family — flagged, not actioned
+
+The remaining JSON-export commands — `saropaLints.issues.copyAsJson`, `saropaLints.summary.copyAsJson`, `saropaLints.securityPosture.copyAsJson`, `saropaLints.fileRisk.copyAsJson`, `saropaLints.suggestions.copyAsJson` — **do** have runtime handlers in [extension/src/extensionCopyAsJsonCommands.ts](../extension/src/extensionCopyAsJsonCommands.ts), so they are not dead.
+
+But: their backing tree providers (`IssuesTreeProvider`, `SummaryTreeProvider`, `SecurityPostureTreeProvider`, `FileRiskTreeProvider`, `SuggestionsTreeProvider`) are constructed in [extension/src/extension.ts:282-308](../extension/src/extension.ts#L282-L308) and **never registered as VS Code tree views** (only the six section providers in `sectionedSidebar.ts` get `vscode.window.registerTreeDataProvider` calls). The trees live in memory as data sources for the Findings Dashboard and the JSON export — users invoke them from the palette without ever seeing a corresponding sidebar tree.
+
+**Status:** flagged, not actioned. This is a product call (palette-only JSON export still works for the Findings Dashboard data), not a dead-code call. The two genuinely dead `copyAsJson` commands (`config`, `overview`) without handlers were removed in [`b1ec4ffd`](../CHANGELOG.md); these five remain by design until/unless a product decision says otherwise.
