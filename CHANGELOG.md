@@ -45,9 +45,9 @@
 
 ---
 
-## [13.4.1]
+## [Unreleased]
 
-Fixes a line-number drift in the Issues tree and the violations export where reported lines could land tens of lines away from the actual offending code on larger projects. The number now matches the squiggle in the editor again. Re-run analysis once after upgrading and the tree will refresh. [log](https://github.com/saropa/saropa_lints/blob/v13.4.1/CHANGELOG.md)
+Fixes a line-number drift in the Issues tree and the violations export where reported lines could land tens of lines away from the actual offending code on larger projects. The number now matches the squiggle in the editor again. Re-run analysis once after upgrading and the tree will refresh.
 
 ### Fixed
 
