@@ -260,6 +260,42 @@ def _count_fixtures_for_category(
 _TEST_COUNT_RE = re.compile(r"^\s+test\(", re.MULTILINE)
 _RULE_INSTANTIATION_MARKER = "Rule Instantiation"
 
+# Tests for rule categories live under nested groups (test/rules/{group}/...),
+# not flat at test/. A non-recursive `glob("*_test.dart")` misses every
+# nested file and falsely reports categories as untested. We must rglob.
+# `test/fixtures/` contains synthetic projects whose own tests would collide
+# with rule-category lookups (e.g., a_test.dart, b_test.dart) — exclude it.
+_TEST_FIXTURES_DIR = "fixtures"
+
+
+def _index_rule_test_files(test_dir: Path) -> dict[str, Path]:
+    """Build {stem: path} for every *_test.dart under test/, excluding fixtures.
+
+    Used by both unit-test stats and rule-instantiation stats so they agree on
+    which file backs a given category. Last-write-wins on stem collisions; in
+    practice rule-category test stems are unique across the tree.
+    """
+    index: dict[str, Path] = {}
+    for tf in test_dir.rglob("*_test.dart"):
+        # Skip synthetic fixture projects whose tests aren't rule-category tests.
+        if _TEST_FIXTURES_DIR in tf.relative_to(test_dir).parts:
+            continue
+        index[tf.stem] = tf
+    return index
+
+
+def _resolve_test_path(
+    test_index: dict[str, Path], category: str, alias: str,
+) -> Path | None:
+    """Find the test file backing a category, honoring alias fallback."""
+    stems = [f"{category}_rules_test", f"{category}_test"]
+    if alias != category:
+        stems.extend([f"{alias}_rules_test", f"{alias}_test"])
+    for stem in stems:
+        if stem in test_index:
+            return test_index[stem]
+    return None
+
 # Categories whose rules reference removed SDK APIs or produce compile-time
 # errors, so fixture files cannot exist without breaking compilation.
 # Excluded from the terminal "Lowest fixture coverage" list but still counted
@@ -276,9 +312,10 @@ def _compute_rule_instantiation_stats(
 ) -> tuple[int, int, list[str]]:
     """Compute how many category test files have a Rule Instantiation group.
 
-    Scans test/*_rules_test.dart for the string 'Rule Instantiation' (the
-    group that instantiates each rule and asserts code.name, problemMessage,
-    correctionMessage). Does not read bugs/UNIT_TEST_COVERAGE_REVIEW.md.
+    Recursively scans test/**/*_rules_test.dart for 'Rule Instantiation'
+    (the group that instantiates each rule and asserts code.name,
+    problemMessage, correctionMessage). Excludes test/fixtures/. Does not
+    read bugs/UNIT_TEST_COVERAGE_REVIEW.md.
 
     Returns:
         (categories_with_instantiation, total_categories_with_tests,
@@ -288,17 +325,14 @@ def _compute_rule_instantiation_stats(
     if not test_dir.exists():
         return 0, 0, []
 
+    test_index = _index_rule_test_files(test_dir)
     categories = _collect_category_rules(rules_dir)
     with_instantiation: list[str] = []
     without_instantiation: list[str] = []
 
     for cat in categories:
         alias = _test_category_alias(cat.category)
-        candidates = [
-            test_dir / f"{cat.category}_rules_test.dart",
-            test_dir / f"{alias}_rules_test.dart",
-        ]
-        test_path = next((p for p in candidates if p.exists()), None)
+        test_path = _resolve_test_path(test_index, cat.category, alias)
         if test_path is None:
             continue
         try:
@@ -328,28 +362,19 @@ def _compute_unit_test_stats(
     if not test_dir.exists():
         return 0, 0, 0, []
 
-    # Build index of test files → test() call count
-    test_files: dict[str, int] = {}
-    for tf in test_dir.glob("*_test.dart"):
-        content = tf.read_text(encoding="utf-8")
-        test_files[tf.stem] = len(_TEST_COUNT_RE.findall(content))
+    # Recursive index — rule tests live under test/rules/{group}/, not flat.
+    test_index = _index_rule_test_files(test_dir)
+    test_counts: dict[str, int] = {}
+    for stem, path in test_index.items():
+        content = path.read_text(encoding="utf-8")
+        test_counts[stem] = len(_TEST_COUNT_RE.findall(content))
 
     categories = _collect_category_rules(rules_dir)
     category_details: list[tuple[str, int, int]] = []
     for cat in categories:
-        # Match: {category}_rules_test or {category}_test
-        test_count = 0
         alias = _test_category_alias(cat.category)
-        stems = [
-            f"{cat.category}_rules_test",
-            f"{cat.category}_test",
-        ]
-        if alias != cat.category:
-            stems.extend([f"{alias}_rules_test", f"{alias}_test"])
-        for stem in stems:
-            if stem in test_files:
-                test_count = test_files[stem]
-                break
+        test_path = _resolve_test_path(test_index, cat.category, alias)
+        test_count = test_counts.get(test_path.stem, 0) if test_path else 0
         category_details.append((cat.category, cat.rule_count, test_count))
 
     tested = sum(1 for c in category_details if c[2] > 0)
