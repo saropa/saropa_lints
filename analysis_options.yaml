@@ -38,6 +38,31 @@ analyzer:
     # CLI report writers legitimately use sync I/O and bare Platform.is*.
     - "lib/src/report/import_graph_tracker.dart"
     - "lib/src/report/report_consolidator.dart"
+    # ───────────────────────────────────────────────────────────────────
+    # Blanket plugin self-source exclusion (DEV-ONLY, NEVER SHIPPED).
+    # ───────────────────────────────────────────────────────────────────
+    # Why a wildcard: rule and fix code naturally contains the strings,
+    # regexes, and API names it detects (e.g. AvoidAssetManifestJsonFix
+    # contains the literal 'AssetManifest.json'; AvoidPrintInReleaseRule
+    # source is full of `print` tokens). The plugin's own
+    # `SaropaContext.isLintPluginSource` already skips /rules/, /fixes/,
+    # /native/, /report/ — but the IDE-resident plugin snapshot lags
+    # behind local source until the analyzer cache rebuilds. New source
+    # subdirs (init/, baseline/, etc.) hit the same pattern before they
+    # get added to that getter.
+    #
+    # Belt-and-braces: this exclude stops the host analyzer from running
+    # plugin diagnostics on package source regardless of plugin cache
+    # state. This is the package's OWN root analysis_options.yaml — it
+    # is dev-only and is NOT shipped to consumers. Consumers regenerate
+    # their own config via `dart run saropa_lints:init` from the tier
+    # files in lib/tiers/, which inherit no exclusions from here.
+    #
+    # Trade-off: real type/lint errors in lib/** won't surface in the
+    # IDE Problems panel. Validation paths still cover them: tests,
+    # explicit `dart analyze` invocations against specific files, and
+    # CI's full pipeline.
+    - "lib/**"
     - "**/*.g.dart"
     - "**/*.freezed.dart"
     - "**/*.gr.dart"
