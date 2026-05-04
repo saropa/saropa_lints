@@ -11,9 +11,16 @@ import json
 from pathlib import Path
 from datetime import datetime
 
-SRC_DIR = Path(__file__).parent.parent / "lib" / "src" / "rules"
-REPORTS_DIR = Path(__file__).parent.parent / "reports"
-REPORTS_DIR.mkdir(exist_ok=True)
+# Three .parents up: scripts/modules/_extract_rule_messages.py → scripts/modules/
+# → scripts/ → repo root. The script lived at scripts/extract_rule_messages.py
+# originally (two .parents was correct then); after moving into modules/ the
+# path was never updated, so SRC_DIR resolved to scripts/lib/src/rules (missing)
+# and the rglob below silently returned zero files.
+_REPO_ROOT = Path(__file__).resolve().parents[2]
+SRC_DIR = _REPO_ROOT / "lib" / "src" / "rules"
+# Directory creation moved into the `__main__` guard below so importing
+# this module does not eagerly mkdir `reports/`.
+REPORTS_DIR = _REPO_ROOT / "reports"
 
 
 
@@ -60,13 +67,25 @@ def extract_lintcodes_from_file(file_path):
             i += 1
     return results
 
-all_results = []
-for file in SRC_DIR.glob("*_rules.dart"):
-    all_results.extend(extract_lintcodes_from_file(file))
+# Guard the CLI body so importing this module (e.g. from tests asserting
+# the SRC_DIR path) does not write a JSON dump to `reports/` as a side
+# effect. The script is still runnable directly via `python -m` or
+# `python scripts/modules/_extract_rule_messages.py`.
+if __name__ == "__main__":
+    REPORTS_DIR.mkdir(exist_ok=True)
+    all_results = []
+    # Recurse — rule files live under nested category dirs (widget/, packages/,
+    # platforms/, …). A flat `glob("*_rules.dart")` only matched `all_rules.dart`
+    # (the barrel export, zero LintCodes) and produced an empty JSON dump.
+    # Skip the barrel explicitly to mirror _audit_dx.extract_rule_messages.
+    for file in sorted(SRC_DIR.rglob("*_rules.dart")):
+        if file.name == "all_rules.dart":
+            continue
+        all_results.extend(extract_lintcodes_from_file(file))
 
-timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-out_path = REPORTS_DIR / f"all_rule_messages_{timestamp}.json"
-with out_path.open("w", encoding="utf-8") as f:
-    json.dump(all_results, f, indent=2, ensure_ascii=False)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    out_path = REPORTS_DIR / f"all_rule_messages_{timestamp}.json"
+    with out_path.open("w", encoding="utf-8") as f:
+        json.dump(all_results, f, indent=2, ensure_ascii=False)
 
-print(f"Extracted {len(all_results)} rules to {out_path}")
+    print(f"Extracted {len(all_results)} rules to {out_path}")

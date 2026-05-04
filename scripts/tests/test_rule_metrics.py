@@ -149,5 +149,57 @@ class NestedRuleTestDiscoveryTests(unittest.TestCase):
         self.assertEqual(total, len(_collect_category_rules(self.rules_dir)))
 
 
+class ExtractRuleMessagesPathTests(unittest.TestCase):
+    """Regression: scripts/modules/_extract_rule_messages.py had two bugs.
+
+    1. Flat `glob("*_rules.dart")` matched only `all_rules.dart` (the barrel
+       export, zero LintCodes), so the JSON dump was always empty.
+    2. After the script moved from `scripts/` to `scripts/modules/`, the
+       SRC_DIR `parent.parent` walk pointed at `scripts/lib/src/rules/`
+       (missing) instead of `<repo>/lib/src/rules/`. rglob on a missing
+       path silently returns nothing, masking the path mistake.
+
+    These tests pin both behaviours by importing the module's resolved
+    constants and asserting they reach the real rules tree.
+    """
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.root = Path(__file__).resolve().parents[2]
+
+    def test_src_dir_resolves_to_repo_rules_tree(self) -> None:
+        # Re-import each run so the module-level path is recomputed cleanly.
+        import importlib
+
+        mod = importlib.import_module(
+            "scripts.modules._extract_rule_messages",
+        )
+        self.assertTrue(
+            mod.SRC_DIR.is_dir(),
+            f"SRC_DIR points outside the repo: {mod.SRC_DIR}",
+        )
+        # The resolved path must match what the rest of the build sees,
+        # not a sibling of `scripts/`.
+        self.assertEqual(
+            mod.SRC_DIR.resolve(),
+            (self.root / "lib" / "src" / "rules").resolve(),
+        )
+
+    def test_recursive_glob_finds_nested_rule_files(self) -> None:
+        # The flat-glob bug returned 1 file (all_rules.dart, zero LintCodes).
+        # Recursive glob should see every nested rule file under the
+        # category subdirectories.
+        rules_dir = self.root / "lib" / "src" / "rules"
+        recursive = list(rules_dir.rglob("*_rules.dart"))
+        # Hard floor: more than the single barrel export.
+        self.assertGreater(
+            len(recursive), 50, "rglob should see nested *_rules.dart files",
+        )
+        # The barrel export must be present in the result so the script's
+        # explicit skip-by-name guard has something to skip.
+        names = {p.name for p in recursive}
+        self.assertIn("all_rules.dart", names)
+
+
 if __name__ == "__main__":
     unittest.main()
