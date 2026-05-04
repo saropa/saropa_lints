@@ -10,6 +10,7 @@ import '../../fixes/formatting/add_blank_line_fix.dart';
 import '../../fixes/formatting/add_trailing_comma_fix.dart';
 import '../../fixes/formatting/remove_unnecessary_trailing_comma_fix.dart';
 import '../../fixes/formatting/require_ignore_comment_spacing_fix.dart';
+import '../../fixes/stylistic/capitalize_comment_fix.dart';
 
 /// Warns when case clauses don't have newlines before them.
 ///
@@ -937,6 +938,16 @@ class FormatCommentFormattingRule extends SaropaLintRule {
         'Start with capital letter and end with punctuation. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     severity: DiagnosticSeverity.INFO,
   );
+
+  // Reuse CapitalizeCommentFix: this rule reports only on lowercase-start
+  // comments today, so capitalization is the meaningful correction. If the
+  // rule grows to also flag missing terminal punctuation, add a second
+  // generator rather than overloading this one.
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        CapitalizeCommentFix(context: context),
+  ];
 
   /// Annotation markers that have their own formatting conventions.
   static final RegExp _annotationMarker = RegExp(

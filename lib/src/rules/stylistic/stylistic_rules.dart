@@ -19,6 +19,12 @@ import '../../fixes/stylistic/convert_to_screaming_case_fix.dart';
 import '../../fixes/stylistic/delete_commented_code_fix.dart';
 import '../../fixes/formatting/add_trailing_comma_fix.dart';
 import '../../fixes/stylistic/increase_font_size_fix.dart';
+import '../../fixes/stylistic/prefer_raw_strings_fix.dart';
+import '../../fixes/stylistic/prefer_period_after_doc_fix.dart';
+import '../../fixes/stylistic/replace_single_cascade_with_dot_fix.dart';
+import '../../fixes/stylistic/swap_string_delimiter_fix.dart';
+import '../../fixes/stylistic/remove_closure_parameter_type_fix.dart';
+import '../../fixes/stylistic/convert_to_expression_body_getter_fix.dart';
 
 // ============================================================================
 // STYLISTIC / OPINIONATED RULES
@@ -398,6 +404,12 @@ class PreferExpressionBodyGettersRule extends SaropaLintRule {
   );
 
   @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ConvertToExpressionBodyGetterFix(context: context),
+  ];
+
+  @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
@@ -458,6 +470,12 @@ class AvoidTypesOnClosureParametersRule extends SaropaLintRule {
         'Remove the type annotation to let the type be inferred.',
     severity: DiagnosticSeverity.INFO,
   );
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveClosureParameterTypeFix(context: context),
+  ];
 
   @override
   void runWithReporter(
@@ -2620,6 +2638,12 @@ class PreferPeriodAfterDocRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        PreferPeriodAfterDocFix(context: context),
+  ];
+
   /// Pattern to strip the doc comment prefix (/// or ///).
   static final RegExp _docPrefixPattern = RegExp(r'^///\s*');
 
@@ -4548,6 +4572,12 @@ class AvoidEscapingInnerQuotesRule extends SaropaLintRule {
   );
 
   @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        SwapStringDelimiterFix(context: context),
+  ];
+
+  @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
@@ -4616,6 +4646,12 @@ class AvoidSingleCascadeInExpressionStatementsRule extends SaropaLintRule {
         'Replace the single cascade with a direct call (e.g. list.add(item) instead of list..add(item)).',
     severity: DiagnosticSeverity.INFO,
   );
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceSingleCascadeWithDotFix(context: context),
+  ];
 
   @override
   void runWithReporter(
@@ -4791,6 +4827,12 @@ class PreferRawStringsRule extends SaropaLintRule {
 
   @override
   String get exampleGood => "final re = RegExp(r'\\d+');  // raw string";
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        PreferRawStringsFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_raw_strings',

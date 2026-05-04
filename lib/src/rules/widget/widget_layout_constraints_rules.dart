@@ -12,6 +12,8 @@ import '../../fixes/widget_layout/prefer_center_over_align_fix.dart';
 import '../../fixes/widget_layout/prefer_align_over_container_fix.dart';
 import '../../fixes/widget_layout/prefer_padding_over_container_fix.dart';
 import '../../fixes/widget_layout/prefer_constrained_box_over_container_fix.dart';
+import '../../fixes/widget_layout/prefer_const_border_radius_fix.dart';
+import '../../fixes/widget_layout/prefer_const_widgets_in_lists_fix.dart';
 
 class AvoidMisnamedPaddingRule extends SaropaLintRule {
   AvoidMisnamedPaddingRule() : super(code: _code);
@@ -550,6 +552,12 @@ class PreferConstBorderRadiusRule extends SaropaLintRule {
   );
 
   @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        PreferConstBorderRadiusFix(context: context),
+  ];
+
+  @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
@@ -935,6 +943,12 @@ class PreferConstWidgetsInListsRule extends SaropaLintRule {
         'Add const keyword: const [Text("a"), Text("b")]. Test on multiple screen sizes to verify the layout adapts correctly.',
     severity: DiagnosticSeverity.INFO,
   );
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        PreferConstWidgetsInListsFix(context: context),
+  ];
 
   @override
   void runWithReporter(

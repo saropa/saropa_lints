@@ -10,6 +10,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 
 import '../../saropa_lint_rule.dart';
+import '../../fixes/packages/remove_redundant_async_on_load_fix.dart';
 
 /// Warns when Vector2/Vector3 objects are created inside update().
 ///
@@ -157,6 +158,12 @@ class AvoidRedundantAsyncOnLoadRule extends SaropaLintRule {
         'Remove async keyword or add await statements. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     severity: DiagnosticSeverity.INFO,
   );
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveRedundantAsyncOnLoadFix(context: context),
+  ];
 
   @override
   void runWithReporter(

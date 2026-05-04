@@ -2,7 +2,7 @@
 
 **Goal:** Increase quick fix coverage by implementing fixes in priority order, with fixtures + tests, and validating via the audit script.
 
-**Current state:** Run `python scripts/list_rules_without_fixes.py` for an up-to-date list. Batches 12+ (conversation batches 4–8) added 28+ quick fixes; 50+ rules now have at least one fix from this effort.
+**Current state:** Run `python scripts/list_rules_without_fixes.py` for an up-to-date list. Batches 12+13 (conversation batches 4–9) added 38+ quick fixes; 60+ rules now have at least one fix from this effort. Audit on 2026-05-04: 1698 rules still missing fixes (down from 1708 after Batch 13).
 
 <!-- cspell:disable -->
 
@@ -12,10 +12,10 @@
 
 ### Broad summary
 
-- **Batches 1–12 are done.** Batch 12 (2026-04-18) added 10 quick fixes across record_pattern, naming_style, type_safety, class_constructor, control_flow, and documentation rules — see **H7. Batch 12** below for the list.
-- **What’s actually left:** (1) one-time pre-flight and post-batch audits if you haven’t run them, (2) one optional fix in the “Batch 6” area, (3) re-run the full audit and record numbers, (4) **future batches (Batch 13+)** — add more quick fixes by choosing rules from Part 1 and following the batch workflow.
+- **Batches 1–13 are done.** Batch 13 (2026-05-04) added 10 quick fixes across stylistic, formatting, widget-layout, and flame package rules — see **H8. Batch 13** below for the list.
+- **What’s actually left:** (1) one-time pre-flight and post-batch audits if you haven’t run them, (2) one optional fix in the “Batch 6” area, (3) re-run the full audit and record numbers, (4) **future batches (Batch 14+)** — add more quick fixes by choosing rules from Part 1 and following the batch workflow.
 
-So: **no remaining work inside Batches 1–12.** Remaining work is housekeeping (audits), the optional Batch 6 fix, and planning/doing **Batch 13+** using Part 1.
+So: **no remaining work inside Batches 1–13.** Remaining work is housekeeping (audits), the optional Batch 6 fix, and planning/doing **Batch 14+** using Part 1.
 
 ### Detail: actionable items
 
@@ -24,7 +24,7 @@ So: **no remaining work inside Batches 1–12.** Remaining work is housekeeping 
 | **One-time**     | Run `python scripts/publish.py` (audit-only); record fix count and “files needing quick fixes”. Confirm `dart analyze --fatal-infos` and `dart test` pass. Optionally create a branch for quick-fix work.                                                                                                                                                                                             | **A. Pre-flight**          |
 | **Optional**     | Add a second fix for `avoid_synchronous_file_io`: when the call is inside an async function, also insert `await` at the call site (multi-edit).                                                                                                                                                                                                                                                       | **H. Batch 6**             |
 | **Ongoing**      | Run full audit again; record new fix count and worst-offending files.                                                                                                                                                                                                                                                                                                                                 | **I. After Batch 6**       |
-| **Next batches** | Add **Batch 13+** by picking more rules from **Part 1**. Many Section-3 EASY candidates are now wired via Batch 12; remaining easy candidates cluster in `firebase_rules`, `drift_rules`, `widget_patterns_require_rules`, and the iOS sub-files (section 4). For each new fix: follow **B. Batch workflow** (add fix producer → wire to rule → fixture → test → format/analyze/test → re-run audit). | **Part 1** + **B** + **I** |
+| **Next batches** | Add **Batch 14+** by picking more rules from **Part 1**. Many Section-3 EASY candidates are now wired via Batches 12–13; remaining easy candidates cluster in `firebase_rules`, `drift_rules`, `widget_patterns_require_rules`, and the iOS sub-files (section 4). For each new fix: follow **B. Batch workflow** (add fix producer → wire to rule → fixture → test → format/analyze/test → re-run audit). | **Part 1** + **B** + **I** |
 
 ---
 
@@ -912,7 +912,7 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 #### flame_rules.dart
 
 - [ ] avoid_creating_vector_in_update
-- [ ] avoid_redundant_async_on_load
+- [X] avoid_redundant_async_on_load
 
 #### flutter_hooks_rules.dart
 
@@ -1459,7 +1459,7 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 
 - [ ] enforce_parameters_ordering
 - [ ] enum_constants_ordering
-- [ ] format_comment_style
+- [X] format_comment_style
 - [ ] prefer_member_ordering
 - [ ] prefer_readable_line_length
 
@@ -1538,10 +1538,10 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 
 #### stylistic_rules.dart
 
-- [ ] avoid_escaping_inner_quotes
+- [X] avoid_escaping_inner_quotes
 - [ ] avoid_explicit_type_declaration
-- [ ] avoid_single_cascade_in_expression_statements
-- [ ] avoid_types_on_closure_parameters
+- [X] avoid_single_cascade_in_expression_statements
+- [X] avoid_types_on_closure_parameters
 - [ ] prefer_adjacent_strings
 - [ ] prefer_all_named_parameters
 - [ ] prefer_arrow_functions
@@ -1554,17 +1554,17 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] prefer_doc_straight_apostrophe
 - [ ] prefer_explicit_null_checks
 - [ ] prefer_explicit_types
-- [ ] prefer_expression_body_getters
+- [X] prefer_expression_body_getters
 - [ ] prefer_fixme_format
 - [ ] prefer_inline_callbacks
 - [ ] prefer_interpolation_to_compose
 - [ ] prefer_one_widget_per_file
 - [ ] prefer_optional_named_params
 - [ ] prefer_optional_positional_params
-- [ ] prefer_period_after_doc
+- [X] prefer_period_after_doc
 - [ ] prefer_positional_bool_params
 - [ ] prefer_private_underscore_prefix
-- [ ] prefer_raw_strings
+- [X] prefer_raw_strings
 - [ ] prefer_relative_imports
 - [ ] prefer_snake_case_files
 - [ ] prefer_todo_format
@@ -1978,8 +1978,8 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] check_for_equals_in_render_object_setters
 - [ ] consistent_update_render_object
 - [ ] prefer_clip_behavior
-- [ ] prefer_const_border_radius
-- [ ] prefer_const_widgets_in_lists
+- [X] prefer_const_border_radius
+- [X] prefer_const_widgets_in_lists
 - [ ] prefer_correct_edge_insets_constructor
 - [ ] prefer_custom_single_child_layout
 - [ ] prefer_fractional_sizing
@@ -2369,6 +2369,23 @@ Execution work follows **Part 2 (Checklist)** below.
 - `deprecated_new_in_comment_reference` — `DeprecatedNewInCommentReferenceFix`
 
 All 10 wired, `rule_quick_fix_presence_test.dart` updated (+10 entries), fixtures created/verified. `dart analyze --fatal-infos` clean; targeted test files green.
+
+### H8. Batch 13 — stylistic, formatting, widget-layout, flame package (EASY) — DONE
+
+**Date:** 2026-05-04. **+10 fixes (9 new producers, 1 reuse):**
+
+- `prefer_raw_strings` — `PreferRawStringsFix` (insert `r` before `SimpleStringLiteral`).
+- `prefer_period_after_doc` — `PreferPeriodAfterDocFix` (append `.` to last doc-comment token; uses `diagnosticOffset/Length` because the rule reports at a `Token`).
+- `format_comment_style` — reuses existing `CapitalizeCommentFix` (rule today only flags lowercase-start, so capitalization is the meaningful correction).
+- `prefer_const_border_radius` — `PreferConstBorderRadiusFix` (prefix `const ` to `BorderRadius.circular(...)`; rule already verified caller is not in const context).
+- `prefer_const_widgets_in_lists` — `PreferConstWidgetsInListsFix` (prefix `const ` to a widget `ListLiteral`; rule already verified all elements are const-capable).
+- `avoid_redundant_async_on_load` — `RemoveRedundantAsyncOnLoadFix` (delete the `async` keyword + trailing whitespace from a Flame `onLoad()` body that contains no `await`).
+- `avoid_single_cascade_in_expression_statements` — `ReplaceSingleCascadeWithDotFix` (delete one of the two dots in `..` so a single-section cascade used as a statement becomes a direct call).
+- `avoid_escaping_inner_quotes` — `SwapStringDelimiterFix` (rewrite the `SimpleStringLiteral` with the opposite delimiter and drop the now-unnecessary backslash escapes; handles single, double, and triple-quoted strings).
+- `avoid_types_on_closure_parameters` — `RemoveClosureParameterTypeFix` (delete the type annotation up to the parameter name so `(int x)` becomes `(x)`).
+- `prefer_expression_body_getters` — `ConvertToExpressionBodyGetterFix` (replace `{ return EXPR; }` with `=> EXPR;` for single-return-block getters).
+
+All 10 wired in their rule files; `test/scan/rule_quick_fix_presence_test.dart` updated with 10 new `hasFix(...)` entries plus two new imports (`flame_rules.dart`, `widget_layout_constraints_rules.dart`). `dart analyze --fatal-infos` clean on all new + modified files. `dart test test/scan/rule_quick_fix_presence_test.dart` passes (185 tests). Audit count went from 1708 to 1698 unfixed rules (Δ = −10).
 
 ### I. After Batch 6
 

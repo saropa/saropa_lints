@@ -25,9 +25,11 @@ import 'package:saropa_lints/src/rules/ui/animation_rules.dart';
 import 'package:saropa_lints/src/rules/network/api_network_rules.dart';
 import 'package:saropa_lints/src/rules/packages/drift_rules.dart';
 import 'package:saropa_lints/src/rules/packages/firebase_rules.dart';
+import 'package:saropa_lints/src/rules/packages/flame_rules.dart';
 import 'package:saropa_lints/src/rules/packages/getx_rules.dart';
 import 'package:saropa_lints/src/rules/widget/flutter_migration_widget_rules.dart';
 import 'package:saropa_lints/src/rules/widget/image_filter_quality_migration_rules.dart';
+import 'package:saropa_lints/src/rules/widget/widget_layout_constraints_rules.dart';
 import 'package:saropa_lints/src/rules/widget/widget_layout_flex_scroll_rules.dart';
 import 'package:saropa_lints/src/rules/widget/widget_patterns_require_rules.dart';
 import 'package:test/test.dart';
@@ -521,6 +523,40 @@ void main() {
     hasFix(
       'PreferGetxBuilderOverObxRule',
       () => PreferGetxBuilderOverObxRule(),
+    );
+
+    // Batch 13 — new quick fixes (10 rules)
+    // Stylistic (6): all narrow-node, deterministic transforms.
+    hasFix('PreferRawStringsRule', () => PreferRawStringsRule());
+    hasFix('PreferPeriodAfterDocRule', () => PreferPeriodAfterDocRule());
+    hasFix(
+      'AvoidSingleCascadeInExpressionStatementsRule',
+      () => AvoidSingleCascadeInExpressionStatementsRule(),
+    );
+    hasFix(
+      'AvoidEscapingInnerQuotesRule',
+      () => AvoidEscapingInnerQuotesRule(),
+    );
+    hasFix(
+      'AvoidTypesOnClosureParametersRule',
+      () => AvoidTypesOnClosureParametersRule(),
+    );
+    hasFix(
+      'PreferExpressionBodyGettersRule',
+      () => PreferExpressionBodyGettersRule(),
+    );
+    // Formatting (1): reuses existing CapitalizeCommentFix.
+    hasFix('FormatCommentFormattingRule', () => FormatCommentFormattingRule());
+    // Widget layout (2): const-prefix insertions on layout primitives.
+    hasFix('PreferConstBorderRadiusRule', () => PreferConstBorderRadiusRule());
+    hasFix(
+      'PreferConstWidgetsInListsRule',
+      () => PreferConstWidgetsInListsRule(),
+    );
+    // Flame package (1): remove redundant async on onLoad.
+    hasFix(
+      'AvoidRedundantAsyncOnLoadRule',
+      () => AvoidRedundantAsyncOnLoadRule(),
     );
   });
 }
