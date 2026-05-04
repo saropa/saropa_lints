@@ -2,7 +2,97 @@
 
 <!-- cspell:disable -->
 
-Archived releases 0.1.0 through 12.5.1. See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md) for the latest versions.
+Archived releases 0.1.0 through 12.6.1. See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md) for the latest versions.
+
+---
+
+## [12.6.1]
+
+More rules now ship IDE quick fixes for repetitive, low-risk edits (secure URL schemes, image and HTTP/Firestore/Drift call shapes), so you can apply the suggested remediation from the lightbulb menu instead of typing boilerplate by hand. Update the package and re-analyze to see new fix actions where diagnostics already appear. [log](https://github.com/saropa/saropa_lints/blob/v12.6.1/CHANGELOG.md)
+
+### Added
+
+- `require_image_error_builder`, `require_image_dimensions`, `require_placeholder_for_network`, `require_https_over_http`, and `require_wss_over_ws` gain quick fixes that insert a minimal `errorBuilder`, placeholder `width`/`height`, a loading/placeholder callback, or rewrite `http://` / `ws://` prefixes where the rule already fires, so common widget and URL hygiene fixes are one action in the IDE. No action required beyond updating and using the fix when offered; adjust inserted dimensions to your layout.
+- `require_websocket_error_handling` gains a quick fix that appends a stub `onError` argument to flagged `listen` calls so you can fill in logging or reconnection logic without retyping the signature. No action required beyond updating and using the fix when offered.
+- `incorrect_firebase_parameter_name` offers a quick fix that rewrites hyphenated Analytics parameter keys to underscores when that alone satisfies Firebase’s naming rules, so common `item-id` style keys become `item_id` in one step. No action required beyond updating and using the fix when offered; reserved-prefix violations still need a manual rename.
+- `avoid_firestore_unbounded_query` offers a quick fix that inserts `limit(100).` before `.get` / `.snapshots` on flagged collection chains so you can cap reads without manually editing the method chain. Review the chosen limit for your product before shipping. No action required to adopt beyond the package update.
+- `prefer_timeout_on_requests` and `require_request_timeout` offer quick fixes that append `.timeout(const Duration(seconds: 30))` after the flagged HTTP client call when the rule applies, matching the documented remediation pattern. Tune the duration in code if 30 seconds is not right for your endpoints. No action required beyond updating and using the fix when offered.
+- `avoid_drift_enum_index_reorder` offers a quick fix that renames `intEnum` to `textEnum` on flagged Drift column builders so you can switch to name-backed enum storage in one step; you must still migrate existing stored ordinals and adjust related `TypeConverter` code the rule flags separately. No action required beyond updating and using the fix when offered.
+
+---
+
+## [12.6.0]
+
+New recommended-tier migrations cover Flutter scrollbar theme lookup and several Dart 3.2 `dart:js_interop` signature changes. The interop rules only fire when the real SDK library is resolved, so local types or extensions that reuse the same names should stay quiet, and outdated `.toDart` chains are still caught when the bool result is cast through dynamic first. [log](https://github.com/saropa/saropa_lints/blob/v12.6.0/CHANGELOG.md)
+
+### Added
+
+- `prefer_scrollbar_theme_of` guides `ScrollbarTheme.of(context)` instead of `Theme.of(context).scrollbarTheme` so inherited scrollbar themes are not skipped. No action required until you enable or adopt the recommended tier.
+- `avoid_legacy_jsboolean_return_assumptions`, `prefer_string_for_typeof_equals`, and `prefer_int_for_jsarray_with_length` target Dart 3.2 `dart:js_interop` changes around `typeofEquals`, `instanceof`, and `JSArray.withLength`. No action required until you enable or adopt the recommended tier.
+
+### Fixed
+
+- `avoid_legacy_jsboolean_return_assumptions`, `prefer_string_for_typeof_equals`, and `prefer_int_for_jsarray_with_length` no longer treat unresolved elements or same-named user declarations as `dart:js_interop`, which removes false positives in mock-heavy code while keeping real interop call sites covered. No action required.
+
+---
+
+## [12.5.4]
+
+This release tightens a noisy repeated-map-lookup lint that could still report in code where extraction was not actually appropriate. The rule now stays out of assignment/update patterns and avoids conflating similarly named variables across different scopes when type resolution is ambiguous. If you were seeing stubborn false positives in loop-heavy or shadowed-variable code, those should now be gone. [log](https://github.com/saropa/saropa_lints/blob/v12.5.4/CHANGELOG.md)
+
+### Fixed
+
+- `prefer_extracting_repeated_map_lookup` now hard-skips write contexts (`[]=`, compound assignment, and increment/decrement), only buckets map-like targets with resolved elements, and refuses unresolved target bucketing, which prevents lingering false positives in shadowed/sibling scopes and mixed read+write loops that users could not safely "extract" anyway. No action required.
+- Diagnostics from the same rule at the same file offset are now deduplicated in reporter emission paths, which reduces duplicate warnings when multiple AST callbacks converge on one location while preserving distinct reports at different offsets or from different rules. No action required.
+
+---
+
+## [12.5.3]
+
+This release focuses on reducing high-noise false positives in common Flutter patterns so teams can keep strict lint settings enabled without fighting the tool. Several rules now better distinguish real risks from valid callback, const-context, lifecycle, and helper-ownership code. You should see cleaner results in existing codebases with fewer diagnostics that require no meaningful code change. [log](https://github.com/saropa/saropa_lints/blob/v12.5.3/CHANGELOG.md)
+
+### Fixed
+
+- `avoid_setstate_in_build` no longer fires on `setState` calls inside event-handler closures (`onTap:`, `onPressed:`, `onChanged:`, `Future.then`, etc.) passed during `build()`, since those closures are stored as callbacks and invoked later — not synchronously during the build pass. Genuine inline `setState` calls in `build()` are still reported. No action required.
+- `avoid_opacity_animation` no longer fires on an `Opacity` widget whose `opacity:` argument is a constant numeric literal, even when it sits inside an `AnimatedBuilder` that drives a sibling property (icon swap, color, layout). A constant value cannot animate, so the rebuild cost the rule targets does not exist; replacing it with `FadeTransition` would introduce flicker. Genuine animation-driven opacity expressions still warn. No action required.
+- `prefer_const_literals_to_create_immutables` no longer fires on collection literals whose enclosing constructor is already `const` (explicitly or via const context). The Dart language auto-promotes inner literals in that case, so adding an explicit `const` would be redundant and trigger the standard analyzer's `unnecessary_const` — leaving the user with no valid resolution. Genuine cases (non-const parent with all-const elements) still warn. No action required.
+- `require_database_close` no longer fires on opener helpers whose lifetime is owned by their caller — methods named `init*` / `_init*` / `open*` / `_open*` / `setup*` / `_setup*` that return `Future<bool>` / `Future<void>` / `bool` / `void`. A success-flag return signals the helper hands control back to a caller that closes in `try { … } finally { close(); }`, the standard pattern for background-isolate / WorkManager / migration setup. Methods returning a connection (`Future<Database>` etc.) still warn because the return type transfers ownership. No action required.
+- `prefer_extracting_repeated_map_lookup` no longer fires on assignment targets (`map[key] = value`, `map[k] += 1`) — those cannot be hoisted into a local since the assignment must remain on the map. The rule also stops conflating same-spelled variables in different scopes: `cache[uuid]` written inside three sequential `for` loops, each declaring its own `uuid`, is three independent lookups and is no longer flagged. No action required.
+- `require_clipboard_paste_validation` no longer fires on reusable paste helpers that hand the pasted string to a callback parameter (`callback.call(text)`, `onPaste?.call(text)`, `(callback)(text)`) — those helpers have no semantic context to validate against, so the security boundary lives at the caller, not the paste site. Genuine cases (clipboard text written directly into a field with no validation regex nearby and no callback dispatch) still warn. No action required.
+- `use_setstate_synchronously` no longer fires on a `setState` that lexically precedes the first `await`, even when both calls live inside a single compound statement (`try`, `if`, `for`, `switch`). Previously the rule treated any nested `await` as if it preceded every `setState` in the enclosing block — which broke every codebase that wraps method bodies in mandatory `try { … } on Object catch (e, st) { … }` blocks. The rule now tracks the await position and `if (!mounted) return;` guard scope in source order across nested blocks. No action required.
+
+<details>
+<summary>Maintenance</summary>
+
+- Archived the resolved `avoid_opacity_animation` constant-opacity false-positive report under `plan/history/2026.04/2026.04.26/` and removed it from `bugs/`. No action required for package users.
+
+</details>
+
+---
+
+## [12.5.2]
+
+This release is a quality pass aimed at precision: fewer accidental matches, fewer environment-related false alarms, and better handling of real-world project layouts. Notification, animation, platform-import, and permission checks now behave more predictably in production-style code. Most users only need to update and re-run analysis to get quieter, more actionable output. [log](https://github.com/saropa/saropa_lints/blob/v12.5.2/CHANGELOG.md)
+
+### Fixed
+
+- `require_intl_plural_rules` now treats comparisons to the integer literal **1** only when that digit is not part of a longer numeral, so helpers that branch on values like 12 or 100 (12-hour labels, build bands, and similar) are not misclassified as manual plural logic. No action required.
+- Long-task name matching for the `dbProcessAll…` skip in `require_notification_for_long_tasks` no longer trips the package's own `avoid_string_substring` rule, so `dart analyze --fatal-infos` stays clean for contributors building the package from source. No action required for end users.
+- `avoid_excessive_rebuilds_animation` now only considers `AnimatedBuilder` and `ListenableBuilder` when the listenable resolves to an `Animation` subtype, so `FutureBuilder`, `StreamBuilder`, `ValueListenableBuilder`, and non-animation listenables no longer get a misleading “every frame” warning. No action required.
+- `require_notification_for_long_tasks` now matches long-operation tokens on camelCase boundaries (so names like `ImportAllowed` no longer hit `importAll`), skips `dbProcessAll…` DB helpers, skips the whole file when common in-app progress or notification-plugin strings appear, and splits example fixtures so BAD cases are not suppressed by GOOD escape hatches in the same file. No action required.
+- Rules that read `Info.plist` through the shared helper now re-read when the file’s size or modification time changes, match keys with whitespace-tolerant XML checks, and normalize analyzer `file:` URIs to OS paths, so `require_image_picker_permission_ios` no longer false-positives once `NSCameraUsageDescription` is present. No action required.
+- `require_image_picker_permission_android` now reads `AndroidManifest.xml` like the iOS camera rule reads `Info.plist`, so it stays silent when `android.permission.CAMERA` is already declared; it also covers `pickVideo` as well as `pickImage` for `ImageSource.camera`. No action required.
+- `avoid_platform_specific_imports` and sibling rules that consult `ProjectContext.hasWebSupport` now run that check while visiting each library, so Flutter projects without a root `web/` directory are correctly treated as non-web and `dart:io` imports stop false-alarming there; pure Dart packages still get web-portability warnings by default. No action required.
+- `prefer_layout_builder_for_constraints` no longer double-reports on `MediaQuery.of(context).size.width` / `.height`, skips intentional screen fractions and numeric breakpoint comparisons, documents when `MediaQuery` sizing is appropriate, and treats `MediaQuery.sizeOf(context).width` / `.height` like the `.of().size.*` pattern. No action required.
+
+<details>
+<summary>Maintenance</summary>
+
+- Archived the closed `require_notification_for_long_tasks` foreground false-positive report under `plan/history/2026.04/2026.04.26/` and removed it from `bugs/`. No action required for package users.
+- Archived the resolved `avoid_excessive_rebuilds_animation` false-positive report under `plan/history/2026.04/2026.04.26/` and removed it from `bugs/`. No action required for package users.
+- Archived the resolved `prefer_layout_builder_for_constraints` false-positive report under `plan/history/2026.04/2026.04.26/` and removed it from `bugs/`. No action required for package users.
+
+</details>
 
 ---
 
