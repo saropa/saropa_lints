@@ -653,13 +653,15 @@ The baseline CLI supports these options:
 
 #### Priority Filtering
 
-Use `only_impacts` to baseline only certain severity levels while still seeing critical issues:
+Use `only_impacts` to baseline only certain severity levels while still seeing errors:
 
 ```yaml
 baseline:
   file: "saropa_baseline.json"
-  only_impacts: [low, medium, opinionated] # Still see critical and high
+  only_impacts: [info] # Still see errors and warnings
 ```
+
+> **Severity model:** errors must be fixed; warnings could fail or look bad; info is FYI. The 5-bucket impact taxonomy (`critical / high / medium / low / opinionated`) collapsed into the analyzer's three native severities on 2026-05-03 — see `plan/COLLAPSE_LINT_IMPACT_TO_SEVERITY.md`. Existing `only_impacts: [low, medium, opinionated]` configs keep working (the values map to the new buckets) but new code should use `[info]` / `[warning]` / `[error]`.
 
 #### Cleaning Up Over Time
 
@@ -769,14 +771,19 @@ Supported operators: `eq`, `ne`, `gt`, `ge`, `lt`, `le`.
 
 Common metrics:
 
-- `new_critical_issues`
+- `new_errors` (alias: `new_critical_issues`)
+- `new_warnings` (alias: `new_high_issues`, `new_medium_issues`)
+- `new_info` (alias: `new_low_issues`)
 - `new_vulnerabilities`
 - `new_security_hotspots`
 - `new_code_smells`
 - `new_bugs`
-- `overall_critical_issues`
-- `overall_high_issues`
+- `overall_errors` (alias: `overall_critical_issues`)
+- `overall_warnings` (alias: `overall_high_issues`, `overall_medium_issues`)
+- `overall_info` (alias: `overall_low_issues`)
 - `overall_vulnerabilities`
+
+The aliases map onto the new severity-keyed names so existing `saropa_quality_gate.yaml` configs keep working without edits. New thresholds should prefer the canonical names.
 
 `violations.json` suppression schema (for CI/report tooling):
 

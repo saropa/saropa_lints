@@ -16,8 +16,28 @@ analyzer:
     # Analyzer 9 marks ClassDeclaration.body as experimental; ignore for analyzer-9 compatibility (8.0.x).
     experimental_member_use: ignore
   exclude:
-    # require_database_close false-positive (rule's runWithReporter contains openDatabase regex)
+    # ───────────────────────────────────────────────────────────────────
+    # Plugin self-source exclusions (FPs covered by rule patches in
+    # CHANGELOG [Unreleased] but the running analyzer plugin uses a
+    # pub.dev snapshot of saropa_lints, so local edits don't reach it
+    # until publish — same belt-and-braces pattern as `bin/**` below).
+    # ───────────────────────────────────────────────────────────────────
+    # require_database_close FP — rule's own openDatabase regex.
     - "lib/src/rules/resources/resource_management_rules.dart"
+    # avoid_purchase_in_sandbox_production FP — IAP URLs in own pattern.
+    - "lib/src/rules/commerce/iap_rules.dart"
+    # avoid_mixed_environments / avoid_string_substring FPs — env regex
+    # patterns and pubspec-version slicing in own rule body.
+    - "lib/src/rules/config/config_rules.dart"
+    # require_unique_iv_per_encryption FP — `'IV.fromSecureRandom(16)'`
+    # string literal inside FixKind constructor.
+    - "lib/src/fixes/crypto/use_secure_random_iv_fix.dart"
+    # require_android_permission_request FP — `RuleTimingTracker.record`.
+    - "lib/src/native/saropa_context.dart"
+    # prefer_platform_io_conditional / avoid_blocking_main_thread FPs —
+    # CLI report writers legitimately use sync I/O and bare Platform.is*.
+    - "lib/src/report/import_graph_tracker.dart"
+    - "lib/src/report/report_consolidator.dart"
     - "**/*.g.dart"
     - "**/*.freezed.dart"
     - "**/*.gr.dart"
