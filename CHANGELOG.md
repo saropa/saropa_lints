@@ -47,6 +47,10 @@
 
 ## [13.4.6]
 
+### Fixed (Extension)
+
+- The **Size Distribution** chart in the Package Vibrancy report now renders each bar at a length proportional to its share of total size. The earlier attempt to fix this didn't take effect in the VS Code webview, so bars kept rendering at the full track width; bars now use the same width-and-grow pattern the Findings Dashboard charts already use reliably. No action required — reopen the report after updating.
+
 ### Fixed
 
 - `lib/tiers/{essential,recommended,professional,comprehensive,pedantic}.yaml` no longer pin the embedded plugin to the old `^5.0.0-beta.8` constraint that's been frozen since Feb 2026. The Dart analyzer's plugin manager fetches that constraint into a synthetic project under `.dartServer/.plugin_manager/<hash>/` and runs `pub upgrade` against it — with the stale pin, anyone whose project also depends on a package requiring a newer analyzer (e.g. `riverpod_lint ^3.1.3` requiring `analyzer ^9.0.0`) had `dart analyze` abort with "An error occurred while setting up the analyzer plugin package". The yamls now ship `^13.0.0`, which resolves cleanly against the current analyzer range, and the publish script keeps them in sync with `pubspec.yaml` on every major bump so they can't drift again. Reported as [#216](https://github.com/saropa/saropa_lints/issues/216). No action required after upgrading; consumers using `include: package:saropa_lints/tiers/<tier>.yaml` will start resolving cleanly on the next `pub get`.
