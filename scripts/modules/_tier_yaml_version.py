@@ -125,7 +125,7 @@ def update_tier_yaml(
     """
     raw = yaml_path.read_bytes()
     # Detect line endings on the original bytes BEFORE decoding so we
-    # can restore them faithfully even if the regex normalised them.
+    # can restore them faithfully even if the regex normalized them.
     use_crlf = b"\r\n" in raw
     content = raw.decode("utf-8")
     found = _find_saropa_version_line(content)
