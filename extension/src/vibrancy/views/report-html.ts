@@ -30,6 +30,17 @@ export interface ReportOptions {
     readonly extensionVersion: string;
     /** Optional per-package score history for inline sparkline rendering. */
     readonly packageTrends?: ReadonlyMap<string, number[]>;
+    /**
+     * True when a scan is currently in progress.  Used by `buildReportHtml`
+     * to show a "Scan in progress" placeholder when there are no results
+     * yet — without it the dashboard would render `0 packages`, `Grade E`,
+     * an empty radial gauge, and an empty table, which looks broken to a
+     * first-time user whose initial scan is still running.  When prior
+     * results exist the dashboard keeps rendering them (stale but
+     * meaningful) and the open panel auto-refreshes when the scan
+     * completes via `publishResults`.
+     */
+    readonly isScanning?: boolean;
 }
 
 /** Columns that can be auto-hidden when all values are empty or start collapsed. */
@@ -38,6 +49,16 @@ type HidableColumn = 'transitives' | 'vulns' | 'status' | 'files' | 'license' | 
 /** Build the full HTML for the vibrancy report webview. */
 export function buildReportHtml(options: ReportOptions): string {
     const { results } = options;
+    // No results yet AND a scan is currently running — render an explicit
+    // "scan in progress" placeholder instead of the normal dashboard.  The
+    // normal dashboard with zero results looks broken (Grade E gauge at 0,
+    // empty status line, empty table) and was being mistaken for a
+    // failed/dead scan.  The placeholder makes the actual state visible
+    // and auto-refresh in `publishResults` swaps it for the real dashboard
+    // as soon as the scan finishes.
+    if (options.isScanning && results.length === 0) {
+        return buildScanInProgressHtml(options);
+    }
     const cspNonce = createWebviewCspNonce();
     /* Average score for the radial gauge (0-100 raw scale). */
     const avg = results.length > 0
@@ -111,6 +132,84 @@ function buildNetworkSection(results: VibrancyResult[]): string {
         <summary>Dependency Network</summary>
         <div id="dep-network" data-network="${payload}" class="network-canvas"></div>
     </details>`;
+}
+
+/**
+ * Empty-state placeholder shown while the first scan is running.  Kept
+ * deliberately simple: no chart, no table, no gauge — just a plainly
+ * worded card so first-time users know the extension is doing real work
+ * and roughly how long to wait.  Uses the same VS Code theme tokens as
+ * the real dashboard so it doesn't look out of place.  No script tag
+ * because there is nothing interactive to drive yet — the open panel
+ * auto-refreshes from `publishResults` when the scan finishes.
+ */
+function buildScanInProgressHtml(options: ReportOptions): string {
+    const cspNonce = createWebviewCspNonce();
+    return `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Saropa Package Dashboard</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'none'; style-src 'nonce-${cspNonce}' 'unsafe-inline';">
+    <style nonce="${cspNonce}">
+        body {
+            font-family: var(--vscode-font-family);
+            color: var(--vscode-foreground);
+            background: var(--vscode-editor-background);
+            margin: 0;
+            padding: 48px 24px;
+            display: flex;
+            justify-content: center;
+        }
+        .scanning-card {
+            max-width: 480px;
+            text-align: center;
+        }
+        .scanning-card h1 {
+            font-size: 1.4em;
+            margin: 0 0 12px;
+        }
+        .scanning-card p {
+            color: var(--vscode-descriptionForeground);
+            line-height: 1.5;
+            margin: 8px 0;
+        }
+        .scanning-card .version {
+            font-size: 0.85em;
+            color: var(--vscode-descriptionForeground);
+            opacity: 0.7;
+        }
+        /* Three-dot pulse — tied to font-size so it scales with theme settings. */
+        .dots::after {
+            content: '...';
+            display: inline-block;
+            animation: dotPulse 1.4s steps(4, end) infinite;
+            width: 1.2em;
+            text-align: left;
+            overflow: hidden;
+            vertical-align: bottom;
+        }
+        @keyframes dotPulse {
+            0%   { content: ''; }
+            25%  { content: '.'; }
+            50%  { content: '..'; }
+            75%  { content: '...'; }
+            100% { content: ''; }
+        }
+    </style>
+</head>
+<body>
+    <div class="scanning-card">
+        <h1>Scanning packages<span class="dots"></span></h1>
+        <p>Saropa is fetching pub.dev metadata, GitHub activity, and dependency
+        graphs for every direct dependency in this project.</p>
+        <p>This page will refresh automatically when the scan finishes.  You can
+        cancel from the progress notification in the bottom-right.</p>
+        <p class="version">Saropa Package Dashboard v${escapeHtml(options.extensionVersion)}</p>
+    </div>
+</body>
+</html>`;
 }
 
 /**

@@ -45,6 +45,23 @@
 
 ---
 
+## [13.4.7]
+
+Package Vibrancy no longer launches a fresh scan after every individual `pub upgrade`. The watcher now waits for a whole upgrade session to settle, runs at most one scan at a time, and skips when `pubspec.lock` has not actually changed — the overlapping toasts and slowdown when upgrading several packages in a row are gone. The Package Dashboard webview also stops looking like a "dead page" during the very first scan: instead of the empty-state grade-E gauge with zero rows it now shows a clear "Scan in progress" placeholder, and the open panel auto-refreshes when the scan finishes.
+
+### Changed (Extension)
+
+- **Package Vibrancy** — the file-system watcher now debounces `pubspec.lock` changes by 30s (was 5s) so a session of back-to-back `pub upgrade` calls collapses into a single trailing scan instead of starting a fresh ~60s scan after each individual upgrade. Previously the abort-on-supersede pattern still left earlier scans running to completion (their HTTP fetches don't honor the abort signal), so three sequential upgrades produced three overlapping toasts and heavy CPU/network contention. No action required.
+- **Package Vibrancy** — `runScan` now coalesces concurrent invocations: if a scan is already in flight, a second call stashes its options and the in-flight scan launches exactly one trailing scan when it finishes. Callers no longer stack parallel scans, and `forceRefresh: true` is sticky across coalesced calls so a "Rescan (clear cache)" click is honored even when it lands during a watcher-triggered scan. No action required.
+- **Package Vibrancy** — the watcher now hashes `pubspec.lock` against the persisted last-scan fingerprint and skips when bytes are unchanged. `pub get` against an unchanged tree, git operations that restore the same lock, and IDE auto-resolve no longer trigger a wasteful full rescan. No action required.
+
+### Fixed (Extension)
+
+- **Package Dashboard** — the webview now shows an explicit "Scan in progress" placeholder when opened during the first scan instead of the empty dashboard with `Grade E · 0/100`, an empty radial gauge, and an empty table. Users were reading the empty-state render as a broken or failed scan. No action required — open the dashboard while a fresh scan is running to see the new placeholder.
+- **Package Dashboard** — the open dashboard panel now auto-refreshes when a scan completes. It used to be built once from `latestResults` and never re-render itself, so users who opened it during a scan stayed on stale or empty data until they manually reran the "Show Report" command. No action required.
+
+---
+
 ## [13.4.6]
 
 ### Fixed (Extension)

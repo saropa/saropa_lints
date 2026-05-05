@@ -122,8 +122,31 @@ let sdkDiagnostics: SdkDiagnostics | null = null;
 let freshnessWatcher: FreshnessWatcher | null = null;
 let stateManager: VibrancyStateManager | null = null;
 let reviewStateService: ReviewStateService | null = null;
-/** Abort controller for the active scan — used to cancel from UI or supersede with a new scan. */
-let activeScanAbort: AbortController | null = null;
+/**
+ * Abort controller for the in-flight scan, kept around so the progress-toast
+ * Cancel button can stop the current scan via `controller.abort()`.  It is
+ * NOT used to supersede an in-flight scan with a new one — superseding now
+ * goes through `pendingRescanOpts` (coalesce) instead, because aborting the
+ * old scan only sets a flag and most awaited operations inside `runScanInner`
+ * (Flutter releases fetch, dep graph, blockers, complexity, archive sizes)
+ * don't accept an `AbortSignal` and run to completion regardless.  The old
+ * "abort + start a new scan" path therefore left two scans running in
+ * parallel — overlapping toasts and heavy CPU/network contention while the
+ * doomed scan kept burning cycles.  Coalescing is the simpler fix.
+ */
+let scanInFlight: AbortController | null = null;
+/**
+ * If `runScan` is called while another scan is in flight, the new options are
+ * stashed here instead of starting a parallel scan.  When the in-flight scan
+ * finishes naturally, exactly one trailing scan is started with these opts —
+ * which collapses bursts of pubspec.lock changes (e.g. three back-to-back
+ * `pub upgrade` calls) into a single trailing scan after the burst settles.
+ *
+ * `forceRefresh` is sticky across coalesced calls: if any caller during the
+ * burst asked for fresh pub.dev data, the trailing scan must honour it even
+ * if later coalesced callers didn't pass the flag.
+ */
+let pendingRescanOpts: { forceRefresh: boolean } | null = null;
 let detailLogger: DetailLogger | null = null;
 let detailChannel: vscode.OutputChannel | null = null;
 let saveTaskRunner: SaveTaskRunner | null = null;
@@ -267,17 +290,29 @@ function registerFileWatcher(
 ): void {
     const watcher = vscode.workspace.createFileSystemWatcher('**/pubspec.lock');
 
-    // Debounce: pubspec.lock can be written multiple times in quick
-    // succession (pub get, IDE auto-resolve, etc.).  Wait 5 seconds
-    // after the last change before triggering a scan so we don't
-    // spam scans and log files.
+    // Why 30s and not 5s: a single scan takes >60s, so the old 5s window
+    // would happily start a fresh scan after each individual `pub upgrade`
+    // in a burst — three back-to-back upgrades produced three overlapping
+    // scans (since abort doesn't actually stop in-flight HTTP work) with
+    // stacked progress toasts and heavy CPU/network contention.  30s of
+    // pubspec.lock idle waits for the user's whole upgrade *session* to
+    // settle before triggering one trailing scan.  The watcher only sees
+    // pubspec.lock (rewritten by `pub get/upgrade`), never pubspec.yaml,
+    // so this doesn't penalise manual yaml edits.
     let debounceTimer: ReturnType<typeof setTimeout> | null = null;
     watcher.onDidChange(() => {
         if (debounceTimer) { clearTimeout(debounceTimer); }
-        debounceTimer = setTimeout(() => {
+        debounceTimer = setTimeout(async () => {
             debounceTimer = null;
-            runScan(targets);
-        }, 5_000);
+            // Belt-and-suspenders skip: `pub get` can rewrite pubspec.lock
+            // with byte-identical contents (timestamp/whitespace shuffles,
+            // git checkout that restores the same lock, IDE auto-resolve
+            // on an unchanged tree).  If the bytes hash to what we already
+            // scanned, there is nothing new to discover — running a 60s+
+            // scan would be pure waste.
+            if (await pubspecLockUnchangedSinceLastScan(targets)) { return; }
+            void runScan(targets);
+        }, 30_000);
     });
 
     // Cancel any pending debounce when the extension deactivates
@@ -290,6 +325,32 @@ function registerFileWatcher(
     });
 
     context.subscriptions.push(watcher, timerDisposable);
+}
+
+/**
+ * True when the current pubspec.lock bytes hash to the same value the last
+ * successful scan recorded in its persisted fingerprint.  Returns false on
+ * any error (missing fingerprint, missing file, IO failure) so the caller
+ * falls back to running a normal scan rather than silently swallowing a
+ * legitimate change.
+ */
+async function pubspecLockUnchangedSinceLastScan(
+    targets: ScanTargets,
+): Promise<boolean> {
+    try {
+        const fp = loadFingerprint(targets.workspaceState);
+        if (!fp) { return false; }
+        const pair = await findPubspecPair();
+        if (!pair) { return false; }
+        const lockHash = await computeLockHash(pair.lock);
+        if (!lockHash) { return false; }
+        return lockHash === fp.lockHash;
+    } catch {
+        // Any unexpected failure here means we genuinely don't know whether
+        // the lock changed — fall back to scanning.  A spurious scan is far
+        // less harmful than silently swallowing a real dependency change.
+        return false;
+    }
 }
 
 /**
@@ -595,6 +656,11 @@ function registerCommands(
                     pubspecUri: lastParsedDeps?.yamlUri?.toString() ?? null,
                     extensionVersion,
                     packageTrends,
+                    // Tell the report whether a scan is currently running.  Drives the
+                    // "Scan in progress" placeholder when there are no prior results
+                    // — without this the dashboard rendered as `Grade E · 0/100` with
+                    // an empty table during the first scan and looked broken.
+                    isScanning: targets.state.isScanning.value,
                 });
             },
         ),
@@ -876,11 +942,20 @@ async function runScan(
     targets: ScanTargets,
     opts?: { forceRefresh?: boolean },
 ): Promise<void> {
-    // Cancel any in-progress scan so this one takes over
-    activeScanAbort?.abort();
+    // Coalesce: a scan is already running, so don't stack a parallel one.
+    // Stash the latest opts; the in-flight scan's `finally` block will
+    // launch exactly one trailing scan once it resolves.  forceRefresh is
+    // sticky so a coalesced "Rescan (clear cache)" click is honoured even
+    // if a later coalesced caller (e.g. file watcher) didn't pass it.
+    if (scanInFlight) {
+        const forceRefresh = (pendingRescanOpts?.forceRefresh ?? false)
+            || (opts?.forceRefresh ?? false);
+        pendingRescanOpts = { forceRefresh };
+        return;
+    }
 
     const controller = new AbortController();
-    activeScanAbort = controller;
+    scanInFlight = controller;
 
     // forceRefresh: explicit user-triggered rescan from the report webview
     // (or any future caller that wants fresh pub.dev data).  Without this the
@@ -897,10 +972,23 @@ async function runScan(
     try {
         await runScanInner(targets, controller);
     } finally {
-        // Only clear state if we weren't superseded by another scan
-        if (activeScanAbort === controller) {
-            activeScanAbort = null;
-            targets.state.stopScanning();
+        // Capture cancel state before clearing globals — if the user clicked
+        // Cancel on the progress toast, that's a "stop scanning" gesture and
+        // we drop any coalesced pending rescan.  A real pubspec.lock change
+        // after the cancel will re-trigger via the file watcher anyway, so
+        // we don't lose data — we just don't immediately defy the user.
+        const wasAborted = controller.signal.aborted;
+        scanInFlight = null;
+        targets.state.stopScanning();
+
+        const pending = pendingRescanOpts;
+        pendingRescanOpts = null;
+        if (pending && !wasAborted) {
+            // Fire-and-forget: this is the trailing scan that picks up any
+            // pubspec.lock changes that arrived during the in-flight scan.
+            // Awaiting here would chain promises across the user's whole
+            // upgrade session for no benefit.
+            void runScan(targets, pending);
         }
     }
 }
@@ -1245,6 +1333,19 @@ function publishResults(
     updateFilteredTargets(targets, results, parsed);
 
     freshnessWatcher?.start(results);
+
+    // Auto-refresh the open Package Dashboard panel.  The panel is built once
+    // from `latestResults` via `_updateContent` and never re-renders itself,
+    // so users who opened it during the first scan (or before a coalesced
+    // trailing rescan finished) saw stale or empty data — the "page is dead,
+    // shows zeros and F ratings" symptom.  We only refresh if the panel is
+    // already open; we never *open* it from here (publishResults runs on every
+    // scan and surprise-popping a panel during a watcher-triggered scan would
+    // be hostile).  Fire-and-forget: refresh failures must not block the rest
+    // of the scan-completion pipeline (history append, fingerprint persist).
+    if (VibrancyReportPanel.currentPanel) {
+        void vscode.commands.executeCommand('saropaLints.packageVibrancy.showReport');
+    }
 }
 
 function updateFilteredTargets(
