@@ -82,6 +82,7 @@ from scripts.modules._extension_publish import (
     set_extension_version,
     verify_extension_store_publication,
 )
+from scripts.modules._tier_yaml_version import sync_tier_yamls
 from scripts.modules._timing import StepTimer
 from scripts.modules._version_changelog import (
     display_changelog,
@@ -906,6 +907,22 @@ def run_full_publish(
                 ctx.pubspec_version,
                 version,
             )
+            # Keep `lib/tiers/*.yaml` plugin-version pins in sync with
+            # the publish version so the analyzer's plugin manager
+            # resolves a synthetic project against the same major as
+            # what's on pub.dev. Without this, the tier yamls froze at
+            # ^5.0.0-beta.8 from Feb 2026 and broke pub resolution for
+            # any consumer also depending on a riverpod_lint /
+            # analyzer_buffer combination — see issue #216.
+            tier_changes = sync_tier_yamls(
+                ctx.project_dir / "lib" / "tiers", version,
+            )
+            for path, (previous, desired) in tier_changes.items():
+                rel = path.relative_to(ctx.project_dir)
+                print_colored(
+                    f"      tier yaml: {rel} {previous} -> {desired}",
+                    Color.CYAN,
+                )
 
         print_colored(f"      Publishing: {version}", Color.CYAN)
         print_colored(f"      Tag:        v{version}", Color.CYAN)
