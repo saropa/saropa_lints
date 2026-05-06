@@ -32,7 +32,7 @@ python extension/scripts/i18n/migrate_manifest_nls.py
 ## Coverage audit
 
 ```bash
-python scripts/i18n/audit_coverage.py
+python extension/scripts/i18n/audit_coverage.py
 ```
 
 Writes:
@@ -48,4 +48,5 @@ Writes:
 
 ## Product note (UI language setting)
 
-- **`saropaLints.uiLanguage`** is currently written to **User** settings from the sidebar picker so saves succeed reliably on all hosts. **Per-workspace** UI language is not supported until we can write workspace settings without policy or registration edge cases; revisit if product requires repo-specific locale.
+- **`saropaLints.uiLanguage`** is written to **User** settings from the sidebar picker so saves succeed reliably on all hosts and **the same language applies in every workspace** (product default; confirmed maintainer intent).
+- **Per-workspace** UI language is **not** implemented; adding it would require a new product decision and a safe workspace-write path (workspace saves previously failed for some hosts with “not a registered configuration”).

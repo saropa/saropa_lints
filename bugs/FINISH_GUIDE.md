@@ -44,6 +44,10 @@ State explicitly:
 ### 4) Done confirmation
 One short paragraph: **why** the result is correct and complete **for the requested scope**, or **what is blocked** and what the user must decide.
 
+### 5) Product / UX choices (when applicable)
+- If shipped behavior depends on a **tradeoff users care about** (e.g. **User vs Workspace** settings, default on/off, destructive data loss), **ask the user directly in the same thread** with plain language and clear options — do **not** bury the only prompt in repo Markdown, and do **not** use reason codes like `BLOCKED-NEEDS-USER-DECISION` in place of an actual question to the user.
+- After the user answers, put the outcome in **Work completed** or **Done confirmation**; update **CHANGELOG** / in-scope **README** when that answer **documents or changes** shipped behavior.
+
 That replaces any requirement to paste a fixed markdown skeleton. Write it so a human or reviewer AI can audit without re-reading the whole chat.
 
 ---
