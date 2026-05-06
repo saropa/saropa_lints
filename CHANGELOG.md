@@ -45,6 +45,24 @@
 
 ---
 
+## [Unreleased]
+
+### Fixed (Extension)
+
+- **Pick UI language** — choosing a language no longer fails with "Unable to write to Workspace Settings … not a registered configuration"; the picker now saves **`saropaLints.uiLanguage`** to **User** settings so the choice applies reliably across workspaces. No action required — pick your language again if a previous attempt failed.
+
+### Changed (Extension)
+
+- **Pick UI language** — the quick pick and sidebar **UI language** row list each language in **native script** with the **English name in parentheses** (except English), so the list is readable in the language itself and still easy to cross-reference for maintainers. No action required.
+
+<details><summary>Maintenance</summary>
+
+- **Publish workflow** — `scripts/publish.py` / extension packaging: US English spelling check skips `extension/scripts/i18n/` (translation data, not US-maintained prose); optional regeneration of `package.nls.<locale>.json` and runtime locale JSON from English sources before compiling the VSIX. No action required for package consumers.
+
+</details>
+
+---
+
 ## [13.4.8]
 
 ### Added (Extension)
