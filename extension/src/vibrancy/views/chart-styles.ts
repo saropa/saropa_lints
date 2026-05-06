@@ -97,16 +97,26 @@ export function getChartStyles(): string {
             overflow: hidden;
         }
         .bar-fill {
-            /* Width is set inline via style="width: N%" on each bar (highest
-               CSS specificity — beats any class selector and cannot be
-               overridden by cascade order). The animation grows the bar in
-               via transform: scaleX(0 → 1), which is a pure number animation
-               with no var() reference in @keyframes — earlier attempts that
-               put the percentage inside the keyframe (to { width: var(...) })
-               left every bar at 100% of the track in webview environments
-               where var() failed to resolve inside @keyframes. */
+            /* Mirrors the Findings Dashboard pattern (violationsDashboardStyles
+               .bar-fill) which has rendered correctly in this webview for
+               months: static width: var(--bar-width, 0%) reading from an
+               inline style="--bar-width: N%", plus a transform: scaleX
+               grow-in animation that never references var() in @keyframes.
+               The 0% fallback is deliberate — if var() somehow fails, bars
+               vanish (clear signal) rather than defaulting to 100% (the
+               failure mode of every prior attempt here). Two earlier
+               attempts on this same chart did not render correctly:
+                 1. width keyframe with var() in the to-step — keyframe
+                    value didn't resolve and .bar-fill fell back to block
+                    default 100%.
+                 2. inline style with a standard width property — apparently
+                    stripped or ignored in this webview despite
+                    unsafe-inline; the sibling Findings Dashboard works
+                    only because it sets a CSS custom property inline,
+                    not a standard property. */
             height: 100%;
             border-radius: 3px;
+            width: var(--bar-width, 0%);
             transform-origin: left center;
             animation: bar-grow 0.6s ease-out;
         }
@@ -187,7 +197,7 @@ export function getChartStyles(): string {
         }
 
         @media (prefers-reduced-motion: reduce) {
-            .bar-fill { animation: none !important; transform: scaleX(1) !important; }
+            .bar-fill { animation: none !important; transform: scaleX(1) !important; width: var(--bar-width, 0%) !important; }
             .bar-row { transition: none; }
             .donut-segment { transition: none !important; }
             .chart-tooltip { transition: none; }

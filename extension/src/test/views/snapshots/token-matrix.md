@@ -1,8 +1,8 @@
 # Token coverage matrix
 
-Generated: 2026-05-04T15:49:18.125Z
+Generated: 2026-05-06T13:11:50.762Z
 
-Scanned 13 surface files; 67 unique tokens referenced.
+Scanned 13 surface files; 68 unique tokens referenced.
 
 ## Index — surfaces
 
@@ -25,6 +25,7 @@ Scanned 13 surface files; 67 unique tokens referenced.
 | Token | Used by (surface index) |
 |-------|--------------------------|
 | `--accent-` | 13 |
+| `--bar-width` | 2 |
 | `--border` | 4, 6 |
 | `--chart-color-0` | 2 |
 | `--chart-color-1` | 2 |
@@ -56,8 +57,8 @@ Scanned 13 surface files; 67 unique tokens referenced.
 | `--vscode-button-secondaryForeground` | 4, 5, 7, 8, 10 |
 | `--vscode-button-secondaryHoverBackground` | 4, 5, 7, 8, 10 |
 | `--vscode-charts-green` | 3 |
-| `--vscode-descriptionForeground` | 2, 3, 5, 6, 7, 10, 13 |
-| `--vscode-editor-background` | 1, 2, 3, 7, 10, 12 |
+| `--vscode-descriptionForeground` | 2, 3, 5, 6, 7, 9, 10, 13 |
+| `--vscode-editor-background` | 1, 2, 3, 7, 9, 10, 12 |
 | `--vscode-editor-findMatchHighlightBackground` | 3, 6 |
 | `--vscode-editor-font-family` | 3, 5, 7, 10 |
 | `--vscode-editor-font-size` | 5, 7 |
@@ -72,9 +73,9 @@ Scanned 13 surface files; 67 unique tokens referenced.
 | `--vscode-editorWidget-background` | 3, 6, 7, 10 |
 | `--vscode-editorWidget-border` | 5 |
 | `--vscode-focusBorder` | 2, 3, 5, 6, 7, 8, 10 |
-| `--vscode-font-family` | 3, 5, 7, 8, 10 |
+| `--vscode-font-family` | 3, 5, 7, 8, 9, 10 |
 | `--vscode-font-size` | 3, 5, 7 |
-| `--vscode-foreground` | 2, 3, 5, 6, 7, 10 |
+| `--vscode-foreground` | 2, 3, 5, 6, 7, 9, 10 |
 | `--vscode-input-background` | 3, 6, 7, 10 |
 | `--vscode-input-border` | 3, 6, 10 |
 | `--vscode-input-foreground` | 3, 6, 7, 10 |
