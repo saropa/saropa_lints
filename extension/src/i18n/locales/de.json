@@ -64,5 +64,12 @@
     "selectAll": "Select all rows",
     "keyboardShortcuts": "Keyboard shortcuts",
     "announcer": "Updates to filter and sort state are announced here."
+  },
+  "uiLanguage": {
+    "pick": {
+      "title": "Saropa Lints Oberflächensprache",
+      "placeholder": "Sprache für Seitenleiste und Dashboards wählen",
+      "auto": "Automatisch (VS Code-Anzeigesprache folgen)"
+    }
   }
 }

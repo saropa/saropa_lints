@@ -64,5 +64,12 @@
     "selectAll": "Alle rijen selecteren",
     "keyboardShortcuts": "Sneltoetsen",
     "announcer": "Updates van filter- en sorteertoestand worden hier aangekondigd."
+  },
+  "uiLanguage": {
+    "pick": {
+      "title": "Saropa Lints UI-taal",
+      "placeholder": "Kies taal voor zijbalk en dashboards",
+      "auto": "Automatisch (volg de weergavetaal van VS Code)"
+    }
   }
 }

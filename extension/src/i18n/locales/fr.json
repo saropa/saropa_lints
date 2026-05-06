@@ -64,5 +64,12 @@
     "selectAll": "Selectionner toutes les lignes",
     "keyboardShortcuts": "Raccourcis clavier",
     "announcer": "Les mises a jour des filtres et du tri sont annoncees ici."
+  },
+  "uiLanguage": {
+    "pick": {
+      "title": "Langue de l'interface Saropa Lints",
+      "placeholder": "Choisir la langue de la barre latérale et des tableaux de bord",
+      "auto": "Automatique (suivre la langue d'affichage VS Code)"
+    }
   }
 }

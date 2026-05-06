@@ -64,5 +64,12 @@
     "selectAll": "Select all rows",
     "keyboardShortcuts": "Keyboard shortcuts",
     "announcer": "Updates to filter and sort state are announced here."
+  },
+  "uiLanguage": {
+    "pick": {
+      "title": "Idioma da IU do Saropa Lints",
+      "placeholder": "Escolha o idioma da barra lateral e dos painéis",
+      "auto": "Automático (seguir o idioma de exibição do VS Code)"
+    }
   }
 }

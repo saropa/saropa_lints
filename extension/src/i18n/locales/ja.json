@@ -64,5 +64,12 @@
     "selectAll": "Select all rows",
     "keyboardShortcuts": "Keyboard shortcuts",
     "announcer": "Updates to filter and sort state are announced here."
+  },
+  "uiLanguage": {
+    "pick": {
+      "title": "Saropa Lints の UI 言語",
+      "placeholder": "サイドバーとダッシュボードの言語を選ぶ",
+      "auto": "自動（VS Code の表示言語に従う）"
+    }
   }
 }

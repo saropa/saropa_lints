@@ -54,6 +54,7 @@
 ### Changed (Extension)
 
 - **Pick UI language** — the quick pick and sidebar **UI language** row list each language in **native script** with the **English name in parentheses** (except English), so the list is readable in the language itself and still easy to cross-reference for maintainers. No action required.
+- **Runtime locale catalogs** — `uiLanguage.pick.*` strings (quick pick title, placeholder, and **Auto** row) are translated in every shipped `extension/src/i18n/locales/<locale>.json`, with matching phrase keys in `extension/scripts/i18n/dictionaries.py` so `generate_locales.py` keeps them after regeneration. No action required.
 
 <details><summary>Maintenance</summary>
 
