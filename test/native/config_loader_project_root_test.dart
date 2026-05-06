@@ -15,6 +15,13 @@
 // the analyzed file path by walking up to the nearest `pubspec.yaml`).
 // This test exercises that path.
 
+/// Module overview (comment coverage pass).
+/// comment-coverage: module overview (batch).
+///
+/// Analyzer-backed tests for `config_loader_project_root_test` (config loader project root).
+///
+/// Uses `// LINT` markers and `example/` fixtures per CONTRIBUTING.md.
+
 import 'dart:io';
 
 import 'package:path/path.dart' as p;

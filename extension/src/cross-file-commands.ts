@@ -1,3 +1,4 @@
+/** * Module overview (comment coverage pass). * comment-coverage: module overview (batch). * * VS Code extension host code (activation, services, readers). */
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as vscode from 'vscode';

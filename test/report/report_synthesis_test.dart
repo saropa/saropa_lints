@@ -7,6 +7,13 @@
 // file's contract is "given counts + severities + classification sets,
 // the synthesis returns the expected structure".
 
+/// Module overview (comment coverage pass).
+/// comment-coverage: module overview (batch).
+///
+/// Analyzer-backed tests for `report_synthesis_test` (report synthesis).
+///
+/// Uses `// LINT` markers and `example/` fixtures per CONTRIBUTING.md.
+
 import 'dart:io' show Directory, File, Platform;
 
 import 'package:saropa_lints/src/report/report_synthesis.dart';

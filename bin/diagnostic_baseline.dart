@@ -1,3 +1,11 @@
+/// Module overview (comment coverage pass).
+/// comment-coverage: module overview (batch).
+///
+/// Dart CLI entrypoint for saropa_lints tooling.
+///
+/// Saropa custom lints: rules register in `lib/src/rules/all_rules.dart`
+/// and tiers in `lib/src/tiers.dart` where applicable; see `plans/COMMENT_COVERAGE_PLAN.md`.
+
 #!/usr/bin/env dart
 // ignore_for_file: avoid_print
 

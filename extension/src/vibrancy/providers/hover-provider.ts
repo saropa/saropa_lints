@@ -1,3 +1,10 @@
+/**
+ * Module overview (comment coverage pass).
+ * comment-coverage: module overview (batch).
+ *
+ * Vibrancy UI experiment: scoring, providers, and webview assets.
+ */
+
 import * as vscode from 'vscode';
 import { VibrancyResult, FamilySplit, PackageInsight, activeFileUsages } from '../types';
 import { categoryLabel, categoryToGrade, scoreToGrade } from '../scoring/status-classifier';

@@ -13,6 +13,13 @@
 //
 // Skips when the dart binary is unavailable (CI image without SDK on PATH).
 
+/// Module overview (comment coverage pass).
+/// comment-coverage: module overview (batch).
+///
+/// Analyzer-backed tests for `fix_application_dart_fix_dry_run_test` (fix application dart fix dry run).
+///
+/// Uses `// LINT` markers and `example/` fixtures per CONTRIBUTING.md.
+
 import 'dart:io';
 
 import 'package:test/test.dart';

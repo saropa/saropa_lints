@@ -1,4 +1,4 @@
-// Single scan pass: pub.dev, GitHub, issues, scores, and problem suggestions per package.
+/** * Module overview (comment coverage pass). * comment-coverage: module overview (batch). * * Vibrancy UI experiment: scoring, providers, and webview assets. */// Single scan pass: pub.dev, GitHub, issues, scores, and problem suggestions per package.
 import {
     VibrancyResult, PackageDependency, GitHubMetrics, KnownIssue,
     PubDevMetrics, AlternativeSuggestion,

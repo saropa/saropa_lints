@@ -1,3 +1,4 @@
+/** * Module overview (comment coverage pass). * comment-coverage: module overview (batch). * * Extension Jest tests: validates commands, webviews, parsers, and state against VS Code APIs (often with local mocks). */
 import { VibrancyResult, VibrancyCategory, DependencySection } from '../../vibrancy/types';
 
 /** Shared minimal VibrancyResult builders for vibrancy unit tests. */

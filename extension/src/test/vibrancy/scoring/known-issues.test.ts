@@ -1,3 +1,4 @@
+/** * Module overview (comment coverage pass). * comment-coverage: module overview (batch). * * Extension Jest tests: validates commands, webviews, parsers, and state against VS Code APIs (often with local mocks). */
 import * as assert from 'assert';
 import knownIssuesData from '../../../vibrancy/data/known_issues.json';
 import { findKnownIssue, allKnownIssues, isReplacementPackageName, getReplacementDisplayText } from '../../../vibrancy/scoring/known-issues';

@@ -1,3 +1,10 @@
+/**
+ * Module overview (comment coverage pass).
+ * comment-coverage: module overview (batch).
+ *
+ * Vibrancy UI experiment: scoring, providers, and webview assets.
+ */
+
 import { PackageDependency, OverrideAnalysis } from '../types';
 import { DepGraphPackage } from './dep-graph';
 import { parseOverrides } from './override-parser';

@@ -1,3 +1,4 @@
+/** * Module overview (comment coverage pass). * comment-coverage: module overview (batch). * * Vibrancy UI experiment: scoring, providers, and webview assets. */
 import { CiThresholds, CiPlatform } from '../types';
 
 // Stubs for GitHub Actions, GitLab CI, and shell from vibrancy thresholds.

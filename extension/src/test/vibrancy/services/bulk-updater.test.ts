@@ -1,3 +1,4 @@
+/** * Module overview (comment coverage pass). * comment-coverage: module overview (batch). * * Extension Jest tests: validates commands, webviews, parsers, and state against VS Code APIs (often with local mocks). */
 import * as assert from 'assert';
 import { resetMocks, messageMock, setTestConfig, clearTestConfig } from '../vscode-mock';
 import { getUpdatablePackages, formatFilterLabel, UpdateEntry } from '../../../vibrancy/services/bulk-updater';

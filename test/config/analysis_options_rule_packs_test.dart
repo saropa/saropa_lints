@@ -1,3 +1,9 @@
+/// Module overview (comment coverage pass).
+/// comment-coverage: module overview (batch).
+///
+/// Analyzer-backed tests for `analysis_options_rule_packs_test` (analysis options rule packs).
+///
+/// Uses `// LINT` markers and `example/` fixtures per CONTRIBUTING.md.
 import 'package:saropa_lints/src/config/analysis_options_rule_packs.dart';
 import 'package:test/test.dart';
 

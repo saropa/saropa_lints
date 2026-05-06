@@ -1,3 +1,9 @@
+/// Module overview (comment coverage pass).
+/// comment-coverage: module overview (batch).
+///
+/// Analyzer-backed tests for `long_operation_method_name_match_test` (long operation method name match).
+///
+/// Uses `// LINT` markers and `example/` fixtures per CONTRIBUTING.md.
 import 'package:saropa_lints/src/long_operation_method_name_match.dart';
 import 'package:test/test.dart';
 

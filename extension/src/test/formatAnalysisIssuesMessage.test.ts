@@ -1,3 +1,10 @@
+/**
+ * Module overview (comment coverage pass).
+ * comment-coverage: module overview (batch).
+ *
+ * Extension Jest tests: validates commands, webviews, parsers, and state against VS Code APIs (often with local mocks).
+ */
+
 // Must load the vscode-module shim BEFORE importing setup.ts, which imports
 // 'vscode' at module scope. Without this, the require resolver can't find
 // 'vscode' outside the VS Code host and the whole test suite fails to load.

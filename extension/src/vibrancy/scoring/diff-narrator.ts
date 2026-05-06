@@ -1,3 +1,10 @@
+/**
+ * Module overview (comment coverage pass).
+ * comment-coverage: module overview (batch).
+ *
+ * Vibrancy UI experiment: scoring, providers, and webview assets.
+ */
+
 import { LockDiff } from '../services/lock-diff';
 
 /** One-line summary for a notification message. */

@@ -1,3 +1,10 @@
+/// Module overview (comment coverage pass).
+/// comment-coverage: module overview (batch).
+///
+/// Analyzer-backed tests for `scan_runner_test` (scan runner).
+///
+/// Uses `// LINT` markers and `example/` fixtures per CONTRIBUTING.md.
+
 import 'dart:io';
 
 import 'package:saropa_lints/scan.dart';

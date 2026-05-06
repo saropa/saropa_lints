@@ -1,3 +1,9 @@
+/// Module overview (comment coverage pass).
+/// comment-coverage: module overview (batch).
+///
+/// Analyzer-backed tests for `diagnostic_statistics_test` (diagnostic statistics).
+///
+/// Uses `// LINT` markers and `example/` fixtures per CONTRIBUTING.md.
 import 'dart:convert' show JsonEncoder;
 import 'dart:io' show Directory, File;
 

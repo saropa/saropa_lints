@@ -1,3 +1,10 @@
+/**
+ * Module overview (comment coverage pass).
+ * comment-coverage: module overview (batch).
+ *
+ * Vibrancy UI experiment: scoring, providers, and webview assets.
+ */
+
 import { VibrancyResult } from '../types';
 import { isReplacementPackageName, getReplacementDisplayText } from './known-issues';
 import { categoryToGrade } from './status-classifier';

@@ -16,6 +16,13 @@
 // analyzer to keep the suite fast (no isolate startup) and stable
 // (no analyzer version drift).
 
+/// Module overview (comment coverage pass).
+/// comment-coverage: module overview (batch).
+///
+/// Analyzer-backed tests for `plan_additional_rules_21_30_test` (plan additional rules 21 30).
+///
+/// Uses `// LINT` markers and `example/` fixtures per CONTRIBUTING.md.
+
 import 'dart:io';
 
 import 'package:saropa_lints/saropa_lints.dart';

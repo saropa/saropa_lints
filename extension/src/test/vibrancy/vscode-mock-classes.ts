@@ -1,4 +1,4 @@
-// Hand-rolled test doubles; keep in sync with vscode-mock’s surface.
+/** * Module overview (comment coverage pass). * comment-coverage: module overview (batch). * * Extension Jest tests: validates commands, webviews, parsers, and state against VS Code APIs (often with local mocks). */// Hand-rolled test doubles; keep in sync with vscode-mock’s surface.
 /**
  * Mock classes for the vscode API — used by vscode-mock.ts.
  */

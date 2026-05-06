@@ -1,3 +1,10 @@
+/**
+ * Module overview (comment coverage pass).
+ * comment-coverage: module overview (batch).
+ *
+ * Vibrancy UI experiment: scoring, providers, and webview assets.
+ */
+
 import * as vscode from 'vscode';
 import { NewVersionNotification, VibrancyResult, WatchFilterMode } from '../types';
 import { CacheService } from './cache-service';

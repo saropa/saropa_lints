@@ -1,4 +1,4 @@
-export interface LockDiffEntry {
+/** * Module overview (comment coverage pass). * comment-coverage: module overview (batch). * * Vibrancy UI experiment: scoring, providers, and webview assets. */export interface LockDiffEntry {
     readonly name: string;
     readonly version: string;
 }

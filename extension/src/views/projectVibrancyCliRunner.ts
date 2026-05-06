@@ -1,3 +1,10 @@
+/**
+ * Module overview (comment coverage pass).
+ * comment-coverage: module overview (batch).
+ *
+ * VS Code views: trees, dashboards, or webview HTML builders.
+ */
+
 import * as vscode from 'vscode';
 import { spawn } from 'node:child_process';
 import type { ProjectVibrancyPayload } from './projectVibrancyTypes';

@@ -1,3 +1,10 @@
+/**
+ * Module overview (comment coverage pass).
+ * comment-coverage: module overview (batch).
+ *
+ * Extension Jest tests: validates commands, webviews, parsers, and state against VS Code APIs (often with local mocks).
+ */
+
 // Tests for the dep-graph service. Two responsibilities:
 //
 //   parseDepGraphJson — turn `dart pub deps --json` output into a

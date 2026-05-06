@@ -1,3 +1,10 @@
+/// Module overview (comment coverage pass).
+/// comment-coverage: module overview (batch).
+///
+/// Analyzer-backed tests for `project_info_root_uri_test` (project info root uri).
+///
+/// Uses `// LINT` markers and `example/` fixtures per CONTRIBUTING.md.
+
 import 'dart:io';
 
 import 'package:saropa_lints/src/init/project_info.dart';

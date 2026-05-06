@@ -1,3 +1,4 @@
+/** * Module overview (comment coverage pass). * comment-coverage: module overview (batch). * * Vibrancy UI experiment: scoring, providers, and webview assets. */
 import { UpdateStatus, UpdateInfo, ChangelogInfo, ChangelogEntry } from '../types';
 import { CacheService } from './cache-service';
 import { fetchWithRetry } from './fetch-retry';

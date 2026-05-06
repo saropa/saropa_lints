@@ -1,3 +1,9 @@
+/// Module overview (comment coverage pass).
+/// comment-coverage: module overview (batch).
+///
+/// Analyzer-backed tests for `runtime_tier_cap_test` (runtime tier cap).
+///
+/// Uses `// LINT` markers and `example/` fixtures per CONTRIBUTING.md.
 import 'dart:io';
 
 import 'package:saropa_lints/src/config/runtime_tier_cap.dart';

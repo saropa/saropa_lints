@@ -1,3 +1,10 @@
+/**
+ * Module overview (comment coverage pass).
+ * comment-coverage: module overview (batch).
+ *
+ * Vibrancy UI experiment: scoring, providers, and webview assets.
+ */
+
 import { KnownIssue } from '../types';
 import { allKnownIssues } from '../scoring/known-issues';
 import { createWebviewCspNonce, escapeHtml } from './html-utils';

@@ -1,6 +1,15 @@
 #!/usr/bin/env dart
 // ignore_for_file: avoid_print
 
+/// Module overview (comment coverage pass).
+/// comment-coverage: module overview (batch).
+///
+/// Dart CLI entrypoint for saropa_lints tooling.
+///
+/// Saropa custom lints: rules register in `lib/src/rules/all_rules.dart`
+/// and tiers in `lib/src/tiers.dart` where applicable; see
+/// `plans/COMMENT_COVERAGE_PLAN.md`.
+
 /// Cross-file analysis CLI (unused files, circular deps, feature deps, etc.).
 ///
 /// Run `dart run saropa_lints:cross_file --help` for commands and options.

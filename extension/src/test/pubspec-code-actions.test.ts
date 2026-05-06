@@ -1,4 +1,4 @@
-// Must be first import — redirects 'vscode' to the local mock
+/** * Module overview (comment coverage pass). * comment-coverage: module overview (batch). * * Extension Jest tests: validates commands, webviews, parsers, and state against VS Code APIs (often with local mocks). */// Must be first import — redirects 'vscode' to the local mock
 // Pubspec code actions: quick fixes and commands when saropa lints the manifest.
 import './vibrancy/register-vscode-mock';
 

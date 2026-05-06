@@ -1,5 +1,13 @@
 // ignore_for_file: depend_on_referenced_packages
 
+/// Module overview (comment coverage pass).
+/// comment-coverage: module overview (batch).
+///
+/// Core saropa_lints library implementation (utilities, context, or rules support).
+///
+/// Saropa custom lints: rules register in `lib/src/rules/all_rules.dart`
+/// and tiers in `lib/src/tiers.dart` where applicable; see `plans/COMMENT_COVERAGE_PLAN.md`.
+
 library;
 
 import 'package:analyzer/dart/element/element.dart';

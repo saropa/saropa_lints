@@ -1,3 +1,9 @@
+/// Module overview (comment coverage pass).
+/// comment-coverage: module overview (batch).
+///
+/// Analyzer-backed tests for `init_composite_plugin_scaffold_test` (init composite plugin scaffold).
+///
+/// Uses `// LINT` markers and `example/` fixtures per CONTRIBUTING.md.
 import 'dart:io';
 
 import 'package:saropa_lints/src/init/cli_args.dart';

@@ -1,3 +1,9 @@
+/// Module overview (comment coverage pass).
+/// comment-coverage: module overview (batch).
+///
+/// Analyzer-backed tests for `rule_packs_semver_test` (rule packs semver).
+///
+/// Uses `// LINT` markers and `example/` fixtures per CONTRIBUTING.md.
 import 'package:saropa_lints/src/config/rule_packs.dart';
 import 'package:test/test.dart';
 

@@ -1,3 +1,9 @@
+/// Module overview (comment coverage pass).
+/// comment-coverage: module overview (batch).
+///
+/// Analyzer-backed tests for `info_plist_utils_test` (info plist utils).
+///
+/// Uses `// LINT` markers and `example/` fixtures per CONTRIBUTING.md.
 import 'dart:io';
 
 import 'package:saropa_lints/src/info_plist_utils.dart';

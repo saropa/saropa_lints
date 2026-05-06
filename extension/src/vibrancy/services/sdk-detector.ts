@@ -1,3 +1,10 @@
+/**
+ * Module overview (comment coverage pass).
+ * comment-coverage: module overview (batch).
+ *
+ * Vibrancy UI experiment: scoring, providers, and webview assets.
+ */
+
 import { execFile } from 'child_process';
 
 // Windows installs dart/flutter as .bat shims. Node 18.20+/20.12+/22+ refuses

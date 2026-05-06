@@ -1,3 +1,12 @@
+/// Module overview (comment coverage pass).
+/// comment-coverage: module overview (batch).
+///
+/// Core saropa_lints library implementation (utilities, context, or rules support).
+///
+/// Saropa custom lints: rules register in `lib/src/rules/all_rules.dart`
+/// and tiers in `lib/src/tiers.dart` where applicable; see
+/// `plans/COMMENT_COVERAGE_PLAN.md`.
+
 part of 'project_context.dart';
 
 /// Optional data from `dart run saropa_lints:cross_file snapshot` (JSON on disk).

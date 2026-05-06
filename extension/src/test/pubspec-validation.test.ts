@@ -1,4 +1,4 @@
-// Must be first import — redirects 'vscode' to the local mock
+/** * Module overview (comment coverage pass). * comment-coverage: module overview (batch). * * Extension Jest tests: validates commands, webviews, parsers, and state against VS Code APIs (often with local mocks). */// Must be first import — redirects 'vscode' to the local mock
 import './vibrancy/register-vscode-mock';
 
 import * as assert from 'node:assert';

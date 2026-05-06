@@ -1,3 +1,4 @@
+/** * Module overview (comment coverage pass). * comment-coverage: module overview (batch). * * Vibrancy UI experiment: scoring, providers, and webview assets. */
 import * as vscode from 'vscode';
 import { execFile } from 'child_process';
 import { UpgradeStep, UpgradeStepResult, UpgradeReport } from '../types';

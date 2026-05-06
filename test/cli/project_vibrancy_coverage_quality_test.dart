@@ -1,3 +1,9 @@
+/// Module overview (comment coverage pass).
+/// comment-coverage: module overview (batch).
+///
+/// Analyzer-backed tests for `project_vibrancy_coverage_quality_test` (project vibrancy coverage quality).
+///
+/// Uses `// LINT` markers and `example/` fixtures per CONTRIBUTING.md.
 import 'package:saropa_lints/src/cli/project_vibrancy_coverage_quality.dart';
 import 'package:test/test.dart';
 

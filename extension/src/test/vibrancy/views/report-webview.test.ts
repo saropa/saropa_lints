@@ -1,4 +1,4 @@
-// Must be first so vscode imports resolve to test mock.
+/** * Module overview (comment coverage pass). * comment-coverage: module overview (batch). * * Extension Jest tests: validates commands, webviews, parsers, and state against VS Code APIs (often with local mocks). */// Must be first so vscode imports resolve to test mock.
 import '../register-vscode-mock';
 
 import * as assert from 'assert';

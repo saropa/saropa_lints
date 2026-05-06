@@ -11,6 +11,13 @@
 // buffered in memory, then flushed to disk once the project root is known
 // (triggered by the first analyzed file in [SaropaContext._wrapCallback]).
 
+/// Module overview (comment coverage pass).
+/// comment-coverage: module overview (batch).
+///
+/// Analyzer-backed tests for `plugin_logger_test` (plugin logger).
+///
+/// Uses `// LINT` markers and `example/` fixtures per CONTRIBUTING.md.
+
 import 'dart:io';
 
 import 'package:path/path.dart' as p;

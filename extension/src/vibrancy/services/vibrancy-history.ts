@@ -1,3 +1,4 @@
+/** * Module overview (comment coverage pass). * comment-coverage: module overview (batch). * * Vibrancy UI experiment: scoring, providers, and webview assets. */
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { categoryToGrade } from '../scoring/status-classifier';

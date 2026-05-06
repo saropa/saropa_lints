@@ -1,3 +1,10 @@
+/**
+ * Module overview (comment coverage pass).
+ * comment-coverage: module overview (batch).
+ *
+ * Extension Jest tests: validates commands, webviews, parsers, and state against VS Code APIs (often with local mocks).
+ */
+
 // Tests for findLatestAnalysisReport — the helper that powers the
 // "Copy Report" / "Open Report" buttons on the post-analysis popup.
 //

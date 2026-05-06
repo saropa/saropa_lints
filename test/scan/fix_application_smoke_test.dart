@@ -17,6 +17,13 @@
 //
 // ignore_for_file: depend_on_referenced_packages
 
+/// Module overview (comment coverage pass).
+/// comment-coverage: module overview (batch).
+///
+/// Analyzer-backed tests for `fix_application_smoke_test` (fix application smoke).
+///
+/// Uses `// LINT` markers and `example/` fixtures per CONTRIBUTING.md.
+
 import 'package:saropa_lints/src/fixes/common/delete_node_fix.dart';
 import 'package:saropa_lints/src/fixes/common/insert_text_fix.dart';
 import 'package:saropa_lints/src/fixes/security/replace_with_https_fix.dart';

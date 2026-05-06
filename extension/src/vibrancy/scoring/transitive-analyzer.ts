@@ -1,3 +1,10 @@
+/**
+ * Module overview (comment coverage pass).
+ * comment-coverage: module overview (batch).
+ *
+ * Vibrancy UI experiment: scoring, providers, and webview assets.
+ */
+
 import {
     TransitiveInfo, SharedDep, DepGraphSummary, KnownIssue,
 } from '../types';

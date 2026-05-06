@@ -1,3 +1,9 @@
+/// Module overview (comment coverage pass).
+/// comment-coverage: module overview (batch).
+///
+/// Analyzer-backed tests for `diagnostic_dedup_tracker_test` (diagnostic dedup tracker).
+///
+/// Uses `// LINT` markers and `example/` fixtures per CONTRIBUTING.md.
 import 'package:saropa_lints/src/saropa_lint_rule.dart'
     show DiagnosticDedupTracker;
 import 'package:test/test.dart';

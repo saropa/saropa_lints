@@ -1,3 +1,10 @@
+/**
+ * Module overview (comment coverage pass).
+ * comment-coverage: module overview (batch).
+ *
+ * Vibrancy UI experiment: scoring, providers, and webview assets.
+ */
+
 import { ComparisonData, DimensionWinner, RankedComparison, VibrancyCategory } from '../types';
 import { formatSizeMB } from '../scoring/bloat-calculator';
 import { createWebviewCspNonce, escapeHtml } from './html-utils';

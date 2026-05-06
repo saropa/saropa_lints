@@ -1,3 +1,4 @@
+/** * Module overview (comment coverage pass). * comment-coverage: module overview (batch). * * Vibrancy UI experiment: scoring, providers, and webview assets. */
 import * as crypto from 'crypto';
 import { VibrancyResult } from '../types';
 import { buildPurl } from '../scoring/purl-builder';

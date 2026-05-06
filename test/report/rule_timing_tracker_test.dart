@@ -1,3 +1,9 @@
+/// Module overview (comment coverage pass).
+/// comment-coverage: module overview (batch).
+///
+/// Analyzer-backed tests for `rule_timing_tracker_test` (rule timing tracker).
+///
+/// Uses `// LINT` markers and `example/` fixtures per CONTRIBUTING.md.
 import 'dart:convert' show jsonDecode;
 
 import 'package:saropa_lints/saropa_lints.dart';

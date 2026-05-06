@@ -78,25 +78,16 @@ export function formatLanguageChoiceLabel(code: string): string {
   return code;
 }
 
-/** Rows for `showQuickPick`; order matches prior UX (auto first, then alphabetical by code). */
+function sortedLocaleCodes(): Exclude<UiLanguageCode, 'auto'>[] {
+  const codes = Object.keys(ENGLISH_ENDONYM) as Exclude<UiLanguageCode, 'auto'>[];
+  return codes.sort((a, b) =>
+    ENGLISH_ENDONYM[a].localeCompare(ENGLISH_ENDONYM[b], 'en', { sensitivity: 'base' }),
+  );
+}
+
+/** Rows for `showQuickPick`: `auto` first, then English language names A–Z. */
 export function buildUiLanguageQuickPickItems(): LanguagePickItem[] {
-  const order: UiLanguageCode[] = [
-    'auto',
-    'ar',
-    'de',
-    'en',
-    'es',
-    'fr',
-    'hi',
-    'it',
-    'ja',
-    'ko',
-    'nl',
-    'pt',
-    'ru',
-    'ur',
-    'zh',
-  ];
+  const order: UiLanguageCode[] = ['auto', ...sortedLocaleCodes()];
   return order.map((value) => ({
     label: formatLanguageChoiceLabel(value),
     value,

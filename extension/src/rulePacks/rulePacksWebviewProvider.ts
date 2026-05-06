@@ -1,3 +1,10 @@
+/**
+ * Module overview (comment coverage pass).
+ * comment-coverage: module overview (batch).
+ *
+ * VS Code extension host code (activation, services, readers).
+ */
+
 // Implements the Rule Packs / Config Dashboard UI: load pubspec, toggles, and `rule_packs` config.
 /**
  * **Config Dashboard** editor webview: rule packs table, tier chips, SDK rollout actions,

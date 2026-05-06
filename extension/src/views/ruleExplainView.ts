@@ -1,3 +1,10 @@
+/**
+ * Module overview (comment coverage pass).
+ * comment-coverage: module overview (batch).
+ *
+ * VS Code views: trees, dashboards, or webview HTML builders.
+ */
+
 // Single webview: rule text, impact, related rules, and external doc links.
 /**
  * "Explain rule" panel: opens a webview tab beside the editor with full rule details

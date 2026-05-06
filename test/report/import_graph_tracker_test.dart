@@ -1,3 +1,9 @@
+/// Module overview (comment coverage pass).
+/// comment-coverage: module overview (batch).
+///
+/// Analyzer-backed tests for `import_graph_tracker_test` (import graph tracker).
+///
+/// Uses `// LINT` markers and `example/` fixtures per CONTRIBUTING.md.
 import 'dart:io' show Directory, Platform;
 
 import 'package:saropa_lints/src/report/import_graph_tracker.dart';

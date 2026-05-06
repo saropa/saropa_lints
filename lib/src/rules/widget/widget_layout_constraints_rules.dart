@@ -1,5 +1,13 @@
 // ignore_for_file: depend_on_referenced_packages, deprecated_member_use
 
+/// Module overview (comment coverage pass).
+/// comment-coverage: module overview (batch).
+///
+/// Saropa lint rule implementations grouped under `widget/`.
+///
+/// Saropa custom lints: rules register in `lib/src/rules/all_rules.dart`
+/// and tiers in `lib/src/tiers.dart` where applicable; see `plans/COMMENT_COVERAGE_PLAN.md`.
+
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';

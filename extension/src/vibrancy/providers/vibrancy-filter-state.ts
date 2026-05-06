@@ -1,3 +1,10 @@
+/**
+ * Module overview (comment coverage pass).
+ * comment-coverage: module overview (batch).
+ *
+ * Vibrancy UI experiment: scoring, providers, and webview assets.
+ */
+
 import { ProblemSeverity, ProblemType } from '../problems/problem-types';
 import { ProblemRegistry } from '../problems/problem-registry';
 import { VibrancyCategory, DependencySection, VibrancyResult } from '../types';

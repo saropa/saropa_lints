@@ -1,3 +1,4 @@
+/** * Module overview (comment coverage pass). * comment-coverage: module overview (batch). * * Extension Jest tests: validates commands, webviews, parsers, and state against VS Code APIs (often with local mocks). */
 import * as assert from 'assert';
 import { RULE_PACK_DEFINITIONS, isPackDetected } from '../../rulePacks/rulePackDefinitions';
 

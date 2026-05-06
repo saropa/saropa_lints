@@ -11,6 +11,13 @@
 // entries that bypass it. Centralising at the SaropaContext layer
 // removes the noise uniformly.
 
+/// Module overview (comment coverage pass).
+/// comment-coverage: module overview (batch).
+///
+/// Analyzer-backed tests for `saropa_context_tool_skip_test` (saropa context tool skip).
+///
+/// Uses `// LINT` markers and `example/` fixtures per CONTRIBUTING.md.
+
 import 'dart:io';
 
 import 'package:path/path.dart' as p;

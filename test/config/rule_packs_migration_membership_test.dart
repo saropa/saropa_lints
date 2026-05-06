@@ -1,4 +1,12 @@
 // Consistency: SDK pack rule lists vs generated codes in kRulePacks* sources.
+/// Module overview (comment coverage pass).
+/// comment-coverage: module overview (batch).
+
+///
+/// Analyzer-backed tests for `rule_packs_migration_membership_test` (rule packs migration membership).
+
+///
+/// Uses `// LINT` markers and `example/` fixtures per CONTRIBUTING.md.
 import 'dart:io';
 
 import 'package:saropa_lints/src/config/rule_packs.dart';

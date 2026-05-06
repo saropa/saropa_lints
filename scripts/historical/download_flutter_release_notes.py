@@ -1,3 +1,10 @@
+# Module overview (comment coverage pass).
+# comment-coverage: module overview (batch).
+#
+# Repository maintenance or publish pipeline script (Python).
+#
+# See scripts/README.md and plans/COMMENT_COVERAGE_PLAN.md for conventions.
+
 # Scrapes Dart-Code, Flutter SDK, and Dart SDK release notes into reports/_cache/.
 # Historical script: not part of the build. Run before extract_lint_candidates.py.
 # Usage (from project root): python scripts/historical/download_flutter_release_notes.py

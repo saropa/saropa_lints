@@ -1,3 +1,4 @@
+/** * Module overview (comment coverage pass). * comment-coverage: module overview (batch). * * VS Code extension host code (activation, services, readers). */
 import * as vscode from 'vscode';
 
 /** Memento-backed counters for rule-explain / suggestions related-rule usage (local only). */

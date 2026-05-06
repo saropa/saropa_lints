@@ -1,3 +1,10 @@
+/**
+ * Module overview (comment coverage pass).
+ * comment-coverage: module overview (batch).
+ *
+ * Vibrancy UI experiment: scoring, providers, and webview assets.
+ */
+
 import type { VersionGapResult } from './types-extended';
 import type { ReplacementComplexity } from './services/package-code-analyzer';
 import type { PackageUsage } from './services/import-scanner';

@@ -1,3 +1,10 @@
+/**
+ * Module overview (comment coverage pass).
+ * comment-coverage: module overview (batch).
+ *
+ * Vibrancy UI experiment: scoring, providers, and webview assets.
+ */
+
 import { VibrancyResult, BudgetConfig, BudgetResult, BudgetStatus } from '../types';
 import { formatSizeMB } from './bloat-calculator';
 import { scoreToGrade } from './status-classifier';
