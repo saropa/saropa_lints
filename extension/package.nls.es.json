@@ -168,7 +168,7 @@
   "config.property.enabled.markdownDescription": "When **on** (default), Saropa Lints runs upgrade checks and treats the workspace as using Saropa lint integration. Turn **off** to pause integration notifications and status-bar score without hiding sidebar options—use **Saropa Lints: Set Up Project** when you need to add `saropa_lints` to pubspec and write `analysis_options`.",
   "config.property.tier.description": "Default tier when enabling or re-initializing.",
   "config.property.runAnalysisAfterConfigChange.description": "Run dart analyze after init or config change when enabled.",
-  "config.property.uiLanguage.description": "UI language for Saropa sidebar and dashboards. Use 'auto' to follow VS Code display language.",
+  "config.property.uiLanguage.description": "UI language for Saropa sidebar and dashboards. Use 'auto' to follow VS Code display language. The sidebar language picker saves this value to User settings so it applies in every workspace.",
   "config.property.runAnalysisOpenEditorsOnly.description": "When true, Saropa Lints runs dart analyze only for Dart files currently open in VS Code (workspace.textDocuments) under the detected project root.",
   "config.property.inlineAnnotations.description": "Show violation messages at the end of affected lines (Error Lens style).",
   "config.property.issuesPageSize.description": "Maximum number of violations shown per file in grouped findings (Findings Dashboard / internal list). Remaining are shown as \"and N more…\".",

@@ -10,7 +10,7 @@
 import * as vscode from 'vscode';
 import { readPubspec } from '../pubspecReader';
 import { getProjectRoot } from '../projectRoot';
-import { getCurrentLocale } from '../i18n/runtime';
+import { formatLanguageChoiceLabel } from '../i18n/languagePick';
 import { getViolationsTriageState, readViolations } from '../violationsReader';
 import {
   type ConfigTreeNode,
@@ -71,9 +71,7 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigTreeNod
     const tier = cfg.get<string>('tier', 'recommended') ?? 'recommended';
     const runAfter = cfg.get<boolean>('runAnalysisAfterConfigChange', true) ?? true;
     const uiLanguage = cfg.get<string>('uiLanguage', 'auto') ?? 'auto';
-    const localeLabel = uiLanguage === 'auto'
-      ? `Auto (${getCurrentLocale()})`
-      : uiLanguage;
+    const localeLabel = formatLanguageChoiceLabel(uiLanguage);
 
     const items: ConfigTreeNode[] = [
       setting('Lint integration', enabled ? 'On' : 'Off', enabled ? 'saropaLints.disable' : 'saropaLints.enable'),

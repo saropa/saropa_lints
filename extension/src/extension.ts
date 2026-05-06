@@ -115,7 +115,8 @@ import { registerCrossFileCommands } from './cross-file-commands';
 import { registerCopyAsJsonCommands } from './extensionCopyAsJsonCommands';
 import { openViolationsWideReport, refreshFindingsDashboardIfOpen } from './views/violationsWideReportView';
 import { pickWorkspaceFolder } from './workspaceFolderPicker';
-import { setCurrentLocale } from './i18n/runtime';
+import { setCurrentLocale, t } from './i18n/runtime';
+import { buildUiLanguageQuickPickItems, type LanguagePickItem } from './i18n/languagePick';
 import { VibrancyReportPanel } from './vibrancy/views/report-webview';
 
 function getConfig() {
@@ -789,34 +790,18 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     vscode.commands.registerCommand('saropaLints.pickUiLanguage', async () => {
       const cfg = vscode.workspace.getConfiguration('saropaLints');
       const current = cfg.get<string>('uiLanguage', 'auto') ?? 'auto';
-      const picked = await vscode.window.showQuickPick(
-        [
-          { label: 'Auto (follow VS Code language)', value: 'auto' },
-          { label: 'Arabic (ar)', value: 'ar' },
-          { label: 'German (de)', value: 'de' },
-          { label: 'English (en)', value: 'en' },
-          { label: 'Spanish (es)', value: 'es' },
-          { label: 'French (fr)', value: 'fr' },
-          { label: 'Hindi (hi)', value: 'hi' },
-          { label: 'Italian (it)', value: 'it' },
-          { label: 'Japanese (ja)', value: 'ja' },
-          { label: 'Korean (ko)', value: 'ko' },
-          { label: 'Dutch (nl)', value: 'nl' },
-          { label: 'Portuguese (pt)', value: 'pt' },
-          { label: 'Russian (ru)', value: 'ru' },
-          { label: 'Urdu (ur)', value: 'ur' },
-          { label: 'Chinese (zh)', value: 'zh' },
-        ],
+      const picked = await vscode.window.showQuickPick<LanguagePickItem>(
+        buildUiLanguageQuickPickItems(),
         {
-          title: 'Saropa Lints UI language',
-          placeHolder: 'Choose language for sidebar and dashboards',
+          title: t('uiLanguage.pick.title'),
+          placeHolder: t('uiLanguage.pick.placeholder'),
         },
       );
       if (!picked || picked.value === current) return;
-      const target = vscode.workspace.workspaceFolders?.length
-        ? vscode.ConfigurationTarget.Workspace
-        : vscode.ConfigurationTarget.Global;
-      await cfg.update('uiLanguage', picked.value, target);
+      // User settings: workspace-level writes can fail on some hosts (e.g. policy
+      // or manifest edge cases) with "not a registered configuration"; UI
+      // language is a personal preference and should match other global UX.
+      await cfg.update('uiLanguage', picked.value, vscode.ConfigurationTarget.Global);
       const locale = applyUiLocalePreference();
       refreshAllSections();
       reloadOpenDashboardsForLocale();
