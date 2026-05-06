@@ -45,6 +45,10 @@
 
 ---
 
+## [Unreleased]
+
+---
+
 ## [13.4.7]
 
 Package Vibrancy no longer launches a fresh scan after every individual `pub upgrade`. The watcher now waits for a whole upgrade session to settle, runs at most one scan at a time, and skips when `pubspec.lock` has not actually changed — the overlapping toasts and slowdown when upgrading several packages in a row are gone. The Package Dashboard webview also stops looking like a "dead page" during the very first scan: instead of the empty-state grade-E gauge with zero rows it now shows a clear "Scan in progress" placeholder, and the open panel auto-refreshes when the scan finishes.
@@ -59,6 +63,7 @@ Package Vibrancy no longer launches a fresh scan after every individual `pub upg
 
 - **Package Dashboard** — the webview now shows an explicit "Scan in progress" placeholder when opened during the first scan instead of the empty dashboard with `Grade E · 0/100`, an empty radial gauge, and an empty table. Users were reading the empty-state render as a broken or failed scan. No action required — open the dashboard while a fresh scan is running to see the new placeholder.
 - **Package Dashboard** — the open dashboard panel now auto-refreshes when a scan completes. It used to be built once from `latestResults` and never re-render itself, so users who opened it during a scan stayed on stale or empty data until they manually reran the "Show Report" command. No action required.
+- **Size Distribution** chart now actually renders each bar at a length proportional to its share of total size. The fix shipped in v13.4.6 didn't take effect in the live webview, so bars kept rendering at the full track width; this release switches to the same CSS pattern the Findings Dashboard's bar charts have used reliably for months. No action required — reopen the report after updating.
 
 ---
 
