@@ -17,6 +17,14 @@ Modes: full publish / audit only / fix docs / skip audit / analyze only / extens
 1
 See scripts/README.md for the full architecture and module map.
 
+Extension localization: US English is the canonical maintainable source
+(``extension/package.nls.json``, ``extension/src/i18n/locales/en.json``).
+Regenerate translated bundles with
+``python extension/scripts/i18n/generate_locales.py`` (from repo root,
+after editing English). The US spelling audit skips
+``extension/scripts/i18n/`` so foreign-language strings in translation
+tables do not false-positive as British English.
+
 Version:   5.0
 Author:    Saropa
 Copyright: (c) 2025-2026 Saropa

@@ -4,7 +4,13 @@ Scans Dart, Python, YAML, and Markdown files for common British
 English spellings and reports the US English alternative. Designed
 to run as a standalone check or be called from the publish pipeline.
 
-Version:   1.0
+Canonical English for the VS Code extension lives in ``package.nls.json``
+and ``extension/src/i18n/locales/en.json``. The directory
+``extension/scripts/i18n/`` is skipped: it holds translation tables and
+generators where non-US text (e.g. French infinitives homographing UK
+spellings) is intentional and must not fail this check.
+
+Version:   1.1
 Author:    Saropa
 Copyright: (c) 2025-2026 Saropa
 """
@@ -198,6 +204,21 @@ def _should_skip_dir(path: Path) -> bool:
     return any(part in _SKIP_DIRS for part in path.parts)
 
 
+def _should_skip_path_for_i18n_tooling(file_path: Path, project_dir: Path) -> bool:
+    """Skip extension i18n scripts: values are translated strings, not US-maintained prose."""
+    try:
+        rel = file_path.resolve().relative_to(project_dir.resolve())
+    except ValueError:
+        return False
+    parts = rel.parts
+    return (
+        len(parts) >= 3
+        and parts[0] == "extension"
+        and parts[1] == "scripts"
+        and parts[2] == "i18n"
+    )
+
+
 def _is_inside_url(line: str, match_start: int, match_end: int) -> bool:
     """Check if the match falls within a URL."""
     for url_match in _URL_PATTERN.finditer(line):
@@ -277,6 +298,7 @@ def scan_file(file_path: Path) -> list[SpellingHit]:
 
 def scan_directory(project_dir: Path) -> list[SpellingHit]:
     """Scan all source files in a project for British spellings."""
+    root = project_dir.resolve()
     all_hits: list[SpellingHit] = []
     for file_path in project_dir.rglob("*"):
         if file_path.suffix not in _SCAN_EXTENSIONS:
@@ -284,6 +306,8 @@ def scan_directory(project_dir: Path) -> list[SpellingHit]:
         if _should_skip_dir(file_path):
             continue
         if file_path.name in _SKIP_FILES:
+            continue
+        if _should_skip_path_for_i18n_tooling(file_path, root):
             continue
         all_hits.extend(scan_file(file_path))
     all_hits.sort(key=lambda h: (str(h.file), h.line_number))

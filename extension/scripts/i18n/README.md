@@ -7,8 +7,16 @@ Generates localized JSON files from English sources for:
 
 ## Usage
 
+From the repository root:
+
 ```bash
-python scripts/i18n/generate_locales.py
+python extension/scripts/i18n/generate_locales.py
+```
+
+Or from ``extension/scripts/i18n`` (imports resolve):
+
+```bash
+python generate_locales.py
 ```
 
 Default locales:

@@ -8,7 +8,11 @@ propagation by polling the Marketplace and Open VSX APIs.
 Used by the unified publish.py workflow (package and extension are
 intrinsically linked).
 
-Version:   2.1
+Before compiling the extension, optionally regenerates
+``package.nls.<locale>.json`` and runtime locale JSON from the English
+sources (dictionary-based; best-effort, non-blocking on failure).
+
+Version:   2.2
 Author:    Saropa
 Copyright: (c) 2025-2026 Saropa
 """
@@ -17,6 +21,7 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 import platform
 import re
 import time
@@ -103,6 +108,39 @@ def set_extension_version(project_dir: Path, version: str) -> bool:
     if n == 0:
         return False
     pkg_path.write_text(new_text, encoding="utf-8")
+    return True
+
+
+def regenerate_extension_locales_from_english(project_dir: Path) -> bool | None:
+    """Run ``generate_locales.py`` so non-en bundles match English sources.
+
+    English (``package.nls.json``, ``src/i18n/locales/en.json``) is the
+    source of truth; this refreshes derived locale files before packaging.
+
+    Returns:
+        True when the script ran successfully, False if it ran but failed,
+        None if ``generate_locales.py`` is not present (no extension i18n).
+    """
+    i18n_dir = _extension_dir(project_dir) / "scripts" / "i18n"
+    gen = i18n_dir / "generate_locales.py"
+    if not gen.is_file():
+        return None
+    r = run_command(
+        [sys.executable, str(gen)],
+        i18n_dir,
+        "Regenerate extension locales from English",
+        capture_output=True,
+        allow_failure=True,
+    )
+    if r.returncode != 0:
+        if r.stderr:
+            print_warning(r.stderr.strip())
+        if r.stdout:
+            print_warning(r.stdout.strip())
+        return False
+    if r.stdout:
+        for line in r.stdout.strip().splitlines():
+            print_info(f"  {line}")
     return True
 
 
@@ -290,6 +328,15 @@ def package_extension(project_dir: Path, version: str) -> Path | None:
         print_warning("Could not set extension version in package.json")
     if not copy_changelog_to_extension(project_dir):
         print_warning("Root CHANGELOG.md not found; extension .vsix will have no changelog.")
+    regen = regenerate_extension_locales_from_english(project_dir)
+    if regen is True:
+        print_success("Extension locale JSON regenerated from English sources.")
+    elif regen is False:
+        print_warning(
+            "Extension locale regeneration failed — fix i18n scripts or run "
+            "python extension/scripts/i18n/generate_locales.py before shipping "
+            "if English strings changed."
+        )
     if not run_extension_compile(project_dir):
         return None
     vsix = run_extension_package(project_dir, version)

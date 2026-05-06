@@ -81,7 +81,7 @@ publish.py                      <- thin entry point (~200 lines)
 | `_audit_checks.py` | Individual audit checks (prefix, message length, etc.) |
 | `_audit_dx.py` | Developer experience message quality validation |
 | `_tier_integrity.py` | Verify all rules are assigned to tiers |
-| `_us_spelling.py` | American English spelling enforcement |
+| `_us_spelling.py` | American English spelling enforcement (skips `extension/scripts/i18n/` — translation tables, not US-maintained prose) |
 | `_roadmap_implemented.py` | Verify roadmap status matches implementation |
 | `_duplicated_messages.py` | Detect duplicate lint messages |
 | `_utils.py` | Shared utilities: colors, exit codes, output helpers, run_command |
