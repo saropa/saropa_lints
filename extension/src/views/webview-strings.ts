@@ -30,7 +30,16 @@
  * lowerCamelCase nouns.
  */
 
-export const STRINGS = {
+import { format } from '../i18n/runtime';
+import en from '../i18n/locales/en.json';
+
+export const STRINGS = en;
+
+/**
+ * @deprecated Prefer `t('domain.key')` from `src/i18n/runtime.ts` for new
+ * runtime-localized surfaces. This helper stays for backwards compatibility.
+ */
+export const LEGACY_STRINGS = {
     /* ──────────────────────────────────────────────────────────────────
      * Toolbar actions — buttons in the sticky band above primary tables.
      * Tier-1 / tier-2 / tier-3 vocabulary per UX guidelines §8.10.
@@ -135,12 +144,4 @@ export const STRINGS = {
  * format(STRINGS.error.partialSummary, { loaded: 5, total: 7, item: 'packages', failed: 2 })
  *   // → '5 of 7 packages loaded. 2 failed.'
  */
-export function format(
-    template: string,
-    params: Readonly<Record<string, string | number>>,
-): string {
-    return template.replace(/\{(\w+)\}/g, (match, key) => {
-        const v = params[key];
-        return v === undefined ? match : String(v);
-    });
-}
+export { format };

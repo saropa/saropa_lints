@@ -125,6 +125,14 @@ export const catalogEntries: readonly CatalogEntry[] = [
     icon: 'sync',
   },
   {
+    command: 'saropaLints.pickUiLanguage',
+    title: 'Pick UI Language',
+    description:
+      'Choose the extension UI language from installed locale bundles or follow VS Code display language.',
+    category: 'Setup & Configuration',
+    icon: 'globe',
+  },
+  {
     command: 'saropaLints.openConfigDashboard',
     title: 'Open Lints Config',
     description: 'Open the Lints Config dashboard in an editor tab for tiers, packs, and config guidance.',
@@ -1069,7 +1077,7 @@ export const catalogEntries: readonly CatalogEntry[] = [
 
   {
     command: 'saropaLints.packageVibrancy.search',
-    title: 'Search Packages',
+    title: 'Search',
     description: 'Filter packages in Package Vibrancy by text.',
     category: 'Package Vibrancy — Filters',
     icon: 'search',

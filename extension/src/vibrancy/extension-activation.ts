@@ -491,7 +491,7 @@ function registerFilterCommands(
             'saropaLints.packageVibrancy.search', async () => {
                 const current = provider.getFilterState().textFilter;
                 const value = await vscode.window.showInputBox({
-                    title: 'Search Packages',
+                    title: 'Search',
                     prompt: 'Filter by package name (case-insensitive substring)',
                     value: current,
                 });

@@ -235,6 +235,13 @@ function buildEditorDashboardItems(): LeafItem[] {
 function buildActionItems(): LeafItem[] {
     return [
         new LeafItem(
+            'Pick UI language',
+            'Switch sidebar/dashboard language',
+            'saropaLints.pickUiLanguage',
+            'globe',
+            new vscode.ThemeColor('textLink.foreground'),
+        ),
+        new LeafItem(
             'Run analysis',
             'Re-run analyzer',
             'saropaLints.runAnalysis',

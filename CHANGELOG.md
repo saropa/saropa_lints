@@ -47,6 +47,11 @@
 
 ## [Unreleased]
 
+### Added (Extension)
+
+- **Localization framework** — contribution strings in `package.json` now resolve through `package.nls.json`, with generated `package.nls.<locale>.json` files for additional languages. Shared webview strings live under `extension/src/i18n/` with a runtime locale picked from VS Code's display language or **`saropaLints.uiLanguage`**.
+- **Pick UI language** — new command and prominent **Actions** row to switch language; open dashboards refresh automatically so you can verify translations without reloading the window.
+
 ### Fixed (Extension)
 
 - **Size Distribution** chart now actually renders each bar at a length proportional to its share of total size. The fix shipped in v13.4.6 didn't take effect in the live webview and v13.4.7 didn't carry a re-fix, so bars kept rendering at the full track width across both releases; this release switches to the same CSS pattern the Findings Dashboard's bar charts have used reliably for months. No action required — reopen the report after updating.

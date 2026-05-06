@@ -1,0 +1,68 @@
+{
+  "toolbar": {
+    "runAnalysis": "تجزيي هلائو",
+    "rescan": "ٻيهر اسڪين",
+    "refresh": "ريفريش",
+    "copyJson": "JSON ڪاپي ڪريو",
+    "saveReport": "رپورٽ محفوظ ڪريو",
+    "moreActions": "وڌيڪ ايڪشنز",
+    "clearAll": "سڀ صاف ڪريو",
+    "resetView": "ويئو ري سيٽ ڪريو"
+  },
+  "empty": {
+    "noFindingsTitle": "ڪا به نتيجا ناهن",
+    "noFindingsMessage": "ورڪ اسپيس اسڪين ڪرڻ لاءِ تجزيو هلائو.",
+    "noFindingsCta": "تجزيي هلائو",
+    "noMatchTitle": "ڪو ميچ نه مليو",
+    "noMatchMessage": "ڪو به قطار موجوده فلٽرن سان نه ملي.",
+    "noMatchCta": "فلٽر ري سيٽ ڪريو",
+    "noProjectTitle": "ڪو ورڪ اسپيس کليل ناهي",
+    "noProjectMessage": "نتيجا ڏسڻ لاءِ Flutter يا Dart پروجيڪٽ کوليو.",
+    "noProjectCta": "فولڊر کوليو",
+    "noDataTitle": "اڃا ڪو ڊيٽا ناهي",
+    "noDataMessage": "هن ڊيش بورڊ کي ڀرڻ لاءِ اسڪين هلائو.",
+    "noDataCta": "تجزيي هلائو"
+  },
+  "loading": {
+    "thinking": "سوچي رهيو آهي…",
+    "preparing": "تياري ٿي رهي آهي…",
+    "checking": "چيڪ ٿي رهيو آهي…",
+    "fetching": "آڻي رهيو آهي…",
+    "working": "ڪم جاري آهي…",
+    "scanning": "اسڪين ٿي رهيو آهي…",
+    "cancel": "منسوخ"
+  },
+  "error": {
+    "genericTitle": "ڪجهه غلط ٿي ويو",
+    "retry": "ٻيهر ڪوشش",
+    "reload": "ٻيهر لوڊ ڪريو",
+    "copyDetails": "تفصيل ڪاپي ڪريو",
+    "unreachable": "{target} تائين پهچي نه سگهيو",
+    "partialSummary": "{total} مان {loaded} {item} لوڊ ٿيا. {failed} ناڪام ٿيا.",
+    "partialRetry": "ٻيهر ڪوشش ناڪام ٿي"
+  },
+  "offline": {
+    "banner": "آف لائن — ريفريش لاءِ ٻيهر ڳنڍيو.",
+    "cachedFooter": "{when} جو ڪيش ٿيل ڊيٽا ڏيکاريو پيو وڃي.",
+    "reconnecting": "ٻيهر ڳنڍجي رهيو آهي…"
+  },
+  "stale": {
+    "statusPill": "آخري ڪامياب رن {when} — ريفريش ناڪام"
+  },
+  "filter": {
+    "searchPlaceholder": "ڳوليو…",
+    "clearSearch": "ڳولا صاف ڪريو",
+    "activeLabel": "فعال فلٽر:",
+    "recentLabel": "تازو ▾",
+    "chipRemove": "هٽايو"
+  },
+  "a11y": {
+    "toggleFullWidth": "پوري ويڪر واري لي آئوٽ ٽوگل ڪريو",
+    "sortBy": "{column} موجب ترتيب ڏيو",
+    "expandRow": "قطار وڌايو",
+    "collapseRow": "قطار سميٽيو",
+    "selectAll": "سڀ قطارون چونڊيو",
+    "keyboardShortcuts": "ڪي بورڊ شارٽ ڪٽس",
+    "announcer": "فلٽر ۽ ترتيب واري حالت جون تازه ڪاريون هتي ٻڌايون وينديون."
+  }
+}

@@ -10,6 +10,7 @@
 import * as vscode from 'vscode';
 import { readPubspec } from '../pubspecReader';
 import { getProjectRoot } from '../projectRoot';
+import { getCurrentLocale } from '../i18n/runtime';
 import { getViolationsTriageState, readViolations } from '../violationsReader';
 import {
   type ConfigTreeNode,
@@ -69,6 +70,10 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigTreeNod
     const enabled = cfg.get<boolean>('enabled', true) ?? true;
     const tier = cfg.get<string>('tier', 'recommended') ?? 'recommended';
     const runAfter = cfg.get<boolean>('runAnalysisAfterConfigChange', true) ?? true;
+    const uiLanguage = cfg.get<string>('uiLanguage', 'auto') ?? 'auto';
+    const localeLabel = uiLanguage === 'auto'
+      ? `Auto (${getCurrentLocale()})`
+      : uiLanguage;
 
     const items: ConfigTreeNode[] = [
       setting('Lint integration', enabled ? 'On' : 'Off', enabled ? 'saropaLints.disable' : 'saropaLints.enable'),
@@ -82,6 +87,7 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigTreeNod
       // sidebar item to navigate somewhere. Toggling a boolean in one click
       // beats opening the Settings UI just to flip a checkbox.
       setting('Run analysis after config change', runAfter ? 'Yes' : 'No', 'saropaLints.toggleRunAnalysisAfterConfigChange'),
+      setting('UI language', localeLabel, 'saropaLints.pickUiLanguage'),
     ];
 
     // Detected platform/packages from pubspec.

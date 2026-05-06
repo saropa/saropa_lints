@@ -1,0 +1,68 @@
+{
+  "toolbar": {
+    "runAnalysis": "Run analysis",
+    "rescan": "Rescan",
+    "refresh": "Refresh",
+    "copyJson": "Copy JSON",
+    "saveReport": "Save report",
+    "moreActions": "More actions",
+    "clearAll": "Clear all",
+    "resetView": "Reset view"
+  },
+  "empty": {
+    "noFindingsTitle": "No findings",
+    "noFindingsMessage": "Run analysis to scan the workspace.",
+    "noFindingsCta": "Run analysis",
+    "noMatchTitle": "No matches",
+    "noMatchMessage": "No rows match the current filters.",
+    "noMatchCta": "Reset filters",
+    "noProjectTitle": "No workspace open",
+    "noProjectMessage": "Open a Flutter or Dart project to see findings.",
+    "noProjectCta": "Open folder",
+    "noDataTitle": "No data yet",
+    "noDataMessage": "Run a scan to populate this dashboard.",
+    "noDataCta": "Run analysis"
+  },
+  "loading": {
+    "thinking": "Thinking…",
+    "preparing": "Preparing…",
+    "checking": "Checking…",
+    "fetching": "Fetching…",
+    "working": "Working…",
+    "scanning": "Scanning…",
+    "cancel": "Cancel"
+  },
+  "error": {
+    "genericTitle": "Something went wrong",
+    "retry": "Retry",
+    "reload": "Reload",
+    "copyDetails": "Copy details",
+    "unreachable": "Could not reach {target}",
+    "partialSummary": "{loaded} of {total} {item} loaded. {failed} failed.",
+    "partialRetry": "Retry failed"
+  },
+  "offline": {
+    "banner": "Offline — reconnect to refresh.",
+    "cachedFooter": "Showing cached data from {when}.",
+    "reconnecting": "Reconnecting…"
+  },
+  "stale": {
+    "statusPill": "Last successful run {when} — refresh failed"
+  },
+  "filter": {
+    "searchPlaceholder": "Search…",
+    "clearSearch": "Clear search",
+    "activeLabel": "Active filters:",
+    "recentLabel": "Recent ▾",
+    "chipRemove": "Remove"
+  },
+  "a11y": {
+    "toggleFullWidth": "Toggle full-width layout",
+    "sortBy": "Sort by {column}",
+    "expandRow": "Expand row",
+    "collapseRow": "Collapse row",
+    "selectAll": "Select all rows",
+    "keyboardShortcuts": "Keyboard shortcuts",
+    "announcer": "Updates to filter and sort state are announced here."
+  }
+}

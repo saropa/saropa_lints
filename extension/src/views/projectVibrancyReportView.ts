@@ -52,6 +52,12 @@ export async function openProjectVibrancyReport(): Promise<void> {
   return inflightScan;
 }
 
+/** Re-run Code Health scan only when its dashboard tab is already open. */
+export function refreshCodeHealthDashboardIfOpen(): void {
+  if (!currentPanel) return;
+  void openProjectVibrancyReport();
+}
+
 async function runScanAndRender(projectRoot: string): Promise<void> {
   const scan = await vscode.window.withProgress(
     {

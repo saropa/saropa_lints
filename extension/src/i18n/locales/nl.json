@@ -1,0 +1,68 @@
+{
+  "toolbar": {
+    "runAnalysis": "Analyse uitvoeren",
+    "rescan": "Opnieuw scannen",
+    "refresh": "Vernieuwen",
+    "copyJson": "JSON kopieren",
+    "saveReport": "Rapport opslaan",
+    "moreActions": "Meer acties",
+    "clearAll": "Alles wissen",
+    "resetView": "Weergave resetten"
+  },
+  "empty": {
+    "noFindingsTitle": "Geen bevindingen",
+    "noFindingsMessage": "Voer een analyse uit om de werkruimte te scannen.",
+    "noFindingsCta": "Analyse uitvoeren",
+    "noMatchTitle": "Geen overeenkomsten",
+    "noMatchMessage": "Geen rijen komen overeen met de huidige filters.",
+    "noMatchCta": "Filters resetten",
+    "noProjectTitle": "Geen werkruimte geopend",
+    "noProjectMessage": "Open een Flutter- of Dart-project om bevindingen te zien.",
+    "noProjectCta": "Map openen",
+    "noDataTitle": "Nog geen gegevens",
+    "noDataMessage": "Voer een scan uit om dit dashboard te vullen.",
+    "noDataCta": "Analyse uitvoeren"
+  },
+  "loading": {
+    "thinking": "Denken…",
+    "preparing": "Voorbereiden…",
+    "checking": "Controleren…",
+    "fetching": "Ophalen…",
+    "working": "Bezig…",
+    "scanning": "Scannen…",
+    "cancel": "Annuleren"
+  },
+  "error": {
+    "genericTitle": "Er is iets misgegaan",
+    "retry": "Opnieuw proberen",
+    "reload": "Opnieuw laden",
+    "copyDetails": "Details kopieren",
+    "unreachable": "{target} kon niet worden bereikt",
+    "partialSummary": "{loaded} van {total} {item} geladen. {failed} mislukt.",
+    "partialRetry": "Opnieuw proberen mislukt"
+  },
+  "offline": {
+    "banner": "Offline — maak opnieuw verbinding om te vernieuwen.",
+    "cachedFooter": "Gecachte gegevens van {when} worden getoond.",
+    "reconnecting": "Opnieuw verbinden…"
+  },
+  "stale": {
+    "statusPill": "Laatste succesvolle run {when} — vernieuwen mislukt"
+  },
+  "filter": {
+    "searchPlaceholder": "Zoeken…",
+    "clearSearch": "Zoeken wissen",
+    "activeLabel": "Actieve filters:",
+    "recentLabel": "Recent ▾",
+    "chipRemove": "Verwijderen"
+  },
+  "a11y": {
+    "toggleFullWidth": "Lay-out op volledige breedte in-/uitschakelen",
+    "sortBy": "Sorteren op {column}",
+    "expandRow": "Rij uitvouwen",
+    "collapseRow": "Rij samenvouwen",
+    "selectAll": "Alle rijen selecteren",
+    "keyboardShortcuts": "Sneltoetsen",
+    "announcer": "Updates van filter- en sorteertoestand worden hier aangekondigd."
+  }
+}

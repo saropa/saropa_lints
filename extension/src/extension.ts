@@ -48,7 +48,7 @@ import { showAboutPanel } from './views/aboutView';
 import { registerIssuesViewCommands } from './commands/issuesViewCommands';
 import { showCommandCatalogPanel } from './views/commandCatalogView';
 import { showRelatedRuleTelemetryPanel } from './views/relatedRuleTelemetryView';
-import { openProjectVibrancyReport } from './views/projectVibrancyReportView';
+import { openProjectVibrancyReport, refreshCodeHealthDashboardIfOpen } from './views/projectVibrancyReportView';
 import { discoverServer } from './driftAdvisor/discovery';
 import { fetchIssues } from './driftAdvisor/client';
 import { mapIssuesToLocations } from './driftAdvisor/mapper';
@@ -115,6 +115,8 @@ import { registerCrossFileCommands } from './cross-file-commands';
 import { registerCopyAsJsonCommands } from './extensionCopyAsJsonCommands';
 import { openViolationsWideReport, refreshFindingsDashboardIfOpen } from './views/violationsWideReportView';
 import { pickWorkspaceFolder } from './workspaceFolderPicker';
+import { setCurrentLocale } from './i18n/runtime';
+import { VibrancyReportPanel } from './vibrancy/views/report-webview';
 
 function getConfig() {
   return vscode.workspace.getConfiguration('saropaLints');
@@ -216,6 +218,14 @@ function syncRuleMetadataFromViolations(data: ViolationsData | null): void {
 }
 
 export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
+  const applyUiLocalePreference = (): string => {
+    const cfg = vscode.workspace.getConfiguration('saropaLints');
+    const preferred = cfg.get<string>('uiLanguage', 'auto') ?? 'auto';
+    const requested = preferred === 'auto' ? vscode.env.language : preferred;
+    return setCurrentLocale(requested);
+  };
+  applyUiLocalePreference();
+
   // Detect whether this workspace is a Dart/Flutter project so the UI can
   // show appropriate welcome content instead of a misleading "Enable" button.
   // getProjectRoot() searches workspace root then one-level-deep subdirectories.
@@ -332,6 +342,14 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   );
 
   const rulePacksWebviewProvider = new RulePacksWebviewProvider(context.extensionUri);
+  const reloadOpenDashboardsForLocale = (): void => {
+    refreshFindingsDashboardIfOpen(context);
+    rulePacksWebviewProvider.refresh();
+    if (VibrancyReportPanel.currentPanel) {
+      void vscode.commands.executeCommand('saropaLints.packageVibrancy.showReport');
+    }
+    refreshCodeHealthDashboardIfOpen();
+  };
 
   registerCrossFileCommands(context);
   let driftAdvisorRefreshInProgress = false;
@@ -446,6 +464,11 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     },
     vscode.workspace.onDidChangeConfiguration((e) => {
       if (!e.affectsConfiguration('saropaLints')) return;
+      if (e.affectsConfiguration('saropaLints.uiLanguage')) {
+        applyUiLocalePreference();
+        refreshAllSections();
+        reloadOpenDashboardsForLocale();
+      }
       if (e.affectsConfiguration('saropaLints.violationsGroupBy')) {
         issuesProvider.setGroupBy(parseViolationsGroupBy(vscode.workspace.getConfiguration('saropaLints')));
       }
@@ -762,6 +785,42 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         : vscode.ConfigurationTarget.Global;
       await cfg.update('runAnalysisAfterConfigChange', !cur, target);
       refreshAllSections();
+    }),
+    vscode.commands.registerCommand('saropaLints.pickUiLanguage', async () => {
+      const cfg = vscode.workspace.getConfiguration('saropaLints');
+      const current = cfg.get<string>('uiLanguage', 'auto') ?? 'auto';
+      const picked = await vscode.window.showQuickPick(
+        [
+          { label: 'Auto (follow VS Code language)', value: 'auto' },
+          { label: 'Arabic (ar)', value: 'ar' },
+          { label: 'German (de)', value: 'de' },
+          { label: 'English (en)', value: 'en' },
+          { label: 'Spanish (es)', value: 'es' },
+          { label: 'French (fr)', value: 'fr' },
+          { label: 'Hindi (hi)', value: 'hi' },
+          { label: 'Italian (it)', value: 'it' },
+          { label: 'Japanese (ja)', value: 'ja' },
+          { label: 'Korean (ko)', value: 'ko' },
+          { label: 'Dutch (nl)', value: 'nl' },
+          { label: 'Portuguese (pt)', value: 'pt' },
+          { label: 'Russian (ru)', value: 'ru' },
+          { label: 'Urdu (ur)', value: 'ur' },
+          { label: 'Chinese (zh)', value: 'zh' },
+        ],
+        {
+          title: 'Saropa Lints UI language',
+          placeHolder: 'Choose language for sidebar and dashboards',
+        },
+      );
+      if (!picked || picked.value === current) return;
+      const target = vscode.workspace.workspaceFolders?.length
+        ? vscode.ConfigurationTarget.Workspace
+        : vscode.ConfigurationTarget.Global;
+      await cfg.update('uiLanguage', picked.value, target);
+      const locale = applyUiLocalePreference();
+      refreshAllSections();
+      reloadOpenDashboardsForLocale();
+      void vscode.window.setStatusBarMessage(`Saropa Lints language: ${locale}`, 2500);
     }),
     vscode.commands.registerCommand('saropaLints.toggleSidebarSection', async (key: unknown) => {
       if (typeof key !== 'string') {

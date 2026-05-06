@@ -1,0 +1,68 @@
+{
+  "toolbar": {
+    "runAnalysis": "Executer l'analyse",
+    "rescan": "Relancer l'analyse",
+    "refresh": "Actualiser",
+    "copyJson": "Copier JSON",
+    "saveReport": "Enregistrer le rapport",
+    "moreActions": "Plus d'actions",
+    "clearAll": "Tout effacer",
+    "resetView": "Reinitialiser la vue"
+  },
+  "empty": {
+    "noFindingsTitle": "Aucun resultat",
+    "noFindingsMessage": "Executez une analyse pour examiner l'espace de travail.",
+    "noFindingsCta": "Executer l'analyse",
+    "noMatchTitle": "Aucune correspondance",
+    "noMatchMessage": "Aucune ligne ne correspond aux filtres actuels.",
+    "noMatchCta": "Reinitialiser les filtres",
+    "noProjectTitle": "Aucun espace de travail ouvert",
+    "noProjectMessage": "Ouvrez un projet Flutter ou Dart pour voir les resultats.",
+    "noProjectCta": "Ouvrir le dossier",
+    "noDataTitle": "Pas encore de donnees",
+    "noDataMessage": "Lancez une analyse pour alimenter ce tableau de bord.",
+    "noDataCta": "Executer l'analyse"
+  },
+  "loading": {
+    "thinking": "Reflexion…",
+    "preparing": "Preparation…",
+    "checking": "Verification…",
+    "fetching": "Recuperation…",
+    "working": "Traitement…",
+    "scanning": "Analyse…",
+    "cancel": "Annuler"
+  },
+  "error": {
+    "genericTitle": "Une erreur s'est produite",
+    "retry": "Reessayer",
+    "reload": "Recharger",
+    "copyDetails": "Copier les details",
+    "unreachable": "Impossible de joindre {target}",
+    "partialSummary": "{loaded} sur {total} {item} charges. {failed} ont echoue.",
+    "partialRetry": "Nouvelle tentative echouee"
+  },
+  "offline": {
+    "banner": "Hors ligne — reconnectez-vous pour actualiser.",
+    "cachedFooter": "Affichage des donnees en cache de {when}.",
+    "reconnecting": "Reconnexion…"
+  },
+  "stale": {
+    "statusPill": "Derniere execution reussie {when} — actualisation echouee"
+  },
+  "filter": {
+    "searchPlaceholder": "Rechercher…",
+    "clearSearch": "Effacer la recherche",
+    "activeLabel": "Filtres actifs :",
+    "recentLabel": "Recents ▾",
+    "chipRemove": "Supprimer"
+  },
+  "a11y": {
+    "toggleFullWidth": "Activer/desactiver la mise en page pleine largeur",
+    "sortBy": "Trier par {column}",
+    "expandRow": "Developper la ligne",
+    "collapseRow": "Reduire la ligne",
+    "selectAll": "Selectionner toutes les lignes",
+    "keyboardShortcuts": "Raccourcis clavier",
+    "announcer": "Les mises a jour des filtres et du tri sont annoncees ici."
+  }
+}

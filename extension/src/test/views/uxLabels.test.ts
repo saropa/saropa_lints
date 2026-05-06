@@ -26,11 +26,31 @@ interface PackageJsonShape {
   };
 }
 
+/** Flat key -> English string bundle for resolves %keys% contributed from package.json. */
+type PackageNls = Record<string, string>;
+
 /** package.json contributes: view names, commands, welcome copy (UX contract). */
 
 function loadPackageJson(): PackageJsonShape {
   const pkgPath = path.resolve(__dirname, '..', '..', '..', 'package.json');
   return JSON.parse(fs.readFileSync(pkgPath, 'utf8')) as PackageJsonShape;
+}
+
+function loadPackageNls(): PackageNls {
+  const nlsPath = path.resolve(__dirname, '..', '..', '..', 'package.nls.json');
+  return JSON.parse(fs.readFileSync(nlsPath, 'utf8')) as PackageNls;
+}
+
+/** Resolves `%key%` placeholders the same way VS Code does at runtime (English bundle). */
+function resolveNlsValue(raw: string, nls: PackageNls): string {
+  const trimmed = raw.trim();
+  const m = /^%([^%]+)%$/.exec(trimmed);
+  if (!m) {
+    return raw;
+  }
+  const resolved = nls[m[1]];
+  assert.ok(resolved !== undefined, `missing package.nls.json entry for "${m[1]}"`);
+  return resolved;
 }
 
 describe('UX labels in package.json', () => {
@@ -73,18 +93,23 @@ describe('UX labels in package.json', () => {
 
   it('uses Activity bar settings group title', () => {
     const pkg = loadPackageJson();
-    const hasGroup = pkg.contributes.configuration.some((section) => section.title === 'Activity bar');
+    const nls = loadPackageNls();
+    const hasGroup = pkg.contributes.configuration.some(
+      (section) => resolveNlsValue(section.title, nls) === 'Activity bar',
+    );
     assert.strictEqual(hasGroup, true, 'expected configuration title "Activity bar"');
   });
 
   it('contributes viewsWelcome on the Banner view for non-Dart projects', () => {
     const pkg = loadPackageJson();
+    const nls = loadPackageNls();
     // The Banner view stays visible whenever a banner is needed OR the
     // workspace is not a Dart project; its welcome content prompts for a
     // pubspec folder when the project type is wrong.
     const welcome = pkg.contributes.viewsWelcome.filter((entry) => entry.view === 'saropaLints.banner');
     assert.strictEqual(welcome.length, 1);
-    assert.strictEqual(welcome[0]!.contents.includes('pubspec.yaml'), true);
+    const bannerCopy = resolveNlsValue(welcome[0]!.contents, nls);
+    assert.strictEqual(bannerCopy.includes('pubspec.yaml'), true);
     assert.ok(
       !pkg.contributes.viewsWelcome.some((entry) => entry.view === 'saropaLints.overview'),
       'old overview welcome removed',
@@ -97,8 +122,9 @@ describe('UX labels in package.json', () => {
 
   it('uses Open Analysis Options command title', () => {
     const pkg = loadPackageJson();
+    const nls = loadPackageNls();
     const cmd = pkg.contributes.commands.find((entry) => entry.command === 'saropaLints.openConfig');
     assert.ok(cmd, 'expected saropaLints.openConfig command to exist');
-    assert.strictEqual(cmd?.title, 'Saropa Lints: Open Analysis Options');
+    assert.strictEqual(resolveNlsValue(cmd!.title, nls), 'Saropa Lints: Open Analysis Options');
   });
 });
