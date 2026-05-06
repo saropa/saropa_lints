@@ -12,7 +12,7 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (2107 i
 
 > **When implementing**: Remove from ROADMAP, add to CHANGELOG, register in `all_rules.dart` + `tiers.dart`. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
-> **Deferred rules**: Rules we cannot implement today are documented with full justification in [plan/deferred/](plan/deferred/). Do not re-propose rules listed there without addressing the stated barrier.
+> **Deferred rules**: Rules we cannot implement today are documented with full justification in [plans/deferred/](plans/deferred/). Do not re-propose rules listed there without addressing the stated barrier.
 
 ---
 
@@ -25,17 +25,17 @@ The `SaropaLintRule` base class provides enhanced features for all lint rules.
 #### Planned Enhancements
 
 Details and design notes for each enhancement are in the plan docs:
-`plan/discussion_056_suppression_tracking.md`, `plan/history/2026.04/2026.04.28/discussion_061_tier_based_filtering.md`,
-`plan/deferred/discussion_059_custom_ignore_prefixes.md`, and historical snapshots in
-`plan/history/` (including `discussion_055_diagnostic_statistics.md`,
+`plans/discussion_056_suppression_tracking.md`, `plans/history/2026.04/2026.04.28/discussion_061_tier_based_filtering.md`,
+`plans/deferred/discussion_059_custom_ignore_prefixes.md`, and historical snapshots in
+`plans/history/` (including `discussion_055_diagnostic_statistics.md`,
 `discussion_057_related_rules.md`, `discussion_058_batch_deduplication.md`, and
 `discussion_060_performance_tracking.md`).
 
 | Enhancement | Status | Notes |
 |-------------|--------|-------|
-| Suppression tracking and governance ([Discussion #56](plan/discussion_056_suppression_tracking.md)) | Done | Plugin tracking, extension Suppressions sidebar, overview suppression-rate metric, and CI/export schema/reporting are complete. |
-| Tier-based filtering ([Discussion #61](plan/history/2026.04/2026.04.28/discussion_061_tier_based_filtering.md)) | Done | Runtime cap via `SAROPA_TIER` / YAML (`saropa_tier`, `runtime_tier`); filters enabled set and visitor execution. |
-| Custom suppression prefixes ([Discussion #59](plan/deferred/discussion_059_custom_ignore_prefixes.md)) | Deferred | Policy-blocked; do not implement custom ignore parsing under current project policy. |
+| Suppression tracking and governance ([Discussion #56](plans/discussion_056_suppression_tracking.md)) | Done | Plugin tracking, extension Suppressions sidebar, overview suppression-rate metric, and CI/export schema/reporting are complete. |
+| Tier-based filtering ([Discussion #61](plans/history/2026.04/2026.04.28/discussion_061_tier_based_filtering.md)) | Done | Runtime cap via `SAROPA_TIER` / YAML (`saropa_tier`, `runtime_tier`); filters enabled set and visitor execution. |
+| Custom suppression prefixes ([Discussion #59](plans/deferred/discussion_059_custom_ignore_prefixes.md)) | Deferred | Policy-blocked; do not implement custom ignore parsing under current project policy. |
 
 ---
 
@@ -53,7 +53,7 @@ Recent additions from this bucket include `avoid_audio_in_background_without_con
 
 ### Cross-File CLI Improvements
 
-The CLI tool (`dart run saropa_lints:cross_file`) is functional but can be improved. See [plan/cross_file_cli_design.md](plan/cross_file_cli_design.md) for the full design.
+The CLI tool (`dart run saropa_lints:cross_file`) is functional but can be improved. See [plans/cross_file_cli_design.md](plans/cross_file_cli_design.md) for the full design.
 
 | Improvement | Status |
 |-------------|--------|
@@ -71,7 +71,7 @@ The CLI tool (`dart run saropa_lints:cross_file`) is functional but can be impro
 
 ### Project Vibrancy (planning)
 
-Project-level code health scoring and surfacing plan snapshot lives in [plan/history/2026.04/2026.04.28/project_vibrancy_report.md](plan/history/2026.04/2026.04.28/project_vibrancy_report.md). For execution order, see the **MVP Slice (first ship)** section in that document (collectors + scoring + CLI first, UI later).
+Project-level code health scoring and surfacing plan snapshot lives in [plans/history/2026.04/2026.04.28/project_vibrancy_report.md](plans/history/2026.04/2026.04.28/project_vibrancy_report.md). For execution order, see the **MVP Slice (first ship)** section in that document (collectors + scoring + CLI first, UI later).
 
 | Initiative | Status |
 |------------|--------|
@@ -102,12 +102,12 @@ Rules that cannot be implemented today are split into focused documents by barri
 
 | Document | Barrier | Rule count |
 |----------|---------|------------|
-| [cross_file_analysis.md](plan/deferred/cross_file_analysis.md) | Single-file AST — needs multi-Dart-file analysis | 26 |
-| [unreliable_detection.md](plan/deferred/unreliable_detection.md) | Heuristic / subjective / no AST pattern | 54 |
-| [external_dependencies.md](plan/deferred/external_dependencies.md) | Needs pub.dev API or maintained databases | 5 |
-| [framework_limitations.md](plan/deferred/framework_limitations.md) | Blocked by analyzer/IDE API limitations | 15 |
-| [compiler_diagnostics.md](plan/deferred/compiler_diagnostics.md) | Duplicates Dart compiler checks — high effort, low value | 28 |
-| [not_viable.md](plan/deferred/not_viable.md) | Reviewed and permanently rejected | 14 |
+| [cross_file_analysis.md](plans/deferred/cross_file_analysis.md) | Single-file AST — needs multi-Dart-file analysis | 26 |
+| [unreliable_detection.md](plans/deferred/unreliable_detection.md) | Heuristic / subjective / no AST pattern | 54 |
+| [external_dependencies.md](plans/deferred/external_dependencies.md) | Needs pub.dev API or maintained databases | 5 |
+| [framework_limitations.md](plans/deferred/framework_limitations.md) | Blocked by analyzer/IDE API limitations | 15 |
+| [compiler_diagnostics.md](plans/deferred/compiler_diagnostics.md) | Duplicates Dart compiler checks — high effort, low value | 28 |
+| [not_viable.md](plans/deferred/not_viable.md) | Reviewed and permanently rejected | 14 |
 
 **Total deferred: ~142 rules/items.** These will not be implemented until the stated barrier is addressed.
 

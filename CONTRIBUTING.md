@@ -361,7 +361,7 @@ Every new `SaropaFixProducer` subclass must add at least one entry to [`test/sca
 - **`fixKind` stable** — assert id, priority, and human-readable message constants. A drift here changes the lightbulb label users see.
 - **Applicability** — only assert if you override the `singleLocation` default.
 
-End-to-end "the rewrite produces the right source" coverage lives in [`test/scan/fix_application_dart_fix_dry_run_test.dart`](test/scan/fix_application_dart_fix_dry_run_test.dart) (runs `dart fix --dry-run` over `example/`) and the manual VS Code verification checklist in [`plan/TESTING_AND_RELEASE.md`](plan/TESTING_AND_RELEASE.md) §10 E. Diff-asserting unit tests are deferred — see plan §10 D-followup.
+End-to-end "the rewrite produces the right source" coverage lives in [`test/scan/fix_application_dart_fix_dry_run_test.dart`](test/scan/fix_application_dart_fix_dry_run_test.dart) (runs `dart fix --dry-run` over `example/`) and the manual VS Code verification checklist in [`plans/TESTING_AND_RELEASE.md`](plans/TESTING_AND_RELEASE.md) §10 E. Diff-asserting unit tests are deferred — see plan §10 D-followup.
 
 ### 8. Add tests
 

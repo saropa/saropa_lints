@@ -64,7 +64,7 @@ This release focuses on reducing high-noise false positives in common Flutter pa
 <details>
 <summary>Maintenance</summary>
 
-- Archived the resolved `avoid_opacity_animation` constant-opacity false-positive report under `plan/history/2026.04/2026.04.26/` and removed it from `bugs/`. No action required for package users.
+- Archived the resolved `avoid_opacity_animation` constant-opacity false-positive report under `plans/history/2026.04/2026.04.26/` and removed it from `bugs/`. No action required for package users.
 
 </details>
 
@@ -88,9 +88,9 @@ This release is a quality pass aimed at precision: fewer accidental matches, few
 <details>
 <summary>Maintenance</summary>
 
-- Archived the closed `require_notification_for_long_tasks` foreground false-positive report under `plan/history/2026.04/2026.04.26/` and removed it from `bugs/`. No action required for package users.
-- Archived the resolved `avoid_excessive_rebuilds_animation` false-positive report under `plan/history/2026.04/2026.04.26/` and removed it from `bugs/`. No action required for package users.
-- Archived the resolved `prefer_layout_builder_for_constraints` false-positive report under `plan/history/2026.04/2026.04.26/` and removed it from `bugs/`. No action required for package users.
+- Archived the closed `require_notification_for_long_tasks` foreground false-positive report under `plans/history/2026.04/2026.04.26/` and removed it from `bugs/`. No action required for package users.
+- Archived the resolved `avoid_excessive_rebuilds_animation` false-positive report under `plans/history/2026.04/2026.04.26/` and removed it from `bugs/`. No action required for package users.
+- Archived the resolved `prefer_layout_builder_for_constraints` false-positive report under `plans/history/2026.04/2026.04.26/` and removed it from `bugs/`. No action required for package users.
 
 </details>
 
@@ -110,7 +110,7 @@ This release cleans up disposal and accessibility false positives that were nois
 <details>
 <summary>Maintenance</summary>
 
-- Archived the closed `avoid_color_only_meaning` design-system wrapper companion false-positive report under `plan/history/2026.04/2026.04.25/` and removed it from `bugs/`. No action required for package users.
+- Archived the closed `avoid_color_only_meaning` design-system wrapper companion false-positive report under `plans/history/2026.04/2026.04.25/` and removed it from `bugs/`. No action required for package users.
 - The publish script’s combined coverage report now treats `repo_integrity` rules as using the shared `config` example fixtures, matching where those files already live. Additional validated example fixtures cover stylistic null-and-collection rules, stylistic whitespace and constructor preferences, and `prefer_semantics_sort`, with matching mock types for analysis. No action required for package users.
 
 </details>
@@ -143,8 +143,8 @@ New rules help you catch missing Android permissions, missing iOS privacy string
 <details>
 <summary>Maintenance</summary>
 
-- Archived closed `avoid_builder_index_out_of_bounds` false-positive investigation under `plan/history/2026.04/2026.04.25/` (removed duplicate from `bugs/`). No action required for package users.
-- Closed false-positive report for `require_image_picker_permission_ios` (existing `NSCameraUsageDescription`) under `plan/history/2026.04/2026.04.25/`. No action required for package users.
+- Archived closed `avoid_builder_index_out_of_bounds` false-positive investigation under `plans/history/2026.04/2026.04.25/` (removed duplicate from `bugs/`). No action required for package users.
+- Closed false-positive report for `require_image_picker_permission_ios` (existing `NSCameraUsageDescription`) under `plans/history/2026.04/2026.04.25/`. No action required for package users.
 
 </details>
 
@@ -161,7 +161,7 @@ New rules help you catch missing Android permissions, missing iOS privacy string
 <details>
 <summary>Maintenance</summary>
 
-- Deferred SDK plan notes consolidated under `plan/deferred/`; publish audit spelling prompt now retry/ignore; publish menu shows logo first; Windows temp-dir teardown hardened in one integration test. No action required for package users.
+- Deferred SDK plan notes consolidated under `plans/deferred/`; publish audit spelling prompt now retry/ignore; publish menu shows logo first; Windows temp-dir teardown hardened in one integration test. No action required for package users.
 - Rounded rule-count messaging is aligned to **2100+** / **~2100** everywhere (pub.dev description, extension listings, walkthrough, tier headers, and guides) so numbers match the current rule set. No action required.
 - Extension publish still tries Open VSX after a failed VS Code Marketplace upload, so the Open VSX listing can move forward when Marketplace auth fails but your Open VSX token is fine. No action required for package users.
 - Publish work-report “unsolved bug” count excludes the bug-filing guide at repo root so only real open bug files inflate that bar. No action required for package users.
@@ -327,10 +327,10 @@ New graph command for import visualization, a searchable command catalog in the 
 
 - **Unified pubspec.yaml listener**: Pubspec validation and SDK constraint diagnostics now share a single `registerPubspecDocListeners` helper with one debounce timer (300ms), eliminating duplicate event subscriptions. Includes error boundary — a pubspec validation failure does not block SDK diagnostics.
 - **Internal**: `parseDependencySections()` now accepts a pre-split lines array, eliminating a duplicate `content.split('\n')` call per validation run.
-- **Roadmap restructure**: Split deferred rules into focused documents in `plan/deferred/` by barrier type (cross-file, unreliable detection, external dependencies, framework limitations, compiler diagnostics, not viable). Trimmed ROADMAP.md to actionable content only. Moved cross-file CLI design to `plan/cross_file_cli_design.md`.
+- **Roadmap restructure**: Split deferred rules into focused documents in `plans/deferred/` by barrier type (cross-file, unreliable detection, external dependencies, framework limitations, compiler diagnostics, not viable). Trimmed ROADMAP.md to actionable content only. Moved cross-file CLI design to `plans/cross_file_cli_design.md`.
 - **Bug Report Guide**: Added `bugs/BUG_REPORT_GUIDE.md` — structured template and investigation checklist for filing lint rule bugs (false positives, false negatives, crashes, wrong fixes, performance)
 - **Changelog Archive**: Moved [9.9.0] and older logs to [CHANGELOG_ARCHIVE.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG_ARCHIVE.md)
-- **Plan history restore**: Restored 21 active plan/discussion/bug documents plus `deferred/` and `implementable_only_in_plugin_extension/` directories back to `plan/` root — these were incorrectly swept into `plan/history/` by the consolidation commit. Added `plan/history/INDEX.md` as a searchable index for the 1,069 history files.
+- **Plan history restore**: Restored 21 active plans/discussion/bug documents plus `deferred/` and `implementable_only_in_plugin_extension/` directories back to `plans/` root — these were incorrectly swept into `plans/history/` by the consolidation commit. Added `plans/history/INDEX.md` as a searchable index for the 1,069 history files.
 
 </details>
 

@@ -419,7 +419,7 @@ Use the date the bug was closed. Create the date folder if it does not exist.
 
 - Reference bugs from commits: `fix: description (rule_name false positive)`
 - Reference bugs from ROADMAP: `[bug file](bugs/rule_name_false_positive_description.md)`
-- Reference related history: `Related: plan/history/YYYY.MM/YYYYMMDD/filename.md`
+- Reference related history: `Related: plans/history/YYYY.MM/YYYYMMDD/filename.md`
 
 ---
 

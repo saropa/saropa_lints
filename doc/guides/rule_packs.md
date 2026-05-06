@@ -112,9 +112,9 @@ For **team-specific** analyzer diagnostics (naming wrappers, banned APIs, migrat
 - **Not a second native plugin** — The Dart analyzer enforces **one analyzer plugin per analysis context** for merged options, so you generally **cannot** run `saropa_lints` and a separate custom analyzer plugin together in the same project. See [dart-lang/sdk#50981](https://github.com/dart-lang/sdk/issues/50981).
 - **Outside the analyzer** — Codemods (`dart fix` custom transforms, bespoke CLI), CI grep/checks, or code review bots for policies that do not need IDE squiggles.
 
-Optional future work (`saropa_lints_api` / Phase 7 in the architecture plan) is **not shipped**; see [plan/plan_migration_plugin_system.md](../../plan/plan_migration_plugin_system.md) §10 Phase 7.
+Optional future work (`saropa_lints_api` / Phase 7 in the architecture plan) is **not shipped**; see [plans/plan_migration_plugin_system.md](../../plans/plan_migration_plugin_system.md) §10 Phase 7.
 
 ## See also
 
 - [composite_analyzer_plugin.md](composite_analyzer_plugin.md) — Saropa + custom rules in one plugin
-- [plan/plan_migration_plugin_system.md](../../plan/plan_migration_plugin_system.md) — full product plan
+- [plans/plan_migration_plugin_system.md](../../plans/plan_migration_plugin_system.md) — full product plan

@@ -661,7 +661,7 @@ baseline:
   only_impacts: [info] # Still see errors and warnings
 ```
 
-> **Severity model:** errors must be fixed; warnings could fail or look bad; info is FYI. The 5-bucket impact taxonomy (`critical / high / medium / low / opinionated`) collapsed into the analyzer's three native severities on 2026-05-03 — see `plan/COLLAPSE_LINT_IMPACT_TO_SEVERITY.md`. Existing `only_impacts: [low, medium, opinionated]` configs keep working (the values map to the new buckets) but new code should use `[info]` / `[warning]` / `[error]`.
+> **Severity model:** errors must be fixed; warnings could fail or look bad; info is FYI. The 5-bucket impact taxonomy (`critical / high / medium / low / opinionated`) collapsed into the analyzer's three native severities on 2026-05-03 — see `plans/COLLAPSE_LINT_IMPACT_TO_SEVERITY.md`. Existing `only_impacts: [low, medium, opinionated]` configs keep working (the values map to the new buckets) but new code should use `[info]` / `[warning]` / `[error]`.
 
 #### Cleaning Up Over Time
 
@@ -748,7 +748,7 @@ dart run bin/project_vibrancy.dart \
 
 Exit code is non-zero when any configured gate is violated. A sample workflow is available at `.github/workflows/project-vibrancy.yml`.
 
-JSON summary includes `stubTestedCount`, `suspiciousCoverageCount`, and `testDriftCount` (see [plan/history/2026.04/2026.04.28/project_vibrancy_report.md](plan/history/2026.04/2026.04.28/project_vibrancy_report.md) for flag semantics; LCOV lacks per-test attribution, so flags use importer + trivial-assertion heuristics).
+JSON summary includes `stubTestedCount`, `suspiciousCoverageCount`, and `testDriftCount` (see [plans/history/2026.04/2026.04.28/project_vibrancy_report.md](plans/history/2026.04/2026.04.28/project_vibrancy_report.md) for flag semantics; LCOV lacks per-test attribution, so flags use importer + trivial-assertion heuristics).
 
 ### Quality gate CLI (new-code focused)
 

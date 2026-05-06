@@ -1,0 +1,26 @@
+# Plan History Index
+
+## Purpose
+
+Searchable index of all files in `plans/history/`. Search this file instead of scanning 1,000+ history files.
+
+## Maintenance
+
+- When moving a file into `plans/history/YYYY.MM/YYYYMMDD/`, add a one-line entry to the appropriate month section below.
+- Format: `- [filename](YYYY.MM/YYYYMMDD/filename.md) — one-line summary of what the file covers`
+- Keep entries in chronological order within each month.
+- Summaries should be specific enough to find the file by keyword search (e.g., include the rule name, bug symptom, or feature name).
+- Do NOT describe the resolution or outcome — just what the file is about.
+
+## Index
+
+### 2026.01
+
+### 2026.02
+
+### 2026.03
+
+### 2026.04
+
+- [avoid_stream_subscription_in_field_false_positive_conditional_listen](2026.04/20260413/avoid_stream_subscription_in_field_false_positive_conditional_listen.md) — false positive when StreamSubscription field is conditionally assigned in a listen callback
+- [project_vibrancy_report](2026.04/2026.04.28/project_vibrancy_report.md) — Project Vibrancy scoring, collectors, gates, MVP slice, and UI/extension roadmap
