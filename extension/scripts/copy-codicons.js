@@ -18,3 +18,6 @@ if (!fs.existsSync(src)) {
 fs.rmSync(dest, { recursive: true, force: true });
 fs.cpSync(src, dest, { recursive: true });
 console.log('copy-codicons: ->', dest);
+
+// Keep Help sidebar panel title versioned in every locale bundle.
+require('./sync-help-version');
