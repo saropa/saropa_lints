@@ -53,6 +53,7 @@ class InfoPlistChecker {
   /// Results are cached per project root for efficiency.
   static InfoPlistChecker? forFile(String filePath) {
     final fsPath = _toFilesystemPath(filePath);
+    if (fsPath == null) return null;
     final projectRoot = _findProjectRoot(fsPath);
     if (projectRoot == null) return null;
 
@@ -115,16 +116,21 @@ class InfoPlistChecker {
     return checker;
   }
 
-  /// Converts `file:` URIs from the analyzer to a path [File] can open.
-  static String _toFilesystemPath(String filePath) {
+  /// Converts analyzer paths/URIs to a filesystem path.
+  ///
+  /// Returns `null` for non-filesystem URI schemes (for example `package:` and
+  /// `dart:`) so callers can safely skip project-root discovery.
+  static String? _toFilesystemPath(String filePath) {
     final trimmed = filePath.trim();
-    if (!trimmed.startsWith('file:')) return trimmed;
+    if (!trimmed.contains(':')) return trimmed;
+    if (RegExp(r'^[A-Za-z]:[\\/]').hasMatch(trimmed)) return trimmed;
     try {
       final uri = Uri.parse(trimmed);
       if (uri.isScheme('file')) {
         final path = uri.toFilePath();
         if (path.isNotEmpty) return path;
       }
+      if (uri.hasScheme) return null;
     } catch (e, st) {
       developer.log(
         'InfoPlistChecker file URI parse failed',
@@ -142,7 +148,8 @@ class InfoPlistChecker {
   /// Returns `null` if no pubspec.yaml is found.
   static String? _findProjectRoot(String filePath) {
     // Normalize path separators for cross-platform compatibility
-    final normalizedPath = filePath.replaceAll('\\', '/');
+    final normalizedPath = _normalizeFilesystemPath(filePath);
+    if (!_isFilesystemPath(normalizedPath)) return null;
 
     // Start from the file's directory
     var current = normalizedPath;
@@ -172,6 +179,25 @@ class InfoPlistChecker {
     }
 
     return null;
+  }
+
+  /// Normalizes file paths across platforms.
+  ///
+  /// Analyzer paths can come through as `/C:/...` for Windows file URIs. Strip
+  /// that leading slash so parent traversal handles Windows drive roots.
+  static String _normalizeFilesystemPath(String path) {
+    var normalized = path.replaceAll('\\', '/');
+    if (RegExp(r'^/[A-Za-z]:/').hasMatch(normalized)) {
+      normalized = normalized.substring(1);
+    }
+    return normalized;
+  }
+
+  /// Returns true for paths that can be traversed on disk.
+  static bool _isFilesystemPath(String path) {
+    return path.startsWith('/') ||
+        path.startsWith('//') ||
+        RegExp(r'^[A-Za-z]:/').hasMatch(path);
   }
 
   /// Whether an Info.plist file was found and successfully read.

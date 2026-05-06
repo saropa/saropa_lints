@@ -241,6 +241,11 @@ NSCameraUsageDescription
       expect(checker.hasKey('NSCameraUsageDescription'), isTrue);
     });
 
+    test('forFile returns null for non-filesystem URIs', () {
+      final checker = InfoPlistChecker.forFile('package:app/src/biometrics.dart');
+      expect(checker, isNull);
+    });
+
     test(
       'reloads plist when file stat snapshot changes (cache invalidation)',
       () {

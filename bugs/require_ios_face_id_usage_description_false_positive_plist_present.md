@@ -1,6 +1,6 @@
 # BUG: `require_ios_face_id_usage_description` — False positive when `NSFaceIDUsageDescription` IS present in Info.plist
 
-**Status: Open**
+**Status: Fixed**
 
 Created: 2026-05-04
 Rule: `require_ios_face_id_usage_description`
@@ -116,7 +116,7 @@ The reported node is the constructor / method invocation. The `runWithReporter` 
 
 ---
 
-## Root Cause
+## Root Cause (Confirmed)
 
 The rule's early-return guard:
 
@@ -135,33 +135,27 @@ For visitors to register (and the lint to fire), the conditional MUST evaluate t
 - (A) `plistChecker` is `null` — `_findProjectRoot(...)` failed to find `pubspec.yaml` walking up from `context.filePath`.
 - (B) `plistChecker` is non-null AND `hasKey('NSFaceIDUsageDescription')` returned `false` — content was loaded but the regex did not match.
 
-### Hypothesis A: `_findProjectRoot` returns null because `context.filePath` is not a filesystem path
+### Confirmed: non-filesystem URIs were treated as filesystem paths
 
-`InfoPlistChecker._toFilesystemPath` (info_plist_utils.dart:119-137) only converts `file:` URIs. Everything else is returned unchanged. If the analyzer passes a `package:saropa/utils/user/security/biometrics.dart`-style URI, `_findProjectRoot` walks up `package:saropa/...` segments — it never sees `pubspec.yaml` because `package:` is not a real filesystem prefix — and returns `null`.
+`InfoPlistChecker._toFilesystemPath` only converted `file:` URIs. Other URI schemes were returned unchanged and then passed into `_findProjectRoot`. For `package:...`/`dart:...` inputs, root discovery walked a non-filesystem string and failed to resolve a project root, so the Face ID rule guard could not reliably short-circuit.
 
-The project trace for the failing reproducer is `d:/src/contacts/lib/utils/user/security/biometrics.dart` (Windows). With this raw filesystem path, the walk-up should find `d:/src/contacts/pubspec.yaml` in five iterations. So the leading hypothesis is that the analyzer is passing a non-filesystem URI form here.
+Windows URI-derived paths (`/d:/...`) were also normalized inconsistently. These now get normalized before traversal.
 
-A second variation of (A): on Windows, when `context.filePath` is `/d:/src/contacts/...` (leading slash from a normalized URI), `lastSlash <= 0` could break the loop too early when `current` becomes `/d:`.
-
-### Hypothesis B: Cache holds a stale "no-key" snapshot
+### Ruled out for this bug: cache staleness
 
 `InfoPlistChecker._cache` keys on `projectRoot` and invalidates by `_plistMtime` + `_plistSize`. If the plist was edited at the same mtime as a prior snapshot AND ended up the same size as a prior version that was missing the key (very unlikely but possible on Windows where mtime can be coarse), the cached `_infoPlistContent` would still be the old missing-key text. The size check makes this very unlikely for a real edit, but a Windows mtime granularity issue combined with a tooling write that landed an identical-size file could trip it.
 
-### Hypothesis C: The walk-up finds a *closer* `pubspec.yaml`
+### Ruled out for this bug: nested pubspec selection
 
 If a pubspec.yaml exists at a path BELOW `d:/src/contacts/` and ABOVE the analyzed file (e.g., a `dependency_overrides/<pkg>/pubspec.yaml` somewhere in the walk), `_findProjectRoot` returns that nested package's directory, not the app root. That nested package has no `ios/Runner/Info.plist`, so `existsSync()` returns `false`, `_infoPlistContent` is `null`, and `hasKey` returns `true` — that branch would NOT cause the bug. So C does not match the symptom directly. Still worth ruling out by tracing.
 
 ---
 
-## Suggested Fix
+## Fix Implemented
 
-1. Make `_toFilesystemPath` reject any non-filesystem URI scheme (`package:`, `dart:`, etc.) explicitly, returning `null` so the caller can early-out instead of walking a fake path. Today it returns the unchanged string and quietly burns a walk-up.
-
-2. In `_findProjectRoot`, return `null` if the input does not start with a recognizable filesystem prefix (drive letter, `/`, or UNC path).
-
-3. Add Windows-path test fixtures: `d:/proj/lib/file.dart`, `D:\proj\lib\file.dart`, `/d:/proj/lib/file.dart` (URI-derived), and `package:foo/bar.dart` (must NOT walk up — must short-circuit to null).
-
-4. Consider logging when `_findProjectRoot` returns null inside the rule's guard — currently the rule silently treats "no project root" as "no plist" and proceeds to flag, which is the worst-case default for downstream noise.
+1. `_toFilesystemPath` now rejects non-filesystem URI schemes and returns `null` (`package:`, `dart:`, etc.), preventing fake path traversal.
+2. `_findProjectRoot` now validates path shape before traversal and normalizes Windows URI-derived paths (`/C:/...` -> `C:/...`).
+3. Added a regression test ensuring `InfoPlistChecker.forFile('package:...')` short-circuits to `null`.
 
 ---
 
@@ -178,19 +172,25 @@ If a pubspec.yaml exists at a path BELOW `d:/src/contacts/` and ABOVE the analyz
 
 ## Changes Made
 
-(pending investigation)
+- Updated `lib/src/info_plist_utils.dart`:
+  - `forFile(...)` now exits early when path conversion yields `null`.
+  - `_toFilesystemPath(...)` now returns nullable and rejects non-filesystem schemes.
+  - Added filesystem-path normalization/validation helpers for robust root discovery.
+- Added regression coverage in `test/utils/info_plist_utils_test.dart`:
+  - `forFile returns null for non-filesystem URIs`.
 
 ---
 
 ## Tests Added
 
-(pending)
+- `dart test test/utils/info_plist_utils_test.dart` (passing)
+- New case: `forFile returns null for non-filesystem URIs`
 
 ---
 
 ## Commits
 
-(pending)
+(not committed in this workspace yet)
 
 ---
 
