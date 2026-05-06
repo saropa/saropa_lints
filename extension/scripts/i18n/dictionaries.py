@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Dict
 
-
+# cspell:disable
 TRANSLATIONS: Dict[str, Dict[str, str]] = {
     "nl": {
         "Search": "Zoeken",

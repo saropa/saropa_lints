@@ -1,3 +1,8 @@
+/// Regression tests for `avoid_nested_scrollables_conflict` via fixture slicing.
+///
+/// The rule is exercised by the real analyzer on `example/` sources elsewhere;
+/// here we assert fixture segments still declare `// expect_lint` only where
+/// same-axis nesting should fire, and omit it for cross-axis or physics escapes.
 import 'dart:io';
 
 import 'package:saropa_lints/saropa_lints.dart';

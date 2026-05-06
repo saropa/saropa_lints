@@ -1,3 +1,7 @@
+/**
+ * Ensures sidebar section constants stay empty after the activity-bar migration
+ * and that `setContext` key helpers still produce stable `saropaLints.*` ids.
+ */
 import * as assert from 'node:assert';
 import {
     SIDEBAR_SECTIONS,

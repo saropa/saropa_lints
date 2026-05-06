@@ -4,24 +4,49 @@ import 'package:path/path.dart' as p;
 import 'package:saropa_lints/src/project_context.dart';
 import 'package:saropa_lints/src/string_slice_utils.dart';
 
+/// Cross-file helpers for the saropa_lints CLI when scanning a consumer project.
+///
+/// Covers: directed edges between feature folders under `lib/features/`,
+/// conservative `lib` → `test` mirror coverage checks, and glob patterns for
+/// path filters. These utilities intentionally avoid full package resolution;
+/// they operate on normalized paths and data from [ImportGraphCache].
+///
+/// Aggregated feature-to-feature dependency graph for a single project scan.
+///
+/// [featureDependencies] maps a feature folder name (first segment after
+/// `lib/features/`) to distinct other features it imports across the scan set.
+/// [crossFeatureImports] lists human-readable `importer -> imported` edges using
+/// project-relative paths for diagnostics and summaries.
 class FeatureDepsResult {
   const FeatureDepsResult({
     required this.featureDependencies,
     required this.crossFeatureImports,
   });
 
+  /// Sorted map: feature name → sorted list of depended-on feature names.
   final Map<String, List<String>> featureDependencies;
+
+  /// Sorted list of `relativeImporter -> relativeImported` cross-feature edges.
   final List<String> crossFeatureImports;
 }
 
+/// Builds a cross-feature import graph for paths under `lib/features/<name>/`.
+///
+/// [projectPath] is normalized to POSIX-style separators internally so feature
+/// detection is stable on Windows hosts. Only imports where both endpoints are
+/// in [includedPaths] contribute; same-feature imports and imports outside
+/// `lib/features/` are ignored. Output collections are sorted for stable diffs.
 FeatureDepsResult analyzeFeatureDependencies({
   required String projectPath,
   required Set<String> includedPaths,
 }) {
   final root = p.normalize(projectPath).replaceAll('\\', '/');
+  // Directed edges: fromFeature → set(toFeature); sets dedupe parallel imports.
   final featureDeps = <String, Set<String>>{};
+  // One string per cross-feature edge for CLI reporting.
   final crossImports = <String>{};
 
+  /// Returns the first path segment under `lib/features/` or null if absent.
   String? featureNameFor(String absolutePath) {
     final normalized = p.normalize(absolutePath).replaceAll('\\', '/');
     final marker = '$root/lib/features/';
@@ -33,25 +58,30 @@ FeatureDepsResult analyzeFeatureDependencies({
     return feature.isEmpty ? null : feature;
   }
 
+  /// Strips [root] prefix when present; otherwise returns a normalized path.
   String toRelative(String absolutePath) {
     final normalized = p.normalize(absolutePath).replaceAll('\\', '/');
     if (!normalized.startsWith(root)) return normalized;
     return normalized.afterIndex(root.length).replaceFirst(RegExp('^/'), '');
   }
 
+  // Outer: every scanned file that lives inside a feature folder.
   for (final importer in includedPaths) {
     final fromFeature = featureNameFor(importer);
     if (fromFeature == null) continue;
     final imports = ImportGraphCache.getImports(importer);
+    // Inner: resolved import targets that are also in the active scan set.
     for (final imported in imports) {
       if (!includedPaths.contains(imported)) continue;
       final toFeature = featureNameFor(imported);
+      // Skip non-feature targets and intra-feature imports (allowed by design).
       if (toFeature == null || toFeature == fromFeature) continue;
       featureDeps.putIfAbsent(fromFeature, () => <String>{}).add(toFeature);
       crossImports.add('${toRelative(importer)} -> ${toRelative(imported)}');
     }
   }
 
+  // Materialize stable, sorted structures for deterministic CLI output.
   final sortedMap = <String, List<String>>{};
   final keys = featureDeps.keys.toList()..sort();
   for (final key in keys) {

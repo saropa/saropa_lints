@@ -1,3 +1,8 @@
+/// Regression tests for `avoid_inert_animation_value_in_build` using fixture markers.
+///
+/// Validates registration and inspects the example fixture: compliant patterns
+/// must not carry `expect_lint` for this rule so benign `AnimatedBuilder` reads
+/// are not accidentally classified as inert `Animation` value access in `build`.
 import 'dart:io';
 
 import 'package:saropa_lints/saropa_lints.dart';

@@ -1,16 +1,32 @@
+/**
+ * Registers VS Code command handlers for the Issues / Violations tree: text and
+ * structured filters, security-hotspot triage, focus-one-file mode, and group-by.
+ *
+ * Each handler updates `IssuesTreeProvider` state and refreshes the view title
+ * via `updateIssuesViewMessage` where needed. Returned disposables must be
+ * pushed onto the extension context subscription list so commands unregister on
+ * deactivate.
+ */
 import * as vscode from 'vscode';
 import { type GroupByMode, type IssueTreeNode, type IssuesTreeProvider } from '../views/issuesTree';
 import { type SecurityHotspotReviewState, type SecurityHotspotReviewStateService, isSecurityHotspotViolation } from '../securityHotspotReviewState';
 import { type ViolationsData } from '../violationsReader';
 
+/** Injected collaborators so `registerIssuesViewCommands` stays testable and thin. */
 interface RegisterIssuesViewCommandsDeps {
+  /** Backing data model for the Issues tree (filters, grouping, refresh). */
   issuesProvider: IssuesTreeProvider;
+  /** Recomputes the view title / description after filter mutations. */
   updateIssuesViewMessage: () => void;
+  /** Workspace folder root for reading `violations.json` off disk. */
   getProjectRoot: () => string | undefined;
+  /** Loads the latest violations payload for metadata-driven filters. */
   readViolations: (root: string) => ViolationsData | null;
+  /** Persists per-violation hotspot review state in workspace memento storage. */
   hotspotReviewState: SecurityHotspotReviewStateService;
 }
 
+/** Wires `saropaLints.*` palette and tree commands; returns all `Disposable`s to retain. */
 export function registerIssuesViewCommands(
   deps: RegisterIssuesViewCommandsDeps,
 ): vscode.Disposable[] {

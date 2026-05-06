@@ -1,3 +1,8 @@
+/**
+ * Snapshot-style tests for `buildSidebarMirrorPanelsHtml`: verifies the HTML
+ * mirrors key violation export fields (suppression breakdown, OWASP hints) so
+ * dashboard webviews stay aligned with `ViolationsData` shape changes.
+ */
 import '../vibrancy/register-vscode-mock';
 
 import * as assert from 'assert';
