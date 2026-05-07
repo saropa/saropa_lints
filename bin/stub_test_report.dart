@@ -6,6 +6,7 @@
 /// Saropa custom lints: rules register in `lib/src/rules/all_rules.dart`
 /// and tiers in `lib/src/tiers.dart` where applicable; see
 /// `plans/COMMENT_COVERAGE_PLAN.md`.
+library;
 
 import 'dart:convert';
 import 'dart:io';
