@@ -988,7 +988,9 @@ class PreferPrivateExtensionTypeFieldRule extends SaropaLintRule {
     context.addExtensionTypeDeclaration((ExtensionTypeDeclaration node) {
       // Primary constructor's first parameter is the representation field;
       // may be empty in malformed code during editing
-      final params = node.primaryConstructor.formalParameters.parameters;
+      final primaryCtor = node.primaryConstructor;
+      if (primaryCtor == null) return;
+      final params = primaryCtor.formalParameters.parameters;
       if (params.isEmpty) return;
       final param = params.first;
       final Token? fieldName = param.name;
@@ -1071,7 +1073,9 @@ class AvoidRenamingRepresentationGettersRule extends SaropaLintRule {
     context.addExtensionTypeDeclaration((ExtensionTypeDeclaration node) {
       // Primary constructor's first parameter is the representation field;
       // may be empty in malformed code during editing
-      final params = node.primaryConstructor.formalParameters.parameters;
+      final primaryCtor = node.primaryConstructor;
+      if (primaryCtor == null) return;
+      final params = primaryCtor.formalParameters.parameters;
       if (params.isEmpty) return;
       final repParam = params.first;
       final String repFieldName = repParam.name?.lexeme ?? '';

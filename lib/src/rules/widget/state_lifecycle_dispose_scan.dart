@@ -38,6 +38,7 @@ Iterable<ClassMember> _classMembers(ClassDeclaration class_) {
   return switch (class_.body) {
     BlockClassBody(:final NodeList<ClassMember> members) => members,
     EmptyClassBody() => const <ClassMember>[],
+    _ => const <ClassMember>[],
   };
 }
 

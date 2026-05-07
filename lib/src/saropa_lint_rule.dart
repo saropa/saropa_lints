@@ -14,6 +14,7 @@ import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/error/error.dart'
     show DiagnosticCode, DiagnosticSeverity, LintCode;
 
+import 'analyzer_compat.dart';
 import 'baseline/baseline_manager.dart';
 import 'ignore_utils.dart';
 import 'native/config_loader.dart'
@@ -27,7 +28,7 @@ import 'project_context.dart';
 import 'rule_metadata.dart';
 import 'tiers.dart' show essentialRules;
 export 'package:analyzer/error/error.dart' show DiagnosticSeverity, LintCode;
-export 'analyzer_compat.dart' show ClassBodyMembersCompat;
+export 'analyzer_compat.dart';
 export 'rule_metadata.dart' show AccuracyTarget, RuleStatus, RuleType;
 export 'native/saropa_context.dart' show SaropaContext;
 export 'native/saropa_fix.dart'

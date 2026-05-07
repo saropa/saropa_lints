@@ -2938,7 +2938,7 @@ class PreferGettersBeforeSettersRule extends SaropaLintRule {
       checkMembers(node.body.members);
     });
     context.addExtensionDeclaration((ExtensionDeclaration node) {
-      checkMembers(node.body.members);
+      checkMembers(node.body?.members ?? const <ClassMember>[]);
     });
   }
 }

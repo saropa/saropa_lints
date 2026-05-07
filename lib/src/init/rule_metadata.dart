@@ -3,6 +3,7 @@ library;
 
 import 'package:saropa_lints/saropa_lints.dart'
     show RuleStatus, RuleTier, SaropaLintRule, allSaropaRules;
+import 'package:saropa_lints/src/analyzer_compat.dart';
 // ignore: implementation_imports
 import 'package:saropa_lints/src/tiers.dart' as tiers;
 import 'package:saropa_lints/src/string_slice_utils.dart';

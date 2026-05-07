@@ -2642,9 +2642,11 @@ class AvoidNestedExtensionTypesRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addExtensionTypeDeclaration((ExtensionTypeDeclaration node) {
+      final primaryCtor = node.primaryConstructor;
+      if (primaryCtor == null) return;
       // Primary constructor's first parameter is the representation field;
       // may be empty in malformed code during editing
-      final params = node.primaryConstructor.formalParameters.parameters;
+      final params = primaryCtor.formalParameters.parameters;
       if (params.isEmpty) return;
       final param = params.first;
       if (param is! SimpleFormalParameter) return;
@@ -2983,7 +2985,7 @@ class AvoidShadowedExtensionMethodsRule extends SaropaLintRule {
       }
 
       // Check extension members
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.body?.members ?? const <ClassMember>[]) {
         if (member is MethodDeclaration) {
           final String methodName = member.name.lexeme;
           if (classMethods.contains(methodName)) {

@@ -1,6 +1,6 @@
 // ignore_for_file: depend_on_referenced_packages
 
-/// Compatibility shims for analyzer 11.
+/// Compatibility shims for analyzer 9-11.
 ///
 /// In analyzer 12, [ClassBody] exposes `.members` directly.
 /// In analyzer 11, [ClassBody] is sealed with no `.members` — only
@@ -11,6 +11,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/error/error.dart';
 
 /// Provides `.members` on [ClassBody] for analyzer 11 compatibility.
 ///
@@ -28,5 +29,42 @@ extension ClassBodyMembersCompat on ClassBody {
 
     // EmptyClassBody — no members exist
     return const [];
+  }
+}
+
+/// Backfills `DiagnosticCode.lowerCaseName` for analyzer versions that only
+/// expose `name`.
+extension DiagnosticCodeLowerCaseCompat on DiagnosticCode {
+  /// Canonical snake_case rule name used in config keys and reports.
+  String get lowerCaseName {
+    final name = this.name;
+    if (name.isEmpty) return '';
+    // analyzer 9 exposes camelCase names for many lints.
+    return name
+        .replaceAllMapped(RegExp(r'(?<=[a-z0-9])[A-Z]'), (m) => '_${m[0]}')
+        .replaceAll('-', '_')
+        .toLowerCase();
+  }
+}
+
+/// Backfills `ConstructorDeclaration.typeName` for analyzer 9 where the API
+/// still exposes `returnType`.
+extension ConstructorTypeNameCompat on ConstructorDeclaration {
+  Identifier? get typeName => returnType;
+}
+
+/// Backfills `ExtensionTypeDeclaration.primaryConstructor` for analyzer 9 by
+/// reading it from `namePart` when declaring constructors AST is enabled.
+extension ExtensionTypePrimaryConstructorCompat on ExtensionTypeDeclaration {
+  PrimaryConstructorDeclaration? get primaryConstructor {
+    try {
+      final part = namePart;
+      if (part is PrimaryConstructorDeclaration) {
+        return part;
+      }
+    } on UnsupportedError {
+      // Legacy extension-type AST shape has no primary constructor node.
+    }
+    return null;
   }
 }

@@ -57,6 +57,10 @@ export 'package:saropa_lints/src/rules/all_rules.dart';
 export 'package:saropa_lints/src/saropa_lint_rule.dart'
     show
         AccuracyTarget,
+        ClassBodyMembersCompat,
+        ConstructorTypeNameCompat,
+        DiagnosticCodeLowerCaseCompat,
+        ExtensionTypePrimaryConstructorCompat,
         ImpactTracker,
         LintImpact,
         OwaspMapping,

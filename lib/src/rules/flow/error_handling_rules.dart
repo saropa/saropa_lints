@@ -929,7 +929,7 @@ class AvoidUncaughtFutureErrorsRule extends SaropaLintRule {
           ClassDeclaration d => d.body.members,
           EnumDeclaration d => d.body.members,
           MixinDeclaration d => d.body.members,
-          ExtensionDeclaration d => d.body.members,
+          ExtensionDeclaration d => d.body?.members ?? const <ClassMember>[],
           ExtensionTypeDeclaration d => d.body.members,
           _ => null,
         };

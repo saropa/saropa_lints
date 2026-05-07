@@ -45,6 +45,18 @@
 
 ---
 
+## [13.5.0]
+
+This release restores real compatibility for analyzer 9 consumers, including Flutter-stable setups that cannot move to analyzer 12+ yet. The plugin and CLI now build cleanly instead of failing during startup due to missing analyzer APIs, so projects pinned to analyzer 9 can run `dart analyze` again with current saropa_lints. [log](https://github.com/saropa/saropa_lints/blob/v13.5.0/CHANGELOG.md)
+
+### Fixed
+
+- **Analyzer 9 compatibility** — analyzer-version shims now backfill API gaps (`lowerCaseName`, constructor/extension-type accessors, and registry deltas) so saropa_lints compiles and runs on analyzer 9 instead of crashing during plugin bootstrap; no action required beyond upgrading.
+- **Rule AST compatibility** — extension/constructor rule paths now handle analyzer-9 node shapes (nullable extension bodies, primary-constructor availability, and member traversal) so previously failing rule files compile and execute consistently; no action required beyond upgrading.
+- **CLI bootstrap on older analyzers** — CLI entrypoint shebang handling was corrected so command wrappers no longer fail parsing before imports on analyzer-9 toolchains; no action required beyond upgrading.
+
+---
+
 ## [13.4.9]
 
 ### Fixed (Extension)

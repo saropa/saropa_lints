@@ -386,7 +386,9 @@ class AvoidImplicitlyNullableExtensionTypesRule extends SaropaLintRule {
       }
 
       if (!implementsObject) {
-        reporter.atToken(node.primaryConstructor.typeName, code);
+        final primaryCtor = node.primaryConstructor;
+        if (primaryCtor == null) return;
+        reporter.atToken(primaryCtor.typeName, code);
       }
     });
   }
@@ -2236,7 +2238,9 @@ class PreferCorrectTypeNameRule extends SaropaLintRule {
     });
 
     context.addExtensionTypeDeclaration((ExtensionTypeDeclaration node) {
-      checkName(node.primaryConstructor.typeName);
+      final primaryCtor = node.primaryConstructor;
+      if (primaryCtor == null) return;
+      checkName(primaryCtor.typeName);
     });
 
     context.addGenericTypeAlias((GenericTypeAlias node) {

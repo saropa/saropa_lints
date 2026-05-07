@@ -1,3 +1,4 @@
+#!/usr/bin/env dart
 /// Module overview (comment coverage pass).
 /// comment-coverage: module overview (batch).
 ///
@@ -5,8 +6,6 @@
 ///
 /// Saropa custom lints: rules register in `lib/src/rules/all_rules.dart`
 /// and tiers in `lib/src/tiers.dart` where applicable; see `plans/COMMENT_COVERAGE_PLAN.md`.
-
-#!/usr/bin/env dart
 
 /// CLI for [QualityGateEvaluator]: reads `violations.json` summary and gate config,
 /// prints PASS / FAIL / WARN, exits 0 (pass or no config), 1 (breach with fail), 2 (errors).

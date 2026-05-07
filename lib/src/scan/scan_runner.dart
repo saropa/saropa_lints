@@ -23,6 +23,7 @@ import 'package:path/path.dart' as p;
 import '../config/runtime_tier_cap.dart';
 import '../init/cli_args.dart' show tierOrder;
 import '../../saropa_lints.dart';
+import '../analyzer_compat.dart';
 import 'capturing_registry.dart';
 import 'scan_config.dart';
 import 'scan_diagnostic.dart';

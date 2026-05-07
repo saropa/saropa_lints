@@ -3,6 +3,7 @@ import 'dart:io' show File;
 
 import 'package:path/path.dart' as path;
 import 'package:saropa_lints/saropa_lints.dart' show getRulesFromRegistry;
+import 'package:saropa_lints/src/analyzer_compat.dart';
 
 /// Runtime configuration for diagnostic statistics enhancements.
 ///

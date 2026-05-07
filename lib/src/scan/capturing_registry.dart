@@ -510,6 +510,12 @@ class CapturingRuleVisitorRegistry implements RuleVisitorRegistry {
   @override
   void addWithClause(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
   @override
+  void addRepresentationConstructorName(AbstractAnalysisRule r, AstVisitor v) =>
+      _capture(v);
+  @override
+  void addRepresentationDeclaration(AbstractAnalysisRule r, AstVisitor v) =>
+      _capture(v);
+  @override
   void addYieldStatement(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
   @override
   void afterLibrary(AbstractAnalysisRule r, void Function() callback) {
