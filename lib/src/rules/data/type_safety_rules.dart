@@ -544,7 +544,8 @@ class RequireNullSafeExtensionsRule extends SaropaLintRule {
       if (!isOuterTypeNullable(onClause.extendedType)) return;
 
       // Check members for null assertions
-      for (final ClassMember member in node.body?.members ?? const <ClassMember>[]) {
+      for (final ClassMember member
+          in node.body?.members ?? const <ClassMember>[]) {
         final String memberSource = member.toSource();
         if (memberSource.contains('this!')) {
           reporter.atNode(member);

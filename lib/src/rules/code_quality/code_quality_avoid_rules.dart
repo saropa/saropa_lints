@@ -2985,7 +2985,8 @@ class AvoidShadowedExtensionMethodsRule extends SaropaLintRule {
       }
 
       // Check extension members
-      for (final ClassMember member in node.body?.members ?? const <ClassMember>[]) {
+      for (final ClassMember member
+          in node.body?.members ?? const <ClassMember>[]) {
         if (member is MethodDeclaration) {
           final String methodName = member.name.lexeme;
           if (classMethods.contains(methodName)) {

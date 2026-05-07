@@ -50,15 +50,37 @@ extension DiagnosticCodeLowerCaseCompat on DiagnosticCode {
 /// Backfills `ConstructorDeclaration.typeName` for analyzer 9 where the API
 /// still exposes `returnType`.
 extension ConstructorTypeNameCompat on ConstructorDeclaration {
-  Identifier? get typeName => returnType;
+  Identifier? get typeName {
+    final self = this as dynamic;
+    try {
+      final value = self.typeName;
+      if (value is Identifier) return value;
+    } on NoSuchMethodError {
+      // analyzer 9/11 surface may not expose this getter.
+    }
+    try {
+      final value = self.returnType;
+      if (value is Identifier) return value;
+    } on NoSuchMethodError {
+      // analyzer 12+ surface removed returnType.
+    }
+    return null;
+  }
 }
 
 /// Backfills `ExtensionTypeDeclaration.primaryConstructor` for analyzer 9 by
 /// reading it from `namePart` when declaring constructors AST is enabled.
 extension ExtensionTypePrimaryConstructorCompat on ExtensionTypeDeclaration {
   PrimaryConstructorDeclaration? get primaryConstructor {
+    final self = this as dynamic;
     try {
-      final part = namePart;
+      final value = self.primaryConstructor;
+      if (value is PrimaryConstructorDeclaration) return value;
+    } on NoSuchMethodError {
+      // analyzer versions without this accessor.
+    }
+    try {
+      final part = self.namePart;
       if (part is PrimaryConstructorDeclaration) {
         return part;
       }
