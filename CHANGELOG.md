@@ -53,6 +53,7 @@
 
 ### Changed (Extension)
 
+- **Health score milestones** — crossing an upward band (50–90) now shows a **short status-bar message** instead of an **information notification**, so steady improvement does not spam the notification center. No action required.
 - **Pick UI language** — the quick pick and sidebar **UI language** row list each language in **native script** with the **English name in parentheses** (except English), so the list is readable in the language itself and still easy to cross-reference for maintainers. No action required.
 - **Runtime locale catalogs** — `uiLanguage.pick.*` strings (quick pick title, placeholder, and **Auto** row) are translated in every shipped `extension/src/i18n/locales/<locale>.json`, with matching phrase keys in `extension/scripts/i18n/dictionaries.py` so `generate_locales.py` keeps them after regeneration. No action required.
 - **UI language scope (docs)** — `extension/scripts/i18n/README.md` now states explicitly that **User** settings are the **intended** scope so one language applies across all workspaces; per-workspace overrides remain out of scope unless product requirements change. No action required.

@@ -172,8 +172,11 @@ function runCelebrationIfNeeded(root: string, history: RunSnapshot[], appended: 
     logSection('Milestone');
     logReport(`- Score reached ${crossing.threshold} (current: ${curr.score})`);
     flushReport(root);
-    vscode.window.showInformationMessage(
-      `Saropa Lints: Score reached ${crossing.threshold} \u2014 great work!`,
+    // Status bar only: upward score bands fire during steady cleanup; notification
+    // toasts stacked annoyingly (milestones at 50/60/70/80/90).
+    vscode.window.setStatusBarMessage(
+      `Saropa Lints: Health score reached ${crossing.threshold}`,
+      5000,
     );
     return;
   }
