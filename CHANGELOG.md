@@ -45,7 +45,7 @@
 
 ---
 
-## [Unreleased]
+## [13.4.9]
 
 ### Fixed (Extension)
 

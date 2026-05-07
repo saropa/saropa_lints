@@ -7,7 +7,7 @@
   "views.actions.name": "ايڪشنز",
   "views.status.name": "اسٽيٽس",
   "views.settings.name": "سيٽنگز",
-  "views.help.name": "Help (v13.4.8)",
+  "views.help.name": "Help (v13.4.9)",
   "viewsWelcome.banner.contents": "**Saropa Lints**\n\n2100+ Dart and Flutter lint rules for security, accessibility, and performance.\n\nRequires a Dart or Flutter project.\n\nOpen a folder containing a `pubspec.yaml` to get started.\n\n[Learn more online](https://pub.dev/packages/saropa_lints)\n[Browse All Commands](command:saropaLints.showCommandCatalog)\n[About Saropa Lints](command:saropaLints.showAbout)\n[Getting Started](command:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: پروجيڪٽ سيٽ اپ ڪريو (pubspec + config)",
   "command.disable.title": "Saropa Lints: Lint انٽيگريشن بند ڪريو",
