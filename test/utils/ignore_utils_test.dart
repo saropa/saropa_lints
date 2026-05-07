@@ -1,3 +1,7 @@
+// Unit tests for [IgnoreUtils]: analyzer-backed detection of `// ignore:` / `// ignore_for_file:`.
+// Covers directive placement, trailing comma lists, duplicate codes, and interaction with AST nodes.
+library;
+
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';

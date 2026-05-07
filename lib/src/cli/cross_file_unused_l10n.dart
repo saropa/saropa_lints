@@ -1,3 +1,6 @@
+// Cross-file **unused l10n** helper: compares ARB message keys against `lib/` + `test/` Dart text.
+// Discovery order: explicit `--arb-dir`, `l10n.yaml` `arb-dir`, then `lib/l10n` and `l10n/`.
+// Matching is regex word-boundary on the raw key string (fast, heuristic; may miss dynamic lookups).
 import 'dart:convert';
 import 'dart:io';
 
@@ -50,6 +53,7 @@ Future<UnusedL10nResult> analyzeUnusedL10n({
   );
 }
 
+/// Resolves `.arb` paths from an override, `l10n.yaml`, or conventional folders under [projectPath].
 List<String> _discoverArbPaths(String projectPath, String? override) {
   if (override != null && override.isNotEmpty) {
     final dir = Directory(p.normalize(p.join(projectPath, override)));
@@ -90,6 +94,7 @@ List<String> _discoverArbPaths(String projectPath, String? override) {
   return out;
 }
 
+/// Returns user message keys from an ARB JSON map (skips `@meta` entries and malformed files).
 Set<String> _readArbKeys(String arbPath) {
   final text = File(arbPath).readAsStringSync();
   final Object? decoded;
@@ -109,6 +114,7 @@ Set<String> _readArbKeys(String arbPath) {
   return keys;
 }
 
+/// Loads non-generated Dart sources under `lib/` and `test/` keyed by absolute path.
 Map<String, String> _readDartSources(String projectPath) {
   final out = <String, String>{};
   for (final sub in ['lib', 'test']) {
@@ -128,6 +134,7 @@ Map<String, String> _readDartSources(String projectPath) {
   return out;
 }
 
+/// Filters ARB keys to simple identifier shapes so metadata keys do not dominate noise.
 bool _isPlausibleL10nKey(String key) {
   if (key.isEmpty) return false;
   return RegExp(r'^[A-Za-z_][A-Za-z0-9_]*$').hasMatch(key);

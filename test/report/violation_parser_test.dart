@@ -8,6 +8,7 @@ import 'package:test/test.dart';
 
 /// Entry: each `group` covers one parser edge (single line, multi, malformed).
 void main() {
+  // Parser accepts analyzer-ish lines with flexible bullet separators; tests pin regressions.
   group('parseViolations', () {
     test('parses single violation line', () {
       const output = '  lib/main.dart:42:10 • Some problem message • my_rule •';

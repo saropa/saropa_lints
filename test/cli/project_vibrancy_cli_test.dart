@@ -12,6 +12,7 @@ import 'package:test/test.dart';
 
 /// Entry point: `group` blocks mirror MVP scenarios (happy path, filters, edge lcov).
 void main() {
+  // Each scenario seeds a minimal pub package + synthetic lcov so grading stays deterministic.
   group('project vibrancy mvp', () {
     late Directory tempDir;
 

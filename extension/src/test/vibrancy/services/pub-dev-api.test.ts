@@ -1,4 +1,7 @@
-/** * Module overview (comment coverage pass). * comment-coverage: module overview (batch). * * Extension Jest tests: validates commands, webviews, parsers, and state against VS Code APIs (often with local mocks). */
+/**
+ * Jest tests for **pub.dev** fetch helpers: parses golden JSON fixtures, surfaces HTTP failures,
+ * and stubs `globalThis.fetch` for deterministic offline runs.
+ */
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import * as fs from 'fs';

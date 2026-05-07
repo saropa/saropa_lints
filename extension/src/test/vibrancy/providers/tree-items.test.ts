@@ -1,4 +1,7 @@
-/** * Module overview (comment coverage pass). * comment-coverage: module overview (batch). * * Extension Jest tests: validates commands, webviews, parsers, and state against VS Code APIs (often with local mocks). */
+/**
+ * Jest tests for vibrancy **tree item builders** (`tree-items.ts`): package/group/detail rows,
+ * suppressed subtrees, severity buckets, and label/description invariants used by the explorer.
+ */
 import '../register-vscode-mock';
 import * as assert from 'assert';
 import * as vscode from 'vscode';

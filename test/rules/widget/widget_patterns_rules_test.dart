@@ -1,3 +1,6 @@
+// Widget pattern rule suite: instantiation smoke tests + long-form fixture coverage elsewhere.
+library;
+
 import 'dart:io';
 
 import 'package:test/test.dart';

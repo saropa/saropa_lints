@@ -16,6 +16,7 @@ import 'package:test/test.dart';
 
 /// Runs export scenarios under isolated `tempDir` workspaces with `setUp`/`tearDown`.
 void main() {
+  // Isolated temp project per test; always reset graph/baseline singletons to avoid order coupling.
   late Directory tempDir;
   late String projectRoot;
 

@@ -1,3 +1,6 @@
+// Integrity: every api_network rule stays wired to a fixture that documents at least one BAD case.
+library;
+
 import 'dart:io';
 
 import 'package:test/test.dart';
@@ -5,6 +8,7 @@ import 'package:test/test.dart';
 /// Contract: each listed rule has an `example/lib/api_network/` fixture that
 /// declares `expect_lint:` for that rule (workstream 3 / plan §9 api_network).
 void main() {
+  // Tuple list mirrors the published rule set; update when adding/removing api_network rules.
   const cases = <({String rule, String fixturePath})>[
     (
       rule: 'avoid_cached_image_in_build',

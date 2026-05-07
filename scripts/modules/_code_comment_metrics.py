@@ -251,6 +251,7 @@ def _collect_c_family_comment_lines(text: str, *, templates: bool) -> set[int]:
             return True
         return False
 
+    # Main scan: classify comment vs string vs (optional) TS template before advancing `i`.
     while i < n:
         c = text[i]
         if c == "\n":
@@ -263,6 +264,7 @@ def _collect_c_family_comment_lines(text: str, *, templates: bool) -> set[int]:
         if _starts_with(text, i, "/*"):
             skip_block_comment()
             continue
+        # Backtick starts a template literal only in TS mode; Dart treats it as normal code.
         if templates and c == "`":
             skip_ts_template()
             continue
@@ -303,6 +305,7 @@ def _skip_brace_expression(
     """Skip until matching `}` for an already-open `{` (depth starts at 1)."""
     n = len(text)
     depth = 1
+    # Mirror the top-level scanner: `${...}` can nest strings/templates; comments inside count.
 
     def mark_line() -> None:
         comment_lines.add(line)
@@ -435,6 +438,7 @@ def _skip_brace_expression(
                 continue
             i += 1
 
+    # Brace matcher: track `{`/`}` depth; treat everything else as opaque except nested literals.
     while i < n and depth > 0:
         c = text[i]
         if c == "\n":
@@ -651,6 +655,7 @@ def display_code_comment_metrics(project_dir: Path) -> None:
     """Print comment-line coverage by source bucket (publish banner section)."""
     buckets = collect_comment_metric_buckets(project_dir)
     if not buckets:
+        # Empty tree (e.g. wrong cwd) — keep publish output quiet rather than printing zeros.
         return
 
     print()

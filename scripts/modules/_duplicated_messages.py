@@ -83,6 +83,7 @@ def find_duplicated_messages(rules_dir: Path) -> DuplicatedMessagesResult:
     result = DuplicatedMessagesResult()
     seen_inline: set[tuple[str, int]] = set()
 
+    # Walk every `*.dart` rule implementation; skip the giant registry aggregator.
     for path in sorted(rules_dir.rglob("*.dart")):
         if path.name == "all_rules.dart":
             continue
@@ -91,11 +92,13 @@ def find_duplicated_messages(rules_dir: Path) -> DuplicatedMessagesResult:
         rel_str = str(rel)
 
         for line_no, field, full, parts in extract_message_strings(text):
+            # Audit-only: repeated boilerplate makes messages easy to mis-scan in reviews.
             if full.count(VERIFY_PHRASE) >= 2:
                 result.verify_twice.append(
                     (rel_str, line_no, field, full[:120] + "...")
                 )
 
+            # Sliding windows (long → short) catch copy/pasted paragraphs inside one message string.
             for length in (80, 60, 40):
                 found = False
                 for i in range(len(full) - length):
@@ -112,6 +115,7 @@ def find_duplicated_messages(rules_dir: Path) -> DuplicatedMessagesResult:
                 if found:
                     break
 
+            # Multiline `LintCode` strings: flag when stitched halves largely repeat each other.
             if len(parts) >= 2:
                 first = parts[0].strip()
                 second = parts[1].strip()
@@ -122,6 +126,7 @@ def find_duplicated_messages(rules_dir: Path) -> DuplicatedMessagesResult:
                 if first.endswith("behavior.") and second.startswith("Disable"):
                     result.missing_space.append((rel_str, line_no))
 
+    # `missing_space` catches a specific typography regression in generated guidance text.
     return result
 
 

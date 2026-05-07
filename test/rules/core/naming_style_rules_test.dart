@@ -1,3 +1,6 @@
+// Naming style rules: metadata smoke tests; behavioral cases live under example fixtures.
+library;
+
 import 'dart:io';
 
 import 'package:saropa_lints/src/rules/core/naming_style_rules.dart';

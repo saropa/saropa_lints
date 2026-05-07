@@ -1,3 +1,6 @@
+// Error handling rules: stack trace / logging / swallowing patterns; fixtures in example/lib.
+library;
+
 import 'dart:io';
 
 import 'package:saropa_lints/src/rules/flow/error_handling_rules.dart';

@@ -1,3 +1,6 @@
+// Orchestrates **cross-file** CLI analysis: import graph, unused files, cycles, mirror tests,
+// feature dependency hints, dead imports (semantic with heuristic fallback), optional unused symbols.
+// All glob excludes are resolved relative to [projectPath] so CI and local runs share one contract.
 import 'dart:io';
 
 import 'package:path/path.dart' as p;
@@ -648,6 +651,7 @@ _FeatureDepsResult _analyzeFeatureDependencies({
   );
 }
 
+/// Adjacency map (`feature -> imported features`) plus sorted human-readable edge strings.
 class _FeatureDepsResult {
   const _FeatureDepsResult({
     required this.featureDependencies,

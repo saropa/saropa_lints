@@ -1,3 +1,6 @@
+// Stylistic rules: smoke-test each rule class for stable `LintCode` metadata strings.
+library;
+
 import 'dart:io';
 
 import 'package:test/test.dart';

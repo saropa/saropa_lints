@@ -1,6 +1,7 @@
 """Unit tests for scripts.modules._code_comment_metrics."""
 
 # Covers Dart/TS/Python comment-line heuristics used by the publish banner metrics.
+# Each case pins an edge of the scanner: strings, templates, `${}` holes, tokenization.
 
 from __future__ import annotations
 
@@ -17,6 +18,8 @@ from scripts.modules._code_comment_metrics import (
 
 
 class TestDartTsCommentLines(unittest.TestCase):
+    # Dart and TS share the C-family scanner; TS additionally tracks template/template-expr depth.
+
     def test_slash_slash_inside_string_not_counted(self) -> None:
         src = "final u = 'http://example.com/foo';\n// real\n"
         lines = _dart_comment_lines(src)
@@ -49,6 +52,8 @@ class TestDartTsCommentLines(unittest.TestCase):
 
 
 class TestPythonCommentLines(unittest.TestCase):
+    # Python uses tokenizer COMMENT tokens so `#` in strings does not inflate coverage.
+
     def test_hash_comment(self) -> None:
         src = "a = 1  # c\nb = 2\n"
         lines = _python_comment_lines(src)
@@ -57,6 +62,8 @@ class TestPythonCommentLines(unittest.TestCase):
 
 
 class TestCollectBuckets(unittest.TestCase):
+    # End-to-end: ensure bucket labels appear for a tiny synthetic package tree.
+
     def test_collect_on_minimal_tree(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

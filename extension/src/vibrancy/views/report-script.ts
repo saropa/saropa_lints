@@ -12,6 +12,10 @@
  * **Algorithms:** table sort is stable for package rows; category/score columns use locale-aware
  * string compare with deterministic tie-breakers so CI and user machines match.
  */
+// Client script for the vibrancy **report** panel (sort, footprint modes, presets, charts).
+// Message bridge: `acquireVsCodeApi().postMessage` for navigation + filter sync with extension.
+// Table model: only `.pkg-row` participates in stable sort; detail rows are reattached in-order.
+// Keyboard model: vim-ish j/k row focus; `/` focuses search from non-editable targets; Esc collapses.
 /** Client-side JavaScript for the report webview (sorting, filtering, search). */
 export function getReportScript(): string {
     return `

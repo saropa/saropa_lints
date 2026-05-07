@@ -1,3 +1,6 @@
+// Guards SDK 3.4 deprecation rule coverage: BAD/GOOD fixtures exist and BAD lists every rule once.
+library;
+
 import 'dart:io';
 
 import 'package:saropa_lints/saropa_lints.dart';
@@ -5,6 +8,7 @@ import 'package:test/test.dart';
 
 /// Tests for Dart SDK 3.4 deprecated-API migration rules.
 void main() {
+  // Single source of truth for rule ids enforced against `expect_lint:` markers in fixtures.
   const sdk34RuleNames = <String>{
     'avoid_deprecated_file_system_delete_event_is_directory',
   };

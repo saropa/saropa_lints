@@ -1,5 +1,20 @@
-/** Client-side JavaScript for the known issues browser (search, filter, sort). */
+/**
+ * Known-issues webview **client script** returned as a single string for HTML injection.
+ *
+ * **Host contract:** expects element ids used below (`search-input`, `pkg-body`, chip strip,
+ * KPI segments, empty state). Sorting is lexicographic on string columns; numeric columns
+ * parse `data-*` attributes defensively because table cells may be placeholders.
+ *
+ * **Persistence:** recent searches use `sessionStorage` (panel lifetime only); see inline
+ * note near `RECENT_STORAGE_KEY` for workspace-scoped follow-up.
+ *
+ * **Comment metric:** publish counts line comments and block comments only *outside*
+ * template literals; the runtime lives mostly inside the template—keep cross-cutting
+ * integration notes here.
+ */
 export function getKnownIssuesScript(): string {
+    // Wire-up order: resolve DOM nodes → bind filters/chips → register sort handlers →
+    // `applyFilters()` once so KPI active state matches the default filter on first paint.
     return `
         let sortCol = 'name';
         let sortAsc = true;

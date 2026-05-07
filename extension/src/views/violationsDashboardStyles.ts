@@ -12,6 +12,9 @@
  *   - Hero KPI numbers ~1.8em (§4.2) — KPIs must read as the largest type
  *     after the title, otherwise the dashboard fails its glance test.
  */
+// Dashboard CSS is injected as one string; keep selectors stable with `violationsDashboardHtml.ts`.
+// Surfaces use three depth tiers (page/panel/inset) so hierarchy reads without heavy outlines.
+// Charts/tables follow UX_UI_GUIDELINES spacing; prefer `color-mix` over hard-coded tints.
 export function getViolationsDashboardStyles(): string {
     return `
     :root {

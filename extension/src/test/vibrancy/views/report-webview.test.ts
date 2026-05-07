@@ -1,6 +1,10 @@
-/** * Module overview (comment coverage pass). * comment-coverage: module overview (batch). * * Extension Jest tests: validates commands, webviews, parsers, and state against VS Code APIs (often with local mocks). */// Must be first so vscode imports resolve to test mock.
+// Side-effect import must stay first so subsequent `vscode` imports bind to the Jest mock.
 import '../register-vscode-mock';
 
+/**
+ * Jest tests for `VibrancyReportPanel`: webview lifecycle, `postMessage` contracts, refresh/reveal,
+ * and option defaults passed into HTML generation.
+ */
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import * as vscode from 'vscode';
@@ -8,8 +12,6 @@ import { VibrancyResult } from '../../../vibrancy/types';
 import { ReportOptions } from '../../../vibrancy/views/report-html';
 import { VibrancyReportPanel } from '../../../vibrancy/views/report-webview';
 import { createdPanels, messageMock, mockWorkspaceFolders, resetMocks } from '../vscode-mock';
-
-/** Unit tests for VibrancyReportPanel (webviews, postMessage, refresh, options). */
 
 function makeResult(
     name: string,

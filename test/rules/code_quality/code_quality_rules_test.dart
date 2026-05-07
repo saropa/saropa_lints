@@ -1,3 +1,6 @@
+// Code quality rule suite: constructor/metadata invariants for the full rule catalog.
+library;
+
 import 'dart:io';
 
 import 'package:test/test.dart';

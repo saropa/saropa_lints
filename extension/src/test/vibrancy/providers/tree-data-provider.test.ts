@@ -1,4 +1,7 @@
-/** * Module overview (comment coverage pass). * comment-coverage: module overview (batch). * * Extension Jest tests: validates commands, webviews, parsers, and state against VS Code APIs (often with local mocks). */
+/**
+ * Jest tests for `VibrancyTreeProvider`: refresh after result updates, filter/prerelease wiring,
+ * `TreeItem` collapsible state, and expand-all override clearing on subsequent scans.
+ */
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import * as vscode from 'vscode';

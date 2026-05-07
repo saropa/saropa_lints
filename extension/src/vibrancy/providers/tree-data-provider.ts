@@ -1,4 +1,10 @@
-/** * Module overview (comment coverage pass). * comment-coverage: module overview (batch). * * Vibrancy UI experiment: scoring, providers, and webview assets. */
+/**
+ * Explorer `TreeDataProvider` for **Package Vibrancy**: packages, overrides, graph summary,
+ * insights, budgets, and integrated problem/suggestion rows.
+ *
+ * Coordinates [VibrancyFilterManager] state, prerelease toggles, lazy detail children, and
+ * `ProblemRegistry` updates. `expandAll()` is a one-shot UI affordance cleared on next refresh.
+ */
 import * as vscode from 'vscode';
 import { VibrancyResult, VibrancyCategory, FamilySplit, OverrideAnalysis, DepGraphSummary, DependencySection, PackageInsight, BudgetResult } from '../types';
 import {
