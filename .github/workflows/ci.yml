@@ -122,4 +122,17 @@ jobs:
         with:
           python-version: "3.12"
       - name: Python script tests (tier integrity)
-        run: python -m unittest discover -s scripts/tests -t . -v
+        run: python -m unittest discover -s scripts/modules/tests -t . -v
+
+  extension-manifest-nls:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Verify extension manifest NLS keys
+        run: node extension/scripts/verify-manifest-nls-keys.mjs
