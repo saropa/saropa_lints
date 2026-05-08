@@ -19,6 +19,8 @@ let currentPanel: vscode.WebviewPanel | undefined;
 
 const knownCommands = new Set(catalogEntries.map((e) => e.command));
 
+const CATALOG_SEARCH_RECENT_KEY = 'saropa.commandCatalog.recentSearchQueries';
+
 function postHistory(context: vscode.ExtensionContext): void {
   if (!currentPanel) {
     return;
@@ -26,6 +28,16 @@ function postHistory(context: vscode.ExtensionContext): void {
   void currentPanel.webview.postMessage({
     type: 'history',
     items: readCommandHistory(context),
+  });
+}
+
+function postCatalogSearchRecent(context: vscode.ExtensionContext): void {
+  if (!currentPanel) {
+    return;
+  }
+  void currentPanel.webview.postMessage({
+    type: 'hydrateCatalogSearchRecent',
+    queries: context.workspaceState.get<string[]>(CATALOG_SEARCH_RECENT_KEY, []),
   });
 }
 
@@ -41,6 +53,17 @@ function handleWebviewMessage(
 
   if (rec.type === 'clearHistory') {
     void clearCommandHistory(context).then(() => postHistory(context));
+    return;
+  }
+
+  if (rec.type === 'saveCatalogSearchRecent') {
+    const raw = (message as { queries?: unknown }).queries;
+    if (Array.isArray(raw)) {
+      const qs = raw
+        .filter((q): q is string => typeof q === 'string')
+        .slice(0, 12);
+      void context.workspaceState.update(CATALOG_SEARCH_RECENT_KEY, qs);
+    }
     return;
   }
 
@@ -69,6 +92,7 @@ export function showCommandCatalogPanel(context: vscode.ExtensionContext): void 
   if (currentPanel) {
     currentPanel.reveal(vscode.ViewColumn.One);
     postHistory(context);
+    postCatalogSearchRecent(context);
     return;
   }
 
@@ -83,10 +107,15 @@ export function showCommandCatalogPanel(context: vscode.ExtensionContext): void 
   );
 
   const history = readCommandHistory(context);
+  const searchRecent = context.workspaceState.get<string[]>(
+    CATALOG_SEARCH_RECENT_KEY,
+    [],
+  );
   currentPanel.webview.html = buildCommandCatalogHtml(
     currentPanel.webview,
     context.extensionUri,
     history,
+    searchRecent,
   );
 
   currentPanel.webview.onDidReceiveMessage((msg) =>

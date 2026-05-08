@@ -266,6 +266,22 @@ describe('violationsDashboardHtml', () => {
     assert.ok(!html.includes('aria-label="Top rules by count"'));
   });
 
+  it('renders findings bulk-selection and multi-sort markup when violations are shown', () => {
+    const html = renderViolationsDashboardHtml(
+      minimalInput({
+        filteredCount: 1,
+        totalRawAfterDisable: 1,
+        sections: [],
+      }),
+    );
+    assert.ok(html.includes('id="findings-bulk-bar"'));
+    assert.ok(html.includes('bulk-select-all'));
+    assert.ok(html.includes('class="bulk-row-cb"'));
+    assert.ok(html.includes('hydrateRecentSearches'));
+    assert.ok(html.includes('sortLevels'));
+    assert.ok(html.includes('saveFindingsRecent'));
+  });
+
   it('exposes the keyboard-shortcut overlay trigger and dialog (§15.2)', () => {
     // §15.2 requires page-level shortcuts to be discoverable. The overlay
     // documents `/`, `Esc`, `Enter`, `Space`, and `?` — all bindings the

@@ -73,6 +73,7 @@ export function buildKnownIssuesHtml(): string {
     ${buildEmptyState()}
     </main>
     ${buildKeyboardShortcutsOverlay(shortcuts)}
+    <script nonce="${nonce}">var vscode = acquireVsCodeApi();</script>
     <script nonce="${nonce}">${getKnownIssuesScript()}${getKeyboardShortcutsScript()}</script>
 </body>
 </html>`;
@@ -147,10 +148,7 @@ function buildToolbar(): string {
                     placeholder="Search packages..." autocomplete="off">
                 <button type="button" id="search-clear" class="search-clear"
                     title="Clear search" aria-label="Clear search" hidden>&times;</button>
-                <!-- §8.5.2 — recent-searches popover. Shown when the search
-                     input is focused empty AND there are stored entries.
-                     Persistence: sessionStorage (in-session only); cross-session
-                     persistence is tracked in plan/UX_GUIDELINES_REMAINING.md. -->
+                <!-- §8.5.2 — recent-searches popover (workspace-persisted via host). -->
                 <div id="recent-searches" class="recent-searches" hidden>
                     <div class="recent-searches-head">
                         <span class="recent-searches-title">Recent searches</span>

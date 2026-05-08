@@ -264,17 +264,14 @@ function sharedAtomStyles(): string {
 .slider:before {
   position: absolute; content: "";
   height: 12px; width: 12px;
-  /* Knob start position. Kept as physical 'left' (not 'inset-inline-start')
-     because the on-state uses 'transform: translateX(14px)', which is
-     direction-agnostic — flipping 'left' to logical without flipping the
-     translate sign would break LTR animation. Full RTL support for this
-     control is tracked in plan/UX_GUIDELINES_REMAINING.md. */
-  left: 2px; bottom: 2px;
+  inset-inline-start: 2px;
+  inset-block-end: 2px;
   background: var(--vscode-foreground);
   border-radius: 50%; opacity: 0.5;
   transition: 0.15s;
 }
 input:checked + .slider:before { transform: translateX(14px); opacity: 1; }
+[dir="rtl"] input:checked + .slider:before { transform: translateX(-14px); opacity: 1; }
 @media (prefers-reduced-motion: reduce) {
   .slider:before { transition: none; }
 }

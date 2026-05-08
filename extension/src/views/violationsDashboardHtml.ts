@@ -414,7 +414,7 @@ function buildToolbar(input: ViolationsDashboardHtmlInput): string {
         <button type="button" class="clear-btn" id="textFilterClear" title="Clear text filter" aria-label="Clear text filter">×</button>
         <!-- §8.5.2 — recent-searches popover for the Findings filter.
              Persistence: sessionStorage. Cross-session persistence via
-             workspaceState is tracked in plan/UX_GUIDELINES_REMAINING.md. -->
+             workspaceState is tracked in plan/UX_GUIDELINES.md (Part B). -->
         <div id="findings-recent" class="findings-recent" hidden>
           <div class="findings-recent-head">
             <span class="findings-recent-title">Recent filters</span>
@@ -426,7 +426,7 @@ function buildToolbar(input: ViolationsDashboardHtmlInput): string {
             role="listbox" aria-label="Recent filters"></ul>
         </div>
       </span>
-      <button type="button" class="btn tier-1" id="btn-run" title="Run Saropa Lints analysis">
+      <button type="button" class="btn tier-1" id="btn-run" data-run-analysis title="Run Saropa Lints analysis">
         <span class="glyph">▶</span>Run analysis
       </button>
       <button type="button" class="btn" id="btn-refresh" title="Reload violations.json from disk">
@@ -446,6 +446,18 @@ function buildToolbar(input: ViolationsDashboardHtmlInput): string {
     </div>
     ${buildChipStrip(input)}
   </section>`;
+}
+
+function buildAnalysisProgress(): string {
+  return `<div id="analysis-progress" class="analysis-progress" role="status" aria-live="polite" hidden>
+    <div class="analysis-progress-head">
+      <strong id="analysis-progress-label">Running analysis…</strong>
+      <span id="analysis-progress-meta">This can take a moment on large projects.</span>
+    </div>
+    <div class="analysis-progress-track" aria-hidden="true">
+      <div class="analysis-progress-bar"></div>
+    </div>
+  </div>`;
 }
 
 function buildMoreActionsMenu(exportCount: number): string {
@@ -621,13 +633,18 @@ function buildFindingsBlock(input: ViolationsDashboardHtmlInput): string {
           <button type="button" class="mini-btn" id="collapse-all">Collapse all</button>
         </div>
       </div>
+      <div id="findings-bulk-bar" class="findings-bulk-bar" hidden>
+        <span class="findings-bulk-label" id="findings-bulk-count">0 selected</span>
+        <button type="button" class="mini-btn tier-1" id="btn-bulk-copy">Copy selected as JSON</button>
+      </div>
       <table class="findings-table" role="grid" aria-rowcount="${input.filteredCount}">
         <thead>
           <tr>
-            <th data-sort="sev" aria-sort="none" scope="col">Severity<span class="arrow">⇅</span></th>
-            <th data-sort="rule" aria-sort="none" scope="col">Rule<span class="arrow">⇅</span></th>
-            <th data-sort="msg" aria-sort="none" scope="col">Message<span class="arrow">⇅</span></th>
-            <th data-sort="line" aria-sort="none" scope="col">Line<span class="arrow">⇅</span></th>
+            <th class="col-sel-bulk" scope="col"><input type="checkbox" id="bulk-select-all" title="Select all visible findings" aria-label="Select all visible findings"></th>
+            <th data-sort="sev" aria-sort="none" scope="col">Severity<span class="arrow">⇅</span><span class="sort-idx" aria-hidden="true"></span></th>
+            <th data-sort="rule" aria-sort="none" scope="col">Rule<span class="arrow">⇅</span><span class="sort-idx" aria-hidden="true"></span></th>
+            <th data-sort="msg" aria-sort="none" scope="col">Message<span class="arrow">⇅</span><span class="sort-idx" aria-hidden="true"></span></th>
+            <th data-sort="line" aria-sort="none" scope="col">Line<span class="arrow">⇅</span><span class="sort-idx" aria-hidden="true"></span></th>
             <th aria-label="Row actions" scope="col"></th>
           </tr>
         </thead>
@@ -654,7 +671,7 @@ function buildOverflowNote(input: ViolationsDashboardHtmlInput): string {
   if (!input.truncatedSource) return '';
   return `<p class="overflow-note">
     <span>Source list truncated at ${input.maxSourceViolations} for render performance.</span>
-    <button type="button" class="link" id="run-again">Run analysis again</button>
+    <button type="button" class="link" id="run-again" data-run-analysis>Run analysis again</button>
   </p>`;
 }
 
@@ -671,7 +688,7 @@ function buildSectionRows(sec: DashboardSection, pageSize: number, openByDefault
     .flatMap((fb) => fb.violations.slice(0, pageSize).map((v) => renderFindingRow(v, fb.filePath)))
     .join('');
   return `<tr class="group-row" data-group="${groupId}" aria-expanded="${expanded}" tabindex="0">
-    <td colspan="5">
+    <td colspan="6">
       <span class="gtitle"><span class="chev">▾</span><span>${title}</span></span>
       <span class="gcount">${total}</span>
     </td>
@@ -687,6 +704,7 @@ function renderFindingRow(v: Violation, filePath: string): string {
   const msg = escapeHtml(v.message ?? '');
   const fileLabel = escapeHtml(filePath);
   return `<tr class="frow" data-sev="${escapeHtml(sev)}" data-rule="${escapeHtml(v.rule)}" data-line="${line}" data-file="${fileAttr}" tabindex="0">
+    <td class="col-sel-bulk"><input type="checkbox" class="bulk-row-cb" data-file="${fileAttr}" data-line="${line}" data-rule="${escapeHtml(v.rule)}" aria-label="Select this finding row"></td>
     <td class="col-sev"><span class="sev-pill sev-${escapeHtml(sev)}">${escapeHtml(sev)}</span></td>
     <td class="col-rule"><span class="rule-tag">${rule}</span></td>
     <td class="col-msg"><div class="vmsg">${msg}</div><div class="kpi-sub" title="${fileLabel}">${fileLabel}</div></td>
@@ -700,10 +718,10 @@ function buildFindingsEmpty(input: ViolationsDashboardHtmlInput): string {
     ? 'No violations in the last analysis run.'
     : 'No violations match the current filters.';
   const cta = input.totalRawAfterDisable === 0
-    ? `<button type="button" class="btn tier-1" id="btn-run-empty"><span class="glyph">▶</span>Run analysis</button>
+    ? `<button type="button" class="btn tier-1" id="btn-run-empty" data-run-analysis><span class="glyph">▶</span>Run analysis</button>
        <button type="button" class="btn" id="btn-refresh-empty"><span class="glyph">⟳</span>Refresh</button>`
     : `<button type="button" class="btn tier-1" id="btn-reset-empty"><span class="glyph">⊘</span>Reset filters</button>
-       <button type="button" class="btn" id="btn-run-empty2"><span class="glyph">▶</span>Re-run analysis</button>`;
+       <button type="button" class="btn" id="btn-run-empty2" data-run-analysis><span class="glyph">▶</span>Re-run analysis</button>`;
   return `<section class="section" aria-label="Findings">
     <div class="findings-wrap">
       <div class="empty-cta">
@@ -1037,6 +1055,7 @@ function buildScript(): string {
   return `(function () {
   var vscode = acquireVsCodeApi();
   var filterDebounce = null;
+  var isAnalyzing = false;
 
   // §15.3 — polite live-region announcer for filter / sort state changes.
   ${getAnnouncerScript()}
@@ -1070,6 +1089,36 @@ function buildScript(): string {
     }, 220);
   }
 
+  function setAnalysisProgress(running, metaText) {
+    isAnalyzing = running;
+    var box = document.getElementById('analysis-progress');
+    var label = document.getElementById('analysis-progress-label');
+    var meta = document.getElementById('analysis-progress-meta');
+    if (box) box.hidden = !running;
+    if (label) label.textContent = running ? 'Running analysis…' : 'Analysis complete';
+    if (meta) {
+      meta.textContent = metaText || (running
+        ? 'This can take a moment on large projects.'
+        : 'Refreshing dashboard with the latest findings.');
+    }
+    document.querySelectorAll('[data-run-analysis]').forEach(function (el) {
+      if ('disabled' in el) {
+        el.disabled = running;
+      }
+      if (running) {
+        el.setAttribute('aria-disabled', 'true');
+      } else {
+        el.removeAttribute('aria-disabled');
+      }
+    });
+  }
+
+  function triggerRunAnalysis() {
+    if (isAnalyzing) return;
+    setAnalysisProgress(true);
+    vscode.postMessage({ type: 'runAnalysis' });
+  }
+
   // §15.3 — describe the current filter state to screen readers so users
   // navigating without a mouse know which constraints are active.
   function announceFilterState() {
@@ -1098,7 +1147,7 @@ function buildScript(): string {
 
   /* §8.5.2 — recent-filters popover. Stored in sessionStorage so the list
      survives within the current panel session; cross-session persistence
-     is tracked in plan/UX_GUIDELINES_REMAINING.md. */
+     is tracked in plan/UX_GUIDELINES.md (Part B). */
   var recentEl = document.getElementById('findings-recent');
   var recentListEl = document.getElementById('findings-recent-list');
   var recentClearAllEl = document.getElementById('findings-recent-clear');
@@ -1106,6 +1155,18 @@ function buildScript(): string {
   var RECENT_CAP = 10;
   var RECENT_DEBOUNCE_MS = 800;
   var recentTimer = null;
+
+  function findingsRecentPersist() {
+    try { vscode.postMessage({ type: 'saveFindingsRecent', queries: recentLoad() }); } catch (_) {}
+  }
+
+  window.addEventListener('message', function (event) {
+    var m = event.data;
+    if (m && m.type === 'hydrateRecentSearches' && Array.isArray(m.queries) && m.queries.length > 0) {
+      recentSave(m.queries.slice(0, RECENT_CAP), true);
+      recentRender();
+    }
+  });
 
   function recentLoad() {
     try {
@@ -1115,8 +1176,9 @@ function buildScript(): string {
       return Array.isArray(parsed) ? parsed.filter(function (s) { return typeof s === 'string'; }) : [];
     } catch (e) { return []; }
   }
-  function recentSave(list) {
+  function recentSave(list, skipHost) {
     try { sessionStorage.setItem(RECENT_KEY, JSON.stringify(list)); } catch (e) { /* best-effort */ }
+    if (!skipHost) { findingsRecentPersist(); }
   }
   function recentRecord(q) {
     var t = (q || '').trim();
@@ -1214,7 +1276,7 @@ function buildScript(): string {
   });
 
   /* Toolbar primary actions */
-  bindClick('btn-run', function () { vscode.postMessage({ type: 'runAnalysis' }); });
+  bindClick('btn-run', triggerRunAnalysis);
   bindClick('btn-refresh', function () { vscode.postMessage({ type: 'refresh' }); });
   // Copy JSON / Save report now live inside the More-actions overflow menu
   // (§14.4 toolbar budget). Auto-close the menu after click so the user is
@@ -1232,11 +1294,11 @@ function buildScript(): string {
   bindClick('btn-refresh-extension', function () {
     vscode.postMessage({ type: 'paletteCommand', commandId: 'saropaLints.refresh' });
   });
-  bindClick('btn-run-empty', function () { vscode.postMessage({ type: 'runAnalysis' }); });
-  bindClick('btn-run-empty2', function () { vscode.postMessage({ type: 'runAnalysis' }); });
+  bindClick('btn-run-empty', triggerRunAnalysis);
+  bindClick('btn-run-empty2', triggerRunAnalysis);
   bindClick('btn-refresh-empty', function () { vscode.postMessage({ type: 'refresh' }); });
   bindClick('btn-reset-empty', function () { vscode.postMessage({ type: 'resetFilters' }); });
-  bindClick('run-again', function () { vscode.postMessage({ type: 'runAnalysis' }); });
+  bindClick('run-again', triggerRunAnalysis);
 
   /* More actions menu */
   document.querySelectorAll('.menu-item[data-palette-cmd]').forEach(function (btn) {
@@ -1356,23 +1418,42 @@ function buildScript(): string {
     document.querySelectorAll('tr.group-row[aria-expanded="true"]').forEach(function (gr) { gr.click(); });
   });
 
-  /* Sortable table headers — sorts within each group, stable. */
-  document.querySelectorAll('.findings-table thead th[data-sort]').forEach(function (th) {
-    th.addEventListener('click', function () {
-      var sortKey = th.getAttribute('data-sort');
-      var current = th.getAttribute('aria-sort') || 'none';
-      var next = current === 'ascending' ? 'descending' : 'ascending';
-      document.querySelectorAll('.findings-table thead th').forEach(function (other) {
-        other.setAttribute('aria-sort', 'none');
-      });
-      th.setAttribute('aria-sort', next);
-      sortRowsWithinGroups(sortKey, next === 'ascending');
+  /* Sortable table headers — primary click sets key; Shift+click stacks a
+     secondary tie-breaker (shows ① / ② badges). */
+  var sortLevels = [];
+  function rowSortVal(tr, sk) {
+    var sevOrder = { error: 0, warning: 1, info: 2, note: 3 };
+    if (sk === 'sev') return sevOrder[tr.getAttribute('data-sev')] || 99;
+    if (sk === 'rule') return tr.getAttribute('data-rule') || '';
+    if (sk === 'line') return parseInt(tr.getAttribute('data-line') || '0', 10);
+    return (tr.querySelector('.vmsg') || {}).textContent || '';
+  }
+  function cmpRows(a, b, sk, asc) {
+    var av = rowSortVal(a, sk);
+    var bv = rowSortVal(b, sk);
+    if (av < bv) return asc ? -1 : 1;
+    if (av > bv) return asc ? 1 : -1;
+    return 0;
+  }
+  function updateSortHeaderUi() {
+    document.querySelectorAll('.findings-table thead th[data-sort]').forEach(function (h) {
+      h.setAttribute('aria-sort', 'none');
+      var idx = h.querySelector('.sort-idx');
+      if (idx) idx.textContent = '';
     });
-  });
-
-  function sortRowsWithinGroups(key, asc) {
+    for (var i = 0; i < sortLevels.length && i < 2; i++) {
+      var lk = sortLevels[i].key;
+      var th = document.querySelector('.findings-table thead th[data-sort="' + lk + '"]');
+      if (th) {
+        th.setAttribute('aria-sort', sortLevels[i].asc ? 'ascending' : 'descending');
+        var idx = th.querySelector('.sort-idx');
+        if (idx) idx.textContent = i === 0 ? '①' : '②';
+      }
+    }
+  }
+  function sortRowsWithinGroupsMulti() {
     var tbody = document.querySelector('.findings-table tbody');
-    if (!tbody) return;
+    if (!tbody || sortLevels.length === 0) return;
     var groups = [];
     var current = null;
     Array.prototype.forEach.call(tbody.children, function (tr) {
@@ -1383,37 +1464,105 @@ function buildScript(): string {
         current.rows.push(tr);
       }
     });
-    var sevOrder = { error: 0, warning: 1, info: 2, note: 3 };
     groups.forEach(function (g) {
       g.rows.sort(function (a, b) {
-        var av, bv;
-        if (key === 'sev') {
-          av = sevOrder[a.getAttribute('data-sev')] || 99;
-          bv = sevOrder[b.getAttribute('data-sev')] || 99;
-        } else if (key === 'rule') {
-          av = a.getAttribute('data-rule') || '';
-          bv = b.getAttribute('data-rule') || '';
-        } else if (key === 'line') {
-          av = parseInt(a.getAttribute('data-line') || '0', 10);
-          bv = parseInt(b.getAttribute('data-line') || '0', 10);
-        } else {
-          av = (a.querySelector('.vmsg') || {}).textContent || '';
-          bv = (b.querySelector('.vmsg') || {}).textContent || '';
+        for (var si = 0; si < sortLevels.length; si++) {
+          var lv = sortLevels[si];
+          var c = cmpRows(a, b, lv.key, lv.asc);
+          if (c !== 0) return c;
         }
-        if (av < bv) return asc ? -1 : 1;
-        if (av > bv) return asc ? 1 : -1;
         return 0;
       });
     });
-    /* Wipe the tbody, then re-append in (header, sorted rows) order so
-       group sequence stays stable while rows within each group reflect
-       the new sort. Single-pass — earlier drafts double-rebuilt. */
     while (tbody.firstChild) tbody.removeChild(tbody.firstChild);
     groups.forEach(function (g) {
       tbody.appendChild(g.header);
       g.rows.forEach(function (r) { tbody.appendChild(r); });
     });
+    updateBulkUi();
   }
+
+  document.querySelectorAll('.findings-table thead th[data-sort]').forEach(function (th) {
+    th.addEventListener('click', function (ev) {
+      var sk = th.getAttribute('data-sort');
+      if (!sk) return;
+      if (ev.shiftKey) {
+        if (sortLevels.length === 0) {
+          sortLevels = [{ key: sk, asc: true }];
+        } else if (sortLevels[0].key === sk) {
+          sortLevels[0].asc = !sortLevels[0].asc;
+        } else if (sortLevels.length >= 2 && sortLevels[1].key === sk) {
+          sortLevels[1].asc = !sortLevels[1].asc;
+        } else if (sortLevels.length === 1) {
+          sortLevels.push({ key: sk, asc: true });
+        } else {
+          sortLevels = [sortLevels[0], { key: sk, asc: true }];
+        }
+      } else {
+        if (sortLevels.length && sortLevels[0].key === sk) {
+          sortLevels[0].asc = !sortLevels[0].asc;
+        } else {
+          sortLevels = [{ key: sk, asc: true }];
+        }
+      }
+      updateSortHeaderUi();
+      sortRowsWithinGroupsMulti();
+    });
+  });
+
+  /* Bulk row selection — copy selected violations as JSON without opening each file. */
+  var bulkBar = document.getElementById('findings-bulk-bar');
+  var bulkCount = document.getElementById('findings-bulk-count');
+  var bulkAll = document.getElementById('bulk-select-all');
+
+  function decodeFileAttr(enc) {
+    try { return decodeURIComponent(enc || ''); } catch (e2) { return enc || ''; }
+  }
+  function updateBulkUi() {
+    var cbs = document.querySelectorAll('.bulk-row-cb:checked');
+    if (!bulkBar || !bulkCount) return;
+    var n = cbs.length;
+    bulkBar.hidden = n === 0;
+    bulkCount.textContent = n + ' selected';
+    var vis = Array.prototype.filter.call(
+      document.querySelectorAll('.bulk-row-cb'),
+      function (cb) {
+        var row = cb.closest('tr');
+        return row && row.style.display !== 'none';
+      },
+    );
+    if (bulkAll) {
+      bulkAll.indeterminate = n > 0 && n < vis.length;
+      bulkAll.checked = vis.length > 0 && n === vis.length;
+    }
+  }
+  function collectBulkPayload() {
+    var out = [];
+    document.querySelectorAll('.bulk-row-cb:checked').forEach(function (cb) {
+      out.push({
+        file: decodeFileAttr(cb.getAttribute('data-file')),
+        line: parseInt(cb.getAttribute('data-line') || '1', 10),
+        rule: cb.getAttribute('data-rule') || ''
+      });
+    });
+    return out;
+  }
+  if (bulkAll) {
+    bulkAll.addEventListener('change', function () {
+      Array.prototype.forEach.call(document.querySelectorAll('.bulk-row-cb'), function (cb) {
+        var tr = cb.closest('tr');
+        if (tr && tr.style.display === 'none') return;
+        cb.checked = bulkAll.checked;
+      });
+      updateBulkUi();
+    });
+  }
+  bindClick('btn-bulk-copy', function () {
+    var pay = collectBulkPayload();
+    if (pay.length) {
+      vscode.postMessage({ type: 'copyBulkFindings', violations: pay });
+    }
+  });
 
   /* Finding-row clicks open the file. Per-row copy posts JSON. */
   bindFRows();
@@ -1421,6 +1570,8 @@ function buildScript(): string {
     document.querySelectorAll('tr.frow').forEach(function (row) {
       row.addEventListener('click', function (e) {
         var t = e.target;
+        if (t && t.closest && t.closest('.bulk-row-cb')) return;
+        if (t && t.closest && t.closest('.col-sel-bulk')) return;
         if (t && t.getAttribute && t.getAttribute('data-row-action') === 'copy') {
           e.stopPropagation();
           vscode.postMessage({
@@ -1434,6 +1585,8 @@ function buildScript(): string {
         openRow(row);
       });
       row.addEventListener('keydown', function (e) {
+        var tgt = e.target;
+        if (tgt && tgt.closest && tgt.closest('.bulk-row-cb')) return;
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openRow(row); }
       });
     });
@@ -1444,6 +1597,13 @@ function buildScript(): string {
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openRow(row); }
       });
     });
+    document.querySelectorAll('.bulk-row-cb').forEach(function (cb) {
+      cb.addEventListener('click', function (e) {
+        e.stopPropagation();
+        updateBulkUi();
+      });
+    });
+    updateBulkUi();
   }
   function openRow(row) {
     var enc = row.getAttribute('data-file');
@@ -1520,6 +1680,25 @@ function buildScript(): string {
     if (el) el.addEventListener('click', fn);
   }
 
+  window.addEventListener('message', function (event) {
+    var msg = event && event.data ? event.data : null;
+    if (!msg || msg.type !== 'analysisProgress') return;
+    if (msg.status === 'started') {
+      setAnalysisProgress(true, 'Analysis started. Collecting diagnostics…');
+      announce('Analysis started');
+      return;
+    }
+    if (msg.status === 'completed') {
+      setAnalysisProgress(false, 'Refreshing dashboard with the latest findings.');
+      announce('Analysis complete');
+      return;
+    }
+    if (msg.status === 'failed') {
+      setAnalysisProgress(false, 'Analysis failed. Check output for details.');
+      announce('Analysis failed');
+    }
+  });
+
   /* Full-width toggle (guideline §4) — flips body[data-full-width] so users on ultrawide
      monitors can opt out of the readability max-width set in the stylesheet. */
   ${getFullWidthToggleScript()}
@@ -1568,6 +1747,7 @@ export function renderViolationsDashboardHtml(input: ViolationsDashboardHtmlInpu
   <header>${buildHero(input)}</header>
   ${buildKpiCards(input)}
   ${buildToolbar(input)}
+  ${buildAnalysisProgress()}
   <main id="findings-table" tabindex="-1">
     ${buildTopRulesTable(input)}
     ${buildFindingsBlock(input)}
@@ -1607,18 +1787,40 @@ export function buildFindingsEmptyStateHtml(message: string): string {
     <p>${esc}</p>
     <p>Run a Saropa Lints analysis to generate <code>violations.json</code>, then use <strong>Refresh</strong> here or reopen this dashboard.</p>
     <div class="btns">
-      <button type="button" class="primary" id="btn-run">Run analysis</button>
+      <button type="button" class="primary" id="btn-run" data-run-analysis>Run analysis</button>
       <button type="button" id="btn-refresh">Refresh from disk</button>
     </div>
+    ${buildAnalysisProgress()}
   </div>
   <script nonce="${nonce}">
     (function () {
       var vscode = acquireVsCodeApi();
+      var running = false;
+      function setRunning(on) {
+        running = on;
+        var box = document.getElementById('analysis-progress');
+        if (box) box.hidden = !on;
+        var btn = document.getElementById('btn-run');
+        if (btn) btn.disabled = on;
+      }
       document.getElementById('btn-run').addEventListener('click', function () {
+        if (running) return;
+        setRunning(true);
         vscode.postMessage({ type: 'runAnalysis' });
       });
       document.getElementById('btn-refresh').addEventListener('click', function () {
         vscode.postMessage({ type: 'refresh' });
+      });
+      window.addEventListener('message', function (event) {
+        var msg = event && event.data ? event.data : null;
+        if (!msg || msg.type !== 'analysisProgress') return;
+        if (msg.status === 'started') {
+          setRunning(true);
+          return;
+        }
+        if (msg.status === 'completed' || msg.status === 'failed') {
+          setRunning(false);
+        }
       });
     })();
   </script>

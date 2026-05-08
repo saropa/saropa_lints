@@ -704,7 +704,7 @@ function registerCommands(
         ),
         vscode.commands.registerCommand(
             'saropaLints.packageVibrancy.browseKnownIssues',
-            () => KnownIssuesPanel.createOrShow(),
+            () => KnownIssuesPanel.createOrShow(context),
         ),
         vscode.commands.registerCommand(
             'saropaLints.packageVibrancy.exportSbom',

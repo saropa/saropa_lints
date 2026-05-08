@@ -61,6 +61,7 @@ import {
 } from './views/ruleExplainView';
 import {
   readViolations,
+  filterDisabledFromData,
   hasViolations,
   ViolationsData,
   getViolationsPath as getViolationsFilePath,
@@ -92,7 +93,12 @@ import {
   DECAY_RATE,
 } from './healthScore';
 import { registerInlineAnnotations, updateAnnotationsForAllEditors, invalidateAnnotationCache } from './inlineAnnotations';
-import { writeRuleOverrides, removeRuleOverrides, invalidateDisabledRulesCache } from './configWriter';
+import {
+  writeRuleOverrides,
+  removeRuleOverrides,
+  invalidateDisabledRulesCache,
+  readDisabledRules,
+} from './configWriter';
 import { logReport, logSection, flushReport, findLatestAnalysisReport } from './reportWriter';
 import { generateOwaspReport } from './owaspExport';
 import { getProjectRoot, invalidateProjectRoot } from './projectRoot';
@@ -188,6 +194,17 @@ function runCelebrationIfNeeded(root: string, history: RunSnapshot[], appended: 
 function updateContext(enabled: boolean, hasViolations: boolean) {
   void vscode.commands.executeCommand('setContext', 'saropaLints.enabled', enabled);
   void vscode.commands.executeCommand('setContext', 'saropaLints.hasViolations', hasViolations);
+}
+
+/**
+ * Dashboard-consistent view of violations:
+ * apply disabled-rule filtering to the current report before computing scores.
+ */
+function readVisibleViolations(root: string): ViolationsData | null {
+  const raw = readViolations(root);
+  if (!raw) return null;
+  const disabled = readDisabledRules(root);
+  return filterDisabledFromData(raw, disabled);
 }
 
 /** Compact status entry: opens the Findings Dashboard (replaces the Violations tree badge). */
@@ -512,9 +529,9 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       // see the updated history (avoids stale findPreviousScore reads).
       const root = getProjectRoot();
       if (root) {
-        const data = readViolations(root);
+        const data = readVisibleViolations(root);
         if (data) {
-          syncRuleMetadataFromViolations(data);
+          syncRuleMetadataFromViolations(readViolations(root));
           const { history, appended } = appendSnapshot(context.workspaceState, data);
           refreshAll();
           updateAllStatusBars(data);
@@ -649,7 +666,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
 
       // I5: Record snapshot before refreshing views so Overview sees fresh history.
       const root = getProjectRoot();
-      const data = root ? readViolations(root) : null;
+      const data = root ? readVisibleViolations(root) : null;
       if (data) {
         appendSnapshot(context.workspaceState, data);
       }

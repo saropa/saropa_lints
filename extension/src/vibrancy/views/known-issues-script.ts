@@ -37,11 +37,19 @@ export function getKnownIssuesScript(): string {
            survives within the current panel session but resets when the panel
            is closed. Cross-session persistence (per-workspace history) is a
            follow-up that needs host-side wiring; tracked in
-           plan/UX_GUIDELINES_REMAINING.md. */
+           plan/UX_GUIDELINES.md (Part B). */
         const RECENT_STORAGE_KEY = 'saropa.knownIssues.recentSearches';
         const RECENT_CAP = 10;
         const RECENT_COMMIT_MS = 800;
         let recentCommitTimer = null;
+
+        window.addEventListener('message', function (event) {
+            const d = event.data;
+            if (d && d.type === 'hydrateKnownIssuesRecent' && Array.isArray(d.queries) && d.queries.length > 0) {
+                writeRecentStorage(d.queries.filter(x => typeof x === 'string').slice(0, RECENT_CAP), false);
+                renderRecent();
+            }
+        });
 
         function loadRecent() {
             try {
@@ -54,13 +62,22 @@ export function getKnownIssuesScript(): string {
             }
         }
 
-        function saveRecent(list) {
+        function writeRecentStorage(list, postToHost) {
             try {
                 sessionStorage.setItem(RECENT_STORAGE_KEY, JSON.stringify(list));
             } catch (e) {
                 /* sessionStorage may throw on quota or restricted contexts —
                    silently fall through; recent searches are best-effort. */
             }
+            if (postToHost) {
+                try {
+                    vscode.postMessage({ type: 'saveKnownIssuesRecent', queries: list.slice(0, RECENT_CAP) });
+                } catch (_) { /* offline / bridge missing */ }
+            }
+        }
+
+        function saveRecent(list) {
+            writeRecentStorage(list, true);
         }
 
         function recordRecent(query) {

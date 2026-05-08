@@ -271,6 +271,11 @@ async function rebuildDashboardHtml(
     filesAffected: countDistinctFiles(afterDisabled.violations),
     enabledRuleCount: raw.config?.enabledRuleCount,
   });
+
+  void panel.webview.postMessage({
+    type: 'hydrateRecentSearches',
+    queries: context.workspaceState.get<string[]>('saropa.findingsDashboard.recentSearches', []),
+  });
 }
 
 function countBySeverity(violations: readonly Violation[]): Record<string, number> {
@@ -477,7 +482,20 @@ function getOrCreatePanel(context: vscode.ExtensionContext): vscode.WebviewPanel
       return;
     }
     if (data.type === 'runAnalysis') {
-      await vscode.commands.executeCommand('saropaLints.runAnalysis');
+      currentPanel?.webview.postMessage({ type: 'analysisProgress', status: 'started' });
+      try {
+        await vscode.commands.executeCommand('saropaLints.runAnalysis');
+        // Force a full dashboard rebuild after analysis so all panels (findings,
+        // TODO/HACK snapshot, drift section) reflect the newest run immediately.
+        todosAndHacksSnapshot = undefined;
+        driftAdvisorSnapshot = undefined;
+        if (currentPanel) {
+          await rebuildDashboardHtml(context, currentPanel);
+          currentPanel.webview.postMessage({ type: 'analysisProgress', status: 'completed' });
+        }
+      } catch {
+        currentPanel?.webview.postMessage({ type: 'analysisProgress', status: 'failed' });
+      }
       return;
     }
     if (data.type === 'copyFilteredJson') {
@@ -607,6 +625,52 @@ function getOrCreatePanel(context: vscode.ExtensionContext): vscode.WebviewPanel
       const rule = (data as { rule?: unknown }).rule;
       if (typeof rule === 'string' && rule.length > 0) {
         await vscode.commands.executeCommand('saropaLints.disableRules', [rule]);
+      }
+      return;
+    }
+    if (data.type === 'copyBulkFindings') {
+      const blobs = (data as { violations?: unknown }).violations;
+      const matches: Violation[] = [];
+      if (Array.isArray(blobs)) {
+        const key = (file: unknown, line: unknown, rule: unknown) =>
+          `${String(file)}@${String(line)}@${String(rule)}`;
+        const target = new Set(
+          blobs
+            .filter((b): b is Record<string, unknown> =>
+              Boolean(b && typeof b === 'object'),
+            )
+            .map((b) =>
+              key(
+                typeof b.file === 'string' ? b.file : '',
+                typeof b.line === 'number' ? b.line : 0,
+                typeof b.rule === 'string' ? b.rule : '',
+              ),
+            ),
+        );
+        for (const v of lastExportViolations) {
+          if (target.has(`${v.file}@${v.line ?? 0}@${v.rule}`)) {
+            matches.push(v);
+          }
+        }
+      }
+      if (matches.length > 0) {
+        await vscode.env.clipboard.writeText(JSON.stringify(matches, null, 2));
+        void vscode.window.setStatusBarMessage(
+          `Copied ${matches.length} selected finding(s) as JSON.`,
+          4000,
+        );
+      } else {
+        void vscode.window.setStatusBarMessage('No matching findings to copy.', 2500);
+      }
+      return;
+    }
+    if (data.type === 'saveFindingsRecent') {
+      const q = (data as { queries?: unknown }).queries;
+      if (Array.isArray(q) && q.every((x) => typeof x === 'string')) {
+        await context.workspaceState.update(
+          'saropa.findingsDashboard.recentSearches',
+          q.slice(0, 12),
+        );
       }
       return;
     }

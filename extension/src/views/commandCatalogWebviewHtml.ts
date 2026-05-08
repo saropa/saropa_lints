@@ -50,6 +50,8 @@ export function buildCommandCatalogHtml(
   webview: vscode.Webview,
   extensionUri: vscode.Uri,
   history: CatalogHistoryRecord[],
+  /** Workspace-persisted catalog search phrases (shown in §8.5.2 popover). */
+  catalogSearchRecent: string[],
 ): string {
   const nonce = getNonce();
   const grouped = entriesByCategory();
@@ -134,7 +136,7 @@ export function buildCommandCatalogHtml(
           <span class="search-count" id="searchCount" aria-live="polite"></span>
           <!-- §8.5.2 — recent-searches popover. Stored in sessionStorage;
                cross-session persistence is tracked in
-               plan/UX_GUIDELINES_REMAINING.md. -->
+               plan/UX_GUIDELINES.md (Part B). -->
           <div id="catalog-recent" class="catalog-recent" hidden>
             <div class="catalog-recent-head">
               <span class="catalog-recent-title">Recent searches</span>
@@ -216,6 +218,7 @@ export function buildCommandCatalogHtml(
   ])}
   <script nonce="${nonce}">
     window.__INITIAL_HISTORY__ = ${JSON.stringify(history)};
+    window.__INITIAL_CATALOG_SEARCH_RECENT__ = ${JSON.stringify(catalogSearchRecent)};
     window.__RECENT_VISIBLE_DEFAULT__ = ${RECENT_VISIBLE_DEFAULT};
     window.__FREQUENT_TILE_LIMIT__ = ${FREQUENT_TILE_LIMIT};
     ${getScript()}
@@ -1302,6 +1305,12 @@ function getScript(): string {
         if (msg && msg.type === 'history') {
           applyHistory(msg.items || []);
         }
+        if (msg && msg.type === 'hydrateCatalogSearchRecent' && Array.isArray(msg.queries) && msg.queries.length > 0) {
+          try {
+            sessionStorage.setItem(CAT_RECENT_KEY, JSON.stringify(msg.queries.slice(0, CAT_RECENT_CAP)));
+          } catch (_) { /* best-effort */ }
+          catRecentRender();
+        }
       });
 
       if (clearHistoryBtn) {
@@ -1466,7 +1475,7 @@ function getScript(): string {
 
       /* §8.5.2 — recent-searches storage and popover wiring for the catalog
          search input. Stored in sessionStorage; cross-session persistence is
-         tracked in plan/UX_GUIDELINES_REMAINING.md. */
+         tracked in plan/UX_GUIDELINES.md (Part B). */
       var catalogRecentEl = document.getElementById('catalog-recent');
       var catalogRecentListEl = document.getElementById('catalog-recent-list');
       var catalogRecentClearEl = document.getElementById('catalog-recent-clear');
@@ -1474,6 +1483,17 @@ function getScript(): string {
       var CAT_RECENT_CAP = 10;
       var CAT_RECENT_DEBOUNCE_MS = 800;
       var catalogRecentTimer = null;
+
+      (function hydrateCatRecentFromBuild() {
+        var init = typeof window.__INITIAL_CATALOG_SEARCH_RECENT__ !== 'undefined'
+          ? window.__INITIAL_CATALOG_SEARCH_RECENT__
+          : null;
+        if (init && Array.isArray(init) && init.length > 0) {
+          try {
+            sessionStorage.setItem(CAT_RECENT_KEY, JSON.stringify(init.slice(0, CAT_RECENT_CAP)));
+          } catch (_) { /* best-effort */ }
+        }
+      })();
 
       function catRecentLoad() {
         try {
@@ -1483,8 +1503,19 @@ function getScript(): string {
           return Array.isArray(p) ? p.filter(function (s) { return typeof s === 'string'; }) : [];
         } catch (e) { return []; }
       }
+      var catRecentPersistTimer = null;
+      function persistCatRecentDebounced(list) {
+        if (catRecentPersistTimer) clearTimeout(catRecentPersistTimer);
+        catRecentPersistTimer = setTimeout(function () {
+          catRecentPersistTimer = null;
+          try {
+            vscode.postMessage({ type: 'saveCatalogSearchRecent', queries: list });
+          } catch (_) { /* offline */ }
+        }, 420);
+      }
       function catRecentSave(list) {
         try { sessionStorage.setItem(CAT_RECENT_KEY, JSON.stringify(list)); } catch (e) { /* best-effort */ }
+        persistCatRecentDebounced(list);
       }
       function catRecentRecord(q) {
         var t = (q || '').trim();

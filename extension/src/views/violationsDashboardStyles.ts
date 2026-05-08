@@ -643,6 +643,36 @@ export function getViolationsDashboardStyles(): string {
     }
     .findings-toolbar .mini-btn:hover { text-decoration: underline; }
 
+    .findings-bulk-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 12px 8px 12px;
+      border-bottom: 1px solid var(--border);
+      background: color-mix(in srgb, var(--surface-3) 92%, transparent);
+    }
+    .findings-bulk-bar[hidden] { display: none !important; }
+    .findings-bulk-label {
+      font-size: .88em;
+      color: var(--muted);
+    }
+    .findings-table thead th .sort-idx {
+      margin-inline-start: 4px;
+      font-size: .78em;
+      color: var(--muted);
+      user-select: none;
+    }
+    .findings-table tbody tr.frow,
+    .findings-table tbody tr.crow {
+      content-visibility: auto;
+      contain-intrinsic-size: 40px auto;
+    }
+    .findings-table .col-sel-bulk {
+      width: 28px;
+      text-align: center;
+      vertical-align: middle;
+    }
+
     .findings-table { width: 100%; border-collapse: collapse; font-size: .92em; }
     .findings-table thead th {
       position: sticky; top: 0;
@@ -800,6 +830,45 @@ export function getViolationsDashboardStyles(): string {
     .empty-cta h3 { margin: 0 0 6px; font-size: 1.05em; }
     .empty-cta p { margin: 0 0 14px; color: var(--muted); }
     .empty-cta .btns { display: inline-flex; gap: 8px; }
+
+    /* Analysis progress strip — shown while Run analysis is in flight. */
+    .analysis-progress {
+      margin: 10px 0 14px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: color-mix(in srgb, var(--surface-2) 86%, var(--vscode-editorInfo-foreground) 14%);
+    }
+    .analysis-progress-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+      font-size: .92em;
+    }
+    .analysis-progress-head strong { font-weight: 600; }
+    .analysis-progress-head span { color: var(--muted); }
+    .analysis-progress-track {
+      position: relative;
+      height: 6px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: color-mix(in srgb, var(--surface-3) 80%, transparent);
+    }
+    .analysis-progress-bar {
+      position: absolute;
+      inset-block: 0;
+      inline-size: 42%;
+      border-radius: inherit;
+      background: var(--vscode-progressBar-background);
+      animation: analysis-indeterminate 1.15s ease-in-out infinite;
+    }
+    @keyframes analysis-indeterminate {
+      0% { transform: translateX(-120%); }
+      50% { transform: translateX(40%); }
+      100% { transform: translateX(260%); }
+    }
 
     /* ============================================================
        SECONDARY LISTS — TODOs, HACKS, drift issues (§14.7).
