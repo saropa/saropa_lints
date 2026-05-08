@@ -6,6 +6,28 @@ Consolidated from TESTING_ISSUES.md, task-phase6-testing-release.md, and UNIT_TE
 **Scope:** All lint rules in `lib/src/rules/`, tests in `test/`, and v5 release readiness.  
 **Goal:** Expand behavioral fixture integration tests, close remaining fixture gaps, verify IDE integration, prove quick-fix application end-to-end.
 
+## Execution snapshot
+
+### Release gates (open)
+
+- [ ] **REL-01 (P0)** Fixture coverage gate to target threshold (or explicit documented exemption delta).
+- [ ] **REL-02 (P0)** Quick-fix application proof (D1-D5) with reproducible test evidence.
+- [ ] **REL-03 (P0)** IDE integration manual sign-off checklist (E1-E5) fully filled and archived.
+- [ ] **REL-04 (P1)** Regression/perf baseline refresh captured before next release-class cut.
+
+### Next 3 (ordered)
+
+- [ ] **REL-N1 (P0)** Complete D1-D3 fix-application tests and land in CI.
+- [ ] **REL-N2 (P0)** Run and record E1-E5 manual IDE validation.
+- [ ] **REL-N3 (P1)** Refresh publish audit numbers and update this document's gate table.
+
+### REL-N1 implementation slice (active)
+
+- [ ] Add/verify one replace-path assertion in `test/scan/fix_application_smoke_test.dart`.
+- [ ] Add/verify one delete-path assertion in `test/scan/fix_application_smoke_test.dart`.
+- [ ] Add/verify one insert-path assertion in `test/scan/fix_application_smoke_test.dart`.
+- [ ] Ensure test names map to plan IDs (D1/D2/D3) for audit traceability.
+
 Fixture coverage for the 27 reviewed categories and rule instantiation tests for 108 categories are complete (see `bugs/history/`).
 
 ---

@@ -56,6 +56,7 @@ This upcoming release tightens Findings Dashboard trust and usability: score/reg
 <details><summary>Maintenance</summary>
 
 - **Planning execution slices** — the quick-fix plan now includes an explicit Batch 14 build set (three deterministic fixes with acceptance criteria) so implementation can proceed in auditable small commits; no action required for package users.
+- **Testing gate clarity** — the testing/release plan now defines an explicit D1-D3 implementation slice for fix application smoke coverage, making release gate ownership and audit traceability clearer; no action required for package users.
 
 </details>
 
