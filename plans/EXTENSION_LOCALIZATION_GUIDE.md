@@ -14,6 +14,26 @@ This guide is intentionally implementation-ready and aligned with your existing 
 
 - `D:\src\contacts\scripts\build\setup_arb_translate.py`
 
+## Execution snapshot
+
+### Next 3 (ordered)
+
+- [ ] **L10N-01 (P0)** Establish English sources: `package.nls.json` + runtime `en` bundle and wire `%key%` usage for manifest-visible strings.
+- [ ] **L10N-02 (P0)** Migrate dashboard/runtime strings to centralized lookup (`runtime.ts`) and ban new inline user-facing literals.
+- [ ] **L10N-03 (P1)** Add CI parity checks (key parity, placeholder parity, manifest key coverage) before enabling additional locales.
+
+### Done criteria for this plan
+
+- Manifest-visible strings are sourced from `%key%` entries with `package.nls*.json` parity.
+- Webview/dashboard strings resolve through runtime i18n bundles.
+- CI fails on missing keys/placeholders and manifest key drift.
+
+### L10N-01 implementation slice (active)
+
+- [ ] Add `extension/package.nls.json` with English keys for all manifest-visible strings.
+- [ ] Replace inline manifest labels in `extension/package.json` with `%key%` references.
+- [ ] Add one validation script/check that all `%key%` references resolve in `package.nls.json`.
+
 ---
 
 ## Current State (Important)

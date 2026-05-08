@@ -58,6 +58,7 @@ This upcoming release tightens Findings Dashboard trust and usability: score/reg
 - **Planning execution slices** — the quick-fix plan now includes an explicit Batch 14 build set (three deterministic fixes with acceptance criteria) so implementation can proceed in auditable small commits; no action required for package users.
 - **Testing gate clarity** — the testing/release plan now defines an explicit D1-D3 implementation slice for fix application smoke coverage, making release gate ownership and audit traceability clearer; no action required for package users.
 - **Stub-test migration sequencing** — the stub-test bug plan now records a fixed top-three conversion order for the next high-risk batch, which improves execution predictability and auditability; no action required for package users.
+- **Localization foundation slicing** — the extension localization guide now includes an explicit L10N-01 implementation slice (NLS source, `%key%` wiring, and key-resolution check), improving delivery clarity; no action required for package users.
 
 </details>
 
