@@ -23,6 +23,8 @@ import '../../fixes/widget_layout/prefer_padding_over_container_fix.dart';
 import '../../fixes/widget_layout/prefer_constrained_box_over_container_fix.dart';
 import '../../fixes/widget_layout/prefer_const_border_radius_fix.dart';
 import '../../fixes/widget_layout/prefer_const_widgets_in_lists_fix.dart';
+import '../../fixes/widget_layout/add_column_text_baseline_fix.dart';
+import '../../fixes/widget_layout/add_main_axis_size_min_fix.dart';
 
 class AvoidMisnamedPaddingRule extends SaropaLintRule {
   AvoidMisnamedPaddingRule() : super(code: _code);
@@ -4985,26 +4987,32 @@ class AvoidPositionedOutsideStackRule extends SaropaLintRule {
 }
 
 // =========================================================================
-// Rule: avoid_spacer_in_wrap
+// Rule: require_baseline_text_baseline
 // =========================================================================
 
-/// Warns when `Spacer` or `Expanded` is used inside a `Wrap` widget.
+/// Warns when `Row`, `Column`, or `Flex` uses `CrossAxisAlignment.baseline`
+/// without a `textBaseline` argument.
 ///
-/// Since: v4.9.14 | Updated: v4.13.0 | Rule version: v3
-///
-/// `Wrap` does not extend `Flex` and does not support flex-based sizing.
-/// `Spacer` and `Expanded` require a `Flex` parent (Row/Column/Flex)
-/// to calculate their size. Using them inside `Wrap` causes a crash.
+/// Since: v4.9.14 | Updated: v4.13.0 | Rule version: v2
 ///
 /// **BAD:**
 /// ```dart
-/// Wrap(children: [Text('a'), Spacer(), Text('b')]) // Crash!
+/// Row(
+///   crossAxisAlignment: CrossAxisAlignment.baseline,
+///   children: [Text('a'), Text('b')],
+/// )
 /// ```
 ///
 /// **GOOD:**
 /// ```dart
-/// Wrap(children: [Text('a'), SizedBox(width: 8), Text('b')])
+/// Row(
+///   crossAxisAlignment: CrossAxisAlignment.baseline,
+///   textBaseline: TextBaseline.alphabetic,
+///   children: [Text('a'), Text('b')],
+/// )
 /// ```
+///
+/// **Quick fix available:** Inserts `textBaseline: TextBaseline.alphabetic`.
 class RequireBaselineTextBaselineRule extends SaropaLintRule {
   RequireBaselineTextBaselineRule() : super(code: _code);
 
@@ -5034,6 +5042,12 @@ class RequireBaselineTextBaselineRule extends SaropaLintRule {
   );
 
   static const Set<String> _targetWidgets = <String>{'Row', 'Column', 'Flex'};
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        AddColumnTextBaselineFix(context: context),
+  ];
 
   @override
   void runWithReporter(
@@ -5095,6 +5109,8 @@ class RequireBaselineTextBaselineRule extends SaropaLintRule {
 ///   ),
 /// )
 /// ```
+///
+/// **Quick fix available:** Inserts `mainAxisSize: MainAxisSize.min`.
 class AvoidUnconstrainedDialogColumnRule extends SaropaLintRule {
   AvoidUnconstrainedDialogColumnRule() : super(code: _code);
 
@@ -5128,6 +5144,12 @@ class AvoidUnconstrainedDialogColumnRule extends SaropaLintRule {
   };
 
   static final RegExp _minPattern = RegExp(r'\bmin\b');
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        AddMainAxisSizeMinFix(context: context),
+  ];
 
   @override
   void runWithReporter(

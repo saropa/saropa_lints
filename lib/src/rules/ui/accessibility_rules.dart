@@ -13,6 +13,7 @@ import 'package:analyzer/dart/ast/visitor.dart';
 
 import '../../saropa_lint_rule.dart';
 import '../../fixes/accessibility/increase_animation_duration_fix.dart';
+import '../../fixes/accessibility/unwrap_redundant_semantics_fix.dart';
 
 /// Warns when IconButton is used without a tooltip for accessibility.
 ///
@@ -4122,6 +4123,9 @@ class PreferSemanticsContainerRule extends SaropaLintRule {
 /// ```dart
 /// Image.asset('logo.png', semanticLabel: 'Company logo')
 /// ```
+///
+/// **Quick fix available:** Removes the redundant outer [Semantics]; keeps the
+/// child [Image] and its `semanticLabel`.
 class AvoidRedundantSemanticsRule extends SaropaLintRule {
   AvoidRedundantSemanticsRule() : super(code: _code);
 
@@ -4147,6 +4151,12 @@ class AvoidRedundantSemanticsRule extends SaropaLintRule {
 
   /// Image widget types that support semanticLabel.
   static const Set<String> _imageTypes = <String>{'Image'};
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        UnwrapRedundantSemanticsFix(context: context),
+  ];
 
   @override
   void runWithReporter(

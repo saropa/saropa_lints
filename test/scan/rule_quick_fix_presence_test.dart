@@ -30,6 +30,7 @@ import 'package:saropa_lints/src/rules/packages/getx_rules.dart';
 import 'package:saropa_lints/src/rules/widget/flutter_migration_widget_rules.dart';
 import 'package:saropa_lints/src/rules/widget/image_filter_quality_migration_rules.dart';
 import 'package:saropa_lints/src/rules/widget/widget_layout_constraints_rules.dart';
+import 'package:saropa_lints/src/rules/ui/accessibility_rules.dart';
 import 'package:saropa_lints/src/rules/widget/widget_layout_flex_scroll_rules.dart';
 import 'package:saropa_lints/src/rules/widget/widget_patterns_require_rules.dart';
 import 'package:test/test.dart';
@@ -557,6 +558,17 @@ void main() {
     hasFix(
       'AvoidRedundantAsyncOnLoadRule',
       () => AvoidRedundantAsyncOnLoadRule(),
+    );
+
+    // Batch 15 — layout / a11y (3 rules): unwrap Semantics + insert missing props.
+    hasFix('AvoidRedundantSemanticsRule', () => AvoidRedundantSemanticsRule());
+    hasFix(
+      'RequireBaselineTextBaselineRule',
+      () => RequireBaselineTextBaselineRule(),
+    );
+    hasFix(
+      'AvoidUnconstrainedDialogColumnRule',
+      () => AvoidUnconstrainedDialogColumnRule(),
     );
   });
 }

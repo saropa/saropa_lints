@@ -18,8 +18,15 @@ Treat this file as two layers:
 - [x] **QF-01 (P0)** Re-run `python scripts/list_rules_without_fixes.py` and stamp a fresh baseline date/count at the top of this plan. (**2026-05-08:** 1698 rules / 109 files; report `reports/20260508/…_list_rules_without_fixes.log`.)
 - [x] **QF-02 (P0)** Execute Batch 14 focused on deterministic AST-local fixes in the highest-yield files. (Verified 2026-05-08: fix wiring present for `avoid_duplicate_exports`, `avoid_duplicate_named_imports`, and `prefer_trailing_underscore_for_unused`; `dart test test/scan/rule_quick_fix_presence_test.dart` passed.)
 - [x] **QF-03 (P1)** Write a batch artifact to `plans/history/` with rule list, tests added, and missing-fix delta. (`plans/history/2026.05/2026.05.08/quick_fix_batch_14_verification.md`.)
+- [ ] **QF-04 (P0)** Batch 16+: pick three more missing-fix rules (see inventory), wire producers + `rule_quick_fix_presence_test.dart`, rerun audit for net delta after merge.
 
-### Batch 14 candidate slice (active build set)
+### Batch 15 candidate slice (done 2026-05-08)
+
+- `avoid_redundant_semantics` → unwrap redundant `Semantics` (keep labeled `Image` child).
+- `require_baseline_text_baseline` → insert `textBaseline: TextBaseline.alphabetic`.
+- `avoid_unconstrained_dialog_column` → insert `mainAxisSize: MainAxisSize.min`.
+
+### Batch 14 candidate slice
 
 Start with three deterministic fixes that are narrow and testable:
 
@@ -28,6 +35,10 @@ Start with three deterministic fixes that are narrow and testable:
 - `prefer_trailing_underscore_for_unused` -> rename unused closure param to trailing-underscore form.
 
 Batch 14 is considered complete when all three have fix producers, fixtures, and fix application tests.
+
+### Batch 15 verification
+
+See `plans/history/2026.05/2026.05.08/quick_fix_batch_15_verification.md`.
 
 ### Batch acceptance contract
 
@@ -1734,7 +1745,7 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] avoid_image_buttons_without_tooltip
 - [ ] avoid_merged_semantics_hiding_info
 - [ ] avoid_motion_without_reduce
-- [ ] avoid_redundant_semantics
+- [X] avoid_redundant_semantics
 - [ ] avoid_semantics_exclusion
 - [ ] avoid_semantics_in_animation
 - [ ] avoid_small_touch_targets
@@ -2006,7 +2017,7 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] avoid_textfield_in_row
 - [ ] avoid_unbounded_constraints
 - [ ] avoid_unconstrained_box_misuse
-- [ ] avoid_unconstrained_dialog_column
+- [X] avoid_unconstrained_dialog_column
 - [ ] avoid_unconstrained_images
 - [ ] avoid_wrapping_in_padding
 - [ ] check_for_equals_in_render_object_setters
@@ -2027,7 +2038,7 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] prefer_sliver_app_bar
 - [ ] prefer_spacing_over_sizedbox
 - [ ] prefer_transform_over_container
-- [ ] require_baseline_text_baseline
+- [X] require_baseline_text_baseline
 - [ ] require_overflow_box_rationale
 
 #### widget_layout_flex_scroll_rules.dart
