@@ -17,7 +17,7 @@ Consolidated from TESTING_ISSUES.md, task-phase6-testing-release.md, and UNIT_TE
 
 ### Next 3 (ordered)
 
-- [ ] **REL-N1 (P0)** Complete D1-D3 fix-application tests and land in CI.
+- [x] **REL-N1 (P0)** Complete D1-D3 fix-application tests and land in CI. (Verified 2026-05-08 via `dart test test/scan/fix_application_smoke_test.dart test/scan/fix_application_dart_fix_dry_run_test.dart`)
 - [ ] **REL-N2 (P0)** Run and record E1-E5 manual IDE validation.
 - [ ] **REL-N3 (P1)** Refresh publish audit numbers and update this document's gate table.
 
