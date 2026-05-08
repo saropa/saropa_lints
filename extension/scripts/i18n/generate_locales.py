@@ -6,9 +6,11 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
+from dictionaries import TRANSLATIONS
 from json_io import read_json, write_json
-from tree_translate import translate_tree
-from translator import DictionaryTranslator
+from mt_fallback import load_mt_cache, prefetch_machine_translations, save_mt_cache
+from tree_translate import apply_string_map, collect_unique_strings
+from translator import HybridTranslator
 
 
 def parse_args() -> argparse.Namespace:
@@ -42,18 +44,34 @@ def main() -> int:
     package_en = read_json(package_en_path)
     runtime_en = read_json(runtime_en_path)
 
+    mt_cache = load_mt_cache()
+    unique_en: set[str] = set()
+    collect_unique_strings(package_en, unique_en)
+    collect_unique_strings(runtime_en, unique_en)
+
+    sorted_unique = sorted(unique_en)
     for locale in locales:
-        translator = DictionaryTranslator(locale)
-        package_out = translate_tree(package_en, translator)
-        runtime_out = translate_tree(runtime_en, translator)
+        print(f"[i18n] {locale}: prefetch…", flush=True)
+        prefetch_machine_translations(
+            locale,
+            sorted_unique,
+            cache=mt_cache,
+            dict_table=TRANSLATIONS.get(locale, {}),
+        )
+        translator = HybridTranslator(locale, mt_cache)
+        # One ``translate_text`` per distinct English string (MT + cache), not per JSON leaf.
+        mapping = {s: translator.translate_text(s) for s in sorted_unique}
+        package_out = apply_string_map(package_en, mapping)
+        runtime_out = apply_string_map(runtime_en, mapping)
 
         package_out_path = root / f"package.nls.{locale}.json"
         runtime_out_path = root / "src" / "i18n" / "locales" / f"{locale}.json"
 
         write_json(package_out_path, package_out)
         write_json(runtime_out_path, runtime_out)
-        print(f"Generated {locale}: {package_out_path.name}, {runtime_out_path.name}")
+        print(f"[i18n] {locale}: wrote {package_out_path.name}, {runtime_out_path.name}", flush=True)
 
+    save_mt_cache(mt_cache)
     return 0
 
 

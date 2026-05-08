@@ -56,6 +56,9 @@ google-services.json
 # Extension changelog (copied from root CHANGELOG.md at publish time; single source of truth)
 extension/CHANGELOG.md
 
+# Extension i18n machine-translation cache (local; never ship secrets here)
+extension/scripts/i18n/.cache/
+
 # Other local config
 .github/copilot-instructions.md
 

@@ -1,0 +1,4 @@
+# Optional: machine translation fallback for ``generate_locales.py``.
+# Install: pip install -r extension/scripts/i18n/requirements.txt
+# Then: SAROPA_I18N_MACHINE_TRANSLATE=1 python extension/scripts/i18n/generate_locales.py
+deep-translator>=1.11.4
