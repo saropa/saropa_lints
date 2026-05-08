@@ -267,11 +267,31 @@ describe('violationsDashboardHtml', () => {
   });
 
   it('renders findings bulk-selection and multi-sort markup when violations are shown', () => {
+    const sections: DashboardSection[] = [
+      {
+        kind: 'severity',
+        severity: 'error',
+        files: [
+          {
+            filePath: 'lib/a.dart',
+            violations: [
+              {
+                file: 'lib/a.dart',
+                line: 10,
+                rule: 'test_rule',
+                message: 'hello',
+                severity: 'error',
+              },
+            ],
+          },
+        ],
+      },
+    ];
     const html = renderViolationsDashboardHtml(
       minimalInput({
         filteredCount: 1,
         totalRawAfterDisable: 1,
-        sections: [],
+        sections,
       }),
     );
     assert.ok(html.includes('id="findings-bulk-bar"'));

@@ -32,6 +32,30 @@ import {
   getKeyboardShortcutsStyles,
 } from './keyboard-shortcuts';
 import { pluralize } from './webview-format';
+import { t } from '../i18n/runtime';
+
+/** Client-script strings (embedded webview JS); resolved at host HTML build time. */
+function findingsDashScriptStrings(): Record<string, string> {
+    return {
+        analysisRunning: t('loading.runningAnalysis'),
+        analysisComplete: t('loading.analysisComplete'),
+        metaRunning: t('findingsDash.progress.runningMeta'),
+        metaDone: t('loading.refreshingDashboard'),
+        metaFailed: t('loading.analysisFailedDetail'),
+        metaStartedDetail: t('loading.analysisStartedDetail'),
+        announceSearchVerb: t('findingsDash.script.announceSearchVerb'),
+        severitiesNoun: t('findingsDash.script.severitiesNoun'),
+        impactsNoun: t('findingsDash.script.impactsNoun'),
+        announceCleared: t('findingsDash.script.announceCleared'),
+        filtersPrefix: t('findingsDash.script.announceFiltersPrefix'),
+        announceStarted: t('findingsDash.script.announceStarted'),
+        announceComplete: t('findingsDash.script.announceComplete'),
+        announceFailed: t('findingsDash.script.announceFailed'),
+        removeRecentTitle: t('findingsDash.script.removeRecentTitle'),
+        removeRecentAriaPrefix: t('findingsDash.script.removeRecentAria'),
+        bulkSelectedTpl: t('findingsDash.script.bulkSelectedTpl'),
+    };
+}
 
 /** Analyzer-side suppression counts from `violations.json` (same source as the Suppressions tree). */
 export interface AnalyzerSuppressionsSlice {
@@ -124,13 +148,13 @@ function escapeHtml(s: string): string {
 
 function groupBySelectOptions(current: GroupByMode): string {
   const labels: Record<GroupByMode, string> = {
-    severity: 'Severity',
-    file: 'File',
-    impact: 'Impact',
-    rule: 'Rule',
-    owasp: 'OWASP',
-    ruleType: 'Rule type',
-    ruleStatus: 'Rule status',
+    severity: t('findingsDash.groupBy.severity'),
+    file: t('findingsDash.groupBy.file'),
+    impact: t('findingsDash.groupBy.impact'),
+    rule: t('findingsDash.groupBy.rule'),
+    owasp: t('findingsDash.groupBy.owasp'),
+    ruleType: t('findingsDash.groupBy.ruleType'),
+    ruleStatus: t('findingsDash.groupBy.ruleStatus'),
   };
   return VIOLATIONS_GROUP_BY_MODES.map((m) => {
     const sel = m === current ? ' selected' : '';
@@ -141,7 +165,7 @@ function groupBySelectOptions(current: GroupByMode): string {
 function severitySegmented(active: readonly string[]): string {
   return SEVERITY_ORDER.map((v) => {
     const pressed = active.includes(v);
-    return `<button type="button" class="seg-btn" aria-pressed="${pressed}" data-sev="${v}" title="Toggle ${v} severity">
+    return `<button type="button" class="seg-btn" aria-pressed="${pressed}" data-sev="${v}" title="${escapeHtml(t('findingsDash.seg.toggleSeverityTitle', { v }))}">
       <span class="swatch sev-${v}"></span>${escapeHtml(v.charAt(0).toUpperCase() + v.slice(1))}
     </button>`;
   }).join('');
@@ -150,7 +174,7 @@ function severitySegmented(active: readonly string[]): string {
 function impactSegmented(active: readonly string[]): string {
   return IMPACT_ORDER.map((v) => {
     const pressed = active.includes(v);
-    return `<button type="button" class="seg-btn" aria-pressed="${pressed}" data-imp="${v}" title="Toggle ${v} impact">
+    return `<button type="button" class="seg-btn" aria-pressed="${pressed}" data-imp="${v}" title="${escapeHtml(t('findingsDash.seg.toggleImpactTitle', { v }))}">
       <span class="swatch imp-${v}"></span>${escapeHtml(v.charAt(0).toUpperCase() + v.slice(1))}
     </button>`;
   }).join('');
@@ -163,18 +187,18 @@ function impactSegmented(active: readonly string[]): string {
 /** Relative time (e.g. "2m ago"). Resilient to clock drift / future stamps. */
 function formatRelative(iso: string | undefined): string | undefined {
   if (!iso) return undefined;
-  const t = Date.parse(iso);
-  if (!Number.isFinite(t)) return undefined;
-  const diffMs = Date.now() - t;
-  if (diffMs < 0) return 'just now';
+  const parsed = Date.parse(iso);
+  if (!Number.isFinite(parsed)) return undefined;
+  const diffMs = Date.now() - parsed;
+  if (diffMs < 0) return t('findingsDash.time.justNow');
   const sec = Math.floor(diffMs / 1000);
-  if (sec < 45) return 'just now';
+  if (sec < 45) return t('findingsDash.time.justNow');
   const min = Math.floor(sec / 60);
-  if (min < 60) return `${min}m ago`;
+  if (min < 60) return t('findingsDash.time.minutesAgo', { min: String(min) });
   const hr = Math.floor(min / 60);
-  if (hr < 24) return `${hr}h ago`;
+  if (hr < 24) return t('findingsDash.time.hoursAgo', { hr: String(hr) });
   const day = Math.floor(hr / 24);
-  return `${day}d ago`;
+  return t('findingsDash.time.daysAgo', { day: String(day) });
 }
 
 /**
@@ -209,7 +233,7 @@ function buildGauge(score: number): string {
     ? `hsl(${Math.round(60 + (score - 50) * 1.2)}, 70%, 48%)`
     : `hsl(${Math.round(score * 1.2)}, 75%, 48%)`;
   const grade = scoreToGrade(score);
-  return `<div class="hero-gauge" title="Health score ${score}/100 (grade ${grade}). Errors weigh heaviest.">
+  return `<div class="hero-gauge" title="${escapeHtml(t('findingsDash.hero.gaugeTitle', { score: String(score), grade }))}">
     <svg viewBox="0 0 88 88">
       <circle class="gauge-track" cx="44" cy="44" r="${r}" fill="none"
         stroke-width="7"
@@ -231,28 +255,28 @@ function buildStatusLine(input: ViolationsDashboardHtmlInput): string {
   const rel = formatRelative(input.reportTimestamp);
   if (rel) {
     const iso = escapeHtml(input.reportTimestamp ?? '');
-    parts.push(`<span class="pill" title="${iso}">⟳ Last run ${escapeHtml(rel)}</span>`);
+    parts.push(`<span class="pill" title="${iso}">⟳ ${t('findingsDash.status.lastRunPrefix')} ${escapeHtml(rel)}</span>`);
   } else {
-    parts.push(`<span class="pill warn" title="No timestamp on violations.json">⟳ Last run unknown</span>`);
+    parts.push(`<span class="pill warn" title="${escapeHtml(t('findingsDash.status.noTimestampTitle'))}">⟳ ${escapeHtml(t('findingsDash.status.lastRunUnknown'))}</span>`);
   }
   const findings = input.totalRawAfterDisable;
   const findingsClass = findings === 0 ? 'good' : findings > 100 ? 'bad' : 'warn';
-  parts.push(`<span class="pill ${findingsClass}" title="Total findings after disabled-rule filter">${pluralize(findings, { one: '{count} finding', other: '{count} findings' })}</span>`);
+  parts.push(`<span class="pill ${findingsClass}" title="${escapeHtml(t('findingsDash.status.findingsAfterFilterTitle'))}">${pluralize(findings, { one: t('findingsDash.status.findingOne'), other: t('findingsDash.status.findingOther') })}</span>`);
   const todos = input.todoHackSnapshot.todos.length;
   const hacks = input.todoHackSnapshot.hacks.length;
   if (input.todoHackSnapshot.enabled) {
-    parts.push(`<span class="pill" title="TODO and HACK markers found in workspace">${todos} TODO · ${hacks} HACK</span>`);
+    parts.push(`<span class="pill" title="${escapeHtml(t('findingsDash.status.todoHackTitle'))}">${todos} TODO · ${hacks} HACK</span>`);
   }
   const drift = input.driftAdvisorSnapshot;
   if (drift.integrationEnabled) {
     if (drift.connected) {
-      parts.push(`<span class="pill good" title="Drift Advisor connected: ${escapeHtml(drift.serverLabel ?? '')}">Drift on · ${drift.issues.length}</span>`);
+      parts.push(`<span class="pill good" title="${escapeHtml(t('findingsDash.status.driftOnTitle', { label: drift.serverLabel ?? '' }))}">${t('findingsDash.status.driftOnPill', { count: String(drift.issues.length) })}</span>`);
     } else {
-      parts.push(`<span class="pill warn" title="Drift Advisor enabled but no server found">Drift offline</span>`);
+      parts.push(`<span class="pill warn" title="${escapeHtml(t('findingsDash.status.driftOfflineTitle'))}">${escapeHtml(t('findingsDash.status.driftOfflinePill'))}</span>`);
     }
   }
   if (typeof input.enabledRuleCount === 'number' && input.enabledRuleCount > 0) {
-    parts.push(`<span class="pill" title="Enabled rules in current tier">${input.enabledRuleCount} rules</span>`);
+    parts.push(`<span class="pill" title="${escapeHtml(t('findingsDash.status.enabledRulesTitle'))}">${t('findingsDash.status.rulesCount', { count: String(input.enabledRuleCount) })}</span>`);
   }
   // Full-width toggle is appended after the pills so it right-aligns via margin-inline-start:auto
   // (see .status-line .full-width-toggle in dashboardChromeStyles.ts / violationsDashboardStyles.ts).
@@ -269,7 +293,7 @@ function buildHero(input: ViolationsDashboardHtmlInput): string {
     : '';
   return `<header class="dash-hero">
     <div class="hero-text">
-      <h1>Saropa Findings Dashboard${stamp}</h1>
+      <h1>${escapeHtml(t('findingsDash.pageTitle'))}${stamp}</h1>
       ${buildStatusLine(input)}
     </div>
     ${buildGauge(score)}
@@ -314,61 +338,61 @@ function collectKpiCards(input: ViolationsDashboardHtmlInput): KpiSpec[] {
   const cards: KpiSpec[] = [];
   cards.push({
     key: 'visible',
-    label: 'Visible findings',
+    label: t('findingsDash.kpi.visibleLabel'),
     value: String(input.filteredCount),
     sub: input.totalRawAfterDisable === input.filteredCount
-      ? 'all matched'
-      : `of ${input.totalRawAfterDisable} total`,
+      ? t('findingsDash.kpi.allMatched')
+      : t('findingsDash.kpi.ofTotal', { total: String(input.totalRawAfterDisable) }),
     classes: '',
     filter: { kind: 'reset' },
-    title: 'Click to clear all filters',
+    title: t('findingsDash.kpi.clearFiltersTitle'),
   });
   cards.push({
     key: 'errors',
-    label: 'Errors',
+    label: t('findingsDash.kpi.errorsLabel'),
     value: String(errorCount),
-    sub: errorCount > 0 ? 'must fix' : 'none — clear',
+    sub: errorCount > 0 ? t('findingsDash.kpi.errorsSubFix') : t('findingsDash.kpi.errorsSubClear'),
     classes: 'errors',
     filter: { kind: 'sev', value: 'error' },
-    title: 'Filter findings to errors (must fix — broken / will crash / exploitable)',
+    title: t('findingsDash.kpi.errorsTitle'),
   });
   cards.push({
     key: 'warnings',
-    label: 'Warnings',
+    label: t('findingsDash.kpi.warningsLabel'),
     value: String(warningCount),
-    sub: warningCount > 0 ? 'could fail or look bad' : 'none — clear',
+    sub: warningCount > 0 ? t('findingsDash.kpi.warningsSubBad') : t('findingsDash.kpi.warningsSubClear'),
     classes: 'warnings',
     filter: { kind: 'sev', value: 'warning' },
-    title: 'Filter findings to warnings (could fail or look bad)',
+    title: t('findingsDash.kpi.warningsTitle'),
   });
   cards.push({
     key: 'info',
-    label: 'Info',
+    label: t('findingsDash.kpi.infoLabel'),
     value: String(infoCount),
-    sub: infoCount > 0 ? 'FYI — style / suggestions' : 'none',
+    sub: infoCount > 0 ? t('findingsDash.kpi.infoSub') : t('findingsDash.kpi.infoSubNone'),
     classes: 'info',
     filter: { kind: 'sev', value: 'info' },
-    title: 'Filter findings to info (FYI — style and suggestions)',
+    title: t('findingsDash.kpi.infoTitle'),
   });
   if (typeof input.filesAffected === 'number') {
     cards.push({
       key: 'files',
-      label: 'Files affected',
+      label: t('findingsDash.kpi.filesLabel'),
       value: String(input.filesAffected),
-      sub: input.filesAffected > 0 ? 'across the export' : 'no files affected',
+      sub: input.filesAffected > 0 ? t('findingsDash.kpi.filesSubAcross') : t('findingsDash.kpi.filesSubNone'),
       classes: '',
-      title: 'Distinct files contributing at least one finding',
+      title: t('findingsDash.kpi.filesTitle'),
     });
   }
   if (input.topRule && input.topRule.count > 0) {
     cards.push({
       key: 'top-rule',
-      label: 'Top rule',
+      label: t('findingsDash.kpi.topRuleLabel'),
       value: String(input.topRule.count),
       sub: input.topRule.name,
       classes: '',
       filter: { kind: 'top-rule', value: input.topRule.name },
-      title: `Filter findings to rule ${input.topRule.name}`,
+      title: t('findingsDash.kpi.topRuleTitle', { name: input.topRule.name }),
     });
   }
   return cards;
@@ -401,46 +425,47 @@ function renderKpiCard(c: KpiSpec): string {
 function buildToolbar(input: ViolationsDashboardHtmlInput): string {
   const tf = escapeHtml(input.textFilter);
   const exportCount = input.exportViolations.length;
-  return `<section class="toolbar-band" aria-label="Filters and actions">
+  const gbLabel = t('findingsDash.toolbar.groupByLabel');
+  return `<section class="toolbar-band" aria-label="${escapeHtml(t('findingsDash.toolbar.ariaFiltersActions'))}">
     <div class="toolbar-row">
-      <span class="field" title="Group findings by selected dimension">
+      <span class="field" title="${escapeHtml(t('findingsDash.toolbar.groupByFieldTitle'))}">
         <span class="glyph">⌘</span>
-        <label for="groupBy">Group by</label>
-        <select id="groupBy" aria-label="Group by">${groupBySelectOptions(input.groupBy)}</select>
+        <label for="groupBy">${escapeHtml(gbLabel)}</label>
+        <select id="groupBy" aria-label="${escapeHtml(gbLabel)}">${groupBySelectOptions(input.groupBy)}</select>
       </span>
-      <span class="field text-filter-field" title="Filter findings by file path, rule, or message text">
+      <span class="field text-filter-field" title="${escapeHtml(t('findingsDash.toolbar.textFilterTitle'))}">
         <span class="glyph">⌕</span>
-        <input type="text" id="textFilter" placeholder="Filter by file, rule, or message…" value="${tf}" aria-label="Text filter" />
-        <button type="button" class="clear-btn" id="textFilterClear" title="Clear text filter" aria-label="Clear text filter">×</button>
+        <input type="text" id="textFilter" placeholder="${escapeHtml(t('findingsDash.toolbar.textFilterPlaceholder'))}" value="${tf}" aria-label="${escapeHtml(t('findingsDash.toolbar.textFilterAria'))}" />
+        <button type="button" class="clear-btn" id="textFilterClear" title="${escapeHtml(t('findingsDash.toolbar.clearTextFilterTitle'))}" aria-label="${escapeHtml(t('findingsDash.toolbar.clearTextFilterAria'))}">×</button>
         <!-- §8.5.2 — recent-searches popover for the Findings filter.
              Persistence: sessionStorage. Cross-session persistence via
              workspaceState is tracked in plan/UX_GUIDELINES.md (Part B). -->
         <div id="findings-recent" class="findings-recent" hidden>
           <div class="findings-recent-head">
-            <span class="findings-recent-title">Recent filters</span>
+            <span class="findings-recent-title">${escapeHtml(t('findingsDash.toolbar.recentFiltersTitle'))}</span>
             <button type="button" id="findings-recent-clear"
               class="findings-recent-clear"
-              title="Clear all recent filters">Clear</button>
+              title="${escapeHtml(t('findingsDash.toolbar.clearRecentTitle'))}">${escapeHtml(t('findingsDash.toolbar.clearRecentButton'))}</button>
           </div>
           <ul id="findings-recent-list" class="findings-recent-list"
-            role="listbox" aria-label="Recent filters"></ul>
+            role="listbox" aria-label="${escapeHtml(t('findingsDash.toolbar.recentFiltersListAria'))}"></ul>
         </div>
       </span>
-      <button type="button" class="btn tier-1" id="btn-run" data-run-analysis title="Run Saropa Lints analysis">
-        <span class="glyph">▶</span>Run analysis
+      <button type="button" class="btn tier-1" id="btn-run" data-run-analysis title="${escapeHtml(t('findingsDash.toolbar.runAnalysisTitle'))}">
+        <span class="glyph">▶</span>${escapeHtml(t('toolbar.runAnalysis'))}
       </button>
-      <button type="button" class="btn" id="btn-refresh" title="Reload violations.json from disk">
-        <span class="glyph">⟳</span>Refresh
+      <button type="button" class="btn" id="btn-refresh" title="${escapeHtml(t('findingsDash.toolbar.refreshViolationsTitle'))}">
+        <span class="glyph">⟳</span>${escapeHtml(t('toolbar.refresh'))}
       </button>
       ${buildMoreActionsMenu(exportCount)}
     </div>
     <div class="toolbar-row">
-      <span class="seg" role="group" aria-label="Severity filter">
-        <span class="seg-label">Severity</span>
+      <span class="seg" role="group" aria-label="${escapeHtml(t('findingsDash.toolbar.severityGroupAria'))}">
+        <span class="seg-label">${escapeHtml(t('findingsDash.toolbar.severityLabel'))}</span>
         ${severitySegmented(input.severities)}
       </span>
-      <span class="seg" role="group" aria-label="Impact filter">
-        <span class="seg-label">Impact</span>
+      <span class="seg" role="group" aria-label="${escapeHtml(t('findingsDash.toolbar.impactGroupAria'))}">
+        <span class="seg-label">${escapeHtml(t('findingsDash.toolbar.impactLabel'))}</span>
         ${impactSegmented(input.impacts)}
       </span>
     </div>
@@ -451,8 +476,8 @@ function buildToolbar(input: ViolationsDashboardHtmlInput): string {
 function buildAnalysisProgress(): string {
   return `<div id="analysis-progress" class="analysis-progress" role="status" aria-live="polite" hidden>
     <div class="analysis-progress-head">
-      <strong id="analysis-progress-label">Running analysis…</strong>
-      <span id="analysis-progress-meta">This can take a moment on large projects.</span>
+      <strong id="analysis-progress-label">${escapeHtml(t('findingsDash.progress.runningLabel'))}</strong>
+      <span id="analysis-progress-meta">${escapeHtml(t('findingsDash.progress.runningMeta'))}</span>
     </div>
     <div class="analysis-progress-track" aria-hidden="true">
       <div class="analysis-progress-bar"></div>
@@ -462,21 +487,21 @@ function buildAnalysisProgress(): string {
 
 function buildMoreActionsMenu(exportCount: number): string {
   const items: Array<[string, string, string]> = [
-    ['saropaLints.openHelpHub', 'Help', 'F1'],
-    ['saropaLints.setGroupBy', 'Group by…', ''],
-    ['saropaLints.setIssuesFilter', 'Text filter…', ''],
-    ['saropaLints.setIssuesFilterByType', 'Severity & impact', ''],
-    ['saropaLints.setIssuesFilterByRule', 'Hide rules…', ''],
-    ['saropaLints.setIssuesFilterByMetadata', 'Rule metadata', ''],
-    ['saropaLints.clearIssuesFilters', 'Clear filters', ''],
-    ['saropaLints.clearSuppressions', 'Clear suppressions', ''],
-    ['saropaLints.clearFocusFile', 'Clear file focus', ''],
-    ['saropaLints.focusIssuesForActiveFile', 'Match active editor', ''],
-    ['saropaLints.issues.copyAsJson', 'Copy tree JSON', ''],
-    ['saropaLints.refresh', 'Refresh extension', ''],
-    ['saropaLints.openPackageVibrancy', 'Open Package dashboard', ''],
-    ['saropaLints.openProjectVibrancyReport', 'Open Code Health', ''],
-    ['saropaLints.openConfigDashboard', 'Open Lints Config', ''],
+    ['saropaLints.openHelpHub', t('findingsDash.menuPalette.help'), 'F1'],
+    ['saropaLints.setGroupBy', t('findingsDash.menuPalette.groupBy'), ''],
+    ['saropaLints.setIssuesFilter', t('findingsDash.menuPalette.textFilter'), ''],
+    ['saropaLints.setIssuesFilterByType', t('findingsDash.menuPalette.severityImpact'), ''],
+    ['saropaLints.setIssuesFilterByRule', t('findingsDash.menuPalette.hideRules'), ''],
+    ['saropaLints.setIssuesFilterByMetadata', t('findingsDash.menuPalette.ruleMetadata'), ''],
+    ['saropaLints.clearIssuesFilters', t('findingsDash.menuPalette.clearFilters'), ''],
+    ['saropaLints.clearSuppressions', t('findingsDash.menuPalette.clearSuppressions'), ''],
+    ['saropaLints.clearFocusFile', t('findingsDash.menuPalette.clearFileFocus'), ''],
+    ['saropaLints.focusIssuesForActiveFile', t('findingsDash.menuPalette.matchActiveEditor'), ''],
+    ['saropaLints.issues.copyAsJson', t('findingsDash.menuPalette.copyTreeJson'), ''],
+    ['saropaLints.refresh', t('findingsDash.menuPalette.refreshExtension'), ''],
+    ['saropaLints.openPackageVibrancy', t('findingsDash.menuPalette.openPackageDashboard'), ''],
+    ['saropaLints.openProjectVibrancyReport', t('findingsDash.menuPalette.openCodeHealth'), ''],
+    ['saropaLints.openConfigDashboard', t('findingsDash.menuPalette.openLintsConfig'), ''],
   ];
   const itemsHtml = items
     .map(([cmd, label, kbd]) =>
@@ -494,16 +519,16 @@ function buildMoreActionsMenu(exportCount: number): string {
   // Hidden id="btn-refresh-extension" preserves the existing test contract
   // and keyboard binding without polluting the visible toolbar.
   return `<details class="more">
-    <summary class="btn" title="More actions" aria-label="More actions">
-      <span class="glyph">⋯</span>More <span class="chev">▾</span>
+    <summary class="btn" title="${escapeHtml(t('toolbar.moreActions'))}" aria-label="${escapeHtml(t('toolbar.moreActions'))}">
+      <span class="glyph">⋯</span>${escapeHtml(t('findingsDash.toolbar.moreSummary'))} <span class="chev">${escapeHtml(t('findingsDash.toolbar.moreChevron'))}</span>
     </summary>
     <div class="menu" role="menu">
-      <button type="button" class="menu-item" id="btn-copy" title="Copy filtered violations as JSON (${exportCount})">
-        <span><span class="glyph">⎘</span>Copy JSON</span>
+      <button type="button" class="menu-item" id="btn-copy" title="${escapeHtml(t('findingsDash.toolbar.copyJsonTitle', { count: String(exportCount) }))}">
+        <span><span class="glyph">⎘</span>${escapeHtml(t('toolbar.copyJson'))}</span>
         <span class="kbd"></span>
       </button>
-      <button type="button" class="menu-item" id="btn-save" title="Save filtered violations as JSON to reports/YYYYMMDD/">
-        <span><span class="glyph">⤓</span>Save report</span>
+      <button type="button" class="menu-item" id="btn-save" title="${escapeHtml(t('findingsDash.toolbar.saveReportTitle'))}">
+        <span><span class="glyph">⤓</span>${escapeHtml(t('toolbar.saveReport'))}</span>
         <span class="kbd"></span>
       </button>
       ${itemsHtml}
@@ -519,30 +544,30 @@ function buildMoreActionsMenu(exportCount: number): string {
 function buildChipStrip(input: ViolationsDashboardHtmlInput): string {
   const chips: string[] = [];
   if (input.textFilter.trim().length > 0) {
-    chips.push(buildChip('contains', `contains "${input.textFilter}"`, 'text'));
+    chips.push(buildChip('contains', t('findingsDash.chip.contains', { q: input.textFilter }), 'text'));
   }
   for (const v of SEVERITY_ORDER) {
     if (!input.severities.includes(v)) {
-      chips.push(buildChip('sev-off', `severity ≠ ${v}`, `sev:${v}`));
+      chips.push(buildChip('sev-off', t('findingsDash.chip.severityOff', { v }), `sev:${v}`));
     }
   }
   for (const v of IMPACT_ORDER) {
     if (!input.impacts.includes(v)) {
-      chips.push(buildChip('imp-off', `impact ≠ ${v}`, `imp:${v}`));
+      chips.push(buildChip('imp-off', t('findingsDash.chip.impactOff', { v }), `imp:${v}`));
     }
   }
   if (chips.length === 0) return '';
   return `<div class="chip-strip" id="chipStrip">
-    <span class="lbl">Active filters:</span>
+    <span class="lbl">${escapeHtml(t('filter.activeLabel'))}</span>
     ${chips.join('')}
-    <button type="button" class="clear-all" id="chipsClearAll" title="Reset all filters">Clear all</button>
+    <button type="button" class="clear-all" id="chipsClearAll" title="${escapeHtml(t('findingsDash.chip.resetAllTitle'))}">${escapeHtml(t('toolbar.clearAll'))}</button>
   </div>`;
 }
 
 function buildChip(kind: string, label: string, dropToken: string): string {
   return `<span class="chip" data-chip-kind="${escapeHtml(kind)}" data-chip-token="${escapeHtml(dropToken)}">
     ${escapeHtml(label)}
-    <button type="button" class="x" aria-label="Remove filter">×</button>
+    <button type="button" class="x" aria-label="${escapeHtml(t('filter.chipRemove'))}">×</button>
   </span>`;
 }
 
@@ -580,33 +605,37 @@ function buildTopRulesTable(input: ViolationsDashboardHtmlInput): string {
       <td class="col-sev"><span class="sev-pill sev-${escapeHtml(sev)}">${escapeHtml(sev)}</span></td>
       <td class="col-actions">
         <button type="button" class="row-action neutral" data-row-action="hide-rule"
-                title="Hide for me only — workspace-level, reversible via Clear Suppressions">
-          Hide
+                title="${escapeHtml(t('findingsDash.topRules.hideTitle'))}">
+          ${escapeHtml(t('findingsDash.topRules.hideButton'))}
         </button>
         <button type="button" class="row-action danger" data-row-action="disable-rule"
-                title="Disable for the whole project — writes analysis_options_custom.yaml and re-runs analysis">
-          Disable
+                title="${escapeHtml(t('findingsDash.topRules.disableTitle'))}">
+          ${escapeHtml(t('findingsDash.topRules.disableButton'))}
         </button>
       </td>
     </tr>`;
   }).join('');
-  return `<section class="section" aria-label="Top rules by count">
+  const topPhrase = pluralize(rows.length, {
+    one: t('findingsDash.topRules.topRulesOne'),
+    other: t('findingsDash.topRules.topRulesOther'),
+  });
+  return `<section class="section" aria-label="${escapeHtml(t('findingsDash.topRules.sectionAria'))}">
     <div class="findings-wrap">
       <div class="findings-toolbar">
         <span class="meta-line" style="margin:0">
-          ${pluralize(rows.length, { one: 'Top {count} rule', other: 'Top {count} rules' })} · ${totalShown} of ${input.filteredCount} findings (${share}%) ·
-          <strong>Hide</strong> = workspace only ·
-          <strong>Disable</strong> = project config (writes <code>analysis_options_custom.yaml</code>)
+          ${topPhrase} · ${totalShown} of ${input.filteredCount} findings (${share}%) ·
+          <strong>${escapeHtml(t('findingsDash.topRules.hideButton'))}</strong> = ${escapeHtml(t('findingsDash.topRules.workspaceOnlyShort'))} ·
+          <strong>${escapeHtml(t('findingsDash.topRules.disableButton'))}</strong> = ${escapeHtml(t('findingsDash.topRules.projectConfigShort'))}
         </span>
       </div>
       <table class="top-rules-table" role="grid">
         <thead>
           <tr>
-            <th class="col-rank" scope="col">#</th>
-            <th class="col-rule" scope="col">Rule</th>
-            <th class="col-count" scope="col">Count</th>
-            <th class="col-sev" scope="col">Severity</th>
-            <th class="col-actions" aria-label="Row actions" scope="col"></th>
+            <th class="col-rank" scope="col">${escapeHtml(t('findingsDash.topRules.colRank'))}</th>
+            <th class="col-rule" scope="col">${escapeHtml(t('findingsDash.topRules.colRule'))}</th>
+            <th class="col-count" scope="col">${escapeHtml(t('findingsDash.topRules.colCount'))}</th>
+            <th class="col-sev" scope="col">${escapeHtml(t('findingsDash.topRules.colSeverity'))}</th>
+            <th class="col-actions" aria-label="${escapeHtml(t('findingsDash.topRules.colActionsAria'))}" scope="col"></th>
           </tr>
         </thead>
         <tbody>${body}</tbody>
@@ -624,28 +653,28 @@ function buildFindingsBlock(input: ViolationsDashboardHtmlInput): string {
   if (input.filteredCount === 0) {
     return buildFindingsEmpty(input);
   }
-  return `<section class="section" aria-label="Findings">
+  return `<section class="section" aria-label="${escapeHtml(t('findingsDash.findings.sectionAria'))}">
     <div class="findings-wrap">
       <div class="findings-toolbar">
         <span class="meta-line" style="margin:0">${escapeHtml(buildFindingsMeta(input))}</span>
         <div class="actions">
-          <button type="button" class="mini-btn" id="expand-all">Expand all</button>
-          <button type="button" class="mini-btn" id="collapse-all">Collapse all</button>
+          <button type="button" class="mini-btn" id="expand-all">${escapeHtml(t('findingsDash.findings.expandAll'))}</button>
+          <button type="button" class="mini-btn" id="collapse-all">${escapeHtml(t('findingsDash.findings.collapseAll'))}</button>
         </div>
       </div>
       <div id="findings-bulk-bar" class="findings-bulk-bar" hidden>
-        <span class="findings-bulk-label" id="findings-bulk-count">0 selected</span>
-        <button type="button" class="mini-btn tier-1" id="btn-bulk-copy">Copy selected as JSON</button>
+        <span class="findings-bulk-label" id="findings-bulk-count">${escapeHtml(t('findingsDash.findings.bulkSelected', { count: '0' }))}</span>
+        <button type="button" class="mini-btn tier-1" id="btn-bulk-copy">${escapeHtml(t('findingsDash.findings.bulkCopy'))}</button>
       </div>
       <table class="findings-table" role="grid" aria-rowcount="${input.filteredCount}">
         <thead>
           <tr>
-            <th class="col-sel-bulk" scope="col"><input type="checkbox" id="bulk-select-all" title="Select all visible findings" aria-label="Select all visible findings"></th>
-            <th data-sort="sev" aria-sort="none" scope="col">Severity<span class="arrow">⇅</span><span class="sort-idx" aria-hidden="true"></span></th>
-            <th data-sort="rule" aria-sort="none" scope="col">Rule<span class="arrow">⇅</span><span class="sort-idx" aria-hidden="true"></span></th>
-            <th data-sort="msg" aria-sort="none" scope="col">Message<span class="arrow">⇅</span><span class="sort-idx" aria-hidden="true"></span></th>
-            <th data-sort="line" aria-sort="none" scope="col">Line<span class="arrow">⇅</span><span class="sort-idx" aria-hidden="true"></span></th>
-            <th aria-label="Row actions" scope="col"></th>
+            <th class="col-sel-bulk" scope="col"><input type="checkbox" id="bulk-select-all" title="${escapeHtml(t('findingsDash.findings.selectAllTitle'))}" aria-label="${escapeHtml(t('findingsDash.findings.selectAllAria'))}"></th>
+            <th data-sort="sev" aria-sort="none" scope="col">${escapeHtml(t('findingsDash.findings.colSeverity'))}<span class="arrow">⇅</span><span class="sort-idx" aria-hidden="true"></span></th>
+            <th data-sort="rule" aria-sort="none" scope="col">${escapeHtml(t('findingsDash.findings.colRule'))}<span class="arrow">⇅</span><span class="sort-idx" aria-hidden="true"></span></th>
+            <th data-sort="msg" aria-sort="none" scope="col">${escapeHtml(t('findingsDash.findings.colMessage'))}<span class="arrow">⇅</span><span class="sort-idx" aria-hidden="true"></span></th>
+            <th data-sort="line" aria-sort="none" scope="col">${escapeHtml(t('findingsDash.findings.colLine'))}<span class="arrow">⇅</span><span class="sort-idx" aria-hidden="true"></span></th>
+            <th aria-label="${escapeHtml(t('findingsDash.findings.colActionsAria'))}" scope="col"></th>
           </tr>
         </thead>
         <tbody>${buildTableBody(input.sections, input.pageSize)}</tbody>
@@ -656,22 +685,22 @@ function buildFindingsBlock(input: ViolationsDashboardHtmlInput): string {
 }
 
 function buildFindingsMeta(input: ViolationsDashboardHtmlInput): string {
-  const parts: string[] = [`${input.filteredCount} shown`];
+  const parts: string[] = [t('findingsDash.findings.metaShown', { filtered: String(input.filteredCount) })];
   if (input.totalRawAfterDisable !== input.filteredCount) {
-    parts.push(`${input.totalRawAfterDisable} after disabled-rule filter`);
+    parts.push(t('findingsDash.findings.metaAfterDisable', { total: String(input.totalRawAfterDisable) }));
   }
   if (input.truncatedSource) {
-    parts.push(`source capped at ${input.maxSourceViolations} for performance`);
+    parts.push(t('findingsDash.findings.metaSourceCap', { max: String(input.maxSourceViolations) }));
   }
-  parts.push(`grouped by ${input.groupBy}`);
+  parts.push(t('findingsDash.findings.metaGroupedBy', { mode: input.groupBy }));
   return parts.join(' · ');
 }
 
 function buildOverflowNote(input: ViolationsDashboardHtmlInput): string {
   if (!input.truncatedSource) return '';
   return `<p class="overflow-note">
-    <span>Source list truncated at ${input.maxSourceViolations} for render performance.</span>
-    <button type="button" class="link" id="run-again" data-run-analysis>Run analysis again</button>
+    <span>${escapeHtml(t('findingsDash.findings.overflowNote', { max: String(input.maxSourceViolations) }))}</span>
+    <button type="button" class="link" id="run-again" data-run-analysis>${escapeHtml(t('findingsDash.findings.runAgain'))}</button>
   </p>`;
 }
 
@@ -704,31 +733,31 @@ function renderFindingRow(v: Violation, filePath: string): string {
   const msg = escapeHtml(v.message ?? '');
   const fileLabel = escapeHtml(filePath);
   return `<tr class="frow" data-sev="${escapeHtml(sev)}" data-rule="${escapeHtml(v.rule)}" data-line="${line}" data-file="${fileAttr}" tabindex="0">
-    <td class="col-sel-bulk"><input type="checkbox" class="bulk-row-cb" data-file="${fileAttr}" data-line="${line}" data-rule="${escapeHtml(v.rule)}" aria-label="Select this finding row"></td>
+    <td class="col-sel-bulk"><input type="checkbox" class="bulk-row-cb" data-file="${fileAttr}" data-line="${line}" data-rule="${escapeHtml(v.rule)}" aria-label="${escapeHtml(t('findingsDash.findings.selectRowAria'))}"></td>
     <td class="col-sev"><span class="sev-pill sev-${escapeHtml(sev)}">${escapeHtml(sev)}</span></td>
     <td class="col-rule"><span class="rule-tag">${rule}</span></td>
     <td class="col-msg"><div class="vmsg">${msg}</div><div class="kpi-sub" title="${fileLabel}">${fileLabel}</div></td>
-    <td class="col-line">L${line}</td>
-    <td class="col-actions"><button type="button" class="row-action" data-row-action="copy" title="Copy this finding as JSON">⎘</button></td>
+    <td class="col-line">${escapeHtml(t('findingsDash.findings.linePrefix', { line: String(line) }))}</td>
+    <td class="col-actions"><button type="button" class="row-action" data-row-action="copy" title="${escapeHtml(t('findingsDash.findings.copyRowTitle'))}">⎘</button></td>
   </tr>`;
 }
 
 function buildFindingsEmpty(input: ViolationsDashboardHtmlInput): string {
   const reason = input.totalRawAfterDisable === 0
-    ? 'No violations in the last analysis run.'
-    : 'No violations match the current filters.';
+    ? t('findingsDash.findings.emptyNoViolations')
+    : t('findingsDash.findings.emptyNoMatch');
   const cta = input.totalRawAfterDisable === 0
-    ? `<button type="button" class="btn tier-1" id="btn-run-empty" data-run-analysis><span class="glyph">▶</span>Run analysis</button>
-       <button type="button" class="btn" id="btn-refresh-empty"><span class="glyph">⟳</span>Refresh</button>`
-    : `<button type="button" class="btn tier-1" id="btn-reset-empty"><span class="glyph">⊘</span>Reset filters</button>
-       <button type="button" class="btn" id="btn-run-empty2" data-run-analysis><span class="glyph">▶</span>Re-run analysis</button>`;
-  return `<section class="section" aria-label="Findings">
+    ? `<button type="button" class="btn tier-1" id="btn-run-empty" data-run-analysis><span class="glyph">▶</span>${escapeHtml(t('toolbar.runAnalysis'))}</button>
+       <button type="button" class="btn" id="btn-refresh-empty"><span class="glyph">⟳</span>${escapeHtml(t('toolbar.refresh'))}</button>`
+    : `<button type="button" class="btn tier-1" id="btn-reset-empty"><span class="glyph">⊘</span>${escapeHtml(t('findingsDash.findings.resetFilters'))}</button>
+       <button type="button" class="btn" id="btn-run-empty2" data-run-analysis><span class="glyph">▶</span>${escapeHtml(t('findingsDash.findings.reRunAnalysis'))}</button>`;
+  return `<section class="section" aria-label="${escapeHtml(t('findingsDash.findings.sectionAria'))}">
     <div class="findings-wrap">
       <div class="empty-cta">
         <h3>${escapeHtml(reason)}</h3>
         <p>${input.totalRawAfterDisable === 0
-          ? 'Run analysis to populate <code>reports/.saropa_lints/violations.json</code>, then refresh.'
-          : 'Adjust filters or run analysis again to see findings.'}</p>
+          ? escapeHtml(t('findingsDash.findings.emptyHintNoData'))
+          : escapeHtml(t('findingsDash.findings.emptyHintFilters'))}</p>
         <div class="btns">${cta}</div>
       </div>
     </div>
@@ -755,11 +784,11 @@ function buildChartsBlock(input: ViolationsDashboardHtmlInput): string {
   const sevTotal = SEVERITY_ORDER.reduce((n, k) => n + (input.severityCounts[k] ?? 0), 0);
   const impTotal = IMPACT_ORDER.reduce((n, k) => n + (input.impactCounts[k] ?? 0), 0);
   if (sevTotal === 0 && impTotal === 0) return '';
-  return `<section class="section" aria-label="Mix charts">
-    <h2>Mix <span class="meta">click a slice to filter</span></h2>
+  return `<section class="section" aria-label="${escapeHtml(t('findingsDash.charts.sectionAria'))}">
+    <h2>${escapeHtml(t('findingsDash.charts.heading'))} <span class="meta">${escapeHtml(t('findingsDash.charts.metaClickSlice'))}</span></h2>
     <div class="charts-grid">
-      ${sevTotal === 0 ? '' : buildMixCard('Severity mix', SEVERITY_ORDER, input.severityCounts, 'sev')}
-      ${impTotal === 0 ? '' : buildMixCard('Impact mix',   IMPACT_ORDER,   input.impactCounts,   'imp')}
+      ${sevTotal === 0 ? '' : buildMixCard(t('findingsDash.charts.severityMix'), SEVERITY_ORDER, input.severityCounts, 'sev')}
+      ${impTotal === 0 ? '' : buildMixCard(t('findingsDash.charts.impactMix'), IMPACT_ORDER, input.impactCounts, 'imp')}
     </div>
   </section>`;
 }
@@ -787,7 +816,7 @@ function buildBarRow(axis: 'sev' | 'imp', key: string, count: number, max: numbe
   const width = max > 0 ? Math.round((count / max) * 100) : 0;
   const zero = count === 0 ? ' zero' : '';
   const role = count === 0 ? '' : ' role="button" tabindex="0"';
-  return `<div class="bar-row${zero}"${role} data-filter-kind="${axis}" data-filter-value="${escapeHtml(key)}" title="Filter to ${escapeHtml(key)} only">
+  return `<div class="bar-row${zero}"${role} data-filter-kind="${axis}" data-filter-value="${escapeHtml(key)}" title="${escapeHtml(t('findingsDash.charts.filterBarTitle', { key }))}">
     <span class="bar-label">${escapeHtml(key)}</span>
     <div class="bar-track"><div class="bar-fill ${axis === 'sev' ? `sev-${escapeHtml(key)}` : `imp-${escapeHtml(key)}`}" style="--bar-width:${width}%"></div></div>
     <span class="bar-value">${count}</span>
@@ -821,7 +850,7 @@ function buildDonut(
   }).join('');
   return `<div class="donut-wrap"><div class="donut">
     <svg viewBox="0 0 96 96">${segs}</svg>
-    <div class="donut-legend"><div class="total">${total}</div><div class="lbl">total</div></div>
+    <div class="donut-legend"><div class="total">${total}</div><div class="lbl">${escapeHtml(t('findingsDash.charts.donutTotal'))}</div></div>
   </div></div>`;
 }
 
@@ -832,16 +861,16 @@ function buildDonut(
 function buildTodoHackBlock(input: ViolationsDashboardHtmlInput): string {
   const snap = input.todoHackSnapshot;
   if (!snap.enabled) {
-    return `<section class="section" aria-label="TODOs and HACKS">
-      <h2>TODOs &amp; HACKS <span class="meta">scan disabled</span></h2>
-      <p class="footer-line">Workspace scan is off — enable to surface markers from project files.
-        <button type="button" class="link" id="btn-enable-todos-scan">Enable scan</button></p>
+    return `<section class="section" aria-label="${escapeHtml(t('findingsDash.todoHack.sectionAria'))}">
+      <h2>${escapeHtml(t('findingsDash.todoHack.headingDisabled'))} <span class="meta">${escapeHtml(t('findingsDash.todoHack.metaDisabled'))}</span></h2>
+      <p class="footer-line">${escapeHtml(t('findingsDash.todoHack.scanOff'))}
+        <button type="button" class="link" id="btn-enable-todos-scan">${escapeHtml(t('findingsDash.todoHack.enableScan'))}</button></p>
     </section>`;
   }
-  const todoBody = renderTodoSubsection('TODOs', snap.todos, snap.capped);
-  const hackBody = renderTodoSubsection('HACKS', snap.hacks, snap.capped);
-  return `<section class="section" aria-label="TODOs and HACKS">
-    <h2>TODOs &amp; HACKS <span class="count">${snap.todos.length + snap.hacks.length}</span></h2>
+  const todoBody = renderTodoSubsection(t('findingsDash.todoHack.todosLabel'), snap.todos, snap.capped);
+  const hackBody = renderTodoSubsection(t('findingsDash.todoHack.hacksLabel'), snap.hacks, snap.capped);
+  return `<section class="section" aria-label="${escapeHtml(t('findingsDash.todoHack.sectionAria'))}">
+    <h2>${escapeHtml(t('findingsDash.todoHack.heading'))} <span class="count">${snap.todos.length + snap.hacks.length}</span></h2>
     ${todoBody}
     ${hackBody}
   </section>`;
@@ -853,11 +882,11 @@ function renderTodoSubsection(
   capped: boolean,
 ): string {
   if (items.length === 0) {
-    return `<p class="footer-line"><strong>${escapeHtml(title)}:</strong> none in scan range.</p>`;
+    return `<p class="footer-line">${escapeHtml(t('findingsDash.todoHack.subsectionNone', { title }))}</p>`;
   }
   const rows = items.map(renderCompactRow).join('');
   const cap = capped
-    ? `<p class="footer-line">Scan hit max-file cap; raise <code>saropaLints.todosAndHacks.maxFilesToScan</code> for full coverage.</p>`
+    ? `<p class="footer-line">${escapeHtml(t('findingsDash.todoHack.capNote'))}</p>`
     : '';
   return `<div style="margin-bottom:8px">
     <h3 style="margin:6px 0;font-size:.95em;font-weight:600">${escapeHtml(title)} <span class="meta">${items.length}</span></h3>
@@ -872,7 +901,7 @@ function renderCompactRow(item: { file: string; line: number; snippet: string })
   const snippet = escapeHtml(item.snippet);
   const file = escapeHtml(item.file);
   return `<div class="crow" role="button" tabindex="0" data-file="${fileAttr}" data-line="${line}">
-    <span class="sev-pill sev-note">note</span>
+    <span class="sev-pill sev-note">${escapeHtml(t('findingsDash.todoHack.notePill'))}</span>
     <span class="floc" title="${file}">${file}</span>
     <span class="fmsg">${snippet}</span>
     <span class="fline">L${line}</span>
@@ -885,26 +914,26 @@ function renderCompactRow(item: { file: string; line: number; snippet: string })
 
 function buildDriftBlock(input: ViolationsDashboardHtmlInput['driftAdvisorSnapshot']): string {
   if (!input.integrationEnabled) {
-    return `<section class="section" aria-label="Drift Advisor">
-      <h2>Drift Advisor <span class="meta">integration off</span></h2>
-      <p class="footer-line">Enable Drift Advisor integration to surface database suggestions here.
-        <button type="button" class="link" id="btn-drift-enable">Enable</button></p>
+    return `<section class="section" aria-label="${escapeHtml(t('findingsDash.drift.sectionAria'))}">
+      <h2>${escapeHtml(t('findingsDash.drift.headingOff'))} <span class="meta">${escapeHtml(t('findingsDash.drift.metaOff'))}</span></h2>
+      <p class="footer-line">${escapeHtml(t('findingsDash.drift.enableBlurb'))}
+        <button type="button" class="link" id="btn-drift-enable">${escapeHtml(t('findingsDash.drift.enable'))}</button></p>
     </section>`;
   }
   if (!input.connected) {
-    return `<section class="section" aria-label="Drift Advisor">
-      <h2>Drift Advisor <span class="meta">no server</span></h2>
-      <p class="footer-line">No Drift Advisor server found on configured ports.
-        <button type="button" class="link" id="btn-drift-refresh">Retry</button>
+    return `<section class="section" aria-label="${escapeHtml(t('findingsDash.drift.sectionAria'))}">
+      <h2>${escapeHtml(t('findingsDash.drift.headingNoServer'))} <span class="meta">${escapeHtml(t('findingsDash.drift.metaNoServer'))}</span></h2>
+      <p class="footer-line">${escapeHtml(t('findingsDash.drift.noServerBlurb'))}
+        <button type="button" class="link" id="btn-drift-refresh">${escapeHtml(t('findingsDash.drift.retry'))}</button>
       </p>
     </section>`;
   }
   if (input.issues.length === 0) {
-    return `<section class="section" aria-label="Drift Advisor">
-      <h2>Drift Advisor <span class="meta">connected</span></h2>
-      <p class="footer-line">Connected to ${escapeHtml(input.serverLabel ?? '')} — no current issues.
-        <button type="button" class="link" id="btn-drift-refresh">Refresh</button>
-        <button type="button" class="link" id="btn-drift-browser">Open in browser</button>
+    return `<section class="section" aria-label="${escapeHtml(t('findingsDash.drift.sectionAria'))}">
+      <h2>${escapeHtml(t('findingsDash.drift.headingConnected'))} <span class="meta">${escapeHtml(t('findingsDash.drift.metaConnected'))}</span></h2>
+      <p class="footer-line">${escapeHtml(t('findingsDash.drift.noIssues', { label: input.serverLabel ?? '' }))}
+        <button type="button" class="link" id="btn-drift-refresh">${escapeHtml(t('findingsDash.drift.refresh'))}</button>
+        <button type="button" class="link" id="btn-drift-browser">${escapeHtml(t('findingsDash.drift.openBrowser'))}</button>
       </p>
     </section>`;
   }
@@ -928,13 +957,13 @@ function buildDriftBlock(input: ViolationsDashboardHtmlInput['driftAdvisorSnapsh
       <span class="fline">—</span>
     </div>`;
   }).join('');
-  return `<section class="section" aria-label="Drift Advisor">
-    <h2>Drift Advisor <span class="count">${input.issues.length}</span> <span class="meta">${escapeHtml(input.serverLabel ?? '')}</span></h2>
+  return `<section class="section" aria-label="${escapeHtml(t('findingsDash.drift.sectionAria'))}">
+    <h2>${escapeHtml(t('findingsDash.drift.headingIssues'))} <span class="count">${input.issues.length}</span> <span class="meta">${escapeHtml(input.serverLabel ?? '')}</span></h2>
     <div class="compact-list">${rows}</div>
     <p class="footer-line">
-      <button type="button" class="link" id="btn-drift-refresh">Refresh</button>
-      <button type="button" class="link" id="btn-drift-browser">Open in browser</button>
-      <button type="button" class="link" id="btn-drift-disable">Disable Drift Advisor</button>
+      <button type="button" class="link" id="btn-drift-refresh">${escapeHtml(t('findingsDash.drift.refresh'))}</button>
+      <button type="button" class="link" id="btn-drift-browser">${escapeHtml(t('findingsDash.drift.openBrowser'))}</button>
+      <button type="button" class="link" id="btn-drift-disable">${escapeHtml(t('findingsDash.drift.disable'))}</button>
     </p>
   </section>`;
 }
@@ -952,10 +981,10 @@ function buildSuppressionsBlock(input: ViolationsDashboardHtmlInput): string {
      section reflects what is in violations.json, not the live workspace state.
      The kind breakdown sits in the meta span when populated; otherwise the meta
      span stays empty so the header doesn't render an awkward trailing dot. */
-  return `<section class="section" id="suppressions-block" aria-label="Suppressions">
-    <h2>Suppressions (export) <span class="count">${a.total}</span>${kindBreakdown ? ` <span class="meta">${kindBreakdown}</span>` : ''}</h2>
+  return `<section class="section" id="suppressions-block" aria-label="${escapeHtml(t('findingsDash.suppressions.sectionAria'))}">
+    <h2>${escapeHtml(t('findingsDash.suppressions.headingExport'))} <span class="count">${a.total}</span>${kindBreakdown ? ` <span class="meta">${kindBreakdown}</span>` : ''}</h2>
     <div class="sup-band">${buildAnalyzerBody(a)}</div>
-    <h3 style="margin:14px 0 6px;font-size:.98em;font-weight:600">Issues view hides <span class="meta" style="margin-inline-start:8px;color:var(--vscode-descriptionForeground)">${v.active ? 'active' : 'none'}</span></h3>
+    <h3 style="margin:14px 0 6px;font-size:.98em;font-weight:600">${escapeHtml(t('findingsDash.suppressions.viewHidesHeading'))} <span class="meta" style="margin-inline-start:8px;color:var(--vscode-descriptionForeground)">${v.active ? escapeHtml(t('findingsDash.suppressions.viewHidesMetaActive')) : escapeHtml(t('findingsDash.suppressions.viewHidesMetaNone'))}</span></h3>
     <div class="sup-band">${buildViewBody(v)}</div>
   </section>`;
 }
@@ -969,22 +998,22 @@ function buildKindBreakdown(byKind: readonly [string, number][]): string {
 
 function buildAnalyzerBody(a: AnalyzerSuppressionsSlice): string {
   if (a.total <= 0) {
-    return `<p class="footer-line">No analyzer suppressions in the current <code>violations.json</code> export. Run analysis after editing ignores or baselines to populate.</p>`;
+    return `<p class="footer-line">${escapeHtml(t('findingsDash.suppressions.noneInExport'))}</p>`;
   }
   const totalRow = `<div class="sup-row sup-act" role="button" tabindex="0" data-sup="focus-issues">
-    <span class="sup-k plain">Total — clear filters and open Findings</span>
+    <span class="sup-k plain">${escapeHtml(t('findingsDash.suppressions.totalRow'))}</span>
     <span class="sup-n">${a.total}</span>
   </div>`;
   const ruleBody = renderSupRows(a.byRule, 'rule');
   const fileBody = renderSupRows(a.byFile, 'file');
   return `${totalRow}
-    <details class="sup-disclosure" open><summary>By rule (${a.byRule.length})</summary>${ruleBody}</details>
-    <details class="sup-disclosure"><summary>By file (${a.byFile.length})</summary>${fileBody}</details>`;
+    <details class="sup-disclosure" open><summary>${escapeHtml(t('findingsDash.suppressions.byRule', { count: String(a.byRule.length) }))}</summary>${ruleBody}</details>
+    <details class="sup-disclosure"><summary>${escapeHtml(t('findingsDash.suppressions.byFile', { count: String(a.byFile.length) }))}</summary>${fileBody}</details>`;
 }
 
 function renderSupRows(entries: readonly [string, number][], kind: 'rule' | 'file'): string {
   if (entries.length === 0) {
-    return `<p class="footer-line">No entries.</p>`;
+    return `<p class="footer-line">${escapeHtml(t('findingsDash.suppressions.noEntries'))}</p>`;
   }
   return entries
     .map(([key, count]) => {
@@ -1001,27 +1030,27 @@ function renderSupRows(entries: readonly [string, number][], kind: 'rule' | 'fil
 
 function buildViewBody(v: ViewSuppressionsSlice): string {
   if (!v.active) {
-    return `<p class="footer-line">Nothing hidden from the Issues list in this workspace. Use tree context actions to hide folders, files, or rules; they persist in workspace state.</p>`;
+    return `<p class="footer-line">${escapeHtml(t('findingsDash.suppressions.nothingHidden'))}</p>`;
   }
   const counts = [
-    v.folderCount ? `${v.folderCount} folder(s)` : '',
-    v.fileCount ? `${v.fileCount} file pattern(s)` : '',
-    v.ruleCount ? `${v.ruleCount} rule(s) globally` : '',
-    v.ruleInFileEntryCount ? `${v.ruleInFileEntryCount} file(s) with per-file rule hides` : '',
-    v.severityCount ? `${v.severityCount} severity hide(s)` : '',
-    v.impactCount ? `${v.impactCount} impact hide(s)` : '',
+    v.folderCount ? t('findingsDash.suppressions.folderPattern', { count: String(v.folderCount) }) : '',
+    v.fileCount ? t('findingsDash.suppressions.filePattern', { count: String(v.fileCount) }) : '',
+    v.ruleCount ? t('findingsDash.suppressions.ruleGlobal', { count: String(v.ruleCount) }) : '',
+    v.ruleInFileEntryCount ? t('findingsDash.suppressions.perFileRules', { count: String(v.ruleInFileEntryCount) }) : '',
+    v.severityCount ? t('findingsDash.suppressions.severityHides', { count: String(v.severityCount) }) : '',
+    v.impactCount ? t('findingsDash.suppressions.impactHides', { count: String(v.impactCount) }) : '',
   ]
     .filter(Boolean)
     .join(' · ');
   const parts: string[] = [];
-  parts.push(`<p class="footer-line"><strong>Active hides:</strong> ${escapeHtml(counts)}.</p>`);
-  parts.push(`<p class="footer-line">These hides shrink the Issues / dashboard list only; they are not written to <code>violations.json</code>.
-    <button type="button" class="link" id="btn-clear-view-sup">Clear all view hides</button></p>`);
-  parts.push(renderListBlock('Folders (sample)', v.sampleFolders));
-  parts.push(renderListBlock('Files / globs (sample)', v.sampleFiles));
-  parts.push(renderListBlock('Rules (sample)', v.sampleRules));
+  parts.push(`<p class="footer-line">${escapeHtml(t('findingsDash.suppressions.activeHides', { counts }))}</p>`);
+  parts.push(`<p class="footer-line">${escapeHtml(t('findingsDash.suppressions.viewHidesFooter'))}
+    <button type="button" class="link" id="btn-clear-view-sup">${escapeHtml(t('findingsDash.suppressions.clearViewHides'))}</button></p>`);
+  parts.push(renderListBlock(t('findingsDash.suppressions.foldersSample'), v.sampleFolders));
+  parts.push(renderListBlock(t('findingsDash.suppressions.filesSample'), v.sampleFiles));
+  parts.push(renderListBlock(t('findingsDash.suppressions.rulesSample'), v.sampleRules));
   if (v.sampleRuleInFileLines.length > 0) {
-    parts.push(renderListBlock('Per-file rules (sample)', v.sampleRuleInFileLines));
+    parts.push(renderListBlock(t('findingsDash.suppressions.perFileRulesSample'), v.sampleRuleInFileLines));
   }
   return parts.filter(Boolean).join('\n');
 }
@@ -1038,7 +1067,7 @@ function renderListBlock(title: string, items: readonly string[]): string {
 }
 
 function prettifyAnalyzerKindToken(token: string): string {
-  if (!token) return 'Unknown';
+  if (!token) return t('findingsDash.unknownAnalyzerKind');
   return token
     .replace(/([a-z])([A-Z])/g, '$1 $2')
     .replaceAll('_', ' ')
@@ -1052,8 +1081,10 @@ function prettifyAnalyzerKindToken(token: string): string {
  * ========================================================================= */
 
 function buildScript(): string {
+  const FD = findingsDashScriptStrings();
   return `(function () {
   var vscode = acquireVsCodeApi();
+  var FD = ${JSON.stringify(FD)};
   var filterDebounce = null;
   var isAnalyzing = false;
 
@@ -1095,11 +1126,9 @@ function buildScript(): string {
     var label = document.getElementById('analysis-progress-label');
     var meta = document.getElementById('analysis-progress-meta');
     if (box) box.hidden = !running;
-    if (label) label.textContent = running ? 'Running analysis…' : 'Analysis complete';
+    if (label) label.textContent = running ? FD.analysisRunning : FD.analysisComplete;
     if (meta) {
-      meta.textContent = metaText || (running
-        ? 'This can take a moment on large projects.'
-        : 'Refreshing dashboard with the latest findings.');
+      meta.textContent = metaText || (running ? FD.metaRunning : FD.metaDone);
     }
     document.querySelectorAll('[data-run-analysis]').forEach(function (el) {
       if ('disabled' in el) {
@@ -1124,19 +1153,19 @@ function buildScript(): string {
   function announceFilterState() {
     var s = readState();
     var parts = [];
-    if (s.textFilter) { parts.push('search ' + s.textFilter); }
+    if (s.textFilter) { parts.push(FD.announceSearchVerb + ' ' + s.textFilter); }
     var sevDefaults = ${JSON.stringify(DEFAULT_SEVERITIES)}.length;
     if (s.severities.length !== sevDefaults) {
-      parts.push(s.severities.length + ' severities');
+      parts.push(s.severities.length + ' ' + FD.severitiesNoun);
     }
     var impDefaults = ${JSON.stringify(DEFAULT_IMPACTS)}.length;
     if (s.impacts.length !== impDefaults) {
-      parts.push(s.impacts.length + ' impacts');
+      parts.push(s.impacts.length + ' ' + FD.impactsNoun);
     }
     if (parts.length === 0) {
-      announce('All filters cleared');
+      announce(FD.announceCleared);
     } else {
-      announce('Filters: ' + parts.join(', '));
+      announce(FD.filtersPrefix + ' ' + parts.join(', '));
     }
   }
 
@@ -1205,7 +1234,7 @@ function buildScript(): string {
       return '<li>' +
         '<button type="button" class="recent-pick" data-query="' + s + '">' + s + '</button>' +
         '<button type="button" class="recent-remove" data-query="' + s +
-        '" aria-label="Remove ' + s + '" title="Remove">&times;</button>' +
+        '" aria-label="' + FD.removeRecentAriaPrefix + ' ' + s + '" title="' + FD.removeRecentTitle + '">&times;</button>' +
         '</li>';
     }).join('');
   }
@@ -1523,7 +1552,7 @@ function buildScript(): string {
     if (!bulkBar || !bulkCount) return;
     var n = cbs.length;
     bulkBar.hidden = n === 0;
-    bulkCount.textContent = n + ' selected';
+    bulkCount.textContent = FD.bulkSelectedTpl.replace(/\{n\}/g, String(n));
     var vis = Array.prototype.filter.call(
       document.querySelectorAll('.bulk-row-cb'),
       function (cb) {
@@ -1684,18 +1713,18 @@ function buildScript(): string {
     var msg = event && event.data ? event.data : null;
     if (!msg || msg.type !== 'analysisProgress') return;
     if (msg.status === 'started') {
-      setAnalysisProgress(true, 'Analysis started. Collecting diagnostics…');
-      announce('Analysis started');
+      setAnalysisProgress(true, FD.metaStartedDetail);
+      announce(FD.announceStarted);
       return;
     }
     if (msg.status === 'completed') {
-      setAnalysisProgress(false, 'Refreshing dashboard with the latest findings.');
-      announce('Analysis complete');
+      setAnalysisProgress(false, FD.metaDone);
+      announce(FD.announceComplete);
       return;
     }
     if (msg.status === 'failed') {
-      setAnalysisProgress(false, 'Analysis failed. Check output for details.');
-      announce('Analysis failed');
+      setAnalysisProgress(false, FD.metaFailed);
+      announce(FD.announceFailed);
     }
   });
 
@@ -1734,7 +1763,7 @@ export function renderViolationsDashboardHtml(input: ViolationsDashboardHtmlInpu
   return `<!DOCTYPE html>
 <html lang="en"><head>
   <meta charset="UTF-8" />
-  <title>Saropa Findings Dashboard</title>
+  <title>${escapeHtml(t('findingsDash.documentTitle'))}</title>
   <!-- 'unsafe-inline' on style-src: hero gauge sets dynamic CSS vars (--gauge-target,
        --gauge-arc, --gauge-color) via inline style="..." attributes. CSP nonces only
        authorize <style> blocks, not style attributes — without 'unsafe-inline' the vars
@@ -1742,7 +1771,7 @@ export function renderViolationsDashboardHtml(input: ViolationsDashboardHtmlInpu
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'nonce-${nonce}' 'unsafe-inline'; script-src 'nonce-${nonce}';" />
   <style nonce="${nonce}">${getViolationsDashboardStyles()}${getKeyboardShortcutsStyles()}</style>
 </head><body>
-  ${buildSkipLink('findings-table', 'Skip to findings')}
+  ${buildSkipLink('findings-table', t('findingsDash.skipToFindings'))}
   ${buildAnnouncer()}
   <header>${buildHero(input)}</header>
   ${buildKpiCards(input)}
@@ -1752,18 +1781,18 @@ export function renderViolationsDashboardHtml(input: ViolationsDashboardHtmlInpu
     ${buildTopRulesTable(input)}
     ${buildFindingsBlock(input)}
   </main>
-  <aside aria-label="Secondary diagnostics">
+  <aside aria-label="${escapeHtml(t('findingsDash.secondaryAsideLabel'))}">
     ${buildTodoHackBlock(input)}
     ${buildDriftBlock(input.driftAdvisorSnapshot)}
     ${buildChartsBlock(input)}
     ${buildSuppressionsBlock(input)}
   </aside>
   ${buildKeyboardShortcutsOverlay([
-    { key: '/', label: 'Focus the text filter' },
-    { key: 'Esc', label: 'Clear the focused text filter' },
-    { key: 'Enter', label: 'Activate focused KPI card or chart bar' },
-    { key: 'Space', label: 'Activate focused KPI card or chart bar' },
-    { key: '?', label: 'Show this shortcut overlay' },
+    { key: '/', label: t('findingsDash.shortcuts.focusTextFilter') },
+    { key: 'Esc', label: t('findingsDash.shortcuts.clearTextFilter') },
+    { key: 'Enter', label: t('findingsDash.shortcuts.activateKpi') },
+    { key: 'Space', label: t('findingsDash.shortcuts.activateKpiSpace') },
+    { key: '?', label: t('findingsDash.shortcuts.showOverlay') },
   ])}
   <script nonce="${nonce}">${buildScript()}</script>
 </body></html>`;
@@ -1783,12 +1812,12 @@ export function buildFindingsEmptyStateHtml(message: string): string {
   <style nonce="${nonce}">${getFindingsEmptyStateStyles()}</style>
 </head><body>
   <div class="empty-hero">
-    <h1>Saropa Findings Dashboard</h1>
+    <h1>${escapeHtml(t('findingsDash.pageTitle'))}</h1>
     <p>${esc}</p>
-    <p>Run a Saropa Lints analysis to generate <code>violations.json</code>, then use <strong>Refresh</strong> here or reopen this dashboard.</p>
+    <p>${escapeHtml(t('findingsDash.emptyState.hintAfterMessage'))}</p>
     <div class="btns">
-      <button type="button" class="primary" id="btn-run" data-run-analysis>Run analysis</button>
-      <button type="button" id="btn-refresh">Refresh from disk</button>
+      <button type="button" class="primary" id="btn-run" data-run-analysis>${escapeHtml(t('toolbar.runAnalysis'))}</button>
+      <button type="button" id="btn-refresh">${escapeHtml(t('findingsDash.emptyState.refreshDisk'))}</button>
     </div>
     ${buildAnalysisProgress()}
   </div>

@@ -28,6 +28,8 @@
  * (§15.2 focus-trap rule).
  */
 
+import { t } from '../i18n/runtime';
+
 function escape(s: string): string {
   return s
     .replaceAll('&', '&amp;')
@@ -52,8 +54,8 @@ export interface KeyboardShortcut {
 export function buildKeyboardShortcutsButton(): string {
   return `<button type="button" id="kbdShortcutsToggle"
     class="kbd-shortcuts-toggle"
-    title="Show keyboard shortcuts (?)"
-    aria-label="Show keyboard shortcuts"
+    title="${escape(t('kbdOverlay.toggleTitle'))}"
+    aria-label="${escape(t('kbdOverlay.toggleAria'))}"
     aria-haspopup="dialog"
     aria-expanded="false">?</button>`;
 }
@@ -74,15 +76,15 @@ export function buildKeyboardShortcutsOverlay(shortcuts: readonly KeyboardShortc
     role="dialog" aria-modal="true" aria-labelledby="kbdShortcutsTitle">
     <div class="kbd-shortcuts-card">
       <div class="kbd-shortcuts-head">
-        <h2 id="kbdShortcutsTitle">Keyboard shortcuts</h2>
+        <h2 id="kbdShortcutsTitle">${escape(t('kbdOverlay.dialogTitle'))}</h2>
         <button type="button" class="kbd-shortcuts-close"
           id="kbdShortcutsClose"
-          aria-label="Close keyboard shortcuts">×</button>
+          aria-label="${escape(t('kbdOverlay.closeAria'))}">×</button>
       </div>
       <table class="kbd-shortcuts-list">
         <tbody>${rows}</tbody>
       </table>
-      <p class="kbd-shortcuts-foot">Press <kbd>Esc</kbd> or click outside to close.</p>
+      <p class="kbd-shortcuts-foot">${escape(t('kbdOverlay.footer'))}</p>
     </div>
   </div>`;
 }

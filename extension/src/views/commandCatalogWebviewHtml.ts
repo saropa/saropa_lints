@@ -39,6 +39,32 @@ import {
   getKeyboardShortcutsScript,
   getKeyboardShortcutsStyles,
 } from './keyboard-shortcuts';
+import { t } from '../i18n/runtime';
+
+/** Client-side strings for `getScript()` (webview has no direct access to `t`). */
+function commandCatalogScriptI18nJson(): string {
+  const s = 'commandCatalog.script';
+  return JSON.stringify({
+    moreSuffix: t(`${s}.moreSuffix`),
+    showLess: t(`${s}.showLess`),
+    runSingular: t(`${s}.runSingular`),
+    runPlural: t(`${s}.runPlural`),
+    recentWord: t(`${s}.recentWord`),
+    expandAll: t(`${s}.expandAll`),
+    collapseAll: t(`${s}.collapseAll`),
+    searchChip: t(`${s}.searchChip`),
+    internalChip: t(`${s}.internalChip`),
+    removeFilterPrefix: t(`${s}.removeFilterPrefix`),
+    matchOne: t(`${s}.matchOne`),
+    matchOther: t(`${s}.matchOther`),
+  });
+}
+
+/** Muted search hint below toolbar (HTML fragment). */
+function buildCommandCatalogSearchHint(): string {
+  const s = 'commandCatalog.search';
+  return `${t(`${s}.hintLine1`)} <strong>${t(`${s}.hintStrongTitle`)}</strong>, <strong>${t(`${s}.hintStrongDesc`)}</strong>, and <strong>${t(`${s}.hintStrongId`)}</strong>\n    ${t(`${s}.hintLine2`)} <kbd>${t(`${s}.hintLine2kbd`)}</kbd> ${t(`${s}.hintLine2End`)}`;
+}
 
 /** Cap on Recent chips visible by default before "+N more" overflow (§8.10). */
 const RECENT_VISIBLE_DEFAULT = 6;
@@ -81,29 +107,29 @@ export function buildCommandCatalogHtml(
   <meta http-equiv="Content-Security-Policy" content="${csp}">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="${codiconCss}">
-  <title>Saropa Command Catalog</title>
+  <title>${escapeHtml(t('commandCatalog.documentTitle'))}</title>
   <style nonce="${nonce}">
     ${getStyles()}
     ${getKeyboardShortcutsStyles()}
   </style>
 </head>
 <body>
-  <a href="#catalog-main" class="skip-link">Skip to command catalog</a>
+  <a href="#catalog-main" class="skip-link">${escapeHtml(t('commandCatalog.skipLink'))}</a>
   <div id="announcer" role="status" aria-live="polite" aria-atomic="true"></div>
   <header class="hero">
     <div class="hero-inner">
-      <h1 class="hero-title">Saropa Command Catalog</h1>
+      <h1 class="hero-title">${escapeHtml(t('commandCatalog.heroTitle'))}</h1>
       <p class="status-line" id="statusLine">
-        <span data-stat="public"><strong>${publicCount}</strong> commands</span>
+        <span data-stat="public"><strong>${publicCount}</strong> ${escapeHtml(t('commandCatalog.status.wordCommands'))}</span>
         <span class="status-sep">·</span>
-        <span data-stat="categories"><strong>${categoryCount}</strong> categories</span>
+        <span data-stat="categories"><strong>${categoryCount}</strong> ${escapeHtml(t('commandCatalog.status.wordCategories'))}</span>
         <span class="status-sep">·</span>
         <span data-stat="history" id="statHistory">
-          <strong>${historyCount}</strong> recent
+          <strong>${historyCount}</strong> ${escapeHtml(t('commandCatalog.status.wordRecent'))}
         </span>
         <span class="status-sep">·</span>
         <span data-stat="internal" class="status-dim" id="statInternal">
-          ${internalCount} context-menu only (hidden)
+          ${escapeHtml(t('commandCatalog.status.internalHidden', { count: String(internalCount) }))}
         </span>
         ${buildKeyboardShortcutsButton()}
       </p>
@@ -119,16 +145,16 @@ export function buildCommandCatalogHtml(
             type="text"
             id="search"
             class="search-input"
-            placeholder="Search title, description, or command id…"
+            placeholder="${escapeAttr(t('commandCatalog.search.placeholder'))}"
             autocomplete="off"
             spellcheck="false"
-            aria-label="Search commands"
+            aria-label="${escapeAttr(t('commandCatalog.search.ariaLabel'))}"
           />
           <button
             type="button"
             id="searchClear"
             class="search-clear"
-            aria-label="Clear search"
+            aria-label="${escapeAttr(t('commandCatalog.search.clearAria'))}"
             hidden
           >
             <span class="codicon codicon-close" aria-hidden="true"></span>
@@ -139,22 +165,22 @@ export function buildCommandCatalogHtml(
                plan/UX_GUIDELINES.md (Part B). -->
           <div id="catalog-recent" class="catalog-recent" hidden>
             <div class="catalog-recent-head">
-              <span class="catalog-recent-title">Recent searches</span>
+              <span class="catalog-recent-title">${escapeHtml(t('commandCatalog.recentPopover.title'))}</span>
               <button type="button" id="catalog-recent-clear"
                 class="catalog-recent-clear"
-                title="Clear all recent searches">Clear</button>
+                title="${escapeAttr(t('commandCatalog.recentPopover.clearTitle'))}">${escapeHtml(t('commandCatalog.recentPopover.clearButton'))}</button>
             </div>
             <ul id="catalog-recent-list" class="catalog-recent-list"
-              role="listbox" aria-label="Recent searches"></ul>
+              role="listbox" aria-label="${escapeAttr(t('commandCatalog.recentPopover.listAria'))}"></ul>
           </div>
         </div>
         <div class="toolbar-controls">
           <label class="checkbox-control">
             <input type="checkbox" id="showInternal" />
-            <span>Show context-menu commands</span>
+            <span>${escapeHtml(t('commandCatalog.toolbar.showInternal'))}</span>
           </label>
           <button type="button" class="text-btn" id="toggleAll" aria-pressed="false">
-            Collapse all
+            ${escapeHtml(t('commandCatalog.toolbar.collapseAll'))}
           </button>
         </div>
       </div>
@@ -166,36 +192,35 @@ export function buildCommandCatalogHtml(
        formatting still renders in the same #searchHint element so any
        script that touched it keeps working. -->
   <p class="search-hint search-hint-below" id="searchHint">
-    Matches each command's <strong>title</strong>, <strong>description</strong>, and <strong>id</strong>
-    (id tokens are spaced too — type <kbd>run analysis</kbd> without dots).
+    ${buildCommandCatalogSearchHint()}
   </p>
 
   <div
     class="filter-chip-strip"
     id="filterChips"
     role="region"
-    aria-label="Active filters"
+    aria-label="${escapeAttr(t('commandCatalog.filterChips.ariaRegion'))}"
     hidden
   >
-    <span class="filter-chip-label">Active filters:</span>
+    <span class="filter-chip-label">${escapeHtml(t('commandCatalog.filterChips.activeLabel'))}</span>
     <span id="filterChipsBody"></span>
-    <button type="button" class="text-btn" id="clearFilters">Clear all</button>
+    <button type="button" class="text-btn" id="clearFilters">${escapeHtml(t('commandCatalog.filterChips.clearAll'))}</button>
   </div>
 
   <section class="band band-frequent" id="frequentSection" hidden>
     <div class="band-header">
-      <h2 class="section-title">Frequent</h2>
+      <h2 class="section-title">${escapeHtml(t('commandCatalog.bands.frequentTitle'))}</h2>
     </div>
-    <p class="band-hint">Most-used across your sessions</p>
+    <p class="band-hint">${escapeHtml(t('commandCatalog.bands.frequentHint'))}</p>
     <div class="frequent-grid" id="frequentGrid"></div>
   </section>
 
   <section class="band band-recent" id="historySection" ${historyCount === 0 ? 'hidden' : ''}>
     <div class="band-header">
-      <h2 class="section-title">Recent</h2>
-      <button type="button" class="text-btn" id="clearHistory">Clear</button>
+      <h2 class="section-title">${escapeHtml(t('commandCatalog.bands.recentTitle'))}</h2>
+      <button type="button" class="text-btn" id="clearHistory">${escapeHtml(t('commandCatalog.bands.recentClear'))}</button>
     </div>
-    <p class="band-hint">Click to run again · Newest first</p>
+    <p class="band-hint">${escapeHtml(t('commandCatalog.bands.recentHint'))}</p>
     <div class="history-chips" id="historyChips"></div>
     <button type="button" class="text-btn history-more" id="historyMore" hidden></button>
   </section>
@@ -205,18 +230,19 @@ export function buildCommandCatalogHtml(
   </main>
   <div class="no-results" id="noResults" hidden>
     <span class="codicon codicon-info no-results-icon" aria-hidden="true"></span>
-    <p>No commands match your search.</p>
-    <button type="button" class="text-btn" id="resetFromEmpty">Reset filters</button>
+    <p>${escapeHtml(t('commandCatalog.noResults.message'))}</p>
+    <button type="button" class="text-btn" id="resetFromEmpty">${escapeHtml(t('commandCatalog.noResults.reset'))}</button>
   </div>
   ${buildKeyboardShortcutsOverlay([
-    { key: '/', label: 'Focus the search field' },
-    { key: '↓ / ↑', label: 'Navigate visible command rows' },
-    { key: 'Home / End', label: 'Jump to the first or last visible row' },
-    { key: 'Enter', label: 'Run the focused command' },
-    { key: 'Esc', label: 'Clear search and reset filters' },
-    { key: '?', label: 'Show this shortcut overlay' },
+    { key: '/', label: t('commandCatalog.shortcuts.focusSearch') },
+    { key: '↓ / ↑', label: t('commandCatalog.shortcuts.navRows') },
+    { key: 'Home / End', label: t('commandCatalog.shortcuts.homeEnd') },
+    { key: 'Enter', label: t('commandCatalog.shortcuts.enterRun') },
+    { key: 'Esc', label: t('commandCatalog.shortcuts.escClear') },
+    { key: '?', label: t('commandCatalog.shortcuts.showOverlay') },
   ])}
   <script nonce="${nonce}">
+    window.__COMMAND_CATALOG_I18N__ = ${commandCatalogScriptI18nJson()};
     window.__INITIAL_HISTORY__ = ${JSON.stringify(history)};
     window.__INITIAL_CATALOG_SEARCH_RECENT__ = ${JSON.stringify(catalogSearchRecent)};
     window.__RECENT_VISIBLE_DEFAULT__ = ${RECENT_VISIBLE_DEFAULT};
@@ -246,7 +272,7 @@ function buildSectionsHtml(
           <span
             class="category-count"
             data-jump-to="${slug}"
-            title="Jump to ${escapeAttr(category)}"
+            title="${escapeAttr(t('commandCatalog.categoryJumpTitle', { category }))}"
           >${catEntries.length}</span>
         </button>
         <div class="category-body" id="${slug}-body" role="list">
@@ -261,7 +287,7 @@ function buildSectionsHtml(
 function buildEntryHtml(entry: CatalogEntry): string {
   const internalClass = entry.internal ? ' internal' : '';
   const internalBadge = entry.internal
-    ? '<span class="badge internal-badge" title="Triggered from context menus only">menu</span>'
+    ? `<span class="badge internal-badge" title="${escapeAttr(t('commandCatalog.entry.internalBadgeTitle'))}">${escapeHtml(t('commandCatalog.entry.internalBadge'))}</span>`
     : '';
 
   // Tooltip carries the command id so the user can still see it without making
@@ -294,8 +320,8 @@ function buildEntryHtml(entry: CatalogEntry): string {
         type="button"
         class="entry-copy"
         data-copy="${escapeAttr(entry.command)}"
-        title="Copy command id (${escapeAttr(entry.command)})"
-        aria-label="Copy command id"
+        title="${escapeAttr(t('commandCatalog.entry.copyTitle', { id: entry.command }))}"
+        aria-label="${escapeAttr(t('commandCatalog.entry.copyAria'))}"
         tabindex="-1"
       >
         <span class="codicon codicon-copy" aria-hidden="true"></span>
@@ -1132,6 +1158,7 @@ function getScript(): string {
   return String.raw`
     (function () {
       const vscode = acquireVsCodeApi();
+      const CC = typeof window.__COMMAND_CATALOG_I18N__ !== 'undefined' ? window.__COMMAND_CATALOG_I18N__ : {};
       const RECENT_VISIBLE = window.__RECENT_VISIBLE_DEFAULT__ || 6;
       const FREQUENT_LIMIT = window.__FREQUENT_TILE_LIMIT__ || 6;
 
@@ -1212,7 +1239,7 @@ function getScript(): string {
         if (historyMoreBtn) {
           if (overflow > 0) {
             historyMoreBtn.hidden = false;
-            historyMoreBtn.textContent = '+' + overflow + ' more';
+            historyMoreBtn.textContent = CC.moreSuffix.replace(/\{count\}/g, String(overflow));
           } else {
             historyMoreBtn.hidden = true;
             historySection.classList.remove('show-all');
@@ -1227,8 +1254,8 @@ function getScript(): string {
           const all = historyChips.querySelectorAll('.history-chip').length;
           const overflow = all - RECENT_VISIBLE;
           historyMoreBtn.textContent = expanded
-            ? 'Show less'
-            : '+' + Math.max(0, overflow) + ' more';
+            ? CC.showLess
+            : CC.moreSuffix.replace(/\{count\}/g, String(Math.max(0, overflow)));
         });
       }
 
@@ -1276,7 +1303,7 @@ function getScript(): string {
           const count = document.createElement('span');
           count.className = 'frequent-count';
           const c = item.count || 1;
-          count.textContent = c + (c === 1 ? ' run' : ' runs');
+          count.textContent = c + (c === 1 ? CC.runSingular : CC.runPlural);
           tile.appendChild(count);
 
           tile.addEventListener('click', function () {
@@ -1294,7 +1321,7 @@ function getScript(): string {
         renderFrequent(items);
         if (statHistory) {
           statHistory.innerHTML =
-            '<strong>' + (items ? items.length : 0) + '</strong> recent';
+            '<strong>' + (items ? items.length : 0) + '</strong> ' + CC.recentWord;
         }
       }
 
@@ -1439,7 +1466,7 @@ function getScript(): string {
         }
         if (toggleAllBtn) {
           toggleAllBtn.setAttribute('aria-pressed', collapsed ? 'true' : 'false');
-          toggleAllBtn.textContent = collapsed ? 'Expand all' : 'Collapse all';
+          toggleAllBtn.textContent = collapsed ? CC.expandAll : CC.collapseAll;
         }
       }
 
@@ -1661,8 +1688,8 @@ function getScript(): string {
         filterChipsBody.textContent = '';
 
         const chips = [];
-        if (query) chips.push({ kind: 'search', label: 'Search: "' + query + '"' });
-        if (showInternal) chips.push({ kind: 'internal', label: 'Showing context-menu commands' });
+        if (query) chips.push({ kind: 'search', label: CC.searchChip.replace(/\{query\}/g, query) });
+        if (showInternal) chips.push({ kind: 'internal', label: CC.internalChip });
 
         if (chips.length === 0) {
           filterChipStrip.hidden = true;
@@ -1676,7 +1703,7 @@ function getScript(): string {
             escText(chip.label) +
             '<button type="button" class="filter-chip-remove" data-remove="' +
             chip.kind +
-            '" aria-label="Remove filter ' + escText(chip.label) +
+            '" aria-label="' + escText(CC.removeFilterPrefix + chip.label) +
             '"><span class="codicon codicon-close" aria-hidden="true"></span></button>';
           filterChipsBody.appendChild(el);
         }
@@ -1797,7 +1824,9 @@ function getScript(): string {
         noResultsEl.hidden = !empty;
 
         searchCountEl.textContent = query
-          ? visibleCount + ' match' + (visibleCount === 1 ? '' : 'es')
+          ? (visibleCount === 1
+              ? CC.matchOne.replace(/\{count\}/g, String(visibleCount))
+              : CC.matchOther.replace(/\{count\}/g, String(visibleCount)))
           : '';
 
         if (searchClearBtn) searchClearBtn.hidden = !query;

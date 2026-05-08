@@ -19,7 +19,7 @@ This guide is intentionally implementation-ready. Optional alignment with an ext
 | Track | Status | Notes |
 |-------|--------|--------|
 | **L10N-01** Manifest NLS | **Done** | `extension/package.json` uses `%key%`; `extension/package.nls.json` is the English source; `extension/package.nls.<locale>.json` shipped for the default locale set; local guard `npm run verify-nls-keys` (runs `extension/scripts/verify-manifest-nls-keys.mjs`). |
-| **L10N-02** Runtime webviews | **In progress** | `extension/src/i18n/runtime.ts` + `extension/src/i18n/locales/*.json`; `webview-strings.ts` exports `STRINGS` from `en.json`. Large HTML builders (e.g. violations dashboard) still contain **inline user-facing English**; migrate to `t()` / keyed lookups over time. |
+| **L10N-02** Runtime webviews | **Done** (shipped set) | Findings / triage dashboards, keyboard overlay, full-width toggle, command catalog webview, Package Vibrancy `report-html.ts`, and wide-report host strings use `t()` + `en.json`; non-English catalogs are regenerated via `generate_locales.py` (dictionary + optional `SAROPA_I18N_MACHINE_TRANSLATE`). Further surfaces (e.g. remaining webviews) can follow the same pattern. |
 | **L10N-03** CI quality gates | **Partial** | **CI runs manifest key coverage** (`node extension/scripts/verify-manifest-nls-keys.mjs` on every push/PR). Locale key parity, placeholder parity, and “no inline literals” lint are **not** automated yet; use `python extension/scripts/i18n/audit_coverage.py` locally for coverage reports. |
 
 ### Next work (ordered)
@@ -41,7 +41,7 @@ This guide is intentionally implementation-ready. Optional alignment with an ext
 
 - **Manifest:** User-facing contributed strings live behind `%…%` keys; English text is in `extension/package.nls.json`.
 - **Runtime:** JSON catalogs under `extension/src/i18n/locales/` are loaded by `runtime.ts`; regenerate non-English files with `python extension/scripts/i18n/generate_locales.py` after editing English or `dictionaries.py` (see `extension/scripts/i18n/README.md`).
-- **Gaps:** Not every locale from the target tier list is shipped; several dashboards still hardcode English in TS/HTML strings.
+- **Gaps:** Not every locale from the target tier list is shipped; some smaller webviews may still contain literals — run `python extension/scripts/i18n/audit_coverage.py` for a heuristic report.
 
 ---
 

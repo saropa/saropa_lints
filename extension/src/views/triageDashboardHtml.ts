@@ -10,6 +10,7 @@ import {
   type TriageData,
   type TriageGroupNode,
 } from './triageTree';
+import { t } from '../i18n/runtime';
 
 function escapeHtml(s: string): string {
   return s
@@ -35,9 +36,9 @@ function renderTriageGroupBlock(group: TriageGroupNode, issuesByRule: IssuesByRu
   const children = getTriageGroupChildren(group, issuesByRule);
   const encAll = rulesPayload(group.rules);
   const actions = `<div class="triage-group-actions">
-  <button type="button" class="action-btn triage-btn" data-triage-action="focus" data-rules="${encAll}">Show in Issues</button>
-  <button type="button" class="action-btn triage-btn secondary" data-triage-action="disable" data-rules="${encAll}">Disable rules</button>
-  <button type="button" class="action-btn triage-btn secondary" data-triage-action="enable" data-rules="${encAll}">Enable rules</button>
+  <button type="button" class="action-btn triage-btn" data-triage-action="focus" data-rules="${encAll}">${escapeHtml(t('triageDash.showInIssues'))}</button>
+  <button type="button" class="action-btn triage-btn secondary" data-triage-action="disable" data-rules="${encAll}">${escapeHtml(t('triageDash.disableRules'))}</button>
+  <button type="button" class="action-btn triage-btn secondary" data-triage-action="enable" data-rules="${encAll}">${escapeHtml(t('triageDash.enableRules'))}</button>
 </div>`;
   const rows = children
     .map((r) => {
@@ -46,9 +47,9 @@ function renderTriageGroupBlock(group: TriageGroupNode, issuesByRule: IssuesByRu
   <td class="triage-rule-name"><code>${escapeHtml(r.ruleName)}</code></td>
   <td class="triage-n">${r.issueCount}</td>
   <td class="triage-row-actions">
-    <button type="button" class="linkish triage-btn" data-triage-action="focus" data-rules="${encOne}">Issues</button>
-    <button type="button" class="linkish triage-btn" data-triage-action="disable" data-rules="${encOne}">Off</button>
-    <button type="button" class="linkish triage-btn" data-triage-action="enable" data-rules="${encOne}">On</button>
+    <button type="button" class="linkish triage-btn" data-triage-action="focus" data-rules="${encOne}">${escapeHtml(t('triageDash.issues'))}</button>
+    <button type="button" class="linkish triage-btn" data-triage-action="disable" data-rules="${encOne}">${escapeHtml(t('triageDash.off'))}</button>
+    <button type="button" class="linkish triage-btn" data-triage-action="enable" data-rules="${encOne}">${escapeHtml(t('triageDash.on'))}</button>
   </td>
 </tr>`;
     })
@@ -61,7 +62,7 @@ function renderTriageGroupBlock(group: TriageGroupNode, issuesByRule: IssuesByRu
   ${actions}
   <div class="triage-table-wrap">
     <table class="triage-table">
-      <thead><tr><th>Rule</th><th>Issues</th><th></th></tr></thead>
+      <thead><tr><th>${escapeHtml(t('triageDash.colRule'))}</th><th>${escapeHtml(t('triageDash.colIssues'))}</th><th></th></tr></thead>
       <tbody>${rows}</tbody>
     </table>
   </div>
@@ -78,12 +79,12 @@ function renderTriageBody(data: ViolationsData, triage: TriageData): string {
   }
   if (triage.zeroIssueCount > 0) {
     blocks.push(
-      `<p class="triage-meta">${triage.zeroIssueCount} rules with zero issues — auto-enabled in tier.</p>`,
+      `<p class="triage-meta">${escapeHtml(t('triageDash.zeroIssueRules', { count: String(triage.zeroIssueCount) }))}</p>`,
     );
   }
   if (triage.disabledOverrideCount > 0) {
     blocks.push(
-      `<p class="triage-meta">${triage.disabledOverrideCount} rules disabled by override in <code>analysis_options_custom.yaml</code>.</p>`,
+      `<p class="triage-meta">${escapeHtml(t('triageDash.disabledOverrides', { count: String(triage.disabledOverrideCount) }))}</p>`,
     );
   }
   if (triage.stylisticGroup) {
@@ -99,48 +100,48 @@ export function buildTriageDashboardSectionHtml(root: string): string {
   const data = readViolations(root);
   if (!data) {
     return `<details class="triage-dash">
-<summary>Rule triage</summary>
-<p class="hint">No <code>reports/.saropa_lints/violations.json</code> yet. Run analysis, then refresh this tab.</p>
-<div class="actions"><button type="button" class="action-btn" data-command="runAnalysis">Run analysis</button></div>
+<summary>${escapeHtml(t('triageDash.summaryRuleTriage'))}</summary>
+<p class="hint">${escapeHtml(t('triageDash.hintNoViolations'))}</p>
+<div class="actions"><button type="button" class="action-btn" data-command="runAnalysis">${escapeHtml(t('toolbar.runAnalysis'))}</button></div>
 </details>`;
   }
 
   const { triage: tri } = getViolationsTriageState(root, data);
   if (tri.kind === 'missing' || (tri.kind === 'incomplete' && tri.reason === 'unreadable')) {
     return `<details class="triage-dash" open>
-<summary>Rule triage</summary>
-<p class="hint warn">No readable violations export. Run Saropa Lints analysis first.</p>
-<div class="actions"><button type="button" class="action-btn" data-command="runAnalysis">Run analysis</button></div>
+<summary>${escapeHtml(t('triageDash.summaryRuleTriage'))}</summary>
+<p class="hint warn">${escapeHtml(t('triageDash.hintUnreadable'))}</p>
+<div class="actions"><button type="button" class="action-btn" data-command="runAnalysis">${escapeHtml(t('toolbar.runAnalysis'))}</button></div>
 </details>`;
   }
   if (tri.kind === 'stale') {
     return `<details class="triage-dash" open>
-<summary>Rule triage</summary>
-<p class="hint warn">Triage data may be outdated (export is ${formatStaleAge(tri.ageMs)} old). Re-run analysis for current groups.</p>
-<div class="actions"><button type="button" class="action-btn" data-command="runAnalysis">Run analysis</button></div>
+<summary>${escapeHtml(t('triageDash.summaryRuleTriage'))}</summary>
+<p class="hint warn">${escapeHtml(t('triageDash.hintStale', { age: formatStaleAge(tri.ageMs) }))}</p>
+<div class="actions"><button type="button" class="action-btn" data-command="runAnalysis">${escapeHtml(t('toolbar.runAnalysis'))}</button></div>
 </details>`;
   }
   if (tri.kind === 'incomplete' && tri.reason === 'no_per_rule') {
     return `<details class="triage-dash" open>
-<summary>Rule triage</summary>
-<p class="hint warn">This export has no per-rule issue counts. Re-analyze with a current Saropa Lints plugin.</p>
-<div class="actions"><button type="button" class="action-btn" data-command="runAnalysis">Run analysis</button></div>
+<summary>${escapeHtml(t('triageDash.summaryRuleTriage'))}</summary>
+<p class="hint warn">${escapeHtml(t('triageDash.hintNoPerRule'))}</p>
+<div class="actions"><button type="button" class="action-btn" data-command="runAnalysis">${escapeHtml(t('toolbar.runAnalysis'))}</button></div>
 </details>`;
   }
 
   const triage = buildTriageData(data, root);
   if (!triage) {
     return `<details class="triage-dash" open>
-<summary>Rule triage</summary>
-<p class="hint warn">Could not build triage from this export. Run a fresh analysis.</p>
-<div class="actions"><button type="button" class="action-btn" data-command="runAnalysis">Run analysis</button></div>
+<summary>${escapeHtml(t('triageDash.summaryRuleTriage'))}</summary>
+<p class="hint warn">${escapeHtml(t('triageDash.hintBuildFailed'))}</p>
+<div class="actions"><button type="button" class="action-btn" data-command="runAnalysis">${escapeHtml(t('toolbar.runAnalysis'))}</button></div>
 </details>`;
   }
 
   const body = renderTriageBody(data, triage);
   return `<details class="triage-dash" open>
-<summary>Rule triage (volume / must-fix / stylistic)</summary>
-<p class="hint">Same grouping as the Triage activity-bar tree: filter Issues, or disable/enable rules in <code>analysis_options_custom.yaml</code>. Large groups may ask for confirmation.</p>
+<summary>${escapeHtml(t('triageDash.summaryVolume'))}</summary>
+<p class="hint">${escapeHtml(t('triageDash.hintSameAsTree'))}</p>
 ${body}
 </details>`;
 }
