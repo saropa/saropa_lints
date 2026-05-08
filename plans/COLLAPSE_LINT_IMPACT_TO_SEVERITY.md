@@ -5,6 +5,23 @@
 **Created:** 2026-05-03.
 **Spawned from:** review of "critical" overuse (CHANGELOG `[Unreleased]` entries on the regression-nudge toast and lint problem-message wording, 2026-05-03).
 
+## Active follow-up queue
+
+Only these items are considered open work for this topic:
+
+- [ ] **SEV-01 (P1)** Audit `severity:` assignments rule-by-rule against MUST-fix / should-fix / info guidance.
+- [ ] **SEV-02 (P1)** Update `saropa_quality_gate.yaml.example` to foreground `new_errors/new_warnings/new_info`.
+- [ ] **SEV-03 (P2)** Rename `bin/impact_report.dart` to `severity_report.dart` with compatibility alias.
+- [ ] **SEV-04 (P2)** Verify internal scripts parsing `v.impact` accept `error|warning|info` value set.
+
+### SEV-01 audit pass order
+
+Run rule-by-rule severity audit in this order:
+
+1. Security/network input + auth/storage rule files
+2. Architecture/disposal + async core rule files
+3. Naming/style and other likely-overrated historical criticals
+
 ## Summary of what shipped
 
 - **Enum collapsed.** `LintImpact` redefined in [`lib/src/saropa_lint_rule.dart`](../lib/src/saropa_lint_rule.dart): `critical / high / medium / low / opinionated` → `error / warning / info`. Mapping: `critical → error`, `high + medium → warning`, `low + opinionated → info`.

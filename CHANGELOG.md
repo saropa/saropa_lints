@@ -60,6 +60,7 @@ This upcoming release tightens Findings Dashboard trust and usability: score/reg
 - **Stub-test migration sequencing** — the stub-test bug plan now records a fixed top-three conversion order for the next high-risk batch, which improves execution predictability and auditability; no action required for package users.
 - **Localization foundation slicing** — the extension localization guide now includes an explicit L10N-01 implementation slice (NLS source, `%key%` wiring, and key-resolution check), improving delivery clarity; no action required for package users.
 - **Localization runtime slicing** — the extension localization guide now defines an explicit L10N-02 runtime migration slice with inline-literal guardrails, improving phased rollout safety; no action required for package users.
+- **Severity follow-up sequencing** — the impact-collapse plan now records an explicit SEV-01 audit order to prioritize highest-risk recategorizations first; no action required for package users.
 
 </details>
 
