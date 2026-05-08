@@ -55,23 +55,8 @@ This upcoming release tightens Findings Dashboard trust and usability: score/reg
 
 <details><summary>Maintenance</summary>
 
-- **Planning execution slices** — the quick-fix plan now includes an explicit Batch 14 build set (three deterministic fixes with acceptance criteria) so implementation can proceed in auditable small commits; no action required for package users.
-- **Testing gate clarity** — the testing/release plan now defines an explicit D1-D3 implementation slice for fix application smoke coverage, making release gate ownership and audit traceability clearer; no action required for package users.
-- **Stub-test migration sequencing** — the stub-test bug plan now records a fixed top-three conversion order for the next high-risk batch, which improves execution predictability and auditability; no action required for package users.
-- **Localization foundation slicing** — the extension localization guide now includes an explicit L10N-01 implementation slice (NLS source, `%key%` wiring, and key-resolution check), improving delivery clarity; no action required for package users.
-- **Localization runtime slicing** — the extension localization guide now defines an explicit L10N-02 runtime migration slice with inline-literal guardrails, improving phased rollout safety; no action required for package users.
-- **Severity follow-up sequencing** — the impact-collapse plan now records an explicit SEV-01 audit order to prioritize highest-risk recategorizations first; no action required for package users.
-- **Cross-file config slicing** — the cross-file CLI design now defines an active XFILE-01 config slice with precedence and integration-test expectations, making the remaining config work concrete; no action required for package users.
-- **UX backlog execution slicing** — the remaining UX plan now includes an explicit UX-B08 implementation slice (host storage, message contract, and per-surface persistence tests), improving trigger-to-build readiness; no action required for package users.
-- **Rule-pack closeout sequencing** — the migration plan now includes an explicit PACK-02 verification slice so final sign-off always includes reproducible test evidence; no action required for package users.
-- **Comment-coverage batch template** — the comment-coverage plan now includes a reusable DOC-02 batch record template so documentation passes can be audited consistently; no action required for package users.
-- **Release gate verification** — REL-N1 is now marked complete in the testing/release plan with recorded smoke-test evidence for D1-D4 fix-application coverage; no action required for package users.
-- **Rule-pack verification evidence** — PACK-02 is now marked complete with recorded test evidence using the current `test/config/*` paths, improving close-out audit accuracy; no action required for package users.
-- **Quick-fix batch verification** — QF-02 is now marked complete with recorded presence-test evidence for the Batch 14 structure-rule fix set, improving execution traceability; no action required for package users.
-- **Quick-fix audit baseline** — QF-01 is closed with a 2026-05-08 missing-fix baseline and `list_rules_without_fixes.py` now prints a one-line audit summary alongside the saved report path, improving repeatability without opening log files; no action required for package users.
-- **Quick-fix Batch 14 history record** — QF-03 adds a dated verification note under `plans/history/` so Batch 14 evidence stays discoverable beside the backlog plan; no action required for package users.
-- **Quality gate sample config** — SEV-02 updates `saropa_quality_gate.yaml.example` to lead with severity-keyed metrics (`new_errors`, `new_warnings`, `new_info`) plus inline legacy-alias notes; no action required unless you vendor this sample into your own CI config.
-- **Release metrics refresh** — REL-N3 records fresh fixture and quick-fix registration numbers (2026-05-08) in the testing/release plan and reconciles the fixture denominator note with `_rule_metrics`, improving gate-table accuracy for release prep; no action required for package users.
+- **Contributor planning docs** — assorted `plans/*.md` checklists (quick-fix, testing/release, stub tests, localization guide, severity follow-ups, cross-file CLI, UX backlog, rule-pack migration, comment coverage) were refreshed for clearer sequencing and sign-off trails; docs only, **no shipped rule or extension behavior** beyond what is listed under **`### Changed (Extension)`** above.
+- **Maintainer tooling** — the quick-fix audit script prints a stdout summary before writing the dated report file, and the bundled quality-gate **example** YAML documents recommended `new_*` metrics with legacy-alias notes; no action unless you vendor that sample into your own CI gate.
 
 </details>
 
