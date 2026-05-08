@@ -59,6 +59,7 @@ This upcoming release tightens Findings Dashboard trust and usability: score/reg
 - **Testing gate clarity** — the testing/release plan now defines an explicit D1-D3 implementation slice for fix application smoke coverage, making release gate ownership and audit traceability clearer; no action required for package users.
 - **Stub-test migration sequencing** — the stub-test bug plan now records a fixed top-three conversion order for the next high-risk batch, which improves execution predictability and auditability; no action required for package users.
 - **Localization foundation slicing** — the extension localization guide now includes an explicit L10N-01 implementation slice (NLS source, `%key%` wiring, and key-resolution check), improving delivery clarity; no action required for package users.
+- **Localization runtime slicing** — the extension localization guide now defines an explicit L10N-02 runtime migration slice with inline-literal guardrails, improving phased rollout safety; no action required for package users.
 
 </details>
 

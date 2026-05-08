@@ -34,6 +34,12 @@ This guide is intentionally implementation-ready and aligned with your existing 
 - [ ] Replace inline manifest labels in `extension/package.json` with `%key%` references.
 - [ ] Add one validation script/check that all `%key%` references resolve in `package.nls.json`.
 
+### L10N-02 implementation slice (active)
+
+- [ ] Route dashboard/webview user-facing strings through `extension/src/i18n/runtime.ts`.
+- [ ] Keep `webview-strings.ts` as source-compatible wrapper until all consumers migrate.
+- [ ] Add a guard check to flag newly introduced inline literals in dashboard HTML builders.
+
 ---
 
 ## Current State (Important)
