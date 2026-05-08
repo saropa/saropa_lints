@@ -61,6 +61,7 @@ This upcoming release tightens Findings Dashboard trust and usability: score/reg
 - **Localization foundation slicing** — the extension localization guide now includes an explicit L10N-01 implementation slice (NLS source, `%key%` wiring, and key-resolution check), improving delivery clarity; no action required for package users.
 - **Localization runtime slicing** — the extension localization guide now defines an explicit L10N-02 runtime migration slice with inline-literal guardrails, improving phased rollout safety; no action required for package users.
 - **Severity follow-up sequencing** — the impact-collapse plan now records an explicit SEV-01 audit order to prioritize highest-risk recategorizations first; no action required for package users.
+- **Cross-file config slicing** — the cross-file CLI design now defines an active XFILE-01 config slice with precedence and integration-test expectations, making the remaining config work concrete; no action required for package users.
 
 </details>
 

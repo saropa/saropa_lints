@@ -2,6 +2,31 @@
 
 > **Last reviewed:** 2026-04-28
 
+## Execution snapshot
+
+### Current status
+
+- Phase 1, Phase 5: complete.
+- Phase 2-4: largely complete with targeted follow-ups.
+
+### Next 3 (ordered)
+
+- [ ] **XFILE-01 (P1)** Add `analysis_options.yaml`-backed config support for commonly repeated cross-file flags.
+- [ ] **XFILE-02 (P1)** Decide whether to keep line-block duplication as final scope or schedule token/AST similarity upgrade with perf budget.
+- [ ] **XFILE-03 (P2)** Improve watch-mode UX (progress surfacing and long-run diagnostics) without regressing CI-first behavior.
+
+### Definition of done for remaining scope
+
+- Config parity exists between CLI flags and checked-in project config.
+- Duplicates strategy is explicitly finalized (MVP accepted or advanced mode scheduled).
+- Watch mode has clear operator-visible status for long runs.
+
+### XFILE-01 config slice (active)
+
+- [ ] Define supported `analysis_options.yaml` keys for cross-file CLI defaults.
+- [ ] Map each key to existing CLI flags with precedence rules (CLI > config > defaults).
+- [ ] Add one integration test proving config-based defaults are honored.
+
 ## Rationale
 
 The analyzer plugin runs per-file, making certain analyses impossible:
