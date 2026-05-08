@@ -2,6 +2,24 @@
 
 Companion to [`UX_GUIDELINES_COMPLIANCE.md`](UX_GUIDELINES_COMPLIANCE.md). Phases 1–3 of that plan landed the structural / mechanical compliance work; this plan tracks **everything still open** against the expanded [`plans/guides/UX_UI_GUIDELINES.md`](guides/UX_UI_GUIDELINES.md). Read the compliance plan first — it explains what's done and why some items were deliberately deferred. This file expands the deferred set into a working plan.
 
+## Execution snapshot
+
+### Next 3 (ordered quick wins)
+
+- [ ] **UX-B08 (P1)** Cross-session recent-search persistence via `workspaceState`.
+- [ ] **UX-B09 (P1)** Full RTL slider behavior for config dashboard toggle knob.
+- [ ] **UX-C07 (P2)** RTL structural snapshot regression test harness.
+
+### Promotion rule
+
+Tier B/C items are only pulled into active implementation when their explicit "Earn it when" trigger fires.
+
+### UX-B08 implementation slice (active when triggered)
+
+- [ ] Add host-side recent-search storage service keyed by surface + workspace.
+- [ ] Add webview init/set message contract for recent-search sync.
+- [ ] Add one persistence test per surface (Known Issues, Findings, Command Catalog).
+
 Each item below carries:
 
 - **Why** — the failure mode the guideline prevents.

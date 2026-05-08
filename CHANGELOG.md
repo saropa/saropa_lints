@@ -62,6 +62,7 @@ This upcoming release tightens Findings Dashboard trust and usability: score/reg
 - **Localization runtime slicing** — the extension localization guide now defines an explicit L10N-02 runtime migration slice with inline-literal guardrails, improving phased rollout safety; no action required for package users.
 - **Severity follow-up sequencing** — the impact-collapse plan now records an explicit SEV-01 audit order to prioritize highest-risk recategorizations first; no action required for package users.
 - **Cross-file config slicing** — the cross-file CLI design now defines an active XFILE-01 config slice with precedence and integration-test expectations, making the remaining config work concrete; no action required for package users.
+- **UX backlog execution slicing** — the remaining UX plan now includes an explicit UX-B08 implementation slice (host storage, message contract, and per-surface persistence tests), improving trigger-to-build readiness; no action required for package users.
 
 </details>
 
