@@ -8,6 +8,35 @@
 
 **Non-goal:** Using “at least one comment line” or raw **comment density %** as proof of quality. Those numbers can go up while still failing this plan.
 
+## Execution snapshot
+
+### Next 3 (ordered)
+
+- [ ] **DOC-01 (P0)** Create a current top-25 backfill queue from `_code_comment_metrics.py` and commit it under `plans/history/` with date stamp.
+- [ ] **DOC-02 (P0)** Complete one focused backfill batch (10 files) to full Part 2 depth, including locals/branches/loops documentation coverage.
+- [ ] **DOC-03 (P1)** Add a lightweight verification checklist script/report so each batch captures evidence beyond raw density.
+
+### Working rule
+
+During normal feature edits, upgraded comment quality for touched code is required; separate backfill passes should target high-churn/high-risk files first.
+
+### Batch evidence requirement
+
+Each backfill batch should record:
+
+- Files covered
+- Reviewer/checker identity
+- Whether Part 2 checklist passed per file
+- Any deferred comment-depth gaps with rationale
+
+### DOC-02 batch template (copy for each run)
+
+- Batch date:
+- Files included:
+- Part 2 checklist pass count:
+- Deferred items (if any):
+- Reviewer notes:
+
 ---
 
 ## What’s left to do

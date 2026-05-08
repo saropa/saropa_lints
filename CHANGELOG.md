@@ -64,6 +64,7 @@ This upcoming release tightens Findings Dashboard trust and usability: score/reg
 - **Cross-file config slicing** — the cross-file CLI design now defines an active XFILE-01 config slice with precedence and integration-test expectations, making the remaining config work concrete; no action required for package users.
 - **UX backlog execution slicing** — the remaining UX plan now includes an explicit UX-B08 implementation slice (host storage, message contract, and per-surface persistence tests), improving trigger-to-build readiness; no action required for package users.
 - **Rule-pack closeout sequencing** — the migration plan now includes an explicit PACK-02 verification slice so final sign-off always includes reproducible test evidence; no action required for package users.
+- **Comment-coverage batch template** — the comment-coverage plan now includes a reusable DOC-02 batch record template so documentation passes can be audited consistently; no action required for package users.
 
 </details>
 
