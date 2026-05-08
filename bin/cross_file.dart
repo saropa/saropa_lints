@@ -26,6 +26,7 @@ import 'package:saropa_lints/src/cli/cross_file_duplicates.dart';
 import 'package:saropa_lints/src/cli/cross_file_html_reporter.dart';
 import 'package:saropa_lints/src/cli/cross_file_reporter.dart';
 import 'package:saropa_lints/src/cli/cross_file_snapshot.dart';
+import 'package:saropa_lints/src/cli/cross_file_options_config.dart';
 import 'package:saropa_lints/src/cli/cross_file_unused_l10n.dart';
 
 Future<void> main(List<String> args) async {
@@ -97,6 +98,22 @@ Future<int> _run(List<String> args) async {
       break;
     }
     i++;
+  }
+
+  // analysis_options.yaml defaults (CLI flags still win when explicitly set).
+  final projectCli = CrossFileProjectCliOptions.load(projectPath);
+  excludes.insertAll(0, projectCli.excludeGlobs);
+  if (projectCli.heuristicDeadImports == true) {
+    heuristicDeadImports = true;
+  }
+  if (projectCli.heuristicUnusedSymbols == true) {
+    heuristicUnusedSymbols = true;
+  }
+  if (projectCli.includePrivateSymbols == true) {
+    includePrivateSymbols = true;
+  }
+  if (projectCli.excludePublicApi == true) {
+    excludePublicApi = true;
   }
 
   final rest = args.skip(i).toList();
@@ -323,6 +340,7 @@ Options:
   --baseline <file>    Load baseline JSON; exit 0 only if no new violations
   --update-baseline    Write current results to baseline file (default: cross_file_baseline.json)
   --exclude <glob>     Exclude matching paths from results (can repeat)
+                       (also reads saropa_lints_cross_file.excludes from analysis_options.yaml)
   --include-private    Include private symbols for unused-symbol analysis
   --exclude-public-api Skip symbols from lib files that are exported by other lib files
   --heuristic-unused-symbols  Use regex heuristic only (skip analyzer resolution)
