@@ -16,7 +16,7 @@ Treat this file as two layers:
 ### Next 3 (ordered)
 
 - [ ] **QF-01 (P0)** Re-run `python scripts/list_rules_without_fixes.py` and stamp a fresh baseline date/count at the top of this plan.
-- [ ] **QF-02 (P0)** Execute Batch 14 focused on deterministic AST-local fixes in the highest-yield files.
+- [x] **QF-02 (P0)** Execute Batch 14 focused on deterministic AST-local fixes in the highest-yield files. (Verified 2026-05-08: fix wiring present for `avoid_duplicate_exports`, `avoid_duplicate_named_imports`, and `prefer_trailing_underscore_for_unused`; `dart test test/scan/rule_quick_fix_presence_test.dart` passed.)
 - [ ] **QF-03 (P1)** Write a batch artifact to `plans/history/` with rule list, tests added, and missing-fix delta.
 
 ### Batch 14 candidate slice (active build set)

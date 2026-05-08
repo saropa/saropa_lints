@@ -67,6 +67,7 @@ This upcoming release tightens Findings Dashboard trust and usability: score/reg
 - **Comment-coverage batch template** — the comment-coverage plan now includes a reusable DOC-02 batch record template so documentation passes can be audited consistently; no action required for package users.
 - **Release gate verification** — REL-N1 is now marked complete in the testing/release plan with recorded smoke-test evidence for D1-D4 fix-application coverage; no action required for package users.
 - **Rule-pack verification evidence** — PACK-02 is now marked complete with recorded test evidence using the current `test/config/*` paths, improving close-out audit accuracy; no action required for package users.
+- **Quick-fix batch verification** — QF-02 is now marked complete with recorded presence-test evidence for the Batch 14 structure-rule fix set, improving execution traceability; no action required for package users.
 
 </details>
 
