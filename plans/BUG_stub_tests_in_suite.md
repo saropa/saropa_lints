@@ -4,6 +4,33 @@
 **Date**: 2026-03-25 (updated 2026-04-27)
 **Status**: In Progress — guardrails added; conversion ongoing
 
+## Execution snapshot
+
+### Next 3 (ordered)
+
+- [ ] **STUB-01 (P0)** Recompute and record current stub baseline using the same scanner used by `stub_test_guard_test.dart`; update this file with timestamped counts.
+- [ ] **STUB-02 (P0)** Convert the next high-risk batch: rules with active bug history and quick fixes in the top 3 highest stub-density files.
+- [ ] **STUB-03 (P1)** Add a repeatable batch report artifact under `plans/history/` with before/after counts and converted rule list.
+
+### STUB-02 active target list
+
+Current high-density conversion order:
+
+1. `widget_patterns_rules_test.dart`
+2. `code_quality_rules_test.dart`
+3. `ios_rules_test.dart`
+
+### Blocked / dependencies
+
+- Conversion velocity depends on fixture authoring capacity in `example*/lib/` and corresponding test updates.
+- Keep ratchet values aligned whenever stubs are removed; stale ratchet values hide progress.
+
+### Done criteria (migration close-out)
+
+- No `expect(true, isTrue)` or literal `isNotNull` tautology stubs remain.
+- Stub guard tests ratchet to zero (or a justified temporary cap with owner/date).
+- Converted tests assert trigger and non-trigger behavior with fixture-backed evidence.
+
 ## Summary
 
 35% of the test suite (1,646 of 4,690 `test()` calls across 66 of 155 test files) are stubs that assert a string literal is not null. They always pass regardless of whether the rule they claim to test works, is registered, or even exists.
