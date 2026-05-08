@@ -13,7 +13,7 @@
 ### Next 3 (ordered)
 
 - [ ] **PACK-01 (P1)** Close Phase 6 maintainer sign-off by filing tracked follow-ups for deferred SDK-pack granularity decisions.
-- [ ] **PACK-02 (P1)** Run and record a fresh verification pass for rule-pack gating and migration membership tests.
+- [x] **PACK-02 (P1)** Run and record a fresh verification pass for rule-pack gating and migration membership tests. (Verified 2026-05-08 via `dart test test/config/rule_packs_migration_membership_test.dart test/config/rule_packs_sdk_gates_test.dart test/config/rule_packs_config_test.dart`)
 - [ ] **PACK-03 (P2)** Tighten docs for composite plugin adoption path and reduce ambiguity around pack ownership vs tier ownership.
 
 ### Close-out criteria for this plan
