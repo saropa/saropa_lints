@@ -2,6 +2,13 @@
 
 **Activity-bar view slots** in `package.json` → `contributes.views.saropaLints` are **six** in the current manifest (banner + Editor dashboards + Actions + Status + Settings + Help). The product surface also includes **154 contributed commands**; menu wiring is now minimal (most commands are reached via tree leaves, the command palette, or the dashboards).
 
+## Snapshot metadata
+
+- **Type:** Inventory/reference (not an execution plan)
+- **Last audited:** 2026-05-04
+- **Refresh trigger:** Any `extension/package.json` command/view/menu change
+- **Refresh expectation:** update counts + status notes in one commit with audit date
+
 Counts below are from `extension/package.json` and `extension/src/views/sectionedSidebar.ts` (post-`b1ec4ffd` orphan-removal commit, audited 2026-05-04). They move when menus change.
 
 | Bucket | Count | Notes |
