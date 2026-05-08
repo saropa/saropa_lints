@@ -42,6 +42,8 @@ The extension is the primary setup and configuration surface:
 - **File Risk** — Files ranked by violation density; focus on the riskiest first
 - **Trends** — Score progression over time with milestone celebrations
 
+Problems panel empty, analyzer plugin stuck, or no lightbulb fixes? Start with **[`doc/troubleshooting.md`](doc/troubleshooting.md)** (narrow IDE-focused checks) — then README [Troubleshooting](#troubleshooting) if you still need broader setup help.
+
 ![Package Vibrancy Report showing dependency health and version status](https://raw.githubusercontent.com/saropa/saropa_lints/main/assets/20260401_package_vibrancy_report.png)
 
 **Set Up Project** wires `pubspec.yaml`, `analysis_options.yaml`, and analysis. No terminal commands required for that path.

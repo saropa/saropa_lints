@@ -2,7 +2,19 @@
 
 Deep-dive for the three most common IDE-specific reports about saropa_lints. The broader [README §Troubleshooting](../README.md#troubleshooting) covers installation and configuration; this doc covers the "I installed it correctly but the IDE isn't behaving" cases.
 
-## 1. `custom_lint` is not running
+## 0. Native analyzer plugin (`saropa_lints` under `analyzer.plugins`)
+
+**Current setups** use VS Code plus the **`saropa_lints`** entry from your project’s **`analysis_options.yaml`** (typically added by **Set Up Project**). You do **not** need separate `plugins: custom_lint` wiring for saropa diagnostics to run in Problems or in `dart analyze` when native plugin bootstrap succeeds.
+
+When things look broken:
+
+1. Run **`dart pub get`** at the workspace root **and** in any Flutter/Dart packages you analyze.
+2. Open **Output → Dart Analysis Server** after saving a Dart file — look for **`saropa_lints`** analyzer plugin lifecycle lines (startup errors show here first).
+3. **Developer: Reload Window** once after changing **`analysis_options.yaml`** or **`pubspec.yaml`** so the analyzer reconnects cleanly.
+
+Older guides that only mention **`custom_lint`** refer to legacy integration; skip them unless your project intentionally still opts into that runner.
+
+## 1. `custom_lint` is not running (legacy / optional runner)
 
 **Symptom:** `dart analyze` shows the saropa rule codes you expect, but VS Code's Problems panel does not — or vice versa.
 
