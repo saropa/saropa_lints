@@ -4,6 +4,40 @@
 
 **Current state:** Run `python scripts/list_rules_without_fixes.py` for an up-to-date list. Batches 12+13 (conversation batches 4–9) added 38+ quick fixes; 60+ rules now have at least one fix from this effort. Audit on 2026-05-04: 1698 rules still missing fixes (down from 1708 after Batch 13).
 
+## Execution snapshot
+
+### Active scope
+
+Treat this file as two layers:
+
+1. **Execution layer**: the next batch to implement now.
+2. **Inventory layer**: the full missing-fixes list used as a source queue.
+
+### Next 3 (ordered)
+
+- [ ] **QF-01 (P0)** Re-run `python scripts/list_rules_without_fixes.py` and stamp a fresh baseline date/count at the top of this plan.
+- [ ] **QF-02 (P0)** Execute Batch 14 focused on deterministic AST-local fixes in the highest-yield files.
+- [ ] **QF-03 (P1)** Write a batch artifact to `plans/history/` with rule list, tests added, and missing-fix delta.
+
+### Batch 14 candidate slice (active build set)
+
+Start with three deterministic fixes that are narrow and testable:
+
+- `avoid_duplicate_exports` -> delete duplicate `ExportDirective`.
+- `avoid_duplicate_named_imports` -> delete duplicate `ImportDirective`.
+- `prefer_trailing_underscore_for_unused` -> rename unused closure param to trailing-underscore form.
+
+Batch 14 is considered complete when all three have fix producers, fixtures, and fix application tests.
+
+### Batch acceptance contract
+
+For every new fix in Batch 14+:
+
+- Rule wiring added (`fixGenerators`)
+- Fixture + fix application test added
+- `dart analyze --fatal-infos` and targeted tests pass
+- Audit delta recorded after batch completion
+
 <!-- cspell:disable -->
 
 ---

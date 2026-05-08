@@ -45,6 +45,22 @@
 
 ---
 
+## [Unreleased]
+
+This upcoming release tightens Findings Dashboard trust and usability: score/regression nudges now line up with what the dashboard actually shows, and running analysis from the dashboard now gives visible in-panel progress with an automatic refresh on completion. It removes the confusing “toast says issues, dashboard looks empty” edge case and makes “run then see results” a one-flow experience. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
+
+### Changed (Extension)
+
+- **Findings Dashboard consistency and run UX** — score/toast regression nudges now use the same visible-findings basis as the dashboard (ending stale-history vs dashboard-empty mismatches), and the dashboard now shows an in-panel progress bar with duplicate-click guard plus an automatic full refresh after analysis completes; no action required.
+
+<details><summary>Maintenance</summary>
+
+- **Planning execution slices** — the quick-fix plan now includes an explicit Batch 14 build set (three deterministic fixes with acceptance criteria) so implementation can proceed in auditable small commits; no action required for package users.
+
+</details>
+
+---
+
 ## [13.5.0]
 
 This release restores real compatibility for analyzer 9 consumers, including Flutter-stable setups that cannot move to analyzer 12+ yet. The plugin and CLI now build cleanly instead of failing during startup due to missing analyzer APIs, so projects pinned to analyzer 9 can run `dart analyze` again with current saropa_lints. [log](https://github.com/saropa/saropa_lints/blob/v13.5.0/CHANGELOG.md)
@@ -58,6 +74,8 @@ This release restores real compatibility for analyzer 9 consumers, including Flu
 ---
 
 ## [13.4.9]
+
+This release smooths language and notification behavior in the extension. UI language selection now saves reliably, and score-milestone feedback is quieter during cleanup work. Translation strings for the picker are now complete across shipped locales, so language switching feels consistent. [log](https://github.com/saropa/saropa_lints/blob/v13.4.9/CHANGELOG.md)
 
 ### Fixed (Extension)
 
@@ -79,6 +97,8 @@ This release restores real compatibility for analyzer 9 consumers, including Flu
 ---
 
 ## [13.4.8]
+
+This release adds first-class localization support to the extension UI and introduces a direct language picker workflow. It also fixes a lingering package-size chart issue so visual weighting matches real values. If you use translated UI strings or the vibrancy chart, this is the reliability pass for both. [log](https://github.com/saropa/saropa_lints/blob/v13.4.8/CHANGELOG.md)
 
 ### Added (Extension)
 
@@ -110,6 +130,8 @@ Package Vibrancy no longer launches a fresh scan after every individual `pub upg
 
 ## [13.4.6]
 
+This release fixes two high-friction issues users hit during normal analysis work: the Package Vibrancy size chart now renders proportionally, and tier YAML version pinning no longer breaks analyzer-plugin resolution on newer analyzer stacks. In practice, charts are readable again and analysis setup is less likely to fail after upgrades. [log](https://github.com/saropa/saropa_lints/blob/v13.4.6/CHANGELOG.md)
+
 ### Fixed (Extension)
 
 - The **Size Distribution** chart in the Package Vibrancy report now renders each bar at a length proportional to its share of total size. The earlier attempt to fix this didn't take effect in the VS Code webview, so bars kept rendering at the full track width; bars now use the same width-and-grow pattern the Findings Dashboard charts already use reliably. No action required — reopen the report after updating.
@@ -128,6 +150,8 @@ Package Vibrancy no longer launches a fresh scan after every individual `pub upg
 
 ## [13.4.5]
 
+This release reduces false positives in command-line and tooling code paths. Rules that make sense for Flutter UI threads no longer fire on scripts under `tool/`, so local utility scripts and generators stop producing noisy warnings. It keeps lint signal focused on code where the risk model actually applies. [log](https://github.com/saropa/saropa_lints/blob/v13.4.5/CHANGELOG.md)
+
 ### Fixed
 
 - `avoid_blocking_main_thread` (and other UI-thread rules) no longer fire on scripts under `tool/` — repo-local CLI utilities run via `dart run` and never execute on a Flutter UI isolate, so sync I/O is legitimate there. Mirrors the existing skip for `bin/`. No action required.
@@ -142,6 +166,8 @@ Package Vibrancy no longer launches a fresh scan after every individual `pub upg
 ---
 
 ## [13.4.4]
+
+This release expands quick-fix coverage and hardens extension update-check behavior. More rules now have one-step IDE fixes, and upgrade notifications break through stale dismiss windows when a new version is actually available. For day-to-day users, that means faster cleanup and fewer “why didn’t I get prompted?” moments. [log](https://github.com/saropa/saropa_lints/blob/v13.4.4/CHANGELOG.md)
 
 ### Added
 
