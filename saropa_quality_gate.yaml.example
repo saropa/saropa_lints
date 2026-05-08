@@ -1,10 +1,25 @@
 quality_gate:
   conditions:
-    # Block CI when new critical issues are introduced.
-    - metric: new_critical_issues
+    # Severity-keyed metric names (recommended for new configs). Legacy aliases
+    # such as `new_critical_issues`, `overall_high_issues`, and `overall_low_issues`
+    # still resolve — see lib/src/report/quality_gate.dart.
+    - metric: new_errors
       op: eq
       value: 0
       on_fail: fail
+
+    # Warning-class regressions for newly touched code (`new_warnings` aliases
+    # `new_high_issues` / `new_medium_issues`).
+    - metric: new_warnings
+      op: le
+      value: 25
+      on_fail: warn
+
+    # FYI regressions (`new_info` aliases `new_low_issues`).
+    - metric: new_info
+      op: le
+      value: 100
+      on_fail: warn
 
     # Block CI when new vulnerabilities are introduced.
     - metric: new_vulnerabilities
@@ -18,8 +33,8 @@ quality_gate:
       value: 5
       on_fail: warn
 
-    # Optional overall budget signal.
-    - metric: overall_high_issues
+    # Optional warning-budget signal (historically `overall_high_issues`).
+    - metric: overall_warnings
       op: le
       value: 25
       on_fail: warn

@@ -47,6 +47,10 @@ def main() -> None:
         if rule_without_fix:
             results.append((dart_file.name, sorted(set(rule_without_fix))))
 
+    unique_without_fix = sorted({r for _, rules in results for r in rules})
+    file_count = len(results)
+    rule_count = len(unique_without_fix)
+
     # Build output lines
     lines: list[str] = []
     for fname, rules in results:
@@ -66,6 +70,10 @@ def main() -> None:
     report_path = report_dir / f"{timestamp}_list_rules_without_fixes.log"
 
     report_path.write_text(output_text, encoding="utf-8")
+    print(
+        f"Quick-fix audit: {rule_count} rule(s) lack fix producers "
+        f"across {file_count} rule file(s)."
+    )
     print(f"Report written to: {report_path.relative_to(PROJECT_ROOT)}")
 
 

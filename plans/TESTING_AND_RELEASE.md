@@ -2,7 +2,7 @@
 
 Consolidated from TESTING_ISSUES.md, task-phase6-testing-release.md, and UNIT_TEST_COVERAGE.md.
 
-**Last updated:** 2026-05-01  
+**Last updated:** 2026-05-08  
 **Scope:** All lint rules in `lib/src/rules/`, tests in `test/`, and v5 release readiness.  
 **Goal:** Expand behavioral fixture integration tests, close remaining fixture gaps, verify IDE integration, prove quick-fix application end-to-end.
 
@@ -19,7 +19,7 @@ Consolidated from TESTING_ISSUES.md, task-phase6-testing-release.md, and UNIT_TE
 
 - [x] **REL-N1 (P0)** Complete D1-D3 fix-application tests and land in CI. (Verified 2026-05-08 via `dart test test/scan/fix_application_smoke_test.dart test/scan/fix_application_dart_fix_dry_run_test.dart`)
 - [ ] **REL-N2 (P0)** Run and record E1-E5 manual IDE validation.
-- [ ] **REL-N3 (P1)** Refresh publish audit numbers and update this document's gate table.
+- [x] **REL-N3 (P1)** Refresh publish audit numbers and update this document's gate table. (Snapshot **2026-05-08:** implemented rules **2158**; audit quick-fix registrations **462** (`get fixGenerators` occurrences per `get_implemented_rules`); fixture coverage **1993 / 2154** rule-category instances (**92.5%**); rules with no fix producer **1698** / **109** files — `python scripts/list_rules_without_fixes.py`.)
 
 ### REL-N1 implementation slice (active)
 
@@ -34,13 +34,13 @@ Fixture coverage for the 27 reviewed categories and rule instantiation tests for
 
 ## 1. Current Status
 
-Verified from the working tree on 2026-04-30 (see §10 for the verification commands).
+Verified from the working tree on 2026-05-08 (see §10 for the verification commands). Metrics below come from `scripts.modules._audit_checks.get_implemented_rules` and `scripts.modules._rule_metrics.display_test_coverage` logic (fixture ratio uses capped per-category totals).
 
 | Item | Status | Notes |
 |------|--------|-------|
 | Behavioral tests (linter on code) | **In progress** | `fixture_lint_integration_test.dart`: 18 compile-time rules asserted via `dart analyze`; 56-rule `custom_lint` set when `dart run custom_lint` is available |
-| Publish report "Fixtures" metric | **<100%** | 92.4% (1993 of 2158 rule-in-category instances); split `code_quality_*` counting fixed in `_rule_metrics.py` (§4) |
-| Quick fix migration (native plugin) | **Complete** | 221 `SaropaFixProducer` subclasses across `lib/src/fixes/**`; **0** `extends DartFix` remain in `lib/`. Verify with: `Grep "extends DartFix" lib/` |
+| Publish report "Fixtures" metric | **<100%** | **92.5%** (**1993** / **2154** rule-category instances); split `code_quality_*` counting fixed in `_rule_metrics.py` (§4) |
+| Quick fix migration (native plugin) | **Complete** | **462** rule classes wire `fixGenerators` (audit scan); 221 `SaropaFixProducer` subclasses across `lib/src/fixes/**` (structural migration); **0** `extends DartFix` remain in `lib/`. Verify with: `Grep "extends DartFix" lib/` |
 | IDE integration testing | **Not started** | §5 |
 | Regression / performance baselines | **Not started** | §6 |
 
@@ -156,7 +156,7 @@ The native-plugin migration referenced in earlier drafts of this plan as "v5" al
 | Milestone | Gate | Status | Description |
 |-----------|------|--------|-------------|
 | Behavioral coverage | §1 row 1 reaches ≥ 90% of `expectedFromFixtures` rules verified live | TODO | Currently 18 compile + 56 fixture rules asserted; target ≥ 100 fixture rules |
-| Fixture coverage | §1 row 2 reaches 100% (or 100% of non-exempt) | TODO | Currently 92.4% (1993/2158); exempt categories listed in `_FIXTURE_EXEMPT_CATEGORIES` |
+| Fixture coverage | §1 row 2 reaches 100% (or 100% of non-exempt) | TODO | Currently **92.5%** (**1993**/**2154** category rule slots per `_rule_metrics`); exempt categories listed in `_FIXTURE_EXEMPT_CATEGORIES` |
 | Quick-fix application proof | §10 D1-D5 land | TODO | Migration is structurally complete (§3); needs end-to-end verification |
 | IDE integration sign-off | §5 / §10 E1-E5 land | TODO | Manual VS Code verification, recorded in `plans/history/` |
 | Regression baseline | §10 F1 captured | TODO | v(N-1) vs current diff before tagging the release that closes this plan |
@@ -592,7 +592,7 @@ Each item below is **independently completable**: one fixture / one assertion / 
      - `lib/src/rules/stylistic/stylistic_rules.dart`: 45 classes / 47 codes (+2)
      - `lib/src/rules/config/dart_sdk_3_removal_rules.dart`: 15 classes / 16 codes (+1)
      - `lib/src/rules/config/dart_sdk_34_deprecation_rules.dart`: 0 classes / 1 code (+1; free-standing `LintCode` constant, no rule class)
-   - Use 2154 for headline "rule count" (README, CHANGELOG); use 2158 for fixture-coverage denominators (each diagnostic needs its own fixture).
+   - Use **2154** for headline "rule class" count (README, CHANGELOG); use **2158** for unique `LintCode` names. The **fixture percentage** in publish output uses the **sum of per-category rule slots** (also **2154** here) as its denominator — not 2158.
 
 ### B. Repair the 3 disabled fixtures (3)
 
@@ -679,7 +679,7 @@ There is no current Dart test that takes a `SaropaFixProducer`, applies it to a 
 Grep "extends DartFix"        in lib/   → 0 matches
 Grep "extends SaropaFixProducer" in lib/ → 221 files / 249 occurrences
 Grep "// HACK: TODO restore"  in example*/lib → 3 files (matches §2)
-fixture coverage from _count_fixtures_for_category → 1993/2158 = 92.4%
+fixture coverage from _count_fixtures_for_category → 1993/2154 = 92.5% (2026-05-08)
 expectedCompileTimeFromDartAnalyze: 18 entries (lines 109-128)
 expectedFromFixtures:               56 entries (lines 134-190)
 ```

@@ -10,7 +10,7 @@
 Only these items are considered open work for this topic:
 
 - [ ] **SEV-01 (P1)** Audit `severity:` assignments rule-by-rule against MUST-fix / should-fix / info guidance.
-- [ ] **SEV-02 (P1)** Update `saropa_quality_gate.yaml.example` to foreground `new_errors/new_warnings/new_info`.
+- [x] **SEV-02 (P1)** Update `saropa_quality_gate.yaml.example` to foreground `new_errors/new_warnings/new_info`. (Done 2026-05-08: primary row uses `new_errors`; hotspots + `overall_warnings` documented with legacy-alias pointer.)
 - [ ] **SEV-03 (P2)** Rename `bin/impact_report.dart` to `severity_report.dart` with compatibility alias.
 - [ ] **SEV-04 (P2)** Verify internal scripts parsing `v.impact` accept `error|warning|info` value set.
 

@@ -2,7 +2,7 @@
 
 **Goal:** Increase quick fix coverage by implementing fixes in priority order, with fixtures + tests, and validating via the audit script.
 
-**Current state:** Run `python scripts/list_rules_without_fixes.py` for an up-to-date list. Batches 12+13 (conversation batches 4–9) added 38+ quick fixes; 60+ rules now have at least one fix from this effort. Audit on 2026-05-04: 1698 rules still missing fixes (down from 1708 after Batch 13).
+**Current state:** Run `python scripts/list_rules_without_fixes.py` for an up-to-date list — the script prints a one-line **`Quick-fix audit: …`** summary to stdout plus writes the grouped log under `reports/<yyyymmdd>/`. Baseline stamped **2026-05-08:** **1698** rules lack fix producers across **109** rule files (same net count as 2026-05-04 after Batch 13; Batch 14 verified without changing this aggregate).
 
 ## Execution snapshot
 
@@ -15,9 +15,9 @@ Treat this file as two layers:
 
 ### Next 3 (ordered)
 
-- [ ] **QF-01 (P0)** Re-run `python scripts/list_rules_without_fixes.py` and stamp a fresh baseline date/count at the top of this plan.
+- [x] **QF-01 (P0)** Re-run `python scripts/list_rules_without_fixes.py` and stamp a fresh baseline date/count at the top of this plan. (**2026-05-08:** 1698 rules / 109 files; report `reports/20260508/…_list_rules_without_fixes.log`.)
 - [x] **QF-02 (P0)** Execute Batch 14 focused on deterministic AST-local fixes in the highest-yield files. (Verified 2026-05-08: fix wiring present for `avoid_duplicate_exports`, `avoid_duplicate_named_imports`, and `prefer_trailing_underscore_for_unused`; `dart test test/scan/rule_quick_fix_presence_test.dart` passed.)
-- [ ] **QF-03 (P1)** Write a batch artifact to `plans/history/` with rule list, tests added, and missing-fix delta.
+- [x] **QF-03 (P1)** Write a batch artifact to `plans/history/` with rule list, tests added, and missing-fix delta. (`plans/history/2026.05/2026.05.08/quick_fix_batch_14_verification.md`.)
 
 ### Batch 14 candidate slice (active build set)
 

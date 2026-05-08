@@ -68,6 +68,10 @@ This upcoming release tightens Findings Dashboard trust and usability: score/reg
 - **Release gate verification** — REL-N1 is now marked complete in the testing/release plan with recorded smoke-test evidence for D1-D4 fix-application coverage; no action required for package users.
 - **Rule-pack verification evidence** — PACK-02 is now marked complete with recorded test evidence using the current `test/config/*` paths, improving close-out audit accuracy; no action required for package users.
 - **Quick-fix batch verification** — QF-02 is now marked complete with recorded presence-test evidence for the Batch 14 structure-rule fix set, improving execution traceability; no action required for package users.
+- **Quick-fix audit baseline** — QF-01 is closed with a 2026-05-08 missing-fix baseline and `list_rules_without_fixes.py` now prints a one-line audit summary alongside the saved report path, improving repeatability without opening log files; no action required for package users.
+- **Quick-fix Batch 14 history record** — QF-03 adds a dated verification note under `plans/history/` so Batch 14 evidence stays discoverable beside the backlog plan; no action required for package users.
+- **Quality gate sample config** — SEV-02 updates `saropa_quality_gate.yaml.example` to lead with severity-keyed metrics (`new_errors`, `new_warnings`, `new_info`) plus inline legacy-alias notes; no action required unless you vendor this sample into your own CI config.
+- **Release metrics refresh** — REL-N3 records fresh fixture and quick-fix registration numbers (2026-05-08) in the testing/release plan and reconciles the fixture denominator note with `_rule_metrics`, improving gate-table accuracy for release prep; no action required for package users.
 
 </details>
 
