@@ -3,6 +3,31 @@
 **Status:** living architecture plan (expand as we implement).  
 **Audience:** maintainers implementing packs, init UX, dependency resolution, and the VS Code extension.
 
+## Execution snapshot
+
+### Current status
+
+- Phases 0-6 are substantially shipped.
+- Remaining work is mostly close-out governance and follow-up ergonomics.
+
+### Next 3 (ordered)
+
+- [ ] **PACK-01 (P1)** Close Phase 6 maintainer sign-off by filing tracked follow-ups for deferred SDK-pack granularity decisions.
+- [ ] **PACK-02 (P1)** Run and record a fresh verification pass for rule-pack gating and migration membership tests.
+- [ ] **PACK-03 (P2)** Tighten docs for composite plugin adoption path and reduce ambiguity around pack ownership vs tier ownership.
+
+### Close-out criteria for this plan
+
+- Phase 6 sign-off checklist fully complete with linked follow-up issues where scope is deferred.
+- Verification commands and outcomes are current and reproducible.
+- Public docs clearly explain canonical config key (`rule_packs`) and ownership semantics.
+
+### PACK-02 verification slice (active)
+
+- [ ] Run `dart test test/rule_packs_migration_membership_test.dart test/rule_packs_sdk_gates_test.dart test/rule_packs_config_test.dart`.
+- [ ] Record command output summary in this plan (pass/fail + notable deltas).
+- [ ] If any behavior changed, add/update regression tests before close-out.
+
 **Single document:** Packs, pubspec-aware enablement, semver migrations, extension UI, and optional third-party plugins are **one product intent** delivered in **phases** (see [§10](#10-phases-one-roadmap)).
 
 ---
