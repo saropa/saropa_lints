@@ -2,7 +2,7 @@
 
 Run from repository root::
 
-    python -m unittest discover -s scripts/tests -t . -v
+    python -m unittest discover -s scripts/modules/tests -t . -v
 
 These tests pin the guard added to prevent the v13.4.2 silent-skip
 incident from recurring (commit 0c5950aa wrote an empty ``## [13.4.2]``

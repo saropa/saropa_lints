@@ -2,7 +2,7 @@
 
 Run from repository root::
 
-    python -m unittest discover -s scripts/tests -t . -v
+    python -m unittest discover -s scripts/modules/tests -t . -v
 """
 
 # Asserts _tier_integrity heuristics for class declaration shapes and rule name listing.

@@ -120,7 +120,7 @@ Historical scripts in `scripts/historical/` are not part of the build.
 From the repo root (no extra packages; uses `unittest`, same as CI):
 
 ```bash
-python -m unittest discover -s scripts/tests -t . -v
+python -m unittest discover -s scripts/modules/tests -t . -v
 ```
 
 ## Troubleshooting

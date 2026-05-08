@@ -2,7 +2,7 @@
 
 Run from repository root::
 
-    python -m unittest discover -s scripts/tests -t . -v
+    python -m unittest discover -s scripts/modules/tests -t . -v
 
 Pins the contract that prevents a recurrence of issue #216 — the
 ``lib/tiers/*.yaml`` files shipped pinned to ``^5.0.0-beta.8`` from
