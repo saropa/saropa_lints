@@ -1572,6 +1572,15 @@ async function handleNewVersions(
             lastParsedDeps,
             lastPublishedDepGraphSummary,
         );
+        // Keep the startup skip-gate snapshot aligned with the merged
+        // updateInfo so a cold reload does not rehydrate stale versions.
+        void persistScanFingerprint(
+            targets,
+            lastParsedDeps,
+            latestResults,
+            lastPublishedDepGraphSummary,
+            lastScanMeta,
+        );
     }
 
     const message = formatNotificationMessage(notifications);

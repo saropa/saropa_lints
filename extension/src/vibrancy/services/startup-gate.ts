@@ -31,6 +31,10 @@ import { ReportMetadata } from './report-exporter';
  * The fingerprint lives in workspaceState (per-workspace, not synced)
  * because pubspec.lock is workspace-scoped and rehydrated results would
  * be misleading in a different workspace.
+ *
+ * After a full scan, `results` match the scan output.  Package Vibrancy's
+ * background freshness watcher may merge newer pub.dev versions into
+ * `results` and persist again so reloads stay aligned until the next scan.
  */
 
 /**
