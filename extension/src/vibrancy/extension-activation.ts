@@ -25,7 +25,10 @@ import { DetailLogger, DETAIL_CHANNEL_NAME } from './services/detail-logger';
 import { exportReports, ReportMetadata } from './services/report-exporter';
 import { exportSbomReport } from './services/sbom-exporter';
 import { ScanLogger } from './services/scan-logger';
-import { VibrancyResult, VibrancyCategory, DependencySection, isUnusedRemovalEligibleSection } from './types';
+import {
+    VibrancyResult, VibrancyCategory, DependencySection, DepGraphSummary,
+    isUnusedRemovalEligibleSection,
+} from './types';
 import { countByCategory } from './scoring/status-classifier';
 import { registerTreeCommands } from './providers/tree-commands';
 import { registerUpgradeCommand } from './providers/upgrade-command';
@@ -72,6 +75,7 @@ import { consolidateInsights } from './scoring/consolidate-insights';
 import {
     FreshnessWatcher, formatNotificationMessage, createNotificationActions,
 } from './services/freshness-watcher';
+import { applyNewVersionNotificationsToResults } from './services/version-comparator';
 import {
     addSuppressedPackage, addSuppressedPackages, clearSuppressedPackages,
     getVulnScanEnabled, getGitHubAdvisoryEnabled, getGithubToken,
@@ -114,6 +118,10 @@ import { SECTION_LABELS } from './providers/tree-item-classes';
 import { categoryLabel } from './scoring/status-classifier';
 
 let latestResults: VibrancyResult[] = [];
+/** Set during vibrancy activation so freshness toasts can republish without a scan. */
+let vibrancyScanTargets: ScanTargets | null = null;
+/** Last non-null dep graph from a scan/skip republish — preserved for lightweight refreshes. */
+let lastPublishedDepGraphSummary: DepGraphSummary | null = null;
 let lastParsedDeps: ParsedDeps | null = null;
 let lastReverseDeps: ReadonlyMap<string, readonly import('./types').DepEdge[]> | null = null;
 let lastOverrideAnalyses: OverrideAnalysis[] = [];
@@ -269,6 +277,7 @@ export function runActivation(
         prereleaseToggle, state: stateManager,
         workspaceState: context.workspaceState,
     };
+    vibrancyScanTargets = targets;
 
     detailChannel = vscode.window.createOutputChannel(DETAIL_CHANNEL_NAME);
     detailLogger = new DetailLogger(detailChannel);
@@ -1316,11 +1325,16 @@ function publishResults(
     targets: ScanTargets,
     results: VibrancyResult[],
     parsed: ParsedDeps,
-    depGraphSummary: import('./types').DepGraphSummary | null = null,
+    depGraphSummary: DepGraphSummary | null = null,
 ): void {
+    if (depGraphSummary !== null) {
+        lastPublishedDepGraphSummary = depGraphSummary;
+    }
+    const graphForTree = depGraphSummary ?? lastPublishedDepGraphSummary;
+
     targets.adoptionGate.clearDecorations();
     targets.tree.updateResults(results);
-    targets.tree.updateDepGraphSummary(depGraphSummary);
+    targets.tree.updateDepGraphSummary(graphForTree);
     targets.tree.updateOverrideAnalyses(lastOverrideAnalyses);
     targets.state.updateFromResults(results);
 
@@ -1546,6 +1560,19 @@ async function handleNewVersions(
     notifications: NewVersionNotification[],
 ): Promise<void> {
     if (notifications.length === 0) { return; }
+
+    const targets = vibrancyScanTargets;
+    if (targets && lastParsedDeps && latestResults.length > 0) {
+        latestResults = applyNewVersionNotificationsToResults(
+            latestResults, notifications,
+        );
+        publishResults(
+            targets,
+            latestResults,
+            lastParsedDeps,
+            lastPublishedDepGraphSummary,
+        );
+    }
 
     const message = formatNotificationMessage(notifications);
     const actions = createNotificationActions();

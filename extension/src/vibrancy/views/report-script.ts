@@ -41,6 +41,7 @@ export function getReportScript(): string {
 
         /* ---- Sorting ---- */
 
+        // Stable sort of .pkg-row only; detail rows reinserted after each parent (see DOM contract in module doc).
         function sortTable(col, keepDirection) {
             if (keepDirection) {
                 sortCol = col;

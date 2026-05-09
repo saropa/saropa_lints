@@ -1,4 +1,7 @@
-/** * Module overview (comment coverage pass). * comment-coverage: module overview (batch). * * Extension Jest tests: validates commands, webviews, parsers, and state against VS Code APIs (often with local mocks). */
+/**
+ * Pubspec dependency_overrides: parseOverrides, findOverridesSection, findOverrideRange (YAML fixtures).
+ */
+// Fixtures live under extension/src/test/fixtures (pubspec-with-overrides.yaml).
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as path from 'path';

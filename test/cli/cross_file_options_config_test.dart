@@ -1,3 +1,6 @@
+/// Loads `saropa_lints_cross_file` from `analysis_options.yaml`: excludes, heuristic flags, optional symbols.
+library;
+
 import 'dart:io';
 
 import 'package:path/path.dart' as p;
@@ -5,6 +8,7 @@ import 'package:saropa_lints/src/cli/cross_file_options_config.dart';
 import 'package:test/test.dart';
 
 void main() {
+  // Missing YAML → empty excludes; valid section → typed fields (see CrossFileProjectCliOptions).
   group('CrossFileProjectCliOptions', () {
     test('returns empty when analysis_options.yaml is missing', () {
       final dir = Directory.systemTemp.createTempSync('cross_file_cfg_');

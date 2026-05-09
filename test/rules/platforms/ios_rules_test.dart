@@ -543,6 +543,7 @@ void main() {
     );
   });
 
+  // example/lib/ios/: each rule's BAD/OK examples under real analyzer + custom_lint.
   group('iOS Rules - Fixture Verification', () {
     // All 89 rules in ios_rules.dart have fixtures in example/lib/ios/.
     // Some rules are not ios-prefixed (e.g. require_apple_sign_in).

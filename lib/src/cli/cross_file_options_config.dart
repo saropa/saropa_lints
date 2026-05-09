@@ -35,7 +35,7 @@ class CrossFileProjectCliOptions {
   final bool? includePrivateSymbols;
   final bool? excludePublicApi;
 
-  /// Parses [analysis_options.yaml] at [projectPath] root only.
+  /// Parses `analysis_options.yaml` at [projectPath] root only.
   static CrossFileProjectCliOptions load(String projectPath) {
     final file = File(p.join(projectPath, 'analysis_options.yaml'));
     if (!file.existsSync()) {

@@ -325,6 +325,7 @@ describe('detail sync duck-typing contracts', () => {
 
 });
 
+// Explorer grouping: severity buckets and labels for dependency/package rows.
 describe('SeverityGroupItem', () => {
     it('should use high label for high severity', () => {
         const item = new SeverityGroupItem('high', []);

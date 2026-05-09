@@ -65,6 +65,7 @@ def _starts_with(text: str, i: int, prefix: str) -> bool:
     return text.startswith(prefix, i)
 
 
+# C-family lexer: Dart always; TypeScript when templates=True (backticks + ${} nesting).
 def _collect_c_family_comment_lines(text: str, *, templates: bool) -> set[int]:
     """Lines (1-based) that contain a comment token outside strings/templates.
 
@@ -604,7 +605,7 @@ def collect_comment_metric_buckets(project_dir: Path) -> list[_BucketScan]:
     """Scan primary source trees and return per-bucket stats (non-empty only)."""
     buckets: list[_BucketScan] = []
 
-    # Each block below aggregates one root; empty roots are skipped (no _BucketScan entry).
+    # One block per root (lib, test, bin, packages/*/lib, extension/src, scripts). Skip empty trees.
     lib_dart = [
         p
         for p in _iter_files(project_dir / "lib", ".dart")

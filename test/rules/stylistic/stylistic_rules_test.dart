@@ -279,6 +279,7 @@ void main() {
     );
   });
 
+  // example/lib/stylistic/: formatting and style rules with fixture-backed expectations.
   group('Stylistic Rules - Fixture Verification', () {
     final fixtures = [
       'prefer_trailing_comma_always',
@@ -322,6 +323,7 @@ void main() {
     }
   });
 
+  // Preference-style rules (ordering, idioms) with dedicated fixture files.
   group('Stylistic - Preference Rules', () {
     group('prefer_trailing_comma_always', () {
       test('rule offers quick fix (add trailing comma)', () {

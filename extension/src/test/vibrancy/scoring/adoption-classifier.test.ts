@@ -1,4 +1,7 @@
-/** * Module overview (comment coverage pass). * comment-coverage: module overview (batch). * * Extension Jest tests: validates commands, webviews, parsers, and state against VS Code APIs (often with local mocks). */
+/**
+ * classifyAdoption: pub points, verified publisher, discontinued → tier + badge text for the tree.
+ */
+// makeInput centralizes defaults so each it() only overrides the signals under test.
 import * as assert from 'assert';
 import { classifyAdoption, AdoptionInput } from '../../../vibrancy/scoring/adoption-classifier';
 

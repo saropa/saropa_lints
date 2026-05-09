@@ -157,6 +157,7 @@ Ran in 5.2s
     });
   });
 
+  // Human-readable `dart analyze` blocks (issue counts, file headers) mixed with machine lines.
   group('parseDartAnalyzeHumanOutput', () {
     test('parses error line with Windows-style path', () {
       const output = r'''
@@ -233,6 +234,7 @@ No issues found!
     });
   });
 
+  // Model helpers: severity mapping and equality used by consumers of parseViolations.
   group('Violation', () {
     test('toString formats as file:line:column - rule - message', () {
       final v = Violation(

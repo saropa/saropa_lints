@@ -1,4 +1,7 @@
-/** * Module overview (comment coverage pass). * comment-coverage: module overview (batch). * * Extension Jest tests: validates commands, webviews, parsers, and state against VS Code APIs (often with local mocks). */
+/**
+ * Report exporter metadata and category histograms built from VibrancyResult lists.
+ */
+// Exercises ReportMetadata shape and countByCategory rollups used in export/report UIs.
 import * as assert from 'assert';
 import { VibrancyResult, VibrancyCategory } from '../../../vibrancy/types';
 import { ReportMetadata } from '../../../vibrancy/services/report-exporter';

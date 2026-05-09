@@ -73,11 +73,13 @@ void main() {
     return '$projectRoot${sep}reports$sep.saropa_lints${sep}consumer_contract.json';
   }
 
+  // Reads violations.json after ViolationExporter.write (schema, session, violations[], summary, config).
   Map<String, dynamic> readExport() {
     final content = File(exportPath()).readAsStringSync();
     return json.decode(content) as Map<String, dynamic>;
   }
 
+  // Disk contract: violations.json + consumer_contract.json (tier sets, health weights, rule relations).
   group('ViolationExporter', () {
     test('writes valid JSON matching schema', () {
       final data = buildData();
@@ -809,6 +811,7 @@ void main() {
   });
 }
 
+// Default ReportConfig for export tests (platforms, packages, tier string match production shape).
 ReportConfig _defaultConfig({int maxIssues = 1000}) {
   return ReportConfig(
     version: '4.14.0',
@@ -825,6 +828,7 @@ ReportConfig _defaultConfig({int maxIssues = 1000}) {
   );
 }
 
+// Single violation row for export ordering, OWASP, correction, and path-normalization assertions.
 ViolationRecord _violation({
   required String rule,
   required String file,

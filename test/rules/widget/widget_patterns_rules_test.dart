@@ -17,6 +17,7 @@ import 'package:saropa_lints/src/rules/widget/widget_patterns_ux_rules.dart';
 /// Test fixtures: example/lib/widget_patterns/*
 // Long file: use group() names and // LINT to jump between rule families.
 void main() {
+  // Smoke: each rule factory returns stable code names and non-trivial messages.
   group('Widget Patterns Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {
       test(name, () {
@@ -673,6 +674,7 @@ void main() {
     );
   });
 
+  // example/lib/: BAD lines must trigger; OK/false-positive blocks stay clean under analysis.
   group('Widget Patterns Rules - Fixture Verification', () {
     final fixtures = [
       'avoid_bool_in_widget_constructors',

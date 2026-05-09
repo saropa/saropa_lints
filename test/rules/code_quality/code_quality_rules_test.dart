@@ -19,6 +19,7 @@ import 'package:saropa_lints/src/rules/code_quality/code_quality_variables_rules
 ///
 /// Test fixtures: example/lib/code_quality/*
 void main() {
+  // Instantiation smoke for every code_quality rule (name, message length, correction present).
   group('Code Quality Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {
       test(name, () {
@@ -663,6 +664,7 @@ void main() {
     );
   });
 
+  // example/lib/code_quality/: fixtures drive real analyzer diagnostics per rule.
   group('Code Quality Rules - Fixture Verification', () {
     final fixtures = [
       'avoid_accessing_collections_by_constant_index',

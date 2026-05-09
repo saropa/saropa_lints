@@ -209,6 +209,7 @@ void main() {
       });
     });
 
+    // Token-attached // ignore: (leading same line or end-of-line before the node).
     group('hasIgnoreCommentOnToken', () {
       test('detects ignore comment with underscore format', () {
         final unit = _parseCode('''
@@ -282,6 +283,7 @@ void test() {
       });
     });
 
+    // Line-level ignores near statements, args, catch, chains, and declarations.
     group('hasIgnoreComment', () {
       group('leading comments', () {
         test('detects comment directly before node', () {

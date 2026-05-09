@@ -4,10 +4,12 @@ import * as sinon from 'sinon';
 import { MockMemento } from '../vscode-mock';
 import { CacheService } from '../../../vibrancy/services/cache-service';
 import {
+    applyNewVersionNotificationsToResults,
     buildWatchList, detectNewVersions, markVersionSeen, markAllSeen,
 } from '../../../vibrancy/services/version-comparator';
 import { VibrancyResult } from '../../../vibrancy/types';
 import * as pubDevApi from '../../../vibrancy/services/pub-dev-api';
+import { makeMinimalResult } from '../test-helpers';
 
 /**
  * Tests **version-comparator**: `buildWatchList`, semver detection vs memento, `markVersionSeen` / `markAllSeen`,
@@ -18,6 +20,26 @@ describe('version-comparator', () => {
     let memento: MockMemento;
     let cache: CacheService;
     let fetchStub: sinon.SinonStub;
+
+    const makeResult = (
+        name: string,
+        version: string,
+        score: number,
+        isDirect: boolean,
+    ): VibrancyResult => {
+        const category = score >= 60 ? 'vibrant' : score >= 40 ? 'stable' : 'outdated';
+        return {
+            ...makeMinimalResult({ name, version, score, category }),
+            package: {
+                name,
+                version,
+                constraint: `^${version}`,
+                source: 'hosted',
+                isDirect,
+                section: 'dependencies',
+            },
+        };
+    };
 
     beforeEach(() => {
         memento = new MockMemento();
@@ -30,39 +52,6 @@ describe('version-comparator', () => {
     });
 
     describe('buildWatchList', () => {
-        const makeResult = (
-            name: string,
-            version: string,
-            score: number,
-            isDirect: boolean,
-        ): VibrancyResult => ({
-            package: { name, version, constraint: `^${version}`, source: 'hosted', isDirect, section: 'dependencies' },
-            pubDev: null,
-            github: null,
-            knownIssue: null,
-            score,
-            category: score >= 60 ? 'vibrant' : score >= 40 ? 'stable' : 'outdated',
-            resolutionVelocity: 0,
-            engagementLevel: 0,
-            popularity: 0,
-            publisherTrust: 0,
-            updateInfo: null,
-            license: null,
-            archiveSizeBytes: null,
-            bloatRating: null,
-            isUnused: false,
-            platforms: null,
-            verifiedPublisher: false,
-            wasmReady: null,
-            blocker: null,
-            upgradeBlockStatus: 'up-to-date',
-            transitiveInfo: null,
-            alternatives: [],
-            latestPrerelease: null,
-            prereleaseTag: null,
-            vulnerabilities: [],
-        });
-
         it('should include all direct dependencies in "all" mode', () => {
             const results = [
                 makeResult('http', '1.0.0', 80, true),
@@ -232,6 +221,42 @@ describe('version-comparator', () => {
             const notifications = await detectNewVersions(watchList, cache);
 
             assert.strictEqual(notifications.length, 0);
+        });
+    });
+
+    describe('applyNewVersionNotificationsToResults', () => {
+        it('should patch updateInfo for packages in the notification list', () => {
+            const http = {
+                ...makeResult('http', '1.0.0', 80, true),
+                updateInfo: {
+                    currentVersion: '1.0.0',
+                    latestVersion: '1.0.0',
+                    updateStatus: 'up-to-date' as const,
+                    changelog: null,
+                },
+            };
+            const pathR = makeResult('path', '2.0.0', 80, true);
+            const merged = applyNewVersionNotificationsToResults(
+                [http, pathR],
+                [{
+                    name: 'http',
+                    currentVersion: '1.0.0',
+                    newVersion: '1.0.2',
+                    updateType: 'patch',
+                    blockedBy: null,
+                }],
+            );
+            assert.strictEqual(merged[0].updateInfo?.latestVersion, '1.0.2');
+            assert.strictEqual(merged[0].updateInfo?.updateStatus, 'patch');
+            assert.strictEqual(merged[1], pathR);
+        });
+
+        it('should return a new results array when there are no notifications', () => {
+            const r = makeResult('http', '1.0.0', 80, true);
+            const results = [r];
+            const merged = applyNewVersionNotificationsToResults(results, []);
+            assert.notStrictEqual(merged, results);
+            assert.strictEqual(merged[0], r);
         });
     });
 

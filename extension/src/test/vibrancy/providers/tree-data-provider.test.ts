@@ -2,6 +2,7 @@
  * Jest tests for `VibrancyTreeProvider`: refresh after result updates, filter/prerelease wiring,
  * `TreeItem` collapsible state, and expand-all override clearing on subsequent scans.
  */
+// VibrancyTreeProvider: refresh, filters, TreeItem state, expand-all vs override clearing.
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import * as vscode from 'vscode';

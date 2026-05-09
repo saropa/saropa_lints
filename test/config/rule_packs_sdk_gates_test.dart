@@ -108,6 +108,7 @@ environment:
     });
   });
 
+  // Pack applicability when pubspec only declares SDK/Flutter constraints (no dependency markers).
   group('isRulePackApplicable with SDK packs', () {
     test('sdk packs can be applicable without dependency markers', () {
       const pubspec = '''

@@ -39,6 +39,7 @@ export function getViolationsDashboardStyles(): string {
       --status-bad: var(--vscode-editorError-foreground);
     }
 
+    /* Border-box everywhere so padding math matches the layout grid (dashboard HTML relies on this). */
     * { box-sizing: border-box; }
     /* Content max-width with full-width override (guideline §4). Editor panes can be 4000+px
        wide on ultrawide monitors — long-line text and dense KPI strips become unreadable past

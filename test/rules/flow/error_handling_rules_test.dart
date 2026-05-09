@@ -213,6 +213,7 @@ void main() {
     });
   });
 
+  // example/lib/flow/error_handling/: try/catch, async, and error propagation fixtures.
   group('Error Handling Rules - Fixture Verification', () {
     final fixtures = [
       'avoid_swallowing_exceptions',
@@ -247,6 +248,7 @@ void main() {
     }
   });
 
+  // Rules that flag swallowing errors, empty catches, or misleading handlers.
   group('Error Handling - Avoidance Rules', () {
     group('avoid_swallowing_exceptions', () {
       test('rule offers quick fix (add rethrow in catch)', () {
@@ -486,6 +488,7 @@ void main() {
     });
   });
 
+  // Rules that require logging, rethrow, or typed handling when failures occur.
   group('Error Handling - Requirement Rules', () {
     group('require_app_startup_error_handling', () {
       test('main() without crash reporting dependency should NOT trigger '

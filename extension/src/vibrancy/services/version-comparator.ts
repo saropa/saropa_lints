@@ -5,7 +5,9 @@
  * Vibrancy UI experiment: scoring, providers, and webview assets.
  */
 
-import { NewVersionNotification, VibrancyResult } from '../types';
+import {
+    NewVersionNotification, VibrancyResult, UpdateInfo, UpdateStatus,
+} from '../types';
 import { CacheService } from './cache-service';
 import { fetchPackageInfo } from './pub-dev-api';
 import { compareVersions } from './changelog-service';
@@ -141,4 +143,33 @@ export function buildWatchList(
 
 function delay(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/**
+ * Merge freshly polled pub.dev versions into the last scan snapshot so the
+ * Package Dashboard, tree, and diagnostics match what the freshness toast
+ * reported — without waiting for a full rescan.
+ */
+export function applyNewVersionNotificationsToResults(
+    results: readonly VibrancyResult[],
+    notifications: readonly NewVersionNotification[],
+): VibrancyResult[] {
+    if (notifications.length === 0) {
+        return [...results];
+    }
+    const byName = new Map(notifications.map(n => [n.name, n]));
+    return results.map((r) => {
+        const n = byName.get(r.package.name);
+        if (!n) {
+            return r;
+        }
+        const updateStatus = n.updateType as UpdateStatus;
+        const newUpdateInfo: UpdateInfo = {
+            currentVersion: r.package.version,
+            latestVersion: n.newVersion,
+            updateStatus,
+            changelog: r.updateInfo?.changelog ?? null,
+        };
+        return { ...r, updateInfo: newUpdateInfo };
+    });
 }

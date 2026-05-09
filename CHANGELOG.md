@@ -45,9 +45,9 @@
 
 ---
 
-## [Unreleased]
+## [13.6.0]
 
-This upcoming release improves how you steer large findings lists and repeat searches across sessions (multi-key sort, bulk JSON copy, and workspace-persisted recents). It tightens RTL behavior for stack toggles, adds cross-file CLI defaults you can commit in **`analysis_options.yaml`**, gives IDE troubleshooting clearer native-plugin-first guidance, and ships a **`verify-nls-keys`** check for Marketplace manifest parity. Score and dashboard consistency improvements from earlier work remain in place. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
+This release improves how you steer large findings lists and repeat searches across sessions (multi-key sort, bulk JSON copy, and workspace-persisted recents). It tightens RTL behavior for stack toggles, adds cross-file CLI defaults you can commit in **`analysis_options.yaml`**, gives IDE troubleshooting clearer native-plugin-first guidance, and ships a **`verify-nls-keys`** check for Marketplace manifest parity. Score and dashboard consistency improvements from earlier work remain in place. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
 
 ### Changed (Extension)
 
@@ -56,6 +56,7 @@ This upcoming release improves how you steer large findings lists and repeat sea
 - **Lints Config pack toggles RTL** — the enable switch knob now tracks right-to-left layouts using logical positioning so the knob lands on the expected side; reload the dashboard if you switched UI direction mid-session; no YAML change needed.
 - **Manifest localization guard** — **`npm run verify-nls-keys`** (under **`extension/`**) asserts every **`%…%`** placeholder from **`extension/package.json`** resolves in **`extension/package.nls.json`**, catching missing English strings before Marketplace packaging; contributors should run it after editing contributed labels or command titles.
 - **More shipped UI locales filled** — **`package.nls.*`** and **`src/i18n/locales/*`** now include machine-translated copy for **`bn`, `fa`, `fil`, `he`, `id`, `pl`, `sw`, `th`, `tr`, `uk`, and `vi`** (plus corrections for **`de`**, **`nl`**, and **`ru`** dependency-count wording); regenerate with **`SAROPA_I18N_MACHINE_TRANSLATE=1`** if you fork strings. Hebrew uses Google target code **`iw`** in the generator.
+- **Package Vibrancy freshness vs tree** — when a new-version notification lists upgrades, the last scan snapshot is patched so the tree and dashboard show the same latest versions as the toast without a full rescan, reusing the last dependency graph when the republish is lightweight; no action required beyond normal Package Vibrancy use.
 
 ### Changed
 
@@ -66,6 +67,7 @@ This upcoming release improves how you steer large findings lists and repeat sea
 
 - **Contributor planning docs** — assorted `plans/*.md` checklists (quick-fix, testing/release, stub tests, localization guide, severity follow-ups, cross-file CLI, UX backlog, rule-pack migration, comment coverage) were refreshed for clearer sequencing and sign-off trails; docs only, **no shipped rule or extension behavior** beyond what is listed under **`### Changed (Extension)`** above.
 - **Maintainer tooling** — the quick-fix audit script prints a stdout summary before writing the dated report file, and the bundled quality-gate **example** YAML documents recommended `new_*` metrics with legacy-alias notes; no action unless you vendor that sample into your own CI gate.
+- **Comment coverage CLI** — the worst-files table uses an **L/C** column (physical lines per comment line, higher means sparser) instead of a percentage so maintainers spot thin files faster when running the comment-coverage script locally.
 
 </details>
 

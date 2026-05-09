@@ -40,6 +40,29 @@ class FileCommentStat:
             return 0.0
         return self.comment_line_count / self.physical_lines
 
+    @property
+    def lines_per_comment_line(self) -> float | None:
+        """Average physical lines per line that contains a comment token.
+
+        None when there are no comment lines (sparsest case). Larger values
+        mean comments are rarer relative to file length.
+        """
+        if self.comment_line_count <= 0:
+            return None
+        return self.physical_lines / self.comment_line_count
+
+
+def _format_lines_per_comment_line(stat: FileCommentStat) -> str:
+    """Table cell: human scale for density (unlike tiny percentages)."""
+    v = stat.lines_per_comment_line
+    if v is None:
+        return "    —"
+    if v >= 1000:
+        return f"{v:>7.0f}"
+    if v >= 100:
+        return f"{v:>7.1f}"
+    return f"{v:>7.2f}"
+
 
 def _format_progress_bar(done: int, total: int, width: int = 28) -> str:
     """ASCII progress bar like [########------------] 40%."""
@@ -60,6 +83,7 @@ def collect_per_file_comment_stats(
     progress_to_stderr: bool = False,
 ) -> list[FileCommentStat]:
     """Scan primary trees; return one stat per file (sorted ascending by ratio)."""
+    # Build (path, ts_template_mode, is_python) jobs so each file is counted once with the right lexer.
     paths_jobs: list[tuple[Path, bool, bool]] = []
     # (absolute path, use_ts_templates, is_python)
 
@@ -149,7 +173,7 @@ def display_comment_coverage_worst_files(
 
     print()
     print_colored(
-        "  > Comment coverage -- worst files (by comment-line / physical-line)",
+        "  > Comment coverage -- worst files (sparsest comment tokens first)",
         Color.WHITE,
     )
     print()
@@ -163,14 +187,23 @@ def display_comment_coverage_worst_files(
         "Does not measure doc quality - see plan/COMMENT_COVERAGE_PLAN.md.)",
         Color.DIM,
     )
+    print_colored(
+        "    L/C = physical lines per comment line (higher ⇒ sparser).  "
+        "— = no comment lines.",
+        Color.DIM,
+    )
     print()
-    w = 52
-    print_colored(f"    {'Path':<{w}s} {'Lines':>6} {'Cmnt':>5} {'Ratio':>7}", Color.DIM)
+    w = 50
+    lc_w = 7
+    print_colored(
+        f"    {'Path':<{w}s} {'Lines':>6} {'Cmnt':>5} {'L/C':>{lc_w}s}",
+        Color.DIM,
+    )
     for s in worst:
-        r = 100.0 * s.ratio
         tail = s.rel_path if len(s.rel_path) <= w else "..." + s.rel_path[-(w - 3) :]
+        lc = _format_lines_per_comment_line(s)
         print_colored(
-            f"    {tail:<{w}s} {s.physical_lines:>6,} {s.comment_line_count:>5} {r:>6.2f}%",
+            f"    {tail:<{w}s} {s.physical_lines:>6,} {s.comment_line_count:>5} {lc:>{lc_w}s}",
             Color.WHITE,
         )
     print()
