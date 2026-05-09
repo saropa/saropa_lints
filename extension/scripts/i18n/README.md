@@ -36,9 +36,9 @@ Or from ``extension/scripts/i18n`` (imports resolve):
 python generate_locales.py
 ```
 
-Default locales:
+Default locales (24 non-English, alphabetically by code in the script):
 
-- `nl, ur, fr, de, es, it, pt, ru, ja, ko, zh, ar, hi`
+- `ar, bn, de, es, fa, fil, fr, he, hi, id, it, ja, ko, nl, pl, pt, ru, sw, th, tr, uk, ur, vi, zh`
 
 ## Manifest migration
 

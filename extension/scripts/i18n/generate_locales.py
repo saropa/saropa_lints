@@ -17,10 +17,12 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Generate extension locale JSON files.")
     parser.add_argument(
         "--locales",
-        default="nl,ur,fr,de,es,it,pt,ru,ja,ko,zh,ar,hi",
+        default=(
+            "ar,bn,de,es,fa,fil,fr,he,hi,id,it,ja,ko,nl,pl,pt,ru,sw,th,tr,uk,ur,vi,zh"
+        ),
         help=(
-            "Comma-separated locale codes "
-            "(default: nl,ur,fr,de,es,it,pt,ru,ja,ko,zh,ar,hi)."
+            "Comma-separated locale codes (default: full shipped set per "
+            "plans/EXTENSION_LOCALIZATION_GUIDE.md primary + secondary + nl)."
         ),
     )
     return parser.parse_args()

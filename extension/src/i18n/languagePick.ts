@@ -12,50 +12,83 @@ import { t } from './runtime';
 export type UiLanguageCode =
   | 'auto'
   | 'ar'
+  | 'bn'
   | 'de'
   | 'en'
   | 'es'
+  | 'fa'
+  | 'fil'
   | 'fr'
+  | 'he'
   | 'hi'
+  | 'id'
   | 'it'
   | 'ja'
   | 'ko'
   | 'nl'
+  | 'pl'
   | 'pt'
   | 'ru'
+  | 'sw'
+  | 'th'
+  | 'tr'
+  | 'uk'
   | 'ur'
+  | 'vi'
   | 'zh';
 
 const ENGLISH_ENDONYM: Record<Exclude<UiLanguageCode, 'auto'>, string> = {
   ar: 'Arabic',
+  bn: 'Bengali',
   de: 'German',
   en: 'English',
   es: 'Spanish',
+  fa: 'Persian',
+  fil: 'Filipino',
   fr: 'French',
+  he: 'Hebrew',
   hi: 'Hindi',
+  id: 'Indonesian',
   it: 'Italian',
   ja: 'Japanese',
   ko: 'Korean',
   nl: 'Dutch',
+  pl: 'Polish',
   pt: 'Portuguese',
   ru: 'Russian',
+  sw: 'Swahili',
+  th: 'Thai',
+  tr: 'Turkish',
+  uk: 'Ukrainian',
   ur: 'Urdu',
+  vi: 'Vietnamese',
   zh: 'Chinese',
 };
 
 const NATIVE_ENDONYM: Record<Exclude<UiLanguageCode, 'auto' | 'en'>, string> = {
   ar: 'العربية',
+  bn: 'বাংলা',
   de: 'Deutsch',
   es: 'Español',
+  fa: 'فارسی',
+  fil: 'Filipino',
   fr: 'Français',
+  he: 'עברית',
   hi: 'हिन्दी',
+  id: 'Bahasa Indonesia',
   it: 'Italiano',
   ja: '日本語',
   ko: '한국어',
   nl: 'Nederlands',
+  pl: 'Polski',
   pt: 'Português',
   ru: 'Русский',
+  sw: 'Kiswahili',
+  th: 'ไทย',
+  tr: 'Türkçe',
+  uk: 'Українська',
   ur: 'اردو',
+  vi: 'Tiếng Việt',
   zh: '中文',
 };
 

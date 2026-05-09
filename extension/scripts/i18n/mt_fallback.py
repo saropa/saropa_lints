@@ -24,19 +24,30 @@ _CACHE_PATH = _CACHE_DIR / "mt_strings.json"
 
 # Google Translate target codes (deep-translator / Google).
 LOCALE_TO_GOOGLE: dict[str, str] = {
-    "nl": "nl",
-    "ur": "ur",
-    "fr": "fr",
+    "ar": "ar",
+    "bn": "bn",
     "de": "de",
     "es": "es",
+    "fa": "fa",
+    "fil": "tl",
+    "fr": "fr",
+    "he": "he",
+    "hi": "hi",
+    "id": "id",
     "it": "it",
-    "pt": "pt",
-    "ru": "ru",
     "ja": "ja",
     "ko": "ko",
+    "nl": "nl",
+    "pl": "pl",
+    "pt": "pt",
+    "ru": "ru",
+    "sw": "sw",
+    "th": "th",
+    "tr": "tr",
+    "uk": "uk",
+    "ur": "ur",
+    "vi": "vi",
     "zh": "zh-CN",
-    "ar": "ar",
-    "hi": "hi",
 }
 
 def _mt_env_enabled() -> bool:

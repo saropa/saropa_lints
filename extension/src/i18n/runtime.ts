@@ -6,19 +6,30 @@
  * and performs simple `{token}` substitution. Does not load additional locales
  * from disk at runtime; catalogs are static imports above.
  */
-import en from './locales/en.json';
 import ar from './locales/ar.json';
+import bn from './locales/bn.json';
 import de from './locales/de.json';
+import en from './locales/en.json';
 import es from './locales/es.json';
+import fa from './locales/fa.json';
+import fil from './locales/fil.json';
 import fr from './locales/fr.json';
+import he from './locales/he.json';
 import hi from './locales/hi.json';
+import id from './locales/id.json';
 import it from './locales/it.json';
 import ja from './locales/ja.json';
 import ko from './locales/ko.json';
 import nl from './locales/nl.json';
+import pl from './locales/pl.json';
 import pt from './locales/pt.json';
 import ru from './locales/ru.json';
+import sw from './locales/sw.json';
+import th from './locales/th.json';
+import tr from './locales/tr.json';
+import uk from './locales/uk.json';
 import ur from './locales/ur.json';
+import vi from './locales/vi.json';
 import zh from './locales/zh.json';
 
 /** Values allowed inside `{name}` interpolation payloads. */
@@ -35,18 +46,29 @@ const DEFAULT_LOCALE = 'en';
 /** Static locale → nested JSON map; keys must match `normalizeLocale` outputs. */
 const catalogs: Readonly<Record<string, NestedRecord>> = {
     ar: ar as NestedRecord,
+    bn: bn as NestedRecord,
     de: de as NestedRecord,
     en: en as NestedRecord,
     es: es as NestedRecord,
+    fa: fa as NestedRecord,
+    fil: fil as NestedRecord,
     fr: fr as NestedRecord,
+    he: he as NestedRecord,
     hi: hi as NestedRecord,
+    id: id as NestedRecord,
     it: it as NestedRecord,
     ja: ja as NestedRecord,
     ko: ko as NestedRecord,
     nl: nl as NestedRecord,
+    pl: pl as NestedRecord,
     pt: pt as NestedRecord,
     ru: ru as NestedRecord,
+    sw: sw as NestedRecord,
+    th: th as NestedRecord,
+    tr: tr as NestedRecord,
+    uk: uk as NestedRecord,
     ur: ur as NestedRecord,
+    vi: vi as NestedRecord,
     zh: zh as NestedRecord,
 };
 /** Process-wide active locale for `t` when `options.locale` is omitted. */
@@ -55,13 +77,20 @@ let activeLocale = DEFAULT_LOCALE;
 /**
  * Maps free-form locale input to a catalog key present in `catalogs`.
  * Lowercases, prefers exact keys, then primary language subtag before `en`.
+ * Aliases cover legacy OS tags (`iw`→Hebrew, `tl`→Filipino).
  */
+const LOCALE_ALIASES: Readonly<Record<string, string>> = {
+    iw: 'he',
+    tl: 'fil',
+};
+
 function normalizeLocale(input: string | undefined): string {
     if (!input) return DEFAULT_LOCALE;
     const raw = input.toLowerCase();
     if (catalogs[raw]) return raw;
     const [base] = raw.split('-');
-    return catalogs[base] ? base : DEFAULT_LOCALE;
+    const mapped = LOCALE_ALIASES[base] ?? base;
+    return catalogs[mapped] ? mapped : DEFAULT_LOCALE;
 }
 
 /** Walks `a.b.c` segments; returns a string leaf or undefined if missing/non-leaf. */
@@ -128,4 +157,3 @@ export function t(
 export function format(template: string, params: Params): string {
     return interpolate(template, params);
 }
-
