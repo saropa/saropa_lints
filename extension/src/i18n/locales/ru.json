@@ -390,7 +390,7 @@
     "heroTitle": "Saropa Package Dashboard",
     "status": {
       "packagesCount": "{count} пакетов",
-      "packagesBreakdown": "{прямой} прямой, {переходный} переходный {direct} {transitive}",
+      "packagesBreakdown": "{direct} прямых, {transitive} транзитивных",
       "gradeLine": "Grade {grade} · {avg}/100",
       "flaggedCount": "{count} отмечено",
       "flaggedTitle": "Abandoned or end-of-life"

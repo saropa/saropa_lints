@@ -390,7 +390,7 @@
     "heroTitle": "Saropa-pakketdashboard",
     "status": {
       "packagesCount": "0 pakketten {count}",
-      "packagesBreakdown": "0 direct, 1 transitief {direct} {transitive}",
+      "packagesBreakdown": "{direct} direct, {transitive} transitief",
       "gradeLine": "Graad 0 · 1/100 {grade} {avg}",
       "flaggedCount": "0 gemarkeerd {count}",
       "flaggedTitle": "Verlaten of einde leven"

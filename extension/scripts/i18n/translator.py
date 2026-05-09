@@ -31,6 +31,20 @@ def _placeholder_names(s: str) -> list[str]:
     return PLACEHOLDER_RE.findall(s)
 
 
+def _leading_garbled_before_first_placeholder(source: str, out: str) -> bool:
+    """True when *source* starts with a placeholder but *out* has visible text first.
+
+    Catches MT that turns ``{direct} direct, …`` into ``0 direct, 1 transitive {direct} …``.
+    """
+    if "{" not in source or "{" not in out:
+        return False
+    lead_src = source[: source.index("{")]
+    if lead_src.strip():
+        return False
+    lead_out = out[: out.index("{")]
+    return bool(lead_out.strip())
+
+
 class DictionaryTranslator:
     def __init__(self, locale: str) -> None:
         self.locale = locale
@@ -61,5 +75,7 @@ class HybridTranslator:
         out = restore_placeholders(source=text, translated=translated)
         # If interpolation keys were renamed or dropped, ship English instead of a broken template.
         if _placeholder_names(text) != _placeholder_names(out):
+            return text
+        if _leading_garbled_before_first_placeholder(text, out):
             return text
         return out

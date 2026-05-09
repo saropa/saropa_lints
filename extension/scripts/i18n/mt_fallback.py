@@ -31,7 +31,8 @@ LOCALE_TO_GOOGLE: dict[str, str] = {
     "fa": "fa",
     "fil": "tl",
     "fr": "fr",
-    "he": "he",
+    # ISO 639-1 ``he``; Google / deep-translator expect legacy ``iw``.
+    "he": "iw",
     "hi": "hi",
     "id": "id",
     "it": "it",

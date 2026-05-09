@@ -19,13 +19,13 @@ This guide is intentionally implementation-ready. Optional alignment with an ext
 | Track | Status | Notes |
 |-------|--------|--------|
 | **L10N-01** Manifest NLS | **Done** | `extension/package.json` uses `%key%`; `extension/package.nls.json` is the English source; `extension/package.nls.<locale>.json` shipped for the default locale set; local guard `npm run verify-nls-keys` (runs `extension/scripts/verify-manifest-nls-keys.mjs`). |
-| **L10N-02** Runtime webviews | **Done** (shipped set) | Findings / triage dashboards, keyboard overlay, full-width toggle, command catalog webview, Package Vibrancy `report-html.ts`, and wide-report host strings use `t()` + `en.json`; non-English catalogs are regenerated via `generate_locales.py` (dictionary + optional `SAROPA_I18N_MACHINE_TRANSLATE`). **Shipped runtime + manifest locales (24):** `ar, bn, de, es, fa, fil, fr, he, hi, id, it, ja, ko, nl, pl, pt, ru, sw, th, tr, uk, ur, vi, zh` (matches primary + secondary tiers in [Target locale strategy](#target-locale-strategy), plus `nl`). New locale files default to English until you run the generator with machine translation enabled. |
+| **L10N-02** Runtime webviews | **Done** (shipped set) | Findings / triage dashboards, keyboard overlay, full-width toggle, command catalog webview, Package Vibrancy `report-html.ts`, and wide-report host strings use `t()` + `en.json`; non-English catalogs are regenerated via `generate_locales.py` (dictionary + optional `SAROPA_I18N_MACHINE_TRANSLATE`). **Shipped runtime + manifest locales (24):** `ar, bn, de, es, fa, fil, fr, he, hi, id, it, ja, ko, nl, pl, pt, ru, sw, th, tr, uk, ur, vi, zh` (union of primary and secondary tiers in [Target locale strategy](#target-locale-strategy)). New locale files default to English until you run the generator with machine translation enabled. |
 | **L10N-03** CI quality gates | **Partial** | **CI runs manifest key coverage** (`node extension/scripts/verify-manifest-nls-keys.mjs` on every push/PR). Locale key parity, placeholder parity, and “no inline literals” lint are **not** automated yet; use `python extension/scripts/i18n/audit_coverage.py` locally for coverage reports. |
 
 ### Next work (ordered)
 
 1. **Dashboard migration** — Route remaining webview/dashboard literals through `runtime.ts` keys (prioritize high-traffic surfaces: Findings / violations HTML).
-2. **Locale expansion** — Add missing locales vs [Target locale strategy](#target-locale-strategy) (e.g. `id`, `tr`, `vi`, secondary tier); extend `extension/scripts/i18n/dictionaries.py` + `generate_locales.py`.
+2. **Translation quality** — Curate high-risk strings in `extension/scripts/i18n/dictionaries.py` (product names, dependency-count templates); re-run `generate_locales.py` with `SAROPA_I18N_MACHINE_TRANSLATE=1` after English copy changes.
 3. **Stronger CI** — Add automated key/placeholder parity across `package.nls*.json` and `locales/*.json`; optional ESLint/custom check for new inline UI strings in `extension/src/views/`.
 
 ### Done criteria for this plan
@@ -41,7 +41,7 @@ This guide is intentionally implementation-ready. Optional alignment with an ext
 
 - **Manifest:** User-facing contributed strings live behind `%…%` keys; English text is in `extension/package.nls.json`.
 - **Runtime:** JSON catalogs under `extension/src/i18n/locales/` are loaded by `runtime.ts`; regenerate non-English files with `python extension/scripts/i18n/generate_locales.py` after editing English or `dictionaries.py` (see `extension/scripts/i18n/README.md`).
-- **Gaps:** Not every locale from the target tier list is shipped; some smaller webviews may still contain literals — run `python extension/scripts/i18n/audit_coverage.py` for a heuristic report.
+- **Gaps:** Some webviews may still contain literals vs runtime keys — run `python extension/scripts/i18n/audit_coverage.py` for a heuristic report.
 
 ---
 
@@ -75,7 +75,7 @@ Why this split:
 Mirror the translation quality/cost tiers from `setup_arb_translate.py`:
 
 - **Primary (Gemini-paid, higher quality)**: `de, es, pt, fr, hi, id, ja, tr, it, ko, zh, ru, vi`
-- **Secondary (machine translate + fallback path)**: `ar, fa, he, ur, pl, th, bn, uk, fil, sw`
+- **Secondary (machine translate + fallback path)**: `ar, bn, fa, fil, he, nl, pl, sw, th, uk, ur`
 
 This keeps extension locale coverage aligned with app locale policy and reduces operator decisions.
 
