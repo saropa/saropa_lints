@@ -24,11 +24,11 @@
     "noDataCta": "Run analysis"
   },
   "loading": {
-    "thinking": "Denken…",
+    "thinking": "Thinking…",
     "preparing": "Preparing…",
     "checking": "Checking…",
     "fetching": "Fetching…",
-    "working": "Arbeiten…",
+    "working": "Working…",
     "scanning": "Scanning…",
     "cancel": "Cancel",
     "runningAnalysis": "Running analysis…",
@@ -43,7 +43,7 @@
     "reload": "Reload",
     "copyDetails": "Copy details",
     "unreachable": "Could not reach {target}",
-    "partialSummary": "0 von 1 2 geladen. 3 fehlgeschlagen. {loaded} {total} {item} {failed}",
+    "partialSummary": "{loaded} of {total} {item} loaded. {failed} failed.",
     "partialRetry": "Retry failed"
   },
   "offline": {
@@ -62,13 +62,13 @@
     "chipRemove": "Remove"
   },
   "a11y": {
-    "toggleFullWidth": "Schalten Sie das Layout in voller Breite um",
+    "toggleFullWidth": "Toggle full-width layout",
     "sortBy": "Sort by {column}",
     "expandRow": "Expand row",
     "collapseRow": "Collapse row",
     "selectAll": "Select all rows",
     "keyboardShortcuts": "Keyboard shortcuts",
-    "announcer": "Aktualisierungen des Filter- und Sortierstatus werden hier angekündigt."
+    "announcer": "Updates to filter and sort state are announced here."
   },
   "uiLanguage": {
     "pick": {
@@ -90,25 +90,25 @@
       "gaugeTitle": "Health score {score}/100 (grade {grade}). Errors weigh heaviest."
     },
     "time": {
-      "justNow": "soeben",
-      "minutesAgo": "Vor 0M {min}",
-      "hoursAgo": "Vor 0h {hr}",
-      "daysAgo": "Vor 0d {day}"
+      "justNow": "just now",
+      "minutesAgo": "{min}m ago",
+      "hoursAgo": "{hr}h ago",
+      "daysAgo": "{day}d ago"
     },
     "status": {
       "lastRunPrefix": "Last run",
       "lastRunUnknown": "Last run unknown",
       "noTimestampTitle": "No timestamp on violations.json",
-      "findingsAfterFilterTitle": "Gesamtergebnisse nach dem Filter für deaktivierte Regeln",
-      "findingOne": "0 finden {count}",
-      "findingOther": "0 Ergebnisse {count}",
+      "findingsAfterFilterTitle": "Total findings after disabled-rule filter",
+      "findingOne": "{count} finding",
+      "findingOther": "{count} findings",
       "todoHackTitle": "TODO and HACK markers found in workspace",
       "driftOnTitle": "Drift Advisor connected: {label}",
       "driftOnPill": "Drift on · {count}",
       "driftOfflineTitle": "Drift Advisor enabled but no server found",
       "driftOfflinePill": "Drift offline",
       "enabledRulesTitle": "Enabled rules in current tier",
-      "rulesCount": "0 Regeln {count}"
+      "rulesCount": "{count} rules"
     },
     "groupBy": {
       "severity": "Severity",
@@ -120,31 +120,31 @@
       "ruleStatus": "Rule status"
     },
     "seg": {
-      "toggleSeverityTitle": "Schalten Sie den Schweregrad 0 um {v}",
-      "toggleImpactTitle": "0-Aufprall umschalten {v}"
+      "toggleSeverityTitle": "Toggle {v} severity",
+      "toggleImpactTitle": "Toggle {v} impact"
     },
     "kpi": {
-      "visibleLabel": "Sichtbare Erkenntnisse",
-      "allMatched": "alles abgestimmt",
-      "ofTotal": "von insgesamt 0 {total}",
+      "visibleLabel": "Visible findings",
+      "allMatched": "all matched",
+      "ofTotal": "of {total} total",
       "clearFiltersTitle": "Click to clear all filters",
       "errorsLabel": "Errors",
-      "errorsSubFix": "muss reparieren",
-      "errorsSubClear": "keine – klar",
+      "errorsSubFix": "must fix",
+      "errorsSubClear": "none — clear",
       "errorsTitle": "Filter findings to errors (must fix — broken / will crash / exploitable)",
-      "warningsLabel": "Warnungen",
-      "warningsSubBad": "könnte scheitern oder schlecht aussehen",
-      "warningsSubClear": "keine – klar",
+      "warningsLabel": "Warnings",
+      "warningsSubBad": "could fail or look bad",
+      "warningsSubClear": "none — clear",
       "warningsTitle": "Filter findings to warnings (could fail or look bad)",
       "infoLabel": "Info",
       "infoSub": "FYI — style / suggestions",
-      "infoSubNone": "keiner",
+      "infoSubNone": "none",
       "infoTitle": "Filter findings to info (FYI — style and suggestions)",
       "filesLabel": "Files affected",
-      "filesSubAcross": "über den Export",
-      "filesSubNone": "Keine Dateien betroffen",
+      "filesSubAcross": "across the export",
+      "filesSubNone": "no files affected",
       "filesTitle": "Distinct files contributing at least one finding",
-      "topRuleLabel": "Oberste Regel",
+      "topRuleLabel": "Top rule",
       "topRuleTitle": "Filter findings to rule {name}"
     },
     "toolbar": {
@@ -172,9 +172,9 @@
       "saveReportTitle": "Save filtered violations as JSON to reports/YYYYMMDD/"
     },
     "chip": {
-      "contains": "enthält „0“ {q}",
-      "severityOff": "Schweregrad ≠ 0 {v}",
-      "impactOff": "Aufprall ≠ 0 {v}",
+      "contains": "contains \"{q}\"",
+      "severityOff": "severity ≠ {v}",
+      "impactOff": "impact ≠ {v}",
       "resetAllTitle": "Reset all filters",
       "removeFilterAria": "Remove filter"
     },
@@ -200,15 +200,15 @@
       "runningMeta": "This can take a moment on large projects."
     },
     "topRules": {
-      "sectionAria": "Top-Regeln nach Anzahl",
+      "sectionAria": "Top rules by count",
       "hideTitle": "Hide for me only — workspace-level, reversible via Clear Suppressions",
       "hideButton": "Hide",
       "disableTitle": "Disable for the whole project — writes analysis_options_custom.yaml and re-runs analysis",
       "disableButton": "Disable",
-      "workspaceOnlyShort": "Nur Arbeitsbereich",
-      "projectConfigShort": "Projektkonfiguration (schreibt Analysis_options_custom.yaml)",
-      "topRulesOne": "Top-0-Regel {count}",
-      "topRulesOther": "Top 0 Regeln {count}",
+      "workspaceOnlyShort": "workspace only",
+      "projectConfigShort": "project config (writes analysis_options_custom.yaml)",
+      "topRulesOne": "Top {count} rule",
+      "topRulesOther": "Top {count} rules",
       "colRank": "#",
       "colRule": "Rule",
       "colCount": "Count",
@@ -219,7 +219,7 @@
       "sectionAria": "Findings",
       "expandAll": "Expand all",
       "collapseAll": "Collapse all",
-      "bulkSelected": "0 ausgewählt {count}",
+      "bulkSelected": "{count} selected",
       "bulkCopy": "Copy selected as JSON",
       "selectAllTitle": "Select all visible findings",
       "selectAllAria": "Select all visible findings",
@@ -230,10 +230,10 @@
       "colActionsAria": "Row actions",
       "selectRowAria": "Select this finding row",
       "copyRowTitle": "Copy this finding as JSON",
-      "metaShown": "0 angezeigt {filtered}",
-      "metaAfterDisable": "0 nach deaktiviertem Regelfilter {total}",
-      "metaSourceCap": "Quelle aus Leistungsgründen auf 0 begrenzt {max}",
-      "metaGroupedBy": "gruppiert nach 0 {mode}",
+      "metaShown": "{filtered} shown",
+      "metaAfterDisable": "{total} after disabled-rule filter",
+      "metaSourceCap": "source capped at {max} for performance",
+      "metaGroupedBy": "grouped by {mode}",
       "overflowNote": "Source list truncated at {max} for render performance.",
       "runAgain": "Run analysis again",
       "emptyNoViolations": "No violations in the last analysis run.",
@@ -247,37 +247,37 @@
     "charts": {
       "sectionAria": "Mix charts",
       "heading": "Mix",
-      "metaClickSlice": "Klicken Sie auf ein Segment, um es zu filtern",
+      "metaClickSlice": "click a slice to filter",
       "severityMix": "Severity mix",
       "impactMix": "Impact mix",
       "filterBarTitle": "Filter to {key} only",
-      "donutTotal": "gesamt"
+      "donutTotal": "total"
     },
     "todoHack": {
       "sectionAria": "TODOs and HACKS",
       "headingDisabled": "TODOs & HACKS",
-      "metaDisabled": "Scan deaktiviert",
-      "scanOff": "Der Arbeitsbereich-Scan ist deaktiviert – aktivieren Sie diese Option, um Markierungen aus Projektdateien anzuzeigen.",
+      "metaDisabled": "scan disabled",
+      "scanOff": "Workspace scan is off — enable to surface markers from project files.",
       "enableScan": "Enable scan",
       "heading": "TODOs & HACKS",
-      "subsectionNone": "0: keine im Scanbereich. {title}",
+      "subsectionNone": "{title}: none in scan range.",
       "capNote": "Scan hit max-file cap; raise `saropaLints.todosAndHacks.maxFilesToScan` for full coverage.",
-      "notePill": "Notiz",
+      "notePill": "note",
       "todosLabel": "TODOs",
       "hacksLabel": "HACKS"
     },
     "drift": {
       "sectionAria": "Drift Advisor",
       "headingOff": "Drift Advisor",
-      "metaOff": "Integration aus",
+      "metaOff": "integration off",
       "enableBlurb": "Enable Drift Advisor integration to surface database suggestions here.",
       "enable": "Enable",
       "headingNoServer": "Drift Advisor",
-      "metaNoServer": "kein Server",
+      "metaNoServer": "no server",
       "noServerBlurb": "No Drift Advisor server found on configured ports.",
       "retry": "Retry",
       "headingConnected": "Drift Advisor",
-      "metaConnected": "verbunden",
+      "metaConnected": "connected",
       "noIssues": "Connected to {label} — no current issues.",
       "refresh": "Refresh",
       "openBrowser": "Open in browser",
@@ -288,40 +288,40 @@
       "sectionAria": "Suppressions",
       "headingExport": "Suppressions (export)",
       "viewHidesHeading": "Issues view hides",
-      "viewHidesMetaActive": "aktiv",
-      "viewHidesMetaNone": "keiner",
+      "viewHidesMetaActive": "active",
+      "viewHidesMetaNone": "none",
       "noneInExport": "No analyzer suppressions in the current `violations.json` export. Run analysis after editing ignores or baselines to populate.",
-      "totalRow": "Gesamt – Filter löschen und Ergebnisse öffnen",
+      "totalRow": "Total — clear filters and open Findings",
       "byRule": "By rule ({count})",
       "byFile": "By file ({count})",
       "noEntries": "No entries.",
       "nothingHidden": "Nothing hidden from the Issues list in this workspace. Use tree context actions to hide folders, files, or rules; they persist in workspace state.",
-      "folderPattern": "0 Ordner {count}",
-      "filePattern": "0 Dateimuster(s) {count}",
-      "ruleGlobal": "0 Regel(n) global {count}",
-      "perFileRules": "0 Datei(en) mit dateispezifischen Regelausblendungen {count}",
-      "severityHides": "0 Schweregrad verstecken(s) {count}",
-      "impactHides": "0 Schlaghaut(en) {count}",
+      "folderPattern": "{count} folder(s)",
+      "filePattern": "{count} file pattern(s)",
+      "ruleGlobal": "{count} rule(s) globally",
+      "perFileRules": "{count} file(s) with per-file rule hides",
+      "severityHides": "{count} severity hide(s)",
+      "impactHides": "{count} impact hide(s)",
       "activeHides": "Active hides: {counts}.",
-      "viewHidesFooter": "Diese Blenden verkleinern nur die Liste der Probleme/Dashboards. Sie werden nicht in „violations.json“ geschrieben.",
+      "viewHidesFooter": "These hides shrink the Issues / dashboard list only; they are not written to `violations.json`.",
       "clearViewHides": "Clear all view hides",
       "foldersSample": "Folders (sample)",
       "filesSample": "Files / globs (sample)",
       "rulesSample": "Rules (sample)",
       "perFileRulesSample": "Per-file rules (sample)",
-      "unknownKind": "Unbekannt"
+      "unknownKind": "Unknown"
     },
     "script": {
       "analysisRunning": "Running analysis…",
       "analysisComplete": "Analysis complete",
       "metaRunning": "This can take a moment on large projects.",
       "metaDone": "Refreshing dashboard with the latest findings.",
-      "announceSearch": "Suche 0 {q}",
-      "announceSeverities": "0 Schweregrade {n}",
-      "announceImpacts": "0 Auswirkungen {n}",
+      "announceSearch": "search {q}",
+      "announceSeverities": "{n} severities",
+      "announceImpacts": "{n} impacts",
       "announceCleared": "All filters cleared",
       "announceFiltersPrefix": "Filters:",
-      "bulkSelected": "0 ausgewählt {n}",
+      "bulkSelected": "{n} selected",
       "analysisStartedDetail": "Analysis started. Collecting diagnostics…",
       "announceStarted": "Analysis started",
       "announceComplete": "Analysis complete",
@@ -329,7 +329,7 @@
       "analysisFailedDetail": "Analysis failed. Check output for details.",
       "removeRecentAria": "Remove",
       "removeRecentTitle": "Remove",
-      "bulkSelectedTpl": "0 ausgewählt {n}"
+      "bulkSelectedTpl": "{n} selected"
     },
     "emptyState": {
       "hintAfterMessage": "Run a Saropa Lints analysis to generate violations.json, then use Refresh here or reopen this dashboard.",
@@ -342,7 +342,7 @@
       "activateKpiSpace": "Activate focused KPI card or chart bar",
       "showOverlay": "Show this shortcut overlay"
     },
-    "unknownAnalyzerKind": "Unbekannt"
+    "unknownAnalyzerKind": "Unknown"
   },
   "triageDash": {
     "showInIssues": "Show in Issues",
@@ -353,13 +353,13 @@
     "on": "On",
     "colRule": "Rule",
     "colIssues": "Issues",
-    "zeroIssueRules": "0 Regeln ohne Probleme – in der Stufe automatisch aktiviert. {count}",
-    "disabledOverrides": "0 Regeln durch Überschreibung in „analysis_options_custom.yaml“ deaktiviert. {count}",
+    "zeroIssueRules": "{count} rules with zero issues — auto-enabled in tier.",
+    "disabledOverrides": "{count} rules disabled by override in `analysis_options_custom.yaml`.",
     "summaryRuleTriage": "Rule triage",
     "hintNoViolations": "No `reports/.saropa_lints/violations.json` yet. Run analysis, then refresh this tab.",
     "hintUnreadable": "No readable violations export. Run Saropa Lints analysis first.",
-    "hintStale": "Die Triage-Daten sind möglicherweise veraltet (der Export ist 0 alt). Führen Sie die Analyse für aktuelle Gruppen erneut durch. {age}",
-    "hintNoPerRule": "Bei diesem Export gibt es keine Problemanzahl pro Regel. Analysieren Sie erneut mit einem aktuellen Saropa Lints-Plugin.",
+    "hintStale": "Triage data may be outdated (export is {age} old). Re-run analysis for current groups.",
+    "hintNoPerRule": "This export has no per-rule issue counts. Re-analyze with a current Saropa Lints plugin.",
     "hintBuildFailed": "Could not build triage from this export. Run a fresh analysis.",
     "summaryVolume": "Rule triage (volume / must-fix / stylistic)",
     "hintSameAsTree": "Same grouping as the Triage activity-bar tree: filter Issues, or disable/enable rules in `analysis_options_custom.yaml`. Large groups may ask for confirmation."
@@ -389,33 +389,33 @@
     "documentTitle": "Saropa Package Dashboard",
     "heroTitle": "Saropa Package Dashboard",
     "status": {
-      "packagesCount": "0 Pakete {count}",
-      "packagesBreakdown": "{direct} direkt, {transitive} transitiv",
+      "packagesCount": "{count} packages",
+      "packagesBreakdown": "{direct} direct, {transitive} transitive",
       "gradeLine": "Grade {grade} · {avg}/100",
-      "flaggedCount": "0 markiert {count}",
+      "flaggedCount": "{count} flagged",
       "flaggedTitle": "Abandoned or end-of-life"
     },
     "scanning": {
       "heading": "Scanning packages",
       "body1": "Saropa is fetching pub.dev metadata, GitHub activity, and dependency graphs for every direct dependency in this project.",
-      "body2": "Diese Seite wird automatisch aktualisiert, wenn der Scan abgeschlossen ist. Sie können den Vorgang über die Fortschrittsbenachrichtigung unten rechts abbrechen.",
+      "body2": "This page will refresh automatically when the scan finishes. You can cancel from the progress notification in the bottom-right.",
       "versionStamp": "Saropa Package Dashboard v{version}"
     },
     "gaugeTitle": "Project Package Grade: {grade}",
     "summary": {
       "packages": "Packages",
       "projectGrade": "Project Package Grade",
-      "totalSize": "Gesamtgröße*",
+      "totalSize": "Total Size*",
       "gradeTooltip": "Project grade {avgGrade}\nAverage score: {avgScore}/100\nPackages: {pkgCount}\nA:{a} B:{b} C:{c} E:{e} F:{f}",
-      "vibrantTitle": "Lebendig",
+      "vibrantTitle": "Vibrant",
       "stableTitle": "Stable",
       "outdatedTitle": "Outdated",
       "abandonedTitle": "Abandoned",
       "eolTitle": "End of Life",
-      "updates": "Aktualisierungen",
-      "unused": "Unbenutzt",
+      "updates": "Updates",
+      "unused": "Unused",
       "singleUse": "Single-use",
-      "vulnerable": "Verletzlich",
+      "vulnerable": "Vulnerable",
       "overrides": "Overrides",
       "caveatLine1": "*Archive sizes before tree shaking. Actual app size will be smaller.",
       "caveatLine2": "Activity thresholds: 90d = stale, 180d = dormant (commit + release timelines)."
@@ -437,7 +437,7 @@
       "openOtherTitle": "Open another pubspec.yaml's project in a new window for Vibrancy scan",
       "openOtherLabel": "Open Project…",
       "footprintGroupAria": "Size column footprint mode",
-      "footprintGroupTitle": "Was die Spalte „Größe“ anzeigt: nur eigenes Archiv plus eindeutige Transitive (Kosten bei Entfernung) oder plus alle Transitive (theoretisches Maximum).",
+      "footprintGroupTitle": "What the Size column shows: own archive only, plus unique transitives (cost if removed), or plus all transitives (theoretical max).",
       "footprintLabel": "Footprint:",
       "footprintOwnTitle": "Own archive size only — matches pub.dev download size",
       "footprintOwn": "Own",
@@ -475,7 +475,7 @@
       },
       "score": {
         "label": "Category",
-        "tooltip": "Lebendigkeitsklassifizierung und Gesundheitsbewertung (0–10)"
+        "tooltip": "Vibrancy classification and health score (0–10)"
       },
       "published": {
         "label": "Published",
@@ -487,11 +487,11 @@
       },
       "likes": {
         "label": "Likes",
-        "tooltip": "pub.dev gefällt mir – klicken Sie, um die Seite mit der Paketbewertung zu öffnen"
+        "tooltip": "pub.dev likes — click to open the package score page"
       },
       "downloads": {
         "label": "Downloads",
-        "tooltip": "pub.dev-Downloads in den letzten 30 Tagen – klicken Sie, um die Seite mit der Paketbewertung zu öffnen"
+        "tooltip": "pub.dev downloads in the last 30 days — click to open the package score page"
       },
       "issues": {
         "label": "Issues",
@@ -514,7 +514,7 @@
         "tooltip": "Number of source files that import this package — click to search"
       },
       "transitives": {
-        "label": "Transitive",
+        "label": "Transitives",
         "tooltip": "Number of transitive (indirect) dependencies this package pulls in"
       },
       "vulns": {
@@ -526,12 +526,12 @@
         "tooltip": "SPDX license identifier from pub.dev"
       },
       "update": {
-        "label": "Aktualisieren",
+        "label": "Update",
         "tooltip": "Available version update: major, minor, or patch"
       },
       "status": {
         "label": "Status",
-        "tooltip": "Nutzungsstatus: ob das Paket in Ihrem Code unbenutzt erscheint"
+        "tooltip": "Usage status: whether the package appears unused in your code"
       },
       "description": {
         "label": "Description",
@@ -549,7 +549,7 @@
       "focusSearch": "Focus the search field",
       "nextRow": "Highlight the next package row",
       "prevRow": "Highlight the previous package row",
-      "toggleDetail": "Schalten Sie den hervorgehobenen Paketdetail-Expander um",
+      "toggleDetail": "Toggle the highlighted package detail expander",
       "escapeSearch": "Clear focused search; second Esc collapses all expanded rows",
       "historyBack": "Go back through the package navigation history",
       "showOverlay": "Show this shortcut overlay"
@@ -560,25 +560,25 @@
     "skipLink": "Skip to command catalog",
     "heroTitle": "Saropa Command Catalog",
     "status": {
-      "commands": "0 Befehle {count}",
-      "categories": "0 Kategorien {count}",
-      "recent": "0 kürzlich {count}",
-      "internalHidden": "0 Nur Kontextmenü (versteckt) {count}",
-      "wordCommands": "Befehle",
-      "wordCategories": "Kategorien",
-      "wordRecent": "jüngste"
+      "commands": "{count} commands",
+      "categories": "{count} categories",
+      "recent": "{count} recent",
+      "internalHidden": "{count} context-menu only (hidden)",
+      "wordCommands": "commands",
+      "wordCategories": "categories",
+      "wordRecent": "recent"
     },
     "search": {
       "placeholder": "Search title, description, or command id…",
       "ariaLabel": "Search commands",
       "clearAria": "Clear search",
       "hintLine1": "Matches each command's",
-      "hintStrongTitle": "Titel",
-      "hintStrongDesc": "Beschreibung",
-      "hintStrongId": "Ausweis",
+      "hintStrongTitle": "title",
+      "hintStrongDesc": "description",
+      "hintStrongId": "id",
       "hintLine2": "(id tokens are spaced too — type",
-      "hintLine2kbd": "Analyse ausführen",
-      "hintLine2End": "ohne Punkte)."
+      "hintLine2kbd": "run analysis",
+      "hintLine2End": "without dots)."
     },
     "toolbar": {
       "showInternal": "Show context-menu commands",
@@ -607,8 +607,8 @@
       "reset": "Reset filters"
     },
     "entry": {
-      "internalBadgeTitle": "Wird nur über Kontextmenüs ausgelöst",
-      "internalBadge": "Speisekarte",
+      "internalBadgeTitle": "Triggered from context menus only",
+      "internalBadge": "menu",
       "copyTitle": "Copy command id ({id})",
       "copyAria": "Copy command id"
     },
@@ -626,14 +626,14 @@
       "showLess": "Show less",
       "runSingular": " run",
       "runPlural": " runs",
-      "recentWord": "jüngste",
+      "recentWord": "recent",
       "expandAll": "Expand all",
       "collapseAll": "Collapse all",
       "searchChip": "Search: \"{query}\"",
       "internalChip": "Showing context-menu commands",
       "removeFilterPrefix": "Remove filter ",
-      "matchOne": "0 Übereinstimmung {count}",
-      "matchOther": "0 Übereinstimmungen {count}"
+      "matchOne": "{count} match",
+      "matchOther": "{count} matches"
     }
   }
 }

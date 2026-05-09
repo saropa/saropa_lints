@@ -43,7 +43,7 @@
     "reload": "Перезавантажити",
     "copyDetails": "Скопіюйте деталі",
     "unreachable": "Не вдалося досягти 0 {target}",
-    "partialSummary": "0 з 1 2 завантажено. 3 не вдалося. {loaded} {total} {item} {failed}",
+    "partialSummary": "{loaded} of {total} {item} loaded. {failed} failed.",
     "partialRetry": "Повторна спроба не вдалася"
   },
   "offline": {
@@ -91,24 +91,24 @@
     },
     "time": {
       "justNow": "тільки зараз",
-      "minutesAgo": "0хв тому {min}",
-      "hoursAgo": "0 год тому {hr}",
-      "daysAgo": "0дн. тому {day}"
+      "minutesAgo": "{min}m ago",
+      "hoursAgo": "{hr}h ago",
+      "daysAgo": "{day}d ago"
     },
     "status": {
       "lastRunPrefix": "Останній запуск",
       "lastRunUnknown": "Останній запуск невідомий",
       "noTimestampTitle": "Немає мітки часу на порушеннях.json",
       "findingsAfterFilterTitle": "Загальна кількість результатів після вимкнення фільтра правил",
-      "findingOne": "0 знахідка {count}",
-      "findingOther": "0 висновки {count}",
+      "findingOne": "{count} finding",
+      "findingOther": "{count} findings",
       "todoHackTitle": "У робочій області знайдено маркери TODO та HACK",
       "driftOnTitle": "Підключено Drift Advisor: 0 {label}",
       "driftOnPill": "Дрейф на · 0 {count}",
       "driftOfflineTitle": "Drift Advisor увімкнено, але сервер не знайдено",
       "driftOfflinePill": "Дрейф офлайн",
       "enabledRulesTitle": "Увімкнені правила на поточному рівні",
-      "rulesCount": "0 правил {count}"
+      "rulesCount": "{count} rules"
     },
     "groupBy": {
       "severity": "Суворість",
@@ -219,7 +219,7 @@
       "sectionAria": "Висновки",
       "expandAll": "Розгорнути все",
       "collapseAll": "Згорнути все",
-      "bulkSelected": "0 вибрано {count}",
+      "bulkSelected": "{count} selected",
       "bulkCopy": "Вибрана копія як JSON",
       "selectAllTitle": "Виберіть усі видимі знахідки",
       "selectAllAria": "Виберіть усі видимі знахідки",
@@ -230,8 +230,8 @@
       "colActionsAria": "Дії рядків",
       "selectRowAria": "Виберіть цей рядок знахідки",
       "copyRowTitle": "Скопіюйте цей результат як JSON",
-      "metaShown": "0 показано {filtered}",
-      "metaAfterDisable": "0 після вимкненого фільтра правила {total}",
+      "metaShown": "{filtered} shown",
+      "metaAfterDisable": "{total} after disabled-rule filter",
       "metaSourceCap": "джерело обмежене 0 для продуктивності {max}",
       "metaGroupedBy": "згруповані за 0 {mode}",
       "overflowNote": "Список джерел скорочено на 0 для продуктивності візуалізації. {max}",
@@ -260,7 +260,7 @@
       "scanOff": "Сканування робочої області вимкнено — увімкніть поверхню маркерів із файлів проекту.",
       "enableScan": "Увімкнути сканування",
       "heading": "ЗАВДАННЯ ТА ХАКИ",
-      "subsectionNone": "0: немає в діапазоні сканування. {title}",
+      "subsectionNone": "{title}: none in scan range.",
       "capNote": "Максимальний розмір файлу сканування; підніміть `saropaLints.todosAndHacks.maxFilesToScan` для повного покриття.",
       "notePill": "примітка",
       "todosLabel": "TODO",
@@ -296,12 +296,12 @@
       "byFile": "За файлом (0) {count}",
       "noEntries": "Записів немає.",
       "nothingHidden": "Нічого не приховано зі списку проблем у цій робочій області. Використовуйте дії контексту дерева, щоб приховати папки, файли або правила; вони зберігаються в стані робочої області.",
-      "folderPattern": "0 папка(и) {count}",
-      "filePattern": "0 шаблон(и) файлів {count}",
-      "ruleGlobal": "0 правил(ів) у всьому світі {count}",
-      "perFileRules": "0 файл(ів) із правилами приховування для кожного файлу {count}",
-      "severityHides": "0 ступінь серйозності приховати {count}",
-      "impactHides": "0 вплив приховування(ів) {count}",
+      "folderPattern": "{count} folder(s)",
+      "filePattern": "{count} file pattern(s)",
+      "ruleGlobal": "{count} rule(s) globally",
+      "perFileRules": "{count} file(s) with per-file rule hides",
+      "severityHides": "{count} severity hide(s)",
+      "impactHides": "{count} impact hide(s)",
       "activeHides": "Активні хованки: 0. {counts}",
       "viewHidesFooter": "Ці приховування зменшують лише список проблем/панелі; вони не записуються у `violations.json`.",
       "clearViewHides": "Очистити всі приховані перегляди",
@@ -317,11 +317,11 @@
       "metaRunning": "Це може зайняти деякий час у великих проектах.",
       "metaDone": "Оновлення інформаційної панелі з останніми висновками.",
       "announceSearch": "пошук 0 {q}",
-      "announceSeverities": "0 тяжкості {n}",
-      "announceImpacts": "0 впливів {n}",
+      "announceSeverities": "{n} severities",
+      "announceImpacts": "{n} impacts",
       "announceCleared": "Усі фільтри очищено",
       "announceFiltersPrefix": "Фільтри:",
-      "bulkSelected": "0 вибрано {n}",
+      "bulkSelected": "{n} selected",
       "analysisStartedDetail": "Розбір розпочато. Збір діагностики…",
       "announceStarted": "Розбір розпочато",
       "announceComplete": "Аналіз завершено",
@@ -329,7 +329,7 @@
       "analysisFailedDetail": "Аналіз не вдалося. Перевірте вихід для деталей.",
       "removeRecentAria": "видалити",
       "removeRecentTitle": "видалити",
-      "bulkSelectedTpl": "0 вибрано {n}"
+      "bulkSelectedTpl": "{n} selected"
     },
     "emptyState": {
       "hintAfterMessage": "Запустіть аналіз Saropa Lints, щоб згенерувати порушення.json, а потім скористайтеся «Оновити» тут або знову відкрийте цю інформаційну панель.",
@@ -353,8 +353,8 @@
     "on": "Увімкнено",
     "colRule": "правило",
     "colIssues": "Питання",
-    "zeroIssueRules": "0 правил із нульовими проблемами — автоматично ввімкнено на рівні. {count}",
-    "disabledOverrides": "0 правил вимкнено перевизначенням у `analysis_options_custom.yaml`. {count}",
+    "zeroIssueRules": "{count} rules with zero issues — auto-enabled in tier.",
+    "disabledOverrides": "{count} rules disabled by override in `analysis_options_custom.yaml`.",
     "summaryRuleTriage": "Правило сортування",
     "hintNoViolations": "`reports/.saropa_lints/violations.json` ще немає. Виконайте аналіз, а потім оновіть цю вкладку.",
     "hintUnreadable": "Експорт порушень відсутній. Спочатку запустіть аналіз Saropa Lints.",
@@ -389,10 +389,10 @@
     "documentTitle": "Інформаційна панель пакета Saropa",
     "heroTitle": "Інформаційна панель пакета Saropa",
     "status": {
-      "packagesCount": "0 пакетів {count}",
-      "packagesBreakdown": "{direct} прямих, {transitive} транзитивних",
+      "packagesCount": "{count} packages",
+      "packagesBreakdown": "{direct} direct, {transitive} transitive",
       "gradeLine": "Оцінка 0 · 1/100 {grade} {avg}",
-      "flaggedCount": "0 позначено {count}",
+      "flaggedCount": "{count} flagged",
       "flaggedTitle": "Покинутий або вийшов із життя"
     },
     "scanning": {
@@ -560,10 +560,10 @@
     "skipLink": "Перейти до каталогу команд",
     "heroTitle": "Каталог Saropa Command",
     "status": {
-      "commands": "0 команд {count}",
-      "categories": "0 категорій {count}",
-      "recent": "0 нещодавно {count}",
-      "internalHidden": "0 лише контекстне меню (приховано) {count}",
+      "commands": "{count} commands",
+      "categories": "{count} categories",
+      "recent": "{count} recent",
+      "internalHidden": "{count} context-menu only (hidden)",
       "wordCommands": "команди",
       "wordCategories": "категорії",
       "wordRecent": "останній"
@@ -632,8 +632,8 @@
       "searchChip": "Пошук: \"0\" {query}",
       "internalChip": "Відображення команд контекстного меню",
       "removeFilterPrefix": "Зняти фільтр",
-      "matchOne": "0 збіг {count}",
-      "matchOther": "0 відповідає {count}"
+      "matchOne": "{count} match",
+      "matchOther": "{count} matches"
     }
   }
 }

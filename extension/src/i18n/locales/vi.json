@@ -43,7 +43,7 @@
     "reload": "Tải lại",
     "copyDetails": "Sao chép chi tiết",
     "unreachable": "Không thể đạt tới 0 {target}",
-    "partialSummary": "0 của 1 2 đã nạp. 3 thất bại. {loaded} {total} {item} {failed}",
+    "partialSummary": "{loaded} of {total} {item} loaded. {failed} failed.",
     "partialRetry": "Thử lại không thành công"
   },
   "offline": {
@@ -91,24 +91,24 @@
     },
     "time": {
       "justNow": "ngay bây giờ",
-      "minutesAgo": "0phút trước {min}",
-      "hoursAgo": "0 giờ trước {hr}",
-      "daysAgo": "0ngày trước {day}"
+      "minutesAgo": "{min}m ago",
+      "hoursAgo": "{hr}h ago",
+      "daysAgo": "{day}d ago"
     },
     "status": {
       "lastRunPrefix": "Lần chạy cuối cùng",
       "lastRunUnknown": "Lần chạy cuối cùng không xác định",
       "noTimestampTitle": "Không có dấu thời gian trên vi phạm.json",
       "findingsAfterFilterTitle": "Tổng số phát hiện sau bộ lọc quy tắc bị vô hiệu hóa",
-      "findingOne": "0 phát hiện {count}",
-      "findingOther": "0 phát hiện {count}",
+      "findingOne": "{count} finding",
+      "findingOther": "{count} findings",
       "todoHackTitle": "Đã tìm thấy dấu TODO và HACK trong không gian làm việc",
       "driftOnTitle": "Drift Advisor đã kết nối: 0 {label}",
       "driftOnPill": "Trôi đi · 0 {count}",
       "driftOfflineTitle": "Đã bật Drift Advisor nhưng không tìm thấy máy chủ",
       "driftOfflinePill": "Trôi nhé",
       "enabledRulesTitle": "Quy tắc đã bật ở cấp hiện tại",
-      "rulesCount": "0 quy tắc {count}"
+      "rulesCount": "{count} rules"
     },
     "groupBy": {
       "severity": "Mức độ nghiêm trọng",
@@ -219,7 +219,7 @@
       "sectionAria": "Những phát hiện",
       "expandAll": "Mở rộng tất cả",
       "collapseAll": "Thu gọn tất cả",
-      "bulkSelected": "0 đã chọn {count}",
+      "bulkSelected": "{count} selected",
       "bulkCopy": "Bản sao được chọn dưới dạng JSON",
       "selectAllTitle": "Chọn tất cả các phát hiện có thể nhìn thấy",
       "selectAllAria": "Chọn tất cả các phát hiện có thể nhìn thấy",
@@ -230,8 +230,8 @@
       "colActionsAria": "Hành động hàng",
       "selectRowAria": "Chọn hàng tìm kiếm này",
       "copyRowTitle": "Sao chép kết quả này dưới dạng JSON",
-      "metaShown": "0 hiển thị {filtered}",
-      "metaAfterDisable": "0 sau bộ lọc quy tắc bị vô hiệu hóa {total}",
+      "metaShown": "{filtered} shown",
+      "metaAfterDisable": "{total} after disabled-rule filter",
       "metaSourceCap": "nguồn giới hạn ở 0 cho hiệu suất {max}",
       "metaGroupedBy": "được nhóm theo 0 {mode}",
       "overflowNote": "Danh sách nguồn bị cắt bớt ở mức 0 để đảm bảo hiệu suất kết xuất. {max}",
@@ -260,7 +260,7 @@
       "scanOff": "Quét không gian làm việc bị tắt — bật tính năng đánh dấu bề mặt từ các tệp dự án.",
       "enableScan": "Bật quét",
       "heading": "TODO & HACK",
-      "subsectionNone": "0: không có trong phạm vi quét. {title}",
+      "subsectionNone": "{title}: none in scan range.",
       "capNote": "Quét đạt giới hạn tệp tối đa; nâng cao `saropaLints.todosAndHacks.maxFilesToScan` để có được mức độ bao phủ đầy đủ.",
       "notePill": "ghi chú",
       "todosLabel": "TODO",
@@ -296,12 +296,12 @@
       "byFile": "Theo hồ sơ (0) {count}",
       "noEntries": "Không có mục nào.",
       "nothingHidden": "Không có gì ẩn khỏi danh sách Sự cố trong không gian làm việc này. Sử dụng các hành động ngữ cảnh dạng cây để ẩn các thư mục, tệp hoặc quy tắc; chúng vẫn tồn tại trong trạng thái không gian làm việc.",
-      "folderPattern": "0 thư mục {count}",
-      "filePattern": "0 mẫu tập tin {count}",
-      "ruleGlobal": "0 (các) quy tắc trên toàn cầu {count}",
-      "perFileRules": "0 (các) tệp có quy tắc ẩn cho mỗi tệp {count}",
-      "severityHides": "0 mức độ nghiêm trọng ẩn {count}",
-      "impactHides": "0 tác động ẩn (s) {count}",
+      "folderPattern": "{count} folder(s)",
+      "filePattern": "{count} file pattern(s)",
+      "ruleGlobal": "{count} rule(s) globally",
+      "perFileRules": "{count} file(s) with per-file rule hides",
+      "severityHides": "{count} severity hide(s)",
+      "impactHides": "{count} impact hide(s)",
       "activeHides": "Ẩn nấp chủ động: 0. {counts}",
       "viewHidesFooter": "Những phần ẩn này chỉ thu nhỏ danh sách Sự cố / bảng thông tin; chúng không được ghi vào `violations.json`.",
       "clearViewHides": "Xóa tất cả chế độ xem ẩn",
@@ -317,11 +317,11 @@
       "metaRunning": "Điều này có thể mất một chút thời gian đối với các dự án lớn.",
       "metaDone": "Làm mới bảng điều khiển với những phát hiện mới nhất.",
       "announceSearch": "tìm kiếm 0 {q}",
-      "announceSeverities": "0 mức độ nghiêm trọng {n}",
-      "announceImpacts": "0 tác động {n}",
+      "announceSeverities": "{n} severities",
+      "announceImpacts": "{n} impacts",
       "announceCleared": "Đã xóa tất cả bộ lọc",
       "announceFiltersPrefix": "Bộ lọc:",
-      "bulkSelected": "0 đã chọn {n}",
+      "bulkSelected": "{n} selected",
       "analysisStartedDetail": "Phân tích bắt đầu. Đang thu thập chẩn đoán…",
       "announceStarted": "Đã bắt đầu phân tích",
       "announceComplete": "Phân tích hoàn tất",
@@ -329,7 +329,7 @@
       "analysisFailedDetail": "Phân tích không thành công. Kiểm tra đầu ra để biết chi tiết.",
       "removeRecentAria": "Di dời",
       "removeRecentTitle": "Di dời",
-      "bulkSelectedTpl": "0 đã chọn {n}"
+      "bulkSelectedTpl": "{n} selected"
     },
     "emptyState": {
       "hintAfterMessage": "Chạy phân tích Saropa Lints để tạo vi phạm.json, sau đó sử dụng Làm mới tại đây hoặc mở lại trang tổng quan này.",
@@ -353,8 +353,8 @@
     "on": "TRÊN",
     "colRule": "Luật lệ",
     "colIssues": "Vấn đề",
-    "zeroIssueRules": "0 quy tắc không có vấn đề gì — được bật tự động theo cấp độ. {count}",
-    "disabledOverrides": "0 quy tắc bị vô hiệu hóa do ghi đè trong `analysis_options_custom.yaml`. {count}",
+    "zeroIssueRules": "{count} rules with zero issues — auto-enabled in tier.",
+    "disabledOverrides": "{count} rules disabled by override in `analysis_options_custom.yaml`.",
     "summaryRuleTriage": "Phân loại quy tắc",
     "hintNoViolations": "Chưa có `reports/.saropa_lints/violations.json`. Chạy phân tích, sau đó làm mới tab này.",
     "hintUnreadable": "Không xuất vi phạm có thể đọc được. Chạy phân tích Saropa Lints trước.",
@@ -389,10 +389,10 @@
     "documentTitle": "Bảng điều khiển gói Saropa",
     "heroTitle": "Bảng điều khiển gói Saropa",
     "status": {
-      "packagesCount": "0 gói {count}",
-      "packagesBreakdown": "{direct} trực tiếp, {transitive} gián tiếp",
+      "packagesCount": "{count} packages",
+      "packagesBreakdown": "{direct} direct, {transitive} transitive",
       "gradeLine": "Lớp 0 · 1/100 {grade} {avg}",
-      "flaggedCount": "0 được gắn cờ {count}",
+      "flaggedCount": "{count} flagged",
       "flaggedTitle": "Bị bỏ rơi hoặc cuối đời"
     },
     "scanning": {
@@ -560,10 +560,10 @@
     "skipLink": "Chuyển đến danh mục lệnh",
     "heroTitle": "Danh mục lệnh Saropa",
     "status": {
-      "commands": "0 lệnh {count}",
-      "categories": "0 danh mục {count}",
-      "recent": "0 gần đây {count}",
-      "internalHidden": "0 chỉ menu ngữ cảnh (ẩn) {count}",
+      "commands": "{count} commands",
+      "categories": "{count} categories",
+      "recent": "{count} recent",
+      "internalHidden": "{count} context-menu only (hidden)",
       "wordCommands": "lệnh",
       "wordCategories": "Thể loại",
       "wordRecent": "gần đây"
@@ -632,8 +632,8 @@
       "searchChip": "Tìm kiếm: \"0\" {query}",
       "internalChip": "Hiển thị các lệnh menu ngữ cảnh",
       "removeFilterPrefix": "Xóa bộ lọc",
-      "matchOne": "0 trận đấu {count}",
-      "matchOther": "0 trận đấu {count}"
+      "matchOne": "{count} match",
+      "matchOther": "{count} matches"
     }
   }
 }

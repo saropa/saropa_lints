@@ -32,10 +32,10 @@
     "scanning": "اسڪين ٿي رهيو آهي…",
     "cancel": "منسوخ",
     "runningAnalysis": "Running analysis…",
-    "analysisComplete": "Analysis complete",
+    "analysisComplete": "تجزیہ مکمل",
     "refreshingDashboard": "Refreshing dashboard with the latest findings.",
-    "analysisStartedDetail": "Analysis started. Collecting diagnostics…",
-    "analysisFailedDetail": "Analysis failed. Check output for details."
+    "analysisStartedDetail": "تجزیہ شروع ہوا۔ تشخیصی معلومات جمع کی جا رہی ہیں…",
+    "analysisFailedDetail": "تجزیہ ناکام ہو گیا۔ تفصیلات کے لیے آؤٹ پٹ چیک کریں۔"
   },
   "error": {
     "genericTitle": "ڪجهه غلط ٿي ويو",
@@ -83,14 +83,14 @@
   "findingsDash": {
     "pageTitle": "Saropa Findings Dashboard",
     "documentTitle": "Saropa Findings Dashboard",
-    "skipToFindings": "Skip to findings",
-    "secondaryAsideLabel": "Secondary diagnostics",
+    "skipToFindings": "نتائج پر جائیں۔",
+    "secondaryAsideLabel": "ثانوی تشخیص",
     "hero": {
-      "productTitle": "Findings Dashboard",
+      "productTitle": "فائنڈنگ ڈیش بورڈ",
       "gaugeTitle": "Health score {score}/100 (grade {grade}). Errors weigh heaviest."
     },
     "time": {
-      "justNow": "just now",
+      "justNow": "ابھی",
       "minutesAgo": "{min}m ago",
       "hoursAgo": "{hr}h ago",
       "daysAgo": "{day}d ago"
@@ -99,20 +99,20 @@
       "lastRunPrefix": "Last run",
       "lastRunUnknown": "Last run unknown",
       "noTimestampTitle": "No timestamp on violations.json",
-      "findingsAfterFilterTitle": "Total findings after disabled-rule filter",
+      "findingsAfterFilterTitle": "غیر فعال اصول فلٹر کے بعد کل نتائج",
       "findingOne": "{count} finding",
       "findingOther": "{count} findings",
-      "todoHackTitle": "TODO and HACK markers found in workspace",
-      "driftOnTitle": "Drift Advisor connected: {label}",
-      "driftOnPill": "Drift on · {count}",
-      "driftOfflineTitle": "Drift Advisor enabled but no server found",
-      "driftOfflinePill": "Drift offline",
-      "enabledRulesTitle": "Enabled rules in current tier",
+      "todoHackTitle": "TODO اور HACK مارکر ورک اسپیس میں پائے گئے۔",
+      "driftOnTitle": "ڈرفٹ ایڈوائزر منسلک: 0 {label}",
+      "driftOnPill": "بڑھے ہوئے · 0 {count}",
+      "driftOfflineTitle": "ڈرفٹ ایڈوائزر فعال ہے لیکن کوئی سرور نہیں ملا",
+      "driftOfflinePill": "ڈرفٹ آف لائن",
+      "enabledRulesTitle": "موجودہ درجے میں فعال قوانین",
       "rulesCount": "{count} rules"
     },
     "groupBy": {
-      "severity": "Severity",
-      "file": "File",
+      "severity": "شدت",
+      "file": "فائل",
       "impact": "Impact",
       "rule": "Rule",
       "owasp": "OWASP",
@@ -120,76 +120,76 @@
       "ruleStatus": "Rule status"
     },
     "seg": {
-      "toggleSeverityTitle": "Toggle {v} severity",
-      "toggleImpactTitle": "Toggle {v} impact"
+      "toggleSeverityTitle": "ٹوگل 0 شدت {v}",
+      "toggleImpactTitle": "ٹوگل 0 اثر {v}"
     },
     "kpi": {
-      "visibleLabel": "Visible findings",
-      "allMatched": "all matched",
-      "ofTotal": "of {total} total",
-      "clearFiltersTitle": "Click to clear all filters",
-      "errorsLabel": "Errors",
-      "errorsSubFix": "must fix",
-      "errorsSubClear": "none — clear",
-      "errorsTitle": "Filter findings to errors (must fix — broken / will crash / exploitable)",
-      "warningsLabel": "Warnings",
-      "warningsSubBad": "could fail or look bad",
-      "warningsSubClear": "none — clear",
-      "warningsTitle": "Filter findings to warnings (could fail or look bad)",
+      "visibleLabel": "مرئی نتائج",
+      "allMatched": "سب ملایا",
+      "ofTotal": "کل 0 کا {total}",
+      "clearFiltersTitle": "تمام فلٹرز کو صاف کرنے کے لیے کلک کریں۔",
+      "errorsLabel": "غلطیاں",
+      "errorsSubFix": "ٹھیک کرنا ہوگا",
+      "errorsSubClear": "کوئی نہیں - واضح",
+      "errorsTitle": "غلطیوں کے نتائج کو فلٹر کریں (درست کرنا ضروری ہے - ٹوٹا ہوا / کریش ہو جائے گا / قابل استعمال)",
+      "warningsLabel": "انتباہات",
+      "warningsSubBad": "ناکام یا برا لگ سکتا ہے",
+      "warningsSubClear": "کوئی نہیں - واضح",
+      "warningsTitle": "نتائج کو انتباہات میں فلٹر کریں (ناکام ہو سکتا ہے یا برا لگ سکتا ہے)",
       "infoLabel": "Info",
-      "infoSub": "FYI — style / suggestions",
-      "infoSubNone": "none",
-      "infoTitle": "Filter findings to info (FYI — style and suggestions)",
-      "filesLabel": "Files affected",
-      "filesSubAcross": "across the export",
-      "filesSubNone": "no files affected",
-      "filesTitle": "Distinct files contributing at least one finding",
-      "topRuleLabel": "Top rule",
-      "topRuleTitle": "Filter findings to rule {name}"
+      "infoSub": "FYI - انداز / تجاویز",
+      "infoSubNone": "کوئی نہیں",
+      "infoTitle": "معلومات کو فلٹر کریں (FYI - انداز اور تجاویز)",
+      "filesLabel": "فائلیں متاثر ہوئیں",
+      "filesSubAcross": "برآمد بھر میں",
+      "filesSubNone": "کوئی فائل متاثر نہیں ہوئی۔",
+      "filesTitle": "کم از کم ایک تلاش میں حصہ ڈالنے والی الگ فائلیں۔",
+      "topRuleLabel": "سب سے اوپر اصول",
+      "topRuleTitle": "حکمرانی کے لیے نتائج کو فلٹر کریں 0 {name}"
     },
     "toolbar": {
-      "ariaFiltersActions": "Filters and actions",
+      "ariaFiltersActions": "فلٹرز اور اعمال",
       "groupByFieldTitle": "Group findings by selected dimension",
       "groupByLabel": "Group by",
-      "textFilterTitle": "Filter findings by file path, rule, or message text",
-      "textFilterPlaceholder": "Filter by file, rule, or message…",
-      "textFilterAria": "Text filter",
-      "clearTextFilterTitle": "Clear text filter",
-      "clearTextFilterAria": "Clear text filter",
+      "textFilterTitle": "فائل پاتھ، اصول، یا پیغام کے متن کے ذریعے نتائج کو فلٹر کریں۔",
+      "textFilterPlaceholder": "فائل، اصول، یا پیغام کے لحاظ سے فلٹر کریں…",
+      "textFilterAria": "ٹیکسٹ فلٹر",
+      "clearTextFilterTitle": "ٹیکسٹ فلٹر صاف کریں۔",
+      "clearTextFilterAria": "ٹیکسٹ فلٹر صاف کریں۔",
       "recentFiltersTitle": "Recent filters",
-      "clearRecentTitle": "Clear all recent filters",
-      "clearRecentButton": "Clear",
+      "clearRecentTitle": "تمام حالیہ فلٹرز کو صاف کریں۔",
+      "clearRecentButton": "صاف",
       "recentFiltersListAria": "Recent filters",
       "runAnalysisTitle": "Run Saropa Lints analysis",
       "refreshViolationsTitle": "Reload violations.json from disk",
-      "severityGroupAria": "Severity filter",
-      "severityLabel": "Severity",
+      "severityGroupAria": "شدت کا فلٹر",
+      "severityLabel": "شدت",
       "impactGroupAria": "Impact filter",
       "impactLabel": "Impact",
       "moreSummary": "More",
       "moreChevron": "▾",
-      "copyJsonTitle": "Copy filtered violations as JSON ({count})",
-      "saveReportTitle": "Save filtered violations as JSON to reports/YYYYMMDD/"
+      "copyJsonTitle": "فلٹر شدہ خلاف ورزیوں کو JSON (0) کے بطور کاپی کریں {count}",
+      "saveReportTitle": "فلٹر شدہ خلاف ورزیوں کو JSON کے بطور رپورٹس/YYYYMMDD/ میں محفوظ کریں"
     },
     "chip": {
-      "contains": "contains \"{q}\"",
-      "severityOff": "severity ≠ {v}",
-      "impactOff": "impact ≠ {v}",
+      "contains": "\"0\" پر مشتمل ہے {q}",
+      "severityOff": "شدت ≠ 0 {v}",
+      "impactOff": "اثر ≠ 0 {v}",
       "resetAllTitle": "Reset all filters",
       "removeFilterAria": "Remove filter"
     },
     "menuPalette": {
       "help": "مدد",
       "groupBy": "Group by…",
-      "textFilter": "Text filter…",
-      "severityImpact": "Severity & impact",
+      "textFilter": "ٹیکسٹ فلٹر…",
+      "severityImpact": "شدت اور اثر",
       "hideRules": "Hide rules…",
       "ruleMetadata": "Rule metadata",
-      "clearFilters": "Clear filters",
-      "clearSuppressions": "Clear suppressions",
-      "clearFileFocus": "Clear file focus",
+      "clearFilters": "فلٹرز صاف کریں۔",
+      "clearSuppressions": "واضح دباو",
+      "clearFileFocus": "فائل فوکس کو صاف کریں۔",
       "matchActiveEditor": "Match active editor",
-      "copyTreeJson": "Copy tree JSON",
+      "copyTreeJson": "درخت JSON کاپی کریں۔",
       "refreshExtension": "Refresh extension",
       "openPackageDashboard": "Open Package dashboard",
       "openCodeHealth": "Open Code Health",
@@ -197,49 +197,49 @@
     },
     "progress": {
       "runningLabel": "Running analysis…",
-      "runningMeta": "This can take a moment on large projects."
+      "runningMeta": "یہ بڑے منصوبوں پر ایک لمحہ لے سکتا ہے۔"
     },
     "topRules": {
-      "sectionAria": "Top rules by count",
+      "sectionAria": "شمار کے لحاظ سے سرفہرست اصول",
       "hideTitle": "Hide for me only — workspace-level, reversible via Clear Suppressions",
       "hideButton": "Hide",
-      "disableTitle": "Disable for the whole project — writes analysis_options_custom.yaml and re-runs analysis",
-      "disableButton": "Disable",
-      "workspaceOnlyShort": "workspace only",
-      "projectConfigShort": "project config (writes analysis_options_custom.yaml)",
-      "topRulesOne": "Top {count} rule",
-      "topRulesOther": "Top {count} rules",
+      "disableTitle": "پورے پروجیکٹ کے لیے غیر فعال کریں — analysis_options_custom.yaml لکھتا ہے اور تجزیہ دوبارہ چلاتا ہے",
+      "disableButton": "غیر فعال کریں۔",
+      "workspaceOnlyShort": "صرف کام کی جگہ",
+      "projectConfigShort": "پروجیکٹ کی تشکیل (تحریر analysis_options_custom.yaml)",
+      "topRulesOne": "سرفہرست 0 اصول {count}",
+      "topRulesOther": "سرفہرست 0 قواعد {count}",
       "colRank": "#",
       "colRule": "Rule",
-      "colCount": "Count",
-      "colSeverity": "Severity",
+      "colCount": "شمار",
+      "colSeverity": "شدت",
       "colActionsAria": "Row actions"
     },
     "findings": {
-      "sectionAria": "Findings",
-      "expandAll": "Expand all",
-      "collapseAll": "Collapse all",
+      "sectionAria": "نتائج",
+      "expandAll": "سبھی کو پھیلائیں۔",
+      "collapseAll": "سب کو سمیٹیں۔",
       "bulkSelected": "{count} selected",
-      "bulkCopy": "Copy selected as JSON",
-      "selectAllTitle": "Select all visible findings",
-      "selectAllAria": "Select all visible findings",
-      "colSeverity": "Severity",
+      "bulkCopy": "JSON کے بطور منتخب کردہ کاپی کریں۔",
+      "selectAllTitle": "تمام مرئی نتائج کو منتخب کریں۔",
+      "selectAllAria": "تمام مرئی نتائج کو منتخب کریں۔",
+      "colSeverity": "شدت",
       "colRule": "Rule",
       "colMessage": "Message",
       "colLine": "Line",
       "colActionsAria": "Row actions",
-      "selectRowAria": "Select this finding row",
-      "copyRowTitle": "Copy this finding as JSON",
+      "selectRowAria": "اس تلاش کی قطار کو منتخب کریں۔",
+      "copyRowTitle": "اس تلاش کو JSON کے بطور کاپی کریں۔",
       "metaShown": "{filtered} shown",
       "metaAfterDisable": "{total} after disabled-rule filter",
-      "metaSourceCap": "source capped at {max} for performance",
-      "metaGroupedBy": "grouped by {mode}",
-      "overflowNote": "Source list truncated at {max} for render performance.",
+      "metaSourceCap": "کارکردگی کے لیے ماخذ 0 پر بند ہے۔ {max}",
+      "metaGroupedBy": "0 کے ذریعے گروپ کردہ {mode}",
+      "overflowNote": "رینڈر کارکردگی کے لیے ماخذ کی فہرست 0 پر تراشی گئی۔ {max}",
       "runAgain": "Run analysis again",
       "emptyNoViolations": "No violations in the last analysis run.",
       "emptyNoMatch": "No violations match the current filters.",
       "emptyHintNoData": "Run analysis to populate `reports/.saropa_lints/violations.json`, then refresh.",
-      "emptyHintFilters": "Adjust filters or run analysis again to see findings.",
+      "emptyHintFilters": "نتائج کو دیکھنے کے لیے فلٹرز کو ایڈجسٹ کریں یا دوبارہ تجزیہ چلائیں۔",
       "reRunAnalysis": "Re-run analysis",
       "resetFilters": "فلٽر ري سيٽ ڪريو",
       "linePrefix": "L{line}"
@@ -247,53 +247,53 @@
     "charts": {
       "sectionAria": "Mix charts",
       "heading": "Mix",
-      "metaClickSlice": "click a slice to filter",
-      "severityMix": "Severity mix",
+      "metaClickSlice": "فلٹر کرنے کے لیے ایک سلائس پر کلک کریں۔",
+      "severityMix": "شدت کا مرکب",
       "impactMix": "Impact mix",
-      "filterBarTitle": "Filter to {key} only",
-      "donutTotal": "total"
+      "filterBarTitle": "صرف 0 پر فلٹر کریں۔ {key}",
+      "donutTotal": "کل"
     },
     "todoHack": {
-      "sectionAria": "TODOs and HACKS",
-      "headingDisabled": "TODOs & HACKS",
-      "metaDisabled": "scan disabled",
-      "scanOff": "Workspace scan is off — enable to surface markers from project files.",
-      "enableScan": "Enable scan",
-      "heading": "TODOs & HACKS",
+      "sectionAria": "ٹوڈو اور ہیکس",
+      "headingDisabled": "ٹوڈو اور ہیکس",
+      "metaDisabled": "اسکین غیر فعال",
+      "scanOff": "ورک اسپیس اسکین آف ہے — پروجیکٹ فائلوں سے مارکر کو سطح پر کرنے کے لیے فعال کریں۔",
+      "enableScan": "اسکین کو فعال کریں۔",
+      "heading": "ٹوڈو اور ہیکس",
       "subsectionNone": "{title}: none in scan range.",
-      "capNote": "Scan hit max-file cap; raise `saropaLints.todosAndHacks.maxFilesToScan` for full coverage.",
-      "notePill": "note",
+      "capNote": "اسکین ہٹ میکس فائل کیپ؛ مکمل کوریج کے لیے `saropaLints.todosAndHacks.maxFilesToScan` بڑھائیں۔",
+      "notePill": "نوٹ",
       "todosLabel": "TODOs",
       "hacksLabel": "HACKS"
     },
     "drift": {
-      "sectionAria": "Drift Advisor",
-      "headingOff": "Drift Advisor",
-      "metaOff": "integration off",
-      "enableBlurb": "Enable Drift Advisor integration to surface database suggestions here.",
-      "enable": "Enable",
-      "headingNoServer": "Drift Advisor",
-      "metaNoServer": "no server",
+      "sectionAria": "بڑھے ہوئے مشیر",
+      "headingOff": "بڑھے ہوئے مشیر",
+      "metaOff": "انضمام بند",
+      "enableBlurb": "Drift Advisor کے انضمام کو ڈیٹا بیس کی تجاویز کو یہاں پر فعال کریں۔",
+      "enable": "فعال کریں۔",
+      "headingNoServer": "بڑھے ہوئے مشیر",
+      "metaNoServer": "کوئی سرور نہیں",
       "noServerBlurb": "No Drift Advisor server found on configured ports.",
       "retry": "ٻيهر ڪوشش",
-      "headingConnected": "Drift Advisor",
-      "metaConnected": "connected",
-      "noIssues": "Connected to {label} — no current issues.",
+      "headingConnected": "بڑھے ہوئے مشیر",
+      "metaConnected": "منسلک",
+      "noIssues": "0 سے منسلک — کوئی موجودہ مسئلہ نہیں۔ {label}",
       "refresh": "ريفريش",
       "openBrowser": "Open in browser",
-      "headingIssues": "Drift Advisor",
-      "disable": "Disable Drift Advisor"
+      "headingIssues": "بڑھے ہوئے مشیر",
+      "disable": "ڈرفٹ ایڈوائزر کو غیر فعال کریں۔"
     },
     "suppressions": {
-      "sectionAria": "Suppressions",
-      "headingExport": "Suppressions (export)",
+      "sectionAria": "دبانے",
+      "headingExport": "دباو (برآمد)",
       "viewHidesHeading": "Issues view hides",
-      "viewHidesMetaActive": "active",
-      "viewHidesMetaNone": "none",
+      "viewHidesMetaActive": "فعال",
+      "viewHidesMetaNone": "کوئی نہیں",
       "noneInExport": "No analyzer suppressions in the current `violations.json` export. Run analysis after editing ignores or baselines to populate.",
-      "totalRow": "Total — clear filters and open Findings",
-      "byRule": "By rule ({count})",
-      "byFile": "By file ({count})",
+      "totalRow": "کل — واضح فلٹرز اور اوپن فائنڈنگز",
+      "byRule": "اصول کے مطابق (0) {count}",
+      "byFile": "بذریعہ فائل (0) {count}",
       "noEntries": "No entries.",
       "nothingHidden": "Nothing hidden from the Issues list in this workspace. Use tree context actions to hide folders, files, or rules; they persist in workspace state.",
       "folderPattern": "{count} folder(s)",
@@ -302,31 +302,31 @@
       "perFileRules": "{count} file(s) with per-file rule hides",
       "severityHides": "{count} severity hide(s)",
       "impactHides": "{count} impact hide(s)",
-      "activeHides": "Active hides: {counts}.",
-      "viewHidesFooter": "These hides shrink the Issues / dashboard list only; they are not written to `violations.json`.",
-      "clearViewHides": "Clear all view hides",
-      "foldersSample": "Folders (sample)",
-      "filesSample": "Files / globs (sample)",
+      "activeHides": "فعال چھپائیں: 0۔ {counts}",
+      "viewHidesFooter": "یہ چھپائیں صرف مسائل / ڈیش بورڈ کی فہرست کو سکڑتی ہیں۔ وہ `violations.json` پر نہیں لکھے گئے ہیں۔",
+      "clearViewHides": "تمام ویو ہائڈز کو صاف کریں۔",
+      "foldersSample": "فولڈرز (نمونہ)",
+      "filesSample": "فائلیں / گلوبز (نمونہ)",
       "rulesSample": "Rules (sample)",
       "perFileRulesSample": "Per-file rules (sample)",
-      "unknownKind": "Unknown"
+      "unknownKind": "نامعلوم"
     },
     "script": {
       "analysisRunning": "Running analysis…",
-      "analysisComplete": "Analysis complete",
-      "metaRunning": "This can take a moment on large projects.",
+      "analysisComplete": "تجزیہ مکمل",
+      "metaRunning": "یہ بڑے منصوبوں پر ایک لمحہ لے سکتا ہے۔",
       "metaDone": "Refreshing dashboard with the latest findings.",
-      "announceSearch": "search {q}",
+      "announceSearch": "تلاش کریں 0 {q}",
       "announceSeverities": "{n} severities",
       "announceImpacts": "{n} impacts",
-      "announceCleared": "All filters cleared",
-      "announceFiltersPrefix": "Filters:",
+      "announceCleared": "تمام فلٹرز صاف ہو گئے۔",
+      "announceFiltersPrefix": "فلٹرز:",
       "bulkSelected": "{n} selected",
-      "analysisStartedDetail": "Analysis started. Collecting diagnostics…",
-      "announceStarted": "Analysis started",
-      "announceComplete": "Analysis complete",
-      "announceFailed": "Analysis failed",
-      "analysisFailedDetail": "Analysis failed. Check output for details.",
+      "analysisStartedDetail": "تجزیہ شروع ہوا۔ تشخیصی معلومات جمع کی جا رہی ہیں…",
+      "announceStarted": "تجزیہ شروع ہوا۔",
+      "announceComplete": "تجزیہ مکمل",
+      "announceFailed": "تجزیہ ناکام ہو گیا۔",
+      "analysisFailedDetail": "تجزیہ ناکام ہو گیا۔ تفصیلات کے لیے آؤٹ پٹ چیک کریں۔",
       "removeRecentAria": "هٽايو",
       "removeRecentTitle": "هٽايو",
       "bulkSelectedTpl": "{n} selected"
@@ -336,18 +336,18 @@
       "refreshDisk": "Refresh from disk"
     },
     "shortcuts": {
-      "focusTextFilter": "Focus the text filter",
-      "clearTextFilter": "Clear the focused text filter",
-      "activateKpi": "Activate focused KPI card or chart bar",
-      "activateKpiSpace": "Activate focused KPI card or chart bar",
-      "showOverlay": "Show this shortcut overlay"
+      "focusTextFilter": "ٹیکسٹ فلٹر پر فوکس کریں۔",
+      "clearTextFilter": "فوکسڈ ٹیکسٹ فلٹر کو صاف کریں۔",
+      "activateKpi": "فوکسڈ KPI کارڈ یا چارٹ بار کو فعال کریں۔",
+      "activateKpiSpace": "فوکسڈ KPI کارڈ یا چارٹ بار کو فعال کریں۔",
+      "showOverlay": "یہ شارٹ کٹ اوورلے دکھائیں۔"
     },
-    "unknownAnalyzerKind": "Unknown"
+    "unknownAnalyzerKind": "نامعلوم"
   },
   "triageDash": {
-    "showInIssues": "Show in Issues",
-    "disableRules": "Disable rules",
-    "enableRules": "Enable rules",
+    "showInIssues": "ایشوز میں دکھائیں۔",
+    "disableRules": "قواعد کو غیر فعال کریں۔",
+    "enableRules": "قواعد کو فعال کریں۔",
     "issues": "Issues",
     "off": "Off",
     "on": "On",
@@ -358,107 +358,107 @@
     "summaryRuleTriage": "Rule triage",
     "hintNoViolations": "No `reports/.saropa_lints/violations.json` yet. Run analysis, then refresh this tab.",
     "hintUnreadable": "No readable violations export. Run Saropa Lints analysis first.",
-    "hintStale": "Triage data may be outdated (export is {age} old). Re-run analysis for current groups.",
-    "hintNoPerRule": "This export has no per-rule issue counts. Re-analyze with a current Saropa Lints plugin.",
-    "hintBuildFailed": "Could not build triage from this export. Run a fresh analysis.",
+    "hintStale": "ٹرائیج ڈیٹا پرانا ہو سکتا ہے (برآمد 0 پرانا ہے)۔ موجودہ گروپس کے لیے دوبارہ تجزیہ کریں۔ {age}",
+    "hintNoPerRule": "اس ایکسپورٹ کا کوئی اصولی مسئلہ شمار نہیں ہے۔ موجودہ سروپا لِنٹ پلگ ان کے ساتھ دوبارہ تجزیہ کریں۔",
+    "hintBuildFailed": "اس برآمد سے ٹرائیج نہیں بن سکا۔ ایک تازہ تجزیہ چلائیں۔",
     "summaryVolume": "Rule triage (volume / must-fix / stylistic)",
     "hintSameAsTree": "Same grouping as the Triage activity-bar tree: filter Issues, or disable/enable rules in `analysis_options_custom.yaml`. Large groups may ask for confirmation."
   },
   "kbdOverlay": {
-    "toggleTitle": "Show keyboard shortcuts (?)",
-    "toggleAria": "Show keyboard shortcuts",
+    "toggleTitle": "کی بورڈ شارٹ کٹ دکھائیں (؟)",
+    "toggleAria": "کی بورڈ شارٹ کٹ دکھائیں۔",
     "dialogTitle": "ڪي بورڊ شارٽ ڪٽس",
-    "closeAria": "Close keyboard shortcuts",
+    "closeAria": "کی بورڈ شارٹ کٹس بند کریں۔",
     "footer": "Press Esc or click outside to close."
   },
   "wideReport": {
     "openWorkspaceFirst": "Open a workspace folder first.",
     "noReportYet": "No violations report yet. Run Saropa Lints analysis first.",
-    "clipboardCopyFailed": "Could not copy to clipboard.",
-    "copiedViolationsJson": "Copied {count} violation(s) as JSON.",
-    "copiedOneViolationJson": "Copied 1 violation as JSON.",
-    "driftNotConnected": "Drift Advisor server is not connected.",
-    "copiedBulkFindings": "Copied {count} selected finding(s) as JSON.",
+    "clipboardCopyFailed": "کلپ بورڈ پر کاپی نہیں کیا جا سکا۔",
+    "copiedViolationsJson": "0 خلاف ورزی (خلاف ورزیوں) کو JSON کے بطور کاپی کیا گیا۔ {count}",
+    "copiedOneViolationJson": "JSON کے بطور 1 خلاف ورزی کاپی کی گئی۔",
+    "driftNotConnected": "ڈرفٹ ایڈوائزر سرور منسلک نہیں ہے۔",
+    "copiedBulkFindings": "کاپی کیا گیا 0 منتخب کردہ تلاش (زبانیں) بطور JSON۔ {count}",
     "noMatchingFindingsCopy": "No matching findings to copy.",
-    "couldNotOpenFile": "Could not open file: {path}",
+    "couldNotOpenFile": "فائل نہیں کھولی جا سکی: 0 {path}",
     "saveReportNoWorkspace": "Open a workspace folder before saving the report.",
-    "savedFindings": "Saved {count} finding(s): {path}",
-    "couldNotSaveReportJson": "Could not save report JSON."
+    "savedFindings": "محفوظ کردہ 0 تلاشیں: 1 {count} {path}",
+    "couldNotSaveReportJson": "رپورٹ JSON کو محفوظ نہیں کیا جا سکا۔"
   },
   "packageDashboard": {
-    "documentTitle": "Saropa Package Dashboard",
-    "heroTitle": "Saropa Package Dashboard",
+    "documentTitle": "سروپا پیکیج ڈیش بورڈ",
+    "heroTitle": "سروپا پیکیج ڈیش بورڈ",
     "status": {
       "packagesCount": "{count} packages",
       "packagesBreakdown": "{direct} direct, {transitive} transitive",
       "gradeLine": "Grade {grade} · {avg}/100",
       "flaggedCount": "{count} flagged",
-      "flaggedTitle": "Abandoned or end-of-life"
+      "flaggedTitle": "لاوارث یا زندگی کا خاتمہ"
     },
     "scanning": {
-      "heading": "Scanning packages",
-      "body1": "Saropa is fetching pub.dev metadata, GitHub activity, and dependency graphs for every direct dependency in this project.",
-      "body2": "This page will refresh automatically when the scan finishes. You can cancel from the progress notification in the bottom-right.",
-      "versionStamp": "Saropa Package Dashboard v{version}"
+      "heading": "سکیننگ پیکجز",
+      "body1": "Saropa اس پروجیکٹ میں ہر براہ راست انحصار کے لیے pub.dev میٹا ڈیٹا، GitHub سرگرمی، اور انحصاری گراف حاصل کر رہا ہے۔",
+      "body2": "اسکین مکمل ہونے پر یہ صفحہ خود بخود تازہ ہوجائے گا۔ آپ نیچے دائیں طرف پیش رفت کی اطلاع سے منسوخ کر سکتے ہیں۔",
+      "versionStamp": "سروپا پیکیج ڈیش بورڈ v0 {version}"
     },
     "gaugeTitle": "Project Package Grade: {grade}",
     "summary": {
       "packages": "Packages",
       "projectGrade": "Project Package Grade",
-      "totalSize": "Total Size*",
+      "totalSize": "کل سائز*",
       "gradeTooltip": "Project grade {avgGrade}\nAverage score: {avgScore}/100\nPackages: {pkgCount}\nA:{a} B:{b} C:{c} E:{e} F:{f}",
-      "vibrantTitle": "Vibrant",
-      "stableTitle": "Stable",
+      "vibrantTitle": "متحرک",
+      "stableTitle": "مستحکم",
       "outdatedTitle": "Outdated",
-      "abandonedTitle": "Abandoned",
-      "eolTitle": "End of Life",
-      "updates": "Updates",
-      "unused": "Unused",
-      "singleUse": "Single-use",
-      "vulnerable": "Vulnerable",
+      "abandonedTitle": "ترک کر دیا گیا۔",
+      "eolTitle": "زندگی کا خاتمہ",
+      "updates": "اپڈیٹس",
+      "unused": "غیر استعمال شدہ",
+      "singleUse": "واحد استعمال",
+      "vulnerable": "کمزور",
       "overrides": "Overrides",
-      "caveatLine1": "*Archive sizes before tree shaking. Actual app size will be smaller.",
-      "caveatLine2": "Activity thresholds: 90d = stale, 180d = dormant (commit + release timelines)."
+      "caveatLine1": "*درخت کے ہلنے سے پہلے سائز کو محفوظ کریں۔ اصل ایپ کا سائز چھوٹا ہو گا۔",
+      "caveatLine2": "سرگرمی کی حدیں: 90d = باسی، 180d = غیر فعال (عزم + ریلیز ٹائم لائنز)۔"
     },
     "network": {
-      "summary": "Dependency Network"
+      "summary": "انحصار نیٹ ورک"
     },
     "toolbar": {
       "openPubspecTitle": "Open pubspec.yaml",
       "openPubspecLabel": "pubspec.yaml",
-      "copyAllTitle": "Copy report JSON (all rows + details)",
-      "copyAllLabel": "Copy",
-      "saveAllTitle": "Save report JSON to reports/YYYYMMDD/...",
-      "saveAllLabel": "Save",
+      "copyAllTitle": "رپورٹ JSON کاپی کریں (تمام قطاریں + تفصیلات)",
+      "copyAllLabel": "کاپی",
+      "saveAllTitle": "رپورٹ JSON کو رپورٹس/YYYYMMDD/... میں محفوظ کریں",
+      "saveAllLabel": "محفوظ کریں۔",
       "resetViewTitle": "Reset filters, sort, and saved view state",
       "resetViewLabel": "ويئو ري سيٽ ڪريو",
       "rescanTitle": "Rescan packages — clears the pub.dev cache and re-fetches versions",
       "rescanLabel": "ٻيهر اسڪين",
       "openOtherTitle": "Open another pubspec.yaml's project in a new window for Vibrancy scan",
       "openOtherLabel": "Open Project…",
-      "footprintGroupAria": "Size column footprint mode",
-      "footprintGroupTitle": "What the Size column shows: own archive only, plus unique transitives (cost if removed), or plus all transitives (theoretical max).",
-      "footprintLabel": "Footprint:",
+      "footprintGroupAria": "سائز کالم فوٹ پرنٹ موڈ",
+      "footprintGroupTitle": "سائز کا کالم کیا دکھاتا ہے: صرف اپنا آرکائیو، نیز منفرد ٹرانزیٹوز (اگر ہٹا دیا جائے تو لاگت)، یا نیز تمام ٹرانزیٹوز (نظریاتی زیادہ سے زیادہ)۔",
+      "footprintLabel": "قدموں کا نشان:",
       "footprintOwnTitle": "Own archive size only — matches pub.dev download size",
       "footprintOwn": "Own",
       "footprintUniqueTitle": "Own size + transitives used only by this dep (savings if you remove it)",
-      "footprintUnique": "+ Unique",
+      "footprintUnique": "+ منفرد",
       "footprintTotalTitle": "Own size + all transitives, including ones shared with other deps",
-      "footprintTotal": "+ All",
-      "searchLabel": "Search packages",
-      "searchPlaceholder": "Search packages…",
+      "footprintTotal": "+ تمام",
+      "searchLabel": "پیکیجز تلاش کریں۔",
+      "searchPlaceholder": "پیکجز تلاش کریں…",
       "clearSearchTitle": "ڳولا صاف ڪريو",
       "clearSearchAria": "ڳولا صاف ڪريو",
-      "ageFilterTitle": "Filter by publish age",
+      "ageFilterTitle": "اشاعت کی عمر کے لحاظ سے فلٹر کریں۔",
       "publishedAgeLabel": "Published age",
-      "ageMaxAll": "All",
-      "presetFilterTitle": "Apply quick filter presets",
+      "ageMaxAll": "تمام",
+      "presetFilterTitle": "فوری فلٹر پری سیٹس کا اطلاق کریں۔",
       "presetLabel": "Preset",
       "presetNone": "None",
       "presetModernization": "Modernization",
       "presetRiskHotspots": "Risk hotspots",
-      "presetCleanup": "Cleanup candidates",
-      "presetDirectOnly": "Direct only",
+      "presetCleanup": "صفائی کے امیدوار",
+      "presetDirectOnly": "صرف براہ راست",
       "devToggleTitle": "Include dev dependencies in table and totals",
       "includeDev": "Include dev",
       "activeFiltersLabel": "فعال فلٽر:",
@@ -470,28 +470,28 @@
         "tooltip": "Package name — click to open pubspec.yaml entry"
       },
       "version": {
-        "label": "Version",
+        "label": "ورژن",
         "tooltip": "Installed version from pubspec.lock"
       },
       "score": {
-        "label": "Category",
-        "tooltip": "Vibrancy classification and health score (0–10)"
+        "label": "زمرہ",
+        "tooltip": "متحرک درجہ بندی اور صحت کا سکور (0–10)"
       },
       "published": {
         "label": "Published",
-        "tooltip": "Date the installed version was published to pub.dev"
+        "tooltip": "انسٹال شدہ ورژن pub.dev پر شائع ہونے کی تاریخ"
       },
       "activity": {
-        "label": "Activity",
-        "tooltip": "Code-and-release activity grade from commit + publish recency"
+        "label": "سرگرمی",
+        "tooltip": "کمٹ + پبلش ریسینسی سے کوڈ اور ریلیز سرگرمی کا گریڈ"
       },
       "likes": {
         "label": "Likes",
-        "tooltip": "pub.dev likes — click to open the package score page"
+        "tooltip": "pub.dev پسند کرتا ہے - پیکیج سکور کا صفحہ کھولنے کے لیے کلک کریں۔"
       },
       "downloads": {
-        "label": "Downloads",
-        "tooltip": "pub.dev downloads in the last 30 days — click to open the package score page"
+        "label": "ڈاؤن لوڈز",
+        "tooltip": "pub.dev پچھلے 30 دنوں میں ڈاؤن لوڈز - پیکیج سکور کا صفحہ کھولنے کے لیے کلک کریں۔"
       },
       "issues": {
         "label": "Issues",
@@ -502,19 +502,19 @@
         "tooltip": "Open GitHub pull requests"
       },
       "size": {
-        "label": "Size",
-        "tooltip": "Archive size on pub.dev (before tree shaking)"
+        "label": "سائز",
+        "tooltip": "pub.dev پر آرکائیو کا سائز (درخت ہلنے سے پہلے)"
       },
       "deps": {
-        "label": "Deps",
-        "tooltip": "Direct transitive dependencies — shared deps highlighted"
+        "label": "ڈیپس",
+        "tooltip": "براہ راست عبوری انحصار - مشترکہ ڈیپس کو نمایاں کیا گیا۔"
       },
       "files": {
         "label": "References",
         "tooltip": "Number of source files that import this package — click to search"
       },
       "transitives": {
-        "label": "Transitives",
+        "label": "منتقلی",
         "tooltip": "Number of transitive (indirect) dependencies this package pulls in"
       },
       "vulns": {
@@ -526,15 +526,15 @@
         "tooltip": "SPDX license identifier from pub.dev"
       },
       "update": {
-        "label": "Update",
-        "tooltip": "Available version update: major, minor, or patch"
+        "label": "اپڈیٹ کریں۔",
+        "tooltip": "دستیاب ورژن اپ ڈیٹ: بڑا، معمولی، یا پیچ"
       },
       "status": {
         "label": "اسٽيٽس",
-        "tooltip": "Usage status: whether the package appears unused in your code"
+        "tooltip": "استعمال کی حیثیت: آیا پیکج آپ کے کوڈ میں غیر استعمال شدہ دکھائی دیتا ہے۔"
       },
       "description": {
-        "label": "Description",
+        "label": "تفصیل",
         "tooltip": "Package description from pub.dev"
       }
     },
@@ -542,95 +542,95 @@
       "noGithub": "No GitHub repository found"
     },
     "row": {
-      "expandDetails": "Expand details",
-      "copyRowJson": "Copy row as JSON"
+      "expandDetails": "تفصیلات کو پھیلائیں۔",
+      "copyRowJson": "قطار کو JSON کے بطور کاپی کریں۔"
     },
     "shortcuts": {
-      "focusSearch": "Focus the search field",
+      "focusSearch": "تلاش کے میدان پر فوکس کریں۔",
       "nextRow": "Highlight the next package row",
       "prevRow": "Highlight the previous package row",
-      "toggleDetail": "Toggle the highlighted package detail expander",
-      "escapeSearch": "Clear focused search; second Esc collapses all expanded rows",
+      "toggleDetail": "نمایاں کردہ پیکیج ڈیٹیل ایکسپینڈر کو ٹوگل کریں۔",
+      "escapeSearch": "توجہ مرکوز کی تلاش کو صاف کریں؛ دوسرا Esc تمام پھیلی ہوئی قطاروں کو ختم کر دیتا ہے۔",
       "historyBack": "Go back through the package navigation history",
-      "showOverlay": "Show this shortcut overlay"
+      "showOverlay": "یہ شارٹ کٹ اوورلے دکھائیں۔"
     }
   },
   "commandCatalog": {
     "documentTitle": "Saropa Command Catalog",
-    "skipLink": "Skip to command catalog",
+    "skipLink": "کمانڈ کیٹلاگ پر جائیں۔",
     "heroTitle": "Saropa Command Catalog",
     "status": {
       "commands": "{count} commands",
       "categories": "{count} categories",
       "recent": "{count} recent",
       "internalHidden": "{count} context-menu only (hidden)",
-      "wordCommands": "commands",
-      "wordCategories": "categories",
-      "wordRecent": "recent"
+      "wordCommands": "احکامات",
+      "wordCategories": "زمرے",
+      "wordRecent": "حالیہ"
     },
     "search": {
-      "placeholder": "Search title, description, or command id…",
-      "ariaLabel": "Search commands",
+      "placeholder": "عنوان، تفصیل، یا کمانڈ آئی ڈی تلاش کریں…",
+      "ariaLabel": "تلاش کے احکامات",
       "clearAria": "ڳولا صاف ڪريو",
       "hintLine1": "Matches each command's",
-      "hintStrongTitle": "title",
-      "hintStrongDesc": "description",
-      "hintStrongId": "id",
-      "hintLine2": "(id tokens are spaced too — type",
-      "hintLine2kbd": "run analysis",
-      "hintLine2End": "without dots)."
+      "hintStrongTitle": "عنوان",
+      "hintStrongDesc": "تفصیل",
+      "hintStrongId": "آئی ڈی",
+      "hintLine2": "(آئی ڈی ٹوکن بھی فاصلہ پر ہیں - قسم",
+      "hintLine2kbd": "تجزیہ چلائیں",
+      "hintLine2End": "نقطوں کے بغیر)۔"
     },
     "toolbar": {
-      "showInternal": "Show context-menu commands",
-      "collapseAll": "Collapse all"
+      "showInternal": "سیاق و سباق کے مینو کمانڈز دکھائیں۔",
+      "collapseAll": "سب کو سمیٹیں۔"
     },
     "recentPopover": {
       "title": "Recent searches",
-      "clearTitle": "Clear all recent searches",
-      "clearButton": "Clear",
+      "clearTitle": "تمام حالیہ تلاشوں کو صاف کریں۔",
+      "clearButton": "صاف",
       "listAria": "Recent searches"
     },
     "filterChips": {
-      "ariaRegion": "Active filters",
+      "ariaRegion": "فعال فلٹرز",
       "activeLabel": "فعال فلٽر:",
       "clearAll": "سڀ صاف ڪريو"
     },
     "bands": {
-      "frequentTitle": "Frequent",
+      "frequentTitle": "بار بار",
       "frequentHint": "Most-used across your sessions",
       "recentTitle": "Recent",
-      "recentClear": "Clear",
-      "recentHint": "Click to run again · Newest first"
+      "recentClear": "صاف",
+      "recentHint": "دوبارہ چلانے کے لیے کلک کریں · تازہ ترین پہلے"
     },
     "noResults": {
       "message": "No commands match your search.",
       "reset": "فلٽر ري سيٽ ڪريو"
     },
     "entry": {
-      "internalBadgeTitle": "Triggered from context menus only",
-      "internalBadge": "menu",
-      "copyTitle": "Copy command id ({id})",
-      "copyAria": "Copy command id"
+      "internalBadgeTitle": "صرف سیاق و سباق کے مینو سے ٹرگر کیا گیا۔",
+      "internalBadge": "مینو",
+      "copyTitle": "کمانڈ آئی ڈی کاپی کریں (0) {id}",
+      "copyAria": "کمانڈ آئی ڈی کاپی کریں۔"
     },
     "categoryJumpTitle": "Jump to {category}",
     "shortcuts": {
-      "focusSearch": "Focus the search field",
+      "focusSearch": "تلاش کے میدان پر فوکس کریں۔",
       "navRows": "Navigate visible command rows",
       "homeEnd": "Jump to the first or last visible row",
       "enterRun": "Run the focused command",
-      "escClear": "Clear search and reset filters",
-      "showOverlay": "Show this shortcut overlay"
+      "escClear": "تلاش کو صاف کریں اور فلٹرز کو دوبارہ ترتیب دیں۔",
+      "showOverlay": "یہ شارٹ کٹ اوورلے دکھائیں۔"
     },
     "script": {
-      "moreSuffix": "+{count} more",
-      "showLess": "Show less",
-      "runSingular": " run",
-      "runPlural": " runs",
-      "recentWord": "recent",
-      "expandAll": "Expand all",
-      "collapseAll": "Collapse all",
-      "searchChip": "Search: \"{query}\"",
-      "internalChip": "Showing context-menu commands",
+      "moreSuffix": "+0 مزید {count}",
+      "showLess": "کم دکھائیں۔",
+      "runSingular": "چلائیں",
+      "runPlural": "چلتا ہے",
+      "recentWord": "حالیہ",
+      "expandAll": "سبھی کو پھیلائیں۔",
+      "collapseAll": "سب کو سمیٹیں۔",
+      "searchChip": "تلاش کریں: \"0\" {query}",
+      "internalChip": "سیاق و سباق کے مینو کمانڈز دکھا رہا ہے۔",
       "removeFilterPrefix": "Remove filter ",
       "matchOne": "{count} match",
       "matchOther": "{count} matches"
