@@ -1452,7 +1452,7 @@ class PreferWidgetMethodsOverClassesRule extends SaropaLintRule {
       if (superclassName != 'StatelessWidget') return;
 
       // Check if it has only the build method (no fields, no other methods)
-      final List<ClassMember> members = node.body.members.toList();
+      final List<ClassMember> members = node.bodyMembers.toList();
 
       bool hasFields = false;
       bool hasOtherMethods = false;
@@ -5146,7 +5146,7 @@ class AnnotateRedeclaresRule extends SaropaLintRule {
       final ClassElement? classEl = node.declaredFragment?.element;
       if (classEl == null) return;
 
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is MethodDeclaration) {
           if (member.isStatic || member.externalKeyword != null) continue;
           final ExecutableElement? el = member.declaredFragment?.element;

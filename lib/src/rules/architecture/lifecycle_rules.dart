@@ -425,7 +425,7 @@ class RequireLateInitializationInInitStateRule extends SaropaLintRule {
 
       // Collect late fields
       final Set<String> lateFields = <String>{};
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is FieldDeclaration && member.fields.isLate) {
           for (final VariableDeclaration variable in member.fields.variables) {
             // Only track uninitialized late fields
@@ -439,7 +439,7 @@ class RequireLateInitializationInInitStateRule extends SaropaLintRule {
       if (lateFields.isEmpty) return;
 
       // Find build method and check for late field assignments
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is MethodDeclaration && member.name.lexeme == 'build') {
           _checkBuildMethodForLateAssignments(member, lateFields, reporter);
         }
@@ -585,7 +585,7 @@ class RequireAppLifecycleHandlingRule extends SaropaLintRule {
       }
     }
 
-    for (final ClassMember member in node.body.members) {
+    for (final ClassMember member in node.bodyMembers) {
       if (member is MethodDeclaration &&
           member.name.lexeme == 'didChangeAppLifecycleState') {
         return true;
@@ -606,7 +606,7 @@ class RequireAppLifecycleHandlingRule extends SaropaLintRule {
   static final RegExp _listenCallPattern = RegExp(r'\.listen\s*\(');
 
   static bool _hasBackgroundWork(ClassDeclaration node) {
-    for (final ClassMember member in node.body.members) {
+    for (final ClassMember member in node.bodyMembers) {
       if (member is MethodDeclaration) {
         final String bodySource = member.body.toSource();
         if (_timerPeriodicPattern.hasMatch(bodySource)) return true;

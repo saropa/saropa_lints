@@ -796,7 +796,7 @@ class RequireTokenRefreshRule extends SaropaLintRule {
       bool hasRefreshMethod = false;
       bool hasExpiryCheck = false;
 
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is FieldDeclaration) {
           final String fieldSource = member.toSource().toLowerCase();
           if (fieldSource.contains('accesstoken') ||

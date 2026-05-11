@@ -896,7 +896,7 @@ class VerifyDocumentedParametersExistRule extends SaropaLintRule {
   Set<String> _extractClassFieldNames(ClassDeclaration? classDecl) {
     if (classDecl == null) return const <String>{};
     final Set<String> names = <String>{};
-    for (final ClassMember member in classDecl.body.members) {
+    for (final ClassMember member in classDecl.bodyMembers) {
       if (member is FieldDeclaration) {
         for (final VariableDeclaration variable in member.fields.variables) {
           names.add(variable.name.lexeme);
@@ -1054,15 +1054,15 @@ void _visitAllDocComments(
     // analyzer 11: ClassBody.members returns List<ClassMember> via compat shim
     final List<ClassMember>? members;
     if (declaration is ClassDeclaration) {
-      members = declaration.body.members;
+      members = declaration.bodyMembers;
     } else if (declaration is EnumDeclaration) {
-      members = declaration.body.members;
+      members = declaration.bodyMembers;
     } else if (declaration is MixinDeclaration) {
-      members = declaration.body.members;
+      members = declaration.bodyMembers;
     } else if (declaration is ExtensionDeclaration) {
       members = declaration.body?.members;
     } else if (declaration is ExtensionTypeDeclaration) {
-      members = declaration.body.members;
+      members = declaration.bodyMembers;
     } else {
       members = null;
     }
@@ -1507,7 +1507,7 @@ class DeprecatedNewInCommentReferenceRule extends SaropaLintRule {
   ) {
     checkDoc(decl.documentationComment);
     if (decl is ClassDeclaration) {
-      for (final ClassMember m in decl.body.members) {
+      for (final ClassMember m in decl.bodyMembers) {
         if (m is MethodDeclaration) {
           checkDoc(m.documentationComment);
         } else if (m is FieldDeclaration) {
@@ -1517,7 +1517,7 @@ class DeprecatedNewInCommentReferenceRule extends SaropaLintRule {
         }
       }
     } else if (decl is MixinDeclaration) {
-      for (final ClassMember m in decl.body.members) {
+      for (final ClassMember m in decl.bodyMembers) {
         if (m is MethodDeclaration) checkDoc(m.documentationComment);
         if (m is FieldDeclaration) checkDoc(m.documentationComment);
       }
@@ -1525,7 +1525,7 @@ class DeprecatedNewInCommentReferenceRule extends SaropaLintRule {
       for (final EnumConstantDeclaration c in decl.body.constants) {
         checkDoc(c.documentationComment);
       }
-      for (final ClassMember m in decl.body.members) {
+      for (final ClassMember m in decl.bodyMembers) {
         if (m is MethodDeclaration) checkDoc(m.documentationComment);
         if (m is FieldDeclaration) checkDoc(m.documentationComment);
         if (m is ConstructorDeclaration) checkDoc(m.documentationComment);

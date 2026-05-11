@@ -1287,7 +1287,7 @@ class RequireSearchDebounceRule extends SaropaLintRule {
         .thisOrAncestorOfType<ClassDeclaration>();
     if (classDecl == null) return false;
 
-    for (final ClassMember member in classDecl.body.members) {
+    for (final ClassMember member in classDecl.bodyMembers) {
       if (member is FieldDeclaration) {
         final String typeSource =
             member.fields.type?.toSource().toLowerCase() ?? '';

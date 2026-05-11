@@ -82,7 +82,7 @@ class AvoidLargeObjectsInStateRule extends SaropaLintRule {
       final String superName = extendsClause.superclass.toSource();
       if (!superName.startsWith('State<')) return;
       // Check fields for large collection types
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is FieldDeclaration) {
           final TypeAnnotation? type = member.fields.type;
           if (type == null) continue;
@@ -176,7 +176,7 @@ class RequireImageDisposalRule extends SaropaLintRule {
       bool hasUiImageField = false;
       bool hasDisposeCall = false;
 
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is FieldDeclaration) {
           final String fieldSource = member.toSource();
           if (fieldSource.contains('ui.Image') ||
@@ -463,7 +463,7 @@ class PreferWeakReferencesForCacheRule extends SaropaLintRule {
       if (!className.contains('cache')) return;
 
       // Check for Map fields without WeakReference
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is FieldDeclaration) {
           final TypeAnnotation? type = member.fields.type;
           if (type == null) continue;
@@ -910,7 +910,7 @@ class AvoidUnboundedCacheGrowthRule extends SaropaLintRule {
   /// Checks if the class has a Map field that appears to be cache storage.
   /// Excludes toMap/fromMap serialization methods.
   bool _hasMapCacheField(ClassDeclaration node) {
-    for (final ClassMember member in node.body.members) {
+    for (final ClassMember member in node.bodyMembers) {
       if (member is FieldDeclaration) {
         final String fieldSource = member.toSource().toLowerCase();
         // Check for Map field declarations
@@ -927,7 +927,7 @@ class AvoidUnboundedCacheGrowthRule extends SaropaLintRule {
   bool _allMapFieldsHaveEnumKeys(ClassDeclaration node) {
     bool hasMapField = false;
 
-    for (final ClassMember member in node.body.members) {
+    for (final ClassMember member in node.bodyMembers) {
       if (member is FieldDeclaration) {
         final String fieldSource = member.toSource();
 
@@ -1223,7 +1223,7 @@ class AvoidRetainingDisposedWidgetsRule extends SaropaLintRule {
     context.addClassDeclaration((ClassDeclaration node) {
       // Skip widget classes — they can hold widget references
       if (_isWidgetClass(node)) return;
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is! FieldDeclaration) continue;
 
         final TypeAnnotation? type = member.fields.type;

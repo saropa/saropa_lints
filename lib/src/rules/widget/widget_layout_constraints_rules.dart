@@ -66,7 +66,7 @@ class AvoidMisnamedPaddingRule extends SaropaLintRule {
 
       // Find "padding" fields
       final List<FieldDeclaration> paddingFields = <FieldDeclaration>[];
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is FieldDeclaration) {
           for (final VariableDeclaration variable in member.fields.variables) {
             if (variable.name.lexeme == 'padding') {
@@ -81,7 +81,7 @@ class AvoidMisnamedPaddingRule extends SaropaLintRule {
       }
 
       // Check build method for misuse patterns
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is MethodDeclaration && member.name.lexeme == 'build') {
           final _PaddingMisuseVisitor visitor = _PaddingMisuseVisitor();
           member.accept(visitor);
@@ -291,7 +291,7 @@ class CheckForEqualsInRenderObjectSettersRule extends SaropaLintRule {
       }
 
       // Check each setter
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is MethodDeclaration && member.isSetter) {
           _checkSetter(member, reporter);
         }
@@ -455,7 +455,7 @@ class ConsistentUpdateRenderObjectRule extends SaropaLintRule {
       MethodDeclaration? createMethod;
       MethodDeclaration? updateMethod;
 
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is MethodDeclaration) {
           if (member.name.lexeme == 'createRenderObject') {
             createMethod = member;

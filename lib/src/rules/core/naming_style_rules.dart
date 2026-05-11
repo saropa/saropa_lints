@@ -474,7 +474,7 @@ class MatchGetterSetterFieldNamesRule extends SaropaLintRule {
     context.addClassDeclaration((ClassDeclaration node) {
       // Collect private field names
       final Set<String> privateFields = <String>{};
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is FieldDeclaration) {
           for (final VariableDeclaration variable in member.fields.variables) {
             final String name = variable.name.lexeme;
@@ -486,7 +486,7 @@ class MatchGetterSetterFieldNamesRule extends SaropaLintRule {
       }
 
       // Check getters
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is MethodDeclaration && member.isGetter) {
           final String getterName = member.name.lexeme;
 

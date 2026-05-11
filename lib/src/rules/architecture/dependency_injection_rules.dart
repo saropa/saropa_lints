@@ -568,7 +568,7 @@ class AvoidCircularDiDependenciesRule extends SaropaLintRule {
       final String className = node.namePart.typeName.lexeme;
 
       // Find constructor parameters
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is ConstructorDeclaration && member.name == null) {
           for (final FormalParameter param in member.parameters.parameters) {
             final String? typeName = _getParameterTypeName(param);
@@ -1065,7 +1065,7 @@ class PreferConstructorInjectionRule extends SaropaLintRule {
     context.addClassDeclaration((ClassDeclaration node) {
       // Skip abstract classes and mixins
       if (node.abstractKeyword != null) return;
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         // Check for late fields with dependency types
         if (member is FieldDeclaration) {
           _checkLateDependencyField(member, reporter);

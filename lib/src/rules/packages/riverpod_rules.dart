@@ -745,7 +745,7 @@ class AvoidNotifierConstructorsRule extends SaropaLintRule {
       if (!_notifierBaseClasses.contains(superclassName)) return;
 
       // Find constructors with body (not just redirecting or empty)
-      for (final member in node.body.members) {
+      for (final member in node.bodyMembers) {
         if (member is ConstructorDeclaration) {
           final body = member.body;
           // Skip factory constructors and redirecting constructors
@@ -904,7 +904,7 @@ class AvoidUnnecessaryConsumerWidgetsRule extends SaropaLintRule {
       }
 
       // Find build method
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is MethodDeclaration && member.name.lexeme == 'build') {
           // Check if ref is used in the body
           bool usesRef = false;

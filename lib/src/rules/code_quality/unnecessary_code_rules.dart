@@ -628,7 +628,7 @@ class AvoidUnnecessaryGetterRule extends SaropaLintRule {
     context.addClassDeclaration((ClassDeclaration node) {
       // Collect all final private fields
       final Set<String> finalPrivateFields = <String>{};
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is FieldDeclaration) {
           final VariableDeclarationList fields = member.fields;
           if (fields.isFinal) {
@@ -645,7 +645,7 @@ class AvoidUnnecessaryGetterRule extends SaropaLintRule {
       if (finalPrivateFields.isEmpty) return;
 
       // Check getters
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is MethodDeclaration && member.isGetter) {
           final FunctionBody body = member.body;
 

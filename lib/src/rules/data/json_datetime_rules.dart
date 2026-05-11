@@ -1537,7 +1537,7 @@ class PreferJsonSerializableRule extends SaropaLintRule {
       if (hasCodegenAnnotation) return;
 
       // Check members
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is ConstructorDeclaration) {
           if (member.factoryKeyword != null &&
               member.name?.lexeme == 'fromJson') {
@@ -1803,7 +1803,7 @@ class PreferJsonCodegenRule extends SaropaLintRule {
       }
       if (hasCodegen) return;
 
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is ConstructorDeclaration &&
             member.factoryKeyword != null &&
             member.name?.lexeme == 'fromJson') {

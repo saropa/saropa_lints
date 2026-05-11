@@ -687,7 +687,7 @@ class PreferWidgetPrivateMembersRule extends SaropaLintRule {
       final String superclass = extendsClause.superclass.name.lexeme;
       if (!_widgetBaseClasses.contains(superclass)) return;
 
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         // Check for non-final public fields
         if (member is FieldDeclaration) {
           if (member.isStatic) continue;
@@ -4804,7 +4804,7 @@ class AvoidLateWithoutGuaranteeRule extends SaropaLintRule {
 
       // Check if initialized in initState
       String? initStateBody;
-      for (final member in parent.body.members) {
+      for (final member in parent.bodyMembers) {
         if (member is MethodDeclaration && member.name.lexeme == 'initState') {
           initStateBody = member.body.toSource();
           break;

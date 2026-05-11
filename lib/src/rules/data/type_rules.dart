@@ -3409,10 +3409,10 @@ class AbiSpecificIntegerInvalidRule extends SaropaLintRule {
         return;
       }
 
-      final List<ConstructorDeclaration> ctors = node.body.members
+      final List<ConstructorDeclaration> ctors = node.bodyMembers
           .whereType<ConstructorDeclaration>()
           .toList();
-      final int otherMembers = node.body.members
+      final int otherMembers = node.bodyMembers
           .where((ClassMember m) => m is! ConstructorDeclaration)
           .length;
 

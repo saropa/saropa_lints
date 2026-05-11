@@ -608,7 +608,7 @@ bool _isUtilityNamespaceFile(CompilationUnit unit) {
 
   for (final ClassDeclaration cls in classes) {
     if (cls.abstractKeyword == null || cls.finalKeyword == null) return false;
-    for (final ClassMember member in cls.body.members) {
+    for (final ClassMember member in cls.bodyMembers) {
       if (member is FieldDeclaration && !member.isStatic) return false;
       if (member is MethodDeclaration && !member.isStatic) return false;
     }
@@ -1722,7 +1722,7 @@ class PreferStaticClassRule extends SaropaLintRule {
       bool hasStaticMember = false;
       bool hasPrivateConstructor = false;
 
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is ConstructorDeclaration) {
           final String? name = member.name?.lexeme;
           if (name != null && name.startsWith('_')) {
@@ -2087,7 +2087,7 @@ class PreferAbstractFinalStaticClassRule extends SaropaLintRule {
       bool hasPrivateConstructor = false;
       bool hasStaticMembers = false;
 
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is ConstructorDeclaration) {
           // Check for private constructor
           final String? name = member.name?.lexeme;
@@ -2768,7 +2768,7 @@ class AvoidClassesWithOnlyStaticMembersRule extends SaropaLintRule {
           node.withClause != null) {
         return;
       }
-      final List<ClassMember> members = node.body.members;
+      final List<ClassMember> members = node.bodyMembers;
       if (members.isEmpty) return;
       for (final ClassMember m in members) {
         if (m is ConstructorDeclaration) {
@@ -2839,7 +2839,7 @@ class AvoidSettersWithoutGettersRule extends SaropaLintRule {
       if (classDecl == null) return;
       if (classDecl.abstractKeyword != null) return;
       final String setterName = node.name.lexeme;
-      for (final ClassMember m in classDecl.body.members) {
+      for (final ClassMember m in classDecl.bodyMembers) {
         if (m is FieldDeclaration) {
           for (final VariableDeclaration v in m.fields.variables) {
             if (v.name.lexeme == setterName) return;
@@ -2932,10 +2932,10 @@ class PreferGettersBeforeSettersRule extends SaropaLintRule {
     }
 
     context.addClassDeclaration((ClassDeclaration node) {
-      checkMembers(node.body.members);
+      checkMembers(node.bodyMembers);
     });
     context.addMixinDeclaration((MixinDeclaration node) {
-      checkMembers(node.body.members);
+      checkMembers(node.bodyMembers);
     });
     context.addExtensionDeclaration((ExtensionDeclaration node) {
       checkMembers(node.body?.members ?? const <ClassMember>[]);
@@ -2977,7 +2977,7 @@ class PreferStaticBeforeInstanceRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final members = node.body.members;
+      final members = node.bodyMembers;
       int firstInstanceField = -1;
       int firstInstanceMethod = -1;
       final outOfOrderStaticFields = <FieldDeclaration>[];
@@ -3051,16 +3051,16 @@ class PreferMixinOverAbstractRule extends SaropaLintRule {
       if (node.abstractKeyword == null) return;
       if (node.sealedKeyword != null) return;
       if (node.extendsClause != null) return;
-      if (node.body.members.isEmpty) return;
+      if (node.bodyMembers.isEmpty) return;
 
-      for (final member in node.body.members) {
+      for (final member in node.bodyMembers) {
         if (member is MethodDeclaration && member.isAbstract) return;
         if (member is FieldDeclaration && member.abstractKeyword != null) {
           return;
         }
       }
 
-      final constructors = node.body.members
+      final constructors = node.bodyMembers
           .whereType<ConstructorDeclaration>()
           .toList();
       final hasGenerative = constructors.any((c) => c.factoryKeyword == null);
@@ -3121,7 +3121,7 @@ class PreferRecordOverTupleClassRule extends SaropaLintRule {
       if (node.implementsClause != null) return;
       if (node.withClause != null) return;
 
-      final fields = node.body.members.whereType<FieldDeclaration>().toList();
+      final fields = node.bodyMembers.whereType<FieldDeclaration>().toList();
       if (fields.any((f) => !f.fields.isFinal || f.isStatic)) return;
 
       final totalFields = fields.fold<int>(
@@ -3130,12 +3130,12 @@ class PreferRecordOverTupleClassRule extends SaropaLintRule {
       );
       if (totalFields < 2 || totalFields > 5) return;
 
-      final methods = node.body.members.whereType<MethodDeclaration>();
+      final methods = node.bodyMembers.whereType<MethodDeclaration>();
       if (methods.any((m) => !_allowedMethodNames.contains(m.name.lexeme))) {
         return;
       }
 
-      final constructors = node.body.members
+      final constructors = node.bodyMembers
           .whereType<ConstructorDeclaration>()
           .toList();
       if (constructors.length != 1) return;
@@ -3325,8 +3325,8 @@ class PreferConstructorsFirstRule extends SaropaLintRule {
       int lastConstructorIndex = -1;
       int firstMethodIndex = -1;
 
-      for (int i = 0; i < node.body.members.length; i++) {
-        final ClassMember member = node.body.members[i];
+      for (int i = 0; i < node.bodyMembers.length; i++) {
+        final ClassMember member = node.bodyMembers[i];
         if (member is ConstructorDeclaration) {
           lastConstructorIndex = i;
         } else if (member is MethodDeclaration &&
@@ -3342,9 +3342,9 @@ class PreferConstructorsFirstRule extends SaropaLintRule {
         return;
       }
 
-      final ConstructorDeclaration outOfOrder = node.body.members
+      final ConstructorDeclaration outOfOrder = node.bodyMembers
           .whereType<ConstructorDeclaration>()
-          .firstWhere((c) => node.body.members.indexOf(c) > firstMethodIndex);
+          .firstWhere((c) => node.bodyMembers.indexOf(c) > firstMethodIndex);
       reporter.atNode(outOfOrder);
     });
   }
@@ -3399,8 +3399,8 @@ class PreferFactoryBeforeNamedRule extends SaropaLintRule {
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
       int firstNamedIndex = -1;
-      for (int i = 0; i < node.body.members.length; i++) {
-        final ClassMember member = node.body.members[i];
+      for (int i = 0; i < node.bodyMembers.length; i++) {
+        final ClassMember member = node.bodyMembers[i];
         if (member is ConstructorDeclaration &&
             member.name != null &&
             member.factoryKeyword == null) {
@@ -3410,8 +3410,8 @@ class PreferFactoryBeforeNamedRule extends SaropaLintRule {
       }
       if (firstNamedIndex < 0) return;
 
-      for (int i = firstNamedIndex + 1; i < node.body.members.length; i++) {
-        final ClassMember member = node.body.members[i];
+      for (int i = firstNamedIndex + 1; i < node.bodyMembers.length; i++) {
+        final ClassMember member = node.bodyMembers[i];
         if (member is ConstructorDeclaration && member.factoryKeyword != null) {
           reporter.atNode(member);
           return;
@@ -3495,8 +3495,8 @@ class PreferOverridesLastRule extends SaropaLintRule {
     context.addClassDeclaration((ClassDeclaration node) {
       int lastOverrideIndex = -1;
       int firstNonOverrideAfterOverride = -1;
-      for (int i = 0; i < node.body.members.length; i++) {
-        final ClassMember member = node.body.members[i];
+      for (int i = 0; i < node.bodyMembers.length; i++) {
+        final ClassMember member = node.bodyMembers[i];
         if (member is MethodDeclaration && _hasOverrideAnnotation(member)) {
           lastOverrideIndex = i;
         } else if (member is MethodDeclaration &&
@@ -3507,7 +3507,7 @@ class PreferOverridesLastRule extends SaropaLintRule {
         }
       }
       if (lastOverrideIndex < 0 || firstNonOverrideAfterOverride < 0) return;
-      final ClassMember outOfOrder = node.body.members[lastOverrideIndex];
+      final ClassMember outOfOrder = node.bodyMembers[lastOverrideIndex];
       reporter.atNode(outOfOrder);
     });
   }
@@ -3928,13 +3928,13 @@ class PreferExtensionOverUtilityClassRule extends SaropaLintRule {
         return;
       }
 
-      final List<MethodDeclaration> staticMethods = node.body.members
+      final List<MethodDeclaration> staticMethods = node.bodyMembers
           .whereType<MethodDeclaration>()
           .where((m) => m.isStatic && !m.isGetter && !m.isSetter)
           .toList();
       if (staticMethods.length < 2) return;
 
-      final bool hasInstanceMember = node.body.members.any((m) {
+      final bool hasInstanceMember = node.bodyMembers.any((m) {
         if (m is FieldDeclaration && !m.isStatic) return true;
         if (m is MethodDeclaration &&
             !m.isStatic &&
@@ -4017,7 +4017,7 @@ class PreferExtensionTypeForWrapperRule extends SaropaLintRule {
         return;
       }
 
-      final List<FieldDeclaration> fields = node.body.members
+      final List<FieldDeclaration> fields = node.bodyMembers
           .whereType<FieldDeclaration>()
           .where((f) => !f.isStatic)
           .toList();
@@ -4026,7 +4026,7 @@ class PreferExtensionTypeForWrapperRule extends SaropaLintRule {
       if (!single.fields.isFinal || single.fields.isLate) return;
       if (single.fields.variables.length != 1) return;
 
-      final List<ConstructorDeclaration> constructors = node.body.members
+      final List<ConstructorDeclaration> constructors = node.bodyMembers
           .whereType<ConstructorDeclaration>()
           .where((c) => c.factoryKeyword == null)
           .toList();
@@ -4040,7 +4040,7 @@ class PreferExtensionTypeForWrapperRule extends SaropaLintRule {
           : p;
       if (inner is! FieldFormalParameter) return;
 
-      final int methodCount = node.body.members
+      final int methodCount = node.bodyMembers
           .whereType<MethodDeclaration>()
           .length;
       if (methodCount > 4) return;
@@ -4305,7 +4305,7 @@ class IllegalEnumValuesRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addEnumDeclaration((EnumDeclaration node) {
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is MethodDeclaration &&
             !member.isStatic &&
             member.name.lexeme == 'values') {

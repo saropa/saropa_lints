@@ -1598,7 +1598,7 @@ class AvoidAssigningToStaticFieldRule extends SaropaLintRule {
     context.addClassDeclaration((ClassDeclaration classNode) {
       // Collect static field names
       final Set<String> staticFields = <String>{};
-      for (final ClassMember member in classNode.body.members) {
+      for (final ClassMember member in classNode.bodyMembers) {
         if (member is FieldDeclaration && member.isStatic) {
           for (final VariableDeclaration field in member.fields.variables) {
             staticFields.add(field.name.lexeme);
@@ -1609,7 +1609,7 @@ class AvoidAssigningToStaticFieldRule extends SaropaLintRule {
       if (staticFields.isEmpty) return;
 
       // Check instance methods
-      for (final ClassMember member in classNode.body.members) {
+      for (final ClassMember member in classNode.bodyMembers) {
         if (member is MethodDeclaration && !member.isStatic) {
           _checkMethodBody(member.body, staticFields, reporter);
         }
@@ -2317,7 +2317,7 @@ class AvoidDefaultToStringRule extends SaropaLintRule {
       bool hasFields = false;
       bool hasToString = false;
 
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is FieldDeclaration && !member.isStatic) {
           hasFields = true;
         }

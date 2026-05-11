@@ -1458,7 +1458,7 @@ class PreferValueListenableBuilderRule extends SaropaLintRule {
       int stateFieldCount = 0;
       int setStateCallCount = 0;
 
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is FieldDeclaration) {
           if (!member.isStatic && !member.fields.isFinal) {
             stateFieldCount++;
@@ -1556,7 +1556,7 @@ class AvoidGlobalKeyMisuseRule extends SaropaLintRule {
       final List<VariableDeclaration> globalKeyFields = <VariableDeclaration>[];
       final globalKeyRegex = RegExp(r'\bGlobalKey\b');
 
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is FieldDeclaration) {
           for (final VariableDeclaration variable in member.fields.variables) {
             final String? typeName = member.fields.type?.toSource();
@@ -2395,7 +2395,7 @@ class RequireImageCacheManagementRule extends SaropaLintRule {
       int imageCount = 0;
       bool hasImageCacheClear = false;
 
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         final String source = member.toSource();
         if (_imageMemberSourceRegex.any((re) => re.hasMatch(source))) {
           imageCount++;
@@ -2744,7 +2744,7 @@ class RequireDisposePatternRule extends SaropaLintRule {
       // Skip classes with const constructors — they hold borrowed
       // references passed in by the caller, not owned resources.
       // Disposing borrowed references would be a bug.
-      final bool hasConstConstructor = node.body.members.any(
+      final bool hasConstConstructor = node.bodyMembers.any(
         (ClassMember m) =>
             m is ConstructorDeclaration && m.constKeyword != null,
       );
@@ -2753,7 +2753,7 @@ class RequireDisposePatternRule extends SaropaLintRule {
       bool hasDisposable = false;
       bool hasDisposeMethod = false;
 
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is FieldDeclaration) {
           final String? typeName = member.fields.type?.toSource();
           if (typeName != null &&
@@ -4457,7 +4457,7 @@ class AvoidFinalizerMisuseRule extends SaropaLintRule {
   }
 
   bool _hasDisposeMethodForFinalizer(ClassDeclaration classDecl) {
-    for (final ClassMember member in classDecl.body.members) {
+    for (final ClassMember member in classDecl.bodyMembers) {
       if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
         return true;
       }
@@ -4859,7 +4859,7 @@ class AvoidCacheStampedeRule extends SaropaLintRule {
     // Check enclosing class for Map<String, Future<...>> field
     final AstNode? parent = node.parent;
     if (parent is ClassDeclaration) {
-      for (final ClassMember member in parent.body.members) {
+      for (final ClassMember member in parent.bodyMembers) {
         if (member is FieldDeclaration) {
           final String? typeSource = member.fields.type?.toSource();
           if (typeSource != null &&

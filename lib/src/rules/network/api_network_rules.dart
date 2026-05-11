@@ -3373,7 +3373,7 @@ class RequireSseSubscriptionCancelRule extends SaropaLintRule {
 
       // Find SSE-related fields
       final List<String> sseFields = <String>[];
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is FieldDeclaration) {
           final String? typeName = member.fields.type?.toSource();
 
@@ -3419,7 +3419,7 @@ class RequireSseSubscriptionCancelRule extends SaropaLintRule {
 
       // Find dispose method and check for close calls
       String? disposeBody;
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
           disposeBody = member.body.toSource();
           break;
@@ -3434,7 +3434,7 @@ class RequireSseSubscriptionCancelRule extends SaropaLintRule {
                 _sseFieldClosePattern(disposeBody, fieldName, 'cancel'));
 
         if (!isClosed) {
-          for (final ClassMember member in node.body.members) {
+          for (final ClassMember member in node.bodyMembers) {
             if (member is FieldDeclaration) {
               for (final VariableDeclaration variable
                   in member.fields.variables) {

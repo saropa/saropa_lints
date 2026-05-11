@@ -1264,7 +1264,7 @@ class PreferSingleDeclarationPerFileRule extends SaropaLintRule {
       if (cls.abstractKeyword == null || cls.finalKeyword == null) {
         return false;
       }
-      for (final ClassMember member in cls.body.members) {
+      for (final ClassMember member in cls.bodyMembers) {
         if (member is FieldDeclaration && !member.isStatic) return false;
         if (member is MethodDeclaration && !member.isStatic) return false;
       }
@@ -1522,7 +1522,7 @@ class PreferOverridingParentEqualityRule extends SaropaLintRule {
     context.addClassDeclaration((ClassDeclaration node) {
       // Check if class has an == operator
       MethodDeclaration? equalityOperator;
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is MethodDeclaration &&
             member.name.lexeme == '==' &&
             member.isOperator) {

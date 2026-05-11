@@ -972,7 +972,7 @@ class RequireFormRestorationRule extends SaropaLintRule {
       int controllerCount = 0;
       bool hasForm = false;
 
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is FieldDeclaration) {
           final String? typeName = member.fields.type?.toSource();
           if (typeName != null &&

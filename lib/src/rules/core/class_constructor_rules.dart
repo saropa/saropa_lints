@@ -214,7 +214,7 @@ class AvoidIncompleteCopyWithRule extends SaropaLintRule {
     context.addClassDeclaration((ClassDeclaration node) {
       // Collect all instance fields
       final Set<String> fieldNames = <String>{};
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is FieldDeclaration && !member.isStatic) {
           for (final VariableDeclaration variable in member.fields.variables) {
             fieldNames.add(variable.name.lexeme);
@@ -225,7 +225,7 @@ class AvoidIncompleteCopyWithRule extends SaropaLintRule {
       if (fieldNames.isEmpty) return;
 
       // Find copyWith method
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is MethodDeclaration && member.name.lexeme == 'copyWith') {
           final FormalParameterList? params = member.parameters;
           if (params == null) continue;
@@ -773,7 +773,7 @@ class PreferDeclaringConstConstructorRule extends SaropaLintRule {
       bool allFieldsFinal = true;
       bool hasFields = false;
 
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is FieldDeclaration && !member.isStatic) {
           hasFields = true;
           if (!member.fields.isFinal && !member.fields.isConst) {
@@ -789,7 +789,7 @@ class PreferDeclaringConstConstructorRule extends SaropaLintRule {
       bool hasConstConstructor = false;
       bool hasNonConstConstructor = false;
 
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is ConstructorDeclaration) {
           if (member.constKeyword != null) {
             hasConstConstructor = true;
@@ -804,7 +804,7 @@ class PreferDeclaringConstConstructorRule extends SaropaLintRule {
       // or if there are final fields but no explicit constructor
       if (!hasConstConstructor && (hasNonConstConstructor || hasFields)) {
         // Find the non-const constructor to report on
-        for (final ClassMember member in node.body.members) {
+        for (final ClassMember member in node.bodyMembers) {
           if (member is ConstructorDeclaration &&
               member.constKeyword == null &&
               member.factoryKeyword == null) {
@@ -1085,7 +1085,7 @@ class AvoidRenamingRepresentationGettersRule extends SaropaLintRule {
           .trim();
       final bool representationIsPrivate = repFieldName.startsWith('_');
       final List<MethodDeclaration> renamingGetters = [];
-      for (final ClassMember m in node.body.members) {
+      for (final ClassMember m in node.bodyMembers) {
         if (m is! MethodDeclaration) continue;
         if (m.parameters != null && m.parameters!.parameters.isNotEmpty) {
           continue;
@@ -1300,7 +1300,7 @@ class AvoidUnmarkedPublicClassRule extends SaropaLintRule {
 
       // Skip classes with only private constructors — they already prevent
       // external instantiation and extension, making a modifier redundant.
-      final List<ConstructorDeclaration> constructors = node.body.members
+      final List<ConstructorDeclaration> constructors = node.bodyMembers
           .whereType<ConstructorDeclaration>()
           .toList();
       if (constructors.isNotEmpty &&
@@ -1389,7 +1389,7 @@ class PreferFinalClassRule extends SaropaLintRule {
       bool hasPublicConstructor = false;
       bool hasAnyConstructor = false;
 
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is ConstructorDeclaration) {
           hasAnyConstructor = true;
           final Token? nameToken = member.name;
@@ -1485,7 +1485,7 @@ class PreferInterfaceClassRule extends SaropaLintRule {
       // Check if all members are abstract (no concrete implementations)
       bool hasConcreteImplementation = false;
 
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is MethodDeclaration) {
           // Check if method has a body (concrete implementation)
           if (member.body is! EmptyFunctionBody) {
@@ -1511,7 +1511,7 @@ class PreferInterfaceClassRule extends SaropaLintRule {
       }
 
       // Only suggest interface if there's no concrete implementation
-      if (!hasConcreteImplementation && node.body.members.isNotEmpty) {
+      if (!hasConcreteImplementation && node.bodyMembers.isNotEmpty) {
         reporter.atToken(node.namePart.typeName, code);
       }
     });
@@ -1595,7 +1595,7 @@ class PreferBaseClassRule extends SaropaLintRule {
       bool hasAbstractMember = false;
       bool hasConcreteImplementation = false;
 
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is MethodDeclaration) {
           if (member.body is EmptyFunctionBody) {
             hasAbstractMember = true;
@@ -1924,7 +1924,7 @@ class AvoidFieldInitializersInConstClassesRule extends SaropaLintRule {
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
       bool hasConstConstructor = false;
-      for (final ClassMember m in node.body.members) {
+      for (final ClassMember m in node.bodyMembers) {
         if (m is ConstructorDeclaration &&
             m.constKeyword != null &&
             (m.factoryKeyword == null || m.factoryKeyword!.length == 0)) {
@@ -1933,7 +1933,7 @@ class AvoidFieldInitializersInConstClassesRule extends SaropaLintRule {
         }
       }
       if (!hasConstConstructor) return;
-      for (final ClassMember m in node.body.members) {
+      for (final ClassMember m in node.bodyMembers) {
         if (m is! FieldDeclaration || m.isStatic) continue;
         for (final VariableDeclaration v in m.fields.variables) {
           final Expression? init = v.initializer;
@@ -2059,7 +2059,7 @@ class RequireLateAccessCheckRule extends SaropaLintRule {
     ClassDeclaration classDecl,
     Set<String> fieldNames,
   ) {
-    for (final member in classDecl.body.members) {
+    for (final member in classDecl.bodyMembers) {
       if (member is! MethodDeclaration) continue;
       final name = member.name.lexeme;
       if (_isConstructorOrInitState(name)) continue;
@@ -2086,7 +2086,7 @@ class RequireLateAccessCheckRule extends SaropaLintRule {
     Set<String> fieldNames,
   ) {
     final reads = <SimpleIdentifier>[];
-    for (final member in classDecl.body.members) {
+    for (final member in classDecl.bodyMembers) {
       if (member is! MethodDeclaration) continue;
       if (_isConstructorOrInitState(member.name.lexeme)) continue;
       member.visitChildren(_ReadFinder(fieldNames, reads));
@@ -2307,7 +2307,7 @@ class PreferConstConstructorsInImmutablesRule extends SaropaLintRule {
       bool hasGenerativeConstructor = false;
       bool hasConstConstructor = false;
 
-      for (final ClassMember m in node.body.members) {
+      for (final ClassMember m in node.bodyMembers) {
         if (m is FieldDeclaration && !m.isStatic) {
           if (!m.fields.isFinal || m.fields.isLate) allFinal = false;
         } else if (m is ConstructorDeclaration) {
@@ -2413,7 +2413,7 @@ class PreferConstConstructorDeclarationsRule extends SaropaLintRule {
       bool allFinal = true;
       ConstructorDeclaration? nonConstGenConstructor;
 
-      for (final ClassMember m in node.body.members) {
+      for (final ClassMember m in node.bodyMembers) {
         if (m is FieldDeclaration && !m.isStatic) {
           if (!m.fields.isFinal || m.fields.isLate) allFinal = false;
         } else if (m is ConstructorDeclaration) {
@@ -2564,7 +2564,7 @@ class PreferFinalFieldsRule extends SaropaLintRule {
       final Map<String, FieldDeclaration> mutableFieldByName =
           <String, FieldDeclaration>{};
 
-      for (final ClassMember m in node.body.members) {
+      for (final ClassMember m in node.bodyMembers) {
         if (m is! FieldDeclaration || m.isStatic) continue;
         if (m.fields.isFinal || m.fields.isConst || m.fields.isLate) continue;
         for (final VariableDeclaration v in m.fields.variables) {
@@ -2577,7 +2577,7 @@ class PreferFinalFieldsRule extends SaropaLintRule {
       if (mutableFieldNames.isEmpty) return;
 
       final Set<String> assigned = <String>{};
-      for (final ClassMember m in node.body.members) {
+      for (final ClassMember m in node.bodyMembers) {
         if (m is ConstructorDeclaration) continue;
         m.visitChildren(_AssignmentToFieldVisitor(mutableFieldNames, assigned));
       }

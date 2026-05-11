@@ -926,11 +926,11 @@ class AvoidUncaughtFutureErrorsRule extends SaropaLintRule {
         }
       } else {
         final List<ClassMember>? members = switch (declaration) {
-          ClassDeclaration d => d.body.members,
-          EnumDeclaration d => d.body.members,
-          MixinDeclaration d => d.body.members,
+          ClassDeclaration d => d.bodyMembers,
+          EnumDeclaration d => d.bodyMembers,
+          MixinDeclaration d => d.bodyMembers,
           ExtensionDeclaration d => d.body?.members ?? const <ClassMember>[],
-          ExtensionTypeDeclaration d => d.body.members,
+          ExtensionTypeDeclaration d => d.bodyMembers,
           _ => null,
         };
         if (members != null) {

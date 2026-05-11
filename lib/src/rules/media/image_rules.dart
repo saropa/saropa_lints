@@ -1304,7 +1304,7 @@ class RequireImageStreamDisposeRule extends SaropaLintRule {
 
       // Find ImageStream fields
       final List<String> imageStreamFields = <String>[];
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is FieldDeclaration) {
           final String? typeName = member.fields.type?.toSource();
           if (typeName != null &&
@@ -1327,7 +1327,7 @@ class RequireImageStreamDisposeRule extends SaropaLintRule {
 
       // Find dispose method and check for removeListener calls
       MethodDeclaration? disposeMethod;
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
           disposeMethod = member;
           break;
@@ -1341,7 +1341,7 @@ class RequireImageStreamDisposeRule extends SaropaLintRule {
             isFieldCleanedUp(fieldName, 'removeListener', disposeMethod.body);
 
         if (!hasRemoveListener) {
-          for (final ClassMember member in node.body.members) {
+          for (final ClassMember member in node.bodyMembers) {
             if (member is FieldDeclaration) {
               for (final VariableDeclaration variable
                   in member.fields.variables) {

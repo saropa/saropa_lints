@@ -128,7 +128,7 @@ class AvoidUnsafeCastRule extends SaropaLintRule {
         .thisOrAncestorOfType<ClassDeclaration>();
     if (classNode == null) return false;
 
-    for (final ClassMember member in classNode.body.members) {
+    for (final ClassMember member in classNode.bodyMembers) {
       if (member is! MethodDeclaration ||
           member.name.lexeme != 'setupParentData') {
         continue;

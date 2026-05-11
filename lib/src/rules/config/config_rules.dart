@@ -346,7 +346,7 @@ class AvoidMixedEnvironmentsRule extends SaropaLintRule {
       bool hasDevIndicator = false;
       ClassMember? firstProdMember;
 
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is FieldDeclaration) {
           for (final VariableDeclaration variable in member.fields.variables) {
             final Expression? init = variable.initializer;

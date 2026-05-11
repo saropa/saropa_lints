@@ -257,7 +257,7 @@ class RequireCurrencyCodeWithAmountRule extends SaropaLintRule {
       bool hasCurrencyField = false;
       bool hasDoubleOrDecimal = false;
 
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is! FieldDeclaration) continue;
 
         for (final VariableDeclaration variable in member.fields.variables) {

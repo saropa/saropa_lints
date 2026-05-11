@@ -79,7 +79,7 @@ class RequireNotifyListenersRule extends SaropaLintRule {
       if (superName != 'ChangeNotifier') return;
 
       // Check each method that modifies state
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is MethodDeclaration) {
           _checkMethod(member, reporter);
         }
@@ -221,7 +221,7 @@ class RequireStreamControllerDisposeRule extends SaropaLintRule {
 
       // Find StreamController and wrapper fields
       final List<_ControllerField> controllers = <_ControllerField>[];
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is FieldDeclaration) {
           final String? typeStr = member.fields.type?.toSource();
           if (typeStr != null && typeStr.contains('StreamController')) {
@@ -244,7 +244,7 @@ class RequireStreamControllerDisposeRule extends SaropaLintRule {
 
       // Find dispose method with close()/dispose() calls
       MethodDeclaration? disposeMethod;
-      for (final member in node.body.members) {
+      for (final member in node.bodyMembers) {
         if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
           disposeMethod = member;
           break;
@@ -380,7 +380,7 @@ class RequireValueNotifierDisposeRule extends SaropaLintRule {
       final List<String> singleNotifierNames = <String>[];
       final List<String> collectionNotifierNames = <String>[];
 
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is FieldDeclaration) {
           for (final VariableDeclaration variable in member.fields.variables) {
             // Skip fields without initializers - they are parameters, not owned
@@ -418,7 +418,7 @@ class RequireValueNotifierDisposeRule extends SaropaLintRule {
 
       // Find dispose method
       MethodDeclaration? disposeMethod;
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
           disposeMethod = member;
           break;
@@ -468,7 +468,7 @@ class RequireValueNotifierDisposeRule extends SaropaLintRule {
     String fieldName,
     SaropaDiagnosticReporter reporter,
   ) {
-    for (final ClassMember member in classNode.body.members) {
+    for (final ClassMember member in classNode.bodyMembers) {
       if (member is FieldDeclaration) {
         for (final VariableDeclaration variable in member.fields.variables) {
           if (variable.name.lexeme == fieldName) {
@@ -862,7 +862,7 @@ class AvoidStatefulWithoutStateRule extends SaropaLintRule {
       bool hasLifecycleMethods = false;
       bool hasSetStateCalls = false;
 
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is FieldDeclaration) {
           // Check for non-final instance fields
           if (!member.isStatic && !member.fields.isFinal) {
@@ -1109,7 +1109,7 @@ class AvoidSetStateInLargeStateClassRule extends SaropaLintRule {
 
       // Measure class size
       final int lineCount = _countLines(node);
-      final int memberCount = node.body.members.length;
+      final int memberCount = node.bodyMembers.length;
 
       // Check if class is "large"
       final bool isLargeClass =

@@ -544,7 +544,7 @@ class AvoidStateConstructorsRule extends SaropaLintRule {
       if (superclassName != 'State') return;
 
       // Check constructors for bodies
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is ConstructorDeclaration) {
           final FunctionBody body = member.body;
           if (body is BlockFunctionBody && body.block.statements.isNotEmpty) {
@@ -615,7 +615,7 @@ class AvoidStatelessWidgetInitializedFieldsRule extends SaropaLintRule {
       if (superclassName != 'StatelessWidget') return;
 
       // Check for initialized fields
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is FieldDeclaration) {
           for (final VariableDeclaration variable in member.fields.variables) {
             if (variable.initializer != null) {
@@ -837,7 +837,7 @@ class RequireInitStateIdempotentRule extends SaropaLintRule {
       if (registerCalls.isEmpty) return;
 
       MethodDeclaration? disposeMethod;
-      for (final member in parent.body.members) {
+      for (final member in parent.bodyMembers) {
         if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
           disposeMethod = member;
           break;
@@ -940,7 +940,7 @@ class AvoidUnnecessaryStatefulWidgetsRule extends SaropaLintRule {
       bool hasSetState = false;
       bool hasMutableFields = false;
 
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         // Check for non-final instance fields
         if (member is FieldDeclaration && !member.isStatic) {
           if (!member.fields.isFinal && !member.fields.isConst) {
@@ -1348,7 +1348,7 @@ class RequireDisposeRule extends SaropaLintRule {
 
       // Find all disposable fields
       final List<_DisposableField> disposableFields = <_DisposableField>[];
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is FieldDeclaration) {
           final _DisposableField? field = _getDisposableField(member);
           if (field != null) {
@@ -1365,7 +1365,7 @@ class RequireDisposeRule extends SaropaLintRule {
       MethodDeclaration? disposeMethod;
       final Map<String, String> methodBodies = <String, String>{};
 
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is MethodDeclaration) {
           final String methodName = member.name.lexeme;
           methodBodies[methodName] = member.body.toSource();
@@ -1641,7 +1641,7 @@ class RequireTimerCancellationRule extends SaropaLintRule {
 
       // Find all cancellable fields
       final List<_CancellableField> cancellableFields = <_CancellableField>[];
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is FieldDeclaration) {
           final _CancellableField? field = _getCancellableField(member);
           if (field != null) {
@@ -1658,7 +1658,7 @@ class RequireTimerCancellationRule extends SaropaLintRule {
       MethodDeclaration? disposeMethod;
       final Map<String, String> methodBodies = <String, String>{};
 
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is MethodDeclaration) {
           final String methodName = member.name.lexeme;
           methodBodies[methodName] = member.body.toSource();
@@ -1964,7 +1964,7 @@ class NullifyAfterDisposeRule extends SaropaLintRule {
     ClassDeclaration classNode,
     String fieldName,
   ) {
-    for (final ClassMember member in classNode.body.members) {
+    for (final ClassMember member in classNode.bodyMembers) {
       if (member is FieldDeclaration) {
         for (final VariableDeclaration variable in member.fields.variables) {
           if (variable.name.lexeme == fieldName) {
@@ -2318,7 +2318,7 @@ class AlwaysRemoveListenerRule extends SaropaLintRule {
       MethodDeclaration? initStateMethod;
       MethodDeclaration? disposeMethod;
 
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is MethodDeclaration) {
           final String name = member.name.lexeme;
           if (name == 'initState') {
@@ -2468,7 +2468,7 @@ class RequireAnimationDisposalRule extends SaropaLintRule {
       // Find AnimationController fields
       final Set<String> animationControllerFields = <String>{};
 
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is FieldDeclaration) {
           final TypeAnnotation? type = member.fields.type;
           if (type is NamedType && type.name.lexeme == 'AnimationController') {
@@ -2486,7 +2486,7 @@ class RequireAnimationDisposalRule extends SaropaLintRule {
       bool hasDisposeMethod = false;
       final Set<String> disposedFields = <String>{};
 
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
           hasDisposeMethod = true;
           member.body.accept(
@@ -2501,7 +2501,7 @@ class RequireAnimationDisposalRule extends SaropaLintRule {
       for (final String fieldName in animationControllerFields) {
         if (!hasDisposeMethod || !disposedFields.contains(fieldName)) {
           // Report at the field declaration
-          for (final ClassMember member in node.body.members) {
+          for (final ClassMember member in node.bodyMembers) {
             if (member is FieldDeclaration) {
               for (final VariableDeclaration variable
                   in member.fields.variables) {
@@ -2710,7 +2710,7 @@ class AvoidBuildContextInProvidersRule extends SaropaLintRule {
       if (!_isProviderClass(superclass)) return;
 
       // Check for BuildContext fields
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is FieldDeclaration) {
           for (final VariableDeclaration field in member.fields.variables) {
             final TypeAnnotation? type = member.fields.type;
@@ -2791,7 +2791,7 @@ class PreferWidgetStateMixinRule extends SaropaLintRule {
 
       // Check for manual state tracking fields
       int stateFields = 0;
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is FieldDeclaration) {
           for (final VariableDeclaration field in member.fields.variables) {
             final String name = field.name.lexeme;
@@ -2949,7 +2949,7 @@ class AvoidRecursiveWidgetCallsRule extends SaropaLintRule {
       }
 
       // Find build method
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is MethodDeclaration && member.name.lexeme == 'build') {
           // Check for self-instantiation in build
           member.body.accept(
@@ -3053,7 +3053,7 @@ class AvoidUndisposedInstancesRule extends SaropaLintRule {
       // Collect all method bodies for helper method analysis
       final Map<String, FunctionBody?> methodBodies = <String, FunctionBody?>{};
 
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is FieldDeclaration) {
           for (final VariableDeclaration variable in member.fields.variables) {
             final String fieldName = variable.name.lexeme;
@@ -3098,7 +3098,7 @@ class AvoidUndisposedInstancesRule extends SaropaLintRule {
       for (final String fieldName in disposableFields) {
         if (!disposedFields.contains(fieldName)) {
           // Find the field declaration to report on
-          for (final ClassMember member in node.body.members) {
+          for (final ClassMember member in node.bodyMembers) {
             if (member is FieldDeclaration) {
               for (final VariableDeclaration variable
                   in member.fields.variables) {
@@ -3253,7 +3253,7 @@ class AvoidUnnecessaryOverridesInStateRule extends SaropaLintRule {
       final String superclassName = extendsClause.superclass.name.lexeme;
       if (superclassName != 'State') return;
 
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is MethodDeclaration) {
           final String methodName = member.name.lexeme;
           if (!_lifecycleMethods.contains(methodName)) continue;
@@ -3347,7 +3347,7 @@ class DisposeFieldsRule extends SaropaLintRule {
           <VariableDeclaration>[];
       bool hasDisposeMethod = false;
 
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is FieldDeclaration) {
           for (final VariableDeclaration variable in member.fields.variables) {
             final Expression? initializer = variable.initializer;
@@ -3602,7 +3602,7 @@ class RequireScrollControllerDisposeRule extends SaropaLintRule {
 
       // Find ScrollController fields (including late fields)
       final List<String> controllerNames = <String>[];
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is FieldDeclaration) {
           for (final VariableDeclaration variable in member.fields.variables) {
             final String? typeName = member.fields.type?.toSource();
@@ -3641,7 +3641,7 @@ class RequireScrollControllerDisposeRule extends SaropaLintRule {
 
         if (!isDisposed) {
           // Find and report the field declaration
-          for (final ClassMember member in node.body.members) {
+          for (final ClassMember member in node.bodyMembers) {
             if (member is FieldDeclaration) {
               for (final VariableDeclaration variable
                   in member.fields.variables) {
@@ -3730,7 +3730,7 @@ class RequireFocusNodeDisposeRule extends SaropaLintRule {
 
       // Find FocusNode fields (including late fields)
       final List<String> nodeNames = <String>[];
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is FieldDeclaration) {
           for (final VariableDeclaration variable in member.fields.variables) {
             final String? typeName = member.fields.type?.toSource();
@@ -3771,7 +3771,7 @@ class RequireFocusNodeDisposeRule extends SaropaLintRule {
 
         if (!isDisposed) {
           // Find and report the field declaration
-          for (final ClassMember member in node.body.members) {
+          for (final ClassMember member in node.bodyMembers) {
             if (member is FieldDeclaration) {
               for (final VariableDeclaration variable
                   in member.fields.variables) {
@@ -3862,7 +3862,7 @@ class RequireShouldRebuildRule extends SaropaLintRule {
 
       // Check if updateShouldNotify is overridden
       bool hasOverride = false;
-      for (final member in node.body.members) {
+      for (final member in node.bodyMembers) {
         if (member is MethodDeclaration) {
           if (member.name.lexeme == 'updateShouldNotify') {
             hasOverride = true;
@@ -4335,7 +4335,7 @@ class AvoidGlobalKeysInStateRule extends SaropaLintRule {
       if (!superclass.contains('StatefulWidget')) return;
 
       final Set<String> constructorFieldParams = <String>{};
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is ConstructorDeclaration) {
           for (final FormalParameter param in member.parameters.parameters) {
             final FormalParameter effectiveParam =
@@ -4351,7 +4351,7 @@ class AvoidGlobalKeysInStateRule extends SaropaLintRule {
       }
 
       // Check fields for GlobalKey, skip constructor parameters
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.bodyMembers) {
         if (member is FieldDeclaration) {
           final TypeAnnotation? type = member.fields.type;
           if (type != null && _globalKeyTypePattern.hasMatch(type.toSource())) {
