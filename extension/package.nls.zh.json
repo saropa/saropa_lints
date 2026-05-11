@@ -7,7 +7,7 @@
   "views.actions.name": "行动",
   "views.status.name": "地位",
   "views.settings.name": "设置",
-  "views.help.name": "帮助（v13.5.0） (v13.6.0)",
+  "views.help.name": "Help (v13.6.0)",
   "viewsWelcome.banner.contents": "**萨罗巴林茨**\n\n2100 多个 Dart 和 Flutter lint 规则，可确保安全性、可访问性和性能。\n\n需要 Dart 或 Flutter 项目。\n\n打开包含“pubspec.yaml”的文件夹即可开始。\n\n[在线了解更多](https://pub.dev/packages/saropa_lints)\n[浏览所有命令]（命令：saropaLints.showCommandCatalog）\n[关于 Saropa Lints]（命令：saropaLints.showAbout）\n[入门]（命令：saropaLints.openWalkthrough）",
   "command.enable.title": "Saropa Lints：设置项目（pubspec + 配置）",
   "command.disable.title": "Saropa Lints：关闭 Lint 集成",
