@@ -2,6 +2,7 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 
+import '../../analyzer_compat.dart';
 import '../../native/saropa_fix.dart';
 
 /// Quick fix: Add `const` keyword to a generative constructor declaration.
@@ -42,9 +43,9 @@ class PreferConstConstructorDeclarationsFix extends SaropaFixProducer {
           ? node
           : node.thisOrAncestorOfType<ClassDeclaration>();
       if (cls == null) return;
-      final body = cls.body;
-      if (body is! BlockClassBody) return;
-      for (final ClassMember m in body.members) {
+      // Use bodyMembers to safely handle analyzer v9 where .body throws
+      // UnsupportedError (useDeclaringConstructorsAst gate)
+      for (final ClassMember m in cls.bodyMembers) {
         if (m is ConstructorDeclaration &&
             m.factoryKeyword == null &&
             m.constKeyword == null) {

@@ -45,6 +45,16 @@
 
 ---
 
+## [13.6.1]
+
+Fixes a remaining analyzer v9 compatibility crash where accessing class body members threw `UnsupportedError` at runtime, preventing the plugin from analyzing files in projects pinned to older analyzer versions ([#224](https://github.com/saropa/saropa_lints/issues/224)). [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
+
+### Fixed
+
+- **Analyzer v9 `useDeclaringConstructorsAst` crash** — all 335+ `.body.members` call sites now use safe `bodyMembers` / `bodyConstants` extensions that fall back to the pre-declaring-constructors API when the gate throws; projects on `analysis_server_plugin ^0.3.4` with `analyzer 9.x` can run `dart analyze` without the plugin crashing. No action required.
+
+---
+
 ## [13.6.0]
 
 This release improves how you steer large findings lists and repeat searches across sessions (multi-key sort, bulk JSON copy, and workspace-persisted recents). It tightens RTL behavior for stack toggles, adds cross-file CLI defaults you can commit in **`analysis_options.yaml`**, gives IDE troubleshooting clearer native-plugin-first guidance, and ships a **`verify-nls-keys`** check for Marketplace manifest parity. Score and dashboard consistency improvements from earlier work remain in place. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)

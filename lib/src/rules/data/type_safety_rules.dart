@@ -545,7 +545,7 @@ class RequireNullSafeExtensionsRule extends SaropaLintRule {
 
       // Check members for null assertions
       for (final ClassMember member
-          in node.body?.members ?? const <ClassMember>[]) {
+          in node.bodyMembers) {
         final String memberSource = member.toSource();
         if (memberSource.contains('this!')) {
           reporter.atNode(member);

@@ -27,12 +27,20 @@ class AddToStringFix extends SaropaFixProducer {
     final classDecl = node.thisOrAncestorOfType<ClassDeclaration>();
     if (classDecl == null) return;
 
-    final body = classDecl.body;
-    if (body is! BlockClassBody) return;
+    // Try to access .body for insertion position; bail on analyzer v9 where
+    // .body throws UnsupportedError (useDeclaringConstructorsAst gate).
+    final BlockClassBody blockBody;
+    try {
+      final body = classDecl.body;
+      if (body is! BlockClassBody) return;
+      blockBody = body;
+    } on UnsupportedError {
+      return;
+    }
 
     // Collect non-static field names for the toString body.
     final fields = <String>[];
-    for (final member in body.members) {
+    for (final member in blockBody.members) {
       if (member is FieldDeclaration && !member.isStatic) {
         for (final variable in member.fields.variables) {
           fields.add(variable.name.lexeme);
@@ -55,7 +63,7 @@ class AddToStringFix extends SaropaFixProducer {
 
     // Insert before the closing brace of the class body.
     await builder.addDartFileEdit(file, (b) {
-      b.addSimpleInsertion(body.rightBracket.offset, method);
+      b.addSimpleInsertion(blockBody.rightBracket.offset, method);
     });
   }
 }

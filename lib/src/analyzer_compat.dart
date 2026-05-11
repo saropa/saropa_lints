@@ -75,6 +75,24 @@ extension SafeEnumDeclMembers on EnumDeclaration {
       }
     }
   }
+
+  /// Enum constants declared inside this enum.
+  ///
+  /// Tries `.body.constants` (analyzer 10+), falls back to the pre-declaring-
+  /// constructors `.constants` API (analyzer 9).
+  List<EnumConstantDeclaration> get bodyConstants {
+    try {
+      return body.constants;
+    } on UnsupportedError {
+      // analyzer v9: useDeclaringConstructorsAst gate not enabled,
+      // constants live directly on the declaration
+      try {
+        return (this as dynamic).constants as List<EnumConstantDeclaration>;
+      } catch (_) {
+        return const [];
+      }
+    }
+  }
 }
 
 /// Safe `.body.members` access for [MixinDeclaration] in analyzer v9.

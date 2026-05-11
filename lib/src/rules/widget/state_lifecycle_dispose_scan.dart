@@ -21,6 +21,8 @@ library;
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 
+import '../../analyzer_compat.dart';
+
 final RegExp _disposeCallPattern = RegExp(r'\.dispose\s*\(\s*\)');
 
 /// Returns true if [body] shows [name] as disposed (direct or iteration).
@@ -34,12 +36,10 @@ bool isNameDisposedInBodyRegex(String body, String name) {
       (iterationRe.hasMatch(body) && _disposeCallPattern.hasMatch(body));
 }
 
+/// Uses [SafeClassDeclMembers.bodyMembers] to handle analyzer v9 where
+/// `.body` throws UnsupportedError (useDeclaringConstructorsAst gate).
 Iterable<ClassMember> _classMembers(ClassDeclaration class_) {
-  return switch (class_.body) {
-    BlockClassBody(:final NodeList<ClassMember> members) => members,
-    EmptyClassBody() => const <ClassMember>[],
-    _ => const <ClassMember>[],
-  };
+  return class_.bodyMembers;
 }
 
 /// Concatenates [dispose] and [didUpdateWidget] method bodies for regex scans.

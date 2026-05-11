@@ -1060,7 +1060,7 @@ void _visitAllDocComments(
     } else if (declaration is MixinDeclaration) {
       members = declaration.bodyMembers;
     } else if (declaration is ExtensionDeclaration) {
-      members = declaration.body?.members;
+      members = declaration.bodyMembers;
     } else if (declaration is ExtensionTypeDeclaration) {
       members = declaration.bodyMembers;
     } else {
@@ -1522,7 +1522,7 @@ class DeprecatedNewInCommentReferenceRule extends SaropaLintRule {
         if (m is FieldDeclaration) checkDoc(m.documentationComment);
       }
     } else if (decl is EnumDeclaration) {
-      for (final EnumConstantDeclaration c in decl.body.constants) {
+      for (final EnumConstantDeclaration c in decl.bodyConstants) {
         checkDoc(c.documentationComment);
       }
       for (final ClassMember m in decl.bodyMembers) {
@@ -1531,7 +1531,7 @@ class DeprecatedNewInCommentReferenceRule extends SaropaLintRule {
         if (m is ConstructorDeclaration) checkDoc(m.documentationComment);
       }
     } else if (decl is ExtensionDeclaration) {
-      for (final ClassMember m in decl.body?.members ?? const <ClassMember>[]) {
+      for (final ClassMember m in decl.bodyMembers) {
         if (m is MethodDeclaration) checkDoc(m.documentationComment);
         if (m is FieldDeclaration) checkDoc(m.documentationComment);
       }

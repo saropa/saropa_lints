@@ -1390,7 +1390,7 @@ class EnumConstantsOrderingRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addEnumDeclaration((EnumDeclaration node) {
-      final List<EnumConstantDeclaration> constants = node.body.constants
+      final List<EnumConstantDeclaration> constants = node.bodyConstants
           .toList();
       if (constants.length < 2) return;
 
