@@ -5,6 +5,7 @@
 
 import type * as vscode from 'vscode';
 import { SIDEBAR_SECTIONS, defaultSidebarSectionVisible } from '../sidebarSectionVisibilityKeys';
+import { l10n } from '../i18n/runtime';
 
 export interface SidebarSectionToggleRow {
   readonly key: string;
@@ -44,8 +45,8 @@ export function buildDashboardSidebarVisibilityPanelHtml(rows: readonly SidebarS
     )
     .join('');
   return `<details class="dashboard-sidebar-vis">
-<summary>Activity bar layout</summary>
-<p class="sidebar-vis-hint">Turn Saropa activity-bar sections on or off here (saved with the workspace, without leaving the dashboard).</p>
+<summary>${escapeHtml(l10n('sidebarLayout.summary'))}</summary>
+<p class="sidebar-vis-hint">${escapeHtml(l10n('sidebarLayout.hint'))}</p>
 <div class="sidebar-vis-list">${inner}</div>
 </details>`;
 }

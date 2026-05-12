@@ -32,28 +32,28 @@ import {
   getKeyboardShortcutsStyles,
 } from './keyboard-shortcuts';
 import { pluralize } from './webview-format';
-import { t } from '../i18n/runtime';
+import { l10n } from '../i18n/runtime';
 
 /** Client-script strings (embedded webview JS); resolved at host HTML build time. */
 function findingsDashScriptStrings(): Record<string, string> {
     return {
-        analysisRunning: t('loading.runningAnalysis'),
-        analysisComplete: t('loading.analysisComplete'),
-        metaRunning: t('findingsDash.progress.runningMeta'),
-        metaDone: t('loading.refreshingDashboard'),
-        metaFailed: t('loading.analysisFailedDetail'),
-        metaStartedDetail: t('loading.analysisStartedDetail'),
-        announceSearchVerb: t('findingsDash.script.announceSearchVerb'),
-        severitiesNoun: t('findingsDash.script.severitiesNoun'),
-        impactsNoun: t('findingsDash.script.impactsNoun'),
-        announceCleared: t('findingsDash.script.announceCleared'),
-        filtersPrefix: t('findingsDash.script.announceFiltersPrefix'),
-        announceStarted: t('findingsDash.script.announceStarted'),
-        announceComplete: t('findingsDash.script.announceComplete'),
-        announceFailed: t('findingsDash.script.announceFailed'),
-        removeRecentTitle: t('findingsDash.script.removeRecentTitle'),
-        removeRecentAriaPrefix: t('findingsDash.script.removeRecentAria'),
-        bulkSelectedTpl: t('findingsDash.script.bulkSelectedTpl'),
+        analysisRunning: l10n('loading.runningAnalysis'),
+        analysisComplete: l10n('loading.analysisComplete'),
+        metaRunning: l10n('findingsDash.progress.runningMeta'),
+        metaDone: l10n('loading.refreshingDashboard'),
+        metaFailed: l10n('loading.analysisFailedDetail'),
+        metaStartedDetail: l10n('loading.analysisStartedDetail'),
+        announceSearchVerb: l10n('findingsDash.script.announceSearchVerb'),
+        severitiesNoun: l10n('findingsDash.script.severitiesNoun'),
+        impactsNoun: l10n('findingsDash.script.impactsNoun'),
+        announceCleared: l10n('findingsDash.script.announceCleared'),
+        filtersPrefix: l10n('findingsDash.script.announceFiltersPrefix'),
+        announceStarted: l10n('findingsDash.script.announceStarted'),
+        announceComplete: l10n('findingsDash.script.announceComplete'),
+        announceFailed: l10n('findingsDash.script.announceFailed'),
+        removeRecentTitle: l10n('findingsDash.script.removeRecentTitle'),
+        removeRecentAriaPrefix: l10n('findingsDash.script.removeRecentAria'),
+        bulkSelectedTpl: l10n('findingsDash.script.bulkSelectedTpl'),
     };
 }
 
@@ -148,13 +148,13 @@ function escapeHtml(s: string): string {
 
 function groupBySelectOptions(current: GroupByMode): string {
   const labels: Record<GroupByMode, string> = {
-    severity: t('findingsDash.groupBy.severity'),
-    file: t('findingsDash.groupBy.file'),
-    impact: t('findingsDash.groupBy.impact'),
-    rule: t('findingsDash.groupBy.rule'),
-    owasp: t('findingsDash.groupBy.owasp'),
-    ruleType: t('findingsDash.groupBy.ruleType'),
-    ruleStatus: t('findingsDash.groupBy.ruleStatus'),
+    severity: l10n('findingsDash.groupBy.severity'),
+    file: l10n('findingsDash.groupBy.file'),
+    impact: l10n('findingsDash.groupBy.impact'),
+    rule: l10n('findingsDash.groupBy.rule'),
+    owasp: l10n('findingsDash.groupBy.owasp'),
+    ruleType: l10n('findingsDash.groupBy.ruleType'),
+    ruleStatus: l10n('findingsDash.groupBy.ruleStatus'),
   };
   return VIOLATIONS_GROUP_BY_MODES.map((m) => {
     const sel = m === current ? ' selected' : '';
@@ -165,7 +165,7 @@ function groupBySelectOptions(current: GroupByMode): string {
 function severitySegmented(active: readonly string[]): string {
   return SEVERITY_ORDER.map((v) => {
     const pressed = active.includes(v);
-    return `<button type="button" class="seg-btn" aria-pressed="${pressed}" data-sev="${v}" title="${escapeHtml(t('findingsDash.seg.toggleSeverityTitle', { v }))}">
+    return `<button type="button" class="seg-btn" aria-pressed="${pressed}" data-sev="${v}" title="${escapeHtml(l10n('findingsDash.seg.toggleSeverityTitle', { v }))}">
       <span class="swatch sev-${v}"></span>${escapeHtml(v.charAt(0).toUpperCase() + v.slice(1))}
     </button>`;
   }).join('');
@@ -174,7 +174,7 @@ function severitySegmented(active: readonly string[]): string {
 function impactSegmented(active: readonly string[]): string {
   return IMPACT_ORDER.map((v) => {
     const pressed = active.includes(v);
-    return `<button type="button" class="seg-btn" aria-pressed="${pressed}" data-imp="${v}" title="${escapeHtml(t('findingsDash.seg.toggleImpactTitle', { v }))}">
+    return `<button type="button" class="seg-btn" aria-pressed="${pressed}" data-imp="${v}" title="${escapeHtml(l10n('findingsDash.seg.toggleImpactTitle', { v }))}">
       <span class="swatch imp-${v}"></span>${escapeHtml(v.charAt(0).toUpperCase() + v.slice(1))}
     </button>`;
   }).join('');
@@ -190,15 +190,15 @@ function formatRelative(iso: string | undefined): string | undefined {
   const parsed = Date.parse(iso);
   if (!Number.isFinite(parsed)) return undefined;
   const diffMs = Date.now() - parsed;
-  if (diffMs < 0) return t('findingsDash.time.justNow');
+  if (diffMs < 0) return l10n('findingsDash.time.justNow');
   const sec = Math.floor(diffMs / 1000);
-  if (sec < 45) return t('findingsDash.time.justNow');
+  if (sec < 45) return l10n('findingsDash.time.justNow');
   const min = Math.floor(sec / 60);
-  if (min < 60) return t('findingsDash.time.minutesAgo', { min: String(min) });
+  if (min < 60) return l10n('findingsDash.time.minutesAgo', { min: String(min) });
   const hr = Math.floor(min / 60);
-  if (hr < 24) return t('findingsDash.time.hoursAgo', { hr: String(hr) });
+  if (hr < 24) return l10n('findingsDash.time.hoursAgo', { hr: String(hr) });
   const day = Math.floor(hr / 24);
-  return t('findingsDash.time.daysAgo', { day: String(day) });
+  return l10n('findingsDash.time.daysAgo', { day: String(day) });
 }
 
 /**
@@ -233,7 +233,7 @@ function buildGauge(score: number): string {
     ? `hsl(${Math.round(60 + (score - 50) * 1.2)}, 70%, 48%)`
     : `hsl(${Math.round(score * 1.2)}, 75%, 48%)`;
   const grade = scoreToGrade(score);
-  return `<div class="hero-gauge" title="${escapeHtml(t('findingsDash.hero.gaugeTitle', { score: String(score), grade }))}">
+  return `<div class="hero-gauge" title="${escapeHtml(l10n('findingsDash.hero.gaugeTitle', { score: String(score), grade }))}">
     <svg viewBox="0 0 88 88">
       <circle class="gauge-track" cx="44" cy="44" r="${r}" fill="none"
         stroke-width="7"
@@ -255,28 +255,28 @@ function buildStatusLine(input: ViolationsDashboardHtmlInput): string {
   const rel = formatRelative(input.reportTimestamp);
   if (rel) {
     const iso = escapeHtml(input.reportTimestamp ?? '');
-    parts.push(`<span class="pill" title="${iso}">⟳ ${t('findingsDash.status.lastRunPrefix')} ${escapeHtml(rel)}</span>`);
+    parts.push(`<span class="pill" title="${iso}">⟳ ${l10n('findingsDash.status.lastRunPrefix')} ${escapeHtml(rel)}</span>`);
   } else {
-    parts.push(`<span class="pill warn" title="${escapeHtml(t('findingsDash.status.noTimestampTitle'))}">⟳ ${escapeHtml(t('findingsDash.status.lastRunUnknown'))}</span>`);
+    parts.push(`<span class="pill warn" title="${escapeHtml(l10n('findingsDash.status.noTimestampTitle'))}">⟳ ${escapeHtml(l10n('findingsDash.status.lastRunUnknown'))}</span>`);
   }
   const findings = input.totalRawAfterDisable;
   const findingsClass = findings === 0 ? 'good' : findings > 100 ? 'bad' : 'warn';
-  parts.push(`<span class="pill ${findingsClass}" title="${escapeHtml(t('findingsDash.status.findingsAfterFilterTitle'))}">${pluralize(findings, { one: t('findingsDash.status.findingOne'), other: t('findingsDash.status.findingOther') })}</span>`);
+  parts.push(`<span class="pill ${findingsClass}" title="${escapeHtml(l10n('findingsDash.status.findingsAfterFilterTitle'))}">${pluralize(findings, { one: l10n('findingsDash.status.findingOne'), other: l10n('findingsDash.status.findingOther') })}</span>`);
   const todos = input.todoHackSnapshot.todos.length;
   const hacks = input.todoHackSnapshot.hacks.length;
   if (input.todoHackSnapshot.enabled) {
-    parts.push(`<span class="pill" title="${escapeHtml(t('findingsDash.status.todoHackTitle'))}">${todos} TODO · ${hacks} HACK</span>`);
+    parts.push(`<span class="pill" title="${escapeHtml(l10n('findingsDash.status.todoHackTitle'))}">${todos} TODO · ${hacks} HACK</span>`);
   }
   const drift = input.driftAdvisorSnapshot;
   if (drift.integrationEnabled) {
     if (drift.connected) {
-      parts.push(`<span class="pill good" title="${escapeHtml(t('findingsDash.status.driftOnTitle', { label: drift.serverLabel ?? '' }))}">${t('findingsDash.status.driftOnPill', { count: String(drift.issues.length) })}</span>`);
+      parts.push(`<span class="pill good" title="${escapeHtml(l10n('findingsDash.status.driftOnTitle', { label: drift.serverLabel ?? '' }))}">${l10n('findingsDash.status.driftOnPill', { count: String(drift.issues.length) })}</span>`);
     } else {
-      parts.push(`<span class="pill warn" title="${escapeHtml(t('findingsDash.status.driftOfflineTitle'))}">${escapeHtml(t('findingsDash.status.driftOfflinePill'))}</span>`);
+      parts.push(`<span class="pill warn" title="${escapeHtml(l10n('findingsDash.status.driftOfflineTitle'))}">${escapeHtml(l10n('findingsDash.status.driftOfflinePill'))}</span>`);
     }
   }
   if (typeof input.enabledRuleCount === 'number' && input.enabledRuleCount > 0) {
-    parts.push(`<span class="pill" title="${escapeHtml(t('findingsDash.status.enabledRulesTitle'))}">${t('findingsDash.status.rulesCount', { count: String(input.enabledRuleCount) })}</span>`);
+    parts.push(`<span class="pill" title="${escapeHtml(l10n('findingsDash.status.enabledRulesTitle'))}">${l10n('findingsDash.status.rulesCount', { count: String(input.enabledRuleCount) })}</span>`);
   }
   // Full-width toggle is appended after the pills so it right-aligns via margin-inline-start:auto
   // (see .status-line .full-width-toggle in dashboardChromeStyles.ts / violationsDashboardStyles.ts).
@@ -293,7 +293,7 @@ function buildHero(input: ViolationsDashboardHtmlInput): string {
     : '';
   return `<header class="dash-hero">
     <div class="hero-text">
-      <h1>${escapeHtml(t('findingsDash.pageTitle'))}${stamp}</h1>
+      <h1>${escapeHtml(l10n('findingsDash.pageTitle'))}${stamp}</h1>
       ${buildStatusLine(input)}
     </div>
     ${buildGauge(score)}
@@ -338,61 +338,61 @@ function collectKpiCards(input: ViolationsDashboardHtmlInput): KpiSpec[] {
   const cards: KpiSpec[] = [];
   cards.push({
     key: 'visible',
-    label: t('findingsDash.kpi.visibleLabel'),
+    label: l10n('findingsDash.kpi.visibleLabel'),
     value: String(input.filteredCount),
     sub: input.totalRawAfterDisable === input.filteredCount
-      ? t('findingsDash.kpi.allMatched')
-      : t('findingsDash.kpi.ofTotal', { total: String(input.totalRawAfterDisable) }),
+      ? l10n('findingsDash.kpi.allMatched')
+      : l10n('findingsDash.kpi.ofTotal', { total: String(input.totalRawAfterDisable) }),
     classes: '',
     filter: { kind: 'reset' },
-    title: t('findingsDash.kpi.clearFiltersTitle'),
+    title: l10n('findingsDash.kpi.clearFiltersTitle'),
   });
   cards.push({
     key: 'errors',
-    label: t('findingsDash.kpi.errorsLabel'),
+    label: l10n('findingsDash.kpi.errorsLabel'),
     value: String(errorCount),
-    sub: errorCount > 0 ? t('findingsDash.kpi.errorsSubFix') : t('findingsDash.kpi.errorsSubClear'),
+    sub: errorCount > 0 ? l10n('findingsDash.kpi.errorsSubFix') : l10n('findingsDash.kpi.errorsSubClear'),
     classes: 'errors',
     filter: { kind: 'sev', value: 'error' },
-    title: t('findingsDash.kpi.errorsTitle'),
+    title: l10n('findingsDash.kpi.errorsTitle'),
   });
   cards.push({
     key: 'warnings',
-    label: t('findingsDash.kpi.warningsLabel'),
+    label: l10n('findingsDash.kpi.warningsLabel'),
     value: String(warningCount),
-    sub: warningCount > 0 ? t('findingsDash.kpi.warningsSubBad') : t('findingsDash.kpi.warningsSubClear'),
+    sub: warningCount > 0 ? l10n('findingsDash.kpi.warningsSubBad') : l10n('findingsDash.kpi.warningsSubClear'),
     classes: 'warnings',
     filter: { kind: 'sev', value: 'warning' },
-    title: t('findingsDash.kpi.warningsTitle'),
+    title: l10n('findingsDash.kpi.warningsTitle'),
   });
   cards.push({
     key: 'info',
-    label: t('findingsDash.kpi.infoLabel'),
+    label: l10n('findingsDash.kpi.infoLabel'),
     value: String(infoCount),
-    sub: infoCount > 0 ? t('findingsDash.kpi.infoSub') : t('findingsDash.kpi.infoSubNone'),
+    sub: infoCount > 0 ? l10n('findingsDash.kpi.infoSub') : l10n('findingsDash.kpi.infoSubNone'),
     classes: 'info',
     filter: { kind: 'sev', value: 'info' },
-    title: t('findingsDash.kpi.infoTitle'),
+    title: l10n('findingsDash.kpi.infoTitle'),
   });
   if (typeof input.filesAffected === 'number') {
     cards.push({
       key: 'files',
-      label: t('findingsDash.kpi.filesLabel'),
+      label: l10n('findingsDash.kpi.filesLabel'),
       value: String(input.filesAffected),
-      sub: input.filesAffected > 0 ? t('findingsDash.kpi.filesSubAcross') : t('findingsDash.kpi.filesSubNone'),
+      sub: input.filesAffected > 0 ? l10n('findingsDash.kpi.filesSubAcross') : l10n('findingsDash.kpi.filesSubNone'),
       classes: '',
-      title: t('findingsDash.kpi.filesTitle'),
+      title: l10n('findingsDash.kpi.filesTitle'),
     });
   }
   if (input.topRule && input.topRule.count > 0) {
     cards.push({
       key: 'top-rule',
-      label: t('findingsDash.kpi.topRuleLabel'),
+      label: l10n('findingsDash.kpi.topRuleLabel'),
       value: String(input.topRule.count),
       sub: input.topRule.name,
       classes: '',
       filter: { kind: 'top-rule', value: input.topRule.name },
-      title: t('findingsDash.kpi.topRuleTitle', { name: input.topRule.name }),
+      title: l10n('findingsDash.kpi.topRuleTitle', { name: input.topRule.name }),
     });
   }
   return cards;
@@ -425,47 +425,47 @@ function renderKpiCard(c: KpiSpec): string {
 function buildToolbar(input: ViolationsDashboardHtmlInput): string {
   const tf = escapeHtml(input.textFilter);
   const exportCount = input.exportViolations.length;
-  const gbLabel = t('findingsDash.toolbar.groupByLabel');
-  return `<section class="toolbar-band" aria-label="${escapeHtml(t('findingsDash.toolbar.ariaFiltersActions'))}">
+  const gbLabel = l10n('findingsDash.toolbar.groupByLabel');
+  return `<section class="toolbar-band" aria-label="${escapeHtml(l10n('findingsDash.toolbar.ariaFiltersActions'))}">
     <div class="toolbar-row">
-      <span class="field" title="${escapeHtml(t('findingsDash.toolbar.groupByFieldTitle'))}">
+      <span class="field" title="${escapeHtml(l10n('findingsDash.toolbar.groupByFieldTitle'))}">
         <span class="glyph">⌘</span>
         <label for="groupBy">${escapeHtml(gbLabel)}</label>
         <select id="groupBy" aria-label="${escapeHtml(gbLabel)}">${groupBySelectOptions(input.groupBy)}</select>
       </span>
-      <span class="field text-filter-field" title="${escapeHtml(t('findingsDash.toolbar.textFilterTitle'))}">
+      <span class="field text-filter-field" title="${escapeHtml(l10n('findingsDash.toolbar.textFilterTitle'))}">
         <span class="glyph">⌕</span>
-        <input type="text" id="textFilter" placeholder="${escapeHtml(t('findingsDash.toolbar.textFilterPlaceholder'))}" value="${tf}" aria-label="${escapeHtml(t('findingsDash.toolbar.textFilterAria'))}" />
-        <button type="button" class="clear-btn" id="textFilterClear" title="${escapeHtml(t('findingsDash.toolbar.clearTextFilterTitle'))}" aria-label="${escapeHtml(t('findingsDash.toolbar.clearTextFilterAria'))}">×</button>
+        <input type="text" id="textFilter" placeholder="${escapeHtml(l10n('findingsDash.toolbar.textFilterPlaceholder'))}" value="${tf}" aria-label="${escapeHtml(l10n('findingsDash.toolbar.textFilterAria'))}" />
+        <button type="button" class="clear-btn" id="textFilterClear" title="${escapeHtml(l10n('findingsDash.toolbar.clearTextFilterTitle'))}" aria-label="${escapeHtml(l10n('findingsDash.toolbar.clearTextFilterAria'))}">×</button>
         <!-- §8.5.2 — recent-searches popover for the Findings filter.
              Persistence: sessionStorage. Cross-session persistence via
              workspaceState is tracked in plan/UX_GUIDELINES.md (Part B). -->
         <div id="findings-recent" class="findings-recent" hidden>
           <div class="findings-recent-head">
-            <span class="findings-recent-title">${escapeHtml(t('findingsDash.toolbar.recentFiltersTitle'))}</span>
+            <span class="findings-recent-title">${escapeHtml(l10n('findingsDash.toolbar.recentFiltersTitle'))}</span>
             <button type="button" id="findings-recent-clear"
               class="findings-recent-clear"
-              title="${escapeHtml(t('findingsDash.toolbar.clearRecentTitle'))}">${escapeHtml(t('findingsDash.toolbar.clearRecentButton'))}</button>
+              title="${escapeHtml(l10n('findingsDash.toolbar.clearRecentTitle'))}">${escapeHtml(l10n('findingsDash.toolbar.clearRecentButton'))}</button>
           </div>
           <ul id="findings-recent-list" class="findings-recent-list"
-            role="listbox" aria-label="${escapeHtml(t('findingsDash.toolbar.recentFiltersListAria'))}"></ul>
+            role="listbox" aria-label="${escapeHtml(l10n('findingsDash.toolbar.recentFiltersListAria'))}"></ul>
         </div>
       </span>
-      <button type="button" class="btn tier-1" id="btn-run" data-run-analysis title="${escapeHtml(t('findingsDash.toolbar.runAnalysisTitle'))}">
-        <span class="glyph">▶</span>${escapeHtml(t('toolbar.runAnalysis'))}
+      <button type="button" class="btn tier-1" id="btn-run" data-run-analysis title="${escapeHtml(l10n('findingsDash.toolbar.runAnalysisTitle'))}">
+        <span class="glyph">▶</span>${escapeHtml(l10n('toolbar.runAnalysis'))}
       </button>
-      <button type="button" class="btn" id="btn-refresh" title="${escapeHtml(t('findingsDash.toolbar.refreshViolationsTitle'))}">
-        <span class="glyph">⟳</span>${escapeHtml(t('toolbar.refresh'))}
+      <button type="button" class="btn" id="btn-refresh" title="${escapeHtml(l10n('findingsDash.toolbar.refreshViolationsTitle'))}">
+        <span class="glyph">⟳</span>${escapeHtml(l10n('toolbar.refresh'))}
       </button>
       ${buildMoreActionsMenu(exportCount)}
     </div>
     <div class="toolbar-row">
-      <span class="seg" role="group" aria-label="${escapeHtml(t('findingsDash.toolbar.severityGroupAria'))}">
-        <span class="seg-label">${escapeHtml(t('findingsDash.toolbar.severityLabel'))}</span>
+      <span class="seg" role="group" aria-label="${escapeHtml(l10n('findingsDash.toolbar.severityGroupAria'))}">
+        <span class="seg-label">${escapeHtml(l10n('findingsDash.toolbar.severityLabel'))}</span>
         ${severitySegmented(input.severities)}
       </span>
-      <span class="seg" role="group" aria-label="${escapeHtml(t('findingsDash.toolbar.impactGroupAria'))}">
-        <span class="seg-label">${escapeHtml(t('findingsDash.toolbar.impactLabel'))}</span>
+      <span class="seg" role="group" aria-label="${escapeHtml(l10n('findingsDash.toolbar.impactGroupAria'))}">
+        <span class="seg-label">${escapeHtml(l10n('findingsDash.toolbar.impactLabel'))}</span>
         ${impactSegmented(input.impacts)}
       </span>
     </div>
@@ -476,8 +476,8 @@ function buildToolbar(input: ViolationsDashboardHtmlInput): string {
 function buildAnalysisProgress(): string {
   return `<div id="analysis-progress" class="analysis-progress" role="status" aria-live="polite" hidden>
     <div class="analysis-progress-head">
-      <strong id="analysis-progress-label">${escapeHtml(t('findingsDash.progress.runningLabel'))}</strong>
-      <span id="analysis-progress-meta">${escapeHtml(t('findingsDash.progress.runningMeta'))}</span>
+      <strong id="analysis-progress-label">${escapeHtml(l10n('findingsDash.progress.runningLabel'))}</strong>
+      <span id="analysis-progress-meta">${escapeHtml(l10n('findingsDash.progress.runningMeta'))}</span>
     </div>
     <div class="analysis-progress-track" aria-hidden="true">
       <div class="analysis-progress-bar"></div>
@@ -487,21 +487,21 @@ function buildAnalysisProgress(): string {
 
 function buildMoreActionsMenu(exportCount: number): string {
   const items: Array<[string, string, string]> = [
-    ['saropaLints.openHelpHub', t('findingsDash.menuPalette.help'), 'F1'],
-    ['saropaLints.setGroupBy', t('findingsDash.menuPalette.groupBy'), ''],
-    ['saropaLints.setIssuesFilter', t('findingsDash.menuPalette.textFilter'), ''],
-    ['saropaLints.setIssuesFilterByType', t('findingsDash.menuPalette.severityImpact'), ''],
-    ['saropaLints.setIssuesFilterByRule', t('findingsDash.menuPalette.hideRules'), ''],
-    ['saropaLints.setIssuesFilterByMetadata', t('findingsDash.menuPalette.ruleMetadata'), ''],
-    ['saropaLints.clearIssuesFilters', t('findingsDash.menuPalette.clearFilters'), ''],
-    ['saropaLints.clearSuppressions', t('findingsDash.menuPalette.clearSuppressions'), ''],
-    ['saropaLints.clearFocusFile', t('findingsDash.menuPalette.clearFileFocus'), ''],
-    ['saropaLints.focusIssuesForActiveFile', t('findingsDash.menuPalette.matchActiveEditor'), ''],
-    ['saropaLints.issues.copyAsJson', t('findingsDash.menuPalette.copyTreeJson'), ''],
-    ['saropaLints.refresh', t('findingsDash.menuPalette.refreshExtension'), ''],
-    ['saropaLints.openPackageVibrancy', t('findingsDash.menuPalette.openPackageDashboard'), ''],
-    ['saropaLints.openProjectVibrancyReport', t('findingsDash.menuPalette.openCodeHealth'), ''],
-    ['saropaLints.openConfigDashboard', t('findingsDash.menuPalette.openLintsConfig'), ''],
+    ['saropaLints.openHelpHub', l10n('findingsDash.menuPalette.help'), 'F1'],
+    ['saropaLints.setGroupBy', l10n('findingsDash.menuPalette.groupBy'), ''],
+    ['saropaLints.setIssuesFilter', l10n('findingsDash.menuPalette.textFilter'), ''],
+    ['saropaLints.setIssuesFilterByType', l10n('findingsDash.menuPalette.severityImpact'), ''],
+    ['saropaLints.setIssuesFilterByRule', l10n('findingsDash.menuPalette.hideRules'), ''],
+    ['saropaLints.setIssuesFilterByMetadata', l10n('findingsDash.menuPalette.ruleMetadata'), ''],
+    ['saropaLints.clearIssuesFilters', l10n('findingsDash.menuPalette.clearFilters'), ''],
+    ['saropaLints.clearSuppressions', l10n('findingsDash.menuPalette.clearSuppressions'), ''],
+    ['saropaLints.clearFocusFile', l10n('findingsDash.menuPalette.clearFileFocus'), ''],
+    ['saropaLints.focusIssuesForActiveFile', l10n('findingsDash.menuPalette.matchActiveEditor'), ''],
+    ['saropaLints.issues.copyAsJson', l10n('findingsDash.menuPalette.copyTreeJson'), ''],
+    ['saropaLints.refresh', l10n('findingsDash.menuPalette.refreshExtension'), ''],
+    ['saropaLints.openPackageVibrancy', l10n('findingsDash.menuPalette.openPackageDashboard'), ''],
+    ['saropaLints.openProjectVibrancyReport', l10n('findingsDash.menuPalette.openCodeHealth'), ''],
+    ['saropaLints.openConfigDashboard', l10n('findingsDash.menuPalette.openLintsConfig'), ''],
   ];
   const itemsHtml = items
     .map(([cmd, label, kbd]) =>
@@ -519,16 +519,16 @@ function buildMoreActionsMenu(exportCount: number): string {
   // Hidden id="btn-refresh-extension" preserves the existing test contract
   // and keyboard binding without polluting the visible toolbar.
   return `<details class="more">
-    <summary class="btn" title="${escapeHtml(t('toolbar.moreActions'))}" aria-label="${escapeHtml(t('toolbar.moreActions'))}">
-      <span class="glyph">⋯</span>${escapeHtml(t('findingsDash.toolbar.moreSummary'))} <span class="chev">${escapeHtml(t('findingsDash.toolbar.moreChevron'))}</span>
+    <summary class="btn" title="${escapeHtml(l10n('toolbar.moreActions'))}" aria-label="${escapeHtml(l10n('toolbar.moreActions'))}">
+      <span class="glyph">⋯</span>${escapeHtml(l10n('findingsDash.toolbar.moreSummary'))} <span class="chev">${escapeHtml(l10n('findingsDash.toolbar.moreChevron'))}</span>
     </summary>
     <div class="menu" role="menu">
-      <button type="button" class="menu-item" id="btn-copy" title="${escapeHtml(t('findingsDash.toolbar.copyJsonTitle', { count: String(exportCount) }))}">
-        <span><span class="glyph">⎘</span>${escapeHtml(t('toolbar.copyJson'))}</span>
+      <button type="button" class="menu-item" id="btn-copy" title="${escapeHtml(l10n('findingsDash.toolbar.copyJsonTitle', { count: String(exportCount) }))}">
+        <span><span class="glyph">⎘</span>${escapeHtml(l10n('toolbar.copyJson'))}</span>
         <span class="kbd"></span>
       </button>
-      <button type="button" class="menu-item" id="btn-save" title="${escapeHtml(t('findingsDash.toolbar.saveReportTitle'))}">
-        <span><span class="glyph">⤓</span>${escapeHtml(t('toolbar.saveReport'))}</span>
+      <button type="button" class="menu-item" id="btn-save" title="${escapeHtml(l10n('findingsDash.toolbar.saveReportTitle'))}">
+        <span><span class="glyph">⤓</span>${escapeHtml(l10n('toolbar.saveReport'))}</span>
         <span class="kbd"></span>
       </button>
       ${itemsHtml}
@@ -544,30 +544,30 @@ function buildMoreActionsMenu(exportCount: number): string {
 function buildChipStrip(input: ViolationsDashboardHtmlInput): string {
   const chips: string[] = [];
   if (input.textFilter.trim().length > 0) {
-    chips.push(buildChip('contains', t('findingsDash.chip.contains', { q: input.textFilter }), 'text'));
+    chips.push(buildChip('contains', l10n('findingsDash.chip.contains', { q: input.textFilter }), 'text'));
   }
   for (const v of SEVERITY_ORDER) {
     if (!input.severities.includes(v)) {
-      chips.push(buildChip('sev-off', t('findingsDash.chip.severityOff', { v }), `sev:${v}`));
+      chips.push(buildChip('sev-off', l10n('findingsDash.chip.severityOff', { v }), `sev:${v}`));
     }
   }
   for (const v of IMPACT_ORDER) {
     if (!input.impacts.includes(v)) {
-      chips.push(buildChip('imp-off', t('findingsDash.chip.impactOff', { v }), `imp:${v}`));
+      chips.push(buildChip('imp-off', l10n('findingsDash.chip.impactOff', { v }), `imp:${v}`));
     }
   }
   if (chips.length === 0) return '';
   return `<div class="chip-strip" id="chipStrip">
-    <span class="lbl">${escapeHtml(t('filter.activeLabel'))}</span>
+    <span class="lbl">${escapeHtml(l10n('filter.activeLabel'))}</span>
     ${chips.join('')}
-    <button type="button" class="clear-all" id="chipsClearAll" title="${escapeHtml(t('findingsDash.chip.resetAllTitle'))}">${escapeHtml(t('toolbar.clearAll'))}</button>
+    <button type="button" class="clear-all" id="chipsClearAll" title="${escapeHtml(l10n('findingsDash.chip.resetAllTitle'))}">${escapeHtml(l10n('toolbar.clearAll'))}</button>
   </div>`;
 }
 
 function buildChip(kind: string, label: string, dropToken: string): string {
   return `<span class="chip" data-chip-kind="${escapeHtml(kind)}" data-chip-token="${escapeHtml(dropToken)}">
     ${escapeHtml(label)}
-    <button type="button" class="x" aria-label="${escapeHtml(t('filter.chipRemove'))}">×</button>
+    <button type="button" class="x" aria-label="${escapeHtml(l10n('filter.chipRemove'))}">×</button>
   </span>`;
 }
 
@@ -605,37 +605,37 @@ function buildTopRulesTable(input: ViolationsDashboardHtmlInput): string {
       <td class="col-sev"><span class="sev-pill sev-${escapeHtml(sev)}">${escapeHtml(sev)}</span></td>
       <td class="col-actions">
         <button type="button" class="row-action neutral" data-row-action="hide-rule"
-                title="${escapeHtml(t('findingsDash.topRules.hideTitle'))}">
-          ${escapeHtml(t('findingsDash.topRules.hideButton'))}
+                title="${escapeHtml(l10n('findingsDash.topRules.hideTitle'))}">
+          ${escapeHtml(l10n('findingsDash.topRules.hideButton'))}
         </button>
         <button type="button" class="row-action danger" data-row-action="disable-rule"
-                title="${escapeHtml(t('findingsDash.topRules.disableTitle'))}">
-          ${escapeHtml(t('findingsDash.topRules.disableButton'))}
+                title="${escapeHtml(l10n('findingsDash.topRules.disableTitle'))}">
+          ${escapeHtml(l10n('findingsDash.topRules.disableButton'))}
         </button>
       </td>
     </tr>`;
   }).join('');
   const topPhrase = pluralize(rows.length, {
-    one: t('findingsDash.topRules.topRulesOne'),
-    other: t('findingsDash.topRules.topRulesOther'),
+    one: l10n('findingsDash.topRules.topRulesOne'),
+    other: l10n('findingsDash.topRules.topRulesOther'),
   });
-  return `<section class="section" aria-label="${escapeHtml(t('findingsDash.topRules.sectionAria'))}">
+  return `<section class="section" aria-label="${escapeHtml(l10n('findingsDash.topRules.sectionAria'))}">
     <div class="findings-wrap">
       <div class="findings-toolbar">
         <span class="meta-line" style="margin:0">
           ${topPhrase} · ${totalShown} of ${input.filteredCount} findings (${share}%) ·
-          <strong>${escapeHtml(t('findingsDash.topRules.hideButton'))}</strong> = ${escapeHtml(t('findingsDash.topRules.workspaceOnlyShort'))} ·
-          <strong>${escapeHtml(t('findingsDash.topRules.disableButton'))}</strong> = ${escapeHtml(t('findingsDash.topRules.projectConfigShort'))}
+          <strong>${escapeHtml(l10n('findingsDash.topRules.hideButton'))}</strong> = ${escapeHtml(l10n('findingsDash.topRules.workspaceOnlyShort'))} ·
+          <strong>${escapeHtml(l10n('findingsDash.topRules.disableButton'))}</strong> = ${escapeHtml(l10n('findingsDash.topRules.projectConfigShort'))}
         </span>
       </div>
       <table class="top-rules-table" role="grid">
         <thead>
           <tr>
-            <th class="col-rank" scope="col">${escapeHtml(t('findingsDash.topRules.colRank'))}</th>
-            <th class="col-rule" scope="col">${escapeHtml(t('findingsDash.topRules.colRule'))}</th>
-            <th class="col-count" scope="col">${escapeHtml(t('findingsDash.topRules.colCount'))}</th>
-            <th class="col-sev" scope="col">${escapeHtml(t('findingsDash.topRules.colSeverity'))}</th>
-            <th class="col-actions" aria-label="${escapeHtml(t('findingsDash.topRules.colActionsAria'))}" scope="col"></th>
+            <th class="col-rank" scope="col">${escapeHtml(l10n('findingsDash.topRules.colRank'))}</th>
+            <th class="col-rule" scope="col">${escapeHtml(l10n('findingsDash.topRules.colRule'))}</th>
+            <th class="col-count" scope="col">${escapeHtml(l10n('findingsDash.topRules.colCount'))}</th>
+            <th class="col-sev" scope="col">${escapeHtml(l10n('findingsDash.topRules.colSeverity'))}</th>
+            <th class="col-actions" aria-label="${escapeHtml(l10n('findingsDash.topRules.colActionsAria'))}" scope="col"></th>
           </tr>
         </thead>
         <tbody>${body}</tbody>
@@ -653,28 +653,28 @@ function buildFindingsBlock(input: ViolationsDashboardHtmlInput): string {
   if (input.filteredCount === 0) {
     return buildFindingsEmpty(input);
   }
-  return `<section class="section" aria-label="${escapeHtml(t('findingsDash.findings.sectionAria'))}">
+  return `<section class="section" aria-label="${escapeHtml(l10n('findingsDash.findings.sectionAria'))}">
     <div class="findings-wrap">
       <div class="findings-toolbar">
         <span class="meta-line" style="margin:0">${escapeHtml(buildFindingsMeta(input))}</span>
         <div class="actions">
-          <button type="button" class="mini-btn" id="expand-all">${escapeHtml(t('findingsDash.findings.expandAll'))}</button>
-          <button type="button" class="mini-btn" id="collapse-all">${escapeHtml(t('findingsDash.findings.collapseAll'))}</button>
+          <button type="button" class="mini-btn" id="expand-all">${escapeHtml(l10n('findingsDash.findings.expandAll'))}</button>
+          <button type="button" class="mini-btn" id="collapse-all">${escapeHtml(l10n('findingsDash.findings.collapseAll'))}</button>
         </div>
       </div>
       <div id="findings-bulk-bar" class="findings-bulk-bar" hidden>
-        <span class="findings-bulk-label" id="findings-bulk-count">${escapeHtml(t('findingsDash.findings.bulkSelected', { count: '0' }))}</span>
-        <button type="button" class="mini-btn tier-1" id="btn-bulk-copy">${escapeHtml(t('findingsDash.findings.bulkCopy'))}</button>
+        <span class="findings-bulk-label" id="findings-bulk-count">${escapeHtml(l10n('findingsDash.findings.bulkSelected', { count: '0' }))}</span>
+        <button type="button" class="mini-btn tier-1" id="btn-bulk-copy">${escapeHtml(l10n('findingsDash.findings.bulkCopy'))}</button>
       </div>
       <table class="findings-table" role="grid" aria-rowcount="${input.filteredCount}">
         <thead>
           <tr>
-            <th class="col-sel-bulk" scope="col"><input type="checkbox" id="bulk-select-all" title="${escapeHtml(t('findingsDash.findings.selectAllTitle'))}" aria-label="${escapeHtml(t('findingsDash.findings.selectAllAria'))}"></th>
-            <th data-sort="sev" aria-sort="none" scope="col">${escapeHtml(t('findingsDash.findings.colSeverity'))}<span class="arrow">⇅</span><span class="sort-idx" aria-hidden="true"></span></th>
-            <th data-sort="rule" aria-sort="none" scope="col">${escapeHtml(t('findingsDash.findings.colRule'))}<span class="arrow">⇅</span><span class="sort-idx" aria-hidden="true"></span></th>
-            <th data-sort="msg" aria-sort="none" scope="col">${escapeHtml(t('findingsDash.findings.colMessage'))}<span class="arrow">⇅</span><span class="sort-idx" aria-hidden="true"></span></th>
-            <th data-sort="line" aria-sort="none" scope="col">${escapeHtml(t('findingsDash.findings.colLine'))}<span class="arrow">⇅</span><span class="sort-idx" aria-hidden="true"></span></th>
-            <th aria-label="${escapeHtml(t('findingsDash.findings.colActionsAria'))}" scope="col"></th>
+            <th class="col-sel-bulk" scope="col"><input type="checkbox" id="bulk-select-all" title="${escapeHtml(l10n('findingsDash.findings.selectAllTitle'))}" aria-label="${escapeHtml(l10n('findingsDash.findings.selectAllAria'))}"></th>
+            <th data-sort="sev" aria-sort="none" scope="col">${escapeHtml(l10n('findingsDash.findings.colSeverity'))}<span class="arrow">⇅</span><span class="sort-idx" aria-hidden="true"></span></th>
+            <th data-sort="rule" aria-sort="none" scope="col">${escapeHtml(l10n('findingsDash.findings.colRule'))}<span class="arrow">⇅</span><span class="sort-idx" aria-hidden="true"></span></th>
+            <th data-sort="msg" aria-sort="none" scope="col">${escapeHtml(l10n('findingsDash.findings.colMessage'))}<span class="arrow">⇅</span><span class="sort-idx" aria-hidden="true"></span></th>
+            <th data-sort="line" aria-sort="none" scope="col">${escapeHtml(l10n('findingsDash.findings.colLine'))}<span class="arrow">⇅</span><span class="sort-idx" aria-hidden="true"></span></th>
+            <th aria-label="${escapeHtml(l10n('findingsDash.findings.colActionsAria'))}" scope="col"></th>
           </tr>
         </thead>
         <tbody>${buildTableBody(input.sections, input.pageSize)}</tbody>
@@ -685,22 +685,22 @@ function buildFindingsBlock(input: ViolationsDashboardHtmlInput): string {
 }
 
 function buildFindingsMeta(input: ViolationsDashboardHtmlInput): string {
-  const parts: string[] = [t('findingsDash.findings.metaShown', { filtered: String(input.filteredCount) })];
+  const parts: string[] = [l10n('findingsDash.findings.metaShown', { filtered: String(input.filteredCount) })];
   if (input.totalRawAfterDisable !== input.filteredCount) {
-    parts.push(t('findingsDash.findings.metaAfterDisable', { total: String(input.totalRawAfterDisable) }));
+    parts.push(l10n('findingsDash.findings.metaAfterDisable', { total: String(input.totalRawAfterDisable) }));
   }
   if (input.truncatedSource) {
-    parts.push(t('findingsDash.findings.metaSourceCap', { max: String(input.maxSourceViolations) }));
+    parts.push(l10n('findingsDash.findings.metaSourceCap', { max: String(input.maxSourceViolations) }));
   }
-  parts.push(t('findingsDash.findings.metaGroupedBy', { mode: input.groupBy }));
+  parts.push(l10n('findingsDash.findings.metaGroupedBy', { mode: input.groupBy }));
   return parts.join(' · ');
 }
 
 function buildOverflowNote(input: ViolationsDashboardHtmlInput): string {
   if (!input.truncatedSource) return '';
   return `<p class="overflow-note">
-    <span>${escapeHtml(t('findingsDash.findings.overflowNote', { max: String(input.maxSourceViolations) }))}</span>
-    <button type="button" class="link" id="run-again" data-run-analysis>${escapeHtml(t('findingsDash.findings.runAgain'))}</button>
+    <span>${escapeHtml(l10n('findingsDash.findings.overflowNote', { max: String(input.maxSourceViolations) }))}</span>
+    <button type="button" class="link" id="run-again" data-run-analysis>${escapeHtml(l10n('findingsDash.findings.runAgain'))}</button>
   </p>`;
 }
 
@@ -733,31 +733,31 @@ function renderFindingRow(v: Violation, filePath: string): string {
   const msg = escapeHtml(v.message ?? '');
   const fileLabel = escapeHtml(filePath);
   return `<tr class="frow" data-sev="${escapeHtml(sev)}" data-rule="${escapeHtml(v.rule)}" data-line="${line}" data-file="${fileAttr}" tabindex="0">
-    <td class="col-sel-bulk"><input type="checkbox" class="bulk-row-cb" data-file="${fileAttr}" data-line="${line}" data-rule="${escapeHtml(v.rule)}" aria-label="${escapeHtml(t('findingsDash.findings.selectRowAria'))}"></td>
+    <td class="col-sel-bulk"><input type="checkbox" class="bulk-row-cb" data-file="${fileAttr}" data-line="${line}" data-rule="${escapeHtml(v.rule)}" aria-label="${escapeHtml(l10n('findingsDash.findings.selectRowAria'))}"></td>
     <td class="col-sev"><span class="sev-pill sev-${escapeHtml(sev)}">${escapeHtml(sev)}</span></td>
     <td class="col-rule"><span class="rule-tag">${rule}</span></td>
     <td class="col-msg"><div class="vmsg">${msg}</div><div class="kpi-sub" title="${fileLabel}">${fileLabel}</div></td>
-    <td class="col-line">${escapeHtml(t('findingsDash.findings.linePrefix', { line: String(line) }))}</td>
-    <td class="col-actions"><button type="button" class="row-action" data-row-action="copy" title="${escapeHtml(t('findingsDash.findings.copyRowTitle'))}">⎘</button></td>
+    <td class="col-line">${escapeHtml(l10n('findingsDash.findings.linePrefix', { line: String(line) }))}</td>
+    <td class="col-actions"><button type="button" class="row-action" data-row-action="copy" title="${escapeHtml(l10n('findingsDash.findings.copyRowTitle'))}">⎘</button></td>
   </tr>`;
 }
 
 function buildFindingsEmpty(input: ViolationsDashboardHtmlInput): string {
   const reason = input.totalRawAfterDisable === 0
-    ? t('findingsDash.findings.emptyNoViolations')
-    : t('findingsDash.findings.emptyNoMatch');
+    ? l10n('findingsDash.findings.emptyNoViolations')
+    : l10n('findingsDash.findings.emptyNoMatch');
   const cta = input.totalRawAfterDisable === 0
-    ? `<button type="button" class="btn tier-1" id="btn-run-empty" data-run-analysis><span class="glyph">▶</span>${escapeHtml(t('toolbar.runAnalysis'))}</button>
-       <button type="button" class="btn" id="btn-refresh-empty"><span class="glyph">⟳</span>${escapeHtml(t('toolbar.refresh'))}</button>`
-    : `<button type="button" class="btn tier-1" id="btn-reset-empty"><span class="glyph">⊘</span>${escapeHtml(t('findingsDash.findings.resetFilters'))}</button>
-       <button type="button" class="btn" id="btn-run-empty2" data-run-analysis><span class="glyph">▶</span>${escapeHtml(t('findingsDash.findings.reRunAnalysis'))}</button>`;
-  return `<section class="section" aria-label="${escapeHtml(t('findingsDash.findings.sectionAria'))}">
+    ? `<button type="button" class="btn tier-1" id="btn-run-empty" data-run-analysis><span class="glyph">▶</span>${escapeHtml(l10n('toolbar.runAnalysis'))}</button>
+       <button type="button" class="btn" id="btn-refresh-empty"><span class="glyph">⟳</span>${escapeHtml(l10n('toolbar.refresh'))}</button>`
+    : `<button type="button" class="btn tier-1" id="btn-reset-empty"><span class="glyph">⊘</span>${escapeHtml(l10n('findingsDash.findings.resetFilters'))}</button>
+       <button type="button" class="btn" id="btn-run-empty2" data-run-analysis><span class="glyph">▶</span>${escapeHtml(l10n('findingsDash.findings.reRunAnalysis'))}</button>`;
+  return `<section class="section" aria-label="${escapeHtml(l10n('findingsDash.findings.sectionAria'))}">
     <div class="findings-wrap">
       <div class="empty-cta">
         <h3>${escapeHtml(reason)}</h3>
         <p>${input.totalRawAfterDisable === 0
-          ? escapeHtml(t('findingsDash.findings.emptyHintNoData'))
-          : escapeHtml(t('findingsDash.findings.emptyHintFilters'))}</p>
+          ? escapeHtml(l10n('findingsDash.findings.emptyHintNoData'))
+          : escapeHtml(l10n('findingsDash.findings.emptyHintFilters'))}</p>
         <div class="btns">${cta}</div>
       </div>
     </div>
@@ -784,11 +784,11 @@ function buildChartsBlock(input: ViolationsDashboardHtmlInput): string {
   const sevTotal = SEVERITY_ORDER.reduce((n, k) => n + (input.severityCounts[k] ?? 0), 0);
   const impTotal = IMPACT_ORDER.reduce((n, k) => n + (input.impactCounts[k] ?? 0), 0);
   if (sevTotal === 0 && impTotal === 0) return '';
-  return `<section class="section" aria-label="${escapeHtml(t('findingsDash.charts.sectionAria'))}">
-    <h2>${escapeHtml(t('findingsDash.charts.heading'))} <span class="meta">${escapeHtml(t('findingsDash.charts.metaClickSlice'))}</span></h2>
+  return `<section class="section" aria-label="${escapeHtml(l10n('findingsDash.charts.sectionAria'))}">
+    <h2>${escapeHtml(l10n('findingsDash.charts.heading'))} <span class="meta">${escapeHtml(l10n('findingsDash.charts.metaClickSlice'))}</span></h2>
     <div class="charts-grid">
-      ${sevTotal === 0 ? '' : buildMixCard(t('findingsDash.charts.severityMix'), SEVERITY_ORDER, input.severityCounts, 'sev')}
-      ${impTotal === 0 ? '' : buildMixCard(t('findingsDash.charts.impactMix'), IMPACT_ORDER, input.impactCounts, 'imp')}
+      ${sevTotal === 0 ? '' : buildMixCard(l10n('findingsDash.charts.severityMix'), SEVERITY_ORDER, input.severityCounts, 'sev')}
+      ${impTotal === 0 ? '' : buildMixCard(l10n('findingsDash.charts.impactMix'), IMPACT_ORDER, input.impactCounts, 'imp')}
     </div>
   </section>`;
 }
@@ -816,7 +816,7 @@ function buildBarRow(axis: 'sev' | 'imp', key: string, count: number, max: numbe
   const width = max > 0 ? Math.round((count / max) * 100) : 0;
   const zero = count === 0 ? ' zero' : '';
   const role = count === 0 ? '' : ' role="button" tabindex="0"';
-  return `<div class="bar-row${zero}"${role} data-filter-kind="${axis}" data-filter-value="${escapeHtml(key)}" title="${escapeHtml(t('findingsDash.charts.filterBarTitle', { key }))}">
+  return `<div class="bar-row${zero}"${role} data-filter-kind="${axis}" data-filter-value="${escapeHtml(key)}" title="${escapeHtml(l10n('findingsDash.charts.filterBarTitle', { key }))}">
     <span class="bar-label">${escapeHtml(key)}</span>
     <div class="bar-track"><div class="bar-fill ${axis === 'sev' ? `sev-${escapeHtml(key)}` : `imp-${escapeHtml(key)}`}" style="--bar-width:${width}%"></div></div>
     <span class="bar-value">${count}</span>
@@ -850,7 +850,7 @@ function buildDonut(
   }).join('');
   return `<div class="donut-wrap"><div class="donut">
     <svg viewBox="0 0 96 96">${segs}</svg>
-    <div class="donut-legend"><div class="total">${total}</div><div class="lbl">${escapeHtml(t('findingsDash.charts.donutTotal'))}</div></div>
+    <div class="donut-legend"><div class="total">${total}</div><div class="lbl">${escapeHtml(l10n('findingsDash.charts.donutTotal'))}</div></div>
   </div></div>`;
 }
 
@@ -861,16 +861,16 @@ function buildDonut(
 function buildTodoHackBlock(input: ViolationsDashboardHtmlInput): string {
   const snap = input.todoHackSnapshot;
   if (!snap.enabled) {
-    return `<section class="section" aria-label="${escapeHtml(t('findingsDash.todoHack.sectionAria'))}">
-      <h2>${escapeHtml(t('findingsDash.todoHack.headingDisabled'))} <span class="meta">${escapeHtml(t('findingsDash.todoHack.metaDisabled'))}</span></h2>
-      <p class="footer-line">${escapeHtml(t('findingsDash.todoHack.scanOff'))}
-        <button type="button" class="link" id="btn-enable-todos-scan">${escapeHtml(t('findingsDash.todoHack.enableScan'))}</button></p>
+    return `<section class="section" aria-label="${escapeHtml(l10n('findingsDash.todoHack.sectionAria'))}">
+      <h2>${escapeHtml(l10n('findingsDash.todoHack.headingDisabled'))} <span class="meta">${escapeHtml(l10n('findingsDash.todoHack.metaDisabled'))}</span></h2>
+      <p class="footer-line">${escapeHtml(l10n('findingsDash.todoHack.scanOff'))}
+        <button type="button" class="link" id="btn-enable-todos-scan">${escapeHtml(l10n('findingsDash.todoHack.enableScan'))}</button></p>
     </section>`;
   }
-  const todoBody = renderTodoSubsection(t('findingsDash.todoHack.todosLabel'), snap.todos, snap.capped);
-  const hackBody = renderTodoSubsection(t('findingsDash.todoHack.hacksLabel'), snap.hacks, snap.capped);
-  return `<section class="section" aria-label="${escapeHtml(t('findingsDash.todoHack.sectionAria'))}">
-    <h2>${escapeHtml(t('findingsDash.todoHack.heading'))} <span class="count">${snap.todos.length + snap.hacks.length}</span></h2>
+  const todoBody = renderTodoSubsection(l10n('findingsDash.todoHack.todosLabel'), snap.todos, snap.capped);
+  const hackBody = renderTodoSubsection(l10n('findingsDash.todoHack.hacksLabel'), snap.hacks, snap.capped);
+  return `<section class="section" aria-label="${escapeHtml(l10n('findingsDash.todoHack.sectionAria'))}">
+    <h2>${escapeHtml(l10n('findingsDash.todoHack.heading'))} <span class="count">${snap.todos.length + snap.hacks.length}</span></h2>
     ${todoBody}
     ${hackBody}
   </section>`;
@@ -882,11 +882,11 @@ function renderTodoSubsection(
   capped: boolean,
 ): string {
   if (items.length === 0) {
-    return `<p class="footer-line">${escapeHtml(t('findingsDash.todoHack.subsectionNone', { title }))}</p>`;
+    return `<p class="footer-line">${escapeHtml(l10n('findingsDash.todoHack.subsectionNone', { title }))}</p>`;
   }
   const rows = items.map(renderCompactRow).join('');
   const cap = capped
-    ? `<p class="footer-line">${escapeHtml(t('findingsDash.todoHack.capNote'))}</p>`
+    ? `<p class="footer-line">${escapeHtml(l10n('findingsDash.todoHack.capNote'))}</p>`
     : '';
   return `<div style="margin-bottom:8px">
     <h3 style="margin:6px 0;font-size:.95em;font-weight:600">${escapeHtml(title)} <span class="meta">${items.length}</span></h3>
@@ -901,7 +901,7 @@ function renderCompactRow(item: { file: string; line: number; snippet: string })
   const snippet = escapeHtml(item.snippet);
   const file = escapeHtml(item.file);
   return `<div class="crow" role="button" tabindex="0" data-file="${fileAttr}" data-line="${line}">
-    <span class="sev-pill sev-note">${escapeHtml(t('findingsDash.todoHack.notePill'))}</span>
+    <span class="sev-pill sev-note">${escapeHtml(l10n('findingsDash.todoHack.notePill'))}</span>
     <span class="floc" title="${file}">${file}</span>
     <span class="fmsg">${snippet}</span>
     <span class="fline">L${line}</span>
@@ -914,26 +914,26 @@ function renderCompactRow(item: { file: string; line: number; snippet: string })
 
 function buildDriftBlock(input: ViolationsDashboardHtmlInput['driftAdvisorSnapshot']): string {
   if (!input.integrationEnabled) {
-    return `<section class="section" aria-label="${escapeHtml(t('findingsDash.drift.sectionAria'))}">
-      <h2>${escapeHtml(t('findingsDash.drift.headingOff'))} <span class="meta">${escapeHtml(t('findingsDash.drift.metaOff'))}</span></h2>
-      <p class="footer-line">${escapeHtml(t('findingsDash.drift.enableBlurb'))}
-        <button type="button" class="link" id="btn-drift-enable">${escapeHtml(t('findingsDash.drift.enable'))}</button></p>
+    return `<section class="section" aria-label="${escapeHtml(l10n('findingsDash.drift.sectionAria'))}">
+      <h2>${escapeHtml(l10n('findingsDash.drift.headingOff'))} <span class="meta">${escapeHtml(l10n('findingsDash.drift.metaOff'))}</span></h2>
+      <p class="footer-line">${escapeHtml(l10n('findingsDash.drift.enableBlurb'))}
+        <button type="button" class="link" id="btn-drift-enable">${escapeHtml(l10n('findingsDash.drift.enable'))}</button></p>
     </section>`;
   }
   if (!input.connected) {
-    return `<section class="section" aria-label="${escapeHtml(t('findingsDash.drift.sectionAria'))}">
-      <h2>${escapeHtml(t('findingsDash.drift.headingNoServer'))} <span class="meta">${escapeHtml(t('findingsDash.drift.metaNoServer'))}</span></h2>
-      <p class="footer-line">${escapeHtml(t('findingsDash.drift.noServerBlurb'))}
-        <button type="button" class="link" id="btn-drift-refresh">${escapeHtml(t('findingsDash.drift.retry'))}</button>
+    return `<section class="section" aria-label="${escapeHtml(l10n('findingsDash.drift.sectionAria'))}">
+      <h2>${escapeHtml(l10n('findingsDash.drift.headingNoServer'))} <span class="meta">${escapeHtml(l10n('findingsDash.drift.metaNoServer'))}</span></h2>
+      <p class="footer-line">${escapeHtml(l10n('findingsDash.drift.noServerBlurb'))}
+        <button type="button" class="link" id="btn-drift-refresh">${escapeHtml(l10n('findingsDash.drift.retry'))}</button>
       </p>
     </section>`;
   }
   if (input.issues.length === 0) {
-    return `<section class="section" aria-label="${escapeHtml(t('findingsDash.drift.sectionAria'))}">
-      <h2>${escapeHtml(t('findingsDash.drift.headingConnected'))} <span class="meta">${escapeHtml(t('findingsDash.drift.metaConnected'))}</span></h2>
-      <p class="footer-line">${escapeHtml(t('findingsDash.drift.noIssues', { label: input.serverLabel ?? '' }))}
-        <button type="button" class="link" id="btn-drift-refresh">${escapeHtml(t('findingsDash.drift.refresh'))}</button>
-        <button type="button" class="link" id="btn-drift-browser">${escapeHtml(t('findingsDash.drift.openBrowser'))}</button>
+    return `<section class="section" aria-label="${escapeHtml(l10n('findingsDash.drift.sectionAria'))}">
+      <h2>${escapeHtml(l10n('findingsDash.drift.headingConnected'))} <span class="meta">${escapeHtml(l10n('findingsDash.drift.metaConnected'))}</span></h2>
+      <p class="footer-line">${escapeHtml(l10n('findingsDash.drift.noIssues', { label: input.serverLabel ?? '' }))}
+        <button type="button" class="link" id="btn-drift-refresh">${escapeHtml(l10n('findingsDash.drift.refresh'))}</button>
+        <button type="button" class="link" id="btn-drift-browser">${escapeHtml(l10n('findingsDash.drift.openBrowser'))}</button>
       </p>
     </section>`;
   }
@@ -957,13 +957,13 @@ function buildDriftBlock(input: ViolationsDashboardHtmlInput['driftAdvisorSnapsh
       <span class="fline">—</span>
     </div>`;
   }).join('');
-  return `<section class="section" aria-label="${escapeHtml(t('findingsDash.drift.sectionAria'))}">
-    <h2>${escapeHtml(t('findingsDash.drift.headingIssues'))} <span class="count">${input.issues.length}</span> <span class="meta">${escapeHtml(input.serverLabel ?? '')}</span></h2>
+  return `<section class="section" aria-label="${escapeHtml(l10n('findingsDash.drift.sectionAria'))}">
+    <h2>${escapeHtml(l10n('findingsDash.drift.headingIssues'))} <span class="count">${input.issues.length}</span> <span class="meta">${escapeHtml(input.serverLabel ?? '')}</span></h2>
     <div class="compact-list">${rows}</div>
     <p class="footer-line">
-      <button type="button" class="link" id="btn-drift-refresh">${escapeHtml(t('findingsDash.drift.refresh'))}</button>
-      <button type="button" class="link" id="btn-drift-browser">${escapeHtml(t('findingsDash.drift.openBrowser'))}</button>
-      <button type="button" class="link" id="btn-drift-disable">${escapeHtml(t('findingsDash.drift.disable'))}</button>
+      <button type="button" class="link" id="btn-drift-refresh">${escapeHtml(l10n('findingsDash.drift.refresh'))}</button>
+      <button type="button" class="link" id="btn-drift-browser">${escapeHtml(l10n('findingsDash.drift.openBrowser'))}</button>
+      <button type="button" class="link" id="btn-drift-disable">${escapeHtml(l10n('findingsDash.drift.disable'))}</button>
     </p>
   </section>`;
 }
@@ -981,10 +981,10 @@ function buildSuppressionsBlock(input: ViolationsDashboardHtmlInput): string {
      section reflects what is in violations.json, not the live workspace state.
      The kind breakdown sits in the meta span when populated; otherwise the meta
      span stays empty so the header doesn't render an awkward trailing dot. */
-  return `<section class="section" id="suppressions-block" aria-label="${escapeHtml(t('findingsDash.suppressions.sectionAria'))}">
-    <h2>${escapeHtml(t('findingsDash.suppressions.headingExport'))} <span class="count">${a.total}</span>${kindBreakdown ? ` <span class="meta">${kindBreakdown}</span>` : ''}</h2>
+  return `<section class="section" id="suppressions-block" aria-label="${escapeHtml(l10n('findingsDash.suppressions.sectionAria'))}">
+    <h2>${escapeHtml(l10n('findingsDash.suppressions.headingExport'))} <span class="count">${a.total}</span>${kindBreakdown ? ` <span class="meta">${kindBreakdown}</span>` : ''}</h2>
     <div class="sup-band">${buildAnalyzerBody(a)}</div>
-    <h3 style="margin:14px 0 6px;font-size:.98em;font-weight:600">${escapeHtml(t('findingsDash.suppressions.viewHidesHeading'))} <span class="meta" style="margin-inline-start:8px;color:var(--vscode-descriptionForeground)">${v.active ? escapeHtml(t('findingsDash.suppressions.viewHidesMetaActive')) : escapeHtml(t('findingsDash.suppressions.viewHidesMetaNone'))}</span></h3>
+    <h3 style="margin:14px 0 6px;font-size:.98em;font-weight:600">${escapeHtml(l10n('findingsDash.suppressions.viewHidesHeading'))} <span class="meta" style="margin-inline-start:8px;color:var(--vscode-descriptionForeground)">${v.active ? escapeHtml(l10n('findingsDash.suppressions.viewHidesMetaActive')) : escapeHtml(l10n('findingsDash.suppressions.viewHidesMetaNone'))}</span></h3>
     <div class="sup-band">${buildViewBody(v)}</div>
   </section>`;
 }
@@ -998,22 +998,22 @@ function buildKindBreakdown(byKind: readonly [string, number][]): string {
 
 function buildAnalyzerBody(a: AnalyzerSuppressionsSlice): string {
   if (a.total <= 0) {
-    return `<p class="footer-line">${escapeHtml(t('findingsDash.suppressions.noneInExport'))}</p>`;
+    return `<p class="footer-line">${escapeHtml(l10n('findingsDash.suppressions.noneInExport'))}</p>`;
   }
   const totalRow = `<div class="sup-row sup-act" role="button" tabindex="0" data-sup="focus-issues">
-    <span class="sup-k plain">${escapeHtml(t('findingsDash.suppressions.totalRow'))}</span>
+    <span class="sup-k plain">${escapeHtml(l10n('findingsDash.suppressions.totalRow'))}</span>
     <span class="sup-n">${a.total}</span>
   </div>`;
   const ruleBody = renderSupRows(a.byRule, 'rule');
   const fileBody = renderSupRows(a.byFile, 'file');
   return `${totalRow}
-    <details class="sup-disclosure" open><summary>${escapeHtml(t('findingsDash.suppressions.byRule', { count: String(a.byRule.length) }))}</summary>${ruleBody}</details>
-    <details class="sup-disclosure"><summary>${escapeHtml(t('findingsDash.suppressions.byFile', { count: String(a.byFile.length) }))}</summary>${fileBody}</details>`;
+    <details class="sup-disclosure" open><summary>${escapeHtml(l10n('findingsDash.suppressions.byRule', { count: String(a.byRule.length) }))}</summary>${ruleBody}</details>
+    <details class="sup-disclosure"><summary>${escapeHtml(l10n('findingsDash.suppressions.byFile', { count: String(a.byFile.length) }))}</summary>${fileBody}</details>`;
 }
 
 function renderSupRows(entries: readonly [string, number][], kind: 'rule' | 'file'): string {
   if (entries.length === 0) {
-    return `<p class="footer-line">${escapeHtml(t('findingsDash.suppressions.noEntries'))}</p>`;
+    return `<p class="footer-line">${escapeHtml(l10n('findingsDash.suppressions.noEntries'))}</p>`;
   }
   return entries
     .map(([key, count]) => {
@@ -1030,27 +1030,27 @@ function renderSupRows(entries: readonly [string, number][], kind: 'rule' | 'fil
 
 function buildViewBody(v: ViewSuppressionsSlice): string {
   if (!v.active) {
-    return `<p class="footer-line">${escapeHtml(t('findingsDash.suppressions.nothingHidden'))}</p>`;
+    return `<p class="footer-line">${escapeHtml(l10n('findingsDash.suppressions.nothingHidden'))}</p>`;
   }
   const counts = [
-    v.folderCount ? t('findingsDash.suppressions.folderPattern', { count: String(v.folderCount) }) : '',
-    v.fileCount ? t('findingsDash.suppressions.filePattern', { count: String(v.fileCount) }) : '',
-    v.ruleCount ? t('findingsDash.suppressions.ruleGlobal', { count: String(v.ruleCount) }) : '',
-    v.ruleInFileEntryCount ? t('findingsDash.suppressions.perFileRules', { count: String(v.ruleInFileEntryCount) }) : '',
-    v.severityCount ? t('findingsDash.suppressions.severityHides', { count: String(v.severityCount) }) : '',
-    v.impactCount ? t('findingsDash.suppressions.impactHides', { count: String(v.impactCount) }) : '',
+    v.folderCount ? l10n('findingsDash.suppressions.folderPattern', { count: String(v.folderCount) }) : '',
+    v.fileCount ? l10n('findingsDash.suppressions.filePattern', { count: String(v.fileCount) }) : '',
+    v.ruleCount ? l10n('findingsDash.suppressions.ruleGlobal', { count: String(v.ruleCount) }) : '',
+    v.ruleInFileEntryCount ? l10n('findingsDash.suppressions.perFileRules', { count: String(v.ruleInFileEntryCount) }) : '',
+    v.severityCount ? l10n('findingsDash.suppressions.severityHides', { count: String(v.severityCount) }) : '',
+    v.impactCount ? l10n('findingsDash.suppressions.impactHides', { count: String(v.impactCount) }) : '',
   ]
     .filter(Boolean)
     .join(' · ');
   const parts: string[] = [];
-  parts.push(`<p class="footer-line">${escapeHtml(t('findingsDash.suppressions.activeHides', { counts }))}</p>`);
-  parts.push(`<p class="footer-line">${escapeHtml(t('findingsDash.suppressions.viewHidesFooter'))}
-    <button type="button" class="link" id="btn-clear-view-sup">${escapeHtml(t('findingsDash.suppressions.clearViewHides'))}</button></p>`);
-  parts.push(renderListBlock(t('findingsDash.suppressions.foldersSample'), v.sampleFolders));
-  parts.push(renderListBlock(t('findingsDash.suppressions.filesSample'), v.sampleFiles));
-  parts.push(renderListBlock(t('findingsDash.suppressions.rulesSample'), v.sampleRules));
+  parts.push(`<p class="footer-line">${escapeHtml(l10n('findingsDash.suppressions.activeHides', { counts }))}</p>`);
+  parts.push(`<p class="footer-line">${escapeHtml(l10n('findingsDash.suppressions.viewHidesFooter'))}
+    <button type="button" class="link" id="btn-clear-view-sup">${escapeHtml(l10n('findingsDash.suppressions.clearViewHides'))}</button></p>`);
+  parts.push(renderListBlock(l10n('findingsDash.suppressions.foldersSample'), v.sampleFolders));
+  parts.push(renderListBlock(l10n('findingsDash.suppressions.filesSample'), v.sampleFiles));
+  parts.push(renderListBlock(l10n('findingsDash.suppressions.rulesSample'), v.sampleRules));
   if (v.sampleRuleInFileLines.length > 0) {
-    parts.push(renderListBlock(t('findingsDash.suppressions.perFileRulesSample'), v.sampleRuleInFileLines));
+    parts.push(renderListBlock(l10n('findingsDash.suppressions.perFileRulesSample'), v.sampleRuleInFileLines));
   }
   return parts.filter(Boolean).join('\n');
 }
@@ -1067,7 +1067,7 @@ function renderListBlock(title: string, items: readonly string[]): string {
 }
 
 function prettifyAnalyzerKindToken(token: string): string {
-  if (!token) return t('findingsDash.unknownAnalyzerKind');
+  if (!token) return l10n('findingsDash.unknownAnalyzerKind');
   return token
     .replace(/([a-z])([A-Z])/g, '$1 $2')
     .replaceAll('_', ' ')
@@ -1763,7 +1763,7 @@ export function renderViolationsDashboardHtml(input: ViolationsDashboardHtmlInpu
   return `<!DOCTYPE html>
 <html lang="en"><head>
   <meta charset="UTF-8" />
-  <title>${escapeHtml(t('findingsDash.documentTitle'))}</title>
+  <title>${escapeHtml(l10n('findingsDash.documentTitle'))}</title>
   <!-- 'unsafe-inline' on style-src: hero gauge sets dynamic CSS vars (--gauge-target,
        --gauge-arc, --gauge-color) via inline style="..." attributes. CSP nonces only
        authorize <style> blocks, not style attributes — without 'unsafe-inline' the vars
@@ -1771,7 +1771,7 @@ export function renderViolationsDashboardHtml(input: ViolationsDashboardHtmlInpu
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'nonce-${nonce}' 'unsafe-inline'; script-src 'nonce-${nonce}';" />
   <style nonce="${nonce}">${getViolationsDashboardStyles()}${getKeyboardShortcutsStyles()}</style>
 </head><body>
-  ${buildSkipLink('findings-table', t('findingsDash.skipToFindings'))}
+  ${buildSkipLink('findings-table', l10n('findingsDash.skipToFindings'))}
   ${buildAnnouncer()}
   <header>${buildHero(input)}</header>
   ${buildKpiCards(input)}
@@ -1781,18 +1781,18 @@ export function renderViolationsDashboardHtml(input: ViolationsDashboardHtmlInpu
     ${buildTopRulesTable(input)}
     ${buildFindingsBlock(input)}
   </main>
-  <aside aria-label="${escapeHtml(t('findingsDash.secondaryAsideLabel'))}">
+  <aside aria-label="${escapeHtml(l10n('findingsDash.secondaryAsideLabel'))}">
     ${buildTodoHackBlock(input)}
     ${buildDriftBlock(input.driftAdvisorSnapshot)}
     ${buildChartsBlock(input)}
     ${buildSuppressionsBlock(input)}
   </aside>
   ${buildKeyboardShortcutsOverlay([
-    { key: '/', label: t('findingsDash.shortcuts.focusTextFilter') },
-    { key: 'Esc', label: t('findingsDash.shortcuts.clearTextFilter') },
-    { key: 'Enter', label: t('findingsDash.shortcuts.activateKpi') },
-    { key: 'Space', label: t('findingsDash.shortcuts.activateKpiSpace') },
-    { key: '?', label: t('findingsDash.shortcuts.showOverlay') },
+    { key: '/', label: l10n('findingsDash.shortcuts.focusTextFilter') },
+    { key: 'Esc', label: l10n('findingsDash.shortcuts.clearTextFilter') },
+    { key: 'Enter', label: l10n('findingsDash.shortcuts.activateKpi') },
+    { key: 'Space', label: l10n('findingsDash.shortcuts.activateKpiSpace') },
+    { key: '?', label: l10n('findingsDash.shortcuts.showOverlay') },
   ])}
   <script nonce="${nonce}">${buildScript()}</script>
 </body></html>`;
@@ -1812,12 +1812,12 @@ export function buildFindingsEmptyStateHtml(message: string): string {
   <style nonce="${nonce}">${getFindingsEmptyStateStyles()}</style>
 </head><body>
   <div class="empty-hero">
-    <h1>${escapeHtml(t('findingsDash.pageTitle'))}</h1>
+    <h1>${escapeHtml(l10n('findingsDash.pageTitle'))}</h1>
     <p>${esc}</p>
-    <p>${escapeHtml(t('findingsDash.emptyState.hintAfterMessage'))}</p>
+    <p>${escapeHtml(l10n('findingsDash.emptyState.hintAfterMessage'))}</p>
     <div class="btns">
-      <button type="button" class="primary" id="btn-run" data-run-analysis>${escapeHtml(t('toolbar.runAnalysis'))}</button>
-      <button type="button" id="btn-refresh">${escapeHtml(t('findingsDash.emptyState.refreshDisk'))}</button>
+      <button type="button" class="primary" id="btn-run" data-run-analysis>${escapeHtml(l10n('toolbar.runAnalysis'))}</button>
+      <button type="button" id="btn-refresh">${escapeHtml(l10n('findingsDash.emptyState.refreshDisk'))}</button>
     </div>
     ${buildAnalysisProgress()}
   </div>

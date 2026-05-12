@@ -13,6 +13,7 @@
 
 import type { ViolationsData } from '../violationsReader';
 import { sortedNumericCountEntries } from '../keyedCountBreakdown';
+import { l10n } from '../i18n/runtime';
 
 function escapeHtml(s: string): string {
   return s
@@ -26,24 +27,24 @@ function escapeHtml(s: string): string {
 export function buildSuppressionsExportSnapshotStripHtml(data: ViolationsData | null): string {
   if (!data) {
     // No analysis run yet. One muted line is enough — the page header already shows freshness.
-    return `<p class="sup-snap strip collapsed" role="note">No <code>violations.json</code> yet — run analysis to populate the suppression snapshot.</p>`;
+    return `<p class="sup-snap strip collapsed" role="note">${l10n('suppressionsStrip.noData')}</p>`;
   }
   const sup = data.summary?.suppressions;
   const total = typeof sup?.total === 'number' ? sup.total : 0;
   if (!sup || total <= 0) {
     // Zero suppressions in this export — compact, no CTA. The user has nothing to act on here.
-    return `<p class="sup-snap strip collapsed" role="note"><strong>0</strong> analyzer suppressions in the latest export.</p>`;
+    return `<p class="sup-snap strip collapsed" role="note">${l10n('suppressionsStrip.zeroTotal')}</p>`;
   }
   const kinds = sortedNumericCountEntries(sup.byKind);
   const kindLine =
     kinds.length === 0
-      ? 'No by-kind breakdown in this export.'
+      ? l10n('suppressionsStrip.noKindBreakdown')
       : kinds
           .map(([k, v]) => `${escapeHtml(k.replace(/_/g, ' '))} ${escapeHtml(String(v))}`)
           .join(' · ');
   return `<div class="sup-snap strip" role="note">
-  <span class="sup-snap-title">Suppressions (export)</span>
-  <span class="sup-snap-body">Total <strong>${escapeHtml(String(total))}</strong> — ${kindLine} <span class="sup-snap-muted">(read-only; open Findings to browse and act.)</span></span>
-  <button type="button" class="btn sup-snap-btn" data-command="openFindingsDashboard">Open Findings Dashboard</button>
+  <span class="sup-snap-title">${escapeHtml(l10n('suppressionsStrip.title'))}</span>
+  <span class="sup-snap-body">Total <strong>${escapeHtml(String(total))}</strong> — ${kindLine} <span class="sup-snap-muted">${escapeHtml(l10n('suppressionsStrip.readOnlyNote'))}</span></span>
+  <button type="button" class="btn sup-snap-btn" data-command="openFindingsDashboard">${escapeHtml(l10n('suppressionsStrip.openFindings'))}</button>
 </div>`;
 }

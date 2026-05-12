@@ -25,11 +25,11 @@ import {
     getKeyboardShortcutsScript,
     getKeyboardShortcutsStyles,
 } from '../../views/keyboard-shortcuts';
-import { t } from '../../i18n/runtime';
+import { l10n } from '../../i18n/runtime';
 
 /** Column header label / tooltip from `packageDashboard.columns.*`. */
 function col(cid: string, part: 'label' | 'tooltip'): string {
-    return t(`packageDashboard.columns.${cid}.${part}`);
+    return l10n(`packageDashboard.columns.${cid}.${part}`);
 }
 
 /** Options passed to the report builder beyond just results. */
@@ -89,28 +89,28 @@ export function buildReportHtml(options: ReportOptions): string {
     const statusLineHtml = buildStatusLine([
         {
             glyph: '📦',
-            label: t('packageDashboard.status.packagesCount', { count: String(totalCount) }),
-            title: t('packageDashboard.status.packagesBreakdown', {
+            label: l10n('packageDashboard.status.packagesCount', { count: String(totalCount) }),
+            title: l10n('packageDashboard.status.packagesBreakdown', {
                 direct: String(directCount),
                 transitive: String(transitives),
             }),
         },
         {
-            label: t('packageDashboard.status.gradeLine', { grade: overallGrade, avg: String(avg) }),
+            label: l10n('packageDashboard.status.gradeLine', { grade: overallGrade, avg: String(avg) }),
             tone: avg >= 75 ? 'good' : avg >= 50 ? 'warn' : 'bad',
         },
         ...(eolCount > 0
             ? [{
-                label: t('packageDashboard.status.flaggedCount', { count: String(eolCount) }),
+                label: l10n('packageDashboard.status.flaggedCount', { count: String(eolCount) }),
                 tone: 'bad' as const,
-                title: t('packageDashboard.status.flaggedTitle'),
+                title: l10n('packageDashboard.status.flaggedTitle'),
             }]
             : []),
     ]);
     return `<!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>${escapeHtml(t('packageDashboard.documentTitle'))}</title>
+    <title>${escapeHtml(l10n('packageDashboard.documentTitle'))}</title>
     <meta charset="UTF-8">
     <!-- 'unsafe-inline' on style-src: radial gauge sets dynamic CSS vars
          (--gauge-target, --gauge-arc) via inline style="..." attributes. CSP
@@ -124,7 +124,7 @@ export function buildReportHtml(options: ReportOptions): string {
 <body>
     <div class="report-header">
         <div class="hero-text">
-          <h1>${escapeHtml(t('packageDashboard.heroTitle'))} <span class="header-version">v${escapeHtml(options.extensionVersion)}</span></h1>
+          <h1>${escapeHtml(l10n('packageDashboard.heroTitle'))} <span class="header-version">v${escapeHtml(options.extensionVersion)}</span></h1>
           ${statusLineHtml.replace('</p>', `${buildKeyboardShortcutsButton()}${buildFullWidthToggle()}</p>`)}
         </div>
         ${buildRadialGauge(avg)}
@@ -135,13 +135,13 @@ export function buildReportHtml(options: ReportOptions): string {
     ${buildToolbar(options)}
     ${buildReportTable(results, options.overrideNames, options.packageTrends)}
     ${buildKeyboardShortcutsOverlay([
-        { key: '/', label: t('packageDashboard.shortcuts.focusSearch') },
-        { key: '↓ / j', label: t('packageDashboard.shortcuts.nextRow') },
-        { key: '↑ / k', label: t('packageDashboard.shortcuts.prevRow') },
-        { key: 'Enter / Space', label: t('packageDashboard.shortcuts.toggleDetail') },
-        { key: 'Esc', label: t('packageDashboard.shortcuts.escapeSearch') },
-        { key: 'Alt + ←', label: t('packageDashboard.shortcuts.historyBack') },
-        { key: '?', label: t('packageDashboard.shortcuts.showOverlay') },
+        { key: '/', label: l10n('packageDashboard.shortcuts.focusSearch') },
+        { key: '↓ / j', label: l10n('packageDashboard.shortcuts.nextRow') },
+        { key: '↑ / k', label: l10n('packageDashboard.shortcuts.prevRow') },
+        { key: 'Enter / Space', label: l10n('packageDashboard.shortcuts.toggleDetail') },
+        { key: 'Esc', label: l10n('packageDashboard.shortcuts.escapeSearch') },
+        { key: 'Alt + ←', label: l10n('packageDashboard.shortcuts.historyBack') },
+        { key: '?', label: l10n('packageDashboard.shortcuts.showOverlay') },
     ])}
     <script nonce="${cspNonce}">${buildPackageDataScript(results, options.overrideNames, buildRepoShareMap(results))}${getReportScript()}${getChartScript()}(function(){${getFullWidthToggleScript()}${getKeyboardShortcutsScript()}})();</script>
 </body>
@@ -158,7 +158,7 @@ function buildNetworkSection(results: VibrancyResult[]): string {
     });
     const payload = escapeHtml(JSON.stringify(nodes));
     return `<details class="network-wrap">
-        <summary>${escapeHtml(t('packageDashboard.network.summary'))}</summary>
+        <summary>${escapeHtml(l10n('packageDashboard.network.summary'))}</summary>
         <div id="dep-network" data-network="${payload}" class="network-canvas"></div>
     </details>`;
 }
@@ -177,7 +177,7 @@ function buildScanInProgressHtml(options: ReportOptions): string {
     return `<!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>${escapeHtml(t('packageDashboard.documentTitle'))}</title>
+    <title>${escapeHtml(l10n('packageDashboard.documentTitle'))}</title>
     <meta charset="UTF-8">
     <meta http-equiv="Content-Security-Policy"
         content="default-src 'none'; style-src 'nonce-${cspNonce}' 'unsafe-inline';">
@@ -230,10 +230,10 @@ function buildScanInProgressHtml(options: ReportOptions): string {
 </head>
 <body>
     <div class="scanning-card">
-        <h1>${escapeHtml(t('packageDashboard.scanning.heading'))}<span class="dots"></span></h1>
-        <p>${escapeHtml(t('packageDashboard.scanning.body1'))}</p>
-        <p>${escapeHtml(t('packageDashboard.scanning.body2'))}</p>
-        <p class="version">${escapeHtml(t('packageDashboard.scanning.versionStamp', { version: options.extensionVersion }))}</p>
+        <h1>${escapeHtml(l10n('packageDashboard.scanning.heading'))}<span class="dots"></span></h1>
+        <p>${escapeHtml(l10n('packageDashboard.scanning.body1'))}</p>
+        <p>${escapeHtml(l10n('packageDashboard.scanning.body2'))}</p>
+        <p class="version">${escapeHtml(l10n('packageDashboard.scanning.versionStamp', { version: options.extensionVersion }))}</p>
     </div>
 </body>
 </html>`;
@@ -260,7 +260,7 @@ function buildRadialGauge(avgScore: number): string {
     /* Grade derived from score thresholds (never F: F requires hard EOL
        signals that can't be inferred from an average score). */
     const gradeLabel = scoreToGrade(pct);
-    return `<div class="radial-gauge" title="${escapeHtml(t('packageDashboard.gaugeTitle', { grade: gradeLabel }))}">
+    return `<div class="radial-gauge" title="${escapeHtml(l10n('packageDashboard.gaugeTitle', { grade: gradeLabel }))}">
         <svg viewBox="0 0 88 88" class="gauge-svg">
             <circle cx="44" cy="44" r="${r}" fill="none"
                 stroke="var(--vscode-widget-border)" stroke-width="7"
@@ -315,7 +315,7 @@ function buildReportSummary(options: ReportOptions): string {
             && !hasActiveReExport(r.fileUsages),
     ).length;
 
-    const gradeTooltip = t('packageDashboard.summary.gradeTooltip', {
+    const gradeTooltip = l10n('packageDashboard.summary.gradeTooltip', {
         avgGrade,
         avgScore: String(Math.round(avgScore)),
         pkgCount: String(results.length),
@@ -326,44 +326,44 @@ function buildReportSummary(options: ReportOptions): string {
         f: String(counts.eol),
     });
     return `<div class="summary">
-        <div class="summary-card"><div class="count">${results.length}</div><div class="label">${escapeHtml(t('packageDashboard.summary.packages'))}</div></div>
-        <div class="summary-card" title="${escapeHtml(gradeTooltip)}"><div class="count">${avgGrade}</div><div class="label">${escapeHtml(t('packageDashboard.summary.projectGrade'))}</div></div>
+        <div class="summary-card"><div class="count">${results.length}</div><div class="label">${escapeHtml(l10n('packageDashboard.summary.packages'))}</div></div>
+        <div class="summary-card" title="${escapeHtml(gradeTooltip)}"><div class="count">${avgGrade}</div><div class="label">${escapeHtml(l10n('packageDashboard.summary.projectGrade'))}</div></div>
         <div class="summary-card total-size"
             data-total-size-own="${totalOwnBytes}"
             data-total-size-unique="${totalUniqueBytes}"
             data-total-size-total="${totalAllBytes}">
-            <div class="count">${totalSize}</div><div class="label">${escapeHtml(t('packageDashboard.summary.totalSize'))}</div>
+            <div class="count">${totalSize}</div><div class="label">${escapeHtml(l10n('packageDashboard.summary.totalSize'))}</div>
         </div>
-        <div class="summary-card vibrant" data-filter="vibrant" title="${escapeHtml(t('packageDashboard.summary.vibrantTitle'))}"><div class="count">${counts.vibrant}</div><div class="label">A</div></div>
-        <div class="summary-card stable" data-filter="stable" title="${escapeHtml(t('packageDashboard.summary.stableTitle'))}"><div class="count">${counts.stable}</div><div class="label">B</div></div>
-        <div class="summary-card outdated" data-filter="outdated" title="${escapeHtml(t('packageDashboard.summary.outdatedTitle'))}"><div class="count">${counts.outdated}</div><div class="label">C</div></div>
-        <div class="summary-card abandoned" data-filter="abandoned" title="${escapeHtml(t('packageDashboard.summary.abandonedTitle'))}"><div class="count">${counts.abandoned}</div><div class="label">E</div></div>
-        <div class="summary-card eol" data-filter="end-of-life" title="${escapeHtml(t('packageDashboard.summary.eolTitle'))}"><div class="count">${counts.eol}</div><div class="label">F</div></div>
-        <div class="summary-card updates" data-filter="updates"><div class="count">${updates}</div><div class="label">${escapeHtml(t('packageDashboard.summary.updates'))}</div></div>
-        <div class="summary-card unused" data-filter="unused"><div class="count">${results.filter(r => r.isUnused).length}</div><div class="label">${escapeHtml(t('packageDashboard.summary.unused'))}</div></div>
-        ${singleUse > 0 ? `<div class="summary-card single-use" data-filter="single-use"><div class="count">${singleUse}</div><div class="label">${escapeHtml(t('packageDashboard.summary.singleUse'))}</div></div>` : ''}
-        <div class="summary-card vulns" data-filter="vulns"><div class="count">${vulnPackages}</div><div class="label">${escapeHtml(t('packageDashboard.summary.vulnerable'))}</div></div>
-        <div class="summary-card overrides" data-filter="overrides"><div class="count">${overrideCount}</div><div class="label">${escapeHtml(t('packageDashboard.summary.overrides'))}</div></div>
+        <div class="summary-card vibrant" data-filter="vibrant" title="${escapeHtml(l10n('packageDashboard.summary.vibrantTitle'))}"><div class="count">${counts.vibrant}</div><div class="label">A</div></div>
+        <div class="summary-card stable" data-filter="stable" title="${escapeHtml(l10n('packageDashboard.summary.stableTitle'))}"><div class="count">${counts.stable}</div><div class="label">B</div></div>
+        <div class="summary-card outdated" data-filter="outdated" title="${escapeHtml(l10n('packageDashboard.summary.outdatedTitle'))}"><div class="count">${counts.outdated}</div><div class="label">C</div></div>
+        <div class="summary-card abandoned" data-filter="abandoned" title="${escapeHtml(l10n('packageDashboard.summary.abandonedTitle'))}"><div class="count">${counts.abandoned}</div><div class="label">E</div></div>
+        <div class="summary-card eol" data-filter="end-of-life" title="${escapeHtml(l10n('packageDashboard.summary.eolTitle'))}"><div class="count">${counts.eol}</div><div class="label">F</div></div>
+        <div class="summary-card updates" data-filter="updates"><div class="count">${updates}</div><div class="label">${escapeHtml(l10n('packageDashboard.summary.updates'))}</div></div>
+        <div class="summary-card unused" data-filter="unused"><div class="count">${results.filter(r => r.isUnused).length}</div><div class="label">${escapeHtml(l10n('packageDashboard.summary.unused'))}</div></div>
+        ${singleUse > 0 ? `<div class="summary-card single-use" data-filter="single-use"><div class="count">${singleUse}</div><div class="label">${escapeHtml(l10n('packageDashboard.summary.singleUse'))}</div></div>` : ''}
+        <div class="summary-card vulns" data-filter="vulns"><div class="count">${vulnPackages}</div><div class="label">${escapeHtml(l10n('packageDashboard.summary.vulnerable'))}</div></div>
+        <div class="summary-card overrides" data-filter="overrides"><div class="count">${overrideCount}</div><div class="label">${escapeHtml(l10n('packageDashboard.summary.overrides'))}</div></div>
     </div>
-    <p class="caveat">${escapeHtml(t('packageDashboard.summary.caveatLine1'))}<br>${escapeHtml(t('packageDashboard.summary.caveatLine2'))}</p>`;
+    <p class="caveat">${escapeHtml(l10n('packageDashboard.summary.caveatLine1'))}<br>${escapeHtml(l10n('packageDashboard.summary.caveatLine2'))}</p>`;
 }
 
 /** Toolbar with search box and pubspec link, placed between chart and table. */
 function buildToolbar(options: ReportOptions): string {
     const tb = 'packageDashboard.toolbar';
     const pubspecBtn = options.pubspecUri
-        ? `<button id="open-pubspec" class="toolbar-btn" title="${escapeHtml(t(`${tb}.openPubspecTitle`))}">&#128196; ${escapeHtml(t(`${tb}.openPubspecLabel`))}</button>`
+        ? `<button id="open-pubspec" class="toolbar-btn" title="${escapeHtml(l10n(`${tb}.openPubspecTitle`))}">&#128196; ${escapeHtml(l10n(`${tb}.openPubspecLabel`))}</button>`
         : '';
     // Copies every package row as a JSON array, including all expander
     // content (health factors, vulnerabilities, file references, full
     // transitive dep list with shared flags, links). Same per-package
     // shape as the per-row copy button, just aggregated.
     const copyAllBtn =
-        `<button id="copy-all" class="toolbar-btn" title="${escapeHtml(t(`${tb}.copyAllTitle`))}">&#128203; ${escapeHtml(t(`${tb}.copyAllLabel`))}</button>`;
+        `<button id="copy-all" class="toolbar-btn" title="${escapeHtml(l10n(`${tb}.copyAllTitle`))}">&#128203; ${escapeHtml(l10n(`${tb}.copyAllLabel`))}</button>`;
     const saveBtn =
-        `<button id="save-all" class="toolbar-btn" title="${escapeHtml(t(`${tb}.saveAllTitle`))}">&#128190; ${escapeHtml(t(`${tb}.saveAllLabel`))}</button>`;
+        `<button id="save-all" class="toolbar-btn" title="${escapeHtml(l10n(`${tb}.saveAllTitle`))}">&#128190; ${escapeHtml(l10n(`${tb}.saveAllLabel`))}</button>`;
     const resetViewBtn =
-        `<button id="reset-view" class="toolbar-btn" title="${escapeHtml(t(`${tb}.resetViewTitle`))}">&#8635; ${escapeHtml(t(`${tb}.resetViewLabel`))}</button>`;
+        `<button id="reset-view" class="toolbar-btn" title="${escapeHtml(l10n(`${tb}.resetViewTitle`))}">&#8635; ${escapeHtml(l10n(`${tb}.resetViewLabel`))}</button>`;
     // Rescan button — invokes saropaLints.packageVibrancy.rescan via the
     // webview message channel so users don't have to leave the report to
     // trigger a refresh after editing pubspec.yaml or running `pub get`.
@@ -371,52 +371,52 @@ function buildToolbar(options: ReportOptions): string {
     // cache first so the report shows current pub.dev state — without it
     // the 24h cache TTL made the button a silent no-op for fresh entries.
     const rescanBtn =
-        `<button id="rescan" class="toolbar-btn" title="${escapeHtml(t(`${tb}.rescanTitle`))}">&#128260; ${escapeHtml(t(`${tb}.rescanLabel`))}</button>`;
+        `<button id="rescan" class="toolbar-btn" title="${escapeHtml(l10n(`${tb}.rescanTitle`))}">&#128260; ${escapeHtml(l10n(`${tb}.rescanLabel`))}</button>`;
     // Open another project — file picker → opens the selected
     // pubspec.yaml's folder in a new VS Code window. Useful for
     // diagnosing multiple projects without swapping workspace roots.
     const openOtherBtn =
-        `<button id="open-other" class="toolbar-btn" title="${escapeHtml(t(`${tb}.openOtherTitle`))}">&#128194; ${escapeHtml(t(`${tb}.openOtherLabel`))}</button>`;
+        `<button id="open-other" class="toolbar-btn" title="${escapeHtml(l10n(`${tb}.openOtherTitle`))}">&#128194; ${escapeHtml(l10n(`${tb}.openOtherLabel`))}</button>`;
     // Footprint-mode toggle controls what the Size column shows:
     //   own     = archive size of the package itself (default; matches old behavior)
     //   unique  = own + transitives used ONLY by this dep (cost saved if removed)
     //   total   = own + ALL transitives, including ones shared with other deps
-    const footprintToggle = `<div class="footprint-toggle" role="group" aria-label="${escapeHtml(t(`${tb}.footprintGroupAria`))}"
-        title="${escapeHtml(t(`${tb}.footprintGroupTitle`))}">
-        <span class="toggle-label">${escapeHtml(t(`${tb}.footprintLabel`))}</span>
+    const footprintToggle = `<div class="footprint-toggle" role="group" aria-label="${escapeHtml(l10n(`${tb}.footprintGroupAria`))}"
+        title="${escapeHtml(l10n(`${tb}.footprintGroupTitle`))}">
+        <span class="toggle-label">${escapeHtml(l10n(`${tb}.footprintLabel`))}</span>
         <button class="toggle-btn footprint-btn active" data-footprint="own"
-            title="${escapeHtml(t(`${tb}.footprintOwnTitle`))}">${escapeHtml(t(`${tb}.footprintOwn`))}</button>
+            title="${escapeHtml(l10n(`${tb}.footprintOwnTitle`))}">${escapeHtml(l10n(`${tb}.footprintOwn`))}</button>
         <button class="toggle-btn footprint-btn" data-footprint="unique"
-            title="${escapeHtml(t(`${tb}.footprintUniqueTitle`))}">${escapeHtml(t(`${tb}.footprintUnique`))}</button>
+            title="${escapeHtml(l10n(`${tb}.footprintUniqueTitle`))}">${escapeHtml(l10n(`${tb}.footprintUnique`))}</button>
         <button class="toggle-btn footprint-btn" data-footprint="total"
-            title="${escapeHtml(t(`${tb}.footprintTotalTitle`))}">${escapeHtml(t(`${tb}.footprintTotal`))}</button>
+            title="${escapeHtml(l10n(`${tb}.footprintTotalTitle`))}">${escapeHtml(l10n(`${tb}.footprintTotal`))}</button>
     </div>`;
     // Search field wrapped so we can absolutely position a clear (X) button
     // inside it; the button stays hidden until the user types something, and
     // a click clears the input + re-runs filters.
     const searchField = `<div class="search-wrapper">
-        <label class="sr-only" for="search-input">${escapeHtml(t(`${tb}.searchLabel`))}</label>
-        <input type="text" id="search-input" placeholder="${escapeHtml(t(`${tb}.searchPlaceholder`))}" class="search-input" />
-        <button type="button" id="search-clear" class="search-clear" title="${escapeHtml(t(`${tb}.clearSearchTitle`))}" aria-label="${escapeHtml(t(`${tb}.clearSearchAria`))}" hidden>&times;</button>
+        <label class="sr-only" for="search-input">${escapeHtml(l10n(`${tb}.searchLabel`))}</label>
+        <input type="text" id="search-input" placeholder="${escapeHtml(l10n(`${tb}.searchPlaceholder`))}" class="search-input" />
+        <button type="button" id="search-clear" class="search-clear" title="${escapeHtml(l10n(`${tb}.clearSearchTitle`))}" aria-label="${escapeHtml(l10n(`${tb}.clearSearchAria`))}" hidden>&times;</button>
     </div>`;
-    const ageFilter = `<div class="age-filter" title="${escapeHtml(t(`${tb}.ageFilterTitle`))}">
-        <label for="age-max">${escapeHtml(t(`${tb}.publishedAgeLabel`))}</label>
+    const ageFilter = `<div class="age-filter" title="${escapeHtml(l10n(`${tb}.ageFilterTitle`))}">
+        <label for="age-max">${escapeHtml(l10n(`${tb}.publishedAgeLabel`))}</label>
         <input id="age-max" type="range" min="0" max="240" value="240" />
-        <span id="age-max-label">${escapeHtml(t(`${tb}.ageMaxAll`))}</span>
+        <span id="age-max-label">${escapeHtml(l10n(`${tb}.ageMaxAll`))}</span>
     </div>`;
-    const presetFilter = `<div class="preset-filter" title="${escapeHtml(t(`${tb}.presetFilterTitle`))}">
-        <label for="filter-preset">${escapeHtml(t(`${tb}.presetLabel`))}</label>
+    const presetFilter = `<div class="preset-filter" title="${escapeHtml(l10n(`${tb}.presetFilterTitle`))}">
+        <label for="filter-preset">${escapeHtml(l10n(`${tb}.presetLabel`))}</label>
         <select id="filter-preset">
-            <option value="none">${escapeHtml(t(`${tb}.presetNone`))}</option>
-            <option value="modernization">${escapeHtml(t(`${tb}.presetModernization`))}</option>
-            <option value="risk-hotspots">${escapeHtml(t(`${tb}.presetRiskHotspots`))}</option>
-            <option value="cleanup-candidates">${escapeHtml(t(`${tb}.presetCleanup`))}</option>
-            <option value="direct-only">${escapeHtml(t(`${tb}.presetDirectOnly`))}</option>
+            <option value="none">${escapeHtml(l10n(`${tb}.presetNone`))}</option>
+            <option value="modernization">${escapeHtml(l10n(`${tb}.presetModernization`))}</option>
+            <option value="risk-hotspots">${escapeHtml(l10n(`${tb}.presetRiskHotspots`))}</option>
+            <option value="cleanup-candidates">${escapeHtml(l10n(`${tb}.presetCleanup`))}</option>
+            <option value="direct-only">${escapeHtml(l10n(`${tb}.presetDirectOnly`))}</option>
         </select>
     </div>`;
-    const devToggle = `<label class="dev-toggle" title="${escapeHtml(t(`${tb}.devToggleTitle`))}">
+    const devToggle = `<label class="dev-toggle" title="${escapeHtml(l10n(`${tb}.devToggleTitle`))}">
         <input id="include-dev-toggle" type="checkbox" checked />
-        ${escapeHtml(t(`${tb}.includeDev`))}
+        ${escapeHtml(l10n(`${tb}.includeDev`))}
     </label>`;
     return `<div class="table-toolbar">
         ${searchField}
@@ -432,9 +432,9 @@ function buildToolbar(options: ReportOptions): string {
         ${pubspecBtn}
     </div>
     <div id="active-filters" class="active-filters" hidden>
-        <span class="active-filters-label">${escapeHtml(t(`${tb}.activeFiltersLabel`))}</span>
+        <span class="active-filters-label">${escapeHtml(l10n(`${tb}.activeFiltersLabel`))}</span>
         <div class="active-filters-list"></div>
-        <button id="clear-all-filters" class="clear-filter-btn" type="button">${escapeHtml(t(`${tb}.clearAllFilters`))}</button>
+        <button id="clear-all-filters" class="clear-filter-btn" type="button">${escapeHtml(l10n(`${tb}.clearAllFilters`))}</button>
     </div>`;
 }
 
@@ -611,8 +611,8 @@ function buildRow(
         data-overridden="${isOverridden}"
         data-shared-transitive="${isSharedTransitive ? 'yes' : 'no'}"
         data-reexport="${isReExport}">
-        <td class="expand-cell"><span class="expand-chevron" title="${escapeHtml(t('packageDashboard.row.expandDetails'))}">\u25B6</span></td>
-        <td class="copy-cell"><span class="copy-btn" data-pkg="${name}" title="${escapeHtml(t('packageDashboard.row.copyRowJson'))}">&#128203;</span></td>
+        <td class="expand-cell"><span class="expand-chevron" title="${escapeHtml(l10n('packageDashboard.row.expandDetails'))}">\u25B6</span></td>
+        <td class="copy-cell"><span class="copy-btn" data-pkg="${name}" title="${escapeHtml(l10n('packageDashboard.row.copyRowJson'))}">&#128203;</span></td>
         ${buildNameCell(r)}
         ${buildVersionCell(r)}
         ${buildCategoryCell(r, packageTrends?.get(r.package.name) ?? [])}
@@ -855,7 +855,7 @@ function buildDownloadsCell(r: VibrancyResult): string {
 function buildIssuesCell(r: VibrancyResult): string {
     const count = r.github?.trueOpenIssues ?? r.github?.openIssues;
     if (count == null) {
-        return `<td class="cell-right" title="${escapeHtml(t('packageDashboard.cells.noGithub'))}"><span class="dimmed">\u2014</span></td>`;
+        return `<td class="cell-right" title="${escapeHtml(l10n('packageDashboard.cells.noGithub'))}"><span class="dimmed">\u2014</span></td>`;
     }
     const repoUrl = resolveRepoUrl(r);
     if (repoUrl) {
@@ -867,7 +867,7 @@ function buildIssuesCell(r: VibrancyResult): string {
 function buildPrsCell(r: VibrancyResult): string {
     const count = r.github?.openPullRequests;
     if (count == null) {
-        return `<td class="cell-right" title="${escapeHtml(t('packageDashboard.cells.noGithub'))}"><span class="dimmed">\u2014</span></td>`;
+        return `<td class="cell-right" title="${escapeHtml(l10n('packageDashboard.cells.noGithub'))}"><span class="dimmed">\u2014</span></td>`;
     }
     const repoUrl = resolveRepoUrl(r);
     if (repoUrl) {

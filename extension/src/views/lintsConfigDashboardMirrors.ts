@@ -5,6 +5,7 @@
 
 import type { Violation, ViolationsData } from '../violationsReader';
 import { buildFileRisks, type FileRisk } from './fileRiskTree';
+import { l10n } from '../i18n/runtime';
 
 function escapeHtml(s: string): string {
   return s
@@ -30,7 +31,7 @@ function countOwaspMappedViolations(violations: readonly Violation[]): number {
 
 function buildFileRiskLines(risks: readonly FileRisk[]): string {
   if (risks.length === 0) {
-    return '<p class="hint">No per-file risk breakdown (no violations in scope).</p>';
+    return `<p class="hint">${escapeHtml(l10n('configMirrors.noFileRisk'))}</p>`;
   }
   return `<ol class="risk-list">${risks
     .map(
@@ -51,25 +52,25 @@ export function buildSidebarMirrorPanelsHtml(data: ViolationsData): string {
     sup && typeof sup.total === 'number'
       ? `<p class="hint">Total suppressed in export: <strong>${escapeHtml(String(sup.total))}</strong>${sup.byKind
         ? ` — ignore ${escapeHtml(String(sup.byKind.ignore ?? 0))}, ignore_for_file ${escapeHtml(String(sup.byKind.ignoreForFile ?? 0))}, baseline ${escapeHtml(String(sup.byKind.baseline ?? 0))}`
-        : ''}.</p><p class="hint">Matches <code>violations.json</code> summary, not live sidebar suppression toggles.</p>`
-      : '<p class="hint">No suppression aggregate in this export (older analyzer or zero suppressions).</p>';
+        : ''}.</p><p class="hint">${escapeHtml(l10n('configMirrors.suppressionNote'))}</p>`
+      : `<p class="hint">${escapeHtml(l10n('configMirrors.noSuppression'))}</p>`;
 
   const owaspN = countOwaspMappedViolations(data.violations);
-  const secBlock = `<p class="hint">${escapeHtml(String(owaspN))} violation(s) in this export carry OWASP mobile/web mapping — open Security Posture for the full matrix and export.</p>`;
+  const secBlock = `<p class="hint">${escapeHtml(l10n('configMirrors.owaspSignal', { count: String(owaspN) }))}</p>`;
 
   const risks = buildFileRisks(data.violations).slice(0, 6);
   const riskBlock = buildFileRiskLines(risks);
 
   return `<details class="mirror-panel">
-<summary>Suppressions (export snapshot)</summary>
+<summary>${escapeHtml(l10n('configMirrors.summarySuppressions'))}</summary>
 ${supBlock}
 </details>
 <details class="mirror-panel">
-<summary>Security posture (OWASP signal)</summary>
+<summary>${escapeHtml(l10n('configMirrors.summaryOwasp'))}</summary>
 ${secBlock}
 </details>
 <details class="mirror-panel">
-<summary>File risk (top files)</summary>
+<summary>${escapeHtml(l10n('configMirrors.summaryFileRisk'))}</summary>
 ${riskBlock}
 </details>`;
 }

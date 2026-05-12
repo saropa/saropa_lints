@@ -39,31 +39,31 @@ import {
   getKeyboardShortcutsScript,
   getKeyboardShortcutsStyles,
 } from './keyboard-shortcuts';
-import { t } from '../i18n/runtime';
+import { l10n } from '../i18n/runtime';
 
-/** Client-side strings for `getScript()` (webview has no direct access to `t`). */
+/** Client-side strings for `getScript()` (webview has no direct access to `l10n`). */
 function commandCatalogScriptI18nJson(): string {
   const s = 'commandCatalog.script';
   return JSON.stringify({
-    moreSuffix: t(`${s}.moreSuffix`),
-    showLess: t(`${s}.showLess`),
-    runSingular: t(`${s}.runSingular`),
-    runPlural: t(`${s}.runPlural`),
-    recentWord: t(`${s}.recentWord`),
-    expandAll: t(`${s}.expandAll`),
-    collapseAll: t(`${s}.collapseAll`),
-    searchChip: t(`${s}.searchChip`),
-    internalChip: t(`${s}.internalChip`),
-    removeFilterPrefix: t(`${s}.removeFilterPrefix`),
-    matchOne: t(`${s}.matchOne`),
-    matchOther: t(`${s}.matchOther`),
+    moreSuffix: l10n(`${s}.moreSuffix`),
+    showLess: l10n(`${s}.showLess`),
+    runSingular: l10n(`${s}.runSingular`),
+    runPlural: l10n(`${s}.runPlural`),
+    recentWord: l10n(`${s}.recentWord`),
+    expandAll: l10n(`${s}.expandAll`),
+    collapseAll: l10n(`${s}.collapseAll`),
+    searchChip: l10n(`${s}.searchChip`),
+    internalChip: l10n(`${s}.internalChip`),
+    removeFilterPrefix: l10n(`${s}.removeFilterPrefix`),
+    matchOne: l10n(`${s}.matchOne`),
+    matchOther: l10n(`${s}.matchOther`),
   });
 }
 
 /** Muted search hint below toolbar (HTML fragment). */
 function buildCommandCatalogSearchHint(): string {
   const s = 'commandCatalog.search';
-  return `${t(`${s}.hintLine1`)} <strong>${t(`${s}.hintStrongTitle`)}</strong>, <strong>${t(`${s}.hintStrongDesc`)}</strong>, and <strong>${t(`${s}.hintStrongId`)}</strong>\n    ${t(`${s}.hintLine2`)} <kbd>${t(`${s}.hintLine2kbd`)}</kbd> ${t(`${s}.hintLine2End`)}`;
+  return `${l10n(`${s}.hintLine1`)} <strong>${l10n(`${s}.hintStrongTitle`)}</strong>, <strong>${l10n(`${s}.hintStrongDesc`)}</strong>, and <strong>${l10n(`${s}.hintStrongId`)}</strong>\n    ${l10n(`${s}.hintLine2`)} <kbd>${l10n(`${s}.hintLine2kbd`)}</kbd> ${l10n(`${s}.hintLine2End`)}`;
 }
 
 /** Cap on Recent chips visible by default before "+N more" overflow (§8.10). */
@@ -107,29 +107,29 @@ export function buildCommandCatalogHtml(
   <meta http-equiv="Content-Security-Policy" content="${csp}">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="${codiconCss}">
-  <title>${escapeHtml(t('commandCatalog.documentTitle'))}</title>
+  <title>${escapeHtml(l10n('commandCatalog.documentTitle'))}</title>
   <style nonce="${nonce}">
     ${getStyles()}
     ${getKeyboardShortcutsStyles()}
   </style>
 </head>
 <body>
-  <a href="#catalog-main" class="skip-link">${escapeHtml(t('commandCatalog.skipLink'))}</a>
+  <a href="#catalog-main" class="skip-link">${escapeHtml(l10n('commandCatalog.skipLink'))}</a>
   <div id="announcer" role="status" aria-live="polite" aria-atomic="true"></div>
   <header class="hero">
     <div class="hero-inner">
-      <h1 class="hero-title">${escapeHtml(t('commandCatalog.heroTitle'))}</h1>
+      <h1 class="hero-title">${escapeHtml(l10n('commandCatalog.heroTitle'))}</h1>
       <p class="status-line" id="statusLine">
-        <span data-stat="public"><strong>${publicCount}</strong> ${escapeHtml(t('commandCatalog.status.wordCommands'))}</span>
+        <span data-stat="public"><strong>${publicCount}</strong> ${escapeHtml(l10n('commandCatalog.status.wordCommands'))}</span>
         <span class="status-sep">·</span>
-        <span data-stat="categories"><strong>${categoryCount}</strong> ${escapeHtml(t('commandCatalog.status.wordCategories'))}</span>
+        <span data-stat="categories"><strong>${categoryCount}</strong> ${escapeHtml(l10n('commandCatalog.status.wordCategories'))}</span>
         <span class="status-sep">·</span>
         <span data-stat="history" id="statHistory">
-          <strong>${historyCount}</strong> ${escapeHtml(t('commandCatalog.status.wordRecent'))}
+          <strong>${historyCount}</strong> ${escapeHtml(l10n('commandCatalog.status.wordRecent'))}
         </span>
         <span class="status-sep">·</span>
         <span data-stat="internal" class="status-dim" id="statInternal">
-          ${escapeHtml(t('commandCatalog.status.internalHidden', { count: String(internalCount) }))}
+          ${escapeHtml(l10n('commandCatalog.status.internalHidden', { count: String(internalCount) }))}
         </span>
         ${buildKeyboardShortcutsButton()}
       </p>
@@ -145,16 +145,16 @@ export function buildCommandCatalogHtml(
             type="text"
             id="search"
             class="search-input"
-            placeholder="${escapeAttr(t('commandCatalog.search.placeholder'))}"
+            placeholder="${escapeAttr(l10n('commandCatalog.search.placeholder'))}"
             autocomplete="off"
             spellcheck="false"
-            aria-label="${escapeAttr(t('commandCatalog.search.ariaLabel'))}"
+            aria-label="${escapeAttr(l10n('commandCatalog.search.ariaLabel'))}"
           />
           <button
             type="button"
             id="searchClear"
             class="search-clear"
-            aria-label="${escapeAttr(t('commandCatalog.search.clearAria'))}"
+            aria-label="${escapeAttr(l10n('commandCatalog.search.clearAria'))}"
             hidden
           >
             <span class="codicon codicon-close" aria-hidden="true"></span>
@@ -165,22 +165,22 @@ export function buildCommandCatalogHtml(
                plan/UX_GUIDELINES.md (Part B). -->
           <div id="catalog-recent" class="catalog-recent" hidden>
             <div class="catalog-recent-head">
-              <span class="catalog-recent-title">${escapeHtml(t('commandCatalog.recentPopover.title'))}</span>
+              <span class="catalog-recent-title">${escapeHtml(l10n('commandCatalog.recentPopover.title'))}</span>
               <button type="button" id="catalog-recent-clear"
                 class="catalog-recent-clear"
-                title="${escapeAttr(t('commandCatalog.recentPopover.clearTitle'))}">${escapeHtml(t('commandCatalog.recentPopover.clearButton'))}</button>
+                title="${escapeAttr(l10n('commandCatalog.recentPopover.clearTitle'))}">${escapeHtml(l10n('commandCatalog.recentPopover.clearButton'))}</button>
             </div>
             <ul id="catalog-recent-list" class="catalog-recent-list"
-              role="listbox" aria-label="${escapeAttr(t('commandCatalog.recentPopover.listAria'))}"></ul>
+              role="listbox" aria-label="${escapeAttr(l10n('commandCatalog.recentPopover.listAria'))}"></ul>
           </div>
         </div>
         <div class="toolbar-controls">
           <label class="checkbox-control">
             <input type="checkbox" id="showInternal" />
-            <span>${escapeHtml(t('commandCatalog.toolbar.showInternal'))}</span>
+            <span>${escapeHtml(l10n('commandCatalog.toolbar.showInternal'))}</span>
           </label>
           <button type="button" class="text-btn" id="toggleAll" aria-pressed="false">
-            ${escapeHtml(t('commandCatalog.toolbar.collapseAll'))}
+            ${escapeHtml(l10n('commandCatalog.toolbar.collapseAll'))}
           </button>
         </div>
       </div>
@@ -199,28 +199,28 @@ export function buildCommandCatalogHtml(
     class="filter-chip-strip"
     id="filterChips"
     role="region"
-    aria-label="${escapeAttr(t('commandCatalog.filterChips.ariaRegion'))}"
+    aria-label="${escapeAttr(l10n('commandCatalog.filterChips.ariaRegion'))}"
     hidden
   >
-    <span class="filter-chip-label">${escapeHtml(t('commandCatalog.filterChips.activeLabel'))}</span>
+    <span class="filter-chip-label">${escapeHtml(l10n('commandCatalog.filterChips.activeLabel'))}</span>
     <span id="filterChipsBody"></span>
-    <button type="button" class="text-btn" id="clearFilters">${escapeHtml(t('commandCatalog.filterChips.clearAll'))}</button>
+    <button type="button" class="text-btn" id="clearFilters">${escapeHtml(l10n('commandCatalog.filterChips.clearAll'))}</button>
   </div>
 
   <section class="band band-frequent" id="frequentSection" hidden>
     <div class="band-header">
-      <h2 class="section-title">${escapeHtml(t('commandCatalog.bands.frequentTitle'))}</h2>
+      <h2 class="section-title">${escapeHtml(l10n('commandCatalog.bands.frequentTitle'))}</h2>
     </div>
-    <p class="band-hint">${escapeHtml(t('commandCatalog.bands.frequentHint'))}</p>
+    <p class="band-hint">${escapeHtml(l10n('commandCatalog.bands.frequentHint'))}</p>
     <div class="frequent-grid" id="frequentGrid"></div>
   </section>
 
   <section class="band band-recent" id="historySection" ${historyCount === 0 ? 'hidden' : ''}>
     <div class="band-header">
-      <h2 class="section-title">${escapeHtml(t('commandCatalog.bands.recentTitle'))}</h2>
-      <button type="button" class="text-btn" id="clearHistory">${escapeHtml(t('commandCatalog.bands.recentClear'))}</button>
+      <h2 class="section-title">${escapeHtml(l10n('commandCatalog.bands.recentTitle'))}</h2>
+      <button type="button" class="text-btn" id="clearHistory">${escapeHtml(l10n('commandCatalog.bands.recentClear'))}</button>
     </div>
-    <p class="band-hint">${escapeHtml(t('commandCatalog.bands.recentHint'))}</p>
+    <p class="band-hint">${escapeHtml(l10n('commandCatalog.bands.recentHint'))}</p>
     <div class="history-chips" id="historyChips"></div>
     <button type="button" class="text-btn history-more" id="historyMore" hidden></button>
   </section>
@@ -230,16 +230,16 @@ export function buildCommandCatalogHtml(
   </main>
   <div class="no-results" id="noResults" hidden>
     <span class="codicon codicon-info no-results-icon" aria-hidden="true"></span>
-    <p>${escapeHtml(t('commandCatalog.noResults.message'))}</p>
-    <button type="button" class="text-btn" id="resetFromEmpty">${escapeHtml(t('commandCatalog.noResults.reset'))}</button>
+    <p>${escapeHtml(l10n('commandCatalog.noResults.message'))}</p>
+    <button type="button" class="text-btn" id="resetFromEmpty">${escapeHtml(l10n('commandCatalog.noResults.reset'))}</button>
   </div>
   ${buildKeyboardShortcutsOverlay([
-    { key: '/', label: t('commandCatalog.shortcuts.focusSearch') },
-    { key: '↓ / ↑', label: t('commandCatalog.shortcuts.navRows') },
-    { key: 'Home / End', label: t('commandCatalog.shortcuts.homeEnd') },
-    { key: 'Enter', label: t('commandCatalog.shortcuts.enterRun') },
-    { key: 'Esc', label: t('commandCatalog.shortcuts.escClear') },
-    { key: '?', label: t('commandCatalog.shortcuts.showOverlay') },
+    { key: '/', label: l10n('commandCatalog.shortcuts.focusSearch') },
+    { key: '↓ / ↑', label: l10n('commandCatalog.shortcuts.navRows') },
+    { key: 'Home / End', label: l10n('commandCatalog.shortcuts.homeEnd') },
+    { key: 'Enter', label: l10n('commandCatalog.shortcuts.enterRun') },
+    { key: 'Esc', label: l10n('commandCatalog.shortcuts.escClear') },
+    { key: '?', label: l10n('commandCatalog.shortcuts.showOverlay') },
   ])}
   <script nonce="${nonce}">
     window.__COMMAND_CATALOG_I18N__ = ${commandCatalogScriptI18nJson()};
@@ -272,7 +272,7 @@ function buildSectionsHtml(
           <span
             class="category-count"
             data-jump-to="${slug}"
-            title="${escapeAttr(t('commandCatalog.categoryJumpTitle', { category }))}"
+            title="${escapeAttr(l10n('commandCatalog.categoryJumpTitle', { category }))}"
           >${catEntries.length}</span>
         </button>
         <div class="category-body" id="${slug}-body" role="list">
@@ -287,7 +287,7 @@ function buildSectionsHtml(
 function buildEntryHtml(entry: CatalogEntry): string {
   const internalClass = entry.internal ? ' internal' : '';
   const internalBadge = entry.internal
-    ? `<span class="badge internal-badge" title="${escapeAttr(t('commandCatalog.entry.internalBadgeTitle'))}">${escapeHtml(t('commandCatalog.entry.internalBadge'))}</span>`
+    ? `<span class="badge internal-badge" title="${escapeAttr(l10n('commandCatalog.entry.internalBadgeTitle'))}">${escapeHtml(l10n('commandCatalog.entry.internalBadge'))}</span>`
     : '';
 
   // Tooltip carries the command id so the user can still see it without making
@@ -320,8 +320,8 @@ function buildEntryHtml(entry: CatalogEntry): string {
         type="button"
         class="entry-copy"
         data-copy="${escapeAttr(entry.command)}"
-        title="${escapeAttr(t('commandCatalog.entry.copyTitle', { id: entry.command }))}"
-        aria-label="${escapeAttr(t('commandCatalog.entry.copyAria'))}"
+        title="${escapeAttr(l10n('commandCatalog.entry.copyTitle', { id: entry.command }))}"
+        aria-label="${escapeAttr(l10n('commandCatalog.entry.copyAria'))}"
         tabindex="-1"
       >
         <span class="codicon codicon-copy" aria-hidden="true"></span>

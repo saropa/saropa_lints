@@ -45,7 +45,7 @@ import {
   type AnalyzerSuppressionsSlice,
   type ViewSuppressionsSlice,
 } from './violationsDashboardHtml';
-import { t } from '../i18n/runtime';
+import { l10n } from '../i18n/runtime';
 
 const PANEL_VIEW_TYPE = 'saropaViolationsWideReport';
 const MAX_SOURCE_VIOLATIONS = 4000;
@@ -174,7 +174,7 @@ function mergeDashboardUpdate(
 export async function openViolationsWideReport(context: vscode.ExtensionContext): Promise<void> {
   const root = getProjectRoot();
   if (!root) {
-    void vscode.window.showErrorMessage(t('wideReport.openWorkspaceFirst'));
+    void vscode.window.showErrorMessage(l10n('wideReport.openWorkspaceFirst'));
     return;
   }
 
@@ -194,7 +194,7 @@ async function rebuildDashboardHtml(
 
   const raw = readViolations(root);
   if (!raw) {
-    panel.webview.html = emptyStateHtml(t('wideReport.noReportYet'));
+    panel.webview.html = emptyStateHtml(l10n('wideReport.noReportYet'));
     return;
   }
 
@@ -448,7 +448,7 @@ function getOrCreatePanel(context: vscode.ExtensionContext): vscode.WebviewPanel
 
   currentPanel = vscode.window.createWebviewPanel(
     PANEL_VIEW_TYPE,
-    t('findingsDash.documentTitle'),
+    l10n('findingsDash.documentTitle'),
     vscode.ViewColumn.One,
     { enableScripts: true, retainContextWhenHidden: true },
   );
@@ -503,11 +503,11 @@ function getOrCreatePanel(context: vscode.ExtensionContext): vscode.WebviewPanel
       try {
         await vscode.env.clipboard.writeText(JSON.stringify(lastExportViolations, null, 2));
         void vscode.window.setStatusBarMessage(
-          t('wideReport.copiedViolationsJson', { count: String(lastExportViolations.length) }),
+          l10n('wideReport.copiedViolationsJson', { count: String(lastExportViolations.length) }),
           4000,
         );
       } catch {
-        void vscode.window.showErrorMessage(t('wideReport.clipboardCopyFailed'));
+        void vscode.window.showErrorMessage(l10n('wideReport.clipboardCopyFailed'));
       }
       return;
     }
@@ -523,9 +523,9 @@ function getOrCreatePanel(context: vscode.ExtensionContext): vscode.WebviewPanel
       if (match) {
         try {
           await vscode.env.clipboard.writeText(JSON.stringify(match, null, 2));
-          void vscode.window.setStatusBarMessage(t('wideReport.copiedOneViolationJson'), 3000);
+          void vscode.window.setStatusBarMessage(l10n('wideReport.copiedOneViolationJson'), 3000);
         } catch {
-          void vscode.window.showErrorMessage(t('wideReport.clipboardCopyFailed'));
+          void vscode.window.showErrorMessage(l10n('wideReport.clipboardCopyFailed'));
         }
       }
       return;
@@ -573,7 +573,7 @@ function getOrCreatePanel(context: vscode.ExtensionContext): vscode.WebviewPanel
     }
     if (data.type === 'driftOpenBrowser') {
       if (!driftAdvisorSnapshot?.serverLabel?.startsWith('127.0.0.1:')) {
-        void vscode.window.showInformationMessage(t('wideReport.driftNotConnected'));
+        void vscode.window.showInformationMessage(l10n('wideReport.driftNotConnected'));
         return;
       }
       const host = driftAdvisorSnapshot.serverLabel.split(' ')[0];
@@ -657,11 +657,11 @@ function getOrCreatePanel(context: vscode.ExtensionContext): vscode.WebviewPanel
       if (matches.length > 0) {
         await vscode.env.clipboard.writeText(JSON.stringify(matches, null, 2));
         void vscode.window.setStatusBarMessage(
-          t('wideReport.copiedBulkFindings', { count: String(matches.length) }),
+          l10n('wideReport.copiedBulkFindings', { count: String(matches.length) }),
           4000,
         );
       } else {
-        void vscode.window.setStatusBarMessage(t('wideReport.noMatchingFindingsCopy'), 2500);
+        void vscode.window.setStatusBarMessage(l10n('wideReport.noMatchingFindingsCopy'), 2500);
       }
       return;
     }
@@ -709,7 +709,7 @@ async function openFileAtLine(relativePath: string, line: number): Promise<void>
     editor.selection = new vscode.Selection(pos, pos);
     editor.revealRange(new vscode.Range(pos, pos), vscode.TextEditorRevealType.InCenter);
   } catch {
-    void vscode.window.showErrorMessage(t('wideReport.couldNotOpenFile', { path: relativePath }));
+    void vscode.window.showErrorMessage(l10n('wideReport.couldNotOpenFile', { path: relativePath }));
   }
 }
 
@@ -731,7 +731,7 @@ async function saveReportJson(violations: readonly Violation[]): Promise<void> {
   try {
     const folder = vscode.workspace.workspaceFolders?.[0];
     if (!folder) {
-      void vscode.window.showWarningMessage(t('wideReport.saveReportNoWorkspace'));
+      void vscode.window.showWarningMessage(l10n('wideReport.saveReportNoWorkspace'));
       return;
     }
     const now = new Date();
@@ -743,13 +743,13 @@ async function saveReportJson(violations: readonly Violation[]): Promise<void> {
     const content = JSON.stringify(violations, null, 2);
     await vscode.workspace.fs.writeFile(file, new TextEncoder().encode(content));
     void vscode.window.showInformationMessage(
-      t('wideReport.savedFindings', {
+      l10n('wideReport.savedFindings', {
         count: String(violations.length),
         path: file.fsPath,
       }),
     );
   } catch {
-    void vscode.window.showErrorMessage(t('wideReport.couldNotSaveReportJson'));
+    void vscode.window.showErrorMessage(l10n('wideReport.couldNotSaveReportJson'));
   }
 }
 

@@ -121,7 +121,7 @@ import { registerCrossFileCommands } from './cross-file-commands';
 import { registerCopyAsJsonCommands } from './extensionCopyAsJsonCommands';
 import { openViolationsWideReport, refreshFindingsDashboardIfOpen } from './views/violationsWideReportView';
 import { pickWorkspaceFolder } from './workspaceFolderPicker';
-import { setCurrentLocale, t } from './i18n/runtime';
+import { setCurrentLocale, l10n } from './i18n/runtime';
 import { buildUiLanguageQuickPickItems, type LanguagePickItem } from './i18n/languagePick';
 import { VibrancyReportPanel } from './vibrancy/views/report-webview';
 
@@ -813,8 +813,8 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       const picked = await vscode.window.showQuickPick<LanguagePickItem>(
         buildUiLanguageQuickPickItems(),
         {
-          title: t('uiLanguage.pick.title'),
-          placeHolder: t('uiLanguage.pick.placeholder'),
+          title: l10n('uiLanguage.pick.title'),
+          placeHolder: l10n('uiLanguage.pick.placeholder'),
         },
       );
       if (!picked || picked.value === current) return;
@@ -825,7 +825,18 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       const locale = applyUiLocalePreference();
       refreshAllSections();
       reloadOpenDashboardsForLocale();
-      void vscode.window.setStatusBarMessage(`Saropa Lints language: ${locale}`, 2500);
+      // Manifest NLS labels (activity bar, command titles, settings) are baked
+      // at activation by VS Code and cannot be hot-swapped. A window reload is
+      // required for those strings to pick up the new locale. Dashboards and
+      // webviews refresh immediately via reloadOpenDashboardsForLocale above.
+      const reloadChoice = await vscode.window.showInformationMessage(
+        l10n('uiLanguage.reloadPrompt', { locale }),
+        l10n('uiLanguage.reloadNow'),
+        l10n('uiLanguage.reloadLater'),
+      );
+      if (reloadChoice === l10n('uiLanguage.reloadNow')) {
+        await vscode.commands.executeCommand('workbench.action.reloadWindow');
+      }
     }),
     vscode.commands.registerCommand('saropaLints.toggleSidebarSection', async (key: unknown) => {
       if (typeof key !== 'string') {

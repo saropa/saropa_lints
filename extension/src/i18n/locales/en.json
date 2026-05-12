@@ -75,7 +75,10 @@
       "title": "Saropa Lints UI language",
       "placeholder": "Choose language for sidebar and dashboards",
       "auto": "Auto (follow VS Code display language)"
-    }
+    },
+    "reloadPrompt": "Language set to {locale}. Reload the window to update sidebar and command labels.",
+    "reloadNow": "Reload now",
+    "reloadLater": "Later"
   },
   "brand": {
     "prefix": "Saropa "
@@ -635,5 +638,158 @@
       "matchOne": "{count} match",
       "matchOther": "{count} matches"
     }
+  },
+  "codeHealth": {
+    "documentTitle": "Saropa Code Health Dashboard",
+    "skipToTable": "Skip to functions table",
+    "openWorkspaceFirst": "Open a Dart/Flutter workspace first.",
+    "scanningTitle": "Code Health: scanning functions…",
+    "runReportFirst": "Run the report again, then copy JSON.",
+    "copiedJson": "Code Health JSON copied to clipboard.",
+    "couldNotOpenFile": "Could not open file: {path}",
+    "panelTitle": "Saropa Code Health Dashboard",
+    "hero": {
+      "title": "Saropa Code Health Dashboard",
+      "generated": "Generated",
+      "functionOne": "{count} function",
+      "functionOther": "{count} functions",
+      "avgFormat": "avg {score} ({grade})",
+      "gatesFailing": "gates failing",
+      "gatesPassing": "gates passing"
+    },
+    "gauge": {
+      "tooltip": "Average score {rounded} of 100 (grade {grade}).",
+      "ariaLabel": "Average score {rounded} of 100"
+    },
+    "gate": {
+      "fallback": "Quality gates failed — review thresholds in Code Health settings.",
+      "failingOne": "{count} gate failing — review thresholds, or copy the JSON to inspect gates.violations.",
+      "failingOther": "{count} gates failing — review thresholds, or copy the JSON to inspect gates.violations.",
+      "openSettingsTitle": "Open the Code Health settings to adjust thresholds.",
+      "openSettingsButton": "Open Code Health settings"
+    },
+    "kpi": {
+      "ariaLabel": "Code health summary",
+      "allClear": "No flagged functions across any category — all clear.",
+      "clickToFilter": "Click to filter the table to functions flagged {flag}.",
+      "noFlagged": "No functions flagged {flag}.",
+      "unused": "Unused",
+      "unusedSub": "functions referenced nowhere",
+      "uncovered": "Uncovered",
+      "uncoveredSub": "no LCOV coverage",
+      "stubTested": "Stub-tested",
+      "stubTestedSub": "tests exist but assert little",
+      "suspiciousCoverage": "Suspicious coverage",
+      "suspiciousCoverageSub": "coverage looks fabricated",
+      "testDrift": "Test drift",
+      "testDriftSub": "tests lag the function"
+    },
+    "toolbar": {
+      "ariaLabel": "Code Health actions",
+      "rescanTitle": "Re-run the Code Health scan and refresh this dashboard.",
+      "rescan": "Rescan",
+      "copyJsonTitle": "Copy the raw Code Health JSON to the clipboard.",
+      "copyJson": "Copy JSON",
+      "settingsTitle": "Open the Code Health settings.",
+      "settingsButton": "Code Health settings",
+      "filterTitle": "Filter rows by name, file, or flag.",
+      "filterLabel": "Filter rows",
+      "filterPlaceholder": "Filter rows…"
+    },
+    "table": {
+      "ariaLabel": "Worst functions by score",
+      "heading": "Worst functions",
+      "topCount": "top {shown} of {total}",
+      "colGrade": "Grade",
+      "colScore": "Score",
+      "colFunction": "Function",
+      "colFile": "File",
+      "colLine": "Line",
+      "colUsage": "Usage",
+      "colCoverage": "Coverage",
+      "colComplexity": "Complexity",
+      "colFlags": "Flags",
+      "noMatch": "No functions match the current filters.",
+      "resetFiltersTitle": "Clear the search and any active flag filter.",
+      "resetFilters": "Reset filters",
+      "hint": "Showing the worst 200 functions by score. Use the search field to narrow further."
+    },
+    "shortcuts": {
+      "focusFilter": "Focus the row filter",
+      "clearFilter": "Clear the focused row filter",
+      "activateKpi": "Activate focused KPI card",
+      "activateKpiSpace": "Activate focused KPI card",
+      "showOverlay": "Show this shortcut overlay"
+    },
+    "script": {
+      "activeFiltersLabel": "Active filters:",
+      "searchChip": "search: \"{q}\"",
+      "flagChip": "flag: {flag}",
+      "removeAria": "Remove {key}",
+      "clearAll": "Clear all",
+      "rowsVisible": "{visible} of {total} rows visible",
+      "neverRun": "never run"
+    },
+    "freshness": {
+      "justNow": "just now",
+      "minutesAgo": "{min}m ago",
+      "hoursAgo": "{hr}h ago",
+      "daysAgo": "{day}d ago",
+      "weeksAgo": "{wk}w ago"
+    }
+  },
+  "suppressionsStrip": {
+    "noData": "No violations.json yet — run analysis to populate the suppression snapshot.",
+    "zeroTotal": "0 analyzer suppressions in the latest export.",
+    "noKindBreakdown": "No by-kind breakdown in this export.",
+    "title": "Suppressions (export)",
+    "readOnlyNote": "(read-only; open Findings to browse and act.)",
+    "openFindings": "Open Findings Dashboard"
+  },
+  "configMirrors": {
+    "noFileRisk": "No per-file risk breakdown (no violations in scope).",
+    "suppressionNote": "Matches violations.json summary, not live sidebar suppression toggles.",
+    "noSuppression": "No suppression aggregate in this export (older analyzer or zero suppressions).",
+    "owaspSignal": "{count} violation(s) in this export carry OWASP mobile/web mapping — open Security Posture for the full matrix and export.",
+    "summarySuppressions": "Suppressions (export snapshot)",
+    "summaryOwasp": "Security posture (OWASP signal)",
+    "summaryFileRisk": "File risk (top files)"
+  },
+  "telemetry": {
+    "heroTitle": "Related Rule Telemetry",
+    "skipToCounters": "Skip to telemetry counters",
+    "lastEvent": "Last event {relative}",
+    "noEvents": "No events recorded",
+    "totalEventOne": "{count} total event",
+    "totalEventOther": "{count} total events",
+    "noCountersTitle": "No counters to reset.",
+    "resetTitle": "Reset all counters",
+    "refreshTitle": "Reload telemetry counters from disk",
+    "refresh": "Refresh",
+    "copyTitle": "Copy snapshot as JSON",
+    "copyJson": "Copy JSON",
+    "resetCounters": "Reset counters",
+    "countersAria": "Counters",
+    "countersHeading": "Event counters",
+    "thEvent": "Event",
+    "thCount": "Count",
+    "emptyMessage": "No telemetry events recorded yet — open a rule from the Findings Dashboard to start capturing counters.",
+    "openFindingsTitle": "Open the Saropa Findings Dashboard.",
+    "openFindings": "Open Findings Dashboard",
+    "lastPropsHeading": "Last event properties",
+    "copiedJson": "Saropa Lints: copied related rule telemetry JSON.",
+    "countersReset": "Saropa Lints: related rule telemetry counters reset."
+  },
+  "sidebarLayout": {
+    "summary": "Activity bar layout",
+    "hint": "Turn Saropa activity-bar sections on or off here (saved with the workspace, without leaving the dashboard)."
+  },
+  "securityPosture": {
+    "issueOne": "{count} issue",
+    "issueOther": "{count} issues",
+    "noIssues": "No issues",
+    "showIssues": "Show issues",
+    "violationTooltip": "{count} violation(s) across {ruleCount} rule(s). Click to show in Issues.",
+    "noViolationsTooltip": "No violations mapped to this category."
   }
 }

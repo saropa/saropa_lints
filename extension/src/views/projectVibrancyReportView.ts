@@ -19,6 +19,7 @@ import {
   getKeyboardShortcutsScript,
   getKeyboardShortcutsStyles,
 } from './keyboard-shortcuts';
+import { l10n } from '../i18n/runtime';
 
 /**
  * **Code Health Dashboard** webview: runs [runProjectVibrancyScan], renders JSON as HTML in an
@@ -50,7 +51,7 @@ export async function openProjectVibrancyReport(): Promise<void> {
   }
   const projectRoot = getProjectRoot();
   if (!projectRoot) {
-    void vscode.window.showErrorMessage('Open a Dart/Flutter workspace first.');
+    void vscode.window.showErrorMessage(l10n('codeHealth.openWorkspaceFirst'));
     return;
   }
   inflightScan = runScanAndRender(projectRoot).finally(() => {
@@ -73,7 +74,7 @@ async function runScanAndRender(projectRoot: string): Promise<void> {
       // scoring CLI is still `saropa_lints:project_vibrancy` and the setting
       // key prefix is still `saropaLints.projectVibrancy.*` — both kept for
       // pubspec/settings.json compatibility, neither is user-visible.
-      title: 'Code Health: scanning functions...',
+      title: l10n('codeHealth.scanningTitle'),
       // Cancellable so a runaway scan can be killed from the notification
       // instead of waiting for the dart process to finish on its own.
       cancellable: true,
@@ -91,7 +92,7 @@ function getOrCreatePanel(): vscode.WebviewPanel {
   if (currentPanel) return currentPanel;
   currentPanel = vscode.window.createWebviewPanel(
     'saropaProjectVibrancyReport',
-    'Saropa Code Health Dashboard',
+    l10n('codeHealth.panelTitle'),
     vscode.ViewColumn.One,
     { enableScripts: true, retainContextWhenHidden: true },
   );
@@ -108,11 +109,11 @@ async function handlePanelMessage(msg: unknown): Promise<void> {
   const data = msg as { type?: string; file?: string; line?: number };
   if (data.type === 'copyJson') {
     if (lastReportRawStdout.trim().length === 0) {
-      void vscode.window.showInformationMessage('Run the report again, then copy JSON.');
+      void vscode.window.showInformationMessage(l10n('codeHealth.runReportFirst'));
       return;
     }
     await vscode.env.clipboard.writeText(lastReportRawStdout);
-    void vscode.window.showInformationMessage('Code Health JSON copied to clipboard.');
+    void vscode.window.showInformationMessage(l10n('codeHealth.copiedJson'));
     return;
   }
   if (data.type === 'openProjectVibrancySettings') {
@@ -140,7 +141,7 @@ async function openFileAtLine(relativePath: string, line: number): Promise<void>
     editor.selection = new vscode.Selection(pos, pos);
     editor.revealRange(new vscode.Range(pos, pos), vscode.TextEditorRevealType.InCenter);
   } catch {
-    void vscode.window.showErrorMessage(`Could not open file: ${relativePath}`);
+    void vscode.window.showErrorMessage(l10n('codeHealth.couldNotOpenFile', { path: relativePath }));
   }
 }
 
@@ -174,16 +175,16 @@ function hslForScore(score: number): string {
 }
 
 function formatRelativeFreshness(iso: string | undefined): string {
-  if (!iso) return 'never run';
-  const t = Date.parse(iso);
-  if (Number.isNaN(t)) return 'never run';
-  const sec = Math.max(0, Math.floor((Date.now() - t) / 1000));
-  if (sec < 60) return 'just now';
-  if (sec < 3600) return `${Math.floor(sec / 60)}m ago`;
-  if (sec < 86400) return `${Math.floor(sec / 3600)}h ago`;
+  if (!iso) return l10n('codeHealth.script.neverRun');
+  const parsed = Date.parse(iso);
+  if (Number.isNaN(parsed)) return l10n('codeHealth.script.neverRun');
+  const sec = Math.max(0, Math.floor((Date.now() - parsed) / 1000));
+  if (sec < 60) return l10n('codeHealth.freshness.justNow');
+  if (sec < 3600) return l10n('codeHealth.freshness.minutesAgo', { min: String(Math.floor(sec / 60)) });
+  if (sec < 86400) return l10n('codeHealth.freshness.hoursAgo', { hr: String(Math.floor(sec / 3600)) });
   const days = Math.floor(sec / 86400);
-  if (days < 7) return `${days}d ago`;
-  return `${Math.floor(days / 7)}w ago`;
+  if (days < 7) return l10n('codeHealth.freshness.daysAgo', { day: String(days) });
+  return l10n('codeHealth.freshness.weeksAgo', { wk: String(Math.floor(days / 7)) });
 }
 
 /**
@@ -204,7 +205,7 @@ function buildHtml(payload: ProjectVibrancyPayload): string {
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Saropa Code Health Dashboard</title>
+  <title>${escapeHtml(l10n('codeHealth.documentTitle'))}</title>
   <!-- 'unsafe-inline' on style-src: hero gauge sets dynamic CSS vars (--gauge-target,
        --gauge-arc, --gauge-color) via inline style="..." attributes. CSP nonces only
        authorize <style> blocks, not style attributes — without 'unsafe-inline' the vars
@@ -213,7 +214,7 @@ function buildHtml(payload: ProjectVibrancyPayload): string {
   <style nonce="${nonce}">${getProjectVibrancyReportStyles()}${getKeyboardShortcutsStyles()}</style>
 </head>
 <body>
-<a href="#pvTable" class="skip-link">Skip to functions table</a>
+<a href="#pvTable" class="skip-link">${escapeHtml(l10n('codeHealth.skipToTable'))}</a>
 <div id="announcer" role="status" aria-live="polite" aria-atomic="true"></div>
 <header>
 ${buildHero(payload, summary)}
@@ -226,11 +227,11 @@ ${buildToolbar()}
 ${buildTable(rows)}
 </main>
 ${buildKeyboardShortcutsOverlay([
-  { key: '/', label: 'Focus the row filter' },
-  { key: 'Esc', label: 'Clear the focused row filter' },
-  { key: 'Enter', label: 'Activate focused KPI card' },
-  { key: 'Space', label: 'Activate focused KPI card' },
-  { key: '?', label: 'Show this shortcut overlay' },
+  { key: '/', label: l10n('codeHealth.shortcuts.focusFilter') },
+  { key: 'Esc', label: l10n('codeHealth.shortcuts.clearFilter') },
+  { key: 'Enter', label: l10n('codeHealth.shortcuts.activateKpi') },
+  { key: 'Space', label: l10n('codeHealth.shortcuts.activateKpiSpace') },
+  { key: '?', label: l10n('codeHealth.shortcuts.showOverlay') },
 ])}
 <script nonce="${nonce}">${buildClientScript()}</script>
 </body>
@@ -245,12 +246,12 @@ function buildHero(payload: ProjectVibrancyPayload, summary: NonNullable<Project
   const fnCount = summary.functionCount ?? (payload.functions?.length ?? 0);
   const gateFailed = payload.gates?.pass === false;
   const parts = [
-    `Generated <strong>${escapeHtml(generated)}</strong>`,
-    pluralize(fnCount, { one: '{count} function', other: '{count} functions' }),
-    `avg ${escapeHtml(avgScore.toFixed(1))} (${escapeHtml(avgGrade)})`,
+    `${escapeHtml(l10n('codeHealth.hero.generated'))} <strong>${escapeHtml(generated)}</strong>`,
+    pluralize(fnCount, { one: l10n('codeHealth.hero.functionOne'), other: l10n('codeHealth.hero.functionOther') }),
+    escapeHtml(l10n('codeHealth.hero.avgFormat', { score: avgScore.toFixed(1), grade: avgGrade })),
     gateFailed
-      ? '<span class="pill bad">gates failing</span>'
-      : '<span class="pill good">gates passing</span>',
+      ? `<span class="pill bad">${escapeHtml(l10n('codeHealth.hero.gatesFailing'))}</span>`
+      : `<span class="pill good">${escapeHtml(l10n('codeHealth.hero.gatesPassing'))}</span>`,
   ];
   const statusLine = parts
     .map((p, i) => (i === 0 ? `<span>${p}</span>` : `<span class="dot">·</span><span>${p}</span>`))
@@ -262,7 +263,7 @@ function buildHero(payload: ProjectVibrancyPayload, summary: NonNullable<Project
   // action here.
   return `<header class="dash-hero">
   <div class="hero-text">
-    <h1>Saropa Code Health Dashboard</h1>
+    <h1>${escapeHtml(l10n('codeHealth.hero.title'))}</h1>
     <p class="status-line">${statusLine}${buildKeyboardShortcutsButton()}</p>
   </div>
   ${buildHeroGauge(avgScore, avgGrade)}
@@ -273,9 +274,9 @@ function buildHero(payload: ProjectVibrancyPayload, summary: NonNullable<Project
 function buildHeroGauge(score: number, grade: string): string {
   const rounded = Math.round(score);
   const hsl = hslForScore(rounded);
-  const tooltip = `Average score ${rounded} of 100 (grade ${grade}).`;
+  const tooltip = l10n('codeHealth.gauge.tooltip', { rounded: String(rounded), grade });
   return `<div class="hero-gauge" role="img"
-    aria-label="${escapeHtml(`Average score ${rounded} of 100`)}"
+    aria-label="${escapeHtml(l10n('codeHealth.gauge.ariaLabel', { rounded: String(rounded) }))}"
     title="${escapeHtml(tooltip)}"
     style="--gauge-target:${rounded};--gauge-arc:100;--gauge-color:${hsl};">
     <svg viewBox="0 0 100 100" aria-hidden="true">
@@ -294,8 +295,8 @@ function buildGateBanner(payload: ProjectVibrancyPayload): string {
   const violations = payload.gates?.violations ?? [];
   const summary =
     violations.length === 0
-      ? 'Quality gates failed — review thresholds in Code Health settings.'
-      : `${pluralize(violations.length, { one: '{count} gate failing', other: '{count} gates failing' })} — review thresholds, or copy the JSON to inspect <code>gates.violations</code>.`;
+      ? l10n('codeHealth.gate.fallback')
+      : pluralize(violations.length, { one: l10n('codeHealth.gate.failingOne'), other: l10n('codeHealth.gate.failingOther') });
   // §8.16 — empty/error states must name the next action with a tier-1 button.
   // Previously this banner only carried explanatory text; the user had to
   // hunt for the *Code Health settings* toolbar button to act on it. The
@@ -306,7 +307,7 @@ function buildGateBanner(payload: ProjectVibrancyPayload): string {
     <span class="glyph">⚠</span>
     <span class="gate-msg">${summary}</span>
     <button type="button" class="btn tier-1" data-cmd="openProjectVibrancySettings"
-      title="Open the Code Health settings to adjust thresholds.">Open Code Health settings</button>
+      title="${escapeHtml(l10n('codeHealth.gate.openSettingsTitle'))}">${escapeHtml(l10n('codeHealth.gate.openSettingsButton'))}</button>
   </div>`;
 }
 
@@ -322,18 +323,18 @@ function buildGateBanner(payload: ProjectVibrancyPayload): string {
  */
 function buildKpiRow(summary: NonNullable<ProjectVibrancyPayload['summary']>): string {
   const specs: KpiInput[] = [
-    { flag: 'unused', label: 'Unused', value: summary.unusedCount ?? 0, sub: 'functions referenced nowhere', classes: 'crit' },
-    { flag: 'uncovered', label: 'Uncovered', value: summary.uncoveredCount ?? 0, sub: 'no LCOV coverage', classes: 'errors' },
-    { flag: 'stub_tested', label: 'Stub-tested', value: summary.stubTestedCount ?? 0, sub: 'tests exist but assert little', classes: 'warnings' },
-    { flag: 'suspicious_coverage', label: 'Suspicious coverage', value: summary.suspiciousCoverageCount ?? 0, sub: 'coverage looks fabricated', classes: 'warnings' },
-    { flag: 'test_drift', label: 'Test drift', value: summary.testDriftCount ?? 0, sub: 'tests lag the function', classes: 'todos' },
+    { flag: 'unused', label: l10n('codeHealth.kpi.unused'), value: summary.unusedCount ?? 0, sub: l10n('codeHealth.kpi.unusedSub'), classes: 'crit' },
+    { flag: 'uncovered', label: l10n('codeHealth.kpi.uncovered'), value: summary.uncoveredCount ?? 0, sub: l10n('codeHealth.kpi.uncoveredSub'), classes: 'errors' },
+    { flag: 'stub_tested', label: l10n('codeHealth.kpi.stubTested'), value: summary.stubTestedCount ?? 0, sub: l10n('codeHealth.kpi.stubTestedSub'), classes: 'warnings' },
+    { flag: 'suspicious_coverage', label: l10n('codeHealth.kpi.suspiciousCoverage'), value: summary.suspiciousCoverageCount ?? 0, sub: l10n('codeHealth.kpi.suspiciousCoverageSub'), classes: 'warnings' },
+    { flag: 'test_drift', label: l10n('codeHealth.kpi.testDrift'), value: summary.testDriftCount ?? 0, sub: l10n('codeHealth.kpi.testDriftSub'), classes: 'todos' },
   ];
   const live = specs.filter((s) => s.value > 0);
   if (live.length === 0) {
-    return `<p class="kpi-allclear" aria-label="Code health summary">No flagged functions across any category — all clear.</p>`;
+    return `<p class="kpi-allclear" aria-label="${escapeHtml(l10n('codeHealth.kpi.ariaLabel'))}">${escapeHtml(l10n('codeHealth.kpi.allClear'))}</p>`;
   }
   const cards = live.map(kpiCard).join('');
-  return `<section class="kpi-row" aria-label="Code health summary">${cards}</section>`;
+  return `<section class="kpi-row" aria-label="${escapeHtml(l10n('codeHealth.kpi.ariaLabel'))}">${cards}</section>`;
 }
 
 interface KpiInput {
@@ -348,9 +349,10 @@ function kpiCard(input: KpiInput): string {
   const interactiveClass = interactive ? 'interactive' : '';
   const filterAttr = interactive ? ` data-flag-filter="${input.flag}"` : '';
   const tabAttr = interactive ? ' tabindex="0"' : '';
+  const humanFlag = input.flag.replace(/_/g, ' ');
   const tooltip = interactive
-    ? `Click to filter the table to functions flagged ${input.flag.replace(/_/g, ' ')}.`
-    : `No functions flagged ${input.flag.replace(/_/g, ' ')}.`;
+    ? l10n('codeHealth.kpi.clickToFilter', { flag: humanFlag })
+    : l10n('codeHealth.kpi.noFlagged', { flag: humanFlag });
   return `<button type="button" class="kpi-card ${input.classes} ${interactiveClass}"${filterAttr}${tabAttr}
     title="${escapeHtml(tooltip)}"${interactive ? '' : ' disabled'}>
     <span class="kpi-k">${escapeHtml(input.label)}</span>
@@ -361,20 +363,20 @@ function kpiCard(input: KpiInput): string {
 
 /** Toolbar with one tier-1 primary (*Rescan*), tier-2 secondaries, and a search field. */
 function buildToolbar(): string {
-  return `<section class="toolbar-band" role="toolbar" aria-label="Code Health actions">
+  return `<section class="toolbar-band" role="toolbar" aria-label="${escapeHtml(l10n('codeHealth.toolbar.ariaLabel'))}">
   <div class="toolbar-row spread">
     <div class="toolbar-row" style="gap:6px;">
       <button class="btn tier-1" id="rescan" type="button"
-        title="Re-run the Code Health scan and refresh this dashboard.">Rescan</button>
+        title="${escapeHtml(l10n('codeHealth.toolbar.rescanTitle'))}">${escapeHtml(l10n('codeHealth.toolbar.rescan'))}</button>
       <button class="btn" id="copyJson" type="button"
-        title="Copy the raw Code Health JSON to the clipboard.">Copy JSON</button>
+        title="${escapeHtml(l10n('codeHealth.toolbar.copyJsonTitle'))}">${escapeHtml(l10n('codeHealth.toolbar.copyJson'))}</button>
       <button class="btn" id="openPvSettings" type="button"
-        title="Open the Code Health settings.">Code Health settings</button>
+        title="${escapeHtml(l10n('codeHealth.toolbar.settingsTitle'))}">${escapeHtml(l10n('codeHealth.toolbar.settingsButton'))}</button>
     </div>
-    <label class="field" title="Filter rows by name, file, or flag.">
+    <label class="field" title="${escapeHtml(l10n('codeHealth.toolbar.filterTitle'))}">
       <span class="glyph">🔎</span>
-      <label class="sr-only" for="pvSearch">Filter rows</label>
-      <input id="pvSearch" type="search" placeholder="Filter rows…" autocomplete="off" />
+      <label class="sr-only" for="pvSearch">${escapeHtml(l10n('codeHealth.toolbar.filterLabel'))}</label>
+      <input id="pvSearch" type="search" placeholder="${escapeHtml(l10n('codeHealth.toolbar.filterPlaceholder'))}" autocomplete="off" />
     </label>
   </div>
 </section>`;
@@ -383,21 +385,21 @@ function buildToolbar(): string {
 /** Sortable, sticky-header functions table (top 200 worst by score). */
 function buildTable(rows: readonly ProjectVibrancyFunctionRow[]): string {
   const tbodyRows = rows.map((row) => buildTableRow(row)).join('');
-  return `<section class="section" aria-label="Worst functions by score">
-  <h2>Worst functions <span class="count">top ${rows.length} of ${rows.length}</span></h2>
+  return `<section class="section" aria-label="${escapeHtml(l10n('codeHealth.table.ariaLabel'))}">
+  <h2>${escapeHtml(l10n('codeHealth.table.heading'))} <span class="count">${escapeHtml(l10n('codeHealth.table.topCount', { shown: String(rows.length), total: String(rows.length) }))}</span></h2>
   <div class="dash-table-wrap">
     <table class="dash-table code-health" id="pvTable">
       <thead>
         <tr>
-          <th class="sortable col-grade" data-sort="grade" aria-sort="none">Grade <span class="arrow">▲</span></th>
-          <th class="sortable col-score" data-sort="score" aria-sort="ascending">Score <span class="arrow">▲</span></th>
-          <th class="sortable col-name"  data-sort="name"  aria-sort="none">Function <span class="arrow">▲</span></th>
-          <th class="sortable col-file"  data-sort="file"  aria-sort="none">File <span class="arrow">▲</span></th>
-          <th class="sortable col-line"  data-sort="line"  aria-sort="none">Line <span class="arrow">▲</span></th>
-          <th class="sortable col-usage" data-sort="usage" aria-sort="none">Usage <span class="arrow">▲</span></th>
-          <th class="sortable col-coverage" data-sort="coverage" aria-sort="none">Coverage <span class="arrow">▲</span></th>
-          <th class="sortable col-complexity" data-sort="complexity" aria-sort="none">Complexity <span class="arrow">▲</span></th>
-          <th class="col-flags">Flags</th>
+          <th class="sortable col-grade" data-sort="grade" aria-sort="none">${escapeHtml(l10n('codeHealth.table.colGrade'))} <span class="arrow">▲</span></th>
+          <th class="sortable col-score" data-sort="score" aria-sort="ascending">${escapeHtml(l10n('codeHealth.table.colScore'))} <span class="arrow">▲</span></th>
+          <th class="sortable col-name"  data-sort="name"  aria-sort="none">${escapeHtml(l10n('codeHealth.table.colFunction'))} <span class="arrow">▲</span></th>
+          <th class="sortable col-file"  data-sort="file"  aria-sort="none">${escapeHtml(l10n('codeHealth.table.colFile'))} <span class="arrow">▲</span></th>
+          <th class="sortable col-line"  data-sort="line"  aria-sort="none">${escapeHtml(l10n('codeHealth.table.colLine'))} <span class="arrow">▲</span></th>
+          <th class="sortable col-usage" data-sort="usage" aria-sort="none">${escapeHtml(l10n('codeHealth.table.colUsage'))} <span class="arrow">▲</span></th>
+          <th class="sortable col-coverage" data-sort="coverage" aria-sort="none">${escapeHtml(l10n('codeHealth.table.colCoverage'))} <span class="arrow">▲</span></th>
+          <th class="sortable col-complexity" data-sort="complexity" aria-sort="none">${escapeHtml(l10n('codeHealth.table.colComplexity'))} <span class="arrow">▲</span></th>
+          <th class="col-flags">${escapeHtml(l10n('codeHealth.table.colFlags'))}</th>
         </tr>
       </thead>
       <tbody id="pvBody">${tbodyRows}</tbody>
@@ -407,12 +409,12 @@ function buildTable(rows: readonly ProjectVibrancyFunctionRow[]): string {
          *Reset filters* button so the user is not stranded looking at an
          empty table with no cue for the next action. -->
     <div id="pvEmpty" class="empty-cta" role="status" hidden>
-      <p class="empty-msg">No functions match the current filters.</p>
+      <p class="empty-msg">${escapeHtml(l10n('codeHealth.table.noMatch'))}</p>
       <button type="button" class="btn tier-1" id="pvResetFilters"
-        title="Clear the search and any active flag filter.">Reset filters</button>
+        title="${escapeHtml(l10n('codeHealth.table.resetFiltersTitle'))}">${escapeHtml(l10n('codeHealth.table.resetFilters'))}</button>
     </div>
   </div>
-  <p class="hint">Showing the worst 200 functions by score. Use the search field to narrow further.</p>
+  <p class="hint">${escapeHtml(l10n('codeHealth.table.hint'))}</p>
 </section>`;
 }
 
@@ -439,10 +441,20 @@ function buildTableRow(row: ProjectVibrancyFunctionRow): string {
   </tr>`;
 }
 
+/** Client-script strings resolved at host HTML build time. */
+function codeHealthScriptStrings(): Record<string, string> {
+  return {
+    activeFiltersLabel: l10n('codeHealth.script.activeFiltersLabel'),
+    clearAll: l10n('codeHealth.script.clearAll'),
+  };
+}
+
 /** Inline client script — sort, search filter, KPI flag-filter, file-link nav, toolbar buttons. */
 function buildClientScript(): string {
+  const CH = codeHealthScriptStrings();
   return `
 (function() {
+  var CH = ${JSON.stringify(CH)};
   const vscode = acquireVsCodeApi();
   const state = { search: '', flag: null, sortKey: 'score', sortAsc: true };
 
@@ -520,12 +532,12 @@ function buildClientScript(): string {
       stripEl.hidden = true; stripEl.innerHTML = ''; return;
     }
     stripEl.hidden = false;
-    const html = ['<span class="lbl">Active filters:</span>'];
+    const html = ['<span class="lbl">' + CH.activeFiltersLabel + '</span>'];
     chips.forEach(function(chip) {
       html.push('<span class="chip">' + chip.label +
         '<button type="button" class="x" data-chip="' + chip.key + '" aria-label="Remove ' + chip.key + '">×</button></span>');
     });
-    html.push('<button type="button" class="clear-all" id="clear-all-filters">Clear all</button>');
+    html.push('<button type="button" class="clear-all" id="clear-all-filters">' + CH.clearAll + '</button>');
     stripEl.innerHTML = html.join('');
     stripEl.querySelectorAll('.chip .x').forEach(function(btn) {
       btn.addEventListener('click', function() { removeChip(btn.getAttribute('data-chip')); });

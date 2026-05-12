@@ -28,7 +28,7 @@
  * (§15.2 focus-trap rule).
  */
 
-import { t } from '../i18n/runtime';
+import { l10n } from '../i18n/runtime';
 
 function escape(s: string): string {
   return s
@@ -54,8 +54,8 @@ export interface KeyboardShortcut {
 export function buildKeyboardShortcutsButton(): string {
   return `<button type="button" id="kbdShortcutsToggle"
     class="kbd-shortcuts-toggle"
-    title="${escape(t('kbdOverlay.toggleTitle'))}"
-    aria-label="${escape(t('kbdOverlay.toggleAria'))}"
+    title="${escape(l10n('kbdOverlay.toggleTitle'))}"
+    aria-label="${escape(l10n('kbdOverlay.toggleAria'))}"
     aria-haspopup="dialog"
     aria-expanded="false">?</button>`;
 }
@@ -76,15 +76,15 @@ export function buildKeyboardShortcutsOverlay(shortcuts: readonly KeyboardShortc
     role="dialog" aria-modal="true" aria-labelledby="kbdShortcutsTitle">
     <div class="kbd-shortcuts-card">
       <div class="kbd-shortcuts-head">
-        <h2 id="kbdShortcutsTitle">${escape(t('kbdOverlay.dialogTitle'))}</h2>
+        <h2 id="kbdShortcutsTitle">${escape(l10n('kbdOverlay.dialogTitle'))}</h2>
         <button type="button" class="kbd-shortcuts-close"
           id="kbdShortcutsClose"
-          aria-label="${escape(t('kbdOverlay.closeAria'))}">×</button>
+          aria-label="${escape(l10n('kbdOverlay.closeAria'))}">×</button>
       </div>
       <table class="kbd-shortcuts-list">
         <tbody>${rows}</tbody>
       </table>
-      <p class="kbd-shortcuts-foot">${escape(t('kbdOverlay.footer'))}</p>
+      <p class="kbd-shortcuts-foot">${escape(l10n('kbdOverlay.footer'))}</p>
     </div>
   </div>`;
 }

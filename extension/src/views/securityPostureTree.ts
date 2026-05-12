@@ -14,6 +14,7 @@ import * as vscode from 'vscode';
 import { readViolations, Violation, filterDisabledFromData } from '../violationsReader';
 import { getProjectRoot } from '../projectRoot';
 import { readDisabledRules } from '../configWriter';
+import { l10n } from '../i18n/runtime';
 
 // --- OWASP category labels ---
 
@@ -61,7 +62,11 @@ class GroupItem extends vscode.TreeItem {
     public readonly totalCount: number,
   ) {
     super(label, vscode.TreeItemCollapsibleState.Collapsed);
-    this.description = totalCount > 0 ? `${totalCount} issue${totalCount === 1 ? '' : 's'}` : 'No issues';
+    this.description = totalCount > 0
+      ? (totalCount === 1
+        ? l10n('securityPosture.issueOne', { count: String(totalCount) })
+        : l10n('securityPosture.issueOther', { count: String(totalCount) }))
+      : l10n('securityPosture.noIssues');
     this.iconPath = new vscode.ThemeIcon(totalCount > 0 ? 'shield' : 'verified');
     this.contextValue = 'securityGroup';
   }
@@ -88,12 +93,12 @@ class CategoryItem extends vscode.TreeItem {
       // D1: Click to filter Violations view to rules mapped to this category.
       this.command = {
         command: 'saropaLints.focusIssuesForOwasp',
-        title: 'Show issues',
+        title: l10n('securityPosture.showIssues'),
         arguments: [rules],
       };
-      this.tooltip = `${count} violation${count === 1 ? '' : 's'} across ${rules.length} rule${rules.length === 1 ? '' : 's'}. Click to show in Issues.`;
+      this.tooltip = l10n('securityPosture.violationTooltip', { count: String(count), ruleCount: String(rules.length) });
     } else {
-      this.tooltip = 'No violations mapped to this category.';
+      this.tooltip = l10n('securityPosture.noViolationsTooltip');
     }
   }
 }

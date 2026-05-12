@@ -36,7 +36,7 @@ import en from '../i18n/locales/en.json';
 export const STRINGS = en;
 
 /**
- * @deprecated Prefer `t('domain.key')` from `src/i18n/runtime.ts` for new
+ * @deprecated Prefer `l10n('domain.key')` from `src/i18n/runtime.ts` for new
  * runtime-localized surfaces. This helper stays for backwards compatibility.
  */
 export const LEGACY_STRINGS = {

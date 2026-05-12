@@ -10,7 +10,7 @@ import {
   type TriageData,
   type TriageGroupNode,
 } from './triageTree';
-import { t } from '../i18n/runtime';
+import { l10n } from '../i18n/runtime';
 
 function escapeHtml(s: string): string {
   return s
@@ -36,9 +36,9 @@ function renderTriageGroupBlock(group: TriageGroupNode, issuesByRule: IssuesByRu
   const children = getTriageGroupChildren(group, issuesByRule);
   const encAll = rulesPayload(group.rules);
   const actions = `<div class="triage-group-actions">
-  <button type="button" class="action-btn triage-btn" data-triage-action="focus" data-rules="${encAll}">${escapeHtml(t('triageDash.showInIssues'))}</button>
-  <button type="button" class="action-btn triage-btn secondary" data-triage-action="disable" data-rules="${encAll}">${escapeHtml(t('triageDash.disableRules'))}</button>
-  <button type="button" class="action-btn triage-btn secondary" data-triage-action="enable" data-rules="${encAll}">${escapeHtml(t('triageDash.enableRules'))}</button>
+  <button type="button" class="action-btn triage-btn" data-triage-action="focus" data-rules="${encAll}">${escapeHtml(l10n('triageDash.showInIssues'))}</button>
+  <button type="button" class="action-btn triage-btn secondary" data-triage-action="disable" data-rules="${encAll}">${escapeHtml(l10n('triageDash.disableRules'))}</button>
+  <button type="button" class="action-btn triage-btn secondary" data-triage-action="enable" data-rules="${encAll}">${escapeHtml(l10n('triageDash.enableRules'))}</button>
 </div>`;
   const rows = children
     .map((r) => {
@@ -47,9 +47,9 @@ function renderTriageGroupBlock(group: TriageGroupNode, issuesByRule: IssuesByRu
   <td class="triage-rule-name"><code>${escapeHtml(r.ruleName)}</code></td>
   <td class="triage-n">${r.issueCount}</td>
   <td class="triage-row-actions">
-    <button type="button" class="linkish triage-btn" data-triage-action="focus" data-rules="${encOne}">${escapeHtml(t('triageDash.issues'))}</button>
-    <button type="button" class="linkish triage-btn" data-triage-action="disable" data-rules="${encOne}">${escapeHtml(t('triageDash.off'))}</button>
-    <button type="button" class="linkish triage-btn" data-triage-action="enable" data-rules="${encOne}">${escapeHtml(t('triageDash.on'))}</button>
+    <button type="button" class="linkish triage-btn" data-triage-action="focus" data-rules="${encOne}">${escapeHtml(l10n('triageDash.issues'))}</button>
+    <button type="button" class="linkish triage-btn" data-triage-action="disable" data-rules="${encOne}">${escapeHtml(l10n('triageDash.off'))}</button>
+    <button type="button" class="linkish triage-btn" data-triage-action="enable" data-rules="${encOne}">${escapeHtml(l10n('triageDash.on'))}</button>
   </td>
 </tr>`;
     })
@@ -62,7 +62,7 @@ function renderTriageGroupBlock(group: TriageGroupNode, issuesByRule: IssuesByRu
   ${actions}
   <div class="triage-table-wrap">
     <table class="triage-table">
-      <thead><tr><th>${escapeHtml(t('triageDash.colRule'))}</th><th>${escapeHtml(t('triageDash.colIssues'))}</th><th></th></tr></thead>
+      <thead><tr><th>${escapeHtml(l10n('triageDash.colRule'))}</th><th>${escapeHtml(l10n('triageDash.colIssues'))}</th><th></th></tr></thead>
       <tbody>${rows}</tbody>
     </table>
   </div>
@@ -79,12 +79,12 @@ function renderTriageBody(data: ViolationsData, triage: TriageData): string {
   }
   if (triage.zeroIssueCount > 0) {
     blocks.push(
-      `<p class="triage-meta">${escapeHtml(t('triageDash.zeroIssueRules', { count: String(triage.zeroIssueCount) }))}</p>`,
+      `<p class="triage-meta">${escapeHtml(l10n('triageDash.zeroIssueRules', { count: String(triage.zeroIssueCount) }))}</p>`,
     );
   }
   if (triage.disabledOverrideCount > 0) {
     blocks.push(
-      `<p class="triage-meta">${escapeHtml(t('triageDash.disabledOverrides', { count: String(triage.disabledOverrideCount) }))}</p>`,
+      `<p class="triage-meta">${escapeHtml(l10n('triageDash.disabledOverrides', { count: String(triage.disabledOverrideCount) }))}</p>`,
     );
   }
   if (triage.stylisticGroup) {
@@ -100,48 +100,48 @@ export function buildTriageDashboardSectionHtml(root: string): string {
   const data = readViolations(root);
   if (!data) {
     return `<details class="triage-dash">
-<summary>${escapeHtml(t('triageDash.summaryRuleTriage'))}</summary>
-<p class="hint">${escapeHtml(t('triageDash.hintNoViolations'))}</p>
-<div class="actions"><button type="button" class="action-btn" data-command="runAnalysis">${escapeHtml(t('toolbar.runAnalysis'))}</button></div>
+<summary>${escapeHtml(l10n('triageDash.summaryRuleTriage'))}</summary>
+<p class="hint">${escapeHtml(l10n('triageDash.hintNoViolations'))}</p>
+<div class="actions"><button type="button" class="action-btn" data-command="runAnalysis">${escapeHtml(l10n('toolbar.runAnalysis'))}</button></div>
 </details>`;
   }
 
   const { triage: tri } = getViolationsTriageState(root, data);
   if (tri.kind === 'missing' || (tri.kind === 'incomplete' && tri.reason === 'unreadable')) {
     return `<details class="triage-dash" open>
-<summary>${escapeHtml(t('triageDash.summaryRuleTriage'))}</summary>
-<p class="hint warn">${escapeHtml(t('triageDash.hintUnreadable'))}</p>
-<div class="actions"><button type="button" class="action-btn" data-command="runAnalysis">${escapeHtml(t('toolbar.runAnalysis'))}</button></div>
+<summary>${escapeHtml(l10n('triageDash.summaryRuleTriage'))}</summary>
+<p class="hint warn">${escapeHtml(l10n('triageDash.hintUnreadable'))}</p>
+<div class="actions"><button type="button" class="action-btn" data-command="runAnalysis">${escapeHtml(l10n('toolbar.runAnalysis'))}</button></div>
 </details>`;
   }
   if (tri.kind === 'stale') {
     return `<details class="triage-dash" open>
-<summary>${escapeHtml(t('triageDash.summaryRuleTriage'))}</summary>
-<p class="hint warn">${escapeHtml(t('triageDash.hintStale', { age: formatStaleAge(tri.ageMs) }))}</p>
-<div class="actions"><button type="button" class="action-btn" data-command="runAnalysis">${escapeHtml(t('toolbar.runAnalysis'))}</button></div>
+<summary>${escapeHtml(l10n('triageDash.summaryRuleTriage'))}</summary>
+<p class="hint warn">${escapeHtml(l10n('triageDash.hintStale', { age: formatStaleAge(tri.ageMs) }))}</p>
+<div class="actions"><button type="button" class="action-btn" data-command="runAnalysis">${escapeHtml(l10n('toolbar.runAnalysis'))}</button></div>
 </details>`;
   }
   if (tri.kind === 'incomplete' && tri.reason === 'no_per_rule') {
     return `<details class="triage-dash" open>
-<summary>${escapeHtml(t('triageDash.summaryRuleTriage'))}</summary>
-<p class="hint warn">${escapeHtml(t('triageDash.hintNoPerRule'))}</p>
-<div class="actions"><button type="button" class="action-btn" data-command="runAnalysis">${escapeHtml(t('toolbar.runAnalysis'))}</button></div>
+<summary>${escapeHtml(l10n('triageDash.summaryRuleTriage'))}</summary>
+<p class="hint warn">${escapeHtml(l10n('triageDash.hintNoPerRule'))}</p>
+<div class="actions"><button type="button" class="action-btn" data-command="runAnalysis">${escapeHtml(l10n('toolbar.runAnalysis'))}</button></div>
 </details>`;
   }
 
   const triage = buildTriageData(data, root);
   if (!triage) {
     return `<details class="triage-dash" open>
-<summary>${escapeHtml(t('triageDash.summaryRuleTriage'))}</summary>
-<p class="hint warn">${escapeHtml(t('triageDash.hintBuildFailed'))}</p>
-<div class="actions"><button type="button" class="action-btn" data-command="runAnalysis">${escapeHtml(t('toolbar.runAnalysis'))}</button></div>
+<summary>${escapeHtml(l10n('triageDash.summaryRuleTriage'))}</summary>
+<p class="hint warn">${escapeHtml(l10n('triageDash.hintBuildFailed'))}</p>
+<div class="actions"><button type="button" class="action-btn" data-command="runAnalysis">${escapeHtml(l10n('toolbar.runAnalysis'))}</button></div>
 </details>`;
   }
 
   const body = renderTriageBody(data, triage);
   return `<details class="triage-dash" open>
-<summary>${escapeHtml(t('triageDash.summaryVolume'))}</summary>
-<p class="hint">${escapeHtml(t('triageDash.hintSameAsTree'))}</p>
+<summary>${escapeHtml(l10n('triageDash.summaryVolume'))}</summary>
+<p class="hint">${escapeHtml(l10n('triageDash.hintSameAsTree'))}</p>
 ${body}
 </details>`;
 }

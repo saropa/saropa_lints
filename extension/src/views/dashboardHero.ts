@@ -56,7 +56,7 @@ export interface StatusPill {
   glyph?: string;
 }
 
-import { t } from '../i18n/runtime';
+import { l10n } from '../i18n/runtime';
 
 function escape(s: string): string {
   return s
@@ -83,7 +83,7 @@ export function buildFullWidthToggle(): string {
   // The arrow glyph (↔) telegraphs "expand horizontally". The active state styling
   // (when body[data-full-width="true"]) lives in dashboardChromeStyles.ts.
   return `<button type="button" class="full-width-toggle" id="dashFullWidthToggle"
-    title="${escape(t('a11y.toggleFullWidth'))}" aria-label="${escape(t('a11y.toggleFullWidth'))}"
+    title="${escape(l10n('a11y.toggleFullWidth'))}" aria-label="${escape(l10n('a11y.toggleFullWidth'))}"
     aria-pressed="false">↔</button>`;
 }
 

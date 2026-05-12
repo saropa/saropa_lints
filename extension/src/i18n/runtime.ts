@@ -138,7 +138,7 @@ export function getCatalog(locale: string | undefined): NestedRecord {
  * Resolves a dotted message key with optional `{param}` interpolation.
  * Order: requested/active locale → English → `options.fallback` → raw `key`.
  */
-export function t(
+export function l10n(
     key: string,
     params?: Params,
     options?: Readonly<{ locale?: string; fallback?: string }>,

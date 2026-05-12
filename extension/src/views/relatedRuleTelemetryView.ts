@@ -24,6 +24,7 @@ import {
   getKeyboardShortcutsStyles,
 } from './keyboard-shortcuts';
 import { pluralize } from './webview-format';
+import { l10n } from '../i18n/runtime';
 
 /** Active panel reference; undefined after dispose or before first open. */
 let currentPanel: vscode.WebviewPanel | undefined;
@@ -82,14 +83,14 @@ function buildHtml(snapshot: TelemetryStore): string {
   const statusLineHtml = buildStatusLine([
     {
       glyph: '⟳',
-      label: relative ? `Last event ${relative}` : 'No events recorded',
+      label: relative ? l10n('telemetry.lastEvent', { relative }) : l10n('telemetry.noEvents'),
       tone: relative ? 'neutral' : 'warn',
       title: snapshot.lastEventAt ?? 'Never',
     },
-    { label: pluralize(totalEvents, { one: '{count} total event', other: '{count} total events' }) },
+    { label: pluralize(totalEvents, { one: l10n('telemetry.totalEventOne'), other: l10n('telemetry.totalEventOther') }) },
   ]);
   const heroHtml = buildDashboardHero({
-    title: 'Related Rule Telemetry',
+    title: l10n('telemetry.heroTitle'),
     statusLineHtml,
     extraToggleHtml: buildKeyboardShortcutsButton(),
   });
@@ -102,8 +103,9 @@ function buildHtml(snapshot: TelemetryStore): string {
   // "one emphasized button per region" — zero is also valid).
   const resetDisabled = totalEvents === 0;
   const resetAttrs = resetDisabled
-    ? ' disabled aria-disabled="true" title="No counters to reset."'
-    : ' title="Reset all counters"';
+    ? ` disabled aria-disabled="true" title="${escapeHtml(l10n('telemetry.noCountersTitle'))}"`
+    : ` title="${escapeHtml(l10n('telemetry.resetTitle'))}"`;
+
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -111,7 +113,7 @@ function buildHtml(snapshot: TelemetryStore): string {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'nonce-${nonce}'; script-src 'nonce-${nonce}';">
-  <title>${escapeHtml(buildDocumentTitle('Related Rule Telemetry'))}</title>
+  <title>${escapeHtml(buildDocumentTitle(l10n('telemetry.heroTitle')))}</title>
   <style nonce="${nonce}">
     ${getDashboardChromeStyles()}
     table.tel-table {
@@ -177,44 +179,44 @@ function buildHtml(snapshot: TelemetryStore): string {
   </style>
 </head>
 <body>
-  <a href="#tel-main" class="skip-link">Skip to telemetry counters</a>
+  <a href="#tel-main" class="skip-link">${escapeHtml(l10n('telemetry.skipToCounters'))}</a>
   <div id="announcer" role="status" aria-live="polite" aria-atomic="true"></div>
   <header>${heroHtml}</header>
-  <section class="toolbar-band" aria-label="Telemetry actions">
+  <section class="toolbar-band" aria-label="${escapeHtml(l10n('telemetry.countersAria'))}">
     <div class="toolbar-row">
-      <button type="button" class="btn" id="refresh" title="Reload telemetry counters from disk">
-        <span class="glyph" aria-hidden="true">⟳</span>Refresh
+      <button type="button" class="btn" id="refresh" title="${escapeHtml(l10n('telemetry.refreshTitle'))}">
+        <span class="glyph" aria-hidden="true">⟳</span>${escapeHtml(l10n('telemetry.refresh'))}
       </button>
-      <button type="button" class="btn" id="copy" title="Copy snapshot as JSON">
-        <span class="glyph" aria-hidden="true">⎘</span>Copy JSON
+      <button type="button" class="btn" id="copy" title="${escapeHtml(l10n('telemetry.copyTitle'))}">
+        <span class="glyph" aria-hidden="true">⎘</span>${escapeHtml(l10n('telemetry.copyJson'))}
       </button>
       <button type="button" class="btn danger" id="reset"${resetAttrs}>
-        <span class="glyph" aria-hidden="true">⊘</span>Reset counters
+        <span class="glyph" aria-hidden="true">⊘</span>${escapeHtml(l10n('telemetry.resetCounters'))}
       </button>
     </div>
   </section>
   <main id="tel-main" tabindex="-1">
-  <section class="section" aria-label="Counters">
-    <h2>Event counters</h2>
+  <section class="section" aria-label="${escapeHtml(l10n('telemetry.countersAria'))}">
+    <h2>${escapeHtml(l10n('telemetry.countersHeading'))}</h2>
     ${totalEvents === 0
       ? `<!-- §8.16 — empty-state CTA replaces the blank counter table when
               no events have fired. The Findings Dashboard is the natural
               place users open rules from, which is what generates the
               ruleExplain.* counters tracked here. -->
          <div class="empty-cta" role="status">
-           <p class="empty-msg">No telemetry events recorded yet — open a rule from the Findings Dashboard to start capturing counters.</p>
+           <p class="empty-msg">${escapeHtml(l10n('telemetry.emptyMessage'))}</p>
            <button type="button" class="btn tier-1" id="openFindings"
-             title="Open the Saropa Findings Dashboard.">Open Findings Dashboard</button>
+             title="${escapeHtml(l10n('telemetry.openFindingsTitle'))}">${escapeHtml(l10n('telemetry.openFindings'))}</button>
          </div>`
       : `<table class="tel-table">
-      <thead><tr><th>Event</th><th>Count</th></tr></thead>
+      <thead><tr><th>${escapeHtml(l10n('telemetry.thEvent'))}</th><th>${escapeHtml(l10n('telemetry.thCount'))}</th></tr></thead>
       <tbody>
         ${renderRows(snapshot)}
       </tbody>
     </table>`}
   </section>
-  <section class="section" aria-label="Last event properties">
-    <h2>Last event properties</h2>
+  <section class="section" aria-label="${escapeHtml(l10n('telemetry.lastPropsHeading'))}">
+    <h2>${escapeHtml(l10n('telemetry.lastPropsHeading'))}</h2>
     <pre class="tel-pre">${lastProps}</pre>
   </section>
   </main>
@@ -274,7 +276,7 @@ export function showRelatedRuleTelemetryPanel(
 
   currentPanel = vscode.window.createWebviewPanel(
     'saropaLints.relatedRuleTelemetry',
-    'Saropa Lints: Related Rule Telemetry',
+    l10n('telemetry.heroTitle'),
     vscode.ViewColumn.One,
     { enableScripts: true },
   );
@@ -291,7 +293,7 @@ export function showRelatedRuleTelemetryPanel(
       const raw = JSON.stringify(telemetry.snapshot(), null, 2);
       void vscode.env.clipboard.writeText(raw);
       void vscode.window.showInformationMessage(
-        'Saropa Lints: copied related rule telemetry JSON.',
+        l10n('telemetry.copiedJson'),
       );
       return;
     }
@@ -299,7 +301,7 @@ export function showRelatedRuleTelemetryPanel(
       telemetry.reset();
       refreshPanel(telemetry);
       void vscode.window.showInformationMessage(
-        'Saropa Lints: related rule telemetry counters reset.',
+        l10n('telemetry.countersReset'),
       );
       return;
     }

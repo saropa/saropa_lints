@@ -6,7 +6,7 @@
  */
 import * as vscode from 'vscode';
 
-import { t } from './runtime';
+import { l10n } from './runtime';
 
 /** Values accepted for `saropaLints.uiLanguage` (matches package.json enum). */
 export type UiLanguageCode =
@@ -99,7 +99,7 @@ export interface LanguagePickItem extends vscode.QuickPickItem {
 /** One-line label for the current value in the Settings tree row. */
 export function formatLanguageChoiceLabel(code: string): string {
   if (code === 'auto') {
-    return t('uiLanguage.pick.auto');
+    return l10n('uiLanguage.pick.auto');
   }
   if (code === 'en') {
     return ENGLISH_ENDONYM.en;
@@ -121,8 +121,16 @@ function sortedLocaleCodes(): Exclude<UiLanguageCode, 'auto'>[] {
 /** Rows for `showQuickPick`: `auto` first, then English language names A–Z. */
 export function buildUiLanguageQuickPickItems(): LanguagePickItem[] {
   const order: UiLanguageCode[] = ['auto', ...sortedLocaleCodes()];
-  return order.map((value) => ({
-    label: formatLanguageChoiceLabel(value),
-    value,
-  }));
+  const resolvedAuto = vscode.env.language;
+  return order.map((value) => {
+    const item: LanguagePickItem = {
+      label: formatLanguageChoiceLabel(value),
+      value,
+    };
+    // Show the resolved language for "auto" so users know what they're getting.
+    if (value === 'auto') {
+      return { ...item, description: `→ ${resolvedAuto}` };
+    }
+    return item;
+  });
 }
