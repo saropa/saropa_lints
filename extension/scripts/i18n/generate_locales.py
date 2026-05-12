@@ -1,10 +1,25 @@
 #!/usr/bin/env python3
-"""Generate extension locale files from English JSON sources."""
+"""Generate extension locale files from English JSON sources.
+
+Usage:
+    py -3 extension/scripts/i18n/generate_locales.py              # English placeholders only
+    py -3 extension/scripts/i18n/generate_locales.py --translate   # machine-translate via Google
+    py -3 extension/scripts/i18n/generate_locales.py --translate --locales bn,de
+"""
 
 from __future__ import annotations
 
 import argparse
+import os
+import sys
 from pathlib import Path
+
+# Force UTF-8 stdout/stderr so non-Latin translated text (Bengali, Arabic,
+# Chinese, etc.) prints correctly on Windows consoles that default to cp1252.
+if sys.stdout.encoding != "utf-8":
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[attr-defined]
+if sys.stderr.encoding != "utf-8":
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[attr-defined]
 
 from dictionaries import TRANSLATIONS
 from json_io import read_json, write_json
@@ -34,6 +49,7 @@ def split_locales(raw: str) -> list[str]:
 
 def main() -> int:
     args = parse_args()
+
     locales = split_locales(args.locales)
     if not locales:
         print("No locales provided.")
