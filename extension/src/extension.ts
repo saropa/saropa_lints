@@ -129,24 +129,67 @@ function getConfig() {
   return vscode.workspace.getConfiguration('saropaLints');
 }
 
-/** D8: Show regression nudge when score dipped below a threshold; offers "View Violations" action. */
+/**
+ * D8: Show regression nudge when score dipped below a threshold.
+ *
+ * Two-layer protection against stacking toasts during slow linting:
+ *
+ * 1. **Debounce (3 s):** the analyzer writes violations.json in batches
+ *    >300ms apart, each crossing a lower threshold (70 \u2192 60 \u2192 50).
+ *    The debounce coalesces rapid crossings and keeps only the worst
+ *    (lowest) threshold before firing a single notification.
+ *
+ * 2. **Visibility gate:** VS Code has no API to dismiss or replace an
+ *    `showInformationMessage` toast. If a nudge is already on screen
+ *    (user hasn't clicked or dismissed it), new crossings are silently
+ *    absorbed \u2014 the existing toast already tells the user to look.
+ */
+let regressionNudgeTimer: ReturnType<typeof setTimeout> | undefined;
+let pendingNudgeCrossing: { threshold: number } | undefined;
+let pendingNudgeSnapshot: RunSnapshot | undefined;
+// True while a regression toast is visible (showInformationMessage
+// resolves when the user clicks an action or dismisses the toast).
+let nudgeVisible = false;
+
 function showRegressionNudge(crossing: { threshold: number }, curr: RunSnapshot): void {
-  // Headline the toast on `error` (DiagnosticSeverity.ERROR \u2014 must be fixed),
-  // not on the saropa-invented `LintImpact.critical` count. "Critical" was
-  // doing PR work that "error" already does in the analyzer's native model,
-  // and the resulting count was alarmist and ambiguous. ERROR maps to the
-  // user's mental model: error = MUST fix, warning = could/embarrassing,
-  // info = FYI. RunSnapshot already carries the error count (runHistory.ts).
-  const errorSuffix = curr.error === 1 ? '' : 's';
-  const msg =
-    curr.error > 0
-      ? `${curr.error} error${errorSuffix} \u2014 view.`
-      : `Score dipped below ${crossing.threshold} \u2014 view issues.`;
-  vscode.window.showInformationMessage(`Saropa Lints: ${msg}`, 'View Violations').then((choice) => {
-    if (choice === 'View Violations') {
-      vscode.commands.executeCommand('saropaLints.focusIssues');
-    }
-  });
+  // If a toast is already on screen, swallow silently. The user already
+  // knows things are regressing; stacking more toasts is just noise.
+  if (nudgeVisible) return;
+
+  // Keep whichever threshold is worse (lower). During a multi-step slide
+  // (score drops through 70, then 60, then 50) this ensures we show only
+  // the final "below 50" toast, not all three.
+  if (!pendingNudgeCrossing || crossing.threshold < pendingNudgeCrossing.threshold) {
+    pendingNudgeCrossing = crossing;
+  }
+  pendingNudgeSnapshot = curr;
+
+  if (regressionNudgeTimer) clearTimeout(regressionNudgeTimer);
+  // 3 s: long enough that slow-lint batches coalesce, short enough
+  // that the user still sees the nudge promptly after linting settles.
+  regressionNudgeTimer = setTimeout(() => {
+    regressionNudgeTimer = undefined;
+    const c = pendingNudgeCrossing!;
+    const s = pendingNudgeSnapshot!;
+    pendingNudgeCrossing = undefined;
+    pendingNudgeSnapshot = undefined;
+
+    const errorSuffix = s.error === 1 ? '' : 's';
+    const msg =
+      s.error > 0
+        ? `${s.error} error${errorSuffix} \u2014 view.`
+        : `Score dipped below ${c.threshold} \u2014 view issues.`;
+    nudgeVisible = true;
+    // Promise resolves when the user clicks "View Violations" or
+    // dismisses the toast (choice === undefined). Either way the
+    // nudge is no longer on screen.
+    vscode.window.showInformationMessage(`Saropa Lints: ${msg}`, 'View Violations').then((choice) => {
+      nudgeVisible = false;
+      if (choice === 'View Violations') {
+        vscode.commands.executeCommand('saropaLints.focusIssues');
+      }
+    });
+  }, 3000);
 }
 
 /** Show celebration/milestone UI when a new snapshot was appended and history has at least 2 entries. */
@@ -548,6 +591,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   context.subscriptions.push({
     dispose: () => {
       if (refreshDebounceTimer) clearTimeout(refreshDebounceTimer);
+      if (regressionNudgeTimer) clearTimeout(regressionNudgeTimer);
     },
   });
   const watchViolations = () => {

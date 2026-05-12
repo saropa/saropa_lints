@@ -58,7 +58,7 @@
 <details><summary>Maintenance</summary>
 
 - Ran `dart pub get` in `packages/saropa_lints_api/` to resolve missing `test` dependency; added source comment noting sub-package requires its own dependency resolution.
-- Tracked `reports/organize_reports.py` in git by switching `.gitignore` from directory-level to content-level ignore with a negation rule.
+- Tracked `reports/organize_reports.py` in git by switching `.gitignore` from directory-level to content-level ignore with a negation rule; also added `example*/reports/` to `.gitignore` so generated report output under example directories stays untracked.
 
 </details>
 
