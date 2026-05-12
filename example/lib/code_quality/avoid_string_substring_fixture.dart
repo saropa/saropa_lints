@@ -119,3 +119,49 @@ void _good159() {
   final result = text.length >= 10 ? text.substring(5, 10) : text;
   // or use split/pattern matching for extracting parts
 }
+
+// GOOD: indexOf-guarded substring — semiIndex is checked for -1 before use
+String? _goodIndexOfGuard(String s) {
+  final semiIndex = s.indexOf(';');
+  if (semiIndex == -1) return null;
+  return s.substring(0, semiIndex);
+}
+
+// GOOD: while-loop guard — offset is bounded by loop condition
+String _goodWhileLoopGuard(String text) {
+  final buf = StringBuffer();
+  int offset = 0;
+  final int length = text.length;
+  while (offset < length) {
+    final ampIndex = text.indexOf('&', offset);
+    if (ampIndex == -1) {
+      buf.write(text.substring(offset));
+      break;
+    }
+    if (ampIndex > offset) {
+      buf.write(text.substring(offset, ampIndex));
+    }
+    offset = ampIndex + 1;
+  }
+  return buf.toString();
+}
+
+// GOOD: for-loop guard — end is bounded by loop condition
+String? _goodForLoopGuard(String text, int offset, int maxLen) {
+  final bound = text.length < offset + maxLen ? text.length : offset + maxLen;
+  for (int end = bound; end >= offset + 3; end--) {
+    final candidate = text.substring(offset, end);
+    if (candidate == '&amp') return candidate;
+  }
+  return null;
+}
+
+// GOOD: arithmetic guard with early return before substring
+String? _goodArithmeticGuard(String text, int offset) {
+  if (offset + 3 >= text.length) return null;
+  final semiIndex = text.indexOf(';', offset + 2);
+  if (semiIndex == -1) return null;
+  final digitStart = offset + 3;
+  if (digitStart >= semiIndex) return null;
+  return text.substring(digitStart, semiIndex);
+}

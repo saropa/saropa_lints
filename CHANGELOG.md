@@ -49,7 +49,8 @@
 
 ### Fixed
 
-- **Analyzer v9 `useDeclaringConstructorsAst` crashes fully resolved** — all `.namePart.typeName` accesses (132 sites) and `.namePart.typeParameters` accesses (4 sites) now use safe `nameToken` / `nameTypeParameters` extensions that fall back to the pre-gate `.name` / `.typeParameters` API; additionally, `_wrapCallback` now catches `UnsupportedError` globally so any remaining gated property on any analyzer version skips the rule gracefully instead of crashing the plugin. Closes the remaining failures reported in [#224](https://github.com/saropa/saropa_lints/issues/224). No action required.
+- **`avoid_string_substring` no longer fires on indexOf-guarded, loop-bounded, or early-exit-guarded substring calls** — the rule now recognizes `while`/`for` loop conditions, preceding `if (idx == -1) return` guards, and if-conditions that reference substring arguments as evidence of bounds safety. No action required.
+- **Analyzer v9 `useDeclaringConstructorsAst` crashes resolved** — all `.namePart.typeName` accesses (132 sites) and `.namePart.typeParameters` accesses (4 sites) now use safe `nameToken` / `nameTypeParameters` extensions that fall back to the pre-gate `.name` / `.typeParameters` API; additionally, `_wrapCallback` now catches `UnsupportedError` globally so any remaining gated property on any analyzer version skips the rule gracefully instead of crashing the plugin. Closes the remaining failures reported in [#224](https://github.com/saropa/saropa_lints/issues/224). No action required.
 
 ### Fixed (Extension)
 

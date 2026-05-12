@@ -1017,32 +1017,52 @@ class AvoidSubstringRule extends SaropaLintRule {
     });
   }
 
-  /// True when [substringCall] sits inside a true-branch (if-then or
-  /// `?:` then-expression) whose condition guarantees the receiver is long
-  /// enough — by calling `startsWith` / `endsWith` on the same receiver, or
-  /// by an explicit `<receiver>.length` comparison.
+  /// True when [substringCall] is guarded by a bounds check — either a
+  /// receiver-specific check (startsWith/endsWith/length) in an enclosing
+  /// if/ternary, a loop condition that bounds a substring argument, or a
+  /// preceding early-exit guard that validates a substring argument.
+  ///
+  /// Without these heuristics the rule fires on safe idioms like
+  /// `while (offset < len) { ... text.substring(offset) ... }` or
+  /// `if (idx == -1) return; text.substring(0, idx)` — both provably
+  /// in-bounds from control flow but invisible to the old startsWith/
+  /// endsWith/length-only check.
   static bool _isGuardedByLengthCheck(MethodInvocation substringCall) {
     final Expression? receiver = substringCall.realTarget;
     if (receiver == null) return false;
     final String receiverSource = receiver.toSource();
+    final argNames = _substringArgNames(substringCall);
 
     AstNode? prev = substringCall;
     AstNode? current = substringCall.parent;
     while (current != null) {
-      if (current is IfStatement) {
-        // A substring inside the IfStatement's then-block is guarded by
-        // its condition. (Else-branch guards are the inverse — out of
-        // scope; we conservatively don't claim them.)
-        if (_isInThen(current, prev)) {
-          if (_conditionGuardsLength(current.expression, receiverSource)) {
-            return true;
-          }
+      if (current is IfStatement && _isInThen(current, prev)) {
+        // Receiver-based guard (startsWith/endsWith/length on receiver)
+        // OR argument-based guard (condition references a substring arg).
+        if (_conditionGuardsLength(current.expression, receiverSource) ||
+            _conditionInvolvesArgs(current.expression, argNames)) {
+          return true;
         }
-      } else if (current is ConditionalExpression) {
-        if (current.thenExpression == prev) {
-          if (_conditionGuardsLength(current.condition, receiverSource)) {
-            return true;
-          }
+      } else if (current is ConditionalExpression &&
+          current.thenExpression == prev) {
+        if (_conditionGuardsLength(current.condition, receiverSource) ||
+            _conditionInvolvesArgs(current.condition, argNames)) {
+          return true;
+        }
+      } else if (current is WhileStatement) {
+        // while (offset < length) — loop condition bounds the body.
+        if (_conditionInvolvesArgs(current.condition, argNames)) {
+          return true;
+        }
+      } else if (current is ForStatement) {
+        // for (...; end >= offset + 3; ...) — condition bounds the body.
+        if (_forConditionInvolvesArgs(current, argNames)) return true;
+      } else if (current is Block) {
+        // Preceding if-return/break/continue/throw that checks substring
+        // args — covers indexOf-derived bounds checks like
+        // `if (semiIndex == -1) return null;` before `substring(0, semiIndex)`.
+        if (_hasPrecedingEarlyExitGuard(current, prev!, argNames)) {
+          return true;
         }
       } else if (current is FunctionBody) {
         // Crossed a function boundary — guards above don't apply here.
@@ -1079,6 +1099,102 @@ class AvoidSubstringRule extends SaropaLintRule {
       '${RegExp.escape(receiverSource)}\\.length\\s*[<>=!]',
     );
     return lengthCheck.hasMatch(source);
+  }
+
+  /// True when [condition] source text contains any identifier from
+  /// [argNames] at a word boundary. This catches conditions like
+  /// `ampIndex > offset`, `semiIndex == -1`, or `offset < length` where
+  /// the programmer is clearly managing the bounds of substring arguments.
+  static bool _conditionInvolvesArgs(
+    Expression condition,
+    Set<String> argNames,
+  ) {
+    if (argNames.isEmpty) return false;
+    final source = condition.toSource();
+    return argNames.any((arg) {
+      // Word-boundary match prevents 'offset' matching 'currentOffset'.
+      return RegExp('\\b${RegExp.escape(arg)}\\b').hasMatch(source);
+    });
+  }
+
+  /// Extracts the for-loop condition and checks if it involves any
+  /// substring argument names.
+  static bool _forConditionInvolvesArgs(
+    ForStatement forStmt,
+    Set<String> argNames,
+  ) {
+    final parts = forStmt.forLoopParts;
+    if (parts is! ForParts || parts.condition == null) return false;
+    return _conditionInvolvesArgs(parts.condition!, argNames);
+  }
+
+  /// True when [block] contains a preceding sibling (before [childStmt])
+  /// that is an if-statement with an early exit (return / break / continue /
+  /// throw) whose condition references one of the [argNames].
+  ///
+  /// This is the indexOf-derived-bounds heuristic: code like
+  ///   `final idx = s.indexOf(';'); if (idx == -1) return;`
+  /// followed by `s.substring(0, idx)` means `idx` is a valid index
+  /// because the -1 case already bailed out.
+  static bool _hasPrecedingEarlyExitGuard(
+    Block block,
+    AstNode childStmt,
+    Set<String> argNames,
+  ) {
+    if (argNames.isEmpty) return false;
+    for (final stmt in block.statements) {
+      // Only check statements BEFORE the one containing the substring.
+      if (identical(stmt, childStmt)) break;
+      if (stmt is! IfStatement) continue;
+      if (!_containsEarlyExit(stmt.thenStatement)) continue;
+      if (_conditionInvolvesArgs(stmt.expression, argNames)) return true;
+    }
+    return false;
+  }
+
+  /// True when [stmt] contains a return, break, continue, or throw —
+  /// i.e. control flow that exits the current block early.
+  static bool _containsEarlyExit(Statement stmt) {
+    if (stmt is ReturnStatement ||
+        stmt is BreakStatement ||
+        stmt is ContinueStatement) {
+      return true;
+    }
+    if (stmt is ExpressionStatement && stmt.expression is ThrowExpression) {
+      return true;
+    }
+    // Unwrap block bodies: `if (x) { return; }` is still an early exit.
+    if (stmt is Block) return stmt.statements.any(_containsEarlyExit);
+    return false;
+  }
+
+  /// Collects all identifier names referenced in the substring arguments.
+  ///
+  /// For `substring(offset)` → `{offset}`.
+  /// For `substring(digitStart, semiIndex + 1)` → `{digitStart, semiIndex}`.
+  /// Literal integers are ignored — only variable references matter.
+  static Set<String> _substringArgNames(MethodInvocation call) {
+    final names = <String>{};
+    for (final arg in call.argumentList.arguments) {
+      _collectIdentifierNames(arg, names);
+    }
+    return names;
+  }
+
+  /// Recursively collects identifier names from an expression tree.
+  /// Handles simple variables, binary expressions (offset + 3), prefix
+  /// expressions (-offset), and parenthesized expressions.
+  static void _collectIdentifierNames(Expression expr, Set<String> names) {
+    if (expr is SimpleIdentifier) {
+      names.add(expr.name);
+    } else if (expr is BinaryExpression) {
+      _collectIdentifierNames(expr.leftOperand, names);
+      _collectIdentifierNames(expr.rightOperand, names);
+    } else if (expr is PrefixExpression) {
+      _collectIdentifierNames(expr.operand, names);
+    } else if (expr is ParenthesizedExpression) {
+      _collectIdentifierNames(expr.expression, names);
+    }
   }
 
   @override
