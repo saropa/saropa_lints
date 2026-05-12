@@ -1,0 +1,30 @@
+{
+  "schema": "1.0",
+  "timestamp": "2026-03-03T04:50:05.387050Z",
+  "sessionId": "20260302_235002",
+  "config": {
+    "tier": "unknown"
+  },
+  "summary": {
+    "filesAnalyzed": 1,
+    "filesWithIssues": 0,
+    "totalViolations": 0,
+    "batchCount": 1,
+    "bySeverity": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    },
+    "byImpact": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0,
+      "opinionated": 0
+    },
+    "issuesByFile": {},
+    "issuesByRule": {},
+    "ruleSeverities": {}
+  },
+  "violations": []
+}

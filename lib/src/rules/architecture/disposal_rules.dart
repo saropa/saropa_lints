@@ -2324,8 +2324,7 @@ class PreferDisposeBeforeNewInstanceRule extends SaropaLintRule {
       if (enclosingMethod.name.lexeme == 'initState') return;
 
       // Skip if this is in a constructor
-      if (enclosingMethod.name.lexeme ==
-          enclosingClass.nameToken.lexeme) {
+      if (enclosingMethod.name.lexeme == enclosingClass.nameToken.lexeme) {
         return;
       }
 
