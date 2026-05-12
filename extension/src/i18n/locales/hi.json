@@ -75,7 +75,10 @@
       "title": "Saropa Lints UI भाषा",
       "placeholder": "साइडबार और डैशबोर्ड के लिए भाषा चुनें",
       "auto": "स्वचालित (VS Code प्रदर्शन भाषा का पालन करें)"
-    }
+    },
+    "reloadPrompt": "भाषा 0 पर सेट है। साइडबार और कमांड लेबल को अपडेट करने के लिए विंडो को पुनः लोड करें। {locale}",
+    "reloadNow": "अभी पुनः लोड करें",
+    "reloadLater": "बाद में"
   },
   "brand": {
     "prefix": "सरोपा"
@@ -635,5 +638,158 @@
       "matchOne": "{count} match",
       "matchOther": "{count} matches"
     }
+  },
+  "codeHealth": {
+    "documentTitle": "सरोपा कोड स्वास्थ्य डैशबोर्ड",
+    "skipToTable": "फ़ंक्शन तालिका पर जाएं",
+    "openWorkspaceFirst": "सबसे पहले एक डार्ट/फ़्लटर कार्यक्षेत्र खोलें।",
+    "scanningTitle": "कोड स्वास्थ्य: स्कैनिंग कार्य...",
+    "runReportFirst": "रिपोर्ट दोबारा चलाएँ, फिर JSON कॉपी करें।",
+    "copiedJson": "कोड हेल्थ JSON को क्लिपबोर्ड पर कॉपी किया गया।",
+    "couldNotOpenFile": "फ़ाइल नहीं खुल सकी: 0 {path}",
+    "panelTitle": "सरोपा कोड स्वास्थ्य डैशबोर्ड",
+    "hero": {
+      "title": "सरोपा कोड स्वास्थ्य डैशबोर्ड",
+      "generated": "जनरेट किया गया",
+      "functionOne": "{count} function",
+      "functionOther": "{count} functions",
+      "avgFormat": "औसत 0 (1) {score} {grade}",
+      "gatesFailing": "गेट विफल हो रहे हैं",
+      "gatesPassing": "द्वार गुजर रहे हैं"
+    },
+    "gauge": {
+      "tooltip": "100 का औसत स्कोर 0 (ग्रेड 1)। {rounded} {grade}",
+      "ariaLabel": "100 का औसत स्कोर 0 {rounded}"
+    },
+    "gate": {
+      "fallback": "गुणवत्ता गेट विफल - कोड स्वास्थ्य सेटिंग्स में समीक्षा सीमाएँ।",
+      "failingOne": "{count} gate failing — review thresholds, or copy the JSON to inspect gates.violations.",
+      "failingOther": "{count} gates failing — review thresholds, or copy the JSON to inspect gates.violations.",
+      "openSettingsTitle": "सीमाएँ समायोजित करने के लिए कोड स्वास्थ्य सेटिंग खोलें।",
+      "openSettingsButton": "कोड स्वास्थ्य सेटिंग खोलें"
+    },
+    "kpi": {
+      "ariaLabel": "कोड स्वास्थ्य सारांश",
+      "allClear": "किसी भी श्रेणी में कोई ध्वजांकित कार्य नहीं - सब कुछ स्पष्ट।",
+      "clickToFilter": "फ़्लैग किए गए फ़ंक्शंस 0 में तालिका को फ़िल्टर करने के लिए क्लिक करें। {flag}",
+      "noFlagged": "कोई फ़ंक्शन फ़्लैग नहीं किया गया 0. {flag}",
+      "unused": "अप्रयुक्त",
+      "unusedSub": "फ़ंक्शंस का कहीं भी संदर्भ नहीं दिया गया है",
+      "uncovered": "खुला",
+      "uncoveredSub": "कोई LCOV कवरेज नहीं",
+      "stubTested": "ठूंठ-परीक्षित",
+      "stubTestedSub": "परीक्षण मौजूद हैं लेकिन बहुत कम दावा करते हैं",
+      "suspiciousCoverage": "संदिग्ध कवरेज",
+      "suspiciousCoverageSub": "कवरेज मनगढ़ंत लगता है",
+      "testDrift": "परीक्षण बहाव",
+      "testDriftSub": "परीक्षण कार्य में पिछड़ जाते हैं"
+    },
+    "toolbar": {
+      "ariaLabel": "कोड स्वास्थ्य क्रियाएँ",
+      "rescanTitle": "कोड हेल्थ स्कैन को दोबारा चलाएं और इस डैशबोर्ड को रीफ्रेश करें।",
+      "rescan": "पुन: स्कैन",
+      "copyJsonTitle": "कच्चे कोड हेल्थ JSON को क्लिपबोर्ड पर कॉपी करें।",
+      "copyJson": "JSON कॉपी करें",
+      "settingsTitle": "कोड स्वास्थ्य सेटिंग खोलें.",
+      "settingsButton": "कोड स्वास्थ्य सेटिंग्स",
+      "filterTitle": "पंक्तियों को नाम, फ़ाइल या ध्वज के आधार पर फ़िल्टर करें।",
+      "filterLabel": "पंक्तियों को फ़िल्टर करें",
+      "filterPlaceholder": "पंक्तियों को फ़िल्टर करें..."
+    },
+    "table": {
+      "ariaLabel": "स्कोर के हिसाब से सबसे खराब कार्य",
+      "heading": "सबसे ख़राब कार्य",
+      "topCount": "1 में से शीर्ष 0 {shown} {total}",
+      "colGrade": "श्रेणी",
+      "colScore": "अंक",
+      "colFunction": "समारोह",
+      "colFile": "फ़ाइल",
+      "colLine": "रेखा",
+      "colUsage": "प्रयोग",
+      "colCoverage": "कवरेज",
+      "colComplexity": "जटिलता",
+      "colFlags": "झंडे",
+      "noMatch": "कोई भी फ़ंक्शन वर्तमान फ़िल्टर से मेल नहीं खाता.",
+      "resetFiltersTitle": "खोज और किसी भी सक्रिय ध्वज फ़िल्टर को साफ़ करें।",
+      "resetFilters": "फ़िल्टर रीसेट करें",
+      "hint": "स्कोर के आधार पर सबसे खराब 200 फ़ंक्शन दिखाए जा रहे हैं। इसे और अधिक सीमित करने के लिए खोज फ़ील्ड का उपयोग करें।"
+    },
+    "shortcuts": {
+      "focusFilter": "पंक्ति फ़िल्टर पर फ़ोकस करें",
+      "clearFilter": "फ़ोकसित पंक्ति फ़िल्टर साफ़ करें",
+      "activateKpi": "केंद्रित KPI कार्ड सक्रिय करें",
+      "activateKpiSpace": "केंद्रित KPI कार्ड सक्रिय करें",
+      "showOverlay": "यह शॉर्टकट ओवरले दिखाएँ"
+    },
+    "script": {
+      "activeFiltersLabel": "सक्रिय फ़िल्टर:",
+      "searchChip": "खोजें: \"0\" {q}",
+      "flagChip": "झंडा: 0 {flag}",
+      "removeAria": "0 हटाएं {key}",
+      "clearAll": "सभी साफ करें",
+      "rowsVisible": "{visible} of {total} rows visible",
+      "neverRun": "कभी नहीं चला"
+    },
+    "freshness": {
+      "justNow": "बस अब",
+      "minutesAgo": "{min}m ago",
+      "hoursAgo": "{hr}h ago",
+      "daysAgo": "{day}d ago",
+      "weeksAgo": "{wk}w ago"
+    }
+  },
+  "suppressionsStrip": {
+    "noData": "अभी तक कोई उल्लंघन नहीं.json - दमन स्नैपशॉट को पॉप्युलेट करने के लिए विश्लेषण चलाएँ।",
+    "zeroTotal": "नवीनतम निर्यात में 0 विश्लेषक दमन।",
+    "noKindBreakdown": "इस निर्यात में किसी प्रकार का कोई व्यवधान नहीं है।",
+    "title": "दमन (निर्यात)",
+    "readOnlyNote": "(केवल पढ़ने के लिए; ब्राउज़ करने और कार्य करने के लिए निष्कर्ष खोलें।)",
+    "openFindings": "निष्कर्ष डैशबोर्ड खोलें"
+  },
+  "configMirrors": {
+    "noFileRisk": "कोई प्रति-फ़ाइल जोखिम विश्लेषण नहीं (दायरे में कोई उल्लंघन नहीं)।",
+    "suppressionNote": "Violations.json सारांश से मेल खाता है, लाइव साइडबार दमन टॉगल से नहीं।",
+    "noSuppression": "इस निर्यात में कोई दमन समुच्चय नहीं है (पुराना विश्लेषक या शून्य दमन)।",
+    "owaspSignal": "{count} violation(s) in this export carry OWASP mobile/web mapping — open Security Posture for the full matrix and export.",
+    "summarySuppressions": "दमन (निर्यात स्नैपशॉट)",
+    "summaryOwasp": "सुरक्षा मुद्रा (OWASP सिग्नल)",
+    "summaryFileRisk": "फ़ाइल जोखिम (शीर्ष फ़ाइलें)"
+  },
+  "telemetry": {
+    "heroTitle": "संबंधित नियम टेलीमेट्री",
+    "skipToCounters": "टेलीमेट्री काउंटरों पर जाएं",
+    "lastEvent": "अंतिम घटना 0 {relative}",
+    "noEvents": "कोई घटना दर्ज नहीं की गई",
+    "totalEventOne": "{count} total event",
+    "totalEventOther": "{count} total events",
+    "noCountersTitle": "रीसेट करने के लिए कोई काउंटर नहीं.",
+    "resetTitle": "सभी काउंटर रीसेट करें",
+    "refreshTitle": "डिस्क से टेलीमेट्री काउंटर पुनः लोड करें",
+    "refresh": "ताज़ा करना",
+    "copyTitle": "स्नैपशॉट को JSON के रूप में कॉपी करें",
+    "copyJson": "JSON कॉपी करें",
+    "resetCounters": "काउंटर रीसेट करें",
+    "countersAria": "काउंटर",
+    "countersHeading": "इवेंट काउंटर",
+    "thEvent": "आयोजन",
+    "thCount": "गिनती करना",
+    "emptyMessage": "अभी तक कोई टेलीमेट्री ईवेंट रिकॉर्ड नहीं किया गया है - काउंटर कैप्चर करना शुरू करने के लिए फाइंडिंग्स डैशबोर्ड से एक नियम खोलें।",
+    "openFindingsTitle": "सरोपा फाइंडिंग्स डैशबोर्ड खोलें।",
+    "openFindings": "निष्कर्ष डैशबोर्ड खोलें",
+    "lastPropsHeading": "अंतिम घटना गुण",
+    "copiedJson": "सरोपा लिंट्स: संबंधित नियम टेलीमेट्री JSON की प्रतिलिपि बनाई गई।",
+    "countersReset": "सरोपा लिंट्स: संबंधित नियम टेलीमेट्री काउंटर रीसेट।"
+  },
+  "sidebarLayout": {
+    "summary": "गतिविधि बार लेआउट",
+    "hint": "यहां सरोपा गतिविधि-बार अनुभागों को चालू या बंद करें (डैशबोर्ड छोड़े बिना, कार्यक्षेत्र के साथ सहेजा गया)।"
+  },
+  "securityPosture": {
+    "issueOne": "{count} issue",
+    "issueOther": "{count} issues",
+    "noIssues": "कोई विवाद नही",
+    "showIssues": "मुद्दे दिखाएँ",
+    "violationTooltip": "{count} violation(s) across {ruleCount} rule(s). Click to show in Issues.",
+    "noViolationsTooltip": "इस श्रेणी में कोई उल्लंघन नहीं दर्शाया गया है।"
   }
 }

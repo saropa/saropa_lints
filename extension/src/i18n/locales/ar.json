@@ -75,7 +75,10 @@
       "title": "لغة واجهة Saropa Lints",
       "placeholder": "اختر لغة الشريط الجانبي ولوحات المعلومات",
       "auto": "تلقائي (اتبع لغة عرض VS Code)"
-    }
+    },
+    "reloadPrompt": "تم ضبط اللغة على 0. أعد تحميل النافذة لتحديث الشريط الجانبي وتسميات الأوامر. {locale}",
+    "reloadNow": "أعد التحميل الآن",
+    "reloadLater": "لاحقاً"
   },
   "brand": {
     "prefix": "ساروبا"
@@ -635,5 +638,158 @@
       "matchOne": "{count} match",
       "matchOther": "{count} matches"
     }
+  },
+  "codeHealth": {
+    "documentTitle": "لوحة المعلومات الصحية لرمز ساروبا",
+    "skipToTable": "انتقل إلى جدول الوظائف",
+    "openWorkspaceFirst": "افتح مساحة عمل Dart/Flutter أولاً.",
+    "scanningTitle": "صحة الكود: وظائف المسح...",
+    "runReportFirst": "قم بتشغيل التقرير مرة أخرى، ثم انسخ JSON.",
+    "copiedJson": "تم نسخ Code Health JSON إلى الحافظة.",
+    "couldNotOpenFile": "تعذر فتح الملف: 0 {path}",
+    "panelTitle": "لوحة المعلومات الصحية لرمز ساروبا",
+    "hero": {
+      "title": "لوحة المعلومات الصحية لرمز ساروبا",
+      "generated": "تم إنشاؤها",
+      "functionOne": "{count} function",
+      "functionOther": "{count} functions",
+      "avgFormat": "المتوسط ​​0 (1) {score} {grade}",
+      "gatesFailing": "بوابات الفشل",
+      "gatesPassing": "مرور البوابات"
+    },
+    "gauge": {
+      "tooltip": "متوسط ​​الدرجات 0 من 100 (الدرجة 1). {rounded} {grade}",
+      "ariaLabel": "متوسط ​​الدرجات 0 من 100 {rounded}"
+    },
+    "gate": {
+      "fallback": "فشلت بوابات الجودة — قم بمراجعة الحدود في إعدادات Code Health.",
+      "failingOne": "{count} gate failing — review thresholds, or copy the JSON to inspect gates.violations.",
+      "failingOther": "{count} gates failing — review thresholds, or copy the JSON to inspect gates.violations.",
+      "openSettingsTitle": "افتح إعدادات Code Health لضبط الحدود.",
+      "openSettingsButton": "افتح إعدادات Code Health"
+    },
+    "kpi": {
+      "ariaLabel": "ملخص صحة الكود",
+      "allClear": "لا توجد وظائف تم وضع علامة عليها في أي فئة - كل شيء واضح.",
+      "clickToFilter": "انقر لتصفية الجدول إلى الوظائف التي تحمل علامة 0. {flag}",
+      "noFlagged": "لم يتم وضع علامة على أي وظائف 0. {flag}",
+      "unused": "غير مستخدمة",
+      "unusedSub": "الوظائف المشار إليها في أي مكان",
+      "uncovered": "مكشوفة",
+      "uncoveredSub": "لا توجد تغطية LCOV",
+      "stubTested": "تم اختباره كعب",
+      "stubTestedSub": "الاختبارات موجودة ولكنها تؤكد القليل",
+      "suspiciousCoverage": "تغطية مشبوهة",
+      "suspiciousCoverageSub": "تبدو التغطية ملفقة",
+      "testDrift": "اختبار الانجراف",
+      "testDriftSub": "الاختبارات تتأخر عن الوظيفة"
+    },
+    "toolbar": {
+      "ariaLabel": "إجراءات الصحة الرمزية",
+      "rescanTitle": "أعد تشغيل فحص Code Health وقم بتحديث لوحة المعلومات هذه.",
+      "rescan": "إعادة المسح",
+      "copyJsonTitle": "انسخ Code Health JSON الخام إلى الحافظة.",
+      "copyJson": "انسخ ملف JSON",
+      "settingsTitle": "افتح إعدادات Code Health.",
+      "settingsButton": "إعدادات صحة الكود",
+      "filterTitle": "تصفية الصفوف حسب الاسم أو الملف أو العلامة.",
+      "filterLabel": "تصفية الصفوف",
+      "filterPlaceholder": "تصفية الصفوف..."
+    },
+    "table": {
+      "ariaLabel": "أسوأ الوظائف حسب النتيجة",
+      "heading": "أسوأ الوظائف",
+      "topCount": "أعلى 0 من 1 {shown} {total}",
+      "colGrade": "درجة",
+      "colScore": "نتيجة",
+      "colFunction": "وظيفة",
+      "colFile": "ملف",
+      "colLine": "خط",
+      "colUsage": "الاستخدام",
+      "colCoverage": "التغطية",
+      "colComplexity": "تعقيد",
+      "colFlags": "أعلام",
+      "noMatch": "لا توجد وظائف تتطابق مع المرشحات الحالية.",
+      "resetFiltersTitle": "امسح البحث وأي مرشح علم نشط.",
+      "resetFilters": "إعادة تعيين المرشحات",
+      "hint": "عرض أسوأ 200 وظيفة حسب النتيجة. استخدم حقل البحث للتضييق أكثر."
+    },
+    "shortcuts": {
+      "focusFilter": "ركز مرشح الصف",
+      "clearFilter": "امسح عامل تصفية الصف الذي تم التركيز عليه",
+      "activateKpi": "تنشيط بطاقة KPI المركزة",
+      "activateKpiSpace": "تنشيط بطاقة KPI المركزة",
+      "showOverlay": "إظهار تراكب الاختصار هذا"
+    },
+    "script": {
+      "activeFiltersLabel": "المرشحات النشطة:",
+      "searchChip": "بحث: \"0\" {q}",
+      "flagChip": "العلم: 0 {flag}",
+      "removeAria": "قم بإزالة 0 {key}",
+      "clearAll": "مسح الكل",
+      "rowsVisible": "{visible} of {total} rows visible",
+      "neverRun": "لا تركض أبدًا"
+    },
+    "freshness": {
+      "justNow": "الآن",
+      "minutesAgo": "{min}m ago",
+      "hoursAgo": "{hr}h ago",
+      "daysAgo": "{day}d ago",
+      "weeksAgo": "{wk}w ago"
+    }
+  },
+  "suppressionsStrip": {
+    "noData": "لا توجد انتهاكات.json حتى الآن - قم بتشغيل التحليل لملء لقطة القمع.",
+    "zeroTotal": "0 عمليات قمع المحلل في أحدث عملية تصدير.",
+    "noKindBreakdown": "لا يوجد تفصيل نوعي في هذا التصدير.",
+    "title": "القمع (التصدير)",
+    "readOnlyNote": "(للقراءة فقط؛ افتح النتائج للتصفح والتصرف.)",
+    "openFindings": "افتح لوحة معلومات النتائج"
+  },
+  "configMirrors": {
+    "noFileRisk": "لا يوجد توزيع للمخاطر لكل ملف (لا توجد انتهاكات في النطاق).",
+    "suppressionNote": "يطابق ملخص الانتهاكات.json، وليس تبديل قمع الشريط الجانبي المباشر.",
+    "noSuppression": "لا يوجد إجمالي للمنع في عملية التصدير هذه (محلل قديم أو عمليات المنع صفر).",
+    "owaspSignal": "{count} violation(s) in this export carry OWASP mobile/web mapping — open Security Posture for the full matrix and export.",
+    "summarySuppressions": "عمليات القمع (لقطة التصدير)",
+    "summaryOwasp": "الوضع الأمني ​​(إشارة OWASP)",
+    "summaryFileRisk": "خطر الملف (الملفات العليا)"
+  },
+  "telemetry": {
+    "heroTitle": "القياس عن بعد للقواعد ذات الصلة",
+    "skipToCounters": "انتقل إلى عدادات القياس عن بعد",
+    "lastEvent": "الحدث الأخير 0 {relative}",
+    "noEvents": "لم يتم تسجيل أي أحداث",
+    "totalEventOne": "{count} total event",
+    "totalEventOther": "{count} total events",
+    "noCountersTitle": "لا توجد عدادات لإعادة تعيين.",
+    "resetTitle": "إعادة ضبط كافة العدادات",
+    "refreshTitle": "إعادة تحميل عدادات القياس عن بعد من القرص",
+    "refresh": "ينعش",
+    "copyTitle": "انسخ اللقطة بتنسيق JSON",
+    "copyJson": "انسخ ملف JSON",
+    "resetCounters": "إعادة ضبط العدادات",
+    "countersAria": "عدادات",
+    "countersHeading": "عدادات الأحداث",
+    "thEvent": "حدث",
+    "thCount": "عدد",
+    "emptyMessage": "لم يتم تسجيل أي أحداث قياس عن بعد حتى الآن - افتح قاعدة من لوحة معلومات النتائج لبدء التقاط العدادات.",
+    "openFindingsTitle": "افتح لوحة معلومات نتائج ساروبا.",
+    "openFindings": "افتح لوحة معلومات النتائج",
+    "lastPropsHeading": "خصائص الحدث الأخير",
+    "copiedJson": "Saropa Lints: القياس عن بعد للقاعدة ذات الصلة المنسوخة JSON.",
+    "countersReset": "ساروبا لينتس: إعادة ضبط عدادات القياس عن بعد للقواعد ذات الصلة."
+  },
+  "sidebarLayout": {
+    "summary": "تخطيط شريط النشاط",
+    "hint": "قم بتشغيل أقسام شريط نشاط Saropa أو إيقاف تشغيلها هنا (يتم حفظها في مساحة العمل، دون مغادرة لوحة المعلومات)."
+  },
+  "securityPosture": {
+    "issueOne": "{count} issue",
+    "issueOther": "{count} issues",
+    "noIssues": "لا توجد قضايا",
+    "showIssues": "إظهار القضايا",
+    "violationTooltip": "{count} violation(s) across {ruleCount} rule(s). Click to show in Issues.",
+    "noViolationsTooltip": "لم يتم تعيين أي انتهاكات لهذه الفئة."
   }
 }

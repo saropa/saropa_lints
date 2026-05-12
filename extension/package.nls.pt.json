@@ -18,7 +18,7 @@
   "command.openConfig.title": "Saropa Lints: opções de análise aberta",
   "command.openPubspec.title": "Saropa Lints: Abra pubspec.yaml",
   "command.toggleRunAnalysisAfterConfigChange.title": "Saropa Lints: Alternar análise de execução após alteração de configuração",
-  "command.pickUiLanguage.title": "Saropa Lints: escolha o idioma da interface do usuário",
+  "command.pickUiLanguage.title": "Saropa Lints: Idioma / Langue / Sprache / 言語 / 语言",
   "command.openConfigDashboard.title": "Saropa Lints: Configuração de Open Lints",
   "command.openPackageVibrancy.title": "Saropa Lints: vibração de pacote aberto",
   "command.openProjectVibrancyReport.title": "Saropa Lints: Painel de integridade de código aberto",

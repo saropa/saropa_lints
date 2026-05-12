@@ -75,7 +75,10 @@
       "title": "Ngôn ngữ giao diện người dùng Saropa Lints",
       "placeholder": "Chọn ngôn ngữ cho thanh bên và trang tổng quan",
       "auto": "Tự động (tuân theo ngôn ngữ hiển thị VS Code)"
-    }
+    },
+    "reloadPrompt": "Ngôn ngữ được đặt thành 0. Tải lại cửa sổ để cập nhật thanh bên và nhãn lệnh. {locale}",
+    "reloadNow": "Tải lại ngay bây giờ",
+    "reloadLater": "Sau đó"
   },
   "brand": {
     "prefix": "Saropa"
@@ -635,5 +638,158 @@
       "matchOne": "{count} match",
       "matchOther": "{count} matches"
     }
+  },
+  "codeHealth": {
+    "documentTitle": "Bảng điều khiển sức khỏe mã Saropa",
+    "skipToTable": "Chuyển đến bảng chức năng",
+    "openWorkspaceFirst": "Trước tiên hãy mở không gian làm việc Dart/Flutter.",
+    "scanningTitle": "Tình trạng mã: chức năng quét…",
+    "runReportFirst": "Chạy lại báo cáo, sau đó sao chép JSON.",
+    "copiedJson": "Code Health JSON đã được sao chép vào bảng nhớ tạm.",
+    "couldNotOpenFile": "Không thể mở tập tin: 0 {path}",
+    "panelTitle": "Bảng điều khiển sức khỏe mã Saropa",
+    "hero": {
+      "title": "Bảng điều khiển sức khỏe mã Saropa",
+      "generated": "Đã tạo",
+      "functionOne": "{count} function",
+      "functionOther": "{count} functions",
+      "avgFormat": "trung bình 0 (1) {score} {grade}",
+      "gatesFailing": "cổng thất bại",
+      "gatesPassing": "cổng đi qua"
+    },
+    "gauge": {
+      "tooltip": "Điểm trung bình 0 trên 100 (lớp 1). {rounded} {grade}",
+      "ariaLabel": "Điểm trung bình 0 trên 100 {rounded}"
+    },
+    "gate": {
+      "fallback": "Cổng chất lượng không thành công - xem lại ngưỡng trong cài đặt Tình trạng mã.",
+      "failingOne": "{count} gate failing — review thresholds, or copy the JSON to inspect gates.violations.",
+      "failingOther": "{count} gates failing — review thresholds, or copy the JSON to inspect gates.violations.",
+      "openSettingsTitle": "Mở cài đặt Code Health để điều chỉnh ngưỡng.",
+      "openSettingsButton": "Mở cài đặt Tình trạng mã"
+    },
+    "kpi": {
+      "ariaLabel": "Tóm tắt tình trạng mã",
+      "allClear": "Không có chức năng nào được gắn cờ trên bất kỳ danh mục nào - tất cả đều rõ ràng.",
+      "clickToFilter": "Bấm để lọc bảng theo các chức năng được gắn cờ 0. {flag}",
+      "noFlagged": "Không có chức năng nào được gắn cờ 0. {flag}",
+      "unused": "Chưa sử dụng",
+      "unusedSub": "chức năng được tham chiếu ở đâu",
+      "uncovered": "Khám phá",
+      "uncoveredSub": "không có bảo hiểm LCOV",
+      "stubTested": "Đã thử nghiệm sơ khai",
+      "stubTestedSub": "thử nghiệm tồn tại nhưng khẳng định ít",
+      "suspiciousCoverage": "Tin tức đáng ngờ",
+      "suspiciousCoverageSub": "phạm vi bảo hiểm có vẻ bịa đặt",
+      "testDrift": "Kiểm tra độ trôi",
+      "testDriftSub": "kiểm tra độ trễ của chức năng"
+    },
+    "toolbar": {
+      "ariaLabel": "Mã hành động Sức khỏe",
+      "rescanTitle": "Chạy lại quá trình quét Code Health và làm mới bảng thông tin này.",
+      "rescan": "Quét lại",
+      "copyJsonTitle": "Sao chép Code Health JSON thô vào bảng nhớ tạm.",
+      "copyJson": "Sao chép JSON",
+      "settingsTitle": "Mở cài đặt Mã sức khỏe.",
+      "settingsButton": "Cài đặt tình trạng mã",
+      "filterTitle": "Lọc các hàng theo tên, tệp hoặc cờ.",
+      "filterLabel": "Lọc hàng",
+      "filterPlaceholder": "Lọc hàng…"
+    },
+    "table": {
+      "ariaLabel": "Chức năng tồi tệ nhất theo điểm số",
+      "heading": "Chức năng tệ nhất",
+      "topCount": "trên cùng 0 của 1 {shown} {total}",
+      "colGrade": "Cấp",
+      "colScore": "Điểm",
+      "colFunction": "Chức năng",
+      "colFile": "Tài liệu",
+      "colLine": "Đường kẻ",
+      "colUsage": "Cách sử dụng",
+      "colCoverage": "Bảo hiểm",
+      "colComplexity": "Độ phức tạp",
+      "colFlags": "Cờ",
+      "noMatch": "Không có chức năng nào phù hợp với bộ lọc hiện tại.",
+      "resetFiltersTitle": "Xóa tìm kiếm và mọi bộ lọc cờ đang hoạt động.",
+      "resetFilters": "Đặt lại bộ lọc",
+      "hint": "Hiển thị 200 chức năng tồi tệ nhất theo điểm số. Sử dụng trường tìm kiếm để thu hẹp hơn nữa."
+    },
+    "shortcuts": {
+      "focusFilter": "Tập trung vào bộ lọc hàng",
+      "clearFilter": "Xóa bộ lọc hàng tập trung",
+      "activateKpi": "Kích hoạt thẻ KPI tập trung",
+      "activateKpiSpace": "Kích hoạt thẻ KPI tập trung",
+      "showOverlay": "Hiển thị lớp phủ phím tắt này"
+    },
+    "script": {
+      "activeFiltersLabel": "Bộ lọc hoạt động:",
+      "searchChip": "tìm kiếm: \"0\" {q}",
+      "flagChip": "cờ: 0 {flag}",
+      "removeAria": "Xóa 0 {key}",
+      "clearAll": "Xóa tất cả",
+      "rowsVisible": "{visible} of {total} rows visible",
+      "neverRun": "không bao giờ chạy"
+    },
+    "freshness": {
+      "justNow": "ngay bây giờ",
+      "minutesAgo": "{min}m ago",
+      "hoursAgo": "{hr}h ago",
+      "daysAgo": "{day}d ago",
+      "weeksAgo": "{wk}w ago"
+    }
+  },
+  "suppressionsStrip": {
+    "noData": "Chưa có vi phạm.json nào — hãy chạy phân tích để điền vào ảnh chụp nhanh ngăn chặn.",
+    "zeroTotal": "0 lần ngăn chặn máy phân tích trong lần xuất mới nhất.",
+    "noKindBreakdown": "Không có phân tích theo loại trong lần xuất khẩu này.",
+    "title": "Sự đàn áp (xuất khẩu)",
+    "readOnlyNote": "(chỉ đọc; mở Kết quả để duyệt và hành động.)",
+    "openFindings": "Mở bảng điều khiển phát hiện"
+  },
+  "configMirrors": {
+    "noFileRisk": "Không có phân tích rủi ro trên mỗi tệp (không có vi phạm trong phạm vi).",
+    "suppressionNote": "Khớp với bản tóm tắt vi phạm.json, không khớp với nút chuyển đổi loại bỏ thanh bên trực tiếp.",
+    "noSuppression": "Không có tổng hợp loại bỏ nào trong bản xuất này (máy phân tích cũ hơn hoặc loại bỏ bằng 0).",
+    "owaspSignal": "{count} violation(s) in this export carry OWASP mobile/web mapping — open Security Posture for the full matrix and export.",
+    "summarySuppressions": "Loại bỏ (xuất ảnh chụp nhanh)",
+    "summaryOwasp": "Trạng thái bảo mật (tín hiệu OWASP)",
+    "summaryFileRisk": "Rủi ro tệp (tệp hàng đầu)"
+  },
+  "telemetry": {
+    "heroTitle": "Quy tắc liên quan từ xa",
+    "skipToCounters": "Chuyển đến quầy đo từ xa",
+    "lastEvent": "Sự kiện cuối cùng 0 {relative}",
+    "noEvents": "Không có sự kiện nào được ghi lại",
+    "totalEventOne": "{count} total event",
+    "totalEventOther": "{count} total events",
+    "noCountersTitle": "Không có bộ đếm để thiết lập lại.",
+    "resetTitle": "Đặt lại tất cả các bộ đếm",
+    "refreshTitle": "Tải lại bộ đếm từ xa từ đĩa",
+    "refresh": "Làm cho khỏe lại",
+    "copyTitle": "Sao chép ảnh chụp nhanh dưới dạng JSON",
+    "copyJson": "Sao chép JSON",
+    "resetCounters": "Đặt lại bộ đếm",
+    "countersAria": "quầy",
+    "countersHeading": "Quầy sự kiện",
+    "thEvent": "Sự kiện",
+    "thCount": "Đếm",
+    "emptyMessage": "Chưa có sự kiện đo từ xa nào được ghi lại - hãy mở quy tắc từ Bảng thông tin phát hiện để bắt đầu ghi lại các bộ đếm.",
+    "openFindingsTitle": "Mở Bảng điều khiển phát hiện Saropa.",
+    "openFindings": "Mở bảng điều khiển phát hiện",
+    "lastPropsHeading": "Thuộc tính sự kiện cuối cùng",
+    "copiedJson": "Saropa Lints: sao chép JSON từ xa quy tắc liên quan.",
+    "countersReset": "Saropa Lints: thiết lập lại bộ đếm từ xa theo quy tắc liên quan."
+  },
+  "sidebarLayout": {
+    "summary": "Bố cục thanh hoạt động",
+    "hint": "Bật hoặc tắt các phần trên thanh hoạt động của Saropa tại đây (được lưu cùng với không gian làm việc mà không cần rời khỏi trang tổng quan)."
+  },
+  "securityPosture": {
+    "issueOne": "{count} issue",
+    "issueOther": "{count} issues",
+    "noIssues": "Không có vấn đề gì",
+    "showIssues": "Hiển thị vấn đề",
+    "violationTooltip": "{count} violation(s) across {ruleCount} rule(s). Click to show in Issues.",
+    "noViolationsTooltip": "Không có vi phạm nào được ánh xạ tới danh mục này."
   }
 }

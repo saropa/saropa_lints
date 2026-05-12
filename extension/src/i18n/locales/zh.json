@@ -75,7 +75,10 @@
       "title": "Saropa Lints 界面语言",
       "placeholder": "选择侧边栏和仪表板的语言",
       "auto": "自动（跟随 VS Code 显示语言）"
-    }
+    },
+    "reloadPrompt": "语言设置为0。重新加载窗口以更新侧边栏和命令标签。 {locale}",
+    "reloadNow": "立即重新加载",
+    "reloadLater": "之后"
   },
   "brand": {
     "prefix": "沙罗巴"
@@ -635,5 +638,158 @@
       "matchOne": "{count} match",
       "matchOther": "{count} matches"
     }
+  },
+  "codeHealth": {
+    "documentTitle": "萨罗巴代码健康仪表板",
+    "skipToTable": "跳至功能表",
+    "openWorkspaceFirst": "首先打开 Dart/Flutter 工作区。",
+    "scanningTitle": "代码健康：扫描功能...",
+    "runReportFirst": "再次运行报告，然后复制 JSON。",
+    "copiedJson": "代码健康 JSON 已复制到剪贴板。",
+    "couldNotOpenFile": "无法打开文件：0 {path}",
+    "panelTitle": "萨罗巴代码健康仪表板",
+    "hero": {
+      "title": "萨罗巴代码健康仪表板",
+      "generated": "生成",
+      "functionOne": "{count} function",
+      "functionOther": "{count} functions",
+      "avgFormat": "平均 0 (1) {score} {grade}",
+      "gatesFailing": "门失败",
+      "gatesPassing": "大门经过"
+    },
+    "gauge": {
+      "tooltip": "平均分0为100分（等级1）。 {rounded} {grade}",
+      "ariaLabel": "平均分 0 100 {rounded}"
+    },
+    "gate": {
+      "fallback": "质量门失败 - 检查代码运行状况设置中的阈值。",
+      "failingOne": "{count} gate failing — review thresholds, or copy the JSON to inspect gates.violations.",
+      "failingOther": "{count} gates failing — review thresholds, or copy the JSON to inspect gates.violations.",
+      "openSettingsTitle": "打开代码运行状况设置以调整阈值。",
+      "openSettingsButton": "打开代码运行状况设置"
+    },
+    "kpi": {
+      "ariaLabel": "代码健康摘要",
+      "allClear": "任何类别中都没有标记的功能 - 一切都很清楚。",
+      "clickToFilter": "单击可将表过滤为标记为 0 的函数。 {flag}",
+      "noFlagged": "没有函数标记为0。 {flag}",
+      "unused": "未使用",
+      "unusedSub": "函数没有被引用",
+      "uncovered": "裸露",
+      "uncoveredSub": "无 LCOV 覆盖",
+      "stubTested": "经过存根测试",
+      "stubTestedSub": "测试存在但断言很少",
+      "suspiciousCoverage": "可疑报道",
+      "suspiciousCoverageSub": "报道看起来是捏造的",
+      "testDrift": "测试漂移",
+      "testDriftSub": "测试滞后于功能"
+    },
+    "toolbar": {
+      "ariaLabel": "守则健康行动",
+      "rescanTitle": "重新运行代码运行状况扫描并刷新此仪表板。",
+      "rescan": "重新扫描",
+      "copyJsonTitle": "将原始代码运行状况 JSON 复制到剪贴板。",
+      "copyJson": "复制 JSON",
+      "settingsTitle": "打开代码运行状况设置。",
+      "settingsButton": "代码健康设置",
+      "filterTitle": "按名称、文件或标志过滤行。",
+      "filterLabel": "过滤行",
+      "filterPlaceholder": "过滤行..."
+    },
+    "table": {
+      "ariaLabel": "按分数列出的最差函数",
+      "heading": "最差的功能",
+      "topCount": "顶部 0 共 1 {shown} {total}",
+      "colGrade": "年级",
+      "colScore": "分数",
+      "colFunction": "功能",
+      "colFile": "文件",
+      "colLine": "线",
+      "colUsage": "用法",
+      "colCoverage": "覆盖范围",
+      "colComplexity": "复杂",
+      "colFlags": "旗帜",
+      "noMatch": "没有与当前过滤器匹配的功能。",
+      "resetFiltersTitle": "清除搜索和任何活动标志过滤器。",
+      "resetFilters": "重置过滤器",
+      "hint": "按分数显示最差的 200 个函数。使用搜索字段进一步缩小范围。"
+    },
+    "shortcuts": {
+      "focusFilter": "聚焦行过滤器",
+      "clearFilter": "清除聚焦的行过滤器",
+      "activateKpi": "激活重点 KPI 卡",
+      "activateKpiSpace": "激活重点 KPI 卡",
+      "showOverlay": "显示此快捷方式叠加层"
+    },
+    "script": {
+      "activeFiltersLabel": "有源滤波器：",
+      "searchChip": "搜索：“0” {q}",
+      "flagChip": "标志: 0 {flag}",
+      "removeAria": "删除0 {key}",
+      "clearAll": "全部清除",
+      "rowsVisible": "{visible} of {total} rows visible",
+      "neverRun": "从不跑"
+    },
+    "freshness": {
+      "justNow": "现在",
+      "minutesAgo": "{min}m ago",
+      "hoursAgo": "{hr}h ago",
+      "daysAgo": "{day}d ago",
+      "weeksAgo": "{wk}w ago"
+    }
+  },
+  "suppressionsStrip": {
+    "noData": "尚无 Violations.json — 运行分析以填充抑制快照。",
+    "zeroTotal": "最新导出中的 0 分析器抑制。",
+    "noKindBreakdown": "此出口没有按种类细分。",
+    "title": "抑制（导出）",
+    "readOnlyNote": "（只读；打开Findings 进行浏览并采取行动。）",
+    "openFindings": "打开结果仪表板"
+  },
+  "configMirrors": {
+    "noFileRisk": "没有每个文件的风险细分（范围内没有违规行为）。",
+    "suppressionNote": "匹配violations.json摘要，而不是实时侧边栏抑制切换。",
+    "noSuppression": "此导出中没有抑制聚合（较旧的分析器或零抑制）。",
+    "owaspSignal": "{count} violation(s) in this export carry OWASP mobile/web mapping — open Security Posture for the full matrix and export.",
+    "summarySuppressions": "抑制（导出快照）",
+    "summaryOwasp": "安全态势（OWASP 信号）",
+    "summaryFileRisk": "文件风险（热门文件）"
+  },
+  "telemetry": {
+    "heroTitle": "相关规则遥测",
+    "skipToCounters": "跳至遥测计数器",
+    "lastEvent": "最后活动0 {relative}",
+    "noEvents": "没有记录任何事件",
+    "totalEventOne": "{count} total event",
+    "totalEventOther": "{count} total events",
+    "noCountersTitle": "没有要重置的计数器。",
+    "resetTitle": "重置所有计数器",
+    "refreshTitle": "从磁盘重新加载遥测计数器",
+    "refresh": "刷新",
+    "copyTitle": "将快照复制为 JSON",
+    "copyJson": "复制 JSON",
+    "resetCounters": "重置计数器",
+    "countersAria": "柜台",
+    "countersHeading": "事件计数器",
+    "thEvent": "事件",
+    "thCount": "数数",
+    "emptyMessage": "尚未记录遥测事件 - 从结果仪表板打开规则以开始捕获计数器。",
+    "openFindingsTitle": "打开 Saropa 调查结果仪表板。",
+    "openFindings": "打开结果仪表板",
+    "lastPropsHeading": "上次事件属性",
+    "copiedJson": "Saropa Lints：复制相关规则遥测 JSON。",
+    "countersReset": "Saropa Lints：相关规则遥测计数器重置。"
+  },
+  "sidebarLayout": {
+    "summary": "活动栏布局",
+    "hint": "在此处打开或关闭 Saropa 活动栏部分（与工作区一起保存，无需离开仪表板）。"
+  },
+  "securityPosture": {
+    "issueOne": "{count} issue",
+    "issueOther": "{count} issues",
+    "noIssues": "没有问题",
+    "showIssues": "显示问题",
+    "violationTooltip": "{count} violation(s) across {ruleCount} rule(s). Click to show in Issues.",
+    "noViolationsTooltip": "没有映射到此类别的违规行为。"
   }
 }

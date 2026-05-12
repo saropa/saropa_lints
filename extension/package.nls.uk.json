@@ -18,7 +18,7 @@
   "command.openConfig.title": "Saropa Lints: Відкрити параметри аналізу",
   "command.openPubspec.title": "Саропа Лінтс: відкрийте pubspec.yaml",
   "command.toggleRunAnalysisAfterConfigChange.title": "Saropa Lints: перемкнути запуск аналізу після зміни конфігурації",
-  "command.pickUiLanguage.title": "Саропа Лінтс: виберіть мову інтерфейсу",
+  "command.pickUiLanguage.title": "Saropa Lints: Мова / Langue / Sprache / 言語 / 语言",
   "command.openConfigDashboard.title": "Saropa Lints: Відкрийте конфігурацію Lints",
   "command.openPackageVibrancy.title": "Saropa Lints: відкрита упаковка Vibrancy",
   "command.openProjectVibrancyReport.title": "Saropa Lints: інформаційна панель із відкритим кодом",

@@ -75,7 +75,10 @@
       "title": "Язык интерфейса Saropa Lints",
       "placeholder": "Выберите язык боковой панели и панелей",
       "auto": "Авто (следовать языку отображения VS Code)"
-    }
+    },
+    "reloadPrompt": "Язык установлен на 0. Перезагрузите окно, чтобы обновить метки боковой панели и команд. {locale}",
+    "reloadNow": "Перезагрузить сейчас",
+    "reloadLater": "Позже"
   },
   "brand": {
     "prefix": "Саропа"
@@ -635,5 +638,158 @@
       "matchOne": "{count} match",
       "matchOther": "{count} matches"
     }
+  },
+  "codeHealth": {
+    "documentTitle": "Панель мониторинга состояния кода Саропа",
+    "skipToTable": "Перейти к таблице функций",
+    "openWorkspaceFirst": "Сначала откройте рабочее пространство Dart/Flutter.",
+    "scanningTitle": "Здоровье кода: функции сканирования…",
+    "runReportFirst": "Запустите отчет еще раз, затем скопируйте JSON.",
+    "copiedJson": "Код Health JSON скопирован в буфер обмена.",
+    "couldNotOpenFile": "Не удалось открыть файл: 0 {path}",
+    "panelTitle": "Панель мониторинга состояния кода Саропа",
+    "hero": {
+      "title": "Панель мониторинга состояния кода Саропа",
+      "generated": "Сгенерировано",
+      "functionOne": "{count} function",
+      "functionOther": "{count} functions",
+      "avgFormat": "среднее 0 (1) {score} {grade}",
+      "gatesFailing": "ворота выходят из строя",
+      "gatesPassing": "ворота проходящие"
+    },
+    "gauge": {
+      "tooltip": "Средний балл 0 из 100 (оценка 1). {rounded} {grade}",
+      "ariaLabel": "Средний балл 0 из 100 {rounded}"
+    },
+    "gate": {
+      "fallback": "Не удалось выполнить контроль качества. Проверьте пороговые значения в настройках состояния кода.",
+      "failingOne": "{count} gate failing — review thresholds, or copy the JSON to inspect gates.violations.",
+      "failingOther": "{count} gates failing — review thresholds, or copy the JSON to inspect gates.violations.",
+      "openSettingsTitle": "Откройте настройки «Состояние кода», чтобы настроить пороговые значения.",
+      "openSettingsButton": "Открыть настройки работоспособности кода"
+    },
+    "kpi": {
+      "ariaLabel": "Сводка о работоспособности кода",
+      "allClear": "Никаких помеченных функций ни в одной категории — все ясно.",
+      "clickToFilter": "Нажмите, чтобы отфильтровать таблицу по функциям, отмеченным 0. {flag}",
+      "noFlagged": "Ни одна функция не отмечена 0. {flag}",
+      "unused": "Неиспользованный",
+      "unusedSub": "функции, на которые нет ссылок",
+      "uncovered": "Непокрытый",
+      "uncoveredSub": "нет покрытия LCOV",
+      "stubTested": "Тестирование",
+      "stubTestedSub": "тесты существуют, но мало что подтверждают",
+      "suspiciousCoverage": "Подозрительное освещение",
+      "suspiciousCoverageSub": "освещение выглядит сфабрикованным",
+      "testDrift": "Тестовый дрифт",
+      "testDriftSub": "тесты отстают от функции"
+    },
+    "toolbar": {
+      "ariaLabel": "Действия Кодекса по охране здоровья",
+      "rescanTitle": "Повторно запустите сканирование работоспособности кода и обновите эту панель мониторинга.",
+      "rescan": "Повторное сканирование",
+      "copyJsonTitle": "Скопируйте необработанный JSON-код работоспособности кода в буфер обмена.",
+      "copyJson": "Копировать JSON",
+      "settingsTitle": "Откройте настройки работоспособности кода.",
+      "settingsButton": "Настройки работоспособности кода",
+      "filterTitle": "Фильтруйте строки по имени, файлу или флагу.",
+      "filterLabel": "Фильтровать строки",
+      "filterPlaceholder": "Фильтровать строки…"
+    },
+    "table": {
+      "ariaLabel": "Худшие функции по баллам",
+      "heading": "Худшие функции",
+      "topCount": "верх 0 из 1 {shown} {total}",
+      "colGrade": "Оценка",
+      "colScore": "Счет",
+      "colFunction": "Функция",
+      "colFile": "Файл",
+      "colLine": "Линия",
+      "colUsage": "Использование",
+      "colCoverage": "Покрытие",
+      "colComplexity": "Сложность",
+      "colFlags": "Флаги",
+      "noMatch": "Ни одна функция не соответствует текущим фильтрам.",
+      "resetFiltersTitle": "Очистите поиск и все активные фильтры пометок.",
+      "resetFilters": "Сбросить фильтры",
+      "hint": "Показаны 200 худших функций по баллам. Используйте поле поиска, чтобы сузить еще больше."
+    },
+    "shortcuts": {
+      "focusFilter": "Фокусировать фильтр строк",
+      "clearFilter": "Очистить фильтр выделенной строки",
+      "activateKpi": "Активировать целевую карту KPI",
+      "activateKpiSpace": "Активировать целевую карту KPI",
+      "showOverlay": "Показать это наложение ярлыков"
+    },
+    "script": {
+      "activeFiltersLabel": "Активные фильтры:",
+      "searchChip": "поиск: \"0\" {q}",
+      "flagChip": "флаг: 0 {flag}",
+      "removeAria": "Удалить 0 {key}",
+      "clearAll": "Очистить все",
+      "rowsVisible": "{visible} of {total} rows visible",
+      "neverRun": "никогда не бегай"
+    },
+    "freshness": {
+      "justNow": "прямо сейчас",
+      "minutesAgo": "{min}m ago",
+      "hoursAgo": "{hr}h ago",
+      "daysAgo": "{day}d ago",
+      "weeksAgo": "{wk}w ago"
+    }
+  },
+  "suppressionsStrip": {
+    "noData": "Нарушений.json пока нет — запустите анализ, чтобы заполнить снимок подавления.",
+    "zeroTotal": "0 подавлений анализатора в последнем экспорте.",
+    "noKindBreakdown": "В этом экспорте нет разбивки по видам.",
+    "title": "Подавления (экспорт)",
+    "readOnlyNote": "(только для чтения; откройте «Выводы», чтобы просмотреть и принять меры.)",
+    "openFindings": "Открыть панель результатов"
+  },
+  "configMirrors": {
+    "noFileRisk": "Нет разбивки рисков по файлам (нет нарушений объема).",
+    "suppressionNote": "Соответствует сводке нарушения.json, а не переключателям подавления боковой панели.",
+    "noSuppression": "В этом экспорте нет совокупного подавления (более старый анализатор или нулевое подавление).",
+    "owaspSignal": "{count} violation(s) in this export carry OWASP mobile/web mapping — open Security Posture for the full matrix and export.",
+    "summarySuppressions": "Подавления (экспортный снимок)",
+    "summaryOwasp": "Состояние безопасности (сигнал OWASP)",
+    "summaryFileRisk": "Файловый риск (топ-файлы)"
+  },
+  "telemetry": {
+    "heroTitle": "Телеметрия связанных правил",
+    "skipToCounters": "Перейти к счетчикам телеметрии",
+    "lastEvent": "Последнее событие 0 {relative}",
+    "noEvents": "Никаких событий не зарегистрировано",
+    "totalEventOne": "{count} total event",
+    "totalEventOther": "{count} total events",
+    "noCountersTitle": "Нет счетчиков для сброса.",
+    "resetTitle": "Сбросить все счетчики",
+    "refreshTitle": "Перезагрузить счетчики телеметрии с диска.",
+    "refresh": "Обновить",
+    "copyTitle": "Скопировать снимок в формате JSON",
+    "copyJson": "Копировать JSON",
+    "resetCounters": "Сбросить счетчики",
+    "countersAria": "Счетчики",
+    "countersHeading": "Счетчики событий",
+    "thEvent": "Событие",
+    "thCount": "Считать",
+    "emptyMessage": "События телеметрии пока не зарегистрированы — откройте правило на панели результатов, чтобы начать сбор данных счетчиков.",
+    "openFindingsTitle": "Откройте панель результатов Саропы.",
+    "openFindings": "Открыть панель результатов",
+    "lastPropsHeading": "Свойства последнего события",
+    "copiedJson": "Саропа Линтс: скопированы данные телеметрии связанных правил в формате JSON.",
+    "countersReset": "Саропа Линтс: сброс счетчиков телеметрии связанных правил."
+  },
+  "sidebarLayout": {
+    "summary": "Макет панели активности",
+    "hint": "Здесь можно включить или отключить разделы панели активности Saropa (сохраняются вместе с рабочей областью, не выходя из панели управления)."
+  },
+  "securityPosture": {
+    "issueOne": "{count} issue",
+    "issueOther": "{count} issues",
+    "noIssues": "Нет проблем",
+    "showIssues": "Показать проблемы",
+    "violationTooltip": "{count} violation(s) across {ruleCount} rule(s). Click to show in Issues.",
+    "noViolationsTooltip": "К этой категории нарушений не относится."
   }
 }

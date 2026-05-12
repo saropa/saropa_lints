@@ -75,7 +75,10 @@
       "title": "Idioma da IU do Saropa Lints",
       "placeholder": "Escolha o idioma da barra lateral e dos painéis",
       "auto": "Automático (seguir o idioma de exibição do VS Code)"
-    }
+    },
+    "reloadPrompt": "Idioma definido como 0. Recarregue a janela para atualizar a barra lateral e os rótulos dos comandos. {locale}",
+    "reloadNow": "Recarregue agora",
+    "reloadLater": "Mais tarde"
   },
   "brand": {
     "prefix": "Saropa"
@@ -635,5 +638,158 @@
       "matchOne": "{count} match",
       "matchOther": "{count} matches"
     }
+  },
+  "codeHealth": {
+    "documentTitle": "Painel de integridade do código Saropa",
+    "skipToTable": "Pular para tabela de funções",
+    "openWorkspaceFirst": "Abra primeiro um espaço de trabalho Dart/Flutter.",
+    "scanningTitle": "Code Health: funções de digitalização…",
+    "runReportFirst": "Execute o relatório novamente e copie o JSON.",
+    "copiedJson": "Code Health JSON copiado para a área de transferência.",
+    "couldNotOpenFile": "Não foi possível abrir o arquivo: 0 {path}",
+    "panelTitle": "Painel de integridade do código Saropa",
+    "hero": {
+      "title": "Painel de integridade do código Saropa",
+      "generated": "Gerado",
+      "functionOne": "{count} function",
+      "functionOther": "{count} functions",
+      "avgFormat": "média 0 (1) {score} {grade}",
+      "gatesFailing": "portões falhando",
+      "gatesPassing": "portões passando"
+    },
+    "gauge": {
+      "tooltip": "Pontuação média 0 de 100 (nota 1). {rounded} {grade}",
+      "ariaLabel": "Pontuação média 0 de 100 {rounded}"
+    },
+    "gate": {
+      "fallback": "Falha nos portões de qualidade – revise os limites nas configurações do Code Health.",
+      "failingOne": "{count} gate failing — review thresholds, or copy the JSON to inspect gates.violations.",
+      "failingOther": "{count} gates failing — review thresholds, or copy the JSON to inspect gates.violations.",
+      "openSettingsTitle": "Abra as configurações de Code Health para ajustar os limites.",
+      "openSettingsButton": "Abra as configurações de integridade do código"
+    },
+    "kpi": {
+      "ariaLabel": "Resumo de integridade do código",
+      "allClear": "Nenhuma função sinalizada em nenhuma categoria – tudo limpo.",
+      "clickToFilter": "Clique para filtrar a tabela para funções sinalizadas 0. {flag}",
+      "noFlagged": "Nenhuma função sinalizada 0. {flag}",
+      "unused": "Não utilizado",
+      "unusedSub": "funções referenciadas em nenhum lugar",
+      "uncovered": "Descoberto",
+      "uncoveredSub": "sem cobertura LCOV",
+      "stubTested": "Testado em esboço",
+      "stubTestedSub": "existem testes, mas afirmam pouco",
+      "suspiciousCoverage": "Cobertura suspeita",
+      "suspiciousCoverageSub": "cobertura parece fabricada",
+      "testDrift": "Desvio de teste",
+      "testDriftSub": "testes atrasam a função"
+    },
+    "toolbar": {
+      "ariaLabel": "Ações de integridade do código",
+      "rescanTitle": "Execute novamente a verificação do Code Health e atualize este painel.",
+      "rescan": "Digitalizar novamente",
+      "copyJsonTitle": "Copie o JSON bruto do Code Health para a área de transferência.",
+      "copyJson": "Copiar JSON",
+      "settingsTitle": "Abra as configurações de integridade do código.",
+      "settingsButton": "Configurações de integridade do código",
+      "filterTitle": "Filtre linhas por nome, arquivo ou sinalizador.",
+      "filterLabel": "Filtrar linhas",
+      "filterPlaceholder": "Filtrar linhas…"
+    },
+    "table": {
+      "ariaLabel": "Piores funções por pontuação",
+      "heading": "Piores funções",
+      "topCount": "topo 0 de 1 {shown} {total}",
+      "colGrade": "Nota",
+      "colScore": "Pontuação",
+      "colFunction": "Função",
+      "colFile": "Arquivo",
+      "colLine": "Linha",
+      "colUsage": "Uso",
+      "colCoverage": "Cobertura",
+      "colComplexity": "Complexidade",
+      "colFlags": "Bandeiras",
+      "noMatch": "Nenhuma função corresponde aos filtros atuais.",
+      "resetFiltersTitle": "Limpe a pesquisa e qualquer filtro de sinalização ativo.",
+      "resetFilters": "Redefinir filtros",
+      "hint": "Mostrando as 200 piores funções por pontuação. Use o campo de pesquisa para restringir ainda mais."
+    },
+    "shortcuts": {
+      "focusFilter": "Focar o filtro de linha",
+      "clearFilter": "Limpe o filtro de linha em foco",
+      "activateKpi": "Ative o cartão KPI focado",
+      "activateKpiSpace": "Ative o cartão KPI focado",
+      "showOverlay": "Mostrar esta sobreposição de atalho"
+    },
+    "script": {
+      "activeFiltersLabel": "Filtros ativos:",
+      "searchChip": "pesquisar: \"0\" {q}",
+      "flagChip": "bandeira: 0 {flag}",
+      "removeAria": "Remover 0 {key}",
+      "clearAll": "Limpar tudo",
+      "rowsVisible": "{visible} of {total} rows visible",
+      "neverRun": "nunca corra"
+    },
+    "freshness": {
+      "justNow": "agora mesmo",
+      "minutesAgo": "{min}m ago",
+      "hoursAgo": "{hr}h ago",
+      "daysAgo": "{day}d ago",
+      "weeksAgo": "{wk}w ago"
+    }
+  },
+  "suppressionsStrip": {
+    "noData": "Ainda não há violations.json – execute a análise para preencher o instantâneo de supressão.",
+    "zeroTotal": "0 supressões do analisador na exportação mais recente.",
+    "noKindBreakdown": "Não há discriminação por tipo nesta exportação.",
+    "title": "Supressões (exportação)",
+    "readOnlyNote": "(somente leitura; abra as descobertas para navegar e agir.)",
+    "openFindings": "Abra o painel de descobertas"
+  },
+  "configMirrors": {
+    "noFileRisk": "Nenhuma análise de risco por arquivo (sem violações no escopo).",
+    "suppressionNote": "Corresponde ao resumo de violações.json, não aos alternadores de supressão da barra lateral ao vivo.",
+    "noSuppression": "Nenhuma supressão agregada nesta exportação (analisador mais antigo ou zero supressões).",
+    "owaspSignal": "{count} violation(s) in this export carry OWASP mobile/web mapping — open Security Posture for the full matrix and export.",
+    "summarySuppressions": "Supressões (exportar instantâneo)",
+    "summaryOwasp": "Postura de segurança (sinal OWASP)",
+    "summaryFileRisk": "Risco de arquivo (arquivos principais)"
+  },
+  "telemetry": {
+    "heroTitle": "Telemetria de regras relacionadas",
+    "skipToCounters": "Pular para contadores de telemetria",
+    "lastEvent": "Último evento 0 {relative}",
+    "noEvents": "Nenhum evento registrado",
+    "totalEventOne": "{count} total event",
+    "totalEventOther": "{count} total events",
+    "noCountersTitle": "Não há contadores para redefinir.",
+    "resetTitle": "Redefinir todos os contadores",
+    "refreshTitle": "Recarregar contadores de telemetria do disco",
+    "refresh": "Atualizar",
+    "copyTitle": "Copiar instantâneo como JSON",
+    "copyJson": "Copiar JSON",
+    "resetCounters": "Redefinir contadores",
+    "countersAria": "Contadores",
+    "countersHeading": "Contadores de eventos",
+    "thEvent": "Evento",
+    "thCount": "Contar",
+    "emptyMessage": "Nenhum evento de telemetria registrado ainda — abra uma regra no Painel de Descobertas para começar a capturar contadores.",
+    "openFindingsTitle": "Abra o painel de descobertas da Saropa.",
+    "openFindings": "Abra o painel de descobertas",
+    "lastPropsHeading": "Propriedades do último evento",
+    "copiedJson": "Saropa Lints: JSON de telemetria de regra relacionada copiada.",
+    "countersReset": "Saropa Lints: redefinição dos contadores de telemetria de regras relacionadas."
+  },
+  "sidebarLayout": {
+    "summary": "Layout da barra de atividades",
+    "hint": "Ative ou desative as seções da barra de atividades do Saropa aqui (salvas com a área de trabalho, sem sair do painel)."
+  },
+  "securityPosture": {
+    "issueOne": "{count} issue",
+    "issueOther": "{count} issues",
+    "noIssues": "Sem problemas",
+    "showIssues": "Mostrar problemas",
+    "violationTooltip": "{count} violation(s) across {ruleCount} rule(s). Click to show in Issues.",
+    "noViolationsTooltip": "Nenhuma violação mapeada para esta categoria."
   }
 }

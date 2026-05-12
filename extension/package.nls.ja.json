@@ -18,7 +18,7 @@
   "command.openConfig.title": "サロパリント: 分析オプションを開く",
   "command.openPubspec.title": "サロパリント: pubspec.yaml を開く",
   "command.toggleRunAnalysisAfterConfigChange.title": "Saropa Lints: Toggle 構成変更後の分析の実行",
-  "command.pickUiLanguage.title": "Saropa Lints: UI 言語の選択",
+  "command.pickUiLanguage.title": "Saropa Lints: 言語 / Langue / Sprache / 言語 / 语言",
   "command.openConfigDashboard.title": "Saropa Lints: Lints 構成を開く",
   "command.openPackageVibrancy.title": "サロパリント: オープンパッケージの活気",
   "command.openProjectVibrancyReport.title": "Saropa Lints: オープンコードヘルスダッシュボード",

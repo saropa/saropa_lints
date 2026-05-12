@@ -75,7 +75,10 @@
       "title": "Мова інтерфейсу користувача Saropa Lints",
       "placeholder": "Виберіть мову для бічної панелі та інформаційних панелей",
       "auto": "Автоматично (дотримуйтеся мови відображення коду VS)"
-    }
+    },
+    "reloadPrompt": "Мова встановлена ​​на 0. Перезавантажте вікно, щоб оновити бічну панель і мітки команд. {locale}",
+    "reloadNow": "Перезавантажте зараз",
+    "reloadLater": "Пізніше"
   },
   "brand": {
     "prefix": "Саропа"
@@ -635,5 +638,158 @@
       "matchOne": "{count} match",
       "matchOther": "{count} matches"
     }
+  },
+  "codeHealth": {
+    "documentTitle": "Інформаційна панель Saropa Code Health",
+    "skipToTable": "Перейти до таблиці функцій",
+    "openWorkspaceFirst": "Спочатку відкрийте робоче середовище Dart/Flutter.",
+    "scanningTitle": "Код Health: функції сканування…",
+    "runReportFirst": "Запустіть звіт ще раз, а потім скопіюйте JSON.",
+    "copiedJson": "Код Health JSON скопійовано в буфер обміну.",
+    "couldNotOpenFile": "Не вдалося відкрити файл: 0 {path}",
+    "panelTitle": "Інформаційна панель Saropa Code Health",
+    "hero": {
+      "title": "Інформаційна панель Saropa Code Health",
+      "generated": "Згенерований",
+      "functionOne": "{count} function",
+      "functionOther": "{count} functions",
+      "avgFormat": "середнє 0 (1) {score} {grade}",
+      "gatesFailing": "ворота виходять з ладу",
+      "gatesPassing": "проходження воріт"
+    },
+    "gauge": {
+      "tooltip": "Середній бал 0 із 100 (оцінка 1). {rounded} {grade}",
+      "ariaLabel": "Середній бал 0 із 100 {rounded}"
+    },
+    "gate": {
+      "fallback": "Помилка перевірки якості — перегляньте порогові значення в налаштуваннях працездатності коду.",
+      "failingOne": "{count} gate failing — review thresholds, or copy the JSON to inspect gates.violations.",
+      "failingOther": "{count} gates failing — review thresholds, or copy the JSON to inspect gates.violations.",
+      "openSettingsTitle": "Відкрийте параметри працездатності коду, щоб налаштувати порогові значення.",
+      "openSettingsButton": "Відкрийте параметри працездатності коду"
+    },
+    "kpi": {
+      "ariaLabel": "Зведення про стан коду",
+      "allClear": "Немає позначених функцій у жодній категорії — все зрозуміло.",
+      "clickToFilter": "Натисніть, щоб відфільтрувати таблицю за функціями, позначеними 0. {flag}",
+      "noFlagged": "Функції не позначено 0. {flag}",
+      "unused": "Невикористаний",
+      "unusedSub": "функції, на які ніде не посилається",
+      "uncovered": "Розкритий",
+      "uncoveredSub": "немає покриття LCOV",
+      "stubTested": "Перевірено",
+      "stubTestedSub": "тести існують, але стверджують мало",
+      "suspiciousCoverage": "Підозріле покриття",
+      "suspiciousCoverageSub": "покриття виглядає сфабрикованим",
+      "testDrift": "Тестовий дрейф",
+      "testDriftSub": "тести відстають від функції"
+    },
+    "toolbar": {
+      "ariaLabel": "Код здоров'я дії",
+      "rescanTitle": "Повторно запустіть сканування коду та оновіть цю інформаційну панель.",
+      "rescan": "Повторне сканування",
+      "copyJsonTitle": "Скопіюйте необроблений JSON коду Health у буфер обміну.",
+      "copyJson": "Скопіюйте JSON",
+      "settingsTitle": "Відкрийте параметри працездатності коду.",
+      "settingsButton": "Параметри працездатності коду",
+      "filterTitle": "Фільтруйте рядки за назвою, файлом або прапорцем.",
+      "filterLabel": "Фільтрувати рядки",
+      "filterPlaceholder": "Фільтрувати рядки…"
+    },
+    "table": {
+      "ariaLabel": "Найгірші функції за балами",
+      "heading": "Найгірші функції",
+      "topCount": "зверху 0 з 1 {shown} {total}",
+      "colGrade": "Оцінка",
+      "colScore": "Оцінка",
+      "colFunction": "функція",
+      "colFile": "Файл",
+      "colLine": "лінія",
+      "colUsage": "Використання",
+      "colCoverage": "Покриття",
+      "colComplexity": "Складність",
+      "colFlags": "Прапори",
+      "noMatch": "Жодна функція не відповідає поточним фільтрам.",
+      "resetFiltersTitle": "Очистіть пошук і будь-який активний фільтр прапорців.",
+      "resetFilters": "Скинути фільтри",
+      "hint": "Показ 200 найгірших функцій за балами. Використовуйте поле пошуку для подальшого звуження."
+    },
+    "shortcuts": {
+      "focusFilter": "Сфокусувати фільтр рядка",
+      "clearFilter": "Очистіть фільтр виділеного рядка",
+      "activateKpi": "Активуйте фокусну картку KPI",
+      "activateKpiSpace": "Активуйте фокусну картку KPI",
+      "showOverlay": "Показати цей ярлик"
+    },
+    "script": {
+      "activeFiltersLabel": "Активні фільтри:",
+      "searchChip": "пошук: \"0\" {q}",
+      "flagChip": "прапор: 0 {flag}",
+      "removeAria": "Видаліть 0 {key}",
+      "clearAll": "Очистити все",
+      "rowsVisible": "{visible} of {total} rows visible",
+      "neverRun": "ніколи не біжи"
+    },
+    "freshness": {
+      "justNow": "тільки зараз",
+      "minutesAgo": "{min}m ago",
+      "hoursAgo": "{hr}h ago",
+      "daysAgo": "{day}d ago",
+      "weeksAgo": "{wk}w ago"
+    }
+  },
+  "suppressionsStrip": {
+    "noData": "Поки немає порушень.json — запустіть аналіз, щоб заповнити знімок придушення.",
+    "zeroTotal": "0 придушень аналізатора в останньому експорті.",
+    "noKindBreakdown": "У цьому експорті немає розподілу за видами.",
+    "title": "Придушення (експорт)",
+    "readOnlyNote": "(тільки для читання; відкрийте Findings, щоб переглядати та діяти.)",
+    "openFindings": "Відкрийте інформаційну панель результатів"
+  },
+  "configMirrors": {
+    "noFileRisk": "Немає розподілу ризиків по файлах (немає порушень у сфері).",
+    "suppressionNote": "Збігається з підсумком.json, а не з живими перемикачами блокування бічної панелі.",
+    "noSuppression": "У цьому експорті відсутній агрегат придушення (старіший аналізатор або нульові придушення).",
+    "owaspSignal": "{count} violation(s) in this export carry OWASP mobile/web mapping — open Security Posture for the full matrix and export.",
+    "summarySuppressions": "Придушення (експорт знімка)",
+    "summaryOwasp": "Безпека (сигнал OWASP)",
+    "summaryFileRisk": "Файловий ризик (найпопулярніші файли)"
+  },
+  "telemetry": {
+    "heroTitle": "Пов’язане правило телеметрії",
+    "skipToCounters": "Перейти до лічильників телеметрії",
+    "lastEvent": "Остання подія 0 {relative}",
+    "noEvents": "Подій не зареєстровано",
+    "totalEventOne": "{count} total event",
+    "totalEventOther": "{count} total events",
+    "noCountersTitle": "Немає лічильників для скидання.",
+    "resetTitle": "Обнулити всі лічильники",
+    "refreshTitle": "Перезавантажте лічильники телеметрії з диска",
+    "refresh": "Оновити",
+    "copyTitle": "Скопіюйте знімок як JSON",
+    "copyJson": "Скопіюйте JSON",
+    "resetCounters": "Обнулити лічильники",
+    "countersAria": "Лічильники",
+    "countersHeading": "Лічильники подій",
+    "thEvent": "Подія",
+    "thCount": "Граф",
+    "emptyMessage": "Подій телеметрії ще не зареєстровано — відкрийте правило на інформаційній панелі результатів, щоб розпочати реєстрацію лічильників.",
+    "openFindingsTitle": "Відкрийте інформаційну панель Saropa Findings.",
+    "openFindings": "Відкрийте інформаційну панель результатів",
+    "lastPropsHeading": "Властивості останньої події",
+    "copiedJson": "Saropa Lints: скопійовано пов’язане правило телеметрії JSON.",
+    "countersReset": "Saropa Lints: скидання лічильників телеметрії пов’язаних правил."
+  },
+  "sidebarLayout": {
+    "summary": "Макет панелі активності",
+    "hint": "Тут можна ввімкнути або вимкнути розділи панелі активності Saropa (зберігаються разом із робочою областю, не виходячи з інформаційної панелі)."
+  },
+  "securityPosture": {
+    "issueOne": "{count} issue",
+    "issueOther": "{count} issues",
+    "noIssues": "Жодних питань",
+    "showIssues": "Показати проблеми",
+    "violationTooltip": "{count} violation(s) across {ruleCount} rule(s). Click to show in Issues.",
+    "noViolationsTooltip": "Жодне порушення не віднесено до цієї категорії."
   }
 }

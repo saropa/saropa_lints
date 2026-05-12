@@ -18,7 +18,7 @@
   "command.openConfig.title": "Saropa Lints: Tùy chọn phân tích mở",
   "command.openPubspec.title": "Saropa Lint: Mở pubspec.yaml",
   "command.toggleRunAnalysisAfterConfigChange.title": "Saropa Lints: Chuyển đổi phân tích chạy sau khi thay đổi cấu hình",
-  "command.pickUiLanguage.title": "Saropa Lints: Chọn ngôn ngữ giao diện người dùng",
+  "command.pickUiLanguage.title": "Saropa Lints: Ngôn ngữ / Langue / Sprache / 言語 / 语言",
   "command.openConfigDashboard.title": "Saropa Lints: Mở cấu hình Lints",
   "command.openPackageVibrancy.title": "Saropa Lints: Sự sống động của gói mở",
   "command.openProjectVibrancyReport.title": "Saropa Lints: Bảng thông tin sức khỏe mã mở",

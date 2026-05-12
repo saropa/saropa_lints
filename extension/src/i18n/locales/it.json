@@ -75,7 +75,10 @@
       "title": "Lingua interfaccia Saropa Lints",
       "placeholder": "Scegli la lingua per barra laterale e dashboard",
       "auto": "Automatico (segui la lingua di visualizzazione di VS Code)"
-    }
+    },
+    "reloadPrompt": "Lingua impostata su 0. Ricarica la finestra per aggiornare la barra laterale e le etichette dei comandi. {locale}",
+    "reloadNow": "Ricarica ora",
+    "reloadLater": "Dopo"
   },
   "brand": {
     "prefix": "Saropa"
@@ -635,5 +638,158 @@
       "matchOne": "{count} match",
       "matchOther": "{count} matches"
     }
+  },
+  "codeHealth": {
+    "documentTitle": "Cruscotto sanitario del codice Saropa",
+    "skipToTable": "Passa alla tabella delle funzioni",
+    "openWorkspaceFirst": "Aprire prima un'area di lavoro Dart/Flutter.",
+    "scanningTitle": "Integrità del codice: funzioni di scansione…",
+    "runReportFirst": "Esegui nuovamente il report, quindi copia JSON.",
+    "copiedJson": "JSON Code Health copiato negli appunti.",
+    "couldNotOpenFile": "Impossibile aprire il file: 0 {path}",
+    "panelTitle": "Cruscotto sanitario del codice Saropa",
+    "hero": {
+      "title": "Cruscotto sanitario del codice Saropa",
+      "generated": "Generato",
+      "functionOne": "{count} function",
+      "functionOther": "{count} functions",
+      "avgFormat": "media 0 (1) {score} {grade}",
+      "gatesFailing": "cancelli falliti",
+      "gatesPassing": "cancelli che passano"
+    },
+    "gauge": {
+      "tooltip": "Punteggio medio 0 su 100 (voto 1). {rounded} {grade}",
+      "ariaLabel": "Punteggio medio 0 su 100 {rounded}"
+    },
+    "gate": {
+      "fallback": "I controlli di qualità non sono riusciti: rivedi le soglie nelle impostazioni di integrità del codice.",
+      "failingOne": "{count} gate failing — review thresholds, or copy the JSON to inspect gates.violations.",
+      "failingOther": "{count} gates failing — review thresholds, or copy the JSON to inspect gates.violations.",
+      "openSettingsTitle": "Apri le impostazioni di integrità del codice per regolare le soglie.",
+      "openSettingsButton": "Apri le impostazioni di integrità del codice"
+    },
+    "kpi": {
+      "ariaLabel": "Riepilogo dello stato del codice",
+      "allClear": "Nessuna funzione contrassegnata in nessuna categoria: tutto chiaro.",
+      "clickToFilter": "Fare clic per filtrare la tabella in base alle funzioni contrassegnate con 0. {flag}",
+      "noFlagged": "Nessuna funzione contrassegnata 0. {flag}",
+      "unused": "Inutilizzato",
+      "unusedSub": "funzioni referenziate da nessuna parte",
+      "uncovered": "Scoperto",
+      "uncoveredSub": "nessuna copertura LCOV",
+      "stubTested": "Testato in stub",
+      "stubTestedSub": "i test esistono ma affermano poco",
+      "suspiciousCoverage": "Copertura sospetta",
+      "suspiciousCoverageSub": "la copertura sembra inventata",
+      "testDrift": "Prova la deriva",
+      "testDriftSub": "i test ritardano la funzione"
+    },
+    "toolbar": {
+      "ariaLabel": "Azioni del codice sanitario",
+      "rescanTitle": "Esegui nuovamente la scansione dell'integrità del codice e aggiorna questa dashboard.",
+      "rescan": "Nuova scansione",
+      "copyJsonTitle": "Copia il codice JSON Code Health non elaborato negli appunti.",
+      "copyJson": "Copia JSON",
+      "settingsTitle": "Apri le impostazioni di integrità del codice.",
+      "settingsButton": "Impostazioni di integrità del codice",
+      "filterTitle": "Filtra le righe per nome, file o flag.",
+      "filterLabel": "Filtra righe",
+      "filterPlaceholder": "Filtra righe…"
+    },
+    "table": {
+      "ariaLabel": "Peggiori funzioni per punteggio",
+      "heading": "Le peggiori funzioni",
+      "topCount": "in alto 0 di 1 {shown} {total}",
+      "colGrade": "Grado",
+      "colScore": "Punto",
+      "colFunction": "Funzione",
+      "colFile": "File",
+      "colLine": "Linea",
+      "colUsage": "Utilizzo",
+      "colCoverage": "Copertura",
+      "colComplexity": "Complessità",
+      "colFlags": "Bandiere",
+      "noMatch": "Nessuna funzione corrisponde ai filtri attuali.",
+      "resetFiltersTitle": "Cancella la ricerca e qualsiasi filtro di segnalazione attivo.",
+      "resetFilters": "Reimposta i filtri",
+      "hint": "Mostra le 200 funzioni peggiori in base al punteggio. Utilizza il campo di ricerca per restringere ulteriormente."
+    },
+    "shortcuts": {
+      "focusFilter": "Mettere a fuoco il filtro di riga",
+      "clearFilter": "Cancella il filtro della riga focalizzata",
+      "activateKpi": "Attiva la scheda KPI focalizzata",
+      "activateKpiSpace": "Attiva la scheda KPI focalizzata",
+      "showOverlay": "Mostra questa sovrapposizione di scorciatoia"
+    },
+    "script": {
+      "activeFiltersLabel": "Filtri attivi:",
+      "searchChip": "ricerca: \"0\" {q}",
+      "flagChip": "bandiera: 0 {flag}",
+      "removeAria": "Rimuovi 0 {key}",
+      "clearAll": "Cancella tutto",
+      "rowsVisible": "{visible} of {total} rows visible",
+      "neverRun": "non correre mai"
+    },
+    "freshness": {
+      "justNow": "proprio adesso",
+      "minutesAgo": "{min}m ago",
+      "hoursAgo": "{hr}h ago",
+      "daysAgo": "{day}d ago",
+      "weeksAgo": "{wk}w ago"
+    }
+  },
+  "suppressionsStrip": {
+    "noData": "Ancora nessun violazioni.json: esegui l'analisi per popolare lo snapshot di soppressione.",
+    "zeroTotal": "0 soppressioni dell'analizzatore nell'ultima esportazione.",
+    "noKindBreakdown": "Nessuna ripartizione per tipologia in questa esportazione.",
+    "title": "Soppressioni (esportazione)",
+    "readOnlyNote": "(sola lettura; apri Risultati per sfogliare e agire.)",
+    "openFindings": "Apri il dashboard dei risultati"
+  },
+  "configMirrors": {
+    "noFileRisk": "Nessuna suddivisione del rischio per file (nessuna violazione nell'ambito).",
+    "suppressionNote": "Corrisponde al riepilogo di violazioni.json, non agli attivatori/disattivatori di soppressione della barra laterale live.",
+    "noSuppression": "Nessun aggregato di soppressione in questa esportazione (analizzatore precedente o soppressioni pari a zero).",
+    "owaspSignal": "{count} violation(s) in this export carry OWASP mobile/web mapping — open Security Posture for the full matrix and export.",
+    "summarySuppressions": "Eliminazioni (esportazione istantanea)",
+    "summaryOwasp": "Atteggiamento di sicurezza (segnale OWASP)",
+    "summaryFileRisk": "Rischio file (file principali)"
+  },
+  "telemetry": {
+    "heroTitle": "Telemetria delle regole correlate",
+    "skipToCounters": "Passa ai contatori di telemetria",
+    "lastEvent": "Ultimo evento 0 {relative}",
+    "noEvents": "Nessun evento registrato",
+    "totalEventOne": "{count} total event",
+    "totalEventOther": "{count} total events",
+    "noCountersTitle": "Nessun contatore da reimpostare.",
+    "resetTitle": "Azzera tutti i contatori",
+    "refreshTitle": "Ricarica i contatori di telemetria dal disco",
+    "refresh": "Aggiorna",
+    "copyTitle": "Copia l'istantanea come JSON",
+    "copyJson": "Copia JSON",
+    "resetCounters": "Azzerare i contatori",
+    "countersAria": "Contatori",
+    "countersHeading": "Contatori di eventi",
+    "thEvent": "Evento",
+    "thCount": "Contare",
+    "emptyMessage": "Nessun evento di telemetria ancora registrato: apri una regola dalla dashboard dei risultati per iniziare ad acquisire i contatori.",
+    "openFindingsTitle": "Apri la dashboard dei risultati di Saropa.",
+    "openFindings": "Apri il dashboard dei risultati",
+    "lastPropsHeading": "Proprietà dell'ultimo evento",
+    "copiedJson": "Saropa Lints: copiata la telemetria della regola correlata JSON.",
+    "countersReset": "Saropa Lints: azzerati i contatori della telemetria delle regole correlate."
+  },
+  "sidebarLayout": {
+    "summary": "Disposizione della barra delle attività",
+    "hint": "Attiva o disattiva qui le sezioni della barra delle attività di Saropa (salvate con l'area di lavoro, senza uscire dal dashboard)."
+  },
+  "securityPosture": {
+    "issueOne": "{count} issue",
+    "issueOther": "{count} issues",
+    "noIssues": "Nessun problema",
+    "showIssues": "Mostra problemi",
+    "violationTooltip": "{count} violation(s) across {ruleCount} rule(s). Click to show in Issues.",
+    "noViolationsTooltip": "Nessuna violazione associata a questa categoria."
   }
 }

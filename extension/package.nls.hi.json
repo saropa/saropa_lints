@@ -18,7 +18,7 @@
   "command.openConfig.title": "सरोपा लिंट्स: विश्लेषण विकल्प खोलें",
   "command.openPubspec.title": "सरोपा लिंट्स: pubspec.yaml खोलें",
   "command.toggleRunAnalysisAfterConfigChange.title": "सरोपा लिंट्स: कॉन्फ़िगरेशन परिवर्तन के बाद टॉगल रन विश्लेषण",
-  "command.pickUiLanguage.title": "सरोपा लिंट्स: यूआई भाषा चुनें",
+  "command.pickUiLanguage.title": "सरोपा लिंट्स: भाषा / भाषा / स्प्रेचे / 言語 / 语言",
   "command.openConfigDashboard.title": "सरोपा लिंट्स: लिंट्स कॉन्फिग खोलें",
   "command.openPackageVibrancy.title": "सरोपा लिंट्स: ओपन पैकेज वाइब्रेंसी",
   "command.openProjectVibrancyReport.title": "सरोपा लिंट्स: ओपन कोड हेल्थ डैशबोर्ड",

@@ -75,7 +75,10 @@
       "title": "Saropa Lints の UI 言語",
       "placeholder": "サイドバーとダッシュボードの言語を選ぶ",
       "auto": "自動（VS Code の表示言語に従う）"
-    }
+    },
+    "reloadPrompt": "言語は「0」に設定されています。ウィンドウを再ロードして、サイドバーとコマンドのラベルを更新します。 {locale}",
+    "reloadNow": "今すぐリロード",
+    "reloadLater": "後で"
   },
   "brand": {
     "prefix": "サロパ"
@@ -635,5 +638,158 @@
       "matchOne": "{count} match",
       "matchOther": "{count} matches"
     }
+  },
+  "codeHealth": {
+    "documentTitle": "サロパコードヘルスダッシュボード",
+    "skipToTable": "関数テーブルにスキップ",
+    "openWorkspaceFirst": "まず、Dart/Flutter ワークスペースを開きます。",
+    "scanningTitle": "コードの健全性: スキャン機能…",
+    "runReportFirst": "レポートを再度実行し、JSON をコピーします。",
+    "copiedJson": "コードヘルス JSON がクリップボードにコピーされました。",
+    "couldNotOpenFile": "ファイルを開けませんでした: 0 {path}",
+    "panelTitle": "サロパコードヘルスダッシュボード",
+    "hero": {
+      "title": "サロパコードヘルスダッシュボード",
+      "generated": "生成された",
+      "functionOne": "{count} function",
+      "functionOther": "{count} functions",
+      "avgFormat": "平均0 (1) {score} {grade}",
+      "gatesFailing": "ゲートが失敗する",
+      "gatesPassing": "ゲート通過"
+    },
+    "gauge": {
+      "tooltip": "平均スコア 0/100 (グレード 1)。 {rounded} {grade}",
+      "ariaLabel": "平均スコア 0/100 {rounded}"
+    },
+    "gate": {
+      "fallback": "品質ゲートが失敗しました — コードの健全性設定でしきい値を確認してください。",
+      "failingOne": "{count} gate failing — review thresholds, or copy the JSON to inspect gates.violations.",
+      "failingOther": "{count} gates failing — review thresholds, or copy the JSON to inspect gates.violations.",
+      "openSettingsTitle": "コードヘルス設定を開いて、しきい値を調整します。",
+      "openSettingsButton": "コードヘルス設定を開く"
+    },
+    "kpi": {
+      "ariaLabel": "コードの健全性の概要",
+      "allClear": "どのカテゴリにもフラグが立てられた関数はなく、すべてクリアされています。",
+      "clickToFilter": "クリックすると、「0」フラグが付けられた関数にテーブルがフィルターされます。 {flag}",
+      "noFlagged": "「0」フラグが立てられた関数はありません。 {flag}",
+      "unused": "未使用",
+      "unusedSub": "関数がどこにも参照されていない",
+      "uncovered": "発見された",
+      "uncoveredSub": "LCOVの対象外",
+      "stubTested": "スタブテスト済み",
+      "stubTestedSub": "テストは存在しますが、ほとんど主張しません",
+      "suspiciousCoverage": "不審な報道",
+      "suspiciousCoverageSub": "報道が捏造されているように見える",
+      "testDrift": "テストドリフト",
+      "testDriftSub": "テストが関数に遅れる"
+    },
+    "toolbar": {
+      "ariaLabel": "コードヘルスアクション",
+      "rescanTitle": "コードヘルススキャンを再実行し、このダッシュボードを更新します。",
+      "rescan": "再スキャン",
+      "copyJsonTitle": "生の Code Health JSON をクリップボードにコピーします。",
+      "copyJson": "JSONをコピー",
+      "settingsTitle": "コードヘルス設定を開きます。",
+      "settingsButton": "コードヘルス設定",
+      "filterTitle": "名前、ファイル、またはフラグで行をフィルターします。",
+      "filterLabel": "行をフィルタリングする",
+      "filterPlaceholder": "行をフィルタリング…"
+    },
+    "table": {
+      "ariaLabel": "スコア別の最悪の関数",
+      "heading": "最悪の機能",
+      "topCount": "1の先頭0 {shown} {total}",
+      "colGrade": "学年",
+      "colScore": "スコア",
+      "colFunction": "関数",
+      "colFile": "ファイル",
+      "colLine": "ライン",
+      "colUsage": "使用法",
+      "colCoverage": "カバレッジ",
+      "colComplexity": "複雑",
+      "colFlags": "フラグ",
+      "noMatch": "現在のフィルターに一致する関数はありません。",
+      "resetFiltersTitle": "検索とアクティブなフラグ フィルターをクリアします。",
+      "resetFilters": "フィルターをリセットする",
+      "hint": "最悪の 200 個の関数をスコア別に表示します。検索フィールドを使用してさらに絞り込みます。"
+    },
+    "shortcuts": {
+      "focusFilter": "行フィルターに焦点を当てる",
+      "clearFilter": "フォーカスされた行フィルターをクリアします",
+      "activateKpi": "焦点を絞った KPI カードをアクティブ化する",
+      "activateKpiSpace": "焦点を絞った KPI カードをアクティブ化する",
+      "showOverlay": "このショートカット オーバーレイを表示する"
+    },
+    "script": {
+      "activeFiltersLabel": "アクティブフィルター:",
+      "searchChip": "検索:「0」 {q}",
+      "flagChip": "フラグ: 0 {flag}",
+      "removeAria": "0を削除 {key}",
+      "clearAll": "すべてクリア",
+      "rowsVisible": "{visible} of {total} rows visible",
+      "neverRun": "決して走らないでください"
+    },
+    "freshness": {
+      "justNow": "ちょうど今",
+      "minutesAgo": "{min}m ago",
+      "hoursAgo": "{hr}h ago",
+      "daysAgo": "{day}d ago",
+      "weeksAgo": "{wk}w ago"
+    }
+  },
+  "suppressionsStrip": {
+    "noData": "Violations.json はまだありません。分析を実行して抑制スナップショットを作成します。",
+    "zeroTotal": "最新のエクスポートではアナライザーの抑制が 0 件ありました。",
+    "noKindBreakdown": "この輸出では種類別の内訳はありません。",
+    "title": "抑制（エクスポート）",
+    "readOnlyNote": "(読み取り専用。検索結果を開いて参照して操作します。)",
+    "openFindings": "調査結果ダッシュボードを開く"
+  },
+  "configMirrors": {
+    "noFileRisk": "ファイルごとのリスクの内訳はありません (範囲内に違反はありません)。",
+    "suppressionNote": "ライブサイドバー抑制の切り替えではなく、iolations.json の概要と一致します。",
+    "noSuppression": "このエクスポートには抑制集計がありません (古いアナライザーまたはゼロ抑制)。",
+    "owaspSignal": "{count} violation(s) in this export carry OWASP mobile/web mapping — open Security Posture for the full matrix and export.",
+    "summarySuppressions": "抑制 (スナップショットのエクスポート)",
+    "summaryOwasp": "セキュリティ体制 (OWASP 信号)",
+    "summaryFileRisk": "ファイルのリスク (上位ファイル)"
+  },
+  "telemetry": {
+    "heroTitle": "関連ルールテレメトリー",
+    "skipToCounters": "テレメトリーカウンターにスキップ",
+    "lastEvent": "最後のイベント 0 {relative}",
+    "noEvents": "イベントは記録されていません",
+    "totalEventOne": "{count} total event",
+    "totalEventOther": "{count} total events",
+    "noCountersTitle": "リセットするカウンターはありません。",
+    "resetTitle": "すべてのカウンターをリセット",
+    "refreshTitle": "ディスクからテレメトリ カウンタをリロードする",
+    "refresh": "リフレッシュ",
+    "copyTitle": "スナップショットを JSON としてコピー",
+    "copyJson": "JSONをコピー",
+    "resetCounters": "カウンタをリセットする",
+    "countersAria": "カウンター",
+    "countersHeading": "イベントカウンター",
+    "thEvent": "イベント",
+    "thCount": "カウント",
+    "emptyMessage": "テレメトリ イベントはまだ記録されていません。検出結果ダッシュボードからルールを開いて、カウンターのキャプチャを開始します。",
+    "openFindingsTitle": "サロパの調査結果ダッシュボードを開きます。",
+    "openFindings": "調査結果ダッシュボードを開く",
+    "lastPropsHeading": "最後のイベントのプロパティ",
+    "copiedJson": "Saropa Lints: 関連ルール テレメトリ JSON をコピーしました。",
+    "countersReset": "Saropa Lints: 関連するルール テレメトリ カウンターがリセットされました。"
+  },
+  "sidebarLayout": {
+    "summary": "アクティビティバーのレイアウト",
+    "hint": "ここで、Saropa アクティビティ バー セクションをオンまたはオフにします (ダッシュボードを離れることなく、ワークスペースに保存されます)。"
+  },
+  "securityPosture": {
+    "issueOne": "{count} issue",
+    "issueOther": "{count} issues",
+    "noIssues": "問題ありません",
+    "showIssues": "問題を表示する",
+    "violationTooltip": "{count} violation(s) across {ruleCount} rule(s). Click to show in Issues.",
+    "noViolationsTooltip": "このカテゴリにマッピングされた違反はありません。"
   }
 }

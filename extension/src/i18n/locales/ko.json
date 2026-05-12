@@ -75,7 +75,10 @@
       "title": "Saropa Lints UI 언어",
       "placeholder": "사이드바와 대시보드 언어 선택",
       "auto": "자동(VS Code 표시 언어 따름)"
-    }
+    },
+    "reloadPrompt": "언어가 0로 설정되었습니다. 사이드바 및 명령 레이블을 업데이트하려면 창을 다시 로드하세요. {locale}",
+    "reloadNow": "지금 새로고침",
+    "reloadLater": "나중에"
   },
   "brand": {
     "prefix": "사로파"
@@ -635,5 +638,158 @@
       "matchOne": "{count} match",
       "matchOther": "{count} matches"
     }
+  },
+  "codeHealth": {
+    "documentTitle": "사로파 코드 상태 대시보드",
+    "skipToTable": "기능 표로 건너뛰기",
+    "openWorkspaceFirst": "먼저 Dart/Flutter 작업공간을 엽니다.",
+    "scanningTitle": "코드 상태: 검색 기능…",
+    "runReportFirst": "보고서를 다시 실행한 후 JSON을 복사하세요.",
+    "copiedJson": "Code Health JSON이 클립보드에 복사되었습니다.",
+    "couldNotOpenFile": "파일을 열 수 없습니다: 0 {path}",
+    "panelTitle": "사로파 코드 상태 대시보드",
+    "hero": {
+      "title": "사로파 코드 상태 대시보드",
+      "generated": "생성됨",
+      "functionOne": "{count} function",
+      "functionOther": "{count} functions",
+      "avgFormat": "평균 0 (1) {score} {grade}",
+      "gatesFailing": "게이트 실패",
+      "gatesPassing": "게이트 통과"
+    },
+    "gauge": {
+      "tooltip": "평균 점수 0/100(등급 1). {rounded} {grade}",
+      "ariaLabel": "100점 만점의 평균 점수 0 {rounded}"
+    },
+    "gate": {
+      "fallback": "품질 게이트 실패 - 코드 상태 설정에서 임계값을 검토하세요.",
+      "failingOne": "{count} gate failing — review thresholds, or copy the JSON to inspect gates.violations.",
+      "failingOther": "{count} gates failing — review thresholds, or copy the JSON to inspect gates.violations.",
+      "openSettingsTitle": "임계값을 조정하려면 코드 상태 설정을 엽니다.",
+      "openSettingsButton": "코드 상태 설정 열기"
+    },
+    "kpi": {
+      "ariaLabel": "코드 상태 요약",
+      "allClear": "모든 카테고리에 플래그가 지정된 기능이 없습니다. 모두 지워집니다.",
+      "clickToFilter": "0 플래그가 지정된 기능으로 테이블을 필터링하려면 클릭하세요. {flag}",
+      "noFlagged": "0로 표시된 기능이 없습니다. {flag}",
+      "unused": "미사용",
+      "unusedSub": "아무데도 참조되지 않는 함수",
+      "uncovered": "발견됨",
+      "uncoveredSub": "LCOV 보장 없음",
+      "stubTested": "스텁 테스트 완료",
+      "stubTestedSub": "테스트가 존재하지만 거의 주장하지 않음",
+      "suspiciousCoverage": "의심스러운 보도",
+      "suspiciousCoverageSub": "커버리지가 조작된 것 같아요",
+      "testDrift": "테스트 드리프트",
+      "testDriftSub": "테스트가 기능보다 지연됩니다."
+    },
+    "toolbar": {
+      "ariaLabel": "코드 상태 작업",
+      "rescanTitle": "코드 상태 검사를 다시 실행하고 이 대시보드를 새로 고치세요.",
+      "rescan": "다시 스캔",
+      "copyJsonTitle": "원시 Code Health JSON을 클립보드에 복사합니다.",
+      "copyJson": "JSON 복사",
+      "settingsTitle": "코드 상태 설정을 엽니다.",
+      "settingsButton": "코드 상태 설정",
+      "filterTitle": "이름, 파일 또는 플래그별로 행을 필터링합니다.",
+      "filterLabel": "행 필터링",
+      "filterPlaceholder": "행 필터링…"
+    },
+    "table": {
+      "ariaLabel": "점수별 최악의 기능",
+      "heading": "최악의 기능",
+      "topCount": "1 중 상위 0 {shown} {total}",
+      "colGrade": "등급",
+      "colScore": "점수",
+      "colFunction": "기능",
+      "colFile": "파일",
+      "colLine": "선",
+      "colUsage": "용법",
+      "colCoverage": "적용 범위",
+      "colComplexity": "복잡성",
+      "colFlags": "플래그",
+      "noMatch": "현재 필터와 일치하는 기능이 없습니다.",
+      "resetFiltersTitle": "검색 및 활성 플래그 필터를 지웁니다.",
+      "resetFilters": "필터 재설정",
+      "hint": "점수별로 최악의 기능 200개를 보여줍니다. 더 범위를 좁히려면 검색 필드를 사용하세요."
+    },
+    "shortcuts": {
+      "focusFilter": "행 필터에 집중",
+      "clearFilter": "초점이 맞춰진 행 필터 지우기",
+      "activateKpi": "집중된 KPI 카드 활성화",
+      "activateKpiSpace": "집중된 KPI 카드 활성화",
+      "showOverlay": "이 바로가기 오버레이 표시"
+    },
+    "script": {
+      "activeFiltersLabel": "활성 필터:",
+      "searchChip": "검색: \"0\" {q}",
+      "flagChip": "플래그: 0 {flag}",
+      "removeAria": "0 제거 {key}",
+      "clearAll": "모두 지우기",
+      "rowsVisible": "{visible} of {total} rows visible",
+      "neverRun": "절대 뛰지 마세요"
+    },
+    "freshness": {
+      "justNow": "방금",
+      "minutesAgo": "{min}m ago",
+      "hoursAgo": "{hr}h ago",
+      "daysAgo": "{day}d ago",
+      "weeksAgo": "{wk}w ago"
+    }
+  },
+  "suppressionsStrip": {
+    "noData": "아직 위반.json이 없습니다. 분석을 실행하여 억제 스냅샷을 채웁니다.",
+    "zeroTotal": "최근 내보내기에서는 분석기 억제가 0개입니다.",
+    "noKindBreakdown": "이번 수출에는 종류별 분류가 없습니다.",
+    "title": "억제(내보내기)",
+    "readOnlyNote": "(읽기 전용, 찾아보고 조치하려면 결과를 엽니다.)",
+    "openFindings": "발견 항목 대시보드 열기"
+  },
+  "configMirrors": {
+    "noFileRisk": "파일별 위험 분석이 없습니다(범위 위반 없음).",
+    "suppressionNote": "라이브 사이드바 억제 토글이 아닌 위반.json 요약과 일치합니다.",
+    "noSuppression": "이 내보내기에는 억제 집계가 없습니다(이전 분석기 또는 0 억제).",
+    "owaspSignal": "{count} violation(s) in this export carry OWASP mobile/web mapping — open Security Posture for the full matrix and export.",
+    "summarySuppressions": "억제(스냅샷 내보내기)",
+    "summaryOwasp": "보안 태세(OWASP 신호)",
+    "summaryFileRisk": "파일 위험(상위 파일)"
+  },
+  "telemetry": {
+    "heroTitle": "관련 규칙 원격 측정",
+    "skipToCounters": "원격 측정 카운터로 건너뛰기",
+    "lastEvent": "마지막 이벤트 0 {relative}",
+    "noEvents": "기록된 이벤트가 없습니다.",
+    "totalEventOne": "{count} total event",
+    "totalEventOther": "{count} total events",
+    "noCountersTitle": "재설정할 카운터가 없습니다.",
+    "resetTitle": "모든 카운터 재설정",
+    "refreshTitle": "디스크에서 원격 측정 카운터 다시 로드",
+    "refresh": "새로 고치다",
+    "copyTitle": "스냅샷을 JSON으로 복사",
+    "copyJson": "JSON 복사",
+    "resetCounters": "카운터 재설정",
+    "countersAria": "카운터",
+    "countersHeading": "이벤트 카운터",
+    "thEvent": "이벤트",
+    "thCount": "세다",
+    "emptyMessage": "아직 기록된 원격 측정 이벤트가 없습니다. 결과 대시보드에서 규칙을 열어 카운터 캡처를 시작하세요.",
+    "openFindingsTitle": "사로파 결과 대시보드를 엽니다.",
+    "openFindings": "발견 항목 대시보드 열기",
+    "lastPropsHeading": "마지막 이벤트 속성",
+    "copiedJson": "Saropa Lints: 관련 규칙 원격 측정 JSON을 복사했습니다.",
+    "countersReset": "사로파 린트(Saropa Lints): 관련 규칙 원격 측정 카운터가 재설정됩니다."
+  },
+  "sidebarLayout": {
+    "summary": "활동 표시줄 레이아웃",
+    "hint": "여기에서 Saropa 활동 표시줄 섹션을 켜거나 끕니다(대시보드를 떠나지 않고 작업 공간과 함께 저장됨)."
+  },
+  "securityPosture": {
+    "issueOne": "{count} issue",
+    "issueOther": "{count} issues",
+    "noIssues": "문제 없음",
+    "showIssues": "문제 표시",
+    "violationTooltip": "{count} violation(s) across {ruleCount} rule(s). Click to show in Issues.",
+    "noViolationsTooltip": "이 카테고리에 매핑된 위반사항이 없습니다."
   }
 }
