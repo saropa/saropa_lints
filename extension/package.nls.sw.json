@@ -7,7 +7,7 @@
   "views.actions.name": "Vitendo",
   "views.status.name": "Hali",
   "views.settings.name": "Mipangilio",
-  "views.help.name": "Msaada (v13.7.0)",
+  "views.help.name": "Help (v13.7.0)",
   "viewsWelcome.banner.contents": "**Saropa Lints**\n\nSheria za 2100+ za Dart na Flutter kwa usalama, ufikiaji na utendakazi.\n\nInahitaji mradi wa Dart au Flutter.\n\nFungua folda iliyo na `pubspec.yaml` ili kuanza.\n\n[Pata maelezo zaidi mtandaoni](https://pub.dev/packages/saropa_lints)\n[Vinjari Amri Zote](command:saropaLints.showCommandCatalog)\n[Kuhusu Saropa Lints](command:saropaLints.showAbout)\n[Kuanza](amri:saropaLints.openWalkthrough)",
   "command.enable.title": "Viungo vya Saropa: Sanidi Mradi (pubspec + config)",
   "command.disable.title": "Saropa Lints: Zima Ushirikiano wa Lint",
