@@ -7,7 +7,7 @@
   "views.actions.name": "Tindakan",
   "views.status.name": "Status",
   "views.settings.name": "Pengaturan",
-  "views.help.name": "Bantuan (v13.6.0)",
+  "views.help.name": "Bantuan (v13.7.0)",
   "viewsWelcome.banner.contents": "**Saropa Lint**\n\n2100+ aturan lint Dart dan Flutter untuk keamanan, aksesibilitas, dan performa.\n\nMemerlukan proyek Dart atau Flutter.\n\nBuka folder yang berisi `pubspec.yaml` untuk memulai.\n\n[Pelajari lebih lanjut secara online](https://pub.dev/packages/saropa_lints)\n[Jelajahi Semua Perintah](perintah:saropaLints.showCommandCatalog)\n[Tentang Saropa Lints](perintah:saropaLints.showAbout)\n[Memulai](perintah:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: Menyiapkan Proyek (pubspec + config)",
   "command.disable.title": "Saropa Lints: Matikan Integrasi Lint",

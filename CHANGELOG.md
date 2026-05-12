@@ -45,7 +45,7 @@
 
 ---
 
-## [13.7.0] - Unreleased
+## [13.7.0]
 
 The VS Code extension dashboard is now fully internationalized, and two analyzer-facing bugs are fixed — a false positive on Face ID rules when the plist key was already present, and a crash on projects running analyzer v9.
 

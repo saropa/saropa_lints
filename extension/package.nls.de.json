@@ -7,7 +7,7 @@
   "views.actions.name": "Aktionen",
   "views.status.name": "Status",
   "views.settings.name": "Einstellungen",
-  "views.help.name": "Hilfe (v13.6.0)",
+  "views.help.name": "Hilfe (v13.7.0)",
   "viewsWelcome.banner.contents": "**Saropa-Fusseln**\n\nÜber 2100 Dart- und Flutter-Flusenregeln für Sicherheit, Zugänglichkeit und Leistung.\n\nErfordert ein Dart- oder Flutter-Projekt.\n\nÖffnen Sie einen Ordner mit „pubspec.yaml“, um zu beginnen.\n\n[Weitere Informationen online](https://pub.dev/packages/saropa_lints)\n[Alle Befehle durchsuchen](command:saropaLints.showCommandCatalog)\n[Über Saropa Lints](command:saropaLints.showAbout)\n[Erste Schritte](Befehl:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: Projekt einrichten (pubspec + config)",
   "command.disable.title": "Saropa Lints: Lint-Integration deaktivieren",

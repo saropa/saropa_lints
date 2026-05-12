@@ -7,7 +7,7 @@
   "views.actions.name": "कार्रवाई",
   "views.status.name": "स्थिति",
   "views.settings.name": "सेटिंग्स",
-  "views.help.name": "सहायता (v13.6.0)",
+  "views.help.name": "सहायता (v13.7.0)",
   "viewsWelcome.banner.contents": "**सरोपा लिंट्स**\n\nसुरक्षा, पहुंच और प्रदर्शन के लिए 2100+ डार्ट और फ़्लटर लिंट नियम।\n\nडार्ट या फ़्लटर प्रोजेक्ट की आवश्यकता है।\n\nआरंभ करने के लिए `pubspec.yaml` वाला फ़ोल्डर खोलें।\n\n[ऑनलाइन अधिक जानें](https://pub.dev/packages/saropa_lints)\n[सभी कमांड ब्राउज़ करें](कमांड:saropaLints.showCommandCatalog)\n[सरोपा लिंट्स के बारे में](कमांड:saropaLints.showAbout)\n[आरंभ करना](कमांड:saropaLints.openWalkthrow)",
   "command.enable.title": "सरोपा लिंट्स: सेट अप प्रोजेक्ट (पबस्पेक + कॉन्फ़िगरेशन)",
   "command.disable.title": "सरोपा लिंट्स: लिंट इंटीग्रेशन बंद करें",
