@@ -14,24 +14,24 @@ This guide is intentionally implementation-ready. Optional alignment with an ext
 
 ## Execution snapshot
 
-### Status (2026-05-08)
+### Status (2026-05-11)
 
 | Track | Status | Notes |
 |-------|--------|--------|
 | **L10N-01** Manifest NLS | **Done** | `extension/package.json` uses `%key%`; `extension/package.nls.json` is the English source; `extension/package.nls.<locale>.json` shipped for the default locale set; local guard `npm run verify-nls-keys` (runs `extension/scripts/verify-manifest-nls-keys.mjs`). |
-| **L10N-02** Runtime webviews | **Done** (shipped set) | Findings / triage dashboards, keyboard overlay, full-width toggle, command catalog webview, Package Vibrancy `report-html.ts`, and wide-report host strings use `t()` + `en.json`; non-English catalogs are regenerated via `generate_locales.py` (dictionary + optional `SAROPA_I18N_MACHINE_TRANSLATE`). **Shipped runtime + manifest locales (24):** `ar, bn, de, es, fa, fil, fr, he, hi, id, it, ja, ko, nl, pl, pt, ru, sw, th, tr, uk, ur, vi, zh` (union of primary and secondary tiers in [Target locale strategy](#target-locale-strategy)). New locale files default to English until you run the generator with machine translation enabled. |
+| **L10N-02** Runtime webviews | **Done** | All webview/dashboard surfaces now resolve user-facing text through `l10n()` + `en.json`: Findings, triage, command catalog, Package Vibrancy, wide-report host, **Code Health**, **Config Dashboard suppressions strip**, **Lints Config mirrors**, **Related Rule Telemetry**, **sidebar layout panel**, and **Security Posture tree**. Non-English catalogs regenerated via `generate_locales.py`. **Shipped runtime + manifest locales (24):** `ar, bn, de, es, fa, fil, fr, he, hi, id, it, ja, ko, nl, pl, pt, ru, sw, th, tr, uk, ur, vi, zh`. |
 | **L10N-03** CI quality gates | **Partial** | **CI runs manifest key coverage** (`node extension/scripts/verify-manifest-nls-keys.mjs` on every push/PR). Locale key parity, placeholder parity, and “no inline literals” lint are **not** automated yet; use `python extension/scripts/i18n/audit_coverage.py` locally for coverage reports. |
 
 ### Next work (ordered)
 
-1. **Dashboard migration** — Route remaining webview/dashboard literals through `runtime.ts` keys (prioritize high-traffic surfaces: Findings / violations HTML).
-2. **Translation quality** — Curate high-risk strings in `extension/scripts/i18n/dictionaries.py` (product names, dependency-count templates); re-run `generate_locales.py` with `SAROPA_I18N_MACHINE_TRANSLATE=1` after English copy changes.
-3. **Stronger CI** — Add automated key/placeholder parity across `package.nls*.json` and `locales/*.json`; optional ESLint/custom check for new inline UI strings in `extension/src/views/`.
+1. **Translation quality** — Curate high-risk strings in `extension/scripts/i18n/dictionaries.py` (product names, dependency-count templates); re-run `generate_locales.py` with `SAROPA_I18N_MACHINE_TRANSLATE=1` after English copy changes.
+2. **Stronger CI** — Add automated key/placeholder parity across `package.nls*.json` and `locales/*.json`; optional ESLint/custom check for new inline UI strings in `extension/src/views/`.
+3. **RTL validation** — Test RTL locales (ar, he, fa, ur) for layout and placeholder correctness.
 
 ### Done criteria for this plan
 
 - [x] Manifest-visible strings are sourced from `%key%` entries with `package.nls.json` (English) and translated `package.nls.<locale>.json` where shipped.
-- [ ] Webview/dashboard strings resolve through runtime i18n keys **everywhere** (no residual inline user-facing literals in dashboard HTML builders).
+- [x] Webview/dashboard strings resolve through runtime i18n keys **everywhere** (no residual inline user-facing literals in dashboard HTML builders).
 - [x] CI fails when a `%key%` in `package.json` is missing from `package.nls.json`.
 - [ ] CI fails on locale key/placeholder drift (pending).
 
@@ -62,7 +62,7 @@ Use two coordinated layers because VS Code extension UX has two rendering domain
 
 2. **Webview/dashboard runtime localization** (HTML/JS rendered UI):
    - Source of truth: **`extension/src/i18n/locales/en.json`** plus generated **`extension/src/i18n/locales/<locale>.json`** (Python `generate_locales.py` + `dictionaries.py`). An ARB export path remains optional for parity with external translation tooling (Phase 2).
-   - Runtime lookup: **`extension/src/i18n/runtime.ts`** (`t`, `format`, locale normalization).
+   - Runtime lookup: **`extension/src/i18n/runtime.ts`** (`l10n`, `format`, locale normalization).
 
 Why this split:
 - VS Code natively localizes `package.json` contributions via `package.nls*`.
@@ -219,7 +219,7 @@ At extension activation:
 For webviews:
 
 - Serialize locale map in the HTML payload (or expose just needed keys per view for payload size control).
-- Use a tiny `t(key, params?)` helper in each webview script.
+- Use a tiny `l10n(key, params?)` helper in each webview script.
 
 ---
 
@@ -246,7 +246,7 @@ CI and local checks to prevent localization regressions:
 | `extension/package.nls.json` | English manifest strings |
 | `extension/package.nls.<locale>.json` | Translated manifest strings |
 | `extension/scripts/verify-manifest-nls-keys.mjs` | Manifest `%key%` → `package.nls.json` CI/local guard |
-| `extension/src/i18n/runtime.ts` | Runtime `t` / `format`, locale catalogs |
+| `extension/src/i18n/runtime.ts` | Runtime `l10n` / `format`, locale catalogs |
 | `extension/src/i18n/locales/en.json` | English runtime catalog |
 | `extension/src/i18n/locales/<locale>.json` | Translated runtime catalogs |
 | `extension/scripts/i18n/generate_locales.py` | Regenerate locale JSON from English + dictionaries |
@@ -263,7 +263,7 @@ Optional later: typed keys (`keys.ts`), dedicated parity scripts, or ARB export/
 
 2. **Sidebar + command palette + settings** — Done: contributed strings use NLS keys.
 
-3. **Dashboards/webviews** — In progress: migrate remaining inline dashboard HTML/TS strings to runtime keys.
+3. **Dashboards/webviews** — Done: all dashboard/webview surfaces route user-facing text through `l10n()` runtime keys.
 
 4. **Locale generation** — Done for default set: `generate_locales.py` + `dictionaries.py`; expand locales toward [target list](#target-locale-strategy).
 
@@ -276,7 +276,7 @@ Optional later: typed keys (`keys.ts`), dedicated parity scripts, or ARB export/
 The extension meets the **full** bar when all are true:
 
 - [x] No user-facing English literals remain in manifest-visible fields (NLS keys + translated `package.nls.<locale>.json` per shipped locale).
-- [ ] All dashboard/webview strings resolve through runtime i18n keys (manifest done; large HTML builders still in flight — see [Execution snapshot](#execution-snapshot)).
+- [x] All dashboard/webview strings resolve through runtime i18n keys.
 - [ ] `package.nls.<locale>.json` and matching runtime `locales/<locale>.json` exist for each **target** locale you commit to ship (see [Target locale strategy](#target-locale-strategy)).
 - [ ] CI blocks locale key/placeholder drift (manifest-only coverage today).
 - [ ] RTL locales validated for layout and placeholders.

@@ -39,6 +39,8 @@ Each backfill batch should record:
 
 ---
 
+<!-- cspell:ignore docstrings -->
+
 ## What’s left to do
 
 | Priority      | What                                                                                                                                                                                                 |

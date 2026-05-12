@@ -45,13 +45,24 @@
 
 ---
 
-## [13.6.1]
+## [13.7.0] - Unreleased
 
-Fixes a remaining analyzer v9 compatibility crash where accessing class body members threw `UnsupportedError` at runtime, preventing the plugin from analyzing files in projects pinned to older analyzer versions ([#224](https://github.com/saropa/saropa_lints/issues/224)). [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
+The VS Code extension dashboard is now fully internationalized, and two analyzer-facing bugs are fixed — a false positive on Face ID rules when the plist key was already present, and a crash on projects running analyzer v9.
+
+### Changed (Extension)
+
+- **Dashboard i18n: remaining webview strings routed through runtime keys** — Code Health, Config Dashboard suppressions strip, Lints Config mirrors, Related Rule Telemetry, sidebar layout panel, and Security Posture tree now resolve all user-facing text through `l10n()` instead of hardcoded English literals; locale files regenerated for all 24 shipped locales. No action required.
+- **Language picker: reload prompt and multilingual discoverability** — changing the UI language now prompts to reload the window (manifest NLS labels like sidebar and command titles require a VS Code reload to take effect); the command palette entry shows the word "Language" in five languages so non-English speakers can find it; the "Auto" option shows which locale it resolves to. No action required.
 
 ### Fixed
 
 - **Analyzer v9 `useDeclaringConstructorsAst` crash** — all 335+ `.body.members` call sites now use safe `bodyMembers` / `bodyConstants` extensions that fall back to the pre-declaring-constructors API when the gate throws; projects on `analysis_server_plugin ^0.3.4` with `analyzer 9.x` can run `dart analyze` without the plugin crashing. No action required.
+- **`require_ios_face_id_usage_description` false positive when Info.plist key is present** — the rule's early-return guard failed to locate the project root when the analyzed file was resolved via a non-filesystem URI scheme (`package:`, `dart:`, etc.), causing the guard to fall through and fire on every `LocalAuthentication` call site even when `NSFaceIDUsageDescription` was already configured; URI handling and Windows path normalization in `InfoPlistChecker` are now robust. No action required.
+
+<details><summary>Maintenance</summary>
+- **Runtime i18n function renamed `t()` → `l10n()`** — the translation lookup function in `runtime.ts` is now `l10n()` for clarity; all 492 call sites updated. No action required unless you import `t` from `src/i18n/runtime` in a fork.
+
+</details>
 
 ---
 
