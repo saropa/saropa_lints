@@ -45,6 +45,25 @@
 
 ---
 
+## [13.7.1] - Unreleased
+
+### Fixed
+
+- **Analyzer v9 `useDeclaringConstructorsAst` crashes fully resolved** — all `.namePart.typeName` accesses (132 sites) and `.namePart.typeParameters` accesses (4 sites) now use safe `nameToken` / `nameTypeParameters` extensions that fall back to the pre-gate `.name` / `.typeParameters` API; additionally, `_wrapCallback` now catches `UnsupportedError` globally so any remaining gated property on any analyzer version skips the rule gracefully instead of crashing the plugin. Closes the remaining failures reported in [#224](https://github.com/saropa/saropa_lints/issues/224). No action required.
+
+### Fixed (Extension)
+
+- **Regression-nudge toasts no longer stack during slow linting** — when the analyzer writes partial results over several seconds the score can cross multiple thresholds downward, previously firing a separate notification for each; now the nudge debounces for 3 seconds and shows only the worst threshold crossed. No action required.
+
+<details><summary>Maintenance</summary>
+
+- Ran `dart pub get` in `packages/saropa_lints_api/` to resolve missing `test` dependency; added source comment noting sub-package requires its own dependency resolution.
+- Tracked `reports/organize_reports.py` in git by switching `.gitignore` from directory-level to content-level ignore with a negation rule.
+
+</details>
+
+---
+
 ## [13.7.0]
 
 The VS Code extension dashboard is now fully internationalized, and two analyzer-facing bugs are fixed — a false positive on Face ID rules when the plist key was already present, and a crash on projects running analyzer v9.

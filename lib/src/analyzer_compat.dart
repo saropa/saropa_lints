@@ -11,6 +11,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/error/error.dart';
 
 /// Provides `.members` on [ClassBody] for analyzer 11 compatibility.
@@ -57,6 +58,34 @@ extension SafeClassDeclMembers on ClassDeclaration {
       }
     }
   }
+
+  /// The class name [Token].
+  ///
+  /// Tries `.namePart.typeName` (analyzer 10+), falls back to `.name`
+  /// (analyzer 9 with useDeclaringConstructorsAst disabled).
+  Token get nameToken {
+    try {
+      return namePart.typeName;
+    } on UnsupportedError {
+      return (this as dynamic).name as Token;
+    }
+  }
+
+  /// Type parameters from the name part, or `null`.
+  ///
+  /// Tries `.namePart.typeParameters` (analyzer 10+), falls back to
+  /// `.typeParameters` directly on the declaration (analyzer 9).
+  TypeParameterList? get nameTypeParameters {
+    try {
+      return namePart.typeParameters;
+    } on UnsupportedError {
+      try {
+        return (this as dynamic).typeParameters as TypeParameterList?;
+      } catch (_) {
+        return null;
+      }
+    }
+  }
 }
 
 /// Safe `.body.members` access for [EnumDeclaration] in analyzer v9.
@@ -93,6 +122,15 @@ extension SafeEnumDeclMembers on EnumDeclaration {
       }
     }
   }
+
+  /// The enum name [Token]. See [SafeClassDeclMembers.nameToken].
+  Token get nameToken {
+    try {
+      return namePart.typeName;
+    } on UnsupportedError {
+      return (this as dynamic).name as Token;
+    }
+  }
 }
 
 /// Safe `.body.members` access for [MixinDeclaration] in analyzer v9.
@@ -127,6 +165,22 @@ extension SafeExtensionTypeDeclMembers on ExtensionTypeDeclaration {
       } catch (_) {
         return const [];
       }
+    }
+  }
+
+  /// The extension type name [Token]. See [SafeClassDeclMembers.nameToken].
+  ///
+  /// Uses dynamic access because [ExtensionTypeDeclaration] may not expose
+  /// `.namePart` at compile time in all analyzer versions.
+  Token get nameToken {
+    final self = this as dynamic;
+    try {
+      final part = self.namePart;
+      return part.typeName as Token;
+    } on UnsupportedError {
+      return self.name as Token;
+    } on NoSuchMethodError {
+      return self.name as Token;
     }
   }
 }

@@ -475,7 +475,7 @@ class AvoidUnnecessaryEnumPrefixRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addEnumDeclaration((EnumDeclaration node) {
-      final String enumName = node.namePart.typeName.lexeme;
+      final String enumName = node.nameToken.lexeme;
 
       // Visit all expressions inside the enum
       node.accept(_EnumPrefixVisitor(enumName, reporter, code));

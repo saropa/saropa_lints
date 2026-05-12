@@ -2037,7 +2037,7 @@ class AvoidScreenshotSensitiveRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final String className = node.namePart.typeName.lexeme.toLowerCase();
+      final String className = node.nameToken.lexeme.toLowerCase();
 
       // Skip debug/tooling screens (e.g. debug DB viewer, WebView from settings).
       for (final String tool in _debugToolingNames) {

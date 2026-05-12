@@ -2327,7 +2327,7 @@ class AvoidDefaultToStringRule extends SaropaLintRule {
       }
 
       if (hasFields && !hasToString) {
-        reporter.atToken(node.namePart.typeName, code);
+        reporter.atToken(node.nameToken, code);
       }
     });
   }

@@ -578,7 +578,7 @@ class RequireDatabaseMigrationRule extends SaropaLintRule {
             !classSource.contains('Migration') &&
             !classSource.contains('schema') &&
             !classSource.contains('version')) {
-          final String className = node.namePart.typeName.lexeme;
+          final String className = node.nameToken.lexeme;
           if (!className.contains('Migration') &&
               !className.contains('Version')) {
             reporter.atNode(node);

@@ -2,6 +2,7 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 
+import '../../analyzer_compat.dart';
 import '../../native/saropa_fix.dart';
 
 /// Quick fix: Generate a `toString()` override listing all instance fields.
@@ -49,7 +50,7 @@ class AddToStringFix extends SaropaFixProducer {
     }
     if (fields.isEmpty) return;
 
-    final className = classDecl.namePart.typeName.lexeme;
+    final className = classDecl.nameToken.lexeme;
     // Use the class declaration node to derive indentation level.
     final indent = getLineIndent(classDecl);
     final memberIndent = '$indent  ';

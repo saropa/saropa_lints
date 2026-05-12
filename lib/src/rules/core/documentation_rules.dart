@@ -70,7 +70,7 @@ class RequirePublicApiDocumentationRule extends SaropaLintRule {
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
       // Skip private classes
-      if (node.namePart.typeName.lexeme.startsWith('_')) return;
+      if (node.nameToken.lexeme.startsWith('_')) return;
 
       // Check for documentation comment
       if (node.documentationComment == null) {
@@ -91,7 +91,7 @@ class RequirePublicApiDocumentationRule extends SaropaLintRule {
       final ClassDeclaration? classDecl = node
           .thisOrAncestorOfType<ClassDeclaration>();
       if (classDecl != null &&
-          classDecl.namePart.typeName.lexeme.startsWith('_')) {
+          classDecl.nameToken.lexeme.startsWith('_')) {
         return;
       }
 
@@ -663,10 +663,10 @@ class RequireExampleInDocumentationRule extends SaropaLintRule {
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
       // Skip private classes
-      if (node.namePart.typeName.lexeme.startsWith('_')) return;
+      if (node.nameToken.lexeme.startsWith('_')) return;
 
       // Only check complex classes
-      final String className = node.namePart.typeName.lexeme;
+      final String className = node.nameToken.lexeme;
       bool isComplexClass = false;
       for (final String suffix in _complexClassSuffixes) {
         if (className.endsWith(suffix)) {

@@ -3676,7 +3676,7 @@ class RequireWebsocketReconnectionRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final String className = node.namePart.typeName.lexeme;
+      final String className = node.nameToken.lexeme;
 
       if (className == 'WebSocketChannel' || className == 'WebSocket') return;
 

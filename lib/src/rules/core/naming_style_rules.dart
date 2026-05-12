@@ -373,7 +373,7 @@ class MatchClassNamePatternRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final String name = node.namePart.typeName.lexeme;
+      final String name = node.nameToken.lexeme;
 
       // Skip private classes
       if (name.startsWith('_')) return;
@@ -407,7 +407,7 @@ class MatchClassNamePatternRule extends SaropaLintRule {
               !name.endsWith('Builder')) {
             // Allow any name for widgets, but warn if very generic
             if (name.length < 4) {
-              reporter.atToken(node.namePart.typeName, code);
+              reporter.atToken(node.nameToken, code);
             }
           }
         }
@@ -415,7 +415,7 @@ class MatchClassNamePatternRule extends SaropaLintRule {
         // State classes should end with State
         if (superName == 'State') {
           if (!name.endsWith('State') && !name.startsWith('_')) {
-            reporter.atToken(node.namePart.typeName, code);
+            reporter.atToken(node.nameToken, code);
           }
         }
       }
@@ -1888,10 +1888,10 @@ class PreferMatchFileNameRule extends SaropaLintRule {
       // Only check the first public class
       for (final CompilationUnitMember member in node.declarations) {
         if (member is ClassDeclaration) {
-          final String className = member.namePart.typeName.lexeme;
+          final String className = member.nameToken.lexeme;
           if (className.startsWith('_')) continue;
           if (className != expectedClassName) {
-            reporter.atToken(member.namePart.typeName, code);
+            reporter.atToken(member.nameToken, code);
           }
           return; // Only check the first public class
         }
@@ -2167,9 +2167,9 @@ class PreferBasePrefixRule extends SaropaLintRule {
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
       if (node.abstractKeyword == null) return;
-      final String name = node.namePart.typeName.lexeme;
+      final String name = node.nameToken.lexeme;
       if (name.endsWith('Base')) return;
-      reporter.atToken(node.namePart.typeName, code);
+      reporter.atToken(node.nameToken, code);
     });
   }
 }
@@ -2298,9 +2298,9 @@ class PreferIPrefixInterfacesRule extends SaropaLintRule {
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
       if (node.abstractKeyword == null) return;
-      final String name = node.namePart.typeName.lexeme;
+      final String name = node.nameToken.lexeme;
       if (name.startsWith('I') && name.length > 1) return;
-      reporter.atToken(node.namePart.typeName, code);
+      reporter.atToken(node.nameToken, code);
     });
   }
 }
@@ -2342,11 +2342,11 @@ class PreferNoIPrefixInterfacesRule extends SaropaLintRule {
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
       if (node.abstractKeyword == null) return;
-      final String name = node.namePart.typeName.lexeme;
+      final String name = node.nameToken.lexeme;
       if (!name.startsWith('I') || name.length < 2) return;
       final String second = name[1];
       if (second != second.toUpperCase() && second != '_') return;
-      reporter.atToken(node.namePart.typeName, code);
+      reporter.atToken(node.nameToken, code);
     });
   }
 }
@@ -2390,9 +2390,9 @@ class PreferImplSuffixRule extends SaropaLintRule {
       final clause = node.implementsClause;
       if (clause == null) return;
       if (clause.interfaces.isEmpty) return;
-      final String name = node.namePart.typeName.lexeme;
+      final String name = node.nameToken.lexeme;
       if (name.endsWith('Impl')) return;
-      reporter.atToken(node.namePart.typeName, code);
+      reporter.atToken(node.nameToken, code);
     });
   }
 }
@@ -2530,7 +2530,7 @@ class PreferEnhancedEnumsRule extends SaropaLintRule {
     final Set<String> enumNames = <String>{};
 
     context.addEnumDeclaration((EnumDeclaration node) {
-      enumNames.add(node.namePart.typeName.lexeme);
+      enumNames.add(node.nameToken.lexeme);
     });
 
     // Check for extensions on enums
@@ -3061,13 +3061,13 @@ class PreferNounClassNamesRule extends SaropaLintRule {
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
       if (node.abstractKeyword != null) return;
-      final name = node.namePart.typeName.lexeme;
+      final name = node.nameToken.lexeme;
       if (name.endsWith('ing') && !_ingAllowlist.contains(name)) {
-        reporter.atToken(node.namePart.typeName);
+        reporter.atToken(node.nameToken);
         return;
       }
       if ((name.endsWith('able') || name.endsWith('ible'))) {
-        reporter.atToken(node.namePart.typeName);
+        reporter.atToken(node.nameToken);
       }
     });
   }

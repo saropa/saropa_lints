@@ -2811,7 +2811,7 @@ class PreferWidgetStateMixinRule extends SaropaLintRule {
       }
 
       if (stateFields >= 2) {
-        reporter.atToken(node.namePart.typeName, code);
+        reporter.atToken(node.nameToken, code);
       }
     });
   }
@@ -2936,7 +2936,7 @@ class AvoidRecursiveWidgetCallsRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final String className = node.namePart.typeName.lexeme;
+      final String className = node.nameToken.lexeme;
 
       // Check if it's a widget class
       final ExtendsClause? extendsClause = node.extendsClause;

@@ -1235,7 +1235,7 @@ class PreferSingleDeclarationPerFileRule extends SaropaLintRule {
       final int majorDeclarations = classCount + enumCount + mixinCount;
       if (majorDeclarations > 1 && secondClass != null) {
         // Skip if it looks like a private helper class
-        if (secondClass.namePart.typeName.lexeme.startsWith('_')) return;
+        if (secondClass.nameToken.lexeme.startsWith('_')) return;
 
         // Skip if all classes are abstract final with only static members
         // (pure constant / utility namespaces co-located for discoverability)

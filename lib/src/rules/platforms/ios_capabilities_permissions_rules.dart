@@ -2727,7 +2727,7 @@ class RequireIosQuickNoteAwarenessRule extends SaropaLintRule {
 
     // Only check for document-like screens
     context.addClassDeclaration((ClassDeclaration node) {
-      final String className = node.namePart.typeName.lexeme.toLowerCase();
+      final String className = node.nameToken.lexeme.toLowerCase();
 
       if (className.contains('document') ||
           className.contains('article') ||

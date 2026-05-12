@@ -559,7 +559,7 @@ class RequireAppLifecycleHandlingRule extends SaropaLintRule {
       if (!_extendsState(node)) return;
       if (_hasLifecycleHandling(node)) return;
       if (_hasBackgroundWork(node)) {
-        reporter.atToken(node.namePart.typeName, code);
+        reporter.atToken(node.nameToken, code);
       }
     });
   }

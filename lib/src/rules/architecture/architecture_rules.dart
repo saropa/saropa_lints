@@ -266,7 +266,7 @@ class AvoidCircularDependenciesRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final String className = node.namePart.typeName.lexeme;
+      final String className = node.nameToken.lexeme;
 
       // Check constructor parameters for same-package service dependencies
       for (final ClassMember member in node.bodyMembers) {
@@ -646,7 +646,7 @@ class AvoidSingletonPatternRule extends SaropaLintRule {
         // Check for static instance field
         if (member is FieldDeclaration && member.isStatic) {
           final String? typeName = member.fields.type?.toSource();
-          if (typeName == node.namePart.typeName.lexeme) {
+          if (typeName == node.nameToken.lexeme) {
             hasStaticInstance = true;
           }
         }

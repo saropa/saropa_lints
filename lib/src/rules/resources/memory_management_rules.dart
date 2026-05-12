@@ -374,7 +374,7 @@ class RequireCacheEvictionPolicyRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final String className = node.namePart.typeName.lexeme.toLowerCase();
+      final String className = node.nameToken.lexeme.toLowerCase();
 
       // Only check classes that appear to be caches
       if (!className.contains('cache') && !className.contains('pool')) {
@@ -457,7 +457,7 @@ class PreferWeakReferencesForCacheRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final String className = node.namePart.typeName.lexeme.toLowerCase();
+      final String className = node.nameToken.lexeme.toLowerCase();
 
       // Only check classes that appear to be caches
       if (!className.contains('cache')) return;
@@ -730,7 +730,7 @@ class RequireCacheExpirationRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final String className = node.namePart.typeName.lexeme.toLowerCase();
+      final String className = node.nameToken.lexeme.toLowerCase();
 
       // Only check cache-related classes
       if (!className.contains('cache') && !className.contains('memo')) {
@@ -853,7 +853,7 @@ class AvoidUnboundedCacheGrowthRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final String className = node.namePart.typeName.lexeme.toLowerCase();
+      final String className = node.nameToken.lexeme.toLowerCase();
 
       // Only check cache-related classes
       if (!className.contains('cache') && !className.contains('memo')) {

@@ -3790,7 +3790,7 @@ class PreferIosSpotlightIndexingRule extends SaropaLintRule {
     }
 
     context.addClassDeclaration((ClassDeclaration node) {
-      final String className = node.namePart.typeName.lexeme.toLowerCase();
+      final String className = node.nameToken.lexeme.toLowerCase();
 
       if (className.contains('search') || className.contains('list')) {
         final String bodySource = node.toSource();
@@ -4453,7 +4453,7 @@ class PreferIosHandoffSupportRule extends SaropaLintRule {
     }
 
     context.addClassDeclaration((ClassDeclaration node) {
-      final String className = node.namePart.typeName.lexeme.toLowerCase();
+      final String className = node.nameToken.lexeme.toLowerCase();
 
       if (className.contains('editor') ||
           className.contains('compose') ||

@@ -226,7 +226,7 @@ class PreferOneWidgetPerFileRule extends SaropaLintRule {
       // Report on all widgets after the first one
       if (widgetClasses.length > 1) {
         for (int i = 1; i < widgetClasses.length; i++) {
-          reporter.atToken(widgetClasses[i].namePart.typeName, code);
+          reporter.atToken(widgetClasses[i].nameToken, code);
         }
       }
     });
@@ -1443,7 +1443,7 @@ class PreferWidgetMethodsOverClassesRule extends SaropaLintRule {
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
       // Only check private StatelessWidget classes
-      if (!node.namePart.typeName.lexeme.startsWith('_')) return;
+      if (!node.nameToken.lexeme.startsWith('_')) return;
 
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -1497,7 +1497,7 @@ class PreferWidgetMethodsOverClassesRule extends SaropaLintRule {
       final int lineCount = endLine - startLine + 1;
 
       if (lineCount <= _maxBuildLines) {
-        reporter.atToken(node.namePart.typeName, code);
+        reporter.atToken(node.nameToken, code);
       }
     });
   }
@@ -3664,7 +3664,7 @@ class PreferDocCommentsOverRegularRule extends SaropaLintRule {
 
     // Check classes
     context.addClassDeclaration((ClassDeclaration node) {
-      if (node.namePart.typeName.lexeme.startsWith('_')) return;
+      if (node.nameToken.lexeme.startsWith('_')) return;
       if (node.documentationComment != null) return;
       _checkPrecedingComment(
         node.firstTokenAfterCommentAndMetadata,

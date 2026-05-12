@@ -662,7 +662,7 @@ class PreferKeyboardShortcutsRule extends SaropaLintRule {
       }
 
       // Check if class name suggests it's the main app
-      final String className = node.namePart.typeName.lexeme;
+      final String className = node.nameToken.lexeme;
       if (!className.contains('App') && !className.contains('Main')) return;
 
       // Check if build method has Shortcuts
@@ -671,7 +671,7 @@ class PreferKeyboardShortcutsRule extends SaropaLintRule {
           classSource.contains('CupertinoApp')) {
         if (!classSource.contains('Shortcuts') &&
             !classSource.contains('CallbackShortcuts')) {
-          reporter.atToken(node.namePart.typeName, code);
+          reporter.atToken(node.nameToken, code);
         }
       }
     });

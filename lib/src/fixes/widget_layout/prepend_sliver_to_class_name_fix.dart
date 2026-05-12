@@ -3,6 +3,7 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/source/source_range.dart';
 
+import '../../analyzer_compat.dart';
 import '../../native/saropa_fix.dart';
 
 /// Renames `class Foo` to `class SliverFoo` when it does not already start with
@@ -27,7 +28,7 @@ class PrependSliverToClassNameFix extends SaropaFixProducer {
         : node?.thisOrAncestorOfType<ClassDeclaration>();
     if (classDecl == null) return;
 
-    final nameToken = classDecl.namePart.typeName;
+    final nameToken = classDecl.nameToken;
     final name = nameToken.lexeme;
     if (name.startsWith('Sliver')) return;
 

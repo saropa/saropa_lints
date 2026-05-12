@@ -548,7 +548,7 @@ class PreferSingleWidgetPerFileRule extends SaropaLintRule {
       for (final CompilationUnitMember member in node.declarations) {
         if (member is ClassDeclaration) {
           // Check if public (not starting with _)
-          if (member.namePart.typeName.lexeme.startsWith('_')) continue;
+          if (member.nameToken.lexeme.startsWith('_')) continue;
 
           // Check if extends Widget
           final ExtendsClause? extendsClause = member.extendsClause;

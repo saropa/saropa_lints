@@ -2184,7 +2184,7 @@ class RequireDisposeImplementationRule extends SaropaLintRule {
 
       if (!hasDispose) {
         // Report on the class name token
-        reporter.atToken(node.namePart.typeName, code);
+        reporter.atToken(node.nameToken, code);
       }
     });
   }
@@ -2325,7 +2325,7 @@ class PreferDisposeBeforeNewInstanceRule extends SaropaLintRule {
 
       // Skip if this is in a constructor
       if (enclosingMethod.name.lexeme ==
-          enclosingClass.namePart.typeName.lexeme) {
+          enclosingClass.nameToken.lexeme) {
         return;
       }
 
@@ -2575,7 +2575,7 @@ class DisposeClassFieldsRule extends SaropaLintRule {
       }
 
       if (!hasDisposeMethod) {
-        reporter.atToken(node.namePart.typeName, code);
+        reporter.atToken(node.nameToken, code);
       }
     });
   }

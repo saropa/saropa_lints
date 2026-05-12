@@ -1476,7 +1476,7 @@ class PreferValueListenableBuilderRule extends SaropaLintRule {
       if (stateFieldCount == 1 &&
           setStateCallCount >= 1 &&
           setStateCallCount <= 3) {
-        reporter.atToken(node.namePart.typeName, code);
+        reporter.atToken(node.nameToken, code);
       }
     });
   }
@@ -1579,7 +1579,7 @@ class AvoidGlobalKeyMisuseRule extends SaropaLintRule {
 
       // Warn if more than 2 GlobalKeys (likely overuse)
       if (globalKeyFields.length > 2) {
-        reporter.atToken(node.namePart.typeName, code);
+        reporter.atToken(node.nameToken, code);
       }
     });
   }

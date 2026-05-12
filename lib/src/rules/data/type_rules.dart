@@ -2226,7 +2226,7 @@ class PreferCorrectTypeNameRule extends SaropaLintRule {
     }
 
     context.addClassDeclaration((ClassDeclaration node) {
-      checkName(node.namePart.typeName);
+      checkName(node.nameToken);
     });
 
     context.addMixinDeclaration((MixinDeclaration node) {
@@ -2234,7 +2234,7 @@ class PreferCorrectTypeNameRule extends SaropaLintRule {
     });
 
     context.addEnumDeclaration((EnumDeclaration node) {
-      checkName(node.namePart.typeName);
+      checkName(node.nameToken);
     });
 
     context.addExtensionTypeDeclaration((ExtensionTypeDeclaration node) {
@@ -2627,7 +2627,7 @@ class AvoidShadowingTypeParametersRule extends SaropaLintRule {
       if (enclosingClass == null) return;
 
       final TypeParameterList? classTypeParams =
-          enclosingClass.namePart.typeParameters;
+          enclosingClass.nameTypeParameters;
       if (classTypeParams == null) return;
 
       // Build set of class type parameter names
@@ -3387,8 +3387,8 @@ class AbiSpecificIntegerInvalidRule extends SaropaLintRule {
       final CompilationUnit unit = node.root as CompilationUnit;
       if (!_compilationUnitImportsDartFfi(unit)) return;
 
-      if (node.namePart.typeParameters != null) {
-        reporter.atToken(node.namePart.typeName, code);
+      if (node.nameTypeParameters != null) {
+        reporter.atToken(node.nameToken, code);
         return;
       }
 
@@ -3400,12 +3400,12 @@ class AbiSpecificIntegerInvalidRule extends SaropaLintRule {
         }
       }
       if (!hasMapping) {
-        reporter.atToken(node.namePart.typeName, code);
+        reporter.atToken(node.nameToken, code);
         return;
       }
 
       if (node.finalKeyword == null) {
-        reporter.atToken(node.namePart.typeName, code);
+        reporter.atToken(node.nameToken, code);
         return;
       }
 
@@ -3419,7 +3419,7 @@ class AbiSpecificIntegerInvalidRule extends SaropaLintRule {
       if (ctors.length != 1 ||
           ctors.single.constKeyword == null ||
           otherMembers != 0) {
-        reporter.atToken(node.namePart.typeName, code);
+        reporter.atToken(node.nameToken, code);
       }
     });
   }

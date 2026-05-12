@@ -344,7 +344,7 @@ class PreferPublicExceptionClassesRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final String className = node.namePart.typeName.lexeme;
+      final String className = node.nameToken.lexeme;
       if (!className.startsWith('_')) return;
 
       // Check if this class extends Exception or Error
@@ -356,7 +356,7 @@ class PreferPublicExceptionClassesRule extends SaropaLintRule {
           superName == 'Error' ||
           superName.endsWith('Exception') ||
           superName.endsWith('Error')) {
-        reporter.atToken(node.namePart.typeName, code);
+        reporter.atToken(node.nameToken, code);
       }
     });
   }

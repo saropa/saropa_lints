@@ -319,7 +319,7 @@ class PreferConstrainedGenericsRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final TypeParameterList? typeParams = node.namePart.typeParameters;
+      final TypeParameterList? typeParams = node.nameTypeParameters;
       if (typeParams == null) return;
 
       for (final TypeParameter param in typeParams.typeParameters) {

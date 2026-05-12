@@ -345,7 +345,7 @@ class RequireImmutableBlocStateRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final String className = node.namePart.typeName.lexeme;
+      final String className = node.nameToken.lexeme;
 
       // Check if class name ends with 'State' (BLoC convention)
       if (!className.endsWith('State')) return;
@@ -412,7 +412,7 @@ class RequireImmutableBlocStateRule extends SaropaLintRule {
       }
 
       if (!hasImmutable && !hasEquatable) {
-        reporter.atToken(node.namePart.typeName, code);
+        reporter.atToken(node.nameToken, code);
       }
     });
   }
@@ -496,7 +496,7 @@ class PreferCubitForSimpleRule extends SaropaLintRule {
 
       // If only 1-2 simple events, suggest Cubit
       if (eventCount <= 2) {
-        reporter.atToken(node.namePart.typeName, code);
+        reporter.atToken(node.nameToken, code);
       }
     });
   }
@@ -747,7 +747,7 @@ class AvoidBlocEventMutationRule extends SaropaLintRule {
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
       // Check if this is an event class (naming convention)
-      final String className = node.namePart.typeName.lexeme;
+      final String className = node.nameToken.lexeme;
       if (!className.endsWith('Event')) return;
 
       // Check for mutable fields
@@ -1052,7 +1052,7 @@ class RequireErrorStateRule extends SaropaLintRule {
     final Set<String> sealedBases = <String>{};
 
     context.addClassDeclaration((ClassDeclaration node) {
-      final String className = node.namePart.typeName.lexeme;
+      final String className = node.nameToken.lexeme;
       if (className.endsWith('State')) {
         stateClasses[className] = node;
         if (node.sealedKeyword != null) {
@@ -1252,7 +1252,7 @@ class PreferSealedEventsRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final String className = node.namePart.typeName.lexeme;
+      final String className = node.nameToken.lexeme;
       if (!className.endsWith('Event')) return;
 
       // Check if abstract but not sealed
@@ -2122,7 +2122,7 @@ class PreferImmutableBlocEventsRule extends SaropaLintRule {
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
       // Check if class name ends with Event
-      final String className = node.namePart.typeName.lexeme;
+      final String className = node.nameToken.lexeme;
       if (!className.endsWith('Event')) return;
 
       // Check for mutable fields
@@ -2197,7 +2197,7 @@ class PreferImmutableBlocStateRule extends SaropaLintRule {
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
       // Check if class name ends with State
-      final String className = node.namePart.typeName.lexeme;
+      final String className = node.nameToken.lexeme;
       if (!className.endsWith('State')) return;
 
       // Exclude Flutter's State class by checking for extends StatefulWidget
@@ -2275,7 +2275,7 @@ class PreferSealedBlocEventsRule extends SaropaLintRule {
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
       // Check if class name ends with Event
-      final String className = node.namePart.typeName.lexeme;
+      final String className = node.nameToken.lexeme;
       if (!className.endsWith('Event')) return;
 
       // Check if it's a base class (abstract without extending another Event)
@@ -2351,7 +2351,7 @@ class PreferSealedBlocStateRule extends SaropaLintRule {
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
       // Check if class name ends with State
-      final String className = node.namePart.typeName.lexeme;
+      final String className = node.nameToken.lexeme;
       if (!className.endsWith('State')) return;
 
       // Check if it's a base class (abstract without extending another State)
@@ -2442,7 +2442,7 @@ class PreferBlocEventSuffixRule extends SaropaLintRule {
       // Check if this class extends something that ends with Event
       // but this class itself doesn't end with Event
       if (superName.endsWith('Event')) {
-        final String className = node.namePart.typeName.lexeme;
+        final String className = node.nameToken.lexeme;
         if (!className.endsWith('Event')) {
           reporter.atNode(node);
         }
@@ -2519,7 +2519,7 @@ class PreferBlocStateSuffixRule extends SaropaLintRule {
       // Check if this class extends something that ends with State (but not Flutter's State)
       // and this class itself doesn't end with State
       if (superName.endsWith('State') && superName != 'State') {
-        final String className = node.namePart.typeName.lexeme;
+        final String className = node.nameToken.lexeme;
         if (!className.endsWith('State')) {
           reporter.atNode(node);
         }
@@ -3383,11 +3383,11 @@ class RequireBlocErrorStateRule extends SaropaLintRule {
     context.addClassDeclaration((ClassDeclaration node) {
       // Check if sealed class ending with State
       if (node.sealedKeyword == null) return;
-      if (!node.namePart.typeName.lexeme.endsWith('State')) return;
+      if (!node.nameToken.lexeme.endsWith('State')) return;
 
       // This is a sealed state class - check file for error subclass
       final fileSource = context.fileContent;
-      final className = node.namePart.typeName.lexeme;
+      final className = node.nameToken.lexeme;
       final baseName = className.replaceAll('State', '');
 
       // Look for error/failure subclass
@@ -3549,7 +3549,7 @@ class RequireBlocManualDisposeRule extends SaropaLintRule {
 
       if (!hasCloseMethod) {
         // No close() method at all
-        reporter.atToken(node.namePart.typeName, code);
+        reporter.atToken(node.nameToken, code);
         return;
       }
 
@@ -3686,7 +3686,7 @@ class PreferCubitForSimpleStateRule extends SaropaLintRule {
 
       // If only one event type is handled, suggest Cubit
       if (eventHandlerCount == 1 && eventTypes.length == 1) {
-        reporter.atToken(node.namePart.typeName, code);
+        reporter.atToken(node.nameToken, code);
       }
     });
   }
@@ -4141,7 +4141,7 @@ class RequireBlocEventSealedRule extends SaropaLintRule {
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
       // Check if class name ends with Event
-      final name = node.namePart.typeName.lexeme;
+      final name = node.nameToken.lexeme;
       if (!name.endsWith('Event')) return;
 
       // Check if it's abstract but not sealed
@@ -4930,7 +4930,7 @@ class PreferBlocHydrationRule extends SaropaLintRule {
         if (member is FieldDeclaration) {
           final typeName = member.fields.type?.toSource();
           if (typeName == 'SharedPreferences') {
-            reporter.atToken(node.namePart.typeName, code);
+            reporter.atToken(node.nameToken, code);
             return;
           }
         }
@@ -4944,7 +4944,7 @@ class PreferBlocHydrationRule extends SaropaLintRule {
             _SharedPrefsUsageVisitor(() => hasSharedPrefs = true),
           );
           if (hasSharedPrefs) {
-            reporter.atToken(node.namePart.typeName, code);
+            reporter.atToken(node.nameToken, code);
             return;
           }
         }
@@ -5119,7 +5119,7 @@ class AvoidOverengineeredBlocStatesRule extends SaropaLintRule {
         <String, List<ClassDeclaration>>{};
 
     context.addClassDeclaration((ClassDeclaration node) {
-      final String className = node.namePart.typeName.lexeme;
+      final String className = node.nameToken.lexeme;
 
       // Check if this is a state base class (abstract class ending in State)
       if (node.abstractKeyword != null && className.endsWith('State')) {

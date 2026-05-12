@@ -237,14 +237,26 @@ class SaropaContext {
         return;
       }
       if (_shouldSkipCurrentFile()) return;
+
+      // Guard: analyzer v9 with useDeclaringConstructorsAst disabled throws
+      // UnsupportedError when rules access newer AST properties (.body,
+      // .namePart, etc.). Catching here prevents one gated property from
+      // crashing the entire plugin — the rule simply skips that file.
       if (!_timingEnabled) {
-        callback(node);
+        try {
+          callback(node);
+        } on UnsupportedError {
+          // Gated AST property — rule cannot analyze this file on this
+          // analyzer version. Silently skip rather than crash the plugin.
+        }
         return;
       }
 
       final stopwatch = Stopwatch()..start();
       try {
         callback(node);
+      } on UnsupportedError {
+        // Gated AST property — see comment above.
       } finally {
         stopwatch.stop();
         final elapsed = stopwatch.elapsed;

@@ -2184,7 +2184,7 @@ class AvoidMultipleAnimationControllersRule extends SaropaLintRule {
       }
 
       if (controllerCount >= _threshold) {
-        reporter.atToken(node.namePart.typeName);
+        reporter.atToken(node.nameToken);
       }
     });
   }

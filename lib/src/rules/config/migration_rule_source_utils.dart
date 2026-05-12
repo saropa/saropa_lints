@@ -4,6 +4,8 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/source/source_range.dart';
 
+import '../../analyzer_compat.dart';
+
 /// True when an instance creation of [typeLexeme] should be reported by
 /// Material deprecation rules.
 ///
@@ -38,11 +40,11 @@ bool compilationUnitDeclaresClassLikeName(
   String typeName,
 ) {
   for (final CompilationUnitMember d in unit.declarations) {
-    if (d is ClassDeclaration && d.namePart.typeName.lexeme == typeName) {
+    if (d is ClassDeclaration && d.nameToken.lexeme == typeName) {
       return true;
     }
     if (d is ClassTypeAlias && d.name.lexeme == typeName) return true;
-    if (d is EnumDeclaration && d.namePart.typeName.lexeme == typeName) {
+    if (d is EnumDeclaration && d.nameToken.lexeme == typeName) {
       return true;
     }
     if (d is MixinDeclaration && d.name.lexeme == typeName) return true;

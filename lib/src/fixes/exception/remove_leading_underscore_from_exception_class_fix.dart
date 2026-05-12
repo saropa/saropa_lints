@@ -3,6 +3,7 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/source/source_range.dart';
 
+import '../../analyzer_compat.dart';
 import '../../native/saropa_fix.dart';
 
 /// Quick fix: Remove leading underscore from exception class name.
@@ -30,11 +31,11 @@ class RemoveLeadingUnderscoreFromExceptionClassFix extends SaropaFixProducer {
         : node.thisOrAncestorOfType<ClassDeclaration>();
     if (classDecl == null) return;
 
-    final name = classDecl.namePart.typeName.lexeme;
+    final name = classDecl.nameToken.lexeme;
     if (!name.startsWith('_')) return;
 
     final newName = name.substring(1);
-    final token = classDecl.namePart.typeName;
+    final token = classDecl.nameToken;
     await builder.addDartFileEdit(file, (b) {
       b.addSimpleReplacement(SourceRange(token.offset, token.length), newName);
     });

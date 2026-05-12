@@ -808,7 +808,7 @@ class PreferDeclaringConstConstructorRule extends SaropaLintRule {
           if (member is ConstructorDeclaration &&
               member.constKeyword == null &&
               member.factoryKeyword == null) {
-            reporter.atToken(member.name ?? node.namePart.typeName, code);
+            reporter.atToken(member.name ?? node.nameToken, code);
             break;
           }
         }
@@ -929,7 +929,7 @@ class PreferFactoryConstructorRule extends SaropaLintRule {
       if (expr is! InstanceCreationExpression) return;
       final AstNode? parent = node.parent;
       if (parent is! ClassDeclaration) return;
-      final String className = parent.namePart.typeName.lexeme;
+      final String className = parent.nameToken.lexeme;
       final String createdName = expr.constructorName.type.name.lexeme;
       if (createdName != className) return;
       reporter.atNode(node);
@@ -1276,7 +1276,7 @@ class AvoidUnmarkedPublicClassRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final String className = node.namePart.typeName.lexeme;
+      final String className = node.nameToken.lexeme;
 
       // Skip private classes
       if (className.startsWith('_')) return;
@@ -1311,7 +1311,7 @@ class AvoidUnmarkedPublicClassRule extends SaropaLintRule {
         return;
       }
 
-      reporter.atToken(node.namePart.typeName, code);
+      reporter.atToken(node.nameToken, code);
     });
   }
 }
@@ -1368,7 +1368,7 @@ class PreferFinalClassRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final String className = node.namePart.typeName.lexeme;
+      final String className = node.nameToken.lexeme;
 
       // Skip private classes
       if (className.startsWith('_')) return;
@@ -1409,7 +1409,7 @@ class PreferFinalClassRule extends SaropaLintRule {
       // Only suggest final for classes with private-only constructors
       // or classes that look like utility/service classes
       if (!hasPublicConstructor) {
-        reporter.atToken(node.namePart.typeName, code);
+        reporter.atToken(node.nameToken, code);
       }
     });
   }
@@ -1480,7 +1480,7 @@ class PreferInterfaceClassRule extends SaropaLintRule {
       }
 
       // Skip private classes
-      if (node.namePart.typeName.lexeme.startsWith('_')) return;
+      if (node.nameToken.lexeme.startsWith('_')) return;
 
       // Check if all members are abstract (no concrete implementations)
       bool hasConcreteImplementation = false;
@@ -1512,7 +1512,7 @@ class PreferInterfaceClassRule extends SaropaLintRule {
 
       // Only suggest interface if there's no concrete implementation
       if (!hasConcreteImplementation && node.bodyMembers.isNotEmpty) {
-        reporter.atToken(node.namePart.typeName, code);
+        reporter.atToken(node.nameToken, code);
       }
     });
   }
@@ -1589,7 +1589,7 @@ class PreferBaseClassRule extends SaropaLintRule {
       }
 
       // Skip private classes
-      if (node.namePart.typeName.lexeme.startsWith('_')) return;
+      if (node.nameToken.lexeme.startsWith('_')) return;
 
       // Check if class has both abstract and concrete members
       bool hasAbstractMember = false;
@@ -1619,7 +1619,7 @@ class PreferBaseClassRule extends SaropaLintRule {
       // Suggest base for abstract classes with shared implementation
       // that also have abstract members (mixed abstraction)
       if (hasAbstractMember && hasConcreteImplementation) {
-        reporter.atToken(node.namePart.typeName, code);
+        reporter.atToken(node.nameToken, code);
       }
     });
   }
@@ -1720,7 +1720,7 @@ class AvoidAccessingOtherClassesPrivateMembersRule extends SaropaLintRule {
 
       // Check if prefix is a parameter, local variable, or field whose
       // type name differs from the enclosing class name.
-      final String enclosingClassName = enclosingClass.namePart.typeName.lexeme;
+      final String enclosingClassName = enclosingClass.nameToken.lexeme;
 
       // Use staticType to determine the prefix's type
       final String? prefixType = node.prefix.staticType?.getDisplayString();
@@ -2781,13 +2781,13 @@ class AvoidReferencingSubclassesRule extends SaropaLintRule {
           if (base != null) {
             baseToSubs
                 .putIfAbsent(base, () => <String>{})
-                .add(d.namePart.typeName.lexeme);
+                .add(d.nameToken.lexeme);
           }
         }
       }
       for (final Declaration d in unit.declarations) {
         if (d is! ClassDeclaration) continue;
-        final baseName = d.namePart.typeName.lexeme;
+        final baseName = d.nameToken.lexeme;
         final subs = baseToSubs[baseName];
         if (subs == null || subs.isEmpty) continue;
         d.visitChildren(_SubclassReferenceVisitor(subs, reporter, _code));

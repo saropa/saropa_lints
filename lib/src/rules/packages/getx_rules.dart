@@ -872,7 +872,7 @@ class RequireGetxLazyPutRule extends SaropaLintRule {
       }
       if (current is ClassDeclaration) {
         // Check if inside a Bindings class
-        final String className = current.namePart.typeName.lexeme;
+        final String className = current.nameToken.lexeme;
         if (className.endsWith('Binding') || className.endsWith('Module')) {
           return true;
         }
@@ -1097,7 +1097,7 @@ class RequireGetxControllerDisposeRule extends SaropaLintRule {
       }
 
       if (hasDisposable && !hasOnClose) {
-        reporter.atToken(node.namePart.typeName, code);
+        reporter.atToken(node.nameToken, code);
       }
     });
   }

@@ -896,10 +896,10 @@ class AvoidFreezedForLogicClassesRule extends SaropaLintRule {
       if (!hasFreezed) return;
 
       // Check if class name suggests it's a logic class
-      final String className = node.namePart.typeName.lexeme;
+      final String className = node.nameToken.lexeme;
       for (final suffix in _logicClassSuffixes) {
         if (className.endsWith(suffix)) {
-          reporter.atToken(node.namePart.typeName, code);
+          reporter.atToken(node.nameToken, code);
           return;
         }
       }
@@ -1033,7 +1033,7 @@ class PreferFreezedForDataClassesRule extends SaropaLintRule {
       // - Has manual copyWith OR manual equals/hashCode
       if (finalFieldCount >= 3 &&
           (hasCopyWith || (hasEqualsOverride && hasHashCodeOverride))) {
-        reporter.atToken(node.namePart.typeName, code);
+        reporter.atToken(node.nameToken, code);
       }
     });
   }
@@ -1137,7 +1137,7 @@ class AvoidFreezedAnyMapIssueRule extends SaropaLintRule {
 
       if (!hasFromJson) return;
 
-      reporter.atToken(node.namePart.typeName);
+      reporter.atToken(node.nameToken);
     });
   }
 }
@@ -1213,7 +1213,7 @@ class PreferFreezedUnionTypesRule extends SaropaLintRule {
             !(member.abstractKeyword?.isKeyword ?? false)) {
           continue;
         }
-        final String name = member.namePart.typeName.lexeme;
+        final String name = member.nameToken.lexeme;
         final List<ClassDeclaration>? subclasses = hierarchy[name];
         if (subclasses == null || subclasses.length < 2) continue;
         bool hasFreezed = false;

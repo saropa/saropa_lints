@@ -1560,7 +1560,7 @@ class PreferJsonSerializableRule extends SaropaLintRule {
 
       // Warn if has manual serialization
       if (hasManualFromJson && hasManualToJson) {
-        reporter.atToken(node.namePart.typeName, code);
+        reporter.atToken(node.nameToken, code);
       }
     });
   }

@@ -593,7 +593,7 @@ Map<String, Set<String>> _collectUniqueIndexedTables(AstNode node) {
     if (uniqueCols.isEmpty) continue;
 
     // Lower-first of class name — Drift's default getter naming convention.
-    final className = decl.namePart.typeName.lexeme;
+    final className = decl.nameToken.lexeme;
     if (className.isEmpty) continue;
     final key = className[0].toLowerCase() + className.substring(1);
     result[key] = uniqueCols;

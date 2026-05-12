@@ -438,7 +438,7 @@ class PreferSliverPrefixRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final String className = node.namePart.typeName.lexeme;
+      final String className = node.nameToken.lexeme;
 
       // Skip if already has Sliver prefix
       if (className.startsWith('Sliver')) return;
@@ -1258,7 +1258,7 @@ class PreferKeepAliveRule extends SaropaLintRule {
           classSource.contains('GridView') ||
           classSource.contains('CustomScrollView')) {
         if (_tabPageViewPattern.hasMatch(classSource)) {
-          reporter.atToken(node.namePart.typeName, code);
+          reporter.atToken(node.nameToken, code);
         }
       }
     });

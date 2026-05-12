@@ -565,7 +565,7 @@ class AvoidCircularDiDependenciesRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final String className = node.namePart.typeName.lexeme;
+      final String className = node.nameToken.lexeme;
 
       // Find constructor parameters
       for (final ClassMember member in node.bodyMembers) {

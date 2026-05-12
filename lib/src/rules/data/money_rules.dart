@@ -240,7 +240,7 @@ class RequireCurrencyCodeWithAmountRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final String className = node.namePart.typeName.lexeme.toLowerCase();
+      final String className = node.nameToken.lexeme.toLowerCase();
 
       // Skip if class name suggests it already handles currency
       if (className.contains('money') || className.contains('currency')) {

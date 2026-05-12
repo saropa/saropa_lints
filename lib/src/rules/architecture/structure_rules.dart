@@ -1748,7 +1748,7 @@ class PreferStaticClassRule extends SaropaLintRule {
       }
 
       if (hasStaticMember && !hasNonStaticMember && !hasPrivateConstructor) {
-        reporter.atToken(node.namePart.typeName, code);
+        reporter.atToken(node.nameToken, code);
       }
     });
   }
@@ -2113,7 +2113,7 @@ class PreferAbstractFinalStaticClassRule extends SaropaLintRule {
 
       // Warn if class has only static members and a private constructor
       if (hasOnlyStaticMembers && hasPrivateConstructor && hasStaticMembers) {
-        reporter.atToken(node.namePart.typeName, code);
+        reporter.atToken(node.nameToken, code);
       }
     });
   }
@@ -2230,7 +2230,7 @@ class AvoidUnusedGenericsRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final TypeParameterList? typeParams = node.namePart.typeParameters;
+      final TypeParameterList? typeParams = node.nameTypeParameters;
       if (typeParams == null) return;
 
       for (final TypeParameter param in typeParams.typeParameters) {
@@ -2785,7 +2785,7 @@ class AvoidClassesWithOnlyStaticMembersRule extends SaropaLintRule {
         }
         return;
       }
-      reporter.atToken(node.namePart.typeName);
+      reporter.atToken(node.nameToken);
     });
   }
 }
@@ -3141,7 +3141,7 @@ class PreferRecordOverTupleClassRule extends SaropaLintRule {
       if (constructors.length != 1) return;
       if (constructors[0].factoryKeyword != null) return;
 
-      reporter.atToken(node.namePart.typeName);
+      reporter.atToken(node.nameToken);
     });
   }
 }
@@ -3186,7 +3186,7 @@ class PreferSealedClassesRule extends SaropaLintRule {
         if (cls.sealedKeyword != null) continue;
         if (cls.extendsClause != null) continue;
 
-        final className = cls.namePart.typeName.lexeme;
+        final className = cls.nameToken.lexeme;
         int subclassCount = 0;
         for (final other in classes) {
           if (other == cls) continue;
@@ -3262,7 +3262,7 @@ class PreferSealedForStateRule extends SaropaLintRule {
         final abstractKw = cls.abstractKeyword;
         if (abstractKw == null) continue;
         if (cls.sealedKeyword != null) continue;
-        final name = cls.namePart.typeName.lexeme;
+        final name = cls.nameToken.lexeme;
         if (!_suffixes.any(name.endsWith)) continue;
         if (!subclassedNames.contains(name)) continue;
         reporter.atToken(abstractKw);
@@ -3581,7 +3581,7 @@ class PreferConstructorsOverStaticMethodsRule extends SaropaLintRule {
       if (expr is! InstanceCreationExpression) return;
       final AstNode? parent = node.parent;
       if (parent is! ClassDeclaration) return;
-      final String className = parent.namePart.typeName.lexeme;
+      final String className = parent.nameToken.lexeme;
       final String createdName = expr.constructorName.type.name.lexeme;
       if (createdName != className) return;
       reporter.atNode(node);
