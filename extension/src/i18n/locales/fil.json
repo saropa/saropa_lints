@@ -419,7 +419,7 @@
       "packages": "Mga package",
       "projectGrade": "Marka ng Pakete ng Proyekto",
       "totalSize": "Kabuuang Sukat*",
-      "gradeTooltip": "Marka ng proyekto 0\nAverage na marka: 1/100\nMga Package: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {b} {avgScore} {c} {f} {avgGrade} {a} {e}",
+      "gradeTooltip": "Marka ng proyekto 0\nAverage na marka: 1/100\nMga Package: 2\nA:3 B:4 C:5 E:6 F:7 {b} {avgGrade} {pkgCount} {c} {f} {a} {e} {avgScore}",
       "vibrantTitle": "Masigla",
       "stableTitle": "Matatag",
       "outdatedTitle": "Luma na",
@@ -673,7 +673,7 @@
       "gatesPassing": "mga tarangkahan na dumadaan"
     },
     "gauge": {
-      "tooltip": "Average na marka 0 ng 100 (grade 1). {rounded} {grade}",
+      "tooltip": "Average na marka 0 ng 100 (grade 1). {grade} {rounded}",
       "ariaLabel": "Average na marka 0 ng 100 {rounded}"
     },
     "gate": {

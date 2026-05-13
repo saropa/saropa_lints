@@ -419,7 +419,7 @@
       "packages": "套餐",
       "projectGrade": "工程包等级",
       "totalSize": "总尺寸*",
-      "gradeTooltip": "工程等级0\n平均分：1/100\n套餐：2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {b} {avgScore} {c} {f} {avgGrade} {a} {e}",
+      "gradeTooltip": "工程等级0\n平均分：1/100\n套餐：2\nA:3 B:4 C:5 E:6 F:7 {b} {avgGrade} {pkgCount} {c} {f} {a} {e} {avgScore}",
       "vibrantTitle": "充满活力",
       "stableTitle": "稳定的",
       "outdatedTitle": "过时的",
@@ -673,7 +673,7 @@
       "gatesPassing": "大门经过"
     },
     "gauge": {
-      "tooltip": "平均分0为100分（等级1）。 {rounded} {grade}",
+      "tooltip": "平均分0为100分（等级1）。 {grade} {rounded}",
       "ariaLabel": "平均分 0 100 {rounded}"
     },
     "gate": {

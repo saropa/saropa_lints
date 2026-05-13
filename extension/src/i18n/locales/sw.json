@@ -419,7 +419,7 @@
       "packages": "Vifurushi",
       "projectGrade": "Daraja la Kifurushi cha Mradi",
       "totalSize": "Jumla ya Ukubwa*",
-      "gradeTooltip": "Daraja la mradi 0\nAlama ya wastani: 1/100\nVifurushi: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {b} {avgScore} {c} {f} {avgGrade} {a} {e}",
+      "gradeTooltip": "Daraja la mradi 0\nAlama ya wastani: 1/100\nVifurushi: 2\nA:3 B:4 C:5 E:6 F:7 {b} {avgGrade} {pkgCount} {c} {f} {a} {e} {avgScore}",
       "vibrantTitle": "Mahiri",
       "stableTitle": "Imara",
       "outdatedTitle": "Imepitwa na wakati",
@@ -673,7 +673,7 @@
       "gatesPassing": "milango kupita"
     },
     "gauge": {
-      "tooltip": "Alama ya wastani 0 ya 100 (daraja 1). {rounded} {grade}",
+      "tooltip": "Alama ya wastani 0 ya 100 (daraja 1). {grade} {rounded}",
       "ariaLabel": "Alama ya wastani 0 ya 100 {rounded}"
     },
     "gate": {

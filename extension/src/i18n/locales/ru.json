@@ -419,7 +419,7 @@
       "packages": "Пакеты",
       "projectGrade": "Оценка пакета проекта",
       "totalSize": "Общий размер*",
-      "gradeTooltip": "Оценка проекта 0\nСредний балл: 1/100\nПакеты: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {b} {avgScore} {c} {f} {avgGrade} {a} {e}",
+      "gradeTooltip": "Оценка проекта 0\nСредний балл: 1/100\nПакеты: 2\nA:3 B:4 C:5 E:6 F:7 {b} {avgGrade} {pkgCount} {c} {f} {a} {e} {avgScore}",
       "vibrantTitle": "Яркий",
       "stableTitle": "Стабильный",
       "outdatedTitle": "Устаревший",
@@ -673,7 +673,7 @@
       "gatesPassing": "ворота проходящие"
     },
     "gauge": {
-      "tooltip": "Средний балл 0 из 100 (оценка 1). {rounded} {grade}",
+      "tooltip": "Средний балл 0 из 100 (оценка 1). {grade} {rounded}",
       "ariaLabel": "Средний балл 0 из 100 {rounded}"
     },
     "gate": {

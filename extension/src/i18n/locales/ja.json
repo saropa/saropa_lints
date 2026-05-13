@@ -419,7 +419,7 @@
       "packages": "パッケージ",
       "projectGrade": "プロジェクトパッケージグレード",
       "totalSize": "合計サイズ*",
-      "gradeTooltip": "プロジェクトグレード 0\n平均スコア: 1/100\nパッケージ: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {b} {avgScore} {c} {f} {avgGrade} {a} {e}",
+      "gradeTooltip": "プロジェクトグレード 0\n平均スコア: 1/100\nパッケージ: 2\nA:3 B:4 C:5 E:6 F:7 {b} {avgGrade} {pkgCount} {c} {f} {a} {e} {avgScore}",
       "vibrantTitle": "活気に満ちた",
       "stableTitle": "安定した",
       "outdatedTitle": "時代遅れ",
@@ -673,7 +673,7 @@
       "gatesPassing": "ゲート通過"
     },
     "gauge": {
-      "tooltip": "平均スコア 0/100 (グレード 1)。 {rounded} {grade}",
+      "tooltip": "平均スコア 0/100 (グレード 1)。 {grade} {rounded}",
       "ariaLabel": "平均スコア 0/100 {rounded}"
     },
     "gate": {

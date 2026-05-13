@@ -419,7 +419,7 @@
       "packages": "پیکجز",
       "projectGrade": "پروجیکٹ پیکیج گریڈ",
       "totalSize": "کل سائز*",
-      "gradeTooltip": "پروجیکٹ گریڈ 0\nاوسط سکور: 1/100\nپیکیجز: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {b} {avgScore} {c} {f} {avgGrade} {a} {e}",
+      "gradeTooltip": "پروجیکٹ گریڈ 0\nاوسط سکور: 1/100\nپیکیجز: 2\nA:3 B:4 C:5 E:6 F:7 {b} {avgGrade} {pkgCount} {c} {f} {a} {e} {avgScore}",
       "vibrantTitle": "متحرک",
       "stableTitle": "مستحکم",
       "outdatedTitle": "فرسودہ",
@@ -673,7 +673,7 @@
       "gatesPassing": "گزرنے والے دروازے"
     },
     "gauge": {
-      "tooltip": "اوسط سکور 0 از 100 (گریڈ 1)۔ {rounded} {grade}",
+      "tooltip": "اوسط سکور 0 از 100 (گریڈ 1)۔ {grade} {rounded}",
       "ariaLabel": "اوسط اسکور 0 از 100 {rounded}"
     },
     "gate": {

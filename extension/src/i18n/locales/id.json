@@ -419,7 +419,7 @@
       "packages": "Paket",
       "projectGrade": "Kelas Paket Proyek",
       "totalSize": "Ukuran Jumlah*",
-      "gradeTooltip": "Kelas proyek 0\nSkor rata-rata: 1/100\nPaket: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {b} {avgScore} {c} {f} {avgGrade} {a} {e}",
+      "gradeTooltip": "Kelas proyek 0\nSkor rata-rata: 1/100\nPaket: 2\nA:3 B:4 C:5 E:6 F:7 {b} {avgGrade} {pkgCount} {c} {f} {a} {e} {avgScore}",
       "vibrantTitle": "Bersemangat",
       "stableTitle": "Stabil",
       "outdatedTitle": "Kedaluwarsa",
@@ -673,7 +673,7 @@
       "gatesPassing": "gerbang lewat"
     },
     "gauge": {
-      "tooltip": "Nilai rata-rata 0 dari 100 (kelas 1). {rounded} {grade}",
+      "tooltip": "Nilai rata-rata 0 dari 100 (kelas 1). {grade} {rounded}",
       "ariaLabel": "Skor rata-rata 0 dari 100 {rounded}"
     },
     "gate": {

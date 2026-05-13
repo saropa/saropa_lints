@@ -419,7 +419,7 @@
       "packages": "Paquetes",
       "projectGrade": "Grado del paquete del proyecto",
       "totalSize": "Tamaño total*",
-      "gradeTooltip": "Calificación del proyecto 0\nPuntuación media: 1/100\nPaquetes: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {b} {avgScore} {c} {f} {avgGrade} {a} {e}",
+      "gradeTooltip": "Calificación del proyecto 0\nPuntuación media: 1/100\nPaquetes: 2\nA:3 B:4 C:5 E:6 F:7 {b} {avgGrade} {pkgCount} {c} {f} {a} {e} {avgScore}",
       "vibrantTitle": "Vibrante",
       "stableTitle": "Estable",
       "outdatedTitle": "Anticuado",
@@ -673,7 +673,7 @@
       "gatesPassing": "puertas pasando"
     },
     "gauge": {
-      "tooltip": "Puntaje promedio 0 de 100 (calificación 1). {rounded} {grade}",
+      "tooltip": "Puntaje promedio 0 de 100 (calificación 1). {grade} {rounded}",
       "ariaLabel": "Puntuación media 0 de 100 {rounded}"
     },
     "gate": {

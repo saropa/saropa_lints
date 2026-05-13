@@ -419,7 +419,7 @@
       "packages": "패키지",
       "projectGrade": "프로젝트 패키지 등급",
       "totalSize": "전체 크기*",
-      "gradeTooltip": "프로젝트 등급 0\n평균 점수: 1/100\n패키지: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {b} {avgScore} {c} {f} {avgGrade} {a} {e}",
+      "gradeTooltip": "프로젝트 등급 0\n평균 점수: 1/100\n패키지: 2\nA:3 B:4 C:5 E:6 F:7 {b} {avgGrade} {pkgCount} {c} {f} {a} {e} {avgScore}",
       "vibrantTitle": "떠는",
       "stableTitle": "안정적인",
       "outdatedTitle": "구식",
@@ -673,7 +673,7 @@
       "gatesPassing": "게이트 통과"
     },
     "gauge": {
-      "tooltip": "평균 점수 0/100(등급 1). {rounded} {grade}",
+      "tooltip": "평균 점수 0/100(등급 1). {grade} {rounded}",
       "ariaLabel": "100점 만점의 평균 점수 0 {rounded}"
     },
     "gate": {

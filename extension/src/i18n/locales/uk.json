@@ -419,7 +419,7 @@
       "packages": "пакети",
       "projectGrade": "Оцінка пакету проекту",
       "totalSize": "Загальний розмір*",
-      "gradeTooltip": "Оцінка проекту 0\nСередній бал: 1/100\nПакети: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {b} {avgScore} {c} {f} {avgGrade} {a} {e}",
+      "gradeTooltip": "Оцінка проекту 0\nСередній бал: 1/100\nПакети: 2\nA:3 B:4 C:5 E:6 F:7 {b} {avgGrade} {pkgCount} {c} {f} {a} {e} {avgScore}",
       "vibrantTitle": "Яскравий",
       "stableTitle": "Стабільний",
       "outdatedTitle": "Застаріла",
@@ -673,7 +673,7 @@
       "gatesPassing": "проходження воріт"
     },
     "gauge": {
-      "tooltip": "Середній бал 0 із 100 (оцінка 1). {rounded} {grade}",
+      "tooltip": "Середній бал 0 із 100 (оцінка 1). {grade} {rounded}",
       "ariaLabel": "Середній бал 0 із 100 {rounded}"
     },
     "gate": {

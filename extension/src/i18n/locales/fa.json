@@ -419,7 +419,7 @@
       "packages": "بسته ها",
       "projectGrade": "درجه بسته پروژه",
       "totalSize": "اندازه کل*",
-      "gradeTooltip": "درجه پروژه 0\nمیانگین امتیاز: 1/100\nپکیج ها: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {b} {avgScore} {c} {f} {avgGrade} {a} {e}",
+      "gradeTooltip": "درجه پروژه 0\nمیانگین امتیاز: 1/100\nپکیج ها: 2\nA:3 B:4 C:5 E:6 F:7 {b} {avgGrade} {pkgCount} {c} {f} {a} {e} {avgScore}",
       "vibrantTitle": "پر جنب و جوش",
       "stableTitle": "پایدار",
       "outdatedTitle": "منسوخ شده",
@@ -673,7 +673,7 @@
       "gatesPassing": "دروازه های عبور"
     },
     "gauge": {
-      "tooltip": "میانگین امتیاز 0 از 100 (درجه 1). {rounded} {grade}",
+      "tooltip": "میانگین امتیاز 0 از 100 (درجه 1). {grade} {rounded}",
       "ariaLabel": "میانگین امتیاز 0 از 100 {rounded}"
     },
     "gate": {

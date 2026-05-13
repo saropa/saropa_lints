@@ -419,7 +419,7 @@
       "packages": "Forfaits",
       "projectGrade": "Catégorie du package de projet",
       "totalSize": "Taille totale*",
-      "gradeTooltip": "Note du projet 0\nNote moyenne : 1/100\nForfaits : 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {b} {avgScore} {c} {f} {avgGrade} {a} {e}",
+      "gradeTooltip": "Note du projet 0\nNote moyenne : 1/100\nForfaits : 2\nA:3 B:4 C:5 E:6 F:7 {b} {avgGrade} {pkgCount} {c} {f} {a} {e} {avgScore}",
       "vibrantTitle": "Dynamique",
       "stableTitle": "Écurie",
       "outdatedTitle": "Dépassé",
@@ -673,7 +673,7 @@
       "gatesPassing": "passage des portes"
     },
     "gauge": {
-      "tooltip": "Note moyenne 0 sur 100 (note 1). {rounded} {grade}",
+      "tooltip": "Note moyenne 0 sur 100 (note 1). {grade} {rounded}",
       "ariaLabel": "Note moyenne 0 sur 100 {rounded}"
     },
     "gate": {

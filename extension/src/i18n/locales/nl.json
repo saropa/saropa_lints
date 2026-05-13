@@ -419,7 +419,7 @@
       "packages": "Pakketten",
       "projectGrade": "Projectpakketklasse",
       "totalSize": "Totale grootte*",
-      "gradeTooltip": "Projectcijfer 0\nGemiddelde score: 1/100\nPakketten: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {b} {avgScore} {c} {f} {avgGrade} {a} {e}",
+      "gradeTooltip": "Projectcijfer 0\nGemiddelde score: 1/100\nPakketten: 2\nA:3 B:4 C:5 E:6 F:7 {b} {avgGrade} {pkgCount} {c} {f} {a} {e} {avgScore}",
       "vibrantTitle": "Levendig",
       "stableTitle": "Stabiel",
       "outdatedTitle": "Verouderd",
@@ -673,7 +673,7 @@
       "gatesPassing": "poorten passeren"
     },
     "gauge": {
-      "tooltip": "Gemiddelde score 0 van 100 (cijfer 1). {rounded} {grade}",
+      "tooltip": "Gemiddelde score 0 van 100 (cijfer 1). {grade} {rounded}",
       "ariaLabel": "Gemiddelde score 0 van 100 {rounded}"
     },
     "gate": {

@@ -419,7 +419,7 @@
       "packages": "แพ็คเกจ",
       "projectGrade": "เกรดแพ็คเกจโครงการ",
       "totalSize": "ขนาดรวม*",
-      "gradeTooltip": "เกรดโครงการ 0\nคะแนนเฉลี่ย: 1/100\nแพ็คเกจ: 2\nก:3 B:4 ค:5 อี:6 ฟ:7 {pkgCount} {b} {avgScore} {c} {f} {avgGrade} {a} {e}",
+      "gradeTooltip": "เกรดโครงการ 0\nคะแนนเฉลี่ย: 1/100\nแพ็คเกจ: 2\nก:3 B:4 ค:5 อี:6 ฟ:7 {b} {avgGrade} {pkgCount} {c} {f} {a} {e} {avgScore}",
       "vibrantTitle": "มีชีวิตชีวา",
       "stableTitle": "มั่นคง",
       "outdatedTitle": "ล้าสมัย",
@@ -673,7 +673,7 @@
       "gatesPassing": "ประตูผ่านไป"
     },
     "gauge": {
-      "tooltip": "คะแนนเฉลี่ย 0 จาก 100 (เกรด 1) {rounded} {grade}",
+      "tooltip": "คะแนนเฉลี่ย 0 จาก 100 (เกรด 1) {grade} {rounded}",
       "ariaLabel": "คะแนนเฉลี่ย 0 จาก 100 {rounded}"
     },
     "gate": {
