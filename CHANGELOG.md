@@ -50,6 +50,7 @@
 ### Fixed (Extension)
 
 - **Package Dashboard toolbar buttons hide when their action is a no-op** — the "← Back" package-navigation button, the "× Clear" chart filter indicator, and the "↻ Reset view" toolbar button now stay hidden whenever there's nothing to act on (no nav history, no live chart filter, view state matches defaults). Back was previously shown disabled, Reset view was always shown, and the chart Clear strip could survive a session restore that referenced a package no longer in the chart. No action required.
+- **Package Dashboard caveats now attach to the cards they describe** — the tree-shaking footnote ("Archive sizes before tree shaking…") now appears as a tooltip on the **Total Size** card, and the activity-threshold legend ("90d = stale, 180d = dormant") now appears in each grade card's tooltip (Vibrant/Stable/Outdated/Abandoned/EOL). Both previously sat in a floating note at the bottom of the summary block where readers couldn't easily connect them to the relevant data. No action required.
 
 ---
 
