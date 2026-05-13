@@ -46,6 +46,10 @@ function makeResult(
         publisherTrust: 0,
         updateInfo: null,
         archiveSizeBytes: null,
+        codeSizeBytes: null,
+        folderBreakdown: null,
+        maintainerQuality: null,
+        maintainerQualityBonus: 0,
         bloatRating: null,
         license: null,
         isUnused: false, fileUsages: [], platforms: null, verifiedPublisher: false, wasmReady: null, blocker: null, upgradeBlockStatus: 'up-to-date',
@@ -354,6 +358,10 @@ describe('report: size in KB', () => {
         const result = {
             ...makeResult('http', 80),
             archiveSizeBytes: 1024,
+            codeSizeBytes: null,
+            folderBreakdown: null,
+            maintainerQuality: null,
+            maintainerQualityBonus: 0,
             transitiveInfo: {
                 directDep: 'http',
                 transitiveCount: 2,

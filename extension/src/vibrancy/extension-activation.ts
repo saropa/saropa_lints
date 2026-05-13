@@ -2128,6 +2128,12 @@ async function fetchComparisonData(
         stars,
         openIssues,
         archiveSizeBytes: archiveSize,
+        /* Compare-by-search lookups don't run the full tarball analyzer
+           (the surface is the lighter-weight "search and inspect" path),
+           so the code-size lane stays null and the ranker falls back to
+           archiveSizeBytes for this card. Full scan results carry the
+           real codeSizeBytes. */
+        codeSizeBytes: null,
         bloatRating,
         license: info.license,
         platforms: metrics.platforms,

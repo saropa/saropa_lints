@@ -36,8 +36,13 @@ const DIMENSIONS: readonly DimensionDef[] = [
         higherIsBetter: true,
     },
     {
-        name: 'Archive Size',
-        extract: p => p.archiveSizeBytes,
+        /* "Code Size" is the new primary install-cost dimension: it ranks on
+           `codeSizeBytes` (lib + declared assets — what reaches the user's
+           app). Falls back to archiveSizeBytes only when the tarball
+           analysis was unavailable, so packages without code-size data
+           still rank rather than appear as a tie at —. */
+        name: 'Code Size',
+        extract: p => p.codeSizeBytes ?? p.archiveSizeBytes,
         format: v => v !== null ? formatSizeMB(v) : '—',
         higherIsBetter: false,
     },
@@ -189,6 +194,7 @@ export function resultToComparisonData(
         } | null;
         readonly github?: { readonly stars: number; readonly openIssues: number; readonly trueOpenIssues?: number } | null;
         readonly archiveSizeBytes: number | null;
+        readonly codeSizeBytes?: number | null;
         readonly bloatRating: number | null;
         readonly license: string | null;
         readonly platforms: readonly string[] | null;
@@ -207,6 +213,7 @@ export function resultToComparisonData(
         stars: result.github?.stars ?? null,
         openIssues: result.github?.trueOpenIssues ?? result.github?.openIssues ?? null,
         archiveSizeBytes: result.archiveSizeBytes,
+        codeSizeBytes: result.codeSizeBytes ?? null,
         bloatRating: result.bloatRating,
         license: result.license,
         platforms: result.platforms ?? [],

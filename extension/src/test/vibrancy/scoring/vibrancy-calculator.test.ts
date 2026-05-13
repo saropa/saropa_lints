@@ -11,6 +11,8 @@ import {
     calcPublisherTrust,
     calcPubQualityBonus,
     calcAdoptionBonus,
+    calcMaintainerQualityBonus,
+    DEFAULT_MAX_MAINTAINER_QUALITY_BONUS,
     computeVibrancyScore,
     TRUSTED_PUBLISHERS,
     RESOLUTION_PUBLISH_RECENCY_CAP,
@@ -510,6 +512,50 @@ describe('vibrancy-calculator', () => {
             assert.strictEqual(withBonus, 20);
             assert.ok(withBonus > withoutBonus,
                 'pub quality bonus should meaningfully lift scores for well-vetted packages');
+        });
+    });
+
+    describe('calcMaintainerQualityBonus', () => {
+        /* Each present flag earns an equal share of the max bonus. The bug
+           that motivated this scorer counted these folders AGAINST the
+           package via tarball-size-as-bloat; the test pins the new direction
+           (presence is positive, absence is neutral). */
+        it('returns 0 for null flags (analyzer unavailable — neutral, not penalty)', () => {
+            assert.strictEqual(calcMaintainerQualityBonus(null), 0);
+        });
+
+        it('returns 0 when no flag is set', () => {
+            assert.strictEqual(calcMaintainerQualityBonus({
+                hasExample: false, hasTests: false, hasTools: false, hasDocs: false,
+            }), 0);
+        });
+
+        it('awards 1/4 of max for one flag (e.g. tests only)', () => {
+            const bonus = calcMaintainerQualityBonus({
+                hasExample: false, hasTests: true, hasTools: false, hasDocs: false,
+            });
+            assert.strictEqual(bonus, DEFAULT_MAX_MAINTAINER_QUALITY_BONUS / 4);
+        });
+
+        it('awards full max for all four flags', () => {
+            const bonus = calcMaintainerQualityBonus({
+                hasExample: true, hasTests: true, hasTools: true, hasDocs: true,
+            });
+            assert.strictEqual(bonus, DEFAULT_MAX_MAINTAINER_QUALITY_BONUS);
+        });
+
+        it('scales linearly: two flags → half-max', () => {
+            const bonus = calcMaintainerQualityBonus({
+                hasExample: true, hasTests: true, hasTools: false, hasDocs: false,
+            });
+            assert.strictEqual(bonus, DEFAULT_MAX_MAINTAINER_QUALITY_BONUS / 2);
+        });
+
+        it('respects custom maxBonus override', () => {
+            const bonus = calcMaintainerQualityBonus({
+                hasExample: true, hasTests: true, hasTools: true, hasDocs: true,
+            }, 4);
+            assert.strictEqual(bonus, 4);
         });
     });
 });

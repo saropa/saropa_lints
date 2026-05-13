@@ -59,6 +59,26 @@ describe('known-issues', () => {
         }
     });
 
+    it('should never have an entry that replaces itself', () => {
+        /* A package cannot replace itself — that's data corruption from the
+           old "upgrade this version" workflow. The version-range fields
+           (appliesToMaxVersion) already scope the issue to old versions, so
+           the "upgrade" signal is implicit. Self-replacements would emit
+           misleading "Replace with X" UX where X is the same package.
+           This test guards the cleanup that landed alongside the vibrancy
+           bloat rescaling — see bugs/infra_vibrancy_bloat_uses_tarball_*. */
+        type RawIssue = { name: string; replacement?: string };
+        const issues = (knownIssuesData as { issues: RawIssue[] }).issues;
+        const selfReplacements = issues.filter(
+            (e) => e.replacement && e.replacement === e.name,
+        );
+        assert.deepStrictEqual(
+            selfReplacements.map(e => e.name),
+            [],
+            'known_issues.json must not contain self-replacement entries',
+        );
+    });
+
     it('should find an active status package', () => {
         const issue = findKnownIssue('http');
         assert.ok(issue);

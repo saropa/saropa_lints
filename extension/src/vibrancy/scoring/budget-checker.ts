@@ -56,8 +56,15 @@ export function computeActuals(results: readonly VibrancyResult[]): {
 
     for (const r of results) {
         totalScore += r.score;
-        if (r.archiveSizeBytes !== null) {
-            totalSizeBytes += r.archiveSizeBytes;
+        /* Per-app size budget sums what packages contribute to the BUILT
+           app, not what we downloaded from pub.dev. codeSizeBytes is the
+           true cost (`lib/` + declared assets); archiveSizeBytes is the
+           gzipped tarball which over-counts demos, fixtures, and sample
+           media. Fall through to archiveSizeBytes only when the tarball
+           analyzer couldn't run, so the budget never goes blank. */
+        const sizeBytes = r.codeSizeBytes ?? r.archiveSizeBytes;
+        if (sizeBytes !== null) {
+            totalSizeBytes += sizeBytes;
         }
         if (r.category === 'abandoned') {
             abandonedCount++;

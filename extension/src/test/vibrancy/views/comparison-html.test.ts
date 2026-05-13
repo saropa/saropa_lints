@@ -18,6 +18,7 @@ function makePackage(overrides: Partial<ComparisonData>): ComparisonData {
         stars: 500,
         openIssues: 10,
         archiveSizeBytes: 100_000,
+        codeSizeBytes: null,
         bloatRating: 3,
         license: 'MIT',
         platforms: ['android', 'ios', 'web'],

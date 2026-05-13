@@ -90,6 +90,46 @@ export interface GitHubMetrics {
     readonly license: string | null;
 }
 
+/**
+ * Bytes per top-level folder in a package tarball.
+ *
+ * Drives the hover "on disk" breakdown so developers can see when a tarball's
+ * mass lives outside `lib/` (e.g. `example/` demos, `test/` suites). `other`
+ * collects everything not in the named buckets (root files, `android/`,
+ * `ios/`, `web/`, etc.) so totals stay reconciled with `archiveSizeBytes`.
+ */
+export interface FolderBreakdown {
+    readonly lib: number;
+    readonly example: number;
+    readonly test: number;
+    readonly tool: number;
+    readonly doc: number;
+    readonly other: number;
+}
+
+/**
+ * Presence of maintainer-quality folders inside the package tarball.
+ *
+ * These are positive health signals — a package that ships a runnable demo,
+ * a test suite, maintainer tooling, or extended docs is generally healthier
+ * than one that strips them. Each flag feeds an independent positive
+ * component on the vibrancy score (see calcMaintainerQualityBonus).
+ *
+ * The earlier model conflated tarball size with bloat, which inverted the
+ * sign on all four signals (packages that shipped demos/tests scored worse).
+ * Surfacing them as explicit positive flags fixes that inversion.
+ */
+export interface MaintainerQualityFlags {
+    /** `example/` contains at least one `.dart` file (runnable demo / onboarding). */
+    readonly hasExample: boolean;
+    /** `test/` contains at least one `_test.dart` file (regression coverage). */
+    readonly hasTests: boolean;
+    /** `tool/` contains at least one `.dart` or shell script (maintainer automation). */
+    readonly hasTools: boolean;
+    /** `doc/` contains at least one `.md` beyond the auto-`api/` dump (extended docs). */
+    readonly hasDocs: boolean;
+}
+
 /** Known issue entry from bundled JSON. */
 export interface KnownIssue {
     readonly name: string;
@@ -240,6 +280,43 @@ export interface VibrancyResult {
     readonly updateInfo: UpdateInfo | null;
     readonly license: string | null;
     readonly archiveSizeBytes: number | null;
+    /**
+     * Bytes the package contributes to a compiled Flutter app — `lib/**` plus
+     * assets declared in the package's own `pubspec.yaml` under
+     * `flutter.assets:`. Excludes `example/`, `test/`, `tool/`, `doc/`, and
+     * other tarball-only folders that never reach the APK/IPA/web bundle.
+     *
+     * This is the field that should drive bloat ratings, per-app size budgets,
+     * and "is this package costly to ship" decisions. `archiveSizeBytes`
+     * (gzipped tarball) is kept for the hover "on disk" line but no longer
+     * drives scoring — it over-reports for packages that ship demos or
+     * fixture media. Null when the tarball analysis could not run (offline,
+     * fetch error, or tar parse failure).
+     */
+    readonly codeSizeBytes: number | null;
+    /**
+     * Per-top-level-folder byte breakdown of the package tarball. Drives the
+     * hover "on disk" detail line so developers can see when a package's
+     * tarball mass lives outside `lib/` (a 21 MB tarball that is 99%
+     * `example/` is healthy; a 21 MB tarball that is 99% `lib/` is bloat).
+     * Null when the tarball analysis could not run.
+     */
+    readonly folderBreakdown: FolderBreakdown | null;
+    /**
+     * Maintainer-quality presence flags derived from the package tarball.
+     * Each true flag earns an independent positive component on the vibrancy
+     * score via calcMaintainerQualityBonus. Null when the tarball analysis
+     * could not run, in which case no bonus is awarded (rather than a
+     * silently-zero penalty).
+     */
+    readonly maintainerQuality: MaintainerQualityFlags | null;
+    /**
+     * Vibrancy score component from `maintainerQuality` flags (0–10). Stored
+     * separately from the score breakdown components (resolutionVelocity,
+     * engagement, popularity) because it is a derived bonus, not a weighted
+     * input. Surfaced in the hover so developers see why the score moved.
+     */
+    readonly maintainerQualityBonus: number;
     readonly bloatRating: number | null;
     readonly isUnused: boolean;
     /** Files that import this package (active + commented-out). Empty array if unused. */
@@ -334,6 +411,9 @@ export interface ComparisonData {
     readonly stars: number | null;
     readonly openIssues: number | null;
     readonly archiveSizeBytes: number | null;
+    /** Code size (lib + declared assets). Null when tarball analysis is
+        unavailable; ranking falls back to archiveSizeBytes in that case. */
+    readonly codeSizeBytes: number | null;
     readonly bloatRating: number | null;
     readonly license: string | null;
     readonly platforms: readonly string[];

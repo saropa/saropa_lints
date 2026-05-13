@@ -7,8 +7,9 @@ import { CacheService } from './services/cache-service';
 import { ScanLogger } from './services/scan-logger';
 import {
     fetchPackageInfoWithPrerelease, fetchPackageMetrics, fetchPublisher,
-    fetchArchiveSize, fetchReverseDependencyCount,
+    fetchArchiveSize, fetchReverseDependencyCount, resolveArchiveUrl,
 } from './services/pub-dev-api';
+import { analyzeTarball, TarballAnalysis } from './services/tarball-analyzer';
 import { calcBloatRating } from './scoring/bloat-calculator';
 import { extractGitHubRepo, fetchRepoMetrics } from './services/github-api';
 import { extractRepoSubpath, buildUpdateInfo } from './services/changelog-service';
@@ -21,6 +22,7 @@ import {
     calcPublisherTrust,
     calcPubQualityBonus,
     calcAdoptionBonus,
+    calcMaintainerQualityBonus,
     calcPublishRecency,
     computeVibrancyScore,
     ScoringWeights,
@@ -113,12 +115,46 @@ export async function analyzePackage(
         ? daysSince(pubDev.publishedDate)
         : undefined;
 
+    /* Run tarball analysis + updateInfo + archive-size fallback in parallel.
+       The tarball analysis is the source of truth for codeSizeBytes,
+       folderBreakdown, and maintainerQuality flags. It can return null on
+       slow networks or oversized tarballs — in that case we still have
+       archiveSizeBytes as a coarse fallback so the hover doesn't go blank. */
+    const [updateInfo, archiveSizeBytes, tarballAnalysis] = await Promise.all([
+        pubDev
+            ? buildUpdateInfo(
+                { current: dep.version, latest: pubDev.latestVersion, constraint: dep.constraint },
+                repoInfo, {
+                    token: params.githubToken, cache: params.cache,
+                    packageName: dep.name,
+                },
+            )
+            : null,
+        resolveArchiveSize(dep.name, dep.version, knownIssue, params),
+        resolveTarballAnalysis(dep.name, params),
+    ]);
+
+    const codeSizeBytes = tarballAnalysis?.codeSizeBytes ?? null;
+    const folderBreakdown = tarballAnalysis?.folderBreakdown ?? null;
+    const maintainerQuality = tarballAnalysis?.maintainerQuality ?? null;
+    const maintainerQualityBonus = calcMaintainerQualityBonus(maintainerQuality);
+
+    /* Bloat rating runs on codeSizeBytes when available — that's what the
+       package actually contributes to the user's app. Falls back to
+       archiveSizeBytes only when the tarball analysis couldn't run, and
+       even then the recalibrated thresholds keep ratings sane for the
+       common case (`lib/`-only packages where the two are similar). */
+    const bloatSourceBytes = codeSizeBytes ?? archiveSizeBytes;
+    const bloatRating = bloatSourceBytes !== null
+        ? calcBloatRating(bloatSourceBytes) : null;
+
     const pubPoints = metrics.pubPoints;
     const scores = computeScores({
         github, pubPoints, publishedDate: pubDev?.publishedDate ?? null,
         publisher, weights: params.weights,
         maxPublisherBonus: params.publisherTrustBonus,
         reverseDependencyCount,
+        maintainerQualityBonus,
     });
     const pubDevWithPoints = pubDev
         ? { ...pubDev, pubPoints, publisher } : null;
@@ -135,21 +171,6 @@ export async function analyzePackage(
         pop: scores.popularity, pt: scores.publisherTrust,
         pq: scores.pubQualityBonus,
     });
-
-    const [updateInfo, archiveSizeBytes] = await Promise.all([
-        pubDev
-            ? buildUpdateInfo(
-                { current: dep.version, latest: pubDev.latestVersion, constraint: dep.constraint },
-                repoInfo, {
-                    token: params.githubToken, cache: params.cache,
-                    packageName: dep.name,
-                },
-            )
-            : null,
-        resolveArchiveSize(dep.name, knownIssue, params),
-    ]);
-    const bloatRating = archiveSizeBytes !== null
-        ? calcBloatRating(archiveSizeBytes) : null;
 
     const merged = mergeMetrics(metrics, knownIssue, publisher);
     logDataGaps(dep.name, metrics, knownIssue, log);
@@ -170,7 +191,12 @@ export async function analyzePackage(
         package: dep, pubDev: pubDevWithPoints, github, knownIssue,
         ...scores, category, updateInfo,
         license: pubDevWithPoints?.license ?? github?.license ?? knownIssue?.license ?? null,
-        archiveSizeBytes, bloatRating, installedVersionDate, isUnused: false, fileUsages: [],
+        archiveSizeBytes,
+        codeSizeBytes,
+        folderBreakdown,
+        maintainerQuality,
+        maintainerQualityBonus,
+        bloatRating, installedVersionDate, isUnused: false, fileUsages: [],
         platforms: merged.platforms,
         verifiedPublisher: merged.verifiedPublisher,
         wasmReady: merged.wasmReady,
@@ -218,12 +244,56 @@ async function fetchGitHubData(
 
 async function resolveArchiveSize(
     name: string,
+    installedVersion: string,
     knownIssue: KnownIssue | null,
     params: AnalyzeParams,
 ): Promise<number | null> {
     const live = await fetchArchiveSize(name, params.cache, params.logger);
     if (live !== null) { return live; }
-    return knownIssue?.archiveSizeBytes ?? null;
+    /* Version-gate the known-issues fallback: a seed value from an old
+       version is not safe to surface on a newer one. findKnownIssue
+       already filters by range when it returns a scoped entry, but an
+       unscoped entry (or future additions) could leak stale numbers if
+       we trusted them unconditionally. Belt-and-braces:
+         - If the entry has appliesToMaxVersion and the installed version
+           is at or past that ceiling, the size data is stale → return null.
+         - Otherwise the data applies → use it.
+       Without this, a project on audioplayers 6.5.1 could inherit the
+       1.0-era 20.05 MB seed if the live HEAD fetch fails. */
+    if (!knownIssue?.archiveSizeBytes) { return null; }
+    const cap = knownIssue.appliesToMaxVersion;
+    if (cap && versionGteForGate(installedVersion, cap)) { return null; }
+    return knownIssue.archiveSizeBytes;
+}
+
+/** Segment-wise numeric version compare, mirrors known-issues.ts.versionGte. */
+function versionGteForGate(a: string, b: string): boolean {
+    const parse = (v: string): number[] => v.trim().replace(/[-+].*$/, '').split('.')
+        .map(s => { const n = parseInt(s, 10); return Number.isNaN(n) ? 0 : n; });
+    const pa = parse(a);
+    const pb = parse(b);
+    const len = Math.max(pa.length, pb.length);
+    for (let i = 0; i < len; i++) {
+        const va = pa[i] ?? 0;
+        const vb = pb[i] ?? 0;
+        if (va !== vb) { return va > vb; }
+    }
+    return true;
+}
+
+/**
+ * Download + analyze the package tarball to produce codeSize, folder
+ * breakdown, and maintainer-quality flags. Returns null on any failure so
+ * the scan continues — the caller treats null as "data unavailable", not
+ * "package has zero code size".
+ */
+async function resolveTarballAnalysis(
+    name: string,
+    params: AnalyzeParams,
+): Promise<TarballAnalysis | null> {
+    const url = await resolveArchiveUrl(name, params.cache, params.logger);
+    if (!url) { return null; }
+    return analyzeTarball(url, params.cache, params.logger);
 }
 
 function mergeMetrics(
@@ -313,6 +383,7 @@ function computeScores(params: {
     readonly weights?: ScoringWeights;
     readonly maxPublisherBonus?: number;
     readonly reverseDependencyCount: number | null;
+    readonly maintainerQualityBonus: number;
 }) {
     const { github, pubPoints, publishedDate, publisher } = params;
     const daysSincePublish = publishedDate
@@ -343,7 +414,8 @@ function computeScores(params: {
         ? calcFlaggedIssuePenalty(github.flaggedIssues?.length ?? 0) : 0;
     const score = computeVibrancyScore(
         { resolutionVelocity, engagementLevel, popularity }, params.weights,
-        flaggedPenalty, publisherTrust + pubQualityBonus + adoptionBonus,
+        flaggedPenalty,
+        publisherTrust + pubQualityBonus + adoptionBonus + params.maintainerQualityBonus,
     );
     return {
         score, resolutionVelocity, engagementLevel,

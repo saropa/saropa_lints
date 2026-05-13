@@ -3,44 +3,59 @@ import * as assert from 'assert';
 import { calcBloatRating, formatSizeMB, formatSizeKB } from '../../../vibrancy/scoring/bloat-calculator';
 
 describe('bloat-calculator', () => {
-    describe('calcBloatRating', () => {
-        it('should return 0 for zero bytes', () => {
+    describe('calcBloatRating (code-size scale)', () => {
+        /* Anchors: 0 = tiny (<10 KB), 4 ≈ 250 KB, 10 = huge (>10 MB).
+           These are tighter than the old tarball-size thresholds because
+           example/, test/, tool/, doc/ no longer count — a 1 MB of pure
+           lib/ code really is high bloat for a Flutter package. */
+        it('returns 0 for zero bytes', () => {
             assert.strictEqual(calcBloatRating(0), 0);
         });
 
-        it('should return 0 for negative bytes', () => {
+        it('returns 0 for negative bytes', () => {
             assert.strictEqual(calcBloatRating(-100), 0);
         });
 
-        it('should return 0 for tiny packages under 50 KB', () => {
+        it('returns 0 for tiny code (≤10 KB)', () => {
             assert.strictEqual(calcBloatRating(10_000), 0);
         });
 
-        it('should return low rating for small packages around 100 KB', () => {
-            const rating = calcBloatRating(100_000);
-            assert.ok(rating >= 1 && rating <= 2, `expected 1-2, got ${rating}`);
+        it('rates 100 KB of code as 3 (low-medium)', () => {
+            /* log10(100000)=5.0 → (5.0-4.0)/0.3 = 3.33 → 3 */
+            assert.strictEqual(calcBloatRating(100_000), 3);
         });
 
-        it('should return medium rating for ~1 MB packages', () => {
-            const rating = calcBloatRating(1_048_576);
+        it('rates 250 KB of code around the medium anchor (~4)', () => {
+            const rating = calcBloatRating(250_000);
             assert.ok(rating >= 4 && rating <= 5, `expected 4-5, got ${rating}`);
         });
 
-        it('should return high rating for ~10 MB packages', () => {
-            const rating = calcBloatRating(10_485_760);
-            assert.ok(rating >= 7 && rating <= 8, `expected 7-8, got ${rating}`);
+        it('rates 1 MB of code as high (~7)', () => {
+            const rating = calcBloatRating(1_048_576);
+            assert.ok(rating >= 6 && rating <= 7, `expected 6-7, got ${rating}`);
         });
 
-        it('should return 10 for very large packages over 50 MB', () => {
-            assert.strictEqual(calcBloatRating(52_428_800), 10);
+        it('returns 10 for 10 MB+ of code', () => {
+            assert.strictEqual(calcBloatRating(10_485_760), 10);
         });
 
-        it('should clamp at 10 for extremely large packages', () => {
-            assert.strictEqual(calcBloatRating(500_000_000), 10);
+        it('returns 10 for very large code sizes', () => {
+            assert.strictEqual(calcBloatRating(50_000_000), 10);
         });
 
-        it('should return 0 for a 1-byte archive', () => {
+        it('returns 0 for a 1-byte input', () => {
             assert.strictEqual(calcBloatRating(1), 0);
+        });
+    });
+
+    describe('audioplayers shape — the bug that drove the rescaling', () => {
+        /* The bug report case: audioplayers ships 21.7 MB on disk but only
+           ~40 KB of lib/ reaches the user's app. Old model rated it 9/10
+           bloat; new model on codeSizeBytes rates it under 2. */
+        it('rates ~40 KB of code as low (≤2), not the old archive-size 9', () => {
+            const lib40kb = 40 * 1024;
+            const rating = calcBloatRating(lib40kb);
+            assert.ok(rating <= 2, `expected ≤2 for 40 KB of code, got ${rating}`);
         });
     });
 

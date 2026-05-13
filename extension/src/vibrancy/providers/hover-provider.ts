@@ -11,7 +11,7 @@ import { categoryLabel, categoryToGrade, scoreToGrade } from '../scoring/status-
 import { classifyLicense, licenseEmoji } from '../scoring/license-classifier';
 import { worstSeverity, severityEmoji, severityLabel } from '../scoring/vuln-classifier';
 import { formatRelativeTime } from '../scoring/time-formatter';
-import { formatSizeMB } from '../scoring/bloat-calculator';
+import { formatSizeMB, formatSizeKB } from '../scoring/bloat-calculator';
 import { findEnvironmentRange } from '../services/pubspec-parser';
 import {
     SDK_VIBRANCY_TABLE_MD,
@@ -264,9 +264,23 @@ function buildDormancyStatus(
 
 function appendHoverSize(md: vscode.MarkdownString, r: VibrancyResult): void {
     const parts: string[] = [];
-    if (r.archiveSizeBytes !== null) {
+    /* Primary line: code size — what the package contributes to the user's
+       compiled app (`lib/` + declared assets). This is the number that
+       matters for bloat decisions and per-app size budgets. Falls back to
+       archiveSizeBytes only when the tarball analyzer could not run, so the
+       line is never blank when ANY size info is available. */
+    const primaryBytes = r.codeSizeBytes ?? r.archiveSizeBytes;
+    if (primaryBytes !== null) {
         const bloat = r.bloatRating !== null ? ` (${r.bloatRating}/10 bloat)` : '';
-        parts.push(`Archive: ${formatSizeMB(r.archiveSizeBytes)}${bloat}`);
+        const label = r.codeSizeBytes !== null ? 'Code' : 'Archive';
+        parts.push(`${label}: ${formatBytesAdaptive(primaryBytes)}${bloat}`);
+    }
+    /* Secondary detail: on-disk tarball total + per-folder breakdown when
+       available. Shows the developer when a package's tarball mass lives
+       outside `lib/` (e.g. a 21 MB `example/` of sample media) — the case
+       the old bloat-by-tarball model flagged as 9/10 bloat. */
+    if (r.archiveSizeBytes !== null && r.codeSizeBytes !== null) {
+        parts.push(`${formatSizeMB(r.archiveSizeBytes)} on disk`);
     }
     if (r.replacementComplexity) {
         parts.push(`Source: ${r.replacementComplexity.summary}`);
@@ -274,6 +288,58 @@ function appendHoverSize(md: vscode.MarkdownString, r: VibrancyResult): void {
     if (parts.length > 0) {
         md.appendMarkdown(`**SIZE** — ${parts.join(' · ')}\n\n`);
     }
+
+    /* Folder breakdown as a sub-line when available — surfaces the
+       asymmetry that `example/` / `test/` would have penalized in the old
+       model but is now a positive signal. */
+    if (r.folderBreakdown) {
+        const breakdown = formatFolderBreakdown(r.folderBreakdown);
+        if (breakdown) { md.appendMarkdown(`${breakdown}\n\n`); }
+    }
+
+    /* Maintainer-quality flags: positive components that lifted the score.
+       Only render when at least one flag is true; absent flags are not
+       penalties, just non-contributions. */
+    if (r.maintainerQuality) {
+        const bonuses = formatMaintainerQuality(r.maintainerQuality);
+        if (bonuses.length > 0) {
+            md.appendMarkdown(`**HEALTH** — ${bonuses.join(' · ')}\n\n`);
+        }
+    }
+}
+
+/** KB for sub-MB sizes, MB above. Keeps the primary line readable across the
+    full code-size range (a 40 KB `lib/` shouldn't render as `0.04 MB`). */
+function formatBytesAdaptive(bytes: number): string {
+    return bytes < 1024 * 1024 ? formatSizeKB(bytes) : formatSizeMB(bytes);
+}
+
+/** Render the per-folder breakdown when at least one non-lib folder has bytes. */
+function formatFolderBreakdown(fb: import('../types').FolderBreakdown): string | null {
+    const total = fb.lib + fb.example + fb.test + fb.tool + fb.doc + fb.other;
+    if (total <= 0) { return null; }
+    const parts: string[] = [];
+    const pct = (n: number) => `${((n / total) * 100).toFixed(n / total < 0.001 ? 2 : 1)}%`;
+    /* Only list folders that have non-trivial mass (>0.1%). A package that
+       only ships `lib/` would otherwise display every folder at 0.0%. */
+    if (fb.lib > 0) { parts.push(`lib ${pct(fb.lib)}`); }
+    if (fb.example / total > 0.001) { parts.push(`example ${pct(fb.example)}`); }
+    if (fb.test / total > 0.001) { parts.push(`test ${pct(fb.test)}`); }
+    if (fb.tool / total > 0.001) { parts.push(`tool ${pct(fb.tool)}`); }
+    if (fb.doc / total > 0.001) { parts.push(`doc ${pct(fb.doc)}`); }
+    if (fb.other / total > 0.001) { parts.push(`other ${pct(fb.other)}`); }
+    if (parts.length <= 1) { return null; }
+    return `_${parts.join(' · ')}_`;
+}
+
+/** Format positive maintainer-quality components for the hover. */
+function formatMaintainerQuality(q: import('../types').MaintainerQualityFlags): string[] {
+    const parts: string[] = [];
+    if (q.hasExample) { parts.push('+example'); }
+    if (q.hasTests) { parts.push('+tests'); }
+    if (q.hasTools) { parts.push('+tools'); }
+    if (q.hasDocs) { parts.push('+docs'); }
+    return parts;
 }
 
 function appendHoverFileUsages(md: vscode.MarkdownString, r: VibrancyResult): void {

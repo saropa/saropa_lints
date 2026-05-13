@@ -5,7 +5,7 @@
  * Vibrancy UI experiment: scoring, providers, and webview assets.
  */
 
-import { GitHubMetrics } from '../types';
+import { GitHubMetrics, MaintainerQualityFlags } from '../types';
 import { isTrustedPublisher } from './trusted-publishers';
 
 export { TRUSTED_PUBLISHERS, isTrustedPublisher } from './trusted-publishers';
@@ -183,6 +183,43 @@ export function calcAdoptionBonus(
     // log10(count + 1) / log10(1001) maps 1→~0, 1000→1.0
     const normalized = Math.log10(reverseDependencyCount + 1) / Math.log10(1001);
     return Math.min(maxBonus, normalized * maxBonus);
+}
+
+/** Maximum maintainer-quality bonus added to the vibrancy score. */
+export const DEFAULT_MAX_MAINTAINER_QUALITY_BONUS = 10;
+
+/**
+ * Bonus for shipping maintainer-quality folders: runnable demo (`example/`),
+ * regression suite (`test/`), maintainer automation (`tool/`), extended docs
+ * (`doc/`). Each present flag earns an equal share of `maxBonus`, so a
+ * fully-equipped package (all four) earns the full bonus.
+ *
+ * Why this is a bonus rather than a penalty: a package that ships these
+ * folders is healthier than one that doesn't. The earlier model counted
+ * their bytes against the package via tarball-size-as-bloat — exactly the
+ * wrong direction on all four signals. Each is now an independent positive
+ * component, surfaced in the hover so developers can see why the score
+ * moved.
+ *
+ * Equal-weight rationale: the absence of any one of these is a real signal
+ * (a package with no tests is less trustworthy than one with tests), so we
+ * don't want any single flag to dominate. If empirical calibration shows
+ * one signal matters disproportionately (likely `hasTests`), the function
+ * can be re-weighted without changing call sites.
+ *
+ * Returns 0 when `flags` is null — the analyzer couldn't read the tarball
+ * so we can't confirm or deny these signals. Treat absence-of-data as
+ * neutral, NOT as a penalty.
+ */
+export function calcMaintainerQualityBonus(
+    flags: MaintainerQualityFlags | null,
+    maxBonus: number = DEFAULT_MAX_MAINTAINER_QUALITY_BONUS,
+): number {
+    if (!flags || maxBonus <= 0) { return 0; }
+    const present = [flags.hasExample, flags.hasTests, flags.hasTools, flags.hasDocs]
+        .filter(Boolean).length;
+    if (present === 0) { return 0; }
+    return Math.min(maxBonus, (present / 4) * maxBonus);
 }
 
 /** Penalty for flagged high-signal open issues (0–15 points). */

@@ -319,7 +319,12 @@ export async function fetchArchiveSize(
     return headContentLength(archiveUrl, cacheKey, cache, logger, headers);
 }
 
-async function resolveArchiveUrl(
+/**
+ * Resolve the archive URL for a package — either from the cache populated by
+ * fetchPackageInfoWithPrerelease, or via a fresh API call. Exported so the
+ * tarball analyzer can drive a download without re-fetching package metadata.
+ */
+export async function resolveArchiveUrl(
     name: string,
     cache?: CacheService,
     logger?: ScanLogger,
