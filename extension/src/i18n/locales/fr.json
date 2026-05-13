@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "Diagnostic secondaire",
     "hero": {
       "productTitle": "Tableau de bord des résultats",
-      "gaugeTitle": "Score de santé 0/100 (grade 1). Les erreurs pèsent le plus lourd. {grade} {score}"
+      "gaugeTitle": "Score de santé 0/100 (grade 1). Les erreurs pèsent le plus lourd. {score} {grade}"
     },
     "time": {
       "justNow": "tout à l' heure",
@@ -395,7 +395,7 @@
     "noMatchingFindingsCopy": "Aucun résultat correspondant à copier.",
     "couldNotOpenFile": "Impossible d'ouvrir le fichier : 0 {path}",
     "saveReportNoWorkspace": "Ouvrez un dossier d'espace de travail avant d'enregistrer le rapport.",
-    "savedFindings": "0 résultat(s) enregistré(s) : 1 {count} {path}",
+    "savedFindings": "0 résultat(s) enregistré(s) : 1 {path} {count}",
     "couldNotSaveReportJson": "Impossible d'enregistrer le rapport JSON."
   },
   "packageDashboard": {
@@ -404,7 +404,7 @@
     "status": {
       "packagesCount": "{count} paquets",
       "packagesBreakdown": "{direct} direct, {transitive} transitif",
-      "gradeLine": "Note 0 · 1/100 {grade} {avg}",
+      "gradeLine": "Note 0 · 1/100 {avg} {grade}",
       "flaggedCount": "{count} signalé(s)",
       "flaggedTitle": "Abandonné ou en fin de vie"
     },
@@ -419,7 +419,7 @@
       "packages": "Forfaits",
       "projectGrade": "Catégorie du package de projet",
       "totalSize": "Taille totale*",
-      "gradeTooltip": "Note du projet 0\nNote moyenne : 1/100\nForfaits : 2\nA:3 B:4 C:5 E:6 F:7 {b} {avgGrade} {pkgCount} {c} {f} {a} {e} {avgScore}",
+      "gradeTooltip": "Note du projet 0\nNote moyenne : 1/100\nForfaits : 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {pkgCount} {f} {c} {e} {avgScore} {a} {b}",
       "vibrantTitle": "Dynamique",
       "stableTitle": "Écurie",
       "outdatedTitle": "Dépassé",
@@ -668,12 +668,12 @@
       "generated": "Généré",
       "functionOne": "{count} fonction",
       "functionOther": "{count} fonctions",
-      "avgFormat": "moyenne 0 (1) {grade} {score}",
+      "avgFormat": "moyenne 0 (1) {score} {grade}",
       "gatesFailing": "portes défaillantes",
       "gatesPassing": "passage des portes"
     },
     "gauge": {
-      "tooltip": "Note moyenne 0 sur 100 (note 1). {grade} {rounded}",
+      "tooltip": "Note moyenne 0 sur 100 (note 1). {rounded} {grade}",
       "ariaLabel": "Note moyenne 0 sur 100 {rounded}"
     },
     "gate": {
@@ -714,7 +714,7 @@
     "table": {
       "ariaLabel": "Pires fonctions par score",
       "heading": "Les pires fonctions",
-      "topCount": "0 supérieur de 1 {shown} {total}",
+      "topCount": "0 supérieur de 1 {total} {shown}",
       "colGrade": "Note",
       "colScore": "Score",
       "colFunction": "Fonction",

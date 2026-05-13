@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "Diagnóstico secundario",
     "hero": {
       "productTitle": "Panel de resultados",
-      "gaugeTitle": "Puntuación de salud 0/100 (grado 1). Los errores pesan más. {grade} {score}"
+      "gaugeTitle": "Puntuación de salud 0/100 (grado 1). Los errores pesan más. {score} {grade}"
     },
     "time": {
       "justNow": "En este momento",
@@ -395,7 +395,7 @@
     "noMatchingFindingsCopy": "No hay resultados coincidentes para copiar.",
     "couldNotOpenFile": "No se pudo abrir el archivo: 0 {path}",
     "saveReportNoWorkspace": "Abra una carpeta del espacio de trabajo antes de guardar el informe.",
-    "savedFindings": "Guardado 0 hallazgo(s): 1 {count} {path}",
+    "savedFindings": "Guardado 0 hallazgo(s): 1 {path} {count}",
     "couldNotSaveReportJson": "No se pudo guardar el informe JSON."
   },
   "packageDashboard": {
@@ -404,7 +404,7 @@
     "status": {
       "packagesCount": "{count} paquetes",
       "packagesBreakdown": "{direct} directo, {transitive} transitivo",
-      "gradeLine": "Calificación 0 · 1/100 {grade} {avg}",
+      "gradeLine": "Calificación 0 · 1/100 {avg} {grade}",
       "flaggedCount": "{count} marcado(s)",
       "flaggedTitle": "Abandonado o al final de su vida"
     },
@@ -419,7 +419,7 @@
       "packages": "Paquetes",
       "projectGrade": "Grado del paquete del proyecto",
       "totalSize": "Tamaño total*",
-      "gradeTooltip": "Calificación del proyecto 0\nPuntuación media: 1/100\nPaquetes: 2\nA:3 B:4 C:5 E:6 F:7 {b} {avgGrade} {pkgCount} {c} {f} {a} {e} {avgScore}",
+      "gradeTooltip": "Calificación del proyecto 0\nPuntuación media: 1/100\nPaquetes: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {pkgCount} {f} {c} {e} {avgScore} {a} {b}",
       "vibrantTitle": "Vibrante",
       "stableTitle": "Estable",
       "outdatedTitle": "Anticuado",
@@ -668,12 +668,12 @@
       "generated": "Generado",
       "functionOne": "{count} función",
       "functionOther": "{count} funciones",
-      "avgFormat": "promedio 0 (1) {grade} {score}",
+      "avgFormat": "promedio 0 (1) {score} {grade}",
       "gatesFailing": "puertas fallando",
       "gatesPassing": "puertas pasando"
     },
     "gauge": {
-      "tooltip": "Puntaje promedio 0 de 100 (calificación 1). {grade} {rounded}",
+      "tooltip": "Puntaje promedio 0 de 100 (calificación 1). {rounded} {grade}",
       "ariaLabel": "Puntuación media 0 de 100 {rounded}"
     },
     "gate": {
@@ -714,7 +714,7 @@
     "table": {
       "ariaLabel": "Peores funciones por puntuación",
       "heading": "Peores funciones",
-      "topCount": "arriba 0 de 1 {shown} {total}",
+      "topCount": "arriba 0 de 1 {total} {shown}",
       "colGrade": "Calificación",
       "colScore": "Puntaje",
       "colFunction": "Función",

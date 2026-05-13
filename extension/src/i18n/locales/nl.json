@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "Secundaire diagnostiek",
     "hero": {
       "productTitle": "Bevindingendashboard",
-      "gaugeTitle": "Gezondheidsscore 0/100 (graad 1). Fouten wegen het zwaarst. {grade} {score}"
+      "gaugeTitle": "Gezondheidsscore 0/100 (graad 1). Fouten wegen het zwaarst. {score} {grade}"
     },
     "time": {
       "justNow": "zojuist",
@@ -395,7 +395,7 @@
     "noMatchingFindingsCopy": "Geen overeenkomende bevindingen om te kopiëren.",
     "couldNotOpenFile": "Kon bestand niet openen: 0 {path}",
     "saveReportNoWorkspace": "Open een werkruimtemap voordat u het rapport opslaat.",
-    "savedFindings": "0 bevinding(en) opgeslagen: 1 {count} {path}",
+    "savedFindings": "0 bevinding(en) opgeslagen: 1 {path} {count}",
     "couldNotSaveReportJson": "Kan rapport-JSON niet opslaan."
   },
   "packageDashboard": {
@@ -404,7 +404,7 @@
     "status": {
       "packagesCount": "{count} pakketten",
       "packagesBreakdown": "{direct} direct, {transitive} transitief",
-      "gradeLine": "Graad 0 · 1/100 {grade} {avg}",
+      "gradeLine": "Graad 0 · 1/100 {avg} {grade}",
       "flaggedCount": "{count} gemarkeerd",
       "flaggedTitle": "Verlaten of einde leven"
     },
@@ -419,7 +419,7 @@
       "packages": "Pakketten",
       "projectGrade": "Projectpakketklasse",
       "totalSize": "Totale grootte*",
-      "gradeTooltip": "Projectcijfer 0\nGemiddelde score: 1/100\nPakketten: 2\nA:3 B:4 C:5 E:6 F:7 {b} {avgGrade} {pkgCount} {c} {f} {a} {e} {avgScore}",
+      "gradeTooltip": "Projectcijfer 0\nGemiddelde score: 1/100\nPakketten: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {pkgCount} {f} {c} {e} {avgScore} {a} {b}",
       "vibrantTitle": "Levendig",
       "stableTitle": "Stabiel",
       "outdatedTitle": "Verouderd",
@@ -668,12 +668,12 @@
       "generated": "Gegenereerd",
       "functionOne": "{count} functie",
       "functionOther": "{count} functies",
-      "avgFormat": "gemiddeld 0 (1) {grade} {score}",
+      "avgFormat": "gemiddeld 0 (1) {score} {grade}",
       "gatesFailing": "poorten falen",
       "gatesPassing": "poorten passeren"
     },
     "gauge": {
-      "tooltip": "Gemiddelde score 0 van 100 (cijfer 1). {grade} {rounded}",
+      "tooltip": "Gemiddelde score 0 van 100 (cijfer 1). {rounded} {grade}",
       "ariaLabel": "Gemiddelde score 0 van 100 {rounded}"
     },
     "gate": {
@@ -714,7 +714,7 @@
     "table": {
       "ariaLabel": "Slechtste functies per score",
       "heading": "Slechtste functies",
-      "topCount": "top 0 van 1 {shown} {total}",
+      "topCount": "top 0 van 1 {total} {shown}",
       "colGrade": "Cijfer",
       "colScore": "Scoren",
       "colFunction": "Functie",

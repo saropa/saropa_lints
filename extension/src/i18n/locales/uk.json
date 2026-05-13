@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "Вторинна діагностика",
     "hero": {
       "productTitle": "Інформаційна панель висновків",
-      "gaugeTitle": "Оцінка здоров’я 0/100 (оцінка 1). Помилки важать найбільше. {grade} {score}"
+      "gaugeTitle": "Оцінка здоров’я 0/100 (оцінка 1). Помилки важать найбільше. {score} {grade}"
     },
     "time": {
       "justNow": "тільки зараз",
@@ -395,7 +395,7 @@
     "noMatchingFindingsCopy": "Немає відповідних результатів для копіювання.",
     "couldNotOpenFile": "Не вдалося відкрити файл: 0 {path}",
     "saveReportNoWorkspace": "Перед збереженням звіту відкрийте папку робочої області.",
-    "savedFindings": "Збережено 0 знахідки: 1 {count} {path}",
+    "savedFindings": "Збережено 0 знахідки: 1 {path} {count}",
     "couldNotSaveReportJson": "Не вдалося зберегти звіт JSON."
   },
   "packageDashboard": {
@@ -404,7 +404,7 @@
     "status": {
       "packagesCount": "{count} пакетів",
       "packagesBreakdown": "{direct} прямих, {transitive} транзитивних",
-      "gradeLine": "Оцінка 0 · 1/100 {grade} {avg}",
+      "gradeLine": "Оцінка 0 · 1/100 {avg} {grade}",
       "flaggedCount": "{count} позначено",
       "flaggedTitle": "Покинутий або вийшов із життя"
     },
@@ -419,7 +419,7 @@
       "packages": "пакети",
       "projectGrade": "Оцінка пакету проекту",
       "totalSize": "Загальний розмір*",
-      "gradeTooltip": "Оцінка проекту 0\nСередній бал: 1/100\nПакети: 2\nA:3 B:4 C:5 E:6 F:7 {b} {avgGrade} {pkgCount} {c} {f} {a} {e} {avgScore}",
+      "gradeTooltip": "Оцінка проекту 0\nСередній бал: 1/100\nПакети: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {pkgCount} {f} {c} {e} {avgScore} {a} {b}",
       "vibrantTitle": "Яскравий",
       "stableTitle": "Стабільний",
       "outdatedTitle": "Застаріла",
@@ -668,12 +668,12 @@
       "generated": "Згенерований",
       "functionOne": "{count} функція",
       "functionOther": "{count} функцій",
-      "avgFormat": "середнє 0 (1) {grade} {score}",
+      "avgFormat": "середнє 0 (1) {score} {grade}",
       "gatesFailing": "ворота виходять з ладу",
       "gatesPassing": "проходження воріт"
     },
     "gauge": {
-      "tooltip": "Середній бал 0 із 100 (оцінка 1). {grade} {rounded}",
+      "tooltip": "Середній бал 0 із 100 (оцінка 1). {rounded} {grade}",
       "ariaLabel": "Середній бал 0 із 100 {rounded}"
     },
     "gate": {
@@ -714,7 +714,7 @@
     "table": {
       "ariaLabel": "Найгірші функції за балами",
       "heading": "Найгірші функції",
-      "topCount": "зверху 0 з 1 {shown} {total}",
+      "topCount": "зверху 0 з 1 {total} {shown}",
       "colGrade": "Оцінка",
       "colScore": "Оцінка",
       "colFunction": "функція",

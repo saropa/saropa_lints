@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "माध्यमिक निदान",
     "hero": {
       "productTitle": "निष्कर्ष डैशबोर्ड",
-      "gaugeTitle": "स्वास्थ्य स्कोर 0/100 (ग्रेड 1). त्रुटियाँ सबसे अधिक भारी पड़ती हैं। {grade} {score}"
+      "gaugeTitle": "स्वास्थ्य स्कोर 0/100 (ग्रेड 1). त्रुटियाँ सबसे अधिक भारी पड़ती हैं। {score} {grade}"
     },
     "time": {
       "justNow": "बस अब",
@@ -395,7 +395,7 @@
     "noMatchingFindingsCopy": "कॉपी करने के लिए कोई मेल खाने वाला निष्कर्ष नहीं.",
     "couldNotOpenFile": "फ़ाइल नहीं खुल सकी: 0 {path}",
     "saveReportNoWorkspace": "रिपोर्ट सहेजने से पहले एक कार्यस्थान फ़ोल्डर खोलें.",
-    "savedFindings": "सहेजे गए 0 निष्कर्ष: 1 {count} {path}",
+    "savedFindings": "सहेजे गए 0 निष्कर्ष: 1 {path} {count}",
     "couldNotSaveReportJson": "रिपोर्ट JSON सहेजा नहीं जा सका."
   },
   "packageDashboard": {
@@ -404,7 +404,7 @@
     "status": {
       "packagesCount": "{count} पैकेज",
       "packagesBreakdown": "{direct} प्रत्यक्ष, {transitive} सकर्मक",
-      "gradeLine": "ग्रेड 0 · 1/100 {grade} {avg}",
+      "gradeLine": "ग्रेड 0 · 1/100 {avg} {grade}",
       "flaggedCount": "{count} फ़्लैग किए गए",
       "flaggedTitle": "त्याग दिया गया या जीवन का अंत हो गया"
     },
@@ -419,7 +419,7 @@
       "packages": "संकुल",
       "projectGrade": "प्रोजेक्ट पैकेज ग्रेड",
       "totalSize": "कुल आकार*",
-      "gradeTooltip": "प्रोजेक्ट ग्रेड 0\nऔसत स्कोर: 1/100\nपैकेज: 2\nA:3 B:4 C:5 E:6 F:7 {b} {avgGrade} {pkgCount} {c} {f} {a} {e} {avgScore}",
+      "gradeTooltip": "प्रोजेक्ट ग्रेड 0\nऔसत स्कोर: 1/100\nपैकेज: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {pkgCount} {f} {c} {e} {avgScore} {a} {b}",
       "vibrantTitle": "जीवंत",
       "stableTitle": "स्थिर",
       "outdatedTitle": "रगड़ा हुआ",
@@ -668,12 +668,12 @@
       "generated": "जनरेट किया गया",
       "functionOne": "{count} फ़ंक्शन",
       "functionOther": "{count} फ़ंक्शन",
-      "avgFormat": "औसत 0 (1) {grade} {score}",
+      "avgFormat": "औसत 0 (1) {score} {grade}",
       "gatesFailing": "गेट विफल हो रहे हैं",
       "gatesPassing": "द्वार गुजर रहे हैं"
     },
     "gauge": {
-      "tooltip": "100 का औसत स्कोर 0 (ग्रेड 1)। {grade} {rounded}",
+      "tooltip": "100 का औसत स्कोर 0 (ग्रेड 1)। {rounded} {grade}",
       "ariaLabel": "100 का औसत स्कोर 0 {rounded}"
     },
     "gate": {
@@ -714,7 +714,7 @@
     "table": {
       "ariaLabel": "स्कोर के हिसाब से सबसे खराब कार्य",
       "heading": "सबसे ख़राब कार्य",
-      "topCount": "1 में से शीर्ष 0 {shown} {total}",
+      "topCount": "1 में से शीर्ष 0 {total} {shown}",
       "colGrade": "श्रेणी",
       "colScore": "अंक",
       "colFunction": "समारोह",

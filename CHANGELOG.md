@@ -47,6 +47,8 @@
 
 ## [13.9.0]
 
+The extension UI is now fully translated into every shipped non-English language — sidebar, dashboards, status bar, command palette, and webviews no longer fall back to English. Package Vibrancy stops over-flagging packages that ship demo media or sample servers, drops misleading "replace with itself" upgrade hints, and rewards packages that include example, test, and doc folders. The Package Dashboard also gains collapsible sections, attaches tooltips to the cards they describe, hides toolbar buttons when there's nothing to do, and renders the Dependency Network diagram cleanly instead of as overlapping garbled text. [log](https://github.com/saropa/saropa_lints/blob/v13.9.0/CHANGELOG.md)
+
 ### Added (Extension)
 
 - **Extension UI now fully localized across all 24 shipped non-English locales** — every string in the sidebar, dashboards, status bar, command palette, and webviews now has a curated translation for ar, bn, de, es, fa, fil, fr, he, hi, id, it, ja, ko, nl, pl, pt, ru, sw, th, tr, uk, ur, vi, and zh. Previously many UI fragments fell back to English in non-English locales because the dictionary was sparse and a defensive guard in the translator was silently reverting legitimate translations whose placeholders sat at non-leading positions. No action required.

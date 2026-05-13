@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "אבחון משני",
     "hero": {
       "productTitle": "לוח המחוונים של ממצאים",
-      "gaugeTitle": "ציון בריאות 0/100 (ציון 1). שגיאות שוקלות את הכבד ביותר. {grade} {score}"
+      "gaugeTitle": "ציון בריאות 0/100 (ציון 1). שגיאות שוקלות את הכבד ביותר. {score} {grade}"
     },
     "time": {
       "justNow": "זֶה עַתָה",
@@ -395,7 +395,7 @@
     "noMatchingFindingsCopy": "אין ממצאים תואמים להעתקה.",
     "couldNotOpenFile": "לא ניתן היה לפתוח את הקובץ: 0 {path}",
     "saveReportNoWorkspace": "פתח תיקיית סביבת עבודה לפני שמירת הדוח.",
-    "savedFindings": "ממצא/ים שמורים 0: 1 {count} {path}",
+    "savedFindings": "ממצא/ים שמורים 0: 1 {path} {count}",
     "couldNotSaveReportJson": "לא ניתן לשמור את הדוח JSON."
   },
   "packageDashboard": {
@@ -404,7 +404,7 @@
     "status": {
       "packagesCount": "{count} חבילות",
       "packagesBreakdown": "{direct} ישיר, {transitive} טרנזיטיבי",
-      "gradeLine": "ציון 0 · 1/100 {grade} {avg}",
+      "gradeLine": "ציון 0 · 1/100 {avg} {grade}",
       "flaggedCount": "{count} סומנו בדגל",
       "flaggedTitle": "נטוש או סוף החיים"
     },
@@ -419,7 +419,7 @@
       "packages": "חבילות",
       "projectGrade": "ציון חבילת פרויקט",
       "totalSize": "גודל כולל*",
-      "gradeTooltip": "ציון הפרויקט 0\nציון ממוצע: 1/100\nחבילות: 2\nA:3 B:4 C:5 E:6 F:7 {b} {avgGrade} {pkgCount} {c} {f} {a} {e} {avgScore}",
+      "gradeTooltip": "ציון הפרויקט 0\nציון ממוצע: 1/100\nחבילות: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {pkgCount} {f} {c} {e} {avgScore} {a} {b}",
       "vibrantTitle": "תוסס",
       "stableTitle": "יַצִיב",
       "outdatedTitle": "מְיוּשָׁן",
@@ -668,12 +668,12 @@
       "generated": "נוצר",
       "functionOne": "{count} פונקציה",
       "functionOther": "{count} פונקציות",
-      "avgFormat": "ממוצע 0 (1) {grade} {score}",
+      "avgFormat": "ממוצע 0 (1) {score} {grade}",
       "gatesFailing": "שערים נכשלים",
       "gatesPassing": "שערים עוברים"
     },
     "gauge": {
-      "tooltip": "ציון ממוצע 0 מתוך 100 (ציון 1). {grade} {rounded}",
+      "tooltip": "ציון ממוצע 0 מתוך 100 (ציון 1). {rounded} {grade}",
       "ariaLabel": "ציון ממוצע 0 מתוך 100 {rounded}"
     },
     "gate": {
@@ -714,7 +714,7 @@
     "table": {
       "ariaLabel": "הפונקציות הגרוע ביותר לפי ציון",
       "heading": "פונקציות גרועות ביותר",
-      "topCount": "למעלה 0 מתוך 1 {shown} {total}",
+      "topCount": "למעלה 0 מתוך 1 {total} {shown}",
       "colGrade": "צִיוּן",
       "colScore": "צִיוּן",
       "colFunction": "פוּנקצִיָה",

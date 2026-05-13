@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "การวินิจฉัยทุติยภูมิ",
     "hero": {
       "productTitle": "แดชบอร์ดผลการสืบค้น",
-      "gaugeTitle": "คะแนนสุขภาพ 0/100 (เกรด 1) ข้อผิดพลาดมีน้ำหนักมากที่สุด {grade} {score}"
+      "gaugeTitle": "คะแนนสุขภาพ 0/100 (เกรด 1) ข้อผิดพลาดมีน้ำหนักมากที่สุด {score} {grade}"
     },
     "time": {
       "justNow": "แค่ตอนนี้",
@@ -395,7 +395,7 @@
     "noMatchingFindingsCopy": "ไม่มีผลการสืบค้นที่ตรงกันที่จะคัดลอก",
     "couldNotOpenFile": "ไม่สามารถเปิดไฟล์ได้: 0 {path}",
     "saveReportNoWorkspace": "เปิดโฟลเดอร์พื้นที่ทำงานก่อนที่จะบันทึกรายงาน",
-    "savedFindings": "บันทึกการค้นพบ 0: 1 {count} {path}",
+    "savedFindings": "บันทึกการค้นพบ 0: 1 {path} {count}",
     "couldNotSaveReportJson": "ไม่สามารถบันทึกรายงาน JSON"
   },
   "packageDashboard": {
@@ -404,7 +404,7 @@
     "status": {
       "packagesCount": "{count} แพ็กเกจ",
       "packagesBreakdown": "ทางตรง {direct}, ทางอ้อม {transitive}",
-      "gradeLine": "เกรด 0 · 1/100 {grade} {avg}",
+      "gradeLine": "เกรด 0 · 1/100 {avg} {grade}",
       "flaggedCount": "ตั้งค่าสถานะ {count} รายการ",
       "flaggedTitle": "ละทิ้งหรือสิ้นชีวิต"
     },
@@ -419,7 +419,7 @@
       "packages": "แพ็คเกจ",
       "projectGrade": "เกรดแพ็คเกจโครงการ",
       "totalSize": "ขนาดรวม*",
-      "gradeTooltip": "เกรดโครงการ 0\nคะแนนเฉลี่ย: 1/100\nแพ็คเกจ: 2\nก:3 B:4 ค:5 อี:6 ฟ:7 {b} {avgGrade} {pkgCount} {c} {f} {a} {e} {avgScore}",
+      "gradeTooltip": "เกรดโครงการ 0\nคะแนนเฉลี่ย: 1/100\nแพ็คเกจ: 2\nก:3 B:4 ค:5 อี:6 ฟ:7 {avgGrade} {pkgCount} {f} {c} {e} {avgScore} {a} {b}",
       "vibrantTitle": "มีชีวิตชีวา",
       "stableTitle": "มั่นคง",
       "outdatedTitle": "ล้าสมัย",
@@ -668,12 +668,12 @@
       "generated": "สร้างขึ้น",
       "functionOne": "{count} ฟังก์ชัน",
       "functionOther": "{count} ฟังก์ชัน",
-      "avgFormat": "เฉลี่ย 0 (1) {grade} {score}",
+      "avgFormat": "เฉลี่ย 0 (1) {score} {grade}",
       "gatesFailing": "ประตูล้มเหลว",
       "gatesPassing": "ประตูผ่านไป"
     },
     "gauge": {
-      "tooltip": "คะแนนเฉลี่ย 0 จาก 100 (เกรด 1) {grade} {rounded}",
+      "tooltip": "คะแนนเฉลี่ย 0 จาก 100 (เกรด 1) {rounded} {grade}",
       "ariaLabel": "คะแนนเฉลี่ย 0 จาก 100 {rounded}"
     },
     "gate": {
@@ -714,7 +714,7 @@
     "table": {
       "ariaLabel": "ฟังก์ชั่นแย่ที่สุดตามคะแนน",
       "heading": "ฟังก์ชั่นที่แย่ที่สุด",
-      "topCount": "บน 0 จาก 1 {shown} {total}",
+      "topCount": "บน 0 จาก 1 {total} {shown}",
       "colGrade": "ระดับ",
       "colScore": "คะแนน",
       "colFunction": "การทำงาน",

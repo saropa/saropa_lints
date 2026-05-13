@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "İkincil teşhis",
     "hero": {
       "productTitle": "Bulgular Kontrol Paneli",
-      "gaugeTitle": "Sağlık puanı 0/100 (derece 1). Hatalar en ağırdır. {grade} {score}"
+      "gaugeTitle": "Sağlık puanı 0/100 (derece 1). Hatalar en ağırdır. {score} {grade}"
     },
     "time": {
       "justNow": "Şu anda",
@@ -395,7 +395,7 @@
     "noMatchingFindingsCopy": "Kopyalanacak eşleşen bulgu yok.",
     "couldNotOpenFile": "Dosya açılamadı: 0 {path}",
     "saveReportNoWorkspace": "Raporu kaydetmeden önce bir çalışma alanı klasörü açın.",
-    "savedFindings": "Kaydedilen 0 bulgu(lar): 1 {count} {path}",
+    "savedFindings": "Kaydedilen 0 bulgu(lar): 1 {path} {count}",
     "couldNotSaveReportJson": "JSON raporu kaydedilemedi."
   },
   "packageDashboard": {
@@ -404,7 +404,7 @@
     "status": {
       "packagesCount": "{count} paket",
       "packagesBreakdown": "{direct} doğrudan, {transitive} geçişli",
-      "gradeLine": "Derece 0 · 1/100 {grade} {avg}",
+      "gradeLine": "Derece 0 · 1/100 {avg} {grade}",
       "flaggedCount": "{count} işaretlendi",
       "flaggedTitle": "Terk edilmiş veya ömrünün sonu"
     },
@@ -419,7 +419,7 @@
       "packages": "Paketler",
       "projectGrade": "Proje Paketi Notu",
       "totalSize": "Toplam Boyut*",
-      "gradeTooltip": "Proje notu 0\nOrtalama puan: 1/100\nPaketler: 2\nA:3 B:4 C:5 E:6 F:7 {b} {avgGrade} {pkgCount} {c} {f} {a} {e} {avgScore}",
+      "gradeTooltip": "Proje notu 0\nOrtalama puan: 1/100\nPaketler: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {pkgCount} {f} {c} {e} {avgScore} {a} {b}",
       "vibrantTitle": "Canlı",
       "stableTitle": "Stabil",
       "outdatedTitle": "Modası geçmiş",
@@ -668,12 +668,12 @@
       "generated": "Oluşturuldu",
       "functionOne": "{count} işlev",
       "functionOther": "{count} işlev",
-      "avgFormat": "ortalama 0 (1) {grade} {score}",
+      "avgFormat": "ortalama 0 (1) {score} {grade}",
       "gatesFailing": "kapılar başarısız",
       "gatesPassing": "geçen kapılar"
     },
     "gauge": {
-      "tooltip": "Ortalama puan 0 100 (not 1). {grade} {rounded}",
+      "tooltip": "Ortalama puan 0 100 (not 1). {rounded} {grade}",
       "ariaLabel": "Ortalama puan 0 / 100 {rounded}"
     },
     "gate": {
@@ -714,7 +714,7 @@
     "table": {
       "ariaLabel": "Puana göre en kötü işlevler",
       "heading": "En kötü işlevler",
-      "topCount": "üst 0 / 1 {shown} {total}",
+      "topCount": "üst 0 / 1 {total} {shown}",
       "colGrade": "Seviye",
       "colScore": "Gol",
       "colFunction": "İşlev",

@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "Вторичная диагностика",
     "hero": {
       "productTitle": "Панель результатов",
-      "gaugeTitle": "Оценка здоровья 0/100 (оценка 1). Ошибки весят больше всего. {grade} {score}"
+      "gaugeTitle": "Оценка здоровья 0/100 (оценка 1). Ошибки весят больше всего. {score} {grade}"
     },
     "time": {
       "justNow": "прямо сейчас",
@@ -395,7 +395,7 @@
     "noMatchingFindingsCopy": "Нет соответствующих результатов для копирования.",
     "couldNotOpenFile": "Не удалось открыть файл: 0 {path}",
     "saveReportNoWorkspace": "Прежде чем сохранять отчет, откройте папку рабочей области.",
-    "savedFindings": "Сохранено 0 результатов: 1 {count} {path}",
+    "savedFindings": "Сохранено 0 результатов: 1 {path} {count}",
     "couldNotSaveReportJson": "Не удалось сохранить отчет в формате JSON."
   },
   "packageDashboard": {
@@ -404,7 +404,7 @@
     "status": {
       "packagesCount": "{count} пакетов",
       "packagesBreakdown": "{direct} прямых, {transitive} транзитивных",
-      "gradeLine": "Оценка 0 · 1/100 {grade} {avg}",
+      "gradeLine": "Оценка 0 · 1/100 {avg} {grade}",
       "flaggedCount": "{count} отмеченных",
       "flaggedTitle": "Заброшенный или окончательный срок службы"
     },
@@ -419,7 +419,7 @@
       "packages": "Пакеты",
       "projectGrade": "Оценка пакета проекта",
       "totalSize": "Общий размер*",
-      "gradeTooltip": "Оценка проекта 0\nСредний балл: 1/100\nПакеты: 2\nA:3 B:4 C:5 E:6 F:7 {b} {avgGrade} {pkgCount} {c} {f} {a} {e} {avgScore}",
+      "gradeTooltip": "Оценка проекта 0\nСредний балл: 1/100\nПакеты: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {pkgCount} {f} {c} {e} {avgScore} {a} {b}",
       "vibrantTitle": "Яркий",
       "stableTitle": "Стабильный",
       "outdatedTitle": "Устаревший",
@@ -668,12 +668,12 @@
       "generated": "Сгенерировано",
       "functionOne": "{count} функция",
       "functionOther": "{count} функций",
-      "avgFormat": "среднее 0 (1) {grade} {score}",
+      "avgFormat": "среднее 0 (1) {score} {grade}",
       "gatesFailing": "ворота выходят из строя",
       "gatesPassing": "ворота проходящие"
     },
     "gauge": {
-      "tooltip": "Средний балл 0 из 100 (оценка 1). {grade} {rounded}",
+      "tooltip": "Средний балл 0 из 100 (оценка 1). {rounded} {grade}",
       "ariaLabel": "Средний балл 0 из 100 {rounded}"
     },
     "gate": {
@@ -714,7 +714,7 @@
     "table": {
       "ariaLabel": "Худшие функции по баллам",
       "heading": "Худшие функции",
-      "topCount": "верх 0 из 1 {shown} {total}",
+      "topCount": "верх 0 из 1 {total} {shown}",
       "colGrade": "Оценка",
       "colScore": "Счет",
       "colFunction": "Функция",

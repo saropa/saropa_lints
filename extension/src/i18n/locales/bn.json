@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "সেকেন্ডারি ডায়াগনস্টিকস",
     "hero": {
       "productTitle": "অনুসন্ধান ড্যাশবোর্ড",
-      "gaugeTitle": "স্বাস্থ্য স্কোর 0/100 (গ্রেড 1)। ত্রুটিগুলি সবচেয়ে ভারী। {grade} {score}"
+      "gaugeTitle": "স্বাস্থ্য স্কোর 0/100 (গ্রেড 1)। ত্রুটিগুলি সবচেয়ে ভারী। {score} {grade}"
     },
     "time": {
       "justNow": "এইমাত্র",
@@ -395,7 +395,7 @@
     "noMatchingFindingsCopy": "অনুলিপি করার জন্য কোনো মিল খুঁজে পাওয়া যায়নি।",
     "couldNotOpenFile": "ফাইল খোলা যায়নি: 0 {path}",
     "saveReportNoWorkspace": "রিপোর্ট সংরক্ষণ করার আগে একটি ওয়ার্কস্পেস ফোল্ডার খুলুন।",
-    "savedFindings": "সংরক্ষিত 0 অনুসন্ধান(গুলি): 1 {count} {path}",
+    "savedFindings": "সংরক্ষিত 0 অনুসন্ধান(গুলি): 1 {path} {count}",
     "couldNotSaveReportJson": "রিপোর্ট JSON সংরক্ষণ করা যায়নি."
   },
   "packageDashboard": {
@@ -404,7 +404,7 @@
     "status": {
       "packagesCount": "{count} প্যাকেজ",
       "packagesBreakdown": "{direct} সরাসরি, {transitive} ট্রানজিটিভ",
-      "gradeLine": "গ্রেড 0 · 1/100 {grade} {avg}",
+      "gradeLine": "গ্রেড 0 · 1/100 {avg} {grade}",
       "flaggedCount": "{count} ফ্ল্যাগ করা হয়েছে",
       "flaggedTitle": "পরিত্যক্ত বা জীবনের শেষ"
     },
@@ -419,7 +419,7 @@
       "packages": "প্যাকেজ",
       "projectGrade": "প্রকল্প প্যাকেজ গ্রেড",
       "totalSize": "মোট আকার*",
-      "gradeTooltip": "প্রকল্প গ্রেড 0\nগড় স্কোর: 1/100\nপ্যাকেজ: 2\nA:3 B:4 C:5 E:6 F:7 {b} {avgGrade} {pkgCount} {c} {f} {a} {e} {avgScore}",
+      "gradeTooltip": "প্রকল্প গ্রেড 0\nগড় স্কোর: 1/100\nপ্যাকেজ: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {pkgCount} {f} {c} {e} {avgScore} {a} {b}",
       "vibrantTitle": "প্রাণবন্ত",
       "stableTitle": "স্থিতিশীল",
       "outdatedTitle": "সেকেলে",
@@ -668,12 +668,12 @@
       "generated": "উৎপন্ন",
       "functionOne": "{count} ফাংশন",
       "functionOther": "{count} ফাংশন",
-      "avgFormat": "গড় 0 (1) {grade} {score}",
+      "avgFormat": "গড় 0 (1) {score} {grade}",
       "gatesFailing": "গেট ব্যর্থ",
       "gatesPassing": "গেট পাসিং"
     },
     "gauge": {
-      "tooltip": "গড় স্কোর 100 এর মধ্যে 0 (গ্রেড 1)। {grade} {rounded}",
+      "tooltip": "গড় স্কোর 100 এর মধ্যে 0 (গ্রেড 1)। {rounded} {grade}",
       "ariaLabel": "গড় স্কোর 100 এর মধ্যে 0 {rounded}"
     },
     "gate": {
@@ -714,7 +714,7 @@
     "table": {
       "ariaLabel": "স্কোর দ্বারা সবচেয়ে খারাপ ফাংশন",
       "heading": "সবচেয়ে খারাপ ফাংশন",
-      "topCount": "1 এর শীর্ষ 0 {shown} {total}",
+      "topCount": "1 এর শীর্ষ 0 {total} {shown}",
       "colGrade": "গ্রেড",
       "colScore": "স্কোর",
       "colFunction": "ফাংশন",

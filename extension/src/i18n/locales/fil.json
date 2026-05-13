@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "Mga pangalawang diagnostic",
     "hero": {
       "productTitle": "Dashboard ng Mga Natuklasan",
-      "gaugeTitle": "Marka ng kalusugan 0/100 (grado 1). Pinakamabigat ang mga pagkakamali. {grade} {score}"
+      "gaugeTitle": "Marka ng kalusugan 0/100 (grado 1). Pinakamabigat ang mga pagkakamali. {score} {grade}"
     },
     "time": {
       "justNow": "ngayon lang",
@@ -395,7 +395,7 @@
     "noMatchingFindingsCopy": "Walang katugmang mga natuklasan upang kopyahin.",
     "couldNotOpenFile": "Hindi mabuksan ang file: 0 {path}",
     "saveReportNoWorkspace": "Magbukas ng folder ng workspace bago i-save ang ulat.",
-    "savedFindings": "Nai-save na 0 (mga) paghahanap: 1 {count} {path}",
+    "savedFindings": "Nai-save na 0 (mga) paghahanap: 1 {path} {count}",
     "couldNotSaveReportJson": "Hindi ma-save ang ulat na JSON."
   },
   "packageDashboard": {
@@ -404,7 +404,7 @@
     "status": {
       "packagesCount": "{count} na package",
       "packagesBreakdown": "{direct} direct, {transitive} transitive",
-      "gradeLine": "Baitang 0 · 1/100 {grade} {avg}",
+      "gradeLine": "Baitang 0 · 1/100 {avg} {grade}",
       "flaggedCount": "{count} na na-flag",
       "flaggedTitle": "Inabandona o end-of-life"
     },
@@ -419,7 +419,7 @@
       "packages": "Mga package",
       "projectGrade": "Marka ng Pakete ng Proyekto",
       "totalSize": "Kabuuang Sukat*",
-      "gradeTooltip": "Marka ng proyekto 0\nAverage na marka: 1/100\nMga Package: 2\nA:3 B:4 C:5 E:6 F:7 {b} {avgGrade} {pkgCount} {c} {f} {a} {e} {avgScore}",
+      "gradeTooltip": "Marka ng proyekto 0\nAverage na marka: 1/100\nMga Package: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {pkgCount} {f} {c} {e} {avgScore} {a} {b}",
       "vibrantTitle": "Masigla",
       "stableTitle": "Matatag",
       "outdatedTitle": "Luma na",
@@ -668,12 +668,12 @@
       "generated": "Nabuo",
       "functionOne": "{count} na function",
       "functionOther": "{count} na function",
-      "avgFormat": "avg 0 (1) {grade} {score}",
+      "avgFormat": "avg 0 (1) {score} {grade}",
       "gatesFailing": "bagsak ang mga pintuan",
       "gatesPassing": "mga tarangkahan na dumadaan"
     },
     "gauge": {
-      "tooltip": "Average na marka 0 ng 100 (grade 1). {grade} {rounded}",
+      "tooltip": "Average na marka 0 ng 100 (grade 1). {rounded} {grade}",
       "ariaLabel": "Average na marka 0 ng 100 {rounded}"
     },
     "gate": {
@@ -714,7 +714,7 @@
     "table": {
       "ariaLabel": "Pinakamasamang pag-andar ayon sa marka",
       "heading": "Mga pinakamasamang function",
-      "topCount": "nangungunang 0 ng 1 {shown} {total}",
+      "topCount": "nangungunang 0 ng 1 {total} {shown}",
       "colGrade": "Grade",
       "colScore": "Puntos",
       "colFunction": "Function",

@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "二次诊断",
     "hero": {
       "productTitle": "调查结果仪表板",
-      "gaugeTitle": "健康评分0/100（1级）。错误是最重的。 {grade} {score}"
+      "gaugeTitle": "健康评分0/100（1级）。错误是最重的。 {score} {grade}"
     },
     "time": {
       "justNow": "现在",
@@ -395,7 +395,7 @@
     "noMatchingFindingsCopy": "没有匹配的结果可供复制。",
     "couldNotOpenFile": "无法打开文件：0 {path}",
     "saveReportNoWorkspace": "保存报告之前打开工作区文件夹。",
-    "savedFindings": "已保存 0 结果：1 {count} {path}",
+    "savedFindings": "已保存 0 结果：1 {path} {count}",
     "couldNotSaveReportJson": "无法保存报告 JSON。"
   },
   "packageDashboard": {
@@ -404,7 +404,7 @@
     "status": {
       "packagesCount": "{count} 个包",
       "packagesBreakdown": "{direct} 个直接，{transitive} 个传递",
-      "gradeLine": "等级0·1/100 {grade} {avg}",
+      "gradeLine": "等级0·1/100 {avg} {grade}",
       "flaggedCount": "已标记 {count} 个",
       "flaggedTitle": "被遗弃或报废"
     },
@@ -419,7 +419,7 @@
       "packages": "套餐",
       "projectGrade": "工程包等级",
       "totalSize": "总尺寸*",
-      "gradeTooltip": "工程等级0\n平均分：1/100\n套餐：2\nA:3 B:4 C:5 E:6 F:7 {b} {avgGrade} {pkgCount} {c} {f} {a} {e} {avgScore}",
+      "gradeTooltip": "工程等级0\n平均分：1/100\n套餐：2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {pkgCount} {f} {c} {e} {avgScore} {a} {b}",
       "vibrantTitle": "充满活力",
       "stableTitle": "稳定的",
       "outdatedTitle": "过时的",
@@ -668,12 +668,12 @@
       "generated": "生成",
       "functionOne": "{count} 个函数",
       "functionOther": "{count} 个函数",
-      "avgFormat": "平均 0 (1) {grade} {score}",
+      "avgFormat": "平均 0 (1) {score} {grade}",
       "gatesFailing": "门失败",
       "gatesPassing": "大门经过"
     },
     "gauge": {
-      "tooltip": "平均分0为100分（等级1）。 {grade} {rounded}",
+      "tooltip": "平均分0为100分（等级1）。 {rounded} {grade}",
       "ariaLabel": "平均分 0 100 {rounded}"
     },
     "gate": {
@@ -714,7 +714,7 @@
     "table": {
       "ariaLabel": "按分数列出的最差函数",
       "heading": "最差的功能",
-      "topCount": "顶部 0 共 1 {shown} {total}",
+      "topCount": "顶部 0 共 1 {total} {shown}",
       "colGrade": "年级",
       "colScore": "分数",
       "colFunction": "功能",

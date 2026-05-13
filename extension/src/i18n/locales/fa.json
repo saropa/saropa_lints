@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "تشخیص ثانویه",
     "hero": {
       "productTitle": "داشبورد یافته ها",
-      "gaugeTitle": "نمره سلامت 0/100 (درجه 1). خطاها سنگین ترین وزن را دارند. {grade} {score}"
+      "gaugeTitle": "نمره سلامت 0/100 (درجه 1). خطاها سنگین ترین وزن را دارند. {score} {grade}"
     },
     "time": {
       "justNow": "همین الان",
@@ -395,7 +395,7 @@
     "noMatchingFindingsCopy": "هیچ یافته منطبقی برای کپی وجود ندارد.",
     "couldNotOpenFile": "فایل باز نشد: 0 {path}",
     "saveReportNoWorkspace": "قبل از ذخیره گزارش، یک پوشه فضای کاری باز کنید.",
-    "savedFindings": "ذخیره شده 0 یافته(های): 1 {count} {path}",
+    "savedFindings": "ذخیره شده 0 یافته(های): 1 {path} {count}",
     "couldNotSaveReportJson": "گزارش JSON ذخیره نشد."
   },
   "packageDashboard": {
@@ -404,7 +404,7 @@
     "status": {
       "packagesCount": "{count} بسته",
       "packagesBreakdown": "{direct} مستقیم، {transitive} غیرمستقیم",
-      "gradeLine": "درجه 0 · 1/100 {grade} {avg}",
+      "gradeLine": "درجه 0 · 1/100 {avg} {grade}",
       "flaggedCount": "{count} نشان‌دار شده",
       "flaggedTitle": "رها شده یا به پایان رسیده است"
     },
@@ -419,7 +419,7 @@
       "packages": "بسته ها",
       "projectGrade": "درجه بسته پروژه",
       "totalSize": "اندازه کل*",
-      "gradeTooltip": "درجه پروژه 0\nمیانگین امتیاز: 1/100\nپکیج ها: 2\nA:3 B:4 C:5 E:6 F:7 {b} {avgGrade} {pkgCount} {c} {f} {a} {e} {avgScore}",
+      "gradeTooltip": "درجه پروژه 0\nمیانگین امتیاز: 1/100\nپکیج ها: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {pkgCount} {f} {c} {e} {avgScore} {a} {b}",
       "vibrantTitle": "پر جنب و جوش",
       "stableTitle": "پایدار",
       "outdatedTitle": "منسوخ شده",
@@ -668,12 +668,12 @@
       "generated": "تولید شده است",
       "functionOne": "{count} تابع",
       "functionOther": "{count} تابع",
-      "avgFormat": "میانگین 0 (1) {grade} {score}",
+      "avgFormat": "میانگین 0 (1) {score} {grade}",
       "gatesFailing": "دروازه ها شکست می خورند",
       "gatesPassing": "دروازه های عبور"
     },
     "gauge": {
-      "tooltip": "میانگین امتیاز 0 از 100 (درجه 1). {grade} {rounded}",
+      "tooltip": "میانگین امتیاز 0 از 100 (درجه 1). {rounded} {grade}",
       "ariaLabel": "میانگین امتیاز 0 از 100 {rounded}"
     },
     "gate": {
@@ -714,7 +714,7 @@
     "table": {
       "ariaLabel": "بدترین توابع با نمره",
       "heading": "بدترین عملکردها",
-      "topCount": "بالای 0 از 1 {shown} {total}",
+      "topCount": "بالای 0 از 1 {total} {shown}",
       "colGrade": "درجه",
       "colScore": "امتیاز",
       "colFunction": "تابع",

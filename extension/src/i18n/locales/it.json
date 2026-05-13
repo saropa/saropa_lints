@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "Diagnostica secondaria",
     "hero": {
       "productTitle": "Pannello dei risultati",
-      "gaugeTitle": "Punteggio sulla salute 0/100 (voto 1). Gli errori pesano di più. {grade} {score}"
+      "gaugeTitle": "Punteggio sulla salute 0/100 (voto 1). Gli errori pesano di più. {score} {grade}"
     },
     "time": {
       "justNow": "proprio adesso",
@@ -395,7 +395,7 @@
     "noMatchingFindingsCopy": "Nessun risultato corrispondente da copiare.",
     "couldNotOpenFile": "Impossibile aprire il file: 0 {path}",
     "saveReportNoWorkspace": "Aprire una cartella dell'area di lavoro prima di salvare il report.",
-    "savedFindings": "Risultato(i) salvato(i) 0: 1 {count} {path}",
+    "savedFindings": "Risultato(i) salvato(i) 0: 1 {path} {count}",
     "couldNotSaveReportJson": "Impossibile salvare il report JSON."
   },
   "packageDashboard": {
@@ -404,7 +404,7 @@
     "status": {
       "packagesCount": "{count} pacchetti",
       "packagesBreakdown": "{direct} diretti, {transitive} transitivi",
-      "gradeLine": "Voto 0 · 1/100 {grade} {avg}",
+      "gradeLine": "Voto 0 · 1/100 {avg} {grade}",
       "flaggedCount": "{count} segnalati",
       "flaggedTitle": "Abbandonato o a fine vita"
     },
@@ -419,7 +419,7 @@
       "packages": "Pacchetti",
       "projectGrade": "Grado del pacchetto di progetti",
       "totalSize": "Dimensione totale*",
-      "gradeTooltip": "Voto del progetto 0\nPunteggio medio: 1/100\nPacchetti: 2\nA:3 B:4 C:5 E:6 F:7 {b} {avgGrade} {pkgCount} {c} {f} {a} {e} {avgScore}",
+      "gradeTooltip": "Voto del progetto 0\nPunteggio medio: 1/100\nPacchetti: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {pkgCount} {f} {c} {e} {avgScore} {a} {b}",
       "vibrantTitle": "Vibrante",
       "stableTitle": "Stabile",
       "outdatedTitle": "Obsoleto",
@@ -668,12 +668,12 @@
       "generated": "Generato",
       "functionOne": "{count} funzione",
       "functionOther": "{count} funzioni",
-      "avgFormat": "media 0 (1) {grade} {score}",
+      "avgFormat": "media 0 (1) {score} {grade}",
       "gatesFailing": "cancelli falliti",
       "gatesPassing": "cancelli che passano"
     },
     "gauge": {
-      "tooltip": "Punteggio medio 0 su 100 (voto 1). {grade} {rounded}",
+      "tooltip": "Punteggio medio 0 su 100 (voto 1). {rounded} {grade}",
       "ariaLabel": "Punteggio medio 0 su 100 {rounded}"
     },
     "gate": {
@@ -714,7 +714,7 @@
     "table": {
       "ariaLabel": "Peggiori funzioni per punteggio",
       "heading": "Le peggiori funzioni",
-      "topCount": "in alto 0 di 1 {shown} {total}",
+      "topCount": "in alto 0 di 1 {total} {shown}",
       "colGrade": "Grado",
       "colScore": "Punto",
       "colFunction": "Funzione",
