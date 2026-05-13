@@ -59,8 +59,6 @@ _Production-hardened tools for VS Code, Dart, and Flutter._
 
 ### VS Code Extensions
 
-- **[Saropa Claude Guard](https://marketplace.visualstudio.com/items?itemName=Saropa.saropa-claude-guard)**
-  - _AI Governance:_ Tracks Claude API costs in real-time by tailing local logs. Enforce daily/monthly budgets and monitor spend directly from the status bar.
 - **[Saropa Drift Viewer](https://marketplace.visualstudio.com/items?itemName=Saropa.drift-viewer)**
   - _SQLite/Drift at a glance:_ Inspect tables, run read-only SQL, export schema or data, compare snapshots, plus **Query Replay DVR**, **Visual Query Builder** (multi-table joins), and **NL-to-SQL** that routes generated queries into the notebook, dashboards, or saved snippets.
 - **[Saropa Lints](https://marketplace.visualstudio.com/items?itemName=saropa.saropa-lints)** (also on [Open VSX](https://open-vsx.org/extension/saropa/saropa-lints))
