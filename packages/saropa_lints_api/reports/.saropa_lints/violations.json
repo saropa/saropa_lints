@@ -1,6 +1,6 @@
 {
   "schema": "1.0",
-  "timestamp": "2026-05-13T20:13:44.942705Z",
+  "timestamp": "2026-05-13T20:26:25.587891Z",
   "sessionId": "20260513_160202",
   "config": {
     "tier": "unknown",
@@ -10,7 +10,7 @@
     "filesAnalyzed": 2,
     "filesWithIssues": 0,
     "totalViolations": 0,
-    "batchCount": 3,
+    "batchCount": 5,
     "bySeverity": {
       "error": 0,
       "warning": 0,
