@@ -419,7 +419,7 @@
       "packages": "Pacotes",
       "projectGrade": "Nota do pacote do projeto",
       "totalSize": "Tamanho Total*",
-      "gradeTooltip": "Nota do projeto 0\nPontuação média: 1/100\nPacotes: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {pkgCount} {f} {c} {e} {avgScore} {a} {b}",
+      "gradeTooltip": "Nota do projeto 0\nPontuação média: 1/100\nPacotes: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {a} {c} {avgGrade} {e} {avgScore} {b} {f}",
       "vibrantTitle": "Vibrante",
       "stableTitle": "Estável",
       "outdatedTitle": "Desatualizado",
@@ -714,7 +714,7 @@
     "table": {
       "ariaLabel": "Piores funções por pontuação",
       "heading": "Piores funções",
-      "topCount": "topo 0 de 1 {total} {shown}",
+      "topCount": "topo 0 de 1 {shown} {total}",
       "colGrade": "Nota",
       "colScore": "Pontuação",
       "colFunction": "Função",

@@ -419,7 +419,7 @@
       "packages": "Paketler",
       "projectGrade": "Proje Paketi Notu",
       "totalSize": "Toplam Boyut*",
-      "gradeTooltip": "Proje notu 0\nOrtalama puan: 1/100\nPaketler: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {pkgCount} {f} {c} {e} {avgScore} {a} {b}",
+      "gradeTooltip": "Proje notu 0\nOrtalama puan: 1/100\nPaketler: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {a} {c} {avgGrade} {e} {avgScore} {b} {f}",
       "vibrantTitle": "Canlı",
       "stableTitle": "Stabil",
       "outdatedTitle": "Modası geçmiş",
@@ -714,7 +714,7 @@
     "table": {
       "ariaLabel": "Puana göre en kötü işlevler",
       "heading": "En kötü işlevler",
-      "topCount": "üst 0 / 1 {total} {shown}",
+      "topCount": "üst 0 / 1 {shown} {total}",
       "colGrade": "Seviye",
       "colScore": "Gol",
       "colFunction": "İşlev",

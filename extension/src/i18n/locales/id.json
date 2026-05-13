@@ -419,7 +419,7 @@
       "packages": "Paket",
       "projectGrade": "Kelas Paket Proyek",
       "totalSize": "Ukuran Jumlah*",
-      "gradeTooltip": "Kelas proyek 0\nSkor rata-rata: 1/100\nPaket: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {pkgCount} {f} {c} {e} {avgScore} {a} {b}",
+      "gradeTooltip": "Kelas proyek 0\nSkor rata-rata: 1/100\nPaket: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {a} {c} {avgGrade} {e} {avgScore} {b} {f}",
       "vibrantTitle": "Bersemangat",
       "stableTitle": "Stabil",
       "outdatedTitle": "Kedaluwarsa",
@@ -714,7 +714,7 @@
     "table": {
       "ariaLabel": "Fungsi terburuk berdasarkan skor",
       "heading": "Fungsi terburuk",
-      "topCount": "0 teratas dari 1 {total} {shown}",
+      "topCount": "0 teratas dari 1 {shown} {total}",
       "colGrade": "Nilai",
       "colScore": "Skor",
       "colFunction": "Fungsi",

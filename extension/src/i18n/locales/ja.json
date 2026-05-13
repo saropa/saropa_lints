@@ -419,7 +419,7 @@
       "packages": "パッケージ",
       "projectGrade": "プロジェクトパッケージグレード",
       "totalSize": "合計サイズ*",
-      "gradeTooltip": "プロジェクトグレード 0\n平均スコア: 1/100\nパッケージ: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {pkgCount} {f} {c} {e} {avgScore} {a} {b}",
+      "gradeTooltip": "プロジェクトグレード 0\n平均スコア: 1/100\nパッケージ: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {a} {c} {avgGrade} {e} {avgScore} {b} {f}",
       "vibrantTitle": "活気に満ちた",
       "stableTitle": "安定した",
       "outdatedTitle": "時代遅れ",
@@ -714,7 +714,7 @@
     "table": {
       "ariaLabel": "スコア別の最悪の関数",
       "heading": "最悪の機能",
-      "topCount": "1の先頭0 {total} {shown}",
+      "topCount": "1の先頭0 {shown} {total}",
       "colGrade": "学年",
       "colScore": "スコア",
       "colFunction": "関数",

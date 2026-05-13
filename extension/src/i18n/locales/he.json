@@ -419,7 +419,7 @@
       "packages": "חבילות",
       "projectGrade": "ציון חבילת פרויקט",
       "totalSize": "גודל כולל*",
-      "gradeTooltip": "ציון הפרויקט 0\nציון ממוצע: 1/100\nחבילות: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {pkgCount} {f} {c} {e} {avgScore} {a} {b}",
+      "gradeTooltip": "ציון הפרויקט 0\nציון ממוצע: 1/100\nחבילות: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {a} {c} {avgGrade} {e} {avgScore} {b} {f}",
       "vibrantTitle": "תוסס",
       "stableTitle": "יַצִיב",
       "outdatedTitle": "מְיוּשָׁן",
@@ -714,7 +714,7 @@
     "table": {
       "ariaLabel": "הפונקציות הגרוע ביותר לפי ציון",
       "heading": "פונקציות גרועות ביותר",
-      "topCount": "למעלה 0 מתוך 1 {total} {shown}",
+      "topCount": "למעלה 0 מתוך 1 {shown} {total}",
       "colGrade": "צִיוּן",
       "colScore": "צִיוּן",
       "colFunction": "פוּנקצִיָה",

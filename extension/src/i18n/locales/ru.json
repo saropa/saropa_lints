@@ -419,7 +419,7 @@
       "packages": "Пакеты",
       "projectGrade": "Оценка пакета проекта",
       "totalSize": "Общий размер*",
-      "gradeTooltip": "Оценка проекта 0\nСредний балл: 1/100\nПакеты: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {pkgCount} {f} {c} {e} {avgScore} {a} {b}",
+      "gradeTooltip": "Оценка проекта 0\nСредний балл: 1/100\nПакеты: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {a} {c} {avgGrade} {e} {avgScore} {b} {f}",
       "vibrantTitle": "Яркий",
       "stableTitle": "Стабильный",
       "outdatedTitle": "Устаревший",
@@ -714,7 +714,7 @@
     "table": {
       "ariaLabel": "Худшие функции по баллам",
       "heading": "Худшие функции",
-      "topCount": "верх 0 из 1 {total} {shown}",
+      "topCount": "верх 0 из 1 {shown} {total}",
       "colGrade": "Оценка",
       "colScore": "Счет",
       "colFunction": "Функция",

@@ -419,7 +419,7 @@
       "packages": "بسته ها",
       "projectGrade": "درجه بسته پروژه",
       "totalSize": "اندازه کل*",
-      "gradeTooltip": "درجه پروژه 0\nمیانگین امتیاز: 1/100\nپکیج ها: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {pkgCount} {f} {c} {e} {avgScore} {a} {b}",
+      "gradeTooltip": "درجه پروژه 0\nمیانگین امتیاز: 1/100\nپکیج ها: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {a} {c} {avgGrade} {e} {avgScore} {b} {f}",
       "vibrantTitle": "پر جنب و جوش",
       "stableTitle": "پایدار",
       "outdatedTitle": "منسوخ شده",
@@ -714,7 +714,7 @@
     "table": {
       "ariaLabel": "بدترین توابع با نمره",
       "heading": "بدترین عملکردها",
-      "topCount": "بالای 0 از 1 {total} {shown}",
+      "topCount": "بالای 0 از 1 {shown} {total}",
       "colGrade": "درجه",
       "colScore": "امتیاز",
       "colFunction": "تابع",

@@ -419,7 +419,7 @@
       "packages": "Mga package",
       "projectGrade": "Marka ng Pakete ng Proyekto",
       "totalSize": "Kabuuang Sukat*",
-      "gradeTooltip": "Marka ng proyekto 0\nAverage na marka: 1/100\nMga Package: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {pkgCount} {f} {c} {e} {avgScore} {a} {b}",
+      "gradeTooltip": "Marka ng proyekto 0\nAverage na marka: 1/100\nMga Package: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {a} {c} {avgGrade} {e} {avgScore} {b} {f}",
       "vibrantTitle": "Masigla",
       "stableTitle": "Matatag",
       "outdatedTitle": "Luma na",
@@ -714,7 +714,7 @@
     "table": {
       "ariaLabel": "Pinakamasamang pag-andar ayon sa marka",
       "heading": "Mga pinakamasamang function",
-      "topCount": "nangungunang 0 ng 1 {total} {shown}",
+      "topCount": "nangungunang 0 ng 1 {shown} {total}",
       "colGrade": "Grade",
       "colScore": "Puntos",
       "colFunction": "Function",

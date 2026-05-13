@@ -419,7 +419,7 @@
       "packages": "套餐",
       "projectGrade": "工程包等级",
       "totalSize": "总尺寸*",
-      "gradeTooltip": "工程等级0\n平均分：1/100\n套餐：2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {pkgCount} {f} {c} {e} {avgScore} {a} {b}",
+      "gradeTooltip": "工程等级0\n平均分：1/100\n套餐：2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {a} {c} {avgGrade} {e} {avgScore} {b} {f}",
       "vibrantTitle": "充满活力",
       "stableTitle": "稳定的",
       "outdatedTitle": "过时的",
@@ -714,7 +714,7 @@
     "table": {
       "ariaLabel": "按分数列出的最差函数",
       "heading": "最差的功能",
-      "topCount": "顶部 0 共 1 {total} {shown}",
+      "topCount": "顶部 0 共 1 {shown} {total}",
       "colGrade": "年级",
       "colScore": "分数",
       "colFunction": "功能",

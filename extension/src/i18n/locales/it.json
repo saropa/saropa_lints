@@ -419,7 +419,7 @@
       "packages": "Pacchetti",
       "projectGrade": "Grado del pacchetto di progetti",
       "totalSize": "Dimensione totale*",
-      "gradeTooltip": "Voto del progetto 0\nPunteggio medio: 1/100\nPacchetti: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {pkgCount} {f} {c} {e} {avgScore} {a} {b}",
+      "gradeTooltip": "Voto del progetto 0\nPunteggio medio: 1/100\nPacchetti: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {a} {c} {avgGrade} {e} {avgScore} {b} {f}",
       "vibrantTitle": "Vibrante",
       "stableTitle": "Stabile",
       "outdatedTitle": "Obsoleto",
@@ -714,7 +714,7 @@
     "table": {
       "ariaLabel": "Peggiori funzioni per punteggio",
       "heading": "Le peggiori funzioni",
-      "topCount": "in alto 0 di 1 {total} {shown}",
+      "topCount": "in alto 0 di 1 {shown} {total}",
       "colGrade": "Grado",
       "colScore": "Punto",
       "colFunction": "Funzione",

@@ -419,7 +419,7 @@
       "packages": "패키지",
       "projectGrade": "프로젝트 패키지 등급",
       "totalSize": "전체 크기*",
-      "gradeTooltip": "프로젝트 등급 0\n평균 점수: 1/100\n패키지: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {pkgCount} {f} {c} {e} {avgScore} {a} {b}",
+      "gradeTooltip": "프로젝트 등급 0\n평균 점수: 1/100\n패키지: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {a} {c} {avgGrade} {e} {avgScore} {b} {f}",
       "vibrantTitle": "떠는",
       "stableTitle": "안정적인",
       "outdatedTitle": "구식",
@@ -714,7 +714,7 @@
     "table": {
       "ariaLabel": "점수별 최악의 기능",
       "heading": "최악의 기능",
-      "topCount": "1 중 상위 0 {total} {shown}",
+      "topCount": "1 중 상위 0 {shown} {total}",
       "colGrade": "등급",
       "colScore": "점수",
       "colFunction": "기능",

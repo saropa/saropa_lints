@@ -419,7 +419,7 @@
       "packages": "Gói",
       "projectGrade": "Lớp gói dự án",
       "totalSize": "Tổng kích thước*",
-      "gradeTooltip": "Cấp dự án 0\nĐiểm trung bình: 1/100\nGói: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {pkgCount} {f} {c} {e} {avgScore} {a} {b}",
+      "gradeTooltip": "Cấp dự án 0\nĐiểm trung bình: 1/100\nGói: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {a} {c} {avgGrade} {e} {avgScore} {b} {f}",
       "vibrantTitle": "Sống động",
       "stableTitle": "Ổn định",
       "outdatedTitle": "lỗi thời",
@@ -714,7 +714,7 @@
     "table": {
       "ariaLabel": "Chức năng tồi tệ nhất theo điểm số",
       "heading": "Chức năng tệ nhất",
-      "topCount": "trên cùng 0 của 1 {total} {shown}",
+      "topCount": "trên cùng 0 của 1 {shown} {total}",
       "colGrade": "Cấp",
       "colScore": "Điểm",
       "colFunction": "Chức năng",

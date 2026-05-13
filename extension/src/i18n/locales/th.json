@@ -419,7 +419,7 @@
       "packages": "แพ็คเกจ",
       "projectGrade": "เกรดแพ็คเกจโครงการ",
       "totalSize": "ขนาดรวม*",
-      "gradeTooltip": "เกรดโครงการ 0\nคะแนนเฉลี่ย: 1/100\nแพ็คเกจ: 2\nก:3 B:4 ค:5 อี:6 ฟ:7 {avgGrade} {pkgCount} {f} {c} {e} {avgScore} {a} {b}",
+      "gradeTooltip": "เกรดโครงการ 0\nคะแนนเฉลี่ย: 1/100\nแพ็คเกจ: 2\nก:3 B:4 ค:5 อี:6 ฟ:7 {pkgCount} {a} {c} {avgGrade} {e} {avgScore} {b} {f}",
       "vibrantTitle": "มีชีวิตชีวา",
       "stableTitle": "มั่นคง",
       "outdatedTitle": "ล้าสมัย",
@@ -714,7 +714,7 @@
     "table": {
       "ariaLabel": "ฟังก์ชั่นแย่ที่สุดตามคะแนน",
       "heading": "ฟังก์ชั่นที่แย่ที่สุด",
-      "topCount": "บน 0 จาก 1 {total} {shown}",
+      "topCount": "บน 0 จาก 1 {shown} {total}",
       "colGrade": "ระดับ",
       "colScore": "คะแนน",
       "colFunction": "การทำงาน",

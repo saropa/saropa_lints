@@ -419,7 +419,7 @@
       "packages": "Forfaits",
       "projectGrade": "Catégorie du package de projet",
       "totalSize": "Taille totale*",
-      "gradeTooltip": "Note du projet 0\nNote moyenne : 1/100\nForfaits : 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {pkgCount} {f} {c} {e} {avgScore} {a} {b}",
+      "gradeTooltip": "Note du projet 0\nNote moyenne : 1/100\nForfaits : 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {a} {c} {avgGrade} {e} {avgScore} {b} {f}",
       "vibrantTitle": "Dynamique",
       "stableTitle": "Écurie",
       "outdatedTitle": "Dépassé",
@@ -714,7 +714,7 @@
     "table": {
       "ariaLabel": "Pires fonctions par score",
       "heading": "Les pires fonctions",
-      "topCount": "0 supérieur de 1 {total} {shown}",
+      "topCount": "0 supérieur de 1 {shown} {total}",
       "colGrade": "Note",
       "colScore": "Score",
       "colFunction": "Fonction",

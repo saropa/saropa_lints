@@ -419,7 +419,7 @@
       "packages": "संकुल",
       "projectGrade": "प्रोजेक्ट पैकेज ग्रेड",
       "totalSize": "कुल आकार*",
-      "gradeTooltip": "प्रोजेक्ट ग्रेड 0\nऔसत स्कोर: 1/100\nपैकेज: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {pkgCount} {f} {c} {e} {avgScore} {a} {b}",
+      "gradeTooltip": "प्रोजेक्ट ग्रेड 0\nऔसत स्कोर: 1/100\nपैकेज: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {a} {c} {avgGrade} {e} {avgScore} {b} {f}",
       "vibrantTitle": "जीवंत",
       "stableTitle": "स्थिर",
       "outdatedTitle": "रगड़ा हुआ",
@@ -714,7 +714,7 @@
     "table": {
       "ariaLabel": "स्कोर के हिसाब से सबसे खराब कार्य",
       "heading": "सबसे ख़राब कार्य",
-      "topCount": "1 में से शीर्ष 0 {total} {shown}",
+      "topCount": "1 में से शीर्ष 0 {shown} {total}",
       "colGrade": "श्रेणी",
       "colScore": "अंक",
       "colFunction": "समारोह",
