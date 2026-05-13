@@ -7,7 +7,7 @@
   "views.actions.name": "الإجراءات",
   "views.status.name": "حالة",
   "views.settings.name": "إعدادات",
-  "views.help.name": "Help (v13.7.1)",
+  "views.help.name": "المساعدة (الإصدار 13.7.1)",
   "viewsWelcome.banner.contents": "** ساروبا لينتس **\n\n2100+ قواعد الوبر Dart وFlutter للأمان وإمكانية الوصول والأداء.\n\nيتطلب مشروع Dart أو Flutter.\n\nافتح مجلدًا يحتوي على \"pubspec.yaml\" للبدء.\n\n[معرفة المزيد عبر الإنترنت](https://pub.dev/packages/saropa_lints)\n[تصفح كافة الأوامر](command:saropaLints.showCommandCatalog)\n[حول ساروبا لينتس] (الأمر: ساروبا لينتس.showAbout)\n[البدء](الأمر:saropaLints.openWalkthrough)",
   "command.enable.title": "ساروبا لينتس: إعداد المشروع (pubspec + config)",
   "command.disable.title": "ساروبا لينتس: قم بإيقاف تشغيل تكامل لينت",
@@ -18,6 +18,7 @@
   "command.openConfig.title": "ساروبا لينتس: افتح خيارات التحليل",
   "command.openPubspec.title": "ساروبا لينتس: افتح pubspec.yaml",
   "command.toggleRunAnalysisAfterConfigChange.title": "ساروبا لينتس: تبديل تشغيل التحليل بعد تغيير التكوين",
+  "command.toggleRunAnalysisAfterDependencyChange.title": "ساروبا لينتس: تبديل تحليل التشغيل بعد تغيير التبعية",
   "command.pickUiLanguage.title": "ساروبا لينت: اللغة / اللغة / السبراش / 言語 / 语言",
   "command.openConfigDashboard.title": "ساروبا لينتس: افتح تكوين لينتس",
   "command.openPackageVibrancy.title": "ساروبا لينتس: حزمة مفتوحة مفعمة بالحيوية",
@@ -168,6 +169,7 @@
   "config.property.enabled.markdownDescription": "عند تشغيل **on** (افتراضي)، تقوم Saropa Lints بتشغيل فحوصات الترقية وتتعامل مع مساحة العمل على أنها تستخدم تكامل Saropa Lint. قم بإيقاف **إيقاف** لإيقاف إشعارات التكامل ونتائج شريط الحالة مؤقتًا دون إخفاء خيارات الشريط الجانبي—استخدم **Saropa Lints: إعداد المشروع** عندما تحتاج إلى إضافة `saropa_lints` إلى pubspec وكتابة `ana Analysis_options`.",
   "config.property.tier.description": "الطبقة الافتراضية عند التمكين أو إعادة التهيئة.",
   "config.property.runAnalysisAfterConfigChange.description": "قم بتشغيل تحليل الأسهم بعد تغيير init أو config عند التمكين.",
+  "config.property.runAnalysisAfterDependencyChange.description": "إعادة تشغيل تحليل الأسهم تلقائيًا عند تغيير pubspec.lock (بعد الحصول على pub/ترقية pub). يستخدم ارتدادًا مدته 10 ثوانٍ لتجميع قرارات التبعية السريعة.",
   "config.property.uiLanguage.description": "لغة واجهة المستخدم للشريط الجانبي ولوحات المعلومات لـ Saropa. استخدم \"تلقائي\" لمتابعة لغة عرض VS Code. يحفظ منتقي لغة الشريط الجانبي هذه القيمة في إعدادات المستخدم بحيث يتم تطبيقها في كل مساحة عمل.",
   "config.property.runAnalysisOpenEditorsOnly.description": "عندما يكون ذلك صحيحًا، تقوم Saropa Lints بإجراء تحليل سهام فقط لملفات Dart المفتوحة حاليًا في VS Code (workspace.textDocuments) ضمن جذر المشروع الذي تم اكتشافه.",
   "config.property.inlineAnnotations.description": "إظهار رسائل المخالفة في نهاية الأسطر المتأثرة (نمط عدسة الخطأ).",
@@ -295,5 +297,10 @@
   "walkthrough.step.walkthrough.commandCatalog.title": "تصفح كافة الأوامر",
   "walkthrough.step.walkthrough.commandCatalog.description": "أكثر من 115 أمرًا منظمًا حسب الفئة مع البحث. يمكنك العثور على أوامر التحليل والأمان وسلامة الحزمة وإعداد التقارير في مكان واحد.\n\n[تصفح كافة الأوامر](command:saropaLints.showCommandCatalog)",
   "walkthrough.step.walkthrough.aboutSaropa.title": "حول ساروبا",
-  "walkthrough.step.walkthrough.aboutSaropa.description": "Saropa Pty Limited - تقوم ببناء الضمانات الرقمية منذ عام 2010.\n\nحزم Dart وملحقات VS Code وتطبيقات المستهلك للمطورين الذين يقدرون الموثوقية.\n\n[تفضل بزيارة saropa.com](https://saropa.com/)"
+  "walkthrough.step.walkthrough.aboutSaropa.description": "Saropa Pty Limited - تقوم ببناء الضمانات الرقمية منذ عام 2010.\n\nحزم Dart وملحقات VS Code وتطبيقات المستهلك للمطورين الذين يقدرون الموثوقية.\n\n[تفضل بزيارة saropa.com](https://saropa.com/)",
+  "command.toggleIncludeOtherAnalyzerFindingsInDashboard.title": "ساروبا لينتس: قم بتبديل عرض نتائج المحلل الأخرى على لوحة المعلومات",
+  "command.toggleIncludeAnalyzerTodosInDashboard.title": "Saropa Lints: تبديل إظهار مهام المحلل على لوحة المعلومات",
+  "command.toggleTodosAndHacksScanner.title": "ساروبا لينتس: تبديل ماسح مساحة العمل TODO/HACK",
+  "config.property.includeOtherAnalyzerFindingsInDashboard.description": "اعرض قرصًا إضافيًا على لوحة معلومات النتائج مع عدد نتائج محلل غير ساروبا على ملفات .dart (خطوط Dart SDK المضمنة بالإضافة إلى أي مكونات إضافية custom_lint تابعة لجهات خارجية مثل Riverpod_lint). العرض فقط - لا يؤثر أبدًا على النتيجة الصحية أو بطاقات مؤشرات الأداء الرئيسية أو قائمة الانتهاكات.",
+  "config.property.includeAnalyzerTodosInDashboard.description": "اعرض قرصًا إضافيًا على لوحة معلومات النتائج مع عدد تشخيصات TODO من جانب المحلل (`الكود: \"todo\"`) على ملفات .dart. مستقل عن الماسح الضوئي TODO/HACK لنظام الملفات ساروبا. العرض فقط."
 }

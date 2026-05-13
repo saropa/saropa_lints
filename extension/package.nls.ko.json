@@ -18,6 +18,7 @@
   "command.openConfig.title": "사로파 린트(Saropa Lints): 개방형 분석 옵션",
   "command.openPubspec.title": "사로파 린트(Saropa Lints): pubspec.yaml 열기",
   "command.toggleRunAnalysisAfterConfigChange.title": "Saropa Lints: 구성 변경 후 분석 실행 전환",
+  "command.toggleRunAnalysisAfterDependencyChange.title": "Saropa Lints: 종속성 변경 후 분석 실행 전환",
   "command.pickUiLanguage.title": "사로파 린트: Language / Langue / Sprache / 言語 / 语言",
   "command.openConfigDashboard.title": "사로파 린트(Saropa Lints): 린트 구성 열기",
   "command.openPackageVibrancy.title": "사로파 린트(Saropa Lints): 오픈 패키지 활력",
@@ -168,6 +169,7 @@
   "config.property.enabled.markdownDescription": "**on**(기본값)인 경우 Saropa Lints는 업그레이드 확인을 실행하고 작업 공간을 Saropa Lint 통합을 사용하는 것으로 처리합니다. 사이드바 옵션을 숨기지 않고 통합 알림 및 상태 표시줄 점수를 일시 중지하려면 **끄기**를 사용하세요. pubspec에 'saropa_lints'를 추가하고 'analytic_options'를 작성해야 하는 경우 **Saropa Lints: 프로젝트 설정**을 사용하세요.",
   "config.property.tier.description": "활성화하거나 다시 초기화할 때의 기본 계층입니다.",
   "config.property.runAnalysisAfterConfigChange.description": "활성화된 경우 초기화 또는 구성 변경 후 dart 분석을 실행합니다.",
+  "config.property.runAnalysisAfterDependencyChange.description": "pubspec.lock이 변경되면(pub get / pub upgrade 후) 자동으로 dart analyze를 다시 실행합니다. 빠른 종속성 해결을 통합하기 위해 10초 디바운스를 사용합니다.",
   "config.property.uiLanguage.description": "Saropa 사이드바 및 대시보드용 UI 언어입니다. VS Code 표시 언어를 따르려면 'auto'를 사용하세요. 사이드바 언어 선택기는 이 값을 사용자 설정에 저장하므로 모든 작업 공간에 적용됩니다.",
   "config.property.runAnalysisOpenEditorsOnly.description": "true인 경우 Saropa Lints는 감지된 프로젝트 루트 아래 VS Code(workspace.textDocuments)에 현재 열려 있는 Dart 파일에 대해서만 dart 분석을 실행합니다.",
   "config.property.inlineAnnotations.description": "영향을 받은 줄 끝에 위반 메시지를 표시합니다(오류 렌즈 스타일).",
@@ -295,5 +297,10 @@
   "walkthrough.step.walkthrough.commandCatalog.title": "모든 명령 찾아보기",
   "walkthrough.step.walkthrough.commandCatalog.description": "검색을 통해 카테고리별로 정리된 115개 이상의 명령. 분석, 보안, 패키지 상태 및 보고 명령을 한 곳에서 찾아보세요.\n\n[모든 명령 찾아보기](명령:saropaLints.showCommandCatalog)",
   "walkthrough.step.walkthrough.aboutSaropa.title": "사로파 소개",
-  "walkthrough.step.walkthrough.aboutSaropa.description": "Saropa Pty Limited — 2010년부터 디지털 보호 장치를 구축하고 있습니다.\n\n안정성을 중시하는 개발자를 위한 Dart 패키지, VS Code 확장 및 소비자 앱입니다.\n\n[saropa.com 방문](https://saropa.com/)"
+  "walkthrough.step.walkthrough.aboutSaropa.description": "Saropa Pty Limited — 2010년부터 디지털 보호 장치를 구축하고 있습니다.\n\n안정성을 중시하는 개발자를 위한 Dart 패키지, VS Code 확장 및 소비자 앱입니다.\n\n[saropa.com 방문](https://saropa.com/)",
+  "command.toggleIncludeOtherAnalyzerFindingsInDashboard.title": "Saropa Lints: Toggle Show Other Analyzer Findings on Dashboard",
+  "command.toggleIncludeAnalyzerTodosInDashboard.title": "Saropa Lints: Toggle Show Analyzer TODOs on Dashboard",
+  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: Toggle TODO/HACK Workspace Scanner",
+  "config.property.includeOtherAnalyzerFindingsInDashboard.description": "Show a supplementary pill on the Findings Dashboard with the count of non-saropa analyzer findings on .dart files (built-in Dart SDK lints plus any third-party custom_lint plugins such as riverpod_lint). Display-only — never affects the health score, KPI cards, or violations list.",
+  "config.property.includeAnalyzerTodosInDashboard.description": "Show a supplementary pill on the Findings Dashboard with the count of analyzer-side TODO diagnostics (`code: \"todo\"`) on .dart files. Independent of the saropa file-system TODO/HACK scanner. Display-only."
 }

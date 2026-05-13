@@ -345,7 +345,17 @@
       "activateKpiSpace": "Активация целевой карты KPI или панели диаграммы",
       "showOverlay": "Показать это наложение ярлыков"
     },
-    "unknownAnalyzerKind": "Неизвестный"
+    "unknownAnalyzerKind": "Неизвестный",
+    "supplementary": {
+      "otherAnalyzerOn": "+{count} other analyzer findings",
+      "otherAnalyzerPromo": "+? other analyzer findings — show",
+      "analyzerTodosOn": "+{count} analyzer TODOs",
+      "analyzerTodosPromo": "+? analyzer TODOs — show",
+      "scannerPromo": "Enable TODO/HACK scanner",
+      "tooltipLive": "Live from VS Code Problems panel. Updates as analysis completes. Click to hide.",
+      "tooltipScanner": "Saropa file-system scanner — counts open TODO/HACK markers in source.",
+      "tooltipPromoClickToOn": "Click to enable"
+    }
   },
   "triageDash": {
     "showInIssues": "Показать в проблемах",

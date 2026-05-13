@@ -345,7 +345,17 @@
       "activateKpiSpace": "फ़ोकस किए गए KPI कार्ड या चार्ट बार को सक्रिय करें",
       "showOverlay": "यह शॉर्टकट ओवरले दिखाएँ"
     },
-    "unknownAnalyzerKind": "अज्ञात"
+    "unknownAnalyzerKind": "अज्ञात",
+    "supplementary": {
+      "otherAnalyzerOn": "+{count} other analyzer findings",
+      "otherAnalyzerPromo": "+? other analyzer findings — show",
+      "analyzerTodosOn": "+{count} analyzer TODOs",
+      "analyzerTodosPromo": "+? analyzer TODOs — show",
+      "scannerPromo": "Enable TODO/HACK scanner",
+      "tooltipLive": "Live from VS Code Problems panel. Updates as analysis completes. Click to hide.",
+      "tooltipScanner": "Saropa file-system scanner — counts open TODO/HACK markers in source.",
+      "tooltipPromoClickToOn": "Click to enable"
+    }
   },
   "triageDash": {
     "showInIssues": "मुद्दों में दिखाएँ",

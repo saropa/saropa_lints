@@ -134,6 +134,29 @@ export function getViolationsDashboardStyles(): string {
     .status-line .pill.bad  { color: var(--status-bad); }
     .status-line .pill.warn { color: var(--accent-warning); }
 
+    /* Toggle pills (#224) — clickable status-line affordances for the
+       supplementary-counts feature. Promo state telegraphs "available but
+       inactive" via dashed border + reduced opacity; ON state inherits the
+       neutral pill look so it doesn't compete with severity-coded pills. */
+    .status-line .pill.toggle {
+      cursor: pointer;
+      user-select: none;
+      transition: opacity .15s, background .15s;
+    }
+    .status-line .pill.toggle:hover {
+      background: var(--vscode-toolbar-hoverBackground, var(--surface-3));
+    }
+    .status-line .pill.toggle.promo {
+      opacity: .65;
+      border: 1px dashed var(--border, currentColor);
+      background: transparent;
+    }
+    .status-line .pill.toggle.promo:hover { opacity: 1; }
+    .status-line .pill.toggle:focus-visible {
+      outline: 1px solid var(--vscode-focusBorder);
+      outline-offset: 2px;
+    }
+
     /* Hero gauge — 0–100 health ring derived from severity mix.
        Driven by --gauge-target / --gauge-arc CSS vars so the keyframe
        animation does not fight the inline stroke-dasharray. */

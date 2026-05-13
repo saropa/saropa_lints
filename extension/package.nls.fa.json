@@ -18,6 +18,7 @@
   "command.openConfig.title": "Saropa Lints: گزینه های تجزیه و تحلیل را باز کنید",
   "command.openPubspec.title": "Saropa Lints: pubspec.yaml را باز کنید",
   "command.toggleRunAnalysisAfterConfigChange.title": "Saropa Lints: پس از تغییر پیکربندی، آنالیز اجرای را تغییر دهید",
+  "command.toggleRunAnalysisAfterDependencyChange.title": "Saropa Lints: پس از تغییر وابستگی، آنالیز اجرای را تغییر دهید",
   "command.pickUiLanguage.title": "Saropa Lints: Language / Langue / Sprache / 言語 / 语言",
   "command.openConfigDashboard.title": "Saropa Lints: پیکربندی Lints را باز کنید",
   "command.openPackageVibrancy.title": "Saropa Lints: Open Package Vibrancy",
@@ -168,6 +169,7 @@
   "config.property.enabled.markdownDescription": "وقتی **روشن** (پیش‌فرض)، Saropa Lints بررسی‌های ارتقاء را اجرا می‌کند و فضای کاری را مانند استفاده از Saropa lint در نظر می‌گیرد. برای توقف موقت اعلان‌های یکپارچه‌سازی و امتیاز نوار وضعیت بدون مخفی کردن گزینه‌های نوار کناری، **** را خاموش کنید—از **Saropa Lints: Setup Project** را هنگامی که نیاز دارید «saropa_lints» را به pubspec اضافه کنید و «analysis_options» را بنویسید، استفاده کنید.",
   "config.property.tier.description": "سطح پیش فرض هنگام فعال کردن یا راه اندازی مجدد.",
   "config.property.runAnalysisAfterConfigChange.description": "آنالیز دارت را بعد از init یا تغییر پیکربندی در صورت فعال شدن اجرا کنید.",
+  "config.property.runAnalysisAfterDependencyChange.description": "اجرای مجدد خودکار dart analyze هنگام تغییر pubspec.lock (پس از pub get / pub upgrade). از یک تأخیر ۱۰ ثانیه‌ای برای ترکیب حل‌های سریع وابستگی استفاده می‌کند.",
   "config.property.uiLanguage.description": "زبان UI برای نوار کناری و داشبورد Saropa. از «خودکار» برای پیروی از زبان نمایش کد VS استفاده کنید. انتخابگر زبان نوار کناری این مقدار را در تنظیمات کاربر ذخیره می کند تا در هر فضای کاری اعمال شود.",
   "config.property.runAnalysisOpenEditorsOnly.description": "وقتی درست باشد، Saropa Lints فقط برای فایل‌های Dart که در حال حاضر در VS Code (workspace.textDocuments) در ریشه پروژه شناسایی‌شده باز هستند، آنالیز دارت را اجرا می‌کند.",
   "config.property.inlineAnnotations.description": "نمایش پیام‌های نقض در انتهای خطوط آسیب‌دیده (سبک لنز خطا).",
@@ -295,5 +297,10 @@
   "walkthrough.step.walkthrough.commandCatalog.title": "همه دستورات را مرور کنید",
   "walkthrough.step.walkthrough.commandCatalog.description": "115+ فرمان سازماندهی شده بر اساس دسته با جستجو. تجزیه و تحلیل، امنیت، سلامت بسته و دستورات گزارش را در یک مکان پیدا کنید.\n\n[مرور همه دستورات] (command:saropaLints.showCommandCatalog)",
   "walkthrough.step.walkthrough.aboutSaropa.title": "درباره ساروپا",
-  "walkthrough.step.walkthrough.aboutSaropa.description": "Saropa Pty Limited - ساخت پادمان های دیجیتال از سال 2010.\n\nبسته‌های دارت، برنامه‌های افزودنی VS Code و برنامه‌های مصرف‌کننده برای توسعه‌دهندگانی که به قابلیت اطمینان اهمیت می‌دهند.\n\n[به saropa.com مراجعه کنید](https://saropa.com/)"
+  "walkthrough.step.walkthrough.aboutSaropa.description": "Saropa Pty Limited - ساخت پادمان های دیجیتال از سال 2010.\n\nبسته‌های دارت، برنامه‌های افزودنی VS Code و برنامه‌های مصرف‌کننده برای توسعه‌دهندگانی که به قابلیت اطمینان اهمیت می‌دهند.\n\n[به saropa.com مراجعه کنید](https://saropa.com/)",
+  "command.toggleIncludeOtherAnalyzerFindingsInDashboard.title": "Saropa Lints: Toggle Show Other Analyzer Findings on Dashboard",
+  "command.toggleIncludeAnalyzerTodosInDashboard.title": "Saropa Lints: Toggle Show Analyzer TODOs on Dashboard",
+  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: Toggle TODO/HACK Workspace Scanner",
+  "config.property.includeOtherAnalyzerFindingsInDashboard.description": "Show a supplementary pill on the Findings Dashboard with the count of non-saropa analyzer findings on .dart files (built-in Dart SDK lints plus any third-party custom_lint plugins such as riverpod_lint). Display-only — never affects the health score, KPI cards, or violations list.",
+  "config.property.includeAnalyzerTodosInDashboard.description": "Show a supplementary pill on the Findings Dashboard with the count of analyzer-side TODO diagnostics (`code: \"todo\"`) on .dart files. Independent of the saropa file-system TODO/HACK scanner. Display-only."
 }

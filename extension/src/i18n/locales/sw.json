@@ -345,7 +345,17 @@
       "activateKpiSpace": "Washa kadi ya KPI iliyolengwa au upau wa chati",
       "showOverlay": "Onyesha wekeleo huu wa njia ya mkato"
     },
-    "unknownAnalyzerKind": "Haijulikani"
+    "unknownAnalyzerKind": "Haijulikani",
+    "supplementary": {
+      "otherAnalyzerOn": "+{count} other analyzer findings",
+      "otherAnalyzerPromo": "+? other analyzer findings — show",
+      "analyzerTodosOn": "+{count} analyzer TODOs",
+      "analyzerTodosPromo": "+? analyzer TODOs — show",
+      "scannerPromo": "Enable TODO/HACK scanner",
+      "tooltipLive": "Live from VS Code Problems panel. Updates as analysis completes. Click to hide.",
+      "tooltipScanner": "Saropa file-system scanner — counts open TODO/HACK markers in source.",
+      "tooltipPromoClickToOn": "Click to enable"
+    }
   },
   "triageDash": {
     "showInIssues": "Onyesha katika Masuala",

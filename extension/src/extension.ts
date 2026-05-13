@@ -551,6 +551,15 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         void vscode.commands.executeCommand('saropaLints.driftAdvisor.refresh');
         scheduleDriftAdvisorPoll();
       }
+      // Dashboard supplementary-counts toggles (#224). Settings UI edits flow
+      // through here too, so the open dashboard updates whether the user
+      // clicked a pill, ran a command, or edited settings.json directly.
+      if (
+        e.affectsConfiguration('saropaLints.includeOtherAnalyzerFindingsInDashboard') ||
+        e.affectsConfiguration('saropaLints.includeAnalyzerTodosInDashboard')
+      ) {
+        refreshFindingsDashboardIfOpen(context);
+      }
     }),
     vscode.workspace.onDidChangeWorkspaceFolders(() => {
       invalidateProjectRoot();
@@ -603,6 +612,59 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     context.subscriptions.push(watcher);
   };
   watchViolations();
+
+  // ── Auto-analyze on dependency changes ──────────────────────────────────
+  // When pubspec.lock changes (after `pub get` / `pub upgrade` / extension
+  // update that resolves new packages), stale violations.json no longer
+  // reflects the current dependency tree.  This watcher debounces rapid
+  // lock-file rewrites (burst `pub get` calls) and cancel-restarts: each
+  // new change resets the timer so only one trailing analysis runs.
+  {
+    let depChangeTimer: ReturnType<typeof setTimeout> | undefined;
+    // Guard against overlapping analysis runs — if a run is already in
+    // flight (from the manual "Analyze" button or a prior timer fire),
+    // skip the auto-trigger to avoid double progress toasts and contention.
+    let analysisInFlight = false;
+
+    const triggerAnalysisAfterDependencyChange = () => {
+      // Cancel-restart: clear any pending timer so the most recent
+      // pubspec.lock write wins and only one analysis runs.
+      if (depChangeTimer) clearTimeout(depChangeTimer);
+
+      // 10 s debounce — long enough for `pub get` to settle in a
+      // multi-package workspace, short enough to feel responsive.
+      // Vibrancy uses 30 s because its scan is much heavier; analysis
+      // is lighter and the user expects near-immediate feedback.
+      depChangeTimer = setTimeout(async () => {
+        depChangeTimer = undefined;
+        const cfg = getConfig();
+        if (!(cfg.get<boolean>('runAnalysisAfterDependencyChange', true) ?? true)) return;
+        if (analysisInFlight) return;
+        analysisInFlight = true;
+        try {
+          const ok = await runAnalysisCommand(context);
+          if (ok) {
+            refreshAll();
+            updateAllStatusBars();
+            updateContext(
+              cfg.get<boolean>('enabled', true) ?? true,
+              issuesProvider.hasViolations(),
+            );
+          }
+        } finally {
+          analysisInFlight = false;
+        }
+      }, 10_000);
+    };
+
+    const depWatcher = vscode.workspace.createFileSystemWatcher('**/pubspec.lock');
+    depWatcher.onDidChange(triggerAnalysisAfterDependencyChange);
+    depWatcher.onDidCreate(triggerAnalysisAfterDependencyChange);
+    context.subscriptions.push(depWatcher, {
+      dispose: () => { if (depChangeTimer) clearTimeout(depChangeTimer); },
+    });
+  }
+
   syncRuleMetadataFromViolations(root ? readViolations(root) : null);
 
   const extVersion = (context.extension.packageJSON as { version: string }).version;
@@ -851,6 +913,62 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       await cfg.update('runAnalysisAfterConfigChange', !cur, target);
       refreshAllSections();
     }),
+    // One-click toggle for "Run analysis after dependency change" sidebar row.
+    vscode.commands.registerCommand('saropaLints.toggleRunAnalysisAfterDependencyChange', async () => {
+      const cfg = vscode.workspace.getConfiguration('saropaLints');
+      const cur = cfg.get<boolean>('runAnalysisAfterDependencyChange', true) ?? true;
+      const target = vscode.workspace.workspaceFolders?.length
+        ? vscode.ConfigurationTarget.Workspace
+        : vscode.ConfigurationTarget.Global;
+      await cfg.update('runAnalysisAfterDependencyChange', !cur, target);
+      refreshAllSections();
+    }),
+    // Dashboard supplementary-counts toggles (#224). Each command flips one
+    // workspace setting and refreshes the open dashboard so the corresponding
+    // status-line pill updates immediately. Wired here (not in the sidebar
+    // config tree) so the toggles remain discoverable via the command
+    // palette without polluting the sidebar with standalone-config rows.
+    vscode.commands.registerCommand(
+      'saropaLints.toggleIncludeOtherAnalyzerFindingsInDashboard',
+      async () => {
+        const cfg = vscode.workspace.getConfiguration('saropaLints');
+        const cur = cfg.get<boolean>('includeOtherAnalyzerFindingsInDashboard', false);
+        const target = vscode.workspace.workspaceFolders?.length
+          ? vscode.ConfigurationTarget.Workspace
+          : vscode.ConfigurationTarget.Global;
+        await cfg.update('includeOtherAnalyzerFindingsInDashboard', !cur, target);
+        refreshFindingsDashboardIfOpen(context);
+      },
+    ),
+    vscode.commands.registerCommand(
+      'saropaLints.toggleIncludeAnalyzerTodosInDashboard',
+      async () => {
+        const cfg = vscode.workspace.getConfiguration('saropaLints');
+        const cur = cfg.get<boolean>('includeAnalyzerTodosInDashboard', false);
+        const target = vscode.workspace.workspaceFolders?.length
+          ? vscode.ConfigurationTarget.Workspace
+          : vscode.ConfigurationTarget.Global;
+        await cfg.update('includeAnalyzerTodosInDashboard', !cur, target);
+        refreshFindingsDashboardIfOpen(context);
+      },
+    ),
+    vscode.commands.registerCommand(
+      'saropaLints.toggleTodosAndHacksScanner',
+      async () => {
+        // Note: writes to the EXISTING setting key
+        // `saropaLints.todosAndHacks.workspaceScanEnabled` — no migration.
+        // This command exists so the scanner toggle is invokable from the
+        // palette and the dashboard pill without duplicating the setting.
+        const cfg = vscode.workspace.getConfiguration('saropaLints.todosAndHacks');
+        const cur = cfg.get<boolean>('workspaceScanEnabled', false);
+        const target = vscode.workspace.workspaceFolders?.length
+          ? vscode.ConfigurationTarget.Workspace
+          : vscode.ConfigurationTarget.Global;
+        await cfg.update('workspaceScanEnabled', !cur, target);
+        refreshAllSections();
+        refreshFindingsDashboardIfOpen(context);
+      },
+    ),
     vscode.commands.registerCommand('saropaLints.pickUiLanguage', async () => {
       const cfg = vscode.workspace.getConfiguration('saropaLints');
       const current = cfg.get<string>('uiLanguage', 'auto') ?? 'auto';

@@ -18,6 +18,7 @@
   "command.openConfig.title": "सरोपा लिंट्स: विश्लेषण विकल्प खोलें",
   "command.openPubspec.title": "सरोपा लिंट्स: pubspec.yaml खोलें",
   "command.toggleRunAnalysisAfterConfigChange.title": "सरोपा लिंट्स: कॉन्फ़िगरेशन परिवर्तन के बाद टॉगल रन विश्लेषण",
+  "command.toggleRunAnalysisAfterDependencyChange.title": "सरोपा लिंट्स: निर्भरता परिवर्तन के बाद टॉगल रन विश्लेषण",
   "command.pickUiLanguage.title": "सरोपा लिंट्स: भाषा / भाषा / स्प्रेचे / 言語 / 语言",
   "command.openConfigDashboard.title": "सरोपा लिंट्स: लिंट्स कॉन्फिग खोलें",
   "command.openPackageVibrancy.title": "सरोपा लिंट्स: ओपन पैकेज वाइब्रेंसी",
@@ -168,6 +169,7 @@
   "config.property.enabled.markdownDescription": "जब **चालू** (डिफ़ॉल्ट) होता है, तो सरोपा लिंट्स अपग्रेड जांच चलाता है और कार्यस्थल को सरोपा लिंट एकीकरण का उपयोग करने जैसा मानता है। साइडबार विकल्पों को छुपाए बिना एकीकरण अधिसूचनाओं और स्टेटस-बार स्कोर को रोकने के लिए **बंद** करें - **सरोपा लिंट्स: सेट अप प्रोजेक्ट** का उपयोग करें जब आपको पबस्पेक में 'सरोपा_लिंट्स' जोड़ने और 'विश्लेषण_विकल्प' लिखने की आवश्यकता हो।",
   "config.property.tier.description": "सक्षम या पुन: प्रारंभ करते समय डिफ़ॉल्ट स्तर।",
   "config.property.runAnalysisAfterConfigChange.description": "सक्षम होने पर init या config परिवर्तन के बाद डार्ट विश्लेषण चलाएँ।",
+  "config.property.runAnalysisAfterDependencyChange.description": "pubspec.lock बदलने पर स्वचालित रूप से dart analyze फिर से चलाएँ (pub get / pub upgrade के बाद)। तेज़ निर्भरता समाधानों को समेकित करने के लिए 10-सेकंड के डिबाउंस का उपयोग करता है।",
   "config.property.uiLanguage.description": "सरोपा साइडबार और डैशबोर्ड के लिए यूआई भाषा। वीएस कोड डिस्प्ले भाषा का पालन करने के लिए 'ऑटो' का उपयोग करें। साइडबार भाषा पिकर इस मान को उपयोगकर्ता सेटिंग्स में सहेजता है ताकि यह प्रत्येक कार्यक्षेत्र में लागू हो।",
   "config.property.runAnalysisOpenEditorsOnly.description": "सत्य होने पर, सरोपा लिंट्स केवल खोजे गए प्रोजेक्ट रूट के तहत वीएस कोड (वर्कस्पेस.टेक्स्टडॉक्यूमेंट्स) में खुली डार्ट फ़ाइलों के लिए डार्ट विश्लेषण चलाता है।",
   "config.property.inlineAnnotations.description": "प्रभावित पंक्तियों के अंत में उल्लंघन संदेश दिखाएं (त्रुटि लेंस शैली)।",
@@ -295,5 +297,10 @@
   "walkthrough.step.walkthrough.commandCatalog.title": "सभी कमांड ब्राउज़ करें",
   "walkthrough.step.walkthrough.commandCatalog.description": "खोज के साथ श्रेणी के अनुसार व्यवस्थित 115+ कमांड। विश्लेषण, सुरक्षा, पैकेज स्वास्थ्य और रिपोर्टिंग कमांड एक ही स्थान पर खोजें।\n\n[सभी कमांड ब्राउज़ करें](कमांड:saropaLints.showCommandCatalog)",
   "walkthrough.step.walkthrough.aboutSaropa.title": "सरोपा के बारे में",
-  "walkthrough.step.walkthrough.aboutSaropa.description": "सरोपा पीटीआई लिमिटेड - 2010 से डिजिटल सुरक्षा उपायों का निर्माण कर रहा है।\n\nविश्वसनीयता को महत्व देने वाले डेवलपर्स के लिए डार्ट पैकेज, वीएस कोड एक्सटेंशन और उपभोक्ता ऐप।\n\n[saropa.com पर जाएं](https://saropa.com/)"
+  "walkthrough.step.walkthrough.aboutSaropa.description": "सरोपा पीटीआई लिमिटेड - 2010 से डिजिटल सुरक्षा उपायों का निर्माण कर रहा है।\n\nविश्वसनीयता को महत्व देने वाले डेवलपर्स के लिए डार्ट पैकेज, वीएस कोड एक्सटेंशन और उपभोक्ता ऐप।\n\n[saropa.com पर जाएं](https://saropa.com/)",
+  "command.toggleIncludeOtherAnalyzerFindingsInDashboard.title": "Saropa Lints: Toggle Show Other Analyzer Findings on Dashboard",
+  "command.toggleIncludeAnalyzerTodosInDashboard.title": "Saropa Lints: Toggle Show Analyzer TODOs on Dashboard",
+  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: Toggle TODO/HACK Workspace Scanner",
+  "config.property.includeOtherAnalyzerFindingsInDashboard.description": "Show a supplementary pill on the Findings Dashboard with the count of non-saropa analyzer findings on .dart files (built-in Dart SDK lints plus any third-party custom_lint plugins such as riverpod_lint). Display-only — never affects the health score, KPI cards, or violations list.",
+  "config.property.includeAnalyzerTodosInDashboard.description": "Show a supplementary pill on the Findings Dashboard with the count of analyzer-side TODO diagnostics (`code: \"todo\"`) on .dart files. Independent of the saropa file-system TODO/HACK scanner. Display-only."
 }

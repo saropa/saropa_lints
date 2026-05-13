@@ -45,12 +45,37 @@
 
 ---
 
-## [13.7.1] - Unreleased
+## [Unreleased]
+
+The Findings Dashboard now lets you reconcile its count with the Problems panel without leaving the window: clickable pills in the hero status line surface analyzer findings (built-in Dart SDK lints plus any third-party `custom_lint` plugins like riverpod_lint) and analyzer-side TODOs that fall outside saropa's rule set, plus a discoverability prompt for the existing TODO/HACK workspace scanner. All three default off; one click toggles each on or off, and none feed health score, KPI cards, or filtering. [log](https://github.com/saropa/saropa_lints/blob/vX.Y.Z/CHANGELOG.md)
+
+### Added (Extension)
+
+- **Findings Dashboard supplementary pills (#224)** — three clickable pills in the dashboard hero surface non-saropa analyzer findings, analyzer-side TODO diagnostics, and the existing TODO/HACK scanner toggle directly on the surface that has the discoverability gap. New workspace settings `saropaLints.includeOtherAnalyzerFindingsInDashboard` and `saropaLints.includeAnalyzerTodosInDashboard` (default off); commands `Saropa Lints: Toggle Show Other Analyzer Findings on Dashboard`, `... Toggle Show Analyzer TODOs on Dashboard`, and `... Toggle TODO/HACK Workspace Scanner` invokable from the command palette. No action required.
+
+---
+
+## [13.7.2]
+
+### Added (Extension)
+
+- **Auto-analyze on dependency changes** — the extension now watches `pubspec.lock` and automatically re-runs `dart analyze` when dependencies change (after `pub get` / `pub upgrade`), with a 10-second cancel-restart debounce to coalesce rapid lock-file rewrites. Controlled by the new `saropaLints.runAnalysisAfterDependencyChange` setting (default: on); toggle from the sidebar Settings row or command palette. No action required.
+
+<details><summary>Maintenance</summary>
+
+- Tracked `reports/organize_reports.py` in git by switching `.gitignore` from directory-level to content-level ignore with a negation rule; also added `example*/reports/` to `.gitignore` so generated report output under example directories stays untracked.
+
+</details>
+
+---
+
+## [13.7.1]
 
 ### Fixed
 
 - **`avoid_string_substring` no longer fires on indexOf-guarded, loop-bounded, or early-exit-guarded substring calls** — the rule now recognizes `while`/`for` loop conditions, preceding `if (idx == -1) return` guards, and if-conditions that reference substring arguments as evidence of bounds safety. No action required.
 - **Analyzer v9 `useDeclaringConstructorsAst` crashes resolved** — all `.namePart.typeName` accesses (132 sites) and `.namePart.typeParameters` accesses (4 sites) now use safe `nameToken` / `nameTypeParameters` extensions that fall back to the pre-gate `.name` / `.typeParameters` API; additionally, `_wrapCallback` now catches `UnsupportedError` globally so any remaining gated property on any analyzer version skips the rule gracefully instead of crashing the plugin. Closes the remaining failures reported in [#224](https://github.com/saropa/saropa_lints/issues/224). No action required.
+
 
 ### Fixed (Extension)
 
@@ -59,7 +84,6 @@
 <details><summary>Maintenance</summary>
 
 - Ran `dart pub get` in `packages/saropa_lints_api/` to resolve missing `test` dependency; added source comment noting sub-package requires its own dependency resolution.
-- Tracked `reports/organize_reports.py` in git by switching `.gitignore` from directory-level to content-level ignore with a negation rule; also added `example*/reports/` to `.gitignore` so generated report output under example directories stays untracked.
 
 </details>
 

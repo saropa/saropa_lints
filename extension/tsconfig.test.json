@@ -75,6 +75,8 @@
     "src/test/pluginLiveness.test.ts",
     "src/upgrade-checker.ts",
     "src/test/upgradeChecker.test.ts",
+    "src/supplementaryDiagnostics.ts",
+    "src/test/supplementaryDiagnostics.test.ts",
     "src/cross-file-commands.ts",
     "src/test/formatAnalysisIssuesMessage.test.ts",
     "src/test/findLatestAnalysisReport.test.ts",

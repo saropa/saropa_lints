@@ -18,6 +18,7 @@
   "command.openConfig.title": "Саропа Линтс: варианты открытого анализа",
   "command.openPubspec.title": "Саропа Линтс: открыть pubspec.yaml",
   "command.toggleRunAnalysisAfterConfigChange.title": "Саропа Линтс: переключение запуска анализа после изменения конфигурации",
+  "command.toggleRunAnalysisAfterDependencyChange.title": "Саропа Линтс: переключение запуска анализа после изменения зависимости",
   "command.pickUiLanguage.title": "Саропа Линтс: Язык / Язык / Sprache / 言語 / 语言",
   "command.openConfigDashboard.title": "Саропа Линтс: Открыть конфигурацию Линтов",
   "command.openPackageVibrancy.title": "Saropa Lints: яркость открытой упаковки",
@@ -168,6 +169,7 @@
   "config.property.enabled.markdownDescription": "Если **включено** (по умолчанию), Saropa Lints выполняет проверку обновлений и рассматривает рабочую область как использующую интеграцию Saropa lint. Отключите **выкл.**, чтобы приостановить уведомления об интеграции и оценку строки состояния, не скрывая параметры боковой панели. Используйте **Saropa Lints: Set Up Project**, когда вам нужно добавить `saropa_lints` в pubspec и написать `anaанализ_options`.",
   "config.property.tier.description": "Уровень по умолчанию при включении или повторной инициализации.",
   "config.property.runAnalysisAfterConfigChange.description": "Запускайте анализ dart после инициализации или изменения конфигурации, если эта функция включена.",
+  "config.property.runAnalysisAfterDependencyChange.description": "Автоматически перезапускать dart analyze при изменении pubspec.lock (после pub get / pub upgrade). Использует 10-секундный debounce для объединения быстрых разрешений зависимостей.",
   "config.property.uiLanguage.description": "Язык пользовательского интерфейса для боковой панели и информационных панелей Saropa. Используйте «авто», чтобы следовать языку отображения VS Code. Средство выбора языка на боковой панели сохраняет это значение в настройках пользователя, поэтому оно применяется в каждом рабочем пространстве.",
   "config.property.runAnalysisOpenEditorsOnly.description": "Если установлено значение true, Saropa Lints запускает анализ dart только для файлов Dart, открытых в настоящее время в VS Code (workspace.textDocuments) в обнаруженном корне проекта.",
   "config.property.inlineAnnotations.description": "Показывать сообщения о нарушениях в конце затронутых строк (стиль «Линза ошибок»).",
@@ -295,5 +297,10 @@
   "walkthrough.step.walkthrough.commandCatalog.title": "Просмотреть все команды",
   "walkthrough.step.walkthrough.commandCatalog.description": "Более 115 команд, организованных по категориям с поиском. Найдите команды анализа, безопасности, работоспособности пакетов и отчетов в одном месте.\n\n[Просмотреть все команды](команда: saropaLints.showCommandCatalog)",
   "walkthrough.step.walkthrough.aboutSaropa.title": "О Саропе",
-  "walkthrough.step.walkthrough.aboutSaropa.description": "Saropa Pty Limited — занимается созданием цифровых систем безопасности с 2010 года.\n\nПакеты Dart, расширения VS Code и потребительские приложения для разработчиков, которые ценят надежность.\n\n[Посетите сайт saropa.com](https://saropa.com/)"
+  "walkthrough.step.walkthrough.aboutSaropa.description": "Saropa Pty Limited — занимается созданием цифровых систем безопасности с 2010 года.\n\nПакеты Dart, расширения VS Code и потребительские приложения для разработчиков, которые ценят надежность.\n\n[Посетите сайт saropa.com](https://saropa.com/)",
+  "command.toggleIncludeOtherAnalyzerFindingsInDashboard.title": "Saropa Lints: Toggle Show Other Analyzer Findings on Dashboard",
+  "command.toggleIncludeAnalyzerTodosInDashboard.title": "Saropa Lints: Toggle Show Analyzer TODOs on Dashboard",
+  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: Toggle TODO/HACK Workspace Scanner",
+  "config.property.includeOtherAnalyzerFindingsInDashboard.description": "Show a supplementary pill on the Findings Dashboard with the count of non-saropa analyzer findings on .dart files (built-in Dart SDK lints plus any third-party custom_lint plugins such as riverpod_lint). Display-only — never affects the health score, KPI cards, or violations list.",
+  "config.property.includeAnalyzerTodosInDashboard.description": "Show a supplementary pill on the Findings Dashboard with the count of analyzer-side TODO diagnostics (`code: \"todo\"`) on .dart files. Independent of the saropa file-system TODO/HACK scanner. Display-only."
 }

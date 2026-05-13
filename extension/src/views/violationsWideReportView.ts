@@ -45,6 +45,7 @@ import {
   type AnalyzerSuppressionsSlice,
   type ViewSuppressionsSlice,
 } from './violationsDashboardHtml';
+import { countSupplementaryDiagnostics } from '../supplementaryDiagnostics';
 import { l10n } from '../i18n/runtime';
 
 const PANEL_VIEW_TYPE = 'saropaViolationsWideReport';
@@ -52,6 +53,13 @@ const MAX_SOURCE_VIOLATIONS = 4000;
 
 let currentPanel: vscode.WebviewPanel | undefined;
 let todosAndHacksSnapshot: TodoHackSnapshot | undefined;
+// Live-diagnostics refresh for supplementary-counts pills (#224). Disposed
+// when the panel closes. Debounced so a flurry of analyzer-update events
+// (typical right after `dart analyze` completes — VS Code re-emits many
+// per-file diagnostic changes) coalesces into a single dashboard rebuild.
+let supplementaryDiagnosticsListener: vscode.Disposable | undefined;
+let supplementaryRefreshTimer: NodeJS.Timeout | undefined;
+const SUPPLEMENTARY_REFRESH_DEBOUNCE_MS = 500;
 
 interface DashboardState {
   groupBy: GroupByMode;
@@ -241,6 +249,12 @@ async function rebuildDashboardHtml(
     driftAdvisorSnapshot = await loadDriftAdvisorSnapshot();
   }
 
+  // Always compute supplementary counts — promo pills need the count even
+  // when the toggle is off (so the promo only shows when there's a gap to
+  // surface). Setting state is read fresh on each rebuild so toggling a pill
+  // immediately flips the rendered state on the next refresh.
+  const supplementary = buildSupplementarySlice(cfg, totalAfterDisable);
+
   panel.webview.html = renderViolationsDashboardHtml({
     exportViolations: lastExportViolations,
     totalRawAfterDisable: totalAfterDisable,
@@ -271,12 +285,53 @@ async function rebuildDashboardHtml(
     topRules: pickTopRules(lastExportViolations, TOP_RULES_LIMIT),
     filesAffected: countDistinctFiles(afterDisabled.violations),
     enabledRuleCount: raw.config?.enabledRuleCount,
+    supplementary,
   });
 
   void panel.webview.postMessage({
     type: 'hydrateRecentSearches',
     queries: context.workspaceState.get<string[]>('saropa.findingsDashboard.recentSearches', []),
   });
+}
+
+/**
+ * Read the three supplementary toggles and combine with a live diagnostic
+ * recount. Counts are always computed (regardless of toggle state) because
+ * the renderer needs to know whether the gap exists in order to decide
+ * whether a promo pill is worth showing.
+ *
+ * Cheap call: `getDiagnostics()` reads already-computed VS Code state, no
+ * analysis is triggered. Safe to invoke on every dashboard rebuild.
+ */
+function buildSupplementarySlice(
+  cfg: vscode.WorkspaceConfiguration,
+  saropaViolationCount: number,
+): {
+  otherAnalyzerEnabled: boolean;
+  analyzerTodosEnabled: boolean;
+  scannerEnabled: boolean;
+  otherAnalyzerCount: number;
+  analyzerTodosCount: number;
+  hasDartFiles: boolean;
+} {
+  const counts = countSupplementaryDiagnostics(saropaViolationCount);
+  return {
+    otherAnalyzerEnabled: cfg.get<boolean>(
+      'includeOtherAnalyzerFindingsInDashboard',
+      false,
+    ),
+    analyzerTodosEnabled: cfg.get<boolean>(
+      'includeAnalyzerTodosInDashboard',
+      false,
+    ),
+    scannerEnabled: cfg.get<boolean>(
+      'todosAndHacks.workspaceScanEnabled',
+      false,
+    ),
+    otherAnalyzerCount: counts.otherAnalyzerCount,
+    analyzerTodosCount: counts.analyzerTodosCount,
+    hasDartFiles: counts.hasDartFiles,
+  };
 }
 
 function countBySeverity(violations: readonly Violation[]): Record<string, number> {
@@ -455,6 +510,30 @@ function getOrCreatePanel(context: vscode.ExtensionContext): vscode.WebviewPanel
 
   currentPanel.onDidDispose(() => {
     currentPanel = undefined;
+    // Stop listening for live diagnostic changes once the dashboard is gone —
+    // no point recomputing supplementary counts for a panel that does not
+    // exist, and we leak the listener if we do not dispose explicitly.
+    supplementaryDiagnosticsListener?.dispose();
+    supplementaryDiagnosticsListener = undefined;
+    if (supplementaryRefreshTimer) {
+      clearTimeout(supplementaryRefreshTimer);
+      supplementaryRefreshTimer = undefined;
+    }
+  });
+
+  // Live supplementary-counts refresh (#224). The Problems panel updates as
+  // analysis runs; this listener keeps the dashboard pills in sync without
+  // requiring the user to click refresh. Debounced because a single analysis
+  // run typically emits dozens of per-URI diagnostic events.
+  supplementaryDiagnosticsListener = vscode.languages.onDidChangeDiagnostics(() => {
+    if (!currentPanel?.visible) return;
+    if (supplementaryRefreshTimer) clearTimeout(supplementaryRefreshTimer);
+    supplementaryRefreshTimer = setTimeout(() => {
+      supplementaryRefreshTimer = undefined;
+      if (currentPanel?.visible) {
+        void rebuildDashboardHtml(context, currentPanel);
+      }
+    }, SUPPLEMENTARY_REFRESH_DEBOUNCE_MS);
   });
 
   currentPanel.webview.onDidReceiveMessage(async (msg: unknown) => {
@@ -548,6 +627,49 @@ function getOrCreatePanel(context: vscode.ExtensionContext): vscode.WebviewPanel
       await todoCfg.update('workspaceScanEnabled', true, vscode.ConfigurationTarget.Workspace);
       todosAndHacksSnapshot = undefined;
       await rebuildDashboardHtml(context, currentPanel!);
+      return;
+    }
+    // Dashboard supplementary-counts pills (#224) — pill click in the
+    // webview posts `{ type: 'toggleSupplementary', source }`. We map the
+    // source key to the matching workspace setting and flip it. The
+    // `onDidChangeConfiguration` handler in extension.ts will trigger the
+    // dashboard refresh, so no manual rebuild is needed here — but we still
+    // invalidate the scanner snapshot when toggling the scanner so the next
+    // rebuild re-scans the workspace from scratch.
+    if (data.type === 'toggleSupplementary') {
+      const source = (data as { source?: string }).source;
+      if (source === 'other') {
+        const cur = cfg.get<boolean>('includeOtherAnalyzerFindingsInDashboard', false);
+        await cfg.update(
+          'includeOtherAnalyzerFindingsInDashboard',
+          !cur,
+          vscode.ConfigurationTarget.Workspace,
+        );
+      } else if (source === 'todos') {
+        const cur = cfg.get<boolean>('includeAnalyzerTodosInDashboard', false);
+        await cfg.update(
+          'includeAnalyzerTodosInDashboard',
+          !cur,
+          vscode.ConfigurationTarget.Workspace,
+        );
+      } else if (source === 'scanner') {
+        const todoCfg = vscode.workspace.getConfiguration('saropaLints.todosAndHacks');
+        const cur = todoCfg.get<boolean>('workspaceScanEnabled', false);
+        await todoCfg.update(
+          'workspaceScanEnabled',
+          !cur,
+          vscode.ConfigurationTarget.Workspace,
+        );
+        // Snapshot cache must be invalidated so the scanner actually re-runs
+        // (or stops contributing) on the next dashboard rebuild.
+        todosAndHacksSnapshot = undefined;
+      }
+      // Force the rebuild here too — onDidChangeConfiguration is racey vs
+      // user expectations after a pill click; the pill should flip its
+      // visible state on the very next paint.
+      if (currentPanel) {
+        await rebuildDashboardHtml(context, currentPanel);
+      }
       return;
     }
     if (data.type === 'driftRefresh') {

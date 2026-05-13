@@ -125,6 +125,37 @@ export const catalogEntries: readonly CatalogEntry[] = [
     icon: 'sync',
   },
   {
+    command: 'saropaLints.toggleRunAnalysisAfterDependencyChange',
+    title: 'Toggle Run Analysis After Dependency Change',
+    description: 'Flip the saropaLints.runAnalysisAfterDependencyChange setting in one click. When on, pubspec.lock changes auto-trigger analysis after a 10-second debounce.',
+    category: 'Setup & Configuration',
+    icon: 'sync',
+  },
+  {
+    command: 'saropaLints.toggleIncludeOtherAnalyzerFindingsInDashboard',
+    title: 'Toggle Show Other Analyzer Findings on Dashboard',
+    description:
+      'Show a supplementary pill on the Findings Dashboard with the count of non-saropa analyzer findings on .dart files — built-in Dart SDK lints plus any third-party custom_lint plugins (e.g. riverpod_lint). Display-only; never affects health score or filtering.',
+    category: 'Setup & Configuration',
+    icon: 'symbol-misc',
+  },
+  {
+    command: 'saropaLints.toggleIncludeAnalyzerTodosInDashboard',
+    title: 'Toggle Show Analyzer TODOs on Dashboard',
+    description:
+      'Show a supplementary pill on the Findings Dashboard with the count of analyzer-side TODO diagnostics (`code: "todo"`) on .dart files. Distinct from the saropa file-system TODO/HACK scanner.',
+    category: 'Setup & Configuration',
+    icon: 'comment',
+  },
+  {
+    command: 'saropaLints.toggleTodosAndHacksScanner',
+    title: 'Toggle TODO/HACK Workspace Scanner',
+    description:
+      'Enable or disable the saropa file-system TODO/HACK scanner (saropaLints.todosAndHacks.workspaceScanEnabled). When on, the Findings Dashboard and sidebar surface open TODO/HACK markers across the workspace.',
+    category: 'Setup & Configuration',
+    icon: 'list-tree',
+  },
+  {
     command: 'saropaLints.pickUiLanguage',
     title: 'Pick UI Language',
     description:

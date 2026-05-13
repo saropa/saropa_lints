@@ -345,7 +345,17 @@
       "activateKpiSpace": "قم بتنشيط بطاقة KPI المركزة أو شريط الرسم البياني",
       "showOverlay": "إظهار تراكب الاختصار هذا"
     },
-    "unknownAnalyzerKind": "مجهول"
+    "unknownAnalyzerKind": "مجهول",
+    "supplementary": {
+      "otherAnalyzerOn": "+0 نتائج أخرى للمحلل {count}",
+      "otherAnalyzerPromo": "+؟ نتائج المحلل الأخرى - عرض",
+      "analyzerTodosOn": "+0 محلل المهام {count}",
+      "analyzerTodosPromo": "+؟ TODOs محلل - عرض",
+      "scannerPromo": "تمكين TODO/HACK الماسح الضوئي",
+      "tooltipLive": "مباشر من لوحة مشاكل VS Code. التحديثات مع اكتمال التحليل. انقر للإخفاء.",
+      "tooltipScanner": "الماسح الضوئي لنظام الملفات Saropa - يقوم بإحصاء علامات TODO/HACK المفتوحة في المصدر.",
+      "tooltipPromoClickToOn": "انقر للتمكين"
+    }
   },
   "triageDash": {
     "showInIssues": "تظهر في القضايا",

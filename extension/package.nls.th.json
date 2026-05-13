@@ -18,6 +18,7 @@
   "command.openConfig.title": "Saropa Lints: เปิดตัวเลือกการวิเคราะห์",
   "command.openPubspec.title": "Saropa Lints: เปิด pubspec.yaml",
   "command.toggleRunAnalysisAfterConfigChange.title": "Saropa Lints: สลับการเรียกใช้การวิเคราะห์หลังจากการเปลี่ยนแปลงการกำหนดค่า",
+  "command.toggleRunAnalysisAfterDependencyChange.title": "Saropa Lints: สลับการเรียกใช้การวิเคราะห์หลังจากการเปลี่ยนแปลง dependency",
   "command.pickUiLanguage.title": "Saropa Lints: ภาษา / ภาษา / Sprache / 言語 / 语言",
   "command.openConfigDashboard.title": "Saropa Lints: เปิดการกำหนดค่า Lints",
   "command.openPackageVibrancy.title": "Saropa Lints: เปิดแพ็คเกจที่มีชีวิตชีวา",
@@ -168,6 +169,7 @@
   "config.property.enabled.markdownDescription": "เมื่อ **เปิด** (ค่าเริ่มต้น) Saropa Lints จะรันการตรวจสอบการอัพเกรดและปฏิบัติต่อพื้นที่ทำงานเหมือนกับการใช้การผสานรวม Saropa Lint ปิด **ปิด** เพื่อหยุดการแจ้งเตือนการรวมระบบและคะแนนแถบสถานะชั่วคราวโดยไม่ต้องซ่อนตัวเลือกแถบด้านข้าง ให้ใช้ **Saropa Lints: ตั้งค่าโปรเจ็กต์** เมื่อคุณต้องการเพิ่ม `saropa_lints` ลงใน pubspec และเขียน `analysis_options`",
   "config.property.tier.description": "ระดับเริ่มต้นเมื่อเปิดใช้งานหรือเริ่มต้นใหม่",
   "config.property.runAnalysisAfterConfigChange.description": "เรียกใช้การวิเคราะห์โผหลังจากเริ่มต้นหรือเปลี่ยนแปลงการกำหนดค่าเมื่อเปิดใช้งาน",
+  "config.property.runAnalysisAfterDependencyChange.description": "เรียกใช้ dart analyze ใหม่โดยอัตโนมัติเมื่อ pubspec.lock เปลี่ยนแปลง (หลัง pub get / pub upgrade) ใช้ debounce 10 วินาทีเพื่อรวมการแก้ไข dependency ที่รวดเร็ว",
   "config.property.uiLanguage.description": "ภาษา UI สำหรับแถบด้านข้างและแดชบอร์ด Saropa ใช้ 'อัตโนมัติ' เพื่อติดตามภาษาที่แสดงรหัส VS เครื่องมือเลือกภาษาของแถบด้านข้างจะบันทึกค่านี้ไว้ในการตั้งค่าผู้ใช้ เพื่อให้ใช้ได้กับทุกพื้นที่ทำงาน",
   "config.property.runAnalysisOpenEditorsOnly.description": "เมื่อเป็นจริง Saropa Lints จะรัน dart analyse เฉพาะไฟล์ Dart ที่เปิดอยู่ใน VS Code (workspace.textDocuments) ภายใต้รูทโปรเจ็กต์ที่ตรวจพบเท่านั้น",
   "config.property.inlineAnnotations.description": "แสดงข้อความการละเมิดที่ท้ายบรรทัดที่ได้รับผลกระทบ (รูปแบบเลนส์ผิดพลาด)",
@@ -295,5 +297,10 @@
   "walkthrough.step.walkthrough.commandCatalog.title": "เรียกดูคำสั่งทั้งหมด",
   "walkthrough.step.walkthrough.commandCatalog.description": "คำสั่งมากกว่า 115 รายการจัดเรียงตามหมวดหมู่พร้อมการค้นหา ค้นหาการวิเคราะห์ ความปลอดภัย ความสมบูรณ์ของแพ็คเกจ และคำสั่งการรายงานได้ในที่เดียว\n\n[เรียกดูคำสั่งทั้งหมด](command:saropaLints.showCommandCatalog)",
   "walkthrough.step.walkthrough.aboutSaropa.title": "เกี่ยวกับ สโรภา",
-  "walkthrough.step.walkthrough.aboutSaropa.description": "Saropa Pty Limited — สร้างการป้องกันทางดิจิทัลตั้งแต่ปี 2010\n\nแพ็คเกจ Dart ส่วนขยาย VS Code และแอปสำหรับผู้บริโภคสำหรับนักพัฒนาที่ให้ความสำคัญกับความน่าเชื่อถือ\n\n[เยี่ยมชม saropa.com](https://saropa.com/)"
+  "walkthrough.step.walkthrough.aboutSaropa.description": "Saropa Pty Limited — สร้างการป้องกันทางดิจิทัลตั้งแต่ปี 2010\n\nแพ็คเกจ Dart ส่วนขยาย VS Code และแอปสำหรับผู้บริโภคสำหรับนักพัฒนาที่ให้ความสำคัญกับความน่าเชื่อถือ\n\n[เยี่ยมชม saropa.com](https://saropa.com/)",
+  "command.toggleIncludeOtherAnalyzerFindingsInDashboard.title": "Saropa Lints: Toggle Show Other Analyzer Findings on Dashboard",
+  "command.toggleIncludeAnalyzerTodosInDashboard.title": "Saropa Lints: Toggle Show Analyzer TODOs on Dashboard",
+  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: Toggle TODO/HACK Workspace Scanner",
+  "config.property.includeOtherAnalyzerFindingsInDashboard.description": "Show a supplementary pill on the Findings Dashboard with the count of non-saropa analyzer findings on .dart files (built-in Dart SDK lints plus any third-party custom_lint plugins such as riverpod_lint). Display-only — never affects the health score, KPI cards, or violations list.",
+  "config.property.includeAnalyzerTodosInDashboard.description": "Show a supplementary pill on the Findings Dashboard with the count of analyzer-side TODO diagnostics (`code: \"todo\"`) on .dart files. Independent of the saropa file-system TODO/HACK scanner. Display-only."
 }

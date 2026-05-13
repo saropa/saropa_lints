@@ -18,6 +18,7 @@
   "command.openConfig.title": "Saropa Lints: تجزيي جا آپشنز کوليو",
   "command.openPubspec.title": "Saropa Lints: pubspec.yaml کوليو",
   "command.toggleRunAnalysisAfterConfigChange.title": "Saropa Lints: config تبديلي کان پوءِ تجزيو هلائڻ ٽوگل ڪريو",
+  "command.toggleRunAnalysisAfterDependencyChange.title": "Saropa Lints: انحصار کی تبدیلی کے بعد تجزیہ چلانا ٹوگل کریں",
   "command.pickUiLanguage.title": "سروپا لِنٹس: زبان / زبان / اسپرچ / 言語 / 语言",
   "command.openConfigDashboard.title": "سروپا لِنٹس: اوپن لِنٹ کنفیگ",
   "command.openPackageVibrancy.title": "سروپا لِنٹس: کھلی پیکج وائبرنسی",
@@ -168,6 +169,7 @@
   "config.property.enabled.markdownDescription": "**آن** (پہلے سے طے شدہ) ہونے پر، Saropa Lints اپ گریڈ چیکز چلاتا ہے اور ورک اسپیس کو Saropa lint انٹیگریشن کے استعمال کی طرح سمجھتا ہے۔ سائڈبار کے اختیارات کو چھپائے بغیر انضمام کی اطلاعات اور اسٹیٹس بار سکور کو روکنے کے لیے **آف** کریں—جب آپ کو پب اسپیک میں `saropa_lints` شامل کرنے اور `analysis_options` لکھنے کی ضرورت ہو تو **سروپا لِنٹ: سیٹ اپ پروجیکٹ** کا استعمال کریں۔",
   "config.property.tier.description": "فعال یا دوبارہ شروع کرتے وقت پہلے سے طے شدہ درجہ۔",
   "config.property.runAnalysisAfterConfigChange.description": "فعال ہونے پر init یا config میں تبدیلی کے بعد ڈارٹ تجزیہ چلائیں۔",
+  "config.property.runAnalysisAfterDependencyChange.description": "pubspec.lock تبدیل ہونے پر خودکار طور پر dart analyze دوبارہ چلائیں (pub get / pub upgrade کے بعد)۔ تیز انحصار کے حل کو یکجا کرنے کے لیے 10 سیکنڈ کا debounce استعمال کرتا ہے۔",
   "config.property.uiLanguage.description": "سروپا سائڈبار اور ڈیش بورڈز کے لیے UI زبان۔ VS کوڈ ڈسپلے لینگویج کی پیروی کرنے کے لیے 'آٹو' استعمال کریں۔ سائڈبار لینگویج چننے والا اس قدر کو صارف کی ترتیبات میں محفوظ کرتا ہے لہذا یہ ہر ورک اسپیس میں لاگو ہوتا ہے۔",
   "config.property.runAnalysisOpenEditorsOnly.description": "سچ ہونے پر، Saropa Lints ڈارٹ تجزیہ صرف اس وقت VS کوڈ (workspace.textDocuments) میں دریافت شدہ پروجیکٹ روٹ کے تحت کھلی ڈارٹ فائلوں کے لیے چلاتا ہے۔",
   "config.property.inlineAnnotations.description": "متاثرہ لائنوں کے آخر میں خلاف ورزی کے پیغامات دکھائیں (Error Lens سٹائل)۔",
@@ -295,5 +297,10 @@
   "walkthrough.step.walkthrough.commandCatalog.title": "تمام کمانڈز کو براؤز کریں۔",
   "walkthrough.step.walkthrough.commandCatalog.description": "تلاش کے ساتھ زمرہ کے لحاظ سے ترتیب دیے گئے 115+ کمانڈز۔ تجزیہ، سیکورٹی، پیکیج ہیلتھ، اور رپورٹنگ کمانڈز ایک جگہ پر تلاش کریں۔\n\n[تمام کمانڈز کو براؤز کریں](command:saropaLints.showCommandCatalog)",
   "walkthrough.step.walkthrough.aboutSaropa.title": "سروپا کے بارے میں",
-  "walkthrough.step.walkthrough.aboutSaropa.description": "Saropa Pty Limited - 2010 سے ڈیجیٹل تحفظات کی تعمیر۔\n\nڈارٹ پیکجز، وی ایس کوڈ ایکسٹینشنز، اور ان ڈویلپرز کے لیے صارف ایپس جو بھروسے کی قدر کرتے ہیں۔\n\n[saropa.com ملاحظہ کریں](https://saropa.com/)"
+  "walkthrough.step.walkthrough.aboutSaropa.description": "Saropa Pty Limited - 2010 سے ڈیجیٹل تحفظات کی تعمیر۔\n\nڈارٹ پیکجز، وی ایس کوڈ ایکسٹینشنز، اور ان ڈویلپرز کے لیے صارف ایپس جو بھروسے کی قدر کرتے ہیں۔\n\n[saropa.com ملاحظہ کریں](https://saropa.com/)",
+  "command.toggleIncludeOtherAnalyzerFindingsInDashboard.title": "Saropa Lints: Toggle Show Other Analyzer Findings on Dashboard",
+  "command.toggleIncludeAnalyzerTodosInDashboard.title": "Saropa Lints: Toggle Show Analyzer TODOs on Dashboard",
+  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: Toggle TODO/HACK Workspace Scanner",
+  "config.property.includeOtherAnalyzerFindingsInDashboard.description": "Show a supplementary pill on the Findings Dashboard with the count of non-saropa analyzer findings on .dart files (built-in Dart SDK lints plus any third-party custom_lint plugins such as riverpod_lint). Display-only — never affects the health score, KPI cards, or violations list.",
+  "config.property.includeAnalyzerTodosInDashboard.description": "Show a supplementary pill on the Findings Dashboard with the count of analyzer-side TODO diagnostics (`code: \"todo\"`) on .dart files. Independent of the saropa file-system TODO/HACK scanner. Display-only."
 }

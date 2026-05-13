@@ -18,6 +18,7 @@
   "command.openConfig.title": "Saropa Lints: Fungua Chaguzi za Uchambuzi",
   "command.openPubspec.title": "Saropa Lints: Fungua pubspec.yaml",
   "command.toggleRunAnalysisAfterConfigChange.title": "Vidokezo vya Saropa: Geuza Uchambuzi wa Utekelezaji Baada ya Kubadilisha Usanidi",
+  "command.toggleRunAnalysisAfterDependencyChange.title": "Vidokezo vya Saropa: Geuza Uchambuzi wa Utekelezaji Baada ya Kubadilisha Utegemezi",
   "command.pickUiLanguage.title": "Linti za Saropa: Lugha / Lugha / Sprache / 言語 / 语言",
   "command.openConfigDashboard.title": "Saropa Lints: Fungua Usanidi wa Lints",
   "command.openPackageVibrancy.title": "Saropa Lints: Fungua Kifurushi Vibrancy",
@@ -168,6 +169,7 @@
   "config.property.enabled.markdownDescription": "Wakati ** imewashwa** (chaguo-msingi), Saropa Lints huendesha ukaguzi wa uboreshaji na hushughulikia nafasi ya kazi kama kutumia uunganishaji wa pamba ya Saropa. Zima **Zima** ili kusitisha arifa za ujumuishaji na alama ya upau-halisi bila kuficha chaguo za upau wa kando—tumia **Viungo vya Saropa: Weka Mradi** unapohitaji kuongeza `saropa_lints` kwenye pubspec na uandike `chaguo_za_changanuzi`.",
   "config.property.tier.description": "Daraja chaguo-msingi wakati wa kuwezesha au kuanzisha upya.",
   "config.property.runAnalysisAfterConfigChange.description": "Endesha uchanganuzi wa kishale baada ya mabadiliko ya init au usanidi unapowashwa.",
+  "config.property.runAnalysisAfterDependencyChange.description": "Endesha upya dart analyze kiotomatiki pubspec.lock inapobadilika (baada ya pub get / pub upgrade). Inatumia debounce ya sekunde 10 kuunganisha utatuzi wa haraka wa utegemezi.",
   "config.property.uiLanguage.description": "Lugha ya UI ya utepe wa Saropa na dashibodi. Tumia 'otomatiki' kufuata lugha ya onyesho ya Msimbo wa VS. Kiteua lugha cha utepe huhifadhi thamani hii kwenye mipangilio ya Mtumiaji ili itumike katika kila nafasi ya kazi.",
   "config.property.runAnalysisOpenEditorsOnly.description": "Ikiwa ndivyo, Saropa Lints huendesha uchanganuzi wa dart kwa faili za Dart zilizofunguliwa kwa sasa katika Msimbo wa VS (workspace.textDocuments) chini ya mzizi wa mradi uliotambuliwa.",
   "config.property.inlineAnnotations.description": "Onyesha ujumbe wa ukiukaji mwishoni mwa mistari iliyoathiriwa (Mtindo wa Hitilafu wa Lenzi).",
@@ -295,5 +297,10 @@
   "walkthrough.step.walkthrough.commandCatalog.title": "Vinjari Amri Zote",
   "walkthrough.step.walkthrough.commandCatalog.description": "Amri 115+ zilizopangwa kwa kategoria na utafutaji. Pata uchanganuzi, usalama, afya ya kifurushi, na amri za kuripoti katika sehemu moja.\n\n[Vinjari Amri Zote](command:saropaLints.showCommandCatalog)",
   "walkthrough.step.walkthrough.aboutSaropa.title": "Kuhusu Saropa",
-  "walkthrough.step.walkthrough.aboutSaropa.description": "Saropa Pty Limited - inajenga ulinzi wa kidijitali tangu 2010.\n\nVifurushi vya Dart, viendelezi vya Msimbo wa VS na programu za watumiaji kwa wasanidi wanaothamini kutegemewa.\n\n[Tembelea saropa.com](https://saropa.com/)"
+  "walkthrough.step.walkthrough.aboutSaropa.description": "Saropa Pty Limited - inajenga ulinzi wa kidijitali tangu 2010.\n\nVifurushi vya Dart, viendelezi vya Msimbo wa VS na programu za watumiaji kwa wasanidi wanaothamini kutegemewa.\n\n[Tembelea saropa.com](https://saropa.com/)",
+  "command.toggleIncludeOtherAnalyzerFindingsInDashboard.title": "Saropa Lints: Toggle Show Other Analyzer Findings on Dashboard",
+  "command.toggleIncludeAnalyzerTodosInDashboard.title": "Saropa Lints: Toggle Show Analyzer TODOs on Dashboard",
+  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: Toggle TODO/HACK Workspace Scanner",
+  "config.property.includeOtherAnalyzerFindingsInDashboard.description": "Show a supplementary pill on the Findings Dashboard with the count of non-saropa analyzer findings on .dart files (built-in Dart SDK lints plus any third-party custom_lint plugins such as riverpod_lint). Display-only — never affects the health score, KPI cards, or violations list.",
+  "config.property.includeAnalyzerTodosInDashboard.description": "Show a supplementary pill on the Findings Dashboard with the count of analyzer-side TODO diagnostics (`code: \"todo\"`) on .dart files. Independent of the saropa file-system TODO/HACK scanner. Display-only."
 }

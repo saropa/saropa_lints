@@ -128,6 +128,34 @@ export interface ViolationsDashboardHtmlInput {
    * the noise is from an INFO-level stylistic rule or a real WARNING.
    */
   topRules?: ReadonlyArray<{ name: string; count: number; severity: string }>;
+  /**
+   * Live supplementary diagnostic state powering the status-line toggle pills
+   * (gap-closing affordance for issue #224). Each source is a three-state
+   * pill on the dashboard: hidden / promo (off, gap present) / count (on).
+   *
+   * Counts come from `vscode.languages.getDiagnostics()` and reflect the
+   * Problems panel; saropa's own findings are subtracted out so the residual
+   * is the *additional* context the user would see in Problems but not on
+   * this dashboard. Display-only — never feeds health score, KPI cards, or
+   * the violations list itself.
+   */
+  supplementary?: {
+    /** Workspace setting `saropaLints.includeOtherAnalyzerFindingsInDashboard`. */
+    otherAnalyzerEnabled: boolean;
+    /** Workspace setting `saropaLints.includeAnalyzerTodosInDashboard`. */
+    analyzerTodosEnabled: boolean;
+    /** Workspace setting `saropaLints.todosAndHacks.workspaceScanEnabled` (existing). */
+    scannerEnabled: boolean;
+    /** Non-saropa analyzer findings on `.dart` files (excludes TODO diagnostics). */
+    otherAnalyzerCount: number;
+    /** Analyzer-side `code: "todo"` diagnostics on `.dart` files. */
+    analyzerTodosCount: number;
+    /**
+     * Whether the workspace has any `.dart` files. Drives the scanner-promo
+     * pill — surfacing it in a workspace with no Dart code is just noise.
+     */
+    hasDartFiles: boolean;
+  };
 }
 
 const DEFAULT_SEVERITIES: readonly string[] = ['error', 'warning', 'info'];
@@ -249,6 +277,65 @@ function buildGauge(score: number): string {
   </div>`;
 }
 
+/**
+ * Build the three-state toggle pills for the supplementary-counts feature
+ * (#224). Each source (other analyzer findings / analyzer TODOs / scanner)
+ * renders as zero or one pill depending on its setting state and whether
+ * there is anything worth surfacing.
+ *
+ * - OFF + gap present  → muted "promo" pill inviting the user to enable.
+ * - OFF + no gap       → hidden (no need to advertise an empty bucket).
+ * - ON  + count > 0    → solid count pill, clickable to disable.
+ * - ON  + count == 0   → hidden (avoids a useless "+0 ..." pill).
+ *
+ * The scanner pill is rendered ELSEWHERE in `buildStatusLine` when ON (to
+ * preserve the existing "{N} TODO · {N} HACK" pill shape and tests). This
+ * helper only returns the scanner *promo* — never the scanner ON state.
+ */
+function buildSupplementaryPills(input: ViolationsDashboardHtmlInput): string[] {
+  const s = input.supplementary;
+  if (!s) return [];
+  const out: string[] = [];
+
+  // Other analyzer findings — bucket includes built-in Dart SDK lints AND any
+  // third-party custom_lint plugins (riverpod_lint, etc.). Label is honest
+  // about that (NOT "Dart lints" alone).
+  if (s.otherAnalyzerEnabled && s.otherAnalyzerCount > 0) {
+    out.push(
+      `<span class="pill toggle on" data-toggle="other" role="button" tabindex="0" title="${escapeHtml(l10n('findingsDash.supplementary.tooltipLive'))}">${escapeHtml(l10n('findingsDash.supplementary.otherAnalyzerOn', { count: String(s.otherAnalyzerCount) }))}</span>`,
+    );
+  } else if (!s.otherAnalyzerEnabled && s.otherAnalyzerCount > 0) {
+    out.push(
+      `<span class="pill toggle promo" data-toggle="other" role="button" tabindex="0" title="${escapeHtml(l10n('findingsDash.supplementary.tooltipPromoClickToOn'))}">${escapeHtml(l10n('findingsDash.supplementary.otherAnalyzerPromo'))}</span>`,
+    );
+  }
+
+  // Analyzer-side TODO diagnostics (`code: "todo"`) — independent of the
+  // file-system scanner; matches what Problems panel shows for #224's "20
+  // TODOs" complaint.
+  if (s.analyzerTodosEnabled && s.analyzerTodosCount > 0) {
+    out.push(
+      `<span class="pill toggle on" data-toggle="todos" role="button" tabindex="0" title="${escapeHtml(l10n('findingsDash.supplementary.tooltipLive'))}">${escapeHtml(l10n('findingsDash.supplementary.analyzerTodosOn', { count: String(s.analyzerTodosCount) }))}</span>`,
+    );
+  } else if (!s.analyzerTodosEnabled && s.analyzerTodosCount > 0) {
+    out.push(
+      `<span class="pill toggle promo" data-toggle="todos" role="button" tabindex="0" title="${escapeHtml(l10n('findingsDash.supplementary.tooltipPromoClickToOn'))}">${escapeHtml(l10n('findingsDash.supplementary.analyzerTodosPromo'))}</span>`,
+    );
+  }
+
+  // Scanner promo only — the ON state pill is rendered in buildStatusLine
+  // alongside the existing todoHackSnapshot logic. Only suggest enabling the
+  // scanner if there are .dart files to scan; promoting it in a non-Dart
+  // workspace is just noise.
+  if (!s.scannerEnabled && s.hasDartFiles) {
+    out.push(
+      `<span class="pill toggle promo" data-toggle="scanner" role="button" tabindex="0" title="${escapeHtml(l10n('findingsDash.supplementary.tooltipPromoClickToOn'))}">${escapeHtml(l10n('findingsDash.supplementary.scannerPromo'))}</span>`,
+    );
+  }
+
+  return out;
+}
+
 /** Status line under the title — freshness + highest-signal facts (§4.1). */
 function buildStatusLine(input: ViolationsDashboardHtmlInput): string {
   const parts: string[] = [];
@@ -265,8 +352,20 @@ function buildStatusLine(input: ViolationsDashboardHtmlInput): string {
   const todos = input.todoHackSnapshot.todos.length;
   const hacks = input.todoHackSnapshot.hacks.length;
   if (input.todoHackSnapshot.enabled) {
-    parts.push(`<span class="pill" title="${escapeHtml(l10n('findingsDash.status.todoHackTitle'))}">${todos} TODO · ${hacks} HACK</span>`);
+    // ON state — count pill matches the existing pre-supplementary-pills
+    // behavior, but is now clickable so users can dismiss the scanner the same
+    // way they enabled it (#224). The data-toggle attribute drives the click
+    // handler at the bottom of this file.
+    parts.push(
+      `<span class="pill toggle on" data-toggle="scanner" role="button" tabindex="0" title="${escapeHtml(l10n('findingsDash.status.todoHackTitle'))} — ${escapeHtml(l10n('findingsDash.supplementary.tooltipScanner'))}">${todos} TODO · ${hacks} HACK</span>`,
+    );
   }
+  // Supplementary toggle pills (#224) — live next to the saropa pills so the
+  // discoverability gap is closed on the surface that has it. Each source has
+  // three render states: hidden / promo (off, gap present) / count (on).
+  // Promo pills only render when there is actually a gap to surface, so a
+  // clean workspace never sees them.
+  parts.push(...buildSupplementaryPills(input));
   const drift = input.driftAdvisorSnapshot;
   if (drift.integrationEnabled) {
     if (drift.connected) {
@@ -1328,6 +1427,29 @@ function buildScript(): string {
   bindClick('btn-refresh-empty', function () { vscode.postMessage({ type: 'refresh' }); });
   bindClick('btn-reset-empty', function () { vscode.postMessage({ type: 'resetFilters' }); });
   bindClick('run-again', triggerRunAnalysis);
+
+  /* Supplementary-counts toggle pills (#224). Single delegated click handler
+     for all three sources (other / todos / scanner) so we do not need to
+     re-bind after every dashboard rebuild — the pills come and go as their
+     state changes. Activate on Enter/Space too so the role="button" pills
+     are keyboard-operable.  */
+  function handleToggleEvent(target) {
+    if (!target || typeof target.closest !== 'function') return;
+    var pill = target.closest('.pill.toggle');
+    if (!pill) return;
+    var source = pill.getAttribute('data-toggle');
+    if (!source) return;
+    vscode.postMessage({ type: 'toggleSupplementary', source: source });
+  }
+  document.addEventListener('click', function (e) { handleToggleEvent(e.target); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    var t = e.target;
+    if (!t || typeof t.closest !== 'function') return;
+    if (!t.closest('.pill.toggle')) return;
+    e.preventDefault();
+    handleToggleEvent(t);
+  });
 
   /* More actions menu */
   document.querySelectorAll('.menu-item[data-palette-cmd]').forEach(function (btn) {

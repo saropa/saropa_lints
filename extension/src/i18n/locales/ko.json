@@ -345,7 +345,17 @@
       "activateKpiSpace": "집중된 KPI 카드 또는 차트 막대 활성화",
       "showOverlay": "이 바로가기 오버레이 표시"
     },
-    "unknownAnalyzerKind": "알려지지 않은"
+    "unknownAnalyzerKind": "알려지지 않은",
+    "supplementary": {
+      "otherAnalyzerOn": "+{count} other analyzer findings",
+      "otherAnalyzerPromo": "+? other analyzer findings — show",
+      "analyzerTodosOn": "+{count} analyzer TODOs",
+      "analyzerTodosPromo": "+? analyzer TODOs — show",
+      "scannerPromo": "Enable TODO/HACK scanner",
+      "tooltipLive": "Live from VS Code Problems panel. Updates as analysis completes. Click to hide.",
+      "tooltipScanner": "Saropa file-system scanner — counts open TODO/HACK markers in source.",
+      "tooltipPromoClickToOn": "Click to enable"
+    }
   },
   "triageDash": {
     "showInIssues": "이슈에 표시",

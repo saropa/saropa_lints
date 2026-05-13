@@ -326,4 +326,116 @@ describe('violationsDashboardHtml', () => {
       'overlay should be marked as a modal dialog for screen readers',
     );
   });
+
+  /* ──────────────────────────────────────────────────────────────────────
+   * Supplementary-counts toggle pills (#224) — three render states per
+   * source. The pills only render when there is actually a gap worth
+   * surfacing; a clean workspace never sees them. Promo pills use the
+   * dashed `.toggle.promo` class; ON pills use solid `.toggle.on`.
+   * ────────────────────────────────────────────────────────────────────── */
+  function withSupplementary(
+    s: Partial<NonNullable<Parameters<typeof renderViolationsDashboardHtml>[0]['supplementary']>>,
+  ): string {
+    return renderViolationsDashboardHtml(
+      minimalInput({
+        supplementary: {
+          otherAnalyzerEnabled: false,
+          analyzerTodosEnabled: false,
+          scannerEnabled: false,
+          otherAnalyzerCount: 0,
+          analyzerTodosCount: 0,
+          hasDartFiles: false,
+          ...s,
+        },
+      }),
+    );
+  }
+
+  it('renders no supplementary pills when supplementary is omitted', () => {
+    const html = renderViolationsDashboardHtml(minimalInput({}));
+    assert.ok(!html.includes('data-toggle="other"'));
+    assert.ok(!html.includes('data-toggle="todos"'));
+    assert.ok(!html.includes('data-toggle="scanner"'));
+  });
+
+  it('hides other-analyzer pill when toggle off AND no gap exists', () => {
+    // Promo pill is suppressed when there is nothing to promote.
+    const html = withSupplementary({
+      otherAnalyzerEnabled: false,
+      otherAnalyzerCount: 0,
+      hasDartFiles: true,
+    });
+    assert.ok(!html.includes('data-toggle="other"'));
+  });
+
+  it('renders other-analyzer promo pill when toggle off AND gap exists', () => {
+    const html = withSupplementary({
+      otherAnalyzerEnabled: false,
+      otherAnalyzerCount: 38,
+      hasDartFiles: true,
+    });
+    assert.ok(html.includes('data-toggle="other"'));
+    assert.ok(html.includes('toggle promo'));
+  });
+
+  it('renders other-analyzer ON pill with count when toggle on AND count > 0', () => {
+    const html = withSupplementary({
+      otherAnalyzerEnabled: true,
+      otherAnalyzerCount: 38,
+      hasDartFiles: true,
+    });
+    assert.ok(html.includes('data-toggle="other"'));
+    assert.ok(html.includes('toggle on'));
+    assert.ok(html.includes('38'), 'count must be rendered in the pill text');
+  });
+
+  it('hides other-analyzer pill when toggle on but count is 0 (no useless +0)', () => {
+    const html = withSupplementary({
+      otherAnalyzerEnabled: true,
+      otherAnalyzerCount: 0,
+      hasDartFiles: true,
+    });
+    assert.ok(!html.includes('data-toggle="other"'));
+  });
+
+  it('renders analyzer-todos promo when toggle off AND analyzer reports todos', () => {
+    const html = withSupplementary({
+      analyzerTodosEnabled: false,
+      analyzerTodosCount: 20,
+      hasDartFiles: true,
+    });
+    assert.ok(html.includes('data-toggle="todos"'));
+    assert.ok(html.includes('toggle promo'));
+  });
+
+  it('renders scanner promo only when scanner off AND hasDartFiles', () => {
+    // Suggesting the scanner in a non-Dart workspace would be noise — guard
+    // against that explicitly. Likewise, no promo when scanner is already on.
+    const offNoDart = withSupplementary({
+      scannerEnabled: false,
+      hasDartFiles: false,
+    });
+    assert.ok(!offNoDart.includes('data-toggle="scanner"'));
+
+    const offWithDart = withSupplementary({
+      scannerEnabled: false,
+      hasDartFiles: true,
+    });
+    assert.ok(offWithDart.includes('data-toggle="scanner"'));
+    assert.ok(offWithDart.includes('toggle promo'));
+  });
+
+  it('renders all three pills together when all toggles off AND all gaps present', () => {
+    // The "discoverability worst case" — user has the original issue #224
+    // setup, no toggles flipped yet. All three promos must be reachable
+    // from the dashboard so the gap is closable in three clicks.
+    const html = withSupplementary({
+      otherAnalyzerCount: 38,
+      analyzerTodosCount: 20,
+      hasDartFiles: true,
+    });
+    assert.ok(html.includes('data-toggle="other"'));
+    assert.ok(html.includes('data-toggle="todos"'));
+    assert.ok(html.includes('data-toggle="scanner"'));
+  });
 });

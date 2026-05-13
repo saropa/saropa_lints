@@ -345,7 +345,17 @@
       "activateKpiSpace": "کارت متمرکز KPI یا نوار نمودار را فعال کنید",
       "showOverlay": "این روکش میانبر را نشان دهید"
     },
-    "unknownAnalyzerKind": "ناشناس"
+    "unknownAnalyzerKind": "ناشناس",
+    "supplementary": {
+      "otherAnalyzerOn": "+{count} other analyzer findings",
+      "otherAnalyzerPromo": "+? other analyzer findings — show",
+      "analyzerTodosOn": "+{count} analyzer TODOs",
+      "analyzerTodosPromo": "+? analyzer TODOs — show",
+      "scannerPromo": "Enable TODO/HACK scanner",
+      "tooltipLive": "Live from VS Code Problems panel. Updates as analysis completes. Click to hide.",
+      "tooltipScanner": "Saropa file-system scanner — counts open TODO/HACK markers in source.",
+      "tooltipPromoClickToOn": "Click to enable"
+    }
   },
   "triageDash": {
     "showInIssues": "نمایش در مسائل",
