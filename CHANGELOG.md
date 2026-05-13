@@ -47,11 +47,24 @@
 
 ## [Unreleased]
 
+### Fixed (Extension)
+
+- **Package Dashboard toolbar buttons hide when their action is a no-op** — the "← Back" package-navigation button, the "× Clear" chart filter indicator, and the "↻ Reset view" toolbar button now stay hidden whenever there's nothing to act on (no nav history, no live chart filter, view state matches defaults). Back was previously shown disabled, Reset view was always shown, and the chart Clear strip could survive a session restore that referenced a package no longer in the chart. No action required.
+
+---
+
+## [13.8.0]
+
 The Findings Dashboard now lets you reconcile its count with the Problems panel without leaving the window: clickable pills in the hero status line surface analyzer findings (built-in Dart SDK lints plus any third-party `custom_lint` plugins like riverpod_lint) and analyzer-side TODOs that fall outside saropa's rule set, plus a discoverability prompt for the existing TODO/HACK workspace scanner. All three default off; one click toggles each on or off, and none feed health score, KPI cards, or filtering. [log](https://github.com/saropa/saropa_lints/blob/vX.Y.Z/CHANGELOG.md)
 
 ### Added (Extension)
 
 - **Findings Dashboard supplementary pills (#224)** — three clickable pills in the dashboard hero surface non-saropa analyzer findings, analyzer-side TODO diagnostics, and the existing TODO/HACK scanner toggle directly on the surface that has the discoverability gap. New workspace settings `saropaLints.includeOtherAnalyzerFindingsInDashboard` and `saropaLints.includeAnalyzerTodosInDashboard` (default off); commands `Saropa Lints: Toggle Show Other Analyzer Findings on Dashboard`, `... Toggle Show Analyzer TODOs on Dashboard`, and `... Toggle TODO/HACK Workspace Scanner` invokable from the command palette. No action required.
+- **Collapsible Package Dashboard sections** — Size Distribution, Filters, and the Packages table each sit inside their own expander now so you can fold any of them away to focus on the rest of the view; all three default to open so the landing experience is unchanged. No action required.
+
+### Fixed (Extension)
+
+- **Package dashboard Dependency Network panel rendered as garbled overlapping text** — the diagram now lists each transitive once on the right column with edges fanning in from every direct that pulls it in, instead of duplicating shared transitive labels at colliding Y positions. The panel also moved below the package table so it no longer pushes the table off-screen. No action required.
 
 ---
 

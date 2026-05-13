@@ -88,6 +88,23 @@ describe('buildReportHtml', () => {
         assert.ok(html.includes('pub.dev/packages/http'));
     });
 
+    /* Pins the dependency-network panel below the package table.
+     * The panel is a wide, scrollable diagram — if it lands above
+     * the table the user has to scroll past it to reach the primary
+     * view (status, chart, table). Both anchors must exist and the
+     * table must appear first in the document order. */
+    it('renders the dependency network panel below the package table', () => {
+        const html = buildReportHtml(opts([makeResult('http', 80)]));
+        const tablePos = html.indexOf('<table');
+        const networkPos = html.indexOf('id="dep-network"');
+        assert.ok(tablePos > 0, 'expected a <table> in the report');
+        assert.ok(networkPos > 0, 'expected the dep-network panel in the report');
+        assert.ok(
+            networkPos > tablePos,
+            `dep-network panel (pos ${networkPos}) must appear after the package table (pos ${tablePos})`,
+        );
+    });
+
     it('should count categories correctly', () => {
         const html = buildReportHtml(opts([
             makeResult('a', 80, 'vibrant'),
@@ -802,9 +819,32 @@ describe('report: activity column', () => {
         assert.ok(html.includes('Activity grade unavailable (missing commit or release data)'));
     });
 
-    it('should include activity thresholds legend in summary caveat', () => {
+    it('should attach activity threshold legend to grade card tooltips', () => {
         const html = buildReportHtml(opts([makeResult('http', 80)]));
-        assert.ok(html.includes('Activity thresholds: 90d = stale, 180d = dormant'));
+        // The threshold legend used to live in a floating <p class="caveat">
+        // at the bottom of the summary block, disconnected from the grade
+        // cards it described. It now rides each grade card's title= tooltip.
+        assert.ok(
+            html.includes('Activity thresholds: 90d = stale, 180d = dormant'),
+            'threshold legend should still be present somewhere',
+        );
+        assert.ok(
+            !html.includes('class="caveat"'),
+            'floating caveat <p> should no longer be rendered',
+        );
+        // Spot-check one grade card carries the legend in its tooltip.
+        assert.ok(
+            /summary-card stable[^>]*title="[^"]*Activity thresholds/.test(html),
+            'Stable grade card should carry the threshold legend in title',
+        );
+    });
+
+    it('should attach total-size caveat to the Total Size card tooltip', () => {
+        const html = buildReportHtml(opts([makeResult('http', 80)]));
+        assert.ok(
+            /summary-card total-size[^>]*title="[^"]*Archive sizes before tree shaking/.test(html),
+            'Total Size card should carry the tree-shaking caveat in title',
+        );
     });
 });
 
@@ -1130,6 +1170,37 @@ describe('report: local navigation affordances', () => {
         assert.ok(html.includes('pkg-nav-back'));
         assert.ok(html.includes('openSourceFolder'));
         assert.ok(html.includes('openFileRef'));
+    });
+
+    it('should render Reset view button hidden and disabled by default', () => {
+        // The reset-view toolbar button is shown only when sort/filter/footprint
+        // state diverges from defaults. Markup-level hide guards against a slow
+        // or failed script leaving the button visible on a pristine view.
+        const html = buildReportHtml(opts([makeResult('http', 80)]));
+        const idIdx = html.indexOf('id="reset-view"');
+        assert.ok(idIdx >= 0, 'expected reset-view button in output');
+        // Find the closing > of the opening tag so we only inspect attributes,
+        // not anything inside the button body or sibling markup.
+        const tagEnd = html.indexOf('>', idIdx);
+        const openTag = html.slice(idIdx, tagEnd);
+        assert.ok(openTag.includes(' hidden'), 'reset-view should start hidden');
+        assert.ok(openTag.includes(' disabled'), 'reset-view should start disabled');
+    });
+
+    it('should include dirty-view visibility helpers in report script', () => {
+        // These literals pin the existence of the Reset/Back/Clear visibility
+        // helpers added to fix the "button shown when nothing to clear" bug.
+        // If anyone renames or removes them, this test forces a deliberate
+        // rewrite rather than a silent regression.
+        const html = buildReportHtml(opts([makeResult('http', 80)]));
+        assert.ok(html.includes('function isViewDirty'),
+            'expected isViewDirty predicate in script');
+        assert.ok(html.includes('function updateResetViewVisibility'),
+            'expected updateResetViewVisibility helper in script');
+        // The stale-chart-filter guard nulls chartFilterPackage when the
+        // restored package name no longer matches any table row.
+        assert.ok(html.includes('.pkg-row[data-name='),
+            'expected pkg-row lookup for stale chart-filter validation');
     });
 });
 

@@ -97,6 +97,10 @@ export function getReportScript(): string {
                 if (detail) { tbody.appendChild(detail); }
             });
             updateArrows();
+            // Sort changes are also "view dirty" events — sortTable runs from
+            // the column header click handler and from setFootprintMode's
+            // resort, neither of which goes through applyFilters.
+            updateResetViewVisibility();
             saveUIState();
         }
 
@@ -139,6 +143,10 @@ export function getReportScript(): string {
                 }
             });
             updateActiveFiltersUI(searchVal);
+            // Reset-view visibility piggybacks on the filter pipeline so any
+            // path that changes filter state (toolbar, chip removal, card,
+            // chart, search) goes through one update site.
+            updateResetViewVisibility();
             saveUIState();
         }
 
@@ -287,6 +295,27 @@ export function getReportScript(): string {
         }
 
         function updateChartFilterIndicator() {
+            // Validate stale state BEFORE the early-return on missing indicator.
+            // restoreUIState() can hand us a chartFilterPackage from a previous
+            // session that no longer matches any package in the current table
+            // (pubspec changed, package removed, all sizes unknown so the chart
+            // section disappeared). Without this, two things break:
+            //   1) If the indicator IS present, it renders "Filtered: <stale>"
+            //      with an "x Clear" strip pointing at nothing — the bug the
+            //      user reported.
+            //   2) If the indicator is NOT present (whole chart section
+            //      omitted because no segments had size data), applyFilters
+            //      still consults chartFilterPackage and hides every row,
+            //      producing an empty table with no UI to clear the filter.
+            // Anchor on .pkg-row (the table) rather than .bar-row (the chart)
+            // so the filter survives a package whose size is unknown but is
+            // still present in pubspec. CSS.escape isn't available in older
+            // webviews, so we escape double-quotes manually for the selector.
+            if (chartFilterPackage) {
+                var safeName = String(chartFilterPackage).replace(/"/g, '\\\\"');
+                var hasRow = document.querySelector('.pkg-row[data-name="' + safeName + '"]');
+                if (!hasRow) { chartFilterPackage = null; }
+            }
             var indicator = document.getElementById('chart-filter-indicator');
             if (!indicator) { return; }
             var textEl = indicator.querySelector('.filter-text');
@@ -585,6 +614,10 @@ export function getReportScript(): string {
                 sortAsc = !sortAsc; /* sortTable flips it back */
                 sortTable('size');
             }
+            // Footprint changes don't go through applyFilters or sortTable
+            // (except for the size-sort path above), so trigger the dirty-view
+            // check directly. Safe to call twice when sortTable also ran.
+            updateResetViewVisibility();
         }
         document.querySelectorAll('.footprint-btn').forEach(function(btn) {
             btn.addEventListener('click', function() {
@@ -596,6 +629,13 @@ export function getReportScript(): string {
         if (initialTable) { initialTable.classList.add('fp-own'); }
         updateTotalSizeSummary('own');
         restoreUIState();
+        // restoreUIState() short-circuits when vscode.getState() returns null
+        // (first-ever open of the panel), so it never reaches applyFilters
+        // and the Reset/Back buttons keep whatever visibility the markup gave
+        // them. Force one update here so a pristine view starts with both
+        // hidden.
+        updateResetViewVisibility();
+        updateBackButtonState();
 
         function formatBytesAsMB(bytes) {
             if (!Number.isFinite(bytes) || bytes <= 0) { return '\\u2014'; }
@@ -931,6 +971,10 @@ export function getReportScript(): string {
             btn.className = 'toolbar-btn';
             btn.textContent = '\u2190 Back';
             btn.title = 'Back to previous package';
+            // Start hidden: a "Back" button with no history is dead UI. The
+            // disabled flag is kept alongside hidden as a belt-and-suspenders
+            // guard in case a future style rule overrides [hidden].
+            btn.hidden = true;
             btn.disabled = true;
             btn.addEventListener('click', function() {
                 goBackPackageNav();
@@ -938,13 +982,55 @@ export function getReportScript(): string {
             toolbar.insertBefore(btn, toolbar.firstChild);
         }
 
+        // True when any sort/filter/footprint/card/chart/search state differs from
+        // the defaults that resetViewState() restores. Drives the visibility of
+        // the "Reset view" toolbar button — there's no point offering "reset"
+        // when nothing has been changed. The constants here must stay in lockstep
+        // with the defaults declared at the top of this script and with the
+        // values resetViewState() writes back; if you add a new piece of view
+        // state, add it here too or "Reset view" will hide when it shouldn't.
+        function isViewDirty() {
+            var searchInputEl = document.getElementById('search-input');
+            var hasSearch = !!(searchInputEl && searchInputEl.value && searchInputEl.value.trim().length > 0);
+            return (
+                sortCol !== 'score' ||
+                sortAsc !== true ||
+                footprintMode !== 'own' ||
+                activeCardFilter !== null ||
+                chartFilterPackage !== null ||
+                excludeSharedTransitives !== false ||
+                includeDevDependencies !== true ||
+                Number.isFinite(maxAgeMonths) ||
+                activePreset !== 'none' ||
+                hasSearch
+            );
+        }
+
+        function updateResetViewVisibility() {
+            var btn = document.getElementById('reset-view');
+            if (!btn) { return; }
+            // Same reasoning as the Back button: a "Reset view" button shown
+            // against a pristine view is misleading. Pair hidden + disabled so
+            // accidental clicks via keyboard shortcuts or screen readers are
+            // also a no-op rather than triggering a redundant rerender.
+            var dirty = isViewDirty();
+            btn.hidden = !dirty;
+            btn.disabled = !dirty;
+        }
+
         function updateBackButtonState() {
             var btn = document.getElementById('pkg-nav-back');
             if (!btn) { return; }
-            btn.disabled = packageNavHistory.length === 0;
-            btn.title = packageNavHistory.length === 0
-                ? 'No previous package'
-                : 'Back to previous package';
+            // Hide entirely when there's nothing to go back to \u2014 a visible-but-disabled
+            // button suggests an action is available when it isn't. Keep .disabled in
+            // sync so screen readers and any [hidden]-bypassing style still get the
+            // correct semantics.
+            var hasHistory = packageNavHistory.length > 0;
+            btn.hidden = !hasHistory;
+            btn.disabled = !hasHistory;
+            btn.title = hasHistory
+                ? 'Back to previous package'
+                : 'No previous package';
         }
 
         function highlightPackageRow(row) {
@@ -999,7 +1085,23 @@ export function getReportScript(): string {
             }
         });
 
-        /* ---- Lightweight dependency network diagram ---- */
+        /* ---- Lightweight dependency network diagram ----
+         *
+         * Layout: two columns. Left column lists each direct dependency
+         * once. Right column lists each UNIQUE transitive once. Edges
+         * fan from a direct to the shared transitive row it depends on.
+         *
+         * Why this is not the per-row-bundle layout the panel used to
+         * have: that version placed each direct's 6 transitive labels in
+         * a 70px vertical band (y2 = y + (j - 2) * 14) while spacing
+         * direct rows only 28px apart, so adjacent rows' transitive
+         * bands overlapped by ~42px. On top of that, many directs share
+         * common transitives (characters, collection, meta, ...), so the
+         * same label was rendered multiple times at near-identical Y —
+         * which is what produced the garbled "chetracters" stacks. The
+         * unique-transitive layout below renders each label exactly once
+         * at a stable Y, so labels can never collide regardless of how
+         * many directs reference them. */
         (function renderNetwork() {
             var host = document.getElementById('dep-network');
             if (!host) { return; }
@@ -1010,49 +1112,139 @@ export function getReportScript(): string {
                 host.textContent = 'No dependency relationship data.';
                 return;
             }
-            var width = 860;
-            var height = Math.max(220, 90 + nodes.length * 26);
-            var leftX = 140;
-            var rightX = 680;
-            var svg = '<svg viewBox="0 0 ' + width + ' ' + height + '" class="network-svg">';
-            nodes.forEach(function(n, i) {
-                var y = 40 + i * 28;
-                svg += '<text x="' + leftX + '" y="' + y + '" class="network-node direct network-node-link" data-owner="' + n.name + '" data-target="' + n.name + '" role="button" tabindex="0">' + n.name + '</text>';
-                var links = Array.isArray(n.links) ? n.links : [];
-                links.slice(0, 6).forEach(function(dep, j) {
-                    var y2 = y + (j - 2) * 14;
-                    svg += '<line x1="' + (leftX + 12) + '" y1="' + (y - 4) + '" x2="' + (rightX - 12) + '" y2="' + (y2 - 4) + '" class="network-edge network-edge-link" data-owner="' + n.name + '" data-target="' + dep + '" />';
-                    svg += '<text x="' + rightX + '" y="' + y2 + '" class="network-node transitive network-node-link" data-owner="' + n.name + '" data-target="' + dep + '" role="button" tabindex="0">' + dep + '</text>';
-                });
-            });
-            svg += '</svg>';
-            host.innerHTML = svg;
+
+            /* Build the unique transitive list in first-seen order so the
+             * right column is at least loosely correlated with the left
+             * column (the first directs introduce the first transitives). */
+            var seen = Object.create(null);
+            var transitives = [];
+            for (var ni = 0; ni < nodes.length; ni++) {
+                var nlinks = Array.isArray(nodes[ni].links) ? nodes[ni].links : [];
+                for (var li = 0; li < nlinks.length; li++) {
+                    var depName = nlinks[li];
+                    if (!seen[depName]) {
+                        seen[depName] = true;
+                        transitives.push(depName);
+                    }
+                }
+            }
+
+            var rowH = 18;
+            var topPad = 24;
+            var botPad = 16;
+            var leftX = 12;
+            var leftColW = 220;
+            var rightColW = 220;
+            var gap = 120;
+            var rightX = leftX + leftColW + gap;
+            var width = leftX + leftColW + gap + rightColW + 12;
+            var rowCount = Math.max(nodes.length, transitives.length);
+            var height = topPad + rowCount * rowH + botPad;
+
+            var directY = Object.create(null);
+            for (var di = 0; di < nodes.length; di++) {
+                directY[nodes[di].name] = topPad + di * rowH;
+            }
+            var transitiveY = Object.create(null);
+            for (var ti = 0; ti < transitives.length; ti++) {
+                transitiveY[transitives[ti]] = topPad + ti * rowH;
+            }
+
+            /* Fixed pixel size on the SVG (not viewBox + width:100%)
+             * because the panel was previously squashing rows on top of
+             * each other when the container was narrower than the
+             * viewBox. The .network-canvas container scrolls instead. */
+            var parts = [];
+            parts.push('<svg width="' + width + '" height="' + height + '" class="network-svg" role="img" aria-label="Dependency network">');
+
+            /* Draw edges first so node text renders on top of line ends. */
+            for (var ei = 0; ei < nodes.length; ei++) {
+                var node = nodes[ei];
+                var y1 = directY[node.name];
+                var elinks = Array.isArray(node.links) ? node.links : [];
+                for (var ej = 0; ej < elinks.length; ej++) {
+                    var depName2 = elinks[ej];
+                    var y2 = transitiveY[depName2];
+                    if (y2 == null) { continue; }
+                    parts.push('<line x1="' + (leftX + leftColW) + '" y1="' + (y1 - 4) + '" x2="' + rightX + '" y2="' + (y2 - 4) + '" class="network-edge network-edge-link" data-owner="' + node.name + '" data-target="' + depName2 + '" />');
+                }
+            }
+
+            for (var ni2 = 0; ni2 < nodes.length; ni2++) {
+                var dn = nodes[ni2];
+                var dy = directY[dn.name];
+                parts.push('<text x="' + leftX + '" y="' + dy + '" class="network-node direct network-node-link" data-owner="' + dn.name + '" data-target="' + dn.name + '" role="button" tabindex="0">' + dn.name + '</text>');
+            }
+
+            for (var tj = 0; tj < transitives.length; tj++) {
+                var tn = transitives[tj];
+                var ty = transitiveY[tn];
+                parts.push('<text x="' + rightX + '" y="' + ty + '" class="network-node transitive network-node-link" data-target="' + tn + '" role="button" tabindex="0">' + tn + '</text>');
+            }
+
+            parts.push('</svg>');
+            host.innerHTML = parts.join('');
+
             function clearNetworkSelection() {
                 host.querySelectorAll('.network-selected').forEach(function(el) {
                     el.classList.remove('network-selected');
                 });
             }
-            function highlightNetworkPath(owner, target) {
+
+            /* Highlight a single direct → transitive edge plus both nodes.
+             * Used when the user clicks an edge or a direct row. */
+            function highlightEdge(owner, target) {
                 clearNetworkSelection();
-                host.querySelectorAll('.network-node-link[data-owner="' + owner + '"][data-target="' + target + '"]').forEach(function(el) {
+                /* Direct's own row (it has data-owner === data-target). */
+                host.querySelectorAll('.network-node-link[data-owner="' + owner + '"][data-target="' + owner + '"]').forEach(function(el) {
+                    el.classList.add('network-selected');
+                });
+                /* Transitive's row (no data-owner — it's a shared label). */
+                host.querySelectorAll('.network-node.transitive[data-target="' + target + '"]').forEach(function(el) {
                     el.classList.add('network-selected');
                 });
                 host.querySelectorAll('.network-edge-link[data-owner="' + owner + '"][data-target="' + target + '"]').forEach(function(el) {
                     el.classList.add('network-selected');
                 });
-                if (owner === target) {
-                    host.querySelectorAll('.network-node-link[data-owner="' + owner + '"][data-target="' + owner + '"]').forEach(function(el) {
-                        el.classList.add('network-selected');
-                    });
-                }
             }
+
+            /* Clicking a transitive highlights ALL incoming edges and
+             * every direct that depends on it. This gives the user a
+             * "who pulls in X?" view, which the per-row bundle layout
+             * couldn't surface at all. */
+            function highlightTransitive(target) {
+                clearNetworkSelection();
+                host.querySelectorAll('.network-node.transitive[data-target="' + target + '"]').forEach(function(el) {
+                    el.classList.add('network-selected');
+                });
+                host.querySelectorAll('.network-edge-link[data-target="' + target + '"]').forEach(function(el) {
+                    el.classList.add('network-selected');
+                    var ownerAttr = el.getAttribute('data-owner') || '';
+                    if (ownerAttr) {
+                        host.querySelectorAll('.network-node.direct[data-owner="' + ownerAttr + '"]').forEach(function(o) {
+                            o.classList.add('network-selected');
+                        });
+                    }
+                });
+            }
+
             host.querySelectorAll('.network-node-link').forEach(function(nodeEl) {
                 function runNavigation() {
-                    var owner = nodeEl.dataset.owner || '';
-                    var target = nodeEl.dataset.target || '';
+                    var owner = nodeEl.getAttribute('data-owner') || '';
+                    var target = nodeEl.getAttribute('data-target') || '';
                     if (!target) { return; }
-                    if (owner) { highlightNetworkPath(owner, target); }
-                    navigateToPackageRow(target, owner && owner !== target ? owner : null);
+                    if (owner && owner === target) {
+                        /* Direct row click — highlight self only and
+                         * navigate to its row in the table. */
+                        clearNetworkSelection();
+                        nodeEl.classList.add('network-selected');
+                        navigateToPackageRow(target, null);
+                    } else {
+                        /* Transitive row click — show every direct that
+                         * pulls it in, then jump to its row. */
+                        highlightTransitive(target);
+                        navigateToPackageRow(target, null);
+                    }
                 }
                 nodeEl.addEventListener('click', runNavigation);
                 nodeEl.addEventListener('keydown', function(e) {
@@ -1064,10 +1256,10 @@ export function getReportScript(): string {
             });
             host.querySelectorAll('.network-edge-link').forEach(function(edgeEl) {
                 edgeEl.addEventListener('click', function() {
-                    var owner = edgeEl.dataset.owner || '';
-                    var target = edgeEl.dataset.target || '';
+                    var owner = edgeEl.getAttribute('data-owner') || '';
+                    var target = edgeEl.getAttribute('data-target') || '';
                     if (!owner || !target) { return; }
-                    highlightNetworkPath(owner, target);
+                    highlightEdge(owner, target);
                     navigateToPackageRow(target, owner);
                 });
             });

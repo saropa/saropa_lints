@@ -131,9 +131,14 @@ export function buildReportHtml(options: ReportOptions): string {
     </div>
     ${buildReportSummary(options)}
     ${buildChartSection(results)}
+    ${buildFiltersSection(options)}
+    ${buildPackagesSection(results, options)}
+    ${/* Network panel lives at the bottom: it's a wide, scrollable diagram
+       * that pushes the high-density table further down when placed above,
+       * so users had to scroll past it just to reach the package list.
+       * Anchoring it after the table keeps the primary view (status, chart,
+       * table) immediately visible and treats the network as a drill-down. */ ''}
     ${buildNetworkSection(results)}
-    ${buildToolbar(options)}
-    ${buildReportTable(results, options.overrideNames, options.packageTrends)}
     ${buildKeyboardShortcutsOverlay([
         { key: '/', label: l10n('packageDashboard.shortcuts.focusSearch') },
         { key: '↓ / j', label: l10n('packageDashboard.shortcuts.nextRow') },
@@ -325,27 +330,68 @@ function buildReportSummary(options: ReportOptions): string {
         e: String(counts.abandoned),
         f: String(counts.eol),
     });
+    // Anchor each caveat to the card it describes via `title=` instead of
+    // a floating <p class="caveat"> at the bottom of the summary. Users
+    // reported the bottom-of-block notes were visually disconnected from
+    // their referent data (Total Size* / activity grade cards).
+    const totalSizeTitle =
+        `${l10n('packageDashboard.summary.totalSize')}\n\n${l10n('packageDashboard.summary.caveatLine1')}`;
+    const thresholdCaveat = l10n('packageDashboard.summary.caveatLine2');
+    const gradeTitle = (key: string) =>
+        `${l10n(`packageDashboard.summary.${key}`)}\n\n${thresholdCaveat}`;
     return `<div class="summary">
         <div class="summary-card"><div class="count">${results.length}</div><div class="label">${escapeHtml(l10n('packageDashboard.summary.packages'))}</div></div>
         <div class="summary-card" title="${escapeHtml(gradeTooltip)}"><div class="count">${avgGrade}</div><div class="label">${escapeHtml(l10n('packageDashboard.summary.projectGrade'))}</div></div>
         <div class="summary-card total-size"
+            title="${escapeHtml(totalSizeTitle)}"
             data-total-size-own="${totalOwnBytes}"
             data-total-size-unique="${totalUniqueBytes}"
             data-total-size-total="${totalAllBytes}">
             <div class="count">${totalSize}</div><div class="label">${escapeHtml(l10n('packageDashboard.summary.totalSize'))}</div>
         </div>
-        <div class="summary-card vibrant" data-filter="vibrant" title="${escapeHtml(l10n('packageDashboard.summary.vibrantTitle'))}"><div class="count">${counts.vibrant}</div><div class="label">A</div></div>
-        <div class="summary-card stable" data-filter="stable" title="${escapeHtml(l10n('packageDashboard.summary.stableTitle'))}"><div class="count">${counts.stable}</div><div class="label">B</div></div>
-        <div class="summary-card outdated" data-filter="outdated" title="${escapeHtml(l10n('packageDashboard.summary.outdatedTitle'))}"><div class="count">${counts.outdated}</div><div class="label">C</div></div>
-        <div class="summary-card abandoned" data-filter="abandoned" title="${escapeHtml(l10n('packageDashboard.summary.abandonedTitle'))}"><div class="count">${counts.abandoned}</div><div class="label">E</div></div>
-        <div class="summary-card eol" data-filter="end-of-life" title="${escapeHtml(l10n('packageDashboard.summary.eolTitle'))}"><div class="count">${counts.eol}</div><div class="label">F</div></div>
+        <div class="summary-card vibrant" data-filter="vibrant" title="${escapeHtml(gradeTitle('vibrantTitle'))}"><div class="count">${counts.vibrant}</div><div class="label">A</div></div>
+        <div class="summary-card stable" data-filter="stable" title="${escapeHtml(gradeTitle('stableTitle'))}"><div class="count">${counts.stable}</div><div class="label">B</div></div>
+        <div class="summary-card outdated" data-filter="outdated" title="${escapeHtml(gradeTitle('outdatedTitle'))}"><div class="count">${counts.outdated}</div><div class="label">C</div></div>
+        <div class="summary-card abandoned" data-filter="abandoned" title="${escapeHtml(gradeTitle('abandonedTitle'))}"><div class="count">${counts.abandoned}</div><div class="label">E</div></div>
+        <div class="summary-card eol" data-filter="end-of-life" title="${escapeHtml(gradeTitle('eolTitle'))}"><div class="count">${counts.eol}</div><div class="label">F</div></div>
         <div class="summary-card updates" data-filter="updates"><div class="count">${updates}</div><div class="label">${escapeHtml(l10n('packageDashboard.summary.updates'))}</div></div>
         <div class="summary-card unused" data-filter="unused"><div class="count">${results.filter(r => r.isUnused).length}</div><div class="label">${escapeHtml(l10n('packageDashboard.summary.unused'))}</div></div>
         ${singleUse > 0 ? `<div class="summary-card single-use" data-filter="single-use"><div class="count">${singleUse}</div><div class="label">${escapeHtml(l10n('packageDashboard.summary.singleUse'))}</div></div>` : ''}
         <div class="summary-card vulns" data-filter="vulns"><div class="count">${vulnPackages}</div><div class="label">${escapeHtml(l10n('packageDashboard.summary.vulnerable'))}</div></div>
         <div class="summary-card overrides" data-filter="overrides"><div class="count">${overrideCount}</div><div class="label">${escapeHtml(l10n('packageDashboard.summary.overrides'))}</div></div>
-    </div>
-    <p class="caveat">${escapeHtml(l10n('packageDashboard.summary.caveatLine1'))}<br>${escapeHtml(l10n('packageDashboard.summary.caveatLine2'))}</p>`;
+    </div>`;
+}
+
+/**
+ * Wrap the toolbar in a collapsible <details> so users can fold the
+ * search/filters row away once they have narrowed the table to what they
+ * care about. Defaults to open to preserve the existing landing
+ * experience — collapse is opt-in. Matches the dashboard's existing
+ * disclosure pattern (network section, chart section).
+ */
+function buildFiltersSection(options: ReportOptions): string {
+    const title = escapeHtml(l10n('packageDashboard.sections.filters'));
+    return `<details class="filters-section dashboard-collapsible" open>
+        <summary><h2>${title}</h2></summary>
+        ${buildToolbar(options)}
+    </details>`;
+}
+
+/**
+ * Wrap the package table in a collapsible <details>. Defaults open so the
+ * dashboard's primary content remains visible on first load; collapsing
+ * is only useful when the user wants to focus on the chart or summary
+ * cards above.
+ */
+function buildPackagesSection(
+    results: VibrancyResult[],
+    options: ReportOptions,
+): string {
+    const title = escapeHtml(l10n('packageDashboard.sections.packages'));
+    return `<details class="packages-section dashboard-collapsible" open>
+        <summary><h2>${title}</h2></summary>
+        ${buildReportTable(results, options.overrideNames, options.packageTrends)}
+    </details>`;
 }
 
 /** Toolbar with search box and pubspec link, placed between chart and table. */
@@ -362,8 +408,12 @@ function buildToolbar(options: ReportOptions): string {
         `<button id="copy-all" class="toolbar-btn" title="${escapeHtml(l10n(`${tb}.copyAllTitle`))}">&#128203; ${escapeHtml(l10n(`${tb}.copyAllLabel`))}</button>`;
     const saveBtn =
         `<button id="save-all" class="toolbar-btn" title="${escapeHtml(l10n(`${tb}.saveAllTitle`))}">&#128190; ${escapeHtml(l10n(`${tb}.saveAllLabel`))}</button>`;
+    // hidden by default — the script flips it on as soon as any sort/filter/
+    // footprint state diverges from defaults. Markup-level hide means a slow
+    // or failed script still keeps the button out of sight on a pristine view,
+    // so "Reset view" never appears against a view that has nothing to reset.
     const resetViewBtn =
-        `<button id="reset-view" class="toolbar-btn" title="${escapeHtml(l10n(`${tb}.resetViewTitle`))}">&#8635; ${escapeHtml(l10n(`${tb}.resetViewLabel`))}</button>`;
+        `<button id="reset-view" class="toolbar-btn" title="${escapeHtml(l10n(`${tb}.resetViewTitle`))}" hidden disabled>&#8635; ${escapeHtml(l10n(`${tb}.resetViewLabel`))}</button>`;
     // Rescan button — invokes saropaLints.packageVibrancy.rescan via the
     // webview message channel so users don't have to leave the report to
     // trigger a refresh after editing pubspec.yaml or running `pub get`.

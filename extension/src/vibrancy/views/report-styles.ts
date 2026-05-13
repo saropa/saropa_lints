@@ -258,7 +258,6 @@ export function getReportStyles(): string {
         .unused .count { color: var(--vscode-editorWarning-foreground); }
         .vulns .count { color: var(--vscode-editorError-foreground); }
         .overrides .count { color: var(--vscode-descriptionForeground); }
-        .caveat { font-size: 0.85em; color: var(--vscode-descriptionForeground); margin-top: 4px; }
 
         /* ---- Toolbar (search + pubspec button) ---- */
         .table-toolbar {
@@ -648,23 +647,56 @@ export function getReportStyles(): string {
             cursor: pointer;
             font-weight: 600;
         }
+        /* Collapsible dashboard sections — used by Size Distribution,
+           Filters, and the Packages table. <details>/<summary> primitive
+           gives the disclosure triangle and toggle behavior for free; we
+           only style the summary affordance and ensure the inner <h2>
+           sits inline with the marker. Marker stays default-colored so
+           it tracks the active theme. */
+        .dashboard-collapsible {
+            margin: 16px 0;
+        }
+        .dashboard-collapsible > summary {
+            cursor: pointer;
+            user-select: none;
+            list-style: revert;
+            padding: 4px 0;
+        }
+        .dashboard-collapsible > summary > h2 {
+            display: inline-block;
+            margin: 0;
+            font-size: 1.1em;
+            opacity: 0.9;
+            vertical-align: middle;
+        }
+        .dashboard-collapsible[open] > summary {
+            margin-bottom: 8px;
+        }
         .network-canvas {
+            /* Both axes scroll: the SVG uses natural pixel dimensions so
+             * labels never get squashed by a narrow container (which is
+             * what produced the previous overlapping-text corruption when
+             * the panel was rendered with width: 100% + height: auto). */
             margin-top: 8px;
             overflow: auto;
-            max-height: 320px;
+            max-height: 420px;
             border-top: 1px solid var(--vscode-widget-border);
             padding-top: 8px;
         }
-        .network-svg { width: 100%; height: auto; }
+        .network-svg { display: block; }
         .network-edge {
             stroke: var(--vscode-widget-border);
             stroke-width: 1;
-            opacity: 0.8;
+            opacity: 0.6;
+            fill: none;
         }
         .network-edge-link { cursor: pointer; }
         .network-node {
             fill: var(--vscode-foreground);
-            font-size: 10px;
+            /* 12px (was 10px): the panel sat in a scrollable container at
+             * natural size, so tiny labels were unnecessary — readability
+             * matters more than fitting more in the viewport. */
+            font-size: 12px;
             font-family: var(--vscode-font-family);
         }
         .network-node-link {
