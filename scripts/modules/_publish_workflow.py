@@ -59,6 +59,7 @@ from scripts.modules._publish_steps import (
     run_analyze_to_log,
     run_format,
     run_pre_publish_audits,
+    run_pub_get,
     run_tests,
     validate_changelog,
     verify_pubdev_publication,
@@ -880,6 +881,20 @@ def run_full_publish(
     published_vsix: Path | None = None
 
     try:
+        # Resolve deps in root + every nested package BEFORE anything
+        # that invokes `dart analyze` (audit, pre-publish pipeline, or
+        # the final CI gate). A stale `.dart_tool/package_config.json`
+        # in a nested package surfaces as thousands of phantom
+        # `package:test/test.dart` errors against the sub-package's
+        # test files; running pub get up front eliminates that whole
+        # class of triage regardless of which downstream mode runs.
+        with timer.step("Dependencies"):
+            if not run_pub_get(ctx.project_dir):
+                exit_with_error(
+                    "dart pub get failed.",
+                    ExitCode.PREREQUISITES_FAILED,
+                )
+
         code = run_audit_step(
             ctx.project_dir, skip_audit, audit_only, timer,
         )

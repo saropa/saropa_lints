@@ -45,7 +45,7 @@
 
 ---
 
-## [Unreleased]
+## [13.9.0]
 
 ### Added (Extension)
 
@@ -64,6 +64,7 @@
 
 <details><summary>Maintenance</summary>
 
+- **Publish script now resolves dependencies in every workspace package before any analyze runs.** A new "Dependencies" step in `scripts/publish.py` runs `dart pub get` in the project root and in every `packages/*/` with a `pubspec.yaml`, ahead of the audit, format, analyze, and test gates. Previously a stale or missing `.dart_tool/package_config.json` in `packages/saropa_lints_api/` surfaced as thousands of phantom `package:test/test.dart` errors during the audit's analyze step, which forced a manual abort + two-directory `dart pub get` + restart of the whole pipeline.
 - **Translation pipeline (`extension/scripts/i18n/`) modernized.** `generate_translations.py` now prints colored per-locale progress (with Windows VT enabling), labels the prefetch step with an explicit "translating N new strings via Google…" count, persists the MT cache after every locale so a Ctrl-C never throws away paid-for Google calls, and exits cleanly (130) instead of dumping a Python traceback. A final coverage audit writes `extension/reports/i18n_translation_audit.md` with a cross-locale rollup (most-missed strings first), paste-ready Python dict stubs per locale, and a per-locale missing list. The translator's placeholder-rename guard now compares placeholders as a *set* (Bengali, Japanese, Korean legitimately reorder `{count}`/`{ruleCount}`) and its MT-garbage "leading-garbled" guard is skipped for curated dictionary entries (Arabic, Ukrainian, Turkish, etc. legitimately put modifier words before the first placeholder). Curated `"X": "X"` passthrough entries in `dictionaries.py` are now counted as translated rather than missing in the audit.
 
 </details>

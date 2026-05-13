@@ -1097,6 +1097,77 @@ def _collect_format_paths(project_dir: Path) -> list[str]:
     return paths
 
 
+def run_pub_get(project_dir: Path) -> bool:
+    """Resolve dependencies in root + every nested workspace package.
+
+    Why this exists as its own step: without it, a stale or missing
+    `.dart_tool/package_config.json` in a nested package (e.g.
+    `packages/saropa_lints_api/`) makes `dart analyze` report thousands
+    of phantom `uri_does_not_exist` / undefined-function errors against
+    `package:test/test.dart` and every symbol in its test files. The
+    failure looks catastrophic ("9000+ errors, codebase broken") when
+    the true cause is simply "deps haven't been resolved in the
+    sub-package". Running pub get here, in every directory containing
+    a pubspec.yaml under `packages/`, eliminates that whole class of
+    triage. Sub-packages are discovered by glob so adding a new one
+    under `packages/` requires no edits to this script.
+
+    Failure mode: a non-zero exit from `dart pub get` in any package
+    blocks the publish via PREREQUISITES_FAILED. We still attempt the
+    remaining packages so the maintainer sees the full picture in one
+    pass instead of fixing-and-retrying for each.
+    """
+    print_header("STEP 4 (cont.): RESOLVING DEPENDENCIES")
+
+    # Root pubspec first; nested packages discovered by glob so future
+    # sub-packages under packages/ are picked up automatically.
+    pubspec_dirs: list[Path] = [project_dir]
+    pubspec_dirs.extend(
+        sorted(
+            p.parent
+            for p in (project_dir / "packages").glob("*/pubspec.yaml")
+        )
+    )
+
+    use_shell = get_shell_mode()
+    all_ok = True
+
+    for pubspec_dir in pubspec_dirs:
+        # Display path as "." for root, relative for sub-packages, so the
+        # user can see at a glance which workspace failed.
+        rel = (
+            Path(".")
+            if pubspec_dir == project_dir
+            else pubspec_dir.relative_to(project_dir)
+        )
+        print_info(f"dart pub get  ({rel})")
+        result = subprocess.run(
+            ["dart", "pub", "get"],
+            cwd=pubspec_dir,
+            capture_output=True,
+            text=True,
+            shell=use_shell,
+        )
+        if result.returncode != 0:
+            # Print both streams so the maintainer can act without
+            # re-running the command manually to see the error.
+            if result.stdout:
+                print_colored(result.stdout.rstrip(), Color.WHITE)
+            if result.stderr:
+                print_colored(result.stderr.rstrip(), Color.RED)
+            print_error(
+                f"dart pub get failed in {rel} "
+                f"(exit code {result.returncode})"
+            )
+            all_ok = False
+            # Continue with remaining packages so the user sees every
+            # failure at once instead of one-per-rerun.
+            continue
+        print_success(f"resolved  ({rel})")
+
+    return all_ok
+
+
 def run_format(project_dir: Path) -> bool:
     """Step 5: Run dart format."""
     print_header("STEP 5: FORMATTING CODE")
