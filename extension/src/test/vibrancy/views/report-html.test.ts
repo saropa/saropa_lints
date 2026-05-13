@@ -1210,6 +1210,57 @@ describe('report: local navigation affordances', () => {
         assert.ok(html.includes('.pkg-row[data-name='),
             'expected pkg-row lookup for stale chart-filter validation');
     });
+
+    it('should force-hide chart filter indicator at init', () => {
+        // The chart-filter-indicator markup carries inline style="display:none",
+        // but a user-reported regression showed the "x Clear" strip visible on
+        // first open after the collapsible-sections refactor wrapped the chart
+        // in <details>. The init block must call updateChartFilterIndicator()
+        // so JS overrides the inline-style failure mode.
+        const html = buildReportHtml(opts([makeResult('http', 80)]));
+        const restoreIdx = html.indexOf('restoreUIState();');
+        assert.ok(restoreIdx > 0, 'expected restoreUIState() init call');
+        const after = html.slice(restoreIdx, restoreIdx + 2000);
+        assert.ok(after.includes('updateChartFilterIndicator();'),
+            'expected updateChartFilterIndicator() in the init block after restoreUIState');
+    });
+
+    it('should emit bar-fill on a single line with data-bar-width fallback', () => {
+        // The bar-fill renders 0%-wide colorless when the inline --bar-width
+        // custom property fails to apply. Pin the single-line attribute layout
+        // (matches the Findings Dashboard's working pattern) and the duplicate
+        // data-bar-width attribute that lets the chart script re-apply via
+        // setProperty() at init.
+        const html = buildReportHtml(opts([
+            { ...makeResult('http', 80), archiveSizeBytes: 5_000_000 },
+            { ...makeResult('bloc', 60), archiveSizeBytes: 2_000_000 },
+        ]));
+        // The chart only renders when at least one package has size data,
+        // so the data above is required for buildBarChart to emit any bars.
+        const barFillMatch = html.match(/<div class="bar-fill[^"]*"[^>]*>/);
+        assert.ok(barFillMatch, 'expected at least one bar-fill in output');
+        const tag = barFillMatch![0];
+        assert.ok(tag.includes('data-bar-width="'),
+            'expected data-bar-width attribute on bar-fill');
+        assert.ok(tag.includes('--bar-width:'),
+            'expected --bar-width inline custom property on bar-fill');
+        // No space after the colon — matches Findings Dashboard exactly.
+        assert.ok(/--bar-width:\d/.test(tag),
+            'expected no whitespace between "--bar-width:" and value');
+    });
+
+    it('should re-apply bar widths defensively in chart script', () => {
+        // The init script must walk .bar-fill[data-bar-width] elements and
+        // call setProperty('--bar-width', value+'%') so the bars render even
+        // when the inline style attribute is dropped by the webview pipeline.
+        const html = buildReportHtml(opts([
+            { ...makeResult('http', 80), archiveSizeBytes: 5_000_000 },
+        ]));
+        assert.ok(html.includes('.bar-fill[data-bar-width]'),
+            'expected defensive selector in chart script');
+        assert.ok(html.includes("setProperty('--bar-width'"),
+            'expected setProperty call applying --bar-width in chart script');
+    });
 });
 
 describe('report: update column uses dimmed hyphen', () => {

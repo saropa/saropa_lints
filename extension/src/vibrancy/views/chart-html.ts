@@ -225,13 +225,23 @@ function buildBarChart(segments: ChartSegment[]): string {
         const sharedAttr = seg.isSharedTransitive
             ? ' data-shared="true"' : '';
 
+        // bar-fill: class + style on ONE LINE matching the Findings Dashboard's
+        // working pattern (violationsDashboardHtml.ts buildBarRowHtml). The
+        // prior two-line attribute layout — class on one line, style on the
+        // next — produced 0%-wide colorless bars in this webview, even though
+        // multi-line attributes are valid HTML. Single-line + no space after
+        // the colon ("--bar-width:N%") matches the dashboard that has rendered
+        // proportional bars in this build for months, so we mirror it exactly.
+        // data-bar-width: defensive duplicate of the inline custom property so
+        // chart-script.ts can re-apply via setProperty() on init. This guards
+        // against any webview oddity that drops the inline style attribute
+        // (the user has reported uncolored zero-width bars after the
+        // collapsible-sections refactor wrapped the chart in <details>).
+        const widthStr = barWidth.toFixed(1);
         return `<div class="bar-row" ${dataAttrs}${sectionAttr}${bucketAttr}${sharedAttr}
                 data-size="${seg.sizeBytes}" data-pct="${pctLabel}">
             <div class="bar-label" title="${safeName}">${safeName}</div>
-            <div class="bar-track">
-                <div class="bar-fill bar-color-${seg.colorIndex}"
-                     style="--bar-width: ${barWidth.toFixed(1)}%"></div>
-            </div>
+            <div class="bar-track"><div class="bar-fill bar-color-${seg.colorIndex}" data-bar-width="${widthStr}" style="--bar-width:${widthStr}%"></div></div>
             <div class="bar-value">${sizeLabel} (${pctLabel}%)</div>
         </div>`;
     }).join('\n');

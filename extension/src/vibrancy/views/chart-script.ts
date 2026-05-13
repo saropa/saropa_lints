@@ -10,6 +10,28 @@ export function getChartScript(): string {
     var tooltip = document.getElementById('chart-tooltip');
     if (!tooltip) return;
 
+    /* --- Defensive bar-width re-application ---
+     * The server-rendered HTML sets each bar's width via an inline CSS custom
+     * property: style="--bar-width:N%". After the collapsible-sections
+     * refactor wrapped the chart in <details>, users reported the bars
+     * rendering at 0% width with no visible color (the color class IS
+     * applied, but width:var(--bar-width,0%) falls back to 0% if the
+     * custom property never resolves). The cause has not been positively
+     * identified — possibly attribute-order parsing inside <details>, a
+     * CSP edge case, or a sanitizer-style step — but setProperty() on the
+     * element directly is known to work in this webview (it's what
+     * rebuildChartExcludingShared uses to update bar widths after the
+     * Exclude Shared toggle). Read the duplicate data-bar-width attribute
+     * and re-set the custom property via JS so the bars render even when
+     * the inline style attribute does not.
+     */
+    document.querySelectorAll('.bar-fill[data-bar-width]').forEach(function(fill) {
+        var w = fill.getAttribute('data-bar-width');
+        if (w !== null && w !== '') {
+            fill.style.setProperty('--bar-width', w + '%');
+        }
+    });
+
     /* --- Donut draw-in animation ---
      * Store each segment's final dasharray, reset to "0 C", then restore
      * after two rAF frames so the CSS transition animates the draw-in.

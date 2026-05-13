@@ -631,11 +631,17 @@ export function getReportScript(): string {
         restoreUIState();
         // restoreUIState() short-circuits when vscode.getState() returns null
         // (first-ever open of the panel), so it never reaches applyFilters
-        // and the Reset/Back buttons keep whatever visibility the markup gave
-        // them. Force one update here so a pristine view starts with both
-        // hidden.
+        // and the Reset/Back/Clear visibility never gets the JS update.
+        // Force all three updates here so a pristine view starts with every
+        // dead-action button hidden, regardless of whether the markup's
+        // inline style="display:none" on the chart-filter-indicator survived
+        // (a user-reported bug showed the "x Clear" strip visible on first
+        // open — the inline style alone was not enough). Setting display via
+        // JS overrides any CSS specificity surprise that might have left it
+        // visible.
         updateResetViewVisibility();
         updateBackButtonState();
+        updateChartFilterIndicator();
 
         function formatBytesAsMB(bytes) {
             if (!Number.isFinite(bytes) || bytes <= 0) { return '\\u2014'; }
