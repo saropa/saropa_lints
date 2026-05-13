@@ -269,6 +269,16 @@ export function getReportStyles(): string {
             border-radius: 6px;
             background: var(--vscode-editor-inactiveSelectionBackground);
         }
+        /* Accessibility helper — visually hide the search label but keep
+           it readable to screen readers. The class is in the HTML, but
+           without this rule the label paints over the toolbar (redundant
+           with the input placeholder). dashboardChromeStyles defines the
+           same rule for other webviews; the vibrancy report doesn't load
+           that stylesheet, so we duplicate it here. */
+        .sr-only {
+            position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+            overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+        }
         /* Relative wrapper anchors the absolutely-positioned clear (X)
            button inside the search field. inline-flex keeps the wrapper
            sized to the input so the toolbar layout is unchanged. */
@@ -317,26 +327,29 @@ export function getReportStyles(): string {
             opacity: 1;
             background: var(--vscode-toolbar-hoverBackground);
         }
-        /* Pill shape (border-radius 999px) shared with the canonical
-         * .saropa-pill-button helper in pill-button-styles.ts. Tokens are
-         * already secondary-button pair; the shape change makes this
-         * panel's toolbar visually consistent with every other Saropa
-         * dashboard. New primary CTAs should use the explicit
-         * .saropa-pill-button + .saropa-pill-button-icon markup for the
-         * chip-with-icon-circle look. */
+        /* Rounded-rect toolbar buttons. Tokens stay on the secondary-button
+         * pair. Two notes on the shape and border:
+         *   - border-radius 6px: a full-pill 999px read as "too round" next
+         *     to the rectangular search input and Preset select; 6px matches
+         *     the table-toolbar container radius and reads as one family.
+         *   - border fallback: --vscode-button-border is undefined in most
+         *     themes (only Dark+ and a few HC themes set it), so the prior
+         *     transparent fallback rendered as no border at all. Falling
+         *     back to --vscode-widget-border keeps a visible edge in every
+         *     theme without competing with focusBorder. */
         .toolbar-btn {
             background: var(--vscode-button-secondaryBackground);
             color: var(--vscode-button-secondaryForeground);
-            border: 1px solid var(--vscode-button-border, transparent);
+            border: 1px solid var(--vscode-button-border, var(--vscode-widget-border));
             padding: 6px 12px;
-            border-radius: 999px;
+            border-radius: 6px;
             cursor: pointer;
             font-size: 0.85em;
             transition: background 0.12s ease, border-color 0.12s ease;
         }
         .toolbar-btn:hover {
             background: var(--vscode-button-secondaryHoverBackground, var(--vscode-button-secondaryBackground));
-            border-color: color-mix(in srgb, var(--vscode-focusBorder) 55%, var(--vscode-button-border, transparent));
+            border-color: color-mix(in srgb, var(--vscode-focusBorder) 55%, var(--vscode-button-border, var(--vscode-widget-border)));
         }
         .toolbar-btn:focus-visible {
             outline: 1px solid var(--vscode-focusBorder);
@@ -347,15 +360,37 @@ export function getReportStyles(): string {
             cursor: not-allowed;
         }
         #pkg-nav-back { min-width: 82px; }
+        /* Age slider sits immediately before the Preset dropdown. Without
+           a strong visual break, the slider's max-value label ("All")
+           reads as the value of the adjacent "Preset" field. We use a
+           wider trailing margin AND a higher-contrast divider built from
+           focusBorder + widget-border so it survives both light and dark
+           themes — widget-border on its own is too subtle. */
         .age-filter {
             display: inline-flex;
             align-items: center;
             gap: 6px;
             font-size: 0.8em;
-            padding-inline-end: 6px;
-            border-inline-end: 1px solid var(--vscode-widget-border);
+            padding-inline-end: 14px;
+            margin-inline-end: 6px;
+            border-inline-end: 1px solid
+                color-mix(in srgb, var(--vscode-focusBorder) 30%, var(--vscode-widget-border));
         }
         .age-filter input[type="range"] { width: 120px; }
+        /* The slider's max-value readout sits at the end of the age group,
+           directly before the divider. A muted chip-style background and
+           a min-width keep "All" from blending into the neighboring
+           "Preset" label. */
+        #age-max-label {
+            display: inline-block;
+            min-width: 32px;
+            padding: 1px 6px;
+            border-radius: 4px;
+            background: var(--vscode-badge-background);
+            color: var(--vscode-badge-foreground);
+            text-align: center;
+            font-size: 0.95em;
+        }
         .preset-filter {
             display: inline-flex;
             align-items: center;
@@ -425,11 +460,14 @@ export function getReportStyles(): string {
            For a radio toggle (exactly one active), the active option gets an inactive-selection
            backdrop tint; inactive options stay transparent. The user picks out the active
            option by its subtle tinted backdrop, not by a shouting blue pill. */
+        /* Segmented control sits beside the rounded-rect toolbar buttons,
+           so its radius is matched (6px container + 4px segments) instead
+           of the prior full-pill 999px. */
         .footprint-toggle {
             display: inline-flex; align-items: center; gap: 2px;
             padding: 2px 4px;
             border: 1px solid var(--vscode-widget-border);
-            border-radius: 999px;
+            border-radius: 6px;
             background: var(--vscode-editor-inactiveSelectionBackground);
         }
         .footprint-toggle .toggle-label {
@@ -444,7 +482,7 @@ export function getReportStyles(): string {
             color: var(--vscode-foreground);
             border: 1px solid transparent;
             padding: 2px 10px;
-            border-radius: 999px;
+            border-radius: 4px;
             cursor: pointer;
             font-size: 0.85em;
             white-space: nowrap;

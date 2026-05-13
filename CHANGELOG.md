@@ -45,6 +45,16 @@
 
 ---
 
+## [Unreleased]
+
+### Fixed (Extension)
+
+- **Package Vibrancy toolbar no longer shows a redundant "Search packages" label next to the search box** — the label is now hidden from view (it remains for screen readers) so the placeholder text inside the input is the only visible cue. No action required.
+- **Package Vibrancy toolbar buttons read as buttons in every theme** — Rescan / Open Project / Copy / Save / pubspec.yaml had a full-pill shape and a transparent border fallback that disappeared on themes that don't define `button.border`. Buttons now use a softer rounded-rect (6px) and fall back to `widget.border`, matching the FOOTPRINT segmented control which moved off the full-pill shape for the same reason. No action required.
+- **"All" age-slider label no longer reads as the value of the Preset dropdown** — the divider between the Published-age group and the Preset group is now higher-contrast, the trailing gap is wider, and the slider's max-value readout sits in a small chip so it stops blending into the neighboring "Preset" label. No action required.
+
+---
+
 ## [13.9.0]
 
 The extension UI is now fully translated into every shipped non-English language — sidebar, dashboards, status bar, command palette, and webviews no longer fall back to English. Package Vibrancy stops over-flagging packages that ship demo media or sample servers, drops misleading "replace with itself" upgrade hints, and rewards packages that include example, test, and doc folders. The Package Dashboard also gains collapsible sections, attaches tooltips to the cards they describe, hides toolbar buttons when there's nothing to do, and renders the Dependency Network diagram cleanly instead of as overlapping garbled text. [log](https://github.com/saropa/saropa_lints/blob/v13.9.0/CHANGELOG.md)
