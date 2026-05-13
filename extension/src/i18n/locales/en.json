@@ -436,6 +436,11 @@
     "network": {
       "summary": "Dependency Network"
     },
+    "sections": {
+      "sizeDistribution": "Size Distribution",
+      "filters": "Filters",
+      "packages": "Packages"
+    },
     "toolbar": {
       "openPubspecTitle": "Open pubspec.yaml",
       "openPubspecLabel": "pubspec.yaml",

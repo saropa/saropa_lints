@@ -8,6 +8,7 @@
 import { VibrancyResult } from '../types';
 import { formatSizeMB } from '../scoring/bloat-calculator';
 import { escapeHtml } from './html-utils';
+import { l10n } from '../../i18n/runtime';
 
 /** A single segment in the bar/donut charts. */
 interface ChartSegment {
@@ -68,12 +69,15 @@ export function buildChartSection(results: VibrancyResult[]): string {
            </label>`
         : '';
 
+    // Collapsible chart section — <details>/<summary> mirrors the network
+    // expander below and the new filters/packages expanders so the whole
+    // dashboard has a single, consistent collapse affordance. The
+    // "Exclude shared" toggle stays outside <summary> so clicking the
+    // checkbox doesn't accidentally collapse the section.
     return `
-    <section class="chart-section">
-        <div class="chart-header">
-            <h2>Size Distribution</h2>
-            ${toggleHtml}
-        </div>
+    <details class="chart-section dashboard-collapsible" open>
+        <summary><h2>${escapeHtml(l10n('packageDashboard.sections.sizeDistribution'))}</h2></summary>
+        ${toggleHtml ? `<div class="chart-header">${toggleHtml}</div>` : ''}
         <div class="chart-container">
             <div class="bar-chart-panel">
                 ${buildBarChart(segments)}
@@ -87,7 +91,7 @@ export function buildChartSection(results: VibrancyResult[]): string {
             <span class="filter-text"></span>
             <button class="clear-filter-btn" id="clear-chart-filter">&times; Clear</button>
         </div>
-    </section>`;
+    </details>`;
 }
 
 /**
