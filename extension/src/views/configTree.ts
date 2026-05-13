@@ -70,6 +70,7 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigTreeNod
     const enabled = cfg.get<boolean>('enabled', true) ?? true;
     const tier = cfg.get<string>('tier', 'recommended') ?? 'recommended';
     const runAfter = cfg.get<boolean>('runAnalysisAfterConfigChange', true) ?? true;
+    const runAfterDep = cfg.get<boolean>('runAnalysisAfterDependencyChange', true) ?? true;
     const uiLanguage = cfg.get<string>('uiLanguage', 'auto') ?? 'auto';
     const localeLabel = formatLanguageChoiceLabel(uiLanguage);
 
@@ -85,6 +86,7 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigTreeNod
       // sidebar item to navigate somewhere. Toggling a boolean in one click
       // beats opening the Settings UI just to flip a checkbox.
       setting('Run analysis after config change', runAfter ? 'Yes' : 'No', 'saropaLints.toggleRunAnalysisAfterConfigChange'),
+      setting('Run analysis after dependency change', runAfterDep ? 'Yes' : 'No', 'saropaLints.toggleRunAnalysisAfterDependencyChange'),
       setting('UI language', localeLabel, 'saropaLints.pickUiLanguage'),
     ];
 
