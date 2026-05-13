@@ -43,7 +43,7 @@
     "reload": "I-reload",
     "copyDetails": "Kopyahin ang mga detalye",
     "unreachable": "Hindi maabot ang 0 {target}",
-    "partialSummary": "{loaded} of {total} {item} loaded. {failed} failed.",
+    "partialSummary": "{loaded} ng {total} {item} ay nai-load. {failed} ang nabigo.",
     "partialRetry": "Nabigo ang muling subukan"
   },
   "offline": {
@@ -90,28 +90,28 @@
     "secondaryAsideLabel": "Mga pangalawang diagnostic",
     "hero": {
       "productTitle": "Dashboard ng Mga Natuklasan",
-      "gaugeTitle": "Marka ng kalusugan 0/100 (grado 1). Pinakamabigat ang mga pagkakamali. {score} {grade}"
+      "gaugeTitle": "Marka ng kalusugan 0/100 (grado 1). Pinakamabigat ang mga pagkakamali. {grade} {score}"
     },
     "time": {
       "justNow": "ngayon lang",
-      "minutesAgo": "{min}m ago",
-      "hoursAgo": "{hr}h ago",
-      "daysAgo": "{day}d ago"
+      "minutesAgo": "{min}m nakalipas",
+      "hoursAgo": "{hr}o nakalipas",
+      "daysAgo": "{day}a nakalipas"
     },
     "status": {
       "lastRunPrefix": "Huling pagtakbo",
       "lastRunUnknown": "Hindi alam ang huling pagtakbo",
       "noTimestampTitle": "Walang timestamp sa violations.json",
       "findingsAfterFilterTitle": "Kabuuang mga natuklasan pagkatapos ng filter na na-disable ang panuntunan",
-      "findingOne": "{count} finding",
-      "findingOther": "{count} findings",
+      "findingOne": "{count} na finding",
+      "findingOther": "{count} na finding",
       "todoHackTitle": "TODO at HACK marker na matatagpuan sa workspace",
       "driftOnTitle": "Nakakonekta ang Drift Advisor: 0 {label}",
       "driftOnPill": "Drift on · 0 {count}",
       "driftOfflineTitle": "Pinagana ang Drift Advisor ngunit walang nakitang server",
       "driftOfflinePill": "Drift offline",
       "enabledRulesTitle": "Naka-enable ang mga panuntunan sa kasalukuyang tier",
-      "rulesCount": "{count} rules"
+      "rulesCount": "{count} na rule"
     },
     "groupBy": {
       "severity": "Kalubhaan",
@@ -222,7 +222,7 @@
       "sectionAria": "Mga natuklasan",
       "expandAll": "Palawakin lahat",
       "collapseAll": "I-collapse lahat",
-      "bulkSelected": "{count} selected",
+      "bulkSelected": "{count} ang pinili",
       "bulkCopy": "Pinili ang kopya bilang JSON",
       "selectAllTitle": "Piliin ang lahat ng nakikitang natuklasan",
       "selectAllAria": "Piliin ang lahat ng nakikitang natuklasan",
@@ -233,8 +233,8 @@
       "colActionsAria": "Mga aksyon sa hilera",
       "selectRowAria": "Piliin ang hanay ng paghahanap na ito",
       "copyRowTitle": "Kopyahin ang paghahanap na ito bilang JSON",
-      "metaShown": "{filtered} shown",
-      "metaAfterDisable": "{total} after disabled-rule filter",
+      "metaShown": "{filtered} ang ipinakita",
+      "metaAfterDisable": "{total} pagkatapos ng disabled-rule filter",
       "metaSourceCap": "source na nilimitahan sa 0 para sa performance {max}",
       "metaGroupedBy": "pinagsama-sama ng 0 {mode}",
       "overflowNote": "Pinutol ang listahan ng pinagmulan sa 0 para sa pagganap ng pag-render. {max}",
@@ -263,7 +263,7 @@
       "scanOff": "Naka-off ang pag-scan sa workspace — paganahin ang paglabas ng mga marker mula sa mga file ng proyekto.",
       "enableScan": "Paganahin ang pag-scan",
       "heading": "Mga TODO at HACK",
-      "subsectionNone": "{title}: none in scan range.",
+      "subsectionNone": "{title}: wala sa saklaw ng scan.",
       "capNote": "Scan hit max-file cap; itaas ang `saropaLints.todosAndHacks.maxFilesToScan` para sa buong saklaw.",
       "notePill": "tala",
       "todosLabel": "Mga TODO",
@@ -299,12 +299,12 @@
       "byFile": "Ayon sa file (0) {count}",
       "noEntries": "Walang entry.",
       "nothingHidden": "Walang nakatago sa listahan ng Mga Isyu sa workspace na ito. Gumamit ng mga aksyon sa konteksto ng puno upang itago ang mga folder, file, o panuntunan; nananatili sila sa estado ng workspace.",
-      "folderPattern": "{count} folder(s)",
-      "filePattern": "{count} file pattern(s)",
-      "ruleGlobal": "{count} rule(s) globally",
-      "perFileRules": "{count} file(s) with per-file rule hides",
-      "severityHides": "{count} severity hide(s)",
-      "impactHides": "{count} impact hide(s)",
+      "folderPattern": "{count} na folder",
+      "filePattern": "{count} na file pattern",
+      "ruleGlobal": "{count} na rule globally",
+      "perFileRules": "{count} na file na may per-file rule hides",
+      "severityHides": "{count} severity hides",
+      "impactHides": "{count} impact hides",
       "activeHides": "Mga aktibong pagtatago: 0. {counts}",
       "viewHidesFooter": "Ang mga pagtatago na ito ay lumiliit lamang sa listahan ng Mga Isyu / dashboard; hindi sila isinulat sa `violations.json`.",
       "clearViewHides": "I-clear ang lahat ng view hides",
@@ -320,11 +320,11 @@
       "metaRunning": "Maaaring tumagal ito ng ilang sandali sa malalaking proyekto.",
       "metaDone": "Nire-refresh ang dashboard na may mga pinakabagong natuklasan.",
       "announceSearch": "maghanap 0 {q}",
-      "announceSeverities": "{n} severities",
-      "announceImpacts": "{n} impacts",
+      "announceSeverities": "{n} na severity",
+      "announceImpacts": "{n} na impact",
       "announceCleared": "Na-clear ang lahat ng filter",
       "announceFiltersPrefix": "Mga filter:",
-      "bulkSelected": "{n} selected",
+      "bulkSelected": "{n} ang pinili",
       "analysisStartedDetail": "Nagsimula ang pagsusuri. Nangongolekta ng mga diagnostic…",
       "announceStarted": "Nagsimula ang pagsusuri",
       "announceComplete": "Kumpleto ang pagsusuri",
@@ -332,7 +332,7 @@
       "analysisFailedDetail": "Nabigo ang pagsusuri. Suriin ang output para sa mga detalye.",
       "removeRecentAria": "Alisin",
       "removeRecentTitle": "Alisin",
-      "bulkSelectedTpl": "{n} selected"
+      "bulkSelectedTpl": "{n} ang pinili"
     },
     "emptyState": {
       "hintAfterMessage": "Magpatakbo ng pagsusuri sa Saropa Lints upang bumuo ng violations.json, pagkatapos ay gamitin ang Refresh dito o muling buksan ang dashboard na ito.",
@@ -347,14 +347,14 @@
     },
     "unknownAnalyzerKind": "Hindi kilala",
     "supplementary": {
-      "otherAnalyzerOn": "+{count} other analyzer findings",
-      "otherAnalyzerPromo": "+? other analyzer findings — show",
-      "analyzerTodosOn": "+{count} analyzer TODOs",
-      "analyzerTodosPromo": "+? analyzer TODOs — show",
-      "scannerPromo": "Enable TODO/HACK scanner",
-      "tooltipLive": "Live from VS Code Problems panel. Updates as analysis completes. Click to hide.",
-      "tooltipScanner": "Saropa file-system scanner — counts open TODO/HACK markers in source.",
-      "tooltipPromoClickToOn": "Click to enable"
+      "otherAnalyzerOn": "+0 iba pang mga natuklasan ng analyzer {count}",
+      "otherAnalyzerPromo": "+? iba pang mga natuklasan ng analyzer — ipakita",
+      "analyzerTodosOn": "+0 analyzer TODOs {count}",
+      "analyzerTodosPromo": "+? analyzer TODOs — ipakita",
+      "scannerPromo": "Paganahin ang TODO/HACK scanner",
+      "tooltipLive": "Live mula sa panel ng VS Code Problems. Mga update habang nakumpleto ang pagsusuri. I-click upang itago.",
+      "tooltipScanner": "Saropa file-system scanner — binibilang ang mga bukas na TODO/HACK marker sa pinagmulan.",
+      "tooltipPromoClickToOn": "I-click upang paganahin"
     }
   },
   "triageDash": {
@@ -366,8 +366,8 @@
     "on": "Naka-on",
     "colRule": "Panuntunan",
     "colIssues": "Mga isyu",
-    "zeroIssueRules": "{count} rules with zero issues — auto-enabled in tier.",
-    "disabledOverrides": "{count} rules disabled by override in `analysis_options_custom.yaml`.",
+    "zeroIssueRules": "{count} na rule na walang isyu — awtomatikong pinagana sa tier.",
+    "disabledOverrides": "{count} na rule ang naka-disable dahil sa override sa `analysis_options_custom.yaml`.",
     "summaryRuleTriage": "Triage ng panuntunan",
     "hintNoViolations": "Wala pang `reports/.saropa_lints/violations.json`. Patakbuhin ang pagsusuri, pagkatapos ay i-refresh ang tab na ito.",
     "hintUnreadable": "Walang nababasang pag-export ng mga paglabag. Patakbuhin muna ang Saropa Lints analysis.",
@@ -402,10 +402,10 @@
     "documentTitle": "Saropa Package Dashboard",
     "heroTitle": "Saropa Package Dashboard",
     "status": {
-      "packagesCount": "{count} packages",
+      "packagesCount": "{count} na package",
       "packagesBreakdown": "{direct} direct, {transitive} transitive",
       "gradeLine": "Baitang 0 · 1/100 {grade} {avg}",
-      "flaggedCount": "{count} flagged",
+      "flaggedCount": "{count} na na-flag",
       "flaggedTitle": "Inabandona o end-of-life"
     },
     "scanning": {
@@ -419,7 +419,7 @@
       "packages": "Mga package",
       "projectGrade": "Marka ng Pakete ng Proyekto",
       "totalSize": "Kabuuang Sukat*",
-      "gradeTooltip": "Marka ng proyekto 0\nAverage na marka: 1/100\nMga Package: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {avgScore} {pkgCount} {a} {b} {c} {e} {f}",
+      "gradeTooltip": "Marka ng proyekto 0\nAverage na marka: 1/100\nMga Package: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {b} {avgScore} {c} {f} {avgGrade} {a} {e}",
       "vibrantTitle": "Masigla",
       "stableTitle": "Matatag",
       "outdatedTitle": "Luma na",
@@ -435,6 +435,11 @@
     },
     "network": {
       "summary": "Dependency Network"
+    },
+    "sections": {
+      "sizeDistribution": "Pamamahagi ng Sukat",
+      "filters": "Mga filter",
+      "packages": "Mga package"
     },
     "toolbar": {
       "openPubspecTitle": "Buksan ang pubspec.yaml",
@@ -519,7 +524,7 @@
         "tooltip": "Laki ng archive sa pub.dev (bago umuuga ang puno)"
       },
       "deps": {
-        "label": "Deps",
+        "label": "Mga Dep",
         "tooltip": "Direktang transitive dependencies — naka-highlight ang mga shared deps"
       },
       "files": {
@@ -539,7 +544,7 @@
         "tooltip": "SPDX license identifier mula sa pub.dev"
       },
       "update": {
-        "label": "Update",
+        "label": "I-update",
         "tooltip": "Available na pag-update ng bersyon: major, minor, o patch"
       },
       "status": {
@@ -573,10 +578,10 @@
     "skipLink": "Laktawan sa command catalog",
     "heroTitle": "Katalogo ng Utos ng Saropa",
     "status": {
-      "commands": "{count} commands",
-      "categories": "{count} categories",
-      "recent": "{count} recent",
-      "internalHidden": "{count} context-menu only (hidden)",
+      "commands": "{count} na command",
+      "categories": "{count} na kategorya",
+      "recent": "{count} na kamakailan",
+      "internalHidden": "{count} context-menu lamang (nakatago)",
       "wordCommands": "mga utos",
       "wordCategories": "mga kategorya",
       "wordRecent": "kamakailan"
@@ -645,8 +650,8 @@
       "searchChip": "Hanapin: \"0\" {query}",
       "internalChip": "Ipinapakita ang mga command sa context-menu",
       "removeFilterPrefix": "Alisin ang filter",
-      "matchOne": "{count} match",
-      "matchOther": "{count} matches"
+      "matchOne": "{count} na match",
+      "matchOther": "{count} na match"
     }
   },
   "codeHealth": {
@@ -661,9 +666,9 @@
     "hero": {
       "title": "Saropa Code Health Dashboard",
       "generated": "Nabuo",
-      "functionOne": "{count} function",
-      "functionOther": "{count} functions",
-      "avgFormat": "avg 0 (1) {score} {grade}",
+      "functionOne": "{count} na function",
+      "functionOther": "{count} na function",
+      "avgFormat": "avg 0 (1) {grade} {score}",
       "gatesFailing": "bagsak ang mga pintuan",
       "gatesPassing": "mga tarangkahan na dumadaan"
     },
@@ -673,8 +678,8 @@
     },
     "gate": {
       "fallback": "Nabigo ang mga gate ng kalidad — suriin ang mga threshold sa mga setting ng Code Health.",
-      "failingOne": "{count} gate failing — review thresholds, or copy the JSON to inspect gates.violations.",
-      "failingOther": "{count} gates failing — review thresholds, or copy the JSON to inspect gates.violations.",
+      "failingOne": "{count} gate ang bumabagsak — suriin ang thresholds, o kopyahin ang JSON para inspeksyunin ang gates.violations.",
+      "failingOther": "{count} gates ang bumabagsak — suriin ang thresholds, o kopyahin ang JSON para inspeksyunin ang gates.violations.",
       "openSettingsTitle": "Buksan ang mga setting ng Code Health para isaayos ang mga threshold.",
       "openSettingsButton": "Buksan ang mga setting ng Code Health"
     },
@@ -737,15 +742,15 @@
       "flagChip": "bandila: 0 {flag}",
       "removeAria": "Alisin ang 0 {key}",
       "clearAll": "I-clear lahat",
-      "rowsVisible": "{visible} of {total} rows visible",
+      "rowsVisible": "{visible} sa {total} na row ang nakikita",
       "neverRun": "hindi na tumakbo"
     },
     "freshness": {
       "justNow": "ngayon lang",
-      "minutesAgo": "{min}m ago",
-      "hoursAgo": "{hr}h ago",
-      "daysAgo": "{day}d ago",
-      "weeksAgo": "{wk}w ago"
+      "minutesAgo": "{min}m nakalipas",
+      "hoursAgo": "{hr}o nakalipas",
+      "daysAgo": "{day}a nakalipas",
+      "weeksAgo": "{wk}l nakalipas"
     }
   },
   "suppressionsStrip": {
@@ -760,7 +765,7 @@
     "noFileRisk": "Walang pagkasira ng panganib sa bawat file (walang mga paglabag sa saklaw).",
     "suppressionNote": "Tumutugma sa buod ng violations.json, hindi sa mga toggle ng live na pagsugpo sa sidebar.",
     "noSuppression": "Walang pinagsama-samang pagsugpo sa pag-export na ito (mas lumang analyzer o zero suppression).",
-    "owaspSignal": "{count} violation(s) in this export carry OWASP mobile/web mapping — open Security Posture for the full matrix and export.",
+    "owaspSignal": "{count} na paglabag sa export na ito ay may dalang OWASP mobile/web mapping — buksan ang Security Posture para sa buong matrix at pag-export.",
     "summarySuppressions": "Mga pagsugpo (export snapshot)",
     "summaryOwasp": "Seguridad na postura (signal ng OWASP)",
     "summaryFileRisk": "Panganib sa file (nangungunang mga file)"
@@ -770,8 +775,8 @@
     "skipToCounters": "Lumaktaw sa mga telemetry counter",
     "lastEvent": "Huling kaganapan 0 {relative}",
     "noEvents": "Walang naitala na mga kaganapan",
-    "totalEventOne": "{count} total event",
-    "totalEventOther": "{count} total events",
+    "totalEventOne": "{count} kabuuang event",
+    "totalEventOther": "{count} kabuuang event",
     "noCountersTitle": "Walang mga counter na ire-reset.",
     "resetTitle": "I-reset ang lahat ng mga counter",
     "refreshTitle": "I-reload ang mga telemetry counter mula sa disk",
@@ -795,11 +800,11 @@
     "hint": "I-on o i-off dito ang mga seksyon ng aktibidad-bar ng Saropa (naka-save kasama ang workspace, nang hindi umaalis sa dashboard)."
   },
   "securityPosture": {
-    "issueOne": "{count} issue",
-    "issueOther": "{count} issues",
+    "issueOne": "{count} na isyu",
+    "issueOther": "{count} na isyu",
     "noIssues": "Walang isyu",
     "showIssues": "Ipakita ang mga isyu",
-    "violationTooltip": "{count} violation(s) across {ruleCount} rule(s). Click to show in Issues.",
+    "violationTooltip": "{count} na paglabag sa {ruleCount} na rule. I-click para makita sa Issues.",
     "noViolationsTooltip": "Walang mga paglabag na nakamapa sa kategoryang ito."
   }
 }

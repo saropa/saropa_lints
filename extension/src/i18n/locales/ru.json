@@ -43,7 +43,7 @@
     "reload": "Перезагрузить",
     "copyDetails": "Копировать детали",
     "unreachable": "Не удалось достичь 0 {target}",
-    "partialSummary": "{loaded} of {total} {item} loaded. {failed} failed.",
+    "partialSummary": "загружено {loaded} из {total} {item}. {failed} с ошибкой.",
     "partialRetry": "Повторная попытка не удалась"
   },
   "offline": {
@@ -90,28 +90,28 @@
     "secondaryAsideLabel": "Вторичная диагностика",
     "hero": {
       "productTitle": "Панель результатов",
-      "gaugeTitle": "Оценка здоровья 0/100 (оценка 1). Ошибки весят больше всего. {score} {grade}"
+      "gaugeTitle": "Оценка здоровья 0/100 (оценка 1). Ошибки весят больше всего. {grade} {score}"
     },
     "time": {
       "justNow": "прямо сейчас",
-      "minutesAgo": "{min}m ago",
-      "hoursAgo": "{hr}h ago",
-      "daysAgo": "{day}d ago"
+      "minutesAgo": "{min} мин. назад",
+      "hoursAgo": "{hr} ч. назад",
+      "daysAgo": "{day} д. назад"
     },
     "status": {
       "lastRunPrefix": "Последний запуск",
       "lastRunUnknown": "Последний запуск неизвестен",
       "noTimestampTitle": "Нет временной метки в файле rights.json",
       "findingsAfterFilterTitle": "Общее количество результатов после фильтра отключенных правил",
-      "findingOne": "{count} finding",
-      "findingOther": "{count} findings",
+      "findingOne": "{count} находка",
+      "findingOther": "{count} находок",
       "todoHackTitle": "В рабочей области обнаружены маркеры TODO и HACK.",
       "driftOnTitle": "Подключен советник по дрифту: 0 {label}",
       "driftOnPill": "Дрейфовать · 0 {count}",
       "driftOfflineTitle": "Drift Advisor включен, но сервер не найден",
       "driftOfflinePill": "Дрифт в автономном режиме",
       "enabledRulesTitle": "Включенные правила на текущем уровне",
-      "rulesCount": "{count} rules"
+      "rulesCount": "{count} правил"
     },
     "groupBy": {
       "severity": "Серьезность",
@@ -222,7 +222,7 @@
       "sectionAria": "Выводы",
       "expandAll": "Развернуть все",
       "collapseAll": "Свернуть все",
-      "bulkSelected": "{count} selected",
+      "bulkSelected": "{count} выбрано",
       "bulkCopy": "Копировать выбранное в формате JSON",
       "selectAllTitle": "Выбрать все видимые результаты",
       "selectAllAria": "Выбрать все видимые результаты",
@@ -233,8 +233,8 @@
       "colActionsAria": "Действия со строками",
       "selectRowAria": "Выберите эту строку поиска",
       "copyRowTitle": "Скопируйте этот вывод в формате JSON.",
-      "metaShown": "{filtered} shown",
-      "metaAfterDisable": "{total} after disabled-rule filter",
+      "metaShown": "показано {filtered}",
+      "metaAfterDisable": "{total} после фильтра отключенных правил",
       "metaSourceCap": "исходный код ограничен 0 для производительности {max}",
       "metaGroupedBy": "сгруппированы по 0 {mode}",
       "overflowNote": "Список источников усечен до 0 для повышения производительности рендеринга. {max}",
@@ -263,7 +263,7 @@
       "scanOff": "Сканирование рабочей области отключено — включите отображение маркеров из файлов проекта.",
       "enableScan": "Включить сканирование",
       "heading": "TODO и ХАКИ",
-      "subsectionNone": "{title}: none in scan range.",
+      "subsectionNone": "{title}: нет в диапазоне сканирования.",
       "capNote": "Сканирование достигло максимального размера файла; поднимите `saropaLints.todosAndHacks.maxFilesToScan` для полного покрытия.",
       "notePill": "примечание",
       "todosLabel": "TODO",
@@ -299,12 +299,12 @@
       "byFile": "По файлу (0) {count}",
       "noEntries": "Нет записей.",
       "nothingHidden": "Ничего не скрыто из списка проблем в этой рабочей области. Используйте действия контекста дерева, чтобы скрыть папки, файлы или правила; они сохраняются в состоянии рабочей области.",
-      "folderPattern": "{count} folder(s)",
-      "filePattern": "{count} file pattern(s)",
-      "ruleGlobal": "{count} rule(s) globally",
-      "perFileRules": "{count} file(s) with per-file rule hides",
-      "severityHides": "{count} severity hide(s)",
-      "impactHides": "{count} impact hide(s)",
+      "folderPattern": "{count} папок",
+      "filePattern": "{count} шаблонов файлов",
+      "ruleGlobal": "{count} правил глобально",
+      "perFileRules": "{count} файлов со скрытыми правилами для файла",
+      "severityHides": "{count} скрытых серьезностей",
+      "impactHides": "{count} скрытых влияний",
       "activeHides": "Активные шкуры: 0. {counts}",
       "viewHidesFooter": "Эти скрытия сжимают только список «Проблемы/панель мониторинга»; они не записаны в `violations.json`.",
       "clearViewHides": "Очистить все скрытия просмотра",
@@ -320,11 +320,11 @@
       "metaRunning": "В крупных проектах это может занять некоторое время.",
       "metaDone": "Обновление информационной панели с последними выводами.",
       "announceSearch": "поиск 0 {q}",
-      "announceSeverities": "{n} severities",
-      "announceImpacts": "{n} impacts",
+      "announceSeverities": "{n} серьезностей",
+      "announceImpacts": "{n} влияний",
       "announceCleared": "Все фильтры очищены",
       "announceFiltersPrefix": "Фильтры:",
-      "bulkSelected": "{n} selected",
+      "bulkSelected": "{n} выбрано",
       "analysisStartedDetail": "Анализ начался. Собираем диагностику…",
       "announceStarted": "Анализ начался",
       "announceComplete": "Анализ завершен",
@@ -332,7 +332,7 @@
       "analysisFailedDetail": "Анализ не удался. Проверьте вывод для получения подробной информации.",
       "removeRecentAria": "Удалять",
       "removeRecentTitle": "Удалять",
-      "bulkSelectedTpl": "{n} selected"
+      "bulkSelectedTpl": "{n} выбрано"
     },
     "emptyState": {
       "hintAfterMessage": "Запустите анализ Saropa Lints, чтобы создать файл нарушения.json, затем используйте «Обновить» здесь или снова откройте эту панель мониторинга.",
@@ -347,14 +347,14 @@
     },
     "unknownAnalyzerKind": "Неизвестный",
     "supplementary": {
-      "otherAnalyzerOn": "+{count} other analyzer findings",
-      "otherAnalyzerPromo": "+? other analyzer findings — show",
-      "analyzerTodosOn": "+{count} analyzer TODOs",
-      "analyzerTodosPromo": "+? analyzer TODOs — show",
-      "scannerPromo": "Enable TODO/HACK scanner",
-      "tooltipLive": "Live from VS Code Problems panel. Updates as analysis completes. Click to hide.",
-      "tooltipScanner": "Saropa file-system scanner — counts open TODO/HACK markers in source.",
-      "tooltipPromoClickToOn": "Click to enable"
+      "otherAnalyzerOn": "+0 другие результаты анализатора {count}",
+      "otherAnalyzerPromo": "+? другие данные анализатора — показать",
+      "analyzerTodosOn": "+0 TODO анализатора {count}",
+      "analyzerTodosPromo": "+? анализатор TODO — показать",
+      "scannerPromo": "Включить сканер TODO/HACK",
+      "tooltipLive": "Прямая трансляция с панели «Проблемы VS Code». Обновления по мере завершения анализа. Нажмите, чтобы скрыть.",
+      "tooltipScanner": "Сканер файловой системы Saropa — подсчитывает открытые маркеры TODO/HACK в исходном коде.",
+      "tooltipPromoClickToOn": "Нажмите, чтобы включить"
     }
   },
   "triageDash": {
@@ -366,8 +366,8 @@
     "on": "На",
     "colRule": "Правило",
     "colIssues": "Проблемы",
-    "zeroIssueRules": "{count} rules with zero issues — auto-enabled in tier.",
-    "disabledOverrides": "{count} rules disabled by override in `analysis_options_custom.yaml`.",
+    "zeroIssueRules": "{count} правил без проблем — автоматически включены на уровне.",
+    "disabledOverrides": "{count} правил отключено переопределением в `analysis_options_custom.yaml`.",
     "summaryRuleTriage": "Сортировка правил",
     "hintNoViolations": "`reports/.saropa_lints/violations.json` пока нет. Запустите анализ, затем обновите эту вкладку.",
     "hintUnreadable": "Нет читаемых нарушений экспорта. Сначала запустите анализ Saropa Lints.",
@@ -402,10 +402,10 @@
     "documentTitle": "Панель управления пакетом Саропа",
     "heroTitle": "Панель управления пакетом Саропа",
     "status": {
-      "packagesCount": "{count} packages",
-      "packagesBreakdown": "{direct} direct, {transitive} transitive",
+      "packagesCount": "{count} пакетов",
+      "packagesBreakdown": "{direct} прямых, {transitive} транзитивных",
       "gradeLine": "Оценка 0 · 1/100 {grade} {avg}",
-      "flaggedCount": "{count} flagged",
+      "flaggedCount": "{count} отмеченных",
       "flaggedTitle": "Заброшенный или окончательный срок службы"
     },
     "scanning": {
@@ -419,7 +419,7 @@
       "packages": "Пакеты",
       "projectGrade": "Оценка пакета проекта",
       "totalSize": "Общий размер*",
-      "gradeTooltip": "Оценка проекта 0\nСредний балл: 1/100\nПакеты: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {avgScore} {pkgCount} {a} {b} {c} {e} {f}",
+      "gradeTooltip": "Оценка проекта 0\nСредний балл: 1/100\nПакеты: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {b} {avgScore} {c} {f} {avgGrade} {a} {e}",
       "vibrantTitle": "Яркий",
       "stableTitle": "Стабильный",
       "outdatedTitle": "Устаревший",
@@ -435,6 +435,11 @@
     },
     "network": {
       "summary": "Сеть зависимостей"
+    },
+    "sections": {
+      "sizeDistribution": "Распределение размеров",
+      "filters": "Фильтры",
+      "packages": "Пакеты"
     },
     "toolbar": {
       "openPubspecTitle": "Открыть pubspec.yaml",
@@ -573,10 +578,10 @@
     "skipLink": "Перейти к каталогу команд",
     "heroTitle": "Каталог команд Саропы",
     "status": {
-      "commands": "{count} commands",
-      "categories": "{count} categories",
-      "recent": "{count} recent",
-      "internalHidden": "{count} context-menu only (hidden)",
+      "commands": "{count} команд",
+      "categories": "{count} категорий",
+      "recent": "{count} недавних",
+      "internalHidden": "{count} только контекстное меню (скрыто)",
       "wordCommands": "команды",
       "wordCategories": "категории",
       "wordRecent": "недавний"
@@ -645,8 +650,8 @@
       "searchChip": "Поиск: \"0\" {query}",
       "internalChip": "Отображение команд контекстного меню",
       "removeFilterPrefix": "Удалить фильтр",
-      "matchOne": "{count} match",
-      "matchOther": "{count} matches"
+      "matchOne": "{count} совпадение",
+      "matchOther": "{count} совпадений"
     }
   },
   "codeHealth": {
@@ -661,9 +666,9 @@
     "hero": {
       "title": "Панель мониторинга состояния кода Саропа",
       "generated": "Сгенерировано",
-      "functionOne": "{count} function",
-      "functionOther": "{count} functions",
-      "avgFormat": "среднее 0 (1) {score} {grade}",
+      "functionOne": "{count} функция",
+      "functionOther": "{count} функций",
+      "avgFormat": "среднее 0 (1) {grade} {score}",
       "gatesFailing": "ворота выходят из строя",
       "gatesPassing": "ворота проходящие"
     },
@@ -673,8 +678,8 @@
     },
     "gate": {
       "fallback": "Не удалось выполнить контроль качества. Проверьте пороговые значения в настройках состояния кода.",
-      "failingOne": "{count} gate failing — review thresholds, or copy the JSON to inspect gates.violations.",
-      "failingOther": "{count} gates failing — review thresholds, or copy the JSON to inspect gates.violations.",
+      "failingOne": "{count} шлюз завершился с ошибкой — проверьте пороги или скопируйте JSON для проверки gates.violations.",
+      "failingOther": "{count} шлюзов завершились с ошибкой — проверьте пороги или скопируйте JSON для проверки gates.violations.",
       "openSettingsTitle": "Откройте настройки «Состояние кода», чтобы настроить пороговые значения.",
       "openSettingsButton": "Открыть настройки работоспособности кода"
     },
@@ -737,15 +742,15 @@
       "flagChip": "флаг: 0 {flag}",
       "removeAria": "Удалить 0 {key}",
       "clearAll": "Очистить все",
-      "rowsVisible": "{visible} of {total} rows visible",
+      "rowsVisible": "отображается {visible} из {total} строк",
       "neverRun": "никогда не бегай"
     },
     "freshness": {
       "justNow": "прямо сейчас",
-      "minutesAgo": "{min}m ago",
-      "hoursAgo": "{hr}h ago",
-      "daysAgo": "{day}d ago",
-      "weeksAgo": "{wk}w ago"
+      "minutesAgo": "{min} мин. назад",
+      "hoursAgo": "{hr} ч. назад",
+      "daysAgo": "{day} д. назад",
+      "weeksAgo": "{wk} нед. назад"
     }
   },
   "suppressionsStrip": {
@@ -760,7 +765,7 @@
     "noFileRisk": "Нет разбивки рисков по файлам (нет нарушений объема).",
     "suppressionNote": "Соответствует сводке нарушения.json, а не переключателям подавления боковой панели.",
     "noSuppression": "В этом экспорте нет совокупного подавления (более старый анализатор или нулевое подавление).",
-    "owaspSignal": "{count} violation(s) in this export carry OWASP mobile/web mapping — open Security Posture for the full matrix and export.",
+    "owaspSignal": "{count} нарушений в этом экспорте содержат маппинг OWASP для мобильных/веб — откройте Позицию безопасности для полной матрицы и экспорта.",
     "summarySuppressions": "Подавления (экспортный снимок)",
     "summaryOwasp": "Состояние безопасности (сигнал OWASP)",
     "summaryFileRisk": "Файловый риск (топ-файлы)"
@@ -770,8 +775,8 @@
     "skipToCounters": "Перейти к счетчикам телеметрии",
     "lastEvent": "Последнее событие 0 {relative}",
     "noEvents": "Никаких событий не зарегистрировано",
-    "totalEventOne": "{count} total event",
-    "totalEventOther": "{count} total events",
+    "totalEventOne": "{count} событие всего",
+    "totalEventOther": "{count} событий всего",
     "noCountersTitle": "Нет счетчиков для сброса.",
     "resetTitle": "Сбросить все счетчики",
     "refreshTitle": "Перезагрузить счетчики телеметрии с диска.",
@@ -795,11 +800,11 @@
     "hint": "Здесь можно включить или отключить разделы панели активности Saropa (сохраняются вместе с рабочей областью, не выходя из панели управления)."
   },
   "securityPosture": {
-    "issueOne": "{count} issue",
-    "issueOther": "{count} issues",
+    "issueOne": "{count} проблема",
+    "issueOther": "{count} проблем",
     "noIssues": "Нет проблем",
     "showIssues": "Показать проблемы",
-    "violationTooltip": "{count} violation(s) across {ruleCount} rule(s). Click to show in Issues.",
+    "violationTooltip": "{count} нарушений в {ruleCount} правилах. Нажмите, чтобы показать в Проблемах.",
     "noViolationsTooltip": "К этой категории нарушений не относится."
   }
 }

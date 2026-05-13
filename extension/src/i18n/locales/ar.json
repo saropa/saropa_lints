@@ -43,7 +43,7 @@
     "reload": "إعادة تحميل",
     "copyDetails": "نسخ التفاصيل",
     "unreachable": "لا يمكن الوصول إلى 0 {target}",
-    "partialSummary": "{loaded} of {total} {item} loaded. {failed} failed.",
+    "partialSummary": "تم تحميل {loaded} من {total} {item}. فشل {failed}.",
     "partialRetry": "فشلت إعادة المحاولة"
   },
   "offline": {
@@ -90,28 +90,28 @@
     "secondaryAsideLabel": "التشخيص الثانوي",
     "hero": {
       "productTitle": "لوحة النتائج",
-      "gaugeTitle": "النتيجة الصحية 0/100 (الدرجة 1). الأخطاء تزن أثقل. {score} {grade}"
+      "gaugeTitle": "النتيجة الصحية 0/100 (الدرجة 1). الأخطاء تزن أثقل. {grade} {score}"
     },
     "time": {
       "justNow": "الآن",
-      "minutesAgo": "{min}m ago",
-      "hoursAgo": "{hr}h ago",
-      "daysAgo": "{day}d ago"
+      "minutesAgo": "منذ {min} د",
+      "hoursAgo": "منذ {hr} س",
+      "daysAgo": "منذ {day} يوم"
     },
     "status": {
       "lastRunPrefix": "التشغيل الأخير",
       "lastRunUnknown": "آخر تشغيل غير معروف",
       "noTimestampTitle": "لا يوجد طابع زمني على الانتهاكات.json",
       "findingsAfterFilterTitle": "إجمالي النتائج بعد عامل تصفية القاعدة المعطل",
-      "findingOne": "{count} finding",
-      "findingOther": "{count} findings",
+      "findingOne": "{count} نتيجة",
+      "findingOther": "{count} نتائج",
       "todoHackTitle": "تم العثور على علامات TODO وHACK في مساحة العمل",
       "driftOnTitle": "مستشار الانجراف متصل: 0 {label}",
       "driftOnPill": "الانجراف على · 0 {count}",
       "driftOfflineTitle": "تم تمكين Drift Advisor ولكن لم يتم العثور على خادم",
       "driftOfflinePill": "الانجراف حاليا",
       "enabledRulesTitle": "القواعد الممكّنة في المستوى الحالي",
-      "rulesCount": "{count} rules"
+      "rulesCount": "{count} قواعد"
     },
     "groupBy": {
       "severity": "خطورة",
@@ -222,7 +222,7 @@
       "sectionAria": "النتائج",
       "expandAll": "قم بتوسيع الكل",
       "collapseAll": "طي الكل",
-      "bulkSelected": "{count} selected",
+      "bulkSelected": "{count} محدد",
       "bulkCopy": "تم تحديد النسخة كـ JSON",
       "selectAllTitle": "حدد جميع النتائج المرئية",
       "selectAllAria": "حدد جميع النتائج المرئية",
@@ -233,8 +233,8 @@
       "colActionsAria": "إجراءات الصف",
       "selectRowAria": "حدد صف البحث هذا",
       "copyRowTitle": "انسخ هذه النتيجة كـ JSON",
-      "metaShown": "{filtered} shown",
-      "metaAfterDisable": "{total} after disabled-rule filter",
+      "metaShown": "تم عرض {filtered}",
+      "metaAfterDisable": "{total} بعد تصفية القواعد المعطلة",
       "metaSourceCap": "الحد الأقصى للمصدر هو 0 للأداء {max}",
       "metaGroupedBy": "مجمعة حسب 0 {mode}",
       "overflowNote": "تم اقتطاع قائمة المصادر عند 0 لأداء العرض. {max}",
@@ -263,7 +263,7 @@
       "scanOff": "تم إيقاف فحص مساحة العمل - قم بتمكين إظهار العلامات من ملفات المشروع.",
       "enableScan": "تمكين المسح",
       "heading": "المهام والحيل",
-      "subsectionNone": "{title}: none in scan range.",
+      "subsectionNone": "{title}: لا يوجد في نطاق الفحص.",
       "capNote": "مسح ضرب الحد الأقصى للملف. قم برفع `saropaLints.todosAndHacks.maxFilesToScan` للحصول على التغطية الكاملة.",
       "notePill": "ملحوظة",
       "todosLabel": "المهام",
@@ -299,12 +299,12 @@
       "byFile": "حسب الملف (0) {count}",
       "noEntries": "لا توجد إدخالات.",
       "nothingHidden": "لا يوجد شيء مخفي من قائمة المشكلات في مساحة العمل هذه. استخدم إجراءات سياق الشجرة لإخفاء المجلدات أو الملفات أو القواعد؛ أنها تستمر في حالة مساحة العمل.",
-      "folderPattern": "{count} folder(s)",
-      "filePattern": "{count} file pattern(s)",
-      "ruleGlobal": "{count} rule(s) globally",
-      "perFileRules": "{count} file(s) with per-file rule hides",
-      "severityHides": "{count} severity hide(s)",
-      "impactHides": "{count} impact hide(s)",
+      "folderPattern": "{count} مجلد(مجلدات)",
+      "filePattern": "{count} نمط/أنماط ملفات",
+      "ruleGlobal": "{count} قاعدة (قواعد) عالميًا",
+      "perFileRules": "{count} ملف(ملفات) بقواعد إخفاء لكل ملف",
+      "severityHides": "{count} إخفاء(إخفاءات) الخطورة",
+      "impactHides": "{count} إخفاء(إخفاءات) التأثير",
       "activeHides": "الجلود النشطة: 0. {counts}",
       "viewHidesFooter": "تؤدي عمليات الإخفاء هذه إلى تقليص قائمة المشكلات/لوحة المعلومات فقط؛ لم تتم كتابتها في \"violations.json\".",
       "clearViewHides": "مسح كافة إخفاءات العرض",
@@ -320,11 +320,11 @@
       "metaRunning": "قد يستغرق هذا بعض الوقت في المشاريع الكبيرة.",
       "metaDone": "تحديث لوحة القيادة بأحدث النتائج.",
       "announceSearch": "بحث 0 {q}",
-      "announceSeverities": "{n} severities",
-      "announceImpacts": "{n} impacts",
+      "announceSeverities": "{n} مستويات خطورة",
+      "announceImpacts": "{n} تأثيرات",
       "announceCleared": "تم مسح كافة عوامل التصفية",
       "announceFiltersPrefix": "المرشحات:",
-      "bulkSelected": "{n} selected",
+      "bulkSelected": "تم تحديد {n}",
       "analysisStartedDetail": "بدأ التحليل. جارٍ جمع بيانات التشخيص...",
       "announceStarted": "بدأ التحليل",
       "announceComplete": "اكتمل التحليل",
@@ -332,7 +332,7 @@
       "analysisFailedDetail": "فشل التحليل. تحقق من الإخراج للحصول على التفاصيل.",
       "removeRecentAria": "يزيل",
       "removeRecentTitle": "يزيل",
-      "bulkSelectedTpl": "{n} selected"
+      "bulkSelectedTpl": "تم تحديد {n}"
     },
     "emptyState": {
       "hintAfterMessage": "قم بتشغيل تحليل Saropa Lints لإنشاء انتهاكات.json، ثم استخدم التحديث هنا أو أعد فتح لوحة المعلومات هذه.",
@@ -366,8 +366,8 @@
     "on": "على",
     "colRule": "قاعدة",
     "colIssues": "مشاكل",
-    "zeroIssueRules": "{count} rules with zero issues — auto-enabled in tier.",
-    "disabledOverrides": "{count} rules disabled by override in `analysis_options_custom.yaml`.",
+    "zeroIssueRules": "{count} قواعد بصفر مشاكل — مفعلة تلقائيًا في المستوى.",
+    "disabledOverrides": "{count} قواعد معطلة بواسطة تجاوز في `analysis_options_custom.yaml`.",
     "summaryRuleTriage": "فرز القواعد",
     "hintNoViolations": "لا توجد تقارير/.saropa_lints/violations.json حتى الآن. قم بتشغيل التحليل، ثم قم بتحديث علامة التبويب هذه.",
     "hintUnreadable": "لا توجد انتهاكات قابلة للقراءة التصدير. قم بتشغيل تحليل Saropa Lints أولاً.",
@@ -402,10 +402,10 @@
     "documentTitle": "لوحة معلومات حزمة ساروبا",
     "heroTitle": "لوحة معلومات حزمة ساروبا",
     "status": {
-      "packagesCount": "{count} packages",
-      "packagesBreakdown": "{direct} direct, {transitive} transitive",
+      "packagesCount": "{count} حزم",
+      "packagesBreakdown": "{direct} مباشر، {transitive} متعدٍ",
       "gradeLine": "الدرجة 0 · 1/100 {grade} {avg}",
-      "flaggedCount": "{count} flagged",
+      "flaggedCount": "{count} تم وضع علامة عليه",
       "flaggedTitle": "مهجورة أو نهاية الحياة"
     },
     "scanning": {
@@ -419,7 +419,7 @@
       "packages": "الحزم",
       "projectGrade": "درجة حزمة المشروع",
       "totalSize": "الحجم الإجمالي*",
-      "gradeTooltip": "درجة المشروع 0\nمتوسط الدرجات: 1/100\nالحزم: 2\nأ:3 ب:4 ج:5 ه:6 و:٧ {avgGrade} {avgScore} {pkgCount} {a} {b} {c} {e} {f}",
+      "gradeTooltip": "درجة المشروع 0\nمتوسط الدرجات: 1/100\nالحزم: 2\nأ:3 ب:4 ج:5 ه:6 و:٧ {pkgCount} {b} {avgScore} {c} {f} {avgGrade} {a} {e}",
       "vibrantTitle": "نابضة بالحياة",
       "stableTitle": "مستقر",
       "outdatedTitle": "عفا عليها الزمن",
@@ -435,6 +435,11 @@
     },
     "network": {
       "summary": "شبكة التبعية"
+    },
+    "sections": {
+      "sizeDistribution": "توزيع الحجم",
+      "filters": "المرشحات",
+      "packages": "الحزم"
     },
     "toolbar": {
       "openPubspecTitle": "افتح pubspec.yaml",
@@ -573,10 +578,10 @@
     "skipLink": "انتقل إلى كتالوج الأوامر",
     "heroTitle": "كتالوج قيادة ساروبا",
     "status": {
-      "commands": "{count} commands",
-      "categories": "{count} categories",
-      "recent": "{count} recent",
-      "internalHidden": "{count} context-menu only (hidden)",
+      "commands": "{count} أوامر",
+      "categories": "{count} فئات",
+      "recent": "{count} حديث",
+      "internalHidden": "{count} قائمة سياق فقط (مخفي)",
       "wordCommands": "الأوامر",
       "wordCategories": "فئات",
       "wordRecent": "مؤخرًا"
@@ -645,8 +650,8 @@
       "searchChip": "البحث: \"0\" {query}",
       "internalChip": "إظهار أوامر قائمة السياق",
       "removeFilterPrefix": "قم بإزالة الفلتر",
-      "matchOne": "{count} match",
-      "matchOther": "{count} matches"
+      "matchOne": "{count} تطابق",
+      "matchOther": "{count} تطابقات"
     }
   },
   "codeHealth": {
@@ -661,9 +666,9 @@
     "hero": {
       "title": "لوحة المعلومات الصحية لرمز ساروبا",
       "generated": "تم إنشاؤها",
-      "functionOne": "{count} function",
-      "functionOther": "{count} functions",
-      "avgFormat": "المتوسط ​​0 (1) {score} {grade}",
+      "functionOne": "{count} دالة",
+      "functionOther": "{count} دوال",
+      "avgFormat": "المتوسط ​​0 (1) {grade} {score}",
       "gatesFailing": "بوابات الفشل",
       "gatesPassing": "مرور البوابات"
     },
@@ -673,8 +678,8 @@
     },
     "gate": {
       "fallback": "فشلت بوابات الجودة — قم بمراجعة الحدود في إعدادات Code Health.",
-      "failingOne": "{count} gate failing — review thresholds, or copy the JSON to inspect gates.violations.",
-      "failingOther": "{count} gates failing — review thresholds, or copy the JSON to inspect gates.violations.",
+      "failingOne": "{count} بوابة فاشلة — راجع الحدود، أو انسخ JSON لفحص gates.violations.",
+      "failingOther": "{count} بوابات فاشلة — راجع الحدود، أو انسخ JSON لفحص gates.violations.",
       "openSettingsTitle": "افتح إعدادات Code Health لضبط الحدود.",
       "openSettingsButton": "افتح إعدادات Code Health"
     },
@@ -737,15 +742,15 @@
       "flagChip": "العلم: 0 {flag}",
       "removeAria": "قم بإزالة 0 {key}",
       "clearAll": "مسح الكل",
-      "rowsVisible": "{visible} of {total} rows visible",
+      "rowsVisible": "{visible} من {total} صفوف مرئية",
       "neverRun": "لا تركض أبدًا"
     },
     "freshness": {
       "justNow": "الآن",
-      "minutesAgo": "{min}m ago",
-      "hoursAgo": "{hr}h ago",
-      "daysAgo": "{day}d ago",
-      "weeksAgo": "{wk}w ago"
+      "minutesAgo": "منذ {min} د",
+      "hoursAgo": "منذ {hr} س",
+      "daysAgo": "منذ {day} يوم",
+      "weeksAgo": "منذ {wk} أسبوع"
     }
   },
   "suppressionsStrip": {
@@ -760,7 +765,7 @@
     "noFileRisk": "لا يوجد توزيع للمخاطر لكل ملف (لا توجد انتهاكات في النطاق).",
     "suppressionNote": "يطابق ملخص الانتهاكات.json، وليس تبديل قمع الشريط الجانبي المباشر.",
     "noSuppression": "لا يوجد إجمالي للمنع في عملية التصدير هذه (محلل قديم أو عمليات المنع صفر).",
-    "owaspSignal": "{count} violation(s) in this export carry OWASP mobile/web mapping — open Security Posture for the full matrix and export.",
+    "owaspSignal": "{count} انتهاك(انتهاكات) في هذا التصدير تحمل تعيين OWASP للجوال/الويب — افتح وضع الأمان للمصفوفة الكاملة والتصدير.",
     "summarySuppressions": "عمليات القمع (لقطة التصدير)",
     "summaryOwasp": "الوضع الأمني ​​(إشارة OWASP)",
     "summaryFileRisk": "خطر الملف (الملفات العليا)"
@@ -770,8 +775,8 @@
     "skipToCounters": "انتقل إلى عدادات القياس عن بعد",
     "lastEvent": "الحدث الأخير 0 {relative}",
     "noEvents": "لم يتم تسجيل أي أحداث",
-    "totalEventOne": "{count} total event",
-    "totalEventOther": "{count} total events",
+    "totalEventOne": "{count} حدث إجمالي",
+    "totalEventOther": "{count} أحداث إجمالية",
     "noCountersTitle": "لا توجد عدادات لإعادة تعيين.",
     "resetTitle": "إعادة ضبط كافة العدادات",
     "refreshTitle": "إعادة تحميل عدادات القياس عن بعد من القرص",
@@ -795,11 +800,11 @@
     "hint": "قم بتشغيل أقسام شريط نشاط Saropa أو إيقاف تشغيلها هنا (يتم حفظها في مساحة العمل، دون مغادرة لوحة المعلومات)."
   },
   "securityPosture": {
-    "issueOne": "{count} issue",
-    "issueOther": "{count} issues",
+    "issueOne": "{count} مشكلة",
+    "issueOther": "{count} مشاكل",
     "noIssues": "لا توجد قضايا",
     "showIssues": "إظهار القضايا",
-    "violationTooltip": "{count} violation(s) across {ruleCount} rule(s). Click to show in Issues.",
+    "violationTooltip": "{count} انتهاك(انتهاكات) عبر {ruleCount} قاعدة (قواعد). انقر للإظهار في المشاكل.",
     "noViolationsTooltip": "لم يتم تعيين أي انتهاكات لهذه الفئة."
   }
 }

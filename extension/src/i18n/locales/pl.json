@@ -43,7 +43,7 @@
     "reload": "Przeładować",
     "copyDetails": "Skopiuj szczegóły",
     "unreachable": "Nie udało się osiągnąć 0 {target}",
-    "partialSummary": "{loaded} of {total} {item} loaded. {failed} failed.",
+    "partialSummary": "załadowano {loaded} z {total} {item}. {failed} nie powiodło się.",
     "partialRetry": "Ponowna próba nie powiodła się"
   },
   "offline": {
@@ -90,28 +90,28 @@
     "secondaryAsideLabel": "Diagnostyka wtórna",
     "hero": {
       "productTitle": "Panel wyników",
-      "gaugeTitle": "Wynik zdrowotny 0/100 (stopień 1). Błędy ważą najwięcej. {score} {grade}"
+      "gaugeTitle": "Wynik zdrowotny 0/100 (stopień 1). Błędy ważą najwięcej. {grade} {score}"
     },
     "time": {
       "justNow": "właśnie",
-      "minutesAgo": "{min}m ago",
-      "hoursAgo": "{hr}h ago",
-      "daysAgo": "{day}d ago"
+      "minutesAgo": "{min} min temu",
+      "hoursAgo": "{hr} godz. temu",
+      "daysAgo": "{day} dni temu"
     },
     "status": {
       "lastRunPrefix": "Ostatni bieg",
       "lastRunUnknown": "Ostatni bieg nieznany",
       "noTimestampTitle": "Brak sygnatury czasowej w pliku naruszenia.json",
       "findingsAfterFilterTitle": "Łączne wyniki po filtrze z wyłączoną regułą",
-      "findingOne": "{count} finding",
-      "findingOther": "{count} findings",
+      "findingOne": "{count} znalezisko",
+      "findingOther": "{count} znalezisk",
       "todoHackTitle": "Znaczniki TODO i HACK znalezione w obszarze roboczym",
       "driftOnTitle": "Doradca driftu podłączony: 0 {label}",
       "driftOnPill": "Dryfuj · 0 {count}",
       "driftOfflineTitle": "Doradca dryfu włączony, ale nie znaleziono serwera",
       "driftOfflinePill": "Dryfuj offline",
       "enabledRulesTitle": "Włączone reguły na bieżącym poziomie",
-      "rulesCount": "{count} rules"
+      "rulesCount": "{count} reguł"
     },
     "groupBy": {
       "severity": "Powaga",
@@ -222,7 +222,7 @@
       "sectionAria": "Ustalenia",
       "expandAll": "Rozwiń wszystko",
       "collapseAll": "Zwiń wszystko",
-      "bulkSelected": "{count} selected",
+      "bulkSelected": "{count} zaznaczonych",
       "bulkCopy": "Kopia wybrana jako JSON",
       "selectAllTitle": "Wybierz wszystkie widoczne wyniki",
       "selectAllAria": "Wybierz wszystkie widoczne wyniki",
@@ -233,8 +233,8 @@
       "colActionsAria": "Działania wierszowe",
       "selectRowAria": "Wybierz ten wiersz wyniku",
       "copyRowTitle": "Skopiuj to ustalenie jako JSON",
-      "metaShown": "{filtered} shown",
-      "metaAfterDisable": "{total} after disabled-rule filter",
+      "metaShown": "{filtered} wyświetlonych",
+      "metaAfterDisable": "{total} po filtrze wyłączonych reguł",
       "metaSourceCap": "źródło ograniczone do 0 ze względu na wydajność {max}",
       "metaGroupedBy": "pogrupowane według 0 {mode}",
       "overflowNote": "Lista źródeł obcięta w 0 ze względu na wydajność renderowania. {max}",
@@ -263,7 +263,7 @@
       "scanOff": "Skanowanie obszaru roboczego jest wyłączone — włącz wyświetlanie znaczników z plików projektu.",
       "enableScan": "Włącz skanowanie",
       "heading": "ZADANIA I HACKI",
-      "subsectionNone": "{title}: none in scan range.",
+      "subsectionNone": "{title}: brak w zakresie skanowania.",
       "capNote": "Skanowanie osiągnęło maksymalny limit pliku; podnieś `saropaLints.todosAndHacks.maxFilesToScan`, aby uzyskać pełne pokrycie.",
       "notePill": "notatka",
       "todosLabel": "DO ZROBIENIA",
@@ -299,12 +299,12 @@
       "byFile": "Według pliku (0) {count}",
       "noEntries": "Brak wpisów.",
       "nothingHidden": "Na liście problemów w tym obszarze roboczym nie ma żadnych ukrytych elementów. Użyj akcji kontekstowych drzewa, aby ukryć foldery, pliki lub reguły; pozostają w stanie obszaru roboczego.",
-      "folderPattern": "{count} folder(s)",
-      "filePattern": "{count} file pattern(s)",
-      "ruleGlobal": "{count} rule(s) globally",
-      "perFileRules": "{count} file(s) with per-file rule hides",
-      "severityHides": "{count} severity hide(s)",
-      "impactHides": "{count} impact hide(s)",
+      "folderPattern": "{count} folderów",
+      "filePattern": "{count} wzorców plików",
+      "ruleGlobal": "{count} reguł globalnie",
+      "perFileRules": "{count} plików z ukrytymi regułami dla plików",
+      "severityHides": "{count} ukrytych istotności",
+      "impactHides": "{count} ukrytych wpływów",
       "activeHides": "Aktywne skóry: 0. {counts}",
       "viewHidesFooter": "Te ukrywają tylko listę problemów / pulpitu nawigacyjnego; nie są one zapisywane w pliku `violations.json`.",
       "clearViewHides": "Wyczyść wszystkie ukrywanie widoku",
@@ -320,11 +320,11 @@
       "metaRunning": "W przypadku dużych projektów może to zająć chwilę.",
       "metaDone": "Odświeżający panel z najnowszymi odkryciami.",
       "announceSearch": "wyszukaj 0 {q}",
-      "announceSeverities": "{n} severities",
-      "announceImpacts": "{n} impacts",
+      "announceSeverities": "{n} istotności",
+      "announceImpacts": "{n} wpływów",
       "announceCleared": "Wszystkie filtry wyczyszczone",
       "announceFiltersPrefix": "Filtry:",
-      "bulkSelected": "{n} selected",
+      "bulkSelected": "{n} zaznaczonych",
       "analysisStartedDetail": "Rozpoczęto analizę. Zbieram dane diagnostyczne…",
       "announceStarted": "Rozpoczęto analizę",
       "announceComplete": "Analiza zakończona",
@@ -332,7 +332,7 @@
       "analysisFailedDetail": "Analiza nie powiodła się. Sprawdź dane wyjściowe, aby uzyskać szczegółowe informacje.",
       "removeRecentAria": "Usunąć",
       "removeRecentTitle": "Usunąć",
-      "bulkSelectedTpl": "{n} selected"
+      "bulkSelectedTpl": "{n} zaznaczonych"
     },
     "emptyState": {
       "hintAfterMessage": "Uruchom analizę Saropa Lints, aby wygenerować plik naruszenia.json, a następnie użyj opcji Odśwież tutaj lub otwórz ponownie ten pulpit nawigacyjny.",
@@ -347,14 +347,14 @@
     },
     "unknownAnalyzerKind": "Nieznany",
     "supplementary": {
-      "otherAnalyzerOn": "+{count} other analyzer findings",
-      "otherAnalyzerPromo": "+? other analyzer findings — show",
-      "analyzerTodosOn": "+{count} analyzer TODOs",
-      "analyzerTodosPromo": "+? analyzer TODOs — show",
-      "scannerPromo": "Enable TODO/HACK scanner",
-      "tooltipLive": "Live from VS Code Problems panel. Updates as analysis completes. Click to hide.",
-      "tooltipScanner": "Saropa file-system scanner — counts open TODO/HACK markers in source.",
-      "tooltipPromoClickToOn": "Click to enable"
+      "otherAnalyzerOn": "+0 inne ustalenia analizatora {count}",
+      "otherAnalyzerPromo": "+? inne ustalenia analizatora — pokaż",
+      "analyzerTodosOn": "+0 analizator TODO {count}",
+      "analyzerTodosPromo": "+? analizator TODO — pokaż",
+      "scannerPromo": "Włącz skaner TODO/HACK",
+      "tooltipLive": "Na żywo z panelu Problemy z kodem VS. Aktualizuje się po zakończeniu analizy. Kliknij, aby ukryć.",
+      "tooltipScanner": "Skaner systemu plików Saropa — zlicza otwarte znaczniki TODO/HACK w źródle.",
+      "tooltipPromoClickToOn": "Kliknij, aby włączyć"
     }
   },
   "triageDash": {
@@ -366,8 +366,8 @@
     "on": "NA",
     "colRule": "Reguła",
     "colIssues": "Kwestie",
-    "zeroIssueRules": "{count} rules with zero issues — auto-enabled in tier.",
-    "disabledOverrides": "{count} rules disabled by override in `analysis_options_custom.yaml`.",
+    "zeroIssueRules": "{count} reguł z zerową liczbą problemów — włączono automatycznie w warstwie.",
+    "disabledOverrides": "{count} reguł wyłączonych przez nadpisanie w `analysis_options_custom.yaml`.",
     "summaryRuleTriage": "Reguła segregacji",
     "hintNoViolations": "Nie ma jeszcze pliku `reports/.saropa_lints/violations.json`. Uruchom analizę, a następnie odśwież tę kartę.",
     "hintUnreadable": "Brak czytelnego eksportu naruszeń. Najpierw wykonaj analizę Saropa Lints.",
@@ -402,10 +402,10 @@
     "documentTitle": "Panel kontrolny pakietu Saropa",
     "heroTitle": "Panel kontrolny pakietu Saropa",
     "status": {
-      "packagesCount": "{count} packages",
-      "packagesBreakdown": "{direct} direct, {transitive} transitive",
+      "packagesCount": "{count} pakietów",
+      "packagesBreakdown": "{direct} bezpośrednich, {transitive} przechodnich",
       "gradeLine": "Stopień 0 · 1/100 {grade} {avg}",
-      "flaggedCount": "{count} flagged",
+      "flaggedCount": "{count} oflagowanych",
       "flaggedTitle": "Opuszczony lub koniec życia"
     },
     "scanning": {
@@ -419,7 +419,7 @@
       "packages": "Pakiety",
       "projectGrade": "Ocena pakietu projektu",
       "totalSize": "Całkowity rozmiar*",
-      "gradeTooltip": "Ocena projektu 0\nŚredni wynik: 1/100\nPakiety: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {avgScore} {pkgCount} {a} {b} {c} {e} {f}",
+      "gradeTooltip": "Ocena projektu 0\nŚredni wynik: 1/100\nPakiety: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {b} {avgScore} {c} {f} {avgGrade} {a} {e}",
       "vibrantTitle": "Wibrujący",
       "stableTitle": "Stabilny",
       "outdatedTitle": "Przestarzały",
@@ -435,6 +435,11 @@
     },
     "network": {
       "summary": "Sieć zależności"
+    },
+    "sections": {
+      "sizeDistribution": "Dystrybucja rozmiarów",
+      "filters": "Filtry",
+      "packages": "Pakiety"
     },
     "toolbar": {
       "openPubspecTitle": "Otwórz plik pubspec.yaml",
@@ -573,10 +578,10 @@
     "skipLink": "Przejdź do katalogu poleceń",
     "heroTitle": "Katalog poleceń Saropa",
     "status": {
-      "commands": "{count} commands",
-      "categories": "{count} categories",
-      "recent": "{count} recent",
-      "internalHidden": "{count} context-menu only (hidden)",
+      "commands": "{count} poleceń",
+      "categories": "{count} kategorii",
+      "recent": "{count} ostatnich",
+      "internalHidden": "{count} tylko menu kontekstowe (ukryte)",
       "wordCommands": "polecenia",
       "wordCategories": "kategorie",
       "wordRecent": "ostatni"
@@ -645,8 +650,8 @@
       "searchChip": "Szukaj: „0” {query}",
       "internalChip": "Wyświetlanie poleceń menu kontekstowego",
       "removeFilterPrefix": "Usuń filtr",
-      "matchOne": "{count} match",
-      "matchOther": "{count} matches"
+      "matchOne": "{count} dopasowanie",
+      "matchOther": "{count} dopasowań"
     }
   },
   "codeHealth": {
@@ -661,9 +666,9 @@
     "hero": {
       "title": "Pulpit nawigacyjny dotyczący zdrowia Kodeksu Saropa",
       "generated": "Wygenerowano",
-      "functionOne": "{count} function",
-      "functionOther": "{count} functions",
-      "avgFormat": "średnia 0 (1) {score} {grade}",
+      "functionOne": "{count} funkcja",
+      "functionOther": "{count} funkcji",
+      "avgFormat": "średnia 0 (1) {grade} {score}",
       "gatesFailing": "bramy nie działają",
       "gatesPassing": "przechodzą bramy"
     },
@@ -673,8 +678,8 @@
     },
     "gate": {
       "fallback": "Bramy jakości nie powiodły się — przejrzyj progi w ustawieniach Code Health.",
-      "failingOne": "{count} gate failing — review thresholds, or copy the JSON to inspect gates.violations.",
-      "failingOther": "{count} gates failing — review thresholds, or copy the JSON to inspect gates.violations.",
+      "failingOne": "{count} brama kończy się niepowodzeniem — przejrzyj progi lub skopiuj kod JSON, aby sprawdzić gates.violations.",
+      "failingOther": "{count} bramy kończą się niepowodzeniem — przejrzyj progi lub skopiuj kod JSON, aby sprawdzić gates.violations.",
       "openSettingsTitle": "Otwórz ustawienia Code Health, aby dostosować progi.",
       "openSettingsButton": "Otwórz ustawienia kondycji kodu"
     },
@@ -737,15 +742,15 @@
       "flagChip": "flaga: 0 {flag}",
       "removeAria": "Usuń 0 {key}",
       "clearAll": "Wyczyść wszystko",
-      "rowsVisible": "{visible} of {total} rows visible",
+      "rowsVisible": "widocznych {visible} z {total} wierszy",
       "neverRun": "nigdy nie biegaj"
     },
     "freshness": {
       "justNow": "właśnie",
-      "minutesAgo": "{min}m ago",
-      "hoursAgo": "{hr}h ago",
-      "daysAgo": "{day}d ago",
-      "weeksAgo": "{wk}w ago"
+      "minutesAgo": "{min} min temu",
+      "hoursAgo": "{hr} godz. temu",
+      "daysAgo": "{day} dni temu",
+      "weeksAgo": "{wk} tyg. temu"
     }
   },
   "suppressionsStrip": {
@@ -760,7 +765,7 @@
     "noFileRisk": "Brak podziału ryzyka na plik (brak naruszeń zakresu).",
     "suppressionNote": "Odpowiada podsumowaniu pliku naruszenia.json, a nie aktywnym przełącznikom pomijania paska bocznego.",
     "noSuppression": "Brak agregatu pomijania w tym eksporcie (starszy analizator lub pomijanie zer).",
-    "owaspSignal": "{count} violation(s) in this export carry OWASP mobile/web mapping — open Security Posture for the full matrix and export.",
+    "owaspSignal": "{count} naruszeń w tym eksporcie zawiera mapowanie OWASP dla urządzeń mobilnych/sieci Web — otwórz pozycję bezpieczeństwa, aby wyświetlić pełną matrycę i eksport.",
     "summarySuppressions": "Pominięcia (eksport migawki)",
     "summaryOwasp": "Pozycja bezpieczeństwa (sygnał OWASP)",
     "summaryFileRisk": "Ryzyko związane z plikami (najczęstsze pliki)"
@@ -770,8 +775,8 @@
     "skipToCounters": "Przejdź do liczników telemetrycznych",
     "lastEvent": "Ostatnie wydarzenie 0 {relative}",
     "noEvents": "Nie zarejestrowano żadnych zdarzeń",
-    "totalEventOne": "{count} total event",
-    "totalEventOther": "{count} total events",
+    "totalEventOne": "{count} zdarzenie ogółem",
+    "totalEventOther": "{count} zdarzeń ogółem",
     "noCountersTitle": "Brak liczników do resetowania.",
     "resetTitle": "Zresetuj wszystkie liczniki",
     "refreshTitle": "Załaduj ponownie liczniki telemetryczne z dysku",
@@ -795,11 +800,11 @@
     "hint": "Tutaj możesz włączyć lub wyłączyć sekcje paska aktywności Saropa (zapisane w obszarze roboczym, bez opuszczania pulpitu nawigacyjnego)."
   },
   "securityPosture": {
-    "issueOne": "{count} issue",
-    "issueOther": "{count} issues",
+    "issueOne": "{count} problem",
+    "issueOther": "{count} problemów",
     "noIssues": "Żadnych problemów",
     "showIssues": "Pokaż problemy",
-    "violationTooltip": "{count} violation(s) across {ruleCount} rule(s). Click to show in Issues.",
+    "violationTooltip": "{count} naruszeń w {ruleCount} regułach. Kliknij, aby wyświetlić w Problemach.",
     "noViolationsTooltip": "Do tej kategorii nie przypisano żadnych naruszeń."
   }
 }

@@ -190,6 +190,41 @@ def machine_translate(text: str, locale: str, *, cache: dict[str, str]) -> str:
 _MT_REQUEST_GAP_SEC = 0.22
 
 
+def _iter_pending_texts(
+    locale: str,
+    texts: list[str],
+    *,
+    cache: dict[str, str],
+    dict_table: dict[str, str],
+):
+    """Yield strings that would require a fresh MT network call.
+
+    Shared by ``count_pending_translations`` and ``prefetch_machine_translations``
+    so both apply identical filter rules — keep them in lockstep here.
+    """
+    for text in texts:
+        if not text or text in dict_table or should_skip_machine_translate(text):
+            continue
+        if _cache_key(locale, text) in cache:
+            continue
+        yield text
+
+
+def count_pending_translations(
+    locale: str,
+    texts: list[str],
+    *,
+    cache: dict[str, str],
+    dict_table: dict[str, str],
+) -> int:
+    """How many strings prefetch would hit the network for. 0 when MT is disabled."""
+    if locale == "en" or not _mt_env_enabled():
+        return 0
+    if not LOCALE_TO_GOOGLE.get(locale):
+        return 0
+    return sum(1 for _ in _iter_pending_texts(locale, texts, cache=cache, dict_table=dict_table))
+
+
 def prefetch_machine_translations(
     locale: str,
     texts: list[str],
@@ -197,7 +232,11 @@ def prefetch_machine_translations(
     cache: dict[str, str],
     dict_table: dict[str, str],
 ) -> None:
-    """Translate strings missing from *dict_table* and *cache* (sequential, rate-limited)."""
+    """Translate strings missing from *dict_table* and *cache* (sequential, rate-limited).
+
+    Raises ``KeyboardInterrupt`` so the caller can save the partial cache and
+    exit cleanly. Anything fetched before interrupt is already in *cache*.
+    """
     if locale == "en" or not _mt_env_enabled():
         return
     google_lang = LOCALE_TO_GOOGLE.get(locale)
@@ -209,14 +248,7 @@ def prefetch_machine_translations(
     except ImportError:
         return
 
-    pending: list[str] = []
-    for text in texts:
-        if not text or text in dict_table or should_skip_machine_translate(text):
-            continue
-        if _cache_key(locale, text) in cache:
-            continue
-        pending.append(text)
-
+    pending = list(_iter_pending_texts(locale, texts, cache=cache, dict_table=dict_table))
     if not pending:
         return
 
@@ -231,6 +263,10 @@ def prefetch_machine_translations(
                     break
             except TooManyRequests:
                 time.sleep(6.0 + float(attempt) * 3.0)
+            except KeyboardInterrupt:
+                # Re-raise so the top-level handler can save the cache; do not
+                # swallow it as a generic Exception below.
+                raise
             except Exception:
                 raw = None
                 break

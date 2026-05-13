@@ -43,7 +43,7 @@
     "reload": "Yeniden yükle",
     "copyDetails": "Ayrıntıları kopyala",
     "unreachable": "0'a ulaşılamadı {target}",
-    "partialSummary": "{loaded} of {total} {item} loaded. {failed} failed.",
+    "partialSummary": "{total} {item} içinden {loaded} yüklendi. {failed} başarısız oldu.",
     "partialRetry": "Yeniden deneme başarısız oldu"
   },
   "offline": {
@@ -90,28 +90,28 @@
     "secondaryAsideLabel": "İkincil teşhis",
     "hero": {
       "productTitle": "Bulgular Kontrol Paneli",
-      "gaugeTitle": "Sağlık puanı 0/100 (derece 1). Hatalar en ağırdır. {score} {grade}"
+      "gaugeTitle": "Sağlık puanı 0/100 (derece 1). Hatalar en ağırdır. {grade} {score}"
     },
     "time": {
       "justNow": "Şu anda",
-      "minutesAgo": "{min}m ago",
-      "hoursAgo": "{hr}h ago",
-      "daysAgo": "{day}d ago"
+      "minutesAgo": "{min} dk önce",
+      "hoursAgo": "{hr} sa önce",
+      "daysAgo": "{day} g önce"
     },
     "status": {
       "lastRunPrefix": "Son çalıştırma",
       "lastRunUnknown": "Son çalıştırma bilinmiyor",
       "noTimestampTitle": "İhlaller.json'da zaman damgası yok",
       "findingsAfterFilterTitle": "Devre dışı bırakılan kural filtresinden sonraki toplam bulgular",
-      "findingOne": "{count} finding",
-      "findingOther": "{count} findings",
+      "findingOne": "{count} bulgu",
+      "findingOther": "{count} bulgu",
       "todoHackTitle": "Çalışma alanında TODO ve HACK işaretleri bulundu",
       "driftOnTitle": "Drift Danışmanı bağlandı: 0 {label}",
       "driftOnPill": "Drift açık · 0 {count}",
       "driftOfflineTitle": "Drift Danışmanı etkin ancak sunucu bulunamadı",
       "driftOfflinePill": "Çevrimdışı sürüklen",
       "enabledRulesTitle": "Geçerli katmanda etkin kurallar",
-      "rulesCount": "{count} rules"
+      "rulesCount": "{count} kural"
     },
     "groupBy": {
       "severity": "Şiddet",
@@ -222,7 +222,7 @@
       "sectionAria": "Bulgular",
       "expandAll": "Tümünü genişlet",
       "collapseAll": "Tümünü daralt",
-      "bulkSelected": "{count} selected",
+      "bulkSelected": "{count} seçildi",
       "bulkCopy": "JSON olarak seçileni kopyala",
       "selectAllTitle": "Görünür tüm bulguları seç",
       "selectAllAria": "Görünür tüm bulguları seç",
@@ -233,8 +233,8 @@
       "colActionsAria": "Satır eylemleri",
       "selectRowAria": "Bu bulma satırını seçin",
       "copyRowTitle": "Bu bulguyu JSON olarak kopyalayın",
-      "metaShown": "{filtered} shown",
-      "metaAfterDisable": "{total} after disabled-rule filter",
+      "metaShown": "{filtered} gösteriliyor",
+      "metaAfterDisable": "devre dışı bırakılan kural filtresinden sonra {total}",
       "metaSourceCap": "performans için kaynak 0 ile sınırlandırıldı {max}",
       "metaGroupedBy": "0'ye göre gruplandırılmış {mode}",
       "overflowNote": "Oluşturma performansı için kaynak listesi 0'da kesildi. {max}",
@@ -263,7 +263,7 @@
       "scanOff": "Çalışma alanı taraması kapalı; proje dosyalarındaki işaretçilerin yüzeye çıkmasını etkinleştirin.",
       "enableScan": "Taramayı etkinleştir",
       "heading": "YAPILACAKLAR VE HACK'LER",
-      "subsectionNone": "{title}: none in scan range.",
+      "subsectionNone": "{title}: tarama aralığında hiç yok.",
       "capNote": "Tarama isabeti maksimum dosya sınırı; Tam kapsama için `saropaLints.todosAndHacks.maxFilesToScan'ı yükseltin.",
       "notePill": "Not",
       "todosLabel": "YAPILACAKLAR",
@@ -299,12 +299,12 @@
       "byFile": "Dosyaya göre (0) {count}",
       "noEntries": "Giriş yok.",
       "nothingHidden": "Bu çalışma alanındaki Sorunlar listesinde gizlenen hiçbir şey yok. Klasörleri, dosyaları veya kuralları gizlemek için ağaç bağlamı eylemlerini kullanın; çalışma alanı durumunda kalırlar.",
-      "folderPattern": "{count} folder(s)",
-      "filePattern": "{count} file pattern(s)",
-      "ruleGlobal": "{count} rule(s) globally",
-      "perFileRules": "{count} file(s) with per-file rule hides",
-      "severityHides": "{count} severity hide(s)",
-      "impactHides": "{count} impact hide(s)",
+      "folderPattern": "{count} klasör",
+      "filePattern": "{count} dosya deseni",
+      "ruleGlobal": "küresel olarak {count} kural",
+      "perFileRules": "dosya başına kural gizlemeleri olan {count} dosya",
+      "severityHides": "{count} önem derecesi gizleme",
+      "impactHides": "{count} etki gizleme",
       "activeHides": "Aktif gizlemeler: 0. {counts}",
       "viewHidesFooter": "Bu gizlemeler yalnızca Sorunlar/kontrol paneli listesini daraltır; `violations.json' dosyasına yazılmazlar.",
       "clearViewHides": "Tüm görünüm gizlemelerini temizle",
@@ -320,11 +320,11 @@
       "metaRunning": "Büyük projelerde bu biraz zaman alabilir.",
       "metaDone": "En son bulgularla kontrol paneli yenileniyor.",
       "announceSearch": "arama 0 {q}",
-      "announceSeverities": "{n} severities",
-      "announceImpacts": "{n} impacts",
+      "announceSeverities": "{n} önem derecesi",
+      "announceImpacts": "{n} etki",
       "announceCleared": "Tüm filtreler temizlendi",
       "announceFiltersPrefix": "Filtreler:",
-      "bulkSelected": "{n} selected",
+      "bulkSelected": "{n} seçildi",
       "analysisStartedDetail": "Analiz başladı. Teşhis toplanıyor…",
       "announceStarted": "Analiz başladı",
       "announceComplete": "Analiz tamamlandı",
@@ -332,7 +332,7 @@
       "analysisFailedDetail": "Analiz başarısız oldu. Ayrıntılar için çıktıyı kontrol edin.",
       "removeRecentAria": "Kaldırmak",
       "removeRecentTitle": "Kaldırmak",
-      "bulkSelectedTpl": "{n} selected"
+      "bulkSelectedTpl": "{n} seçildi"
     },
     "emptyState": {
       "hintAfterMessage": "İhlaller.json oluşturmak için bir Saropa Lints analizi çalıştırın, ardından Burayı Yenile'yi kullanın veya bu kontrol panelini yeniden açın.",
@@ -347,14 +347,14 @@
     },
     "unknownAnalyzerKind": "Bilinmiyor",
     "supplementary": {
-      "otherAnalyzerOn": "+{count} other analyzer findings",
-      "otherAnalyzerPromo": "+? other analyzer findings — show",
-      "analyzerTodosOn": "+{count} analyzer TODOs",
-      "analyzerTodosPromo": "+? analyzer TODOs — show",
-      "scannerPromo": "Enable TODO/HACK scanner",
-      "tooltipLive": "Live from VS Code Problems panel. Updates as analysis completes. Click to hide.",
-      "tooltipScanner": "Saropa file-system scanner — counts open TODO/HACK markers in source.",
-      "tooltipPromoClickToOn": "Click to enable"
+      "otherAnalyzerOn": "+0 diğer analizör bulguları {count}",
+      "otherAnalyzerPromo": "+? diğer analizör bulguları - göster",
+      "analyzerTodosOn": "+0 analizci YAPILACAKLAR {count}",
+      "analyzerTodosPromo": "+? analizci YAPILACAKLAR — göster",
+      "scannerPromo": "TODO/HACK tarayıcısını etkinleştir",
+      "tooltipLive": "VS Kod Sorunları panelinden canlı yayın. Analiz tamamlandıkça güncellenir. Gizlemek için tıklayın.",
+      "tooltipScanner": "Saropa dosya sistemi tarayıcısı — kaynaktaki açık TODO/HACK işaretçilerini sayar.",
+      "tooltipPromoClickToOn": "Etkinleştirmek için tıklayın"
     }
   },
   "triageDash": {
@@ -366,8 +366,8 @@
     "on": "Açık",
     "colRule": "Kural",
     "colIssues": "Sorunlar",
-    "zeroIssueRules": "{count} rules with zero issues — auto-enabled in tier.",
-    "disabledOverrides": "{count} rules disabled by override in `analysis_options_custom.yaml`.",
+    "zeroIssueRules": "sıfır sorunu olan {count} kural — katmanda otomatik olarak etkinleştirildi.",
+    "disabledOverrides": "`analysis_options_custom.yaml` içindeki geçersiz kılma nedeniyle {count} kural devre dışı bırakıldı.",
     "summaryRuleTriage": "Kural triyajı",
     "hintNoViolations": "Henüz 'reports/.saropa_lints/violations.json' yok. Analizi çalıştırın ve ardından bu sekmeyi yenileyin.",
     "hintUnreadable": "Okunabilir ihlal aktarımı yok. Önce Saropa Lints analizini çalıştırın.",
@@ -402,10 +402,10 @@
     "documentTitle": "Saropa Paket Kontrol Paneli",
     "heroTitle": "Saropa Paket Kontrol Paneli",
     "status": {
-      "packagesCount": "{count} packages",
-      "packagesBreakdown": "{direct} direct, {transitive} transitive",
+      "packagesCount": "{count} paket",
+      "packagesBreakdown": "{direct} doğrudan, {transitive} geçişli",
       "gradeLine": "Derece 0 · 1/100 {grade} {avg}",
-      "flaggedCount": "{count} flagged",
+      "flaggedCount": "{count} işaretlendi",
       "flaggedTitle": "Terk edilmiş veya ömrünün sonu"
     },
     "scanning": {
@@ -419,7 +419,7 @@
       "packages": "Paketler",
       "projectGrade": "Proje Paketi Notu",
       "totalSize": "Toplam Boyut*",
-      "gradeTooltip": "Proje notu 0\nOrtalama puan: 1/100\nPaketler: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {avgScore} {pkgCount} {a} {b} {c} {e} {f}",
+      "gradeTooltip": "Proje notu 0\nOrtalama puan: 1/100\nPaketler: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {b} {avgScore} {c} {f} {avgGrade} {a} {e}",
       "vibrantTitle": "Canlı",
       "stableTitle": "Stabil",
       "outdatedTitle": "Modası geçmiş",
@@ -435,6 +435,11 @@
     },
     "network": {
       "summary": "Bağımlılık Ağı"
+    },
+    "sections": {
+      "sizeDistribution": "Boyut Dağılımı",
+      "filters": "Filtreler",
+      "packages": "Paketler"
     },
     "toolbar": {
       "openPubspecTitle": "pubspec.yaml'ı açın",
@@ -573,10 +578,10 @@
     "skipLink": "Komut kataloğuna atla",
     "heroTitle": "Saropa Komuta Kataloğu",
     "status": {
-      "commands": "{count} commands",
-      "categories": "{count} categories",
-      "recent": "{count} recent",
-      "internalHidden": "{count} context-menu only (hidden)",
+      "commands": "{count} komut",
+      "categories": "{count} kategori",
+      "recent": "{count} yeni",
+      "internalHidden": "yalnızca {count} bağlam menüsü (gizli)",
       "wordCommands": "komutlar",
       "wordCategories": "kategoriler",
       "wordRecent": "son"
@@ -645,8 +650,8 @@
       "searchChip": "Arama: \"0\" {query}",
       "internalChip": "Bağlam menüsü komutları gösteriliyor",
       "removeFilterPrefix": "Filtreyi kaldır",
-      "matchOne": "{count} match",
-      "matchOther": "{count} matches"
+      "matchOne": "{count} eşleşme",
+      "matchOther": "{count} eşleşme"
     }
   },
   "codeHealth": {
@@ -661,9 +666,9 @@
     "hero": {
       "title": "Saropa Kod Sağlık Kontrol Paneli",
       "generated": "Oluşturuldu",
-      "functionOne": "{count} function",
-      "functionOther": "{count} functions",
-      "avgFormat": "ortalama 0 (1) {score} {grade}",
+      "functionOne": "{count} işlev",
+      "functionOther": "{count} işlev",
+      "avgFormat": "ortalama 0 (1) {grade} {score}",
       "gatesFailing": "kapılar başarısız",
       "gatesPassing": "geçen kapılar"
     },
@@ -673,8 +678,8 @@
     },
     "gate": {
       "fallback": "Kalite kapıları başarısız oldu; Kod Durumu ayarlarındaki eşikleri inceleyin.",
-      "failingOne": "{count} gate failing — review thresholds, or copy the JSON to inspect gates.violations.",
-      "failingOther": "{count} gates failing — review thresholds, or copy the JSON to inspect gates.violations.",
+      "failingOne": "{count} geçit başarısız — eşikleri gözden geçirin veya gates.violations'ı incelemek için JSON'u kopyalayın.",
+      "failingOther": "{count} geçit başarısız — eşikleri gözden geçirin veya gates.violations'ı incelemek için JSON'u kopyalayın.",
       "openSettingsTitle": "Eşikleri ayarlamak için Kod Sağlığı ayarlarını açın.",
       "openSettingsButton": "Kod Sağlığı ayarlarını aç"
     },
@@ -737,15 +742,15 @@
       "flagChip": "bayrak: 0 {flag}",
       "removeAria": "0'yi kaldır {key}",
       "clearAll": "Tümünü temizle",
-      "rowsVisible": "{visible} of {total} rows visible",
+      "rowsVisible": "{total} satırdan {visible} satır görünür",
       "neverRun": "asla koşma"
     },
     "freshness": {
       "justNow": "Şu anda",
-      "minutesAgo": "{min}m ago",
-      "hoursAgo": "{hr}h ago",
-      "daysAgo": "{day}d ago",
-      "weeksAgo": "{wk}w ago"
+      "minutesAgo": "{min} dk önce",
+      "hoursAgo": "{hr} sa önce",
+      "daysAgo": "{day} g önce",
+      "weeksAgo": "{wk} hft önce"
     }
   },
   "suppressionsStrip": {
@@ -760,7 +765,7 @@
     "noFileRisk": "Dosya başına risk dökümü yok (kapsam dahilinde ihlal yok).",
     "suppressionNote": "İhlaller.json özetiyle eşleşir, canlı kenar çubuğu bastırma geçişleri değil.",
     "noSuppression": "Bu dışa aktarmada gizleme toplamı yok (eski analizör veya sıfır gizleme).",
-    "owaspSignal": "{count} violation(s) in this export carry OWASP mobile/web mapping — open Security Posture for the full matrix and export.",
+    "owaspSignal": "Bu dışa aktarımdaki {count} ihlal OWASP mobil/web eşlemesini içerir — tam matris ve dışa aktarım için Güvenlik Duruşu'nu açın.",
     "summarySuppressions": "Bastırmalar (anlık görüntüyü dışa aktarma)",
     "summaryOwasp": "Güvenlik duruşu (OWASP sinyali)",
     "summaryFileRisk": "Dosya riski (en iyi dosyalar)"
@@ -770,8 +775,8 @@
     "skipToCounters": "Telemetri sayaçlarına atla",
     "lastEvent": "Son etkinlik 0 {relative}",
     "noEvents": "Kayıtlı etkinlik yok",
-    "totalEventOne": "{count} total event",
-    "totalEventOther": "{count} total events",
+    "totalEventOne": "toplam {count} etkinlik",
+    "totalEventOther": "toplam {count} etkinlik",
     "noCountersTitle": "Sıfırlanacak sayaç yok.",
     "resetTitle": "Tüm sayaçları sıfırla",
     "refreshTitle": "Telemetri sayaçlarını diskten yeniden yükle",
@@ -795,11 +800,11 @@
     "hint": "Saropa etkinlik çubuğu bölümlerini buradan açın veya kapatın (kontrol panelinden ayrılmadan, çalışma alanıyla birlikte kaydedilir)."
   },
   "securityPosture": {
-    "issueOne": "{count} issue",
-    "issueOther": "{count} issues",
+    "issueOne": "{count} sorun",
+    "issueOther": "{count} sorun",
     "noIssues": "Sorun yok",
     "showIssues": "Sorunları göster",
-    "violationTooltip": "{count} violation(s) across {ruleCount} rule(s). Click to show in Issues.",
+    "violationTooltip": "{ruleCount} kuralda {count} ihlal. Sorunlar'da göstermek için tıklayın.",
     "noViolationsTooltip": "Bu kategoriyle eşlenen ihlal yok."
   }
 }

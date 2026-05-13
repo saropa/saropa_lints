@@ -43,7 +43,7 @@
     "reload": "Muat ulang",
     "copyDetails": "Salin detailnya",
     "unreachable": "Tidak dapat mencapai 0 {target}",
-    "partialSummary": "{loaded} of {total} {item} loaded. {failed} failed.",
+    "partialSummary": "{loaded} dari {total} {item} dimuat. {failed} gagal.",
     "partialRetry": "Coba lagi gagal"
   },
   "offline": {
@@ -90,28 +90,28 @@
     "secondaryAsideLabel": "Diagnostik sekunder",
     "hero": {
       "productTitle": "Dasbor Temuan",
-      "gaugeTitle": "Skor kesehatan 0/100 (kelas 1). Kesalahan adalah hal yang paling berat. {score} {grade}"
+      "gaugeTitle": "Skor kesehatan 0/100 (kelas 1). Kesalahan adalah hal yang paling berat. {grade} {score}"
     },
     "time": {
       "justNow": "baru saja",
-      "minutesAgo": "{min}m ago",
-      "hoursAgo": "{hr}h ago",
-      "daysAgo": "{day}d ago"
+      "minutesAgo": "{min}m yang lalu",
+      "hoursAgo": "{hr}j yang lalu",
+      "daysAgo": "{day}h yang lalu"
     },
     "status": {
       "lastRunPrefix": "Lari terakhir",
       "lastRunUnknown": "Terakhir dijalankan tidak diketahui",
       "noTimestampTitle": "Tidak ada stempel waktu pada pelanggaran.json",
       "findingsAfterFilterTitle": "Total temuan setelah filter aturan dinonaktifkan",
-      "findingOne": "{count} finding",
-      "findingOther": "{count} findings",
+      "findingOne": "{count} temuan",
+      "findingOther": "{count} temuan",
       "todoHackTitle": "Penanda TODO dan HACK ditemukan di ruang kerja",
       "driftOnTitle": "Penasihat Drift terhubung: 0 {label}",
       "driftOnPill": "Melayang · 0 {count}",
       "driftOfflineTitle": "Drift Advisor diaktifkan tetapi tidak ada server yang ditemukan",
       "driftOfflinePill": "Melayang offline",
       "enabledRulesTitle": "Aturan yang diaktifkan di tingkat saat ini",
-      "rulesCount": "{count} rules"
+      "rulesCount": "{count} aturan"
     },
     "groupBy": {
       "severity": "Kerasnya",
@@ -222,7 +222,7 @@
       "sectionAria": "Temuan",
       "expandAll": "Perluas semuanya",
       "collapseAll": "Ciutkan semuanya",
-      "bulkSelected": "{count} selected",
+      "bulkSelected": "{count} dipilih",
       "bulkCopy": "Salin dipilih sebagai JSON",
       "selectAllTitle": "Pilih semua temuan yang terlihat",
       "selectAllAria": "Pilih semua temuan yang terlihat",
@@ -233,8 +233,8 @@
       "colActionsAria": "Tindakan baris",
       "selectRowAria": "Pilih baris temuan ini",
       "copyRowTitle": "Salin temuan ini sebagai JSON",
-      "metaShown": "{filtered} shown",
-      "metaAfterDisable": "{total} after disabled-rule filter",
+      "metaShown": "{filtered} ditampilkan",
+      "metaAfterDisable": "{total} setelah filter aturan dinonaktifkan",
       "metaSourceCap": "sumber dibatasi pada 0 untuk kinerja {max}",
       "metaGroupedBy": "dikelompokkan berdasarkan 0 {mode}",
       "overflowNote": "Daftar sumber terpotong pada 0 untuk kinerja render. {max}",
@@ -263,7 +263,7 @@
       "scanOff": "Pemindaian ruang kerja tidak aktif — aktifkan untuk menampilkan penanda dari file proyek.",
       "enableScan": "Aktifkan pemindaian",
       "heading": "TODO & HACKS",
-      "subsectionNone": "{title}: none in scan range.",
+      "subsectionNone": "{title}: tidak ada dalam jangkauan pemindaian.",
       "capNote": "Pemindaian mencapai batas file maksimal; naikkan `saropaLints.todosAndHacks.maxFilesToScan` untuk cakupan penuh.",
       "notePill": "catatan",
       "todosLabel": "TODO",
@@ -299,12 +299,12 @@
       "byFile": "Berdasarkan file (0) {count}",
       "noEntries": "Tidak ada entri.",
       "nothingHidden": "Tidak ada yang tersembunyi dari daftar Masalah di ruang kerja ini. Gunakan tindakan konteks pohon untuk menyembunyikan folder, file, atau aturan; mereka bertahan dalam status ruang kerja.",
-      "folderPattern": "{count} folder(s)",
-      "filePattern": "{count} file pattern(s)",
-      "ruleGlobal": "{count} rule(s) globally",
-      "perFileRules": "{count} file(s) with per-file rule hides",
-      "severityHides": "{count} severity hide(s)",
-      "impactHides": "{count} impact hide(s)",
+      "folderPattern": "{count} folder",
+      "filePattern": "{count} pola file",
+      "ruleGlobal": "{count} aturan secara global",
+      "perFileRules": "{count} file dengan aturan sembunyikan per file",
+      "severityHides": "{count} sembunyikan keparahan",
+      "impactHides": "{count} sembunyikan dampak",
       "activeHides": "Sembunyikan aktif: 0. {counts}",
       "viewHidesFooter": "Penyembunyian ini hanya memperkecil daftar Masalah/dasbor; mereka tidak ditulis ke `violations.json`.",
       "clearViewHides": "Hapus semua tampilan yang disembunyikan",
@@ -320,11 +320,11 @@
       "metaRunning": "Ini bisa memakan waktu cukup lama pada proyek-proyek besar.",
       "metaDone": "Menyegarkan dasbor dengan temuan terbaru.",
       "announceSearch": "cari 0 {q}",
-      "announceSeverities": "{n} severities",
-      "announceImpacts": "{n} impacts",
+      "announceSeverities": "{n} keparahan",
+      "announceImpacts": "{n} dampak",
       "announceCleared": "Semua filter dihapus",
       "announceFiltersPrefix": "Filter:",
-      "bulkSelected": "{n} selected",
+      "bulkSelected": "{n} dipilih",
       "analysisStartedDetail": "Analisis dimulai. Mengumpulkan diagnostik…",
       "announceStarted": "Analisis dimulai",
       "announceComplete": "Analisis selesai",
@@ -332,7 +332,7 @@
       "analysisFailedDetail": "Analisis gagal. Periksa keluaran untuk detailnya.",
       "removeRecentAria": "Menghapus",
       "removeRecentTitle": "Menghapus",
-      "bulkSelectedTpl": "{n} selected"
+      "bulkSelectedTpl": "{n} dipilih"
     },
     "emptyState": {
       "hintAfterMessage": "Jalankan analisis Saropa Lints untuk menghasilkan pelanggaran.json, lalu gunakan Refresh di sini atau buka kembali dasbor ini.",
@@ -347,14 +347,14 @@
     },
     "unknownAnalyzerKind": "Tidak dikenal",
     "supplementary": {
-      "otherAnalyzerOn": "+{count} other analyzer findings",
-      "otherAnalyzerPromo": "+? other analyzer findings — show",
-      "analyzerTodosOn": "+{count} analyzer TODOs",
-      "analyzerTodosPromo": "+? analyzer TODOs — show",
-      "scannerPromo": "Enable TODO/HACK scanner",
-      "tooltipLive": "Live from VS Code Problems panel. Updates as analysis completes. Click to hide.",
-      "tooltipScanner": "Saropa file-system scanner — counts open TODO/HACK markers in source.",
-      "tooltipPromoClickToOn": "Click to enable"
+      "otherAnalyzerOn": "+0 temuan penganalisis lainnya {count}",
+      "otherAnalyzerPromo": "+? temuan penganalisis lainnya — tunjukkan",
+      "analyzerTodosOn": "+0 TODO penganalisis {count}",
+      "analyzerTodosPromo": "+? TODO penganalisis — tunjukkan",
+      "scannerPromo": "Aktifkan pemindai TODO/HACK",
+      "tooltipLive": "Langsung dari panel VS Code Problems. Pembaruan saat analisis selesai. Klik untuk menyembunyikan.",
+      "tooltipScanner": "Pemindai sistem file Saropa — menghitung penanda TODO/HACK yang terbuka di sumber.",
+      "tooltipPromoClickToOn": "Klik untuk mengaktifkan"
     }
   },
   "triageDash": {
@@ -366,8 +366,8 @@
     "on": "Pada",
     "colRule": "Aturan",
     "colIssues": "Masalah",
-    "zeroIssueRules": "{count} rules with zero issues — auto-enabled in tier.",
-    "disabledOverrides": "{count} rules disabled by override in `analysis_options_custom.yaml`.",
+    "zeroIssueRules": "{count} aturan tanpa masalah — otomatis diaktifkan di tingkat.",
+    "disabledOverrides": "{count} aturan dinonaktifkan dengan menimpa di `analysis_options_custom.yaml`.",
     "summaryRuleTriage": "Aturan triase",
     "hintNoViolations": "Belum ada `reports/.saropa_lints/violations.json`. Jalankan analisis, lalu segarkan tab ini.",
     "hintUnreadable": "Tidak ada ekspor pelanggaran yang dapat dibaca. Jalankan analisis Saropa Lints terlebih dahulu.",
@@ -402,10 +402,10 @@
     "documentTitle": "Dasbor Paket Saropa",
     "heroTitle": "Dasbor Paket Saropa",
     "status": {
-      "packagesCount": "{count} packages",
-      "packagesBreakdown": "{direct} direct, {transitive} transitive",
+      "packagesCount": "{count} paket",
+      "packagesBreakdown": "{direct} langsung, {transitive} transitif",
       "gradeLine": "Kelas 0 · 1/100 {grade} {avg}",
-      "flaggedCount": "{count} flagged",
+      "flaggedCount": "{count} ditandai",
       "flaggedTitle": "Ditinggalkan atau akhir kehidupan"
     },
     "scanning": {
@@ -419,7 +419,7 @@
       "packages": "Paket",
       "projectGrade": "Kelas Paket Proyek",
       "totalSize": "Ukuran Jumlah*",
-      "gradeTooltip": "Kelas proyek 0\nSkor rata-rata: 1/100\nPaket: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {avgScore} {pkgCount} {a} {b} {c} {e} {f}",
+      "gradeTooltip": "Kelas proyek 0\nSkor rata-rata: 1/100\nPaket: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {b} {avgScore} {c} {f} {avgGrade} {a} {e}",
       "vibrantTitle": "Bersemangat",
       "stableTitle": "Stabil",
       "outdatedTitle": "Kedaluwarsa",
@@ -435,6 +435,11 @@
     },
     "network": {
       "summary": "Jaringan Ketergantungan"
+    },
+    "sections": {
+      "sizeDistribution": "Distribusi Ukuran",
+      "filters": "Filter",
+      "packages": "Paket"
     },
     "toolbar": {
       "openPubspecTitle": "Buka pubspec.yaml",
@@ -573,10 +578,10 @@
     "skipLink": "Lewati ke katalog perintah",
     "heroTitle": "Katalog Komando Saropa",
     "status": {
-      "commands": "{count} commands",
-      "categories": "{count} categories",
-      "recent": "{count} recent",
-      "internalHidden": "{count} context-menu only (hidden)",
+      "commands": "{count} perintah",
+      "categories": "{count} kategori",
+      "recent": "{count} terbaru",
+      "internalHidden": "{count} hanya menu konteks (tersembunyi)",
       "wordCommands": "perintah",
       "wordCategories": "kategori",
       "wordRecent": "terkini"
@@ -645,8 +650,8 @@
       "searchChip": "Pencarian: \"0\" {query}",
       "internalChip": "Menampilkan perintah menu konteks",
       "removeFilterPrefix": "Hapus penyaring",
-      "matchOne": "{count} match",
-      "matchOther": "{count} matches"
+      "matchOne": "{count} kecocokan",
+      "matchOther": "{count} kecocokan"
     }
   },
   "codeHealth": {
@@ -661,9 +666,9 @@
     "hero": {
       "title": "Dasbor Kesehatan Kode Saropa",
       "generated": "Dihasilkan",
-      "functionOne": "{count} function",
-      "functionOther": "{count} functions",
-      "avgFormat": "rata-rata 0 (1) {score} {grade}",
+      "functionOne": "{count} fungsi",
+      "functionOther": "{count} fungsi",
+      "avgFormat": "rata-rata 0 (1) {grade} {score}",
       "gatesFailing": "gerbang gagal",
       "gatesPassing": "gerbang lewat"
     },
@@ -673,8 +678,8 @@
     },
     "gate": {
       "fallback": "Gerbang kualitas gagal — meninjau ambang batas dalam pengaturan Code Health.",
-      "failingOne": "{count} gate failing — review thresholds, or copy the JSON to inspect gates.violations.",
-      "failingOther": "{count} gates failing — review thresholds, or copy the JSON to inspect gates.violations.",
+      "failingOne": "{count} gerbang gagal — tinjau ambang batas, atau salin JSON untuk memeriksa gates.violations.",
+      "failingOther": "{count} gerbang gagal — tinjau ambang batas, atau salin JSON untuk memeriksa gates.violations.",
       "openSettingsTitle": "Buka pengaturan Kode Kesehatan untuk menyesuaikan ambang batas.",
       "openSettingsButton": "Buka pengaturan Kesehatan Kode"
     },
@@ -737,15 +742,15 @@
       "flagChip": "bendera: 0 {flag}",
       "removeAria": "Hapus 0 {key}",
       "clearAll": "Hapus semuanya",
-      "rowsVisible": "{visible} of {total} rows visible",
+      "rowsVisible": "{visible} dari {total} baris terlihat",
       "neverRun": "jangan pernah lari"
     },
     "freshness": {
       "justNow": "baru saja",
-      "minutesAgo": "{min}m ago",
-      "hoursAgo": "{hr}h ago",
-      "daysAgo": "{day}d ago",
-      "weeksAgo": "{wk}w ago"
+      "minutesAgo": "{min}m yang lalu",
+      "hoursAgo": "{hr}j yang lalu",
+      "daysAgo": "{day}h yang lalu",
+      "weeksAgo": "{wk}m yang lalu"
     }
   },
   "suppressionsStrip": {
@@ -760,7 +765,7 @@
     "noFileRisk": "Tidak ada perincian risiko per file (tidak ada pelanggaran dalam cakupan).",
     "suppressionNote": "Cocok dengan ringkasan pelanggaran.json, bukan tombol matikan penekanan sidebar langsung.",
     "noSuppression": "Tidak ada agregat penekanan dalam ekspor ini (penganalisis lama atau tanpa penekanan).",
-    "owaspSignal": "{count} violation(s) in this export carry OWASP mobile/web mapping — open Security Posture for the full matrix and export.",
+    "owaspSignal": "{count} pelanggaran dalam ekspor ini membawa pemetaan mobile/web OWASP — buka Postur Keamanan untuk matriks penuh dan ekspor.",
     "summarySuppressions": "Penindasan (ekspor cuplikan)",
     "summaryOwasp": "Postur keamanan (sinyal OWASP)",
     "summaryFileRisk": "Risiko file (file teratas)"
@@ -770,8 +775,8 @@
     "skipToCounters": "Lewati ke penghitung telemetri",
     "lastEvent": "Acara terakhir 0 {relative}",
     "noEvents": "Tidak ada peristiwa yang tercatat",
-    "totalEventOne": "{count} total event",
-    "totalEventOther": "{count} total events",
+    "totalEventOne": "total {count} peristiwa",
+    "totalEventOther": "total {count} peristiwa",
     "noCountersTitle": "Tidak ada penghitung untuk diatur ulang.",
     "resetTitle": "Setel ulang semua penghitung",
     "refreshTitle": "Muat ulang penghitung telemetri dari disk",
@@ -795,11 +800,11 @@
     "hint": "Aktifkan atau nonaktifkan bagian bilah aktivitas Saropa di sini (disimpan bersama ruang kerja, tanpa meninggalkan dasbor)."
   },
   "securityPosture": {
-    "issueOne": "{count} issue",
-    "issueOther": "{count} issues",
+    "issueOne": "{count} masalah",
+    "issueOther": "{count} masalah",
     "noIssues": "Tidak ada masalah",
     "showIssues": "Tampilkan masalah",
-    "violationTooltip": "{count} violation(s) across {ruleCount} rule(s). Click to show in Issues.",
+    "violationTooltip": "{count} pelanggaran di {ruleCount} aturan. Klik untuk menampilkan di Masalah.",
     "noViolationsTooltip": "Tidak ada pelanggaran yang dipetakan ke kategori ini."
   }
 }

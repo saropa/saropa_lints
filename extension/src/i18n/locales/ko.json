@@ -43,7 +43,7 @@
     "reload": "새로고침",
     "copyDetails": "세부정보 복사",
     "unreachable": "0에 도달할 수 없습니다. {target}",
-    "partialSummary": "{loaded} of {total} {item} loaded. {failed} failed.",
+    "partialSummary": "{total}개의 {item} 중 {loaded}개 로드됨. {failed}개 실패.",
     "partialRetry": "재시도 실패"
   },
   "offline": {
@@ -90,28 +90,28 @@
     "secondaryAsideLabel": "2차 진단",
     "hero": {
       "productTitle": "발견 항목 대시보드",
-      "gaugeTitle": "건강 점수 0/100(학년 1). 오류의 무게가 가장 무겁습니다. {score} {grade}"
+      "gaugeTitle": "건강 점수 0/100(학년 1). 오류의 무게가 가장 무겁습니다. {grade} {score}"
     },
     "time": {
       "justNow": "방금",
-      "minutesAgo": "{min}m ago",
-      "hoursAgo": "{hr}h ago",
-      "daysAgo": "{day}d ago"
+      "minutesAgo": "{min}분 전",
+      "hoursAgo": "{hr}시간 전",
+      "daysAgo": "{day}일 전"
     },
     "status": {
       "lastRunPrefix": "마지막 실행",
       "lastRunUnknown": "마지막 실행을 알 수 없음",
       "noTimestampTitle": "위반.json에 타임스탬프가 없습니다.",
       "findingsAfterFilterTitle": "비활성화된 규칙 필터 이후의 총 발견 항목",
-      "findingOne": "{count} finding",
-      "findingOther": "{count} findings",
+      "findingOne": "{count}개 결과",
+      "findingOther": "{count}개 결과",
       "todoHackTitle": "작업 공간에서 TODO 및 HACK 마커를 찾을 수 있습니다.",
       "driftOnTitle": "드리프트 어드바이저 연결됨: 0 {label}",
       "driftOnPill": "드리프트 온 · 0 {count}",
       "driftOfflineTitle": "Drift Advisor가 활성화되었지만 서버를 찾을 수 없습니다.",
       "driftOfflinePill": "드리프트 오프라인",
       "enabledRulesTitle": "현재 계층에서 활성화된 규칙",
-      "rulesCount": "{count} rules"
+      "rulesCount": "{count}개 규칙"
     },
     "groupBy": {
       "severity": "심각성",
@@ -222,7 +222,7 @@
       "sectionAria": "조사 결과",
       "expandAll": "모두 펼치기",
       "collapseAll": "모두 접기",
-      "bulkSelected": "{count} selected",
+      "bulkSelected": "{count}개 선택됨",
       "bulkCopy": "JSON으로 선택된 복사본",
       "selectAllTitle": "표시되는 발견 항목 모두 선택",
       "selectAllAria": "표시되는 발견 항목 모두 선택",
@@ -233,8 +233,8 @@
       "colActionsAria": "행 작업",
       "selectRowAria": "이 발견 항목 행을 선택하세요.",
       "copyRowTitle": "이 발견 항목을 JSON으로 복사",
-      "metaShown": "{filtered} shown",
-      "metaAfterDisable": "{total} after disabled-rule filter",
+      "metaShown": "{filtered}개 표시됨",
+      "metaAfterDisable": "비활성화된 규칙 필터 적용 후 {total}개",
       "metaSourceCap": "성능을 위해 소스는 0로 제한됩니다. {max}",
       "metaGroupedBy": "0로 그룹화됨 {mode}",
       "overflowNote": "렌더링 성능을 위해 0에서 소스 목록이 잘렸습니다. {max}",
@@ -263,7 +263,7 @@
       "scanOff": "작업 공간 스캔이 꺼져 있습니다. 프로젝트 파일에서 마커를 표시하려면 활성화하세요.",
       "enableScan": "스캔 활성화",
       "heading": "TODO 및 해킹",
-      "subsectionNone": "{title}: none in scan range.",
+      "subsectionNone": "{title}: 스캔 범위에 없습니다.",
       "capNote": "스캔 히트 최대 파일 한도; 전체 적용 범위를 위해 `saropaLints.todosAndHacks.maxFilesToScan`을 올립니다.",
       "notePill": "메모",
       "todosLabel": "TODO",
@@ -299,12 +299,12 @@
       "byFile": "파일별(0) {count}",
       "noEntries": "항목이 없습니다.",
       "nothingHidden": "이 작업 영역의 문제 목록에는 숨겨진 항목이 없습니다. 트리 컨텍스트 작업을 사용하여 폴더, 파일 또는 규칙을 숨깁니다. 작업공간 상태로 유지됩니다.",
-      "folderPattern": "{count} folder(s)",
-      "filePattern": "{count} file pattern(s)",
-      "ruleGlobal": "{count} rule(s) globally",
-      "perFileRules": "{count} file(s) with per-file rule hides",
-      "severityHides": "{count} severity hide(s)",
-      "impactHides": "{count} impact hide(s)",
+      "folderPattern": "{count}개 폴더",
+      "filePattern": "{count}개 파일 패턴",
+      "ruleGlobal": "전역적으로 {count}개 규칙",
+      "perFileRules": "{count}개 파일(파일별 숨김 규칙 적용됨)",
+      "severityHides": "{count}개 심각도 숨김",
+      "impactHides": "{count}개 영향 숨김",
       "activeHides": "활성 가죽: 0. {counts}",
       "viewHidesFooter": "이렇게 하면 문제/대시보드 목록만 축소됩니다. `violations.json`에는 기록되지 않습니다.",
       "clearViewHides": "모든 뷰 숨기기 지우기",
@@ -320,11 +320,11 @@
       "metaRunning": "대규모 프로젝트에서는 이 작업에 시간이 걸릴 수 있습니다.",
       "metaDone": "최신 결과로 대시보드를 새로 고칩니다.",
       "announceSearch": "검색 0 {q}",
-      "announceSeverities": "{n} severities",
-      "announceImpacts": "{n} impacts",
+      "announceSeverities": "{n}개 심각도",
+      "announceImpacts": "{n}개 영향",
       "announceCleared": "모든 필터가 지워졌습니다.",
       "announceFiltersPrefix": "필터:",
-      "bulkSelected": "{n} selected",
+      "bulkSelected": "{n}개 선택됨",
       "analysisStartedDetail": "분석이 시작되었습니다. 진단 정보 수집 중…",
       "announceStarted": "분석이 시작되었습니다",
       "announceComplete": "분석 완료",
@@ -332,7 +332,7 @@
       "analysisFailedDetail": "분석에 실패했습니다. 자세한 내용은 출력을 확인하세요.",
       "removeRecentAria": "제거하다",
       "removeRecentTitle": "제거하다",
-      "bulkSelectedTpl": "{n} selected"
+      "bulkSelectedTpl": "{n}개 선택됨"
     },
     "emptyState": {
       "hintAfterMessage": "Saropa Lints 분석을 실행하여 위반.json을 생성한 다음 여기에서 새로 고침을 사용하거나 이 대시보드를 다시 엽니다.",
@@ -347,14 +347,14 @@
     },
     "unknownAnalyzerKind": "알려지지 않은",
     "supplementary": {
-      "otherAnalyzerOn": "+{count} other analyzer findings",
-      "otherAnalyzerPromo": "+? other analyzer findings — show",
-      "analyzerTodosOn": "+{count} analyzer TODOs",
-      "analyzerTodosPromo": "+? analyzer TODOs — show",
-      "scannerPromo": "Enable TODO/HACK scanner",
-      "tooltipLive": "Live from VS Code Problems panel. Updates as analysis completes. Click to hide.",
-      "tooltipScanner": "Saropa file-system scanner — counts open TODO/HACK markers in source.",
-      "tooltipPromoClickToOn": "Click to enable"
+      "otherAnalyzerOn": "+0 기타 분석 결과 {count}",
+      "otherAnalyzerPromo": "+? 기타 분석 결과 - 표시",
+      "analyzerTodosOn": "+0 분석기 TODO {count}",
+      "analyzerTodosPromo": "+? 분석기 TODO — 표시",
+      "scannerPromo": "TODO/HACK 스캐너 활성화",
+      "tooltipLive": "VS 코드 문제 패널에서 실시간으로 제공됩니다. 분석이 완료되면 업데이트됩니다. 숨기려면 클릭하세요.",
+      "tooltipScanner": "Saropa 파일 시스템 스캐너 — 소스에서 열려 있는 TODO/HACK 마커를 계산합니다.",
+      "tooltipPromoClickToOn": "활성화하려면 클릭하세요."
     }
   },
   "triageDash": {
@@ -366,8 +366,8 @@
     "on": "~에",
     "colRule": "규칙",
     "colIssues": "문제",
-    "zeroIssueRules": "{count} rules with zero issues — auto-enabled in tier.",
-    "disabledOverrides": "{count} rules disabled by override in `analysis_options_custom.yaml`.",
+    "zeroIssueRules": "문제가 없는 {count}개 규칙 — 해당 계층에서 자동 활성화되었습니다.",
+    "disabledOverrides": "`analysis_options_custom.yaml`의 재정의로 인해 {count}개 규칙이 비활성화되었습니다.",
     "summaryRuleTriage": "규칙 분류",
     "hintNoViolations": "아직 `reports/.saropa_lints/violations.json`이 없습니다. 분석을 실행한 후 이 탭을 새로 고치세요.",
     "hintUnreadable": "읽을 수 있는 위반 내보내기가 없습니다. 먼저 Saropa Lints 분석을 실행하세요.",
@@ -402,10 +402,10 @@
     "documentTitle": "사로파 패키지 대시보드",
     "heroTitle": "사로파 패키지 대시보드",
     "status": {
-      "packagesCount": "{count} packages",
-      "packagesBreakdown": "{direct} direct, {transitive} transitive",
+      "packagesCount": "{count}개 패키지",
+      "packagesBreakdown": "직접 {direct}개, 전이 {transitive}개",
       "gradeLine": "학년 0 · 1/100 {grade} {avg}",
-      "flaggedCount": "{count} flagged",
+      "flaggedCount": "{count}개 플래그됨",
       "flaggedTitle": "버려졌거나 수명이 다한 상태"
     },
     "scanning": {
@@ -419,7 +419,7 @@
       "packages": "패키지",
       "projectGrade": "프로젝트 패키지 등급",
       "totalSize": "전체 크기*",
-      "gradeTooltip": "프로젝트 등급 0\n평균 점수: 1/100\n패키지: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {avgScore} {pkgCount} {a} {b} {c} {e} {f}",
+      "gradeTooltip": "프로젝트 등급 0\n평균 점수: 1/100\n패키지: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {b} {avgScore} {c} {f} {avgGrade} {a} {e}",
       "vibrantTitle": "떠는",
       "stableTitle": "안정적인",
       "outdatedTitle": "구식",
@@ -435,6 +435,11 @@
     },
     "network": {
       "summary": "종속성 네트워크"
+    },
+    "sections": {
+      "sizeDistribution": "크기 분포",
+      "filters": "필터",
+      "packages": "패키지"
     },
     "toolbar": {
       "openPubspecTitle": "pubspec.yaml 열기",
@@ -573,10 +578,10 @@
     "skipLink": "명령 카탈로그로 건너뛰기",
     "heroTitle": "사로파 명령 카탈로그",
     "status": {
-      "commands": "{count} commands",
-      "categories": "{count} categories",
-      "recent": "{count} recent",
-      "internalHidden": "{count} context-menu only (hidden)",
+      "commands": "{count}개 명령",
+      "categories": "{count}개 카테고리",
+      "recent": "최근 {count}개",
+      "internalHidden": "{count}개 컨텍스트 메뉴 전용(숨김)",
       "wordCommands": "명령",
       "wordCategories": "카테고리",
       "wordRecent": "최근의"
@@ -645,8 +650,8 @@
       "searchChip": "검색: \"0\" {query}",
       "internalChip": "상황에 맞는 메뉴 명령 표시",
       "removeFilterPrefix": "필터 제거",
-      "matchOne": "{count} match",
-      "matchOther": "{count} matches"
+      "matchOne": "{count}개 일치",
+      "matchOther": "{count}개 일치"
     }
   },
   "codeHealth": {
@@ -661,9 +666,9 @@
     "hero": {
       "title": "사로파 코드 상태 대시보드",
       "generated": "생성됨",
-      "functionOne": "{count} function",
-      "functionOther": "{count} functions",
-      "avgFormat": "평균 0 (1) {score} {grade}",
+      "functionOne": "{count}개 함수",
+      "functionOther": "{count}개 함수",
+      "avgFormat": "평균 0 (1) {grade} {score}",
       "gatesFailing": "게이트 실패",
       "gatesPassing": "게이트 통과"
     },
@@ -673,8 +678,8 @@
     },
     "gate": {
       "fallback": "품질 게이트 실패 - 코드 상태 설정에서 임계값을 검토하세요.",
-      "failingOne": "{count} gate failing — review thresholds, or copy the JSON to inspect gates.violations.",
-      "failingOther": "{count} gates failing — review thresholds, or copy the JSON to inspect gates.violations.",
+      "failingOne": "{count}개 게이트 실패 — 임계값을 검토하거나 JSON을 복사하여 gates.violations를 검사하세요.",
+      "failingOther": "{count}개 게이트 실패 — 임계값을 검토하거나 JSON을 복사하여 gates.violations를 검사하세요.",
       "openSettingsTitle": "임계값을 조정하려면 코드 상태 설정을 엽니다.",
       "openSettingsButton": "코드 상태 설정 열기"
     },
@@ -737,15 +742,15 @@
       "flagChip": "플래그: 0 {flag}",
       "removeAria": "0 제거 {key}",
       "clearAll": "모두 지우기",
-      "rowsVisible": "{visible} of {total} rows visible",
+      "rowsVisible": "{total}개 행 중 {visible}개 표시됨",
       "neverRun": "절대 뛰지 마세요"
     },
     "freshness": {
       "justNow": "방금",
-      "minutesAgo": "{min}m ago",
-      "hoursAgo": "{hr}h ago",
-      "daysAgo": "{day}d ago",
-      "weeksAgo": "{wk}w ago"
+      "minutesAgo": "{min}분 전",
+      "hoursAgo": "{hr}시간 전",
+      "daysAgo": "{day}일 전",
+      "weeksAgo": "{wk}주 전"
     }
   },
   "suppressionsStrip": {
@@ -760,7 +765,7 @@
     "noFileRisk": "파일별 위험 분석이 없습니다(범위 위반 없음).",
     "suppressionNote": "라이브 사이드바 억제 토글이 아닌 위반.json 요약과 일치합니다.",
     "noSuppression": "이 내보내기에는 억제 집계가 없습니다(이전 분석기 또는 0 억제).",
-    "owaspSignal": "{count} violation(s) in this export carry OWASP mobile/web mapping — open Security Posture for the full matrix and export.",
+    "owaspSignal": "이 내보내기의 {count}개 위반 사항은 OWASP 모바일/웹 매핑을 포함합니다 — 전체 매트릭스 및 내보내기를 보려면 보안 태세를 엽니다.",
     "summarySuppressions": "억제(스냅샷 내보내기)",
     "summaryOwasp": "보안 태세(OWASP 신호)",
     "summaryFileRisk": "파일 위험(상위 파일)"
@@ -770,8 +775,8 @@
     "skipToCounters": "원격 측정 카운터로 건너뛰기",
     "lastEvent": "마지막 이벤트 0 {relative}",
     "noEvents": "기록된 이벤트가 없습니다.",
-    "totalEventOne": "{count} total event",
-    "totalEventOther": "{count} total events",
+    "totalEventOne": "총 {count}개 이벤트",
+    "totalEventOther": "총 {count}개 이벤트",
     "noCountersTitle": "재설정할 카운터가 없습니다.",
     "resetTitle": "모든 카운터 재설정",
     "refreshTitle": "디스크에서 원격 측정 카운터 다시 로드",
@@ -795,11 +800,11 @@
     "hint": "여기에서 Saropa 활동 표시줄 섹션을 켜거나 끕니다(대시보드를 떠나지 않고 작업 공간과 함께 저장됨)."
   },
   "securityPosture": {
-    "issueOne": "{count} issue",
-    "issueOther": "{count} issues",
+    "issueOne": "{count}개 문제",
+    "issueOther": "{count}개 문제",
     "noIssues": "문제 없음",
     "showIssues": "문제 표시",
-    "violationTooltip": "{count} violation(s) across {ruleCount} rule(s). Click to show in Issues.",
+    "violationTooltip": "{ruleCount}개 규칙에 걸쳐 {count}개 위반 사항이 있습니다. 클릭하여 문제에서 표시합니다.",
     "noViolationsTooltip": "이 카테고리에 매핑된 위반사항이 없습니다."
   }
 }

@@ -43,7 +43,7 @@
     "reload": "โหลดซ้ำ",
     "copyDetails": "คัดลอกรายละเอียด",
     "unreachable": "ไม่สามารถเข้าถึง0 {target}",
-    "partialSummary": "{loaded} of {total} {item} loaded. {failed} failed.",
+    "partialSummary": "โหลด {item} {loaded} จาก {total} รายการ ล้มเหลว {failed} รายการ",
     "partialRetry": "ลองอีกครั้งล้มเหลว"
   },
   "offline": {
@@ -90,28 +90,28 @@
     "secondaryAsideLabel": "การวินิจฉัยทุติยภูมิ",
     "hero": {
       "productTitle": "แดชบอร์ดผลการสืบค้น",
-      "gaugeTitle": "คะแนนสุขภาพ 0/100 (เกรด 1) ข้อผิดพลาดมีน้ำหนักมากที่สุด {score} {grade}"
+      "gaugeTitle": "คะแนนสุขภาพ 0/100 (เกรด 1) ข้อผิดพลาดมีน้ำหนักมากที่สุด {grade} {score}"
     },
     "time": {
       "justNow": "แค่ตอนนี้",
-      "minutesAgo": "{min}m ago",
-      "hoursAgo": "{hr}h ago",
-      "daysAgo": "{day}d ago"
+      "minutesAgo": "{min} นาทีที่แล้ว",
+      "hoursAgo": "{hr} ชม. ที่แล้ว",
+      "daysAgo": "{day} วันที่แล้ว"
     },
     "status": {
       "lastRunPrefix": "วิ่งครั้งสุดท้าย",
       "lastRunUnknown": "ไม่ทราบการดำเนินการครั้งล่าสุด",
       "noTimestampTitle": "ไม่มีการประทับเวลาในการละเมิด json",
       "findingsAfterFilterTitle": "ผลการสืบค้นทั้งหมดหลังจากตัวกรองกฎที่ถูกปิดใช้งาน",
-      "findingOne": "{count} finding",
-      "findingOther": "{count} findings",
+      "findingOne": "{count} รายการที่พบ",
+      "findingOther": "{count} รายการที่พบ",
       "todoHackTitle": "พบเครื่องหมาย TODO และ HACK ในพื้นที่ทำงาน",
       "driftOnTitle": "เชื่อมต่อที่ปรึกษาดริฟท์แล้ว: 0 {label}",
       "driftOnPill": "ล่องลอยไป · 0 {count}",
       "driftOfflineTitle": "เปิดใช้งาน Drift Advisor แล้ว แต่ไม่พบเซิร์ฟเวอร์",
       "driftOfflinePill": "ดริฟท์ออฟไลน์",
       "enabledRulesTitle": "กฎที่เปิดใช้งานในระดับปัจจุบัน",
-      "rulesCount": "{count} rules"
+      "rulesCount": "{count} กฎ"
     },
     "groupBy": {
       "severity": "ความรุนแรง",
@@ -222,7 +222,7 @@
       "sectionAria": "ผลการวิจัย",
       "expandAll": "ขยายทั้งหมด",
       "collapseAll": "ยุบทั้งหมด",
-      "bulkSelected": "{count} selected",
+      "bulkSelected": "เลือกแล้ว {count} รายการ",
       "bulkCopy": "คัดลอกที่เลือกเป็น JSON",
       "selectAllTitle": "เลือกการค้นพบที่มองเห็นได้ทั้งหมด",
       "selectAllAria": "เลือกการค้นพบที่มองเห็นได้ทั้งหมด",
@@ -233,8 +233,8 @@
       "colActionsAria": "การกระทำของแถว",
       "selectRowAria": "เลือกแถวการค้นหานี้",
       "copyRowTitle": "คัดลอกการค้นพบนี้เป็น JSON",
-      "metaShown": "{filtered} shown",
-      "metaAfterDisable": "{total} after disabled-rule filter",
+      "metaShown": "แสดง {filtered} รายการ",
+      "metaAfterDisable": "{total} หลังตัวกรองกฎที่ปิดใช้งาน",
       "metaSourceCap": "แหล่งที่มาต่อยอดที่ 0 เพื่อประสิทธิภาพ {max}",
       "metaGroupedBy": "จัดกลุ่มตาม 0 {mode}",
       "overflowNote": "รายการแหล่งที่มาถูกตัดทอนที่ 0 เพื่อประสิทธิภาพในการเรนเดอร์ {max}",
@@ -263,7 +263,7 @@
       "scanOff": "การสแกนพื้นที่ทำงานปิดอยู่ — เปิดใช้งานเพื่อแสดงเครื่องหมายจากไฟล์โครงการ",
       "enableScan": "เปิดใช้งานการสแกน",
       "heading": "สิ่งที่ต้องทำและแฮ็ก",
-      "subsectionNone": "{title}: none in scan range.",
+      "subsectionNone": "{title}: ไม่มีในช่วงการสแกน",
       "capNote": "สแกนไฟล์สูงสุดสูงสุด เพิ่ม `saropaLints.todosAndHacks.maxFilesToScan` เพื่อความครอบคลุมทั้งหมด",
       "notePill": "บันทึก",
       "todosLabel": "สิ่งที่ต้องทำ",
@@ -299,12 +299,12 @@
       "byFile": "ตามไฟล์ (0) {count}",
       "noEntries": "ไม่มีรายการ",
       "nothingHidden": "ไม่มีสิ่งใดถูกซ่อนจากรายการปัญหาในพื้นที่ทำงานนี้ ใช้การดำเนินการตามบริบทแบบต้นไม้เพื่อซ่อนโฟลเดอร์ ไฟล์ หรือกฎ พวกเขายังคงอยู่ในสถานะพื้นที่ทำงาน",
-      "folderPattern": "{count} folder(s)",
-      "filePattern": "{count} file pattern(s)",
-      "ruleGlobal": "{count} rule(s) globally",
-      "perFileRules": "{count} file(s) with per-file rule hides",
-      "severityHides": "{count} severity hide(s)",
-      "impactHides": "{count} impact hide(s)",
+      "folderPattern": "{count} โฟลเดอร์",
+      "filePattern": "{count} รูปแบบไฟล์",
+      "ruleGlobal": "{count} กฎทั่วโลก",
+      "perFileRules": "{count} ไฟล์ที่มีการซ่อนกฎต่อไฟล์",
+      "severityHides": "การซ่อนความรุนแรง {count} รายการ",
+      "impactHides": "การซ่อนผลกระทบ {count} รายการ",
       "activeHides": "การซ่อนที่ใช้งานอยู่: 0 {counts}",
       "viewHidesFooter": "การซ่อนเหล่านี้จะย่อขนาดรายการปัญหา / แดชบอร์ดเท่านั้น พวกเขาไม่ได้เขียนถึง `violations.json`",
       "clearViewHides": "ล้างการซ่อนมุมมองทั้งหมด",
@@ -320,11 +320,11 @@
       "metaRunning": "การดำเนินการนี้อาจใช้เวลาสักครู่สำหรับโครงการขนาดใหญ่",
       "metaDone": "แดชบอร์ดรีเฟรชพร้อมข้อค้นพบล่าสุด",
       "announceSearch": "ค้นหา 0 {q}",
-      "announceSeverities": "{n} severities",
-      "announceImpacts": "{n} impacts",
+      "announceSeverities": "ความรุนแรง {n} ระดับ",
+      "announceImpacts": "ผลกระทบ {n} รายการ",
       "announceCleared": "ล้างตัวกรองทั้งหมดแล้ว",
       "announceFiltersPrefix": "ตัวกรอง:",
-      "bulkSelected": "{n} selected",
+      "bulkSelected": "เลือกแล้ว {n} รายการ",
       "analysisStartedDetail": "การวิเคราะห์เริ่มต้นขึ้น กำลังรวบรวมการวินิจฉัย...",
       "announceStarted": "การวิเคราะห์เริ่มต้นขึ้น",
       "announceComplete": "การวิเคราะห์เสร็จสมบูรณ์",
@@ -332,7 +332,7 @@
       "analysisFailedDetail": "การวิเคราะห์ล้มเหลว ตรวจสอบผลลัพธ์เพื่อดูรายละเอียด",
       "removeRecentAria": "ลบ",
       "removeRecentTitle": "ลบ",
-      "bulkSelectedTpl": "{n} selected"
+      "bulkSelectedTpl": "เลือกแล้ว {n} รายการ"
     },
     "emptyState": {
       "hintAfterMessage": "เรียกใช้การวิเคราะห์ Saropa Lints เพื่อสร้างการละเมิด json จากนั้นใช้รีเฟรชที่นี่หรือเปิดแดชบอร์ดนี้อีกครั้ง",
@@ -347,14 +347,14 @@
     },
     "unknownAnalyzerKind": "ไม่ทราบ",
     "supplementary": {
-      "otherAnalyzerOn": "+{count} other analyzer findings",
-      "otherAnalyzerPromo": "+? other analyzer findings — show",
-      "analyzerTodosOn": "+{count} analyzer TODOs",
-      "analyzerTodosPromo": "+? analyzer TODOs — show",
-      "scannerPromo": "Enable TODO/HACK scanner",
-      "tooltipLive": "Live from VS Code Problems panel. Updates as analysis completes. Click to hide.",
-      "tooltipScanner": "Saropa file-system scanner — counts open TODO/HACK markers in source.",
-      "tooltipPromoClickToOn": "Click to enable"
+      "otherAnalyzerOn": "+0 ผลการวิเคราะห์อื่นๆ {count}",
+      "otherAnalyzerPromo": "+? ผลการวิเคราะห์อื่นๆ — แสดง",
+      "analyzerTodosOn": "+0 TODO วิเคราะห์ {count}",
+      "analyzerTodosPromo": "+? TODO วิเคราะห์ — แสดง",
+      "scannerPromo": "เปิดใช้งานเครื่องสแกน TODO/HACK",
+      "tooltipLive": "ถ่ายทอดสดจากแผง VS Code Problems อัปเดตเมื่อการวิเคราะห์เสร็จสิ้น คลิกเพื่อซ่อน",
+      "tooltipScanner": "เครื่องสแกนระบบไฟล์ Saropa — นับเครื่องหมาย TODO/HACK ที่เปิดอยู่ในแหล่งที่มา",
+      "tooltipPromoClickToOn": "คลิกเพื่อเปิดใช้งาน"
     }
   },
   "triageDash": {
@@ -366,8 +366,8 @@
     "on": "บน",
     "colRule": "กฎ",
     "colIssues": "ปัญหา",
-    "zeroIssueRules": "{count} rules with zero issues — auto-enabled in tier.",
-    "disabledOverrides": "{count} rules disabled by override in `analysis_options_custom.yaml`.",
+    "zeroIssueRules": "{count} กฎที่ไม่มีปัญหา — เปิดใช้งานอัตโนมัติในระดับชั้น.",
+    "disabledOverrides": "{count} กฎถูกปิดใช้งานโดยการลบล้างใน `analysis_options_custom.yaml`.",
     "summaryRuleTriage": "กฎเกณฑ์การคัดเลือก",
     "hintNoViolations": "ยังไม่มี `reports/.saropa_lints/violations.json` เรียกใช้การวิเคราะห์ จากนั้นรีเฟรชแท็บนี้",
     "hintUnreadable": "ไม่มีการส่งออกการละเมิดที่สามารถอ่านได้ เรียกใช้การวิเคราะห์ Saropa Lints ก่อน",
@@ -402,10 +402,10 @@
     "documentTitle": "แดชบอร์ดแพ็คเกจ Saropa",
     "heroTitle": "แดชบอร์ดแพ็คเกจ Saropa",
     "status": {
-      "packagesCount": "{count} packages",
-      "packagesBreakdown": "{direct} direct, {transitive} transitive",
+      "packagesCount": "{count} แพ็กเกจ",
+      "packagesBreakdown": "ทางตรง {direct}, ทางอ้อม {transitive}",
       "gradeLine": "เกรด 0 · 1/100 {grade} {avg}",
-      "flaggedCount": "{count} flagged",
+      "flaggedCount": "ตั้งค่าสถานะ {count} รายการ",
       "flaggedTitle": "ละทิ้งหรือสิ้นชีวิต"
     },
     "scanning": {
@@ -419,7 +419,7 @@
       "packages": "แพ็คเกจ",
       "projectGrade": "เกรดแพ็คเกจโครงการ",
       "totalSize": "ขนาดรวม*",
-      "gradeTooltip": "เกรดโครงการ 0\nคะแนนเฉลี่ย: 1/100\nแพ็คเกจ: 2\nก:3 B:4 ค:5 อี:6 ฟ:7 {avgGrade} {avgScore} {pkgCount} {a} {b} {c} {e} {f}",
+      "gradeTooltip": "เกรดโครงการ 0\nคะแนนเฉลี่ย: 1/100\nแพ็คเกจ: 2\nก:3 B:4 ค:5 อี:6 ฟ:7 {pkgCount} {b} {avgScore} {c} {f} {avgGrade} {a} {e}",
       "vibrantTitle": "มีชีวิตชีวา",
       "stableTitle": "มั่นคง",
       "outdatedTitle": "ล้าสมัย",
@@ -435,6 +435,11 @@
     },
     "network": {
       "summary": "เครือข่ายการพึ่งพา"
+    },
+    "sections": {
+      "sizeDistribution": "การกระจายขนาด",
+      "filters": "ตัวกรอง",
+      "packages": "แพ็คเกจ"
     },
     "toolbar": {
       "openPubspecTitle": "เปิด pubspec.yaml",
@@ -573,10 +578,10 @@
     "skipLink": "ข้ามไปที่แค็ตตาล็อกคำสั่ง",
     "heroTitle": "แคตตาล็อกคำสั่ง Saropa",
     "status": {
-      "commands": "{count} commands",
-      "categories": "{count} categories",
-      "recent": "{count} recent",
-      "internalHidden": "{count} context-menu only (hidden)",
+      "commands": "{count} คำสั่ง",
+      "categories": "{count} หมวดหมู่",
+      "recent": "ล่าสุด {count} รายการ",
+      "internalHidden": "{count} เมนูบริบทเท่านั้น (ซ่อนอยู่)",
       "wordCommands": "คำสั่ง",
       "wordCategories": "หมวดหมู่",
       "wordRecent": "ล่าสุด"
@@ -645,8 +650,8 @@
       "searchChip": "ค้นหา: \"0\" {query}",
       "internalChip": "การแสดงคำสั่งเมนูบริบท",
       "removeFilterPrefix": "ลบตัวกรอง",
-      "matchOne": "{count} match",
-      "matchOther": "{count} matches"
+      "matchOne": "ตรงกัน {count} รายการ",
+      "matchOther": "ตรงกัน {count} รายการ"
     }
   },
   "codeHealth": {
@@ -661,9 +666,9 @@
     "hero": {
       "title": "แดชบอร์ดสุขภาพ Saropa Code",
       "generated": "สร้างขึ้น",
-      "functionOne": "{count} function",
-      "functionOther": "{count} functions",
-      "avgFormat": "เฉลี่ย 0 (1) {score} {grade}",
+      "functionOne": "{count} ฟังก์ชัน",
+      "functionOther": "{count} ฟังก์ชัน",
+      "avgFormat": "เฉลี่ย 0 (1) {grade} {score}",
       "gatesFailing": "ประตูล้มเหลว",
       "gatesPassing": "ประตูผ่านไป"
     },
@@ -673,8 +678,8 @@
     },
     "gate": {
       "fallback": "ประตูคุณภาพล้มเหลว — ตรวจสอบเกณฑ์ในการตั้งค่าความสมบูรณ์ของโค้ด",
-      "failingOne": "{count} gate failing — review thresholds, or copy the JSON to inspect gates.violations.",
-      "failingOther": "{count} gates failing — review thresholds, or copy the JSON to inspect gates.violations.",
+      "failingOne": "{count} เกตล้มเหลว — ตรวจสอบเกณฑ์ หรือคัดลอก JSON เพื่อตรวจสอบ gates.violations.",
+      "failingOther": "{count} เกตล้มเหลว — ตรวจสอบเกณฑ์ หรือคัดลอก JSON เพื่อตรวจสอบ gates.violations.",
       "openSettingsTitle": "เปิดการตั้งค่าความสมบูรณ์ของโค้ดเพื่อปรับเกณฑ์",
       "openSettingsButton": "เปิดการตั้งค่าสุขภาพโค้ด"
     },
@@ -737,15 +742,15 @@
       "flagChip": "ธง: 0 {flag}",
       "removeAria": "ลบ 0 {key}",
       "clearAll": "เคลียร์ทั้งหมด",
-      "rowsVisible": "{visible} of {total} rows visible",
+      "rowsVisible": "มองเห็น {visible} จาก {total} แถว",
       "neverRun": "ไม่เคยวิ่ง"
     },
     "freshness": {
       "justNow": "แค่ตอนนี้",
-      "minutesAgo": "{min}m ago",
-      "hoursAgo": "{hr}h ago",
-      "daysAgo": "{day}d ago",
-      "weeksAgo": "{wk}w ago"
+      "minutesAgo": "{min} นาทีที่แล้ว",
+      "hoursAgo": "{hr} ชม. ที่แล้ว",
+      "daysAgo": "{day} วันที่แล้ว",
+      "weeksAgo": "{wk} สัปดาห์ที่แล้ว"
     }
   },
   "suppressionsStrip": {
@@ -760,7 +765,7 @@
     "noFileRisk": "ไม่มีการแยกย่อยความเสี่ยงต่อไฟล์ (ไม่มีการละเมิดในขอบเขต)",
     "suppressionNote": "ตรงกับสรุปการละเมิด json ไม่ใช่การสลับการระงับแถบด้านข้างแบบสด",
     "noSuppression": "ไม่มีการรวมการระงับในการส่งออกนี้ (ตัววิเคราะห์รุ่นเก่าหรือการระงับเป็นศูนย์)",
-    "owaspSignal": "{count} violation(s) in this export carry OWASP mobile/web mapping — open Security Posture for the full matrix and export.",
+    "owaspSignal": "การละเมิด {count} รายการในการส่งออกนี้มีการแมป OWASP บนมือถือ/เว็บ — เปิดสถานะความปลอดภัยสำหรับเมทริกซ์เต็มรูปแบบและการส่งออก",
     "summarySuppressions": "การระงับ (ภาพรวมการส่งออก)",
     "summaryOwasp": "มาตรการรักษาความปลอดภัย (สัญญาณ OWASP)",
     "summaryFileRisk": "ความเสี่ยงของไฟล์ (ไฟล์บนสุด)"
@@ -770,8 +775,8 @@
     "skipToCounters": "ข้ามไปที่เคาน์เตอร์โทรมาตร",
     "lastEvent": "เหตุการณ์ล่าสุด 0 {relative}",
     "noEvents": "ไม่มีการบันทึกเหตุการณ์",
-    "totalEventOne": "{count} total event",
-    "totalEventOther": "{count} total events",
+    "totalEventOne": "เหตุการณ์ทั้งหมด {count} รายการ",
+    "totalEventOther": "เหตุการณ์ทั้งหมด {count} รายการ",
     "noCountersTitle": "ไม่มีตัวนับที่จะรีเซ็ต",
     "resetTitle": "รีเซ็ตตัวนับทั้งหมด",
     "refreshTitle": "โหลดตัวนับการวัดและส่งข้อมูลทางไกลจากดิสก์",
@@ -795,11 +800,11 @@
     "hint": "เปิดหรือปิดส่วนแถบกิจกรรม Saropa ที่นี่ (บันทึกพร้อมกับพื้นที่ทำงานโดยไม่ต้องออกจากแดชบอร์ด)"
   },
   "securityPosture": {
-    "issueOne": "{count} issue",
-    "issueOther": "{count} issues",
+    "issueOne": "{count} ปัญหา",
+    "issueOther": "{count} ปัญหา",
     "noIssues": "ไม่มีปัญหา",
     "showIssues": "แสดงประเด็นต่างๆ",
-    "violationTooltip": "{count} violation(s) across {ruleCount} rule(s). Click to show in Issues.",
+    "violationTooltip": "การละเมิด {count} รายการใน {ruleCount} กฎ คลิกเพื่อแสดงในปัญหา",
     "noViolationsTooltip": "ไม่มีการละเมิดที่แมปกับหมวดหมู่นี้"
   }
 }

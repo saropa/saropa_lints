@@ -43,7 +43,7 @@
     "reload": "リロード",
     "copyDetails": "詳細をコピーする",
     "unreachable": "0に到達できませんでした {target}",
-    "partialSummary": "{loaded} of {total} {item} loaded. {failed} failed.",
+    "partialSummary": "{total} 中 {loaded} の {item} がロードされました。{failed} 件失敗。",
     "partialRetry": "再試行に失敗しました"
   },
   "offline": {
@@ -90,28 +90,28 @@
     "secondaryAsideLabel": "二次診断",
     "hero": {
       "productTitle": "調査結果ダッシュボード",
-      "gaugeTitle": "健康スコア 0/100 (グレード 1)。エラーが最も重くなります。 {score} {grade}"
+      "gaugeTitle": "健康スコア 0/100 (グレード 1)。エラーが最も重くなります。 {grade} {score}"
     },
     "time": {
       "justNow": "ちょうど今",
-      "minutesAgo": "{min}m ago",
-      "hoursAgo": "{hr}h ago",
-      "daysAgo": "{day}d ago"
+      "minutesAgo": "{min} 分前",
+      "hoursAgo": "{hr} 時間前",
+      "daysAgo": "{day} 日前"
     },
     "status": {
       "lastRunPrefix": "最後の実行",
       "lastRunUnknown": "最終実行は不明",
       "noTimestampTitle": "Violations.json にタイムスタンプがありません",
       "findingsAfterFilterTitle": "無効なルール フィルター後の検出結果の合計",
-      "findingOne": "{count} finding",
-      "findingOther": "{count} findings",
+      "findingOne": "{count} 件の検出",
+      "findingOther": "{count} 件の検出",
       "todoHackTitle": "ワークスペースで見つかった TODO および HACK マーカー",
       "driftOnTitle": "ドリフトアドバイザー接続中: 0 {label}",
       "driftOnPill": "ドリフトオン · 0 {count}",
       "driftOfflineTitle": "Drift Advisor は有効になっていますが、サーバーが見つかりません",
       "driftOfflinePill": "オフラインでドリフトする",
       "enabledRulesTitle": "現在の層で有効なルール",
-      "rulesCount": "{count} rules"
+      "rulesCount": "{count} つのルール"
     },
     "groupBy": {
       "severity": "重大度",
@@ -222,7 +222,7 @@
       "sectionAria": "調査結果",
       "expandAll": "すべて展開",
       "collapseAll": "すべて折りたたむ",
-      "bulkSelected": "{count} selected",
+      "bulkSelected": "{count} 件選択中",
       "bulkCopy": "選択されたものを JSON としてコピー",
       "selectAllTitle": "表示されているすべての結果を選択します",
       "selectAllAria": "表示されているすべての結果を選択します",
@@ -233,8 +233,8 @@
       "colActionsAria": "行アクション",
       "selectRowAria": "この結果行を選択します",
       "copyRowTitle": "この結果を JSON としてコピーします",
-      "metaShown": "{filtered} shown",
-      "metaAfterDisable": "{total} after disabled-rule filter",
+      "metaShown": "{filtered} 件表示",
+      "metaAfterDisable": "無効化ルールフィルター適用後 {total} 件",
       "metaSourceCap": "パフォーマンスのためにソースの上限は「0」に制限されています {max}",
       "metaGroupedBy": "0でグループ化 {mode}",
       "overflowNote": "レンダリング パフォーマンスのため、ソース リストは「0」で切り詰められています。 {max}",
@@ -263,7 +263,7 @@
       "scanOff": "ワークスペース スキャンはオフになっています。プロジェクト ファイルからマーカーを表示できるようになります。",
       "enableScan": "スキャンを有効にする",
       "heading": "TODOとハック",
-      "subsectionNone": "{title}: none in scan range.",
+      "subsectionNone": "{title}: スキャン範囲にありません。",
       "capNote": "スキャンが最大ファイル上限に達しました。完全にカバーするには「saropaLints.todosAndHacks.maxFilesToScan」を上げてください。",
       "notePill": "注記",
       "todosLabel": "TODO",
@@ -299,12 +299,12 @@
       "byFile": "ファイル別 (0) {count}",
       "noEntries": "エントリーはありません。",
       "nothingHidden": "このワークスペースの問題リストには何も隠されていません。ツリー コンテキスト アクションを使用して、フォルダー、ファイル、またはルールを非表示にします。これらはワークスペース状態を保持します。",
-      "folderPattern": "{count} folder(s)",
-      "filePattern": "{count} file pattern(s)",
-      "ruleGlobal": "{count} rule(s) globally",
-      "perFileRules": "{count} file(s) with per-file rule hides",
-      "severityHides": "{count} severity hide(s)",
-      "impactHides": "{count} impact hide(s)",
+      "folderPattern": "{count} フォルダー",
+      "filePattern": "{count} ファイルパターン",
+      "ruleGlobal": "グローバルに {count} つのルール",
+      "perFileRules": "{count} 個のファイル(ファイルごとの非表示ルールあり)",
+      "severityHides": "{count} つの重大度を非表示",
+      "impactHides": "{count} つの影響を非表示",
       "activeHides": "アクティブな非表示: 0。 {counts}",
       "viewHidesFooter": "これらの非表示では、問題/ダッシュボードのリストのみが縮小されます。これらは「violations.json」には書き込まれません。",
       "clearViewHides": "ビューの非表示をすべてクリアする",
@@ -320,11 +320,11 @@
       "metaRunning": "大規模なプロジェクトではこれに少し時間がかかる場合があります。",
       "metaDone": "最新の調査結果を反映したダッシュボードの更新。",
       "announceSearch": "検索0 {q}",
-      "announceSeverities": "{n} severities",
-      "announceImpacts": "{n} impacts",
+      "announceSeverities": "{n} 個の重大度",
+      "announceImpacts": "{n} 個の影響",
       "announceCleared": "すべてのフィルターがクリアされました",
       "announceFiltersPrefix": "フィルター:",
-      "bulkSelected": "{n} selected",
+      "bulkSelected": "{n} 件選択中",
       "analysisStartedDetail": "分析が始まりました。診断情報を収集しています…",
       "announceStarted": "分析開始",
       "announceComplete": "分析完了",
@@ -332,7 +332,7 @@
       "analysisFailedDetail": "分析に失敗しました。詳細については出力を確認してください。",
       "removeRecentAria": "取り除く",
       "removeRecentTitle": "取り除く",
-      "bulkSelectedTpl": "{n} selected"
+      "bulkSelectedTpl": "{n} 件選択中"
     },
     "emptyState": {
       "hintAfterMessage": "Saropa Lints 分析を実行して Violations.json を生成し、ここで [更新] を使用するか、このダッシュボードを再度開きます。",
@@ -347,14 +347,14 @@
     },
     "unknownAnalyzerKind": "未知",
     "supplementary": {
-      "otherAnalyzerOn": "+{count} other analyzer findings",
-      "otherAnalyzerPromo": "+? other analyzer findings — show",
-      "analyzerTodosOn": "+{count} analyzer TODOs",
-      "analyzerTodosPromo": "+? analyzer TODOs — show",
-      "scannerPromo": "Enable TODO/HACK scanner",
-      "tooltipLive": "Live from VS Code Problems panel. Updates as analysis completes. Click to hide.",
-      "tooltipScanner": "Saropa file-system scanner — counts open TODO/HACK markers in source.",
-      "tooltipPromoClickToOn": "Click to enable"
+      "otherAnalyzerOn": "+0 その他のアナライザーの結果 {count}",
+      "otherAnalyzerPromo": "+?その他のアナライザーの結果 — 表示",
+      "analyzerTodosOn": "+0 アナライザー TODO {count}",
+      "analyzerTodosPromo": "+?アナライザー TODO — 表示",
+      "scannerPromo": "TODO/HACK スキャナーを有効にする",
+      "tooltipLive": "VS Code 問題パネルからのライブ。分析が完了すると更新されます。クリックして非表示にします。",
+      "tooltipScanner": "Saropa ファイル システム スキャナー - ソース内の開いている TODO/HACK マーカーをカウントします。",
+      "tooltipPromoClickToOn": "クリックして有効にします"
     }
   },
   "triageDash": {
@@ -366,8 +366,8 @@
     "on": "の上",
     "colRule": "ルール",
     "colIssues": "問題",
-    "zeroIssueRules": "{count} rules with zero issues — auto-enabled in tier.",
-    "disabledOverrides": "{count} rules disabled by override in `analysis_options_custom.yaml`.",
+    "zeroIssueRules": "問題ゼロの {count} つのルール — 階層で自動有効化されました。",
+    "disabledOverrides": "`analysis_options_custom.yaml` のオーバーライドにより {count} つのルールが無効化されました。",
     "summaryRuleTriage": "ルールのトリアージ",
     "hintNoViolations": "「reports/.saropa_lints/violations.json」はまだありません。分析を実行してから、このタブを更新します。",
     "hintUnreadable": "読み取り可能な違反はエクスポートされません。最初にサロパリント分析を実行します。",
@@ -402,10 +402,10 @@
     "documentTitle": "サロパパッケージダッシュボード",
     "heroTitle": "サロパパッケージダッシュボード",
     "status": {
-      "packagesCount": "{count} packages",
-      "packagesBreakdown": "{direct} direct, {transitive} transitive",
+      "packagesCount": "{count} 個のパッケージ",
+      "packagesBreakdown": "直接 {direct}、推移的 {transitive}",
       "gradeLine": "等級0・1/100 {grade} {avg}",
-      "flaggedCount": "{count} flagged",
+      "flaggedCount": "{count} 件フラグ付き",
       "flaggedTitle": "放棄または寿命終了"
     },
     "scanning": {
@@ -419,7 +419,7 @@
       "packages": "パッケージ",
       "projectGrade": "プロジェクトパッケージグレード",
       "totalSize": "合計サイズ*",
-      "gradeTooltip": "プロジェクトグレード 0\n平均スコア: 1/100\nパッケージ: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {avgScore} {pkgCount} {a} {b} {c} {e} {f}",
+      "gradeTooltip": "プロジェクトグレード 0\n平均スコア: 1/100\nパッケージ: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {b} {avgScore} {c} {f} {avgGrade} {a} {e}",
       "vibrantTitle": "活気に満ちた",
       "stableTitle": "安定した",
       "outdatedTitle": "時代遅れ",
@@ -435,6 +435,11 @@
     },
     "network": {
       "summary": "依存関係ネットワーク"
+    },
+    "sections": {
+      "sizeDistribution": "サイズ分布",
+      "filters": "フィルター",
+      "packages": "パッケージ"
     },
     "toolbar": {
       "openPubspecTitle": "pubspec.yaml を開く",
@@ -573,10 +578,10 @@
     "skipLink": "コマンドカタログにスキップ",
     "heroTitle": "サロパコマンドカタログ",
     "status": {
-      "commands": "{count} commands",
-      "categories": "{count} categories",
-      "recent": "{count} recent",
-      "internalHidden": "{count} context-menu only (hidden)",
+      "commands": "{count} コマンド",
+      "categories": "{count} カテゴリ",
+      "recent": "{count} 件の最近の項目",
+      "internalHidden": "{count} コンテキストメニューのみ（非表示）",
       "wordCommands": "コマンド",
       "wordCategories": "カテゴリ",
       "wordRecent": "最近の"
@@ -645,8 +650,8 @@
       "searchChip": "検索:「0」 {query}",
       "internalChip": "コンテキストメニューコマンドの表示",
       "removeFilterPrefix": "フィルターを削除する",
-      "matchOne": "{count} match",
-      "matchOther": "{count} matches"
+      "matchOne": "{count} 件の一致",
+      "matchOther": "{count} 件の一致"
     }
   },
   "codeHealth": {
@@ -661,9 +666,9 @@
     "hero": {
       "title": "サロパコードヘルスダッシュボード",
       "generated": "生成された",
-      "functionOne": "{count} function",
-      "functionOther": "{count} functions",
-      "avgFormat": "平均0 (1) {score} {grade}",
+      "functionOne": "{count} 関数",
+      "functionOther": "{count} 関数",
+      "avgFormat": "平均0 (1) {grade} {score}",
       "gatesFailing": "ゲートが失敗する",
       "gatesPassing": "ゲート通過"
     },
@@ -673,8 +678,8 @@
     },
     "gate": {
       "fallback": "品質ゲートが失敗しました — コードの健全性設定でしきい値を確認してください。",
-      "failingOne": "{count} gate failing — review thresholds, or copy the JSON to inspect gates.violations.",
-      "failingOther": "{count} gates failing — review thresholds, or copy the JSON to inspect gates.violations.",
+      "failingOne": "{count} つのゲートが失敗しました — しきい値を確認するか、JSON をコピーして gates.violations を検査してください。",
+      "failingOther": "{count} つのゲートが失敗しました — しきい値を確認するか、JSON をコピーして gates.violations を検査してください。",
       "openSettingsTitle": "コードヘルス設定を開いて、しきい値を調整します。",
       "openSettingsButton": "コードヘルス設定を開く"
     },
@@ -737,15 +742,15 @@
       "flagChip": "フラグ: 0 {flag}",
       "removeAria": "0を削除 {key}",
       "clearAll": "すべてクリア",
-      "rowsVisible": "{visible} of {total} rows visible",
+      "rowsVisible": "{total} 行中 {visible} 行を表示",
       "neverRun": "決して走らないでください"
     },
     "freshness": {
       "justNow": "ちょうど今",
-      "minutesAgo": "{min}m ago",
-      "hoursAgo": "{hr}h ago",
-      "daysAgo": "{day}d ago",
-      "weeksAgo": "{wk}w ago"
+      "minutesAgo": "{min} 分前",
+      "hoursAgo": "{hr} 時間前",
+      "daysAgo": "{day} 日前",
+      "weeksAgo": "{wk} 週間前"
     }
   },
   "suppressionsStrip": {
@@ -760,7 +765,7 @@
     "noFileRisk": "ファイルごとのリスクの内訳はありません (範囲内に違反はありません)。",
     "suppressionNote": "ライブサイドバー抑制の切り替えではなく、iolations.json の概要と一致します。",
     "noSuppression": "このエクスポートには抑制集計がありません (古いアナライザーまたはゼロ抑制)。",
-    "owaspSignal": "{count} violation(s) in this export carry OWASP mobile/web mapping — open Security Posture for the full matrix and export.",
+    "owaspSignal": "このエクスポート内の {count} 件の違反には OWASP モバイル/ウェブマッピングが含まれています — 完全なマトリックスとエクスポートを表示するにはセキュリティポスチャを開いてください。",
     "summarySuppressions": "抑制 (スナップショットのエクスポート)",
     "summaryOwasp": "セキュリティ体制 (OWASP 信号)",
     "summaryFileRisk": "ファイルのリスク (上位ファイル)"
@@ -770,8 +775,8 @@
     "skipToCounters": "テレメトリーカウンターにスキップ",
     "lastEvent": "最後のイベント 0 {relative}",
     "noEvents": "イベントは記録されていません",
-    "totalEventOne": "{count} total event",
-    "totalEventOther": "{count} total events",
+    "totalEventOne": "合計 {count} イベント",
+    "totalEventOther": "合計 {count} イベント",
     "noCountersTitle": "リセットするカウンターはありません。",
     "resetTitle": "すべてのカウンターをリセット",
     "refreshTitle": "ディスクからテレメトリ カウンタをリロードする",
@@ -795,11 +800,11 @@
     "hint": "ここで、Saropa アクティビティ バー セクションをオンまたはオフにします (ダッシュボードを離れることなく、ワークスペースに保存されます)。"
   },
   "securityPosture": {
-    "issueOne": "{count} issue",
-    "issueOther": "{count} issues",
+    "issueOne": "{count} 件の問題",
+    "issueOther": "{count} 件の問題",
     "noIssues": "問題ありません",
     "showIssues": "問題を表示する",
-    "violationTooltip": "{count} violation(s) across {ruleCount} rule(s). Click to show in Issues.",
+    "violationTooltip": "{ruleCount} 個のルール全体で {count} 件の違反。クリックして問題(Issues)に表示します。",
     "noViolationsTooltip": "このカテゴリにマッピングされた違反はありません。"
   }
 }

@@ -43,7 +43,7 @@
     "reload": "पुनः लोड करें",
     "copyDetails": "विवरण कॉपी करें",
     "unreachable": "0 तक नहीं पहुंच सका {target}",
-    "partialSummary": "{loaded} of {total} {item} loaded. {failed} failed.",
+    "partialSummary": "{total} में से {loaded} {item} लोड हुए। {failed} विफल।",
     "partialRetry": "पुनः प्रयास विफल रहा"
   },
   "offline": {
@@ -90,28 +90,28 @@
     "secondaryAsideLabel": "माध्यमिक निदान",
     "hero": {
       "productTitle": "निष्कर्ष डैशबोर्ड",
-      "gaugeTitle": "स्वास्थ्य स्कोर 0/100 (ग्रेड 1). त्रुटियाँ सबसे अधिक भारी पड़ती हैं। {score} {grade}"
+      "gaugeTitle": "स्वास्थ्य स्कोर 0/100 (ग्रेड 1). त्रुटियाँ सबसे अधिक भारी पड़ती हैं। {grade} {score}"
     },
     "time": {
       "justNow": "बस अब",
-      "minutesAgo": "{min}m ago",
-      "hoursAgo": "{hr}h ago",
-      "daysAgo": "{day}d ago"
+      "minutesAgo": "{min} मिनट पहले",
+      "hoursAgo": "{hr} घंटे पहले",
+      "daysAgo": "{day} दिन पहले"
     },
     "status": {
       "lastRunPrefix": "आखरी बार",
       "lastRunUnknown": "अंतिम रन अज्ञात",
       "noTimestampTitle": "उल्लंघनों पर कोई टाइमस्टैम्प नहीं.json",
       "findingsAfterFilterTitle": "अक्षम-नियम फ़िल्टर के बाद कुल निष्कर्ष",
-      "findingOne": "{count} finding",
-      "findingOther": "{count} findings",
+      "findingOne": "{count} परिणाम",
+      "findingOther": "{count} परिणाम",
       "todoHackTitle": "कार्यस्थान में TODO और HACK मार्कर पाए गए",
       "driftOnTitle": "बहाव सलाहकार जुड़ा: 0 {label}",
       "driftOnPill": "· 0 पर बहाव {count}",
       "driftOfflineTitle": "ड्रिफ्ट एडवाइजर सक्षम लेकिन कोई सर्वर नहीं मिला",
       "driftOfflinePill": "ऑफ़लाइन बहें",
       "enabledRulesTitle": "वर्तमान स्तर में सक्षम नियम",
-      "rulesCount": "{count} rules"
+      "rulesCount": "{count} नियम"
     },
     "groupBy": {
       "severity": "गंभीरता",
@@ -222,7 +222,7 @@
       "sectionAria": "निष्कर्ष",
       "expandAll": "सभी का विस्तार",
       "collapseAll": "सभी को संकुचित करें",
-      "bulkSelected": "{count} selected",
+      "bulkSelected": "{count} चयनित",
       "bulkCopy": "प्रतिलिपि JSON के रूप में चयनित",
       "selectAllTitle": "सभी दृश्यमान निष्कर्षों का चयन करें",
       "selectAllAria": "सभी दृश्यमान निष्कर्षों का चयन करें",
@@ -233,8 +233,8 @@
       "colActionsAria": "पंक्ति क्रियाएँ",
       "selectRowAria": "इस खोज पंक्ति का चयन करें",
       "copyRowTitle": "इस खोज को JSON के रूप में कॉपी करें",
-      "metaShown": "{filtered} shown",
-      "metaAfterDisable": "{total} after disabled-rule filter",
+      "metaShown": "{filtered} दिखाए गए",
+      "metaAfterDisable": "अक्षम-नियम फ़िल्टर के बाद {total}",
       "metaSourceCap": "प्रदर्शन के लिए स्रोत को 0 पर सीमित किया गया है {max}",
       "metaGroupedBy": "0 द्वारा समूहीकृत {mode}",
       "overflowNote": "रेंडर प्रदर्शन के लिए स्रोत सूची को 0 पर छोटा किया गया। {max}",
@@ -263,7 +263,7 @@
       "scanOff": "कार्यस्थान स्कैन बंद है - प्रोजेक्ट फ़ाइलों से मार्करों को प्रदर्शित करने में सक्षम करें।",
       "enableScan": "स्कैन सक्षम करें",
       "heading": "कार्य और भाड़े",
-      "subsectionNone": "{title}: none in scan range.",
+      "subsectionNone": "{title}: स्कैन सीमा में कोई नहीं।",
       "capNote": "स्कैन हिट मैक्स-फ़ाइल कैप; पूर्ण कवरेज के लिए `saropaLints.todosAndHacks.maxFilesToScan` बढ़ाएं।",
       "notePill": "टिप्पणी",
       "todosLabel": "सब",
@@ -299,12 +299,12 @@
       "byFile": "फ़ाइल द्वारा (0) {count}",
       "noEntries": "कोई प्रविष्टियाँ नहीं.",
       "nothingHidden": "इस कार्यक्षेत्र में मुद्दों की सूची से कुछ भी छिपा नहीं है। फ़ोल्डरों, फ़ाइलों या नियमों को छिपाने के लिए ट्री संदर्भ क्रियाओं का उपयोग करें; वे कार्यस्थल स्थिति में बने रहते हैं।",
-      "folderPattern": "{count} folder(s)",
-      "filePattern": "{count} file pattern(s)",
-      "ruleGlobal": "{count} rule(s) globally",
-      "perFileRules": "{count} file(s) with per-file rule hides",
-      "severityHides": "{count} severity hide(s)",
-      "impactHides": "{count} impact hide(s)",
+      "folderPattern": "{count} फ़ोल्डर",
+      "filePattern": "{count} फ़ाइल पैटर्न",
+      "ruleGlobal": "{count} नियम विश्व स्तर पर",
+      "perFileRules": "{count} फ़ाइलें प्रति-फ़ाइल नियम छिपाने के साथ",
+      "severityHides": "{count} गंभीरता छिपती है",
+      "impactHides": "{count} प्रभाव छिपते हैं",
       "activeHides": "सक्रिय खाल: 0. {counts}",
       "viewHidesFooter": "ये छिपाएँ केवल मुद्दे/डैशबोर्ड सूची को छोटा करते हैं; वे `violations.json` के लिए नहीं लिखे गए हैं।",
       "clearViewHides": "सभी दृश्य छिपाएँ साफ़ करें",
@@ -320,11 +320,11 @@
       "metaRunning": "बड़ी परियोजनाओं पर इसमें कुछ समय लग सकता है।",
       "metaDone": "नवीनतम निष्कर्षों के साथ ताज़ा डैशबोर्ड।",
       "announceSearch": "खोजें 0 {q}",
-      "announceSeverities": "{n} severities",
-      "announceImpacts": "{n} impacts",
+      "announceSeverities": "{n} गंभीरताएँ",
+      "announceImpacts": "{n} प्रभाव",
       "announceCleared": "सभी फ़िल्टर साफ़ हो गए",
       "announceFiltersPrefix": "फ़िल्टर:",
-      "bulkSelected": "{n} selected",
+      "bulkSelected": "{n} चयनित",
       "analysisStartedDetail": "विश्लेषण शुरू हुआ. निदान एकत्रित किया जा रहा है...",
       "announceStarted": "विश्लेषण शुरू हुआ",
       "announceComplete": "विश्लेषण पूरा हुआ",
@@ -332,7 +332,7 @@
       "analysisFailedDetail": "विश्लेषण विफल रहा. विवरण के लिए आउटपुट जांचें.",
       "removeRecentAria": "निकालना",
       "removeRecentTitle": "निकालना",
-      "bulkSelectedTpl": "{n} selected"
+      "bulkSelectedTpl": "{n} चयनित"
     },
     "emptyState": {
       "hintAfterMessage": "उल्लंघन.जेसन उत्पन्न करने के लिए सरोपा लिंट्स विश्लेषण चलाएँ, फिर यहां रिफ्रेश का उपयोग करें या इस डैशबोर्ड को फिर से खोलें।",
@@ -347,14 +347,14 @@
     },
     "unknownAnalyzerKind": "अज्ञात",
     "supplementary": {
-      "otherAnalyzerOn": "+{count} other analyzer findings",
-      "otherAnalyzerPromo": "+? other analyzer findings — show",
-      "analyzerTodosOn": "+{count} analyzer TODOs",
-      "analyzerTodosPromo": "+? analyzer TODOs — show",
-      "scannerPromo": "Enable TODO/HACK scanner",
-      "tooltipLive": "Live from VS Code Problems panel. Updates as analysis completes. Click to hide.",
-      "tooltipScanner": "Saropa file-system scanner — counts open TODO/HACK markers in source.",
-      "tooltipPromoClickToOn": "Click to enable"
+      "otherAnalyzerOn": "+0 अन्य विश्लेषक निष्कर्ष {count}",
+      "otherAnalyzerPromo": "+? अन्य विश्लेषक निष्कर्ष - दिखाएँ",
+      "analyzerTodosOn": "+0 विश्लेषक TODOs {count}",
+      "analyzerTodosPromo": "+? विश्लेषक TODOs - दिखाएँ",
+      "scannerPromo": "TODO/हैक स्कैनर सक्षम करें",
+      "tooltipLive": "वीएस कोड समस्या पैनल से लाइव। विश्लेषण पूरा होते ही अपडेट। छिपाने के लिए क्लिक करें.",
+      "tooltipScanner": "सरोपा फ़ाइल-सिस्टम स्कैनर - स्रोत में खुले TODO/HACK मार्करों की गणना करता है।",
+      "tooltipPromoClickToOn": "सक्षम करने के लिए क्लिक करें"
     }
   },
   "triageDash": {
@@ -366,8 +366,8 @@
     "on": "पर",
     "colRule": "नियम",
     "colIssues": "समस्याएँ",
-    "zeroIssueRules": "{count} rules with zero issues — auto-enabled in tier.",
-    "disabledOverrides": "{count} rules disabled by override in `analysis_options_custom.yaml`.",
+    "zeroIssueRules": "शून्य समस्याओं वाले {count} नियम — टियर में स्वतः सक्षम।",
+    "disabledOverrides": "{count} नियम `analysis_options_custom.yaml` में ओवरराइड द्वारा अक्षम किए गए।",
     "summaryRuleTriage": "नियम ट्राइएज",
     "hintNoViolations": "अभी तक कोई `रिपोर्ट/.saropa_lints/violations.json` नहीं। विश्लेषण चलाएँ, फिर इस टैब को ताज़ा करें।",
     "hintUnreadable": "कोई पठनीय उल्लंघन निर्यात नहीं. पहले सरोपा लिंट्स विश्लेषण चलाएँ।",
@@ -402,10 +402,10 @@
     "documentTitle": "सरोपा पैकेज डैशबोर्ड",
     "heroTitle": "सरोपा पैकेज डैशबोर्ड",
     "status": {
-      "packagesCount": "{count} packages",
-      "packagesBreakdown": "{direct} direct, {transitive} transitive",
+      "packagesCount": "{count} पैकेज",
+      "packagesBreakdown": "{direct} प्रत्यक्ष, {transitive} सकर्मक",
       "gradeLine": "ग्रेड 0 · 1/100 {grade} {avg}",
-      "flaggedCount": "{count} flagged",
+      "flaggedCount": "{count} फ़्लैग किए गए",
       "flaggedTitle": "त्याग दिया गया या जीवन का अंत हो गया"
     },
     "scanning": {
@@ -419,7 +419,7 @@
       "packages": "संकुल",
       "projectGrade": "प्रोजेक्ट पैकेज ग्रेड",
       "totalSize": "कुल आकार*",
-      "gradeTooltip": "प्रोजेक्ट ग्रेड 0\nऔसत स्कोर: 1/100\nपैकेज: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {avgScore} {pkgCount} {a} {b} {c} {e} {f}",
+      "gradeTooltip": "प्रोजेक्ट ग्रेड 0\nऔसत स्कोर: 1/100\nपैकेज: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {b} {avgScore} {c} {f} {avgGrade} {a} {e}",
       "vibrantTitle": "जीवंत",
       "stableTitle": "स्थिर",
       "outdatedTitle": "रगड़ा हुआ",
@@ -435,6 +435,11 @@
     },
     "network": {
       "summary": "निर्भरता नेटवर्क"
+    },
+    "sections": {
+      "sizeDistribution": "आकार वितरण",
+      "filters": "फिल्टर",
+      "packages": "संकुल"
     },
     "toolbar": {
       "openPubspecTitle": "pubspec.yaml खोलें",
@@ -573,10 +578,10 @@
     "skipLink": "कमांड कैटलॉग पर जाएं",
     "heroTitle": "सरोपा कमांड कैटलॉग",
     "status": {
-      "commands": "{count} commands",
-      "categories": "{count} categories",
-      "recent": "{count} recent",
-      "internalHidden": "{count} context-menu only (hidden)",
+      "commands": "{count} कमांड",
+      "categories": "{count} श्रेणियाँ",
+      "recent": "{count} हाल ही के",
+      "internalHidden": "{count} केवल संदर्भ-मेनू (छिपा हुआ)",
       "wordCommands": "आदेश",
       "wordCategories": "श्रेणियाँ",
       "wordRecent": "हाल ही का"
@@ -645,8 +650,8 @@
       "searchChip": "खोजें: \"0\" {query}",
       "internalChip": "संदर्भ-मेनू आदेश दिखा रहा है",
       "removeFilterPrefix": "फ़िल्टर हटाएँ",
-      "matchOne": "{count} match",
-      "matchOther": "{count} matches"
+      "matchOne": "{count} मिलान",
+      "matchOther": "{count} मिलान"
     }
   },
   "codeHealth": {
@@ -661,9 +666,9 @@
     "hero": {
       "title": "सरोपा कोड स्वास्थ्य डैशबोर्ड",
       "generated": "जनरेट किया गया",
-      "functionOne": "{count} function",
-      "functionOther": "{count} functions",
-      "avgFormat": "औसत 0 (1) {score} {grade}",
+      "functionOne": "{count} फ़ंक्शन",
+      "functionOther": "{count} फ़ंक्शन",
+      "avgFormat": "औसत 0 (1) {grade} {score}",
       "gatesFailing": "गेट विफल हो रहे हैं",
       "gatesPassing": "द्वार गुजर रहे हैं"
     },
@@ -673,8 +678,8 @@
     },
     "gate": {
       "fallback": "गुणवत्ता गेट विफल - कोड स्वास्थ्य सेटिंग्स में समीक्षा सीमाएँ।",
-      "failingOne": "{count} gate failing — review thresholds, or copy the JSON to inspect gates.violations.",
-      "failingOther": "{count} gates failing — review thresholds, or copy the JSON to inspect gates.violations.",
+      "failingOne": "{count} गेट विफल — थ्रेशोल्ड की समीक्षा करें, या gates.violations का निरीक्षण करने के लिए JSON कॉपी करें।",
+      "failingOther": "{count} गेट विफल — थ्रेशोल्ड की समीक्षा करें, या gates.violations का निरीक्षण करने के लिए JSON कॉपी करें।",
       "openSettingsTitle": "सीमाएँ समायोजित करने के लिए कोड स्वास्थ्य सेटिंग खोलें।",
       "openSettingsButton": "कोड स्वास्थ्य सेटिंग खोलें"
     },
@@ -737,15 +742,15 @@
       "flagChip": "झंडा: 0 {flag}",
       "removeAria": "0 हटाएं {key}",
       "clearAll": "सभी साफ करें",
-      "rowsVisible": "{visible} of {total} rows visible",
+      "rowsVisible": "{total} में से {visible} पंक्तियाँ दिखाई दे रही हैं",
       "neverRun": "कभी नहीं चला"
     },
     "freshness": {
       "justNow": "बस अब",
-      "minutesAgo": "{min}m ago",
-      "hoursAgo": "{hr}h ago",
-      "daysAgo": "{day}d ago",
-      "weeksAgo": "{wk}w ago"
+      "minutesAgo": "{min} मिनट पहले",
+      "hoursAgo": "{hr} घंटे पहले",
+      "daysAgo": "{day} दिन पहले",
+      "weeksAgo": "{wk} सप्ताह पहले"
     }
   },
   "suppressionsStrip": {
@@ -760,7 +765,7 @@
     "noFileRisk": "कोई प्रति-फ़ाइल जोखिम विश्लेषण नहीं (दायरे में कोई उल्लंघन नहीं)।",
     "suppressionNote": "Violations.json सारांश से मेल खाता है, लाइव साइडबार दमन टॉगल से नहीं।",
     "noSuppression": "इस निर्यात में कोई दमन समुच्चय नहीं है (पुराना विश्लेषक या शून्य दमन)।",
-    "owaspSignal": "{count} violation(s) in this export carry OWASP mobile/web mapping — open Security Posture for the full matrix and export.",
+    "owaspSignal": "इस निर्यात में {count} उल्लंघन OWASP मोबाइल/वेब मैपिंग ले जाते हैं — पूर्ण मैट्रिक्स और निर्यात के लिए सुरक्षा मुद्रा खोलें।",
     "summarySuppressions": "दमन (निर्यात स्नैपशॉट)",
     "summaryOwasp": "सुरक्षा मुद्रा (OWASP सिग्नल)",
     "summaryFileRisk": "फ़ाइल जोखिम (शीर्ष फ़ाइलें)"
@@ -770,8 +775,8 @@
     "skipToCounters": "टेलीमेट्री काउंटरों पर जाएं",
     "lastEvent": "अंतिम घटना 0 {relative}",
     "noEvents": "कोई घटना दर्ज नहीं की गई",
-    "totalEventOne": "{count} total event",
-    "totalEventOther": "{count} total events",
+    "totalEventOne": "कुल {count} ईवेंट",
+    "totalEventOther": "कुल {count} ईवेंट",
     "noCountersTitle": "रीसेट करने के लिए कोई काउंटर नहीं.",
     "resetTitle": "सभी काउंटर रीसेट करें",
     "refreshTitle": "डिस्क से टेलीमेट्री काउंटर पुनः लोड करें",
@@ -795,11 +800,11 @@
     "hint": "यहां सरोपा गतिविधि-बार अनुभागों को चालू या बंद करें (डैशबोर्ड छोड़े बिना, कार्यक्षेत्र के साथ सहेजा गया)।"
   },
   "securityPosture": {
-    "issueOne": "{count} issue",
-    "issueOther": "{count} issues",
+    "issueOne": "{count} समस्या",
+    "issueOther": "{count} समस्याएँ",
     "noIssues": "कोई विवाद नही",
     "showIssues": "मुद्दे दिखाएँ",
-    "violationTooltip": "{count} violation(s) across {ruleCount} rule(s). Click to show in Issues.",
+    "violationTooltip": "{ruleCount} नियमों में {count} उल्लंघन। समस्याओं में दिखाने के लिए क्लिक करें।",
     "noViolationsTooltip": "इस श्रेणी में कोई उल्लंघन नहीं दर्शाया गया है।"
   }
 }

@@ -43,7 +43,7 @@
     "reload": "לִטעוֹן מִחָדָשׁ",
     "copyDetails": "העתק פרטים",
     "unreachable": "לא ניתן היה להגיע ל-0 {target}",
-    "partialSummary": "{loaded} of {total} {item} loaded. {failed} failed.",
+    "partialSummary": "{loaded} מתוך {total} {item} נטענו. {failed} נכשלו.",
     "partialRetry": "ניסיון חוזר נכשל"
   },
   "offline": {
@@ -90,28 +90,28 @@
     "secondaryAsideLabel": "אבחון משני",
     "hero": {
       "productTitle": "לוח המחוונים של ממצאים",
-      "gaugeTitle": "ציון בריאות 0/100 (ציון 1). שגיאות שוקלות את הכבד ביותר. {score} {grade}"
+      "gaugeTitle": "ציון בריאות 0/100 (ציון 1). שגיאות שוקלות את הכבד ביותר. {grade} {score}"
     },
     "time": {
       "justNow": "זֶה עַתָה",
-      "minutesAgo": "{min}m ago",
-      "hoursAgo": "{hr}h ago",
-      "daysAgo": "{day}d ago"
+      "minutesAgo": "לפני {min} דקות",
+      "hoursAgo": "לפני {hr} שעות",
+      "daysAgo": "לפני {day} ימים"
     },
     "status": {
       "lastRunPrefix": "ריצה אחרונה",
       "lastRunUnknown": "ריצה אחרונה לא ידועה",
       "noTimestampTitle": "אין חותמת זמן על violations.json",
       "findingsAfterFilterTitle": "סך כל הממצאים לאחר מסנן כלל מושבת",
-      "findingOne": "{count} finding",
-      "findingOther": "{count} findings",
+      "findingOne": "{count} ממצא",
+      "findingOther": "{count} ממצאים",
       "todoHackTitle": "סמני TODO ו-HACK נמצאים בסביבת העבודה",
       "driftOnTitle": "דריפט יועץ מחובר: 0 {label}",
       "driftOnPill": "להיסחף על · 0 {count}",
       "driftOfflineTitle": "Drift Advisor מופעל אך לא נמצא שרת",
       "driftOfflinePill": "נסחף במצב לא מקוון",
       "enabledRulesTitle": "כללים מופעלים בשכבה הנוכחית",
-      "rulesCount": "{count} rules"
+      "rulesCount": "{count} כללים"
     },
     "groupBy": {
       "severity": "חוּמרָה",
@@ -195,7 +195,7 @@
       "copyTreeJson": "העתק את העץ JSON",
       "refreshExtension": "רענן את ההרחבה",
       "openPackageDashboard": "פתח את לוח המחוונים של החבילה",
-      "openCodeHealth": "Open Code Health",
+      "openCodeHealth": "פתיחת תקינות קוד",
       "openLintsConfig": "פתח את תצורת Lints"
     },
     "progress": {
@@ -222,7 +222,7 @@
       "sectionAria": "ממצאים",
       "expandAll": "הרחב הכל",
       "collapseAll": "כווץ הכל",
-      "bulkSelected": "{count} selected",
+      "bulkSelected": "{count} נבחרו",
       "bulkCopy": "העתק נבחר כ-JSON",
       "selectAllTitle": "בחר את כל הממצאים הגלויים",
       "selectAllAria": "בחר את כל הממצאים הגלויים",
@@ -233,8 +233,8 @@
       "colActionsAria": "פעולות שורה",
       "selectRowAria": "בחר בשורת מציאת זו",
       "copyRowTitle": "העתק את הממצא הזה בתור JSON",
-      "metaShown": "{filtered} shown",
-      "metaAfterDisable": "{total} after disabled-rule filter",
+      "metaShown": "{filtered} מוצגים",
+      "metaAfterDisable": "{total} לאחר מסנן כללים מושבתים",
       "metaSourceCap": "מקור מוגבל ל-0 לביצועים {max}",
       "metaGroupedBy": "מקובצים לפי 0 {mode}",
       "overflowNote": "רשימת המקורות קטועה ב-0 לביצועי רינדור. {max}",
@@ -263,7 +263,7 @@
       "scanOff": "סריקת סביבת העבודה כבויה - אפשר להציג סמנים מקובצי פרויקט.",
       "enableScan": "אפשר סריקה",
       "heading": "מטלות ופריצות",
-      "subsectionNone": "{title}: none in scan range.",
+      "subsectionNone": "{title}: אף אחד בטווח הסריקה.",
       "capNote": "סריקה פגע max-file cap; העלה את `saropaLints.todosAndHacks.maxFilesToScan` לכיסוי מלא.",
       "notePill": "פֶּתֶק",
       "todosLabel": "מטלות",
@@ -299,12 +299,12 @@
       "byFile": "לפי קובץ (0) {count}",
       "noEntries": "אין ערכים.",
       "nothingHidden": "שום דבר לא מוסתר מרשימת הבעיות בסביבת העבודה הזו. השתמש בפעולות ההקשר של עץ כדי להסתיר תיקיות, קבצים או כללים; הם נמשכים במצב סביבת עבודה.",
-      "folderPattern": "{count} folder(s)",
-      "filePattern": "{count} file pattern(s)",
-      "ruleGlobal": "{count} rule(s) globally",
-      "perFileRules": "{count} file(s) with per-file rule hides",
-      "severityHides": "{count} severity hide(s)",
-      "impactHides": "{count} impact hide(s)",
+      "folderPattern": "{count} תיקיות",
+      "filePattern": "{count} תבניות קבצים",
+      "ruleGlobal": "{count} כללים באופן גלובלי",
+      "perFileRules": "{count} קבצים עם כללי הסתרה לכל קובץ",
+      "severityHides": "{count} הסתרות חומרה",
+      "impactHides": "{count} הסתרות השפעה",
       "activeHides": "הסתרות פעילות: 0. {counts}",
       "viewHidesFooter": "הסתרות אלה מכווצות את רשימת הבעיות / לוח המחוונים בלבד; הם לא נכתבים אל `violations.json`.",
       "clearViewHides": "נקה את כל הסתרות התצוגה",
@@ -320,11 +320,11 @@
       "metaRunning": "זה יכול לקחת רגע בפרויקטים גדולים.",
       "metaDone": "לוח מחוונים מרענן עם הממצאים האחרונים.",
       "announceSearch": "חפש 0 {q}",
-      "announceSeverities": "{n} severities",
-      "announceImpacts": "{n} impacts",
+      "announceSeverities": "{n} חומרות",
+      "announceImpacts": "{n} השפעות",
       "announceCleared": "כל המסננים נוקו",
       "announceFiltersPrefix": "מסננים:",
-      "bulkSelected": "{n} selected",
+      "bulkSelected": "{n} נבחרו",
       "analysisStartedDetail": "הניתוח התחיל. אוספת אבחון...",
       "announceStarted": "הניתוח התחיל",
       "announceComplete": "הניתוח הושלם",
@@ -332,7 +332,7 @@
       "analysisFailedDetail": "הניתוח נכשל. בדוק פלט לפרטים.",
       "removeRecentAria": "לְהַסִיר",
       "removeRecentTitle": "לְהַסִיר",
-      "bulkSelectedTpl": "{n} selected"
+      "bulkSelectedTpl": "{n} נבחרו"
     },
     "emptyState": {
       "hintAfterMessage": "הפעל ניתוח Saropa Lints כדי ליצור violations.json, ולאחר מכן השתמש ב-Refresh כאן או פתח מחדש את לוח המחוונים הזה.",
@@ -347,14 +347,14 @@
     },
     "unknownAnalyzerKind": "לֹא יְדוּעַ",
     "supplementary": {
-      "otherAnalyzerOn": "+{count} other analyzer findings",
-      "otherAnalyzerPromo": "+? other analyzer findings — show",
-      "analyzerTodosOn": "+{count} analyzer TODOs",
-      "analyzerTodosPromo": "+? analyzer TODOs — show",
-      "scannerPromo": "Enable TODO/HACK scanner",
-      "tooltipLive": "Live from VS Code Problems panel. Updates as analysis completes. Click to hide.",
-      "tooltipScanner": "Saropa file-system scanner — counts open TODO/HACK markers in source.",
-      "tooltipPromoClickToOn": "Click to enable"
+      "otherAnalyzerOn": "+0 ממצאי מנתח אחרים {count}",
+      "otherAnalyzerPromo": "+? ממצאי מנתח אחרים - מראים",
+      "analyzerTodosOn": "+0 TODOs של מנתח {count}",
+      "analyzerTodosPromo": "+? מנתח TODOs - הצג",
+      "scannerPromo": "הפעל את סורק TODO/HACK",
+      "tooltipLive": "חי מפאנל VS Code Problems. עדכונים עם סיום הניתוח. לחץ כדי להסתיר.",
+      "tooltipScanner": "סורק מערכת הקבצים של Saropa - סופר סמני TODO/HACK פתוחים במקור.",
+      "tooltipPromoClickToOn": "לחץ כדי להפעיל"
     }
   },
   "triageDash": {
@@ -366,8 +366,8 @@
     "on": "עַל",
     "colRule": "כְּלָל",
     "colIssues": "בעיות",
-    "zeroIssueRules": "{count} rules with zero issues — auto-enabled in tier.",
-    "disabledOverrides": "{count} rules disabled by override in `analysis_options_custom.yaml`.",
+    "zeroIssueRules": "{count} כללים עם אפס בעיות — מופעלים אוטומטית ברמה.",
+    "disabledOverrides": "{count} כללים הושבתו על ידי עקיפה ב-`analysis_options_custom.yaml`.",
     "summaryRuleTriage": "שילוש כללים",
     "hintNoViolations": "אין עדיין `reports/.saropa_lints/violations.json`. הפעל ניתוח ולאחר מכן רענן כרטיסייה זו.",
     "hintUnreadable": "אין ייצוא של הפרות קריאות. הפעל תחילה את ניתוח Saropa Lints.",
@@ -402,10 +402,10 @@
     "documentTitle": "לוח המחוונים של חבילת Saropa",
     "heroTitle": "לוח המחוונים של חבילת Saropa",
     "status": {
-      "packagesCount": "{count} packages",
-      "packagesBreakdown": "{direct} direct, {transitive} transitive",
+      "packagesCount": "{count} חבילות",
+      "packagesBreakdown": "{direct} ישיר, {transitive} טרנזיטיבי",
       "gradeLine": "ציון 0 · 1/100 {grade} {avg}",
-      "flaggedCount": "{count} flagged",
+      "flaggedCount": "{count} סומנו בדגל",
       "flaggedTitle": "נטוש או סוף החיים"
     },
     "scanning": {
@@ -419,7 +419,7 @@
       "packages": "חבילות",
       "projectGrade": "ציון חבילת פרויקט",
       "totalSize": "גודל כולל*",
-      "gradeTooltip": "ציון הפרויקט 0\nציון ממוצע: 1/100\nחבילות: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {avgScore} {pkgCount} {a} {b} {c} {e} {f}",
+      "gradeTooltip": "ציון הפרויקט 0\nציון ממוצע: 1/100\nחבילות: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {b} {avgScore} {c} {f} {avgGrade} {a} {e}",
       "vibrantTitle": "תוסס",
       "stableTitle": "יַצִיב",
       "outdatedTitle": "מְיוּשָׁן",
@@ -435,6 +435,11 @@
     },
     "network": {
       "summary": "רשת תלות"
+    },
+    "sections": {
+      "sizeDistribution": "חלוקת מידות",
+      "filters": "מסננים",
+      "packages": "חבילות"
     },
     "toolbar": {
       "openPubspecTitle": "פתח את pubspec.yaml",
@@ -531,7 +536,7 @@
         "tooltip": "מספר תלות טרנזיטיבית (עקיפה) שהחבילה הזו מושכת אליה"
       },
       "vulns": {
-        "label": "Vulns",
+        "label": "פגיעויות",
         "tooltip": "פרצות אבטחה ידועות ממסדי נתונים של OSV ו- GitHub Advisory"
       },
       "license": {
@@ -573,10 +578,10 @@
     "skipLink": "דלג לקטלוג הפקודות",
     "heroTitle": "קטלוג פקודות Saropa",
     "status": {
-      "commands": "{count} commands",
-      "categories": "{count} categories",
-      "recent": "{count} recent",
-      "internalHidden": "{count} context-menu only (hidden)",
+      "commands": "{count} פקודות",
+      "categories": "{count} קטגוריות",
+      "recent": "{count} אחרונים",
+      "internalHidden": "{count} תפריט הקשר בלבד (מוסתר)",
       "wordCommands": "פקודות",
       "wordCategories": "קטגוריות",
       "wordRecent": "לאחרונה"
@@ -645,8 +650,8 @@
       "searchChip": "חיפוש: \"0\" {query}",
       "internalChip": "מציג פקודות תפריט הקשר",
       "removeFilterPrefix": "הסר מסנן",
-      "matchOne": "{count} match",
-      "matchOther": "{count} matches"
+      "matchOne": "{count} התאמה",
+      "matchOther": "{count} התאמות"
     }
   },
   "codeHealth": {
@@ -661,9 +666,9 @@
     "hero": {
       "title": "לוח המחוונים הבריאותי של Saropa Code",
       "generated": "נוצר",
-      "functionOne": "{count} function",
-      "functionOther": "{count} functions",
-      "avgFormat": "ממוצע 0 (1) {score} {grade}",
+      "functionOne": "{count} פונקציה",
+      "functionOther": "{count} פונקציות",
+      "avgFormat": "ממוצע 0 (1) {grade} {score}",
       "gatesFailing": "שערים נכשלים",
       "gatesPassing": "שערים עוברים"
     },
@@ -673,8 +678,8 @@
     },
     "gate": {
       "fallback": "שערי איכות נכשלו - סקירת ספים בהגדרות Code Health.",
-      "failingOne": "{count} gate failing — review thresholds, or copy the JSON to inspect gates.violations.",
-      "failingOther": "{count} gates failing — review thresholds, or copy the JSON to inspect gates.violations.",
+      "failingOne": "{count} שער נכשל — סקור את הספים, או העתק את ה-JSON כדי לבדוק את gates.violations.",
+      "failingOther": "{count} שערים נכשלים — סקור את הספים, או העתק את ה-JSON כדי לבדוק את gates.violations.",
       "openSettingsTitle": "פתח את הגדרות Code Health כדי להתאים את הספים.",
       "openSettingsButton": "פתח את הגדרות Code Health"
     },
@@ -737,15 +742,15 @@
       "flagChip": "דגל: 0 {flag}",
       "removeAria": "הסר את 0 {key}",
       "clearAll": "נקה הכל",
-      "rowsVisible": "{visible} of {total} rows visible",
+      "rowsVisible": "{visible} מתוך {total} שורות גלויות",
       "neverRun": "לעולם לא לרוץ"
     },
     "freshness": {
       "justNow": "זֶה עַתָה",
-      "minutesAgo": "{min}m ago",
-      "hoursAgo": "{hr}h ago",
-      "daysAgo": "{day}d ago",
-      "weeksAgo": "{wk}w ago"
+      "minutesAgo": "לפני {min} דקות",
+      "hoursAgo": "לפני {hr} שעות",
+      "daysAgo": "לפני {day} ימים",
+      "weeksAgo": "לפני {wk} שבועות"
     }
   },
   "suppressionsStrip": {
@@ -760,7 +765,7 @@
     "noFileRisk": "אין פירוט סיכונים לכל קובץ (ללא הפרות בהיקף).",
     "suppressionNote": "תואם תקציר violations.json, לא דיכוי סרגל צד בזמן אמת.",
     "noSuppression": "אין מצטבר דיכוי בייצוא זה (נתח ישן יותר או אפס דיכוי).",
-    "owaspSignal": "{count} violation(s) in this export carry OWASP mobile/web mapping — open Security Posture for the full matrix and export.",
+    "owaspSignal": "{count} הפרות בייצוא זה נושאות מיפוי מובייל/ווב של OWASP — פתח את תנוחת אבטחה למטריצה המלאה ולייצוא.",
     "summarySuppressions": "דיכויים (יצוא תמונת מצב)",
     "summaryOwasp": "תנוחת אבטחה (אות OWASP)",
     "summaryFileRisk": "סיכון קבצים (קבצים מובילים)"
@@ -770,8 +775,8 @@
     "skipToCounters": "דלג למוני טלמטריה",
     "lastEvent": "אירוע אחרון 0 {relative}",
     "noEvents": "לא נרשמו אירועים",
-    "totalEventOne": "{count} total event",
-    "totalEventOther": "{count} total events",
+    "totalEventOne": "{count} אירוע סך הכל",
+    "totalEventOther": "סך הכל {count} אירועים",
     "noCountersTitle": "אין מונים לאיפוס.",
     "resetTitle": "אפס את כל המונים",
     "refreshTitle": "טען מחדש מוני טלמטריה מהדיסק",
@@ -795,11 +800,11 @@
     "hint": "הפעל או כבה את מקטעי סרגל הפעילות של Saropa (נשמר עם סביבת העבודה, מבלי לצאת מלוח המחוונים)."
   },
   "securityPosture": {
-    "issueOne": "{count} issue",
-    "issueOther": "{count} issues",
+    "issueOne": "{count} בעיה",
+    "issueOther": "{count} בעיות",
     "noIssues": "אין בעיות",
     "showIssues": "הצג בעיות",
-    "violationTooltip": "{count} violation(s) across {ruleCount} rule(s). Click to show in Issues.",
+    "violationTooltip": "{count} הפרות על פני {ruleCount} כללים. לחץ כדי להציג בבעיות.",
     "noViolationsTooltip": "אין הפרות שמופו לקטגוריה זו."
   }
 }

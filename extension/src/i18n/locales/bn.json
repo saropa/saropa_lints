@@ -43,7 +43,7 @@
     "reload": "পুনরায় লোড করুন",
     "copyDetails": "বিবরণ অনুলিপি করুন",
     "unreachable": "0 এ পৌঁছানো যায়নি {target}",
-    "partialSummary": "{loaded} of {total} {item} loaded. {failed} failed.",
+    "partialSummary": "{total} এর মধ্যে {loaded} {item} লোড হয়েছে। {failed} ব্যর্থ।",
     "partialRetry": "পুনরায় চেষ্টা ব্যর্থ হয়েছে"
   },
   "offline": {
@@ -90,28 +90,28 @@
     "secondaryAsideLabel": "সেকেন্ডারি ডায়াগনস্টিকস",
     "hero": {
       "productTitle": "অনুসন্ধান ড্যাশবোর্ড",
-      "gaugeTitle": "স্বাস্থ্য স্কোর 0/100 (গ্রেড 1)। ত্রুটিগুলি সবচেয়ে ভারী। {score} {grade}"
+      "gaugeTitle": "স্বাস্থ্য স্কোর 0/100 (গ্রেড 1)। ত্রুটিগুলি সবচেয়ে ভারী। {grade} {score}"
     },
     "time": {
       "justNow": "এইমাত্র",
-      "minutesAgo": "{min}m ago",
-      "hoursAgo": "{hr}h ago",
-      "daysAgo": "{day}d ago"
+      "minutesAgo": "{min} মিনিট আগে",
+      "hoursAgo": "{hr} ঘণ্টা আগে",
+      "daysAgo": "{day} দিন আগে"
     },
     "status": {
       "lastRunPrefix": "শেষ রান",
       "lastRunUnknown": "শেষ রান অজানা",
       "noTimestampTitle": "violations.json-এ কোনো টাইমস্ট্যাম্প নেই",
       "findingsAfterFilterTitle": "নিষ্ক্রিয়-নিয়ম ফিল্টারের পরে মোট ফলাফল",
-      "findingOne": "{count} finding",
-      "findingOther": "{count} findings",
+      "findingOne": "{count} ফাইন্ডিং",
+      "findingOther": "{count} ফাইন্ডিং",
       "todoHackTitle": "কর্মক্ষেত্রে TODO এবং HACK মার্কার পাওয়া গেছে",
       "driftOnTitle": "ড্রিফ্ট উপদেষ্টা সংযুক্ত: 0 {label}",
       "driftOnPill": "ড্রিফ্ট অন · 0 {count}",
       "driftOfflineTitle": "ড্রিফ্ট অ্যাডভাইজার সক্রিয় কিন্তু কোনো সার্ভার পাওয়া যায়নি",
       "driftOfflinePill": "ড্রিফ্ট অফলাইন",
       "enabledRulesTitle": "বর্তমান স্তরে নিয়ম চালু করা হয়েছে",
-      "rulesCount": "{count} rules"
+      "rulesCount": "{count} রুল"
     },
     "groupBy": {
       "severity": "তীব্রতা",
@@ -222,7 +222,7 @@
       "sectionAria": "ফাইন্ডিংস",
       "expandAll": "সব প্রসারিত",
       "collapseAll": "সব সঙ্কুচিত করুন",
-      "bulkSelected": "{count} selected",
+      "bulkSelected": "{count} নির্বাচিত",
       "bulkCopy": "JSON হিসাবে নির্বাচিত অনুলিপি",
       "selectAllTitle": "সমস্ত দৃশ্যমান ফলাফল নির্বাচন করুন",
       "selectAllAria": "সমস্ত দৃশ্যমান ফলাফল নির্বাচন করুন",
@@ -233,8 +233,8 @@
       "colActionsAria": "সারি কর্ম",
       "selectRowAria": "এই অনুসন্ধান সারি নির্বাচন করুন",
       "copyRowTitle": "এই অনুসন্ধানটি JSON হিসাবে অনুলিপি করুন",
-      "metaShown": "{filtered} shown",
-      "metaAfterDisable": "{total} after disabled-rule filter",
+      "metaShown": "{filtered} দেখানো হয়েছে",
+      "metaAfterDisable": "অক্ষম-রুল ফিল্টারের পরে {total}",
       "metaSourceCap": "পারফরম্যান্সের জন্য উৎস 0 এ সীমাবদ্ধ {max}",
       "metaGroupedBy": "0 দ্বারা গোষ্ঠীবদ্ধ {mode}",
       "overflowNote": "রেন্ডার পারফরম্যান্সের জন্য উৎস তালিকা 0 এ কাটা হয়েছে। {max}",
@@ -258,15 +258,15 @@
     },
     "todoHack": {
       "sectionAria": "TODOs এবং HACKS",
-      "headingDisabled": "TODOs & HACKS",
+      "headingDisabled": "করণীয় ও হ্যাকস",
       "metaDisabled": "স্ক্যান নিষ্ক্রিয়",
       "scanOff": "ওয়ার্কস্পেস স্ক্যান বন্ধ আছে — প্রোজেক্ট ফাইল থেকে সারফেস মার্কার করতে সক্ষম করুন।",
       "enableScan": "স্ক্যান সক্ষম করুন",
-      "heading": "TODOs & HACKS",
-      "subsectionNone": "{title}: none in scan range.",
+      "heading": "করণীয় ও হ্যাকস",
+      "subsectionNone": "{title}: স্ক্যান রেঞ্জে কিছুই নেই।",
       "capNote": "স্ক্যান হিট ম্যাক্স-ফাইল ক্যাপ; সম্পূর্ণ কভারেজের জন্য `saropaLints.todosAndHacks.maxFilesToScan` বাড়ান।",
       "notePill": "নোট",
-      "todosLabel": "TODOs",
+      "todosLabel": "করণীয়",
       "hacksLabel": "হ্যাকস"
     },
     "drift": {
@@ -299,12 +299,12 @@
       "byFile": "ফাইল দ্বারা (0) {count}",
       "noEntries": "কোন এন্ট্রি নেই.",
       "nothingHidden": "এই কর্মক্ষেত্রে সমস্যা তালিকা থেকে কিছুই লুকানো নেই। ফোল্ডার, ফাইল বা নিয়ম লুকানোর জন্য ট্রি কনটেক্সট অ্যাকশন ব্যবহার করুন; তারা কর্মক্ষেত্র অবস্থায় টিকে থাকে।",
-      "folderPattern": "{count} folder(s)",
-      "filePattern": "{count} file pattern(s)",
-      "ruleGlobal": "{count} rule(s) globally",
-      "perFileRules": "{count} file(s) with per-file rule hides",
-      "severityHides": "{count} severity hide(s)",
-      "impactHides": "{count} impact hide(s)",
+      "folderPattern": "{count} ফোল্ডার",
+      "filePattern": "{count} ফাইল প্যাটার্ন",
+      "ruleGlobal": "{count} রুল (বিশ্বব্যাপী)",
+      "perFileRules": "{count} ফাইল (প্রতি-ফাইল রুল হাইড সহ)",
+      "severityHides": "{count} তীব্রতা হাইড",
+      "impactHides": "{count} ইমপ্যাক্ট হাইড",
       "activeHides": "সক্রিয় লুকান: 0. {counts}",
       "viewHidesFooter": "এই হাইডগুলি শুধুমাত্র সমস্যা/ড্যাশবোর্ড তালিকাকে সঙ্কুচিত করে; তারা `violations.json` এ লেখা হয় না।",
       "clearViewHides": "সমস্ত ভিউ হাইড সাফ করুন",
@@ -320,11 +320,11 @@
       "metaRunning": "এটি বড় প্রকল্পগুলিতে একটি মুহূর্ত নিতে পারে।",
       "metaDone": "সাম্প্রতিক ফলাফলের সাথে ড্যাশবোর্ড রিফ্রেশ করছে।",
       "announceSearch": "অনুসন্ধান করুন 0 {q}",
-      "announceSeverities": "{n} severities",
-      "announceImpacts": "{n} impacts",
+      "announceSeverities": "{n} তীব্রতা",
+      "announceImpacts": "{n} প্রভাব",
       "announceCleared": "সমস্ত ফিল্টার সাফ করা হয়েছে৷",
       "announceFiltersPrefix": "ফিল্টার:",
-      "bulkSelected": "{n} selected",
+      "bulkSelected": "{n} নির্বাচিত",
       "analysisStartedDetail": "শুরু হলো বিশ্লেষণ। ডায়াগনস্টিকস সংগ্রহ করা হচ্ছে...",
       "announceStarted": "শুরু হলো বিশ্লেষণ",
       "announceComplete": "বিশ্লেষণ সম্পূর্ণ",
@@ -332,7 +332,7 @@
       "analysisFailedDetail": "বিশ্লেষণ ব্যর্থ হয়েছে. বিস্তারিত জানার জন্য আউটপুট চেক করুন.",
       "removeRecentAria": "সরান",
       "removeRecentTitle": "সরান",
-      "bulkSelectedTpl": "{n} selected"
+      "bulkSelectedTpl": "{n} নির্বাচিত"
     },
     "emptyState": {
       "hintAfterMessage": "violations.json তৈরি করতে একটি Saropa Lints বিশ্লেষণ চালান, তারপর এখানে রিফ্রেশ ব্যবহার করুন বা এই ড্যাশবোর্ডটি আবার খুলুন।",
@@ -347,14 +347,14 @@
     },
     "unknownAnalyzerKind": "অজানা",
     "supplementary": {
-      "otherAnalyzerOn": "+{count} other analyzer findings",
-      "otherAnalyzerPromo": "+? other analyzer findings — show",
-      "analyzerTodosOn": "+{count} analyzer TODOs",
-      "analyzerTodosPromo": "+? analyzer TODOs — show",
-      "scannerPromo": "Enable TODO/HACK scanner",
-      "tooltipLive": "Live from VS Code Problems panel. Updates as analysis completes. Click to hide.",
-      "tooltipScanner": "Saropa file-system scanner — counts open TODO/HACK markers in source.",
-      "tooltipPromoClickToOn": "Click to enable"
+      "otherAnalyzerOn": "+0 অন্যান্য বিশ্লেষক অনুসন্ধান {count}",
+      "otherAnalyzerPromo": "+? অন্যান্য বিশ্লেষক অনুসন্ধান - দেখান",
+      "analyzerTodosOn": "+0 বিশ্লেষক TODOs {count}",
+      "analyzerTodosPromo": "+? বিশ্লেষক TODOs — দেখান",
+      "scannerPromo": "TODO/HACK স্ক্যানার সক্ষম করুন",
+      "tooltipLive": "ভিএস কোড সমস্যা প্যানেল থেকে লাইভ। বিশ্লেষণ সম্পূর্ণ হওয়ার সাথে সাথে আপডেটগুলি। লুকাতে ক্লিক করুন.",
+      "tooltipScanner": "Saropa ফাইল-সিস্টেম স্ক্যানার — উৎসে খোলা TODO/HACK মার্কার গণনা করে।",
+      "tooltipPromoClickToOn": "সক্রিয় করতে ক্লিক করুন"
     }
   },
   "triageDash": {
@@ -366,8 +366,8 @@
     "on": "চালু",
     "colRule": "নিয়ম",
     "colIssues": "ইস্যু",
-    "zeroIssueRules": "{count} rules with zero issues — auto-enabled in tier.",
-    "disabledOverrides": "{count} rules disabled by override in `analysis_options_custom.yaml`.",
+    "zeroIssueRules": "শূন্য ইস্যু সহ {count} রুল — টিয়ারে স্বয়ংক্রিয়ভাবে সক্ষম।",
+    "disabledOverrides": "`analysis_options_custom.yaml` এ ওভাররাইড দ্বারা {count} রুল অক্ষম করা হয়েছে।",
     "summaryRuleTriage": "রুল triage",
     "hintNoViolations": "এখনো কোনো `report/.saropa_lints/violations.json` নেই। বিশ্লেষণ চালান, তারপর এই ট্যাবটি রিফ্রেশ করুন৷",
     "hintUnreadable": "কোন পঠনযোগ্য লঙ্ঘন রপ্তানি. প্রথমে সরোপা লিন্টস বিশ্লেষণ চালান।",
@@ -402,10 +402,10 @@
     "documentTitle": "Saropa প্যাকেজ ড্যাশবোর্ড",
     "heroTitle": "Saropa প্যাকেজ ড্যাশবোর্ড",
     "status": {
-      "packagesCount": "{count} packages",
-      "packagesBreakdown": "{direct} direct, {transitive} transitive",
+      "packagesCount": "{count} প্যাকেজ",
+      "packagesBreakdown": "{direct} সরাসরি, {transitive} ট্রানজিটিভ",
       "gradeLine": "গ্রেড 0 · 1/100 {grade} {avg}",
-      "flaggedCount": "{count} flagged",
+      "flaggedCount": "{count} ফ্ল্যাগ করা হয়েছে",
       "flaggedTitle": "পরিত্যক্ত বা জীবনের শেষ"
     },
     "scanning": {
@@ -419,7 +419,7 @@
       "packages": "প্যাকেজ",
       "projectGrade": "প্রকল্প প্যাকেজ গ্রেড",
       "totalSize": "মোট আকার*",
-      "gradeTooltip": "প্রকল্প গ্রেড 0\nগড় স্কোর: 1/100\nপ্যাকেজ: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {avgScore} {pkgCount} {a} {b} {c} {e} {f}",
+      "gradeTooltip": "প্রকল্প গ্রেড 0\nগড় স্কোর: 1/100\nপ্যাকেজ: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {b} {avgScore} {c} {f} {avgGrade} {a} {e}",
       "vibrantTitle": "প্রাণবন্ত",
       "stableTitle": "স্থিতিশীল",
       "outdatedTitle": "সেকেলে",
@@ -435,6 +435,11 @@
     },
     "network": {
       "summary": "নির্ভরতা নেটওয়ার্ক"
+    },
+    "sections": {
+      "sizeDistribution": "আকার বিতরণ",
+      "filters": "ফিল্টার",
+      "packages": "প্যাকেজ"
     },
     "toolbar": {
       "openPubspecTitle": "pubspec.yaml খুলুন",
@@ -531,7 +536,7 @@
         "tooltip": "ট্রানজিটিভ (পরোক্ষ) নির্ভরতার সংখ্যা এই প্যাকেজ টানে"
       },
       "vulns": {
-        "label": "Vulns",
+        "label": "দুর্বলতা",
         "tooltip": "OSV এবং GitHub অ্যাডভাইজরি ডেটাবেস থেকে পরিচিত নিরাপত্তা দুর্বলতা"
       },
       "license": {
@@ -573,10 +578,10 @@
     "skipLink": "কমান্ড ক্যাটালগ এড়িয়ে যান",
     "heroTitle": "Saropa কমান্ড ক্যাটালগ",
     "status": {
-      "commands": "{count} commands",
-      "categories": "{count} categories",
-      "recent": "{count} recent",
-      "internalHidden": "{count} context-menu only (hidden)",
+      "commands": "{count} কমান্ড",
+      "categories": "{count} ক্যাটাগরি",
+      "recent": "{count} সাম্প্রতিক",
+      "internalHidden": "{count} শুধুমাত্র কনটেক্সট-মেনু (লুকানো)",
       "wordCommands": "আদেশ",
       "wordCategories": "বিভাগ",
       "wordRecent": "সাম্প্রতিক"
@@ -645,8 +650,8 @@
       "searchChip": "অনুসন্ধান করুন: \"0\" {query}",
       "internalChip": "প্রসঙ্গ-মেনু কমান্ড দেখানো হচ্ছে",
       "removeFilterPrefix": "ফিল্টার সরান",
-      "matchOne": "{count} match",
-      "matchOther": "{count} matches"
+      "matchOne": "{count} মিল",
+      "matchOther": "{count} মিল"
     }
   },
   "codeHealth": {
@@ -661,9 +666,9 @@
     "hero": {
       "title": "Saropa কোড স্বাস্থ্য ড্যাশবোর্ড",
       "generated": "উৎপন্ন",
-      "functionOne": "{count} function",
-      "functionOther": "{count} functions",
-      "avgFormat": "গড় 0 (1) {score} {grade}",
+      "functionOne": "{count} ফাংশন",
+      "functionOther": "{count} ফাংশন",
+      "avgFormat": "গড় 0 (1) {grade} {score}",
       "gatesFailing": "গেট ব্যর্থ",
       "gatesPassing": "গেট পাসিং"
     },
@@ -673,8 +678,8 @@
     },
     "gate": {
       "fallback": "গুণমান গেট ব্যর্থ হয়েছে — কোড স্বাস্থ্য সেটিংসে থ্রেশহোল্ড পর্যালোচনা করুন।",
-      "failingOne": "{count} gate failing — review thresholds, or copy the JSON to inspect gates.violations.",
-      "failingOther": "{count} gates failing — review thresholds, or copy the JSON to inspect gates.violations.",
+      "failingOne": "{count} গেট ব্যর্থ — থ্রেশহোল্ড পর্যালোচনা করুন, বা gates.violations পরিদর্শন করতে JSON কপি করুন।",
+      "failingOther": "{count} গেট ব্যর্থ — থ্রেশহোল্ড পর্যালোচনা করুন, বা gates.violations পরিদর্শন করতে JSON কপি করুন।",
       "openSettingsTitle": "থ্রেশহোল্ড সামঞ্জস্য করতে কোড স্বাস্থ্য সেটিংস খুলুন।",
       "openSettingsButton": "কোড স্বাস্থ্য সেটিংস খুলুন"
     },
@@ -737,15 +742,15 @@
       "flagChip": "পতাকা: 0 {flag}",
       "removeAria": "0 সরান {key}",
       "clearAll": "সব সাফ করুন",
-      "rowsVisible": "{visible} of {total} rows visible",
+      "rowsVisible": "{total} সারির মধ্যে {visible} দৃশ্যমান",
       "neverRun": "কখনই দৌড়ান না"
     },
     "freshness": {
       "justNow": "এইমাত্র",
-      "minutesAgo": "{min}m ago",
-      "hoursAgo": "{hr}h ago",
-      "daysAgo": "{day}d ago",
-      "weeksAgo": "{wk}w ago"
+      "minutesAgo": "{min} মিনিট আগে",
+      "hoursAgo": "{hr} ঘণ্টা আগে",
+      "daysAgo": "{day} দিন আগে",
+      "weeksAgo": "{wk} সপ্তাহ আগে"
     }
   },
   "suppressionsStrip": {
@@ -760,7 +765,7 @@
     "noFileRisk": "প্রতি-ফাইল ঝুঁকি ভাঙ্গন নেই (স্কোপের মধ্যে কোন লঙ্ঘন নেই)।",
     "suppressionNote": "মিলছে violations.json সারাংশ, লাইভ সাইডবার সাপ্রেশন টগল নয়।",
     "noSuppression": "এই রপ্তানিতে কোন দমন সামগ্রিক নয় (পুরানো বিশ্লেষক বা শূন্য দমন)।",
-    "owaspSignal": "{count} violation(s) in this export carry OWASP mobile/web mapping — open Security Posture for the full matrix and export.",
+    "owaspSignal": "এই এক্সপোর্টে {count} লঙ্ঘন OWASP মোবাইল/ওয়েব ম্যাপিং বহন করে — সম্পূর্ণ ম্যাট্রিক্স এবং এক্সপোর্টের জন্য Security Posture খুলুন।",
     "summarySuppressions": "দমন (স্ন্যাপশট রপ্তানি)",
     "summaryOwasp": "নিরাপত্তা ভঙ্গি (OWASP সংকেত)",
     "summaryFileRisk": "ফাইল ঝুঁকি (শীর্ষ ফাইল)"
@@ -770,8 +775,8 @@
     "skipToCounters": "টেলিমেট্রি কাউন্টারে যান",
     "lastEvent": "শেষ ঘটনা 0 {relative}",
     "noEvents": "কোন ঘটনা রেকর্ড করা হয়নি",
-    "totalEventOne": "{count} total event",
-    "totalEventOther": "{count} total events",
+    "totalEventOne": "{count} মোট ইভেন্ট",
+    "totalEventOther": "{count} মোট ইভেন্ট",
     "noCountersTitle": "রিসেট করার জন্য কোন কাউন্টার নেই।",
     "resetTitle": "সমস্ত কাউন্টার রিসেট করুন",
     "refreshTitle": "ডিস্ক থেকে টেলিমেট্রি কাউন্টার পুনরায় লোড করুন",
@@ -795,11 +800,11 @@
     "hint": "সারোপা অ্যাক্টিভিটি-বার বিভাগগুলি এখানে চালু বা বন্ধ করুন (ড্যাশবোর্ড না রেখে ওয়ার্কস্পেসের সাথে সংরক্ষিত)।"
   },
   "securityPosture": {
-    "issueOne": "{count} issue",
-    "issueOther": "{count} issues",
+    "issueOne": "{count} ইস্যু",
+    "issueOther": "{count} ইস্যু",
     "noIssues": "কোন সমস্যা নেই",
     "showIssues": "সমস্যা দেখান",
-    "violationTooltip": "{count} violation(s) across {ruleCount} rule(s). Click to show in Issues.",
+    "violationTooltip": "{ruleCount} রুল জুড়ে {count} লঙ্ঘন। ইস্যুগুলিতে দেখাতে ক্লিক করুন।",
     "noViolationsTooltip": "এই বিভাগে ম্যাপ করা কোনো লঙ্ঘন নেই।"
   }
 }

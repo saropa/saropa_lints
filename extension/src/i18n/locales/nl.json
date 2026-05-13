@@ -90,28 +90,28 @@
     "secondaryAsideLabel": "Secundaire diagnostiek",
     "hero": {
       "productTitle": "Bevindingendashboard",
-      "gaugeTitle": "Gezondheidsscore 0/100 (graad 1). Fouten wegen het zwaarst. {score} {grade}"
+      "gaugeTitle": "Gezondheidsscore 0/100 (graad 1). Fouten wegen het zwaarst. {grade} {score}"
     },
     "time": {
       "justNow": "zojuist",
-      "minutesAgo": "{min}m ago",
-      "hoursAgo": "{hr}h ago",
-      "daysAgo": "{day}d ago"
+      "minutesAgo": "{min} m geleden",
+      "hoursAgo": "{hr} u geleden",
+      "daysAgo": "{day} d geleden"
     },
     "status": {
       "lastRunPrefix": "Laatste run",
       "lastRunUnknown": "Laatste run onbekend",
       "noTimestampTitle": "Geen tijdstempel op schendings.json",
       "findingsAfterFilterTitle": "Totaal aantal bevindingen na uitgeschakeld regelfilter",
-      "findingOne": "{count} finding",
-      "findingOther": "{count} findings",
+      "findingOne": "{count} bevinding",
+      "findingOther": "{count} bevindingen",
       "todoHackTitle": "TODO- en HACK-markeringen gevonden in de werkruimte",
       "driftOnTitle": "Driftadviseur aangesloten: 0 {label}",
       "driftOnPill": "Drift voort op · 0 {count}",
       "driftOfflineTitle": "Drift Advisor ingeschakeld, maar geen server gevonden",
       "driftOfflinePill": "Offline gaan",
       "enabledRulesTitle": "Ingeschakelde regels in de huidige laag",
-      "rulesCount": "{count} rules"
+      "rulesCount": "{count} regels"
     },
     "groupBy": {
       "severity": "Ernst",
@@ -222,7 +222,7 @@
       "sectionAria": "Bevindingen",
       "expandAll": "Alles uitvouwen",
       "collapseAll": "Alles samenvouwen",
-      "bulkSelected": "{count} selected",
+      "bulkSelected": "{count} geselecteerd",
       "bulkCopy": "Kopieer geselecteerd als JSON",
       "selectAllTitle": "Selecteer alle zichtbare bevindingen",
       "selectAllAria": "Selecteer alle zichtbare bevindingen",
@@ -233,8 +233,8 @@
       "colActionsAria": "Rij-acties",
       "selectRowAria": "Selecteer deze bevindingsrij",
       "copyRowTitle": "Kopieer deze bevinding als JSON",
-      "metaShown": "{filtered} shown",
-      "metaAfterDisable": "{total} after disabled-rule filter",
+      "metaShown": "{filtered} weergegeven",
+      "metaAfterDisable": "{total} na filter voor uitgeschakelde regels",
       "metaSourceCap": "bron beperkt tot 0 vanwege prestaties {max}",
       "metaGroupedBy": "gegroepeerd op 0 {mode}",
       "overflowNote": "Bronnenlijst afgekapt op 0 voor weergaveprestaties. {max}",
@@ -263,11 +263,11 @@
       "scanOff": "Werkruimtescan is uitgeschakeld: schakel markeringen uit projectbestanden in.",
       "enableScan": "Scannen inschakelen",
       "heading": "TODO's & HACKS",
-      "subsectionNone": "{title}: none in scan range.",
+      "subsectionNone": "{title}: geen in scanbereik.",
       "capNote": "Scan hit max-bestandslimiet; verhogen `saropaLints.todosAndHacks.maxFilesToScan` voor volledige dekking.",
       "notePill": "opmerking",
       "todosLabel": "TODO's",
-      "hacksLabel": "HACKS"
+      "hacksLabel": "Noodoplossingen"
     },
     "drift": {
       "sectionAria": "Drift adviseur",
@@ -299,12 +299,12 @@
       "byFile": "Per bestand (0) {count}",
       "noEntries": "Geen vermeldingen.",
       "nothingHidden": "Er is niets verborgen in de lijst met problemen in deze werkruimte. Gebruik boomcontextacties om mappen, bestanden of regels te verbergen; ze blijven bestaan ​​in de werkruimtestatus.",
-      "folderPattern": "{count} folder(s)",
-      "filePattern": "{count} file pattern(s)",
-      "ruleGlobal": "{count} rule(s) globally",
-      "perFileRules": "{count} file(s) with per-file rule hides",
-      "severityHides": "{count} severity hide(s)",
-      "impactHides": "{count} impact hide(s)",
+      "folderPattern": "{count} map(pen)",
+      "filePattern": "{count} bestandspatroon(en)",
+      "ruleGlobal": "{count} regel(s) globaal",
+      "perFileRules": "{count} bestand(en) met regelverberging per bestand",
+      "severityHides": "{count} ernst verborgen",
+      "impactHides": "{count} impact verborgen",
       "activeHides": "Actieve huiden: 0. {counts}",
       "viewHidesFooter": "Deze verbergingen verkleinen alleen de lijst met problemen/dashboards; ze worden niet naar `violations.json` geschreven.",
       "clearViewHides": "Wis alle weergavehuiden",
@@ -320,11 +320,11 @@
       "metaRunning": "Bij grote projecten kan dit even duren.",
       "metaDone": "Verfrissend dashboard met de laatste bevindingen.",
       "announceSearch": "zoek 0 {q}",
-      "announceSeverities": "{n} severities",
-      "announceImpacts": "{n} impacts",
+      "announceSeverities": "{n} graden van ernst",
+      "announceImpacts": "{n} effecten",
       "announceCleared": "Alle filters gewist",
       "announceFiltersPrefix": "Filters:",
-      "bulkSelected": "{n} selected",
+      "bulkSelected": "{n} geselecteerd",
       "analysisStartedDetail": "Analyse gestart. Diagnostische gegevens verzamelen...",
       "announceStarted": "Analyse gestart",
       "announceComplete": "Analyse voltooid",
@@ -332,7 +332,7 @@
       "analysisFailedDetail": "Analyse mislukt. Controleer de uitvoer voor details.",
       "removeRecentAria": "Verwijderen",
       "removeRecentTitle": "Verwijderen",
-      "bulkSelectedTpl": "{n} selected"
+      "bulkSelectedTpl": "{n} geselecteerd"
     },
     "emptyState": {
       "hintAfterMessage": "Voer een Saropa Lints-analyse uit om schendings.json te genereren en gebruik vervolgens hier Vernieuwen of open dit dashboard opnieuw.",
@@ -347,14 +347,14 @@
     },
     "unknownAnalyzerKind": "Onbekend",
     "supplementary": {
-      "otherAnalyzerOn": "+{count} other analyzer findings",
-      "otherAnalyzerPromo": "+? other analyzer findings — show",
-      "analyzerTodosOn": "+{count} analyzer TODOs",
-      "analyzerTodosPromo": "+? analyzer TODOs — show",
-      "scannerPromo": "Enable TODO/HACK scanner",
-      "tooltipLive": "Live from VS Code Problems panel. Updates as analysis completes. Click to hide.",
-      "tooltipScanner": "Saropa file-system scanner — counts open TODO/HACK markers in source.",
-      "tooltipPromoClickToOn": "Click to enable"
+      "otherAnalyzerOn": "+0 andere bevindingen van de analyser {count}",
+      "otherAnalyzerPromo": "+? andere bevindingen van de analysator - laten zien",
+      "analyzerTodosOn": "+0 TODO's van analysatoren {count}",
+      "analyzerTodosPromo": "+? analysator TODO's - tonen",
+      "scannerPromo": "Schakel TODO/HACK-scanner in",
+      "tooltipLive": "Live vanuit het VS-codeproblemenpaneel. Wordt bijgewerkt zodra de analyse is voltooid. Klik om te verbergen.",
+      "tooltipScanner": "Saropa-bestandssysteemscanner — telt open TODO/HACK-markeringen in de bron.",
+      "tooltipPromoClickToOn": "Klik om in te schakelen"
     }
   },
   "triageDash": {
@@ -366,8 +366,8 @@
     "on": "Op",
     "colRule": "Regel",
     "colIssues": "Problemen",
-    "zeroIssueRules": "{count} rules with zero issues — auto-enabled in tier.",
-    "disabledOverrides": "{count} rules disabled by override in `analysis_options_custom.yaml`.",
+    "zeroIssueRules": "{count} regels met nul problemen — automatisch ingeschakeld in tier.",
+    "disabledOverrides": "{count} regels uitgeschakeld door overschrijving in `analysis_options_custom.yaml`.",
     "summaryRuleTriage": "Regel triage",
     "hintNoViolations": "Nog geen `reports/.saropa_lints/violations.json`. Voer de analyse uit en vernieuw vervolgens dit tabblad.",
     "hintUnreadable": "Geen leesbare schendingen exporteren. Voer eerst de Saropa Lints-analyse uit.",
@@ -402,10 +402,10 @@
     "documentTitle": "Saropa-pakketdashboard",
     "heroTitle": "Saropa-pakketdashboard",
     "status": {
-      "packagesCount": "{count} packages",
-      "packagesBreakdown": "{direct} direct, {transitive} transitive",
+      "packagesCount": "{count} pakketten",
+      "packagesBreakdown": "{direct} direct, {transitive} transitief",
       "gradeLine": "Graad 0 · 1/100 {grade} {avg}",
-      "flaggedCount": "{count} flagged",
+      "flaggedCount": "{count} gemarkeerd",
       "flaggedTitle": "Verlaten of einde leven"
     },
     "scanning": {
@@ -419,7 +419,7 @@
       "packages": "Pakketten",
       "projectGrade": "Projectpakketklasse",
       "totalSize": "Totale grootte*",
-      "gradeTooltip": "Projectcijfer 0\nGemiddelde score: 1/100\nPakketten: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {avgScore} {pkgCount} {a} {b} {c} {e} {f}",
+      "gradeTooltip": "Projectcijfer 0\nGemiddelde score: 1/100\nPakketten: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {b} {avgScore} {c} {f} {avgGrade} {a} {e}",
       "vibrantTitle": "Levendig",
       "stableTitle": "Stabiel",
       "outdatedTitle": "Verouderd",
@@ -435,6 +435,11 @@
     },
     "network": {
       "summary": "Afhankelijkheidsnetwerk"
+    },
+    "sections": {
+      "sizeDistribution": "Grootteverdeling",
+      "filters": "Filters",
+      "packages": "Pakketten"
     },
     "toolbar": {
       "openPubspecTitle": "Open pubspec.yaml",
@@ -531,7 +536,7 @@
         "tooltip": "Aantal transitieve (indirecte) afhankelijkheden die dit pakket binnenhaalt"
       },
       "vulns": {
-        "label": "Vulns",
+        "label": "Kwetsb.",
         "tooltip": "Bekende beveiligingsproblemen uit OSV- en GitHub Advisory-databases"
       },
       "license": {
@@ -573,10 +578,10 @@
     "skipLink": "Ga naar de opdrachtencatalogus",
     "heroTitle": "Saropa-opdrachtencatalogus",
     "status": {
-      "commands": "{count} commands",
-      "categories": "{count} categories",
+      "commands": "{count} opdrachten",
+      "categories": "{count} categorieën",
       "recent": "{count} recent",
-      "internalHidden": "{count} context-menu only (hidden)",
+      "internalHidden": "{count} alleen contextmenu (verborgen)",
       "wordCommands": "opdrachten",
       "wordCategories": "categorieën",
       "wordRecent": "recent"
@@ -645,8 +650,8 @@
       "searchChip": "Zoeken: \"0\" {query}",
       "internalChip": "Contextmenuopdrachten weergeven",
       "removeFilterPrefix": "Filter verwijderen",
-      "matchOne": "{count} match",
-      "matchOther": "{count} matches"
+      "matchOne": "{count} overeenkomst",
+      "matchOther": "{count} overeenkomsten"
     }
   },
   "codeHealth": {
@@ -661,9 +666,9 @@
     "hero": {
       "title": "Saropa Code Gezondheidsdashboard",
       "generated": "Gegenereerd",
-      "functionOne": "{count} function",
-      "functionOther": "{count} functions",
-      "avgFormat": "gemiddeld 0 (1) {score} {grade}",
+      "functionOne": "{count} functie",
+      "functionOther": "{count} functies",
+      "avgFormat": "gemiddeld 0 (1) {grade} {score}",
       "gatesFailing": "poorten falen",
       "gatesPassing": "poorten passeren"
     },
@@ -673,8 +678,8 @@
     },
     "gate": {
       "fallback": "Kwaliteitspoorten zijn mislukt: bekijk de drempelwaarden in de Code Health-instellingen.",
-      "failingOne": "{count} gate failing — review thresholds, or copy the JSON to inspect gates.violations.",
-      "failingOther": "{count} gates failing — review thresholds, or copy the JSON to inspect gates.violations.",
+      "failingOne": "{count} gate faalt — controleer drempelwaarden of kopieer de JSON om gates.violations te inspecteren.",
+      "failingOther": "{count} gates falen — controleer drempelwaarden of kopieer de JSON om gates.violations te inspecteren.",
       "openSettingsTitle": "Open de Code Health-instellingen om drempels aan te passen.",
       "openSettingsButton": "Open Code Health-instellingen"
     },
@@ -737,15 +742,15 @@
       "flagChip": "vlag: 0 {flag}",
       "removeAria": "Verwijder 0 {key}",
       "clearAll": "Alles wissen",
-      "rowsVisible": "{visible} of {total} rows visible",
+      "rowsVisible": "{visible} van {total} rijen zichtbaar",
       "neverRun": "nooit rennen"
     },
     "freshness": {
       "justNow": "zojuist",
-      "minutesAgo": "{min}m ago",
-      "hoursAgo": "{hr}h ago",
-      "daysAgo": "{day}d ago",
-      "weeksAgo": "{wk}w ago"
+      "minutesAgo": "{min} m geleden",
+      "hoursAgo": "{hr} u geleden",
+      "daysAgo": "{day} d geleden",
+      "weeksAgo": "{wk} w geleden"
     }
   },
   "suppressionsStrip": {
@@ -760,7 +765,7 @@
     "noFileRisk": "Geen risicoanalyse per bestand (geen schendingen in reikwijdte).",
     "suppressionNote": "Komt overeen met de samenvatting van schendingen.json, niet met live zijbalkonderdrukkingsschakelaars.",
     "noSuppression": "Geen onderdrukkingsaggregaat in deze export (oudere analysator of nulonderdrukkingen).",
-    "owaspSignal": "{count} violation(s) in this export carry OWASP mobile/web mapping — open Security Posture for the full matrix and export.",
+    "owaspSignal": "{count} overtreding(en) in deze export bevatten OWASP mobiele/web mapping — open Security Posture voor de volledige matrix en export.",
     "summarySuppressions": "Onderdrukkingen (momentopname exporteren)",
     "summaryOwasp": "Beveiligingshouding (OWASP-signaal)",
     "summaryFileRisk": "Bestandsrisico (topbestanden)"
@@ -770,8 +775,8 @@
     "skipToCounters": "Ga naar telemetrietellers",
     "lastEvent": "Laatste gebeurtenis 0 {relative}",
     "noEvents": "Geen gebeurtenissen geregistreerd",
-    "totalEventOne": "{count} total event",
-    "totalEventOther": "{count} total events",
+    "totalEventOne": "{count} totaal evenement",
+    "totalEventOther": "{count} totale evenementen",
     "noCountersTitle": "Geen tellers om te resetten.",
     "resetTitle": "Reset alle tellers",
     "refreshTitle": "Herlaad telemetrietellers vanaf schijf",
@@ -795,11 +800,11 @@
     "hint": "Schakel hier Saropa-activiteitenbalksecties in of uit (opgeslagen in de werkruimte, zonder het dashboard te verlaten)."
   },
   "securityPosture": {
-    "issueOne": "{count} issue",
-    "issueOther": "{count} issues",
+    "issueOne": "{count} probleem",
+    "issueOther": "{count} problemen",
     "noIssues": "Geen problemen",
     "showIssues": "Problemen weergeven",
-    "violationTooltip": "{count} violation(s) across {ruleCount} rule(s). Click to show in Issues.",
+    "violationTooltip": "{count} overtreding(en) verdeeld over {ruleCount} regel(s). Klik om weer te geven in Problemen.",
     "noViolationsTooltip": "Er zijn geen overtredingen toegewezen aan deze categorie."
   }
 }

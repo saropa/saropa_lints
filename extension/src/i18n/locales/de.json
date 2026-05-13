@@ -43,7 +43,7 @@
     "reload": "Neu laden",
     "copyDetails": "Details kopieren",
     "unreachable": "0 konnte nicht erreicht werden {target}",
-    "partialSummary": "{loaded} of {total} {item} loaded. {failed} failed.",
+    "partialSummary": "{loaded} von {total} {item} geladen. {failed} fehlgeschlagen.",
     "partialRetry": "Wiederholungsversuch fehlgeschlagen"
   },
   "offline": {
@@ -90,28 +90,28 @@
     "secondaryAsideLabel": "Sekundärdiagnostik",
     "hero": {
       "productTitle": "Ergebnis-Dashboard",
-      "gaugeTitle": "Gesundheitswert 0/100 (Note 1). Fehler wiegen am schwersten. {score} {grade}"
+      "gaugeTitle": "Gesundheitswert 0/100 (Note 1). Fehler wiegen am schwersten. {grade} {score}"
     },
     "time": {
       "justNow": "soeben",
-      "minutesAgo": "{min}m ago",
-      "hoursAgo": "{hr}h ago",
-      "daysAgo": "{day}d ago"
+      "minutesAgo": "vor {min} Min.",
+      "hoursAgo": "vor {hr} Std.",
+      "daysAgo": "vor {day} Tg."
     },
     "status": {
       "lastRunPrefix": "Letzter Lauf",
       "lastRunUnknown": "Letzter Lauf unbekannt",
       "noTimestampTitle": "Kein Zeitstempel in der Datei „violences.json“.",
       "findingsAfterFilterTitle": "Gesamtergebnisse nach dem Filter für deaktivierte Regeln",
-      "findingOne": "{count} finding",
-      "findingOther": "{count} findings",
+      "findingOne": "{count} Fund",
+      "findingOther": "{count} Funde",
       "todoHackTitle": "TODO- und HACK-Marker im Arbeitsbereich gefunden",
       "driftOnTitle": "Drift Advisor verbunden: 0 {label}",
       "driftOnPill": "Driften Sie auf · 0 {count}",
       "driftOfflineTitle": "Drift Advisor aktiviert, aber kein Server gefunden",
       "driftOfflinePill": "Offline driften",
       "enabledRulesTitle": "Aktivierte Regeln in der aktuellen Stufe",
-      "rulesCount": "{count} rules"
+      "rulesCount": "{count} Regeln"
     },
     "groupBy": {
       "severity": "Schwere",
@@ -195,7 +195,7 @@
       "copyTreeJson": "Kopieren Sie den JSON-Baum",
       "refreshExtension": "Erweiterung aktualisieren",
       "openPackageDashboard": "Öffnen Sie das Paket-Dashboard",
-      "openCodeHealth": "Open Code Health",
+      "openCodeHealth": "Code Health öffnen",
       "openLintsConfig": "Öffnen Sie die Lints-Konfiguration"
     },
     "progress": {
@@ -222,7 +222,7 @@
       "sectionAria": "Erkenntnisse",
       "expandAll": "Alles erweitern",
       "collapseAll": "Alles einklappen",
-      "bulkSelected": "{count} selected",
+      "bulkSelected": "{count} ausgewählt",
       "bulkCopy": "Als JSON ausgewählte Kopie",
       "selectAllTitle": "Wählen Sie alle sichtbaren Befunde aus",
       "selectAllAria": "Wählen Sie alle sichtbaren Befunde aus",
@@ -233,8 +233,8 @@
       "colActionsAria": "Zeilenaktionen",
       "selectRowAria": "Wählen Sie diese Ergebniszeile aus",
       "copyRowTitle": "Kopieren Sie dieses Ergebnis als JSON",
-      "metaShown": "{filtered} shown",
-      "metaAfterDisable": "{total} after disabled-rule filter",
+      "metaShown": "{filtered} angezeigt",
+      "metaAfterDisable": "{total} nach Filter für deaktivierte Regeln",
       "metaSourceCap": "Quelle aus Leistungsgründen auf 0 begrenzt {max}",
       "metaGroupedBy": "gruppiert nach 0 {mode}",
       "overflowNote": "Die Quellliste wurde für die Renderleistung auf 0 gekürzt. {max}",
@@ -258,16 +258,16 @@
     },
     "todoHack": {
       "sectionAria": "TODOs und HACKS",
-      "headingDisabled": "TODOs & HACKS",
+      "headingDisabled": "To-dos & Workarounds",
       "metaDisabled": "Scan deaktiviert",
       "scanOff": "Der Arbeitsbereich-Scan ist deaktiviert – aktivieren Sie diese Option, um Markierungen aus Projektdateien anzuzeigen.",
       "enableScan": "Scan aktivieren",
-      "heading": "TODOs & HACKS",
-      "subsectionNone": "{title}: none in scan range.",
+      "heading": "To-dos & Workarounds",
+      "subsectionNone": "{title}: keine im Scan-Bereich.",
       "capNote": "Max. Dateiobergrenze für Scantreffer; Erhöhen Sie „saropaLints.todosAndHacks.maxFilesToScan“ für eine vollständige Abdeckung.",
       "notePill": "Notiz",
-      "todosLabel": "TODOs",
-      "hacksLabel": "HACKS"
+      "todosLabel": "To-dos",
+      "hacksLabel": "Workarounds"
     },
     "drift": {
       "sectionAria": "Drift-Berater",
@@ -299,12 +299,12 @@
       "byFile": "Nach Datei (0) {count}",
       "noEntries": "Keine Einträge.",
       "nothingHidden": "In diesem Arbeitsbereich ist in der Liste „Probleme“ nichts verborgen. Verwenden Sie Baumkontextaktionen, um Ordner, Dateien oder Regeln auszublenden. Sie bleiben im Arbeitsbereichsstatus bestehen.",
-      "folderPattern": "{count} folder(s)",
-      "filePattern": "{count} file pattern(s)",
-      "ruleGlobal": "{count} rule(s) globally",
-      "perFileRules": "{count} file(s) with per-file rule hides",
-      "severityHides": "{count} severity hide(s)",
-      "impactHides": "{count} impact hide(s)",
+      "folderPattern": "{count} Ordner",
+      "filePattern": "{count} Dateimuster",
+      "ruleGlobal": "{count} Regel(n) global",
+      "perFileRules": "{count} Datei(en) mit dateispezifischen Regelausblendungen",
+      "severityHides": "{count} Schweregrad(e) ausgeblendet",
+      "impactHides": "{count} Auswirkung(en) ausgeblendet",
       "activeHides": "Aktive Verstecke: 0. {counts}",
       "viewHidesFooter": "Diese Blenden verkleinern nur die Liste der Probleme/Dashboards. Sie werden nicht in „violations.json“ geschrieben.",
       "clearViewHides": "Alle ausgeblendeten Ansichten löschen",
@@ -320,11 +320,11 @@
       "metaRunning": "Bei großen Projekten kann dies einen Moment dauern.",
       "metaDone": "Erfrischendes Dashboard mit den neuesten Erkenntnissen.",
       "announceSearch": "Suche 0 {q}",
-      "announceSeverities": "{n} severities",
-      "announceImpacts": "{n} impacts",
+      "announceSeverities": "{n} Schweregrade",
+      "announceImpacts": "{n} Auswirkungen",
       "announceCleared": "Alle Filter gelöscht",
       "announceFiltersPrefix": "Filter:",
-      "bulkSelected": "{n} selected",
+      "bulkSelected": "{n} ausgewählt",
       "analysisStartedDetail": "Die Analyse hat begonnen. Diagnosedaten sammeln…",
       "announceStarted": "Die Analyse hat begonnen",
       "announceComplete": "Analyse abgeschlossen",
@@ -332,7 +332,7 @@
       "analysisFailedDetail": "Die Analyse ist fehlgeschlagen. Einzelheiten finden Sie in der Ausgabe.",
       "removeRecentAria": "Entfernen",
       "removeRecentTitle": "Entfernen",
-      "bulkSelectedTpl": "{n} selected"
+      "bulkSelectedTpl": "{n} ausgewählt"
     },
     "emptyState": {
       "hintAfterMessage": "Führen Sie eine Saropa-Lints-Analyse durch, um „violences.json“ zu generieren, und verwenden Sie dann „Hier aktualisieren“ oder öffnen Sie dieses Dashboard erneut.",
@@ -347,14 +347,14 @@
     },
     "unknownAnalyzerKind": "Unbekannt",
     "supplementary": {
-      "otherAnalyzerOn": "+{count} other analyzer findings",
-      "otherAnalyzerPromo": "+? other analyzer findings — show",
-      "analyzerTodosOn": "+{count} analyzer TODOs",
-      "analyzerTodosPromo": "+? analyzer TODOs — show",
-      "scannerPromo": "Enable TODO/HACK scanner",
-      "tooltipLive": "Live from VS Code Problems panel. Updates as analysis completes. Click to hide.",
-      "tooltipScanner": "Saropa file-system scanner — counts open TODO/HACK markers in source.",
-      "tooltipPromoClickToOn": "Click to enable"
+      "otherAnalyzerOn": "+0 andere Analyseergebnisse {count}",
+      "otherAnalyzerPromo": "+? andere Analysatorergebnisse – anzeigen",
+      "analyzerTodosOn": "+0 TODOs des Analysators {count}",
+      "analyzerTodosPromo": "+? TODOs des Analysators – anzeigen",
+      "scannerPromo": "Aktivieren Sie den TODO/HACK-Scanner",
+      "tooltipLive": "Live aus dem Bereich „VS-Code-Probleme“. Aktualisierungen, sobald die Analyse abgeschlossen ist. Klicken Sie zum Ausblenden.",
+      "tooltipScanner": "Saropa-Dateisystemscanner – zählt offene TODO/HACK-Marker in der Quelle.",
+      "tooltipPromoClickToOn": "Klicken Sie zum Aktivieren"
     }
   },
   "triageDash": {
@@ -366,8 +366,8 @@
     "on": "An",
     "colRule": "Regel",
     "colIssues": "Probleme",
-    "zeroIssueRules": "{count} rules with zero issues — auto-enabled in tier.",
-    "disabledOverrides": "{count} rules disabled by override in `analysis_options_custom.yaml`.",
+    "zeroIssueRules": "{count} Regeln mit null Problemen — im Tier automatisch aktiviert.",
+    "disabledOverrides": "{count} Regeln durch Überschreibung in `analysis_options_custom.yaml` deaktiviert.",
     "summaryRuleTriage": "Regeltriage",
     "hintNoViolations": "Noch kein „reports/.saropa_lints/violations.json“. Führen Sie die Analyse durch und aktualisieren Sie dann diese Registerkarte.",
     "hintUnreadable": "Es werden keine lesbaren Verstöße exportiert. Führen Sie zuerst die Saropa Lints-Analyse durch.",
@@ -402,10 +402,10 @@
     "documentTitle": "Saropa-Paket-Dashboard",
     "heroTitle": "Saropa-Paket-Dashboard",
     "status": {
-      "packagesCount": "{count} packages",
-      "packagesBreakdown": "{direct} direct, {transitive} transitive",
+      "packagesCount": "{count} Pakete",
+      "packagesBreakdown": "{direct} direkt, {transitive} transitiv",
       "gradeLine": "Note 0 · 1/100 {grade} {avg}",
-      "flaggedCount": "{count} flagged",
+      "flaggedCount": "{count} markiert",
       "flaggedTitle": "Verlassen oder am Lebensende"
     },
     "scanning": {
@@ -419,7 +419,7 @@
       "packages": "Pakete",
       "projectGrade": "Grad des Projektpakets",
       "totalSize": "Gesamtgröße*",
-      "gradeTooltip": "Projektnote 0\nDurchschnittliche Punktzahl: 1/100\nPakete: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {avgScore} {pkgCount} {a} {b} {c} {e} {f}",
+      "gradeTooltip": "Projektnote 0\nDurchschnittliche Punktzahl: 1/100\nPakete: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {b} {avgScore} {c} {f} {avgGrade} {a} {e}",
       "vibrantTitle": "Lebendig",
       "stableTitle": "Stabil",
       "outdatedTitle": "Veraltet",
@@ -435,6 +435,11 @@
     },
     "network": {
       "summary": "Abhängigkeitsnetzwerk"
+    },
+    "sections": {
+      "sizeDistribution": "Größenverteilung",
+      "filters": "Filter",
+      "packages": "Pakete"
     },
     "toolbar": {
       "openPubspecTitle": "Öffnen Sie pubspec.yaml",
@@ -531,7 +536,7 @@
         "tooltip": "Anzahl der transitiven (indirekten) Abhängigkeiten, die dieses Paket einbezieht"
       },
       "vulns": {
-        "label": "Vulns",
+        "label": "Schwachst.",
         "tooltip": "Bekannte Sicherheitslücken aus OSV- und GitHub Advisory-Datenbanken"
       },
       "license": {
@@ -573,10 +578,10 @@
     "skipLink": "Zum Befehlskatalog springen",
     "heroTitle": "Saropa-Befehlskatalog",
     "status": {
-      "commands": "{count} commands",
-      "categories": "{count} categories",
-      "recent": "{count} recent",
-      "internalHidden": "{count} context-menu only (hidden)",
+      "commands": "{count} Befehle",
+      "categories": "{count} Kategorien",
+      "recent": "{count} kürzlich",
+      "internalHidden": "Nur {count} Kontextmenü (ausgeblendet)",
       "wordCommands": "Befehle",
       "wordCategories": "Kategorien",
       "wordRecent": "jüngste"
@@ -645,8 +650,8 @@
       "searchChip": "Suche: „0“ {query}",
       "internalChip": "Kontextmenübefehle werden angezeigt",
       "removeFilterPrefix": "Filter entfernen",
-      "matchOne": "{count} match",
-      "matchOther": "{count} matches"
+      "matchOne": "{count} Treffer",
+      "matchOther": "{count} Treffer"
     }
   },
   "codeHealth": {
@@ -661,9 +666,9 @@
     "hero": {
       "title": "Saropa-Code-Gesundheits-Dashboard",
       "generated": "Generiert",
-      "functionOne": "{count} function",
-      "functionOther": "{count} functions",
-      "avgFormat": "Durchschnitt 0 (1) {score} {grade}",
+      "functionOne": "{count} Funktion",
+      "functionOther": "{count} Funktionen",
+      "avgFormat": "Durchschnitt 0 (1) {grade} {score}",
       "gatesFailing": "Tore versagen",
       "gatesPassing": "Tore passieren"
     },
@@ -673,8 +678,8 @@
     },
     "gate": {
       "fallback": "Qualitätstore fehlgeschlagen – überprüfen Sie die Schwellenwerte in den Code-Integritätseinstellungen.",
-      "failingOne": "{count} gate failing — review thresholds, or copy the JSON to inspect gates.violations.",
-      "failingOther": "{count} gates failing — review thresholds, or copy the JSON to inspect gates.violations.",
+      "failingOne": "{count} Gate fehlgeschlagen — Schwellenwerte überprüfen oder das JSON kopieren, um gates.violations zu inspizieren.",
+      "failingOther": "{count} Gates fehlgeschlagen — Schwellenwerte überprüfen oder das JSON kopieren, um gates.violations zu inspizieren.",
       "openSettingsTitle": "Öffnen Sie die Code Health-Einstellungen, um Schwellenwerte anzupassen.",
       "openSettingsButton": "Öffnen Sie die Code Health-Einstellungen"
     },
@@ -737,15 +742,15 @@
       "flagChip": "Flagge: 0 {flag}",
       "removeAria": "Entfernen Sie 0 {key}",
       "clearAll": "Alles löschen",
-      "rowsVisible": "{visible} of {total} rows visible",
+      "rowsVisible": "{visible} von {total} Zeilen sichtbar",
       "neverRun": "niemals laufen"
     },
     "freshness": {
       "justNow": "soeben",
-      "minutesAgo": "{min}m ago",
-      "hoursAgo": "{hr}h ago",
-      "daysAgo": "{day}d ago",
-      "weeksAgo": "{wk}w ago"
+      "minutesAgo": "vor {min} Min.",
+      "hoursAgo": "vor {hr} Std.",
+      "daysAgo": "vor {day} Tg.",
+      "weeksAgo": "vor {wk} Wo."
     }
   },
   "suppressionsStrip": {
@@ -760,7 +765,7 @@
     "noFileRisk": "Keine Risikoaufschlüsselung pro Datei (keine Verstöße im Umfang).",
     "suppressionNote": "Entspricht der Zusammenfassung von crimes.json, nicht der Live-Umschaltung der Seitenleistenunterdrückung.",
     "noSuppression": "Kein Unterdrückungsaggregat in diesem Export (älterer Analysator oder keine Unterdrückung).",
-    "owaspSignal": "{count} violation(s) in this export carry OWASP mobile/web mapping — open Security Posture for the full matrix and export.",
+    "owaspSignal": "{count} Verstoß/Verstöße in diesem Export enthalten OWASP Mobile/Web-Zuordnung — öffnen Sie Security Posture für die vollständige Matrix und den Export.",
     "summarySuppressions": "Unterdrückungen (Snapshot exportieren)",
     "summaryOwasp": "Sicherheitslage (OWASP-Signal)",
     "summaryFileRisk": "Dateirisiko (Top-Dateien)"
@@ -770,8 +775,8 @@
     "skipToCounters": "Zu den Telemetriezählern springen",
     "lastEvent": "Letztes Ereignis 0 {relative}",
     "noEvents": "Keine Ereignisse aufgezeichnet",
-    "totalEventOne": "{count} total event",
-    "totalEventOther": "{count} total events",
+    "totalEventOne": "{count} Ereignis insgesamt",
+    "totalEventOther": "{count} Ereignisse insgesamt",
     "noCountersTitle": "Keine Zähler zum Zurücksetzen.",
     "resetTitle": "Alle Zähler zurücksetzen",
     "refreshTitle": "Telemetriezähler von der Festplatte neu laden",
@@ -795,11 +800,11 @@
     "hint": "Aktivieren oder deaktivieren Sie hier die Saropa-Aktivitätsleistenabschnitte (mit dem Arbeitsbereich gespeichert, ohne das Dashboard zu verlassen)."
   },
   "securityPosture": {
-    "issueOne": "{count} issue",
-    "issueOther": "{count} issues",
+    "issueOne": "{count} Problem",
+    "issueOther": "{count} Probleme",
     "noIssues": "Keine Probleme",
     "showIssues": "Probleme anzeigen",
-    "violationTooltip": "{count} violation(s) across {ruleCount} rule(s). Click to show in Issues.",
+    "violationTooltip": "{count} Verstoß/Verstöße über {ruleCount} Regel(n). Klicken, um in Problemen anzuzeigen.",
     "noViolationsTooltip": "Dieser Kategorie sind keine Verstöße zugeordnet."
   }
 }

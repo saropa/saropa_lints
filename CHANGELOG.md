@@ -47,10 +47,22 @@
 
 ## [Unreleased]
 
+### Added (Extension)
+
+- **Extension UI now fully localized across all 24 shipped non-English locales** — every string in the sidebar, dashboards, status bar, command palette, and webviews now has a curated translation for ar, bn, de, es, fa, fil, fr, he, hi, id, it, ja, ko, nl, pl, pt, ru, sw, th, tr, uk, ur, vi, and zh. Previously many UI fragments fell back to English in non-English locales because the dictionary was sparse and a defensive guard in the translator was silently reverting legitimate translations whose placeholders sat at non-leading positions. No action required.
+- **Collapsible Package Dashboard sections** — Size Distribution, Filters, and the Packages table each sit inside their own expander now so you can fold any of them away to focus on the rest of the view; all three default to open so the landing experience is unchanged. No action required.
+
 ### Fixed (Extension)
 
 - **Package Dashboard toolbar buttons hide when their action is a no-op** — the "← Back" package-navigation button, the "× Clear" chart filter indicator, and the "↻ Reset view" toolbar button now stay hidden whenever there's nothing to act on (no nav history, no live chart filter, view state matches defaults). Back was previously shown disabled, Reset view was always shown, and the chart Clear strip could survive a session restore that referenced a package no longer in the chart. No action required.
 - **Package Dashboard caveats now attach to the cards they describe** — the tree-shaking footnote ("Archive sizes before tree shaking…") now appears as a tooltip on the **Total Size** card, and the activity-threshold legend ("90d = stale, 180d = dormant") now appears in each grade card's tooltip (Vibrant/Stable/Outdated/Abandoned/EOL). Both previously sat in a floating note at the bottom of the summary block where readers couldn't easily connect them to the relevant data. No action required.
+- **Package dashboard Dependency Network panel rendered as garbled overlapping text** — the diagram now lists each transitive once on the right column with edges fanning in from every direct that pulls it in, instead of duplicating shared transitive labels at colliding Y positions. The panel also moved below the package table so it no longer pushes the table off-screen. No action required.
+
+<details><summary>Maintenance</summary>
+
+- **Translation pipeline (`extension/scripts/i18n/`) modernized.** `generate_translations.py` now prints colored per-locale progress (with Windows VT enabling), labels the prefetch step with an explicit "translating N new strings via Google…" count, persists the MT cache after every locale so a Ctrl-C never throws away paid-for Google calls, and exits cleanly (130) instead of dumping a Python traceback. A final coverage audit writes `extension/reports/i18n_translation_audit.md` with a cross-locale rollup (most-missed strings first), paste-ready Python dict stubs per locale, and a per-locale missing list. The translator's placeholder-rename guard now compares placeholders as a *set* (Bengali, Japanese, Korean legitimately reorder `{count}`/`{ruleCount}`) and its MT-garbage "leading-garbled" guard is skipped for curated dictionary entries (Arabic, Ukrainian, Turkish, etc. legitimately put modifier words before the first placeholder). Curated `"X": "X"` passthrough entries in `dictionaries.py` are now counted as translated rather than missing in the audit.
+
+</details>
 
 ---
 
@@ -61,11 +73,6 @@ The Findings Dashboard now lets you reconcile its count with the Problems panel 
 ### Added (Extension)
 
 - **Findings Dashboard supplementary pills (#224)** — three clickable pills in the dashboard hero surface non-saropa analyzer findings, analyzer-side TODO diagnostics, and the existing TODO/HACK scanner toggle directly on the surface that has the discoverability gap. New workspace settings `saropaLints.includeOtherAnalyzerFindingsInDashboard` and `saropaLints.includeAnalyzerTodosInDashboard` (default off); commands `Saropa Lints: Toggle Show Other Analyzer Findings on Dashboard`, `... Toggle Show Analyzer TODOs on Dashboard`, and `... Toggle TODO/HACK Workspace Scanner` invokable from the command palette. No action required.
-- **Collapsible Package Dashboard sections** — Size Distribution, Filters, and the Packages table each sit inside their own expander now so you can fold any of them away to focus on the rest of the view; all three default to open so the landing experience is unchanged. No action required.
-
-### Fixed (Extension)
-
-- **Package dashboard Dependency Network panel rendered as garbled overlapping text** — the diagram now lists each transitive once on the right column with edges fanning in from every direct that pulls it in, instead of duplicating shared transitive labels at colliding Y positions. The panel also moved below the package table so it no longer pushes the table off-screen. No action required.
 
 ---
 

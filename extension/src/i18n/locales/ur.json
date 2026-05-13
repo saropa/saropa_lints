@@ -43,7 +43,7 @@
     "reload": "ٻيهر لوڊ ڪريو",
     "copyDetails": "تفصيل ڪاپي ڪريو",
     "unreachable": "{target} تائين پهچي نه سگهيو",
-    "partialSummary": "{loaded} of {total} {item} loaded. {failed} failed.",
+    "partialSummary": "{total} میں سے {loaded} {item} لوڈ ہو گئے۔ {failed} ناکام۔",
     "partialRetry": "ٻيهر ڪوشش ناڪام ٿي"
   },
   "offline": {
@@ -90,28 +90,28 @@
     "secondaryAsideLabel": "ثانوی تشخیص",
     "hero": {
       "productTitle": "فائنڈنگ ڈیش بورڈ",
-      "gaugeTitle": "ہیلتھ سکور 0/100 (گریڈ 1)۔ غلطیوں کا وزن سب سے زیادہ ہے۔ {score} {grade}"
+      "gaugeTitle": "ہیلتھ سکور 0/100 (گریڈ 1)۔ غلطیوں کا وزن سب سے زیادہ ہے۔ {grade} {score}"
     },
     "time": {
       "justNow": "ابھی",
-      "minutesAgo": "{min}m ago",
-      "hoursAgo": "{hr}h ago",
-      "daysAgo": "{day}d ago"
+      "minutesAgo": "{min} منٹ قبل",
+      "hoursAgo": "{hr} گھنٹے قبل",
+      "daysAgo": "{day} دن قبل"
     },
     "status": {
       "lastRunPrefix": "آخری دوڑ",
       "lastRunUnknown": "آخری رن نامعلوم",
       "noTimestampTitle": "violations.json پر کوئی ٹائم اسٹیمپ نہیں۔",
       "findingsAfterFilterTitle": "غیر فعال اصول فلٹر کے بعد کل نتائج",
-      "findingOne": "{count} finding",
-      "findingOther": "{count} findings",
+      "findingOne": "{count} دریافت",
+      "findingOther": "{count} دریافتیں",
       "todoHackTitle": "TODO اور HACK مارکر ورک اسپیس میں پائے گئے۔",
       "driftOnTitle": "ڈرفٹ ایڈوائزر منسلک: 0 {label}",
       "driftOnPill": "بڑھے ہوئے · 0 {count}",
       "driftOfflineTitle": "ڈرفٹ ایڈوائزر فعال ہے لیکن کوئی سرور نہیں ملا",
       "driftOfflinePill": "ڈرفٹ آف لائن",
       "enabledRulesTitle": "موجودہ درجے میں فعال قوانین",
-      "rulesCount": "{count} rules"
+      "rulesCount": "{count} اصول"
     },
     "groupBy": {
       "severity": "شدت",
@@ -222,7 +222,7 @@
       "sectionAria": "نتائج",
       "expandAll": "سبھی کو پھیلائیں۔",
       "collapseAll": "سب کو سمیٹیں۔",
-      "bulkSelected": "{count} selected",
+      "bulkSelected": "{count} منتخب کردہ",
       "bulkCopy": "JSON کے بطور منتخب کردہ کاپی کریں۔",
       "selectAllTitle": "تمام مرئی نتائج کو منتخب کریں۔",
       "selectAllAria": "تمام مرئی نتائج کو منتخب کریں۔",
@@ -233,8 +233,8 @@
       "colActionsAria": "صف کے اعمال",
       "selectRowAria": "اس تلاش کی قطار کو منتخب کریں۔",
       "copyRowTitle": "اس تلاش کو JSON کے بطور کاپی کریں۔",
-      "metaShown": "{filtered} shown",
-      "metaAfterDisable": "{total} after disabled-rule filter",
+      "metaShown": "{filtered} دکھائے گئے",
+      "metaAfterDisable": "غیر فعال اصولوں کے فلٹر کے بعد {total}",
       "metaSourceCap": "کارکردگی کے لیے ماخذ 0 پر بند ہے۔ {max}",
       "metaGroupedBy": "0 کے ذریعے گروپ کردہ {mode}",
       "overflowNote": "رینڈر کارکردگی کے لیے ماخذ کی فہرست 0 پر تراشی گئی۔ {max}",
@@ -263,10 +263,10 @@
       "scanOff": "ورک اسپیس اسکین آف ہے — پروجیکٹ فائلوں سے مارکر کو سطح پر کرنے کے لیے فعال کریں۔",
       "enableScan": "اسکین کو فعال کریں۔",
       "heading": "ٹوڈو اور ہیکس",
-      "subsectionNone": "{title}: none in scan range.",
+      "subsectionNone": "{title}: اسکین کی حد میں کوئی نہیں ہے۔",
       "capNote": "اسکین ہٹ میکس فائل کیپ؛ مکمل کوریج کے لیے `saropaLints.todosAndHacks.maxFilesToScan` بڑھائیں۔",
       "notePill": "نوٹ",
-      "todosLabel": "TODOs",
+      "todosLabel": "کرنے والے کام",
       "hacksLabel": "ہیکس"
     },
     "drift": {
@@ -299,12 +299,12 @@
       "byFile": "بذریعہ فائل (0) {count}",
       "noEntries": "کوئی اندراجات نہیں۔",
       "nothingHidden": "اس ورک اسپیس میں مسائل کی فہرست سے کچھ بھی پوشیدہ نہیں ہے۔ فولڈرز، فائلز، یا اصولوں کو چھپانے کے لیے درخت کے سیاق و سباق کی کارروائیوں کا استعمال کریں؛ وہ کام کی جگہ پر برقرار رہتے ہیں۔",
-      "folderPattern": "{count} folder(s)",
-      "filePattern": "{count} file pattern(s)",
-      "ruleGlobal": "{count} rule(s) globally",
-      "perFileRules": "{count} file(s) with per-file rule hides",
-      "severityHides": "{count} severity hide(s)",
-      "impactHides": "{count} impact hide(s)",
+      "folderPattern": "{count} فولڈرز",
+      "filePattern": "{count} فائل پیٹرن",
+      "ruleGlobal": "عالمی سطح پر {count} اصول",
+      "perFileRules": "{count} فائلیں جن میں فی فائل اصول پوشیدہ ہیں",
+      "severityHides": "{count} شدت پوشیدہ",
+      "impactHides": "{count} اثرات پوشیدہ",
       "activeHides": "فعال چھپائیں: 0۔ {counts}",
       "viewHidesFooter": "یہ چھپائیں صرف مسائل / ڈیش بورڈ کی فہرست کو سکڑتی ہیں۔ وہ `violations.json` پر نہیں لکھے گئے ہیں۔",
       "clearViewHides": "تمام ویو ہائڈز کو صاف کریں۔",
@@ -320,11 +320,11 @@
       "metaRunning": "یہ بڑے منصوبوں پر ایک لمحہ لے سکتا ہے۔",
       "metaDone": "تازہ ترین نتائج کے ساتھ ڈیش بورڈ کو تازہ کرنا۔",
       "announceSearch": "تلاش کریں 0 {q}",
-      "announceSeverities": "{n} severities",
-      "announceImpacts": "{n} impacts",
+      "announceSeverities": "{n} شدتیں",
+      "announceImpacts": "{n} اثرات",
       "announceCleared": "تمام فلٹرز صاف ہو گئے۔",
       "announceFiltersPrefix": "فلٹرز:",
-      "bulkSelected": "{n} selected",
+      "bulkSelected": "{n} منتخب کردہ",
       "analysisStartedDetail": "تجزیہ شروع ہوا۔ تشخیصی معلومات جمع کی جا رہی ہیں…",
       "announceStarted": "تجزیہ شروع ہوا۔",
       "announceComplete": "تجزیہ مکمل",
@@ -332,7 +332,7 @@
       "analysisFailedDetail": "تجزیہ ناکام ہو گیا۔ تفصیلات کے لیے آؤٹ پٹ چیک کریں۔",
       "removeRecentAria": "هٽايو",
       "removeRecentTitle": "هٽايو",
-      "bulkSelectedTpl": "{n} selected"
+      "bulkSelectedTpl": "{n} منتخب کردہ"
     },
     "emptyState": {
       "hintAfterMessage": "violations.json پیدا کرنے کے لیے Saropa Lints کا تجزیہ چلائیں، پھر یہاں ریفریش کا استعمال کریں یا اس ڈیش بورڈ کو دوبارہ کھولیں۔",
@@ -347,14 +347,14 @@
     },
     "unknownAnalyzerKind": "نامعلوم",
     "supplementary": {
-      "otherAnalyzerOn": "+{count} other analyzer findings",
-      "otherAnalyzerPromo": "+? other analyzer findings — show",
-      "analyzerTodosOn": "+{count} analyzer TODOs",
-      "analyzerTodosPromo": "+? analyzer TODOs — show",
-      "scannerPromo": "Enable TODO/HACK scanner",
-      "tooltipLive": "Live from VS Code Problems panel. Updates as analysis completes. Click to hide.",
-      "tooltipScanner": "Saropa file-system scanner — counts open TODO/HACK markers in source.",
-      "tooltipPromoClickToOn": "Click to enable"
+      "otherAnalyzerOn": "+0 دیگر تجزیہ کار کے نتائج {count}",
+      "otherAnalyzerPromo": "+؟ دیگر تجزیہ کار کے نتائج — دکھائیں۔",
+      "analyzerTodosOn": "+0 تجزیہ کار TODOs {count}",
+      "analyzerTodosPromo": "+؟ تجزیہ کار TODOs — دکھائیں۔",
+      "scannerPromo": "TODO/HACK سکینر کو فعال کریں۔",
+      "tooltipLive": "VS کوڈ کے مسائل کے پینل سے لائیو۔ تجزیہ مکمل ہونے پر اپ ڈیٹس۔ چھپانے کے لیے کلک کریں۔",
+      "tooltipScanner": "Saropa فائل سسٹم اسکینر - ذریعہ میں کھلے TODO/HACK مارکر کو شمار کرتا ہے۔",
+      "tooltipPromoClickToOn": "فعال کرنے کے لیے کلک کریں۔"
     }
   },
   "triageDash": {
@@ -366,8 +366,8 @@
     "on": "پر",
     "colRule": "قاعدہ",
     "colIssues": "مسائل",
-    "zeroIssueRules": "{count} rules with zero issues — auto-enabled in tier.",
-    "disabledOverrides": "{count} rules disabled by override in `analysis_options_custom.yaml`.",
+    "zeroIssueRules": "صفر مسائل کے ساتھ {count} اصول — ٹائر میں خودکار طور پر فعال۔",
+    "disabledOverrides": "`analysis_options_custom.yaml` میں اوور رائیڈ کے ذریعے {count} اصول غیر فعال کر دیے گئے۔",
     "summaryRuleTriage": "اصول ٹریج",
     "hintNoViolations": "ابھی تک کوئی `reports/.saropa_lints/violations.json` نہیں ہے۔ تجزیہ چلائیں، پھر اس ٹیب کو ریفریش کریں۔",
     "hintUnreadable": "کوئی پڑھنے کے قابل خلاف ورزیاں برآمد نہیں۔ پہلے سروپا لِنٹ کا تجزیہ چلائیں۔",
@@ -402,10 +402,10 @@
     "documentTitle": "سروپا پیکیج ڈیش بورڈ",
     "heroTitle": "سروپا پیکیج ڈیش بورڈ",
     "status": {
-      "packagesCount": "{count} packages",
-      "packagesBreakdown": "{direct} direct, {transitive} transitive",
+      "packagesCount": "{count} پیکجز",
+      "packagesBreakdown": "{direct} براہ راست، {transitive} ٹرانزیٹیو",
       "gradeLine": "گریڈ 0 · 1/100 {grade} {avg}",
-      "flaggedCount": "{count} flagged",
+      "flaggedCount": "{count} نشان زدہ",
       "flaggedTitle": "لاوارث یا زندگی کا خاتمہ"
     },
     "scanning": {
@@ -419,7 +419,7 @@
       "packages": "پیکجز",
       "projectGrade": "پروجیکٹ پیکیج گریڈ",
       "totalSize": "کل سائز*",
-      "gradeTooltip": "پروجیکٹ گریڈ 0\nاوسط سکور: 1/100\nپیکیجز: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {avgScore} {pkgCount} {a} {b} {c} {e} {f}",
+      "gradeTooltip": "پروجیکٹ گریڈ 0\nاوسط سکور: 1/100\nپیکیجز: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {b} {avgScore} {c} {f} {avgGrade} {a} {e}",
       "vibrantTitle": "متحرک",
       "stableTitle": "مستحکم",
       "outdatedTitle": "فرسودہ",
@@ -435,6 +435,11 @@
     },
     "network": {
       "summary": "انحصار نیٹ ورک"
+    },
+    "sections": {
+      "sizeDistribution": "سائز کی تقسیم",
+      "filters": "فلٹرز",
+      "packages": "پیکجز"
     },
     "toolbar": {
       "openPubspecTitle": "pubspec.yaml کھولیں۔",
@@ -511,7 +516,7 @@
         "tooltip": "GitHub کے مسائل کھولیں (جب دستیاب ہوں تو پل کی درخواستوں کو شامل نہیں کرتا)"
       },
       "prs": {
-        "label": "PRs",
+        "label": "پل ریکویسٹس",
         "tooltip": "GitHub پل کی درخواستیں کھولیں۔"
       },
       "size": {
@@ -531,7 +536,7 @@
         "tooltip": "عبوری (بالواسطہ) انحصار کی تعداد جو اس پیکیج کو کھینچتی ہے۔"
       },
       "vulns": {
-        "label": "Vulns",
+        "label": "کمزوریاں",
         "tooltip": "OSV اور GitHub ایڈوائزری ڈیٹا بیس سے معلوم سیکیورٹی خطرات"
       },
       "license": {
@@ -573,10 +578,10 @@
     "skipLink": "کمانڈ کیٹلاگ پر جائیں۔",
     "heroTitle": "سروپا کمانڈ کیٹلاگ",
     "status": {
-      "commands": "{count} commands",
-      "categories": "{count} categories",
-      "recent": "{count} recent",
-      "internalHidden": "{count} context-menu only (hidden)",
+      "commands": "{count} کمانڈز",
+      "categories": "{count} زمرے",
+      "recent": "{count} حالیہ",
+      "internalHidden": "صرف {count} سیاق و سباق مینو (پوشیدہ)",
       "wordCommands": "احکامات",
       "wordCategories": "زمرے",
       "wordRecent": "حالیہ"
@@ -645,8 +650,8 @@
       "searchChip": "تلاش کریں: \"0\" {query}",
       "internalChip": "سیاق و سباق کے مینو کمانڈز دکھا رہا ہے۔",
       "removeFilterPrefix": "فلٹر کو ہٹا دیں۔",
-      "matchOne": "{count} match",
-      "matchOther": "{count} matches"
+      "matchOne": "{count} مماثلت",
+      "matchOther": "{count} مماثلتیں"
     }
   },
   "codeHealth": {
@@ -661,9 +666,9 @@
     "hero": {
       "title": "سروپا کوڈ ہیلتھ ڈیش بورڈ",
       "generated": "پیدا کیا",
-      "functionOne": "{count} function",
-      "functionOther": "{count} functions",
-      "avgFormat": "اوسط 0 (1) {score} {grade}",
+      "functionOne": "{count} فنکشن",
+      "functionOther": "{count} فنکشنز",
+      "avgFormat": "اوسط 0 (1) {grade} {score}",
       "gatesFailing": "دروازے ناکام ہو رہے ہیں",
       "gatesPassing": "گزرنے والے دروازے"
     },
@@ -673,8 +678,8 @@
     },
     "gate": {
       "fallback": "کوالٹی گیٹس ناکام ہو گئے — کوڈ ہیلتھ سیٹنگز میں تھریشولڈز کا جائزہ لیں۔",
-      "failingOne": "{count} gate failing — review thresholds, or copy the JSON to inspect gates.violations.",
-      "failingOther": "{count} gates failing — review thresholds, or copy the JSON to inspect gates.violations.",
+      "failingOne": "{count} گیٹ ناکام — حدوں کا جائزہ لیں، یا gates.violations کا معائنہ کرنے کے لیے JSON کاپی کریں۔",
+      "failingOther": "{count} گیٹس ناکام — حدوں کا جائزہ لیں، یا gates.violations کا معائنہ کرنے کے لیے JSON کاپی کریں۔",
       "openSettingsTitle": "حد کو ایڈجسٹ کرنے کے لیے کوڈ ہیلتھ سیٹنگز کو کھولیں۔",
       "openSettingsButton": "کوڈ ہیلتھ سیٹنگز کھولیں۔"
     },
@@ -737,15 +742,15 @@
       "flagChip": "پرچم: 0 {flag}",
       "removeAria": "0 کو ہٹا دیں۔ {key}",
       "clearAll": "سڀ صاف ڪريو",
-      "rowsVisible": "{visible} of {total} rows visible",
+      "rowsVisible": "{total} میں سے {visible} قطاریں نظر آ رہی ہیں",
       "neverRun": "کبھی نہیں بھاگتے"
     },
     "freshness": {
       "justNow": "ابھی",
-      "minutesAgo": "{min}m ago",
-      "hoursAgo": "{hr}h ago",
-      "daysAgo": "{day}d ago",
-      "weeksAgo": "{wk}w ago"
+      "minutesAgo": "{min} منٹ قبل",
+      "hoursAgo": "{hr} گھنٹے قبل",
+      "daysAgo": "{day} دن قبل",
+      "weeksAgo": "{wk} ہفتے قبل"
     }
   },
   "suppressionsStrip": {
@@ -760,7 +765,7 @@
     "noFileRisk": "فی فائل رسک بریک ڈاؤن نہیں (دائرہ کار میں کوئی خلاف ورزی نہیں)۔",
     "suppressionNote": "violations.json کا خلاصہ میچ کرتا ہے، لائیو سائڈبار سپریشن ٹوگلز نہیں۔",
     "noSuppression": "اس برآمد میں کوئی دبانے والا مجموعی نہیں ہے (پرانا تجزیہ کار یا صفر دبانے)۔",
-    "owaspSignal": "{count} violation(s) in this export carry OWASP mobile/web mapping — open Security Posture for the full matrix and export.",
+    "owaspSignal": "اس ایکسپورٹ میں {count} خلاف ورزیاں OWASP موبائل/ویب میپنگ رکھتی ہیں — مکمل میٹرکس اور ایکسپورٹ کے لیے سیکیورٹی پوسچر کھولیں۔",
     "summarySuppressions": "دبانے (اسنیپ شاٹ برآمد کریں)",
     "summaryOwasp": "سیکورٹی کرنسی (OWASP سگنل)",
     "summaryFileRisk": "فائل کا خطرہ (ٹاپ فائلیں)"
@@ -770,8 +775,8 @@
     "skipToCounters": "ٹیلی میٹری کاؤنٹرز پر جائیں۔",
     "lastEvent": "آخری واقعہ 0 {relative}",
     "noEvents": "کوئی واقعات ریکارڈ نہیں ہوئے۔",
-    "totalEventOne": "{count} total event",
-    "totalEventOther": "{count} total events",
+    "totalEventOne": "کل {count} واقعہ",
+    "totalEventOther": "کل {count} واقعات",
     "noCountersTitle": "ری سیٹ کرنے کے لیے کوئی کاؤنٹر نہیں۔",
     "resetTitle": "تمام کاؤنٹرز کو دوبارہ ترتیب دیں۔",
     "refreshTitle": "ڈسک سے ٹیلی میٹری کاؤنٹرز کو دوبارہ لوڈ کریں۔",
@@ -795,11 +800,11 @@
     "hint": "سروپا ایکٹیویٹی بار سیکشنز کو یہاں آن یا آف کریں (ڈیش بورڈ کو چھوڑے بغیر ورک اسپیس کے ساتھ محفوظ کیا گیا)۔"
   },
   "securityPosture": {
-    "issueOne": "{count} issue",
-    "issueOther": "{count} issues",
+    "issueOne": "{count} مسئلہ",
+    "issueOther": "{count} مسائل",
     "noIssues": "کوئی مسئلہ نہیں۔",
     "showIssues": "مسائل دکھائیں۔",
-    "violationTooltip": "{count} violation(s) across {ruleCount} rule(s). Click to show in Issues.",
+    "violationTooltip": "{ruleCount} اصولوں میں {count} خلاف ورزیاں۔ مسائل میں دیکھنے کے لیے کلک کریں۔",
     "noViolationsTooltip": "اس زمرے میں کوئی خلاف ورزی نہیں کی گئی ہے۔"
   }
 }

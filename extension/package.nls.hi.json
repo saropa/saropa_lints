@@ -7,7 +7,7 @@
   "views.actions.name": "कार्रवाई",
   "views.status.name": "स्थिति",
   "views.settings.name": "सेटिंग्स",
-  "views.help.name": "Help (v13.7.1)",
+  "views.help.name": "सहायता (v13.7.1)",
   "viewsWelcome.banner.contents": "**सरोपा लिंट्स**\n\nसुरक्षा, पहुंच और प्रदर्शन के लिए 2100+ डार्ट और फ़्लटर लिंट नियम।\n\nडार्ट या फ़्लटर प्रोजेक्ट की आवश्यकता है।\n\nआरंभ करने के लिए `pubspec.yaml` वाला फ़ोल्डर खोलें।\n\n[ऑनलाइन अधिक जानें](https://pub.dev/packages/saropa_lints)\n[सभी कमांड ब्राउज़ करें](कमांड:saropaLints.showCommandCatalog)\n[सरोपा लिंट्स के बारे में](कमांड:saropaLints.showAbout)\n[आरंभ करना](कमांड:saropaLints.openWalkthrow)",
   "command.enable.title": "सरोपा लिंट्स: सेट अप प्रोजेक्ट (पबस्पेक + कॉन्फ़िगरेशन)",
   "command.disable.title": "सरोपा लिंट्स: लिंट इंटीग्रेशन बंद करें",
@@ -169,7 +169,7 @@
   "config.property.enabled.markdownDescription": "जब **चालू** (डिफ़ॉल्ट) होता है, तो सरोपा लिंट्स अपग्रेड जांच चलाता है और कार्यस्थल को सरोपा लिंट एकीकरण का उपयोग करने जैसा मानता है। साइडबार विकल्पों को छुपाए बिना एकीकरण अधिसूचनाओं और स्टेटस-बार स्कोर को रोकने के लिए **बंद** करें - **सरोपा लिंट्स: सेट अप प्रोजेक्ट** का उपयोग करें जब आपको पबस्पेक में 'सरोपा_लिंट्स' जोड़ने और 'विश्लेषण_विकल्प' लिखने की आवश्यकता हो।",
   "config.property.tier.description": "सक्षम या पुन: प्रारंभ करते समय डिफ़ॉल्ट स्तर।",
   "config.property.runAnalysisAfterConfigChange.description": "सक्षम होने पर init या config परिवर्तन के बाद डार्ट विश्लेषण चलाएँ।",
-  "config.property.runAnalysisAfterDependencyChange.description": "pubspec.lock बदलने पर स्वचालित रूप से dart analyze फिर से चलाएँ (pub get / pub upgrade के बाद)। तेज़ निर्भरता समाधानों को समेकित करने के लिए 10-सेकंड के डिबाउंस का उपयोग करता है।",
+  "config.property.runAnalysisAfterDependencyChange.description": "जब पबस्पेक.लॉक बदलता है (पब प्राप्त/पब अपग्रेड के बाद) स्वचालित रूप से डार्ट विश्लेषण फिर से चलाएं। तीव्र निर्भरता समाधानों को संयोजित करने के लिए 10-सेकंड के डिबाउंस का उपयोग करता है।",
   "config.property.uiLanguage.description": "सरोपा साइडबार और डैशबोर्ड के लिए यूआई भाषा। वीएस कोड डिस्प्ले भाषा का पालन करने के लिए 'ऑटो' का उपयोग करें। साइडबार भाषा पिकर इस मान को उपयोगकर्ता सेटिंग्स में सहेजता है ताकि यह प्रत्येक कार्यक्षेत्र में लागू हो।",
   "config.property.runAnalysisOpenEditorsOnly.description": "सत्य होने पर, सरोपा लिंट्स केवल खोजे गए प्रोजेक्ट रूट के तहत वीएस कोड (वर्कस्पेस.टेक्स्टडॉक्यूमेंट्स) में खुली डार्ट फ़ाइलों के लिए डार्ट विश्लेषण चलाता है।",
   "config.property.inlineAnnotations.description": "प्रभावित पंक्तियों के अंत में उल्लंघन संदेश दिखाएं (त्रुटि लेंस शैली)।",
@@ -298,9 +298,9 @@
   "walkthrough.step.walkthrough.commandCatalog.description": "खोज के साथ श्रेणी के अनुसार व्यवस्थित 115+ कमांड। विश्लेषण, सुरक्षा, पैकेज स्वास्थ्य और रिपोर्टिंग कमांड एक ही स्थान पर खोजें।\n\n[सभी कमांड ब्राउज़ करें](कमांड:saropaLints.showCommandCatalog)",
   "walkthrough.step.walkthrough.aboutSaropa.title": "सरोपा के बारे में",
   "walkthrough.step.walkthrough.aboutSaropa.description": "सरोपा पीटीआई लिमिटेड - 2010 से डिजिटल सुरक्षा उपायों का निर्माण कर रहा है।\n\nविश्वसनीयता को महत्व देने वाले डेवलपर्स के लिए डार्ट पैकेज, वीएस कोड एक्सटेंशन और उपभोक्ता ऐप।\n\n[saropa.com पर जाएं](https://saropa.com/)",
-  "command.toggleIncludeOtherAnalyzerFindingsInDashboard.title": "Saropa Lints: Toggle Show Other Analyzer Findings on Dashboard",
-  "command.toggleIncludeAnalyzerTodosInDashboard.title": "Saropa Lints: Toggle Show Analyzer TODOs on Dashboard",
-  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: Toggle TODO/HACK Workspace Scanner",
-  "config.property.includeOtherAnalyzerFindingsInDashboard.description": "Show a supplementary pill on the Findings Dashboard with the count of non-saropa analyzer findings on .dart files (built-in Dart SDK lints plus any third-party custom_lint plugins such as riverpod_lint). Display-only — never affects the health score, KPI cards, or violations list.",
-  "config.property.includeAnalyzerTodosInDashboard.description": "Show a supplementary pill on the Findings Dashboard with the count of analyzer-side TODO diagnostics (`code: \"todo\"`) on .dart files. Independent of the saropa file-system TODO/HACK scanner. Display-only."
+  "command.toggleIncludeOtherAnalyzerFindingsInDashboard.title": "सरोपा लिंट्स: डैशबोर्ड पर अन्य विश्लेषक निष्कर्षों को दिखाने के लिए टॉगल करें",
+  "command.toggleIncludeAnalyzerTodosInDashboard.title": "सरोपा लिंट्स: डैशबोर्ड पर शो एनालाइजर TODOs को टॉगल करें",
+  "command.toggleTodosAndHacksScanner.title": "सरोपा लिंट्स: TODO/HACK वर्कस्पेस स्कैनर को टॉगल करें",
+  "config.property.includeOtherAnalyzerFindingsInDashboard.description": ".डार्ट फ़ाइलों (अंतर्निहित डार्ट एसडीके लिंट और रिवरपॉड_लिंट जैसे किसी भी तृतीय-पक्ष कस्टम_लिंट प्लगइन्स) पर गैर-सरोपा विश्लेषक निष्कर्षों की गिनती के साथ फाइंडिंग्स डैशबोर्ड पर एक पूरक गोली दिखाएं। केवल-प्रदर्शन - कभी भी स्वास्थ्य स्कोर, KPI कार्ड या उल्लंघन सूची को प्रभावित नहीं करता है।",
+  "config.property.includeAnalyzerTodosInDashboard.description": ".डार्ट फ़ाइलों पर विश्लेषक-पक्ष TODO डायग्नोस्टिक्स (`कोड: \"todo\"`) की गिनती के साथ निष्कर्ष डैशबोर्ड पर एक पूरक गोली दिखाएं। सरोपा फ़ाइल-सिस्टम TODO/HACK स्कैनर से स्वतंत्र। केवल डिस्प्ले।"
 }
