@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "การวินิจฉัยทุติยภูมิ",
     "hero": {
       "productTitle": "แดชบอร์ดผลการสืบค้น",
-      "gaugeTitle": "คะแนนสุขภาพ 0/100 (เกรด 1) ข้อผิดพลาดมีน้ำหนักมากที่สุด {grade} {score}"
+      "gaugeTitle": "คะแนนสุขภาพ 0/100 (เกรด 1) ข้อผิดพลาดมีน้ำหนักมากที่สุด {score} {grade}"
     },
     "time": {
       "justNow": "แค่ตอนนี้",
@@ -395,7 +395,7 @@
     "noMatchingFindingsCopy": "ไม่มีผลการสืบค้นที่ตรงกันที่จะคัดลอก",
     "couldNotOpenFile": "ไม่สามารถเปิดไฟล์ได้: 0 {path}",
     "saveReportNoWorkspace": "เปิดโฟลเดอร์พื้นที่ทำงานก่อนที่จะบันทึกรายงาน",
-    "savedFindings": "บันทึกการค้นพบ 0: 1 {count} {path}",
+    "savedFindings": "บันทึกการค้นพบ 0: 1 {path} {count}",
     "couldNotSaveReportJson": "ไม่สามารถบันทึกรายงาน JSON"
   },
   "packageDashboard": {
@@ -419,7 +419,7 @@
       "packages": "แพ็คเกจ",
       "projectGrade": "เกรดแพ็คเกจโครงการ",
       "totalSize": "ขนาดรวม*",
-      "gradeTooltip": "เกรดโครงการ 0\nคะแนนเฉลี่ย: 1/100\nแพ็คเกจ: 2\nก:3 B:4 ค:5 อี:6 ฟ:7 {c} {e} {a} {f} {b} {pkgCount} {avgGrade} {avgScore}",
+      "gradeTooltip": "เกรดโครงการ 0\nคะแนนเฉลี่ย: 1/100\nแพ็คเกจ: 2\nก:3 B:4 ค:5 อี:6 ฟ:7 {f} {a} {avgGrade} {b} {c} {pkgCount} {avgScore} {e}",
       "vibrantTitle": "มีชีวิตชีวา",
       "stableTitle": "มั่นคง",
       "outdatedTitle": "ล้าสมัย",
@@ -434,7 +434,7 @@
       "caveatLine2": "เกณฑ์กิจกรรม: 90d = เก่า, 180d = อยู่เฉยๆ (กระทำ + ไทม์ไลน์การเผยแพร่)"
     },
     "breakdown": {
-      "title": "ทำไมต้องเกรด 0? — 1/100 โดยเฉลี่ยจากแพ็คเกจ 2 {grade} {pkgCount} {avgScore}",
+      "title": "ทำไมต้องเกรด 0? — 1/100 โดยเฉลี่ยจากแพ็คเกจ 2 {avgScore} {pkgCount} {grade}",
       "hint": "คลิกเพื่อขยาย",
       "distributionHeading": "การกระจาย",
       "signalsHeading": "สัญญาณความเสี่ยงลากคะแนนลง",
@@ -686,7 +686,7 @@
       "generated": "สร้างขึ้น",
       "functionOne": "{count} ฟังก์ชัน",
       "functionOther": "{count} ฟังก์ชัน",
-      "avgFormat": "เฉลี่ย 0 (1) {grade} {score}",
+      "avgFormat": "เฉลี่ย 0 (1) {score} {grade}",
       "gatesFailing": "ประตูล้มเหลว",
       "gatesPassing": "ประตูผ่านไป"
     },

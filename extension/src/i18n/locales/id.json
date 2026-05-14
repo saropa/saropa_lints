@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "Diagnostik sekunder",
     "hero": {
       "productTitle": "Dasbor Temuan",
-      "gaugeTitle": "Skor kesehatan 0/100 (kelas 1). Kesalahan adalah hal yang paling berat. {grade} {score}"
+      "gaugeTitle": "Skor kesehatan 0/100 (kelas 1). Kesalahan adalah hal yang paling berat. {score} {grade}"
     },
     "time": {
       "justNow": "baru saja",
@@ -395,7 +395,7 @@
     "noMatchingFindingsCopy": "Tidak ada temuan yang cocok untuk disalin.",
     "couldNotOpenFile": "Tidak dapat membuka file: 0 {path}",
     "saveReportNoWorkspace": "Buka folder ruang kerja sebelum menyimpan laporan.",
-    "savedFindings": "Temuan 0 yang disimpan: 1 {count} {path}",
+    "savedFindings": "Temuan 0 yang disimpan: 1 {path} {count}",
     "couldNotSaveReportJson": "Tidak dapat menyimpan laporan JSON."
   },
   "packageDashboard": {
@@ -419,7 +419,7 @@
       "packages": "Paket",
       "projectGrade": "Kelas Paket Proyek",
       "totalSize": "Ukuran Jumlah*",
-      "gradeTooltip": "Kelas proyek 0\nSkor rata-rata: 1/100\nPaket: 2\nA:3 B:4 C:5 E:6 F:7 {c} {e} {a} {f} {b} {pkgCount} {avgGrade} {avgScore}",
+      "gradeTooltip": "Kelas proyek 0\nSkor rata-rata: 1/100\nPaket: 2\nA:3 B:4 C:5 E:6 F:7 {f} {a} {avgGrade} {b} {c} {pkgCount} {avgScore} {e}",
       "vibrantTitle": "Bersemangat",
       "stableTitle": "Stabil",
       "outdatedTitle": "Kedaluwarsa",
@@ -434,7 +434,7 @@
       "caveatLine2": "Ambang batas aktivitas: 90d = basi, 180d = tidak aktif (jadwal komit + rilis)."
     },
     "breakdown": {
-      "title": "Mengapa kelas 0? — Rata-rata 1/100 di seluruh 2 paket {grade} {pkgCount} {avgScore}",
+      "title": "Mengapa kelas 0? — Rata-rata 1/100 di seluruh 2 paket {avgScore} {pkgCount} {grade}",
       "hint": "Klik untuk memperluas",
       "distributionHeading": "Distribusi",
       "signalsHeading": "Sinyal risiko menyeret skor ke bawah",
@@ -686,7 +686,7 @@
       "generated": "Dihasilkan",
       "functionOne": "{count} fungsi",
       "functionOther": "{count} fungsi",
-      "avgFormat": "rata-rata 0 (1) {grade} {score}",
+      "avgFormat": "rata-rata 0 (1) {score} {grade}",
       "gatesFailing": "gerbang gagal",
       "gatesPassing": "gerbang lewat"
     },

@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "تشخیص ثانویه",
     "hero": {
       "productTitle": "داشبورد یافته ها",
-      "gaugeTitle": "نمره سلامت 0/100 (درجه 1). خطاها سنگین ترین وزن را دارند. {grade} {score}"
+      "gaugeTitle": "نمره سلامت 0/100 (درجه 1). خطاها سنگین ترین وزن را دارند. {score} {grade}"
     },
     "time": {
       "justNow": "همین الان",
@@ -419,7 +419,7 @@
       "packages": "بسته ها",
       "projectGrade": "درجه بسته پروژه",
       "totalSize": "اندازه کل*",
-      "gradeTooltip": "درجه پروژه 0\nمیانگین امتیاز: 1/100\nپکیج ها: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {a} {f} {e} {avgGrade} {b} {avgScore} {c}",
+      "gradeTooltip": "درجه پروژه 0\nمیانگین امتیاز: 1/100\nپکیج ها: 2\nA:3 B:4 C:5 E:6 F:7 {f} {a} {avgGrade} {b} {c} {pkgCount} {avgScore} {e}",
       "vibrantTitle": "پر جنب و جوش",
       "stableTitle": "پایدار",
       "outdatedTitle": "منسوخ شده",
@@ -434,7 +434,7 @@
       "caveatLine2": "آستانه فعالیت: 90d = قدیمی، 180d = غیرفعال (تعهد + جدول زمانی انتشار)."
     },
     "breakdown": {
-      "title": "چرا درجه 0؟ — 1/100 میانگین در بین بسته‌های 2 {pkgCount} {grade} {avgScore}",
+      "title": "چرا درجه 0؟ — 1/100 میانگین در بین بسته‌های 2 {avgScore} {pkgCount} {grade}",
       "hint": "برای گسترش کلیک کنید",
       "distributionHeading": "توزیع",
       "signalsHeading": "سیگنال های ریسک امتیاز را به پایین می کشد",
@@ -686,12 +686,12 @@
       "generated": "تولید شده است",
       "functionOne": "{count} تابع",
       "functionOther": "{count} تابع",
-      "avgFormat": "میانگین 0 (1) {grade} {score}",
+      "avgFormat": "میانگین 0 (1) {score} {grade}",
       "gatesFailing": "دروازه ها شکست می خورند",
       "gatesPassing": "دروازه های عبور"
     },
     "gauge": {
-      "tooltip": "میانگین امتیاز 0 از 100 (درجه 1). {grade} {rounded}",
+      "tooltip": "میانگین امتیاز 0 از 100 (درجه 1). {rounded} {grade}",
       "ariaLabel": "میانگین امتیاز 0 از 100 {rounded}"
     },
     "gate": {

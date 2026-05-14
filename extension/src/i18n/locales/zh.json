@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "二次诊断",
     "hero": {
       "productTitle": "调查结果仪表板",
-      "gaugeTitle": "健康评分0/100（1级）。错误是最重的。 {grade} {score}"
+      "gaugeTitle": "健康评分0/100（1级）。错误是最重的。 {score} {grade}"
     },
     "time": {
       "justNow": "现在",
@@ -395,7 +395,7 @@
     "noMatchingFindingsCopy": "没有匹配的结果可供复制。",
     "couldNotOpenFile": "无法打开文件：0 {path}",
     "saveReportNoWorkspace": "保存报告之前打开工作区文件夹。",
-    "savedFindings": "已保存 0 结果：1 {count} {path}",
+    "savedFindings": "已保存 0 结果：1 {path} {count}",
     "couldNotSaveReportJson": "无法保存报告 JSON。"
   },
   "packageDashboard": {
@@ -419,7 +419,7 @@
       "packages": "套餐",
       "projectGrade": "工程包等级",
       "totalSize": "总尺寸*",
-      "gradeTooltip": "工程等级0\n平均分：1/100\n套餐：2\nA:3 B:4 C:5 E:6 F:7 {c} {e} {a} {f} {b} {pkgCount} {avgGrade} {avgScore}",
+      "gradeTooltip": "工程等级0\n平均分：1/100\n套餐：2\nA:3 B:4 C:5 E:6 F:7 {f} {a} {avgGrade} {b} {c} {pkgCount} {avgScore} {e}",
       "vibrantTitle": "充满活力",
       "stableTitle": "稳定的",
       "outdatedTitle": "过时的",
@@ -434,7 +434,7 @@
       "caveatLine2": "活动阈值：90d = 陈旧，180d = 休眠（提交 + 发布时间表）。"
     },
     "breakdown": {
-      "title": "为什么评分0？ — 2 包的 1/100 平均值 {grade} {pkgCount} {avgScore}",
+      "title": "为什么评分0？ — 2 包的 1/100 平均值 {avgScore} {pkgCount} {grade}",
       "hint": "点击展开",
       "distributionHeading": "分配",
       "signalsHeading": "风险信号拖累分数下跌",
@@ -686,7 +686,7 @@
       "generated": "生成",
       "functionOne": "{count} 个函数",
       "functionOther": "{count} 个函数",
-      "avgFormat": "平均 0 (1) {grade} {score}",
+      "avgFormat": "平均 0 (1) {score} {grade}",
       "gatesFailing": "门失败",
       "gatesPassing": "大门经过"
     },

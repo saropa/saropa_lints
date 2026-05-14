@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "Uchunguzi wa sekondari",
     "hero": {
       "productTitle": "Dashibodi ya Matokeo",
-      "gaugeTitle": "Alama ya afya 0/100 (daraja 1). Makosa yana uzito mkubwa zaidi. {grade} {score}"
+      "gaugeTitle": "Alama ya afya 0/100 (daraja 1). Makosa yana uzito mkubwa zaidi. {score} {grade}"
     },
     "time": {
       "justNow": "sasa hivi",
@@ -419,7 +419,7 @@
       "packages": "Vifurushi",
       "projectGrade": "Daraja la Kifurushi cha Mradi",
       "totalSize": "Jumla ya Ukubwa*",
-      "gradeTooltip": "Daraja la mradi 0\nAlama ya wastani: 1/100\nVifurushi: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {a} {f} {e} {avgGrade} {b} {avgScore} {c}",
+      "gradeTooltip": "Daraja la mradi 0\nAlama ya wastani: 1/100\nVifurushi: 2\nA:3 B:4 C:5 E:6 F:7 {f} {a} {avgGrade} {b} {c} {pkgCount} {avgScore} {e}",
       "vibrantTitle": "Mahiri",
       "stableTitle": "Imara",
       "outdatedTitle": "Imepitwa na wakati",
@@ -434,7 +434,7 @@
       "caveatLine2": "Viwango vya shughuli: 90d = vilichakaa, 180d = vimetulia (jitolea + muda wa kutolewa)."
     },
     "breakdown": {
-      "title": "Kwa nini daraja 0? — 1/100 wastani katika vifurushi 2 {pkgCount} {grade} {avgScore}",
+      "title": "Kwa nini daraja 0? — 1/100 wastani katika vifurushi 2 {avgScore} {pkgCount} {grade}",
       "hint": "Bofya ili kupanua",
       "distributionHeading": "Usambazaji",
       "signalsHeading": "Ishara za hatari zinazoburuta alama chini",
@@ -686,12 +686,12 @@
       "generated": "Imetolewa",
       "functionOne": "chaguo la kukokotoa {count}",
       "functionOther": "chaguo za kukokotoa {count}",
-      "avgFormat": "wastani 0 (1) {grade} {score}",
+      "avgFormat": "wastani 0 (1) {score} {grade}",
       "gatesFailing": "milango kushindwa",
       "gatesPassing": "milango kupita"
     },
     "gauge": {
-      "tooltip": "Alama ya wastani 0 ya 100 (daraja 1). {grade} {rounded}",
+      "tooltip": "Alama ya wastani 0 ya 100 (daraja 1). {rounded} {grade}",
       "ariaLabel": "Alama ya wastani 0 ya 100 {rounded}"
     },
     "gate": {

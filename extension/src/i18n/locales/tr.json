@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "İkincil teşhis",
     "hero": {
       "productTitle": "Bulgular Kontrol Paneli",
-      "gaugeTitle": "Sağlık puanı 0/100 (derece 1). Hatalar en ağırdır. {grade} {score}"
+      "gaugeTitle": "Sağlık puanı 0/100 (derece 1). Hatalar en ağırdır. {score} {grade}"
     },
     "time": {
       "justNow": "Şu anda",
@@ -395,7 +395,7 @@
     "noMatchingFindingsCopy": "Kopyalanacak eşleşen bulgu yok.",
     "couldNotOpenFile": "Dosya açılamadı: 0 {path}",
     "saveReportNoWorkspace": "Raporu kaydetmeden önce bir çalışma alanı klasörü açın.",
-    "savedFindings": "Kaydedilen 0 bulgu(lar): 1 {count} {path}",
+    "savedFindings": "Kaydedilen 0 bulgu(lar): 1 {path} {count}",
     "couldNotSaveReportJson": "JSON raporu kaydedilemedi."
   },
   "packageDashboard": {
@@ -419,7 +419,7 @@
       "packages": "Paketler",
       "projectGrade": "Proje Paketi Notu",
       "totalSize": "Toplam Boyut*",
-      "gradeTooltip": "Proje notu 0\nOrtalama puan: 1/100\nPaketler: 2\nA:3 B:4 C:5 E:6 F:7 {c} {e} {a} {f} {b} {pkgCount} {avgGrade} {avgScore}",
+      "gradeTooltip": "Proje notu 0\nOrtalama puan: 1/100\nPaketler: 2\nA:3 B:4 C:5 E:6 F:7 {f} {a} {avgGrade} {b} {c} {pkgCount} {avgScore} {e}",
       "vibrantTitle": "Canlı",
       "stableTitle": "Stabil",
       "outdatedTitle": "Modası geçmiş",
@@ -434,7 +434,7 @@
       "caveatLine2": "Etkinlik eşikleri: 90d = eski, 180d = hareketsiz (taahhüt + sürüm zaman çizelgeleri)."
     },
     "breakdown": {
-      "title": "Neden 0 notu? — 2 paketlerde ortalama 1/100 {grade} {pkgCount} {avgScore}",
+      "title": "Neden 0 notu? — 2 paketlerde ortalama 1/100 {avgScore} {pkgCount} {grade}",
       "hint": "Genişletmek için tıklayın",
       "distributionHeading": "Dağıtım",
       "signalsHeading": "Skoru aşağı çeken risk sinyalleri",
@@ -686,7 +686,7 @@
       "generated": "Oluşturuldu",
       "functionOne": "{count} işlev",
       "functionOther": "{count} işlev",
-      "avgFormat": "ortalama 0 (1) {grade} {score}",
+      "avgFormat": "ortalama 0 (1) {score} {grade}",
       "gatesFailing": "kapılar başarısız",
       "gatesPassing": "geçen kapılar"
     },

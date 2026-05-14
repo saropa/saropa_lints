@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "التشخيص الثانوي",
     "hero": {
       "productTitle": "لوحة النتائج",
-      "gaugeTitle": "النتيجة الصحية 0/100 (الدرجة 1). الأخطاء تزن أثقل. {grade} {score}"
+      "gaugeTitle": "النتيجة الصحية 0/100 (الدرجة 1). الأخطاء تزن أثقل. {score} {grade}"
     },
     "time": {
       "justNow": "الآن",
@@ -419,7 +419,7 @@
       "packages": "الحزم",
       "projectGrade": "درجة حزمة المشروع",
       "totalSize": "الحجم الإجمالي*",
-      "gradeTooltip": "درجة المشروع 0\nمتوسط الدرجات: 1/100\nالحزم: 2\nأ:3 ب:4 ج:5 ه:6 و:٧ {pkgCount} {a} {f} {e} {avgGrade} {b} {avgScore} {c}",
+      "gradeTooltip": "درجة المشروع 0\nمتوسط الدرجات: 1/100\nالحزم: 2\nأ:3 ب:4 ج:5 ه:6 و:٧ {f} {a} {avgGrade} {b} {c} {pkgCount} {avgScore} {e}",
       "vibrantTitle": "نابضة بالحياة",
       "stableTitle": "مستقر",
       "outdatedTitle": "عفا عليها الزمن",
@@ -434,7 +434,7 @@
       "caveatLine2": "حدود النشاط: 90 يومًا = قديم، 180 يومًا = خامل (الالتزام + الجداول الزمنية للإصدار)."
     },
     "breakdown": {
-      "title": "لماذا الدرجة 0؟ — متوسط ​​1/100 عبر الحزم 2 {pkgCount} {grade} {avgScore}",
+      "title": "لماذا الدرجة 0؟ — متوسط ​​1/100 عبر الحزم 2 {avgScore} {pkgCount} {grade}",
       "hint": "انقر للتوسيع",
       "distributionHeading": "توزيع",
       "signalsHeading": "إشارات الخطر تسحب النتيجة إلى أسفل",
@@ -686,12 +686,12 @@
       "generated": "تم إنشاؤها",
       "functionOne": "{count} دالة",
       "functionOther": "{count} دوال",
-      "avgFormat": "المتوسط ​​0 (1) {grade} {score}",
+      "avgFormat": "المتوسط ​​0 (1) {score} {grade}",
       "gatesFailing": "بوابات الفشل",
       "gatesPassing": "مرور البوابات"
     },
     "gauge": {
-      "tooltip": "متوسط ​​الدرجات 0 من 100 (الدرجة 1). {grade} {rounded}",
+      "tooltip": "متوسط ​​الدرجات 0 من 100 (الدرجة 1). {rounded} {grade}",
       "ariaLabel": "متوسط ​​الدرجات 0 من 100 {rounded}"
     },
     "gate": {

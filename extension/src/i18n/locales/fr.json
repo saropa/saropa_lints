@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "Diagnostic secondaire",
     "hero": {
       "productTitle": "Tableau de bord des résultats",
-      "gaugeTitle": "Score de santé 0/100 (grade 1). Les erreurs pèsent le plus lourd. {grade} {score}"
+      "gaugeTitle": "Score de santé 0/100 (grade 1). Les erreurs pèsent le plus lourd. {score} {grade}"
     },
     "time": {
       "justNow": "tout à l' heure",
@@ -419,7 +419,7 @@
       "packages": "Forfaits",
       "projectGrade": "Catégorie du package de projet",
       "totalSize": "Taille totale*",
-      "gradeTooltip": "Note du projet 0\nNote moyenne : 1/100\nForfaits : 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {a} {f} {e} {avgGrade} {b} {avgScore} {c}",
+      "gradeTooltip": "Note du projet 0\nNote moyenne : 1/100\nForfaits : 2\nA:3 B:4 C:5 E:6 F:7 {f} {a} {avgGrade} {b} {c} {pkgCount} {avgScore} {e}",
       "vibrantTitle": "Dynamique",
       "stableTitle": "Écurie",
       "outdatedTitle": "Dépassé",
@@ -434,7 +434,7 @@
       "caveatLine2": "Seuils d'activité : 90 j = obsolète, 180 j = dormant (échéanciers de validation et de publication)."
     },
     "breakdown": {
-      "title": "Pourquoi noter 0 ? — 1/100 en moyenne sur 2 forfaits {pkgCount} {grade} {avgScore}",
+      "title": "Pourquoi noter 0 ? — 1/100 en moyenne sur 2 forfaits {avgScore} {pkgCount} {grade}",
       "hint": "Cliquez pour agrandir",
       "distributionHeading": "Distribution",
       "signalsHeading": "Les signaux de risque font baisser le score",
@@ -686,12 +686,12 @@
       "generated": "Généré",
       "functionOne": "{count} fonction",
       "functionOther": "{count} fonctions",
-      "avgFormat": "moyenne 0 (1) {grade} {score}",
+      "avgFormat": "moyenne 0 (1) {score} {grade}",
       "gatesFailing": "portes défaillantes",
       "gatesPassing": "passage des portes"
     },
     "gauge": {
-      "tooltip": "Note moyenne 0 sur 100 (note 1). {grade} {rounded}",
+      "tooltip": "Note moyenne 0 sur 100 (note 1). {rounded} {grade}",
       "ariaLabel": "Note moyenne 0 sur 100 {rounded}"
     },
     "gate": {

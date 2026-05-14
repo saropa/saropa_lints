@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "Diagnóstico secundário",
     "hero": {
       "productTitle": "Painel de descobertas",
-      "gaugeTitle": "Pontuação de saúde 0/100 (nota 1). Os erros pesam mais. {grade} {score}"
+      "gaugeTitle": "Pontuação de saúde 0/100 (nota 1). Os erros pesam mais. {score} {grade}"
     },
     "time": {
       "justNow": "agora mesmo",
@@ -395,7 +395,7 @@
     "noMatchingFindingsCopy": "Nenhuma descoberta correspondente para copiar.",
     "couldNotOpenFile": "Não foi possível abrir o arquivo: 0 {path}",
     "saveReportNoWorkspace": "Abra uma pasta do espaço de trabalho antes de salvar o relatório.",
-    "savedFindings": "0 descobertas salvas: 1 {count} {path}",
+    "savedFindings": "0 descobertas salvas: 1 {path} {count}",
     "couldNotSaveReportJson": "Não foi possível salvar o relatório JSON."
   },
   "packageDashboard": {
@@ -419,7 +419,7 @@
       "packages": "Pacotes",
       "projectGrade": "Nota do pacote do projeto",
       "totalSize": "Tamanho Total*",
-      "gradeTooltip": "Nota do projeto 0\nPontuação média: 1/100\nPacotes: 2\nA:3 B:4 C:5 E:6 F:7 {c} {e} {a} {f} {b} {pkgCount} {avgGrade} {avgScore}",
+      "gradeTooltip": "Nota do projeto 0\nPontuação média: 1/100\nPacotes: 2\nA:3 B:4 C:5 E:6 F:7 {f} {a} {avgGrade} {b} {c} {pkgCount} {avgScore} {e}",
       "vibrantTitle": "Vibrante",
       "stableTitle": "Estável",
       "outdatedTitle": "Desatualizado",
@@ -434,7 +434,7 @@
       "caveatLine2": "Limites de atividade: 90d = obsoleto, 180d = inativo (prazos de confirmação + lançamento)."
     },
     "breakdown": {
-      "title": "Por que nota 0? — Média de 1/100 em pacotes de 2 {grade} {pkgCount} {avgScore}",
+      "title": "Por que nota 0? — Média de 1/100 em pacotes de 2 {avgScore} {pkgCount} {grade}",
       "hint": "Clique para expandir",
       "distributionHeading": "Distribuição",
       "signalsHeading": "Sinais de risco arrastando a pontuação para baixo",
@@ -686,7 +686,7 @@
       "generated": "Gerado",
       "functionOne": "{count} função",
       "functionOther": "{count} funções",
-      "avgFormat": "média 0 (1) {grade} {score}",
+      "avgFormat": "média 0 (1) {score} {grade}",
       "gatesFailing": "portões falhando",
       "gatesPassing": "portões passando"
     },

@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "二次診断",
     "hero": {
       "productTitle": "調査結果ダッシュボード",
-      "gaugeTitle": "健康スコア 0/100 (グレード 1)。エラーが最も重くなります。 {grade} {score}"
+      "gaugeTitle": "健康スコア 0/100 (グレード 1)。エラーが最も重くなります。 {score} {grade}"
     },
     "time": {
       "justNow": "ちょうど今",
@@ -395,7 +395,7 @@
     "noMatchingFindingsCopy": "コピーできる一致する結果はありません。",
     "couldNotOpenFile": "ファイルを開けませんでした: 0 {path}",
     "saveReportNoWorkspace": "レポートを保存する前に、ワークスペース フォルダーを開いてください。",
-    "savedFindings": "保存された 0 の結果: 1 {count} {path}",
+    "savedFindings": "保存された 0 の結果: 1 {path} {count}",
     "couldNotSaveReportJson": "レポート JSON を保存できませんでした。"
   },
   "packageDashboard": {
@@ -419,7 +419,7 @@
       "packages": "パッケージ",
       "projectGrade": "プロジェクトパッケージグレード",
       "totalSize": "合計サイズ*",
-      "gradeTooltip": "プロジェクトグレード 0\n平均スコア: 1/100\nパッケージ: 2\nA:3 B:4 C:5 E:6 F:7 {c} {e} {a} {f} {b} {pkgCount} {avgGrade} {avgScore}",
+      "gradeTooltip": "プロジェクトグレード 0\n平均スコア: 1/100\nパッケージ: 2\nA:3 B:4 C:5 E:6 F:7 {f} {a} {avgGrade} {b} {c} {pkgCount} {avgScore} {e}",
       "vibrantTitle": "活気に満ちた",
       "stableTitle": "安定した",
       "outdatedTitle": "時代遅れ",
@@ -434,7 +434,7 @@
       "caveatLine2": "アクティビティのしきい値: 90 日 = 古い、180 日 = 休止中 (コミット + リリースのタイムライン)。"
     },
     "breakdown": {
-      "title": "なぜ 0 と評価するのでしょうか? — 2 パッケージ全体で 1/100 の平均 {grade} {pkgCount} {avgScore}",
+      "title": "なぜ 0 と評価するのでしょうか? — 2 パッケージ全体で 1/100 の平均 {avgScore} {pkgCount} {grade}",
       "hint": "クリックして展開します",
       "distributionHeading": "分布",
       "signalsHeading": "スコアを引き下げるリスクシグナル",
@@ -686,7 +686,7 @@
       "generated": "生成された",
       "functionOne": "{count} 関数",
       "functionOther": "{count} 関数",
-      "avgFormat": "平均0 (1) {grade} {score}",
+      "avgFormat": "平均0 (1) {score} {grade}",
       "gatesFailing": "ゲートが失敗する",
       "gatesPassing": "ゲート通過"
     },

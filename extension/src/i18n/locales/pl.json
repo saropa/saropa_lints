@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "Diagnostyka wtórna",
     "hero": {
       "productTitle": "Panel wyników",
-      "gaugeTitle": "Wynik zdrowotny 0/100 (stopień 1). Błędy ważą najwięcej. {grade} {score}"
+      "gaugeTitle": "Wynik zdrowotny 0/100 (stopień 1). Błędy ważą najwięcej. {score} {grade}"
     },
     "time": {
       "justNow": "właśnie",
@@ -419,7 +419,7 @@
       "packages": "Pakiety",
       "projectGrade": "Ocena pakietu projektu",
       "totalSize": "Całkowity rozmiar*",
-      "gradeTooltip": "Ocena projektu 0\nŚredni wynik: 1/100\nPakiety: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {a} {f} {e} {avgGrade} {b} {avgScore} {c}",
+      "gradeTooltip": "Ocena projektu 0\nŚredni wynik: 1/100\nPakiety: 2\nA:3 B:4 C:5 E:6 F:7 {f} {a} {avgGrade} {b} {c} {pkgCount} {avgScore} {e}",
       "vibrantTitle": "Wibrujący",
       "stableTitle": "Stabilny",
       "outdatedTitle": "Przestarzały",
@@ -434,7 +434,7 @@
       "caveatLine2": "Progi aktywności: 90d = nieaktualne, 180d = uśpione (osie czasu zatwierdzenia i wydania)."
     },
     "breakdown": {
-      "title": "Dlaczego klasa 0? — 1/100 średnio w 2 pakietach {pkgCount} {grade} {avgScore}",
+      "title": "Dlaczego klasa 0? — 1/100 średnio w 2 pakietach {avgScore} {pkgCount} {grade}",
       "hint": "Kliknij, aby rozwinąć",
       "distributionHeading": "Dystrybucja",
       "signalsHeading": "Sygnały ryzyka obniżają wynik",
@@ -686,12 +686,12 @@
       "generated": "Wygenerowano",
       "functionOne": "{count} funkcja",
       "functionOther": "{count} funkcji",
-      "avgFormat": "średnia 0 (1) {grade} {score}",
+      "avgFormat": "średnia 0 (1) {score} {grade}",
       "gatesFailing": "bramy nie działają",
       "gatesPassing": "przechodzą bramy"
     },
     "gauge": {
-      "tooltip": "Średni wynik 0 na poziomie 100 (ocena 1). {grade} {rounded}",
+      "tooltip": "Średni wynik 0 na poziomie 100 (ocena 1). {rounded} {grade}",
       "ariaLabel": "Średni wynik 0 na poziomie 100 {rounded}"
     },
     "gate": {

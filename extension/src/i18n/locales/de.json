@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "Sekundärdiagnostik",
     "hero": {
       "productTitle": "Ergebnis-Dashboard",
-      "gaugeTitle": "Gesundheitswert 0/100 (Note 1). Fehler wiegen am schwersten. {grade} {score}"
+      "gaugeTitle": "Gesundheitswert 0/100 (Note 1). Fehler wiegen am schwersten. {score} {grade}"
     },
     "time": {
       "justNow": "soeben",
@@ -419,7 +419,7 @@
       "packages": "Pakete",
       "projectGrade": "Grad des Projektpakets",
       "totalSize": "Gesamtgröße*",
-      "gradeTooltip": "Projektnote 0\nDurchschnittliche Punktzahl: 1/100\nPakete: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {a} {f} {e} {avgGrade} {b} {avgScore} {c}",
+      "gradeTooltip": "Projektnote 0\nDurchschnittliche Punktzahl: 1/100\nPakete: 2\nA:3 B:4 C:5 E:6 F:7 {f} {a} {avgGrade} {b} {c} {pkgCount} {avgScore} {e}",
       "vibrantTitle": "Lebendig",
       "stableTitle": "Stabil",
       "outdatedTitle": "Veraltet",
@@ -434,7 +434,7 @@
       "caveatLine2": "Aktivitätsschwellenwerte: 90 Tage = veraltet, 180 Tage = ruhend (Commit- und Release-Zeitpläne)."
     },
     "breakdown": {
-      "title": "Warum Note 0? — 1/100 Durchschnitt über 2 Pakete {pkgCount} {grade} {avgScore}",
+      "title": "Warum Note 0? — 1/100 Durchschnitt über 2 Pakete {avgScore} {pkgCount} {grade}",
       "hint": "Klicken Sie zum Erweitern",
       "distributionHeading": "Verteilung",
       "signalsHeading": "Risikosignale ziehen den Score nach unten",
@@ -686,12 +686,12 @@
       "generated": "Generiert",
       "functionOne": "{count} Funktion",
       "functionOther": "{count} Funktionen",
-      "avgFormat": "Durchschnitt 0 (1) {grade} {score}",
+      "avgFormat": "Durchschnitt 0 (1) {score} {grade}",
       "gatesFailing": "Tore versagen",
       "gatesPassing": "Tore passieren"
     },
     "gauge": {
-      "tooltip": "Durchschnittliche Punktzahl 0 von 100 (Note 1). {grade} {rounded}",
+      "tooltip": "Durchschnittliche Punktzahl 0 von 100 (Note 1). {rounded} {grade}",
       "ariaLabel": "Durchschnittliche Punktzahl 0 von 100 {rounded}"
     },
     "gate": {

@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "Вторичная диагностика",
     "hero": {
       "productTitle": "Панель результатов",
-      "gaugeTitle": "Оценка здоровья 0/100 (оценка 1). Ошибки весят больше всего. {grade} {score}"
+      "gaugeTitle": "Оценка здоровья 0/100 (оценка 1). Ошибки весят больше всего. {score} {grade}"
     },
     "time": {
       "justNow": "прямо сейчас",
@@ -419,7 +419,7 @@
       "packages": "Пакеты",
       "projectGrade": "Оценка пакета проекта",
       "totalSize": "Общий размер*",
-      "gradeTooltip": "Оценка проекта 0\nСредний балл: 1/100\nПакеты: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {a} {f} {e} {avgGrade} {b} {avgScore} {c}",
+      "gradeTooltip": "Оценка проекта 0\nСредний балл: 1/100\nПакеты: 2\nA:3 B:4 C:5 E:6 F:7 {f} {a} {avgGrade} {b} {c} {pkgCount} {avgScore} {e}",
       "vibrantTitle": "Яркий",
       "stableTitle": "Стабильный",
       "outdatedTitle": "Устаревший",
@@ -434,7 +434,7 @@
       "caveatLine2": "Пороги активности: 90d = устаревшие, 180d = бездействующие (сроки фиксации + выпуска)."
     },
     "breakdown": {
-      "title": "Почему оценка 0? — 1/100 в среднем по 2 пакетам {pkgCount} {grade} {avgScore}",
+      "title": "Почему оценка 0? — 1/100 в среднем по 2 пакетам {avgScore} {pkgCount} {grade}",
       "hint": "Нажмите, чтобы развернуть",
       "distributionHeading": "Распределение",
       "signalsHeading": "Сигналы риска, снижающие рейтинг",
@@ -686,12 +686,12 @@
       "generated": "Сгенерировано",
       "functionOne": "{count} функция",
       "functionOther": "{count} функций",
-      "avgFormat": "среднее 0 (1) {grade} {score}",
+      "avgFormat": "среднее 0 (1) {score} {grade}",
       "gatesFailing": "ворота выходят из строя",
       "gatesPassing": "ворота проходящие"
     },
     "gauge": {
-      "tooltip": "Средний балл 0 из 100 (оценка 1). {grade} {rounded}",
+      "tooltip": "Средний балл 0 из 100 (оценка 1). {rounded} {grade}",
       "ariaLabel": "Средний балл 0 из 100 {rounded}"
     },
     "gate": {

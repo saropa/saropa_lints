@@ -71,11 +71,11 @@ return FocusCard(
 );
 ```
 
-## Expected behaviour
+## Expected behavior
 
 `Positioned` widgets supplied to a `List<Widget>` parameter that is documented as "rendered inside a Stack" (or whose receiver visibly spreads the list into a `Stack`) should not trigger the lint. The runtime parent is well-defined and correct.
 
-## Actual behaviour
+## Actual behavior
 
 The lint fires on the `Positioned` constructor at the call site because the ancestor walk encounters the `List<Widget>` literal / named argument `backgroundLayers:` and can't resolve where that list ends up at runtime.
 

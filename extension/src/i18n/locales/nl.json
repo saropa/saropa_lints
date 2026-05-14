@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "Secundaire diagnostiek",
     "hero": {
       "productTitle": "Bevindingendashboard",
-      "gaugeTitle": "Gezondheidsscore 0/100 (graad 1). Fouten wegen het zwaarst. {grade} {score}"
+      "gaugeTitle": "Gezondheidsscore 0/100 (graad 1). Fouten wegen het zwaarst. {score} {grade}"
     },
     "time": {
       "justNow": "zojuist",
@@ -419,7 +419,7 @@
       "packages": "Pakketten",
       "projectGrade": "Projectpakketklasse",
       "totalSize": "Totale grootte*",
-      "gradeTooltip": "Projectcijfer 0\nGemiddelde score: 1/100\nPakketten: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {a} {f} {e} {avgGrade} {b} {avgScore} {c}",
+      "gradeTooltip": "Projectcijfer 0\nGemiddelde score: 1/100\nPakketten: 2\nA:3 B:4 C:5 E:6 F:7 {f} {a} {avgGrade} {b} {c} {pkgCount} {avgScore} {e}",
       "vibrantTitle": "Levendig",
       "stableTitle": "Stabiel",
       "outdatedTitle": "Verouderd",
@@ -434,7 +434,7 @@
       "caveatLine2": "Activiteitsdrempels: 90d = verouderd, 180d = slapend (tijdlijnen voor vastleggen en vrijgeven)."
     },
     "breakdown": {
-      "title": "Waarom cijfer 0? — 1/100 gemiddeld over 2 pakketten {pkgCount} {grade} {avgScore}",
+      "title": "Waarom cijfer 0? — 1/100 gemiddeld over 2 pakketten {avgScore} {pkgCount} {grade}",
       "hint": "Klik om uit te vouwen",
       "distributionHeading": "Verdeling",
       "signalsHeading": "Risicosignalen die de score naar beneden halen",
@@ -686,12 +686,12 @@
       "generated": "Gegenereerd",
       "functionOne": "{count} functie",
       "functionOther": "{count} functies",
-      "avgFormat": "gemiddeld 0 (1) {grade} {score}",
+      "avgFormat": "gemiddeld 0 (1) {score} {grade}",
       "gatesFailing": "poorten falen",
       "gatesPassing": "poorten passeren"
     },
     "gauge": {
-      "tooltip": "Gemiddelde score 0 van 100 (cijfer 1). {grade} {rounded}",
+      "tooltip": "Gemiddelde score 0 van 100 (cijfer 1). {rounded} {grade}",
       "ariaLabel": "Gemiddelde score 0 van 100 {rounded}"
     },
     "gate": {

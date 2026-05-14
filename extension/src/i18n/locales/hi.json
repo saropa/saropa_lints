@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "माध्यमिक निदान",
     "hero": {
       "productTitle": "निष्कर्ष डैशबोर्ड",
-      "gaugeTitle": "स्वास्थ्य स्कोर 0/100 (ग्रेड 1). त्रुटियाँ सबसे अधिक भारी पड़ती हैं। {grade} {score}"
+      "gaugeTitle": "स्वास्थ्य स्कोर 0/100 (ग्रेड 1). त्रुटियाँ सबसे अधिक भारी पड़ती हैं। {score} {grade}"
     },
     "time": {
       "justNow": "बस अब",
@@ -395,7 +395,7 @@
     "noMatchingFindingsCopy": "कॉपी करने के लिए कोई मेल खाने वाला निष्कर्ष नहीं.",
     "couldNotOpenFile": "फ़ाइल नहीं खुल सकी: 0 {path}",
     "saveReportNoWorkspace": "रिपोर्ट सहेजने से पहले एक कार्यस्थान फ़ोल्डर खोलें.",
-    "savedFindings": "सहेजे गए 0 निष्कर्ष: 1 {count} {path}",
+    "savedFindings": "सहेजे गए 0 निष्कर्ष: 1 {path} {count}",
     "couldNotSaveReportJson": "रिपोर्ट JSON सहेजा नहीं जा सका."
   },
   "packageDashboard": {
@@ -419,7 +419,7 @@
       "packages": "संकुल",
       "projectGrade": "प्रोजेक्ट पैकेज ग्रेड",
       "totalSize": "कुल आकार*",
-      "gradeTooltip": "प्रोजेक्ट ग्रेड 0\nऔसत स्कोर: 1/100\nपैकेज: 2\nA:3 B:4 C:5 E:6 F:7 {c} {e} {a} {f} {b} {pkgCount} {avgGrade} {avgScore}",
+      "gradeTooltip": "प्रोजेक्ट ग्रेड 0\nऔसत स्कोर: 1/100\nपैकेज: 2\nA:3 B:4 C:5 E:6 F:7 {f} {a} {avgGrade} {b} {c} {pkgCount} {avgScore} {e}",
       "vibrantTitle": "जीवंत",
       "stableTitle": "स्थिर",
       "outdatedTitle": "रगड़ा हुआ",
@@ -434,7 +434,7 @@
       "caveatLine2": "गतिविधि सीमाएँ: 90d = बासी, 180d = निष्क्रिय (प्रतिबद्ध + रिलीज़ समयसीमा)।"
     },
     "breakdown": {
-      "title": "ग्रेड 0 क्यों? - 1/100 औसत 2 पैकेजों में {grade} {pkgCount} {avgScore}",
+      "title": "ग्रेड 0 क्यों? - 1/100 औसत 2 पैकेजों में {avgScore} {pkgCount} {grade}",
       "hint": "विस्तार करने के लिए क्लिक करें",
       "distributionHeading": "वितरण",
       "signalsHeading": "जोखिम संकेत स्कोर को नीचे खींच रहे हैं",
@@ -686,7 +686,7 @@
       "generated": "जनरेट किया गया",
       "functionOne": "{count} फ़ंक्शन",
       "functionOther": "{count} फ़ंक्शन",
-      "avgFormat": "औसत 0 (1) {grade} {score}",
+      "avgFormat": "औसत 0 (1) {score} {grade}",
       "gatesFailing": "गेट विफल हो रहे हैं",
       "gatesPassing": "द्वार गुजर रहे हैं"
     },

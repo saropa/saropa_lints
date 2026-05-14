@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "Mga pangalawang diagnostic",
     "hero": {
       "productTitle": "Dashboard ng Mga Natuklasan",
-      "gaugeTitle": "Marka ng kalusugan 0/100 (grado 1). Pinakamabigat ang mga pagkakamali. {grade} {score}"
+      "gaugeTitle": "Marka ng kalusugan 0/100 (grado 1). Pinakamabigat ang mga pagkakamali. {score} {grade}"
     },
     "time": {
       "justNow": "ngayon lang",
@@ -419,7 +419,7 @@
       "packages": "Mga package",
       "projectGrade": "Marka ng Pakete ng Proyekto",
       "totalSize": "Kabuuang Sukat*",
-      "gradeTooltip": "Marka ng proyekto 0\nAverage na marka: 1/100\nMga Package: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {a} {f} {e} {avgGrade} {b} {avgScore} {c}",
+      "gradeTooltip": "Marka ng proyekto 0\nAverage na marka: 1/100\nMga Package: 2\nA:3 B:4 C:5 E:6 F:7 {f} {a} {avgGrade} {b} {c} {pkgCount} {avgScore} {e}",
       "vibrantTitle": "Masigla",
       "stableTitle": "Matatag",
       "outdatedTitle": "Luma na",
@@ -434,7 +434,7 @@
       "caveatLine2": "Mga threshold ng aktibidad: 90d = lipas, 180d = tulog (commit + release timeline)."
     },
     "breakdown": {
-      "title": "Bakit grade 0? — 1/100 average sa 2 na mga pakete {pkgCount} {grade} {avgScore}",
+      "title": "Bakit grade 0? — 1/100 average sa 2 na mga pakete {avgScore} {pkgCount} {grade}",
       "hint": "I-click upang palawakin",
       "distributionHeading": "Pamamahagi",
       "signalsHeading": "Mga senyales ng panganib na nag-drag pababa sa marka",
@@ -686,12 +686,12 @@
       "generated": "Nabuo",
       "functionOne": "{count} na function",
       "functionOther": "{count} na function",
-      "avgFormat": "avg 0 (1) {grade} {score}",
+      "avgFormat": "avg 0 (1) {score} {grade}",
       "gatesFailing": "bagsak ang mga pintuan",
       "gatesPassing": "mga tarangkahan na dumadaan"
     },
     "gauge": {
-      "tooltip": "Average na marka 0 ng 100 (grade 1). {grade} {rounded}",
+      "tooltip": "Average na marka 0 ng 100 (grade 1). {rounded} {grade}",
       "ariaLabel": "Average na marka 0 ng 100 {rounded}"
     },
     "gate": {
