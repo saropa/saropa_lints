@@ -1,8 +1,8 @@
 # Token coverage matrix
 
-Generated: 2026-05-06T13:11:50.762Z
+Generated: 2026-05-14T01:32:44.410Z
 
-Scanned 13 surface files; 68 unique tokens referenced.
+Scanned 13 surface files; 66 unique tokens referenced.
 
 ## Index — surfaces
 
@@ -40,8 +40,6 @@ Scanned 13 surface files; 68 unique tokens referenced.
 | `--chart-color-8` | 2 |
 | `--chart-color-9` | 2 |
 | `--chart-hue-` | 11 |
-| `--gauge-arc` | 10 |
-| `--gauge-target` | 10 |
 | `--link` | 4 |
 | `--muted` | 6 |
 | `--surface-2` | 6 |

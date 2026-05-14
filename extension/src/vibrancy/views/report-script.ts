@@ -1079,16 +1079,64 @@ export function getReportScript(): string {
         ensureBackButton();
         updateBackButtonState();
 
-        /* ---- Radial gauge animation ---- */
-        /* Trigger the CSS transition after the DOM is painted by setting
-           the final stroke-dasharray value on the next animation frame. */
-        requestAnimationFrame(function() {
-            var gaugeFill = document.querySelector('.gauge-fill');
-            if (gaugeFill) {
-                var target = parseFloat(gaugeFill.style.getPropertyValue('--gauge-target')) || 0;
-                var arc = parseFloat(gaugeFill.style.getPropertyValue('--gauge-arc')) || 999;
-                gaugeFill.setAttribute('stroke-dasharray', target + ' ' + (arc * 2));
+        /* ---- Radial gauge: honor prefers-reduced-motion ----
+           The fill animation is a SMIL <animate> inside .gauge-fill (see
+           buildRadialGauge in report-html.ts). SMIL ignores CSS animation
+           properties, so a CSS @media (prefers-reduced-motion) rule can't
+           disable it — remove the element here instead. The circle's static
+           stroke-dasharray attribute still paints the final fill. */
+        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            var smil = document.querySelector('.gauge-fill > animate');
+            if (smil && smil.parentNode) {
+                smil.parentNode.removeChild(smil);
             }
+        }
+
+        /* ---- "Why this grade?" breakdown panel ----
+           The gauge and the Project Grade summary card both carry
+           data-breakdown-trigger and aria-controls="grade-breakdown". Clicking
+           either toggles the <details id="grade-breakdown"> open and scrolls
+           it into view. Inside the panel, distribution rows / signal buttons
+           filter the table via the existing filterByCard pipeline, and the
+           lowest-scoring package buttons jump to the corresponding row using
+           the same navigation helper the dependency network uses. */
+        function openGradeBreakdown() {
+            var panel = document.getElementById('grade-breakdown');
+            if (!panel) { return; }
+            panel.open = true;
+            panel.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        }
+        document.querySelectorAll('[data-breakdown-trigger]').forEach(function(el) {
+            el.addEventListener('click', function(e) {
+                /* The summary card already has a click handler from the
+                   filter-by-card loop above. Suppress that path so opening the
+                   breakdown doesn't also toggle a category filter; the user
+                   wants to read the explanation, not filter the table. */
+                if (el.getAttribute('data-filter')) { e.stopPropagation(); }
+                openGradeBreakdown();
+            });
+            el.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    openGradeBreakdown();
+                }
+            });
+        });
+        document.querySelectorAll('.grade-breakdown .breakdown-filter-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var filter = btn.getAttribute('data-filter');
+                if (filter) { filterByCard(filter); }
+            });
+        });
+        document.querySelectorAll('.grade-breakdown .breakdown-jump-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var pkg = btn.getAttribute('data-pkg');
+                if (!pkg) { return; }
+                /* navigateToPackageRow scrolls AND highlights — single-arg
+                   form skips the "from" row that the dependency-network
+                   linkage uses for back-navigation. */
+                navigateToPackageRow(pkg, null);
+            });
         });
 
         /* ---- Lightweight dependency network diagram ----

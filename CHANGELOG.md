@@ -47,8 +47,13 @@
 
 ## [Unreleased]
 
+### Added (Extension)
+
+- **Package Dashboard now explains the project grade** — clicking the radial gauge (or the **Project Package Grade** summary card) opens a new "Why this grade?" panel showing the score distribution, risk signals (flagged / vulnerable / updates available), the five lowest-scoring packages, and the score-to-grade thresholds. Every row inside the panel is interactive: distribution and signal entries filter the package table, and the lowest-scoring entries jump straight to the relevant row. No action required.
+
 ### Fixed (Extension)
 
+- **Package Dashboard radial grade gauge now paints the arc again** — under the strict webview CSP the inline CSS variables that drove the stroke length were being dropped, so only a single rounded line-cap dot was visible next to the letter grade. The arc and its load animation now use SVG presentation attributes and SMIL, which survive the CSP. No action required.
 - **Package Vibrancy toolbar no longer shows a redundant "Search packages" label next to the search box** — the label is now hidden from view (it remains for screen readers) so the placeholder text inside the input is the only visible cue. No action required.
 - **Package Vibrancy toolbar buttons read as buttons in every theme** — Rescan / Open Project / Copy / Save / pubspec.yaml had a full-pill shape and a transparent border fallback that disappeared on themes that don't define `button.border`. Buttons now use a softer rounded-rect (6px) and fall back to `widget.border`, matching the FOOTPRINT segmented control which moved off the full-pill shape for the same reason. No action required.
 - **"All" age-slider label no longer reads as the value of the Preset dropdown** — the divider between the Published-age group and the Preset group is now higher-contrast, the trailing gap is wider, and the slider's max-value readout sits in a small chip so it stops blending into the neighboring "Preset" label. No action required.

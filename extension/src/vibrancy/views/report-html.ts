@@ -112,13 +112,15 @@ export function buildReportHtml(options: ReportOptions): string {
 <head>
     <title>${escapeHtml(l10n('packageDashboard.documentTitle'))}</title>
     <meta charset="UTF-8">
-    <!-- 'unsafe-inline' on style-src: radial gauge sets dynamic CSS vars
-         (--gauge-target, --gauge-arc) via inline style="..." attributes. CSP
-         nonces only authorize <style> blocks, not style attributes — without
-         'unsafe-inline' the vars are dropped, the dasharray falls back to 0,
-         and the gauge renders as a tiny dot. -->
+    <!-- Strict CSP: nonce-only style/script, no 'unsafe-inline'. CSP3 ignores
+         'unsafe-inline' when a nonce is present anyway, which previously caused
+         the radial gauge's inline style="--gauge-target:..." attribute to be
+         stripped, collapsing stroke-dasharray to "0 999" so only the rounded
+         linecap (a single dot) was painted. The gauge now writes its
+         stroke-dasharray as a direct SVG presentation attribute and animates
+         via SMIL <animate>, so no inline style attributes are needed. -->
     <meta http-equiv="Content-Security-Policy"
-        content="default-src 'none'; style-src 'nonce-${cspNonce}' 'unsafe-inline'; script-src 'nonce-${cspNonce}';">
+        content="default-src 'none'; style-src 'nonce-${cspNonce}'; script-src 'nonce-${cspNonce}';">
     <style nonce="${cspNonce}">${getPillButtonStyles()}${getReportStyles()}${getChartStyles()}${getKeyboardShortcutsStyles()}</style>
 </head>
 <body>
@@ -129,6 +131,7 @@ export function buildReportHtml(options: ReportOptions): string {
         </div>
         ${buildRadialGauge(avg)}
     </div>
+    ${buildGradeBreakdown(results, avg)}
     ${buildReportSummary(options)}
     ${buildChartSection(results)}
     ${buildFiltersSection(options)}
@@ -265,7 +268,18 @@ function buildRadialGauge(avgScore: number): string {
     /* Grade derived from score thresholds (never F: F requires hard EOL
        signals that can't be inferred from an average score). */
     const gradeLabel = scoreToGrade(pct);
-    return `<div class="radial-gauge" title="${escapeHtml(l10n('packageDashboard.gaugeTitle', { grade: gradeLabel }))}">
+    // stroke-dasharray is written as a direct SVG presentation attribute (not
+    // inline style or CSS var) so it survives the strict CSP — see the CSP
+    // comment in buildReportHtml for the failure mode this avoids. SMIL
+    // <animate> is used for the fill-in animation because it's part of SVG,
+    // not CSS, so it doesn't require any style-src concessions.
+    // role/tabindex make the gauge keyboard-actionable; the click handler in
+    // report-script.ts toggles the <details id="grade-breakdown"> panel so
+    // the gauge doubles as a "why this grade?" affordance.
+    return `<div class="radial-gauge" role="button" tabindex="0"
+            aria-controls="grade-breakdown"
+            data-breakdown-trigger="gauge"
+            title="${escapeHtml(l10n('packageDashboard.gaugeTitle', { grade: gradeLabel }))}">
         <svg viewBox="0 0 88 88" class="gauge-svg">
             <circle cx="44" cy="44" r="${r}" fill="none"
                 stroke="var(--vscode-widget-border)" stroke-width="7"
@@ -275,14 +289,137 @@ function buildRadialGauge(avgScore: number): string {
                 transform="rotate(135 44 44)" />
             <circle cx="44" cy="44" r="${r}" fill="none"
                 stroke="${color}" stroke-width="7"
-                stroke-dasharray="${filled} ${circumference}"
+                stroke-dasharray="${filled} ${arcLength}"
                 stroke-dashoffset="0"
                 stroke-linecap="round"
                 transform="rotate(135 44 44)"
-                class="gauge-fill" style="--gauge-target: ${filled}; --gauge-arc: ${arcLength};" />
+                class="gauge-fill">
+                <animate attributeName="stroke-dasharray"
+                    from="0 ${arcLength}"
+                    to="${filled} ${arcLength}"
+                    dur="1.2s"
+                    fill="freeze"
+                    calcMode="spline"
+                    keySplines="0.25 0.1 0.25 1" />
+            </circle>
         </svg>
         <div class="gauge-label">${gradeLabel}</div>
     </div>`;
+}
+
+/**
+ * "Why this grade?" breakdown — a collapsible panel that explains the inputs
+ * driving the overall project grade. Opens when the user clicks the radial
+ * gauge or the Project Package Grade summary card (wired up in
+ * report-script.ts). The panel itself is a plain <details> so it works
+ * without JS — clicking the summary still toggles it. All drill-down links
+ * route through existing infrastructure (filterByCard, navigateToPackageRow)
+ * to keep behavior consistent with the rest of the dashboard.
+ */
+function buildGradeBreakdown(results: readonly VibrancyResult[], avgScore: number): string {
+    if (results.length === 0) return '';
+    const counts = countByCategory(results);
+    const total = results.length;
+    const avgGrade = scoreToGrade(avgScore);
+    const vulnerable = results.filter(r => r.vulnerabilities.length > 0).length;
+    const updates = results.filter(
+        r => r.updateInfo && r.updateInfo.updateStatus !== 'up-to-date',
+    ).length;
+    const flagged = counts.eol + counts.abandoned;
+    // Sort by score ascending (worst first); ties broken by category severity
+    // implicitly via score, then name for stability. Score is the same number
+    // that drives the gauge — surfacing the bottom 5 directly tells the user
+    // which packages to look at to lift the project grade.
+    const bottom = [...results]
+        .sort((a, b) => a.score - b.score || a.package.name.localeCompare(b.package.name))
+        .slice(0, 5);
+    const distRow = (key: 'vibrant' | 'stable' | 'outdated' | 'abandoned' | 'eol', filter: string, count: number) => {
+        const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+        return `<li class="breakdown-dist-row">
+            <button type="button" class="breakdown-filter-btn" data-filter="${filter}"
+                title="${escapeHtml(l10n('packageDashboard.breakdown.filterTooltip'))}">
+                <span class="grade-badge grade-${gradeBadgeLetter(key)}">${gradeBadgeLetter(key)}</span>
+                <span class="breakdown-dist-label">${escapeHtml(l10n(`packageDashboard.summary.${key}Title`))}</span>
+            </button>
+            <span class="breakdown-dist-count">${count}</span>
+            <span class="breakdown-dist-pct">${pct}%</span>
+        </li>`;
+    };
+    const bottomItem = (r: VibrancyResult) => {
+        const grade = scoreToGrade(r.score);
+        return `<li class="breakdown-bottom-row">
+            <button type="button" class="breakdown-jump-btn" data-pkg="${escapeHtml(r.package.name)}"
+                title="${escapeHtml(l10n('packageDashboard.breakdown.jumpTooltip', { name: r.package.name }))}">
+                <span class="grade-badge grade-${grade}">${grade}</span>
+                <span class="breakdown-pkg-name">${escapeHtml(r.package.name)}</span>
+            </button>
+            <span class="breakdown-pkg-score">${Math.round(r.score)}/100</span>
+        </li>`;
+    };
+    const heading = escapeHtml(l10n('packageDashboard.breakdown.title', {
+        grade: avgGrade,
+        avgScore: String(Math.round(avgScore)),
+        pkgCount: String(total),
+    }));
+    return `<details id="grade-breakdown" class="grade-breakdown">
+        <summary class="grade-breakdown-summary">
+            <span class="grade-breakdown-title">${heading}</span>
+            <span class="grade-breakdown-hint">${escapeHtml(l10n('packageDashboard.breakdown.hint'))}</span>
+        </summary>
+        <div class="grade-breakdown-body">
+            <section class="breakdown-section">
+                <h3>${escapeHtml(l10n('packageDashboard.breakdown.distributionHeading'))}</h3>
+                <ul class="breakdown-dist">
+                    ${distRow('vibrant', 'vibrant', counts.vibrant)}
+                    ${distRow('stable', 'stable', counts.stable)}
+                    ${distRow('outdated', 'outdated', counts.outdated)}
+                    ${distRow('abandoned', 'abandoned', counts.abandoned)}
+                    ${distRow('eol', 'end-of-life', counts.eol)}
+                </ul>
+            </section>
+            <section class="breakdown-section">
+                <h3>${escapeHtml(l10n('packageDashboard.breakdown.signalsHeading'))}</h3>
+                <ul class="breakdown-signals">
+                    <li><button type="button" class="breakdown-filter-btn" data-filter="end-of-life"
+                        ${flagged === 0 ? 'disabled' : ''}>${escapeHtml(l10n('packageDashboard.breakdown.signalFlagged', { count: String(flagged) }))}</button></li>
+                    <li><button type="button" class="breakdown-filter-btn" data-filter="vulns"
+                        ${vulnerable === 0 ? 'disabled' : ''}>${escapeHtml(l10n('packageDashboard.breakdown.signalVulnerable', { count: String(vulnerable) }))}</button></li>
+                    <li><button type="button" class="breakdown-filter-btn" data-filter="updates"
+                        ${updates === 0 ? 'disabled' : ''}>${escapeHtml(l10n('packageDashboard.breakdown.signalUpdates', { count: String(updates) }))}</button></li>
+                </ul>
+            </section>
+            <section class="breakdown-section">
+                <h3>${escapeHtml(l10n('packageDashboard.breakdown.bottomHeading'))}</h3>
+                <ol class="breakdown-bottom">
+                    ${bottom.map(bottomItem).join('')}
+                </ol>
+            </section>
+            <section class="breakdown-section breakdown-thresholds">
+                <h3>${escapeHtml(l10n('packageDashboard.breakdown.thresholdsHeading'))}</h3>
+                <ul>
+                    <li><span class="grade-badge grade-A">A</span> ${escapeHtml(l10n('packageDashboard.breakdown.thresholdA'))}</li>
+                    <li><span class="grade-badge grade-B">B</span> ${escapeHtml(l10n('packageDashboard.breakdown.thresholdB'))}</li>
+                    <li><span class="grade-badge grade-C">C</span> ${escapeHtml(l10n('packageDashboard.breakdown.thresholdC'))}</li>
+                    <li><span class="grade-badge grade-E">E</span> ${escapeHtml(l10n('packageDashboard.breakdown.thresholdE'))}</li>
+                    <li><span class="grade-badge grade-F">F</span> ${escapeHtml(l10n('packageDashboard.breakdown.thresholdF'))}</li>
+                </ul>
+            </section>
+        </div>
+    </details>`;
+}
+
+/** Map a distribution category bucket to its letter-grade badge. The
+ *  buckets used in countByCategory don't carry the letter directly, so this
+ *  small lookup keeps the badge styling consistent with the rest of the
+ *  dashboard's grade-A/B/C/E/F CSS classes. */
+function gradeBadgeLetter(bucket: 'vibrant' | 'stable' | 'outdated' | 'abandoned' | 'eol'): string {
+    switch (bucket) {
+        case 'vibrant': return 'A';
+        case 'stable': return 'B';
+        case 'outdated': return 'C';
+        case 'abandoned': return 'E';
+        case 'eol': return 'F';
+    }
 }
 
 function buildReportSummary(options: ReportOptions): string {
@@ -341,7 +478,9 @@ function buildReportSummary(options: ReportOptions): string {
         `${l10n(`packageDashboard.summary.${key}`)}\n\n${thresholdCaveat}`;
     return `<div class="summary">
         <div class="summary-card"><div class="count">${results.length}</div><div class="label">${escapeHtml(l10n('packageDashboard.summary.packages'))}</div></div>
-        <div class="summary-card" title="${escapeHtml(gradeTooltip)}"><div class="count">${avgGrade}</div><div class="label">${escapeHtml(l10n('packageDashboard.summary.projectGrade'))}</div></div>
+        <div class="summary-card" role="button" tabindex="0"
+            aria-controls="grade-breakdown" data-breakdown-trigger="grade-card"
+            title="${escapeHtml(gradeTooltip)}"><div class="count">${avgGrade}</div><div class="label">${escapeHtml(l10n('packageDashboard.summary.projectGrade'))}</div></div>
         <div class="summary-card total-size"
             title="${escapeHtml(totalSizeTitle)}"
             data-total-size-own="${totalOwnBytes}"

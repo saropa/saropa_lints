@@ -433,6 +433,24 @@
       "caveatLine1": "*Archive sizes before tree shaking. Actual app size will be smaller.",
       "caveatLine2": "Activity thresholds: 90d = stale, 180d = dormant (commit + release timelines)."
     },
+    "breakdown": {
+      "title": "Why grade {grade}? — {avgScore}/100 average across {pkgCount} packages",
+      "hint": "Click to expand",
+      "distributionHeading": "Distribution",
+      "signalsHeading": "Risk signals dragging the score down",
+      "signalFlagged": "{count} flagged (abandoned / end-of-life)",
+      "signalVulnerable": "{count} with known vulnerabilities",
+      "signalUpdates": "{count} have updates available",
+      "bottomHeading": "Lowest-scoring packages",
+      "thresholdsHeading": "How scores map to grades",
+      "thresholdA": "70+ — Vibrant: actively maintained, recently published",
+      "thresholdB": "40–69 — Stable: still maintained but slowing",
+      "thresholdC": "20–39 — Outdated: long gaps between releases",
+      "thresholdE": "below 20 — Abandoned: signs of inactivity",
+      "thresholdF": "Discontinued or archived on pub.dev (score not used)",
+      "filterTooltip": "Filter the package table to just this category",
+      "jumpTooltip": "Jump to {name} in the package table"
+    },
     "network": {
       "summary": "Dependency Network"
     },

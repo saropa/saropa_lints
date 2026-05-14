@@ -116,19 +116,13 @@ export function getReportStyles(): string {
             flex-shrink: 0;
         }
         .gauge-svg { width: 72px; height: 72px; }
-        /* Animate the arc fill on load: start at 0, fill to target.
-           The resting value uses inline CSS vars set on the <circle>
-           (--gauge-target = filled length, --gauge-arc = full arc).
-           Without referencing the vars here, the static rule would
-           override the SVG attribute and the gauge would always read 0. */
-        .gauge-fill {
-            stroke-dasharray: var(--gauge-target, 0) var(--gauge-arc, 999);
-            animation: gauge-fill-in 1.2s ease-out;
-        }
-        @keyframes gauge-fill-in {
-            from { stroke-dasharray: 0 var(--gauge-arc, 999); }
-            to   { stroke-dasharray: var(--gauge-target, 0) var(--gauge-arc, 999); }
-        }
+        /* Arc fill: stroke-dasharray is set as a direct SVG presentation
+           attribute on the <circle class="gauge-fill"> (see buildRadialGauge
+           in report-html.ts) and the load animation is driven by a SMIL
+           <animate> child. Both survive the strict CSP — an earlier CSS-vars
+           approach using inline style="..." attributes collapsed under CSP3
+           and left the gauge as a single dot. Do NOT reintroduce a
+           stroke-dasharray rule here: it would override the attribute. */
         .gauge-label {
             position: absolute; top: 50%; left: 50%;
             transform: translate(-50%, -55%);
@@ -139,6 +133,136 @@ export function getReportStyles(): string {
             transform: translate(-50%, 40%);
             font-size: 0.65em; opacity: 0.5;
         }
+        /* Gauge doubles as the trigger for the "Why this grade?" breakdown
+           panel (see buildGradeBreakdown). Visual affordance: cursor change +
+           subtle focus ring; the SVG itself is unchanged so the animation
+           reads the same. */
+        .radial-gauge[role="button"] { cursor: pointer; }
+        .radial-gauge[role="button"]:hover { filter: brightness(1.08); }
+        .radial-gauge[role="button"]:focus-visible {
+            outline: 2px solid var(--vscode-focusBorder);
+            outline-offset: 4px;
+            border-radius: 50%;
+        }
+
+        /* ---- "Why this grade?" breakdown panel ---- */
+        .grade-breakdown {
+            margin: 0 0 14px;
+            border: 1px solid var(--vscode-widget-border);
+            border-radius: 10px;
+            background: var(--vscode-editor-inactiveSelectionBackground);
+        }
+        .grade-breakdown-summary {
+            cursor: pointer;
+            padding: 10px 14px;
+            list-style: none;
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 12px;
+            font-size: 0.95em;
+        }
+        /* Override the default disclosure-triangle marker so the chevron sits
+           where we expect across Chromium and WebKit. */
+        .grade-breakdown-summary::-webkit-details-marker { display: none; }
+        .grade-breakdown-summary::marker { content: ''; }
+        .grade-breakdown-summary::before {
+            content: '\\25B8'; /* right-pointing triangle, rotates on open */
+            display: inline-block;
+            margin-inline-end: 8px;
+            transition: transform 0.15s ease-out;
+            opacity: 0.6;
+        }
+        .grade-breakdown[open] > .grade-breakdown-summary::before {
+            transform: rotate(90deg);
+        }
+        .grade-breakdown-title { font-weight: 600; flex: 1; min-width: 0; }
+        .grade-breakdown-hint {
+            font-size: 0.85em;
+            color: var(--vscode-descriptionForeground);
+            opacity: 0.7;
+        }
+        .grade-breakdown[open] > .grade-breakdown-summary .grade-breakdown-hint {
+            visibility: hidden;
+        }
+        .grade-breakdown-body {
+            padding: 0 14px 14px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            border-top: 1px solid var(--vscode-widget-border);
+            padding-top: 12px;
+        }
+        .grade-breakdown-body h3 {
+            margin: 0 0 6px;
+            font-size: 0.82em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--vscode-descriptionForeground);
+        }
+        .grade-breakdown-body ul,
+        .grade-breakdown-body ol {
+            list-style: none;
+            margin: 0; padding: 0;
+        }
+        .breakdown-section li {
+            display: flex; align-items: center; gap: 8px;
+            padding: 3px 0;
+            font-size: 0.92em;
+        }
+        .breakdown-dist-row,
+        .breakdown-bottom-row {
+            justify-content: space-between;
+        }
+        .breakdown-dist-count,
+        .breakdown-pkg-score {
+            font-variant-numeric: tabular-nums;
+            color: var(--vscode-foreground);
+        }
+        .breakdown-dist-pct {
+            font-variant-numeric: tabular-nums;
+            color: var(--vscode-descriptionForeground);
+            opacity: 0.7;
+            min-width: 38px;
+            text-align: end;
+        }
+        /* Filter / jump buttons inside the breakdown panel — visually plain
+           so the panel reads as a report, not a toolbar; styled like links
+           with a hover affordance to confirm they're actionable. */
+        .breakdown-filter-btn,
+        .breakdown-jump-btn {
+            background: none; border: none; cursor: pointer; padding: 0;
+            color: var(--vscode-foreground);
+            font: inherit;
+            display: inline-flex; align-items: center; gap: 6px;
+            flex: 1; min-width: 0;
+            text-align: start;
+        }
+        .breakdown-filter-btn:hover,
+        .breakdown-jump-btn:hover {
+            color: var(--vscode-textLink-foreground);
+            text-decoration: underline;
+        }
+        .breakdown-filter-btn:focus-visible,
+        .breakdown-jump-btn:focus-visible {
+            outline: 1px solid var(--vscode-focusBorder);
+            outline-offset: 2px;
+            border-radius: 3px;
+        }
+        .breakdown-filter-btn[disabled] {
+            cursor: default;
+            opacity: 0.45;
+            text-decoration: none;
+        }
+        .breakdown-filter-btn[disabled]:hover {
+            color: var(--vscode-foreground);
+            text-decoration: none;
+        }
+        .breakdown-pkg-name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .breakdown-thresholds li { font-size: 0.88em; }
 
         /* ---- Letter grade badges ---- */
         .grade-badge {
@@ -239,11 +363,17 @@ export function getReportStyles(): string {
         /* Summary-card label: was 0.85em + opacity 0.8 — small and washed-out.
          * descriptionForeground gives proper muted contrast in any theme. */
         .summary-card .label { font-size: 0.9em; color: var(--vscode-descriptionForeground); min-height: 18px; }
-        .summary-card[data-filter] {
+        .summary-card[data-filter],
+        .summary-card[data-breakdown-trigger] {
             cursor: pointer; transition: box-shadow 0.2s, background 0.2s;
         }
-        .summary-card[data-filter]:hover {
+        .summary-card[data-filter]:hover,
+        .summary-card[data-breakdown-trigger]:hover {
             box-shadow: 0 0 0 2px var(--vscode-focusBorder);
+        }
+        .summary-card[data-breakdown-trigger]:focus-visible {
+            outline: 2px solid var(--vscode-focusBorder);
+            outline-offset: 2px;
         }
         .summary-card.card-active {
             box-shadow: 0 0 0 2px var(--vscode-focusBorder);
@@ -785,8 +915,9 @@ export function getReportStyles(): string {
         .clear-filter-btn:hover { text-decoration: underline; }
 
         @media (prefers-reduced-motion: reduce) {
-            .gauge-fill { animation: none !important;
-                stroke-dasharray: var(--gauge-target, 0) var(--gauge-arc, 999) !important; }
+            /* gauge-fill SMIL <animate> is removed at runtime by
+               report-script.ts when this query matches — CSS can't disable
+               SMIL, so the JS path is the only reliable kill-switch. */
             .expand-chevron { transition: none; }
             .copy-btn { transition: none; }
             .summary-card[data-filter] { transition: none; }
