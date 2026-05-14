@@ -395,7 +395,7 @@
     "noMatchingFindingsCopy": "Aucun résultat correspondant à copier.",
     "couldNotOpenFile": "Impossible d'ouvrir le fichier : 0 {path}",
     "saveReportNoWorkspace": "Ouvrez un dossier d'espace de travail avant d'enregistrer le rapport.",
-    "savedFindings": "0 résultat(s) enregistré(s) : 1 {path} {count}",
+    "savedFindings": "0 résultat(s) enregistré(s) : 1 {count} {path}",
     "couldNotSaveReportJson": "Impossible d'enregistrer le rapport JSON."
   },
   "packageDashboard": {
@@ -419,7 +419,7 @@
       "packages": "Forfaits",
       "projectGrade": "Catégorie du package de projet",
       "totalSize": "Taille totale*",
-      "gradeTooltip": "Note du projet 0\nNote moyenne : 1/100\nForfaits : 2\nA:3 B:4 C:5 E:6 F:7 {f} {a} {avgGrade} {b} {c} {pkgCount} {avgScore} {e}",
+      "gradeTooltip": "Note du projet 0\nNote moyenne : 1/100\nForfaits : 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {avgGrade} {avgScore} {e} {c} {f} {b} {a}",
       "vibrantTitle": "Dynamique",
       "stableTitle": "Écurie",
       "outdatedTitle": "Dépassé",
@@ -434,7 +434,7 @@
       "caveatLine2": "Seuils d'activité : 90 j = obsolète, 180 j = dormant (échéanciers de validation et de publication)."
     },
     "breakdown": {
-      "title": "Pourquoi noter 0 ? — 1/100 en moyenne sur 2 forfaits {avgScore} {pkgCount} {grade}",
+      "title": "Pourquoi noter 0 ? — 1/100 en moyenne sur 2 forfaits {pkgCount} {avgScore} {grade}",
       "hint": "Cliquez pour agrandir",
       "distributionHeading": "Distribution",
       "signalsHeading": "Les signaux de risque font baisser le score",
@@ -691,7 +691,7 @@
       "gatesPassing": "passage des portes"
     },
     "gauge": {
-      "tooltip": "Note moyenne 0 sur 100 (note 1). {rounded} {grade}",
+      "tooltip": "Note moyenne 0 sur 100 (note 1). {grade} {rounded}",
       "ariaLabel": "Note moyenne 0 sur 100 {rounded}"
     },
     "gate": {

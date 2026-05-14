@@ -395,7 +395,7 @@
     "noMatchingFindingsCopy": "Walang katugmang mga natuklasan upang kopyahin.",
     "couldNotOpenFile": "Hindi mabuksan ang file: 0 {path}",
     "saveReportNoWorkspace": "Magbukas ng folder ng workspace bago i-save ang ulat.",
-    "savedFindings": "Nai-save na 0 (mga) paghahanap: 1 {path} {count}",
+    "savedFindings": "Nai-save na 0 (mga) paghahanap: 1 {count} {path}",
     "couldNotSaveReportJson": "Hindi ma-save ang ulat na JSON."
   },
   "packageDashboard": {
@@ -419,7 +419,7 @@
       "packages": "Mga package",
       "projectGrade": "Marka ng Pakete ng Proyekto",
       "totalSize": "Kabuuang Sukat*",
-      "gradeTooltip": "Marka ng proyekto 0\nAverage na marka: 1/100\nMga Package: 2\nA:3 B:4 C:5 E:6 F:7 {f} {a} {avgGrade} {b} {c} {pkgCount} {avgScore} {e}",
+      "gradeTooltip": "Marka ng proyekto 0\nAverage na marka: 1/100\nMga Package: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {avgGrade} {avgScore} {e} {c} {f} {b} {a}",
       "vibrantTitle": "Masigla",
       "stableTitle": "Matatag",
       "outdatedTitle": "Luma na",
@@ -434,7 +434,7 @@
       "caveatLine2": "Mga threshold ng aktibidad: 90d = lipas, 180d = tulog (commit + release timeline)."
     },
     "breakdown": {
-      "title": "Bakit grade 0? — 1/100 average sa 2 na mga pakete {avgScore} {pkgCount} {grade}",
+      "title": "Bakit grade 0? — 1/100 average sa 2 na mga pakete {pkgCount} {avgScore} {grade}",
       "hint": "I-click upang palawakin",
       "distributionHeading": "Pamamahagi",
       "signalsHeading": "Mga senyales ng panganib na nag-drag pababa sa marka",
@@ -691,7 +691,7 @@
       "gatesPassing": "mga tarangkahan na dumadaan"
     },
     "gauge": {
-      "tooltip": "Average na marka 0 ng 100 (grade 1). {rounded} {grade}",
+      "tooltip": "Average na marka 0 ng 100 (grade 1). {grade} {rounded}",
       "ariaLabel": "Average na marka 0 ng 100 {rounded}"
     },
     "gate": {

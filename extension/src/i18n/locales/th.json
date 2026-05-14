@@ -395,7 +395,7 @@
     "noMatchingFindingsCopy": "ไม่มีผลการสืบค้นที่ตรงกันที่จะคัดลอก",
     "couldNotOpenFile": "ไม่สามารถเปิดไฟล์ได้: 0 {path}",
     "saveReportNoWorkspace": "เปิดโฟลเดอร์พื้นที่ทำงานก่อนที่จะบันทึกรายงาน",
-    "savedFindings": "บันทึกการค้นพบ 0: 1 {path} {count}",
+    "savedFindings": "บันทึกการค้นพบ 0: 1 {count} {path}",
     "couldNotSaveReportJson": "ไม่สามารถบันทึกรายงาน JSON"
   },
   "packageDashboard": {
@@ -419,7 +419,7 @@
       "packages": "แพ็คเกจ",
       "projectGrade": "เกรดแพ็คเกจโครงการ",
       "totalSize": "ขนาดรวม*",
-      "gradeTooltip": "เกรดโครงการ 0\nคะแนนเฉลี่ย: 1/100\nแพ็คเกจ: 2\nก:3 B:4 ค:5 อี:6 ฟ:7 {f} {a} {avgGrade} {b} {c} {pkgCount} {avgScore} {e}",
+      "gradeTooltip": "เกรดโครงการ 0\nคะแนนเฉลี่ย: 1/100\nแพ็คเกจ: 2\nก:3 B:4 ค:5 อี:6 ฟ:7 {pkgCount} {avgGrade} {avgScore} {e} {c} {f} {b} {a}",
       "vibrantTitle": "มีชีวิตชีวา",
       "stableTitle": "มั่นคง",
       "outdatedTitle": "ล้าสมัย",
@@ -434,7 +434,7 @@
       "caveatLine2": "เกณฑ์กิจกรรม: 90d = เก่า, 180d = อยู่เฉยๆ (กระทำ + ไทม์ไลน์การเผยแพร่)"
     },
     "breakdown": {
-      "title": "ทำไมต้องเกรด 0? — 1/100 โดยเฉลี่ยจากแพ็คเกจ 2 {avgScore} {pkgCount} {grade}",
+      "title": "ทำไมต้องเกรด 0? — 1/100 โดยเฉลี่ยจากแพ็คเกจ 2 {pkgCount} {avgScore} {grade}",
       "hint": "คลิกเพื่อขยาย",
       "distributionHeading": "การกระจาย",
       "signalsHeading": "สัญญาณความเสี่ยงลากคะแนนลง",
@@ -691,7 +691,7 @@
       "gatesPassing": "ประตูผ่านไป"
     },
     "gauge": {
-      "tooltip": "คะแนนเฉลี่ย 0 จาก 100 (เกรด 1) {rounded} {grade}",
+      "tooltip": "คะแนนเฉลี่ย 0 จาก 100 (เกรด 1) {grade} {rounded}",
       "ariaLabel": "คะแนนเฉลี่ย 0 จาก 100 {rounded}"
     },
     "gate": {

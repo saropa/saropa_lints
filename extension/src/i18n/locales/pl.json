@@ -395,7 +395,7 @@
     "noMatchingFindingsCopy": "Brak pasujących wyników do skopiowania.",
     "couldNotOpenFile": "Nie można otworzyć pliku: 0 {path}",
     "saveReportNoWorkspace": "Przed zapisaniem raportu otwórz folder obszaru roboczego.",
-    "savedFindings": "Zapisano 0 wyników: 1 {path} {count}",
+    "savedFindings": "Zapisano 0 wyników: 1 {count} {path}",
     "couldNotSaveReportJson": "Nie można zapisać raportu w formacie JSON."
   },
   "packageDashboard": {
@@ -419,7 +419,7 @@
       "packages": "Pakiety",
       "projectGrade": "Ocena pakietu projektu",
       "totalSize": "Całkowity rozmiar*",
-      "gradeTooltip": "Ocena projektu 0\nŚredni wynik: 1/100\nPakiety: 2\nA:3 B:4 C:5 E:6 F:7 {f} {a} {avgGrade} {b} {c} {pkgCount} {avgScore} {e}",
+      "gradeTooltip": "Ocena projektu 0\nŚredni wynik: 1/100\nPakiety: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {avgGrade} {avgScore} {e} {c} {f} {b} {a}",
       "vibrantTitle": "Wibrujący",
       "stableTitle": "Stabilny",
       "outdatedTitle": "Przestarzały",
@@ -434,7 +434,7 @@
       "caveatLine2": "Progi aktywności: 90d = nieaktualne, 180d = uśpione (osie czasu zatwierdzenia i wydania)."
     },
     "breakdown": {
-      "title": "Dlaczego klasa 0? — 1/100 średnio w 2 pakietach {avgScore} {pkgCount} {grade}",
+      "title": "Dlaczego klasa 0? — 1/100 średnio w 2 pakietach {pkgCount} {avgScore} {grade}",
       "hint": "Kliknij, aby rozwinąć",
       "distributionHeading": "Dystrybucja",
       "signalsHeading": "Sygnały ryzyka obniżają wynik",
@@ -691,7 +691,7 @@
       "gatesPassing": "przechodzą bramy"
     },
     "gauge": {
-      "tooltip": "Średni wynik 0 na poziomie 100 (ocena 1). {rounded} {grade}",
+      "tooltip": "Średni wynik 0 na poziomie 100 (ocena 1). {grade} {rounded}",
       "ariaLabel": "Średni wynik 0 na poziomie 100 {rounded}"
     },
     "gate": {

@@ -395,7 +395,7 @@
     "noMatchingFindingsCopy": "Немає відповідних результатів для копіювання.",
     "couldNotOpenFile": "Не вдалося відкрити файл: 0 {path}",
     "saveReportNoWorkspace": "Перед збереженням звіту відкрийте папку робочої області.",
-    "savedFindings": "Збережено 0 знахідки: 1 {path} {count}",
+    "savedFindings": "Збережено 0 знахідки: 1 {count} {path}",
     "couldNotSaveReportJson": "Не вдалося зберегти звіт JSON."
   },
   "packageDashboard": {
@@ -419,7 +419,7 @@
       "packages": "пакети",
       "projectGrade": "Оцінка пакету проекту",
       "totalSize": "Загальний розмір*",
-      "gradeTooltip": "Оцінка проекту 0\nСередній бал: 1/100\nПакети: 2\nA:3 B:4 C:5 E:6 F:7 {f} {a} {avgGrade} {b} {c} {pkgCount} {avgScore} {e}",
+      "gradeTooltip": "Оцінка проекту 0\nСередній бал: 1/100\nПакети: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {avgGrade} {avgScore} {e} {c} {f} {b} {a}",
       "vibrantTitle": "Яскравий",
       "stableTitle": "Стабільний",
       "outdatedTitle": "Застаріла",
@@ -434,7 +434,7 @@
       "caveatLine2": "Порогові значення активності: 90d = неактивний, 180d = неактивний (термінали фіксації + випуску)."
     },
     "breakdown": {
-      "title": "Чому оцінка 0? — 1/100 у середньому для 2 упаковок {avgScore} {pkgCount} {grade}",
+      "title": "Чому оцінка 0? — 1/100 у середньому для 2 упаковок {pkgCount} {avgScore} {grade}",
       "hint": "Натисніть, щоб розгорнути",
       "distributionHeading": "Розподіл",
       "signalsHeading": "Сигнали ризику, що знижують рахунок",
@@ -691,7 +691,7 @@
       "gatesPassing": "проходження воріт"
     },
     "gauge": {
-      "tooltip": "Середній бал 0 із 100 (оцінка 1). {rounded} {grade}",
+      "tooltip": "Середній бал 0 із 100 (оцінка 1). {grade} {rounded}",
       "ariaLabel": "Середній бал 0 із 100 {rounded}"
     },
     "gate": {

@@ -7,7 +7,7 @@
   "views.actions.name": "কর্ম",
   "views.status.name": "স্ট্যাটাস",
   "views.settings.name": "সেটিংস",
-  "views.help.name": "সাহায্য (v13.9.1)",
+  "views.help.name": "Help (v13.9.1)",
   "viewsWelcome.banner.contents": "**সরোপা লিন্টস**\n\nনিরাপত্তা, অ্যাক্সেসযোগ্যতা এবং কর্মক্ষমতার জন্য 2100+ ডার্ট এবং ফ্লটার লিন্ট নিয়ম।\n\nএকটি ডার্ট বা ফ্লাটার প্রকল্প প্রয়োজন।\n\nশুরু করতে `pubspec.yaml` ধারণকারী একটি ফোল্ডার খুলুন।\n\n[অনলাইনে আরও জানুন](https://pub.dev/packages/saropa_lints)\n[সমস্ত কমান্ড ব্রাউজ করুন](command:saropaLints.showCommandCatalog)\n[সরোপা লিন্টস সম্পর্কে](command:saropaLints.showAbout)\n[শুরু করা](command:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: সেট আপ প্রজেক্ট (pubspec + config)",
   "command.disable.title": "সরোপা লিন্টস: লিন্ট ইন্টিগ্রেশন বন্ধ করুন",

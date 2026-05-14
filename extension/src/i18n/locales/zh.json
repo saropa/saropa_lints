@@ -395,7 +395,7 @@
     "noMatchingFindingsCopy": "没有匹配的结果可供复制。",
     "couldNotOpenFile": "无法打开文件：0 {path}",
     "saveReportNoWorkspace": "保存报告之前打开工作区文件夹。",
-    "savedFindings": "已保存 0 结果：1 {path} {count}",
+    "savedFindings": "已保存 0 结果：1 {count} {path}",
     "couldNotSaveReportJson": "无法保存报告 JSON。"
   },
   "packageDashboard": {
@@ -419,7 +419,7 @@
       "packages": "套餐",
       "projectGrade": "工程包等级",
       "totalSize": "总尺寸*",
-      "gradeTooltip": "工程等级0\n平均分：1/100\n套餐：2\nA:3 B:4 C:5 E:6 F:7 {f} {a} {avgGrade} {b} {c} {pkgCount} {avgScore} {e}",
+      "gradeTooltip": "工程等级0\n平均分：1/100\n套餐：2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {avgGrade} {avgScore} {e} {c} {f} {b} {a}",
       "vibrantTitle": "充满活力",
       "stableTitle": "稳定的",
       "outdatedTitle": "过时的",
@@ -434,7 +434,7 @@
       "caveatLine2": "活动阈值：90d = 陈旧，180d = 休眠（提交 + 发布时间表）。"
     },
     "breakdown": {
-      "title": "为什么评分0？ — 2 包的 1/100 平均值 {avgScore} {pkgCount} {grade}",
+      "title": "为什么评分0？ — 2 包的 1/100 平均值 {pkgCount} {avgScore} {grade}",
       "hint": "点击展开",
       "distributionHeading": "分配",
       "signalsHeading": "风险信号拖累分数下跌",
@@ -691,7 +691,7 @@
       "gatesPassing": "大门经过"
     },
     "gauge": {
-      "tooltip": "平均分0为100分（等级1）。 {rounded} {grade}",
+      "tooltip": "平均分0为100分（等级1）。 {grade} {rounded}",
       "ariaLabel": "平均分 0 100 {rounded}"
     },
     "gate": {

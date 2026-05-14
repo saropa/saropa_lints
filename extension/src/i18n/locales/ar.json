@@ -395,7 +395,7 @@
     "noMatchingFindingsCopy": "لا توجد نتائج مطابقة لنسخها.",
     "couldNotOpenFile": "تعذر فتح الملف: 0 {path}",
     "saveReportNoWorkspace": "افتح مجلد مساحة العمل قبل حفظ التقرير.",
-    "savedFindings": "النتائج المحفوظة 0: 1 {path} {count}",
+    "savedFindings": "النتائج المحفوظة 0: 1 {count} {path}",
     "couldNotSaveReportJson": "تعذر حفظ تقرير JSON."
   },
   "packageDashboard": {
@@ -419,7 +419,7 @@
       "packages": "الحزم",
       "projectGrade": "درجة حزمة المشروع",
       "totalSize": "الحجم الإجمالي*",
-      "gradeTooltip": "درجة المشروع 0\nمتوسط الدرجات: 1/100\nالحزم: 2\nأ:3 ب:4 ج:5 ه:6 و:٧ {f} {a} {avgGrade} {b} {c} {pkgCount} {avgScore} {e}",
+      "gradeTooltip": "درجة المشروع 0\nمتوسط الدرجات: 1/100\nالحزم: 2\nأ:3 ب:4 ج:5 ه:6 و:٧ {pkgCount} {avgGrade} {avgScore} {e} {c} {f} {b} {a}",
       "vibrantTitle": "نابضة بالحياة",
       "stableTitle": "مستقر",
       "outdatedTitle": "عفا عليها الزمن",
@@ -434,7 +434,7 @@
       "caveatLine2": "حدود النشاط: 90 يومًا = قديم، 180 يومًا = خامل (الالتزام + الجداول الزمنية للإصدار)."
     },
     "breakdown": {
-      "title": "لماذا الدرجة 0؟ — متوسط ​​1/100 عبر الحزم 2 {avgScore} {pkgCount} {grade}",
+      "title": "لماذا الدرجة 0؟ — متوسط ​​1/100 عبر الحزم 2 {pkgCount} {avgScore} {grade}",
       "hint": "انقر للتوسيع",
       "distributionHeading": "توزيع",
       "signalsHeading": "إشارات الخطر تسحب النتيجة إلى أسفل",
@@ -691,7 +691,7 @@
       "gatesPassing": "مرور البوابات"
     },
     "gauge": {
-      "tooltip": "متوسط ​​الدرجات 0 من 100 (الدرجة 1). {rounded} {grade}",
+      "tooltip": "متوسط ​​الدرجات 0 من 100 (الدرجة 1). {grade} {rounded}",
       "ariaLabel": "متوسط ​​الدرجات 0 من 100 {rounded}"
     },
     "gate": {

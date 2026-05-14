@@ -395,7 +395,7 @@
     "noMatchingFindingsCopy": "Kopyalanacak eşleşen bulgu yok.",
     "couldNotOpenFile": "Dosya açılamadı: 0 {path}",
     "saveReportNoWorkspace": "Raporu kaydetmeden önce bir çalışma alanı klasörü açın.",
-    "savedFindings": "Kaydedilen 0 bulgu(lar): 1 {path} {count}",
+    "savedFindings": "Kaydedilen 0 bulgu(lar): 1 {count} {path}",
     "couldNotSaveReportJson": "JSON raporu kaydedilemedi."
   },
   "packageDashboard": {
@@ -419,7 +419,7 @@
       "packages": "Paketler",
       "projectGrade": "Proje Paketi Notu",
       "totalSize": "Toplam Boyut*",
-      "gradeTooltip": "Proje notu 0\nOrtalama puan: 1/100\nPaketler: 2\nA:3 B:4 C:5 E:6 F:7 {f} {a} {avgGrade} {b} {c} {pkgCount} {avgScore} {e}",
+      "gradeTooltip": "Proje notu 0\nOrtalama puan: 1/100\nPaketler: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {avgGrade} {avgScore} {e} {c} {f} {b} {a}",
       "vibrantTitle": "Canlı",
       "stableTitle": "Stabil",
       "outdatedTitle": "Modası geçmiş",
@@ -434,7 +434,7 @@
       "caveatLine2": "Etkinlik eşikleri: 90d = eski, 180d = hareketsiz (taahhüt + sürüm zaman çizelgeleri)."
     },
     "breakdown": {
-      "title": "Neden 0 notu? — 2 paketlerde ortalama 1/100 {avgScore} {pkgCount} {grade}",
+      "title": "Neden 0 notu? — 2 paketlerde ortalama 1/100 {pkgCount} {avgScore} {grade}",
       "hint": "Genişletmek için tıklayın",
       "distributionHeading": "Dağıtım",
       "signalsHeading": "Skoru aşağı çeken risk sinyalleri",
@@ -691,7 +691,7 @@
       "gatesPassing": "geçen kapılar"
     },
     "gauge": {
-      "tooltip": "Ortalama puan 0 100 (not 1). {rounded} {grade}",
+      "tooltip": "Ortalama puan 0 100 (not 1). {grade} {rounded}",
       "ariaLabel": "Ortalama puan 0 / 100 {rounded}"
     },
     "gate": {

@@ -395,7 +395,7 @@
     "noMatchingFindingsCopy": "Keine passenden Ergebnisse zum Kopieren vorhanden.",
     "couldNotOpenFile": "Datei konnte nicht geöffnet werden: 0 {path}",
     "saveReportNoWorkspace": "Öffnen Sie einen Arbeitsbereichsordner, bevor Sie den Bericht speichern.",
-    "savedFindings": "Gespeicherte 0 Ergebnisse: 1 {path} {count}",
+    "savedFindings": "Gespeicherte 0 Ergebnisse: 1 {count} {path}",
     "couldNotSaveReportJson": "Der JSON-Bericht konnte nicht gespeichert werden."
   },
   "packageDashboard": {
@@ -419,7 +419,7 @@
       "packages": "Pakete",
       "projectGrade": "Grad des Projektpakets",
       "totalSize": "Gesamtgröße*",
-      "gradeTooltip": "Projektnote 0\nDurchschnittliche Punktzahl: 1/100\nPakete: 2\nA:3 B:4 C:5 E:6 F:7 {f} {a} {avgGrade} {b} {c} {pkgCount} {avgScore} {e}",
+      "gradeTooltip": "Projektnote 0\nDurchschnittliche Punktzahl: 1/100\nPakete: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {avgGrade} {avgScore} {e} {c} {f} {b} {a}",
       "vibrantTitle": "Lebendig",
       "stableTitle": "Stabil",
       "outdatedTitle": "Veraltet",
@@ -434,7 +434,7 @@
       "caveatLine2": "Aktivitätsschwellenwerte: 90 Tage = veraltet, 180 Tage = ruhend (Commit- und Release-Zeitpläne)."
     },
     "breakdown": {
-      "title": "Warum Note 0? — 1/100 Durchschnitt über 2 Pakete {avgScore} {pkgCount} {grade}",
+      "title": "Warum Note 0? — 1/100 Durchschnitt über 2 Pakete {pkgCount} {avgScore} {grade}",
       "hint": "Klicken Sie zum Erweitern",
       "distributionHeading": "Verteilung",
       "signalsHeading": "Risikosignale ziehen den Score nach unten",
@@ -691,7 +691,7 @@
       "gatesPassing": "Tore passieren"
     },
     "gauge": {
-      "tooltip": "Durchschnittliche Punktzahl 0 von 100 (Note 1). {rounded} {grade}",
+      "tooltip": "Durchschnittliche Punktzahl 0 von 100 (Note 1). {grade} {rounded}",
       "ariaLabel": "Durchschnittliche Punktzahl 0 von 100 {rounded}"
     },
     "gate": {

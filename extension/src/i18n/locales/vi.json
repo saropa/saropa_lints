@@ -395,7 +395,7 @@
     "noMatchingFindingsCopy": "Không có kết quả phù hợp để sao chép.",
     "couldNotOpenFile": "Không thể mở tập tin: 0 {path}",
     "saveReportNoWorkspace": "Mở thư mục không gian làm việc trước khi lưu báo cáo.",
-    "savedFindings": "Đã lưu 0 (các) phát hiện: 1 {path} {count}",
+    "savedFindings": "Đã lưu 0 (các) phát hiện: 1 {count} {path}",
     "couldNotSaveReportJson": "Không thể lưu JSON báo cáo."
   },
   "packageDashboard": {
@@ -419,7 +419,7 @@
       "packages": "Gói",
       "projectGrade": "Lớp gói dự án",
       "totalSize": "Tổng kích thước*",
-      "gradeTooltip": "Cấp dự án 0\nĐiểm trung bình: 1/100\nGói: 2\nA:3 B:4 C:5 E:6 F:7 {f} {a} {avgGrade} {b} {c} {pkgCount} {avgScore} {e}",
+      "gradeTooltip": "Cấp dự án 0\nĐiểm trung bình: 1/100\nGói: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {avgGrade} {avgScore} {e} {c} {f} {b} {a}",
       "vibrantTitle": "Sống động",
       "stableTitle": "Ổn định",
       "outdatedTitle": "lỗi thời",
@@ -434,7 +434,7 @@
       "caveatLine2": "Ngưỡng hoạt động: 90d = cũ, 180d = không hoạt động (cam kết + mốc thời gian phát hành)."
     },
     "breakdown": {
-      "title": "Tại sao lại điểm 0? — trung bình 1/100 trên 2 gói {avgScore} {pkgCount} {grade}",
+      "title": "Tại sao lại điểm 0? — trung bình 1/100 trên 2 gói {pkgCount} {avgScore} {grade}",
       "hint": "Bấm để mở rộng",
       "distributionHeading": "Phân bổ",
       "signalsHeading": "Tín hiệu rủi ro kéo điểm xuống",
@@ -691,7 +691,7 @@
       "gatesPassing": "cổng đi qua"
     },
     "gauge": {
-      "tooltip": "Điểm trung bình 0 trên 100 (lớp 1). {rounded} {grade}",
+      "tooltip": "Điểm trung bình 0 trên 100 (lớp 1). {grade} {rounded}",
       "ariaLabel": "Điểm trung bình 0 trên 100 {rounded}"
     },
     "gate": {

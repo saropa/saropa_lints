@@ -395,7 +395,7 @@
     "noMatchingFindingsCopy": "Tidak ada temuan yang cocok untuk disalin.",
     "couldNotOpenFile": "Tidak dapat membuka file: 0 {path}",
     "saveReportNoWorkspace": "Buka folder ruang kerja sebelum menyimpan laporan.",
-    "savedFindings": "Temuan 0 yang disimpan: 1 {path} {count}",
+    "savedFindings": "Temuan 0 yang disimpan: 1 {count} {path}",
     "couldNotSaveReportJson": "Tidak dapat menyimpan laporan JSON."
   },
   "packageDashboard": {
@@ -419,7 +419,7 @@
       "packages": "Paket",
       "projectGrade": "Kelas Paket Proyek",
       "totalSize": "Ukuran Jumlah*",
-      "gradeTooltip": "Kelas proyek 0\nSkor rata-rata: 1/100\nPaket: 2\nA:3 B:4 C:5 E:6 F:7 {f} {a} {avgGrade} {b} {c} {pkgCount} {avgScore} {e}",
+      "gradeTooltip": "Kelas proyek 0\nSkor rata-rata: 1/100\nPaket: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {avgGrade} {avgScore} {e} {c} {f} {b} {a}",
       "vibrantTitle": "Bersemangat",
       "stableTitle": "Stabil",
       "outdatedTitle": "Kedaluwarsa",
@@ -434,7 +434,7 @@
       "caveatLine2": "Ambang batas aktivitas: 90d = basi, 180d = tidak aktif (jadwal komit + rilis)."
     },
     "breakdown": {
-      "title": "Mengapa kelas 0? — Rata-rata 1/100 di seluruh 2 paket {avgScore} {pkgCount} {grade}",
+      "title": "Mengapa kelas 0? — Rata-rata 1/100 di seluruh 2 paket {pkgCount} {avgScore} {grade}",
       "hint": "Klik untuk memperluas",
       "distributionHeading": "Distribusi",
       "signalsHeading": "Sinyal risiko menyeret skor ke bawah",
@@ -691,7 +691,7 @@
       "gatesPassing": "gerbang lewat"
     },
     "gauge": {
-      "tooltip": "Nilai rata-rata 0 dari 100 (kelas 1). {rounded} {grade}",
+      "tooltip": "Nilai rata-rata 0 dari 100 (kelas 1). {grade} {rounded}",
       "ariaLabel": "Skor rata-rata 0 dari 100 {rounded}"
     },
     "gate": {

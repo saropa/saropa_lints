@@ -395,7 +395,7 @@
     "noMatchingFindingsCopy": "Hakuna matokeo yanayolingana ya kunakili.",
     "couldNotOpenFile": "Haikuweza kufungua faili: 0 {path}",
     "saveReportNoWorkspace": "Fungua folda ya nafasi ya kazi kabla ya kuhifadhi ripoti.",
-    "savedFindings": "Imehifadhiwa 0 matokeo: 1 {path} {count}",
+    "savedFindings": "Imehifadhiwa 0 matokeo: 1 {count} {path}",
     "couldNotSaveReportJson": "Haikuweza kuhifadhi ripoti JSON."
   },
   "packageDashboard": {
@@ -419,7 +419,7 @@
       "packages": "Vifurushi",
       "projectGrade": "Daraja la Kifurushi cha Mradi",
       "totalSize": "Jumla ya Ukubwa*",
-      "gradeTooltip": "Daraja la mradi 0\nAlama ya wastani: 1/100\nVifurushi: 2\nA:3 B:4 C:5 E:6 F:7 {f} {a} {avgGrade} {b} {c} {pkgCount} {avgScore} {e}",
+      "gradeTooltip": "Daraja la mradi 0\nAlama ya wastani: 1/100\nVifurushi: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {avgGrade} {avgScore} {e} {c} {f} {b} {a}",
       "vibrantTitle": "Mahiri",
       "stableTitle": "Imara",
       "outdatedTitle": "Imepitwa na wakati",
@@ -434,7 +434,7 @@
       "caveatLine2": "Viwango vya shughuli: 90d = vilichakaa, 180d = vimetulia (jitolea + muda wa kutolewa)."
     },
     "breakdown": {
-      "title": "Kwa nini daraja 0? — 1/100 wastani katika vifurushi 2 {avgScore} {pkgCount} {grade}",
+      "title": "Kwa nini daraja 0? — 1/100 wastani katika vifurushi 2 {pkgCount} {avgScore} {grade}",
       "hint": "Bofya ili kupanua",
       "distributionHeading": "Usambazaji",
       "signalsHeading": "Ishara za hatari zinazoburuta alama chini",
@@ -691,7 +691,7 @@
       "gatesPassing": "milango kupita"
     },
     "gauge": {
-      "tooltip": "Alama ya wastani 0 ya 100 (daraja 1). {rounded} {grade}",
+      "tooltip": "Alama ya wastani 0 ya 100 (daraja 1). {grade} {rounded}",
       "ariaLabel": "Alama ya wastani 0 ya 100 {rounded}"
     },
     "gate": {

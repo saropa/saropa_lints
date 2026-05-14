@@ -7,7 +7,7 @@
   "views.actions.name": "Actions",
   "views.status.name": "Etat",
   "views.settings.name": "Parametres",
-  "views.help.name": "Aide (v13.9.1)",
+  "views.help.name": "Help (v13.9.1)",
   "viewsWelcome.banner.contents": "** Peluches Saropa **\n\nPlus de 2 100 règles de charpie Dart et Flutter pour la sécurité, l'accessibilité et les performances.\n\nNécessite un projet Dart ou Flutter.\n\nOuvrez un dossier contenant un « pubspec.yaml » pour commencer.\n\n[En savoir plus en ligne](https://pub.dev/packages/saropa_lints)\n[Parcourir toutes les commandes](commande:saropaLints.showCommandCatalog)\n[À propos de Saropa Lints](commande:saropaLints.showAbout)\n[Mise en route](commande :saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints : Configurer le projet (pubspec + config)",
   "command.disable.title": "Saropa Lints : Désactiver l'intégration des lints",

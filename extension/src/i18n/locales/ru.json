@@ -395,7 +395,7 @@
     "noMatchingFindingsCopy": "Нет соответствующих результатов для копирования.",
     "couldNotOpenFile": "Не удалось открыть файл: 0 {path}",
     "saveReportNoWorkspace": "Прежде чем сохранять отчет, откройте папку рабочей области.",
-    "savedFindings": "Сохранено 0 результатов: 1 {path} {count}",
+    "savedFindings": "Сохранено 0 результатов: 1 {count} {path}",
     "couldNotSaveReportJson": "Не удалось сохранить отчет в формате JSON."
   },
   "packageDashboard": {
@@ -419,7 +419,7 @@
       "packages": "Пакеты",
       "projectGrade": "Оценка пакета проекта",
       "totalSize": "Общий размер*",
-      "gradeTooltip": "Оценка проекта 0\nСредний балл: 1/100\nПакеты: 2\nA:3 B:4 C:5 E:6 F:7 {f} {a} {avgGrade} {b} {c} {pkgCount} {avgScore} {e}",
+      "gradeTooltip": "Оценка проекта 0\nСредний балл: 1/100\nПакеты: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {avgGrade} {avgScore} {e} {c} {f} {b} {a}",
       "vibrantTitle": "Яркий",
       "stableTitle": "Стабильный",
       "outdatedTitle": "Устаревший",
@@ -434,7 +434,7 @@
       "caveatLine2": "Пороги активности: 90d = устаревшие, 180d = бездействующие (сроки фиксации + выпуска)."
     },
     "breakdown": {
-      "title": "Почему оценка 0? — 1/100 в среднем по 2 пакетам {avgScore} {pkgCount} {grade}",
+      "title": "Почему оценка 0? — 1/100 в среднем по 2 пакетам {pkgCount} {avgScore} {grade}",
       "hint": "Нажмите, чтобы развернуть",
       "distributionHeading": "Распределение",
       "signalsHeading": "Сигналы риска, снижающие рейтинг",
@@ -691,7 +691,7 @@
       "gatesPassing": "ворота проходящие"
     },
     "gauge": {
-      "tooltip": "Средний балл 0 из 100 (оценка 1). {rounded} {grade}",
+      "tooltip": "Средний балл 0 из 100 (оценка 1). {grade} {rounded}",
       "ariaLabel": "Средний балл 0 из 100 {rounded}"
     },
     "gate": {

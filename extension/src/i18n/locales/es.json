@@ -395,7 +395,7 @@
     "noMatchingFindingsCopy": "No hay resultados coincidentes para copiar.",
     "couldNotOpenFile": "No se pudo abrir el archivo: 0 {path}",
     "saveReportNoWorkspace": "Abra una carpeta del espacio de trabajo antes de guardar el informe.",
-    "savedFindings": "Guardado 0 hallazgo(s): 1 {path} {count}",
+    "savedFindings": "Guardado 0 hallazgo(s): 1 {count} {path}",
     "couldNotSaveReportJson": "No se pudo guardar el informe JSON."
   },
   "packageDashboard": {
@@ -419,7 +419,7 @@
       "packages": "Paquetes",
       "projectGrade": "Grado del paquete del proyecto",
       "totalSize": "Tamaño total*",
-      "gradeTooltip": "Calificación del proyecto 0\nPuntuación media: 1/100\nPaquetes: 2\nA:3 B:4 C:5 E:6 F:7 {f} {a} {avgGrade} {b} {c} {pkgCount} {avgScore} {e}",
+      "gradeTooltip": "Calificación del proyecto 0\nPuntuación media: 1/100\nPaquetes: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {avgGrade} {avgScore} {e} {c} {f} {b} {a}",
       "vibrantTitle": "Vibrante",
       "stableTitle": "Estable",
       "outdatedTitle": "Anticuado",
@@ -434,7 +434,7 @@
       "caveatLine2": "Umbrales de actividad: 90d = obsoleto, 180d = inactivo (cronogramas de confirmación + liberación)."
     },
     "breakdown": {
-      "title": "¿Por qué calificar 0? — 1/100 promedio en 2 paquetes {avgScore} {pkgCount} {grade}",
+      "title": "¿Por qué calificar 0? — 1/100 promedio en 2 paquetes {pkgCount} {avgScore} {grade}",
       "hint": "Haga clic para ampliar",
       "distributionHeading": "Distribución",
       "signalsHeading": "Señales de riesgo que arrastran la puntuación hacia abajo",
@@ -691,7 +691,7 @@
       "gatesPassing": "puertas pasando"
     },
     "gauge": {
-      "tooltip": "Puntaje promedio 0 de 100 (calificación 1). {rounded} {grade}",
+      "tooltip": "Puntaje promedio 0 de 100 (calificación 1). {grade} {rounded}",
       "ariaLabel": "Puntuación media 0 de 100 {rounded}"
     },
     "gate": {

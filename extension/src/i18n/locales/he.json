@@ -395,7 +395,7 @@
     "noMatchingFindingsCopy": "אין ממצאים תואמים להעתקה.",
     "couldNotOpenFile": "לא ניתן היה לפתוח את הקובץ: 0 {path}",
     "saveReportNoWorkspace": "פתח תיקיית סביבת עבודה לפני שמירת הדוח.",
-    "savedFindings": "ממצא/ים שמורים 0: 1 {path} {count}",
+    "savedFindings": "ממצא/ים שמורים 0: 1 {count} {path}",
     "couldNotSaveReportJson": "לא ניתן לשמור את הדוח JSON."
   },
   "packageDashboard": {
@@ -419,7 +419,7 @@
       "packages": "חבילות",
       "projectGrade": "ציון חבילת פרויקט",
       "totalSize": "גודל כולל*",
-      "gradeTooltip": "ציון הפרויקט 0\nציון ממוצע: 1/100\nחבילות: 2\nA:3 B:4 C:5 E:6 F:7 {f} {a} {avgGrade} {b} {c} {pkgCount} {avgScore} {e}",
+      "gradeTooltip": "ציון הפרויקט 0\nציון ממוצע: 1/100\nחבילות: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {avgGrade} {avgScore} {e} {c} {f} {b} {a}",
       "vibrantTitle": "תוסס",
       "stableTitle": "יַצִיב",
       "outdatedTitle": "מְיוּשָׁן",
@@ -434,7 +434,7 @@
       "caveatLine2": "ספי פעילות: 90d = מעופש, 180d = רדום (מחוייבות + לוחות זמנים לשחרור)."
     },
     "breakdown": {
-      "title": "למה ציון 0? — ממוצע של 1/100 על פני 2 חבילות {avgScore} {pkgCount} {grade}",
+      "title": "למה ציון 0? — ממוצע של 1/100 על פני 2 חבילות {pkgCount} {avgScore} {grade}",
       "hint": "לחץ כדי להרחיב",
       "distributionHeading": "הֲפָצָה",
       "signalsHeading": "אותות סיכון גוררים את הניקוד למטה",
@@ -691,7 +691,7 @@
       "gatesPassing": "שערים עוברים"
     },
     "gauge": {
-      "tooltip": "ציון ממוצע 0 מתוך 100 (ציון 1). {rounded} {grade}",
+      "tooltip": "ציון ממוצע 0 מתוך 100 (ציון 1). {grade} {rounded}",
       "ariaLabel": "ציון ממוצע 0 מתוך 100 {rounded}"
     },
     "gate": {
