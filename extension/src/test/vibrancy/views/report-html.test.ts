@@ -944,10 +944,14 @@ describe('report: empty-cell dash with explanatory tooltip', () => {
         assert.ok(issueCells.length >= 2, 'expected at least 2 cells with GitHub tooltip (issues, PRs)');
     });
 
-    it('should show dash with tooltip when archive size is unavailable', () => {
-        /* makeResult defaults to archiveSizeBytes: null */
+    it('should show dash with tooltip when size is unavailable', () => {
+        /* makeResult defaults both codeSizeBytes and archiveSizeBytes to null.
+           The cell now prefers codeSize and falls back to archive — so the
+           "unavailable" branch fires only when BOTH are null. Tooltip copy
+           was generalized to "Size not available" since the cell may surface
+           either dimension. */
         const html = buildReportHtml(opts([makeResult('http', 80)]));
-        assert.ok(html.includes('title="Archive size not available from pub.dev"'));
+        assert.ok(html.includes('title="Size not available from pub.dev"'));
     });
 
     it('should hide license column by default (no license cell rendered)', () => {

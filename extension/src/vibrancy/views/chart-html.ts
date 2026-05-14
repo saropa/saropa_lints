@@ -105,11 +105,22 @@ function prepareChartData(
     results: VibrancyResult[],
     sharedDepNames: ReadonlySet<string>,
 ): ChartSegment[] {
+    /* Size Distribution chart uses codeSizeBytes — what each package
+       contributes to a built app. Falls back to archiveSizeBytes only when
+       the tarball analyzer couldn't run, so the chart still shows something
+       for legacy entries. The earlier model used archiveSizeBytes here,
+       which inflated bars for packages that ship example media (audioplayers
+       appeared near the top of the chart when its actual code contribution
+       is ~40 KB). See plans/history/2026.05/2026.05.13/
+       infra_vibrancy_bloat_uses_tarball_size_not_runtime.md. */
+    const sizeOf = (r: VibrancyResult): number | null =>
+        r.codeSizeBytes ?? r.archiveSizeBytes;
     const withSize = results
-        .filter(r => r.archiveSizeBytes !== null && r.archiveSizeBytes > 0)
-        .map(r => ({
+        .map(r => ({ r, size: sizeOf(r) }))
+        .filter(p => p.size !== null && p.size > 0)
+        .map(({ r, size }) => ({
             name: r.package.name,
-            sizeBytes: r.archiveSizeBytes!,
+            sizeBytes: size!,
             section: r.package.section,
             isTransitive: r.package.section === 'transitive',
             isShared: r.package.section === 'transitive'

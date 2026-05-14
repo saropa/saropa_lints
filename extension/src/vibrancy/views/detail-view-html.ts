@@ -104,8 +104,16 @@ function buildVersionSection(r: VibrancyResult): string {
         parts.push(`<div class="detail-row">${licenseBadge}</div>`);
     }
 
-    if (r.archiveSizeBytes !== null) {
-        parts.push(`<div class="detail-row muted">Size: ${formatSizeMB(r.archiveSizeBytes)}</div>`);
+    /* Prefer code size — what the package contributes to a built app.
+       Falls back to the archive total when the tarball analyzer couldn't
+       run. The earlier model showed only archive size which over-reported
+       by 100x+ for packages shipping example media. See
+       plans/history/2026.05/2026.05.13/
+       infra_vibrancy_bloat_uses_tarball_size_not_runtime.md. */
+    const detailSizeBytes = r.codeSizeBytes ?? r.archiveSizeBytes;
+    if (detailSizeBytes !== null) {
+        const label = r.codeSizeBytes !== null ? 'Code Size' : 'Archive';
+        parts.push(`<div class="detail-row muted">${label}: ${formatSizeMB(detailSizeBytes)}</div>`);
     }
 
     if (r.replacementComplexity) {

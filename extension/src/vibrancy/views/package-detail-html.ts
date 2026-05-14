@@ -207,10 +207,24 @@ function buildVersionSection(r: VibrancyResult): string {
             rows.push(row('Blocked by', `<strong>${escapeHtml(r.blocker.blockerPackage)}</strong>`));
         }
     }
-    if (r.archiveSizeBytes !== null) {
-        const sizeMB = formatSizeMB(r.archiveSizeBytes);
+    /* Prefer code size — what the package contributes to a built app.
+       Falls back to the archive total when the tarball analyzer couldn't run.
+       Labels the row "Code Size" or "Archive Size" so the developer knows
+       which is being shown. See plans/history/2026.05/2026.05.13/
+       infra_vibrancy_bloat_uses_tarball_size_not_runtime.md. */
+    const sizeBytes = r.codeSizeBytes ?? r.archiveSizeBytes;
+    if (sizeBytes !== null) {
+        const sizeMB = formatSizeMB(sizeBytes);
         const bloat = r.bloatRating !== null ? ` (${r.bloatRating}/10 bloat)` : '';
-        rows.push(row('Size', `${sizeMB}${bloat}`));
+        const label = r.codeSizeBytes !== null ? 'Code Size' : 'Archive Size';
+        rows.push(row(label, `${sizeMB}${bloat}`));
+        /* When on-disk total differs materially from code size, surface it
+           as a secondary row so the asymmetry (e.g. 40 KB code / 20 MB on
+           disk for packages that ship example media) is visible. */
+        if (r.codeSizeBytes !== null && r.archiveSizeBytes !== null
+            && r.archiveSizeBytes !== r.codeSizeBytes) {
+            rows.push(row('On Disk', formatSizeMB(r.archiveSizeBytes)));
+        }
     }
 
     const buttons: string[] = [];
@@ -279,12 +293,14 @@ function buildCommunitySection(r: VibrancyResult): string {
             ? ` (${r.transitiveInfo.flaggedCount} flagged)` : '';
         rows.push(row('Transitive Deps', `${r.transitiveInfo.transitiveCount}${flagged}`));
 
-        // True footprint: own archive + transitives this dep pulls in.
-        // Distinguish unique (eliminated by removing this dep) from shared
-        // (still pulled in by other direct deps after removal). When neither
-        // size field is populated (null/undefined for fixtures from older
-        // builds), skip the row so we don't render a misleading 0 MB.
-        const own = r.archiveSizeBytes ?? 0;
+        // True footprint: own code (or archive fallback) + transitives this
+        // dep pulls in. Distinguish unique (eliminated by removing this dep)
+        // from shared (still pulled in by other direct deps after removal).
+        // When neither size field is populated (null/undefined for fixtures
+        // from older builds), skip the row so we don't render a misleading
+        // 0 MB. Uses codeSizeBytes when available so the footprint reflects
+        // what actually ships, not the gzipped tarball total.
+        const own = r.codeSizeBytes ?? r.archiveSizeBytes ?? 0;
         const uniqueT = r.transitiveInfo.uniqueTransitiveSizeBytes;
         const sharedT = r.transitiveInfo.sharedTransitiveSizeBytes;
         const haveData = (uniqueT !== null && uniqueT !== undefined)

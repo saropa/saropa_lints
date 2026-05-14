@@ -432,16 +432,21 @@ function buildReportSummary(options: ReportOptions): string {
         ? results.reduce((s, r) => s + r.score, 0) / results.length
         : 0;
     const avgGrade = results.length > 0 ? scoreToGrade(avgScore) : '—';
+    /* Total Size summary prefers code-size — the bytes the package
+       contributes to a built app. Falls back to the gzipped archive when the
+       tarball analyzer couldn't run, so the rollup is never blank when ANY
+       size info is available. Mirrors buildSizeCell's fallback. */
+    const ownBytes = (r: VibrancyResult) => r.codeSizeBytes ?? r.archiveSizeBytes ?? 0;
     const totalOwnBytes = results.reduce(
-        (sum, r) => sum + (r.archiveSizeBytes ?? 0), 0,
+        (sum, r) => sum + ownBytes(r), 0,
     );
     const totalUniqueBytes = results.reduce((sum, r) => {
-        const own = r.archiveSizeBytes ?? 0;
+        const own = ownBytes(r);
         const unique = r.transitiveInfo?.uniqueTransitiveSizeBytes ?? 0;
         return sum + own + unique;
     }, 0);
     const totalAllBytes = results.reduce((sum, r) => {
-        const own = r.archiveSizeBytes ?? 0;
+        const own = ownBytes(r);
         const unique = r.transitiveInfo?.uniqueTransitiveSizeBytes ?? 0;
         const shared = r.transitiveInfo?.sharedTransitiveSizeBytes ?? 0;
         return sum + own + unique + shared;
@@ -788,7 +793,7 @@ function buildRow(
         data-activity="${activity.sortValue}"
         data-age-months="${publishedAgeMonths ?? ''}"
         data-issues="${issueCount}" data-prs="${prCount}"
-        data-size="${r.archiveSizeBytes ?? 0}"
+        data-size="${r.codeSizeBytes ?? r.archiveSizeBytes ?? 0}"
         data-files="${activeFileCount}"
         data-transitives="${transitiveCount}"
         data-deps="${transitiveCount}"
@@ -1066,21 +1071,41 @@ function buildPrsCell(r: VibrancyResult): string {
 }
 
 function buildSizeCell(r: VibrancyResult): string {
-    if (r.archiveSizeBytes === null) {
-        return '<td class="cell-right size-cell" title="Archive size not available from pub.dev"><span class="dimmed">\u2014</span></td>';
+    /* Prefer codeSizeBytes — what the package actually contributes to a built
+       app (`lib/` + declared `flutter.assets:`). Falls back to the gzipped
+       tarball size only when the analyzer couldn't run, so the cell is never
+       blank when ANY size info is available. The earlier model used
+       archiveSizeBytes here and over-reported by 100x+ for packages that ship
+       example media (audioplayers showed ~20 MB when the real contribution is
+       ~40 KB). See plans/history/2026.05/2026.05.13/
+       infra_vibrancy_bloat_uses_tarball_size_not_runtime.md. */
+    const own = r.codeSizeBytes ?? r.archiveSizeBytes;
+    if (own === null) {
+        return '<td class="cell-right size-cell" title="Size not available from pub.dev"><span class="dimmed">—</span></td>';
     }
     // Render three precomputed labels — the toolbar toggle picks which one is
     // visible by toggling a class on the table. This avoids re-running format
     // logic in JS on every toggle.
-    const own = r.archiveSizeBytes;
     const uniqueT = r.transitiveInfo?.uniqueTransitiveSizeBytes ?? 0;
     const sharedT = r.transitiveInfo?.sharedTransitiveSizeBytes ?? 0;
     const ownLabel = formatSizeKB(own);
     const uniqueLabel = formatSizeKB(own + uniqueT);
     const totalLabel = formatSizeKB(own + uniqueT + sharedT);
-    const tooltip = r.transitiveInfo && r.transitiveInfo.transitiveCount > 0
-        ? `Own: ${ownLabel}\nWith unique transitives: ${uniqueLabel}\nWith shared transitives: ${totalLabel}`
-        : `Archive size: ${ownLabel}`;
+    /* Tooltip discloses whether we're showing code-size (analyzer ran) or the
+       tarball fallback so the developer can tell the cases apart. When both
+       differ, surface the on-disk total too so the asymmetry (e.g. 40 KB code
+       / 20 MB on disk) is visible without leaving the dashboard. */
+    const sizeKind = r.codeSizeBytes !== null ? 'Code size' : 'Archive size';
+    const tooltipParts: string[] = [`${sizeKind}: ${ownLabel}`];
+    if (r.archiveSizeBytes !== null && r.codeSizeBytes !== null
+        && r.archiveSizeBytes !== r.codeSizeBytes) {
+        tooltipParts.push(`On disk: ${formatSizeMB(r.archiveSizeBytes)}`);
+    }
+    if (r.transitiveInfo && r.transitiveInfo.transitiveCount > 0) {
+        tooltipParts.push(`With unique transitives: ${uniqueLabel}`);
+        tooltipParts.push(`With shared transitives: ${totalLabel}`);
+    }
+    const tooltip = tooltipParts.join('\n');
     const packageName = escapeHtml(r.package.name);
     return `<td class="cell-right size-cell" title="${escapeHtml(tooltip)}"
         data-size-own="${own}" data-size-unique="${own + uniqueT}" data-size-total="${own + uniqueT + sharedT}">`
@@ -1307,6 +1332,29 @@ function buildDetailScoreSection(r: VibrancyResult): string {
     if (dormancy) {
         activityRows.push(`<span class="detail-label">Dormancy Signal</span><span>${escapeHtml(dormancy)}</span>`);
     }
+    /* Maintainer-quality bonus rows — each of `example/`, `test/`, `tool/`,
+       `doc/` is a positive component on the health score (NOT a bloat
+       penalty as the old tarball-size model treated them). Each present
+       flag adds a row so the developer can see why the score moved.
+       Absent flags don't render — they're non-contributions, not penalties.
+       See plans/history/2026.05/2026.05.13/
+       infra_vibrancy_bloat_uses_tarball_size_not_runtime.md. */
+    const qualityRows: string[] = [];
+    if (r.maintainerQuality) {
+        const q = r.maintainerQuality;
+        if (q.hasExample) {
+            qualityRows.push('<span class="detail-label">+example</span><span title="Ships a runnable demo">+</span>');
+        }
+        if (q.hasTests) {
+            qualityRows.push('<span class="detail-label">+tests</span><span title="Ships a test suite">+</span>');
+        }
+        if (q.hasTools) {
+            qualityRows.push('<span class="detail-label">+tools</span><span title="Ships maintainer tooling">+</span>');
+        }
+        if (q.hasDocs) {
+            qualityRows.push('<span class="detail-label">+docs</span><span title="Ships extended documentation">+</span>');
+        }
+    }
     /* The "Overall" numeric row was removed — it was the same info as the
        header grade letter, just shown as a /10. The factor rows below stay
        because they're distinct dimensions, not the same aggregate. */
@@ -1318,6 +1366,7 @@ function buildDetailScoreSection(r: VibrancyResult): string {
             <span class="detail-label">Popularity</span><span>${fmt(r.popularity)}</span>
             <span class="detail-label">Publisher Trust</span><span>${fmt(r.publisherTrust)}</span>
             ${activityRows.join('')}
+            ${qualityRows.join('')}
         </div>
     </div>`;
 }
@@ -1545,6 +1594,11 @@ function buildPackageJson(
         stars: buildStarsBlock(r, repoShareMap),
         openIssues: r.github?.trueOpenIssues ?? r.github?.openIssues ?? null,
         openPullRequests: r.github?.openPullRequests ?? null,
+        /* Exported JSON keeps both fields so consumers can tell code size
+           (what reaches the app) from on-disk archive (the gzipped tarball).
+           `archiveSize` retained for backwards-compatibility with existing
+           downstream parsers; `codeSize` is the new authoritative number. */
+        codeSize: r.codeSizeBytes !== null ? formatSizeKB(r.codeSizeBytes) : null,
         archiveSize: r.archiveSizeBytes !== null
             ? formatSizeKB(r.archiveSizeBytes) : null,
         license: r.license ?? null,

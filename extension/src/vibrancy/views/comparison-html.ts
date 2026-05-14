@@ -213,9 +213,19 @@ const ROWS: readonly RowDef[] = [
         extract: p => p.openIssues !== null ? String(p.openIssues) : '—',
     },
     {
-        label: 'Archive Size',
-        dimension: 'Archive Size',
-        extract: p => p.archiveSizeBytes !== null ? formatSizeMB(p.archiveSizeBytes) : '—',
+        /* Code Size = what the package contributes to a built app (`lib/` +
+           declared `flutter.assets:`). Falls back to the gzipped archive
+           total when the tarball analyzer couldn't run. The "Archive Size"
+           label and field used to be the only number here, which over-
+           reported by 100x+ for packages that ship example media. See
+           plans/history/2026.05/2026.05.13/
+           infra_vibrancy_bloat_uses_tarball_size_not_runtime.md. */
+        label: 'Code Size',
+        dimension: 'Code Size',
+        extract: p => {
+            const size = p.codeSizeBytes ?? p.archiveSizeBytes;
+            return size !== null ? formatSizeMB(size) : '—';
+        },
     },
     {
         label: 'Bloat Rating',

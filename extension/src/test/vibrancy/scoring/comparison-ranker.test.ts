@@ -50,7 +50,14 @@ describe('comparison-ranker', () => {
             assert.strictEqual(vibrancyWinner.winnerName, 'http');
         });
 
-        it('should identify smallest archive size as winner', () => {
+        it('should identify smallest code size as winner', () => {
+            /* The size dimension is now "Code Size" — what reaches the
+               user's app. The ranker still falls back to archiveSizeBytes
+               when codeSizeBytes is null, so a fixture that only sets the
+               archive field still drives the winner. The earlier dimension
+               name "Archive Size" was renamed in the v13.9.0 fix; pinning
+               the new name here so a future rename can't silently regress
+               the dimension's identity. */
             const packages: ComparisonData[] = [
                 makePackage({ name: 'small', archiveSizeBytes: 50_000 }),
                 makePackage({ name: 'medium', archiveSizeBytes: 500_000 }),
@@ -60,7 +67,7 @@ describe('comparison-ranker', () => {
             const result = rankPackages(packages);
 
             const sizeWinner = result.winners.find(
-                w => w.dimension === 'Archive Size',
+                w => w.dimension === 'Code Size',
             );
             assert.ok(sizeWinner, 'Should have size winner');
             assert.strictEqual(sizeWinner.winnerName, 'small');

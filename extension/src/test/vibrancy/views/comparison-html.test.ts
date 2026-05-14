@@ -123,13 +123,18 @@ describe('buildComparisonHtml', () => {
         assert.ok(html.includes('unverified'));
     });
 
-    it('should show archive size formatted', () => {
+    it('should show code size formatted (with archive fallback)', () => {
+        /* Comparison panel now exposes "Code Size" — what reaches the user's
+           app. archiveSizeBytes is the fallback when the tarball analyzer
+           hasn't populated codeSizeBytes. Until the panel is rewired to a
+           fixture that sets codeSizeBytes directly, the archive fallback
+           must still drive the row. */
         const ranked = makeRankedComparison([
             makePackage({ name: 'small', archiveSizeBytes: 50_000 }),
             makePackage({ name: 'large', archiveSizeBytes: 5_000_000 }),
         ]);
         const html = buildComparisonHtml(ranked);
-        assert.ok(html.includes('Archive Size'));
+        assert.ok(html.includes('Code Size'));
         assert.ok(html.includes('0.05 MB') || html.includes('<0.01 MB'));
         assert.ok(html.includes('4.8 MB') || html.includes('4.77 MB'));
     });

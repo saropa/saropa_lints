@@ -223,6 +223,26 @@ Test run: 1089 passing, 0 failing.
 
 ---
 
+## Follow-up — Dashboard surfaces (2026-05-13, second pass)
+
+**What the first pass missed:** the original "Changes Made" listed only the internal scoring sites and the editor hover. Every Package Dashboard webview surface still rendered `archiveSizeBytes`, so users saw the bloated tarball number on the Dashboard table (audioplayers as 20,535 KB), the package detail panel, the package comparison panel, the sidebar detail view, and the Size Distribution chart. The Health Score panel also never gained the four `+example` / `+tests` / `+tools` / `+docs` rows the hover added — the bonus fed the overall score but was invisible per row.
+
+**Dashboard surfaces wired through to `codeSizeBytes ?? archiveSizeBytes`:**
+
+- `extension/src/vibrancy/views/report-html.ts` — `buildSizeCell` now prefers `codeSizeBytes`, the tooltip discloses which dimension is showing ("Code size" vs "Archive size") and adds an "On disk" line when both are known and differ. `buildReportSummary` Total Size summary card sums code size. The row's `data-size` attribute (used for client-side sorting/filtering) reads code size. The JSON export gains a new `codeSize` field alongside the retained `archiveSize`. `buildDetailScoreSection` (Health Score panel) now renders `+example` / `+tests` / `+tools` / `+docs` rows when the respective `maintainerQuality` flags are true; absent flags don't render (non-contribution, not penalty).
+- `extension/src/vibrancy/views/package-detail-html.ts` — VERSION section's size row labels itself "Code Size" (or "Archive Size" fallback) and adds an "On Disk" secondary row when the two differ materially. Transitive-footprint own-size uses code size.
+- `extension/src/vibrancy/views/comparison-html.ts` — "Archive Size" row renamed to "Code Size", extractor reads `codeSizeBytes ?? archiveSizeBytes`. Matches the comparison-ranker which already ranked by code size.
+- `extension/src/vibrancy/views/detail-view-html.ts` — sidebar VERSION section size row labels itself "Code Size" or "Archive" and reads the same fallback.
+- `extension/src/vibrancy/views/chart-html.ts` — Size Distribution chart's `prepareChartData` filter and segment sizing both read code size.
+
+**Tests updated:**
+- `extension/src/test/vibrancy/views/report-html.test.ts` — the dash-tooltip test now asserts the generalized "Size not available from pub.dev" copy (was "Archive size not available").
+- `extension/src/test/vibrancy/views/comparison-html.test.ts` — the "archive size formatted" test renamed to "code size formatted" and asserts "Code Size" instead of "Archive Size".
+
+Test run after follow-up: 1092 passing, 0 failing.
+
+---
+
 ## Commits
 
 <!-- Add commit hashes as fixes land. -->
