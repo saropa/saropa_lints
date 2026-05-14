@@ -7,7 +7,7 @@
   "views.actions.name": "Дії",
   "views.status.name": "Статус",
   "views.settings.name": "Налаштування",
-  "views.help.name": "Help (v13.9.0)",
+  "views.help.name": "Довідка (v13.9.0)",
   "viewsWelcome.banner.contents": "**Саропа Лінтс**\n\nПонад 2100 правил Dart і Flutter для безпеки, доступності та продуктивності.\n\nПотрібен проект Dart або Flutter.\n\nЩоб розпочати, відкрийте папку, що містить `pubspec.yaml`.\n\n[Докладніше онлайн](https://pub.dev/packages/saropa_lints)\n[Переглянути всі команди](command:saropaLints.showCommandCatalog)\n[Про Saropa Lints](command:saropaLints.showAbout)\n[Початок роботи](command:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: налаштувати проект (pubspec + конфігурація)",
   "command.disable.title": "Saropa Lints: Вимкніть інтеграцію Lint",

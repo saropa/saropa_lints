@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "การวินิจฉัยทุติยภูมิ",
     "hero": {
       "productTitle": "แดชบอร์ดผลการสืบค้น",
-      "gaugeTitle": "คะแนนสุขภาพ 0/100 (เกรด 1) ข้อผิดพลาดมีน้ำหนักมากที่สุด {score} {grade}"
+      "gaugeTitle": "คะแนนสุขภาพ 0/100 (เกรด 1) ข้อผิดพลาดมีน้ำหนักมากที่สุด {grade} {score}"
     },
     "time": {
       "justNow": "แค่ตอนนี้",
@@ -395,7 +395,7 @@
     "noMatchingFindingsCopy": "ไม่มีผลการสืบค้นที่ตรงกันที่จะคัดลอก",
     "couldNotOpenFile": "ไม่สามารถเปิดไฟล์ได้: 0 {path}",
     "saveReportNoWorkspace": "เปิดโฟลเดอร์พื้นที่ทำงานก่อนที่จะบันทึกรายงาน",
-    "savedFindings": "บันทึกการค้นพบ 0: 1 {path} {count}",
+    "savedFindings": "บันทึกการค้นพบ 0: 1 {count} {path}",
     "couldNotSaveReportJson": "ไม่สามารถบันทึกรายงาน JSON"
   },
   "packageDashboard": {
@@ -419,7 +419,7 @@
       "packages": "แพ็คเกจ",
       "projectGrade": "เกรดแพ็คเกจโครงการ",
       "totalSize": "ขนาดรวม*",
-      "gradeTooltip": "เกรดโครงการ 0\nคะแนนเฉลี่ย: 1/100\nแพ็คเกจ: 2\nก:3 B:4 ค:5 อี:6 ฟ:7 {pkgCount} {a} {c} {avgGrade} {e} {avgScore} {b} {f}",
+      "gradeTooltip": "เกรดโครงการ 0\nคะแนนเฉลี่ย: 1/100\nแพ็คเกจ: 2\nก:3 B:4 ค:5 อี:6 ฟ:7 {c} {e} {a} {f} {b} {pkgCount} {avgGrade} {avgScore}",
       "vibrantTitle": "มีชีวิตชีวา",
       "stableTitle": "มั่นคง",
       "outdatedTitle": "ล้าสมัย",
@@ -430,8 +430,26 @@
       "singleUse": "ใช้ครั้งเดียว",
       "vulnerable": "เปราะบาง",
       "overrides": "แทนที่",
-      "caveatLine1": "*เก็บขนาดก่อนต้นไม้สั่น ขนาดแอปจริงจะเล็กลง",
+      "caveatLine1": "*ขนาดโค้ดที่แสดง (lib + เนื้อหาที่ประกาศ) จะกลับไปเป็นขนาดไฟล์เก็บถาวร pub.dev เมื่อขนาดโค้ดไม่พร้อมใช้งาน ขนาดแอปจริงจะเล็กลงหลังจากการเขย่าต้นไม้",
       "caveatLine2": "เกณฑ์กิจกรรม: 90d = เก่า, 180d = อยู่เฉยๆ (กระทำ + ไทม์ไลน์การเผยแพร่)"
+    },
+    "breakdown": {
+      "title": "ทำไมต้องเกรด 0? — 1/100 โดยเฉลี่ยจากแพ็คเกจ 2 {grade} {pkgCount} {avgScore}",
+      "hint": "คลิกเพื่อขยาย",
+      "distributionHeading": "การกระจาย",
+      "signalsHeading": "สัญญาณความเสี่ยงลากคะแนนลง",
+      "signalFlagged": "{count} flagged (abandoned / end-of-life)",
+      "signalVulnerable": "{count} with known vulnerabilities",
+      "signalUpdates": "{count} have updates available",
+      "bottomHeading": "แพ็คเกจที่มีคะแนนต่ำสุด",
+      "thresholdsHeading": "คะแนนเทียบเคียงกับเกรดอย่างไร",
+      "thresholdA": "70+ — มีชีวิตชีวา: ได้รับการดูแลอย่างแข็งขัน เผยแพร่เมื่อเร็วๆ นี้",
+      "thresholdB": "40–69 — เสถียร: ยังคงรักษาไว้แต่ชะลอตัว",
+      "thresholdC": "20–39 — ล้าสมัย: มีช่องว่างยาวระหว่างการเปิดตัว",
+      "thresholdE": "ต่ำกว่า 20 — ถูกทอดทิ้ง: สัญญาณของการไม่ใช้งาน",
+      "thresholdF": "ยกเลิกหรือเก็บถาวรบน pub.dev (ไม่ได้ใช้คะแนน)",
+      "filterTooltip": "กรองตารางแพ็กเกจให้เหลือเพียงหมวดหมู่นี้",
+      "jumpTooltip": "ข้ามไปที่ 0 ในตารางแพ็คเกจ {name}"
     },
     "network": {
       "summary": "เครือข่ายการพึ่งพา"
@@ -455,9 +473,9 @@
       "openOtherTitle": "เปิดโปรเจ็กต์อื่นของ pubspec.yaml ในหน้าต่างใหม่สำหรับการสแกน Vibrancy",
       "openOtherLabel": "เปิดโครงการ...",
       "footprintGroupAria": "โหมดรอยเท้าคอลัมน์ขนาด",
-      "footprintGroupTitle": "สิ่งที่คอลัมน์ขนาดแสดง: ที่เก็บถาวรของตัวเองเท่านั้น บวกสกรรมกริยาที่ไม่ซ้ำกัน (ต้นทุนหากลบออก) หรือบวกสกรรมกริยาทั้งหมด (สูงสุดทางทฤษฎี)",
+      "footprintGroupTitle": "สิ่งที่คอลัมน์ขนาดแสดง: ขนาดโค้ดของตัวเองเท่านั้น บวกสกรรมกริยาที่ไม่ซ้ำกัน (ต้นทุนหากลบออก) หรือบวกสกรรมกริยาทั้งหมด (สูงสุดทางทฤษฎี) ย้อนกลับไปที่ขนาดไฟล์เก็บถาวรเมื่อขนาดโค้ดไม่พร้อมใช้งาน",
       "footprintLabel": "รอยเท้า:",
-      "footprintOwnTitle": "ขนาดไฟล์เก็บถาวรของตัวเองเท่านั้น — ตรงกับขนาดการดาวน์โหลด pub.dev",
+      "footprintOwnTitle": "ขนาดรหัสของตัวเองเท่านั้น (lib + สินทรัพย์ที่ประกาศ) กลับไปเป็นขนาดไฟล์เก็บถาวร pub.dev เมื่อไม่พร้อมใช้งาน",
       "footprintOwn": "เป็นเจ้าของ",
       "footprintUniqueTitle": "ขนาดของตัวเอง + สกรรมกริยาที่ใช้โดย dep นี้เท่านั้น (ประหยัดถ้าคุณลบออก)",
       "footprintUnique": "+ ไม่ซ้ำใคร",
@@ -521,7 +539,7 @@
       },
       "size": {
         "label": "ขนาด",
-        "tooltip": "ขนาดไฟล์เก็บถาวรบน pub.dev (ก่อนต้นไม้สั่น)"
+        "tooltip": "ขนาดรหัส (lib + สินทรัพย์ที่ประกาศ); ย้อนกลับไปที่ขนาดไฟล์เก็บถาวร pub.dev เมื่อขนาดโค้ดไม่พร้อมใช้งาน"
       },
       "deps": {
         "label": "เดปส์",
@@ -668,7 +686,7 @@
       "generated": "สร้างขึ้น",
       "functionOne": "{count} ฟังก์ชัน",
       "functionOther": "{count} ฟังก์ชัน",
-      "avgFormat": "เฉลี่ย 0 (1) {score} {grade}",
+      "avgFormat": "เฉลี่ย 0 (1) {grade} {score}",
       "gatesFailing": "ประตูล้มเหลว",
       "gatesPassing": "ประตูผ่านไป"
     },

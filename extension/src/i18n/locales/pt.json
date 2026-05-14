@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "Diagnóstico secundário",
     "hero": {
       "productTitle": "Painel de descobertas",
-      "gaugeTitle": "Pontuação de saúde 0/100 (nota 1). Os erros pesam mais. {score} {grade}"
+      "gaugeTitle": "Pontuação de saúde 0/100 (nota 1). Os erros pesam mais. {grade} {score}"
     },
     "time": {
       "justNow": "agora mesmo",
@@ -395,7 +395,7 @@
     "noMatchingFindingsCopy": "Nenhuma descoberta correspondente para copiar.",
     "couldNotOpenFile": "Não foi possível abrir o arquivo: 0 {path}",
     "saveReportNoWorkspace": "Abra uma pasta do espaço de trabalho antes de salvar o relatório.",
-    "savedFindings": "0 descobertas salvas: 1 {path} {count}",
+    "savedFindings": "0 descobertas salvas: 1 {count} {path}",
     "couldNotSaveReportJson": "Não foi possível salvar o relatório JSON."
   },
   "packageDashboard": {
@@ -419,7 +419,7 @@
       "packages": "Pacotes",
       "projectGrade": "Nota do pacote do projeto",
       "totalSize": "Tamanho Total*",
-      "gradeTooltip": "Nota do projeto 0\nPontuação média: 1/100\nPacotes: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {a} {c} {avgGrade} {e} {avgScore} {b} {f}",
+      "gradeTooltip": "Nota do projeto 0\nPontuação média: 1/100\nPacotes: 2\nA:3 B:4 C:5 E:6 F:7 {c} {e} {a} {f} {b} {pkgCount} {avgGrade} {avgScore}",
       "vibrantTitle": "Vibrante",
       "stableTitle": "Estável",
       "outdatedTitle": "Desatualizado",
@@ -430,8 +430,26 @@
       "singleUse": "Uso único",
       "vulnerable": "Vulnerável",
       "overrides": "Substituições",
-      "caveatLine1": "*Tamanhos de arquivo antes de sacudir a árvore. O tamanho real do aplicativo será menor.",
+      "caveatLine1": "*Tamanhos de código mostrados (lib + ativos declarados), voltando ao tamanho do arquivo pub.dev quando o tamanho do código não está disponível. O tamanho real do aplicativo será menor após a agitação da árvore.",
       "caveatLine2": "Limites de atividade: 90d = obsoleto, 180d = inativo (prazos de confirmação + lançamento)."
+    },
+    "breakdown": {
+      "title": "Por que nota 0? — Média de 1/100 em pacotes de 2 {grade} {pkgCount} {avgScore}",
+      "hint": "Clique para expandir",
+      "distributionHeading": "Distribuição",
+      "signalsHeading": "Sinais de risco arrastando a pontuação para baixo",
+      "signalFlagged": "{count} flagged (abandoned / end-of-life)",
+      "signalVulnerable": "{count} with known vulnerabilities",
+      "signalUpdates": "{count} have updates available",
+      "bottomHeading": "Pacotes com pontuação mais baixa",
+      "thresholdsHeading": "Como as pontuações são mapeadas para as notas",
+      "thresholdA": "70+ – Vibrante: mantido ativamente, publicado recentemente",
+      "thresholdB": "40–69 – Estável: ainda mantido, mas desacelerando",
+      "thresholdC": "20–39 — Desatualizado: longos intervalos entre os lançamentos",
+      "thresholdE": "abaixo de 20 — Abandonado: sinais de inatividade",
+      "thresholdF": "Descontinuado ou arquivado em pub.dev (pontuação não usada)",
+      "filterTooltip": "Filtre a tabela de pacotes apenas para esta categoria",
+      "jumpTooltip": "Vá para 0 na tabela de pacotes {name}"
     },
     "network": {
       "summary": "Rede de Dependência"
@@ -455,9 +473,9 @@
       "openOtherTitle": "Abra outro projeto pubspec.yaml em uma nova janela para verificação do Vibrancy",
       "openOtherLabel": "Abrir projeto…",
       "footprintGroupAria": "Modo de tamanho da coluna de tamanho",
-      "footprintGroupTitle": "O que a coluna Tamanho mostra: somente arquivo próprio, mais transitivos exclusivos (custo se removidos) ou mais todos os transitivos (máximo teórico).",
+      "footprintGroupTitle": "O que a coluna Tamanho mostra: apenas o tamanho do próprio código, mais transitivos exclusivos (custo se removidos) ou mais todos os transitivos (máximo teórico). Volta ao tamanho do arquivo quando o tamanho do código não está disponível.",
       "footprintLabel": "Pegada:",
-      "footprintOwnTitle": "Somente tamanho de arquivo próprio – corresponde ao tamanho de download do pub.dev",
+      "footprintOwnTitle": "Apenas tamanho de código próprio (lib + ativos declarados); volta ao tamanho do arquivo pub.dev quando indisponível",
       "footprintOwn": "Ter",
       "footprintUniqueTitle": "Tamanho próprio + transitivos usados ​​apenas por este dep (economia se você removê-lo)",
       "footprintUnique": "+ Único",
@@ -521,7 +539,7 @@
       },
       "size": {
         "label": "Tamanho",
-        "tooltip": "Tamanho do arquivo em pub.dev (antes do tremor da árvore)"
+        "tooltip": "Tamanho do código (lib + ativos declarados); volta ao tamanho do arquivo pub.dev quando o tamanho do código não está disponível"
       },
       "deps": {
         "label": "Dep.",
@@ -668,7 +686,7 @@
       "generated": "Gerado",
       "functionOne": "{count} função",
       "functionOther": "{count} funções",
-      "avgFormat": "média 0 (1) {score} {grade}",
+      "avgFormat": "média 0 (1) {grade} {score}",
       "gatesFailing": "portões falhando",
       "gatesPassing": "portões passando"
     },

@@ -7,7 +7,7 @@
   "views.actions.name": "פעולות",
   "views.status.name": "סטָטוּס",
   "views.settings.name": "הגדרות",
-  "views.help.name": "Help (v13.9.0)",
+  "views.help.name": "עזרה (v13.9.0)",
   "viewsWelcome.banner.contents": "**Saropa Lints**\n\nיותר מ-2100 כללי מוך של Dart and Flutter לאבטחה, נגישות וביצועים.\n\nמצריך פרויקט דרט או חלפן.\n\nפתח תיקיה המכילה 'pubspec.yaml' כדי להתחיל.\n\n[למידע נוסף באינטרנט](https://pub.dev/packages/saropa_lints)\n[עיין בכל הפקודות](command:saropaLints.showCommandCatalog)\n[על Saropa Lints](command:saropaLints.showAbout)\n[תחילת העבודה](command:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: הגדר פרויקט (פאבספק + תצורה)",
   "command.disable.title": "Saropa Lints: כבה את שילוב המוך",

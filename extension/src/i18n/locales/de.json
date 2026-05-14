@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "Sekundärdiagnostik",
     "hero": {
       "productTitle": "Ergebnis-Dashboard",
-      "gaugeTitle": "Gesundheitswert 0/100 (Note 1). Fehler wiegen am schwersten. {score} {grade}"
+      "gaugeTitle": "Gesundheitswert 0/100 (Note 1). Fehler wiegen am schwersten. {grade} {score}"
     },
     "time": {
       "justNow": "soeben",
@@ -419,7 +419,7 @@
       "packages": "Pakete",
       "projectGrade": "Grad des Projektpakets",
       "totalSize": "Gesamtgröße*",
-      "gradeTooltip": "Projektnote 0\nDurchschnittliche Punktzahl: 1/100\nPakete: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {a} {c} {avgGrade} {e} {avgScore} {b} {f}",
+      "gradeTooltip": "Projektnote 0\nDurchschnittliche Punktzahl: 1/100\nPakete: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {a} {f} {e} {avgGrade} {b} {avgScore} {c}",
       "vibrantTitle": "Lebendig",
       "stableTitle": "Stabil",
       "outdatedTitle": "Veraltet",
@@ -430,8 +430,26 @@
       "singleUse": "Einmalgebrauch",
       "vulnerable": "Verletzlich",
       "overrides": "Überschreibt",
-      "caveatLine1": "*Archivgrößen vor Baumschütteln. Die tatsächliche App-Größe wird kleiner sein.",
+      "caveatLine1": "*Angezeigte Codegrößen (lib + deklarierte Assets), zurückgreifend auf die Archivgröße von pub.dev, wenn die Codegröße nicht verfügbar ist. Die tatsächliche App-Größe wird nach dem Baumschütteln kleiner sein.",
       "caveatLine2": "Aktivitätsschwellenwerte: 90 Tage = veraltet, 180 Tage = ruhend (Commit- und Release-Zeitpläne)."
+    },
+    "breakdown": {
+      "title": "Warum Note 0? — 1/100 Durchschnitt über 2 Pakete {pkgCount} {grade} {avgScore}",
+      "hint": "Klicken Sie zum Erweitern",
+      "distributionHeading": "Verteilung",
+      "signalsHeading": "Risikosignale ziehen den Score nach unten",
+      "signalFlagged": "{count} flagged (abandoned / end-of-life)",
+      "signalVulnerable": "{count} with known vulnerabilities",
+      "signalUpdates": "{count} have updates available",
+      "bottomHeading": "Pakete mit der niedrigsten Bewertung",
+      "thresholdsHeading": "Wie Noten den Noten zugeordnet werden",
+      "thresholdA": "70+ – Lebendig: aktiv gepflegt, kürzlich veröffentlicht",
+      "thresholdB": "40–69 – Stabil: immer noch beibehalten, aber langsamer",
+      "thresholdC": "20–39 – Veraltet: lange Lücken zwischen den Veröffentlichungen",
+      "thresholdE": "unter 20 – Verlassen: Anzeichen von Inaktivität",
+      "thresholdF": "Eingestellt oder auf pub.dev archiviert (Score nicht verwendet)",
+      "filterTooltip": "Filtern Sie die Pakettabelle nur nach dieser Kategorie",
+      "jumpTooltip": "Springe zu 0 in der Pakettabelle {name}"
     },
     "network": {
       "summary": "Abhängigkeitsnetzwerk"
@@ -455,9 +473,9 @@
       "openOtherTitle": "Öffnen Sie ein anderes pubspec.yaml-Projekt in einem neuen Fenster für den Vibrancy-Scan",
       "openOtherLabel": "Projekt öffnen…",
       "footprintGroupAria": "Größenspalten-Footprint-Modus",
-      "footprintGroupTitle": "Was die Spalte „Größe“ anzeigt: nur eigenes Archiv plus eindeutige Transitive (Kosten bei Entfernung) oder plus alle Transitive (theoretisches Maximum).",
+      "footprintGroupTitle": "Was in der Spalte „Größe“ angezeigt wird: Nur die eigene Codegröße plus eindeutige Transitive (Kosten bei Entfernung) oder plus alle Transitive (theoretisches Maximum). Fällt auf die Archivgröße zurück, wenn die Codegröße nicht verfügbar ist.",
       "footprintLabel": "Fußabdruck:",
-      "footprintOwnTitle": "Nur eigene Archivgröße – entspricht der Downloadgröße von pub.dev",
+      "footprintOwnTitle": "Nur eigene Codegröße (lib + deklarierte Assets); Fällt auf die Archivgröße von pub.dev zurück, wenn es nicht verfügbar ist",
       "footprintOwn": "Eigen",
       "footprintUniqueTitle": "Eigene Größe + Transitive, die nur von dieser Abteilung verwendet werden (Einsparungen, wenn Sie sie entfernen)",
       "footprintUnique": "+ Einzigartig",
@@ -521,7 +539,7 @@
       },
       "size": {
         "label": "Größe",
-        "tooltip": "Archivgröße auf pub.dev (vor dem Tree Shaking)"
+        "tooltip": "Codegröße (lib + deklarierte Vermögenswerte); Fällt auf die Archivgröße von pub.dev zurück, wenn die Codegröße nicht verfügbar ist"
       },
       "deps": {
         "label": "Abt",
@@ -668,12 +686,12 @@
       "generated": "Generiert",
       "functionOne": "{count} Funktion",
       "functionOther": "{count} Funktionen",
-      "avgFormat": "Durchschnitt 0 (1) {score} {grade}",
+      "avgFormat": "Durchschnitt 0 (1) {grade} {score}",
       "gatesFailing": "Tore versagen",
       "gatesPassing": "Tore passieren"
     },
     "gauge": {
-      "tooltip": "Durchschnittliche Punktzahl 0 von 100 (Note 1). {rounded} {grade}",
+      "tooltip": "Durchschnittliche Punktzahl 0 von 100 (Note 1). {grade} {rounded}",
       "ariaLabel": "Durchschnittliche Punktzahl 0 von 100 {rounded}"
     },
     "gate": {

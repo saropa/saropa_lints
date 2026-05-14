@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "Secundaire diagnostiek",
     "hero": {
       "productTitle": "Bevindingendashboard",
-      "gaugeTitle": "Gezondheidsscore 0/100 (graad 1). Fouten wegen het zwaarst. {score} {grade}"
+      "gaugeTitle": "Gezondheidsscore 0/100 (graad 1). Fouten wegen het zwaarst. {grade} {score}"
     },
     "time": {
       "justNow": "zojuist",
@@ -419,7 +419,7 @@
       "packages": "Pakketten",
       "projectGrade": "Projectpakketklasse",
       "totalSize": "Totale grootte*",
-      "gradeTooltip": "Projectcijfer 0\nGemiddelde score: 1/100\nPakketten: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {a} {c} {avgGrade} {e} {avgScore} {b} {f}",
+      "gradeTooltip": "Projectcijfer 0\nGemiddelde score: 1/100\nPakketten: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {a} {f} {e} {avgGrade} {b} {avgScore} {c}",
       "vibrantTitle": "Levendig",
       "stableTitle": "Stabiel",
       "outdatedTitle": "Verouderd",
@@ -430,8 +430,26 @@
       "singleUse": "Eenmalig gebruik",
       "vulnerable": "Kwetsbaar",
       "overrides": "Overschrijvingen",
-      "caveatLine1": "* Archiefgroottes vóór het schudden van de boom. De werkelijke app-grootte zal kleiner zijn.",
+      "caveatLine1": "*Getoonde codegroottes (lib + gedeclareerde assets), terugvallend op de archiefgrootte pub.dev wanneer de codegrootte niet beschikbaar is. De werkelijke app-grootte zal kleiner zijn na het schudden van de boom.",
       "caveatLine2": "Activiteitsdrempels: 90d = verouderd, 180d = slapend (tijdlijnen voor vastleggen en vrijgeven)."
+    },
+    "breakdown": {
+      "title": "Waarom cijfer 0? — 1/100 gemiddeld over 2 pakketten {pkgCount} {grade} {avgScore}",
+      "hint": "Klik om uit te vouwen",
+      "distributionHeading": "Verdeling",
+      "signalsHeading": "Risicosignalen die de score naar beneden halen",
+      "signalFlagged": "{count} flagged (abandoned / end-of-life)",
+      "signalVulnerable": "{count} with known vulnerabilities",
+      "signalUpdates": "{count} have updates available",
+      "bottomHeading": "Laagst scorende pakketten",
+      "thresholdsHeading": "Hoe scores worden omgezet in cijfers",
+      "thresholdA": "70+ — Levendig: actief onderhouden, onlangs gepubliceerd",
+      "thresholdB": "40–69 — Stabiel: nog steeds gehandhaafd, maar langzamer",
+      "thresholdC": "20–39 — Verouderd: lange pauzes tussen releases",
+      "thresholdE": "onder de 20 — Verlaten: tekenen van inactiviteit",
+      "thresholdF": "Stopgezet of gearchiveerd op pub.dev (partituur niet gebruikt)",
+      "filterTooltip": "Filter de pakkettabel op alleen deze categorie",
+      "jumpTooltip": "Ga naar 0 in de pakkettabel {name}"
     },
     "network": {
       "summary": "Afhankelijkheidsnetwerk"
@@ -455,9 +473,9 @@
       "openOtherTitle": "Open een ander project van pubspec.yaml in een nieuw venster voor de Vibrancy-scan",
       "openOtherLabel": "Project openen…",
       "footprintGroupAria": "Groottekolomvoetafdrukmodus",
-      "footprintGroupTitle": "Wat de kolom Grootte laat zien: alleen eigen archief, plus unieke transitieven (kosten indien verwijderd), of plus alle transitieven (theoretisch maximum).",
+      "footprintGroupTitle": "Wat de kolom Grootte laat zien: alleen de eigen codegrootte, plus unieke transitieven (kosten indien verwijderd), of plus alle transitieven (theoretisch maximum). Valt terug naar de archiefgrootte wanneer de codegrootte niet beschikbaar is.",
       "footprintLabel": "Voetafdruk:",
-      "footprintOwnTitle": "Alleen eigen archiefgrootte: komt overeen met de downloadgrootte van pub.dev",
+      "footprintOwnTitle": "Alleen eigen codegrootte (lib + gedeclareerde assets); valt terug naar de archiefgrootte pub.dev wanneer deze niet beschikbaar is",
       "footprintOwn": "Eigen",
       "footprintUniqueTitle": "Eigen grootte + transitieven die alleen door deze afdeling worden gebruikt (besparing als u deze verwijdert)",
       "footprintUnique": "+ Uniek",
@@ -521,7 +539,7 @@
       },
       "size": {
         "label": "Maat",
-        "tooltip": "Archiefgrootte op pub.dev (vóór boomschudden)"
+        "tooltip": "Codegrootte (lib + gedeclareerde activa); valt terug naar de archiefgrootte pub.dev wanneer de codegrootte niet beschikbaar is"
       },
       "deps": {
         "label": "Afd",
@@ -668,12 +686,12 @@
       "generated": "Gegenereerd",
       "functionOne": "{count} functie",
       "functionOther": "{count} functies",
-      "avgFormat": "gemiddeld 0 (1) {score} {grade}",
+      "avgFormat": "gemiddeld 0 (1) {grade} {score}",
       "gatesFailing": "poorten falen",
       "gatesPassing": "poorten passeren"
     },
     "gauge": {
-      "tooltip": "Gemiddelde score 0 van 100 (cijfer 1). {rounded} {grade}",
+      "tooltip": "Gemiddelde score 0 van 100 (cijfer 1). {grade} {rounded}",
       "ariaLabel": "Gemiddelde score 0 van 100 {rounded}"
     },
     "gate": {

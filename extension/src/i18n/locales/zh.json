@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "二次诊断",
     "hero": {
       "productTitle": "调查结果仪表板",
-      "gaugeTitle": "健康评分0/100（1级）。错误是最重的。 {score} {grade}"
+      "gaugeTitle": "健康评分0/100（1级）。错误是最重的。 {grade} {score}"
     },
     "time": {
       "justNow": "现在",
@@ -395,7 +395,7 @@
     "noMatchingFindingsCopy": "没有匹配的结果可供复制。",
     "couldNotOpenFile": "无法打开文件：0 {path}",
     "saveReportNoWorkspace": "保存报告之前打开工作区文件夹。",
-    "savedFindings": "已保存 0 结果：1 {path} {count}",
+    "savedFindings": "已保存 0 结果：1 {count} {path}",
     "couldNotSaveReportJson": "无法保存报告 JSON。"
   },
   "packageDashboard": {
@@ -419,7 +419,7 @@
       "packages": "套餐",
       "projectGrade": "工程包等级",
       "totalSize": "总尺寸*",
-      "gradeTooltip": "工程等级0\n平均分：1/100\n套餐：2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {a} {c} {avgGrade} {e} {avgScore} {b} {f}",
+      "gradeTooltip": "工程等级0\n平均分：1/100\n套餐：2\nA:3 B:4 C:5 E:6 F:7 {c} {e} {a} {f} {b} {pkgCount} {avgGrade} {avgScore}",
       "vibrantTitle": "充满活力",
       "stableTitle": "稳定的",
       "outdatedTitle": "过时的",
@@ -430,8 +430,26 @@
       "singleUse": "一次性使用",
       "vulnerable": "易受伤害的",
       "overrides": "覆盖",
-      "caveatLine1": "*摇树之前的存档大小。实际应用程序大小会更小。",
+      "caveatLine1": "*显示代码大小（lib + 声明的资产），当代码大小不可用时，回退到 pub.dev 存档大小。 Tree Shaking 后实际应用程序大小会更小。",
       "caveatLine2": "活动阈值：90d = 陈旧，180d = 休眠（提交 + 发布时间表）。"
+    },
+    "breakdown": {
+      "title": "为什么评分0？ — 2 包的 1/100 平均值 {grade} {pkgCount} {avgScore}",
+      "hint": "点击展开",
+      "distributionHeading": "分配",
+      "signalsHeading": "风险信号拖累分数下跌",
+      "signalFlagged": "{count} flagged (abandoned / end-of-life)",
+      "signalVulnerable": "{count} with known vulnerabilities",
+      "signalUpdates": "{count} have updates available",
+      "bottomHeading": "得分最低的套餐",
+      "thresholdsHeading": "分数如何映射到成绩",
+      "thresholdA": "70+ — 充满活力：积极维护，最近发布",
+      "thresholdB": "40–69 — 稳定：仍保持不变，但速度放缓",
+      "thresholdC": "20-39 — 过时：版本之间的间隔很长",
+      "thresholdE": "低于 20 — 废弃：不活动的迹象",
+      "thresholdF": "在 pub.dev 上停止或存档（未使用分数）",
+      "filterTooltip": "将包表过滤为仅此类别",
+      "jumpTooltip": "跳转到封装表中0 {name}"
     },
     "network": {
       "summary": "依赖网络"
@@ -455,9 +473,9 @@
       "openOtherTitle": "在新窗口中打开另一个 pubspec.yaml 的项目进行 Vibrancy 扫描",
       "openOtherLabel": "打开项目...",
       "footprintGroupAria": "尺寸列足迹模式",
-      "footprintGroupTitle": "大小列显示的内容：仅自己的存档，加上唯一的传递性（如果删除则成本），或加上所有传递性（理论最大值）。",
+      "footprintGroupTitle": "“大小”列显示的内容：仅包含自己的代码大小，加上唯一的传递性（如果删除则成本），或加上所有传递性（理论最大值）。当代码大小不可用时，回退到存档大小。",
       "footprintLabel": "脚印：",
-      "footprintOwnTitle": "仅自己的存档大小 - 与 pub.dev 下载大小匹配",
+      "footprintOwnTitle": "仅自己的代码大小（lib + 声明的资产）；不可用时回退到 pub.dev 存档大小",
       "footprintOwn": "自己的",
       "footprintUniqueTitle": "自己的大小+仅由该部门使用的传递性（如果删除它则可以节省）",
       "footprintUnique": "+ 独特",
@@ -521,7 +539,7 @@
       },
       "size": {
         "label": "尺寸",
-        "tooltip": "pub.dev 上的存档大小（Tree Shaking 之前）"
+        "tooltip": "代码大小（lib + 声明的资产）；当代码大小不可用时，回退到 pub.dev 存档大小"
       },
       "deps": {
         "label": "部门",
@@ -668,7 +686,7 @@
       "generated": "生成",
       "functionOne": "{count} 个函数",
       "functionOther": "{count} 个函数",
-      "avgFormat": "平均 0 (1) {score} {grade}",
+      "avgFormat": "平均 0 (1) {grade} {score}",
       "gatesFailing": "门失败",
       "gatesPassing": "大门经过"
     },

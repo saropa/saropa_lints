@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "אבחון משני",
     "hero": {
       "productTitle": "לוח המחוונים של ממצאים",
-      "gaugeTitle": "ציון בריאות 0/100 (ציון 1). שגיאות שוקלות את הכבד ביותר. {score} {grade}"
+      "gaugeTitle": "ציון בריאות 0/100 (ציון 1). שגיאות שוקלות את הכבד ביותר. {grade} {score}"
     },
     "time": {
       "justNow": "זֶה עַתָה",
@@ -395,7 +395,7 @@
     "noMatchingFindingsCopy": "אין ממצאים תואמים להעתקה.",
     "couldNotOpenFile": "לא ניתן היה לפתוח את הקובץ: 0 {path}",
     "saveReportNoWorkspace": "פתח תיקיית סביבת עבודה לפני שמירת הדוח.",
-    "savedFindings": "ממצא/ים שמורים 0: 1 {path} {count}",
+    "savedFindings": "ממצא/ים שמורים 0: 1 {count} {path}",
     "couldNotSaveReportJson": "לא ניתן לשמור את הדוח JSON."
   },
   "packageDashboard": {
@@ -419,7 +419,7 @@
       "packages": "חבילות",
       "projectGrade": "ציון חבילת פרויקט",
       "totalSize": "גודל כולל*",
-      "gradeTooltip": "ציון הפרויקט 0\nציון ממוצע: 1/100\nחבילות: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {a} {c} {avgGrade} {e} {avgScore} {b} {f}",
+      "gradeTooltip": "ציון הפרויקט 0\nציון ממוצע: 1/100\nחבילות: 2\nA:3 B:4 C:5 E:6 F:7 {c} {e} {a} {f} {b} {pkgCount} {avgGrade} {avgScore}",
       "vibrantTitle": "תוסס",
       "stableTitle": "יַצִיב",
       "outdatedTitle": "מְיוּשָׁן",
@@ -430,8 +430,26 @@
       "singleUse": "לשימוש חד פעמי",
       "vulnerable": "פָּגִיעַ",
       "overrides": "עוקפים",
-      "caveatLine1": "*גדלים בארכיון לפני ניעור עצים. גודל האפליקציה בפועל יהיה קטן יותר.",
+      "caveatLine1": "*גדלי קוד מוצגים (lib + נכסים מוצהרים), נופלים חזרה לגודל הארכיון pub.dev כאשר גודל הקוד אינו זמין. גודל האפליקציה בפועל יהיה קטן יותר לאחר ניעור עץ.",
       "caveatLine2": "ספי פעילות: 90d = מעופש, 180d = רדום (מחוייבות + לוחות זמנים לשחרור)."
+    },
+    "breakdown": {
+      "title": "למה ציון 0? — ממוצע של 1/100 על פני 2 חבילות {grade} {pkgCount} {avgScore}",
+      "hint": "לחץ כדי להרחיב",
+      "distributionHeading": "הֲפָצָה",
+      "signalsHeading": "אותות סיכון גוררים את הניקוד למטה",
+      "signalFlagged": "{count} flagged (abandoned / end-of-life)",
+      "signalVulnerable": "{count} with known vulnerabilities",
+      "signalUpdates": "{count} have updates available",
+      "bottomHeading": "חבילות עם הניקוד הנמוך ביותר",
+      "thresholdsHeading": "איך הציונים ממפים לציונים",
+      "thresholdA": "70+ - תוסס: מתוחזק באופן פעיל, פורסם לאחרונה",
+      "thresholdB": "40–69 - יציב: עדיין נשמר אך מואט",
+      "thresholdC": "20–39 - מיושן: פערים ארוכים בין מהדורות",
+      "thresholdE": "מתחת לגיל 20 - נטוש: סימנים של חוסר פעילות",
+      "thresholdF": "הופסק או הועבר לארכיון ב-pub.dev (לא נעשה בו שימוש)",
+      "filterTooltip": "סנן את טבלת החבילות רק לקטגוריה זו",
+      "jumpTooltip": "קפוץ אל 0 בטבלת החבילות {name}"
     },
     "network": {
       "summary": "רשת תלות"
@@ -455,9 +473,9 @@
       "openOtherTitle": "פתח פרויקט אחר של pubspec.yaml בחלון חדש לסריקת Vibrancy",
       "openOtherLabel": "פתח את הפרויקט...",
       "footprintGroupAria": "מצב טביעת רגל בעמודה בגודל",
-      "footprintGroupTitle": "מה מציגה העמודה גודל: ארכיון משלו בלבד, בתוספת טרנזיבים ייחודיים (עלות אם הוסר), או בתוספת כל המעברים (מקסימום תיאורטי).",
+      "footprintGroupTitle": "מה מציגה העמודה גודל: גודל קוד משלו בלבד, בתוספת טרנזיבים ייחודיים (עלות אם הוסר), או בתוספת כל הטרנזיבים (מקסימום תיאורטי). חוזר לגודל הארכיון כאשר גודל הקוד אינו זמין.",
       "footprintLabel": "עָקֵב:",
-      "footprintOwnTitle": "גודל ארכיון משלו בלבד - מתאים לגודל ההורדה של pub.dev",
+      "footprintOwnTitle": "גודל קוד משלו בלבד (lib + נכסים מוצהרים); חוזר לגודל הארכיון pub.dev כאשר אינו זמין",
       "footprintOwn": "שֶׁלוֹ",
       "footprintUniqueTitle": "מידה משלו + טרנזיטיבים המשמשים רק את המחלקה הזו (חיסכון אם תסיר אותו)",
       "footprintUnique": "+ ייחודי",
@@ -521,7 +539,7 @@
       },
       "size": {
         "label": "גוֹדֶל",
-        "tooltip": "גודל הארכיון ב-pub.dev (לפני רעידות עץ)"
+        "tooltip": "גודל הקוד (lib + נכסים מוצהרים); חוזר לגודל הארכיון pub.dev כאשר גודל הקוד אינו זמין"
       },
       "deps": {
         "label": "דפס",
@@ -668,7 +686,7 @@
       "generated": "נוצר",
       "functionOne": "{count} פונקציה",
       "functionOther": "{count} פונקציות",
-      "avgFormat": "ממוצע 0 (1) {score} {grade}",
+      "avgFormat": "ממוצע 0 (1) {grade} {score}",
       "gatesFailing": "שערים נכשלים",
       "gatesPassing": "שערים עוברים"
     },

@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "Chẩn đoán thứ cấp",
     "hero": {
       "productTitle": "Trang tổng quan về phát hiện",
-      "gaugeTitle": "Điểm sức khỏe 0/100 (cấp 1). Lỗi nặng nề nhất. {score} {grade}"
+      "gaugeTitle": "Điểm sức khỏe 0/100 (cấp 1). Lỗi nặng nề nhất. {grade} {score}"
     },
     "time": {
       "justNow": "ngay bây giờ",
@@ -395,7 +395,7 @@
     "noMatchingFindingsCopy": "Không có kết quả phù hợp để sao chép.",
     "couldNotOpenFile": "Không thể mở tập tin: 0 {path}",
     "saveReportNoWorkspace": "Mở thư mục không gian làm việc trước khi lưu báo cáo.",
-    "savedFindings": "Đã lưu 0 (các) phát hiện: 1 {path} {count}",
+    "savedFindings": "Đã lưu 0 (các) phát hiện: 1 {count} {path}",
     "couldNotSaveReportJson": "Không thể lưu JSON báo cáo."
   },
   "packageDashboard": {
@@ -419,7 +419,7 @@
       "packages": "Gói",
       "projectGrade": "Lớp gói dự án",
       "totalSize": "Tổng kích thước*",
-      "gradeTooltip": "Cấp dự án 0\nĐiểm trung bình: 1/100\nGói: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {a} {c} {avgGrade} {e} {avgScore} {b} {f}",
+      "gradeTooltip": "Cấp dự án 0\nĐiểm trung bình: 1/100\nGói: 2\nA:3 B:4 C:5 E:6 F:7 {c} {e} {a} {f} {b} {pkgCount} {avgGrade} {avgScore}",
       "vibrantTitle": "Sống động",
       "stableTitle": "Ổn định",
       "outdatedTitle": "lỗi thời",
@@ -430,8 +430,26 @@
       "singleUse": "Sử dụng một lần",
       "vulnerable": "Dễ bị tổn thương",
       "overrides": "Ghi đè",
-      "caveatLine1": "* Lưu trữ kích thước trước khi cây rung chuyển. Kích thước ứng dụng thực tế sẽ nhỏ hơn.",
+      "caveatLine1": "*Kích thước mã được hiển thị (lib + nội dung được khai báo), quay trở lại kích thước lưu trữ pub.dev khi không có kích thước mã. Kích thước ứng dụng thực tế sẽ nhỏ hơn sau khi cây rung.",
       "caveatLine2": "Ngưỡng hoạt động: 90d = cũ, 180d = không hoạt động (cam kết + mốc thời gian phát hành)."
+    },
+    "breakdown": {
+      "title": "Tại sao lại điểm 0? — trung bình 1/100 trên 2 gói {grade} {pkgCount} {avgScore}",
+      "hint": "Bấm để mở rộng",
+      "distributionHeading": "Phân bổ",
+      "signalsHeading": "Tín hiệu rủi ro kéo điểm xuống",
+      "signalFlagged": "{count} flagged (abandoned / end-of-life)",
+      "signalVulnerable": "{count} with known vulnerabilities",
+      "signalUpdates": "{count} have updates available",
+      "bottomHeading": "Gói có điểm thấp nhất",
+      "thresholdsHeading": "Cách ánh xạ điểm đến các lớp",
+      "thresholdA": "70+ — Sống động: được duy trì tích cực, được xuất bản gần đây",
+      "thresholdB": "40–69 — Ổn định: vẫn được duy trì nhưng chậm lại",
+      "thresholdC": "20–39 — Đã lỗi thời: khoảng cách dài giữa các bản phát hành",
+      "thresholdE": "dưới 20 — Bị bỏ rơi: có dấu hiệu không hoạt động",
+      "thresholdF": "Đã ngừng hoặc được lưu trữ trên pub.dev (điểm không được sử dụng)",
+      "filterTooltip": "Lọc bảng gói chỉ theo danh mục này",
+      "jumpTooltip": "Chuyển tới 0 trong bảng gói {name}"
     },
     "network": {
       "summary": "Mạng phụ thuộc"
@@ -455,9 +473,9 @@
       "openOtherTitle": "Mở một dự án khác của pubspec.yaml trong cửa sổ mới để quét Vibrancy",
       "openOtherLabel": "Mở dự án…",
       "footprintGroupAria": "Chế độ dấu chân cột kích thước",
-      "footprintGroupTitle": "Cột Kích thước hiển thị: chỉ bản lưu trữ riêng, cộng với các giá trị bắc cầu duy nhất (chi phí nếu bị loại bỏ) hoặc cộng với tất cả các giá trị bắc cầu (tối đa theo lý thuyết).",
+      "footprintGroupTitle": "Cột Kích thước hiển thị: chỉ kích thước mã riêng, cộng với các chuyển tiếp duy nhất (chi phí nếu bị loại bỏ) hoặc cộng với tất cả các chuyển tiếp (tối đa theo lý thuyết). Quay trở lại kích thước lưu trữ khi kích thước mã không có sẵn.",
       "footprintLabel": "Dấu chân:",
-      "footprintOwnTitle": "Chỉ kích thước lưu trữ riêng - khớp với kích thước tải xuống pub.dev",
+      "footprintOwnTitle": "Chỉ kích thước mã riêng (lib + nội dung được khai báo); quay trở lại kích thước lưu trữ pub.dev khi không có sẵn",
       "footprintOwn": "Sở hữu",
       "footprintUniqueTitle": "Kích thước riêng + chuyển tiếp chỉ được sử dụng bởi bộ phận này (tiết kiệm nếu bạn loại bỏ nó)",
       "footprintUnique": "+ Độc đáo",
@@ -521,7 +539,7 @@
       },
       "size": {
         "label": "Kích cỡ",
-        "tooltip": "Kích thước lưu trữ trên pub.dev (trước khi rung cây)"
+        "tooltip": "Kích thước mã (lib + tài sản được khai báo); quay trở lại kích thước lưu trữ pub.dev khi kích thước mã không có sẵn"
       },
       "deps": {
         "label": "Phụ thuộc",
@@ -668,7 +686,7 @@
       "generated": "Đã tạo",
       "functionOne": "{count} hàm",
       "functionOther": "{count} hàm",
-      "avgFormat": "trung bình 0 (1) {score} {grade}",
+      "avgFormat": "trung bình 0 (1) {grade} {score}",
       "gatesFailing": "cổng thất bại",
       "gatesPassing": "cổng đi qua"
     },

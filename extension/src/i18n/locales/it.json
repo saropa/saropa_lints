@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "Diagnostica secondaria",
     "hero": {
       "productTitle": "Pannello dei risultati",
-      "gaugeTitle": "Punteggio sulla salute 0/100 (voto 1). Gli errori pesano di più. {score} {grade}"
+      "gaugeTitle": "Punteggio sulla salute 0/100 (voto 1). Gli errori pesano di più. {grade} {score}"
     },
     "time": {
       "justNow": "proprio adesso",
@@ -419,7 +419,7 @@
       "packages": "Pacchetti",
       "projectGrade": "Grado del pacchetto di progetti",
       "totalSize": "Dimensione totale*",
-      "gradeTooltip": "Voto del progetto 0\nPunteggio medio: 1/100\nPacchetti: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {a} {c} {avgGrade} {e} {avgScore} {b} {f}",
+      "gradeTooltip": "Voto del progetto 0\nPunteggio medio: 1/100\nPacchetti: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {a} {f} {e} {avgGrade} {b} {avgScore} {c}",
       "vibrantTitle": "Vibrante",
       "stableTitle": "Stabile",
       "outdatedTitle": "Obsoleto",
@@ -430,8 +430,26 @@
       "singleUse": "Monouso",
       "vulnerable": "Vulnerabile",
       "overrides": "Sostituisce",
-      "caveatLine1": "*Dimensioni dell'archivio prima dello scuotimento dell'albero. Le dimensioni effettive dell'app saranno inferiori.",
+      "caveatLine1": "*Dimensioni del codice mostrate (lib + risorse dichiarate), tornando alla dimensione dell'archivio pub.dev quando la dimensione del codice non è disponibile. Le dimensioni effettive dell'app saranno inferiori dopo lo scuotimento dell'albero.",
       "caveatLine2": "Soglie di attività: 90d = obsoleto, 180d = dormiente (impegno + tempistiche di rilascio)."
+    },
+    "breakdown": {
+      "title": "Perché il voto 0? — 1/100 di media tra 2 pacchetti {pkgCount} {grade} {avgScore}",
+      "hint": "Fare clic per espandere",
+      "distributionHeading": "Distribuzione",
+      "signalsHeading": "Segnali di rischio che trascinano verso il basso il punteggio",
+      "signalFlagged": "{count} flagged (abandoned / end-of-life)",
+      "signalVulnerable": "{count} with known vulnerabilities",
+      "signalUpdates": "{count} have updates available",
+      "bottomHeading": "Pacchetti con il punteggio più basso",
+      "thresholdsHeading": "Come i punteggi vengono associati ai voti",
+      "thresholdA": "70+ - Vivace: mantenuto attivamente, pubblicato di recente",
+      "thresholdB": "40–69 — Stabile: ancora mantenuto ma in rallentamento",
+      "thresholdC": "20–39 — Obsoleto: lunghi intervalli tra le versioni",
+      "thresholdE": "inferiore a 20 anni — Abbandonato: segni di inattività",
+      "thresholdF": "Fuori produzione o archiviato su pub.dev (punteggio non utilizzato)",
+      "filterTooltip": "Filtra la tabella dei pacchetti solo in questa categoria",
+      "jumpTooltip": "Vai a 0 nella tabella dei pacchetti {name}"
     },
     "network": {
       "summary": "Rete di dipendenza"
@@ -455,9 +473,9 @@
       "openOtherTitle": "Apri un altro progetto pubspec.yaml in una nuova finestra per la scansione di Vibrancy",
       "openOtherLabel": "Apri progetto…",
       "footprintGroupAria": "Modalità impronta colonna dimensioni",
-      "footprintGroupTitle": "Cosa mostra la colonna Dimensioni: solo il proprio archivio, più transitivi univoci (costo se rimossi) o più tutti i transitivi (massimo teorico).",
+      "footprintGroupTitle": "Cosa mostra la colonna Dimensioni: solo la dimensione del proprio codice, più transitivi univoci (costo se rimossi) o più tutti i transitivi (massimo teorico). Torna alla dimensione dell'archivio quando la dimensione del codice non è disponibile.",
       "footprintLabel": "Orma:",
-      "footprintOwnTitle": "Solo la dimensione del proprio archivio: corrisponde alla dimensione del download di pub.dev",
+      "footprintOwnTitle": "Solo dimensione del proprio codice (lib + risorse dichiarate); ritorna alla dimensione dell'archivio pub.dev quando non disponibile",
       "footprintOwn": "Possedere",
       "footprintUniqueTitle": "Propria dimensione + transitivi utilizzati solo da questo reparto (risparmi se lo rimuovi)",
       "footprintUnique": "+ Unico",
@@ -521,7 +539,7 @@
       },
       "size": {
         "label": "Misurare",
-        "tooltip": "Dimensioni dell'archivio su pub.dev (prima dello scuotimento dell'albero)"
+        "tooltip": "Dimensione del codice (lib + asset dichiarati); ritorna alla dimensione dell'archivio pub.dev quando la dimensione del codice non è disponibile"
       },
       "deps": {
         "label": "Dipende",
@@ -668,12 +686,12 @@
       "generated": "Generato",
       "functionOne": "{count} funzione",
       "functionOther": "{count} funzioni",
-      "avgFormat": "media 0 (1) {score} {grade}",
+      "avgFormat": "media 0 (1) {grade} {score}",
       "gatesFailing": "cancelli falliti",
       "gatesPassing": "cancelli che passano"
     },
     "gauge": {
-      "tooltip": "Punteggio medio 0 su 100 (voto 1). {rounded} {grade}",
+      "tooltip": "Punteggio medio 0 su 100 (voto 1). {grade} {rounded}",
       "ariaLabel": "Punteggio medio 0 su 100 {rounded}"
     },
     "gate": {

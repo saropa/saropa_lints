@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "Uchunguzi wa sekondari",
     "hero": {
       "productTitle": "Dashibodi ya Matokeo",
-      "gaugeTitle": "Alama ya afya 0/100 (daraja 1). Makosa yana uzito mkubwa zaidi. {score} {grade}"
+      "gaugeTitle": "Alama ya afya 0/100 (daraja 1). Makosa yana uzito mkubwa zaidi. {grade} {score}"
     },
     "time": {
       "justNow": "sasa hivi",
@@ -419,7 +419,7 @@
       "packages": "Vifurushi",
       "projectGrade": "Daraja la Kifurushi cha Mradi",
       "totalSize": "Jumla ya Ukubwa*",
-      "gradeTooltip": "Daraja la mradi 0\nAlama ya wastani: 1/100\nVifurushi: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {a} {c} {avgGrade} {e} {avgScore} {b} {f}",
+      "gradeTooltip": "Daraja la mradi 0\nAlama ya wastani: 1/100\nVifurushi: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {a} {f} {e} {avgGrade} {b} {avgScore} {c}",
       "vibrantTitle": "Mahiri",
       "stableTitle": "Imara",
       "outdatedTitle": "Imepitwa na wakati",
@@ -430,8 +430,26 @@
       "singleUse": "Matumizi moja",
       "vulnerable": "Inayo hatarini",
       "overrides": "Inabatilisha",
-      "caveatLine1": "*Hifadhi ukubwa kabla ya mti kutikisika. Ukubwa halisi wa programu utakuwa mdogo.",
+      "caveatLine1": "*Ukubwa wa msimbo umeonyeshwa (lib + mali iliyotangazwa), ikirejea kwenye ukubwa wa kumbukumbu ya pub.dev wakati ukubwa wa msimbo haupatikani. Ukubwa halisi wa programu utakuwa mdogo baada ya mti kutikisika.",
       "caveatLine2": "Viwango vya shughuli: 90d = vilichakaa, 180d = vimetulia (jitolea + muda wa kutolewa)."
+    },
+    "breakdown": {
+      "title": "Kwa nini daraja 0? — 1/100 wastani katika vifurushi 2 {pkgCount} {grade} {avgScore}",
+      "hint": "Bofya ili kupanua",
+      "distributionHeading": "Usambazaji",
+      "signalsHeading": "Ishara za hatari zinazoburuta alama chini",
+      "signalFlagged": "{count} flagged (abandoned / end-of-life)",
+      "signalVulnerable": "{count} with known vulnerabilities",
+      "signalUpdates": "{count} have updates available",
+      "bottomHeading": "Vifurushi vya alama za chini zaidi",
+      "thresholdsHeading": "Jinsi alama zinavyoelekeza kwenye alama",
+      "thresholdA": "70+ - Inayopendeza: imedumishwa kikamilifu, iliyochapishwa hivi karibuni",
+      "thresholdB": "40-69 - Imara: bado inadumishwa lakini inapunguza kasi",
+      "thresholdC": "20–39 - Imepitwa na wakati: mapengo marefu kati ya matoleo",
+      "thresholdE": "chini ya 20 - Kuachwa: ishara za kutofanya kazi",
+      "thresholdF": "Imesimamishwa au kuhifadhiwa kwenye kumbukumbu kwenye pub.dev (alama haijatumika)",
+      "filterTooltip": "Chuja jedwali la kifurushi kwa kategoria hii pekee",
+      "jumpTooltip": "Rukia 0 kwenye jedwali la kifurushi {name}"
     },
     "network": {
       "summary": "Mtandao wa Kutegemea"
@@ -455,9 +473,9 @@
       "openOtherTitle": "Fungua mradi mwingine wa pubspec.yaml katika dirisha jipya la uchanganuzi wa Vibrancy",
       "openOtherLabel": "Fungua Mradi...",
       "footprintGroupAria": "Hali ya alama ya safu wima ya ukubwa",
-      "footprintGroupTitle": "Kile ambacho safu wima ya Ukubwa inaonyesha: kumbukumbu yako pekee, pamoja na viingilio vya kipekee (gharama ikiwa imeondolewa), au pamoja na vipitio vyote (kiwango cha juu cha kinadharia).",
+      "footprintGroupTitle": "Kile ambacho safu wima ya Ukubwa inaonyesha: saizi yako ya msimbo pekee, pamoja na viingilio vya kipekee (gharama ikiondolewa), au pamoja na vipitishio vyote (kiwango cha juu cha kinadharia). Hurudi kwenye ukubwa wa kumbukumbu wakati ukubwa wa msimbo haupatikani.",
       "footprintLabel": "Nyayo:",
-      "footprintOwnTitle": "Ukubwa wa kumbukumbu pekee - unalingana na ukubwa wa upakuaji wa pub.dev",
+      "footprintOwnTitle": "Saizi ya nambari yako pekee (lib + mali iliyotangazwa); inarudi kwenye saizi ya kumbukumbu ya pub.dev wakati haipatikani",
       "footprintOwn": "Miliki",
       "footprintUniqueTitle": "Saizi yako mwenyewe + vipitishio vinavyotumiwa na eneo hili pekee (akiba ukiiondoa)",
       "footprintUnique": "+ Kipekee",
@@ -521,7 +539,7 @@
       },
       "size": {
         "label": "Ukubwa",
-        "tooltip": "Saizi ya kumbukumbu kwenye pub.dev (kabla ya mti kutikisika)"
+        "tooltip": "Saizi ya msimbo (lib + mali iliyotangazwa); inarudi kwenye saizi ya kumbukumbu ya pub.dev wakati saizi ya msimbo haipatikani"
       },
       "deps": {
         "label": "Vitegemezi",
@@ -668,12 +686,12 @@
       "generated": "Imetolewa",
       "functionOne": "chaguo la kukokotoa {count}",
       "functionOther": "chaguo za kukokotoa {count}",
-      "avgFormat": "wastani 0 (1) {score} {grade}",
+      "avgFormat": "wastani 0 (1) {grade} {score}",
       "gatesFailing": "milango kushindwa",
       "gatesPassing": "milango kupita"
     },
     "gauge": {
-      "tooltip": "Alama ya wastani 0 ya 100 (daraja 1). {rounded} {grade}",
+      "tooltip": "Alama ya wastani 0 ya 100 (daraja 1). {grade} {rounded}",
       "ariaLabel": "Alama ya wastani 0 ya 100 {rounded}"
     },
     "gate": {

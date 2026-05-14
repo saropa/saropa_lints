@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "İkincil teşhis",
     "hero": {
       "productTitle": "Bulgular Kontrol Paneli",
-      "gaugeTitle": "Sağlık puanı 0/100 (derece 1). Hatalar en ağırdır. {score} {grade}"
+      "gaugeTitle": "Sağlık puanı 0/100 (derece 1). Hatalar en ağırdır. {grade} {score}"
     },
     "time": {
       "justNow": "Şu anda",
@@ -395,7 +395,7 @@
     "noMatchingFindingsCopy": "Kopyalanacak eşleşen bulgu yok.",
     "couldNotOpenFile": "Dosya açılamadı: 0 {path}",
     "saveReportNoWorkspace": "Raporu kaydetmeden önce bir çalışma alanı klasörü açın.",
-    "savedFindings": "Kaydedilen 0 bulgu(lar): 1 {path} {count}",
+    "savedFindings": "Kaydedilen 0 bulgu(lar): 1 {count} {path}",
     "couldNotSaveReportJson": "JSON raporu kaydedilemedi."
   },
   "packageDashboard": {
@@ -419,7 +419,7 @@
       "packages": "Paketler",
       "projectGrade": "Proje Paketi Notu",
       "totalSize": "Toplam Boyut*",
-      "gradeTooltip": "Proje notu 0\nOrtalama puan: 1/100\nPaketler: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {a} {c} {avgGrade} {e} {avgScore} {b} {f}",
+      "gradeTooltip": "Proje notu 0\nOrtalama puan: 1/100\nPaketler: 2\nA:3 B:4 C:5 E:6 F:7 {c} {e} {a} {f} {b} {pkgCount} {avgGrade} {avgScore}",
       "vibrantTitle": "Canlı",
       "stableTitle": "Stabil",
       "outdatedTitle": "Modası geçmiş",
@@ -430,8 +430,26 @@
       "singleUse": "Tek kullanımlık",
       "vulnerable": "Hassas",
       "overrides": "Geçersiz kılmalar",
-      "caveatLine1": "*Ağaç sallamadan önce arşiv boyutları. Gerçek uygulama boyutu daha küçük olacaktır.",
+      "caveatLine1": "*Kod boyutları mevcut olmadığında pub.dev arşiv boyutuna geri dönen kod boyutları (lib + bildirilen varlıklar) gösterilir. Ağaç sallandıktan sonra gerçek uygulama boyutu daha küçük olacaktır.",
       "caveatLine2": "Etkinlik eşikleri: 90d = eski, 180d = hareketsiz (taahhüt + sürüm zaman çizelgeleri)."
+    },
+    "breakdown": {
+      "title": "Neden 0 notu? — 2 paketlerde ortalama 1/100 {grade} {pkgCount} {avgScore}",
+      "hint": "Genişletmek için tıklayın",
+      "distributionHeading": "Dağıtım",
+      "signalsHeading": "Skoru aşağı çeken risk sinyalleri",
+      "signalFlagged": "{count} flagged (abandoned / end-of-life)",
+      "signalVulnerable": "{count} with known vulnerabilities",
+      "signalUpdates": "{count} have updates available",
+      "bottomHeading": "En düşük puanlı paketler",
+      "thresholdsHeading": "Puanlar notlarla nasıl eşleşir?",
+      "thresholdA": "70+ — Canlı: aktif olarak sürdürülüyor, yakın zamanda yayınlandı",
+      "thresholdB": "40–69 — Kararlı: hâlâ korunuyor ancak yavaşlıyor",
+      "thresholdC": "20–39 — Güncelliğini yitirmiş: sürümler arasında uzun boşluklar var",
+      "thresholdE": "20'nin altında - Terk edilmiş: hareketsizlik belirtileri",
+      "thresholdF": "Yayınlanmıyor veya pub.dev'de arşivleniyor (puan kullanılmıyor)",
+      "filterTooltip": "Paket tablosunu yalnızca bu kategoriye göre filtreleyin",
+      "jumpTooltip": "Paket tablosunda 0'ya atlayın {name}"
     },
     "network": {
       "summary": "Bağımlılık Ağı"
@@ -455,9 +473,9 @@
       "openOtherTitle": "Titreşim taraması için başka bir pubspec.yaml projesini yeni bir pencerede açın",
       "openOtherLabel": "Projeyi Aç…",
       "footprintGroupAria": "Boyut sütunu ayak izi modu",
-      "footprintGroupTitle": "Boyut sütununun gösterdiği şey: yalnızca kendi arşivi, artı benzersiz geçişli öğeler (kaldırılırsa maliyet) veya artı tüm geçişli öğeler (teorik maksimum).",
+      "footprintGroupTitle": "Boyut sütununun gösterdiği şey: yalnızca kendi kod boyutunun yanı sıra benzersiz geçişli öğeler (kaldırılırsa maliyet) veya artı tüm geçişli öğeler (teorik maksimum). Kod boyutu kullanılamadığında arşiv boyutuna geri döner.",
       "footprintLabel": "Ayak izi:",
-      "footprintOwnTitle": "Yalnızca kendi arşiv boyutu — pub.dev indirme boyutuyla eşleşir",
+      "footprintOwnTitle": "Yalnızca kendi kod boyutu (lib + beyan edilen varlıklar); kullanılamadığında pub.dev arşiv boyutuna geri döner",
       "footprintOwn": "Sahip olmak",
       "footprintUniqueTitle": "Kendi boyutu + yalnızca bu bölüm tarafından kullanılan geçişli öğeler (kaldırırsanız tasarruf sağlanır)",
       "footprintUnique": "+ Benzersiz",
@@ -521,7 +539,7 @@
       },
       "size": {
         "label": "Boyut",
-        "tooltip": "Pub.dev'deki arşiv boyutu (ağaç sallanmadan önce)"
+        "tooltip": "Kod boyutu (lib + beyan edilen varlıklar); Kod boyutu kullanılamadığında pub.dev arşiv boyutuna geri döner"
       },
       "deps": {
         "label": "Dep'ler",
@@ -668,7 +686,7 @@
       "generated": "Oluşturuldu",
       "functionOne": "{count} işlev",
       "functionOther": "{count} işlev",
-      "avgFormat": "ortalama 0 (1) {score} {grade}",
+      "avgFormat": "ortalama 0 (1) {grade} {score}",
       "gatesFailing": "kapılar başarısız",
       "gatesPassing": "geçen kapılar"
     },

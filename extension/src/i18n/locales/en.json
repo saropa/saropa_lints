@@ -430,7 +430,7 @@
       "singleUse": "Single-use",
       "vulnerable": "Vulnerable",
       "overrides": "Overrides",
-      "caveatLine1": "*Archive sizes before tree shaking. Actual app size will be smaller.",
+      "caveatLine1": "*Code sizes shown (lib + declared assets), falling back to the pub.dev archive size when code size is unavailable. Actual app size will be smaller after tree shaking.",
       "caveatLine2": "Activity thresholds: 90d = stale, 180d = dormant (commit + release timelines)."
     },
     "breakdown": {
@@ -473,9 +473,9 @@
       "openOtherTitle": "Open another pubspec.yaml's project in a new window for Vibrancy scan",
       "openOtherLabel": "Open Project…",
       "footprintGroupAria": "Size column footprint mode",
-      "footprintGroupTitle": "What the Size column shows: own archive only, plus unique transitives (cost if removed), or plus all transitives (theoretical max).",
+      "footprintGroupTitle": "What the Size column shows: own code size only, plus unique transitives (cost if removed), or plus all transitives (theoretical max). Falls back to archive size when code size is unavailable.",
       "footprintLabel": "Footprint:",
-      "footprintOwnTitle": "Own archive size only — matches pub.dev download size",
+      "footprintOwnTitle": "Own code size only (lib + declared assets); falls back to pub.dev archive size when unavailable",
       "footprintOwn": "Own",
       "footprintUniqueTitle": "Own size + transitives used only by this dep (savings if you remove it)",
       "footprintUnique": "+ Unique",
@@ -539,7 +539,7 @@
       },
       "size": {
         "label": "Size",
-        "tooltip": "Archive size on pub.dev (before tree shaking)"
+        "tooltip": "Code size (lib + declared assets); falls back to pub.dev archive size when code size is unavailable"
       },
       "deps": {
         "label": "Deps",

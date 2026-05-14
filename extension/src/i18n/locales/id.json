@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "Diagnostik sekunder",
     "hero": {
       "productTitle": "Dasbor Temuan",
-      "gaugeTitle": "Skor kesehatan 0/100 (kelas 1). Kesalahan adalah hal yang paling berat. {score} {grade}"
+      "gaugeTitle": "Skor kesehatan 0/100 (kelas 1). Kesalahan adalah hal yang paling berat. {grade} {score}"
     },
     "time": {
       "justNow": "baru saja",
@@ -395,7 +395,7 @@
     "noMatchingFindingsCopy": "Tidak ada temuan yang cocok untuk disalin.",
     "couldNotOpenFile": "Tidak dapat membuka file: 0 {path}",
     "saveReportNoWorkspace": "Buka folder ruang kerja sebelum menyimpan laporan.",
-    "savedFindings": "Temuan 0 yang disimpan: 1 {path} {count}",
+    "savedFindings": "Temuan 0 yang disimpan: 1 {count} {path}",
     "couldNotSaveReportJson": "Tidak dapat menyimpan laporan JSON."
   },
   "packageDashboard": {
@@ -419,7 +419,7 @@
       "packages": "Paket",
       "projectGrade": "Kelas Paket Proyek",
       "totalSize": "Ukuran Jumlah*",
-      "gradeTooltip": "Kelas proyek 0\nSkor rata-rata: 1/100\nPaket: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {a} {c} {avgGrade} {e} {avgScore} {b} {f}",
+      "gradeTooltip": "Kelas proyek 0\nSkor rata-rata: 1/100\nPaket: 2\nA:3 B:4 C:5 E:6 F:7 {c} {e} {a} {f} {b} {pkgCount} {avgGrade} {avgScore}",
       "vibrantTitle": "Bersemangat",
       "stableTitle": "Stabil",
       "outdatedTitle": "Kedaluwarsa",
@@ -430,8 +430,26 @@
       "singleUse": "Sekali pakai",
       "vulnerable": "Rentan",
       "overrides": "Penggantian",
-      "caveatLine1": "*Ukuran arsip sebelum pohon diguncang. Ukuran aplikasi sebenarnya akan lebih kecil.",
+      "caveatLine1": "*Ukuran kode ditampilkan (lib + aset yang dideklarasikan), dikembalikan ke ukuran arsip pub.dev ketika ukuran kode tidak tersedia. Ukuran aplikasi sebenarnya akan lebih kecil setelah pohon diguncang.",
       "caveatLine2": "Ambang batas aktivitas: 90d = basi, 180d = tidak aktif (jadwal komit + rilis)."
+    },
+    "breakdown": {
+      "title": "Mengapa kelas 0? — Rata-rata 1/100 di seluruh 2 paket {grade} {pkgCount} {avgScore}",
+      "hint": "Klik untuk memperluas",
+      "distributionHeading": "Distribusi",
+      "signalsHeading": "Sinyal risiko menyeret skor ke bawah",
+      "signalFlagged": "{count} flagged (abandoned / end-of-life)",
+      "signalVulnerable": "{count} with known vulnerabilities",
+      "signalUpdates": "{count} have updates available",
+      "bottomHeading": "Paket dengan skor terendah",
+      "thresholdsHeading": "Bagaimana skor dipetakan ke nilai",
+      "thresholdA": "70+ — Bersemangat: dipelihara secara aktif, baru-baru ini diterbitkan",
+      "thresholdB": "40–69 — Stabil: masih dipertahankan namun melambat",
+      "thresholdC": "20–39 - Kedaluwarsa: jarak antar rilis yang panjang",
+      "thresholdE": "di bawah 20 — Ditinggalkan: tanda-tanda tidak aktif",
+      "thresholdF": "Dihentikan atau diarsipkan di pub.dev (skor tidak digunakan)",
+      "filterTooltip": "Filter tabel paket hanya ke kategori ini",
+      "jumpTooltip": "Lompat ke 0 di tabel paket {name}"
     },
     "network": {
       "summary": "Jaringan Ketergantungan"
@@ -455,9 +473,9 @@
       "openOtherTitle": "Buka proyek pubspec.yaml lain di jendela baru untuk pemindaian Vibrancy",
       "openOtherLabel": "Buka Proyek…",
       "footprintGroupAria": "Mode tapak kolom ukuran",
-      "footprintGroupTitle": "Apa yang ditampilkan kolom Ukuran: hanya arsip milik sendiri, ditambah transitif unik (biaya jika dihapus), atau ditambah semua transitif (maks teoritis).",
+      "footprintGroupTitle": "Apa yang ditampilkan kolom Ukuran: hanya ukuran kode sendiri, ditambah transitif unik (biaya jika dihapus), atau ditambah semua transitif (maks teoritis). Kembali ke ukuran arsip ketika ukuran kode tidak tersedia.",
       "footprintLabel": "Tapak:",
-      "footprintOwnTitle": "Hanya ukuran arsip sendiri — cocok dengan ukuran unduhan pub.dev",
+      "footprintOwnTitle": "Hanya ukuran kode sendiri (lib + aset yang dinyatakan); kembali ke ukuran arsip pub.dev jika tidak tersedia",
       "footprintOwn": "Memiliki",
       "footprintUniqueTitle": "Ukuran sendiri + transitif hanya digunakan oleh dep ini (menghemat jika Anda menghapusnya)",
       "footprintUnique": "+ Unik",
@@ -521,7 +539,7 @@
       },
       "size": {
         "label": "Ukuran",
-        "tooltip": "Ukuran arsip di pub.dev (sebelum pohon bergetar)"
+        "tooltip": "Ukuran kode (lib + aset yang dideklarasikan); kembali ke ukuran arsip pub.dev ketika ukuran kode tidak tersedia"
       },
       "deps": {
         "label": "Departemen",
@@ -668,7 +686,7 @@
       "generated": "Dihasilkan",
       "functionOne": "{count} fungsi",
       "functionOther": "{count} fungsi",
-      "avgFormat": "rata-rata 0 (1) {score} {grade}",
+      "avgFormat": "rata-rata 0 (1) {grade} {score}",
       "gatesFailing": "gerbang gagal",
       "gatesPassing": "gerbang lewat"
     },

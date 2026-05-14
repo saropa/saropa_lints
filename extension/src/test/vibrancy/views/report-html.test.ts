@@ -460,8 +460,13 @@ describe('report: column heading tooltips', () => {
     });
 
     it('should include tooltip on Size column header', () => {
+        /* Tooltip copy was updated in the v13.9.0 follow-up: the Size column
+           now reports code size (lib + declared assets) and only falls back
+           to archive size when code size is unavailable. The old "Archive
+           size on pub.dev (before tree shaking)" wording misrepresented what
+           the column shows. */
         const html = buildReportHtml(opts([]));
-        assert.ok(html.includes('title="Archive size on pub.dev (before tree shaking)"'));
+        assert.ok(html.includes('title="Code size (lib + declared assets); falls back to pub.dev archive size when code size is unavailable"'));
     });
 
     it('should hide description column header by default', () => {
@@ -848,10 +853,15 @@ describe('report: activity column', () => {
     });
 
     it('should attach total-size caveat to the Total Size card tooltip', () => {
+        /* Caveat copy was updated in the v13.9.0 follow-up: the Total Size
+           summary now sums code size (lib + declared assets) and only falls
+           back to archive size when code size is unavailable. The caveat must
+           reflect that the number is a code-size aggregate, not a raw tarball
+           total. */
         const html = buildReportHtml(opts([makeResult('http', 80)]));
         assert.ok(
-            /summary-card total-size[^>]*title="[^"]*Archive sizes before tree shaking/.test(html),
-            'Total Size card should carry the tree-shaking caveat in title',
+            /summary-card total-size[^>]*title="[^"]*Code sizes shown/.test(html),
+            'Total Size card should carry the code-size caveat in title',
         );
     });
 });
@@ -1284,6 +1294,203 @@ describe('report: update column uses dimmed hyphen', () => {
         const html = buildReportHtml(opts([result]));
         assert.ok(html.includes('update-major'));
         assert.ok(html.includes('\u2192'));
+    });
+});
+
+/* Behaviors landed in the v13.9.0 "tarball is not runtime size" follow-up:
+   Package Dashboard surfaces now prefer `codeSizeBytes` over `archiveSizeBytes`,
+   the Health Score panel exposes `+example/+tests/+tools/+docs` maintainer-quality
+   rows when the flags are set, the size cell tooltip surfaces an "On disk:"
+   secondary line when archive and code size diverge, and the JSON export
+   carries both `codeSize` and `archiveSize` so downstream parsers can tell
+   the two dimensions apart. These tests pin the new behaviors so a future
+   regression that re-introduces archive-only rendering trips immediately
+   rather than waiting for a user to notice 20 MB packages on the dashboard. */
+describe('report: code-size semantics (v13.9.0 follow-up)', () => {
+    it('size cell prefers codeSizeBytes over archiveSizeBytes', () => {
+        /* audioplayers-like asymmetry: 40 KB code vs 20 MB on disk. The cell
+           must show the code-size number — the old archive-only render was
+           the bug being fixed. */
+        const result = {
+            ...makeResult('audioplayers', 80),
+            codeSizeBytes: 40_000,
+            archiveSizeBytes: 20_000_000,
+        };
+        const html = buildReportHtml(opts([result]));
+        /* size-cell carries data-size-own = the chosen own value. 40_000 is
+           formatted via formatSizeKB, but the data attr is the raw byte count. */
+        assert.ok(
+            html.includes('data-size-own="40000"'),
+            'expected size cell to use codeSizeBytes (40000), not archiveSizeBytes',
+        );
+    });
+
+    it('size cell falls back to archiveSizeBytes when codeSizeBytes is null', () => {
+        /* Pre-v13.9.0 packages or any case where the analyzer didn't run still
+           render their archive size — silence is worse than a slightly-inflated
+           number. */
+        const result = {
+            ...makeResult('legacy-pkg', 80),
+            codeSizeBytes: null,
+            archiveSizeBytes: 250_000,
+        };
+        const html = buildReportHtml(opts([result]));
+        assert.ok(
+            html.includes('data-size-own="250000"'),
+            'expected fallback to archiveSizeBytes when codeSizeBytes is null',
+        );
+    });
+
+    it('size cell tooltip labels code-size vs archive-size and discloses on-disk asymmetry', () => {
+        /* Tooltip copy is the user's only signal that the dashboard moved away
+           from tarball size. The label must say "Code size" when codeSizeBytes
+           is set, and the "On disk:" secondary line must surface only when the
+           two dimensions actually differ (so packages where they match don't
+           get a redundant row). */
+        const result = {
+            ...makeResult('audioplayers', 80),
+            codeSizeBytes: 40_000,
+            archiveSizeBytes: 20_000_000,
+        };
+        const html = buildReportHtml(opts([result]));
+        assert.ok(
+            html.includes('Code size:'),
+            'expected tooltip to label the rendered number as "Code size"',
+        );
+        assert.ok(
+            html.includes('On disk:'),
+            'expected tooltip to disclose on-disk archive size when it differs from code size',
+        );
+    });
+
+    it('size cell tooltip omits "On disk:" when archive equals code size', () => {
+        /* Symmetry check on the previous test — when the two numbers agree
+           there's nothing for the secondary line to disclose, so the tooltip
+           stays compact. */
+        const result = {
+            ...makeResult('pure-dart-pkg', 80),
+            codeSizeBytes: 50_000,
+            archiveSizeBytes: 50_000,
+        };
+        const html = buildReportHtml(opts([result]));
+        assert.ok(
+            !html.includes('On disk:'),
+            'expected no "On disk:" tooltip line when archive matches code size',
+        );
+    });
+
+    it('Health Score panel renders +example row when hasExample flag is set', () => {
+        /* Maintainer-quality flags are POSITIVE components. The earlier
+           tarball-bloat model penalized them (packages shipping demos scored
+           worse) — the rows exist as a visible signal that the inversion is
+           fixed. Each flag becomes its own row so the contribution is
+           legible, not buried in an aggregate. */
+        const result = {
+            ...makeResult('http', 80),
+            maintainerQuality: {
+                hasExample: true,
+                hasTests: false,
+                hasTools: false,
+                hasDocs: false,
+            },
+        };
+        const html = buildReportHtml(opts([result]));
+        assert.ok(
+            html.includes('>+example<'),
+            'expected +example row in Health Score panel when hasExample=true',
+        );
+    });
+
+    it('Health Score panel renders all four maintainer-quality rows when every flag set', () => {
+        const result = {
+            ...makeResult('http', 80),
+            maintainerQuality: {
+                hasExample: true,
+                hasTests: true,
+                hasTools: true,
+                hasDocs: true,
+            },
+        };
+        const html = buildReportHtml(opts([result]));
+        assert.ok(html.includes('>+example<'), 'missing +example row');
+        assert.ok(html.includes('>+tests<'), 'missing +tests row');
+        assert.ok(html.includes('>+tools<'), 'missing +tools row');
+        assert.ok(html.includes('>+docs<'), 'missing +docs row');
+    });
+
+    it('Health Score panel omits maintainer-quality rows when flags are all false', () => {
+        /* Absent flags are non-contributions, not penalties — they shouldn't
+           render at all. Otherwise the panel would mislead users with rows
+           that read as "no demo" when really the analyzer didn't find one. */
+        const result = {
+            ...makeResult('http', 80),
+            maintainerQuality: {
+                hasExample: false,
+                hasTests: false,
+                hasTools: false,
+                hasDocs: false,
+            },
+        };
+        const html = buildReportHtml(opts([result]));
+        assert.ok(!html.includes('>+example<'));
+        assert.ok(!html.includes('>+tests<'));
+        assert.ok(!html.includes('>+tools<'));
+        assert.ok(!html.includes('>+docs<'));
+    });
+
+    it('Health Score panel omits maintainer-quality rows when maintainerQuality is null', () => {
+        /* Defensive case: pre-v13.9.0 scans didn't populate the field. The
+           panel must not throw or render bogus rows; absence is silent. */
+        const html = buildReportHtml(opts([makeResult('http', 80)]));
+        assert.ok(!html.includes('>+example<'));
+    });
+
+    it('JSON export embeds both codeSize and archiveSize fields', () => {
+        /* Downstream consumers of the report JSON (CI dashboards, scripts)
+           must be able to tell the two dimensions apart. archiveSize is
+           retained for backwards compatibility; codeSize is the new
+           authoritative field. */
+        const result = {
+            ...makeResult('audioplayers', 80),
+            codeSizeBytes: 40_000,
+            archiveSizeBytes: 20_000_000,
+        };
+        const html = buildReportHtml(opts([result]));
+        /* The embedded packageData object is plain JS — grep for both keys
+           and confirm they carry distinct values from formatSizeKB. */
+        assert.ok(
+            html.includes('"codeSize":'),
+            'expected JSON export to include codeSize field',
+        );
+        assert.ok(
+            html.includes('"archiveSize":'),
+            'expected JSON export to retain archiveSize field for back-compat',
+        );
+    });
+
+    it('JSON export sets codeSize to null when codeSizeBytes is null', () => {
+        const result = {
+            ...makeResult('legacy-pkg', 80),
+            codeSizeBytes: null,
+            archiveSizeBytes: 250_000,
+        };
+        const html = buildReportHtml(opts([result]));
+        assert.ok(
+            html.includes('"codeSize":null'),
+            'expected codeSize:null when codeSizeBytes is null',
+        );
+    });
+
+    it('size column tooltip uses "Code size" label semantics', () => {
+        /* Pins the en.json l10n string updated in the v13.9.0 follow-up.
+           The column tooltip is the developer's at-a-glance signal about what
+           the Size column actually measures; if it slips back to "Archive
+           size on pub.dev" the rename is undone. */
+        const html = buildReportHtml(opts([makeResult('http', 80)]));
+        assert.ok(
+            html.includes('Code size (lib + declared assets)'),
+            'expected size column tooltip to mention "Code size (lib + declared assets)"',
+        );
     });
 });
 

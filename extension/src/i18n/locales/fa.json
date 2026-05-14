@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "تشخیص ثانویه",
     "hero": {
       "productTitle": "داشبورد یافته ها",
-      "gaugeTitle": "نمره سلامت 0/100 (درجه 1). خطاها سنگین ترین وزن را دارند. {score} {grade}"
+      "gaugeTitle": "نمره سلامت 0/100 (درجه 1). خطاها سنگین ترین وزن را دارند. {grade} {score}"
     },
     "time": {
       "justNow": "همین الان",
@@ -419,7 +419,7 @@
       "packages": "بسته ها",
       "projectGrade": "درجه بسته پروژه",
       "totalSize": "اندازه کل*",
-      "gradeTooltip": "درجه پروژه 0\nمیانگین امتیاز: 1/100\nپکیج ها: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {a} {c} {avgGrade} {e} {avgScore} {b} {f}",
+      "gradeTooltip": "درجه پروژه 0\nمیانگین امتیاز: 1/100\nپکیج ها: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {a} {f} {e} {avgGrade} {b} {avgScore} {c}",
       "vibrantTitle": "پر جنب و جوش",
       "stableTitle": "پایدار",
       "outdatedTitle": "منسوخ شده",
@@ -430,8 +430,26 @@
       "singleUse": "یکبار مصرف",
       "vulnerable": "آسیب پذیر",
       "overrides": "لغو می کند",
-      "caveatLine1": "*قبل از تکان دادن درخت اندازه ها را بایگانی کنید. اندازه واقعی برنامه کوچکتر خواهد بود.",
+      "caveatLine1": "*اندازه های کد نشان داده شده (lib + دارایی های اعلام شده)، زمانی که اندازه کد در دسترس نباشد به اندازه بایگانی pub.dev برمی گردد. اندازه واقعی برنامه پس از تکان دادن درخت کوچکتر خواهد شد.",
       "caveatLine2": "آستانه فعالیت: 90d = قدیمی، 180d = غیرفعال (تعهد + جدول زمانی انتشار)."
+    },
+    "breakdown": {
+      "title": "چرا درجه 0؟ — 1/100 میانگین در بین بسته‌های 2 {pkgCount} {grade} {avgScore}",
+      "hint": "برای گسترش کلیک کنید",
+      "distributionHeading": "توزیع",
+      "signalsHeading": "سیگنال های ریسک امتیاز را به پایین می کشد",
+      "signalFlagged": "{count} flagged (abandoned / end-of-life)",
+      "signalVulnerable": "{count} with known vulnerabilities",
+      "signalUpdates": "{count} have updates available",
+      "bottomHeading": "بسته های با کمترین امتیاز",
+      "thresholdsHeading": "نحوه نگاشت نمرات به نمرات",
+      "thresholdA": "70+ — پر جنب و جوش: فعالانه نگهداری می شود، اخیراً منتشر شده است",
+      "thresholdB": "40-69 - پایدار: همچنان حفظ می شود اما کند می شود",
+      "thresholdC": "20-39 - منسوخ شده: فاصله های طولانی بین نسخه ها",
+      "thresholdE": "زیر 20 - رها شده: نشانه های عدم فعالیت",
+      "thresholdF": "متوقف شده یا در pub.dev بایگانی شده است (امتیاز استفاده نشده است)",
+      "filterTooltip": "جدول بسته را فقط به این دسته فیلتر کنید",
+      "jumpTooltip": "در جدول بسته به 0 بروید {name}"
     },
     "network": {
       "summary": "شبکه وابستگی"
@@ -455,9 +473,9 @@
       "openOtherTitle": "پروژه دیگری از pubspec.yaml را در یک پنجره جدید برای اسکن Vibrancy باز کنید",
       "openOtherLabel": "باز کردن پروژه…",
       "footprintGroupAria": "حالت ردپای ستون اندازه",
-      "footprintGroupTitle": "آنچه که ستون Size نشان می‌دهد: فقط بایگانی شخصی، به‌علاوه موارد انتقالی منحصربه‌فرد (هزینه در صورت حذف) یا به‌علاوه همه موارد انتقالی (حداکثر نظری).",
+      "footprintGroupTitle": "آنچه که ستون Size نشان می‌دهد: فقط اندازه کد خود، به‌علاوه متعدی‌های منحصربه‌فرد (هزینه در صورت حذف)، یا به‌علاوه همه موارد انتقالی (حداکثر نظری). وقتی اندازه کد در دسترس نباشد به اندازه بایگانی باز می گردد.",
       "footprintLabel": "رد پا:",
-      "footprintOwnTitle": "فقط اندازه آرشیو شخصی - با اندازه دانلود pub.dev مطابقت دارد",
+      "footprintOwnTitle": "فقط اندازه کد شخصی (lib + دارایی های اعلام شده)؛ وقتی در دسترس نباشد به اندازه بایگانی pub.dev برمی گردد",
       "footprintOwn": "صاحب",
       "footprintUniqueTitle": "اندازه شخصی + موارد انتقالی که فقط توسط این قسمت استفاده می شود (در صورت حذف آن صرفه جویی می شود)",
       "footprintUnique": "+ بی نظیر",
@@ -521,7 +539,7 @@
       },
       "size": {
         "label": "اندازه",
-        "tooltip": "اندازه آرشیو در pub.dev (قبل از تکان دادن درخت)"
+        "tooltip": "اندازه کد (lib + دارایی های اعلام شده)؛ زمانی که اندازه کد در دسترس نباشد به اندازه بایگانی pub.dev برمی گردد"
       },
       "deps": {
         "label": "وابستگی‌ها",
@@ -668,12 +686,12 @@
       "generated": "تولید شده است",
       "functionOne": "{count} تابع",
       "functionOther": "{count} تابع",
-      "avgFormat": "میانگین 0 (1) {score} {grade}",
+      "avgFormat": "میانگین 0 (1) {grade} {score}",
       "gatesFailing": "دروازه ها شکست می خورند",
       "gatesPassing": "دروازه های عبور"
     },
     "gauge": {
-      "tooltip": "میانگین امتیاز 0 از 100 (درجه 1). {rounded} {grade}",
+      "tooltip": "میانگین امتیاز 0 از 100 (درجه 1). {grade} {rounded}",
       "ariaLabel": "میانگین امتیاز 0 از 100 {rounded}"
     },
     "gate": {

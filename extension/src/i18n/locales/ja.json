@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "二次診断",
     "hero": {
       "productTitle": "調査結果ダッシュボード",
-      "gaugeTitle": "健康スコア 0/100 (グレード 1)。エラーが最も重くなります。 {score} {grade}"
+      "gaugeTitle": "健康スコア 0/100 (グレード 1)。エラーが最も重くなります。 {grade} {score}"
     },
     "time": {
       "justNow": "ちょうど今",
@@ -395,7 +395,7 @@
     "noMatchingFindingsCopy": "コピーできる一致する結果はありません。",
     "couldNotOpenFile": "ファイルを開けませんでした: 0 {path}",
     "saveReportNoWorkspace": "レポートを保存する前に、ワークスペース フォルダーを開いてください。",
-    "savedFindings": "保存された 0 の結果: 1 {path} {count}",
+    "savedFindings": "保存された 0 の結果: 1 {count} {path}",
     "couldNotSaveReportJson": "レポート JSON を保存できませんでした。"
   },
   "packageDashboard": {
@@ -419,7 +419,7 @@
       "packages": "パッケージ",
       "projectGrade": "プロジェクトパッケージグレード",
       "totalSize": "合計サイズ*",
-      "gradeTooltip": "プロジェクトグレード 0\n平均スコア: 1/100\nパッケージ: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {a} {c} {avgGrade} {e} {avgScore} {b} {f}",
+      "gradeTooltip": "プロジェクトグレード 0\n平均スコア: 1/100\nパッケージ: 2\nA:3 B:4 C:5 E:6 F:7 {c} {e} {a} {f} {b} {pkgCount} {avgGrade} {avgScore}",
       "vibrantTitle": "活気に満ちた",
       "stableTitle": "安定した",
       "outdatedTitle": "時代遅れ",
@@ -430,8 +430,26 @@
       "singleUse": "使い捨て",
       "vulnerable": "脆弱",
       "overrides": "オーバーライド",
-      "caveatLine1": "*ツリーが揺れる前のアーカイブサイズ。実際のアプリのサイズはこれより小さくなります。",
+      "caveatLine1": "*表示されるコード サイズ (lib + 宣言されたアセット)。コード サイズが利用できない場合は、pub.dev アーカイブ サイズに戻ります。実際のアプリのサイズは、ツリーシェイキング後は小さくなります。",
       "caveatLine2": "アクティビティのしきい値: 90 日 = 古い、180 日 = 休止中 (コミット + リリースのタイムライン)。"
+    },
+    "breakdown": {
+      "title": "なぜ 0 と評価するのでしょうか? — 2 パッケージ全体で 1/100 の平均 {grade} {pkgCount} {avgScore}",
+      "hint": "クリックして展開します",
+      "distributionHeading": "分布",
+      "signalsHeading": "スコアを引き下げるリスクシグナル",
+      "signalFlagged": "{count} flagged (abandoned / end-of-life)",
+      "signalVulnerable": "{count} with known vulnerabilities",
+      "signalUpdates": "{count} have updates available",
+      "bottomHeading": "最もスコアの低いパッケージ",
+      "thresholdsHeading": "スコアが成績にどのように対応するか",
+      "thresholdA": "70+ — 活気に満ちたもの: 積極的に維持され、最近公開されました",
+      "thresholdB": "40–69 — 安定: まだ維持されているが、速度が低下している",
+      "thresholdC": "20–39 — 古い: リリース間の長い空白",
+      "thresholdE": "20 未満 — 放棄: 活動停止の兆候",
+      "thresholdF": "中止または pub.dev にアーカイブ (スコアは使用されません)",
+      "filterTooltip": "パッケージテーブルをこのカテゴリのみにフィルタリングします",
+      "jumpTooltip": "パッケージ表の0にジャンプします {name}"
     },
     "network": {
       "summary": "依存関係ネットワーク"
@@ -455,9 +473,9 @@
       "openOtherTitle": "Vibrancy スキャンのために別の pubspec.yaml のプロジェクトを新しいウィンドウで開きます",
       "openOtherLabel": "プロジェクトを開く…",
       "footprintGroupAria": "サイズ列フットプリントモード",
-      "footprintGroupTitle": "[サイズ] 列に表示される内容: 独自のアーカイブのみ、固有の推移 (削除された場合のコスト)、またはすべての推移 (理論上の最大値) を加えたもの。",
+      "footprintGroupTitle": "[サイズ] 列に表示される内容: 独自のコード サイズのみ、プラス固有の推移 (削除された場合のコスト)、またはすべての推移 (理論上の最大値) をプラス。コード サイズが利用できない場合は、アーカイブ サイズにフォールバックします。",
       "footprintLabel": "フットプリント:",
-      "footprintOwnTitle": "独自のアーカイブ サイズのみ - pub.dev のダウンロード サイズと一致します",
+      "footprintOwnTitle": "独自のコード サイズのみ (lib + 宣言されたアセット)。利用できない場合は、pub.dev アーカイブ サイズにフォールバックします",
       "footprintOwn": "自分の",
       "footprintUniqueTitle": "独自のサイズ + この dep によってのみ使用される推移語 (削除した場合の節約)",
       "footprintUnique": "+ ユニークな",
@@ -521,7 +539,7 @@
       },
       "size": {
         "label": "サイズ",
-        "tooltip": "pub.dev 上のアーカイブ サイズ (ツリーシェイキング前)"
+        "tooltip": "コードサイズ (ライブラリ + 宣言されたアセット)。コード サイズが利用できない場合は、pub.dev アーカイブ サイズにフォールバックします。"
       },
       "deps": {
         "label": "デプス",
@@ -668,7 +686,7 @@
       "generated": "生成された",
       "functionOne": "{count} 関数",
       "functionOther": "{count} 関数",
-      "avgFormat": "平均0 (1) {score} {grade}",
+      "avgFormat": "平均0 (1) {grade} {score}",
       "gatesFailing": "ゲートが失敗する",
       "gatesPassing": "ゲート通過"
     },

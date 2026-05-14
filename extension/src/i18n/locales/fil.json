@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "Mga pangalawang diagnostic",
     "hero": {
       "productTitle": "Dashboard ng Mga Natuklasan",
-      "gaugeTitle": "Marka ng kalusugan 0/100 (grado 1). Pinakamabigat ang mga pagkakamali. {score} {grade}"
+      "gaugeTitle": "Marka ng kalusugan 0/100 (grado 1). Pinakamabigat ang mga pagkakamali. {grade} {score}"
     },
     "time": {
       "justNow": "ngayon lang",
@@ -419,7 +419,7 @@
       "packages": "Mga package",
       "projectGrade": "Marka ng Pakete ng Proyekto",
       "totalSize": "Kabuuang Sukat*",
-      "gradeTooltip": "Marka ng proyekto 0\nAverage na marka: 1/100\nMga Package: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {a} {c} {avgGrade} {e} {avgScore} {b} {f}",
+      "gradeTooltip": "Marka ng proyekto 0\nAverage na marka: 1/100\nMga Package: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {a} {f} {e} {avgGrade} {b} {avgScore} {c}",
       "vibrantTitle": "Masigla",
       "stableTitle": "Matatag",
       "outdatedTitle": "Luma na",
@@ -430,8 +430,26 @@
       "singleUse": "pang-isahang gamit",
       "vulnerable": "Mahina",
       "overrides": "Mga override",
-      "caveatLine1": "*Mga laki ng archive bago yumanig ang puno. Ang aktwal na laki ng app ay magiging mas maliit.",
+      "caveatLine1": "*Mga ipinapakitang laki ng code (lib + idineklarang asset), bumabalik sa laki ng archive ng pub.dev kapag hindi available ang laki ng code. Ang aktwal na laki ng app ay magiging mas maliit pagkatapos ng pagyanig ng puno.",
       "caveatLine2": "Mga threshold ng aktibidad: 90d = lipas, 180d = tulog (commit + release timeline)."
+    },
+    "breakdown": {
+      "title": "Bakit grade 0? — 1/100 average sa 2 na mga pakete {pkgCount} {grade} {avgScore}",
+      "hint": "I-click upang palawakin",
+      "distributionHeading": "Pamamahagi",
+      "signalsHeading": "Mga senyales ng panganib na nag-drag pababa sa marka",
+      "signalFlagged": "{count} flagged (abandoned / end-of-life)",
+      "signalVulnerable": "{count} with known vulnerabilities",
+      "signalUpdates": "{count} have updates available",
+      "bottomHeading": "Mga pakete na may pinakamababang marka",
+      "thresholdsHeading": "Paano nagmamapa ang mga marka sa mga marka",
+      "thresholdA": "70+ — Vibrant: aktibong pinananatili, kamakailang na-publish",
+      "thresholdB": "40–69 — Matatag: pinananatili pa rin ngunit bumabagal",
+      "thresholdC": "20–39 — Luma na: mahabang agwat sa pagitan ng mga release",
+      "thresholdE": "below 20 — Inabandona: mga palatandaan ng kawalan ng aktibidad",
+      "thresholdF": "Itinigil o na-archive sa pub.dev (hindi nagamit ang marka)",
+      "filterTooltip": "I-filter ang talahanayan ng package sa kategoryang ito lamang",
+      "jumpTooltip": "Tumalon sa 0 sa talahanayan ng package {name}"
     },
     "network": {
       "summary": "Dependency Network"
@@ -455,9 +473,9 @@
       "openOtherTitle": "Magbukas ng isa pang proyekto ng pubspec.yaml sa isang bagong window para sa Vibrancy scan",
       "openOtherLabel": "Buksan ang Proyekto...",
       "footprintGroupAria": "Laki ng column footprint mode",
-      "footprintGroupTitle": "Ang ipinapakita ng column na Sukat: sariling archive lang, kasama ang mga natatanging transitive (gastos kung aalisin), o kasama ang lahat ng transitive (theoretical max).",
+      "footprintGroupTitle": "Ano ang ipinapakita ng column na Sukat: sariling laki ng code lang, kasama ang mga natatanging transitive (gastos kung aalisin), o kasama ang lahat ng transitive (theoretical max). Bumalik sa laki ng archive kapag hindi available ang laki ng code.",
       "footprintLabel": "bakas ng paa:",
-      "footprintOwnTitle": "Sariling laki ng archive lamang — tumutugma sa laki ng pag-download ng pub.dev",
+      "footprintOwnTitle": "Sariling laki ng code lamang (lib + ipinahayag na mga asset); bumabalik sa laki ng archive ng pub.dev kapag hindi available",
       "footprintOwn": "Pag-aari",
       "footprintUniqueTitle": "Sariling laki + transitive na ginagamit lang ng dep na ito (matipid kung aalisin mo ito)",
       "footprintUnique": "+ Natatangi",
@@ -521,7 +539,7 @@
       },
       "size": {
         "label": "Sukat",
-        "tooltip": "Laki ng archive sa pub.dev (bago umuuga ang puno)"
+        "tooltip": "Laki ng code (lib + ipinahayag na mga asset); bumabalik sa laki ng archive ng pub.dev kapag hindi available ang laki ng code"
       },
       "deps": {
         "label": "Mga Dep",
@@ -668,12 +686,12 @@
       "generated": "Nabuo",
       "functionOne": "{count} na function",
       "functionOther": "{count} na function",
-      "avgFormat": "avg 0 (1) {score} {grade}",
+      "avgFormat": "avg 0 (1) {grade} {score}",
       "gatesFailing": "bagsak ang mga pintuan",
       "gatesPassing": "mga tarangkahan na dumadaan"
     },
     "gauge": {
-      "tooltip": "Average na marka 0 ng 100 (grade 1). {rounded} {grade}",
+      "tooltip": "Average na marka 0 ng 100 (grade 1). {grade} {rounded}",
       "ariaLabel": "Average na marka 0 ng 100 {rounded}"
     },
     "gate": {

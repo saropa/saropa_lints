@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "माध्यमिक निदान",
     "hero": {
       "productTitle": "निष्कर्ष डैशबोर्ड",
-      "gaugeTitle": "स्वास्थ्य स्कोर 0/100 (ग्रेड 1). त्रुटियाँ सबसे अधिक भारी पड़ती हैं। {score} {grade}"
+      "gaugeTitle": "स्वास्थ्य स्कोर 0/100 (ग्रेड 1). त्रुटियाँ सबसे अधिक भारी पड़ती हैं। {grade} {score}"
     },
     "time": {
       "justNow": "बस अब",
@@ -395,7 +395,7 @@
     "noMatchingFindingsCopy": "कॉपी करने के लिए कोई मेल खाने वाला निष्कर्ष नहीं.",
     "couldNotOpenFile": "फ़ाइल नहीं खुल सकी: 0 {path}",
     "saveReportNoWorkspace": "रिपोर्ट सहेजने से पहले एक कार्यस्थान फ़ोल्डर खोलें.",
-    "savedFindings": "सहेजे गए 0 निष्कर्ष: 1 {path} {count}",
+    "savedFindings": "सहेजे गए 0 निष्कर्ष: 1 {count} {path}",
     "couldNotSaveReportJson": "रिपोर्ट JSON सहेजा नहीं जा सका."
   },
   "packageDashboard": {
@@ -419,7 +419,7 @@
       "packages": "संकुल",
       "projectGrade": "प्रोजेक्ट पैकेज ग्रेड",
       "totalSize": "कुल आकार*",
-      "gradeTooltip": "प्रोजेक्ट ग्रेड 0\nऔसत स्कोर: 1/100\nपैकेज: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {a} {c} {avgGrade} {e} {avgScore} {b} {f}",
+      "gradeTooltip": "प्रोजेक्ट ग्रेड 0\nऔसत स्कोर: 1/100\nपैकेज: 2\nA:3 B:4 C:5 E:6 F:7 {c} {e} {a} {f} {b} {pkgCount} {avgGrade} {avgScore}",
       "vibrantTitle": "जीवंत",
       "stableTitle": "स्थिर",
       "outdatedTitle": "रगड़ा हुआ",
@@ -430,8 +430,26 @@
       "singleUse": "एक बार इस्तेमाल लायक",
       "vulnerable": "असुरक्षित",
       "overrides": "ओवरराइड",
-      "caveatLine1": "*पेड़ हिलाने से पहले आकार संग्रहित करें। वास्तविक ऐप का आकार छोटा होगा.",
+      "caveatLine1": "*कोड आकार दिखाए गए हैं (lib + घोषित संपत्ति), कोड आकार अनुपलब्ध होने पर वापस पब.डेव संग्रह आकार में आ जाता है। पेड़ के हिलने के बाद वास्तविक ऐप का आकार छोटा हो जाएगा।",
       "caveatLine2": "गतिविधि सीमाएँ: 90d = बासी, 180d = निष्क्रिय (प्रतिबद्ध + रिलीज़ समयसीमा)।"
+    },
+    "breakdown": {
+      "title": "ग्रेड 0 क्यों? - 1/100 औसत 2 पैकेजों में {grade} {pkgCount} {avgScore}",
+      "hint": "विस्तार करने के लिए क्लिक करें",
+      "distributionHeading": "वितरण",
+      "signalsHeading": "जोखिम संकेत स्कोर को नीचे खींच रहे हैं",
+      "signalFlagged": "{count} flagged (abandoned / end-of-life)",
+      "signalVulnerable": "{count} with known vulnerabilities",
+      "signalUpdates": "{count} have updates available",
+      "bottomHeading": "सबसे कम स्कोरिंग पैकेज",
+      "thresholdsHeading": "स्कोर को ग्रेड में कैसे मैप किया जाता है",
+      "thresholdA": "70+ - वाइब्रेंट: सक्रिय रूप से बनाए रखा गया, हाल ही में प्रकाशित",
+      "thresholdB": "40-69 - स्थिर: अभी भी कायम है लेकिन धीमा है",
+      "thresholdC": "20-39 - पुराना: रिलीज़ के बीच लंबा अंतराल",
+      "thresholdE": "20 से नीचे - परित्यक्त: निष्क्रियता के संकेत",
+      "thresholdF": "पब.देव पर बंद या संग्रहीत (स्कोर उपयोग नहीं किया गया)",
+      "filterTooltip": "पैकेज तालिका को केवल इसी श्रेणी में फ़िल्टर करें",
+      "jumpTooltip": "पैकेज तालिका में 0 पर जाएं {name}"
     },
     "network": {
       "summary": "निर्भरता नेटवर्क"
@@ -455,9 +473,9 @@
       "openOtherTitle": "वाइब्रेंसी स्कैन के लिए एक नई विंडो में एक और pubspec.yaml का प्रोजेक्ट खोलें",
       "openOtherLabel": "ओपन प्रोजेक्ट…",
       "footprintGroupAria": "आकार स्तंभ पदचिह्न मोड",
-      "footprintGroupTitle": "आकार कॉलम क्या दिखाता है: केवल स्वयं का संग्रह, साथ ही अद्वितीय ट्रांजिटिव (यदि हटा दिया गया है तो लागत), या प्लस सभी ट्रांजिटिव (सैद्धांतिक अधिकतम)।",
+      "footprintGroupTitle": "आकार कॉलम क्या दिखाता है: केवल स्वयं का कोड आकार, साथ ही अद्वितीय ट्रांजिटिव (यदि हटा दिया गया है तो लागत), या प्लस सभी ट्रांजिटिव (सैद्धांतिक अधिकतम)। कोड आकार अनुपलब्ध होने पर वापस संग्रह आकार में आ जाता है।",
       "footprintLabel": "पदचिह्न:",
-      "footprintOwnTitle": "केवल स्वयं का संग्रह आकार - पब.डेव डाउनलोड आकार से मेल खाता है",
+      "footprintOwnTitle": "केवल अपना कोड आकार (lib + घोषित संपत्ति); अनुपलब्ध होने पर वापस pub.dev संग्रह आकार में आ जाता है",
       "footprintOwn": "अपना",
       "footprintUniqueTitle": "स्वयं का आकार + केवल इस विभाग द्वारा उपयोग किए जाने वाले ट्रांजिटिव (यदि आप इसे हटाते हैं तो बचत होगी)",
       "footprintUnique": "+ अद्वितीय",
@@ -521,7 +539,7 @@
       },
       "size": {
         "label": "आकार",
-        "tooltip": "पब.देव पर संग्रह का आकार (पेड़ हिलाने से पहले)"
+        "tooltip": "कोड आकार (lib + घोषित संपत्ति); कोड आकार अनुपलब्ध होने पर वापस pub.dev संग्रह आकार में आ जाता है"
       },
       "deps": {
         "label": "डिप्स",
@@ -668,7 +686,7 @@
       "generated": "जनरेट किया गया",
       "functionOne": "{count} फ़ंक्शन",
       "functionOther": "{count} फ़ंक्शन",
-      "avgFormat": "औसत 0 (1) {score} {grade}",
+      "avgFormat": "औसत 0 (1) {grade} {score}",
       "gatesFailing": "गेट विफल हो रहे हैं",
       "gatesPassing": "द्वार गुजर रहे हैं"
     },

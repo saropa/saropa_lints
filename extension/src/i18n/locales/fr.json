@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "Diagnostic secondaire",
     "hero": {
       "productTitle": "Tableau de bord des résultats",
-      "gaugeTitle": "Score de santé 0/100 (grade 1). Les erreurs pèsent le plus lourd. {score} {grade}"
+      "gaugeTitle": "Score de santé 0/100 (grade 1). Les erreurs pèsent le plus lourd. {grade} {score}"
     },
     "time": {
       "justNow": "tout à l' heure",
@@ -419,7 +419,7 @@
       "packages": "Forfaits",
       "projectGrade": "Catégorie du package de projet",
       "totalSize": "Taille totale*",
-      "gradeTooltip": "Note du projet 0\nNote moyenne : 1/100\nForfaits : 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {a} {c} {avgGrade} {e} {avgScore} {b} {f}",
+      "gradeTooltip": "Note du projet 0\nNote moyenne : 1/100\nForfaits : 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {a} {f} {e} {avgGrade} {b} {avgScore} {c}",
       "vibrantTitle": "Dynamique",
       "stableTitle": "Écurie",
       "outdatedTitle": "Dépassé",
@@ -430,8 +430,26 @@
       "singleUse": "À usage unique",
       "vulnerable": "Vulnérable",
       "overrides": "Remplacements",
-      "caveatLine1": "*Archivez les tailles avant de secouer l’arbre. La taille réelle de l'application sera plus petite.",
+      "caveatLine1": "*Tailles de code affichées (lib + actifs déclarés), revenant à la taille de l'archive pub.dev lorsque la taille du code n'est pas disponible. La taille réelle de l'application sera plus petite après le tremblement de l'arbre.",
       "caveatLine2": "Seuils d'activité : 90 j = obsolète, 180 j = dormant (échéanciers de validation et de publication)."
+    },
+    "breakdown": {
+      "title": "Pourquoi noter 0 ? — 1/100 en moyenne sur 2 forfaits {pkgCount} {grade} {avgScore}",
+      "hint": "Cliquez pour agrandir",
+      "distributionHeading": "Distribution",
+      "signalsHeading": "Les signaux de risque font baisser le score",
+      "signalFlagged": "{count} flagged (abandoned / end-of-life)",
+      "signalVulnerable": "{count} with known vulnerabilities",
+      "signalUpdates": "{count} have updates available",
+      "bottomHeading": "Forfaits les moins bien notés",
+      "thresholdsHeading": "Comment les scores correspondent aux notes",
+      "thresholdA": "70+ — Vibrant : activement maintenu, récemment publié",
+      "thresholdB": "40-69 — Stable : toujours maintenu mais en ralentissement",
+      "thresholdC": "20-39 — Obsolète : longs écarts entre les versions",
+      "thresholdE": "en dessous de 20 — Abandonné : signes d’inactivité",
+      "thresholdF": "Arrêté ou archivé sur pub.dev (partition non utilisée)",
+      "filterTooltip": "Filtrer le tableau des packages uniquement sur cette catégorie",
+      "jumpTooltip": "Aller à 0 dans le tableau des packages {name}"
     },
     "network": {
       "summary": "Réseau de dépendance"
@@ -455,9 +473,9 @@
       "openOtherTitle": "Ouvrez un autre projet pubspec.yaml dans une nouvelle fenêtre pour l'analyse Vibrancy",
       "openOtherLabel": "Projet ouvert…",
       "footprintGroupAria": "Mode d'empreinte de colonne de taille",
-      "footprintGroupTitle": "Ce que montre la colonne Taille : votre propre archive uniquement, plus les transitifs uniques (coût en cas de suppression) ou plus tous les transitifs (maximum théorique).",
+      "footprintGroupTitle": "Ce que montre la colonne Taille : propre taille de code uniquement, plus les transitifs uniques (coût en cas de suppression) ou plus tous les transitifs (maximum théorique). Revient à la taille de l'archive lorsque la taille du code n'est pas disponible.",
       "footprintLabel": "Empreinte:",
-      "footprintOwnTitle": "Taille de l'archive propre uniquement : correspond à la taille du téléchargement de pub.dev",
+      "footprintOwnTitle": "Taille du code propre uniquement (lib + actifs déclarés) ; revient à la taille de l'archive pub.dev lorsqu'elle est indisponible",
       "footprintOwn": "Propre",
       "footprintUniqueTitle": "Taille propre + transitifs utilisés uniquement par ce département (économies si vous le supprimez)",
       "footprintUnique": "+ Unique",
@@ -521,7 +539,7 @@
       },
       "size": {
         "label": "Taille",
-        "tooltip": "Taille de l'archive sur pub.dev (avant le tremblement de l'arbre)"
+        "tooltip": "Taille du code (lib + actifs déclarés) ; revient à la taille de l'archive pub.dev lorsque la taille du code n'est pas disponible"
       },
       "deps": {
         "label": "Dépôts",
@@ -668,12 +686,12 @@
       "generated": "Généré",
       "functionOne": "{count} fonction",
       "functionOther": "{count} fonctions",
-      "avgFormat": "moyenne 0 (1) {score} {grade}",
+      "avgFormat": "moyenne 0 (1) {grade} {score}",
       "gatesFailing": "portes défaillantes",
       "gatesPassing": "passage des portes"
     },
     "gauge": {
-      "tooltip": "Note moyenne 0 sur 100 (note 1). {rounded} {grade}",
+      "tooltip": "Note moyenne 0 sur 100 (note 1). {grade} {rounded}",
       "ariaLabel": "Note moyenne 0 sur 100 {rounded}"
     },
     "gate": {

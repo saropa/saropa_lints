@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "التشخيص الثانوي",
     "hero": {
       "productTitle": "لوحة النتائج",
-      "gaugeTitle": "النتيجة الصحية 0/100 (الدرجة 1). الأخطاء تزن أثقل. {score} {grade}"
+      "gaugeTitle": "النتيجة الصحية 0/100 (الدرجة 1). الأخطاء تزن أثقل. {grade} {score}"
     },
     "time": {
       "justNow": "الآن",
@@ -419,7 +419,7 @@
       "packages": "الحزم",
       "projectGrade": "درجة حزمة المشروع",
       "totalSize": "الحجم الإجمالي*",
-      "gradeTooltip": "درجة المشروع 0\nمتوسط الدرجات: 1/100\nالحزم: 2\nأ:3 ب:4 ج:5 ه:6 و:٧ {pkgCount} {a} {c} {avgGrade} {e} {avgScore} {b} {f}",
+      "gradeTooltip": "درجة المشروع 0\nمتوسط الدرجات: 1/100\nالحزم: 2\nأ:3 ب:4 ج:5 ه:6 و:٧ {pkgCount} {a} {f} {e} {avgGrade} {b} {avgScore} {c}",
       "vibrantTitle": "نابضة بالحياة",
       "stableTitle": "مستقر",
       "outdatedTitle": "عفا عليها الزمن",
@@ -430,8 +430,26 @@
       "singleUse": "استخدام مرة واحدة",
       "vulnerable": "مُعَرَّض",
       "overrides": "يتجاوز",
-      "caveatLine1": "* أحجام الأرشيف قبل اهتزاز الشجرة. سيكون الحجم الفعلي للتطبيق أصغر.",
+      "caveatLine1": "*أحجام الأكواد المعروضة (lib + الأصول المعلنة)، تعود إلى حجم أرشيف pub.dev عندما لا يكون حجم الأكواد متاحًا. سيكون الحجم الفعلي للتطبيق أصغر بعد اهتزاز الشجرة.",
       "caveatLine2": "حدود النشاط: 90 يومًا = قديم، 180 يومًا = خامل (الالتزام + الجداول الزمنية للإصدار)."
+    },
+    "breakdown": {
+      "title": "لماذا الدرجة 0؟ — متوسط ​​1/100 عبر الحزم 2 {pkgCount} {grade} {avgScore}",
+      "hint": "انقر للتوسيع",
+      "distributionHeading": "توزيع",
+      "signalsHeading": "إشارات الخطر تسحب النتيجة إلى أسفل",
+      "signalFlagged": "{count} flagged (abandoned / end-of-life)",
+      "signalVulnerable": "{count} with known vulnerabilities",
+      "signalUpdates": "{count} have updates available",
+      "bottomHeading": "الحزم ذات الدرجات الأقل",
+      "thresholdsHeading": "كيفية تعيين النتائج إلى الدرجات",
+      "thresholdA": "70+ — نابضة بالحياة: تمت صيانتها بنشاط، وتم نشرها مؤخرًا",
+      "thresholdB": "40–69 — مستقر: لا يزال موجودًا ولكنه يتباطأ",
+      "thresholdC": "20–39 — عفا عليها الزمن: فجوات طويلة بين الإصدارات",
+      "thresholdE": "أقل من 20 - مهجور: علامات الخمول",
+      "thresholdF": "تم إيقافه أو أرشفته على pub.dev (النتيجة غير مستخدمة)",
+      "filterTooltip": "قم بتصفية جدول الحزمة إلى هذه الفئة فقط",
+      "jumpTooltip": "انتقل إلى 0 في جدول الحزمة {name}"
     },
     "network": {
       "summary": "شبكة التبعية"
@@ -455,9 +473,9 @@
       "openOtherTitle": "افتح مشروع pubspec.yaml آخر في نافذة جديدة لفحص Vibrancy",
       "openOtherLabel": "مشروع مفتوح…",
       "footprintGroupAria": "وضع بصمة عمود الحجم",
-      "footprintGroupTitle": "ما يعرضه عمود الحجم: الأرشيف الخاص فقط، بالإضافة إلى المتعديات الفريدة (التكلفة في حالة إزالتها)، أو بالإضافة إلى جميع المتعديات (الحد الأقصى النظري).",
+      "footprintGroupTitle": "ما يعرضه عمود الحجم: حجم الكود الخاص فقط، بالإضافة إلى المتعديات الفريدة (التكلفة في حالة إزالتها)، أو بالإضافة إلى جميع المتعديات (الحد الأقصى النظري). يعود إلى حجم الأرشيف عندما يكون حجم الكود غير متاح.",
       "footprintLabel": "البصمة:",
-      "footprintOwnTitle": "حجم الأرشيف الخاص فقط — يطابق حجم تنزيل pub.dev",
+      "footprintOwnTitle": "حجم الكود الخاص فقط (lib + الأصول المعلنة)؛ يعود إلى حجم أرشيف pub.dev عندما لا يكون متاحًا",
       "footprintOwn": "ملك",
       "footprintUniqueTitle": "الحجم الخاص + العناصر المتعدية التي يستخدمها هذا القسم فقط (التوفير إذا قمت بإزالته)",
       "footprintUnique": "+ فريدة من نوعها",
@@ -521,7 +539,7 @@
       },
       "size": {
         "label": "مقاس",
-        "tooltip": "حجم الأرشيف على pub.dev (قبل اهتزاز الشجرة)"
+        "tooltip": "حجم الكود (lib + الأصول المعلنة)؛ يعود إلى حجم أرشيف pub.dev عندما لا يكون حجم الكود متاحًا"
       },
       "deps": {
         "label": "الإقلاع",
@@ -668,12 +686,12 @@
       "generated": "تم إنشاؤها",
       "functionOne": "{count} دالة",
       "functionOther": "{count} دوال",
-      "avgFormat": "المتوسط ​​0 (1) {score} {grade}",
+      "avgFormat": "المتوسط ​​0 (1) {grade} {score}",
       "gatesFailing": "بوابات الفشل",
       "gatesPassing": "مرور البوابات"
     },
     "gauge": {
-      "tooltip": "متوسط ​​الدرجات 0 من 100 (الدرجة 1). {rounded} {grade}",
+      "tooltip": "متوسط ​​الدرجات 0 من 100 (الدرجة 1). {grade} {rounded}",
       "ariaLabel": "متوسط ​​الدرجات 0 من 100 {rounded}"
     },
     "gate": {

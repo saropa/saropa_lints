@@ -7,7 +7,7 @@
   "views.actions.name": "Azioni",
   "views.status.name": "Stato",
   "views.settings.name": "Impostazioni",
-  "views.help.name": "Help (v13.9.0)",
+  "views.help.name": "Aiuto (v13.9.0)",
   "viewsWelcome.banner.contents": "**Lanugine Saropa**\n\nOltre 2100 regole Dart e Flutter per sicurezza, accessibilità e prestazioni.\n\nRichiede un progetto Dart o Flutter.\n\nApri una cartella contenente un `pubspec.yaml` per iniziare.\n\n[Ulteriori informazioni online](https://pub.dev/packages/saropa_lints)\n[Sfoglia tutti i comandi](command:saropaLints.showCommandCatalog)\n[Informazioni su Saropa Lints](command:saropaLints.showAbout)\n[Per iniziare](comando:saropaLints.openProcedura dettagliata)",
   "command.enable.title": "Saropa Lints: impostazione del progetto (pubspec + configurazione)",
   "command.disable.title": "Saropa Lint: disattiva l'integrazione Lint",

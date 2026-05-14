@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "সেকেন্ডারি ডায়াগনস্টিকস",
     "hero": {
       "productTitle": "অনুসন্ধান ড্যাশবোর্ড",
-      "gaugeTitle": "স্বাস্থ্য স্কোর 0/100 (গ্রেড 1)। ত্রুটিগুলি সবচেয়ে ভারী। {score} {grade}"
+      "gaugeTitle": "স্বাস্থ্য স্কোর 0/100 (গ্রেড 1)। ত্রুটিগুলি সবচেয়ে ভারী। {grade} {score}"
     },
     "time": {
       "justNow": "এইমাত্র",
@@ -419,7 +419,7 @@
       "packages": "প্যাকেজ",
       "projectGrade": "প্রকল্প প্যাকেজ গ্রেড",
       "totalSize": "মোট আকার*",
-      "gradeTooltip": "প্রকল্প গ্রেড 0\nগড় স্কোর: 1/100\nপ্যাকেজ: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {a} {c} {avgGrade} {e} {avgScore} {b} {f}",
+      "gradeTooltip": "প্রকল্প গ্রেড 0\nগড় স্কোর: 1/100\nপ্যাকেজ: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {a} {f} {e} {avgGrade} {b} {avgScore} {c}",
       "vibrantTitle": "প্রাণবন্ত",
       "stableTitle": "স্থিতিশীল",
       "outdatedTitle": "সেকেলে",
@@ -430,8 +430,26 @@
       "singleUse": "একক ব্যবহার",
       "vulnerable": "দুর্বল",
       "overrides": "ওভাররাইড করে",
-      "caveatLine1": "*গাছ কাঁপানোর আগে আর্কাইভ মাপ। প্রকৃত অ্যাপের আকার ছোট হবে।",
+      "caveatLine1": "*কোডের আকার দেখানো হয়েছে (lib + ঘোষিত সম্পদ), যখন কোডের আকার অনুপলব্ধ থাকে তখন pub.dev সংরক্ষণাগার আকারে ফিরে আসে। গাছ কাঁপানোর পর প্রকৃত অ্যাপের আকার ছোট হবে।",
       "caveatLine2": "অ্যাক্টিভিটি থ্রেশহোল্ড: 90d = বাসি, 180d = সুপ্ত (কমিট + রিলিজ টাইমলাইন)।"
+    },
+    "breakdown": {
+      "title": "কেন গ্রেড 0? — 1/100 গড় 2 প্যাকেজ জুড়ে {pkgCount} {grade} {avgScore}",
+      "hint": "প্রসারিত করতে ক্লিক করুন",
+      "distributionHeading": "বিতরণ",
+      "signalsHeading": "স্কোর নিচে টেনে ঝুঁকি সংকেত",
+      "signalFlagged": "{count} flagged (abandoned / end-of-life)",
+      "signalVulnerable": "{count} with known vulnerabilities",
+      "signalUpdates": "{count} have updates available",
+      "bottomHeading": "সর্বনিম্ন স্কোরিং প্যাকেজ",
+      "thresholdsHeading": "স্কোর কিভাবে গ্রেডে মানচিত্র করে",
+      "thresholdA": "70+ — প্রাণবন্ত: সক্রিয়ভাবে রক্ষণাবেক্ষণ করা হয়েছে, সম্প্রতি প্রকাশিত হয়েছে",
+      "thresholdB": "40-69 — স্থিতিশীল: এখনও বজায় আছে কিন্তু ধীর",
+      "thresholdC": "20-39 — পুরানো: রিলিজের মধ্যে দীর্ঘ ব্যবধান",
+      "thresholdE": "20 এর নিচে — পরিত্যক্ত: নিষ্ক্রিয়তার লক্ষণ",
+      "thresholdF": "pub.dev-এ বন্ধ বা সংরক্ষণাগারভুক্ত (স্কোর ব্যবহার করা হয়নি)",
+      "filterTooltip": "শুধু এই বিভাগে প্যাকেজ টেবিল ফিল্টার",
+      "jumpTooltip": "প্যাকেজ টেবিলে 0-এ যান {name}"
     },
     "network": {
       "summary": "নির্ভরতা নেটওয়ার্ক"
@@ -455,9 +473,9 @@
       "openOtherTitle": "ভাইব্রেন্সি স্ক্যানের জন্য একটি নতুন উইন্ডোতে আরেকটি pubspec.yaml এর প্রকল্প খুলুন",
       "openOtherLabel": "প্রকল্প খুলুন...",
       "footprintGroupAria": "সাইজ কলাম ফুটপ্রিন্ট মোড",
-      "footprintGroupTitle": "সাইজ কলাম যা দেখায়: শুধুমাত্র নিজস্ব সংরক্ষণাগার, প্লাস অনন্য ট্রানজিটিভ (সরানো হলে খরচ), বা প্লাস সমস্ত ট্রানজিটিভ (তাত্ত্বিক সর্বোচ্চ)।",
+      "footprintGroupTitle": "সাইজ কলাম যা দেখায়: শুধুমাত্র নিজের কোড সাইজ, প্লাস ইউনিক ট্রানজিটিভ (সরানো হলে খরচ), বা প্লাস সব ট্রানজিটিভ (তাত্ত্বিক সর্বোচ্চ)। কোডের আকার অনুপলব্ধ হলে সংরক্ষণাগার আকারে ফিরে আসে।",
       "footprintLabel": "পদচিহ্ন:",
-      "footprintOwnTitle": "শুধুমাত্র নিজস্ব সংরক্ষণাগার আকার — pub.dev ডাউনলোড আকারের সাথে মেলে",
+      "footprintOwnTitle": "শুধুমাত্র নিজস্ব কোড আকার (lib + ঘোষিত সম্পদ); অনুপলব্ধ হলে pub.dev সংরক্ষণাগার আকারে ফিরে আসে",
       "footprintOwn": "নিজের",
       "footprintUniqueTitle": "নিজস্ব আকার + ট্রানজিটিভ শুধুমাত্র এই ডিপ দ্বারা ব্যবহৃত হয় (যদি আপনি এটি সরিয়ে দেন)",
       "footprintUnique": "+ অনন্য",
@@ -521,7 +539,7 @@
       },
       "size": {
         "label": "আকার",
-        "tooltip": "pub.dev-এ সংরক্ষণাগারের আকার (গাছ কাঁপানোর আগে)"
+        "tooltip": "কোড আকার (lib + ঘোষিত সম্পদ); কোড আকার অনুপলব্ধ হলে pub.dev সংরক্ষণাগার আকারে ফিরে আসে"
       },
       "deps": {
         "label": "ডিপস",
@@ -668,12 +686,12 @@
       "generated": "উৎপন্ন",
       "functionOne": "{count} ফাংশন",
       "functionOther": "{count} ফাংশন",
-      "avgFormat": "গড় 0 (1) {score} {grade}",
+      "avgFormat": "গড় 0 (1) {grade} {score}",
       "gatesFailing": "গেট ব্যর্থ",
       "gatesPassing": "গেট পাসিং"
     },
     "gauge": {
-      "tooltip": "গড় স্কোর 100 এর মধ্যে 0 (গ্রেড 1)। {rounded} {grade}",
+      "tooltip": "গড় স্কোর 100 এর মধ্যে 0 (গ্রেড 1)। {grade} {rounded}",
       "ariaLabel": "গড় স্কোর 100 এর মধ্যে 0 {rounded}"
     },
     "gate": {

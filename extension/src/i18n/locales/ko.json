@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "2차 진단",
     "hero": {
       "productTitle": "발견 항목 대시보드",
-      "gaugeTitle": "건강 점수 0/100(학년 1). 오류의 무게가 가장 무겁습니다. {score} {grade}"
+      "gaugeTitle": "건강 점수 0/100(학년 1). 오류의 무게가 가장 무겁습니다. {grade} {score}"
     },
     "time": {
       "justNow": "방금",
@@ -419,7 +419,7 @@
       "packages": "패키지",
       "projectGrade": "프로젝트 패키지 등급",
       "totalSize": "전체 크기*",
-      "gradeTooltip": "프로젝트 등급 0\n평균 점수: 1/100\n패키지: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {a} {c} {avgGrade} {e} {avgScore} {b} {f}",
+      "gradeTooltip": "프로젝트 등급 0\n평균 점수: 1/100\n패키지: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {a} {f} {e} {avgGrade} {b} {avgScore} {c}",
       "vibrantTitle": "떠는",
       "stableTitle": "안정적인",
       "outdatedTitle": "구식",
@@ -430,8 +430,26 @@
       "singleUse": "일회용",
       "vulnerable": "취약한",
       "overrides": "재정의",
-      "caveatLine1": "*트리 쉐이킹 전 아카이브 크기. 실제 앱 크기는 더 작습니다.",
+      "caveatLine1": "*표시된 코드 크기(lib + 선언된 자산), 코드 크기를 사용할 수 없는 경우 pub.dev 아카이브 크기로 대체됩니다. 트리 흔들기 후에는 실제 앱 크기가 더 작아집니다.",
       "caveatLine2": "활동 임계값: 90일 = 오래됨, 180일 = 휴면(커밋 + 릴리스 타임라인)."
+    },
+    "breakdown": {
+      "title": "왜 0등급인가요? — 2 패키지 전체 평균 1/100 {pkgCount} {grade} {avgScore}",
+      "hint": "펼치려면 클릭하세요.",
+      "distributionHeading": "분포",
+      "signalsHeading": "점수를 낮추는 위험 신호",
+      "signalFlagged": "{count} flagged (abandoned / end-of-life)",
+      "signalVulnerable": "{count} with known vulnerabilities",
+      "signalUpdates": "{count} have updates available",
+      "bottomHeading": "가장 낮은 점수를 받은 패키지",
+      "thresholdsHeading": "점수가 성적에 매핑되는 방식",
+      "thresholdA": "70+ — 활기: 적극적으로 유지 관리되고 최근 게시됨",
+      "thresholdB": "40–69 — 안정적: 여전히 유지되지만 속도가 느려지고 있음",
+      "thresholdC": "20–39 — 오래됨: 릴리스 간 간격이 깁니다.",
+      "thresholdE": "20 미만 — 포기됨: 활동이 없다는 징후",
+      "thresholdF": "pub.dev에서 중단되거나 보관됨(점수는 사용되지 않음)",
+      "filterTooltip": "패키지 테이블을 이 카테고리로만 필터링하세요.",
+      "jumpTooltip": "패키지 테이블의 0로 점프 {name}"
     },
     "network": {
       "summary": "종속성 네트워크"
@@ -455,9 +473,9 @@
       "openOtherTitle": "Vibrancy 스캔을 위해 새 창에서 다른 pubspec.yaml 프로젝트를 엽니다.",
       "openOtherLabel": "프로젝트 열기…",
       "footprintGroupAria": "크기 열 공간 모드",
-      "footprintGroupTitle": "크기 열에 표시되는 내용: 자체 아카이브만 + 고유 전이(제거된 경우 비용) 또는 모든 전이(이론적 최대값)를 더한 것입니다.",
+      "footprintGroupTitle": "크기 열에 표시되는 내용: 자체 코드 크기만 + 고유 추이(제거된 경우 비용) 또는 모든 추이(이론적 최대값)를 더한 것입니다. 코드 크기를 사용할 수 없으면 아카이브 크기로 대체됩니다.",
       "footprintLabel": "발자국:",
-      "footprintOwnTitle": "자체 아카이브 크기만 — pub.dev 다운로드 크기와 일치",
+      "footprintOwnTitle": "자체 코드 크기만 해당(lib + 선언된 자산). 사용할 수 없는 경우 pub.dev 아카이브 크기로 대체",
       "footprintOwn": "소유하다",
       "footprintUniqueTitle": "자체 크기 + 이 Dep에서만 사용되는 전이사(제거하면 절약됨)",
       "footprintUnique": "+ 독특함",
@@ -521,7 +539,7 @@
       },
       "size": {
         "label": "크기",
-        "tooltip": "pub.dev의 아카이브 크기(트리 쉐이킹 전)"
+        "tooltip": "코드 크기(lib + 선언된 자산) 코드 크기를 사용할 수 없는 경우 pub.dev 아카이브 크기로 대체"
       },
       "deps": {
         "label": "뎁스",
@@ -668,12 +686,12 @@
       "generated": "생성됨",
       "functionOne": "{count}개 함수",
       "functionOther": "{count}개 함수",
-      "avgFormat": "평균 0 (1) {score} {grade}",
+      "avgFormat": "평균 0 (1) {grade} {score}",
       "gatesFailing": "게이트 실패",
       "gatesPassing": "게이트 통과"
     },
     "gauge": {
-      "tooltip": "평균 점수 0/100(등급 1). {rounded} {grade}",
+      "tooltip": "평균 점수 0/100(등급 1). {grade} {rounded}",
       "ariaLabel": "100점 만점의 평균 점수 0 {rounded}"
     },
     "gate": {

@@ -45,7 +45,7 @@
 
 ---
 
-## [Unreleased]
+## [13.9.1]
 
 ### Fixed
 
@@ -58,10 +58,18 @@
 ### Fixed (Extension)
 
 - **Package Dashboard now shows code size, not tarball size, across every surface** — the Size column, Total Size summary card, package detail panel, package comparison "Code Size" dimension, sidebar detail view, and Size Distribution chart all now read what each package contributes to your built app (its `lib/` plus declared assets), with the gzipped archive total as a labeled fallback when the analyzer hasn't run yet. The Package Dashboard's Health Score panel also gains `+example` / `+tests` / `+tools` / `+docs` rows when a package ships those folders, so the bonus already feeding the overall score is now visible row-by-row instead of invisible. Previously the v13.9.0 fix only landed in the editor hover; every dashboard surface still showed the old tarball number (e.g. `audioplayers` rendering as 20,535 KB on the Dashboard table). No action required.
+- **Package Dashboard size tooltips now describe code size in every language** — the Size column header, Total Size caveat, and Footprint toggle tooltips said "archive size before tree shaking" in all 25 shipped locales, contradicting the corrected number shown beside them. The copy now explains the column reports code size (lib + declared assets) and falls back to archive size only when code size is unavailable. No action required.
 - **Package Dashboard radial grade gauge now paints the arc again** — under the strict webview CSP the inline CSS variables that drove the stroke length were being dropped, so only a single rounded line-cap dot was visible next to the letter grade. The arc and its load animation now use SVG presentation attributes and SMIL, which survive the CSP. No action required.
 - **Package Vibrancy toolbar no longer shows a redundant "Search packages" label next to the search box** — the label is now hidden from view (it remains for screen readers) so the placeholder text inside the input is the only visible cue. No action required.
 - **Package Vibrancy toolbar buttons read as buttons in every theme** — Rescan / Open Project / Copy / Save / pubspec.yaml had a full-pill shape and a transparent border fallback that disappeared on themes that don't define `button.border`. Buttons now use a softer rounded-rect (6px) and fall back to `widget.border`, matching the FOOTPRINT segmented control which moved off the full-pill shape for the same reason. No action required.
 - **"All" age-slider label no longer reads as the value of the Preset dropdown** — the divider between the Published-age group and the Preset group is now higher-contrast, the trailing gap is wider, and the slider's max-value readout sits in a small chip so it stops blending into the neighboring "Preset" label. No action required.
+
+<details><summary>Maintenance</summary>
+
+- Added dedicated tests pinning the code-size dashboard behaviors (size cell prefers `codeSizeBytes`, archive fallback, on-disk tooltip asymmetry, Health Score maintainer-quality rows, `codeSize` JSON export field, "Code size" column tooltip copy).
+- Added `comparison-ranker.test.ts` to the test `tsconfig` include list — the file existed but never compiled, so its stale "Archive Size" dimension assertion went unrun.
+
+</details>
 
 ---
 
