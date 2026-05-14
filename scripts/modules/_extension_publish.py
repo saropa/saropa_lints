@@ -89,6 +89,23 @@ def copy_changelog_to_extension(project_dir: Path) -> bool:
     return True
 
 
+def copy_readme_to_extension(project_dir: Path) -> bool:
+    """Copy root README.md to extension/README.md for the .vsix (single source of truth).
+
+    The package and the extension are one product; the Marketplace listing
+    renders the same README as pub.dev. extension/README.md is gitignored and
+    regenerated here so the two listings cannot drift apart.
+
+    Returns True if copied, False if root README.md missing.
+    """
+    root_readme = project_dir / "README.md"
+    ext_readme = _extension_dir(project_dir) / "README.md"
+    if not root_readme.is_file():
+        return False
+    ext_readme.write_text(root_readme.read_text(encoding="utf-8"), encoding="utf-8")
+    return True
+
+
 def set_extension_version(project_dir: Path, version: str) -> bool:
     """Set extension/package.json version to match the package version.
 
@@ -323,11 +340,13 @@ def publish_extension_to_ovsx(project_dir: Path, vsix_path: Path) -> bool:
 
 
 def package_extension(project_dir: Path, version: str) -> Path | None:
-    """Sync version, copy root changelog, compile, and package .vsix. Returns path to .vsix or None."""
+    """Sync version, copy root changelog + readme, compile, and package .vsix. Returns path to .vsix or None."""
     if not set_extension_version(project_dir, version):
         print_warning("Could not set extension version in package.json")
     if not copy_changelog_to_extension(project_dir):
         print_warning("Root CHANGELOG.md not found; extension .vsix will have no changelog.")
+    if not copy_readme_to_extension(project_dir):
+        print_warning("Root README.md not found; extension .vsix will have no README.")
     regen = regenerate_extension_locales_from_english(project_dir)
     if regen is True:
         print_success("Extension locale JSON regenerated from English sources.")

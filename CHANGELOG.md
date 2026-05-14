@@ -45,6 +45,16 @@
 
 ---
 
+## [13.9.2]
+
+<details><summary>Maintenance</summary>
+
+- **The pub.dev and VS Code Marketplace listings now share one README** — `extension/README.md` is gitignored and regenerated from the root `README.md` at publish time (same pattern already used for `extension/CHANGELOG.md`), so the package and extension descriptions can no longer drift apart.
+
+</details>
+
+---
+
 ## [13.9.1]
 
 ### Fixed
