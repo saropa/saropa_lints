@@ -4726,6 +4726,15 @@ enum _AncestorResult {
 /// hierarchy includes any of [targetParents] (e.g. a custom widget that
 /// extends `Stack` will match `{'Stack'}`).
 ///
+/// When [treatCustomWidgetParentAsIndeterminate] is `true`, the first widget
+/// constructor encountered on the way up is checked against the Flutter
+/// framework allowlist. If it is a user-defined (custom) widget — which can
+/// internally spread `child` / `children` into a `Stack`, `IndexedStack`,
+/// `Wrap`, etc. — we cannot statically determine the runtime parent and
+/// return [_AncestorResult.indeterminate] instead of continuing past it.
+/// Flutter framework widgets (Column, Row, Container, ...) have predictable
+/// child placement, so we keep walking past them.
+///
 /// Returns [_AncestorResult.found] if a target parent is found.
 /// Returns [_AncestorResult.wrongParent] if a widget in [stopAt] is found
 /// before any target parent.
@@ -4736,6 +4745,7 @@ _AncestorResult _findWidgetAncestor(
   required Set<String> targetParents,
   Set<String> stopAt = const <String>{},
   bool checkSuperTypes = false,
+  bool treatCustomWidgetParentAsIndeterminate = false,
   int maxDepth = 20,
 }) {
   AstNode? current = startNode.parent;
@@ -4794,11 +4804,33 @@ _AncestorResult _findWidgetAncestor(
       if (targetParents.contains(parentType)) return _AncestorResult.found;
       if (stopAt.contains(parentType)) return _AncestorResult.wrongParent;
 
-      // Check if the parent widget is a subclass of any target.
+      // Check if the parent widget is a subclass of any target. Must run
+      // before the custom-widget check below, otherwise a custom subclass
+      // of `Stack` (e.g. `Indexer` from `package:indexed`) would be
+      // misclassified as a user widget and lose its `found` match.
       if (checkSuperTypes) {
         if (_isSubtypeOfAny(current.staticType, targetParents)) {
           return _AncestorResult.found;
         }
+      }
+
+      // FP guard: a user-defined widget can spread its `child` / `children`
+      // parameter into a `Stack` (or any other layout) internally. The AST
+      // walk has no visibility into the consumer's `build()` method, so we
+      // cannot prove the runtime parent is or isn't `Stack`. Treat as
+      // indeterminate when this is the FIRST widget ancestor (i.e. the
+      // direct widget consumer of [startNode]). Subsequent ICs higher up
+      // are grandparents and do not change the direct child-relationship,
+      // so the check is gated on `!passedThroughWidget`.
+      //
+      // Failure mode this prevents: `FocusCard(backgroundLayers: [Positioned(...)])`
+      // where `FocusCard` internally spreads `backgroundLayers` into a
+      // `Stack`. The runtime parent IS `Stack`, but the ancestor walk
+      // only sees `FocusCard` and used to return `notFound` -> false lint.
+      if (treatCustomWidgetParentAsIndeterminate &&
+          !passedThroughWidget &&
+          _isCustomFlutterWidget(current)) {
+        return _AncestorResult.indeterminate;
       }
 
       passedThroughWidget = true;
@@ -4836,6 +4868,54 @@ bool _isSubtypeOfAny(DartType? type, Set<String> targetNames) {
   }
 
   return false;
+}
+
+/// Returns `true` if [node] constructs a `Widget` whose declaring library is
+/// not part of the Flutter framework.
+///
+/// Used by [_findWidgetAncestor] to decide whether walking past a widget IC
+/// is safe for child-relationship lints. Flutter framework widgets render
+/// their `child` / `children` predictably (Column places children in a
+/// row, Container wraps a single child, Padding insets one child, ...) so
+/// the ancestor walk can confidently keep going. A user-defined widget,
+/// by contrast, can wrap its parameter in arbitrary layouts inside its
+/// own `build()` — including a hidden `Stack`, `IndexedStack`, or `Wrap`
+/// that the static walk cannot see. Treating that boundary as indeterminate
+/// is what lets `FocusCard(backgroundLayers: [Positioned(...)])` not lint
+/// when `FocusCard` is the kind of card widget that internally spreads
+/// `backgroundLayers` into a `Stack`.
+///
+/// The library URI check catches real Flutter code (`package:flutter/...`).
+/// The `/flutter_mocks.dart` suffix covers this repo's example fixture
+/// package — its mock widgets stand in for the real Flutter SDK and
+/// should be classified the same way.
+bool _isCustomFlutterWidget(InstanceCreationExpression node) {
+  final DartType? type = node.staticType;
+  if (type is! InterfaceType) return false;
+
+  bool extendsWidget = type.element.name == 'Widget';
+  if (!extendsWidget) {
+    for (final InterfaceType supertype in type.allSupertypes) {
+      if (supertype.element.name == 'Widget') {
+        extendsWidget = true;
+        break;
+      }
+    }
+  }
+  if (!extendsWidget) return false;
+
+  final String libraryUri = type.element.library.identifier;
+
+  // Flutter framework and dart: SDK libraries — predictable layout.
+  if (libraryUri.startsWith('package:flutter/')) return false;
+  if (libraryUri.startsWith('dart:')) return false;
+
+  // Local mock package used by saropa_lints fixtures stands in for the
+  // real Flutter SDK; treat as framework so test fixtures behave like
+  // production Flutter code.
+  if (libraryUri.endsWith('/flutter_mocks.dart')) return false;
+
+  return true;
 }
 
 // =========================================================================
@@ -4977,6 +5057,10 @@ class AvoidPositionedOutsideStackRule extends SaropaLintRule {
         node,
         targetParents: const <String>{'Stack', 'IndexedStack'},
         checkSuperTypes: true,
+        // Custom widgets often spread `child` / `children` into an internal
+        // `Stack` (e.g. card widgets with a `backgroundLayers` parameter).
+        // The walk cannot see inside such widgets, so be conservative.
+        treatCustomWidgetParentAsIndeterminate: true,
       );
 
       if (result == _AncestorResult.found) return;

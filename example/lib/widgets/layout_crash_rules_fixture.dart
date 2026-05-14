@@ -94,6 +94,44 @@ Widget testPositionedInColumnInsideBuilderIndeterminate() {
   );
 }
 
+// FP guard: a custom user widget that takes a `List<Widget>` parameter and
+// spreads it into an internal Stack is invisible to static analysis. The
+// runtime parent IS a Stack but the AST walk only sees the custom widget.
+// Treating the custom-widget boundary as indeterminate avoids the false
+// positive without weakening the rule for the genuinely-broken
+// `Column(children: [Positioned(...)])` case (Column is a Flutter widget,
+// so the walk continues past it and still lints).
+
+class _FocusCard extends StatelessWidget {
+  const _FocusCard({required this.child, this.backgroundLayers = const []});
+
+  final List<Widget> backgroundLayers;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(children: <Widget>[...backgroundLayers, child]);
+  }
+}
+
+Widget testPositionedInCustomWidgetBackgroundLayersIndeterminate() {
+  // Positioned passed via a List<Widget> parameter to a custom widget that
+  // internally spreads the list into a Stack. The static walker cannot see
+  // into `_FocusCard.build()`, so this is indeterminate (no lint).
+  return _FocusCard(
+    backgroundLayers: <Widget>[
+      Positioned(top: 10, child: Text('watermark')),
+    ],
+    child: Text('content'),
+  );
+}
+
+Widget testPositionedInCustomWidgetChildIndeterminate() {
+  // Same idea via the single `child:` slot — custom widgets can wrap a
+  // single child in a Stack too. Indeterminate (no lint).
+  return _FocusCard(child: Positioned(top: 10, child: Text('watermark')));
+}
+
 // ============================================================
 // avoid_spacer_in_wrap
 // ============================================================

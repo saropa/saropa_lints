@@ -47,12 +47,17 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- **`avoid_positioned_outside_stack` no longer fires when `Positioned` is passed via a `List<Widget>` (or `child:`) parameter to a custom widget that internally spreads it into a `Stack`** — e.g. `FocusCard(backgroundLayers: [Positioned(...)])` where `FocusCard` is a user-defined card that hosts a Stack inside its own `build()`. The ancestor walk now treats the direct custom-widget parent as indeterminate (its internal layout is invisible to static analysis); Flutter framework widgets like `Column`/`Row` are still walked past, so the real bug `Column(children: [Positioned(...)])` continues to lint. No action required — remove any `// ignore: avoid_positioned_outside_stack` you added for this shape.
+
 ### Added (Extension)
 
 - **Package Dashboard now explains the project grade** — clicking the radial gauge (or the **Project Package Grade** summary card) opens a new "Why this grade?" panel showing the score distribution, risk signals (flagged / vulnerable / updates available), the five lowest-scoring packages, and the score-to-grade thresholds. Every row inside the panel is interactive: distribution and signal entries filter the package table, and the lowest-scoring entries jump straight to the relevant row. No action required.
 
 ### Fixed (Extension)
 
+- **Package Dashboard now shows code size, not tarball size, across every surface** — the Size column, Total Size summary card, package detail panel, package comparison "Code Size" dimension, sidebar detail view, and Size Distribution chart all now read what each package contributes to your built app (its `lib/` plus declared assets), with the gzipped archive total as a labeled fallback when the analyzer hasn't run yet. The Package Dashboard's Health Score panel also gains `+example` / `+tests` / `+tools` / `+docs` rows when a package ships those folders, so the bonus already feeding the overall score is now visible row-by-row instead of invisible. Previously the v13.9.0 fix only landed in the editor hover; every dashboard surface still showed the old tarball number (e.g. `audioplayers` rendering as 20,535 KB on the Dashboard table). No action required.
 - **Package Dashboard radial grade gauge now paints the arc again** — under the strict webview CSP the inline CSS variables that drove the stroke length were being dropped, so only a single rounded line-cap dot was visible next to the letter grade. The arc and its load animation now use SVG presentation attributes and SMIL, which survive the CSP. No action required.
 - **Package Vibrancy toolbar no longer shows a redundant "Search packages" label next to the search box** — the label is now hidden from view (it remains for screen readers) so the placeholder text inside the input is the only visible cue. No action required.
 - **Package Vibrancy toolbar buttons read as buttons in every theme** — Rescan / Open Project / Copy / Save / pubspec.yaml had a full-pill shape and a transparent border fallback that disappeared on themes that don't define `button.border`. Buttons now use a softer rounded-rect (6px) and fall back to `widget.border`, matching the FOOTPRINT segmented control which moved off the full-pill shape for the same reason. No action required.
