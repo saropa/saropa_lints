@@ -185,7 +185,7 @@
       "help": "Ayuda",
       "groupBy": "Agrupar por…",
       "textFilter": "Filtro de texto…",
-      "severityImpact": "Gravedad e impacto",
+      "severityImpact": "Severity filter…",
       "hideRules": "Ocultar reglas…",
       "ruleMetadata": "Metadatos de reglas",
       "clearFilters": "Limpiar filtros",
@@ -196,7 +196,19 @@
       "refreshExtension": "Actualizar extensión",
       "openPackageDashboard": "Abrir panel de paquete",
       "openCodeHealth": "Salud del código abierto",
-      "openLintsConfig": "Abrir configuración de Lints"
+      "openLintsConfig": "Abrir configuración de Lints",
+      "reloadFromDisk": "Reload from disk",
+      "reloadFromDiskTitle": "Re-render the dashboard from the last violations.json without re-running the analyzer.",
+      "reEnableDisabledRules": "Re-enable disabled rules…",
+      "reEnableDisabledRulesTitle": "Open a quick-pick of rules currently disabled in analysis_options_custom.yaml and re-enable the chosen ones.",
+      "reEnableNoneTitle": "No rules currently disabled",
+      "reEnableNoneMessage": "No rules are currently disabled via analysis_options_custom.yaml.",
+      "reEnableQuickPickTitle": "Re-enable disabled rules",
+      "reEnableQuickPickPlaceholder": "Select one or more rules to re-enable",
+      "menuGroupExport": "Export",
+      "menuGroupFilter": "Filter & focus",
+      "menuGroupOpen": "Open dashboard",
+      "menuGroupSystem": "System"
     },
     "progress": {
       "runningLabel": "Análisis en ejecución…",
@@ -395,7 +407,7 @@
     "noMatchingFindingsCopy": "No hay resultados coincidentes para copiar.",
     "couldNotOpenFile": "No se pudo abrir el archivo: 0 {path}",
     "saveReportNoWorkspace": "Abra una carpeta del espacio de trabajo antes de guardar el informe.",
-    "savedFindings": "Guardado 0 hallazgo(s): 1 {count} {path}",
+    "savedFindings": "Guardado 0 hallazgo(s): 1 {path} {count}",
     "couldNotSaveReportJson": "No se pudo guardar el informe JSON."
   },
   "packageDashboard": {
@@ -419,7 +431,7 @@
       "packages": "Paquetes",
       "projectGrade": "Grado del paquete del proyecto",
       "totalSize": "Tamaño total*",
-      "gradeTooltip": "Calificación del proyecto 0\nPuntuación media: 1/100\nPaquetes: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {avgGrade} {avgScore} {e} {c} {f} {b} {a}",
+      "gradeTooltip": "Calificación del proyecto 0\nPuntuación media: 1/100\nPaquetes: 2\nA:3 B:4 C:5 E:6 F:7 {a} {f} {avgGrade} {b} {c} {avgScore} {pkgCount} {e}",
       "vibrantTitle": "Vibrante",
       "stableTitle": "Estable",
       "outdatedTitle": "Anticuado",
@@ -434,7 +446,7 @@
       "caveatLine2": "Umbrales de actividad: 90d = obsoleto, 180d = inactivo (cronogramas de confirmación + liberación)."
     },
     "breakdown": {
-      "title": "¿Por qué calificar 0? — 1/100 promedio en 2 paquetes {pkgCount} {avgScore} {grade}",
+      "title": "¿Por qué calificar 0? — 1/100 promedio en 2 paquetes {avgScore} {pkgCount} {grade}",
       "hint": "Haga clic para ampliar",
       "distributionHeading": "Distribución",
       "signalsHeading": "Señales de riesgo que arrastran la puntuación hacia abajo",
@@ -691,7 +703,7 @@
       "gatesPassing": "puertas pasando"
     },
     "gauge": {
-      "tooltip": "Puntaje promedio 0 de 100 (calificación 1). {grade} {rounded}",
+      "tooltip": "Puntaje promedio 0 de 100 (calificación 1). {rounded} {grade}",
       "ariaLabel": "Puntuación media 0 de 100 {rounded}"
     },
     "gate": {
@@ -732,7 +744,7 @@
     "table": {
       "ariaLabel": "Peores funciones por puntuación",
       "heading": "Peores funciones",
-      "topCount": "arriba 0 de 1 {shown} {total}",
+      "topCount": "arriba 0 de 1 {total} {shown}",
       "colGrade": "Calificación",
       "colScore": "Puntaje",
       "colFunction": "Función",

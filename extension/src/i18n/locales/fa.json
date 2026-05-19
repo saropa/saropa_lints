@@ -185,7 +185,7 @@
       "help": "کمک کنید",
       "groupBy": "گروه بندی بر اساس…",
       "textFilter": "فیلتر متن…",
-      "severityImpact": "شدت و تاثیر",
+      "severityImpact": "Severity filter…",
       "hideRules": "پنهان کردن قوانین…",
       "ruleMetadata": "فراداده قانون",
       "clearFilters": "فیلترها را پاک کنید",
@@ -196,7 +196,19 @@
       "refreshExtension": "برنامه افزودنی را بازخوانی کنید",
       "openPackageDashboard": "داشبورد Package را باز کنید",
       "openCodeHealth": "باز کردن سلامت کد",
-      "openLintsConfig": "Lints Config را باز کنید"
+      "openLintsConfig": "Lints Config را باز کنید",
+      "reloadFromDisk": "Reload from disk",
+      "reloadFromDiskTitle": "Re-render the dashboard from the last violations.json without re-running the analyzer.",
+      "reEnableDisabledRules": "Re-enable disabled rules…",
+      "reEnableDisabledRulesTitle": "Open a quick-pick of rules currently disabled in analysis_options_custom.yaml and re-enable the chosen ones.",
+      "reEnableNoneTitle": "No rules currently disabled",
+      "reEnableNoneMessage": "No rules are currently disabled via analysis_options_custom.yaml.",
+      "reEnableQuickPickTitle": "Re-enable disabled rules",
+      "reEnableQuickPickPlaceholder": "Select one or more rules to re-enable",
+      "menuGroupExport": "Export",
+      "menuGroupFilter": "Filter & focus",
+      "menuGroupOpen": "Open dashboard",
+      "menuGroupSystem": "System"
     },
     "progress": {
       "runningLabel": "تجزیه و تحلیل در حال اجرا…",
@@ -395,7 +407,7 @@
     "noMatchingFindingsCopy": "هیچ یافته منطبقی برای کپی وجود ندارد.",
     "couldNotOpenFile": "فایل باز نشد: 0 {path}",
     "saveReportNoWorkspace": "قبل از ذخیره گزارش، یک پوشه فضای کاری باز کنید.",
-    "savedFindings": "ذخیره شده 0 یافته(های): 1 {count} {path}",
+    "savedFindings": "ذخیره شده 0 یافته(های): 1 {path} {count}",
     "couldNotSaveReportJson": "گزارش JSON ذخیره نشد."
   },
   "packageDashboard": {
@@ -419,7 +431,7 @@
       "packages": "بسته ها",
       "projectGrade": "درجه بسته پروژه",
       "totalSize": "اندازه کل*",
-      "gradeTooltip": "درجه پروژه 0\nمیانگین امتیاز: 1/100\nپکیج ها: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {avgGrade} {avgScore} {e} {c} {f} {b} {a}",
+      "gradeTooltip": "درجه پروژه 0\nمیانگین امتیاز: 1/100\nپکیج ها: 2\nA:3 B:4 C:5 E:6 F:7 {a} {f} {avgGrade} {b} {c} {avgScore} {pkgCount} {e}",
       "vibrantTitle": "پر جنب و جوش",
       "stableTitle": "پایدار",
       "outdatedTitle": "منسوخ شده",
@@ -434,7 +446,7 @@
       "caveatLine2": "آستانه فعالیت: 90d = قدیمی، 180d = غیرفعال (تعهد + جدول زمانی انتشار)."
     },
     "breakdown": {
-      "title": "چرا درجه 0؟ — 1/100 میانگین در بین بسته‌های 2 {pkgCount} {avgScore} {grade}",
+      "title": "چرا درجه 0؟ — 1/100 میانگین در بین بسته‌های 2 {avgScore} {pkgCount} {grade}",
       "hint": "برای گسترش کلیک کنید",
       "distributionHeading": "توزیع",
       "signalsHeading": "سیگنال های ریسک امتیاز را به پایین می کشد",
@@ -691,7 +703,7 @@
       "gatesPassing": "دروازه های عبور"
     },
     "gauge": {
-      "tooltip": "میانگین امتیاز 0 از 100 (درجه 1). {grade} {rounded}",
+      "tooltip": "میانگین امتیاز 0 از 100 (درجه 1). {rounded} {grade}",
       "ariaLabel": "میانگین امتیاز 0 از 100 {rounded}"
     },
     "gate": {
@@ -732,7 +744,7 @@
     "table": {
       "ariaLabel": "بدترین توابع با نمره",
       "heading": "بدترین عملکردها",
-      "topCount": "بالای 0 از 1 {shown} {total}",
+      "topCount": "بالای 0 از 1 {total} {shown}",
       "colGrade": "درجه",
       "colScore": "امتیاز",
       "colFunction": "تابع",

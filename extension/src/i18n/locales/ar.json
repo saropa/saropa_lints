@@ -185,7 +185,7 @@
       "help": "يساعد",
       "groupBy": "المجموعة حسب…",
       "textFilter": "مرشح النص...",
-      "severityImpact": "الشدة والتأثير",
+      "severityImpact": "Severity filter…",
       "hideRules": "إخفاء القواعد...",
       "ruleMetadata": "البيانات التعريفية للقاعدة",
       "clearFilters": "مسح المرشحات",
@@ -196,7 +196,19 @@
       "refreshExtension": "تحديث التمديد",
       "openPackageDashboard": "افتح لوحة معلومات الحزمة",
       "openCodeHealth": "افتح كود الصحة",
-      "openLintsConfig": "افتح تكوين اللينتس"
+      "openLintsConfig": "افتح تكوين اللينتس",
+      "reloadFromDisk": "Reload from disk",
+      "reloadFromDiskTitle": "Re-render the dashboard from the last violations.json without re-running the analyzer.",
+      "reEnableDisabledRules": "Re-enable disabled rules…",
+      "reEnableDisabledRulesTitle": "Open a quick-pick of rules currently disabled in analysis_options_custom.yaml and re-enable the chosen ones.",
+      "reEnableNoneTitle": "No rules currently disabled",
+      "reEnableNoneMessage": "No rules are currently disabled via analysis_options_custom.yaml.",
+      "reEnableQuickPickTitle": "Re-enable disabled rules",
+      "reEnableQuickPickPlaceholder": "Select one or more rules to re-enable",
+      "menuGroupExport": "Export",
+      "menuGroupFilter": "Filter & focus",
+      "menuGroupOpen": "Open dashboard",
+      "menuGroupSystem": "System"
     },
     "progress": {
       "runningLabel": "جاري التحليل...",
@@ -395,7 +407,7 @@
     "noMatchingFindingsCopy": "لا توجد نتائج مطابقة لنسخها.",
     "couldNotOpenFile": "تعذر فتح الملف: 0 {path}",
     "saveReportNoWorkspace": "افتح مجلد مساحة العمل قبل حفظ التقرير.",
-    "savedFindings": "النتائج المحفوظة 0: 1 {count} {path}",
+    "savedFindings": "النتائج المحفوظة 0: 1 {path} {count}",
     "couldNotSaveReportJson": "تعذر حفظ تقرير JSON."
   },
   "packageDashboard": {
@@ -419,7 +431,7 @@
       "packages": "الحزم",
       "projectGrade": "درجة حزمة المشروع",
       "totalSize": "الحجم الإجمالي*",
-      "gradeTooltip": "درجة المشروع 0\nمتوسط الدرجات: 1/100\nالحزم: 2\nأ:3 ب:4 ج:5 ه:6 و:٧ {pkgCount} {avgGrade} {avgScore} {e} {c} {f} {b} {a}",
+      "gradeTooltip": "درجة المشروع 0\nمتوسط الدرجات: 1/100\nالحزم: 2\nأ:3 ب:4 ج:5 ه:6 و:٧ {a} {f} {avgGrade} {b} {c} {avgScore} {pkgCount} {e}",
       "vibrantTitle": "نابضة بالحياة",
       "stableTitle": "مستقر",
       "outdatedTitle": "عفا عليها الزمن",
@@ -434,7 +446,7 @@
       "caveatLine2": "حدود النشاط: 90 يومًا = قديم، 180 يومًا = خامل (الالتزام + الجداول الزمنية للإصدار)."
     },
     "breakdown": {
-      "title": "لماذا الدرجة 0؟ — متوسط ​​1/100 عبر الحزم 2 {pkgCount} {avgScore} {grade}",
+      "title": "لماذا الدرجة 0؟ — متوسط ​​1/100 عبر الحزم 2 {avgScore} {pkgCount} {grade}",
       "hint": "انقر للتوسيع",
       "distributionHeading": "توزيع",
       "signalsHeading": "إشارات الخطر تسحب النتيجة إلى أسفل",
@@ -691,7 +703,7 @@
       "gatesPassing": "مرور البوابات"
     },
     "gauge": {
-      "tooltip": "متوسط ​​الدرجات 0 من 100 (الدرجة 1). {grade} {rounded}",
+      "tooltip": "متوسط ​​الدرجات 0 من 100 (الدرجة 1). {rounded} {grade}",
       "ariaLabel": "متوسط ​​الدرجات 0 من 100 {rounded}"
     },
     "gate": {
@@ -732,7 +744,7 @@
     "table": {
       "ariaLabel": "أسوأ الوظائف حسب النتيجة",
       "heading": "أسوأ الوظائف",
-      "topCount": "أعلى 0 من 1 {shown} {total}",
+      "topCount": "أعلى 0 من 1 {total} {shown}",
       "colGrade": "درجة",
       "colScore": "نتيجة",
       "colFunction": "وظيفة",

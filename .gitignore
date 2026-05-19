@@ -32,6 +32,7 @@ scripts/comment_coverage_batch/
 
 # IDE
 .idea/
+.agents/
 *.iml
 .vscode/
 

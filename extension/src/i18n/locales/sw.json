@@ -185,7 +185,7 @@
       "help": "Msaada",
       "groupBy": "Panga kwa...",
       "textFilter": "Kichujio cha maandishi...",
-      "severityImpact": "Ukali na athari",
+      "severityImpact": "Severity filter…",
       "hideRules": "Ficha sheria...",
       "ruleMetadata": "Kanuni ya metadata",
       "clearFilters": "Futa vichungi",
@@ -196,7 +196,19 @@
       "refreshExtension": "Onyesha upya kiendelezi",
       "openPackageDashboard": "Fungua dashibodi ya Kifurushi",
       "openCodeHealth": "Fungua Kanuni ya Afya",
-      "openLintsConfig": "Fungua Usanidi wa Lints"
+      "openLintsConfig": "Fungua Usanidi wa Lints",
+      "reloadFromDisk": "Reload from disk",
+      "reloadFromDiskTitle": "Re-render the dashboard from the last violations.json without re-running the analyzer.",
+      "reEnableDisabledRules": "Re-enable disabled rules…",
+      "reEnableDisabledRulesTitle": "Open a quick-pick of rules currently disabled in analysis_options_custom.yaml and re-enable the chosen ones.",
+      "reEnableNoneTitle": "No rules currently disabled",
+      "reEnableNoneMessage": "No rules are currently disabled via analysis_options_custom.yaml.",
+      "reEnableQuickPickTitle": "Re-enable disabled rules",
+      "reEnableQuickPickPlaceholder": "Select one or more rules to re-enable",
+      "menuGroupExport": "Export",
+      "menuGroupFilter": "Filter & focus",
+      "menuGroupOpen": "Open dashboard",
+      "menuGroupSystem": "System"
     },
     "progress": {
       "runningLabel": "Inaendesha uchambuzi…",
@@ -395,7 +407,7 @@
     "noMatchingFindingsCopy": "Hakuna matokeo yanayolingana ya kunakili.",
     "couldNotOpenFile": "Haikuweza kufungua faili: 0 {path}",
     "saveReportNoWorkspace": "Fungua folda ya nafasi ya kazi kabla ya kuhifadhi ripoti.",
-    "savedFindings": "Imehifadhiwa 0 matokeo: 1 {count} {path}",
+    "savedFindings": "Imehifadhiwa 0 matokeo: 1 {path} {count}",
     "couldNotSaveReportJson": "Haikuweza kuhifadhi ripoti JSON."
   },
   "packageDashboard": {
@@ -419,7 +431,7 @@
       "packages": "Vifurushi",
       "projectGrade": "Daraja la Kifurushi cha Mradi",
       "totalSize": "Jumla ya Ukubwa*",
-      "gradeTooltip": "Daraja la mradi 0\nAlama ya wastani: 1/100\nVifurushi: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {avgGrade} {avgScore} {e} {c} {f} {b} {a}",
+      "gradeTooltip": "Daraja la mradi 0\nAlama ya wastani: 1/100\nVifurushi: 2\nA:3 B:4 C:5 E:6 F:7 {a} {f} {avgGrade} {b} {c} {avgScore} {pkgCount} {e}",
       "vibrantTitle": "Mahiri",
       "stableTitle": "Imara",
       "outdatedTitle": "Imepitwa na wakati",
@@ -434,7 +446,7 @@
       "caveatLine2": "Viwango vya shughuli: 90d = vilichakaa, 180d = vimetulia (jitolea + muda wa kutolewa)."
     },
     "breakdown": {
-      "title": "Kwa nini daraja 0? — 1/100 wastani katika vifurushi 2 {pkgCount} {avgScore} {grade}",
+      "title": "Kwa nini daraja 0? — 1/100 wastani katika vifurushi 2 {avgScore} {pkgCount} {grade}",
       "hint": "Bofya ili kupanua",
       "distributionHeading": "Usambazaji",
       "signalsHeading": "Ishara za hatari zinazoburuta alama chini",
@@ -691,7 +703,7 @@
       "gatesPassing": "milango kupita"
     },
     "gauge": {
-      "tooltip": "Alama ya wastani 0 ya 100 (daraja 1). {grade} {rounded}",
+      "tooltip": "Alama ya wastani 0 ya 100 (daraja 1). {rounded} {grade}",
       "ariaLabel": "Alama ya wastani 0 ya 100 {rounded}"
     },
     "gate": {
@@ -732,7 +744,7 @@
     "table": {
       "ariaLabel": "Utendaji mbaya zaidi kwa alama",
       "heading": "Kazi mbaya zaidi",
-      "topCount": "juu 0 ya 1 {shown} {total}",
+      "topCount": "juu 0 ya 1 {total} {shown}",
       "colGrade": "Daraja",
       "colScore": "Alama",
       "colFunction": "Kazi",

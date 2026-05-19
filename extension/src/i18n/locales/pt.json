@@ -185,7 +185,7 @@
       "help": "Ajuda",
       "groupBy": "Agrupar por…",
       "textFilter": "Filtro de texto…",
-      "severityImpact": "Gravidade e impacto",
+      "severityImpact": "Severity filter…",
       "hideRules": "Ocultar regras…",
       "ruleMetadata": "Metadados de regras",
       "clearFilters": "Limpar filtros",
@@ -196,7 +196,19 @@
       "refreshExtension": "Atualizar extensão",
       "openPackageDashboard": "Abra o painel do pacote",
       "openCodeHealth": "Saúde do código aberto",
-      "openLintsConfig": "Abra a configuração do Lints"
+      "openLintsConfig": "Abra a configuração do Lints",
+      "reloadFromDisk": "Reload from disk",
+      "reloadFromDiskTitle": "Re-render the dashboard from the last violations.json without re-running the analyzer.",
+      "reEnableDisabledRules": "Re-enable disabled rules…",
+      "reEnableDisabledRulesTitle": "Open a quick-pick of rules currently disabled in analysis_options_custom.yaml and re-enable the chosen ones.",
+      "reEnableNoneTitle": "No rules currently disabled",
+      "reEnableNoneMessage": "No rules are currently disabled via analysis_options_custom.yaml.",
+      "reEnableQuickPickTitle": "Re-enable disabled rules",
+      "reEnableQuickPickPlaceholder": "Select one or more rules to re-enable",
+      "menuGroupExport": "Export",
+      "menuGroupFilter": "Filter & focus",
+      "menuGroupOpen": "Open dashboard",
+      "menuGroupSystem": "System"
     },
     "progress": {
       "runningLabel": "Executando análise…",
@@ -395,7 +407,7 @@
     "noMatchingFindingsCopy": "Nenhuma descoberta correspondente para copiar.",
     "couldNotOpenFile": "Não foi possível abrir o arquivo: 0 {path}",
     "saveReportNoWorkspace": "Abra uma pasta do espaço de trabalho antes de salvar o relatório.",
-    "savedFindings": "0 descobertas salvas: 1 {count} {path}",
+    "savedFindings": "0 descobertas salvas: 1 {path} {count}",
     "couldNotSaveReportJson": "Não foi possível salvar o relatório JSON."
   },
   "packageDashboard": {
@@ -419,7 +431,7 @@
       "packages": "Pacotes",
       "projectGrade": "Nota do pacote do projeto",
       "totalSize": "Tamanho Total*",
-      "gradeTooltip": "Nota do projeto 0\nPontuação média: 1/100\nPacotes: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {avgGrade} {avgScore} {e} {c} {f} {b} {a}",
+      "gradeTooltip": "Nota do projeto 0\nPontuação média: 1/100\nPacotes: 2\nA:3 B:4 C:5 E:6 F:7 {a} {f} {avgGrade} {b} {c} {avgScore} {pkgCount} {e}",
       "vibrantTitle": "Vibrante",
       "stableTitle": "Estável",
       "outdatedTitle": "Desatualizado",
@@ -434,7 +446,7 @@
       "caveatLine2": "Limites de atividade: 90d = obsoleto, 180d = inativo (prazos de confirmação + lançamento)."
     },
     "breakdown": {
-      "title": "Por que nota 0? — Média de 1/100 em pacotes de 2 {pkgCount} {avgScore} {grade}",
+      "title": "Por que nota 0? — Média de 1/100 em pacotes de 2 {avgScore} {pkgCount} {grade}",
       "hint": "Clique para expandir",
       "distributionHeading": "Distribuição",
       "signalsHeading": "Sinais de risco arrastando a pontuação para baixo",
@@ -691,7 +703,7 @@
       "gatesPassing": "portões passando"
     },
     "gauge": {
-      "tooltip": "Pontuação média 0 de 100 (nota 1). {grade} {rounded}",
+      "tooltip": "Pontuação média 0 de 100 (nota 1). {rounded} {grade}",
       "ariaLabel": "Pontuação média 0 de 100 {rounded}"
     },
     "gate": {
@@ -732,7 +744,7 @@
     "table": {
       "ariaLabel": "Piores funções por pontuação",
       "heading": "Piores funções",
-      "topCount": "topo 0 de 1 {shown} {total}",
+      "topCount": "topo 0 de 1 {total} {shown}",
       "colGrade": "Nota",
       "colScore": "Pontuação",
       "colFunction": "Função",

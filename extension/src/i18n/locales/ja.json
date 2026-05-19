@@ -185,7 +185,7 @@
       "help": "ヘルプ",
       "groupBy": "グループ化…",
       "textFilter": "テキストフィルター…",
-      "severityImpact": "重大度と影響",
+      "severityImpact": "Severity filter…",
       "hideRules": "ルールを非表示にします…",
       "ruleMetadata": "ルールのメタデータ",
       "clearFilters": "フィルターをクリアする",
@@ -196,7 +196,19 @@
       "refreshExtension": "更新拡張機能",
       "openPackageDashboard": "パッケージダッシュボードを開く",
       "openCodeHealth": "オープンコードの健全性",
-      "openLintsConfig": "Lint 構成を開く"
+      "openLintsConfig": "Lint 構成を開く",
+      "reloadFromDisk": "Reload from disk",
+      "reloadFromDiskTitle": "Re-render the dashboard from the last violations.json without re-running the analyzer.",
+      "reEnableDisabledRules": "Re-enable disabled rules…",
+      "reEnableDisabledRulesTitle": "Open a quick-pick of rules currently disabled in analysis_options_custom.yaml and re-enable the chosen ones.",
+      "reEnableNoneTitle": "No rules currently disabled",
+      "reEnableNoneMessage": "No rules are currently disabled via analysis_options_custom.yaml.",
+      "reEnableQuickPickTitle": "Re-enable disabled rules",
+      "reEnableQuickPickPlaceholder": "Select one or more rules to re-enable",
+      "menuGroupExport": "Export",
+      "menuGroupFilter": "Filter & focus",
+      "menuGroupOpen": "Open dashboard",
+      "menuGroupSystem": "System"
     },
     "progress": {
       "runningLabel": "分析を実行中…",
@@ -395,7 +407,7 @@
     "noMatchingFindingsCopy": "コピーできる一致する結果はありません。",
     "couldNotOpenFile": "ファイルを開けませんでした: 0 {path}",
     "saveReportNoWorkspace": "レポートを保存する前に、ワークスペース フォルダーを開いてください。",
-    "savedFindings": "保存された 0 の結果: 1 {count} {path}",
+    "savedFindings": "保存された 0 の結果: 1 {path} {count}",
     "couldNotSaveReportJson": "レポート JSON を保存できませんでした。"
   },
   "packageDashboard": {
@@ -419,7 +431,7 @@
       "packages": "パッケージ",
       "projectGrade": "プロジェクトパッケージグレード",
       "totalSize": "合計サイズ*",
-      "gradeTooltip": "プロジェクトグレード 0\n平均スコア: 1/100\nパッケージ: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {avgGrade} {avgScore} {e} {c} {f} {b} {a}",
+      "gradeTooltip": "プロジェクトグレード 0\n平均スコア: 1/100\nパッケージ: 2\nA:3 B:4 C:5 E:6 F:7 {a} {f} {avgGrade} {b} {c} {avgScore} {pkgCount} {e}",
       "vibrantTitle": "活気に満ちた",
       "stableTitle": "安定した",
       "outdatedTitle": "時代遅れ",
@@ -434,7 +446,7 @@
       "caveatLine2": "アクティビティのしきい値: 90 日 = 古い、180 日 = 休止中 (コミット + リリースのタイムライン)。"
     },
     "breakdown": {
-      "title": "なぜ 0 と評価するのでしょうか? — 2 パッケージ全体で 1/100 の平均 {pkgCount} {avgScore} {grade}",
+      "title": "なぜ 0 と評価するのでしょうか? — 2 パッケージ全体で 1/100 の平均 {avgScore} {pkgCount} {grade}",
       "hint": "クリックして展開します",
       "distributionHeading": "分布",
       "signalsHeading": "スコアを引き下げるリスクシグナル",
@@ -691,7 +703,7 @@
       "gatesPassing": "ゲート通過"
     },
     "gauge": {
-      "tooltip": "平均スコア 0/100 (グレード 1)。 {grade} {rounded}",
+      "tooltip": "平均スコア 0/100 (グレード 1)。 {rounded} {grade}",
       "ariaLabel": "平均スコア 0/100 {rounded}"
     },
     "gate": {
@@ -732,7 +744,7 @@
     "table": {
       "ariaLabel": "スコア別の最悪の関数",
       "heading": "最悪の機能",
-      "topCount": "1の先頭0 {shown} {total}",
+      "topCount": "1の先頭0 {total} {shown}",
       "colGrade": "学年",
       "colScore": "スコア",
       "colFunction": "関数",

@@ -185,7 +185,7 @@
       "help": "সাহায্য",
       "groupBy": "গ্রুপ করে…",
       "textFilter": "টেক্সট ফিল্টার...",
-      "severityImpact": "তীব্রতা এবং প্রভাব",
+      "severityImpact": "Severity filter…",
       "hideRules": "নিয়ম লুকান...",
       "ruleMetadata": "নিয়ম মেটাডেটা",
       "clearFilters": "ফিল্টার সাফ করুন",
@@ -196,7 +196,19 @@
       "refreshExtension": "রিফ্রেশ এক্সটেনশন",
       "openPackageDashboard": "প্যাকেজ ড্যাশবোর্ড খুলুন",
       "openCodeHealth": "স্বাস্থ্য কোড খুলুন",
-      "openLintsConfig": "লিন্টস কনফিগারেশন খুলুন"
+      "openLintsConfig": "লিন্টস কনফিগারেশন খুলুন",
+      "reloadFromDisk": "Reload from disk",
+      "reloadFromDiskTitle": "Re-render the dashboard from the last violations.json without re-running the analyzer.",
+      "reEnableDisabledRules": "Re-enable disabled rules…",
+      "reEnableDisabledRulesTitle": "Open a quick-pick of rules currently disabled in analysis_options_custom.yaml and re-enable the chosen ones.",
+      "reEnableNoneTitle": "No rules currently disabled",
+      "reEnableNoneMessage": "No rules are currently disabled via analysis_options_custom.yaml.",
+      "reEnableQuickPickTitle": "Re-enable disabled rules",
+      "reEnableQuickPickPlaceholder": "Select one or more rules to re-enable",
+      "menuGroupExport": "Export",
+      "menuGroupFilter": "Filter & focus",
+      "menuGroupOpen": "Open dashboard",
+      "menuGroupSystem": "System"
     },
     "progress": {
       "runningLabel": "বিশ্লেষণ চলছে...",
@@ -395,7 +407,7 @@
     "noMatchingFindingsCopy": "অনুলিপি করার জন্য কোনো মিল খুঁজে পাওয়া যায়নি।",
     "couldNotOpenFile": "ফাইল খোলা যায়নি: 0 {path}",
     "saveReportNoWorkspace": "রিপোর্ট সংরক্ষণ করার আগে একটি ওয়ার্কস্পেস ফোল্ডার খুলুন।",
-    "savedFindings": "সংরক্ষিত 0 অনুসন্ধান(গুলি): 1 {count} {path}",
+    "savedFindings": "সংরক্ষিত 0 অনুসন্ধান(গুলি): 1 {path} {count}",
     "couldNotSaveReportJson": "রিপোর্ট JSON সংরক্ষণ করা যায়নি."
   },
   "packageDashboard": {
@@ -419,7 +431,7 @@
       "packages": "প্যাকেজ",
       "projectGrade": "প্রকল্প প্যাকেজ গ্রেড",
       "totalSize": "মোট আকার*",
-      "gradeTooltip": "প্রকল্প গ্রেড 0\nগড় স্কোর: 1/100\nপ্যাকেজ: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {avgGrade} {avgScore} {e} {c} {f} {b} {a}",
+      "gradeTooltip": "প্রকল্প গ্রেড 0\nগড় স্কোর: 1/100\nপ্যাকেজ: 2\nA:3 B:4 C:5 E:6 F:7 {a} {f} {avgGrade} {b} {c} {avgScore} {pkgCount} {e}",
       "vibrantTitle": "প্রাণবন্ত",
       "stableTitle": "স্থিতিশীল",
       "outdatedTitle": "সেকেলে",
@@ -434,7 +446,7 @@
       "caveatLine2": "অ্যাক্টিভিটি থ্রেশহোল্ড: 90d = বাসি, 180d = সুপ্ত (কমিট + রিলিজ টাইমলাইন)।"
     },
     "breakdown": {
-      "title": "কেন গ্রেড 0? — 1/100 গড় 2 প্যাকেজ জুড়ে {pkgCount} {avgScore} {grade}",
+      "title": "কেন গ্রেড 0? — 1/100 গড় 2 প্যাকেজ জুড়ে {avgScore} {pkgCount} {grade}",
       "hint": "প্রসারিত করতে ক্লিক করুন",
       "distributionHeading": "বিতরণ",
       "signalsHeading": "স্কোর নিচে টেনে ঝুঁকি সংকেত",
@@ -691,7 +703,7 @@
       "gatesPassing": "গেট পাসিং"
     },
     "gauge": {
-      "tooltip": "গড় স্কোর 100 এর মধ্যে 0 (গ্রেড 1)। {grade} {rounded}",
+      "tooltip": "গড় স্কোর 100 এর মধ্যে 0 (গ্রেড 1)। {rounded} {grade}",
       "ariaLabel": "গড় স্কোর 100 এর মধ্যে 0 {rounded}"
     },
     "gate": {
@@ -732,7 +744,7 @@
     "table": {
       "ariaLabel": "স্কোর দ্বারা সবচেয়ে খারাপ ফাংশন",
       "heading": "সবচেয়ে খারাপ ফাংশন",
-      "topCount": "1 এর শীর্ষ 0 {shown} {total}",
+      "topCount": "1 এর শীর্ষ 0 {total} {shown}",
       "colGrade": "গ্রেড",
       "colScore": "স্কোর",
       "colFunction": "ফাংশন",

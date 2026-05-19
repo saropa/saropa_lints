@@ -185,7 +185,7 @@
       "help": "Giúp đỡ",
       "groupBy": "Nhóm theo…",
       "textFilter": "Bộ lọc văn bản…",
-      "severityImpact": "Mức độ nghiêm trọng và tác động",
+      "severityImpact": "Severity filter…",
       "hideRules": "Ẩn quy tắc…",
       "ruleMetadata": "Siêu dữ liệu quy tắc",
       "clearFilters": "Xóa bộ lọc",
@@ -196,7 +196,19 @@
       "refreshExtension": "Làm mới tiện ích mở rộng",
       "openPackageDashboard": "Mở bảng thông tin Gói",
       "openCodeHealth": "Sức khỏe mã mở",
-      "openLintsConfig": "Mở cấu hình Lint"
+      "openLintsConfig": "Mở cấu hình Lint",
+      "reloadFromDisk": "Reload from disk",
+      "reloadFromDiskTitle": "Re-render the dashboard from the last violations.json without re-running the analyzer.",
+      "reEnableDisabledRules": "Re-enable disabled rules…",
+      "reEnableDisabledRulesTitle": "Open a quick-pick of rules currently disabled in analysis_options_custom.yaml and re-enable the chosen ones.",
+      "reEnableNoneTitle": "No rules currently disabled",
+      "reEnableNoneMessage": "No rules are currently disabled via analysis_options_custom.yaml.",
+      "reEnableQuickPickTitle": "Re-enable disabled rules",
+      "reEnableQuickPickPlaceholder": "Select one or more rules to re-enable",
+      "menuGroupExport": "Export",
+      "menuGroupFilter": "Filter & focus",
+      "menuGroupOpen": "Open dashboard",
+      "menuGroupSystem": "System"
     },
     "progress": {
       "runningLabel": "Đang chạy phân tích…",
@@ -395,7 +407,7 @@
     "noMatchingFindingsCopy": "Không có kết quả phù hợp để sao chép.",
     "couldNotOpenFile": "Không thể mở tập tin: 0 {path}",
     "saveReportNoWorkspace": "Mở thư mục không gian làm việc trước khi lưu báo cáo.",
-    "savedFindings": "Đã lưu 0 (các) phát hiện: 1 {count} {path}",
+    "savedFindings": "Đã lưu 0 (các) phát hiện: 1 {path} {count}",
     "couldNotSaveReportJson": "Không thể lưu JSON báo cáo."
   },
   "packageDashboard": {
@@ -419,7 +431,7 @@
       "packages": "Gói",
       "projectGrade": "Lớp gói dự án",
       "totalSize": "Tổng kích thước*",
-      "gradeTooltip": "Cấp dự án 0\nĐiểm trung bình: 1/100\nGói: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {avgGrade} {avgScore} {e} {c} {f} {b} {a}",
+      "gradeTooltip": "Cấp dự án 0\nĐiểm trung bình: 1/100\nGói: 2\nA:3 B:4 C:5 E:6 F:7 {a} {f} {avgGrade} {b} {c} {avgScore} {pkgCount} {e}",
       "vibrantTitle": "Sống động",
       "stableTitle": "Ổn định",
       "outdatedTitle": "lỗi thời",
@@ -434,7 +446,7 @@
       "caveatLine2": "Ngưỡng hoạt động: 90d = cũ, 180d = không hoạt động (cam kết + mốc thời gian phát hành)."
     },
     "breakdown": {
-      "title": "Tại sao lại điểm 0? — trung bình 1/100 trên 2 gói {pkgCount} {avgScore} {grade}",
+      "title": "Tại sao lại điểm 0? — trung bình 1/100 trên 2 gói {avgScore} {pkgCount} {grade}",
       "hint": "Bấm để mở rộng",
       "distributionHeading": "Phân bổ",
       "signalsHeading": "Tín hiệu rủi ro kéo điểm xuống",
@@ -691,7 +703,7 @@
       "gatesPassing": "cổng đi qua"
     },
     "gauge": {
-      "tooltip": "Điểm trung bình 0 trên 100 (lớp 1). {grade} {rounded}",
+      "tooltip": "Điểm trung bình 0 trên 100 (lớp 1). {rounded} {grade}",
       "ariaLabel": "Điểm trung bình 0 trên 100 {rounded}"
     },
     "gate": {
@@ -732,7 +744,7 @@
     "table": {
       "ariaLabel": "Chức năng tồi tệ nhất theo điểm số",
       "heading": "Chức năng tệ nhất",
-      "topCount": "trên cùng 0 của 1 {shown} {total}",
+      "topCount": "trên cùng 0 của 1 {total} {shown}",
       "colGrade": "Cấp",
       "colScore": "Điểm",
       "colFunction": "Chức năng",

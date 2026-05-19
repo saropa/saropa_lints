@@ -185,7 +185,7 @@
       "help": "돕다",
       "groupBy": "그룹화 기준…",
       "textFilter": "텍스트 필터…",
-      "severityImpact": "심각도 및 영향",
+      "severityImpact": "Severity filter…",
       "hideRules": "규칙 숨기기…",
       "ruleMetadata": "규칙 메타데이터",
       "clearFilters": "필터 지우기",
@@ -196,7 +196,19 @@
       "refreshExtension": "확장 프로그램 새로 고침",
       "openPackageDashboard": "패키지 대시보드 열기",
       "openCodeHealth": "오픈 코드 상태",
-      "openLintsConfig": "린트 구성 열기"
+      "openLintsConfig": "린트 구성 열기",
+      "reloadFromDisk": "Reload from disk",
+      "reloadFromDiskTitle": "Re-render the dashboard from the last violations.json without re-running the analyzer.",
+      "reEnableDisabledRules": "Re-enable disabled rules…",
+      "reEnableDisabledRulesTitle": "Open a quick-pick of rules currently disabled in analysis_options_custom.yaml and re-enable the chosen ones.",
+      "reEnableNoneTitle": "No rules currently disabled",
+      "reEnableNoneMessage": "No rules are currently disabled via analysis_options_custom.yaml.",
+      "reEnableQuickPickTitle": "Re-enable disabled rules",
+      "reEnableQuickPickPlaceholder": "Select one or more rules to re-enable",
+      "menuGroupExport": "Export",
+      "menuGroupFilter": "Filter & focus",
+      "menuGroupOpen": "Open dashboard",
+      "menuGroupSystem": "System"
     },
     "progress": {
       "runningLabel": "분석 실행 중…",
@@ -395,7 +407,7 @@
     "noMatchingFindingsCopy": "복사할 일치하는 발견 항목이 없습니다.",
     "couldNotOpenFile": "파일을 열 수 없습니다: 0 {path}",
     "saveReportNoWorkspace": "보고서를 저장하기 전에 작업 공간 폴더를 엽니다.",
-    "savedFindings": "저장된 0 발견 항목: 1 {count} {path}",
+    "savedFindings": "저장된 0 발견 항목: 1 {path} {count}",
     "couldNotSaveReportJson": "보고서 JSON을 저장할 수 없습니다."
   },
   "packageDashboard": {
@@ -419,7 +431,7 @@
       "packages": "패키지",
       "projectGrade": "프로젝트 패키지 등급",
       "totalSize": "전체 크기*",
-      "gradeTooltip": "프로젝트 등급 0\n평균 점수: 1/100\n패키지: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {avgGrade} {avgScore} {e} {c} {f} {b} {a}",
+      "gradeTooltip": "프로젝트 등급 0\n평균 점수: 1/100\n패키지: 2\nA:3 B:4 C:5 E:6 F:7 {a} {f} {avgGrade} {b} {c} {avgScore} {pkgCount} {e}",
       "vibrantTitle": "떠는",
       "stableTitle": "안정적인",
       "outdatedTitle": "구식",
@@ -434,7 +446,7 @@
       "caveatLine2": "활동 임계값: 90일 = 오래됨, 180일 = 휴면(커밋 + 릴리스 타임라인)."
     },
     "breakdown": {
-      "title": "왜 0등급인가요? — 2 패키지 전체 평균 1/100 {pkgCount} {avgScore} {grade}",
+      "title": "왜 0등급인가요? — 2 패키지 전체 평균 1/100 {avgScore} {pkgCount} {grade}",
       "hint": "펼치려면 클릭하세요.",
       "distributionHeading": "분포",
       "signalsHeading": "점수를 낮추는 위험 신호",
@@ -691,7 +703,7 @@
       "gatesPassing": "게이트 통과"
     },
     "gauge": {
-      "tooltip": "평균 점수 0/100(등급 1). {grade} {rounded}",
+      "tooltip": "평균 점수 0/100(등급 1). {rounded} {grade}",
       "ariaLabel": "100점 만점의 평균 점수 0 {rounded}"
     },
     "gate": {
@@ -732,7 +744,7 @@
     "table": {
       "ariaLabel": "점수별 최악의 기능",
       "heading": "최악의 기능",
-      "topCount": "1 중 상위 0 {shown} {total}",
+      "topCount": "1 중 상위 0 {total} {shown}",
       "colGrade": "등급",
       "colScore": "점수",
       "colFunction": "기능",

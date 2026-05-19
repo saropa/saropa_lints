@@ -185,7 +185,7 @@
       "help": "Help",
       "groupBy": "Groeperen op…",
       "textFilter": "Tekstfilter…",
-      "severityImpact": "Ernst en impact",
+      "severityImpact": "Severity filter…",
       "hideRules": "Regels verbergen…",
       "ruleMetadata": "Metagegevens van regels",
       "clearFilters": "Wis filters",
@@ -196,7 +196,19 @@
       "refreshExtension": "Extensie vernieuwen",
       "openPackageDashboard": "Open het Pakketdashboard",
       "openCodeHealth": "Open Code Gezondheid",
-      "openLintsConfig": "Open Lints-configuratie"
+      "openLintsConfig": "Open Lints-configuratie",
+      "reloadFromDisk": "Reload from disk",
+      "reloadFromDiskTitle": "Re-render the dashboard from the last violations.json without re-running the analyzer.",
+      "reEnableDisabledRules": "Re-enable disabled rules…",
+      "reEnableDisabledRulesTitle": "Open a quick-pick of rules currently disabled in analysis_options_custom.yaml and re-enable the chosen ones.",
+      "reEnableNoneTitle": "No rules currently disabled",
+      "reEnableNoneMessage": "No rules are currently disabled via analysis_options_custom.yaml.",
+      "reEnableQuickPickTitle": "Re-enable disabled rules",
+      "reEnableQuickPickPlaceholder": "Select one or more rules to re-enable",
+      "menuGroupExport": "Export",
+      "menuGroupFilter": "Filter & focus",
+      "menuGroupOpen": "Open dashboard",
+      "menuGroupSystem": "System"
     },
     "progress": {
       "runningLabel": "Analyse uitvoeren…",
@@ -395,7 +407,7 @@
     "noMatchingFindingsCopy": "Geen overeenkomende bevindingen om te kopiëren.",
     "couldNotOpenFile": "Kon bestand niet openen: 0 {path}",
     "saveReportNoWorkspace": "Open een werkruimtemap voordat u het rapport opslaat.",
-    "savedFindings": "0 bevinding(en) opgeslagen: 1 {count} {path}",
+    "savedFindings": "0 bevinding(en) opgeslagen: 1 {path} {count}",
     "couldNotSaveReportJson": "Kan rapport-JSON niet opslaan."
   },
   "packageDashboard": {
@@ -419,7 +431,7 @@
       "packages": "Pakketten",
       "projectGrade": "Projectpakketklasse",
       "totalSize": "Totale grootte*",
-      "gradeTooltip": "Projectcijfer 0\nGemiddelde score: 1/100\nPakketten: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {avgGrade} {avgScore} {e} {c} {f} {b} {a}",
+      "gradeTooltip": "Projectcijfer 0\nGemiddelde score: 1/100\nPakketten: 2\nA:3 B:4 C:5 E:6 F:7 {a} {f} {avgGrade} {b} {c} {avgScore} {pkgCount} {e}",
       "vibrantTitle": "Levendig",
       "stableTitle": "Stabiel",
       "outdatedTitle": "Verouderd",
@@ -434,7 +446,7 @@
       "caveatLine2": "Activiteitsdrempels: 90d = verouderd, 180d = slapend (tijdlijnen voor vastleggen en vrijgeven)."
     },
     "breakdown": {
-      "title": "Waarom cijfer 0? — 1/100 gemiddeld over 2 pakketten {pkgCount} {avgScore} {grade}",
+      "title": "Waarom cijfer 0? — 1/100 gemiddeld over 2 pakketten {avgScore} {pkgCount} {grade}",
       "hint": "Klik om uit te vouwen",
       "distributionHeading": "Verdeling",
       "signalsHeading": "Risicosignalen die de score naar beneden halen",
@@ -691,7 +703,7 @@
       "gatesPassing": "poorten passeren"
     },
     "gauge": {
-      "tooltip": "Gemiddelde score 0 van 100 (cijfer 1). {grade} {rounded}",
+      "tooltip": "Gemiddelde score 0 van 100 (cijfer 1). {rounded} {grade}",
       "ariaLabel": "Gemiddelde score 0 van 100 {rounded}"
     },
     "gate": {
@@ -732,7 +744,7 @@
     "table": {
       "ariaLabel": "Slechtste functies per score",
       "heading": "Slechtste functies",
-      "topCount": "top 0 van 1 {shown} {total}",
+      "topCount": "top 0 van 1 {total} {shown}",
       "colGrade": "Cijfer",
       "colScore": "Scoren",
       "colFunction": "Functie",

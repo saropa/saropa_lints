@@ -185,7 +185,7 @@
       "help": "Помощь",
       "groupBy": "Группировать по…",
       "textFilter": "Текстовый фильтр…",
-      "severityImpact": "Серьезность и влияние",
+      "severityImpact": "Severity filter…",
       "hideRules": "Скрыть правила…",
       "ruleMetadata": "Метаданные правила",
       "clearFilters": "Очистить фильтры",
@@ -196,7 +196,19 @@
       "refreshExtension": "Обновить расширение",
       "openPackageDashboard": "Открыть панель управления пакетом",
       "openCodeHealth": "Здоровье открытого кода",
-      "openLintsConfig": "Открыть конфигурацию линтов"
+      "openLintsConfig": "Открыть конфигурацию линтов",
+      "reloadFromDisk": "Reload from disk",
+      "reloadFromDiskTitle": "Re-render the dashboard from the last violations.json without re-running the analyzer.",
+      "reEnableDisabledRules": "Re-enable disabled rules…",
+      "reEnableDisabledRulesTitle": "Open a quick-pick of rules currently disabled in analysis_options_custom.yaml and re-enable the chosen ones.",
+      "reEnableNoneTitle": "No rules currently disabled",
+      "reEnableNoneMessage": "No rules are currently disabled via analysis_options_custom.yaml.",
+      "reEnableQuickPickTitle": "Re-enable disabled rules",
+      "reEnableQuickPickPlaceholder": "Select one or more rules to re-enable",
+      "menuGroupExport": "Export",
+      "menuGroupFilter": "Filter & focus",
+      "menuGroupOpen": "Open dashboard",
+      "menuGroupSystem": "System"
     },
     "progress": {
       "runningLabel": "Выполнение анализа…",
@@ -395,7 +407,7 @@
     "noMatchingFindingsCopy": "Нет соответствующих результатов для копирования.",
     "couldNotOpenFile": "Не удалось открыть файл: 0 {path}",
     "saveReportNoWorkspace": "Прежде чем сохранять отчет, откройте папку рабочей области.",
-    "savedFindings": "Сохранено 0 результатов: 1 {count} {path}",
+    "savedFindings": "Сохранено 0 результатов: 1 {path} {count}",
     "couldNotSaveReportJson": "Не удалось сохранить отчет в формате JSON."
   },
   "packageDashboard": {
@@ -419,7 +431,7 @@
       "packages": "Пакеты",
       "projectGrade": "Оценка пакета проекта",
       "totalSize": "Общий размер*",
-      "gradeTooltip": "Оценка проекта 0\nСредний балл: 1/100\nПакеты: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {avgGrade} {avgScore} {e} {c} {f} {b} {a}",
+      "gradeTooltip": "Оценка проекта 0\nСредний балл: 1/100\nПакеты: 2\nA:3 B:4 C:5 E:6 F:7 {a} {f} {avgGrade} {b} {c} {avgScore} {pkgCount} {e}",
       "vibrantTitle": "Яркий",
       "stableTitle": "Стабильный",
       "outdatedTitle": "Устаревший",
@@ -434,7 +446,7 @@
       "caveatLine2": "Пороги активности: 90d = устаревшие, 180d = бездействующие (сроки фиксации + выпуска)."
     },
     "breakdown": {
-      "title": "Почему оценка 0? — 1/100 в среднем по 2 пакетам {pkgCount} {avgScore} {grade}",
+      "title": "Почему оценка 0? — 1/100 в среднем по 2 пакетам {avgScore} {pkgCount} {grade}",
       "hint": "Нажмите, чтобы развернуть",
       "distributionHeading": "Распределение",
       "signalsHeading": "Сигналы риска, снижающие рейтинг",
@@ -691,7 +703,7 @@
       "gatesPassing": "ворота проходящие"
     },
     "gauge": {
-      "tooltip": "Средний балл 0 из 100 (оценка 1). {grade} {rounded}",
+      "tooltip": "Средний балл 0 из 100 (оценка 1). {rounded} {grade}",
       "ariaLabel": "Средний балл 0 из 100 {rounded}"
     },
     "gate": {
@@ -732,7 +744,7 @@
     "table": {
       "ariaLabel": "Худшие функции по баллам",
       "heading": "Худшие функции",
-      "topCount": "верх 0 из 1 {shown} {total}",
+      "topCount": "верх 0 из 1 {total} {shown}",
       "colGrade": "Оценка",
       "colScore": "Счет",
       "colFunction": "Функция",

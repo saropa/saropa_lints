@@ -185,7 +185,7 @@
       "help": "مدد",
       "groupBy": "گروپ بذریعہ…",
       "textFilter": "ٹیکسٹ فلٹر…",
-      "severityImpact": "شدت اور اثر",
+      "severityImpact": "Severity filter…",
       "hideRules": "اصول چھپائیں…",
       "ruleMetadata": "اصول میٹا ڈیٹا",
       "clearFilters": "فلٹرز صاف کریں۔",
@@ -196,7 +196,19 @@
       "refreshExtension": "ریفریش ایکسٹینشن",
       "openPackageDashboard": "پیکیج ڈیش بورڈ کھولیں۔",
       "openCodeHealth": "کوڈ ہیلتھ کھولیں۔",
-      "openLintsConfig": "Lints Config کھولیں۔"
+      "openLintsConfig": "Lints Config کھولیں۔",
+      "reloadFromDisk": "Reload from disk",
+      "reloadFromDiskTitle": "Re-render the dashboard from the last violations.json without re-running the analyzer.",
+      "reEnableDisabledRules": "Re-enable disabled rules…",
+      "reEnableDisabledRulesTitle": "Open a quick-pick of rules currently disabled in analysis_options_custom.yaml and re-enable the chosen ones.",
+      "reEnableNoneTitle": "No rules currently disabled",
+      "reEnableNoneMessage": "No rules are currently disabled via analysis_options_custom.yaml.",
+      "reEnableQuickPickTitle": "Re-enable disabled rules",
+      "reEnableQuickPickPlaceholder": "Select one or more rules to re-enable",
+      "menuGroupExport": "Export",
+      "menuGroupFilter": "Filter & focus",
+      "menuGroupOpen": "Open dashboard",
+      "menuGroupSystem": "System"
     },
     "progress": {
       "runningLabel": "تجزیہ چل رہا ہے…",
@@ -395,7 +407,7 @@
     "noMatchingFindingsCopy": "کاپی کرنے کے لیے کوئی مماثل نتائج نہیں ملے۔",
     "couldNotOpenFile": "فائل نہیں کھولی جا سکی: 0 {path}",
     "saveReportNoWorkspace": "رپورٹ کو محفوظ کرنے سے پہلے ایک ورک اسپیس فولڈر کھولیں۔",
-    "savedFindings": "محفوظ کردہ 0 تلاشیں: 1 {count} {path}",
+    "savedFindings": "محفوظ کردہ 0 تلاشیں: 1 {path} {count}",
     "couldNotSaveReportJson": "رپورٹ JSON کو محفوظ نہیں کیا جا سکا۔"
   },
   "packageDashboard": {
@@ -419,7 +431,7 @@
       "packages": "پیکجز",
       "projectGrade": "پروجیکٹ پیکیج گریڈ",
       "totalSize": "کل سائز*",
-      "gradeTooltip": "پروجیکٹ گریڈ 0\nاوسط سکور: 1/100\nپیکیجز: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {avgGrade} {avgScore} {e} {c} {f} {b} {a}",
+      "gradeTooltip": "پروجیکٹ گریڈ 0\nاوسط سکور: 1/100\nپیکیجز: 2\nA:3 B:4 C:5 E:6 F:7 {a} {f} {avgGrade} {b} {c} {avgScore} {pkgCount} {e}",
       "vibrantTitle": "متحرک",
       "stableTitle": "مستحکم",
       "outdatedTitle": "فرسودہ",
@@ -434,7 +446,7 @@
       "caveatLine2": "سرگرمی کی حدیں: 90d = باسی، 180d = غیر فعال (عزم + ریلیز ٹائم لائنز)۔"
     },
     "breakdown": {
-      "title": "گریڈ 0 کیوں؟ — 1/100 اوسط 2 پیکجوں میں {pkgCount} {avgScore} {grade}",
+      "title": "گریڈ 0 کیوں؟ — 1/100 اوسط 2 پیکجوں میں {avgScore} {pkgCount} {grade}",
       "hint": "پھیلانے کے لیے کلک کریں۔",
       "distributionHeading": "تقسیم",
       "signalsHeading": "اسکور کو نیچے گھسیٹتے ہوئے رسک سگنلز",
@@ -691,7 +703,7 @@
       "gatesPassing": "گزرنے والے دروازے"
     },
     "gauge": {
-      "tooltip": "اوسط سکور 0 از 100 (گریڈ 1)۔ {grade} {rounded}",
+      "tooltip": "اوسط سکور 0 از 100 (گریڈ 1)۔ {rounded} {grade}",
       "ariaLabel": "اوسط اسکور 0 از 100 {rounded}"
     },
     "gate": {
@@ -732,7 +744,7 @@
     "table": {
       "ariaLabel": "اسکور کے لحاظ سے بدترین افعال",
       "heading": "بدترین افعال",
-      "topCount": "سب سے اوپر 0 از 1 {shown} {total}",
+      "topCount": "سب سے اوپر 0 از 1 {total} {shown}",
       "colGrade": "گریڈ",
       "colScore": "سکور",
       "colFunction": "فنکشن",

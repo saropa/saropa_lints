@@ -185,7 +185,7 @@
       "help": "帮助",
       "groupBy": "分组依据...",
       "textFilter": "文本过滤器...",
-      "severityImpact": "严重性和影响",
+      "severityImpact": "Severity filter…",
       "hideRules": "隐藏规则...",
       "ruleMetadata": "规则元数据",
       "clearFilters": "清除过滤器",
@@ -196,7 +196,19 @@
       "refreshExtension": "刷新扩展",
       "openPackageDashboard": "打开包仪表板",
       "openCodeHealth": "开放代码健康",
-      "openLintsConfig": "打开 Lints 配置"
+      "openLintsConfig": "打开 Lints 配置",
+      "reloadFromDisk": "Reload from disk",
+      "reloadFromDiskTitle": "Re-render the dashboard from the last violations.json without re-running the analyzer.",
+      "reEnableDisabledRules": "Re-enable disabled rules…",
+      "reEnableDisabledRulesTitle": "Open a quick-pick of rules currently disabled in analysis_options_custom.yaml and re-enable the chosen ones.",
+      "reEnableNoneTitle": "No rules currently disabled",
+      "reEnableNoneMessage": "No rules are currently disabled via analysis_options_custom.yaml.",
+      "reEnableQuickPickTitle": "Re-enable disabled rules",
+      "reEnableQuickPickPlaceholder": "Select one or more rules to re-enable",
+      "menuGroupExport": "Export",
+      "menuGroupFilter": "Filter & focus",
+      "menuGroupOpen": "Open dashboard",
+      "menuGroupSystem": "System"
     },
     "progress": {
       "runningLabel": "运行分析...",
@@ -395,7 +407,7 @@
     "noMatchingFindingsCopy": "没有匹配的结果可供复制。",
     "couldNotOpenFile": "无法打开文件：0 {path}",
     "saveReportNoWorkspace": "保存报告之前打开工作区文件夹。",
-    "savedFindings": "已保存 0 结果：1 {count} {path}",
+    "savedFindings": "已保存 0 结果：1 {path} {count}",
     "couldNotSaveReportJson": "无法保存报告 JSON。"
   },
   "packageDashboard": {
@@ -419,7 +431,7 @@
       "packages": "套餐",
       "projectGrade": "工程包等级",
       "totalSize": "总尺寸*",
-      "gradeTooltip": "工程等级0\n平均分：1/100\n套餐：2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {avgGrade} {avgScore} {e} {c} {f} {b} {a}",
+      "gradeTooltip": "工程等级0\n平均分：1/100\n套餐：2\nA:3 B:4 C:5 E:6 F:7 {a} {f} {avgGrade} {b} {c} {avgScore} {pkgCount} {e}",
       "vibrantTitle": "充满活力",
       "stableTitle": "稳定的",
       "outdatedTitle": "过时的",
@@ -434,7 +446,7 @@
       "caveatLine2": "活动阈值：90d = 陈旧，180d = 休眠（提交 + 发布时间表）。"
     },
     "breakdown": {
-      "title": "为什么评分0？ — 2 包的 1/100 平均值 {pkgCount} {avgScore} {grade}",
+      "title": "为什么评分0？ — 2 包的 1/100 平均值 {avgScore} {pkgCount} {grade}",
       "hint": "点击展开",
       "distributionHeading": "分配",
       "signalsHeading": "风险信号拖累分数下跌",
@@ -691,7 +703,7 @@
       "gatesPassing": "大门经过"
     },
     "gauge": {
-      "tooltip": "平均分0为100分（等级1）。 {grade} {rounded}",
+      "tooltip": "平均分0为100分（等级1）。 {rounded} {grade}",
       "ariaLabel": "平均分 0 100 {rounded}"
     },
     "gate": {
@@ -732,7 +744,7 @@
     "table": {
       "ariaLabel": "按分数列出的最差函数",
       "heading": "最差的功能",
-      "topCount": "顶部 0 共 1 {shown} {total}",
+      "topCount": "顶部 0 共 1 {total} {shown}",
       "colGrade": "年级",
       "colScore": "分数",
       "colFunction": "功能",

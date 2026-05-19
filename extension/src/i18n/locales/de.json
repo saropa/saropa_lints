@@ -185,7 +185,7 @@
       "help": "Helfen",
       "groupBy": "Gruppieren nach…",
       "textFilter": "Textfilter…",
-      "severityImpact": "Schweregrad und Auswirkungen",
+      "severityImpact": "Severity filter…",
       "hideRules": "Regeln ausblenden…",
       "ruleMetadata": "Regelmetadaten",
       "clearFilters": "Filter löschen",
@@ -196,7 +196,19 @@
       "refreshExtension": "Erweiterung aktualisieren",
       "openPackageDashboard": "Öffnen Sie das Paket-Dashboard",
       "openCodeHealth": "Code Health öffnen",
-      "openLintsConfig": "Öffnen Sie die Lints-Konfiguration"
+      "openLintsConfig": "Öffnen Sie die Lints-Konfiguration",
+      "reloadFromDisk": "Reload from disk",
+      "reloadFromDiskTitle": "Re-render the dashboard from the last violations.json without re-running the analyzer.",
+      "reEnableDisabledRules": "Re-enable disabled rules…",
+      "reEnableDisabledRulesTitle": "Open a quick-pick of rules currently disabled in analysis_options_custom.yaml and re-enable the chosen ones.",
+      "reEnableNoneTitle": "No rules currently disabled",
+      "reEnableNoneMessage": "No rules are currently disabled via analysis_options_custom.yaml.",
+      "reEnableQuickPickTitle": "Re-enable disabled rules",
+      "reEnableQuickPickPlaceholder": "Select one or more rules to re-enable",
+      "menuGroupExport": "Export",
+      "menuGroupFilter": "Filter & focus",
+      "menuGroupOpen": "Open dashboard",
+      "menuGroupSystem": "System"
     },
     "progress": {
       "runningLabel": "Laufanalyse…",
@@ -395,7 +407,7 @@
     "noMatchingFindingsCopy": "Keine passenden Ergebnisse zum Kopieren vorhanden.",
     "couldNotOpenFile": "Datei konnte nicht geöffnet werden: 0 {path}",
     "saveReportNoWorkspace": "Öffnen Sie einen Arbeitsbereichsordner, bevor Sie den Bericht speichern.",
-    "savedFindings": "Gespeicherte 0 Ergebnisse: 1 {count} {path}",
+    "savedFindings": "Gespeicherte 0 Ergebnisse: 1 {path} {count}",
     "couldNotSaveReportJson": "Der JSON-Bericht konnte nicht gespeichert werden."
   },
   "packageDashboard": {
@@ -419,7 +431,7 @@
       "packages": "Pakete",
       "projectGrade": "Grad des Projektpakets",
       "totalSize": "Gesamtgröße*",
-      "gradeTooltip": "Projektnote 0\nDurchschnittliche Punktzahl: 1/100\nPakete: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {avgGrade} {avgScore} {e} {c} {f} {b} {a}",
+      "gradeTooltip": "Projektnote 0\nDurchschnittliche Punktzahl: 1/100\nPakete: 2\nA:3 B:4 C:5 E:6 F:7 {a} {f} {avgGrade} {b} {c} {avgScore} {pkgCount} {e}",
       "vibrantTitle": "Lebendig",
       "stableTitle": "Stabil",
       "outdatedTitle": "Veraltet",
@@ -434,7 +446,7 @@
       "caveatLine2": "Aktivitätsschwellenwerte: 90 Tage = veraltet, 180 Tage = ruhend (Commit- und Release-Zeitpläne)."
     },
     "breakdown": {
-      "title": "Warum Note 0? — 1/100 Durchschnitt über 2 Pakete {pkgCount} {avgScore} {grade}",
+      "title": "Warum Note 0? — 1/100 Durchschnitt über 2 Pakete {avgScore} {pkgCount} {grade}",
       "hint": "Klicken Sie zum Erweitern",
       "distributionHeading": "Verteilung",
       "signalsHeading": "Risikosignale ziehen den Score nach unten",
@@ -691,7 +703,7 @@
       "gatesPassing": "Tore passieren"
     },
     "gauge": {
-      "tooltip": "Durchschnittliche Punktzahl 0 von 100 (Note 1). {grade} {rounded}",
+      "tooltip": "Durchschnittliche Punktzahl 0 von 100 (Note 1). {rounded} {grade}",
       "ariaLabel": "Durchschnittliche Punktzahl 0 von 100 {rounded}"
     },
     "gate": {
@@ -732,7 +744,7 @@
     "table": {
       "ariaLabel": "Schlechteste Funktionen nach Punktzahl",
       "heading": "Schlechteste Funktionen",
-      "topCount": "oben 0 von 1 {shown} {total}",
+      "topCount": "oben 0 von 1 {total} {shown}",
       "colGrade": "Grad",
       "colScore": "Punktzahl",
       "colFunction": "Funktion",

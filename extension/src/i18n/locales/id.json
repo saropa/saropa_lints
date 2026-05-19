@@ -185,7 +185,7 @@
       "help": "Membantu",
       "groupBy": "Kelompokkan berdasarkan…",
       "textFilter": "Filter teks…",
-      "severityImpact": "Tingkat keparahan & dampak",
+      "severityImpact": "Severity filter…",
       "hideRules": "Sembunyikan aturan…",
       "ruleMetadata": "Metadata aturan",
       "clearFilters": "Hapus filter",
@@ -196,7 +196,19 @@
       "refreshExtension": "Segarkan ekstensi",
       "openPackageDashboard": "Buka dasbor Paket",
       "openCodeHealth": "Buka Kode Kesehatan",
-      "openLintsConfig": "Buka Konfigurasi Lints"
+      "openLintsConfig": "Buka Konfigurasi Lints",
+      "reloadFromDisk": "Reload from disk",
+      "reloadFromDiskTitle": "Re-render the dashboard from the last violations.json without re-running the analyzer.",
+      "reEnableDisabledRules": "Re-enable disabled rules…",
+      "reEnableDisabledRulesTitle": "Open a quick-pick of rules currently disabled in analysis_options_custom.yaml and re-enable the chosen ones.",
+      "reEnableNoneTitle": "No rules currently disabled",
+      "reEnableNoneMessage": "No rules are currently disabled via analysis_options_custom.yaml.",
+      "reEnableQuickPickTitle": "Re-enable disabled rules",
+      "reEnableQuickPickPlaceholder": "Select one or more rules to re-enable",
+      "menuGroupExport": "Export",
+      "menuGroupFilter": "Filter & focus",
+      "menuGroupOpen": "Open dashboard",
+      "menuGroupSystem": "System"
     },
     "progress": {
       "runningLabel": "Menjalankan analisis…",
@@ -395,7 +407,7 @@
     "noMatchingFindingsCopy": "Tidak ada temuan yang cocok untuk disalin.",
     "couldNotOpenFile": "Tidak dapat membuka file: 0 {path}",
     "saveReportNoWorkspace": "Buka folder ruang kerja sebelum menyimpan laporan.",
-    "savedFindings": "Temuan 0 yang disimpan: 1 {count} {path}",
+    "savedFindings": "Temuan 0 yang disimpan: 1 {path} {count}",
     "couldNotSaveReportJson": "Tidak dapat menyimpan laporan JSON."
   },
   "packageDashboard": {
@@ -419,7 +431,7 @@
       "packages": "Paket",
       "projectGrade": "Kelas Paket Proyek",
       "totalSize": "Ukuran Jumlah*",
-      "gradeTooltip": "Kelas proyek 0\nSkor rata-rata: 1/100\nPaket: 2\nA:3 B:4 C:5 E:6 F:7 {pkgCount} {avgGrade} {avgScore} {e} {c} {f} {b} {a}",
+      "gradeTooltip": "Kelas proyek 0\nSkor rata-rata: 1/100\nPaket: 2\nA:3 B:4 C:5 E:6 F:7 {a} {f} {avgGrade} {b} {c} {avgScore} {pkgCount} {e}",
       "vibrantTitle": "Bersemangat",
       "stableTitle": "Stabil",
       "outdatedTitle": "Kedaluwarsa",
@@ -434,7 +446,7 @@
       "caveatLine2": "Ambang batas aktivitas: 90d = basi, 180d = tidak aktif (jadwal komit + rilis)."
     },
     "breakdown": {
-      "title": "Mengapa kelas 0? — Rata-rata 1/100 di seluruh 2 paket {pkgCount} {avgScore} {grade}",
+      "title": "Mengapa kelas 0? — Rata-rata 1/100 di seluruh 2 paket {avgScore} {pkgCount} {grade}",
       "hint": "Klik untuk memperluas",
       "distributionHeading": "Distribusi",
       "signalsHeading": "Sinyal risiko menyeret skor ke bawah",
@@ -691,7 +703,7 @@
       "gatesPassing": "gerbang lewat"
     },
     "gauge": {
-      "tooltip": "Nilai rata-rata 0 dari 100 (kelas 1). {grade} {rounded}",
+      "tooltip": "Nilai rata-rata 0 dari 100 (kelas 1). {rounded} {grade}",
       "ariaLabel": "Skor rata-rata 0 dari 100 {rounded}"
     },
     "gate": {
@@ -732,7 +744,7 @@
     "table": {
       "ariaLabel": "Fungsi terburuk berdasarkan skor",
       "heading": "Fungsi terburuk",
-      "topCount": "0 teratas dari 1 {shown} {total}",
+      "topCount": "0 teratas dari 1 {total} {shown}",
       "colGrade": "Nilai",
       "colScore": "Skor",
       "colFunction": "Fungsi",
