@@ -401,6 +401,47 @@ export function getViolationsDashboardStyles(): string {
     }
     .menu-item:hover { background: var(--vscode-list-hoverBackground); }
     .menu-item:focus-visible { outline: 1px solid var(--vscode-focusBorder); outline-offset: -1px; }
+    /* Uniform icon column so labels align across every menu item regardless
+       of which glyph codepoint is used (varying advance widths in the fallback
+       font would otherwise create a ragged left edge). The .menu-item-label
+       wraps glyph+label so they shrink together rather than breaking the kbd
+       column. */
+    .menu-item-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+    .menu-item-label > .glyph {
+      display: inline-block;
+      width: 1.2em;
+      flex: 0 0 1.2em;
+      text-align: center;
+      color: var(--muted);
+      font-size: 1.05em;
+      line-height: 1;
+    }
+    /* Section separator + section heading inside the More menu.
+       The heading is a thin uppercase label that doubles as a sectional
+       anchor; the separator is the visual rule between groups (Export /
+       Filter / Open / System). The first heading has no separator above
+       because it would draw a line immediately under the menu's top edge. */
+    .menu-sep {
+      border: 0;
+      border-top: 1px solid var(--vscode-input-border, var(--surface-3, rgba(128,128,128,.25)));
+      margin: 6px 4px;
+      height: 0;
+    }
+    .menu-section-title {
+      padding: 6px 10px 2px;
+      font-size: .72em;
+      font-weight: 600;
+      letter-spacing: .6px;
+      text-transform: uppercase;
+      color: var(--muted);
+      pointer-events: none;
+      user-select: none;
+    }
 
     /* Active filters chip strip (§8.5, §14.10).
        Only renders when filter state diverges from defaults; each chip
@@ -766,6 +807,24 @@ export function getViolationsDashboardStyles(): string {
       word-break: break-word;
     }
     .vmsg { white-space: pre-wrap; word-break: break-word; }
+    /* Finding-row file path is rendered inside .col-msg using the .kpi-sub
+       class (visual reuse). When the column narrows, default LTR truncation
+       eats the END of the path -- which is the filename, the part the user
+       most needs to see. Flip the truncation: render the text as plaintext
+       (direction-detected per run) but anchor it to the right of the cell
+       so when overflow happens the FRONT of the path is clipped and the
+       filename stays visible. The plain title attribute on the element
+       still carries the full path for hover.
+       Scoped via .col-msg so KPI-card subtitles (also .kpi-sub) keep
+       their default left-anchored layout. */
+    .findings-table .col-msg .kpi-sub {
+      direction: rtl;
+      text-align: left;
+      unicode-bidi: plaintext;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
     .row-action {
       visibility: hidden;
       border: 0; background: transparent;

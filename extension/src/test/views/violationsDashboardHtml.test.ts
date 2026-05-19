@@ -208,6 +208,70 @@ describe('violationsDashboardHtml', () => {
     assert.ok(html.includes('id="btn-copy"'));
   });
 
+  it('groups the More menu into Export / Filter / Open / System sections with separators', () => {
+    /* Pins the menu regroup: each of the four section titles must render
+       (so labels are scannable instead of a flat 17-item dump), and at
+       least three <hr class="menu-sep"> separators must render (one
+       between each adjacent pair of sections). */
+    const html = renderViolationsDashboardHtml(minimalInput({}));
+    assert.ok(html.includes('Export'));
+    // Ampersand is HTML-escaped by buildMoreActionsMenu's escapeHtml call,
+    // so the rendered DOM string contains the entity form.
+    assert.ok(html.includes('Filter &amp; focus'));
+    assert.ok(html.includes('Open dashboard'));
+    assert.ok(html.includes('System'));
+    const sepCount = (html.match(/class="menu-sep"/g) ?? []).length;
+    assert.ok(sepCount >= 3, `expected at least 3 menu-sep separators, got ${sepCount}`);
+    assert.ok(html.includes('class="menu-section-title"'));
+  });
+
+  it('exposes "Reload from disk" and "Re-enable disabled rules" inside the More menu', () => {
+    /* "Reload from disk" replaces the redundant toolbar Refresh button.
+       "Re-enable disabled rules" closes the gap where disabling a rule
+       from the dashboard left no in-dashboard path back. Both must be
+       present in the rendered menu HTML. */
+    const html = renderViolationsDashboardHtml(minimalInput({}));
+    assert.ok(html.includes('id="btn-reload-disk"'));
+    assert.ok(html.includes('Reload from disk'));
+    assert.ok(html.includes('data-palette-cmd="saropaLints.reEnableDisabledRules"'));
+    assert.ok(html.includes('Re-enable disabled rules'));
+  });
+
+  it('removes the duplicate Impact filter UI from the dashboard', () => {
+    /* Post-collapse (2026-05-03) impact mirrors severity, so the second
+       pill row, the Group-by-Impact option, the Impact-mix donut, and
+       the imp-off chips were all duplicates. Pin their absence so they
+       cannot drift back in. */
+    const html = renderViolationsDashboardHtml(
+      minimalInput({
+        // Non-zero severity AND non-zero impact so the chart block is
+        // genuinely allowed to render — we want to assert Impact stays
+        // out even when data is present.
+        severityCounts: { error: 1, warning: 2, info: 3 },
+        impactCounts: { error: 1, warning: 2, info: 3 },
+        // Diverge filters from defaults so the chip strip renders.
+        severities: ['error'],
+        impacts: ['error'],
+      }),
+    );
+    assert.ok(!html.includes('data-imp="'));
+    assert.ok(!html.includes('imp-off'));
+    assert.ok(!html.includes('<option value="impact"'));
+    assert.ok(!html.includes('Impact mix'));
+    assert.ok(!html.includes('class="seg-label">Impact'));
+  });
+
+  it('reverses file-path truncation in finding rows so the filename stays visible', () => {
+    /* Scoped CSS rule on .findings-table .col-msg .kpi-sub uses
+       direction: rtl + text-align: left + unicode-bidi: plaintext to
+       anchor the path to the right of the cell — when the column
+       narrows, the FRONT of the path is clipped and the filename
+       stays visible. */
+    const html = renderViolationsDashboardHtml(minimalInput({}));
+    assert.ok(html.includes('.findings-table .col-msg .kpi-sub'));
+    assert.ok(html.includes('unicode-bidi: plaintext'));
+  });
+
   it('renders the Top Rules triage table with per-row Hide and Disable buttons when topRules are supplied', () => {
     const html = renderViolationsDashboardHtml(
       minimalInput({

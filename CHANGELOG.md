@@ -45,6 +45,27 @@
 
 ---
 
+## [13.10.0]
+
+Findings dashboard cleanup: the duplicate Impact filter row, Group-by-Impact option, and Impact-mix donut are gone — Severity is now the single axis (Impact had mirrored Severity since the 5→3 collapse). The "More" menu is grouped into Export / Filter / Open / System sections with separators, file paths in the findings table truncate from the front so the filename stays visible, the redundant toolbar Refresh has moved into the menu as "Reload from disk", and a new "Re-enable disabled rules…" item lets you recover from an accidental disable without leaving the dashboard. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
+
+### Added (Extension)
+
+- **New More-menu item "Re-enable disabled rules…"** opens a multi-select quick-pick over the rules currently disabled in `analysis_options_custom.yaml` and re-enables the ones you tick — closes a gap where disabling a rule from the Findings dashboard left no in-dashboard path back. No action required.
+- **New More-menu item "Reload from disk"** in the System section re-renders the dashboard from the existing `violations.json` without re-running the analyzer; replaces the visible toolbar Refresh button which was indistinguishable from Run analysis. No action required.
+
+### Changed (Extension)
+
+- **Findings dashboard "More" menu is now grouped** into Export / Filter & focus / Open dashboard / System with section headers, horizontal separators between groups, and a uniform-width icon column so labels align — the flat 17-item list was visually inscrutable. No action required.
+- **File paths in the findings table truncate from the front instead of the end** so the filename (the part you most need to read) stays visible when the column narrows; the full path is still in the hover title. No action required.
+
+### Removed (Extension)
+
+- **Duplicate Impact filter UI removed from the Findings dashboard** — the second pill row, "Group by Impact" option, Impact-mix donut chart, and impact chips on the active-filter strip all mirrored Severity since the 5→3 collapse on 2026-05-03 and added no information. The underlying `Violation.impact` / `byImpact` fields in `violations.json` are kept for back-compat with external consumers. No action required.
+- **Visible toolbar Refresh button removed** in favor of "Reload from disk" inside the More menu (see Added). The hidden `#btn-refresh` stub is retained so existing keybindings and selectors continue to resolve. No action required.
+
+---
+
 ## [13.9.2]
 
 <details><summary>Maintenance</summary>

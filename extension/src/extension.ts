@@ -98,6 +98,7 @@ import {
   removeRuleOverrides,
   invalidateDisabledRulesCache,
   readDisabledRules,
+  readRuleOverrides,
 } from './configWriter';
 import { logReport, logSection, flushReport, findLatestAnalysisReport } from './reportWriter';
 import { generateOwaspReport } from './owaspExport';
@@ -1575,6 +1576,45 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         await vscode.commands.executeCommand('saropaLints.editorDashboards.focus');
       }),
     ),
+    /* Re-enable disabled rules — multi-select quick-pick over the rules
+       currently disabled in analysis_options_custom.yaml. Surfaced from
+       the Findings dashboard More menu because users who disabled a rule
+       from that dashboard previously had no in-dashboard path back to
+       enable it.
+       Why filter to readRuleOverrides() instead of readDisabledRules():
+       saropaLints.enableRules delegates to removeRuleOverrides, which
+       only edits analysis_options_custom.yaml. Rules disabled at the
+       analysis_options.yaml diagnostics level (also returned by
+       readDisabledRules) cannot be re-enabled by that path — listing
+       them here would be a quiet no-op for the user. */
+    vscode.commands.registerCommand('saropaLints.reEnableDisabledRules', async () => {
+      const root = getProjectRoot();
+      if (!root) return;
+      const overrides = readRuleOverrides(root);
+      const disabled: string[] = [];
+      for (const [rule, enabled] of overrides) {
+        if (!enabled) disabled.push(rule);
+      }
+      disabled.sort();
+      if (disabled.length === 0) {
+        await vscode.window.showInformationMessage(
+          l10n('findingsDash.menuPalette.reEnableNoneMessage'),
+        );
+        return;
+      }
+      const picks = await vscode.window.showQuickPick(
+        disabled.map((r) => ({ label: r, picked: false })),
+        {
+          canPickMany: true,
+          title: l10n('findingsDash.menuPalette.reEnableQuickPickTitle'),
+          placeHolder: l10n('findingsDash.menuPalette.reEnableQuickPickPlaceholder'),
+          matchOnDescription: true,
+        },
+      );
+      if (!picks || picks.length === 0) return;
+      const ruleNames = picks.map((p) => p.label);
+      await vscode.commands.executeCommand('saropaLints.enableRules', ruleNames);
+    }),
   );
 
   // ── Copy as JSON commands ───────────────────────────────────────────────

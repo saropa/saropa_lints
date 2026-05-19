@@ -161,10 +161,12 @@ export interface ViolationsDashboardHtmlInput {
 const DEFAULT_SEVERITIES: readonly string[] = ['error', 'warning', 'info'];
 // Three-bucket severity model — collapsed from the prior 5-bucket
 // (critical/high/medium/low/opinionated) impact taxonomy on 2026-05-03;
-// see plan/COLLAPSE_LINT_IMPACT_TO_SEVERITY.md.
+// see plan/COLLAPSE_LINT_IMPACT_TO_SEVERITY.md. DEFAULT_IMPACTS mirrors
+// DEFAULT_SEVERITIES exactly and is only embedded in the webview JS state
+// payload for back-compat with stored panel state; no UI surface solicits
+// impact toggles anymore.
 const DEFAULT_IMPACTS: readonly string[] = ['error', 'warning', 'info'];
 const SEVERITY_ORDER: readonly string[] = ['error', 'warning', 'info'];
-const IMPACT_ORDER: readonly string[] = ['error', 'warning', 'info'];
 
 function escapeHtml(s: string): string {
   return s
@@ -184,7 +186,11 @@ function groupBySelectOptions(current: GroupByMode): string {
     ruleType: l10n('findingsDash.groupBy.ruleType'),
     ruleStatus: l10n('findingsDash.groupBy.ruleStatus'),
   };
-  return VIOLATIONS_GROUP_BY_MODES.map((m) => {
+  // 'impact' is filtered out: post-collapse it groups identically to 'severity'
+  // so offering both is a trap. The mode value stays in the GroupByMode union
+  // (issuesTreeGrouping / triage views still understand it for stored state
+  // back-compat) — the dashboard select simply doesn't expose it.
+  return VIOLATIONS_GROUP_BY_MODES.filter((m) => m !== 'impact').map((m) => {
     const sel = m === current ? ' selected' : '';
     return `<option value="${escapeHtml(m)}"${sel}>${escapeHtml(labels[m])}</option>`;
   }).join('');
@@ -195,15 +201,6 @@ function severitySegmented(active: readonly string[]): string {
     const pressed = active.includes(v);
     return `<button type="button" class="seg-btn" aria-pressed="${pressed}" data-sev="${v}" title="${escapeHtml(l10n('findingsDash.seg.toggleSeverityTitle', { v }))}">
       <span class="swatch sev-${v}"></span>${escapeHtml(v.charAt(0).toUpperCase() + v.slice(1))}
-    </button>`;
-  }).join('');
-}
-
-function impactSegmented(active: readonly string[]): string {
-  return IMPACT_ORDER.map((v) => {
-    const pressed = active.includes(v);
-    return `<button type="button" class="seg-btn" aria-pressed="${pressed}" data-imp="${v}" title="${escapeHtml(l10n('findingsDash.seg.toggleImpactTitle', { v }))}">
-      <span class="swatch imp-${v}"></span>${escapeHtml(v.charAt(0).toUpperCase() + v.slice(1))}
     </button>`;
   }).join('');
 }
@@ -409,7 +406,7 @@ interface KpiSpec {
   value: string;
   sub: string;
   classes: string;
-  filter?: { kind: 'sev' | 'imp' | 'reset' | 'top-rule'; value?: string };
+  filter?: { kind: 'sev' | 'reset' | 'top-rule'; value?: string };
   title?: string;
 }
 
@@ -553,19 +550,26 @@ function buildToolbar(input: ViolationsDashboardHtmlInput): string {
       <button type="button" class="btn tier-1" id="btn-run" data-run-analysis title="${escapeHtml(l10n('findingsDash.toolbar.runAnalysisTitle'))}">
         <span class="glyph">▶</span>${escapeHtml(l10n('toolbar.runAnalysis'))}
       </button>
-      <button type="button" class="btn" id="btn-refresh" title="${escapeHtml(l10n('findingsDash.toolbar.refreshViolationsTitle'))}">
-        <span class="glyph">⟳</span>${escapeHtml(l10n('toolbar.refresh'))}
-      </button>
       ${buildMoreActionsMenu(exportCount)}
+      <!-- Refresh moved into the More menu as "Reload from disk".
+           The visible toolbar button was indistinguishable from Run analysis
+           and never re-ran the analyzer — it only re-rendered from the
+           existing violations.json. Hidden stub kept so existing tests and
+           keybindings that reference #btn-refresh still resolve to a node;
+           the actual click handler is bound to the in-menu replacement. -->
+      <button type="button" id="btn-refresh" hidden aria-hidden="true" tabindex="-1"></button>
     </div>
     <div class="toolbar-row">
+      <!-- The Impact filter pill row was removed: since the LintImpact 5→3
+           collapse on 2026-05-03 (plan/COLLAPSE_LINT_IMPACT_TO_SEVERITY.md),
+           every Impact bucket mirrors the same-named Severity bucket. Two
+           pill rows with identical semantics were confusing — users could
+           not tell which one to use. Severity is the single axis now;
+           input.impacts is still accepted for back-compat with stored
+           webview state but no longer surfaced or solicited. -->
       <span class="seg" role="group" aria-label="${escapeHtml(l10n('findingsDash.toolbar.severityGroupAria'))}">
         <span class="seg-label">${escapeHtml(l10n('findingsDash.toolbar.severityLabel'))}</span>
         ${severitySegmented(input.severities)}
-      </span>
-      <span class="seg" role="group" aria-label="${escapeHtml(l10n('findingsDash.toolbar.impactGroupAria'))}">
-        <span class="seg-label">${escapeHtml(l10n('findingsDash.toolbar.impactLabel'))}</span>
-        ${impactSegmented(input.impacts)}
       </span>
     </div>
     ${buildChipStrip(input)}
@@ -584,53 +588,102 @@ function buildAnalysisProgress(): string {
   </div>`;
 }
 
+/**
+ * One menu item: either a palette command (`cmd` invokes the VS Code command
+ * via paletteCommand message) or a local action (`localId` is the button id,
+ * wired in the webview script directly). Mutually exclusive.
+ */
+type MenuItem = {
+  readonly cmd?: string;
+  readonly localId?: string;
+  readonly glyph: string;
+  readonly label: string;
+  readonly kbd?: string;
+  readonly title?: string;
+};
+
+/**
+ * Build the More menu HTML, grouped into four labeled sections with separators:
+ *   Export   — Copy JSON, Save report, Copy tree JSON
+ *   Filter   — Group by, Text filter, Severity & impact, Hide rules, Rule
+ *              metadata, Match active editor, Clear filters, Clear
+ *              suppressions, Clear file focus, Re-enable disabled rules
+ *   Open     — Package dashboard, Code Health, Lints Config
+ *   System   — Help, Reload from disk, Refresh extension
+ *
+ * Why grouped: a flat 17-item list (previous shape) is visually inscrutable —
+ * users scan label-by-label instead of jumping to a category. Section heads
+ * + <hr class="menu-sep"> between sections make the menu glanceable.
+ *
+ * Every item carries a glyph so the icon column is uniform (previously only
+ * Copy JSON / Save report had glyphs, the rest were text-only — labels did
+ * not line up). The glyph slot is fixed-width via .menu-item .glyph in
+ * violationsDashboardStyles.ts.
+ *
+ * Hidden id="btn-refresh-extension" preserves the existing test contract
+ * and keyboard binding (Cmd/Ctrl-R) without polluting the visible menu.
+ */
 function buildMoreActionsMenu(exportCount: number): string {
-  const items: Array<[string, string, string]> = [
-    ['saropaLints.openHelpHub', l10n('findingsDash.menuPalette.help'), 'F1'],
-    ['saropaLints.setGroupBy', l10n('findingsDash.menuPalette.groupBy'), ''],
-    ['saropaLints.setIssuesFilter', l10n('findingsDash.menuPalette.textFilter'), ''],
-    ['saropaLints.setIssuesFilterByType', l10n('findingsDash.menuPalette.severityImpact'), ''],
-    ['saropaLints.setIssuesFilterByRule', l10n('findingsDash.menuPalette.hideRules'), ''],
-    ['saropaLints.setIssuesFilterByMetadata', l10n('findingsDash.menuPalette.ruleMetadata'), ''],
-    ['saropaLints.clearIssuesFilters', l10n('findingsDash.menuPalette.clearFilters'), ''],
-    ['saropaLints.clearSuppressions', l10n('findingsDash.menuPalette.clearSuppressions'), ''],
-    ['saropaLints.clearFocusFile', l10n('findingsDash.menuPalette.clearFileFocus'), ''],
-    ['saropaLints.focusIssuesForActiveFile', l10n('findingsDash.menuPalette.matchActiveEditor'), ''],
-    ['saropaLints.issues.copyAsJson', l10n('findingsDash.menuPalette.copyTreeJson'), ''],
-    ['saropaLints.refresh', l10n('findingsDash.menuPalette.refreshExtension'), ''],
-    ['saropaLints.openPackageVibrancy', l10n('findingsDash.menuPalette.openPackageDashboard'), ''],
-    ['saropaLints.openProjectVibrancyReport', l10n('findingsDash.menuPalette.openCodeHealth'), ''],
-    ['saropaLints.openConfigDashboard', l10n('findingsDash.menuPalette.openLintsConfig'), ''],
+  const exportItems: readonly MenuItem[] = [
+    { localId: 'btn-copy', glyph: '⎘', label: l10n('toolbar.copyJson'), title: l10n('findingsDash.toolbar.copyJsonTitle', { count: String(exportCount) }) },
+    { localId: 'btn-save', glyph: '⤓', label: l10n('toolbar.saveReport'), title: l10n('findingsDash.toolbar.saveReportTitle') },
+    { cmd: 'saropaLints.issues.copyAsJson', glyph: '❏', label: l10n('findingsDash.menuPalette.copyTreeJson') },
   ];
-  const itemsHtml = items
-    .map(([cmd, label, kbd]) =>
-      `<button type="button" class="menu-item" data-palette-cmd="${escapeHtml(cmd)}">
-        <span>${escapeHtml(label)}</span>
-        <span class="kbd">${escapeHtml(kbd)}</span>
-      </button>`,
-    )
+  const filterItems: readonly MenuItem[] = [
+    { cmd: 'saropaLints.setGroupBy', glyph: '▦', label: l10n('findingsDash.menuPalette.groupBy') },
+    { cmd: 'saropaLints.setIssuesFilter', glyph: '⌕', label: l10n('findingsDash.menuPalette.textFilter') },
+    { cmd: 'saropaLints.setIssuesFilterByType', glyph: '◉', label: l10n('findingsDash.menuPalette.severityImpact') },
+    { cmd: 'saropaLints.setIssuesFilterByRule', glyph: '⊘', label: l10n('findingsDash.menuPalette.hideRules') },
+    { cmd: 'saropaLints.setIssuesFilterByMetadata', glyph: 'ℹ', label: l10n('findingsDash.menuPalette.ruleMetadata') },
+    { cmd: 'saropaLints.focusIssuesForActiveFile', glyph: '⊙', label: l10n('findingsDash.menuPalette.matchActiveEditor') },
+    { cmd: 'saropaLints.clearIssuesFilters', glyph: '⌫', label: l10n('findingsDash.menuPalette.clearFilters') },
+    { cmd: 'saropaLints.clearSuppressions', glyph: '⌫', label: l10n('findingsDash.menuPalette.clearSuppressions') },
+    { cmd: 'saropaLints.clearFocusFile', glyph: '⌫', label: l10n('findingsDash.menuPalette.clearFileFocus') },
+    { cmd: 'saropaLints.reEnableDisabledRules', glyph: '⟲', label: l10n('findingsDash.menuPalette.reEnableDisabledRules'), title: l10n('findingsDash.menuPalette.reEnableDisabledRulesTitle') },
+  ];
+  const openItems: readonly MenuItem[] = [
+    { cmd: 'saropaLints.openPackageVibrancy', glyph: '❒', label: l10n('findingsDash.menuPalette.openPackageDashboard') },
+    { cmd: 'saropaLints.openProjectVibrancyReport', glyph: '♥', label: l10n('findingsDash.menuPalette.openCodeHealth') },
+    { cmd: 'saropaLints.openConfigDashboard', glyph: '⚙', label: l10n('findingsDash.menuPalette.openLintsConfig') },
+  ];
+  const systemItems: readonly MenuItem[] = [
+    { cmd: 'saropaLints.openHelpHub', glyph: '?', label: l10n('findingsDash.menuPalette.help'), kbd: 'F1' },
+    { localId: 'btn-reload-disk', glyph: '↺', label: l10n('findingsDash.menuPalette.reloadFromDisk'), title: l10n('findingsDash.menuPalette.reloadFromDiskTitle') },
+    { cmd: 'saropaLints.refresh', glyph: '⟳', label: l10n('findingsDash.menuPalette.refreshExtension') },
+  ];
+
+  const sections: ReadonlyArray<{ key: string; title: string; items: readonly MenuItem[] }> = [
+    { key: 'export', title: l10n('findingsDash.menuPalette.menuGroupExport'), items: exportItems },
+    { key: 'filter', title: l10n('findingsDash.menuPalette.menuGroupFilter'), items: filterItems },
+    { key: 'open', title: l10n('findingsDash.menuPalette.menuGroupOpen'), items: openItems },
+    { key: 'system', title: l10n('findingsDash.menuPalette.menuGroupSystem'), items: systemItems },
+  ];
+
+  const renderItem = (item: MenuItem): string => {
+    const idAttr = item.localId ? ` id="${escapeHtml(item.localId)}"` : '';
+    const cmdAttr = item.cmd ? ` data-palette-cmd="${escapeHtml(item.cmd)}"` : '';
+    const titleAttr = item.title ? ` title="${escapeHtml(item.title)}"` : '';
+    return `<button type="button" class="menu-item"${idAttr}${cmdAttr}${titleAttr}>
+      <span class="menu-item-label"><span class="glyph">${escapeHtml(item.glyph)}</span>${escapeHtml(item.label)}</span>
+      <span class="kbd">${escapeHtml(item.kbd ?? '')}</span>
+    </button>`;
+  };
+
+  const sectionsHtml = sections
+    .map((section, index) => {
+      const sep = index > 0 ? `<hr class="menu-sep" role="separator" />` : '';
+      const head = `<div class="menu-section-title" role="presentation">${escapeHtml(section.title)}</div>`;
+      const body = section.items.map(renderItem).join('');
+      return `${sep}${head}${body}`;
+    })
     .join('');
-  // Copy JSON / Save report were tier-2 toolbar buttons but pushed the visible
-  // control row past the §14.4 ~6-button budget. They are filtered-export
-  // operations users reach for occasionally, not on every visit, so they
-  // belong in the overflow menu. IDs are preserved so existing test
-  // contracts and message handlers keep working without script changes.
-  // Hidden id="btn-refresh-extension" preserves the existing test contract
-  // and keyboard binding without polluting the visible toolbar.
+
   return `<details class="more">
     <summary class="btn" title="${escapeHtml(l10n('toolbar.moreActions'))}" aria-label="${escapeHtml(l10n('toolbar.moreActions'))}">
       <span class="glyph">⋯</span>${escapeHtml(l10n('findingsDash.toolbar.moreSummary'))} <span class="chev">${escapeHtml(l10n('findingsDash.toolbar.moreChevron'))}</span>
     </summary>
     <div class="menu" role="menu">
-      <button type="button" class="menu-item" id="btn-copy" title="${escapeHtml(l10n('findingsDash.toolbar.copyJsonTitle', { count: String(exportCount) }))}">
-        <span><span class="glyph">⎘</span>${escapeHtml(l10n('toolbar.copyJson'))}</span>
-        <span class="kbd"></span>
-      </button>
-      <button type="button" class="menu-item" id="btn-save" title="${escapeHtml(l10n('findingsDash.toolbar.saveReportTitle'))}">
-        <span><span class="glyph">⤓</span>${escapeHtml(l10n('toolbar.saveReport'))}</span>
-        <span class="kbd"></span>
-      </button>
-      ${itemsHtml}
+      ${sectionsHtml}
     </div>
   </details>
   <button type="button" id="btn-refresh-extension" hidden aria-hidden="true" tabindex="-1"></button>`;
@@ -650,11 +703,10 @@ function buildChipStrip(input: ViolationsDashboardHtmlInput): string {
       chips.push(buildChip('sev-off', l10n('findingsDash.chip.severityOff', { v }), `sev:${v}`));
     }
   }
-  for (const v of IMPACT_ORDER) {
-    if (!input.impacts.includes(v)) {
-      chips.push(buildChip('imp-off', l10n('findingsDash.chip.impactOff', { v }), `imp:${v}`));
-    }
-  }
+  // Impact chips intentionally not emitted — see the comment on the toolbar
+  // row above buildToolbar's seg group. Impact mirrors severity since the
+  // 2026-05-03 collapse; the chip would always duplicate the corresponding
+  // severity chip.
   if (chips.length === 0) return '';
   return `<div class="chip-strip" id="chipStrip">
     <span class="lbl">${escapeHtml(l10n('filter.activeLabel'))}</span>
@@ -881,13 +933,14 @@ function sectionCount(sec: DashboardSection): number {
 
 function buildChartsBlock(input: ViolationsDashboardHtmlInput): string {
   const sevTotal = SEVERITY_ORDER.reduce((n, k) => n + (input.severityCounts[k] ?? 0), 0);
-  const impTotal = IMPACT_ORDER.reduce((n, k) => n + (input.impactCounts[k] ?? 0), 0);
-  if (sevTotal === 0 && impTotal === 0) return '';
+  if (sevTotal === 0) return '';
+  // The Impact mix donut was removed: post-collapse it rendered an identical
+  // chart to Severity mix on the same row. impactCounts is still populated
+  // on input for stored snapshot back-compat but no longer displayed.
   return `<section class="section" aria-label="${escapeHtml(l10n('findingsDash.charts.sectionAria'))}">
     <h2>${escapeHtml(l10n('findingsDash.charts.heading'))} <span class="meta">${escapeHtml(l10n('findingsDash.charts.metaClickSlice'))}</span></h2>
     <div class="charts-grid">
-      ${sevTotal === 0 ? '' : buildMixCard(l10n('findingsDash.charts.severityMix'), SEVERITY_ORDER, input.severityCounts, 'sev')}
-      ${impTotal === 0 ? '' : buildMixCard(l10n('findingsDash.charts.impactMix'), IMPACT_ORDER, input.impactCounts, 'imp')}
+      ${buildMixCard(l10n('findingsDash.charts.severityMix'), SEVERITY_ORDER, input.severityCounts, 'sev')}
     </div>
   </section>`;
 }
@@ -1197,16 +1250,15 @@ function buildScript(): string {
     document.querySelectorAll('.seg-btn[data-sev][aria-pressed="true"]').forEach(function (el) {
       sev.push(el.getAttribute('data-sev'));
     });
-    var imp = [];
-    document.querySelectorAll('.seg-btn[data-imp][aria-pressed="true"]').forEach(function (el) {
-      imp.push(el.getAttribute('data-imp'));
-    });
+    // Impact pills were removed (post-collapse impact mirrors severity).
+    // Send the default all-impacts-on list so the host-side merge that
+    // still accepts an impacts field treats it as "no filter applied".
     return {
       type: 'dashboardUpdate',
       groupBy: gb ? gb.value : undefined,
       textFilter: tf ? tf.value : '',
       severities: sev.length ? sev : ${JSON.stringify(DEFAULT_SEVERITIES)},
-      impacts: imp.length ? imp : ${JSON.stringify(DEFAULT_IMPACTS)}
+      impacts: ${JSON.stringify(DEFAULT_IMPACTS)}
     };
   }
 
@@ -1257,10 +1309,9 @@ function buildScript(): string {
     if (s.severities.length !== sevDefaults) {
       parts.push(s.severities.length + ' ' + FD.severitiesNoun);
     }
-    var impDefaults = ${JSON.stringify(DEFAULT_IMPACTS)}.length;
-    if (s.impacts.length !== impDefaults) {
-      parts.push(s.impacts.length + ' ' + FD.impactsNoun);
-    }
+    // Impact divergence-announcement was removed alongside the impact
+    // pill UI; readState always emits the default all-impacts-on list,
+    // so the branch would be permanently dead.
     if (parts.length === 0) {
       announce(FD.announceCleared);
     } else {
@@ -1395,7 +1446,9 @@ function buildScript(): string {
   if (tfClear) tfClear.addEventListener('click', function () {
     if (tf) { tf.value = ''; pushState(true); recentMaybeShow(); }
   });
-  document.querySelectorAll('.seg-btn[data-sev], .seg-btn[data-imp]').forEach(function (btn) {
+  // Impact-pill click branch was removed alongside the impact toolbar row.
+  // The selector is now severity-only.
+  document.querySelectorAll('.seg-btn[data-sev]').forEach(function (btn) {
     btn.addEventListener('click', function () {
       var pressed = btn.getAttribute('aria-pressed') === 'true';
       btn.setAttribute('aria-pressed', pressed ? 'false' : 'true');
@@ -1405,7 +1458,18 @@ function buildScript(): string {
 
   /* Toolbar primary actions */
   bindClick('btn-run', triggerRunAnalysis);
+  // Refresh was promoted out of the toolbar (it was indistinguishable from
+  // Run analysis but only re-rendered from disk). The hidden #btn-refresh
+  // stub keeps test selectors / keybindings resolvable; the user-clickable
+  // replacement is the "Reload from disk" item in the More menu's System
+  // section. Both fire the same {type:'refresh'} message so any existing
+  // host-side handler keeps working unchanged.
   bindClick('btn-refresh', function () { vscode.postMessage({ type: 'refresh' }); });
+  bindClick('btn-reload-disk', function () {
+    vscode.postMessage({ type: 'refresh' });
+    var det = document.querySelector('details.more');
+    if (det) det.removeAttribute('open');
+  });
   // Copy JSON / Save report now live inside the More-actions overflow menu
   // (§14.4 toolbar budget). Auto-close the menu after click so the user is
   // not left with an open dropdown obscuring the table.
@@ -1483,14 +1547,8 @@ function buildScript(): string {
         pushState(true);
         return;
       }
-      if (kind === 'imp') {
-        var keep = v.split(',');
-        document.querySelectorAll('.seg-btn[data-imp]').forEach(function (b) {
-          b.setAttribute('aria-pressed', keep.indexOf(b.getAttribute('data-imp')) >= 0 ? 'true' : 'false');
-        });
-        pushState(true);
-        return;
-      }
+      // KpiSpec.filter.kind === 'imp' branch was removed: collectKpiCards()
+      // never emits an 'imp' KPI card since the Impact axis was retired.
       if (kind === 'top-rule') {
         var input = document.getElementById('textFilter');
         if (input) { input.value = v; pushState(true); }
@@ -1507,13 +1565,11 @@ function buildScript(): string {
     function fire() {
       var kind = row.getAttribute('data-filter-kind');
       var v = row.getAttribute('data-filter-value');
+      // Only severity bars emit clickable rows now — the Impact-mix donut /
+      // bars are gone.
       if (kind === 'sev') {
         document.querySelectorAll('.seg-btn[data-sev]').forEach(function (b) {
           b.setAttribute('aria-pressed', b.getAttribute('data-sev') === v ? 'true' : 'false');
-        });
-      } else if (kind === 'imp') {
-        document.querySelectorAll('.seg-btn[data-imp]').forEach(function (b) {
-          b.setAttribute('aria-pressed', b.getAttribute('data-imp') === v ? 'true' : 'false');
         });
       }
       pushState(true);
@@ -1537,11 +1593,10 @@ function buildScript(): string {
         var sv = token.slice(4);
         var btn = document.querySelector('.seg-btn[data-sev="' + sv + '"]');
         if (btn) { btn.setAttribute('aria-pressed', 'true'); pushState(true); }
-      } else if (token.indexOf('imp:') === 0) {
-        var iv = token.slice(4);
-        var ibtn = document.querySelector('.seg-btn[data-imp="' + iv + '"]');
-        if (ibtn) { ibtn.setAttribute('aria-pressed', 'true'); pushState(true); }
       }
+      // No 'imp:' branch — impact chips are no longer emitted from
+      // buildChipStrip, so any imp: token in stored state is stale and
+      // a no-op is the right behavior.
     });
   });
   bindClick('chipsClearAll', function () { vscode.postMessage({ type: 'resetFilters' }); });
