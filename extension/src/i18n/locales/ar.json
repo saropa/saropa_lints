@@ -431,7 +431,7 @@
       "packages": "الحزم",
       "projectGrade": "درجة حزمة المشروع",
       "totalSize": "الحجم الإجمالي*",
-      "gradeTooltip": "درجة المشروع 0\nمتوسط الدرجات: 1/100\nالحزم: 2\nأ:3 ب:4 ج:5 ه:6 و:٧ {a} {f} {avgGrade} {b} {c} {avgScore} {pkgCount} {e}",
+      "gradeTooltip": "درجة المشروع 0\nمتوسط الدرجات: 1/100\nالحزم: 2\nأ:3 ب:4 ج:5 ه:6 و:٧ {c} {e} {avgScore} {pkgCount} {avgGrade} {a} {b} {f}",
       "vibrantTitle": "نابضة بالحياة",
       "stableTitle": "مستقر",
       "outdatedTitle": "عفا عليها الزمن",
@@ -446,7 +446,7 @@
       "caveatLine2": "حدود النشاط: 90 يومًا = قديم، 180 يومًا = خامل (الالتزام + الجداول الزمنية للإصدار)."
     },
     "breakdown": {
-      "title": "لماذا الدرجة 0؟ — متوسط ​​1/100 عبر الحزم 2 {avgScore} {pkgCount} {grade}",
+      "title": "لماذا الدرجة 0؟ — متوسط ​​1/100 عبر الحزم 2 {avgScore} {grade} {pkgCount}",
       "hint": "انقر للتوسيع",
       "distributionHeading": "توزيع",
       "signalsHeading": "إشارات الخطر تسحب النتيجة إلى أسفل",

@@ -431,7 +431,7 @@
       "packages": "Pakketten",
       "projectGrade": "Projectpakketklasse",
       "totalSize": "Totale grootte*",
-      "gradeTooltip": "Projectcijfer 0\nGemiddelde score: 1/100\nPakketten: 2\nA:3 B:4 C:5 E:6 F:7 {a} {f} {avgGrade} {b} {c} {avgScore} {pkgCount} {e}",
+      "gradeTooltip": "Projectcijfer 0\nGemiddelde score: 1/100\nPakketten: 2\nA:3 B:4 C:5 E:6 F:7 {c} {e} {avgScore} {pkgCount} {avgGrade} {a} {b} {f}",
       "vibrantTitle": "Levendig",
       "stableTitle": "Stabiel",
       "outdatedTitle": "Verouderd",
@@ -446,7 +446,7 @@
       "caveatLine2": "Activiteitsdrempels: 90d = verouderd, 180d = slapend (tijdlijnen voor vastleggen en vrijgeven)."
     },
     "breakdown": {
-      "title": "Waarom cijfer 0? — 1/100 gemiddeld over 2 pakketten {avgScore} {pkgCount} {grade}",
+      "title": "Waarom cijfer 0? — 1/100 gemiddeld over 2 pakketten {avgScore} {grade} {pkgCount}",
       "hint": "Klik om uit te vouwen",
       "distributionHeading": "Verdeling",
       "signalsHeading": "Risicosignalen die de score naar beneden halen",

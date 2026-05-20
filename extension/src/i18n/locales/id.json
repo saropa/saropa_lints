@@ -431,7 +431,7 @@
       "packages": "Paket",
       "projectGrade": "Kelas Paket Proyek",
       "totalSize": "Ukuran Jumlah*",
-      "gradeTooltip": "Kelas proyek 0\nSkor rata-rata: 1/100\nPaket: 2\nA:3 B:4 C:5 E:6 F:7 {a} {f} {avgGrade} {b} {c} {avgScore} {pkgCount} {e}",
+      "gradeTooltip": "Kelas proyek 0\nSkor rata-rata: 1/100\nPaket: 2\nA:3 B:4 C:5 E:6 F:7 {c} {e} {avgScore} {pkgCount} {avgGrade} {a} {b} {f}",
       "vibrantTitle": "Bersemangat",
       "stableTitle": "Stabil",
       "outdatedTitle": "Kedaluwarsa",
@@ -446,7 +446,7 @@
       "caveatLine2": "Ambang batas aktivitas: 90d = basi, 180d = tidak aktif (jadwal komit + rilis)."
     },
     "breakdown": {
-      "title": "Mengapa kelas 0? — Rata-rata 1/100 di seluruh 2 paket {avgScore} {pkgCount} {grade}",
+      "title": "Mengapa kelas 0? — Rata-rata 1/100 di seluruh 2 paket {avgScore} {grade} {pkgCount}",
       "hint": "Klik untuk memperluas",
       "distributionHeading": "Distribusi",
       "signalsHeading": "Sinyal risiko menyeret skor ke bawah",

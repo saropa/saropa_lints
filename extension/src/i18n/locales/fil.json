@@ -431,7 +431,7 @@
       "packages": "Mga package",
       "projectGrade": "Marka ng Pakete ng Proyekto",
       "totalSize": "Kabuuang Sukat*",
-      "gradeTooltip": "Marka ng proyekto 0\nAverage na marka: 1/100\nMga Package: 2\nA:3 B:4 C:5 E:6 F:7 {a} {f} {avgGrade} {b} {c} {avgScore} {pkgCount} {e}",
+      "gradeTooltip": "Marka ng proyekto 0\nAverage na marka: 1/100\nMga Package: 2\nA:3 B:4 C:5 E:6 F:7 {c} {e} {avgScore} {pkgCount} {avgGrade} {a} {b} {f}",
       "vibrantTitle": "Masigla",
       "stableTitle": "Matatag",
       "outdatedTitle": "Luma na",
@@ -446,7 +446,7 @@
       "caveatLine2": "Mga threshold ng aktibidad: 90d = lipas, 180d = tulog (commit + release timeline)."
     },
     "breakdown": {
-      "title": "Bakit grade 0? — 1/100 average sa 2 na mga pakete {avgScore} {pkgCount} {grade}",
+      "title": "Bakit grade 0? — 1/100 average sa 2 na mga pakete {avgScore} {grade} {pkgCount}",
       "hint": "I-click upang palawakin",
       "distributionHeading": "Pamamahagi",
       "signalsHeading": "Mga senyales ng panganib na nag-drag pababa sa marka",

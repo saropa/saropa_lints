@@ -431,7 +431,7 @@
       "packages": "Pacotes",
       "projectGrade": "Nota do pacote do projeto",
       "totalSize": "Tamanho Total*",
-      "gradeTooltip": "Nota do projeto 0\nPontuação média: 1/100\nPacotes: 2\nA:3 B:4 C:5 E:6 F:7 {a} {f} {avgGrade} {b} {c} {avgScore} {pkgCount} {e}",
+      "gradeTooltip": "Nota do projeto 0\nPontuação média: 1/100\nPacotes: 2\nA:3 B:4 C:5 E:6 F:7 {c} {e} {avgScore} {pkgCount} {avgGrade} {a} {b} {f}",
       "vibrantTitle": "Vibrante",
       "stableTitle": "Estável",
       "outdatedTitle": "Desatualizado",
@@ -446,7 +446,7 @@
       "caveatLine2": "Limites de atividade: 90d = obsoleto, 180d = inativo (prazos de confirmação + lançamento)."
     },
     "breakdown": {
-      "title": "Por que nota 0? — Média de 1/100 em pacotes de 2 {avgScore} {pkgCount} {grade}",
+      "title": "Por que nota 0? — Média de 1/100 em pacotes de 2 {avgScore} {grade} {pkgCount}",
       "hint": "Clique para expandir",
       "distributionHeading": "Distribuição",
       "signalsHeading": "Sinais de risco arrastando a pontuação para baixo",

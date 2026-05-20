@@ -431,7 +431,7 @@
       "packages": "Forfaits",
       "projectGrade": "Catégorie du package de projet",
       "totalSize": "Taille totale*",
-      "gradeTooltip": "Note du projet 0\nNote moyenne : 1/100\nForfaits : 2\nA:3 B:4 C:5 E:6 F:7 {a} {f} {avgGrade} {b} {c} {avgScore} {pkgCount} {e}",
+      "gradeTooltip": "Note du projet 0\nNote moyenne : 1/100\nForfaits : 2\nA:3 B:4 C:5 E:6 F:7 {c} {e} {avgScore} {pkgCount} {avgGrade} {a} {b} {f}",
       "vibrantTitle": "Dynamique",
       "stableTitle": "Écurie",
       "outdatedTitle": "Dépassé",
@@ -446,7 +446,7 @@
       "caveatLine2": "Seuils d'activité : 90 j = obsolète, 180 j = dormant (échéanciers de validation et de publication)."
     },
     "breakdown": {
-      "title": "Pourquoi noter 0 ? — 1/100 en moyenne sur 2 forfaits {avgScore} {pkgCount} {grade}",
+      "title": "Pourquoi noter 0 ? — 1/100 en moyenne sur 2 forfaits {avgScore} {grade} {pkgCount}",
       "hint": "Cliquez pour agrandir",
       "distributionHeading": "Distribution",
       "signalsHeading": "Les signaux de risque font baisser le score",

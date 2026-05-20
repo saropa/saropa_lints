@@ -431,7 +431,7 @@
       "packages": "套餐",
       "projectGrade": "工程包等级",
       "totalSize": "总尺寸*",
-      "gradeTooltip": "工程等级0\n平均分：1/100\n套餐：2\nA:3 B:4 C:5 E:6 F:7 {a} {f} {avgGrade} {b} {c} {avgScore} {pkgCount} {e}",
+      "gradeTooltip": "工程等级0\n平均分：1/100\n套餐：2\nA:3 B:4 C:5 E:6 F:7 {c} {e} {avgScore} {pkgCount} {avgGrade} {a} {b} {f}",
       "vibrantTitle": "充满活力",
       "stableTitle": "稳定的",
       "outdatedTitle": "过时的",
@@ -446,7 +446,7 @@
       "caveatLine2": "活动阈值：90d = 陈旧，180d = 休眠（提交 + 发布时间表）。"
     },
     "breakdown": {
-      "title": "为什么评分0？ — 2 包的 1/100 平均值 {avgScore} {pkgCount} {grade}",
+      "title": "为什么评分0？ — 2 包的 1/100 平均值 {avgScore} {grade} {pkgCount}",
       "hint": "点击展开",
       "distributionHeading": "分配",
       "signalsHeading": "风险信号拖累分数下跌",

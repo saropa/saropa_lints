@@ -431,7 +431,7 @@
       "packages": "Vifurushi",
       "projectGrade": "Daraja la Kifurushi cha Mradi",
       "totalSize": "Jumla ya Ukubwa*",
-      "gradeTooltip": "Daraja la mradi 0\nAlama ya wastani: 1/100\nVifurushi: 2\nA:3 B:4 C:5 E:6 F:7 {a} {f} {avgGrade} {b} {c} {avgScore} {pkgCount} {e}",
+      "gradeTooltip": "Daraja la mradi 0\nAlama ya wastani: 1/100\nVifurushi: 2\nA:3 B:4 C:5 E:6 F:7 {c} {e} {avgScore} {pkgCount} {avgGrade} {a} {b} {f}",
       "vibrantTitle": "Mahiri",
       "stableTitle": "Imara",
       "outdatedTitle": "Imepitwa na wakati",
@@ -446,7 +446,7 @@
       "caveatLine2": "Viwango vya shughuli: 90d = vilichakaa, 180d = vimetulia (jitolea + muda wa kutolewa)."
     },
     "breakdown": {
-      "title": "Kwa nini daraja 0? — 1/100 wastani katika vifurushi 2 {avgScore} {pkgCount} {grade}",
+      "title": "Kwa nini daraja 0? — 1/100 wastani katika vifurushi 2 {avgScore} {grade} {pkgCount}",
       "hint": "Bofya ili kupanua",
       "distributionHeading": "Usambazaji",
       "signalsHeading": "Ishara za hatari zinazoburuta alama chini",

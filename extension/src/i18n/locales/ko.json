@@ -431,7 +431,7 @@
       "packages": "패키지",
       "projectGrade": "프로젝트 패키지 등급",
       "totalSize": "전체 크기*",
-      "gradeTooltip": "프로젝트 등급 0\n평균 점수: 1/100\n패키지: 2\nA:3 B:4 C:5 E:6 F:7 {a} {f} {avgGrade} {b} {c} {avgScore} {pkgCount} {e}",
+      "gradeTooltip": "프로젝트 등급 0\n평균 점수: 1/100\n패키지: 2\nA:3 B:4 C:5 E:6 F:7 {c} {e} {avgScore} {pkgCount} {avgGrade} {a} {b} {f}",
       "vibrantTitle": "떠는",
       "stableTitle": "안정적인",
       "outdatedTitle": "구식",
@@ -446,7 +446,7 @@
       "caveatLine2": "활동 임계값: 90일 = 오래됨, 180일 = 휴면(커밋 + 릴리스 타임라인)."
     },
     "breakdown": {
-      "title": "왜 0등급인가요? — 2 패키지 전체 평균 1/100 {avgScore} {pkgCount} {grade}",
+      "title": "왜 0등급인가요? — 2 패키지 전체 평균 1/100 {avgScore} {grade} {pkgCount}",
       "hint": "펼치려면 클릭하세요.",
       "distributionHeading": "분포",
       "signalsHeading": "점수를 낮추는 위험 신호",

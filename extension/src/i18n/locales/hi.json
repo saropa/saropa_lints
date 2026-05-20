@@ -431,7 +431,7 @@
       "packages": "संकुल",
       "projectGrade": "प्रोजेक्ट पैकेज ग्रेड",
       "totalSize": "कुल आकार*",
-      "gradeTooltip": "प्रोजेक्ट ग्रेड 0\nऔसत स्कोर: 1/100\nपैकेज: 2\nA:3 B:4 C:5 E:6 F:7 {a} {f} {avgGrade} {b} {c} {avgScore} {pkgCount} {e}",
+      "gradeTooltip": "प्रोजेक्ट ग्रेड 0\nऔसत स्कोर: 1/100\nपैकेज: 2\nA:3 B:4 C:5 E:6 F:7 {c} {e} {avgScore} {pkgCount} {avgGrade} {a} {b} {f}",
       "vibrantTitle": "जीवंत",
       "stableTitle": "स्थिर",
       "outdatedTitle": "रगड़ा हुआ",
@@ -446,7 +446,7 @@
       "caveatLine2": "गतिविधि सीमाएँ: 90d = बासी, 180d = निष्क्रिय (प्रतिबद्ध + रिलीज़ समयसीमा)।"
     },
     "breakdown": {
-      "title": "ग्रेड 0 क्यों? - 1/100 औसत 2 पैकेजों में {avgScore} {pkgCount} {grade}",
+      "title": "ग्रेड 0 क्यों? - 1/100 औसत 2 पैकेजों में {avgScore} {grade} {pkgCount}",
       "hint": "विस्तार करने के लिए क्लिक करें",
       "distributionHeading": "वितरण",
       "signalsHeading": "जोखिम संकेत स्कोर को नीचे खींच रहे हैं",

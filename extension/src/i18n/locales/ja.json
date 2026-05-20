@@ -431,7 +431,7 @@
       "packages": "パッケージ",
       "projectGrade": "プロジェクトパッケージグレード",
       "totalSize": "合計サイズ*",
-      "gradeTooltip": "プロジェクトグレード 0\n平均スコア: 1/100\nパッケージ: 2\nA:3 B:4 C:5 E:6 F:7 {a} {f} {avgGrade} {b} {c} {avgScore} {pkgCount} {e}",
+      "gradeTooltip": "プロジェクトグレード 0\n平均スコア: 1/100\nパッケージ: 2\nA:3 B:4 C:5 E:6 F:7 {c} {e} {avgScore} {pkgCount} {avgGrade} {a} {b} {f}",
       "vibrantTitle": "活気に満ちた",
       "stableTitle": "安定した",
       "outdatedTitle": "時代遅れ",
@@ -446,7 +446,7 @@
       "caveatLine2": "アクティビティのしきい値: 90 日 = 古い、180 日 = 休止中 (コミット + リリースのタイムライン)。"
     },
     "breakdown": {
-      "title": "なぜ 0 と評価するのでしょうか? — 2 パッケージ全体で 1/100 の平均 {avgScore} {pkgCount} {grade}",
+      "title": "なぜ 0 と評価するのでしょうか? — 2 パッケージ全体で 1/100 の平均 {avgScore} {grade} {pkgCount}",
       "hint": "クリックして展開します",
       "distributionHeading": "分布",
       "signalsHeading": "スコアを引き下げるリスクシグナル",

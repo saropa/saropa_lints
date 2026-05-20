@@ -431,7 +431,7 @@
       "packages": "بسته ها",
       "projectGrade": "درجه بسته پروژه",
       "totalSize": "اندازه کل*",
-      "gradeTooltip": "درجه پروژه 0\nمیانگین امتیاز: 1/100\nپکیج ها: 2\nA:3 B:4 C:5 E:6 F:7 {a} {f} {avgGrade} {b} {c} {avgScore} {pkgCount} {e}",
+      "gradeTooltip": "درجه پروژه 0\nمیانگین امتیاز: 1/100\nپکیج ها: 2\nA:3 B:4 C:5 E:6 F:7 {c} {e} {avgScore} {pkgCount} {avgGrade} {a} {b} {f}",
       "vibrantTitle": "پر جنب و جوش",
       "stableTitle": "پایدار",
       "outdatedTitle": "منسوخ شده",
@@ -446,7 +446,7 @@
       "caveatLine2": "آستانه فعالیت: 90d = قدیمی، 180d = غیرفعال (تعهد + جدول زمانی انتشار)."
     },
     "breakdown": {
-      "title": "چرا درجه 0؟ — 1/100 میانگین در بین بسته‌های 2 {avgScore} {pkgCount} {grade}",
+      "title": "چرا درجه 0؟ — 1/100 میانگین در بین بسته‌های 2 {avgScore} {grade} {pkgCount}",
       "hint": "برای گسترش کلیک کنید",
       "distributionHeading": "توزیع",
       "signalsHeading": "سیگنال های ریسک امتیاز را به پایین می کشد",

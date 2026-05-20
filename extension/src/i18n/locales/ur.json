@@ -431,7 +431,7 @@
       "packages": "پیکجز",
       "projectGrade": "پروجیکٹ پیکیج گریڈ",
       "totalSize": "کل سائز*",
-      "gradeTooltip": "پروجیکٹ گریڈ 0\nاوسط سکور: 1/100\nپیکیجز: 2\nA:3 B:4 C:5 E:6 F:7 {a} {f} {avgGrade} {b} {c} {avgScore} {pkgCount} {e}",
+      "gradeTooltip": "پروجیکٹ گریڈ 0\nاوسط سکور: 1/100\nپیکیجز: 2\nA:3 B:4 C:5 E:6 F:7 {c} {e} {avgScore} {pkgCount} {avgGrade} {a} {b} {f}",
       "vibrantTitle": "متحرک",
       "stableTitle": "مستحکم",
       "outdatedTitle": "فرسودہ",
@@ -446,7 +446,7 @@
       "caveatLine2": "سرگرمی کی حدیں: 90d = باسی، 180d = غیر فعال (عزم + ریلیز ٹائم لائنز)۔"
     },
     "breakdown": {
-      "title": "گریڈ 0 کیوں؟ — 1/100 اوسط 2 پیکجوں میں {avgScore} {pkgCount} {grade}",
+      "title": "گریڈ 0 کیوں؟ — 1/100 اوسط 2 پیکجوں میں {avgScore} {grade} {pkgCount}",
       "hint": "پھیلانے کے لیے کلک کریں۔",
       "distributionHeading": "تقسیم",
       "signalsHeading": "اسکور کو نیچے گھسیٹتے ہوئے رسک سگنلز",

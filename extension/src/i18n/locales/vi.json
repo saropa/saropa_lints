@@ -431,7 +431,7 @@
       "packages": "Gói",
       "projectGrade": "Lớp gói dự án",
       "totalSize": "Tổng kích thước*",
-      "gradeTooltip": "Cấp dự án 0\nĐiểm trung bình: 1/100\nGói: 2\nA:3 B:4 C:5 E:6 F:7 {a} {f} {avgGrade} {b} {c} {avgScore} {pkgCount} {e}",
+      "gradeTooltip": "Cấp dự án 0\nĐiểm trung bình: 1/100\nGói: 2\nA:3 B:4 C:5 E:6 F:7 {c} {e} {avgScore} {pkgCount} {avgGrade} {a} {b} {f}",
       "vibrantTitle": "Sống động",
       "stableTitle": "Ổn định",
       "outdatedTitle": "lỗi thời",
@@ -446,7 +446,7 @@
       "caveatLine2": "Ngưỡng hoạt động: 90d = cũ, 180d = không hoạt động (cam kết + mốc thời gian phát hành)."
     },
     "breakdown": {
-      "title": "Tại sao lại điểm 0? — trung bình 1/100 trên 2 gói {avgScore} {pkgCount} {grade}",
+      "title": "Tại sao lại điểm 0? — trung bình 1/100 trên 2 gói {avgScore} {grade} {pkgCount}",
       "hint": "Bấm để mở rộng",
       "distributionHeading": "Phân bổ",
       "signalsHeading": "Tín hiệu rủi ro kéo điểm xuống",

@@ -431,7 +431,7 @@
       "packages": "пакети",
       "projectGrade": "Оцінка пакету проекту",
       "totalSize": "Загальний розмір*",
-      "gradeTooltip": "Оцінка проекту 0\nСередній бал: 1/100\nПакети: 2\nA:3 B:4 C:5 E:6 F:7 {a} {f} {avgGrade} {b} {c} {avgScore} {pkgCount} {e}",
+      "gradeTooltip": "Оцінка проекту 0\nСередній бал: 1/100\nПакети: 2\nA:3 B:4 C:5 E:6 F:7 {c} {e} {avgScore} {pkgCount} {avgGrade} {a} {b} {f}",
       "vibrantTitle": "Яскравий",
       "stableTitle": "Стабільний",
       "outdatedTitle": "Застаріла",
@@ -446,7 +446,7 @@
       "caveatLine2": "Порогові значення активності: 90d = неактивний, 180d = неактивний (термінали фіксації + випуску)."
     },
     "breakdown": {
-      "title": "Чому оцінка 0? — 1/100 у середньому для 2 упаковок {avgScore} {pkgCount} {grade}",
+      "title": "Чому оцінка 0? — 1/100 у середньому для 2 упаковок {avgScore} {grade} {pkgCount}",
       "hint": "Натисніть, щоб розгорнути",
       "distributionHeading": "Розподіл",
       "signalsHeading": "Сигнали ризику, що знижують рахунок",

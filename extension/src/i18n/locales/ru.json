@@ -431,7 +431,7 @@
       "packages": "Пакеты",
       "projectGrade": "Оценка пакета проекта",
       "totalSize": "Общий размер*",
-      "gradeTooltip": "Оценка проекта 0\nСредний балл: 1/100\nПакеты: 2\nA:3 B:4 C:5 E:6 F:7 {a} {f} {avgGrade} {b} {c} {avgScore} {pkgCount} {e}",
+      "gradeTooltip": "Оценка проекта 0\nСредний балл: 1/100\nПакеты: 2\nA:3 B:4 C:5 E:6 F:7 {c} {e} {avgScore} {pkgCount} {avgGrade} {a} {b} {f}",
       "vibrantTitle": "Яркий",
       "stableTitle": "Стабильный",
       "outdatedTitle": "Устаревший",
@@ -446,7 +446,7 @@
       "caveatLine2": "Пороги активности: 90d = устаревшие, 180d = бездействующие (сроки фиксации + выпуска)."
     },
     "breakdown": {
-      "title": "Почему оценка 0? — 1/100 в среднем по 2 пакетам {avgScore} {pkgCount} {grade}",
+      "title": "Почему оценка 0? — 1/100 в среднем по 2 пакетам {avgScore} {grade} {pkgCount}",
       "hint": "Нажмите, чтобы развернуть",
       "distributionHeading": "Распределение",
       "signalsHeading": "Сигналы риска, снижающие рейтинг",

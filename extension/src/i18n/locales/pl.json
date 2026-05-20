@@ -431,7 +431,7 @@
       "packages": "Pakiety",
       "projectGrade": "Ocena pakietu projektu",
       "totalSize": "Całkowity rozmiar*",
-      "gradeTooltip": "Ocena projektu 0\nŚredni wynik: 1/100\nPakiety: 2\nA:3 B:4 C:5 E:6 F:7 {a} {f} {avgGrade} {b} {c} {avgScore} {pkgCount} {e}",
+      "gradeTooltip": "Ocena projektu 0\nŚredni wynik: 1/100\nPakiety: 2\nA:3 B:4 C:5 E:6 F:7 {c} {e} {avgScore} {pkgCount} {avgGrade} {a} {b} {f}",
       "vibrantTitle": "Wibrujący",
       "stableTitle": "Stabilny",
       "outdatedTitle": "Przestarzały",
@@ -446,7 +446,7 @@
       "caveatLine2": "Progi aktywności: 90d = nieaktualne, 180d = uśpione (osie czasu zatwierdzenia i wydania)."
     },
     "breakdown": {
-      "title": "Dlaczego klasa 0? — 1/100 średnio w 2 pakietach {avgScore} {pkgCount} {grade}",
+      "title": "Dlaczego klasa 0? — 1/100 średnio w 2 pakietach {avgScore} {grade} {pkgCount}",
       "hint": "Kliknij, aby rozwinąć",
       "distributionHeading": "Dystrybucja",
       "signalsHeading": "Sygnały ryzyka obniżają wynik",

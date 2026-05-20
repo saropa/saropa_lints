@@ -431,7 +431,7 @@
       "packages": "Paquetes",
       "projectGrade": "Grado del paquete del proyecto",
       "totalSize": "Tamaño total*",
-      "gradeTooltip": "Calificación del proyecto 0\nPuntuación media: 1/100\nPaquetes: 2\nA:3 B:4 C:5 E:6 F:7 {a} {f} {avgGrade} {b} {c} {avgScore} {pkgCount} {e}",
+      "gradeTooltip": "Calificación del proyecto 0\nPuntuación media: 1/100\nPaquetes: 2\nA:3 B:4 C:5 E:6 F:7 {c} {e} {avgScore} {pkgCount} {avgGrade} {a} {b} {f}",
       "vibrantTitle": "Vibrante",
       "stableTitle": "Estable",
       "outdatedTitle": "Anticuado",
@@ -446,7 +446,7 @@
       "caveatLine2": "Umbrales de actividad: 90d = obsoleto, 180d = inactivo (cronogramas de confirmación + liberación)."
     },
     "breakdown": {
-      "title": "¿Por qué calificar 0? — 1/100 promedio en 2 paquetes {avgScore} {pkgCount} {grade}",
+      "title": "¿Por qué calificar 0? — 1/100 promedio en 2 paquetes {avgScore} {grade} {pkgCount}",
       "hint": "Haga clic para ampliar",
       "distributionHeading": "Distribución",
       "signalsHeading": "Señales de riesgo que arrastran la puntuación hacia abajo",

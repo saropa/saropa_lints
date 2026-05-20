@@ -431,7 +431,7 @@
       "packages": "חבילות",
       "projectGrade": "ציון חבילת פרויקט",
       "totalSize": "גודל כולל*",
-      "gradeTooltip": "ציון הפרויקט 0\nציון ממוצע: 1/100\nחבילות: 2\nA:3 B:4 C:5 E:6 F:7 {a} {f} {avgGrade} {b} {c} {avgScore} {pkgCount} {e}",
+      "gradeTooltip": "ציון הפרויקט 0\nציון ממוצע: 1/100\nחבילות: 2\nA:3 B:4 C:5 E:6 F:7 {c} {e} {avgScore} {pkgCount} {avgGrade} {a} {b} {f}",
       "vibrantTitle": "תוסס",
       "stableTitle": "יַצִיב",
       "outdatedTitle": "מְיוּשָׁן",
@@ -446,7 +446,7 @@
       "caveatLine2": "ספי פעילות: 90d = מעופש, 180d = רדום (מחוייבות + לוחות זמנים לשחרור)."
     },
     "breakdown": {
-      "title": "למה ציון 0? — ממוצע של 1/100 על פני 2 חבילות {avgScore} {pkgCount} {grade}",
+      "title": "למה ציון 0? — ממוצע של 1/100 על פני 2 חבילות {avgScore} {grade} {pkgCount}",
       "hint": "לחץ כדי להרחיב",
       "distributionHeading": "הֲפָצָה",
       "signalsHeading": "אותות סיכון גוררים את הניקוד למטה",

@@ -431,7 +431,7 @@
       "packages": "প্যাকেজ",
       "projectGrade": "প্রকল্প প্যাকেজ গ্রেড",
       "totalSize": "মোট আকার*",
-      "gradeTooltip": "প্রকল্প গ্রেড 0\nগড় স্কোর: 1/100\nপ্যাকেজ: 2\nA:3 B:4 C:5 E:6 F:7 {a} {f} {avgGrade} {b} {c} {avgScore} {pkgCount} {e}",
+      "gradeTooltip": "প্রকল্প গ্রেড 0\nগড় স্কোর: 1/100\nপ্যাকেজ: 2\nA:3 B:4 C:5 E:6 F:7 {c} {e} {avgScore} {pkgCount} {avgGrade} {a} {b} {f}",
       "vibrantTitle": "প্রাণবন্ত",
       "stableTitle": "স্থিতিশীল",
       "outdatedTitle": "সেকেলে",
@@ -446,7 +446,7 @@
       "caveatLine2": "অ্যাক্টিভিটি থ্রেশহোল্ড: 90d = বাসি, 180d = সুপ্ত (কমিট + রিলিজ টাইমলাইন)।"
     },
     "breakdown": {
-      "title": "কেন গ্রেড 0? — 1/100 গড় 2 প্যাকেজ জুড়ে {avgScore} {pkgCount} {grade}",
+      "title": "কেন গ্রেড 0? — 1/100 গড় 2 প্যাকেজ জুড়ে {avgScore} {grade} {pkgCount}",
       "hint": "প্রসারিত করতে ক্লিক করুন",
       "distributionHeading": "বিতরণ",
       "signalsHeading": "স্কোর নিচে টেনে ঝুঁকি সংকেত",

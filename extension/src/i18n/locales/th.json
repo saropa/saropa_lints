@@ -431,7 +431,7 @@
       "packages": "แพ็คเกจ",
       "projectGrade": "เกรดแพ็คเกจโครงการ",
       "totalSize": "ขนาดรวม*",
-      "gradeTooltip": "เกรดโครงการ 0\nคะแนนเฉลี่ย: 1/100\nแพ็คเกจ: 2\nก:3 B:4 ค:5 อี:6 ฟ:7 {a} {f} {avgGrade} {b} {c} {avgScore} {pkgCount} {e}",
+      "gradeTooltip": "เกรดโครงการ 0\nคะแนนเฉลี่ย: 1/100\nแพ็คเกจ: 2\nก:3 B:4 ค:5 อี:6 ฟ:7 {c} {e} {avgScore} {pkgCount} {avgGrade} {a} {b} {f}",
       "vibrantTitle": "มีชีวิตชีวา",
       "stableTitle": "มั่นคง",
       "outdatedTitle": "ล้าสมัย",
@@ -446,7 +446,7 @@
       "caveatLine2": "เกณฑ์กิจกรรม: 90d = เก่า, 180d = อยู่เฉยๆ (กระทำ + ไทม์ไลน์การเผยแพร่)"
     },
     "breakdown": {
-      "title": "ทำไมต้องเกรด 0? — 1/100 โดยเฉลี่ยจากแพ็คเกจ 2 {avgScore} {pkgCount} {grade}",
+      "title": "ทำไมต้องเกรด 0? — 1/100 โดยเฉลี่ยจากแพ็คเกจ 2 {avgScore} {grade} {pkgCount}",
       "hint": "คลิกเพื่อขยาย",
       "distributionHeading": "การกระจาย",
       "signalsHeading": "สัญญาณความเสี่ยงลากคะแนนลง",
