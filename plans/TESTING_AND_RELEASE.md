@@ -1,7 +1,5 @@
 # Testing & Release Plan
 
-Consolidated from TESTING_ISSUES.md, task-phase6-testing-release.md, and UNIT_TEST_COVERAGE.md.
-
 **Last updated:** 2026-05-08  
 **Scope:** All lint rules in `lib/src/rules/`, tests in `test/`, and v5 release readiness.  
 **Goal:** Expand behavioral fixture integration tests, close remaining fixture gaps, verify IDE integration, prove quick-fix application end-to-end.
