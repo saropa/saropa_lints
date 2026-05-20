@@ -52,6 +52,7 @@
 <details><summary>Maintenance</summary>
 
 - **Stopped tracking `packages/saropa_lints_api/pubspec.lock`** — it had been committed before the `.gitignore` rule that ignores sub-package lockfiles, so the index contradicted the stated intent (consumers re-resolve; tracked sub-package locks only create merge churn). Now untracked via `git rm --cached`.
+- Consolidated the build backlog and planning index into `ROADMAP.md` and dropped the eight already-shipped platform-config rules from it; internal planning docs only, no packaged behavior change.
 
 </details>
 
