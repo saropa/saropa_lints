@@ -142,12 +142,24 @@ def regenerate_extension_locales_from_english(project_dir: Path) -> bool | None:
     gen = i18n_dir / "generate_locales.py"
     if not gen.is_file():
         return None
+    # Enable machine translation so newly-added English strings are actually
+    # translated at publish time. Without this flag the generator leaves unknown
+    # phrases in English (passthrough), which silently ships untranslated UI and
+    # leaves the coverage audit perpetually "missing". MT results are cached in
+    # extension/scripts/i18n/.cache so reruns are network-free for known strings.
+    # Merge over os.environ (not replace): run_command passes env straight to the
+    # subprocess, so a bare {flag: "1"} would wipe PATH/PYTHONPATH and break it.
+    gen_env = {**os.environ, "SAROPA_I18N_MACHINE_TRANSLATE": "1"}
     r = run_command(
-        [sys.executable, str(gen)],
+        # --fail-on-missing turns residual untranslated strings into a non-zero
+        # exit so the publish pipeline aborts instead of shipping a "translated"
+        # bundle that silently contains English. The caller treats False as fatal.
+        [sys.executable, str(gen), "--fail-on-missing"],
         i18n_dir,
-        "Regenerate extension locales from English",
+        "Regenerate extension locales from English (machine-translate new strings)",
         capture_output=True,
         allow_failure=True,
+        env=gen_env,
     )
     if r.returncode != 0:
         if r.stderr:
@@ -351,11 +363,17 @@ def package_extension(project_dir: Path, version: str) -> Path | None:
     if regen is True:
         print_success("Extension locale JSON regenerated from English sources.")
     elif regen is False:
-        print_warning(
-            "Extension locale regeneration failed — fix i18n scripts or run "
-            "python extension/scripts/i18n/generate_locales.py before shipping "
-            "if English strings changed."
+        # Coverage gate: the generator ran with --fail-on-missing, so a non-zero
+        # exit means at least one locale still has untranslated strings (or the
+        # i18n scripts errored). Abort rather than ship a partially-English
+        # "translated" bundle — the user chose MT + gate over silent passthrough.
+        print_error(
+            "Extension locale coverage gate FAILED — at least one locale has "
+            "missing translations (or the i18n generator errored). Resolve the "
+            "gaps (see the printed coverage table; add curated dictionaries.py "
+            "entries) and rerun. Publish aborted."
         )
+        return None
     if not run_extension_compile(project_dir):
         return None
     vsix = run_extension_package(project_dir, version)

@@ -7,6 +7,8 @@ from typing import Dict
 # cspell:disable
 TRANSLATIONS: Dict[str, Dict[str, str]] = {
     "nl": {
+        # Curated passthroughs: MT returns these identical (cognate / brand-prefixed title / abbreviation) for this locale; English is the correct rendering. Keeps the coverage gate honest without shipping garbage.
+        "impact ≠ {v}": "impact ≠ {v}",
         "Search": "Zoeken",
         "Search Packages": "Zoeken",
         "Search Packages...": "Zoeken",
@@ -142,6 +144,9 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "fr": {
+        # Curated passthroughs: MT returns these identical (cognate / brand-prefixed title / abbreviation) for this locale; English is the correct rendering. Keeps the coverage gate honest without shipping garbage.
+        "Distribution": "Distribution",
+        "impact ≠ {v}": "impact ≠ {v}",
         "Search": "Rechercher",
         "Search Packages": "Rechercher",
         "Search Packages...": "Rechercher",
@@ -275,6 +280,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "ur": {
+        # Curated passthrough: Urdu MT echoes this command title unchanged; English (with the Saropa brand) is the correct rendering.
+        "Saropa Lints: Open Lints Config": "Saropa Lints: Open Lints Config",
         "Search": "تلاش",
         "Search Packages": "تلاش",
         "Search Packages...": "تلاش",
@@ -394,6 +401,9 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "de": {
+        # Curated passthroughs: MT returns these identical (cognate / brand-prefixed title / abbreviation) for this locale; English is the correct rendering. Keeps the coverage gate honest without shipping garbage.
+        "Export": "Export",
+        "System": "System",
         "Search": "Suchen",
         "Saropa Lints UI language": "Saropa Lints Oberflächensprache",
         "Choose language for sidebar and dashboards": "Sprache für Seitenleiste und Dashboards wählen",
@@ -1076,6 +1086,11 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "fil": {
+        # Curated passthroughs: MT returns these identical (cognate / brand-prefixed title / abbreviation) for this locale; English is the correct rendering. Keeps the coverage gate honest without shipping garbage.
+        "Drift on · {count}": "Drift on · {count}",
+        "avg {score} ({grade})": "avg {score} ({grade})",
+        "Saropa Package Dashboard v{version}": "Saropa Package Dashboard v{version}",
+        "+{count} analyzer TODOs": "+{count} analyzer TODOs",
         "#": "#",
         "Activity bar": "Activity bar",
         "Code Health": "Code Health",
@@ -1274,6 +1289,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "pl": {
+        # Curated passthroughs: MT returns these identical (cognate / brand-prefixed title / abbreviation) for this locale; English is the correct rendering. Keeps the coverage gate honest without shipping garbage.
+        "System": "System",
         "#": "#",
         "OWASP": "OWASP",
         "Saropa": "Saropa",

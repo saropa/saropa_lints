@@ -41,9 +41,24 @@ def _placeholder_names(s: str) -> set[str]:
 
 
 def _leading_garbled_before_first_placeholder(source: str, out: str) -> bool:
-    """True when *source* starts with a placeholder but *out* has visible text first.
+    """True when *source* starts with a placeholder but *out* leads with a numeric value.
 
-    Catches MT that turns ``{direct} direct, …`` into ``0 direct, 1 transitive {direct} …``.
+    Catches the specific MT corruption where Google's placeholder shielding
+    fails and substitutes a sample VALUE for the leading ``{token}`` — e.g.
+    ``{direct} direct, {transitive} transitive`` becomes
+    ``0 direct, 1 transitive {direct} {transitive}`` (the placeholders get
+    appended at the end by ``restore_placeholders`` while bare numbers appear
+    up front where the tokens belonged).
+
+    The guard is deliberately narrowed to a DIGIT in the leading run. The
+    original "any visible text before the placeholder" test over-triggered:
+    many languages legitimately put a *word* before a leading placeholder
+    (German "Für {count} sind Updates verfügbar", Arabic "منذ {day} يوم",
+    Ukrainian "{count} ..." word-order shifts), and rejecting those silently
+    dropped correct machine translations back to English — that is exactly what
+    left "{count} have updates available" untranslated in every locale. Only a
+    numeric leading run signals the value-substitution failure this guard
+    exists to catch; words before the placeholder are normal translation.
     """
     if "{" not in source or "{" not in out:
         return False
@@ -51,7 +66,7 @@ def _leading_garbled_before_first_placeholder(source: str, out: str) -> bool:
     if lead_src.strip():
         return False
     lead_out = out[: out.index("{")]
-    return bool(lead_out.strip())
+    return any(ch.isdigit() for ch in lead_out)
 
 
 class DictionaryTranslator:

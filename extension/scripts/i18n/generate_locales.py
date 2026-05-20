@@ -64,6 +64,16 @@ def parse_args() -> argparse.Namespace:
             "plans/EXTENSION_LOCALIZATION_GUIDE.md primary and secondary tiers)."
         ),
     )
+    parser.add_argument(
+        "--fail-on-missing",
+        action="store_true",
+        help=(
+            "Exit non-zero if any locale still has missing translations after "
+            "this run. Used by the publish pipeline as a coverage gate so "
+            "untranslated UI strings can never ship silently. Standalone dev "
+            "runs omit this flag and always exit 0."
+        ),
+    )
     return parser.parse_args()
 
 
@@ -382,6 +392,21 @@ def main() -> int:
         )
         # Standard convention: shells treat 128 + SIGINT(2) = 130 as Ctrl-C exit.
         return 130
+
+    # Coverage gate (publish only): block the release rather than ship English
+    # placeholders in a translated bundle. Dev runs omit --fail-on-missing and
+    # always succeed so iterating on English strings is never gated.
+    total_missing = sum(s.missing for s in stats_by_locale.values())
+    if args.fail_on_missing and total_missing > 0:
+        print()
+        print(
+            c("red", f"  Coverage gate FAILED: {total_missing} missing translation(s) "
+                     "across locales. Add curated entries to dictionaries.py (or a "
+                     '"X": "X" passthrough for words identical in the target language) '
+                     "and rerun, then commit the regenerated locale JSON."),
+            file=sys.stderr,
+        )
+        return 1
     return 0
 
 

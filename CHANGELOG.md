@@ -43,6 +43,26 @@
 
 -->
 
+## [13.10.2]
+
+This release cleans up the extension's translated interface. The Saropa brand name is no longer turned into local scripts, stray placeholder gibberish has been cleared out of several languages, and a batch of toolbar and status strings that were stuck in English are now translated across all 24 languages. The Help panel also shows the version you actually have installed. [log](https://github.com/saropa/saropa_lints/blob/v13.10.2/CHANGELOG.md)
+
+### Fixed (Extension)
+
+- **The "Saropa" brand name is no longer translated or transliterated in any language** — it had been rendered in local scripts (Arabic, Hindi, Bengali, and others) across the localized UI, and now stays "Saropa" everywhere. No action required.
+- **Removed leftover translation-marker gibberish from several non-English strings** — fragments like `q0q` had leaked into some translated labels and now no longer appear. No action required.
+- **The Help panel title shows the version you actually have installed** — it had a fixed version baked into each translation that drifted out of date every release; it is now read live at runtime. No action required.
+- **Translated UI strings that were previously stuck in English across all 24 languages** — toolbar and menu entries (Export, Filter & focus, Reload from disk, Re-enable disabled rules, severity filter) and the package update/vulnerability counts are now localized. No action required.
+
+<details><summary>Maintenance</summary>
+
+- Rewrote the locale generator's placeholder shield to use an ASCII sentinel with a strict integrity check, brand-term protection, and a self-healing cache, so machine translation can no longer ship transliterated brand names or leftover marker residue; poisoned cache entries re-translate automatically on the next run.
+- The publish pipeline now machine-translates newly added English strings and gates the release on full locale coverage, so untranslated or incomplete UI can no longer ship.
+
+</details>
+
+---
+
 ## [13.10.1]
 
 ### Fixed

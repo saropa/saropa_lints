@@ -34,6 +34,7 @@ import { invalidateCodeLenses, registerCodeLensProvider } from './codeLensProvid
 import { IssuesTreeProvider, parseViolationsGroupBy, registerIssueCommands, type IssueTreeNode } from './views/issuesTree';
 import {
   createSidebarSectionProviders,
+  SECTION_VIEW_IDS,
   updateSidebarSectionContext,
 } from './views/sectionedSidebar';
 import { showHelpHubQuickPick } from './views/helpHub';
@@ -372,6 +373,22 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     updateSidebarSectionContext(context.workspaceState);
   };
   for (const provider of sectionProviders) {
+    // The Help panel surfaces the installed version in its title. The version
+    // must NOT be baked into the localized view name (package.nls used
+    // "Help (vX.Y.Z)"): that froze the string per release, forced a manual bump
+    // every version, and made it a perpetual missing translation in all 24
+    // locales. Inject it at runtime via createTreeView().title so it tracks
+    // package.json automatically while the word "Help" stays localized through
+    // the runtime catalog. Other panels keep the lighter registerTreeDataProvider.
+    if (provider.viewId === SECTION_VIEW_IDS.help) {
+      const helpView = vscode.window.createTreeView(provider.viewId, {
+        treeDataProvider: provider,
+      });
+      const helpExtVersion = (context.extension.packageJSON as { version: string }).version;
+      helpView.title = `${l10n('findingsDash.menuPalette.help')} (v${helpExtVersion})`;
+      context.subscriptions.push(helpView);
+      continue;
+    }
     context.subscriptions.push(
       vscode.window.registerTreeDataProvider(provider.viewId, provider),
     );

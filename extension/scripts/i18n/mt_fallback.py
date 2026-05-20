@@ -22,6 +22,29 @@ _PLACEHOLDER_FULL = re.compile(r"\{[A-Za-z0-9_]+\}")
 _CACHE_DIR = Path(__file__).resolve().parent / ".cache"
 _CACHE_PATH = _CACHE_DIR / "mt_strings.json"
 
+# ASCII sentinel wrappers for shielded tokens (placeholders + brand terms).
+# History: the shield first used Unicode noncharacters (U+FDD0/U+FDD1), then PUA
+# code points (U+E000/U+E001). Google Translate mangles BOTH in non-Latin
+# scripts -- it strips the wrappers and leaves residue ("0", "q0q") that shipped
+# as visible garbage (e.g. Arabic "...q0q {target}"). A plain ASCII token
+# round-trips cleanly in every script we ship (measured 48/48 vs 35/48 for PUA
+# across ar/he/hi/ja/ru/th/tl/zh). "ZZ" is absent from the catalog, so there is
+# no collision risk; the strict integrity check in _fetch_translation rejects
+# any result where the exact sentinel failed to survive anyway.
+_SHIELD_OPEN = "ZZ"
+_SHIELD_CLOSE = "ZZ"
+
+# Brand / proper-noun terms MT must NEVER translate or transliterate. Google
+# rendered "Saropa" in local scripts in 124 locale strings; the company name has
+# one spelling worldwide. Shielded exactly like placeholders so the engine
+# cannot touch it. Longest-first if this grows, to avoid a shorter term
+# shielding inside a longer one.
+_DO_NOT_TRANSLATE = ("Saropa",)
+# Detects leftover sentinel residue from this or any past shield scheme so cached
+# values poisoned by the old noncharacter/PUA shields get re-fetched: ASCII core
+# "ZZ<n>ZZ", PUA "q<n>q", and the raw marker code points.
+_SHIELD_RESIDUE_RE = re.compile(r"ZZ\d+ZZ|q\d+q|[﷐﷑]")
+
 # Google Translate target codes (deep-translator / Google).
 LOCALE_TO_GOOGLE: dict[str, str] = {
     "ar": "ar",
@@ -82,23 +105,102 @@ def _cache_key(locale: str, text: str) -> str:
     return f"{locale}:{h}"
 
 
+# Word-boundary patterns for brand terms (no letter on either side) so "Saropa"
+# is shielded but a hypothetical "Saropas" would not be half-shielded.
+_BRAND_PATTERNS: dict[str, re.Pattern[str]] = {
+    term: re.compile(rf"(?<![A-Za-z]){re.escape(term)}(?![A-Za-z])")
+    for term in _DO_NOT_TRANSLATE
+}
+
+
+def _sentinel(index: int) -> str:
+    """The shield token for slot *index* (e.g. ``ZZ0ZZ``)."""
+    return f"{_SHIELD_OPEN}{index}{_SHIELD_CLOSE}"
+
+
 def shield_placeholders(text: str) -> tuple[str, list[str]]:
-    """Replace ``{tokens}`` with U+FDD0..sentinels so MT cannot rewrite keys."""
+    """Shield ``{tokens}`` AND do-not-translate brand terms with ASCII sentinels.
+
+    Returns ``(masked, originals)`` where ``originals[i]`` is the substring that
+    sentinel ``i`` stands for. Placeholders are shielded first, then brand terms,
+    so MT can neither rename an interpolation key nor transliterate the brand.
+    """
     originals: list[str] = []
 
-    def repl(_m: re.Match[str]) -> str:
-        originals.append(_m.group(0))
-        return f"\ufdd0{len(originals) - 1}\ufdd1"
+    def repl(m: re.Match[str]) -> str:
+        originals.append(m.group(0))
+        return _sentinel(len(originals) - 1)
 
-    return _PLACEHOLDER_FULL.sub(repl, text), originals
+    masked = _PLACEHOLDER_FULL.sub(repl, text)
+    for term in _DO_NOT_TRANSLATE:
+        masked = _BRAND_PATTERNS[term].sub(repl, masked)
+    return masked, originals
+
+
+def _shield_brand_only(text: str) -> tuple[str, list[str]]:
+    """Shield only brand terms, leaving ``{braces}`` raw.
+
+    Used by the raw-brace fallback in ``_fetch_translation``: Google preserves
+    literal ``{tokens}`` better than sentinels for some placeholder-leading
+    strings, but the brand must STILL be protected on that path.
+    """
+    originals: list[str] = []
+
+    def repl(m: re.Match[str]) -> str:
+        originals.append(m.group(0))
+        return _sentinel(len(originals) - 1)
+
+    masked = text
+    for term in _DO_NOT_TRANSLATE:
+        masked = _BRAND_PATTERNS[term].sub(repl, masked)
+    return masked, originals
 
 
 def unshield_placeholders(translated: str, originals: list[str]) -> str:
-    """Restore ``{tokens}`` from ``shield_placeholders`` sentinels."""
+    """Restore shielded tokens from their sentinels."""
     out = translated
     for i, orig in enumerate(originals):
-        out = out.replace(f"\ufdd0{i}\ufdd1", orig)
+        out = out.replace(_sentinel(i), orig)
     return out
+
+
+def _sentinels_intact(translated: str, count: int) -> bool:
+    """True when every sentinel ``0..count-1`` survived MT exactly once.
+
+    Stricter than checking the placeholder names: MT sometimes strips a sentinel
+    wrapper and leaves residue while a later restore re-appends the real token,
+    which passed the loose check and shipped garbage (Arabic "...q0q {target}").
+    Requiring the exact sentinel to round-trip rejects those outright.
+    """
+    return all(translated.count(_sentinel(i)) == 1 for i in range(count))
+
+
+def _placeholders_preserved(source: str, candidate: str) -> bool:
+    """True when *candidate* carries exactly the same ``{tokens}`` as *source*.
+
+    Set comparison, not ordered: languages legitimately reorder placeholders.
+    A mismatch means MT dropped, renamed, or leaked a token and the candidate
+    must not be trusted.
+    """
+    return set(_PLACEHOLDER_FULL.findall(source)) == set(_PLACEHOLDER_FULL.findall(candidate))
+
+
+def _cache_value_is_clean(source: str, cached: str) -> bool:
+    """True when a cached translation is safe to serve without re-fetching.
+
+    Rejects three poison classes so they heal on the next run with the current
+    engine: placeholder loss/rename, leaked shield residue from any past scheme
+    (``q0q`` / ``ZZ0ZZ`` / PUA chars), and brand corruption (a do-not-translate
+    term in *source* missing from *cached* because MT transliterated it).
+    """
+    if not _placeholders_preserved(source, cached):
+        return False
+    if _SHIELD_RESIDUE_RE.search(cached):
+        return False
+    for term in _DO_NOT_TRANSLATE:
+        if _BRAND_PATTERNS[term].search(source) and term not in cached:
+            return False
+    return True
 
 
 def _translate_masked_with_timeout(
@@ -141,7 +243,100 @@ def should_skip_machine_translate(text: str) -> bool:
     # Pure placeholder lines (rare) — keep English shape.
     if re.fullmatch(r"(\{[A-Za-z0-9_]+\})+", s):
         return True
+    # Pure brand: the whole string is a do-not-translate term plus spacing /
+    # separators. MT can only echo or transliterate it, so keep English
+    # ("Saropa", "Saropa "). Counting these as missing forever is noise — the
+    # brand has one spelling worldwide.
+    brandless = s
+    for term in _DO_NOT_TRANSLATE:
+        brandless = _BRAND_PATTERNS[term].sub("", brandless)
+    if brandless != s and re.fullmatch(r"[\s·—…▶↪]*", brandless):
+        return True
+    # Single-letter label wrapping placeholders: once the {tokens} are removed
+    # nothing translatable remains, and MT only renames the token ("L{line}" ->
+    # "L{Linie}"). Keep the English label. Residue must be exactly one ASCII
+    # letter so real phrases ("of {total}") are unaffected.
+    residue = re.sub(r"[\s\W_]+", "", _PLACEHOLDER_FULL.sub("", s), flags=re.UNICODE)
+    if _PLACEHOLDER_FULL.search(s) and len(residue) == 1 and residue.isascii() and residue.isalpha():
+        return True
     return False
+
+
+def _translate_with_retry(gt: object, payload: str) -> str | None:
+    """`_translate_masked_with_timeout` wrapped in TooManyRequests backoff.
+
+    Returns the raw translated string, or None on hard failure / repeated
+    rate-limiting. Re-raises ``KeyboardInterrupt`` so callers can save the
+    partial cache and exit cleanly.
+    """
+    try:
+        from deep_translator.exceptions import TooManyRequests  # type: ignore[import-untyped]
+    except ImportError:  # deep-translator absent — nothing specific to back off on
+        TooManyRequests = ()  # type: ignore[assignment]
+    for attempt in range(4):
+        try:
+            raw = _translate_masked_with_timeout(gt, payload)
+            if raw is not None:
+                return raw
+        except TooManyRequests:  # type: ignore[misc]
+            time.sleep(6.0 + float(attempt) * 3.0)
+        except KeyboardInterrupt:
+            raise
+        except Exception:  # noqa: BLE001 — any other engine failure is non-retryable here
+            return None
+    return None
+
+
+def _accept(text: str, candidate: str) -> bool:
+    """True when *candidate* is a usable translation: placeholders intact, no
+    leaked sentinel residue, and actually different from the English source."""
+    return (
+        candidate is not None
+        and candidate.strip() != ""
+        and candidate != text
+        and _placeholders_preserved(text, candidate)
+        and not _SHIELD_RESIDUE_RE.search(candidate)
+    )
+
+
+def _fetch_translation(gt: object, text: str) -> str | None:
+    """Translate *text* preserving every ``{token}`` and brand term, or give up.
+
+    Two stages, because Google handles shielded tokens inconsistently:
+      1. Shield placeholders + brand with ASCII sentinels, translate, and accept
+         only if every sentinel round-tripped EXACTLY (``_sentinels_intact``) and
+         the unshielded result has no residue and changed the text.
+      2. Otherwise retry with RAW ``{braces}`` (which Google preserves better for
+         placeholder-leading strings) while STILL shielding the brand, so the
+         brand can never be transliterated on this path either.
+
+    Returns a clean translation, or — when MT only ever echoes the source — the
+    identical-but-clean source so the coverage gate flags it for curation rather
+    than shipping garbage. ``None`` when the engine returned nothing usable.
+    """
+    masked, holders = shield_placeholders(text)
+    n = len(holders)
+    shielded = _translate_with_retry(gt, masked)
+    echoed_clean: str | None = None
+    if shielded is not None and shielded.strip() and _sentinels_intact(shielded, n):
+        restored = unshield_placeholders(shielded, holders)
+        if _accept(text, restored):
+            return restored
+        # MT echoed the source unchanged (or only the brand differs); remember it
+        # as a clean last resort but try the raw-brace path first.
+        if restored == text and not _SHIELD_RESIDUE_RE.search(restored):
+            echoed_clean = restored
+
+    # Raw-brace fallback (brand still shielded).
+    brand_masked, brand_holders = _shield_brand_only(text)
+    if _PLACEHOLDER_FULL.search(text) or brand_holders:
+        raw = _translate_with_retry(gt, brand_masked)
+        if raw is not None and raw.strip() and _sentinels_intact(raw, len(brand_holders)):
+            cand = unshield_placeholders(raw, brand_holders)
+            if _accept(text, cand):
+                return cand
+
+    return echoed_clean
 
 
 def machine_translate(text: str, locale: str, *, cache: dict[str, str]) -> str:
@@ -153,37 +348,32 @@ def machine_translate(text: str, locale: str, *, cache: dict[str, str]) -> str:
         return text
 
     ck = _cache_key(locale, text)
-    if ck in cache:
-        return cache[ck]
+    cached = cache.get(ck)
+    # Self-heal: serve the cache only when the entry is clean. Poisoned entries
+    # (placeholder loss, leaked sentinel residue, transliterated brand) are
+    # re-fetched with the current engine instead of shipped. Without this the old
+    # noncharacter/PUA-shield corruption and brand transliteration would survive
+    # in the cache forever.
+    if cached is not None and _cache_value_is_clean(text, cached):
+        return cached
 
     if not _mt_env_enabled():
+        # No network allowed; a poisoned cache entry can't be healed, so fall back
+        # to English (the coverage gate flags it) rather than ship garbage.
         return text
 
     try:
         from deep_translator import GoogleTranslator  # type: ignore[import-untyped]
-        from deep_translator.exceptions import TooManyRequests  # type: ignore[import-untyped]
     except ImportError:
         return text
 
-    masked, holders = shield_placeholders(text)
-    raw: str | None = None
     gt = GoogleTranslator(source="en", target=google_lang)
-    for attempt in range(4):
-        try:
-            raw = _translate_masked_with_timeout(gt, masked)
-            if raw is not None:
-                break
-        except TooManyRequests:
-            time.sleep(6.0 + float(attempt) * 3.0)
-        except Exception:
-            raw = None
-            break
-    if not isinstance(raw, str) or not raw.strip():
-        return text
-    out = unshield_placeholders(raw, holders)
-    cache[ck] = out
-    time.sleep(0.22)
-    return out
+    out = _fetch_translation(gt, text)
+    if isinstance(out, str) and out.strip():
+        cache[ck] = out
+        time.sleep(_MT_REQUEST_GAP_SEC)
+        return out
+    return text
 
 
 # Pace Google free tier (~5 req/s); ``prefetch`` does one call per string with this gap.
@@ -205,7 +395,11 @@ def _iter_pending_texts(
     for text in texts:
         if not text or text in dict_table or should_skip_machine_translate(text):
             continue
-        if _cache_key(locale, text) in cache:
+        cached = cache.get(_cache_key(locale, text))
+        # Re-fetch when absent OR when the cached entry is poisoned (placeholder
+        # loss, leaked sentinel residue, transliterated brand). Skipping poisoned
+        # entries here would leave them broken because prefetch never revisits them.
+        if cached is not None and _cache_value_is_clean(text, cached):
             continue
         yield text
 
@@ -244,7 +438,6 @@ def prefetch_machine_translations(
         return
     try:
         from deep_translator import GoogleTranslator  # type: ignore[import-untyped]
-        from deep_translator.exceptions import TooManyRequests  # type: ignore[import-untyped]
     except ImportError:
         return
 
@@ -254,23 +447,12 @@ def prefetch_machine_translations(
 
     gt = GoogleTranslator(source="en", target=google_lang)
     for src in pending:
-        msk, hld = shield_placeholders(src)
-        raw: str | None = None
-        for attempt in range(4):
-            try:
-                raw = _translate_masked_with_timeout(gt, msk)
-                if raw is not None:
-                    break
-            except TooManyRequests:
-                time.sleep(6.0 + float(attempt) * 3.0)
-            except KeyboardInterrupt:
-                # Re-raise so the top-level handler can save the cache; do not
-                # swallow it as a generic Exception below.
-                raise
-            except Exception:
-                raw = None
-                break
-        if isinstance(raw, str) and raw.strip():
-            cache[_cache_key(locale, src)] = unshield_placeholders(raw, hld)
+        # Shared fetch path: PUA-shield with raw-brace fallback, same as
+        # machine_translate, so cached results are identical regardless of which
+        # entry point warmed them. _translate_with_retry re-raises
+        # KeyboardInterrupt for the caller to save the partial cache.
+        out = _fetch_translation(gt, src)
+        if isinstance(out, str) and out.strip():
+            cache[_cache_key(locale, src)] = out
         time.sleep(_MT_REQUEST_GAP_SEC)
 
