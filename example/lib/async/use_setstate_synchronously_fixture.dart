@@ -681,3 +681,133 @@ class _GoodGuardInCatchProtectsSetStateState
   @override
   Widget build(BuildContext context) => Text(_data);
 }
+
+// =========================================================================
+// Compound || negated-mounted early-exit guards
+// =========================================================================
+// Repro for plans/history/2026.05/2026.05.19/use_setstate_synchronously_false_positive_or_disjunction_mounted_guard.md
+// — `if (cond || !mounted) return;` is the boolean dual of `if (mounted && cond)`:
+// the fall-through path proves !cond AND mounted. Either operand can carry
+// the `!mounted` check, and the chain may be 3+ operands deep.
+// Negative cases (#4, #5) protect against an over-eager fix that would
+// also accept `if (mounted || cond) setState(...)` as a guard — it isn't,
+// because the then-branch is entered when cond is true regardless of mounted.
+
+// GOOD: `!mounted` on LHS of `||` — fall-through implies mounted == true
+class GoodNotMountedLhsOfOrGuard extends StatefulWidget {
+  const GoodNotMountedLhsOfOrGuard({super.key});
+
+  @override
+  State<GoodNotMountedLhsOfOrGuard> createState() =>
+      _GoodNotMountedLhsOfOrGuardState();
+}
+
+class _GoodNotMountedLhsOfOrGuardState
+    extends State<GoodNotMountedLhsOfOrGuard> {
+  String _data = '';
+
+  Future<void> loadData() async {
+    final value = await Future.value('data');
+    if (!mounted || value.isEmpty) return; // !mounted on LHS of ||
+    setState(() => _data = value); // Protected — fall-through proves mounted
+  }
+
+  @override
+  Widget build(BuildContext context) => Text(_data);
+}
+
+// GOOD: `!mounted` on RHS of `||` — the consumer reproducer shape
+class GoodNotMountedRhsOfOrGuard extends StatefulWidget {
+  const GoodNotMountedRhsOfOrGuard({super.key});
+
+  @override
+  State<GoodNotMountedRhsOfOrGuard> createState() =>
+      _GoodNotMountedRhsOfOrGuardState();
+}
+
+class _GoodNotMountedRhsOfOrGuardState
+    extends State<GoodNotMountedRhsOfOrGuard> {
+  String _data = '';
+
+  Future<void> loadData() async {
+    final value = await Future.value('data');
+    if (value.isEmpty || !mounted) return; // !mounted on RHS of ||
+    setState(() => _data = value); // Protected — fall-through proves mounted
+  }
+
+  @override
+  Widget build(BuildContext context) => Text(_data);
+}
+
+// GOOD: `!mounted` nested deep in a 3-operand `||` chain
+class GoodNotMountedDeepInOrChain extends StatefulWidget {
+  const GoodNotMountedDeepInOrChain({super.key});
+
+  @override
+  State<GoodNotMountedDeepInOrChain> createState() =>
+      _GoodNotMountedDeepInOrChainState();
+}
+
+class _GoodNotMountedDeepInOrChainState
+    extends State<GoodNotMountedDeepInOrChain> {
+  String _data = '';
+  bool _aborted = false;
+
+  Future<void> loadData() async {
+    final value = await Future.value('data');
+    if (_aborted || value.isEmpty || !mounted) return; // !mounted 3-deep
+    setState(() => _data = value); // Protected — recursion through || holds
+  }
+
+  @override
+  Widget build(BuildContext context) => Text(_data);
+}
+
+// BAD: `mounted` on LHS of `||` is NOT a guard — then-branch enters when
+// cond is true regardless of mounted, so setState may run while !mounted.
+class BadMountedLhsOfOr extends StatefulWidget {
+  const BadMountedLhsOfOr({super.key});
+
+  @override
+  State<BadMountedLhsOfOr> createState() => _BadMountedLhsOfOrState();
+}
+
+class _BadMountedLhsOfOrState extends State<BadMountedLhsOfOr> {
+  String _data = '';
+  bool _force = false;
+
+  Future<void> loadData() async {
+    final value = await Future.value('data');
+    if (mounted || _force) {
+      // expect_lint: use_setstate_synchronously
+      setState(() => _data = value); // NOT protected — cond bypasses mounted
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => Text(_data);
+}
+
+// BAD: `mounted` on RHS of `||` — same reasoning as the LHS case
+class BadMountedRhsOfOr extends StatefulWidget {
+  const BadMountedRhsOfOr({super.key});
+
+  @override
+  State<BadMountedRhsOfOr> createState() => _BadMountedRhsOfOrState();
+}
+
+class _BadMountedRhsOfOrState extends State<BadMountedRhsOfOr> {
+  String _data = '';
+  bool _force = false;
+
+  Future<void> loadData() async {
+    final value = await Future.value('data');
+    if (_force || mounted) {
+      // expect_lint: use_setstate_synchronously
+      setState(() => _data = value); // NOT protected — cond bypasses mounted
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => Text(_data);
+}

@@ -2104,7 +2104,7 @@ class UseSetStateSynchronouslyRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'use_setstate_synchronously',
-    '[use_setstate_synchronously] setState called after async gap without mounted check. Quick fix available: Wraps the setState call in if (mounted) { .. }. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption. {v10}',
+    '[use_setstate_synchronously] setState called after async gap without mounted check. Quick fix available: Wraps the setState call in if (mounted) { .. }. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption. {v11}',
     correctionMessage:
         'Check mounted before calling setState after await. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     severity: DiagnosticSeverity.WARNING,

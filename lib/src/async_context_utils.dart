@@ -59,7 +59,8 @@ bool checksMounted(Expression expr) {
 
 /// Checks if expression is `!mounted`, `!this.mounted`, or `!context.mounted`.
 ///
-/// Also handles `mounted == false` and `false == mounted` patterns.
+/// Also handles `mounted == false` and `false == mounted` patterns, plus
+/// compound `||` disjunctions where any operand is a not-mounted check.
 bool checksNotMounted(Expression expr) {
   // `!mounted` - prefix negation
   if (expr is PrefixExpression && expr.operator.type == TokenType.BANG) {
@@ -72,6 +73,20 @@ bool checksNotMounted(Expression expr) {
     final right = expr.rightOperand;
     if (_isFalseLiteral(left) && checksMounted(right)) return true;
     if (_isFalseLiteral(right) && checksMounted(left)) return true;
+  }
+
+  // Compound `||` disjunction: `cond || !mounted` or `!mounted || cond`.
+  // For an early-exit guard `if (X) return;`, the fall-through path
+  // implies !X. When X = X1 || X2 and either operand is a not-mounted
+  // check, the fall-through proves both operands are false — i.e.
+  // mounted is true. This is the dual of the `&&` handling in
+  // `checksMounted`. The dual does NOT hold for `||` in the positive
+  // case (`if (mounted || cond) { ... }` enters the then-branch when
+  // cond alone is true), so `checksMounted` must not be extended in
+  // the same way — keep this branch on the negated side only.
+  if (expr is BinaryExpression && expr.operator.type == TokenType.BAR_BAR) {
+    return checksNotMounted(expr.leftOperand) ||
+        checksNotMounted(expr.rightOperand);
   }
 
   return false;

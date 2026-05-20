@@ -875,7 +875,7 @@ plugins:
       require_widgets_binding_callback: true  # [WARNING] showDialog/showModalBottomSheet in initState without addPostFrameCallback may fail. {v2}
       require_workmanager_for_background: true  # [WARNING] Periodic task detected without workmanager. Dart isolates die when app backgrounds. Use workmanager for reliable background tasks. {v2}
       require_wss_over_ws: true  # [ERROR] ws:// transmits data unencrypted. Attackers can intercept, read, and modify WebSocket messages in transit. {v1}
-      use_setstate_synchronously: true  # [WARNING] setState called after async gap without mounted check. Quick fix available: Wraps the setState call in if (mounted) { .. }. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption. {v9}
+      use_setstate_synchronously: true  # [WARNING] setState called after async gap without mounted check. Quick fix available: Wraps the setState call in if (mounted) { .. }. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption. {v11}
 
       #
       # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

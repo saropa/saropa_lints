@@ -43,6 +43,12 @@
 
 -->
 
+## Unreleased
+
+### Fixed
+
+- **`use_setstate_synchronously` no longer flags `setState` after an `if (cond || !mounted) return;` guard** — the early-exit recognizer now treats either operand of an `||` disjunction as a valid not-mounted check, matching how it already handles `&&` for positive `mounted` guards. No action required; any `// ignore:` markers added to work around this false positive can be removed.
+
 ---
 
 ## [13.10.0]
