@@ -257,7 +257,7 @@ Cases 4 and 5 are the negative tests that protect against a future regression wh
 
 ## Commits
 
-<!-- Add commit hashes as fixes land. -->
+- `47e53eee` — fix: recognize ||-disjunction negated mounted guard in use_setstate_synchronously
 
 ---
 
