@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "Chẩn đoán thứ cấp",
     "hero": {
       "productTitle": "Trang tổng quan về phát hiện",
-      "gaugeTitle": "Điểm sức khỏe 0/100 (cấp 1). Lỗi nặng nề nhất. {score} {grade}"
+      "gaugeTitle": "Điểm sức khỏe 0/100 (cấp 1). Lỗi nặng nề nhất. {grade} {score}"
     },
     "time": {
       "justNow": "ngay bây giờ",
@@ -431,7 +431,7 @@
       "packages": "Gói",
       "projectGrade": "Lớp gói dự án",
       "totalSize": "Tổng kích thước*",
-      "gradeTooltip": "Cấp dự án 0\nĐiểm trung bình: 1/100\nGói: 2\nA:3 B:4 C:5 E:6 F:7 {c} {e} {avgScore} {pkgCount} {avgGrade} {a} {b} {f}",
+      "gradeTooltip": "Cấp dự án 0\nĐiểm trung bình: 1/100\nGói: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {e} {f} {c} {a} {b} {avgScore} {pkgCount}",
       "vibrantTitle": "Sống động",
       "stableTitle": "Ổn định",
       "outdatedTitle": "lỗi thời",
@@ -446,7 +446,7 @@
       "caveatLine2": "Ngưỡng hoạt động: 90d = cũ, 180d = không hoạt động (cam kết + mốc thời gian phát hành)."
     },
     "breakdown": {
-      "title": "Tại sao lại điểm 0? — trung bình 1/100 trên 2 gói {avgScore} {grade} {pkgCount}",
+      "title": "Tại sao lại điểm 0? — trung bình 1/100 trên 2 gói {pkgCount} {avgScore} {grade}",
       "hint": "Bấm để mở rộng",
       "distributionHeading": "Phân bổ",
       "signalsHeading": "Tín hiệu rủi ro kéo điểm xuống",
@@ -698,7 +698,7 @@
       "generated": "Đã tạo",
       "functionOne": "{count} hàm",
       "functionOther": "{count} hàm",
-      "avgFormat": "trung bình 0 (1) {score} {grade}",
+      "avgFormat": "trung bình 0 (1) {grade} {score}",
       "gatesFailing": "cổng thất bại",
       "gatesPassing": "cổng đi qua"
     },
@@ -744,7 +744,7 @@
     "table": {
       "ariaLabel": "Chức năng tồi tệ nhất theo điểm số",
       "heading": "Chức năng tệ nhất",
-      "topCount": "trên cùng 0 của 1 {total} {shown}",
+      "topCount": "trên cùng 0 của 1 {shown} {total}",
       "colGrade": "Cấp",
       "colScore": "Điểm",
       "colFunction": "Chức năng",

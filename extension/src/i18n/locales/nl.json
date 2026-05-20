@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "Secundaire diagnostiek",
     "hero": {
       "productTitle": "Bevindingendashboard",
-      "gaugeTitle": "Gezondheidsscore 0/100 (graad 1). Fouten wegen het zwaarst. {score} {grade}"
+      "gaugeTitle": "Gezondheidsscore 0/100 (graad 1). Fouten wegen het zwaarst. {grade} {score}"
     },
     "time": {
       "justNow": "zojuist",
@@ -431,7 +431,7 @@
       "packages": "Pakketten",
       "projectGrade": "Projectpakketklasse",
       "totalSize": "Totale grootte*",
-      "gradeTooltip": "Projectcijfer 0\nGemiddelde score: 1/100\nPakketten: 2\nA:3 B:4 C:5 E:6 F:7 {c} {e} {avgScore} {pkgCount} {avgGrade} {a} {b} {f}",
+      "gradeTooltip": "Projectcijfer 0\nGemiddelde score: 1/100\nPakketten: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {e} {f} {c} {a} {b} {avgScore} {pkgCount}",
       "vibrantTitle": "Levendig",
       "stableTitle": "Stabiel",
       "outdatedTitle": "Verouderd",
@@ -446,7 +446,7 @@
       "caveatLine2": "Activiteitsdrempels: 90d = verouderd, 180d = slapend (tijdlijnen voor vastleggen en vrijgeven)."
     },
     "breakdown": {
-      "title": "Waarom cijfer 0? — 1/100 gemiddeld over 2 pakketten {avgScore} {grade} {pkgCount}",
+      "title": "Waarom cijfer 0? — 1/100 gemiddeld over 2 pakketten {pkgCount} {avgScore} {grade}",
       "hint": "Klik om uit te vouwen",
       "distributionHeading": "Verdeling",
       "signalsHeading": "Risicosignalen die de score naar beneden halen",
@@ -698,7 +698,7 @@
       "generated": "Gegenereerd",
       "functionOne": "{count} functie",
       "functionOther": "{count} functies",
-      "avgFormat": "gemiddeld 0 (1) {score} {grade}",
+      "avgFormat": "gemiddeld 0 (1) {grade} {score}",
       "gatesFailing": "poorten falen",
       "gatesPassing": "poorten passeren"
     },
@@ -744,7 +744,7 @@
     "table": {
       "ariaLabel": "Slechtste functies per score",
       "heading": "Slechtste functies",
-      "topCount": "top 0 van 1 {total} {shown}",
+      "topCount": "top 0 van 1 {shown} {total}",
       "colGrade": "Cijfer",
       "colScore": "Scoren",
       "colFunction": "Functie",

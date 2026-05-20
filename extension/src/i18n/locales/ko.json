@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "2차 진단",
     "hero": {
       "productTitle": "발견 항목 대시보드",
-      "gaugeTitle": "건강 점수 0/100(학년 1). 오류의 무게가 가장 무겁습니다. {score} {grade}"
+      "gaugeTitle": "건강 점수 0/100(학년 1). 오류의 무게가 가장 무겁습니다. {grade} {score}"
     },
     "time": {
       "justNow": "방금",
@@ -431,7 +431,7 @@
       "packages": "패키지",
       "projectGrade": "프로젝트 패키지 등급",
       "totalSize": "전체 크기*",
-      "gradeTooltip": "프로젝트 등급 0\n평균 점수: 1/100\n패키지: 2\nA:3 B:4 C:5 E:6 F:7 {c} {e} {avgScore} {pkgCount} {avgGrade} {a} {b} {f}",
+      "gradeTooltip": "프로젝트 등급 0\n평균 점수: 1/100\n패키지: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {e} {f} {c} {a} {b} {avgScore} {pkgCount}",
       "vibrantTitle": "떠는",
       "stableTitle": "안정적인",
       "outdatedTitle": "구식",
@@ -446,7 +446,7 @@
       "caveatLine2": "활동 임계값: 90일 = 오래됨, 180일 = 휴면(커밋 + 릴리스 타임라인)."
     },
     "breakdown": {
-      "title": "왜 0등급인가요? — 2 패키지 전체 평균 1/100 {avgScore} {grade} {pkgCount}",
+      "title": "왜 0등급인가요? — 2 패키지 전체 평균 1/100 {pkgCount} {avgScore} {grade}",
       "hint": "펼치려면 클릭하세요.",
       "distributionHeading": "분포",
       "signalsHeading": "점수를 낮추는 위험 신호",
@@ -698,7 +698,7 @@
       "generated": "생성됨",
       "functionOne": "{count}개 함수",
       "functionOther": "{count}개 함수",
-      "avgFormat": "평균 0 (1) {score} {grade}",
+      "avgFormat": "평균 0 (1) {grade} {score}",
       "gatesFailing": "게이트 실패",
       "gatesPassing": "게이트 통과"
     },
@@ -744,7 +744,7 @@
     "table": {
       "ariaLabel": "점수별 최악의 기능",
       "heading": "최악의 기능",
-      "topCount": "1 중 상위 0 {total} {shown}",
+      "topCount": "1 중 상위 0 {shown} {total}",
       "colGrade": "등급",
       "colScore": "점수",
       "colFunction": "기능",

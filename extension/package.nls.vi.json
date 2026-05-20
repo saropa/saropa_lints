@@ -7,7 +7,7 @@
   "views.actions.name": "hành động",
   "views.status.name": "Trạng thái",
   "views.settings.name": "Cài đặt",
-  "views.help.name": "Help (v13.10.0)",
+  "views.help.name": "Help (v13.10.1)",
   "viewsWelcome.banner.contents": "**Saropa Lint**\n\nHơn 2100 quy tắc tìm lỗi mã nguồn Dart và Flutter để đảm bảo tính bảo mật, khả năng truy cập và hiệu suất.\n\nYêu cầu dự án Dart hoặc Flutter.\n\nMở thư mục chứa `pubspec.yaml` để bắt đầu.\n\n[Tìm hiểu thêm trực tuyến](https://pub.dev/packages/saropa_lints)\n[Duyệt tất cả các lệnh](lệnh:saropaLints.showCommandCatalog)\n[Giới thiệu về Saropa Lints](lệnh:saropaLints.showAbout)\n[Bắt đầu](lệnh:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: Thiết lập dự án (pubspec + config)",
   "command.disable.title": "Saropa Lints: Tắt tích hợp Lint",

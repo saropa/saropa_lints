@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "ثانوی تشخیص",
     "hero": {
       "productTitle": "فائنڈنگ ڈیش بورڈ",
-      "gaugeTitle": "ہیلتھ سکور 0/100 (گریڈ 1)۔ غلطیوں کا وزن سب سے زیادہ ہے۔ {score} {grade}"
+      "gaugeTitle": "ہیلتھ سکور 0/100 (گریڈ 1)۔ غلطیوں کا وزن سب سے زیادہ ہے۔ {grade} {score}"
     },
     "time": {
       "justNow": "ابھی",
@@ -431,7 +431,7 @@
       "packages": "پیکجز",
       "projectGrade": "پروجیکٹ پیکیج گریڈ",
       "totalSize": "کل سائز*",
-      "gradeTooltip": "پروجیکٹ گریڈ 0\nاوسط سکور: 1/100\nپیکیجز: 2\nA:3 B:4 C:5 E:6 F:7 {c} {e} {avgScore} {pkgCount} {avgGrade} {a} {b} {f}",
+      "gradeTooltip": "پروجیکٹ گریڈ 0\nاوسط سکور: 1/100\nپیکیجز: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {e} {f} {c} {a} {b} {avgScore} {pkgCount}",
       "vibrantTitle": "متحرک",
       "stableTitle": "مستحکم",
       "outdatedTitle": "فرسودہ",
@@ -446,7 +446,7 @@
       "caveatLine2": "سرگرمی کی حدیں: 90d = باسی، 180d = غیر فعال (عزم + ریلیز ٹائم لائنز)۔"
     },
     "breakdown": {
-      "title": "گریڈ 0 کیوں؟ — 1/100 اوسط 2 پیکجوں میں {avgScore} {grade} {pkgCount}",
+      "title": "گریڈ 0 کیوں؟ — 1/100 اوسط 2 پیکجوں میں {pkgCount} {avgScore} {grade}",
       "hint": "پھیلانے کے لیے کلک کریں۔",
       "distributionHeading": "تقسیم",
       "signalsHeading": "اسکور کو نیچے گھسیٹتے ہوئے رسک سگنلز",
@@ -698,7 +698,7 @@
       "generated": "پیدا کیا",
       "functionOne": "{count} فنکشن",
       "functionOther": "{count} فنکشنز",
-      "avgFormat": "اوسط 0 (1) {score} {grade}",
+      "avgFormat": "اوسط 0 (1) {grade} {score}",
       "gatesFailing": "دروازے ناکام ہو رہے ہیں",
       "gatesPassing": "گزرنے والے دروازے"
     },
@@ -744,7 +744,7 @@
     "table": {
       "ariaLabel": "اسکور کے لحاظ سے بدترین افعال",
       "heading": "بدترین افعال",
-      "topCount": "سب سے اوپر 0 از 1 {total} {shown}",
+      "topCount": "سب سے اوپر 0 از 1 {shown} {total}",
       "colGrade": "گریڈ",
       "colScore": "سکور",
       "colFunction": "فنکشن",

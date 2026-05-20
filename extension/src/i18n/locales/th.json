@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "การวินิจฉัยทุติยภูมิ",
     "hero": {
       "productTitle": "แดชบอร์ดผลการสืบค้น",
-      "gaugeTitle": "คะแนนสุขภาพ 0/100 (เกรด 1) ข้อผิดพลาดมีน้ำหนักมากที่สุด {score} {grade}"
+      "gaugeTitle": "คะแนนสุขภาพ 0/100 (เกรด 1) ข้อผิดพลาดมีน้ำหนักมากที่สุด {grade} {score}"
     },
     "time": {
       "justNow": "แค่ตอนนี้",
@@ -431,7 +431,7 @@
       "packages": "แพ็คเกจ",
       "projectGrade": "เกรดแพ็คเกจโครงการ",
       "totalSize": "ขนาดรวม*",
-      "gradeTooltip": "เกรดโครงการ 0\nคะแนนเฉลี่ย: 1/100\nแพ็คเกจ: 2\nก:3 B:4 ค:5 อี:6 ฟ:7 {c} {e} {avgScore} {pkgCount} {avgGrade} {a} {b} {f}",
+      "gradeTooltip": "เกรดโครงการ 0\nคะแนนเฉลี่ย: 1/100\nแพ็คเกจ: 2\nก:3 B:4 ค:5 อี:6 ฟ:7 {avgGrade} {e} {f} {c} {a} {b} {avgScore} {pkgCount}",
       "vibrantTitle": "มีชีวิตชีวา",
       "stableTitle": "มั่นคง",
       "outdatedTitle": "ล้าสมัย",
@@ -446,7 +446,7 @@
       "caveatLine2": "เกณฑ์กิจกรรม: 90d = เก่า, 180d = อยู่เฉยๆ (กระทำ + ไทม์ไลน์การเผยแพร่)"
     },
     "breakdown": {
-      "title": "ทำไมต้องเกรด 0? — 1/100 โดยเฉลี่ยจากแพ็คเกจ 2 {avgScore} {grade} {pkgCount}",
+      "title": "ทำไมต้องเกรด 0? — 1/100 โดยเฉลี่ยจากแพ็คเกจ 2 {pkgCount} {avgScore} {grade}",
       "hint": "คลิกเพื่อขยาย",
       "distributionHeading": "การกระจาย",
       "signalsHeading": "สัญญาณความเสี่ยงลากคะแนนลง",
@@ -698,7 +698,7 @@
       "generated": "สร้างขึ้น",
       "functionOne": "{count} ฟังก์ชัน",
       "functionOther": "{count} ฟังก์ชัน",
-      "avgFormat": "เฉลี่ย 0 (1) {score} {grade}",
+      "avgFormat": "เฉลี่ย 0 (1) {grade} {score}",
       "gatesFailing": "ประตูล้มเหลว",
       "gatesPassing": "ประตูผ่านไป"
     },
@@ -744,7 +744,7 @@
     "table": {
       "ariaLabel": "ฟังก์ชั่นแย่ที่สุดตามคะแนน",
       "heading": "ฟังก์ชั่นที่แย่ที่สุด",
-      "topCount": "บน 0 จาก 1 {total} {shown}",
+      "topCount": "บน 0 จาก 1 {shown} {total}",
       "colGrade": "ระดับ",
       "colScore": "คะแนน",
       "colFunction": "การทำงาน",

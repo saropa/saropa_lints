@@ -7,7 +7,7 @@
   "views.actions.name": "الإجراءات",
   "views.status.name": "حالة",
   "views.settings.name": "إعدادات",
-  "views.help.name": "Help (v13.10.0)",
+  "views.help.name": "Help (v13.10.1)",
   "viewsWelcome.banner.contents": "** ساروبا لينتس **\n\n2100+ قواعد الوبر Dart وFlutter للأمان وإمكانية الوصول والأداء.\n\nيتطلب مشروع Dart أو Flutter.\n\nافتح مجلدًا يحتوي على \"pubspec.yaml\" للبدء.\n\n[معرفة المزيد عبر الإنترنت](https://pub.dev/packages/saropa_lints)\n[تصفح كافة الأوامر](command:saropaLints.showCommandCatalog)\n[حول ساروبا لينتس] (الأمر: ساروبا لينتس.showAbout)\n[البدء](الأمر:saropaLints.openWalkthrough)",
   "command.enable.title": "ساروبا لينتس: إعداد المشروع (pubspec + config)",
   "command.disable.title": "ساروبا لينتس: قم بإيقاف تشغيل تكامل لينت",

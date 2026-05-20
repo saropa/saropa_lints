@@ -57,9 +57,7 @@ void main() {
     });
 
     test('`cond1 || cond2` with no mounted operand — not a guard', () {
-      final expr = _parseIfCondition(
-        'if (aborted || value.isEmpty) return;',
-      );
+      final expr = _parseIfCondition('if (aborted || value.isEmpty) return;');
       // Sanity check: the new || branch must not accept arbitrary ||s.
       expect(checksNotMounted(expr), isFalse);
     });
@@ -130,7 +128,8 @@ Expression _parseIfCondition(String ifSource) =>
 /// first IfStatement it finds.
 IfStatement _parseIfStatement(String ifSource) {
   final unit = parseString(
-    content: '''
+    content:
+        '''
 void f() async {
   $ifSource
 }

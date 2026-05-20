@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "Вторинна діагностика",
     "hero": {
       "productTitle": "Інформаційна панель висновків",
-      "gaugeTitle": "Оцінка здоров’я 0/100 (оцінка 1). Помилки важать найбільше. {score} {grade}"
+      "gaugeTitle": "Оцінка здоров’я 0/100 (оцінка 1). Помилки важать найбільше. {grade} {score}"
     },
     "time": {
       "justNow": "тільки зараз",
@@ -431,7 +431,7 @@
       "packages": "пакети",
       "projectGrade": "Оцінка пакету проекту",
       "totalSize": "Загальний розмір*",
-      "gradeTooltip": "Оцінка проекту 0\nСередній бал: 1/100\nПакети: 2\nA:3 B:4 C:5 E:6 F:7 {c} {e} {avgScore} {pkgCount} {avgGrade} {a} {b} {f}",
+      "gradeTooltip": "Оцінка проекту 0\nСередній бал: 1/100\nПакети: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {e} {f} {c} {a} {b} {avgScore} {pkgCount}",
       "vibrantTitle": "Яскравий",
       "stableTitle": "Стабільний",
       "outdatedTitle": "Застаріла",
@@ -446,7 +446,7 @@
       "caveatLine2": "Порогові значення активності: 90d = неактивний, 180d = неактивний (термінали фіксації + випуску)."
     },
     "breakdown": {
-      "title": "Чому оцінка 0? — 1/100 у середньому для 2 упаковок {avgScore} {grade} {pkgCount}",
+      "title": "Чому оцінка 0? — 1/100 у середньому для 2 упаковок {pkgCount} {avgScore} {grade}",
       "hint": "Натисніть, щоб розгорнути",
       "distributionHeading": "Розподіл",
       "signalsHeading": "Сигнали ризику, що знижують рахунок",
@@ -698,7 +698,7 @@
       "generated": "Згенерований",
       "functionOne": "{count} функція",
       "functionOther": "{count} функцій",
-      "avgFormat": "середнє 0 (1) {score} {grade}",
+      "avgFormat": "середнє 0 (1) {grade} {score}",
       "gatesFailing": "ворота виходять з ладу",
       "gatesPassing": "проходження воріт"
     },
@@ -744,7 +744,7 @@
     "table": {
       "ariaLabel": "Найгірші функції за балами",
       "heading": "Найгірші функції",
-      "topCount": "зверху 0 з 1 {total} {shown}",
+      "topCount": "зверху 0 з 1 {shown} {total}",
       "colGrade": "Оцінка",
       "colScore": "Оцінка",
       "colFunction": "функція",

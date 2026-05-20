@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "Sekundärdiagnostik",
     "hero": {
       "productTitle": "Ergebnis-Dashboard",
-      "gaugeTitle": "Gesundheitswert 0/100 (Note 1). Fehler wiegen am schwersten. {score} {grade}"
+      "gaugeTitle": "Gesundheitswert 0/100 (Note 1). Fehler wiegen am schwersten. {grade} {score}"
     },
     "time": {
       "justNow": "soeben",
@@ -431,7 +431,7 @@
       "packages": "Pakete",
       "projectGrade": "Grad des Projektpakets",
       "totalSize": "Gesamtgröße*",
-      "gradeTooltip": "Projektnote 0\nDurchschnittliche Punktzahl: 1/100\nPakete: 2\nA:3 B:4 C:5 E:6 F:7 {c} {e} {avgScore} {pkgCount} {avgGrade} {a} {b} {f}",
+      "gradeTooltip": "Projektnote 0\nDurchschnittliche Punktzahl: 1/100\nPakete: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {e} {f} {c} {a} {b} {avgScore} {pkgCount}",
       "vibrantTitle": "Lebendig",
       "stableTitle": "Stabil",
       "outdatedTitle": "Veraltet",
@@ -446,7 +446,7 @@
       "caveatLine2": "Aktivitätsschwellenwerte: 90 Tage = veraltet, 180 Tage = ruhend (Commit- und Release-Zeitpläne)."
     },
     "breakdown": {
-      "title": "Warum Note 0? — 1/100 Durchschnitt über 2 Pakete {avgScore} {grade} {pkgCount}",
+      "title": "Warum Note 0? — 1/100 Durchschnitt über 2 Pakete {pkgCount} {avgScore} {grade}",
       "hint": "Klicken Sie zum Erweitern",
       "distributionHeading": "Verteilung",
       "signalsHeading": "Risikosignale ziehen den Score nach unten",
@@ -698,7 +698,7 @@
       "generated": "Generiert",
       "functionOne": "{count} Funktion",
       "functionOther": "{count} Funktionen",
-      "avgFormat": "Durchschnitt 0 (1) {score} {grade}",
+      "avgFormat": "Durchschnitt 0 (1) {grade} {score}",
       "gatesFailing": "Tore versagen",
       "gatesPassing": "Tore passieren"
     },
@@ -744,7 +744,7 @@
     "table": {
       "ariaLabel": "Schlechteste Funktionen nach Punktzahl",
       "heading": "Schlechteste Funktionen",
-      "topCount": "oben 0 von 1 {total} {shown}",
+      "topCount": "oben 0 von 1 {shown} {total}",
       "colGrade": "Grad",
       "colScore": "Punktzahl",
       "colFunction": "Funktion",

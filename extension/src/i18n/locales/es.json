@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "Diagnóstico secundario",
     "hero": {
       "productTitle": "Panel de resultados",
-      "gaugeTitle": "Puntuación de salud 0/100 (grado 1). Los errores pesan más. {score} {grade}"
+      "gaugeTitle": "Puntuación de salud 0/100 (grado 1). Los errores pesan más. {grade} {score}"
     },
     "time": {
       "justNow": "En este momento",
@@ -431,7 +431,7 @@
       "packages": "Paquetes",
       "projectGrade": "Grado del paquete del proyecto",
       "totalSize": "Tamaño total*",
-      "gradeTooltip": "Calificación del proyecto 0\nPuntuación media: 1/100\nPaquetes: 2\nA:3 B:4 C:5 E:6 F:7 {c} {e} {avgScore} {pkgCount} {avgGrade} {a} {b} {f}",
+      "gradeTooltip": "Calificación del proyecto 0\nPuntuación media: 1/100\nPaquetes: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {e} {f} {c} {a} {b} {avgScore} {pkgCount}",
       "vibrantTitle": "Vibrante",
       "stableTitle": "Estable",
       "outdatedTitle": "Anticuado",
@@ -446,7 +446,7 @@
       "caveatLine2": "Umbrales de actividad: 90d = obsoleto, 180d = inactivo (cronogramas de confirmación + liberación)."
     },
     "breakdown": {
-      "title": "¿Por qué calificar 0? — 1/100 promedio en 2 paquetes {avgScore} {grade} {pkgCount}",
+      "title": "¿Por qué calificar 0? — 1/100 promedio en 2 paquetes {pkgCount} {avgScore} {grade}",
       "hint": "Haga clic para ampliar",
       "distributionHeading": "Distribución",
       "signalsHeading": "Señales de riesgo que arrastran la puntuación hacia abajo",
@@ -698,7 +698,7 @@
       "generated": "Generado",
       "functionOne": "{count} función",
       "functionOther": "{count} funciones",
-      "avgFormat": "promedio 0 (1) {score} {grade}",
+      "avgFormat": "promedio 0 (1) {grade} {score}",
       "gatesFailing": "puertas fallando",
       "gatesPassing": "puertas pasando"
     },
@@ -744,7 +744,7 @@
     "table": {
       "ariaLabel": "Peores funciones por puntuación",
       "heading": "Peores funciones",
-      "topCount": "arriba 0 de 1 {total} {shown}",
+      "topCount": "arriba 0 de 1 {shown} {total}",
       "colGrade": "Calificación",
       "colScore": "Puntaje",
       "colFunction": "Función",

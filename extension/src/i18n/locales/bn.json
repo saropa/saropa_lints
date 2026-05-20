@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "সেকেন্ডারি ডায়াগনস্টিকস",
     "hero": {
       "productTitle": "অনুসন্ধান ড্যাশবোর্ড",
-      "gaugeTitle": "স্বাস্থ্য স্কোর 0/100 (গ্রেড 1)। ত্রুটিগুলি সবচেয়ে ভারী। {score} {grade}"
+      "gaugeTitle": "স্বাস্থ্য স্কোর 0/100 (গ্রেড 1)। ত্রুটিগুলি সবচেয়ে ভারী। {grade} {score}"
     },
     "time": {
       "justNow": "এইমাত্র",
@@ -431,7 +431,7 @@
       "packages": "প্যাকেজ",
       "projectGrade": "প্রকল্প প্যাকেজ গ্রেড",
       "totalSize": "মোট আকার*",
-      "gradeTooltip": "প্রকল্প গ্রেড 0\nগড় স্কোর: 1/100\nপ্যাকেজ: 2\nA:3 B:4 C:5 E:6 F:7 {c} {e} {avgScore} {pkgCount} {avgGrade} {a} {b} {f}",
+      "gradeTooltip": "প্রকল্প গ্রেড 0\nগড় স্কোর: 1/100\nপ্যাকেজ: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {e} {f} {c} {a} {b} {avgScore} {pkgCount}",
       "vibrantTitle": "প্রাণবন্ত",
       "stableTitle": "স্থিতিশীল",
       "outdatedTitle": "সেকেলে",
@@ -446,7 +446,7 @@
       "caveatLine2": "অ্যাক্টিভিটি থ্রেশহোল্ড: 90d = বাসি, 180d = সুপ্ত (কমিট + রিলিজ টাইমলাইন)।"
     },
     "breakdown": {
-      "title": "কেন গ্রেড 0? — 1/100 গড় 2 প্যাকেজ জুড়ে {avgScore} {grade} {pkgCount}",
+      "title": "কেন গ্রেড 0? — 1/100 গড় 2 প্যাকেজ জুড়ে {pkgCount} {avgScore} {grade}",
       "hint": "প্রসারিত করতে ক্লিক করুন",
       "distributionHeading": "বিতরণ",
       "signalsHeading": "স্কোর নিচে টেনে ঝুঁকি সংকেত",
@@ -698,7 +698,7 @@
       "generated": "উৎপন্ন",
       "functionOne": "{count} ফাংশন",
       "functionOther": "{count} ফাংশন",
-      "avgFormat": "গড় 0 (1) {score} {grade}",
+      "avgFormat": "গড় 0 (1) {grade} {score}",
       "gatesFailing": "গেট ব্যর্থ",
       "gatesPassing": "গেট পাসিং"
     },
@@ -744,7 +744,7 @@
     "table": {
       "ariaLabel": "স্কোর দ্বারা সবচেয়ে খারাপ ফাংশন",
       "heading": "সবচেয়ে খারাপ ফাংশন",
-      "topCount": "1 এর শীর্ষ 0 {total} {shown}",
+      "topCount": "1 এর শীর্ষ 0 {shown} {total}",
       "colGrade": "গ্রেড",
       "colScore": "স্কোর",
       "colFunction": "ফাংশন",

@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "二次診断",
     "hero": {
       "productTitle": "調査結果ダッシュボード",
-      "gaugeTitle": "健康スコア 0/100 (グレード 1)。エラーが最も重くなります。 {score} {grade}"
+      "gaugeTitle": "健康スコア 0/100 (グレード 1)。エラーが最も重くなります。 {grade} {score}"
     },
     "time": {
       "justNow": "ちょうど今",
@@ -431,7 +431,7 @@
       "packages": "パッケージ",
       "projectGrade": "プロジェクトパッケージグレード",
       "totalSize": "合計サイズ*",
-      "gradeTooltip": "プロジェクトグレード 0\n平均スコア: 1/100\nパッケージ: 2\nA:3 B:4 C:5 E:6 F:7 {c} {e} {avgScore} {pkgCount} {avgGrade} {a} {b} {f}",
+      "gradeTooltip": "プロジェクトグレード 0\n平均スコア: 1/100\nパッケージ: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {e} {f} {c} {a} {b} {avgScore} {pkgCount}",
       "vibrantTitle": "活気に満ちた",
       "stableTitle": "安定した",
       "outdatedTitle": "時代遅れ",
@@ -446,7 +446,7 @@
       "caveatLine2": "アクティビティのしきい値: 90 日 = 古い、180 日 = 休止中 (コミット + リリースのタイムライン)。"
     },
     "breakdown": {
-      "title": "なぜ 0 と評価するのでしょうか? — 2 パッケージ全体で 1/100 の平均 {avgScore} {grade} {pkgCount}",
+      "title": "なぜ 0 と評価するのでしょうか? — 2 パッケージ全体で 1/100 の平均 {pkgCount} {avgScore} {grade}",
       "hint": "クリックして展開します",
       "distributionHeading": "分布",
       "signalsHeading": "スコアを引き下げるリスクシグナル",
@@ -698,7 +698,7 @@
       "generated": "生成された",
       "functionOne": "{count} 関数",
       "functionOther": "{count} 関数",
-      "avgFormat": "平均0 (1) {score} {grade}",
+      "avgFormat": "平均0 (1) {grade} {score}",
       "gatesFailing": "ゲートが失敗する",
       "gatesPassing": "ゲート通過"
     },
@@ -744,7 +744,7 @@
     "table": {
       "ariaLabel": "スコア別の最悪の関数",
       "heading": "最悪の機能",
-      "topCount": "1の先頭0 {total} {shown}",
+      "topCount": "1の先頭0 {shown} {total}",
       "colGrade": "学年",
       "colScore": "スコア",
       "colFunction": "関数",

@@ -7,7 +7,7 @@
   "views.actions.name": "Действия",
   "views.status.name": "Статус",
   "views.settings.name": "Настройки",
-  "views.help.name": "Help (v13.10.0)",
+  "views.help.name": "Help (v13.10.1)",
   "viewsWelcome.banner.contents": "**Саропа Линтс**\n\nБолее 2100 правил проверки Dart и Flutter для обеспечения безопасности, доступности и производительности.\n\nТребуется проект Dart или Flutter.\n\nОткройте папку, содержащую `pubspec.yaml`, чтобы начать.\n\n[Узнать больше онлайн](https://pub.dev/packages/saropa_lints)\n[Просмотреть все команды](команда: saropaLints.showCommandCatalog)\n[О Саропа Линтс](команда:saropaLints.showAbout)\n[Начало работы](команда: saropaLints.openWalkthrough)",
   "command.enable.title": "Саропа Линтс: Настройка проекта (pubspec + config)",
   "command.disable.title": "Saropa Lints: отключить интеграцию Lint",

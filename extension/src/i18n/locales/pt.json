@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "Diagnóstico secundário",
     "hero": {
       "productTitle": "Painel de descobertas",
-      "gaugeTitle": "Pontuação de saúde 0/100 (nota 1). Os erros pesam mais. {score} {grade}"
+      "gaugeTitle": "Pontuação de saúde 0/100 (nota 1). Os erros pesam mais. {grade} {score}"
     },
     "time": {
       "justNow": "agora mesmo",
@@ -431,7 +431,7 @@
       "packages": "Pacotes",
       "projectGrade": "Nota do pacote do projeto",
       "totalSize": "Tamanho Total*",
-      "gradeTooltip": "Nota do projeto 0\nPontuação média: 1/100\nPacotes: 2\nA:3 B:4 C:5 E:6 F:7 {c} {e} {avgScore} {pkgCount} {avgGrade} {a} {b} {f}",
+      "gradeTooltip": "Nota do projeto 0\nPontuação média: 1/100\nPacotes: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {e} {f} {c} {a} {b} {avgScore} {pkgCount}",
       "vibrantTitle": "Vibrante",
       "stableTitle": "Estável",
       "outdatedTitle": "Desatualizado",
@@ -446,7 +446,7 @@
       "caveatLine2": "Limites de atividade: 90d = obsoleto, 180d = inativo (prazos de confirmação + lançamento)."
     },
     "breakdown": {
-      "title": "Por que nota 0? — Média de 1/100 em pacotes de 2 {avgScore} {grade} {pkgCount}",
+      "title": "Por que nota 0? — Média de 1/100 em pacotes de 2 {pkgCount} {avgScore} {grade}",
       "hint": "Clique para expandir",
       "distributionHeading": "Distribuição",
       "signalsHeading": "Sinais de risco arrastando a pontuação para baixo",
@@ -698,7 +698,7 @@
       "generated": "Gerado",
       "functionOne": "{count} função",
       "functionOther": "{count} funções",
-      "avgFormat": "média 0 (1) {score} {grade}",
+      "avgFormat": "média 0 (1) {grade} {score}",
       "gatesFailing": "portões falhando",
       "gatesPassing": "portões passando"
     },
@@ -744,7 +744,7 @@
     "table": {
       "ariaLabel": "Piores funções por pontuação",
       "heading": "Piores funções",
-      "topCount": "topo 0 de 1 {total} {shown}",
+      "topCount": "topo 0 de 1 {shown} {total}",
       "colGrade": "Nota",
       "colScore": "Pontuação",
       "colFunction": "Função",

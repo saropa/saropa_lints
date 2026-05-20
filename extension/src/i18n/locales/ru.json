@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "Вторичная диагностика",
     "hero": {
       "productTitle": "Панель результатов",
-      "gaugeTitle": "Оценка здоровья 0/100 (оценка 1). Ошибки весят больше всего. {score} {grade}"
+      "gaugeTitle": "Оценка здоровья 0/100 (оценка 1). Ошибки весят больше всего. {grade} {score}"
     },
     "time": {
       "justNow": "прямо сейчас",
@@ -431,7 +431,7 @@
       "packages": "Пакеты",
       "projectGrade": "Оценка пакета проекта",
       "totalSize": "Общий размер*",
-      "gradeTooltip": "Оценка проекта 0\nСредний балл: 1/100\nПакеты: 2\nA:3 B:4 C:5 E:6 F:7 {c} {e} {avgScore} {pkgCount} {avgGrade} {a} {b} {f}",
+      "gradeTooltip": "Оценка проекта 0\nСредний балл: 1/100\nПакеты: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {e} {f} {c} {a} {b} {avgScore} {pkgCount}",
       "vibrantTitle": "Яркий",
       "stableTitle": "Стабильный",
       "outdatedTitle": "Устаревший",
@@ -446,7 +446,7 @@
       "caveatLine2": "Пороги активности: 90d = устаревшие, 180d = бездействующие (сроки фиксации + выпуска)."
     },
     "breakdown": {
-      "title": "Почему оценка 0? — 1/100 в среднем по 2 пакетам {avgScore} {grade} {pkgCount}",
+      "title": "Почему оценка 0? — 1/100 в среднем по 2 пакетам {pkgCount} {avgScore} {grade}",
       "hint": "Нажмите, чтобы развернуть",
       "distributionHeading": "Распределение",
       "signalsHeading": "Сигналы риска, снижающие рейтинг",
@@ -698,7 +698,7 @@
       "generated": "Сгенерировано",
       "functionOne": "{count} функция",
       "functionOther": "{count} функций",
-      "avgFormat": "среднее 0 (1) {score} {grade}",
+      "avgFormat": "среднее 0 (1) {grade} {score}",
       "gatesFailing": "ворота выходят из строя",
       "gatesPassing": "ворота проходящие"
     },
@@ -744,7 +744,7 @@
     "table": {
       "ariaLabel": "Худшие функции по баллам",
       "heading": "Худшие функции",
-      "topCount": "верх 0 из 1 {total} {shown}",
+      "topCount": "верх 0 из 1 {shown} {total}",
       "colGrade": "Оценка",
       "colScore": "Счет",
       "colFunction": "Функция",

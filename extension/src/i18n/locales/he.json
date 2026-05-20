@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "אבחון משני",
     "hero": {
       "productTitle": "לוח המחוונים של ממצאים",
-      "gaugeTitle": "ציון בריאות 0/100 (ציון 1). שגיאות שוקלות את הכבד ביותר. {score} {grade}"
+      "gaugeTitle": "ציון בריאות 0/100 (ציון 1). שגיאות שוקלות את הכבד ביותר. {grade} {score}"
     },
     "time": {
       "justNow": "זֶה עַתָה",
@@ -431,7 +431,7 @@
       "packages": "חבילות",
       "projectGrade": "ציון חבילת פרויקט",
       "totalSize": "גודל כולל*",
-      "gradeTooltip": "ציון הפרויקט 0\nציון ממוצע: 1/100\nחבילות: 2\nA:3 B:4 C:5 E:6 F:7 {c} {e} {avgScore} {pkgCount} {avgGrade} {a} {b} {f}",
+      "gradeTooltip": "ציון הפרויקט 0\nציון ממוצע: 1/100\nחבילות: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {e} {f} {c} {a} {b} {avgScore} {pkgCount}",
       "vibrantTitle": "תוסס",
       "stableTitle": "יַצִיב",
       "outdatedTitle": "מְיוּשָׁן",
@@ -446,7 +446,7 @@
       "caveatLine2": "ספי פעילות: 90d = מעופש, 180d = רדום (מחוייבות + לוחות זמנים לשחרור)."
     },
     "breakdown": {
-      "title": "למה ציון 0? — ממוצע של 1/100 על פני 2 חבילות {avgScore} {grade} {pkgCount}",
+      "title": "למה ציון 0? — ממוצע של 1/100 על פני 2 חבילות {pkgCount} {avgScore} {grade}",
       "hint": "לחץ כדי להרחיב",
       "distributionHeading": "הֲפָצָה",
       "signalsHeading": "אותות סיכון גוררים את הניקוד למטה",
@@ -698,7 +698,7 @@
       "generated": "נוצר",
       "functionOne": "{count} פונקציה",
       "functionOther": "{count} פונקציות",
-      "avgFormat": "ממוצע 0 (1) {score} {grade}",
+      "avgFormat": "ממוצע 0 (1) {grade} {score}",
       "gatesFailing": "שערים נכשלים",
       "gatesPassing": "שערים עוברים"
     },
@@ -744,7 +744,7 @@
     "table": {
       "ariaLabel": "הפונקציות הגרוע ביותר לפי ציון",
       "heading": "פונקציות גרועות ביותר",
-      "topCount": "למעלה 0 מתוך 1 {total} {shown}",
+      "topCount": "למעלה 0 מתוך 1 {shown} {total}",
       "colGrade": "צִיוּן",
       "colScore": "צִיוּן",
       "colFunction": "פוּנקצִיָה",

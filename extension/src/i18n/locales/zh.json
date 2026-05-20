@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "二次诊断",
     "hero": {
       "productTitle": "调查结果仪表板",
-      "gaugeTitle": "健康评分0/100（1级）。错误是最重的。 {score} {grade}"
+      "gaugeTitle": "健康评分0/100（1级）。错误是最重的。 {grade} {score}"
     },
     "time": {
       "justNow": "现在",
@@ -431,7 +431,7 @@
       "packages": "套餐",
       "projectGrade": "工程包等级",
       "totalSize": "总尺寸*",
-      "gradeTooltip": "工程等级0\n平均分：1/100\n套餐：2\nA:3 B:4 C:5 E:6 F:7 {c} {e} {avgScore} {pkgCount} {avgGrade} {a} {b} {f}",
+      "gradeTooltip": "工程等级0\n平均分：1/100\n套餐：2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {e} {f} {c} {a} {b} {avgScore} {pkgCount}",
       "vibrantTitle": "充满活力",
       "stableTitle": "稳定的",
       "outdatedTitle": "过时的",
@@ -446,7 +446,7 @@
       "caveatLine2": "活动阈值：90d = 陈旧，180d = 休眠（提交 + 发布时间表）。"
     },
     "breakdown": {
-      "title": "为什么评分0？ — 2 包的 1/100 平均值 {avgScore} {grade} {pkgCount}",
+      "title": "为什么评分0？ — 2 包的 1/100 平均值 {pkgCount} {avgScore} {grade}",
       "hint": "点击展开",
       "distributionHeading": "分配",
       "signalsHeading": "风险信号拖累分数下跌",
@@ -698,7 +698,7 @@
       "generated": "生成",
       "functionOne": "{count} 个函数",
       "functionOther": "{count} 个函数",
-      "avgFormat": "平均 0 (1) {score} {grade}",
+      "avgFormat": "平均 0 (1) {grade} {score}",
       "gatesFailing": "门失败",
       "gatesPassing": "大门经过"
     },
@@ -744,7 +744,7 @@
     "table": {
       "ariaLabel": "按分数列出的最差函数",
       "heading": "最差的功能",
-      "topCount": "顶部 0 共 1 {total} {shown}",
+      "topCount": "顶部 0 共 1 {shown} {total}",
       "colGrade": "年级",
       "colScore": "分数",
       "colFunction": "功能",
