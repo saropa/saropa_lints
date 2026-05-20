@@ -42,17 +42,17 @@
     "retry": "Yeniden dene",
     "reload": "Yeniden yükle",
     "copyDetails": "Ayrıntıları kopyala",
-    "unreachable": "0'a ulaşılamadı {target}",
+    "unreachable": "{target}’ye ulaşılamadı",
     "partialSummary": "{total} {item} içinden {loaded} yüklendi. {failed} başarısız oldu.",
     "partialRetry": "Yeniden deneme başarısız oldu"
   },
   "offline": {
     "banner": "Çevrimdışı — yenilemek için yeniden bağlanın.",
-    "cachedFooter": "0'dan önbelleğe alınmış veriler gösteriliyor. {when}",
+    "cachedFooter": "{when}'den önbelleğe alınmış veriler gösteriliyor.",
     "reconnecting": "Yeniden bağlanılıyor…"
   },
   "stale": {
-    "statusPill": "Son başarılı çalıştırma 0 — yenileme başarısız oldu {when}"
+    "statusPill": "Son başarılı çalıştırma {when} — yenileme başarısız oldu"
   },
   "filter": {
     "searchPlaceholder": "Aramak…",
@@ -63,7 +63,7 @@
   },
   "a11y": {
     "toggleFullWidth": "Tam genişlikli düzeni değiştir",
-    "sortBy": "0'ye göre sırala {column}",
+    "sortBy": "{column}'ye göre sırala",
     "expandRow": "Satırı genişlet",
     "collapseRow": "Satırı daralt",
     "selectAll": "Tüm satırları seç",
@@ -76,12 +76,12 @@
       "placeholder": "Kenar çubuğu ve kontrol panelleri için dil seçin",
       "auto": "Otomatik (VS Code görüntüleme dilini takip edin)"
     },
-    "reloadPrompt": "Dil 0 olarak ayarlandı. Kenar çubuğunu ve komut etiketlerini güncellemek için pencereyi yeniden yükleyin. {locale}",
+    "reloadPrompt": "Dil {locale} olarak ayarlandı. Kenar çubuğunu ve komut etiketlerini güncellemek için pencereyi yeniden yükleyin.",
     "reloadNow": "Şimdi yeniden yükle",
     "reloadLater": "Daha sonra"
   },
   "brand": {
-    "prefix": "Saropa"
+    "prefix": "Saropa "
   },
   "findingsDash": {
     "pageTitle": "Saropa Bulgular Kontrol Paneli",
@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "İkincil teşhis",
     "hero": {
       "productTitle": "Bulgular Kontrol Paneli",
-      "gaugeTitle": "Sağlık puanı 0/100 (derece 1). Hatalar en ağırdır. {grade} {score}"
+      "gaugeTitle": "Sağlık puanı {score}/100 (derece {grade}). Hatalar en ağırdır."
     },
     "time": {
       "justNow": "Şu anda",
@@ -106,8 +106,8 @@
       "findingOne": "{count} bulgu",
       "findingOther": "{count} bulgu",
       "todoHackTitle": "Çalışma alanında TODO ve HACK işaretleri bulundu",
-      "driftOnTitle": "Drift Danışmanı bağlandı: 0 {label}",
-      "driftOnPill": "Drift açık · 0 {count}",
+      "driftOnTitle": "Drift Danışmanı bağlandı: {label}",
+      "driftOnPill": "Sürüklenmeye devam · {count}",
       "driftOfflineTitle": "Drift Danışmanı etkin ancak sunucu bulunamadı",
       "driftOfflinePill": "Çevrimdışı sürüklen",
       "enabledRulesTitle": "Geçerli katmanda etkin kurallar",
@@ -123,13 +123,13 @@
       "ruleStatus": "Kural durumu"
     },
     "seg": {
-      "toggleSeverityTitle": "0 önem derecesini değiştir {v}",
-      "toggleImpactTitle": "0 etkisini değiştir {v}"
+      "toggleSeverityTitle": "{v} önem derecesini değiştir",
+      "toggleImpactTitle": "{v} etkisini aç/kapat"
     },
     "kpi": {
       "visibleLabel": "Görünür bulgular",
       "allMatched": "hepsi eşleşti",
-      "ofTotal": "toplam 0 {total}",
+      "ofTotal": "toplamın {total}",
       "clearFiltersTitle": "Tüm filtreleri temizlemek için tıklayın",
       "errorsLabel": "Hatalar",
       "errorsSubFix": "düzeltmeli",
@@ -148,7 +148,7 @@
       "filesSubNone": "hiçbir dosya etkilenmedi",
       "filesTitle": "En az bir bulguya katkıda bulunan farklı dosyalar",
       "topRuleLabel": "En iyi kural",
-      "topRuleTitle": "Bulguları 0 kuralına göre filtreleyin {name}"
+      "topRuleTitle": "Bulguları {name} kuralına göre filtreleyin"
     },
     "toolbar": {
       "ariaFiltersActions": "Filtreler ve eylemler",
@@ -171,13 +171,13 @@
       "impactLabel": "Darbe",
       "moreSummary": "Daha",
       "moreChevron": "▾",
-      "copyJsonTitle": "Filtrelenen ihlalleri JSON (0) olarak kopyala {count}",
+      "copyJsonTitle": "Filtrelenen ihlalleri JSON ({count}) olarak kopyalayın",
       "saveReportTitle": "Filtrelenen ihlalleri raporlara JSON olarak kaydet/YYYYAAGG/"
     },
     "chip": {
-      "contains": "\"0\" içeriyor {q}",
-      "severityOff": "ciddiyet ≠ 0 {v}",
-      "impactOff": "etki ≠ 0 {v}",
+      "contains": "\"{q}\" içerir",
+      "severityOff": "şiddet ≠ {v}",
+      "impactOff": "etki ≠ {v}",
       "resetAllTitle": "Tüm filtreleri sıfırla",
       "removeFilterAria": "Filtreyi kaldır"
     },
@@ -185,7 +185,7 @@
       "help": "Yardım",
       "groupBy": "Gruplandırmaya göre…",
       "textFilter": "Metin filtresi…",
-      "severityImpact": "Severity filter…",
+      "severityImpact": "Önem derecesi filtresi…",
       "hideRules": "Kuralları gizle…",
       "ruleMetadata": "Kural meta verileri",
       "clearFilters": "Filtreleri temizle",
@@ -197,18 +197,18 @@
       "openPackageDashboard": "Paket kontrol panelini aç",
       "openCodeHealth": "Açık Kod Sağlığı",
       "openLintsConfig": "Lints Yapılandırmasını Aç",
-      "reloadFromDisk": "Reload from disk",
-      "reloadFromDiskTitle": "Re-render the dashboard from the last violations.json without re-running the analyzer.",
-      "reEnableDisabledRules": "Re-enable disabled rules…",
-      "reEnableDisabledRulesTitle": "Open a quick-pick of rules currently disabled in analysis_options_custom.yaml and re-enable the chosen ones.",
-      "reEnableNoneTitle": "No rules currently disabled",
-      "reEnableNoneMessage": "No rules are currently disabled via analysis_options_custom.yaml.",
-      "reEnableQuickPickTitle": "Re-enable disabled rules",
-      "reEnableQuickPickPlaceholder": "Select one or more rules to re-enable",
-      "menuGroupExport": "Export",
-      "menuGroupFilter": "Filter & focus",
-      "menuGroupOpen": "Open dashboard",
-      "menuGroupSystem": "System"
+      "reloadFromDisk": "Diskten yeniden yükle",
+      "reloadFromDiskTitle": "Analiz aracını yeniden çalıştırmadan kontrol panelini son ihlaller.json dosyasından yeniden oluşturun.",
+      "reEnableDisabledRules": "Devre dışı bırakılan kuralları yeniden etkinleştirin…",
+      "reEnableDisabledRulesTitle": "analyze_options_custom.yaml'de halihazırda devre dışı bırakılmış olan kuralların hızlı seçimini açın ve seçilenleri yeniden etkinleştirin.",
+      "reEnableNoneTitle": "Şu anda devre dışı bırakılmış kural yok",
+      "reEnableNoneMessage": "Şu anda analyze_options_custom.yaml aracılığıyla hiçbir kural devre dışı bırakılmadı.",
+      "reEnableQuickPickTitle": "Devre dışı bırakılan kuralları yeniden etkinleştirin",
+      "reEnableQuickPickPlaceholder": "Yeniden etkinleştirmek için bir veya daha fazla kural seçin",
+      "menuGroupExport": "İhracat",
+      "menuGroupFilter": "Filtrele ve odaklan",
+      "menuGroupOpen": "Kontrol panelini aç",
+      "menuGroupSystem": "Sistem"
     },
     "progress": {
       "runningLabel": "Analiz çalıştırılıyor…",
@@ -222,8 +222,8 @@
       "disableButton": "Devre dışı bırakmak",
       "workspaceOnlyShort": "yalnızca çalışma alanı",
       "projectConfigShort": "proje yapılandırması (analyse_options_custom.yaml yazar)",
-      "topRulesOne": "Üst 0 kuralı {count}",
-      "topRulesOther": "En önemli 0 kuralları {count}",
+      "topRulesOne": "En iyi {count} kuralı",
+      "topRulesOther": "En önemli {count} kuralları",
       "colRank": "#",
       "colRule": "Kural",
       "colCount": "Saymak",
@@ -247,9 +247,9 @@
       "copyRowTitle": "Bu bulguyu JSON olarak kopyalayın",
       "metaShown": "{filtered} gösteriliyor",
       "metaAfterDisable": "devre dışı bırakılan kural filtresinden sonra {total}",
-      "metaSourceCap": "performans için kaynak 0 ile sınırlandırıldı {max}",
-      "metaGroupedBy": "0'ye göre gruplandırılmış {mode}",
-      "overflowNote": "Oluşturma performansı için kaynak listesi 0'da kesildi. {max}",
+      "metaSourceCap": "performans için kaynak {max} ile sınırlandırıldı",
+      "metaGroupedBy": "{mode}’ye göre gruplandırılmış",
+      "overflowNote": "Oluşturma performansı için kaynak listesi {max}'de kesildi.",
       "runAgain": "Analizi tekrar çalıştır",
       "emptyNoViolations": "Son analiz çalışmasında ihlal yok.",
       "emptyNoMatch": "Mevcut filtrelerle eşleşen ihlal yok.",
@@ -257,7 +257,7 @@
       "emptyHintFilters": "Bulguları görmek için filtreleri ayarlayın veya analizi tekrar çalıştırın.",
       "reRunAnalysis": "Analizi yeniden çalıştır",
       "resetFilters": "Filtreleri sıfırla",
-      "linePrefix": "L0 {line}"
+      "linePrefix": "L{line}"
     },
     "charts": {
       "sectionAria": "Grafikleri karıştır",
@@ -265,7 +265,7 @@
       "metaClickSlice": "Filtrelemek için bir dilimi tıklayın",
       "severityMix": "Şiddet karışımı",
       "impactMix": "Etki karışımı",
-      "filterBarTitle": "Yalnızca 0'ye filtrele {key}",
+      "filterBarTitle": "Yalnızca {key} olarak filtrele",
       "donutTotal": "toplam"
     },
     "todoHack": {
@@ -293,7 +293,7 @@
       "retry": "Yeniden dene",
       "headingConnected": "Drift Danışmanı",
       "metaConnected": "bağlı",
-      "noIssues": "0'ye bağlanıldı — güncel sorun yok. {label}",
+      "noIssues": "{label}'ye bağlanıldı — güncel sorun yok.",
       "refresh": "Yenile",
       "openBrowser": "Tarayıcıda aç",
       "headingIssues": "Drift Danışmanı",
@@ -307,8 +307,8 @@
       "viewHidesMetaNone": "hiçbiri",
       "noneInExport": "Mevcut `violations.json` dışa aktarımında analizör engellemesi yok. Yok sayılanları veya doldurulacak temel çizgileri düzenledikten sonra analizi çalıştırın.",
       "totalRow": "Toplam — filtreleri temizleyin ve Bulgular'ı açın",
-      "byRule": "Kurala göre (0) {count}",
-      "byFile": "Dosyaya göre (0) {count}",
+      "byRule": "Kurala göre ({count})",
+      "byFile": "Dosyaya göre ({count})",
       "noEntries": "Giriş yok.",
       "nothingHidden": "Bu çalışma alanındaki Sorunlar listesinde gizlenen hiçbir şey yok. Klasörleri, dosyaları veya kuralları gizlemek için ağaç bağlamı eylemlerini kullanın; çalışma alanı durumunda kalırlar.",
       "folderPattern": "{count} klasör",
@@ -317,7 +317,7 @@
       "perFileRules": "dosya başına kural gizlemeleri olan {count} dosya",
       "severityHides": "{count} önem derecesi gizleme",
       "impactHides": "{count} etki gizleme",
-      "activeHides": "Aktif gizlemeler: 0. {counts}",
+      "activeHides": "Aktif gizlemeler: {counts}.",
       "viewHidesFooter": "Bu gizlemeler yalnızca Sorunlar/kontrol paneli listesini daraltır; `violations.json' dosyasına yazılmazlar.",
       "clearViewHides": "Tüm görünüm gizlemelerini temizle",
       "foldersSample": "Klasörler (örnek)",
@@ -331,7 +331,7 @@
       "analysisComplete": "Analiz tamamlandı",
       "metaRunning": "Büyük projelerde bu biraz zaman alabilir.",
       "metaDone": "En son bulgularla kontrol paneli yenileniyor.",
-      "announceSearch": "arama 0 {q}",
+      "announceSearch": "arama {q}",
       "announceSeverities": "{n} önem derecesi",
       "announceImpacts": "{n} etki",
       "announceCleared": "Tüm filtreler temizlendi",
@@ -359,9 +359,9 @@
     },
     "unknownAnalyzerKind": "Bilinmiyor",
     "supplementary": {
-      "otherAnalyzerOn": "+0 diğer analizör bulguları {count}",
+      "otherAnalyzerOn": "+{count} diğer analizör bulguları",
       "otherAnalyzerPromo": "+? diğer analizör bulguları - göster",
-      "analyzerTodosOn": "+0 analizci YAPILACAKLAR {count}",
+      "analyzerTodosOn": "+{count} analizör YAPILACAKLAR",
       "analyzerTodosPromo": "+? analizci YAPILACAKLAR — göster",
       "scannerPromo": "TODO/HACK tarayıcısını etkinleştir",
       "tooltipLive": "VS Kod Sorunları panelinden canlı yayın. Analiz tamamlandıkça güncellenir. Gizlemek için tıklayın.",
@@ -383,7 +383,7 @@
     "summaryRuleTriage": "Kural triyajı",
     "hintNoViolations": "Henüz 'reports/.saropa_lints/violations.json' yok. Analizi çalıştırın ve ardından bu sekmeyi yenileyin.",
     "hintUnreadable": "Okunabilir ihlal aktarımı yok. Önce Saropa Lints analizini çalıştırın.",
-    "hintStale": "Önceliklendirme verileri eski olabilir (dışa aktarma 0 eskidir). Mevcut gruplar için analizi yeniden çalıştırın. {age}",
+    "hintStale": "Triyaj verileri eski olabilir (dışa aktarma {age} eskidir). Mevcut gruplar için analizi yeniden çalıştırın.",
     "hintNoPerRule": "Bu dışa aktarmada kural başına sorun sayısı yoktur. Güncel bir Saropa Lints eklentisi ile yeniden analiz edin.",
     "hintBuildFailed": "Bu dışa aktarmadan önceliklendirme oluşturulamadı. Yeni bir analiz yapın.",
     "summaryVolume": "Kural triyajı (hacim / düzeltilmesi gereken / biçimsel)",
@@ -400,14 +400,14 @@
     "openWorkspaceFirst": "Önce bir çalışma alanı klasörü açın.",
     "noReportYet": "Henüz herhangi bir ihlal raporu yok. Önce Saropa Lints analizini çalıştırın.",
     "clipboardCopyFailed": "Panoya kopyalanamadı.",
-    "copiedViolationsJson": "0 ihlalleri JSON olarak kopyalandı. {count}",
+    "copiedViolationsJson": "{count} ihlalleri JSON olarak kopyalandı.",
     "copiedOneViolationJson": "1 ihlal JSON olarak kopyalandı.",
     "driftNotConnected": "Drift Advisor sunucusu bağlı değil.",
-    "copiedBulkFindings": "Seçilen 0 bulgu/bulgular JSON olarak kopyalandı. {count}",
+    "copiedBulkFindings": "Seçilen {count} bulgu(lar)ı JSON olarak kopyalandı.",
     "noMatchingFindingsCopy": "Kopyalanacak eşleşen bulgu yok.",
-    "couldNotOpenFile": "Dosya açılamadı: 0 {path}",
+    "couldNotOpenFile": "Dosya açılamadı: {path}",
     "saveReportNoWorkspace": "Raporu kaydetmeden önce bir çalışma alanı klasörü açın.",
-    "savedFindings": "Kaydedilen 0 bulgu(lar): 1 {path} {count}",
+    "savedFindings": "Kaydedilen {count} bulgu(lar): {path}",
     "couldNotSaveReportJson": "JSON raporu kaydedilemedi."
   },
   "packageDashboard": {
@@ -416,7 +416,7 @@
     "status": {
       "packagesCount": "{count} paket",
       "packagesBreakdown": "{direct} doğrudan, {transitive} geçişli",
-      "gradeLine": "Derece 0 · 1/100 {avg} {grade}",
+      "gradeLine": "Derece {grade} · {avg}/100",
       "flaggedCount": "{count} işaretlendi",
       "flaggedTitle": "Terk edilmiş veya ömrünün sonu"
     },
@@ -424,14 +424,14 @@
       "heading": "Paketler taranıyor",
       "body1": "Saropa, bu projedeki her doğrudan bağımlılık için pub.dev meta verilerini, GitHub etkinliğini ve bağımlılık grafiklerini getiriyor.",
       "body2": "Tarama bittiğinde bu sayfa otomatik olarak yenilenecektir. Sağ alttaki ilerleme bildiriminden iptal edebilirsiniz.",
-      "versionStamp": "Saropa Paket Kontrol Paneli v0 {version}"
+      "versionStamp": "Saropa Paket Kontrol Paneli v{version}"
     },
-    "gaugeTitle": "Proje Paketi Notu: 0 {grade}",
+    "gaugeTitle": "Proje Paket Derecesi: {grade}",
     "summary": {
       "packages": "Paketler",
       "projectGrade": "Proje Paketi Notu",
       "totalSize": "Toplam Boyut*",
-      "gradeTooltip": "Proje notu 0\nOrtalama puan: 1/100\nPaketler: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {e} {f} {c} {a} {b} {avgScore} {pkgCount}",
+      "gradeTooltip": "Proje notu {avgGrade}\nOrtalama puan: {avgScore}/100\nPaketler: {pkgCount}\nA:{a} B:{b} C:{c} E:{e} F:{f}",
       "vibrantTitle": "Canlı",
       "stableTitle": "Stabil",
       "outdatedTitle": "Modası geçmiş",
@@ -446,13 +446,13 @@
       "caveatLine2": "Etkinlik eşikleri: 90d = eski, 180d = hareketsiz (taahhüt + sürüm zaman çizelgeleri)."
     },
     "breakdown": {
-      "title": "Neden 0 notu? — 2 paketlerde ortalama 1/100 {pkgCount} {avgScore} {grade}",
+      "title": "Neden {grade} notu veriliyor? — {pkgCount} paketlerinde {avgScore}/100 ortalama",
       "hint": "Genişletmek için tıklayın",
       "distributionHeading": "Dağıtım",
       "signalsHeading": "Skoru aşağı çeken risk sinyalleri",
-      "signalFlagged": "{count} flagged (abandoned / end-of-life)",
-      "signalVulnerable": "{count} with known vulnerabilities",
-      "signalUpdates": "{count} have updates available",
+      "signalFlagged": "{count} işaretli (terk edilmiş / kullanım ömrü sonu)",
+      "signalVulnerable": "Bilinen güvenlik açıklarına sahip {count}",
+      "signalUpdates": "{count} güncellemeler mevcut",
       "bottomHeading": "En düşük puanlı paketler",
       "thresholdsHeading": "Puanlar notlarla nasıl eşleşir?",
       "thresholdA": "70+ — Canlı: aktif olarak sürdürülüyor, yakın zamanda yayınlandı",
@@ -461,7 +461,7 @@
       "thresholdE": "20'nin altında - Terk edilmiş: hareketsizlik belirtileri",
       "thresholdF": "Yayınlanmıyor veya pub.dev'de arşivleniyor (puan kullanılmıyor)",
       "filterTooltip": "Paket tablosunu yalnızca bu kategoriye göre filtreleyin",
-      "jumpTooltip": "Paket tablosunda 0'ya atlayın {name}"
+      "jumpTooltip": "Paket tablosunda {name}'ye geçin"
     },
     "network": {
       "summary": "Bağımlılık Ağı"
@@ -657,10 +657,10 @@
     "entry": {
       "internalBadgeTitle": "Yalnızca bağlam menülerinden tetiklenir",
       "internalBadge": "menü",
-      "copyTitle": "Komut kimliğini kopyala (0) {id}",
+      "copyTitle": "Komut kimliğini kopyala ({id})",
       "copyAria": "Komut kimliğini kopyala"
     },
-    "categoryJumpTitle": "0'e atla {category}",
+    "categoryJumpTitle": "{category}'e atla",
     "shortcuts": {
       "focusSearch": "Arama alanına odaklanın",
       "navRows": "Görünür komut satırlarında gezinin",
@@ -670,14 +670,14 @@
       "showOverlay": "Bu kısayol katmanını göster"
     },
     "script": {
-      "moreSuffix": "+0 daha fazla {count}",
+      "moreSuffix": "+{count} daha fazla",
       "showLess": "Daha az göster",
       "runSingular": "koşmak",
       "runPlural": "koşar",
       "recentWord": "son",
       "expandAll": "Tümünü genişlet",
       "collapseAll": "Tümünü daralt",
-      "searchChip": "Arama: \"0\" {query}",
+      "searchChip": "Arama: \"{query}\"",
       "internalChip": "Bağlam menüsü komutları gösteriliyor",
       "removeFilterPrefix": "Filtreyi kaldır",
       "matchOne": "{count} eşleşme",
@@ -691,20 +691,20 @@
     "scanningTitle": "Kod Sağlığı: tarama işlevleri…",
     "runReportFirst": "Raporu yeniden çalıştırın ve ardından JSON'u kopyalayın.",
     "copiedJson": "Code Health JSON panoya kopyalandı.",
-    "couldNotOpenFile": "Dosya açılamadı: 0 {path}",
+    "couldNotOpenFile": "Dosya açılamadı: {path}",
     "panelTitle": "Saropa Kod Sağlık Kontrol Paneli",
     "hero": {
       "title": "Saropa Kod Sağlık Kontrol Paneli",
       "generated": "Oluşturuldu",
       "functionOne": "{count} işlev",
       "functionOther": "{count} işlev",
-      "avgFormat": "ortalama 0 (1) {grade} {score}",
+      "avgFormat": "ortalama {score} ({grade})",
       "gatesFailing": "kapılar başarısız",
       "gatesPassing": "geçen kapılar"
     },
     "gauge": {
-      "tooltip": "Ortalama puan 0 100 (not 1). {rounded} {grade}",
-      "ariaLabel": "Ortalama puan 0 / 100 {rounded}"
+      "tooltip": "Ortalama puan {rounded} 100 (derece {grade}).",
+      "ariaLabel": "Ortalama puan {rounded} 100"
     },
     "gate": {
       "fallback": "Kalite kapıları başarısız oldu; Kod Durumu ayarlarındaki eşikleri inceleyin.",
@@ -716,8 +716,8 @@
     "kpi": {
       "ariaLabel": "Kod durumu özeti",
       "allClear": "Hiçbir kategoride işaretlenmiş işlev yok; hepsi açık.",
-      "clickToFilter": "Tabloyu 0 işaretli işlevlere göre filtrelemek için tıklayın. {flag}",
-      "noFlagged": "0 ile işaretlenen işlev yok. {flag}",
+      "clickToFilter": "Tabloyu {flag} işaretli işlevlere göre filtrelemek için tıklayın.",
+      "noFlagged": "{flag} olarak işaretlenen işlev yok.",
       "unused": "Kullanılmayan",
       "unusedSub": "hiçbir yerde referans verilmeyen işlevler",
       "uncovered": "Açık",
@@ -744,7 +744,7 @@
     "table": {
       "ariaLabel": "Puana göre en kötü işlevler",
       "heading": "En kötü işlevler",
-      "topCount": "üst 0 / 1 {shown} {total}",
+      "topCount": "{total}'nin en üst {shown}'si",
       "colGrade": "Seviye",
       "colScore": "Gol",
       "colFunction": "İşlev",
@@ -768,9 +768,9 @@
     },
     "script": {
       "activeFiltersLabel": "Aktif filtreler:",
-      "searchChip": "arama: \"0\" {q}",
-      "flagChip": "bayrak: 0 {flag}",
-      "removeAria": "0'yi kaldır {key}",
+      "searchChip": "arama: \"{q}\"",
+      "flagChip": "bayrak: {flag}",
+      "removeAria": "{key}’yi kaldırın",
       "clearAll": "Tümünü temizle",
       "rowsVisible": "{total} satırdan {visible} satır görünür",
       "neverRun": "asla koşma"
@@ -803,7 +803,7 @@
   "telemetry": {
     "heroTitle": "İlgili Kural Telemetrisi",
     "skipToCounters": "Telemetri sayaçlarına atla",
-    "lastEvent": "Son etkinlik 0 {relative}",
+    "lastEvent": "Son olay {relative}",
     "noEvents": "Kayıtlı etkinlik yok",
     "totalEventOne": "toplam {count} etkinlik",
     "totalEventOther": "toplam {count} etkinlik",

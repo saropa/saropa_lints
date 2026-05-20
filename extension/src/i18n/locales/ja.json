@@ -42,17 +42,17 @@
     "retry": "リトライ",
     "reload": "リロード",
     "copyDetails": "詳細をコピーする",
-    "unreachable": "0に到達できませんでした {target}",
+    "unreachable": "{target}に到達できませんでした",
     "partialSummary": "{total} 中 {loaded} の {item} がロードされました。{failed} 件失敗。",
     "partialRetry": "再試行に失敗しました"
   },
   "offline": {
     "banner": "オフライン — 再接続して更新します。",
-    "cachedFooter": "「0」からのキャッシュされたデータを表示しています。 {when}",
+    "cachedFooter": "{when} からのキャッシュされたデータを表示しています。",
     "reconnecting": "再接続中…"
   },
   "stale": {
-    "statusPill": "最後に成功した実行 0 — 更新に失敗しました {when}"
+    "statusPill": "最後に成功した実行 {when} — 更新に失敗しました"
   },
   "filter": {
     "searchPlaceholder": "検索…",
@@ -63,7 +63,7 @@
   },
   "a11y": {
     "toggleFullWidth": "全幅レイアウトの切り替え",
-    "sortBy": "0で並べ替え {column}",
+    "sortBy": "{column}で並べ替え",
     "expandRow": "行を展開する",
     "collapseRow": "行を折りたたむ",
     "selectAll": "すべての行を選択",
@@ -76,21 +76,21 @@
       "placeholder": "サイドバーとダッシュボードの言語を選ぶ",
       "auto": "自動（VS Code の表示言語に従う）"
     },
-    "reloadPrompt": "言語は「0」に設定されています。ウィンドウを再ロードして、サイドバーとコマンドのラベルを更新します。 {locale}",
+    "reloadPrompt": "言語は {locale} に設定されています。ウィンドウを再ロードして、サイドバーとコマンドのラベルを更新します。",
     "reloadNow": "今すぐリロード",
     "reloadLater": "後で"
   },
   "brand": {
-    "prefix": "サロパ"
+    "prefix": "Saropa "
   },
   "findingsDash": {
-    "pageTitle": "サロパの調査結果ダッシュボード",
-    "documentTitle": "サロパの調査結果ダッシュボード",
+    "pageTitle": "Saropa 調査結果ダッシュボード",
+    "documentTitle": "Saropa 調査結果ダッシュボード",
     "skipToFindings": "調査結果にスキップ",
     "secondaryAsideLabel": "二次診断",
     "hero": {
       "productTitle": "調査結果ダッシュボード",
-      "gaugeTitle": "健康スコア 0/100 (グレード 1)。エラーが最も重くなります。 {grade} {score}"
+      "gaugeTitle": "健康スコア {score}/100 (グレード {grade})。エラーが最も重くなります。"
     },
     "time": {
       "justNow": "ちょうど今",
@@ -106,8 +106,8 @@
       "findingOne": "{count} 件の検出",
       "findingOther": "{count} 件の検出",
       "todoHackTitle": "ワークスペースで見つかった TODO および HACK マーカー",
-      "driftOnTitle": "ドリフトアドバイザー接続中: 0 {label}",
-      "driftOnPill": "ドリフトオン · 0 {count}",
+      "driftOnTitle": "ドリフトアドバイザーが接続されました: {label}",
+      "driftOnPill": "ドリフトオン · {count}",
       "driftOfflineTitle": "Drift Advisor は有効になっていますが、サーバーが見つかりません",
       "driftOfflinePill": "オフラインでドリフトする",
       "enabledRulesTitle": "現在の層で有効なルール",
@@ -123,13 +123,13 @@
       "ruleStatus": "ルールのステータス"
     },
     "seg": {
-      "toggleSeverityTitle": "0の重大度を切り替えます {v}",
-      "toggleImpactTitle": "0の影響を切り替えます {v}"
+      "toggleSeverityTitle": "{v} 重大度の切り替え",
+      "toggleImpactTitle": "{v}の影響を切り替えます"
     },
     "kpi": {
       "visibleLabel": "目に見える所見",
       "allMatched": "すべて一致しました",
-      "ofTotal": "合計0中 {total}",
+      "ofTotal": "合計 {total} のうち",
       "clearFiltersTitle": "クリックしてすべてのフィルターをクリアします",
       "errorsLabel": "エラー",
       "errorsSubFix": "直さなければならない",
@@ -148,7 +148,7 @@
       "filesSubNone": "影響を受けるファイルはありません",
       "filesTitle": "少なくとも 1 つの結果に寄与する個別のファイル",
       "topRuleLabel": "トップルール",
-      "topRuleTitle": "検出結果をルール「0」にフィルターします {name}"
+      "topRuleTitle": "結果をルール {name} にフィルタリングします"
     },
     "toolbar": {
       "ariaFiltersActions": "フィルターとアクション",
@@ -163,7 +163,7 @@
       "clearRecentTitle": "最近のフィルターをすべてクリアします",
       "clearRecentButton": "クリア",
       "recentFiltersListAria": "最近のフィルター",
-      "runAnalysisTitle": "サロパリント分析を実行する",
+      "runAnalysisTitle": "Saropa リント分析を実行する",
       "refreshViolationsTitle": "ディスクから Violations.json をリロードします",
       "severityGroupAria": "重大度フィルター",
       "severityLabel": "重大度",
@@ -171,13 +171,13 @@
       "impactLabel": "インパクト",
       "moreSummary": "もっと",
       "moreChevron": "▾",
-      "copyJsonTitle": "フィルタリングされた違反を JSON としてコピー (0) {count}",
+      "copyJsonTitle": "フィルタリングされた違反を JSON としてコピー ({count})",
       "saveReportTitle": "フィルターされた違反を JSON として reports/YYYYMMDD/ に保存します"
     },
     "chip": {
-      "contains": "「0」が含まれています {q}",
-      "severityOff": "重大度 ≠ 0 {v}",
-      "impactOff": "影響 ≠ 0 {v}",
+      "contains": "「{q}」が含まれています",
+      "severityOff": "重大度≠ {v}",
+      "impactOff": "影響≠ {v}",
       "resetAllTitle": "すべてのフィルターをリセット",
       "removeFilterAria": "フィルターを削除する"
     },
@@ -185,7 +185,7 @@
       "help": "ヘルプ",
       "groupBy": "グループ化…",
       "textFilter": "テキストフィルター…",
-      "severityImpact": "Severity filter…",
+      "severityImpact": "重大度フィルター…",
       "hideRules": "ルールを非表示にします…",
       "ruleMetadata": "ルールのメタデータ",
       "clearFilters": "フィルターをクリアする",
@@ -197,18 +197,18 @@
       "openPackageDashboard": "パッケージダッシュボードを開く",
       "openCodeHealth": "オープンコードの健全性",
       "openLintsConfig": "Lint 構成を開く",
-      "reloadFromDisk": "Reload from disk",
-      "reloadFromDiskTitle": "Re-render the dashboard from the last violations.json without re-running the analyzer.",
-      "reEnableDisabledRules": "Re-enable disabled rules…",
-      "reEnableDisabledRulesTitle": "Open a quick-pick of rules currently disabled in analysis_options_custom.yaml and re-enable the chosen ones.",
-      "reEnableNoneTitle": "No rules currently disabled",
-      "reEnableNoneMessage": "No rules are currently disabled via analysis_options_custom.yaml.",
-      "reEnableQuickPickTitle": "Re-enable disabled rules",
-      "reEnableQuickPickPlaceholder": "Select one or more rules to re-enable",
-      "menuGroupExport": "Export",
-      "menuGroupFilter": "Filter & focus",
-      "menuGroupOpen": "Open dashboard",
-      "menuGroupSystem": "System"
+      "reloadFromDisk": "ディスクからリロードする",
+      "reloadFromDiskTitle": "アナライザーを再実行せずに、最後の Violes.json からダッシュボードを再レンダリングします。",
+      "reEnableDisabledRules": "無効化されたルールを再度有効にします…",
+      "reEnableDisabledRulesTitle": "Analysis_options_custom.yaml で現在無効になっているルールのクイックピックを開き、選択したルールを再度有効にします。",
+      "reEnableNoneTitle": "現在無効になっているルールはありません",
+      "reEnableNoneMessage": "現在、analyze_options_custom.yaml によって無効になっているルールはありません。",
+      "reEnableQuickPickTitle": "無効化されたルールを再度有効にする",
+      "reEnableQuickPickPlaceholder": "再度有効にするルールを 1 つ以上選択してください",
+      "menuGroupExport": "輸出",
+      "menuGroupFilter": "フィルターとフォーカス",
+      "menuGroupOpen": "ダッシュボードを開く",
+      "menuGroupSystem": "システム"
     },
     "progress": {
       "runningLabel": "分析を実行中…",
@@ -222,8 +222,8 @@
       "disableButton": "無効にする",
       "workspaceOnlyShort": "ワークスペースのみ",
       "projectConfigShort": "プロジェクト構成 (analyze_options_custom.yaml を書き込みます)",
-      "topRulesOne": "上位の0ルール {count}",
-      "topRulesOther": "上位の0ルール {count}",
+      "topRulesOne": "上位の {count} ルール",
+      "topRulesOther": "上位の {count} ルール",
       "colRank": "#",
       "colRule": "ルール",
       "colCount": "カウント",
@@ -247,9 +247,9 @@
       "copyRowTitle": "この結果を JSON としてコピーします",
       "metaShown": "{filtered} 件表示",
       "metaAfterDisable": "無効化ルールフィルター適用後 {total} 件",
-      "metaSourceCap": "パフォーマンスのためにソースの上限は「0」に制限されています {max}",
-      "metaGroupedBy": "0でグループ化 {mode}",
-      "overflowNote": "レンダリング パフォーマンスのため、ソース リストは「0」で切り詰められています。 {max}",
+      "metaSourceCap": "パフォーマンスのためにソースは {max} に制限されています",
+      "metaGroupedBy": "{mode}でグループ化",
+      "overflowNote": "レンダリング パフォーマンスのため、ソース リストは {max} で切り捨てられました。",
       "runAgain": "分析を再度実行する",
       "emptyNoViolations": "前回の分析実行では違反はありませんでした。",
       "emptyNoMatch": "現在のフィルターに一致する違反はありません。",
@@ -257,7 +257,7 @@
       "emptyHintFilters": "フィルターを調整するか、分析を再度実行して結果を確認します。",
       "reRunAnalysis": "分析を再実行する",
       "resetFilters": "フィルターをリセットする",
-      "linePrefix": "L0 {line}"
+      "linePrefix": "L{line}"
     },
     "charts": {
       "sectionAria": "ミックスチャート",
@@ -265,7 +265,7 @@
       "metaClickSlice": "スライスをクリックしてフィルタリングします",
       "severityMix": "重大度の組み合わせ",
       "impactMix": "インパクトミックス",
-      "filterBarTitle": "「0」のみにフィルタをかける {key}",
+      "filterBarTitle": "{key}のみにフィルタをかける",
       "donutTotal": "合計"
     },
     "todoHack": {
@@ -293,7 +293,7 @@
       "retry": "リトライ",
       "headingConnected": "ドリフトアドバイザー",
       "metaConnected": "接続されています",
-      "noIssues": "0 に接続 - 現在問題はありません。 {label}",
+      "noIssues": "{label} に接続されています — 現在問題はありません。",
       "refresh": "リフレッシュ",
       "openBrowser": "ブラウザで開く",
       "headingIssues": "ドリフトアドバイザー",
@@ -307,8 +307,8 @@
       "viewHidesMetaNone": "なし",
       "noneInExport": "現在の「violations.json」エクスポートにはアナライザーの抑制はありません。無視または入力するベースラインを編集した後に分析を実行します。",
       "totalRow": "合計 — フィルターをクリアし、結果を開きます",
-      "byRule": "ルールにより(0) {count}",
-      "byFile": "ファイル別 (0) {count}",
+      "byRule": "ルールにより ({count})",
+      "byFile": "ファイル別 ({count})",
       "noEntries": "エントリーはありません。",
       "nothingHidden": "このワークスペースの問題リストには何も隠されていません。ツリー コンテキスト アクションを使用して、フォルダー、ファイル、またはルールを非表示にします。これらはワークスペース状態を保持します。",
       "folderPattern": "{count} フォルダー",
@@ -317,7 +317,7 @@
       "perFileRules": "{count} 個のファイル(ファイルごとの非表示ルールあり)",
       "severityHides": "{count} つの重大度を非表示",
       "impactHides": "{count} つの影響を非表示",
-      "activeHides": "アクティブな非表示: 0。 {counts}",
+      "activeHides": "アクティブな非表示: {counts}。",
       "viewHidesFooter": "これらの非表示では、問題/ダッシュボードのリストのみが縮小されます。これらは「violations.json」には書き込まれません。",
       "clearViewHides": "ビューの非表示をすべてクリアする",
       "foldersSample": "フォルダー（サンプル）",
@@ -331,7 +331,7 @@
       "analysisComplete": "分析完了",
       "metaRunning": "大規模なプロジェクトではこれに少し時間がかかる場合があります。",
       "metaDone": "最新の調査結果を反映したダッシュボードの更新。",
-      "announceSearch": "検索0 {q}",
+      "announceSearch": "{q}を検索",
       "announceSeverities": "{n} 個の重大度",
       "announceImpacts": "{n} 個の影響",
       "announceCleared": "すべてのフィルターがクリアされました",
@@ -359,9 +359,9 @@
     },
     "unknownAnalyzerKind": "未知",
     "supplementary": {
-      "otherAnalyzerOn": "+0 その他のアナライザーの結果 {count}",
+      "otherAnalyzerOn": "+{count} その他のアナライザーの結果",
       "otherAnalyzerPromo": "+?その他のアナライザーの結果 — 表示",
-      "analyzerTodosOn": "+0 アナライザー TODO {count}",
+      "analyzerTodosOn": "+{count} アナライザー TODO",
       "analyzerTodosPromo": "+?アナライザー TODO — 表示",
       "scannerPromo": "TODO/HACK スキャナーを有効にする",
       "tooltipLive": "VS Code 問題パネルからのライブ。分析が完了すると更新されます。クリックして非表示にします。",
@@ -382,8 +382,8 @@
     "disabledOverrides": "`analysis_options_custom.yaml` のオーバーライドにより {count} つのルールが無効化されました。",
     "summaryRuleTriage": "ルールのトリアージ",
     "hintNoViolations": "「reports/.saropa_lints/violations.json」はまだありません。分析を実行してから、このタブを更新します。",
-    "hintUnreadable": "読み取り可能な違反はエクスポートされません。最初にサロパリント分析を実行します。",
-    "hintStale": "トリアージ データが古い可能性があります (エクスポートは「0」古い)。現在のグループの分析を再実行します。 {age}",
+    "hintUnreadable": "読み取り可能な違反はエクスポートされません。最初に Saropa Lint 分析を実行します。",
+    "hintStale": "トリアージ データが古い可能性があります (エクスポートは {age} 古い)。現在のグループの分析を再実行します。",
     "hintNoPerRule": "このエクスポートには、ルールごとの問題数はありません。現在の Saropa Lints プラグインを使用して再分析します。",
     "hintBuildFailed": "このエクスポートからトリアージを構築できませんでした。新しい分析を実行します。",
     "summaryVolume": "ルールのトリアージ (量 / 修正が必要 / スタイル)",
@@ -398,25 +398,25 @@
   },
   "wideReport": {
     "openWorkspaceFirst": "まずワークスペースフォルダーを開きます。",
-    "noReportYet": "まだ違反報告はありません。最初にサロパリント分析を実行します。",
+    "noReportYet": "まだ違反報告はありません。最初に Saropa Lint 分析を実行します。",
     "clipboardCopyFailed": "クリップボードにコピーできませんでした。",
-    "copiedViolationsJson": "0 違反を JSON としてコピーしました。 {count}",
+    "copiedViolationsJson": "{count} 違反を JSON としてコピーしました。",
     "copiedOneViolationJson": "1 件の違反を JSON としてコピーしました。",
     "driftNotConnected": "Drift Advisor サーバーが接続されていません。",
-    "copiedBulkFindings": "選択した 0 の結果を JSON としてコピーしました。 {count}",
+    "copiedBulkFindings": "選択した結果 {count} を JSON としてコピーしました。",
     "noMatchingFindingsCopy": "コピーできる一致する結果はありません。",
-    "couldNotOpenFile": "ファイルを開けませんでした: 0 {path}",
+    "couldNotOpenFile": "ファイルを開けませんでした: {path}",
     "saveReportNoWorkspace": "レポートを保存する前に、ワークスペース フォルダーを開いてください。",
-    "savedFindings": "保存された 0 の結果: 1 {path} {count}",
+    "savedFindings": "保存された {count} 結果: {path}",
     "couldNotSaveReportJson": "レポート JSON を保存できませんでした。"
   },
   "packageDashboard": {
-    "documentTitle": "サロパパッケージダッシュボード",
-    "heroTitle": "サロパパッケージダッシュボード",
+    "documentTitle": "Saropa パッケージ ダッシュボード",
+    "heroTitle": "Saropa パッケージ ダッシュボード",
     "status": {
       "packagesCount": "{count} 個のパッケージ",
       "packagesBreakdown": "直接 {direct}、推移的 {transitive}",
-      "gradeLine": "等級0・1/100 {avg} {grade}",
+      "gradeLine": "等級 {grade} · {avg}/100",
       "flaggedCount": "{count} 件フラグ付き",
       "flaggedTitle": "放棄または寿命終了"
     },
@@ -424,14 +424,14 @@
       "heading": "パッケージのスキャン",
       "body1": "Saropa は、このプロジェクト内のすべての直接依存関係について、pub.dev メタデータ、GitHub アクティビティ、依存関係グラフを取得しています。",
       "body2": "スキャンが完了すると、このページは自動的に更新されます。右下の進捗通知からキャンセルできます。",
-      "versionStamp": "サロパ パッケージ ダッシュボード v0 {version}"
+      "versionStamp": "Saropa パッケージ ダッシュボード v{version}"
     },
-    "gaugeTitle": "プロジェクトパッケージグレード: 0 {grade}",
+    "gaugeTitle": "プロジェクトパッケージグレード: {grade}",
     "summary": {
       "packages": "パッケージ",
       "projectGrade": "プロジェクトパッケージグレード",
       "totalSize": "合計サイズ*",
-      "gradeTooltip": "プロジェクトグレード 0\n平均スコア: 1/100\nパッケージ: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {e} {f} {c} {a} {b} {avgScore} {pkgCount}",
+      "gradeTooltip": "プロジェクトグレード {avgGrade}\n平均スコア: {avgScore}/100\nパッケージ: {pkgCount}\nA:{a} B:{b} C:{c} E:{e} F:{f}",
       "vibrantTitle": "活気に満ちた",
       "stableTitle": "安定した",
       "outdatedTitle": "時代遅れ",
@@ -446,13 +446,13 @@
       "caveatLine2": "アクティビティのしきい値: 90 日 = 古い、180 日 = 休止中 (コミット + リリースのタイムライン)。"
     },
     "breakdown": {
-      "title": "なぜ 0 と評価するのでしょうか? — 2 パッケージ全体で 1/100 の平均 {pkgCount} {avgScore} {grade}",
+      "title": "{grade} を採点する理由は何ですか? — {avgScore}/100 {pkgCount} パッケージ全体の平均",
       "hint": "クリックして展開します",
       "distributionHeading": "分布",
       "signalsHeading": "スコアを引き下げるリスクシグナル",
-      "signalFlagged": "{count} flagged (abandoned / end-of-life)",
-      "signalVulnerable": "{count} with known vulnerabilities",
-      "signalUpdates": "{count} have updates available",
+      "signalFlagged": "{count} フラグ付き (放棄/サポート終了)",
+      "signalVulnerable": "既知の脆弱性がある {count}",
+      "signalUpdates": "{count} 利用可能なアップデートがあります",
       "bottomHeading": "最もスコアの低いパッケージ",
       "thresholdsHeading": "スコアが成績にどのように対応するか",
       "thresholdA": "70+ — 活気に満ちたもの: 積極的に維持され、最近公開されました",
@@ -461,7 +461,7 @@
       "thresholdE": "20 未満 — 放棄: 活動停止の兆候",
       "thresholdF": "中止または pub.dev にアーカイブ (スコアは使用されません)",
       "filterTooltip": "パッケージテーブルをこのカテゴリのみにフィルタリングします",
-      "jumpTooltip": "パッケージ表の0にジャンプします {name}"
+      "jumpTooltip": "パッケージ表の {name} にジャンプします"
     },
     "network": {
       "summary": "依存関係ネットワーク"
@@ -604,9 +604,9 @@
     }
   },
   "commandCatalog": {
-    "documentTitle": "サロパコマンドカタログ",
+    "documentTitle": "Saropa コマンドカタログ",
     "skipLink": "コマンドカタログにスキップ",
-    "heroTitle": "サロパコマンドカタログ",
+    "heroTitle": "Saropa コマンドカタログ",
     "status": {
       "commands": "{count} コマンド",
       "categories": "{count} カテゴリ",
@@ -657,10 +657,10 @@
     "entry": {
       "internalBadgeTitle": "コンテキスト メニューからのみトリガーされます",
       "internalBadge": "メニュー",
-      "copyTitle": "コマンド ID をコピー (0) {id}",
+      "copyTitle": "コマンドID ({id}) をコピーします",
       "copyAria": "コマンドIDをコピー"
     },
-    "categoryJumpTitle": "0へジャンプ {category}",
+    "categoryJumpTitle": "{category}にジャンプ",
     "shortcuts": {
       "focusSearch": "検索フィールドに焦点を当てる",
       "navRows": "表示されているコマンド行を移動する",
@@ -670,14 +670,14 @@
       "showOverlay": "このショートカット オーバーレイを表示する"
     },
     "script": {
-      "moreSuffix": "+0以上 {count}",
+      "moreSuffix": "+{count} 詳細",
       "showLess": "表示を少なくする",
       "runSingular": "走る",
       "runPlural": "走る",
       "recentWord": "最近の",
       "expandAll": "すべて展開",
       "collapseAll": "すべて折りたたむ",
-      "searchChip": "検索:「0」 {query}",
+      "searchChip": "検索:「{query}」",
       "internalChip": "コンテキストメニューコマンドの表示",
       "removeFilterPrefix": "フィルターを削除する",
       "matchOne": "{count} 件の一致",
@@ -685,26 +685,26 @@
     }
   },
   "codeHealth": {
-    "documentTitle": "サロパコードヘルスダッシュボード",
+    "documentTitle": "Saropa コードヘルスダッシュボード",
     "skipToTable": "関数テーブルにスキップ",
     "openWorkspaceFirst": "まず、Dart/Flutter ワークスペースを開きます。",
     "scanningTitle": "コードの健全性: スキャン機能…",
     "runReportFirst": "レポートを再度実行し、JSON をコピーします。",
     "copiedJson": "コードヘルス JSON がクリップボードにコピーされました。",
-    "couldNotOpenFile": "ファイルを開けませんでした: 0 {path}",
-    "panelTitle": "サロパコードヘルスダッシュボード",
+    "couldNotOpenFile": "ファイルを開けませんでした: {path}",
+    "panelTitle": "Saropa コードヘルスダッシュボード",
     "hero": {
-      "title": "サロパコードヘルスダッシュボード",
+      "title": "Saropa コードヘルスダッシュボード",
       "generated": "生成された",
       "functionOne": "{count} 関数",
       "functionOther": "{count} 関数",
-      "avgFormat": "平均0 (1) {grade} {score}",
+      "avgFormat": "平均 {score} ({grade})",
       "gatesFailing": "ゲートが失敗する",
       "gatesPassing": "ゲート通過"
     },
     "gauge": {
-      "tooltip": "平均スコア 0/100 (グレード 1)。 {rounded} {grade}",
-      "ariaLabel": "平均スコア 0/100 {rounded}"
+      "tooltip": "平均スコア {rounded}/100 (グレード {grade})。",
+      "ariaLabel": "平均スコア {rounded}/100"
     },
     "gate": {
       "fallback": "品質ゲートが失敗しました — コードの健全性設定でしきい値を確認してください。",
@@ -716,8 +716,8 @@
     "kpi": {
       "ariaLabel": "コードの健全性の概要",
       "allClear": "どのカテゴリにもフラグが立てられた関数はなく、すべてクリアされています。",
-      "clickToFilter": "クリックすると、「0」フラグが付けられた関数にテーブルがフィルターされます。 {flag}",
-      "noFlagged": "「0」フラグが立てられた関数はありません。 {flag}",
+      "clickToFilter": "クリックすると、{flag} フラグの付いた関数にテーブルがフィルターされます。",
+      "noFlagged": "{flag} フラグが立てられた関数はありません。",
       "unused": "未使用",
       "unusedSub": "関数がどこにも参照されていない",
       "uncovered": "発見された",
@@ -744,7 +744,7 @@
     "table": {
       "ariaLabel": "スコア別の最悪の関数",
       "heading": "最悪の機能",
-      "topCount": "1の先頭0 {shown} {total}",
+      "topCount": "{total} の先頭 {shown}",
       "colGrade": "学年",
       "colScore": "スコア",
       "colFunction": "関数",
@@ -768,9 +768,9 @@
     },
     "script": {
       "activeFiltersLabel": "アクティブフィルター:",
-      "searchChip": "検索:「0」 {q}",
-      "flagChip": "フラグ: 0 {flag}",
-      "removeAria": "0を削除 {key}",
+      "searchChip": "検索:「{q}」",
+      "flagChip": "フラグ: {flag}",
+      "removeAria": "{key}を削除",
       "clearAll": "すべてクリア",
       "rowsVisible": "{total} 行中 {visible} 行を表示",
       "neverRun": "決して走らないでください"
@@ -803,7 +803,7 @@
   "telemetry": {
     "heroTitle": "関連ルールテレメトリー",
     "skipToCounters": "テレメトリーカウンターにスキップ",
-    "lastEvent": "最後のイベント 0 {relative}",
+    "lastEvent": "最後のイベント {relative}",
     "noEvents": "イベントは記録されていません",
     "totalEventOne": "合計 {count} イベント",
     "totalEventOther": "合計 {count} イベント",
@@ -819,7 +819,7 @@
     "thEvent": "イベント",
     "thCount": "カウント",
     "emptyMessage": "テレメトリ イベントはまだ記録されていません。検出結果ダッシュボードからルールを開いて、カウンターのキャプチャを開始します。",
-    "openFindingsTitle": "サロパの調査結果ダッシュボードを開きます。",
+    "openFindingsTitle": "Saropa の調査結果ダッシュボードを開きます。",
     "openFindings": "調査結果ダッシュボードを開く",
     "lastPropsHeading": "最後のイベントのプロパティ",
     "copiedJson": "Saropa Lints: 関連ルール テレメトリ JSON をコピーしました。",

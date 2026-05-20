@@ -42,17 +42,17 @@
     "retry": "נסה שוב",
     "reload": "לִטעוֹן מִחָדָשׁ",
     "copyDetails": "העתק פרטים",
-    "unreachable": "לא ניתן היה להגיע ל-0 {target}",
+    "unreachable": "לא ניתן היה להגיע ל{target}",
     "partialSummary": "{loaded} מתוך {total} {item} נטענו. {failed} נכשלו.",
     "partialRetry": "ניסיון חוזר נכשל"
   },
   "offline": {
     "banner": "לא מקוון - התחבר מחדש כדי לרענן.",
-    "cachedFooter": "מציג נתונים במטמון מ-0. {when}",
+    "cachedFooter": "מציג נתונים במטמון מ-{when}.",
     "reconnecting": "מתחבר מחדש..."
   },
   "stale": {
-    "statusPill": "ריצה אחרונה מוצלחת 0 - הרענון נכשל {when}"
+    "statusPill": "ריצה מוצלחת אחרונה {when} - הרענון נכשל"
   },
   "filter": {
     "searchPlaceholder": "לְחַפֵּשׂ…",
@@ -63,7 +63,7 @@
   },
   "a11y": {
     "toggleFullWidth": "החלף את הפריסה ברוחב מלא",
-    "sortBy": "מיין לפי 0 {column}",
+    "sortBy": "מיין לפי {column}",
     "expandRow": "הרחב שורה",
     "collapseRow": "כווץ שורה",
     "selectAll": "בחר את כל השורות",
@@ -76,12 +76,12 @@
       "placeholder": "בחר שפה עבור סרגל הצד ולוחות המחוונים",
       "auto": "אוטומטי (עקוב אחר שפת התצוגה של קוד VS)"
     },
-    "reloadPrompt": "השפה מוגדרת ל-0. טען מחדש את החלון כדי לעדכן תוויות סרגל צד ותוויות פקודות. {locale}",
+    "reloadPrompt": "השפה מוגדרת ל-{locale}. טען מחדש את החלון כדי לעדכן תוויות סרגל צד ותוויות פקודות.",
     "reloadNow": "טען מחדש עכשיו",
     "reloadLater": "מְאוּחָר יוֹתֵר"
   },
   "brand": {
-    "prefix": "סרופה"
+    "prefix": "Saropa "
   },
   "findingsDash": {
     "pageTitle": "לוח המחוונים של Saropa Findings",
@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "אבחון משני",
     "hero": {
       "productTitle": "לוח המחוונים של ממצאים",
-      "gaugeTitle": "ציון בריאות 0/100 (ציון 1). שגיאות שוקלות את הכבד ביותר. {grade} {score}"
+      "gaugeTitle": "ציון בריאות {score}/100 (ציון {grade}). שגיאות שוקלות את הכבד ביותר."
     },
     "time": {
       "justNow": "זֶה עַתָה",
@@ -106,8 +106,8 @@
       "findingOne": "{count} ממצא",
       "findingOther": "{count} ממצאים",
       "todoHackTitle": "סמני TODO ו-HACK נמצאים בסביבת העבודה",
-      "driftOnTitle": "דריפט יועץ מחובר: 0 {label}",
-      "driftOnPill": "להיסחף על · 0 {count}",
+      "driftOnTitle": "דריפט Advisor מחובר: {label}",
+      "driftOnPill": "להיסחף על · {count}",
       "driftOfflineTitle": "Drift Advisor מופעל אך לא נמצא שרת",
       "driftOfflinePill": "נסחף במצב לא מקוון",
       "enabledRulesTitle": "כללים מופעלים בשכבה הנוכחית",
@@ -123,13 +123,13 @@
       "ruleStatus": "מצב כלל"
     },
     "seg": {
-      "toggleSeverityTitle": "החלף 0 חומרה {v}",
-      "toggleImpactTitle": "החלף 0 השפעה {v}"
+      "toggleSeverityTitle": "החלף את חומרת {v}",
+      "toggleImpactTitle": "החלף את ההשפעה {v}"
     },
     "kpi": {
       "visibleLabel": "ממצאים גלויים",
       "allMatched": "כולם תואמים",
-      "ofTotal": "של 0 סך הכל {total}",
+      "ofTotal": "מסך {total}",
       "clearFiltersTitle": "לחץ כדי לנקות את כל המסננים",
       "errorsLabel": "שגיאות",
       "errorsSubFix": "חייב לתקן",
@@ -148,7 +148,7 @@
       "filesSubNone": "לא הושפעו קבצים",
       "filesTitle": "קבצים נפרדים התורמים לפחות ממצא אחד",
       "topRuleLabel": "כלל עליון",
-      "topRuleTitle": "סנן ממצאים לכלל 0 {name}"
+      "topRuleTitle": "סנן ממצאים כדי כלל {name}"
     },
     "toolbar": {
       "ariaFiltersActions": "מסננים ופעולות",
@@ -171,13 +171,13 @@
       "impactLabel": "פְּגִיעָה",
       "moreSummary": "יוֹתֵר",
       "moreChevron": "▾",
-      "copyJsonTitle": "העתק הפרות מסוננות כ-JSON (0) {count}",
+      "copyJsonTitle": "העתק הפרות מסוננות כ-JSON ({count})",
       "saveReportTitle": "שמור הפרות מסוננות כ-JSON בדוחות/YYYYMMDD/"
     },
     "chip": {
-      "contains": "מכיל \"0\" {q}",
-      "severityOff": "חומרה ≠ 0 {v}",
-      "impactOff": "השפעה ≠ 0 {v}",
+      "contains": "מכיל \"{q}\"",
+      "severityOff": "חומרה ≠ {v}",
+      "impactOff": "השפעה ≠ {v}",
       "resetAllTitle": "אפס את כל המסננים",
       "removeFilterAria": "הסר מסנן"
     },
@@ -185,7 +185,7 @@
       "help": "עֶזרָה",
       "groupBy": "קבץ לפי…",
       "textFilter": "מסנן טקסט...",
-      "severityImpact": "Severity filter…",
+      "severityImpact": "מסנן חומרה...",
       "hideRules": "הסתר כללים...",
       "ruleMetadata": "מטא נתונים של כללים",
       "clearFilters": "נקה מסננים",
@@ -197,18 +197,18 @@
       "openPackageDashboard": "פתח את לוח המחוונים של החבילה",
       "openCodeHealth": "פתיחת תקינות קוד",
       "openLintsConfig": "פתח את תצורת Lints",
-      "reloadFromDisk": "Reload from disk",
-      "reloadFromDiskTitle": "Re-render the dashboard from the last violations.json without re-running the analyzer.",
-      "reEnableDisabledRules": "Re-enable disabled rules…",
-      "reEnableDisabledRulesTitle": "Open a quick-pick of rules currently disabled in analysis_options_custom.yaml and re-enable the chosen ones.",
-      "reEnableNoneTitle": "No rules currently disabled",
-      "reEnableNoneMessage": "No rules are currently disabled via analysis_options_custom.yaml.",
-      "reEnableQuickPickTitle": "Re-enable disabled rules",
-      "reEnableQuickPickPlaceholder": "Select one or more rules to re-enable",
-      "menuGroupExport": "Export",
-      "menuGroupFilter": "Filter & focus",
-      "menuGroupOpen": "Open dashboard",
-      "menuGroupSystem": "System"
+      "reloadFromDisk": "טען מחדש מהדיסק",
+      "reloadFromDiskTitle": "עבד מחדש את לוח המחוונים מה-violations.json האחרון מבלי להפעיל מחדש את הנתח.",
+      "reEnableDisabledRules": "הפעל מחדש כללים מושבתים...",
+      "reEnableDisabledRulesTitle": "פתח בחירה מהירה של כללים המושבתים כעת ב-analys_options_custom.yaml והפעל מחדש את אלה שנבחרו.",
+      "reEnableNoneTitle": "אין כללים מושבתים כרגע",
+      "reEnableNoneMessage": "אין כללים מושבתים כעת באמצעות analysis_options_custom.yaml.",
+      "reEnableQuickPickTitle": "הפעל מחדש כללים מושבתים",
+      "reEnableQuickPickPlaceholder": "בחר כלל אחד או יותר להפעלה מחדש",
+      "menuGroupExport": "יְצוּא",
+      "menuGroupFilter": "סינון ומיקוד",
+      "menuGroupOpen": "פתח את לוח המחוונים",
+      "menuGroupSystem": "מַעֲרֶכֶת"
     },
     "progress": {
       "runningLabel": "מפעיל ניתוח...",
@@ -222,8 +222,8 @@
       "disableButton": "השבת",
       "workspaceOnlyShort": "סביבת עבודה בלבד",
       "projectConfigShort": "תצורת הפרויקט (כותב analyze_options_custom.yaml)",
-      "topRulesOne": "כלל 0 העליון {count}",
-      "topRulesOther": "כללי 0 מובילים {count}",
+      "topRulesOne": "כלל {count} העליון",
+      "topRulesOther": "כללי {count} המובילים",
       "colRank": "#",
       "colRule": "כְּלָל",
       "colCount": "לִסְפּוֹר",
@@ -247,9 +247,9 @@
       "copyRowTitle": "העתק את הממצא הזה בתור JSON",
       "metaShown": "{filtered} מוצגים",
       "metaAfterDisable": "{total} לאחר מסנן כללים מושבתים",
-      "metaSourceCap": "מקור מוגבל ל-0 לביצועים {max}",
-      "metaGroupedBy": "מקובצים לפי 0 {mode}",
-      "overflowNote": "רשימת המקורות קטועה ב-0 לביצועי רינדור. {max}",
+      "metaSourceCap": "מקור מוגבל ל-{max} לביצועים",
+      "metaGroupedBy": "מקובצים לפי {mode}",
+      "overflowNote": "רשימת המקורות קטועה ב-{max} לביצועי רינדור.",
       "runAgain": "הפעל שוב ניתוח",
       "emptyNoViolations": "אין הפרות בריצת הניתוח האחרונה.",
       "emptyNoMatch": "אין הפרות תואמות למסננים הנוכחיים.",
@@ -257,7 +257,7 @@
       "emptyHintFilters": "התאם מסננים או הפעל שוב ניתוח כדי לראות ממצאים.",
       "reRunAnalysis": "הפעל מחדש את הניתוח",
       "resetFilters": "אפס מסננים",
-      "linePrefix": "L0 {line}"
+      "linePrefix": "L{line}"
     },
     "charts": {
       "sectionAria": "מערבבים תרשימים",
@@ -265,7 +265,7 @@
       "metaClickSlice": "לחץ על פרוסה כדי לסנן",
       "severityMix": "תמהיל חומרה",
       "impactMix": "תמהיל השפעה",
-      "filterBarTitle": "סינון ל-0 בלבד {key}",
+      "filterBarTitle": "מסנן ל-{key} בלבד",
       "donutTotal": "סַך הַכֹּל"
     },
     "todoHack": {
@@ -293,7 +293,7 @@
       "retry": "נסה שוב",
       "headingConnected": "יועץ דריפט",
       "metaConnected": "מְחוּבָּר",
-      "noIssues": "מחובר ל-0 - אין בעיות עדכניות. {label}",
+      "noIssues": "מחובר ל-{label} - אין בעיות עדכניות.",
       "refresh": "לְרַעֲנֵן",
       "openBrowser": "פתח בדפדפן",
       "headingIssues": "יועץ דריפט",
@@ -307,8 +307,8 @@
       "viewHidesMetaNone": "אַף לֹא אֶחָד",
       "noneInExport": "אין דיכוי מנתח בייצוא 'violations.json' הנוכחי. הפעל ניתוח לאחר עריכת התעלמות או קווי בסיס לאכלוס.",
       "totalRow": "סך הכל - נקה מסננים ופתח את ממצאים",
-      "byRule": "לפי כלל (0) {count}",
-      "byFile": "לפי קובץ (0) {count}",
+      "byRule": "לפי כלל ({count})",
+      "byFile": "לפי קובץ ({count})",
       "noEntries": "אין ערכים.",
       "nothingHidden": "שום דבר לא מוסתר מרשימת הבעיות בסביבת העבודה הזו. השתמש בפעולות ההקשר של עץ כדי להסתיר תיקיות, קבצים או כללים; הם נמשכים במצב סביבת עבודה.",
       "folderPattern": "{count} תיקיות",
@@ -317,7 +317,7 @@
       "perFileRules": "{count} קבצים עם כללי הסתרה לכל קובץ",
       "severityHides": "{count} הסתרות חומרה",
       "impactHides": "{count} הסתרות השפעה",
-      "activeHides": "הסתרות פעילות: 0. {counts}",
+      "activeHides": "הסתרות פעילות: {counts}.",
       "viewHidesFooter": "הסתרות אלה מכווצות את רשימת הבעיות / לוח המחוונים בלבד; הם לא נכתבים אל `violations.json`.",
       "clearViewHides": "נקה את כל הסתרות התצוגה",
       "foldersSample": "תיקיות (דוגמה)",
@@ -331,7 +331,7 @@
       "analysisComplete": "הניתוח הושלם",
       "metaRunning": "זה יכול לקחת רגע בפרויקטים גדולים.",
       "metaDone": "לוח מחוונים מרענן עם הממצאים האחרונים.",
-      "announceSearch": "חפש 0 {q}",
+      "announceSearch": "חפש {q}",
       "announceSeverities": "{n} חומרות",
       "announceImpacts": "{n} השפעות",
       "announceCleared": "כל המסננים נוקו",
@@ -359,9 +359,9 @@
     },
     "unknownAnalyzerKind": "לֹא יְדוּעַ",
     "supplementary": {
-      "otherAnalyzerOn": "+0 ממצאי מנתח אחרים {count}",
+      "otherAnalyzerOn": "+{count} ממצאי מנתח אחרים",
       "otherAnalyzerPromo": "+? ממצאי מנתח אחרים - מראים",
-      "analyzerTodosOn": "+0 TODOs של מנתח {count}",
+      "analyzerTodosOn": "+{count} מטלות מנתח",
       "analyzerTodosPromo": "+? מנתח TODOs - הצג",
       "scannerPromo": "הפעל את סורק TODO/HACK",
       "tooltipLive": "חי מפאנל VS Code Problems. עדכונים עם סיום הניתוח. לחץ כדי להסתיר.",
@@ -383,7 +383,7 @@
     "summaryRuleTriage": "שילוש כללים",
     "hintNoViolations": "אין עדיין `reports/.saropa_lints/violations.json`. הפעל ניתוח ולאחר מכן רענן כרטיסייה זו.",
     "hintUnreadable": "אין ייצוא של הפרות קריאות. הפעל תחילה את ניתוח Saropa Lints.",
-    "hintStale": "נתוני טריאג' עשויים להיות מיושנים (היצוא ישן 0). הפעל מחדש ניתוח עבור קבוצות נוכחיות. {age}",
+    "hintStale": "נתוני טריאג' עשויים להיות מיושנים (היצוא ישן {age}). הפעל מחדש ניתוח עבור קבוצות נוכחיות.",
     "hintNoPerRule": "לייצוא זה אין ספירת בעיות לכל כלל. נתח מחדש עם תוסף נוכחי של Saropa Lints.",
     "hintBuildFailed": "לא ניתן היה לבנות טריאג' מהייצוא הזה. הפעל ניתוח חדש.",
     "summaryVolume": "ניסוח כללים (נפח / תיקון חובה / סגנוני)",
@@ -400,14 +400,14 @@
     "openWorkspaceFirst": "פתח תחילה תיקיית סביבת עבודה.",
     "noReportYet": "אין עדיין דיווח על הפרות. הפעל תחילה את ניתוח Saropa Lints.",
     "clipboardCopyFailed": "לא ניתן היה להעתיק ללוח.",
-    "copiedViolationsJson": "הועתקו הפרות 0 בתור JSON. {count}",
+    "copiedViolationsJson": "הועתקו הפרות {count} כ-JSON.",
     "copiedOneViolationJson": "הועתק הפרה אחת בתור JSON.",
     "driftNotConnected": "שרת Drift Advisor אינו מחובר.",
-    "copiedBulkFindings": "הועתק 0 הממצא/ים שנבחרו בתור JSON. {count}",
+    "copiedBulkFindings": "הועתק {count} הממצא/ים שנבחרו בתור JSON.",
     "noMatchingFindingsCopy": "אין ממצאים תואמים להעתקה.",
-    "couldNotOpenFile": "לא ניתן היה לפתוח את הקובץ: 0 {path}",
+    "couldNotOpenFile": "לא ניתן היה לפתוח את הקובץ: {path}",
     "saveReportNoWorkspace": "פתח תיקיית סביבת עבודה לפני שמירת הדוח.",
-    "savedFindings": "ממצא/ים שמורים 0: 1 {path} {count}",
+    "savedFindings": "ממצא/ים שמורים {count}: {path}",
     "couldNotSaveReportJson": "לא ניתן לשמור את הדוח JSON."
   },
   "packageDashboard": {
@@ -416,7 +416,7 @@
     "status": {
       "packagesCount": "{count} חבילות",
       "packagesBreakdown": "{direct} ישיר, {transitive} טרנזיטיבי",
-      "gradeLine": "ציון 0 · 1/100 {avg} {grade}",
+      "gradeLine": "כיתה {grade} · {avg}/100",
       "flaggedCount": "{count} סומנו בדגל",
       "flaggedTitle": "נטוש או סוף החיים"
     },
@@ -424,14 +424,14 @@
       "heading": "סריקת חבילות",
       "body1": "Saropa מביאה מטא נתונים של pub.dev, פעילות GitHub וגרפים תלות עבור כל תלות ישירה בפרויקט זה.",
       "body2": "דף זה יתרענן אוטומטית עם סיום הסריקה. אתה יכול לבטל מהתראה על ההתקדמות בפינה השמאלית התחתונה.",
-      "versionStamp": "לוח המחוונים של חבילת Saropa v0 {version}"
+      "versionStamp": "לוח המחוונים של חבילת Saropa v{version}"
     },
-    "gaugeTitle": "ציון חבילת פרויקט: 0 {grade}",
+    "gaugeTitle": "ציון חבילת פרויקט: {grade}",
     "summary": {
       "packages": "חבילות",
       "projectGrade": "ציון חבילת פרויקט",
       "totalSize": "גודל כולל*",
-      "gradeTooltip": "ציון הפרויקט 0\nציון ממוצע: 1/100\nחבילות: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {e} {f} {c} {a} {b} {avgScore} {pkgCount}",
+      "gradeTooltip": "דרגת פרויקט {avgGrade}\nציון ממוצע: {avgScore}/100\nחבילות: {pkgCount}\nA:{a} B:{b} C:{c} E:{e} F:{f}",
       "vibrantTitle": "תוסס",
       "stableTitle": "יַצִיב",
       "outdatedTitle": "מְיוּשָׁן",
@@ -446,13 +446,13 @@
       "caveatLine2": "ספי פעילות: 90d = מעופש, 180d = רדום (מחוייבות + לוחות זמנים לשחרור)."
     },
     "breakdown": {
-      "title": "למה ציון 0? — ממוצע של 1/100 על פני 2 חבילות {pkgCount} {avgScore} {grade}",
+      "title": "למה ציון {grade}? — ממוצע {avgScore}/100 על פני חבילות {pkgCount}",
       "hint": "לחץ כדי להרחיב",
       "distributionHeading": "הֲפָצָה",
       "signalsHeading": "אותות סיכון גוררים את הניקוד למטה",
-      "signalFlagged": "{count} flagged (abandoned / end-of-life)",
-      "signalVulnerable": "{count} with known vulnerabilities",
-      "signalUpdates": "{count} have updates available",
+      "signalFlagged": "{count} מסומן (נטוש / סוף חיים)",
+      "signalVulnerable": "{count} עם נקודות תורפה ידועות",
+      "signalUpdates": "{count} יש עדכונים זמינים",
       "bottomHeading": "חבילות עם הניקוד הנמוך ביותר",
       "thresholdsHeading": "איך הציונים ממפים לציונים",
       "thresholdA": "70+ - תוסס: מתוחזק באופן פעיל, פורסם לאחרונה",
@@ -461,7 +461,7 @@
       "thresholdE": "מתחת לגיל 20 - נטוש: סימנים של חוסר פעילות",
       "thresholdF": "הופסק או הועבר לארכיון ב-pub.dev (לא נעשה בו שימוש)",
       "filterTooltip": "סנן את טבלת החבילות רק לקטגוריה זו",
-      "jumpTooltip": "קפוץ אל 0 בטבלת החבילות {name}"
+      "jumpTooltip": "קפוץ אל {name} בטבלת החבילות"
     },
     "network": {
       "summary": "רשת תלות"
@@ -657,10 +657,10 @@
     "entry": {
       "internalBadgeTitle": "מופעל מתפריטי הקשר בלבד",
       "internalBadge": "תַפרִיט",
-      "copyTitle": "העתק את מזהה הפקודה (0) {id}",
+      "copyTitle": "העתק את מזהה הפקודה ({id})",
       "copyAria": "העתק את מזהה הפקודה"
     },
-    "categoryJumpTitle": "קפוץ אל 0 {category}",
+    "categoryJumpTitle": "קפוץ אל {category}",
     "shortcuts": {
       "focusSearch": "מקד את שדה החיפוש",
       "navRows": "נווט בשורות פקודות גלויות",
@@ -670,14 +670,14 @@
       "showOverlay": "הצג שכבת-על של קיצור דרך זו"
     },
     "script": {
-      "moreSuffix": "+0 נוספים {count}",
+      "moreSuffix": "+{count} יותר",
       "showLess": "הצג פחות",
       "runSingular": "לָרוּץ",
       "runPlural": "פועל",
       "recentWord": "לאחרונה",
       "expandAll": "הרחב הכל",
       "collapseAll": "כווץ הכל",
-      "searchChip": "חיפוש: \"0\" {query}",
+      "searchChip": "חיפוש: \"{query}\"",
       "internalChip": "מציג פקודות תפריט הקשר",
       "removeFilterPrefix": "הסר מסנן",
       "matchOne": "{count} התאמה",
@@ -691,20 +691,20 @@
     "scanningTitle": "Code Health: פונקציות סריקה...",
     "runReportFirst": "הפעל את הדוח שוב, ולאחר מכן העתק את JSON.",
     "copiedJson": "Code Health JSON הועתק ללוח.",
-    "couldNotOpenFile": "לא ניתן היה לפתוח את הקובץ: 0 {path}",
+    "couldNotOpenFile": "לא ניתן היה לפתוח את הקובץ: {path}",
     "panelTitle": "לוח המחוונים הבריאותי של Saropa Code",
     "hero": {
       "title": "לוח המחוונים הבריאותי של Saropa Code",
       "generated": "נוצר",
       "functionOne": "{count} פונקציה",
       "functionOther": "{count} פונקציות",
-      "avgFormat": "ממוצע 0 (1) {grade} {score}",
+      "avgFormat": "ממוצע {score} ({grade})",
       "gatesFailing": "שערים נכשלים",
       "gatesPassing": "שערים עוברים"
     },
     "gauge": {
-      "tooltip": "ציון ממוצע 0 מתוך 100 (ציון 1). {rounded} {grade}",
-      "ariaLabel": "ציון ממוצע 0 מתוך 100 {rounded}"
+      "tooltip": "ציון ממוצע {rounded} של 100 (ציון {grade}).",
+      "ariaLabel": "ציון ממוצע {rounded} של 100"
     },
     "gate": {
       "fallback": "שערי איכות נכשלו - סקירת ספים בהגדרות Code Health.",
@@ -716,8 +716,8 @@
     "kpi": {
       "ariaLabel": "תקציר בריאות הקוד",
       "allClear": "אין פונקציות מסומנות בכל קטגוריה - הכל ברור.",
-      "clickToFilter": "לחץ כדי לסנן את הטבלה לפונקציות שסומנו 0. {flag}",
-      "noFlagged": "אין פונקציות מסומנות 0. {flag}",
+      "clickToFilter": "לחץ כדי לסנן את הטבלה לפונקציות המסומנות {flag}.",
+      "noFlagged": "אין פונקציות מסומנות {flag}.",
       "unused": "לא בשימוש",
       "unusedSub": "פונקציות לא מוזכרות בשום מקום",
       "uncovered": "חָשׂוּף",
@@ -744,7 +744,7 @@
     "table": {
       "ariaLabel": "הפונקציות הגרוע ביותר לפי ציון",
       "heading": "פונקציות גרועות ביותר",
-      "topCount": "למעלה 0 מתוך 1 {shown} {total}",
+      "topCount": "העליון {shown} של {total}",
       "colGrade": "צִיוּן",
       "colScore": "צִיוּן",
       "colFunction": "פוּנקצִיָה",
@@ -768,9 +768,9 @@
     },
     "script": {
       "activeFiltersLabel": "מסננים פעילים:",
-      "searchChip": "חיפוש: \"0\" {q}",
-      "flagChip": "דגל: 0 {flag}",
-      "removeAria": "הסר את 0 {key}",
+      "searchChip": "חיפוש: \"{q}\"",
+      "flagChip": "דגל: {flag}",
+      "removeAria": "הסר את {key}",
       "clearAll": "נקה הכל",
       "rowsVisible": "{visible} מתוך {total} שורות גלויות",
       "neverRun": "לעולם לא לרוץ"
@@ -803,7 +803,7 @@
   "telemetry": {
     "heroTitle": "טלמטריית כללים קשורה",
     "skipToCounters": "דלג למוני טלמטריה",
-    "lastEvent": "אירוע אחרון 0 {relative}",
+    "lastEvent": "אירוע אחרון {relative}",
     "noEvents": "לא נרשמו אירועים",
     "totalEventOne": "{count} אירוע סך הכל",
     "totalEventOther": "סך הכל {count} אירועים",

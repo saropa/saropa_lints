@@ -76,12 +76,12 @@
       "placeholder": "Kies taal voor zijbalk en dashboards",
       "auto": "Automatisch (volg de weergavetaal van VS Code)"
     },
-    "reloadPrompt": "Taal ingesteld op 0. Laad het venster opnieuw om de zijbalk en opdrachtlabels bij te werken. {locale}",
+    "reloadPrompt": "Taal ingesteld op {locale}. Laad het venster opnieuw om de zijbalk en opdrachtlabels bij te werken.",
     "reloadNow": "Herlaad nu",
     "reloadLater": "Later"
   },
   "brand": {
-    "prefix": "Saropa"
+    "prefix": "Saropa "
   },
   "findingsDash": {
     "pageTitle": "Saropa-bevindingendashboard",
@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "Secundaire diagnostiek",
     "hero": {
       "productTitle": "Bevindingendashboard",
-      "gaugeTitle": "Gezondheidsscore 0/100 (graad 1). Fouten wegen het zwaarst. {grade} {score}"
+      "gaugeTitle": "Gezondheidsscore {score}/100 (graad {grade}). Fouten wegen het zwaarst."
     },
     "time": {
       "justNow": "zojuist",
@@ -106,8 +106,8 @@
       "findingOne": "{count} bevinding",
       "findingOther": "{count} bevindingen",
       "todoHackTitle": "TODO- en HACK-markeringen gevonden in de werkruimte",
-      "driftOnTitle": "Driftadviseur aangesloten: 0 {label}",
-      "driftOnPill": "Drift voort op · 0 {count}",
+      "driftOnTitle": "Driftadviseur aangesloten: {label}",
+      "driftOnPill": "Ga verder met · {count}",
       "driftOfflineTitle": "Drift Advisor ingeschakeld, maar geen server gevonden",
       "driftOfflinePill": "Offline gaan",
       "enabledRulesTitle": "Ingeschakelde regels in de huidige laag",
@@ -123,13 +123,13 @@
       "ruleStatus": "Regelstatus"
     },
     "seg": {
-      "toggleSeverityTitle": "Schakel de ernst van 0 in {v}",
-      "toggleImpactTitle": "Schakel impact van 0 in {v}"
+      "toggleSeverityTitle": "Schakel de ernst van {v} in",
+      "toggleImpactTitle": "Schakel impact {v} in"
     },
     "kpi": {
       "visibleLabel": "Zichtbare bevindingen",
       "allMatched": "allemaal op elkaar afgestemd",
-      "ofTotal": "van 0 totaal {total}",
+      "ofTotal": "van {total} totaal",
       "clearFiltersTitle": "Klik om alle filters te wissen",
       "errorsLabel": "Fouten",
       "errorsSubFix": "moet repareren",
@@ -148,7 +148,7 @@
       "filesSubNone": "geen bestanden getroffen",
       "filesTitle": "Verschillende bestanden die ten minste één bevinding bijdragen",
       "topRuleLabel": "Topregel",
-      "topRuleTitle": "Filter bevindingen om 0 te bepalen {name}"
+      "topRuleTitle": "Filter bevindingen om {name} te bepalen"
     },
     "toolbar": {
       "ariaFiltersActions": "Filters en acties",
@@ -171,13 +171,13 @@
       "impactLabel": "Invloed",
       "moreSummary": "Meer",
       "moreChevron": "▾",
-      "copyJsonTitle": "Kopieer gefilterde overtredingen als JSON (0) {count}",
+      "copyJsonTitle": "Kopieer gefilterde overtredingen als JSON ({count})",
       "saveReportTitle": "Sla gefilterde overtredingen op als JSON in rapporten/JJJJMMDD/"
     },
     "chip": {
-      "contains": "bevat \"0\" {q}",
-      "severityOff": "ernst ≠ 0 {v}",
-      "impactOff": "impact ≠ 0 {v}",
+      "contains": "bevat \"{q}\"",
+      "severityOff": "ernst ≠ {v}",
+      "impactOff": "impact ≠ {v}",
       "resetAllTitle": "Reset alle filters",
       "removeFilterAria": "Filter verwijderen"
     },
@@ -185,7 +185,7 @@
       "help": "Help",
       "groupBy": "Groeperen op…",
       "textFilter": "Tekstfilter…",
-      "severityImpact": "Severity filter…",
+      "severityImpact": "Ernstfilter…",
       "hideRules": "Regels verbergen…",
       "ruleMetadata": "Metagegevens van regels",
       "clearFilters": "Wis filters",
@@ -197,18 +197,18 @@
       "openPackageDashboard": "Open het Pakketdashboard",
       "openCodeHealth": "Open Code Gezondheid",
       "openLintsConfig": "Open Lints-configuratie",
-      "reloadFromDisk": "Reload from disk",
-      "reloadFromDiskTitle": "Re-render the dashboard from the last violations.json without re-running the analyzer.",
-      "reEnableDisabledRules": "Re-enable disabled rules…",
-      "reEnableDisabledRulesTitle": "Open a quick-pick of rules currently disabled in analysis_options_custom.yaml and re-enable the chosen ones.",
-      "reEnableNoneTitle": "No rules currently disabled",
-      "reEnableNoneMessage": "No rules are currently disabled via analysis_options_custom.yaml.",
-      "reEnableQuickPickTitle": "Re-enable disabled rules",
-      "reEnableQuickPickPlaceholder": "Select one or more rules to re-enable",
-      "menuGroupExport": "Export",
-      "menuGroupFilter": "Filter & focus",
-      "menuGroupOpen": "Open dashboard",
-      "menuGroupSystem": "System"
+      "reloadFromDisk": "Herladen vanaf schijf",
+      "reloadFromDiskTitle": "Geef het dashboard opnieuw weer vanaf de laatste schendingen.json zonder de analyser opnieuw uit te voeren.",
+      "reEnableDisabledRules": "Uitgeschakelde regels opnieuw inschakelen…",
+      "reEnableDisabledRulesTitle": "Open een snelle selectie van regels die momenteel zijn uitgeschakeld in analyse_options_custom.yaml en schakel de gekozen regels opnieuw in.",
+      "reEnableNoneTitle": "Er zijn momenteel geen regels uitgeschakeld",
+      "reEnableNoneMessage": "Er zijn momenteel geen regels uitgeschakeld via analyse_options_custom.yaml.",
+      "reEnableQuickPickTitle": "Schakel uitgeschakelde regels opnieuw in",
+      "reEnableQuickPickPlaceholder": "Selecteer een of meer regels die u opnieuw wilt inschakelen",
+      "menuGroupExport": "Exporteren",
+      "menuGroupFilter": "Filteren en scherpstellen",
+      "menuGroupOpen": "Dashboard openen",
+      "menuGroupSystem": "Systeem"
     },
     "progress": {
       "runningLabel": "Analyse uitvoeren…",
@@ -222,8 +222,8 @@
       "disableButton": "Uitzetten",
       "workspaceOnlyShort": "alleen werkruimte",
       "projectConfigShort": "projectconfiguratie (schrijft analyse_options_custom.yaml)",
-      "topRulesOne": "Top 0 regel {count}",
-      "topRulesOther": "Top 0 regels {count}",
+      "topRulesOne": "Top {count} regel",
+      "topRulesOther": "Belangrijkste {count}-regels",
       "colRank": "#",
       "colRule": "Regel",
       "colCount": "Graaf",
@@ -247,9 +247,9 @@
       "copyRowTitle": "Kopieer deze bevinding als JSON",
       "metaShown": "{filtered} weergegeven",
       "metaAfterDisable": "{total} na filter voor uitgeschakelde regels",
-      "metaSourceCap": "bron beperkt tot 0 vanwege prestaties {max}",
-      "metaGroupedBy": "gegroepeerd op 0 {mode}",
-      "overflowNote": "Bronnenlijst afgekapt op 0 voor weergaveprestaties. {max}",
+      "metaSourceCap": "bron afgetopt op {max} voor prestaties",
+      "metaGroupedBy": "gegroepeerd op {mode}",
+      "overflowNote": "Bronnenlijst afgekapt op {max} voor weergaveprestaties.",
       "runAgain": "Voer de analyse opnieuw uit",
       "emptyNoViolations": "Geen overtredingen tijdens de laatste analyserun.",
       "emptyNoMatch": "Er zijn geen overtredingen die overeenkomen met de huidige filters.",
@@ -257,7 +257,7 @@
       "emptyHintFilters": "Pas de filters aan of voer de analyse opnieuw uit om de bevindingen te bekijken.",
       "reRunAnalysis": "Analyse opnieuw uitvoeren",
       "resetFilters": "Filters resetten",
-      "linePrefix": "L0 {line}"
+      "linePrefix": "L{line}"
     },
     "charts": {
       "sectionAria": "Meng grafieken",
@@ -265,7 +265,7 @@
       "metaClickSlice": "klik op een segment om te filteren",
       "severityMix": "Ernstmix",
       "impactMix": "Impactmix",
-      "filterBarTitle": "Filter alleen op 0 {key}",
+      "filterBarTitle": "Filter alleen op {key}",
       "donutTotal": "totaal"
     },
     "todoHack": {
@@ -293,7 +293,7 @@
       "retry": "Opnieuw proberen",
       "headingConnected": "Drift adviseur",
       "metaConnected": "aangesloten",
-      "noIssues": "Verbonden met 0 — geen actuele problemen. {label}",
+      "noIssues": "Verbonden met {label} — geen huidige problemen.",
       "refresh": "Vernieuwen",
       "openBrowser": "Openen in browser",
       "headingIssues": "Drift adviseur",
@@ -307,8 +307,8 @@
       "viewHidesMetaNone": "geen",
       "noneInExport": "Geen analysatoronderdrukkingen in de huidige `violations.json`-export. Voer een analyse uit na het bewerken van negaties of basislijnen die moeten worden ingevuld.",
       "totalRow": "Totaal — verwijder filters en open Bevindingen",
-      "byRule": "Volgens regel (0) {count}",
-      "byFile": "Per bestand (0) {count}",
+      "byRule": "Volgens regel ({count})",
+      "byFile": "Per bestand ({count})",
       "noEntries": "Geen vermeldingen.",
       "nothingHidden": "Er is niets verborgen in de lijst met problemen in deze werkruimte. Gebruik boomcontextacties om mappen, bestanden of regels te verbergen; ze blijven bestaan ​​in de werkruimtestatus.",
       "folderPattern": "{count} map(pen)",
@@ -317,7 +317,7 @@
       "perFileRules": "{count} bestand(en) met regelverberging per bestand",
       "severityHides": "{count} ernst verborgen",
       "impactHides": "{count} impact verborgen",
-      "activeHides": "Actieve huiden: 0. {counts}",
+      "activeHides": "Actieve huiden: {counts}.",
       "viewHidesFooter": "Deze verbergingen verkleinen alleen de lijst met problemen/dashboards; ze worden niet naar `violations.json` geschreven.",
       "clearViewHides": "Wis alle weergavehuiden",
       "foldersSample": "Mappen (voorbeeld)",
@@ -331,7 +331,7 @@
       "analysisComplete": "Analyse voltooid",
       "metaRunning": "Bij grote projecten kan dit even duren.",
       "metaDone": "Verfrissend dashboard met de laatste bevindingen.",
-      "announceSearch": "zoek 0 {q}",
+      "announceSearch": "zoek {q}",
       "announceSeverities": "{n} graden van ernst",
       "announceImpacts": "{n} effecten",
       "announceCleared": "Alle filters gewist",
@@ -359,9 +359,9 @@
     },
     "unknownAnalyzerKind": "Onbekend",
     "supplementary": {
-      "otherAnalyzerOn": "+0 andere bevindingen van de analyser {count}",
+      "otherAnalyzerOn": "+{count} andere bevindingen van de analyser",
       "otherAnalyzerPromo": "+? andere bevindingen van de analysator - laten zien",
-      "analyzerTodosOn": "+0 TODO's van analysatoren {count}",
+      "analyzerTodosOn": "+{count} analysator TODO's",
       "analyzerTodosPromo": "+? analysator TODO's - tonen",
       "scannerPromo": "Schakel TODO/HACK-scanner in",
       "tooltipLive": "Live vanuit het VS-codeproblemenpaneel. Wordt bijgewerkt zodra de analyse is voltooid. Klik om te verbergen.",
@@ -383,7 +383,7 @@
     "summaryRuleTriage": "Regel triage",
     "hintNoViolations": "Nog geen `reports/.saropa_lints/violations.json`. Voer de analyse uit en vernieuw vervolgens dit tabblad.",
     "hintUnreadable": "Geen leesbare schendingen exporteren. Voer eerst de Saropa Lints-analyse uit.",
-    "hintStale": "Triagegegevens zijn mogelijk verouderd (export is 0 oud). Voer de analyse opnieuw uit voor huidige groepen. {age}",
+    "hintStale": "Triagegegevens kunnen verouderd zijn (export is {age} oud). Voer de analyse opnieuw uit voor huidige groepen.",
     "hintNoPerRule": "Voor deze export zijn er geen problemen per regel. Analyseer opnieuw met een huidige Saropa Lints-plug-in.",
     "hintBuildFailed": "Kan geen triage opbouwen op basis van deze export. Voer een nieuwe analyse uit.",
     "summaryVolume": "Regeltriage (volume / must-fix / stilistisch)",
@@ -400,14 +400,14 @@
     "openWorkspaceFirst": "Open eerst een werkruimtemap.",
     "noReportYet": "Er zijn nog geen overtredingen gemeld. Voer eerst de Saropa Lints-analyse uit.",
     "clipboardCopyFailed": "Kan niet naar klembord kopiëren.",
-    "copiedViolationsJson": "0 overtreding(en) gekopieerd als JSON. {count}",
+    "copiedViolationsJson": "{count} overtreding(en) gekopieerd als JSON.",
     "copiedOneViolationJson": "Er is 1 overtreding gekopieerd als JSON.",
     "driftNotConnected": "Drift Advisor-server is niet verbonden.",
-    "copiedBulkFindings": "0 geselecteerde bevinding(en) gekopieerd als JSON. {count}",
+    "copiedBulkFindings": "Gekopieerde {count} geselecteerde bevinding(en) als JSON.",
     "noMatchingFindingsCopy": "Geen overeenkomende bevindingen om te kopiëren.",
-    "couldNotOpenFile": "Kon bestand niet openen: 0 {path}",
+    "couldNotOpenFile": "Kan bestand niet openen: {path}",
     "saveReportNoWorkspace": "Open een werkruimtemap voordat u het rapport opslaat.",
-    "savedFindings": "0 bevinding(en) opgeslagen: 1 {path} {count}",
+    "savedFindings": "Bewaarde {count} bevinding(en): {path}",
     "couldNotSaveReportJson": "Kan rapport-JSON niet opslaan."
   },
   "packageDashboard": {
@@ -416,7 +416,7 @@
     "status": {
       "packagesCount": "{count} pakketten",
       "packagesBreakdown": "{direct} direct, {transitive} transitief",
-      "gradeLine": "Graad 0 · 1/100 {avg} {grade}",
+      "gradeLine": "Graad {grade} · {avg}/100",
       "flaggedCount": "{count} gemarkeerd",
       "flaggedTitle": "Verlaten of einde leven"
     },
@@ -424,14 +424,14 @@
       "heading": "Pakketten scannen",
       "body1": "Saropa haalt pub.dev-metagegevens, GitHub-activiteit en afhankelijkheidsgrafieken op voor elke directe afhankelijkheid in dit project.",
       "body2": "Deze pagina wordt automatisch vernieuwd wanneer de scan is voltooid. U kunt annuleren via de voortgangsmelding rechtsonder.",
-      "versionStamp": "Saropa-pakketdashboard v0 {version}"
+      "versionStamp": "Saropa-pakketdashboard v{version}"
     },
-    "gaugeTitle": "Projectpakketcijfer: 0 {grade}",
+    "gaugeTitle": "Projectpakketkwaliteit: {grade}",
     "summary": {
       "packages": "Pakketten",
       "projectGrade": "Projectpakketklasse",
       "totalSize": "Totale grootte*",
-      "gradeTooltip": "Projectcijfer 0\nGemiddelde score: 1/100\nPakketten: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {e} {f} {c} {a} {b} {avgScore} {pkgCount}",
+      "gradeTooltip": "Projectcijfer {avgGrade}\nGemiddelde score: {avgScore}/100\nPakketten: {pkgCount}\nA:{a} B:{b} C:{c} E:{e} F:{f}",
       "vibrantTitle": "Levendig",
       "stableTitle": "Stabiel",
       "outdatedTitle": "Verouderd",
@@ -446,13 +446,13 @@
       "caveatLine2": "Activiteitsdrempels: 90d = verouderd, 180d = slapend (tijdlijnen voor vastleggen en vrijgeven)."
     },
     "breakdown": {
-      "title": "Waarom cijfer 0? — 1/100 gemiddeld over 2 pakketten {pkgCount} {avgScore} {grade}",
+      "title": "Waarom een ​​cijfer {grade}? — {avgScore}/100 gemiddeld over {pkgCount}-pakketten",
       "hint": "Klik om uit te vouwen",
       "distributionHeading": "Verdeling",
       "signalsHeading": "Risicosignalen die de score naar beneden halen",
-      "signalFlagged": "{count} flagged (abandoned / end-of-life)",
-      "signalVulnerable": "{count} with known vulnerabilities",
-      "signalUpdates": "{count} have updates available",
+      "signalFlagged": "{count} gemarkeerd (verlaten / einde levensduur)",
+      "signalVulnerable": "{count} met bekende kwetsbaarheden",
+      "signalUpdates": "Voor {count} zijn updates beschikbaar",
       "bottomHeading": "Laagst scorende pakketten",
       "thresholdsHeading": "Hoe scores worden omgezet in cijfers",
       "thresholdA": "70+ — Levendig: actief onderhouden, onlangs gepubliceerd",
@@ -461,7 +461,7 @@
       "thresholdE": "onder de 20 — Verlaten: tekenen van inactiviteit",
       "thresholdF": "Stopgezet of gearchiveerd op pub.dev (partituur niet gebruikt)",
       "filterTooltip": "Filter de pakkettabel op alleen deze categorie",
-      "jumpTooltip": "Ga naar 0 in de pakkettabel {name}"
+      "jumpTooltip": "Ga naar {name} in de pakkettabel"
     },
     "network": {
       "summary": "Afhankelijkheidsnetwerk"
@@ -657,10 +657,10 @@
     "entry": {
       "internalBadgeTitle": "Alleen geactiveerd vanuit contextmenu's",
       "internalBadge": "menu",
-      "copyTitle": "Opdracht-ID kopiëren (0) {id}",
+      "copyTitle": "Kopieer opdracht-ID ({id})",
       "copyAria": "Kopieer opdracht-ID"
     },
-    "categoryJumpTitle": "Ga naar 0 {category}",
+    "categoryJumpTitle": "Ga naar {category}",
     "shortcuts": {
       "focusSearch": "Focus het zoekveld",
       "navRows": "Navigeer door zichtbare opdrachtrijen",
@@ -670,14 +670,14 @@
       "showOverlay": "Toon deze snelkoppelingsoverlay"
     },
     "script": {
-      "moreSuffix": "+0 meer {count}",
+      "moreSuffix": "+{count} meer",
       "showLess": "Laat minder zien",
       "runSingular": "loop",
       "runPlural": "loopt",
       "recentWord": "recent",
       "expandAll": "Alles uitvouwen",
       "collapseAll": "Alles samenvouwen",
-      "searchChip": "Zoeken: \"0\" {query}",
+      "searchChip": "Zoeken: \"{query}\"",
       "internalChip": "Contextmenuopdrachten weergeven",
       "removeFilterPrefix": "Filter verwijderen",
       "matchOne": "{count} overeenkomst",
@@ -691,20 +691,20 @@
     "scanningTitle": "Code Health: scanfuncties…",
     "runReportFirst": "Voer het rapport opnieuw uit en kopieer vervolgens JSON.",
     "copiedJson": "Code Health JSON gekopieerd naar klembord.",
-    "couldNotOpenFile": "Kon bestand niet openen: 0 {path}",
+    "couldNotOpenFile": "Kan bestand niet openen: {path}",
     "panelTitle": "Saropa Code Gezondheidsdashboard",
     "hero": {
       "title": "Saropa Code Gezondheidsdashboard",
       "generated": "Gegenereerd",
       "functionOne": "{count} functie",
       "functionOther": "{count} functies",
-      "avgFormat": "gemiddeld 0 (1) {grade} {score}",
+      "avgFormat": "gemiddelde {score} ({grade})",
       "gatesFailing": "poorten falen",
       "gatesPassing": "poorten passeren"
     },
     "gauge": {
-      "tooltip": "Gemiddelde score 0 van 100 (cijfer 1). {rounded} {grade}",
-      "ariaLabel": "Gemiddelde score 0 van 100 {rounded}"
+      "tooltip": "Gemiddelde score {rounded} van 100 (cijfer {grade}).",
+      "ariaLabel": "Gemiddelde score {rounded} van 100"
     },
     "gate": {
       "fallback": "Kwaliteitspoorten zijn mislukt: bekijk de drempelwaarden in de Code Health-instellingen.",
@@ -716,8 +716,8 @@
     "kpi": {
       "ariaLabel": "Samenvatting van de codestatus",
       "allClear": "Geen gemarkeerde functies in welke categorie dan ook - allemaal duidelijk.",
-      "clickToFilter": "Klik om de tabel te filteren op functies met de vlag 0. {flag}",
-      "noFlagged": "Geen functies gemarkeerd met 0. {flag}",
+      "clickToFilter": "Klik om de tabel te filteren op functies met de vlag {flag}.",
+      "noFlagged": "Geen functies gemarkeerd met {flag}.",
       "unused": "Ongebruikt",
       "unusedSub": "functies waarnaar nergens wordt verwezen",
       "uncovered": "Onbedekt",
@@ -744,7 +744,7 @@
     "table": {
       "ariaLabel": "Slechtste functies per score",
       "heading": "Slechtste functies",
-      "topCount": "top 0 van 1 {shown} {total}",
+      "topCount": "bovenste {shown} van {total}",
       "colGrade": "Cijfer",
       "colScore": "Scoren",
       "colFunction": "Functie",
@@ -768,9 +768,9 @@
     },
     "script": {
       "activeFiltersLabel": "Actieve filters:",
-      "searchChip": "zoeken: \"0\" {q}",
-      "flagChip": "vlag: 0 {flag}",
-      "removeAria": "Verwijder 0 {key}",
+      "searchChip": "zoeken: \"{q}\"",
+      "flagChip": "vlag: {flag}",
+      "removeAria": "Verwijder {key}",
       "clearAll": "Alles wissen",
       "rowsVisible": "{visible} van {total} rijen zichtbaar",
       "neverRun": "nooit rennen"
@@ -803,7 +803,7 @@
   "telemetry": {
     "heroTitle": "Gerelateerde regeltelemetrie",
     "skipToCounters": "Ga naar telemetrietellers",
-    "lastEvent": "Laatste gebeurtenis 0 {relative}",
+    "lastEvent": "Laatste gebeurtenis {relative}",
     "noEvents": "Geen gebeurtenissen geregistreerd",
     "totalEventOne": "{count} totaal evenement",
     "totalEventOther": "{count} totale evenementen",

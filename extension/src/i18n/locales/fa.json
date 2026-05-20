@@ -42,17 +42,17 @@
     "retry": "دوباره امتحان کنید",
     "reload": "بارگذاری مجدد",
     "copyDetails": "کپی جزئیات",
-    "unreachable": "نمی توان به 0 رسید {target}",
+    "unreachable": "نمی توان به {target} رسید",
     "partialSummary": "{loaded} از {total} {item} بارگذاری شد. {failed} مورد ناموفق بود.",
     "partialRetry": "تلاش مجدد ناموفق بود"
   },
   "offline": {
     "banner": "آفلاین - برای تازه کردن دوباره وصل شوید.",
-    "cachedFooter": "نمایش داده های حافظه پنهان از 0. {when}",
+    "cachedFooter": "نمایش داده های کش شده از {when}.",
     "reconnecting": "در حال اتصال مجدد…"
   },
   "stale": {
-    "statusPill": "آخرین اجرای موفقیت آمیز 0 - بازخوانی انجام نشد {when}"
+    "statusPill": "آخرین اجرای موفقیت آمیز {when} — به روز رسانی انجام نشد"
   },
   "filter": {
     "searchPlaceholder": "جستجو…",
@@ -63,7 +63,7 @@
   },
   "a11y": {
     "toggleFullWidth": "طرح بندی تمام عرض را تغییر دهید",
-    "sortBy": "مرتب سازی بر اساس 0 {column}",
+    "sortBy": "مرتب سازی بر اساس {column}",
     "expandRow": "سطر را بزرگ کنید",
     "collapseRow": "جمع کردن ردیف",
     "selectAll": "همه ردیف ها را انتخاب کنید",
@@ -76,21 +76,21 @@
       "placeholder": "زبان را برای نوار کناری و داشبورد انتخاب کنید",
       "auto": "خودکار (از زبان نمایش کد VS پیروی کنید)"
     },
-    "reloadPrompt": "زبان روی 0 تنظیم شده است. برای به‌روزرسانی نوار کناری و برچسب‌های فرمان، پنجره را دوباره بارگیری کنید. {locale}",
+    "reloadPrompt": "زبان روی {locale} تنظیم شده است. برای به‌روزرسانی نوار کناری و برچسب‌های فرمان، پنجره را دوباره بارگیری کنید.",
     "reloadNow": "اکنون بارگیری مجدد",
     "reloadLater": "بعدا"
   },
   "brand": {
-    "prefix": "ساروپا"
+    "prefix": "Saropa "
   },
   "findingsDash": {
-    "pageTitle": "داشبورد یافته های ساروپا",
-    "documentTitle": "داشبورد یافته های ساروپا",
+    "pageTitle": "داشبورد یافته های Saropa",
+    "documentTitle": "داشبورد یافته های Saropa",
     "skipToFindings": "پرش به یافته ها",
     "secondaryAsideLabel": "تشخیص ثانویه",
     "hero": {
       "productTitle": "داشبورد یافته ها",
-      "gaugeTitle": "نمره سلامت 0/100 (درجه 1). خطاها سنگین ترین وزن را دارند. {grade} {score}"
+      "gaugeTitle": "نمره سلامت {score}/100 (درجه {grade}). خطاها سنگین ترین وزن را دارند."
     },
     "time": {
       "justNow": "همین الان",
@@ -106,8 +106,8 @@
       "findingOne": "{count} یافته",
       "findingOther": "{count} یافته",
       "todoHackTitle": "نشانگرهای TODO و HACK موجود در فضای کاری",
-      "driftOnTitle": "Drift Advisor متصل است: 0 {label}",
-      "driftOnPill": "دریفت روشن · 0 {count}",
+      "driftOnTitle": "Drift Advisor متصل است: {label}",
+      "driftOnPill": "رانش در · {count}",
       "driftOfflineTitle": "Drift Advisor فعال است اما سروری پیدا نشد",
       "driftOfflinePill": "دریفت آفلاین",
       "enabledRulesTitle": "قوانین فعال در ردیف فعلی",
@@ -123,13 +123,13 @@
       "ruleStatus": "وضعیت قانون"
     },
     "seg": {
-      "toggleSeverityTitle": "0 شدت را تغییر دهید {v}",
-      "toggleImpactTitle": "ضربه 0 را تغییر دهید {v}"
+      "toggleSeverityTitle": "{v} شدت را تغییر دهید",
+      "toggleImpactTitle": "ضربه {v} را تغییر دهید"
     },
     "kpi": {
       "visibleLabel": "یافته های قابل مشاهده",
       "allMatched": "همه مطابقت دارند",
-      "ofTotal": "از 0 کل {total}",
+      "ofTotal": "از {total} کل",
       "clearFiltersTitle": "برای پاک کردن همه فیلترها کلیک کنید",
       "errorsLabel": "خطاها",
       "errorsSubFix": "باید رفع شود",
@@ -148,7 +148,7 @@
       "filesSubNone": "هیچ فایلی تحت تاثیر قرار نگرفت",
       "filesTitle": "فایل‌های متمایز که حداقل در یک یافته مشارکت دارند",
       "topRuleLabel": "قانون برتر",
-      "topRuleTitle": "یافته ها را برای قانون 0 فیلتر کنید {name}"
+      "topRuleTitle": "یافته ها را برای قانون {name} فیلتر کنید"
     },
     "toolbar": {
       "ariaFiltersActions": "فیلترها و اقدامات",
@@ -171,13 +171,13 @@
       "impactLabel": "تاثیر",
       "moreSummary": "بیشتر",
       "moreChevron": "▾",
-      "copyJsonTitle": "کپی نقض فیلتر شده به عنوان JSON (0) {count}",
+      "copyJsonTitle": "کپی نقض فیلتر شده به عنوان JSON ({count})",
       "saveReportTitle": "ذخیره تخلفات فیلتر شده به عنوان JSON در گزارش ها/YYYYMMDD/"
     },
     "chip": {
-      "contains": "حاوی \"0\" است {q}",
-      "severityOff": "شدت ≠ 0 {v}",
-      "impactOff": "تاثیر ≠ 0 {v}",
+      "contains": "حاوی \"{q}\"",
+      "severityOff": "شدت ≠ {v}",
+      "impactOff": "تاثیر ≠ {v}",
       "resetAllTitle": "همه فیلترها را بازنشانی کنید",
       "removeFilterAria": "فیلتر را بردارید"
     },
@@ -185,7 +185,7 @@
       "help": "کمک کنید",
       "groupBy": "گروه بندی بر اساس…",
       "textFilter": "فیلتر متن…",
-      "severityImpact": "Severity filter…",
+      "severityImpact": "فیلتر شدت…",
       "hideRules": "پنهان کردن قوانین…",
       "ruleMetadata": "فراداده قانون",
       "clearFilters": "فیلترها را پاک کنید",
@@ -197,18 +197,18 @@
       "openPackageDashboard": "داشبورد Package را باز کنید",
       "openCodeHealth": "باز کردن سلامت کد",
       "openLintsConfig": "Lints Config را باز کنید",
-      "reloadFromDisk": "Reload from disk",
-      "reloadFromDiskTitle": "Re-render the dashboard from the last violations.json without re-running the analyzer.",
-      "reEnableDisabledRules": "Re-enable disabled rules…",
-      "reEnableDisabledRulesTitle": "Open a quick-pick of rules currently disabled in analysis_options_custom.yaml and re-enable the chosen ones.",
-      "reEnableNoneTitle": "No rules currently disabled",
-      "reEnableNoneMessage": "No rules are currently disabled via analysis_options_custom.yaml.",
-      "reEnableQuickPickTitle": "Re-enable disabled rules",
-      "reEnableQuickPickPlaceholder": "Select one or more rules to re-enable",
-      "menuGroupExport": "Export",
-      "menuGroupFilter": "Filter & focus",
-      "menuGroupOpen": "Open dashboard",
-      "menuGroupSystem": "System"
+      "reloadFromDisk": "بارگیری مجدد از دیسک",
+      "reloadFromDiskTitle": "داشبورد را از آخرین موارد نقض.json بدون اجرای مجدد آنالیزور رندر کنید.",
+      "reEnableDisabledRules": "دوباره فعال کردن قوانین غیرفعال…",
+      "reEnableDisabledRulesTitle": "یک انتخاب سریع از قوانینی که در حال حاضر غیرفعال شده اند را در analyzy_options_custom.yaml باز کنید و موارد انتخابی را دوباره فعال کنید.",
+      "reEnableNoneTitle": "هیچ قانونی در حال حاضر غیرفعال نیست",
+      "reEnableNoneMessage": "در حال حاضر هیچ قانونی از طریق analysis_options_custom.yaml غیرفعال نشده است.",
+      "reEnableQuickPickTitle": "قوانین غیرفعال را دوباره فعال کنید",
+      "reEnableQuickPickPlaceholder": "یک یا چند قانون را برای فعال کردن مجدد انتخاب کنید",
+      "menuGroupExport": "صادرات",
+      "menuGroupFilter": "فیلتر و فوکوس",
+      "menuGroupOpen": "داشبورد را باز کنید",
+      "menuGroupSystem": "سیستم"
     },
     "progress": {
       "runningLabel": "تجزیه و تحلیل در حال اجرا…",
@@ -222,8 +222,8 @@
       "disableButton": "غیر فعال کردن",
       "workspaceOnlyShort": "فقط فضای کار",
       "projectConfigShort": "پیکربندی پروژه (نوشتن analysis_options_custom.yaml)",
-      "topRulesOne": "قانون بالا 0 {count}",
-      "topRulesOther": "قوانین برتر 0 {count}",
+      "topRulesOne": "قانون بالای {count}",
+      "topRulesOther": "قوانین {count} برتر",
       "colRank": "#",
       "colRule": "قانون",
       "colCount": "بشمار",
@@ -247,9 +247,9 @@
       "copyRowTitle": "این یافته را به صورت JSON کپی کنید",
       "metaShown": "{filtered} مورد نمایش داده شد",
       "metaAfterDisable": "{total} مورد پس از فیلتر قوانین غیرفعال",
-      "metaSourceCap": "منبع برای عملکرد در 0 محدود شده است {max}",
-      "metaGroupedBy": "گروه بندی شده توسط 0 {mode}",
-      "overflowNote": "لیست منبع برای عملکرد رندر در 0 کوتاه شده است. {max}",
+      "metaSourceCap": "منبع برای عملکرد در {max} محدود شده است",
+      "metaGroupedBy": "گروه بندی شده توسط {mode}",
+      "overflowNote": "لیست منبع برای عملکرد رندر در {max} کوتاه شده است.",
       "runAgain": "دوباره آنالیز را اجرا کنید",
       "emptyNoViolations": "هیچ تخلفی در اجرای آخرین تحلیل وجود ندارد.",
       "emptyNoMatch": "هیچ تخلفی با فیلترهای فعلی مطابقت ندارد.",
@@ -257,7 +257,7 @@
       "emptyHintFilters": "فیلترها را تنظیم کنید یا تجزیه و تحلیل را دوباره اجرا کنید تا یافته ها را ببینید.",
       "reRunAnalysis": "آنالیز را دوباره اجرا کنید",
       "resetFilters": "بازنشانی فیلترها",
-      "linePrefix": "L0 {line}"
+      "linePrefix": "L{line}"
     },
     "charts": {
       "sectionAria": "نمودارها را مخلوط کنید",
@@ -265,7 +265,7 @@
       "metaClickSlice": "برای فیلتر کردن، بر روی آن کلیک کنید",
       "severityMix": "ترکیب شدت",
       "impactMix": "ترکیب ضربه",
-      "filterBarTitle": "فقط به 0 فیلتر کنید {key}",
+      "filterBarTitle": "فقط به {key} فیلتر کنید",
       "donutTotal": "کل"
     },
     "todoHack": {
@@ -293,7 +293,7 @@
       "retry": "دوباره امتحان کنید",
       "headingConnected": "مشاور دریفت",
       "metaConnected": "متصل است",
-      "noIssues": "متصل به 0 - مشکل فعلی وجود ندارد. {label}",
+      "noIssues": "به {label} متصل شد - مشکل فعلی وجود ندارد.",
       "refresh": "تازه کردن",
       "openBrowser": "در مرورگر باز کنید",
       "headingIssues": "مشاور دریفت",
@@ -307,8 +307,8 @@
       "viewHidesMetaNone": "هیچ کدام",
       "noneInExport": "در صادرات «violations.json» کنونی هیچ تحلیلگر سرکوبگر وجود ندارد. تجزیه و تحلیل را پس از ویرایش نادیده گرفته یا خطوط پایه برای پر کردن اجرا کنید.",
       "totalRow": "مجموع - فیلترها را پاک کنید و یافته‌ها را باز کنید",
-      "byRule": "طبق قانون (0) {count}",
-      "byFile": "بر اساس فایل (0) {count}",
+      "byRule": "طبق قانون ({count})",
+      "byFile": "بر اساس فایل ({count})",
       "noEntries": "ورودی وجود ندارد.",
       "nothingHidden": "هیچ چیز از لیست مشکلات در این فضای کاری پنهان نیست. از اقدامات زمینه درختی برای پنهان کردن پوشه ها، فایل ها یا قوانین استفاده کنید. آنها در حالت فضای کاری باقی می مانند.",
       "folderPattern": "{count} پوشه",
@@ -317,7 +317,7 @@
       "perFileRules": "{count} فایل با قوانین پنهان‌سازی اختصاصی",
       "severityHides": "{count} پنهان‌سازی شدت",
       "impactHides": "{count} پنهان‌سازی تأثیر",
-      "activeHides": "پوست های فعال: 0. {counts}",
+      "activeHides": "پوست های فعال: {counts}.",
       "viewHidesFooter": "این پنهان‌ها فقط فهرست مسائل / داشبورد را کوچک می‌کنند. آنها روی 'violations.json' نوشته نمی شوند.",
       "clearViewHides": "پاک کردن همه موارد پنهان",
       "foldersSample": "پوشه ها (نمونه)",
@@ -331,7 +331,7 @@
       "analysisComplete": "تحلیل کامل شد",
       "metaRunning": "این می تواند در پروژه های بزرگ یک لحظه طول بکشد.",
       "metaDone": "داشبورد تازه با آخرین یافته ها.",
-      "announceSearch": "جستجو 0 {q}",
+      "announceSearch": "جستجو {q}",
       "announceSeverities": "{n} شدت",
       "announceImpacts": "{n} تأثیر",
       "announceCleared": "همه فیلترها پاک شدند",
@@ -359,9 +359,9 @@
     },
     "unknownAnalyzerKind": "ناشناس",
     "supplementary": {
-      "otherAnalyzerOn": "+0 دیگر یافته های تحلیلگر {count}",
+      "otherAnalyzerOn": "+{count} دیگر یافته های تحلیلگر",
       "otherAnalyzerPromo": "+؟ سایر یافته های تحلیلگر - نشان می دهد",
-      "analyzerTodosOn": "+0 آنالیزور TODOs {count}",
+      "analyzerTodosOn": "+{count} آنالایزر TODOs",
       "analyzerTodosPromo": "+؟ تجزیه و تحلیل TODOs - نشان می دهد",
       "scannerPromo": "اسکنر TODO/HACK را فعال کنید",
       "tooltipLive": "پخش زنده از پنل مشکلات VS Code. با تکمیل تجزیه و تحلیل، به روز رسانی می شود. برای پنهان کردن کلیک کنید.",
@@ -383,7 +383,7 @@
     "summaryRuleTriage": "تریاژ قانون",
     "hintNoViolations": "هنوز هیچ «گزارش/.saropa_lints/violations.json» وجود ندارد. تجزیه و تحلیل را اجرا کنید، سپس این برگه را بازخوانی کنید.",
     "hintUnreadable": "بدون تخلف قابل خواندن صادرات. ابتدا آنالیز Saropa Lints را اجرا کنید.",
-    "hintStale": "داده های تریاژ ممکن است قدیمی باشد (صادرات 0 قدیمی است). اجرای مجدد تجزیه و تحلیل برای گروه های فعلی. {age}",
+    "hintStale": "داده های تریاژ ممکن است قدیمی باشد (صادرات {age} قدیمی است). اجرای مجدد تجزیه و تحلیل برای گروه های فعلی.",
     "hintNoPerRule": "این صادرات هیچ مشکلی بر اساس قانون ندارد. با افزونه Saropa Lints فعلی، دوباره آنالیز کنید.",
     "hintBuildFailed": "نمی‌توان از این صادرات تریاژ ساخت. یک تحلیل تازه انجام دهید.",
     "summaryVolume": "تریاژ قانون (حجم / باید اصلاح شود / سبک)",
@@ -400,23 +400,23 @@
     "openWorkspaceFirst": "ابتدا یک پوشه فضای کاری باز کنید.",
     "noReportYet": "هنوز تخلفی گزارش نشده است ابتدا آنالیز Saropa Lints را اجرا کنید.",
     "clipboardCopyFailed": "در کلیپ بورد کپی نشد.",
-    "copiedViolationsJson": "0 نقض (های) به عنوان JSON کپی شد. {count}",
+    "copiedViolationsJson": "نقض(های) {count} به عنوان JSON کپی شد.",
     "copiedOneViolationJson": "1 نقض به عنوان JSON کپی شد.",
     "driftNotConnected": "سرور Drift Advisor متصل نیست.",
-    "copiedBulkFindings": "0 یافته(های) انتخاب شده به عنوان JSON کپی شد. {count}",
+    "copiedBulkFindings": "{count} یافته(های) انتخاب شده به عنوان JSON کپی شد.",
     "noMatchingFindingsCopy": "هیچ یافته منطبقی برای کپی وجود ندارد.",
-    "couldNotOpenFile": "فایل باز نشد: 0 {path}",
+    "couldNotOpenFile": "فایل باز نشد: {path}",
     "saveReportNoWorkspace": "قبل از ذخیره گزارش، یک پوشه فضای کاری باز کنید.",
-    "savedFindings": "ذخیره شده 0 یافته(های): 1 {path} {count}",
+    "savedFindings": "ذخیره شده {count} یافته(های): {path}",
     "couldNotSaveReportJson": "گزارش JSON ذخیره نشد."
   },
   "packageDashboard": {
-    "documentTitle": "داشبورد پکیج ساروپا",
-    "heroTitle": "داشبورد پکیج ساروپا",
+    "documentTitle": "داشبورد بسته Saropa",
+    "heroTitle": "داشبورد بسته Saropa",
     "status": {
       "packagesCount": "{count} بسته",
       "packagesBreakdown": "{direct} مستقیم، {transitive} غیرمستقیم",
-      "gradeLine": "درجه 0 · 1/100 {avg} {grade}",
+      "gradeLine": "درجه {grade} · {avg}/100",
       "flaggedCount": "{count} نشان‌دار شده",
       "flaggedTitle": "رها شده یا به پایان رسیده است"
     },
@@ -424,14 +424,14 @@
       "heading": "اسکن بسته ها",
       "body1": "Saropa در حال واکشی متاداده pub.dev، فعالیت GitHub و نمودارهای وابستگی برای هر وابستگی مستقیم در این پروژه است.",
       "body2": "پس از پایان اسکن، این صفحه به طور خودکار بازخوانی می شود. می‌توانید از اعلان پیشرفت در پایین سمت راست لغو کنید.",
-      "versionStamp": "داشبورد پکیج ساروپا v0 {version}"
+      "versionStamp": "داشبورد بسته Saropa v{version}"
     },
-    "gaugeTitle": "درجه بسته پروژه: 0 {grade}",
+    "gaugeTitle": "درجه بسته پروژه: {grade}",
     "summary": {
       "packages": "بسته ها",
       "projectGrade": "درجه بسته پروژه",
       "totalSize": "اندازه کل*",
-      "gradeTooltip": "درجه پروژه 0\nمیانگین امتیاز: 1/100\nپکیج ها: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {e} {f} {c} {a} {b} {avgScore} {pkgCount}",
+      "gradeTooltip": "درجه پروژه {avgGrade}\nمیانگین امتیاز: {avgScore}/100\nبسته ها: {pkgCount}\nA:{a} B:{b} C:{c} E:{e} F:{f}",
       "vibrantTitle": "پر جنب و جوش",
       "stableTitle": "پایدار",
       "outdatedTitle": "منسوخ شده",
@@ -446,13 +446,13 @@
       "caveatLine2": "آستانه فعالیت: 90d = قدیمی، 180d = غیرفعال (تعهد + جدول زمانی انتشار)."
     },
     "breakdown": {
-      "title": "چرا درجه 0؟ — 1/100 میانگین در بین بسته‌های 2 {pkgCount} {avgScore} {grade}",
+      "title": "چرا درجه {grade}؟ — {avgScore}/100 میانگین در بسته های {pkgCount}",
       "hint": "برای گسترش کلیک کنید",
       "distributionHeading": "توزیع",
       "signalsHeading": "سیگنال های ریسک امتیاز را به پایین می کشد",
-      "signalFlagged": "{count} flagged (abandoned / end-of-life)",
-      "signalVulnerable": "{count} with known vulnerabilities",
-      "signalUpdates": "{count} have updates available",
+      "signalFlagged": "{count} پرچمدار (رها شده / پایان عمر)",
+      "signalVulnerable": "{count} با آسیب پذیری های شناخته شده",
+      "signalUpdates": "{count} به روز رسانی در دسترس است",
       "bottomHeading": "بسته های با کمترین امتیاز",
       "thresholdsHeading": "نحوه نگاشت نمرات به نمرات",
       "thresholdA": "70+ — پر جنب و جوش: فعالانه نگهداری می شود، اخیراً منتشر شده است",
@@ -461,7 +461,7 @@
       "thresholdE": "زیر 20 - رها شده: نشانه های عدم فعالیت",
       "thresholdF": "متوقف شده یا در pub.dev بایگانی شده است (امتیاز استفاده نشده است)",
       "filterTooltip": "جدول بسته را فقط به این دسته فیلتر کنید",
-      "jumpTooltip": "در جدول بسته به 0 بروید {name}"
+      "jumpTooltip": "در جدول بسته به {name} بروید"
     },
     "network": {
       "summary": "شبکه وابستگی"
@@ -604,9 +604,9 @@
     }
   },
   "commandCatalog": {
-    "documentTitle": "کاتالوگ فرماندهی ساروپا",
+    "documentTitle": "کاتالوگ فرمان Saropa",
     "skipLink": "به کاتالوگ فرمان بروید",
-    "heroTitle": "کاتالوگ فرماندهی ساروپا",
+    "heroTitle": "کاتالوگ فرمان Saropa",
     "status": {
       "commands": "{count} دستور",
       "categories": "{count} دسته‌بندی",
@@ -657,10 +657,10 @@
     "entry": {
       "internalBadgeTitle": "فقط از منوهای زمینه فعال می شود",
       "internalBadge": "منو",
-      "copyTitle": "کپی شناسه فرمان (0) {id}",
+      "copyTitle": "کپی شناسه فرمان ({id})",
       "copyAria": "شناسه فرمان را کپی کنید"
     },
-    "categoryJumpTitle": "پرش به 0 {category}",
+    "categoryJumpTitle": "پرش به {category}",
     "shortcuts": {
       "focusSearch": "فیلد جستجو را متمرکز کنید",
       "navRows": "در ردیف های فرمان قابل مشاهده حرکت کنید",
@@ -670,14 +670,14 @@
       "showOverlay": "این روکش میانبر را نشان دهید"
     },
     "script": {
-      "moreSuffix": "+0 بیشتر {count}",
+      "moreSuffix": "+{count} بیشتر",
       "showLess": "کمتر نشان دادن",
       "runSingular": "اجرا کنید",
       "runPlural": "اجرا می شود",
       "recentWord": "اخیر",
       "expandAll": "همه را گسترش دهید",
       "collapseAll": "همه را جمع کن",
-      "searchChip": "جستجو: \"0\" {query}",
+      "searchChip": "جستجو: \"{query}\"",
       "internalChip": "نمایش دستورات منوی زمینه",
       "removeFilterPrefix": "فیلتر را بردارید",
       "matchOne": "{count} تطابق",
@@ -685,26 +685,26 @@
     }
   },
   "codeHealth": {
-    "documentTitle": "داشبورد سلامت کد ساروپا",
+    "documentTitle": "داشبورد سلامت کد Saropa",
     "skipToTable": "پرش به جدول توابع",
     "openWorkspaceFirst": "ابتدا یک فضای کاری Dart/Flutter را باز کنید.",
     "scanningTitle": "کد سلامت: توابع اسکن…",
     "runReportFirst": "گزارش را دوباره اجرا کنید، سپس JSON را کپی کنید.",
     "copiedJson": "Code Health JSON در کلیپ بورد کپی شد.",
-    "couldNotOpenFile": "فایل باز نشد: 0 {path}",
-    "panelTitle": "داشبورد سلامت کد ساروپا",
+    "couldNotOpenFile": "فایل باز نشد: {path}",
+    "panelTitle": "داشبورد سلامت کد Saropa",
     "hero": {
-      "title": "داشبورد سلامت کد ساروپا",
+      "title": "داشبورد سلامت کد Saropa",
       "generated": "تولید شده است",
       "functionOne": "{count} تابع",
       "functionOther": "{count} تابع",
-      "avgFormat": "میانگین 0 (1) {grade} {score}",
+      "avgFormat": "میانگین {score} ({grade})",
       "gatesFailing": "دروازه ها شکست می خورند",
       "gatesPassing": "دروازه های عبور"
     },
     "gauge": {
-      "tooltip": "میانگین امتیاز 0 از 100 (درجه 1). {rounded} {grade}",
-      "ariaLabel": "میانگین امتیاز 0 از 100 {rounded}"
+      "tooltip": "میانگین امتیاز {rounded} از 100 (درجه {grade}).",
+      "ariaLabel": "میانگین امتیاز {rounded} از 100"
     },
     "gate": {
       "fallback": "دروازه‌های کیفیت ناموفق بود - آستانه‌های بازبینی در تنظیمات Code Health.",
@@ -716,8 +716,8 @@
     "kpi": {
       "ariaLabel": "خلاصه کد سلامت",
       "allClear": "هیچ توابع پرچم‌گذاری شده در هیچ دسته‌ای وجود ندارد - همه واضح است.",
-      "clickToFilter": "برای فیلتر کردن جدول به توابع پرچمدار 0 کلیک کنید. {flag}",
-      "noFlagged": "هیچ عملکردی با 0 پرچم گذاری نشده است. {flag}",
+      "clickToFilter": "برای فیلتر کردن جدول به توابع پرچمدار {flag} کلیک کنید.",
+      "noFlagged": "هیچ عملکردی با {flag} پرچم گذاری نشده است.",
       "unused": "استفاده نشده",
       "unusedSub": "توابع به هیچ کجا ارجاع داده نمی شود",
       "uncovered": "بدون پوشش",
@@ -744,7 +744,7 @@
     "table": {
       "ariaLabel": "بدترین توابع با نمره",
       "heading": "بدترین عملکردها",
-      "topCount": "بالای 0 از 1 {shown} {total}",
+      "topCount": "بالای {shown} از {total}",
       "colGrade": "درجه",
       "colScore": "امتیاز",
       "colFunction": "تابع",
@@ -768,9 +768,9 @@
     },
     "script": {
       "activeFiltersLabel": "فیلترهای فعال:",
-      "searchChip": "جستجو: \"0\" {q}",
-      "flagChip": "پرچم: 0 {flag}",
-      "removeAria": "0 را حذف کنید {key}",
+      "searchChip": "جستجو: \"{q}\"",
+      "flagChip": "پرچم: {flag}",
+      "removeAria": "{key} را حذف کنید",
       "clearAll": "همه را پاک کنید",
       "rowsVisible": "{visible} از {total} ردیف قابل مشاهده است",
       "neverRun": "هرگز اجرا نکنید"
@@ -803,7 +803,7 @@
   "telemetry": {
     "heroTitle": "قوانین مرتبط تله متری",
     "skipToCounters": "به شمارنده های تله متری پرش کنید",
-    "lastEvent": "آخرین رویداد 0 {relative}",
+    "lastEvent": "آخرین رویداد {relative}",
     "noEvents": "هیچ رویدادی ثبت نشده است",
     "totalEventOne": "{count} رویداد کل",
     "totalEventOther": "{count} رویداد کل",

@@ -7,7 +7,7 @@
   "views.actions.name": "Ações",
   "views.status.name": "Status",
   "views.settings.name": "Configurações",
-  "views.help.name": "Help (v13.10.1)",
+  "views.help.name": "Ajuda",
   "viewsWelcome.banner.contents": "**Saropa Lints**\n\nMais de 2100 regras de Dart e Flutter para segurança, acessibilidade e desempenho.\n\nRequer um projeto Dart ou Flutter.\n\nAbra uma pasta contendo `pubspec.yaml` para começar.\n\n[Saiba mais on-line](https://pub.dev/packages/saropa_lints)\n[Navegar por todos os comandos](comando:saropaLints.showCommandCatalog)\n[Sobre Saropa Lints](comando:saropaLints.showAbout)\n[Primeiros passos](comando: saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: Configurar projeto (pubspec + config)",
   "command.disable.title": "Saropa Lints: Desative a integração do Lint",

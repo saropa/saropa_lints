@@ -42,17 +42,17 @@
     "retry": "重试",
     "reload": "重新加载",
     "copyDetails": "复制详细信息",
-    "unreachable": "无法达到0 {target}",
+    "unreachable": "无法到达 {target}",
     "partialSummary": "已加载 {total} 个 {item} 中的 {loaded} 个。{failed} 个失败。",
     "partialRetry": "重试失败"
   },
   "offline": {
     "banner": "离线 — 重新连接以刷新。",
-    "cachedFooter": "显示来自 0 的缓存数据。 {when}",
+    "cachedFooter": "显示来自 {when} 的缓存数据。",
     "reconnecting": "正在重新连接..."
   },
   "stale": {
-    "statusPill": "上次成功运行0 — 刷新失败 {when}"
+    "statusPill": "上次成功运行 {when} — 刷新失败"
   },
   "filter": {
     "searchPlaceholder": "搜索…",
@@ -63,7 +63,7 @@
   },
   "a11y": {
     "toggleFullWidth": "切换全角布局",
-    "sortBy": "按0排序 {column}",
+    "sortBy": "按 {column} 排序",
     "expandRow": "展开行",
     "collapseRow": "折叠行",
     "selectAll": "选择所有行",
@@ -76,21 +76,21 @@
       "placeholder": "选择侧边栏和仪表板的语言",
       "auto": "自动（跟随 VS Code 显示语言）"
     },
-    "reloadPrompt": "语言设置为0。重新加载窗口以更新侧边栏和命令标签。 {locale}",
+    "reloadPrompt": "语言设置为 {locale}。重新加载窗口以更新侧边栏和命令标签。",
     "reloadNow": "立即重新加载",
     "reloadLater": "之后"
   },
   "brand": {
-    "prefix": "沙罗巴"
+    "prefix": "Saropa "
   },
   "findingsDash": {
-    "pageTitle": "萨罗巴调查结果仪表板",
-    "documentTitle": "萨罗巴调查结果仪表板",
+    "pageTitle": "Saropa 调查结果仪表板",
+    "documentTitle": "Saropa 调查结果仪表板",
     "skipToFindings": "跳至调查结果",
     "secondaryAsideLabel": "二次诊断",
     "hero": {
       "productTitle": "调查结果仪表板",
-      "gaugeTitle": "健康评分0/100（1级）。错误是最重的。 {grade} {score}"
+      "gaugeTitle": "健康得分 {score}/100（等级 {grade}）。错误是最重的。"
     },
     "time": {
       "justNow": "现在",
@@ -106,8 +106,8 @@
       "findingOne": "{count} 个发现",
       "findingOther": "{count} 个发现",
       "todoHackTitle": "在工作区中发现 TODO 和 HACK 标记",
-      "driftOnTitle": "漂移顾问已连接：0 {label}",
-      "driftOnPill": "漂移·0 {count}",
+      "driftOnTitle": "漂移顾问已连接：{label}",
+      "driftOnPill": "漂移·{count}",
       "driftOfflineTitle": "漂移顾问已启用但未找到服务器",
       "driftOfflinePill": "离线漂移",
       "enabledRulesTitle": "当前层启用的规则",
@@ -123,13 +123,13 @@
       "ruleStatus": "规则状态"
     },
     "seg": {
-      "toggleSeverityTitle": "切换 0 严重性 {v}",
-      "toggleImpactTitle": "切换 0 影响 {v}"
+      "toggleSeverityTitle": "切换 {v} 严重性",
+      "toggleImpactTitle": "切换 {v} 影响"
     },
     "kpi": {
       "visibleLabel": "可见的发现",
       "allMatched": "全部匹配",
-      "ofTotal": "总计 0 {total}",
+      "ofTotal": "共 {total} 个",
       "clearFiltersTitle": "单击以清除所有过滤器",
       "errorsLabel": "错误",
       "errorsSubFix": "必须修复",
@@ -148,7 +148,7 @@
       "filesSubNone": "没有文件受影响",
       "filesTitle": "不同的文件至少有一项发现",
       "topRuleLabel": "顶部规则",
-      "topRuleTitle": "过滤结果以规则 0 {name}"
+      "topRuleTitle": "过滤结果以规则 {name}"
     },
     "toolbar": {
       "ariaFiltersActions": "过滤器和操作",
@@ -171,13 +171,13 @@
       "impactLabel": "影响",
       "moreSummary": "更多的",
       "moreChevron": "▾",
-      "copyJsonTitle": "将过滤后的违规行为复制为 JSON (0) {count}",
+      "copyJsonTitle": "将过滤后的违规行为复制为 JSON ({count})",
       "saveReportTitle": "将过滤后的违规行为以 JSON 格式保存到 reports/YYYYMMDD/"
     },
     "chip": {
-      "contains": "包含“0” {q}",
-      "severityOff": "严重程度≠0 {v}",
-      "impactOff": "影响≠0 {v}",
+      "contains": "包含“{q}”",
+      "severityOff": "严重程度 ≠ {v}",
+      "impactOff": "影响 ≠ {v}",
       "resetAllTitle": "重置所有过滤器",
       "removeFilterAria": "移除过滤器"
     },
@@ -185,7 +185,7 @@
       "help": "帮助",
       "groupBy": "分组依据...",
       "textFilter": "文本过滤器...",
-      "severityImpact": "Severity filter…",
+      "severityImpact": "严重性过滤器...",
       "hideRules": "隐藏规则...",
       "ruleMetadata": "规则元数据",
       "clearFilters": "清除过滤器",
@@ -197,18 +197,18 @@
       "openPackageDashboard": "打开包仪表板",
       "openCodeHealth": "开放代码健康",
       "openLintsConfig": "打开 Lints 配置",
-      "reloadFromDisk": "Reload from disk",
-      "reloadFromDiskTitle": "Re-render the dashboard from the last violations.json without re-running the analyzer.",
-      "reEnableDisabledRules": "Re-enable disabled rules…",
-      "reEnableDisabledRulesTitle": "Open a quick-pick of rules currently disabled in analysis_options_custom.yaml and re-enable the chosen ones.",
-      "reEnableNoneTitle": "No rules currently disabled",
-      "reEnableNoneMessage": "No rules are currently disabled via analysis_options_custom.yaml.",
-      "reEnableQuickPickTitle": "Re-enable disabled rules",
-      "reEnableQuickPickPlaceholder": "Select one or more rules to re-enable",
-      "menuGroupExport": "Export",
-      "menuGroupFilter": "Filter & focus",
-      "menuGroupOpen": "Open dashboard",
-      "menuGroupSystem": "System"
+      "reloadFromDisk": "从磁盘重新加载",
+      "reloadFromDiskTitle": "从最后一个 Violations.json 重新渲染仪表板，而无需重新运行分析器。",
+      "reEnableDisabledRules": "重新启用禁用的规则...",
+      "reEnableDisabledRulesTitle": "打开 Analysis_options_custom.yaml 中当前禁用的规则的快速选择，然后重新启用所选的规则。",
+      "reEnableNoneTitle": "目前没有禁用规则",
+      "reEnableNoneMessage": "当前没有通过analysis_options_custom.yaml禁用任何规则。",
+      "reEnableQuickPickTitle": "重新启用已禁用的规则",
+      "reEnableQuickPickPlaceholder": "选择一个或多个规则以重新启用",
+      "menuGroupExport": "出口",
+      "menuGroupFilter": "过滤和聚焦",
+      "menuGroupOpen": "打开仪表板",
+      "menuGroupSystem": "系统"
     },
     "progress": {
       "runningLabel": "运行分析...",
@@ -222,8 +222,8 @@
       "disableButton": "禁用",
       "workspaceOnlyShort": "仅工作区",
       "projectConfigShort": "项目配置（写入analysis_options_custom.yaml）",
-      "topRulesOne": "顶部 0 规则 {count}",
-      "topRulesOther": "前 0 规则 {count}",
+      "topRulesOne": "前 {count} 条规则",
+      "topRulesOther": "前 {count} 条规则",
       "colRank": "#",
       "colRule": "规则",
       "colCount": "数数",
@@ -247,9 +247,9 @@
       "copyRowTitle": "将此结果复制为 JSON",
       "metaShown": "显示 {filtered} 个",
       "metaAfterDisable": "过滤禁用规则后共 {total} 个",
-      "metaSourceCap": "为了提高性能，源上限为 0 {max}",
-      "metaGroupedBy": "按0分组 {mode}",
-      "overflowNote": "为了渲染性能，源列表被截断为 0。 {max}",
+      "metaSourceCap": "为了提高性能，源上限为 {max}",
+      "metaGroupedBy": "按 {mode} 分组",
+      "overflowNote": "为了渲染性能，源列表在 {max} 处被截断。",
       "runAgain": "再次运行分析",
       "emptyNoViolations": "上次分析运行中没有违规。",
       "emptyNoMatch": "没有与当前过滤器匹配的违规行为。",
@@ -257,7 +257,7 @@
       "emptyHintFilters": "调整过滤器或再次运行分析以查看结果。",
       "reRunAnalysis": "重新运行分析",
       "resetFilters": "重置过滤器",
-      "linePrefix": "L0 {line}"
+      "linePrefix": "L{line}"
     },
     "charts": {
       "sectionAria": "混合图表",
@@ -265,7 +265,7 @@
       "metaClickSlice": "单击切片进行过滤",
       "severityMix": "严重程度组合",
       "impactMix": "影响组合",
-      "filterBarTitle": "仅过滤到 0 {key}",
+      "filterBarTitle": "仅过滤到 {key}",
       "donutTotal": "全部的"
     },
     "todoHack": {
@@ -293,7 +293,7 @@
       "retry": "重试",
       "headingConnected": "漂移顾问",
       "metaConnected": "已连接",
-      "noIssues": "连接到 0 — 当前没有问题。 {label}",
+      "noIssues": "已连接到 {label} — 当前没有问题。",
       "refresh": "刷新",
       "openBrowser": "在浏览器中打开",
       "headingIssues": "漂移顾问",
@@ -307,8 +307,8 @@
       "viewHidesMetaNone": "没有任何",
       "noneInExport": "当前“violations.json”导出中没有分析器抑制。编辑忽略或填充基线后运行分析。",
       "totalRow": "总计 — 清除过滤器并打开结果",
-      "byRule": "按规则 (0) {count}",
-      "byFile": "按文件 (0) {count}",
+      "byRule": "根据规则 ({count})",
+      "byFile": "按文件 ({count})",
       "noEntries": "没有条目。",
       "nothingHidden": "此工作区的问题列表中没有隐藏任何内容。使用树上下文操作来隐藏文件夹、文件或规则；他们坚持工作区状态。",
       "folderPattern": "{count} 个文件夹",
@@ -317,7 +317,7 @@
       "perFileRules": "{count} 个包含按文件隐藏规则的文件",
       "severityHides": "隐藏了 {count} 个严重性",
       "impactHides": "隐藏了 {count} 个影响",
-      "activeHides": "活跃生皮：0。 {counts}",
+      "activeHides": "活动生皮：{counts}。",
       "viewHidesFooter": "这些隐藏仅缩小问题/仪表板列表；它们不会写入“violations.json”。",
       "clearViewHides": "清除所有视图隐藏",
       "foldersSample": "文件夹（样本）",
@@ -331,7 +331,7 @@
       "analysisComplete": "分析完成",
       "metaRunning": "对于大型项目来说，这可能需要一些时间。",
       "metaDone": "使用最新发现刷新仪表板。",
-      "announceSearch": "搜索0 {q}",
+      "announceSearch": "搜索{q}",
       "announceSeverities": "{n} 个严重性",
       "announceImpacts": "{n} 个影响",
       "announceCleared": "所有过滤器已清除",
@@ -359,9 +359,9 @@
     },
     "unknownAnalyzerKind": "未知",
     "supplementary": {
-      "otherAnalyzerOn": "+0 其他分析结果 {count}",
+      "otherAnalyzerOn": "+{count} 个其他分析结果",
       "otherAnalyzerPromo": "+？其他分析结果 — 显示",
-      "analyzerTodosOn": "+0 分析器 TODO {count}",
+      "analyzerTodosOn": "+{count} 分析器 TODO",
       "analyzerTodosPromo": "+？分析器 TODO — 显示",
       "scannerPromo": "启用 TODO/HACK 扫描器",
       "tooltipLive": "从 VS Code 问题面板实时查看。分析完成后更新。单击即可隐藏。",
@@ -383,7 +383,7 @@
     "summaryRuleTriage": "规则分类",
     "hintNoViolations": "还没有 `reports/.saropa_lints/violations.json` 。运行分析，然后刷新此选项卡。",
     "hintUnreadable": "没有可读的违规导出。首先运行 Saropa Lints 分析。",
-    "hintStale": "分类数据可能已过时（导出为 0 旧数据）。对当前组重新运行分析。 {age}",
+    "hintStale": "分类数据可能已过时（导出为 {age} 旧）。对当前组重新运行分析。",
     "hintNoPerRule": "此导出没有每条规则的问题计数。使用当前的 Saropa Lints 插件重新分析。",
     "hintBuildFailed": "无法从此导出建立分类。运行新的分析。",
     "summaryVolume": "规则分类（数量/必须修复/风格）",
@@ -400,14 +400,14 @@
     "openWorkspaceFirst": "首先打开工作区文件夹。",
     "noReportYet": "尚未收到违规报告。首先运行 Saropa Lints 分析。",
     "clipboardCopyFailed": "无法复制到剪贴板。",
-    "copiedViolationsJson": "将 0 违规行为复制为 JSON。 {count}",
+    "copiedViolationsJson": "已将 {count} 个违规行为复制为 JSON。",
     "copiedOneViolationJson": "将 1 个违规行为复制为 JSON。",
     "driftNotConnected": "Drift Advisor 服务器未连接。",
-    "copiedBulkFindings": "将 0 选定的结果复制为 JSON。 {count}",
+    "copiedBulkFindings": "已将 {count} 个选定的结果复制为 JSON。",
     "noMatchingFindingsCopy": "没有匹配的结果可供复制。",
-    "couldNotOpenFile": "无法打开文件：0 {path}",
+    "couldNotOpenFile": "无法打开文件：{path}",
     "saveReportNoWorkspace": "保存报告之前打开工作区文件夹。",
-    "savedFindings": "已保存 0 结果：1 {path} {count}",
+    "savedFindings": "已保存 {count} 个结果：{path}",
     "couldNotSaveReportJson": "无法保存报告 JSON。"
   },
   "packageDashboard": {
@@ -416,7 +416,7 @@
     "status": {
       "packagesCount": "{count} 个包",
       "packagesBreakdown": "{direct} 个直接，{transitive} 个传递",
-      "gradeLine": "等级0·1/100 {avg} {grade}",
+      "gradeLine": "牌号 {grade} · {avg}/100",
       "flaggedCount": "已标记 {count} 个",
       "flaggedTitle": "被遗弃或报废"
     },
@@ -424,14 +424,14 @@
       "heading": "扫描包裹",
       "body1": "Saropa 正在为该项目中的每个直接依赖项获取 pub.dev 元数据、GitHub 活动和依赖关系图。",
       "body2": "扫描完成后，该页面将自动刷新。您可以从右下角的进度通知中取消。",
-      "versionStamp": "Saropa 软件包仪表板 v0 {version}"
+      "versionStamp": "Saropa 套件仪表板 v{version}"
     },
-    "gaugeTitle": "工程包等级：0 {grade}",
+    "gaugeTitle": "项目包等级：{grade}",
     "summary": {
       "packages": "套餐",
       "projectGrade": "工程包等级",
       "totalSize": "总尺寸*",
-      "gradeTooltip": "工程等级0\n平均分：1/100\n套餐：2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {e} {f} {c} {a} {b} {avgScore} {pkgCount}",
+      "gradeTooltip": "项目等级 {avgGrade}\n平均分：{avgScore}/100\n包装：{pkgCount}\nA:{a} B:{b} C:{c} E:{e} F:{f}",
       "vibrantTitle": "充满活力",
       "stableTitle": "稳定的",
       "outdatedTitle": "过时的",
@@ -446,13 +446,13 @@
       "caveatLine2": "活动阈值：90d = 陈旧，180d = 休眠（提交 + 发布时间表）。"
     },
     "breakdown": {
-      "title": "为什么评分0？ — 2 包的 1/100 平均值 {pkgCount} {avgScore} {grade}",
+      "title": "为什么要给{grade}评分？ — {pkgCount} 个软件包的 {avgScore}/100 平均值",
       "hint": "点击展开",
       "distributionHeading": "分配",
       "signalsHeading": "风险信号拖累分数下跌",
-      "signalFlagged": "{count} flagged (abandoned / end-of-life)",
-      "signalVulnerable": "{count} with known vulnerabilities",
-      "signalUpdates": "{count} have updates available",
+      "signalFlagged": "{count} 已标记（废弃/寿命终止）",
+      "signalVulnerable": "有 {count} 个已知漏洞",
+      "signalUpdates": "{count} 有可用更新",
       "bottomHeading": "得分最低的套餐",
       "thresholdsHeading": "分数如何映射到成绩",
       "thresholdA": "70+ — 充满活力：积极维护，最近发布",
@@ -461,7 +461,7 @@
       "thresholdE": "低于 20 — 废弃：不活动的迹象",
       "thresholdF": "在 pub.dev 上停止或存档（未使用分数）",
       "filterTooltip": "将包表过滤为仅此类别",
-      "jumpTooltip": "跳转到封装表中0 {name}"
+      "jumpTooltip": "跳转到包表中的{name}"
     },
     "network": {
       "summary": "依赖网络"
@@ -604,9 +604,9 @@
     }
   },
   "commandCatalog": {
-    "documentTitle": "萨罗巴指挥目录",
+    "documentTitle": "Saropa 命令目录",
     "skipLink": "跳至命令目录",
-    "heroTitle": "萨罗巴指挥目录",
+    "heroTitle": "Saropa 命令目录",
     "status": {
       "commands": "{count} 个命令",
       "categories": "{count} 个类别",
@@ -657,10 +657,10 @@
     "entry": {
       "internalBadgeTitle": "仅从上下文菜单触发",
       "internalBadge": "菜单",
-      "copyTitle": "复制命令ID (0) {id}",
+      "copyTitle": "复制命令 ID ({id})",
       "copyAria": "复制命令 ID"
     },
-    "categoryJumpTitle": "跳转至0 {category}",
+    "categoryJumpTitle": "跳转至{category}",
     "shortcuts": {
       "focusSearch": "聚焦搜索字段",
       "navRows": "导航可见的命令行",
@@ -670,14 +670,14 @@
       "showOverlay": "显示此快捷方式叠加层"
     },
     "script": {
-      "moreSuffix": "+0 更多 {count}",
+      "moreSuffix": "+还有{count}个",
       "showLess": "显示较少",
       "runSingular": "跑步",
       "runPlural": "运行",
       "recentWord": "最近的",
       "expandAll": "全部展开",
       "collapseAll": "全部折叠",
-      "searchChip": "搜索：“0” {query}",
+      "searchChip": "搜索：“{query}”",
       "internalChip": "显示上下文菜单命令",
       "removeFilterPrefix": "移除过滤器",
       "matchOne": "{count} 个匹配项",
@@ -685,26 +685,26 @@
     }
   },
   "codeHealth": {
-    "documentTitle": "萨罗巴代码健康仪表板",
+    "documentTitle": "Saropa 代码健康仪表板",
     "skipToTable": "跳至功能表",
     "openWorkspaceFirst": "首先打开 Dart/Flutter 工作区。",
     "scanningTitle": "代码健康：扫描功能...",
     "runReportFirst": "再次运行报告，然后复制 JSON。",
     "copiedJson": "代码健康 JSON 已复制到剪贴板。",
-    "couldNotOpenFile": "无法打开文件：0 {path}",
-    "panelTitle": "萨罗巴代码健康仪表板",
+    "couldNotOpenFile": "无法打开文件：{path}",
+    "panelTitle": "Saropa 代码健康仪表板",
     "hero": {
-      "title": "萨罗巴代码健康仪表板",
+      "title": "Saropa 代码健康仪表板",
       "generated": "生成",
       "functionOne": "{count} 个函数",
       "functionOther": "{count} 个函数",
-      "avgFormat": "平均 0 (1) {grade} {score}",
+      "avgFormat": "平均 {score} ({grade})",
       "gatesFailing": "门失败",
       "gatesPassing": "大门经过"
     },
     "gauge": {
-      "tooltip": "平均分0为100分（等级1）。 {rounded} {grade}",
-      "ariaLabel": "平均分 0 100 {rounded}"
+      "tooltip": "平均分 {rounded} 为 100（等级 {grade}）。",
+      "ariaLabel": "平均分 {rounded} 为 100"
     },
     "gate": {
       "fallback": "质量门失败 - 检查代码运行状况设置中的阈值。",
@@ -716,8 +716,8 @@
     "kpi": {
       "ariaLabel": "代码健康摘要",
       "allClear": "任何类别中都没有标记的功能 - 一切都很清楚。",
-      "clickToFilter": "单击可将表过滤为标记为 0 的函数。 {flag}",
-      "noFlagged": "没有函数标记为0。 {flag}",
+      "clickToFilter": "单击可将表过滤为标记为 {flag} 的函数。",
+      "noFlagged": "没有标记为 {flag} 的函数。",
       "unused": "未使用",
       "unusedSub": "函数没有被引用",
       "uncovered": "裸露",
@@ -744,7 +744,7 @@
     "table": {
       "ariaLabel": "按分数列出的最差函数",
       "heading": "最差的功能",
-      "topCount": "顶部 0 共 1 {shown} {total}",
+      "topCount": "{total} 的顶部 {shown}",
       "colGrade": "年级",
       "colScore": "分数",
       "colFunction": "功能",
@@ -768,9 +768,9 @@
     },
     "script": {
       "activeFiltersLabel": "有源滤波器：",
-      "searchChip": "搜索：“0” {q}",
-      "flagChip": "标志: 0 {flag}",
-      "removeAria": "删除0 {key}",
+      "searchChip": "搜索：“{q}”",
+      "flagChip": "标志: {flag}",
+      "removeAria": "删除{key}",
       "clearAll": "全部清除",
       "rowsVisible": "{total} 行中可见 {visible} 行",
       "neverRun": "从不跑"
@@ -803,7 +803,7 @@
   "telemetry": {
     "heroTitle": "相关规则遥测",
     "skipToCounters": "跳至遥测计数器",
-    "lastEvent": "最后活动0 {relative}",
+    "lastEvent": "最后活动 {relative}",
     "noEvents": "没有记录任何事件",
     "totalEventOne": "共计 {count} 个事件",
     "totalEventOther": "共计 {count} 个事件",

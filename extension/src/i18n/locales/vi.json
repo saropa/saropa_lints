@@ -42,17 +42,17 @@
     "retry": "Thử lại",
     "reload": "Tải lại",
     "copyDetails": "Sao chép chi tiết",
-    "unreachable": "Không thể đạt tới 0 {target}",
+    "unreachable": "Không thể đạt tới {target}",
     "partialSummary": "đã tải {loaded}/{total} {item}. {failed} thất bại.",
     "partialRetry": "Thử lại không thành công"
   },
   "offline": {
     "banner": "Ngoại tuyến - kết nối lại để làm mới.",
-    "cachedFooter": "Hiển thị dữ liệu được lưu trong bộ nhớ đệm từ 0. {when}",
+    "cachedFooter": "Hiển thị dữ liệu được lưu trong bộ nhớ đệm từ {when}.",
     "reconnecting": "Đang kết nối lại…"
   },
   "stale": {
-    "statusPill": "Lần chạy thành công cuối cùng 0 — làm mới không thành công {when}"
+    "statusPill": "Lần chạy thành công cuối cùng {when} — làm mới không thành công"
   },
   "filter": {
     "searchPlaceholder": "Tìm kiếm…",
@@ -63,7 +63,7 @@
   },
   "a11y": {
     "toggleFullWidth": "Chuyển đổi bố cục toàn chiều rộng",
-    "sortBy": "Sắp xếp theo 0 {column}",
+    "sortBy": "Sắp xếp theo {column}",
     "expandRow": "Mở rộng hàng",
     "collapseRow": "Thu gọn hàng",
     "selectAll": "Chọn tất cả các hàng",
@@ -76,12 +76,12 @@
       "placeholder": "Chọn ngôn ngữ cho thanh bên và trang tổng quan",
       "auto": "Tự động (tuân theo ngôn ngữ hiển thị VS Code)"
     },
-    "reloadPrompt": "Ngôn ngữ được đặt thành 0. Tải lại cửa sổ để cập nhật thanh bên và nhãn lệnh. {locale}",
+    "reloadPrompt": "Ngôn ngữ được đặt thành {locale}. Tải lại cửa sổ để cập nhật thanh bên và nhãn lệnh.",
     "reloadNow": "Tải lại ngay bây giờ",
     "reloadLater": "Sau đó"
   },
   "brand": {
-    "prefix": "Saropa"
+    "prefix": "Saropa "
   },
   "findingsDash": {
     "pageTitle": "Bảng điều khiển phát hiện Saropa",
@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "Chẩn đoán thứ cấp",
     "hero": {
       "productTitle": "Trang tổng quan về phát hiện",
-      "gaugeTitle": "Điểm sức khỏe 0/100 (cấp 1). Lỗi nặng nề nhất. {grade} {score}"
+      "gaugeTitle": "Điểm sức khỏe {score}/100 (loại {grade}). Lỗi nặng nề nhất."
     },
     "time": {
       "justNow": "ngay bây giờ",
@@ -106,8 +106,8 @@
       "findingOne": "{count} phát hiện",
       "findingOther": "{count} phát hiện",
       "todoHackTitle": "Đã tìm thấy dấu TODO và HACK trong không gian làm việc",
-      "driftOnTitle": "Drift Advisor đã kết nối: 0 {label}",
-      "driftOnPill": "Trôi đi · 0 {count}",
+      "driftOnTitle": "Drift Advisor đã kết nối: {label}",
+      "driftOnPill": "Trôi đi · {count}",
       "driftOfflineTitle": "Đã bật Drift Advisor nhưng không tìm thấy máy chủ",
       "driftOfflinePill": "Trôi nhé",
       "enabledRulesTitle": "Quy tắc đã bật ở cấp hiện tại",
@@ -123,13 +123,13 @@
       "ruleStatus": "Trạng thái quy tắc"
     },
     "seg": {
-      "toggleSeverityTitle": "Chuyển đổi mức độ nghiêm trọng 0 {v}",
-      "toggleImpactTitle": "Chuyển đổi tác động 0 {v}"
+      "toggleSeverityTitle": "Chuyển đổi mức độ nghiêm trọng của {v}",
+      "toggleImpactTitle": "Chuyển đổi tác động {v}"
     },
     "kpi": {
       "visibleLabel": "Những phát hiện có thể nhìn thấy",
       "allMatched": "tất cả đều khớp",
-      "ofTotal": "tổng cộng là 0 {total}",
+      "ofTotal": "tổng cộng là {total}",
       "clearFiltersTitle": "Nhấp để xóa tất cả bộ lọc",
       "errorsLabel": "Lỗi",
       "errorsSubFix": "phải sửa",
@@ -148,7 +148,7 @@
       "filesSubNone": "không có tập tin nào bị ảnh hưởng",
       "filesTitle": "Các tệp riêng biệt đóng góp ít nhất một phát hiện",
       "topRuleLabel": "Quy tắc hàng đầu",
-      "topRuleTitle": "Lọc kết quả để quy tắc 0 {name}"
+      "topRuleTitle": "Lọc kết quả để quy tắc {name}"
     },
     "toolbar": {
       "ariaFiltersActions": "Bộ lọc và hành động",
@@ -171,13 +171,13 @@
       "impactLabel": "Sự va chạm",
       "moreSummary": "Hơn",
       "moreChevron": "▾",
-      "copyJsonTitle": "Sao chép các vi phạm được lọc dưới dạng JSON (0) {count}",
+      "copyJsonTitle": "Sao chép các vi phạm đã lọc dưới dạng JSON ({count})",
       "saveReportTitle": "Lưu các vi phạm đã lọc dưới dạng JSON vào báo cáo/YYYYMMDD/"
     },
     "chip": {
-      "contains": "chứa \"0\" {q}",
-      "severityOff": "mức độ nghiêm trọng ≠ 0 {v}",
-      "impactOff": "tác động ≠ 0 {v}",
+      "contains": "chứa \"{q}\"",
+      "severityOff": "mức độ nghiêm trọng ≠ {v}",
+      "impactOff": "tác động ≠ {v}",
       "resetAllTitle": "Đặt lại tất cả bộ lọc",
       "removeFilterAria": "Xóa bộ lọc"
     },
@@ -185,7 +185,7 @@
       "help": "Giúp đỡ",
       "groupBy": "Nhóm theo…",
       "textFilter": "Bộ lọc văn bản…",
-      "severityImpact": "Severity filter…",
+      "severityImpact": "Bộ lọc mức độ nghiêm trọng…",
       "hideRules": "Ẩn quy tắc…",
       "ruleMetadata": "Siêu dữ liệu quy tắc",
       "clearFilters": "Xóa bộ lọc",
@@ -197,18 +197,18 @@
       "openPackageDashboard": "Mở bảng thông tin Gói",
       "openCodeHealth": "Sức khỏe mã mở",
       "openLintsConfig": "Mở cấu hình Lint",
-      "reloadFromDisk": "Reload from disk",
-      "reloadFromDiskTitle": "Re-render the dashboard from the last violations.json without re-running the analyzer.",
-      "reEnableDisabledRules": "Re-enable disabled rules…",
-      "reEnableDisabledRulesTitle": "Open a quick-pick of rules currently disabled in analysis_options_custom.yaml and re-enable the chosen ones.",
-      "reEnableNoneTitle": "No rules currently disabled",
-      "reEnableNoneMessage": "No rules are currently disabled via analysis_options_custom.yaml.",
-      "reEnableQuickPickTitle": "Re-enable disabled rules",
-      "reEnableQuickPickPlaceholder": "Select one or more rules to re-enable",
-      "menuGroupExport": "Export",
-      "menuGroupFilter": "Filter & focus",
-      "menuGroupOpen": "Open dashboard",
-      "menuGroupSystem": "System"
+      "reloadFromDisk": "Tải lại từ đĩa",
+      "reloadFromDiskTitle": "Kết xuất lại trang tổng quan từ vi phạm.json gần đây nhất mà không chạy lại trình phân tích.",
+      "reEnableDisabledRules": "Kích hoạt lại các quy tắc đã bị vô hiệu hóa…",
+      "reEnableDisabledRulesTitle": "Mở phần chọn nhanh các quy tắc hiện bị vô hiệu hóa trong analyze_options_custom.yaml và bật lại các quy tắc đã chọn.",
+      "reEnableNoneTitle": "Hiện không có quy tắc nào bị vô hiệu hóa",
+      "reEnableNoneMessage": "Hiện không có quy tắc nào bị vô hiệu hóa thông qua analyze_options_custom.yaml.",
+      "reEnableQuickPickTitle": "Kích hoạt lại các quy tắc đã bị vô hiệu hóa",
+      "reEnableQuickPickPlaceholder": "Chọn một hoặc nhiều quy tắc để kích hoạt lại",
+      "menuGroupExport": "Xuất khẩu",
+      "menuGroupFilter": "Lọc và lấy nét",
+      "menuGroupOpen": "Mở trang tổng quan",
+      "menuGroupSystem": "Hệ thống"
     },
     "progress": {
       "runningLabel": "Đang chạy phân tích…",
@@ -222,8 +222,8 @@
       "disableButton": "Vô hiệu hóa",
       "workspaceOnlyShort": "chỉ không gian làm việc",
       "projectConfigShort": "cấu hình dự án (viết analyze_options_custom.yaml)",
-      "topRulesOne": "Quy tắc 0 hàng đầu {count}",
-      "topRulesOther": "Quy tắc 0 hàng đầu {count}",
+      "topRulesOne": "Quy tắc {count} hàng đầu",
+      "topRulesOther": "Các quy tắc {count} hàng đầu",
       "colRank": "#",
       "colRule": "Luật lệ",
       "colCount": "Đếm",
@@ -247,9 +247,9 @@
       "copyRowTitle": "Sao chép kết quả này dưới dạng JSON",
       "metaShown": "hiển thị {filtered}",
       "metaAfterDisable": "{total} sau khi lọc quy tắc bị vô hiệu hóa",
-      "metaSourceCap": "nguồn giới hạn ở 0 cho hiệu suất {max}",
-      "metaGroupedBy": "được nhóm theo 0 {mode}",
-      "overflowNote": "Danh sách nguồn bị cắt bớt ở mức 0 để đảm bảo hiệu suất kết xuất. {max}",
+      "metaSourceCap": "nguồn được giới hạn ở {max} cho hiệu suất",
+      "metaGroupedBy": "được nhóm theo {mode}",
+      "overflowNote": "Danh sách nguồn bị cắt bớt ở {max} để đảm bảo hiệu suất kết xuất.",
       "runAgain": "Chạy lại phân tích",
       "emptyNoViolations": "Không có vi phạm trong lần chạy phân tích cuối cùng.",
       "emptyNoMatch": "Không có vi phạm nào phù hợp với các bộ lọc hiện tại.",
@@ -257,7 +257,7 @@
       "emptyHintFilters": "Điều chỉnh bộ lọc hoặc chạy lại phân tích để xem kết quả.",
       "reRunAnalysis": "Chạy lại phân tích",
       "resetFilters": "Đặt lại bộ lọc",
-      "linePrefix": "L0 {line}"
+      "linePrefix": "L{line}"
     },
     "charts": {
       "sectionAria": "Trộn biểu đồ",
@@ -265,7 +265,7 @@
       "metaClickSlice": "bấm vào một lát để lọc",
       "severityMix": "Hỗn hợp mức độ nghiêm trọng",
       "impactMix": "Hỗn hợp tác động",
-      "filterBarTitle": "Chỉ lọc tới 0 {key}",
+      "filterBarTitle": "Chỉ lọc tới {key}",
       "donutTotal": "tổng cộng"
     },
     "todoHack": {
@@ -293,7 +293,7 @@
       "retry": "Thử lại",
       "headingConnected": "Cố vấn trôi dạt",
       "metaConnected": "đã kết nối",
-      "noIssues": "Đã kết nối với 0 — hiện tại không có vấn đề gì. {label}",
+      "noIssues": "Đã kết nối với {label} — hiện tại không có vấn đề gì.",
       "refresh": "Làm cho khỏe lại",
       "openBrowser": "Mở trong trình duyệt",
       "headingIssues": "Cố vấn trôi dạt",
@@ -307,8 +307,8 @@
       "viewHidesMetaNone": "không có",
       "noneInExport": "Không có bộ phân tích nào bị chặn trong quá trình xuất `violations.json` hiện tại. Chạy phân tích sau khi chỉnh sửa bỏ qua hoặc đường cơ sở để điền.",
       "totalRow": "Tổng cộng — xóa bộ lọc và mở Kết quả",
-      "byRule": "Theo quy tắc (0) {count}",
-      "byFile": "Theo hồ sơ (0) {count}",
+      "byRule": "Theo quy tắc ({count})",
+      "byFile": "Theo tập tin ({count})",
       "noEntries": "Không có mục nào.",
       "nothingHidden": "Không có gì ẩn khỏi danh sách Sự cố trong không gian làm việc này. Sử dụng các hành động ngữ cảnh dạng cây để ẩn các thư mục, tệp hoặc quy tắc; chúng vẫn tồn tại trong trạng thái không gian làm việc.",
       "folderPattern": "{count} thư mục",
@@ -317,7 +317,7 @@
       "perFileRules": "{count} tệp có ẩn quy tắc theo tệp",
       "severityHides": "{count} ẩn mức độ nghiêm trọng",
       "impactHides": "{count} ẩn tác động",
-      "activeHides": "Ẩn nấp chủ động: 0. {counts}",
+      "activeHides": "Ẩn hoạt động: {counts}.",
       "viewHidesFooter": "Những phần ẩn này chỉ thu nhỏ danh sách Sự cố / bảng thông tin; chúng không được ghi vào `violations.json`.",
       "clearViewHides": "Xóa tất cả chế độ xem ẩn",
       "foldersSample": "Thư mục (mẫu)",
@@ -331,7 +331,7 @@
       "analysisComplete": "Phân tích hoàn tất",
       "metaRunning": "Điều này có thể mất một chút thời gian đối với các dự án lớn.",
       "metaDone": "Làm mới bảng điều khiển với những phát hiện mới nhất.",
-      "announceSearch": "tìm kiếm 0 {q}",
+      "announceSearch": "tìm kiếm {q}",
       "announceSeverities": "{n} mức độ nghiêm trọng",
       "announceImpacts": "{n} tác động",
       "announceCleared": "Đã xóa tất cả bộ lọc",
@@ -359,9 +359,9 @@
     },
     "unknownAnalyzerKind": "Không xác định",
     "supplementary": {
-      "otherAnalyzerOn": "+0 kết quả phân tích khác {count}",
+      "otherAnalyzerOn": "+{count} kết quả phân tích khác",
       "otherAnalyzerPromo": "+? kết quả phân tích khác - hiển thị",
-      "analyzerTodosOn": "+0 TODO phân tích {count}",
+      "analyzerTodosOn": "+{count} phân tích TODO",
       "analyzerTodosPromo": "+? TODO phân tích — hiển thị",
       "scannerPromo": "Kích hoạt trình quét TODO/HACK",
       "tooltipLive": "Trực tiếp từ bảng điều khiển Vấn đề về Mã VS. Cập nhật khi phân tích hoàn tất. Bấm để ẩn.",
@@ -383,7 +383,7 @@
     "summaryRuleTriage": "Phân loại quy tắc",
     "hintNoViolations": "Chưa có `reports/.saropa_lints/violations.json`. Chạy phân tích, sau đó làm mới tab này.",
     "hintUnreadable": "Không xuất vi phạm có thể đọc được. Chạy phân tích Saropa Lints trước.",
-    "hintStale": "Dữ liệu phân loại có thể đã lỗi thời (xuất đã cũ 0). Chạy lại phân tích cho các nhóm hiện tại. {age}",
+    "hintStale": "Dữ liệu phân loại có thể đã lỗi thời (xuất là {age} cũ). Chạy lại phân tích cho các nhóm hiện tại.",
     "hintNoPerRule": "Việc xuất này không có số vấn đề theo quy tắc. Phân tích lại bằng plugin Saropa Lints hiện tại.",
     "hintBuildFailed": "Không thể tạo phân loại từ lần xuất này. Chạy một phân tích mới.",
     "summaryVolume": "Phân loại quy tắc (khối lượng/phải sửa/kiểu cách)",
@@ -400,14 +400,14 @@
     "openWorkspaceFirst": "Trước tiên hãy mở một thư mục không gian làm việc.",
     "noReportYet": "Chưa có báo cáo vi phạm. Chạy phân tích Saropa Lints trước.",
     "clipboardCopyFailed": "Không thể sao chép vào clipboard.",
-    "copiedViolationsJson": "Đã sao chép 0 vi phạm dưới dạng JSON. {count}",
+    "copiedViolationsJson": "Đã sao chép (các) vi phạm {count} dưới dạng JSON.",
     "copiedOneViolationJson": "Đã sao chép 1 vi phạm dưới dạng JSON.",
     "driftNotConnected": "Máy chủ Drift Advisor chưa được kết nối.",
-    "copiedBulkFindings": "Đã sao chép 0 (các) kết quả đã chọn dưới dạng JSON. {count}",
+    "copiedBulkFindings": "Đã sao chép {count} kết quả đã chọn dưới dạng JSON.",
     "noMatchingFindingsCopy": "Không có kết quả phù hợp để sao chép.",
-    "couldNotOpenFile": "Không thể mở tập tin: 0 {path}",
+    "couldNotOpenFile": "Không thể mở tập tin: {path}",
     "saveReportNoWorkspace": "Mở thư mục không gian làm việc trước khi lưu báo cáo.",
-    "savedFindings": "Đã lưu 0 (các) phát hiện: 1 {path} {count}",
+    "savedFindings": "Đã lưu {count} kết quả: {path}",
     "couldNotSaveReportJson": "Không thể lưu JSON báo cáo."
   },
   "packageDashboard": {
@@ -416,7 +416,7 @@
     "status": {
       "packagesCount": "{count} gói",
       "packagesBreakdown": "{direct} trực tiếp, {transitive} bắc cầu",
-      "gradeLine": "Lớp 0 · 1/100 {avg} {grade}",
+      "gradeLine": "Cấp {grade} · {avg}/100",
       "flaggedCount": "{count} đã gắn cờ",
       "flaggedTitle": "Bị bỏ rơi hoặc cuối đời"
     },
@@ -424,14 +424,14 @@
       "heading": "Gói quét",
       "body1": "Saropa đang tìm nạp siêu dữ liệu pub.dev, hoạt động GitHub và biểu đồ phụ thuộc cho mọi phụ thuộc trực tiếp trong dự án này.",
       "body2": "Trang này sẽ tự động làm mới khi quá trình quét kết thúc. Bạn có thể hủy thông báo tiến độ ở phía dưới bên phải.",
-      "versionStamp": "Bảng điều khiển gói Saropa v0 {version}"
+      "versionStamp": "Bảng điều khiển gói Saropa v{version}"
     },
-    "gaugeTitle": "Cấp gói dự án: 0 {grade}",
+    "gaugeTitle": "Cấp gói dự án: {grade}",
     "summary": {
       "packages": "Gói",
       "projectGrade": "Lớp gói dự án",
       "totalSize": "Tổng kích thước*",
-      "gradeTooltip": "Cấp dự án 0\nĐiểm trung bình: 1/100\nGói: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {e} {f} {c} {a} {b} {avgScore} {pkgCount}",
+      "gradeTooltip": "Cấp dự án {avgGrade}\nĐiểm trung bình: {avgScore}/100\nGói: {pkgCount}\nA:{a} B:{b} C:{c} E:{e} F:{f}",
       "vibrantTitle": "Sống động",
       "stableTitle": "Ổn định",
       "outdatedTitle": "lỗi thời",
@@ -446,13 +446,13 @@
       "caveatLine2": "Ngưỡng hoạt động: 90d = cũ, 180d = không hoạt động (cam kết + mốc thời gian phát hành)."
     },
     "breakdown": {
-      "title": "Tại sao lại điểm 0? — trung bình 1/100 trên 2 gói {pkgCount} {avgScore} {grade}",
+      "title": "Tại sao lại xếp hạng {grade}? — {avgScore}/100 trung bình trên các gói {pkgCount}",
       "hint": "Bấm để mở rộng",
       "distributionHeading": "Phân bổ",
       "signalsHeading": "Tín hiệu rủi ro kéo điểm xuống",
-      "signalFlagged": "{count} flagged (abandoned / end-of-life)",
-      "signalVulnerable": "{count} with known vulnerabilities",
-      "signalUpdates": "{count} have updates available",
+      "signalFlagged": "{count} được gắn cờ (bị bỏ rơi / hết tuổi thọ)",
+      "signalVulnerable": "{count} với các lỗ hổng đã biết",
+      "signalUpdates": "{count} có sẵn các bản cập nhật",
       "bottomHeading": "Gói có điểm thấp nhất",
       "thresholdsHeading": "Cách ánh xạ điểm đến các lớp",
       "thresholdA": "70+ — Sống động: được duy trì tích cực, được xuất bản gần đây",
@@ -461,7 +461,7 @@
       "thresholdE": "dưới 20 — Bị bỏ rơi: có dấu hiệu không hoạt động",
       "thresholdF": "Đã ngừng hoặc được lưu trữ trên pub.dev (điểm không được sử dụng)",
       "filterTooltip": "Lọc bảng gói chỉ theo danh mục này",
-      "jumpTooltip": "Chuyển tới 0 trong bảng gói {name}"
+      "jumpTooltip": "Chuyển tới {name} trong bảng gói"
     },
     "network": {
       "summary": "Mạng phụ thuộc"
@@ -657,10 +657,10 @@
     "entry": {
       "internalBadgeTitle": "Chỉ được kích hoạt từ menu ngữ cảnh",
       "internalBadge": "thực đơn",
-      "copyTitle": "Sao chép id lệnh (0) {id}",
+      "copyTitle": "Sao chép id lệnh ({id})",
       "copyAria": "Sao chép id lệnh"
     },
-    "categoryJumpTitle": "Chuyển tới 0 {category}",
+    "categoryJumpTitle": "Chuyển tới {category}",
     "shortcuts": {
       "focusSearch": "Tập trung vào trường tìm kiếm",
       "navRows": "Điều hướng các hàng lệnh hiển thị",
@@ -670,14 +670,14 @@
       "showOverlay": "Hiển thị lớp phủ phím tắt này"
     },
     "script": {
-      "moreSuffix": "+0 thêm {count}",
+      "moreSuffix": "+{count} thêm",
       "showLess": "Hiển thị ít hơn",
       "runSingular": "chạy",
       "runPlural": "chạy",
       "recentWord": "gần đây",
       "expandAll": "Mở rộng tất cả",
       "collapseAll": "Thu gọn tất cả",
-      "searchChip": "Tìm kiếm: \"0\" {query}",
+      "searchChip": "Tìm kiếm: \"{query}\"",
       "internalChip": "Hiển thị các lệnh menu ngữ cảnh",
       "removeFilterPrefix": "Xóa bộ lọc",
       "matchOne": "{count} kết quả phù hợp",
@@ -691,20 +691,20 @@
     "scanningTitle": "Tình trạng mã: chức năng quét…",
     "runReportFirst": "Chạy lại báo cáo, sau đó sao chép JSON.",
     "copiedJson": "Code Health JSON đã được sao chép vào bảng nhớ tạm.",
-    "couldNotOpenFile": "Không thể mở tập tin: 0 {path}",
+    "couldNotOpenFile": "Không thể mở tập tin: {path}",
     "panelTitle": "Bảng điều khiển sức khỏe mã Saropa",
     "hero": {
       "title": "Bảng điều khiển sức khỏe mã Saropa",
       "generated": "Đã tạo",
       "functionOne": "{count} hàm",
       "functionOther": "{count} hàm",
-      "avgFormat": "trung bình 0 (1) {grade} {score}",
+      "avgFormat": "trung bình {score} ({grade})",
       "gatesFailing": "cổng thất bại",
       "gatesPassing": "cổng đi qua"
     },
     "gauge": {
-      "tooltip": "Điểm trung bình 0 trên 100 (lớp 1). {rounded} {grade}",
-      "ariaLabel": "Điểm trung bình 0 trên 100 {rounded}"
+      "tooltip": "Điểm trung bình {rounded} là 100 (lớp {grade}).",
+      "ariaLabel": "Điểm trung bình {rounded} là 100"
     },
     "gate": {
       "fallback": "Cổng chất lượng không thành công - xem lại ngưỡng trong cài đặt Tình trạng mã.",
@@ -716,8 +716,8 @@
     "kpi": {
       "ariaLabel": "Tóm tắt tình trạng mã",
       "allClear": "Không có chức năng nào được gắn cờ trên bất kỳ danh mục nào - tất cả đều rõ ràng.",
-      "clickToFilter": "Bấm để lọc bảng theo các chức năng được gắn cờ 0. {flag}",
-      "noFlagged": "Không có chức năng nào được gắn cờ 0. {flag}",
+      "clickToFilter": "Bấm để lọc bảng theo các chức năng được gắn cờ {flag}.",
+      "noFlagged": "Không có chức năng nào được gắn cờ {flag}.",
       "unused": "Chưa sử dụng",
       "unusedSub": "chức năng được tham chiếu ở đâu",
       "uncovered": "Khám phá",
@@ -744,7 +744,7 @@
     "table": {
       "ariaLabel": "Chức năng tồi tệ nhất theo điểm số",
       "heading": "Chức năng tệ nhất",
-      "topCount": "trên cùng 0 của 1 {shown} {total}",
+      "topCount": "{shown} hàng đầu của {total}",
       "colGrade": "Cấp",
       "colScore": "Điểm",
       "colFunction": "Chức năng",
@@ -768,9 +768,9 @@
     },
     "script": {
       "activeFiltersLabel": "Bộ lọc hoạt động:",
-      "searchChip": "tìm kiếm: \"0\" {q}",
-      "flagChip": "cờ: 0 {flag}",
-      "removeAria": "Xóa 0 {key}",
+      "searchChip": "tìm kiếm: \"{q}\"",
+      "flagChip": "cờ: {flag}",
+      "removeAria": "Loại bỏ {key}",
       "clearAll": "Xóa tất cả",
       "rowsVisible": "hiển thị {visible}/{total} hàng",
       "neverRun": "không bao giờ chạy"
@@ -803,7 +803,7 @@
   "telemetry": {
     "heroTitle": "Quy tắc liên quan từ xa",
     "skipToCounters": "Chuyển đến quầy đo từ xa",
-    "lastEvent": "Sự kiện cuối cùng 0 {relative}",
+    "lastEvent": "Sự kiện cuối cùng {relative}",
     "noEvents": "Không có sự kiện nào được ghi lại",
     "totalEventOne": "tổng số {count} sự kiện",
     "totalEventOther": "tổng số {count} sự kiện",

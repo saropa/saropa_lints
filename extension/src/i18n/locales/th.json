@@ -42,17 +42,17 @@
     "retry": "ลองอีกครั้ง",
     "reload": "โหลดซ้ำ",
     "copyDetails": "คัดลอกรายละเอียด",
-    "unreachable": "ไม่สามารถเข้าถึง0 {target}",
+    "unreachable": "ไม่สามารถเข้าถึง {target}",
     "partialSummary": "โหลด {item} {loaded} จาก {total} รายการ ล้มเหลว {failed} รายการ",
     "partialRetry": "ลองอีกครั้งล้มเหลว"
   },
   "offline": {
     "banner": "ออฟไลน์ — เชื่อมต่อใหม่เพื่อรีเฟรช",
-    "cachedFooter": "แสดงข้อมูลที่แคชจาก 0 {when}",
+    "cachedFooter": "กำลังแสดงข้อมูลที่แคชจาก {when}",
     "reconnecting": "กำลังเชื่อมต่อใหม่..."
   },
   "stale": {
-    "statusPill": "การรันสำเร็จครั้งล่าสุด 0 — การรีเฟรชล้มเหลว {when}"
+    "statusPill": "การรันสำเร็จครั้งล่าสุด {when} — การรีเฟรชล้มเหลว"
   },
   "filter": {
     "searchPlaceholder": "ค้นหา…",
@@ -63,7 +63,7 @@
   },
   "a11y": {
     "toggleFullWidth": "สลับเค้าโครงแบบเต็มความกว้าง",
-    "sortBy": "จัดเรียงตาม 0 {column}",
+    "sortBy": "จัดเรียงตาม {column}",
     "expandRow": "ขยายแถว",
     "collapseRow": "ยุบแถว",
     "selectAll": "เลือกแถวทั้งหมด",
@@ -76,12 +76,12 @@
       "placeholder": "เลือกภาษาสำหรับแถบด้านข้างและแดชบอร์ด",
       "auto": "อัตโนมัติ (ตามภาษาที่แสดง VS Code)"
     },
-    "reloadPrompt": "ตั้งค่าภาษาเป็น 0 โหลดหน้าต่างซ้ำเพื่ออัปเดตแถบด้านข้างและป้ายกำกับคำสั่ง {locale}",
+    "reloadPrompt": "ตั้งค่าภาษาเป็น {locale} โหลดหน้าต่างซ้ำเพื่ออัปเดตแถบด้านข้างและป้ายกำกับคำสั่ง",
     "reloadNow": "โหลดใหม่ตอนนี้",
     "reloadLater": "ภายหลัง"
   },
   "brand": {
-    "prefix": "สโรภา"
+    "prefix": "Saropa "
   },
   "findingsDash": {
     "pageTitle": "แดชบอร์ดการค้นพบของ Saropa",
@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "การวินิจฉัยทุติยภูมิ",
     "hero": {
       "productTitle": "แดชบอร์ดผลการสืบค้น",
-      "gaugeTitle": "คะแนนสุขภาพ 0/100 (เกรด 1) ข้อผิดพลาดมีน้ำหนักมากที่สุด {grade} {score}"
+      "gaugeTitle": "คะแนนสุขภาพ {score}/100 (เกรด {grade}) ข้อผิดพลาดมีน้ำหนักมากที่สุด"
     },
     "time": {
       "justNow": "แค่ตอนนี้",
@@ -106,8 +106,8 @@
       "findingOne": "{count} รายการที่พบ",
       "findingOther": "{count} รายการที่พบ",
       "todoHackTitle": "พบเครื่องหมาย TODO และ HACK ในพื้นที่ทำงาน",
-      "driftOnTitle": "เชื่อมต่อที่ปรึกษาดริฟท์แล้ว: 0 {label}",
-      "driftOnPill": "ล่องลอยไป · 0 {count}",
+      "driftOnTitle": "เชื่อมต่อที่ปรึกษาดริฟท์: {label}",
+      "driftOnPill": "ล่องลอยไป · {count}",
       "driftOfflineTitle": "เปิดใช้งาน Drift Advisor แล้ว แต่ไม่พบเซิร์ฟเวอร์",
       "driftOfflinePill": "ดริฟท์ออฟไลน์",
       "enabledRulesTitle": "กฎที่เปิดใช้งานในระดับปัจจุบัน",
@@ -123,13 +123,13 @@
       "ruleStatus": "สถานะกฎ"
     },
     "seg": {
-      "toggleSeverityTitle": "สลับความรุนแรง 0 {v}",
-      "toggleImpactTitle": "สลับการกระทบ 0 {v}"
+      "toggleSeverityTitle": "สลับความรุนแรง {v}",
+      "toggleImpactTitle": "สลับผลกระทบ {v}"
     },
     "kpi": {
       "visibleLabel": "การค้นพบที่มองเห็นได้",
       "allMatched": "ตรงกันทั้งหมด",
-      "ofTotal": "จากทั้งหมด 0 {total}",
+      "ofTotal": "จากทั้งหมด {total}",
       "clearFiltersTitle": "คลิกเพื่อล้างตัวกรองทั้งหมด",
       "errorsLabel": "ข้อผิดพลาด",
       "errorsSubFix": "ต้องแก้ไข",
@@ -148,7 +148,7 @@
       "filesSubNone": "ไม่มีไฟล์ที่ได้รับผลกระทบ",
       "filesTitle": "ไฟล์ที่แตกต่างกันซึ่งมีส่วนช่วยในการค้นพบอย่างน้อยหนึ่งครั้ง",
       "topRuleLabel": "กฎยอดนิยม",
-      "topRuleTitle": "กรองสิ่งที่ค้นพบไปยังกฎ 0 {name}"
+      "topRuleTitle": "กรองสิ่งที่ค้นพบเพื่อควบคุม {name}"
     },
     "toolbar": {
       "ariaFiltersActions": "ตัวกรองและการดำเนินการ",
@@ -171,13 +171,13 @@
       "impactLabel": "ผลกระทบ",
       "moreSummary": "มากกว่า",
       "moreChevron": "▾",
-      "copyJsonTitle": "คัดลอกการละเมิดที่กรองแล้วเป็น JSON (0) {count}",
+      "copyJsonTitle": "คัดลอกการละเมิดที่กรองแล้วเป็น JSON ({count})",
       "saveReportTitle": "บันทึกการละเมิดที่กรองแล้วเป็น JSON ไปยังรายงาน/YYYYMMDD/"
     },
     "chip": {
-      "contains": "มี \"0\" {q}",
-      "severityOff": "ความรุนแรง ≠ 0 {v}",
-      "impactOff": "ผลกระทบ ≠ 0 {v}",
+      "contains": "มี \"{q}\"",
+      "severityOff": "ความรุนแรง ≠ {v}",
+      "impactOff": "ผลกระทบ ≠ {v}",
       "resetAllTitle": "รีเซ็ตตัวกรองทั้งหมด",
       "removeFilterAria": "ลบตัวกรอง"
     },
@@ -185,7 +185,7 @@
       "help": "ช่วย",
       "groupBy": "จัดกลุ่มตาม...",
       "textFilter": "ตัวกรองข้อความ...",
-      "severityImpact": "Severity filter…",
+      "severityImpact": "ตัวกรองความรุนแรง...",
       "hideRules": "ซ่อนกฎ...",
       "ruleMetadata": "ข้อมูลเมตาของกฎ",
       "clearFilters": "ล้างตัวกรอง",
@@ -197,18 +197,18 @@
       "openPackageDashboard": "เปิดแดชบอร์ดแพ็คเกจ",
       "openCodeHealth": "เปิดรหัสสุขภาพ",
       "openLintsConfig": "เปิดการกำหนดค่า Lints",
-      "reloadFromDisk": "Reload from disk",
-      "reloadFromDiskTitle": "Re-render the dashboard from the last violations.json without re-running the analyzer.",
-      "reEnableDisabledRules": "Re-enable disabled rules…",
-      "reEnableDisabledRulesTitle": "Open a quick-pick of rules currently disabled in analysis_options_custom.yaml and re-enable the chosen ones.",
-      "reEnableNoneTitle": "No rules currently disabled",
-      "reEnableNoneMessage": "No rules are currently disabled via analysis_options_custom.yaml.",
-      "reEnableQuickPickTitle": "Re-enable disabled rules",
-      "reEnableQuickPickPlaceholder": "Select one or more rules to re-enable",
-      "menuGroupExport": "Export",
-      "menuGroupFilter": "Filter & focus",
-      "menuGroupOpen": "Open dashboard",
-      "menuGroupSystem": "System"
+      "reloadFromDisk": "โหลดซ้ำจากดิสก์",
+      "reloadFromDiskTitle": "แสดงผลแดชบอร์ดอีกครั้งจากการละเมิด json ครั้งล่าสุดโดยไม่ต้องเรียกใช้ตัววิเคราะห์อีกครั้ง",
+      "reEnableDisabledRules": "เปิดใช้งานกฎที่ปิดใช้งานอีกครั้ง...",
+      "reEnableDisabledRulesTitle": "เปิดกฎที่เลือกอย่างรวดเร็วที่ปิดใช้งานอยู่ใน analytics_options_custom.yaml และเปิดใช้งานกฎที่เลือกอีกครั้ง",
+      "reEnableNoneTitle": "ไม่มีกฎที่ถูกปิดใช้งานในขณะนี้",
+      "reEnableNoneMessage": "ขณะนี้ไม่มีกฎใดถูกปิดใช้งานผ่าน analytics_options_custom.yaml",
+      "reEnableQuickPickTitle": "เปิดใช้งานกฎที่ปิดใช้งานอีกครั้ง",
+      "reEnableQuickPickPlaceholder": "เลือกกฎอย่างน้อย 1 ข้อเพื่อเปิดใช้งานอีกครั้ง",
+      "menuGroupExport": "ส่งออก",
+      "menuGroupFilter": "กรองและโฟกัส",
+      "menuGroupOpen": "เปิดแดชบอร์ด",
+      "menuGroupSystem": "ระบบ"
     },
     "progress": {
       "runningLabel": "กำลังวิเคราะห์...",
@@ -222,8 +222,8 @@
       "disableButton": "ปิดการใช้งาน",
       "workspaceOnlyShort": "พื้นที่ทำงานเท่านั้น",
       "projectConfigShort": "การกำหนดค่าโครงการ (เขียน analyse_options_custom.yaml)",
-      "topRulesOne": "กฎยอดนิยม 0 {count}",
-      "topRulesOther": "กฎยอดนิยม 0 {count}",
+      "topRulesOne": "กฎ {count} ยอดนิยม",
+      "topRulesOther": "กฎยอดนิยม {count}",
       "colRank": "#",
       "colRule": "กฎ",
       "colCount": "นับ",
@@ -247,9 +247,9 @@
       "copyRowTitle": "คัดลอกการค้นพบนี้เป็น JSON",
       "metaShown": "แสดง {filtered} รายการ",
       "metaAfterDisable": "{total} หลังตัวกรองกฎที่ปิดใช้งาน",
-      "metaSourceCap": "แหล่งที่มาต่อยอดที่ 0 เพื่อประสิทธิภาพ {max}",
-      "metaGroupedBy": "จัดกลุ่มตาม 0 {mode}",
-      "overflowNote": "รายการแหล่งที่มาถูกตัดทอนที่ 0 เพื่อประสิทธิภาพในการเรนเดอร์ {max}",
+      "metaSourceCap": "แหล่งที่มาต่อยอดที่ {max} เพื่อประสิทธิภาพ",
+      "metaGroupedBy": "จัดกลุ่มตาม {mode}",
+      "overflowNote": "รายการแหล่งที่มาถูกตัดทอนที่ {max} เพื่อประสิทธิภาพในการเรนเดอร์",
       "runAgain": "เรียกใช้การวิเคราะห์อีกครั้ง",
       "emptyNoViolations": "ไม่มีการละเมิดในการวิเคราะห์ครั้งล่าสุด",
       "emptyNoMatch": "ไม่มีการละเมิดที่ตรงกับตัวกรองปัจจุบัน",
@@ -257,7 +257,7 @@
       "emptyHintFilters": "ปรับตัวกรองหรือทำการวิเคราะห์อีกครั้งเพื่อดูผลการวิจัย",
       "reRunAnalysis": "ดำเนินการวิเคราะห์อีกครั้ง",
       "resetFilters": "รีเซ็ตตัวกรอง",
-      "linePrefix": "L0 {line}"
+      "linePrefix": "L{line}"
     },
     "charts": {
       "sectionAria": "แผนภูมิผสม",
@@ -265,7 +265,7 @@
       "metaClickSlice": "คลิกชิ้นเพื่อกรอง",
       "severityMix": "ความรุนแรงผสม",
       "impactMix": "ผลกระทบผสม",
-      "filterBarTitle": "กรองเป็น 0 เท่านั้น {key}",
+      "filterBarTitle": "กรองเป็น {key} เท่านั้น",
       "donutTotal": "ทั้งหมด"
     },
     "todoHack": {
@@ -293,7 +293,7 @@
       "retry": "ลองอีกครั้ง",
       "headingConnected": "ที่ปรึกษาดริฟท์",
       "metaConnected": "เชื่อมต่อแล้ว",
-      "noIssues": "เชื่อมต่อกับ 0 — ไม่มีปัญหาในปัจจุบัน {label}",
+      "noIssues": "เชื่อมต่อกับ {label} แล้ว — ไม่มีปัญหาในปัจจุบัน",
       "refresh": "รีเฟรช",
       "openBrowser": "เปิดในเบราว์เซอร์",
       "headingIssues": "ที่ปรึกษาดริฟท์",
@@ -307,8 +307,8 @@
       "viewHidesMetaNone": "ไม่มี",
       "noneInExport": "ไม่มีการระงับตัววิเคราะห์ในการส่งออก `violations.json` ในปัจจุบัน เรียกใช้การวิเคราะห์หลังจากแก้ไขการละเว้นหรือเส้นพื้นฐานที่จะเติมข้อมูล",
       "totalRow": "รวม — ล้างตัวกรองและเปิดผลการสืบค้น",
-      "byRule": "ตามกฎ (0) {count}",
-      "byFile": "ตามไฟล์ (0) {count}",
+      "byRule": "ตามกฎ ({count})",
+      "byFile": "ตามไฟล์ ({count})",
       "noEntries": "ไม่มีรายการ",
       "nothingHidden": "ไม่มีสิ่งใดถูกซ่อนจากรายการปัญหาในพื้นที่ทำงานนี้ ใช้การดำเนินการตามบริบทแบบต้นไม้เพื่อซ่อนโฟลเดอร์ ไฟล์ หรือกฎ พวกเขายังคงอยู่ในสถานะพื้นที่ทำงาน",
       "folderPattern": "{count} โฟลเดอร์",
@@ -317,7 +317,7 @@
       "perFileRules": "{count} ไฟล์ที่มีการซ่อนกฎต่อไฟล์",
       "severityHides": "การซ่อนความรุนแรง {count} รายการ",
       "impactHides": "การซ่อนผลกระทบ {count} รายการ",
-      "activeHides": "การซ่อนที่ใช้งานอยู่: 0 {counts}",
+      "activeHides": "การซ่อนที่ใช้งานอยู่: {counts}",
       "viewHidesFooter": "การซ่อนเหล่านี้จะย่อขนาดรายการปัญหา / แดชบอร์ดเท่านั้น พวกเขาไม่ได้เขียนถึง `violations.json`",
       "clearViewHides": "ล้างการซ่อนมุมมองทั้งหมด",
       "foldersSample": "โฟลเดอร์ (ตัวอย่าง)",
@@ -331,7 +331,7 @@
       "analysisComplete": "การวิเคราะห์เสร็จสมบูรณ์",
       "metaRunning": "การดำเนินการนี้อาจใช้เวลาสักครู่สำหรับโครงการขนาดใหญ่",
       "metaDone": "แดชบอร์ดรีเฟรชพร้อมข้อค้นพบล่าสุด",
-      "announceSearch": "ค้นหา 0 {q}",
+      "announceSearch": "ค้นหา {q}",
       "announceSeverities": "ความรุนแรง {n} ระดับ",
       "announceImpacts": "ผลกระทบ {n} รายการ",
       "announceCleared": "ล้างตัวกรองทั้งหมดแล้ว",
@@ -359,9 +359,9 @@
     },
     "unknownAnalyzerKind": "ไม่ทราบ",
     "supplementary": {
-      "otherAnalyzerOn": "+0 ผลการวิเคราะห์อื่นๆ {count}",
+      "otherAnalyzerOn": "+{count} ผลการวิจัยอื่นๆ ของเครื่องวิเคราะห์",
       "otherAnalyzerPromo": "+? ผลการวิเคราะห์อื่นๆ — แสดง",
-      "analyzerTodosOn": "+0 TODO วิเคราะห์ {count}",
+      "analyzerTodosOn": "+{count} เครื่องวิเคราะห์ TODO",
       "analyzerTodosPromo": "+? TODO วิเคราะห์ — แสดง",
       "scannerPromo": "เปิดใช้งานเครื่องสแกน TODO/HACK",
       "tooltipLive": "ถ่ายทอดสดจากแผง VS Code Problems อัปเดตเมื่อการวิเคราะห์เสร็จสิ้น คลิกเพื่อซ่อน",
@@ -383,7 +383,7 @@
     "summaryRuleTriage": "กฎเกณฑ์การคัดเลือก",
     "hintNoViolations": "ยังไม่มี `reports/.saropa_lints/violations.json` เรียกใช้การวิเคราะห์ จากนั้นรีเฟรชแท็บนี้",
     "hintUnreadable": "ไม่มีการส่งออกการละเมิดที่สามารถอ่านได้ เรียกใช้การวิเคราะห์ Saropa Lints ก่อน",
-    "hintStale": "ข้อมูล Triage อาจล้าสมัย (การส่งออกเป็น 0 เก่า) ดำเนินการวิเคราะห์ซ้ำสำหรับกลุ่มปัจจุบัน {age}",
+    "hintStale": "ข้อมูล Triage อาจล้าสมัย (การส่งออกคือ {age} เก่า) ดำเนินการวิเคราะห์ซ้ำสำหรับกลุ่มปัจจุบัน",
     "hintNoPerRule": "การส่งออกนี้ไม่มีปัญหาต่อกฎ วิเคราะห์อีกครั้งด้วยปลั๊กอิน Saropa Lints ปัจจุบัน",
     "hintBuildFailed": "ไม่สามารถสร้าง triage จากการส่งออกนี้ได้ ทำการวิเคราะห์ใหม่",
     "summaryVolume": "การคัดแยกกฎ (ปริมาณ / ต้องแก้ไข / โวหาร)",
@@ -400,14 +400,14 @@
     "openWorkspaceFirst": "เปิดโฟลเดอร์พื้นที่ทำงานก่อน",
     "noReportYet": "ยังไม่มีรายงานการละเมิด เรียกใช้การวิเคราะห์ Saropa Lints ก่อน",
     "clipboardCopyFailed": "ไม่สามารถคัดลอกไปยังคลิปบอร์ดได้",
-    "copiedViolationsJson": "คัดลอกการละเมิด 0 เป็น JSON {count}",
+    "copiedViolationsJson": "คัดลอกการละเมิด {count} รายการเป็น JSON",
     "copiedOneViolationJson": "คัดลอกการละเมิด 1 รายการเป็น JSON",
     "driftNotConnected": "ไม่ได้เชื่อมต่อเซิร์ฟเวอร์ Drift Advisor",
-    "copiedBulkFindings": "คัดลอกการค้นพบที่เลือก 0 เป็น JSON {count}",
+    "copiedBulkFindings": "คัดลอกผลการสืบค้นที่เลือก {count} รายการเป็น JSON",
     "noMatchingFindingsCopy": "ไม่มีผลการสืบค้นที่ตรงกันที่จะคัดลอก",
-    "couldNotOpenFile": "ไม่สามารถเปิดไฟล์ได้: 0 {path}",
+    "couldNotOpenFile": "ไม่สามารถเปิดไฟล์: {path}",
     "saveReportNoWorkspace": "เปิดโฟลเดอร์พื้นที่ทำงานก่อนที่จะบันทึกรายงาน",
-    "savedFindings": "บันทึกการค้นพบ 0: 1 {path} {count}",
+    "savedFindings": "บันทึกการค้นหา {count}: {path}",
     "couldNotSaveReportJson": "ไม่สามารถบันทึกรายงาน JSON"
   },
   "packageDashboard": {
@@ -416,7 +416,7 @@
     "status": {
       "packagesCount": "{count} แพ็กเกจ",
       "packagesBreakdown": "ทางตรง {direct}, ทางอ้อม {transitive}",
-      "gradeLine": "เกรด 0 · 1/100 {avg} {grade}",
+      "gradeLine": "เกรด {grade} · {avg}/100",
       "flaggedCount": "ตั้งค่าสถานะ {count} รายการ",
       "flaggedTitle": "ละทิ้งหรือสิ้นชีวิต"
     },
@@ -424,14 +424,14 @@
       "heading": "กำลังสแกนแพ็คเกจ",
       "body1": "Saropa กำลังดึงข้อมูลเมตาของ pub.dev กิจกรรม GitHub และกราฟการขึ้นต่อกันสำหรับการขึ้นต่อกันโดยตรงทุกครั้งในโปรเจ็กต์นี้",
       "body2": "หน้านี้จะรีเฟรชโดยอัตโนมัติเมื่อการสแกนเสร็จสิ้น คุณสามารถยกเลิกได้จากการแจ้งเตือนความคืบหน้าที่ด้านล่างขวา",
-      "versionStamp": "แดชบอร์ดแพ็คเกจ Saropa v0 {version}"
+      "versionStamp": "แดชบอร์ดแพ็คเกจ Saropa v{version}"
     },
-    "gaugeTitle": "เกรดแพ็คเกจโครงการ: 0 {grade}",
+    "gaugeTitle": "เกรดแพ็คเกจโครงการ: {grade}",
     "summary": {
       "packages": "แพ็คเกจ",
       "projectGrade": "เกรดแพ็คเกจโครงการ",
       "totalSize": "ขนาดรวม*",
-      "gradeTooltip": "เกรดโครงการ 0\nคะแนนเฉลี่ย: 1/100\nแพ็คเกจ: 2\nก:3 B:4 ค:5 อี:6 ฟ:7 {avgGrade} {e} {f} {c} {a} {b} {avgScore} {pkgCount}",
+      "gradeTooltip": "เกรดโครงการ {avgGrade}\nคะแนนเฉลี่ย: {avgScore}/100\nแพ็คเกจ: {pkgCount}\nก:{a} B:{b} ค:{c} จ:{e} ฉ:{f}",
       "vibrantTitle": "มีชีวิตชีวา",
       "stableTitle": "มั่นคง",
       "outdatedTitle": "ล้าสมัย",
@@ -446,13 +446,13 @@
       "caveatLine2": "เกณฑ์กิจกรรม: 90d = เก่า, 180d = อยู่เฉยๆ (กระทำ + ไทม์ไลน์การเผยแพร่)"
     },
     "breakdown": {
-      "title": "ทำไมต้องเกรด 0? — 1/100 โดยเฉลี่ยจากแพ็คเกจ 2 {pkgCount} {avgScore} {grade}",
+      "title": "ทำไมต้องเกรด {grade}? — เฉลี่ย {avgScore}/100 จากแพ็คเกจ {pkgCount}",
       "hint": "คลิกเพื่อขยาย",
       "distributionHeading": "การกระจาย",
       "signalsHeading": "สัญญาณความเสี่ยงลากคะแนนลง",
-      "signalFlagged": "{count} flagged (abandoned / end-of-life)",
-      "signalVulnerable": "{count} with known vulnerabilities",
-      "signalUpdates": "{count} have updates available",
+      "signalFlagged": "{count} ถูกตั้งค่าสถานะ (ละทิ้ง / สิ้นสุดอายุการใช้งาน)",
+      "signalVulnerable": "{count} ที่มีช่องโหว่ที่ทราบ",
+      "signalUpdates": "{count} มีการอัปเดต",
       "bottomHeading": "แพ็คเกจที่มีคะแนนต่ำสุด",
       "thresholdsHeading": "คะแนนเทียบเคียงกับเกรดอย่างไร",
       "thresholdA": "70+ — มีชีวิตชีวา: ได้รับการดูแลอย่างแข็งขัน เผยแพร่เมื่อเร็วๆ นี้",
@@ -461,7 +461,7 @@
       "thresholdE": "ต่ำกว่า 20 — ถูกทอดทิ้ง: สัญญาณของการไม่ใช้งาน",
       "thresholdF": "ยกเลิกหรือเก็บถาวรบน pub.dev (ไม่ได้ใช้คะแนน)",
       "filterTooltip": "กรองตารางแพ็กเกจให้เหลือเพียงหมวดหมู่นี้",
-      "jumpTooltip": "ข้ามไปที่ 0 ในตารางแพ็คเกจ {name}"
+      "jumpTooltip": "ข้ามไปที่ {name} ในตารางแพ็คเกจ"
     },
     "network": {
       "summary": "เครือข่ายการพึ่งพา"
@@ -657,10 +657,10 @@
     "entry": {
       "internalBadgeTitle": "ทริกเกอร์จากเมนูบริบทเท่านั้น",
       "internalBadge": "เมนู",
-      "copyTitle": "คัดลอกรหัสคำสั่ง (0) {id}",
+      "copyTitle": "คัดลอกรหัสคำสั่ง ({id})",
       "copyAria": "คัดลอกรหัสคำสั่ง"
     },
-    "categoryJumpTitle": "ข้ามไปที่ 0 {category}",
+    "categoryJumpTitle": "ข้ามไปที่ {category}",
     "shortcuts": {
       "focusSearch": "เน้นช่องค้นหา",
       "navRows": "นำทางแถวคำสั่งที่มองเห็นได้",
@@ -670,14 +670,14 @@
       "showOverlay": "แสดงการซ้อนทับทางลัดนี้"
     },
     "script": {
-      "moreSuffix": "+0 เพิ่มเติม {count}",
+      "moreSuffix": "+{count} เพิ่มเติม",
       "showLess": "แสดงน้อยลง",
       "runSingular": "วิ่ง",
       "runPlural": "วิ่ง",
       "recentWord": "ล่าสุด",
       "expandAll": "ขยายทั้งหมด",
       "collapseAll": "ยุบทั้งหมด",
-      "searchChip": "ค้นหา: \"0\" {query}",
+      "searchChip": "ค้นหา: \"{query}\"",
       "internalChip": "การแสดงคำสั่งเมนูบริบท",
       "removeFilterPrefix": "ลบตัวกรอง",
       "matchOne": "ตรงกัน {count} รายการ",
@@ -691,20 +691,20 @@
     "scanningTitle": "ความสมบูรณ์ของโค้ด: ฟังก์ชั่นการสแกน...",
     "runReportFirst": "เรียกใช้รายงานอีกครั้ง จากนั้นคัดลอก JSON",
     "copiedJson": "คัดลอก Code Health JSON ไปยังคลิปบอร์ดแล้ว",
-    "couldNotOpenFile": "ไม่สามารถเปิดไฟล์ได้: 0 {path}",
+    "couldNotOpenFile": "ไม่สามารถเปิดไฟล์: {path}",
     "panelTitle": "แดชบอร์ดสุขภาพ Saropa Code",
     "hero": {
       "title": "แดชบอร์ดสุขภาพ Saropa Code",
       "generated": "สร้างขึ้น",
       "functionOne": "{count} ฟังก์ชัน",
       "functionOther": "{count} ฟังก์ชัน",
-      "avgFormat": "เฉลี่ย 0 (1) {grade} {score}",
+      "avgFormat": "เฉลี่ย {score} ({grade})",
       "gatesFailing": "ประตูล้มเหลว",
       "gatesPassing": "ประตูผ่านไป"
     },
     "gauge": {
-      "tooltip": "คะแนนเฉลี่ย 0 จาก 100 (เกรด 1) {rounded} {grade}",
-      "ariaLabel": "คะแนนเฉลี่ย 0 จาก 100 {rounded}"
+      "tooltip": "คะแนนเฉลี่ย {rounded} ของ 100 (เกรด {grade})",
+      "ariaLabel": "คะแนนเฉลี่ย {rounded} เท่ากับ 100"
     },
     "gate": {
       "fallback": "ประตูคุณภาพล้มเหลว — ตรวจสอบเกณฑ์ในการตั้งค่าความสมบูรณ์ของโค้ด",
@@ -716,8 +716,8 @@
     "kpi": {
       "ariaLabel": "สรุปสุขภาพโค้ด",
       "allClear": "ไม่มีฟังก์ชันที่ถูกตั้งค่าสถานะในทุกหมวดหมู่ — ทั้งหมดชัดเจน",
-      "clickToFilter": "คลิกเพื่อกรองตารางตามฟังก์ชันที่ตั้งค่าสถานะ 0 {flag}",
-      "noFlagged": "ไม่มีฟังก์ชันที่ตั้งค่าสถานะ 0 {flag}",
+      "clickToFilter": "คลิกเพื่อกรองตารางตามฟังก์ชันที่ตั้งค่าสถานะ {flag}",
+      "noFlagged": "ไม่มีฟังก์ชันที่ตั้งค่าสถานะ {flag}",
       "unused": "ไม่ได้ใช้",
       "unusedSub": "ฟังก์ชั่นไม่มีการอ้างอิงที่ไหนเลย",
       "uncovered": "ถูกเปิดเผย",
@@ -744,7 +744,7 @@
     "table": {
       "ariaLabel": "ฟังก์ชั่นแย่ที่สุดตามคะแนน",
       "heading": "ฟังก์ชั่นที่แย่ที่สุด",
-      "topCount": "บน 0 จาก 1 {shown} {total}",
+      "topCount": "ด้านบน {shown} จาก {total}",
       "colGrade": "ระดับ",
       "colScore": "คะแนน",
       "colFunction": "การทำงาน",
@@ -768,9 +768,9 @@
     },
     "script": {
       "activeFiltersLabel": "ตัวกรองที่ใช้งานอยู่:",
-      "searchChip": "ค้นหา: \"0\" {q}",
-      "flagChip": "ธง: 0 {flag}",
-      "removeAria": "ลบ 0 {key}",
+      "searchChip": "ค้นหา: \"{q}\"",
+      "flagChip": "ธง: {flag}",
+      "removeAria": "ลบ {key}",
       "clearAll": "เคลียร์ทั้งหมด",
       "rowsVisible": "มองเห็น {visible} จาก {total} แถว",
       "neverRun": "ไม่เคยวิ่ง"
@@ -803,7 +803,7 @@
   "telemetry": {
     "heroTitle": "กฎเกณฑ์ที่เกี่ยวข้อง",
     "skipToCounters": "ข้ามไปที่เคาน์เตอร์โทรมาตร",
-    "lastEvent": "เหตุการณ์ล่าสุด 0 {relative}",
+    "lastEvent": "งานล่าสุด {relative}",
     "noEvents": "ไม่มีการบันทึกเหตุการณ์",
     "totalEventOne": "เหตุการณ์ทั้งหมด {count} รายการ",
     "totalEventOther": "เหตุการณ์ทั้งหมด {count} รายการ",

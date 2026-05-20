@@ -42,17 +42,17 @@
     "retry": "Mencoba kembali",
     "reload": "Muat ulang",
     "copyDetails": "Salin detailnya",
-    "unreachable": "Tidak dapat mencapai 0 {target}",
+    "unreachable": "Tidak dapat mencapai {target}",
     "partialSummary": "{loaded} dari {total} {item} dimuat. {failed} gagal.",
     "partialRetry": "Coba lagi gagal"
   },
   "offline": {
     "banner": "Offline — sambungkan kembali untuk menyegarkan.",
-    "cachedFooter": "Menampilkan data cache dari 0. {when}",
+    "cachedFooter": "Menampilkan data cache dari {when}.",
     "reconnecting": "Menghubungkan kembali…"
   },
   "stale": {
-    "statusPill": "Terakhir kali berhasil dijalankan 0 — penyegaran gagal {when}"
+    "statusPill": "Terakhir kali berhasil dijalankan {when} — penyegaran gagal"
   },
   "filter": {
     "searchPlaceholder": "Mencari…",
@@ -63,7 +63,7 @@
   },
   "a11y": {
     "toggleFullWidth": "Alihkan tata letak lebar penuh",
-    "sortBy": "Urutkan berdasarkan 0 {column}",
+    "sortBy": "Urutkan berdasarkan {column}",
     "expandRow": "Perluas baris",
     "collapseRow": "Ciutkan baris",
     "selectAll": "Pilih semua baris",
@@ -76,12 +76,12 @@
       "placeholder": "Pilih bahasa untuk sidebar dan dasbor",
       "auto": "Otomatis (ikuti bahasa tampilan VS Code)"
     },
-    "reloadPrompt": "Bahasa disetel ke 0. Muat ulang jendela untuk memperbarui sidebar dan label perintah. {locale}",
+    "reloadPrompt": "Bahasa diatur ke {locale}. Muat ulang jendela untuk memperbarui sidebar dan label perintah.",
     "reloadNow": "Muat ulang sekarang",
     "reloadLater": "Nanti"
   },
   "brand": {
-    "prefix": "Saropa"
+    "prefix": "Saropa "
   },
   "findingsDash": {
     "pageTitle": "Dasbor Temuan Saropa",
@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "Diagnostik sekunder",
     "hero": {
       "productTitle": "Dasbor Temuan",
-      "gaugeTitle": "Skor kesehatan 0/100 (kelas 1). Kesalahan adalah hal yang paling berat. {grade} {score}"
+      "gaugeTitle": "Skor kesehatan {score}/100 (kelas {grade}). Kesalahan adalah hal yang paling berat."
     },
     "time": {
       "justNow": "baru saja",
@@ -106,8 +106,8 @@
       "findingOne": "{count} temuan",
       "findingOther": "{count} temuan",
       "todoHackTitle": "Penanda TODO dan HACK ditemukan di ruang kerja",
-      "driftOnTitle": "Penasihat Drift terhubung: 0 {label}",
-      "driftOnPill": "Melayang · 0 {count}",
+      "driftOnTitle": "Penasihat Drift terhubung: {label}",
+      "driftOnPill": "Melayang · {count}",
       "driftOfflineTitle": "Drift Advisor diaktifkan tetapi tidak ada server yang ditemukan",
       "driftOfflinePill": "Melayang offline",
       "enabledRulesTitle": "Aturan yang diaktifkan di tingkat saat ini",
@@ -123,13 +123,13 @@
       "ruleStatus": "Status aturan"
     },
     "seg": {
-      "toggleSeverityTitle": "Alihkan tingkat keparahan 0 {v}",
-      "toggleImpactTitle": "Alihkan dampak 0 {v}"
+      "toggleSeverityTitle": "Alihkan tingkat keparahan {v}",
+      "toggleImpactTitle": "Alihkan dampak {v}"
     },
     "kpi": {
       "visibleLabel": "Temuan yang terlihat",
       "allMatched": "semuanya cocok",
-      "ofTotal": "dari jumlah 0 {total}",
+      "ofTotal": "dari total {total}",
       "clearFiltersTitle": "Klik untuk menghapus semua filter",
       "errorsLabel": "Kesalahan",
       "errorsSubFix": "harus diperbaiki",
@@ -148,7 +148,7 @@
       "filesSubNone": "tidak ada file yang terpengaruh",
       "filesTitle": "File berbeda berkontribusi setidaknya satu temuan",
       "topRuleLabel": "Aturan teratas",
-      "topRuleTitle": "Filter temuan ke aturan 0 {name}"
+      "topRuleTitle": "Filter temuan untuk mengatur {name}"
     },
     "toolbar": {
       "ariaFiltersActions": "Filter dan tindakan",
@@ -171,13 +171,13 @@
       "impactLabel": "Dampak",
       "moreSummary": "Lagi",
       "moreChevron": "▾",
-      "copyJsonTitle": "Salin pelanggaran yang difilter sebagai JSON (0) {count}",
+      "copyJsonTitle": "Salin pelanggaran yang difilter sebagai JSON ({count})",
       "saveReportTitle": "Simpan pelanggaran yang difilter sebagai JSON ke laporan/YYYYMMDD/"
     },
     "chip": {
-      "contains": "berisi \"0\" {q}",
-      "severityOff": "tingkat keparahan ≠ 0 {v}",
-      "impactOff": "dampak ≠ 0 {v}",
+      "contains": "berisi \"{q}\"",
+      "severityOff": "tingkat keparahan ≠ {v}",
+      "impactOff": "dampak ≠ {v}",
       "resetAllTitle": "Setel ulang semua filter",
       "removeFilterAria": "Hapus penyaring"
     },
@@ -185,7 +185,7 @@
       "help": "Membantu",
       "groupBy": "Kelompokkan berdasarkan…",
       "textFilter": "Filter teks…",
-      "severityImpact": "Severity filter…",
+      "severityImpact": "Filter tingkat keparahan…",
       "hideRules": "Sembunyikan aturan…",
       "ruleMetadata": "Metadata aturan",
       "clearFilters": "Hapus filter",
@@ -197,18 +197,18 @@
       "openPackageDashboard": "Buka dasbor Paket",
       "openCodeHealth": "Buka Kode Kesehatan",
       "openLintsConfig": "Buka Konfigurasi Lints",
-      "reloadFromDisk": "Reload from disk",
-      "reloadFromDiskTitle": "Re-render the dashboard from the last violations.json without re-running the analyzer.",
-      "reEnableDisabledRules": "Re-enable disabled rules…",
-      "reEnableDisabledRulesTitle": "Open a quick-pick of rules currently disabled in analysis_options_custom.yaml and re-enable the chosen ones.",
-      "reEnableNoneTitle": "No rules currently disabled",
-      "reEnableNoneMessage": "No rules are currently disabled via analysis_options_custom.yaml.",
-      "reEnableQuickPickTitle": "Re-enable disabled rules",
-      "reEnableQuickPickPlaceholder": "Select one or more rules to re-enable",
-      "menuGroupExport": "Export",
-      "menuGroupFilter": "Filter & focus",
-      "menuGroupOpen": "Open dashboard",
-      "menuGroupSystem": "System"
+      "reloadFromDisk": "Muat ulang dari disk",
+      "reloadFromDiskTitle": "Render ulang dasbor dari pelanggaran terakhir.json tanpa menjalankan kembali penganalisis.",
+      "reEnableDisabledRules": "Aktifkan kembali aturan yang dinonaktifkan…",
+      "reEnableDisabledRulesTitle": "Buka aturan pilihan cepat yang saat ini dinonaktifkan di analysis_options_custom.yaml dan aktifkan kembali aturan yang dipilih.",
+      "reEnableNoneTitle": "Tidak ada aturan yang saat ini dinonaktifkan",
+      "reEnableNoneMessage": "Saat ini tidak ada aturan yang dinonaktifkan melalui analysis_options_custom.yaml.",
+      "reEnableQuickPickTitle": "Aktifkan kembali aturan yang dinonaktifkan",
+      "reEnableQuickPickPlaceholder": "Pilih satu atau beberapa aturan untuk diaktifkan kembali",
+      "menuGroupExport": "Ekspor",
+      "menuGroupFilter": "Saring & fokus",
+      "menuGroupOpen": "Buka dasbor",
+      "menuGroupSystem": "Sistem"
     },
     "progress": {
       "runningLabel": "Menjalankan analisis…",
@@ -222,8 +222,8 @@
       "disableButton": "Cacat",
       "workspaceOnlyShort": "ruang kerja saja",
       "projectConfigShort": "konfigurasi proyek (tulis analysis_options_custom.yaml)",
-      "topRulesOne": "Aturan 0 teratas {count}",
-      "topRulesOther": "Aturan 0 teratas {count}",
+      "topRulesOne": "Aturan {count} teratas",
+      "topRulesOther": "Aturan {count} teratas",
       "colRank": "#",
       "colRule": "Aturan",
       "colCount": "Menghitung",
@@ -247,9 +247,9 @@
       "copyRowTitle": "Salin temuan ini sebagai JSON",
       "metaShown": "{filtered} ditampilkan",
       "metaAfterDisable": "{total} setelah filter aturan dinonaktifkan",
-      "metaSourceCap": "sumber dibatasi pada 0 untuk kinerja {max}",
-      "metaGroupedBy": "dikelompokkan berdasarkan 0 {mode}",
-      "overflowNote": "Daftar sumber terpotong pada 0 untuk kinerja render. {max}",
+      "metaSourceCap": "sumber dibatasi pada {max} untuk kinerja",
+      "metaGroupedBy": "dikelompokkan berdasarkan {mode}",
+      "overflowNote": "Daftar sumber terpotong pada {max} untuk kinerja render.",
       "runAgain": "Jalankan analisis lagi",
       "emptyNoViolations": "Tidak ada pelanggaran pada analisis terakhir yang dijalankan.",
       "emptyNoMatch": "Tidak ada pelanggaran yang cocok dengan filter saat ini.",
@@ -257,7 +257,7 @@
       "emptyHintFilters": "Sesuaikan filter atau jalankan analisis lagi untuk melihat temuan.",
       "reRunAnalysis": "Jalankan kembali analisis",
       "resetFilters": "Setel ulang filter",
-      "linePrefix": "L0 {line}"
+      "linePrefix": "L{line}"
     },
     "charts": {
       "sectionAria": "Campuran grafik",
@@ -265,7 +265,7 @@
       "metaClickSlice": "klik sepotong untuk memfilter",
       "severityMix": "Campuran tingkat keparahan",
       "impactMix": "Campuran dampak",
-      "filterBarTitle": "Filter ke 0 saja {key}",
+      "filterBarTitle": "Filter ke {key} saja",
       "donutTotal": "total"
     },
     "todoHack": {
@@ -293,7 +293,7 @@
       "retry": "Mencoba kembali",
       "headingConnected": "Penasihat Melayang",
       "metaConnected": "terhubung",
-      "noIssues": "Terhubung ke 0 — tidak ada masalah saat ini. {label}",
+      "noIssues": "Terhubung ke {label} — tidak ada masalah saat ini.",
       "refresh": "Menyegarkan",
       "openBrowser": "Buka di peramban",
       "headingIssues": "Penasihat Melayang",
@@ -307,8 +307,8 @@
       "viewHidesMetaNone": "tidak ada",
       "noneInExport": "Tidak ada penindasan penganalisis dalam ekspor `violations.json` saat ini. Jalankan analisis setelah mengedit pengabaian atau garis dasar untuk diisi.",
       "totalRow": "Total — hapus filter dan buka Temuan",
-      "byRule": "Menurut aturan (0) {count}",
-      "byFile": "Berdasarkan file (0) {count}",
+      "byRule": "Berdasarkan aturan ({count})",
+      "byFile": "Berdasarkan file ({count})",
       "noEntries": "Tidak ada entri.",
       "nothingHidden": "Tidak ada yang tersembunyi dari daftar Masalah di ruang kerja ini. Gunakan tindakan konteks pohon untuk menyembunyikan folder, file, atau aturan; mereka bertahan dalam status ruang kerja.",
       "folderPattern": "{count} folder",
@@ -317,7 +317,7 @@
       "perFileRules": "{count} file dengan aturan sembunyikan per file",
       "severityHides": "{count} sembunyikan keparahan",
       "impactHides": "{count} sembunyikan dampak",
-      "activeHides": "Sembunyikan aktif: 0. {counts}",
+      "activeHides": "Sembunyikan aktif: {counts}.",
       "viewHidesFooter": "Penyembunyian ini hanya memperkecil daftar Masalah/dasbor; mereka tidak ditulis ke `violations.json`.",
       "clearViewHides": "Hapus semua tampilan yang disembunyikan",
       "foldersSample": "Folder (contoh)",
@@ -331,7 +331,7 @@
       "analysisComplete": "Analisis selesai",
       "metaRunning": "Ini bisa memakan waktu cukup lama pada proyek-proyek besar.",
       "metaDone": "Menyegarkan dasbor dengan temuan terbaru.",
-      "announceSearch": "cari 0 {q}",
+      "announceSearch": "cari {q}",
       "announceSeverities": "{n} keparahan",
       "announceImpacts": "{n} dampak",
       "announceCleared": "Semua filter dihapus",
@@ -359,9 +359,9 @@
     },
     "unknownAnalyzerKind": "Tidak dikenal",
     "supplementary": {
-      "otherAnalyzerOn": "+0 temuan penganalisis lainnya {count}",
+      "otherAnalyzerOn": "+{count} temuan penganalisis lainnya",
       "otherAnalyzerPromo": "+? temuan penganalisis lainnya — tunjukkan",
-      "analyzerTodosOn": "+0 TODO penganalisis {count}",
+      "analyzerTodosOn": "+{count} TODO penganalisis",
       "analyzerTodosPromo": "+? TODO penganalisis — tunjukkan",
       "scannerPromo": "Aktifkan pemindai TODO/HACK",
       "tooltipLive": "Langsung dari panel VS Code Problems. Pembaruan saat analisis selesai. Klik untuk menyembunyikan.",
@@ -383,7 +383,7 @@
     "summaryRuleTriage": "Aturan triase",
     "hintNoViolations": "Belum ada `reports/.saropa_lints/violations.json`. Jalankan analisis, lalu segarkan tab ini.",
     "hintUnreadable": "Tidak ada ekspor pelanggaran yang dapat dibaca. Jalankan analisis Saropa Lints terlebih dahulu.",
-    "hintStale": "Data triase mungkin sudah usang (ekspor sudah 0 lama). Jalankan kembali analisis untuk grup saat ini. {age}",
+    "hintStale": "Data triase mungkin sudah usang (ekspor sudah {age} lama). Jalankan kembali analisis untuk grup saat ini.",
     "hintNoPerRule": "Ekspor ini tidak memiliki jumlah masalah per aturan. Analisis ulang dengan plugin Saropa Lints saat ini.",
     "hintBuildFailed": "Tidak dapat membuat triase dari ekspor ini. Jalankan analisis baru.",
     "summaryVolume": "Triase aturan (volume / harus diperbaiki / gaya)",
@@ -400,14 +400,14 @@
     "openWorkspaceFirst": "Buka folder ruang kerja terlebih dahulu.",
     "noReportYet": "Belum ada laporan pelanggaran. Jalankan analisis Saropa Lints terlebih dahulu.",
     "clipboardCopyFailed": "Tidak dapat menyalin ke papan klip.",
-    "copiedViolationsJson": "Menyalin 0 pelanggaran sebagai JSON. {count}",
+    "copiedViolationsJson": "Menyalin pelanggaran {count} sebagai JSON.",
     "copiedOneViolationJson": "Menyalin 1 pelanggaran sebagai JSON.",
     "driftNotConnected": "Server Penasihat Drift tidak terhubung.",
-    "copiedBulkFindings": "Menyalin 0 temuan yang dipilih sebagai JSON. {count}",
+    "copiedBulkFindings": "Menyalin {count} temuan yang dipilih sebagai JSON.",
     "noMatchingFindingsCopy": "Tidak ada temuan yang cocok untuk disalin.",
-    "couldNotOpenFile": "Tidak dapat membuka file: 0 {path}",
+    "couldNotOpenFile": "Tidak dapat membuka file: {path}",
     "saveReportNoWorkspace": "Buka folder ruang kerja sebelum menyimpan laporan.",
-    "savedFindings": "Temuan 0 yang disimpan: 1 {path} {count}",
+    "savedFindings": "Temuan {count} yang disimpan: {path}",
     "couldNotSaveReportJson": "Tidak dapat menyimpan laporan JSON."
   },
   "packageDashboard": {
@@ -416,7 +416,7 @@
     "status": {
       "packagesCount": "{count} paket",
       "packagesBreakdown": "{direct} langsung, {transitive} transitif",
-      "gradeLine": "Kelas 0 · 1/100 {avg} {grade}",
+      "gradeLine": "Nilai {grade} · {avg}/100",
       "flaggedCount": "{count} ditandai",
       "flaggedTitle": "Ditinggalkan atau akhir kehidupan"
     },
@@ -424,14 +424,14 @@
       "heading": "Memindai paket",
       "body1": "Saropa mengambil metadata pub.dev, aktivitas GitHub, dan grafik ketergantungan untuk setiap ketergantungan langsung dalam proyek ini.",
       "body2": "Halaman ini akan disegarkan secara otomatis ketika pemindaian selesai. Anda dapat membatalkan dari pemberitahuan kemajuan di kanan bawah.",
-      "versionStamp": "Dasbor Paket Saropa v0 {version}"
+      "versionStamp": "Dasbor Paket Saropa v{version}"
     },
-    "gaugeTitle": "Kelas Paket Proyek: 0 {grade}",
+    "gaugeTitle": "Nilai Paket Proyek: {grade}",
     "summary": {
       "packages": "Paket",
       "projectGrade": "Kelas Paket Proyek",
       "totalSize": "Ukuran Jumlah*",
-      "gradeTooltip": "Kelas proyek 0\nSkor rata-rata: 1/100\nPaket: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {e} {f} {c} {a} {b} {avgScore} {pkgCount}",
+      "gradeTooltip": "Nilai proyek {avgGrade}\nSkor rata-rata: {avgScore}/100\nPaket: {pkgCount}\nA:{a} B:{b} C:{c} E:{e} F:{f}",
       "vibrantTitle": "Bersemangat",
       "stableTitle": "Stabil",
       "outdatedTitle": "Kedaluwarsa",
@@ -446,13 +446,13 @@
       "caveatLine2": "Ambang batas aktivitas: 90d = basi, 180d = tidak aktif (jadwal komit + rilis)."
     },
     "breakdown": {
-      "title": "Mengapa kelas 0? — Rata-rata 1/100 di seluruh 2 paket {pkgCount} {avgScore} {grade}",
+      "title": "Mengapa kelas {grade}? — Rata-rata {avgScore}/100 di seluruh paket {pkgCount}",
       "hint": "Klik untuk memperluas",
       "distributionHeading": "Distribusi",
       "signalsHeading": "Sinyal risiko menyeret skor ke bawah",
-      "signalFlagged": "{count} flagged (abandoned / end-of-life)",
-      "signalVulnerable": "{count} with known vulnerabilities",
-      "signalUpdates": "{count} have updates available",
+      "signalFlagged": "{count} ditandai (ditinggalkan / habis masa pakainya)",
+      "signalVulnerable": "{count} dengan kerentanan yang diketahui",
+      "signalUpdates": "{count} memiliki pembaruan yang tersedia",
       "bottomHeading": "Paket dengan skor terendah",
       "thresholdsHeading": "Bagaimana skor dipetakan ke nilai",
       "thresholdA": "70+ — Bersemangat: dipelihara secara aktif, baru-baru ini diterbitkan",
@@ -461,7 +461,7 @@
       "thresholdE": "di bawah 20 — Ditinggalkan: tanda-tanda tidak aktif",
       "thresholdF": "Dihentikan atau diarsipkan di pub.dev (skor tidak digunakan)",
       "filterTooltip": "Filter tabel paket hanya ke kategori ini",
-      "jumpTooltip": "Lompat ke 0 di tabel paket {name}"
+      "jumpTooltip": "Lompat ke {name} di tabel paket"
     },
     "network": {
       "summary": "Jaringan Ketergantungan"
@@ -657,10 +657,10 @@
     "entry": {
       "internalBadgeTitle": "Dipicu dari menu konteks saja",
       "internalBadge": "menu",
-      "copyTitle": "Salin id perintah (0) {id}",
+      "copyTitle": "Salin id perintah ({id})",
       "copyAria": "Salin id perintah"
     },
-    "categoryJumpTitle": "Lompat ke 0 {category}",
+    "categoryJumpTitle": "Lompat ke {category}",
     "shortcuts": {
       "focusSearch": "Fokuskan bidang pencarian",
       "navRows": "Navigasi baris perintah yang terlihat",
@@ -670,14 +670,14 @@
       "showOverlay": "Tampilkan hamparan pintasan ini"
     },
     "script": {
-      "moreSuffix": "+0 lagi {count}",
+      "moreSuffix": "+{count} selengkapnya",
       "showLess": "Tampilkan lebih sedikit",
       "runSingular": "berlari",
       "runPlural": "berjalan",
       "recentWord": "terkini",
       "expandAll": "Perluas semuanya",
       "collapseAll": "Ciutkan semuanya",
-      "searchChip": "Pencarian: \"0\" {query}",
+      "searchChip": "Pencarian: \"{query}\"",
       "internalChip": "Menampilkan perintah menu konteks",
       "removeFilterPrefix": "Hapus penyaring",
       "matchOne": "{count} kecocokan",
@@ -691,20 +691,20 @@
     "scanningTitle": "Kode Kesehatan: fungsi pemindaian…",
     "runReportFirst": "Jalankan kembali laporannya, lalu salin JSON.",
     "copiedJson": "Kode Kesehatan JSON disalin ke clipboard.",
-    "couldNotOpenFile": "Tidak dapat membuka file: 0 {path}",
+    "couldNotOpenFile": "Tidak dapat membuka file: {path}",
     "panelTitle": "Dasbor Kesehatan Kode Saropa",
     "hero": {
       "title": "Dasbor Kesehatan Kode Saropa",
       "generated": "Dihasilkan",
       "functionOne": "{count} fungsi",
       "functionOther": "{count} fungsi",
-      "avgFormat": "rata-rata 0 (1) {grade} {score}",
+      "avgFormat": "rata-rata {score} ({grade})",
       "gatesFailing": "gerbang gagal",
       "gatesPassing": "gerbang lewat"
     },
     "gauge": {
-      "tooltip": "Nilai rata-rata 0 dari 100 (kelas 1). {rounded} {grade}",
-      "ariaLabel": "Skor rata-rata 0 dari 100 {rounded}"
+      "tooltip": "Skor rata-rata {rounded} sebesar 100 (kelas {grade}).",
+      "ariaLabel": "Skor rata-rata {rounded} sebesar 100"
     },
     "gate": {
       "fallback": "Gerbang kualitas gagal — meninjau ambang batas dalam pengaturan Code Health.",
@@ -716,8 +716,8 @@
     "kpi": {
       "ariaLabel": "Ringkasan kesehatan kode",
       "allClear": "Tidak ada fungsi yang ditandai di semua kategori — semuanya jelas.",
-      "clickToFilter": "Klik untuk memfilter tabel ke fungsi yang ditandai 0. {flag}",
-      "noFlagged": "Tidak ada fungsi yang ditandai 0. {flag}",
+      "clickToFilter": "Klik untuk memfilter tabel ke fungsi yang ditandai {flag}.",
+      "noFlagged": "Tidak ada fungsi yang ditandai {flag}.",
       "unused": "Tidak digunakan",
       "unusedSub": "fungsi yang tidak direferensikan di mana pun",
       "uncovered": "Terbongkar",
@@ -744,7 +744,7 @@
     "table": {
       "ariaLabel": "Fungsi terburuk berdasarkan skor",
       "heading": "Fungsi terburuk",
-      "topCount": "0 teratas dari 1 {shown} {total}",
+      "topCount": "{shown} teratas dari {total}",
       "colGrade": "Nilai",
       "colScore": "Skor",
       "colFunction": "Fungsi",
@@ -768,9 +768,9 @@
     },
     "script": {
       "activeFiltersLabel": "Filter aktif:",
-      "searchChip": "cari: \"0\" {q}",
-      "flagChip": "bendera: 0 {flag}",
-      "removeAria": "Hapus 0 {key}",
+      "searchChip": "cari: \"{q}\"",
+      "flagChip": "bendera: {flag}",
+      "removeAria": "Hapus {key}",
       "clearAll": "Hapus semuanya",
       "rowsVisible": "{visible} dari {total} baris terlihat",
       "neverRun": "jangan pernah lari"
@@ -803,7 +803,7 @@
   "telemetry": {
     "heroTitle": "Telemetri Aturan Terkait",
     "skipToCounters": "Lewati ke penghitung telemetri",
-    "lastEvent": "Acara terakhir 0 {relative}",
+    "lastEvent": "Acara terakhir {relative}",
     "noEvents": "Tidak ada peristiwa yang tercatat",
     "totalEventOne": "total {count} peristiwa",
     "totalEventOther": "total {count} peristiwa",

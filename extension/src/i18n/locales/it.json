@@ -42,17 +42,17 @@
     "retry": "Riprova",
     "reload": "Ricaricare",
     "copyDetails": "Copia i dettagli",
-    "unreachable": "Impossibile raggiungere 0 {target}",
+    "unreachable": "Impossibile raggiungere {target}",
     "partialSummary": "{loaded} di {total} {item} caricati. {failed} non riusciti.",
     "partialRetry": "Nuovo tentativo fallito"
   },
   "offline": {
     "banner": "Offline: riconnettiti per aggiornare.",
-    "cachedFooter": "Visualizzazione dei dati memorizzati nella cache da 0. {when}",
+    "cachedFooter": "Visualizzazione dei dati memorizzati nella cache da {when}.",
     "reconnecting": "Riconnessione…"
   },
   "stale": {
-    "statusPill": "Ultima esecuzione riuscita 0: aggiornamento non riuscito {when}"
+    "statusPill": "Ultima esecuzione riuscita {when}: aggiornamento non riuscito"
   },
   "filter": {
     "searchPlaceholder": "Ricerca…",
@@ -63,7 +63,7 @@
   },
   "a11y": {
     "toggleFullWidth": "Attiva/disattiva il layout a larghezza intera",
-    "sortBy": "Ordina per 0 {column}",
+    "sortBy": "Ordina per {column}",
     "expandRow": "Espandi riga",
     "collapseRow": "Comprimi riga",
     "selectAll": "Seleziona tutte le righe",
@@ -76,12 +76,12 @@
       "placeholder": "Scegli la lingua per barra laterale e dashboard",
       "auto": "Automatico (segui la lingua di visualizzazione di VS Code)"
     },
-    "reloadPrompt": "Lingua impostata su 0. Ricarica la finestra per aggiornare la barra laterale e le etichette dei comandi. {locale}",
+    "reloadPrompt": "Lingua impostata su {locale}. Ricarica la finestra per aggiornare la barra laterale e le etichette dei comandi.",
     "reloadNow": "Ricarica ora",
     "reloadLater": "Dopo"
   },
   "brand": {
-    "prefix": "Saropa"
+    "prefix": "Saropa "
   },
   "findingsDash": {
     "pageTitle": "Dashboard dei risultati di Saropa",
@@ -90,7 +90,7 @@
     "secondaryAsideLabel": "Diagnostica secondaria",
     "hero": {
       "productTitle": "Pannello dei risultati",
-      "gaugeTitle": "Punteggio sulla salute 0/100 (voto 1). Gli errori pesano di più. {grade} {score}"
+      "gaugeTitle": "Punteggio sulla salute {score}/100 (voto {grade}). Gli errori pesano di più."
     },
     "time": {
       "justNow": "proprio adesso",
@@ -106,8 +106,8 @@
       "findingOne": "{count} risultato",
       "findingOther": "{count} risultati",
       "todoHackTitle": "Indicatori TODO e HACK trovati nell'area di lavoro",
-      "driftOnTitle": "Consigliere di deriva connesso: 0 {label}",
-      "driftOnPill": "Deriva su · 0 {count}",
+      "driftOnTitle": "Consigliere di deriva collegato: {label}",
+      "driftOnPill": "Vai alla deriva · {count}",
       "driftOfflineTitle": "Drift Advisor abilitato ma nessun server trovato",
       "driftOfflinePill": "Vai alla deriva offline",
       "enabledRulesTitle": "Regole abilitate nel livello corrente",
@@ -123,13 +123,13 @@
       "ruleStatus": "Stato della regola"
     },
     "seg": {
-      "toggleSeverityTitle": "Attiva/disattiva la gravità 0 {v}",
-      "toggleImpactTitle": "Attiva/disattiva l'impatto 0 {v}"
+      "toggleSeverityTitle": "Attiva/disattiva la gravità {v}",
+      "toggleImpactTitle": "Attiva/disattiva l'impatto {v}"
     },
     "kpi": {
       "visibleLabel": "Risultati visibili",
       "allMatched": "tutto abbinato",
-      "ofTotal": "di 0 totale {total}",
+      "ofTotal": "di {total} totale",
       "clearFiltersTitle": "Fare clic per cancellare tutti i filtri",
       "errorsLabel": "Errori",
       "errorsSubFix": "deve sistemare",
@@ -148,7 +148,7 @@
       "filesSubNone": "nessun file interessato",
       "filesTitle": "File distinti che contribuiscono ad almeno un risultato",
       "topRuleLabel": "La regola principale",
-      "topRuleTitle": "Filtra i risultati per regolare 0 {name}"
+      "topRuleTitle": "Filtra i risultati per regolare {name}"
     },
     "toolbar": {
       "ariaFiltersActions": "Filtri e azioni",
@@ -171,13 +171,13 @@
       "impactLabel": "Impatto",
       "moreSummary": "Di più",
       "moreChevron": "▾",
-      "copyJsonTitle": "Copia le violazioni filtrate come JSON (0) {count}",
+      "copyJsonTitle": "Copia le violazioni filtrate come JSON ({count})",
       "saveReportTitle": "Salva le violazioni filtrate come JSON nei report/AAAAMMGG/"
     },
     "chip": {
-      "contains": "contiene \"0\" {q}",
-      "severityOff": "gravità ≠ 0 {v}",
-      "impactOff": "impatto ≠ 0 {v}",
+      "contains": "contiene \"{q}\"",
+      "severityOff": "gravità ≠ {v}",
+      "impactOff": "impatto ≠ {v}",
       "resetAllTitle": "Reimposta tutti i filtri",
       "removeFilterAria": "Rimuovi il filtro"
     },
@@ -185,7 +185,7 @@
       "help": "Aiuto",
       "groupBy": "Raggruppa per...",
       "textFilter": "Filtro testo...",
-      "severityImpact": "Severity filter…",
+      "severityImpact": "Filtro gravità...",
       "hideRules": "Nascondi regole...",
       "ruleMetadata": "Metadati delle regole",
       "clearFilters": "Cancella filtri",
@@ -197,18 +197,18 @@
       "openPackageDashboard": "Apri la dashboard del pacchetto",
       "openCodeHealth": "Apri integrità del codice",
       "openLintsConfig": "Apri la configurazione dei lint",
-      "reloadFromDisk": "Reload from disk",
-      "reloadFromDiskTitle": "Re-render the dashboard from the last violations.json without re-running the analyzer.",
-      "reEnableDisabledRules": "Re-enable disabled rules…",
-      "reEnableDisabledRulesTitle": "Open a quick-pick of rules currently disabled in analysis_options_custom.yaml and re-enable the chosen ones.",
-      "reEnableNoneTitle": "No rules currently disabled",
-      "reEnableNoneMessage": "No rules are currently disabled via analysis_options_custom.yaml.",
-      "reEnableQuickPickTitle": "Re-enable disabled rules",
-      "reEnableQuickPickPlaceholder": "Select one or more rules to re-enable",
-      "menuGroupExport": "Export",
-      "menuGroupFilter": "Filter & focus",
-      "menuGroupOpen": "Open dashboard",
-      "menuGroupSystem": "System"
+      "reloadFromDisk": "Ricarica dal disco",
+      "reloadFromDiskTitle": "Eseguire nuovamente il rendering del dashboard dall'ultimo violazioni.json senza eseguire nuovamente l'analizzatore.",
+      "reEnableDisabledRules": "Riattiva le regole disabilitate...",
+      "reEnableDisabledRulesTitle": "Apri una selezione rapida di regole attualmente disabilitate in analysis_options_custom.yaml e riattiva quelle scelte.",
+      "reEnableNoneTitle": "Nessuna regola attualmente disabilitata",
+      "reEnableNoneMessage": "Nessuna regola è attualmente disabilitata tramite analysis_options_custom.yaml.",
+      "reEnableQuickPickTitle": "Riattiva le regole disabilitate",
+      "reEnableQuickPickPlaceholder": "Seleziona una o più regole da riattivare",
+      "menuGroupExport": "Esportare",
+      "menuGroupFilter": "Filtra e concentrati",
+      "menuGroupOpen": "Apri il cruscotto",
+      "menuGroupSystem": "Sistema"
     },
     "progress": {
       "runningLabel": "Esecuzione dell'analisi…",
@@ -222,8 +222,8 @@
       "disableButton": "Disabilita",
       "workspaceOnlyShort": "solo spazio di lavoro",
       "projectConfigShort": "configurazione del progetto (scrive analysis_options_custom.yaml)",
-      "topRulesOne": "Regola superiore 0 {count}",
-      "topRulesOther": "Le migliori 0 regole {count}",
+      "topRulesOne": "Regola principale {count}",
+      "topRulesOther": "Le migliori regole {count}",
       "colRank": "#",
       "colRule": "Regola",
       "colCount": "Contare",
@@ -247,9 +247,9 @@
       "copyRowTitle": "Copia questo risultato come JSON",
       "metaShown": "{filtered} mostrati",
       "metaAfterDisable": "{total} dopo il filtro delle regole disabilitate",
-      "metaSourceCap": "fonte limitata a 0 per le prestazioni {max}",
-      "metaGroupedBy": "raggruppati per 0 {mode}",
-      "overflowNote": "Elenco delle origini troncato a 0 per le prestazioni di rendering. {max}",
+      "metaSourceCap": "fonte limitata a {max} per le prestazioni",
+      "metaGroupedBy": "raggruppati per {mode}",
+      "overflowNote": "Elenco delle origini troncato in {max} per le prestazioni di rendering.",
       "runAgain": "Eseguire nuovamente l'analisi",
       "emptyNoViolations": "Nessuna violazione nell'ultima analisi eseguita.",
       "emptyNoMatch": "Nessuna violazione corrisponde ai filtri attuali.",
@@ -257,7 +257,7 @@
       "emptyHintFilters": "Modifica i filtri o esegui nuovamente l'analisi per visualizzare i risultati.",
       "reRunAnalysis": "Rieseguire l'analisi",
       "resetFilters": "Reimposta i filtri",
-      "linePrefix": "L0 {line}"
+      "linePrefix": "L{line}"
     },
     "charts": {
       "sectionAria": "Mescolare i grafici",
@@ -265,7 +265,7 @@
       "metaClickSlice": "fare clic su una sezione per filtrare",
       "severityMix": "Miscela di gravità",
       "impactMix": "Miscela d'impatto",
-      "filterBarTitle": "Filtra solo su 0 {key}",
+      "filterBarTitle": "Filtra solo su {key}",
       "donutTotal": "totale"
     },
     "todoHack": {
@@ -293,7 +293,7 @@
       "retry": "Riprova",
       "headingConnected": "Consulente di deriva",
       "metaConnected": "collegato",
-      "noIssues": "Connesso a 0: nessun problema attuale. {label}",
+      "noIssues": "Connesso a {label}: nessun problema attuale.",
       "refresh": "Aggiorna",
       "openBrowser": "Apri nel browser",
       "headingIssues": "Consulente di deriva",
@@ -307,8 +307,8 @@
       "viewHidesMetaNone": "nessuno",
       "noneInExport": "Nessuna soppressione dell'analizzatore nell'esportazione corrente di \"violations.json\". Esegui l'analisi dopo aver modificato gli ignoramenti o le linee di base da popolare.",
       "totalRow": "Totale: cancella i filtri e apri Risultati",
-      "byRule": "Per regola (0) {count}",
-      "byFile": "Per file (0) {count}",
+      "byRule": "Per regola ({count})",
+      "byFile": "Per file ({count})",
       "noEntries": "Nessuna voce.",
       "nothingHidden": "Niente di nascosto dall'elenco dei problemi in questa area di lavoro. Utilizzare le azioni del contesto dell'albero per nascondere cartelle, file o regole; persistono nello stato dell'area di lavoro.",
       "folderPattern": "{count} cartelle",
@@ -317,7 +317,7 @@
       "perFileRules": "{count} file con regole nascoste per file",
       "severityHides": "{count} gravità nascoste",
       "impactHides": "{count} impatti nascosti",
-      "activeHides": "Pelli attive: 0. {counts}",
+      "activeHides": "Pelli attive: {counts}.",
       "viewHidesFooter": "Queste pelli riducono solo l'elenco dei problemi/dashboard; non vengono scritti in \"violations.json\".",
       "clearViewHides": "Cancella tutte le visualizzazioni nascoste",
       "foldersSample": "Cartelle (esempio)",
@@ -331,7 +331,7 @@
       "analysisComplete": "Analisi completata",
       "metaRunning": "Questo può richiedere un momento per i progetti di grandi dimensioni.",
       "metaDone": "Aggiornamento del dashboard con gli ultimi risultati.",
-      "announceSearch": "cerca 0 {q}",
+      "announceSearch": "cerca {q}",
       "announceSeverities": "{n} gravità",
       "announceImpacts": "{n} impatti",
       "announceCleared": "Tutti i filtri sono stati cancellati",
@@ -359,9 +359,9 @@
     },
     "unknownAnalyzerKind": "Sconosciuto",
     "supplementary": {
-      "otherAnalyzerOn": "+0 altri risultati dell'analizzatore {count}",
+      "otherAnalyzerOn": "+{count} altri risultati dell'analizzatore",
       "otherAnalyzerPromo": "+? altri risultati dell'analizzatore: mostra",
-      "analyzerTodosOn": "+0 TODO dell'analizzatore {count}",
+      "analyzerTodosOn": "+{count} TODO dell'analizzatore",
       "analyzerTodosPromo": "+? TODO dell'analizzatore: mostra",
       "scannerPromo": "Abilita lo scanner TODO/HACK",
       "tooltipLive": "In diretta dal pannello Problemi VS Code. Aggiornamenti al completamento dell'analisi. Fare clic per nascondere.",
@@ -383,7 +383,7 @@
     "summaryRuleTriage": "Triage delle regole",
     "hintNoViolations": "Nessun `reports/.saropa_lints/violations.json` ancora. Esegui l'analisi, quindi aggiorna questa scheda.",
     "hintUnreadable": "Nessuna esportazione di violazioni leggibili. Eseguire prima l'analisi Saropa Lints.",
-    "hintStale": "I dati di triage potrebbero essere obsoleti (l'esportazione è vecchia di 0). Eseguire nuovamente l'analisi per i gruppi attuali. {age}",
+    "hintStale": "I dati di triage potrebbero essere obsoleti (l'esportazione è vecchia di {age}). Eseguire nuovamente l'analisi per i gruppi attuali.",
     "hintNoPerRule": "Questa esportazione non prevede conteggi di problemi per regola. Rianalizzare con un plugin Saropa Lints corrente.",
     "hintBuildFailed": "Impossibile creare un triage da questa esportazione. Esegui una nuova analisi.",
     "summaryVolume": "Triage delle regole (volume/da correggere/stilistica)",
@@ -400,14 +400,14 @@
     "openWorkspaceFirst": "Apri prima una cartella dell'area di lavoro.",
     "noReportYet": "Nessuna segnalazione di violazione ancora. Eseguire prima l'analisi Saropa Lints.",
     "clipboardCopyFailed": "Impossibile copiare negli appunti.",
-    "copiedViolationsJson": "Violazione/i 0 copiata/e come JSON. {count}",
+    "copiedViolationsJson": "Violazione/i {count} copiata/e come JSON.",
     "copiedOneViolationJson": "Copiata 1 violazione come JSON.",
     "driftNotConnected": "Il server Drift Advisor non è connesso.",
-    "copiedBulkFindings": "Copiato/i 0 risultato/i selezionato/i come JSON. {count}",
+    "copiedBulkFindings": "Copiato/i i risultati selezionati {count} come JSON.",
     "noMatchingFindingsCopy": "Nessun risultato corrispondente da copiare.",
-    "couldNotOpenFile": "Impossibile aprire il file: 0 {path}",
+    "couldNotOpenFile": "Impossibile aprire il file: {path}",
     "saveReportNoWorkspace": "Aprire una cartella dell'area di lavoro prima di salvare il report.",
-    "savedFindings": "Risultato(i) salvato(i) 0: 1 {path} {count}",
+    "savedFindings": "Risultati {count} salvati: {path}",
     "couldNotSaveReportJson": "Impossibile salvare il report JSON."
   },
   "packageDashboard": {
@@ -416,7 +416,7 @@
     "status": {
       "packagesCount": "{count} pacchetti",
       "packagesBreakdown": "{direct} diretti, {transitive} transitivi",
-      "gradeLine": "Voto 0 · 1/100 {avg} {grade}",
+      "gradeLine": "Grado {grade} · {avg}/100",
       "flaggedCount": "{count} segnalati",
       "flaggedTitle": "Abbandonato o a fine vita"
     },
@@ -424,14 +424,14 @@
       "heading": "Scansione dei pacchi",
       "body1": "Saropa sta recuperando i metadati pub.dev, l'attività GitHub e i grafici delle dipendenze per ogni dipendenza diretta in questo progetto.",
       "body2": "Questa pagina si aggiornerà automaticamente al termine della scansione. Puoi annullare dalla notifica di avanzamento in basso a destra.",
-      "versionStamp": "Dashboard del pacchetto Saropa v0 {version}"
+      "versionStamp": "Dashboard del pacchetto Saropa v{version}"
     },
-    "gaugeTitle": "Grado del pacchetto di progetti: 0 {grade}",
+    "gaugeTitle": "Grado del pacchetto progetti: {grade}",
     "summary": {
       "packages": "Pacchetti",
       "projectGrade": "Grado del pacchetto di progetti",
       "totalSize": "Dimensione totale*",
-      "gradeTooltip": "Voto del progetto 0\nPunteggio medio: 1/100\nPacchetti: 2\nA:3 B:4 C:5 E:6 F:7 {avgGrade} {e} {f} {c} {a} {b} {avgScore} {pkgCount}",
+      "gradeTooltip": "Grado del progetto {avgGrade}\nPunteggio medio: {avgScore}/100\nPacchetti: {pkgCount}\nA:{a} B:{b} C:{c} MI:{e} F:{f}",
       "vibrantTitle": "Vibrante",
       "stableTitle": "Stabile",
       "outdatedTitle": "Obsoleto",
@@ -446,13 +446,13 @@
       "caveatLine2": "Soglie di attività: 90d = obsoleto, 180d = dormiente (impegno + tempistiche di rilascio)."
     },
     "breakdown": {
-      "title": "Perché il voto 0? — 1/100 di media tra 2 pacchetti {pkgCount} {avgScore} {grade}",
+      "title": "Perché valutare {grade}? — Media {avgScore}/100 tra i pacchetti {pkgCount}",
       "hint": "Fare clic per espandere",
       "distributionHeading": "Distribuzione",
       "signalsHeading": "Segnali di rischio che trascinano verso il basso il punteggio",
-      "signalFlagged": "{count} flagged (abandoned / end-of-life)",
-      "signalVulnerable": "{count} with known vulnerabilities",
-      "signalUpdates": "{count} have updates available",
+      "signalFlagged": "{count} contrassegnato (abbandonato/fine vita)",
+      "signalVulnerable": "{count} con vulnerabilità note",
+      "signalUpdates": "{count} hanno aggiornamenti disponibili",
       "bottomHeading": "Pacchetti con il punteggio più basso",
       "thresholdsHeading": "Come i punteggi vengono associati ai voti",
       "thresholdA": "70+ - Vivace: mantenuto attivamente, pubblicato di recente",
@@ -461,7 +461,7 @@
       "thresholdE": "inferiore a 20 anni — Abbandonato: segni di inattività",
       "thresholdF": "Fuori produzione o archiviato su pub.dev (punteggio non utilizzato)",
       "filterTooltip": "Filtra la tabella dei pacchetti solo in questa categoria",
-      "jumpTooltip": "Vai a 0 nella tabella dei pacchetti {name}"
+      "jumpTooltip": "Vai a {name} nella tabella dei pacchetti"
     },
     "network": {
       "summary": "Rete di dipendenza"
@@ -657,10 +657,10 @@
     "entry": {
       "internalBadgeTitle": "Attivato solo dai menu contestuali",
       "internalBadge": "menu",
-      "copyTitle": "Copia ID comando (0) {id}",
+      "copyTitle": "Copia ID comando ({id})",
       "copyAria": "Copia ID comando"
     },
-    "categoryJumpTitle": "Vai a 0 {category}",
+    "categoryJumpTitle": "Vai a {category}",
     "shortcuts": {
       "focusSearch": "Focalizza il campo di ricerca",
       "navRows": "Naviga tra le righe di comando visibili",
@@ -670,14 +670,14 @@
       "showOverlay": "Mostra questa sovrapposizione di scorciatoia"
     },
     "script": {
-      "moreSuffix": "+0 in più {count}",
+      "moreSuffix": "+{count} altro",
       "showLess": "Mostra meno",
       "runSingular": "correre",
       "runPlural": "corre",
       "recentWord": "recente",
       "expandAll": "Espandi tutto",
       "collapseAll": "Comprimi tutto",
-      "searchChip": "Cerca: \"0\" {query}",
+      "searchChip": "Cerca: \"{query}\"",
       "internalChip": "Visualizzazione dei comandi del menu contestuale",
       "removeFilterPrefix": "Rimuovi il filtro",
       "matchOne": "{count} corrispondenza",
@@ -691,20 +691,20 @@
     "scanningTitle": "Integrità del codice: funzioni di scansione…",
     "runReportFirst": "Esegui nuovamente il report, quindi copia JSON.",
     "copiedJson": "JSON Code Health copiato negli appunti.",
-    "couldNotOpenFile": "Impossibile aprire il file: 0 {path}",
+    "couldNotOpenFile": "Impossibile aprire il file: {path}",
     "panelTitle": "Cruscotto sanitario del codice Saropa",
     "hero": {
       "title": "Cruscotto sanitario del codice Saropa",
       "generated": "Generato",
       "functionOne": "{count} funzione",
       "functionOther": "{count} funzioni",
-      "avgFormat": "media 0 (1) {grade} {score}",
+      "avgFormat": "medio {score} ({grade})",
       "gatesFailing": "cancelli falliti",
       "gatesPassing": "cancelli che passano"
     },
     "gauge": {
-      "tooltip": "Punteggio medio 0 su 100 (voto 1). {rounded} {grade}",
-      "ariaLabel": "Punteggio medio 0 su 100 {rounded}"
+      "tooltip": "Punteggio medio {rounded} di 100 (voto {grade}).",
+      "ariaLabel": "Punteggio medio {rounded} di 100"
     },
     "gate": {
       "fallback": "I controlli di qualità non sono riusciti: rivedi le soglie nelle impostazioni di integrità del codice.",
@@ -716,8 +716,8 @@
     "kpi": {
       "ariaLabel": "Riepilogo dello stato del codice",
       "allClear": "Nessuna funzione contrassegnata in nessuna categoria: tutto chiaro.",
-      "clickToFilter": "Fare clic per filtrare la tabella in base alle funzioni contrassegnate con 0. {flag}",
-      "noFlagged": "Nessuna funzione contrassegnata 0. {flag}",
+      "clickToFilter": "Fare clic per filtrare la tabella in base alle funzioni contrassegnate con {flag}.",
+      "noFlagged": "Nessuna funzione contrassegnata con {flag}.",
       "unused": "Inutilizzato",
       "unusedSub": "funzioni referenziate da nessuna parte",
       "uncovered": "Scoperto",
@@ -744,7 +744,7 @@
     "table": {
       "ariaLabel": "Peggiori funzioni per punteggio",
       "heading": "Le peggiori funzioni",
-      "topCount": "in alto 0 di 1 {shown} {total}",
+      "topCount": "parte superiore {shown} di {total}",
       "colGrade": "Grado",
       "colScore": "Punto",
       "colFunction": "Funzione",
@@ -768,9 +768,9 @@
     },
     "script": {
       "activeFiltersLabel": "Filtri attivi:",
-      "searchChip": "ricerca: \"0\" {q}",
-      "flagChip": "bandiera: 0 {flag}",
-      "removeAria": "Rimuovi 0 {key}",
+      "searchChip": "ricerca: \"{q}\"",
+      "flagChip": "bandiera: {flag}",
+      "removeAria": "Rimuovere {key}",
       "clearAll": "Cancella tutto",
       "rowsVisible": "{visible} di {total} righe visibili",
       "neverRun": "non correre mai"
@@ -803,7 +803,7 @@
   "telemetry": {
     "heroTitle": "Telemetria delle regole correlate",
     "skipToCounters": "Passa ai contatori di telemetria",
-    "lastEvent": "Ultimo evento 0 {relative}",
+    "lastEvent": "Ultimo evento {relative}",
     "noEvents": "Nessun evento registrato",
     "totalEventOne": "{count} evento totale",
     "totalEventOther": "{count} eventi totali",
