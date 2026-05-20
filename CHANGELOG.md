@@ -49,6 +49,12 @@
 
 - **`use_setstate_synchronously` no longer flags `setState` after an `if (cond || !mounted) return;` guard** — the early-exit recognizer now treats either operand of an `||` disjunction as a valid not-mounted check, matching how it already handles `&&` for positive `mounted` guards. No action required; any `// ignore:` markers added to work around this false positive can be removed.
 
+<details><summary>Maintenance</summary>
+
+- **Stopped tracking `packages/saropa_lints_api/pubspec.lock`** — it had been committed before the `.gitignore` rule that ignores sub-package lockfiles, so the index contradicted the stated intent (consumers re-resolve; tracked sub-package locks only create merge churn). Now untracked via `git rm --cached`.
+
+</details>
+
 ---
 
 ## [13.10.0]
