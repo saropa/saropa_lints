@@ -158,7 +158,7 @@ Step 1 removes the reporter's exact reproducer (`toUniqueByInPlace`). Step 2 rem
 
 ## Commits
 
-<!-- Filled in at commit time. -->
+- `9ba0c37e` — fix: prefer_spread_over_addall no longer flags in-place mutation
 
 ---
 
