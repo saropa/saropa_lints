@@ -1,6 +1,6 @@
 # BUG: `avoid_large_list_copy` — fires on structurally-required `.toList()` that is a cascade target or wrapped in an expression
 
-**Status: Open**
+**Status: Fixed**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
@@ -141,19 +141,26 @@ The cascade case (step 1) alone resolves the `..sort()` instances, which are the
 
 ## Changes Made
 
-<!-- Not yet fixed. Filed from downstream corpus saropa_dart_utils. -->
+`lib/src/rules/core/performance_rules.dart` (`AvoidLargeListCopyRule`):
+
+1. **Dropped `take` from the lazy-chain triggers.** `take(N)` caps the result at N elements, so `take(...).toList()` is bounded by construction and is never a "large" copy — it no longer fires regardless of context (cascade, interpolation, or discarded). `skip(N)` keeps the potentially large tail, so it stays a trigger.
+2. **Rewrote `_isToListRequired` to climb transparent wrappers and recognize cascades.** It now walks up through `ParenthesizedExpression` and `ConditionalExpression` to the nearest semantically meaningful ancestor before applying the existing required-context checks, and treats a `.toList()` (or wrapper around it) that is the *target* of a `CascadeExpression` as required — the cascade sections (`..sort()`, `..shuffle()`, `..add()`) are List-only mutators absent from `Iterable`.
+
+Net effect: the cascade `..sort()` case, the ternary-assigned-to-typed-`List` case, and both `take(N)` cases (discarded and interpolated) stop firing; a bare lazy chain whose result is discarded still fires.
 
 ---
 
 ## Tests Added
 
-<!-- Pending fix. -->
+`example/lib/performance/avoid_large_list_copy_fixture.dart` — added four NO-LINT cases (`_good794e` cascade target, `_good794f` ternary→typed List, `_good794g` bounded `take`) and one positive control (`_bad794b` bare discarded lazy chain → `expect_lint`).
+
+Verified with the in-repo standalone scanner against a file holding all reproducer shapes (cascade median, ternary, bounded `take`, `take` in interpolation, bare discarded chain, return): only the bare discarded chain reports `avoid_large_list_copy`; every structurally-required case is clean. `dart analyze lib` → no issues.
 
 ---
 
 ## Commits
 
-<!-- Pending fix. -->
+<!-- Filled at commit time. -->
 
 ---
 

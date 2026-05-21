@@ -137,3 +137,31 @@ void _good794d() {
   final list = largeList.where((e) => e > 0).toList(); // Variable assignment
   list.shuffle();
 }
+
+// GOOD: .toList() is a cascade target — ..sort() is a List-only mutator
+// absent from Iterable, so a concrete List is structurally required.
+void _good794e() {
+  final sorted = largeList.map((e) => e * 2).toList()..sort();
+}
+
+// GOOD: .toList() in a ternary assigned to a typed List — the wrapper does
+// not remove the requirement; the result is indexed afterward.
+void _good794f(bool cond) {
+  final List<int> picked = cond
+      ? largeList.where((e) => e > 0).toList()
+      : largeList.skip(1).toList();
+  final first = picked[0];
+}
+
+// GOOD: take(N) caps the result at N elements, so take(...).toList() is never
+// a large copy — not flagged even when the result is discarded.
+void _good794g() {
+  largeList.take(10).toList();
+}
+
+// BAD: bare .toList() on a lazy chain whose result is discarded — no concrete
+// List is required, so the copy is gratuitous.
+void _bad794b() {
+  // expect_lint: avoid_large_list_copy
+  largeList.where((e) => e > 0).toList();
+}

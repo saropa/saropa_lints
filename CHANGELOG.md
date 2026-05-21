@@ -69,7 +69,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [Unreleased]
 
-The `prefer_spread_over_addall` style hint stops nagging when you mutate a collection in place — clearing a list and re-filling it, for example — where spread syntax simply can't apply. The lint score in the status bar no longer flashes a misleading red 0% while a scan is still in progress, and a low score no longer paints the status bar red. The Findings dashboard's health gauge is steadier too — it no longer collapses to an empty dot or whiplashes from A to E while a scan is running. Its Top Rules list now shows the 10 noisiest rules, sorts on a header click, and expands each rule to reveal its full message and the files it affects. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
+The `prefer_spread_over_addall` style hint stops nagging when you mutate a collection in place — clearing a list and re-filling it, for example — where spread syntax simply can't apply. The `avoid_large_list_copy` rule no longer warns on `.toList()` calls where a concrete list is actually required. The lint score in the status bar no longer flashes a misleading red 0% while a scan is still in progress, and a low score no longer paints the status bar red. The Findings dashboard's health gauge is steadier too — it no longer collapses to an empty dot or whiplashes from A to E while a scan is running. Its Top Rules list now shows the 10 noisiest rules, sorts on a header click, and expands each rule to reveal its full message and the files it affects. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
 
 ### Fixed
 
@@ -83,6 +83,7 @@ The `prefer_spread_over_addall` style hint stops nagging when you mutate a colle
 ### Fixed (Extension)
 
 - **The status bar no longer shows a false 0% lint score from an in-progress scan** — the score divides violations by the files analyzed so far, so a partial editor sweep could crater it; it now appears only once a full analysis has covered enough of the project. If the tooltip says "partial scan", run a full analysis to get the score.
+- **The status-bar "updates available" count now matches the package-tree badge** — it had counted packages whose update status was undetermined (offline / no pub.dev data) as available updates, over-reporting the total. No action required.
 - **The Findings dashboard health gauge no longer collapses to an empty dot** — its entrance animation restarted on every refresh and got stuck near the empty frame; the ring now paints the true score instantly on every render. No action required.
 - **The Findings dashboard "Group by" dropdown is now legible when open** — the option list inherited a low-contrast highlight; it now uses the editor's dropdown colors. No action required.
 

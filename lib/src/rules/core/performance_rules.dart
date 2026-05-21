@@ -1890,10 +1890,12 @@ class AvoidLargeListCopyRule extends SaropaLintRule {
       final Expression? target = node.target;
       if (target is! MethodInvocation) return;
       final String methodName = target.methodName.name;
+      // take(N) caps the result at N elements, so take(...).toList() is never
+      // a "large" copy by construction — the developer explicitly bounded it.
+      // skip(N) keeps the (potentially large) tail, so it stays a trigger.
       if (methodName != 'where' &&
           methodName != 'map' &&
           methodName != 'expand' &&
-          methodName != 'take' &&
           methodName != 'skip') {
         return;
       }
@@ -1906,10 +1908,36 @@ class AvoidLargeListCopyRule extends SaropaLintRule {
   }
 
   /// Returns true if the .toList() result is used in a context where a
-  /// concrete List is required (return statement, variable assignment,
-  /// method chain target, or passed as argument).
+  /// concrete List is required: returned, assigned, passed as an argument,
+  /// fed into a method chain, or made the target of a cascade whose sections
+  /// (`..sort()`, `..shuffle()`, `..add()`) are List-only mutators absent from
+  /// Iterable. Transparent wrappers (parentheses, ternary branches) are
+  /// climbed through so the enclosing context — not the wrapper — decides.
   static bool _isToListRequired(MethodInvocation node) {
-    final AstNode? parent = node.parent;
+    // Climb past wrappers that forward their value unchanged so the
+    // requirement check sees the nearest semantically meaningful ancestor.
+    // Without this, a .toList() that is a cascade target or a ternary branch
+    // is judged against the wrapper (CascadeExpression / ConditionalExpression),
+    // which matches none of the cases below — a false positive even though a
+    // concrete List is structurally unavoidable.
+    AstNode current = node;
+    AstNode? parent = current.parent;
+    while (parent != null) {
+      // .toList() (or a wrapper around it) is the target of a cascade. The
+      // cascade sections call List-only mutators (..sort()/..shuffle()/..add())
+      // that do not exist on Iterable, so a concrete List is required here.
+      if (parent is CascadeExpression && parent.target == current) return true;
+
+      // Parentheses and ternary branches do not change whether a List is
+      // needed — keep climbing to whatever consumes their value.
+      if (parent is ParenthesizedExpression ||
+          parent is ConditionalExpression) {
+        current = parent;
+        parent = parent.parent;
+        continue;
+      }
+      break;
+    }
 
     // .toList() result is returned — function contract requires List
     if (parent is ReturnStatement) return true;
@@ -1923,7 +1951,7 @@ class AvoidLargeListCopyRule extends SaropaLintRule {
 
     // .toList() result is used in a method chain — downstream method
     // may be defined on List but not Iterable
-    if (parent is MethodInvocation && parent.target == node) return true;
+    if (parent is MethodInvocation && parent.target == current) return true;
 
     // .toList() result is passed as an argument
     if (parent is ArgumentList) return true;
