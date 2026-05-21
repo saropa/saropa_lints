@@ -1,6 +1,30 @@
 <!-- markdownlint-disable-file MD024 MD033 -->
 # Changelog
 
+```text
+                                    ....
+                             -+shdmNMMMMNmdhs+-
+                          -odMMMNyo/-..``.++:+o+/-
+                       /dMMMMMM/               `````
+                      dMMMMMMMMNdhhhdddmmmNmmddhs+-
+                      /MMMMMMMMMMMMMMMMMMMMMMMMMMMMMNh/
+                    . :sdmNNNNMMMMMNNNMMMMMMMMMMMMMMMMm+
+                    o     ..~~~::~+==+~:/+sdNMMMMMMMMMMMo
+                    m                        .+NMMMMMMMMMN
+                    m+                         :MMMMMMMMMm
+                    /N:                        :MMMMMMMMM/
+                     oNs.                    +NMMMMMMMMo
+                      :dNy/.              ./smMMMMMMMMm:
+                       /dMNmhyso+++oosydNNMMMMMMMMMd/
+                          .odMMMMMMMMMMMMMMMMMMMMdo-
+                             -+shdNNMMMMNNdhs+-
+                                     ``
+
+Made by Saropa. All rights reserved.
+
+Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
+```
+
 2100+ custom lint rules with 250+ quick fixes for Flutter and Dart — static analysis for security, accessibility, performance, and library-specific patterns. Includes a VS Code extension with Package Vibrancy scoring.
 
 **Package** — [pub.dev/packages/saropa_lints](https://pub.dev/packages/saropa_lints)
@@ -42,6 +66,34 @@
     **Maintenance entries** — Anything with **no end-user impact** (publish/CI tooling, internal refactors, test harness tweaks, plan-folder housekeeping, developer-only scripts) goes INSIDE a collapsed `<details><summary>Maintenance</summary>...</details>` block at the *bottom* of its version section — NOT in `### Added` / `### Changed` / `### Fixed`, which are reserved for user-visible changes that ship in the `.dart` / `.vsix` artifacts. Rule of thumb: if a pub.dev / Marketplace user running the published package would notice the difference, it belongs in a top-level section; otherwise it belongs in the Maintenance expander.
 
 -->
+
+## [Unreleased]
+
+The `prefer_spread_over_addall` style hint stops nagging when you mutate a collection in place — clearing a list and re-filling it, for example — where spread syntax simply can't apply. The lint score in the status bar no longer flashes a misleading red 0% while a scan is still in progress, and a low score no longer paints the status bar red. The Findings dashboard's health gauge is steadier too — it no longer collapses to an empty dot or whiplashes from A to E while a scan is running. Its Top Rules list now shows the 10 noisiest rules, sorts on a header click, and expands each rule to reveal its full message and the files it affects. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
+
+### Fixed
+
+- **`prefer_spread_over_addall` no longer flags in-place mutation that has no spread equivalent** — it previously fired on every `addAll` call, including `clear(); addAll(items);` on the current object (where there is no receiver to spread into) and unrelated user-defined `addAll` methods. It now reports only `addAll` on a `List`/`Set`/`Queue` receiver that exists to spread into. No action required; any `// ignore:` markers added to work around this false positive can be removed.
+- **`avoid_large_list_copy` no longer flags `.toList()` that is structurally required** — a `.toList()` used as a cascade target (`...toList()..sort()`), as a branch of a ternary assigned to a typed `List`, or bounded by `take(N)` is no longer reported, because a concrete list is unavoidable or the copy is already bounded. No action required.
+
+### Added (Extension)
+
+- **Each Top Rules row on the Findings dashboard now expands** to show the rule's full message and the files it affects, with each file clickable to jump straight to it — triage a noisy rule without scrolling down to the findings list. No action required.
+
+### Fixed (Extension)
+
+- **The status bar no longer shows a false 0% lint score from an in-progress scan** — the score divides violations by the files analyzed so far, so a partial editor sweep could crater it; it now appears only once a full analysis has covered enough of the project. If the tooltip says "partial scan", run a full analysis to get the score.
+- **The Findings dashboard health gauge no longer collapses to an empty dot** — its entrance animation restarted on every refresh and got stuck near the empty frame; the ring now paints the true score instantly on every render. No action required.
+- **The Findings dashboard "Group by" dropdown is now legible when open** — the option list inherited a low-contrast highlight; it now uses the editor's dropdown colors. No action required.
+
+### Changed (Extension)
+
+- **The lint score no longer colors the status bar red** — a low score is informational, not an error, so the status-bar background now stays neutral. No action required.
+- **The Findings dashboard health grade no longer whiplashes from A to E mid-scan** — it dims to a "computing" state while an analysis is streaming results in, then reveals the settled grade once the run finishes. No action required.
+- **The health gauge shows the score without the "/100" suffix** — the denominator was redundant next to the letter grade. No action required.
+- **The Findings dashboard Top Rules table is trimmed to the 10 noisiest rules and its Rule / Count / Severity headers are now click-to-sort** — fewer, richer rows that you can reorder for triage. No action required.
+
+---
 
 ## [13.10.2]
 

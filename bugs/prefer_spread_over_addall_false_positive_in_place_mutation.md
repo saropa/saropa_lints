@@ -1,6 +1,6 @@
 # BUG: `prefer_spread_over_addall` — fires on every `addAll`, including in-place mutation with no spread equivalent
 
-**Status: Open**
+**Status: Fixed**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
@@ -129,19 +129,36 @@ Step 1 alone removes the in-place `this` false positives.
 
 ## Changes Made
 
-<!-- Not yet fixed. Filed from downstream corpus saropa_dart_utils. -->
+`PreferSpreadOverAddAllRule.runWithReporter` in `lib/src/rules/stylistic/stylistic_null_collection_rules.dart` now gates the report (was: unconditional on method name `addAll`):
+
+1. **Skip implicit `this`.** `node.realTarget == null` returns early — an in-place mutation of the surrounding collection (e.g. `clear(); addAll(items);` in an extension/instance method) has no receiver to spread into. `realTarget` (not `target`) is used so a cascade like `<int>[]..addAll(x)` still resolves its receiver and is flagged.
+2. **Require a core mutable-collection receiver.** The target's `staticType` display name must start with `List`, `Set`, or `Queue`. This drops matches on unrelated user-defined `addAll` methods. `Map` is intentionally excluded — its spread form is `{...m1, ...m2}`, not the list syntax the correction message advertises.
+
+Rule version marker bumped `{v2}` → `{v3}` to reflect the behavior change.
+
+Step 1 removes the reporter's exact reproducer (`toUniqueByInPlace`). Step 2 removes the unrelated-method class of false positive. The positive control (`someList.addAll([3, 4])` on a named `List`) still fires.
 
 ---
 
 ## Tests Added
 
-<!-- Pending fix. -->
+- Rewrote the stub fixture `example/lib/stylistic_null_collection/prefer_spread_over_addall_fixture.dart` with real cases: BAD (List, Set, cascade-onto-fresh-literal, Queue) and GOOD (in-place `this` mutation via extension, unrelated `Bag.addAll`).
+- **Verified end-to-end against the live analyzer plugin** (not custom_lint — this package uses `analysis_server_plugin`). A scratch project at `D:\tmp\saropa_verify` with `prefer_spread_over_addall: true` enabled, running the locally-edited plugin via `dart analyze`, reported the rule on exactly the four BAD lines and on neither GOOD case:
+  ```
+  info - lib\cases.dart:6:3  - [prefer_spread_over_addall] ...   (List)
+  info - lib\cases.dart:12:3 - [prefer_spread_over_addall] ...   (Set)
+  info - lib\cases.dart:17:34- [prefer_spread_over_addall] ...   (cascade)
+  info - lib\cases.dart:23:3 - [prefer_spread_over_addall] ...   (Queue)
+  5 issues found.   (the 5th is an unrelated path_not_posix pubspec warning)
+  ```
+  The implicit-`this` extension method and the `Bag.addAll` call produced no diagnostic.
+- Existing unit suite `test/rules/stylistic/stylistic_null_collection_rules_test.dart` passes (28/28) — confirms the rule still compiles and its metadata contract holds.
 
 ---
 
 ## Commits
 
-<!-- Pending fix. -->
+<!-- Filled in at commit time. -->
 
 ---
 

@@ -103,15 +103,51 @@
 // Test fixture for: prefer_spread_over_addall
 // Source: lib\src\rules\stylistic_null_collection_rules.dart
 
+import 'dart:collection';
+
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// BAD: Should trigger prefer_spread_over_addall
-// expect_lint: prefer_spread_over_addall
-void _bad1113() {
-  // TODO: Add method call that triggers prefer_spread_over_addall
+// BAD: addAll on a named List receiver has a spread equivalent.
+void _badList() {
+  final List<int> someList = [1, 2];
+  // expect_lint: prefer_spread_over_addall
+  someList.addAll([3, 4]);
 }
 
-// GOOD: Should NOT trigger prefer_spread_over_addall
-void _good1113() {
-  // TODO: Add compliant method call for prefer_spread_over_addall
+// BAD: addAll on a Set receiver.
+void _badSet() {
+  final Set<int> s = {1, 2};
+  // expect_lint: prefer_spread_over_addall
+  s.addAll({3, 4});
+}
+
+// BAD: cascade onto a fresh list literal — realTarget resolves the receiver.
+void _badCascade() {
+  // expect_lint: prefer_spread_over_addall
+  final List<int> built = <int>[]..addAll([3, 4]);
+}
+
+// GOOD: in-place mutation of `this` (no receiver) — spread cannot mutate `this`.
+extension _UniqueInPlace<T> on List<T> {
+  void replaceAllWith(List<T> items) {
+    clear();
+    addAll(items);
+  }
+}
+
+// GOOD: unrelated user-defined addAll on a non-collection type.
+class _Bag {
+  void addAll(List<int> items) {}
+}
+
+void _goodUnrelated() {
+  final _Bag bag = _Bag();
+  bag.addAll([1, 2]);
+}
+
+// BAD: Queue.addAll on a named receiver (positive control for collection coverage).
+void _badQueue() {
+  final Queue<int> q = Queue<int>();
+  // expect_lint: prefer_spread_over_addall
+  q.addAll([1, 2]);
 }

@@ -621,7 +621,7 @@ class PreferSpreadOverAddAllRule extends SaropaLintRule {
   // cspell:ignore addall
   static const LintCode _code = LintCode(
     'prefer_spread_over_addall',
-    '[prefer_spread_over_addall] Collection uses addAll() instead of the spread operator. The spread syntax [...list1, ...list2] is a declarative, expression-level merge that avoids mutation. {v2}',
+    '[prefer_spread_over_addall] Collection uses addAll() instead of the spread operator. The spread syntax [...list1, ...list2] is a declarative, expression-level merge that avoids mutation. {v3}',
     correctionMessage:
         'Replace addAll() with the spread operator [...list1, ...list2] for a declarative, expression-level merge.',
     severity: DiagnosticSeverity.INFO,
@@ -633,9 +633,32 @@ class PreferSpreadOverAddAllRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addMethodInvocation((node) {
-      if (node.methodName.name == 'addAll') {
-        reporter.atNode(node);
+      if (node.methodName.name != 'addAll') return;
+
+      // Implicit `this` (no receiver) is an in-place mutation of the
+      // surrounding collection — e.g. an extension/instance method doing
+      // `clear(); addAll(items);`. Spread builds a NEW collection and cannot
+      // mutate `this`, so no equivalent rewrite exists. Use realTarget (not
+      // target) so a cascade like `<int>[]..addAll(x)` still resolves its
+      // receiver and is flagged. (FP: saropa_dart_utils toUniqueByInPlace.)
+      final Expression? target = node.realTarget;
+      if (target == null) return;
+
+      // Only core mutable collections have a spread-literal equivalent
+      // (`[...a, ...b]`). Matching the bare name `addAll` otherwise flags
+      // unrelated user-defined methods named addAll on non-collection types.
+      // Map is excluded: its spread form is `{...m1, ...m2}`, not the list
+      // syntax this rule's correction message advertises.
+      final targetType = target.staticType;
+      if (targetType == null) return;
+      final String typeName = targetType.getDisplayString();
+      if (!typeName.startsWith('List') &&
+          !typeName.startsWith('Set') &&
+          !typeName.startsWith('Queue')) {
+        return;
       }
+
+      reporter.atNode(node);
     });
   }
 }
