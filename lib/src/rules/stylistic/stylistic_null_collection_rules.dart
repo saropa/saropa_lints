@@ -570,7 +570,7 @@ class PreferNullableOverLateRule extends SaropaLintRule {
 
 /// Warns when .addAll() is used instead of spread operator.
 ///
-/// Since: v4.9.11 | Updated: v4.13.0 | Rule version: v2
+/// Since: v4.9.11 | Updated: v13.10.4 | Rule version: v3
 ///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
@@ -596,6 +596,14 @@ class PreferNullableOverLateRule extends SaropaLintRule {
 /// ```dart
 /// final list = [1, 2, ...otherList];
 /// // Or for in-place: list = [...list, ...otherList];
+/// ```
+///
+/// #### Not flagged (no spread equivalent):
+/// ```dart
+/// // Implicit `this` — spread cannot mutate the receiver in place.
+/// void replaceAllWith(List<T> items) { clear(); addAll(items); }
+/// // addAll on a non-collection type (unrelated user-defined method).
+/// myBag.addAll(items);
 /// ```
 class PreferSpreadOverAddAllRule extends SaropaLintRule {
   PreferSpreadOverAddAllRule() : super(code: _code);
