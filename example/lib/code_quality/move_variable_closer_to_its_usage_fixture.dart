@@ -101,23 +101,68 @@
 // ignore_for_file: equal_keys_in_map, unused_catch_stack
 // ignore_for_file: non_constant_default_value, not_a_type
 // Test fixture for: move_variable_closer_to_its_usage
-// Source: lib\src\rules\code_quality_rules.dart
+// Source: lib/src/rules/code_quality/code_quality_variables_rules.dart
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-dynamic x;
+// No-op helpers keep the fixtures as straight-line code without pulling in the
+// example project's print(...) rules.
+void _step() {}
+int _compute(int seed) => seed * 2;
 
-// BAD: Should trigger move_variable_closer_to_its_usage
-// expect_lint: move_variable_closer_to_its_usage
-void _bad224_foo() {
-  final x = 1;
-//20 lines of code not using x
-  print(x);
+// BAD: the declaration sits three unrelated statements above its only use, and
+// that use is a direct sibling — it can move down without changing semantics.
+int _bad_movableLocal(int seed) {
+  // expect_lint: move_variable_closer_to_its_usage
+  final result = _compute(seed);
+  _step();
+  _step();
+  _step();
+  return result;
 }
 
-// GOOD: Should NOT trigger move_variable_closer_to_its_usage
-void _good224_foo() {
-//20 lines of code
-  final x = 1;
-  print(x);
+// GOOD: declared immediately before its first use.
+int _good_movableLocal(int seed) {
+  _step();
+  _step();
+  _step();
+  final result = _compute(seed);
+  return result;
+}
+
+// NO LINT (Defect 1): accumulator declared before the loop it must enclose.
+// Its first use is inside the loop body; moving the declaration in would reset
+// it every iteration.
+List<int> _accumulatorBeforeLoop(List<int> input) {
+  final result = <int>[];
+  final scale = 2;
+  final base = input.length;
+  for (final value in input) {
+    result.add(value * scale + base);
+  }
+  return result;
+}
+
+// NO LINT (Defect 2): a single multi-line initializer is not "distance" — there
+// are zero intervening statements before the use, only a long own initializer.
+List<int> _longOwnInitializer() {
+  final out = List<int>.generate(8, (i) {
+    final doubled = i * 2;
+    final shifted = doubled + 1;
+    return shifted > 15 ? 15 : shifted;
+  });
+  return out;
+}
+
+// NO LINT (Defect 3): a value read in several sibling branches must enclose them
+// all; its first use is nested inside the first branch, so it is never flagged.
+int _multiUseConstAcrossBranches(int mode) {
+  const factor = 100;
+  if (mode == 1) {
+    return factor;
+  }
+  if (mode == 2) {
+    return factor * 2;
+  }
+  return factor * 3;
 }

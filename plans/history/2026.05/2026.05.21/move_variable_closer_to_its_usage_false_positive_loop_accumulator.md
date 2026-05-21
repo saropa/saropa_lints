@@ -1,14 +1,15 @@
 # BUG: `move_variable_closer_to_its_usage` — fires on loop accumulators declared before a loop
 
-**Status: Open**
+**Status: Fixed**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
 Created: 2026-05-21
+Fixed: 2026-05-21
 Rule: `move_variable_closer_to_its_usage`
 File: `lib/src/rules/code_quality/code_quality_variables_rules.dart` (line ~1925)
 Severity: False positive
-Rule version: v7 | Since: (unknown) | Updated: (unknown)
+Rule version: v7 → v8 | Since: v0.1.4 | Updated: v13.10.4
 
 ---
 
@@ -158,19 +159,28 @@ The fixture at `example/lib/code_quality/move_variable_closer_to_its_usage_fixtu
 
 ## Changes Made
 
-<!-- Not yet fixed. Filed from downstream corpus saropa_dart_utils. -->
+`MoveVariableCloserToUsageRule` in `lib/src/rules/code_quality/code_quality_variables_rules.dart` rewritten (rule version v7 → v8):
+
+1. **Nested-scope guard (Defects 1 & 3).** `_FirstUsageVisitor` now captures the first-usage `SimpleIdentifier` node, not just its line. The new `_canMoveCloser` helper rejects any case where the statement holding that first use is not a direct child of the registered `Block` — i.e. the use is nested inside a loop, `if`/`switch` branch, nested block, or closure the declaration must enclose. This kills the loop-accumulator false positive (Defect 1) and the multi-use-const-across-branches case, whose first use is nested in the first branch (Defect 3).
+2. **Statement count, not line distance (Defect 2).** Replaced `useLine - declLine > 10` with "≥ `_minInterveningStatements` (3) sibling statements between the declaration statement and the use statement." A long multi-line own initializer produces zero intervening statements and is no longer flagged.
+3. Removed the now-unused `package:analyzer/source/line_info.dart` import (CI runs `--fatal-infos`).
+4. Updated the DartDoc (accurate Bad/Good examples + an explicit "left alone" accumulator example) and the message tag `{v7}` → `{v8}`.
 
 ---
 
 ## Tests Added
 
-<!-- Pending fix. -->
+- Rewrote `example/lib/code_quality/move_variable_closer_to_its_usage_fixture.dart`: a triggering BAD positive control (3 intervening statements, direct-sibling use), a GOOD case, and three NO-LINT cases — accumulator-before-loop, long own initializer, multi-use const across sibling branches.
+- Verified the detection logic with a throwaway `package:analyzer` script (parse-only AST, deleted after use) against the original `parseCsvLine` reproducer plus all fixture cases and a threshold boundary (2 intervening → no fire): all 7 cases passed.
+- `dart analyze lib/` → no issues. `dart test test/rules/code_quality/code_quality_rules_test.dart` → 208 passed (instantiation + fixture-verification contract).
 
 ---
 
 ## Commits
 
-<!-- Pending fix. -->
+<!-- Filled at commit time. -->
+
+Residual limitation (not a regression): a run of consecutive sibling declarations all consumed by one later statement (e.g. the `uuid_v4` `segment*` group) can still flag the earliest declaration, since each is a single direct-sibling use with ≥ 3 intervening declaration statements. Reordering is harmless there; tightening this would require distinguishing "related sibling declarations" from "unrelated statements" and is out of scope for the accumulator fix.
 
 ---
 

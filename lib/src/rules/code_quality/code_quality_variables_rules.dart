@@ -15,7 +15,6 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:analyzer/source/line_info.dart';
 
 import '../../fixes/code_quality/add_late_final_fix.dart';
 import '../../fixes/code_quality/remove_late_keyword_fix.dart';
@@ -1899,27 +1898,50 @@ class MatchBaseClassDefaultValueRule extends SaropaLintRule {
   }
 }
 
-/// Warns when a variable could be declared closer to its usage.
+/// Warns when a variable is declared several unrelated statements before its
+/// first use and the declaration can move closer without changing semantics.
 ///
-/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v7
+/// Since: v0.1.4 | Updated: v13.10.4 | Rule version: v8
 ///
 /// Alias: move_variable_closer_to_usage
+///
+/// Distance is measured in intervening sibling statements, not source lines, so
+/// a single multi-line initializer never counts as "far". The rule stays silent
+/// when the first use is nested inside a loop, branch, nested block, or closure:
+/// moving an accumulator into a loop would reset it every iteration, and moving
+/// a value into one branch would drop it from sibling branches that also read
+/// it. See plans/history/2026.05/2026.05.21/move_variable_closer_to_its_usage_false_positive_loop_accumulator.md.
 ///
 /// Example of **bad** code:
 /// ```dart
 /// void foo() {
-///   final x = 1;
-///   // ... 20 lines of code not using x ...
-///   print(x);
+///   final x = computeX();
+///   stepOne();
+///   stepTwo();
+///   stepThree();
+///   print(x); // x sat unread through three unrelated statements
 /// }
 /// ```
 ///
 /// Example of **good** code:
 /// ```dart
 /// void foo() {
-///   // ... 20 lines of code ...
-///   final x = 1;
+///   stepOne();
+///   stepTwo();
+///   stepThree();
+///   final x = computeX();
 ///   print(x);
+/// }
+/// ```
+///
+/// Example of code that is **left alone** (accumulator must enclose the loop):
+/// ```dart
+/// List<String> parse(String line) {
+///   final fields = <String>[];
+///   for (int i = 0; i < line.length; i++) {
+///     fields.add(line[i]); // first use is inside the loop — not flagged
+///   }
+///   return fields;
 /// }
 /// ```
 class MoveVariableCloserToUsageRule extends SaropaLintRule {
@@ -1940,13 +1962,19 @@ class MoveVariableCloserToUsageRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'move_variable_closer_to_its_usage',
-    '[move_variable_closer_to_its_usage] Variable declared far from its first use, with many unrelated statements in between. This forces readers to hold the variable in memory while reading irrelevant code, reducing comprehension and increasing the risk of accidental reuse or shadowing. {v7}',
+    '[move_variable_closer_to_its_usage] Variable declared far from its first use, with several unrelated statements in between. This forces readers to hold the variable in memory while reading irrelevant code, reducing comprehension and increasing the risk of accidental reuse or shadowing. {v8}',
     correctionMessage:
         'Move the variable declaration to just before its first usage. This narrows the scope, improves readability, and makes the data flow easier to follow.',
     severity: DiagnosticSeverity.INFO,
   );
 
-  static const int _minLineDistance = 10;
+  /// Minimum number of unrelated sibling statements that must separate a
+  /// declaration from its first use before the rule fires.
+  ///
+  /// Counted as intervening `Statement`s in the same `Block`, not source lines:
+  /// a single multi-line initializer (e.g. a `List.generate(...)` spanning a
+  /// dozen lines) produces zero intervening statements and must not be flagged.
+  static const int _minInterveningStatements = 3;
 
   @override
   void runWithReporter(
@@ -1954,69 +1982,86 @@ class MoveVariableCloserToUsageRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addBlock((Block node) {
-      final Map<String, int> declarationLines = <String, int>{};
-      final Map<String, int> firstUsageLines = <String, int>{};
+      // First pass: collect this block's own top-level declarations.
       final Map<String, VariableDeclaration> declarations =
           <String, VariableDeclaration>{};
-
-      // First pass: collect declarations
       for (final Statement statement in node.statements) {
         if (statement is VariableDeclarationStatement) {
           for (final VariableDeclaration variable
               in statement.variables.variables) {
-            final String name = variable.name.lexeme;
-            declarationLines[name] = context.lineInfo
-                .getLocation(variable.offset)
-                .lineNumber;
-            declarations[name] = variable;
+            declarations[variable.name.lexeme] = variable;
           }
         }
       }
+      if (declarations.isEmpty) return;
 
-      // Second pass: find first usage of each variable
+      // Second pass: capture the first-usage node (not just its line) so the
+      // enclosing scope can be inspected, not merely the source distance.
+      final Map<String, SimpleIdentifier> firstUsage =
+          <String, SimpleIdentifier>{};
       node.visitChildren(
-        _FirstUsageVisitor(
-          declarationLines.keys.toSet(),
-          firstUsageLines,
-          context.lineInfo,
-        ),
+        _FirstUsageVisitor(declarations.keys.toSet(), firstUsage),
       );
 
-      // Check distances
-      for (final String name in declarationLines.keys) {
-        final int? declLineValue = declarationLines[name];
-        if (declLineValue == null) continue;
-        final int declLine = declLineValue;
-        final int? useLine = firstUsageLines[name];
-
-        if (useLine != null && useLine - declLine > _minLineDistance) {
-          final VariableDeclaration? decl = declarations[name];
-          if (decl != null) {
-            reporter.atToken(decl.name, code);
-          }
+      for (final MapEntry<String, VariableDeclaration> entry
+          in declarations.entries) {
+        final SimpleIdentifier? useNode = firstUsage[entry.key];
+        if (useNode == null) continue;
+        if (_canMoveCloser(node, entry.value, useNode)) {
+          reporter.atToken(entry.value.name, code);
         }
       }
     });
   }
+
+  /// Returns true only when [decl] can be moved nearer to its first use without
+  /// changing semantics — the precondition for flagging it.
+  ///
+  /// Two guards, each killing a documented false-positive class:
+  /// - The first use must sit directly in [block], not nested in a loop,
+  ///   branch, nested block, or closure. Relocating into a loop turns an
+  ///   accumulator into a per-iteration reset; relocating into one branch drops
+  ///   the variable from sibling branches that also read it.
+  /// - At least [_minInterveningStatements] sibling statements must separate the
+  ///   declaration from the use statement. Counting statements (not lines)
+  ///   ignores the declaration's own multi-line initializer.
+  bool _canMoveCloser(
+    Block block,
+    VariableDeclaration decl,
+    SimpleIdentifier useNode,
+  ) {
+    // The statement holding the first use must be a direct child of the block;
+    // anything nested means the declaration must enclose that inner scope.
+    final Statement? useStatement = useNode.thisOrAncestorOfType<Statement>();
+    if (useStatement == null || useStatement.parent != block) return false;
+
+    final Statement? declStatement =
+        decl.thisOrAncestorOfType<VariableDeclarationStatement>();
+    if (declStatement == null) return false;
+
+    final int declIndex = block.statements.indexOf(declStatement);
+    final int useIndex = block.statements.indexOf(useStatement);
+    if (declIndex < 0 || useIndex <= declIndex) return false;
+
+    return useIndex - declIndex - 1 >= _minInterveningStatements;
+  }
 }
 
 class _FirstUsageVisitor extends RecursiveAstVisitor<void> {
-  _FirstUsageVisitor(this.variableNames, this.firstUsageLines, this.lineInfo);
+  _FirstUsageVisitor(this.variableNames, this.firstUsage);
 
   final Set<String> variableNames;
-  final Map<String, int> firstUsageLines;
-  final LineInfo lineInfo;
+  final Map<String, SimpleIdentifier> firstUsage;
 
   @override
   void visitSimpleIdentifier(SimpleIdentifier node) {
     final String name = node.name;
-    if (variableNames.contains(name) && !firstUsageLines.containsKey(name)) {
-      // Skip if this is the declaration itself
-      final parent = node.parent;
-      if (parent is VariableDeclaration && parent.name == node.token) {
-        return;
+    if (variableNames.contains(name) && !firstUsage.containsKey(name)) {
+      // Skip the declaration's own name token; only real references count.
+      final AstNode? parent = node.parent;
+      if (!(parent is VariableDeclaration && parent.name == node.token)) {
+        firstUsage[name] = node;
       }
-      firstUsageLines[name] = lineInfo.getLocation(node.offset).lineNumber;
     }
     super.visitSimpleIdentifier(node);
   }
