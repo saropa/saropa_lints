@@ -29,7 +29,7 @@ import {
     VibrancyResult, VibrancyCategory, DependencySection, DepGraphSummary,
     isUnusedRemovalEligibleSection,
 } from './types';
-import { countByCategory } from './scoring/status-classifier';
+import { countByCategory, isUpdatable } from './scoring/status-classifier';
 import { registerTreeCommands } from './providers/tree-commands';
 import { registerUpgradeCommand } from './providers/upgrade-command';
 import { registerAnnotateCommand } from './providers/annotate-command';
@@ -172,9 +172,19 @@ const HISTORY_BACKFILL_DONE_KEY = 'saropaLints.packageVibrancy.historyBackfillDo
 
 /** Lightweight vibrancy data for the unified status bar. */
 export interface VibrancyStatusData {
+    /** Total packages scanned, including suppressed (a coverage fact). */
     readonly packageCount: number;
+    /** How many of [packageCount] the user has suppressed (dismissed). */
+    readonly suppressedCount: number;
+    /**
+     * Average vibrancy over *active* (non-suppressed) packages. Suppressing a
+     * weak package is the user dismissing it, so it must not drag the headline
+     * health number — otherwise triaging would have no visible reward.
+     */
     readonly averageScore: number;
+    /** Updates available across *active* packages (suppressed are dismissed). */
     readonly updateCount: number;
+    /** Actionable insights, already computed over active packages. */
     readonly actionCount: number;
 }
 
@@ -1336,7 +1346,10 @@ function publishResults(
     targets.tree.updateResults(results);
     targets.tree.updateDepGraphSummary(graphForTree);
     targets.tree.updateOverrideAnalyses(lastOverrideAnalyses);
-    targets.state.updateFromResults(results);
+    // Pass the suppressed set so the update/problem badges exclude dismissed
+    // packages (packageCount still reflects all scanned). Same set the tree
+    // and status-bar tooltip use.
+    targets.state.updateFromResults(results, getSuppressedSet());
 
     const config = vscode.workspace.getConfiguration('saropaLints.packageVibrancy');
     const budgetConfig = readBudgetConfig(key => config.get(key));
@@ -1406,12 +1419,19 @@ function updateFilteredTargets(
     // Fire callback to update the unified status bar in extension.ts.
     // Guard against empty results to avoid NaN from division by zero.
     if (vibrancyStatusCallback && results.length > 0) {
-        const avg = results.reduce((s, r) => s + r.score, 0) / results.length;
-        const updateCount = results.filter(
-            r => r.updateInfo && r.updateInfo.updateStatus !== 'up-to-date',
-        ).length;
+        // "Scanned" is a coverage fact and includes suppressed packages.
+        // The health/nag numbers below are computed over `active` only:
+        // suppressing a package is the user dismissing it, so it should not
+        // drag the average score or pad the "updates available" count — the
+        // same set the tree's main list and the insights (actionCount) use.
+        const scoreBase = active.length > 0 ? active : results;
+        const avg = scoreBase.reduce((s, r) => s + r.score, 0) / scoreBase.length;
+        // Shared predicate: excludes `'unknown'` (status undetermined), matching
+        // the package-tree badge. Counting `!== 'up-to-date'` over-reported.
+        const updateCount = active.filter(isUpdatable).length;
         vibrancyStatusCallback({
             packageCount: results.length,
+            suppressedCount: results.length - active.length,
             averageScore: Math.round(avg),
             updateCount,
             actionCount: lastInsights.length,

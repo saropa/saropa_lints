@@ -90,6 +90,7 @@ import {
   computeHealthScore,
   formatScoreDelta,
   scoreColorBand,
+  isReportTooPartial,
   IMPACT_WEIGHTS,
   DECAY_RATE,
 } from './healthScore';
@@ -252,28 +253,27 @@ function readVisibleViolations(root: string): ViolationsData | null {
   return filterDisabledFromData(raw, disabled);
 }
 
-/** Compact status entry: opens the Findings Dashboard (replaces the Violations tree badge). */
-function updateFindingsStatusBar(item: vscode.StatusBarItem, dartProject: boolean): void {
-  const root = getProjectRoot();
-  if (!root || !dartProject) {
-    item.hide();
-    return;
-  }
-  const data = readViolations(root);
+/**
+ * Findings indicator merged into the unified Saropa status-bar item.
+ *
+ * Headlines the error count (must-fix) when there are errors, else the total
+ * finding count. Returns null when the project is clean so the badge vanishes.
+ * Was previously a SEPARATE status-bar item, which put a "98%" score right next
+ * to a "⚠ 96" count — visually contradictory and cluttered. Folded into the one
+ * item so there is a single Saropa entry. Error-headlining was keyed on
+ * LintImpact.critical before the 5-bucket taxonomy retired 2026-05-03.
+ */
+function findingsBadge(
+  data: ViolationsData | null,
+): { suffix: string; tooltip: string } | null {
   const total = data?.summary?.totalViolations ?? data?.violations?.length ?? 0;
-  // Status-bar badge headlines errors (must-fix). Was previously keyed on
-  // LintImpact.critical (5-bucket taxonomy retired 2026-05-03).
+  if (total <= 0) return null;
   const errorCount = data?.summary?.byImpact?.error ?? 0;
-  if (total <= 0) {
-    item.hide();
-    return;
-  }
-  item.text = errorCount > 0 ? `$(warning) ${errorCount}` : `$(warning) ${total}`;
-  item.tooltip = errorCount > 0
-    ? `${errorCount} error(s) of ${total} total — Open Findings Dashboard`
-    : `${total} violation(s) — Open Findings Dashboard`;
-  item.command = 'saropaLints.openViolationsWideReport';
-  item.show();
+  const shown = errorCount > 0 ? errorCount : total;
+  const tooltip = errorCount > 0
+    ? `${errorCount} error(s) of ${total} finding(s)`
+    : `${total} finding(s)`;
+  return { suffix: ` · $(warning) ${shown}`, tooltip };
 }
 
 function syncRuleMetadataFromViolations(data: ViolationsData | null): void {
@@ -356,9 +356,6 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   );
 
   const issuesProvider = new IssuesTreeProvider(context.workspaceState);
-  const findingsStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 99);
-  findingsStatusBarItem.name = 'Saropa Findings';
-  context.subscriptions.push(findingsStatusBarItem);
   const hotspotReviewState = new SecurityHotspotReviewStateService(context.workspaceState);
   const summaryProvider = new SummaryTreeProvider(context.workspaceState);
   const suppressionsProvider = new SuppressionsTreeProvider();
@@ -467,15 +464,6 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     void vscode.commands.executeCommand('setContext', 'saropaLints.hasIssuesFilter', state.hasActiveFilters);
     void vscode.commands.executeCommand('setContext', 'saropaLints.hasSuppressions', state.hasSuppressions);
     void vscode.commands.executeCommand('setContext', 'saropaLints.hasFocusedFile', focused !== undefined);
-    updateFindingsStatusBar(findingsStatusBarItem, isDartProject);
-    const filterHint = focused
-      ? `List: focused on ${focused.split('/').pop() ?? focused} (${state.filteredCount}/${state.totalUnfiltered})`
-      : state.hasActiveFilters || state.hasSuppressions
-        ? `List: filtered ${state.filteredCount}/${state.totalUnfiltered}`
-        : `List: ${state.filteredCount} visible (of ${state.totalUnfiltered})`;
-    if (findingsStatusBarItem.tooltip) {
-      findingsStatusBarItem.tooltip = `${findingsStatusBarItem.tooltip}\n${filterHint}`;
-    }
   }
   updateIssuesViewMessage();
 
@@ -693,25 +681,30 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // Vibrancy data pushed from the vibrancy subsystem via callback.
   let vibrancyData: VibrancyStatusData | null = null;
 
-  /** Theme color for status bar by score band (red / yellow / none). */
-  function statusBarBackgroundForScore(score: number): vscode.ThemeColor | undefined {
-    const band = scoreColorBand(score);
-    if (band === 'red') return new vscode.ThemeColor('statusBarItem.errorBackground');
-    if (band === 'yellow') return new vscode.ThemeColor('statusBarItem.warningBackground');
-    return undefined;
-  }
-
   /** Build tooltip lines for the status bar (version, tier, score, vibrancy details). */
   function buildStatusBarTooltipLines(
     tier: string,
     health: { score: number } | null,
     showVibrancy: boolean,
     vibrancyLabel: string | null,
+    scorePending: boolean,
   ): string[] {
     const base = [`Saropa Lints v${extVersion}`, `Tier: ${tier}`];
-    if (health) base.push(`Lint score: ${health.score}%`);
+    if (health) {
+      base.push(`Lint score: ${health.score}%`);
+    } else if (scorePending) {
+      // The report covers too little of the project to score reliably. Tell
+      // the user how to get a real score instead of leaving the line blank.
+      base.push('Lint score: run a full analysis (partial scan)');
+    }
     if (showVibrancy && vibrancyData !== null) {
-      base.push(`Vibrancy: ${vibrancyLabel}`, `${vibrancyData.packageCount} packages scanned`);
+      // "Scanned" counts everything; the suffix explains why the assessment
+      // numbers below (vibrancy, updates) are over the smaller active set.
+      const scanned =
+        vibrancyData.suppressedCount > 0
+          ? `${vibrancyData.packageCount} packages scanned (${vibrancyData.suppressedCount} suppressed)`
+          : `${vibrancyData.packageCount} packages scanned`;
+      base.push(`Vibrancy: ${vibrancyLabel}`, scanned);
       if (vibrancyData.updateCount > 0) base.push(`${vibrancyData.updateCount} update(s) available`);
       if (vibrancyData.actionCount > 0) base.push(`${vibrancyData.actionCount} action item(s)`);
     }
@@ -746,6 +739,9 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       const root = getProjectRoot();
       const data = preloadedData ?? (root ? readViolations(root) : null);
       const health = data ? computeHealthScore(data) : null;
+      // Finding count folded into this single item (was a separate ⚠ entry).
+      const badge = findingsBadge(data);
+      const badgeSuffix = badge?.suffix ?? '';
       if (health) {
         const history = loadHistory(context.workspaceState);
         const prevScore = findPreviousScore(history);
@@ -758,24 +754,41 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
           showVibrancy,
           vibrancyLabel,
         });
-        statusBarItem.text = `$(checklist) Saropa: ${detailLabel}`;
-        statusBarItem.backgroundColor = statusBarBackgroundForScore(health.score);
+        statusBarItem.text = `$(checklist) Saropa: ${detailLabel}${badgeSuffix}`;
+        // Never paint the score onto a colored (esp. red) status-bar
+        // background — a low lint score is informational, not an error, and a
+        // red fill reads as "broken". The number alone carries the signal.
+        statusBarItem.backgroundColor = undefined;
       } else {
         statusBarItem.text = `$(checklist) ${buildStatusBarLabel({
           hasHealth: false,
           tier,
           showVibrancy,
           vibrancyLabel,
-        })}`;
+        })}${badgeSuffix}`;
         statusBarItem.backgroundColor = undefined;
       }
-      statusBarItem.tooltip = buildStatusBarTooltipLines(tier, health, showVibrancy, vibrancyLabel).join('\n');
+      // "Score pending": we have a report but it covers too little of the
+      // project to score (partial IDE sweep) — surface a hint, not a blank.
+      const scorePending = health === null && data !== null && isReportTooPartial(data);
+      const tooltipLines = buildStatusBarTooltipLines(
+        tier,
+        health,
+        showVibrancy,
+        vibrancyLabel,
+        scorePending,
+      );
+      if (badge) tooltipLines.push(badge.tooltip);
+      statusBarItem.tooltip = tooltipLines.join('\n');
+      // Click opens the Findings Dashboard (the most actionable destination)
+      // now that this item also carries the finding count.
+      statusBarItem.command = 'saropaLints.openViolationsWideReport';
     } else {
       statusBarItem.text = '$(checklist) Saropa Lints: Off';
       statusBarItem.tooltip = `Saropa Lints v${extVersion} — Disabled`;
       statusBarItem.backgroundColor = undefined;
+      statusBarItem.command = 'saropaLints.editorDashboards.focus';
     }
-    statusBarItem.command = 'saropaLints.editorDashboards.focus';
     statusBarItem.show();
   };
   updateAllStatusBars();

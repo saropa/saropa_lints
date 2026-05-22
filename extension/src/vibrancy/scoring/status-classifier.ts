@@ -15,6 +15,21 @@ export {
     scoreToGrade, type VibrancyGrade,
 } from '../category-dictionary';
 
+/**
+ * True when a package has a concrete, actionable update available.
+ *
+ * "Actionable" means a known newer version exists — patch, minor, or major.
+ * `'unknown'` is excluded on purpose: it means the update status could not be
+ * determined (offline, no pub.dev data), which is NOT the same as "an update
+ * is waiting". This is the single source of truth for the update total shown
+ * in the status bar and the package-tree badge — the two had drifted (the
+ * status bar omitted the `'unknown'` exclusion and over-reported the count).
+ */
+export function isUpdatable(result: VibrancyResult): boolean {
+    const status = result.updateInfo?.updateStatus;
+    return status !== undefined && status !== 'up-to-date' && status !== 'unknown';
+}
+
 /** Count results by vibrancy category. */
 export function countByCategory(results: readonly VibrancyResult[]) {
     let vibrant = 0, stable = 0, outdated = 0, abandoned = 0, eol = 0;

@@ -323,6 +323,13 @@ class ViolationExporter {
 
     return <String, Object>{
       'filesAnalyzed': data.filesAnalyzed,
+      // Total discovered project files (the health-score denominator basis).
+      // Lets the extension distinguish a full sweep from a partial one and
+      // avoid showing a false 0% computed over a tiny incremental sample.
+      // Omitted when discovery did not run, so consumers fall back to the
+      // legacy behavior of trusting whatever filesAnalyzed reports.
+      if (ProgressTracker.expectedFileCount > 0)
+        'filesExpected': ProgressTracker.expectedFileCount,
       'filesWithIssues': data.filesWithIssues,
       'totalViolations': data.total,
       'batchCount': data.batchCount,

@@ -60,6 +60,7 @@ Aggregate statistics for the analysis run. **This is the primary section for CI 
 | Field | Type | Description |
 |-------|------|-------------|
 | `filesAnalyzed` | `int` | Total Dart files analyzed |
+| `filesExpected` | `int?` | Total project Dart files discovered at session start (the health-score denominator basis). Omitted when discovery did not run. Over-estimates for projects with large `analysis_options`-excluded dirs (discovery is a fast recursive walk). Consumers use `filesAnalyzed / filesExpected` to detect a partial sweep and suppress a misleading score. |
 | `filesWithIssues` | `int` | Files with at least one violation |
 | `totalViolations` | `int` | Total violation count |
 | `batchCount` | `int` | Number of analysis batches (parallel isolates) |

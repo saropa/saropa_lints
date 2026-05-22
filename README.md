@@ -33,7 +33,7 @@ Lint integration defaults **on** for Dart workspaces (`saropaLints.enabled`). Ov
 
 At a glance:
 
-- **Health Score** — 0–100 score in the status bar; green/yellow/red bands
+- **Health Score** — 0–100 score in the status bar; green/yellow/red bands in the Overview
 - **Violations view** — Violations grouped by severity and file, with Error Lens-style inline annotations; multi-select works with **Copy as JSON**
 - **Security Posture** — OWASP Top 10 coverage matrix, compliance export
 - **Triage** — Disable noisy rules from the UI; see estimated score impact before acting
@@ -71,7 +71,7 @@ A single 0–100 number in the **Overview** and **status bar**, computed from vi
 - **50–79** (yellow): Needs work — some high-impact issues.
 - **Below 50** (red): Serious problems — many critical/high-impact violations.
 
-The status bar shows the score with a delta from the last run (e.g. "Saropa: 78 ▲4"). When violations decrease, a celebration message includes the score change.
+The status bar shows the score with a delta from the last run, plus the finding count, in a single item (e.g. "Saropa: 78 ▲4 · ⚠ 12"); its background stays neutral rather than turning red, and the score is held back until a full analysis has covered enough of the project. When violations decrease, a celebration message includes the score change.
 
 ### Violations view
 

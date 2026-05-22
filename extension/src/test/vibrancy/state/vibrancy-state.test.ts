@@ -1,4 +1,7 @@
 /** * Module overview (comment coverage pass). * comment-coverage: module overview (batch). * * Extension Jest tests: validates commands, webviews, parsers, and state against VS Code APIs (often with local mocks). */
+// Must be first: redirects 'vscode' imports to the local mock before any
+// source module that depends on vscode is loaded (works in isolation too).
+import '../register-vscode-mock';
 import * as assert from 'assert';
 import * as vscode from 'vscode';
 import { VibrancyStateManager, STATE_KEYS } from '../../../vibrancy/state/vibrancy-state';
@@ -27,6 +30,53 @@ describe('VibrancyStateManager', () => {
     afterEach(() => {
         manager.dispose();
         clearTestConfig();
+    });
+
+    /** A complete VibrancyResult fixture; override only the fields a test cares about. */
+    const makeResult = (overrides: Partial<VibrancyResult> = {}): VibrancyResult => ({
+        package: { name: 'test', version: '1.0.0', constraint: '^1.0.0', source: 'hosted', isDirect: true, section: 'dependencies' },
+        pubDev: null,
+        github: null,
+        knownIssue: null,
+        score: 50,
+        category: 'vibrant',
+        resolutionVelocity: 0,
+        engagementLevel: 0,
+        popularity: 0,
+        publisherTrust: 0,
+        updateInfo: null,
+        license: null,
+        archiveSizeBytes: null,
+        codeSizeBytes: null,
+        folderBreakdown: null,
+        maintainerQuality: null,
+        maintainerQualityBonus: 0,
+        bloatRating: null,
+        isUnused: false,
+        fileUsages: [],
+        platforms: null,
+        verifiedPublisher: false,
+        wasmReady: null,
+        blocker: null,
+        upgradeBlockStatus: 'up-to-date',
+        transitiveInfo: null,
+        alternatives: [],
+        latestPrerelease: null,
+        prereleaseTag: null,
+        vulnerabilities: [],
+        versionGap: null,
+        overrideGap: null,
+        replacementComplexity: null,
+        likes: null,
+        downloadCount30Days: null,
+        reverseDependencyCount: null,
+        readme: null,
+        ...overrides,
+    });
+
+    /** Build a package dependency with a distinct name (for suppression tests). */
+    const pkg = (name: string): VibrancyResult['package'] => ({
+        name, version: '1.0.0', constraint: '^1.0.0', source: 'hosted', isDirect: true, section: 'dependencies',
     });
 
     describe('initial state', () => {
@@ -105,35 +155,6 @@ describe('VibrancyStateManager', () => {
     });
 
     describe('updateFromResults', () => {
-        const makeResult = (overrides: Partial<VibrancyResult> = {}): VibrancyResult => ({
-            package: { name: 'test', version: '1.0.0', constraint: '^1.0.0', source: 'hosted', isDirect: true, section: 'dependencies' },
-            pubDev: null,
-            github: null,
-            knownIssue: null,
-            score: 50,
-            category: 'vibrant',
-            resolutionVelocity: 0,
-            engagementLevel: 0,
-            popularity: 0,
-            publisherTrust: 0,
-            updateInfo: null,
-            license: null,
-            archiveSizeBytes: null,
-            bloatRating: null,
-            isUnused: false,
-            platforms: null,
-            verifiedPublisher: false,
-            wasmReady: null,
-            blocker: null,
-            upgradeBlockStatus: 'up-to-date',
-            transitiveInfo: null,
-            alternatives: [],
-            latestPrerelease: null,
-            prereleaseTag: null,
-            vulnerabilities: [],
-            ...overrides,
-        });
-
         it('should set hasResults true when results exist', () => {
             manager.updateFromResults([makeResult()]);
             assert.strictEqual(manager.hasResults.value, true);
@@ -191,6 +212,25 @@ describe('VibrancyStateManager', () => {
             });
             manager.updateFromResults([makeResult()]);
         });
+
+        it('keeps suppressed packages in packageCount but excludes them from update/problem counts', () => {
+            const withUpdate = { currentVersion: '1.0.0', latestVersion: '2.0.0', updateStatus: 'major' as const, changelog: null };
+            manager.updateFromResults(
+                [
+                    makeResult({ package: pkg('keep'), category: 'abandoned', updateInfo: withUpdate }),
+                    makeResult({ package: pkg('dismissed'), category: 'end-of-life', updateInfo: withUpdate }),
+                ],
+                new Set(['dismissed']),
+            );
+            assert.strictEqual(manager.packageCount.value, 2, 'both packages were scanned');
+            assert.strictEqual(manager.updatableCount.value, 1, 'suppressed update excluded');
+            assert.strictEqual(manager.problemCount.value, 1, 'suppressed problem excluded');
+        });
+
+        it('treats an absent suppressed set as nothing suppressed (back-compat)', () => {
+            manager.updateFromResults([makeResult({ category: 'abandoned' })]);
+            assert.strictEqual(manager.problemCount.value, 1);
+        });
     });
 
     describe('codeLens methods', () => {
@@ -216,14 +256,9 @@ describe('VibrancyStateManager', () => {
 
     describe('reset', () => {
         it('should reset all values to defaults', () => {
-            manager.updateFromResults([{
-                package: { name: 'test', version: '1.0.0', constraint: '^1.0.0', source: 'hosted', isDirect: true, section: 'dependencies' },
-                pubDev: null, github: null, knownIssue: null, score: 50, category: 'vibrant',
-                resolutionVelocity: 0, engagementLevel: 0, popularity: 0, publisherTrust: 0,
+            manager.updateFromResults([makeResult({
                 updateInfo: { currentVersion: '1.0.0', latestVersion: '2.0.0', updateStatus: 'major', changelog: null },
-                platforms: null, verifiedPublisher: false, wasmReady: null, blocker: null,
-                upgradeBlockStatus: 'up-to-date', transitiveInfo: null, alternatives: [], latestPrerelease: null, prereleaseTag: null, vulnerabilities: [],
-            }]);
+            })]);
             manager.startScanning();
             manager.selectedPackage.value = 'some_package';
 

@@ -8,6 +8,7 @@
 import * as vscode from 'vscode';
 import { ContextState } from './context-state';
 import { VibrancyResult } from '../types';
+import { isUpdatable } from '../scoring/status-classifier';
 
 /** Context key prefix for all vibrancy state. */
 const PREFIX = 'saropaLints.packageVibrancy';
@@ -66,16 +67,27 @@ export class VibrancyStateManager implements vscode.Disposable {
         this.hasFilter = new ContextState(STATE_KEYS.hasFilter, false);
     }
 
-    /** Update state from scan results. Call after scan completes. */
-    updateFromResults(results: readonly VibrancyResult[]): void {
+    /**
+     * Update state from scan results. Call after scan completes.
+     *
+     * [suppressed] holds packages the user has dismissed. They remain in
+     * [packageCount] (a coverage fact — they were scanned) but are excluded
+     * from the actionable badges [updatableCount] and [problemCount], so a
+     * dismissed package no longer lights up the "updates"/"problems"
+     * affordances. This matches the status-bar tooltip and the tree's main
+     * list, which also drop suppressed packages.
+     */
+    updateFromResults(
+        results: readonly VibrancyResult[],
+        suppressed: ReadonlySet<string> = new Set<string>(),
+    ): void {
+        const active = results.filter(r => !suppressed.has(r.package.name));
         this.hasResults.value = results.length > 0;
         this.packageCount.value = results.length;
-        this.updatableCount.value = results.filter(r => {
-            const status = r.updateInfo?.updateStatus;
-            return status && status !== 'up-to-date' && status !== 'unknown';
-        }).length;
+        // Single source of truth shared with the status-bar update total.
+        this.updatableCount.value = active.filter(isUpdatable).length;
         // End-of-life, abandoned, and outdated packages are all counted as problems
-        this.problemCount.value = results.filter(
+        this.problemCount.value = active.filter(
             r => r.category === 'end-of-life' || r.category === 'abandoned' || r.category === 'outdated',
         ).length;
         this._onDidChangeResults.fire();

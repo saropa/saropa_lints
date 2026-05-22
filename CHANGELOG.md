@@ -84,16 +84,26 @@ The `prefer_spread_over_addall` style hint stops nagging when you mutate a colle
 ### Fixed (Extension)
 
 - **The status bar no longer shows a false 0% lint score from an in-progress scan** — the score divides violations by the files analyzed so far, so a partial editor sweep could crater it; it now appears only once a full analysis has covered enough of the project. If the tooltip says "partial scan", run a full analysis to get the score.
-- **The status-bar "updates available" count now matches the package-tree badge** — it had counted packages whose update status was undetermined (offline / no pub.dev data) as available updates, over-reporting the total. No action required.
+- **The status-bar "updates available" count no longer over-reports** — it had counted packages whose update status was undetermined (offline / no pub.dev data) as available updates; it now counts only packages with a real newer version. No action required.
 - **The Findings dashboard health gauge no longer collapses to an empty dot** — its entrance animation restarted on every refresh and got stuck near the empty frame; the ring now paints the true score instantly on every render. No action required.
 - **The Findings dashboard "Group by" dropdown is now legible when open** — the option list inherited a low-contrast highlight; it now uses the editor's dropdown colors. No action required.
 
 ### Changed (Extension)
 
+- **Saropa now uses a single status-bar item instead of two** — the score/vibrancy summary and the separate finding-count badge were merged, so a high score no longer sits next to a contradictory "⚠ N" count; the count is now appended to the one item (e.g. `Saropa: 98% ▼2 · V8/10 · ⚠ 96`) and clicking it opens the Findings Dashboard. No action required.
 - **The lint score no longer colors the status bar red** — a low score is informational, not an error, so the status-bar background now stays neutral. No action required.
+- **Suppressed packages no longer skew the vibrancy score, "updates available", or problem counts** — dismissing a package now removes it from the status-bar numbers and the tree's update/problem badges alike, while the "packages scanned" line shows how many are suppressed so the totals reconcile. No action required.
 - **The Findings dashboard health grade no longer whiplashes from A to E mid-scan** — it dims to a "computing" state while an analysis is streaming results in, then reveals the settled grade once the run finishes. No action required.
 - **The health gauge shows the score without the "/100" suffix** — the denominator was redundant next to the letter grade. No action required.
 - **The Findings dashboard Top Rules table is trimmed to the 10 noisiest rules and its Rule / Count / Severity headers are now click-to-sort** — fewer, richer rows that you can reorder for triage. No action required.
+
+<details><summary>Maintenance</summary>
+
+- Wired the `vibrancy-state` unit tests into the test build (they had drifted out and stopped compiling) and refreshed their fixtures; added coverage for the shared `isUpdatable` predicate and suppressed-package exclusion.
+- Added a `filesExpected` field to `violations.json` (the project-file denominator) so the extension can detect a partial analysis.
+- Documented the empty `cross_file_fixture/test/*_test.dart` files as mirror-test presence markers (existence-only fixtures, not stub tests) to stop them reading as broken.
+
+</details>
 
 ---
 

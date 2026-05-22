@@ -949,6 +949,20 @@ class ProgressTracker {
   /// Unmodifiable view of all file paths analyzed in this session.
   static Set<String> get analyzedFiles => Set<String>.unmodifiable(_seenFiles);
 
+  /// Total project Dart files discovered at session start (the analysis
+  /// denominator), or 0 when discovery has not run / found too few files.
+  ///
+  /// Written to `violations.json` as `filesExpected` so consumers can tell a
+  /// full sweep from a partial one. The IDE plugin analyzes files
+  /// incrementally (open/affected first), so a debounced report can land with
+  /// only a handful of [analyzedFiles] — dividing violations by that tiny
+  /// denominator inflates density and craters the health score to a false 0%.
+  /// `filesExpected` lets the extension suppress the score until coverage is
+  /// high enough. Note this count includes files later excluded by
+  /// `analysis_options` (discovery is a fast recursive `.dart` walk), so it is
+  /// an over-estimate for projects with large excluded dirs.
+  static int get expectedFileCount => _totalExpectedFiles;
+
   /// Get a snapshot of all tracking data for report generation.
   static ProgressTrackerData get reportData => ProgressTrackerData(
     filesAnalyzed: _seenFiles.length,

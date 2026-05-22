@@ -6,7 +6,16 @@ import {
     categoryToSeverity,
     categoryLabel,
     categoryToGrade,
+    isUpdatable,
 } from '../../../vibrancy/scoring/status-classifier';
+import type { UpdateStatus, VibrancyResult } from '../../../vibrancy/types';
+
+/** Minimal result carrying only the field isUpdatable reads. */
+function resultWithStatus(status: UpdateStatus | null): VibrancyResult {
+    return {
+        updateInfo: status === null ? null : { updateStatus: status },
+    } as unknown as VibrancyResult;
+}
 
 /**
  * Tests **status-classifier** exports: score → category (`vibrant` / `stable` / …), icons, labels,
@@ -357,6 +366,26 @@ describe('status-classifier', () => {
             assert.strictEqual(categoryToGrade('outdated'), 'C');
             assert.strictEqual(categoryToGrade('abandoned'), 'E');
             assert.strictEqual(categoryToGrade('end-of-life'), 'F');
+        });
+    });
+
+    describe('isUpdatable', () => {
+        it('counts patch, minor, and major as updatable', () => {
+            assert.strictEqual(isUpdatable(resultWithStatus('patch')), true);
+            assert.strictEqual(isUpdatable(resultWithStatus('minor')), true);
+            assert.strictEqual(isUpdatable(resultWithStatus('major')), true);
+        });
+
+        it('excludes up-to-date', () => {
+            assert.strictEqual(isUpdatable(resultWithStatus('up-to-date')), false);
+        });
+
+        it('excludes unknown (status undetermined is not an available update)', () => {
+            assert.strictEqual(isUpdatable(resultWithStatus('unknown')), false);
+        });
+
+        it('excludes packages with no updateInfo', () => {
+            assert.strictEqual(isUpdatable(resultWithStatus(null)), false);
         });
     });
 });

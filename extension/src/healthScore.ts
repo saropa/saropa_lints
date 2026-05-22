@@ -50,6 +50,34 @@ export const IMPACT_WEIGHTS = {
 export const DECAY_RATE = 0.3;
 
 /**
+ * Minimum fraction of the project that must be analyzed before a score is
+ * trusted. Below this, the report is treated as a partial sweep and no score
+ * is produced (see [isReportTooPartial]).
+ *
+ * **Why this exists.** The IDE plugin analyzes files incrementally
+ * (open/affected first) and writes the report on a debounce, so a snapshot can
+ * land with only a handful of files. Dividing violations by that tiny
+ * denominator inflates density and craters the score to a false 0% — the bug
+ * this guards against. The score returns once a full `dart analyze` sweep
+ * lands.
+ *
+ * **Deliberately low.** `filesExpected` (the denominator) counts *all*
+ * discovered `.dart` files, including those later excluded by
+ * `analysis_options`. A project with large excluded dirs analyzes far fewer
+ * files than it discovers — e.g. this repo excludes its bundled `example`
+ * fixture dirs and a full sweep covers ~0.24 of discovered files. The
+ * threshold sits below
+ * that so legitimate full sweeps still score.
+ *
+ * **What it catches / misses.** Catches grossly-partial reports (coverage
+ * under the threshold, e.g. an early IDE sweep or an open-editors-only run).
+ * It does NOT catch a mid-coverage report that over-represents messy files,
+ * and it will withhold the score from a project that excludes more than
+ * ~85% of its `.dart` files via `analysis_options`.
+ */
+export const MIN_COVERAGE_FOR_SCORE = 0.15;
+
+/**
  * Coerce unknown values to number, returning 0 for null/undefined/NaN/non-numeric.
  * Guards against malformed JSON (e.g. "error": "bad").
  */
@@ -69,8 +97,26 @@ export interface HealthScoreResult {
 }
 
 /**
+ * True when the report covers too small a fraction of the project to score.
+ *
+ * Returns false when `filesExpected` is absent (older plugin reports carry no
+ * coverage signal — we trust them rather than hiding the score). Otherwise
+ * compares analyzed-vs-expected against [MIN_COVERAGE_FOR_SCORE].
+ */
+export function isReportTooPartial(data: ViolationsData): boolean {
+  const summary = data.summary;
+  if (!summary) return false;
+  const expected = summary.filesExpected ?? 0;
+  if (expected <= 0) return false; // no coverage signal — do not gate
+  const analyzed = summary.filesAnalyzed ?? 0;
+  return analyzed < expected * MIN_COVERAGE_FOR_SCORE;
+}
+
+/**
  * Compute a health score from violations data.
- * Returns null if there is no summary data to compute from.
+ * Returns null if there is no summary data to compute from, or if the report
+ * is only a partial sweep (see [isReportTooPartial]) — a score from an
+ * incremental slice is misleading, so callers show "no score" instead.
  */
 export function computeHealthScore(
   data: ViolationsData,
@@ -81,6 +127,8 @@ export function computeHealthScore(
   const filesAnalyzed = summary.filesAnalyzed ?? 0;
   // No files analyzed means no meaningful score.
   if (filesAnalyzed === 0) return null;
+  // A tiny incremental sample inflates density and produces a false 0%.
+  if (isReportTooPartial(data)) return null;
 
   const impact = summary.byImpact ?? {};
   const errorCount = safeNum(impact.error);
@@ -126,6 +174,8 @@ export function estimateScoreWithout(
   if (!summary) return null;
   const filesAnalyzed = summary.filesAnalyzed ?? 0;
   if (filesAnalyzed === 0) return null;
+  // Mirror computeHealthScore: do not project from a partial sweep.
+  if (isReportTooPartial(data)) return null;
 
   const impactCounts = summary.byImpact ?? {};
 

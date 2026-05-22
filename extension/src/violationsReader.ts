@@ -97,6 +97,13 @@ export interface ViolationsData {
   summary?: {
     totalViolations?: number;
     filesAnalyzed?: number;
+    /**
+     * Total project Dart files discovered at analysis start (the score
+     * denominator basis). Absent on reports from older plugin versions.
+     * Used by [computeHealthScore] to suppress a misleading score when the
+     * report covers only a tiny incremental slice of the project.
+     */
+    filesExpected?: number;
     filesWithIssues?: number;
     bySeverity?: BySeverity;
     byImpact?: ByImpact;
@@ -269,6 +276,7 @@ export function readViolations(workspaceRoot: string): ViolationsData | null {
         ? {
             totalViolations: summary.totalViolations,
             filesAnalyzed: summary.filesAnalyzed,
+            filesExpected: summary.filesExpected,
             filesWithIssues: summary.filesWithIssues,
             bySeverity: summary.bySeverity,
             // Re-key the legacy 5-bucket `byImpact` map onto the 3-bucket
