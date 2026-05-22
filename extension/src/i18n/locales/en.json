@@ -90,7 +90,8 @@
     "secondaryAsideLabel": "Secondary diagnostics",
     "hero": {
       "productTitle": "Findings Dashboard",
-      "gaugeTitle": "Health score {score}/100 (grade {grade}). Errors weigh heaviest."
+      "gaugeTitle": "Health score {score} (grade {grade}). Errors weigh heaviest.",
+      "gaugePending": "…"
     },
     "time": {
       "justNow": "just now",
@@ -228,7 +229,8 @@
       "colRule": "Rule",
       "colCount": "Count",
       "colSeverity": "Severity",
-      "colActionsAria": "Row actions"
+      "colActionsAria": "Row actions",
+      "filesAffected": "Files affected ({count})"
     },
     "findings": {
       "sectionAria": "Findings",

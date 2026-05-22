@@ -127,7 +127,25 @@ export interface ViolationsDashboardHtmlInput {
    * post-filter). Each row carries severity so the user can decide whether
    * the noise is from an INFO-level stylistic rule or a real WARNING.
    */
-  topRules?: ReadonlyArray<{ name: string; count: number; severity: string }>;
+  topRules?: ReadonlyArray<{
+    name: string;
+    count: number;
+    severity: string;
+    /**
+     * Representative finding message for the rule (first occurrence). Shown
+     * when the row is expanded so the user can read what the rule flags
+     * without scrolling down to the findings table. Optional: callers (and
+     * tests) that only need the count ranking may omit it — the row then
+     * renders as a plain, non-expandable row.
+     */
+    message?: string;
+    /**
+     * Files contributing this rule's findings, highest-count first and capped
+     * host-side, each with a representative (lowest) line so the expander can
+     * deep-link into the source. Optional for the same reason as `message`.
+     */
+    files?: ReadonlyArray<{ file: string; count: number; line: number }>;
+  }>;
   /**
    * Live supplementary diagnostic state powering the status-line toggle pills
    * (gap-closing affordance for issue #224). Each source is a three-state
@@ -248,7 +266,20 @@ function scoreToGrade(score: number): string {
   return 'E';
 }
 
-/** Hero radial gauge — same SVG geometry as the package dashboard's gauge. */
+/**
+ * Hero radial gauge — same SVG geometry as the package dashboard's gauge.
+ *
+ * The fill arc is a static SVG `stroke-dasharray` presentation attribute, NOT a
+ * CSS keyframe. The dashboard re-renders its whole HTML on every diagnostics
+ * tick; an entrance animation restarts from the 0% frame on each rebuild, and
+ * when rebuilds arrive faster than the animation duration the ring is forever
+ * caught near empty — it reads as a lone round-cap dot. A static dasharray
+ * paints the true fill instantly on every rebuild, so the ring is always right.
+ *
+ * `data-pending` (toggled client-side while analysis is in flight) dims the ring
+ * and swaps the grade for a "computing" glyph, so a transient not-yet-settled
+ * score never flashes a misleading grade (the A→E whiplash the user reported).
+ */
 function buildGauge(score: number): string {
   const r = 36;
   const circumference = 2 * Math.PI * r;
@@ -258,7 +289,7 @@ function buildGauge(score: number): string {
     ? `hsl(${Math.round(60 + (score - 50) * 1.2)}, 70%, 48%)`
     : `hsl(${Math.round(score * 1.2)}, 75%, 48%)`;
   const grade = scoreToGrade(score);
-  return `<div class="hero-gauge" title="${escapeHtml(l10n('findingsDash.hero.gaugeTitle', { score: String(score), grade }))}">
+  return `<div class="hero-gauge" data-pending="false" title="${escapeHtml(l10n('findingsDash.hero.gaugeTitle', { score: String(score), grade }))}">
     <svg viewBox="0 0 88 88">
       <circle class="gauge-track" cx="44" cy="44" r="${r}" fill="none"
         stroke-width="7"
@@ -267,10 +298,13 @@ function buildGauge(score: number): string {
       <circle class="gauge-fill" cx="44" cy="44" r="${r}" fill="none"
         stroke="${color}" stroke-width="7"
         stroke-dasharray="${filled} ${circumference}"
-        stroke-linecap="round" transform="rotate(135 44 44)"
-        style="--gauge-target: ${filled}; --gauge-arc: ${arcLength};" />
+        stroke-linecap="round" transform="rotate(135 44 44)" />
     </svg>
-    <div class="gauge-label"><span class="lg">${grade}</span><span class="sm">${score}/100</span></div>
+    <div class="gauge-label">
+      <span class="lg">${grade}</span>
+      <span class="sm">${score}</span>
+    </div>
+    <div class="gauge-pending" aria-hidden="true">${escapeHtml(l10n('findingsDash.hero.gaugePending'))}</div>
   </div>`;
 }
 
@@ -734,6 +768,8 @@ function buildChip(kind: string, label: string, dropToken: string): string {
  * label, not buried behind a chevron.
  * ========================================================================= */
 
+type TopRule = NonNullable<ViolationsDashboardHtmlInput['topRules']>[number];
+
 function buildTopRulesTable(input: ViolationsDashboardHtmlInput): string {
   const rows = input.topRules ?? [];
   // Hide the section entirely when there are no findings — avoids an empty
@@ -746,26 +782,10 @@ function buildTopRulesTable(input: ViolationsDashboardHtmlInput): string {
   // Body is built once on render; suppressing a rule reloads the panel via
   // the issuesProvider tree-data event, so client-side row removal is not
   // needed (and would diverge from the rebuilt findings table below).
-  const body = rows.map((r, i) => {
-    const sev = (r.severity || 'info').toLowerCase();
-    const ruleAttr = encodeURIComponent(r.name);
-    return `<tr class="trow" data-rule="${escapeHtml(r.name)}" data-rule-enc="${ruleAttr}">
-      <td class="col-rank">${i + 1}</td>
-      <td class="col-rule"><span class="rule-tag">${escapeHtml(r.name)}</span></td>
-      <td class="col-count">${r.count}</td>
-      <td class="col-sev"><span class="sev-pill sev-${escapeHtml(sev)}">${escapeHtml(sev)}</span></td>
-      <td class="col-actions">
-        <button type="button" class="row-action neutral" data-row-action="hide-rule"
-                title="${escapeHtml(l10n('findingsDash.topRules.hideTitle'))}">
-          ${escapeHtml(l10n('findingsDash.topRules.hideButton'))}
-        </button>
-        <button type="button" class="row-action danger" data-row-action="disable-rule"
-                title="${escapeHtml(l10n('findingsDash.topRules.disableTitle'))}">
-          ${escapeHtml(l10n('findingsDash.topRules.disableButton'))}
-        </button>
-      </td>
-    </tr>`;
-  }).join('');
+  // Rank is a stable position attribute reflecting the original count order;
+  // it is intentionally NOT sortable, so it keeps reading as "the Nth noisiest
+  // rule" even after the user re-sorts by name or severity.
+  const body = rows.map((r, i) => buildTopRuleRow(r, i)).join('');
   const topPhrase = pluralize(rows.length, {
     one: l10n('findingsDash.topRules.topRulesOne'),
     other: l10n('findingsDash.topRules.topRulesOther'),
@@ -783,9 +803,9 @@ function buildTopRulesTable(input: ViolationsDashboardHtmlInput): string {
         <thead>
           <tr>
             <th class="col-rank" scope="col">${escapeHtml(l10n('findingsDash.topRules.colRank'))}</th>
-            <th class="col-rule" scope="col">${escapeHtml(l10n('findingsDash.topRules.colRule'))}</th>
-            <th class="col-count" scope="col">${escapeHtml(l10n('findingsDash.topRules.colCount'))}</th>
-            <th class="col-sev" scope="col">${escapeHtml(l10n('findingsDash.topRules.colSeverity'))}</th>
+            <th class="col-rule" data-sort="rule" aria-sort="none" scope="col">${escapeHtml(l10n('findingsDash.topRules.colRule'))}<span class="arrow">⇅</span></th>
+            <th class="col-count" data-sort="count" aria-sort="none" scope="col">${escapeHtml(l10n('findingsDash.topRules.colCount'))}<span class="arrow">⇅</span></th>
+            <th class="col-sev" data-sort="sev" aria-sort="none" scope="col">${escapeHtml(l10n('findingsDash.topRules.colSeverity'))}<span class="arrow">⇅</span></th>
             <th class="col-actions" aria-label="${escapeHtml(l10n('findingsDash.topRules.colActionsAria'))}" scope="col"></th>
           </tr>
         </thead>
@@ -793,6 +813,71 @@ function buildTopRulesTable(input: ViolationsDashboardHtmlInput): string {
       </table>
     </div>
   </section>`;
+}
+
+/**
+ * One Top-Rules row. When the rule carries a message or file breakdown the row
+ * becomes an expander: a chevron + `data-expandable` main row, followed by a
+ * `trow-detail` row (hidden) holding the full message and the affected-file
+ * list. Rows without that detail (count-only fixtures) render flat so the
+ * chevron never advertises content that is not there.
+ */
+function buildTopRuleRow(r: TopRule, i: number): string {
+  const sev = (r.severity || 'info').toLowerCase();
+  const ruleAttr = encodeURIComponent(r.name);
+  const files = r.files ?? [];
+  const message = r.message ?? '';
+  const expandable = message.length > 0 || files.length > 0;
+  const chevron = expandable
+    ? '<span class="trow-chev" aria-hidden="true">▸</span>'
+    : '<span class="trow-chev placeholder" aria-hidden="true"></span>';
+  const expandAttrs = expandable
+    ? ` role="button" tabindex="0" aria-expanded="false" data-expandable="true" aria-controls="trd-${ruleAttr}"`
+    : '';
+  const mainRow = `<tr class="trow" data-rule="${escapeHtml(r.name)}" data-rule-enc="${ruleAttr}" data-count="${r.count}" data-sev="${escapeHtml(sev)}"${expandAttrs}>
+      <td class="col-rank">${i + 1}</td>
+      <td class="col-rule">${chevron}<span class="rule-tag">${escapeHtml(r.name)}</span></td>
+      <td class="col-count">${r.count}</td>
+      <td class="col-sev"><span class="sev-pill sev-${escapeHtml(sev)}">${escapeHtml(sev)}</span></td>
+      <td class="col-actions">
+        <button type="button" class="row-action neutral" data-row-action="hide-rule"
+                title="${escapeHtml(l10n('findingsDash.topRules.hideTitle'))}">
+          ${escapeHtml(l10n('findingsDash.topRules.hideButton'))}
+        </button>
+        <button type="button" class="row-action danger" data-row-action="disable-rule"
+                title="${escapeHtml(l10n('findingsDash.topRules.disableTitle'))}">
+          ${escapeHtml(l10n('findingsDash.topRules.disableButton'))}
+        </button>
+      </td>
+    </tr>`;
+  if (!expandable) return mainRow;
+  return `${mainRow}${buildTopRuleDetailRow(ruleAttr, message, files)}`;
+}
+
+function buildTopRuleDetailRow(
+  ruleAttr: string,
+  message: string,
+  files: ReadonlyArray<{ file: string; count: number; line: number }>,
+): string {
+  const msgHtml = message.length > 0
+    ? `<p class="trd-msg">${escapeHtml(message)}</p>`
+    : '';
+  const fileItems = files
+    .map((f) => {
+      const enc = encodeURIComponent(f.file);
+      return `<li class="trd-file" role="button" tabindex="0" data-file="${enc}" data-line="${Math.max(1, f.line)}" title="${escapeHtml(f.file)}">
+            <span class="trd-file-path">${escapeHtml(f.file)}</span>
+            <span class="trd-file-count">${f.count}</span>
+          </li>`;
+    })
+    .join('');
+  const filesHtml = files.length > 0
+    ? `<div class="trd-files-head">${escapeHtml(l10n('findingsDash.topRules.filesAffected', { count: String(files.length) }))}</div>
+         <ul class="trd-files">${fileItems}</ul>`
+    : '';
+  return `<tr class="trow-detail" id="trd-${ruleAttr}" data-rule-enc="${ruleAttr}" hidden>
+      <td colspan="5"><div class="trd-body">${msgHtml}${filesHtml}</div></td>
+    </tr>`;
 }
 
 /* ============================================================================
@@ -1271,8 +1356,19 @@ function buildScript(): string {
     }, 220);
   }
 
+  /* Gauge "pending" state — dims the ring and hides the grade while analysis
+     is in flight, so a transient not-yet-settled health score never flashes a
+     misleading grade (the A→E whiplash). No explicit clear is needed for the
+     normal path: every host rebuild ships a fresh gauge with data-pending
+     already "false", so the settled grade reveals itself on the next paint. */
+  function setGaugePending(on) {
+    var g = document.querySelector('.hero-gauge');
+    if (g) g.setAttribute('data-pending', on ? 'true' : 'false');
+  }
+
   function setAnalysisProgress(running, metaText) {
     isAnalyzing = running;
+    setGaugePending(running);
     var box = document.getElementById('analysis-progress');
     var label = document.getElementById('analysis-progress-label');
     var meta = document.getElementById('analysis-progress-meta');
@@ -1845,6 +1941,102 @@ function buildScript(): string {
     }
   });
 
+  /* Top Rules table — click a header to sort; click a row to expand its full
+     message + affected-file breakdown. Sorting moves each detail row with its
+     parent so the disclosure stays glued to the right rule. Rank is left
+     unsortable on purpose (it is a stable noise-rank position label). */
+  (function () {
+    var tbl = document.querySelector('.top-rules-table');
+    if (!tbl) return;
+    var tbody = tbl.querySelector('tbody');
+    if (!tbody) return;
+    var sevOrder = { error: 0, warning: 1, info: 2, note: 3 };
+    var sortState = { key: null, asc: true };
+
+    function sortVal(tr, key) {
+      if (key === 'count') return parseInt(tr.getAttribute('data-count') || '0', 10);
+      if (key === 'sev') {
+        var s = sevOrder[tr.getAttribute('data-sev')];
+        return s == null ? 99 : s;
+      }
+      return (tr.getAttribute('data-rule') || '').toLowerCase();
+    }
+    function detailFor(tr) {
+      var n = tr.nextElementSibling;
+      return (n && n.classList.contains('trow-detail')) ? n : null;
+    }
+    function applySort(key) {
+      if (sortState.key === key) { sortState.asc = !sortState.asc; }
+      else { sortState.key = key; sortState.asc = true; }
+      var asc = sortState.asc;
+      var pairs = [];
+      Array.prototype.forEach.call(tbody.querySelectorAll('tr.trow'), function (tr) {
+        pairs.push({ row: tr, detail: detailFor(tr) });
+      });
+      pairs.sort(function (a, b) {
+        var av = sortVal(a.row, key), bv = sortVal(b.row, key);
+        if (av < bv) return asc ? -1 : 1;
+        if (av > bv) return asc ? 1 : -1;
+        return 0;
+      });
+      while (tbody.firstChild) tbody.removeChild(tbody.firstChild);
+      pairs.forEach(function (p) {
+        tbody.appendChild(p.row);
+        if (p.detail) tbody.appendChild(p.detail);
+      });
+      tbl.querySelectorAll('thead th[data-sort]').forEach(function (h) {
+        var hk = h.getAttribute('data-sort');
+        h.setAttribute('aria-sort', hk === key ? (asc ? 'ascending' : 'descending') : 'none');
+      });
+    }
+    tbl.querySelectorAll('thead th[data-sort]').forEach(function (th) {
+      th.addEventListener('click', function () {
+        var k = th.getAttribute('data-sort');
+        if (k) applySort(k);
+      });
+    });
+
+    function toggleRow(tr) {
+      var detail = detailFor(tr);
+      if (!detail) return;
+      var open = tr.getAttribute('aria-expanded') === 'true';
+      tr.setAttribute('aria-expanded', open ? 'false' : 'true');
+      detail.hidden = open;
+      var chev = tr.querySelector('.trow-chev');
+      if (chev) chev.textContent = open ? '▸' : '▾';
+    }
+    Array.prototype.forEach.call(
+      tbody.querySelectorAll('tr.trow[data-expandable="true"]'),
+      function (tr) {
+        tr.addEventListener('click', function (e) {
+          // Hide / Disable buttons own their own clicks — never toggle on them.
+          if (e.target && e.target.closest && e.target.closest('.row-action')) return;
+          toggleRow(tr);
+        });
+        tr.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleRow(tr); }
+        });
+      },
+    );
+
+    /* Affected-file rows in the expander deep-link into the source file. */
+    Array.prototype.forEach.call(tbl.querySelectorAll('.trd-file[data-file]'), function (li) {
+      function open() {
+        try {
+          vscode.postMessage({
+            type: 'openFile',
+            file: decodeURIComponent(li.getAttribute('data-file') || ''),
+            line: parseInt(li.getAttribute('data-line') || '1', 10),
+          });
+        } catch (e) { /* ignore */ }
+      }
+      li.addEventListener('click', open);
+      li.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
+      });
+    });
+  })();
+
   /* TODOs / Drift section action bindings */
   bindClick('btn-enable-todos-scan', function () { vscode.postMessage({ type: 'enableTodosScan' }); });
   bindClick('btn-drift-refresh', function () { vscode.postMessage({ type: 'driftRefresh' }); });
@@ -1888,7 +2080,13 @@ function buildScript(): string {
 
   window.addEventListener('message', function (event) {
     var msg = event && event.data ? event.data : null;
-    if (!msg || msg.type !== 'analysisProgress') return;
+    if (!msg) return;
+    // Host posts this on the first diagnostics change of a burst (analysis is
+    // streaming results in); the subsequent debounced rebuild reveals the
+    // settled grade. Keeps the gauge honest even for runs the dashboard did
+    // not initiate (e.g. analyze-on-save).
+    if (msg.type === 'gaugePending') { setGaugePending(!!msg.pending); return; }
+    if (msg.type !== 'analysisProgress') return;
     if (msg.status === 'started') {
       setAnalysisProgress(true, FD.metaStartedDetail);
       announce(FD.announceStarted);
@@ -1941,10 +2139,11 @@ export function renderViolationsDashboardHtml(input: ViolationsDashboardHtmlInpu
 <html lang="en"><head>
   <meta charset="UTF-8" />
   <title>${escapeHtml(l10n('findingsDash.documentTitle'))}</title>
-  <!-- 'unsafe-inline' on style-src: hero gauge sets dynamic CSS vars (--gauge-target,
-       --gauge-arc, --gauge-color) via inline style="..." attributes. CSP nonces only
-       authorize <style> blocks, not style attributes — without 'unsafe-inline' the vars
-       are dropped, the dasharray falls back to 0, and the gauge renders as a tiny dot. -->
+  <!-- 'unsafe-inline' on style-src: the severity-mix chart bars set their width
+       via an inline style="--bar-width:N%" attribute. CSP nonces authorize
+       <style> blocks, not style attributes — without 'unsafe-inline' the var is
+       dropped and every bar renders at zero width. (The hero gauge no longer
+       needs this: its fill is now a static SVG stroke-dasharray attribute.) -->
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'nonce-${nonce}' 'unsafe-inline'; script-src 'nonce-${nonce}';" />
   <style nonce="${nonce}">${getViolationsDashboardStyles()}${getKeyboardShortcutsStyles()}</style>
 </head><body>

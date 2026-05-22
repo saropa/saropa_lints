@@ -157,9 +157,9 @@ export function getViolationsDashboardStyles(): string {
       outline-offset: 2px;
     }
 
-    /* Hero gauge — 0–100 health ring derived from severity mix.
-       Driven by --gauge-target / --gauge-arc CSS vars so the keyframe
-       animation does not fight the inline stroke-dasharray. */
+    /* Hero gauge — 0–100 health ring derived from severity mix. The fill arc
+       is a static SVG stroke-dasharray attribute set in the markup; there is no
+       keyframe (see .gauge-fill below for why an entrance animation was a bug). */
     .hero-gauge {
       position: relative;
       width: 96px;
@@ -168,14 +168,13 @@ export function getViolationsDashboardStyles(): string {
     }
     .hero-gauge svg { width: 96px; height: 96px; display: block; }
     .gauge-track { stroke: var(--border); }
-    .gauge-fill {
-      stroke-dasharray: var(--gauge-target, 0) var(--gauge-arc, 999);
-      animation: gauge-fill-in 1100ms ease-out;
-    }
-    @keyframes gauge-fill-in {
-      from { stroke-dasharray: 0 var(--gauge-arc, 999); }
-      to   { stroke-dasharray: var(--gauge-target, 0) var(--gauge-arc, 999); }
-    }
+    /* No entrance animation: the fill is a static SVG stroke-dasharray. The
+       panel rebuilds its whole HTML on every diagnostics tick, and a keyframe
+       restarts from the 0% frame on each rebuild — when ticks arrive faster
+       than the animation duration the ring is forever caught near empty (it
+       reads as a lone round-cap dot). Static dasharray = always correct, no
+       flicker. Only opacity transitions, for the pending dim-out. */
+    .gauge-fill { transition: opacity 160ms ease-out; }
     .gauge-label {
       position: absolute;
       inset: 0;
@@ -188,6 +187,24 @@ export function getViolationsDashboardStyles(): string {
     }
     .gauge-label .lg { font-size: 1.55em; font-weight: 700; line-height: 1; }
     .gauge-label .sm { font-size: .7em; opacity: .7; }
+    /* Pending state (analysis streaming results in): dim the ring, hide the
+       grade, and show a compact "computing" glyph so a not-yet-settled score
+       never flashes a misleading grade. Toggled via data-pending in the script. */
+    .gauge-pending {
+      position: absolute;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6em;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: var(--muted);
+      pointer-events: none;
+    }
+    .hero-gauge[data-pending="true"] .gauge-fill { opacity: .2; }
+    .hero-gauge[data-pending="true"] .gauge-label { display: none; }
+    .hero-gauge[data-pending="true"] .gauge-pending { display: flex; }
 
     /* ============================================================
        TOOLBAR — bordered band, density tiers, sticky.
@@ -228,12 +245,30 @@ export function getViolationsDashboardStyles(): string {
     .field input, .field select {
       border: 0;
       outline: 0;
-      background: transparent;
       color: var(--vscode-input-foreground);
       font: inherit;
       min-width: 160px;
     }
-    .field input { flex: 1; min-width: 200px; }
+    .field input { flex: 1; min-width: 200px; background: transparent; }
+    /* The native <select> popup previously inherited a transparent background,
+       so the open option list fell back to the browser default — a low-contrast
+       bright highlight on the active row (the reported contrast bug). Pin the
+       control and its <option>s to the VS Code dropdown tokens, and the
+       active/hovered option to the list-selection tokens, so the open menu is
+       legible in every theme. */
+    .field select {
+      background: var(--vscode-dropdown-background, var(--vscode-input-background));
+      color: var(--vscode-dropdown-foreground, var(--vscode-input-foreground));
+    }
+    .field select option {
+      background: var(--vscode-dropdown-background, var(--surface-2));
+      color: var(--vscode-dropdown-foreground, var(--vscode-foreground));
+    }
+    .field select option:checked,
+    .field select option:hover {
+      background: var(--vscode-list-activeSelectionBackground, var(--surface-3));
+      color: var(--vscode-list-activeSelectionForeground, var(--vscode-foreground));
+    }
     .field .glyph { color: var(--muted); }
     .field .clear-btn {
       border: 0; background: transparent; color: var(--muted);
@@ -852,7 +887,10 @@ export function getViolationsDashboardStyles(): string {
       white-space: nowrap;
     }
     .top-rules-table tr.trow { border-bottom: 1px solid var(--border); }
-    .top-rules-table tr.trow:nth-child(odd) { background: color-mix(in srgb, var(--surface-3) 35%, transparent); }
+    /* No :nth-child zebra striping: expander detail rows interleave with main
+       rows (and stay in the DOM while collapsed), so position parity no longer
+       maps to visible-row parity. The per-row bottom border + hover give enough
+       separation on their own. */
     .top-rules-table tr.trow:hover { background: var(--vscode-list-hoverBackground); }
     .top-rules-table td { padding: 6px 10px; vertical-align: middle; }
     .top-rules-table .col-rank   { width: 36px; color: var(--muted); font-variant-numeric: tabular-nums; text-align: right; }
@@ -890,6 +928,62 @@ export function getViolationsDashboardStyles(): string {
       border-color: var(--accent-error);
     }
     .top-rules-table .row-action:focus-visible {
+      outline: 2px solid var(--vscode-focusBorder);
+      outline-offset: 1px;
+    }
+
+    /* Sortable headers (Rule / Count / Severity). Rank is intentionally not
+       sortable, so it carries no arrow and no pointer cursor. */
+    .top-rules-table thead th[data-sort] { cursor: pointer; }
+    .top-rules-table thead th[data-sort] .arrow { opacity: .4; margin-inline-start: 4px; }
+    .top-rules-table thead th[aria-sort="ascending"] .arrow,
+    .top-rules-table thead th[aria-sort="descending"] .arrow { opacity: 1; }
+    .top-rules-table thead th[data-sort]:hover { color: var(--fg); }
+
+    /* Expander affordance: a chevron in the rule cell; the whole row toggles. */
+    .top-rules-table tr.trow[data-expandable="true"] { cursor: pointer; }
+    .top-rules-table .trow-chev {
+      display: inline-block;
+      width: 1em;
+      margin-inline-end: 4px;
+      color: var(--muted);
+    }
+    .top-rules-table .trow-chev.placeholder { visibility: hidden; }
+    .top-rules-table tr.trow[aria-expanded="true"] { background: var(--vscode-list-hoverBackground); }
+
+    /* Detail (expanded) row — full rule message + affected-file breakdown.
+       Indented to align under the rule name, past the rank + chevron gutter. */
+    .top-rules-table tr.trow-detail > td { padding: 0; border-bottom: 1px solid var(--border); }
+    .top-rules-table tr.trow-detail .trd-body {
+      padding: 8px 12px 12px 50px;
+      background: color-mix(in srgb, var(--surface-3) 50%, transparent);
+    }
+    .top-rules-table .trd-msg { margin: 0 0 8px; color: var(--fg); line-height: 1.45; }
+    .top-rules-table .trd-files-head {
+      font-size: .82em;
+      letter-spacing: .3px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    .top-rules-table .trd-files {
+      list-style: none; margin: 0; padding: 0;
+      display: flex; flex-direction: column; gap: 2px;
+    }
+    .top-rules-table .trd-file {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px; padding: 3px 8px; border-radius: 4px;
+      cursor: pointer; color: var(--link);
+    }
+    .top-rules-table .trd-file:hover { background: var(--vscode-list-hoverBackground); }
+    /* RTL + plaintext bidi anchors the path to the right so the filename stays
+       visible when the row narrows (same trick as the findings table). */
+    .top-rules-table .trd-file-path {
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      direction: rtl; text-align: left; unicode-bidi: plaintext;
+    }
+    .top-rules-table .trd-file-count { color: var(--muted); font-variant-numeric: tabular-nums; flex: 0 0 auto; }
+    .top-rules-table .trd-file:focus-visible {
       outline: 2px solid var(--vscode-focusBorder);
       outline-offset: 1px;
     }
@@ -1153,10 +1247,8 @@ export function getViolationsDashboardStyles(): string {
     @media (prefers-reduced-motion: reduce) {
       .dash-hero, .chart-card, .kpi-card, .chip { animation: none; }
       .bar-fill { animation: none; transform: scaleX(1); }
-      .gauge-fill {
-        animation: none !important;
-        stroke-dasharray: var(--gauge-target, 0) var(--gauge-arc, 999) !important;
-      }
+      /* Gauge no longer animates (static SVG dasharray) so no override is
+         needed here; the pending opacity transition is sub-perceptual. */
     }
 
     @media (max-width: 720px) {

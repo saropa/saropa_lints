@@ -366,35 +366,83 @@ function pickTopRule(violations: readonly Violation[]): { name: string; count: n
   return best;
 }
 
-/** Cap on rows in the noisy-rule triage table — matches the summary report. */
-const TOP_RULES_LIMIT = 20;
+/**
+ * Cap on rows in the noisy-rule triage table. Trimmed 20 → 10 so the table
+ * stays scannable above the fold: each row now expands to its full message +
+ * affected-file list, so 10 rich rows beat 20 terse ones.
+ */
+const TOP_RULES_LIMIT = 10;
 
 /**
- * Top-N rules by violation count, paired with the severity emitted on the
- * first occurrence (a rule has a single LintCode severity, so first-seen is
- * deterministic). Sorted by count desc; ties broken by rule name for stable
- * rendering between rebuilds.
+ * Per-rule cap on files listed inside an expanded Top-Rules row. Guards against
+ * a pathological "one rule, hundreds of files" case ballooning the webview DOM.
  */
-function pickTopRules(
-  violations: readonly Violation[],
-  limit: number,
-): Array<{ name: string; count: number; severity: string }> {
-  if (violations.length === 0) return [];
-  const counts = new Map<string, number>();
-  const severities = new Map<string, string>();
+const TOP_RULE_FILES_LIMIT = 12;
+
+interface TopRuleEntry {
+  name: string;
+  count: number;
+  severity: string;
+  /** Representative finding message (first occurrence), shown on expand. */
+  message: string;
+  /** Files carrying this rule, highest-count first, with a representative line. */
+  files: Array<{ file: string; count: number; line: number }>;
+}
+
+interface RuleAccumulator {
+  count: number;
+  severity: string;
+  message: string;
+  /** file path → { occurrence count, lowest line seen } for that rule. */
+  files: Map<string, { count: number; line: number }>;
+}
+
+/** Single pass: tally per-rule count, severity, first message, and per-file stats. */
+function accumulateRuleStats(violations: readonly Violation[]): Map<string, RuleAccumulator> {
+  const acc = new Map<string, RuleAccumulator>();
   for (const v of violations) {
-    counts.set(v.rule, (counts.get(v.rule) ?? 0) + 1);
-    if (!severities.has(v.rule)) {
-      severities.set(v.rule, (v.severity ?? 'info').toLowerCase());
+    let entry = acc.get(v.rule);
+    if (!entry) {
+      // A rule has a single LintCode severity, so first-seen is deterministic.
+      entry = {
+        count: 0,
+        severity: (v.severity ?? 'info').toLowerCase(),
+        message: v.message ?? '',
+        files: new Map(),
+      };
+      acc.set(v.rule, entry);
+    }
+    entry.count += 1;
+    if (!entry.message && v.message) entry.message = v.message;
+    const line = v.line ?? 1;
+    const perFile = entry.files.get(v.file);
+    if (perFile) {
+      perFile.count += 1;
+      if (line < perFile.line) perFile.line = line;
+    } else {
+      entry.files.set(v.file, { count: 1, line });
     }
   }
-  const all = Array.from(counts, ([name, count]) => ({
-    name,
-    count,
-    severity: severities.get(name) ?? 'info',
-  }));
-  all.sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
-  return all.slice(0, limit);
+  return acc;
+}
+
+/**
+ * Top-N rules by violation count. Sorted by count desc; ties broken by rule
+ * name for stable rendering between rebuilds. Each entry carries the data the
+ * dashboard's expandable Top-Rules row needs (message + affected files), so
+ * the user can triage without scrolling to the findings table.
+ */
+function pickTopRules(violations: readonly Violation[], limit: number): TopRuleEntry[] {
+  if (violations.length === 0) return [];
+  const acc = accumulateRuleStats(violations);
+  const entries = Array.from(acc, ([name, stats]) => ({ name, stats }));
+  entries.sort((a, b) => b.stats.count - a.stats.count || a.name.localeCompare(b.name));
+  return entries.slice(0, limit).map(({ name, stats }) => {
+    const files = Array.from(stats.files, ([file, s]) => ({ file, count: s.count, line: s.line }))
+      .sort((a, b) => b.count - a.count || a.file.localeCompare(b.file))
+      .slice(0, TOP_RULE_FILES_LIMIT);
+    return { name, count: stats.count, severity: stats.severity, message: stats.message, files };
+  });
 }
 
 function countDistinctFiles(violations: readonly Violation[]): number {
@@ -527,6 +575,11 @@ function getOrCreatePanel(context: vscode.ExtensionContext): vscode.WebviewPanel
   // run typically emits dozens of per-URI diagnostic events.
   supplementaryDiagnosticsListener = vscode.languages.onDidChangeDiagnostics(() => {
     if (!currentPanel?.visible) return;
+    // Diagnostics are actively changing → analysis is streaming results in, so
+    // the on-disk health score is mid-flight. Dim the gauge to "computing" now
+    // (avoids the A→E whiplash); the debounced rebuild below ships a fresh
+    // gauge with the settled grade once the dust settles.
+    void currentPanel.webview.postMessage({ type: 'gaugePending', pending: true });
     if (supplementaryRefreshTimer) clearTimeout(supplementaryRefreshTimer);
     supplementaryRefreshTimer = setTimeout(() => {
       supplementaryRefreshTimer = undefined;

@@ -330,6 +330,96 @@ describe('violationsDashboardHtml', () => {
     assert.ok(!html.includes('aria-label="Top rules by count"'));
   });
 
+  it('renders the health gauge without a /100 suffix and without the restart-prone animation', () => {
+    /* Item 1 + 2: the visible score dropped its "/100" denominator, and the
+       gauge fill is a static SVG dasharray (the gauge-fill-in keyframe that
+       collapsed the ring to a dot on every rebuild is gone). */
+    const html = renderViolationsDashboardHtml(minimalInput({}));
+    assert.ok(!html.includes('/100'), 'gauge label and tooltip must not show /100');
+    assert.ok(!html.includes('gauge-fill-in'), 'entrance keyframe must be removed');
+    assert.ok(!html.includes('--gauge-target'), 'inline gauge CSS vars must be removed');
+  });
+
+  it('wires the pending gauge state for in-flight analysis (whiplash guard)', () => {
+    /* Item 3: a not-yet-settled health score is dimmed to "computing" instead
+       of flashing a misleading grade. The scaffolding + script hooks must ship. */
+    const html = renderViolationsDashboardHtml(minimalInput({}));
+    assert.ok(html.includes('data-pending="false"'));
+    assert.ok(html.includes('class="gauge-pending"'));
+    assert.ok(html.includes('setGaugePending'));
+    assert.ok(html.includes("msg.type === 'gaugePending'"));
+  });
+
+  it('renders sortable headers and expandable rows in the Top Rules table', () => {
+    /* Item 4 + 7: Rule / Count / Severity headers are click-to-sort (Rank is a
+       stable position, so it is not sortable), and each rule row expands to its
+       full message + affected-file breakdown when that detail is supplied. */
+    const html = renderViolationsDashboardHtml(
+      minimalInput({
+        filteredCount: 70,
+        totalRawAfterDisable: 70,
+        severityCounts: { error: 0, warning: 0, info: 70 },
+        topRules: [
+          {
+            name: 'prefer_const_constructors',
+            count: 40,
+            severity: 'info',
+            message: 'Prefer const with constant constructors.',
+            files: [
+              { file: 'lib/a.dart', count: 25, line: 12 },
+              { file: 'lib/b.dart', count: 15, line: 3 },
+            ],
+          },
+          {
+            name: 'avoid_print',
+            count: 30,
+            severity: 'warning',
+            message: 'Avoid print calls in production code.',
+            files: [{ file: 'lib/c.dart', count: 30, line: 7 }],
+          },
+        ],
+      }),
+    );
+    assert.ok(html.includes('data-sort="rule"'));
+    assert.ok(html.includes('data-sort="count"'));
+    assert.ok(html.includes('data-sort="sev"'));
+    // A rendered detail row (not the script's selector string) proves the row
+    // expanded; key off the per-rule detail id which only the markup emits.
+    assert.ok(html.includes('id="trd-prefer_const_constructors"'));
+    assert.ok(html.includes('class="trow-detail"'));
+    assert.ok(html.includes('Prefer const with constant constructors.'));
+    assert.ok(html.includes('Files affected (2)'));
+    assert.ok(html.includes('data-file="lib%2Fa.dart"'));
+    assert.ok(html.includes('data-line="12"'));
+  });
+
+  it('keeps Top Rules rows flat (non-expandable) when no message or files are supplied', () => {
+    /* Count-only rows (e.g. legacy callers) must not advertise a chevron that
+       reveals nothing — the row renders flat, with the action buttons intact. */
+    const html = renderViolationsDashboardHtml(
+      minimalInput({
+        filteredCount: 10,
+        totalRawAfterDisable: 10,
+        severityCounts: { error: 0, warning: 0, info: 10 },
+        topRules: [{ name: 'some_rule', count: 10, severity: 'info' }],
+      }),
+    );
+    // No rendered detail row, and the chevron slot is the hidden placeholder
+    // (so the row carries no "click to reveal" affordance). `class="trow-detail"`
+    // is emitted only by an actual detail row, never by the script.
+    assert.ok(!html.includes('class="trow-detail"'));
+    assert.ok(html.includes('trow-chev placeholder'));
+    assert.ok(html.includes('data-row-action="hide-rule"'));
+  });
+
+  it('pins the group-by select dropdown to readable VS Code tokens', () => {
+    /* Item 5: the open option list previously inherited a transparent
+       background and a low-contrast bright highlight. */
+    const html = renderViolationsDashboardHtml(minimalInput({}));
+    assert.ok(html.includes('.field select option'));
+    assert.ok(html.includes('--vscode-dropdown-background'));
+  });
+
   it('renders findings bulk-selection and multi-sort markup when violations are shown', () => {
     const sections: DashboardSection[] = [
       {
