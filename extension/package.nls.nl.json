@@ -7,7 +7,7 @@
   "views.actions.name": "Acties",
   "views.status.name": "Status",
   "views.settings.name": "Instellingen",
-  "views.help.name": "Help (v13.10.2)",
+  "views.help.name": "Hulp (v13.10.3)",
   "viewsWelcome.banner.contents": "**Saropa-linten**\n\n2100+ Dart- en Flutter-lintregels voor beveiliging, toegankelijkheid en prestaties.\n\nVereist een Dart- of Flutter-project.\n\nOpen een map met daarin `pubspec.yaml` om aan de slag te gaan.\n\n[Meer informatie online](https://pub.dev/packages/saropa_lints)\n[Blader door alle opdrachten](opdracht:saropaLints.showCommandCatalog)\n[Over Saropa Lints](command:saropaLints.showAbout)\n[Aan de slag](opdracht:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: Project instellen (pubspec + config)",
   "command.disable.title": "Saropa Lints: Lint-integratie uitschakelen",

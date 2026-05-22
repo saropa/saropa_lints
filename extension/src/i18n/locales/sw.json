@@ -90,7 +90,8 @@
     "secondaryAsideLabel": "Uchunguzi wa sekondari",
     "hero": {
       "productTitle": "Dashibodi ya Matokeo",
-      "gaugeTitle": "Alama ya afya {score}/100 (daraja {grade}). Makosa yana uzito mkubwa zaidi."
+      "gaugeTitle": "Alama ya afya {score} (daraja {grade}). Makosa yana uzito mkubwa zaidi.",
+      "gaugePending": "…"
     },
     "time": {
       "justNow": "sasa hivi",
@@ -228,7 +229,8 @@
       "colRule": "Kanuni",
       "colCount": "Hesabu",
       "colSeverity": "Ukali",
-      "colActionsAria": "Vitendo vya safu"
+      "colActionsAria": "Vitendo vya safu",
+      "filesAffected": "Faili zilizoathiriwa ({count})"
     },
     "findings": {
       "sectionAria": "Matokeo",

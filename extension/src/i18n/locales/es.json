@@ -90,7 +90,8 @@
     "secondaryAsideLabel": "Diagnóstico secundario",
     "hero": {
       "productTitle": "Panel de resultados",
-      "gaugeTitle": "Puntuación de salud {score}/100 (grado {grade}). Los errores pesan más."
+      "gaugeTitle": "Puntuación de salud {score} (grado {grade}). Los errores pesan más.",
+      "gaugePending": "…"
     },
     "time": {
       "justNow": "En este momento",
@@ -228,7 +229,8 @@
       "colRule": "Regla",
       "colCount": "Contar",
       "colSeverity": "Gravedad",
-      "colActionsAria": "Acciones de fila"
+      "colActionsAria": "Acciones de fila",
+      "filesAffected": "Archivos afectados ({count})"
     },
     "findings": {
       "sectionAria": "Recomendaciones",

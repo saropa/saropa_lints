@@ -90,7 +90,8 @@
     "secondaryAsideLabel": "Sekundärdiagnostik",
     "hero": {
       "productTitle": "Ergebnis-Dashboard",
-      "gaugeTitle": "Gesundheitswert {score}/100 (Note {grade}). Fehler wiegen am schwersten."
+      "gaugeTitle": "Gesundheitsbewertung {score} (Note {grade}). Fehler wiegen am schwersten.",
+      "gaugePending": "…"
     },
     "time": {
       "justNow": "soeben",
@@ -228,7 +229,8 @@
       "colRule": "Regel",
       "colCount": "Zählen",
       "colSeverity": "Schwere",
-      "colActionsAria": "Zeilenaktionen"
+      "colActionsAria": "Zeilenaktionen",
+      "filesAffected": "Betroffene Dateien ({count})"
     },
     "findings": {
       "sectionAria": "Erkenntnisse",

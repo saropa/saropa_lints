@@ -90,7 +90,8 @@
     "secondaryAsideLabel": "אבחון משני",
     "hero": {
       "productTitle": "לוח המחוונים של ממצאים",
-      "gaugeTitle": "ציון בריאות {score}/100 (ציון {grade}). שגיאות שוקלות את הכבד ביותר."
+      "gaugeTitle": "ציון בריאות {score} (ציון {grade}). שגיאות שוקלות את הכבד ביותר.",
+      "gaugePending": "…"
     },
     "time": {
       "justNow": "זֶה עַתָה",
@@ -228,7 +229,8 @@
       "colRule": "כְּלָל",
       "colCount": "לִסְפּוֹר",
       "colSeverity": "חוּמרָה",
-      "colActionsAria": "פעולות שורה"
+      "colActionsAria": "פעולות שורה",
+      "filesAffected": "קבצים מושפעים ({count})"
     },
     "findings": {
       "sectionAria": "ממצאים",

@@ -90,7 +90,8 @@
     "secondaryAsideLabel": "ثانوی تشخیص",
     "hero": {
       "productTitle": "فائنڈنگ ڈیش بورڈ",
-      "gaugeTitle": "ہیلتھ سکور {score}/100 (گریڈ {grade})۔ غلطیوں کا وزن سب سے زیادہ ہے۔"
+      "gaugeTitle": "ہیلتھ سکور {score} (گریڈ {grade})۔ غلطیوں کا وزن سب سے زیادہ ہے۔",
+      "gaugePending": "…"
     },
     "time": {
       "justNow": "ابھی",
@@ -228,7 +229,8 @@
       "colRule": "قاعدہ",
       "colCount": "شمار",
       "colSeverity": "شدت",
-      "colActionsAria": "صف کے اعمال"
+      "colActionsAria": "صف کے اعمال",
+      "filesAffected": "متاثرہ فائلیں ({count})"
     },
     "findings": {
       "sectionAria": "نتائج",

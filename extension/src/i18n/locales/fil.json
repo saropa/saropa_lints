@@ -90,7 +90,8 @@
     "secondaryAsideLabel": "Mga pangalawang diagnostic",
     "hero": {
       "productTitle": "Dashboard ng Mga Natuklasan",
-      "gaugeTitle": "Marka ng kalusugan {score}/100 (grado {grade}). Pinakamabigat ang mga pagkakamali."
+      "gaugeTitle": "Marka ng kalusugan {score} (grade {grade}). Pinakamabigat ang mga pagkakamali.",
+      "gaugePending": "…"
     },
     "time": {
       "justNow": "ngayon lang",
@@ -228,7 +229,8 @@
       "colRule": "Panuntunan",
       "colCount": "Bilangin",
       "colSeverity": "Kalubhaan",
-      "colActionsAria": "Mga aksyon sa hilera"
+      "colActionsAria": "Mga aksyon sa hilera",
+      "filesAffected": "Mga file na apektado ({count})"
     },
     "findings": {
       "sectionAria": "Mga natuklasan",

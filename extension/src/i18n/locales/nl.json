@@ -90,7 +90,8 @@
     "secondaryAsideLabel": "Secundaire diagnostiek",
     "hero": {
       "productTitle": "Bevindingendashboard",
-      "gaugeTitle": "Gezondheidsscore {score}/100 (graad {grade}). Fouten wegen het zwaarst."
+      "gaugeTitle": "Gezondheidsscore {score} (graad {grade}). Fouten wegen het zwaarst.",
+      "gaugePending": "…"
     },
     "time": {
       "justNow": "zojuist",
@@ -228,7 +229,8 @@
       "colRule": "Regel",
       "colCount": "Graaf",
       "colSeverity": "Ernst",
-      "colActionsAria": "Rij-acties"
+      "colActionsAria": "Rij-acties",
+      "filesAffected": "Betrokken bestanden ({count})"
     },
     "findings": {
       "sectionAria": "Bevindingen",

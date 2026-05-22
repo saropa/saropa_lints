@@ -90,7 +90,8 @@
     "secondaryAsideLabel": "二次诊断",
     "hero": {
       "productTitle": "调查结果仪表板",
-      "gaugeTitle": "健康得分 {score}/100（等级 {grade}）。错误是最重的。"
+      "gaugeTitle": "健康评分 {score}（{grade} 级）。错误是最重的。",
+      "gaugePending": "…"
     },
     "time": {
       "justNow": "现在",
@@ -228,7 +229,8 @@
       "colRule": "规则",
       "colCount": "数数",
       "colSeverity": "严重性",
-      "colActionsAria": "行动作"
+      "colActionsAria": "行动作",
+      "filesAffected": "受影响的文件 ({count})"
     },
     "findings": {
       "sectionAria": "发现",

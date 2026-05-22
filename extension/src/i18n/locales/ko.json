@@ -90,7 +90,8 @@
     "secondaryAsideLabel": "2차 진단",
     "hero": {
       "productTitle": "발견 항목 대시보드",
-      "gaugeTitle": "건강 점수 {score}/100 (등급 {grade}). 오류의 무게가 가장 큽니다."
+      "gaugeTitle": "상태 점수 {score}(등급 {grade}). 오류의 무게가 가장 큽니다.",
+      "gaugePending": "…"
     },
     "time": {
       "justNow": "방금",
@@ -228,7 +229,8 @@
       "colRule": "규칙",
       "colCount": "세다",
       "colSeverity": "심각성",
-      "colActionsAria": "행 작업"
+      "colActionsAria": "행 작업",
+      "filesAffected": "영향을 받은 파일({count})"
     },
     "findings": {
       "sectionAria": "조사 결과",

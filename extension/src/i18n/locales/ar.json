@@ -90,7 +90,8 @@
     "secondaryAsideLabel": "التشخيص الثانوي",
     "hero": {
       "productTitle": "لوحة النتائج",
-      "gaugeTitle": "النتيجة الصحية {score}/100 (الدرجة {grade}). الأخطاء تزن أثقل."
+      "gaugeTitle": "النتيجة الصحية {score} (الصف {grade}). الأخطاء تزن أثقل.",
+      "gaugePending": "…"
     },
     "time": {
       "justNow": "الآن",
@@ -228,7 +229,8 @@
       "colRule": "قاعدة",
       "colCount": "عدد",
       "colSeverity": "خطورة",
-      "colActionsAria": "إجراءات الصف"
+      "colActionsAria": "إجراءات الصف",
+      "filesAffected": "الملفات المتأثرة ({count})"
     },
     "findings": {
       "sectionAria": "النتائج",

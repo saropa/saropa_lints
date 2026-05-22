@@ -90,7 +90,8 @@
     "secondaryAsideLabel": "Diagnostica secondaria",
     "hero": {
       "productTitle": "Pannello dei risultati",
-      "gaugeTitle": "Punteggio sulla salute {score}/100 (voto {grade}). Gli errori pesano di più."
+      "gaugeTitle": "Punteggio sanitario {score} (voto {grade}). Gli errori pesano di più.",
+      "gaugePending": "…"
     },
     "time": {
       "justNow": "proprio adesso",
@@ -228,7 +229,8 @@
       "colRule": "Regola",
       "colCount": "Contare",
       "colSeverity": "Gravità",
-      "colActionsAria": "Azioni di riga"
+      "colActionsAria": "Azioni di riga",
+      "filesAffected": "File interessati ({count})"
     },
     "findings": {
       "sectionAria": "Risultati",

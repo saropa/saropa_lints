@@ -90,7 +90,8 @@
     "secondaryAsideLabel": "二次診断",
     "hero": {
       "productTitle": "調査結果ダッシュボード",
-      "gaugeTitle": "健康スコア {score}/100 (グレード {grade})。エラーが最も重くなります。"
+      "gaugeTitle": "健康スコア {score} (グレード {grade})。エラーが最も重くなります。",
+      "gaugePending": "…"
     },
     "time": {
       "justNow": "ちょうど今",
@@ -228,7 +229,8 @@
       "colRule": "ルール",
       "colCount": "カウント",
       "colSeverity": "重大度",
-      "colActionsAria": "行アクション"
+      "colActionsAria": "行アクション",
+      "filesAffected": "影響を受けるファイル ({count})"
     },
     "findings": {
       "sectionAria": "調査結果",

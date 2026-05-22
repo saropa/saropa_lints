@@ -90,7 +90,8 @@
     "secondaryAsideLabel": "การวินิจฉัยทุติยภูมิ",
     "hero": {
       "productTitle": "แดชบอร์ดผลการสืบค้น",
-      "gaugeTitle": "คะแนนสุขภาพ {score}/100 (เกรด {grade}) ข้อผิดพลาดมีน้ำหนักมากที่สุด"
+      "gaugeTitle": "คะแนนสุขภาพ {score} (เกรด {grade}) ข้อผิดพลาดมีน้ำหนักมากที่สุด",
+      "gaugePending": "…"
     },
     "time": {
       "justNow": "แค่ตอนนี้",
@@ -228,7 +229,8 @@
       "colRule": "กฎ",
       "colCount": "นับ",
       "colSeverity": "ความรุนแรง",
-      "colActionsAria": "การกระทำของแถว"
+      "colActionsAria": "การกระทำของแถว",
+      "filesAffected": "ไฟล์ที่ได้รับผลกระทบ ({count})"
     },
     "findings": {
       "sectionAria": "ผลการวิจัย",

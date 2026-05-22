@@ -90,7 +90,8 @@
     "secondaryAsideLabel": "সেকেন্ডারি ডায়াগনস্টিকস",
     "hero": {
       "productTitle": "অনুসন্ধান ড্যাশবোর্ড",
-      "gaugeTitle": "স্বাস্থ্য স্কোর {score}/100 (গ্রেড {grade})। ত্রুটিগুলি সবচেয়ে ভারী।"
+      "gaugeTitle": "স্বাস্থ্য স্কোর {score} (গ্রেড {grade})। ত্রুটিগুলি সবচেয়ে ভারী।",
+      "gaugePending": "…"
     },
     "time": {
       "justNow": "এইমাত্র",
@@ -228,7 +229,8 @@
       "colRule": "নিয়ম",
       "colCount": "গণনা",
       "colSeverity": "তীব্রতা",
-      "colActionsAria": "সারি কর্ম"
+      "colActionsAria": "সারি কর্ম",
+      "filesAffected": "ফাইল প্রভাবিত ({count})"
     },
     "findings": {
       "sectionAria": "ফাইন্ডিংস",

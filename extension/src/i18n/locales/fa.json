@@ -90,7 +90,8 @@
     "secondaryAsideLabel": "تشخیص ثانویه",
     "hero": {
       "productTitle": "داشبورد یافته ها",
-      "gaugeTitle": "نمره سلامت {score}/100 (درجه {grade}). خطاها سنگین ترین وزن را دارند."
+      "gaugeTitle": "نمره سلامت {score} (درجه {grade}). خطاها سنگین ترین وزن را دارند.",
+      "gaugePending": "…"
     },
     "time": {
       "justNow": "همین الان",
@@ -228,7 +229,8 @@
       "colRule": "قانون",
       "colCount": "بشمار",
       "colSeverity": "شدت",
-      "colActionsAria": "اقدامات ردیف"
+      "colActionsAria": "اقدامات ردیف",
+      "filesAffected": "فایل های تحت تأثیر ({count})"
     },
     "findings": {
       "sectionAria": "یافته ها",

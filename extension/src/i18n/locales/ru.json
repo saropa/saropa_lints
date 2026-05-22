@@ -90,7 +90,8 @@
     "secondaryAsideLabel": "Вторичная диагностика",
     "hero": {
       "productTitle": "Панель результатов",
-      "gaugeTitle": "Оценка здоровья {score}/100 (оценка {grade}). Ошибки весят больше всего."
+      "gaugeTitle": "Оценка здоровья {score} (оценка {grade}). Ошибки весят больше всего.",
+      "gaugePending": "…"
     },
     "time": {
       "justNow": "прямо сейчас",
@@ -228,7 +229,8 @@
       "colRule": "Правило",
       "colCount": "Считать",
       "colSeverity": "Серьезность",
-      "colActionsAria": "Действия со строками"
+      "colActionsAria": "Действия со строками",
+      "filesAffected": "Затронутые файлы ({count})"
     },
     "findings": {
       "sectionAria": "Выводы",

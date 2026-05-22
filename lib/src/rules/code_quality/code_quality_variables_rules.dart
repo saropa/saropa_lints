@@ -2035,8 +2035,8 @@ class MoveVariableCloserToUsageRule extends SaropaLintRule {
     final Statement? useStatement = useNode.thisOrAncestorOfType<Statement>();
     if (useStatement == null || useStatement.parent != block) return false;
 
-    final Statement? declStatement =
-        decl.thisOrAncestorOfType<VariableDeclarationStatement>();
+    final Statement? declStatement = decl
+        .thisOrAncestorOfType<VariableDeclarationStatement>();
     if (declStatement == null) return false;
 
     final int declIndex = block.statements.indexOf(declStatement);

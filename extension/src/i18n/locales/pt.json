@@ -90,7 +90,8 @@
     "secondaryAsideLabel": "Diagnóstico secundário",
     "hero": {
       "productTitle": "Painel de descobertas",
-      "gaugeTitle": "Pontuação de saúde {score}/100 (nota {grade}). Os erros pesam mais."
+      "gaugeTitle": "Pontuação de saúde {score} (nota {grade}). Os erros pesam mais.",
+      "gaugePending": "…"
     },
     "time": {
       "justNow": "agora mesmo",
@@ -228,7 +229,8 @@
       "colRule": "Regra",
       "colCount": "Contar",
       "colSeverity": "Gravidade",
-      "colActionsAria": "Ações de linha"
+      "colActionsAria": "Ações de linha",
+      "filesAffected": "Arquivos afetados ({count})"
     },
     "findings": {
       "sectionAria": "Descobertas",

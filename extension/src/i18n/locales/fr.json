@@ -90,7 +90,8 @@
     "secondaryAsideLabel": "Diagnostic secondaire",
     "hero": {
       "productTitle": "Tableau de bord des résultats",
-      "gaugeTitle": "Score de santé {score}/100 (grade {grade}). Les erreurs pèsent le plus lourd."
+      "gaugeTitle": "Score de santé {score} (grade {grade}). Les erreurs pèsent le plus lourd.",
+      "gaugePending": "…"
     },
     "time": {
       "justNow": "tout à l' heure",
@@ -228,7 +229,8 @@
       "colRule": "Règle",
       "colCount": "Compter",
       "colSeverity": "Gravité",
-      "colActionsAria": "Actions sur les lignes"
+      "colActionsAria": "Actions sur les lignes",
+      "filesAffected": "Fichiers concernés ({count})"
     },
     "findings": {
       "sectionAria": "Résultats",

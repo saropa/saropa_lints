@@ -90,7 +90,8 @@
     "secondaryAsideLabel": "Diagnostik sekunder",
     "hero": {
       "productTitle": "Dasbor Temuan",
-      "gaugeTitle": "Skor kesehatan {score}/100 (kelas {grade}). Kesalahan adalah hal yang paling berat."
+      "gaugeTitle": "Skor kesehatan {score} (kelas {grade}). Kesalahan adalah hal yang paling berat.",
+      "gaugePending": "…"
     },
     "time": {
       "justNow": "baru saja",
@@ -228,7 +229,8 @@
       "colRule": "Aturan",
       "colCount": "Menghitung",
       "colSeverity": "Kerasnya",
-      "colActionsAria": "Tindakan baris"
+      "colActionsAria": "Tindakan baris",
+      "filesAffected": "File terpengaruh ({count})"
     },
     "findings": {
       "sectionAria": "Temuan",

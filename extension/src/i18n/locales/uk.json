@@ -90,7 +90,8 @@
     "secondaryAsideLabel": "Вторинна діагностика",
     "hero": {
       "productTitle": "Інформаційна панель висновків",
-      "gaugeTitle": "Показник здоров’я {score}/100 (оцінка {grade}). Помилки важать найбільше."
+      "gaugeTitle": "Оцінка здоров'я {score} (клас {grade}). Помилки важать найбільше.",
+      "gaugePending": "…"
     },
     "time": {
       "justNow": "тільки зараз",
@@ -228,7 +229,8 @@
       "colRule": "правило",
       "colCount": "Граф",
       "colSeverity": "Суворість",
-      "colActionsAria": "Дії рядків"
+      "colActionsAria": "Дії рядків",
+      "filesAffected": "Постраждалі файли ({count})"
     },
     "findings": {
       "sectionAria": "Висновки",

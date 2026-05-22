@@ -90,7 +90,8 @@
     "secondaryAsideLabel": "माध्यमिक निदान",
     "hero": {
       "productTitle": "निष्कर्ष डैशबोर्ड",
-      "gaugeTitle": "स्वास्थ्य स्कोर {score}/100 (ग्रेड {grade})। त्रुटियाँ सबसे अधिक भारी पड़ती हैं।"
+      "gaugeTitle": "स्वास्थ्य स्कोर {score} (ग्रेड {grade})। त्रुटियाँ सबसे अधिक भारी पड़ती हैं।",
+      "gaugePending": "…"
     },
     "time": {
       "justNow": "बस अब",
@@ -228,7 +229,8 @@
       "colRule": "नियम",
       "colCount": "गिनती करना",
       "colSeverity": "गंभीरता",
-      "colActionsAria": "पंक्ति क्रियाएँ"
+      "colActionsAria": "पंक्ति क्रियाएँ",
+      "filesAffected": "प्रभावित फ़ाइलें ({count})"
     },
     "findings": {
       "sectionAria": "निष्कर्ष",

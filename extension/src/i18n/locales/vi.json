@@ -90,7 +90,8 @@
     "secondaryAsideLabel": "Chẩn đoán thứ cấp",
     "hero": {
       "productTitle": "Trang tổng quan về phát hiện",
-      "gaugeTitle": "Điểm sức khỏe {score}/100 (loại {grade}). Lỗi nặng nề nhất."
+      "gaugeTitle": "Điểm sức khỏe {score} (cấp {grade}). Lỗi nặng nề nhất.",
+      "gaugePending": "…"
     },
     "time": {
       "justNow": "ngay bây giờ",
@@ -228,7 +229,8 @@
       "colRule": "Luật lệ",
       "colCount": "Đếm",
       "colSeverity": "Mức độ nghiêm trọng",
-      "colActionsAria": "Hành động hàng"
+      "colActionsAria": "Hành động hàng",
+      "filesAffected": "Các tệp bị ảnh hưởng ({count})"
     },
     "findings": {
       "sectionAria": "Những phát hiện",

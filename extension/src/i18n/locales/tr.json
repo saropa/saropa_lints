@@ -90,7 +90,8 @@
     "secondaryAsideLabel": "İkincil teşhis",
     "hero": {
       "productTitle": "Bulgular Kontrol Paneli",
-      "gaugeTitle": "Sağlık puanı {score}/100 (derece {grade}). Hatalar en ağırdır."
+      "gaugeTitle": "Sağlık puanı {score} (derece {grade}). Hatalar en ağırdır.",
+      "gaugePending": "…"
     },
     "time": {
       "justNow": "Şu anda",
@@ -228,7 +229,8 @@
       "colRule": "Kural",
       "colCount": "Saymak",
       "colSeverity": "Şiddet",
-      "colActionsAria": "Satır eylemleri"
+      "colActionsAria": "Satır eylemleri",
+      "filesAffected": "Etkilenen dosyalar ({count})"
     },
     "findings": {
       "sectionAria": "Bulgular",

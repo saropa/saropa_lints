@@ -90,7 +90,8 @@
     "secondaryAsideLabel": "Diagnostyka wtórna",
     "hero": {
       "productTitle": "Panel wyników",
-      "gaugeTitle": "Wynik zdrowotny {score}/100 (stopień {grade}). Błędy ważą najwięcej."
+      "gaugeTitle": "Wynik zdrowotny {score} (stopień {grade}). Błędy ważą najwięcej.",
+      "gaugePending": "…"
     },
     "time": {
       "justNow": "właśnie",
@@ -228,7 +229,8 @@
       "colRule": "Reguła",
       "colCount": "Liczyć",
       "colSeverity": "Powaga",
-      "colActionsAria": "Działania wierszowe"
+      "colActionsAria": "Działania wierszowe",
+      "filesAffected": "Pliki, których to dotyczy ({count})"
     },
     "findings": {
       "sectionAria": "Ustalenia",
