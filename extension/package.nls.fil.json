@@ -7,7 +7,7 @@
   "views.actions.name": "Mga aksyon",
   "views.status.name": "Katayuan",
   "views.settings.name": "Mga setting",
-  "views.help.name": "Tulong (v13.10.3)",
+  "views.help.name": "Tulong (v13.10.4)",
   "viewsWelcome.banner.contents": "**Saropa Lints**\n\n2100+ Dart at Flutter lint rules para sa seguridad, accessibility, at performance.\n\nNangangailangan ng proyekto ng Dart o Flutter.\n\nMagbukas ng folder na naglalaman ng `pubspec.yaml` para makapagsimula.\n\n[Matuto pa online](https://pub.dev/packages/saropa_lints)\n[Browse All Commands](command:saropaLints.showCommandCatalog)\n[Tungkol sa Saropa Lints](command:saropaLints.showAbout)\n[Pagsisimula](command:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: I-set Up ang Proyekto (pubspec + config)",
   "command.disable.title": "Saropa Lints: I-off ang Lint Integration",
