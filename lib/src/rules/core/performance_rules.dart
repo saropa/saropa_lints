@@ -3761,7 +3761,9 @@ class AvoidBlockingDatabaseUiRule extends SaropaLintRule {
 /// ```
 ///
 /// **Exempt:** Operands are matched by camelCase word boundary; names like
-/// `totalWidth` or `frameRate` are not flagged as financial.
+/// `totalWidth`, `widthTotal`, `trailingTotal`, or `frameRate` are not flagged
+/// as financial. `total` is a weak word — it only counts when paired with a
+/// true money word (`totalPrice`, `invoiceTotal`).
 class AvoidMoneyArithmeticOnDoubleRule extends SaropaLintRule {
   AvoidMoneyArithmeticOnDoubleRule() : super(code: _code);
 
@@ -3791,6 +3793,11 @@ class AvoidMoneyArithmeticOnDoubleRule extends SaropaLintRule {
     'price',
     'cost',
     'amount',
+    // "total" is intentionally a *weak* money word (see _weakMoneyPatterns):
+    // it stays here so totalPrice/invoiceTotal still register as financial via
+    // the two-money-word path, but on its own it is overwhelmingly a generic
+    // aggregation noun (trailingTotal, widthTotal, angleTotal — pixel/geometry
+    // sums, not currency). Same call as removing standalone "rate".
     'total',
     'subtotal',
     'tax',
@@ -3808,6 +3815,16 @@ class AvoidMoneyArithmeticOnDoubleRule extends SaropaLintRule {
     'budget',
     'invoice',
   };
+
+  /// Generic aggregation words that are financial ONLY when paired with a true
+  /// money word. They count toward the two-money-word path (totalPrice,
+  /// invoiceTotal) but never make a single-word identifier financial on their
+  /// own. `total` alone is far more often a non-financial sum (trailingTotal,
+  /// widthTotal, angleTotal). Mirrors the earlier `rate` decision
+  /// (frameRate/sampleRate/heartRate are non-financial). This fixes the
+  /// asymmetry where leading `total` (totalWidth) was already exempt but
+  /// trailing `total` (widthTotal) was not.
+  static const Set<String> _weakMoneyPatterns = <String>{'total'};
 
   static final RegExp _upperCaseRegex = RegExp(r'[A-Z]');
   static final RegExp _wordSplitRegex = RegExp(r'[_ ]+');
@@ -3836,12 +3853,18 @@ class AvoidMoneyArithmeticOnDoubleRule extends SaropaLintRule {
     );
     final int moneyHits = hits.length;
 
-    // Two or more money words: totalPrice, discountAmount, taxRate
+    // Two or more money words: totalPrice, discountAmount, invoiceTotal.
     if (moneyHits >= 2) return true;
 
-    // Single money word at the end: price, itemCost, monthlyFee
-    if (moneyHits == 1 && words.isNotEmpty) {
-      if (_moneyPatterns.contains(words.last)) return true;
+    // Single money word at the end: price, itemCost, monthlyFee.
+    // A weak word (total) does NOT qualify on its own — trailingTotal /
+    // widthTotal / cartTotal are not flagged unless a second money word pairs
+    // with them. Avoids the geometry/aggregation false positives.
+    final String last = words.last;
+    if (moneyHits == 1 &&
+        _moneyPatterns.contains(last) &&
+        !_weakMoneyPatterns.contains(last)) {
+      return true;
     }
 
     return false;

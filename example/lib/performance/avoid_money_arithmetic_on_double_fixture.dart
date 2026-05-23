@@ -135,3 +135,31 @@ double taxRate = 0.08;
 double feeRate = 0.02;
 double _bad813_taxCalc = amount * taxRate;
 double _bad813_feeCalc = amount * feeRate;
+
+// GOOD: Non-financial "*Total" aggregates (trailing "total") are pixel/geometry
+// sums, not money. `total` is a weak word and must not flag on its own.
+double trailingTotal = 100.0;
+double widthTotal = 0;
+double heightTotal = 0;
+double angleTotal = 0;
+double animValue = 0.5;
+double scale = 2.0;
+double delta = 1.0;
+
+double _good813_revealCalc = trailingTotal * animValue;
+double _good813_widthCalc = widthTotal * scale;
+double _good813_heightCalc = heightTotal / 2.0;
+double _good813_angleCalc = angleTotal + delta;
+
+// GOOD: A single-word total is no longer flagged — this pins the accepted
+// trade-off (cartTotal/orderTotal/grandTotal need a paired money word to fire).
+double cartTotal = 50.0;
+double _good813_cartCalc = cartTotal * 1.0;
+
+// BAD: "total" paired with a real money word stays financial via the
+// two-money-word path (regression guard for totalPrice / invoiceTotal).
+// expect_lint: avoid_money_arithmetic_on_double
+double totalPrice = 9.99;
+double invoiceTotal = 100.0;
+double _bad813_totalPriceCalc = totalPrice * quantity;
+double _bad813_invoiceTotalCalc = invoiceTotal - discount;
