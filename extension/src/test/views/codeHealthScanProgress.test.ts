@@ -52,4 +52,10 @@ describe('Code Health scanning-state HTML', () => {
     assert.ok(html.includes("default-src 'none'"), 'CSP default-src missing');
     assert.ok(/script-src 'nonce-[A-Za-z0-9]+'/.test(html), 'script nonce CSP missing');
   });
+
+  it('shows the extension version and an engine-version slot', () => {
+    const versioned = buildCodeHealthScanningHtml('99.9.9');
+    assert.ok(versioned.includes('Saropa Lints v99.9.9'), 'extension version missing');
+    assert.ok(versioned.includes('id="engineVer"'), 'engine version slot missing');
+  });
 });

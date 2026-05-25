@@ -33,7 +33,7 @@ export interface ProjectVibrancyGates {
  * signals the dashboard can flip from the scanning view to the full report.
  */
 export interface VibrancyScanEvent {
-  readonly event: 'phase' | 'tick' | 'row' | 'done';
+  readonly event: 'meta' | 'phase' | 'tick' | 'row' | 'done';
   readonly phase?: string;
   readonly done?: number;
   readonly total?: number;
@@ -45,6 +45,7 @@ export interface VibrancyScanEvent {
   readonly line?: number;
   readonly complexity?: number;
   readonly flags?: readonly string[];
+  readonly version?: string; // engine (scanned project's saropa_lints) version, from the 'meta' event
 }
 
 /** Pause/resume/cancel handle for an in-flight streaming scan (control file backed). */

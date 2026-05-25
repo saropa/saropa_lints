@@ -20,6 +20,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:path/path.dart' as p;
+import 'package:saropa_lints/saropa_lints.dart' show saropaLintsVersion;
 import 'package:saropa_lints/src/cli/project_vibrancy.dart';
 
 Future<void> main(List<String> args) async {
@@ -63,6 +64,19 @@ Future<void> main(List<String> args) async {
   final progress = wantsProgress
       ? ProjectScanProgress(onEvent: _emitEvent, gate: _makeGate(controlPath))
       : null;
+
+  // Identify the engine driving the dashboard. saropaLintsVersion reads the
+  // SCANNED project's resolved saropa_lints, so it reveals whether the project
+  // is on the published package or a local path override — the key thing to see
+  // when "no progress" usually means the project pulled an older published CLI.
+  // (The published CLI predating this feature emits no meta event at all, which
+  // by its absence tells the dashboard the engine is legacy.)
+  if (progress != null) {
+    _emitEvent(<String, Object?>{
+      'event': 'meta',
+      'version': saropaLintsVersion,
+    });
+  }
 
   final options = ProjectVibrancyOptions(
     projectPath: projectPath,

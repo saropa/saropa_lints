@@ -72,6 +72,17 @@ export async function openProjectVibrancyReport(): Promise<void> {
   return inflightScan;
 }
 
+/** Running extension version, shown on the scanning panel so the loaded build is visible. */
+function codeHealthExtensionVersion(): string {
+  try {
+    const ext = vscode.extensions.getExtension('saropa.saropa-lints');
+    const version = (ext?.packageJSON as { version?: string } | undefined)?.version;
+    return typeof version === 'string' ? version : 'dev';
+  } catch {
+    return 'dev';
+  }
+}
+
 /** Re-run Code Health scan only when its dashboard tab is already open. */
 export function refreshCodeHealthDashboardIfOpen(): void {
   if (!currentPanel) return;
@@ -84,7 +95,7 @@ async function runScanAndRender(projectRoot: string): Promise<void> {
   // the whole point of this view. The full report replaces this HTML on
   // completion.
   const panel = getOrCreatePanel();
-  panel.webview.html = buildCodeHealthScanningHtml();
+  panel.webview.html = buildCodeHealthScanningHtml(codeHealthExtensionVersion());
   panel.reveal(vscode.ViewColumn.One);
   await runStreamingScan(projectRoot, panel);
 }
@@ -127,7 +138,7 @@ async function restartScan(): Promise<void> {
   if (!root || !currentPanel) return;
   currentControl?.cancel();
   currentControl = undefined;
-  currentPanel.webview.html = buildCodeHealthScanningHtml();
+  currentPanel.webview.html = buildCodeHealthScanningHtml(codeHealthExtensionVersion());
   await runStreamingScan(root, currentPanel);
 }
 

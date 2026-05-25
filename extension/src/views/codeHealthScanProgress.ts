@@ -39,11 +39,12 @@ function scanStrings(): Record<string, string> {
     previewEmpty: l10n('codeHealth.scan.preview.empty'),
     pause: l10n('codeHealth.scan.btn.pause'),
     resume: l10n('codeHealth.scan.btn.resume'),
+    legacyEngine: l10n('codeHealth.scan.version.legacy'),
   };
 }
 
 /** Full scanning-state HTML document set as the panel's initial `webview.html`. */
-export function buildCodeHealthScanningHtml(): string {
+export function buildCodeHealthScanningHtml(extensionVersion = 'dev'): string {
   const nonce = createWebviewCspNonce();
   const labels = phaseLabels();
   const stepper = Object.entries(labels)
@@ -95,6 +96,12 @@ export function buildCodeHealthScanningHtml(): string {
   <h2>${escapeHtml(l10n('codeHealth.scan.preview.heading'))}</h2>
   <ul class="prob-list" id="probList"><li class="empty" id="probEmpty">${escapeHtml(l10n('codeHealth.scan.preview.empty'))}</li></ul>
 </section>
+
+<footer class="ver-foot">
+  <span class="ver-brand">Saropa Lints v${escapeHtml(extensionVersion)}</span>
+  <span class="ver-sep">·</span>
+  <span>${escapeHtml(l10n('codeHealth.scan.version.engine'))}: <span id="engineVer">${escapeHtml(l10n('codeHealth.scan.version.detecting'))}</span></span>
+</footer>
 
 <script nonce="${nonce}">${scanScript()}</script>
 </body>
@@ -149,6 +156,11 @@ body{font-family:var(--vscode-font-family);color:var(--vscode-foreground);backgr
 .grade-F{color:var(--vscode-charts-red,#f14c4c);}
 .prob-name{font-family:var(--vscode-editor-font-family,monospace);}
 .prob-file{margin-left:auto;color:var(--vscode-descriptionForeground);font-size:.78rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:45%;}
+.ver-foot{margin-top:28px;padding-top:12px;border-top:1px solid var(--vscode-widget-border,#8883);font-size:.78rem;color:var(--vscode-descriptionForeground);display:flex;gap:8px;align-items:center;}
+.ver-brand{font-weight:600;}
+.ver-sep{opacity:.5;}
+#engineVer.ok{color:var(--vscode-charts-green,#2ea043);font-weight:600;}
+#engineVer.legacy{color:var(--vscode-charts-orange,#e2a03f);font-weight:600;}
 body.paused .bar-fill{background:var(--vscode-charts-yellow,#cca700);}
 body.paused .spinner{animation-play-state:paused;}
 `;
@@ -172,6 +184,17 @@ function scanScript(): string {
     document.getElementById('cElapsed').textContent = s + 's';
   }, 1000);
 
+  // If no 'meta' event has arrived after a generous window (covers a cold
+  // dart-run compile), the scanned project is almost certainly running an older
+  // saropa_lints CLI that cannot report progress — say so explicitly so a stuck
+  // 0% is explained rather than mysterious. A late meta still overrides this
+  // back to the green version.
+  setTimeout(function(){
+    if (sawMeta) return;
+    var ve = document.getElementById('engineVer');
+    if (ve){ ve.textContent = S.legacyEngine; ve.className = 'legacy'; }
+  }, 40000);
+
   function setActive(phase){
     var steps = document.querySelectorAll('.step');
     var passed = true;
@@ -189,7 +212,14 @@ function scanScript(): string {
     document.getElementById('barTrack').classList.remove('indeterminate');
   }
 
+  var sawMeta = false;
   function onEvent(ev){
+    if (ev.event === 'meta'){
+      sawMeta = true;
+      var ve = document.getElementById('engineVer');
+      if (ve){ ve.textContent = 'saropa_lints v' + (ev.version || '?'); ve.className = 'ok'; }
+      return;
+    }
     if (ev.event === 'phase'){
       // 'collect' precedes file enumeration — keep the bar indeterminate, just
       // confirm the scanner is alive. Real phases reset to 0% on first tick.

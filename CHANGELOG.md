@@ -104,7 +104,8 @@ A new project size scan lays the groundwork for an upcoming Project Map dashboar
 ### Added (Extension)
 
 - **The Code Health Dashboard now opens immediately and fills in live while it scans** — instead of a notification that sat at "scanning…" with no movement, it shows a progress bar, the current file, running counts of files and functions, and a streaming preview of the worst functions found so far, so a long scan never looks frozen. While the scanner is compiling/starting the bar shows an animated indeterminate state rather than a dead 0%. No action required.
-- **Pause, Resume, Restart, and Cancel controls on the Code Health scan** — a long scan can now be suspended and continued, restarted, or stopped from the dashboard, and closing the panel also stops it, so the scan no longer runs unstoppably in the background. No action required.
+- **Pause, Resume, Restart, and Cancel controls on the Code Health scan** — a long scan can now be suspended and continued, restarted, or stopped from the dashboard, and closing the panel also stops it, so the scan no longer runs unstoppably in the background. Cancelling now stops the whole scanner process tree (previously a runaway scan could keep running on Windows). No action required.
+- **The scanning panel shows the extension version and the scanner-engine version** — if the project's `saropa_lints` is too old to report progress, the engine line says so instead of leaving a stuck 0%, making it obvious when the dashboard and the scanned project's package versions don't match. No action required.
 
 ---
 

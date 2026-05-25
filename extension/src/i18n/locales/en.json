@@ -724,6 +724,11 @@
       "preview": {
         "heading": "Problems found so far",
         "empty": "No problems found yet…"
+      },
+      "version": {
+        "engine": "Engine",
+        "detecting": "detecting…",
+        "legacy": "legacy — no live progress (this project's saropa_lints predates it)"
       }
     },
     "runReportFirst": "Run the report again, then copy JSON.",
