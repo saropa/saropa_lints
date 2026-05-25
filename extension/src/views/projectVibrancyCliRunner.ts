@@ -131,6 +131,32 @@ function writeControl(controlPath: string, command: string): void {
   }
 }
 
+/**
+ * Kills the scan process AND its descendants. On Windows we spawn through the
+ * shell (shell:true, required for dart.bat resolution), so `child` is the
+ * `cmd.exe` wrapper — `child.kill()` reaps the shell but orphans the real
+ * `dart.exe` grandchild, which keeps pegging the machine (the "cancel does
+ * nothing / page locked up" bug). `taskkill /T` kills the whole tree. On POSIX
+ * a plain kill of the (non-shell) child suffices.
+ */
+function killProcessTree(child: ReturnType<typeof spawn>): void {
+  const pid = child.pid;
+  if (pid === undefined) return;
+  if (process.platform === 'win32') {
+    try {
+      spawn('taskkill', ['/F', '/T', '/PID', String(pid)], { windowsHide: true });
+      return;
+    } catch {
+      // Fall through to child.kill() if taskkill is somehow unavailable.
+    }
+  }
+  try {
+    child.kill();
+  } catch {
+    // Best-effort: child may have already exited.
+  }
+}
+
 export function runProjectVibrancyScan(
   projectRoot: string,
   cancellationToken?: vscode.CancellationToken,
@@ -171,11 +197,7 @@ export function runProjectVibrancyScan(
     const cancelSubscription = cancellationToken?.onCancellationRequested(() => {
       cancelled = true;
       if (controlPath) writeControl(controlPath, 'cancel');
-      try {
-        child.kill();
-      } catch {
-        // Best-effort: child may have already exited between the check and the kill.
-      }
+      killProcessTree(child);
     });
     // Hand pause/resume/cancel controls back to the caller (the dashboard wires
     // them to its buttons). Pause/resume are cooperative via the control file;
@@ -187,11 +209,7 @@ export function runProjectVibrancyScan(
         cancel: () => {
           cancelled = true;
           writeControl(controlPath, 'cancel');
-          try {
-            child.kill();
-          } catch {
-            // Best-effort.
-          }
+          killProcessTree(child);
         },
       };
       handlers.onControl(control);
