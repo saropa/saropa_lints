@@ -157,6 +157,32 @@ function killProcessTree(child: ReturnType<typeof spawn>): void {
   }
 }
 
+/**
+ * Working directory for the `dart run` that resolves which saropa_lints CLI
+ * executes. Normally the scanned project (so it uses that project's own
+ * saropa_lints version, the correct production behavior). BUT when the extension
+ * itself is the in-development build (F5 from the repo), the package source sits
+ * at `<extensionPath>/..`; running from there uses the in-development CLI —
+ * which has live progress and the symlink-safe walk — to scan the project via
+ * `--path`, instead of whatever older version the project happens to pin. Pure
+ * filesystem detection (bin script present), so an installed production
+ * extension transparently falls back to the project's CLI.
+ */
+function resolveCliCwd(projectRoot: string): string {
+  try {
+    const extPath = vscode.extensions.getExtension('saropa.saropa-lints')?.extensionPath;
+    if (extPath) {
+      const repoRoot = path.dirname(extPath);
+      const hasCli = fs.existsSync(path.join(repoRoot, 'bin', 'project_vibrancy.dart'));
+      const hasPubspec = fs.existsSync(path.join(repoRoot, 'pubspec.yaml'));
+      if (hasCli && hasPubspec) return repoRoot;
+    }
+  } catch {
+    // Fall through to the project root on any detection error.
+  }
+  return projectRoot;
+}
+
 export function runProjectVibrancyScan(
   projectRoot: string,
   cancellationToken?: vscode.CancellationToken,
@@ -174,9 +200,12 @@ export function runProjectVibrancyScan(
       if (controlPath) args.push('--control', controlPath);
     }
     const command = dartCommandForPlatform();
+    // cwd decides which saropa_lints CLI runs (see resolveCliCwd): the project's
+    // own version in production, or the in-development repo CLI under F5.
+    const cliCwd = resolveCliCwd(projectRoot);
     // shell:true on Windows is required for .bat/.cmd resolution; see
     // SPAWN_USE_SHELL comment above for the CVE-2024-27980 reason.
-    const child = spawn(command, args, { cwd: projectRoot, shell: SPAWN_USE_SHELL });
+    const child = spawn(command, args, { cwd: cliCwd, shell: SPAWN_USE_SHELL });
     let stdout = '';
     let stderr = '';
     let stderrLine = ''; // carries an incomplete trailing NDJSON line between chunks

@@ -107,6 +107,13 @@ A new project size scan lays the groundwork for an upcoming Project Map dashboar
 - **Pause, Resume, Restart, and Cancel controls on the Code Health scan** — a long scan can now be suspended and continued, restarted, or stopped from the dashboard, and closing the panel also stops it, so the scan no longer runs unstoppably in the background. Cancelling now stops the whole scanner process tree (previously a runaway scan could keep running on Windows). No action required.
 - **The scanning panel shows the extension version and the scanner-engine version** — if the project's `saropa_lints` is too old to report progress, the engine line says so instead of leaving a stuck 0%, making it obvious when the dashboard and the scanned project's package versions don't match. No action required.
 
+<details><summary>Maintenance</summary>
+
+- When the extension runs as its own in-development build (F5 from the repo), the Code Health scan now executes the in-repo `saropa_lints` CLI against the opened project (via `--path`) instead of the project's pinned package version, so new CLI behavior can be tested without a path override. Installed builds are unaffected — they still use the project's own CLI.
+- `git blame` in the vibrancy scan now passes the scanned project as its working directory, so age scoring stays correct when the CLI process runs from a different directory than the scanned project.
+
+</details>
+
 ---
 
 ## [13.10.4]

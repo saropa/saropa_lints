@@ -582,13 +582,16 @@ Future<Map<String, Map<int, int>>> _collectBlameAges(
         continue;
       }
     }
+    // workingDirectory: root so blame targets the SCANNED project's repo even
+    // when the CLI process runs from elsewhere (the dev path runs the local
+    // saropa_lints CLI but scans a different project via --path).
     final proc = await Process.run('git', <String>[
       'blame',
       '--line-porcelain',
       '-w',
       '--',
       file,
-    ]);
+    ], workingDirectory: root);
     if (proc.exitCode != 0) {
       result[file] = const <int, int>{};
       continue;
