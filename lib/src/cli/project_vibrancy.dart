@@ -22,6 +22,32 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:path/path.dart' as p;
 import 'package:saropa_lints/src/cli/project_vibrancy_coverage_quality.dart';
 
+/// Live progress + cooperative pause/cancel sink for [runProjectVibrancy].
+///
+/// The Code Health webview opens immediately and renders a progress bar, the
+/// file currently being processed, and Pause/Resume/Cancel controls while the
+/// scan runs in the background. The scan reports through [onEvent] (the CLI maps
+/// each event to one NDJSON line on stderr) and `await`s [gate] before each unit
+/// of work.
+///
+/// [gate] is the pause/cancel mechanism: it returns immediately during normal
+/// running, blocks (polling) while the user has paused, and throws to abort when
+/// the user cancels. Pause is cooperative on purpose — there is no portable way
+/// to SIGSTOP a child process on Windows, so the scan must suspend itself rather
+/// than rely on the OS. A null [ProjectScanProgress] (the CLI/CI default) makes
+/// every call site a no-op, so non-interactive runs are byte-for-byte unchanged.
+class ProjectScanProgress {
+  ProjectScanProgress({required this.onEvent, required this.gate});
+
+  /// Receives one progress event map per call (phase/tick/row). The CLI
+  /// serializes each to NDJSON on stderr; stdout stays the pure report JSON.
+  final void Function(Map<String, Object?> event) onEvent;
+
+  /// Awaited before each unit of work. Resolves instantly when running, waits
+  /// while paused, and throws when cancelled (the CLI catches and exits clean).
+  final Future<void> Function() gate;
+}
+
 /// CLI and library entry options for [runProjectVibrancy].
 class ProjectVibrancyOptions {
   const ProjectVibrancyOptions({
@@ -140,8 +166,9 @@ class ProjectVibrancyReport {
 }
 
 Future<ProjectVibrancyReport> runProjectVibrancy(
-  ProjectVibrancyOptions options,
-) async {
+  ProjectVibrancyOptions options, {
+  ProjectScanProgress? progress,
+}) async {
   final root = p.normalize(options.projectPath);
   final files = _collectTargetFiles(options);
   final cache = _ProjectVibrancyCache.open(
@@ -157,15 +184,41 @@ Future<ProjectVibrancyReport> runProjectVibrancy(
   final fileContents = <String, String>{};
   final declaredFunctions = <_FunctionNode>[];
 
+  progress?.onEvent(<String, Object?>{
+    'event': 'phase',
+    'phase': 'parse',
+    'total': files.length,
+  });
+  var parsedCount = 0;
   for (final filePath in files) {
+    await progress?.gate();
+    parsedCount++;
     final file = File(filePath);
     if (!file.existsSync()) continue;
     final content = file.readAsStringSync();
     fileContents[filePath] = content;
-    final parsed = parseString(content: content, path: filePath);
+    // throwIfDiagnostics:false is essential — a Code Health scan runs over
+    // possibly-broken source (a consumer project mid-edit, an example fixture
+    // with intentional violations). The analyzer default throws on ANY parse
+    // diagnostic (e.g. await_in_wrong_context), which previously aborted the
+    // whole scan on the first imperfect file. Tolerate diagnostics and keep
+    // scanning the rest of the project.
+    final parsed = parseString(
+      content: content,
+      path: filePath,
+      throwIfDiagnostics: false,
+    );
     final collector = _FunctionCollector(content: content, filePath: filePath);
     parsed.unit.accept(collector);
     declaredFunctions.addAll(collector.functions);
+    progress?.onEvent(<String, Object?>{
+      'event': 'tick',
+      'phase': 'parse',
+      'done': parsedCount,
+      'total': files.length,
+      'file': p.relative(filePath, from: root).replaceAll('\\', '/'),
+      'functions': declaredFunctions.length,
+    });
   }
 
   final pathsForGit = <String>{};
@@ -177,11 +230,26 @@ Future<ProjectVibrancyReport> runProjectVibrancy(
     );
   }
   final commitEpoch = <String, int?>{};
+  progress?.onEvent(<String, Object?>{
+    'event': 'phase',
+    'phase': 'history',
+    'total': pathsForGit.length,
+  });
+  var historyDone = 0;
   for (final path in pathsForGit) {
+    await progress?.gate();
+    historyDone++;
     commitEpoch[path] = await gitLastCommitEpochSec(
       projectRoot: root,
       absoluteDartPath: path,
     );
+    progress?.onEvent(<String, Object?>{
+      'event': 'tick',
+      'phase': 'history',
+      'done': historyDone,
+      'total': pathsForGit.length,
+      'file': p.relative(path, from: root).replaceAll('\\', '/'),
+    });
   }
 
   final extendedForUsage = Map<String, String>.from(fileContents);
@@ -191,12 +259,26 @@ Future<ProjectVibrancyReport> runProjectVibrancy(
       extendedForUsage[testPath] = tf.readAsStringSync();
     }
   }
-  final usageCounts = _computeUsageCounts(extendedForUsage, declaredFunctions);
-  final blameByFile = await _collectBlameAges(files, cache);
+  final usageCounts = _computeUsageCounts(
+    extendedForUsage,
+    declaredFunctions,
+    progress: progress,
+    root: root,
+  );
+  final blameByFile = await _collectBlameAges(files, cache, progress: progress, root: root);
   final results = <ProjectVibrancyFunctionResult>[];
 
+  progress?.onEvent(<String, Object?>{
+    'event': 'phase',
+    'phase': 'score',
+    'total': declaredFunctions.length,
+  });
+  var scoreDone = 0;
+  var streamedRows = 0;
   final nowSec = DateTime.now().millisecondsSinceEpoch ~/ 1000;
   for (final fn in declaredFunctions) {
+    await progress?.gate();
+    scoreDone++;
     final content = fileContents[fn.filePath] ?? '';
     final rawCoverage = _computeCoverage(fn, lcov[fn.filePath]);
     final libRel = p.relative(fn.filePath, from: root).replaceAll('\\', '/');
@@ -292,6 +374,33 @@ Future<ProjectVibrancyReport> runProjectVibrancy(
         flags: flags,
       ),
     );
+    // Stream a bounded sample of problem functions (grade D and worse) so the
+    // webview "fills out" a live preview as the scan learns the code, without
+    // flooding stderr on a large project. The full sorted table renders at the
+    // end; this is just the at-a-glance "worst found so far" feel.
+    if (progress != null && streamedRows < 100 && rounded < 35) {
+      streamedRows++;
+      progress.onEvent(<String, Object?>{
+        'event': 'row',
+        'grade': grade,
+        'score': rounded,
+        'name': fn.name,
+        'file': libRel,
+        'line': fn.lineStart,
+        'complexity': fn.complexity,
+        'flags': flags,
+      });
+    }
+    // Throttle score ticks — the function count can be in the thousands and
+    // this phase is fast; one tick per 25 keeps the bar moving without spam.
+    if (scoreDone % 25 == 0 || scoreDone == declaredFunctions.length) {
+      progress?.onEvent(<String, Object?>{
+        'event': 'tick',
+        'phase': 'score',
+        'done': scoreDone,
+        'total': declaredFunctions.length,
+      });
+    }
   }
 
   results.sort((a, b) => a.score.compareTo(b.score));
@@ -390,10 +499,29 @@ Map<String, Set<int>> _parseLcov(
 
 Future<Map<String, Map<int, int>>> _collectBlameAges(
   List<String> files,
-  _ProjectVibrancyCache cache,
-) async {
+  _ProjectVibrancyCache cache, {
+  ProjectScanProgress? progress,
+  String? root,
+}) async {
   final result = <String, Map<int, int>>{};
+  progress?.onEvent(<String, Object?>{
+    'event': 'phase',
+    'phase': 'blame',
+    'total': files.length,
+  });
+  var blameDone = 0;
   for (final file in files) {
+    await progress?.gate();
+    blameDone++;
+    progress?.onEvent(<String, Object?>{
+      'event': 'tick',
+      'phase': 'blame',
+      'done': blameDone,
+      'total': files.length,
+      'file': root == null
+          ? file
+          : p.relative(file, from: root).replaceAll('\\', '/'),
+    });
     final fileHash = await _gitBlobHash(file);
     if (fileHash != null) {
       final cached = cache.getBlame(fileHash);
@@ -472,9 +600,15 @@ double? _computeCoverage(_FunctionNode fn, Set<int>? hitLines) {
 
 Map<String, int> _computeUsageCounts(
   Map<String, String> contents,
-  List<_FunctionNode> functions,
-) {
-  final referencesByName = _collectReferenceCounts(contents);
+  List<_FunctionNode> functions, {
+  ProjectScanProgress? progress,
+  String? root,
+}) {
+  final referencesByName = _collectReferenceCounts(
+    contents,
+    progress: progress,
+    root: root,
+  );
   final counts = <String, int>{};
   for (final fn in functions) {
     counts[fn.id] = referencesByName[fn.name] ?? 0;
@@ -482,14 +616,42 @@ Map<String, int> _computeUsageCounts(
   return counts;
 }
 
-Map<String, int> _collectReferenceCounts(Map<String, String> contents) {
+Map<String, int> _collectReferenceCounts(
+  Map<String, String> contents, {
+  ProjectScanProgress? progress,
+  String? root,
+}) {
   final counts = <String, int>{};
+  progress?.onEvent(<String, Object?>{
+    'event': 'phase',
+    'phase': 'usage',
+    'total': contents.length,
+  });
+  var usageDone = 0;
   for (final entry in contents.entries) {
-    final parsed = parseString(content: entry.value, path: entry.key);
+    usageDone++;
+    // throwIfDiagnostics:false: same robustness reason as the primary parse —
+    // reference counting must not crash on a file the analyzer flags.
+    final parsed = parseString(
+      content: entry.value,
+      path: entry.key,
+      throwIfDiagnostics: false,
+    );
     final visitor = _ReferenceVisitor();
     parsed.unit.accept(visitor);
     for (final name in visitor.references) {
       counts.update(name, (c) => c + 1, ifAbsent: () => 1);
+    }
+    if (usageDone % 25 == 0 || usageDone == contents.length) {
+      progress?.onEvent(<String, Object?>{
+        'event': 'tick',
+        'phase': 'usage',
+        'done': usageDone,
+        'total': contents.length,
+        'file': root == null
+            ? entry.key
+            : p.relative(entry.key, from: root).replaceAll('\\', '/'),
+      });
     }
   }
   return counts;

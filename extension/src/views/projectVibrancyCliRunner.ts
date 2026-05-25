@@ -7,7 +7,15 @@
 
 import * as vscode from 'vscode';
 import { spawn } from 'node:child_process';
-import type { ProjectVibrancyPayload } from './projectVibrancyTypes';
+import * as fs from 'node:fs';
+import * as os from 'node:os';
+import * as path from 'node:path';
+import type {
+  ProjectVibrancyPayload,
+  VibrancyScanControl,
+  VibrancyScanEvent,
+  VibrancyScanHandlers,
+} from './projectVibrancyTypes';
 
 export interface ProjectVibrancyScanResult {
   readonly payload: ProjectVibrancyPayload | null;
@@ -94,39 +102,128 @@ export function buildProjectVibrancyDartArgs(projectRoot: string): string[] {
   return args;
 }
 
+/**
+ * Allocates a unique control file under the OS temp dir, seeded with `run`. The
+ * dashboard rewrites it with `pause`/`run`/`cancel`; the dart scan polls it at
+ * each unit of work. Temp (not the project tree) so a scan never dirties the
+ * user's workspace or git status.
+ */
+function createControlFile(): string {
+  const controlPath = path.join(
+    os.tmpdir(),
+    `saropa-health-control-${process.pid}-${Date.now()}.txt`,
+  );
+  try {
+    fs.writeFileSync(controlPath, 'run');
+  } catch {
+    // Best-effort: if temp is not writable the scan still runs, just without
+    // pause/cancel-via-file (token cancellation still kills the child).
+  }
+  return controlPath;
+}
+
+function writeControl(controlPath: string, command: string): void {
+  try {
+    fs.writeFileSync(controlPath, command);
+  } catch {
+    // Best-effort: a failed control write leaves the scan running; the user can
+    // still cancel via the notification token (which kills the child).
+  }
+}
+
 export function runProjectVibrancyScan(
   projectRoot: string,
   cancellationToken?: vscode.CancellationToken,
+  handlers?: VibrancyScanHandlers,
 ): Promise<ProjectVibrancyScanResult> {
   return new Promise((resolve) => {
     const args = buildProjectVibrancyDartArgs(projectRoot);
+    // Streaming mode: opt in to NDJSON progress on stderr + a control file the
+    // dashboard rewrites for pause/cancel. Absent handlers, the invocation is
+    // identical to the original buffered scan (CI, tests).
+    const streaming = handlers !== undefined;
+    const controlPath = streaming ? createControlFile() : undefined;
+    if (streaming) {
+      args.push('--progress');
+      if (controlPath) args.push('--control', controlPath);
+    }
     const command = dartCommandForPlatform();
     // shell:true on Windows is required for .bat/.cmd resolution; see
     // SPAWN_USE_SHELL comment above for the CVE-2024-27980 reason.
     const child = spawn(command, args, { cwd: projectRoot, shell: SPAWN_USE_SHELL });
     let stdout = '';
     let stderr = '';
+    let stderrLine = ''; // carries an incomplete trailing NDJSON line between chunks
     let cancelled = false;
+    const cleanupControl = (): void => {
+      if (controlPath) {
+        try {
+          fs.unlinkSync(controlPath);
+        } catch {
+          // Best-effort temp cleanup; a leftover tiny file is harmless.
+        }
+      }
+    };
     // Wire user cancellation to a real process kill — without this the dart
     // run keeps consuming CPU even after the progress notification is dismissed,
     // which is exactly the "non-stop scanning" pile-up symptom we're guarding
     // against.
     const cancelSubscription = cancellationToken?.onCancellationRequested(() => {
       cancelled = true;
+      if (controlPath) writeControl(controlPath, 'cancel');
       try {
         child.kill();
       } catch {
         // Best-effort: child may have already exited between the check and the kill.
       }
     });
+    // Hand pause/resume/cancel controls back to the caller (the dashboard wires
+    // them to its buttons). Pause/resume are cooperative via the control file;
+    // cancel both signals the file and kills the child so it stops promptly.
+    if (handlers?.onControl && controlPath) {
+      const control: VibrancyScanControl = {
+        pause: () => writeControl(controlPath, 'pause'),
+        resume: () => writeControl(controlPath, 'run'),
+        cancel: () => {
+          cancelled = true;
+          writeControl(controlPath, 'cancel');
+          try {
+            child.kill();
+          } catch {
+            // Best-effort.
+          }
+        },
+      };
+      handlers.onControl(control);
+    }
     child.stdout.on('data', (chunk: Buffer | string) => {
       stdout += chunk.toString();
     });
     child.stderr.on('data', (chunk: Buffer | string) => {
-      stderr += chunk.toString();
+      if (!streaming) {
+        stderr += chunk.toString();
+        return;
+      }
+      // Split NDJSON events from real error text. Each complete line that parses
+      // to an object with `.event` is a progress event; everything else is kept
+      // as diagnostic stderr for the failure path.
+      stderrLine += chunk.toString();
+      const lines = stderrLine.split('\n');
+      stderrLine = lines.pop() ?? '';
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (trimmed.length === 0) continue;
+        const event = tryParseEvent(trimmed);
+        if (event) {
+          handlers?.onEvent?.(event);
+        } else {
+          stderr += `${trimmed}\n`;
+        }
+      }
     });
     child.on('error', (err: NodeJS.ErrnoException) => {
       cancelSubscription?.dispose();
+      cleanupControl();
       // Startup failures happen before exit/close when the runtime is missing
       // or non-executable in PATH.
       const details = err?.message?.trim();
@@ -144,6 +241,7 @@ export function runProjectVibrancyScan(
     });
     child.on('close', (code) => {
       cancelSubscription?.dispose();
+      cleanupControl();
       const exitCode = code ?? -1;
       const raw = stdout;
       // Suppress error toasts when we killed the child ourselves — the user
@@ -180,4 +278,16 @@ export function runProjectVibrancyScan(
       }
     });
   });
+}
+
+/** Parses one NDJSON stderr line into a scan event, or null if it isn't one. */
+function tryParseEvent(line: string): VibrancyScanEvent | undefined {
+  if (!line.startsWith('{')) return undefined;
+  try {
+    const parsed = JSON.parse(line) as { event?: unknown };
+    if (typeof parsed.event === 'string') return parsed as VibrancyScanEvent;
+  } catch {
+    // Not an event line (e.g. a dart stack trace). Caller keeps it as stderr.
+  }
+  return undefined;
 }

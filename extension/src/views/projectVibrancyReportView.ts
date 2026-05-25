@@ -10,7 +10,12 @@ import * as nodePath from 'node:path';
 import { createWebviewCspNonce, escapeHtml } from '../vibrancy/views/html-utils';
 import { getProjectRoot } from '../projectRoot';
 import { runProjectVibrancyScan } from './projectVibrancyCliRunner';
-import type { ProjectVibrancyFunctionRow, ProjectVibrancyPayload } from './projectVibrancyTypes';
+import type {
+  ProjectVibrancyFunctionRow,
+  ProjectVibrancyPayload,
+  VibrancyScanControl,
+} from './projectVibrancyTypes';
+import { buildCodeHealthScanningHtml } from './codeHealthScanProgress';
 import { getProjectVibrancyReportStyles } from './projectVibrancyReportStyles';
 import { pluralize } from './webview-format';
 import {
@@ -41,6 +46,13 @@ let lastReportRawStdout = '';
 // is in progress reuse the in-flight promise so they share the same panel
 // update instead of stacking.
 let inflightScan: Promise<void> | undefined;
+// Pause/resume/cancel handle for the scan currently feeding the panel. Set when
+// a streaming scan starts, cleared when it ends.
+let currentControl: VibrancyScanControl | undefined;
+// Monotonic scan generation. A Restart cancels the in-flight scan and starts a
+// new one in the same panel; the old scan's async completion must not clobber
+// the new scan's view, so every callback checks its captured epoch against this.
+let scanEpoch = 0;
 
 export async function openProjectVibrancyReport(): Promise<void> {
   if (inflightScan) {
@@ -67,25 +79,56 @@ export function refreshCodeHealthDashboardIfOpen(): void {
 }
 
 async function runScanAndRender(projectRoot: string): Promise<void> {
-  const scan = await vscode.window.withProgress(
-    {
-      location: vscode.ProgressLocation.Notification,
-      // User-facing wording is "Code Health" everywhere. The underlying
-      // scoring CLI is still `saropa_lints:project_vibrancy` and the setting
-      // key prefix is still `saropaLints.projectVibrancy.*` — both kept for
-      // pubspec/settings.json compatibility, neither is user-visible.
-      title: l10n('codeHealth.scanningTitle'),
-      // Cancellable so a runaway scan can be killed from the notification
-      // instead of waiting for the dart process to finish on its own.
-      cancellable: true,
-    },
-    async (_progress, token) => runProjectVibrancyScan(projectRoot, token),
-  );
-  if (!scan.payload) return;
-  lastReportRawStdout = scan.rawStdout;
+  // Open the panel in its scanning state immediately so the user sees live
+  // progress (bar, current file, counters) instead of a frozen notification —
+  // the whole point of this view. The full report replaces this HTML on
+  // completion.
   const panel = getOrCreatePanel();
+  panel.webview.html = buildCodeHealthScanningHtml();
+  panel.reveal(vscode.ViewColumn.One);
+  await runStreamingScan(projectRoot, panel);
+}
+
+/**
+ * Streams a scan into the already-open scanning panel, forwarding progress
+ * events to the webview and capturing the pause/cancel control. On success the
+ * panel swaps to the full report; on cancel/failure it tells the view to stop
+ * the spinner (the runner already toasts genuine failures).
+ */
+async function runStreamingScan(
+  projectRoot: string,
+  panel: vscode.WebviewPanel,
+): Promise<void> {
+  const epoch = ++scanEpoch;
+  const scan = await runProjectVibrancyScan(projectRoot, undefined, {
+    onEvent: (event) => {
+      if (epoch === scanEpoch) void panel.webview.postMessage({ type: 'event', event });
+    },
+    onControl: (control) => {
+      if (epoch === scanEpoch) currentControl = control;
+    },
+  });
+  // A Restart (or a fresh open) superseded this scan — ignore its stale result
+  // so it cannot overwrite the newer scan's view.
+  if (epoch !== scanEpoch) return;
+  currentControl = undefined;
+  if (!scan.payload) {
+    void panel.webview.postMessage({ type: 'stopped' });
+    return;
+  }
+  lastReportRawStdout = scan.rawStdout;
   panel.webview.html = buildHtml(scan.payload);
   panel.reveal(vscode.ViewColumn.One);
+}
+
+/** Cancels the in-flight scan and starts a fresh one in the same panel. */
+async function restartScan(): Promise<void> {
+  const root = getProjectRoot();
+  if (!root || !currentPanel) return;
+  currentControl?.cancel();
+  currentControl = undefined;
+  currentPanel.webview.html = buildCodeHealthScanningHtml();
+  await runStreamingScan(root, currentPanel);
 }
 
 function getOrCreatePanel(): vscode.WebviewPanel {
@@ -97,6 +140,11 @@ function getOrCreatePanel(): vscode.WebviewPanel {
     { enableScripts: true, retainContextWhenHidden: true },
   );
   currentPanel.onDidDispose(() => {
+    // Closing the panel is an implicit cancel — otherwise the dart scan keeps
+    // burning CPU with no visible surface to stop it (the old "runaway scan"
+    // symptom). This replaces the notification token that used to cancel it.
+    currentControl?.cancel();
+    currentControl = undefined;
     currentPanel = undefined;
   });
   currentPanel.webview.onDidReceiveMessage(async (msg: unknown) => {
@@ -122,6 +170,23 @@ async function handlePanelMessage(msg: unknown): Promise<void> {
   }
   if (data.type === 'rescan') {
     await openProjectVibrancyReport();
+    return;
+  }
+  // Scanning-view controls — only meaningful while a streaming scan is running.
+  if (data.type === 'pause') {
+    currentControl?.pause();
+    return;
+  }
+  if (data.type === 'resume') {
+    currentControl?.resume();
+    return;
+  }
+  if (data.type === 'cancel') {
+    currentControl?.cancel();
+    return;
+  }
+  if (data.type === 'restart') {
+    await restartScan();
     return;
   }
   if (data.type === 'openFile' && typeof data.file === 'string') {

@@ -26,6 +26,40 @@ export interface ProjectVibrancyGates {
   readonly violations?: readonly ProjectVibrancyGateViolation[];
 }
 
+/**
+ * One live scan event emitted by `project_vibrancy --progress` (NDJSON on
+ * stderr). `phase`/`tick` drive the progress bar + current-file line; `row`
+ * streams a bounded sample of problem functions into the live preview; `done`
+ * signals the dashboard can flip from the scanning view to the full report.
+ */
+export interface VibrancyScanEvent {
+  readonly event: 'phase' | 'tick' | 'row' | 'done';
+  readonly phase?: string;
+  readonly done?: number;
+  readonly total?: number;
+  readonly file?: string;
+  readonly functions?: number;
+  readonly grade?: string;
+  readonly score?: number;
+  readonly name?: string;
+  readonly line?: number;
+  readonly complexity?: number;
+  readonly flags?: readonly string[];
+}
+
+/** Pause/resume/cancel handle for an in-flight streaming scan (control file backed). */
+export interface VibrancyScanControl {
+  pause(): void;
+  resume(): void;
+  cancel(): void;
+}
+
+/** Optional streaming hooks; when supplied the scan runs with `--progress`/`--control`. */
+export interface VibrancyScanHandlers {
+  readonly onEvent?: (event: VibrancyScanEvent) => void;
+  readonly onControl?: (control: VibrancyScanControl) => void;
+}
+
 export interface ProjectVibrancyPayload {
   readonly gates?: ProjectVibrancyGates;
   readonly summary?: {

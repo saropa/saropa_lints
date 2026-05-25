@@ -53,25 +53,44 @@ Future<void> main(List<String> args) async {
       ? null
       : await _changedDartFilesSince(projectPath, since);
 
-  final report = await runProjectVibrancy(
-    ProjectVibrancyOptions(
-      projectPath: projectPath,
-      lcovPath: lcovPath,
-      filePath: filePath == null
-          ? null
-          : p.normalize(
-              p.isAbsolute(filePath) ? filePath : p.join(projectPath, filePath),
-            ),
-      folderPath: folderPath == null
-          ? null
-          : p.normalize(
-              p.isAbsolute(folderPath)
-                  ? folderPath
-                  : p.join(projectPath, folderPath),
-            ),
-      includedFiles: includedFiles,
-    ),
+  // --progress streams NDJSON scan events to stderr (the dashboard webview
+  // consumes them for a live progress bar + current file). --control <path>
+  // points at a tiny text file the dashboard rewrites with run/pause/cancel so
+  // the user can suspend or abort a long scan. Both are opt-in; without them the
+  // CLI/CI output is byte-for-byte unchanged. stdout stays the pure report JSON.
+  final wantsProgress = args.contains('--progress');
+  final controlPath = _readOption(args, '--control');
+  final progress = wantsProgress
+      ? ProjectScanProgress(onEvent: _emitEvent, gate: _makeGate(controlPath))
+      : null;
+
+  final options = ProjectVibrancyOptions(
+    projectPath: projectPath,
+    lcovPath: lcovPath,
+    filePath: filePath == null
+        ? null
+        : p.normalize(
+            p.isAbsolute(filePath) ? filePath : p.join(projectPath, filePath),
+          ),
+    folderPath: folderPath == null
+        ? null
+        : p.normalize(
+            p.isAbsolute(folderPath)
+                ? folderPath
+                : p.join(projectPath, folderPath),
+          ),
+    includedFiles: includedFiles,
   );
+
+  final ProjectVibrancyReport report;
+  try {
+    report = await runProjectVibrancy(options, progress: progress);
+  } on _ScanCancelled {
+    // User cancelled from the dashboard. Exit clean with no stdout payload —
+    // the extension treats an empty result after a cancel request as "stopped",
+    // not "failed", so no error toast fires.
+    exit(0);
+  }
 
   var exitCode = 0;
   final avgGrade = _averageGrade(report);
@@ -174,6 +193,11 @@ Future<void> main(List<String> args) async {
     since: since,
     exitCode: exitCode,
   );
+  // Signal scan completion before the payload so the webview can flip from the
+  // scanning view to the rendered dashboard the instant stdout arrives.
+  if (progress != null) {
+    _emitEvent(<String, Object?>{'event': 'done'});
+  }
   print(const JsonEncoder.withIndent('  ').convert(payload));
   exit(exitCode);
 }
@@ -182,6 +206,54 @@ String? _readOption(List<String> args, String key) {
   final index = args.indexOf(key);
   if (index < 0 || index + 1 >= args.length) return null;
   return args[index + 1];
+}
+
+/// Writes one scan event as a single NDJSON line on stderr. stdout is reserved
+/// for the final report JSON, so the extension parses the two streams separately.
+void _emitEvent(Map<String, Object?> event) {
+  stderr.writeln(jsonEncode(event));
+}
+
+/// Thrown by the control gate when the dashboard requests cancel; caught in
+/// [main] to exit cleanly without emitting a partial report.
+class _ScanCancelled implements Exception {
+  const _ScanCancelled();
+}
+
+/// Builds the cooperative pause/cancel gate the scan awaits before each unit of
+/// work. With no control file it is a no-op. With one, it reads the file's
+/// current command: `pause` blocks (re-checking every 150 ms) until the command
+/// changes; `cancel` throws [_ScanCancelled]; anything else resumes immediately.
+Future<void> Function() _makeGate(String? controlPath) {
+  if (controlPath == null) {
+    return () async {};
+  }
+  return () async {
+    while (true) {
+      final command = _readControl(controlPath);
+      if (command == 'cancel') {
+        throw const _ScanCancelled();
+      }
+      if (command != 'pause') {
+        return;
+      }
+      // Poll while paused. 150 ms is responsive to a Resume click without
+      // busy-spinning a CPU core during a long pause.
+      await Future<void>.delayed(const Duration(milliseconds: 150));
+    }
+  };
+}
+
+/// Reads the control command, defaulting to `run` on any miss/error so a missing
+/// or transiently-locked control file never wedges the scan.
+String _readControl(String controlPath) {
+  try {
+    final file = File(controlPath);
+    if (!file.existsSync()) return 'run';
+    return file.readAsStringSync().trim().toLowerCase();
+  } on Object {
+    return 'run';
+  }
 }
 
 void _printUsage() {

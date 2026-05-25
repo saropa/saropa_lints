@@ -691,6 +691,38 @@
     "skipToTable": "Skip to functions table",
     "openWorkspaceFirst": "Open a Dart/Flutter workspace first.",
     "scanningTitle": "Code Health: scanning functions…",
+    "scan": {
+      "title": "Scanning project health",
+      "subtitle": "Reading your code. The dashboard fills in as the scan learns more.",
+      "waiting": "Starting scan…",
+      "paused": "Paused",
+      "stopped": "Scan stopped",
+      "elapsed": "Elapsed",
+      "phase": {
+        "parse": "Parsing files",
+        "history": "Reading git history",
+        "blame": "Computing code age",
+        "usage": "Counting references",
+        "score": "Scoring functions"
+      },
+      "counter": {
+        "files": "Files",
+        "functions": "Functions",
+        "problems": "Problems found"
+      },
+      "counters": { "aria": "Live scan counters" },
+      "controls": { "aria": "Scan controls" },
+      "btn": {
+        "pause": "Pause",
+        "resume": "Resume",
+        "restart": "Restart",
+        "cancel": "Cancel"
+      },
+      "preview": {
+        "heading": "Problems found so far",
+        "empty": "No problems found yet…"
+      }
+    },
     "runReportFirst": "Run the report again, then copy JSON.",
     "copiedJson": "Code Health JSON copied to clipboard.",
     "couldNotOpenFile": "Could not open file: {path}",
