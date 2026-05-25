@@ -170,6 +170,11 @@ Future<ProjectVibrancyReport> runProjectVibrancy(
   ProjectScanProgress? progress,
 }) async {
   final root = p.normalize(options.projectPath);
+  // Earliest possible signal: file enumeration + the `dart run` compile that
+  // precedes it are the longest stretch with no other feedback. Emitting this
+  // first means the dashboard shows "Discovering files…" the instant the
+  // process produces any output, instead of sitting at a dead 0%.
+  progress?.onEvent(<String, Object?>{'event': 'phase', 'phase': 'collect'});
   final files = _collectTargetFiles(options);
   final cache = _ProjectVibrancyCache.open(
     options.cachePath ??
@@ -412,6 +417,33 @@ Future<ProjectVibrancyReport> runProjectVibrancy(
   );
 }
 
+/// Directory names pruned from the file walk. None hold the project's own
+/// scannable `lib/` sources, but on a real Flutter app they are huge (build
+/// outputs, the pub cache, generated tool state) or contain symlink loops
+/// (iOS/macOS `Pods`, plugin `.symlinks`). Walking them with `followLinks` was
+/// the dominant cost of the long "0 files" dead-zone before the first progress
+/// event — and could hang outright on a symlink cycle. Pruning the *traversal*
+/// does not change which files are scanned: the `/lib/` + `.dart` + `build/`
+/// filters below already excluded everything under these directories.
+bool _isPrunedScanDir(String name) {
+  switch (name) {
+    case '.git':
+    case '.dart_tool':
+    case '.fvm':
+    case '.symlinks':
+    case '.plugin_symlinks':
+    case '.gradle':
+    case '.idea':
+    case '.vscode':
+    case 'build':
+    case 'node_modules':
+    case 'Pods':
+      return true;
+    default:
+      return false;
+  }
+}
+
 List<String> _collectTargetFiles(ProjectVibrancyOptions options) {
   final root = Directory(options.projectPath);
   if (!root.existsSync()) return const <String>[];
@@ -420,32 +452,52 @@ List<String> _collectTargetFiles(ProjectVibrancyOptions options) {
   final selectedFolder = options.folderPath;
   final included = options.includedFiles?.map(p.normalize).toSet();
   final files = <String>[];
-  for (final entity in root.listSync(recursive: true)) {
-    if (entity is! File) continue;
-    final path = p.normalize(entity.path);
-    if (!path.endsWith('.dart')) continue;
-    final posix = path.replaceAll('\\', '/');
-    if (posix.endsWith('.g.dart') ||
-        posix.endsWith('.freezed.dart') ||
-        posix.endsWith('.mocks.dart')) {
+  // Manual stack walk with followLinks:false so a symlink cycle can never wedge
+  // the scan, and pruned dirs are never descended into.
+  final stack = <Directory>[root];
+  while (stack.isNotEmpty) {
+    final dir = stack.removeLast();
+    List<FileSystemEntity> entries;
+    try {
+      entries = dir.listSync(followLinks: false);
+    } on FileSystemException {
+      // Permission denied or the dir vanished mid-walk — skip it, never abort
+      // the whole scan over one unreadable directory.
       continue;
     }
-    // Exclude project `build/` outputs only (relative to root). A plain
-    // substring match on `/build/` skips real packages under paths like
-    // `<repo>/build/test_tmp/.../lib/` when TMP is redirected for tests.
-    final rel = p.relative(path, from: rootPath);
-    final posixRel = rel.replaceAll('\\', '/');
-    if (posixRel.startsWith('build/') || posixRel.contains('/build/')) {
-      continue;
+    for (final entity in entries) {
+      if (entity is Directory) {
+        if (!_isPrunedScanDir(p.basename(entity.path))) {
+          stack.add(entity);
+        }
+        continue;
+      }
+      if (entity is! File) continue;
+      final path = p.normalize(entity.path);
+      if (!path.endsWith('.dart')) continue;
+      final posix = path.replaceAll('\\', '/');
+      if (posix.endsWith('.g.dart') ||
+          posix.endsWith('.freezed.dart') ||
+          posix.endsWith('.mocks.dart')) {
+        continue;
+      }
+      // Exclude project `build/` outputs only (relative to root). A plain
+      // substring match on `/build/` skips real packages under paths like
+      // `<repo>/build/test_tmp/.../lib/` when TMP is redirected for tests.
+      final rel = p.relative(path, from: rootPath);
+      final posixRel = rel.replaceAll('\\', '/');
+      if (posixRel.startsWith('build/') || posixRel.contains('/build/')) {
+        continue;
+      }
+      if (!posix.contains('/lib/')) continue;
+      if (selectedFile != null && p.normalize(selectedFile) != path) continue;
+      if (selectedFolder != null &&
+          !path.startsWith(p.normalize(selectedFolder))) {
+        continue;
+      }
+      if (included != null && !included.contains(path)) continue;
+      files.add(path);
     }
-    if (!posix.contains('/lib/')) continue;
-    if (selectedFile != null && p.normalize(selectedFile) != path) continue;
-    if (selectedFolder != null &&
-        !path.startsWith(p.normalize(selectedFolder))) {
-      continue;
-    }
-    if (included != null && !included.contains(path)) continue;
-    files.add(path);
   }
   files.sort();
   return files;

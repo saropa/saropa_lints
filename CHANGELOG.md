@@ -99,10 +99,11 @@ A new project size scan lays the groundwork for an upcoming Project Map dashboar
 ### Fixed
 
 - **Code Health scan no longer crashes on a file the analyzer can't fully parse** — one source file with a parse-level diagnostic (for example an `await` outside an async function, common while editing) previously aborted the whole scan with an unhandled exception; it now tolerates such files and keeps scanning the rest. No action required.
+- **Code Health scan starts faster and can't hang on symlinks** — file discovery now skips heavy directories (`build`, `.dart_tool`, `node_modules`, `Pods`, `.git`, …) and no longer follows symbolic links, so the scan reaches your `lib/` sources quickly instead of crawling generated output, and a symlink loop can't wedge it. No action required.
 
 ### Added (Extension)
 
-- **The Code Health Dashboard now opens immediately and fills in live while it scans** — instead of a notification that sat at "scanning…" with no movement, it shows a progress bar, the current file, running counts of files and functions, and a streaming preview of the worst functions found so far, so a long scan never looks frozen. No action required.
+- **The Code Health Dashboard now opens immediately and fills in live while it scans** — instead of a notification that sat at "scanning…" with no movement, it shows a progress bar, the current file, running counts of files and functions, and a streaming preview of the worst functions found so far, so a long scan never looks frozen. While the scanner is compiling/starting the bar shows an animated indeterminate state rather than a dead 0%. No action required.
 - **Pause, Resume, Restart, and Cancel controls on the Code Health scan** — a long scan can now be suspended and continued, restarted, or stopped from the dashboard, and closing the panel also stops it, so the scan no longer runs unstoppably in the background. No action required.
 
 ---

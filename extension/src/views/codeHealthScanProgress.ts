@@ -34,6 +34,8 @@ function scanStrings(): Record<string, string> {
     paused: l10n('codeHealth.scan.paused'),
     stopped: l10n('codeHealth.scan.stopped'),
     waiting: l10n('codeHealth.scan.waiting'),
+    launching: l10n('codeHealth.scan.launching'),
+    collect: l10n('codeHealth.scan.collect'),
     previewEmpty: l10n('codeHealth.scan.preview.empty'),
     pause: l10n('codeHealth.scan.btn.pause'),
     resume: l10n('codeHealth.scan.btn.resume'),
@@ -68,10 +70,11 @@ export function buildCodeHealthScanningHtml(): string {
 
 <section class="bar-block">
   <div class="bar-head">
-    <span id="phaseLabel">${escapeHtml(l10n('codeHealth.scan.waiting'))}</span>
-    <span id="phasePct" class="pct">0%</span>
+    <span id="phaseLabel">${escapeHtml(l10n('codeHealth.scan.launching'))}</span>
+    <span id="phasePct" class="pct"></span>
   </div>
-  <div class="bar-track"><div class="bar-fill" id="barFill"></div></div>
+  <div class="bar-track indeterminate" id="barTrack"><div class="bar-fill" id="barFill"></div></div>
+  <p class="scan-hint" id="scanHint">${escapeHtml(l10n('codeHealth.scan.firstRunHint'))}</p>
   <p class="current-file" id="currentFile" title=""></p>
 </section>
 
@@ -120,6 +123,12 @@ body{font-family:var(--vscode-font-family);color:var(--vscode-foreground);backgr
 .pct{font-variant-numeric:tabular-nums;color:var(--vscode-descriptionForeground);}
 .bar-track{height:10px;border-radius:6px;background:var(--vscode-input-background,#8881);overflow:hidden;}
 .bar-fill{height:100%;width:0;border-radius:6px;background:var(--vscode-progressBar-background,#0e70c0);transition:width .15s ease;}
+/* Indeterminate: a sliding chunk shown while the scan is starting/compiling and
+   no done/total has arrived yet, so the bar is never a dead "0%". */
+.bar-track.indeterminate .bar-fill{width:35%;animation:indeterminate 1.1s ease-in-out infinite;}
+@keyframes indeterminate{0%{margin-left:-35%;}100%{margin-left:100%;}}
+@media (prefers-reduced-motion:reduce){.bar-track.indeterminate .bar-fill{animation:none;width:100%;opacity:.4;}}
+.scan-hint{margin:8px 0 0;font-size:.8rem;color:var(--vscode-descriptionForeground);}
 .current-file{margin:8px 0 0;font-family:var(--vscode-editor-font-family,monospace);font-size:.8rem;color:var(--vscode-descriptionForeground);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:1.2em;}
 .counters{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:20px;}
 .counter{flex:1 1 90px;background:var(--vscode-editorWidget-background,#8881);border:1px solid var(--vscode-widget-border,#8883);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:2px;}
@@ -174,14 +183,25 @@ function scanScript(): string {
     });
   }
 
+  function goDeterminate(){
+    var hint = document.getElementById('scanHint');
+    if (hint){ hint.style.display = 'none'; }
+    document.getElementById('barTrack').classList.remove('indeterminate');
+  }
+
   function onEvent(ev){
     if (ev.event === 'phase'){
+      // 'collect' precedes file enumeration — keep the bar indeterminate, just
+      // confirm the scanner is alive. Real phases reset to 0% on first tick.
+      if (ev.phase === 'collect'){
+        document.getElementById('phaseLabel').textContent = S.collect;
+        return;
+      }
       setActive(ev.phase);
       document.getElementById('phaseLabel').textContent = S[ev.phase] || ev.phase;
-      document.getElementById('barFill').style.width = '0%';
-      document.getElementById('phasePct').textContent = '0%';
     } else if (ev.event === 'tick'){
       if (typeof ev.total === 'number' && ev.total > 0){
+        goDeterminate();
         var pct = Math.min(100, Math.round((ev.done/ev.total)*100));
         document.getElementById('barFill').style.width = pct + '%';
         document.getElementById('phasePct').textContent = pct + '%';
