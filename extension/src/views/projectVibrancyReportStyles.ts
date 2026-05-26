@@ -25,10 +25,9 @@ export function getProjectVibrancyReportStyles(): string {
 }
 
 /**
- * Saved-report-file action row: a monospace path the user can click to copy,
- * with explicit Copy / Open / Reveal buttons. Rendered as a strip directly
- * under the KPI cards so it sits next to the data it summarises rather than
- * being buried in the toolbar.
+ * Saved-report-file action row + the new toolbar inline-checkbox + load-more
+ * button styles. Grouped here so the report-view-specific chrome (anything
+ * that isn't the score pill, flag pill, or table grid) lives in one place.
  */
 function reportFileRowStyles(): string {
   return `
@@ -56,6 +55,25 @@ function reportFileRowStyles(): string {
 }
 .report-file .rf-path:hover { text-decoration: underline; }
 .report-file .btn { flex: 0 0 auto; }
+/* Inline checkbox label next to the search field — "Hide boilerplate methods" */
+.check-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.9em;
+  color: var(--vscode-foreground);
+}
+.check-inline input[type="checkbox"] { cursor: pointer; }
+/* Render-window "Show next N" button, shown when the filtered list is longer
+   than the current visible window (default 500 rows). */
+.load-more {
+  display: flex;
+  justify-content: center;
+  padding: 10px 0;
+}
+.load-more .btn { min-width: 220px; }
 `;
 }
 
@@ -71,6 +89,8 @@ function reportFileRowStyles(): string {
 function codeHealthTableStyles(): string {
   return `
 .dash-table.code-health th, .dash-table.code-health td { padding: 5px 8px; }
+.dash-table.code-health .col-select { width: 34px; text-align: center; }
+.dash-table.code-health .col-select input[type="checkbox"] { cursor: pointer; }
 .dash-table.code-health .col-score { width: 62px; text-align: center; }
 .dash-table.code-health .col-name  { width: 22%; }
 .dash-table.code-health .col-file  { width: 26%; }

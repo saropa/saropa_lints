@@ -8,7 +8,7 @@
 import * as vscode from 'vscode';
 import * as nodePath from 'node:path';
 import * as nodeFs from 'node:fs';
-import { createWebviewCspNonce, escapeHtml } from '../vibrancy/views/html-utils';
+import { createWebviewCspNonce, escapeHtml, jsonForScriptBlock } from '../vibrancy/views/html-utils';
 import { getProjectRoot } from '../projectRoot';
 import { runProjectVibrancyScan } from './projectVibrancyCliRunner';
 import type {
@@ -278,6 +278,21 @@ async function handlePanelMessage(msg: unknown): Promise<void> {
     }
     return;
   }
+  if (data.type === 'copyText') {
+    // Generic text-to-clipboard for in-page selections (currently the bulk
+    // "Copy selected" workflow on the worst-functions table). Bounded to
+    // 1 MB so a runaway selection can't paste a multi-megabyte string into
+    // the clipboard by accident.
+    const text = (data as { text?: string }).text;
+    if (typeof text !== 'string' || text.length === 0) return;
+    const capped = text.length > 1_000_000 ? text.slice(0, 1_000_000) : text;
+    await vscode.env.clipboard.writeText(capped);
+    const lineCount = capped.split('\n').filter((l) => l.length > 0).length;
+    void vscode.window.showInformationMessage(
+      `Copied ${lineCount} ${lineCount === 1 ? 'row' : 'rows'} to clipboard.`,
+    );
+    return;
+  }
   if (data.type === 'revealReportFile') {
     if (!lastReportFilePath) return;
     // `revealFileInOS` opens the OS file browser at the file — Explorer on
@@ -391,7 +406,7 @@ ${buildReportFileRow(reportFilePath)}
 ${buildToolbar()}
 <div class="chip-strip" id="filter-strip" hidden></div>
 <main id="pv-main">
-${buildTable(rows)}
+${buildTable(rows, nonce)}
 </main>
 ${buildKeyboardShortcutsOverlay([
   { key: '/', label: l10n('codeHealth.shortcuts.focusFilter') },
@@ -540,135 +555,117 @@ function buildReportFileRow(reportFilePath: string | undefined): string {
 </section>`;
 }
 
-/** Toolbar with one tier-1 primary (*Rescan*), tier-2 secondaries, and a search field. */
+/**
+ * Toolbar: tier-1 primary (*Rescan*), tier-2 secondaries, a *Copy selected*
+ * action for the row-selection workflow, a "hide boilerplate" toggle, and the
+ * row search field. The toggle defaults ON because `==`, `hashCode`,
+ * `toString`, `copyWith`, `fromJson` etc. dominate a real project's "worst
+ * functions" list and rarely deserve triage attention — surfacing them
+ * obscures the genuinely problematic functions underneath.
+ */
 function buildToolbar(): string {
   return `<section class="toolbar-band" role="toolbar" aria-label="${escapeHtml(l10n('codeHealth.toolbar.ariaLabel'))}">
   <div class="toolbar-row spread">
     <div class="toolbar-row" style="gap:6px;">
       <button class="btn tier-1" id="rescan" type="button"
         title="${escapeHtml(l10n('codeHealth.toolbar.rescanTitle'))}">${escapeHtml(l10n('codeHealth.toolbar.rescan'))}</button>
+      <button class="btn" id="copySelected" type="button" disabled
+        title="Copy the selected rows as one line each — file:line then function name and score — ready to paste into a chat or issue for analysis.">Copy selected</button>
       <button class="btn" id="copyJson" type="button"
         title="${escapeHtml(l10n('codeHealth.toolbar.copyJsonTitle'))}">${escapeHtml(l10n('codeHealth.toolbar.copyJson'))}</button>
       <button class="btn" id="openPvSettings" type="button"
         title="${escapeHtml(l10n('codeHealth.toolbar.settingsTitle'))}">${escapeHtml(l10n('codeHealth.toolbar.settingsButton'))}</button>
     </div>
-    <label class="field" title="${escapeHtml(l10n('codeHealth.toolbar.filterTitle'))}">
-      <span class="glyph">🔎</span>
-      <label class="sr-only" for="pvSearch">${escapeHtml(l10n('codeHealth.toolbar.filterLabel'))}</label>
-      <input id="pvSearch" type="search" placeholder="${escapeHtml(l10n('codeHealth.toolbar.filterPlaceholder'))}" autocomplete="off" />
-    </label>
+    <div class="toolbar-row" style="gap:12px;">
+      <label class="check-inline" title="Hide equality, serialization, and dispatch boilerplate: operator overrides (==, &lt;, []), hashCode, toString, noSuchMethod, copyWith, fromJson, toJson, fromMap, toMap, props (Equatable). These are technically functions but rarely the source of code-health concerns; on by default so the table surfaces functions you can actually act on.">
+        <input type="checkbox" id="hideBoilerplate" checked />
+        <span>Hide boilerplate methods</span>
+      </label>
+      <label class="field" title="${escapeHtml(l10n('codeHealth.toolbar.filterTitle'))}">
+        <span class="glyph">🔎</span>
+        <label class="sr-only" for="pvSearch">${escapeHtml(l10n('codeHealth.toolbar.filterLabel'))}</label>
+        <input id="pvSearch" type="search" placeholder="${escapeHtml(l10n('codeHealth.toolbar.filterPlaceholder'))}" autocomplete="off" />
+      </label>
+    </div>
   </div>
 </section>`;
 }
 
 /**
- * Sortable, sticky-header functions table — bound to the FULL function list
- * (previously sliced to 200, which broke filters and KPI clicks because they
- * only saw the prefix). Sort indicators show ONLY on the active column and in
- * the actual direction (the previous design painted an up-arrow on every
- * header forever, which read as decoration, not state). The grade column was
- * dropped: it duplicated the score axis. The score itself is a colored pill
- * (red→amber→green by value) so the value AND the bucketing are in one cell.
+ * Sortable, sticky-header functions table — bound to the FULL function list.
+ *
+ * Rendering strategy: rows are embedded as JSON in a `<script type="application/
+ * json">` data block, NOT as server-side `<tr>` elements. The previous design
+ * emitted 18,000+ `<tr>`s into the DOM up front, which locked the browser for
+ * seconds on every render and made sort clicks unresponsive (re-appending 18k
+ * DOM rows triggers 18k layouts). The inline script parses the data once and
+ * renders a 500-row window into the empty tbody; sort/filter operate on the
+ * data array (fast); a "Show next 500" button reveals more on demand. Selection
+ * checkboxes feed the toolbar's *Copy selected* action.
+ *
+ * Sort indicators show ONLY on the active column and in the actual direction
+ * (the previous all-up-arrow-forever design read as decoration, not state).
+ * The grade column was dropped (it duplicated the score axis); the score is a
+ * colored pill (red→amber→green) carrying both value and bucketing in one
+ * cell. A `title` on the score header explains the composite formula since the
+ * column header alone gave no clue what the number means.
  */
-function buildTable(rows: readonly ProjectVibrancyFunctionRow[]): string {
-  const tbodyRows = rows.map((row) => buildTableRow(row)).join('');
+function buildTable(
+  rows: readonly ProjectVibrancyFunctionRow[],
+  nonce: string,
+): string {
   const total = rows.length;
+  const scoreTitle =
+    'Composite health score, 0–100, lower = worse. Formula: ' +
+    '40% test coverage + 25% how often the function is referenced + ' +
+    '15% how recently its file changed + 15% cyclomatic complexity + ' +
+    '5% documentation. Click to sort.';
+  // Strip down to only the fields the row renderer reads — keeps the embedded
+  // JSON small (3,600 functions × extra fields adds up fast).
+  const rowData = rows.map((r) => ({
+    file: r.file,
+    name: r.name,
+    lineStart: r.lineStart,
+    lineEnd: r.lineEnd,
+    score: r.score,
+    usageCount: r.usageCount,
+    coveragePercent: r.coveragePercent,
+    complexity: r.complexity,
+    flags: r.flags,
+    lastChangedEpochSec: r.lastChangedEpochSec ?? 0,
+  }));
   return `<section class="section" aria-label="${escapeHtml(l10n('codeHealth.table.ariaLabel'))}">
-  <h2>${escapeHtml(l10n('codeHealth.table.heading'))} <span class="count" id="pvShownCount">showing ${total.toLocaleString('en-US')} of ${total.toLocaleString('en-US')}</span></h2>
-  <div class="dash-table-wrap">
+  <h2>${escapeHtml(l10n('codeHealth.table.heading'))} <span class="count" id="pvShownCount">showing 0 of ${total.toLocaleString('en-US')}</span></h2>
+  <div class="dash-table-wrap" id="pvTableWrap">
     <table class="dash-table code-health" id="pvTable">
       <thead>
         <tr>
-          <th class="sortable col-score" data-sort="score" aria-sort="ascending">${escapeHtml(l10n('codeHealth.table.colScore'))}<span class="arrow"></span></th>
+          <th class="col-select" title="Select rows to bulk-copy with the toolbar button. The header checkbox toggles all currently-visible rows."><input type="checkbox" id="pvSelectAll" aria-label="Select all visible rows" /></th>
+          <th class="sortable col-score" data-sort="score" aria-sort="ascending" title="${escapeHtml(scoreTitle)}">${escapeHtml(l10n('codeHealth.table.colScore'))}<span class="arrow"></span></th>
           <th class="sortable col-name"  data-sort="name"  aria-sort="none">${escapeHtml(l10n('codeHealth.table.colFunction'))}<span class="arrow"></span></th>
           <th class="sortable col-file"  data-sort="file"  aria-sort="none">${escapeHtml(l10n('codeHealth.table.colFile'))}<span class="arrow"></span></th>
           <th class="sortable col-line"  data-sort="line"  aria-sort="none">${escapeHtml(l10n('codeHealth.table.colLine'))}<span class="arrow"></span></th>
-          <th class="sortable col-usage" data-sort="usage" aria-sort="none">${escapeHtml(l10n('codeHealth.table.colUsage'))}<span class="arrow"></span></th>
-          <th class="sortable col-coverage" data-sort="coverage" aria-sort="none">${escapeHtml(l10n('codeHealth.table.colCoverage'))}<span class="arrow"></span></th>
-          <th class="sortable col-complexity" data-sort="complexity" aria-sort="none">${escapeHtml(l10n('codeHealth.table.colComplexity'))}<span class="arrow"></span></th>
-          <th class="sortable col-changed" data-sort="changed" aria-sort="none" title="Last commit that touched this file">Changed<span class="arrow"></span></th>
+          <th class="sortable col-usage" data-sort="usage" aria-sort="none" title="How many times this function name is referenced across all scanned files (lib + test).">${escapeHtml(l10n('codeHealth.table.colUsage'))}<span class="arrow"></span></th>
+          <th class="sortable col-coverage" data-sort="coverage" aria-sort="none" title="Line coverage % from LCOV, when available.">${escapeHtml(l10n('codeHealth.table.colCoverage'))}<span class="arrow"></span></th>
+          <th class="sortable col-complexity" data-sort="complexity" aria-sort="none" title="Cyclomatic complexity — branches + loops + boolean operators inside the function body.">${escapeHtml(l10n('codeHealth.table.colComplexity'))}<span class="arrow"></span></th>
+          <th class="sortable col-changed" data-sort="changed" aria-sort="none" title="How long ago the last commit touched this file (ISO timestamp in each cell's tooltip).">Changed<span class="arrow"></span></th>
           <th class="col-flags">${escapeHtml(l10n('codeHealth.table.colFlags'))}</th>
         </tr>
       </thead>
-      <tbody id="pvBody">${tbodyRows}</tbody>
+      <tbody id="pvBody"></tbody>
     </table>
-    <!-- §8.16 — empty-state banner shown by the script when text-filter or
-         flag-filter narrows the visible row count to zero. Carries a tier-1
-         *Reset filters* button so the user is not stranded looking at an
-         empty table with no cue for the next action. -->
     <div id="pvEmpty" class="empty-cta" role="status" hidden>
       <p class="empty-msg">${escapeHtml(l10n('codeHealth.table.noMatch'))}</p>
       <button type="button" class="btn tier-1" id="pvResetFilters"
         title="${escapeHtml(l10n('codeHealth.table.resetFiltersTitle'))}">${escapeHtml(l10n('codeHealth.table.resetFilters'))}</button>
     </div>
+    <div id="pvLoadMore" class="load-more" hidden>
+      <button type="button" class="btn" id="pvLoadMoreBtn">Show next 500</button>
+    </div>
   </div>
-  <p class="hint">${escapeHtml(l10n('codeHealth.table.hint'))}</p>
+  <p class="hint">Use the search field, the KPI tiles, or the column headers to triage. Select rows with the checkboxes and click <strong>Copy selected</strong> to bulk-copy them as <code>file:line  name  (score, flags)</code> lines.</p>
+  <script id="pvRowData" type="application/json" nonce="${nonce}">${jsonForScriptBlock(rowData)}</script>
 </section>`;
-}
-
-function buildTableRow(row: ProjectVibrancyFunctionRow): string {
-  const flags = row.flags
-    .map((f) => `<span class="flag-pill ${escapeHtml(f)}">${escapeHtml(f.replace(/_/g, ' '))}</span>`)
-    .join(' ');
-  const flagsAttr = row.flags.join(' ');
-  // Search haystack — name + path + flags. The name comes first so a substring
-  // typed into the filter prefers function-name matches over file-path matches.
-  const search = `${row.name} ${row.file} ${row.flags.join(' ')}`.toLowerCase();
-  const scoreInt = Math.round(row.score);
-  const scoreColor = hslForScore(scoreInt);
-  // Operator overrides come from the analyzer by their symbol (`==`, `<`, `[]`).
-  // Bare in a "worst functions" list they read as nonsense; prefix `operator `
-  // so the row is identifiable. (Class context would be ideal but isn't in the
-  // CLI payload today — follow-up.)
-  const displayName = /^[A-Za-z_$]/.test(row.name) ? row.name : `operator ${row.name}`;
-  const dir = lastSlashDir(row.file);
-  const base = lastSlashBase(row.file);
-  const changed = row.lastChangedEpochSec;
-  const changedText = changed ? formatRelativeAge(changed) : '—';
-  const changedSort = changed ?? 0;
-  return `<tr data-score="${row.score}" data-name="${escapeHtml(row.name)}"
-    data-file="${escapeHtml(row.file)}" data-line="${row.lineStart}" data-line-end="${row.lineEnd}"
-    data-usage="${row.usageCount}" data-coverage="${row.coveragePercent}" data-complexity="${row.complexity}"
-    data-changed="${changedSort}" data-flags="${escapeHtml(flagsAttr)}" data-search="${escapeHtml(search)}">
-    <td class="col-score"><span class="score-pill" style="background:${scoreColor};color:#000;" title="Score ${scoreInt}/100">${scoreInt}</span></td>
-    <td class="col-name"><span class="fn-link" data-file="${escapeHtml(row.file)}" data-line="${row.lineStart}" title="Open at line ${row.lineStart}">${escapeHtml(displayName)}</span></td>
-    <td class="col-file"><span class="file-link" data-file="${escapeHtml(row.file)}" data-line="${row.lineStart}" title="${escapeHtml(row.file)}"><span class="path-dir">${escapeHtml(dir)}</span><span class="path-base">${escapeHtml(base)}</span></span></td>
-    <td class="col-line">${row.lineStart}-${row.lineEnd}</td>
-    <td class="col-usage">${row.usageCount.toLocaleString('en-US')}</td>
-    <td class="col-coverage">${Math.round(row.coveragePercent)}%</td>
-    <td class="col-complexity">${row.complexity}</td>
-    <td class="col-changed" title="${changed ? new Date(changed * 1000).toISOString() : 'No git history available'}">${escapeHtml(changedText)}</td>
-    <td class="col-flags"><span class="flag-pills">${flags}</span></td>
-  </tr>`;
-}
-
-/** Trailing directory portion (including final slash), '' if none. */
-function lastSlashDir(filePath: string): string {
-  const i = filePath.lastIndexOf('/');
-  return i < 0 ? '' : filePath.slice(0, i + 1);
-}
-
-/** Basename, or the whole path if no slash. */
-function lastSlashBase(filePath: string): string {
-  const i = filePath.lastIndexOf('/');
-  return i < 0 ? filePath : filePath.slice(i + 1);
-}
-
-/**
- * Compact relative age for the Changed column: "3d", "5w", "2mo", "1y". Per-row
- * so it has to be terse — the column is narrow, and ISO timestamps are in the
- * cell `title` for anyone wanting precision.
- */
-function formatRelativeAge(epochSec: number): string {
-  const sec = Math.max(0, Math.floor(Date.now() / 1000 - epochSec));
-  if (sec < 60) return 'now';
-  if (sec < 3600) return `${Math.floor(sec / 60)}m`;
-  if (sec < 86400) return `${Math.floor(sec / 3600)}h`;
-  const days = Math.floor(sec / 86400);
-  if (days < 14) return `${days}d`;
-  if (days < 60) return `${Math.floor(days / 7)}w`;
-  if (days < 365) return `${Math.floor(days / 30)}mo`;
-  return `${Math.floor(days / 365)}y`;
 }
 
 /** Client-script strings resolved at host HTML build time. */
@@ -685,15 +682,194 @@ function buildClientScript(): string {
   return `
 (function() {
   var CH = ${JSON.stringify(CH)};
-  const vscode = acquireVsCodeApi();
-  const state = { search: '', flag: null, sortKey: 'score', sortAsc: true };
+  var vscode = acquireVsCodeApi();
 
+  // Row data is parsed once from the JSON script block. The previous design
+  // server-rendered 18,000+ <tr> elements into the DOM up front and locked the
+  // browser; this approach holds rows in memory, renders a 500-row window,
+  // and runs filter/sort on the array (cheap) before re-rendering.
+  var dataEl = document.getElementById('pvRowData');
+  var allRows = [];
+  try { allRows = JSON.parse(dataEl ? dataEl.textContent : '[]'); }
+  catch (e) { allRows = []; }
+
+  var RENDER_CHUNK = 500;
+  var state = {
+    search: '', flag: null,
+    sortKey: 'score', sortAsc: true,
+    hideBoilerplate: true,
+    visibleCount: RENDER_CHUNK
+  };
+  var filtered = [];
+  // Selection survives filter/sort changes — keyed by file:line:name.
+  var selected = Object.create(null);
+  var selectedCount = 0;
+
+  // Names that dominate a "worst functions" list because they are tiny,
+  // uncovered, and rarely called — but where touching them rarely improves
+  // anything. Hidden by default; toggle uncheck to see them.
+  var BOILERPLATE_NAMES = {
+    'hashCode': 1, 'toString': 1, 'noSuchMethod': 1,
+    'copyWith': 1, 'props': 1,
+    'fromJson': 1, 'toJson': 1, 'fromMap': 1, 'toMap': 1
+  };
+  function isBoilerplate(name) {
+    if (!name) return false;
+    if (BOILERPLATE_NAMES[name]) return true;
+    if (!/^[A-Za-z_$]/.test(name)) return true; // operator overrides
+    return false;
+  }
+  function displayName(name) {
+    if (!name) return '';
+    return /^[A-Za-z_$]/.test(name) ? name : 'operator ' + name;
+  }
+  function rowKey(r) { return r.file + ':' + r.lineStart + ':' + r.name; }
+
+  function hslForScore(s) {
+    var c = Math.max(0, Math.min(100, s));
+    return 'hsl(' + Math.round((c / 100) * 130) + ', 70%, 50%)';
+  }
+  function fmtAge(epochSec) {
+    if (!epochSec) return '—';
+    var sec = Math.max(0, Math.floor(Date.now() / 1000 - epochSec));
+    if (sec < 60) return 'now';
+    if (sec < 3600) return Math.floor(sec / 60) + 'm';
+    if (sec < 86400) return Math.floor(sec / 3600) + 'h';
+    var days = Math.floor(sec / 86400);
+    if (days < 14) return days + 'd';
+    if (days < 60) return Math.floor(days / 7) + 'w';
+    if (days < 365) return Math.floor(days / 30) + 'mo';
+    return Math.floor(days / 365) + 'y';
+  }
+  function esc(s) {
+    return String(s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function compileFiltered() {
+    var q = state.search;
+    var flag = state.flag;
+    var hideBp = state.hideBoilerplate;
+    filtered = allRows.filter(function(r) {
+      if (hideBp && isBoilerplate(r.name)) return false;
+      if (flag && r.flags.indexOf(flag) === -1) return false;
+      if (q) {
+        var hay = (r.name + ' ' + r.file + ' ' + r.flags.join(' ')).toLowerCase();
+        if (hay.indexOf(q) === -1) return false;
+      }
+      return true;
+    });
+    sortFiltered();
+  }
+  function sortVal(r, key) {
+    switch (key) {
+      case 'score': return r.score;
+      case 'name': return (r.name || '').toLowerCase();
+      case 'file': return (r.file || '').toLowerCase();
+      case 'line': return r.lineStart;
+      case 'usage': return r.usageCount;
+      case 'coverage': return r.coveragePercent;
+      case 'complexity': return r.complexity;
+      case 'changed': return r.lastChangedEpochSec || 0;
+      default: return 0;
+    }
+  }
+  function sortFiltered() {
+    var key = state.sortKey, asc = state.sortAsc;
+    filtered.sort(function(a, b) {
+      var av = sortVal(a, key), bv = sortVal(b, key);
+      var c = (typeof av === 'number' && typeof bv === 'number')
+        ? av - bv
+        : String(av).localeCompare(String(bv));
+      return asc ? c : -c;
+    });
+  }
+
+  function rowHtml(r) {
+    var key = rowKey(r);
+    var checked = selected[key] ? ' checked' : '';
+    var scoreInt = Math.round(r.score);
+    var color = hslForScore(scoreInt);
+    var name = displayName(r.name);
+    var cut = r.file.lastIndexOf('/');
+    var dir = cut >= 0 ? r.file.slice(0, cut + 1) : '';
+    var base = cut >= 0 ? r.file.slice(cut + 1) : r.file;
+    var changedTxt = fmtAge(r.lastChangedEpochSec);
+    var changedIso = r.lastChangedEpochSec
+      ? new Date(r.lastChangedEpochSec * 1000).toISOString()
+      : 'No git history available';
+    var flagPills = r.flags.map(function(f) {
+      return '<span class="flag-pill ' + esc(f) + '">' + esc(f.replace(/_/g, ' ')) + '</span>';
+    }).join(' ');
+    return '<tr data-key="' + esc(key) + '">' +
+      '<td class="col-select"><input type="checkbox" class="row-check"' + checked + ' aria-label="Select row" /></td>' +
+      '<td class="col-score"><span class="score-pill" style="background:' + color + ';color:#000;" title="Score ' + scoreInt + '/100">' + scoreInt + '</span></td>' +
+      '<td class="col-name"><span class="fn-link" data-file="' + esc(r.file) + '" data-line="' + r.lineStart + '" title="Open at line ' + r.lineStart + '">' + esc(name) + '</span></td>' +
+      '<td class="col-file"><span class="file-link" data-file="' + esc(r.file) + '" data-line="' + r.lineStart + '" title="' + esc(r.file) + '"><span class="path-dir">' + esc(dir) + '</span><span class="path-base">' + esc(base) + '</span></span></td>' +
+      '<td class="col-line">' + r.lineStart + '-' + r.lineEnd + '</td>' +
+      '<td class="col-usage">' + r.usageCount.toLocaleString('en-US') + '</td>' +
+      '<td class="col-coverage">' + Math.round(r.coveragePercent) + '%</td>' +
+      '<td class="col-complexity">' + r.complexity + '</td>' +
+      '<td class="col-changed" title="' + esc(changedIso) + '">' + esc(changedTxt) + '</td>' +
+      '<td class="col-flags"><span class="flag-pills">' + flagPills + '</span></td>' +
+      '</tr>';
+  }
+
+  function render() {
+    var tbody = document.getElementById('pvBody');
+    if (!tbody) return;
+    var slice = filtered.slice(0, state.visibleCount);
+    // innerHTML is the fast path for a wholesale rebuild — appendChild'ing
+    // hundreds of <tr>s individually triggers a layout per insert.
+    tbody.innerHTML = slice.map(rowHtml).join('');
+    var countEl = document.getElementById('pvShownCount');
+    if (countEl) {
+      var totalStr = allRows.length.toLocaleString('en-US');
+      var shownStr = slice.length.toLocaleString('en-US');
+      var filtStr = filtered.length.toLocaleString('en-US');
+      countEl.textContent = (filtered.length === allRows.length)
+        ? 'showing ' + shownStr + ' of ' + totalStr
+        : 'showing ' + shownStr + ' of ' + filtStr + ' (filtered from ' + totalStr + ')';
+    }
+    var loadMore = document.getElementById('pvLoadMore');
+    if (loadMore) {
+      loadMore.hidden = slice.length >= filtered.length;
+      var btn = document.getElementById('pvLoadMoreBtn');
+      if (btn) {
+        var remaining = filtered.length - slice.length;
+        var next = Math.min(RENDER_CHUNK, remaining);
+        btn.textContent = 'Show next ' + next.toLocaleString('en-US') +
+          ' (' + remaining.toLocaleString('en-US') + ' more)';
+      }
+    }
+    var emptyEl = document.getElementById('pvEmpty');
+    if (emptyEl) emptyEl.hidden = !(filtered.length === 0 && allRows.length > 0);
+    updateSortArrows();
+    updateSelectAllCheckbox();
+  }
+  function updateSortArrows() {
+    var ths = document.querySelectorAll('th.sortable[data-sort]');
+    for (var i = 0; i < ths.length; i++) {
+      var th = ths[i];
+      var col = th.getAttribute('data-sort');
+      th.setAttribute('aria-sort',
+        col === state.sortKey ? (state.sortAsc ? 'ascending' : 'descending') : 'none');
+    }
+  }
+  function applyAll() {
+    compileFiltered();
+    state.visibleCount = RENDER_CHUNK;
+    render();
+    renderStrip();
+    announce(filtered.length + ' of ' + allRows.length + ' rows match');
+  }
+
+  // --- Toolbar wiring ----------------------------------------------------
   function postCmd(type) { vscode.postMessage({ type: type }); }
   document.getElementById('rescan').addEventListener('click', function() { postCmd('rescan'); });
   document.getElementById('copyJson').addEventListener('click', function() { postCmd('copyJson'); });
   document.getElementById('openPvSettings').addEventListener('click', function() { postCmd('openProjectVibrancySettings'); });
-  // Report-file action row (present only when a JSON file was written). Clicking
-  // the path itself also copies, since the path looks clickable.
   function wireReportBtn(id, type) {
     var el = document.getElementById(id);
     if (el) el.addEventListener('click', function() { postCmd(type); });
@@ -708,146 +884,117 @@ function buildClientScript(): string {
       if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); postCmd('copyReportPath'); }
     });
   }
-  // The gate-failure banner now exposes its own tier-1 *Open Code Health
-  // settings* button (§8.16). Wire any [data-cmd] button on the page so
-  // future banner / empty-state CTAs reuse the same dispatch path.
   document.querySelectorAll('[data-cmd]').forEach(function(b) {
     b.addEventListener('click', function() { postCmd(b.getAttribute('data-cmd')); });
   });
 
-  const tbody = document.getElementById('pvBody');
-  const searchEl = document.getElementById('pvSearch');
-  const stripEl = document.getElementById('filter-strip');
-  const emptyEl = document.getElementById('pvEmpty');
-  const resetEmptyBtn = document.getElementById('pvResetFilters');
-  if (resetEmptyBtn) resetEmptyBtn.addEventListener('click', resetFilters);
-
+  var searchEl = document.getElementById('pvSearch');
   searchEl.addEventListener('input', function() {
     state.search = (searchEl.value || '').trim().toLowerCase();
-    applyFilters();
+    applyAll();
   });
-
+  var hideBpEl = document.getElementById('hideBoilerplate');
+  if (hideBpEl) {
+    hideBpEl.addEventListener('change', function() {
+      state.hideBoilerplate = hideBpEl.checked;
+      applyAll();
+    });
+  }
   document.querySelectorAll('.kpi-card.interactive[data-flag-filter]').forEach(function(card) {
     card.addEventListener('click', function() {
       if (card.disabled) return;
-      const key = card.getAttribute('data-flag-filter');
-      const wasActive = card.classList.contains('active');
+      var key = card.getAttribute('data-flag-filter');
+      var wasActive = card.classList.contains('active');
       document.querySelectorAll('.kpi-card.active').forEach(function(c) { c.classList.remove('active'); });
       state.flag = wasActive ? null : key;
       if (state.flag) card.classList.add('active');
-      applyFilters();
+      applyAll();
     });
   });
-
-  function applyFilters() {
-    let visible = 0;
-    let total = 0;
-    Array.from(tbody.querySelectorAll('tr')).forEach(function(tr) {
-      total++;
-      const hay = (tr.dataset.search || '').toLowerCase();
-      const flagsArr = (tr.dataset.flags || '').split(/\\s+/);
-      let show = true;
-      if (state.search && hay.indexOf(state.search) === -1) show = false;
-      if (state.flag && flagsArr.indexOf(state.flag) === -1) show = false;
-      tr.style.display = show ? '' : 'none';
-      if (show) visible++;
-    });
-    if (emptyEl) emptyEl.hidden = !(visible === 0 && tbody.children.length > 0);
-    var countEl = document.getElementById('pvShownCount');
-    if (countEl) {
-      countEl.textContent = 'showing ' + visible.toLocaleString('en-US') +
-        ' of ' + total.toLocaleString('en-US');
-    }
-    renderStrip();
-    announce(visible + ' of ' + total + ' rows visible');
-  }
-
-  // §15.3 — polite live-region announcer.
-  function announce(message) {
-    var el = document.getElementById('announcer');
-    if (!el) { return; }
-    el.textContent = '';
-    setTimeout(function() { el.textContent = message; }, 50);
-  }
-
-  function renderStrip() {
-    const chips = [];
-    if (state.search) chips.push({ key: 'search', label: 'search: "' + escapeHtml(state.search) + '"' });
-    if (state.flag) chips.push({ key: 'flag', label: 'flag: ' + state.flag.replace(/_/g, ' ') });
-    if (chips.length === 0) {
-      stripEl.hidden = true; stripEl.innerHTML = ''; return;
-    }
-    stripEl.hidden = false;
-    const html = ['<span class="lbl">' + CH.activeFiltersLabel + '</span>'];
-    chips.forEach(function(chip) {
-      html.push('<span class="chip">' + chip.label +
-        '<button type="button" class="x" data-chip="' + chip.key + '" aria-label="Remove ' + chip.key + '">×</button></span>');
-    });
-    html.push('<button type="button" class="clear-all" id="clear-all-filters">' + CH.clearAll + '</button>');
-    stripEl.innerHTML = html.join('');
-    stripEl.querySelectorAll('.chip .x').forEach(function(btn) {
-      btn.addEventListener('click', function() { removeChip(btn.getAttribute('data-chip')); });
-    });
-    document.getElementById('clear-all-filters').addEventListener('click', resetFilters);
-  }
-
-  function removeChip(key) {
-    if (key === 'search') { state.search = ''; searchEl.value = ''; }
-    else if (key === 'flag') {
-      state.flag = null;
-      document.querySelectorAll('.kpi-card.active').forEach(function(c) { c.classList.remove('active'); });
-    }
-    applyFilters();
-  }
-  function resetFilters() {
-    state.search = ''; state.flag = null;
-    searchEl.value = '';
-    document.querySelectorAll('.kpi-card.active').forEach(function(c) { c.classList.remove('active'); });
-    applyFilters();
-  }
-
-  function val(tr, key) {
-    if (key === 'score' || key === 'coverage') return parseFloat(tr.dataset[key] || '0');
-    if (key === 'usage' || key === 'complexity' || key === 'line' || key === 'changed') {
-      return parseInt(tr.dataset[key] || '0', 10);
-    }
-    if (key === 'name') return (tr.dataset.name || '').toLowerCase();
-    if (key === 'file') return (tr.dataset.file || '').toLowerCase();
-    return '';
-  }
-  function resort() {
-    const rows = Array.from(tbody.querySelectorAll('tr'));
-    rows.sort(function(a, b) {
-      const av = val(a, state.sortKey);
-      const bv = val(b, state.sortKey);
-      let c = 0;
-      if (typeof av === 'number' && typeof bv === 'number') c = av - bv;
-      else c = String(av).localeCompare(String(bv));
-      return state.sortAsc ? c : -c;
-    });
-    rows.forEach(function(r) { tbody.appendChild(r); });
-    document.querySelectorAll('th.sortable').forEach(function(th) {
-      th.setAttribute('aria-sort',
-        th.getAttribute('data-sort') === state.sortKey
-          ? (state.sortAsc ? 'ascending' : 'descending')
-          : 'none');
-    });
-  }
+  // Column sort: click flips direction on the active column, otherwise sorts
+  // the new column ascending (smallest/worst first).
   document.querySelectorAll('th.sortable[data-sort]').forEach(function(th) {
     th.addEventListener('click', function() {
-      const col = th.getAttribute('data-sort');
+      var col = th.getAttribute('data-sort');
       if (state.sortKey === col) state.sortAsc = !state.sortAsc;
       else { state.sortKey = col; state.sortAsc = true; }
-      resort();
+      sortFiltered();
+      state.visibleCount = RENDER_CHUNK;
+      render();
     });
   });
+  var loadMoreBtn = document.getElementById('pvLoadMoreBtn');
+  if (loadMoreBtn) {
+    loadMoreBtn.addEventListener('click', function() {
+      state.visibleCount = Math.min(state.visibleCount + RENDER_CHUNK, filtered.length);
+      render();
+    });
+  }
+  var resetEmptyBtn = document.getElementById('pvResetFilters');
+  if (resetEmptyBtn) resetEmptyBtn.addEventListener('click', resetFilters);
+  function resetFilters() {
+    state.search = '';
+    state.flag = null;
+    searchEl.value = '';
+    document.querySelectorAll('.kpi-card.active').forEach(function(c) { c.classList.remove('active'); });
+    applyAll();
+  }
 
-  // Open-at-line for both the function-name and the file cells. One delegated
-  // listener on the tbody so we don't attach thousands of per-row handlers
-  // (with 18k+ rows that mattered: per-row listeners noticeably slowed render).
+  // --- Selection + bulk copy --------------------------------------------
+  function updateCopyButton() {
+    var btn = document.getElementById('copySelected');
+    if (!btn) return;
+    if (selectedCount === 0) {
+      btn.textContent = 'Copy selected';
+      btn.setAttribute('disabled', '');
+    } else {
+      btn.textContent = 'Copy selected (' + selectedCount + ')';
+      btn.removeAttribute('disabled');
+    }
+  }
+  function updateSelectAllCheckbox() {
+    var master = document.getElementById('pvSelectAll');
+    if (!master) return;
+    var visible = filtered.slice(0, state.visibleCount);
+    var hit = 0;
+    for (var i = 0; i < visible.length; i++) if (selected[rowKey(visible[i])]) hit++;
+    if (hit === 0) { master.checked = false; master.indeterminate = false; }
+    else if (hit === visible.length && visible.length > 0) { master.checked = true; master.indeterminate = false; }
+    else { master.checked = false; master.indeterminate = true; }
+  }
+  var masterCheck = document.getElementById('pvSelectAll');
+  if (masterCheck) {
+    masterCheck.addEventListener('change', function() {
+      var want = masterCheck.checked;
+      var visible = filtered.slice(0, state.visibleCount);
+      for (var i = 0; i < visible.length; i++) {
+        var k = rowKey(visible[i]);
+        if (want && !selected[k]) { selected[k] = true; selectedCount++; }
+        else if (!want && selected[k]) { delete selected[k]; selectedCount--; }
+      }
+      render();
+      updateCopyButton();
+    });
+  }
+
+  var tbody = document.getElementById('pvBody');
   if (tbody) {
+    // Delegated click handler: row-check toggles selection; fn-link / file-link
+    // open the file at the line. One listener handles the whole table.
     tbody.addEventListener('click', function(e) {
-      var t = e.target;
+      var tgt = e.target;
+      if (tgt && tgt.classList && tgt.classList.contains('row-check')) {
+        var tr = tgt.closest ? tgt.closest('tr') : null;
+        if (!tr) return;
+        var k = tr.getAttribute('data-key');
+        if (!k) return;
+        if (tgt.checked && !selected[k]) { selected[k] = true; selectedCount++; }
+        else if (!tgt.checked && selected[k]) { delete selected[k]; selectedCount--; }
+        updateCopyButton();
+        updateSelectAllCheckbox();
+        return;
+      }
+      var t = tgt;
       while (t && t !== tbody && !(t.classList && (t.classList.contains('fn-link') || t.classList.contains('file-link')))) {
         t = t.parentNode;
       }
@@ -859,12 +1006,62 @@ function buildClientScript(): string {
     });
   }
 
-  function escapeHtml(s) {
-    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  // Bulk-copy format chosen for an LLM/chat paste: one line per row, leads
+  // with file:line (clickable in many tools), then function name, then score
+  // and flags in parentheses for context.
+  document.getElementById('copySelected').addEventListener('click', function() {
+    if (selectedCount === 0) return;
+    var lines = [];
+    for (var i = 0; i < allRows.length; i++) {
+      var r = allRows[i];
+      var k = rowKey(r);
+      if (!selected[k]) continue;
+      var meta = ['score ' + Math.round(r.score)];
+      if (r.flags && r.flags.length) meta.push(r.flags.join(', '));
+      lines.push(r.file + ':' + r.lineStart + '  ' + displayName(r.name) +
+        '  (' + meta.join(', ') + ')');
+    }
+    vscode.postMessage({ type: 'copyText', text: lines.join('\\n') });
+  });
+
+  // --- Active-filter strip ---------------------------------------------
+  var stripEl = document.getElementById('filter-strip');
+  function renderStrip() {
+    if (!stripEl) return;
+    var chips = [];
+    if (state.search) chips.push({ key: 'search', label: 'search: "' + esc(state.search) + '"' });
+    if (state.flag) chips.push({ key: 'flag', label: 'flag: ' + state.flag.replace(/_/g, ' ') });
+    if (chips.length === 0) { stripEl.hidden = true; stripEl.innerHTML = ''; return; }
+    stripEl.hidden = false;
+    var parts = ['<span class="lbl">' + esc(CH.activeFiltersLabel) + '</span>'];
+    chips.forEach(function(chip) {
+      parts.push('<span class="chip">' + chip.label +
+        '<button type="button" class="x" data-chip="' + chip.key +
+        '" aria-label="Remove ' + chip.key + '">×</button></span>');
+    });
+    parts.push('<button type="button" class="clear-all" id="clear-all-filters">' + esc(CH.clearAll) + '</button>');
+    stripEl.innerHTML = parts.join('');
+    stripEl.querySelectorAll('.chip .x').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var k = btn.getAttribute('data-chip');
+        if (k === 'search') { state.search = ''; searchEl.value = ''; }
+        else if (k === 'flag') {
+          state.flag = null;
+          document.querySelectorAll('.kpi-card.active').forEach(function(c) { c.classList.remove('active'); });
+        }
+        applyAll();
+      });
+    });
+    document.getElementById('clear-all-filters').addEventListener('click', resetFilters);
   }
 
-  // §15.2 — page-level keyboard shortcuts advertised in the overlay.
-  // '/' focuses the row filter; 'Esc' on a focused, non-empty filter clears it.
+  function announce(message) {
+    var el = document.getElementById('announcer');
+    if (!el) return;
+    el.textContent = '';
+    setTimeout(function() { el.textContent = message; }, 50);
+  }
+
   document.addEventListener('keydown', function(e) {
     var tag = e.target && e.target.tagName ? e.target.tagName.toLowerCase() : '';
     var isEditable = tag === 'input' || tag === 'textarea' || tag === 'select';
@@ -875,9 +1072,13 @@ function buildClientScript(): string {
       e.preventDefault();
       searchEl.value = '';
       state.search = '';
-      applyFilters();
+      applyAll();
     }
   });
+
+  compileFiltered();
+  render();
+  updateCopyButton();
   ${getKeyboardShortcutsScript()}
 })();
 `;

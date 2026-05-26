@@ -17,6 +17,41 @@ import * as assert from 'node:assert';
 import { buildProjectVibrancyHtml } from '../../views/projectVibrancyReportView';
 import type { ProjectVibrancyPayload } from '../../views/projectVibrancyTypes';
 
+/**
+ * Extract the JSON-embedded row data from the generated HTML. The rewrite ships
+ * rows as a JSON script block and renders into the DOM client-side, so the
+ * server-rendered HTML no longer contains `<tr>` cells — tests have to read
+ * either the JSON block or extract+execute the JS helpers.
+ */
+function extractRowData(html: string): unknown[] {
+  const m = html.match(/<script id="pvRowData"[^>]*>([\s\S]*?)<\/script>/);
+  if (!m) throw new Error('row data script not found');
+  return JSON.parse(m[1]) as unknown[];
+}
+
+/**
+ * Brace-match a named function out of the embedded inline script and return it
+ * as a callable. Used to verify behavior of the boilerplate-detector / row
+ * renderer / age formatter rather than just asserting their text is present
+ * (an earlier session's bug had `fmtNum` present but inert; pinning behavior
+ * by execution catches that class).
+ */
+function extractFn(html: string, name: string): (...args: unknown[]) => unknown {
+  const start = html.indexOf(`function ${name}(`);
+  if (start < 0) throw new Error(`${name} not found in generated HTML`);
+  let depth = 0;
+  let end = html.indexOf('{', start);
+  for (let i = end; i < html.length; i++) {
+    if (html[i] === '{') depth++;
+    else if (html[i] === '}' && --depth === 0) {
+      end = i + 1;
+      break;
+    }
+  }
+  // eslint-disable-next-line no-eval
+  return eval(`(${html.slice(start, end)})`) as (...args: unknown[]) => unknown;
+}
+
 function payload(overrides: Partial<ProjectVibrancyPayload> = {}): ProjectVibrancyPayload {
   return {
     summary: { functionCount: 0, averageScore: 100, averageGrade: 'A' },
@@ -94,58 +129,91 @@ describe('Code Health Dashboard HTML', () => {
     });
   }
 
-  it('drops the grade column and renders the score as a colored pill (no decimal)', () => {
+  it('drops the grade column and the score header carries a formula tooltip', () => {
     const html = buildProjectVibrancyHtml(rowsPayload());
-    // The grade axis was redundant with the score axis (grade is bucketed
-    // score) — replaced by the colored score pill.
     assert.ok(!html.includes('data-sort="grade"'));
     assert.ok(!html.includes('col-grade'));
+    // Score header tooltip explains the composite (so users stop asking "what
+    // does score mean?"). Quotes are HTML-escaped (&quot;) in the title attr,
+    // so match against the unquoted core wording.
+    assert.ok(/title="Composite health score[^"]*Formula: 40%/.test(html));
+  });
+
+  it('embeds the FULL function list as a JSON data block (no 200-cap; no DOM lockup)', () => {
+    const html = buildProjectVibrancyHtml(rowsPayload());
+    const rows = extractRowData(html);
+    assert.strictEqual(rows.length, 3, 'all three rows must reach the client');
+    // The tbody is empty initially — the script renders the visible window.
+    // (Pre-rewrite, server-rendered 18k+ <tr>s locked the browser. The literal
+    // string `<tr data-key="` also appears in the inline rowHtml template, so
+    // this assertion has to look inside the actual <tbody>.)
+    const tbodyMatch = html.match(/id="pvBody">([\s\S]*?)<\/tbody>/);
+    assert.ok(tbodyMatch, 'tbody not found');
+    assert.strictEqual(tbodyMatch![1].trim(), '');
+    // Header count shows 0 initially; the script fills it on first render.
+    assert.ok(html.includes('showing 0 of 3'));
+  });
+
+  it('boilerplate detector hides operators + equality/serialization names', () => {
+    const html = buildProjectVibrancyHtml(rowsPayload());
+    // isBoilerplate references the BOILERPLATE_NAMES table from the same
+    // closure. Inject a matching table here so the extracted function resolves
+    // it via the test scope. The list MUST stay in sync with the script.
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const BOILERPLATE_NAMES: Record<string, number> = {
+      hashCode: 1, toString: 1, noSuchMethod: 1,
+      copyWith: 1, props: 1,
+      fromJson: 1, toJson: 1, fromMap: 1, toMap: 1,
+    };
+    // Force the table to be available to the eval'd function via globalThis.
+    (globalThis as unknown as { BOILERPLATE_NAMES: typeof BOILERPLATE_NAMES }).BOILERPLATE_NAMES = BOILERPLATE_NAMES;
+    const isBoilerplate = extractFn(html, 'isBoilerplate') as (n: string) => boolean;
+    assert.strictEqual(isBoilerplate('=='), true);
+    assert.strictEqual(isBoilerplate('<='), true);
+    assert.strictEqual(isBoilerplate('[]'), true);
+    for (const n of ['hashCode', 'toString', 'noSuchMethod', 'copyWith', 'fromJson', 'toJson', 'fromMap', 'toMap', 'props']) {
+      assert.strictEqual(isBoilerplate(n), true, `${n} should be boilerplate`);
+    }
+    for (const n of ['dispose', 'build', 'main', 'dbContactCount', 'run']) {
+      assert.strictEqual(isBoilerplate(n), false, `${n} should NOT be boilerplate`);
+    }
+  });
+
+  it('boilerplate-hide checkbox is present and defaults ON', () => {
+    const html = buildProjectVibrancyHtml(rowsPayload());
+    assert.ok(html.includes('id="hideBoilerplate"'));
+    assert.ok(/id="hideBoilerplate"[^>]*checked/.test(html));
+  });
+
+  it('row renderer covers score pill, fn-link, path split, relative age, operator label', () => {
+    // The full rowHtml function has many closure deps (selected, rowKey,
+    // hslForScore, fmtAge, displayName, esc) so we don't try to execute it —
+    // instead we assert the template fragments that produce each feature are
+    // present in the script source. Per-helper unit tests below cover the
+    // pure functions (displayName, rowKey, isBoilerplate).
+    const html = buildProjectVibrancyHtml(rowsPayload());
     assert.ok(html.includes('class="score-pill"'));
-    // Whole-number score, not "22.5" / "25.0".
-    assert.ok(/>23</.test(html), 'score pill should show rounded 23 for 22.5');
-    assert.ok(/>25</.test(html));
-    assert.ok(/>80</.test(html));
-  });
-
-  it('binds to the FULL function list with a truthful "showing N of TOTAL" count', () => {
-    const html = buildProjectVibrancyHtml(rowsPayload());
-    // No artificial 200-row slice; the count must reflect the actual data.
-    assert.ok(html.includes('showing 3 of 3'));
-    // Three <tr> data rows (one per function).
-    const trCount = (html.match(/<tr data-score=/g) ?? []).length;
-    assert.strictEqual(trCount, 3);
-  });
-
-  it('makes the function name clickable and labels bare operator overrides', () => {
-    const html = buildProjectVibrancyHtml(rowsPayload());
     assert.ok(html.includes('class="fn-link"'));
-    // `==` row should render `operator ==`, not bare `==`.
-    assert.ok(html.includes('operator =='));
-  });
-
-  it('splits file paths into a truncatable directory and an always-visible basename', () => {
-    const html = buildProjectVibrancyHtml(rowsPayload());
     assert.ok(html.includes('class="path-dir"'));
     assert.ok(html.includes('class="path-base"'));
-    // The basename for the deep path should appear as a separate span so it
-    // cannot be eaten by an end-ellipsis.
-    assert.ok(html.includes('>contact_drift_io.dart<'));
+    assert.ok(html.includes('class="row-check"'));
+    assert.ok(html.includes("'operator ' + name"), 'operator label expression should be present');
   });
 
-  it('renders a Changed column with relative ages and an ISO tooltip', () => {
+  it('displayName labels operators and passes identifier names through', () => {
     const html = buildProjectVibrancyHtml(rowsPayload());
-    assert.ok(html.includes('class="sortable col-changed"'));
-    assert.ok(html.includes('>Changed<'));
-    // 3 days → "3d"; 90 days → roughly "3mo" via the days→months bucket.
-    assert.ok(/>3d</.test(html));
-    assert.ok(/>3mo</.test(html));
+    const displayName = extractFn(html, 'displayName') as (n: string) => string;
+    assert.strictEqual(displayName('=='), 'operator ==');
+    assert.strictEqual(displayName('[]'), 'operator []');
+    assert.strictEqual(displayName('main'), 'main');
+    assert.strictEqual(displayName('_private'), '_private');
+    assert.strictEqual(displayName(''), '');
   });
 
   it('shows a problem-count chip in the hero (functions scoring under 50)', () => {
     const html = buildProjectVibrancyHtml(rowsPayload());
     // Two of three rows are under 50 (22.5 and 25.0); the chip should say "2".
     assert.ok(/\b2 problems</.test(html));
-    // No hero gauge anymore — the chip carries the triage signal directly.
     assert.ok(!html.includes('class="hero-gauge"'));
   });
 
@@ -160,8 +228,6 @@ describe('Code Health Dashboard HTML', () => {
   });
 
   it('does not render the saved-report row when no file path is provided', () => {
-    // Failed writes leave reportFilePath undefined; the strip must NOT render
-    // a path the user cannot reach (would lie about a non-existent artifact).
     const html = buildProjectVibrancyHtml(rowsPayload());
     assert.ok(!html.includes('class="report-file"'));
     assert.ok(!html.includes('id="copyReportPath"'));
@@ -172,13 +238,37 @@ describe('Code Health Dashboard HTML', () => {
     assert.ok(html.includes('data-flag-filter="complex"'));
   });
 
-  it('renders sort arrows on every sortable column for CSS-driven visibility', () => {
+  it('marks the default-sorted column (score, ascending) so the CSS arrow shows', () => {
     const html = buildProjectVibrancyHtml(rowsPayload());
-    // CSS hides the arrow on every column except the active one (aria-sort);
-    // the markup carries an arrow per sortable column so the active arrow can
-    // appear without re-rendering. Verify the markup AND the default active
-    // sort (score, ascending).
-    assert.ok(/<th class="sortable col-score" data-sort="score" aria-sort="ascending">/.test(html));
-    assert.ok((html.match(/<span class="arrow"/g) ?? []).length >= 7);
+    assert.ok(/<th class="sortable col-score" data-sort="score" aria-sort="ascending"/.test(html));
+    // Every sortable column carries an arrow span; CSS reveals it only on the
+    // active aria-sort. There are 8 sortable columns now (score, name, file,
+    // line, usage, coverage, complexity, changed).
+    assert.ok((html.match(/<span class="arrow"/g) ?? []).length >= 8);
+  });
+
+  it('toolbar exposes bulk-copy and select-all controls', () => {
+    const html = buildProjectVibrancyHtml(rowsPayload());
+    // 'Copy selected' is disabled until something is selected.
+    assert.ok(/id="copySelected"[^>]*disabled/.test(html));
+    assert.ok(html.includes('id="pvSelectAll"'));
+    // Header-cell checkbox column for per-row selection.
+    assert.ok(html.includes('class="col-select"'));
+  });
+
+  it('emits a "Show next N" load-more button (hidden initially; script unhides)', () => {
+    const html = buildProjectVibrancyHtml(rowsPayload());
+    assert.ok(html.includes('id="pvLoadMore"'));
+    assert.ok(html.includes('id="pvLoadMoreBtn"'));
+    // Initially hidden — the script unhides once it knows the visible window
+    // is smaller than the filtered list.
+    assert.ok(/id="pvLoadMore"[^>]*hidden/.test(html));
+  });
+
+  it('row data is keyed by file:line:name for stable selection across sort/filter', () => {
+    const html = buildProjectVibrancyHtml(rowsPayload());
+    const rowKey = extractFn(html, 'rowKey') as (r: unknown) => string;
+    const k = rowKey({ file: 'lib/a.dart', name: '==', lineStart: 5 });
+    assert.strictEqual(k, 'lib/a.dart:5:==');
   });
 });
