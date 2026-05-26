@@ -1588,7 +1588,11 @@ class RequireCancelTokenRule extends SaropaLintRule {
     RegExp(r'\bCancelToken\b'),
     RegExp(r'\bcancelToken\b'),
     RegExp(r'\b_cancelled\b'),
-    RegExp(r'\bisCancelled\b'),
+    // British double-l spelling of the Dio/Java-style getter. We match
+    // both spellings so the rule fires regardless of the user's
+    // preference; the trailing cspell tag stops the US-spelling audit
+    // from flagging this intentional API-name regex.
+    RegExp(r'\bisCancelled\b'), // cspell:ignore isCancelled
     RegExp(r'\b_canceled\b'),
     RegExp(r'\bisCanceled\b'),
     RegExp(r'\.cancel\s*\(\s*\)'),

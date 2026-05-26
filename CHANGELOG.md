@@ -67,7 +67,6 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ### Fixed
 
-- **`require_https_only` no longer flags prose mentions of the `http://` scheme** — user-facing strings that name supported schemes (e.g. `'http:// or https:// URLs are supported.'`, the Korean equivalent `'http:// 또는 https:// URL만 지원됩니다.'` in a Flutter `app_localizations_*.dart` file, or a bare `'http://'` constant) are no longer reported as insecure URLs. A real URL has no whitespace between scheme and host, so strings with whitespace right after `http://` (or just the bare scheme) are descriptive text, not network requests. Hardcoded HTTP URLs (`'http://api.example.com'`, `Uri.parse('http://…')`, `http.get('http://…')`) still fire. No action required; any `// ignore:` markers added to work around this false positive can be removed.
 
 ---
 
@@ -106,6 +105,7 @@ This release ships a new **Saropa Project Map** dashboard — a project-wide hea
 - **Code Health scan no longer crashes on a file the analyzer can't fully parse** — one source file with a parse-level diagnostic (for example an `await` outside an async function, common while editing) previously aborted the whole scan with an unhandled exception; it now tolerates such files and keeps scanning the rest. No action required.
 - **Code Health scan starts faster and can't hang on symlinks** — file discovery now skips heavy directories (`build`, `.dart_tool`, `node_modules`, `Pods`, `.git`, …) and no longer follows symbolic links, so the scan reaches your `lib/` sources quickly instead of crawling generated output, and a symlink loop can't wedge it. No action required.
 - **Code Health no longer stalls on huge generated files** — files over ~512 KB (e.g. `flutter gen-l10n` `app_localizations*.dart` at multiple MB) are skipped; parsing one previously froze the progress bar for many seconds with no health value. The panel also shows the file it is *currently* processing and a per-phase time estimate, so a slow phase reads as working, not stalled. No action required.
+- **`require_https_only` no longer flags prose mentions of the `http://` scheme** — user-facing strings that name supported schemes (e.g. `'http:// or https:// URLs are supported.'`, the Korean equivalent `'http:// 또는 https:// URL만 지원됩니다.'` in a Flutter `app_localizations_*.dart` file, or a bare `'http://'` constant) are no longer reported as insecure URLs. A real URL has no whitespace between scheme and host, so strings with whitespace right after `http://` (or just the bare scheme) are descriptive text, not network requests. Hardcoded HTTP URLs (`'http://api.example.com'`, `Uri.parse('http://…')`, `http.get('http://…')`) still fire. No action required; any `// ignore:` markers added to work around this false positive can be removed.
 
 ### Added (Extension)
 
@@ -142,6 +142,7 @@ This release ships a new **Saropa Project Map** dashboard — a project-wide hea
 - When the extension runs as its own in-development build (F5 from the repo), the Code Health scan now executes the in-repo `saropa_lints` CLI against the opened project (via `--path`) instead of the project's pinned package version, so new CLI behavior can be tested without a path override. Installed builds are unaffected — they still use the project's own CLI.
 - `git blame` in the vibrancy scan now passes the scanned project as its working directory, so age scoring stays correct when the CLI process runs from a different directory than the scanned project.
 - Health time-machine (`--history`) now refuses to inherit a parent repo's tags. `git tag` climbs the directory tree, so running the scan on a subdirectory of another repo (the case that surfaces here is the publish script redirecting `TMP` into `build/test_tmp` inside this repo) silently reported the parent's tags as the project's own history. The scan now requires the scanned path to host its own `.git` entry (directory or worktree file) before asking git anything.
+- Publish-time US-English spelling audit now also flags British forms embedded in CamelCase identifiers (e.g. `_ScanCancelled`, `OnColourPicked`); the original word-boundary regex missed these because there is no `\b` between two letters of the same identifier. The audit also exempts archived plan docs under `plans/history/` so old write-ups don't keep tripping the gate after their work has shipped. <!-- cspell:ignore Cancelled Colour -->
 
 </details>
 

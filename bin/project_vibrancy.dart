@@ -99,8 +99,8 @@ Future<void> main(List<String> args) async {
   final ProjectVibrancyReport report;
   try {
     report = await runProjectVibrancy(options, progress: progress);
-  } on _ScanCancelled {
-    // User cancelled from the dashboard. Exit clean with no stdout payload —
+  } on _ScanCanceled {
+    // User canceled from the dashboard. Exit clean with no stdout payload —
     // the extension treats an empty result after a cancel request as "stopped",
     // not "failed", so no error toast fires.
     exit(0);
@@ -230,14 +230,14 @@ void _emitEvent(Map<String, Object?> event) {
 
 /// Thrown by the control gate when the dashboard requests cancel; caught in
 /// [main] to exit cleanly without emitting a partial report.
-class _ScanCancelled implements Exception {
-  const _ScanCancelled();
+class _ScanCanceled implements Exception {
+  const _ScanCanceled();
 }
 
 /// Builds the cooperative pause/cancel gate the scan awaits before each unit of
 /// work. With no control file it is a no-op. With one, it reads the file's
 /// current command: `pause` blocks (re-checking every 150 ms) until the command
-/// changes; `cancel` throws [_ScanCancelled]; anything else resumes immediately.
+/// changes; `cancel` throws [_ScanCanceled]; anything else resumes immediately.
 Future<void> Function() _makeGate(String? controlPath) {
   if (controlPath == null) {
     return () async {};
@@ -246,7 +246,7 @@ Future<void> Function() _makeGate(String? controlPath) {
     while (true) {
       final command = _readControl(controlPath);
       if (command == 'cancel') {
-        throw const _ScanCancelled();
+        throw const _ScanCanceled();
       }
       if (command != 'pause') {
         return;

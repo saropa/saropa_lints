@@ -3777,7 +3777,10 @@ class PostgresUserRepository extends UserRepository {}
 
 class CancelToken {
   void cancel([String? reason]) {}
-  bool get isCancelled => false;
+  // Mocks the Dio `CancelToken` getter that uses the double-l spelling.
+  // The trailing cspell tag suppresses the US-spelling audit's
+  // CamelCase pass for this intentional API-name match.
+  bool get isCancelled => false; // cspell:ignore isCancelled
 }
 
 // ============================================================================

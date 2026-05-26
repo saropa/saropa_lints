@@ -147,6 +147,18 @@ _UK_PATTERN = re.compile(
     re.IGNORECASE,
 )
 
+# Second pass: catch British words embedded in CamelCase identifiers
+# (e.g. `_ScanCancelled`, `OnColourPicked`). The `\b` in _UK_PATTERN does
+# not treat a lowercase->uppercase transition as a boundary, so identifiers
+# like `_ScanCancelled` slip through. This pattern matches a capitalized
+# UK word that is preceded by a lowercase letter (lower->Upper CamelCase
+# boundary) and not followed by a lowercase letter (end of word at next
+# camel chunk, underscore, digit, or non-letter).
+_CAPITALIZED_UK = [w[0].upper() + w[1:] for w in _SORTED_UK]
+_UK_CAMEL_PATTERN = re.compile(
+    r"(?<=[a-z])(" + "|".join(re.escape(w) for w in _CAPITALIZED_UK) + r")(?![a-z])"
+)
+
 # File extensions to scan
 _SCAN_EXTENSIONS = {".dart", ".py", ".md", ".yaml", ".yml"}
 
@@ -161,8 +173,9 @@ _SKIP_DIRS = {
     "reports",
 }
 
-# Specific filenames to skip (e.g. this file's own dictionary)
-_SKIP_FILES = {"_us_spelling.py"}
+# Specific filenames to skip (e.g. this file's own dictionary and its tests,
+# both of which must reference British forms verbatim to verify detection).
+_SKIP_FILES = {"_us_spelling.py", "test_us_spelling.py"}
 
 # URL pattern to detect links (skip matches inside URLs)
 _URL_PATTERN = re.compile(r"https?://\S+", re.IGNORECASE)
@@ -219,6 +232,23 @@ def _should_skip_path_for_i18n_tooling(file_path: Path, project_dir: Path) -> bo
     )
 
 
+def _should_skip_plans_history(file_path: Path, project_dir: Path) -> bool:
+    """Skip archived plan docs: frozen historical prose, not user-facing source.
+
+    The audit gates publishing of code that ships to pub.dev and the
+    Marketplace. Plans under ``plans/history/`` are dated archives that
+    are never rewritten after the work lands — re-policing them blocks
+    publishes for spellings that were already merged and add no risk to
+    shipped content.
+    """
+    try:
+        rel = file_path.resolve().relative_to(project_dir.resolve())
+    except ValueError:
+        return False
+    parts = rel.parts
+    return len(parts) >= 2 and parts[0] == "plans" and parts[1] == "history"
+
+
 def _is_inside_url(line: str, match_start: int, match_end: int) -> bool:
     """Check if the match falls within a URL."""
     for url_match in _URL_PATTERN.finditer(line):
@@ -268,31 +298,41 @@ def scan_file(file_path: Path) -> list[SpellingHit]:
     for line_num, line in enumerate(content.splitlines(), start=1):
         if "cspell" in line.lower():
             continue
-        for match in _UK_PATTERN.finditer(line):
-            uk_found = match.group(1)
-            uk_lower = uk_found.lower()
+        # Track (start, end) spans already reported on this line so the
+        # word-boundary pass and the CamelCase pass don't both report the
+        # same character range (e.g. a standalone `cancelled` would match
+        # both if it followed a lowercase letter).
+        reported_spans: set[tuple[int, int]] = set()
+        for pattern in (_UK_PATTERN, _UK_CAMEL_PATTERN):
+            for match in pattern.finditer(line):
+                span = (match.start(1), match.end(1))
+                if span in reported_spans:
+                    continue
+                uk_found = match.group(1)
+                uk_lower = uk_found.lower()
 
-            if _is_inside_url(line, match.start(), match.end()):
-                continue
+                if _is_inside_url(line, match.start(), match.end()):
+                    continue
 
-            if uk_lower == "grey" and _is_grey_api_context(
-                line, match.start()
-            ):
-                continue
+                if uk_lower == "grey" and _is_grey_api_context(
+                    line, match.start()
+                ):
+                    continue
 
-            us_word = UK_TO_US.get(uk_lower, "")
-            if not us_word:
-                continue
+                us_word = UK_TO_US.get(uk_lower, "")
+                if not us_word:
+                    continue
 
-            hits.append(
-                SpellingHit(
-                    file=file_path,
-                    line_number=line_num,
-                    line_text=line.strip(),
-                    uk_word=uk_found,
-                    us_word=_preserve_case(uk_found, us_word),
+                reported_spans.add(span)
+                hits.append(
+                    SpellingHit(
+                        file=file_path,
+                        line_number=line_num,
+                        line_text=line.strip(),
+                        uk_word=uk_found,
+                        us_word=_preserve_case(uk_found, us_word),
+                    )
                 )
-            )
     return hits
 
 
@@ -308,6 +348,8 @@ def scan_directory(project_dir: Path) -> list[SpellingHit]:
         if file_path.name in _SKIP_FILES:
             continue
         if _should_skip_path_for_i18n_tooling(file_path, root):
+            continue
+        if _should_skip_plans_history(file_path, root):
             continue
         all_hits.extend(scan_file(file_path))
     all_hits.sort(key=lambda h: (str(h.file), h.line_number))

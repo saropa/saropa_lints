@@ -308,7 +308,7 @@ fast ones.
 - **Content-hash + HEAD-sha cache** under `reports/.saropa_lints/health/cache.json`: recompute only changed files (reuse [project_context_incremental_priority.dart](../lib/src/project_context_incremental_priority.dart) patterns); git signals keyed by commit sha.
 - **Batched git** (`git log --name-only`, one `git blame` per file pooled) rather than a process per metric.
 - **Section toggles** (`--no-git --no-coverage --no-complexity --no-deadweight`) so users trade completeness for speed.
-- **Acceptance:** opening the dashboard returns control to the editor immediately; size map paints before git/complexity finish; a warm cache run is materially faster than cold; cancelling closes cleanly with no orphan process.
+- **Acceptance:** opening the dashboard returns control to the editor immediately; size map paints before git/complexity finish; a warm cache run is materially faster than cold; canceling closes cleanly with no orphan process.
 
 ---
 
