@@ -63,6 +63,14 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 -->
 
+## [Unreleased]
+
+### Fixed
+
+- **`require_https_only` no longer flags prose mentions of the `http://` scheme** — user-facing strings that name supported schemes (e.g. `'http:// or https:// URLs are supported.'`, the Korean equivalent `'http:// 또는 https:// URL만 지원됩니다.'` in a Flutter `app_localizations_*.dart` file, or a bare `'http://'` constant) are no longer reported as insecure URLs. A real URL has no whitespace between scheme and host, so strings with whitespace right after `http://` (or just the bare scheme) are descriptive text, not network requests. Hardcoded HTTP URLs (`'http://api.example.com'`, `Uri.parse('http://…')`, `http.get('http://…')`) still fire. No action required; any `// ignore:` markers added to work around this false positive can be removed.
+
+---
+
 ## [13.11.0]
 
 This release ships a new **Saropa Project Map** dashboard — a project-wide health scan that walks your code and ranks the worst files across complexity, coverage, dead code, churn, coupling, and import cycles, then prints a prioritized worklist (and copy-paste agent prompts) so you know what to fix first. The **Code Health Dashboard** also got a major overhaul: it opens instantly with a live progress bar, can be paused/resumed/restarted/canceled, caches per-file results so re-scans are fast, and lets you slice the worst-functions table by score, search, or any combination of flag categories — then bulk-copy what's left to the clipboard. And pubspec validation no longer pesters you about files inside the pub cache or vendored third-party packages. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
@@ -126,11 +134,14 @@ This release ships a new **Saropa Project Map** dashboard — a project-wide hea
 ### Fixed (Extension)
 
 - **Pubspec validation and Package Vibrancy diagnostics no longer fire on third-party packages** — opening a vendored `pubspec.yaml` under the pub cache (`Pub/Cache/hosted/…`, `~/.pub-cache/…`) or under `.dart_tool` / `node_modules` was producing `saropa-pubspec`, `saropa-sdk`, and `Package Vibrancy` diagnostics on files you can't edit, polluting the Problems panel. The listener now skips any pubspec outside the open workspace and any pubspec inside a known cache or generated directory. No action required.
+- **"Score dipped below N" toasts no longer repeat on every save when the score oscillates near a band edge, and no longer fire from one-off partial-sweep dips** — each crossing of a band (90 / 80 / 70 / 60 / 50) now fires at most once and only re-arms after the score recovers clearly above that band (5 points), and a downward crossing is held one snapshot before firing so an intermediate partial sweep that briefly skews the score (the case where the dashboard reads 93 while a stale toast had already said "below 50") is dropped quietly when the next snapshot recovers. Set `saropaLints.regressionNudge.enabled` to `false` to silence regression toasts entirely.
+- **"No errors!" celebration toast no longer repeats when the error count flickers between 0 and 1** — the toast is now persisted per workspace and only re-fires after errors return and are cleared again, so an intermediate analyzer batch that briefly drops and re-adds an error stops producing a stream of identical celebrations. No action required.
 
 <details><summary>Maintenance</summary>
 
 - When the extension runs as its own in-development build (F5 from the repo), the Code Health scan now executes the in-repo `saropa_lints` CLI against the opened project (via `--path`) instead of the project's pinned package version, so new CLI behavior can be tested without a path override. Installed builds are unaffected — they still use the project's own CLI.
 - `git blame` in the vibrancy scan now passes the scanned project as its working directory, so age scoring stays correct when the CLI process runs from a different directory than the scanned project.
+- Health time-machine (`--history`) now refuses to inherit a parent repo's tags. `git tag` climbs the directory tree, so running the scan on a subdirectory of another repo (the case that surfaces here is the publish script redirecting `TMP` into `build/test_tmp` inside this repo) silently reported the parent's tags as the project's own history. The scan now requires the scanned path to host its own `.git` entry (directory or worktree file) before asking git anything.
 
 </details>
 

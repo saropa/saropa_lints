@@ -3617,6 +3617,37 @@ class RequireHttpsOnlyRule extends SaropaLintRule {
     return false;
   }
 
+  /// Returns true when the literal is a prose mention of the `http://`
+  /// scheme rather than a URL being requested.
+  ///
+  /// A real URL goes straight from scheme to host (`http://host[/path]`).
+  /// Two shapes are NOT URLs:
+  ///
+  /// 1. **Bare scheme** — the string is exactly `'http://'`. Common in
+  ///    generated localization files and constants used to label the
+  ///    scheme, not to request anything.
+  /// 2. **Whitespace after the scheme** — `'http:// or https:// only'`,
+  ///    `'http:// 또는 https://'`. URLs never contain whitespace between
+  ///    `http://` and the host, so this is descriptive text. Common in
+  ///    user-facing i18n error messages that name supported schemes
+  ///    (e.g. Flutter `app_localizations_*.dart` outputs).
+  ///
+  /// Why a content check (not a filename check): generated-locale files
+  /// are one source of this FP class, but hand-written copy ("Use http://
+  /// or https://") and error builders trigger the same pattern. The
+  /// whitespace signal catches all of them without depending on filename
+  /// conventions and without masking a real hardcoded `http://host`.
+  static bool _isHttpSchemeMention(String value) {
+    // Bare scheme — a request always has a host after.
+    if (value == 'http://') return true;
+
+    // Char immediately after `http://` (index 7) is whitespace.
+    if (value.length <= 7) return false;
+    final int code = value.codeUnitAt(7);
+    // Space, tab, LF, CR. Real URL hosts cannot start with whitespace.
+    return code == 0x20 || code == 0x09 || code == 0x0A || code == 0x0D;
+  }
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -3652,6 +3683,11 @@ class RequireHttpsOnlyRule extends SaropaLintRule {
       // literal is a needle being searched for, not a URL being requested.
       if (_isStringInspectionPattern(node)) return;
 
+      // Allow prose mentions of the http scheme (i18n error messages,
+      // bare-scheme constants). A real URL has no whitespace between
+      // scheme and host.
+      if (_isHttpSchemeMention(value)) return;
+
       onViolation(node);
     });
 
@@ -3669,6 +3705,9 @@ class RequireHttpsOnlyRule extends SaropaLintRule {
       for (final String pattern in _allowedHttpPatterns) {
         if (value.startsWith(pattern)) return;
       }
+
+      // Allow prose mentions of the http scheme (e.g. `'http:// ${name}'`).
+      if (_isHttpSchemeMention(value)) return;
 
       onViolation(node);
     });

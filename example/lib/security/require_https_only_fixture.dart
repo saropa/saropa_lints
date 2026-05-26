@@ -171,6 +171,30 @@ class HttpDetectionPatterns {
   }
 }
 
+// FALSE POSITIVE TEST: Prose mentions of the http:// scheme in user-facing
+// strings (i18n messages, error builders, bare-scheme labels) should NOT
+// trigger. Real URLs go straight from scheme to host with no whitespace;
+// these strings have either nothing or whitespace after `http://`, so they
+// are descriptive text, not network requests.
+class HttpSchemeProseMentions {
+  // OK: bare scheme — no host, cannot be a request
+  String get scheme => 'http://';
+
+  // OK: space after the scheme — prose listing supported schemes
+  String get supported => 'http:// or https:// URLs are supported.';
+
+  // OK: non-ASCII text after the scheme (mirrors the Korean i18n case
+  // that triggered the rule fix: 'http:// 또는 https://...')
+  String get supportedKo => 'http:// 또는 https:// URL만 지원됩니다.';
+
+  // OK: tab after the scheme — same prose signal as space
+  String get tabbed => 'http://\tor https://';
+
+  // OK: interpolation where the literal starts with `http:// ` (space).
+  // Real interpolated URLs are `'http://${host}/path'`, not `'http:// ${x}'`.
+  String describe(String name) => 'http:// ${name} is the http scheme';
+}
+
 // ALLOWED: Localhost and development URLs
 class LocalhostUsage {
   void connectToLocalhost() {
