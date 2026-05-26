@@ -556,12 +556,16 @@ function buildReportFileRow(reportFilePath: string | undefined): string {
 }
 
 /**
- * Toolbar: tier-1 primary (*Rescan*), tier-2 secondaries, a *Copy selected*
- * action for the row-selection workflow, a "hide boilerplate" toggle, and the
- * row search field. The toggle defaults ON because `==`, `hashCode`,
- * `toString`, `copyWith`, `fromJson` etc. dominate a real project's "worst
- * functions" list and rarely deserve triage attention — surfacing them
- * obscures the genuinely problematic functions underneath.
+ * Toolbar: tier-1 *Rescan*, tier-2 *Copy filtered* / *Copy JSON* / *Settings*,
+ * then the filter controls — *Score ≤* numeric threshold, *Hide boilerplate*
+ * checkbox (default ON), and the text search. The workflow is filter-driven:
+ * narrow the table to the rows of interest, then *Copy filtered* dumps every
+ * visible row to the clipboard. No selection checkboxes — the filters ARE the
+ * selection, which keeps the table clean and scales to large reports.
+ *
+ * Boilerplate is hidden by default because `==`, `hashCode`, `toString`,
+ * `copyWith`, `fromJson` etc. dominate a real project's worst-functions list
+ * but rarely deserve triage; surfacing them obscures the actionable problems.
  */
 function buildToolbar(): string {
   return `<section class="toolbar-band" role="toolbar" aria-label="${escapeHtml(l10n('codeHealth.toolbar.ariaLabel'))}">
@@ -569,14 +573,19 @@ function buildToolbar(): string {
     <div class="toolbar-row" style="gap:6px;">
       <button class="btn tier-1" id="rescan" type="button"
         title="${escapeHtml(l10n('codeHealth.toolbar.rescanTitle'))}">${escapeHtml(l10n('codeHealth.toolbar.rescan'))}</button>
-      <button class="btn" id="copySelected" type="button" disabled
-        title="Copy the selected rows as one line each — file:line then function name and score — ready to paste into a chat or issue for analysis.">Copy selected</button>
+      <button class="btn" id="copyFiltered" type="button" disabled
+        title="Copy every row currently shown in the table — one line per row: file:line, function name, score, flags. Use the score threshold, KPI tiles, search field, and boilerplate toggle to narrow the table down to the rows you want first.">Copy filtered</button>
       <button class="btn" id="copyJson" type="button"
         title="${escapeHtml(l10n('codeHealth.toolbar.copyJsonTitle'))}">${escapeHtml(l10n('codeHealth.toolbar.copyJson'))}</button>
       <button class="btn" id="openPvSettings" type="button"
         title="${escapeHtml(l10n('codeHealth.toolbar.settingsTitle'))}">${escapeHtml(l10n('codeHealth.toolbar.settingsButton'))}</button>
     </div>
     <div class="toolbar-row" style="gap:12px;">
+      <label class="field score-threshold" title="Only show functions with a score at or below this number. Empty = no limit. Try 30 for the worst third, 50 for problem grades (D / E / F).">
+        <span class="sr-only-label">Score ≤</span>
+        <span class="prefix">Score ≤</span>
+        <input id="pvScoreMax" type="number" min="0" max="100" inputmode="numeric" placeholder="—" autocomplete="off" />
+      </label>
       <label class="check-inline" title="Hide equality, serialization, and dispatch boilerplate: operator overrides (==, &lt;, []), hashCode, toString, noSuchMethod, copyWith, fromJson, toJson, fromMap, toMap, props (Equatable). These are technically functions but rarely the source of code-health concerns; on by default so the table surfaces functions you can actually act on.">
         <input type="checkbox" id="hideBoilerplate" checked />
         <span>Hide boilerplate methods</span>
@@ -640,7 +649,6 @@ function buildTable(
     <table class="dash-table code-health" id="pvTable">
       <thead>
         <tr>
-          <th class="col-select" title="Select rows to bulk-copy with the toolbar button. The header checkbox toggles all currently-visible rows."><input type="checkbox" id="pvSelectAll" aria-label="Select all visible rows" /></th>
           <th class="sortable col-score" data-sort="score" aria-sort="ascending" title="${escapeHtml(scoreTitle)}">${escapeHtml(l10n('codeHealth.table.colScore'))}<span class="arrow"></span></th>
           <th class="sortable col-name"  data-sort="name"  aria-sort="none">${escapeHtml(l10n('codeHealth.table.colFunction'))}<span class="arrow"></span></th>
           <th class="sortable col-file"  data-sort="file"  aria-sort="none">${escapeHtml(l10n('codeHealth.table.colFile'))}<span class="arrow"></span></th>
@@ -663,7 +671,7 @@ function buildTable(
       <button type="button" class="btn" id="pvLoadMoreBtn">Show next 500</button>
     </div>
   </div>
-  <p class="hint">Use the search field, the KPI tiles, or the column headers to triage. Select rows with the checkboxes and click <strong>Copy selected</strong> to bulk-copy them as <code>file:line  name  (score, flags)</code> lines.</p>
+  <p class="hint">Narrow the table with the search field, the score threshold, and the KPI tiles (click multiple to combine), then click <strong>Copy filtered</strong> to bulk-copy every visible row as <code>file:line  name  (score, flags)</code> lines.</p>
   <script id="pvRowData" type="application/json" nonce="${nonce}">${jsonForScriptBlock(rowData)}</script>
 </section>`;
 }
@@ -695,15 +703,20 @@ function buildClientScript(): string {
 
   var RENDER_CHUNK = 500;
   var state = {
-    search: '', flag: null,
+    search: '',
+    // Multi-flag set: KPI cards add/remove membership (intersection — every
+    // active flag must be present on the row). A single-flag mutual-exclusive
+    // state was less useful: "show me unused AND complex" is a common ask.
+    flags: Object.create(null),
+    flagCount: 0,
+    // Numeric score cap. null = no limit. Common values: 30 (worst third),
+    // 50 (D/E/F problem grades).
+    scoreMax: null,
     sortKey: 'score', sortAsc: true,
     hideBoilerplate: true,
     visibleCount: RENDER_CHUNK
   };
   var filtered = [];
-  // Selection survives filter/sort changes — keyed by file:line:name.
-  var selected = Object.create(null);
-  var selectedCount = 0;
 
   // Names that dominate a "worst functions" list because they are tiny,
   // uncovered, and rarely called — but where touching them rarely improves
@@ -749,11 +762,19 @@ function buildClientScript(): string {
 
   function compileFiltered() {
     var q = state.search;
-    var flag = state.flag;
+    var flagSet = state.flags;
+    var flagCount = state.flagCount;
+    var scoreMax = state.scoreMax;
     var hideBp = state.hideBoilerplate;
     filtered = allRows.filter(function(r) {
       if (hideBp && isBoilerplate(r.name)) return false;
-      if (flag && r.flags.indexOf(flag) === -1) return false;
+      if (scoreMax !== null && r.score > scoreMax) return false;
+      if (flagCount > 0) {
+        // AND-intersection: every active flag must be present on the row.
+        for (var f in flagSet) {
+          if (r.flags.indexOf(f) === -1) return false;
+        }
+      }
       if (q) {
         var hay = (r.name + ' ' + r.file + ' ' + r.flags.join(' ')).toLowerCase();
         if (hay.indexOf(q) === -1) return false;
@@ -787,8 +808,6 @@ function buildClientScript(): string {
   }
 
   function rowHtml(r) {
-    var key = rowKey(r);
-    var checked = selected[key] ? ' checked' : '';
     var scoreInt = Math.round(r.score);
     var color = hslForScore(scoreInt);
     var name = displayName(r.name);
@@ -802,8 +821,7 @@ function buildClientScript(): string {
     var flagPills = r.flags.map(function(f) {
       return '<span class="flag-pill ' + esc(f) + '">' + esc(f.replace(/_/g, ' ')) + '</span>';
     }).join(' ');
-    return '<tr data-key="' + esc(key) + '">' +
-      '<td class="col-select"><input type="checkbox" class="row-check"' + checked + ' aria-label="Select row" /></td>' +
+    return '<tr data-key="' + esc(rowKey(r)) + '">' +
       '<td class="col-score"><span class="score-pill" style="background:' + color + ';color:#000;" title="Score ' + scoreInt + '/100">' + scoreInt + '</span></td>' +
       '<td class="col-name"><span class="fn-link" data-file="' + esc(r.file) + '" data-line="' + r.lineStart + '" title="Open at line ' + r.lineStart + '">' + esc(name) + '</span></td>' +
       '<td class="col-file"><span class="file-link" data-file="' + esc(r.file) + '" data-line="' + r.lineStart + '" title="' + esc(r.file) + '"><span class="path-dir">' + esc(dir) + '</span><span class="path-base">' + esc(base) + '</span></span></td>' +
@@ -846,7 +864,7 @@ function buildClientScript(): string {
     var emptyEl = document.getElementById('pvEmpty');
     if (emptyEl) emptyEl.hidden = !(filtered.length === 0 && allRows.length > 0);
     updateSortArrows();
-    updateSelectAllCheckbox();
+    updateCopyButton();
   }
   function updateSortArrows() {
     var ths = document.querySelectorAll('th.sortable[data-sort]');
@@ -900,17 +918,43 @@ function buildClientScript(): string {
       applyAll();
     });
   }
+  // KPI tiles are multi-select: click multiple to AND them (e.g. unused AND
+  // complex). Click an active tile again to remove it. Previously the cards
+  // were mutually-exclusive single-select, which made the obvious "find
+  // unused-and-complex" query impossible.
   document.querySelectorAll('.kpi-card.interactive[data-flag-filter]').forEach(function(card) {
     card.addEventListener('click', function() {
       if (card.disabled) return;
       var key = card.getAttribute('data-flag-filter');
-      var wasActive = card.classList.contains('active');
-      document.querySelectorAll('.kpi-card.active').forEach(function(c) { c.classList.remove('active'); });
-      state.flag = wasActive ? null : key;
-      if (state.flag) card.classList.add('active');
+      if (state.flags[key]) {
+        delete state.flags[key];
+        state.flagCount--;
+        card.classList.remove('active');
+      } else {
+        state.flags[key] = true;
+        state.flagCount++;
+        card.classList.add('active');
+      }
       applyAll();
     });
   });
+
+  // Score-threshold input: empty = no cap; a number caps the table to rows
+  // whose score is at or below it. Tries to parse so '30', '30.5', '  50 ' all
+  // work, but ignores anything not numeric (the placeholder shows '—' as a
+  // hint that empty means no limit).
+  var scoreMaxEl = document.getElementById('pvScoreMax');
+  if (scoreMaxEl) {
+    scoreMaxEl.addEventListener('input', function() {
+      var raw = (scoreMaxEl.value || '').trim();
+      if (raw === '') { state.scoreMax = null; }
+      else {
+        var n = parseFloat(raw);
+        state.scoreMax = (isFinite(n) && n >= 0 && n <= 100) ? n : null;
+      }
+      applyAll();
+    });
+  }
   // Column sort: click flips direction on the active column, otherwise sorts
   // the new column ascending (smallest/worst first).
   document.querySelectorAll('th.sortable[data-sort]').forEach(function(th) {
@@ -934,67 +978,36 @@ function buildClientScript(): string {
   if (resetEmptyBtn) resetEmptyBtn.addEventListener('click', resetFilters);
   function resetFilters() {
     state.search = '';
-    state.flag = null;
+    state.flags = Object.create(null);
+    state.flagCount = 0;
+    state.scoreMax = null;
     searchEl.value = '';
+    if (scoreMaxEl) scoreMaxEl.value = '';
     document.querySelectorAll('.kpi-card.active').forEach(function(c) { c.classList.remove('active'); });
     applyAll();
   }
 
-  // --- Selection + bulk copy --------------------------------------------
+  // --- Filter-driven bulk copy ------------------------------------------
+  // No selection checkboxes — the filters ARE the selection. *Copy filtered*
+  // dumps every currently-visible row. The button label shows the live count
+  // so the user knows how many rows they're about to copy before clicking.
   function updateCopyButton() {
-    var btn = document.getElementById('copySelected');
+    var btn = document.getElementById('copyFiltered');
     if (!btn) return;
-    if (selectedCount === 0) {
-      btn.textContent = 'Copy selected';
+    if (filtered.length === 0) {
+      btn.textContent = 'Copy filtered';
       btn.setAttribute('disabled', '');
     } else {
-      btn.textContent = 'Copy selected (' + selectedCount + ')';
+      btn.textContent = 'Copy filtered (' + filtered.length.toLocaleString('en-US') + ')';
       btn.removeAttribute('disabled');
     }
-  }
-  function updateSelectAllCheckbox() {
-    var master = document.getElementById('pvSelectAll');
-    if (!master) return;
-    var visible = filtered.slice(0, state.visibleCount);
-    var hit = 0;
-    for (var i = 0; i < visible.length; i++) if (selected[rowKey(visible[i])]) hit++;
-    if (hit === 0) { master.checked = false; master.indeterminate = false; }
-    else if (hit === visible.length && visible.length > 0) { master.checked = true; master.indeterminate = false; }
-    else { master.checked = false; master.indeterminate = true; }
-  }
-  var masterCheck = document.getElementById('pvSelectAll');
-  if (masterCheck) {
-    masterCheck.addEventListener('change', function() {
-      var want = masterCheck.checked;
-      var visible = filtered.slice(0, state.visibleCount);
-      for (var i = 0; i < visible.length; i++) {
-        var k = rowKey(visible[i]);
-        if (want && !selected[k]) { selected[k] = true; selectedCount++; }
-        else if (!want && selected[k]) { delete selected[k]; selectedCount--; }
-      }
-      render();
-      updateCopyButton();
-    });
   }
 
   var tbody = document.getElementById('pvBody');
   if (tbody) {
-    // Delegated click handler: row-check toggles selection; fn-link / file-link
-    // open the file at the line. One listener handles the whole table.
+    // Delegated click handler: fn-link / file-link open the file at its line.
     tbody.addEventListener('click', function(e) {
-      var tgt = e.target;
-      if (tgt && tgt.classList && tgt.classList.contains('row-check')) {
-        var tr = tgt.closest ? tgt.closest('tr') : null;
-        if (!tr) return;
-        var k = tr.getAttribute('data-key');
-        if (!k) return;
-        if (tgt.checked && !selected[k]) { selected[k] = true; selectedCount++; }
-        else if (!tgt.checked && selected[k]) { delete selected[k]; selectedCount--; }
-        updateCopyButton();
-        updateSelectAllCheckbox();
-        return;
-      }
-      var t = tgt;
+      var t = e.target;
       while (t && t !== tbody && !(t.classList && (t.classList.contains('fn-link') || t.classList.contains('file-link')))) {
         t = t.parentNode;
       }
@@ -1006,16 +1019,14 @@ function buildClientScript(): string {
     });
   }
 
-  // Bulk-copy format chosen for an LLM/chat paste: one line per row, leads
-  // with file:line (clickable in many tools), then function name, then score
-  // and flags in parentheses for context.
-  document.getElementById('copySelected').addEventListener('click', function() {
-    if (selectedCount === 0) return;
+  // Bulk-copy format for LLM/chat paste: one line per row, file:line first
+  // (clickable in most tools), then function name, then score + flags in
+  // parentheses. Copies EVERY filtered row — filter narrows, button dumps.
+  document.getElementById('copyFiltered').addEventListener('click', function() {
+    if (filtered.length === 0) return;
     var lines = [];
-    for (var i = 0; i < allRows.length; i++) {
-      var r = allRows[i];
-      var k = rowKey(r);
-      if (!selected[k]) continue;
+    for (var i = 0; i < filtered.length; i++) {
+      var r = filtered[i];
       var meta = ['score ' + Math.round(r.score)];
       if (r.flags && r.flags.length) meta.push(r.flags.join(', '));
       lines.push(r.file + ':' + r.lineStart + '  ' + displayName(r.name) +
@@ -1028,26 +1039,34 @@ function buildClientScript(): string {
   var stripEl = document.getElementById('filter-strip');
   function renderStrip() {
     if (!stripEl) return;
+    // chip.key is the dismiss target: 'search', 'score', or 'flag:<name>' so
+    // the X removes that specific filter only.
     var chips = [];
     if (state.search) chips.push({ key: 'search', label: 'search: "' + esc(state.search) + '"' });
-    if (state.flag) chips.push({ key: 'flag', label: 'flag: ' + state.flag.replace(/_/g, ' ') });
+    if (state.scoreMax !== null) chips.push({ key: 'score', label: 'score ≤ ' + state.scoreMax });
+    for (var f in state.flags) {
+      chips.push({ key: 'flag:' + f, label: 'flag: ' + f.replace(/_/g, ' ') });
+    }
     if (chips.length === 0) { stripEl.hidden = true; stripEl.innerHTML = ''; return; }
     stripEl.hidden = false;
     var parts = ['<span class="lbl">' + esc(CH.activeFiltersLabel) + '</span>'];
     chips.forEach(function(chip) {
       parts.push('<span class="chip">' + chip.label +
-        '<button type="button" class="x" data-chip="' + chip.key +
-        '" aria-label="Remove ' + chip.key + '">×</button></span>');
+        '<button type="button" class="x" data-chip="' + esc(chip.key) +
+        '" aria-label="Remove filter">×</button></span>');
     });
     parts.push('<button type="button" class="clear-all" id="clear-all-filters">' + esc(CH.clearAll) + '</button>');
     stripEl.innerHTML = parts.join('');
     stripEl.querySelectorAll('.chip .x').forEach(function(btn) {
       btn.addEventListener('click', function() {
-        var k = btn.getAttribute('data-chip');
+        var k = btn.getAttribute('data-chip') || '';
         if (k === 'search') { state.search = ''; searchEl.value = ''; }
-        else if (k === 'flag') {
-          state.flag = null;
-          document.querySelectorAll('.kpi-card.active').forEach(function(c) { c.classList.remove('active'); });
+        else if (k === 'score') { state.scoreMax = null; if (scoreMaxEl) scoreMaxEl.value = ''; }
+        else if (k.indexOf('flag:') === 0) {
+          var name = k.slice(5);
+          if (state.flags[name]) { delete state.flags[name]; state.flagCount--; }
+          var card = document.querySelector('.kpi-card.active[data-flag-filter="' + name + '"]');
+          if (card) card.classList.remove('active');
         }
         applyAll();
       });

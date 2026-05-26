@@ -186,18 +186,20 @@ describe('Code Health Dashboard HTML', () => {
   });
 
   it('row renderer covers score pill, fn-link, path split, relative age, operator label', () => {
-    // The full rowHtml function has many closure deps (selected, rowKey,
-    // hslForScore, fmtAge, displayName, esc) so we don't try to execute it —
-    // instead we assert the template fragments that produce each feature are
-    // present in the script source. Per-helper unit tests below cover the
-    // pure functions (displayName, rowKey, isBoilerplate).
+    // rowHtml has many closure deps (hslForScore, fmtAge, displayName, esc) so
+    // we assert template fragments are present rather than executing it. Per-
+    // helper unit tests below cover the pure functions (displayName, rowKey,
+    // isBoilerplate).
     const html = buildProjectVibrancyHtml(rowsPayload());
     assert.ok(html.includes('class="score-pill"'));
     assert.ok(html.includes('class="fn-link"'));
     assert.ok(html.includes('class="path-dir"'));
     assert.ok(html.includes('class="path-base"'));
-    assert.ok(html.includes('class="row-check"'));
     assert.ok(html.includes("'operator ' + name"), 'operator label expression should be present');
+    // Selection checkboxes were removed — filters drive the bulk-copy now.
+    assert.ok(!html.includes('class="row-check"'));
+    assert.ok(!html.includes('id="pvSelectAll"'));
+    assert.ok(!html.includes('class="col-select"'));
   });
 
   it('displayName labels operators and passes identifier names through', () => {
@@ -247,13 +249,27 @@ describe('Code Health Dashboard HTML', () => {
     assert.ok((html.match(/<span class="arrow"/g) ?? []).length >= 8);
   });
 
-  it('toolbar exposes bulk-copy and select-all controls', () => {
+  it('toolbar exposes filter-driven bulk-copy + score threshold input', () => {
     const html = buildProjectVibrancyHtml(rowsPayload());
-    // 'Copy selected' is disabled until something is selected.
-    assert.ok(/id="copySelected"[^>]*disabled/.test(html));
-    assert.ok(html.includes('id="pvSelectAll"'));
-    // Header-cell checkbox column for per-row selection.
-    assert.ok(html.includes('class="col-select"'));
+    // Copy filtered button is present and starts disabled (the script enables
+    // it once the filtered row count is non-zero).
+    assert.ok(/id="copyFiltered"[^>]*disabled/.test(html));
+    // Score-threshold numeric input.
+    assert.ok(/id="pvScoreMax"[^>]*type="number"/.test(html));
+    // Selection UI must NOT be present — filters drive the workflow now.
+    assert.ok(!html.includes('id="copySelected"'));
+    assert.ok(!html.includes('id="pvSelectAll"'));
+  });
+
+  it('KPI tiles toggle multi-select state (clicking adds/removes flags)', () => {
+    const html = buildProjectVibrancyHtml(rowsPayload());
+    // The script holds an object/set of active flags, not a single string.
+    assert.ok(html.includes('state.flags'));
+    assert.ok(html.includes('state.flagCount'));
+    // The active-filter strip emits a chip per active flag (key 'flag:<name>').
+    assert.ok(html.includes("'flag:'"));
+    // Score threshold also appears in the strip when set.
+    assert.ok(html.includes("'score ≤ '"));
   });
 
   it('emits a "Show next N" load-more button (hidden initially; script unhides)', () => {

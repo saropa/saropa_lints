@@ -74,6 +74,48 @@ function reportFileRowStyles(): string {
   padding: 10px 0;
 }
 .load-more .btn { min-width: 220px; }
+/* Score-threshold input — a compact numeric field with a 'Score ≤' prefix.
+   Narrow on purpose so it doesn't compete with the search field for space. */
+.score-threshold {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  border: 1px solid var(--border, var(--vscode-input-border, #8884));
+  border-radius: 4px;
+  background: var(--vscode-input-background, transparent);
+}
+.score-threshold .prefix {
+  font-size: 0.85em;
+  color: var(--muted, var(--vscode-descriptionForeground));
+  white-space: nowrap;
+}
+.score-threshold input[type="number"] {
+  width: 48px;
+  border: none;
+  background: transparent;
+  color: var(--vscode-input-foreground);
+  font: inherit;
+  text-align: right;
+  padding: 0;
+}
+.score-threshold input[type="number"]:focus { outline: none; }
+.score-threshold input[type="number"]::-webkit-inner-spin-button,
+.score-threshold input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none; appearance: none; margin: 0;
+}
+.sr-only-label {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+/* Multi-select KPI cards: an active card carries a thicker outline + brighter
+   foreground so several active cards read as a group, not as a momentary
+   selection. */
+.kpi-card.active {
+  outline: 2px solid var(--vscode-focusBorder, var(--accent-info, #3794ff));
+  outline-offset: 1px;
+}
 `;
 }
 
@@ -89,8 +131,6 @@ function reportFileRowStyles(): string {
 function codeHealthTableStyles(): string {
   return `
 .dash-table.code-health th, .dash-table.code-health td { padding: 5px 8px; }
-.dash-table.code-health .col-select { width: 34px; text-align: center; }
-.dash-table.code-health .col-select input[type="checkbox"] { cursor: pointer; }
 .dash-table.code-health .col-score { width: 62px; text-align: center; }
 .dash-table.code-health .col-name  { width: 22%; }
 .dash-table.code-health .col-file  { width: 26%; }
