@@ -127,6 +127,10 @@ A new project size scan lays the groundwork for an upcoming Saropa Project Map d
 - **Bulk-copy methods for analysis is filter-driven** — narrow the Worst Functions table with the new *Score ≤ N* threshold, the search field, the *Hide boilerplate* toggle, and the KPI tiles (multi-select — click multiple to combine flags, e.g. `unused` AND `complex`), then click *Copy filtered (N)* to send every visible row to the clipboard as `file:line  function-name  (score, flags)`, one line per row, ready to paste into a chat or issue. No per-row checkboxes; the filters are the selection. The active-filter strip lists every applied filter (search, score threshold, each flag) with its own dismiss button. No action required.
 - **The Score column now explains what it measures** — hovering the column header shows the composite formula (`40% coverage + 25% usage + 15% age + 15% complexity + 5% documentation`), and Usage / Coverage / Complexity / Changed columns gained similar tooltips so a reader doesn't have to guess what each axis means. No action required.
 
+### Fixed (Extension)
+
+- **Pubspec validation and Package Vibrancy diagnostics no longer fire on third-party packages** — opening a vendored `pubspec.yaml` under the pub cache (`Pub/Cache/hosted/…`, `~/.pub-cache/…`) or under `.dart_tool` / `node_modules` was producing `saropa-pubspec`, `saropa-sdk`, and `Package Vibrancy` diagnostics on files you can't edit, polluting the Problems panel. The listener now skips any pubspec outside the open workspace and any pubspec inside a known cache or generated directory. No action required.
+
 <details><summary>Maintenance</summary>
 
 - When the extension runs as its own in-development build (F5 from the repo), the Code Health scan now executes the in-repo `saropa_lints` CLI against the opened project (via `--path`) instead of the project's pinned package version, so new CLI behavior can be tested without a path override. Installed builds are unaffected — they still use the project's own CLI.

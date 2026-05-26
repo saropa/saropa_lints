@@ -6,7 +6,8 @@ import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import * as vscode from 'vscode';
-import { PubspecValidation, parseSuppressedRules } from '../pubspec-validation';
+import { PubspecValidation, parseSuppressedRules, isExternalPubspecUri } from '../pubspec-validation';
+import { workspace as mockWorkspaceObj } from './vibrancy/vscode-mock';
 import { MockDiagnosticCollection, Diagnostic } from './vibrancy/vscode-mock';
 
 function runValidation(
@@ -1022,5 +1023,61 @@ describe('combined checks', () => {
         ].join('\n');
         const diags = runValidation(content);
         assert.strictEqual(diags.length, 0);
+    });
+});
+
+// ── isExternalPubspecUri ──────────────────────────────────────
+//
+// Regression coverage for the listener guard that stops
+// PubspecValidation / SdkDiagnostics / Package Vibrancy from
+// publishing diagnostics on third-party pubspecs (pub cache,
+// .dart_tool, node_modules) or files outside the workspace.
+describe('isExternalPubspecUri', () => {
+    const originalGetWorkspaceFolder = mockWorkspaceObj.getWorkspaceFolder;
+
+    beforeEach(() => {
+        // Claim a workspace folder so the path-segment branch is exercised
+        // instead of the no-workspace branch.
+        mockWorkspaceObj.getWorkspaceFolder = (_uri: any) => ({
+            uri: vscode.Uri.file('/workspace'),
+            name: 'workspace',
+            index: 0,
+        });
+    });
+
+    afterEach(() => {
+        mockWorkspaceObj.getWorkspaceFolder = originalGetWorkspaceFolder;
+    });
+
+    it('flags Windows pub cache pubspecs', () => {
+        const uri = vscode.Uri.file(
+            'D:/tools/Pub/Cache/hosted/pub.dev/http-1.2.0/pubspec.yaml',
+        );
+        assert.strictEqual(isExternalPubspecUri(uri), true);
+    });
+
+    it('flags Unix .pub-cache pubspecs', () => {
+        const uri = vscode.Uri.file(
+            '/home/user/.pub-cache/hosted/pub.dev/http-1.2.0/pubspec.yaml',
+        );
+        assert.strictEqual(isExternalPubspecUri(uri), true);
+    });
+
+    it('flags .dart_tool pubspecs', () => {
+        const uri = vscode.Uri.file(
+            '/workspace/.dart_tool/flutter_gen/pubspec.yaml',
+        );
+        assert.strictEqual(isExternalPubspecUri(uri), true);
+    });
+
+    it('does not flag a regular workspace pubspec', () => {
+        const uri = vscode.Uri.file('/workspace/my_app/pubspec.yaml');
+        assert.strictEqual(isExternalPubspecUri(uri), false);
+    });
+
+    it('flags any URI outside every workspace folder', () => {
+        mockWorkspaceObj.getWorkspaceFolder = (_uri: any) => null;
+        const uri = vscode.Uri.file('/some/random/place/pubspec.yaml');
+        assert.strictEqual(isExternalPubspecUri(uri), true);
     });
 });

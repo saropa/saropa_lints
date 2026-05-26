@@ -841,9 +841,53 @@ export function createPubspecValidation(
 }
 
 /**
+ * Path segments that mark a pubspec.yaml as belonging to a third-party
+ * package fetched by `pub get` (or to generated tool output) rather than
+ * the user's editable project. Match is case-insensitive against
+ * `uri.path`, which always uses forward slashes even on Windows.
+ *
+ *   Windows:  D:\tools\Pub\Cache\hosted\pub.dev\<pkg>\pubspec.yaml
+ *             → uri.path = /D:/tools/Pub/Cache/hosted/pub.dev/...
+ *   Unix:     ~/.pub-cache/hosted/pub.dev/<pkg>/pubspec.yaml
+ *   Generated: any pubspec under .dart_tool/ or node_modules/
+ */
+const EXTERNAL_PATH_SEGMENTS = [
+    '/pub/cache/hosted/',
+    '/pub/cache/git/',
+    '/.pub-cache/hosted/',
+    '/.pub-cache/git/',
+    '/.dart_tool/',
+    '/node_modules/',
+];
+
+/**
+ * True if the pubspec URI belongs to a third-party package or generated
+ * output rather than the user's editable workspace. We must skip these
+ * because (a) the user cannot fix lints in vendored packages, and
+ * (b) running the validator on every cached pubspec the user clicks
+ * into (e.g. via "Go to source") floods the Problems panel with noise.
+ *
+ * Two-part check:
+ *   1. The URI is outside every open workspace folder, OR
+ *   2. The URI path matches a known cache/generated directory segment,
+ *      even when nested inside a workspace folder (rare, but happens
+ *      when the user opens their pub cache as a workspace).
+ */
+export function isExternalPubspecUri(uri: vscode.Uri): boolean {
+    if (!vscode.workspace.getWorkspaceFolder(uri)) {
+        return true;
+    }
+    const lower = uri.path.toLowerCase();
+    return EXTERNAL_PATH_SEGMENTS.some(seg => lower.includes(seg));
+}
+
+/**
  * Wire up pubspec.yaml document listeners with debounce. Shared helper
  * used by both the primary listener path (extension-activation.ts) and
  * the fallback path (when vibrancy activation fails).
+ *
+ * Skips third-party pubspecs (pub cache, .dart_tool, node_modules) and
+ * any pubspec outside the open workspace — see [isExternalPubspecUri].
  *
  * @param onRefresh Called with the document when pubspec.yaml is opened
  *   or edited (after debounce). May be sync or async.
@@ -853,7 +897,8 @@ export function registerPubspecDocListeners(
     onRefresh: (doc: vscode.TextDocument) => void | Promise<void>,
 ): void {
     const isPubspec = (doc: vscode.TextDocument) =>
-        doc.fileName.endsWith('pubspec.yaml');
+        doc.fileName.endsWith('pubspec.yaml')
+        && !isExternalPubspecUri(doc.uri);
 
     // Track URIs already refreshed during the initial sync so we
     // don't call onRefresh twice for the same document.
