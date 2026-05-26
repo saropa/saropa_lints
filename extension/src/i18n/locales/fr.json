@@ -691,6 +691,50 @@
     "skipToTable": "Passer au tableau des fonctions",
     "openWorkspaceFirst": "Ouvrez d'abord un espace de travail Dart/Flutter.",
     "scanningTitle": "Code Health : fonctions de scanning…",
+    "scan": {
+      "title": "Analyser la santé du projet",
+      "subtitle": "Lire votre code. Le tableau de bord se remplit au fur et à mesure que l'analyse en apprend davantage.",
+      "waiting": "Démarrage de l'analyse…",
+      "launching": "Lancement du scanner…",
+      "collect": "Découverte de fichiers…",
+      "firstRunHint": "La première exécution compile le scanner ; les grands projets prennent un moment avant que les fichiers n'apparaissent.",
+      "paused": "En pause",
+      "stopped": "Analyse arrêtée",
+      "elapsed": "Écoulé",
+      "phase": {
+        "parse": "Analyser des fichiers",
+        "history": "Lire l'historique de Git",
+        "blame": "Âge du code informatique",
+        "usage": "Compter les références",
+        "score": "Fonctions de notation"
+      },
+      "counter": {
+        "files": "Fichiers",
+        "functions": "Fonctions",
+        "problems": "Problèmes trouvés"
+      },
+      "counters": {
+        "aria": "Compteurs d'analyse en direct"
+      },
+      "controls": {
+        "aria": "Contrôles de numérisation"
+      },
+      "btn": {
+        "pause": "Pause",
+        "resume": "CV",
+        "restart": "Redémarrage",
+        "cancel": "Annuler"
+      },
+      "preview": {
+        "heading": "Problèmes trouvés jusqu'à présent",
+        "empty": "Aucun problème trouvé pour l’instant…"
+      },
+      "version": {
+        "engine": "Moteur",
+        "detecting": "détecter…",
+        "legacy": "héritage - pas de progrès en direct (le saropa_lints de ce projet est antérieur)"
+      }
+    },
     "runReportFirst": "Exécutez à nouveau le rapport, puis copiez JSON.",
     "copiedJson": "Code Health JSON copié dans le presse-papiers.",
     "couldNotOpenFile": "Impossible d'ouvrir le fichier : {path}",

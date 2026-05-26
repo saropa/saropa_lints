@@ -691,6 +691,50 @@
     "skipToTable": "Zur Funktionstabelle springen",
     "openWorkspaceFirst": "Öffnen Sie zunächst einen Dart/Flutter-Arbeitsbereich.",
     "scanningTitle": "Code Health: Scanfunktionen…",
+    "scan": {
+      "title": "Scannen des Projektzustands",
+      "subtitle": "Lesen Sie Ihren Code. Das Dashboard füllt sich, wenn der Scan mehr erfährt.",
+      "waiting": "Scan wird gestartet…",
+      "launching": "Scanner wird gestartet…",
+      "collect": "Dateien werden entdeckt…",
+      "firstRunHint": "Beim ersten Durchlauf wird der Scanner kompiliert. Bei großen Projekten dauert es einen Moment, bis Dateien angezeigt werden.",
+      "paused": "Angehalten",
+      "stopped": "Der Scan wurde gestoppt",
+      "elapsed": "Vergangen",
+      "phase": {
+        "parse": "Parsen von Dateien",
+        "history": "Git-Geschichte lesen",
+        "blame": "Alter des Computercodes",
+        "usage": "Referenzen zählen",
+        "score": "Scoring-Funktionen"
+      },
+      "counter": {
+        "files": "Dateien",
+        "functions": "Funktionen",
+        "problems": "Probleme gefunden"
+      },
+      "counters": {
+        "aria": "Live-Scan-Zähler"
+      },
+      "controls": {
+        "aria": "Scan-Steuerelemente"
+      },
+      "btn": {
+        "pause": "Pause",
+        "resume": "Wieder aufnehmen",
+        "restart": "Neustart",
+        "cancel": "Stornieren"
+      },
+      "preview": {
+        "heading": "Bisher festgestellte Probleme",
+        "empty": "Noch keine Probleme gefunden…"
+      },
+      "version": {
+        "engine": "Motor",
+        "detecting": "erkennen…",
+        "legacy": "Legacy – kein Live-Fortschritt (saropa_lints dieses Projekts ist älter als es)"
+      }
+    },
     "runReportFirst": "Führen Sie den Bericht erneut aus und kopieren Sie dann JSON.",
     "copiedJson": "Code Health JSON in die Zwischenablage kopiert.",
     "couldNotOpenFile": "Datei konnte nicht geöffnet werden: {path}",
