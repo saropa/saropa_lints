@@ -12,6 +12,8 @@ export interface ProjectVibrancyFunctionRow {
   readonly coveragePercent: number;
   readonly complexity: number;
   readonly flags: readonly string[];
+  /** Unix seconds of the last commit that touched this function's file. */
+  readonly lastChangedEpochSec?: number;
 }
 
 export interface ProjectVibrancyGateViolation {

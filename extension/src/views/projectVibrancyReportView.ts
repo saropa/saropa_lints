@@ -7,6 +7,7 @@
 
 import * as vscode from 'vscode';
 import * as nodePath from 'node:path';
+import * as nodeFs from 'node:fs';
 import { createWebviewCspNonce, escapeHtml } from '../vibrancy/views/html-utils';
 import { getProjectRoot } from '../projectRoot';
 import { runProjectVibrancyScan } from './projectVibrancyCliRunner';
@@ -39,6 +40,10 @@ import { l10n } from '../i18n/runtime';
 
 let currentPanel: vscode.WebviewPanel | undefined;
 let lastReportRawStdout = '';
+// Absolute path of the most recently persisted report file. The dashboard
+// surfaces this as a click-to-copy / open / reveal-in-Explorer row so the user
+// has a real artifact to share or version, not just a transient webview.
+let lastReportFilePath: string | undefined;
 // Single-flight guard: a project vibrancy scan spawns a full-project AST walk
 // via `dart run`, which is heavy. Without this, every command invocation
 // (sidebar item, rescan button, command palette) starts a fresh dart process
@@ -128,8 +133,53 @@ async function runStreamingScan(
     return;
   }
   lastReportRawStdout = scan.rawStdout;
-  panel.webview.html = buildHtml(scan.payload);
+  // Persist BEFORE rendering so the dashboard can show the real path it can be
+  // copied / opened / revealed from. A failed write is non-fatal — the panel
+  // still renders, just without a file row.
+  lastReportFilePath = writeReportFile(projectRoot, scan.rawStdout);
+  panel.webview.html = buildHtml(scan.payload, lastReportFilePath);
   panel.reveal(vscode.ViewColumn.One);
+}
+
+/**
+ * Write the raw report JSON to `reports/<yyyymmdd>/<yyyymmdd>_<HHmmss>_saropa_code_health.json`
+ * under the project root. Returns the absolute path, or `undefined` on failure
+ * (a missing /reports parent dir is created; a permission error swallows so the
+ * dashboard still renders).
+ *
+ * The date-partitioned filename pattern matches the rest of the saropa toolchain
+ * so report files from multiple tools sit side-by-side in one folder per day.
+ */
+function writeReportFile(projectRoot: string, rawJson: string): string | undefined {
+  if (rawJson.trim().length === 0) return undefined;
+  try {
+    const now = new Date();
+    const day = reportDateStamp(now);
+    const time = reportTimeStamp(now);
+    const dir = nodePath.join(projectRoot, 'reports', day);
+    nodeFs.mkdirSync(dir, { recursive: true });
+    const filePath = nodePath.join(dir, `${day}_${time}_saropa_code_health.json`);
+    nodeFs.writeFileSync(filePath, rawJson);
+    return filePath;
+  } catch {
+    return undefined;
+  }
+}
+
+/** `yyyymmdd` from a Date in local time — matches saropa report naming. */
+function reportDateStamp(d: Date): string {
+  const y = String(d.getFullYear()).padStart(4, '0');
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}${m}${day}`;
+}
+
+/** `HHmmss` from a Date in local time. */
+function reportTimeStamp(d: Date): string {
+  const h = String(d.getHours()).padStart(2, '0');
+  const m = String(d.getMinutes()).padStart(2, '0');
+  const s = String(d.getSeconds()).padStart(2, '0');
+  return `${h}${m}${s}`;
 }
 
 /** Cancels the in-flight scan and starts a fresh one in the same panel. */
@@ -202,6 +252,40 @@ async function handlePanelMessage(msg: unknown): Promise<void> {
   }
   if (data.type === 'openFile' && typeof data.file === 'string') {
     await openFileAtLine(data.file, data.line ?? 1);
+    return;
+  }
+  if (data.type === 'copyReportPath') {
+    if (!lastReportFilePath) return;
+    await vscode.env.clipboard.writeText(lastReportFilePath);
+    // Inline English (not l10n) so the publish gate isn't blocked on new keys
+    // needing translation across all locales — fold into i18n in a later pass.
+    void vscode.window.showInformationMessage(
+      `Copied report path: ${lastReportFilePath}`,
+    );
+    return;
+  }
+  if (data.type === 'openReportFile') {
+    if (!lastReportFilePath) return;
+    try {
+      const doc = await vscode.workspace.openTextDocument(
+        vscode.Uri.file(lastReportFilePath),
+      );
+      await vscode.window.showTextDocument(doc);
+    } catch {
+      void vscode.window.showErrorMessage(
+        `Could not open report file: ${lastReportFilePath}`,
+      );
+    }
+    return;
+  }
+  if (data.type === 'revealReportFile') {
+    if (!lastReportFilePath) return;
+    // `revealFileInOS` opens the OS file browser at the file — Explorer on
+    // Windows, Finder on macOS, the default file manager on Linux.
+    await vscode.commands.executeCommand(
+      'revealFileInOS',
+      vscode.Uri.file(lastReportFilePath),
+    );
   }
 }
 
@@ -219,12 +303,6 @@ async function openFileAtLine(relativePath: string, line: number): Promise<void>
   } catch {
     void vscode.window.showErrorMessage(l10n('codeHealth.couldNotOpenFile', { path: relativePath }));
   }
-}
-
-/** Map report letter grade to CSS suffix (A–F); unknown → X. */
-function gradeBadgeClass(grade: string): string {
-  const c = grade.trim().charAt(0).toUpperCase();
-  return c >= 'A' && c <= 'F' ? c : 'X';
 }
 
 function resolveReportFileUri(root: string, filePathFromReport: string): vscode.Uri {
@@ -268,13 +346,25 @@ function formatRelativeFreshness(iso: string | undefined): string {
  * assert the rendered structure (KPI behavior, empty-state CTA, gate banner)
  * without standing up a real VS Code webview.
  */
-export function buildProjectVibrancyHtml(payload: ProjectVibrancyPayload): string {
-  return buildHtml(payload);
+export function buildProjectVibrancyHtml(
+  payload: ProjectVibrancyPayload,
+  reportFilePath?: string,
+): string {
+  return buildHtml(payload, reportFilePath);
 }
 
-function buildHtml(payload: ProjectVibrancyPayload): string {
+function buildHtml(
+  payload: ProjectVibrancyPayload,
+  reportFilePath?: string,
+): string {
   const summary = payload.summary ?? {};
-  const rows = [...(payload.functions ?? [])].sort((a, b) => a.score - b.score).slice(0, 200);
+  // Ship the FULL sorted list to the client — previously sliced to 200, which
+  // meant KPI clicks and the search filter only operated on a tiny prefix and
+  // produced misleading results (e.g. clicking "Test drift: 974" showed 5
+  // because only 5 of the 974 happened to be in the worst-200).
+  const rows = [...(payload.functions ?? [])].sort((a, b) => a.score - b.score);
+  const problemCount = rows.filter((r) => r.score < 50).length;
+  const complexCount = rows.filter((r) => r.flags.includes('complex')).length;
   const nonce = createWebviewCspNonce();
   const gateFailed = payload.gates?.pass === false;
   return `<!DOCTYPE html>
@@ -282,10 +372,10 @@ function buildHtml(payload: ProjectVibrancyPayload): string {
 <head>
   <meta charset="UTF-8" />
   <title>${escapeHtml(l10n('codeHealth.documentTitle'))}</title>
-  <!-- 'unsafe-inline' on style-src: hero gauge sets dynamic CSS vars (--gauge-target,
-       --gauge-arc, --gauge-color) via inline style="..." attributes. CSP nonces only
-       authorize <style> blocks, not style attributes — without 'unsafe-inline' the vars
-       are dropped, the dasharray falls back to 0, and the gauge renders as a tiny dot. -->
+  <!-- 'unsafe-inline' on style-src: score pills set their colour via inline
+       style="--score-color:hsl(...)" attributes (one per row, ~thousands per
+       report). CSP nonces only authorize <style> blocks, not style attributes —
+       without 'unsafe-inline' every pill would lose its colour. -->
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'nonce-${nonce}' 'unsafe-inline'; script-src 'nonce-${nonce}';">
   <style nonce="${nonce}">${getProjectVibrancyReportStyles()}${getKeyboardShortcutsStyles()}</style>
 </head>
@@ -293,10 +383,11 @@ function buildHtml(payload: ProjectVibrancyPayload): string {
 <a href="#pvTable" class="skip-link">${escapeHtml(l10n('codeHealth.skipToTable'))}</a>
 <div id="announcer" role="status" aria-live="polite" aria-atomic="true"></div>
 <header>
-${buildHero(payload, summary)}
+${buildHero(payload, summary, problemCount)}
 </header>
 ${gateFailed ? buildGateBanner(payload) : ''}
-${buildKpiRow(summary)}
+${buildKpiRow(summary, complexCount)}
+${buildReportFileRow(reportFilePath)}
 ${buildToolbar()}
 <div class="chip-strip" id="filter-strip" hidden></div>
 <main id="pv-main">
@@ -314,17 +405,30 @@ ${buildKeyboardShortcutsOverlay([
 </html>`;
 }
 
-/** Header band with status line + hero gauge driven by averageScore. */
-function buildHero(payload: ProjectVibrancyPayload, summary: NonNullable<ProjectVibrancyPayload['summary']>): string {
+/**
+ * Header band: status line only. The hero gauge was removed because it
+ * duplicated the average-score text right next to it (with different rounding
+ * — header said "avg 53.5 (C)", gauge said "C 54/100"), which read as a layout
+ * accident rather than a feature. Numbers in the status line now carry the
+ * same info more compactly, and a problem-count chip surfaces the triage
+ * signal (how many D/E/F functions) that the gauge silently omitted.
+ */
+function buildHero(
+  payload: ProjectVibrancyPayload,
+  summary: NonNullable<ProjectVibrancyPayload['summary']>,
+  problemCount: number,
+): string {
   const generated = formatRelativeFreshness(payload.generatedAt);
   const avgScore = typeof summary.averageScore === 'number' ? summary.averageScore : 0;
   const avgGrade = summary.averageGrade ?? '—';
   const fnCount = summary.functionCount ?? (payload.functions?.length ?? 0);
   const gateFailed = payload.gates?.pass === false;
+  const problemPillClass = problemCount === 0 ? 'good' : problemCount < 50 ? 'warn' : 'bad';
   const parts = [
     `${escapeHtml(l10n('codeHealth.hero.generated'))} <strong>${escapeHtml(generated)}</strong>`,
     pluralize(fnCount, { one: l10n('codeHealth.hero.functionOne'), other: l10n('codeHealth.hero.functionOther') }),
-    escapeHtml(l10n('codeHealth.hero.avgFormat', { score: avgScore.toFixed(1), grade: avgGrade })),
+    escapeHtml(l10n('codeHealth.hero.avgFormat', { score: Math.round(avgScore).toString(), grade: avgGrade })),
+    `<span class="pill ${problemPillClass}" title="Functions scoring under 50 (grades D, E, F)">${problemCount.toLocaleString('en-US')} problems</span>`,
     gateFailed
       ? `<span class="pill bad">${escapeHtml(l10n('codeHealth.hero.gatesFailing'))}</span>`
       : `<span class="pill good">${escapeHtml(l10n('codeHealth.hero.gatesPassing'))}</span>`,
@@ -332,38 +436,12 @@ function buildHero(payload: ProjectVibrancyPayload, summary: NonNullable<Project
   const statusLine = parts
     .map((p, i) => (i === 0 ? `<span>${p}</span>` : `<span class="dot">·</span><span>${p}</span>`))
     .join('');
-  // §15.2 — keyboard-shortcut overlay trigger appended to the status line so
-  // it sits in the hero's trailing-actions slot, consistent with the
-  // full-width toggle position on other dashboards. This dashboard does not
-  // expose the full-width toggle, so the kbd button is the sole trailing
-  // action here.
   return `<header class="dash-hero">
   <div class="hero-text">
     <h1>${escapeHtml(l10n('codeHealth.hero.title'))}</h1>
     <p class="status-line">${statusLine}${buildKeyboardShortcutsButton()}</p>
   </div>
-  ${buildHeroGauge(avgScore, avgGrade)}
 </header>`;
-}
-
-/** Hero gauge — average score on a 0–100 scale, red→green hue. */
-function buildHeroGauge(score: number, grade: string): string {
-  const rounded = Math.round(score);
-  const hsl = hslForScore(rounded);
-  const tooltip = l10n('codeHealth.gauge.tooltip', { rounded: String(rounded), grade });
-  return `<div class="hero-gauge" role="img"
-    aria-label="${escapeHtml(l10n('codeHealth.gauge.ariaLabel', { rounded: String(rounded) }))}"
-    title="${escapeHtml(tooltip)}"
-    style="--gauge-target:${rounded};--gauge-arc:100;--gauge-color:${hsl};">
-    <svg viewBox="0 0 100 100" aria-hidden="true">
-      <path class="gauge-track" d="M 15 80 A 45 45 0 1 1 85 80" pathLength="100"></path>
-      <path class="gauge-fill" d="M 15 80 A 45 45 0 1 1 85 80" pathLength="100"></path>
-    </svg>
-    <div class="gauge-label">
-      <span class="lg">${escapeHtml(grade)}</span>
-      <span class="sm">${rounded} / 100</span>
-    </div>
-  </div>`;
 }
 
 /** Banner shown when project vibrancy quality gates fail. */
@@ -397,10 +475,17 @@ function buildGateBanner(payload: ProjectVibrancyPayload): string {
  * boxes. When every category is zero, the row collapses to a single muted
  * line acknowledging the all-clear state without occupying card real estate.
  */
-function buildKpiRow(summary: NonNullable<ProjectVibrancyPayload['summary']>): string {
+function buildKpiRow(
+  summary: NonNullable<ProjectVibrancyPayload['summary']>,
+  complexCount: number,
+): string {
+  // 'complex' isn't in summary (no aggregate count in the CLI payload), so the
+  // dashboard counts it directly from the loaded rows — keeps it in lock-step
+  // with the table and the click filter, without shipping yet another CLI flag.
   const specs: KpiInput[] = [
     { flag: 'unused', label: l10n('codeHealth.kpi.unused'), value: summary.unusedCount ?? 0, sub: l10n('codeHealth.kpi.unusedSub'), classes: 'crit' },
     { flag: 'uncovered', label: l10n('codeHealth.kpi.uncovered'), value: summary.uncoveredCount ?? 0, sub: l10n('codeHealth.kpi.uncoveredSub'), classes: 'errors' },
+    { flag: 'complex', label: 'COMPLEX', value: complexCount, sub: 'high cyclomatic complexity', classes: 'warnings' },
     { flag: 'stub_tested', label: l10n('codeHealth.kpi.stubTested'), value: summary.stubTestedCount ?? 0, sub: l10n('codeHealth.kpi.stubTestedSub'), classes: 'warnings' },
     { flag: 'suspicious_coverage', label: l10n('codeHealth.kpi.suspiciousCoverage'), value: summary.suspiciousCoverageCount ?? 0, sub: l10n('codeHealth.kpi.suspiciousCoverageSub'), classes: 'warnings' },
     { flag: 'test_drift', label: l10n('codeHealth.kpi.testDrift'), value: summary.testDriftCount ?? 0, sub: l10n('codeHealth.kpi.testDriftSub'), classes: 'todos' },
@@ -437,6 +522,24 @@ function kpiCard(input: KpiInput): string {
   </button>`;
 }
 
+/**
+ * Click-to-copy / open / reveal row for the persisted JSON file. Rendered only
+ * when the write succeeded so we never lie about a file the user can't reach.
+ * Three distinct actions because each maps to a different next step the user
+ * actually takes with this artifact: copy the path to paste into a chat, open
+ * the JSON in the editor, or jump to the folder in the OS file browser.
+ */
+function buildReportFileRow(reportFilePath: string | undefined): string {
+  if (!reportFilePath) return '';
+  return `<section class="report-file" aria-label="Saved report file">
+  <span class="rf-label">Saved to</span>
+  <span class="rf-path" id="reportFilePath" title="Click to copy" tabindex="0" role="button">${escapeHtml(reportFilePath)}</span>
+  <button type="button" class="btn" id="copyReportPath" title="Copy this path to the clipboard">Copy path</button>
+  <button type="button" class="btn" id="openReportFile" title="Open the JSON in the editor">Open</button>
+  <button type="button" class="btn" id="revealReportFile" title="Reveal in the OS file browser">Reveal</button>
+</section>`;
+}
+
 /** Toolbar with one tier-1 primary (*Rescan*), tier-2 secondaries, and a search field. */
 function buildToolbar(): string {
   return `<section class="toolbar-band" role="toolbar" aria-label="${escapeHtml(l10n('codeHealth.toolbar.ariaLabel'))}">
@@ -458,23 +561,32 @@ function buildToolbar(): string {
 </section>`;
 }
 
-/** Sortable, sticky-header functions table (top 200 worst by score). */
+/**
+ * Sortable, sticky-header functions table — bound to the FULL function list
+ * (previously sliced to 200, which broke filters and KPI clicks because they
+ * only saw the prefix). Sort indicators show ONLY on the active column and in
+ * the actual direction (the previous design painted an up-arrow on every
+ * header forever, which read as decoration, not state). The grade column was
+ * dropped: it duplicated the score axis. The score itself is a colored pill
+ * (red→amber→green by value) so the value AND the bucketing are in one cell.
+ */
 function buildTable(rows: readonly ProjectVibrancyFunctionRow[]): string {
   const tbodyRows = rows.map((row) => buildTableRow(row)).join('');
+  const total = rows.length;
   return `<section class="section" aria-label="${escapeHtml(l10n('codeHealth.table.ariaLabel'))}">
-  <h2>${escapeHtml(l10n('codeHealth.table.heading'))} <span class="count">${escapeHtml(l10n('codeHealth.table.topCount', { shown: String(rows.length), total: String(rows.length) }))}</span></h2>
+  <h2>${escapeHtml(l10n('codeHealth.table.heading'))} <span class="count" id="pvShownCount">showing ${total.toLocaleString('en-US')} of ${total.toLocaleString('en-US')}</span></h2>
   <div class="dash-table-wrap">
     <table class="dash-table code-health" id="pvTable">
       <thead>
         <tr>
-          <th class="sortable col-grade" data-sort="grade" aria-sort="none">${escapeHtml(l10n('codeHealth.table.colGrade'))} <span class="arrow">▲</span></th>
-          <th class="sortable col-score" data-sort="score" aria-sort="ascending">${escapeHtml(l10n('codeHealth.table.colScore'))} <span class="arrow">▲</span></th>
-          <th class="sortable col-name"  data-sort="name"  aria-sort="none">${escapeHtml(l10n('codeHealth.table.colFunction'))} <span class="arrow">▲</span></th>
-          <th class="sortable col-file"  data-sort="file"  aria-sort="none">${escapeHtml(l10n('codeHealth.table.colFile'))} <span class="arrow">▲</span></th>
-          <th class="sortable col-line"  data-sort="line"  aria-sort="none">${escapeHtml(l10n('codeHealth.table.colLine'))} <span class="arrow">▲</span></th>
-          <th class="sortable col-usage" data-sort="usage" aria-sort="none">${escapeHtml(l10n('codeHealth.table.colUsage'))} <span class="arrow">▲</span></th>
-          <th class="sortable col-coverage" data-sort="coverage" aria-sort="none">${escapeHtml(l10n('codeHealth.table.colCoverage'))} <span class="arrow">▲</span></th>
-          <th class="sortable col-complexity" data-sort="complexity" aria-sort="none">${escapeHtml(l10n('codeHealth.table.colComplexity'))} <span class="arrow">▲</span></th>
+          <th class="sortable col-score" data-sort="score" aria-sort="ascending">${escapeHtml(l10n('codeHealth.table.colScore'))}<span class="arrow"></span></th>
+          <th class="sortable col-name"  data-sort="name"  aria-sort="none">${escapeHtml(l10n('codeHealth.table.colFunction'))}<span class="arrow"></span></th>
+          <th class="sortable col-file"  data-sort="file"  aria-sort="none">${escapeHtml(l10n('codeHealth.table.colFile'))}<span class="arrow"></span></th>
+          <th class="sortable col-line"  data-sort="line"  aria-sort="none">${escapeHtml(l10n('codeHealth.table.colLine'))}<span class="arrow"></span></th>
+          <th class="sortable col-usage" data-sort="usage" aria-sort="none">${escapeHtml(l10n('codeHealth.table.colUsage'))}<span class="arrow"></span></th>
+          <th class="sortable col-coverage" data-sort="coverage" aria-sort="none">${escapeHtml(l10n('codeHealth.table.colCoverage'))}<span class="arrow"></span></th>
+          <th class="sortable col-complexity" data-sort="complexity" aria-sort="none">${escapeHtml(l10n('codeHealth.table.colComplexity'))}<span class="arrow"></span></th>
+          <th class="sortable col-changed" data-sort="changed" aria-sort="none" title="Last commit that touched this file">Changed<span class="arrow"></span></th>
           <th class="col-flags">${escapeHtml(l10n('codeHealth.table.colFlags'))}</th>
         </tr>
       </thead>
@@ -495,26 +607,68 @@ function buildTable(rows: readonly ProjectVibrancyFunctionRow[]): string {
 }
 
 function buildTableRow(row: ProjectVibrancyFunctionRow): string {
-  const gClass = gradeBadgeClass(row.grade);
   const flags = row.flags
     .map((f) => `<span class="flag-pill ${escapeHtml(f)}">${escapeHtml(f.replace(/_/g, ' '))}</span>`)
     .join(' ');
   const flagsAttr = row.flags.join(' ');
+  // Search haystack — name + path + flags. The name comes first so a substring
+  // typed into the filter prefers function-name matches over file-path matches.
   const search = `${row.name} ${row.file} ${row.flags.join(' ')}`.toLowerCase();
-  return `<tr data-grade="${escapeHtml(row.grade)}" data-score="${row.score}" data-name="${escapeHtml(row.name)}"
+  const scoreInt = Math.round(row.score);
+  const scoreColor = hslForScore(scoreInt);
+  // Operator overrides come from the analyzer by their symbol (`==`, `<`, `[]`).
+  // Bare in a "worst functions" list they read as nonsense; prefix `operator `
+  // so the row is identifiable. (Class context would be ideal but isn't in the
+  // CLI payload today — follow-up.)
+  const displayName = /^[A-Za-z_$]/.test(row.name) ? row.name : `operator ${row.name}`;
+  const dir = lastSlashDir(row.file);
+  const base = lastSlashBase(row.file);
+  const changed = row.lastChangedEpochSec;
+  const changedText = changed ? formatRelativeAge(changed) : '—';
+  const changedSort = changed ?? 0;
+  return `<tr data-score="${row.score}" data-name="${escapeHtml(row.name)}"
     data-file="${escapeHtml(row.file)}" data-line="${row.lineStart}" data-line-end="${row.lineEnd}"
     data-usage="${row.usageCount}" data-coverage="${row.coveragePercent}" data-complexity="${row.complexity}"
-    data-flags="${escapeHtml(flagsAttr)}" data-search="${escapeHtml(search)}">
-    <td class="col-grade"><span class="grade-badge grade-${gClass}">${escapeHtml(row.grade)}</span></td>
-    <td class="col-score">${row.score.toFixed(1)}</td>
-    <td class="col-name">${escapeHtml(row.name)}</td>
-    <td class="col-file"><span class="file-link" data-file="${escapeHtml(row.file)}" data-line="${row.lineStart}">${escapeHtml(row.file)}</span></td>
+    data-changed="${changedSort}" data-flags="${escapeHtml(flagsAttr)}" data-search="${escapeHtml(search)}">
+    <td class="col-score"><span class="score-pill" style="background:${scoreColor};color:#000;" title="Score ${scoreInt}/100">${scoreInt}</span></td>
+    <td class="col-name"><span class="fn-link" data-file="${escapeHtml(row.file)}" data-line="${row.lineStart}" title="Open at line ${row.lineStart}">${escapeHtml(displayName)}</span></td>
+    <td class="col-file"><span class="file-link" data-file="${escapeHtml(row.file)}" data-line="${row.lineStart}" title="${escapeHtml(row.file)}"><span class="path-dir">${escapeHtml(dir)}</span><span class="path-base">${escapeHtml(base)}</span></span></td>
     <td class="col-line">${row.lineStart}-${row.lineEnd}</td>
-    <td class="col-usage">${row.usageCount}</td>
-    <td class="col-coverage">${row.coveragePercent.toFixed(1)}%</td>
+    <td class="col-usage">${row.usageCount.toLocaleString('en-US')}</td>
+    <td class="col-coverage">${Math.round(row.coveragePercent)}%</td>
     <td class="col-complexity">${row.complexity}</td>
+    <td class="col-changed" title="${changed ? new Date(changed * 1000).toISOString() : 'No git history available'}">${escapeHtml(changedText)}</td>
     <td class="col-flags"><span class="flag-pills">${flags}</span></td>
   </tr>`;
+}
+
+/** Trailing directory portion (including final slash), '' if none. */
+function lastSlashDir(filePath: string): string {
+  const i = filePath.lastIndexOf('/');
+  return i < 0 ? '' : filePath.slice(0, i + 1);
+}
+
+/** Basename, or the whole path if no slash. */
+function lastSlashBase(filePath: string): string {
+  const i = filePath.lastIndexOf('/');
+  return i < 0 ? filePath : filePath.slice(i + 1);
+}
+
+/**
+ * Compact relative age for the Changed column: "3d", "5w", "2mo", "1y". Per-row
+ * so it has to be terse — the column is narrow, and ISO timestamps are in the
+ * cell `title` for anyone wanting precision.
+ */
+function formatRelativeAge(epochSec: number): string {
+  const sec = Math.max(0, Math.floor(Date.now() / 1000 - epochSec));
+  if (sec < 60) return 'now';
+  if (sec < 3600) return `${Math.floor(sec / 60)}m`;
+  if (sec < 86400) return `${Math.floor(sec / 3600)}h`;
+  const days = Math.floor(sec / 86400);
+  if (days < 14) return `${days}d`;
+  if (days < 60) return `${Math.floor(days / 7)}w`;
+  if (days < 365) return `${Math.floor(days / 30)}mo`;
+  return `${Math.floor(days / 365)}y`;
 }
 
 /** Client-script strings resolved at host HTML build time. */
@@ -538,6 +692,22 @@ function buildClientScript(): string {
   document.getElementById('rescan').addEventListener('click', function() { postCmd('rescan'); });
   document.getElementById('copyJson').addEventListener('click', function() { postCmd('copyJson'); });
   document.getElementById('openPvSettings').addEventListener('click', function() { postCmd('openProjectVibrancySettings'); });
+  // Report-file action row (present only when a JSON file was written). Clicking
+  // the path itself also copies, since the path looks clickable.
+  function wireReportBtn(id, type) {
+    var el = document.getElementById(id);
+    if (el) el.addEventListener('click', function() { postCmd(type); });
+  }
+  wireReportBtn('copyReportPath', 'copyReportPath');
+  wireReportBtn('openReportFile', 'openReportFile');
+  wireReportBtn('revealReportFile', 'revealReportFile');
+  var rfPath = document.getElementById('reportFilePath');
+  if (rfPath) {
+    rfPath.addEventListener('click', function() { postCmd('copyReportPath'); });
+    rfPath.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); postCmd('copyReportPath'); }
+    });
+  }
   // The gate-failure banner now exposes its own tier-1 *Open Code Health
   // settings* button (§8.16). Wire any [data-cmd] button on the page so
   // future banner / empty-state CTAs reuse the same dispatch path.
@@ -582,13 +752,13 @@ function buildClientScript(): string {
       tr.style.display = show ? '' : 'none';
       if (show) visible++;
     });
-    // §8.16 — show the empty-state CTA only when filters reduced the table
-    // to zero rows. If there were no rows to begin with (e.g. fresh project,
-    // no scan data) we leave the table alone — that is a different empty
-    // condition handled by the upstream "no data" path, not by reset.
     if (emptyEl) emptyEl.hidden = !(visible === 0 && tbody.children.length > 0);
+    var countEl = document.getElementById('pvShownCount');
+    if (countEl) {
+      countEl.textContent = 'showing ' + visible.toLocaleString('en-US') +
+        ' of ' + total.toLocaleString('en-US');
+    }
     renderStrip();
-    // §15.3 — announce filter result count to screen readers.
     announce(visible + ' of ' + total + ' rows visible');
   }
 
@@ -638,8 +808,9 @@ function buildClientScript(): string {
 
   function val(tr, key) {
     if (key === 'score' || key === 'coverage') return parseFloat(tr.dataset[key] || '0');
-    if (key === 'usage' || key === 'complexity' || key === 'line') return parseInt(tr.dataset[key === 'line' ? 'line' : key] || '0', 10);
-    if (key === 'grade') return (tr.dataset.grade || '').toLowerCase();
+    if (key === 'usage' || key === 'complexity' || key === 'line' || key === 'changed') {
+      return parseInt(tr.dataset[key] || '0', 10);
+    }
     if (key === 'name') return (tr.dataset.name || '').toLowerCase();
     if (key === 'file') return (tr.dataset.file || '').toLowerCase();
     return '';
@@ -671,14 +842,22 @@ function buildClientScript(): string {
     });
   });
 
-  document.querySelectorAll('.file-link').forEach(function(el) {
-    el.addEventListener('click', function() {
-      const file = el.getAttribute('data-file');
-      const line = Number(el.getAttribute('data-line') || '1');
+  // Open-at-line for both the function-name and the file cells. One delegated
+  // listener on the tbody so we don't attach thousands of per-row handlers
+  // (with 18k+ rows that mattered: per-row listeners noticeably slowed render).
+  if (tbody) {
+    tbody.addEventListener('click', function(e) {
+      var t = e.target;
+      while (t && t !== tbody && !(t.classList && (t.classList.contains('fn-link') || t.classList.contains('file-link')))) {
+        t = t.parentNode;
+      }
+      if (!t || t === tbody) return;
+      var file = t.getAttribute('data-file');
+      var line = Number(t.getAttribute('data-line') || '1');
       if (!file) return;
       vscode.postMessage({ type: 'openFile', file: file, line: line });
     });
-  });
+  }
 
   function escapeHtml(s) {
     return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');

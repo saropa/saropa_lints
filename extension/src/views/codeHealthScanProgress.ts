@@ -145,7 +145,13 @@ body{font-family:var(--vscode-font-family);color:var(--vscode-foreground);backgr
 @keyframes indeterminate{0%{margin-left:-35%;}100%{margin-left:100%;}}
 @media (prefers-reduced-motion:reduce){.bar-track.indeterminate .bar-fill{animation:none;width:100%;opacity:.4;}}
 .scan-hint{margin:8px 0 0;font-size:.8rem;color:var(--vscode-descriptionForeground);}
-.current-file{margin:8px 0 0;font-family:var(--vscode-editor-font-family,monospace);font-size:.8rem;color:var(--vscode-descriptionForeground);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:1.2em;}
+.current-file{margin:8px 0 0;font-family:var(--vscode-editor-font-family,monospace);font-size:.8rem;color:var(--vscode-descriptionForeground);min-height:1.2em;display:flex;min-width:0;}
+/* File paths collapse the DIRECTORY (the truncatable part) and keep the basename
+   fully visible: cropping the end with a plain ellipsis used to eat the filename,
+   which is the one piece a reader needs to identify the file. The dir shrinks
+   first (flex:0 1), the basename never shrinks (flex:0 0). */
+.path-dir{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:0 1 auto;min-width:0;}
+.path-base{white-space:nowrap;flex:0 0 auto;}
 .counters{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:20px;}
 .counter{flex:1 1 90px;background:var(--vscode-editorWidget-background,#8881);border:1px solid var(--vscode-widget-border,#8883);border-top-width:3px;border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:2px;}
 .counter .n{font-size:1.5rem;font-weight:700;font-variant-numeric:tabular-nums;}
@@ -166,13 +172,18 @@ body{font-family:var(--vscode-font-family);color:var(--vscode-foreground);backgr
 .btn[disabled]{opacity:.5;cursor:default;}
 .preview h2{font-size:1rem;margin:0 0 8px;}
 .prob-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:4px;max-height:340px;overflow:auto;}
-.prob-list li{display:flex;align-items:center;gap:10px;padding:6px 10px;border-radius:6px;background:var(--vscode-editorWidget-background,#8881);font-size:.85rem;}
-.prob-list li.empty{background:transparent;color:var(--vscode-descriptionForeground);font-style:italic;}
-.grade{font-weight:700;width:1.4em;text-align:center;border-radius:4px;padding:1px 0;}
+/* Fixed three-column grid (grade | function | path) so the columns line up at the
+   same x on every row. The previous flex + margin-left:auto layout let each row's
+   path start wherever its function name ended, which read as ragged. */
+.prob-list li{display:grid;grid-template-columns:1.6em minmax(0,1fr) minmax(0,42%);align-items:center;column-gap:12px;padding:6px 10px;border-radius:6px;background:var(--vscode-editorWidget-background,#8881);font-size:.85rem;}
+.prob-list li.empty{display:block;background:transparent;color:var(--vscode-descriptionForeground);font-style:italic;}
+.prob-list li.clickable{cursor:pointer;}
+.prob-list li.clickable:hover{background:var(--vscode-list-hoverBackground,#8882);}
+.grade{font-weight:700;text-align:center;border-radius:4px;padding:1px 0;}
 .grade-D,.grade-E{color:var(--vscode-charts-orange,#e2a03f);}
 .grade-F{color:var(--vscode-charts-red,#f14c4c);}
-.prob-name{font-family:var(--vscode-editor-font-family,monospace);}
-.prob-file{margin-left:auto;color:var(--vscode-descriptionForeground);font-size:.78rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:45%;}
+.prob-name{font-family:var(--vscode-editor-font-family,monospace);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.prob-file{display:flex;min-width:0;color:var(--vscode-descriptionForeground);font-size:.78rem;}
 .ver-foot{margin-top:28px;padding-top:12px;border-top:1px solid var(--vscode-widget-border,#8883);font-size:.78rem;color:var(--vscode-descriptionForeground);display:flex;gap:8px;align-items:center;}
 .ver-brand{font-weight:600;}
 .ver-tag{font-family:var(--vscode-editor-font-family,monospace);color:var(--vscode-charts-blue,#3794ff);opacity:.85;}
@@ -210,16 +221,31 @@ function scanScript(): string {
     if (remaining <= 0){ el.textContent = ''; return; }
     el.textContent = '~' + fmtDuration(remaining) + ' left';
   }
+  // Human-friendly elapsed/remaining: seconds under a minute, m+s under an hour,
+  // h+m above it (seconds are dropped past an hour — noise at that scale). A raw
+  // "6762s" is unreadable; "1h 52m" is not.
   function fmtDuration(s){
     if (s < 60) return s + 's';
-    var m = Math.floor(s / 60);
-    var r = s % 60;
-    return r === 0 ? m + 'm' : m + 'm ' + r + 's';
+    if (s < 3600){
+      var m = Math.floor(s / 60);
+      var rs = s % 60;
+      return rs === 0 ? m + 'm' : m + 'm ' + rs + 's';
+    }
+    var h = Math.floor(s / 3600);
+    var rm = Math.floor((s % 3600) / 60);
+    return rm === 0 ? h + 'h' : h + 'h ' + rm + 'm';
+  }
+  // Thousands separators so six-figure file/function counts stay readable.
+  // en-US locale forces comma grouping regardless of the host's locale; a regex
+  // can't be used here because this whole script lives inside a template literal,
+  // where \\d / \\B in a regex would collapse to plain d / B.
+  function fmtNum(n){
+    return Number(n || 0).toLocaleString('en-US');
   }
 
   setInterval(function(){
     var s = Math.floor((Date.now()-started)/1000);
-    document.getElementById('cElapsed').textContent = s + 's';
+    document.getElementById('cElapsed').textContent = fmtDuration(s);
   }, 1000);
 
   // If no 'meta' event has arrived after a generous window (covers a cold
@@ -273,39 +299,81 @@ function scanScript(): string {
     } else if (ev.event === 'tick'){
       if (typeof ev.total === 'number' && ev.total > 0){
         goDeterminate();
-        var pct = Math.min(100, Math.round((ev.done/ev.total)*100));
+        // One decimal: on a multi-thousand-file phase a whole-number percent sits
+        // on the same value for dozens of ticks and reads as stalled; the decimal
+        // keeps visibly moving. clamp to 100 so float drift can't print 100.1.
+        var pct = Math.min(100, (ev.done/ev.total)*100);
         document.getElementById('barFill').style.width = pct + '%';
-        document.getElementById('phasePct').textContent = pct + '%';
+        document.getElementById('phasePct').textContent = pct.toFixed(1) + '%';
         updateEta(ev.done, ev.total);
       }
       if (ev.phase === 'parse'){
-        document.getElementById('cFiles').textContent = ev.done || 0;
-        if (typeof ev.functions === 'number') document.getElementById('cFns').textContent = ev.functions;
+        document.getElementById('cFiles').textContent = fmtNum(ev.done || 0);
+        if (typeof ev.functions === 'number') document.getElementById('cFns').textContent = fmtNum(ev.functions);
       }
       if (ev.file){
-        var cf = document.getElementById('currentFile');
-        cf.textContent = ev.file; cf.title = ev.file;
+        applyPath(document.getElementById('currentFile'), ev.file);
       }
     } else if (ev.event === 'row'){
       addProblem(ev);
     }
   }
 
+  // Render a path into the element as a truncatable directory span + an
+  // always-visible basename span, so the filename is never the part that gets
+  // cropped. The CLI already emits posix-separated paths (forward slashes), so
+  // no backslash normalization is needed here.
+  function applyPath(el, path){
+    if (!el) return;
+    var p = path || '';
+    el.textContent = '';
+    el.title = p;
+    var cut = p.lastIndexOf('/');
+    if (cut >= 0){
+      var dir = document.createElement('span');
+      dir.className = 'path-dir';
+      dir.textContent = p.slice(0, cut + 1);
+      el.appendChild(dir);
+    }
+    var base = document.createElement('span');
+    base.className = 'path-base';
+    base.textContent = cut >= 0 ? p.slice(cut + 1) : p;
+    el.appendChild(base);
+  }
+
+  // Dart reports operator overrides by their symbol (==, <, []). Shown bare in a
+  // "worst functions" list they read as nonsense, so label them as operators.
+  function displayName(n){
+    if (!n) return '';
+    return /^[A-Za-z_$]/.test(n) ? n : 'operator ' + n;
+  }
+
   function addProblem(ev){
     if (probEmpty){ probEmpty.remove(); probEmpty = null; }
     problems++;
-    document.getElementById('cProb').textContent = problems;
+    document.getElementById('cProb').textContent = fmtNum(problems);
+    var label = displayName(ev.name);
     var li = document.createElement('li');
     var g = document.createElement('span');
     g.className = 'grade grade-' + (ev.grade||'F');
     g.textContent = ev.grade || 'F';
     var name = document.createElement('span');
     name.className = 'prob-name';
-    name.textContent = ev.name || '';
+    name.textContent = label;
     var file = document.createElement('span');
     file.className = 'prob-file';
-    file.textContent = ev.file || '';
+    applyPath(file, ev.file || '');
     li.appendChild(g); li.appendChild(name); li.appendChild(file);
+    // Clicking the row opens the function at its line (host handles 'openFile').
+    if (ev.file){
+      li.className = 'clickable';
+      li.setAttribute('role', 'button');
+      li.setAttribute('tabindex', '0');
+      li.title = label + ' — ' + ev.file;
+      var open = function(){ vscode.postMessage({type:'openFile', file: ev.file, line: ev.line || 1}); };
+      li.addEventListener('click', open);
+      li.addEventListener('keydown', function(e){ if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); open(); } });
+    }
     var list = document.getElementById('probList');
     list.appendChild(li);
     list.scrollTop = list.scrollHeight;
@@ -324,6 +392,8 @@ function scanScript(): string {
     if (paused){ vscode.postMessage({type:'resume'}); setPaused(false); }
     else { vscode.postMessage({type:'pause'}); setPaused(true); }
   });
+  // Restart and Cancel act immediately — no Y/N confirmation. A scan is cheap to
+  // re-run and easy to restart, so a confirmation dialog is friction, not safety.
   document.getElementById('btnRestart').addEventListener('click', function(){
     setPaused(false); problems = 0; vscode.postMessage({type:'restart'});
   });

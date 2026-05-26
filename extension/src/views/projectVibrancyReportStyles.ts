@@ -20,28 +20,121 @@ export function getProjectVibrancyReportStyles(): string {
     gradeAndFlagPillStyles(),
     gateBannerStyles(),
     healthSummaryStateStyles(),
+    reportFileRowStyles(),
   ].join('\n');
 }
 
-/** Code Health table column widths and minor spacing on top of `.dash-table`. */
+/**
+ * Saved-report-file action row: a monospace path the user can click to copy,
+ * with explicit Copy / Open / Reveal buttons. Rendered as a strip directly
+ * under the KPI cards so it sits next to the data it summarises rather than
+ * being buried in the toolbar.
+ */
+function reportFileRowStyles(): string {
+  return `
+.report-file {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px 0;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface-2);
+  font-size: 0.9em;
+}
+.report-file .rf-label { color: var(--muted); flex: 0 0 auto; }
+.report-file .rf-path {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--vscode-editor-font-family, ui-monospace, monospace);
+  color: var(--link);
+  cursor: pointer;
+}
+.report-file .rf-path:hover { text-decoration: underline; }
+.report-file .btn { flex: 0 0 auto; }
+`;
+}
+
+/**
+ * Code Health table column widths and minor spacing on top of `.dash-table`.
+ *
+ * Score is rendered as a colored *pill* (red→amber→green by value) so the cell
+ * carries both the value and the bucketing at a glance — no separate grade
+ * column needed. Sort arrows are hidden by default and revealed only on the
+ * column currently being sorted on (the old design painted an up-arrow on every
+ * header forever, which read as decoration rather than state).
+ */
 function codeHealthTableStyles(): string {
   return `
 .dash-table.code-health th, .dash-table.code-health td { padding: 5px 8px; }
-.dash-table.code-health .col-grade { width: 56px; text-align: center; }
-.dash-table.code-health .col-score { width: 64px; text-align: right; font-variant-numeric: tabular-nums; }
+.dash-table.code-health .col-score { width: 62px; text-align: center; }
 .dash-table.code-health .col-name  { width: 22%; }
 .dash-table.code-health .col-file  { width: 26%; }
 .dash-table.code-health .col-line  { width: 80px; text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); white-space: nowrap; }
 .dash-table.code-health .col-usage,
 .dash-table.code-health .col-coverage,
 .dash-table.code-health .col-complexity { width: 80px; text-align: right; font-variant-numeric: tabular-nums; }
+.dash-table.code-health .col-changed { width: 80px; text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); white-space: nowrap; }
 .dash-table.code-health .col-flags { color: var(--muted); }
-.dash-table.code-health .file-link {
+.dash-table.code-health .fn-link {
   cursor: pointer;
   color: var(--link);
   font-family: var(--vscode-editor-font-family, ui-monospace, monospace);
 }
+.dash-table.code-health .fn-link:hover { text-decoration: underline; }
+.dash-table.code-health .file-link {
+  cursor: pointer;
+  color: var(--link);
+  font-family: var(--vscode-editor-font-family, ui-monospace, monospace);
+  display: inline-flex;
+  min-width: 0;
+  max-width: 100%;
+}
 .dash-table.code-health .file-link:hover { text-decoration: underline; }
+/* Path truncation collapses the DIRECTORY and keeps the basename whole, so the
+   filename is never the part that gets cropped (end-ellipsis on the whole
+   string used to eat the filename, leaving an unreadable stub like
+   '…/drift_midd…'). Dir shrinks first (flex:0 1), basename never shrinks
+   (flex:0 0). */
+.dash-table.code-health .path-dir { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 0 1 auto; min-width: 0; }
+.dash-table.code-health .path-base { white-space: nowrap; flex: 0 0 auto; }
+/* Score pill: background is set inline per-row from hslForScore (red→amber→
+   green). Black text wins contrast on every hue in the ramp; the previous
+   yellow-on-yellow pill was unreadable. Tabular numerals so a column of pills
+   visually aligns regardless of digit count. */
+.dash-table.code-health .score-pill {
+  display: inline-block;
+  min-width: 30px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.82em;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  line-height: 1.2;
+}
+/* Sort-arrow visibility: render the chevron ONLY on the actively-sorted column,
+   and rotate by sort direction. Idle headers show no decoration. */
+.dash-table.code-health th.sortable .arrow {
+  display: inline-block;
+  width: 0;
+  height: 0;
+  margin-left: 6px;
+  vertical-align: middle;
+  visibility: hidden;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-bottom: 5px solid currentColor;
+}
+.dash-table.code-health th.sortable[aria-sort="ascending"] .arrow,
+.dash-table.code-health th.sortable[aria-sort="descending"] .arrow {
+  visibility: visible;
+}
+.dash-table.code-health th.sortable[aria-sort="descending"] .arrow { transform: rotate(180deg); }
 `;
 }
 

@@ -87,6 +87,7 @@ class ProjectVibrancyFunctionResult {
     required this.coveragePercent,
     required this.complexity,
     required this.flags,
+    this.lastChangedEpochSec,
   });
 
   final String id;
@@ -106,6 +107,10 @@ class ProjectVibrancyFunctionResult {
   final double coveragePercent;
   final int complexity;
   final List<String> flags;
+  /// Unix seconds of the last commit that touched the function's file, or null
+  /// when git history is unavailable (no repo, brand-new file). Surfaced per
+  /// row so the report can show "changed 3d ago" for triage.
+  final int? lastChangedEpochSec;
 
   Map<String, Object> toJson() => <String, Object>{
     'id': id,
@@ -127,6 +132,7 @@ class ProjectVibrancyFunctionResult {
     'coveragePercent': coveragePercent,
     'complexity': complexity,
     'flags': flags,
+    if (lastChangedEpochSec != null) 'lastChangedEpochSec': lastChangedEpochSec!,
   };
 }
 
@@ -214,20 +220,13 @@ Future<ProjectVibrancyReport> runProjectVibrancy(
     if (!file.existsSync()) continue;
     final content = file.readAsStringSync();
     fileContents[filePath] = content;
-    // throwIfDiagnostics:false is essential — a Code Health scan runs over
-    // possibly-broken source (a consumer project mid-edit, an example fixture
-    // with intentional violations). The analyzer default throws on ANY parse
-    // diagnostic (e.g. await_in_wrong_context), which previously aborted the
-    // whole scan on the first imperfect file. Tolerate diagnostics and keep
-    // scanning the rest of the project.
-    final parsed = parseString(
-      content: content,
-      path: filePath,
-      throwIfDiagnostics: false,
-    );
-    final collector = _FunctionCollector(content: content, filePath: filePath);
-    parsed.unit.accept(collector);
-    declaredFunctions.addAll(collector.functions);
+    // Parse via the hash cache: a file unchanged since the last run is not
+    // re-parsed, and the usage phase reuses this same parse rather than parsing
+    // the file a second time. The read above still happens (needed to hash and
+    // to score documentation), but the read is cheap; the parse is not.
+    final relPath = p.relative(filePath, from: root).replaceAll('\\', '/');
+    final parsed = _parseFileCached(filePath, relPath, content, cache);
+    declaredFunctions.addAll(parsed.functions);
   }
 
   final pathsForGit = <String>{};
@@ -271,6 +270,7 @@ Future<ProjectVibrancyReport> runProjectVibrancy(
   final usageCounts = _computeUsageCounts(
     extendedForUsage,
     declaredFunctions,
+    cache: cache,
     progress: progress,
     root: root,
   );
@@ -381,6 +381,10 @@ Future<ProjectVibrancyReport> runProjectVibrancy(
         coveragePercent: _round1((rawCoverage ?? 0) * 100),
         complexity: fn.complexity,
         flags: flags,
+        // Per-row "changed N ago" surfaces in the report for triage; the same
+        // map is already consumed above for test-drift, so we're not paying
+        // for extra git work here.
+        lastChangedEpochSec: commitEpoch[fn.filePath],
       ),
     );
     // Stream a bounded sample of problem functions (grade D and worse) so the
@@ -421,14 +425,19 @@ Future<ProjectVibrancyReport> runProjectVibrancy(
   );
 }
 
-/// Directory names pruned from the file walk. None hold the project's own
-/// scannable `lib/` sources, but on a real Flutter app they are huge (build
-/// outputs, the pub cache, generated tool state) or contain symlink loops
-/// (iOS/macOS `Pods`, plugin `.symlinks`). Walking them with `followLinks` was
-/// the dominant cost of the long "0 files" dead-zone before the first progress
-/// event — and could hang outright on a symlink cycle. Pruning the *traversal*
-/// does not change which files are scanned: the `/lib/` + `.dart` + `build/`
-/// filters below already excluded everything under these directories.
+/// Directory names pruned from the file walk. Most hold no scannable `lib/`
+/// sources but on a real Flutter app are huge (build outputs, the pub cache,
+/// generated tool state) or contain symlink loops (iOS/macOS `Pods`, plugin
+/// `.symlinks`). Walking them with `followLinks` was the dominant cost of the
+/// long "0 files" dead-zone before the first progress event — and could hang
+/// outright on a symlink cycle.
+///
+/// `dependency_overrides` is the deliberate exception: it DOES contain `/lib/`
+/// sources, so the `/lib/` + `.dart` filters below would otherwise scan it. But
+/// those are vendored copies of third-party packages the user can't act on, and
+/// scoring them only floods the report with un-actionable rows (a bare `==`
+/// operator from a dependency, generated parsers, etc.). Prune it so the report
+/// stays focused on code the user owns.
 bool _isPrunedScanDir(String name) {
   switch (name) {
     case '.git':
@@ -442,6 +451,7 @@ bool _isPrunedScanDir(String name) {
     case 'build':
     case 'node_modules':
     case 'Pods':
+    case 'dependency_overrides':
       return true;
     default:
       return false;
@@ -670,11 +680,13 @@ double? _computeCoverage(_FunctionNode fn, Set<int>? hitLines) {
 Map<String, int> _computeUsageCounts(
   Map<String, String> contents,
   List<_FunctionNode> functions, {
+  required _ProjectVibrancyCache cache,
   ProjectScanProgress? progress,
   String? root,
 }) {
   final referencesByName = _collectReferenceCounts(
     contents,
+    cache: cache,
     progress: progress,
     root: root,
   );
@@ -687,6 +699,7 @@ Map<String, int> _computeUsageCounts(
 
 Map<String, int> _collectReferenceCounts(
   Map<String, String> contents, {
+  required _ProjectVibrancyCache cache,
   ProjectScanProgress? progress,
   String? root,
 }) {
@@ -699,18 +712,16 @@ Map<String, int> _collectReferenceCounts(
   var usageDone = 0;
   for (final entry in contents.entries) {
     usageDone++;
-    // throwIfDiagnostics:false: same robustness reason as the primary parse —
-    // reference counting must not crash on a file the analyzer flags.
-    final parsed = parseString(
-      content: entry.value,
-      path: entry.key,
-      throwIfDiagnostics: false,
-    );
-    final visitor = _ReferenceVisitor();
-    parsed.unit.accept(visitor);
-    for (final name in visitor.references) {
-      counts.update(name, (c) => c + 1, ifAbsent: () => 1);
-    }
+    final relPath = root == null
+        ? entry.key.replaceAll('\\', '/')
+        : p.relative(entry.key, from: root).replaceAll('\\', '/');
+    // Lib files are a cache hit here (already parsed in the parse phase); only
+    // test files actually parse, so no file is parsed twice in one run. `refs`
+    // is per-occurrence per file, so accumulate by its count, not by 1.
+    final parsed = _parseFileCached(entry.key, relPath, entry.value, cache);
+    parsed.refs.forEach((name, n) {
+      counts.update(name, (c) => c + n, ifAbsent: () => n);
+    });
     if (usageDone % 25 == 0 || usageDone == contents.length) {
       progress?.onEvent(<String, Object?>{
         'event': 'tick',
@@ -958,13 +969,68 @@ Future<String?> _gitBlobHash(String filePath) async {
 }
 
 String _stableHash(String input) {
-  // Lightweight deterministic hash for cache keying.
+  // Lightweight deterministic hash for cache keying. FNV-1a 32-bit: a collision
+  // would need a file to change into different content with the same hash (~1 in
+  // 4 billion per edit, and scoped per path), so at worst one function shows a
+  // stale metric until its next change — acceptable for a local perf cache.
   var h = 2166136261;
   for (final u in input.codeUnits) {
     h ^= u;
     h = (h * 16777619) & 0xffffffff;
   }
   return h.toRadixString(16);
+}
+
+/// Bump when the parse-derived data shape or extraction logic changes (new
+/// `_FunctionNode` field, a different complexity formula), so a stale on-disk
+/// parse cache is discarded rather than trusted. Per-file content hashing only
+/// catches *file* changes; this catches *engine* changes.
+const int _parseCacheVersion = 1;
+
+/// Per-file parse output, reused across phases and runs: the collected functions
+/// and the per-occurrence reference counts (`name -> times referenced in this
+/// file`). Parsing is the dominant scan cost, so caching this is what makes a
+/// rescan cheap.
+class _FileParse {
+  const _FileParse(this.functions, this.refs);
+  final List<_FunctionNode> functions;
+  final Map<String, int> refs;
+}
+
+/// Parse a file's [content] at most once. A hit (same path, same content hash,
+/// same engine version) returns the cached functions/refs without calling
+/// `parseString` — the expensive step. The parse phase (needs functions) and the
+/// usage phase (needs refs) both call this, so a lib file is parsed once per run
+/// instead of twice, and an unchanged file is not parsed at all on the next run.
+_FileParse _parseFileCached(
+  String absPath,
+  String relPath,
+  String content,
+  _ProjectVibrancyCache cache,
+) {
+  final hash = _stableHash(content);
+  final cached = cache.getParse(relPath, hash, absPath);
+  if (cached != null) return cached;
+  // throwIfDiagnostics:false is essential — a Code Health scan runs over
+  // possibly-broken source (a consumer project mid-edit, an example fixture with
+  // intentional violations). The analyzer default throws on ANY parse diagnostic,
+  // which would abort the whole scan on the first imperfect file.
+  final parsed = parseString(
+    content: content,
+    path: absPath,
+    throwIfDiagnostics: false,
+  );
+  final collector = _FunctionCollector(content: content, filePath: absPath);
+  parsed.unit.accept(collector);
+  final refVisitor = _ReferenceVisitor();
+  parsed.unit.accept(refVisitor);
+  final refs = <String, int>{};
+  for (final name in refVisitor.references) {
+    refs.update(name, (c) => c + 1, ifAbsent: () => 1);
+  }
+  final result = _FileParse(collector.functions, refs);
+  cache.setParse(relPath, hash, result);
+  return result;
 }
 
 class _ProjectVibrancyCache {
@@ -974,19 +1040,25 @@ class _ProjectVibrancyCache {
   final Map<String, Object?> data;
 
   static _ProjectVibrancyCache open(String path) {
+    final cache = _ProjectVibrancyCache(path, _loadData(path));
+    cache._normalizeParseTable();
+    return cache;
+  }
+
+  static Map<String, Object?> _freshData() => <String, Object?>{
+    'schemaVersion': 1,
+    'blameByBlob': <String, Object?>{},
+    'lcovByFingerprint': <String, Object?>{},
+    'parseSchemaVersion': _parseCacheVersion,
+    'parseByPath': <String, Object?>{},
+  };
+
+  static Map<String, Object?> _loadData(String path) {
     final file = File(path);
-    if (!file.existsSync()) {
-      return _ProjectVibrancyCache(path, <String, Object?>{
-        'schemaVersion': 1,
-        'blameByBlob': <String, Object?>{},
-        'lcovByFingerprint': <String, Object?>{},
-      });
-    }
+    if (!file.existsSync()) return _freshData();
     try {
       final decoded = jsonDecode(file.readAsStringSync());
-      if (decoded is Map<String, Object?>) {
-        return _ProjectVibrancyCache(path, decoded);
-      }
+      if (decoded is Map<String, Object?>) return decoded;
       stderr.writeln(
         'Project vibrancy cache ignored: root JSON is not an object.',
       );
@@ -994,11 +1066,18 @@ class _ProjectVibrancyCache {
       stderr.writeln('Project vibrancy cache ignored: $e');
       stderr.writeln('$st');
     }
-    return _ProjectVibrancyCache(path, <String, Object?>{
-      'schemaVersion': 1,
-      'blameByBlob': <String, Object?>{},
-      'lcovByFingerprint': <String, Object?>{},
-    });
+    return _freshData();
+  }
+
+  /// Drop the parse table when it predates the current extraction logic (or is
+  /// malformed), so a stale complexity/score shape can't leak into a fresh
+  /// report. Blame/lcov tables are content-fingerprinted and survive a bump.
+  void _normalizeParseTable() {
+    if (data['parseSchemaVersion'] != _parseCacheVersion ||
+        data['parseByPath'] is! Map) {
+      data['parseSchemaVersion'] = _parseCacheVersion;
+      data['parseByPath'] = <String, Object?>{};
+    }
   }
 
   Map<int, int>? getBlame(String blobHash) {
@@ -1038,6 +1117,73 @@ class _ProjectVibrancyCache {
     final table = (data['lcovByFingerprint'] as Map?) ?? <String, Object?>{};
     data['lcovByFingerprint'] = table;
     table[fingerprint] = byFile.map((k, v) => MapEntry(k, v.toList()..sort()));
+  }
+
+  /// Cached parse for [relPath], but only when [contentHash] still matches — a
+  /// changed file misses and is re-parsed. `id`/`filePath` are rebuilt from the
+  /// current [absPath] so the cache stays valid across checkout locations.
+  _FileParse? getParse(String relPath, String contentHash, String absPath) {
+    final table = data['parseByPath'];
+    if (table is! Map) return null;
+    final entry = table[relPath];
+    if (entry is! Map || entry['hash'] != contentHash) return null;
+    final rawFns = entry['functions'];
+    final rawRefs = entry['refs'];
+    if (rawFns is! List || rawRefs is! Map) return null;
+    final functions = <_FunctionNode>[];
+    for (final f in rawFns) {
+      if (f is! Map) return null;
+      final name = f['name'];
+      final start = f['lineStart'];
+      final end = f['lineEnd'];
+      final complexity = f['complexity'];
+      final hasDoc = f['hasDocComment'];
+      if (name is! String ||
+          start is! int ||
+          end is! int ||
+          complexity is! int ||
+          hasDoc is! bool) {
+        return null;
+      }
+      functions.add(
+        _FunctionNode(
+          id: '$absPath:$name:$start',
+          filePath: absPath,
+          name: name,
+          lineStart: start,
+          lineEnd: end,
+          complexity: complexity,
+          hasDocComment: hasDoc,
+        ),
+      );
+    }
+    final refs = <String, int>{};
+    rawRefs.forEach((k, v) {
+      if (k is String && v is int) refs[k] = v;
+    });
+    return _FileParse(functions, refs);
+  }
+
+  void setParse(String relPath, String contentHash, _FileParse parse) {
+    final table = (data['parseByPath'] as Map?) ?? <String, Object?>{};
+    data['parseByPath'] = table;
+    // filePath/id are intentionally omitted — rebuilt on load from the current
+    // path, keeping the cache portable between machines and checkouts.
+    table[relPath] = <String, Object?>{
+      'hash': contentHash,
+      'functions': parse.functions
+          .map(
+            (f) => <String, Object?>{
+              'name': f.name,
+              'lineStart': f.lineStart,
+              'lineEnd': f.lineEnd,
+              'complexity': f.complexity,
+              'hasDocComment': f.hasDocComment,
+            },
+          )
+          .toList(growable: false),
+      'refs': parse.refs,
+    };
   }
 
   void save() {
