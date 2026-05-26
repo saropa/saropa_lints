@@ -296,40 +296,43 @@ int square(int n) => n * n;
       if (tempDir.existsSync()) tempDir.deleteSync(recursive: true);
     });
 
-    test('does not throw on a file the analyzer flags (parse diagnostic)', () async {
-      // `await` outside an async function is a parse-level diagnostic. Before
-      // throwIfDiagnostics:false this aborted the entire scan with an unhandled
-      // exception; the scan must now tolerate it and still produce a report.
-      File('${tempDir.path}/lib/broken.dart').writeAsStringSync('''
+    test(
+      'does not throw on a file the analyzer flags (parse diagnostic)',
+      () async {
+        // `await` outside an async function is a parse-level diagnostic. Before
+        // throwIfDiagnostics:false this aborted the entire scan with an unhandled
+        // exception; the scan must now tolerate it and still produce a report.
+        File('${tempDir.path}/lib/broken.dart').writeAsStringSync('''
 int bad() {
   await something();
   return 0;
 }
 ''');
-      final report = await runProjectVibrancy(
-        ProjectVibrancyOptions(projectPath: tempDir.path),
-      );
-      expect(report.functions, isNotEmpty);
-      // The healthy file is still scored despite the broken sibling.
-      expect(report.functions.any((f) => f.name == 'square'), isTrue);
-    });
+        final report = await runProjectVibrancy(
+          ProjectVibrancyOptions(projectPath: tempDir.path),
+        );
+        expect(report.functions, isNotEmpty);
+        // The healthy file is still scored despite the broken sibling.
+        expect(report.functions.any((f) => f.name == 'square'), isTrue);
+      },
+    );
 
-    test('emits phase + tick progress events through ProjectScanProgress', () async {
-      final events = <Map<String, Object?>>[];
-      await runProjectVibrancy(
-        ProjectVibrancyOptions(projectPath: tempDir.path),
-        progress: ProjectScanProgress(
-          onEvent: events.add,
-          gate: () async {},
-        ),
-      );
-      final phases = events
-          .where((e) => e['event'] == 'phase')
-          .map((e) => e['phase'])
-          .toSet();
-      expect(phases, containsAll(<String>['parse', 'score']));
-      expect(events.any((e) => e['event'] == 'tick'), isTrue);
-    });
+    test(
+      'emits phase + tick progress events through ProjectScanProgress',
+      () async {
+        final events = <Map<String, Object?>>[];
+        await runProjectVibrancy(
+          ProjectVibrancyOptions(projectPath: tempDir.path),
+          progress: ProjectScanProgress(onEvent: events.add, gate: () async {}),
+        );
+        final phases = events
+            .where((e) => e['event'] == 'phase')
+            .map((e) => e['phase'])
+            .toSet();
+        expect(phases, containsAll(<String>['parse', 'score']));
+        expect(events.any((e) => e['event'] == 'tick'), isTrue);
+      },
+    );
 
     test('a throwing gate aborts the scan (cancel path)', () async {
       // The CLI wires cancel to a gate that throws; runProjectVibrancy must let

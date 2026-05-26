@@ -115,7 +115,7 @@ class LineClassifier {
 
   /// Consumes a string literal starting at the opening quote [qi]. Handles
   /// triple-quoted (possibly multiline) and escapes (skipped when [raw]).
-  /// Returns the index after the closing quote, or sets [_triple] and returns
+  /// Returns the index after the closing quote, or sets `_triple` and returns
   /// [line.length] when a triple string runs past the line.
   int _consumeString(String line, int qi, String q, bool raw) {
     final n = line.length;

@@ -73,6 +73,17 @@ Future<List<HistoryPoint>> loadHealthHistory(
 
 /// Most recent [maxTags] tags, returned oldest-first (chronological).
 List<String> _recentTags(String projectPath, int maxTags) {
+  // git climbs the directory tree looking for a repo, so running `git tag`
+  // from a non-repo subdirectory of another repo silently inherits the
+  // parent's tags. That misreports a stranger repo's history as the project's
+  // own — for example when the test runner places its temp dirs under
+  // build/test_tmp inside this repo. Require projectPath to host its own .git
+  // entry (a directory for regular repos, a file for worktrees) before
+  // trusting git to answer for it.
+  if (FileSystemEntity.typeSync(p.join(projectPath, '.git')) ==
+      FileSystemEntityType.notFound) {
+    return const [];
+  }
   final r = Process.runSync('git', [
     '-C',
     projectPath,

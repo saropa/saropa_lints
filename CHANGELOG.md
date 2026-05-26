@@ -35,41 +35,37 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 **Open VSX Registry** — [open-vsx.org/extension/saropa/saropa-lints](https://open-vsx.org/extension/saropa/saropa-lints)
 
-<!-- MAINTEANCE NOTES -- IMPORTANT --
+<!-- MAINTENANCE NOTES -- IMPORTANT --
 
-    All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+    Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). Versioning: [SemVer](https://semver.org/spec/v2.0.0.html). Omit dates from headers; [pub.dev](https://pub.dev/packages/saropa_lints/changelog) displays them.
 
-    Dates are not included in version headers — [pub.dev](https://pub.dev/packages/saropa_lints/changelog) displays publish dates separately.
+    **Overview** — Every release (and [Unreleased]) opens with a 2–4 sentence user-facing summary. Do not restate the detailed bullets. Banned in the overview: file paths, line numbers, regex snippets, internal flag names, project-specific counts or percentages, and AST or visitor terminology. End with `[log](https://github.com/saropa/saropa_lints/blob/vX.Y.Z/CHANGELOG.md)` (no preceding line break), substituting the version.
 
-    Each release (and [Unreleased]) opens with a short plain-language **overview** for humans — user-facing only, casual wording, 2–4 sentences max. Summarize what changed from the user's point of view; do NOT restate implementation details from the `### Added/Changed/Fixed` sections below. Hard bans in the overview: line numbers, file paths, regex snippets, internal flag names (`multiLine: true`, `requiredPatterns`, etc.), specific counts/percentages from particular projects ("22,695 issues on project X", "96.8% of the backlog"), AST/visitor terminology. If a reader would have to open the code to understand a phrase, it belongs in the detailed section — not the overview. End the overview (no linebreak) with: [log](https://github.com/saropa/saropa_lints/blob/vX.Y.Z/CHANGELOG.md) substituting X.Y.Z.
+    **Bullet density (HARD RULE)** — Applies to every bullet under `### Added`, `### Changed`, `### Fixed`, `### Removed`, and their `(Extension)` variants. One sentence per bullet, ordered: *what changed → why the user cares → what the user must do* (write "No action required" when true). A second sentence is permitted only when a required user action does not fit in the first. Three-sentence bullets are forbidden — split, or move detail to the commit message, PR, bug report, or code comment, and link out. Concision edits may touch historical sections.
 
-    **Bullet density (HARD RULE — applies to every entry under `### Added` / `### Changed` / `### Fixed` / `### Removed`, including `### Added (Extension)` / `### Fixed (Extension)` / `### Changed (Extension)` and similar)** — One sentence per bullet. That sentence answers, in order: *what changed* → *why the user cares* → *what the user must do* (say "No action required" explicitly when true). A second sentence is allowed ONLY when a concrete user action (migration step, config line to remove) cannot fit in the first. Three-sentence bullets are forbidden — split into multiple bullets, or move the detail to the commit message, PR description, bug report, or inline code comment. When a bullet genuinely needs more context, LINK OUT to those places; do not inline the explanation. Concision edits may touch historical sections on purpose.
+    **Banned inside bullets** (move to commit message, PR, or code comment):
+    - **PR archaeology** — prior attempts, rename history, "after X didn't hold". Describe the landed state only.
+    - **File-by-file inventories** — that is the git diff.
+    - **Test counts** — that is CI output.
+    - **Code-internal names** — AST classes, regex flags, function signatures, field or type names, private identifiers.
+    - **Bug-report, fixture, or test paths** — commit message footer only.
+    - **Decision-making narrative** — one clause of reasoning is fine; a paragraph is not.
 
-    Hard bans inside bullets (send any of these to the commit message / PR / code comments instead):
-    - **PR archaeology** — narrative of prior failed attempts, rename history, "after X didn't hold…". The changelog describes the landed state.
-    - **File-by-file inventories** — `Removed from config_rules.dart, saropa_lints.dart, tiers.dart, …`. That's the git diff.
-    - **Test counts** — `8,585 Dart tests pass` / `817 passing, 1 failing (unrelated)`. That's CI output.
-    - **Code-internal names** — AST visitor classes, regex flags (`multiLine: true`), function signatures (`flushReport(root, options?)`), field names, type names, private identifiers. If a reader would need the source to understand the phrase, it does not belong here.
-    - **Bug-report / fixture / test file paths** — those belong in the commit message footer.
-    - **How-the-decision-was-made paragraphs** — one-clause reasoning is fine; a paragraph is not.
+    **Maintenance `<details>` bullets** — Same bans apply (no test counts, no file inventories). The what→why→must-do template is optional for infra-only entries.
 
-    **Maintenance** `<details>` bullets: keep them short and free of the same bans (no test counts, no file inventories); the strict what → why → must-do template is optional there when the change is infra-only.
+    **Maintenance section** — Changes with no end-user impact (publish/CI tooling, internal refactors, test harness, plan housekeeping, developer scripts) belong in a collapsed `<details><summary>Maintenance</summary>...</details>` block at the bottom of the version section, never in `### Added` / `### Changed` / `### Fixed`. Test: if a pub.dev or Marketplace user would notice, it is top-level; otherwise Maintenance.
 
-    **Tagged changelog** — Published versions use git tag **`vx.y.z`**; each section below ends its summary line with **[log](url)** to that snapshot (or a standalone **[log](url)** when there is no summary). Compare to [current `main`](https://github.com/saropa/saropa-lints/blob/main/CHANGELOG.md).
+    **Tagged changelog** — Published versions use git tag `vx.y.z`. Each section ends its summary with `[log](url)` pointing to that tag's snapshot. Compare against [current `main`](https://github.com/saropa/saropa-lints/blob/main/CHANGELOG.md).
 
-    **Published version**: See field "version": "x.y.z" in [package.json](./package.json)
+    **Published version** — `"version": "x.y.z"` in [package.json](./package.json).
 
-    **CI** — [github.com / saropa / saropa_lints / actions](https://github.com/saropa/saropa_lints/actions)
-
-    **Score** — [pub.dev/packages/saropa_lints/score](https://pub.dev/packages/saropa_lints/score)
-
-    **Maintenance entries** — Anything with **no end-user impact** (publish/CI tooling, internal refactors, test harness tweaks, plan-folder housekeeping, developer-only scripts) goes INSIDE a collapsed `<details><summary>Maintenance</summary>...</details>` block at the *bottom* of its version section — NOT in `### Added` / `### Changed` / `### Fixed`, which are reserved for user-visible changes that ship in the `.dart` / `.vsix` artifacts. Rule of thumb: if a pub.dev / Marketplace user running the published package would notice the difference, it belongs in a top-level section; otherwise it belongs in the Maintenance expander.
+    **CI** — [actions](https://github.com/saropa/saropa_lints/actions). **Score** — [pub.dev score](https://pub.dev/packages/saropa_lints/score).
 
 -->
 
-## [Unreleased]
+## [13.11.0]
 
-A new project size scan lays the groundwork for an upcoming Saropa Project Map dashboard. Run it to see which files and folders are the biggest by lines and on-disk size, so oversized files are easy to spot. The Code Health Dashboard now opens right away and fills in live as it scans — a progress bar, the file being processed, and Pause/Resume/Restart/Cancel controls — instead of a notification that looked stuck, and it no longer crashes when a source file can't be fully parsed. The finished report dashboard is also reworked: it shows every scored function (not just the worst 200), saves each run to a JSON file you can copy or open, drops the redundant grade column for a colored score pill, makes function names and file paths clickable, sorts columns honestly, and shows when each file last changed. Repeat scans are now incremental — each file's parse is hashed and cached so unchanged files are not re-parsed. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
+This release ships a new **Saropa Project Map** dashboard — a project-wide health scan that walks your code and ranks the worst files across complexity, coverage, dead code, churn, coupling, and import cycles, then prints a prioritized worklist (and copy-paste agent prompts) so you know what to fix first. The **Code Health Dashboard** also got a major overhaul: it opens instantly with a live progress bar, can be paused/resumed/restarted/canceled, caches per-file results so re-scans are fast, and lets you slice the worst-functions table by score, search, or any combination of flag categories — then bulk-copy what's left to the clipboard. And pubspec validation no longer pesters you about files inside the pub cache or vendored third-party packages. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
 
 ### Added
 
@@ -106,7 +102,7 @@ A new project size scan lays the groundwork for an upcoming Saropa Project Map d
 ### Added (Extension)
 
 - **The Code Health Dashboard now opens immediately and fills in live while it scans** — instead of a notification that sat at "scanning…" with no movement, it shows a progress bar, the current file, running counts of files and functions, and a streaming preview of the worst functions found so far, so a long scan never looks frozen. While the scanner is compiling/starting the bar shows an animated indeterminate state rather than a dead 0%. No action required.
-- **Pause, Resume, Restart, and Cancel controls on the Code Health scan** — a long scan can now be suspended and continued, restarted, or stopped from the dashboard, and closing the panel also stops it, so the scan no longer runs unstoppably in the background. Cancelling now stops the whole scanner process tree (previously a runaway scan could keep running on Windows). No action required.
+- **Pause, Resume, Restart, and Cancel controls on the Code Health scan** — a long scan can now be suspended and continued, restarted, or stopped from the dashboard, and closing the panel also stops it, so the scan no longer runs unstoppably in the background. Canceling now stops the whole scanner process tree (previously a runaway scan could keep running on Windows). No action required.
 - **The scanning panel shows the extension version and the scanner-engine version** — if the project's `saropa_lints` is too old to report progress, the engine line says so instead of leaving a stuck 0%, making it obvious when the dashboard and the scanned project's package versions don't match. No action required.
 
 ### Changed (Extension)

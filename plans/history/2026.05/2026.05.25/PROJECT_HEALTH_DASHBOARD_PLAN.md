@@ -59,8 +59,10 @@ are thin. Ordered by impact:
 - [x] Fan-in/fan-out coupling + instability + public-API doc coverage (2026-05-25).
 - [x] Hierarchical folder treemap with drill-down (2026-05-25, `folder_tree.dart` + ECharts breadcrumb).
 - [x] Caching/incremental warm-rescan (2026-05-25, `--cache`, content-hash parse reuse; cold→warm 11.7s→8.6s on lib/src).
-- [ ] **Isolate worker pool** — DEFERRED (see rationale below): cold-scan CPU parallelism; reworks the verified core loop for an unmeasured gain. Memory is already flat and `--cache` covers rescans.
-- [ ] Adaptive huge-workspace auto-defaults (auto-aggregate mode over a file-count threshold).
+
+**Moved to dedicated deferred plans (2026-05-26):**
+- **Isolate worker pool** — cold-scan CPU parallelism. See [deferred/PROJECT_HEALTH_isolate_worker_pool.md](deferred/PROJECT_HEALTH_isolate_worker_pool.md).
+- **Adaptive huge-workspace auto-defaults** — auto-aggregate mode over a file-count threshold. See [deferred/PROJECT_HEALTH_adaptive_huge_workspace.md](deferred/PROJECT_HEALTH_adaptive_huge_workspace.md).
 
 **C. WOW backlog (ranked by impact-per-effort):**
 1. ~~AI-fix handoff~~ ✅ done.
@@ -70,17 +72,13 @@ are thin. Ordered by impact:
 5. ~~In-editor heat (CodeLens)~~ ✅ done (2026-05-25) — opt-in, off by default + toggle command.
 6. ~~"What-if" cleanup simulator~~ ✅ ~~NL exec summary~~ ✅ ~~cycle-cut suggestions~~ ✅ (2026-05-25, `--cycles`).
 
-### Deferred: isolate worker pool (with rationale)
+### Deferred items
 
-The only planned item intentionally NOT built. It would parallelize the cold-scan
-parse across CPU cores. Deferred because: (a) memory is already flat (the
-streaming design), so this is throughput-only; (b) `--cache` already makes
-rescans fast; (c) it would rework `runSizeScan` — the verified core every other
-feature depends on — and parsed AST can't cross isolate boundaries, so workers
-must receive file CONTENT (a copy per in-flight file), reintroducing a memory
-trade-off; (d) the speedup is unmeasurable here without a multi-core benchmark.
-"Cheap before heavy": not worth destabilizing the verified core for an unverified
-gain. Revisit only if cold scans on huge monorepos prove too slow in practice.
+Both moved to standalone plans under [deferred/](deferred/) on 2026-05-26 so the
+parent plan tracks shipped scope only:
+
+- [deferred/PROJECT_HEALTH_isolate_worker_pool.md](deferred/PROJECT_HEALTH_isolate_worker_pool.md) — cold-scan CPU parallelism; intentionally not built (throughput-only, would destabilize the verified core for an unmeasured gain).
+- [deferred/PROJECT_HEALTH_adaptive_huge_workspace.md](deferred/PROJECT_HEALTH_adaptive_huge_workspace.md) — auto-aggregate defaults above a file-count threshold; no real-user trigger yet.
 
 ### Next build order (active)
 

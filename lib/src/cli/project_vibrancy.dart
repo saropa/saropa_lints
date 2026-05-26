@@ -44,7 +44,7 @@ class ProjectScanProgress {
   final void Function(Map<String, Object?> event) onEvent;
 
   /// Awaited before each unit of work. Resolves instantly when running, waits
-  /// while paused, and throws when cancelled (the CLI catches and exits clean).
+  /// while paused, and throws when canceled (the CLI catches and exits clean).
   final Future<void> Function() gate;
 }
 
@@ -107,6 +107,7 @@ class ProjectVibrancyFunctionResult {
   final double coveragePercent;
   final int complexity;
   final List<String> flags;
+
   /// Unix seconds of the last commit that touched the function's file, or null
   /// when git history is unavailable (no repo, brand-new file). Surfaced per
   /// row so the report can show "changed 3d ago" for triage.
@@ -132,7 +133,8 @@ class ProjectVibrancyFunctionResult {
     'coveragePercent': coveragePercent,
     'complexity': complexity,
     'flags': flags,
-    if (lastChangedEpochSec != null) 'lastChangedEpochSec': lastChangedEpochSec!,
+    if (lastChangedEpochSec != null)
+      'lastChangedEpochSec': lastChangedEpochSec!,
   };
 }
 
@@ -274,7 +276,12 @@ Future<ProjectVibrancyReport> runProjectVibrancy(
     progress: progress,
     root: root,
   );
-  final blameByFile = await _collectBlameAges(files, cache, progress: progress, root: root);
+  final blameByFile = await _collectBlameAges(
+    files,
+    cache,
+    progress: progress,
+    root: root,
+  );
   final results = <ProjectVibrancyFunctionResult>[];
 
   progress?.onEvent(<String, Object?>{
