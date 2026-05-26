@@ -12,6 +12,12 @@
 import { createWebviewCspNonce, escapeHtml, jsonForScriptBlock } from '../vibrancy/views/html-utils';
 import { l10n } from '../i18n/runtime';
 
+// Injected by esbuild at build time (see esbuild.js `define`). Falls back to
+// 'dev' under the test compiler (tsc, no define), so importing this module in a
+// unit test never throws on an undefined global.
+declare const __BUILD_TAG__: string;
+const BUILD_TAG = typeof __BUILD_TAG__ !== 'undefined' ? __BUILD_TAG__ : 'dev';
+
 /** Ordered phases the dart scan reports, with human labels for the stepper. */
 function phaseLabels(): Record<string, string> {
   return {
@@ -72,7 +78,7 @@ export function buildCodeHealthScanningHtml(extensionVersion = 'dev'): string {
 <section class="bar-block">
   <div class="bar-head">
     <span id="phaseLabel">${escapeHtml(l10n('codeHealth.scan.launching'))}</span>
-    <span id="phasePct" class="pct"></span>
+    <span class="head-right"><span id="eta" class="eta"></span><span id="phasePct" class="pct"></span></span>
   </div>
   <div class="bar-track indeterminate" id="barTrack"><div class="bar-fill" id="barFill"></div></div>
   <p class="scan-hint" id="scanHint">${escapeHtml(l10n('codeHealth.scan.firstRunHint'))}</p>
@@ -80,10 +86,10 @@ export function buildCodeHealthScanningHtml(extensionVersion = 'dev'): string {
 </section>
 
 <section class="counters" aria-label="${escapeHtml(l10n('codeHealth.scan.counters.aria'))}">
-  <div class="counter"><span class="n" id="cFiles">0</span><span class="k">${escapeHtml(l10n('codeHealth.scan.counter.files'))}</span></div>
-  <div class="counter"><span class="n" id="cFns">0</span><span class="k">${escapeHtml(l10n('codeHealth.scan.counter.functions'))}</span></div>
-  <div class="counter"><span class="n bad" id="cProb">0</span><span class="k">${escapeHtml(l10n('codeHealth.scan.counter.problems'))}</span></div>
-  <div class="counter"><span class="n" id="cElapsed">0s</span><span class="k">${escapeHtml(l10n('codeHealth.scan.elapsed'))}</span></div>
+  <div class="counter c-files"><span class="n" id="cFiles">0</span><span class="k">${escapeHtml(l10n('codeHealth.scan.counter.files'))}</span></div>
+  <div class="counter c-fns"><span class="n" id="cFns">0</span><span class="k">${escapeHtml(l10n('codeHealth.scan.counter.functions'))}</span></div>
+  <div class="counter c-prob"><span class="n bad" id="cProb">0</span><span class="k">${escapeHtml(l10n('codeHealth.scan.counter.problems'))}</span></div>
+  <div class="counter c-time"><span class="n" id="cElapsed">0s</span><span class="k">${escapeHtml(l10n('codeHealth.scan.elapsed'))}</span></div>
 </section>
 
 <section class="controls" role="toolbar" aria-label="${escapeHtml(l10n('codeHealth.scan.controls.aria'))}">
@@ -98,7 +104,7 @@ export function buildCodeHealthScanningHtml(extensionVersion = 'dev'): string {
 </section>
 
 <footer class="ver-foot">
-  <span class="ver-brand">Saropa Lints v${escapeHtml(extensionVersion)}</span>
+  <span class="ver-brand">Saropa Lints v${escapeHtml(extensionVersion)} <span class="ver-tag">#${escapeHtml(BUILD_TAG)}</span></span>
   <span class="ver-sep">·</span>
   <span>${escapeHtml(l10n('codeHealth.scan.version.engine'))}: <span id="engineVer">${escapeHtml(l10n('codeHealth.scan.version.detecting'))}</span></span>
 </footer>
@@ -127,9 +133,12 @@ body{font-family:var(--vscode-font-family);color:var(--vscode-foreground);backgr
 .step.done .dot{background:var(--vscode-charts-green,#2ea043);}
 .bar-block{margin-bottom:18px;}
 .bar-head{display:flex;justify-content:space-between;font-size:.9rem;margin-bottom:6px;}
-.pct{font-variant-numeric:tabular-nums;color:var(--vscode-descriptionForeground);}
-.bar-track{height:10px;border-radius:6px;background:var(--vscode-input-background,#8881);overflow:hidden;}
-.bar-fill{height:100%;width:0;border-radius:6px;background:var(--vscode-progressBar-background,#0e70c0);transition:width .15s ease;}
+.bar-head #phaseLabel{font-weight:600;}
+.head-right{display:flex;gap:10px;align-items:baseline;}
+.eta{font-size:.8rem;color:var(--vscode-charts-blue,#3794ff);font-variant-numeric:tabular-nums;}
+.pct{font-variant-numeric:tabular-nums;font-weight:600;color:var(--vscode-foreground);}
+.bar-track{height:12px;border-radius:7px;background:var(--vscode-input-background,#8881);overflow:hidden;box-shadow:inset 0 0 0 1px var(--vscode-widget-border,#8883);}
+.bar-fill{height:100%;width:0;border-radius:7px;background:linear-gradient(90deg,var(--vscode-charts-blue,#3794ff),var(--vscode-progressBar-background,#0e70c0));transition:width .2s ease;}
 /* Indeterminate: a sliding chunk shown while the scan is starting/compiling and
    no done/total has arrived yet, so the bar is never a dead "0%". */
 .bar-track.indeterminate .bar-fill{width:35%;animation:indeterminate 1.1s ease-in-out infinite;}
@@ -138,10 +147,18 @@ body{font-family:var(--vscode-font-family);color:var(--vscode-foreground);backgr
 .scan-hint{margin:8px 0 0;font-size:.8rem;color:var(--vscode-descriptionForeground);}
 .current-file{margin:8px 0 0;font-family:var(--vscode-editor-font-family,monospace);font-size:.8rem;color:var(--vscode-descriptionForeground);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:1.2em;}
 .counters{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:20px;}
-.counter{flex:1 1 90px;background:var(--vscode-editorWidget-background,#8881);border:1px solid var(--vscode-widget-border,#8883);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:2px;}
-.counter .n{font-size:1.4rem;font-weight:700;font-variant-numeric:tabular-nums;}
-.counter .n.bad{color:var(--vscode-charts-red,#f14c4c);}
+.counter{flex:1 1 90px;background:var(--vscode-editorWidget-background,#8881);border:1px solid var(--vscode-widget-border,#8883);border-top-width:3px;border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:2px;}
+.counter .n{font-size:1.5rem;font-weight:700;font-variant-numeric:tabular-nums;}
 .counter .k{font-size:.75rem;color:var(--vscode-descriptionForeground);text-transform:uppercase;letter-spacing:.04em;}
+/* Each counter gets its own hue so the strip reads at a glance. */
+.c-files{border-top-color:var(--vscode-charts-blue,#3794ff);}
+.c-files .n{color:var(--vscode-charts-blue,#3794ff);}
+.c-fns{border-top-color:var(--vscode-charts-purple,#b180d7);}
+.c-fns .n{color:var(--vscode-charts-purple,#b180d7);}
+.c-prob{border-top-color:var(--vscode-charts-red,#f14c4c);}
+.counter .n.bad{color:var(--vscode-charts-red,#f14c4c);}
+.c-time{border-top-color:var(--vscode-charts-green,#2ea043);}
+.c-time .n{color:var(--vscode-charts-green,#2ea043);}
 .controls{display:flex;gap:8px;margin-bottom:24px;}
 .btn{font:inherit;padding:6px 16px;border-radius:6px;border:1px solid var(--vscode-button-border,transparent);background:var(--vscode-button-secondaryBackground,#3a3d41);color:var(--vscode-button-secondaryForeground,#fff);cursor:pointer;}
 .btn:hover{background:var(--vscode-button-secondaryHoverBackground,#45494e);}
@@ -158,6 +175,7 @@ body{font-family:var(--vscode-font-family);color:var(--vscode-foreground);backgr
 .prob-file{margin-left:auto;color:var(--vscode-descriptionForeground);font-size:.78rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:45%;}
 .ver-foot{margin-top:28px;padding-top:12px;border-top:1px solid var(--vscode-widget-border,#8883);font-size:.78rem;color:var(--vscode-descriptionForeground);display:flex;gap:8px;align-items:center;}
 .ver-brand{font-weight:600;}
+.ver-tag{font-family:var(--vscode-editor-font-family,monospace);color:var(--vscode-charts-blue,#3794ff);opacity:.85;}
 .ver-sep{opacity:.5;}
 #engineVer.ok{color:var(--vscode-charts-green,#2ea043);font-weight:600;}
 #engineVer.legacy{color:var(--vscode-charts-orange,#e2a03f);font-weight:600;}
@@ -174,10 +192,30 @@ function scanScript(): string {
   var S = ${strings};
   var vscode = acquireVsCodeApi();
   var started = Date.now();
+  var phaseStart = Date.now();
   var paused = false;
   var problems = 0;
   var btnPause = document.getElementById('btnPause');
   var probEmpty = document.getElementById('probEmpty');
+
+  // Estimate remaining time for the current phase from its observed rate so the
+  // user gets a real "this isn't stalled, ~N left" signal. Throttled-feeling by
+  // nature: it only refines as ticks arrive.
+  function updateEta(done, total){
+    var el = document.getElementById('eta');
+    if (!el) return;
+    var elapsed = (Date.now() - phaseStart) / 1000;
+    if (done <= 0 || elapsed < 1){ el.textContent = ''; return; }
+    var remaining = Math.round((total - done) / (done / elapsed));
+    if (remaining <= 0){ el.textContent = ''; return; }
+    el.textContent = '~' + fmtDuration(remaining) + ' left';
+  }
+  function fmtDuration(s){
+    if (s < 60) return s + 's';
+    var m = Math.floor(s / 60);
+    var r = s % 60;
+    return r === 0 ? m + 'm' : m + 'm ' + r + 's';
+  }
 
   setInterval(function(){
     var s = Math.floor((Date.now()-started)/1000);
@@ -228,6 +266,9 @@ function scanScript(): string {
         return;
       }
       setActive(ev.phase);
+      // Reset the per-phase rate window so the ETA reflects THIS phase's speed.
+      phaseStart = Date.now();
+      document.getElementById('eta').textContent = '';
       document.getElementById('phaseLabel').textContent = S[ev.phase] || ev.phase;
     } else if (ev.event === 'tick'){
       if (typeof ev.total === 'number' && ev.total > 0){
@@ -235,6 +276,7 @@ function scanScript(): string {
         var pct = Math.min(100, Math.round((ev.done/ev.total)*100));
         document.getElementById('barFill').style.width = pct + '%';
         document.getElementById('phasePct').textContent = pct + '%';
+        updateEta(ev.done, ev.total);
       }
       if (ev.phase === 'parse'){
         document.getElementById('cFiles').textContent = ev.done || 0;

@@ -3,6 +3,11 @@ const esbuild = require("esbuild");
 const production = process.argv.includes('--production');
 const watch = process.argv.includes('--watch');
 
+// Build stamp injected into the bundle so the dashboard can show which build is
+// running — lets a developer confirm a reload actually picked up new code. Time
+// of this build (local HH:MM:SS); changes every rebuild.
+const buildTag = new Date().toTimeString().slice(0, 8);
+
 /**
  * @type {import('esbuild').Plugin}
  */
@@ -36,6 +41,7 @@ async function main() {
 		platform: 'node',
 		outfile: 'dist/extension.js',
 		external: ['vscode'],
+		define: { __BUILD_TAG__: JSON.stringify(buildTag) },
 		logLevel: 'silent',
 		plugins: [
 			esbuildProblemMatcherPlugin,

@@ -100,6 +100,7 @@ A new project size scan lays the groundwork for an upcoming Project Map dashboar
 
 - **Code Health scan no longer crashes on a file the analyzer can't fully parse** — one source file with a parse-level diagnostic (for example an `await` outside an async function, common while editing) previously aborted the whole scan with an unhandled exception; it now tolerates such files and keeps scanning the rest. No action required.
 - **Code Health scan starts faster and can't hang on symlinks** — file discovery now skips heavy directories (`build`, `.dart_tool`, `node_modules`, `Pods`, `.git`, …) and no longer follows symbolic links, so the scan reaches your `lib/` sources quickly instead of crawling generated output, and a symlink loop can't wedge it. No action required.
+- **Code Health no longer stalls on huge generated files** — files over ~512 KB (e.g. `flutter gen-l10n` `app_localizations*.dart` at multiple MB) are skipped; parsing one previously froze the progress bar for many seconds with no health value. The panel also shows the file it is *currently* processing and a per-phase time estimate, so a slow phase reads as working, not stalled. No action required.
 
 ### Added (Extension)
 

@@ -197,6 +197,18 @@ Future<ProjectVibrancyReport> runProjectVibrancy(
   var parsedCount = 0;
   for (final filePath in files) {
     await progress?.gate();
+    // Emit the file BEFORE parsing it (not after), so the panel shows what the
+    // scan is currently chewing on. A single huge generated file can take many
+    // seconds to parse with no tick in between; showing it as "in progress"
+    // means the user sees real work instead of a frozen bar.
+    progress?.onEvent(<String, Object?>{
+      'event': 'tick',
+      'phase': 'parse',
+      'done': parsedCount,
+      'total': files.length,
+      'file': p.relative(filePath, from: root).replaceAll('\\', '/'),
+      'functions': declaredFunctions.length,
+    });
     parsedCount++;
     final file = File(filePath);
     if (!file.existsSync()) continue;
@@ -216,14 +228,6 @@ Future<ProjectVibrancyReport> runProjectVibrancy(
     final collector = _FunctionCollector(content: content, filePath: filePath);
     parsed.unit.accept(collector);
     declaredFunctions.addAll(collector.functions);
-    progress?.onEvent(<String, Object?>{
-      'event': 'tick',
-      'phase': 'parse',
-      'done': parsedCount,
-      'total': files.length,
-      'file': p.relative(filePath, from: root).replaceAll('\\', '/'),
-      'functions': declaredFunctions.length,
-    });
   }
 
   final pathsForGit = <String>{};
@@ -479,6 +483,16 @@ List<String> _collectTargetFiles(ProjectVibrancyOptions options) {
       if (posix.endsWith('.g.dart') ||
           posix.endsWith('.freezed.dart') ||
           posix.endsWith('.mocks.dart')) {
+        continue;
+      }
+      // Skip pathologically large files — almost always generated (gen-l10n
+      // `app_localizations_*.dart` runs to 1MB+, protobuf, etc.). Parsing and
+      // visiting a 30k-line generated file stalls the scan for many seconds with
+      // no per-file progress and adds no health signal. lengthSync is cheap (no
+      // read). ~512KB ≈ 12k lines, well above any hand-written Dart file.
+      try {
+        if (entity.lengthSync() > 512000) continue;
+      } on FileSystemException {
         continue;
       }
       // Exclude project `build/` outputs only (relative to root). A plain

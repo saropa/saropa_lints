@@ -16,6 +16,7 @@ import type {
   VibrancyScanEvent,
   VibrancyScanHandlers,
 } from './projectVibrancyTypes';
+import { killProcessTree, resolveCliCwd } from './devCliRoot';
 
 export interface ProjectVibrancyScanResult {
   readonly payload: ProjectVibrancyPayload | null;
@@ -129,58 +130,6 @@ function writeControl(controlPath: string, command: string): void {
     // Best-effort: a failed control write leaves the scan running; the user can
     // still cancel via the notification token (which kills the child).
   }
-}
-
-/**
- * Kills the scan process AND its descendants. On Windows we spawn through the
- * shell (shell:true, required for dart.bat resolution), so `child` is the
- * `cmd.exe` wrapper — `child.kill()` reaps the shell but orphans the real
- * `dart.exe` grandchild, which keeps pegging the machine (the "cancel does
- * nothing / page locked up" bug). `taskkill /T` kills the whole tree. On POSIX
- * a plain kill of the (non-shell) child suffices.
- */
-function killProcessTree(child: ReturnType<typeof spawn>): void {
-  const pid = child.pid;
-  if (pid === undefined) return;
-  if (process.platform === 'win32') {
-    try {
-      spawn('taskkill', ['/F', '/T', '/PID', String(pid)], { windowsHide: true });
-      return;
-    } catch {
-      // Fall through to child.kill() if taskkill is somehow unavailable.
-    }
-  }
-  try {
-    child.kill();
-  } catch {
-    // Best-effort: child may have already exited.
-  }
-}
-
-/**
- * Working directory for the `dart run` that resolves which saropa_lints CLI
- * executes. Normally the scanned project (so it uses that project's own
- * saropa_lints version, the correct production behavior). BUT when the extension
- * itself is the in-development build (F5 from the repo), the package source sits
- * at `<extensionPath>/..`; running from there uses the in-development CLI —
- * which has live progress and the symlink-safe walk — to scan the project via
- * `--path`, instead of whatever older version the project happens to pin. Pure
- * filesystem detection (bin script present), so an installed production
- * extension transparently falls back to the project's CLI.
- */
-function resolveCliCwd(projectRoot: string): string {
-  try {
-    const extPath = vscode.extensions.getExtension('saropa.saropa-lints')?.extensionPath;
-    if (extPath) {
-      const repoRoot = path.dirname(extPath);
-      const hasCli = fs.existsSync(path.join(repoRoot, 'bin', 'project_vibrancy.dart'));
-      const hasPubspec = fs.existsSync(path.join(repoRoot, 'pubspec.yaml'));
-      if (hasCli && hasPubspec) return repoRoot;
-    }
-  } catch {
-    // Fall through to the project root on any detection error.
-  }
-  return projectRoot;
 }
 
 export function runProjectVibrancyScan(
