@@ -691,6 +691,50 @@
     "skipToTable": "関数テーブルにスキップ",
     "openWorkspaceFirst": "まず、Dart/Flutter ワークスペースを開きます。",
     "scanningTitle": "コードの健全性: スキャン機能…",
+    "scan": {
+      "title": "プロジェクトの健全性をスキャンしています",
+      "subtitle": "コードを読んでいます。スキャンがさらに学習するにつれて、ダッシュボードが埋められます。",
+      "waiting": "スキャンを開始しています…",
+      "launching": "スキャナーを起動中…",
+      "collect": "ファイルを検出中…",
+      "firstRunHint": "最初の実行ではスキャナーがコンパイルされます。大規模なプロジェクトの場合、ファイルが表示されるまでに少し時間がかかります。",
+      "paused": "一時停止中",
+      "stopped": "スキャンが停止しました",
+      "elapsed": "経過",
+      "phase": {
+        "parse": "ファイルの解析",
+        "history": "git 履歴の読み取り",
+        "blame": "コード年齢の計算",
+        "usage": "参照のカウント",
+        "score": "スコアリング機能"
+      },
+      "counter": {
+        "files": "ファイル",
+        "functions": "機能",
+        "problems": "問題が見つかりました"
+      },
+      "counters": {
+        "aria": "ライブスキャンカウンター"
+      },
+      "controls": {
+        "aria": "スキャンコントロール"
+      },
+      "btn": {
+        "pause": "一時停止",
+        "resume": "再開する",
+        "restart": "再起動",
+        "cancel": "キャンセル"
+      },
+      "preview": {
+        "heading": "これまでに見つかった問題点",
+        "empty": "まだ問題は見つかりません…"
+      },
+      "version": {
+        "engine": "エンジン",
+        "detecting": "検出中…",
+        "legacy": "レガシー — 現在の進行状況はありません (このプロジェクトの saropa_lints はそれ以前のものです)"
+      }
+    },
     "runReportFirst": "レポートを再度実行し、JSON をコピーします。",
     "copiedJson": "コードヘルス JSON がクリップボードにコピーされました。",
     "couldNotOpenFile": "ファイルを開けませんでした: {path}",

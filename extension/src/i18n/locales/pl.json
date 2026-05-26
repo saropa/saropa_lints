@@ -691,6 +691,50 @@
     "skipToTable": "Przejdź do tabeli funkcji",
     "openWorkspaceFirst": "Najpierw otwórz obszar roboczy Dart/Flutter.",
     "scanningTitle": "Code Health: funkcje skanowania…",
+    "scan": {
+      "title": "Skanowanie kondycji projektu",
+      "subtitle": "Czytanie kodu. Pulpit nawigacyjny zapełnia się w miarę uzyskiwania dalszych informacji podczas skanowania.",
+      "waiting": "Rozpoczynam skanowanie…",
+      "launching": "Uruchamiam skaner…",
+      "collect": "Odkrywanie plików…",
+      "firstRunHint": "Pierwsze uruchomienie kompiluje skaner; duże projekty potrzebują chwili, zanim pojawią się pliki.",
+      "paused": "Wstrzymano",
+      "stopped": "Skanowanie zatrzymane",
+      "elapsed": "Upłynął",
+      "phase": {
+        "parse": "Parsowanie plików",
+        "history": "Czytanie historii gita",
+        "blame": "Obliczanie wieku kodu",
+        "usage": "Liczenie referencji",
+        "score": "Funkcje punktacji"
+      },
+      "counter": {
+        "files": "Akta",
+        "functions": "Funkcje",
+        "problems": "Znaleziono problemy"
+      },
+      "counters": {
+        "aria": "Liczniki skanowania na żywo"
+      },
+      "controls": {
+        "aria": "Elementy sterujące skanowania"
+      },
+      "btn": {
+        "pause": "Pauza",
+        "resume": "Wznawiać",
+        "restart": "Uruchom ponownie",
+        "cancel": "Anulować"
+      },
+      "preview": {
+        "heading": "Dotychczas wykryte problemy",
+        "empty": "Nie znaleziono jeszcze żadnych problemów…"
+      },
+      "version": {
+        "engine": "Silnik",
+        "detecting": "wykrywanie…",
+        "legacy": "dziedzictwo — brak postępu na żywo (saropa_lints tego projektu jest wcześniejszy)"
+      }
+    },
     "runReportFirst": "Uruchom raport ponownie, a następnie skopiuj JSON.",
     "copiedJson": "Kod kondycji JSON skopiowany do schowka.",
     "couldNotOpenFile": "Nie można otworzyć pliku: {path}",

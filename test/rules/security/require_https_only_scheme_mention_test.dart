@@ -50,7 +50,10 @@ void main() {
     });
 
     test('space after scheme is recognized as prose mention', () {
-      expect(isSchemeMention('http:// or https:// URLs are supported.'), isTrue);
+      expect(
+        isSchemeMention('http:// or https:// URLs are supported.'),
+        isTrue,
+      );
     });
 
     test('non-ASCII text after space is recognized (Korean i18n)', () {

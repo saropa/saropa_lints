@@ -691,6 +691,50 @@
     "skipToTable": "Pular para tabela de funções",
     "openWorkspaceFirst": "Abra primeiro um espaço de trabalho Dart/Flutter.",
     "scanningTitle": "Code Health: funções de digitalização…",
+    "scan": {
+      "title": "Verificando a integridade do projeto",
+      "subtitle": "Lendo seu código. O painel é preenchido à medida que a verificação aprende mais.",
+      "waiting": "Iniciando a verificação…",
+      "launching": "Iniciando scanner…",
+      "collect": "Descobrindo arquivos…",
+      "firstRunHint": "A primeira execução compila o scanner; projetos grandes demoram um pouco antes que os arquivos apareçam.",
+      "paused": "Pausado",
+      "stopped": "Verificação interrompida",
+      "elapsed": "Decorrido",
+      "phase": {
+        "parse": "Analisando arquivos",
+        "history": "Lendo o histórico do git",
+        "blame": "Era do código de computação",
+        "usage": "Contando referências",
+        "score": "Funções de pontuação"
+      },
+      "counter": {
+        "files": "Arquivos",
+        "functions": "Funções",
+        "problems": "Problemas encontrados"
+      },
+      "counters": {
+        "aria": "Contadores de varredura ao vivo"
+      },
+      "controls": {
+        "aria": "Controles de digitalização"
+      },
+      "btn": {
+        "pause": "Pausa",
+        "resume": "Retomar",
+        "restart": "Reiniciar",
+        "cancel": "Cancelar"
+      },
+      "preview": {
+        "heading": "Problemas encontrados até agora",
+        "empty": "Nenhum problema encontrado ainda…"
+      },
+      "version": {
+        "engine": "Motor",
+        "detecting": "detecção…",
+        "legacy": "legado - sem progresso ao vivo (o saropa_lints deste projeto é anterior a ele)"
+      }
+    },
     "runReportFirst": "Execute o relatório novamente e copie o JSON.",
     "copiedJson": "Code Health JSON copiado para a área de transferência.",
     "couldNotOpenFile": "Não foi possível abrir o arquivo: {path}",

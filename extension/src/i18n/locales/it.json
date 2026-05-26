@@ -691,6 +691,50 @@
     "skipToTable": "Passa alla tabella delle funzioni",
     "openWorkspaceFirst": "Aprire prima un'area di lavoro Dart/Flutter.",
     "scanningTitle": "Integrità del codice: funzioni di scansione…",
+    "scan": {
+      "title": "Scansione dello stato del progetto",
+      "subtitle": "Leggendo il tuo codice. La dashboard si riempie man mano che la scansione apprende di più.",
+      "waiting": "Avvio della scansione...",
+      "launching": "Avvio dello scanner…",
+      "collect": "Individuazione dei file...",
+      "firstRunHint": "La prima esecuzione compila lo scanner; i progetti di grandi dimensioni richiedono un momento prima che i file vengano visualizzati.",
+      "paused": "In pausa",
+      "stopped": "Scansione interrotta",
+      "elapsed": "Trascorso",
+      "phase": {
+        "parse": "Analisi dei file",
+        "history": "Leggere la cronologia di Git",
+        "blame": "Età del codice informatico",
+        "usage": "Conteggio dei riferimenti",
+        "score": "Funzioni di punteggio"
+      },
+      "counter": {
+        "files": "File",
+        "functions": "Funzioni",
+        "problems": "Problemi riscontrati"
+      },
+      "counters": {
+        "aria": "Contatori di scansione in tempo reale"
+      },
+      "controls": {
+        "aria": "Controlli di scansione"
+      },
+      "btn": {
+        "pause": "Pausa",
+        "resume": "Riprendere",
+        "restart": "Ricomincia",
+        "cancel": "Cancellare"
+      },
+      "preview": {
+        "heading": "Problemi riscontrati finora",
+        "empty": "Nessun problema ancora trovato..."
+      },
+      "version": {
+        "engine": "Motore",
+        "detecting": "rilevamento...",
+        "legacy": "legacy: nessun progresso in tempo reale (saropa_lints di questo progetto lo precede)"
+      }
+    },
     "runReportFirst": "Esegui nuovamente il report, quindi copia JSON.",
     "copiedJson": "JSON Code Health copiato negli appunti.",
     "couldNotOpenFile": "Impossibile aprire il file: {path}",

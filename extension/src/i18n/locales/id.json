@@ -691,6 +691,50 @@
     "skipToTable": "Lewati ke tabel fungsi",
     "openWorkspaceFirst": "Buka ruang kerja Dart/Flutter terlebih dahulu.",
     "scanningTitle": "Kode Kesehatan: fungsi pemindaian…",
+    "scan": {
+      "title": "Memindai kesehatan proyek",
+      "subtitle": "Membaca kode Anda. Dasbor terisi saat pemindaian mempelajari lebih lanjut.",
+      "waiting": "Memulai pemindaian…",
+      "launching": "Meluncurkan pemindai…",
+      "collect": "Menemukan file…",
+      "firstRunHint": "Jalankan pertama mengkompilasi pemindai; proyek besar membutuhkan waktu beberapa saat sebelum file muncul.",
+      "paused": "Dijeda",
+      "stopped": "Pemindaian terhenti",
+      "elapsed": "Berlalu",
+      "phase": {
+        "parse": "Mengurai file",
+        "history": "Membaca riwayat git",
+        "blame": "Usia kode komputasi",
+        "usage": "Menghitung referensi",
+        "score": "Fungsi penilaian"
+      },
+      "counter": {
+        "files": "File",
+        "functions": "Fungsi",
+        "problems": "Masalah ditemukan"
+      },
+      "counters": {
+        "aria": "Penghitung pemindaian langsung"
+      },
+      "controls": {
+        "aria": "Kontrol pemindaian"
+      },
+      "btn": {
+        "pause": "Berhenti sebentar",
+        "resume": "Melanjutkan",
+        "restart": "Mulai ulang",
+        "cancel": "Membatalkan"
+      },
+      "preview": {
+        "heading": "Masalah yang ditemukan sejauh ini",
+        "empty": "Belum ada masalah yang ditemukan…"
+      },
+      "version": {
+        "engine": "Mesin",
+        "detecting": "mendeteksi…",
+        "legacy": "warisan — tidak ada kemajuan langsung (saropa_lints proyek ini sudah ada sebelumnya)"
+      }
+    },
     "runReportFirst": "Jalankan kembali laporannya, lalu salin JSON.",
     "copiedJson": "Kode Kesehatan JSON disalin ke clipboard.",
     "couldNotOpenFile": "Tidak dapat membuka file: {path}",

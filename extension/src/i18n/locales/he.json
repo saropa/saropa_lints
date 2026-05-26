@@ -691,6 +691,50 @@
     "skipToTable": "דלג לטבלת הפונקציות",
     "openWorkspaceFirst": "פתח תחילה סביבת עבודה של Dart/Flutter.",
     "scanningTitle": "Code Health: פונקציות סריקה...",
+    "scan": {
+      "title": "סריקת תקינות הפרויקט",
+      "subtitle": "קורא את הקוד שלך. לוח המחוונים מתמלא ככל שהסריקה לומדת יותר.",
+      "waiting": "מתחיל בסריקה...",
+      "launching": "מפעיל את הסורק...",
+      "collect": "מגלה קבצים...",
+      "firstRunHint": "הפעלה ראשונה מרכיבה את הסורק; לפרויקטים גדולים לוקח רגע לפני שקבצים מופיעים.",
+      "paused": "מושהה",
+      "stopped": "הסריקה הופסקה",
+      "elapsed": "חלף",
+      "phase": {
+        "parse": "ניתוח קבצים",
+        "history": "קריאת היסטוריית git",
+        "blame": "עידן קוד מחשוב",
+        "usage": "ספירת הפניות",
+        "score": "פונקציות ניקוד"
+      },
+      "counter": {
+        "files": "קבצים",
+        "functions": "פונקציות",
+        "problems": "נמצאו בעיות"
+      },
+      "counters": {
+        "aria": "מוני סריקה חיים"
+      },
+      "controls": {
+        "aria": "בקרות סריקה"
+      },
+      "btn": {
+        "pause": "הַפסָקָה",
+        "resume": "קוֹרוֹת חַיִים",
+        "restart": "הפעל מחדש",
+        "cancel": "לְבַטֵל"
+      },
+      "preview": {
+        "heading": "נמצאו בעיות עד כה",
+        "empty": "עדיין לא נמצאו בעיות..."
+      },
+      "version": {
+        "engine": "מָנוֹעַ",
+        "detecting": "מזהה…",
+        "legacy": "מורשת - אין התקדמות חיה (ה-saropa_lints של הפרויקט הזה קדם לו)"
+      }
+    },
     "runReportFirst": "הפעל את הדוח שוב, ולאחר מכן העתק את JSON.",
     "copiedJson": "Code Health JSON הועתק ללוח.",
     "couldNotOpenFile": "לא ניתן היה לפתוח את הקובץ: {path}",

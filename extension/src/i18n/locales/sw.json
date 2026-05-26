@@ -691,6 +691,50 @@
     "skipToTable": "Ruka hadi kwenye jedwali la kukokotoa",
     "openWorkspaceFirst": "Fungua nafasi ya kazi ya Dart/Flutter kwanza.",
     "scanningTitle": "Kanuni ya Afya: utendakazi wa kuchanganua...",
+    "scan": {
+      "title": "Kuchanganua afya ya mradi",
+      "subtitle": "Kusoma nambari yako. Dashibodi hujaza kadiri skanisho inavyojifunza zaidi.",
+      "waiting": "Inaanza kuchanganua...",
+      "launching": "Inazindua kichanganuzi...",
+      "collect": "Inagundua faili...",
+      "firstRunHint": "Kukimbia kwanza kunakusanya skana; miradi mikubwa huchukua muda kabla ya faili kuonekana.",
+      "paused": "Imesitishwa",
+      "stopped": "Uchanganuzi umesimamishwa",
+      "elapsed": "Iliyopita",
+      "phase": {
+        "parse": "Inachanganua faili",
+        "history": "Kusoma historia ya git",
+        "blame": "Umri wa msimbo wa kompyuta",
+        "usage": "Kuhesabu marejeleo",
+        "score": "Utendaji wa bao"
+      },
+      "counter": {
+        "files": "Faili",
+        "functions": "Kazi",
+        "problems": "Matatizo yamepatikana"
+      },
+      "counters": {
+        "aria": "Kaunta za kuchanganua moja kwa moja"
+      },
+      "controls": {
+        "aria": "Vidhibiti vya kuchanganua"
+      },
+      "btn": {
+        "pause": "Sitisha",
+        "resume": "Endelea",
+        "restart": "Anzisha upya",
+        "cancel": "Ghairi"
+      },
+      "preview": {
+        "heading": "Matatizo yaliyopatikana hadi sasa",
+        "empty": "Bado hakuna matatizo yaliyopatikana..."
+      },
+      "version": {
+        "engine": "Injini",
+        "detecting": "inagundua...",
+        "legacy": "legacy — hakuna maendeleo ya moja kwa moja (saropa_lints ya mradi huu imetangulia)"
+      }
+    },
     "runReportFirst": "Tekeleza ripoti tena, kisha unakili JSON.",
     "copiedJson": "Code Health JSON imenakiliwa kwenye ubao wa kunakili.",
     "couldNotOpenFile": "Haikuweza kufungua faili: {path}",

@@ -691,6 +691,50 @@
     "skipToTable": "İşlev tablosuna atla",
     "openWorkspaceFirst": "Önce bir Dart/Flutter çalışma alanı açın.",
     "scanningTitle": "Kod Sağlığı: tarama işlevleri…",
+    "scan": {
+      "title": "Proje durumunu tarama",
+      "subtitle": "Kodunuzu okuyorum. Tarama daha fazlasını öğrendikçe kontrol paneli dolar.",
+      "waiting": "Tarama başlatılıyor…",
+      "launching": "Tarayıcı başlatılıyor…",
+      "collect": "Dosyalar keşfediliyor…",
+      "firstRunHint": "İlk çalıştırmada tarayıcı derlenir; büyük projelerin dosyaların görünmesi biraz zaman alır.",
+      "paused": "Duraklatıldı",
+      "stopped": "Tarama durduruldu",
+      "elapsed": "Geçen",
+      "phase": {
+        "parse": "Dosyalar ayrıştırılıyor",
+        "history": "Git geçmişini okuma",
+        "blame": "Hesaplama kodu yaşı",
+        "usage": "Referansları sayma",
+        "score": "Puanlama işlevleri"
+      },
+      "counter": {
+        "files": "Dosyalar",
+        "functions": "Fonksiyonlar",
+        "problems": "Bulunan sorunlar"
+      },
+      "counters": {
+        "aria": "Canlı tarama sayaçları"
+      },
+      "controls": {
+        "aria": "Tarama kontrolleri"
+      },
+      "btn": {
+        "pause": "Duraklat",
+        "resume": "Sürdürmek",
+        "restart": "Tekrar başlat",
+        "cancel": "İptal etmek"
+      },
+      "preview": {
+        "heading": "Şu ana kadar bulunan sorunlar",
+        "empty": "Henüz sorun bulunamadı…"
+      },
+      "version": {
+        "engine": "Motor",
+        "detecting": "tespit ediliyor…",
+        "legacy": "eski - canlı ilerleme yok (bu projenin saropa_lints'i ondan öncedir)"
+      }
+    },
     "runReportFirst": "Raporu yeniden çalıştırın ve ardından JSON'u kopyalayın.",
     "copiedJson": "Code Health JSON panoya kopyalandı.",
     "couldNotOpenFile": "Dosya açılamadı: {path}",

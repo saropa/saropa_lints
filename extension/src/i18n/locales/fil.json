@@ -691,6 +691,50 @@
     "skipToTable": "Lumaktaw sa talahanayan ng mga function",
     "openWorkspaceFirst": "Magbukas muna ng Dart/Flutter workspace.",
     "scanningTitle": "Code Health: mga function ng pag-scan…",
+    "scan": {
+      "title": "Pag-scan sa kalusugan ng proyekto",
+      "subtitle": "Binabasa ang iyong code. Napupuno ang dashboard habang natututo ang pag-scan.",
+      "waiting": "Sinisimulan ang pag-scan...",
+      "launching": "Inilunsad ang scanner…",
+      "collect": "Tumutuklas ng mga file…",
+      "firstRunHint": "First run ay nag-compile ng scanner; ang malalaking proyekto ay tumatagal ng ilang sandali bago lumitaw ang mga file.",
+      "paused": "Naka-pause",
+      "stopped": "Huminto ang pag-scan",
+      "elapsed": "Lumipas na",
+      "phase": {
+        "parse": "Pag-parse ng mga file",
+        "history": "Pagbabasa ng git history",
+        "blame": "Edad ng computing code",
+        "usage": "Nagbibilang ng mga sanggunian",
+        "score": "Mga function ng pagmamarka"
+      },
+      "counter": {
+        "files": "Mga file",
+        "functions": "Mga pag-andar",
+        "problems": "May nakitang mga problema"
+      },
+      "counters": {
+        "aria": "Mga live na scan counter"
+      },
+      "controls": {
+        "aria": "Mga kontrol sa pag-scan"
+      },
+      "btn": {
+        "pause": "I-pause",
+        "resume": "Ipagpatuloy",
+        "restart": "I-restart",
+        "cancel": "Kanselahin"
+      },
+      "preview": {
+        "heading": "Mga problemang natagpuan sa ngayon",
+        "empty": "Wala pang nakitang problema…"
+      },
+      "version": {
+        "engine": "makina",
+        "detecting": "nakakakita…",
+        "legacy": "legacy — walang live na pag-unlad (nauna na ang saropa_lints ng proyektong ito)"
+      }
+    },
     "runReportFirst": "Patakbuhin muli ang ulat, pagkatapos ay kopyahin ang JSON.",
     "copiedJson": "Kinopya ang Code Health JSON sa clipboard.",
     "couldNotOpenFile": "Hindi mabuksan ang file: {path}",

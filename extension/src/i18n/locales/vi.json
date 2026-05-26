@@ -691,6 +691,50 @@
     "skipToTable": "Chuyển đến bảng chức năng",
     "openWorkspaceFirst": "Trước tiên hãy mở không gian làm việc Dart/Flutter.",
     "scanningTitle": "Tình trạng mã: chức năng quét…",
+    "scan": {
+      "title": "Quét tình trạng dự án",
+      "subtitle": "Đọc mã của bạn. Bảng điều khiển sẽ hiển thị khi quá trình quét tìm hiểu thêm.",
+      "waiting": "Đang bắt đầu quét…",
+      "launching": "Đang khởi chạy máy quét…",
+      "collect": "Đang khám phá các tập tin…",
+      "firstRunHint": "Lần chạy đầu tiên biên dịch máy quét; các dự án lớn cần một chút thời gian trước khi các tập tin xuất hiện.",
+      "paused": "Đã tạm dừng",
+      "stopped": "Đã dừng quét",
+      "elapsed": "Đã qua",
+      "phase": {
+        "parse": "Phân tích tập tin",
+        "history": "Đọc lịch sử git",
+        "blame": "Tuổi mã máy tính",
+        "usage": "Đếm tài liệu tham khảo",
+        "score": "Chức năng chấm điểm"
+      },
+      "counter": {
+        "files": "Tập tin",
+        "functions": "Chức năng",
+        "problems": "Đã tìm thấy sự cố"
+      },
+      "counters": {
+        "aria": "Bộ đếm quét trực tiếp"
+      },
+      "controls": {
+        "aria": "Điều khiển quét"
+      },
+      "btn": {
+        "pause": "Tạm dừng",
+        "resume": "Bản tóm tắt",
+        "restart": "Khởi động lại",
+        "cancel": "Hủy bỏ"
+      },
+      "preview": {
+        "heading": "Các vấn đề được tìm thấy cho đến nay",
+        "empty": "Chưa tìm thấy vấn đề gì…"
+      },
+      "version": {
+        "engine": "Động cơ",
+        "detecting": "phát hiện…",
+        "legacy": "di sản - không có tiến triển trực tiếp (saropa_lints của dự án này có trước nó)"
+      }
+    },
     "runReportFirst": "Chạy lại báo cáo, sau đó sao chép JSON.",
     "copiedJson": "Code Health JSON đã được sao chép vào bảng nhớ tạm.",
     "couldNotOpenFile": "Không thể mở tập tin: {path}",

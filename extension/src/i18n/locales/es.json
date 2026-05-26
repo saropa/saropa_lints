@@ -691,6 +691,50 @@
     "skipToTable": "Saltar a la tabla de funciones",
     "openWorkspaceFirst": "Primero abra un espacio de trabajo de Dart/Flutter.",
     "scanningTitle": "Code Health: funciones de escaneo...",
+    "scan": {
+      "title": "Escaneando el estado del proyecto",
+      "subtitle": "Leyendo tu código. El panel se completa a medida que el escaneo aprende más.",
+      "waiting": "Iniciando escaneo…",
+      "launching": "Lanzando el escáner…",
+      "collect": "Descubriendo archivos...",
+      "firstRunHint": "La primera ejecución compila el escáner; Los proyectos grandes tardan un momento antes de que aparezcan los archivos.",
+      "paused": "En pausa",
+      "stopped": "Escaneo detenido",
+      "elapsed": "Transcurrido",
+      "phase": {
+        "parse": "Analizando archivos",
+        "history": "Leyendo el historial de git",
+        "blame": "Era del código informático",
+        "usage": "Contando referencias",
+        "score": "Funciones de puntuación"
+      },
+      "counter": {
+        "files": "Archivos",
+        "functions": "Funciones",
+        "problems": "Problemas encontrados"
+      },
+      "counters": {
+        "aria": "Contadores de escaneo en vivo"
+      },
+      "controls": {
+        "aria": "Controles de escaneo"
+      },
+      "btn": {
+        "pause": "Pausa",
+        "resume": "Reanudar",
+        "restart": "Reanudar",
+        "cancel": "Cancelar"
+      },
+      "preview": {
+        "heading": "Problemas encontrados hasta el momento",
+        "empty": "Aún no se han encontrado problemas..."
+      },
+      "version": {
+        "engine": "Motor",
+        "detecting": "detector…",
+        "legacy": "legado: sin progreso en vivo (saropa_lints de este proyecto es anterior)"
+      }
+    },
     "runReportFirst": "Ejecute el informe nuevamente y luego copie JSON.",
     "copiedJson": "Code Health JSON copiado al portapapeles.",
     "couldNotOpenFile": "No se pudo abrir el archivo: {path}",

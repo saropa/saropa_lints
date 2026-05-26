@@ -691,6 +691,50 @@
     "skipToTable": "跳至功能表",
     "openWorkspaceFirst": "首先打开 Dart/Flutter 工作区。",
     "scanningTitle": "代码健康：扫描功能...",
+    "scan": {
+      "title": "扫描项目健康状况",
+      "subtitle": "阅读你的代码。随着扫描了解更多信息，仪表板将会填充。",
+      "waiting": "开始扫描...",
+      "launching": "正在启动扫描仪...",
+      "collect": "正在发现文件...",
+      "firstRunHint": "第一次运行编译扫描器；大型项目需要一段时间才能出现文件。",
+      "paused": "已暂停",
+      "stopped": "扫描已停止",
+      "elapsed": "过去",
+      "phase": {
+        "parse": "解析文件",
+        "history": "阅读 git 历史",
+        "blame": "计算代码时代",
+        "usage": "计算参考文献",
+        "score": "评分功能"
+      },
+      "counter": {
+        "files": "文件",
+        "functions": "功能",
+        "problems": "发现问题"
+      },
+      "counters": {
+        "aria": "实时扫描计数器"
+      },
+      "controls": {
+        "aria": "扫描控制"
+      },
+      "btn": {
+        "pause": "暂停",
+        "resume": "恢复",
+        "restart": "重新启动",
+        "cancel": "取消"
+      },
+      "preview": {
+        "heading": "目前发现的问题",
+        "empty": "还没有发现问题..."
+      },
+      "version": {
+        "engine": "引擎",
+        "detecting": "检测…",
+        "legacy": "遗留 - 没有实时进展（该项目的 saropa_lints 早于它）"
+      }
+    },
     "runReportFirst": "再次运行报告，然后复制 JSON。",
     "copiedJson": "代码健康 JSON 已复制到剪贴板。",
     "couldNotOpenFile": "无法打开文件：{path}",

@@ -691,6 +691,50 @@
     "skipToTable": "기능 표로 건너뛰기",
     "openWorkspaceFirst": "먼저 Dart/Flutter 작업공간을 엽니다.",
     "scanningTitle": "코드 상태: 검색 기능…",
+    "scan": {
+      "title": "프로젝트 상태 스캔 중",
+      "subtitle": "코드를 읽는 중입니다. 스캔을 통해 더 많은 내용이 학습되면 대시보드가 ​​채워집니다.",
+      "waiting": "스캔 시작 중…",
+      "launching": "스캐너 실행 중…",
+      "collect": "파일 검색 중…",
+      "firstRunHint": "처음 실행하면 스캐너가 컴파일됩니다. 대규모 프로젝트에서는 파일이 나타나기까지 잠시 시간이 걸립니다.",
+      "paused": "일시중지됨",
+      "stopped": "스캔이 중지되었습니다.",
+      "elapsed": "경과됨",
+      "phase": {
+        "parse": "파일 구문 분석",
+        "history": "Git 기록 읽기",
+        "blame": "컴퓨팅 코드 연령",
+        "usage": "참조 계산",
+        "score": "채점 기능"
+      },
+      "counter": {
+        "files": "파일",
+        "functions": "기능",
+        "problems": "발견된 문제"
+      },
+      "counters": {
+        "aria": "라이브 스캔 카운터"
+      },
+      "controls": {
+        "aria": "스캔 컨트롤"
+      },
+      "btn": {
+        "pause": "정지시키다",
+        "resume": "재개하다",
+        "restart": "다시 시작",
+        "cancel": "취소"
+      },
+      "preview": {
+        "heading": "현재까지 발견된 문제점",
+        "empty": "아직 문제는 발견되지 않았습니다…"
+      },
+      "version": {
+        "engine": "엔진",
+        "detecting": "감지 중…",
+        "legacy": "레거시 — 실시간 진행 없음(이 프로젝트의 saropa_lints가 이전 버전임)"
+      }
+    },
     "runReportFirst": "보고서를 다시 실행한 후 JSON을 복사하세요.",
     "copiedJson": "Code Health JSON이 클립보드에 복사되었습니다.",
     "couldNotOpenFile": "파일을 열 수 없습니다: {path}",

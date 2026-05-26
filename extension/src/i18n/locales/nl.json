@@ -691,6 +691,50 @@
     "skipToTable": "Ga naar de functietabel",
     "openWorkspaceFirst": "Open eerst een Dart/Flutter-werkruimte.",
     "scanningTitle": "Code Health: scanfuncties…",
+    "scan": {
+      "title": "Projectstatus scannen",
+      "subtitle": "Je code lezen. Het dashboard wordt ingevuld naarmate de scan meer leert.",
+      "waiting": "Scannen starten…",
+      "launching": "Scanner starten…",
+      "collect": "Bestanden ontdekken…",
+      "firstRunHint": "Bij de eerste run wordt de scanner gecompileerd; bij grote projecten duurt het even voordat bestanden verschijnen.",
+      "paused": "Gepauzeerd",
+      "stopped": "Scannen gestopt",
+      "elapsed": "Verstreken",
+      "phase": {
+        "parse": "Bestanden parseren",
+        "history": "Git-geschiedenis lezen",
+        "blame": "Leeftijd computercode",
+        "usage": "Referenties tellen",
+        "score": "Scorefuncties"
+      },
+      "counter": {
+        "files": "Bestanden",
+        "functions": "Functies",
+        "problems": "Problemen gevonden"
+      },
+      "counters": {
+        "aria": "Live scantellers"
+      },
+      "controls": {
+        "aria": "Scanbediening"
+      },
+      "btn": {
+        "pause": "Pauze",
+        "resume": "Cv",
+        "restart": "Opnieuw opstarten",
+        "cancel": "Annuleren"
+      },
+      "preview": {
+        "heading": "Tot nu toe gevonden problemen",
+        "empty": "Nog geen problemen gevonden…"
+      },
+      "version": {
+        "engine": "Motor",
+        "detecting": "detecteren…",
+        "legacy": "erfenis - geen live voortgang (de saropa_lints van dit project dateert van vóór het project)"
+      }
+    },
     "runReportFirst": "Voer het rapport opnieuw uit en kopieer vervolgens JSON.",
     "copiedJson": "Code Health JSON gekopieerd naar klembord.",
     "couldNotOpenFile": "Kan bestand niet openen: {path}",
