@@ -2,7 +2,7 @@
   "name": "saropa-lints",
   "displayName": "%extension.displayName%",
   "description": "%extension.description%",
-  "version": "13.10.4",
+  "version": "13.11.0",
   "publisher": "saropa",
   "license": "MIT",
   "repository": {
@@ -1137,6 +1137,11 @@
             "type": "boolean",
             "default": false,
             "description": "%config.property.runAnalysisOpenEditorsOnly.description%"
+          },
+          "saropaLints.regressionNudge.enabled": {
+            "type": "boolean",
+            "default": true,
+            "markdownDescription": "%config.property.regressionNudge.enabled.markdownDescription%"
           },
           "saropaLints.inlineAnnotations": {
             "type": "boolean",

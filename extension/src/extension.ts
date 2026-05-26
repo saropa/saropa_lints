@@ -137,33 +137,106 @@ function getConfig() {
 /**
  * D8: Show regression nudge when score dipped below a threshold.
  *
- * Two-layer protection against stacking toasts during slow linting:
+ * Four-layer protection against repeat / false-positive toasts:
  *
- * 1. **Debounce (3 s):** the analyzer writes violations.json in batches
+ * 1. **User opt-out (`saropaLints.regressionNudge.enabled`):** when off,
+ *    no regression toasts fire at all. Defaults to on.
+ *
+ * 2. **Per-threshold memory in workspaceState:** once we have nudged
+ *    about crossing band T (e.g. 50), we record T in
+ *    [NUDGE_NOTIFIED_THRESHOLDS_KEY] and silently suppress further
+ *    crossings of the same T until the score recovers clearly above
+ *    that band. This kills the previous failure mode where the
+ *    visibility gate released the moment the user dismissed the toast,
+ *    so a score oscillating around an edge (89 \u2194 91) produced a fresh
+ *    "below 90" toast on every save. Re-arm lives in
+ *    [rearmNotifiedThresholds] and runs from `runCelebrationIfNeeded`.
+ *
+ * 3. **Two-snapshot confirmation ([NUDGE_PENDING_ANCHOR_KEY]):** a
+ *    downward crossing detected on one snapshot is *pended*, not fired,
+ *    and only confirmed if the next snapshot still scores below the same
+ *    band. This defends against the dashboard-vs-toast misalignment seen
+ *    when the IDE writes an intermediate partial sweep that crosses
+ *    `MIN_COVERAGE_FOR_SCORE` (15%) but skews the score downward \u2014 the
+ *    dashboard later shows a healthy 93 while a stale toast for "below
+ *    50" had already fired from a 1-file batch. The anchor stores the
+ *    pre-regression score so the confirming snapshot re-runs the
+ *    crossing detector against the true baseline, preserving the lowest
+ *    threshold crossed.
+ *
+ * 4. **Debounce (3 s):** the analyzer writes violations.json in batches
  *    >300ms apart, each crossing a lower threshold (70 \u2192 60 \u2192 50).
  *    The debounce coalesces rapid crossings and keeps only the worst
  *    (lowest) threshold before firing a single notification.
- *
- * 2. **Visibility gate:** VS Code has no API to dismiss or replace an
- *    `showInformationMessage` toast. If a nudge is already on screen
- *    (user hasn't clicked or dismissed it), new crossings are silently
- *    absorbed \u2014 the existing toast already tells the user to look.
  */
+const NUDGE_NOTIFIED_THRESHOLDS_KEY = 'saropaLints.regressionNudge.notifiedThresholds';
+const NUDGE_PENDING_ANCHOR_KEY = 'saropaLints.regressionNudge.pendingAnchor';
+const NO_ERRORS_CELEBRATED_KEY = 'saropaLints.noErrorsCelebrated';
+// Required recovery above a notified band before we will nudge again
+// for that band. 5 points is a full grade step in the score formula, so
+// the score must climb solidly out of the band \u2014 not just bounce one
+// point above the edge \u2014 before we'll fire a second toast for it.
+const NUDGE_REARM_MARGIN = 5;
+
 let regressionNudgeTimer: ReturnType<typeof setTimeout> | undefined;
 let pendingNudgeCrossing: { threshold: number } | undefined;
 let pendingNudgeSnapshot: RunSnapshot | undefined;
-// True while a regression toast is visible (showInformationMessage
-// resolves when the user clicks an action or dismisses the toast).
-let nudgeVisible = false;
 
-function showRegressionNudge(crossing: { threshold: number }, curr: RunSnapshot): void {
-  // If a toast is already on screen, swallow silently. The user already
-  // knows things are regressing; stacking more toasts is just noise.
-  if (nudgeVisible) return;
+function readNotifiedThresholds(state: vscode.Memento): number[] {
+  const raw = state.get<unknown>(NUDGE_NOTIFIED_THRESHOLDS_KEY);
+  if (!Array.isArray(raw)) return [];
+  return raw.filter((n): n is number => typeof n === 'number' && Number.isFinite(n));
+}
 
-  // Keep whichever threshold is worse (lower). During a multi-step slide
-  // (score drops through 70, then 60, then 50) this ensures we show only
-  // the final "below 50" toast, not all three.
+function writeNotifiedThresholds(state: vscode.Memento, thresholds: number[]): void {
+  void state.update(NUDGE_NOTIFIED_THRESHOLDS_KEY, thresholds);
+}
+
+/**
+ * Re-arm regression nudges for any band the score has clearly climbed
+ * out of. Called from `runCelebrationIfNeeded` on every recorded snapshot
+ * so a band that was previously notified can fire again after a real
+ * recovery, but small oscillations around the edge do not.
+ */
+function rearmNotifiedThresholds(state: vscode.Memento, currentScore: number): void {
+  const notified = readNotifiedThresholds(state);
+  if (notified.length === 0) return;
+  const remaining = notified.filter((t) => currentScore < t + NUDGE_REARM_MARGIN);
+  if (remaining.length !== notified.length) writeNotifiedThresholds(state, remaining);
+}
+
+/**
+ * Read the pending-anchor (pre-regression score) from workspaceState.
+ * Returns undefined when nothing is pending or the stored value is malformed
+ * (defensive — workspaceState is opaque storage and a stale extension build
+ * could have written a different shape).
+ */
+function readPendingAnchor(state: vscode.Memento): number | undefined {
+  const raw = state.get<unknown>(NUDGE_PENDING_ANCHOR_KEY);
+  return typeof raw === 'number' && Number.isFinite(raw) ? raw : undefined;
+}
+
+function writePendingAnchor(state: vscode.Memento, anchor: number | undefined): void {
+  void state.update(NUDGE_PENDING_ANCHOR_KEY, anchor);
+}
+
+function showRegressionNudge(
+  state: vscode.Memento,
+  crossing: { threshold: number },
+  curr: RunSnapshot,
+): void {
+  // Layer 1: setting opt-out. User can silence regression toasts entirely.
+  if (getConfig().get<boolean>('regressionNudge.enabled', true) !== true) return;
+
+  // Layer 2: memory gate. We have already nudged about this band and
+  // the score has not recovered above (threshold + REARM_MARGIN), so a
+  // fresh crossing in the same direction is the same news \u2014 stay quiet.
+  if (readNotifiedThresholds(state).includes(crossing.threshold)) return;
+
+  // Layer 3: keep whichever threshold is worse (lower) within the
+  // coalesce window. During a multi-step slide (score drops through 70,
+  // then 60, then 50) this ensures we show only the final "below 50"
+  // toast, not all three.
   if (!pendingNudgeCrossing || crossing.threshold < pendingNudgeCrossing.threshold) {
     pendingNudgeCrossing = crossing;
   }
@@ -179,17 +252,19 @@ function showRegressionNudge(crossing: { threshold: number }, curr: RunSnapshot)
     pendingNudgeCrossing = undefined;
     pendingNudgeSnapshot = undefined;
 
+    // Re-check the memory gate at fire time: a re-arm or a parallel
+    // crossing for the same band could have updated state during the
+    // 3 s coalesce window.
+    const notifiedNow = readNotifiedThresholds(state);
+    if (notifiedNow.includes(c.threshold)) return;
+    writeNotifiedThresholds(state, [...notifiedNow, c.threshold]);
+
     const errorSuffix = s.error === 1 ? '' : 's';
     const msg =
       s.error > 0
         ? `${s.error} error${errorSuffix} \u2014 view.`
         : `Score dipped below ${c.threshold} \u2014 view issues.`;
-    nudgeVisible = true;
-    // Promise resolves when the user clicks "View Violations" or
-    // dismisses the toast (choice === undefined). Either way the
-    // nudge is no longer on screen.
     vscode.window.showInformationMessage(`Saropa Lints: ${msg}`, 'View Violations').then((choice) => {
-      nudgeVisible = false;
       if (choice === 'View Violations') {
         vscode.commands.executeCommand('saropaLints.focusIssues');
       }
@@ -198,7 +273,12 @@ function showRegressionNudge(crossing: { threshold: number }, curr: RunSnapshot)
 }
 
 /** Show celebration/milestone UI when a new snapshot was appended and history has at least 2 entries. */
-function runCelebrationIfNeeded(root: string, history: RunSnapshot[], appended: boolean): void {
+function runCelebrationIfNeeded(
+  state: vscode.Memento,
+  root: string,
+  history: RunSnapshot[],
+  appended: boolean,
+): void {
   if (!appended || history.length < 2) return;
   const prev = history.at(-2)!;
   const curr = history.at(-1)!;
@@ -214,13 +294,51 @@ function runCelebrationIfNeeded(root: string, history: RunSnapshot[], appended: 
       5000,
     );
   }
-  // Celebrate clearing all ERROR-severity diagnostics (must-fix). Was
-  // previously gated on LintImpact.critical, which is a parallel saropa
-  // count; the analyzer's native error severity is the right zero-target.
-  if (prev.error > 0 && curr.error === 0) {
-    vscode.window.showInformationMessage('Saropa Lints: No errors!');
+
+  // Re-arm regression-nudge memory when the score has climbed clearly
+  // above a previously-notified band. Runs every appended snapshot so a
+  // genuine recovery → regression cycle still produces one toast per cycle.
+  if (curr.score !== undefined) rearmNotifiedThresholds(state, curr.score);
+
+  // Celebrate clearing all ERROR-severity diagnostics (must-fix), but at
+  // most once per zero-streak. Without the persisted flag, an error count
+  // that flickers 0 ↔ 1 across saves (intermediate analyzer batches that
+  // briefly drop and re-add an error) re-fires the toast every time.
+  // The flag re-arms the next time errors return so a real cleanup that
+  // happens after a regression still earns a fresh "No errors!".
+  if (curr.error > 0) {
+    if (state.get<boolean>(NO_ERRORS_CELEBRATED_KEY) === true) {
+      void state.update(NO_ERRORS_CELEBRATED_KEY, false);
+    }
+  } else if (prev.error > 0 && curr.error === 0) {
+    if (state.get<boolean>(NO_ERRORS_CELEBRATED_KEY) !== true) {
+      void state.update(NO_ERRORS_CELEBRATED_KEY, true);
+      vscode.window.showInformationMessage('Saropa Lints: No errors!');
+    }
   }
+
   if (curr.score === undefined) return;
+
+  // Two-snapshot confirmation gate. A downward crossing detected last
+  // snapshot was pended (not fired); this snapshot decides. Re-running
+  // detectThresholdCrossing against the stored anchor (the pre-regression
+  // score) returns the *current* lowest crossed band — important for a
+  // genuine multi-step slide where the score has dropped further between
+  // the pending and confirming snapshots.
+  const pendingAnchor = readPendingAnchor(state);
+  if (pendingAnchor !== undefined) {
+    writePendingAnchor(state, undefined);
+    const confirmed = detectThresholdCrossing(curr.score, pendingAnchor);
+    if (confirmed?.direction === 'down') {
+      showRegressionNudge(state, confirmed, curr);
+      return;
+    }
+    // Anchor cleared without firing: the next-snapshot bounce-back is
+    // evidence the prior dip was transient (partial sweep). Fall through
+    // and let this snapshot independently start a new pending if it
+    // crosses its own band.
+  }
+
   const crossing = detectThresholdCrossing(curr.score, findPreviousScore(history));
   if (crossing?.direction === 'up') {
     logSection('Milestone');
@@ -235,7 +353,13 @@ function runCelebrationIfNeeded(root: string, history: RunSnapshot[], appended: 
     return;
   }
   if (crossing?.direction === 'down') {
-    showRegressionNudge(crossing, curr);
+    // Pend, don't fire. The next snapshot either confirms (score is
+    // still below the band — fire then) or clears (score recovered —
+    // the dip was a transient partial sweep, stay quiet). The anchor
+    // stores the pre-regression score so the confirming snapshot can
+    // re-derive the lowest band crossed.
+    const previousScore = findPreviousScore(history);
+    if (previousScore !== undefined) writePendingAnchor(state, previousScore);
   }
 }
 
@@ -598,7 +722,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
           refreshAll();
           updateAllStatusBars(data);
           updateContext(getConfig().get<boolean>('enabled', true) ?? true, issuesProvider.hasViolations());
-          runCelebrationIfNeeded(root, history, appended);
+          runCelebrationIfNeeded(context.workspaceState, root, history, appended);
           return;
         }
       }
