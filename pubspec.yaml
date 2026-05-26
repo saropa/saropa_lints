@@ -45,6 +45,8 @@ executables:
   # `bin/project_vibrancy.dart`, which only resolves inside this repo and broke
   # the Code Health Dashboard for every downstream workspace.
   project_vibrancy: project_vibrancy
+  # Project Health "size map" scan, invoked by the Saropa Project Map dashboard.
+  project_health: project_health
 
 # Dart SDK constraint (pure Dart package; Flutter topic tag provides discoverability)
 environment:

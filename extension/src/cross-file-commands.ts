@@ -189,6 +189,8 @@ export function registerCrossFileCommands(context: vscode.ExtensionContext): voi
       void vscode.window.showInformationMessage('Cross-file snapshot written to reports/.saropa_lints/cross_file_snapshot.json');
     }),
   );
+  // The Saropa Project Map dashboard command lives in views/projectMapView.ts — it
+  // renders an in-editor webview with vendored ECharts (offline), spawned async.
 }
 
 function getWorkspaceRootOrError(): string | null {

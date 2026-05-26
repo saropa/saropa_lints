@@ -50,6 +50,8 @@ import { registerIssuesViewCommands } from './commands/issuesViewCommands';
 import { showCommandCatalogPanel } from './views/commandCatalogView';
 import { showRelatedRuleTelemetryPanel } from './views/relatedRuleTelemetryView';
 import { openProjectVibrancyReport, refreshCodeHealthDashboardIfOpen } from './views/projectVibrancyReportView';
+import { registerProjectMapCommand } from './views/projectMapView';
+import { registerHealthCodeLens } from './views/healthCodeLens';
 import { discoverServer } from './driftAdvisor/discovery';
 import { fetchIssues } from './driftAdvisor/client';
 import { mapIssuesToLocations } from './driftAdvisor/mapper';
@@ -431,6 +433,8 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   };
 
   registerCrossFileCommands(context);
+  registerProjectMapCommand(context);
+  registerHealthCodeLens(context);
   let driftAdvisorRefreshInProgress = false;
 
   let todosAndHacksSaveDebounce: ReturnType<typeof setTimeout> | undefined;

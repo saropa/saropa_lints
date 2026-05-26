@@ -1,6 +1,6 @@
 /**
  * Resolves the working directory for the `dart run saropa_lints:<tool>` that the
- * Code Health and Project Map dashboards spawn.
+ * Code Health and Saropa Project Map dashboards spawn.
  *
  * Which directory wins decides WHICH saropa_lints CLI executes:
  *  - Production: the scanned project (so it uses that project's own pinned

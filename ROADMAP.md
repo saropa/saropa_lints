@@ -92,6 +92,7 @@ Project-level code health scoring and surfacing plan snapshot lives in [plans/hi
 |------------|--------|
 | Project Vibrancy MVP (collectors + scoring + CLI) | In progress (CLI JSON/text, scoped scans, CI gates including coverage-quality counts; analyzer-element usage + full plan parity ongoing — see plan snapshot) |
 | Project Vibrancy UI surfaces (tree/editor/HTML/history) | In progress (function report webview; native tree, editor overlays, history/trends pending — see plan snapshot) |
+| Saropa Project Map dashboard (size map · dead-weight · coverage · git · hot spots) | In progress — plan in [plans/PROJECT_HEALTH_DASHBOARD_PLAN.md](plans/PROJECT_HEALTH_DASHBOARD_PLAN.md). Shipped on the `project_health` CLI (53 tests): size map (NDJSON shards, memory-flat); complexity + class LCOM + Maintainability Index (`--complexity`); dead-weight overlay (`--deadweight`); coverage (`--coverage`/`--lcov`); git churn/recency/bus-factor (`--git`); unused assets (`--assets`); 🔥 hot-spot ranking + AI-fix Markdown (`--format markdown`); self-contained ECharts HTML report (`--format html`); transitive dead private islands (`--islands`); change coupling (`--coupling`); stub-test density (`--stubs`); reviewable `git rm` fix script (`--fix`); and the **"Saropa Project Map"** sidebar dashboard (sixth Editor-dashboards leaf, tsc + catalog-sync verified). Remaining refinement: vendor ECharts so charts render in an offline in-editor webview (currently opens in the browser via CDN) |
 
 ---
 

@@ -756,6 +756,22 @@ export const catalogEntries: readonly CatalogEntry[] = [
     icon: 'graph',
   },
   {
+    command: 'saropaLints.openProjectHealthDashboard',
+    title: 'Open Saropa Project Map Dashboard',
+    description:
+      'Project-wide size map, dead-weight, complexity, git churn, and hot spots (size treemap + churn×complexity charts).',
+    category: 'Code Health',
+    icon: 'flame',
+  },
+  {
+    command: 'saropaLints.toggleProjectMapCodeLensHeat',
+    title: 'Toggle Saropa Project Map Heat CodeLens (in-editor)',
+    description:
+      'Turn the in-editor per-function complexity CodeLens on or off (off by default to avoid clutter).',
+    category: 'Code Health',
+    icon: 'flame',
+  },
+  {
     command: 'saropaLints.openProjectVibrancySettings',
     title: 'Open Code Health Settings',
     // Setting key prefix is still `saropaLints.projectVibrancy` from the

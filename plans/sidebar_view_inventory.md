@@ -20,7 +20,7 @@ Counts below are from `extension/package.json` and `extension/src/views/sectione
 | `editor/title` rows | **2** | Package Vibrancy CodeLens toggles on `pubspec.yaml` |
 | `editor/context` rows | **1** | `packageVibrancy.sortDependencies` on `pubspec.yaml` |
 | `commandPalette` entries | **39** | Mostly visibility/enablement gates for palette entries (was 40 before `b1ec4ffd`) |
-| **Editor dashboards** tree **leaves** | **5** | See `buildEditorDashboardItems` in [sectionedSidebar.ts](../extension/src/views/sectionedSidebar.ts) |
+| **Editor dashboards** tree **leaves** | **6** | See `buildEditorDashboardItems` in [sectionedSidebar.ts](../extension/src/views/sectionedSidebar.ts) (added "Saropa Project Map" 2026-05-25, renamed from "Project Map" 2026-05-26) |
 | Editor **HTML** dashboard buttons | **Not counted here** | Each dashboard is its own bundle |
 
 ---
@@ -44,13 +44,14 @@ The earlier per-concern trees (`overview`, `fileRisk`, `summary`, `suppressions`
 
 ## Editor dashboards — tree shape
 
-`buildEditorDashboardItems` returns **five leaves** (no nested groups, flat list):
+`buildEditorDashboardItems` returns **six leaves** (no nested groups, flat list):
 
 1. **Lints Config** → `saropaLints.openConfigDashboard`
 2. **Package Dashboard** → `saropaLints.packageVibrancy.showReport`
 3. **Code Health Dashboard** → `saropaLints.openProjectVibrancyReport`
-4. **Findings Dashboard** → `saropaLints.openViolationsWideReport`
-5. **Command Catalog** → `saropaLints.showCommandCatalog`
+4. **Saropa Project Map** → `saropaLints.openProjectHealthDashboard`
+5. **Findings Dashboard** → `saropaLints.openViolationsWideReport`
+6. **Command Catalog** → `saropaLints.showCommandCatalog`
 
 Run analysis, walkthrough, about, pub.dev, and Create AI agent instructions live under **Actions** / **Help**, not under Editor dashboards.
 

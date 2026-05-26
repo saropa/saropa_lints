@@ -164,6 +164,16 @@
         "icon": "$(graph)"
       },
       {
+        "command": "saropaLints.openProjectHealthDashboard",
+        "title": "Saropa Lints: Open Saropa Project Map Dashboard",
+        "icon": "$(flame)"
+      },
+      {
+        "command": "saropaLints.toggleProjectMapCodeLensHeat",
+        "title": "Saropa Lints: Toggle Saropa Project Map Heat CodeLens (in-editor)",
+        "icon": "$(flame)"
+      },
+      {
         "command": "saropaLints.openProjectVibrancySettings",
         "title": "%command.openProjectVibrancySettings.title%",
         "icon": "$(settings-gear)"
@@ -1052,6 +1062,11 @@
             "type": "boolean",
             "default": true,
             "markdownDescription": "%config.property.enabled.markdownDescription%"
+          },
+          "saropaLints.projectMap.codeLensHeat": {
+            "type": "boolean",
+            "default": false,
+            "description": "Show per-function complexity 'heat' as in-editor CodeLens above functions (from the last Saropa Project Map scan). Off by default to avoid clutter; toggle with 'Saropa Lints: Toggle Saropa Project Map Heat CodeLens'."
           },
           "saropaLints.tier": {
             "type": "string",
