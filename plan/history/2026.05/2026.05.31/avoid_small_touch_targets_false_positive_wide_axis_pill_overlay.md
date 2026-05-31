@@ -296,7 +296,93 @@ user encountered the FP) does full resolution, so the fix lands as designed.
 
 ## Commits
 
-(Pending — implemented in this turn.)
+- `de245617` — fix(rules): avoid_small_touch_targets skips wide-band region recognizers
+- (follow-up this turn) — docs(bugs): append finish report to archived avoid_small_touch_targets bug
+
+---
+
+## Finish Report (2026-05-31)
+
+### Scope
+
+(A) Dart lint rules — touched `lib/src/rules/ui/accessibility_rules.dart`, expanded `example/lib/accessibility/avoid_small_touch_targets_fixture.dart`, added a `### Fixed` entry to `CHANGELOG.md`, archived this bug file from `bugs/` to `plan/history/2026.05/2026.05.31/`.
+
+### Change Summary
+
+Replaced the single `_interactiveWidgets` set with two intent-specific sets:
+
+- `_iconSizedTargets` (`IconButton`, `Checkbox`, `Radio`, `Switch`, `TextButton`, `ElevatedButton`, `OutlinedButton`) — visual size IS hit area → either axis `< 44` still fires.
+- `_regionRecognizers` (`GestureDetector`, `InkWell`, `InkResponse`) — cover their child's layout slot → require BOTH axes explicitly `< 44`.
+
+Descendant classification now uses a small `_InteractiveDescendants` struct (`hasIconSized` / `hasRegionRecognizer`). A SizedBox containing both kinds is still flagged via the icon-sized path (preserves original detection on mixed subtrees).
+
+Rule version stamp bumped: DartDoc `v5` → `v6`, problem-message `{v5}` → `{v6}`.
+
+### Deep Review Notes
+
+- **Logic & safety**: Synchronous AST walk via `RecursiveAstVisitor`, bounded to SizedBox subtree. No race or recursion risk.
+- **Architecture**: `_InteractiveDescendants` is a private 3-field flag carrier scoped to this file — no shared-utility extraction warranted.
+- **Linter integrity**: Tier (`recommendedOnlyRules`), impact (`warning`), cost (`medium`), tags unchanged. No quick fix added — resizing is not safely automatable.
+- **Performance**: Same single-pass `visitChildren`. Two set lookups per descendant instead of one — negligible.
+- **Documentation**: Inline comments above each set state the rationale; DartDoc updated to explain the icon vs region distinction.
+- **Refactoring scope**: None beyond the rule.
+
+### Testing
+
+**A. Existing test audit**:
+
+- `test/rules/ui/accessibility_rules_test.dart` references `AvoidSmallTouchTargetsRule()` for instantiation only. Constructor signature unchanged → still passes. Fixture-existence test → still passes.
+- No test pins this rule's message string, severity, threshold, or visitor internals.
+- Other files containing `_interactiveWidgets` (`widget_patterns_avoid_prefer_rules.dart:3935`, `testing_best_practices_rules.dart:1150`) are private fields in different classes — unaffected.
+- Removed helper `_containsInteractiveWidget` has no external references.
+- Ran `dart test test/rules/ui/accessibility_rules_test.dart` → 82 tests pass.
+- Ran `dart analyze --fatal-infos lib test` → clean.
+
+**B. New behavior tests**:
+
+`example/lib/accessibility/avoid_small_touch_targets_fixture.dart` expanded 2 → 6 cases with `// expect_lint:` markers:
+
+| Case | Shape | Expected |
+|---|---|---|
+| `_bad1` | `SizedBox(width: 24, height: 24, child: IconButton())` | LINT |
+| `_good1` | `SizedBox(width: 48, height: 48, child: IconButton())` | no lint |
+| `_bad2_iconSingleAxisSmall` | `SizedBox(height: 32, child: IconButton())` | LINT (icon single-axis) |
+| `_good2_widePillOverlay` | bug repro: SizedBox h38 / Stack / Positioned / AnimatedOpacity / GestureDetector | no lint |
+| `_good3_wideListRowInkWell` | `SizedBox(height: 40, child: InkWell(child: ListTile()))` | no lint |
+| `_bad3_smallSquareGesture` | `SizedBox(width: 24, height: 24, child: GestureDetector(...))` | LINT |
+
+**Caveat — scan-CLI gap**: the rule's dispatch uses `node.constructorName.type.element?.name`, which requires resolved type info. The scan CLI uses `parseString` (unresolved) → `element` is `null` and the rule no-ops there. Verified by:
+
+1. Predicate trace on paper against the bug's repro (wide pill → no fire).
+2. Original `_bad1` / `_good1` semantics preserved under the new predicate.
+3. Production analyzer (where the user hit the FP in `app_search_bar.dart:655`) does full resolution → fix lands as designed.
+
+### Project Maintenance
+
+- CHANGELOG: `### Fixed` bullet added under `[Unreleased]` per the file's density contract (what → why → user action).
+- README: rule count `2106+` unchanged → no edit.
+- pubspec: no dependency or version change.
+- Roadmap: no completed lint entries to remove.
+- Guides: reviewed; no developer-facing change.
+- Bug archival: this file `git mv`'d from `bugs/` to `plan/history/2026.05/2026.05.31/` with `Status: Fixed`.
+
+`Bug archived: bugs/avoid_small_touch_targets_false_positive_wide_axis_pill_overlay.md → plan/history/2026.05/2026.05.31/avoid_small_touch_targets_false_positive_wide_axis_pill_overlay.md`
+
+`Finish report appended: plan/history/2026.05/2026.05.31/avoid_small_touch_targets_false_positive_wide_axis_pill_overlay.md`
+
+### Files Touched
+
+| Type | Path |
+|---|---|
+| edited | `lib/src/rules/ui/accessibility_rules.dart` |
+| edited | `example/lib/accessibility/avoid_small_touch_targets_fixture.dart` |
+| edited | `CHANGELOG.md` |
+| renamed | `bugs/avoid_small_touch_targets_false_positive_wide_axis_pill_overlay.md` → `plan/history/2026.05/2026.05.31/avoid_small_touch_targets_false_positive_wide_axis_pill_overlay.md` |
+| appended | this file (Finish Report section) |
+
+### Outstanding Work
+
+None.
 
 ---
 
