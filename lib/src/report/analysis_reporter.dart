@@ -95,6 +95,15 @@ class AnalysisReporter {
   /// Maximum report files to keep in the reports directory.
   static const int _maxReportFiles = 10;
 
+  /// Maximum age for trashed report files before they are deleted.
+  ///
+  /// `_cleanOldReports` moves overflow into `reports/.trash/` but nothing
+  /// else sweeps it; without retention the directory grows unboundedly
+  /// (an observed project hit 6,837 trashed files / 659 MB after a few
+  /// weeks). 14 days is long enough to recover a report you actually
+  /// wanted to keep, short enough that disk usage stays bounded.
+  static const Duration _trashRetention = Duration(days: 14);
+
   /// Maximum rows in the FILE IMPORTANCE table.
   static const int _maxFileImportanceRows = 50;
 
@@ -184,25 +193,30 @@ class AnalysisReporter {
     _debounceTimer = Timer(_debounce, _writeReport);
   }
 
-  /// Start a fresh report session.
+  /// Reset accumulated tracker state when re-analysis is detected, so the
+  /// next report reflects only the current pass and not stale counts from
+  /// the prior pass over the same files.
   ///
-  /// Called when re-analysis is detected after a report has been written.
-  /// Resets all accumulated data and generates a new timestamp so the
-  /// next report is written to a new file.
+  /// Why this does NOT mint a new sessionId or isolateId: the IDE re-runs
+  /// the analyzer on every file save. Historically this method generated a
+  /// fresh sessionId on each re-analysis, producing one new
+  /// `*_saropa_lint_report.log` per save — at ~30s cadence that buried
+  /// `reports/<date>/` and accumulated thousands of files in
+  /// `reports/.trash/` (one observed project had 6,837 trashed files /
+  /// 659 MB). The reporter's documented contract at the top of this class
+  /// is "a single timestamped file that is overwritten on each debounce
+  /// cycle"; reusing both IDs honors that contract — the same report file
+  /// and this isolate's existing batch file are overwritten in place on
+  /// the next `_writeReport()` call.
+  ///
+  /// `_hasReportWritten` stays `true` so `_hasPathsLogged` is preserved
+  /// and we don't spam stderr with the report path on every save.
   static void _startNewSession() {
     ProgressTracker.reset();
     ImpactTracker.reset();
     SuppressionTracker.reset();
     ImportGraphTracker.reset();
     ProgressTracker.clearReanalysisFlag();
-    final root = _projectRoot;
-    if (root != null) {
-      ReportConsolidator.cleanupSession(root);
-      _sessionId = ReportConsolidator.initSession(root);
-    }
-    _isolateId = _generateIsolateId();
-    _hasPathsLogged = false;
-    _hasReportWritten = false;
   }
 
   /// The project root directory, or null if not initialized.
@@ -1094,7 +1108,8 @@ class AnalysisReporter {
   /// Move old report files to `.trash/`, keeping only the
   /// [_maxReportFiles] most recent across all date subdirectories.
   /// Trashed files can still be viewed but are excluded from the
-  /// active reports listing.
+  /// active reports listing. Also sweeps `.trash/` of files older than
+  /// [_trashRetention] so it does not grow unboundedly.
   static void _cleanOldReports() {
     // Copy static nullable into local (avoid_nullable_interpolation).
     final root = _projectRoot;
@@ -1120,17 +1135,19 @@ class AnalysisReporter {
       }
       reportFiles.sort((a, b) => b.path.compareTo(a.path));
 
-      if (reportFiles.length <= _maxReportFiles) return;
-
       final trashDir = Directory('$root${sep}reports$sep.trash');
-      if (!trashDir.existsSync()) {
-        trashDir.createSync(recursive: true);
+
+      if (reportFiles.length > _maxReportFiles) {
+        if (!trashDir.existsSync()) {
+          trashDir.createSync(recursive: true);
+        }
+        for (final old in reportFiles.skip(_maxReportFiles)) {
+          final name = old.path.split(sep).last;
+          old.renameSync('${trashDir.path}$sep$name');
+        }
       }
 
-      for (final old in reportFiles.skip(_maxReportFiles)) {
-        final name = old.path.split(sep).last;
-        old.renameSync('${trashDir.path}$sep$name');
-      }
+      _pruneTrash(trashDir);
     } catch (e, st) {
       developer.log(
         '_rotateReports cleanup failed',
@@ -1139,6 +1156,25 @@ class AnalysisReporter {
         stackTrace: st,
       );
       // Cleanup failure is non-critical — silently ignore.
+    }
+  }
+
+  /// Delete trashed `*_saropa_lint_report.log` files older than
+  /// [_trashRetention]. Best-effort: per-file failures are skipped so a
+  /// single locked file doesn't block the rest of the sweep.
+  static void _pruneTrash(Directory trashDir) {
+    if (!trashDir.existsSync()) return;
+    final cutoff = DateTime.now().subtract(_trashRetention);
+    for (final entity in trashDir.listSync()) {
+      if (entity is! File) continue;
+      if (!entity.path.endsWith('_saropa_lint_report.log')) continue;
+      try {
+        if (entity.lastModifiedSync().isBefore(cutoff)) {
+          entity.deleteSync();
+        }
+      } on Object {
+        // Best-effort: skip files we can't stat or delete.
+      }
     }
   }
 

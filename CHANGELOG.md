@@ -63,10 +63,17 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 -->
 
-## [13.11.1]
+## [13.11.2]
 
 ### Fixed
 
+- **Analysis reports no longer pile up — one file per VS Code session, overwritten in place** — every file save was previously generating a new `*_saropa_lint_report.log` (one observed project had 6,837 trashed reports / 659 MB in `reports/.trash/`), violating the reporter's documented contract; the reporter now overwrites the same file on each debounce cycle and also prunes trashed reports older than 14 days. No action required.
+
+---
+
+## [13.11.1]
+
+Stub build for publishing. No recorded changes.
 
 ---
 

@@ -7,7 +7,7 @@
   "views.actions.name": "اقدامات",
   "views.status.name": "وضعیت",
   "views.settings.name": "تنظیمات",
-  "views.help.name": "راهنما (نسخه 13.10.4) (v13.11.1)",
+  "views.help.name": "راهنما (نسخه 13.11.1) (v13.11.2)",
   "viewsWelcome.banner.contents": "**Saropa Lints**\n\n2100+ قوانین پرز دارت و فلاتر برای امنیت، دسترسی و عملکرد.\n\nبه پروژه دارت یا فلاتر نیاز دارد.\n\nبرای شروع، یک پوشه حاوی «pubspec.yaml» باز کنید.\n\n[بیشتر به صورت آنلاین بیاموزید](https://pub.dev/packages/saropa_lints)\n[مرور همه دستورات] (command:saropaLints.showCommandCatalog)\n[درباره Saropa Lints](command:saropaLints.showAbout)\n[شروع به کار] (command:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: راه اندازی پروژه (pubspec + config)",
   "command.disable.title": "Saropa Lints: یکپارچه سازی Lint را خاموش کنید",
