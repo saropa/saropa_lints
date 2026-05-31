@@ -65,6 +65,12 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [Unreleased]
 
+### Fixed
+
+- **`function_always_returns_null` no longer fires on `@override` declarations that return null.** Overriding a nullable parent member (e.g. `@override Color? get barrierColor => null;` on a no-barrier `ModalRoute`) honors the parent's contract — the override cannot widen the return type, and returning anything other than `null` would lie about absence. The rule now skips any declaration carrying `@override`; if the parent's return type were non-nullable, the override would already be a compile error, so the annotation alone is a sufficient signal. No action required.
+- **`avoid_small_touch_targets` no longer false-fires on wide-band overlays.** A `SizedBox` or `Container` whose single small axis (e.g. `height: 38`) wrapped a `GestureDetector`, `InkWell`, or `InkResponse` — typically a dismiss-on-tap pill, list row, or `Positioned.fill` overlay — was incorrectly flagged as a small touch target even though the tap region spans the full parent width. The rule now distinguishes icon-sized targets (`IconButton`, `Checkbox`, `Radio`, `Switch`, `TextButton`, `ElevatedButton`, `OutlinedButton`) — where either axis under 44 px is a real concern — from region recognizers, which require both axes explicitly under 44 px to fire. Remove any project-local `// ignore: avoid_small_touch_targets` comments added to silence the false positive.
+- **`prefer_layout_builder_for_constraints` no longer fires inside `static` utility methods that take a `BuildContext`.** Static helpers like `MenuUtils.popupMenuConstraints(BuildContext)` compute absolute viewport-fraction dimensions for non-widget return types (`BoxConstraints`, `Size`, `EdgeInsets`); `LayoutBuilder` is structurally inapplicable to them because there is no parent constraint to consult and the return is data, not a widget. Instance methods that take `BuildContext` (the 2026-04-28 case) still fire. Remove any project-local `// ignore: prefer_layout_builder_for_constraints` comments added to silence the false positive on static utilities.
+
 <details>
 <summary>Maintenance</summary>
 

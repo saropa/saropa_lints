@@ -89,12 +89,18 @@ class AvoidIconButtonsWithoutTooltipRule extends SaropaLintRule {
 
 /// Warns when touch targets are potentially too small for accessibility.
 ///
-/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+/// Since: v0.1.4 | Updated: v13.11.3 | Rule version: v6
 ///
 /// WCAG 2.1 recommends touch targets be at least 44x44 CSS pixels.
 /// Material Design recommends 48x48 dp minimum.
 ///
 /// This rule checks for explicit small sizes on interactive widgets.
+/// The check distinguishes icon-sized targets (IconButton, Checkbox,
+/// Radio, Switch, TextButton, ElevatedButton, OutlinedButton) from
+/// region recognizers (GestureDetector, InkWell, InkResponse): icon-
+/// sized targets flag on EITHER axis being small, but region recognizers
+/// require BOTH axes small so wide-band pills (full-width x 38 px) wrapping
+/// a dismiss-on-tap GestureDetector via Positioned.fill do not false-fire.
 ///
 /// **BAD:**
 /// ```dart
@@ -131,7 +137,7 @@ class AvoidSmallTouchTargetsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'avoid_small_touch_targets',
-    '[avoid_small_touch_targets] Touch target under 44px violates WCAG 2.5.5 (Target Size). Users with motor impairments, tremors, or limited dexterity will struggle to tap accurately, causing frustration and excluding them from core functionality. The minimum recommended touch target size is 48x48 logical pixels to ensure reliable interaction across all ability levels. {v5}',
+    '[avoid_small_touch_targets] Touch target under 44px violates WCAG 2.5.5 (Target Size). Users with motor impairments, tremors, or limited dexterity will struggle to tap accurately, causing frustration and excluding them from core functionality. The minimum recommended touch target size is 48x48 logical pixels to ensure reliable interaction across all ability levels. {v6}',
     correctionMessage:
         'Wrap the interactive element in a SizedBox(width: 48, height: 48) or set MaterialTapTargetSize.padded to ensure the touch area meets the 48px minimum.',
     severity: DiagnosticSeverity.INFO,
@@ -139,17 +145,30 @@ class AvoidSmallTouchTargetsRule extends SaropaLintRule {
 
   static const double _minTouchTarget = 44.0;
 
-  static const Set<String> _interactiveWidgets = <String>{
+  // Icon-sized targets: the visual size IS the hit area, so squeezing
+  // EITHER axis below 44 px makes the tap unreliable. Example:
+  // SizedBox(height: 32, child: IconButton(...)) — width may be wide
+  // via parent layout, but the icon's hit patch is icon-sized and
+  // gets clipped vertically.
+  static const Set<String> _iconSizedTargets = <String>{
     'IconButton',
     'TextButton',
     'ElevatedButton',
     'OutlinedButton',
-    'GestureDetector',
-    'InkWell',
-    'InkResponse',
     'Checkbox',
     'Radio',
     'Switch',
+  };
+
+  // Region recognizers: cover whatever their child / Positioned.fill
+  // lays out to. A wide-band pill (full-width x 38 px) wrapped around
+  // a GestureDetector for dismiss-on-tap is hit-reliable, so only flag
+  // when BOTH axes are explicitly small. See
+  // bugs/avoid_small_touch_targets_false_positive_wide_axis_pill_overlay.md.
+  static const Set<String> _regionRecognizers = <String>{
+    'GestureDetector',
+    'InkWell',
+    'InkResponse',
   };
 
   @override
@@ -163,11 +182,9 @@ class AvoidSmallTouchTargetsRule extends SaropaLintRule {
         return;
       }
 
-      // Check if it contains an interactive widget
-      final bool hasInteractiveChild = _containsInteractiveWidget(node);
-      if (!hasInteractiveChild) return;
+      final _InteractiveDescendants descendants = _classifyDescendants(node);
+      if (!descendants.hasAny) return;
 
-      // Check width and height
       double? width;
       double? height;
 
@@ -185,23 +202,37 @@ class AvoidSmallTouchTargetsRule extends SaropaLintRule {
         }
       }
 
-      if ((width != null && width < _minTouchTarget) ||
-          (height != null && height < _minTouchTarget)) {
+      final bool widthSmall = width != null && width < _minTouchTarget;
+      final bool heightSmall = height != null && height < _minTouchTarget;
+
+      // Icon-sized: ANY explicit small axis is a real tap concern.
+      // Region recognizer: require BOTH axes small — a one-axis-small,
+      // other-axis-wide-or-unspecified shape is the wide pill / list-row
+      // tap pattern and is hit-reliable.
+      final bool shouldReport =
+          (descendants.hasIconSized && (widthSmall || heightSmall)) ||
+          (descendants.hasRegionRecognizer && widthSmall && heightSmall);
+
+      if (shouldReport) {
         reporter.atNode(node.constructorName, code);
       }
     });
   }
 
-  bool _containsInteractiveWidget(InstanceCreationExpression node) {
-    bool found = false;
+  _InteractiveDescendants _classifyDescendants(
+    InstanceCreationExpression node,
+  ) {
+    final _InteractiveDescendants result = _InteractiveDescendants();
     node.visitChildren(
       _InteractiveWidgetVisitor((String name) {
-        if (_interactiveWidgets.contains(name)) {
-          found = true;
+        if (_iconSizedTargets.contains(name)) {
+          result.hasIconSized = true;
+        } else if (_regionRecognizers.contains(name)) {
+          result.hasRegionRecognizer = true;
         }
       }),
     );
-    return found;
+    return result;
   }
 
   double? _extractNumericValue(Expression expr) {
@@ -212,6 +243,12 @@ class AvoidSmallTouchTargetsRule extends SaropaLintRule {
     }
     return null;
   }
+}
+
+class _InteractiveDescendants {
+  bool hasIconSized = false;
+  bool hasRegionRecognizer = false;
+  bool get hasAny => hasIconSized || hasRegionRecognizer;
 }
 
 class _InteractiveWidgetVisitor extends RecursiveAstVisitor<void> {

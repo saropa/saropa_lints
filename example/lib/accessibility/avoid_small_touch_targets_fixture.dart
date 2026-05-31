@@ -107,21 +107,78 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic child;
 
-// BAD: Should trigger avoid_small_touch_targets
+// BAD: Both axes < 44 around an icon-sized target.
 // expect_lint: avoid_small_touch_targets
 void _bad1() {
+  SizedBox(width: 24, height: 24, child: IconButton());
+}
+
+// GOOD: Both axes >= 44 around an icon-sized target.
+void _good1() {
+  SizedBox(width: 48, height: 48, child: IconButton());
+}
+
+// BAD: Single small axis around an icon-sized target. The icon's hit patch
+// is icon-sized regardless of parent width — squeezing the height clips it.
+// expect_lint: avoid_small_touch_targets
+void _bad2_iconSingleAxisSmall() {
+  SizedBox(height: 32, child: IconButton());
+}
+
+// GOOD: Wide-pill overlay (full-width x 38 px) wrapping a region recognizer
+// for dismiss-on-tap. The tap region is the whole pill, not an icon-sized
+// hit, so the per-axis check must not fire on the outer SizedBox.
+// See bugs history: avoid_small_touch_targets_false_positive_wide_axis_pill_overlay.md
+void _good2_widePillOverlay() {
   SizedBox(
-    width: 24,
-    height: 24,
-    child: IconButton(),
+    height: 38,
+    child: Stack(
+      children: <Widget>[
+        Row(),
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          child: AnimatedOpacity(
+            duration: Duration(milliseconds: 350),
+            opacity: 1.0,
+            child: GestureDetector(
+              onTap: _noop,
+              child: ColoredBox(
+                color: Color(0xFFFFFFFF),
+                child: Align(child: Text('Good morning, Craig')),
+              ),
+            ),
+          ),
+        ),
+      ],
+    ),
   );
 }
 
-// GOOD: Should NOT trigger avoid_small_touch_targets
-void _good1() {
+// GOOD: Wide list-row tap area (height 40, width unspecified — list row
+// fills parent). InkWell is a region recognizer; the tap area is the row,
+// not a small square.
+void _good3_wideListRowInkWell() {
   SizedBox(
-    width: 48,
-    height: 48,
-    child: IconButton(),
+    height: 40,
+    child: InkWell(onTap: _noop, child: ListTile()),
   );
 }
+
+// BAD: Both axes explicitly small around a region recognizer — small square
+// gesture target genuinely fails WCAG 2.5.5.
+// expect_lint: avoid_small_touch_targets
+void _bad3_smallSquareGesture() {
+  SizedBox(
+    width: 24,
+    height: 24,
+    child: GestureDetector(
+      onTap: _noop,
+      child: ColoredBox(color: Color(0xFFFFFFFF)),
+    ),
+  );
+}
+
+void _noop() {}

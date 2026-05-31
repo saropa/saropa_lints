@@ -1,12 +1,13 @@
 # BUG: `avoid_small_touch_targets` — Fires on Wide-Axis Pill Overlay Whose Tap Area Is Huge
 
-**Status: Open**
+**Status: Fixed**
 
 Created: 2026-05-30
+Fixed: 2026-05-31
 Rule: `avoid_small_touch_targets`
 File: `lib/src/rules/ui/accessibility_rules.dart` (line ~116)
 Severity: False positive
-Rule version: v5 | Since: unknown | Updated: v5
+Rule version: v5 → v6 | Since: unknown | Updated: v13.11.3
 
 ---
 
@@ -257,19 +258,45 @@ regression is caught by the fixture suite.
 
 ## Changes Made
 
-(Not yet — bug filed, fix pending.)
+Implemented Hypothesis B (split `_interactiveWidgets` by category) layered with Hypothesis A (require both axes small for region recognizers). The single
+`_interactiveWidgets` set was replaced by two intent-specific sets:
 
----
+- `_iconSizedTargets` — `IconButton`, `TextButton`, `ElevatedButton`,
+  `OutlinedButton`, `Checkbox`, `Radio`, `Switch`. Visual size IS the hit area,
+  so the per-axis OR check remains (either explicit axis `< 44` fires).
+- `_regionRecognizers` — `GestureDetector`, `InkWell`, `InkResponse`. The
+  gesture covers whatever the child / `Positioned.fill` lays out to, so the
+  rule now requires BOTH axes to be explicitly `< 44` before firing. The
+  wide-pill case (`SizedBox(height: 38)` over a `Positioned.fill` GestureDetector,
+  width unspecified) has `widthSmall == false` and is therefore skipped.
+
+The descendant walk now classifies into a small struct (`_InteractiveDescendants`
+with `hasIconSized` / `hasRegionRecognizer` flags) so a single SizedBox
+containing both kinds is still flagged via the icon-sized path. The rule's
+DartDoc and version stamp were updated to `v6`; problem-message version
+tag bumped from `{v5}` to `{v6}`.
 
 ## Tests Added
 
-(Pending — see Fixture Gap section.)
+`example/lib/accessibility/avoid_small_touch_targets_fixture.dart` was expanded
+from 2 cases to 6 cases covering the gap list:
 
----
+- `_bad1` (kept) — `SizedBox(width: 24, height: 24, child: IconButton())` → LINT.
+- `_good1` (kept) — `SizedBox(width: 48, height: 48, child: IconButton())` → no lint.
+- `_bad2_iconSingleAxisSmall` (new) — `SizedBox(height: 32, child: IconButton())` → LINT (icon-sized + single-axis-small).
+- `_good2_widePillOverlay` (new) — bug reproducer: `SizedBox(height: 38, child: Stack([Row(), Positioned(...child: AnimatedOpacity(child: GestureDetector(...))))]))` → no lint.
+- `_good3_wideListRowInkWell` (new) — `SizedBox(height: 40, child: InkWell(child: ListTile()))` → no lint.
+- `_bad3_smallSquareGesture` (new) — `SizedBox(width: 24, height: 24, child: GestureDetector(...))` → LINT (region recognizer + both axes small is still a genuine small tap target).
+
+Note: the project's unit tests pin instantiation only; fixture behavior is
+verified by reading + the new `expect_lint:` markers. The scan CLI uses
+unresolved `parseString`, so `node.constructorName.type.element?.name`
+returns null there and the rule no-ops — production analyzer (where the
+user encountered the FP) does full resolution, so the fix lands as designed.
 
 ## Commits
 
-(None yet.)
+(Pending — implemented in this turn.)
 
 ---
 
