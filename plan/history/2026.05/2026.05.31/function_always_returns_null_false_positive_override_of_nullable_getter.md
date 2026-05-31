@@ -1,8 +1,9 @@
 # BUG: `function_always_returns_null` — false positive on override of nullable getter from parent class
 
-**Status: Open**
+**Status: Fixed**
 
 Created: 2026-05-31
+Fixed: 2026-05-31
 Rule: `function_always_returns_null`
 File: `lib/src/rules/code_quality/code_quality_variables_rules.dart` (line ~663, body check ~712)
 Severity: False positive
@@ -229,4 +230,125 @@ should include:
 
 ## Changes Made
 
-(Filled in when a fix is written.)
+### Fix (2026-05-31)
+
+Implemented **Hypothesis A** from the report — the `@override` syntactic
+check. Both call sites in `FunctionAlwaysReturnsNullRule.runWithReporter`
+(`addFunctionDeclaration` and `addMethodDeclaration`) now early-exit when
+the declaration carries an `@override` annotation, before `_checkFunctionBody`
+runs.
+
+The annotation-alone check is sufficient: if the parent declared a
+non-nullable return type, returning `null` would already be a compile error
+(`invalid_override`), so any `@override` returning `null` that compiles must
+be honoring a parent contract that permits null.
+
+**Code:** `lib/src/rules/code_quality/code_quality_variables_rules.dart`
+- `addFunctionDeclaration` / `addMethodDeclaration` callbacks now guard on
+  `_hasOverrideAnnotation(node.metadata)`.
+- New private helper `_hasOverrideAnnotation(NodeList<Annotation>)` returns
+  true when any annotation's name is `override`. Matches the existing
+  pattern used in `code_quality_avoid_rules.dart:3938`,
+  `code_quality_prefer_rules.dart:2248`, and `bloc_rules.dart:2833`.
+
+**Fixture:** `example/lib/code_quality/function_always_returns_null_fixture.dart`
+- Added `_NullableParent` / `_NullableChild` pair covering the three forms
+  named in the report: expression-body getter override, block-body getter
+  override, expression-body method override. All three expect NO lint.
+- Added `unannotatedReturnsNull` negative guard — same shape without
+  `@override`. This still triggers `function_always_returns_null` to
+  prove the rule's prior behavior is preserved for non-overrides.
+
+### Verification
+
+Standalone scan against a temp project containing both overriding and
+non-overriding null-returning methods:
+
+```
+String? alwaysReturnsNull() => null;            // LINT (line 4) ✓
+class Plain {
+  int? compute() => null;                       // LINT (line 8) ✓
+  String? get value { return null; }            // LINT (line 9) ✓
+}
+class Child extends Parent {
+  @override String? get label => null;          // no lint ✓
+  @override int? get value { return null; }     // no lint ✓
+  @override String? compute() => null;          // no lint ✓
+  @override Color? barrierColor() => null;      // no lint ✓
+}
+```
+
+`dart test test/rules/code_quality/code_quality_rules_test.dart` — 208/208
+passing, including the rule's instantiation pin.
+
+### Downstream
+
+`saropa_contacts/lib/components/primitive/menu/menu_utils.dart` lines 118
+and 124 carry `// ignore: function_always_returns_null` comments that
+point at this bug. They can be removed once a `saropa_lints` release
+containing this fix is consumed by that repo.
+
+---
+
+## Finish Report (2026-05-31)
+
+**Scope:** (A) Dart lint rules + (C) docs. No analyzer-plugin lifecycle code touched; no tier reassignment; no severity / impact / cost change; no quick fix added (the fix is to stop emitting, not to autofix).
+
+**Files in this task's commit:**
+
+- `lib/src/rules/code_quality/code_quality_variables_rules.dart` — added `_hasOverrideAnnotation()` helper; wired both `addFunctionDeclaration` and `addMethodDeclaration` callbacks to early-exit when the declaration carries `@override`.
+- `example/lib/code_quality/function_always_returns_null_fixture.dart` — added `_NullableParent` abstract class and `_NullableChild` override implementations (expression-body getter, block-body getter, expression-body method) with no `expect_lint` markers, plus an unannotated negative guard that still carries `expect_lint`.
+- `CHANGELOG.md` — added `### Fixed` entry under `[Unreleased]`.
+- `bugs/function_always_returns_null_false_positive_override_of_nullable_getter.md` — flipped `Status` to `Fixed`, populated `Changes Made`, appended this finish report. The file is renamed in the same commit to `plan/history/2026.05/2026.05.31/`.
+
+**Files explicitly excluded from this commit** (other workstreams' unverified changes already in the working tree at the start of this task; not mine to commit):
+
+- `example/lib/accessibility/avoid_small_touch_targets_fixture.dart`
+- `example/lib/widget_layout/prefer_layout_builder_for_constraints_fixture.dart`
+- `lib/src/rules/ui/accessibility_rules.dart`
+- `lib/src/rules/widget/widget_layout_constraints_rules.dart`
+
+**Diff summary of core logic change:**
+
+```dart
+// In FunctionAlwaysReturnsNullRule.runWithReporter:
+context.addFunctionDeclaration((FunctionDeclaration node) {
++  if (_hasOverrideAnnotation(node.metadata)) return;
+  _checkFunctionBody(...);
+});
+context.addMethodDeclaration((MethodDeclaration node) {
++  if (_hasOverrideAnnotation(node.metadata)) return;
+  _checkFunctionBody(...);
+});
++bool _hasOverrideAnnotation(NodeList<Annotation> metadata) {
++  return metadata.any((Annotation a) => a.name.name == 'override');
++}
+```
+
+**Why annotation-only is sufficient** (not element-model lookup): if the
+parent declared a non-nullable return type, the override returning `null`
+would already be a compile error (`invalid_override`). Therefore any
+`@override` returning `null` that compiles must be honoring a parent
+contract that permits null. No need to resolve the parent.
+
+**Verification:**
+
+1. Standalone scan against `d:/tmp/farn_proj` covering 4 plain forms and 4 `@override` forms (getter expression-body, getter block-body, method expression-body, method `barrierColor`-style):
+   - Plain forms: 3 hits at the expected lines (4, 8, 9). The 4th — `Color? barrierColor() => null` inside `abstract class Parent` with no `@override` — also fires at line 18, as expected (negative guard).
+   - `@override` forms (lines 28, 31, 36, 39): zero hits. Fix confirmed.
+2. `dart test test/rules/code_quality/code_quality_rules_test.dart` — 208/208 pass.
+3. `dart test test/integrity/false_positive_fixes_test.dart` — 16/16 pass.
+
+**Tier / registration audit:**
+
+- Rule remains registered in `lib/saropa_lints.dart:645` via `FunctionAlwaysReturnsNullRule.new`.
+- Rule remains in `recommendedOnlyRules` at `lib/src/tiers.dart:1548`.
+- `code.lowerCaseName`, `problemMessage`, `correctionMessage`, `severity`, `LintImpact.warning`, `RuleType.codeSmell`, `RuleCost.medium` all unchanged.
+
+**No quick fix added.** This bug is a "stop emitting" fix, not a code-rewrite fix. The pre-existing message still recommends "Change the return type to void" — that recommendation is still valid for the cases the rule still fires on (non-override null-returning methods), so no message change is needed.
+
+**Outstanding work:** none in this repo. Downstream `saropa_contacts/lib/components/primitive/menu/menu_utils.dart` carries two `// ignore: function_always_returns_null` comments pointing at this bug — they can be removed once a `saropa_lints` release containing this fix is consumed.
+
+**Bug archived:** `bugs/function_always_returns_null_false_positive_override_of_nullable_getter.md` → `plan/history/2026.05/2026.05.31/function_always_returns_null_false_positive_override_of_nullable_getter.md`.
+
+**Finish report appended:** `plan/history/2026.05/2026.05.31/function_always_returns_null_false_positive_override_of_nullable_getter.md`.

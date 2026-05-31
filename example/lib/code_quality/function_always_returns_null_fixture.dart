@@ -201,6 +201,40 @@ Stream<List<int>>? nullableStreamGenerator(List<int>? items) async* {
 }
 
 // =========================================================================
+// GOOD: @override of nullable parent member returning null — should NOT
+// be flagged. Returning null honors the parent's contract; the override
+// cannot widen the return type to non-null. Textbook case:
+// `@override Color? get barrierColor => null;` on a no-barrier route.
+// =========================================================================
+
+abstract class _NullableParent {
+  String? get label;
+  int? get value;
+  String? compute();
+}
+
+class _NullableChild extends _NullableParent {
+  // Override of nullable getter — honors parent contract; no lint expected.
+  @override
+  String? get label => null;
+
+  // Override of nullable getter (block body) — no lint expected.
+  @override
+  int? get value {
+    return null;
+  }
+
+  // Override of nullable method — no lint expected.
+  @override
+  String? compute() => null;
+}
+
+// Negative guard: same shape without @override — current behavior preserved,
+// lint still fires.
+// expect_lint: function_always_returns_null
+String? unannotatedReturnsNull() => null;
+
+// =========================================================================
 // Known trade-off: Non-generator Stream?/Iterable? returning null
 // =========================================================================
 // The return-type guard skips Stream/Iterable return types entirely.

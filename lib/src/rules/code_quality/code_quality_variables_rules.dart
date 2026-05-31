@@ -673,6 +673,9 @@ class FunctionAlwaysReturnsNullRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addFunctionDeclaration((FunctionDeclaration node) {
+      // Top-level functions cannot override anything, but the annotation
+      // check is harmless and keeps both call sites symmetrical.
+      if (_hasOverrideAnnotation(node.metadata)) return;
       _checkFunctionBody(
         node.functionExpression.body,
         node.returnType,
@@ -682,8 +685,21 @@ class FunctionAlwaysReturnsNullRule extends SaropaLintRule {
     });
 
     context.addMethodDeclaration((MethodDeclaration node) {
+      // Skip `@override` declarations. The parent's nullable return type IS
+      // the contract: returning `null` is honoring it, not a code smell.
+      // Textbook case: `@override Color? get barrierColor => null;`
+      // overriding `ModalRoute.barrierColor` to opt out of the modal barrier.
+      // A syntactic @override check is sufficient — if the parent declared a
+      // non-nullable return type, returning null would already be a compile
+      // error (`invalid_override`), so we can trust that an @override
+      // returning null is honoring a parent contract that permits null.
+      if (_hasOverrideAnnotation(node.metadata)) return;
       _checkFunctionBody(node.body, node.returnType, node.name, reporter);
     });
+  }
+
+  bool _hasOverrideAnnotation(NodeList<Annotation> metadata) {
+    return metadata.any((Annotation a) => a.name.name == 'override');
   }
 
   void _checkFunctionBody(
