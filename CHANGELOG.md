@@ -70,6 +70,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 - **Python publish-tooling tests now find the repo root.** The unittest suite was relocated to `scripts/modules/tests/` in May without updating its `parents[2]` repo-root index, leaving CI's test job red against every release commit since (including `Release v13.11.2`). No user impact.
 - **Removed post-publish auto-bump of `pubspec.yaml`.** Releases no longer auto-commit `chore: bump version to n.n.n+1`. The next publish prompt now defaults to a patch bump only when `CHANGELOG.md` has an `[Unreleased]` section, so minor or major releases no longer have to undo a pre-committed patch decision and main no longer carries phantom version-bump commits for releases that never shipped. No user impact.
+- **Stopped per-release churn of `views.help.name` across 25 locale bundles.** The static value is now the localized word "Help" alone (no version suffix); the runtime `createTreeView().title` injection in `extension/src/extension.ts` continues to display the live `(vX.Y.Z)` from `package.json`, unchanged from the user's perspective. The pre-compile sync script that stamped the version on every locale was deleted, which also fixes a long-standing duplicate-version pattern that had crept into Arabic, Persian, and Polish bundles (the stripper only matched lowercase Latin `v`, leaving translated version parens intact across releases). No user impact.
 
 </details>
 

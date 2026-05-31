@@ -7,7 +7,7 @@
   "views.actions.name": "ايڪشنز",
   "views.status.name": "اسٽيٽس",
   "views.settings.name": "سيٽنگز",
-  "views.help.name": "مدد (v13.11.2)",
+  "views.help.name": "مدد",
   "viewsWelcome.banner.contents": "**Saropa لنٹس**\n\nسیکیورٹی، رسائی اور کارکردگی کے لیے 2100+ ڈارٹ اور فلٹر لنٹ کے اصول۔\n\nڈارٹ یا فلٹر پروجیکٹ کی ضرورت ہے۔\n\nشروع کرنے کے لیے ایک فولڈر کھولیں جس میں `pubspec.yaml` ہو۔\n\n[آن لائن مزید جانیں](https://pub.dev/packages/saropa_lints)\n[تمام کمانڈز کو براؤز کریں](command:saropaLints.showCommandCatalog)\n[Saropa Lints کے بارے میں](command:saropaLints.showAbout)\n[شروع کرنا](command:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: پروجيڪٽ سيٽ اپ ڪريو (pubspec + config)",
   "command.disable.title": "Saropa Lints: Lint انٽيگريشن بند ڪريو",
