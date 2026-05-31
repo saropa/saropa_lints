@@ -279,6 +279,29 @@ def increment_version(version: str) -> str:
     return ".".join(parts)
 
 
+def has_unreleased_section(changelog_path: Path) -> bool:
+    """Return True if CHANGELOG.md has a ``## [Unreleased]`` heading.
+
+    Used by the publish prompt to decide the default version offered:
+    presence of an Unreleased section is the signal that there is real
+    work pending against the last-published pubspec version, so the
+    default should be ``increment_version(pubspec_version)``. Without
+    an Unreleased section the prompt keeps the current pubspec value
+    (which equals the last-published version) — that lands the user at
+    a known-bad default for accidental publish runs and forces an
+    explicit override when they really do mean to ship something.
+
+    Matches the same literal pattern as ``rename_unreleased_to_version``
+    so detection and renaming cannot diverge. Returns False on a missing
+    file rather than raising, because the caller is a default-suggester
+    and a missing CHANGELOG is a publish-blocker handled elsewhere.
+    """
+    if not changelog_path.is_file():
+        return False
+    content = changelog_path.read_text(encoding="utf-8")
+    return bool(re.search(r"## \[Unreleased\]", content))
+
+
 def rename_unreleased_to_version(
     changelog_path: Path, version: str
 ) -> bool:

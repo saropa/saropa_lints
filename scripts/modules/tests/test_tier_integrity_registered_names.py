@@ -12,8 +12,12 @@ from __future__ import annotations
 import unittest
 from pathlib import Path
 
-# Repo root (parent of scripts/)
-_ROOT = Path(__file__).resolve().parents[2]
+# Repo root: this file is scripts/modules/tests/<name>.py, so parents[3] = repo root.
+# Previously parents[2] when the suite lived at scripts/tests/; the relocate
+# commit b311c339 moved the files one level deeper without updating this index,
+# which made every path resolve under scripts/ and broke CI silently for tests
+# that referenced existing files only.
+_ROOT = Path(__file__).resolve().parents[3]
 
 
 class TestFindLintRuleClassStart(unittest.TestCase):

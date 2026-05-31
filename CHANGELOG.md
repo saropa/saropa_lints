@@ -63,6 +63,18 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 -->
 
+## [Unreleased]
+
+<details>
+<summary>Maintenance</summary>
+
+- **Python publish-tooling tests now find the repo root.** The unittest suite was relocated to `scripts/modules/tests/` in May without updating its `parents[2]` repo-root index, leaving CI's test job red against every release commit since (including `Release v13.11.2`). No user impact.
+- **Removed post-publish auto-bump of `pubspec.yaml`.** Releases no longer auto-commit `chore: bump version to n.n.n+1`. The next publish prompt now defaults to a patch bump only when `CHANGELOG.md` has an `[Unreleased]` section, so minor or major releases no longer have to undo a pre-committed patch decision and main no longer carries phantom version-bump commits for releases that never shipped. No user impact.
+
+</details>
+
+---
+
 ## [13.11.2]
 
 ### Fixed

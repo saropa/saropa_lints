@@ -85,7 +85,11 @@ class TestFindEmptyVersionSections(unittest.TestCase):
     def test_real_project_changelog_has_no_empty_sections(self) -> None:
         # Sanity check against the actual repo state — if this fails,
         # someone reintroduced an orphan stub and publish would abort.
-        repo_root = Path(__file__).resolve().parents[2]
+        # parents[3] = repo root (file is scripts/modules/tests/<name>.py).
+        # parents[2] silently pointed at scripts/ after b311c339 moved the
+        # suite; _find on the missing scripts/CHANGELOG.md returned [], so
+        # the assertion accidentally passed without exercising real input.
+        repo_root = Path(__file__).resolve().parents[3]
         self.assertEqual(self._find(repo_root / "CHANGELOG.md"), [])
 
 

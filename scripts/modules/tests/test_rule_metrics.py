@@ -21,7 +21,9 @@ class CodeQualityFixtureCountTests(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
-        cls.root = Path(__file__).resolve().parents[2]
+        # parents[3] reaches the repo root from scripts/modules/tests/<name>.py.
+        # parents[2] was correct before b311c339 moved the suite one level deeper.
+        cls.root = Path(__file__).resolve().parents[3]
         cls.rules_dir = cls.root / "lib" / "src" / "rules"
         cls.example_dirs = _get_example_dirs(cls.root)
 
@@ -84,7 +86,8 @@ class NestedRuleTestDiscoveryTests(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
-        cls.root = Path(__file__).resolve().parents[2]
+        # See sibling setUpClass for why parents[3] is the repo root.
+        cls.root = Path(__file__).resolve().parents[3]
         cls.rules_dir = cls.root / "lib" / "src" / "rules"
         cls.test_dir = cls.root / "test"
 
@@ -165,7 +168,8 @@ class ExtractRuleMessagesPathTests(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
-        cls.root = Path(__file__).resolve().parents[2]
+        # See first setUpClass in this module for why parents[3] is the repo root.
+        cls.root = Path(__file__).resolve().parents[3]
 
     def test_src_dir_resolves_to_repo_rules_tree(self) -> None:
         # Re-import each run so the module-level path is recomputed cleanly.

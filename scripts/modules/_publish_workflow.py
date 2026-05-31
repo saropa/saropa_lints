@@ -41,7 +41,6 @@ from scripts.modules._git_ops import (
     git_commit_and_push,
     post_publish_commit,
     publish_to_pubdev_step,
-    tag_exists_on_remote,
 )
 from scripts.modules._pubdev_lint import (
     check_pubdev_lint_issues,
@@ -89,6 +88,7 @@ from scripts.modules._version_changelog import (
     display_changelog,
     get_package_name,
     get_version_from_pubspec,
+    has_unreleased_section,
     increment_version,
     prompt_version_until_valid,
     set_version_in_pubspec,
@@ -906,11 +906,21 @@ def run_full_publish(
         )
 
         print_header("VERSION")
+        # Default offered to the prompt:
+        # - CHANGELOG has [Unreleased] → patch bump from current pubspec
+        #   (signals real work pending against the last-published version).
+        # - No [Unreleased] → keep current pubspec value (= last published).
+        #   This lands a known-bad default for accidental publish runs and
+        #   forces an explicit override when the user really means to ship.
+        # Replaces the old tag-on-remote heuristic which only made sense
+        # alongside the post-publish auto-bump that committed the next
+        # patch number into pubspec. That auto-bump was removed because
+        # it pre-committed a patch decision the user might later want to
+        # be a minor or major; the [Unreleased] signal now bumps only
+        # when there is documented work to release.
         default_version = (
             increment_version(ctx.pubspec_version)
-            if tag_exists_on_remote(
-                ctx.project_dir, f"v{ctx.pubspec_version}",
-            )
+            if has_unreleased_section(ctx.changelog_path)
             else ctx.pubspec_version
         )
         version = prompt_version_until_valid(default_version)
@@ -967,14 +977,13 @@ def run_full_publish(
         )
         succeeded = True
 
-        run_version_bump(
-            ctx.project_dir,
-            ctx.pubspec_path,
-            ctx.package_name,
-            version,
-            ctx.branch,
-            timer,
-        )
+        # No post-publish version bump: the next publish run decides the next
+        # version at prompt time, driven by has_unreleased_section() above.
+        # Auto-bumping pre-committed a patch decision (n.n.n+1) which was
+        # wrong any time a minor or major was intended, and left phantom
+        # "chore: bump version to X" commits on main for versions that may
+        # never ship. See run_version_bump() — function kept for direct use
+        # but no longer wired into the publish workflow.
         published_vsix, extension_published = run_extension_after_publish(
             ctx.project_dir, version, timer,
         )
