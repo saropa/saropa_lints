@@ -32,7 +32,7 @@ void main() {
       );
     });
 
-    test('BAD fixture declares seven expect_lint markers', () {
+    test('BAD fixture declares eight expect_lint markers', () {
       final file = File('example/lib/widget_layout/${ruleName}_fixture.dart');
       expect(file.existsSync(), isTrue);
       final content = file.readAsStringSync();
@@ -41,12 +41,39 @@ void main() {
           .length;
       expect(
         markerCount,
-        equals(7),
+        equals(8),
         reason:
             'Constrained width, width+height, sizeOf width, two width operands, '
-            'and AnimatedBuilder builder callback',
+            'AnimatedBuilder builder callback, and instance-helper '
+            'taking BuildContext (preserves 2026-04-28 behavior)',
       );
     });
+
+    test(
+      'static-utility classes appear AFTER OkScreenFraction with no markers',
+      () {
+        // Guards Hypothesis B from
+        // plan/history/2026.05/2026.05.31/prefer_layout_builder_for_constraints_false_positive_static_utility_with_buildcontext.md:
+        // `static` methods that take BuildContext are utilities, not
+        // build-scope, and must not fire the rule. The fixture lives in
+        // the GOOD/OK section so the existing "no expect_lint after
+        // OkScreenFraction" test also covers it; this assertion makes
+        // the intent explicit so a future edit cannot silently delete
+        // the static cases without breaking a test.
+        final file = File('example/lib/widget_layout/${ruleName}_fixture.dart');
+        final content = file.readAsStringSync();
+        expect(
+          content.contains('class OkStaticMenuConstraintsUtils'),
+          isTrue,
+          reason: 'static BoxConstraints utility fixture case is missing',
+        );
+        expect(
+          content.contains('class OkStaticSizeUtils'),
+          isTrue,
+          reason: 'static Size utility fixture case is missing',
+        );
+      },
+    );
 
     test(
       'fixture GOOD / OK blocks after OkScreenFraction have no expect_lint',

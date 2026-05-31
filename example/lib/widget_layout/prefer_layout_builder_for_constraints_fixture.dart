@@ -101,6 +101,20 @@ class _BadAnimatedBuilderCallbackDimensionState
   }
 }
 
+// BAD: instance helper that takes BuildContext STILL fires. Preserves
+// the 2026-04-28 behavior — only `static` short-circuits the build-scope
+// gate. A non-static method on a Widget is still treated as build-phase.
+class BadInstanceBuildContextHelper extends StatelessWidget {
+  const BadInstanceBuildContextHelper({super.key});
+
+  double _readHeight(BuildContext context) =>
+      // expect_lint: prefer_layout_builder_for_constraints
+      MediaQuery.sizeOf(context).height;
+
+  @override
+  Widget build(BuildContext context) => SizedBox(height: _readHeight(context));
+}
+
 // GOOD: intentional screen-relative sizing (not replaceable by LayoutBuilder)
 class OkScreenFraction extends StatelessWidget {
   const OkScreenFraction({super.key});
@@ -199,3 +213,26 @@ class OkAsyncCallbackSnapshot extends StatelessWidget {
     return const SizedBox();
   }
 }
+
+// GOOD: static utility computing BoxConstraints from viewport fraction.
+// LayoutBuilder is structurally inapplicable here — there is no parent
+// constraint to consult, and the return is data, not a widget.
+abstract final class OkStaticMenuConstraintsUtils {
+  OkStaticMenuConstraintsUtils._();
+
+  static BoxConstraints popupConstraints(BuildContext context) {
+    final double height = MediaQuery.sizeOf(context).height;
+    return BoxConstraints(maxHeight: height * 0.9);
+  }
+}
+
+// GOOD: static utility returning a Size derived from the viewport.
+abstract final class OkStaticSizeUtils {
+  OkStaticSizeUtils._();
+
+  static Size halfScreen(BuildContext context) {
+    final Size s = MediaQuery.sizeOf(context);
+    return Size(s.width / 2, s.height / 2);
+  }
+}
+

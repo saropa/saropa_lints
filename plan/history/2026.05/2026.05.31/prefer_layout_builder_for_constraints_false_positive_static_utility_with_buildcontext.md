@@ -1,8 +1,9 @@
 # BUG: `prefer_layout_builder_for_constraints` — false positive on static utility method that takes `BuildContext`
 
-**Status: Open**
+**Status: Fixed**
 
 Created: 2026-05-31
+Fixed: 2026-05-31
 Rule: `prefer_layout_builder_for_constraints`
 File: `lib/src/rules/widget/widget_layout_constraints_rules.dart` (line ~2588, scope check ~2699)
 Severity: False positive
@@ -267,4 +268,93 @@ should include:
 
 ## Changes Made
 
-(Filled in when a fix is written.)
+**Implementation (Hypothesis B — `static` short-circuit):**
+
+- `lib/src/rules/widget/widget_layout_constraints_rules.dart` — `_isInNonBuildScope` now returns `true` immediately when the enclosing `MethodDeclaration.isStatic` is true, before the `build` / lifecycle / `BuildContext`-parameter checks. The check uses the analyzer AST's `isStatic` getter (no element resolution), so the cost is the same one-token inspection as the existing checks. A multi-line `// Why` comment cites this report and the failure mode (`MenuUtils.popupMenuConstraints(BuildContext)`) so the rationale survives at the call site.
+
+**Fixture additions** (`example/lib/widget_layout/prefer_layout_builder_for_constraints_fixture.dart`):
+
+- `BadInstanceBuildContextHelper` — instance helper that takes `BuildContext`; expect-lint marker preserves the 2026-04-28 true-positive case (only `static` short-circuits).
+- `OkStaticMenuConstraintsUtils.popupConstraints(BuildContext)` — static utility returning `BoxConstraints` from `MediaQuery.sizeOf(context).height`; expect NO lint.
+- `OkStaticSizeUtils.halfScreen(BuildContext)` — static utility returning `Size` from `MediaQuery.sizeOf(context)`; expect NO lint.
+
+**Test updates** (`test/rules/widget/prefer_layout_builder_for_constraints_fixture_test.dart`):
+
+- Bumped expected `// expect_lint:` marker count from 7 to 8 (added one for the instance-helper guard).
+- New test `static-utility classes appear AFTER OkScreenFraction with no markers` asserts both static fixture classes exist; the existing "no expect_lint after `OkScreenFraction`" test continues to cover the no-marker requirement on those classes.
+
+**Verification:**
+
+- Repro project at `d:/tmp/lint_repro/` with `dart run saropa_lints scan ... --tier comprehensive --format json`:
+  - Static `popupMenuConstraints` / `halfScreen` utilities — no `prefer_layout_builder_for_constraints` hits (was: 2 false positives).
+  - Instance `BadWidget.build` (lines 37, 38) — still fires (true positive preserved).
+  - Instance `HelperWidget._readHeight` — still fires (2026-04-28 case preserved).
+- All 6 fixture tests pass: `dart test test/rules/widget/prefer_layout_builder_for_constraints_fixture_test.dart` → `+6 All tests passed!`
+- `dart analyze --fatal-infos lib/src/rules/widget/widget_layout_constraints_rules.dart` → `No issues found!`
+
+**Changelog entry:** `CHANGELOG.md` [Unreleased] § Fixed.
+
+**Related closed report:** `plan/history/2026.04/2026.04.28/prefer_layout_builder_for_constraints_false_positive_non_build_method.md` (the `BuildContext`-parameter scope gate this report extends).
+
+---
+
+## Finish Report (2026-05-31)
+
+**Scope:** (A) Dart lint rule — one-branch patch to `PreferLayoutBuilderForConstraintsRule._isInNonBuildScope` so static utility methods that take `BuildContext` no longer get treated as widget-build scope. Fixture, unit test, CHANGELOG, and bug-archive updates land in the same commit.
+
+**Files changed:**
+
+- `lib/src/rules/widget/widget_layout_constraints_rules.dart` — added `if (cur.isStatic) return true;` short-circuit at the top of the `MethodDeclaration` arm of `_isInNonBuildScope` (line ~2711). Multi-line `// Why` comment cites this report and names the failure mode. After moving the bug file to `plan/history/...`, the comment's report-path reference was repointed in the same commit.
+- `example/lib/widget_layout/prefer_layout_builder_for_constraints_fixture.dart` — added three fixture classes:
+  - `BadInstanceBuildContextHelper` (BAD, before `OkScreenFraction`) — pins the instance-method-with-BuildContext true-positive case from 2026-04-28.
+  - `OkStaticMenuConstraintsUtils` (OK, after `OkScreenFraction`) — static `BoxConstraints` utility; expect no lint.
+  - `OkStaticSizeUtils` (OK, after `OkScreenFraction`) — static `Size` utility; expect no lint.
+- `test/rules/widget/prefer_layout_builder_for_constraints_fixture_test.dart` — marker count 7 → 8; new `static-utility classes appear AFTER OkScreenFraction with no markers` test asserts both static fixture classes exist (the existing `no expect_lint after OkScreenFraction` test continues to enforce the no-marker requirement on them). Report-path reference repointed.
+- `CHANGELOG.md` — new `[Unreleased] § Fixed` bullet: "`prefer_layout_builder_for_constraints` no longer fires inside `static` utility methods that take a `BuildContext`."
+- `bugs/prefer_layout_builder_for_constraints_false_positive_static_utility_with_buildcontext.md` → `plan/history/2026.05/2026.05.31/prefer_layout_builder_for_constraints_false_positive_static_utility_with_buildcontext.md` — `git mv`; `Status:` flipped to `Fixed`; `Fixed: 2026-05-31` date added.
+
+**Diff summary of core logic change:**
+
+```diff
+   static bool _isInNonBuildScope(AstNode node) {
+     for (AstNode? cur = node; cur != null; cur = cur.parent) {
+       if (cur is MethodDeclaration) {
++        // Static methods are utilities, not widget builders … [9-line Why]
++        if (cur.isStatic) return true;
+         final String methodName = cur.name.lexeme;
+         if (methodName == 'build') return false;
+         if (_nonBuildLifecycleMethods.contains(methodName)) return true;
+         return !_declaresBuildContextParameter(cur.parameters);
+       }
+```
+
+No other code paths modified. `MethodDeclaration.isStatic` is an analyzer AST getter — same one-token cost as the existing `methodName` check.
+
+**Test results:**
+
+- `dart test test/rules/widget/prefer_layout_builder_for_constraints_fixture_test.dart` → `+6 All tests passed!`
+- `dart test test/rules/widget/widget_layout_rules_test.dart` → `+132 All tests passed!`
+- `dart test test/scan/rule_quick_fix_presence_test.dart` → `+188 All tests passed!`
+- `dart analyze --fatal-infos lib/src/rules/widget/widget_layout_constraints_rules.dart` → `No issues found!`
+
+**External verification (scan CLI repro at `d:/tmp/lint_repro/`):**
+
+| Code shape | Before (rule v5) | After (this patch) |
+|---|---|---|
+| `static BoxConstraints popupMenuConstraints(BuildContext)` | LINT (FP) | no lint ✓ |
+| `static Size halfScreen(BuildContext)` | LINT (FP) | no lint ✓ |
+| `Widget build(BuildContext) { MediaQuery.of(context).size.width … }` | LINT | LINT ✓ |
+| `double _readHeight(BuildContext)` (instance method on Widget) | LINT | LINT ✓ (2026-04-28 case preserved) |
+
+**Test-audit notes:**
+
+- `_isInNonBuildScope` is private — no test pins it directly.
+- `test/scan/rule_quick_fix_presence_test.dart` only imports the rule's containing file; it does not pin any behavior of this rule. No update needed.
+- `test/rules/widget/widget_layout_rules_test.dart` carries a registration smoke test and a registry list assertion for `prefer_layout_builder_for_constraints`. No update needed — name, class, and tier are unchanged.
+- `test/rules/widget/avoid_builder_index_out_of_bounds_behavior_test.dart` matched only on a dartdoc comment mentioning `widget_layout_constraints_rules.dart`; no behavior assertion involved.
+
+**Bug archived:** `bugs/prefer_layout_builder_for_constraints_false_positive_static_utility_with_buildcontext.md` → `plan/history/2026.05/2026.05.31/prefer_layout_builder_for_constraints_false_positive_static_utility_with_buildcontext.md`.
+
+**Finish report appended:** `plan/history/2026.05/2026.05.31/prefer_layout_builder_for_constraints_false_positive_static_utility_with_buildcontext.md`.
+
+**Outstanding work:** None for this task. The downstream silencing comment in `saropa_contacts/lib/components/primitive/menu/menu_utils.dart` (referenced in the bug's "Downstream site this surfaced on") can be removed once the next `saropa_lints` release ships — out of scope for this repo.

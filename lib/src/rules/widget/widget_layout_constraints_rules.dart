@@ -2699,6 +2699,16 @@ class PreferLayoutBuilderForConstraintsRule extends SaropaLintRule {
   static bool _isInNonBuildScope(AstNode node) {
     for (AstNode? cur = node; cur != null; cur = cur.parent) {
       if (cur is MethodDeclaration) {
+        // Static methods are utilities, not widget builders: they cannot
+        // override `build()` (instance-only on Widget) and cannot host a
+        // `WidgetBuilder` callback body (those are anonymous closures, not
+        // methods). Treat as non-build regardless of `BuildContext`
+        // parameter presence — static helpers like
+        // `MenuUtils.popupMenuConstraints(BuildContext)` compute absolute
+        // viewport-fraction dimensions for non-widget return types, and
+        // `LayoutBuilder` is structurally inapplicable. See
+        // plan/history/2026.05/2026.05.31/prefer_layout_builder_for_constraints_false_positive_static_utility_with_buildcontext.md.
+        if (cur.isStatic) return true;
         final String methodName = cur.name.lexeme;
         if (methodName == 'build') return false;
         if (_nonBuildLifecycleMethods.contains(methodName)) return true;
