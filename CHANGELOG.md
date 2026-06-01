@@ -67,6 +67,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ### Fixed
 
+- **`avoid_large_list_copy` no longer fires when the `.toList()` is structurally required by a named argument, a `??` fallback, or a getter on the result.** Named arguments like `children: items.map(...).toList()`, null-coalescing chains like `source?.where(...).toList() ?? <T>[]`, and getter access like `items.map(...).toList().nonEmpty` all need a concrete `List` and have no lazy alternative — remove any `// ignore: avoid_large_list_copy` added for these three patterns.
 - **`avoid_listview_without_item_extent` no longer fires on `ListView.separated`.** The `.separated` constructor does not declare `itemExtent`, `prototypeItem`, or `itemExtentBuilder` (an extent applied to items would also apply to separators, which never share one), so the rule's correction was unfixable on `.separated`. The rule now targets `ListView.builder` only — remove any `// ignore: avoid_listview_without_item_extent` added on `.separated` call sites.
 - **`avoid_listview_without_item_extent` no longer fires on inline non-scrolling `ListView.builder`.** When the call sets both `shrinkWrap: true` and `physics: NeverScrollableScrollPhysics()` the inner list does not scroll and `shrinkWrap` already forces eager layout, so the extent-hint guidance does not apply and forcing one would clip variable-height rows — remove any `// ignore: avoid_listview_without_item_extent` that was added for this pattern.
 

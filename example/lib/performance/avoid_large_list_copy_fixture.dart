@@ -165,3 +165,24 @@ void _bad794b() {
   // expect_lint: avoid_large_list_copy
   largeList.where((e) => e > 0).toList();
 }
+
+final List<int>? nullableSource = null;
+
+// GOOD: .toList() is a named argument (`children:`). The NamedExpression wraps
+// the ArgumentList, where a concrete List is structurally required.
+void _good794h() {
+  Column(children: largeList.map((e) => Text('$e')).toList());
+}
+
+// GOOD: .toList() is the left operand of `??` with a fallback list. The binary
+// expression's result flows to the typed List variable, so the copy is required.
+void _good794i() {
+  final List<int> selected =
+      nullableSource?.where((e) => e > 0).toList() ?? <int>[];
+}
+
+// GOOD: a getter (`.nonEmpty`) is accessed on the .toList() result. The getter
+// is defined on List, not Iterable, so the .toList() is required to compile.
+void _good794j() {
+  final hasItems = largeList.map((e) => e + 1).toList().nonEmpty;
+}
