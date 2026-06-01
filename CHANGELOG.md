@@ -65,6 +65,15 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [Unreleased]
 
+### Added
+
+- **Code Health scanner auto-skips generated files.** Filename suffixes `.g.dart`, `.freezed.dart`, `.mocks.dart`, `.gr.dart`, `.config.dart`, `.chopper.dart`, `.gen.dart`, `.drift.dart`, and the protobuf family (`.pb.dart`, `.pbenum.dart`, `.pbgrpc.dart`, `.pbjson.dart`, `.pbserver.dart`) are excluded at file-walk time; gen-l10n output (`lib/l10n/app_localizations*.dart`, `lib/l10n/intl_*.dart`) is skipped by path. A header-marker fallback (`GENERATED CODE`, `DO NOT MODIFY`, `DO NOT EDIT`, `AUTO-GENERATED FILE` in the first 1KB) catches codegen output that lands at non-standard paths. The hero band shows an `N suppressed` pill so suppression is visible, never silent.
+- **`// ignore_for_file: code_health` directive support.** Add `// ignore_for_file: code_health` at the top of a Dart file to keep it out of the Code Health scan entirely; add `// ignore_for_file: code_health:complex,undocumented` to drop only specific flags from every row in that file. The directive composes with normal analyzer ignore lists (`// ignore_for_file: avoid_print, code_health` is recognized).
+
+### Added (Extension)
+
+- **"Suppress in file" button on every issue in the Code Health Dashboard's expanded detail row.** Click writes a `// ignore_for_file: code_health:<flag>` directive at the top of the source file (merging with any existing ignore list — sorted, deduped, idempotent) and offers a one-click Rescan. Files-not-yet-saved are respected via VS Code's workspace file API.
+
 ### Changed (Extension)
 
 - **Code Health Dashboard "Worst functions" rows now explain WHY each function scored low.** Flag pills (`unused`, `complex`, `undocumented`, …) used to carry only the label, so a reader had to look at four other columns to reconstruct the evidence. Each pill now reads `complex (CC 36)`, `unused (0 callers)`, `uncovered (0% tests)` etc. — the threshold the row tripped, inline. A chevron next to the score expands the row to show every issue with its threshold rule (e.g. "Flagged when cyclomatic complexity exceeds 10"), so readers can confirm what to fix without leaving the table. Expand state survives sort and filter changes. No action required.

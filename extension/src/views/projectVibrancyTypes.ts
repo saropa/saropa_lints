@@ -74,6 +74,17 @@ export interface ProjectVibrancyPayload {
     readonly stubTestedCount?: number;
     readonly suspiciousCoverageCount?: number;
     readonly testDriftCount?: number;
+    /**
+     * Per-file suppression counts emitted by the Dart CLI when the scanner
+     * skipped a file. `codegenFiles` counts auto-detected generated files
+     * (filename pattern OR header marker); `directiveFiles` counts files
+     * carrying `// ignore_for_file: code_health`. The hero surfaces the
+     * combined total so suppression never goes silent.
+     */
+    readonly suppressions?: {
+      readonly codegenFiles?: number;
+      readonly directiveFiles?: number;
+    };
   };
   readonly generatedAt?: string;
   readonly determinism?: {

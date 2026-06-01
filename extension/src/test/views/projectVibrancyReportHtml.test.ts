@@ -224,6 +224,50 @@ describe('Code Health Dashboard HTML', () => {
     assert.ok(html.includes('"unused":{'), 'FLAG_DESC must carry "unused" descriptor');
   });
 
+  it('detail row carries a per-issue Suppress button with data-suppress-{file,flag}', () => {
+    // The Suppress button is what closes the loop on the user's UX ask —
+    // they see WHY a function scored low, then click to drop the flag for
+    // that file. The button must:
+    //   - sit inside pv-detail-list (so it only appears in the expanded view)
+    //   - carry the file path AND the flag name for the host handler to act
+    //   - be wired through pv-suppress-btn class so the delegated click
+    //     handler in the tbody matches it
+    const html = buildProjectVibrancyHtml(rowsPayload());
+    assert.ok(html.includes('class="pv-suppress-btn"'), 'suppress button class missing');
+    assert.ok(html.includes('data-suppress-file='), 'data-suppress-file attribute missing');
+    assert.ok(html.includes('data-suppress-flag='), 'data-suppress-flag attribute missing');
+    // The script must post 'suppressFlag' so the host can match the case.
+    assert.ok(html.includes("type: 'suppressFlag'"), 'suppressFlag message wiring missing');
+  });
+
+  it('hero shows a "N suppressed" pill when the payload reports any suppression', () => {
+    const supp = buildProjectVibrancyHtml({
+      summary: {
+        functionCount: 10,
+        averageScore: 80,
+        averageGrade: 'B',
+        suppressions: { codegenFiles: 5, directiveFiles: 2 },
+      },
+      functions: [],
+      gates: { pass: true, violations: [] },
+      generatedAt: new Date().toISOString(),
+    });
+    assert.ok(/\b7 suppressed</.test(supp), 'expected combined "7 suppressed" pill');
+    // And when there are zero suppressions, the pill should not render.
+    const noSupp = buildProjectVibrancyHtml({
+      summary: {
+        functionCount: 10,
+        averageScore: 80,
+        averageGrade: 'B',
+        suppressions: { codegenFiles: 0, directiveFiles: 0 },
+      },
+      functions: [],
+      gates: { pass: true, violations: [] },
+      generatedAt: new Date().toISOString(),
+    });
+    assert.ok(!/\bsuppressed</.test(noSupp), 'no suppressed pill expected when count is zero');
+  });
+
   it('flag descriptor table substitutes per-row tokens ({cc}, {pct}) into evidence strings', () => {
     // Pin the evidence templates so a future i18n edit cannot silently drop
     // the {cc}/{pct} placeholders — without them the pill says e.g.

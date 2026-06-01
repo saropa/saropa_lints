@@ -138,17 +138,46 @@ class ProjectVibrancyFunctionResult {
   };
 }
 
+/// Suppression-count breakdown surfaced in the dashboard so suppressed files
+/// remain visible — silent suppression is the failure mode this prevents.
+class ProjectVibrancySuppressions {
+  const ProjectVibrancySuppressions({
+    required this.codegenFiles,
+    required this.directiveFiles,
+  });
+
+  /// Files skipped because they are auto-detected codegen output (filename
+  /// suffix like `*.g.dart` / `*.drift.dart` OR a header marker like
+  /// `GENERATED CODE` / `DO NOT EDIT` in the first ~512 chars).
+  final int codegenFiles;
+
+  /// Files skipped because they carry a bare `// ignore_for_file: code_health`
+  /// directive (no `:flag` list). Per-flag suppressions on a file that
+  /// otherwise gets scanned are not counted here.
+  final int directiveFiles;
+
+  Map<String, Object> toJson() => <String, Object>{
+    'codegenFiles': codegenFiles,
+    'directiveFiles': directiveFiles,
+  };
+}
+
 /// Full report payload returned by [runProjectVibrancy].
 class ProjectVibrancyReport {
   const ProjectVibrancyReport({
     required this.generatedAt,
     required this.projectPath,
     required this.functions,
+    this.suppressions = const ProjectVibrancySuppressions(
+      codegenFiles: 0,
+      directiveFiles: 0,
+    ),
   });
 
   final String generatedAt;
   final String projectPath;
   final List<ProjectVibrancyFunctionResult> functions;
+  final ProjectVibrancySuppressions suppressions;
 
   Map<String, Object> toJson() {
     final avg = functions.isEmpty
@@ -167,6 +196,7 @@ class ProjectVibrancyReport {
         'stubTestedCount': countFlag('stub_tested'),
         'suspiciousCoverageCount': countFlag('suspicious_coverage'),
         'testDriftCount': countFlag('test_drift'),
+        'suppressions': suppressions.toJson(),
       },
       'functions': functions.map((f) => f.toJson()).toList(growable: false),
     };
@@ -196,6 +226,23 @@ Future<ProjectVibrancyReport> runProjectVibrancy(
   );
   final fileContents = <String, String>{};
   final declaredFunctions = <_FunctionNode>[];
+  // Per-file ignore directives parsed from `// ignore_for_file: code_health`
+  // comments. Two shapes are supported:
+  //   - bare `code_health` => null entry => the entire file is suppressed
+  //     (functions parsed but never scored / never emitted as rows)
+  //   - `code_health:complex,undocumented` => entry is the set of flag names
+  //     that should be dropped from any row in this file. The row still shows
+  //     up; specific flags are silently removed.
+  // The dashboard's "Suppress in this file" button writes one of these two
+  // shapes, so the scanner round-trip is the contract.
+  final ignoreByFile = <String, Set<String>?>{};
+  // Files skipped at scan time because they're auto-detected as codegen
+  // output (filename pattern OR header marker) OR carry a bare
+  // `// ignore_for_file: code_health` directive. Surfaced as a count in the
+  // dashboard so suppressions stay visible — silent suppression is the
+  // failure mode this prevents.
+  var skippedCodegenFiles = 0;
+  var skippedByDirectiveFiles = 0;
 
   progress?.onEvent(<String, Object?>{
     'event': 'phase',
@@ -221,6 +268,25 @@ Future<ProjectVibrancyReport> runProjectVibrancy(
     final file = File(filePath);
     if (!file.existsSync()) continue;
     final content = file.readAsStringSync();
+    // Header-marker fallback for misnamed generated files. The filename
+    // exclusions above catch the common cases by suffix; this catches files
+    // that landed under non-standard codegen output paths (custom
+    // `build.yaml`, hand-routed `dart run build_runner build --output …`).
+    // Reading the first ~512 chars is cheap relative to a full parse.
+    if (_hasCodegenHeader(content)) {
+      skippedCodegenFiles++;
+      continue;
+    }
+    // File-level `// ignore_for_file: code_health[:flag,...]` directive.
+    // Parsed once per file at read time so the scoring loop never re-scans
+    // comments. A bare `code_health` (no `:flags`) drops the whole file.
+    final ignore = _parseCodeHealthIgnoreForFile(content);
+    if (ignore != null && ignore.isEmpty) {
+      // empty set = bare `code_health` directive => suppress the entire file
+      skippedByDirectiveFiles++;
+      continue;
+    }
+    if (ignore != null) ignoreByFile[filePath] = ignore;
     fileContents[filePath] = content;
     // Parse via the hash cache: a file unchanged since the last run is not
     // re-parsed, and the usage phase reuses this same parse rather than parsing
@@ -368,6 +434,13 @@ Future<ProjectVibrancyReport> runProjectVibrancy(
     if (documentationScore < 20 && fn.complexity > 10) {
       flags.add('undocumented');
     }
+    // Apply per-file flag suppressions parsed at file-read time. A row whose
+    // suppression set covers a flag has that flag dropped — the row still
+    // ships (so the user can see WHY the score is what it is) but the pill
+    // and detail-row item disappear. Bare-file suppression took a different
+    // path above and never reaches scoring.
+    final suppressed = ignoreByFile[fn.filePath];
+    if (suppressed != null) flags.removeWhere(suppressed.contains);
 
     results.add(
       ProjectVibrancyFunctionResult(
@@ -429,7 +502,94 @@ Future<ProjectVibrancyReport> runProjectVibrancy(
     generatedAt: DateTime.now().toUtc().toIso8601String(),
     projectPath: root,
     functions: results,
+    suppressions: ProjectVibrancySuppressions(
+      codegenFiles: skippedCodegenFiles,
+      directiveFiles: skippedByDirectiveFiles,
+    ),
   );
+}
+
+/// Returns true when [content] looks like generated code based on a header
+/// marker in the first ~512 chars. Codegen tools that don't follow the
+/// filename conventions in [_collectTargetFiles] (custom `build.yaml` output
+/// paths, hand-routed `dart run build_runner build --output …`, intl_utils,
+/// protoc with non-standard suffixes) all still emit one of these strings near
+/// the top of every file. Matching is case-sensitive on the literal phrases —
+/// codegen tools are consistent and tightening this to case-insensitive risked
+/// flagging hand-written files that mention "generated" in a docstring.
+bool _hasCodegenHeader(String content) {
+  // Bounded read: codegen markers live in the first banner / file-doc block;
+  // 1024 chars is more than enough and protects against a 10MB minified file.
+  final head = content.length > 1024 ? content.substring(0, 1024) : content;
+  return head.contains('GENERATED CODE') ||
+      head.contains('DO NOT MODIFY') ||
+      head.contains('DO NOT EDIT') ||
+      head.contains('Generated code. Do not modify') ||
+      head.contains('AUTO-GENERATED FILE');
+}
+
+/// Parses `// ignore_for_file: code_health[:flag,flag,...]` directives from
+/// [content]. Returns:
+///   - `null` if no directive matches (file is scanned normally)
+///   - an empty set if the directive is bare `code_health` (entire file
+///     suppressed; the caller skips parse + scoring)
+///   - a set of flag names for `code_health:complex,undocumented`-style
+///     suppressions (those flags are dropped from every row in the file)
+///
+/// Reads only the first ~4KB — file-level ignore directives live near the
+/// top of any reasonable Dart file. Recognized shapes (per line):
+///   `// ignore_for_file: code_health`
+///   `// ignore_for_file: code_health:complex,undocumented`
+///   `// ignore_for_file: avoid_print, code_health`            (mixed list)
+///   `// ignore_for_file: avoid_print, code_health:complex`    (mixed list)
+///
+/// Parsing strategy: locate the literal `code_health` token by index (not by
+/// splitting on `,`, which conflates the flag-list separator with the
+/// rule-list separator and dropped `undocumented` in the comma-split design).
+/// Once found, look at the next character: a `:` opens the flag list (read
+/// until end-of-line); anything else (including end-of-line, whitespace, or
+/// comma) means a bare directive — whole-file suppression.
+Set<String>? _parseCodeHealthIgnoreForFile(String content) {
+  final head = content.length > 4096 ? content.substring(0, 4096) : content;
+  Set<String>? perFlag;
+  for (final line in head.split('\n')) {
+    final trimmed = line.trimLeft();
+    if (!trimmed.startsWith('// ignore_for_file:') &&
+        !trimmed.startsWith('//ignore_for_file:')) {
+      continue;
+    }
+    final colon = trimmed.indexOf(':');
+    if (colon < 0) continue;
+    final rest = trimmed.substring(colon + 1);
+    final idx = rest.indexOf('code_health');
+    if (idx < 0) continue;
+    // Token-boundary check on the LEFT — `code_health` must not be a substring
+    // of a longer identifier (e.g. `not_code_health`). Permitted left chars:
+    // start-of-string, whitespace, or comma (the rule-list separator).
+    if (idx > 0) {
+      final left = rest[idx - 1];
+      if (left != ' ' && left != ',' && left != '\t') continue;
+    }
+    final afterIdx = idx + 'code_health'.length;
+    if (afterIdx >= rest.length) {
+      // bare `code_health` at end of line
+      return <String>{};
+    }
+    final after = rest[afterIdx];
+    if (after != ':') {
+      // bare `code_health` followed by `,` or whitespace — whole-file
+      return <String>{};
+    }
+    // Flag list starts at afterIdx+1, runs to end-of-line. Strip any trailing
+    // comment-of-comment artifacts and split on `,` for flag names.
+    final flagsRaw = rest.substring(afterIdx + 1).trim();
+    perFlag ??= <String>{};
+    for (final f in flagsRaw.split(',')) {
+      final name = f.trim();
+      if (name.isNotEmpty) perFlag.add(name);
+    }
+  }
+  return perFlag;
 }
 
 /// Directory names pruned from the file walk. Most hold no scannable `lib/`
@@ -497,9 +657,43 @@ List<String> _collectTargetFiles(ProjectVibrancyOptions options) {
       final path = p.normalize(entity.path);
       if (!path.endsWith('.dart')) continue;
       final posix = path.replaceAll('\\', '/');
+      // Filename-pattern exclusions for known codegen output. A single, well-
+      // known suffix is faster and more deterministic than reading the file
+      // header — every match here avoids a file-open later. Patterns covered:
+      //   .g.dart            build_runner / source_gen (json_serializable,
+      //                       freezed companions, retrofit, riverpod_generator)
+      //   .freezed.dart      Freezed
+      //   .mocks.dart        mockito
+      //   .gr.dart           auto_route
+      //   .config.dart       injectable
+      //   .chopper.dart      chopper
+      //   .gen.dart          flutter_gen
+      //   .drift.dart        drift (when generated alongside hand-written code)
+      //   .pb.dart, .pbenum.dart, .pbgrpc.dart, .pbjson.dart, .pbserver.dart
+      //                       protoc Dart plugin
+      // The header-marker fallback below catches the long tail where a project
+      // configures non-standard output paths.
       if (posix.endsWith('.g.dart') ||
           posix.endsWith('.freezed.dart') ||
-          posix.endsWith('.mocks.dart')) {
+          posix.endsWith('.mocks.dart') ||
+          posix.endsWith('.gr.dart') ||
+          posix.endsWith('.config.dart') ||
+          posix.endsWith('.chopper.dart') ||
+          posix.endsWith('.gen.dart') ||
+          posix.endsWith('.drift.dart') ||
+          posix.endsWith('.pb.dart') ||
+          posix.endsWith('.pbenum.dart') ||
+          posix.endsWith('.pbgrpc.dart') ||
+          posix.endsWith('.pbjson.dart') ||
+          posix.endsWith('.pbserver.dart')) {
+        continue;
+      }
+      // gen-l10n emits app_localizations*.dart + intl_*.dart under lib/l10n/.
+      // These are pure ARB-derived translation tables — long, mechanical, never
+      // hand-written, and never improvable by a code-health flag.
+      if (posix.contains('/lib/l10n/') &&
+          (p.basename(posix).startsWith('app_localizations') ||
+           p.basename(posix).startsWith('intl_'))) {
         continue;
       }
       // Skip pathologically large files — almost always generated (gen-l10n

@@ -84,11 +84,35 @@ function rowExpanderAndDetailStyles(): string {
 .pv-detail-list { margin: 0; padding: 0; list-style: none; }
 .pv-detail-item {
   display: grid;
-  grid-template-columns: max-content max-content 1fr;
+  grid-template-columns: max-content max-content 1fr max-content;
   gap: 8px 12px;
   align-items: baseline;
   padding: 4px 0;
   border-top: 1px dashed var(--border);
+}
+/* Suppress button: small, low-key chip. Visually subordinate to the rule
+   text — the user reads the rule first, then decides to suppress. Right-
+   aligned in the grid (max-content column) so it stays out of the rule's
+   way regardless of rule length. */
+.pv-suppress-btn {
+  justify-self: end;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.82em;
+  padding: 2px 8px;
+  border-radius: 3px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.pv-suppress-btn:hover {
+  background: var(--surface-2);
+  color: var(--vscode-foreground);
+  border-color: var(--accent-warning);
+}
+.pv-suppress-btn:focus-visible {
+  outline: 1px solid var(--accent-info);
+  outline-offset: 1px;
 }
 .pv-detail-item:first-child { border-top: 0; }
 .pv-detail-label {

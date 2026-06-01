@@ -26,6 +26,7 @@ import {
   getKeyboardShortcutsStyles,
 } from './keyboard-shortcuts';
 import { l10n } from '../i18n/runtime';
+import { mergeCodeHealthSuppression } from './codeHealthSuppression';
 
 /**
  * **Code Health Dashboard** webview: runs [runProjectVibrancyScan], renders JSON as HTML in an
@@ -301,6 +302,55 @@ async function handlePanelMessage(msg: unknown): Promise<void> {
       'revealFileInOS',
       vscode.Uri.file(lastReportFilePath),
     );
+    return;
+  }
+  if (data.type === 'suppressFlag') {
+    const dm = data as { file?: string; flag?: string };
+    if (typeof dm.file !== 'string' || typeof dm.flag !== 'string') return;
+    await applyFileSuppression(dm.file, dm.flag);
+    return;
+  }
+}
+
+/**
+ * Write a `// ignore_for_file: code_health:<flag>` directive into a source
+ * file so the next Code Health scan drops that flag for that file. Pure merge
+ * logic lives in [mergeCodeHealthSuppression] (testable; no I/O). This shim
+ * resolves the report-relative path against the workspace root, reads the
+ * file via VS Code's file API (respects unsaved buffers and any FS provider),
+ * applies the merge, writes back, and offers a one-click rescan.
+ *
+ * The toast uses the existing rescan command (same path the toolbar button
+ * uses) so the suppression closes the loop in a single user click.
+ */
+async function applyFileSuppression(reportFile: string, flag: string): Promise<void> {
+  const root = getProjectRoot();
+  if (!root) return;
+  try {
+    const uri = resolveReportFileUri(root, reportFile);
+    const buffer = await vscode.workspace.fs.readFile(uri);
+    const original = new TextDecoder('utf-8').decode(buffer);
+    const merged = mergeCodeHealthSuppression(original, flag);
+    const fileName = nodePath.basename(reportFile);
+    if (merged.noChange) {
+      void vscode.window.showInformationMessage(
+        `'${flag}' is already suppressed in ${fileName}.`,
+      );
+      return;
+    }
+    await vscode.workspace.fs.writeFile(uri, new TextEncoder().encode(merged.content));
+    const rescanAction = 'Rescan';
+    const choice = await vscode.window.showInformationMessage(
+      `Suppressed '${flag}' in ${fileName}.`,
+      rescanAction,
+    );
+    if (choice === rescanAction) {
+      await openProjectVibrancyReport();
+    }
+  } catch (e) {
+    void vscode.window.showErrorMessage(
+      `Could not suppress '${flag}' in ${reportFile}: ${(e as Error).message ?? e}`,
+    );
   }
 }
 
@@ -439,15 +489,31 @@ function buildHero(
   const fnCount = summary.functionCount ?? (payload.functions?.length ?? 0);
   const gateFailed = payload.gates?.pass === false;
   const problemPillClass = problemCount === 0 ? 'good' : problemCount < 50 ? 'warn' : 'bad';
+  // Suppressed-file count: number of files dropped from the scan by codegen
+  // detection or by `// ignore_for_file: code_health`. Surfaced as a hero pill
+  // so suppression stays visible — "we silently skipped 247 of your files"
+  // would be the failure mode otherwise.
+  const supp = (summary as { suppressions?: { codegenFiles?: number; directiveFiles?: number } }).suppressions;
+  const suppCodegen = supp?.codegenFiles ?? 0;
+  const suppDirective = supp?.directiveFiles ?? 0;
+  const suppTotal = suppCodegen + suppDirective;
   const parts = [
     `${escapeHtml(l10n('codeHealth.hero.generated'))} <strong>${escapeHtml(generated)}</strong>`,
     pluralize(fnCount, { one: l10n('codeHealth.hero.functionOne'), other: l10n('codeHealth.hero.functionOther') }),
     escapeHtml(l10n('codeHealth.hero.avgFormat', { score: Math.round(avgScore).toString(), grade: avgGrade })),
     `<span class="pill ${problemPillClass}" title="Functions scoring under 50 (grades D, E, F)">${problemCount.toLocaleString('en-US')} problems</span>`,
+  ];
+  if (suppTotal > 0) {
+    const title = `${suppCodegen} auto-detected codegen file(s), ${suppDirective} suppressed via // ignore_for_file: code_health`;
+    parts.push(
+      `<span class="pill" title="${escapeHtml(title)}">${suppTotal.toLocaleString('en-US')} suppressed</span>`,
+    );
+  }
+  parts.push(
     gateFailed
       ? `<span class="pill bad">${escapeHtml(l10n('codeHealth.hero.gatesFailing'))}</span>`
       : `<span class="pill good">${escapeHtml(l10n('codeHealth.hero.gatesPassing'))}</span>`,
-  ];
+  );
   const statusLine = parts
     .map((p, i) => (i === 0 ? `<span>${p}</span>` : `<span class="dot">·</span><span>${p}</span>`))
     .join('');
@@ -685,6 +751,8 @@ function codeHealthScriptStrings(): Record<string, string> {
     expanderExpanded: l10n('codeHealth.table.expanderAriaExpanded'),
     detailHeading: l10n('codeHealth.table.detailHeading'),
     detailNoIssues: l10n('codeHealth.table.detailNoIssues'),
+    suppressLabel: l10n('codeHealth.table.suppressLabel'),
+    suppressTooltip: l10n('codeHealth.table.suppressTooltip'),
   };
 }
 
@@ -911,9 +979,19 @@ function buildClientScript(): string {
       var parts = r.flags.map(function(f) {
         var info = flagInfo(f, r);
         var ev = info.evidence ? '<span class="pv-detail-evidence">' + esc(info.evidence) + '</span>' : '';
+        // The suppress button writes a // ignore_for_file: code_health:<flag>
+        // directive into the file so the next scan drops this flag for the
+        // whole file. Per-function suppression is intentionally NOT offered
+        // here — the dashboard's "your file, your call" model is file-scoped.
+        var suppressBtn = '<button type="button" class="pv-suppress-btn"' +
+          ' data-suppress-file="' + esc(r.file) + '"' +
+          ' data-suppress-flag="' + esc(f) + '"' +
+          ' title="' + esc(CH.suppressTooltip) + '">' +
+          esc(CH.suppressLabel) + '</button>';
         return '<li class="pv-detail-item ' + esc(f) + '">' +
           '<span class="pv-detail-label">' + esc(info.label) + '</span>' + ev +
           (info.rule ? '<span class="pv-detail-rule">' + esc(info.rule) + '</span>' : '') +
+          suppressBtn +
           '</li>';
       });
       items = '<ul class="pv-detail-list">' + parts.join('') + '</ul>';
@@ -1110,10 +1188,21 @@ function buildClientScript(): string {
     // fall through to no-op (score pill has no data-file).
     tbody.addEventListener('click', function(e) {
       var target = e.target;
-      // Climb to either an expander or a link.
+      // Climb to a known affordance: row-expander, suppress button, or link.
+      // The suppress button MUST be matched before bubbling to fn-link / file-
+      // link checks because it can sit inside the detail panel below a row.
       var node = target;
       while (node && node !== tbody) {
         if (node.classList) {
+          if (node.classList.contains('pv-suppress-btn')) {
+            e.preventDefault();
+            e.stopPropagation();
+            var sFile = node.getAttribute('data-suppress-file');
+            var sFlag = node.getAttribute('data-suppress-flag');
+            if (!sFile || !sFlag) return;
+            vscode.postMessage({ type: 'suppressFlag', file: sFile, flag: sFlag });
+            return;
+          }
           if (node.classList.contains('row-expander')) {
             e.preventDefault();
             var key = node.getAttribute('data-row-key');

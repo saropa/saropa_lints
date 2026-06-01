@@ -814,7 +814,9 @@
       "expanderAriaCollapsed": "Show issue details",
       "expanderAriaExpanded": "Hide issue details",
       "detailHeading": "Why this function scored {score}",
-      "detailNoIssues": "No flags on this row — the score is driven by the column values above (usage, coverage, complexity, age, documentation)."
+      "detailNoIssues": "No flags on this row — the score is driven by the column values above (usage, coverage, complexity, age, documentation).",
+      "suppressLabel": "Suppress in file",
+      "suppressTooltip": "Writes `// ignore_for_file: code_health:<flag>` into this file so future scans drop this flag for the whole file."
     },
     "flag": {
       "unused": { "label": "unused", "evidence": "0 callers", "rule": "Flagged when no other file references this function name." },
