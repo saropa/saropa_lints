@@ -420,7 +420,17 @@
       "packagesBreakdown": "{direct} direct, {transitive} transitive",
       "gradeLine": "Grade {grade} · {avg}/100",
       "flaggedCount": "{count} flagged",
-      "flaggedTitle": "Abandoned or end-of-life"
+      "flaggedTitle": "Abandoned or end-of-life",
+      "lastScanLabel": "Scanned {when}",
+      "lastScanTitle": "When this dashboard data was fetched — {timestamp}. Click Rescan to refresh.",
+      "lastScanUnknown": "Scanned (time unknown)",
+      "lastScanUnknownTitle": "This scan ran before the dashboard tracked timestamps. Click Rescan to refresh."
+    },
+    "time": {
+      "justNow": "just now",
+      "minutesAgo": "{min}m ago",
+      "hoursAgo": "{hr}h ago",
+      "daysAgo": "{day}d ago"
     },
     "scanning": {
       "heading": "Scanning packages",
@@ -444,7 +454,7 @@
       "singleUse": "Single-use",
       "vulnerable": "Vulnerable",
       "overrides": "Overrides",
-      "caveatLine1": "*Code sizes shown (lib + declared assets), falling back to the pub.dev archive size when code size is unavailable. Actual app size will be smaller after tree shaking.",
+      "caveatLine1": "*Code sizes shown (lib + declared assets), falling back to the pub.dev archive size when code size is unavailable. Excludes dev_dependencies (build_runner, lints, saropa_lints, etc.) — they never ship to the APK / IPA / web bundle. Actual app size will be smaller after tree shaking.",
       "caveatLine2": "Activity thresholds: 90d = stale, 180d = dormant (commit + release timelines)."
     },
     "breakdown": {
@@ -470,6 +480,7 @@
     },
     "sections": {
       "sizeDistribution": "Size Distribution",
+      "sizeDistributionCaption": "Excludes dev_dependencies — they never ship to the APK / IPA / web bundle.",
       "filters": "Filters",
       "packages": "Packages"
     },

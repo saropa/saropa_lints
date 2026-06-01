@@ -18,7 +18,7 @@ import { createWebviewCspNonce, escapeHtml } from './html-utils';
 import { buildChartSection } from './chart-html';
 import { getChartStyles } from './chart-styles';
 import { getChartScript } from './chart-script';
-import { buildFullWidthToggle, buildStatusLine, getFullWidthToggleScript } from '../../views/dashboardHero';
+import { buildFullWidthToggle, buildStatusLine, getFullWidthToggleScript, StatusPill } from '../../views/dashboardHero';
 import {
     buildKeyboardShortcutsButton,
     buildKeyboardShortcutsOverlay,
@@ -54,6 +54,14 @@ export interface ReportOptions {
      * completes via `publishResults`.
      */
     readonly isScanning?: boolean;
+    // Wall-clock ms-since-epoch the displayed data was scanned at.  Drives
+    // the "Scanned X ago" pill in the hero status line so users can tell at
+    // a glance whether a Rescan click actually produced fresh data — without
+    // it, the dashboard re-rendering with identical numbers reads as "rescan
+    // did nothing" even when a scan really did run.  Undefined ⇒ no scan
+    // has completed since the panel opened, or the displayed data came from
+    // a pre-timestamp persisted snapshot.
+    readonly lastScanTimestamp?: number;
 }
 
 /** Columns that can be auto-hidden when all values are empty or start collapsed. */
@@ -106,6 +114,7 @@ export function buildReportHtml(options: ReportOptions): string {
                 title: l10n('packageDashboard.status.flaggedTitle'),
             }]
             : []),
+        buildLastScanPill(options.lastScanTimestamp),
     ]);
     return `<!DOCTYPE html>
 <html lang="en">
@@ -154,6 +163,59 @@ export function buildReportHtml(options: ReportOptions): string {
     <script nonce="${cspNonce}">${buildPackageDataScript(results, options.overrideNames, buildRepoShareMap(results))}${getReportScript()}${getChartScript()}(function(){${getFullWidthToggleScript()}${getKeyboardShortcutsScript()}})();</script>
 </body>
 </html>`;
+}
+
+/**
+ * Build the "Scanned X ago" pill for the hero status line.
+ *
+ * Surfaces the wall-clock recency of the displayed data so users can tell
+ * at a glance whether a Rescan click actually produced fresh results —
+ * without this, the dashboard re-rendering with identical numbers reads
+ * as "rescan did nothing" even when the scan really did run.  An absolute
+ * timestamp lives in the tooltip for the cases where "5m ago" isn't
+ * precise enough (e.g. distinguishing two scans seconds apart).
+ *
+ * Pre-timestamp persisted snapshots have no `ts` — show "unknown" rather
+ * than dropping the pill so the affordance stays in the same place every
+ * render (a pill that comes and goes makes the dashboard layout jump).
+ */
+function buildLastScanPill(ts?: number): StatusPill {
+    if (typeof ts !== 'number' || !Number.isFinite(ts) || ts <= 0) {
+        return {
+            glyph: '⟳',
+            label: l10n('packageDashboard.status.lastScanUnknown'),
+            title: l10n('packageDashboard.status.lastScanUnknownTitle'),
+            tone: 'neutral',
+        };
+    }
+    return {
+        glyph: '⟳',
+        label: l10n('packageDashboard.status.lastScanLabel', { when: formatScanRelative(ts) }),
+        title: l10n('packageDashboard.status.lastScanTitle', {
+            timestamp: new Date(ts).toLocaleString(),
+        }),
+        tone: 'neutral',
+    };
+}
+
+/**
+ * Format a ms-since-epoch timestamp as a relative-to-now string.
+ *
+ * Clock skew is real (NTP drift, VM time jumps after sleep, user system
+ * clock set wrong) so future timestamps are normalised to "just now"
+ * rather than showing a nonsensical negative value.
+ */
+function formatScanRelative(ts: number): string {
+    const diffMs = Date.now() - ts;
+    if (diffMs < 0) return l10n('packageDashboard.time.justNow');
+    const sec = Math.floor(diffMs / 1000);
+    if (sec < 45) return l10n('packageDashboard.time.justNow');
+    const min = Math.floor(sec / 60);
+    if (min < 60) return l10n('packageDashboard.time.minutesAgo', { min: String(min) });
+    const hr = Math.floor(min / 60);
+    if (hr < 24) return l10n('packageDashboard.time.hoursAgo', { hr: String(hr) });
+    const day = Math.floor(hr / 24);
+    return l10n('packageDashboard.time.daysAgo', { day: String(day) });
 }
 
 function buildNetworkSection(results: VibrancyResult[]): string {
@@ -435,17 +497,27 @@ function buildReportSummary(options: ReportOptions): string {
     /* Total Size summary prefers code-size — the bytes the package
        contributes to a built app. Falls back to the gzipped archive when the
        tarball analyzer couldn't run, so the rollup is never blank when ANY
-       size info is available. Mirrors buildSizeCell's fallback. */
+       size info is available. Mirrors buildSizeCell's fallback.
+
+       dev_dependencies are EXCLUDED from every Total Size variant. They are
+       compile/lint/test-time tooling (saropa_lints, build_runner, lints) and
+       never reach the APK / IPA / web bundle, so counting them as "shipped
+       bytes" gave 66%+ of "total size" to dev-only packages and inverted what
+       this card communicates. The Include-dev toggle still affects the
+       package table (people want dev rows visible there) but never the
+       size summary — shipped bytes is the only meaning of this number. */
+    const isShippable = (r: VibrancyResult) => r.package.section !== 'dev_dependencies';
+    const shippableResults = results.filter(isShippable);
     const ownBytes = (r: VibrancyResult) => r.codeSizeBytes ?? r.archiveSizeBytes ?? 0;
-    const totalOwnBytes = results.reduce(
+    const totalOwnBytes = shippableResults.reduce(
         (sum, r) => sum + ownBytes(r), 0,
     );
-    const totalUniqueBytes = results.reduce((sum, r) => {
+    const totalUniqueBytes = shippableResults.reduce((sum, r) => {
         const own = ownBytes(r);
         const unique = r.transitiveInfo?.uniqueTransitiveSizeBytes ?? 0;
         return sum + own + unique;
     }, 0);
-    const totalAllBytes = results.reduce((sum, r) => {
+    const totalAllBytes = shippableResults.reduce((sum, r) => {
         const own = ownBytes(r);
         const unique = r.transitiveInfo?.uniqueTransitiveSizeBytes ?? 0;
         const shared = r.transitiveInfo?.sharedTransitiveSizeBytes ?? 0;

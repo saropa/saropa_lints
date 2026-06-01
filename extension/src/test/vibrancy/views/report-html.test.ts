@@ -378,6 +378,32 @@ describe('report: size in KB', () => {
         assert.ok(html.includes('data-total-size-unique="3072"'));
         assert.ok(html.includes('data-total-size-total="7168"'));
     });
+
+    /* dev_dependencies (build_runner, lints, saropa_lints, etc.) are
+       compile/lint/test-time tooling and never ship to APK/IPA/web bundles.
+       Counting them in "Total Size" inverted what the card communicates —
+       saropa_lints alone was 66% of the reported total on its consumer
+       projects. The size summary now drops dev deps unconditionally; the
+       Include-dev table toggle is unaffected. */
+    it('should exclude dev_dependencies from Total Size summary', () => {
+        const prodDep = {
+            ...makeResult('http', 80),
+            archiveSizeBytes: 1024, codeSizeBytes: null,
+            folderBreakdown: null, maintainerQuality: null, maintainerQualityBonus: 0,
+        };
+        const devOnly = makeResult('saropa_lints', 90);
+        const devResult = {
+            ...devOnly,
+            package: { ...devOnly.package, section: 'dev_dependencies' as const },
+            archiveSizeBytes: 9_000_000, codeSizeBytes: 9_000_000,
+            folderBreakdown: null, maintainerQuality: null, maintainerQualityBonus: 0,
+        };
+        const html = buildReportHtml(opts([prodDep, devResult]));
+        // Only the prod dep's 1024 bytes count; saropa_lints' 9 MB is dropped.
+        assert.ok(html.includes('data-total-size-own="1024"'));
+        assert.ok(html.includes('data-total-size-unique="1024"'));
+        assert.ok(html.includes('data-total-size-total="1024"'));
+    });
 });
 
 describe('report: summary card filters', () => {
@@ -1504,5 +1530,65 @@ describe('report: sparkline rendering', () => {
         assert.ok(svg.includes('<svg'));
         assert.ok(svg.includes('<polyline'));
         assert.ok(svg.includes('stroke="var(--vscode-editorInfo-foreground)"'));
+    });
+});
+
+describe('report: Size Distribution chart excludes dev dependencies', () => {
+    /* Same reason as the Total Size summary: dev_dependencies are
+       compile/lint/test-time tooling that never ship. saropa_lints
+       previously dominated the chart on its consumer projects (~66%
+       of the bar/donut), which is the opposite of what "Size
+       Distribution" is supposed to communicate. */
+    it('should not include a dev_dependency in the Size Distribution chart', () => {
+        const prodDep = {
+            ...makeResult('http', 80),
+            codeSizeBytes: 100_000,
+        };
+        const devOnly = makeResult('saropa_lints', 90);
+        const devResult = {
+            ...devOnly,
+            package: { ...devOnly.package, section: 'dev_dependencies' as const },
+            codeSizeBytes: 9_000_000,
+        };
+        const html = buildReportHtml(opts([prodDep, devResult]));
+        // The chart-section bar-chart-panel renders one segment per named
+        // package; saropa_lints must NOT appear as a named segment inside
+        // the chart panels even though it's the biggest "size" on disk.
+        const chartPanelMatch = html.match(/<div class="bar-chart-panel">([\s\S]*?)<\/div>\s*<div class="donut-chart-panel">/);
+        assert.ok(chartPanelMatch, 'expected a bar-chart-panel block');
+        assert.ok(
+            !chartPanelMatch![1].includes('saropa_lints'),
+            'saropa_lints (dev-only) must not be a segment in Size Distribution',
+        );
+    });
+
+    it('should render the dev-exclusion caption under the Size Distribution heading', () => {
+        const prodDep = {
+            ...makeResult('http', 80),
+            codeSizeBytes: 100_000,
+        };
+        const html = buildReportHtml(opts([prodDep]));
+        // The caption is the explicit signal to the user that
+        // dev_dependencies aren't in the picture — surfacing the
+        // exclusion so the chart total doesn't look "wrong" next to
+        // the package table (which still shows dev rows).
+        assert.ok(
+            /class="chart-caption">[^<]*dev_dependencies/.test(html),
+            'Size Distribution should carry a caption naming dev_dependencies as excluded',
+        );
+    });
+});
+
+describe('report: Total Size caveat names dev_dependencies', () => {
+    it('should mention dev_dependencies in the Total Size tooltip caveat', () => {
+        /* The caveat text doubles as the disclosure that explains
+           why a project's dev tooling does not move the Total Size
+           number. Pinned so a future copy edit can't silently drop
+           the exclusion note. */
+        const html = buildReportHtml(opts([makeResult('http', 80)]));
+        assert.ok(
+            /summary-card total-size[^>]*title="[^"]*dev_dependencies/.test(html),
+            'Total Size card tooltip should name dev_dependencies as excluded',
+        );
     });
 });

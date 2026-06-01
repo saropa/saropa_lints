@@ -65,6 +65,14 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [Unreleased]
 
+### Added (Extension)
+
+- **Saropa Package Dashboard hero now shows a "Scanned X ago" pill with the actual scan timestamp.** Hovering reveals the absolute date/time. Previously the Rescan button could feel like a no-op because the dashboard re-rendered with identical numbers and no recency indicator, so users had no way to tell whether the click triggered a fresh scan or returned cached results. The pill updates on every scan completion (including the trailing rescan that fires after a coalesced in-flight scan), so a click producing fresh data flips "5m ago" back to "just now". No action required.
+
+### Fixed (Extension)
+
+- **Package Dashboard Total Size and Size Distribution now exclude dev_dependencies.** Dev-only tooling like `saropa_lints`, `build_runner`, and `lints` was being summed into the "Total Size" card and given its own bar in the Size Distribution chart, even though dev deps never reach the APK / IPA / web bundle. On projects that use `saropa_lints` as a dev dep, the chart was assigning it ~66% of "total size" — the opposite of what either surface communicates. Both now drop dev deps unconditionally; the "Include dev" toggle still controls the package table. A new caption under the chart and updated Total Size tooltip call out the exclusion. No action required.
+
 ### Fixed
 
 - **`require_error_widget` no longer fires when error handling lives in an extension method on `AsyncSnapshot`.** Centralized helpers like `snapshot.snapLoadingProgress()` (returns the loading widget or null) and `snapshot.reportErrorIfAny()` were reported as missing error handling because the substring check at the call site never saw the literal `hasError` / `.error` text — the inspection happened inside the extension. The rule now walks the builder body and treats an inline `.hasError` / `.error` / `.stackTrace` access, any method invocation on the snapshot parameter, or any helper whose name itself contains "error" as sufficient. The same change also closes a latent false negative where a local variable named `hasErrorState` suppressed the lint via raw substring match. Remove any project-local `// ignore: require_error_widget` comments added to silence the false positive.

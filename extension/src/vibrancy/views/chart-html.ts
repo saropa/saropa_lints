@@ -77,6 +77,7 @@ export function buildChartSection(results: VibrancyResult[]): string {
     return `
     <details class="chart-section dashboard-collapsible" open>
         <summary><h2>${escapeHtml(l10n('packageDashboard.sections.sizeDistribution'))}</h2></summary>
+        <p class="chart-caption">${escapeHtml(l10n('packageDashboard.sections.sizeDistributionCaption'))}</p>
         ${toggleHtml ? `<div class="chart-header">${toggleHtml}</div>` : ''}
         <div class="chart-container">
             <div class="bar-chart-panel">
@@ -112,10 +113,17 @@ function prepareChartData(
        which inflated bars for packages that ship example media (audioplayers
        appeared near the top of the chart when its actual code contribution
        is ~40 KB). See plans/history/2026.05/2026.05.13/
-       infra_vibrancy_bloat_uses_tarball_size_not_runtime.md. */
+       infra_vibrancy_bloat_uses_tarball_size_not_runtime.md.
+
+       dev_dependencies are EXCLUDED — same reason as the Total Size summary
+       card. They are compile/lint/test-time tooling (saropa_lints,
+       build_runner, lints) and never ship to APK/IPA/web bundles. Including
+       them gave saropa_lints a 66% bar on projects that depend on it as a
+       dev dep, which is the opposite of what "Size Distribution" means. */
     const sizeOf = (r: VibrancyResult): number | null =>
         r.codeSizeBytes ?? r.archiveSizeBytes;
     const withSize = results
+        .filter(r => r.package.section !== 'dev_dependencies')
         .map(r => ({ r, size: sizeOf(r) }))
         .filter(p => p.size !== null && p.size > 0)
         .map(({ r, size }) => ({

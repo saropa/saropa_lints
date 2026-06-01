@@ -28,6 +28,12 @@ export function getChartStyles(): string {
             gap: 16px;
             margin-bottom: 12px;
         }
+        .chart-caption {
+            margin: 4px 0 8px;
+            font-size: 0.85em;
+            color: var(--vscode-descriptionForeground);
+            opacity: 0.85;
+        }
         .chart-section h2 {
             font-size: 1.1em;
             margin-bottom: 0;
