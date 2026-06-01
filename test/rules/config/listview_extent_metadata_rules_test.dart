@@ -13,14 +13,12 @@ import 'package:test/test.dart';
 /// Mirrors the named-argument scan used in production rules (no full plugin run).
 void main() {
   group('AvoidListViewWithoutItemExtentRule (argument scan)', () {
-    test(
-      'flags builder without any extent hint; does not flag separated',
-      () {
-        // ListView.separated is unconditionally excluded because its
-        // constructor does not declare itemExtent / prototypeItem /
-        // itemExtentBuilder — see archived bug
-        // avoid_listview_without_item_extent_false_positive_listview_separated_unfixable.md.
-        final code = '''
+    test('flags builder without any extent hint; does not flag separated', () {
+      // ListView.separated is unconditionally excluded because its
+      // constructor does not declare itemExtent / prototypeItem /
+      // itemExtentBuilder — see archived bug
+      // avoid_listview_without_item_extent_false_positive_listview_separated_unfixable.md.
+      final code = '''
 class ListView {
   ListView.builder({dynamic itemCount, dynamic itemBuilder});
   ListView.separated({
@@ -39,9 +37,8 @@ void f() {
   );
 }
 ''';
-        expect(_countListViewsMissingExtentHints(code), 1);
-      },
-    );
+      expect(_countListViewsMissingExtentHints(code), 1);
+    });
 
     test('does not flag when itemExtentBuilder is present', () {
       final code = '''
