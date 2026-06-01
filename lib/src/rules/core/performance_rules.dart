@@ -1929,9 +1929,14 @@ class AvoidLargeListCopyRule extends SaropaLintRule {
       if (parent is CascadeExpression && parent.target == current) return true;
 
       // Parentheses and ternary branches do not change whether a List is
-      // needed — keep climbing to whatever consumes their value.
+      // needed — keep climbing to whatever consumes their value. A named
+      // argument (`children: x.toList()`) is also just a transparent wrapper:
+      // its parent is the ArgumentList, where a concrete List is required.
+      // Without unwrapping NamedExpression the .toList() is judged against the
+      // wrapper and fires a false positive on every `children:`-style call.
       if (parent is ParenthesizedExpression ||
-          parent is ConditionalExpression) {
+          parent is ConditionalExpression ||
+          parent is NamedExpression) {
         current = parent;
         parent = parent.parent;
         continue;
@@ -1955,6 +1960,25 @@ class AvoidLargeListCopyRule extends SaropaLintRule {
 
     // .toList() result is passed as an argument
     if (parent is ArgumentList) return true;
+
+    // .toList() is an operand of `??` (`x.toList() ?? <T>[]`). The binary
+    // expression's result flows to wherever a List was structurally required
+    // (return, assignment, argument). The dominant case is a nullable lazy
+    // chain with a concrete fallback list; both operands are List-typed, so
+    // the .toList() is unavoidable. Restricted to QUESTION_QUESTION so other
+    // operators (`==`, etc.) are not silently exempted.
+    if (parent is BinaryExpression &&
+        parent.operator.type == TokenType.QUESTION_QUESTION) {
+      return true;
+    }
+
+    // A property/getter is accessed on the .toList() result
+    // (`x.toList().nonEmpty`). The getter is defined on List (or a List
+    // extension), not Iterable, so the .toList() is required for it to
+    // compile. PropertyAccess covers the `a.b.toList().g` form;
+    // PrefixedIdentifier covers the simpler `x.toList().g` form.
+    if (parent is PropertyAccess && parent.target == current) return true;
+    if (parent is PrefixedIdentifier && parent.prefix == current) return true;
 
     return false;
   }
