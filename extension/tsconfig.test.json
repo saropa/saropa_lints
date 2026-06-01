@@ -20,6 +20,7 @@
     "src/test/vibrancy/vscode-mock-classes.ts",
     "src/test/vibrancy/test-helpers.ts",
     "src/test/vibrancy/services/pubspec-sorter.test.ts",
+    "src/test/vibrancy/services/pubspec-parser-comments.test.ts",
     "src/test/vibrancy/providers/annotate-command.test.ts",
     "src/test/vibrancy/providers/adoption-gate.test.ts",
     "src/test/vibrancy/category-dictionary.test.ts",

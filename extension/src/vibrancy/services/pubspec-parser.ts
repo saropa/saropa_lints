@@ -27,7 +27,15 @@ export function parsePubspecYaml(content: string): {
             section = 'dev';
             continue;
         }
-        if (/^\S/.test(trimmed) && section !== 'none') {
+        // Skip top-level comments (e.g. `# cspell:ignore foo` at column 0)
+        // and blank lines from the section-exit guard. Without this, a stray
+        // zero-indent comment inside `dependencies:` flips section to 'none'
+        // and every package declared after it is silently dropped — observed
+        // on saropa/contacts where two `# cspell:ignore ...` lines caused
+        // ~14 direct deps (device_info_plus, image, share_plus, …) to vanish
+        // from the Package Dashboard.
+        const isCommentOrBlank = trimmed.length === 0 || trimmed.startsWith('#');
+        if (!isCommentOrBlank && /^\S/.test(trimmed) && section !== 'none') {
             section = 'none';
         }
         if (section === 'none') { continue; }
@@ -167,7 +175,10 @@ function forEachEnvironmentLine(
             inSection = true;
             continue;
         }
-        if (inSection && /^\S/.test(trimmed)) { break; }
+        // Same guard as parsePubspecYaml: a zero-indent comment inside the
+        // section is not a section terminator, even though /^\S/ matches `#`.
+        const isCommentOrBlank = trimmed.length === 0 || trimmed.startsWith('#');
+        if (inSection && !isCommentOrBlank && /^\S/.test(trimmed)) { break; }
         if (!inSection) { continue; }
         // Return true from visitor to stop iteration early
         if (visitor(i, trimmed) === true) { break; }
@@ -237,7 +248,10 @@ export function parseDependencyOverrides(content: string): string[] {
             inOverrides = true;
             continue;
         }
-        if (inOverrides && /^\S/.test(trimmed)) {
+        // Same guard as parsePubspecYaml: a zero-indent comment inside the
+        // section is not a section terminator, even though /^\S/ matches `#`.
+        const isCommentOrBlank = trimmed.length === 0 || trimmed.startsWith('#');
+        if (inOverrides && !isCommentOrBlank && /^\S/.test(trimmed)) {
             break;
         }
         if (!inOverrides) { continue; }

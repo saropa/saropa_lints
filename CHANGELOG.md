@@ -71,6 +71,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ### Fixed (Extension)
 
+- **Package Dashboard no longer drops direct dependencies that follow a zero-indent comment.** A `# cspell:ignore foo` (or any other column-zero comment) inside `dependencies:` or `dependency_overrides:` was treated as a new top-level YAML key, exiting the active section and silently skipping every package declared after it. On the saropa contacts pubspec two `# cspell:ignore …` comments caused ~14 direct deps (`device_info_plus`, `image`, `share_plus`, `youtube_player_flutter`, …) to vanish from the dashboard and the saved `pubspec_vibrancy.json`. The parser now ignores comment and blank lines in the section-exit guard. A real top-level key still ends the section. No action required — rescan to repopulate.
 - **Package Dashboard Total Size and Size Distribution now exclude dev_dependencies.** Dev-only tooling like `saropa_lints`, `build_runner`, and `lints` was being summed into the "Total Size" card and given its own bar in the Size Distribution chart, even though dev deps never reach the APK / IPA / web bundle. On projects that use `saropa_lints` as a dev dep, the chart was assigning it ~66% of "total size" — the opposite of what either surface communicates. Both now drop dev deps unconditionally; the "Include dev" toggle still controls the package table. A new caption under the chart and updated Total Size tooltip call out the exclusion. No action required.
 
 ### Fixed
