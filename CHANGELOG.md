@@ -63,6 +63,16 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 -->
 
+## [Unreleased]
+
+### Fixed
+
+- **`require_error_widget` no longer fires when error handling lives in an extension method on `AsyncSnapshot`.** Centralized helpers like `snapshot.snapLoadingProgress()` (returns the loading widget or null) and `snapshot.reportErrorIfAny()` were reported as missing error handling because the substring check at the call site never saw the literal `hasError` / `.error` text — the inspection happened inside the extension. The rule now walks the builder body and treats an inline `.hasError` / `.error` / `.stackTrace` access, any method invocation on the snapshot parameter, or any helper whose name itself contains "error" as sufficient. The same change also closes a latent false negative where a local variable named `hasErrorState` suppressed the lint via raw substring match. Remove any project-local `// ignore: require_error_widget` comments added to silence the false positive.
+- **`require_late_initialization_in_init_state` no longer fires on reassignment inside `onPressed`, `onTap`, or `setState` callbacks.** Standard "View All / load more" patterns — a `late` field that is correctly initialized in `initState` and then reset to a different value inside a button or gesture callback — were incorrectly reported as build-path initialization because the rule matched the assignment via a regex over the build method's source text and could not see that the assignment was lexically nested inside a closure. The rule now walks the AST and skips assignments inside nested function expressions, and excludes any late field that `initState` already assigns. Remove any project-local `// ignore: require_late_initialization_in_init_state` comments added to silence the false positive.
+- **`pass_existing_future_to_future_builder` no longer fires on the cache-method pattern.** When the `future:` argument is a private instance method (`_getContactsFuture(...)`) on a class that declares at least one `Future<...>?` field, the rule now treats the call as a cached-future accessor rather than a fresh allocation. This is the idiomatic pattern when the cached future depends on dynamic input that a `late final` field cannot model, and the rule's own correction message ("cache the Future") already endorses it. Public methods and methods on classes without a nullable Future field still fire. Remove any project-local `// ignore: pass_existing_future_to_future_builder` comments added to silence the false positive.
+
+---
+
 ## [13.11.3]
 
 ### Fixed

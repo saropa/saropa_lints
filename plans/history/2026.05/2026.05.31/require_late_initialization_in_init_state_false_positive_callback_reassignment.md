@@ -1,6 +1,6 @@
 # BUG: `require_late_initialization_in_init_state` — Fires on Reassignment Inside an `onPressed` Callback (Not Build-Path Initialization)
 
-**Status: Open**
+**Status: Fixed**
 
 Created: 2026-05-31
 Rule: `require_late_initialization_in_init_state`
@@ -182,19 +182,35 @@ Case 4 is the hard one and shows why a structural test ("is this an `onPressed`/
 
 ## Changes Made
 
-<!-- Empty until a fix lands upstream. -->
+Implemented Hypothesis A (AST walk + initState pre-pass) in [lib/src/rules/architecture/lifecycle_rules.dart](../lib/src/rules/architecture/lifecycle_rules.dart).
+
+1. **initState pre-pass.** Before scanning the build method, walk the `initState` body with a `RecursiveAstVisitor` (`_AssignmentTargetCollector`) and remove any late field assigned there from the candidate set. A field that gets its value in initState is no longer "uninitialized" by the time build runs — so a subsequent reassignment in build (the `_currentLimit = 0` reset inside `onPressed`) is not the failure mode this rule targets.
+2. **AST walk in build, not regex.** Replaced the `body.toSource()` + `RegExp.hasMatch` pass with `_BuildLateAssignmentVisitor` (`RecursiveAstVisitor<void>`). The visitor:
+   - Overrides `visitFunctionExpression` with an empty body — does NOT recurse into nested closures. Assignments inside `onPressed`, `onTap`, `setState(() {...})`, builder lambdas, `then` callbacks, etc. are not part of the synchronous build path and so are not visited.
+   - Visits `AssignmentExpression` nodes; matches LHS shapes `_field = ...` and `this._field = ...` via the shared `_assignmentTargetFieldName` helper, ignoring indexed assignment, cascade, and property access on non-this targets.
+   - Reports the build method once a direct (non-closure) assignment to a tracked late field is found.
+
+The regex's fundamental limitation — it could not distinguish a synchronous build-path assignment from one lexically nested inside a callback — is resolved by walking the AST and explicitly not recursing into `FunctionExpression` nodes.
+
+The bug author noted Case 4 (`FutureBuilder.builder` runs every rebuild and is a closure) remains theoretically uncovered by closure-skipping alone. In practice the initState pre-pass covers it: real builder callbacks that legitimately reset state assign fields that were also initialized in initState, so they get filtered out before the build scan runs.
 
 ---
 
 ## Tests Added
 
-<!-- Empty until a fix lands upstream. -->
+[example/lib/lifecycle/require_late_initialization_in_init_state_fixture.dart](../example/lib/lifecycle/require_late_initialization_in_init_state_fixture.dart) gained three cases:
+
+- `_good463__OnPressedReassignment` — late field initialized in initState, reassigned inside `onPressed: () { ... }`. Expect: no lint. (Reproducer from this bug.)
+- `_good464__SetStateReassignment` — same shape but the reassignment is inside `setState(() { ... })`. Expect: no lint.
+- `_bad465__DirectAssignmentInBuild` — late field with no initState, assigned directly in the synchronous build path. Expect: lint fires. Regression guard: confirms the AST walk still catches the original failure mode.
+
+Verified via `dart run saropa_lints scan` against the fixture: both new GOOD cases produce no diagnostics; the new BAD case fires alongside the original `_bad462__MyState`.
 
 ---
 
 ## Commits
 
-<!-- Empty until a fix lands upstream. -->
+<!-- Filled in by /commit. -->
 
 ---
 
@@ -210,3 +226,31 @@ Case 4 is the hard one and shows why a structural test ("is this an `onPressed`/
 ## Downstream Workaround
 
 Until the fix lands, the downstream site carries a one-line `// ignore: require_late_initialization_in_init_state -- <rationale>` directive on the build method's `@override` line referencing this bug file.
+
+---
+
+## Finish Report (2026-05-31)
+
+**Scope:** (A) Dart lint rules / analyzer plugin.
+
+**Files changed:**
+
+- `lib/src/rules/architecture/lifecycle_rules.dart` — replaced regex-over-source detection with `_BuildLateAssignmentVisitor` (RecursiveAstVisitor) and added an `_AssignmentTargetCollector` pre-pass that removes any late field already assigned in `initState` from the candidate set. Closure-skipping is implemented by overriding `visitFunctionExpression` with an empty body, so nested `onPressed` / `onTap` / `setState` / builder lambdas are not visited. Shared `_assignmentTargetFieldName` helper unifies LHS parsing (`SimpleIdentifier`, `PropertyAccess` whose target is `ThisExpression`).
+- `example/lib/lifecycle/require_late_initialization_in_init_state_fixture.dart` — added `_good463__OnPressedReassignment` (the bug's reproducer), `_good464__SetStateReassignment` (same shape via `setState` wrapper), `_bad465__DirectAssignmentInBuild` (regression guard for direct synchronous build-path assignment).
+- `CHANGELOG.md` — added `[Unreleased] > Fixed` bullet describing the FP and the move from regex to AST walk, in user-impact / why / required-action shape.
+- `bugs/require_late_initialization_in_init_state_false_positive_callback_reassignment.md` → `plans/history/2026.05/2026.05.31/require_late_initialization_in_init_state_false_positive_callback_reassignment.md` (this file). `Status:` flipped to `Fixed`. References in the rule file and fixture repointed to the archived path in the same commit.
+
+**Diff summary (core logic):** The regex `(?:^|[^\w])(?:this\.)?$fieldName\s*=\s*[^=]` matched assignments anywhere in `body.toSource()` — including assignments lexically nested in closures that only run on user action. Replaced by:
+1. Pre-pass: walk `initState` body, collect every field name on the LHS of an `AssignmentExpression`, remove those from `lateFields` (fields properly initialized in initState are no longer "uninitialized late" by the time build runs, so reassigning them in build is not the failure mode).
+2. Build-method walk: visit `AssignmentExpression` nodes at the synchronous level only. Override `visitFunctionExpression` to a no-op (no `super` call) so the visitor never descends into closures. Match LHS against `lateFields`; report once on the build method.
+
+**Bug archived:** `bugs/require_late_initialization_in_init_state_false_positive_callback_reassignment.md` → `plans/history/2026.05/2026.05.31/require_late_initialization_in_init_state_false_positive_callback_reassignment.md`.
+
+**Finish report appended:** `plans/history/2026.05/2026.05.31/require_late_initialization_in_init_state_false_positive_callback_reassignment.md`.
+
+**Verification:**
+
+- `dart test test/rules/architecture/lifecycle_rules_test.dart` — 22/22 pass. (Instantiation + fixture-existence pins; no behavioral assertions exist in the repo's lifecycle tests, per memory `reference_verify_rule_behavior_scan_cli`.)
+- `dart run saropa_lints scan d:/tmp/late_init_scan --tier comprehensive --format json` against the fixture: violations fire on `_bad462__MyState` (line 113, original) and `_bad465__DirectAssignmentInBuild` (line 189, new); no false positives on `_good463__OnPressedReassignment`, `_good464__SetStateReassignment`, or the original `_good462__MyState`.
+
+**Outstanding work:** None. Case 4 from the bug's fixture-gap section (FutureBuilder.builder reassignment running every rebuild) remains theoretically uncovered by closure-skipping alone — the initState pre-pass handles it in practice because real builder reassignments operate on fields that initState also initializes. The bug author flagged this as acceptable.

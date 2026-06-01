@@ -135,3 +135,63 @@ class _good462__MyState extends State<MyWidget> {
     return TextField(controller: _controller);
   }
 }
+
+// GOOD: late field initialized in initState, reassigned inside an onPressed
+// callback in build. Callback only runs on user tap, not on every rebuild.
+// Was previously a false positive — see
+// plans/history/2026.05/2026.05.31/require_late_initialization_in_init_state_false_positive_callback_reassignment.md.
+class _good463__OnPressedReassignment extends State<MyWidget> {
+  late int _currentLimit;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentLimit = 10;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton(
+      onPressed: () {
+        _currentLimit = 0;
+      },
+      child: Text('Show all ($_currentLimit)'),
+    );
+  }
+}
+
+// GOOD: late field initialized in initState, reassigned inside a setState
+// callback in build. Same shape as the onPressed case, different surface.
+class _good464__SetStateReassignment extends State<MyWidget> {
+  late int _currentLimit;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentLimit = 10;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton(
+      onPressed: () => setState(() {
+        _currentLimit = 0;
+      }),
+      child: Text('Show all ($_currentLimit)'),
+    );
+  }
+}
+
+// BAD: late field NOT assigned in initState, assigned directly in build's
+// synchronous path. The assignment runs on every rebuild — the failure mode
+// this rule targets.
+// expect_lint: require_late_initialization_in_init_state
+class _bad465__DirectAssignmentInBuild extends State<MyWidget> {
+  late TextEditingController _controller;
+
+  @override
+  Widget build(BuildContext context) {
+    _controller = TextEditingController();
+    return TextField(controller: _controller);
+  }
+}

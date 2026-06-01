@@ -7,6 +7,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/visitor.dart';
 
 import '../../saropa_lint_rule.dart';
 
@@ -438,6 +439,28 @@ class RequireLateInitializationInInitStateRule extends SaropaLintRule {
 
       if (lateFields.isEmpty) return;
 
+      // Pre-pass: remove fields that initState already initializes. A late
+      // field that gets its value in initState is no longer "uninitialized"
+      // by the time build runs, so a subsequent reassignment in build (e.g.
+      // inside an onPressed/setState callback that resets the field) is not
+      // the failure mode this rule targets. Without this filter, the rule
+      // flags every "View All / load more" style reassignment as a violation.
+      // See plans/history/2026.05/2026.05.31/require_late_initialization_in_init_state_false_positive_callback_reassignment.md.
+      final Set<String> initStateAssigned = <String>{};
+      for (final ClassMember member in node.bodyMembers) {
+        if (member is MethodDeclaration && member.name.lexeme == 'initState') {
+          final FunctionBody? initStateBody = member.body;
+          if (initStateBody != null) {
+            final _AssignmentTargetCollector collector =
+                _AssignmentTargetCollector(initStateAssigned);
+            initStateBody.visitChildren(collector);
+          }
+        }
+      }
+      lateFields.removeAll(initStateAssigned);
+
+      if (lateFields.isEmpty) return;
+
       // Find build method and check for late field assignments
       for (final ClassMember member in node.bodyMembers) {
         if (member is MethodDeclaration && member.name.lexeme == 'build') {
@@ -455,24 +478,87 @@ class RequireLateInitializationInInitStateRule extends SaropaLintRule {
     final FunctionBody? body = buildMethod.body;
     if (body == null) return;
 
-    // Find all assignment expressions in the build method
-    final String bodySource = body.toSource();
-    final fieldList = lateFields.toList();
-    final assignmentPatterns = fieldList
-        .map(
-          (fieldName) =>
-              RegExp('(?:^|[^\\w])(?:this\\.)?$fieldName\\s*=\\s*[^=]'),
-        )
-        .toList();
+    // Walk the AST for direct (non-closure) assignments to late fields.
+    // Assignments inside nested FunctionExpression closures — onPressed,
+    // onTap, setState callbacks, builder lambdas, async then callbacks —
+    // run on user action or deferred events, NOT on every rebuild, so they
+    // are not the build-path re-initialization this rule targets. The
+    // previous implementation matched a regex against the body's source
+    // text and could not distinguish synchronous build-path assignments
+    // from assignments lexically nested inside callbacks. See
+    // plans/history/2026.05/2026.05.31/require_late_initialization_in_init_state_false_positive_callback_reassignment.md.
+    final _BuildLateAssignmentVisitor visitor =
+        _BuildLateAssignmentVisitor(lateFields);
+    body.visitChildren(visitor);
 
-    for (var i = 0; i < fieldList.length; i++) {
-      if (assignmentPatterns[i].hasMatch(bodySource)) {
-        // Report at the build method level
-        reporter.atNode(buildMethod);
-        return; // Only report once per build method
-      }
+    if (visitor.found) {
+      reporter.atNode(buildMethod);
     }
   }
+}
+
+/// Collects names of fields assigned anywhere within a method body.
+///
+/// Used to detect which late fields are initialized in `initState` so the
+/// build-method check can skip them. Recurses into nested expressions to
+/// catch assignments wrapped in conditionals or callbacks within initState.
+class _AssignmentTargetCollector extends RecursiveAstVisitor<void> {
+  _AssignmentTargetCollector(this.assigned);
+
+  final Set<String> assigned;
+
+  @override
+  void visitAssignmentExpression(AssignmentExpression node) {
+    final String? fieldName = _assignmentTargetFieldName(node);
+    if (fieldName != null) {
+      assigned.add(fieldName);
+    }
+    super.visitAssignmentExpression(node);
+  }
+}
+
+/// Finds direct (non-closure) assignments to any of [lateFields] inside the
+/// build method body. Skips nested FunctionExpression closures because
+/// assignments there fire on user interaction or deferred events, not on
+/// every rebuild.
+class _BuildLateAssignmentVisitor extends RecursiveAstVisitor<void> {
+  _BuildLateAssignmentVisitor(this.lateFields);
+
+  final Set<String> lateFields;
+  bool found = false;
+
+  @override
+  void visitFunctionExpression(FunctionExpression node) {
+    // Do NOT recurse into nested closures: assignments inside onPressed,
+    // setState, builder lambdas, etc. are not part of the synchronous
+    // build path, so they are not the failure mode targeted by this rule.
+  }
+
+  @override
+  void visitAssignmentExpression(AssignmentExpression node) {
+    if (found) return;
+    final String? fieldName = _assignmentTargetFieldName(node);
+    if (fieldName != null && lateFields.contains(fieldName)) {
+      found = true;
+      return;
+    }
+    super.visitAssignmentExpression(node);
+  }
+}
+
+/// Extracts the field name an [AssignmentExpression] targets, handling both
+/// bare identifiers (`_field = ...`) and explicit-`this` access
+/// (`this._field = ...`). Returns null for any other LHS shape (indexed
+/// assignment, cascade, property access on a non-this target).
+String? _assignmentTargetFieldName(AssignmentExpression node) {
+  final Expression lhs = node.leftHandSide;
+  if (lhs is SimpleIdentifier) {
+    return lhs.name;
+  }
+  if (lhs is PropertyAccess && lhs.target is ThisExpression) {
+    return lhs.propertyName.name;
+  }
+  return null;
 }
 
 /// Warns when State subclasses use Timer or stream subscriptions without
