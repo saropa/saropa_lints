@@ -13,8 +13,14 @@ import 'package:test/test.dart';
 /// Mirrors the named-argument scan used in production rules (no full plugin run).
 void main() {
   group('AvoidListViewWithoutItemExtentRule (argument scan)', () {
-    test('flags builder and separated without any extent hint', () {
-      final code = '''
+    test(
+      'flags builder without any extent hint; does not flag separated',
+      () {
+        // ListView.separated is unconditionally excluded because its
+        // constructor does not declare itemExtent / prototypeItem /
+        // itemExtentBuilder — see archived bug
+        // avoid_listview_without_item_extent_false_positive_listview_separated_unfixable.md.
+        final code = '''
 class ListView {
   ListView.builder({dynamic itemCount, dynamic itemBuilder});
   ListView.separated({
@@ -33,8 +39,9 @@ void f() {
   );
 }
 ''';
-      expect(_countListViewsMissingExtentHints(code), 2);
-    });
+        expect(_countListViewsMissingExtentHints(code), 1);
+      },
+    );
 
     test('does not flag when itemExtentBuilder is present', () {
       final code = '''
@@ -100,6 +107,110 @@ void f() {
 ''';
       expect(_countListViewsMissingExtentHints(code), 0);
     });
+
+    test(
+      'false positive guard: shrinkWrap + const NeverScrollableScrollPhysics() skips',
+      () {
+        // Inline non-scrolling list pattern — outer parent scrolls; shrinkWrap
+        // forces eager layout so itemExtent's lazy-extent benefit is impossible
+        // and forcing a constant extent here would clip variable-height rows.
+        // See bugs/...shrinkwrap_never_scrollable_inline_list.md.
+        final code = '''
+class NeverScrollableScrollPhysics {
+  const NeverScrollableScrollPhysics();
+}
+class ListView {
+  ListView.builder({
+    dynamic itemCount,
+    dynamic itemBuilder,
+    dynamic shrinkWrap,
+    dynamic physics,
+  });
+}
+void f() {
+  ListView.builder(
+    shrinkWrap: true,
+    physics: const NeverScrollableScrollPhysics(),
+    itemCount: 1,
+    itemBuilder: (c, i) => null,
+  );
+}
+''';
+        expect(_countListViewsMissingExtentHints(code), 0);
+      },
+    );
+
+    test('false positive guard: ListView.separated is excluded entirely', () {
+      // ListView.separated is excluded regardless of arguments — its
+      // constructor does not accept the extent-hint parameters at all, so
+      // even the inline-non-scrolling shape should produce no diagnostic.
+      final code = '''
+class NeverScrollableScrollPhysics {
+  const NeverScrollableScrollPhysics();
+}
+class ListView {
+  ListView.separated({
+    dynamic itemCount,
+    dynamic itemBuilder,
+    dynamic separatorBuilder,
+    dynamic shrinkWrap,
+    dynamic physics,
+  });
+}
+void f() {
+  ListView.separated(
+    shrinkWrap: true,
+    physics: const NeverScrollableScrollPhysics(),
+    itemCount: 1,
+    itemBuilder: (c, i) => null,
+    separatorBuilder: (c, i) => null,
+  );
+}
+''';
+      expect(_countListViewsMissingExtentHints(code), 0);
+    });
+
+    test('still flags when only shrinkWrap is set (no physics)', () {
+      // shrinkWrap alone is NOT the inline-non-scrolling pattern — the inner
+      // list still scrolls and the extent-hint guidance applies.
+      final code = '''
+class ListView {
+  ListView.builder({dynamic itemCount, dynamic itemBuilder, dynamic shrinkWrap});
+}
+void f() {
+  ListView.builder(
+    shrinkWrap: true,
+    itemCount: 1,
+    itemBuilder: (c, i) => null,
+  );
+}
+''';
+      expect(_countListViewsMissingExtentHints(code), 1);
+    });
+
+    test(
+      'still flags when only NeverScrollableScrollPhysics is set (no shrinkWrap)',
+      () {
+        // Other-axis or unbounded nesting — without shrinkWrap, virtualization
+        // can still happen and the extent-hint guidance applies.
+        final code = '''
+class NeverScrollableScrollPhysics {
+  const NeverScrollableScrollPhysics();
+}
+class ListView {
+  ListView.builder({dynamic itemCount, dynamic itemBuilder, dynamic physics});
+}
+void f() {
+  ListView.builder(
+    physics: const NeverScrollableScrollPhysics(),
+    itemCount: 1,
+    itemBuilder: (c, i) => null,
+  );
+}
+''';
+        expect(_countListViewsMissingExtentHints(code), 1);
+      },
+    );
   });
 
   group('PreferOverflowBarOverButtonBarRule (metadata + AST)', () {
@@ -188,8 +299,10 @@ class _ListViewExtentVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
-    final method = node.methodName.name;
-    if (method == 'builder' || method == 'separated') {
+    // Only `.builder` is targeted; `.separated` is excluded — its constructor
+    // does not accept itemExtent / prototypeItem / itemExtentBuilder, so a
+    // diagnostic there would be unfixable.
+    if (node.methodName.name == 'builder') {
       final target = node.target;
       if (target is SimpleIdentifier && target.name == 'ListView') {
         _countIfMissingHints(node.argumentList);
@@ -201,7 +314,7 @@ class _ListViewExtentVisitor extends RecursiveAstVisitor<void> {
   void _maybeCountListView(ConstructorName constructorName, ArgumentList args) {
     final typeName = constructorName.type.name.lexeme;
     final name = constructorName.name?.name;
-    if (typeName == 'ListView' && (name == 'builder' || name == 'separated')) {
+    if (typeName == 'ListView' && name == 'builder') {
       _countIfMissingHints(args);
     }
   }
@@ -210,14 +323,34 @@ class _ListViewExtentVisitor extends RecursiveAstVisitor<void> {
     var hasItemExtent = false;
     var hasPrototypeItem = false;
     var hasItemExtentBuilder = false;
+    var shrinkWrapTrue = false;
+    var neverScrollablePhysics = false;
     for (final arg in argumentList.arguments) {
       if (arg is! NamedExpression) continue;
       final name = arg.name.label.name;
       if (name == 'itemExtent') hasItemExtent = true;
       if (name == 'prototypeItem') hasPrototypeItem = true;
       if (name == 'itemExtentBuilder') hasItemExtentBuilder = true;
+      if (name == 'shrinkWrap') {
+        final v = arg.expression;
+        if (v is BooleanLiteral && v.value) shrinkWrapTrue = true;
+      }
+      if (name == 'physics') {
+        Expression v = arg.expression;
+        if (v is ParenthesizedExpression) v = v.expression;
+        if (v is InstanceCreationExpression &&
+            v.constructorName.type.name.lexeme ==
+                'NeverScrollableScrollPhysics') {
+          neverScrollablePhysics = true;
+        }
+      }
     }
-    if (!hasItemExtent && !hasPrototypeItem && !hasItemExtentBuilder) {
+    // Mirrors the rule's inline-non-scrolling skip.
+    final isInlineNonScrolling = shrinkWrapTrue && neverScrollablePhysics;
+    if (!hasItemExtent &&
+        !hasPrototypeItem &&
+        !hasItemExtentBuilder &&
+        !isInlineNonScrolling) {
       missingHintCount++;
     }
   }

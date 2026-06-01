@@ -63,6 +63,13 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 -->
 
+## [Unreleased]
+
+### Fixed
+
+- **`avoid_listview_without_item_extent` no longer fires on `ListView.separated`.** The `.separated` constructor does not declare `itemExtent`, `prototypeItem`, or `itemExtentBuilder` (an extent applied to items would also apply to separators, which never share one), so the rule's correction was unfixable on `.separated`. The rule now targets `ListView.builder` only — remove any `// ignore: avoid_listview_without_item_extent` added on `.separated` call sites.
+- **`avoid_listview_without_item_extent` no longer fires on inline non-scrolling `ListView.builder`.** When the call sets both `shrinkWrap: true` and `physics: NeverScrollableScrollPhysics()` the inner list does not scroll and `shrinkWrap` already forces eager layout, so the extent-hint guidance does not apply and forcing one would clip variable-height rows — remove any `// ignore: avoid_listview_without_item_extent` that was added for this pattern.
+
 ## [13.11.5]
 
 ### Added

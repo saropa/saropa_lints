@@ -545,13 +545,20 @@ class PreferUsingListViewRule extends SaropaLintRule {
   }
 }
 
-/// Warns when ListView.builder or ListView.separated omits scroll extent hints.
+/// Warns when ListView.builder omits scroll extent hints.
 ///
-/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+/// Since: v0.1.4 | Updated: v13.11.6 | Rule version: v7
 ///
 /// Prefer `itemExtent` when every row has the same height, `prototypeItem`
 /// when a single widget represents typical sizing, or `itemExtentBuilder`
 /// (Flutter 3.16+, PR #131393) when each index may have a different extent.
+///
+/// `ListView.separated` is intentionally NOT targeted: its constructor
+/// signature does not declare `itemExtent`, `prototypeItem`, or
+/// `itemExtentBuilder` (an extent applied to items would also apply to
+/// separators, which never share a uniform extent), so any diagnostic on
+/// `.separated` would be unfixable. See archived bug
+/// `avoid_listview_without_item_extent_false_positive_listview_separated_unfixable.md`.
 ///
 /// **BAD:**
 /// ```dart
@@ -579,7 +586,7 @@ class AvoidListViewWithoutItemExtentRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'avoid_listview_without_item_extent',
-    '[avoid_listview_without_item_extent] ListView.builder should specify itemExtent, prototypeItem, or itemExtentBuilder for predictable scroll layout. Omitting all three forces per-child layout measurement, which hurts jump/scrollbar accuracy and large-list performance (Flutter 3.16+ adds itemExtentBuilder for varying per-index heights). {v6}',
+    '[avoid_listview_without_item_extent] ListView.builder should specify itemExtent, prototypeItem, or itemExtentBuilder for predictable scroll layout. Omitting all three forces per-child layout measurement, which hurts jump/scrollbar accuracy and large-list performance (Flutter 3.16+ adds itemExtentBuilder for varying per-index heights). ListView.separated is excluded because its constructor does not accept these parameters. {v7}',
     correctionMessage:
         'Add itemExtent for uniform height, prototypeItem for a single representative size, or itemExtentBuilder when each index can have a different extent. Test on multiple screen sizes.',
     severity: DiagnosticSeverity.INFO,
@@ -594,11 +601,17 @@ class AvoidListViewWithoutItemExtentRule extends SaropaLintRule {
       final String typeName = node.constructorName.type.name.lexeme;
       final String? constructorName = node.constructorName.name?.name;
 
-      if (typeName == 'ListView' &&
-          (constructorName == 'builder' || constructorName == 'separated')) {
+      // ListView.separated deliberately omitted: its constructor does not
+      // accept itemExtent/prototypeItem/itemExtentBuilder (an extent would
+      // apply to items AND separators, which never share one), so firing on
+      // .separated produced an unfixable diagnostic. See archived bug
+      // avoid_listview_without_item_extent_false_positive_listview_separated_unfixable.md.
+      if (typeName == 'ListView' && constructorName == 'builder') {
         bool hasItemExtent = false;
         bool hasPrototypeItem = false;
         bool hasItemExtentBuilder = false;
+        bool shrinkWrapTrue = false;
+        bool neverScrollablePhysics = false;
 
         for (final Expression arg in node.argumentList.arguments) {
           if (arg is NamedExpression) {
@@ -606,10 +619,37 @@ class AvoidListViewWithoutItemExtentRule extends SaropaLintRule {
             if (name == 'itemExtent') hasItemExtent = true;
             if (name == 'prototypeItem') hasPrototypeItem = true;
             if (name == 'itemExtentBuilder') hasItemExtentBuilder = true;
+            if (name == 'shrinkWrap') {
+              final Expression v = arg.expression;
+              if (v is BooleanLiteral && v.value) shrinkWrapTrue = true;
+            }
+            if (name == 'physics') {
+              // Inline non-scrolling list pattern uses
+              // `physics: const NeverScrollableScrollPhysics()` (sometimes
+              // without `const`). Structural match: peel a leading const
+              // expression to reach the InstanceCreationExpression.
+              Expression v = arg.expression;
+              if (v is ParenthesizedExpression) v = v.expression;
+              if (v is InstanceCreationExpression &&
+                  v.constructorName.type.name.lexeme ==
+                      'NeverScrollableScrollPhysics') {
+                neverScrollablePhysics = true;
+              }
+            }
           }
         }
 
-        if (!hasItemExtent && !hasPrototypeItem && !hasItemExtentBuilder) {
+        // Skip inline-non-scrolling lists: shrinkWrap forces eager layout of
+        // every child, so itemExtent's lazy-extent benefit is impossible and
+        // forcing a constant extent here clips variable-height rows. See
+        // plans/history/2026.06/2026.06.01/avoid_listview_without_item_extent_false_positive_shrinkwrap_never_scrollable_inline_list.md.
+        final bool isInlineNonScrolling =
+            shrinkWrapTrue && neverScrollablePhysics;
+
+        if (!hasItemExtent &&
+            !hasPrototypeItem &&
+            !hasItemExtentBuilder &&
+            !isInlineNonScrolling) {
           reporter.atNode(node.constructorName, code);
         }
       }

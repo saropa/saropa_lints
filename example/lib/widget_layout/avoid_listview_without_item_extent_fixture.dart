@@ -100,11 +100,13 @@
 // ignore_for_file: abstract_super_member_reference
 // ignore_for_file: equal_keys_in_map, unused_catch_stack
 // ignore_for_file: non_constant_default_value, not_a_type
-// Test fixture for: avoid_listview_without_item_extent (ListView.builder / .separated)
+// Test fixture for: avoid_listview_without_item_extent (ListView.builder only)
 //
-// BAD: builder/separated with no itemExtent, prototypeItem, or itemExtentBuilder.
+// BAD: ListView.builder with no itemExtent, prototypeItem, or itemExtentBuilder.
 // GOOD: any of those parameters supplied.
 // OK (false positive guard): plain ListView(children: ...) — rule does not apply.
+// OK (false positive guard): ListView.separated — constructor does not accept
+// itemExtent/prototypeItem/itemExtentBuilder, so the rule excludes it entirely.
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
@@ -117,9 +119,13 @@ Widget badListViewBuilderNoExtent() {
   );
 }
 
-// BAD: separated without extent metadata
-// expect_lint: avoid_listview_without_item_extent
-Widget badListViewSeparatedNoExtent() {
+// OK (false positive guard): ListView.separated is excluded from this rule —
+// its constructor signature does not declare itemExtent, prototypeItem, or
+// itemExtentBuilder (an extent would apply to items AND separators, which
+// never share a uniform extent), so the rule's recommended fix is unfixable
+// here. See archived bug
+// avoid_listview_without_item_extent_false_positive_listview_separated_unfixable.md.
+Widget goodListViewSeparated() {
   return ListView.separated(
     itemCount: 2,
     itemBuilder: (BuildContext c, int i) => Text('$i'),
@@ -140,8 +146,7 @@ Widget goodListViewBuilderItemExtent() {
 Widget goodListViewBuilderItemExtentBuilder() {
   return ListView.builder(
     itemCount: 3,
-    itemExtentBuilder: (int index, dynamic d) =>
-        index.isEven ? 48.0 : 56.0,
+    itemExtentBuilder: (int index, dynamic d) => index.isEven ? 48.0 : 56.0,
     itemBuilder: (BuildContext c, int i) => Text('$i'),
   );
 }
@@ -158,4 +163,31 @@ Widget goodListViewBuilderPrototype() {
 // OK: Default ListView constructor — not targeted by this rule (no builder/separated).
 Widget goodPlainListViewChildren() {
   return ListView(children: [Text('a'), Text('b')]);
+}
+
+// OK (false positive guard): inline non-scrolling list — shrinkWrap: true
+// AND physics: NeverScrollableScrollPhysics(). The outer parent scrolls; this
+// list is used as an index-driven Column substitute, so the rule's
+// virtualizing-scroll-perf rationale does not apply. Forcing itemExtent here
+// would clip variable-height rows.
+Widget goodInlineNonScrollingListView() {
+  return ListView.builder(
+    shrinkWrap: true,
+    physics: const NeverScrollableScrollPhysics(),
+    itemCount: 3,
+    itemBuilder: (BuildContext c, int i) => Text('$i'),
+  );
+}
+
+// OK: ListView.separated is excluded unconditionally (see goodListViewSeparated
+// above); this case also has shrinkWrap+NeverScrollable just to confirm both
+// exclusions stack without producing a diagnostic.
+Widget goodInlineNonScrollingListViewSeparated() {
+  return ListView.separated(
+    shrinkWrap: true,
+    physics: const NeverScrollableScrollPhysics(),
+    itemCount: 3,
+    itemBuilder: (BuildContext c, int i) => Text('$i'),
+    separatorBuilder: (BuildContext c, int i) => Divider(),
+  );
 }
