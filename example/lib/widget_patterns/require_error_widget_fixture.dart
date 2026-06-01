@@ -127,3 +127,80 @@ void _good1432() {
     ),
   );
 }
+
+// ---------------------------------------------------------------------------
+// Cases covering the rule's actual surface: FutureBuilder / StreamBuilder.
+// See: bugs/require_error_widget_false_positive_extension_method_error_handling.md
+// ---------------------------------------------------------------------------
+
+// Extension used by the delegated-handler test cases below.
+extension _SnapErr<T> on AsyncSnapshot<T> {
+  Widget? snapLoadingProgress() => null;
+  void reportErrorIfAny() {}
+}
+
+// BAD: builder accesses only `.data` — no error handling anywhere.
+// expect_lint: require_error_widget
+void _badNoErrorHandling() {
+  FutureBuilder<int>(
+    future: null,
+    builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
+      return Text('${snapshot.data}');
+    },
+  );
+}
+
+// GOOD: canonical inline pattern.
+void _goodInlineHasError() {
+  FutureBuilder<int>(
+    future: null,
+    builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
+      if (snapshot.hasError) return Text('error');
+      return Text('${snapshot.data}');
+    },
+  );
+}
+
+// GOOD: delegated handler that returns a Widget? — extension method does
+// not contain the literal substring "hasError" or ".error" at the call site
+// but its body does the error routing.
+void _goodDelegatedSnapLoadingProgress() {
+  FutureBuilder<int>(
+    future: null,
+    builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
+      final Widget? snapWaiting = snapshot.snapLoadingProgress();
+      if (snapWaiting != null) return snapWaiting;
+      return Text('${snapshot.data}');
+    },
+  );
+}
+
+// GOOD: delegated handler whose name contains capital-E "Error" — the old
+// rule's `.error` lowercase substring check missed this; the new check
+// catches it via the method-name-contains-error pattern AND via the
+// method-on-snapshot pattern.
+void _goodDelegatedReportErrorIfAny() {
+  FutureBuilder<int>(
+    future: null,
+    builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
+      snapshot.reportErrorIfAny();
+      return Text('${snapshot.data}');
+    },
+  );
+}
+
+// BAD: builder mentions a variable named `hasErrorState` but never touches
+// the snapshot's error state. Under the old substring rule this was a
+// silent FALSE NEGATIVE (the literal `hasError` appeared in source).
+// The AST-based check now correctly fires.
+// expect_lint: require_error_widget
+void _badVariableNameFalseNegative() {
+  FutureBuilder<int>(
+    future: null,
+    builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
+      // ignore: unused_local_variable
+      final bool hasErrorState = false;
+      return Text('${snapshot.data}');
+    },
+  );
+}

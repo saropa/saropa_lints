@@ -324,3 +324,52 @@ verified.
 ## Downstream Workaround
 
 Until the fix lands, each downstream FP carries a one-line `// ignore: require_error_widget -- <rationale>` directive on the line above the `FutureBuilder` / `StreamBuilder` constructor, referencing this bug file. Volume: ~16 ignores across 14 files in the Saropa Contacts repo.
+
+---
+
+## Finish Report (2026-05-31)
+
+### Scope
+
+(A) Dart lint rules — single-rule fix in `lib/src/rules/widget/widget_patterns_require_rules.dart`, new Dart unit test, fixture additions, CHANGELOG entry.
+
+### Approach chosen
+
+Rejected the bug's recommended Hypothesis B (per-rule configurable allow-list) — this codebase has no per-rule option plumbing, and adding it for one rule is scope creep. Rejected the bug's Hypothesis A (regex on method-name-containing-`error`) as too narrow on its own — it misses `snapLoadingProgress`. Implemented an **AST-based predicate** that supersets both: walk the builder body via `RecursiveAstVisitor` and accept ANY of:
+
+1. **Inline access** — `PrefixedIdentifier` / `PropertyAccess` whose property name is `hasError`, `error`, or `stackTrace` (with `stackTrace` added since access to it is strongly diagnostic-related).
+2. **Delegated handler on the snapshot** — `MethodInvocation` whose target identifier matches the second positional parameter of the builder (the snapshot, per Flutter convention). `AsyncSnapshot` has no instance methods that aren't tied to state inspection, so any method invocation on the snapshot identifier is treated as user-supplied handling. Catches both `snapshot.snapLoadingProgress()` and `snapshot.reportErrorIfAny()` from the bug.
+3. **Bare helper whose name encodes "error"** — `MethodInvocation` whose method name (case-insensitive) contains `error`. Catches mixin/extension helpers called without a target prefix.
+
+Preserved the original source-substring fallback for non-`FunctionExpression` builder shapes (method tear-off / identifier passed as `builder:`), since the AST predicate cannot see through a tear-off. Bumped the rule's diagnostic-message version marker `{v4}` → `{v5}` per project convention.
+
+### Side-effect win
+
+The AST check also closes the latent **false-negative** the bug noted (case 4 in the Fixture Gap): a local variable named `hasErrorState` no longer suppresses the lint, because `hasErrorState` is a `VariableDeclaration` not a `.hasError` access. Substring matching against `hasError` was silently letting these through.
+
+### Files changed
+
+- `lib/src/rules/widget/widget_patterns_require_rules.dart` — added `import 'package:analyzer/dart/ast/visitor.dart';`; rewrote `RequireErrorWidgetRule.runWithReporter` to dispatch on `FunctionExpression` vs fallback; added private helpers `_builderHandlesError` and `_snapshotParamName`; added top-level `_ErrorHandlingVisitor`.
+- `test/rules/widget/require_error_widget_extension_method_test.dart` — NEW; 7 contract tests that mirror `_builderHandlesError` against parsed AST snippets.
+- `example/lib/widget_patterns/require_error_widget_fixture.dart` — added 5 fixtures (2 carry `expect_lint: require_error_widget`): BAD no-handling, GOOD inline `hasError`, GOOD delegated `snapLoadingProgress`, GOOD delegated `reportErrorIfAny`, BAD `hasErrorState` variable.
+- `CHANGELOG.md` — entry added under `[Unreleased] ### Fixed`.
+- `bugs/require_error_widget_false_positive_extension_method_error_handling.md` — `Status: Open` → `Fixed`, "Changes Made" / "Tests Added" / "Commits" sections populated, this finish report appended.
+
+### Test results
+
+- `dart test test/rules/widget/require_error_widget_extension_method_test.dart test/rules/widget/widget_patterns_rules_test.dart` → **219/219 passed** (7 new + 212 existing).
+- `dart analyze --fatal-infos` on the changed files → **No issues found**.
+
+### Verification caveat (documented)
+
+The scan CLI parses with `parseString` and no type resolution, so `FutureBuilder<int>(...)` without a `new`/`const` keyword parses as a `MethodInvocation` rather than an `InstanceCreationExpression`. This means the rule's `addInstanceCreationExpression` registration never fires under the scan CLI on standalone files — both before and after this fix. The rule fires correctly under the analyzer plugin (which has full resolution), which is where the bug was originally reported. The 7 contract tests exercise the predicate independent of registration so the fix IS verified.
+
+### Stale artifacts (intentional)
+
+`analysis_options.yaml:303` still carries the rule's old `{v4}` text in an auto-generated doc-comment. No test pins this; `dart run saropa_lints:init` regenerates it on the next run. Touching all rule comments for one version bump would be heavy churn for zero behavior change.
+
+### Out of scope / left alone
+
+- The pre-existing fixture stub at lines 109-129 of `require_error_widget_fixture.dart` tests an unrelated pattern (`SingleChildScrollView` + `Expanded`) with no FutureBuilder/StreamBuilder. Untouched per "Never raise unrelated issues."
+- No quick fix added — implementing error handling is a design choice, not a mechanical edit. Matches the project's "no insert-TODO quick fixes" rule and the rule's prior absence of any fix.
+- Downstream `// ignore: require_error_widget` markers in the Saropa Contacts repo (~16 across 14 files) are NOT touched from here — that repo is separate. The CHANGELOG entry tells reporters to remove them.

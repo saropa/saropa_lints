@@ -10,6 +10,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/source/source_range.dart';
 
 import '../../android_manifest_utils.dart';
@@ -1102,7 +1103,7 @@ class RequireErrorWidgetRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'require_error_widget',
-    '[require_error_widget] FutureBuilder/StreamBuilder must handle error state to prevent silent failures, blank screens, or cryptic UI. Without error handling, users may see no feedback when data fails to load, leading to confusion, poor UX, and support burden. This can also mask backend or network issues during development. {v4}',
+    '[require_error_widget] FutureBuilder/StreamBuilder must handle error state to prevent silent failures, blank screens, or cryptic UI. Without error handling, users may see no feedback when data fails to load, leading to confusion, poor UX, and support burden. This can also mask backend or network issues during development. {v5}',
     correctionMessage:
         'Add error handling: if (snapshot.hasError) show a user-friendly error message or fallback UI. Log errors for diagnostics and provide actionable feedback to users. Audit all async builders for error handling coverage.',
     severity: DiagnosticSeverity.WARNING,
@@ -1120,17 +1121,138 @@ class RequireErrorWidgetRule extends SaropaLintRule {
       // Find the builder argument
       for (final Expression arg in node.argumentList.arguments) {
         if (arg is NamedExpression && arg.name.label.name == 'builder') {
-          final String builderSource = arg.expression.toSource();
-
-          // Check if it handles errors
-          if (!builderSource.contains('hasError') &&
-              !builderSource.contains('.error')) {
-            reporter.atNode(node.constructorName, code);
+          final Expression expr = arg.expression;
+          if (expr is FunctionExpression) {
+            // AST-based check. Avoids the previous source-substring trap
+            // where (a) a builder that delegates error handling to an
+            // extension method (e.g. `snapshot.snapLoadingProgress()` or
+            // `snapshot.reportErrorIfAny()`) was a false positive because
+            // the literal `hasError`/`.error` never appeared at the call
+            // site, and (b) a local variable named e.g. `hasErrorState`
+            // silently suppressed the lint via raw substring match.
+            // See: bugs/require_error_widget_false_positive_extension_method_error_handling.md
+            if (!_builderHandlesError(expr)) {
+              reporter.atNode(node.constructorName, code);
+            }
+          } else {
+            // Non-inline builder (method tear-off, identifier reference,
+            // etc.). We cannot see the body, so fall back to the original
+            // source-substring heuristic to preserve prior behavior on
+            // those shapes.
+            final String builderSource = expr.toSource();
+            if (!builderSource.contains('hasError') &&
+                !builderSource.contains('.error')) {
+              reporter.atNode(node.constructorName, code);
+            }
           }
           return;
         }
       }
     });
+  }
+
+  /// Whether [builder] (the `(ctx, snapshot) { ... }` argument) demonstrates
+  /// error handling in its body.
+  ///
+  /// Treats the builder as handling errors when ANY of these AST patterns
+  /// appear in its body:
+  /// 1. access to `.hasError`, `.error`, or `.stackTrace` on any target
+  ///    (canonical inline pattern: `if (snapshot.hasError) ...`)
+  /// 2. a method invocation whose target identifier matches the snapshot
+  ///    parameter name (delegated handler pattern: `snapshot.foo()`).
+  ///    AsyncSnapshot has no built-in instance methods that aren't tied to
+  ///    state inspection, so calling anything on the snapshot reliably
+  ///    indicates user-supplied handling
+  /// 3. a method invocation whose name itself contains `error`
+  ///    (e.g. `handleError(...)`, `reportErrorIfAny()` called without a
+  ///    target prefix)
+  static bool _builderHandlesError(FunctionExpression builder) {
+    final String? snapshotName = _snapshotParamName(builder);
+    final _ErrorHandlingVisitor visitor = _ErrorHandlingVisitor(snapshotName);
+    builder.body.visitChildren(visitor);
+    return visitor.handlesError;
+  }
+
+  /// Returns the name of the snapshot parameter — the second positional
+  /// parameter of the builder by Flutter convention,
+  /// `(BuildContext context, AsyncSnapshot<T> snapshot) => ...`.
+  /// Returns null when the shape doesn't match (still safe — the visitor
+  /// then only matches patterns 1 and 3 above).
+  static String? _snapshotParamName(FunctionExpression builder) {
+    final FormalParameterList? params = builder.parameters;
+    if (params == null) return null;
+    final NodeList<FormalParameter> list = params.parameters;
+    if (list.length < 2) return null;
+    final FormalParameter second = list[1];
+    // Optional/named-defaulted parameters are wrapped; unwrap before
+    // inspecting the underlying name token.
+    final FormalParameter inner =
+        second is DefaultFormalParameter ? second.parameter : second;
+    if (inner is SimpleFormalParameter) {
+      return inner.name?.lexeme;
+    }
+    return null;
+  }
+}
+
+/// Visitor used by [RequireErrorWidgetRule] to detect error-handling
+/// patterns inside a builder body. See [RequireErrorWidgetRule._builderHandlesError]
+/// for the matched patterns. Short-circuits via the [handlesError] flag —
+/// any positive match is enough.
+class _ErrorHandlingVisitor extends RecursiveAstVisitor<void> {
+  _ErrorHandlingVisitor(this.snapshotParamName);
+
+  /// Identifier name of the builder's snapshot parameter. May be null when
+  /// the builder doesn't follow the (context, snapshot) shape — in that
+  /// case the snapshot-target check below simply never fires.
+  final String? snapshotParamName;
+
+  /// Set to true once any error-handling pattern is observed.
+  bool handlesError = false;
+
+  static const Set<String> _errorPropertyNames = <String>{
+    'hasError',
+    'error',
+    'stackTrace',
+  };
+
+  bool _isSnapshotTarget(Expression? target) {
+    if (snapshotParamName == null || target == null) return false;
+    return target is SimpleIdentifier && target.name == snapshotParamName;
+  }
+
+  @override
+  void visitPrefixedIdentifier(PrefixedIdentifier node) {
+    if (_errorPropertyNames.contains(node.identifier.name)) {
+      handlesError = true;
+    }
+    super.visitPrefixedIdentifier(node);
+  }
+
+  @override
+  void visitPropertyAccess(PropertyAccess node) {
+    if (_errorPropertyNames.contains(node.propertyName.name)) {
+      handlesError = true;
+    }
+    super.visitPropertyAccess(node);
+  }
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    // Pattern 2: any method invocation whose receiver is the snapshot
+    // identifier (e.g. snapshot.snapLoadingProgress()).
+    if (_isSnapshotTarget(node.target)) {
+      handlesError = true;
+    }
+    // Pattern 3: method name itself contains "error" (case-insensitive).
+    // Catches helpers called without a target prefix from inside the
+    // builder's enclosing scope (mixin/extension that's already in scope,
+    // or top-level helpers).
+    final String methodName = node.methodName.name;
+    if (methodName.toLowerCase().contains('error')) {
+      handlesError = true;
+    }
+    super.visitMethodInvocation(node);
   }
 }
 
