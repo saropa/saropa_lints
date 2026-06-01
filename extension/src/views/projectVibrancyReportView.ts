@@ -681,15 +681,44 @@ function codeHealthScriptStrings(): Record<string, string> {
   return {
     activeFiltersLabel: l10n('codeHealth.script.activeFiltersLabel'),
     clearAll: l10n('codeHealth.script.clearAll'),
+    expanderCollapsed: l10n('codeHealth.table.expanderAriaCollapsed'),
+    expanderExpanded: l10n('codeHealth.table.expanderAriaExpanded'),
+    detailHeading: l10n('codeHealth.table.detailHeading'),
+    detailNoIssues: l10n('codeHealth.table.detailNoIssues'),
   };
+}
+
+/**
+ * Localized descriptors for each flag, shipped to the client so each pill can
+ * carry its evidence inline (e.g. `complex (CC 36)`) AND so the expanded detail
+ * row can name the rule that fired (`Flagged when cyclomatic complexity > 10`).
+ * The `evidence` template uses {cc}/{pct} tokens substituted per-row at render
+ * time — knowing the threshold matters more than knowing the label.
+ */
+function codeHealthFlagDescriptors(): Record<string, { label: string; evidence: string; rule: string }> {
+  const keys = [
+    'unused', 'uncovered', 'complex', 'undocumented',
+    'test_drift', 'stub_tested', 'suspicious_coverage',
+  ];
+  const out: Record<string, { label: string; evidence: string; rule: string }> = {};
+  for (const k of keys) {
+    out[k] = {
+      label: l10n('codeHealth.flag.' + k + '.label'),
+      evidence: l10n('codeHealth.flag.' + k + '.evidence'),
+      rule: l10n('codeHealth.flag.' + k + '.rule'),
+    };
+  }
+  return out;
 }
 
 /** Inline client script — sort, search filter, KPI flag-filter, file-link nav, toolbar buttons. */
 function buildClientScript(): string {
   const CH = codeHealthScriptStrings();
+  const FLAGS = codeHealthFlagDescriptors();
   return `
 (function() {
   var CH = ${JSON.stringify(CH)};
+  var FLAG_DESC = ${JSON.stringify(FLAGS)};
   var vscode = acquireVsCodeApi();
 
   // Row data is parsed once from the JSON script block. The previous design
@@ -714,7 +743,11 @@ function buildClientScript(): string {
     scoreMax: null,
     sortKey: 'score', sortAsc: true,
     hideBoilerplate: true,
-    visibleCount: RENDER_CHUNK
+    visibleCount: RENDER_CHUNK,
+    // Per-row expansion: rowKey(r) of any rows the user has expanded to read
+    // the "why scored low" detail. Set (not array) so re-renders after sort or
+    // filter restore the open state in O(1) per row.
+    expanded: Object.create(null)
   };
   var filtered = [];
 
@@ -807,6 +840,22 @@ function buildClientScript(): string {
     });
   }
 
+  // Resolve a flag's i18n descriptor and substitute per-row tokens. Returns
+  // { label, evidence, rule } — evidence is the inline "why" carried on the
+  // pill, rule is the threshold sentence shown in the expanded detail panel.
+  // Unknown flags fall back to the bare flag name so a future CLI flag can't
+  // crash the renderer.
+  function flagInfo(f, r) {
+    var d = FLAG_DESC[f];
+    if (!d) return { label: f.replace(/_/g, ' '), evidence: '', rule: '' };
+    var pct = Math.round(r.coveragePercent || 0);
+    var cc = r.complexity != null ? r.complexity : 0;
+    var evidence = d.evidence
+      .replace('{cc}', String(cc))
+      .replace('{pct}', String(pct));
+    return { label: d.label, evidence: evidence, rule: d.rule };
+  }
+
   function rowHtml(r) {
     var scoreInt = Math.round(r.score);
     var color = hslForScore(scoreInt);
@@ -818,11 +867,23 @@ function buildClientScript(): string {
     var changedIso = r.lastChangedEpochSec
       ? new Date(r.lastChangedEpochSec * 1000).toISOString()
       : 'No git history available';
+    var key = rowKey(r);
+    var isOpen = !!state.expanded[key];
     var flagPills = r.flags.map(function(f) {
-      return '<span class="flag-pill ' + esc(f) + '">' + esc(f.replace(/_/g, ' ')) + '</span>';
+      var info = flagInfo(f, r);
+      var ev = info.evidence ? ' <span class="flag-evidence">(' + esc(info.evidence) + ')</span>' : '';
+      var title = info.rule ? ' title="' + esc(info.rule) + '"' : '';
+      return '<span class="flag-pill ' + esc(f) + '"' + title + '>' + esc(info.label) + ev + '</span>';
     }).join(' ');
-    return '<tr data-key="' + esc(rowKey(r)) + '">' +
-      '<td class="col-score"><span class="score-pill" style="background:' + color + ';color:#000;" title="Score ' + scoreInt + '/100">' + scoreInt + '</span></td>' +
+    var expLabel = isOpen ? CH.expanderExpanded : CH.expanderCollapsed;
+    var expander =
+      '<button type="button" class="row-expander' + (isOpen ? ' open' : '') +
+      '" data-row-key="' + esc(key) + '" aria-expanded="' + (isOpen ? 'true' : 'false') +
+      '" aria-controls="pv-detail-' + esc(key) + '" aria-label="' + esc(expLabel) + '" title="' + esc(expLabel) + '">' +
+      '<span class="chev" aria-hidden="true"></span></button>';
+    return '<tr data-key="' + esc(key) + '">' +
+      '<td class="col-score">' + expander +
+      '<span class="score-pill" style="background:' + color + ';color:#000;" title="Score ' + scoreInt + '/100">' + scoreInt + '</span></td>' +
       '<td class="col-name"><span class="fn-link" data-file="' + esc(r.file) + '" data-line="' + r.lineStart + '" title="Open at line ' + r.lineStart + '">' + esc(name) + '</span></td>' +
       '<td class="col-file"><span class="file-link" data-file="' + esc(r.file) + '" data-line="' + r.lineStart + '" title="' + esc(r.file) + '"><span class="path-dir">' + esc(dir) + '</span><span class="path-base">' + esc(base) + '</span></span></td>' +
       '<td class="col-line">' + r.lineStart + '-' + r.lineEnd + '</td>' +
@@ -834,13 +895,50 @@ function buildClientScript(): string {
       '</tr>';
   }
 
+  // Inline detail row rendered immediately after its parent when expanded.
+  // colspan spans the full table width so the panel reads as a single block
+  // instead of fragmenting into 9 cells. The "rule" text answers the user's
+  // actual question — WHY did this function land on the worst list — rather
+  // than restating column values they can already see above.
+  function detailRowHtml(r) {
+    var key = rowKey(r);
+    var scoreInt = Math.round(r.score);
+    var heading = CH.detailHeading.replace('{score}', String(scoreInt));
+    var items;
+    if (!r.flags || r.flags.length === 0) {
+      items = '<p class="pv-detail-empty">' + esc(CH.detailNoIssues) + '</p>';
+    } else {
+      var parts = r.flags.map(function(f) {
+        var info = flagInfo(f, r);
+        var ev = info.evidence ? '<span class="pv-detail-evidence">' + esc(info.evidence) + '</span>' : '';
+        return '<li class="pv-detail-item ' + esc(f) + '">' +
+          '<span class="pv-detail-label">' + esc(info.label) + '</span>' + ev +
+          (info.rule ? '<span class="pv-detail-rule">' + esc(info.rule) + '</span>' : '') +
+          '</li>';
+      });
+      items = '<ul class="pv-detail-list">' + parts.join('') + '</ul>';
+    }
+    return '<tr class="pv-detail-row" id="pv-detail-' + esc(key) + '" data-detail-for="' + esc(key) + '">' +
+      '<td colspan="9"><div class="pv-detail-panel">' +
+      '<h4 class="pv-detail-heading">' + esc(heading) + '</h4>' + items +
+      '</div></td></tr>';
+  }
+
   function render() {
     var tbody = document.getElementById('pvBody');
     if (!tbody) return;
     var slice = filtered.slice(0, state.visibleCount);
     // innerHTML is the fast path for a wholesale rebuild — appendChild'ing
-    // hundreds of <tr>s individually triggers a layout per insert.
-    tbody.innerHTML = slice.map(rowHtml).join('');
+    // hundreds of <tr>s individually triggers a layout per insert. Each row is
+    // followed by its detail panel iff state.expanded[key] is set, so sort and
+    // filter operations preserve open panels (single source of truth).
+    var html = [];
+    for (var i = 0; i < slice.length; i++) {
+      var row = slice[i];
+      html.push(rowHtml(row));
+      if (state.expanded[rowKey(row)]) html.push(detailRowHtml(row));
+    }
+    tbody.innerHTML = html.join('');
     var countEl = document.getElementById('pvShownCount');
     if (countEl) {
       var totalStr = allRows.length.toLocaleString('en-US');
@@ -1005,17 +1103,36 @@ function buildClientScript(): string {
 
   var tbody = document.getElementById('pvBody');
   if (tbody) {
-    // Delegated click handler: fn-link / file-link open the file at its line.
+    // Delegated click handler: row-expander toggles the detail panel,
+    // fn-link / file-link open the file at its line. Expander wins when its
+    // ancestor chain matches because the button sits INSIDE the score cell
+    // alongside the score pill — without the early-return the click would
+    // fall through to no-op (score pill has no data-file).
     tbody.addEventListener('click', function(e) {
-      var t = e.target;
-      while (t && t !== tbody && !(t.classList && (t.classList.contains('fn-link') || t.classList.contains('file-link')))) {
-        t = t.parentNode;
+      var target = e.target;
+      // Climb to either an expander or a link.
+      var node = target;
+      while (node && node !== tbody) {
+        if (node.classList) {
+          if (node.classList.contains('row-expander')) {
+            e.preventDefault();
+            var key = node.getAttribute('data-row-key');
+            if (!key) return;
+            if (state.expanded[key]) delete state.expanded[key];
+            else state.expanded[key] = true;
+            render();
+            return;
+          }
+          if (node.classList.contains('fn-link') || node.classList.contains('file-link')) {
+            var file = node.getAttribute('data-file');
+            var line = Number(node.getAttribute('data-line') || '1');
+            if (!file) return;
+            vscode.postMessage({ type: 'openFile', file: file, line: line });
+            return;
+          }
+        }
+        node = node.parentNode;
       }
-      if (!t || t === tbody) return;
-      var file = t.getAttribute('data-file');
-      var line = Number(t.getAttribute('data-line') || '1');
-      if (!file) return;
-      vscode.postMessage({ type: 'openFile', file: file, line: line });
     });
   }
 

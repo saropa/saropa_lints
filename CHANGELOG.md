@@ -65,6 +65,14 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [Unreleased]
 
+### Changed (Extension)
+
+- **Code Health Dashboard "Worst functions" rows now explain WHY each function scored low.** Flag pills (`unused`, `complex`, `undocumented`, …) used to carry only the label, so a reader had to look at four other columns to reconstruct the evidence. Each pill now reads `complex (CC 36)`, `unused (0 callers)`, `uncovered (0% tests)` etc. — the threshold the row tripped, inline. A chevron next to the score expands the row to show every issue with its threshold rule (e.g. "Flagged when cyclomatic complexity exceeds 10"), so readers can confirm what to fix without leaving the table. Expand state survives sort and filter changes. No action required.
+
+---
+
+## [13.11.4]
+
 ### Added (Extension)
 
 - **Saropa Package Dashboard hero now shows a "Scanned X ago" pill with the actual scan timestamp.** Hovering reveals the absolute date/time. Previously the Rescan button could feel like a no-op because the dashboard re-rendered with identical numbers and no recency indicator, so users had no way to tell whether the click triggered a fresh scan or returned cached results. The pill updates on every scan completion (including the trailing rescan that fires after a coalesced in-flight scan), so a click producing fresh data flips "5m ago" back to "just now". No action required.

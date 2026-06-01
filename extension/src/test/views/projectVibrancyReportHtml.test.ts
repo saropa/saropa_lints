@@ -202,6 +202,42 @@ describe('Code Health Dashboard HTML', () => {
     assert.ok(!html.includes('class="col-select"'));
   });
 
+  it('row renderer ships the expander button, flag-evidence span, and detail-row scaffolding', () => {
+    // The "why scored low" surfacing relies on three pieces being present in
+    // the generated client script: the per-row chevron button, the inline
+    // evidence span carried by each pill, and the colspan-detail row that
+    // expands underneath. Without all three the user is back to triangulating
+    // four numeric columns to reconstruct WHY a function landed on the list.
+    const html = buildProjectVibrancyHtml(rowsPayload());
+    assert.ok(html.includes('class="row-expander'), 'row-expander button class missing');
+    assert.ok(html.includes('data-row-key='), 'row-expander needs data-row-key for toggle');
+    assert.ok(html.includes('aria-expanded='), 'row-expander needs aria-expanded for a11y');
+    assert.ok(html.includes('class="flag-evidence"'), 'pill evidence span class missing');
+    assert.ok(html.includes('pv-detail-row'), 'detail row template missing');
+    assert.ok(html.includes('pv-detail-list'), 'detail list template missing');
+    assert.ok(html.includes('pv-detail-rule'), 'threshold-rule span missing');
+    // FLAG_DESC is the i18n-derived descriptor table the client script reads
+    // to resolve each flag → {label, evidence, rule}. Without it every pill
+    // would fall back to the raw flag name and lose its evidence.
+    assert.ok(html.includes('var FLAG_DESC ='), 'FLAG_DESC client constant missing');
+    assert.ok(html.includes('"complex":{'), 'FLAG_DESC must carry "complex" descriptor');
+    assert.ok(html.includes('"unused":{'), 'FLAG_DESC must carry "unused" descriptor');
+  });
+
+  it('flag descriptor table substitutes per-row tokens ({cc}, {pct}) into evidence strings', () => {
+    // Pin the evidence templates so a future i18n edit cannot silently drop
+    // the {cc}/{pct} placeholders — without them the pill says e.g.
+    // "complex (CC )" with a dangling space, which is the failure mode this
+    // assertion catches.
+    const html = buildProjectVibrancyHtml(rowsPayload());
+    const m = html.match(/var FLAG_DESC\s*=\s*(\{[\s\S]*?\});/);
+    assert.ok(m, 'FLAG_DESC initializer not found');
+    const desc = JSON.parse(m![1]) as Record<string, { evidence: string }>;
+    assert.ok(desc.complex.evidence.includes('{cc}'), 'complex evidence must keep {cc} token');
+    assert.ok(desc.uncovered.evidence.includes('{pct}'), 'uncovered evidence must keep {pct} token');
+    assert.ok(desc.unused.evidence.length > 0, 'unused evidence must be non-empty');
+  });
+
   it('displayName labels operators and passes identifier names through', () => {
     const html = buildProjectVibrancyHtml(rowsPayload());
     const displayName = extractFn(html, 'displayName') as (n: string) => string;

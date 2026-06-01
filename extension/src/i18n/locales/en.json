@@ -810,7 +810,20 @@
       "noMatch": "No functions match the current filters.",
       "resetFiltersTitle": "Clear the search and any active flag filter.",
       "resetFilters": "Reset filters",
-      "hint": "Showing the worst 200 functions by score. Use the search field to narrow further."
+      "hint": "Showing the worst 200 functions by score. Use the search field to narrow further.",
+      "expanderAriaCollapsed": "Show issue details",
+      "expanderAriaExpanded": "Hide issue details",
+      "detailHeading": "Why this function scored {score}",
+      "detailNoIssues": "No flags on this row — the score is driven by the column values above (usage, coverage, complexity, age, documentation)."
+    },
+    "flag": {
+      "unused": { "label": "unused", "evidence": "0 callers", "rule": "Flagged when no other file references this function name." },
+      "uncovered": { "label": "uncovered", "evidence": "{pct}% tests", "rule": "Flagged when LCOV reports 0% line coverage." },
+      "complex": { "label": "complex", "evidence": "CC {cc}", "rule": "Flagged when cyclomatic complexity exceeds 10." },
+      "undocumented": { "label": "undocumented", "evidence": "CC {cc}, no doc", "rule": "Flagged when a complex function (CC > 10) has no doc comment." },
+      "test_drift": { "label": "test drift", "evidence": "tests lag the function", "rule": "Flagged when the newest linked test file is meaningfully older than the function's source file." },
+      "stub_tested": { "label": "stub-tested", "evidence": "thin asserts", "rule": "Flagged when a linked test exists but barely asserts anything." },
+      "suspicious_coverage": { "label": "suspicious coverage", "evidence": "{pct}% with no test", "rule": "Flagged when LCOV reports high coverage but no test references the function." }
     },
     "shortcuts": {
       "focusFilter": "Focus the row filter",

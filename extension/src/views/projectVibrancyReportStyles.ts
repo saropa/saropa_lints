@@ -18,10 +18,106 @@ export function getProjectVibrancyReportStyles(): string {
     getDashboardChromeStyles(),
     codeHealthTableStyles(),
     gradeAndFlagPillStyles(),
+    rowExpanderAndDetailStyles(),
     gateBannerStyles(),
     healthSummaryStateStyles(),
     reportFileRowStyles(),
   ].join('\n');
+}
+
+/**
+ * Score-cell expander chevron + the expanded "why" detail row. The chevron
+ * lives inside the score cell so the score column itself is the affordance —
+ * users instinctively click the score to ask "why is this low?". The detail
+ * panel spans every column (colspan=9) and lists each flag with its label,
+ * evidence (e.g. CC 36, 0% tests) and the threshold rule that fired, so the
+ * reader does not have to triangulate four numeric columns to reconstruct WHY.
+ */
+function rowExpanderAndDetailStyles(): string {
+  return `
+.dash-table.code-health .col-score { width: 92px; text-align: left; white-space: nowrap; }
+.row-expander {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  margin-right: 4px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  vertical-align: middle;
+  border-radius: 3px;
+}
+.row-expander:hover { background: var(--surface-2); color: var(--vscode-foreground); }
+.row-expander:focus-visible { outline: 1px solid var(--accent-info); outline-offset: 1px; }
+.row-expander .chev {
+  display: inline-block;
+  width: 0;
+  height: 0;
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  border-left: 5px solid currentColor;
+  transition: transform 80ms ease-out;
+}
+.row-expander.open .chev { transform: rotate(90deg); }
+
+.pv-detail-row > td {
+  padding: 0 !important;
+  background: var(--surface-2);
+  border-top: 1px solid var(--border);
+}
+.pv-detail-panel {
+  padding: 10px 14px 12px 32px;
+  font-size: 0.92em;
+}
+.pv-detail-heading {
+  margin: 0 0 6px 0;
+  font-size: 0.85em;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.pv-detail-list { margin: 0; padding: 0; list-style: none; }
+.pv-detail-item {
+  display: grid;
+  grid-template-columns: max-content max-content 1fr;
+  gap: 8px 12px;
+  align-items: baseline;
+  padding: 4px 0;
+  border-top: 1px dashed var(--border);
+}
+.pv-detail-item:first-child { border-top: 0; }
+.pv-detail-label {
+  font-weight: 600;
+  color: var(--accent-warning);
+  text-transform: lowercase;
+}
+.pv-detail-item.unused .pv-detail-label,
+.pv-detail-item.uncovered .pv-detail-label { color: var(--accent-error); }
+.pv-detail-item.test_drift .pv-detail-label { color: var(--accent-info); }
+.pv-detail-evidence {
+  font-family: var(--vscode-editor-font-family, ui-monospace, monospace);
+  font-size: 0.92em;
+  color: var(--vscode-foreground);
+}
+.pv-detail-rule {
+  color: var(--muted);
+}
+.pv-detail-empty {
+  margin: 0;
+  color: var(--muted);
+  font-style: italic;
+}
+.flag-evidence {
+  opacity: 0.78;
+  font-weight: 400;
+  margin-left: 2px;
+}
+`;
 }
 
 /**
