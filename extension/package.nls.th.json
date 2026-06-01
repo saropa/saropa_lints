@@ -7,7 +7,7 @@
   "views.actions.name": "การดำเนินการ",
   "views.status.name": "สถานะ",
   "views.settings.name": "การตั้งค่า",
-  "views.help.name": "วิธีใช้",
+  "views.help.name": "ช่วย",
   "viewsWelcome.banner.contents": "**สโรภา ลินท์**\n\nกฎ Dart และ Flutter Lint มากกว่า 2,100 รายการเพื่อความปลอดภัย การเข้าถึง และประสิทธิภาพ\n\nต้องใช้โปรเจ็กต์ Dart หรือ Flutter\n\nเปิดโฟลเดอร์ที่มี `pubspec.yaml` เพื่อเริ่มต้น\n\n[เรียนรู้เพิ่มเติมออนไลน์](https://pub.dev/packages/saropa_lints)\n[เรียกดูคำสั่งทั้งหมด](command:saropaLints.showCommandCatalog)\n[เกี่ยวกับ Saropa Lints](command:saropaLints.showAbout)\n[เริ่มต้นใช้งาน](คำสั่ง:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: ตั้งค่าโปรเจ็กต์ (pubspec + config)",
   "command.disable.title": "Saropa Lints: ปิดการรวม Lint",
