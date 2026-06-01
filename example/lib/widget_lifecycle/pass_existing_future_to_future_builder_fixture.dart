@@ -140,3 +140,66 @@ void _good1357() {
     builder: (context, snapshot) => Container(),
   );
 }
+
+// GOOD: cache-method pattern — private instance method on a class that owns a
+// `Future<...>?` field. The method returns the cached field when inputs are
+// unchanged, so the rule must not fire.
+class _CachedContactsWidgetState extends State<StatefulWidget> {
+  Future<List<String>?>? _contactsFuture;
+  List<String>? _lastKeys;
+
+  Future<List<String>?> _getContactsFuture(List<String>? keys) {
+    final bool unchanged = _contactsFuture != null && _listEq(keys, _lastKeys);
+    if (unchanged) return _contactsFuture!;
+    _lastKeys = keys;
+    _contactsFuture = _fetch(keys);
+    return _contactsFuture!;
+  }
+
+  Future<List<String>?> _fetch(List<String>? keys) async => keys;
+
+  bool _listEq(List<String>? a, List<String>? b) => a?.length == b?.length;
+
+  @override
+  Widget build(BuildContext context) {
+    final List<String>? keys = const <String>['a', 'b'];
+    return FutureBuilder<List<String>?>(
+      future: _getContactsFuture(keys),
+      builder: (context, snapshot) => Container(),
+    );
+  }
+}
+
+// BAD: private instance method on a class with NO `Future<...>?` field —
+// no cache field, so the call still allocates a fresh future on every build.
+class _UncachedState extends State<StatefulWidget> {
+  Future<String> _loadData() async => 'hello';
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<String>(
+      // expect_lint: pass_existing_future_to_future_builder
+      future: _loadData(),
+      builder: (context, snapshot) => Container(),
+    );
+  }
+}
+
+// BAD: PUBLIC method on a class that owns a `Future<...>?` field.
+// The cache field alone is not sufficient — without the private (`_`) marker,
+// the method could come from a superclass / mixin / external API and we
+// cannot reason about its body shape from project conventions.
+class _PublicMethodCachedState extends State<StatefulWidget> {
+  Future<String>? _cached;
+
+  Future<String> loadData() async => _cached ??= Future<String>.value('hi');
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<String>(
+      // expect_lint: pass_existing_future_to_future_builder
+      future: loadData(),
+      builder: (context, snapshot) => Container(),
+    );
+  }
+}

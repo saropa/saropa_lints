@@ -1,6 +1,6 @@
 # BUG: `pass_existing_future_to_future_builder` — Fires on Private Method Calls That Return a Cached Field
 
-**Status: Open**
+**Status: Fixed**
 
 Created: 2026-05-31
 Rule: `pass_existing_future_to_future_builder`
@@ -193,19 +193,43 @@ See "Root Cause" → Hypothesis A above. Net change: a small `_isCacheMethodCall
 
 ## Changes Made
 
-<!-- Empty until a fix lands upstream. -->
+Implemented Hypothesis A in [lib/src/rules/widget/widget_lifecycle_rules.dart](../lib/src/rules/widget/widget_lifecycle_rules.dart) — added `_isCacheMethodCall(MethodInvocation)` helper to `PassExistingFutureToFutureBuilderRule`. The `MethodInvocation` branch in `runWithReporter` now skips reporting when all three conditions hold:
+
+1. `node.target == null` or `node.target is ThisExpression` — implicit-`this` or explicit-`this` call on the enclosing class.
+2. `node.methodName.name.startsWith('_')` — private to the library, so the project convention is locally inspectable.
+3. The nearest enclosing `ClassDeclaration` has at least one `FieldDeclaration` whose `fields.type` is a `NamedType` named `Future` with `question != null` (nullable). The nullable signal is load-bearing — a `late final Future<T>` non-nullable field can only be assigned once and so cannot back the cache-method reassignment pattern.
+
+Real violations (top-level call, public method with cache field, private method without cache field) continue to fire.
+
+Updated [example/lib/widget_lifecycle/pass_existing_future_to_future_builder_fixture.dart](../example/lib/widget_lifecycle/pass_existing_future_to_future_builder_fixture.dart) with three new cases:
+
+- GOOD — private method on `State` with `Future<List<String>?>?` field (canonical reproducer).
+- BAD — private method on `State` with NO `Future<T>?` field (no cache; still fires).
+- BAD — public method on `State` even with `Future<T>?` field (private marker is required).
+
+Added a CHANGELOG entry under `[Unreleased] > Fixed` explaining the rule change and removing the need for the downstream `// ignore:` comments.
 
 ---
 
 ## Tests Added
 
-<!-- Empty until a fix lands upstream. -->
+[test/rules/widget/pass_existing_future_to_future_builder_cache_method_test.dart](../test/rules/widget/pass_existing_future_to_future_builder_cache_method_test.dart) — seven AST-level tests mirror the predicate against `parseString` snippets (same project pattern as `require_https_only_string_inspection_pattern_test.dart`):
+
+1. Private method on class with `Future<T>?` field IS cache.
+2. Explicit `this._x()` on class with `Future<T>?` field IS cache.
+3. Private method on class with NO `Future<T>?` field is NOT cache (still fires).
+4. PUBLIC method even with `Future<T>?` field is NOT cache (private marker required).
+5. Top-level / free-function call is NOT cache (no enclosing class).
+6. Non-nullable `Future<T>` field alone is NOT cache (nullable signal required).
+7. Call on a different receiver (`helper.load()`) is NOT cache (target check enforced).
+
+The existing instantiation test in `widget_lifecycle_rules_test.dart` continues to pass.
 
 ---
 
 ## Commits
 
-<!-- Empty until a fix lands upstream. -->
+Pending — single commit covering the rule change, fixture additions, behavior test, and CHANGELOG entry.
 
 ---
 
@@ -224,3 +248,67 @@ See "Root Cause" → Hypothesis A above. Net change: a small `_isCacheMethodCall
 ## Downstream Workaround
 
 Until the fix lands, both downstream sites carry a one-line `// ignore: pass_existing_future_to_future_builder` directive with a comment that references this bug file by name. The ignore is targeted (single line), explained at the call site, and removable once the rule learns to recognize the cache-method pattern.
+
+The fix has landed in this repo. The downstream `// ignore:` markers can be removed on the next `saropa_lints` upgrade — the rule now suppresses on the cache-method pattern automatically.
+
+---
+
+## Finish Report (2026-06-01)
+
+### Scope
+
+LINTER variant. (A) Dart lint rule + fixture + behavior test + CHANGELOG + bug archival. No (C) docs-only or script changes.
+
+### Files changed
+
+- `lib/src/rules/widget/widget_lifecycle_rules.dart` — added `_isCacheMethodCall` helper to `PassExistingFutureToFutureBuilderRule`; gated the `MethodInvocation` reporter on it.
+- `example/lib/widget_lifecycle/pass_existing_future_to_future_builder_fixture.dart` — added three new cases: GOOD (`_CachedContactsWidgetState`), BAD (`_UncachedState`), BAD (`_PublicMethodCachedState`).
+- `test/rules/widget/pass_existing_future_to_future_builder_cache_method_test.dart` — new file. 7 AST-level tests mirror `_isCacheMethodCall` against `parseString` snippets (same pattern as `require_https_only_string_inspection_pattern_test.dart`).
+- `CHANGELOG.md` — entry under `[Unreleased] > Fixed` (third bullet).
+- `bugs/...md` → `plans/history/2026.06/2026.06.01/...md` (this file). Status flipped to `Fixed`; Changes Made, Tests Added, downstream-workaround note filled in.
+
+### Core logic diff (Reviewer AI)
+
+The fix is a 3-condition AST predicate gating the existing `reporter.atNode(value)` call when `value is MethodInvocation`:
+
+1. `node.target == null || node.target is ThisExpression` — implicit-/explicit-this call on the enclosing class. Excludes `helper.load()` style calls on other receivers.
+2. `node.methodName.name.startsWith('_')` — private to library. The underscore is the load-bearing signal that the project's local convention applies; public methods could come from a superclass / mixin / external API and are not locally inspectable.
+3. The nearest enclosing `ClassDeclaration` has at least one `FieldDeclaration` whose `fields.type is NamedType` named `Future` with `question != null` (nullable). Non-nullable `late final Future<T>` cannot back the reassignment pattern (single-assignment); the nullable signal is what tells us the cached value can be re-seated.
+
+All three conditions short-circuit cheaply, so the linear field scan only runs on plausibly cached calls. No surface change to the rule (`code`, `problemMessage`, `correctionMessage`, severity, tier, impact, cost, applicableFileTypes all unchanged) — the fix is detection-only.
+
+### Tests
+
+**A. Existing tests audited:**
+
+- `test/rules/widget/widget_lifecycle_rules_test.dart` references `PassExistingFutureToFutureBuilderRule` (instantiation pin: `code.lowerCaseName`, `problemMessage`, `correctionMessage`). No surface field was modified — verified by run. **72/72 pass.**
+- No other test file references the rule, message, fixture path, or tier assignment.
+
+**B. New tests:**
+
+- `test/rules/widget/pass_existing_future_to_future_builder_cache_method_test.dart` — 7 cases (private-with-cache, explicit-this, no-cache-field, public-method, top-level, non-nullable-field, different-receiver). **7/7 pass.**
+
+**Combined run:** `dart test test/rules/widget/widget_lifecycle_rules_test.dart test/rules/widget/pass_existing_future_to_future_builder_cache_method_test.dart` → 79/79 pass.
+
+**Analyzer sweep:** `dart analyze lib/src/rules/widget/widget_lifecycle_rules.dart test/rules/widget/pass_existing_future_to_future_builder_cache_method_test.dart` → No issues found.
+
+### Project maintenance
+
+- CHANGELOG updated (`[Unreleased] > Fixed`).
+- README verified — no updates needed (rule count, doc count, headline pitch unchanged).
+- pubspec / pubspec.lock — SKIPPED [C-NOT-IN-SCOPE]. No release or dependency change.
+- doc/guides — guides reviewed (no user-facing surface change).
+- ROADMAP — no entry for this rule (verified via grep); nothing to remove.
+- **Bug archived:** `bugs/pass_existing_future_to_future_builder_false_positive_private_method_returning_cached_field.md` → `plans/history/2026.06/2026.06.01/pass_existing_future_to_future_builder_false_positive_private_method_returning_cached_field.md` (this file). Status flipped to `Fixed`. Inline bug references in `test/rules/widget/pass_existing_future_to_future_builder_cache_method_test.dart:7` repointed to the new archived path; the rule-file inline comment uses the slug only (no `bugs/` prefix) so it stays greppable across relocations.
+
+### Persist Finish Report
+
+**Finish report appended:** `plans/history/2026.06/2026.06.01/pass_existing_future_to_future_builder_false_positive_private_method_returning_cached_field.md` (this file).
+
+### Outstanding
+
+None for this task. The downstream `// ignore:` markers in `contacts` repo can be removed once the consuming project upgrades to a saropa_lints version including this commit.
+
+### Scope notes
+
+Working tree at the moment of commit also contains unrelated in-progress work from other workstreams (`require_late_initialization_in_init_state` rule fix, `require_error_widget` rule fix, the corresponding bug archives). Those are NOT included in this commit — only my own files are staged. The CHANGELOG file is committed as-is (it carries three Unreleased bullets — mine plus the two from the other workstreams, which are documentation entries already added by those sessions); the implementation code behind the other two bullets stays uncommitted in the working tree for those sessions to land.

@@ -3455,9 +3455,16 @@ class PassExistingFutureToFutureBuilderRule extends SaropaLintRule {
         if (arg is NamedExpression && arg.name.label.name == 'future') {
           final Expression value = arg.expression;
 
-          // Warn if future is a method invocation (creating new future)
+          // Warn if future is a method invocation (creating new future).
+          // Skip the cache-method pattern: a private instance method on a class
+          // that owns a Future<T>? field is the idiomatic way to return a
+          // cached future when the cached value depends on dynamic input
+          // (where `late final` would be wrong). See bug:
+          // pass_existing_future_to_future_builder_false_positive_private_method_returning_cached_field.
           if (value is MethodInvocation) {
-            reporter.atNode(value);
+            if (!_isCacheMethodCall(value)) {
+              reporter.atNode(value);
+            }
           }
 
           // Warn if future is a function expression
@@ -3472,6 +3479,44 @@ class PassExistingFutureToFutureBuilderRule extends SaropaLintRule {
         }
       }
     });
+  }
+
+  /// Returns true when the call looks like a cache-method pattern:
+  /// a private instance method on the enclosing class whose owning class
+  /// declares at least one `Future<...>?` field.
+  ///
+  /// The combination of (implicit-this private call) + (nullable Future field
+  /// on the same class) is a strong signal that the method returns a cached
+  /// future rather than allocating a fresh one each call. Without this opt-out
+  /// the rule criminalizes the project's idiomatic cache-method pattern, which
+  /// the rule's own correction message ("cache the Future") already endorses.
+  bool _isCacheMethodCall(MethodInvocation node) {
+    // Must be a method call on the enclosing class (implicit-this or `this`).
+    final Expression? target = node.target;
+    if (target != null && target is! ThisExpression) return false;
+
+    // Must be a private method (lives in the same library) — strong signal
+    // that we can reason about its body shape from project conventions.
+    if (!node.methodName.name.startsWith('_')) return false;
+
+    final ClassDeclaration? cls = node
+        .thisOrAncestorOfType<ClassDeclaration>();
+    if (cls == null) return false;
+
+    // Search for at least one `Future<...>?` field on the class. Nullable
+    // (`?`) is the load-bearing signal: late-final non-nullable futures can
+    // only be assigned once, so the cache-method reassignment pattern requires
+    // the field to be nullable.
+    for (final ClassMember member in cls.bodyMembers) {
+      if (member is! FieldDeclaration) continue;
+      final TypeAnnotation? type = member.fields.type;
+      if (type is NamedType &&
+          type.name.lexeme == 'Future' &&
+          type.question != null) {
+        return true;
+      }
+    }
+    return false;
   }
 }
 
