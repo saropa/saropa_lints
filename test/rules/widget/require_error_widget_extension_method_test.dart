@@ -22,8 +22,9 @@ void main() {
     final NodeList<FormalParameter> list = params.parameters;
     if (list.length < 2) return null;
     final FormalParameter second = list[1];
-    final FormalParameter inner =
-        second is DefaultFormalParameter ? second.parameter : second;
+    final FormalParameter inner = second is DefaultFormalParameter
+        ? second.parameter
+        : second;
     if (inner is SimpleFormalParameter) {
       return inner.name?.lexeme;
     }
@@ -47,12 +48,14 @@ void main() {
       throwIfDiagnostics: false,
     ).unit;
     FunctionExpression? hit;
-    unit.visitChildren(_BuilderFinder((FunctionExpression node) {
-      if (hit != null) return;
-      if ((node.parameters?.parameters.length ?? 0) >= 2) {
-        hit = node;
-      }
-    }));
+    unit.visitChildren(
+      _BuilderFinder((FunctionExpression node) {
+        if (hit != null) return;
+        if ((node.parameters?.parameters.length ?? 0) >= 2) {
+          hit = node;
+        }
+      }),
+    );
     expect(hit, isNotNull, reason: 'no two-arg FunctionExpression in snippet');
     return hit!;
   }

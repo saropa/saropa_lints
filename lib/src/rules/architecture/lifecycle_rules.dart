@@ -487,8 +487,9 @@ class RequireLateInitializationInInitStateRule extends SaropaLintRule {
     // text and could not distinguish synchronous build-path assignments
     // from assignments lexically nested inside callbacks. See
     // plans/history/2026.05/2026.05.31/require_late_initialization_in_init_state_false_positive_callback_reassignment.md.
-    final _BuildLateAssignmentVisitor visitor =
-        _BuildLateAssignmentVisitor(lateFields);
+    final _BuildLateAssignmentVisitor visitor = _BuildLateAssignmentVisitor(
+      lateFields,
+    );
     body.visitChildren(visitor);
 
     if (visitor.found) {

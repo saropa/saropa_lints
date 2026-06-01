@@ -46,6 +46,12 @@ export interface ReportMetadata {
     readonly flutterVersion: string;
     readonly dartVersion: string;
     readonly executionTimeMs: number;
+    // Wall-clock ms-since-epoch the scan completed at.  Optional because
+    // legacy persisted fingerprints (FINGERPRINT_SCHEMA_VERSION = 1)
+    // pre-date this field; absent ⇒ caller must show "unknown".  New scans
+    // always populate it (buildScanMeta), so the dashboard's "Scanned X ago"
+    // pill stays accurate without forcing a fingerprint-schema bump.
+    readonly scanTimestamp?: number;
 }
 
 function buildMarkdownReport(

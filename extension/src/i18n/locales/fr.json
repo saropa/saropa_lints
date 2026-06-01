@@ -420,7 +420,17 @@
       "packagesBreakdown": "{direct} direct, {transitive} transitif",
       "gradeLine": "Note {grade} · {avg}/100",
       "flaggedCount": "{count} signalé(s)",
-      "flaggedTitle": "Abandonné ou en fin de vie"
+      "flaggedTitle": "Abandonné ou en fin de vie",
+      "lastScanLabel": "{when} scanné",
+      "lastScanTitle": "Date de récupération des données de ce tableau de bord : {timestamp}. Cliquez sur Nouvelle analyse pour actualiser.",
+      "lastScanUnknown": "Scanné (heure inconnue)",
+      "lastScanUnknownTitle": "Cette analyse s'est exécutée avant que le tableau de bord ne suive les horodatages. Cliquez sur Nouvelle analyse pour actualiser."
+    },
+    "time": {
+      "justNow": "tout à l' heure",
+      "minutesAgo": "il y a {min} min",
+      "hoursAgo": "il y a {hr} h",
+      "daysAgo": "il y a {day} j"
     },
     "scanning": {
       "heading": "Paquets de numérisation",
@@ -444,7 +454,7 @@
       "singleUse": "À usage unique",
       "vulnerable": "Vulnérable",
       "overrides": "Remplacements",
-      "caveatLine1": "*Tailles de code affichées (lib + actifs déclarés), revenant à la taille de l'archive pub.dev lorsque la taille du code n'est pas disponible. La taille réelle de l'application sera plus petite après le tremblement de l'arbre.",
+      "caveatLine1": "*Tailles de code affichées (lib + actifs déclarés), revenant à la taille de l'archive pub.dev lorsque la taille du code n'est pas disponible. Exclut les dev_dependencies (build_runner, lints, saropa_lints, etc.) – elles ne sont jamais livrées au bundle APK/IPA/web. La taille réelle de l'application sera plus petite après le tremblement de l'arbre.",
       "caveatLine2": "Seuils d'activité : 90 j = obsolète, 180 j = dormant (échéanciers de validation et de publication)."
     },
     "breakdown": {
@@ -470,6 +480,7 @@
     },
     "sections": {
       "sizeDistribution": "Répartition des tailles",
+      "sizeDistributionCaption": "Exclut les dépendances dev — elles ne sont jamais expédiées vers le bundle APK/IPA/Web.",
       "filters": "Filtres",
       "packages": "Forfaits"
     },
@@ -803,7 +814,50 @@
       "noMatch": "Aucune fonction ne correspond aux filtres actuels.",
       "resetFiltersTitle": "Effacez la recherche et tout filtre de drapeau actif.",
       "resetFilters": "Reinitialiser les filtres",
-      "hint": "Affichage des 200 pires fonctions par score. Utilisez le champ de recherche pour affiner davantage."
+      "hint": "Affichage des 200 pires fonctions par score. Utilisez le champ de recherche pour affiner davantage.",
+      "expanderAriaCollapsed": "Afficher les détails du problème",
+      "expanderAriaExpanded": "Masquer les détails du problème",
+      "detailHeading": "Pourquoi cette fonction a marqué {score}",
+      "detailNoIssues": "Aucun indicateur sur cette ligne : le score est déterminé par les valeurs des colonnes ci-dessus (utilisation, couverture, complexité, âge, documentation).",
+      "suppressLabel": "Supprimer dans le fichier",
+      "suppressTooltip": "Écrit `// ignore_for_file: code_health:<flag>` dans ce fichier afin que les analyses futures suppriment cet indicateur pour l'ensemble du fichier."
+    },
+    "flag": {
+      "unused": {
+        "label": "inutilisé",
+        "evidence": "0 appelant",
+        "rule": "Marqué lorsqu'aucun autre fichier ne fait référence à ce nom de fonction."
+      },
+      "uncovered": {
+        "label": "découvert",
+        "evidence": "Tests {pct}%",
+        "rule": "Marqué lorsque LCOV signale une couverture de ligne de 0 %."
+      },
+      "complex": {
+        "label": "complexe",
+        "evidence": "CC {cc}",
+        "rule": "Signalé lorsque la complexité cyclomatique dépasse 10."
+      },
+      "undocumented": {
+        "label": "sans papiers",
+        "evidence": "CC {cc}, pas de doc",
+        "rule": "Marqué lorsqu'une fonction complexe (CC > 10) n'a pas de commentaire doc."
+      },
+      "test_drift": {
+        "label": "dérive d'essai",
+        "evidence": "les tests sont en retard sur la fonction",
+        "rule": "Marqué lorsque le fichier de test lié le plus récent est significativement plus ancien que le fichier source de la fonction."
+      },
+      "stub_tested": {
+        "label": "testé",
+        "evidence": "mince affirme",
+        "rule": "Signalé lorsqu'un test lié existe mais n'affirme presque rien."
+      },
+      "suspicious_coverage": {
+        "label": "couverture suspecte",
+        "evidence": "{pct}% sans test",
+        "rule": "Marqué lorsque LCOV signale une couverture élevée mais qu'aucun test ne fait référence à la fonction."
+      }
     },
     "shortcuts": {
       "focusFilter": "Concentrez le filtre de ligne",

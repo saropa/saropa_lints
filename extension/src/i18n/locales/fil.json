@@ -420,7 +420,17 @@
       "packagesBreakdown": "{direct} direct, {transitive} transitive",
       "gradeLine": "Baitang {grade} · {avg}/100",
       "flaggedCount": "{count} na na-flag",
-      "flaggedTitle": "Inabandona o end-of-life"
+      "flaggedTitle": "Inabandona o end-of-life",
+      "lastScanLabel": "Na-scan ang {when}",
+      "lastScanTitle": "Kapag kinuha ang data ng dashboard na ito — {timestamp}. I-click ang I-scan muli upang i-refresh.",
+      "lastScanUnknown": "Na-scan (hindi alam ang oras)",
+      "lastScanUnknownTitle": "Ang pag-scan na ito ay tumakbo bago nasubaybayan ng dashboard ang mga timestamp. I-click ang I-scan muli upang i-refresh."
+    },
+    "time": {
+      "justNow": "ngayon lang",
+      "minutesAgo": "{min}m nakalipas",
+      "hoursAgo": "{hr}o nakalipas",
+      "daysAgo": "{day}a nakalipas"
     },
     "scanning": {
       "heading": "Pag-scan ng mga pakete",
@@ -444,7 +454,7 @@
       "singleUse": "pang-isahang gamit",
       "vulnerable": "Mahina",
       "overrides": "Mga override",
-      "caveatLine1": "*Mga ipinapakitang laki ng code (lib + idineklarang asset), bumabalik sa laki ng archive ng pub.dev kapag hindi available ang laki ng code. Ang aktwal na laki ng app ay magiging mas maliit pagkatapos ng pagyanig ng puno.",
+      "caveatLine1": "*Mga ipinapakitang laki ng code (lib + idineklarang asset), bumabalik sa laki ng archive ng pub.dev kapag hindi available ang laki ng code. Hindi kasama ang dev_dependencies (build_runner, lints, saropa_lints, atbp.) — hinding-hindi sila nagpapadala sa APK / IPA / web bundle. Ang aktwal na laki ng app ay magiging mas maliit pagkatapos ng pagyanig ng puno.",
       "caveatLine2": "Mga threshold ng aktibidad: 90d = lipas, 180d = tulog (commit + release timeline)."
     },
     "breakdown": {
@@ -470,6 +480,7 @@
     },
     "sections": {
       "sizeDistribution": "Pamamahagi ng Sukat",
+      "sizeDistributionCaption": "Hindi kasama ang dev_dependencies — hindi sila kailanman nagpapadala sa APK / IPA / web bundle.",
       "filters": "Mga filter",
       "packages": "Mga package"
     },
@@ -803,7 +814,50 @@
       "noMatch": "Walang mga function na tumutugma sa kasalukuyang mga filter.",
       "resetFiltersTitle": "I-clear ang paghahanap at anumang aktibong flag filter.",
       "resetFilters": "I-reset ang mga filter",
-      "hint": "Ipinapakita ang pinakamasamang 200 function ayon sa marka. Gamitin ang field ng paghahanap para mas makitid."
+      "hint": "Ipinapakita ang pinakamasamang 200 function ayon sa marka. Gamitin ang field ng paghahanap para mas makitid.",
+      "expanderAriaCollapsed": "Ipakita ang mga detalye ng isyu",
+      "expanderAriaExpanded": "Itago ang mga detalye ng isyu",
+      "detailHeading": "Bakit nakakuha ng {score} ang function na ito",
+      "detailNoIssues": "Walang mga flag sa row na ito — ang marka ay hinihimok ng mga value ng column sa itaas (paggamit, saklaw, pagiging kumplikado, edad, dokumentasyon).",
+      "suppressLabel": "Pigilan sa file",
+      "suppressTooltip": "Isinulat ang `// ignore_for_file: code_health:<flag>` sa file na ito upang maalis ng mga pag-scan sa hinaharap ang flag na ito para sa buong file."
+    },
+    "flag": {
+      "unused": {
+        "label": "hindi nagamit",
+        "evidence": "0 tumatawag",
+        "rule": "Na-flag kapag walang ibang file na tumutukoy sa pangalan ng function na ito."
+      },
+      "uncovered": {
+        "label": "walang takip",
+        "evidence": "{pct}% na mga pagsubok",
+        "rule": "Na-flag kapag nag-ulat ang LCOV ng 0% line coverage."
+      },
+      "complex": {
+        "label": "kumplikado",
+        "evidence": "CC {cc}",
+        "rule": "Na-flag kapag lumampas sa 10 ang cyclomatic complexity."
+      },
+      "undocumented": {
+        "label": "hindi dokumentado",
+        "evidence": "CC {cc}, walang doc",
+        "rule": "Na-flag kapag ang isang kumplikadong function (CC > 10) ay walang komento sa doc."
+      },
+      "test_drift": {
+        "label": "pagsubok drift",
+        "evidence": "mga pagsubok lag ang function",
+        "rule": "Na-flag kapag ang pinakabagong naka-link na test file ay makabuluhang mas luma kaysa sa source file ng function."
+      },
+      "stub_tested": {
+        "label": "stub-tested",
+        "evidence": "manipis na paninindigan",
+        "rule": "Na-flag kapag may umiiral na naka-link na pagsubok ngunit halos walang iginigiit."
+      },
+      "suspicious_coverage": {
+        "label": "kahina-hinalang coverage",
+        "evidence": "{pct}% na walang pagsubok",
+        "rule": "Na-flag kapag nag-ulat ang LCOV ng mataas na saklaw ngunit walang pagsubok na tumutukoy sa function."
+      }
     },
     "shortcuts": {
       "focusFilter": "Ituon ang filter ng hilera",

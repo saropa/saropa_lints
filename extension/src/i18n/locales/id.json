@@ -420,7 +420,17 @@
       "packagesBreakdown": "{direct} langsung, {transitive} transitif",
       "gradeLine": "Nilai {grade} · {avg}/100",
       "flaggedCount": "{count} ditandai",
-      "flaggedTitle": "Ditinggalkan atau akhir kehidupan"
+      "flaggedTitle": "Ditinggalkan atau akhir kehidupan",
+      "lastScanLabel": "{when} yang dipindai",
+      "lastScanTitle": "Saat data dasbor ini diambil — {timestamp}. Klik Pindai Ulang untuk menyegarkan.",
+      "lastScanUnknown": "Dipindai (waktu tidak diketahui)",
+      "lastScanUnknownTitle": "Pemindaian ini dijalankan sebelum dasbor melacak stempel waktu. Klik Pindai Ulang untuk menyegarkan."
+    },
+    "time": {
+      "justNow": "baru saja",
+      "minutesAgo": "{min}m yang lalu",
+      "hoursAgo": "{hr}j yang lalu",
+      "daysAgo": "{day}h yang lalu"
     },
     "scanning": {
       "heading": "Memindai paket",
@@ -444,7 +454,7 @@
       "singleUse": "Sekali pakai",
       "vulnerable": "Rentan",
       "overrides": "Penggantian",
-      "caveatLine1": "*Ukuran kode ditampilkan (lib + aset yang dideklarasikan), dikembalikan ke ukuran arsip pub.dev ketika ukuran kode tidak tersedia. Ukuran aplikasi sebenarnya akan lebih kecil setelah pohon diguncang.",
+      "caveatLine1": "*Ukuran kode ditampilkan (lib + aset yang dideklarasikan), dikembalikan ke ukuran arsip pub.dev ketika ukuran kode tidak tersedia. Tidak termasuk dev_dependencies (build_runner, lints, saropa_lints, dll.) — semuanya tidak pernah dikirim ke bundel APK / IPA / web. Ukuran aplikasi sebenarnya akan lebih kecil setelah pohon diguncang.",
       "caveatLine2": "Ambang batas aktivitas: 90d = basi, 180d = tidak aktif (jadwal komit + rilis)."
     },
     "breakdown": {
@@ -470,6 +480,7 @@
     },
     "sections": {
       "sizeDistribution": "Distribusi Ukuran",
+      "sizeDistributionCaption": "Tidak termasuk dev_dependencies — tidak pernah dikirimkan ke paket APK / IPA / web.",
       "filters": "Filter",
       "packages": "Paket"
     },
@@ -803,7 +814,50 @@
       "noMatch": "Tidak ada fungsi yang cocok dengan filter saat ini.",
       "resetFiltersTitle": "Hapus pencarian dan filter tanda aktif apa pun.",
       "resetFilters": "Setel ulang filter",
-      "hint": "Menampilkan 200 fungsi terburuk berdasarkan skor. Gunakan kolom pencarian untuk mempersempit lebih jauh."
+      "hint": "Menampilkan 200 fungsi terburuk berdasarkan skor. Gunakan kolom pencarian untuk mempersempit lebih jauh.",
+      "expanderAriaCollapsed": "Tampilkan detail masalah",
+      "expanderAriaExpanded": "Sembunyikan detail masalah",
+      "detailHeading": "Mengapa fungsi ini mendapat skor {score}",
+      "detailNoIssues": "Tidak ada tanda pada baris ini — skor ditentukan oleh nilai kolom di atas (penggunaan, cakupan, kompleksitas, usia, dokumentasi).",
+      "suppressLabel": "Tekan dalam file",
+      "suppressTooltip": "Menulis `// abaikan_for_file: code_health:<flag>` ke dalam file ini sehingga pemindaian selanjutnya menghilangkan tanda ini untuk keseluruhan file."
+    },
+    "flag": {
+      "unused": {
+        "label": "tidak terpakai",
+        "evidence": "0 penelepon",
+        "rule": "Ditandai ketika tidak ada file lain yang mereferensikan nama fungsi ini."
+      },
+      "uncovered": {
+        "label": "terbongkar",
+        "evidence": "Tes {pct}%.",
+        "rule": "Ditandai ketika LCOV melaporkan cakupan jalur 0%."
+      },
+      "complex": {
+        "label": "kompleks",
+        "evidence": "CC {cc}",
+        "rule": "Ditandai ketika kompleksitas siklomatik melebihi 10."
+      },
+      "undocumented": {
+        "label": "tidak berdokumen",
+        "evidence": "CC {cc}, tidak ada dok",
+        "rule": "Ditandai ketika fungsi kompleks (CC > 10) tidak memiliki komentar dokumen."
+      },
+      "test_drift": {
+        "label": "uji penyimpangan",
+        "evidence": "tes memperlambat fungsinya",
+        "rule": "Ditandai ketika file uji tertaut terbaru jauh lebih tua dari file sumber fungsi."
+      },
+      "stub_tested": {
+        "label": "diuji rintisan",
+        "evidence": "tipis menegaskan",
+        "rule": "Ditandai ketika tes tertaut ada tetapi hampir tidak menyatakan apa pun."
+      },
+      "suspicious_coverage": {
+        "label": "liputan yang mencurigakan",
+        "evidence": "{pct}% tanpa tes",
+        "rule": "Ditandai ketika LCOV melaporkan cakupan tinggi tetapi tidak ada tes yang mereferensikan fungsinya."
+      }
     },
     "shortcuts": {
       "focusFilter": "Fokuskan filter baris",

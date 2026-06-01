@@ -3499,8 +3499,7 @@ class PassExistingFutureToFutureBuilderRule extends SaropaLintRule {
     // that we can reason about its body shape from project conventions.
     if (!node.methodName.name.startsWith('_')) return false;
 
-    final ClassDeclaration? cls = node
-        .thisOrAncestorOfType<ClassDeclaration>();
+    final ClassDeclaration? cls = node.thisOrAncestorOfType<ClassDeclaration>();
     if (cls == null) return false;
 
     // Search for at least one `Future<...>?` field on the class. Nullable

@@ -89,6 +89,11 @@ export async function buildScanMeta(startTime: number): Promise<ReportMetadata> 
         flutterVersion: flutterVer,
         dartVersion: dartVer,
         executionTimeMs: Date.now() - startTime,
+        // Drives the "Scanned X ago" pill in the Package Dashboard hero.
+        // Recorded at meta-build time (end of scan), not startTime, so the
+        // pill reflects "when the data is from", which is what users want
+        // when judging staleness after a Rescan click.
+        scanTimestamp: Date.now(),
     };
 }
 

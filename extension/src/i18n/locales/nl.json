@@ -420,7 +420,17 @@
       "packagesBreakdown": "{direct} direct, {transitive} transitief",
       "gradeLine": "Graad {grade} · {avg}/100",
       "flaggedCount": "{count} gemarkeerd",
-      "flaggedTitle": "Verlaten of einde leven"
+      "flaggedTitle": "Verlaten of einde leven",
+      "lastScanLabel": "{when} gescand",
+      "lastScanTitle": "Toen deze dashboardgegevens werden opgehaald: {timestamp}. Klik op Opnieuw scannen om te vernieuwen.",
+      "lastScanUnknown": "Gescand (tijd onbekend)",
+      "lastScanUnknownTitle": "Deze scan werd uitgevoerd voordat het dashboard tijdstempels bijhield. Klik op Opnieuw scannen om te vernieuwen."
+    },
+    "time": {
+      "justNow": "zojuist",
+      "minutesAgo": "{min} m geleden",
+      "hoursAgo": "{hr} u geleden",
+      "daysAgo": "{day} d geleden"
     },
     "scanning": {
       "heading": "Pakketten scannen",
@@ -444,7 +454,7 @@
       "singleUse": "Eenmalig gebruik",
       "vulnerable": "Kwetsbaar",
       "overrides": "Overschrijvingen",
-      "caveatLine1": "*Getoonde codegroottes (lib + gedeclareerde assets), terugvallend op de archiefgrootte pub.dev wanneer de codegrootte niet beschikbaar is. De werkelijke app-grootte zal kleiner zijn na het schudden van de boom.",
+      "caveatLine1": "*Getoonde codegroottes (lib + gedeclareerde assets), terugvallend op de archiefgrootte pub.dev wanneer de codegrootte niet beschikbaar is. Exclusief dev_dependencies (build_runner, lints, saropa_lints, enz.) — ze worden nooit verzonden naar de APK/IPA/webbundel. De werkelijke app-grootte zal kleiner zijn na het schudden van de boom.",
       "caveatLine2": "Activiteitsdrempels: 90d = verouderd, 180d = slapend (tijdlijnen voor vastleggen en vrijgeven)."
     },
     "breakdown": {
@@ -470,6 +480,7 @@
     },
     "sections": {
       "sizeDistribution": "Grootteverdeling",
+      "sizeDistributionCaption": "Exclusief dev_dependencies: ze worden nooit verzonden naar de APK/IPA/webbundel.",
       "filters": "Filters",
       "packages": "Pakketten"
     },
@@ -803,7 +814,50 @@
       "noMatch": "Er zijn geen functies die overeenkomen met de huidige filters.",
       "resetFiltersTitle": "Wis de zoekopdracht en eventuele actieve vlagfilters.",
       "resetFilters": "Filters resetten",
-      "hint": "Toont de slechtste 200 functies op score. Gebruik het zoekveld om verder te verfijnen."
+      "hint": "Toont de slechtste 200 functies op score. Gebruik het zoekveld om verder te verfijnen.",
+      "expanderAriaCollapsed": "Probleemdetails tonen",
+      "expanderAriaExpanded": "Probleemdetails verbergen",
+      "detailHeading": "Waarom deze functie {score} scoorde",
+      "detailNoIssues": "Geen vlaggen in deze rij: de score wordt bepaald door de bovenstaande kolomwaarden (gebruik, dekking, complexiteit, leeftijd, documentatie).",
+      "suppressLabel": "Onderdrukken in bestand",
+      "suppressTooltip": "Schrijft `// negeer_for_file: code_health:<flag>` in dit bestand, zodat toekomstige scans deze vlag voor het hele bestand verwijderen."
+    },
+    "flag": {
+      "unused": {
+        "label": "ongebruikt",
+        "evidence": "0 bellers",
+        "rule": "Gemarkeerd wanneer geen ander bestand naar deze functienaam verwijst."
+      },
+      "uncovered": {
+        "label": "blootgelegd",
+        "evidence": "{pct}% testen",
+        "rule": "Gemarkeerd wanneer LCOV een lijndekking van 0% rapporteert."
+      },
+      "complex": {
+        "label": "complex",
+        "evidence": "CC {cc}",
+        "rule": "Gemarkeerd wanneer de cyclomatische complexiteit groter is dan 10."
+      },
+      "undocumented": {
+        "label": "ongedocumenteerd",
+        "evidence": "CC {cc}, geen document",
+        "rule": "Gemarkeerd wanneer een complexe functie (CC > 10) geen documentcommentaar heeft."
+      },
+      "test_drift": {
+        "label": "proef drift",
+        "evidence": "tests lopen achter op de functie",
+        "rule": "Gemarkeerd wanneer het nieuwste gekoppelde testbestand aanzienlijk ouder is dan het bronbestand van de functie."
+      },
+      "stub_tested": {
+        "label": "stomp-getest",
+        "evidence": "dun beweert",
+        "rule": "Gemarkeerd als er een gekoppelde test bestaat, maar nauwelijks iets beweert."
+      },
+      "suspicious_coverage": {
+        "label": "verdachte berichtgeving",
+        "evidence": "{pct}% zonder test",
+        "rule": "Gemarkeerd wanneer LCOV een hoge dekking rapporteert, maar geen enkele test naar de functie verwijst."
+      }
     },
     "shortcuts": {
       "focusFilter": "Focus het rijfilter",

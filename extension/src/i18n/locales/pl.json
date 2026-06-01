@@ -420,7 +420,17 @@
       "packagesBreakdown": "{direct} bezpośrednich, {transitive} przechodnich",
       "gradeLine": "Stopień {grade} · {avg}/100",
       "flaggedCount": "{count} oflagowanych",
-      "flaggedTitle": "Opuszczony lub koniec życia"
+      "flaggedTitle": "Opuszczony lub koniec życia",
+      "lastScanLabel": "Zeskanowano {when}",
+      "lastScanTitle": "Kiedy pobrano dane tego panelu kontrolnego — {timestamp}. Kliknij opcję Skanuj ponownie, aby odświeżyć.",
+      "lastScanUnknown": "Zeskanowano (czas nieznany)",
+      "lastScanUnknownTitle": "To skanowanie zostało przeprowadzone, zanim na pulpicie nawigacyjnym wykryto znaczniki czasu. Kliknij opcję Skanuj ponownie, aby odświeżyć."
+    },
+    "time": {
+      "justNow": "właśnie",
+      "minutesAgo": "{min} min temu",
+      "hoursAgo": "{hr} godz. temu",
+      "daysAgo": "{day} dni temu"
     },
     "scanning": {
       "heading": "Skanowanie pakietów",
@@ -444,7 +454,7 @@
       "singleUse": "Jednorazowe",
       "vulnerable": "Wrażliwy",
       "overrides": "Zastępuje",
-      "caveatLine1": "*Pokazane rozmiary kodu (lib + zadeklarowane zasoby) wracają do rozmiaru archiwum pub.dev, gdy rozmiar kodu jest niedostępny. Rzeczywisty rozmiar aplikacji będzie mniejszy po potrząśnięciu drzewem.",
+      "caveatLine1": "*Pokazane rozmiary kodu (lib + zadeklarowane zasoby) wracają do rozmiaru archiwum pub.dev, gdy rozmiar kodu jest niedostępny. Nie obejmuje zależności dev (build_runner, lints, saropa_lints itp.) — nigdy nie są wysyłane do pakietu APK/IPA/web. Rzeczywisty rozmiar aplikacji będzie mniejszy po potrząśnięciu drzewem.",
       "caveatLine2": "Progi aktywności: 90d = nieaktualne, 180d = uśpione (osie czasu zatwierdzenia i wydania)."
     },
     "breakdown": {
@@ -470,6 +480,7 @@
     },
     "sections": {
       "sizeDistribution": "Dystrybucja rozmiarów",
+      "sizeDistributionCaption": "Nie obejmuje zależności dev — nigdy nie są wysyłane do pakietu APK/IPA/web.",
       "filters": "Filtry",
       "packages": "Pakiety"
     },
@@ -803,7 +814,50 @@
       "noMatch": "Żadna funkcja nie pasuje do bieżących filtrów.",
       "resetFiltersTitle": "Wyczyść wyszukiwanie i wszystkie aktywne filtry flag.",
       "resetFilters": "Zresetuj filtry",
-      "hint": "Wyświetlanie 200 najgorszych funkcji według wyniku. Użyj pola wyszukiwania, aby jeszcze bardziej zawęzić zakres."
+      "hint": "Wyświetlanie 200 najgorszych funkcji według wyniku. Użyj pola wyszukiwania, aby jeszcze bardziej zawęzić zakres.",
+      "expanderAriaCollapsed": "Pokaż szczegóły problemu",
+      "expanderAriaExpanded": "Ukryj szczegóły problemu",
+      "detailHeading": "Dlaczego ta funkcja uzyskała ocenę {score}",
+      "detailNoIssues": "Brak flag w tym wierszu — wynik zależy od wartości kolumn powyżej (wykorzystanie, zasięg, złożoność, wiek, dokumentacja).",
+      "suppressLabel": "Pomiń w pliku",
+      "suppressTooltip": "Zapisuje `// ignorowanie_pliku: code_health:<flaga>` w tym pliku, więc przyszłe skany usuwają tę flagę dla całego pliku."
+    },
+    "flag": {
+      "unused": {
+        "label": "nie używany",
+        "evidence": "0 rozmówców",
+        "rule": "Oznaczone, gdy żaden inny plik nie odwołuje się do tej nazwy funkcji."
+      },
+      "uncovered": {
+        "label": "nieosłonięty",
+        "evidence": "Testy {pct}%.",
+        "rule": "Oznaczone, gdy LCOV zgłasza 0% pokrycia linii."
+      },
+      "complex": {
+        "label": "złożony",
+        "evidence": "DW {cc}",
+        "rule": "Oznaczone, gdy złożoność cyklomatyczna przekracza 10."
+      },
+      "undocumented": {
+        "label": "nieudokumentowany",
+        "evidence": "CC {cc}, brak dok",
+        "rule": "Flagowana, gdy funkcja złożona (CC > 10) nie ma komentarza do dokumentu."
+      },
+      "test_drift": {
+        "label": "dryf próbny",
+        "evidence": "testy opóźniają działanie funkcji",
+        "rule": "Oznaczone, gdy najnowszy połączony plik testowy jest znacznie starszy niż plik źródłowy funkcji."
+      },
+      "stub_tested": {
+        "label": "przetestowane",
+        "evidence": "cienki twierdzi",
+        "rule": "Oznaczone, gdy istnieje połączony test, ale prawie niczego nie potwierdza."
+      },
+      "suspicious_coverage": {
+        "label": "podejrzany zasięg",
+        "evidence": "{pct}% bez testu",
+        "rule": "Oznaczone, gdy LCOV zgłasza duże pokrycie, ale żaden test nie odwołuje się do tej funkcji."
+      }
     },
     "shortcuts": {
       "focusFilter": "Skoncentruj filtr wierszy",

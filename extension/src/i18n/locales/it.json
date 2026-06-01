@@ -420,7 +420,17 @@
       "packagesBreakdown": "{direct} diretti, {transitive} transitivi",
       "gradeLine": "Grado {grade} · {avg}/100",
       "flaggedCount": "{count} segnalati",
-      "flaggedTitle": "Abbandonato o a fine vita"
+      "flaggedTitle": "Abbandonato o a fine vita",
+      "lastScanLabel": "{when} scansionato",
+      "lastScanTitle": "Quando sono stati recuperati i dati del dashboard: {timestamp}. Fare clic su Nuova scansione per aggiornare.",
+      "lastScanUnknown": "Scansionato (ora sconosciuta)",
+      "lastScanUnknownTitle": "Questa scansione è stata eseguita prima che il dashboard tenesse traccia dei timestamp. Fare clic su Nuova scansione per aggiornare."
+    },
+    "time": {
+      "justNow": "proprio adesso",
+      "minutesAgo": "{min} m fa",
+      "hoursAgo": "{hr} h fa",
+      "daysAgo": "{day} g fa"
     },
     "scanning": {
       "heading": "Scansione dei pacchi",
@@ -444,7 +454,7 @@
       "singleUse": "Monouso",
       "vulnerable": "Vulnerabile",
       "overrides": "Sostituisce",
-      "caveatLine1": "*Dimensioni del codice mostrate (lib + risorse dichiarate), tornando alla dimensione dell'archivio pub.dev quando la dimensione del codice non è disponibile. Le dimensioni effettive dell'app saranno inferiori dopo lo scuotimento dell'albero.",
+      "caveatLine1": "*Dimensioni del codice mostrate (lib + risorse dichiarate), tornando alla dimensione dell'archivio pub.dev quando la dimensione del codice non è disponibile. Esclude dev_dependencies (build_runner, lints, saropa_lints, ecc.): non vengono mai spediti al bundle APK/IPA/web. Le dimensioni effettive dell'app saranno inferiori dopo lo scuotimento dell'albero.",
       "caveatLine2": "Soglie di attività: 90d = obsoleto, 180d = dormiente (impegno + tempistiche di rilascio)."
     },
     "breakdown": {
@@ -470,6 +480,7 @@
     },
     "sections": {
       "sizeDistribution": "Distribuzione delle dimensioni",
+      "sizeDistributionCaption": "Esclude dev_dependencies: non vengono mai spediti al pacchetto APK/IPA/web.",
       "filters": "Filtri",
       "packages": "Pacchetti"
     },
@@ -803,7 +814,50 @@
       "noMatch": "Nessuna funzione corrisponde ai filtri attuali.",
       "resetFiltersTitle": "Cancella la ricerca e qualsiasi filtro di segnalazione attivo.",
       "resetFilters": "Reimposta i filtri",
-      "hint": "Mostra le 200 funzioni peggiori in base al punteggio. Utilizza il campo di ricerca per restringere ulteriormente."
+      "hint": "Mostra le 200 funzioni peggiori in base al punteggio. Utilizza il campo di ricerca per restringere ulteriormente.",
+      "expanderAriaCollapsed": "Mostra i dettagli del problema",
+      "expanderAriaExpanded": "Nascondi i dettagli del problema",
+      "detailHeading": "Perché questa funzione ha ottenuto {score}",
+      "detailNoIssues": "Nessun contrassegno su questa riga: il punteggio è determinato dai valori della colonna sopra (utilizzo, copertura, complessità, età, documentazione).",
+      "suppressLabel": "Sopprimi nel file",
+      "suppressTooltip": "Scrive `// ignore_for_file: code_health:<flag>` in questo file in modo che le scansioni future rilascino questo flag per l'intero file."
+    },
+    "flag": {
+      "unused": {
+        "label": "inutilizzato",
+        "evidence": "0 chiamanti",
+        "rule": "Contrassegnato quando nessun altro file fa riferimento a questo nome di funzione."
+      },
+      "uncovered": {
+        "label": "scoperto",
+        "evidence": "Test {pct}%.",
+        "rule": "Contrassegnato quando LCOV riporta una copertura della linea dello 0%."
+      },
+      "complex": {
+        "label": "complesso",
+        "evidence": "CC{cc}",
+        "rule": "Contrassegnato quando la complessità ciclomatica supera 10."
+      },
+      "undocumented": {
+        "label": "privo di documenti",
+        "evidence": "CC {cc}, nessun documento",
+        "rule": "Contrassegnato quando una funzione complessa (CC > 10) non ha commenti doc."
+      },
+      "test_drift": {
+        "label": "deriva di prova",
+        "evidence": "i test ritardano la funzione",
+        "rule": "Contrassegnato quando il file di test collegato più recente è significativamente più vecchio del file di origine della funzione."
+      },
+      "stub_tested": {
+        "label": "testato in stub",
+        "evidence": "sottile afferma",
+        "rule": "Contrassegnato quando esiste un test collegato ma non afferma quasi nulla."
+      },
+      "suspicious_coverage": {
+        "label": "copertura sospetta",
+        "evidence": "{pct}% senza test",
+        "rule": "Contrassegnato quando LCOV riporta una copertura elevata ma nessun test fa riferimento alla funzione."
+      }
     },
     "shortcuts": {
       "focusFilter": "Mettere a fuoco il filtro di riga",

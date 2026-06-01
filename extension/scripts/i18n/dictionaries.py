@@ -8,6 +8,8 @@ from typing import Dict
 TRANSLATIONS: Dict[str, Dict[str, str]] = {
     "nl": {
         # Curated passthroughs: MT returns these identical (cognate / brand-prefixed title / abbreviation) for this locale; English is the correct rendering. Keeps the coverage gate honest without shipping garbage.
+        "CC {cc}": "CC {cc}",
+        "complex": "complex",
         "impact ≠ {v}": "impact ≠ {v}",
         "Search": "Zoeken",
         "Search Packages": "Zoeken",
@@ -145,6 +147,7 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
     },
     "fr": {
         # Curated passthroughs: MT returns these identical (cognate / brand-prefixed title / abbreviation) for this locale; English is the correct rendering. Keeps the coverage gate honest without shipping garbage.
+        "CC {cc}": "CC {cc}",
         "Distribution": "Distribution",
         "impact ≠ {v}": "impact ≠ {v}",
         "Search": "Rechercher",
@@ -282,6 +285,7 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
     },
     "ur": {
         # Curated passthrough: Urdu MT echoes this command title unchanged; English (with the Saropa brand) is the correct rendering.
+        "CC {cc}": "CC {cc}",
         "Saropa Lints: Open Lints Config": "Saropa Lints: Open Lints Config",
         "Search": "تلاش",
         "Search Packages": "تلاش",
@@ -403,6 +407,7 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
     },
     "de": {
         # Curated passthroughs: MT returns these identical (cognate / brand-prefixed title / abbreviation) for this locale; English is the correct rendering. Keeps the coverage gate honest without shipping garbage.
+        "CC {cc}": "CC {cc}",
         "Export": "Export",
         "System": "System",
         "Search": "Suchen",
@@ -474,6 +479,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "es": {
+        # Curated passthrough: "CC" is the universal abbreviation for Cyclomatic Complexity in code metrics; keeping it untranslated preserves recognition.
+        "CC {cc}": "CC {cc}",
         "Search": "Buscar",
         "Saropa Lints UI language": "Idioma de la interfaz de Saropa Lints",
         "Choose language for sidebar and dashboards": "Elija el idioma de la barra lateral y los paneles",
@@ -590,6 +597,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "{count} function": "{count} funzione",
     },
     "pt": {
+        # Curated passthrough: "CC" is the universal abbreviation for Cyclomatic Complexity in code metrics; keeping it untranslated preserves recognition.
+        "CC {cc}": "CC {cc}",
         "Search": "Pesquisar",
         "Saropa Lints UI language": "Idioma da IU do Saropa Lints",
         "Choose language for sidebar and dashboards": "Escolha o idioma da barra lateral e dos painéis",
@@ -702,6 +711,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "ja": {
+        # Curated passthrough: "CC" is the universal abbreviation for Cyclomatic Complexity in code metrics; keeping it untranslated preserves recognition.
+        "CC {cc}": "CC {cc}",
         "Search": "検索",
         "Saropa Lints UI language": "Saropa Lints の UI 言語",
         "Choose language for sidebar and dashboards": "サイドバーとダッシュボードの言語を選ぶ",
@@ -754,6 +765,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "ko": {
+        # Curated passthrough: "CC" is the universal abbreviation for Cyclomatic Complexity in code metrics; keeping it untranslated preserves recognition.
+        "CC {cc}": "CC {cc}",
         "Search": "검색",
         "Saropa Lints UI language": "Saropa Lints UI 언어",
         "Choose language for sidebar and dashboards": "사이드바와 대시보드 언어 선택",
@@ -807,6 +820,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "zh": {
+        # Curated passthrough: "CC" is the universal abbreviation for Cyclomatic Complexity in code metrics; keeping it untranslated preserves recognition.
+        "CC {cc}": "CC {cc}",
         "Search": "搜索",
         "Saropa Lints UI language": "Saropa Lints 界面语言",
         "Choose language for sidebar and dashboards": "选择侧边栏和仪表板的语言",
@@ -860,6 +875,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "ar": {
+        # Curated passthrough: "CC" is the universal abbreviation for Cyclomatic Complexity in code metrics; keeping it untranslated preserves recognition.
+        "CC {cc}": "CC {cc}",
         "Search": "بحث",
         "Saropa Lints UI language": "لغة واجهة Saropa Lints",
         "Choose language for sidebar and dashboards": "اختر لغة الشريط الجانبي ولوحات المعلومات",
@@ -966,6 +983,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "bn": {
+        # Curated passthrough: "CC" is the universal abbreviation for Cyclomatic Complexity in code metrics; keeping it untranslated preserves recognition.
+        "CC {cc}": "CC {cc}",
         "#": "#",
         "OWASP": "OWASP",
         "Saropa Lints: Open Lints Config": "Saropa Lints: লিন্ট কনফিগারেশন খুলুন",
@@ -1089,6 +1108,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
     },
     "fil": {
         # Curated passthroughs: MT returns these identical (cognate / brand-prefixed title / abbreviation) for this locale; English is the correct rendering. Keeps the coverage gate honest without shipping garbage.
+        "CC {cc}": "CC {cc}",
+        "stub-tested": "stub-tested",
         "Drift on · {count}": "Drift on · {count}",
         "avg {score} ({grade})": "avg {score} ({grade})",
         "Saropa Package Dashboard v{version}": "Saropa Package Dashboard v{version}",
@@ -1180,6 +1201,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "he": {
+        # Curated passthrough: "CC" is the universal abbreviation for Cyclomatic Complexity in code metrics; keeping it untranslated preserves recognition.
+        "CC {cc}": "CC {cc}",
         "#": "#",
         "OWASP": "OWASP",
         "Open Code Health": "פתיחת תקינות קוד",
@@ -1237,6 +1260,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "id": {
+        # Curated passthrough: "CC" is the universal abbreviation for Cyclomatic Complexity in code metrics; keeping it untranslated preserves recognition.
+        "CC {cc}": "CC {cc}",
         "#": "#",
         "OWASP": "OWASP",
         "Saropa": "Saropa",
@@ -1347,6 +1372,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "sw": {
+        # Curated passthrough: "CC" is the universal abbreviation for Cyclomatic Complexity in code metrics; keeping it untranslated preserves recognition.
+        "CC {cc}": "CC {cc}",
         "#": "#",
         "Counters": "Kaunta",
         "Deps": "Vitegemezi",
@@ -1458,6 +1485,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "tr": {
+        # Curated passthrough: "CC" is the universal abbreviation for Cyclomatic Complexity in code metrics; keeping it untranslated preserves recognition.
+        "CC {cc}": "CC {cc}",
         "#": "#",
         "OWASP": "OWASP",
         "Saropa": "Saropa",
@@ -1509,6 +1538,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "uk": {
+        # Curated passthrough: "CC" is the universal abbreviation for Cyclomatic Complexity in code metrics; keeping it untranslated preserves recognition.
+        "CC {cc}": "CC {cc}",
         "#": "#",
         "Deps": "Залежн.",
         "OWASP": "OWASP",
@@ -1564,6 +1595,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "vi": {
+        # Curated passthrough: "CC" is the universal abbreviation for Cyclomatic Complexity in code metrics; keeping it untranslated preserves recognition.
+        "CC {cc}": "CC {cc}",
         "#": "#",
         "Deps": "Phụ thuộc",
         "OWASP": "OWASP",

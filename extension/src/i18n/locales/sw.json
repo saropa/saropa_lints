@@ -420,7 +420,17 @@
       "packagesBreakdown": "{direct} ya moja kwa moja, {transitive} badilishi",
       "gradeLine": "Daraja {grade} · {avg}/100",
       "flaggedCount": "{count} zimewekewa alama",
-      "flaggedTitle": "Kuachwa au mwisho wa maisha"
+      "flaggedTitle": "Kuachwa au mwisho wa maisha",
+      "lastScanLabel": "Ilichanganua {when}",
+      "lastScanTitle": "Wakati data hii ya dashibodi ililetwa - {timestamp}. Bofya Changanua upya ili kuonyesha upya.",
+      "lastScanUnknown": "Imechanganuliwa (muda haujulikani)",
+      "lastScanUnknownTitle": "Uchanganuzi huu ulifanyika kabla ya dashibodi kufuatilia mihuri ya muda. Bofya Changanua upya ili kuonyesha upya."
+    },
+    "time": {
+      "justNow": "sasa hivi",
+      "minutesAgo": "dakika {min} zilizopita",
+      "hoursAgo": "saa {hr} zilizopita",
+      "daysAgo": "siku {day} zilizopita"
     },
     "scanning": {
       "heading": "Inachanganua vifurushi",
@@ -444,7 +454,7 @@
       "singleUse": "Matumizi moja",
       "vulnerable": "Inayo hatarini",
       "overrides": "Inabatilisha",
-      "caveatLine1": "*Ukubwa wa msimbo umeonyeshwa (lib + mali iliyotangazwa), ikirejea kwenye ukubwa wa kumbukumbu ya pub.dev wakati ukubwa wa msimbo haupatikani. Ukubwa halisi wa programu utakuwa mdogo baada ya mti kutikisika.",
+      "caveatLine1": "*Ukubwa wa msimbo umeonyeshwa (lib + mali iliyotangazwa), ikirejea kwenye ukubwa wa kumbukumbu ya pub.dev wakati ukubwa wa msimbo haupatikani. Haijumuishi dev_dependencies (build_runner, lints, saropa_lints, n.k.) - hazisafirishiwi kwa APK / IPA / web bundle. Ukubwa halisi wa programu utakuwa mdogo baada ya mti kutikisika.",
       "caveatLine2": "Viwango vya shughuli: 90d = vilichakaa, 180d = vimetulia (jitolea + muda wa kutolewa)."
     },
     "breakdown": {
@@ -470,6 +480,7 @@
     },
     "sections": {
       "sizeDistribution": "Usambazaji wa ukubwa",
+      "sizeDistributionCaption": "Haijumuishi dev_dependencies - hazisafirishi kwa APK / IPA / mtandao bundle.",
       "filters": "Vichujio",
       "packages": "Vifurushi"
     },
@@ -803,7 +814,50 @@
       "noMatch": "Hakuna chaguo za kukokotoa zinazolingana na vichujio vya sasa.",
       "resetFiltersTitle": "Futa utafutaji na kichujio chochote cha bendera kinachotumika.",
       "resetFilters": "Weka upya vichujio",
-      "hint": "Inaonyesha utendaji mbaya zaidi 200 kwa alama. Tumia sehemu ya utafutaji ili kupunguza zaidi."
+      "hint": "Inaonyesha utendaji mbaya zaidi 200 kwa alama. Tumia sehemu ya utafutaji ili kupunguza zaidi.",
+      "expanderAriaCollapsed": "Onyesha maelezo ya suala",
+      "expanderAriaExpanded": "Ficha maelezo ya suala",
+      "detailHeading": "Kwa nini kazi hii ilifunga {score}",
+      "detailNoIssues": "Hakuna alama kwenye safu mlalo hii - alama inaendeshwa na thamani za safu wima zilizo hapo juu (matumizi, chanjo, utata, umri, uwekaji kumbukumbu).",
+      "suppressLabel": "Bonyeza kwenye faili",
+      "suppressTooltip": "Huandika `// ignore_for_file: code_health:<flag>` kwenye faili hii ili utafutaji wa siku zijazo udondoshe bendera hii kwa faili nzima."
+    },
+    "flag": {
+      "unused": {
+        "label": "isiyotumika",
+        "evidence": "0 wapigaji",
+        "rule": "Imeripotiwa wakati hakuna faili nyingine inayorejelea jina la chaguo hili la kukokotoa."
+      },
+      "uncovered": {
+        "label": "kufunuliwa",
+        "evidence": "Vipimo vya {pct}%.",
+        "rule": "Imeripotiwa wakati LCOV inaripoti 0% ya huduma ya laini."
+      },
+      "complex": {
+        "label": "changamano",
+        "evidence": "CC {cc}",
+        "rule": "Imeripotiwa wakati utata wa cyclomatic unazidi 10."
+      },
+      "undocumented": {
+        "label": "isiyo na hati",
+        "evidence": "CC {cc}, hakuna hati",
+        "rule": "Imealamishwa wakati kitendakazi changamano (CC > 10) hakina maoni ya hati."
+      },
+      "test_drift": {
+        "label": "mtihani drift",
+        "evidence": "vipimo huchelewesha utendaji",
+        "rule": "Imealamishwa wakati faili mpya ya majaribio iliyounganishwa ni ya zamani zaidi kuliko faili ya chanzo cha chaguo hili."
+      },
+      "stub_tested": {
+        "label": "iliyojaribiwa stub",
+        "evidence": "madai nyembamba",
+        "rule": "Imeripotiwa wakati jaribio lililounganishwa lipo lakini haidai chochote."
+      },
+      "suspicious_coverage": {
+        "label": "chanjo ya tuhuma",
+        "evidence": "{pct}% bila mtihani",
+        "rule": "Imeripotiwa wakati LCOV inaripoti huduma ya juu lakini hakuna marejeleo ya jaribio la kukokotoa."
+      }
     },
     "shortcuts": {
       "focusFilter": "Lenga kichujio cha safu mlalo",

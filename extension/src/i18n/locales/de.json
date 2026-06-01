@@ -420,7 +420,17 @@
       "packagesBreakdown": "{direct} direkt, {transitive} transitiv",
       "gradeLine": "Note {grade} · {avg}/100",
       "flaggedCount": "{count} markiert",
-      "flaggedTitle": "Verlassen oder am Lebensende"
+      "flaggedTitle": "Verlassen oder am Lebensende",
+      "lastScanLabel": "Gescannt {when}",
+      "lastScanTitle": "Als diese Dashboard-Daten abgerufen wurden – {timestamp}. Klicken Sie zum Aktualisieren auf „Erneut scannen“.",
+      "lastScanUnknown": "Gescannt (Zeitpunkt unbekannt)",
+      "lastScanUnknownTitle": "Dieser Scan wurde ausgeführt, bevor das Dashboard Zeitstempel verfolgte. Klicken Sie zum Aktualisieren auf „Erneut scannen“."
+    },
+    "time": {
+      "justNow": "soeben",
+      "minutesAgo": "vor {min} Min.",
+      "hoursAgo": "vor {hr} Std.",
+      "daysAgo": "vor {day} Tg."
     },
     "scanning": {
       "heading": "Pakete scannen",
@@ -444,7 +454,7 @@
       "singleUse": "Einmalgebrauch",
       "vulnerable": "Verletzlich",
       "overrides": "Überschreibt",
-      "caveatLine1": "*Angezeigte Codegrößen (lib + deklarierte Assets), zurückgreifend auf die Archivgröße von pub.dev, wenn die Codegröße nicht verfügbar ist. Die tatsächliche App-Größe wird nach dem Baumschütteln kleiner sein.",
+      "caveatLine1": "*Angezeigte Codegrößen (lib + deklarierte Assets), zurückgreifend auf die Archivgröße von pub.dev, wenn die Codegröße nicht verfügbar ist. Ausgeschlossen sind dev_dependencies (build_runner, lints, saropa_lints usw.) – sie werden nie an das APK/IPA/Web-Bundle geliefert. Die tatsächliche App-Größe wird nach dem Baumschütteln kleiner sein.",
       "caveatLine2": "Aktivitätsschwellenwerte: 90 Tage = veraltet, 180 Tage = ruhend (Commit- und Release-Zeitpläne)."
     },
     "breakdown": {
@@ -470,6 +480,7 @@
     },
     "sections": {
       "sizeDistribution": "Größenverteilung",
+      "sizeDistributionCaption": "Ausgenommen sind dev_dependencies – sie werden nie an das APK-/IPA-/Web-Bundle versendet.",
       "filters": "Filter",
       "packages": "Pakete"
     },
@@ -803,7 +814,50 @@
       "noMatch": "Keine Funktion entspricht den aktuellen Filtern.",
       "resetFiltersTitle": "Löschen Sie die Suche und alle aktiven Flaggenfilter.",
       "resetFilters": "Filter zurücksetzen",
-      "hint": "Zeigt die 200 schlechtesten Funktionen nach Punktzahl. Verwenden Sie das Suchfeld, um die Suche weiter einzugrenzen."
+      "hint": "Zeigt die 200 schlechtesten Funktionen nach Punktzahl. Verwenden Sie das Suchfeld, um die Suche weiter einzugrenzen.",
+      "expanderAriaCollapsed": "Problemdetails anzeigen",
+      "expanderAriaExpanded": "Problemdetails ausblenden",
+      "detailHeading": "Warum diese Funktion {score} bewertet hat",
+      "detailNoIssues": "Keine Flags in dieser Zeile – die Bewertung wird durch die oben genannten Spaltenwerte bestimmt (Nutzung, Abdeckung, Komplexität, Alter, Dokumentation).",
+      "suppressLabel": "In Datei unterdrücken",
+      "suppressTooltip": "Schreibt „//ignore_for_file: code_health:<flag>“ in diese Datei, damit zukünftige Scans dieses Flag für die gesamte Datei löschen."
+    },
+    "flag": {
+      "unused": {
+        "label": "unbenutzt",
+        "evidence": "0 Anrufer",
+        "rule": "Wird markiert, wenn keine andere Datei auf diesen Funktionsnamen verweist."
+      },
+      "uncovered": {
+        "label": "aufgedeckt",
+        "evidence": "{pct}%-Tests",
+        "rule": "Wird gekennzeichnet, wenn LCOV eine Leitungsabdeckung von 0 % meldet."
+      },
+      "complex": {
+        "label": "Komplex",
+        "evidence": "CC {cc}",
+        "rule": "Wird markiert, wenn die zyklomatische Komplexität 10 überschreitet."
+      },
+      "undocumented": {
+        "label": "undokumentiert",
+        "evidence": "CC {cc}, kein Dokument",
+        "rule": "Wird markiert, wenn eine komplexe Funktion (CC > 10) keinen Dokumentkommentar hat."
+      },
+      "test_drift": {
+        "label": "Testdrift",
+        "evidence": "Tests verzögern die Funktion",
+        "rule": "Wird markiert, wenn die neueste verknüpfte Testdatei deutlich älter als die Quelldatei der Funktion ist."
+      },
+      "stub_tested": {
+        "label": "Stub-getestet",
+        "evidence": "dünn behauptet",
+        "rule": "Wird markiert, wenn ein verknüpfter Test vorhanden ist, aber kaum etwas aussagt."
+      },
+      "suspicious_coverage": {
+        "label": "verdächtige Berichterstattung",
+        "evidence": "{pct}% ohne Test",
+        "rule": "Wird markiert, wenn LCOV eine hohe Abdeckung meldet, aber kein Test auf die Funktion verweist."
+      }
     },
     "shortcuts": {
       "focusFilter": "Fokussieren Sie den Zeilenfilter",

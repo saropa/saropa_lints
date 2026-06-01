@@ -25,8 +25,7 @@ void main() {
     if (target != null && target is! ThisExpression) return false;
     if (!node.methodName.name.startsWith('_')) return false;
 
-    final ClassDeclaration? cls = node
-        .thisOrAncestorOfType<ClassDeclaration>();
+    final ClassDeclaration? cls = node.thisOrAncestorOfType<ClassDeclaration>();
     if (cls == null) return false;
 
     for (final ClassMember member in cls.bodyMembers) {
@@ -46,7 +45,11 @@ void main() {
   MethodInvocation findCall(CompilationUnit unit, String methodName) {
     MethodInvocation? hit;
     unit.visitChildren(_CallFinder(methodName, (n) => hit ??= n));
-    expect(hit, isNotNull, reason: 'call to `$methodName` not found in snippet');
+    expect(
+      hit,
+      isNotNull,
+      reason: 'call to `$methodName` not found in snippet',
+    );
     return hit!;
   }
 

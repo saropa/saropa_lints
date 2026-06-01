@@ -63,7 +63,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 -->
 
-## [Unreleased]
+## [13.11.5]
 
 ### Added
 
@@ -77,6 +77,12 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 ### Changed (Extension)
 
 - **Code Health Dashboard "Worst functions" rows now explain WHY each function scored low.** Flag pills (`unused`, `complex`, `undocumented`, …) used to carry only the label, so a reader had to look at four other columns to reconstruct the evidence. Each pill now reads `complex (CC 36)`, `unused (0 callers)`, `uncovered (0% tests)` etc. — the threshold the row tripped, inline. A chevron next to the score expands the row to show every issue with its threshold rule (e.g. "Flagged when cyclomatic complexity exceeds 10"), so readers can confirm what to fix without leaving the table. Expand state survives sort and filter changes. No action required.
+
+<details><summary>Maintenance</summary>
+
+- Publish script no longer hard-aborts when the extension locale coverage gate fails. The user is now prompted Ignore / Retry (default) / Abort, so the typical recovery — edit `extension/scripts/i18n/dictionaries.py` and rerun the generator — happens in-place without restarting the whole publish.
+
+</details>
 
 ---
 

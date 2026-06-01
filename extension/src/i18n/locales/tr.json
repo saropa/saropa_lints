@@ -420,7 +420,17 @@
       "packagesBreakdown": "{direct} doğrudan, {transitive} geçişli",
       "gradeLine": "Derece {grade} · {avg}/100",
       "flaggedCount": "{count} işaretlendi",
-      "flaggedTitle": "Terk edilmiş veya ömrünün sonu"
+      "flaggedTitle": "Terk edilmiş veya ömrünün sonu",
+      "lastScanLabel": "Taranan {when}",
+      "lastScanTitle": "Bu kontrol paneli verileri getirildiğinde — {timestamp}. Yenilemek için Yeniden Tara'yı tıklayın.",
+      "lastScanUnknown": "Tarandı (zaman bilinmiyor)",
+      "lastScanUnknownTitle": "Bu tarama, kontrol panelinin zaman damgalarını izlemesinden önce çalıştırıldı. Yenilemek için Yeniden Tara'yı tıklayın."
+    },
+    "time": {
+      "justNow": "Şu anda",
+      "minutesAgo": "{min} dk önce",
+      "hoursAgo": "{hr} sa önce",
+      "daysAgo": "{day} g önce"
     },
     "scanning": {
       "heading": "Paketler taranıyor",
@@ -444,7 +454,7 @@
       "singleUse": "Tek kullanımlık",
       "vulnerable": "Hassas",
       "overrides": "Geçersiz kılmalar",
-      "caveatLine1": "*Kod boyutları mevcut olmadığında pub.dev arşiv boyutuna geri dönen kod boyutları (lib + bildirilen varlıklar) gösterilir. Ağaç sallandıktan sonra gerçek uygulama boyutu daha küçük olacaktır.",
+      "caveatLine1": "*Kod boyutları mevcut olmadığında pub.dev arşiv boyutuna geri dönen kod boyutları (lib + bildirilen varlıklar) gösterilir. dev_dependencing'leri (build_runner, lints, saropa_lints vb.) hariç tutar; bunlar hiçbir zaman APK / IPA / web paketine gönderilmez. Ağaç sallandıktan sonra gerçek uygulama boyutu daha küçük olacaktır.",
       "caveatLine2": "Etkinlik eşikleri: 90d = eski, 180d = hareketsiz (taahhüt + sürüm zaman çizelgeleri)."
     },
     "breakdown": {
@@ -470,6 +480,7 @@
     },
     "sections": {
       "sizeDistribution": "Boyut Dağılımı",
+      "sizeDistributionCaption": "dev_dependencing'leri hariç tutar; hiçbir zaman APK / IPA / web paketine gönderilmezler.",
       "filters": "Filtreler",
       "packages": "Paketler"
     },
@@ -803,7 +814,50 @@
       "noMatch": "Geçerli filtrelerle eşleşen işlev yok.",
       "resetFiltersTitle": "Aramayı ve tüm etkin bayrak filtrelerini temizleyin.",
       "resetFilters": "Filtreleri sıfırla",
-      "hint": "Puana göre en kötü 200 fonksiyon gösteriliyor. Daha da daraltmak için arama alanını kullanın."
+      "hint": "Puana göre en kötü 200 fonksiyon gösteriliyor. Daha da daraltmak için arama alanını kullanın.",
+      "expanderAriaCollapsed": "Sorun ayrıntılarını göster",
+      "expanderAriaExpanded": "Sorun ayrıntılarını gizle",
+      "detailHeading": "Bu işlev neden {score} puanını aldı?",
+      "detailNoIssues": "Bu satırda bayrak yok; puan, yukarıdaki sütun değerlerine göre belirlenir (kullanım, kapsam, karmaşıklık, yaş, belgeler).",
+      "suppressLabel": "Dosyada bastır",
+      "suppressTooltip": "Bu dosyaya `// görmezden_for_dosya: code_health:<flag>` yazar, böylece gelecekteki taramalar dosyanın tamamı için bu bayrağı bırakır."
+    },
+    "flag": {
+      "unused": {
+        "label": "kullanılmayan",
+        "evidence": "0 arayan",
+        "rule": "Başka hiçbir dosya bu işlev adına başvurmadığında işaretlenir."
+      },
+      "uncovered": {
+        "label": "açıkta",
+        "evidence": "{pct}% testleri",
+        "rule": "LCOV %0 hat kapsama alanı bildirdiğinde işaretlenir."
+      },
+      "complex": {
+        "label": "karmaşık",
+        "evidence": "CC {cc}",
+        "rule": "Döngüsel karmaşıklık 10'u aştığında işaretlenir."
+      },
+      "undocumented": {
+        "label": "belgesiz",
+        "evidence": "CC {cc}, belge yok",
+        "rule": "Karmaşık bir işlevin (CC > 10) belge yorumu olmadığında işaretlenir."
+      },
+      "test_drift": {
+        "label": "test kayması",
+        "evidence": "testler fonksiyonu geciktiriyor",
+        "rule": "En yeni bağlantılı test dosyası, işlevin kaynak dosyasından anlamlı derecede eski olduğunda işaretlenir."
+      },
+      "stub_tested": {
+        "label": "saplama testi yapılmış",
+        "evidence": "ince iddia ediyor",
+        "rule": "Bağlantılı bir test mevcut olduğunda işaretlenir ancak neredeyse hiçbir şey iddia etmez."
+      },
+      "suspicious_coverage": {
+        "label": "şüpheli kapsam",
+        "evidence": "Test olmadan %{pct}",
+        "rule": "LCOV yüksek kapsam bildirdiğinde ancak hiçbir test işleve referans vermediğinde işaretlenir."
+      }
     },
     "shortcuts": {
       "focusFilter": "Satır filtresine odaklan",

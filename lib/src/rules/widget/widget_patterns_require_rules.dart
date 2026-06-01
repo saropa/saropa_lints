@@ -1186,8 +1186,9 @@ class RequireErrorWidgetRule extends SaropaLintRule {
     final FormalParameter second = list[1];
     // Optional/named-defaulted parameters are wrapped; unwrap before
     // inspecting the underlying name token.
-    final FormalParameter inner =
-        second is DefaultFormalParameter ? second.parameter : second;
+    final FormalParameter inner = second is DefaultFormalParameter
+        ? second.parameter
+        : second;
     if (inner is SimpleFormalParameter) {
       return inner.name?.lexeme;
     }

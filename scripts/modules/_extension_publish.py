@@ -173,6 +173,29 @@ def regenerate_extension_locales_from_english(project_dir: Path) -> bool | None:
     return True
 
 
+def _prompt_locale_coverage_failure() -> str:
+    """Ask user what to do after the locale coverage gate failed.
+
+    Returns 'ignore' | 'retry' | 'abort'. Default (empty input) is
+    Retry — the typical recovery is to edit dictionaries.py and rerun
+    the generator without aborting the whole publish. Ctrl+C / EOF
+    falls through to Abort so the user can always bail out hard.
+    """
+    print_warning("Extension locale coverage gate FAILED. Choose an action:")
+    print_colored("  [I]gnore and continue (ship with missing translations)", Color.CYAN)
+    print_colored("  [R]etry (re-run generator after editing dictionaries.py)", Color.CYAN)
+    print_colored("  [A]bort (stop publish)", Color.CYAN)
+    try:
+        raw = input("  Choice [i/R/a]: ").strip().lower() or "r"
+        if raw.startswith("i"):
+            return "ignore"
+        if raw.startswith("a"):
+            return "abort"
+        return "retry"
+    except (EOFError, KeyboardInterrupt):
+        return "abort"
+
+
 def run_extension_compile(project_dir: Path) -> bool:
     """Run npm run compile in extension directory. Returns True on success."""
     ext_dir = _extension_dir(project_dir)
@@ -359,20 +382,31 @@ def package_extension(project_dir: Path, version: str) -> Path | None:
         print_warning("Root CHANGELOG.md not found; extension .vsix will have no changelog.")
     if not copy_readme_to_extension(project_dir):
         print_warning("Root README.md not found; extension .vsix will have no README.")
-    regen = regenerate_extension_locales_from_english(project_dir)
-    if regen is True:
-        print_success("Extension locale JSON regenerated from English sources.")
-    elif regen is False:
-        # Coverage gate: the generator ran with --fail-on-missing, so a non-zero
-        # exit means at least one locale still has untranslated strings (or the
-        # i18n scripts errored). Abort rather than ship a partially-English
-        # "translated" bundle — the user chose MT + gate over silent passthrough.
-        print_error(
-            "Extension locale coverage gate FAILED — at least one locale has "
-            "missing translations (or the i18n generator errored). Resolve the "
-            "gaps (see the printed coverage table; add curated dictionaries.py "
-            "entries) and rerun. Publish aborted."
-        )
+    # Coverage gate: the generator runs with --fail-on-missing, so a non-zero
+    # exit means at least one locale still has untranslated strings (or the
+    # i18n scripts errored). On failure, prompt Ignore / Retry / Abort instead
+    # of hard-aborting — Retry is the common case (user edits dictionaries.py
+    # and reruns), Ignore lets the user ship despite gaps when intentional,
+    # Abort matches the prior behavior.
+    while True:
+        regen = regenerate_extension_locales_from_english(project_dir)
+        if regen is True:
+            print_success("Extension locale JSON regenerated from English sources.")
+            break
+        if regen is None:
+            # No i18n scripts present; nothing to gate.
+            break
+        choice = _prompt_locale_coverage_failure()
+        if choice == "retry":
+            print_info("Re-running extension locale generator...")
+            continue
+        if choice == "ignore":
+            print_warning(
+                "Continuing with missing extension translations — bundle will ship "
+                "with some English passthroughs."
+            )
+            break
+        print_error("Publish aborted at extension locale coverage gate.")
         return None
     if not run_extension_compile(project_dir):
         return None

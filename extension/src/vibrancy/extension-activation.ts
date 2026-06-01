@@ -687,6 +687,10 @@ function registerCommands(
                     // — without this the dashboard rendered as `Grade E · 0/100` with
                     // an empty table during the first scan and looked broken.
                     isScanning: targets.state.isScanning.value,
+                    // Drives the "Scanned X ago" pill in the hero so users can verify
+                    // a Rescan click really produced fresh data (vs. coalescing into
+                    // a still-pending scan that returns the same numbers).
+                    lastScanTimestamp: lastScanMeta.scanTimestamp,
                 });
             },
         ),

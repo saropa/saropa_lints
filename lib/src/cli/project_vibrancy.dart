@@ -693,7 +693,7 @@ List<String> _collectTargetFiles(ProjectVibrancyOptions options) {
       // hand-written, and never improvable by a code-health flag.
       if (posix.contains('/lib/l10n/') &&
           (p.basename(posix).startsWith('app_localizations') ||
-           p.basename(posix).startsWith('intl_'))) {
+              p.basename(posix).startsWith('intl_'))) {
         continue;
       }
       // Skip pathologically large files — almost always generated (gen-l10n

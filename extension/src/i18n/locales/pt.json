@@ -420,7 +420,17 @@
       "packagesBreakdown": "{direct} direto, {transitive} transitivo",
       "gradeLine": "Nota {grade} · {avg}/100",
       "flaggedCount": "{count} marcados",
-      "flaggedTitle": "Abandonado ou em fim de vida"
+      "flaggedTitle": "Abandonado ou em fim de vida",
+      "lastScanLabel": "{when} digitalizado",
+      "lastScanTitle": "Quando os dados deste painel foram buscados – {timestamp}. Clique em Rescan para atualizar.",
+      "lastScanUnknown": "Digitalizado (horário desconhecido)",
+      "lastScanUnknownTitle": "Essa verificação foi executada antes que o painel monitorasse os carimbos de data/hora. Clique em Rescan para atualizar."
+    },
+    "time": {
+      "justNow": "agora mesmo",
+      "minutesAgo": "há {min} m",
+      "hoursAgo": "há {hr} h",
+      "daysAgo": "há {day} d"
     },
     "scanning": {
       "heading": "Verificando pacotes",
@@ -444,7 +454,7 @@
       "singleUse": "Uso único",
       "vulnerable": "Vulnerável",
       "overrides": "Substituições",
-      "caveatLine1": "*Tamanhos de código mostrados (lib + ativos declarados), voltando ao tamanho do arquivo pub.dev quando o tamanho do código não está disponível. O tamanho real do aplicativo será menor após a agitação da árvore.",
+      "caveatLine1": "*Tamanhos de código mostrados (lib + ativos declarados), voltando ao tamanho do arquivo pub.dev quando o tamanho do código não está disponível. Exclui dev_dependencies (build_runner, lints, saropa_lints, etc.) — eles nunca são enviados para o pacote APK/IPA/web. O tamanho real do aplicativo será menor após a agitação da árvore.",
       "caveatLine2": "Limites de atividade: 90d = obsoleto, 180d = inativo (prazos de confirmação + lançamento)."
     },
     "breakdown": {
@@ -470,6 +480,7 @@
     },
     "sections": {
       "sizeDistribution": "Distribuição de tamanho",
+      "sizeDistributionCaption": "Exclui dev_dependencies — eles nunca são enviados para o pacote APK/IPA/web.",
       "filters": "Filtros",
       "packages": "Pacotes"
     },
@@ -803,7 +814,50 @@
       "noMatch": "Nenhuma função corresponde aos filtros atuais.",
       "resetFiltersTitle": "Limpe a pesquisa e qualquer filtro de sinalização ativo.",
       "resetFilters": "Redefinir filtros",
-      "hint": "Mostrando as 200 piores funções por pontuação. Use o campo de pesquisa para restringir ainda mais."
+      "hint": "Mostrando as 200 piores funções por pontuação. Use o campo de pesquisa para restringir ainda mais.",
+      "expanderAriaCollapsed": "Mostrar detalhes do problema",
+      "expanderAriaExpanded": "Ocultar detalhes do problema",
+      "detailHeading": "Por que esta função obteve pontuação {score}",
+      "detailNoIssues": "Não há sinalizadores nesta linha — a pontuação é determinada pelos valores da coluna acima (uso, cobertura, complexidade, idade, documentação).",
+      "suppressLabel": "Suprimir no arquivo",
+      "suppressTooltip": "Grava `// ignore_for_file: code_health:<flag>` neste arquivo para que verificações futuras eliminem esse sinalizador para todo o arquivo."
+    },
+    "flag": {
+      "unused": {
+        "label": "não utilizado",
+        "evidence": "0 chamadores",
+        "rule": "Sinalizado quando nenhum outro arquivo faz referência a esse nome de função."
+      },
+      "uncovered": {
+        "label": "descoberto",
+        "evidence": "Testes {pct}%",
+        "rule": "Sinalizado quando o LCOV reporta 0% de cobertura de linha."
+      },
+      "complex": {
+        "label": "complexo",
+        "evidence": "CC {cc}",
+        "rule": "Sinalizado quando a complexidade ciclomática excede 10."
+      },
+      "undocumented": {
+        "label": "indocumentado",
+        "evidence": "CC {cc}, sem documento",
+        "rule": "Sinalizado quando uma função complexa (CC > 10) não possui comentários no documento."
+      },
+      "test_drift": {
+        "label": "desvio de teste",
+        "evidence": "testes atrasam a função",
+        "rule": "Sinalizado quando o arquivo de teste vinculado mais recente é significativamente mais antigo que o arquivo de origem da função."
+      },
+      "stub_tested": {
+        "label": "testado em esboço",
+        "evidence": "afirmações finas",
+        "rule": "Sinalizado quando existe um teste vinculado, mas quase não afirma nada."
+      },
+      "suspicious_coverage": {
+        "label": "cobertura suspeita",
+        "evidence": "{pct}% sem teste",
+        "rule": "Sinalizado quando o LCOV relata alta cobertura, mas nenhum teste faz referência à função."
+      }
     },
     "shortcuts": {
       "focusFilter": "Focar o filtro de linha",

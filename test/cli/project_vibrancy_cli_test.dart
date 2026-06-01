@@ -367,105 +367,130 @@ int bad() {
       if (tempDir.existsSync()) tempDir.deleteSync(recursive: true);
     });
 
-    test('codegen filename suffixes (.drift.dart / .pb.dart / .gr.dart) are not scanned', () async {
-      File('${tempDir.path}/lib/users.drift.dart').writeAsStringSync('''
+    test(
+      'codegen filename suffixes (.drift.dart / .pb.dart / .gr.dart) are not scanned',
+      () async {
+        File('${tempDir.path}/lib/users.drift.dart').writeAsStringSync('''
 class UsersTable {
   void mig() { if (true) {} }
 }
 ''');
-      File('${tempDir.path}/lib/api.pb.dart').writeAsStringSync('class Api {}\n');
-      File('${tempDir.path}/lib/routes.gr.dart').writeAsStringSync('class Routes {}\n');
-      File('${tempDir.path}/lib/real.dart').writeAsStringSync('int real() => 1;\n');
-      final report = await runProjectVibrancy(
-        ProjectVibrancyOptions(projectPath: tempDir.path),
-      );
-      // Only `real` should show up; codegen-suffix files never get parsed so
-      // their functions don't appear in the result list.
-      final names = report.functions.map((f) => f.name).toList();
-      expect(names, equals(['real']));
-    });
+        File(
+          '${tempDir.path}/lib/api.pb.dart',
+        ).writeAsStringSync('class Api {}\n');
+        File(
+          '${tempDir.path}/lib/routes.gr.dart',
+        ).writeAsStringSync('class Routes {}\n');
+        File(
+          '${tempDir.path}/lib/real.dart',
+        ).writeAsStringSync('int real() => 1;\n');
+        final report = await runProjectVibrancy(
+          ProjectVibrancyOptions(projectPath: tempDir.path),
+        );
+        // Only `real` should show up; codegen-suffix files never get parsed so
+        // their functions don't appear in the result list.
+        final names = report.functions.map((f) => f.name).toList();
+        expect(names, equals(['real']));
+      },
+    );
 
-    test('header marker (GENERATED CODE / DO NOT EDIT) skips and counts the file', () async {
-      File('${tempDir.path}/lib/handwritten.dart').writeAsStringSync('int real() => 1;\n');
-      // File has a hand-written-looking name but a codegen header — the
-      // filename filter misses it; the header check must catch it.
-      File('${tempDir.path}/lib/looks_normal.dart').writeAsStringSync('''
+    test(
+      'header marker (GENERATED CODE / DO NOT EDIT) skips and counts the file',
+      () async {
+        File(
+          '${tempDir.path}/lib/handwritten.dart',
+        ).writeAsStringSync('int real() => 1;\n');
+        // File has a hand-written-looking name but a codegen header — the
+        // filename filter misses it; the header check must catch it.
+        File('${tempDir.path}/lib/looks_normal.dart').writeAsStringSync('''
 // GENERATED CODE - DO NOT MODIFY BY HAND
 int leakyGen() {
   if (true) { return 1; }
   return 2;
 }
 ''');
-      final report = await runProjectVibrancy(
-        ProjectVibrancyOptions(projectPath: tempDir.path),
-      );
-      expect(report.functions.map((f) => f.name), equals(['real']));
-      expect(report.suppressions.codegenFiles, equals(1));
-      expect(report.suppressions.directiveFiles, equals(0));
-      // The summary block must surface the count so the dashboard can render it.
-      final summary = report.toJson()['summary'] as Map<String, Object?>;
-      final supp = summary['suppressions'] as Map<String, Object?>;
-      expect(supp['codegenFiles'], equals(1));
-    });
+        final report = await runProjectVibrancy(
+          ProjectVibrancyOptions(projectPath: tempDir.path),
+        );
+        expect(report.functions.map((f) => f.name), equals(['real']));
+        expect(report.suppressions.codegenFiles, equals(1));
+        expect(report.suppressions.directiveFiles, equals(0));
+        // The summary block must surface the count so the dashboard can render it.
+        final summary = report.toJson()['summary'] as Map<String, Object?>;
+        final supp = summary['suppressions'] as Map<String, Object?>;
+        expect(supp['codegenFiles'], equals(1));
+      },
+    );
 
-    test('bare // ignore_for_file: code_health drops the whole file from results', () async {
-      File('${tempDir.path}/lib/keep.dart').writeAsStringSync('int keep() => 1;\n');
-      File('${tempDir.path}/lib/drop.dart').writeAsStringSync('''
+    test(
+      'bare // ignore_for_file: code_health drops the whole file from results',
+      () async {
+        File(
+          '${tempDir.path}/lib/keep.dart',
+        ).writeAsStringSync('int keep() => 1;\n');
+        File('${tempDir.path}/lib/drop.dart').writeAsStringSync('''
 // ignore_for_file: code_health
 int drop() {
   if (true) {}
   return 1;
 }
 ''');
-      final report = await runProjectVibrancy(
-        ProjectVibrancyOptions(projectPath: tempDir.path),
-      );
-      expect(report.functions.map((f) => f.name), equals(['keep']));
-      expect(report.suppressions.directiveFiles, equals(1));
-      expect(report.suppressions.codegenFiles, equals(0));
-    });
+        final report = await runProjectVibrancy(
+          ProjectVibrancyOptions(projectPath: tempDir.path),
+        );
+        expect(report.functions.map((f) => f.name), equals(['keep']));
+        expect(report.suppressions.directiveFiles, equals(1));
+        expect(report.suppressions.codegenFiles, equals(0));
+      },
+    );
 
-    test('// ignore_for_file: code_health:complex,undocumented drops those flags only', () async {
-      // Build a function whose complexity is high enough to trip both `complex`
-      // and `undocumented` (CC > 10 + no doc comment). Without the directive
-      // the row would carry both flags; with it, neither should appear, while
-      // `unused` (also true because the function has no callers) still does.
-      final body = StringBuffer('int spaghetti() {\n');
-      for (var i = 0; i < 12; i++) {
-        body.writeln('  if ($i > 0) {}');
-      }
-      body.writeln('  return 1;\n}');
-      File('${tempDir.path}/lib/spaghetti.dart').writeAsStringSync('''
+    test(
+      '// ignore_for_file: code_health:complex,undocumented drops those flags only',
+      () async {
+        // Build a function whose complexity is high enough to trip both `complex`
+        // and `undocumented` (CC > 10 + no doc comment). Without the directive
+        // the row would carry both flags; with it, neither should appear, while
+        // `unused` (also true because the function has no callers) still does.
+        final body = StringBuffer('int spaghetti() {\n');
+        for (var i = 0; i < 12; i++) {
+          body.writeln('  if ($i > 0) {}');
+        }
+        body.writeln('  return 1;\n}');
+        File('${tempDir.path}/lib/spaghetti.dart').writeAsStringSync('''
 // ignore_for_file: code_health:complex,undocumented
 ${body.toString()}
 ''');
-      final report = await runProjectVibrancy(
-        ProjectVibrancyOptions(projectPath: tempDir.path),
-      );
-      expect(report.functions, hasLength(1));
-      final row = report.functions.single;
-      expect(row.flags, contains('unused'));
-      expect(row.flags, isNot(contains('complex')));
-      expect(row.flags, isNot(contains('undocumented')));
-    });
+        final report = await runProjectVibrancy(
+          ProjectVibrancyOptions(projectPath: tempDir.path),
+        );
+        expect(report.functions, hasLength(1));
+        final row = report.functions.single;
+        expect(row.flags, contains('unused'));
+        expect(row.flags, isNot(contains('complex')));
+        expect(row.flags, isNot(contains('undocumented')));
+      },
+    );
 
-    test('mixed-list directive `// ignore_for_file: avoid_print, code_health` still suppresses', () async {
-      // The analyzer-grammar comma list can legitimately mix `code_health`
-      // with real lint rule names. The parser must find `code_health` as a
-      // token (not just a substring) and treat the bare form as whole-file.
-      File('${tempDir.path}/lib/mixed.dart').writeAsStringSync('''
+    test(
+      'mixed-list directive `// ignore_for_file: avoid_print, code_health` still suppresses',
+      () async {
+        // The analyzer-grammar comma list can legitimately mix `code_health`
+        // with real lint rule names. The parser must find `code_health` as a
+        // token (not just a substring) and treat the bare form as whole-file.
+        File('${tempDir.path}/lib/mixed.dart').writeAsStringSync('''
 // ignore_for_file: avoid_print, code_health
 int mixed() {
   if (true) {}
   return 1;
 }
 ''');
-      final report = await runProjectVibrancy(
-        ProjectVibrancyOptions(projectPath: tempDir.path),
-      );
-      expect(report.functions, isEmpty);
-      expect(report.suppressions.directiveFiles, equals(1));
-    });
+        final report = await runProjectVibrancy(
+          ProjectVibrancyOptions(projectPath: tempDir.path),
+        );
+        expect(report.functions, isEmpty);
+        expect(report.suppressions.directiveFiles, equals(1));
+      },
+    );
   });
 }
 

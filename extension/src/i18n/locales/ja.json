@@ -420,7 +420,17 @@
       "packagesBreakdown": "直接 {direct}、推移的 {transitive}",
       "gradeLine": "等級 {grade} · {avg}/100",
       "flaggedCount": "{count} 件フラグ付き",
-      "flaggedTitle": "放棄または寿命終了"
+      "flaggedTitle": "放棄または寿命終了",
+      "lastScanLabel": "スキャン済み {when}",
+      "lastScanTitle": "このダッシュボード データが取得された時刻 — {timestamp}。 「再スキャン」をクリックして更新します。",
+      "lastScanUnknown": "スキャン済み（時期不明）",
+      "lastScanUnknownTitle": "このスキャンは、ダッシュボードがタイムスタンプを追跡する前に実行されました。 「再スキャン」をクリックして更新します。"
+    },
+    "time": {
+      "justNow": "ちょうど今",
+      "minutesAgo": "{min} 分前",
+      "hoursAgo": "{hr} 時間前",
+      "daysAgo": "{day} 日前"
     },
     "scanning": {
       "heading": "パッケージのスキャン",
@@ -444,7 +454,7 @@
       "singleUse": "使い捨て",
       "vulnerable": "脆弱",
       "overrides": "オーバーライド",
-      "caveatLine1": "*表示されるコード サイズ (lib + 宣言されたアセット)。コード サイズが利用できない場合は、pub.dev アーカイブ サイズに戻ります。実際のアプリのサイズは、ツリーシェイキング後は小さくなります。",
+      "caveatLine1": "*表示されるコード サイズ (lib + 宣言されたアセット)。コード サイズが利用できない場合は、pub.dev アーカイブ サイズに戻ります。 dev_dependency (build_runner、lints、saropa_lints など) は除外されます。これらは APK / IPA / Web バンドルに配布されることはありません。実際のアプリのサイズは、ツリーシェイキング後は小さくなります。",
       "caveatLine2": "アクティビティのしきい値: 90 日 = 古い、180 日 = 休止中 (コミット + リリースのタイムライン)。"
     },
     "breakdown": {
@@ -470,6 +480,7 @@
     },
     "sections": {
       "sizeDistribution": "サイズ分布",
+      "sizeDistributionCaption": "dev_dependency は除外されます。APK / IPA / Web バンドルには決して出荷されません。",
       "filters": "フィルター",
       "packages": "パッケージ"
     },
@@ -803,7 +814,50 @@
       "noMatch": "現在のフィルターに一致する関数はありません。",
       "resetFiltersTitle": "検索とアクティブなフラグ フィルターをクリアします。",
       "resetFilters": "フィルターをリセットする",
-      "hint": "最悪の 200 個の関数をスコア別に表示します。検索フィールドを使用してさらに絞り込みます。"
+      "hint": "最悪の 200 個の関数をスコア別に表示します。検索フィールドを使用してさらに絞り込みます。",
+      "expanderAriaCollapsed": "問題の詳細を表示する",
+      "expanderAriaExpanded": "問題の詳細を非表示にする",
+      "detailHeading": "この関数のスコアが {score} となった理由",
+      "detailNoIssues": "この行にはフラグがありません。スコアは上記の列の値 (使用量、カバレッジ、複雑さ、経過時間、ドキュメント) によって決まります。",
+      "suppressLabel": "ファイル内で抑制する",
+      "suppressTooltip": "`//ignore_for_file: code_health:<flag>` をこのファイルに書き込み、今後のスキャンでファイル全体のこのフラグを削除します。"
+    },
+    "flag": {
+      "unused": {
+        "label": "未使用",
+        "evidence": "発信者0人",
+        "rule": "他のファイルがこの関数名を参照していない場合にフラグが立てられます。"
+      },
+      "uncovered": {
+        "label": "覆われていない",
+        "evidence": "{pct}% テスト",
+        "rule": "LCOV が 0% のライン カバレッジを報告するとフラグが立てられます。"
+      },
+      "complex": {
+        "label": "複雑な",
+        "evidence": "CC {cc}",
+        "rule": "循環的複雑度が 10 を超えるとフラグが立てられます。"
+      },
+      "undocumented": {
+        "label": "文書化されていない",
+        "evidence": "CC {cc}、ドキュメントなし",
+        "rule": "複雑な関数 (CC > 10) に doc コメントがない場合にフラグが立てられます。"
+      },
+      "test_drift": {
+        "label": "テストドリフト",
+        "evidence": "テストが関数に遅れる",
+        "rule": "最新のリンクされたテスト ファイルが関数のソース ファイルよりもかなり古い場合にフラグが立てられます。"
+      },
+      "stub_tested": {
+        "label": "スタブテスト済み",
+        "evidence": "薄いアサート",
+        "rule": "リンクされたテストは存在するが、ほとんど何もアサートされていない場合にフラグが立てられます。"
+      },
+      "suspicious_coverage": {
+        "label": "不審な報道",
+        "evidence": "{pct}% (テストなし)",
+        "rule": "LCOV が高いカバレッジを報告するが、その関数を参照するテストがない場合にフラグが立てられます。"
+      }
     },
     "shortcuts": {
       "focusFilter": "行フィルターに焦点を当てる",

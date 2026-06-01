@@ -420,7 +420,17 @@
       "packagesBreakdown": "직접 {direct}개, 전이 {transitive}개",
       "gradeLine": "등급 {grade} · {avg}/100",
       "flaggedCount": "{count}개 플래그됨",
-      "flaggedTitle": "버려졌거나 수명이 다한 상태"
+      "flaggedTitle": "버려졌거나 수명이 다한 상태",
+      "lastScanLabel": "스캔한 {when}",
+      "lastScanTitle": "이 대시보드 데이터를 가져온 시기 — {timestamp}. 새로 고치려면 다시 검색을 클릭하세요.",
+      "lastScanUnknown": "스캔됨(시간 알 수 없음)",
+      "lastScanUnknownTitle": "이 검사는 대시보드가 ​​타임스탬프를 추적하기 전에 실행되었습니다. 새로 고치려면 다시 검색을 클릭하세요."
+    },
+    "time": {
+      "justNow": "방금",
+      "minutesAgo": "{min}분 전",
+      "hoursAgo": "{hr}시간 전",
+      "daysAgo": "{day}일 전"
     },
     "scanning": {
       "heading": "패키지 스캔 중",
@@ -444,7 +454,7 @@
       "singleUse": "일회용",
       "vulnerable": "취약한",
       "overrides": "재정의",
-      "caveatLine1": "*표시된 코드 크기(lib + 선언된 자산), 코드 크기를 사용할 수 없는 경우 pub.dev 아카이브 크기로 대체됩니다. 트리 흔들기 후에는 실제 앱 크기가 더 작아집니다.",
+      "caveatLine1": "*표시된 코드 크기(lib + 선언된 자산), 코드 크기를 사용할 수 없는 경우 pub.dev 아카이브 크기로 대체됩니다. dev_dependent(build_runner, lints, saropa_lints 등)를 제외합니다. 이는 APK/IPA/웹 번들로 제공되지 않습니다. 트리 흔들기 후에는 실제 앱 크기가 더 작아집니다.",
       "caveatLine2": "활동 임계값: 90일 = 오래됨, 180일 = 휴면(커밋 + 릴리스 타임라인)."
     },
     "breakdown": {
@@ -470,6 +480,7 @@
     },
     "sections": {
       "sizeDistribution": "크기 분포",
+      "sizeDistributionCaption": "dev_dependent를 제외합니다. APK/IPA/웹 번들로 제공되지 않습니다.",
       "filters": "필터",
       "packages": "패키지"
     },
@@ -803,7 +814,50 @@
       "noMatch": "현재 필터와 일치하는 기능이 없습니다.",
       "resetFiltersTitle": "검색 및 활성 플래그 필터를 지웁니다.",
       "resetFilters": "필터 재설정",
-      "hint": "점수별로 최악의 기능 200개를 보여줍니다. 더 범위를 좁히려면 검색 필드를 사용하세요."
+      "hint": "점수별로 최악의 기능 200개를 보여줍니다. 더 범위를 좁히려면 검색 필드를 사용하세요.",
+      "expanderAriaCollapsed": "문제 세부정보 표시",
+      "expanderAriaExpanded": "문제 세부정보 숨기기",
+      "detailHeading": "이 함수의 점수가 {score}인 이유",
+      "detailNoIssues": "이 행에는 플래그가 없습니다. 점수는 위의 열 값(사용량, 적용 범위, 복잡성, 연령, 문서)에 따라 결정됩니다.",
+      "suppressLabel": "파일에서 억제",
+      "suppressTooltip": "`//ignore_for_file: code_health:<flag>`를 이 파일에 기록하므로 향후 검색 시 전체 파일에 대해 이 플래그가 삭제됩니다."
+    },
+    "flag": {
+      "unused": {
+        "label": "미사용",
+        "evidence": "발신자 0명",
+        "rule": "다른 파일이 이 함수 이름을 참조하지 않을 때 플래그가 지정됩니다."
+      },
+      "uncovered": {
+        "label": "폭로된",
+        "evidence": "{pct}% 테스트",
+        "rule": "LCOV가 0% 라인 커버리지를 보고하면 플래그가 지정됩니다."
+      },
+      "complex": {
+        "label": "복잡한",
+        "evidence": "CC {cc}",
+        "rule": "순환 복잡도가 10을 초과하면 플래그가 지정됩니다."
+      },
+      "undocumented": {
+        "label": "문서화되지 않은",
+        "evidence": "CC {cc}, 문서 없음",
+        "rule": "복잡한 함수(CC > 10)에 문서 주석이 없을 때 플래그가 지정됩니다."
+      },
+      "test_drift": {
+        "label": "테스트 드리프트",
+        "evidence": "테스트가 기능보다 지연됩니다.",
+        "rule": "가장 최근에 연결된 테스트 파일이 함수의 소스 파일보다 의미 있게 오래된 경우 플래그가 지정됩니다."
+      },
+      "stub_tested": {
+        "label": "스텁 테스트를 거친",
+        "evidence": "얇은 주장",
+        "rule": "연결된 테스트가 존재하지만 거의 아무것도 주장하지 않는 경우 플래그가 지정됩니다."
+      },
+      "suspicious_coverage": {
+        "label": "의심스러운 보도",
+        "evidence": "테스트 없이 {pct}%",
+        "rule": "LCOV가 높은 적용 범위를 보고하지만 해당 기능을 참조하는 테스트가 없을 때 플래그가 지정됩니다."
+      }
     },
     "shortcuts": {
       "focusFilter": "행 필터에 집중",

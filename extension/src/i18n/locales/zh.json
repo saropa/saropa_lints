@@ -420,7 +420,17 @@
       "packagesBreakdown": "{direct} 个直接，{transitive} 个传递",
       "gradeLine": "牌号 {grade} · {avg}/100",
       "flaggedCount": "已标记 {count} 个",
-      "flaggedTitle": "被遗弃或报废"
+      "flaggedTitle": "被遗弃或报废",
+      "lastScanLabel": "已扫描 {when}",
+      "lastScanTitle": "获取此仪表板数据时 — {timestamp}。单击“重新扫描”进行刷新。",
+      "lastScanUnknown": "已扫描（时间未知）",
+      "lastScanUnknownTitle": "此扫描在仪表板跟踪时间戳之前运行。单击“重新扫描”进行刷新。"
+    },
+    "time": {
+      "justNow": "现在",
+      "minutesAgo": "{min} 分钟前",
+      "hoursAgo": "{hr} 小时前",
+      "daysAgo": "{day} 天前"
     },
     "scanning": {
       "heading": "扫描包裹",
@@ -444,7 +454,7 @@
       "singleUse": "一次性使用",
       "vulnerable": "易受伤害的",
       "overrides": "覆盖",
-      "caveatLine1": "*显示代码大小（lib + 声明的资产），当代码大小不可用时，回退到 pub.dev 存档大小。 Tree Shaking 后实际应用程序大小会更小。",
+      "caveatLine1": "*显示代码大小（lib + 声明的资产），当代码大小不可用时，回退到 pub.dev 存档大小。排除 dev_dependency（build_runner、lints、saropa_lints 等）——它们永远不会发送到 APK / IPA / Web 捆绑包。 Tree Shaking 后实际应用程序大小会更小。",
       "caveatLine2": "活动阈值：90d = 陈旧，180d = 休眠（提交 + 发布时间表）。"
     },
     "breakdown": {
@@ -470,6 +480,7 @@
     },
     "sections": {
       "sizeDistribution": "尺寸分布",
+      "sizeDistributionCaption": "排除 dev_dependency — 它们永远不会发送到 APK / IPA / Web 捆绑包。",
       "filters": "过滤器",
       "packages": "套餐"
     },
@@ -803,7 +814,50 @@
       "noMatch": "没有与当前过滤器匹配的功能。",
       "resetFiltersTitle": "清除搜索和任何活动标志过滤器。",
       "resetFilters": "重置过滤器",
-      "hint": "按分数显示最差的 200 个函数。使用搜索字段进一步缩小范围。"
+      "hint": "按分数显示最差的 200 个函数。使用搜索字段进一步缩小范围。",
+      "expanderAriaCollapsed": "显示问题详细信息",
+      "expanderAriaExpanded": "隐藏问题详细信息",
+      "detailHeading": "为什么这个函数得分为{score}",
+      "detailNoIssues": "此行上没有标志 - 分数由上面的列值（使用情况、覆盖范围、复杂性、年龄、文档）驱动。",
+      "suppressLabel": "抑制在文件中",
+      "suppressTooltip": "将 `//ignore_for_file: code_health:<flag>` 写入此文件，以便将来的扫描删除整个文件的此标志。"
+    },
+    "flag": {
+      "unused": {
+        "label": "未使用",
+        "evidence": "0 来电者",
+        "rule": "当没有其他文件引用此函数名称时进行标记。"
+      },
+      "uncovered": {
+        "label": "裸露",
+        "evidence": "{pct}% 测试",
+        "rule": "当 LCOV 报告 0% 线路覆盖率时进行标记。"
+      },
+      "complex": {
+        "label": "复杂的",
+        "evidence": "CC {cc}",
+        "rule": "当圈复杂度超过 10 时进行标记。"
+      },
+      "undocumented": {
+        "label": "无证的",
+        "evidence": "CC {cc}，无文档",
+        "rule": "当复杂函数 (CC > 10) 没有文档注释时进行标记。"
+      },
+      "test_drift": {
+        "label": "测试漂移",
+        "evidence": "测试滞后于功能",
+        "rule": "当最新链接的测试文件明显早于函数的源文件时进行标记。"
+      },
+      "stub_tested": {
+        "label": "存根测试",
+        "evidence": "薄断言",
+        "rule": "当存在链接测试但几乎没有断言任何内容时进行标记。"
+      },
+      "suspicious_coverage": {
+        "label": "可疑报道",
+        "evidence": "{pct}% 未测试",
+        "rule": "当 LCOV 报告高覆盖率但没有测试引用该函数时进行标记。"
+      }
     },
     "shortcuts": {
       "focusFilter": "聚焦行过滤器",

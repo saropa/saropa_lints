@@ -420,7 +420,17 @@
       "packagesBreakdown": "{direct} trực tiếp, {transitive} bắc cầu",
       "gradeLine": "Cấp {grade} · {avg}/100",
       "flaggedCount": "{count} đã gắn cờ",
-      "flaggedTitle": "Bị bỏ rơi hoặc cuối đời"
+      "flaggedTitle": "Bị bỏ rơi hoặc cuối đời",
+      "lastScanLabel": "Đã quét {when}",
+      "lastScanTitle": "Khi dữ liệu bảng điều khiển này được tìm nạp - {timestamp}. Nhấp vào Quét lại để làm mới.",
+      "lastScanUnknown": "Đã quét (không rõ thời gian)",
+      "lastScanUnknownTitle": "Quá trình quét này diễn ra trước dấu thời gian được theo dõi trên trang tổng quan. Nhấp vào Quét lại để làm mới."
+    },
+    "time": {
+      "justNow": "ngay bây giờ",
+      "minutesAgo": "{min} phút trước",
+      "hoursAgo": "{hr} giờ trước",
+      "daysAgo": "{day} ngày trước"
     },
     "scanning": {
       "heading": "Gói quét",
@@ -444,7 +454,7 @@
       "singleUse": "Sử dụng một lần",
       "vulnerable": "Dễ bị tổn thương",
       "overrides": "Ghi đè",
-      "caveatLine1": "*Kích thước mã được hiển thị (lib + nội dung được khai báo), quay trở lại kích thước lưu trữ pub.dev khi không có kích thước mã. Kích thước ứng dụng thực tế sẽ nhỏ hơn sau khi cây rung.",
+      "caveatLine1": "*Kích thước mã được hiển thị (lib + nội dung được khai báo), quay trở lại kích thước lưu trữ pub.dev khi không có kích thước mã. Không bao gồm dev_dependency (build_runner, lints, saropa_lints, v.v.) — chúng không bao giờ gửi đến gói APK / IPA / web. Kích thước ứng dụng thực tế sẽ nhỏ hơn sau khi cây rung.",
       "caveatLine2": "Ngưỡng hoạt động: 90d = cũ, 180d = không hoạt động (cam kết + mốc thời gian phát hành)."
     },
     "breakdown": {
@@ -470,6 +480,7 @@
     },
     "sections": {
       "sizeDistribution": "Phân bố kích thước",
+      "sizeDistributionCaption": "Không bao gồm dev_dependency — chúng không bao giờ gửi tới gói APK / IPA / web.",
       "filters": "Bộ lọc",
       "packages": "Gói"
     },
@@ -803,7 +814,50 @@
       "noMatch": "Không có chức năng nào phù hợp với bộ lọc hiện tại.",
       "resetFiltersTitle": "Xóa tìm kiếm và mọi bộ lọc cờ đang hoạt động.",
       "resetFilters": "Đặt lại bộ lọc",
-      "hint": "Hiển thị 200 chức năng tồi tệ nhất theo điểm số. Sử dụng trường tìm kiếm để thu hẹp hơn nữa."
+      "hint": "Hiển thị 200 chức năng tồi tệ nhất theo điểm số. Sử dụng trường tìm kiếm để thu hẹp hơn nữa.",
+      "expanderAriaCollapsed": "Hiển thị chi tiết vấn đề",
+      "expanderAriaExpanded": "Ẩn chi tiết vấn đề",
+      "detailHeading": "Tại sao chức năng này đạt điểm {score}",
+      "detailNoIssues": "Không có cờ nào trên hàng này — điểm số được xác định bởi các giá trị cột ở trên (mức sử dụng, mức độ phù hợp, độ phức tạp, độ tuổi, tài liệu).",
+      "suppressLabel": "Ngăn chặn trong tập tin",
+      "suppressTooltip": "Ghi `// ign_for_file: code_health:<flag>` vào tệp này để các lần quét trong tương lai bỏ cờ này cho toàn bộ tệp."
+    },
+    "flag": {
+      "unused": {
+        "label": "chưa sử dụng",
+        "evidence": "0 người gọi",
+        "rule": "Được gắn cờ khi không có tệp nào khác tham chiếu đến tên hàm này."
+      },
+      "uncovered": {
+        "label": "chưa được khám phá",
+        "evidence": "Kiểm tra {pct}%",
+        "rule": "Được gắn cờ khi LCOV báo cáo mức độ bao phủ đường dây là 0%."
+      },
+      "complex": {
+        "label": "tổ hợp",
+        "evidence": "CC {cc}",
+        "rule": "Được gắn cờ khi độ phức tạp chu kỳ vượt quá 10."
+      },
+      "undocumented": {
+        "label": "không có giấy tờ",
+        "evidence": "CC {cc}, không có tài liệu",
+        "rule": "Được gắn cờ khi hàm phức tạp (CC > 10) không có nhận xét tài liệu."
+      },
+      "test_drift": {
+        "label": "thử trôi dạt",
+        "evidence": "kiểm tra độ trễ của chức năng",
+        "rule": "Được gắn cờ khi tệp kiểm tra được liên kết mới nhất cũ hơn đáng kể so với tệp nguồn của hàm."
+      },
+      "stub_tested": {
+        "label": "thử nghiệm sơ khai",
+        "evidence": "khẳng định mỏng",
+        "rule": "Được gắn cờ khi có một bài kiểm tra được liên kết nhưng hầu như không khẳng định điều gì."
+      },
+      "suspicious_coverage": {
+        "label": "tin tức đáng ngờ",
+        "evidence": "{pct}% không có kiểm tra",
+        "rule": "Được gắn cờ khi LCOV báo cáo mức độ phù hợp cao nhưng không có thử nghiệm nào tham chiếu đến chức năng này."
+      }
     },
     "shortcuts": {
       "focusFilter": "Tập trung vào bộ lọc hàng",

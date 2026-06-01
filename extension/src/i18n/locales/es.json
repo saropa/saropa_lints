@@ -420,7 +420,17 @@
       "packagesBreakdown": "{direct} directo, {transitive} transitivo",
       "gradeLine": "Calificación {grade} · {avg}/100",
       "flaggedCount": "{count} marcado(s)",
-      "flaggedTitle": "Abandonado o al final de su vida"
+      "flaggedTitle": "Abandonado o al final de su vida",
+      "lastScanLabel": "Escaneado {when}",
+      "lastScanTitle": "Cuando se obtuvieron los datos de este panel: {timestamp}. Haga clic en Volver a escanear para actualizar.",
+      "lastScanUnknown": "Escaneado (hora desconocida)",
+      "lastScanUnknownTitle": "Este análisis se ejecutó antes de que el panel rastreara las marcas de tiempo. Haga clic en Volver a escanear para actualizar."
+    },
+    "time": {
+      "justNow": "En este momento",
+      "minutesAgo": "hace {min} m",
+      "hoursAgo": "hace {hr} h",
+      "daysAgo": "hace {day} d"
     },
     "scanning": {
       "heading": "Paquetes de escaneo",
@@ -444,7 +454,7 @@
       "singleUse": "De un solo uso",
       "vulnerable": "Vulnerable",
       "overrides": "Anulaciones",
-      "caveatLine1": "*Se muestran los tamaños de código (lib + activos declarados), recurriendo al tamaño del archivo pub.dev cuando el tamaño del código no está disponible. El tamaño real de la aplicación será menor después de sacudir el árbol.",
+      "caveatLine1": "*Se muestran los tamaños de código (lib + activos declarados), recurriendo al tamaño del archivo pub.dev cuando el tamaño del código no está disponible. Excluye dev_dependencies (build_runner, lints, saropa_lints, etc.): nunca se envían al paquete APK/IPA/web. El tamaño real de la aplicación será menor después de sacudir el árbol.",
       "caveatLine2": "Umbrales de actividad: 90d = obsoleto, 180d = inactivo (cronogramas de confirmación + liberación)."
     },
     "breakdown": {
@@ -470,6 +480,7 @@
     },
     "sections": {
       "sizeDistribution": "Distribución de tamaño",
+      "sizeDistributionCaption": "Excluye dev_dependencies: nunca se envían al paquete APK/IPA/web.",
       "filters": "Filtros",
       "packages": "Paquetes"
     },
@@ -803,7 +814,50 @@
       "noMatch": "Ninguna función coincide con los filtros actuales.",
       "resetFiltersTitle": "Borre la búsqueda y cualquier filtro de bandera activo.",
       "resetFilters": "Restablecer filtros",
-      "hint": "Mostrando las peores 200 funciones por puntuación. Utilice el campo de búsqueda para limitar aún más."
+      "hint": "Mostrando las peores 200 funciones por puntuación. Utilice el campo de búsqueda para limitar aún más.",
+      "expanderAriaCollapsed": "Mostrar detalles del problema",
+      "expanderAriaExpanded": "Ocultar detalles del problema",
+      "detailHeading": "Por qué esta función obtuvo {score}",
+      "detailNoIssues": "No hay indicadores en esta fila: la puntuación depende de los valores de las columnas anteriores (uso, cobertura, complejidad, antigüedad, documentación).",
+      "suppressLabel": "Suprimir en archivo",
+      "suppressTooltip": "Escribe `// ignore_for_file: code_health:<flag>` en este archivo para que análisis futuros eliminen este indicador para todo el archivo."
+    },
+    "flag": {
+      "unused": {
+        "label": "no usado",
+        "evidence": "0 personas que llaman",
+        "rule": "Marcado cuando ningún otro archivo hace referencia a este nombre de función."
+      },
+      "uncovered": {
+        "label": "descubierto",
+        "evidence": "{pct}% pruebas",
+        "rule": "Se marca cuando LCOV informa una cobertura de línea del 0%."
+      },
+      "complex": {
+        "label": "complejo",
+        "evidence": "CC {cc}",
+        "rule": "Se marca cuando la complejidad ciclomática supera 10."
+      },
+      "undocumented": {
+        "label": "indocumentado",
+        "evidence": "CC {cc}, sin documento",
+        "rule": "Se marca cuando una función compleja (CC > 10) no tiene ningún comentario en el documento."
+      },
+      "test_drift": {
+        "label": "deriva de prueba",
+        "evidence": "las pruebas retrasan la función",
+        "rule": "Se marca cuando el archivo de prueba vinculado más reciente es significativamente más antiguo que el archivo fuente de la función."
+      },
+      "stub_tested": {
+        "label": "probado",
+        "evidence": "delgado afirma",
+        "rule": "Se marca cuando existe una prueba vinculada pero apenas afirma nada."
+      },
+      "suspicious_coverage": {
+        "label": "cobertura sospechosa",
+        "evidence": "{pct}% sin prueba",
+        "rule": "Se marca cuando LCOV informa una cobertura alta pero ninguna prueba hace referencia a la función."
+      }
     },
     "shortcuts": {
       "focusFilter": "Enfocar el filtro de fila",
