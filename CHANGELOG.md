@@ -63,6 +63,12 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 -->
 
+## [Unreleased]
+
+### Fixed
+
+- **`avoid_expensive_build` no longer fires on iteration primitives (`sort`, `where`, `map`, `fold`, `reduce`) inside `build()`.** These calls are the idiomatic shape of list-to-widget rendering (`Column(children: items.map(...).toList())` is the Flutter cookbook pattern) and produced noise without measurable cost on typical UI list sizes — one production project saw 45 WARNING hits on the first run, every one a small-list render. The rule now flags only genuinely heavy operations: `jsonDecode`, `jsonEncode`, `parse`, `tryParse`, `compute`, and the `readAsXxx` file-I/O family. Remove any project-local `// ignore: avoid_expensive_build` comments added for the iteration patterns above.
+
 ## [13.11.6]
 
 ### Fixed
