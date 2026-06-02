@@ -587,7 +587,16 @@ def maybe_bump_for_tag_clash(
     changelog_path: Path,
     version_to_sync: str,
 ) -> str:
-    """If tag v{version} exists on remote, bump version and add CHANGELOG section.
+    """If tag v{version} exists on remote, bump version and PROMOTE the top
+    CHANGELOG section to the new version (filename ⇔ CHANGELOG sync).
+
+    The publish artifact (`.vsix` filename, `pubspec.yaml` version, git tag,
+    Marketplace listing) and the top CHANGELOG section MUST carry the same
+    version — otherwise users see release notes that do not match the version
+    they install. When the colliding tag is detected we therefore RENAME the
+    existing top section, never insert a placeholder "Release version" stub
+    (the prior behavior shipped meaningless notes for v13.11.9 — see
+    `bugs/infra_publish_tag_clash_stub.md`).
 
     Returns:
         The final version string (bumped if tag existed, unchanged otherwise).
@@ -601,17 +610,63 @@ def maybe_bump_for_tag_clash(
         f"Version {version_to_sync} has already been published."
     )
     print_info(
-        f"Bumping to {next_version} and adding CHANGELOG section."
+        f"Bumping to {next_version} and promoting top CHANGELOG section."
     )
     set_version_in_pubspec(pubspec_path, next_version)
-    add_version_section(
-        changelog_path, next_version, "Release version",
+    promoted_from = _promote_top_section_to_version(
+        changelog_path, version_to_sync, next_version,
     )
+    if promoted_from is None:
+        # Refuse to insert a stub — the top section is something the script
+        # can't safely repurpose (e.g. a manually-edited future version or
+        # no version section at all). The user must add real [next_version]
+        # notes by hand so the .vsix filename matches the CHANGELOG.
+        exit_with_error(
+            f"Cannot publish [{next_version}]: top CHANGELOG section is "
+            f"neither [{version_to_sync}] nor [Unreleased], so the script "
+            f"won't auto-rename it. The published version, .vsix filename, "
+            f"and top CHANGELOG section MUST be in sync. Manually add a "
+            f"[{next_version}] section above the current top section with "
+            f"real release notes, then re-run.",
+            ExitCode.CHANGELOG_FAILED,
+        )
     print_success(
-        f"Updated pubspec.yaml to {next_version} and added "
-        f"[{next_version}] to CHANGELOG.md (Release version)."
+        f"Updated pubspec.yaml to {next_version} and renamed top CHANGELOG "
+        f"section [{promoted_from}] → [{next_version}]."
     )
     return next_version
+
+
+def _promote_top_section_to_version(
+    changelog_path: Path, expected_version: str, next_version: str,
+) -> str | None:
+    """Rename the top `## [X]` heading to `## [next_version]` when X is the
+    expected colliding version or [Unreleased].
+
+    Returns the original heading label on success, None when the top section
+    is something else (caller should abort rather than guess).
+    """
+    content = changelog_path.read_text(encoding="utf-8")
+    # Match the first ## [...] heading anywhere in the file — there are no
+    # version-like headings before the first release section in this repo's
+    # CHANGELOG layout (the header block uses no `## [...]` form).
+    match = re.search(r"## \[([^\]]+)\]", content)
+    if not match:
+        return None
+    label = match.group(1)
+    if label != expected_version and label != "Unreleased":
+        return None
+    # Refuse if the target version already has its own section — caller's
+    # abort path is safer than silently merging two histories.
+    if re.search(rf"## \[{re.escape(next_version)}\]", content):
+        return None
+    new_content = (
+        content[: match.start()]
+        + f"## [{next_version}]"
+        + content[match.end() :]
+    )
+    changelog_path.write_text(new_content, encoding="utf-8")
+    return label
 
 
 def sync_version_with_changelog(
