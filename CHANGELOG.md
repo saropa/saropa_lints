@@ -63,6 +63,12 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 -->
 
+## [Unreleased]
+
+### Fixed
+
+- **`avoid_nullable_interpolation` no longer fires on `${x ?? fallback}`, on syntactic `if (x != null)` / `x != null ? ... : ...` guards over chained property access, or on developer-facing log calls (`debug`, `breadcrumb`, `debugPrint`, `print`, `dart:developer log`).** Enabling the rule on a real Flutter codebase produced floods of false positives at sites where the developer had already handled null or was intentionally logging it for diagnosis (one project saw 58 raw hits across 22 sites, half of them inside `debug()` strings where seeing `null` IS the point). Remove any project-local `// ignore: avoid_nullable_interpolation` comments added for these three patterns.
+
 ## [13.11.7]
 
 ### Fixed

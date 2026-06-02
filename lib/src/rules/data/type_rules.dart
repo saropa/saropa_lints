@@ -396,7 +396,22 @@ class AvoidImplicitlyNullableExtensionTypesRule extends SaropaLintRule {
 
 /// Warns when interpolating a nullable value in a string.
 ///
-/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+/// Since: v0.1.4 | Updated: v6 | Rule version: v6
+///
+/// v6 narrowing — three classes of false-positive suppressed so the
+/// rule's remaining hits represent the actual "user sees null in the UI"
+/// failure mode it was designed for:
+///
+/// 1. `${x ?? fallback}` — the `??` operator IS the developer's null
+///    handling; trust it even if the fallback type still reads nullable.
+/// 2. `expr != null ? '...$expr...' : ...` and `if (expr != null) { ... }`
+///    — syntactic null guards on the same source expression. Dart's
+///    flow analysis already narrows local variables; this catches the
+///    chained-property cases (`widget.contact.uuid`) that flow can't
+///    promote.
+/// 3. Interpolation inside `debug()`, `breadcrumb()`, `debugPrint()`,
+///    `print()`, or `dart:developer log()` — diagnostic output where
+///    seeing "null" IS the intended signal.
 ///
 /// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidNullableInterpolationRule extends SaropaLintRule {
@@ -418,12 +433,25 @@ class AvoidNullableInterpolationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'avoid_nullable_interpolation',
     "[avoid_nullable_interpolation] Nullable value in string interpolation produces the literal text 'null' instead of a meaningful fallback. "
-        "Users may see 'Hello null' or 'Order #null' in the UI, which looks like a bug and erodes trust in the application quality and data integrity. {v5}",
+        "Users may see 'Hello null' or 'Order #null' in the UI, which looks like a bug and erodes trust in the application quality and data integrity. {v6}",
     correctionMessage:
         "Add a null check before interpolation, or use the null-coalescing operator (??) to provide a sensible default (e.g., '\${name ?? \"Guest\"}'). "
         'For complex formatting, consider a helper method that handles null values with appropriate placeholder text.',
     severity: DiagnosticSeverity.WARNING,
   );
+
+  /// Call targets whose string arguments are developer-facing diagnostic
+  /// output. Interpolating a nullable into one of these is intentional —
+  /// the literal "null" IS the diagnostic signal the developer wants to
+  /// see in their log channel. Flagging it would push developers to hide
+  /// the very nulls they are trying to diagnose.
+  static const Set<String> _developerLogCallTargets = <String>{
+    'debug', // saropa-specific log helper
+    'breadcrumb', // saropa-specific log helper
+    'debugPrint', // Flutter SDK
+    'print', // Dart core
+    'log', // dart:developer
+  };
 
   @override
   void runWithReporter(
@@ -435,11 +463,112 @@ class AvoidNullableInterpolationRule extends SaropaLintRule {
       final DartType? type = expr.staticType;
       if (type == null) return;
 
-      if (type.nullabilitySuffix == NullabilitySuffix.question) {
-        reporter.atNode(node);
+      if (type.nullabilitySuffix != NullabilitySuffix.question) return;
+
+      // `${x ?? fallback}`: developer explicitly handled null via `??`.
+      // Trust the intent even when the fallback's static type is also
+      // nullable — both sides being null is a separate concern, and
+      // re-flagging the `??` form drowns the signal in noise.
+      final Expression inner = _unwrapParens(expr);
+      if (inner is BinaryExpression &&
+          inner.operator.type == TokenType.QUESTION_QUESTION) {
+        return;
       }
+
+      // Syntactic `expr != null` guard on the same expression: covers
+      // chained property access (e.g. `widget.contact.uuid`) that Dart
+      // flow analysis refuses to promote, where the user has clearly
+      // already proven non-null in the enclosing then-branch.
+      if (_hasNotNullAncestorGuard(node)) return;
+
+      // Developer-facing log call: see _developerLogCallTargets.
+      if (_isInsideDeveloperLogCall(node)) return;
+
+      reporter.atNode(node);
     });
   }
+
+  Expression _unwrapParens(Expression e) {
+    Expression current = e;
+    while (current is ParenthesizedExpression) {
+      current = current.expression;
+    }
+    return current;
+  }
+
+  bool _isInsideDeveloperLogCall(InterpolationExpression node) {
+    // Walk up from the interpolation. The string can be inside an
+    // ArgumentList (positional or named) feeding a top-level invocation,
+    // or wrapped in AdjacentStrings / ParenthesizedExpression first.
+    // Stop at any function body — we don't want to attribute a log call
+    // in one scope to an interpolation in another.
+    AstNode? current = node.parent;
+    int hops = 0;
+    while (current != null && hops < 12) {
+      if (current is MethodInvocation) {
+        return _developerLogCallTargets.contains(current.methodName.name);
+      }
+      if (current is FunctionExpressionInvocation) return false;
+      if (current is InstanceCreationExpression) return false;
+      if (current is FunctionBody) return false;
+      current = current.parent;
+      hops++;
+    }
+    return false;
+  }
+
+  bool _hasNotNullAncestorGuard(InterpolationExpression node) {
+    final String exprSource = _normalizeSource(node.expression.toSource());
+    AstNode child = node;
+    AstNode? parent = node.parent;
+    while (parent != null) {
+      if (parent is ConditionalExpression &&
+          identical(parent.thenExpression, child)) {
+        if (_isNotNullCheckFor(parent.condition, exprSource)) return true;
+      }
+      if (parent is IfStatement &&
+          identical(parent.thenStatement, child) &&
+          _isNotNullCheckFor(parent.expression, exprSource)) {
+        return true;
+      }
+      if (parent is IfElement &&
+          identical(parent.thenElement, child) &&
+          _isNotNullCheckFor(parent.expression, exprSource)) {
+        return true;
+      }
+      // Don't escape past a function body — a guard outside the closure
+      // doesn't carry into it.
+      if (parent is FunctionBody) return false;
+      child = parent;
+      parent = parent.parent;
+    }
+    return false;
+  }
+
+  bool _isNotNullCheckFor(Expression condition, String exprSource) {
+    Expression c = condition;
+    while (c is ParenthesizedExpression) {
+      c = c.expression;
+    }
+    if (c is BinaryExpression && c.operator.type == TokenType.BANG_EQ) {
+      final Expression left = c.leftOperand;
+      final Expression right = c.rightOperand;
+      if (right is NullLiteral) {
+        return _normalizeSource(left.toSource()) == exprSource;
+      }
+      if (left is NullLiteral) {
+        return _normalizeSource(right.toSource()) == exprSource;
+      }
+    }
+    return false;
+  }
+
+  /// Strip whitespace so `widget.contact.uuid` matches across line breaks
+  /// inside multi-line conditions. We deliberately do NOT strip `?` here
+  /// (unlike `_getBaseExpression` elsewhere in this file) because the
+  /// guard `widget.contact?.uuid != null` proves a different invariant
+  /// than `widget.contact.uuid != null`.
+  String _normalizeSource(String src) => src.replaceAll(RegExp(r'\s+'), '');
 }
 
 /// Warns when nullable parameters have default values that could be non-null.

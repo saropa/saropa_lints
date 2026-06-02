@@ -103,6 +103,8 @@
 // Test fixture for: avoid_nullable_interpolation
 // Source: lib\src\rules\type_rules.dart
 
+import 'dart:developer' as developer;
+
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_nullable_interpolation
@@ -114,4 +116,64 @@ void _bad1225(String? name) {
 // GOOD: Should NOT trigger avoid_nullable_interpolation
 void _good1225(String? name) {
   final s = 'Hello ${name ?? "Guest"}'; // null-coalesced
+}
+
+// GOOD (v6): `??` with nullable fallback — developer signaled intent.
+// Even though the fallback `other` is itself nullable, the explicit `??`
+// is a deliberate null-handling choice; trust it.
+void _goodNullCoalesceNullableFallback(String? name, String? other) {
+  final s = 'Hello ${name ?? other}';
+}
+
+// GOOD (v6): syntactic `!= null` guard in ternary then-branch covers
+// chained property access that Dart flow analysis cannot promote.
+class _Contact {
+  String? uuid;
+}
+
+class _Widget {
+  final _Contact contact = _Contact();
+}
+
+String _goodTernaryGuardOnChainedAccess(_Widget widget) {
+  return widget.contact.uuid != null
+      ? 'avatar-${widget.contact.uuid}'
+      : 'avatar-anon';
+}
+
+// GOOD (v6): `if (x != null)` guard in then-block, chained access form.
+void _goodIfGuardChainedAccess(_Widget widget) {
+  if (widget.contact.uuid != null) {
+    final s = 'id=${widget.contact.uuid}';
+  }
+}
+
+// GOOD (v6): interpolation inside developer-facing log call.
+// "null" in the output IS the diagnostic signal.
+void debug(String message) {}
+void breadcrumb(String message) {}
+
+void _goodDebugLogString(String? name) {
+  debug('Missing [name]: $name');
+}
+
+void _goodPrintLogString(String? name) {
+  print('Order #$name');
+}
+
+void _goodDeveloperLogString(String? name) {
+  developer.log('User: $name');
+}
+
+void _goodBreadcrumbString(String? name) {
+  breadcrumb('checkout-step: $name');
+}
+
+// BAD: Real UI bug — nullable in a string built for the UI, no guard.
+class _UiCard {
+  _UiCard(this.name);
+  final String? name;
+
+  // expect_lint: avoid_nullable_interpolation
+  String build() => 'Hello, $name';
 }
