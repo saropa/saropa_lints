@@ -106,6 +106,14 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [13.11.9]
+
+### Changed
+
+- Release version
+
+---
+
 ## [13.11.4]
 
 ### Added (Extension)
