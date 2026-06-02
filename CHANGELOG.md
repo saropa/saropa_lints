@@ -63,11 +63,15 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 -->
 
-## [13.11.8]
+## [13.11.9]
 
 ### Fixed
 
 - **`avoid_nullable_interpolation` no longer fires on `${x ?? fallback}`, on syntactic `if (x != null)` / `x != null ? ... : ...` guards over chained property access, or on developer-facing log calls (`debug`, `breadcrumb`, `debugPrint`, `print`, `dart:developer log`).** Enabling the rule on a real Flutter codebase produced floods of false positives at sites where the developer had already handled null or was intentionally logging it for diagnosis (one project saw 58 raw hits across 22 sites, half of them inside `debug()` strings where seeing `null` IS the point). Remove any project-local `// ignore: avoid_nullable_interpolation` comments added for these three patterns.
+
+## [13.11.8]
+
+Identical content — re-released as `13.11.9` to repackage the VS Code extension `.vsix` for Marketplace upload. See `[13.11.9]` for the release notes.
 
 ## [13.11.7]
 
@@ -103,14 +107,6 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 - Publish script no longer hard-aborts when the extension locale coverage gate fails. The user is now prompted Ignore / Retry (default) / Abort, so the typical recovery — edit `extension/scripts/i18n/dictionaries.py` and rerun the generator — happens in-place without restarting the whole publish.
 
 </details>
-
----
-
-## [13.11.9]
-
-### Changed
-
-- Release version
 
 ---
 
