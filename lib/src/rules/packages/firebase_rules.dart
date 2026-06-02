@@ -62,7 +62,7 @@ class AvoidFirestoreUnboundedQueryRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
-  /// True when [.get] / [.snapshots] on a collection chain has no [limit] / doc.
+  /// True when `.get` / `.snapshots` on a collection chain has no `limit` / doc.
   static bool isUnboundedCollectionTerminal(MethodInvocation node) {
     final String methodName = node.methodName.name;
     if (methodName != 'get' && methodName != 'snapshots') return false;

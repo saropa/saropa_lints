@@ -4161,8 +4161,8 @@ class PreferSemanticsContainerRule extends SaropaLintRule {
 /// Image.asset('logo.png', semanticLabel: 'Company logo')
 /// ```
 ///
-/// **Quick fix available:** Removes the redundant outer [Semantics]; keeps the
-/// child [Image] and its `semanticLabel`.
+/// **Quick fix available:** Removes the redundant outer `Semantics`; keeps the
+/// child `Image` and its `semanticLabel`.
 class AvoidRedundantSemanticsRule extends SaropaLintRule {
   AvoidRedundantSemanticsRule() : super(code: _code);
 

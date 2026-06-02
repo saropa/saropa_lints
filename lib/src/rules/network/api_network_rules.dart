@@ -3516,7 +3516,7 @@ class PreferTimeoutOnRequestsRule extends SaropaLintRule {
     RegExp(r'\bDio\b'),
   ];
 
-  /// True when this HTTP client call has no [.timeout] chained (same as rule).
+  /// True when this HTTP client call has no `.timeout` chained (same as rule).
   static bool isMissingRequestTimeout(MethodInvocation node) {
     final String methodName = node.methodName.name;
     if (!_httpMethods.contains(methodName)) return false;
