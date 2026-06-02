@@ -154,10 +154,20 @@ class _ReturnVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when expensive operations are performed in build methods.
 ///
-/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v2
+/// Since: v1.7.2 | Updated: v13.11.7 | Rule version: v3
 ///
 /// Operations like JSON parsing, file I/O, or complex calculations
 /// should not be done in build() as it's called frequently.
+///
+/// **v3 — Narrowed to heavy operations only.** Iteration primitives
+/// (`sort`, `where`, `map`, `fold`, `reduce`) used to fire here and produced
+/// noise on idiomatic Flutter list rendering (`items.map(...).toList()` in
+/// `children:`), because the matcher was on the call name rather than the
+/// cost. The Flutter cookbook itself demonstrates the same pattern inside
+/// `build()`. The size-aware concern they raise is covered by
+/// `avoid_excessive_rebuilds_animation` and `prefer_value_listenable_builder`
+/// at the rebuild axis; this rule now stays unambiguous and actionable for
+/// the genuinely heavy class of operations.
 ///
 /// **BAD:**
 /// ```dart
@@ -194,12 +204,18 @@ class AvoidExpensiveBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'avoid_expensive_build',
     '[avoid_expensive_build] Expensive operations in build() run on every '
-        'frame, causing jank and dropped frames during animations. {v2}',
+        'frame, causing jank and dropped frames during animations. {v3}',
     correctionMessage:
         'Move expensive operations to initState, didChangeDependencies, or cache the result.',
     severity: DiagnosticSeverity.WARNING,
   );
 
+  // v3 (2026-06-01): iteration primitives (`sort`, `where`, `map`, `fold`,
+  // `reduce`) removed — they are the idiomatic shape of list-to-widget
+  // rendering inside `build()` and produced noise (≥45 hits in a single
+  // production project) without measurable perf cost on typical UI list
+  // sizes. The genuine "heavy in build()" concern is parsing/I/O/isolate
+  // dispatch — keep those.
   static const Set<String> _expensiveOperations = <String>{
     'jsonDecode',
     'jsonEncode',
@@ -211,11 +227,6 @@ class AvoidExpensiveBuildRule extends SaropaLintRule {
     'readAsBytesSync',
     'readAsStringSync',
     'compute',
-    'sort',
-    'where',
-    'map',
-    'fold',
-    'reduce',
   };
 
   @override

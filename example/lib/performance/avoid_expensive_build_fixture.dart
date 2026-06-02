@@ -124,3 +124,39 @@ void _good778() {
     return Text(data['name']);
   }
 }
+
+// v3 (2026-06-01): iteration primitives in build() no longer fire.
+// Coverage for the narrowing: `map`, `where`, `sort`, `fold`, `reduce`
+// applied to small UI lists are idiomatic Flutter and used to produce noise.
+// Each call site below would have fired under v2 and must NOT fire under v3.
+// Heavy operations (`jsonDecode`, etc.) still fire — see `_HeavyInBuild`.
+
+class _IterationInBuildOk extends StatelessWidget {
+  const _IterationInBuildOk({required this.items});
+
+  final List<String> items;
+
+  @override
+  Widget build(BuildContext context) {
+    // v2 would have flagged each of these. v3: silent.
+    final filtered = items.where((s) => s.isNotEmpty).toList();
+    final mapped = items.map((s) => Text(s)).toList();
+    final sorted = [...items]..sort();
+    final joined = items.fold<String>('', (acc, s) => '$acc$s');
+    final firstNonEmpty = filtered.reduce((a, b) => a.isNotEmpty ? a : b);
+    return Column(children: <Widget>[Text(joined), Text(firstNonEmpty), ...mapped, ...sorted.map(Text.new)]);
+  }
+}
+
+class _HeavyInBuild extends StatelessWidget {
+  const _HeavyInBuild({required this.json});
+
+  final String json;
+
+  @override
+  Widget build(BuildContext context) {
+    // expect_lint: avoid_expensive_build
+    final data = jsonDecode(json);
+    return Text(data['title']);
+  }
+}
