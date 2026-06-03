@@ -65,11 +65,12 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [Unreleased]
 
-A false-positive fix for the `avoid_large_list_copy` performance rule. No action required unless you added a project-local ignore for the pattern below. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
+False-positive fixes for the `avoid_large_list_copy` and `prefer_single_setstate` rules. No action required unless you added a project-local ignore for the patterns below. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
 
 ### Fixed
 
 - **`avoid_large_list_copy` no longer fires on `.toList()` used as a map-entry value or a set/list-literal element.** A `toJson()` map value such as `'items': items.map((e) => e.name).toList()` must be a concrete List because a lazy Iterable is not JSON-encodable, so the copy is structurally required, not gratuitous — remove any project-local `// ignore: avoid_large_list_copy` comments added on such literal entries.
+- **`prefer_single_setstate` no longer fires on `setState` calls that live in separate closures (e.g. two buttons' `onPressed` handlers).** Such calls run on different events and can never be merged, so only multiple `setState` calls within one synchronous execution scope are now flagged — remove any project-local `// ignore: prefer_single_setstate` comments added on distinct-callback `setState` calls.
 
 ## [13.11.10]
 

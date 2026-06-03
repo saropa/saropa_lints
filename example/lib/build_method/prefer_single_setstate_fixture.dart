@@ -127,3 +127,20 @@ void _good132_updateData() {
     _email = 'j@e.com';
   });
 }
+
+// GOOD: Two setStates in SEPARATE closures (distinct onPressed handlers) run on
+// different events and cannot be merged - must NOT trigger prefer_single_setstate.
+Widget _good132_separateClosures() {
+  return Column(
+    children: <Widget>[
+      ElevatedButton(
+        onPressed: () => setState(() => _a = false),
+        child: const Text('Retry'),
+      ),
+      ElevatedButton(
+        onPressed: () => setState(() => _b = false),
+        child: const Text('Settings'),
+      ),
+    ],
+  );
+}
