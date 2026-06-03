@@ -1334,61 +1334,80 @@ class RequireIntlDateFormatLocaleRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    // Check DateFormat constructor: DateFormat('pattern')
+    // Both forms parse as InstanceCreationExpression:
+    //   - unnamed:  DateFormat('pattern', locale)  -> constructorName.name == null
+    //   - named:    DateFormat.yMd(locale)         -> constructorName.name == 'yMd'
+    // The named factory constructors take the locale as their FIRST positional
+    // argument, so requiring args.length >= 2 (correct only for the unnamed
+    // pattern+locale form) falsely flagged every DateFormat.yMd(locale) call as
+    // missing a locale. Branch on the named-constructor segment instead.
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'DateFormat') return;
 
-      // DateFormat constructor takes pattern as first arg, locale as second
-      // If only one arg, locale is missing
       final args = node.argumentList.arguments;
-      if (args.length < 2) {
+      final SimpleIdentifier? namedConstructor = node.constructorName.name;
+
+      if (namedConstructor == null) {
+        // Unnamed constructor: DateFormat(pattern, locale).
+        // Pattern is arg 1, locale is arg 2 — fewer than two args means the
+        // locale is missing.
+        if (args.length < 2) {
+          reporter.atNode(node);
+        }
+        return;
+      }
+
+      // Named factory constructor: DateFormat.yMd(locale). The locale is the
+      // only relevant positional argument, so the call is missing a locale
+      // only when it has no arguments at all.
+      if (_factoryConstructors.contains(namedConstructor.name) &&
+          args.isEmpty) {
         reporter.atNode(node);
       }
     });
 
-    // Check DateFormat factory constructors: DateFormat.yMd()
+    // The parser only rewrites `DateFormat.yMd(...)` into an
+    // InstanceCreationExpression once the `intl` constructor resolves. When
+    // resolution is unavailable (e.g. a partially-analyzed file), the same
+    // source parses as a MethodInvocation with `DateFormat` as the target, so
+    // this handler covers the unresolved path. It mirrors the named-constructor
+    // logic above: a known factory with no arguments is missing its locale.
     context.addMethodInvocation((MethodInvocation node) {
       final Expression? target = node.target;
       if (target is! SimpleIdentifier || target.name != 'DateFormat') return;
 
-      // Factory constructors like yMd, yMMM, etc. take locale as first arg
-      final String methodName = node.methodName.name;
-      // Skip the main constructor (handled above)
-      if (methodName == 'DateFormat') return;
-
-      // cspell:ignore MMMMEEE
-      // Common factory constructors that need locale
-      const Set<String> factoryMethods = <String>{
-        'yMd',
-        'yMMMd',
-        'yMMMMd',
-        'yMMMM',
-        'yMMM',
-        'yM',
-        'y',
-        'Hm',
-        'Hms',
-        'jm',
-        'jms',
-        'E',
-        'EEEE',
-        'MMMd',
-        'MMMMd',
-        'Md',
-        'MEd',
-        'MMMEd',
-        'MMMMEEEEd',
-      };
-
-      if (factoryMethods.contains(methodName)) {
-        // Factory methods take optional locale as first argument
-        if (node.argumentList.arguments.isEmpty) {
-          reporter.atNode(node);
-        }
+      if (_factoryConstructors.contains(node.methodName.name) &&
+          node.argumentList.arguments.isEmpty) {
+        reporter.atNode(node);
       }
     });
   }
+
+  // cspell:ignore MMMMEEE
+  // Common DateFormat named factory constructors that accept an optional
+  // locale as their first positional argument.
+  static const Set<String> _factoryConstructors = <String>{
+    'yMd',
+    'yMMMd',
+    'yMMMMd',
+    'yMMMM',
+    'yMMM',
+    'yM',
+    'y',
+    'Hm',
+    'Hms',
+    'jm',
+    'jms',
+    'E',
+    'EEEE',
+    'MMMd',
+    'MMMMd',
+    'Md',
+    'MEd',
+    'MMMEd',
+    'MMMMEEEEd',
+  };
 }
 
 /// Warns when NumberFormat is used without explicit locale parameter.
