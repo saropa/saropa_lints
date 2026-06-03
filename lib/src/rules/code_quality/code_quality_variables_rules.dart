@@ -469,15 +469,34 @@ class AvoidParameterMutationRule extends SaropaLintRule {
   ) {
     if (params == null) return;
 
-    final Set<String> paramNames = <String>{};
+    // Map each parameter name to its declared type name (syntactic). The
+    // declared name lets us recognize mutation-by-design types even under a
+    // syntax-only parse (the scan CLI), where staticType is unavailable.
+    final Map<String, String?> paramTypeNames = <String, String?>{};
     for (final FormalParameter param in params.parameters) {
       final Token? name = param.name;
-      if (name != null) paramNames.add(name.lexeme);
+      if (name != null) {
+        paramTypeNames[name.lexeme] = _declaredTypeName(param);
+      }
     }
 
-    if (paramNames.isEmpty) return;
+    if (paramTypeNames.isEmpty) return;
 
-    body.visitChildren(_ParameterMutationVisitor(paramNames, reporter, _code));
+    body.visitChildren(
+      _ParameterMutationVisitor(paramTypeNames, reporter, _code),
+    );
+  }
+
+  /// Returns the simple name of a parameter's declared type, or null when it
+  /// has no explicit annotation. Unwraps optional/default parameters.
+  static String? _declaredTypeName(FormalParameter param) {
+    FormalParameter inner = param;
+    if (inner is DefaultFormalParameter) inner = inner.parameter;
+    if (inner is SimpleFormalParameter) {
+      final TypeAnnotation? type = inner.type;
+      if (type is NamedType) return type.name.lexeme;
+    }
+    return null;
   }
 }
 
@@ -487,9 +506,10 @@ class AvoidParameterMutationRule extends SaropaLintRule {
 /// Collection method calls (add, addAll, etc.) are intentionally skipped —
 /// they represent the standard accumulator/output pattern in Dart.
 class _ParameterMutationVisitor extends RecursiveAstVisitor<void> {
-  _ParameterMutationVisitor(this.paramNames, this.reporter, this.code);
+  _ParameterMutationVisitor(this.paramTypeNames, this.reporter, this.code);
 
-  final Set<String> paramNames;
+  /// Parameter name -> declared type name (null when unannotated).
+  final Map<String, String?> paramTypeNames;
   final SaropaDiagnosticReporter reporter;
   final LintCode code;
 
@@ -508,7 +528,7 @@ class _ParameterMutationVisitor extends RecursiveAstVisitor<void> {
     // Check for param.field = value pattern
     if (left is PrefixedIdentifier) {
       final SimpleIdentifier prefix = left.prefix;
-      if (paramNames.contains(prefix.name)) {
+      if (_isMutableParameter(prefix.name, prefix.staticType)) {
         reporter.atNode(node);
       }
     }
@@ -516,7 +536,8 @@ class _ParameterMutationVisitor extends RecursiveAstVisitor<void> {
     // Check for param[index] = value pattern
     if (left is IndexExpression) {
       final Expression? target = left.target;
-      if (target is SimpleIdentifier && paramNames.contains(target.name)) {
+      if (target is SimpleIdentifier &&
+          _isMutableParameter(target.name, target.staticType)) {
         reporter.atNode(node);
       }
     }
@@ -528,7 +549,8 @@ class _ParameterMutationVisitor extends RecursiveAstVisitor<void> {
   void visitCascadeExpression(CascadeExpression node) {
     // Check for param..field = value pattern (skip collection method cascades)
     final Expression target = node.target;
-    if (target is SimpleIdentifier && paramNames.contains(target.name)) {
+    if (target is SimpleIdentifier &&
+        _isMutableParameter(target.name, target.staticType)) {
       for (final Expression section in node.cascadeSections) {
         if (section is AssignmentExpression) {
           reporter.atNode(node);
@@ -538,6 +560,54 @@ class _ParameterMutationVisitor extends RecursiveAstVisitor<void> {
     }
     super.visitCascadeExpression(node);
   }
+
+  /// True when [name] is a parameter whose mutation should be flagged.
+  ///
+  /// Excludes notifiers/sinks whose mutation IS the contract (e.g.
+  /// `ValueNotifier.value = x`): a caller passes one in precisely so the callee
+  /// can update it and notify listeners. Flagging that as caller-data
+  /// corruption is a false positive — only plain DTOs/collections are the real
+  /// target. Recognition uses the declared type name (works under the
+  /// syntax-only scan) and, when types are resolved, the supertype chain (so
+  /// custom subclasses of ChangeNotifier are also excluded).
+  bool _isMutableParameter(String name, DartType? staticType) {
+    if (!paramTypeNames.containsKey(name)) return false;
+    final String? declaredType = paramTypeNames[name];
+    if (declaredType != null &&
+        _mutationByDesignTypeNames.contains(declaredType)) {
+      return false;
+    }
+    if (_isMutationByDesignType(staticType)) return false;
+    return true;
+  }
+}
+
+/// Type names whose mutation IS the designed contract — a caller passes one in
+/// precisely so the callee can update it (e.g. `notifier.value = x` to notify
+/// listeners, `sink.add(...)` / `controller` writes). These are not the plain
+/// caller-owned DTOs/collections that [AvoidParameterMutationRule] targets, so
+/// assigning through them must not fire.
+const Set<String> _mutationByDesignTypeNames = <String>{
+  'ValueNotifier',
+  'ChangeNotifier',
+  'Listenable',
+  'ValueListenable',
+  'Sink',
+  'EventSink',
+  'StreamSink',
+  'StreamController',
+};
+
+/// True when [type] is, or implements/extends, a mutation-by-design type.
+///
+/// Walks the supertype chain so subclasses (a custom `class FooNotifier
+/// extends ChangeNotifier`) are also recognized, not just the exact names.
+bool _isMutationByDesignType(DartType? type) {
+  if (type is! InterfaceType) return false;
+  if (_mutationByDesignTypeNames.contains(type.element.name)) return true;
+  return type.allSupertypes.any(
+    (InterfaceType t) => _mutationByDesignTypeNames.contains(t.element.name),
+  );
 }
 
 // cspell:ignore valuel

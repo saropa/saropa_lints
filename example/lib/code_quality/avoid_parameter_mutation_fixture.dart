@@ -7,6 +7,34 @@ class User {
   User(this.name, this.age);
 }
 
+// Mutation-by-design types. The example package has no Flutter dependency, so
+// these mirror the foundation classes the rule recognizes by name/supertype.
+abstract class Listenable {}
+
+class ChangeNotifier implements Listenable {}
+
+class ValueNotifier<T> extends ChangeNotifier {
+  ValueNotifier(this.value);
+  T value;
+}
+
+// A user-defined notifier subclass — recognized via the supertype walk.
+class BusyNotifier extends ChangeNotifier {
+  bool busy = false;
+}
+
+// GOOD: updating a ValueNotifier param is its entire designed purpose. The
+// caller passes it in precisely so the callee can set .value and notify
+// listeners — not a caller-owned DTO being corrupted.
+void setBusy(ValueNotifier<bool> isBusy) {
+  isBusy.value = true; // No lint - notifier mutation is by design
+}
+
+// GOOD: a ChangeNotifier subclass field write is also by design.
+void toggleBusy(BusyNotifier notifier) {
+  notifier.busy = true; // No lint - type extends ChangeNotifier
+}
+
 /// Tests parameter mutation detection
 void testParameterMutation() {
   // BAD: List mutation - add
