@@ -63,6 +63,15 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 -->
 
+## [Unreleased]
+
+### Fixed
+
+- **`require_file_exists_check` no longer fires when the read is guarded by the synchronous `existsSync()` check.** Only the async `exists()` form was recognized, so the common `file.existsSync() ? await file.readAsBytes() : null` pattern was wrongly flagged — the guard is now also detected in `if` conditions, ternary conditions, and preceding statements. Remove any project-local `// ignore: require_file_exists_check` added on `existsSync()`-guarded reads.
+- **`avoid_parameter_mutation` no longer fires on `notifier.value = x` for a `ValueNotifier`/`ChangeNotifier` parameter.** Mutating a notifier passed in for that exact purpose is idiomatic Flutter, not corruption of caller-owned data, so the warning was inapplicable — remove any project-local `// ignore: avoid_parameter_mutation` comments added on such notifier writes.
+- **`require_intl_date_format_locale` no longer fires on `DateFormat.yMd(locale)` and other named constructors that already pass a locale.** Named constructors take the locale as their only positional argument, but the rule applied the unnamed-constructor rule (needs two arguments) and flagged every one — one project saw 16 false positives in a single file. Remove any project-local `// ignore: require_intl_date_format_locale` comments added on such calls.
+- **`prefer_value_listenable_builder` no longer fires when the single state field is a `Future`/`Stream` cache backing a `FutureBuilder`/`StreamBuilder`.** That field uses `setState` to invalidate-and-re-fetch (e.g. `_future = null`), which `ValueListenableBuilder` cannot express, so the suggestion was inapplicable — remove any project-local `// ignore: prefer_value_listenable_builder` added on such async-cache states.
+
 ## [13.11.9]
 
 ### Fixed
