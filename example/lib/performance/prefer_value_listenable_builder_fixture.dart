@@ -115,8 +115,45 @@ dynamic value;
 class _bad790__MyState extends State<MyWidget> {
   int _counter = 0;
 
+  void _inc() => setState(() => _counter++);
+
   Widget build(BuildContext context) {
     return Text('$_counter');
+  }
+}
+
+// GOOD: single Future field backing a FutureBuilder. setState invalidates the
+// cache to re-fetch; ValueListenableBuilder cannot express this, so no lint.
+class _good790FutureCacheState extends State<MyWidget> {
+  Future<int>? _future;
+
+  void _refresh() => setState(() => _future = null);
+
+  Widget build(BuildContext context) {
+    return FutureBuilder<int>(
+      future: _future ??= _load(),
+      builder: (context, snapshot) => Text('${snapshot.data}'),
+    );
+  }
+
+  Future<int> _load() async => 0;
+}
+
+// GOOD: single Stream field backing a StreamBuilder. Same idiom as above.
+class _good790StreamCacheState extends State<MyWidget> {
+  Stream<int>? _stream;
+
+  void _refresh() => setState(() => _stream = null);
+
+  Widget build(BuildContext context) {
+    return StreamBuilder<int>(
+      stream: _stream ??= _load(),
+      builder: (context, snapshot) => Text('${snapshot.data}'),
+    );
+  }
+
+  Stream<int> _load() async* {
+    yield 0;
   }
 }
 

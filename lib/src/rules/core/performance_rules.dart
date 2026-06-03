@@ -1400,10 +1400,14 @@ class _AddListenerVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when ValueListenableBuilder could simplify state management.
 ///
-/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v3
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v4
 ///
 /// For single values that need to trigger rebuilds, ValueListenableBuilder
 /// is more efficient than StatefulWidget + setState.
+///
+/// Skips `Future`/`Stream`-typed state fields: those back
+/// FutureBuilder/StreamBuilder and use setState to invalidate-and-re-fetch,
+/// which ValueListenableBuilder cannot express.
 ///
 /// **BAD:**
 /// ```dart
@@ -1445,7 +1449,7 @@ class PreferValueListenableBuilderRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'prefer_value_listenable_builder',
-    '[prefer_value_listenable_builder] Simple single-value state managed with setState causes the entire widget subtree to rebuild on every change. ValueListenableBuilder isolates rebuilds to only the affected subtree, significantly reducing unnecessary widget tree comparisons, improving frame rendering performance, and lowering battery consumption. {v3}',
+    '[prefer_value_listenable_builder] Simple single-value state managed with setState causes the entire widget subtree to rebuild on every change. ValueListenableBuilder isolates rebuilds to only the affected subtree, significantly reducing unnecessary widget tree comparisons, improving frame rendering performance, and lowering battery consumption. {v4}',
     correctionMessage:
         'Replace setState with a ValueNotifier field and wrap the dependent UI in ValueListenableBuilder to isolate rebuilds to only the affected subtree.',
     severity: DiagnosticSeverity.INFO,
@@ -1472,6 +1476,16 @@ class PreferValueListenableBuilderRule extends SaropaLintRule {
       for (final ClassMember member in node.bodyMembers) {
         if (member is FieldDeclaration) {
           if (!member.isStatic && !member.fields.isFinal) {
+            // Skip Future/Stream-typed fields. These are the cached-async
+            // idiom backing FutureBuilder/StreamBuilder, where setState exists
+            // to invalidate and re-fetch (e.g. `_future = null`), not to
+            // publish a synchronous display value. ValueListenableBuilder
+            // cannot express "re-run an async fetch", so suggesting it here is
+            // a false positive. See bugs/prefer_value_listenable_builder_
+            // false_positive_future_cache.md.
+            if (_isAsyncBuilderCacheType(member.fields.type)) {
+              continue;
+            }
             stateFieldCount++;
           }
         }
@@ -1490,6 +1504,17 @@ class PreferValueListenableBuilderRule extends SaropaLintRule {
         reporter.atToken(node.nameToken, code);
       }
     });
+  }
+
+  /// Returns true when [type] is a `Future`/`Stream` (raw or parameterized).
+  ///
+  /// Uses the syntactic type name so the check works without resolution: a
+  /// state field declared `Future<int>?` / `Stream<T>` is the async-builder
+  /// cache idiom, not a ValueListenable-able display value.
+  static bool _isAsyncBuilderCacheType(TypeAnnotation? type) {
+    if (type is! NamedType) return false;
+    final String name = type.name.lexeme;
+    return name == 'Future' || name == 'Stream';
   }
 }
 
