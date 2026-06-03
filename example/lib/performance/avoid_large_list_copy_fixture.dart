@@ -186,3 +186,26 @@ void _good794i() {
 void _good794j() {
   final hasItems = largeList.map((e) => e + 1).toList().nonEmpty;
 }
+
+// GOOD: .toList() is the value of a map literal entry (e.g. a toJson() map).
+// jsonEncode rejects a lazy Iterable, so the value must be a concrete List.
+Map<String, Object?> _good794k() {
+  return <String, Object?>{
+    'items': largeList.map((e) => '$e').toList(),
+  };
+}
+
+// GOOD: .toList() is an element of a set literal — the element slot expects a
+// concrete List, not a lazy Iterable.
+void _good794l() {
+  final set = <List<int>>{
+    largeList.where((e) => e > 0).toList(),
+  };
+}
+
+// GOOD: .toList() is an element of a list literal (a List<List<int>>).
+void _good794m() {
+  final nested = <List<int>>[
+    largeList.map((e) => e * 2).toList(),
+  ];
+}
