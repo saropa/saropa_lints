@@ -759,14 +759,16 @@ class AvoidHardcodedFeatureFlagsRule extends SaropaLintRule {
   }
 }
 
-/// Warns when multiple setState calls are made in the same method.
+/// Warns when multiple setState calls are made in the same execution scope.
 ///
-/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
+/// Since: v2.0.0 | Updated: v13.11.11 | Rule version: v3
 ///
 /// Alias: combine_setstate, multiple_setstate, batch_setstate
 ///
-/// Multiple setState calls cause multiple rebuilds. Combine them for
-/// better performance.
+/// Multiple setState calls in one synchronous path cause multiple rebuilds.
+/// Combine them for better performance. setState calls in separate closures
+/// (e.g. two buttons' onPressed handlers) run on different events and cannot
+/// be merged, so they are not flagged.
 ///
 /// **BAD:**
 /// ```dart
@@ -785,6 +787,14 @@ class AvoidHardcodedFeatureFlagsRule extends SaropaLintRule {
 ///     _age = 30;
 ///     _email = 'j@e.com';
 ///   });
+/// }
+///
+/// // Separate closures - cannot be merged, not flagged:
+/// Widget buildButtons() {
+///   return Column(children: <Widget>[
+///     ElevatedButton(onPressed: () => setState(() => _a = false), child: a),
+///     ElevatedButton(onPressed: () => setState(() => _b = false), child: b),
+///   ]);
 /// }
 /// ```
 class PreferSingleSetStateRule extends SaropaLintRule {
@@ -807,7 +817,7 @@ class PreferSingleSetStateRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'prefer_single_setstate',
-    '[prefer_single_setstate] Multiple setState calls cause unnecessary rebuilds. Multiple setState calls are made in the same method. This increases build() cost, causing unnecessary widget rebuilds that degrade scroll performance. {v2}',
+    '[prefer_single_setstate] Multiple setState calls cause unnecessary rebuilds. Multiple setState calls are made in the same execution scope. This increases build() cost, causing unnecessary widget rebuilds that degrade scroll performance. setState calls in separate closures (e.g. distinct onPressed handlers) are not flagged because they run on different events and cannot be merged. {v3}',
     correctionMessage:
         'Combine setState calls into a single call. Use DevTools widget inspector to verify that rebuild counts decrease.',
     severity: DiagnosticSeverity.INFO,
@@ -822,29 +832,53 @@ class PreferSingleSetStateRule extends SaropaLintRule {
       // Skip build methods - this rule is for other methods
       if (node.name.lexeme == 'build') return;
 
-      int setStateCount = 0;
-      MethodInvocation? firstSetState;
+      // Each closure (and the method's own synchronous body) is an independent
+      // execution scope. setState calls in DIFFERENT closures run on different
+      // events (e.g. two buttons' onPressed handlers) at different times and
+      // can never be merged. Only flag when a SINGLE scope makes more than one
+      // setState call; counting across distinct closures was the v2 false
+      // positive (two separate onPressed callbacks reported as mergeable).
+      final List<AstNode> scopes = <AstNode>[node.body];
+      MethodInvocation? firstMergeable;
 
-      node.body.visitChildren(
-        _SetStateCountVisitor(
-          onSetState: (MethodInvocation inv) {
-            setStateCount++;
-            firstSetState ??= inv;
-          },
-        ),
-      );
+      while (scopes.isNotEmpty) {
+        final AstNode scope = scopes.removeLast();
+        int scopeCount = 0;
+        MethodInvocation? firstInScope;
 
-      if (setStateCount > 1 && firstSetState != null) {
-        reporter.atNode(firstSetState!, code);
+        scope.visitChildren(
+          _SetStateCountVisitor(
+            onSetState: (MethodInvocation inv) {
+              scopeCount++;
+              firstInScope ??= inv;
+            },
+            // Nested closures are separate scopes; defer them rather than
+            // counting their setState calls against the current scope.
+            onNestedClosure: scopes.add,
+          ),
+        );
+
+        if (scopeCount > 1 && firstInScope != null) {
+          firstMergeable = firstInScope;
+          break;
+        }
+      }
+
+      if (firstMergeable != null) {
+        reporter.atNode(firstMergeable, code);
       }
     });
   }
 }
 
 class _SetStateCountVisitor extends RecursiveAstVisitor<void> {
-  _SetStateCountVisitor({required this.onSetState});
+  _SetStateCountVisitor({
+    required this.onSetState,
+    required this.onNestedClosure,
+  });
 
   final void Function(MethodInvocation) onSetState;
+  final void Function(FunctionExpression) onNestedClosure;
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
@@ -852,6 +886,14 @@ class _SetStateCountVisitor extends RecursiveAstVisitor<void> {
       onSetState(node);
     }
     super.visitMethodInvocation(node);
+  }
+
+  @override
+  void visitFunctionExpression(FunctionExpression node) {
+    // Stop here: this closure is a distinct execution scope. Hand it back to
+    // the caller to be counted on its own instead of descending and merging
+    // its setState calls with the enclosing scope's.
+    onNestedClosure(node);
   }
 }
 
