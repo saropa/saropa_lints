@@ -63,6 +63,14 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 -->
 
+## [Unreleased]
+
+A false-positive fix for the `avoid_large_list_copy` performance rule. No action required unless you added a project-local ignore for the pattern below. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
+
+### Fixed
+
+- **`avoid_large_list_copy` no longer fires on `.toList()` used as a map-entry value or a set/list-literal element.** A `toJson()` map value such as `'items': items.map((e) => e.name).toList()` must be a concrete List because a lazy Iterable is not JSON-encodable, so the copy is structurally required, not gratuitous — remove any project-local `// ignore: avoid_large_list_copy` comments added on such literal entries.
+
 ## [13.11.10]
 
 ### Fixed

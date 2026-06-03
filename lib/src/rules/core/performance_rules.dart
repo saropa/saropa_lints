@@ -2016,6 +2016,16 @@ class AvoidLargeListCopyRule extends SaropaLintRule {
     if (parent is PropertyAccess && parent.target == current) return true;
     if (parent is PrefixedIdentifier && parent.prefix == current) return true;
 
+    // .toList() is the value of a map literal entry (`{'k': x.map().toList()}`)
+    // or an element of a set/map/list literal (`{x.map().toList()}`,
+    // `[x.map().toList()]`). The literal's element/value slot expects a
+    // concrete List — a lazy Iterable is not a List and is not JSON-encodable,
+    // so these `toJson()`-style map values cannot be left lazy. Guard the map
+    // entry on `.value` so a (rare) `.toList()` used as a map KEY is not
+    // exempted by accident.
+    if (parent is MapLiteralEntry && parent.value == current) return true;
+    if (parent is SetOrMapLiteral || parent is ListLiteral) return true;
+
     return false;
   }
 }
