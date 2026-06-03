@@ -1,12 +1,13 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:saropa_lints/src/platform_path_utils.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart';
 
 /// Warns when file read operations are used without exists() check or try-catch.
 ///
-/// Since: v1.8.2 | Updated: v4.13.0 | Rule version: v2
+/// Since: v1.8.2 | Updated: v13.11.10 | Rule version: v3
 ///
 /// File operations on non-existent files throw exceptions. Always verify
 /// the file exists or wrap in try-catch to handle missing files gracefully.
@@ -46,7 +47,7 @@ class RequireFileExistsCheckRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'require_file_exists_check',
-    '[require_file_exists_check] File read operation should check exists() or use try-catch. File operations on non-existent files throw exceptions. Always verify the file exists or wrap in try-catch to handle missing files gracefully. {v2}',
+    '[require_file_exists_check] File read operation should check exists() or use try-catch. File operations on non-existent files throw exceptions. Always verify the file exists or wrap in try-catch to handle missing files gracefully. {v3}',
     correctionMessage:
         'Wrap in if (await file.exists()) or try-catch block. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     severity: DiagnosticSeverity.INFO,
@@ -92,31 +93,75 @@ class RequireFileExistsCheckRule extends SaropaLintRule {
 
       if (insideTryCatch) return;
 
-      // Check if preceded by exists() check in same block
-      current = node.parent;
-      BlockFunctionBody? enclosingBody;
-
-      while (current != null) {
-        if (current is BlockFunctionBody) {
-          enclosingBody = current;
-          break;
-        }
-        current = current.parent;
-      }
-
-      if (enclosingBody != null) {
-        final String bodySource = enclosingBody.toSource();
-        // Simple check for exists() call before the read operation
-        final int readPos = bodySource.indexOf(methodName);
-        final int existsPos = bodySource.indexOf('.exists()');
-
-        if (existsPos >= 0 && existsPos < readPos) {
-          return; // exists() check is before read
-        }
-      }
+      // Skip when an exists()/existsSync() guard dominates this read. The
+      // previous implementation substring-searched the enclosing body for the
+      // literal '.exists()', which never matched the synchronous '.existsSync()'
+      // form (the '(' does not follow 'exists' directly), producing false
+      // positives on the common `file.existsSync() ? file.readAsBytes() : null`
+      // pattern. Walking the AST recognizes both forms and is not fooled by
+      // matches in comments/strings or out-of-order method-name text.
+      if (_isGuardedByExistsCheck(node)) return;
 
       reporter.atNode(node.methodName, code);
     });
+  }
+
+  /// Returns true when [readNode] is dominated by a `File.exists()` or
+  /// `File.existsSync()` invocation that gates whether the read executes:
+  /// the condition of an enclosing `if` statement or ternary expression, or a
+  /// statement preceding the read in the same block.
+  static bool _isGuardedByExistsCheck(MethodInvocation readNode) {
+    AstNode? child = readNode;
+    AstNode? current = readNode.parent;
+
+    while (current != null) {
+      if (current is IfStatement) {
+        // Read is in the then/else branch; the condition is the guard.
+        if (!identical(child, current.expression) &&
+            _subtreeHasExistsInvocation(current.expression)) {
+          return true;
+        }
+      } else if (current is ConditionalExpression) {
+        // Read is in the then/else expression; the condition is the guard.
+        if (!identical(child, current.condition) &&
+            _subtreeHasExistsInvocation(current.condition)) {
+          return true;
+        }
+      } else if (current is Block) {
+        // A statement earlier in the block may perform the existence check.
+        for (final Statement stmt in current.statements) {
+          if (identical(stmt, child)) break;
+          if (_subtreeHasExistsInvocation(stmt)) return true;
+        }
+      }
+
+      child = current;
+      current = current.parent;
+    }
+
+    return false;
+  }
+
+  /// Whether [node]'s subtree contains a call to `exists` or `existsSync`.
+  static bool _subtreeHasExistsInvocation(AstNode node) {
+    final _ExistsInvocationFinder finder = _ExistsInvocationFinder();
+    node.accept(finder);
+    return finder.found;
+  }
+}
+
+/// Detects `exists()`/`existsSync()` method invocations anywhere in a subtree.
+class _ExistsInvocationFinder extends RecursiveAstVisitor<void> {
+  bool found = false;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    final String name = node.methodName.name;
+    if (name == 'exists' || name == 'existsSync') {
+      found = true;
+      return;
+    }
+    super.visitMethodInvocation(node);
   }
 }
 

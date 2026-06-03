@@ -126,3 +126,8 @@ void _good369() async {
     handleMissingFile();
   }
 }
+
+// GOOD: synchronous existence guard in a ternary condition.
+void _goodSync() async {
+  final bytes = file.existsSync() ? await file.readAsBytes() : null;
+}
