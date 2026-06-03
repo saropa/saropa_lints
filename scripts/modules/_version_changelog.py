@@ -596,7 +596,7 @@ def maybe_bump_for_tag_clash(
     they install. When the colliding tag is detected we therefore RENAME the
     existing top section, never insert a placeholder "Release version" stub
     (the prior behavior shipped meaningless notes for v13.11.9 — see
-    `bugs/infra_publish_tag_clash_stub.md`).
+    `plans/history/2026.06/2026.06.02/infra_publish_tag_clash_stub.md`).
 
     Returns:
         The final version string (bumped if tag existed, unchanged otherwise).
