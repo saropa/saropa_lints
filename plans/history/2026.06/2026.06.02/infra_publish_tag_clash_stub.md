@@ -55,7 +55,7 @@ The user's rule was stated directly in the conversation that closed this: **"the
 
 - New helper `_promote_top_section_to_version(changelog, expected, next)` renames the first `## [...]` heading from `[expected]` (or `[Unreleased]`) to `[next]`. Returns the original label on success, `None` when the top section is something the script cannot safely repurpose.
 - On tag collision: bump `pubspec.yaml`, then call the promote helper. On `None` return, **abort with a clear error** instead of inserting a stub — the user must add `[next_version]` notes manually before re-running. The published version, `.vsix` filename, and top CHANGELOG section are now in sync by construction.
-- The literal string `"Release version"` no longer appears in the codebase.
+- No active code path inserts the literal string `"Release version"` anymore. The only CHANGELOG-section inserters (`add_version_section`, `reconcile_pubspec_changelog_versions`) now write `"Version bump"`. The string survives only as historical references in comments, the regression-test docstring, `CHANGELOG_ARCHIVE.md`, and `plans/history/`.
 
 Tests pinned in `scripts/modules/tests/test_tag_clash_promotion.py` (4 cases):
 
