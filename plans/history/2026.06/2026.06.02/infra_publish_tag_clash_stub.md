@@ -79,3 +79,25 @@ The bad `.vsix` for v13.11.9 was never uploaded. The corrective sequence before 
 ## Why this won't recur
 
 The script-level abort makes "release `[X.Y.Z+1]` with a top section reading `[X.Y.Z]`" impossible without a manual override of the CHANGELOG by the user. The four-case test pins the helper's behavior. The historical incident is documented above so the failure pattern survives.
+
+---
+
+## Finish Report (2026-06-03)
+
+**Trigger:** User asked to "review and fix" this bug doc.
+
+**Scope:** (C) docs/scripts only. The underlying code fix (`maybe_bump_for_tag_clash` rewrite + `_promote_top_section_to_version` helper + 4-case regression test) had already landed in commit `c724d148`. This pass reviewed that fix against the live repo and corrected the doc.
+
+**Review findings — code fix is real and verified:**
+- `maybe_bump_for_tag_clash` promotes the top CHANGELOG section on tag clash and aborts (via `exit_with_error`) when the top section is neither the colliding version nor `[Unreleased]` — matches this doc's "Fix (landed)" section.
+- `scripts/modules/tests/test_tag_clash_promotion.py` — all 4 cases pass (`python -m unittest scripts.modules.tests.test_tag_clash_promotion -v` → `Ran 4 tests OK`).
+- No active code path inserts a `"Release version"` stub; the two CHANGELOG-section inserters (`add_version_section`, `reconcile_pubspec_changelog_versions`) write `"Version bump"`.
+
+**Defect found in the doc (not the code):** the "Fix (landed)" bullet claimed the literal `"Release version"` "no longer appears in the codebase." `grep` shows it in 5 files (source comment, this doc, the test docstring, `CHANGELOG_ARCHIVE.md`, a prior history file). Corrected the bullet to the accurate claim: no active code path *inserts* it; remaining hits are historical references.
+
+**Changes made this pass:**
+- Corrected the false `"Release version"` claim in this file's "Fix (landed)" section.
+- Archived this report `bugs/ → plans/history/2026.06/2026.06.02/` (Status was already `Fixed`, closed 2026-06-02) — commit `3cb8929c`.
+- Repointed the stale `bugs/infra_publish_tag_clash_stub.md` reference in `scripts/modules/_version_changelog.py` to this archived path.
+
+**Outstanding work:** none.
