@@ -5,6 +5,7 @@ library;
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:saropa_lints/src/analyzer_compat.dart';
 import 'package:saropa_lints/src/ignore_utils.dart';
 import 'package:test/test.dart';
 
@@ -280,6 +281,144 @@ void test() {
 
       test('handles null token', () {
         expect(IgnoreUtils.hasIgnoreCommentOnToken(null, 'my_rule'), isFalse);
+      });
+    });
+
+    // Leading `// ignore:` honored for diagnostics reported on a declaration's
+    // NAME token (`reporter.atToken(node.nameToken)`). The directive attaches to
+    // the declaration's first token on its line (e.g. `class`), never the
+    // mid-line name token, so `hasIgnoreCommentOnToken(nameToken)` never sees it.
+    // See plans/history/2026.06/2026.06.04/infra_ignore_comment_not_honored_attoken_declaration_name.md.
+    group('hasLeadingIgnoreCommentBeforeToken', () {
+      bool check(String code, {String rule = 'my_rule', int index = 0}) {
+        final unit = _parseCode(code);
+        final decl = _findAll<ClassDeclaration>(unit)[index];
+        return IgnoreUtils.hasLeadingIgnoreCommentBeforeToken(
+          decl.nameToken,
+          rule,
+          unit.lineInfo,
+        );
+      }
+
+      test('detects leading ignore directly above the declaration', () {
+        expect(
+          check('''
+// ignore: my_rule
+class FooState {}
+'''),
+          isTrue,
+        );
+      });
+
+      test('detects leading ignore on a declaration at the very top of file', () {
+        // Regression guard for the synthetic start-of-file token (offset -1):
+        // its clamped line-1 location must not mislabel a line-1 ignore as
+        // trailing. See _isCommentAtLineStart.
+        expect(check('// ignore: my_rule\nclass FooState {}\n'), isTrue);
+      });
+
+      test('detects leading ignore directly above a doc-commented declaration', () {
+        // Standard ordering: doc block, then the ignore adjacent to the
+        // declaration. Keying off the name token's line (not node.offset, which
+        // points at the /// line) is what makes this resolve.
+        expect(
+          check('''
+/// Doc line one.
+/// Doc line two.
+// ignore: my_rule
+class FooState {}
+'''),
+          isTrue,
+        );
+      });
+
+      test('honors hyphenated rule name', () {
+        expect(
+          check('''
+// ignore: my-rule
+class FooState {}
+'''),
+          isTrue,
+        );
+      });
+
+      test('detects leading ignore on a mid-file declaration', () {
+        expect(
+          check('''
+import 'dart:core';
+
+void helper() {}
+
+// ignore: my_rule
+class FooState {}
+'''),
+          isTrue,
+        );
+      });
+
+      test('does NOT suppress when ignore sits above an annotation block', () {
+        // The diagnostic is reported on the name line; the analyzer suppresses
+        // only the line immediately below the directive, so an ignore above the
+        // `@` (two lines up from the name) must not suppress.
+        expect(
+          check('''
+// ignore: my_rule
+@deprecated
+class FooState {}
+'''),
+          isFalse,
+        );
+      });
+
+      test('does NOT suppress when ignore is two lines up (doc between)', () {
+        expect(
+          check('''
+// ignore: my_rule
+/// Doc line.
+class FooState {}
+'''),
+          isFalse,
+        );
+      });
+
+      test('does NOT suppress for a different rule name', () {
+        expect(
+          check('''
+// ignore: other_rule
+class FooState {}
+'''),
+          isFalse,
+        );
+      });
+
+      test('does NOT suppress with no ignore comment (control)', () {
+        expect(check('class FooState {}\n'), isFalse);
+      });
+
+      test('does NOT treat a trailing ignore on prior code as leading', () {
+        expect(
+          check('''
+final x = 1; // ignore: my_rule
+class FooState {}
+'''),
+          isFalse,
+        );
+      });
+
+      test('returns false when lineInfo is null', () {
+        final unit = _parseCode('''
+// ignore: my_rule
+class FooState {}
+''');
+        final decl = _findFirst<ClassDeclaration>(unit)!;
+        expect(
+          IgnoreUtils.hasLeadingIgnoreCommentBeforeToken(
+            decl.nameToken,
+            'my_rule',
+            null,
+          ),
+          isFalse,
+        );
       });
     });
 
