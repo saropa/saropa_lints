@@ -63,7 +63,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 -->
 
-## [Unreleased]
+## [13.11.12]
 
 Fixes a suppression bug where a `// ignore:` placed directly above a declaration that also carries a `///` doc comment was silently ignored. No action required. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
 

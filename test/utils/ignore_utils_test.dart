@@ -675,10 +675,7 @@ class A {
 }
 ''');
             final mapLiteral = _findFirst<SetOrMapLiteral>(unit)!;
-            expect(
-              IgnoreUtils.hasIgnoreComment(mapLiteral, 'my_rule'),
-              isTrue,
-            );
+            expect(IgnoreUtils.hasIgnoreComment(mapLiteral, 'my_rule'), isTrue);
           },
         );
 
