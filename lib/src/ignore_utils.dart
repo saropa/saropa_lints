@@ -150,13 +150,9 @@ class IgnoreUtils {
     final int nodeStartLine =
         lineInfo?.getLocation(node.offset).lineNumber ?? -1;
 
-    // Check the node's own begin token
-    if (_hasValidLeadingIgnoreComment(
-      node.beginToken,
-      ruleName,
-      nodeStartLine,
-      lineInfo,
-    )) {
+    // Check the node's own begin token (and, for AnnotatedNodes, the post-doc
+    // token — see _nodeHasLeadingIgnore).
+    if (_nodeHasLeadingIgnore(node, ruleName, nodeStartLine, lineInfo)) {
       return true;
     }
 
@@ -236,12 +232,7 @@ class IgnoreUtils {
     AstNode? current = node.parent;
     Statement? containingStatement;
     while (current != null) {
-      if (_hasValidLeadingIgnoreComment(
-        current.beginToken,
-        ruleName,
-        nodeStartLine,
-        lineInfo,
-      )) {
+      if (_nodeHasLeadingIgnore(current, ruleName, nodeStartLine, lineInfo)) {
         return true;
       }
 
@@ -266,6 +257,54 @@ class IgnoreUtils {
       }
     }
 
+    return false;
+  }
+
+  /// Checks for a valid leading `// ignore:` directive on [node], probing every
+  /// token its directive could legitimately hang off.
+  ///
+  /// Two tokens must be inspected for an [AnnotatedNode]:
+  /// - [AstNode.beginToken] — the `@` metadata token (or, with no doc comment
+  ///   and no metadata, the declaration keyword). A `// ignore:` placed above
+  ///   an annotation attaches here, so this MUST still be checked or annotated
+  ///   declarations regress.
+  /// - [AnnotatedNode.firstTokenAfterCommentAndMetadata] — the declaration
+  ///   keyword (e.g. `static`/`final`). When a `///` doc comment is present,
+  ///   `beginToken` resolves to the doc-comment token whose own
+  ///   `precedingComments` is null, so the `// ignore:` (which then hangs off
+  ///   this post-doc token) is invisible to a beginToken-only walk and the
+  ///   suppression silently never fires. This is the doc-comment bug fix.
+  ///
+  /// Both probes share the unchanged `commentLine == nodeStartLine - 1` guard
+  /// in [_hasValidLeadingIgnoreComment], so widening the tokens inspected does
+  /// not loosen placement (the `///` lines never match — they contain no
+  /// `ignore:`).
+  static bool _nodeHasLeadingIgnore(
+    AstNode node,
+    String ruleName,
+    int nodeStartLine,
+    LineInfo? lineInfo,
+  ) {
+    if (_hasValidLeadingIgnoreComment(
+      node.beginToken,
+      ruleName,
+      nodeStartLine,
+      lineInfo,
+    )) {
+      return true;
+    }
+    if (node is AnnotatedNode) {
+      final Token postDoc = node.firstTokenAfterCommentAndMetadata;
+      if (!identical(postDoc, node.beginToken) &&
+          _hasValidLeadingIgnoreComment(
+            postDoc,
+            ruleName,
+            nodeStartLine,
+            lineInfo,
+          )) {
+        return true;
+      }
+    }
     return false;
   }
 
