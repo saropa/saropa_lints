@@ -63,7 +63,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 -->
 
-## [Unreleased]
+## [13.11.14]
 
 Adds `prefer_reusing_assigned_local` (Recommended), which flags an expression recomputed verbatim when a local variable already holds its result and offers a quick fix to reuse the local. It is the complement of `prefer_cached_getter`: the local already exists, so the fix swaps the recompute for the local rather than creating one. No action required. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
 
