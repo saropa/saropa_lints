@@ -63,6 +63,14 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 -->
 
+## [Unreleased]
+
+Adds `prefer_reusing_assigned_local` (Recommended), which flags an expression recomputed verbatim when a local variable already holds its result and offers a quick fix to reuse the local. It is the complement of `prefer_cached_getter`: the local already exists, so the fix swaps the recompute for the local rather than creating one. No action required. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
+
+### Added
+
+- New rule `prefer_reusing_assigned_local` (Recommended, INFO): reports a pure-read expression recomputed in the same block when a local already caches it, with a quick fix to reuse the local. It only fires when the value cannot have changed — it skips non-deterministic calls, write targets, and any recompute after the receiver or local is mutated. No action required.
+
 ## [13.11.13]
 
 Fixes a `prefer_value_listenable_builder` false positive on `State` classes that hold one reassigned field plus a `final` collection mutated in place, and restores line-level `// ignore:` suppression for diagnostics reported on a declaration's name (such as class-level rules). No action required unless you added a project-local ignore for either pattern below. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)

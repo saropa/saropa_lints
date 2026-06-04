@@ -18,6 +18,7 @@ import '../../fixes/unnecessary_code/remove_unnecessary_getter_fix.dart';
 import '../../fixes/unnecessary_code/no_empty_block_fix.dart';
 import '../../fixes/unnecessary_code/remove_unnecessary_super_fix.dart';
 import '../../fixes/unnecessary_code/replace_null_aware_spread_fix.dart';
+import '../../fixes/unnecessary_code/reuse_assigned_local_fix.dart';
 
 /// Warns when an empty spread is used.
 ///
@@ -1108,4 +1109,419 @@ class NoEmptyStringRule extends SaropaLintRule {
     ({required CorrectionProducerContext context}) =>
         NoEmptyStringPreferIsEmptyFix(context: context),
   ];
+}
+
+/// Warns when a local already holds a value but the identical expression is
+/// recomputed instead of reusing the local.
+///
+/// Since: v13.11.14 | Rule version: v1
+///
+/// A local variable is assigned a pure-read expression (a member chain, an
+/// index access, or a deterministic call), then that **same expression is
+/// re-evaluated verbatim** later in the same block instead of reusing the
+/// local. The value was already computed and named; recomputing it wastes work
+/// and lets the two copies silently drift apart if one is later edited.
+///
+/// This is the complement of `prefer_cached_getter`, which fires when a value
+/// is read repeatedly and *no* local caches it (its fix is "create a local").
+/// Here the local already exists, so the fix is "reuse it" — giving this rule a
+/// near-zero false-positive surface.
+///
+/// **BAD:**
+/// ```dart
+/// final host = contact.websites?.firstOrNull?.host;
+/// if (host == null) return null;
+/// return Label(text: contact.websites?.firstOrNull?.host); // recomputed
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final host = contact.websites?.firstOrNull?.host;
+/// if (host == null) return null;
+/// return Label(text: host);
+/// ```
+///
+/// **Quick fix available:** Replaces the recomputed expression with the local.
+class PreferReusingAssignedLocalRule extends SaropaLintRule {
+  PreferReusingAssignedLocalRule() : super(code: _code);
+
+  /// Minor cleanup. Large counts acceptable; each is a local, safe fix.
+  @override
+  LintImpact get impact => LintImpact.info;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability', 'dart-core'};
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'prefer_reusing_assigned_local',
+    '[prefer_reusing_assigned_local] A local variable already holds the result '
+        'of this expression, but the identical expression is recomputed here '
+        'instead of reusing that local. Recomputing wastes work and risks the '
+        'two copies drifting apart if one is later edited. {v1}',
+    correctionMessage:
+        'Replace the recomputed expression with the existing local variable '
+        'that already holds its value.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addBlock((Block block) {
+      final List<Statement> statements = block.statements;
+      // Need at least a declaration and one later statement to recompute in.
+      if (statements.length < 2) return;
+
+      // 1. Record the first pure-read local declaration per initializer source.
+      //    Keying on source means a later identical declaration also resolves
+      //    back to the original local.
+      final Map<String, _AssignedLocal> firstDecls = <String, _AssignedLocal>{};
+      for (final Statement statement in statements) {
+        if (statement is! VariableDeclarationStatement) continue;
+        for (final VariableDeclaration variable
+            in statement.variables.variables) {
+          final Expression? initializer = variable.initializer;
+          if (initializer == null) continue;
+          if (!_isReusableInitializer(initializer)) continue;
+          firstDecls.putIfAbsent(
+            initializer.toSource(),
+            () => _AssignedLocal(
+              name: variable.name.lexeme,
+              initializer: initializer,
+              referencedNames: _collectReferencedNames(initializer)
+                ..add(variable.name.lexeme),
+            ),
+          );
+        }
+      }
+      if (firstDecls.isEmpty) return;
+
+      // 2. Walk the block once to collect every matching expression and every
+      //    point at which a referenced identifier is mutated.
+      final _BlockReuseScanner scanner = _BlockReuseScanner(
+        firstDecls.keys.toSet(),
+      );
+      block.accept(scanner);
+
+      for (final MapEntry<String, _AssignedLocal> entry
+          in firstDecls.entries) {
+        final _AssignedLocal local = entry.value;
+        // The earliest offset at which the receiver/local may have changed.
+        // Past this point the recompute is no longer guaranteed redundant.
+        final int barrier = scanner.mutationBarrierFor(
+          local.referencedNames,
+          afterOffset: local.initializer.end,
+        );
+
+        for (final Expression reuse in scanner.occurrencesOf(entry.key)) {
+          // Skip the declaration's own initializer and anything before it.
+          if (reuse.offset <= local.initializer.offset) continue;
+          // Skip recomputes after a mutation could have changed the value.
+          if (reuse.offset >= barrier) continue;
+          // Skip write targets (`obj.field = x`): a write is not a redundant
+          // read, and rewriting it to the local would be wrong.
+          if (_isWriteTarget(reuse)) continue;
+
+          reporter.atNode(reuse);
+        }
+      }
+    });
+  }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReuseAssignedLocalFix(context: context),
+  ];
+
+  /// Whether [expr] is a pure read whose result is safe to reuse from a local.
+  ///
+  /// Only member chains, index reads, and deterministic calls qualify. Anything
+  /// non-deterministic, side-effecting, or identity-sensitive is rejected by
+  /// [_InitializerPurityVisitor] so that legitimately-differing recomputes
+  /// (e.g. `DateTime.now()`, `Random().nextInt(6)`) are never flagged.
+  static bool _isReusableInitializer(Expression expr) {
+    if (expr is! PropertyAccess &&
+        expr is! PrefixedIdentifier &&
+        expr is! IndexExpression &&
+        expr is! MethodInvocation) {
+      return false;
+    }
+    final _InitializerPurityVisitor visitor = _InitializerPurityVisitor();
+    expr.accept(visitor);
+    return visitor.isPure;
+  }
+
+  /// Whether [node] sits in a write position (assignment LHS or `++`/`--`).
+  static bool _isWriteTarget(Expression node) {
+    final AstNode? parent = node.parent;
+    if (parent is AssignmentExpression && parent.leftHandSide == node) {
+      return true;
+    }
+    if (parent is PostfixExpression && parent.operand == node) return true;
+    if (parent is PrefixExpression && parent.operand == node) return true;
+    return false;
+  }
+
+  /// Collects every simple-identifier name referenced anywhere in [expr].
+  ///
+  /// These are the names whose mutation between the declaration and a recompute
+  /// would change the value, so any of them being written invalidates reuse.
+  static Set<String> _collectReferencedNames(Expression expr) {
+    final _IdentifierNameCollector collector = _IdentifierNameCollector();
+    expr.accept(collector);
+    return collector.names;
+  }
+}
+
+/// A local declaration whose initializer is a reusable pure read.
+class _AssignedLocal {
+  _AssignedLocal({
+    required this.name,
+    required this.initializer,
+    required this.referencedNames,
+  });
+
+  final String name;
+  final Expression initializer;
+  final Set<String> referencedNames;
+}
+
+/// Rejects initializers whose value is non-deterministic, side-effecting, or
+/// identity-sensitive, so reuse never changes program behavior.
+class _InitializerPurityVisitor extends RecursiveAstVisitor<void> {
+  bool isPure = true;
+
+  /// Method/getter names whose result may differ between calls. A reference to
+  /// any of these (as a call or a property) disqualifies the initializer.
+  static const Set<String> _nonDeterministicNames = <String>{
+    'now',
+    'current',
+    'random',
+    'next',
+    'nextInt',
+    'nextDouble',
+    'nextBool',
+    'nextBytes',
+    'uuid',
+    'v1',
+    'v4',
+    'read',
+    'readLine',
+    'readAsString',
+    'readAsStringSync',
+    'readAsBytes',
+    'readAsBytesSync',
+    'elapsed',
+    'elapsedMilliseconds',
+    'elapsedMicroseconds',
+    'elapsedTicks',
+  };
+
+  // Object allocation: reusing changes identity, which `identical()` and
+  // mutation-after-construction can observe.
+  @override
+  void visitInstanceCreationExpression(InstanceCreationExpression node) {
+    isPure = false;
+  }
+
+  // Closures allocate a fresh function object each evaluation.
+  @override
+  void visitFunctionExpression(FunctionExpression node) {
+    isPure = false;
+  }
+
+  // Side effects / async: value or effects need not repeat.
+  @override
+  void visitAwaitExpression(AwaitExpression node) {
+    isPure = false;
+  }
+
+  @override
+  void visitAssignmentExpression(AssignmentExpression node) {
+    isPure = false;
+  }
+
+  @override
+  void visitCascadeExpression(CascadeExpression node) {
+    isPure = false;
+  }
+
+  @override
+  void visitThrowExpression(ThrowExpression node) {
+    isPure = false;
+  }
+
+  @override
+  void visitSimpleIdentifier(SimpleIdentifier node) {
+    if (_nonDeterministicNames.contains(node.name)) isPure = false;
+    super.visitSimpleIdentifier(node);
+  }
+}
+
+/// Collects the names of all simple identifiers in an expression subtree.
+class _IdentifierNameCollector extends RecursiveAstVisitor<void> {
+  final Set<String> names = <String>{};
+
+  @override
+  void visitSimpleIdentifier(SimpleIdentifier node) {
+    names.add(node.name);
+    super.visitSimpleIdentifier(node);
+  }
+}
+
+/// Single-pass scan of a block recording (a) expressions whose source matches a
+/// tracked local's initializer and (b) mutation points for any identifier.
+class _BlockReuseScanner extends RecursiveAstVisitor<void> {
+  _BlockReuseScanner(this._targetSources);
+
+  final Set<String> _targetSources;
+  final Map<String, List<Expression>> _occurrences =
+      <String, List<Expression>>{};
+  // (offset, mutatedRootName) for each in-block mutation, in visit order.
+  final List<({int offset, String name})> _mutations =
+      <({int offset, String name})>[];
+
+  /// Method names that mutate their receiver. A call to one of these on an
+  /// identifier referenced by a cached expression invalidates a later reuse.
+  static const Set<String> _mutatingMethods = <String>{
+    'add',
+    'addAll',
+    'addEntries',
+    'remove',
+    'removeAt',
+    'removeLast',
+    'removeWhere',
+    'removeRange',
+    'clear',
+    'insert',
+    'insertAll',
+    'setAll',
+    'setRange',
+    'retainWhere',
+    'fillRange',
+    'sort',
+    'shuffle',
+    'putIfAbsent',
+    'update',
+    'updateAll',
+    'write',
+    'writeln',
+    'writeAll',
+  };
+
+  List<Expression> occurrencesOf(String source) =>
+      _occurrences[source] ?? const <Expression>[];
+
+  /// Earliest mutation offset after [afterOffset] that touches any of [names],
+  /// or a sentinel beyond any real offset when none exists.
+  int mutationBarrierFor(Set<String> names, {required int afterOffset}) {
+    int barrier = 1 << 30;
+    for (final ({int offset, String name}) event in _mutations) {
+      if (event.offset > afterOffset &&
+          event.offset < barrier &&
+          names.contains(event.name)) {
+        barrier = event.offset;
+      }
+    }
+    return barrier;
+  }
+
+  void _recordOccurrence(Expression node) {
+    final String source = node.toSource();
+    if (_targetSources.contains(source)) {
+      _occurrences.putIfAbsent(source, () => <Expression>[]).add(node);
+    }
+  }
+
+  @override
+  void visitPropertyAccess(PropertyAccess node) {
+    _recordOccurrence(node);
+    super.visitPropertyAccess(node);
+  }
+
+  @override
+  void visitPrefixedIdentifier(PrefixedIdentifier node) {
+    _recordOccurrence(node);
+    super.visitPrefixedIdentifier(node);
+  }
+
+  @override
+  void visitIndexExpression(IndexExpression node) {
+    _recordOccurrence(node);
+    super.visitIndexExpression(node);
+  }
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    _recordOccurrence(node);
+    if (_mutatingMethods.contains(node.methodName.name)) {
+      final String? root = _rootIdentifierName(node.target);
+      if (root != null) {
+        _mutations.add((offset: node.offset, name: root));
+      }
+    }
+    super.visitMethodInvocation(node);
+  }
+
+  @override
+  void visitAssignmentExpression(AssignmentExpression node) {
+    final String? root = _rootIdentifierName(node.leftHandSide);
+    if (root != null) {
+      _mutations.add((offset: node.leftHandSide.offset, name: root));
+    }
+    super.visitAssignmentExpression(node);
+  }
+
+  @override
+  void visitPostfixExpression(PostfixExpression node) {
+    if (node.operator.type == TokenType.PLUS_PLUS ||
+        node.operator.type == TokenType.MINUS_MINUS) {
+      final String? root = _rootIdentifierName(node.operand);
+      if (root != null) {
+        _mutations.add((offset: node.operand.offset, name: root));
+      }
+    }
+    super.visitPostfixExpression(node);
+  }
+
+  @override
+  void visitPrefixExpression(PrefixExpression node) {
+    if (node.operator.type == TokenType.PLUS_PLUS ||
+        node.operator.type == TokenType.MINUS_MINUS) {
+      final String? root = _rootIdentifierName(node.operand);
+      if (root != null) {
+        _mutations.add((offset: node.operand.offset, name: root));
+      }
+    }
+    super.visitPrefixExpression(node);
+  }
+}
+
+/// Returns the leftmost identifier name of a member/index/call chain, e.g.
+/// `list` for `list.length`, `m` for `m[k]`, `Json` for `Json.decode(x)`.
+String? _rootIdentifierName(Expression? expr) {
+  Expression? current = expr;
+  while (current != null) {
+    if (current is SimpleIdentifier) return current.name;
+    if (current is PrefixedIdentifier) return current.prefix.name;
+    if (current is PropertyAccess) {
+      current = current.target;
+    } else if (current is IndexExpression) {
+      current = current.target;
+    } else if (current is MethodInvocation) {
+      current = current.target;
+    } else {
+      return null;
+    }
+  }
+  return null;
 }
