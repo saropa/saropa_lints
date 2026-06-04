@@ -610,6 +610,91 @@ final obj = C();
         });
       });
 
+      // Regression for infra_ignore_comment_shadowed_by_doc_comment:
+      // an AnnotatedNode's beginToken is the /// doc-comment token, whose own
+      // precedingComments is null, so a // ignore: directly above the
+      // declaration (attached to firstTokenAfterCommentAndMetadata) was never
+      // inspected. The reported node here is the map literal (a child), so the
+      // suppression flows through the ancestor walk up to the FieldDeclaration.
+      group('// ignore: below a /// doc comment', () {
+        test('suppresses child-node diagnostic on doc-commented field', () {
+          final unit = _parseCode('''
+class A {
+  /// Doc line one.
+  /// Doc line two.
+  // ignore: my_rule
+  static const Map<int, int> caseWithDoc = <int, int>{
+    1: 10,
+  };
+}
+''');
+          final mapLiteral = _findFirst<SetOrMapLiteral>(unit)!;
+          expect(IgnoreUtils.hasIgnoreComment(mapLiteral, 'my_rule'), isTrue);
+        });
+
+        test('still suppresses when no doc comment (regression guard)', () {
+          final unit = _parseCode('''
+class A {
+  // ignore: my_rule
+  static const Map<int, int> caseNoDoc = <int, int>{
+    1: 10,
+  };
+}
+''');
+          final mapLiteral = _findFirst<SetOrMapLiteral>(unit)!;
+          expect(IgnoreUtils.hasIgnoreComment(mapLiteral, 'my_rule'), isTrue);
+        });
+
+        test('does not over-fire: doc comment but no // ignore:', () {
+          final unit = _parseCode('''
+class A {
+  /// Doc line one.
+  /// Doc line two.
+  static const Map<int, int> caseDocNoIgnore = <int, int>{
+    1: 10,
+  };
+}
+''');
+          final mapLiteral = _findFirst<SetOrMapLiteral>(unit)!;
+          expect(IgnoreUtils.hasIgnoreComment(mapLiteral, 'my_rule'), isFalse);
+        });
+
+        test(
+          'still suppresses on an annotated declaration with NO doc comment',
+          () {
+            // Regression guard: with an inline annotation and no doc comment,
+            // the FieldDeclaration's beginToken is the @ metadata token, which
+            // holds the // ignore: in its precedingComments. The post-doc token
+            // (static) does NOT — so a fix that probed only
+            // firstTokenAfterCommentAndMetadata would regress this case. Both
+            // tokens must be checked.
+            final unit = _parseCode('''
+class A {
+  // ignore: my_rule
+  @Deprecated('x') static const Map<int, int> m = <int, int>{1: 10};
+}
+''');
+            final mapLiteral = _findFirst<SetOrMapLiteral>(unit)!;
+            expect(
+              IgnoreUtils.hasIgnoreComment(mapLiteral, 'my_rule'),
+              isTrue,
+            );
+          },
+        );
+
+        test('works for a doc-commented top-level variable (not field)', () {
+          final unit = _parseCode('''
+/// Doc for a top-level map.
+// ignore: my_rule
+const Map<int, int> topLevel = <int, int>{
+  1: 10,
+};
+''');
+          final mapLiteral = _findFirst<SetOrMapLiteral>(unit)!;
+          expect(IgnoreUtils.hasIgnoreComment(mapLiteral, 'my_rule'), isTrue);
+        });
+      });
+
       group('chained property access (mid-chain comments)', () {
         test('detects comment before property in chain', () {
           // Use method call result as target to ensure PropertyAccess node
