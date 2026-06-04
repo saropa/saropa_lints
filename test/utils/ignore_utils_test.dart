@@ -310,27 +310,33 @@ class FooState {}
         );
       });
 
-      test('detects leading ignore on a declaration at the very top of file', () {
-        // Regression guard for the synthetic start-of-file token (offset -1):
-        // its clamped line-1 location must not mislabel a line-1 ignore as
-        // trailing. See _isCommentAtLineStart.
-        expect(check('// ignore: my_rule\nclass FooState {}\n'), isTrue);
-      });
+      test(
+        'detects leading ignore on a declaration at the very top of file',
+        () {
+          // Regression guard for the synthetic start-of-file token (offset -1):
+          // its clamped line-1 location must not mislabel a line-1 ignore as
+          // trailing. See _isCommentAtLineStart.
+          expect(check('// ignore: my_rule\nclass FooState {}\n'), isTrue);
+        },
+      );
 
-      test('detects leading ignore directly above a doc-commented declaration', () {
-        // Standard ordering: doc block, then the ignore adjacent to the
-        // declaration. Keying off the name token's line (not node.offset, which
-        // points at the /// line) is what makes this resolve.
-        expect(
-          check('''
+      test(
+        'detects leading ignore directly above a doc-commented declaration',
+        () {
+          // Standard ordering: doc block, then the ignore adjacent to the
+          // declaration. Keying off the name token's line (not node.offset, which
+          // points at the /// line) is what makes this resolve.
+          expect(
+            check('''
 /// Doc line one.
 /// Doc line two.
 // ignore: my_rule
 class FooState {}
 '''),
-          isTrue,
-        );
-      });
+            isTrue,
+          );
+        },
+      );
 
       test('honors hyphenated rule name', () {
         expect(

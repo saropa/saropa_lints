@@ -1590,10 +1590,27 @@ class _FinalFieldMutationVisitor extends RecursiveAstVisitor<void> {
   /// `where`, `map`, …) are intentionally absent so a `final` collection that
   /// is only *read* in setState does not suppress the lint.
   static const Set<String> _mutatingMethods = <String>{
-    'add', 'addAll', 'insert', 'insertAll', 'remove', 'removeAt',
-    'removeLast', 'removeRange', 'removeWhere', 'retainWhere', 'clear',
-    'setAll', 'setRange', 'fillRange', 'replaceRange', 'sort', 'shuffle',
-    'putIfAbsent', 'update', 'updateAll', 'addEntries',
+    'add',
+    'addAll',
+    'insert',
+    'insertAll',
+    'remove',
+    'removeAt',
+    'removeLast',
+    'removeRange',
+    'removeWhere',
+    'retainWhere',
+    'clear',
+    'setAll',
+    'setRange',
+    'fillRange',
+    'replaceRange',
+    'sort',
+    'shuffle',
+    'putIfAbsent',
+    'update',
+    'updateAll',
+    'addEntries',
   };
 
   @override
