@@ -63,6 +63,14 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 -->
 
+## [Unreleased]
+
+Adds support for analyzer 12, now that Flutter stable ships the `meta` version analyzer 12 requires. Flutter and Dart projects on analyzer 12 can use saropa_lints without being pinned back to analyzer 11. analyzer 13 stays excluded because it requires a newer `meta` than Flutter stable currently pins. No action required. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
+
+### Changed
+
+- Added analyzer 12 support: widened the `analyzer`/`analyzer_plugin` constraints and updated the plugin internally for analyzer 12's API changes, so it now compiles and runs on analyzer 11 and 12. analyzer 13 remains excluded because it demands a newer `meta` than Flutter stable pins, which would break `flutter pub add`. No action required.
+
 ## [13.11.14]
 
 Adds `prefer_reusing_assigned_local` (Recommended), which flags an expression recomputed verbatim when a local variable already holds its result and offers a quick fix to reuse the local. It is the complement of `prefer_cached_getter`: the local already exists, so the fix swaps the recompute for the local rather than creating one. No action required. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
