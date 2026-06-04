@@ -52,9 +52,11 @@ class ReuseAssignedLocalFix extends SaropaFixProducer {
     // initializer prevents the fix from rewriting the declaration itself.
     Expression? target;
     String? replacement;
-    for (AstNode? current = node;
-        current != null && current != block;
-        current = current.parent) {
+    for (
+      AstNode? current = node;
+      current != null && current != block;
+      current = current.parent
+    ) {
       if (current is! Expression) continue;
       final declInfo = declsBySource[current.toSource()];
       if (declInfo != null && current.offset > declInfo.offset) {

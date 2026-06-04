@@ -1211,8 +1211,7 @@ class PreferReusingAssignedLocalRule extends SaropaLintRule {
       );
       block.accept(scanner);
 
-      for (final MapEntry<String, _AssignedLocal> entry
-          in firstDecls.entries) {
+      for (final MapEntry<String, _AssignedLocal> entry in firstDecls.entries) {
         final _AssignedLocal local = entry.value;
         // The earliest offset at which the receiver/local may have changed.
         // Past this point the recompute is no longer guaranteed redundant.
