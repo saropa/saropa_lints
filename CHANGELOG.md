@@ -63,13 +63,17 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 -->
 
-## [Unreleased]
+## [13.12.0]
 
 Adds support for analyzer 12, now that Flutter stable ships the `meta` version analyzer 12 requires. Flutter and Dart projects on analyzer 12 can use saropa_lints without being pinned back to analyzer 11. analyzer 13 stays excluded because it requires a newer `meta` than Flutter stable currently pins. No action required. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
 
 ### Changed
 
 - Added analyzer 12 support: widened the `analyzer`/`analyzer_plugin` constraints and updated the plugin internally for analyzer 12's API changes, so it now compiles and runs on analyzer 11 and 12. analyzer 13 remains excluded because it demands a newer `meta` than Flutter stable pins, which would break `flutter pub add`. No action required.
+
+### Fixed
+
+- **The "issues found" popup shown after analysis no longer claims violations when the Findings dashboard is empty, and no longer offers dead "Copy Report" / "Open Report" buttons.** It now waits for the analyzer to finish writing its results before appearing, counts what the dashboard will actually display so the two always agree, and shows each button only when the report it opens exists. When a run produces no findings it shows an honest "see Output" message instead. No action required.
 
 ## [13.11.14]
 

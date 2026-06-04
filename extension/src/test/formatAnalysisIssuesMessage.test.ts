@@ -11,7 +11,7 @@
 import './vibrancy/register-vscode-mock';
 
 import * as assert from 'node:assert';
-import { formatAnalysisIssuesMessage } from '../setup';
+import { analysisIssuesActions, formatAnalysisIssuesMessage } from '../setup';
 
 // Regression coverage for bugs/infra_run_analysis_popup_dumps_progress_stderr.md.
 // The earlier popup sliced dart analyze's stderr progress bar into the user's
@@ -103,5 +103,58 @@ describe('formatAnalysisIssuesMessage', () => {
     assert.ok(!msg.includes(' v '), `unexpected bare "v" token in: ${msg}`);
     assert.ok(!msg.includes('vundefined'), `undefined leaked into: ${msg}`);
     assert.strictEqual(msg, 'Saropa Lints: 42 issues found.');
+  });
+});
+
+// Gating matrix for the post-analysis popup's action buttons. The popup
+// previously offered "View Violations" / "Copy Report" / "Open Report"
+// unconditionally; on a run that exited non-zero but produced no saropa_lints
+// findings (no violations.json content, no report log) three of the four
+// buttons were inert and read as broken. analysisIssuesActions makes each
+// button appear only when its target artifact exists.
+describe('analysisIssuesActions', () => {
+  it('offers all four actions when there are violations and a report', () => {
+    assert.deepStrictEqual(analysisIssuesActions(7, true), [
+      'View Violations',
+      'Copy Report',
+      'Open Report',
+      'Show Output',
+    ]);
+  });
+
+  it('drops Copy/Open Report when the report log is absent', () => {
+    // The dashboard can still render violations, but there is no
+    // *_saropa_lint_report.log to copy or open — so those two buttons must
+    // not appear and flash a dead "no report found" toast.
+    assert.deepStrictEqual(analysisIssuesActions(7, false), [
+      'View Violations',
+      'Show Output',
+    ]);
+  });
+
+  it('drops View Violations when nothing is renderable but a report exists', () => {
+    assert.deepStrictEqual(analysisIssuesActions(0, true), [
+      'Copy Report',
+      'Open Report',
+      'Show Output',
+    ]);
+  });
+
+  it('shows only Show Output for a non-zero exit with no findings and no report', () => {
+    // The exact false-popup case: dart analyze exited non-zero (e.g. a
+    // compile error) but the plugin produced neither violations nor a report.
+    // Only the always-valid Output action survives.
+    assert.deepStrictEqual(analysisIssuesActions(0, false), ['Show Output']);
+  });
+
+  it('always includes Show Output', () => {
+    for (const renderable of [0, 1, 999]) {
+      for (const hasReport of [true, false]) {
+        assert.ok(
+          analysisIssuesActions(renderable, hasReport).includes('Show Output'),
+          `Show Output missing for renderable=${renderable} hasReport=${hasReport}`,
+        );
+      }
+    }
   });
 });
