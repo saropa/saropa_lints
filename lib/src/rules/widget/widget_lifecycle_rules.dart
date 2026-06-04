@@ -3521,7 +3521,7 @@ class PassExistingFutureToFutureBuilderRule extends SaropaLintRule {
 
 /// Warns when a new Stream is created inside StreamBuilder.
 ///
-/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v7
+/// Since: v0.1.4 | Updated: v13.11.12 | Rule version: v8
 ///
 /// Example of **bad** code:
 /// ```dart
@@ -3561,7 +3561,7 @@ class PassExistingStreamToStreamBuilderRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'pass_existing_stream_to_stream_builder',
-    '[pass_existing_stream_to_stream_builder] New Stream created inline in the StreamBuilder constructor. Every build() call creates a fresh stream, discarding the previous subscription and triggering an infinite rebuild loop as each new stream emits its initial value. {v7}',
+    '[pass_existing_stream_to_stream_builder] New Stream created inline in the StreamBuilder constructor. Every build() call creates a fresh stream, discarding the previous subscription and triggering an infinite rebuild loop as each new stream emits its initial value. {v8}',
     correctionMessage:
         'Store the Stream in a field (e.g., a late final or a State variable initialized in initState) and pass the stored reference to StreamBuilder.',
     severity: DiagnosticSeverity.WARNING,
@@ -3581,9 +3581,17 @@ class PassExistingStreamToStreamBuilderRule extends SaropaLintRule {
         if (arg is NamedExpression && arg.name.label.name == 'stream') {
           final Expression value = arg.expression;
 
-          // Warn if stream is a method invocation (creating new stream)
+          // Warn if stream is a method invocation (creating new stream).
+          // Skip the cache-method pattern: a private instance method on a class
+          // that owns a Stream<T>? field is the idiomatic way to return a
+          // cached stream when the cached value depends on dynamic input
+          // (where `late final` would be wrong). Mirrors the Future sibling's
+          // exemption. See bug:
+          // pass_existing_stream_to_stream_builder_missing_cache_method_exemption.
           if (value is MethodInvocation) {
-            reporter.atNode(value);
+            if (!_isCacheMethodCall(value)) {
+              reporter.atNode(value);
+            }
           }
 
           // Warn if stream is a function expression
@@ -3593,6 +3601,44 @@ class PassExistingStreamToStreamBuilderRule extends SaropaLintRule {
         }
       }
     });
+  }
+
+  /// Returns true when the call looks like a cache-method pattern:
+  /// a private instance method on the enclosing class whose owning class
+  /// declares at least one `Stream<...>?` field.
+  ///
+  /// The combination of (implicit-this private call) + (nullable Stream field
+  /// on the same class) is a strong signal that the method returns a cached
+  /// stream rather than allocating a fresh one each call. Without this opt-out
+  /// the rule criminalizes the project's idiomatic cache-method pattern, which
+  /// the rule's own correction message ("store the Stream in a field") already
+  /// endorses.
+  bool _isCacheMethodCall(MethodInvocation node) {
+    // Must be a method call on the enclosing class (implicit-this or `this`).
+    final Expression? target = node.target;
+    if (target != null && target is! ThisExpression) return false;
+
+    // Must be a private method (lives in the same library) — strong signal
+    // that we can reason about its body shape from project conventions.
+    if (!node.methodName.name.startsWith('_')) return false;
+
+    final ClassDeclaration? cls = node.thisOrAncestorOfType<ClassDeclaration>();
+    if (cls == null) return false;
+
+    // Search for at least one `Stream<...>?` field on the class. Nullable
+    // (`?`) is the load-bearing signal: late-final non-nullable streams can
+    // only be assigned once, so the cache-method reassignment pattern requires
+    // the field to be nullable.
+    for (final ClassMember member in cls.bodyMembers) {
+      if (member is! FieldDeclaration) continue;
+      final TypeAnnotation? type = member.fields.type;
+      if (type is NamedType &&
+          type.name.lexeme == 'Stream' &&
+          type.question != null) {
+        return true;
+      }
+    }
+    return false;
   }
 }
 

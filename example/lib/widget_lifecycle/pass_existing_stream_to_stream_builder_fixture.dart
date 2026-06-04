@@ -127,3 +127,66 @@ void _good1358() {
     builder: (context, snapshot) => Container(),
   );
 }
+
+// GOOD: cache-method pattern — private instance method on a class that owns a
+// `Stream<...>?` field. The method returns the cached field when inputs are
+// unchanged, so the rule must not fire.
+class _CachedContactsWidgetState extends State<StatefulWidget> {
+  Stream<List<String>?>? _contactsStream;
+  List<String>? _lastKeys;
+
+  Stream<List<String>?> _getContactsStream(List<String>? keys) {
+    final bool unchanged = _contactsStream != null && _listEq(keys, _lastKeys);
+    if (unchanged) return _contactsStream!;
+    _lastKeys = keys;
+    _contactsStream = _watch(keys);
+    return _contactsStream!;
+  }
+
+  Stream<List<String>?> _watch(List<String>? keys) => Stream.value(keys);
+
+  bool _listEq(List<String>? a, List<String>? b) => a?.length == b?.length;
+
+  @override
+  Widget build(BuildContext context) {
+    final List<String>? keys = const <String>['a', 'b'];
+    return StreamBuilder<List<String>?>(
+      stream: _getContactsStream(keys),
+      builder: (context, snapshot) => Container(),
+    );
+  }
+}
+
+// BAD: private instance method on a class with NO `Stream<...>?` field —
+// no cache field, so the call still allocates a fresh stream on every build.
+class _UncachedState extends State<StatefulWidget> {
+  Stream<String> _loadStream() => Stream.value('hello');
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<String>(
+      // expect_lint: pass_existing_stream_to_stream_builder
+      stream: _loadStream(),
+      builder: (context, snapshot) => Container(),
+    );
+  }
+}
+
+// BAD: PUBLIC method on a class that owns a `Stream<...>?` field.
+// The cache field alone is not sufficient — without the private (`_`) marker,
+// the method could come from a superclass / mixin / external API and we
+// cannot reason about its body shape from project conventions.
+class _PublicMethodCachedState extends State<StatefulWidget> {
+  Stream<String>? _cached;
+
+  Stream<String> loadStream() => _cached ??= Stream<String>.value('hi');
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<String>(
+      // expect_lint: pass_existing_stream_to_stream_builder
+      stream: loadStream(),
+      builder: (context, snapshot) => Container(),
+    );
+  }
+}
