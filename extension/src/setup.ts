@@ -7,7 +7,7 @@ import * as vscode from 'vscode';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { spawn, spawnSync, type ChildProcess } from 'node:child_process';
-import { logReport, logSection, flushReport } from './reportWriter';
+import { logReport, logSection, flushReport, findLatestAnalysisReport } from './reportWriter';
 import { getProjectRoot } from './projectRoot';
 import { readViolations } from './violationsReader';
 import { readInstalledVersion } from './upgrade-checker';
@@ -438,6 +438,98 @@ export function formatAnalysisIssuesMessage(
 }
 
 /**
+ * Decide which action buttons the post-analysis popup may show, given how
+ * many violations the dashboard can actually render and whether the Dart
+ * plugin's `*_saropa_lint_report.log` exists on disk.
+ *
+ * Why this is a separate, pure function: the popup historically offered
+ * "View Violations", "Copy Report" and "Open Report" *unconditionally* —
+ * even when there was nothing to view and no report file to copy/open. The
+ * `dart analyze` the extension spawns can exit non-zero for reasons that
+ * have nothing to do with saropa_lints (a core analyzer error, a compile
+ * failure), while the plugin writes `violations.json` and the report log
+ * together on a 3s idle debounce inside the analysis server
+ * (`AnalysisReporter._writeReport`). Those two signals are decoupled, so the
+ * popup could fire with zero renderable violations and no report — leaving
+ * three of its four buttons inert (a transient "no report found" toast that
+ * reads as broken). Gating each button on the thing it acts upon keeps the
+ * popup honest: a button appears only when it has a target.
+ *
+ * - "View Violations" requires at least one violation the dashboard renders.
+ * - "Copy Report" / "Open Report" require the report log to exist.
+ * - "Show Output" is always available — the Output channel always has the
+ *   run's stderr/diagnosis even when nothing else was produced.
+ *
+ * Exported for unit testing so the gating matrix is verified without driving
+ * the live VS Code notification UI.
+ */
+export function analysisIssuesActions(
+  renderableViolations: number,
+  hasReport: boolean,
+): string[] {
+  const actions: string[] = [];
+  if (renderableViolations > 0) actions.push('View Violations');
+  if (hasReport) actions.push('Copy Report', 'Open Report');
+  actions.push('Show Output');
+  return actions;
+}
+
+/**
+ * Max time to wait for the plugin to write a fresh `violations.json` after an
+ * analysis run before falling back to whatever is on disk. The analyzer writes
+ * on a 3s idle debounce (`AnalysisReporter._debounce`); 6s leaves margin for a
+ * multi-isolate consolidation without pinning the progress toast for an
+ * unreasonable time.
+ */
+const FRESH_VIOLATIONS_TIMEOUT_MS = 6000;
+
+/** Poll interval while waiting for the fresh `violations.json` write. */
+const FRESH_VIOLATIONS_POLL_MS = 250;
+
+/**
+ * Wait until `reports/.saropa_lints/violations.json` has been written newer
+ * than [sinceMs], or [timeoutMs] elapses. Returns true when a fresh write
+ * landed.
+ *
+ * Why this exists: the post-analysis popup must reflect the plugin's ACTUAL
+ * output, not the bare `dart analyze` exit code. The plugin (the live analysis
+ * server) writes `violations.json` and the `*_saropa_lint_report.log` together
+ * on a debounce, decoupled from the one-shot `dart analyze` the extension
+ * spawns. Firing the popup immediately off the exit code produced the "claims
+ * violations, empty dashboard, dead Copy/Open Report buttons" bug: the exit
+ * code can be non-zero (a core analyzer error, a compile failure) while the
+ * plugin's fresh write hasn't landed — or never lands for this run. Gating on
+ * a fresh write makes the popup honest: when it fires off fresh data, the
+ * dashboard is populated and the report exists, so every button has a target.
+ *
+ * Robust to both runtime realities — whether the spawned `dart analyze`
+ * triggers the write or the live server does — because it keys off the real
+ * artifact's mtime, not the subprocess. When no fresh write lands within the
+ * timeout, the caller still shows the gated notification, which then reflects
+ * whatever is on disk (typically the honest "see Output" no-findings message).
+ */
+async function awaitFreshViolations(
+  workspaceRoot: string,
+  sinceMs: number,
+  timeoutMs: number = FRESH_VIOLATIONS_TIMEOUT_MS,
+): Promise<boolean> {
+  const p = path.join(workspaceRoot, 'reports', '.saropa_lints', 'violations.json');
+  const deadline = Date.now() + timeoutMs;
+  for (;;) {
+    try {
+      // mtimeMs strictly greater than the run start means the plugin rewrote
+      // the file for THIS run, not a leftover from a prior session.
+      if (fs.existsSync(p) && fs.statSync(p).mtimeMs > sinceMs) return true;
+    } catch {
+      // stat race: the exporter writes temp-then-rename (ViolationExporter
+      // ._writeAtomicFile), so a stat can briefly hit a mid-rename gap. Retry.
+    }
+    if (Date.now() >= deadline) return false;
+    await new Promise((resolve) => setTimeout(resolve, FRESH_VIOLATIONS_POLL_MS));
+  }
+}
+
+/**
  * Warn the user that `dart analyze` reported issues, with the real count and
  * clickable buttons for the next step.
  *
@@ -448,32 +540,39 @@ export function formatAnalysisIssuesMessage(
  */
 function showAnalysisIssuesNotification(workspaceRoot: string, scope?: string): void {
   const data = readViolations(workspaceRoot);
-  // Prefer summary.totalViolations (authoritative — written by the plugin).
-  // Fall back to violations.length so older violations.json files (pre-summary)
-  // still produce a useful number. Final fallback of 0 triggers the
-  // "non-zero exit, see Output" branch in formatAnalysisIssuesMessage.
-  const total = data?.summary?.totalViolations ?? data?.violations.length ?? 0;
+  // Count what the Findings dashboard will actually render — the
+  // `violations[]` array — NOT `summary.totalViolations`. The summary is a
+  // plugin-written aggregate that can diverge from (or outlive) the array
+  // it summarizes; keying the popup off the array guarantees the popup can
+  // never claim "N violations found" while the dashboard shows none. That
+  // exact mismatch is what made the popup look like it was lying.
+  const renderableViolations = data?.violations.length ?? 0;
+  // The plugin writes `violations.json` and the `*_saropa_lint_report.log`
+  // together in one atomic pass (`AnalysisReporter._writeReport`). A missing
+  // report therefore means the plugin produced no findings this run — even
+  // when `dart analyze` exited non-zero for an unrelated reason (compile
+  // error, core analyzer diagnostic). Resolve it once so both the message
+  // and the button set agree on what data actually exists.
+  const reportPath = findLatestAnalysisReport(workspaceRoot);
+  const hasReport = reportPath !== undefined;
   // Surface the resolved saropa_lints version in the popup so users can tell
   // at a glance which plugin build produced these diagnostics — previously
   // users had to open the report file (and that field was broken too).
   const installed = resolveSaropaLintsVersion(workspaceRoot);
-  const message = formatAnalysisIssuesMessage(total, scope, installed?.version);
+  // When nothing renderable exists, formatAnalysisIssuesMessage(0, …) already
+  // produces the honest "analysis finished with a non-zero exit. See Output"
+  // text — so a no-findings run shows that message with only the always-valid
+  // "Show Output" action (analysisIssuesActions gates the rest away).
+  const message = formatAnalysisIssuesMessage(renderableViolations, scope, installed?.version);
 
-  // Two new actions — "Copy Report" and "Open Report" — land alongside
-  // the existing buttons rather than replacing them, so users who relied
-  // on the sidebar / output-channel flow keep their muscle memory. The
-  // two new actions target the Dart plugin's consolidated
-  // `*_saropa_lint_report.log` (top rules, concentration, triage) since
-  // that's the report users need to copy into a chat / issue / email or
-  // scroll through themselves.
+  // Each action is gated on the artifact it acts upon (see
+  // analysisIssuesActions): "Copy Report" / "Open Report" only appear when
+  // the report log exists, "View Violations" only when there is something to
+  // view. This removes the dead buttons that previously fired a transient
+  // "no report found" toast and read as broken.
+  const actions = analysisIssuesActions(renderableViolations, hasReport);
   void vscode.window
-    .showWarningMessage(
-      message,
-      'View Violations',
-      'Copy Report',
-      'Open Report',
-      'Show Output',
-    )
+    .showWarningMessage(message, ...actions)
     .then((choice) => {
       if (choice === 'View Violations') {
         void vscode.commands.executeCommand('saropaLints.focusIssues');
@@ -541,6 +640,11 @@ export async function runAnalysis(context: vscode.ExtensionContext): Promise<boo
       cancellable: false,
     },
     async () => {
+      // Stamp the run start so the post-analysis popup can wait for the
+      // plugin's fresh violations.json write (newer than this) before firing,
+      // instead of racing the bare `dart analyze` exit code. See
+      // awaitFreshViolations for the decoupling rationale.
+      const runStartMs = Date.now();
       if (openEditorsOnly) {
         const files = getOpenDartFilePaths(workspaceRoot);
         if (files.length === 0) {
@@ -554,6 +658,9 @@ export async function runAnalysis(context: vscode.ExtensionContext): Promise<boo
         if (!ok) {
           // See bugs/infra_run_analysis_popup_dumps_progress_stderr.md — scope
           // label tells the user why the count may differ from a full run.
+          // Wait for the plugin's fresh write so the popup reflects real data
+          // (and the report log exists) rather than a stale/empty snapshot.
+          await awaitFreshViolations(workspaceRoot, runStartMs);
           showAnalysisIssuesNotification(workspaceRoot, 'open editors only');
         }
         return;
@@ -571,7 +678,10 @@ export async function runAnalysis(context: vscode.ExtensionContext): Promise<boo
         // See bugs/infra_run_analysis_popup_dumps_progress_stderr.md — the old
         // code sliced result.stderr into the popup, but dart analyze writes a
         // progress bar to stderr, so the popup was always garbled chrome.
-        // Read the authoritative count from violations.json instead.
+        // Read the authoritative count from violations.json instead — but only
+        // after waiting for the plugin's fresh write so the popup, the report
+        // buttons, and the dashboard all agree on the same data.
+        await awaitFreshViolations(workspaceRoot, runStartMs);
         showAnalysisIssuesNotification(workspaceRoot);
       }
       logSuppressionSummary(workspaceRoot);
