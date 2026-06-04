@@ -830,6 +830,9 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_extending_security_context', // ERROR - SecurityContext final (Dart 3.5)
   'avoid_deprecated_pointer_arithmetic', // WARNING - Pointer.elementAt() deprecated (Dart 3.3)
   'prefer_extracting_repeated_map_lookup', // INFO - extract repeated map[key] (Flutter 3.10)
+  // INFO - a local already caches this expression; reuse it instead of
+  // recomputing. Complement of prefer_cached_getter (which creates the local).
+  'prefer_reusing_assigned_local',
   // Flutter deprecation migrations
   'avoid_removed_render_object_element_methods',
   'avoid_deprecated_animated_list_typedefs',

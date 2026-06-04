@@ -234,6 +234,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidEmptySpreadRule.new,
   AvoidOnlyRethrowRule.new,
   NoEmptyStringRule.new,
+  PreferReusingAssignedLocalRule.new,
   PreferContainsRule.new,
   PreferFirstRule.new,
   RequireDisposeRule.new,

@@ -4,7 +4,7 @@ import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/code_quality/unnecessary_code_rules.dart';
 
-/// Tests for 14 Unnecessary Code lint rules.
+/// Tests for 15 Unnecessary Code lint rules.
 ///
 /// Test fixtures: example/lib/unnecessary_code/*
 void main() {
@@ -93,6 +93,11 @@ void main() {
 
     testRule('NoEmptyBlockRule', 'no_empty_block', () => NoEmptyBlockRule());
     testRule('NoEmptyStringRule', 'no_empty_string', () => NoEmptyStringRule());
+    testRule(
+      'PreferReusingAssignedLocalRule',
+      'prefer_reusing_assigned_local',
+      () => PreferReusingAssignedLocalRule(),
+    );
   });
 
   group('Unnecessary Code Rules - Fixture Verification', () {
@@ -111,6 +116,7 @@ void main() {
       'avoid_unnecessary_super',
       'no_empty_block',
       'no_empty_string',
+      'prefer_reusing_assigned_local',
     ];
 
     for (final fixture in fixtures) {
@@ -136,6 +142,13 @@ void main() {
     group('no_empty_block', () {
       test('rule offers quick fix (add no-op comment)', () {
         final rule = NoEmptyBlockRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+    });
+
+    group('prefer_reusing_assigned_local', () {
+      test('rule offers quick fix (reuse the existing local)', () {
+        final rule = PreferReusingAssignedLocalRule();
         expect(rule.fixGenerators, isNotEmpty);
       });
     });
