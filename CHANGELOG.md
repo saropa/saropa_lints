@@ -63,13 +63,14 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 -->
 
-## [Unreleased]
+## [13.11.13]
 
-Fixes a `prefer_value_listenable_builder` false positive on `State` classes that hold one reassigned field plus a `final` collection mutated in place. No action required unless you added a project-local ignore for the pattern below. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
+Fixes a `prefer_value_listenable_builder` false positive on `State` classes that hold one reassigned field plus a `final` collection mutated in place, and restores line-level `// ignore:` suppression for diagnostics reported on a declaration's name (such as class-level rules). No action required unless you added a project-local ignore for either pattern below. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
 
 ### Fixed
 
 - **`prefer_value_listenable_builder` no longer fires when a `State` mutates a `final` `List`/`Set`/`Map` field in place inside `setState` (e.g. `_selected.add(v)` or `_tally[k] = v`).** That collection is a second independent state the single-value suggestion would silently drop, so the rule now treats such a widget as multi-state and stays quiet — remove any project-local `// ignore_for_file: prefer_value_listenable_builder` added for this case. A `final` collection that is only read in `setState` still triggers the rule.
+- **A `// ignore:` on the line directly above a declaration now suppresses diagnostics reported on the declaration's name (class-level rules such as `prefer_value_listenable_builder` and `avoid_global_key_misuse`).** Previously only `// ignore_for_file:` worked for these, because the directive attaches to the declaration keyword rather than the name token the rule reports on — place the `// ignore:` on the line immediately above the declaration as usual and it now applies, including below a `///` doc block.
 
 ## [13.11.12]
 

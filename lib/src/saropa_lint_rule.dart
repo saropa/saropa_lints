@@ -3032,7 +3032,21 @@ class SaropaDiagnosticReporter {
       _trackSuppression(token.offset, SuppressionKind.ignoreForFile);
       return;
     }
-    if (IgnoreUtils.hasIgnoreCommentOnToken(token, _ruleName)) {
+    // A leading `// ignore:` above a declaration attaches to the declaration's
+    // first token on its line (e.g. `class`), not the name token reported here,
+    // so `hasIgnoreCommentOnToken` (name-token `precedingComments` only) never
+    // sees it. Probe the line-leading token first. The two checks are OR'd so
+    // every site the legacy check suppressed stays suppressed — this can only
+    // ever suppress MORE, never fewer. `currentUnit` is the unit under analysis
+    // during this synchronous callback, so its `lineInfo` matches `token`. See
+    // plans/history/2026.06/2026.06.04/infra_ignore_comment_not_honored_attoken_declaration_name.md.
+    final lineInfo = _ruleContext.currentUnit?.unit.lineInfo;
+    if (IgnoreUtils.hasLeadingIgnoreCommentBeforeToken(
+          token,
+          _ruleName,
+          lineInfo,
+        ) ||
+        IgnoreUtils.hasIgnoreCommentOnToken(token, _ruleName)) {
       _trackSuppression(token.offset, SuppressionKind.ignore);
       return;
     }

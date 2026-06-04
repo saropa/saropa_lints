@@ -122,6 +122,67 @@ class IgnoreUtils {
     return false;
   }
 
+  /// Checks for a leading `// ignore:` directive governing a diagnostic that is
+  /// reported directly on [token] — typically a declaration's NAME token
+  /// (`reporter.atToken(node.nameToken)`).
+  ///
+  /// A leading `// ignore:` written on the line above a declaration attaches to
+  /// the declaration's FIRST token on that line (the `class`/`enum`/`mixin`
+  /// keyword), never to the name token sitting mid-line. [hasIgnoreCommentOnToken]
+  /// inspects only the name token's own `precedingComments` — always `null` for
+  /// a mid-line name token — so the directive is invisible to it, and a
+  /// correctly-placed line-level `// ignore:` silently does nothing. See
+  /// plans/history/2026.06/2026.06.04/infra_ignore_comment_not_honored_attoken_declaration_name.md.
+  ///
+  /// This walks back across the tokens that share [token]'s own line to reach
+  /// the line-leading token, then reuses [_hasValidLeadingIgnoreComment] so the
+  /// placement rules are identical to node-based suppression and the analyzer's
+  /// line-based `// ignore:` semantics: the directive must be on the line
+  /// immediately above the diagnostic line (and at the start of that line), or
+  /// trailing on the same line.
+  ///
+  /// Keying off [token]'s line (not the enclosing declaration's `node.offset`,
+  /// which for a doc-commented declaration points at the `///` line) is what
+  /// lets the common `///`-then-`// ignore:`-then-declaration ordering resolve —
+  /// the gap the node-path left open (see the doc-comment sibling fix's "Known
+  /// remaining gap"). It intentionally does NOT suppress a `// ignore:` placed
+  /// above an annotation block, because the diagnostic is reported on the name
+  /// line, not the `@` line — matching the analyzer, which suppresses only the
+  /// line immediately below the directive.
+  ///
+  /// Returns `false` when [lineInfo] is `null` (the "line above" relationship is
+  /// unknowable without it); callers should fall back to [hasIgnoreCommentOnToken].
+  static bool hasLeadingIgnoreCommentBeforeToken(
+    Token token,
+    String ruleName,
+    LineInfo? lineInfo,
+  ) {
+    if (lineInfo == null) return false;
+
+    final int tokenLine = lineInfo.getLocation(token.offset).lineNumber;
+
+    // Walk back to the first token on the diagnostic token's line. The leading
+    // `// ignore:` hangs off that token's `precedingComments`, not the name's.
+    // Comments are NOT part of the `.previous` chain (they attach via
+    // `precedingComments`), so this only crosses real code tokens and stops at
+    // the line boundary or the start of the token stream.
+    Token lineLeadingToken = token;
+    Token? previous = token.previous;
+    while (previous != null &&
+        previous.offset >= 0 &&
+        lineInfo.getLocation(previous.offset).lineNumber == tokenLine) {
+      lineLeadingToken = previous;
+      previous = previous.previous;
+    }
+
+    return _hasValidLeadingIgnoreComment(
+      lineLeadingToken,
+      ruleName,
+      tokenLine,
+      lineInfo,
+    );
+  }
+
   /// Checks for ignore comments on the node or any of its ancestors.
   ///
   /// This handles cases where the ignore comment is on a parent expression,
@@ -381,7 +442,12 @@ class IgnoreUtils {
     // If that token ends on the same line as the comment, then the comment
     // is a trailing comment for that token, not a leading comment
     final Token? prevToken = tokenHoldingComment.previous;
-    if (prevToken != null) {
+    // A synthetic start-of-file token has offset -1; `lineInfo.getLocation(-1)`
+    // clamps to line 1, which spuriously equals a line-1 comment's line and
+    // would mislabel a genuine leading `// ignore:` on the first line as
+    // trailing. There is no real code before it, so the comment IS leading.
+    // This matters for any declaration at the very top of a file.
+    if (prevToken != null && prevToken.offset >= 0) {
       final prevTokenEndLine = lineInfo.getLocation(prevToken.end).lineNumber;
       if (prevTokenEndLine == commentLine) {
         // Previous token ends on the same line as the comment
