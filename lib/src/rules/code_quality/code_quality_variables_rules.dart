@@ -124,22 +124,48 @@ class _LateFinalAssignmentCounter extends RecursiveAstVisitor<void> {
   }
 }
 
-/// Warns when Completer.completeError is called without stack trace.
+/// Warns when an enum-keyed map literal omits one or more enum constants.
 ///
-/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+/// Rule version: v3
+///
+/// When a new enum value is later added, an incomplete map silently returns
+/// `null` for the missing key instead of failing at compile time, which can
+/// surface as an unexpected null or a wrong fallback at runtime.
 ///
 /// Example of **bad** code:
 /// ```dart
-/// completer.completeError(error);  // Missing stack trace
+/// enum Color { red, green, blue }
+/// final labels = <Color, String>{
+///   Color.red: 'Red',
+///   Color.green: 'Green', // Color.blue missing -> labels[Color.blue] == null
+/// };
 /// ```
 ///
 /// Example of **good** code:
 /// ```dart
-/// completer.completeError(error, stackTrace);
+/// final labels = <Color, String>{
+///   Color.red: 'Red',
+///   Color.green: 'Green',
+///   Color.blue: 'Blue',
+/// };
 /// ```
 ///
 /// **Exempt:** Maps that include all enum constants (resolved from the
 /// actual enum type) are not flagged.
+///
+/// **Intentionally-sparse tables:** Some maps deliberately omit constants — a
+/// lookup table where an absent key is a defined default, consumed only via
+/// iteration (`.entries`/`.values`/`.keys`/`.forEach`) or via a null-handled
+/// read (`map[k] ?? default`, or a nullable-typed `final v = map[k];
+/// if (v != null) ...`). This rule decides purely from the literal's keys and
+/// cannot see the read site — which is usually in another file (the literal in
+/// a `*_data.dart`, the read in a `*_utils.dart`/view) — so it cannot prove
+/// such reads are null-safe and the silent-null harm cannot occur. When the
+/// sparseness is intentional and the reads are null-safe, suppress with a
+/// `// ignore: avoid_missing_enum_constant_in_map` on the line directly above
+/// the declaration plus a one-line reason. The suppression is honored even when
+/// the declaration carries a `///` doc comment (see `IgnoreUtils`). See bug
+/// `avoid_missing_enum_constant_in_map_false_positive_sparse_null_handled_lookup.md`.
 class AvoidMissingEnumConstantInMapRule extends SaropaLintRule {
   AvoidMissingEnumConstantInMapRule() : super(code: _code);
 

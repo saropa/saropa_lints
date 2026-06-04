@@ -71,6 +71,7 @@ Fixes a suppression bug where a `// ignore:` placed directly above a declaration
 
 - **A `// ignore:` directly above a `///`-documented declaration is now honored.** When a doc comment preceded the declaration, the suppression silently never fired for any diagnostic reported on a child node (e.g. a map literal), so teams had no working narrow-suppression for those sites — place the `// ignore:` on the line immediately above the declaration as usual and it now applies.
 - **`pass_existing_stream_to_stream_builder` no longer fires on a private cache-method that returns a stored `Stream<...>?` field.** A `stream: _getStream(filter)` accessor that rebuilds its stream only when inputs change already satisfies the rule's own advice to store and reuse the stream, so it now mirrors the cache-method exemption its `FutureBuilder` sibling already had — remove any project-local `// ignore: pass_existing_stream_to_stream_builder` added on such accessors.
+- **`avoid_missing_enum_constant_in_map` documentation now describes the rule (its examples had been copy-pasted from an unrelated rule) and the supported escape hatch for intentionally-sparse tables.** The rule cannot see the (usually cross-file) read site, so it cannot tell a deliberate sparse lookup table whose absent keys are a null-handled default from a latent bug — for those tables suppress with a verified `// ignore: avoid_missing_enum_constant_in_map` on the line above the declaration, now honored even under a `///` doc comment.
 
 ## [13.11.11]
 

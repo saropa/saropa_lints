@@ -135,6 +135,16 @@ final _completeStatusMap = <_Status, int>{
   _Status.inactive: 0,
 };
 
+// GOOD: Intentionally-sparse lookup table. _Color.green is a defined default
+// (absent key -> handled null at the read site). The rule cannot see the
+// cross-file null-safe read, so the supported escape hatch is a verified
+// // ignore: on the line directly above the declaration.
+// ignore: avoid_missing_enum_constant_in_map
+final _sparseWeights = <_Color, int>{
+  _Color.red: 3,
+  _Color.blue: 3,
+};
+
 // GOOD: Not enum-keyed
 final _stringMap = <String, int>{
   'a': 1,
