@@ -63,6 +63,15 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 -->
 
+## [Unreleased]
+
+Fixes a suppression bug where a `// ignore:` placed directly above a declaration that also carries a `///` doc comment was silently ignored. No action required. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
+
+### Fixed
+
+- **A `// ignore:` directly above a `///`-documented declaration is now honored.** When a doc comment preceded the declaration, the suppression silently never fired for any diagnostic reported on a child node (e.g. a map literal), so teams had no working narrow-suppression for those sites — place the `// ignore:` on the line immediately above the declaration as usual and it now applies.
+- **`pass_existing_stream_to_stream_builder` no longer fires on a private cache-method that returns a stored `Stream<...>?` field.** A `stream: _getStream(filter)` accessor that rebuilds its stream only when inputs change already satisfies the rule's own advice to store and reuse the stream, so it now mirrors the cache-method exemption its `FutureBuilder` sibling already had — remove any project-local `// ignore: pass_existing_stream_to_stream_builder` added on such accessors.
+
 ## [13.11.11]
 
 False-positive fixes for the `avoid_large_list_copy` and `prefer_single_setstate` rules. No action required unless you added a project-local ignore for the patterns below. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
