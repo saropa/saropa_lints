@@ -79,9 +79,13 @@ class CapturingRuleVisitorRegistry implements RuleVisitorRegistry {
   void addBlockClassBody(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
   // analyzer 11 has a single addEnumBody (covers both block and empty enum
   // bodies). analyzer 12 split it into addBlockEnumBody + addEmptyEnumBody and
-  // dropped addEnumBody. We pin to analyzer <12 (Flutter stable's meta 1.17.0
-  // forces this), so addEnumBody is what we override; the 12-only split
-  // methods are not present in this file.
+  // dropped addEnumBody. The package supports analyzer 9-12, so all three are
+  // implemented: addEnumBody satisfies the 9-11 interface, the split pair
+  // satisfies the 12 interface. The unused override on each version is an
+  // override_on_non_overriding_member warning, suppressed by the lib/**
+  // analyzer exclude. addEmptyEnumBody lives in its alphabetical slot below.
+  @override
+  void addBlockEnumBody(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
   @override
   void addEnumBody(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
   @override
@@ -170,8 +174,11 @@ class CapturingRuleVisitorRegistry implements RuleVisitorRegistry {
       _capture(v);
   @override
   void addEmptyStatement(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
-  // analyzer 12-only: addEmptyEnumBody was removed (analyzer 11 handles it via
-  // addEnumBody above). Removed entirely so the class isn't abstract.
+  // analyzer 12-only: the addEnumBody split (see addBlockEnumBody above).
+  // analyzer 9-11 route empty enum bodies through addEnumBody, where this is an
+  // override_on_non_overriding_member warning suppressed by the lib/** exclude.
+  @override
+  void addEmptyEnumBody(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
   @override
   void addEnumConstantArguments(AbstractAnalysisRule r, AstVisitor v) =>
       _capture(v);

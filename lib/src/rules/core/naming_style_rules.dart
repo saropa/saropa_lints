@@ -2770,10 +2770,11 @@ class PreferCorrectPackageNameRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addLibraryDirective((LibraryDirective node) {
-      // analyzer 11: LibraryDirective.name is LibraryIdentifier?.
-      // analyzer 12 renamed this to DottedName. We pin to analyzer <12 to
-      // stay compatible with Flutter stable's meta 1.17.0 pin (see pubspec).
-      final LibraryIdentifier? libName = node.name;
+      // LibraryDirective.name is LibraryIdentifier? on analyzer 9-11 and
+      // DottedName? on analyzer 12. Both are AstNodes exposing toSource(), so
+      // inferring the type keeps this compiling across the supported 9-12
+      // range without a version-specific annotation.
+      final libName = node.name;
       if (libName == null) return; // `library;` without name is valid
 
       final String libraryName = libName.toSource();

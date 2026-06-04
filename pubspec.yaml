@@ -65,19 +65,26 @@ dependencies:
 
   # This package provides a library that performs static analysis of Dart code.
   # https://pub.dev/packages/analyzer
-  # CRITICAL: Must stay compatible with Flutter stable's pinned meta version.
-  # analyzer 12 requires meta ^1.18.0 which conflicts with Flutter stable's
-  # meta 1.17.0 pin — making saropa_lints unresolvable for Flutter consumers.
-  # Reverting to analyzer 11 range fixes the regression introduced in
-  # commit 0bab4ea0 (Apr 27 2026), which broke every Flutter stable consumer
-  # of saropa_lints 12.6.0 onward (resolution failure on `flutter pub add`).
-  # Do NOT bump back to analyzer ^12 until Flutter stable ships meta ^1.18.0.
-  analyzer: ">=9.0.0 <12.0.0"
+  # CRITICAL: Must stay compatible with Flutter stable's exact `meta` pin.
+  # Flutter stable (3.44.x, May 2026) pins meta to EXACTLY 1.18.0, so any
+  # transitive dependency that demands a higher meta makes saropa_lints
+  # unresolvable for Flutter consumers (`flutter pub add` resolution failure).
+  #   - analyzer 12.x requires meta ^1.18.0 -> satisfied by 1.18.0 (OK).
+  #   - analyzer 13.x requires meta ^1.18.3 -> NOT satisfied by 1.18.0 (BREAKS).
+  # History: the original regression (commit 0bab4ea0, Apr 27 2026) was an
+  # analyzer ^12 bump back when Flutter stable still pinned meta 1.17.0. That
+  # blocker is gone now that stable ships meta 1.18.0; the live blocker is
+  # analyzer 13's meta ^1.18.3 floor.
+  # Do NOT raise the cap to allow analyzer ^13 until Flutter stable ships
+  # meta ^1.18.3.
+  analyzer: ">=9.0.0 <13.0.0"
 
   # A framework and support code for building plugins for the analysis server.
   # https://pub.dev/packages/analyzer_plugin
-  # Capped at <0.14.7 because 0.14.7+ requires analyzer ^12.
-  analyzer_plugin: ">=0.11.0 <0.14.7"
+  # Capped below 0.15.0: analyzer_plugin 0.14.10 pulls analyzer 13.1.0 (meta
+  # ^1.18.3, breaks Flutter consumers per the analyzer note above). The pub
+  # solver backtracks to the highest 0.14.x that pairs with analyzer 12.x.
+  analyzer_plugin: ">=0.11.0 <0.15.0"
 
   # Collections and utilities functions and classes related to collections.
   # https://pub.dev/packages/collection
