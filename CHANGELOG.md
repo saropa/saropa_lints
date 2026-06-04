@@ -63,6 +63,14 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 -->
 
+## [Unreleased]
+
+Fixes a `prefer_value_listenable_builder` false positive on `State` classes that hold one reassigned field plus a `final` collection mutated in place. No action required unless you added a project-local ignore for the pattern below. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
+
+### Fixed
+
+- **`prefer_value_listenable_builder` no longer fires when a `State` mutates a `final` `List`/`Set`/`Map` field in place inside `setState` (e.g. `_selected.add(v)` or `_tally[k] = v`).** That collection is a second independent state the single-value suggestion would silently drop, so the rule now treats such a widget as multi-state and stays quiet — remove any project-local `// ignore_for_file: prefer_value_listenable_builder` added for this case. A `final` collection that is only read in `setState` still triggers the rule.
+
 ## [13.11.12]
 
 Fixes a suppression bug where a `// ignore:` placed directly above a declaration that also carries a `///` doc comment was silently ignored. No action required. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
