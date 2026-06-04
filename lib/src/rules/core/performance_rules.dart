@@ -1469,9 +1469,26 @@ class PreferValueListenableBuilderRule extends SaropaLintRule {
       if (superclass.name.lexeme != 'State') return;
       if (superclass.typeArguments == null) return;
 
+      // First pass: collect names of non-static `final` fields. A `final`
+      // collection mutated in place (`List.add`, `Map[k] = v`) inside setState
+      // is live UI state that the non-final field count below cannot see, and
+      // declaration order is not guaranteed (methods may precede fields), so
+      // the names must be gathered before the setState bodies are walked.
+      final Set<String> finalFieldNames = <String>{};
+      for (final ClassMember member in node.bodyMembers) {
+        if (member is FieldDeclaration &&
+            !member.isStatic &&
+            member.fields.isFinal) {
+          for (final VariableDeclaration variable in member.fields.variables) {
+            finalFieldNames.add(variable.name.lexeme);
+          }
+        }
+      }
+
       // Count non-final fields (state)
       int stateFieldCount = 0;
       int setStateCallCount = 0;
+      bool mutatesFinalField = false;
 
       for (final ClassMember member in node.bodyMembers) {
         if (member is FieldDeclaration) {
@@ -1491,10 +1508,22 @@ class PreferValueListenableBuilderRule extends SaropaLintRule {
         }
         if (member is MethodDeclaration) {
           member.body.visitChildren(
-            _SetStateCounterVisitor(() => setStateCallCount++),
+            _SetStateCounterVisitor(
+              () => setStateCallCount++,
+              finalFieldNames,
+              () => mutatesFinalField = true,
+            ),
           );
         }
       }
+
+      // A `final` collection mutated in place and republished via setState is a
+      // second, independent state. ValueListenableBuilder<T> exposes exactly
+      // one value, so the suggested single-notifier refactor would silently
+      // drop the mutated-collection state. Bail out. See bugs/
+      // prefer_value_listenable_builder_false_positive_inplace_mutation_
+      // final_collection.md.
+      if (mutatesFinalField) return;
 
       // Suggest ValueListenableBuilder if state is very simple
       // (1 field with few setState calls)
@@ -1519,16 +1548,77 @@ class PreferValueListenableBuilderRule extends SaropaLintRule {
 }
 
 class _SetStateCounterVisitor extends RecursiveAstVisitor<void> {
-  _SetStateCounterVisitor(this.onSetState);
+  _SetStateCounterVisitor(
+    this.onSetState,
+    this.finalFieldNames,
+    this.onFinalFieldMutated,
+  );
 
   final void Function() onSetState;
+
+  /// Names of the class's non-static `final` fields. A mutating call against
+  /// one of these inside a setState callback signals hidden collection state.
+  final Set<String> finalFieldNames;
+  final void Function() onFinalFieldMutated;
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
     if (node.methodName.name == 'setState') {
       onSetState();
+      // Scan the setState callback for in-place mutation of a `final` field;
+      // such a field is a second state the field-count heuristic misses.
+      node.argumentList.visitChildren(
+        _FinalFieldMutationVisitor(finalFieldNames, onFinalFieldMutated),
+      );
     }
     super.visitMethodInvocation(node);
+  }
+}
+
+/// Detects in-place mutation of a `final` collection field within a setState
+/// callback: a method call like `_selected.add(x)` / `_map.clear()` or an
+/// index-assignment like `_map[k] = v`. Either pattern means the `final` field
+/// carries live UI state that `prefer_value_listenable_builder`'s non-final
+/// field count cannot see.
+class _FinalFieldMutationVisitor extends RecursiveAstVisitor<void> {
+  _FinalFieldMutationVisitor(this.finalFieldNames, this.onMutation);
+
+  final Set<String> finalFieldNames;
+  final void Function() onMutation;
+
+  /// Mutating members of `List`/`Set`/`Map`. Read-only members (`contains`,
+  /// `where`, `map`, …) are intentionally absent so a `final` collection that
+  /// is only *read* in setState does not suppress the lint.
+  static const Set<String> _mutatingMethods = <String>{
+    'add', 'addAll', 'insert', 'insertAll', 'remove', 'removeAt',
+    'removeLast', 'removeRange', 'removeWhere', 'retainWhere', 'clear',
+    'setAll', 'setRange', 'fillRange', 'replaceRange', 'sort', 'shuffle',
+    'putIfAbsent', 'update', 'updateAll', 'addEntries',
+  };
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    final Expression? target = node.target;
+    if (target is SimpleIdentifier &&
+        finalFieldNames.contains(target.name) &&
+        _mutatingMethods.contains(node.methodName.name)) {
+      onMutation();
+    }
+    super.visitMethodInvocation(node);
+  }
+
+  @override
+  void visitAssignmentExpression(AssignmentExpression node) {
+    // `_map[k] = v` / `_list[i] = v` — index-assignment into a final field.
+    final Expression lhs = node.leftHandSide;
+    if (lhs is IndexExpression) {
+      final Expression? indexTarget = lhs.target;
+      if (indexTarget is SimpleIdentifier &&
+          finalFieldNames.contains(indexTarget.name)) {
+        onMutation();
+      }
+    }
+    super.visitAssignmentExpression(node);
   }
 }
 

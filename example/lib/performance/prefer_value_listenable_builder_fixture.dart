@@ -157,6 +157,55 @@ class _good790StreamCacheState extends State<MyWidget> {
   }
 }
 
+// GOOD: one non-final field (_filtered) PLUS a `final` List mutated in place
+// (_selected.add/remove) and republished via setState. That is two independent
+// states; a single ValueListenableBuilder cannot express both, so no lint.
+// See bugs/prefer_value_listenable_builder_false_positive_inplace_mutation_
+// final_collection.md.
+class _good790InPlaceListState extends State<MyWidget> {
+  List<int> _filtered = <int>[];
+  late final List<int> _selected = <int>[];
+
+  void _onSearch() => setState(() => _filtered = <int>[1]);
+  void _toggle(int v) => setState(() {
+    _selected.contains(v) ? _selected.remove(v) : _selected.add(v);
+  });
+
+  Widget build(BuildContext context) {
+    return Text('${_filtered.length}/${_selected.length}');
+  }
+}
+
+// GOOD: one non-final field plus a `final` Map index-assigned (m[k] = v) inside
+// setState — the map is a second state, so no lint.
+class _good790IndexAssignMapState extends State<MyWidget> {
+  int _counter = 0;
+  final Map<int, int> _tally = <int, int>{};
+
+  void _inc() => setState(() => _counter++);
+  void _record(int k) => setState(() => _tally[k] = _counter);
+
+  Widget build(BuildContext context) {
+    return Text('$_counter/${_tally.length}');
+  }
+}
+
+// BAD: one non-final field with two setState calls that only REASSIGN it (the
+// `final` list is read, never mutated) — genuine single-value state, so it
+// still fires. Confirms the new guard does not over-suppress.
+// expect_lint: prefer_value_listenable_builder
+class _bad790ReadOnlyFinalState extends State<MyWidget> {
+  int _counter = 0;
+  final List<int> _history = <int>[];
+
+  void _inc() => setState(() => _counter = _history.length);
+  void _reset() => setState(() => _counter = 0);
+
+  Widget build(BuildContext context) {
+    return Text('$_counter');
+  }
+}
+
 // GOOD: Should NOT trigger prefer_value_listenable_builder
 void _good790() {
   final _counter = ValueNotifier<int>(0);
