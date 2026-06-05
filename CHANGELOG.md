@@ -65,7 +65,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [Unreleased]
 
-Fixes two `prefer_value_listenable_builder` false positives: one on `State` classes that back a `FutureBuilder`/`StreamBuilder` cache with a plain cache-key companion field plus one `setState` that re-runs the fetch, and one on screens whose extra rebuild state lives in a `final` controller republished by a bare `setState(() {})`. Also fixes two `prefer_reusing_assigned_local` false positives: one where a nested builder closure reuses a parameter name (such as `snapshot`) that an outer scope already declared, and one where a live value (such as a `GlobalKey`'s `currentContext`) is intentionally re-read after an `await`. No action required unless you added a project-local ignore for one of these patterns. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
+Fixes two `prefer_value_listenable_builder` false positives: one on `State` classes that back a `FutureBuilder`/`StreamBuilder` cache with a plain cache-key companion field plus one `setState` that re-runs the fetch, and one on screens whose extra rebuild state lives in a `final` controller republished by a bare `setState(() {})`. Also fixes two `prefer_reusing_assigned_local` false positives: one where a nested builder closure reuses a parameter name (such as `snapshot`) that an outer scope already declared, and one where a live value (such as a `GlobalKey`'s `currentContext`) is intentionally re-read after an `await`. Renames the `impact_report` CLI tool to `severity_report` (the old name still works). No action required unless you added a project-local ignore for one of these patterns. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
 
 ### Fixed
 
@@ -73,6 +73,16 @@ Fixes two `prefer_value_listenable_builder` false positives: one on `State` clas
 - **`prefer_reusing_assigned_local` no longer flags an identical expression read against a shadowed inner variable.** When a nested closure parameter (such as a `FutureBuilder` builder whose `snapshot` shadows the outer `StreamBuilder` `snapshot`) reads the same member text as an outer local, the rule now confirms the identifiers resolve to the same binding before reporting, so reuse is never suggested across a shadow where it would read the wrong value or fail to compile. Genuine same-binding recomputes still flag. No action required.
 - **`prefer_value_listenable_builder` no longer fires on the cached `FutureBuilder` idiom when the cache carries a non-`Future` key field.** A non-`Future` field now counts as single-value state only when it is reassigned inside a `setState` callback, so a cache key mutated only in helper methods (or re-initialized via a `setState` tear-off) is correctly ignored. Genuine single-value `setState` state stays flagged. No action required.
 - **`prefer_value_listenable_builder` no longer fires when a `State` also rebuilds via a bare `setState(() {})` whose callback assigns no field.** A bare rebuild signals state held outside the counted fields — a `final` `TextEditingController`/`Listenable` or a parent value — that a single `ValueListenableBuilder` cannot model, so the rule now stays quiet (this also covers the common `setState(() => cb?.call())` safe-setState wrapper). Genuine single-value state still triggers. No action required.
+
+### Changed
+
+- **Renamed the `impact_report` CLI tool to `severity_report`** to match the three-level severity model (errors / warnings / info) that replaced the old five-bucket impact grades. Run `dart run saropa_lints:severity_report`; the old `dart run saropa_lints:impact_report` keeps working as an alias, so no action required.
+
+<details><summary>Maintenance</summary>
+
+- Fixed the publish audit's "Rules by Severity" table, which had been counting zero for every rule since the impact taxonomy collapsed because it still keyed on the retired `critical`/`high`/`medium`/`low` value set instead of `error`/`warning`/`info`.
+
+</details>
 
 ## [13.12.0]
 
