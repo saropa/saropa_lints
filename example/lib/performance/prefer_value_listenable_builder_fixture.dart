@@ -277,6 +277,43 @@ class _bad790AssignedInSetStateState extends State<MyWidget> {
   }
 }
 
+// GOOD: one non-final field assigned in setState PLUS a `final`
+// TextEditingController whose search state is republished by a BARE
+// `setState(() {})` (no field assignment). The bare rebuild signals a second,
+// controller-backed state a single ValueListenableBuilder cannot model, so no
+// lint. See bugs/prefer_value_listenable_builder_false_positive_controller_
+// backed_state_bare_setstate.md.
+class _good790ControllerBackedBareSetStateState extends State<MyWidget> {
+  final TextEditingController _textController = TextEditingController();
+  int? _lastScanSummary;
+
+  void _onScan(int s) => setState(() => _lastScanSummary = s);
+  void _onSearch() => setState(() {});
+
+  Widget build(BuildContext context) {
+    return Text('$_lastScanSummary/${_textController.text}');
+  }
+}
+
+// GOOD: same shape via the common safe-setState wrapper. The literal
+// `setState(() => cb?.call())` assigns no field, so it is bare and bails the
+// same way — covering the wrapper indirection from the bug's real-world file.
+class _good790SafeSetStateWrapperState extends State<MyWidget> {
+  final TextEditingController _textController = TextEditingController();
+  int? _lastScanSummary;
+
+  void _setStateSafe([void Function()? cb]) {
+    if (mounted) setState(() => cb?.call());
+  }
+
+  void _onScan(int s) => _setStateSafe(() => _lastScanSummary = s);
+  void _onSearch() => _setStateSafe();
+
+  Widget build(BuildContext context) {
+    return Text('$_lastScanSummary/${_textController.text}');
+  }
+}
+
 // GOOD: Should NOT trigger prefer_value_listenable_builder
 void _good790() {
   final _counter = ValueNotifier<int>(0);
