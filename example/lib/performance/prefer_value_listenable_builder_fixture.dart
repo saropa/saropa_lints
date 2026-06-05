@@ -206,6 +206,77 @@ class _bad790ReadOnlyFinalState extends State<MyWidget> {
   }
 }
 
+// GOOD: cached Future + a non-Future cache-key companion field, with one
+// setState that re-inits the futures via a tear-off. The key (_lastKeys) is
+// mutated only in plain helpers, never via `setState(() => field = x)`, so it
+// is not the synchronous display value the rule targets. ValueListenableBuilder
+// cannot re-run an async fetch, so no lint. See bugs/prefer_value_listenable_
+// builder_false_positive_future_cache_key_companion_field.md.
+class _good790FutureCacheKeyState extends State<MyWidget> {
+  late Future<List<int>?> _primaryFuture;
+  Future<List<String>?>? _secondaryFuture;
+  List<int>? _lastKeys;
+
+  void _initFutures() {
+    _primaryFuture = _fetchPrimary();
+    _secondaryFuture = null;
+    _lastKeys = null;
+  }
+
+  void refresh() {
+    if (mounted) {
+      setState(_initFutures);
+    }
+  }
+
+  Future<List<String>?> _cachedSecondary(List<int>? keys) {
+    final bool changed =
+        _secondaryFuture == null || keys?.length != _lastKeys?.length;
+    if (changed) {
+      _lastKeys = keys;
+      _secondaryFuture = _fetchSecondary(keys);
+    }
+    return _secondaryFuture!;
+  }
+
+  Future<List<int>?> _fetchPrimary() async => <int>[];
+  Future<List<String>?> _fetchSecondary(List<int>? keys) async => <String>[];
+
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<int>?>(
+      future: _primaryFuture,
+      builder: (context, snapshot) => const SizedBox(),
+    );
+  }
+}
+
+// GOOD: a single non-Future field mutated ONLY outside setState (no Future
+// fields). Nothing drives a rebuild through it via setState, so it is not the
+// single-value display state the rule targets — no lint.
+class _good790OutsideSetStateState extends State<MyWidget> {
+  int _cacheKey = 0;
+
+  void _warm() => _cacheKey = 1;
+
+  Widget build(BuildContext context) {
+    return Text('$_cacheKey');
+  }
+}
+
+// BAD: a single non-Future field reassigned inside setState and no Future
+// fields — genuine single-value state, so it still fires. Confirms the
+// reassigned-in-setState guard does not over-suppress.
+// expect_lint: prefer_value_listenable_builder
+class _bad790AssignedInSetStateState extends State<MyWidget> {
+  int _value = 0;
+
+  void _set(int v) => setState(() => _value = v);
+
+  Widget build(BuildContext context) {
+    return Text('$_value');
+  }
+}
+
 // GOOD: Should NOT trigger prefer_value_listenable_builder
 void _good790() {
   final _counter = ValueNotifier<int>(0);

@@ -63,6 +63,14 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 -->
 
+## [Unreleased]
+
+Fixes a `prefer_value_listenable_builder` false positive on `State` classes that back a `FutureBuilder`/`StreamBuilder` cache with a plain cache-key companion field (for example a `List<String>?` key paired with a `Future` field) plus one `setState` that re-runs the fetch. No action required unless you added a project-local ignore for this pattern. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
+
+### Fixed
+
+- **`prefer_value_listenable_builder` no longer fires on the cached `FutureBuilder` idiom when the cache carries a non-`Future` key field.** A non-`Future` field now counts as single-value state only when it is reassigned inside a `setState` callback, so a cache key mutated only in helper methods (or re-initialized via a `setState` tear-off) is correctly ignored. Genuine single-value `setState` state stays flagged. No action required.
+
 ## [13.12.0]
 
 Adds support for analyzer 12, now that Flutter stable ships the `meta` version analyzer 12 requires. Flutter and Dart projects on analyzer 12 can use saropa_lints without being pinned back to analyzer 11. analyzer 13 stays excluded because it requires a newer `meta` than Flutter stable currently pins. No action required. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)

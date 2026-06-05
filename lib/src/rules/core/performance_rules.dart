@@ -1469,49 +1469,43 @@ class PreferValueListenableBuilderRule extends SaropaLintRule {
       if (superclass.name.lexeme != 'State') return;
       if (superclass.typeArguments == null) return;
 
-      // First pass: collect names of non-static `final` fields. A `final`
-      // collection mutated in place (`List.add`, `Map[k] = v`) inside setState
-      // is live UI state that the non-final field count below cannot see, and
-      // declaration order is not guaranteed (methods may precede fields), so
-      // the names must be gathered before the setState bodies are walked.
+      // First pass: collect the names of non-static fields, split by mutability.
+      // `finalFieldNames` feeds the in-place-mutation guard below. The
+      // non-final names are needed up front because the setState bodies are
+      // walked before the fields are counted (declaration order is not
+      // guaranteed — methods may precede fields), and the assignment collector
+      // must intersect against real field names rather than closure locals.
       final Set<String> finalFieldNames = <String>{};
+      final Set<String> nonFinalFieldNames = <String>{};
       for (final ClassMember member in node.bodyMembers) {
-        if (member is FieldDeclaration &&
-            !member.isStatic &&
-            member.fields.isFinal) {
+        if (member is FieldDeclaration && !member.isStatic) {
+          final Set<String> target = member.fields.isFinal
+              ? finalFieldNames
+              : nonFinalFieldNames;
           for (final VariableDeclaration variable in member.fields.variables) {
-            finalFieldNames.add(variable.name.lexeme);
+            target.add(variable.name.lexeme);
           }
         }
       }
 
-      // Count non-final fields (state)
-      int stateFieldCount = 0;
+      // Second pass: walk every method body to count setState calls, detect
+      // in-place mutation of a `final` collection, and collect the names of
+      // non-final fields *reassigned* inside a setState callback.
       int setStateCallCount = 0;
       bool mutatesFinalField = false;
+      bool hasBareSetState = false;
+      final Set<String> fieldsAssignedInSetState = <String>{};
 
       for (final ClassMember member in node.bodyMembers) {
-        if (member is FieldDeclaration) {
-          if (!member.isStatic && !member.fields.isFinal) {
-            // Skip Future/Stream-typed fields. These are the cached-async
-            // idiom backing FutureBuilder/StreamBuilder, where setState exists
-            // to invalidate and re-fetch (e.g. `_future = null`), not to
-            // publish a synchronous display value. ValueListenableBuilder
-            // cannot express "re-run an async fetch", so suggesting it here is
-            // a false positive. See bugs/prefer_value_listenable_builder_
-            // false_positive_future_cache.md.
-            if (_isAsyncBuilderCacheType(member.fields.type)) {
-              continue;
-            }
-            stateFieldCount++;
-          }
-        }
         if (member is MethodDeclaration) {
           member.body.visitChildren(
             _SetStateCounterVisitor(
               () => setStateCallCount++,
               finalFieldNames,
               () => mutatesFinalField = true,
+              nonFinalFieldNames,
+              fieldsAssignedInSetState,
+              () => hasBareSetState = true,
             ),
           );
         }
@@ -1524,6 +1518,43 @@ class PreferValueListenableBuilderRule extends SaropaLintRule {
       // prefer_value_listenable_builder_false_positive_inplace_mutation_
       // final_collection.md.
       if (mutatesFinalField) return;
+
+      // Third pass: count the non-final fields that represent genuine
+      // single-value display state.
+      int stateFieldCount = 0;
+      for (final ClassMember member in node.bodyMembers) {
+        if (member is FieldDeclaration &&
+            !member.isStatic &&
+            !member.fields.isFinal) {
+          // Skip Future/Stream-typed fields. These are the cached-async idiom
+          // backing FutureBuilder/StreamBuilder, where setState exists to
+          // invalidate and re-fetch (e.g. `_future = null`), not to publish a
+          // synchronous display value. ValueListenableBuilder cannot express
+          // "re-run an async fetch", so suggesting it here is a false positive.
+          // See bugs/prefer_value_listenable_builder_false_positive_future_
+          // cache.md.
+          if (_isAsyncBuilderCacheType(member.fields.type)) {
+            continue;
+          }
+          // Skip fields never reassigned inside a setState callback. A cached
+          // FutureBuilder commonly carries a non-Future cache-key companion
+          // (e.g. `List<String>? _lastKeys` paired with a `Future` field) that
+          // is mutated only in plain helper methods to invalidate the cache,
+          // never via `setState(() => field = x)`. Such a field is not the
+          // synchronous display value the rule targets, so counting it trips a
+          // false positive on the FutureBuilder cache idiom. See bugs/prefer_
+          // value_listenable_builder_false_positive_future_cache_key_companion_
+          // field.md.
+          final bool reassignedInSetState = member.fields.variables.any(
+            (VariableDeclaration v) =>
+                fieldsAssignedInSetState.contains(v.name.lexeme),
+          );
+          if (!reassignedInSetState) {
+            continue;
+          }
+          stateFieldCount++;
+        }
+      }
 
       // Suggest ValueListenableBuilder if state is very simple
       // (1 field with few setState calls)
@@ -1552,6 +1583,8 @@ class _SetStateCounterVisitor extends RecursiveAstVisitor<void> {
     this.onSetState,
     this.finalFieldNames,
     this.onFinalFieldMutated,
+    this.nonFinalFieldNames,
+    this.fieldsAssignedInSetState,
   );
 
   final void Function() onSetState;
@@ -1560,6 +1593,13 @@ class _SetStateCounterVisitor extends RecursiveAstVisitor<void> {
   /// one of these inside a setState callback signals hidden collection state.
   final Set<String> finalFieldNames;
   final void Function() onFinalFieldMutated;
+
+  /// Names of the class's non-static non-final fields. Used to filter the
+  /// assignment collector so closure locals sharing a name are not recorded.
+  final Set<String> nonFinalFieldNames;
+
+  /// Output set: non-final field names reassigned inside a setState callback.
+  final Set<String> fieldsAssignedInSetState;
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
@@ -1570,8 +1610,73 @@ class _SetStateCounterVisitor extends RecursiveAstVisitor<void> {
       node.argumentList.visitChildren(
         _FinalFieldMutationVisitor(finalFieldNames, onFinalFieldMutated),
       );
+      // Collect non-final fields reassigned in the callback — only these are
+      // the synchronous display values the rule targets. A tear-off argument
+      // (`setState(_reinit)`) carries no assignment expressions in its body
+      // here, so a field assigned only inside such a helper is intentionally
+      // not collected; that is what exempts the FutureBuilder cache-key idiom.
+      node.argumentList.visitChildren(
+        _SetStateAssignmentCollector(
+          nonFinalFieldNames,
+          fieldsAssignedInSetState,
+        ),
+      );
     }
     super.visitMethodInvocation(node);
+  }
+}
+
+/// Collects the names of non-final fields reassigned (`=`, compound assignment,
+/// or `++`/`--`) inside a setState callback. A field reassigned this way is the
+/// synchronous display value `prefer_value_listenable_builder` targets; a field
+/// that never appears here (e.g. a FutureBuilder cache key mutated only in a
+/// plain helper) is not, and must not be counted toward the single-field gate.
+/// In-place index mutation (`_list[i] = v`) is intentionally excluded: it
+/// mutates the field's contents, not the field, mirroring the `final`-collection
+/// guard. See bugs/prefer_value_listenable_builder_false_positive_future_cache_
+/// key_companion_field.md.
+class _SetStateAssignmentCollector extends RecursiveAstVisitor<void> {
+  _SetStateAssignmentCollector(this.nonFinalFieldNames, this.assigned);
+
+  final Set<String> nonFinalFieldNames;
+  final Set<String> assigned;
+
+  void _record(Expression? target) {
+    if (target is SimpleIdentifier &&
+        nonFinalFieldNames.contains(target.name)) {
+      assigned.add(target.name);
+    }
+  }
+
+  @override
+  void visitAssignmentExpression(AssignmentExpression node) {
+    // `_field = x`, `_field += x`, `_field ??= x` — reassignment of the field
+    // itself. `_list[i] = v` has an IndexExpression lhs and is skipped by
+    // _record (not a SimpleIdentifier).
+    _record(node.leftHandSide);
+    super.visitAssignmentExpression(node);
+  }
+
+  @override
+  void visitPostfixExpression(PostfixExpression node) {
+    // `_field++` / `_field--` reassign the field; `_field!` (also a postfix)
+    // only reads it, so guard on the operator.
+    final String op = node.operator.lexeme;
+    if (op == '++' || op == '--') {
+      _record(node.operand);
+    }
+    super.visitPostfixExpression(node);
+  }
+
+  @override
+  void visitPrefixExpression(PrefixExpression node) {
+    // `++_field` / `--_field` reassign; `!_field`, `-_field`, `~_field` only
+    // read it, so guard on the operator.
+    final String op = node.operator.lexeme;
+    if (op == '++' || op == '--') {
+      _record(node.operand);
+    }
+    super.visitPrefixExpression(node);
   }
 }
 
