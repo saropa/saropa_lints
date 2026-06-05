@@ -63,7 +63,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 -->
 
-## [Unreleased]
+## [13.12.1]
 
 Fixes two `prefer_value_listenable_builder` false positives: one on `State` classes that back a `FutureBuilder`/`StreamBuilder` cache with a plain cache-key companion field plus one `setState` that re-runs the fetch, and one on screens whose extra rebuild state lives in a `final` controller republished by a bare `setState(() {})`. Also fixes two `prefer_reusing_assigned_local` false positives: one where a nested builder closure reuses a parameter name (such as `snapshot`) that an outer scope already declared, and one where a live value (such as a `GlobalKey`'s `currentContext`) is intentionally re-read after an `await`. Renames the `impact_report` CLI tool to `severity_report` (the old name still works). No action required unless you added a project-local ignore for one of these patterns. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
 
