@@ -89,7 +89,33 @@ void goodReusesLocal(dynamic contact) {
   use(host);
 }
 
+// A nested closure parameter shadows the outer `wrapper`. The inner
+// `wrapper.label` has identical source text but resolves to a DIFFERENT
+// element (the closure parameter), so it is not a recompute of the outer
+// local — reusing the outer local would read the wrong object. Must NOT lint.
+String goodShadowedNestedClosure(Wrapper wrapper) {
+  final String label = wrapper.label;
+  use(label);
+  String Function(Wrapper) read = (Wrapper wrapper) => wrapper.label;
+  return read(Wrapper());
+}
+
+// Regression guard: a nested closure that CAPTURES the same `wrapper` element
+// (no shadowing) genuinely recomputes `wrapper.label`. The captured `wrapper`
+// resolves to the same parameter element, so reuse is valid — must still lint.
+String badCapturedSameElement(Wrapper wrapper) {
+  final String label = wrapper.label;
+  use(label);
+  // expect_lint: prefer_reusing_assigned_local
+  String Function() read = () => wrapper.label;
+  return read();
+}
+
 // --- Mock helpers so the fixture parses standalone. ---
+
+class Wrapper {
+  String get label => 'label';
+}
 
 class Theme {
   static final ThemeColor surface = ThemeColor();

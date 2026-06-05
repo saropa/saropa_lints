@@ -3,6 +3,7 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/dart/element/element.dart';
 import '../../saropa_lint_rule.dart';
 import '../../fixes/unnecessary_code/comment_out_empty_spread_fix.dart';
 import '../../fixes/unnecessary_code/comment_out_unnecessary_constructor_fix.dart';
@@ -1163,7 +1164,7 @@ class PreferReusingAssignedLocalRule extends SaropaLintRule {
     '[prefer_reusing_assigned_local] A local variable already holds the result '
         'of this expression, but the identical expression is recomputed here '
         'instead of reusing that local. Recomputing wastes work and risks the '
-        'two copies drifting apart if one is later edited. {v1}',
+        'two copies drifting apart if one is later edited. {v2}',
     correctionMessage:
         'Replace the recomputed expression with the existing local variable '
         'that already holds its value.',
@@ -1228,6 +1229,15 @@ class PreferReusingAssignedLocalRule extends SaropaLintRule {
           // Skip write targets (`obj.field = x`): a write is not a redundant
           // read, and rewriting it to the local would be wrong.
           if (_isWriteTarget(reuse)) continue;
+          // Skip occurrences whose identifiers resolve to DIFFERENT elements
+          // than the declaration's, even though the source text is identical.
+          // A nested closure parameter (e.g. a `FutureBuilder` builder whose
+          // `snapshot` shadows the outer `StreamBuilder` `snapshot`) produces
+          // the same text against a different, differently-typed binding;
+          // reusing the outer local there reads the wrong value or fails to
+          // compile. Text equality alone cannot see the shadow — element
+          // identity can.
+          if (!_sameBindings(local.initializer, reuse)) continue;
 
           reporter.atNode(reuse);
         }
@@ -1278,6 +1288,35 @@ class PreferReusingAssignedLocalRule extends SaropaLintRule {
     final _IdentifierNameCollector collector = _IdentifierNameCollector();
     expr.accept(collector);
     return collector.names;
+  }
+
+  /// Whether [reuse] reads the SAME bindings as the declaration's [declInit].
+  ///
+  /// An occurrence is only matched to a declaration by source text, so a name
+  /// re-bound in an inner scope (a closure parameter shadowing an outer local)
+  /// can produce identical text against a different element. Because the two
+  /// expressions are matched on `toSource()` equality, their AST shapes — and
+  /// therefore their in-order identifier sequences — are identical, so we can
+  /// compare resolved elements position-by-position.
+  ///
+  /// Conservative: a mismatch only counts when BOTH identifiers resolve to a
+  /// non-null element and those elements differ. Unresolved identifiers
+  /// (e.g. members read off a `dynamic` receiver) leave behavior unchanged.
+  static bool _sameBindings(Expression declInit, Expression reuse) {
+    final List<Element?> declElements =
+        (_IdentifierElementCollector()..visitExpression(declInit)).elements;
+    final List<Element?> reuseElements =
+        (_IdentifierElementCollector()..visitExpression(reuse)).elements;
+    // Identical source guarantees identical length; bail safely if it ever
+    // diverges rather than risk an out-of-range read.
+    if (declElements.length != reuseElements.length) return true;
+    for (int i = 0; i < declElements.length; i++) {
+      final Element? a = declElements[i];
+      final Element? b = reuseElements[i];
+      if (a == null || b == null) continue;
+      if (!identical(a, b) && a != b) return false;
+    }
+    return true;
   }
 }
 
@@ -1373,6 +1412,22 @@ class _IdentifierNameCollector extends RecursiveAstVisitor<void> {
   @override
   void visitSimpleIdentifier(SimpleIdentifier node) {
     names.add(node.name);
+    super.visitSimpleIdentifier(node);
+  }
+}
+
+/// Collects the resolved element of every simple identifier in traversal order.
+///
+/// Used to compare two source-identical expressions binding-by-binding so a
+/// shadowed name (same text, different element) is not treated as a recompute.
+class _IdentifierElementCollector extends RecursiveAstVisitor<void> {
+  final List<Element?> elements = <Element?>[];
+
+  void visitExpression(Expression expr) => expr.accept(this);
+
+  @override
+  void visitSimpleIdentifier(SimpleIdentifier node) {
+    elements.add(node.element);
     super.visitSimpleIdentifier(node);
   }
 }
