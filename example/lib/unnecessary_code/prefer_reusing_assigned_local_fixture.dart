@@ -80,6 +80,31 @@ void goodReceiverReassigned(dynamic a, dynamic other) {
   use(a.b);
 }
 
+// Live read re-read across an `await`: a suspension point lets external state
+// change between the two reads (e.g. a GlobalKey's currentContext flips
+// null->mounted while the navigator boots during the delay). Reusing the local
+// captured before the await would be wrong, so this must NOT lint.
+Future<void> goodReReadAcrossAwait(dynamic key) async {
+  final first = key.currentContext;
+  use(first);
+  for (int i = 0; i < 3; i++) {
+    await Future<void>.delayed(const Duration(seconds: 1));
+    final retry = key.currentContext;
+    use(retry);
+  }
+}
+
+// No await and no mutation between the reads: the recompute is genuinely
+// redundant and must still lint — the await barrier must not suppress this.
+void badLoopNoAwait(dynamic contact) {
+  final host = contact.websites.firstOrNull.host;
+  use(host);
+  for (int i = 0; i < 3; i++) {
+    // expect_lint: prefer_reusing_assigned_local
+    use(contact.websites.firstOrNull.host);
+  }
+}
+
 // Correct form: the cached local is reused, no recompute.
 void goodReusesLocal(dynamic contact) {
   final host = contact.websites.firstOrNull.host;
