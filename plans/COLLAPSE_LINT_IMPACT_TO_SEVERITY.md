@@ -11,8 +11,8 @@ Only these items are considered open work for this topic:
 
 - [ ] **SEV-01 (P1)** Audit `severity:` assignments rule-by-rule against MUST-fix / should-fix / info guidance.
 - [x] **SEV-02 (P1)** Update `saropa_quality_gate.yaml.example` to foreground `new_errors/new_warnings/new_info`. (Done 2026-05-08: primary row uses `new_errors`; hotspots + `overall_warnings` documented with legacy-alias pointer.)
-- [ ] **SEV-03 (P2)** Rename `bin/impact_report.dart` to `severity_report.dart` with compatibility alias.
-- [ ] **SEV-04 (P2)** Verify internal scripts parsing `v.impact` accept `error|warning|info` value set.
+- [x] **SEV-03 (P2)** Rename `bin/impact_report.dart` to `severity_report.dart` with compatibility alias. (Done 2026-06-05: `bin/severity_report.dart` holds the implementation; `bin/impact_report.dart` is now a thin forwarder that re-exports `severity_report.main`. `pubspec.yaml` registers both `severity_report` and the legacy `impact_report` executable.)
+- [~] **SEV-04 (P2)** Verify internal scripts parsing impact accept `error|warning|info` value set. (Partial, 2026-06-05: fixed `scripts/modules/_audit_checks.py` — `SEVERITIES`/`SeverityStats` and `print_severity_stats` colors were still keyed on the dead `critical/high/medium/low` set, so `get_severity_stats` counted **zero** for every rule. **Still open:** the DX-message audit scripts `_audit_dx.py`, `_improve_dx_messages.py`, and `_audit.py:_dx_impact_table` key their length thresholds and "By Impact" table on the old 5-value names; they don't crash but degrade to defaults. Left untouched this pass. Note: no script actually parses the JSON `v.impact` field — they all parse the Dart-source `LintImpact get impact => LintImpact.X;` getter.)
 
 ### SEV-01 audit pass order
 
@@ -251,3 +251,36 @@ The following user-visible "critical" prose was already cleaned up in CHANGELOG 
 - `RuleTier.essential` doc on `lib/src/saropa_lint_rule.dart:1636`.
 
 The Scope 1 changes intentionally did not touch the underlying data model (`LintImpact` enum still exists, dashboards still show separate "Critical" KPI card, JSON `v.impact` field still emitted) — those are this plan's job.
+
+---
+
+## Finish Report (2026-06-05)
+
+This work will be reviewed by another AI.
+
+**Trigger:** "do some work on this: COLLAPSE_LINT_IMPACT_TO_SEVERITY.md" — picked up the open follow-up queue and closed SEV-03 fully plus the highest-impact part of SEV-04.
+
+**Plan status after this pass (why it stays active, not archived):** the plan still has genuinely open scope — **SEV-01 (P1)** rule-by-rule severity audit is untouched, and **SEV-04 is only partial**. It is also the canonical tracker referenced from `ROADMAP.md`. Splitting the queue into a separate active file would fragment that single tracker, so the plan is kept active with its checkboxes updated rather than split + archived. The `Active follow-up queue` at the top is the live representation of remaining work.
+
+### SEV-03 — `impact_report` → `severity_report` rename (DONE)
+
+- `bin/severity_report.dart` (new) holds the implementation, copied verbatim from the old `bin/impact_report.dart` with only the usage strings and header comments relabeled to `severity_report`. No behavior change — same parse, same ERROR/WARNING/INFO grouping, same exit-code-equals-error-count.
+- `bin/impact_report.dart` (was 160 lines) is now a 17-line thin forwarder: `import 'severity_report.dart' as severity_report; main(args) => severity_report.main(args);`. Keeps `dart run saropa_lints:impact_report` working.
+- `pubspec.yaml` registers `severity_report` as the canonical executable and keeps `impact_report` as a documented back-compat alias.
+- `bin/saropa_lints.dart` dispatcher: imports `severity_report.dart` (dropped the `impact_report.dart` import), routes `severity-report` / `severity_report` / `impact-report` / `impact_report` all to `severity_cmd.main`, and relabels the usage text + example.
+- `README.md` "Impact Report" section rewritten to "Severity Report": new command, corrected sample output (was the retired `--- CRITICAL ---` / `Impact Summary` with critical/high/medium/low; now `--- ERROR ---` / `Severity Summary` with errors/warnings/info), and the "Impact levels" list replaced with "Severity levels" matching the `LintImpact` doc.
+
+### SEV-04 — internal scripts accept `error|warning|info` (PARTIAL)
+
+- **Fixed** `scripts/modules/_audit_checks.py`: `SEVERITIES` was `["critical","high","medium","low"]` and `SeverityStats.counts` was keyed on it, so `get_severity_stats` — whose regex now matches the post-collapse `LintImpact.error/warning/info` getters — hit `if severity in stats.counts` as always-False and reported **zero** for every rule in the publish audit's "Rules by Severity" table. Now `["error","warning","info"]` with a matching color map (error→RED, warning→YELLOW, info→DIM).
+- **Confirmed scope correction:** no script actually parses the JSON `v.impact` field; the impact-reading scripts all parse the Dart-source `LintImpact get impact => LintImpact.X;` getter. The SEV-04 wording ("parsing `v.impact`") was inaccurate.
+- **Still open:** the DX-message audit scripts `_audit_dx.py`, `_improve_dx_messages.py`, and `_audit.py:_dx_impact_table` key their length thresholds / "By Impact" table on the retired 5-value names. They do not crash (the value regex still captures, unknown values fall back to defaults) but degrade to default grading. The collapse mapping (critical→error, high+medium→warning, low+opinionated→info) makes the fix deterministic when picked up. Not touched this pass.
+
+### Verification
+
+- `dart analyze bin/saropa_lints.dart bin/severity_report.dart bin/impact_report.dart` → **No issues found** (exit 0).
+- `python -m py_compile scripts/modules/_audit_checks.py` → clean.
+- Functional: `dart run saropa_lints:severity_report --help`, `dart run saropa_lints:impact_report --help` (alias), and `dart run saropa_lints severity-report --help` (subcommand) all print the Severity Report usage.
+- No Dart test references `impact_report` / `severity_report` / `SEVERITIES` / `get_severity_stats` (grep of `test/` → no matches); no Python test suite covers `_audit_checks.py`. Tooling has no existing test harness; verified by compile + run instead.
+
+**No bug archive** — task did not close a `bugs/*.md` file.

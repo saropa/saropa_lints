@@ -123,8 +123,11 @@ TIERS = [
     "stylistic",
 ]
 
-# Severity levels
-SEVERITIES = ["critical", "high", "medium", "low"]
+# Severity levels. Collapsed from the old 5-bucket impact taxonomy
+# (critical/high/medium/low/opinionated) to the analyzer's 3-level severity
+# model on 2026-05-03; rule sources now only emit error/warning/info, so the
+# old key set silently counted zero for every rule.
+SEVERITIES = ["error", "warning", "info"]
 
 
 class TierStats:
@@ -763,10 +766,9 @@ def print_severity_stats(
         print_subheader("Rules by Severity")
 
     severity_colors = {
-        "critical": Color.RED,
-        "high": Color.YELLOW,
-        "medium": Color.WHITE,
-        "low": Color.DIM,
+        "error": Color.RED,
+        "warning": Color.YELLOW,
+        "info": Color.DIM,
     }
 
     for severity in SEVERITIES:

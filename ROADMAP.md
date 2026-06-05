@@ -47,8 +47,8 @@ The `LintImpact` five-bucket enum (`critical/high/medium/low/opinionated`) was c
 |------|----------|--------|-------|
 | SEV-01 — Audit `severity:` assignments rule-by-rule against MUST-fix / should-fix / info guidance | P1 | Open | Audit order: (1) security/network input + auth/storage, (2) architecture/disposal + async core, (3) naming/style and likely-overrated historical criticals. |
 | SEV-02 — Update `saropa_quality_gate.yaml.example` to foreground `new_errors/new_warnings/new_info` | P1 | Done (2026-05-08) | Primary row uses `new_errors`; hotspots + `overall_warnings` documented with legacy-alias pointer. |
-| SEV-03 — Rename `bin/impact_report.dart` to `severity_report.dart` with compatibility alias | P2 | Open | File is still `bin/impact_report.dart`. |
-| SEV-04 — Verify internal scripts parsing `v.impact` accept `error|warning|info` value set | P2 | Open | `scripts/modules/_audit_checks.py` still carries the old `["critical","high","medium","low"]` set and color map. |
+| SEV-03 — Rename `bin/impact_report.dart` to `severity_report.dart` with compatibility alias | P2 | Done (2026-06-05) | `bin/severity_report.dart` holds the implementation; `bin/impact_report.dart` forwards to it; `pubspec.yaml` + the `saropa_lints` subcommand dispatcher register both names. |
+| SEV-04 — Verify internal scripts parsing impact accept `error|warning|info` value set | P2 | Partial (2026-06-05) | `scripts/modules/_audit_checks.py` severity stats fixed (old key set counted zero). Still open: DX-message scripts `_audit_dx.py`, `_improve_dx_messages.py`, `_audit.py` key thresholds on the retired 5-value names. |
 
 ---
 

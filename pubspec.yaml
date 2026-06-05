@@ -37,6 +37,10 @@ executables:
   baseline: baseline
   diagnostic_baseline: diagnostic_baseline
   cross_file: cross_file
+  severity_report: severity_report
+  # Backward-compatible alias: forwards to severity_report. Kept so existing
+  # `dart run saropa_lints:impact_report` invocations keep working after the
+  # 2026-06-05 rename (LintImpact taxonomy collapsed into severity).
   impact_report: impact_report
   scan: scan
   quality_gate: quality_gate

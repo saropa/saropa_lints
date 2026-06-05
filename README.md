@@ -1147,43 +1147,45 @@ Saropa Lints runs as a native Dart analyzer plugin. Issues appear automatically 
 
 When analysis runs with reporting enabled, the plugin also writes a combined log under `reports/<date>/` (filename contains `_saropa_lint_report`). That file includes **FILE IMPORTANCE** (fan-in × layer), **FIX PRIORITY** (violations sorted by impact × importance), and **PROJECT STRUCTURE** (import tree), built from import data collected during analysis.
 
-### Impact Report
+### Severity Report
 
-Run lints with results grouped by business impact:
+Run lints with results grouped by severity (errors first):
 
 ```bash
-dart run saropa_lints:impact_report
+dart run saropa_lints:severity_report
 ```
 
-Output shows critical issues first, with actionable guidance:
+> The command was renamed from `impact_report` to `severity_report` when the
+> five-bucket impact model collapsed into the analyzer's three severities.
+> `dart run saropa_lints:impact_report` still works as a backward-compatible alias.
+
+Output shows errors first, with actionable guidance:
 
 ```
---- CRITICAL (2) ---
+--- ERROR (2) ---
   lib/main.dart:45 - avoid_hardcoded_credentials
   lib/auth.dart:23 - require_dispose
 
---- HIGH (5) ---
+--- WARNING (5) ---
   lib/widget.dart:89 - avoid_icon_buttons_without_tooltip
   ...
 
-Impact Summary
-==============
-CRITICAL: 2 (fix immediately!)
-HIGH:     5 (address soon)
-MEDIUM:   12 (tech debt)
-LOW:      34 (style)
+Severity Summary
+================
+ERRORS:   2 (must fix)
+WARNINGS: 5 (could fail or look bad)
+INFO:     12 (FYI)
 
-Total: 53 issues
+Total: 19 issues
 ```
 
-**Impact levels:**
+**Severity levels:**
 
-- `critical`: Each occurrence is serious — even 1-2 is unacceptable (memory leaks, security)
-- `high`: 10+ requires action (accessibility, performance anti-patterns)
-- `medium`: 100+ indicates tech debt (error handling, complexity)
-- `low`: Large counts acceptable (style, naming conventions)
+- `error`: MUST be fixed — broken, will crash, exploitable, or fails in production (memory leaks, hardcoded credentials, always-failing casts)
+- `warning`: Could fail or is embarrassing — may break under the wrong conditions or fail audits (accessibility, performance anti-patterns, missing error handling)
+- `info`: FYI — style, consistency, opinionated guidance (naming conventions, hardcoded strings, missing docs)
 
-Exit code equals the number of critical issues (capped at 125), making it CI-friendly.
+Exit code equals the number of errors (capped at 125), making it CI-friendly.
 
 ### IDE Integration
 

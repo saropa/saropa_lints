@@ -32,9 +32,9 @@ library;
 import 'package:collection/collection.dart';
 
 import 'baseline.dart' as baseline_cmd;
-import 'impact_report.dart' as impact_cmd;
 import 'init.dart' as init_cmd;
 import 'scan.dart' as scan_cmd;
+import 'severity_report.dart' as severity_cmd;
 
 Future<void> main(List<String> args) async {
   if (args.firstOrNull == '--help' || args.firstOrNull == '-h') {
@@ -51,8 +51,13 @@ Future<void> main(List<String> args) async {
       await init_cmd.main(commandArgs);
     case 'baseline':
       await baseline_cmd.main(commandArgs);
-    case 'impact-report' || 'impact_report':
-      await impact_cmd.main(commandArgs);
+    // `impact-report` kept as a back-compat alias after the 2026-06-05 rename
+    // to `severity-report` (LintImpact taxonomy collapsed into severity).
+    case 'severity-report' ||
+        'severity_report' ||
+        'impact-report' ||
+        'impact_report':
+      await severity_cmd.main(commandArgs);
     case 'scan':
       // scan.main is synchronous — no await needed
       scan_cmd.main(commandArgs);
@@ -72,7 +77,7 @@ void _printUsage() {
   print('  init            Generate analysis_options.yaml with rule config');
   print('                  (default if no command given)');
   print('  baseline        Generate/manage baseline for existing violations');
-  print('  impact-report   Run analysis and show results by impact level');
+  print('  severity-report Run analysis and show results grouped by severity');
   print('  scan            Run configured lint rules against any Dart project');
   print('');
   print('Options:');
@@ -89,7 +94,7 @@ void _printUsage() {
   print('  dart run saropa_lints init --tier essential --reset');
   print('  dart run saropa_lints baseline');
   print('  dart run saropa_lints baseline --update');
-  print('  dart run saropa_lints impact-report');
+  print('  dart run saropa_lints severity-report');
   print(
     '  dart run saropa_lints init --target . && dart run saropa_lints scan .',
   );
