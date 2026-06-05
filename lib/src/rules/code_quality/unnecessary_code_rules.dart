@@ -1226,8 +1226,9 @@ class PreferReusingAssignedLocalRule extends SaropaLintRule {
         final int awaitBarrier = scanner.awaitBarrierFor(
           afterOffset: local.initializer.end,
         );
-        final int barrier =
-            mutationBarrier < awaitBarrier ? mutationBarrier : awaitBarrier;
+        final int barrier = mutationBarrier < awaitBarrier
+            ? mutationBarrier
+            : awaitBarrier;
 
         for (final Expression reuse in scanner.occurrencesOf(entry.key)) {
           // Skip the declaration's own initializer and anything before it.
