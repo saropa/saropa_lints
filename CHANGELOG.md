@@ -65,11 +65,12 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [Unreleased]
 
-Fixes a `prefer_value_listenable_builder` false positive on `State` classes that back a `FutureBuilder`/`StreamBuilder` cache with a plain cache-key companion field (for example a `List<String>?` key paired with a `Future` field) plus one `setState` that re-runs the fetch. No action required unless you added a project-local ignore for this pattern. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
+Fixes two `prefer_value_listenable_builder` false positives: one on `State` classes that back a `FutureBuilder`/`StreamBuilder` cache with a plain cache-key companion field plus one `setState` that re-runs the fetch, and one on screens whose extra rebuild state lives in a `final` controller republished by a bare `setState(() {})`. No action required unless you added a project-local ignore for either pattern. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
 
 ### Fixed
 
 - **`prefer_value_listenable_builder` no longer fires on the cached `FutureBuilder` idiom when the cache carries a non-`Future` key field.** A non-`Future` field now counts as single-value state only when it is reassigned inside a `setState` callback, so a cache key mutated only in helper methods (or re-initialized via a `setState` tear-off) is correctly ignored. Genuine single-value `setState` state stays flagged. No action required.
+- **`prefer_value_listenable_builder` no longer fires when a `State` also rebuilds via a bare `setState(() {})` whose callback assigns no field.** A bare rebuild signals state held outside the counted fields — a `final` `TextEditingController`/`Listenable` or a parent value — that a single `ValueListenableBuilder` cannot model, so the rule now stays quiet (this also covers the common `setState(() => cb?.call())` safe-setState wrapper). Genuine single-value state still triggers. No action required.
 
 ## [13.12.0]
 

@@ -1519,6 +1519,20 @@ class PreferValueListenableBuilderRule extends SaropaLintRule {
       // final_collection.md.
       if (mutatesFinalField) return;
 
+      // A `setState` whose callback assigns no non-final field is a bare
+      // rebuild signal: it republishes state that lives elsewhere — a `final`
+      // TextEditingController / ScrollController / Listenable read in build(),
+      // or a parent value — rather than the one non-final display field the
+      // heuristic counts. That hidden state is a second, independent rebuild
+      // trigger a single ValueListenableBuilder<T> cannot model, so the
+      // suggested refactor would silently drop it (and an always-present
+      // builder slot can inject a spurious gap in a `spacing:`-ed Column).
+      // Bail out, mirroring the in-place-mutated `final` collection guard
+      // above. The common safe-setState wrapper (`setState(() => cb?.call())`)
+      // is also bare and lands here. See bugs/prefer_value_listenable_builder_
+      // false_positive_controller_backed_state_bare_setstate.md.
+      if (hasBareSetState) return;
+
       // Third pass: count the non-final fields that represent genuine
       // single-value display state.
       int stateFieldCount = 0;
@@ -1585,6 +1599,7 @@ class _SetStateCounterVisitor extends RecursiveAstVisitor<void> {
     this.onFinalFieldMutated,
     this.nonFinalFieldNames,
     this.fieldsAssignedInSetState,
+    this.onBareSetState,
   );
 
   final void Function() onSetState;
@@ -1601,6 +1616,12 @@ class _SetStateCounterVisitor extends RecursiveAstVisitor<void> {
   /// Output set: non-final field names reassigned inside a setState callback.
   final Set<String> fieldsAssignedInSetState;
 
+  /// Fires when a `setState` callback assigns no non-final field — a bare
+  /// rebuild signal for state that lives outside the counted fields (a `final`
+  /// controller/Listenable, a parent value). Signals the State is not the
+  /// single-value shape the rule targets.
+  final void Function() onBareSetState;
+
   @override
   void visitMethodInvocation(MethodInvocation node) {
     if (node.methodName.name == 'setState') {
@@ -1615,12 +1636,16 @@ class _SetStateCounterVisitor extends RecursiveAstVisitor<void> {
       // (`setState(_reinit)`) carries no assignment expressions in its body
       // here, so a field assigned only inside such a helper is intentionally
       // not collected; that is what exempts the FutureBuilder cache-key idiom.
+      // Collect into a per-call set first so an empty result identifies this
+      // invocation as a bare rebuild (assigns no non-final field).
+      final Set<String> assignedHere = <String>{};
       node.argumentList.visitChildren(
-        _SetStateAssignmentCollector(
-          nonFinalFieldNames,
-          fieldsAssignedInSetState,
-        ),
+        _SetStateAssignmentCollector(nonFinalFieldNames, assignedHere),
       );
+      fieldsAssignedInSetState.addAll(assignedHere);
+      if (assignedHere.isEmpty) {
+        onBareSetState();
+      }
     }
     super.visitMethodInvocation(node);
   }
