@@ -1216,10 +1216,18 @@ class PreferReusingAssignedLocalRule extends SaropaLintRule {
         final _AssignedLocal local = entry.value;
         // The earliest offset at which the receiver/local may have changed.
         // Past this point the recompute is no longer guaranteed redundant.
-        final int barrier = scanner.mutationBarrierFor(
+        // A mutation of a referenced identifier OR an `await` (a suspension
+        // point that lets external state change underneath a live read) both
+        // lower the barrier; take whichever comes first.
+        final int mutationBarrier = scanner.mutationBarrierFor(
           local.referencedNames,
           afterOffset: local.initializer.end,
         );
+        final int awaitBarrier = scanner.awaitBarrierFor(
+          afterOffset: local.initializer.end,
+        );
+        final int barrier =
+            mutationBarrier < awaitBarrier ? mutationBarrier : awaitBarrier;
 
         for (final Expression reuse in scanner.occurrencesOf(entry.key)) {
           // Skip the declaration's own initializer and anything before it.
@@ -1443,6 +1451,11 @@ class _BlockReuseScanner extends RecursiveAstVisitor<void> {
   // (offset, mutatedRootName) for each in-block mutation, in visit order.
   final List<({int offset, String name})> _mutations =
       <({int offset, String name})>[];
+  // Offsets of every `await` in the block. A suspension point lets external
+  // state change between two reads even when no in-scope identifier is written
+  // (e.g. `GlobalKey.currentContext` flips null->mounted as the navigator boots
+  // during an awaited delay), so an `await` acts as a reuse barrier too.
+  final List<int> _awaitOffsets = <int>[];
 
   /// Method names that mutate their receiver. A call to one of these on an
   /// identifier referenced by a cached expression invalidates a later reuse.
@@ -1489,11 +1502,28 @@ class _BlockReuseScanner extends RecursiveAstVisitor<void> {
     return barrier;
   }
 
+  /// Earliest `await` offset after [afterOffset], or a sentinel beyond any real
+  /// offset when none exists. Past a suspension point the cached value is no
+  /// longer guaranteed redundant, so a reuse after it must not be flagged.
+  int awaitBarrierFor({required int afterOffset}) {
+    int barrier = 1 << 30;
+    for (final int offset in _awaitOffsets) {
+      if (offset > afterOffset && offset < barrier) barrier = offset;
+    }
+    return barrier;
+  }
+
   void _recordOccurrence(Expression node) {
     final String source = node.toSource();
     if (_targetSources.contains(source)) {
       _occurrences.putIfAbsent(source, () => <Expression>[]).add(node);
     }
+  }
+
+  @override
+  void visitAwaitExpression(AwaitExpression node) {
+    _awaitOffsets.add(node.offset);
+    super.visitAwaitExpression(node);
   }
 
   @override
