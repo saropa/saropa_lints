@@ -105,15 +105,44 @@
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// BAD: Should trigger nullify_after_dispose
-// expect_lint: nullify_after_dispose
-void _bad1346__cancelTimer() {
-  _timer?.cancel();
-// Missing: _timer = null;
+class _NullifyWidget extends StatefulWidget {}
+
+class _NullifyState extends State<_NullifyWidget> {
+  // Nullable instance field: this is what the rule targets.
+  Timer? _timer;
+
+  // Final field: cannot be nulled, so the rule must skip it.
+  final FocusNode _focusNode = FocusNode();
+
+  // BAD: nullable field canceled but not set to null.
+  void _badCancelTimer() {
+    // expect_lint: nullify_after_dispose
+    _timer?.cancel();
+    // Missing: _timer = null;
+  }
+
+  // GOOD: nullable field nulled after cancel.
+  void _goodCancelTimer() {
+    _timer?.cancel();
+    _timer = null;
+  }
+
+  // GOOD: final field cannot be nulled — rule skips it.
+  void _goodDisposeFinalField() {
+    _focusNode.dispose();
+  }
 }
 
-// GOOD: Should NOT trigger nullify_after_dispose
-void _good1346__cancelTimer() {
-  _timer?.cancel();
-  _timer = null;
+// GOOD: local `final` disposable — dies at scope exit, cannot be nulled.
+// Regression guard: previously falsely flagged because a local SimpleIdentifier
+// was treated as a non-final nullable field.
+void _goodLocalFinalDispose() {
+  final FocusNode node = FocusNode();
+  node.dispose();
+}
+
+// GOOD: local `var` disposable — going out of scope needs no nullification.
+void _goodLocalVarDispose() {
+  var timer = Timer();
+  timer.cancel();
 }
