@@ -12,9 +12,16 @@ import '../../fixes/equality/use_not_equals_fix.dart';
 
 /// Warns when comparing an expression to itself (x == x).
 ///
-/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+/// Since: v0.1.4 | Updated: v13.12.1 | Rule version: v6
 ///
 /// Comparing something to itself is usually a bug, except for NaN checks.
+///
+/// Only comparison (`==`, `<`, `>`, `<=`, `>=`) and logical (`&&`, `||`)
+/// operators are flagged: identical operands there always produce a constant
+/// or redundant result. Arithmetic operators (`*`, `+`, `-`, `/`, `%`, `<<`,
+/// `>>`, `&`, `|`, `^`) are intentionally NOT flagged because `N op N` is a
+/// routine, meaningful value — `1024 * 1024` (1 MiB), `60 * 60` (3600),
+/// `x * x` (a square) are all legitimate.
 ///
 /// Example of **bad** code:
 /// ```dart
@@ -26,7 +33,8 @@ import '../../fixes/equality/use_not_equals_fix.dart';
 /// ```dart
 /// if (value == expectedValue) {}
 /// // For NaN checks:
-/// if (value != value) {}  // This is intentional for NaN detection
+/// if (value != value) {} // This is intentional for NaN detection
+/// final oneMebibyte = 1024 * 1024; // arithmetic, not a comparison bug
 /// ```
 class AvoidEqualExpressionsRule extends SaropaLintRule {
   AvoidEqualExpressionsRule() : super(code: _code);
@@ -46,7 +54,7 @@ class AvoidEqualExpressionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'avoid_equal_expressions',
-    '[avoid_equal_expressions] Both sides of the binary expression are identical, meaning the comparison always produces the same result (true for ==, false for >, <). This is almost always a copy-paste bug where the developer intended to compare two different values, and the redundant comparison masks the real logic error in the code. {v5}',
+    '[avoid_equal_expressions] Both sides of a comparison or logical binary expression are identical, meaning the result is always constant (true for ==, false for >, <) or redundant (for && and ||). This is almost always a copy-paste bug where the developer intended to compare two different values, and the redundant comparison masks the real logic error in the code. Arithmetic operators (N * N, N + N, ...) are excluded because identical operands there form a legitimate value. {v6}',
     correctionMessage:
         'Replace one side of the expression with the intended comparison target to fix the copy-paste error.',
     severity: DiagnosticSeverity.WARNING,
@@ -58,8 +66,22 @@ class AvoidEqualExpressionsRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addBinaryExpression((BinaryExpression node) {
-      // Skip != as it might be intentional for NaN checks
-      if (node.operator.type == TokenType.BANG_EQ) return;
+      // Identical operands are only a defect for comparison and logical
+      // operators, where the result is constant or redundant. For arithmetic
+      // operators `N op N` is a routine, meaningful value (e.g. `1024 * 1024`
+      // for 1 MiB, `60 * 60` for seconds-per-hour, `x * x` for a square), so
+      // matching raw source equality there is a false positive. `!=` is also
+      // excluded because `x != x` is the canonical NaN check.
+      const Set<TokenType> flaggableOps = <TokenType>{
+        TokenType.EQ_EQ,
+        TokenType.GT,
+        TokenType.LT,
+        TokenType.GT_EQ,
+        TokenType.LT_EQ,
+        TokenType.AMPERSAND_AMPERSAND,
+        TokenType.BAR_BAR,
+      };
+      if (!flaggableOps.contains(node.operator.type)) return;
 
       final String leftSource = node.leftOperand.toSource();
       final String rightSource = node.rightOperand.toSource();

@@ -63,6 +63,16 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 -->
 
+## [Unreleased]
+
+Fixes a `nullify_after_dispose` false positive that flagged `dispose()`/`cancel()`/`close()` calls on local variables, a `prefer_single_setstate` false positive that flagged `setState` calls sitting in mutually-exclusive branches, and an `avoid_equal_expressions` false positive that flagged arithmetic with identical operands such as `1024 * 1024`. No action required unless you added a project-local ignore for these patterns. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
+
+### Fixed
+
+- **`nullify_after_dispose` no longer flags a disposable local variable.** The rule targets nullable instance fields, but it treated any disposed `SimpleIdentifier` as a non-final nullable field, so disposing a method-local (such as a `final ui.Codec`) was falsely reported even though a local cannot be nulled and needs none. It now confirms the target is a declared field of the enclosing class before reporting. Genuine nullable fields disposed without nullification still flag. No action required.
+- **`prefer_single_setstate` no longer flags `setState` calls in mutually-exclusive branches.** The rule counted every `setState` in a method body together, so calls in separate `if`/`else` arms, distinct `switch` cases, or a `try` body versus its `catch` were reported as mergeable even though at most one can run per pass. It now treats each branch as its own scope and flags only when two or more `setState` calls share one straight-line path. Genuine sequential `setState` calls still flag. No action required.
+- **`avoid_equal_expressions` no longer flags arithmetic with identical operands.** The matcher previously fired on any binary expression whose left and right source text matched, sweeping in legitimate constant math like `1024 * 1024`, `60 * 60`, `x * x`, and `1 << 1`. It now restricts the identical-operand check to comparison (`==`, `<`, `>`, `<=`, `>=`) and logical (`&&`, `||`) operators, where two identical sides always produce a constant or redundant result. Genuine copy-paste bugs (`a == a`, `w > w`, `flag && flag`) still flag. No action required.
+
 ## [13.12.1]
 
 Fixes two `prefer_value_listenable_builder` false positives: one on `State` classes that back a `FutureBuilder`/`StreamBuilder` cache with a plain cache-key companion field plus one `setState` that re-runs the fetch, and one on screens whose extra rebuild state lives in a `final` controller republished by a bare `setState(() {})`. Also fixes two `prefer_reusing_assigned_local` false positives: one where a nested builder closure reuses a parameter name (such as `snapshot`) that an outer scope already declared, and one where a live value (such as a `GlobalKey`'s `currentContext`) is intentionally re-read after an `await`. Renames the `impact_report` CLI tool to `severity_report` (the old name still works). No action required unless you added a project-local ignore for one of these patterns. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
