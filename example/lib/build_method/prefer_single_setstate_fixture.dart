@@ -144,3 +144,79 @@ Widget _good132_separateClosures() {
     ],
   );
 }
+
+// GOOD: setStates in mutually-exclusive if/else arms can never both run in one
+// pass - must NOT trigger prefer_single_setstate.
+void _good132_ifElseArms() {
+  if (_a) {
+    setState(() => _busy = true);
+  } else {
+    setState(() => _busy = false);
+  }
+}
+
+// GOOD: setState in the try body and setState in the catch block are on separate
+// paths (a throw diverts to catch) - must NOT trigger prefer_single_setstate.
+void _good132_tryCatch() {
+  try {
+    setState(() => _busy = true);
+  } catch (_) {
+    setState(() => _busy = false);
+  }
+}
+
+// GOOD: setStates in two distinct switch cases are mutually exclusive - must NOT
+// trigger prefer_single_setstate.
+void _good132_switchCases(int code) {
+  switch (code) {
+    case 0:
+      setState(() => _busy = true);
+      break;
+    case 1:
+      setState(() => _busy = false);
+      break;
+  }
+}
+
+// GOOD: real-world shape - an entry setState plus per-branch guards across an
+// await, all on distinct paths. Must NOT trigger prefer_single_setstate.
+Future<void> _good132_branchGuards() async {
+  try {
+    if (_busy) return;
+    setState(() => _busy = true);
+    final bool ok = await _doWork();
+    if (!ok) {
+      if (mounted) setState(() => _busy = false);
+      return;
+    }
+    if (mounted) setState(() => _busy = false);
+  } catch (_) {
+    if (mounted) setState(() => _busy = false);
+  }
+}
+
+// BAD: two sequential setStates inside a SINGLE if-arm share one straight-line
+// path and are mergeable - must still trigger prefer_single_setstate.
+// expect_lint: prefer_single_setstate
+void _bad132_sequentialInBranch() {
+  if (_a) {
+    setState(() => _name = 'John');
+    setState(() => _age = 30);
+  }
+}
+
+// GOOD: loading-state pattern - two unconditional setStates split by an await
+// fire in different frames and cannot merge. Must NOT trigger.
+Future<void> _good132_loadingState() async {
+  setState(() => _busy = true);
+  await _doWork();
+  setState(() => _busy = false);
+}
+
+// BAD: two unconditional setStates with NO await between them on one path.
+// expect_lint: prefer_single_setstate
+Future<void> _bad132_noAwaitBetween() async {
+  setState(() => _busy = true);
+  setState(() => _busy = false);
+  await _doWork();
+}
