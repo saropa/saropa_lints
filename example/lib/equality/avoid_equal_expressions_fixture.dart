@@ -107,12 +107,19 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic list;
 dynamic value;
+dynamic flag;
+int byteCount = 0;
 
 // BAD: Should trigger avoid_equal_expressions
-// expect_lint: avoid_equal_expressions
 void _bad345() {
+  // expect_lint: avoid_equal_expressions
   if (value == value) {} // Always true (unless NaN);
+  // expect_lint: avoid_equal_expressions
   if (list.length > list.length) {} // Always false
+  // expect_lint: avoid_equal_expressions
+  if (flag && flag) {} // Redundant logical AND
+  // expect_lint: avoid_equal_expressions
+  if (flag || flag) {} // Redundant logical OR
 }
 
 // GOOD: Should NOT trigger avoid_equal_expressions
@@ -120,4 +127,13 @@ void _good345() {
   if (value == expectedValue) {}
   // For NaN checks:
   if (value != value) {} // This is intentional for NaN detection
+
+  // Arithmetic with identical operands is a legitimate value, not a bug.
+  final int oneMebibyte = 1024 * 1024; // bytes in 1 MiB
+  final int secondsPerHour = 60 * 60; // 3600
+  final bool big = byteCount >= 1024 * 1024; // inner 1024*1024 not flagged
+  final double mib = byteCount / (1024 * 1024);
+  final int square = byteCount * byteCount; // x * x is a square
+  final int shifted = 1 << 1;
+  final int sum = byteCount + byteCount; // doubling
 }
