@@ -834,7 +834,9 @@ class PreferSingleSetStateRule extends SaropaLintRule {
       // Skip build methods - this rule is for other methods
       if (node.name.lexeme == 'build') return;
 
-      final MethodInvocation? firstMergeable = _findMergeableSetState(node.body);
+      final MethodInvocation? firstMergeable = _findMergeableSetState(
+        node.body,
+      );
       if (firstMergeable != null) {
         reporter.atNode(firstMergeable, code);
       }

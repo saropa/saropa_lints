@@ -63,7 +63,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 -->
 
-## [3.12.2]
+## [13.12.2]
 
 Fixes a `nullify_after_dispose` false positive that flagged `dispose()`/`cancel()`/`close()` calls on local variables, a `prefer_single_setstate` false positive that flagged `setState` calls sitting in mutually-exclusive branches, an `avoid_equal_expressions` false positive that flagged arithmetic with identical operands such as `1024 * 1024`, and an `avoid_variable_shadowing` false positive that flagged a name legitimately reused in disjoint sibling scopes (two collection-`for` loops in separate literals, or the same local in two separate `switch` cases). No action required unless you added a project-local ignore for these patterns. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""
+"""             
 Publish saropa_lints package to pub.dev and create GitHub release.
 
 Single entry point for the complete release workflow (package to pub.dev
