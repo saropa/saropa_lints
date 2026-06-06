@@ -1842,7 +1842,7 @@ class NullifyAfterDisposeRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'nullify_after_dispose',
-    '[nullify_after_dispose] Nullable disposable field must be set to null after disposal. When a nullable disposable field (Timer?, StreamSubscription?, etc.) is disposed/canceled, it\'s good practice to also set it to null. This: - Helps garbage collection - Prevents accidental reuse of disposed resources - Makes it clear the resource has been cleaned up. {v7}',
+    '[nullify_after_dispose] Nullable disposable field must be set to null after disposal. When a nullable disposable field (Timer?, StreamSubscription?, etc.) is disposed/canceled, it\'s good practice to also set it to null. This: - Helps garbage collection - Prevents accidental reuse of disposed resources - Makes it clear the resource has been cleaned up. {v8}',
     correctionMessage:
         'Add `fieldName = null;` after disposing to help garbage collection. Verify the change works correctly with existing tests and add coverage for the new behavior. '
         'and prevent accidental reuse.',
@@ -1886,10 +1886,26 @@ class NullifyAfterDisposeRule extends SaropaLintRule {
 
       final String fieldName = target.name;
 
-      // Skip if field is final or non-nullable (can't be set to null)
+      // This rule only applies to nullable INSTANCE FIELDS. A SimpleIdentifier
+      // target can equally be a local variable or parameter (e.g. a method-local
+      // `final ui.Codec codec` calling `codec.dispose()`). Locals die at scope
+      // exit and need no nullification — a `final` local cannot even be nulled —
+      // so resolve the name against the enclosing class's declared fields and
+      // bail when it is not one. Without this guard a local was treated as a
+      // non-final nullable field and falsely flagged (false-positive class:
+      // nullify_after_dispose on local disposables).
       final ClassDeclaration? classNode = _findContainingClass(node);
-      if (classNode != null &&
-          _isFieldFinalOrNonNullable(classNode, fieldName)) {
+      if (classNode == null) {
+        return;
+      }
+      final FieldDeclaration? field = _findField(classNode, fieldName);
+      if (field == null) {
+        // Target is a local variable or parameter, not a class field.
+        return;
+      }
+
+      // Skip if field is final or non-nullable (can't be set to null)
+      if (_isFieldFinalOrNonNullable(field)) {
         return;
       }
 
@@ -1959,30 +1975,33 @@ class NullifyAfterDisposeRule extends SaropaLintRule {
     return null;
   }
 
-  /// Check if a field is final or has a non-nullable type
-  bool _isFieldFinalOrNonNullable(
-    ClassDeclaration classNode,
-    String fieldName,
-  ) {
+  /// Find the field declaration named [fieldName] on [classNode], or null when
+  /// the class declares no such field. A null result means the disposal target
+  /// is a local variable or parameter rather than an instance field, so the
+  /// rule must not report on it.
+  FieldDeclaration? _findField(ClassDeclaration classNode, String fieldName) {
     for (final ClassMember member in classNode.bodyMembers) {
       if (member is FieldDeclaration) {
         for (final VariableDeclaration variable in member.fields.variables) {
           if (variable.name.lexeme == fieldName) {
-            // Final fields can't be reassigned
-            if (member.fields.isFinal) {
-              return true;
-            }
-            // Non-nullable types can't be set to null
-            final TypeAnnotation? type = member.fields.type;
-            if (type is NamedType && type.question == null) {
-              return true;
-            }
-            return false;
+            return member;
           }
         }
       }
     }
-    return false;
+    return null;
+  }
+
+  /// Check if a field is final or has a non-nullable type. Either case means it
+  /// can't be set to null, so the "nullify after dispose" advice does not apply.
+  bool _isFieldFinalOrNonNullable(FieldDeclaration field) {
+    // Final fields can't be reassigned.
+    if (field.fields.isFinal) {
+      return true;
+    }
+    // Non-nullable types can't be set to null.
+    final TypeAnnotation? type = field.fields.type;
+    return type is NamedType && type.question == null;
   }
 
   /// Check if the field is set to null after the given statement
