@@ -342,7 +342,7 @@ class AvoidNonEmptyConstructorBodiesRule extends SaropaLintRule {
 
 /// Warns when a variable or parameter shadows another declaration from an
 ///
-/// Since: v4.1.3 | Updated: v4.13.0 | Rule version: v3
+/// Since: v4.1.3 | Updated: v13.12.2 | Rule version: v4
 ///
 /// outer scope.
 ///
@@ -401,7 +401,7 @@ class AvoidShadowingRule extends SaropaLintRule {
   /// Alias: avoid_shadowing
   static const LintCode _code = LintCode(
     'avoid_variable_shadowing',
-    '[avoid_variable_shadowing] Declaration shadows a declaration from an outer scope. Shadowing occurs when a nested scope declares a variable with the same name as one in an enclosing scope. This can lead to confusion about which variable is being referenced and is a common source of subtle bugs. {v3}',
+    '[avoid_variable_shadowing] Declaration shadows a declaration from an outer scope. Shadowing occurs when a nested scope declares a variable with the same name as one in an enclosing scope. This can lead to confusion about which variable is being referenced and is a common source of subtle bugs. {v4}',
     correctionMessage:
         'Rename the variable to avoid confusion. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     severity: DiagnosticSeverity.INFO,
@@ -498,34 +498,66 @@ class _ShadowingChecker extends RecursiveAstVisitor<void> {
     super.visitFunctionDeclarationStatement(node);
   }
 
+  /// Visits [node] inside a snapshot of [outerNames], restoring the snapshot
+  /// afterward. Use for any construct that opens its own scope: names declared
+  /// inside it must not leak to DISJOINT sibling/sequential scopes, because
+  /// shadowing is a NESTING relationship — only a still-live enclosing scope
+  /// can be shadowed, never a sibling scope that has already closed.
+  void _visitScoped(void Function() visit) {
+    final Set<String> savedNames = Set<String>.from(outerNames);
+    visit();
+    outerNames
+      ..clear()
+      ..addAll(savedNames);
+  }
+
   @override
   void visitForStatement(ForStatement node) {
     // For-loop variables are scoped to the loop body. After the loop
     // exits, they no longer exist. Save/restore so sequential loops
     // reusing the same variable name are not treated as shadowing.
-    final Set<String> savedNames = Set<String>.from(outerNames);
-    super.visitForStatement(node);
-    outerNames
-      ..clear()
-      ..addAll(savedNames);
+    _visitScoped(() => super.visitForStatement(node));
+  }
+
+  @override
+  void visitForElement(ForElement node) {
+    // Collection-for (`for (x in …)` inside a list/set/map literal) scopes its
+    // loop variable to the element body. Two sibling collection-fors in
+    // separate literals are disjoint scopes, so reusing the same loop var is
+    // not shadowing. ForElement is a distinct node from ForStatement, so it
+    // needs its own save/restore. (FP: sibling map-literal for-loops.)
+    _visitScoped(() => super.visitForElement(node));
   }
 
   @override
   void visitWhileStatement(WhileStatement node) {
-    final Set<String> savedNames = Set<String>.from(outerNames);
-    super.visitWhileStatement(node);
-    outerNames
-      ..clear()
-      ..addAll(savedNames);
+    _visitScoped(() => super.visitWhileStatement(node));
   }
 
   @override
   void visitDoStatement(DoStatement node) {
-    final Set<String> savedNames = Set<String>.from(outerNames);
-    super.visitDoStatement(node);
-    outerNames
-      ..clear()
-      ..addAll(savedNames);
+    _visitScoped(() => super.visitDoStatement(node));
+  }
+
+  @override
+  void visitSwitchCase(SwitchCase node) {
+    // Each switch case opens its own scope: a variable declared in one case is
+    // not visible in another, so reusing a name across cases is legal Dart and
+    // not shadowing. visitBlock only covers cases that wrap statements in `{}`;
+    // a bare `case X: final c = …;` has no Block, so the case itself must
+    // save/restore. (FP: same local declared in two separate switch cases.)
+    _visitScoped(() => super.visitSwitchCase(node));
+  }
+
+  @override
+  void visitSwitchPatternCase(SwitchPatternCase node) {
+    // Dart 3 pattern case — same disjoint-scope reasoning as visitSwitchCase.
+    _visitScoped(() => super.visitSwitchPatternCase(node));
+  }
+
+  @override
+  void visitSwitchDefault(SwitchDefault node) {
+    _visitScoped(() => super.visitSwitchDefault(node));
   }
 
   @override

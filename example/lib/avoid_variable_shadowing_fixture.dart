@@ -118,6 +118,34 @@ void ifElseSiblingBlocks() {
   }
 }
 
+/// Sibling collection-for loops in separate map literals - should NOT trigger
+/// (disjoint scopes; `level` in the second does not shadow the first).
+Map<String, int> siblingCollectionForLoops() {
+  final Map<String, int> a = <String, int>{
+    for (final level in [1, 2]) '$level': level, // OK: scope A
+  };
+  final Map<String, int> b = <String, int>{
+    for (final level in [3, 4]) '$level': level, // OK: scope B — disjoint
+  };
+  return {...a, ...b};
+}
+
+/// Separate switch cases reusing a local - should NOT trigger
+/// (each case is its own scope; legal Dart, not shadowing).
+int separateSwitchCases(int kind) {
+  switch (kind) {
+    case 0:
+      final country = kind + 1; // OK: case-0 scope
+      return country;
+    case 1:
+      final country = kind + 2; // OK: case-1 scope — disjoint, not shadowing
+      return country;
+    default:
+      final country = kind; // OK: default scope — disjoint
+      return country;
+  }
+}
+
 /// Mixed case - outer variable with sibling closures
 void mixedCaseExample() {
   final outerValue = 'outer';
