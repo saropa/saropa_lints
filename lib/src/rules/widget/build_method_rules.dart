@@ -761,14 +761,16 @@ class AvoidHardcodedFeatureFlagsRule extends SaropaLintRule {
 
 /// Warns when multiple setState calls are made in the same execution scope.
 ///
-/// Since: v2.0.0 | Updated: v13.11.11 | Rule version: v3
+/// Since: v2.0.0 | Updated: v13.12.2 | Rule version: v4
 ///
 /// Alias: combine_setstate, multiple_setstate, batch_setstate
 ///
-/// Multiple setState calls in one synchronous path cause multiple rebuilds.
+/// Multiple setState calls on one straight-line path cause multiple rebuilds.
 /// Combine them for better performance. setState calls in separate closures
 /// (e.g. two buttons' onPressed handlers) run on different events and cannot
-/// be merged, so they are not flagged.
+/// be merged, so they are not flagged. setState calls in mutually-exclusive
+/// branches (if/else arms, switch cases, try body vs. catch) can never both
+/// run in a single pass, so they are not flagged either.
 ///
 /// **BAD:**
 /// ```dart
@@ -817,7 +819,7 @@ class PreferSingleSetStateRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'prefer_single_setstate',
-    '[prefer_single_setstate] Multiple setState calls cause unnecessary rebuilds. Multiple setState calls are made in the same execution scope. This increases build() cost, causing unnecessary widget rebuilds that degrade scroll performance. setState calls in separate closures (e.g. distinct onPressed handlers) are not flagged because they run on different events and cannot be merged. {v3}',
+    '[prefer_single_setstate] Multiple setState calls cause unnecessary rebuilds. Two or more setState calls are made on the same straight-line execution path. This increases build() cost, causing unnecessary widget rebuilds that degrade scroll performance. setState calls in separate closures (e.g. distinct onPressed handlers) or in mutually-exclusive branches (if/else arms, switch cases, try/catch) are not flagged because they can never both run in a single pass and cannot be merged. {v4}',
     correctionMessage:
         'Combine setState calls into a single call. Use DevTools widget inspector to verify that rebuild counts decrease.',
     severity: DiagnosticSeverity.INFO,
@@ -832,38 +834,7 @@ class PreferSingleSetStateRule extends SaropaLintRule {
       // Skip build methods - this rule is for other methods
       if (node.name.lexeme == 'build') return;
 
-      // Each closure (and the method's own synchronous body) is an independent
-      // execution scope. setState calls in DIFFERENT closures run on different
-      // events (e.g. two buttons' onPressed handlers) at different times and
-      // can never be merged. Only flag when a SINGLE scope makes more than one
-      // setState call; counting across distinct closures was the v2 false
-      // positive (two separate onPressed callbacks reported as mergeable).
-      final List<AstNode> scopes = <AstNode>[node.body];
-      MethodInvocation? firstMergeable;
-
-      while (scopes.isNotEmpty) {
-        final AstNode scope = scopes.removeLast();
-        int scopeCount = 0;
-        MethodInvocation? firstInScope;
-
-        scope.visitChildren(
-          _SetStateCountVisitor(
-            onSetState: (MethodInvocation inv) {
-              scopeCount++;
-              firstInScope ??= inv;
-            },
-            // Nested closures are separate scopes; defer them rather than
-            // counting their setState calls against the current scope.
-            onNestedClosure: scopes.add,
-          ),
-        );
-
-        if (scopeCount > 1 && firstInScope != null) {
-          firstMergeable = firstInScope;
-          break;
-        }
-      }
-
+      final MethodInvocation? firstMergeable = _findMergeableSetState(node.body);
       if (firstMergeable != null) {
         reporter.atNode(firstMergeable, code);
       }
@@ -871,29 +842,151 @@ class PreferSingleSetStateRule extends SaropaLintRule {
   }
 }
 
-class _SetStateCountVisitor extends RecursiveAstVisitor<void> {
-  _SetStateCountVisitor({
-    required this.onSetState,
-    required this.onNestedClosure,
-  });
+/// Returns the first setState call that shares a synchronous straight-line
+/// segment with another setState (and is therefore mergeable), or null.
+///
+/// Each closure and each mutually-exclusive control-flow branch (if/else arms,
+/// switch cases, try body vs. catch vs. finally) is analyzed as its own scope:
+/// two setState calls that can never both run in a single pass are never
+/// counted together. Within a scope an `await` ends the current segment —
+/// calls on opposite sides of a suspension fire in different frames (the
+/// loading-state idiom: `setState(busy=true); await …; setState(busy=false)`)
+/// and cannot be combined. Only ≥2 setState calls in one synchronous segment
+/// are reported.
+MethodInvocation? _findMergeableSetState(AstNode methodBody) {
+  final List<AstNode> scopes = <AstNode>[methodBody];
 
-  final void Function(MethodInvocation) onSetState;
-  final void Function(FunctionExpression) onNestedClosure;
+  while (scopes.isNotEmpty) {
+    final AstNode scope = scopes.removeLast();
+    final MethodInvocation? hit = _scanScopeSegments(scope, scopes.add);
+    if (hit != null) return hit;
+  }
+  return null;
+}
+
+/// Walks the statements of [scope] in order, accumulating setState calls into
+/// the current straight-line segment. An `await` resets the segment; a branch
+/// or closure is handed to [defer] to be scanned as its own scope. Returns the
+/// first setState of the first segment that reaches two calls, else null.
+MethodInvocation? _scanScopeSegments(
+  AstNode scope,
+  void Function(AstNode) defer,
+) {
+  int count = 0;
+  MethodInvocation? firstInSegment;
+
+  for (final Statement statement in _statementsOf(scope)) {
+    final _StatementScan scan = _StatementScan();
+    statement.accept(_SegmentVisitor(scan, defer));
+
+    if (scan.firstSetState != null) {
+      firstInSegment ??= scan.firstSetState;
+      count += scan.setStateCount;
+      if (count >= 2) return firstInSegment;
+    }
+
+    // An await suspends execution: later setState calls land in a different
+    // frame and can no longer merge with calls before the suspension.
+    if (scan.hasAwait) {
+      count = 0;
+      firstInSegment = null;
+    }
+  }
+  return null;
+}
+
+/// Flattens [scope] to the ordered statement list whose segments are counted.
+/// Closures and branch bodies arrive here (via the worklist) as their own
+/// scopes; an expression-bodied function holds at most one setState and so
+/// needs no segment analysis.
+List<Statement> _statementsOf(AstNode scope) {
+  if (scope is BlockFunctionBody) return scope.block.statements;
+  if (scope is FunctionExpression) return _statementsOf(scope.body);
+  if (scope is Block) return scope.statements;
+  if (scope is SwitchMember) return scope.statements;
+  if (scope is Statement) return <Statement>[scope];
+  return const <Statement>[];
+}
+
+/// Accumulator for a single statement's scan: how many setState calls it makes
+/// on its own straight-line path, the first of them, and whether it suspends.
+class _StatementScan {
+  int setStateCount = 0;
+  MethodInvocation? firstSetState;
+  bool hasAwait = false;
+}
+
+class _SegmentVisitor extends RecursiveAstVisitor<void> {
+  _SegmentVisitor(this.result, this.defer);
+
+  final _StatementScan result;
+
+  /// Hands a separate execution scope (a closure, or a mutually-exclusive
+  /// control-flow branch) back to the worklist so its setState calls are
+  /// counted on their own instead of merged into the current segment.
+  final void Function(AstNode) defer;
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
     if (node.methodName.name == 'setState') {
-      onSetState(node);
+      result.setStateCount++;
+      result.firstSetState ??= node;
     }
     super.visitMethodInvocation(node);
   }
 
   @override
+  void visitAwaitExpression(AwaitExpression node) {
+    // Marks this statement as a segment boundary for the enclosing scope.
+    result.hasAwait = true;
+    super.visitAwaitExpression(node);
+  }
+
+  @override
   void visitFunctionExpression(FunctionExpression node) {
-    // Stop here: this closure is a distinct execution scope. Hand it back to
-    // the caller to be counted on its own instead of descending and merging
-    // its setState calls with the enclosing scope's.
-    onNestedClosure(node);
+    // Distinct execution scope (e.g. an onPressed handler): defer rather than
+    // merging its setState calls — or its awaits — into the current segment.
+    defer(node);
+  }
+
+  @override
+  void visitIfStatement(IfStatement node) {
+    // The then/else arms are mutually exclusive: at most one runs per pass, so
+    // a setState in one arm can never merge with one in the other arm or with
+    // surrounding straight-line code. The condition stays on the current path.
+    node.expression.accept(this);
+    defer(node.thenStatement);
+    final Statement? elseStatement = node.elseStatement;
+    if (elseStatement != null) {
+      defer(elseStatement);
+    }
+  }
+
+  @override
+  void visitSwitchStatement(SwitchStatement node) {
+    // Each case/default body is a distinct, mutually-exclusive path; setState
+    // calls in different cases never both run. Sequential setState calls WITHIN
+    // one case are still counted together (that case becomes its own scope).
+    node.expression.accept(this);
+    for (final SwitchMember member in node.members) {
+      defer(member);
+    }
+  }
+
+  @override
+  void visitTryStatement(TryStatement node) {
+    // The try body, each catch block, and finally run on separate segments: a
+    // throw diverts the success path into catch, so success and error setState
+    // calls can never both execute. (finally runs on every path; counting it
+    // separately only under-reports and never yields a false positive.)
+    defer(node.body);
+    for (final CatchClause clause in node.catchClauses) {
+      defer(clause.body);
+    }
+    final Block? finallyBlock = node.finallyBlock;
+    if (finallyBlock != null) {
+      defer(finallyBlock);
+    }
   }
 }
 
