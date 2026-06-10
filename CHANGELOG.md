@@ -73,6 +73,13 @@ Fixes an `avoid_context_in_async_static` false positive that flagged every async
 - **`avoid_debug_print` and `avoid_print_error` no longer flag the logging infrastructure's own sink.** Both rules redirect callers to structured logging, but the implementation of that logging — functions named `debug*`, `_debug*`, or `breadcrumb` — must call `debugPrint`/`print` directly, since routing back through `debug()` would recurse infinitely. Both rules now exempt calls inside those logging-primitive functions. Ordinary application `debugPrint`/`print`-in-catch usage still flags. No action required.
 - **`avoid_duplicate_object_elements` no longer flags a repeated entry in a gradient `colors:`/`stops:` list.** Those parameters are ordered, position-sensitive sequences where a symmetric ramp deliberately repeats an endpoint (`[base, highlight, base]`), so the duplicate is required by the visual shape, not a copy-paste error. The rule now skips lists bound to a `colors:` or `stops:` argument. Duplicate identifiers, booleans, and nulls in ordinary collections still flag. No action required.
 
+<details>
+<summary>Maintenance</summary>
+
+- Added regression fixtures for `avoid_equal_expressions` covering compound arithmetic with identical operands (`dx * dx + dy * dy`, `(a * a + b * b) / 2`). The rule already excludes arithmetic operators (fixed in 13.12.2); these cases guard against a future regression. No behavior change.
+
+</details>
+
 ## [13.12.2]
 
 Fixes a `nullify_after_dispose` false positive that flagged `dispose()`/`cancel()`/`close()` calls on local variables, a `prefer_single_setstate` false positive that flagged `setState` calls sitting in mutually-exclusive branches, an `avoid_equal_expressions` false positive that flagged arithmetic with identical operands such as `1024 * 1024`, and an `avoid_variable_shadowing` false positive that flagged a name legitimately reused in disjoint sibling scopes (two collection-`for` loops in separate literals, or the same local in two separate `switch` cases). No action required unless you added a project-local ignore for these patterns. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
