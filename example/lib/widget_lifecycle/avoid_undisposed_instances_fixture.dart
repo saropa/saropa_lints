@@ -136,3 +136,20 @@ class _GoodClass1354_State extends State<_GoodClass1354_MyWidget> {
   @override
   Widget build(BuildContext context) => Container();
 }
+
+// GOOD: disposed via a multi-section null-aware cascade where dispose() is the
+// last section. The field IS disposed; the cascade also removes a listener.
+class _CascadeState extends State<_GoodClass1354_MyWidget> {
+  AnimationController? _c;
+
+  void _tick() {}
+
+  @override
+  void dispose() {
+    _c?..removeListener(_tick)..dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => Container();
+}

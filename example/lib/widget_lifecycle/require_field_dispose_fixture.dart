@@ -122,3 +122,45 @@ void _good1344() {
     padding: EdgeInsets.all(8),
   );
 }
+
+// GOOD: field disposed via a multi-section null-aware cascade (dispose() is the
+// last section). The field IS disposed; cascade chaining must not read as a leak.
+class _CascadeDisposeState extends State<StatefulWidget> {
+  AnimationController? _c;
+
+  void _tick() {}
+
+  @override
+  void dispose() {
+    _c?..removeListener(_tick)..dispose();
+    super.dispose();
+  }
+}
+
+// GOOD: three-section cascade, dispose last.
+class _ThreeSectionState extends State<StatefulWidget> {
+  AnimationController? _c;
+
+  void _tick() {}
+  void _tock() {}
+
+  @override
+  void dispose() {
+    _c?..removeListener(_tick)..removeListener(_tock)..dispose();
+    super.dispose();
+  }
+}
+
+// BAD: multi-section cascade that never calls dispose() — still a leak.
+// expect_lint: require_field_dispose
+class _NoDisposeState extends State<StatefulWidget> {
+  AnimationController? _c;
+
+  void _tick() {}
+
+  @override
+  void dispose() {
+    _c?..removeListener(_tick)..reset();
+    super.dispose();
+  }
+}

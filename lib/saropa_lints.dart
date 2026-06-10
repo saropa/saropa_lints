@@ -1465,6 +1465,15 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidCanvasInBuildRule.new,
   AvoidHardcodedFeatureFlagsRule.new,
 
+  // Compound (context-aware) performance rules — expensive widget inside a
+  // costly parent (per-frame / per-scrolled-item). Context-gated, not presence.
+  AvoidOpacityInAnimatedBuilderRule.new,
+  AvoidOpacityInScrollableRule.new,
+  AvoidBackdropFilterInScrollableRule.new,
+  AvoidShaderMaskInScrollableRule.new,
+  AvoidImageFilterInScrollableRule.new,
+  AvoidClipPathInAnimatedBuilderRule.new,
+
   // Scroll and list rules (NEW)
   AvoidShrinkWrapInScrollViewRule.new,
   AvoidNestedScrollablesConflictRule.new,

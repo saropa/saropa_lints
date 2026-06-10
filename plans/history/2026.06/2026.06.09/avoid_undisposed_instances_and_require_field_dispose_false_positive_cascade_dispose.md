@@ -1,6 +1,6 @@
 # BUG: `avoid_undisposed_instances` + `require_field_dispose` — Cascade Dispose Not Traced
 
-**Status: Open**
+**Status: Fixed**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
@@ -240,19 +240,71 @@ The fixture at
 
 ## Changes Made
 
-<!-- Fill in when a fix is written. -->
+Both rules in `widget_lifecycle_rules.dart`:
+
+- **`avoid_undisposed_instances` (`_DisposeVisitor`)**: the real fix is using
+  `node.realTarget` instead of `node.target` for disposal-method detection. In
+  a cascade section (`_c?..removeListener(f)..dispose()`) the `.dispose()`
+  invocation's *syntactic* `target` is null (the receiver is implicit), so
+  `_extractFieldName(null)` recorded nothing and the field read as undisposed.
+  `realTarget` resolves to the cascade receiver `_c`. Also added a
+  `PostfixExpression` branch to `_extractFieldName` for the null-assertion
+  cascade form `_c!..dispose()`.
+- **`require_field_dispose` (`_isFieldDisposed`)**: added two regex patterns
+  matching `dispose()`/`disposeSafe()` in any cascade section, not just the
+  first — `$name\??(?:\.\.[^;]+)*\.\.$method\(`. The `*` also covers the
+  single-section null-aware form `_c?..dispose()`. `[^;]+` confines each match
+  to one cascade statement so it cannot bridge to a different field's disposal.
+
+The report's suggested PostfixExpression-only fix for `avoid_undisposed` was
+insufficient on its own — the section target is null, not a PostfixExpression,
+so `realTarget` was the actual root cause.
 
 ---
 
 ## Tests Added
 
-<!-- List new or updated fixture/test files and what they verify. -->
+- `example/lib/widget_lifecycle/avoid_undisposed_instances_fixture.dart`: added
+  `_CascadeState` disposing `AnimationController? _c` via
+  `_c?..removeListener(_tick)..dispose()` (NO lint).
+- `example/lib/widget_lifecycle/require_field_dispose_fixture.dart`: added
+  `_CascadeDisposeState` (two-section, dispose last — NO lint),
+  `_ThreeSectionState` (three-section — NO lint), and `_NoDisposeState`
+  (cascade with `..reset()` but no dispose — LINT).
+- Scan CLI verified: both rules now fire ONLY on `_NoDisposeState` (the genuine
+  leak); every cascade-disposed field is clean. Unit suites
+  `widget_lifecycle_rules_test.dart` and `state_lifecycle_dispose_scan_test.dart`
+  pass.
 
 ---
 
 ## Commits
 
 <!-- Add commit hashes as fixes land. -->
+
+---
+
+## Finish Report (2026-06-09)
+
+**Scope:** (A) Dart lint rules / analyzer plugin.
+
+**Deep review:** The `avoid_undisposed` change swaps `target` for
+`realTarget ?? target` — a strict superset (realTarget equals target for
+non-cascade calls), so no existing detection is lost. The `require_field_dispose`
+regexes are statement-bounded (`[^;]+`) to avoid cross-field bridging. Disposal
+detection is name/string based (no type resolution needed), so the scan CLI
+exercises it fully. Rule files, tiers, severities, `LintImpact` unchanged.
+
+**Tests:** scan CLI + `widget_lifecycle_rules_test.dart` +
+`state_lifecycle_dispose_scan_test.dart` all pass, verified as above.
+
+**Maintenance:** CHANGELOG `[Unreleased]` Fixed bullet added. README/ROADMAP
+unchanged (false-positive fix).
+
+**Bug archived:** bugs/avoid_undisposed_instances_and_require_field_dispose_false_positive_cascade_dispose.md
+→ plans/history/2026.06/2026.06.09/avoid_undisposed_instances_and_require_field_dispose_false_positive_cascade_dispose.md
+
+**Finish report appended:** this file.
 
 ---
 

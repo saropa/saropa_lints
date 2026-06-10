@@ -1521,6 +1521,13 @@ class RequireDisposeRule extends SaropaLintRule {
       RegExp('$name\\.\\.${method}Safe\\('),
       // Cascade with optional whitespace (e.g. "_x\n  ..dispose()" or "_x ..dispose()")
       RegExp('$name\\s+\\.\\.\\s*$method\\s*\\('),
+      // Multi-section cascade where dispose is not the first section, with an
+      // optional null-aware/assertion marker: "_x?..removeListener(f)..dispose()"
+      // or "_x!..a()..b()..dispose()". The `*` also covers the single-section
+      // null-aware form "_x?..dispose()". `[^;]+` keeps the match inside one
+      // cascade statement so it cannot span to a different field's disposal.
+      RegExp('$name\\??(?:\\.\\.[^;]+)*\\.\\.$method\\('),
+      RegExp('$name\\??(?:\\.\\.[^;]+)*\\.\\.${method}Safe\\('),
     ];
 
     for (final RegExp re in patterns) {
@@ -3161,7 +3168,12 @@ class _DisposeVisitor extends RecursiveAstVisitor<void> {
 
     // Check if this is a disposal method call on a field
     if (_disposeMethodNames.contains(methodName)) {
-      final Expression? target = node.target;
+      // Use realTarget, not target: for a cascade section
+      // (`_c?..removeListener(f)..dispose()`) the syntactic target is null
+      // because the receiver is implicit. realTarget resolves to the cascade
+      // receiver `_c`, so the field is recorded as disposed instead of reading
+      // as a leak.
+      final Expression? target = node.realTarget ?? node.target;
       _extractFieldName(target);
     }
 
@@ -3206,6 +3218,14 @@ class _DisposeVisitor extends RecursiveAstVisitor<void> {
     // Handle cascade: _controller..dispose()
     else if (target is CascadeExpression) {
       _extractFieldName(target.target);
+    }
+    // Handle null-assertion / null-aware postfix on a cascade target:
+    // `_controller!..dispose()` or `_controller?..removeListener(x)..dispose()`
+    // resolve the cascade target to the PostfixExpression `_controller!`/`_controller?`.
+    // Recurse into its operand so the field name is still extracted; otherwise
+    // a controller disposed through a multi-section cascade reads as undisposed.
+    else if (target is PostfixExpression) {
+      _extractFieldName(target.operand);
     }
   }
 }
