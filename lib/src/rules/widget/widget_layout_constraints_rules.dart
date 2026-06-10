@@ -2616,6 +2616,15 @@ class PreferLayoutBuilderForConstraintsRule extends SaropaLintRule {
           (_isMediaQuerySizeAccess(target) ||
               _isMediaQuerySizeOfResult(target))) {
         if (_isMediaQuerySizeDimensionInLiteralScaleOrBreakpoint(node)) return;
+        // A width/height passed as a POSITIONAL argument to a call is not
+        // widget sizing — it is fed to a helper that decides a layout strategy,
+        // e.g. `ResponsiveLayout.isWide(MediaQuery.sizeOf(context).width)`,
+        // which returns a device-class bool. LayoutBuilder gives the LOCAL box
+        // width, the wrong signal for a window-class breakpoint. Real sizing is
+        // written as a `width:`/`height:` NAMED argument (a NamedExpression
+        // value, whose parent is not the ArgumentList), so that case still
+        // flags.
+        if (_isPositionalCallArgument(node)) return;
         if (_isInNonBuildScope(node)) return;
         reporter.atNode(node, _code);
       }
@@ -2686,6 +2695,23 @@ class PreferLayoutBuilderForConstraintsRule extends SaropaLintRule {
         : p.leftOperand;
     final Expression unwrapped = _unwrapOuterParentheses(sibling);
     return unwrapped is IntegerLiteral || unwrapped is DoubleLiteral;
+  }
+
+  /// True when [node] is a positional argument to a call (its parent, after
+  /// unwrapping parentheses, is the call's `ArgumentList`). A `width:`/`height:`
+  /// named-argument value does NOT match — its parent is the `NamedExpression`
+  /// — so genuine widget sizing still flags.
+  static bool _isPositionalCallArgument(PropertyAccess node) {
+    AstNode cur = node;
+    while (cur.parent is ParenthesizedExpression) {
+      cur = cur.parent!;
+    }
+    final AstNode? parent = cur.parent;
+    if (parent is! ArgumentList) return false;
+    final AstNode? call = parent.parent;
+    return call is MethodInvocation ||
+        call is InstanceCreationExpression ||
+        call is FunctionExpressionInvocation;
   }
 
   static Expression _unwrapOuterParentheses(Expression expr) {

@@ -236,3 +236,34 @@ abstract final class OkStaticSizeUtils {
   }
 }
 
+abstract final class ResponsiveLayout {
+  ResponsiveLayout._();
+  static bool isWide(double width) => width > 600;
+}
+
+// GOOD: window width passed POSITIONALLY to a device-class breakpoint helper.
+// LayoutBuilder would give the local box width — the wrong input. No lint.
+class OkBreakpointHelper extends StatelessWidget {
+  const OkBreakpointHelper({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final bool isWide = ResponsiveLayout.isWide(
+      MediaQuery.sizeOf(context).width,
+    );
+    return Text('wide: $isWide');
+  }
+}
+
+// BAD: window width assigned to a `width:` NAMED argument — this IS widget
+// sizing, which LayoutBuilder should drive.
+class BadDirectSizing extends StatelessWidget {
+  const BadDirectSizing({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // expect_lint: prefer_layout_builder_for_constraints
+    return SizedBox(width: MediaQuery.sizeOf(context).width);
+  }
+}
+
