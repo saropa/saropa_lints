@@ -162,3 +162,62 @@ violating pattern.
   gate (`scanEmptyBodyStubTests`); kept 27 legitimate assertion-free tests;
   full suite green (5,726). Built & validated the Phase 2 resolved-analyzer
   oracle.
+
+## Finish Report (2026-06-10)
+
+**This work will be reviewed by another AI.**
+
+**Scope:** (A) Dart analyzer-plugin code + (C) docs/scripts. No rule-behavior
+change, no extension/UI change. Phase 1 (stub removal) and the non-overridable
+publish gate are complete; Phase 2 (writing real fixture-backed tests) is
+explicitly deferred at the user's instruction and remains tracked above.
+
+**Deep review:**
+- `stub_density.dart`: `scanEmptyBodyStubTests` / `emptyBodyStubCountIn` mirror
+  the existing `scanStubTests` / `stubCountIn` structure (same visitor pattern,
+  `firstOrNull`-safe argument access). Empty-body = `BlockFunctionBody` with
+  zero statements — a comment-only body is correctly still "empty" (comments
+  are not AST statements), pinned by a test.
+- `stub_test_guard_test.dart`: empty-body gate uses `isEmpty` (hard zero), not
+  a ratchet — chosen over gating the broader assertion-free metric because that
+  metric has 27 legitimate hits (does-not-throw and helper-asserted tests) that
+  must not be force-deleted. The two literal-tautology regex guards are kept.
+- `_audit.py`: `run_stub_guard_check` shells out to the canonical Dart guard
+  test (single source of truth — no reimplemented AST detection in Python),
+  uses `get_shell_mode()` for Windows `dart` resolution, and treats a missing
+  test file as FAIL so the gate can't silently pass. `stub_guard_passed` feeds
+  `AuditResult.has_blocking_issues` (publish exit code 11); the blocking reason
+  is surfaced in `_publish_steps.py`.
+
+**Testing:**
+- 4A audit: the only tests referencing changed symbols are
+  `stub_test_guard_test.dart` (updated) and `fix_and_stub_test.dart` (tests the
+  unchanged `stubCountIn` — not broken). No assertion pinned a deleted stub.
+- 4B new tests: added an `emptyBodyStubCountIn` group to `fix_and_stub_test.dart`
+  (empty block, `testWidgets`, comment-only body all count; non-empty body does
+  not — with an explicit contrast assertion that `stubCountIn` still flags it).
+- Ran: `dart test test/project_health/fix_and_stub_test.dart` (9 pass),
+  `dart test test/integrity/stub_test_guard_test.dart` (3 pass), the 5
+  heavily-edited rule-test files (pass), and the full suite (5,726 pass).
+  Guard FAIL path verified by injecting a temp stub (blocked, then removed).
+- `dart analyze --fatal-infos` on the changed Dart files: no issues.
+
+**Maintenance:** CHANGELOG updated (2 Maintenance entries: Phase 1 removal +
+audit gate). README verified — no updates needed (no rule/test count cited).
+ROADMAP — N/A (no lint entry completed). Guides reviewed — nothing user-facing.
+No bug archive — task did not close a `bugs/*.md` file.
+
+**Plan disposition:** stays ACTIVE, not moved/split. The user explicitly
+directed Phase 2 be tracked in this plan and deferred; the remaining scope is a
+self-contained, unstarted phase documented above. Deliberate deviation from the
+A-MOVE "split or archive" default, justified by that instruction.
+
+**Outstanding:** Phase 2 — author real fixture-backed trigger/non-trigger tests
+via the resolved-analyzer oracle for the rules whose stub placeholders were
+removed; fix fake fixtures (e.g. `avoid_god_class`'s empty BAD class) as
+encountered.
+
+**Files this finish pass:** `test/project_health/fix_and_stub_test.dart`
+(new `emptyBodyStubCountIn` tests), `plans/BUG_stub_tests_in_suite.md` (this
+report). Phase 1 + gate code landed earlier in commits `b086d7d6` and
+`29d62604` (gate code swept into a concurrent session's commit `0f739a8d`).
