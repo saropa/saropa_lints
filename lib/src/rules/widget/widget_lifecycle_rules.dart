@@ -3,6 +3,7 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:meta/meta.dart';
 
 import '../../async_context_utils.dart';
 import '../../fixes/remove_empty_set_state_fix.dart';
@@ -72,6 +73,20 @@ class AvoidContextInInitStateDisposeRule extends SaropaLintRule {
       }
     });
   }
+
+  /// Exposed for unit tests: the unsafe-`context`-usage detection for one
+  /// initState/dispose [method] body. Pure syntactic analysis (no resolved
+  /// types), so it is verifiable on `parseString` ASTs.
+  @visibleForTesting
+  static List<SimpleIdentifier> unsafeContextUsagesForTesting(
+    MethodDeclaration method,
+  ) {
+    final _ContextUsageVisitor visitor = _ContextUsageVisitor(
+      method.name.lexeme,
+    );
+    method.body.accept(visitor);
+    return visitor.unsafeContextUsages;
+  }
 }
 
 /// Visitor that finds unsafe `context` usages in initState/dispose methods.
@@ -100,18 +115,77 @@ class _ContextUsageVisitor extends RecursiveAstVisitor<void> {
     'delayed', // Future.delayed
   };
 
+  /// Methods on `context` that perform an inherited-widget / render-tree
+  /// lookup — these are the genuinely-unsafe uses in initState/dispose.
+  static const Set<String> _inheritedAccessorMethods = <String>{
+    'dependOnInheritedWidgetOfExactType',
+    'getInheritedWidgetOfExactType',
+    'dependOnInheritedElement',
+    'getElementForInheritedWidgetOfExactType',
+    'findAncestorWidgetOfExactType',
+    'findAncestorStateOfType',
+    'findRootAncestorStateOfType',
+    'findAncestorRenderObjectOfType',
+    'findRenderObject',
+    'visitAncestorElements',
+    'visitChildElements',
+    // provider / riverpod / watch_it extension accessors on BuildContext
+    'watch',
+    'read',
+    'select',
+  };
+
+  /// Properties on `context` that read the (possibly unmounted) render tree.
+  static const Set<String> _inheritedProps = <String>{'size', 'owner'};
+
   @override
   void visitSimpleIdentifier(SimpleIdentifier node) {
-    // Check if this is a 'context' identifier
-    if (node.name == 'context' && _safeCallbackDepth == 0) {
-      // Make sure it's actually accessing BuildContext, not a parameter named context
-      // in a callback. We check by seeing if it's the left side of a property access
-      // or used as an argument.
-      if (!_isContextParameter(node)) {
-        unsafeContextUsages.add(node);
-      }
+    // Only flag `context` when it actually performs an inherited-widget /
+    // render-tree lookup (`Theme.of(context)`, `context.watch()`,
+    // `context.size`, `context.dependOnInheritedWidgetOfExactType(...)`).
+    // A bare `context` forwarded as an argument to an ordinary helper that
+    // does no `.of(context)` lookup (e.g. `resolveColor(context)`) registers
+    // no dependency and reads no unmounted tree, so flagging it is a false
+    // positive — the pre-narrowing behavior fired on the mere token.
+    if (node.name == 'context' &&
+        _safeCallbackDepth == 0 &&
+        !_isContextParameter(node) &&
+        _isUnsafeInheritedUsage(node)) {
+      unsafeContextUsages.add(node);
     }
     super.visitSimpleIdentifier(node);
+  }
+
+  /// True when [node] (a `context` identifier) is used in an inherited-widget
+  /// or render-tree lookup shape, rather than merely forwarded as data.
+  bool _isUnsafeInheritedUsage(SimpleIdentifier node) {
+    final AstNode? parent = node.parent;
+
+    // `context.<accessor>(...)` — context is the receiver of an inherited call.
+    if (parent is MethodInvocation && identical(parent.realTarget, node)) {
+      return _inheritedAccessorMethods.contains(parent.methodName.name);
+    }
+
+    // `context.size` / `context.owner` — context is the receiver of a
+    // render-tree property read.
+    if (parent is PropertyAccess && identical(parent.realTarget, node)) {
+      return _inheritedProps.contains(parent.propertyName.name);
+    }
+    if (parent is PrefixedIdentifier && identical(parent.prefix, node)) {
+      return _inheritedProps.contains(parent.identifier.name);
+    }
+
+    // `X.of(context)` / `X.maybeOf(context)` — context is an argument to a
+    // static inherited accessor (Theme.of, MediaQuery.of, Navigator.of, …).
+    if (parent is ArgumentList) {
+      final AstNode? grandparent = parent.parent;
+      if (grandparent is MethodInvocation) {
+        final String m = grandparent.methodName.name;
+        return m == 'of' || m == 'maybeOf';
+      }
+    }
+
+    return false;
   }
 
   @override
@@ -2392,6 +2466,25 @@ class AlwaysRemoveListenerRule extends SaropaLintRule {
       }
     });
   }
+
+  /// Exposed for unit tests: the receiver/callback normalization that lets the
+  /// idiomatic `field!.addListener` / `field?.removeListener` pairing match.
+  @visibleForTesting
+  static String normalizeListenerTokenForTesting(String raw) =>
+      _normalizeListenerToken(raw);
+}
+
+/// Strip a single trailing null-aware / null-assertion operator so the SAME
+/// listenable or callback reached via `x!` (add, where it is known to be set in
+/// initState) and `x?` (remove, where the field may be gone in dispose)
+/// compares equal. Without this, `field!.addListener(cb)` in initState and
+/// `field?.removeListener(cb)` in dispose have unequal receiver source text
+/// (`field!` vs `field?`) and the listener is read as never removed — a false
+/// positive on a dispose that DOES remove the listener.
+String _normalizeListenerToken(String raw) {
+  if (raw.isEmpty) return raw;
+  final String last = raw.substring(raw.length - 1);
+  return (last == '!' || last == '?') ? raw.substring(0, raw.length - 1) : raw;
 }
 
 class _ListenerInfo {
@@ -2408,10 +2501,12 @@ class _AddListenerFinder extends RecursiveAstVisitor<void> {
   @override
   void visitMethodInvocation(MethodInvocation node) {
     if (node.methodName.name == 'addListener') {
-      final String target = node.realTarget?.toSource() ?? '';
+      final String target = _normalizeListenerToken(
+        node.realTarget?.toSource() ?? '',
+      );
       final NodeList<Expression> args = node.argumentList.arguments;
       if (args.isNotEmpty) {
-        final String callback = args.first.toSource();
+        final String callback = _normalizeListenerToken(args.first.toSource());
         onFound(target, callback, node);
       }
     }
@@ -2426,10 +2521,12 @@ class _RemoveListenerFinder extends RecursiveAstVisitor<void> {
   @override
   void visitMethodInvocation(MethodInvocation node) {
     if (node.methodName.name == 'removeListener') {
-      final String target = node.realTarget?.toSource() ?? '';
+      final String target = _normalizeListenerToken(
+        node.realTarget?.toSource() ?? '',
+      );
       final NodeList<Expression> args = node.argumentList.arguments;
       if (args.isNotEmpty) {
-        final String callback = args.first.toSource();
+        final String callback = _normalizeListenerToken(args.first.toSource());
         onFound(target, callback);
       }
     }
