@@ -126,3 +126,17 @@ void _good193() {
     }
   }
 }
+
+// GOOD: the condition variable is reassigned between the two identical checks,
+// so the inner check tests the POST-reassignment (nullable) value — a
+// mandatory guard, not redundant.
+void _goodReassignedNested(String? q) {
+  if (q == null) {
+    q = q?.trim();
+    if (q == null) {
+      // OK — q was reassigned to a nullable value between the checks.
+      return;
+    }
+    use(q);
+  }
+}

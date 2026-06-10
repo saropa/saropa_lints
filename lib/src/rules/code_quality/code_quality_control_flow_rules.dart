@@ -309,13 +309,55 @@ class _NestedConditionChecker extends RecursiveAstVisitor<void> {
   final SaropaDiagnosticReporter reporter;
   final LintCode code;
 
+  /// Names reassigned so far, in source order, within the outer then-branch.
+  /// The visitor walks children in source order, so a reassignment recorded
+  /// before an inner `if` is one that executes between the two identical
+  /// checks. When a condition variable was reassigned in between, the inner
+  /// check tests a NEW value (e.g. `q = q.normalize();` returning nullable),
+  /// so it is a mandatory guard, not redundant dead logic.
+  final Set<String> _reassignedBefore = <String>{};
+
+  @override
+  void visitAssignmentExpression(AssignmentExpression node) {
+    final Expression lhs = node.leftHandSide;
+    if (lhs is SimpleIdentifier) {
+      _reassignedBefore.add(lhs.name);
+    } else if (lhs is PrefixedIdentifier) {
+      _reassignedBefore.add(lhs.identifier.name);
+    }
+    super.visitAssignmentExpression(node);
+  }
+
   @override
   void visitIfStatement(IfStatement node) {
     final String innerCondition = node.expression.toSource();
-    if (innerCondition == outerCondition) {
+    if (innerCondition == outerCondition &&
+        !_conditionUsesReassignedVar(node.expression)) {
       reporter.atNode(node.expression, code);
     }
     super.visitIfStatement(node);
+  }
+
+  /// True when any identifier in [condition] was reassigned earlier in the
+  /// then-branch. A conditional reassignment counts: if the value MIGHT have
+  /// changed before the inner check, the check is not provably redundant.
+  bool _conditionUsesReassignedVar(Expression condition) {
+    if (_reassignedBefore.isEmpty) return false;
+    final _ConditionIdentifierCollector collector =
+        _ConditionIdentifierCollector();
+    condition.accept(collector);
+    return collector.names.any(_reassignedBefore.contains);
+  }
+}
+
+/// Collects the simple identifier names referenced in a condition expression.
+class _ConditionIdentifierCollector extends RecursiveAstVisitor<void> {
+  final Set<String> names = <String>{};
+
+  @override
+  void visitSimpleIdentifier(SimpleIdentifier node) {
+    names.add(node.name);
+    super.visitSimpleIdentifier(node);
   }
 }
 
