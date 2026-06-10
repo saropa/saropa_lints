@@ -45,17 +45,35 @@ behave as before.
 Current semver-gated packs:
 
 - **`collection_compat`** — gated on `collection >= 1.19.0`.
-- **`riverpod_2`** — gated on `riverpod >= 2.0.0`. Holds `prefer_notifier_over_state`,
-  which recommends migrating `StateProvider` to `NotifierProvider`. That target
-  API only exists in Riverpod 2.x, so the rule is **moved out** of the base
-  `riverpod` pack into `riverpod_2` — a Riverpod 1.x project never sees a
-  recommendation it cannot follow. (`flutter_riverpod` / `hooks_riverpod` 2.x both
-  resolve `riverpod` 2.x in the lockfile, so the core-package gate covers them.)
+- **`riverpod_2`** — gated on `riverpod >= 2.0.0`. Holds `prefer_notifier_over_state`
+  (migrate `StateProvider` → `NotifierProvider`); the Notifier API only exists in
+  Riverpod 2.x.
+- **`riverpod_3`** — gated on `riverpod >= 3.0.0`. Holds `avoid_riverpod_state_notifier`
+  (the legacy `StateNotifier` / `StateNotifierProvider` were deprecated and moved to
+  `legacy.dart` in Riverpod 3.0).
+- **`dio_5`** — gated on `dio >= 5.0.0`. Holds `avoid_dio_error` (the `DioError` type
+  was removed in dio 5.0 in favor of `DioException`).
+- **`bloc_8`** — gated on `bloc >= 8.0.0`. Holds `avoid_bloc_map_event_to_state` (the
+  `mapEventToState` override was removed in bloc 8.0 in favor of `on<Event>` handlers).
+- **`go_router_6`** — gated on `go_router >= 6.0.0`. Holds `avoid_go_router_legacy_redirect`
+  (the redirect callback gained a leading `BuildContext` argument in go_router 6.0). This
+  pack's rule file *is* the gated pack (`go_router_6_rules.dart`), so the whole pack is
+  gated rather than relocating a single rule.
 
-When a version-gated rule would otherwise live in an ungated package pack, it is
-relocated via `kRelocatedRulePackCodes` (in `tool/rule_pack_audit.dart`) so the
-gate is authoritative — both the registry generator and the audit apply the same
-relocation.
+For the migration packs above whose rule would otherwise live in an ungated package
+pack (`riverpod_2`, `riverpod_3`, `dio_5`, `bloc_8`), the rule is **moved out** of the
+base pack into the gated pack via `kRelocatedRulePackCodes` (in
+`tool/rule_pack_audit.dart`) so the gate is authoritative — a project below the gate
+version never sees a recommendation it cannot follow. Both the registry generator and
+the audit apply the same relocation.
+
+### VS Code: upgrade-pack nudge
+
+The extension offers, once per workspace, to enable any of these gated packs when your
+resolved `pubspec.lock` version satisfies the gate but the pack is off (e.g. after a
+`pub upgrade` brings you onto dio 5.x). The offer reads the lockfile and applies the same
+gate the plugin enforces, so it never nudges a project below the gate version. Turn it off
+with `saropaLints.upgradePackNudge.enabled`.
 
 ## SDK-gated packs (pubspec `environment`)
 
