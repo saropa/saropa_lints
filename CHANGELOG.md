@@ -65,11 +65,12 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [Unreleased]
 
-Fixes an `avoid_context_in_async_static` false positive that flagged every async static method taking a `BuildContext`, even when the context was used only before the first `await` or only behind a `mounted` guard. No action required unless you added a project-local ignore for this pattern. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
+Fixes an `avoid_context_in_async_static` false positive that flagged every async static method taking a `BuildContext`, even when the context was used only before the first `await` or only behind a `mounted` guard. Also fixes `avoid_debug_print` and `avoid_print_error` false positives that flagged the `debugPrint`/`print` calls inside a project's own logging primitives (`debug()`, `debugException()`, `breadcrumb()`), which are the terminal sink and cannot route through structured logging without recursing. No action required unless you added a project-local ignore for these patterns. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
 
 ### Fixed
 
 - **`avoid_context_in_async_static` no longer flags a guarded or pre-await `BuildContext` parameter.** The rule reported the parameter unconditionally whenever the method was an async static, so a context used only before the async gap opened, or only after a `mounted` check, was wrongly flagged and forced widespread ignores. It now reuses the same flow analysis as the sibling after-await rule and fires only when the context is used after an `await` without a guard. Genuinely unguarded post-await usage still flags. No action required.
+- **`avoid_debug_print` and `avoid_print_error` no longer flag the logging infrastructure's own sink.** Both rules redirect callers to structured logging, but the implementation of that logging — functions named `debug*`, `_debug*`, or `breadcrumb` — must call `debugPrint`/`print` directly, since routing back through `debug()` would recurse infinitely. Both rules now exempt calls inside those logging-primitive functions. Ordinary application `debugPrint`/`print`-in-catch usage still flags. No action required.
 
 ## [13.12.2]
 

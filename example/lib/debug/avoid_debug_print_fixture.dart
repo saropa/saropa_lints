@@ -15,4 +15,20 @@ void _good() {
   logger.info('Loading data...'); // structured logging
 }
 
+// GOOD: debugPrint inside the logging sink itself — routing through debug()
+// here would recurse, so it must call debugPrint directly. No lint.
+void debug(String message) {
+  debugPrint('[info] $message');
+}
+
+// GOOD: debugException is part of the logging infrastructure. No lint.
+void debugException(Object error, StackTrace stack) {
+  debugPrint('[ERROR] $error\n$stack');
+}
+
+// GOOD: breadcrumb is a logging primitive. No lint.
+void breadcrumb(String label) {
+  debugPrint('[crumb] $label');
+}
+
 void main() {}

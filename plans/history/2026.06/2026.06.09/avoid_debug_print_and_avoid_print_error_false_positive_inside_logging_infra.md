@@ -1,6 +1,6 @@
 # BUG: `avoid_debug_print` + `avoid_print_error` — Fire inside the project's own logging infrastructure (terminal sink)
 
-**Status: Open**
+**Status: Fixed**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
@@ -224,19 +224,66 @@ The fixture at `example*/lib/testing/avoid_debug_print_fixture.dart` and
 
 ## Changes Made
 
-<!-- Fill in when a fix is written. -->
+Implemented Option A (enclosing-function-name heuristic):
+
+- `AvoidDebugPrintRule.runWithReporter` (`debug_rules.dart`) now skips a
+  `debugPrint` call when it is inside a logging-primitive function. Added a
+  top-level `isInsideLoggingSink(AstNode)` helper that walks the parent chain
+  for an enclosing `MethodDeclaration`/`FunctionDeclaration` named `debug*`,
+  `_debug*`, `breadcrumb`, or `_breadcrumb`. This matches the existing
+  exemption in the sibling `avoid_unguarded_debug` rule.
+- `AvoidPrintErrorRule.runWithReporter` (`error_handling_rules.dart`) now skips
+  a `CatchClause` when it is inside the same set of logging-primitive
+  functions, via a local `_isInsideLoggingSink(AstNode)` helper.
+
+Both helpers are intentionally small and file-local rather than coupling the
+two rule modules through a cross-import.
 
 ---
 
 ## Tests Added
 
-<!-- List new or updated fixture/test files and what they verify. -->
+- `example/lib/debug/avoid_debug_print_fixture.dart`: added `debug`,
+  `debugException`, and `breadcrumb` functions whose `debugPrint` bodies must
+  NOT lint; kept the ordinary-function BAD case.
+- `example/lib/error_handling/avoid_print_error_fixture.dart`: added a
+  `debugException` function whose catch-block `debugPrint('… $e')` must NOT
+  lint; kept the ordinary-method BAD case.
+- Verified with the scan CLI: `avoid_debug_print` fires only on the ordinary
+  `_bad()` call; `avoid_print_error` fires only on the ordinary catch-block
+  `print(e)`. Both stay silent inside the logging-sink functions.
 
 ---
 
 ## Commits
 
 <!-- Add commit hashes as fixes land. -->
+
+---
+
+## Finish Report (2026-06-09)
+
+**Scope:** (A) Dart lint rules / analyzer plugin.
+
+**Deep review:** Both fixes add a guard that walks parents to the enclosing
+function/method and exempts logging primitives. No recursion risk (single
+upward walk, terminates at root). The `avoid_debug_print` helper is public
+(`isInsideLoggingSink`) and mirrors the already-shipped `avoid_unguarded_debug`
+exemption, so the two debugPrint rules now agree on what counts as a logging
+helper. The `avoid_print_error` helper is file-local. Rule files, tiers,
+severities, and `LintImpact` unchanged.
+
+**Tests:** `dart test test/rules/testing/debug_rules_test.dart
+test/rules/flow/error_handling_rules_test.dart` → all pass. Scan-CLI behavior
+verified as above.
+
+**Maintenance:** CHANGELOG `[Unreleased]` updated. README rule count unchanged.
+ROADMAP unchanged (false-positive fix).
+
+**Bug archived:** bugs/avoid_debug_print_and_avoid_print_error_false_positive_inside_logging_infra.md
+→ plans/history/2026.06/2026.06.09/avoid_debug_print_and_avoid_print_error_false_positive_inside_logging_infra.md
+
+**Finish report appended:** this file.
 
 ---
 

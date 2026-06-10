@@ -1084,6 +1084,13 @@ class AvoidPrintErrorRule extends SaropaLintRule {
       final CatchClauseParameter? exceptionParam = node.exceptionParameter;
       if (exceptionParam == null) return;
 
+      // A catch block inside the logging infrastructure itself (debug() /
+      // debugException() / breadcrumb()) is the terminal sink: when structured
+      // logging has already failed, its last-resort fallback must call
+      // print()/debugPrint() directly — there is no higher logger to route to.
+      // Flagging it forces an ignore on code that has no alternative.
+      if (_isInsideLoggingSink(node)) return;
+
       final String exceptionName = exceptionParam.name.lexeme;
 
       // Visit the catch body to find print calls using the exception
@@ -1097,6 +1104,32 @@ class AvoidPrintErrorRule extends SaropaLintRule {
       );
     });
   }
+}
+
+/// Returns true when [node] is inside a logging-primitive implementation —
+/// a function/method named `debug*`, `_debug*`, `breadcrumb`, or `_breadcrumb`.
+///
+/// These are the terminal sinks the error/print rules redirect callers to;
+/// their own catch-block fallbacks must call print()/debugPrint() directly.
+bool _isInsideLoggingSink(AstNode node) {
+  AstNode? current = node.parent;
+  while (current != null) {
+    String? name;
+    if (current is MethodDeclaration) {
+      name = current.name.lexeme;
+    } else if (current is FunctionDeclaration) {
+      name = current.name.lexeme;
+    }
+    if (name != null &&
+        (name.startsWith('debug') ||
+            name.startsWith('_debug') ||
+            name == 'breadcrumb' ||
+            name == '_breadcrumb')) {
+      return true;
+    }
+    current = current.parent;
+  }
+  return false;
 }
 
 class _PrintErrorVisitor extends RecursiveAstVisitor<void> {
