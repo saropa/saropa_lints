@@ -62,7 +62,9 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 -->
 
-## [Unreleased]
+## [13.12.4]
+
+Clears a wide round of false positives across the string, exception-handling, async, rebuild, testing, collection, listener, lifecycle, and platform rules, so idiomatic patterns that previously forced project-local ignores now pass cleanly. The Package Dashboard gains a one-click "Save Upgrade Report" that exports just the packages with an available update as a focused worklist, and every Package Vibrancy dashboard is now fully translatable instead of always rendering in English. The localized UI also stops machine-translating brand and tool names — the product name, VS Code, and pub.dev now read identically in every language. No action required unless you added an ignore for one of the corrected patterns. [log](https://github.com/saropa/saropa_lints/blob/v13.12.4/CHANGELOG.md)
 
 ### Fixed
 
@@ -93,11 +95,17 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 - **The Package Vibrancy dashboards are now fully translatable.** Around 265 previously-hardcoded English strings across the report, comparison, package-detail, detail, and chart webviews now resolve through the extension's localization catalog, so they translate alongside the rest of the UI instead of always rendering in English. No visible change for English users; other locales pick up the translations once the locale catalogs are regenerated.
 
+### Fixed (Extension)
+
+- **Brand and tool names are no longer machine-translated or transliterated in the localized UI.** "Saropa Lints", "VS Code", "pub.dev", "OWASP", and "SPDX" were being rendered as native words or local-script transliterations (e.g. "Saropa Fusseln", "VS Kodu", "पब.डेव") across translated command titles, settings descriptions, and dashboards; every locale now shows one worldwide spelling, and the translation pipeline shields these terms so future regenerations keep them intact. No action required.
+
 <details>
 <summary>Maintenance</summary>
 
 - The publish script now gates the release on a CHANGELOG Overview check: the version section must open with an intro paragraph ending in a `[log](.../vX.Y.Z/CHANGELOG.md)` link pinned to the proposed version. A missing intro or a stale/wrong-version link prompts retry (default) / ignore / abort instead of shipping silently. Build tooling only; no behavior change for users.
 - The extension translation script gained operator controls for long NLLB runs: a graceful Ctrl-C (first press finishes the in-flight string, flushes the cache, and exits cleanly; second force-quits), a `--mode` selector — gaps-only / gaps + upgrade low-quality Google→NLLB / force re-translate — with an interactive menu, persistent per-string engine provenance, and `--show` / `--set` / `--unset` commands to inspect, override, or remove cached translations. Build tooling only (excluded from the `.vsix`); no behavior change for users.
+- The translation script's `--mode` menu adds an audit-only option (`--mode audit`) that writes the gaps + low-quality (upgrade-candidate) report to file without translating, pruning, or rewriting any locale, plus an `[a]` abort option that exits the menu with no changes. Build tooling only; no behavior change for users.
+- The publish pipeline no longer machine-translates extension locales; it now runs the coverage check in `--mode audit` (writes the gaps report, translates nothing) and, on a remaining gap, prompts Retry (re-audit, default) / Ignore / Abort. Closing gaps is an explicit separate step (edit `dictionaries.py` or run the translator yourself). Build tooling only; no behavior change for users.
 - The extension package now excludes `scripts/**` (build-time i18n/MT tooling) from the published `.vsix`. Those scripts are never loaded at runtime — runtime locales ship from `src/i18n/locales` via the esbuild bundle — and shipping them leaked the machine-translation cache, whose high-entropy translated strings tripped Open VSX's secret scanner and blocked publication. No behavior change.
 - The publish script now checks for `VSCE_PAT` before the Marketplace publish step and prompts with token-creation guidance when it is missing, mirroring the existing Open VSX handling. A missing or expired Marketplace token previously failed with an opaque `vsce` error and only a generic "PAT expired?" guess. No behavior change.
 - Documented the upstream cause of the `analyzer`/`analyzer_plugin` version caps in `pubspec.yaml`: Flutter pins `meta` exactly inside the SDK, analyzer 13 raised its `meta` floor above that pin, and the caps clear only when Flutter stable bumps its bundled `meta`. Added links to the Dart pinning rationale and the open Flutter unpin issue. No behavior change.

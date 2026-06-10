@@ -34,12 +34,42 @@ _CACHE_PATH = _CACHE_DIR / "mt_strings.json"
 _SHIELD_OPEN = "ZZ"
 _SHIELD_CLOSE = "ZZ"
 
-# Brand / proper-noun terms MT must NEVER translate or transliterate. Google
-# rendered "Saropa" in local scripts in 124 locale strings; the company name has
-# one spelling worldwide. Shielded exactly like placeholders so the engine
-# cannot touch it. Longest-first if this grows, to avoid a shorter term
-# shielding inside a longer one.
-_DO_NOT_TRANSLATE = ("Saropa",)
+# Brand / proper-noun terms MT must NEVER translate or transliterate. Each has one
+# spelling worldwide (like "Google" or "Apple"). Shielded exactly like placeholders
+# so the engine cannot touch it. MT had translated the *non-Saropa* half of the
+# product name ("Saropa Lints" -> "Saropa Fusseln/Pelusas/糸くず/…") and the tool
+# names ("VS Code" -> "VS Kodu/код VS", "pub.dev" -> "पब.डेव", "OWASP" -> "オワスプ")
+# across 300+ locale strings because only "Saropa" itself was on this list.
+# ORDER MATTERS: longest / most specific first, so a shorter term cannot shield
+# inside a longer one — "Saropa Lints" must be masked as a unit before bare
+# "Saropa" can grab the "Saropa" inside it.
+# Code identifiers (file names, config keys, package names, CLI invocations) are
+# ALSO included: MT had transliterated/translated them too — "violations.json" ->
+# "الانتهاكات.json", "saropa_lints" -> "सरोपा_लिंट्स", "dart analyze" -> "تحليل الأسهم"
+# ("dart" read as the projectile). A code identifier is literal in every language.
+_DO_NOT_TRANSLATE = (
+    # Longest / most specific first.
+    "workspace.textDocuments",
+    "analysis_options",
+    "dev_dependencies",
+    "violations.json",
+    "pubspec.yaml",
+    "pubspec.lock",
+    "build_runner",
+    "saropa_lints",
+    "dart analyze",
+    "dart format",
+    "Saropa Lints",
+    "VS Code",
+    "pub.dev",
+    "GitHub",
+    "Flutter",
+    "OWASP",
+    "SPDX",
+    "Dart",
+    "OSV",
+    "Saropa",
+)
 # Detects leftover sentinel residue from this or any past shield scheme so cached
 # values poisoned by the old noncharacter/PUA shields get re-fetched: ASCII core
 # "ZZ<n>ZZ", PUA "q<n>q", and the raw marker code points.
@@ -199,6 +229,28 @@ def prune_low_quality(
             _provenance.pop(key, None)
             removed += 1
     return removed
+
+
+def low_quality_entries(
+    cache: dict[str, str], locale: str, texts: list[str], dict_table: dict[str, str],
+) -> list[str]:
+    """Audit counterpart to prune_low_quality: return (without removing) the
+    source strings whose cached translation ranks below NLLB and would be
+    re-translated in 'upgrade' mode. Mirrors prune_low_quality's selection
+    exactly so the audit count equals what an upgrade run would actually redo.
+    Empty unless NLLB is the locale's primary engine — there is nothing better
+    to upgrade to otherwise.
+    """
+    if _primary_engine(locale) != "nllb":
+        return []
+    found: list[str] = []
+    for text in texts:
+        if not text or text in dict_table:
+            continue
+        key = _cache_key(locale, text, "nllb")
+        if key in cache and _provenance.get(key, "") in _LOW_QUALITY_PROVENANCE:
+            found.append(text)
+    return found
 
 
 def prune_all(

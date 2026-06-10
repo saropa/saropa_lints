@@ -79,7 +79,18 @@ dependencies:
   # analyzer ^12 bump back when Flutter stable still pinned meta 1.17.0. That
   # blocker is gone now that stable ships meta 1.18.0; the live blocker is
   # analyzer 13's meta ^1.18.3 floor.
-  # Do NOT raise the cap to allow analyzer ^13 until Flutter stable ships
+  #
+  # Why the pin exists upstream: meta ships INSIDE the Flutter SDK (with
+  # intl/collection/path/vector_math/async) at an EXACT version, so a new pub
+  # release cannot break apps on an older SDK. analyzer is not itself pinned but
+  # depends on meta, so analyzer's meta floor must stay <= Flutter's meta pin.
+  # We cannot "widen below a hard floor", so this clears only when Flutter
+  # stable bumps its bundled meta. Intentional and acknowledged-painful; tracked
+  # for removal upstream:
+  #   - rationale: https://github.com/dart-lang/sdk/blob/main/docs/Flutter-Pinned-Packages.md
+  #   - unpin effort: https://github.com/flutter/flutter/issues/158050
+  #
+  ###### Do NOT raise the cap to allow analyzer ^13 until Flutter stable ships
   # meta ^1.18.3.
   analyzer: ">=9.0.0 <13.0.0"
 

@@ -27,10 +27,7 @@ void main() {
   });
 
   test('close() in a hand-named disposeController() is exempt', () {
-    expect(
-      exempt('void disposeController() { controller?.close(); }'),
-      isTrue,
-    );
+    expect(exempt('void disposeController() { controller?.close(); }'), isTrue);
   });
 
   test('cancel() inside a sync callback closure is exempt', () {

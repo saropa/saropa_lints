@@ -11,7 +11,8 @@ import 'package:test/test.dart';
 void main() {
   bool mergeable(String methodBody) {
     final unit = parseString(
-      content: 'class _S { Future<void> m(List<Object> items) async '
+      content:
+          'class _S { Future<void> m(List<Object> items) async '
           '{ $methodBody } }',
       throwIfDiagnostics: false,
     ).unit;
@@ -55,8 +56,10 @@ while (i < items.length) {
 
     test('loading-state top-level await (regression guard)', () {
       expect(
-        mergeable('setState(() {}); await _save(items); '
-            'if (mounted) setState(() {});'),
+        mergeable(
+          'setState(() {}); await _save(items); '
+          'if (mounted) setState(() {});',
+        ),
         isFalse,
       );
     });
@@ -65,8 +68,10 @@ while (i < items.length) {
   group('LINT — genuinely mergeable', () {
     test('two consecutive setState calls inside one loop body, no await', () {
       expect(
-        mergeable('for (int i = 0; i < items.length; i++) '
-            '{ setState(() {}); setState(() {}); }'),
+        mergeable(
+          'for (int i = 0; i < items.length; i++) '
+          '{ setState(() {}); setState(() {}); }',
+        ),
         isTrue,
       );
     });

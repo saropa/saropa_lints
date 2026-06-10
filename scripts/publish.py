@@ -19,7 +19,9 @@ See scripts/README.md for the full architecture and module map.
 
 Extension localization: US English is the canonical maintainable source
 (``extension/package.nls.json``, ``extension/src/i18n/locales/en.json``).
-Regenerate translated bundles with
+Publish only AUDITS locale coverage (``generate_locales.py --mode audit``);
+it never machine-translates. Closing gaps is an explicit, separate step —
+edit ``dictionaries.py`` or run the translator yourself with
 ``python extension/scripts/i18n/generate_locales.py`` (from repo root,
 after editing English). The US spelling audit skips
 ``extension/scripts/i18n/`` so foreign-language strings in translation

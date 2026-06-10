@@ -2,6 +2,11 @@
 src/**
 test/**
 out/**
+# Build-time tooling only (i18n MT pipeline + caches). Never loaded at runtime —
+# runtime locales live in src/i18n/locales and are bundled into out/ by esbuild.
+# Shipping scripts/ also leaked the MT cache (mt_strings.json), whose high-entropy
+# translated strings trip Open VSX's secret scanner and block publication.
+scripts/**
 tsconfig.json
 node_modules/**
 .gitignore

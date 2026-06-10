@@ -69,10 +69,7 @@ void main() {
     });
 
     test('Pattern 5b: map.keys.first inside `while (map.length > n)`', () {
-      expect(
-        guarded('while (map.length > maxN) { map.keys.first; }'),
-        isTrue,
-      );
+      expect(guarded('while (map.length > maxN) { map.keys.first; }'), isTrue);
     });
 
     test('Pattern 6: extension `isListNullOrEmpty` early return', () {
@@ -93,17 +90,11 @@ void main() {
     });
 
     test('Pattern 7: indexed target with inline isNotEmpty guard', () {
-      expect(
-        guarded('if (props[k]!.isNotEmpty) { props[k]!.first; }'),
-        isTrue,
-      );
+      expect(guarded('if (props[k]!.isNotEmpty) { props[k]!.first; }'), isTrue);
     });
 
     test('Pattern 8: split() result through a local variable', () {
-      expect(
-        guarded("final parts = prefix.split(';'); parts.first;"),
-        isTrue,
-      );
+      expect(guarded("final parts = prefix.split(';'); parts.first;"), isTrue);
     });
   });
 

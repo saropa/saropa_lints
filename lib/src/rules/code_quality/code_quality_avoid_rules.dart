@@ -1057,8 +1057,7 @@ class AvoidSubstringRule extends SaropaLintRule {
           return true;
         }
       } else if (current is ConditionalExpression &&
-          (current.thenExpression == prev ||
-              current.elseExpression == prev)) {
+          (current.thenExpression == prev || current.elseExpression == prev)) {
         // Accept BOTH branches. For an indexOf-derived index the safe slice is
         // normally the ELSE branch (`i < 0 ? s : s.substring(0, i)`): the then
         // handles "not found". The arg/receiver checks are polarity-agnostic —
@@ -1224,8 +1223,7 @@ class AvoidSubstringRule extends SaropaLintRule {
       final bool boundsReceiverLength = RegExp(
         '${RegExp.escape(receiverSource)}\\.length',
       ).hasMatch(condition.toSource());
-      if (boundsReceiverLength &&
-          _conditionInvolvesArgs(condition, argNames)) {
+      if (boundsReceiverLength && _conditionInvolvesArgs(condition, argNames)) {
         return true;
       }
     }

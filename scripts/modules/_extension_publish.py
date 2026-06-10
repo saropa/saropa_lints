@@ -128,38 +128,33 @@ def set_extension_version(project_dir: Path, version: str) -> bool:
     return True
 
 
-def regenerate_extension_locales_from_english(project_dir: Path) -> bool | None:
-    """Run ``generate_locales.py`` so non-en bundles match English sources.
+def audit_extension_locales(project_dir: Path) -> bool | None:
+    """Audit (never translate) extension locale coverage before packaging.
 
-    English (``package.nls.json``, ``src/i18n/locales/en.json``) is the
-    source of truth; this refreshes derived locale files before packaging.
+    Publish must not run any machine-translation job — that is an explicit,
+    separate operation. This runs ``generate_locales.py --mode audit``, which
+    reads the curated dictionaries + existing MT cache only (zero network calls),
+    writes the gaps + low-quality report to file, and translates nothing. With
+    ``--fail-on-missing`` it exits non-zero when any locale still has a gap, so the
+    caller can prompt the operator instead of silently shipping English.
 
     Returns:
-        True when the script ran successfully, False if it ran but failed,
-        None if ``generate_locales.py`` is not present (no extension i18n).
+        True when the audit found no gaps, False when gaps remain (or the audit
+        errored), None if ``generate_locales.py`` is not present (no extension i18n).
     """
     i18n_dir = _extension_dir(project_dir) / "scripts" / "i18n"
     gen = i18n_dir / "generate_locales.py"
     if not gen.is_file():
         return None
-    # Enable machine translation so newly-added English strings are actually
-    # translated at publish time. Without this flag the generator leaves unknown
-    # phrases in English (passthrough), which silently ships untranslated UI and
-    # leaves the coverage audit perpetually "missing". MT results are cached in
-    # extension/scripts/i18n/.cache so reruns are network-free for known strings.
-    # Merge over os.environ (not replace): run_command passes env straight to the
-    # subprocess, so a bare {flag: "1"} would wipe PATH/PYTHONPATH and break it.
-    gen_env = {**os.environ, "SAROPA_I18N_MACHINE_TRANSLATE": "1"}
     r = run_command(
-        # --fail-on-missing turns residual untranslated strings into a non-zero
-        # exit so the publish pipeline aborts instead of shipping a "translated"
-        # bundle that silently contains English. The caller treats False as fatal.
-        [sys.executable, str(gen), "--fail-on-missing"],
+        # --mode audit => no translation, no locale-file rewrite, just the report.
+        # --fail-on-missing turns a residual gap into a non-zero exit so the caller
+        # treats False as a gate failure and prompts rather than shipping English.
+        [sys.executable, str(gen), "--mode", "audit", "--fail-on-missing"],
         i18n_dir,
-        "Regenerate extension locales from English (machine-translate new strings)",
+        "Audit extension locale coverage (no translation)",
         capture_output=True,
         allow_failure=True,
-        env=gen_env,
     )
     if r.returncode != 0:
         if r.stderr:
@@ -174,19 +169,19 @@ def regenerate_extension_locales_from_english(project_dir: Path) -> bool | None:
 
 
 def _prompt_locale_coverage_failure() -> str:
-    """Ask user what to do after the locale coverage gate failed.
+    """Ask user what to do after the locale coverage AUDIT found gaps.
 
-    Returns 'ignore' | 'retry' | 'abort'. Default (empty input) is
-    Retry — the typical recovery is to edit dictionaries.py and rerun
-    the generator without aborting the whole publish. Ctrl+C / EOF
-    falls through to Abort so the user can always bail out hard.
+    Returns 'ignore' | 'retry' | 'abort'. Default (empty input) is Retry — the
+    typical recovery is to close gaps (edit dictionaries.py, or run the translator
+    separately — publish never translates) and re-audit without aborting the whole
+    publish. Ctrl+C / EOF falls through to Abort so the user can always bail hard.
     """
-    print_warning("Extension locale coverage gate FAILED. Choose an action:")
+    print_warning("Extension locale coverage AUDIT found gaps. Choose an action:")
+    print_colored("  [R]etry the audit (after closing gaps; publish does not translate)  [default]", Color.CYAN)
     print_colored("  [I]gnore and continue (ship with missing translations)", Color.CYAN)
-    print_colored("  [R]etry (re-run generator after editing dictionaries.py)", Color.CYAN)
     print_colored("  [A]bort (stop publish)", Color.CYAN)
     try:
-        raw = input("  Choice [i/R/a]: ").strip().lower() or "r"
+        raw = input("  Choice [R/i/a]: ").strip().lower() or "r"
         if raw.startswith("i"):
             return "ignore"
         if raw.startswith("a"):
@@ -272,10 +267,71 @@ def install_extension(vsix_path: Path) -> bool:
     return True
 
 
+def _prompt_for_vsce_pat() -> str:
+    """Prompt user for VSCE_PAT when not set. Returns token or empty string to skip.
+
+    Mirrors _prompt_for_ovsx_pat. Without this, a missing/expired Marketplace
+    token made `vsce publish` fail with an opaque error (under capture_output it
+    cannot fall back to vsce's own interactive prompt), and the caller could only
+    print a generic "PAT expired or missing scope?" guess.
+    """
+    print_warning("VSCE_PAT environment variable not set.")
+    print_info("The VS Code Marketplace requires a Personal Access Token (PAT) to publish.")
+    print_info("Create one in Azure DevOps (the Marketplace uses Azure DevOps for auth):")
+    print_info("  1. Sign in at https://dev.azure.com with the account that owns the Saropa publisher.")
+    print_info("  2. User settings (top-right avatar) -> Personal Access Tokens -> New Token.")
+    print_info("  3. Organization: All accessible organizations. Scopes: Marketplace -> Manage.")
+    print_info("  4. Create, then copy the token (it is shown only once).")
+    print_info(f"  Publisher page: {MARKETPLACE_MANAGE_URL}")
+    print()
+    # Show platform-specific instructions for setting it permanently
+    is_windows = platform.system() == "Windows"
+    if is_windows:
+        print_colored(
+            "  To set permanently (PowerShell):",
+            Color.DIM,
+        )
+        print_colored(
+            '    [Environment]::SetEnvironmentVariable("VSCE_PAT", "your-token", "User")',
+            Color.WHITE,
+        )
+        print_colored(
+            "  Or for current session only:",
+            Color.DIM,
+        )
+        print_colored(
+            '    $env:VSCE_PAT = "your-token"',
+            Color.WHITE,
+        )
+    else:
+        print_colored(
+            "  To set permanently, add to ~/.bashrc or ~/.zshrc:",
+            Color.DIM,
+        )
+        print_colored(
+            '    export VSCE_PAT="your-token"',
+            Color.WHITE,
+        )
+    print()
+    token = input("  Paste your Marketplace PAT now (or press Enter to skip): ").strip()
+    if token:
+        # Set for this process so vsce (which reads VSCE_PAT) picks it up.
+        os.environ["VSCE_PAT"] = token
+    return token
+
+
 def publish_extension_to_marketplace(
     project_dir: Path, vsix_path: Path
 ) -> bool:
-    """Publish .vsix to VS Code Marketplace via vsce. Returns True on success."""
+    """Publish .vsix to VS Code Marketplace via vsce. Returns True on success or skip."""
+    # vsce reads VSCE_PAT from the environment. Check it up front and prompt when
+    # missing, so the failure names the real cause instead of an opaque vsce error.
+    vsce_pat = os.environ.get("VSCE_PAT", "").strip()
+    if not vsce_pat:
+        vsce_pat = _prompt_for_vsce_pat()
+        if not vsce_pat:
+            print_info("Skipping VS Code Marketplace publish.")
+            return True
     ext_dir = _extension_dir(project_dir)
     r = run_command(
         [
@@ -382,23 +438,24 @@ def package_extension(project_dir: Path, version: str) -> Path | None:
         print_warning("Root CHANGELOG.md not found; extension .vsix will have no changelog.")
     if not copy_readme_to_extension(project_dir):
         print_warning("Root README.md not found; extension .vsix will have no README.")
-    # Coverage gate: the generator runs with --fail-on-missing, so a non-zero
-    # exit means at least one locale still has untranslated strings (or the
-    # i18n scripts errored). On failure, prompt Ignore / Retry / Abort instead
-    # of hard-aborting — Retry is the common case (user edits dictionaries.py
-    # and reruns), Ignore lets the user ship despite gaps when intentional,
-    # Abort matches the prior behavior.
+    # Coverage gate: publish AUDITS locale coverage but never translates — a
+    # translation run is an explicit, separate operation. The audit runs with
+    # --fail-on-missing, so a non-zero exit means at least one locale still has
+    # untranslated strings (or the i18n scripts errored). On failure, prompt
+    # Retry / Ignore / Abort instead of hard-aborting — Retry re-audits after the
+    # user closes gaps (dictionaries.py edit or a separate translation run),
+    # Ignore ships despite gaps when intentional, Abort stops the publish.
     while True:
-        regen = regenerate_extension_locales_from_english(project_dir)
-        if regen is True:
-            print_success("Extension locale JSON regenerated from English sources.")
+        audit = audit_extension_locales(project_dir)
+        if audit is True:
+            print_success("Extension locale audit clean — no missing translations.")
             break
-        if regen is None:
+        if audit is None:
             # No i18n scripts present; nothing to gate.
             break
         choice = _prompt_locale_coverage_failure()
         if choice == "retry":
-            print_info("Re-running extension locale generator...")
+            print_info("Re-running extension locale audit...")
             continue
         if choice == "ignore":
             print_warning(
