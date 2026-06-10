@@ -48,10 +48,11 @@ Step 7:
 - `expect(true, isTrue)` — **0**.
 - `expect('<literal>', isNotNull)` — **0**.
 
-Still TODO (Phase 2 / hardening): a non-overridable gate in `publish.py`'s
-audit phase. Today the guard runs in Step 7's `dart test`, but that step's
-failure can be waved through the interactive "continue despite test failure"
-prompt; the audit phase blocks with an exit code.
+- **publish.py audit gate (non-overridable)** — `run_stub_guard_check` in
+  `scripts/modules/_audit.py` runs the guard test during the audit and feeds
+  `AuditResult.stub_guard_passed` into `has_blocking_issues`. A reintroduced
+  stub blocks publish with the audit's exit code (11), so it cannot be waved
+  through the interactive "continue despite test failure" prompt in Step 7.
 
 ### Phase 2 backlog — files that lost stub coverage (count = stubs removed)
 
@@ -147,7 +148,7 @@ violating pattern.
 - [x] Empty-body stub count = **0**, hard-gated.
 - [ ] Each removed stub's intended coverage is restored by a fixture-backed
       assertion (trigger + non-trigger) under the resolved-analyzer oracle.
-- [ ] A **non-overridable** stub gate runs in `publish.py`'s audit phase
+- [x] A **non-overridable** stub gate runs in `publish.py`'s audit phase
       (blocking exit code), not only in the wave-through-able Step 7 `dart test`.
 
 ## History

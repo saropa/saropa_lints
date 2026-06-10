@@ -113,7 +113,12 @@ Round 2 — bloc_rules.dart should-fix patterns (not crashes):
 - `avoid_bloc_listen_in_build`
 - `require_error_state`
 
-Left at ERROR in bloc_rules.dart after reading: `require_bloc_close` (resource/memory leak, consistent with the disposal family) and `require_initial_state` (throws LateInitializationError at runtime).
+
+Round 3 — full Bucket A sweep (35 rules): every remaining ERROR rule with an explicit impact=warning/info was read and graded. 35 downgraded ERROR->WARNING (performance, architecture, robustness-fallback patterns, deployment-config heuristics, accessibility, test-quality); see the per-rule `// SEV-01 (downgraded from ERROR):` comment at each call site.
+
+## Bucket A audit COMPLETE
+
+All ERROR-severity rules whose explicit impact getter said warning/info have been individually read. The rules still at ERROR (listed in Bucket A above) are confirmed-correct: genuine compile errors (compile_time_syntax_rules, uri_does_not_exist, type_rules), deterministic crashes (avoid_setstate_in_build, avoid_recursive_widget_calls, require_provider_scope, avoid_circular_redirects), data corruption/loss (avoid_isar_enum_field, avoid_isar_schema_breaking_changes, require_isar_nullable_field), security/exploit (require_https_only, require_route_guards), and the disposal/leak family (require_bloc_close, require_scroll_controller_dispose). Only Bucket B (under-rated WARNING->ERROR upgrades) remains open.
 
 ## Left at ERROR despite prefer_* name (confirmed genuine crashes / test hook)
 
