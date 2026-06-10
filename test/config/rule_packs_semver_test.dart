@@ -89,6 +89,26 @@ void main() {
       );
       expect(packPassesDependencyGate('riverpod_3', null), isFalse);
     });
+
+    // go_router_6 is a whole-pack gate (no relocation) on go_router 6.0.
+    test('go_router_6 passes on go_router >=6.0.0, fails on 5.x', () {
+      expect(
+        packPassesDependencyGate('go_router_6', {'go_router': '6.0.0'}),
+        isTrue,
+      );
+      expect(
+        packPassesDependencyGate('go_router_6', {'go_router': '5.2.4'}),
+        isFalse,
+      );
+      expect(packPassesDependencyGate('go_router_6', null), isFalse);
+    });
+
+    test('go_router_6 owns avoid_go_router_legacy_redirect', () {
+      expect(
+        ruleCodesForPack('go_router_6'),
+        contains('avoid_go_router_legacy_redirect'),
+      );
+    });
   });
 
   group('riverpod_2 ownership', () {

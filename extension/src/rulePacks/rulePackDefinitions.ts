@@ -491,6 +491,15 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
     ],
   },
   {
+    id: 'go_router_6',
+    label: 'go_router 6.x',
+    matchPubNames: ['go_router'],
+    ruleCodes: [
+      'avoid_go_router_legacy_redirect',
+    ],
+    dependencyGate: { package: 'go_router', constraint: '>=6.0.0' },
+  },
+  {
     id: 'graphql',
     label: 'GraphQL',
     matchPubNames: ['graphql'],

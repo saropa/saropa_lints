@@ -2918,6 +2918,7 @@ const Set<String> comprehensiveOnlyRules = <String>{
   'avoid_dio_error',
   'avoid_bloc_map_event_to_state',
   'avoid_riverpod_state_notifier',
+  'avoid_go_router_legacy_redirect',
   'prefer_provider_extensions',
   'prefer_redirecting_superclass_constructor',
   'prefer_image_filter_quality_medium',

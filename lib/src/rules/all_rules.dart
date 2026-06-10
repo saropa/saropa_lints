@@ -145,6 +145,7 @@ export 'packages/flutter_hooks_rules.dart';
 export 'packages/geolocator_rules.dart';
 export 'packages/get_it_rules.dart';
 export 'packages/getx_rules.dart';
+export 'packages/go_router_6_rules.dart';
 export 'packages/graphql_rules.dart';
 export 'packages/hive_rules.dart';
 export 'packages/isar_rules.dart';
