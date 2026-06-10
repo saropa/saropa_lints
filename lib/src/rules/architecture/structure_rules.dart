@@ -2788,6 +2788,15 @@ class AvoidClassesWithOnlyStaticMembersRule extends SaropaLintRule {
       reporter.atToken(node.nameToken);
     });
   }
+
+  // A class holding only static members should be made non-instantiable;
+  // `abstract final` is the canonical Dart idiom (same fix as
+  // prefer_abstract_final_static_class).
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        AddAbstractFinalFix(context: context),
+  ];
 }
 
 /// Warns when a setter has no corresponding getter in the class hierarchy.

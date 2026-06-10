@@ -570,5 +570,24 @@ void main() {
       'AvoidUnconstrainedDialogColumnRule',
       () => AvoidUnconstrainedDialogColumnRule(),
     );
+
+    // Batch 16 — control flow + structure (4 rules):
+    // if/else true-false collapse, nested-if merge, static-only class.
+    hasFix('AvoidUnnecessaryIfRule', () => AvoidUnnecessaryIfRule());
+    hasFix(
+      'PreferReturningConditionRule',
+      () => PreferReturningConditionRule(),
+    );
+    hasFix('AvoidCollapsibleIfRule', () => AvoidCollapsibleIfRule());
+    hasFix(
+      'AvoidClassesWithOnlyStaticMembersRule',
+      () => AvoidClassesWithOnlyStaticMembersRule(),
+    );
+
+    // Batch 17 — null-aware call rewrite.
+    hasFix(
+      'PreferNullAwareMethodCallsRule',
+      () => PreferNullAwareMethodCallsRule(),
+    );
   });
 }

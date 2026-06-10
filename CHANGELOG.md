@@ -62,6 +62,25 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 -->
 
+## [Unreleased]
+
+Adds one-click quick fixes for five more lint rules, so common simplifications can be applied straight from the IDE lightbulb instead of by hand. An if/else (or if plus a following return) that returns `true` in one branch and `false` in the other collapses to a direct return of the condition, a nested `if` with no else on either level merges into a single combined condition, an explicit null-check-then-call becomes the null-aware `?.` form, and a class that holds only static members is marked `abstract final` so it can no longer be instantiated. No action required. [log](https://github.com/saropa/saropa_lints/blob/v13.12.5/CHANGELOG.md)
+
+### Added
+
+- **`avoid_unnecessary_if` and `prefer_returning_condition` gain a quick fix that returns the condition directly.** `if (c) return true; return false;` becomes `return c;` and the if/else form becomes `return c;` / `return !(c);`; the condition is parenthesized when negated so operator precedence stays correct. No action required.
+- **`avoid_collapsible_if` gains a quick fix that merges the nested if into its parent.** `if (a) { if (b) { … } }` becomes `if ((a) && (b)) { … }`, with both conditions parenthesized to preserve precedence. No action required.
+- **`prefer_null_aware_method_calls` gains a quick fix that rewrites the guard with `?.`.** `if (x != null) x.foo();` and `x != null ? x.foo() : null` both become `x?.foo()`, reusing the original receiver and arguments verbatim. No action required.
+- **`avoid_classes_with_only_static_members` gains a quick fix that adds `abstract final` modifiers.** This makes a static-only utility class non-instantiable, matching the existing `prefer_abstract_final_static_class` fix. No action required.
+
+<details>
+<summary>Maintenance</summary>
+
+- The rule-pack lockfile resolver can now distinguish direct from transitive dependencies (`isDirectDependency`), parsing the `dependency:` field of `pubspec.lock`. This is the resolver primitive behind the ratified "direct-only suggestions" policy; the suggest UX that consumes it is not yet wired. No behavior change for users.
+- Corrected stale test paths in the plugin-system migration plan so the documented rule-pack verification command (`test/config/rule_packs_*.dart`) actually runs. Plan housekeeping only.
+
+</details>
+
 ## [13.12.4]
 
 Clears a wide round of false positives across the string, exception-handling, async, rebuild, testing, collection, listener, lifecycle, and platform rules, so idiomatic patterns that previously forced project-local ignores now pass cleanly. The Package Dashboard gains a one-click "Save Upgrade Report" that exports just the packages with an available update as a focused worklist, and every Package Vibrancy dashboard is now fully translatable instead of always rendering in English. The localized UI also stops machine-translating brand and tool names — the product name, VS Code, and pub.dev now read identically in every language. No action required unless you added an ignore for one of the corrected patterns. [log](https://github.com/saropa/saropa_lints/blob/v13.12.4/CHANGELOG.md)
@@ -97,7 +116,7 @@ Clears a wide round of false positives across the string, exception-handling, as
 
 ### Fixed (Extension)
 
-- **Brand and tool names are no longer machine-translated or transliterated in the localized UI.** "Saropa Lints", "VS Code", "pub.dev", "OWASP", and "SPDX" were being rendered as native words or local-script transliterations (e.g. "Saropa Fusseln", "VS Kodu", "पब.डेव") across translated command titles, settings descriptions, and dashboards; every locale now shows one worldwide spelling, and the translation pipeline shields these terms so future regenerations keep them intact. No action required.
+- **Brand, tool, and code-identifier names are no longer machine-translated or transliterated in the localized UI.** Product and tool names ("Saropa Lints", "VS Code", "pub.dev", "OWASP", "SPDX", "Dart", "Flutter") and literal identifiers such as file names and config keys (`violations.json`, `analysis_options`, `pubspec.yaml`, `dev_dependencies`, `saropa_lints`) were being rendered as native words or local-script transliterations (e.g. "Saropa Fusseln", "VS Kodu", "पब.डेव", "الانتهاكات.json") across translated command titles, settings descriptions, and dashboards; every locale now shows one worldwide spelling, and the translation pipeline shields these terms so future regenerations keep them intact. No action required.
 
 <details>
 <summary>Maintenance</summary>

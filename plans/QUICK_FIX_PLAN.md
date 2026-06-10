@@ -2,7 +2,7 @@
 
 **Goal:** Increase quick fix coverage by implementing fixes in priority order, with fixtures + tests, and validating via the audit script.
 
-**Current state:** Run `python scripts/list_rules_without_fixes.py` for an up-to-date list — the script prints a one-line **`Quick-fix audit: …`** summary to stdout plus writes the grouped log under `reports/<yyyymmdd>/`. Baseline stamped **2026-05-08:** **1698** rules lack fix producers across **109** rule files (same net count as 2026-05-04 after Batch 13; Batch 14 verified without changing this aggregate).
+**Current state:** Run `python scripts/list_rules_without_fixes.py` for an up-to-date list — the script prints a one-line **`Quick-fix audit: …`** summary to stdout plus writes the grouped log under `reports/<yyyymmdd>/`. Baseline stamped **2026-06-10:** **1697** rules lack fix producers across **110** rule files (down from 1701 after Batch 16; the file/rule counts grew vs. the 2026-05-08 baseline of 1698 because new rules were added in the interim).
 
 ## Execution snapshot
 
@@ -18,7 +18,8 @@ Treat this file as two layers:
 - [x] **QF-01 (P0)** Re-run `python scripts/list_rules_without_fixes.py` and stamp a fresh baseline date/count at the top of this plan. (**2026-05-08:** 1698 rules / 109 files; report `reports/20260508/…_list_rules_without_fixes.log`.)
 - [x] **QF-02 (P0)** Execute Batch 14 focused on deterministic AST-local fixes in the highest-yield files. (Verified 2026-05-08: fix wiring present for `avoid_duplicate_exports`, `avoid_duplicate_named_imports`, and `prefer_trailing_underscore_for_unused`; `dart test test/scan/rule_quick_fix_presence_test.dart` passed.)
 - [x] **QF-03 (P1)** Write a batch artifact to `plans/history/` with rule list, tests added, and missing-fix delta. (`plans/history/2026.05/2026.05.08/quick_fix_batch_14_verification.md`.)
-- [ ] **QF-04 (P0)** Batch 16+: pick three more missing-fix rules (see inventory), wire producers + `rule_quick_fix_presence_test.dart`, rerun audit for net delta after merge.
+- [x] **QF-04 (P0)** Batch 16 done (2026-06-10): +4 fixes — `avoid_unnecessary_if` + `prefer_returning_condition` (shared `ReturnConditionFix`), `avoid_collapsible_if` (`CollapseNestedIfFix`), `avoid_classes_with_only_static_members` (reuse `AddAbstractFinalFix`). Presence test +4 (192 pass), `dart analyze --fatal-infos` clean, audit 1701 → 1697.
+- [ ] **QF-05 (P0)** Batch 17+: continue from inventory. Next candidates already scoped: `prefer_null_aware_method_calls` (if/ternary → `?.`), more reuse of `AddAbstractFinalFix` (`prefer_static_class`?), `code_quality_avoid` deletions.
 
 ### Batch 15 candidate slice (done 2026-05-08)
 
@@ -2432,9 +2433,62 @@ All 10 wired, `rule_quick_fix_presence_test.dart` updated (+10 entries), fixture
 
 All 10 wired in their rule files; `test/scan/rule_quick_fix_presence_test.dart` updated with 10 new `hasFix(...)` entries plus two new imports (`flame_rules.dart`, `widget_layout_constraints_rules.dart`). `dart analyze --fatal-infos` clean on all new + modified files. `dart test test/scan/rule_quick_fix_presence_test.dart` passes (185 tests). Audit count went from 1708 to 1698 unfixed rules (Δ = −10).
 
+### H9. Batch 16 — control flow + structure (EASY/MEDIUM) — DONE
+
+**Date:** 2026-06-10. **+4 fixes (2 new producers, 1 reuse covering 3 rules):**
+
+- `avoid_unnecessary_if` and `prefer_returning_condition` — `ReturnConditionFix` (`lib/src/fixes/control_flow/return_condition_fix.dart`). Both report at the `IfStatement`; the producer reconstructs `return <cond>;` (then-branch returns `true`) or `return !(<cond>);` (then-branch returns `false`), wrapping the condition in parens on negation. For the no-else `avoid_unnecessary_if` shape it also consumes the following sibling `return <opposite-bool>;`.
+- `avoid_collapsible_if` — `CollapseNestedIfFix` (`lib/src/fixes/control_flow/collapse_nested_if_fix.dart`). Merges `if (a) { if (b) { body } }` into `if ((a) && (b)) body`, parenthesizing both conditions so a low-precedence operator can't bind incorrectly against the inserted `&&`.
+- `avoid_classes_with_only_static_members` — reuses `AddAbstractFinalFix` (rule reports at the class name token; the fix walks up to the `ClassDeclaration` and inserts `abstract final `, same idiom as `prefer_abstract_final_static_class`).
+
+All 4 wired; `test/scan/rule_quick_fix_presence_test.dart` +4 (192 pass). `dart analyze --fatal-infos` clean. Existing example fixtures already cover all four rules. Audit 1701 → 1697 (Δ = −4).
+
+### H10. Batch 17 — null-aware call rewrite (MEDIUM) — DONE
+
+**Date:** 2026-06-10. **+1 fix:**
+
+- `prefer_null_aware_method_calls` — `PreferNullAwareCallFix` (`lib/src/fixes/control_flow/prefer_null_aware_call_fix.dart`). Handles both reported shapes: `if (x != null) { x.foo(args); }` → `x?.foo(args);` and `x != null ? x.foo() : null` → `x?.foo()`. Inserts `?` before the receiver's `.` token, reusing the original source for receiver/member/args verbatim. Ternary is matched before the enclosing `if` so a guard ternary nested inside an `if` resolves to the correct node.
+
+Wired; presence test +1 (193 pass). `dart analyze --fatal-infos` clean. Existing fixture `example/lib/control_flow/prefer_null_aware_method_calls_fixture.dart` covers it. Audit 1697 → 1696 (Δ = −1). Cumulative this session: 1701 → 1696 (−5 across 5 rules).
+
 ### I. After Batch 6
 
 - [ ] Run full audit and record:
   - [ ] new fix count / coverage %
   - [ ] updated worst offending files list
 - [ ] Add Batch 7+ for iOS, security, widget patterns/layout based on updated audit deltas.
+
+---
+
+## Finish Report (2026-06-10)
+
+**Scope (LINTER variant, A):** Dart analyzer-plugin quick fixes. Added 3 new fix producers wired to 5 rules (Batches 16–17). No `extension/` changes.
+
+**Files changed:**
+
+- NEW `lib/src/fixes/control_flow/return_condition_fix.dart` — `ReturnConditionFix`.
+- NEW `lib/src/fixes/control_flow/collapse_nested_if_fix.dart` — `CollapseNestedIfFix`.
+- NEW `lib/src/fixes/control_flow/prefer_null_aware_call_fix.dart` — `PreferNullAwareCallFix`.
+- MOD `lib/src/rules/flow/control_flow_rules.dart` — 3 fix imports + `fixGenerators` on `AvoidUnnecessaryIfRule`, `PreferReturningConditionRule`, `AvoidCollapsibleIfRule`, `PreferNullAwareMethodCallsRule`.
+- MOD `lib/src/rules/architecture/structure_rules.dart` — `fixGenerators` on `AvoidClassesWithOnlyStaticMembersRule` (reuses `AddAbstractFinalFix`).
+- MOD `test/scan/rule_quick_fix_presence_test.dart` — +5 presence entries.
+- MOD `CHANGELOG.md` — `[Unreleased]` Added section.
+
+**Core logic:**
+
+- `ReturnConditionFix`: both rules report at the `IfStatement`. Reconstructs `return <cond>;` when the then-branch returns `true`, `return !(<cond>);` when it returns `false` (parens guard precedence). For the no-else `avoid_unnecessary_if` shape it extends the replacement span to consume the following sibling `return <opposite-bool>;`.
+- `CollapseNestedIfFix`: merges `if (a) { if (b) { body } }` → `if ((a) && (b)) body`; both conditions parenthesized so a low-precedence operator can't bind incorrectly against the inserted `&&`.
+- `PreferNullAwareCallFix`: handles `if (x != null) x.foo();` and `x != null ? x.foo() : null` → `x?.foo()`. Inserts `?` before the receiver's `.` token, reusing original source for receiver/member/args. Ternary is resolved before the enclosing `if` so a guard ternary nested in an `if` targets the right node.
+
+**Validation:**
+
+- `dart analyze --fatal-infos` on all changed files: clean (No issues found).
+- `dart test test/scan/rule_quick_fix_presence_test.dart`: 193 pass (+5).
+- `dart test test/rules/flow/control_flow_rules_test.dart test/rules/architecture/structure_rules_test.dart test/integrity/`: 569 pass, no regressions.
+- `dart test test/rules/code_quality/code_quality_rules_test.dart`: 208 pass.
+- Test audit (Section 4A): grepped test/ for all 5 rule names + fix class names; only-added `fixGenerators` means no existing assertion invalidated; all referencing tests pass.
+- Audit delta: 1701 → 1696 unfixed rules (−5). Existing `example/` fixtures cover all 5 rules.
+
+**Outstanding:** This is an ongoing program — 1696 rules still lack fixes. Plan stays active; next candidates scoped in QF-05.
+
+**No bug archive** — task did not close a `bugs/*.md` file.
