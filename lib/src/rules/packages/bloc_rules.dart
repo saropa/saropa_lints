@@ -5234,3 +5234,86 @@ class PreferBlocExtensionsRule extends SaropaLintRule {
     });
   }
 }
+
+/// Flags the `mapEventToState` override, removed in bloc 8.0.0.
+///
+/// Since: v13.13.0 | Rule version: v1
+///
+/// bloc 8.0 removed the `mapEventToState` API in favor of registering typed
+/// event handlers with `on<Event>` in the constructor. A `Bloc` subclass that
+/// still overrides `mapEventToState` does not compile against bloc 8.x. Gated to
+/// the `bloc_8` rule pack (bloc >= 8.0.0) so projects on bloc 7.x — where the
+/// override is still correct — never see it.
+///
+/// **BAD:**
+/// ```dart
+/// class CounterBloc extends Bloc<CounterEvent, int> {
+///   CounterBloc() : super(0);
+///
+///   @override
+///   Stream<int> mapEventToState(CounterEvent event) async* {   // removed
+///     if (event is Increment) yield state + 1;
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class CounterBloc extends Bloc<CounterEvent, int> {
+///   CounterBloc() : super(0) {
+///     on<Increment>((event, emit) => emit(state + 1));
+///   }
+/// }
+/// ```
+class AvoidBlocMapEventToStateRule extends SaropaLintRule {
+  AvoidBlocMapEventToStateRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.warning;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  // Perf: only walk classes in files that mention the removed API.
+  @override
+  Set<String>? get requiredPatterns => const <String>{'mapEventToState'};
+
+  static const LintCode _code = LintCode(
+    'avoid_bloc_map_event_to_state',
+    '[avoid_bloc_map_event_to_state] The mapEventToState override was removed in bloc 8.0.0; event handling moved to on<Event> handlers registered in the constructor. A Bloc subclass that still overrides mapEventToState will not compile against bloc 8.x. Convert each event branch to its own on<EventType>((event, emit) { ... }) registration and call emit(...) instead of yielding. Cubits are unaffected. This rule only runs in the bloc_8 rule pack (bloc >= 8.0.0); projects on bloc 7.x keep mapEventToState. {v1}',
+    correctionMessage:
+        'Replace the mapEventToState override with on<Event> handler registrations in the constructor, using emit(state) in place of yield.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  // Matches the removed override's declaration signature: `mapEventToState(`.
+  static final RegExp _mapEventToStatePattern = RegExp(
+    r'\bmapEventToState\s*\(',
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addClassDeclaration((ClassDeclaration node) {
+      final ExtendsClause? extendsClause = node.extendsClause;
+      if (extendsClause == null) return;
+      // Cubit never had mapEventToState; restrict to Bloc subclasses so an
+      // unrelated method of the same name elsewhere is not flagged.
+      if (!extendsClause.superclass.name.lexeme.contains('Bloc')) return;
+
+      // Source-level check mirrors prefer_cubit_for_simple: detect the removed
+      // override by its declaration signature within the class body.
+      if (_mapEventToStatePattern.hasMatch(node.toSource())) {
+        reporter.atNode(extendsClause.superclass);
+      }
+    });
+  }
+}

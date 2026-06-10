@@ -38,6 +38,8 @@ import 'rule_pack_audit.dart'
 const Map<String, Set<String>> kPubspecMarkersByPack = {
   'auto_route': {'auto_route'},
   'bloc': {'bloc', 'flutter_bloc', 'hydrated_bloc'},
+  // Semver-gated companion to `bloc` (gate bloc >= 8.0.0 in kRulePackDependencyGates).
+  'bloc_8': {'bloc', 'flutter_bloc', 'hydrated_bloc'},
   'dio': {'dio'},
   // Semver-gated companion to `dio` (gate dio >= 5.0.0 in kRulePackDependencyGates).
   'dio_5': {'dio'},
@@ -78,6 +80,7 @@ const Map<String, Set<String>> kPubspecMarkersByPack = {
 const Map<String, String> kPackUiLabels = {
   'auto_route': 'Auto Route',
   'bloc': 'Bloc',
+  'bloc_8': 'Bloc 8.x',
   'dio': 'Dio',
   'dio_5': 'Dio 5.x',
   'drift': 'Drift',
