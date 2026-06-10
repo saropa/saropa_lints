@@ -877,10 +877,24 @@ class AvoidIosHardcodedDeviceModelRule extends SaropaLintRule {
         return;
       }
 
-      if (_deviceModelPattern.hasMatch(value)) {
+      if (_deviceModelPattern.hasMatch(value) && !_isDataLiteralElement(node)) {
         reporter.atNode(node);
       }
     });
+  }
+
+  // A device-model string that is an ELEMENT of a collection literal is DATA, not
+  // a runtime device-capability branch: e.g. a signature noise-filter corpus
+  // `['sent from my iphone', 'sent from my ipad']` is a list of taglines to
+  // strip, never broken by new device releases. Exempting only collection-literal
+  // elements keeps the genuine anti-patterns flagged — an `== 'iPhone 14'`
+  // comparison and a `deviceModel.contains('iPod touch')` device check both sit
+  // outside any collection literal and still fire.
+  static bool _isDataLiteralElement(SimpleStringLiteral node) {
+    final AstNode? parent = node.parent;
+    return parent is ListLiteral ||
+        parent is SetOrMapLiteral ||
+        parent is MapLiteralEntry;
   }
 }
 

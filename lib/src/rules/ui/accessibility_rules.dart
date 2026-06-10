@@ -10,6 +10,7 @@ library;
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/dart/element/type.dart';
 
 import '../../saropa_lint_rule.dart';
 import '../../fixes/accessibility/increase_animation_duration_fix.dart';
@@ -2045,6 +2046,17 @@ class RequireErrorIdentificationRule extends SaropaLintRule {
         return;
       }
 
+      // Require at least one branch to be Color-typed. The `\.error\b` alternative
+      // in the regex matches ANY dotted identifier ending in error/Error —
+      // including a log-severity enum value like `DebugLevels.Error` or a String
+      // label — none of which is a UI color. A staticType==Color gate drops those
+      // non-color ternaries (the accessibility concern only applies when the
+      // distinction is actually carried by color).
+      if (!_isColorTyped(node.thenExpression.staticType) &&
+          !_isColorTyped(node.elseExpression.staticType)) {
+        return;
+      }
+
       // Check if this is in a color-only context (no icon nearby)
       // Look for Icon, errorText, or helperText in surrounding context
       AstNode? current = node.parent;
@@ -2071,6 +2083,19 @@ class RequireErrorIdentificationRule extends SaropaLintRule {
         reporter.atNode(node);
       }
     });
+  }
+
+  // A branch carries an "error by color alone" cue only when it is actually a
+  // Color. Matches Color / MaterialColor / MaterialAccentColor (and nullable
+  // forms); a name ending in `Color` covers project Color subtypes. Enum values
+  // (`DebugLevels`), String labels, and bool flags fall through to false.
+  static bool _isColorTyped(DartType? type) {
+    if (type == null) return false;
+    final String name = type.getDisplayString();
+    final String bare = name.endsWith('?')
+        ? name.substring(0, name.length - 1)
+        : name;
+    return bare == 'Color' || bare.endsWith('Color');
   }
 }
 

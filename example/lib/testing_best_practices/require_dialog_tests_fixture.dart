@@ -131,3 +131,15 @@ void _good1214() async {
     await tester.pumpAndSettle();
   });
 }
+
+// GOOD: a localization String getter whose name merely contains "Dialog"
+// (emergencyDirectoryDialogHeader) shows no dialog — its return type is not
+// awaitable, so there is nothing to pumpAndSettle. Should NOT trigger.
+String emergencyDirectoryDialogHeader(String a, String b) => '$a $b';
+
+void _goodDialogNamedStringGetter() async {
+  testWidgets('localized header resolves', (tester) async {
+    expect(emergencyDirectoryDialogHeader('Australian', 'Banks'),
+        equals('Australian Banks'));
+  });
+}

@@ -149,3 +149,13 @@ void _goodSubstringDomains() {
   const domain2 = 'tripadvisor.co.uk';
   const brand = 'tripadvisor';
 }
+
+// GOOD: device names as DATA — elements of a const list (a signature
+// noise-filter corpus). These are taglines to strip, not a device-capability
+// branch, so new device releases do not break them. Should NOT trigger.
+abstract final class SignatureNoiseFilter {
+  static const List<String> mobileTaglines = <String>[
+    'sent from my iphone',
+    'sent from my ipad',
+  ];
+}

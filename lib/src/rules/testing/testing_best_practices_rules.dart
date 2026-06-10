@@ -8,6 +8,7 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/dart/element/type.dart';
 
 import '../../saropa_lint_rule.dart';
 import '../../fixes/testing_best_practices/wrap_with_material_app_fix.dart';
@@ -3623,10 +3624,35 @@ class RequireDialogTestsRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addMethodInvocation((MethodInvocation node) {
-      // Check for showDialog calls in tests
-      if (node.methodName.name != 'showDialog' &&
-          !node.methodName.name.contains('Dialog')) {
-        return;
+      // Identify a real dialog launch, not any identifier containing "Dialog".
+      // A bare `name.contains('Dialog')` flags l10n string getters such as
+      // `emergencyDirectoryDialogHeader(...)` (returns String) as dialog
+      // launches, demanding a meaningless pumpAndSettle. A genuine dialog API
+      // is either a known launcher OR a "*Dialog*" call that returns an
+      // awaitable (Future/void) — a String/int/bool getter never shows a dialog.
+      final String methodName = node.methodName.name;
+      const Set<String> dialogLaunchers = <String>{
+        'showDialog',
+        'showGeneralDialog',
+        'showAdaptiveDialog',
+        'showDialogCommon',
+        'showModalBottomSheet',
+        'showCupertinoDialog',
+        'showCupertinoModalPopup',
+      };
+      if (!dialogLaunchers.contains(methodName)) {
+        if (!methodName.contains('Dialog')) return;
+        // A "*Dialog*" call is a real dialog launch only when its return type is
+        // a CONFIRMED awaitable (Future/void). A String/int/bool getter such as
+        // the l10n `emergencyDirectoryDialogHeader(...)` is not. Unresolved
+        // (null) type is NOT treated as awaitable: genuine launchers are already
+        // matched by name above, so the type-fallback path only needs to admit
+        // confirmed-awaitable custom helpers, never guess on unresolved types.
+        final DartType? returnType = node.staticType;
+        final bool awaitable =
+            returnType != null &&
+            (returnType.isDartAsyncFuture || returnType is VoidType);
+        if (!awaitable) return;
       }
 
       // Check if inside a test function

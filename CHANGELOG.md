@@ -65,19 +65,34 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [Unreleased]
 
+### Fixed
+
+- **`avoid_returning_null_for_future` no longer flags `return null` from a function declared to return a nullable Future (`Future<T>?`).** A nullable Future explicitly permits null, so the return is type-correct; only non-nullable `Future<T>` is still flagged. No action required.
+- **`avoid_ios_hardcoded_device_model` only fires when code branches on a device name (`==`/`!=` or a switch case).** Device names appearing as data — list elements, string-cleanup arguments, messages — are no longer flagged. No action required.
+- **`require_dialog_tests` no longer flags calls that merely contain "Dialog" in their name.** A localization string getter such as `emergencyDirectoryDialogHeader(...)` is not a dialog launch; the rule now matches known dialog launchers or `*Dialog*` calls that return an awaitable. No action required.
+- **`require_error_identification` no longer flags non-color ternaries that select a log-severity enum or text label.** It now requires a branch to be `Color`-typed, so a `DebugLevels.Error` selection is not mistaken for an error-color cue. No action required.
+- **`avoid_unbounded_cache_growth` recognizes `removeWhere` / `removeRange` / `clear` as eviction.** A cache pruned with these idiomatic operations is no longer reported as unbounded. No action required.
+
 ### Added (Extension)
 
 - **The Package Dashboard toolbar adds a "Save Upgrade Report" button next to "Save".** It writes the same per-package JSON as "Save" but filtered to only packages with an available update, to `reports/YYYYMMDD/..._pubspec_upgrade.json`, giving you a focused upgrade worklist. No action required.
+
+### Changed (Extension)
+
+- **The Package Vibrancy dashboards are now fully translatable.** Around 265 previously-hardcoded English strings across the report, comparison, package-detail, detail, and chart webviews now resolve through the extension's localization catalog, so they translate alongside the rest of the UI instead of always rendering in English. No visible change for English users; other locales pick up the translations once the locale catalogs are regenerated.
 
 <details>
 <summary>Maintenance</summary>
 
 - The extension package now excludes `scripts/**` (build-time i18n/MT tooling) from the published `.vsix`. Those scripts are never loaded at runtime — runtime locales ship from `src/i18n/locales` via the esbuild bundle — and shipping them leaked the machine-translation cache, whose high-entropy translated strings tripped Open VSX's secret scanner and blocked publication. No behavior change.
 - The publish script now checks for `VSCE_PAT` before the Marketplace publish step and prompts with token-creation guidance when it is missing, mirroring the existing Open VSX handling. A missing or expired Marketplace token previously failed with an opaque `vsce` error and only a generic "PAT expired?" guess. No behavior change.
+- Documented the upstream cause of the `analyzer`/`analyzer_plugin` version caps in `pubspec.yaml`: Flutter pins `meta` exactly inside the SDK, analyzer 13 raised its `meta` floor above that pin, and the caps clear only when Flutter stable bumps its bundled `meta`. Added links to the Dart pinning rationale and the open Flutter unpin issue. No behavior change.
 
 </details>
 
 ## [13.12.3]
+
+Adds a family of compound performance rules that flag GPU-expensive widgets only when a parent makes their cost recur every frame or every scrolled item, leaving intentional one-off use alone, plus a Project Map panel that ranks features by rendering risk before you profile. Also clears a broad round of false positives across the async-context, logging, disposal, date-formatting, enum-map, environment-mixing, parameter-mutation, and error-widget rules, so patterns that previously forced project-local ignores now pass cleanly. No action required unless you added an ignore for one of these patterns. [log](https://github.com/saropa/saropa_lints/blob/v13.12.3/CHANGELOG.md)
 
 ### Added
 

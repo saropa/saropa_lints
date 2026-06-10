@@ -11,3 +11,24 @@ Future<String?> badAsyncReturnNull() async {
 Future<String?> goodAsyncNullable() async {
   return null;
 }
+
+// BAD: SYNCHRONOUS function declared to return a NON-NULLABLE Future — awaiting
+// the returned null is a runtime null error. Should trigger.
+Future<String> badSyncNonNullable() {
+  return null;
+}
+
+// GOOD: SYNCHRONOUS function declared to return a NULLABLE Future (`Future<T>?`).
+// Null is type-correct; the caller must null-check before awaiting (e.g.
+// FutureBuilder.future accepts Future<T>?). Should NOT trigger.
+Future<String>? goodSyncNullableFuture() {
+  return null;
+}
+
+// GOOD: nested nullable Future, conditional null return. Should NOT trigger.
+Future<List<int>?>? goodSyncNullableNested(bool b) {
+  if (b) {
+    return null;
+  }
+  return Future<List<int>?>.value(<int>[]);
+}
