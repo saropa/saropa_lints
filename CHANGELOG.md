@@ -63,6 +63,14 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 -->
 
+## [Unreleased]
+
+Fixes an `avoid_context_in_async_static` false positive that flagged every async static method taking a `BuildContext`, even when the context was used only before the first `await` or only behind a `mounted` guard. No action required unless you added a project-local ignore for this pattern. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
+
+### Fixed
+
+- **`avoid_context_in_async_static` no longer flags a guarded or pre-await `BuildContext` parameter.** The rule reported the parameter unconditionally whenever the method was an async static, so a context used only before the async gap opened, or only after a `mounted` check, was wrongly flagged and forced widespread ignores. It now reuses the same flow analysis as the sibling after-await rule and fires only when the context is used after an `await` without a guard. Genuinely unguarded post-await usage still flags. No action required.
+
 ## [13.12.2]
 
 Fixes a `nullify_after_dispose` false positive that flagged `dispose()`/`cancel()`/`close()` calls on local variables, a `prefer_single_setstate` false positive that flagged `setState` calls sitting in mutually-exclusive branches, an `avoid_equal_expressions` false positive that flagged arithmetic with identical operands such as `1024 * 1024`, and an `avoid_variable_shadowing` false positive that flagged a name legitimately reused in disjoint sibling scopes (two collection-`for` loops in separate literals, or the same local in two separate `switch` cases). No action required unless you added a project-local ignore for these patterns. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)

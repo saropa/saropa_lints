@@ -527,7 +527,7 @@ class AvoidContextAfterAwaitInStaticRule extends SaropaLintRule {
         if (contextParamNames.isEmpty) return;
 
         // Analyze block for context usages after await without guards
-        _checkAsyncStaticBody(
+        checkAsyncStaticBody(
           body.block,
           contextParamNames,
           (node) => reporter.atNode(node),
@@ -541,7 +541,11 @@ class AvoidContextAfterAwaitInStaticRule extends SaropaLintRule {
   /// Similar to [AvoidContextAcrossAsyncRule._checkAsyncBody] but tracks
   /// context parameter names instead of just 'context', and recognizes
   /// `context.mounted` guards in static methods.
-  static void _checkAsyncStaticBody(
+  ///
+  /// Public because [AvoidContextInAsyncStaticRule] reuses it: that rule must
+  /// only flag a BuildContext parameter when the body has an unguarded
+  /// post-await use, so both rules share one definition of "guarded".
+  static void checkAsyncStaticBody(
     Block block,
     List<String> contextParamNames,
     void Function(AstNode) onUnguardedUsage, {
@@ -626,7 +630,7 @@ class AvoidContextAfterAwaitInStaticRule extends SaropaLintRule {
     final tryHasAwait = containsAwait(statement.body);
 
     // Analyze try body with inherited state
-    _checkAsyncStaticBody(
+    checkAsyncStaticBody(
       statement.body,
       contextParamNames,
       onUnguardedUsage,
@@ -638,7 +642,7 @@ class AvoidContextAfterAwaitInStaticRule extends SaropaLintRule {
     final catchInDanger = seenAwait || tryHasAwait;
     if (catchInDanger) {
       for (final clause in statement.catchClauses) {
-        _checkAsyncStaticBody(
+        checkAsyncStaticBody(
           clause.body,
           contextParamNames,
           onUnguardedUsage,
@@ -646,7 +650,7 @@ class AvoidContextAfterAwaitInStaticRule extends SaropaLintRule {
         );
       }
       if (statement.finallyBlock != null) {
-        _checkAsyncStaticBody(
+        checkAsyncStaticBody(
           statement.finallyBlock!,
           contextParamNames,
           onUnguardedUsage,
@@ -1010,11 +1014,36 @@ class AvoidContextInAsyncStaticRule extends SaropaLintRule {
       if (body is! BlockFunctionBody) return;
       if (!body.isAsynchronous) return;
 
-      // Check parameters for BuildContext
+      // Collect the BuildContext parameters and their names.
+      final contextParams = <FormalParameter>[];
+      final contextParamNames = <String>[];
       for (final param in node.parameters?.parameters ?? <FormalParameter>[]) {
-        if (isBuildContextParam(param)) {
-          reporter.atNode(param);
-        }
+        if (!isBuildContextParam(param)) continue;
+        final name = getBuildContextParamName(param);
+        if (name == null) continue;
+        contextParams.add(param);
+        contextParamNames.add(name);
+      }
+      if (contextParams.isEmpty) return;
+
+      // A BuildContext parameter is only stale-prone when the body actually
+      // uses it AFTER an await without a mounted guard. Using it solely before
+      // the first await (no async gap has opened yet) or only behind a
+      // `if (!context.mounted) return;` / `if (context.mounted) { ... }` guard
+      // is safe. Reporting unconditionally forced ~119 `// ignore:`
+      // suppressions in downstream projects on otherwise-correct code. Reuse
+      // the same flow analysis the sibling avoid_context_after_await_in_static
+      // rule applies so the two rules agree on what "guarded" means.
+      bool hasUnguardedUsage = false;
+      AvoidContextAfterAwaitInStaticRule.checkAsyncStaticBody(
+        body.block,
+        contextParamNames,
+        (_) => hasUnguardedUsage = true,
+      );
+      if (!hasUnguardedUsage) return;
+
+      for (final param in contextParams) {
+        reporter.atNode(param);
       }
     });
   }

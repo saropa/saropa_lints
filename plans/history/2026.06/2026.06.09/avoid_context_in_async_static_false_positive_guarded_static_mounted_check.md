@@ -1,6 +1,6 @@
 # BUG: `avoid_context_in_async_static` — Fires on Every Async Static with a Context Parameter, Regardless of Mounted Guards
 
-**Status: Open**
+**Status: Fixed**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
@@ -176,19 +176,79 @@ The fixture at `example*/lib/core/context_rules_fixture.dart` (or equivalent) sh
 
 ## Changes Made
 
-<!-- Fill in when a fix is written. -->
+Implemented Option A (full flow analysis) in `lib/src/rules/core/context_rules.dart`:
+
+- `AvoidContextInAsyncStaticRule.runWithReporter` no longer reports the
+  `BuildContext` parameter unconditionally. It now collects the context
+  parameter names and runs the existing static-method flow analysis; it reports
+  only when that analysis finds an unguarded post-`await` use of the parameter.
+- The flow-analysis helper `AvoidContextAfterAwaitInStaticRule._checkAsyncStaticBody`
+  was renamed to the public `checkAsyncStaticBody` so both rules share one
+  definition of "guarded" (mounted early-exit guard, positive-block guard,
+  context-in-await-statement, before-first-await). Its five internal call sites
+  were updated.
+
+Result: context used only before the first `await`, or only behind a
+`if (!context.mounted) return;` / `if (context.mounted) { ... }` guard, no
+longer produces a diagnostic. Unguarded post-`await` usage still flags.
 
 ---
 
 ## Tests Added
 
-<!-- List new or updated fixture/test files and what they verify. -->
+- Rewrote `example/lib/context/avoid_context_in_async_static_fixture.dart` with
+  four cases: guarded (early-exit), used-before-await-only, positive-block
+  guard (all NO lint), and unguarded post-await (LINT).
+- Verified with the scan CLI (`dart run saropa_lints scan` against a copy of
+  the fixture): `avoid_context_in_async_static` fires exactly once, on the
+  unguarded `showUnguarded` method's parameter, and stays silent on the three
+  safe methods.
 
 ---
 
 ## Commits
 
 <!-- Add commit hashes as fixes land. -->
+
+---
+
+## Finish Report (2026-06-09)
+
+**Scope:** (A) Dart lint rules / analyzer plugin.
+
+**Deep review:**
+- Logic & safety: The rule now delegates to the existing, well-tested
+  `checkAsyncStaticBody` flow analysis. No new recursion or state introduced —
+  a single `bool` accumulator captures whether any unguarded post-await usage
+  exists. The early `return`s preserve the original short-circuit order
+  (static → block body → async → has context param).
+- Architecture: Reuses the sibling rule's analyzer rather than duplicating the
+  guard-recognition state machine. The previously-private
+  `_checkAsyncStaticBody` was promoted to public `checkAsyncStaticBody`; its
+  five internal call sites updated. No logic duplication added.
+- Linter integrity: rule stays in `context_rules.dart`, tier and `LintImpact`
+  (warning) unchanged. No quick fix applicable (the fix is restructuring the
+  method, not a mechanical edit at the call site).
+
+**Tests:**
+- Existing: `dart test test/ -N context` → all 61 matched tests pass. The
+  instantiation/tier pins for `avoid_context_in_async_static` are unaffected
+  (rule name, severity, tier membership unchanged).
+- New behavior: rewrote
+  `example/lib/context/avoid_context_in_async_static_fixture.dart` with guarded,
+  pre-await-only, positive-block-guard (NO lint) and unguarded post-await (LINT)
+  cases. Verified via scan CLI against a temp copy: the rule fires exactly once,
+  on the unguarded method's parameter (line 51), silent on the three safe forms.
+
+**Maintenance:**
+- CHANGELOG: added `[Unreleased]` section with the Fixed bullet.
+- README verified — rule count unchanged, no updates needed.
+- ROADMAP: no entry change — this is a false-positive fix, not a new/removed rule.
+
+**Bug archived:** bugs/avoid_context_in_async_static_false_positive_guarded_static_mounted_check.md
+→ plans/history/2026.06/2026.06.09/avoid_context_in_async_static_false_positive_guarded_static_mounted_check.md
+
+**Finish report appended:** this file.
 
 ---
 
