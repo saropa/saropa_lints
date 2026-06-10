@@ -10,6 +10,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import signal
 import sys
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -26,12 +27,24 @@ from dictionaries import TRANSLATIONS
 from json_io import read_json, write_json
 from mt_fallback import (
     active_engine_name,
+    cache_lookup,
+    cache_set,
+    cache_unset,
     count_pending_translations,
     describe_engine_availability,
+    engine_stats_for,
     load_mt_cache,
+    load_provenance,
     prefetch_machine_translations,
+    provenance_of,
+    prune_all,
+    prune_low_quality,
+    request_stop,
+    reset_engine_stats,
     save_mt_cache,
+    save_provenance,
     should_skip_machine_translate,
+    stop_requested,
 )
 from term_color import c
 from tree_translate import apply_string_map, collect_unique_strings
@@ -75,6 +88,31 @@ def parse_args() -> argparse.Namespace:
             "untranslated UI strings can never ship silently. Standalone dev "
             "runs omit this flag and always exit 0."
         ),
+    )
+    parser.add_argument(
+        "--mode",
+        choices=["gaps", "upgrade", "all"],
+        default=None,
+        help=(
+            "What to translate: 'gaps' = only untranslated strings; 'upgrade' = "
+            "gaps PLUS re-translate low-quality (Google/English) strings to NLLB; "
+            "'all' = force re-translate everything except manual overrides. Omit "
+            "on a terminal to choose from a menu; defaults to 'gaps' non-interactively."
+        ),
+    )
+    # Key-management subcommands — operate on the cache + provenance files only,
+    # no translation run. Each returns immediately.
+    parser.add_argument(
+        "--show", nargs="+", metavar="LOCALE [FILTER]",
+        help="List cached translations for LOCALE (English -> translation [engine]); optional FILTER substring.",
+    )
+    parser.add_argument(
+        "--set", nargs=3, metavar=("LOCALE", "ENGLISH", "TRANSLATION"),
+        help="Manually override one translation (provenance 'manual'; never re-translated).",
+    )
+    parser.add_argument(
+        "--unset", nargs=2, metavar=("LOCALE", "ENGLISH"),
+        help="Remove one cached translation so it is re-translated on the next run.",
     )
     return parser.parse_args()
 
@@ -293,15 +331,109 @@ def write_audit_report(
     report_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
+def _install_sigint() -> None:
+    """First Ctrl-C requests a graceful stop (finish current string, flush cache +
+    provenance, exit); a second Ctrl-C restores the default handler for an
+    immediate abort. Lets the operator cancel a multi-hour run without losing
+    work or seeing a traceback."""
+    def handler(signum: int, frame: object) -> None:  # noqa: ARG001
+        if stop_requested():
+            signal.signal(signal.SIGINT, signal.SIG_DFL)
+            raise KeyboardInterrupt
+        request_stop()
+        sys.stderr.write(c(
+            "yellow",
+            "\n  Stop requested — finishing the current string, saving, then exiting. "
+            "Ctrl-C again to force-quit.\n",
+        ))
+        sys.stderr.flush()
+    signal.signal(signal.SIGINT, handler)
+
+
+def _choose_mode(args_mode: str | None) -> str:
+    """Resolve translation mode: explicit --mode, else a TTY menu, else 'gaps'."""
+    if args_mode:
+        return args_mode
+    if not sys.stdin.isatty():
+        return "gaps"
+    print(c("bold", "\nTranslation mode:"))
+    print("  [1] Close gaps only (translate untranslated strings)  [default]")
+    print("  [2] Close gaps + upgrade low-quality (re-translate Google/English -> NLLB)")
+    print("  [3] Re-translate everything (force; keeps manual overrides)")
+    try:
+        raw = input("  Choose [1/2/3]: ").strip()
+    except (EOFError, KeyboardInterrupt):
+        raw = ""
+    return {"2": "upgrade", "3": "all"}.get(raw, "gaps")
+
+
+def _source_strings(root: Path) -> list[str]:
+    """All unique English source strings (package.nls + runtime en.json)."""
+    unique: set[str] = set()
+    collect_unique_strings(read_json(root / "package.nls.json"), unique)
+    collect_unique_strings(read_json(root / "src" / "i18n" / "locales" / "en.json"), unique)
+    return sorted(unique)
+
+
+def _run_key_command(args: argparse.Namespace, root: Path) -> int:
+    """Handle --show / --set / --unset. Operates on the cache + provenance files
+    only — no translation run. Returns an exit code."""
+    cache = load_mt_cache()
+    load_provenance()
+
+    if args.set:
+        locale, english, translation = args.set
+        cache_set(cache, locale, english, translation)
+        save_mt_cache(cache)
+        save_provenance()
+        print(c("green", f"  set [{locale}] {english!r} -> {translation!r} (manual)"))
+        return 0
+
+    if args.unset:
+        locale, english = args.unset
+        existed = cache_unset(cache, locale, english)
+        save_mt_cache(cache)
+        save_provenance()
+        print(c("green" if existed else "yellow",
+                f"  {'removed' if existed else 'no cached entry'}: [{locale}] {english!r}"))
+        return 0
+
+    # --show LOCALE [FILTER]
+    locale = args.show[0]
+    needle = args.show[1] if len(args.show) > 1 else None
+    rows = 0
+    for english in _source_strings(root):
+        if needle and needle.lower() not in english.lower():
+            continue
+        value, prov = cache_lookup(cache, locale, english)
+        if value is None:
+            continue
+        print(f"  [{prov or '?'}] {english[:48]!r} -> {value[:60]!r}")
+        rows += 1
+    print(c("bold", f"  {rows} cached entr{'y' if rows == 1 else 'ies'} for {locale}"
+                    + (f" matching {needle!r}" if needle else "")))
+    return 0
+
+
 def main() -> int:
     args = parse_args()
+
+    root = Path(__file__).resolve().parents[2]
+
+    # Key-management subcommands operate on the cache only — no translation run.
+    if args.show or args.set or args.unset:
+        return _run_key_command(args, root)
 
     locales = split_locales(args.locales)
     if not locales:
         print(c("red", "No locales provided."))
         return 1
 
-    root = Path(__file__).resolve().parents[2]
+    # Graceful Ctrl-C + persistent provenance for the translation run.
+    _install_sigint()
+    load_provenance()
+    mode = _choose_mode(args.mode)
+
     package_en_path = root / "package.nls.json"
     runtime_en_path = root / "src" / "i18n" / "locales" / "en.json"
 
@@ -311,7 +443,14 @@ def main() -> int:
     # Announce the active MT engine up front so a silent Google downgrade (NLLB
     # model not installed) is visible before a multi-hour run starts.
     print(f"[{c('blue', 'i18n')}] {describe_engine_availability()}", flush=True)
+    mode_label = {
+        "gaps": "gaps only", "upgrade": "gaps + upgrade low-quality to NLLB",
+        "all": "force re-translate all",
+    }[mode]
+    print(f"[{c('blue', 'i18n')}] mode: {c('cyan', mode_label)}  (Ctrl-C to stop gracefully)", flush=True)
 
+    # Fresh engine tally so the per-locale mix below reflects only this run.
+    reset_engine_stats()
     mt_cache = load_mt_cache()
     unique_en: set[str] = set()
     collect_unique_strings(package_en, unique_en)
@@ -324,7 +463,26 @@ def main() -> int:
 
     try:
         for locale in locales:
+            # Cooperative stop: a graceful Ctrl-C breaks here between locales (and
+            # prefetch breaks between strings), so the partial cache already saved
+            # is consistent and the run resumes cleanly next time.
+            if stop_requested():
+                break
             dict_table = TRANSLATIONS.get(locale, {})
+            # Apply the chosen mode by pruning the cache before counting gaps:
+            # 'upgrade' drops low-quality (Google/English) entries so NLLB redoes
+            # them; 'all' drops everything except manual overrides. 'gaps' prunes
+            # nothing. Each pruned entry becomes a gap the prefetch below refills.
+            if mode == "upgrade":
+                n = prune_low_quality(mt_cache, locale, sorted_unique, dict_table)
+                if n:
+                    print(f"[{c('blue', 'i18n')}] {c('cyan', locale)}: upgrade -> cleared "
+                          f"{n} low-quality entr{'y' if n == 1 else 'ies'} for re-translation", flush=True)
+            elif mode == "all":
+                n = prune_all(mt_cache, locale, sorted_unique, dict_table)
+                if n:
+                    print(f"[{c('blue', 'i18n')}] {c('cyan', locale)}: force -> cleared "
+                          f"{n} entr{'y' if n == 1 else 'ies'} for re-translation", flush=True)
             pending = count_pending_translations(
                 locale, sorted_unique, cache=mt_cache, dict_table=dict_table
             )
@@ -344,6 +502,15 @@ def main() -> int:
                 cache=mt_cache,
                 dict_table=dict_table,
             )
+            # Engine mix for the strings this run actually translated — makes a
+            # silent NLLB->Google fallback visible instead of hidden behind the
+            # "NLLB ready" banner. ('cached' here = warmed earlier this same run.)
+            mix = engine_stats_for(locale)
+            real = {k: v for k, v in mix.items() if k != "cached"}
+            if real:
+                parts = ", ".join(f"{k}:{v}" for k, v in sorted(real.items()))
+                print(f"[{c('blue', 'i18n')}] {c('cyan', locale)}: engines -> {parts}", flush=True)
+
             translator = HybridTranslator(locale, mt_cache)
             # One ``translate_text`` per distinct English string (MT + cache), not per JSON leaf.
             mapping = {s: translator.translate_text(s) for s in sorted_unique}
@@ -360,8 +527,9 @@ def main() -> int:
             stats_by_locale[locale] = stats
             missing_by_locale[locale] = missing
             # Persist after every locale so a Ctrl-C in a later locale cannot
-            # discard already-paid-for MT calls. Cheap (single JSON write).
+            # discard already-paid-for MT calls. Cheap (two small JSON writes).
             save_mt_cache(mt_cache)
+            save_provenance()
 
             missing_tag = (
                 c("green", "ok") if stats.missing == 0 else c("yellow", f"{stats.missing} missing")
@@ -373,11 +541,18 @@ def main() -> int:
                 flush=True,
             )
     except KeyboardInterrupt:
-        # Capture which locale was in flight so the user can resume meaningfully.
-        # The current locale's stats are not in stats_by_locale yet (it never reached
-        # the assignment) — they will simply be regenerated on the next run from cache.
+        # Hard abort (second Ctrl-C). Capture which locale was in flight so the
+        # user can resume meaningfully; its stats are not in stats_by_locale yet.
         interrupted_locale = locales[len(stats_by_locale)] if len(stats_by_locale) < len(locales) else None
         save_mt_cache(mt_cache)
+        save_provenance()
+
+    # Cooperative stop (first Ctrl-C): the loop broke cleanly, no exception. Flush
+    # and report the same way as a hard interrupt so the run is resumable.
+    if stop_requested() and interrupted_locale is None:
+        interrupted_locale = locales[len(stats_by_locale)] if len(stats_by_locale) < len(locales) else None
+        save_mt_cache(mt_cache)
+        save_provenance()
 
     if stats_by_locale:
         print_summary(stats_by_locale)

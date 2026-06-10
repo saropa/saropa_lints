@@ -99,6 +99,156 @@ def save_mt_cache(cache: dict[str, str]) -> None:
     _CACHE_PATH.write_text(json.dumps(cache, ensure_ascii=False, indent=0) + "\n", encoding="utf-8")
 
 
+# ---------------------------------------------------------------------------
+# Persistent per-key engine provenance (sidecar to the value cache).
+#
+# The value cache (mt_strings.json) stores text only and cannot answer "which
+# engine produced this string?" — and the cache KEY namespace can't either,
+# because a Google fallback value is cached under the NLLB primary key. This
+# sidecar records the actual producing engine per cache key so a run can
+# (a) upgrade ONLY the low-quality (Google/English) strings to NLLB, (b) protect
+# manual overrides from re-translation, and (c) let the operator inspect / edit /
+# remove specific entries. Engines: 'nllb', 'google', 'english', 'manual'.
+# ---------------------------------------------------------------------------
+_PROVENANCE_PATH = _CACHE_DIR / "mt_provenance.json"
+_provenance: dict[str, str] = {}
+
+# Provenance values that rank BELOW NLLB and are therefore re-translation
+# candidates in 'upgrade' mode. 'nllb' and 'manual' are never re-translated.
+_LOW_QUALITY_PROVENANCE = frozenset({"google", "english", "legacy", ""})
+
+# Flush the value cache + provenance to disk every N translated strings so a long
+# single-locale run survives a hard kill (or the cooperative stop) without losing
+# more than this many strings of work.
+_CHECKPOINT_EVERY = 25
+
+
+def load_provenance() -> None:
+    """Load the provenance sidecar into the module dict. Call once per run."""
+    _provenance.clear()
+    if _PROVENANCE_PATH.is_file():
+        try:
+            raw = json.loads(_PROVENANCE_PATH.read_text(encoding="utf-8"))
+            if isinstance(raw, dict):
+                _provenance.update({str(k): str(v) for k, v in raw.items()})
+        except (json.JSONDecodeError, OSError):
+            pass
+
+
+def save_provenance() -> None:
+    _CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    _PROVENANCE_PATH.write_text(
+        json.dumps(_provenance, ensure_ascii=False, indent=0) + "\n", encoding="utf-8",
+    )
+
+
+def provenance_of(locale: str, text: str) -> str | None:
+    """Engine that produced the cached translation for (locale, text), or None."""
+    primary = _primary_engine(locale) or "google"
+    return _provenance.get(_cache_key(locale, text, primary))
+
+
+# ---------------------------------------------------------------------------
+# Cooperative cancellation. A full NLLB run can take many hours; a single Ctrl-C
+# should finish the in-flight string, flush cache + provenance, and exit cleanly
+# rather than abandon the run or dump a traceback. The entry point installs a
+# SIGINT handler that calls request_stop(); the prefetch loop checks
+# stop_requested() between strings (worst-case latency: one NLLB call).
+# ---------------------------------------------------------------------------
+_stop_requested = False
+
+
+def request_stop() -> None:
+    global _stop_requested  # noqa: PLW0603
+    _stop_requested = True
+
+
+def clear_stop() -> None:
+    global _stop_requested  # noqa: PLW0603
+    _stop_requested = False
+
+
+def stop_requested() -> bool:
+    return _stop_requested
+
+
+# ---------------------------------------------------------------------------
+# Mode pruning + key management. Translation 'modes' are expressed as a pre-run
+# cache prune followed by the normal gap-fill: removing an entry turns it back
+# into a gap the next prefetch re-translates. This reuses ALL the gap-fill logic
+# instead of threading a mode flag through every fetch.
+# ---------------------------------------------------------------------------
+
+def prune_low_quality(
+    cache: dict[str, str], locale: str, texts: list[str], dict_table: dict[str, str],
+) -> int:
+    """'upgrade' mode: drop cached entries for *locale* whose provenance ranks
+    below NLLB, so the next run re-translates them via NLLB. No-op unless NLLB is
+    the locale's primary engine (nothing better to upgrade to otherwise). Manual
+    overrides and existing NLLB entries are kept. Returns the number removed.
+    """
+    if _primary_engine(locale) != "nllb":
+        return 0
+    removed = 0
+    for text in texts:
+        if not text or text in dict_table:
+            continue
+        key = _cache_key(locale, text, "nllb")
+        if key in cache and _provenance.get(key, "") in _LOW_QUALITY_PROVENANCE:
+            cache.pop(key, None)
+            _provenance.pop(key, None)
+            removed += 1
+    return removed
+
+
+def prune_all(
+    cache: dict[str, str], locale: str, texts: list[str], dict_table: dict[str, str],
+) -> int:
+    """'all' mode: drop every cached entry for *locale* EXCEPT manual overrides
+    (the operator set those deliberately), forcing a full re-translate. Returns
+    the number removed.
+    """
+    primary = _primary_engine(locale) or "google"
+    removed = 0
+    for text in texts:
+        if not text or text in dict_table:
+            continue
+        key = _cache_key(locale, text, primary)
+        if key in cache and _provenance.get(key, "") != "manual":
+            cache.pop(key, None)
+            _provenance.pop(key, None)
+            removed += 1
+    return removed
+
+
+def cache_set(cache: dict[str, str], locale: str, english: str, value: str) -> str:
+    """Manually override the translation for (locale, english). Marks provenance
+    'manual' so upgrade/force runs never overwrite it. Returns the cache key."""
+    primary = _primary_engine(locale) or "google"
+    key = _cache_key(locale, english, primary)
+    cache[key] = value
+    _provenance[key] = "manual"
+    return key
+
+
+def cache_unset(cache: dict[str, str], locale: str, english: str) -> bool:
+    """Remove the cached translation + provenance for (locale, english) so it is
+    re-translated next run. Returns True if an entry existed."""
+    primary = _primary_engine(locale) or "google"
+    key = _cache_key(locale, english, primary)
+    existed = key in cache or key in _provenance
+    cache.pop(key, None)
+    _provenance.pop(key, None)
+    return existed
+
+
+def cache_lookup(cache: dict[str, str], locale: str, english: str) -> tuple[str | None, str | None]:
+    """Return (value, provenance) for (locale, english), or (None, None)."""
+    primary = _primary_engine(locale) or "google"
+    key = _cache_key(locale, english, primary)
+    return cache.get(key), _provenance.get(key)
+
+
 def _cache_key(locale: str, text: str, engine: str = "google") -> str:
     # Bump prefix when MT pipeline changes (invalidate stale cache entries).
     h = hashlib.sha256(f"v2|{locale}\n{text}".encode("utf-8")).hexdigest()
@@ -427,23 +577,103 @@ def _google_fetch(locale: str, text: str) -> str | None:
     return out
 
 
+# NLLB placeholder mask. NLLB gets its OWN scheme — underscore-delimited
+# ``__PH0__`` markers — NOT the ASCII ``ZZ0ZZ`` shield used for Google. The ZZ
+# sentinels were measured to round-trip through Google; NLLB is a SentencePiece
+# subword model that tends to translate/transliterate ``ZZ`` in non-Latin scripts
+# (ar/hi/zh — exactly where NLLB's quality matters), which would make
+# _nllb_marks_intact reject NLLB's output for every interpolated string and fall
+# back to Google silently. ``__PH0__`` is the scheme proven with NLLB in the
+# contacts pipeline; subword models keep code-like underscore tokens verbatim far
+# more reliably. (Run ``nllb_engine.py --probe`` to confirm empirically per locale.)
+_NLLB_PH = re.compile(r"__PH\d+__")
+
+
+def _nllb_mask(text: str) -> tuple[str, list[str]]:
+    """Mask ``{tokens}`` AND brand terms with ``__PHn__`` markers for NLLB.
+
+    Returns ``(masked, originals)`` where ``originals[i]`` is the substring marker
+    ``i`` stands for. Placeholders first, then brand, mirroring the Google shield
+    so the brand can never be transliterated on the NLLB path either.
+    """
+    originals: list[str] = []
+
+    def repl(m: re.Match[str]) -> str:
+        originals.append(m.group(0))
+        return f"__PH{len(originals) - 1}__"
+
+    masked = _PLACEHOLDER_FULL.sub(repl, text)
+    for term in _DO_NOT_TRANSLATE:
+        masked = _BRAND_PATTERNS[term].sub(repl, masked)
+    return masked, originals
+
+
+def _nllb_unmask(translated: str, originals: list[str]) -> str:
+    out = translated
+    for i, orig in enumerate(originals):
+        out = out.replace(f"__PH{i}__", orig)
+    return out
+
+
+def _nllb_marks_intact(translated: str, count: int) -> bool:
+    """True when every ``__PHi__`` marker survived NLLB exactly once."""
+    return all(translated.count(f"__PH{i}__") == 1 for i in range(count))
+
+
 def _nllb_fetch(locale: str, text: str) -> str | None:
     """Translate via the local NLLB model, preserving placeholders + brand.
 
-    Returns ``None`` (so the caller falls back to Google) whenever NLLB cannot
-    translate the string — INCLUDING the echo case, because an NLLB echo means
-    "no real translation happened", not "leave this as English". Letting echoes
-    fall through to Google is what keeps NLLB-primary from silently shipping
-    English for strings NLLB happened to bounce.
+    Uses the NLLB-specific ``__PH__`` mask (see ``_nllb_mask``) rather than the
+    Google ``ZZ`` shield. Returns ``None`` — so the caller falls back to Google —
+    when NLLB returns nothing, mangles a placeholder/brand marker, leaves marker
+    residue, drops a ``{token}``, or echoes the source. An NLLB echo means "no
+    real translation happened", not "leave this English", so it must fall through.
     """
     try:
         import nllb_engine  # local sibling module
     except ImportError:
         return None
-    out = _fetch_translation(lambda m: nllb_engine.nllb_translate(m, locale), text)
-    if isinstance(out, str) and out.strip() and out != text:
-        return out
-    return None
+    masked, originals = _nllb_mask(text)
+    raw = nllb_engine.nllb_translate(masked, locale)
+    if raw is None:
+        return None
+    # Markers must survive verbatim; otherwise NLLB altered a placeholder/brand
+    # and the result is untrustworthy — reject so Google fills the slot.
+    if not _nllb_marks_intact(raw, len(originals)):
+        return None
+    restored = _nllb_unmask(raw, originals).strip()
+    if not restored or restored == text:
+        return None
+    # Defence-in-depth: no half-mangled marker residue, and the {tokens} match.
+    if "__PH" in restored or not _placeholders_preserved(text, restored):
+        return None
+    return restored
+
+
+# Per-locale, per-run tally of which engine actually produced each served
+# string. Exists so a run can REPORT its engine mix ("nllb:120 google:30
+# english:5") instead of hiding a silent Google fallback behind an "NLLB ready"
+# banner — without this, an NLLB-primary run that bounces every string to Google
+# is indistinguishable from one where NLLB did the work. Keyed locale -> engine
+# -> count. Engines: 'nllb', 'google', 'english' (no engine produced a real
+# translation), 'cached' (served from a prior run's cache; original engine not
+# re-derived).
+_engine_stats: dict[str, dict[str, int]] = {}
+
+
+def _record_engine(locale: str, engine: str) -> None:
+    _engine_stats.setdefault(locale, {})
+    _engine_stats[locale][engine] = _engine_stats[locale].get(engine, 0) + 1
+
+
+def engine_stats_for(locale: str) -> dict[str, int]:
+    """Engine tally for *locale* this run (see ``_engine_stats``)."""
+    return dict(_engine_stats.get(locale, {}))
+
+
+def reset_engine_stats() -> None:
+    """Clear the per-run engine tally. Call once at the start of a run."""
+    _engine_stats.clear()
 
 
 def _translate_one(locale: str, text: str, *, cache: dict[str, str], primary: str) -> str:
@@ -452,8 +682,10 @@ def _translate_one(locale: str, text: str, *, cache: dict[str, str], primary: st
     Caches the served value under the PRIMARY engine's key — even when Google
     produced it as a fallback. The key means "the best translation we serve for
     this string in this locale", so a re-run hits the cache instead of repeating
-    a slow NLLB call that already bounced this input. Returns the served string,
-    or English unchanged when no engine produced anything usable.
+    a slow NLLB call that already bounced this input. Records the engine that
+    actually produced the value (``_record_engine``) so the run can report the
+    mix. Returns the served string, or English unchanged when no engine produced
+    anything usable.
     """
     key = _cache_key(locale, text, primary)
     cached = cache.get(key)
@@ -461,23 +693,39 @@ def _translate_one(locale: str, text: str, *, cache: dict[str, str], primary: st
     # (placeholder loss, leaked sentinel residue, transliterated brand) are
     # re-fetched instead of shipped.
     if cached is not None and _cache_value_is_clean(text, cached):
+        _record_engine(locale, "cached")
         return cached
 
     if not _mt_env_enabled():
         # MT off this run; a poisoned/absent entry can't be healed, so fall back
         # to English (the coverage gate flags it) rather than ship garbage.
+        _record_engine(locale, "english")
         return text
 
+    out: str | None = None
+    used = "english"
     if primary == "nllb":
         out = _nllb_fetch(locale, text)
-        if out is None:
+        if out is not None:
+            used = "nllb"
+        else:
             out = _google_fetch(locale, text)
+            if isinstance(out, str) and out.strip():
+                used = "google"
     else:
         out = _google_fetch(locale, text)
+        if isinstance(out, str) and out.strip():
+            used = "google"
 
     if isinstance(out, str) and out.strip():
         cache[key] = out
+        # An echoed value that equals the English source isn't a real
+        # translation, so attribute it to 'english', not the engine that echoed.
+        eng = "english" if out == text else used
+        _provenance[key] = eng
+        _record_engine(locale, eng)
         return out
+    _record_engine(locale, "english")
     return text
 
 
@@ -567,11 +815,21 @@ def prefetch_machine_translations(
     if not pending:
         return
 
-    for src in pending:
+    for i, src in enumerate(pending):
+        # Cooperative cancel: a single Ctrl-C sets the stop flag; finish the
+        # in-flight string above, then break here so the caller flushes a clean
+        # partial cache and exits. Checked between strings, so worst-case latency
+        # is one NLLB call (vs. abandoning the whole multi-hour run).
+        if stop_requested():
+            break
         # Shared fetch path: NLLB-primary (when available) then Google fallback,
         # warming the same primary-engine cache key machine_translate reads, so
-        # results are identical regardless of which entry point warmed them.
-        # _translate_with_retry re-raises KeyboardInterrupt for the caller to
-        # save the partial cache; the Google pacing gap lives in _google_fetch.
+        # results are identical regardless of which entry point warmed them. The
+        # Google pacing gap lives in _google_fetch.
         _translate_one(locale, src, cache=cache, primary=primary)
+        # Periodic checkpoint so a hard kill mid-locale loses at most
+        # _CHECKPOINT_EVERY strings of work, not the whole locale.
+        if (i + 1) % _CHECKPOINT_EVERY == 0:
+            save_mt_cache(cache)
+            save_provenance()
 

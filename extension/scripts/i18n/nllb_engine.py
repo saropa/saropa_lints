@@ -289,13 +289,23 @@ def _packages_dir() -> str:
 
 
 def _add_packages_to_path() -> None:
-    """Prepend the packages dir to sys.path when it actually carries our payload.
+    """APPEND the packages dir to sys.path when it actually carries our payload.
 
-    A crashed ``pip install --target`` can strand orphan files (e.g. a lone
-    ``typing_extensions.py`` with a broken ACL) with no real payload. Inserting
-    that dir at sys.path[0] would shadow system packages and raise
-    PermissionError on the first import with no obvious cause. Only insert when
-    at least one of the real payload dirs is present.
+    Append, not prepend — this is the load-bearing choice. ``ctranslate2`` and
+    ``sentencepiece`` exist ONLY in this --target dir, so appending still lets
+    ``find_spec`` / ``import`` locate them. But for a name that ALSO exists in
+    system site-packages (``typing_extensions``, ``certifi``, …), append makes
+    the system copy win. That matters because a ``pip install --target`` here
+    can leave a single file with a broken / AV-quarantined ACL (real incident:
+    ``typing_extensions.py``, Errno 13). Prepending put that locked file ahead
+    of the clean system copy, so the next unrelated import that touched
+    ``typing_extensions`` — including the Google fallback's
+    ``deep_translator -> bs4 -> typing_extensions`` chain — crashed with a
+    PermissionError. Appending routes every collision to the clean system file,
+    so one locked file in this dir can no longer poison the whole process.
+
+    The ``has_payload`` guard additionally skips a dir stranded by a crashed
+    install (orphan files, no real package dirs) so it is never added at all.
     """
     pkg_path = Path(_packages_dir())
     if not pkg_path.is_dir():
@@ -309,7 +319,7 @@ def _add_packages_to_path() -> None:
         return
     pkg_dir = str(pkg_path)
     if pkg_dir not in sys.path:
-        sys.path.insert(0, pkg_dir)
+        sys.path.append(pkg_dir)
 
 
 def _add_nvidia_dll_path(pkg_dir: str) -> None:
@@ -846,15 +856,64 @@ def nllb_translate(text: str, locale: str) -> str | None:
 
 
 # ---------------------------------------------------------------------------
-# CLI — status / setup
+# CLI — status / setup / probe
 # ---------------------------------------------------------------------------
+
+def _probe() -> int:
+    """Empirically test which placeholder-mask scheme NLLB preserves per locale.
+
+    Translates the SAME sentence three ways — raw ``{braces}``, the Google
+    ``ZZ0ZZ`` shield, and the NLLB ``__PH0__`` mask — into several scripts and
+    reports, for each, whether both markers survived the round-trip verbatim. The
+    pipeline can only trust a scheme that SURVIVES across locales; this is the
+    evidence the mask choice in mt_fallback (``__PH__``) is the right one, and the
+    check this assistant cannot run itself. Loads + runs the model, so it must be
+    invoked explicitly by an operator.
+    """
+    if not _ensure_model():
+        print("NLLB model not ready — run --setup first.")
+        return 1
+    variants = [
+        ("raw {braces}", "Show {count} of {total} packages", ["{count}", "{total}"]),
+        ("ZZ sentinel", "Show ZZ0ZZ of ZZ1ZZ packages", ["ZZ0ZZ", "ZZ1ZZ"]),
+        ("__PH__ underscore", "Show __PH0__ of __PH1__ packages", ["__PH0__", "__PH1__"]),
+    ]
+    print("Probing placeholder-mask survival through NLLB (both markers must survive verbatim):\n")
+    survival: dict[str, int] = {label: 0 for label, _, _ in variants}
+    locales = ("ar", "hi", "zh", "ru", "de", "fr")
+    for locale in locales:
+        print(f"=== {locale} ===")
+        for label, masked, markers in variants:
+            out = nllb_translate(masked, locale)
+            if out is None:
+                print(f"  {label:18}: (echoed / no output)")
+                continue
+            ok = all(m in out for m in markers)
+            if ok:
+                survival[label] += 1
+            print(f"  {label:18}: {'SURVIVED' if ok else 'LOST    '} | {out[:70]}")
+        print()
+    print("Survival across locales (higher = safer mask):")
+    for label, _, _ in variants:
+        print(f"  {label:18}: {survival[label]}/{len(locales)}")
+    print(
+        "\nmt_fallback uses the '__PH__ underscore' mask for NLLB. If a different "
+        "scheme scores higher here, update _nllb_mask accordingly.",
+    )
+    return 0
+
 
 def main() -> int:
     import argparse
 
-    parser = argparse.ArgumentParser(description="NLLB-200-3.3B engine — status / setup.")
+    parser = argparse.ArgumentParser(description="NLLB-200-3.3B engine — status / setup / probe.")
     parser.add_argument("--setup", action="store_true", help="Download + load the model (~7 GB; prompts on TTY).")
+    parser.add_argument("--probe", action="store_true", help="Test which placeholder mask NLLB preserves (loads + runs the model).")
     args = parser.parse_args()
+
+    if args.probe:
+        os.environ.setdefault("SAROPA_NLLB_ENABLED", "1")
+        return _probe()
 
     if args.setup:
         # Allow the download to proceed without a second env-var hurdle when the

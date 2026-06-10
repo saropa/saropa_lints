@@ -24,6 +24,7 @@ Usage (from repo root):
 from __future__ import annotations
 
 import os
+import signal
 import subprocess
 import sys
 from pathlib import Path
@@ -55,15 +56,15 @@ def main() -> int:
     print(f"[{tag}] {c('gray', 'python=')}{sys.executable}", flush=True)
     print(f"[{tag}] {c('gray', 'locales=')}{c('cyan', locales)}", flush=True)
 
-    # On Ctrl-C in PowerShell, both the child and this parent receive SIGINT.
-    # The child handles it gracefully (saves cache, prints audit, exits 130).
-    # We catch the parent's KeyboardInterrupt here so the user does not see a
-    # Python traceback on top of the child's clean exit message.
-    try:
-        result = subprocess.run(cmd, env=env, cwd=str(script_dir))
-        return result.returncode
-    except KeyboardInterrupt:
-        return 130
+    # Let the CHILD own Ctrl-C. On Ctrl-C in PowerShell both processes get SIGINT;
+    # the child stops gracefully (finishes the current string, flushes cache +
+    # provenance, exits 130). The parent IGNORES SIGINT so it can't be torn down
+    # mid-save and instead waits for the child's clean exit, then returns its code.
+    # (The child re-installs its own handler at startup, so ignoring here doesn't
+    # disable the child's graceful stop.)
+    signal.signal(signal.SIGINT, signal.SIG_IGN)
+    result = subprocess.run(cmd, env=env, cwd=str(script_dir))
+    return result.returncode
 
 
 def _locales_from_args(args: list[str]) -> str:

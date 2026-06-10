@@ -917,9 +917,9 @@ function buildNameCell(r: VibrancyResult): string {
     const titleAttr = desc ? ` title="${escapeHtml(desc)}"` : '';
     let badge = '';
     if (r.package.section === 'dev_dependencies') {
-        badge = ' <span class="badge-dev">dev</span>';
+        badge = ` <span class="badge-dev">${escapeHtml(l10n('packageDashboard.cells.devBadge'))}</span>`;
     } else if (r.package.section === 'transitive') {
-        badge = ' <span class="badge-transitive">transitive</span>';
+        badge = ` <span class="badge-transitive">${escapeHtml(l10n('packageDashboard.cells.transitiveBadge'))}</span>`;
     }
     return `<td><span class="pkg-name-link" data-pkg="${name}"${titleAttr}>${name}</span>${badge}</td>`;
 }
@@ -964,15 +964,26 @@ function buildVersionTooltip(r: VibrancyResult): string {
     const createdDate = formatDate(r.pubDev?.createdDate);
 
     if (installedDate) {
-        lines.push(`Installed: ${r.package.version} (${installedDate})`);
+        lines.push(l10n('packageDashboard.versionTooltip.installed', {
+            version: r.package.version,
+            date: installedDate,
+        }));
     }
     const latest = r.pubDev?.latestVersion;
     if (latest && latest !== r.package.version) {
         const suffix = latestDate ? ` (${latestDate})` : '';
-        lines.push(`Latest: ${latest}${suffix}`);
+        lines.push(l10n('packageDashboard.versionTooltip.latest', {
+            version: `${latest}${suffix}`,
+        }));
     }
-    if (createdDate) { lines.push(`Created: ${createdDate}`); }
-    if (r.package.constraint) { lines.push(`Constraint: ${r.package.constraint}`); }
+    if (createdDate) {
+        lines.push(l10n('packageDashboard.versionTooltip.created', { date: createdDate }));
+    }
+    if (r.package.constraint) {
+        lines.push(l10n('packageDashboard.versionTooltip.constraint', {
+            constraint: r.package.constraint,
+        }));
+    }
     return lines.join('\n');
 }
 
@@ -1019,7 +1030,7 @@ function buildPublishedCell(r: VibrancyResult): string {
     const url = `https://pub.dev/packages/${encodeURIComponent(r.package.name)}`;
     const ageSuffix = formatAgeSuffix(r.installedVersionDate ?? r.pubDev?.publishedDate);
     if (!date) {
-        return '<td title="Publish date not available from pub.dev"><span class="dimmed">\u2014</span></td>';
+        return `<td title="${escapeHtml(l10n('packageDashboard.cells.publishDateUnavailable'))}"><span class="dimmed">\u2014</span></td>`;
     }
     return `<td><a href="${url}">${date}</a>${ageSuffix}</td>`;
 }
@@ -1027,9 +1038,9 @@ function buildPublishedCell(r: VibrancyResult): string {
 function buildActivityCell(r: VibrancyResult): string {
     const activity = computeActivitySignal(r);
     if (activity.grade === null) {
-        return '<td title="Activity grade unavailable (missing commit or release data)"><span class="dimmed">\u2014</span></td>';
+        return `<td title="${escapeHtml(l10n('packageDashboard.cells.activityGradeUnavailable'))}"><span class="dimmed">\u2014</span></td>`;
     }
-    const title = activity.message ?? 'Activity based on recent commits and releases';
+    const title = activity.message ?? l10n('packageDashboard.cells.activityFallback');
     return `<td title="${escapeHtml(title)}"><span class="grade-badge grade-${activity.grade}">${activity.grade}</span></td>`;
 }
 
@@ -1043,22 +1054,22 @@ function buildHealthTooltip(r: VibrancyResult): string {
        new information. The factor rows that remain are distinct signals,
        not the aggregate. */
     const lines = [
-        `Grade: ${categoryToGrade(r.category)}`,
+        l10n('packageDashboard.healthTooltip.grade', { grade: categoryToGrade(r.category) }),
         '',
-        `Resolution Velocity: ${fmt(r.resolutionVelocity)}`,
-        `Engagement Level: ${fmt(r.engagementLevel)}`,
-        `Popularity: ${fmt(r.popularity)}`,
-        `Publisher Trust: ${fmt(r.publisherTrust)}`,
+        l10n('packageDashboard.healthTooltip.resolutionVelocity', { value: String(fmt(r.resolutionVelocity)) }),
+        l10n('packageDashboard.healthTooltip.engagementLevel', { value: String(fmt(r.engagementLevel)) }),
+        l10n('packageDashboard.healthTooltip.popularity', { value: String(fmt(r.popularity)) }),
+        l10n('packageDashboard.healthTooltip.publisherTrust', { value: String(fmt(r.publisherTrust)) }),
     ];
     if (commitAgeDays !== undefined) {
-        lines.push(`Code commits: ${formatAgeFromDays(commitAgeDays)} ago`);
+        lines.push(l10n('packageDashboard.healthTooltip.codeCommits', { age: formatAgeFromDays(commitAgeDays) }));
     }
     if (publishAgeDays !== undefined) {
-        lines.push(`Latest release: ${formatAgeFromDays(publishAgeDays)} ago`);
+        lines.push(l10n('packageDashboard.healthTooltip.latestRelease', { age: formatAgeFromDays(publishAgeDays) }));
     }
     const dormancy = buildDormancyStatus(commitAgeDays, publishAgeDays);
     if (dormancy) {
-        lines.push('', `Activity signal: ${dormancy}`);
+        lines.push('', l10n('packageDashboard.healthTooltip.activitySignal', { signal: dormancy }));
     }
     return lines.join('\n');
 }
@@ -1100,11 +1111,11 @@ function buildLikesCell(r: VibrancyResult): string {
     const likes = r.likes;
     const href = pubDevScoreUrl(r.package.name);
     if (likes == null) {
-        return `<td class="cell-right" title="pub.dev likes not available"><a href="${href}"><span class="dimmed">\u2014</span></a></td>`;
+        return `<td class="cell-right" title="${escapeHtml(l10n('packageDashboard.cells.likesUnavailable'))}"><a href="${href}"><span class="dimmed">\u2014</span></a></td>`;
     }
     const full = likes.toLocaleString('en-US');
     const compact = formatCompactCount(likes);
-    return `<td class="cell-right" title="${full} pub.dev likes">`
+    return `<td class="cell-right" title="${escapeHtml(l10n('packageDashboard.cells.likesCount', { count: full }))}">`
         + `<a href="${href}">${escapeHtml(compact)}</a></td>`;
 }
 
@@ -1118,11 +1129,11 @@ function buildDownloadsCell(r: VibrancyResult): string {
     const downloads = r.downloadCount30Days;
     const href = pubDevScoreUrl(r.package.name);
     if (downloads == null) {
-        return `<td class="cell-right" title="pub.dev 30-day downloads not available"><a href="${href}"><span class="dimmed">\u2014</span></a></td>`;
+        return `<td class="cell-right" title="${escapeHtml(l10n('packageDashboard.cells.downloadsUnavailable'))}"><a href="${href}"><span class="dimmed">\u2014</span></a></td>`;
     }
     const full = downloads.toLocaleString('en-US');
     const compact = formatCompactCount(downloads);
-    return `<td class="cell-right" title="${full} downloads in the last 30 days">`
+    return `<td class="cell-right" title="${escapeHtml(l10n('packageDashboard.cells.downloadsCount', { count: full }))}">`
         + `<a href="${href}">${escapeHtml(compact)}</a></td>`;
 }
 
@@ -1161,7 +1172,7 @@ function buildSizeCell(r: VibrancyResult): string {
        infra_vibrancy_bloat_uses_tarball_size_not_runtime.md. */
     const own = r.codeSizeBytes ?? r.archiveSizeBytes;
     if (own === null) {
-        return '<td class="cell-right size-cell" title="Size not available from pub.dev"><span class="dimmed">—</span></td>';
+        return `<td class="cell-right size-cell" title="${escapeHtml(l10n('packageDashboard.cells.sizeUnavailable'))}"><span class="dimmed">—</span></td>`;
     }
     // Render three precomputed labels — the toolbar toggle picks which one is
     // visible by toggling a class on the table. This avoids re-running format
@@ -1175,23 +1186,26 @@ function buildSizeCell(r: VibrancyResult): string {
        tarball fallback so the developer can tell the cases apart. When both
        differ, surface the on-disk total too so the asymmetry (e.g. 40 KB code
        / 20 MB on disk) is visible without leaving the dashboard. */
-    const sizeKind = r.codeSizeBytes !== null ? 'Code size' : 'Archive size';
-    const tooltipParts: string[] = [`${sizeKind}: ${ownLabel}`];
+    const sizeKindLabel = r.codeSizeBytes !== null
+        ? l10n('packageDashboard.size.codeSize', { size: ownLabel })
+        : l10n('packageDashboard.size.archiveSize', { size: ownLabel });
+    const tooltipParts: string[] = [sizeKindLabel];
     if (r.archiveSizeBytes !== null && r.codeSizeBytes !== null
         && r.archiveSizeBytes !== r.codeSizeBytes) {
-        tooltipParts.push(`On disk: ${formatSizeMB(r.archiveSizeBytes)}`);
+        tooltipParts.push(l10n('packageDashboard.size.onDisk', { size: formatSizeMB(r.archiveSizeBytes) }));
     }
     if (r.transitiveInfo && r.transitiveInfo.transitiveCount > 0) {
-        tooltipParts.push(`With unique transitives: ${uniqueLabel}`);
-        tooltipParts.push(`With shared transitives: ${totalLabel}`);
+        tooltipParts.push(l10n('packageDashboard.size.withUniqueTransitives', { size: uniqueLabel }));
+        tooltipParts.push(l10n('packageDashboard.size.withSharedTransitives', { size: totalLabel }));
     }
     const tooltip = tooltipParts.join('\n');
     const packageName = escapeHtml(r.package.name);
+    const openFolderTitle = escapeHtml(l10n('packageDashboard.size.openFolder'));
     return `<td class="cell-right size-cell" title="${escapeHtml(tooltip)}"
         data-size-own="${own}" data-size-unique="${own + uniqueT}" data-size-total="${own + uniqueT + sharedT}">`
-        + `<span class="size-link size-own" data-pkg="${packageName}" title="Open local package folder">${ownLabel}</span>`
-        + `<span class="size-link size-unique" data-pkg="${packageName}" title="Open local package folder">${uniqueLabel}</span>`
-        + `<span class="size-link size-total" data-pkg="${packageName}" title="Open local package folder">${totalLabel}</span>`
+        + `<span class="size-link size-own" data-pkg="${packageName}" title="${openFolderTitle}">${ownLabel}</span>`
+        + `<span class="size-link size-unique" data-pkg="${packageName}" title="${openFolderTitle}">${uniqueLabel}</span>`
+        + `<span class="size-link size-total" data-pkg="${packageName}" title="${openFolderTitle}">${totalLabel}</span>`
         + `</td>`;
 }
 
@@ -1200,7 +1214,7 @@ function buildReferencesCell(r: VibrancyResult): string {
     const active = activeFileUsages(r.fileUsages);
     const count = active.length;
     if (count === 0) {
-        return '<td class="cell-right" title="No source file imports detected"><span class="dimmed">\u2014</span></td>';
+        return `<td class="cell-right" title="${escapeHtml(l10n('packageDashboard.references.noImports'))}"><span class="dimmed">\u2014</span></td>`;
     }
     // Single-use = muted; 6+ = bold (deeply embedded). A re-export overrides
     // single-use styling so it doesn't read as "easy to remove".
@@ -1218,7 +1232,9 @@ function buildReferencesCell(r: VibrancyResult): string {
     const refEntries: Array<{ path: string; line: number; label: string }> = [];
     for (const u of active) {
         if (u.exportLine != null) {
-            const label = `${u.filePath}:${u.exportLine} (re-export)`;
+            const label = l10n('packageDashboard.references.reExportLine', {
+                location: `${u.filePath}:${u.exportLine}`,
+            });
             tooltipLines.push(label);
             refEntries.push({ path: u.filePath, line: u.exportLine, label });
         }
@@ -1229,13 +1245,16 @@ function buildReferencesCell(r: VibrancyResult): string {
         }
         // Fallback for fixtures that don't populate the directive lines.
         if (u.exportLine == null && u.importLine == null) {
-            const label = `${u.filePath}:${u.line}${u.isExport ? ' (re-export)' : ''}`;
+            const location = `${u.filePath}:${u.line}`;
+            const label = u.isExport
+                ? l10n('packageDashboard.references.reExportLine', { location })
+                : location;
             tooltipLines.push(label);
             refEntries.push({ path: u.filePath, line: u.line, label });
         }
     }
     if (isReExport) {
-        tooltipLines.unshift('Public API surface — at least one usage is a re-export.', '');
+        tooltipLines.unshift(l10n('packageDashboard.references.publicApiSurface'), '');
     }
     const tooltip = tooltipLines.join('\n');
     const name = escapeHtml(r.package.name);
@@ -1243,11 +1262,11 @@ function buildReferencesCell(r: VibrancyResult): string {
     // so we keep this to a single character ("\u21AA" leftwards arrow with
     // hook = "exposed onward").
     const reexportBadge = isReExport
-        ? ' <span class="ref-reexport-badge" title="Re-exported">\u21AA</span>'
+        ? ` <span class="ref-reexport-badge" title="${escapeHtml(l10n('packageDashboard.references.reExportedBadge'))}">\u21AA</span>`
         : '';
     const refsData = encodeURIComponent(JSON.stringify(refEntries.slice(0, 50)));
     return `<td class="cell-right refs-cell${cls}" title="${escapeHtml(tooltip)}">`
-        + `<span class="ref-link" data-pkg="${name}" data-refs="${refsData}" title="Open file references">${count}</span>${reexportBadge}`
+        + `<span class="ref-link" data-pkg="${name}" data-refs="${refsData}" title="${escapeHtml(l10n('packageDashboard.references.openFileReferences'))}">${count}</span>${reexportBadge}`
         + `</td>`;
 }
 
@@ -1258,7 +1277,7 @@ function buildTransitivesCell(
     const count = r.transitiveInfo?.transitiveCount ?? 0;
     const flagged = r.transitiveInfo?.flaggedCount ?? 0;
     if (count === 0) {
-        return '<td class="cell-right transitives-cell" title="No transitive dependencies"><span class="dimmed">\u2014</span></td>';
+        return `<td class="cell-right transitives-cell" title="${escapeHtml(l10n('packageDashboard.deps.noTransitives'))}"><span class="dimmed">\u2014</span></td>`;
     }
     const info = r.transitiveInfo!;
     const depList = info.transitives
@@ -1267,14 +1286,14 @@ function buildTransitivesCell(
     const text = flagged > 0 ? `${count} (${flagged}\u26A0)` : `${count}`;
     const cls = flagged > 0 ? ' transitive-flagged' : '';
     return `<td class="cell-right transitives-cell${cls}">`
-        + `<span class="dep-list-link" data-pkg="${escapeHtml(r.package.name)}" data-deps="${escapeHtml(depList)}" title="Show transitive dependencies">${text}</span>`
+        + `<span class="dep-list-link" data-pkg="${escapeHtml(r.package.name)}" data-deps="${escapeHtml(depList)}" title="${escapeHtml(l10n('packageDashboard.deps.showTransitives'))}">${text}</span>`
         + `</td>`;
 }
 
 function buildVulnsCell(r: VibrancyResult): string {
     const count = r.vulnerabilities.length;
     const worst = worstSeverity(r.vulnerabilities);
-    if (count === 0) { return '<td title="No known vulnerabilities"><span class="dimmed">\u2014</span></td>'; }
+    if (count === 0) { return `<td title="${escapeHtml(l10n('packageDashboard.cells.noVulnerabilities'))}"><span class="dimmed">\u2014</span></td>`; }
     const emoji = worst ? severityEmoji(worst) : '';
     const label = worst ? severityLabel(worst) : '';
     const cls = worst ? ` class="vuln-${worst}"` : '';
@@ -1283,7 +1302,7 @@ function buildVulnsCell(r: VibrancyResult): string {
 
 function buildLicenseCell(r: VibrancyResult): string {
     const license = r.license;
-    if (!license) { return '<td title="License not specified on pub.dev"><span class="dimmed">\u2014</span></td>'; }
+    if (!license) { return `<td title="${escapeHtml(l10n('packageDashboard.cells.licenseUnspecified'))}"><span class="dimmed">\u2014</span></td>`; }
     const name = encodeURIComponent(r.package.name);
     const url = `https://pub.dev/packages/${name}/license`;
     return `<td><a href="${url}">${escapeHtml(license)}</a></td>`;
@@ -1311,9 +1330,9 @@ function getUpdateClass(status: string): string {
 
 function buildStatusCell(r: VibrancyResult): string {
     if (r.isUnused) {
-        return '<td><span class="badge-unused">Unused</span></td>';
+        return `<td><span class="badge-unused">${escapeHtml(l10n('packageDashboard.cells.unusedBadge'))}</span></td>`;
     }
-    return '<td title="Package is in use"><span class="dimmed">\u2014</span></td>';
+    return `<td title="${escapeHtml(l10n('packageDashboard.cells.packageInUse'))}"><span class="dimmed">\u2014</span></td>`;
 }
 
 /** Plain-text description cell (hidable, starts collapsed). */
@@ -1330,7 +1349,7 @@ function buildDepsCell(
 ): string {
     const info = r.transitiveInfo;
     if (!info || info.transitiveCount === 0) {
-        return '<td class="cell-right deps-cell" title="No transitive dependencies"><span class="dimmed">\u2014</span></td>';
+        return `<td class="cell-right deps-cell" title="${escapeHtml(l10n('packageDashboard.deps.noTransitives'))}"><span class="dimmed">\u2014</span></td>`;
     }
     const total = info.transitiveCount;
     const shared = info.sharedDeps.length;
@@ -1338,12 +1357,17 @@ function buildDepsCell(
     /* Build a tooltip listing all transitive deps, marking shared ones. */
     const depLines = linkedDeps.map(dep => {
         const isShared = info.sharedDeps.includes(dep);
-        return isShared ? `\u2022 ${dep} (shared)` : `\u2022 ${dep}`;
+        return isShared
+            ? l10n('packageDashboard.deps.tooltipDepShared', { dep })
+            : l10n('packageDashboard.deps.tooltipDep', { dep });
     });
-    const tooltip = `${total} transitive deps${shared > 0 ? ` (${shared} shared)` : ''}\n${depLines.join('\n')}`;
+    const tooltipHeader = shared > 0
+        ? l10n('packageDashboard.deps.tooltipHeaderShared', { total: String(total), shared: String(shared) })
+        : l10n('packageDashboard.deps.tooltipHeader', { total: String(total) });
+    const tooltip = `${tooltipHeader}\n${depLines.join('\n')}`;
     /* Show count with a tree icon; highlight if shared deps exist. */
     const sharedBadge = shared > 0
-        ? ` <span class="badge-shared" title="${shared} shared with other packages">${shared}s</span>`
+        ? ` <span class="badge-shared" title="${escapeHtml(l10n('packageDashboard.deps.sharedBadgeTitle', { count: String(shared) }))}">${shared}s</span>`
         : '';
     const depList = linkedDeps.join(',');
     return `<td class="cell-right deps-cell" title="${escapeHtml(tooltip)}">`
@@ -1403,14 +1427,14 @@ function buildDetailScoreSection(r: VibrancyResult): string {
     const commitAgeDays = r.github?.daysSinceLastCommit;
     const activityRows: string[] = [];
     if (commitAgeDays !== undefined) {
-        activityRows.push(`<span class="detail-label">Code Commit Activity</span><span>${escapeHtml(formatAgeFromDays(commitAgeDays))} ago</span>`);
+        activityRows.push(`<span class="detail-label">${escapeHtml(l10n('packageDashboard.detail.codeCommitActivity'))}</span><span>${escapeHtml(l10n('packageDashboard.detail.ago', { age: formatAgeFromDays(commitAgeDays) }))}</span>`);
     }
     if (publishAgeDays !== undefined) {
-        activityRows.push(`<span class="detail-label">Release Activity</span><span>${escapeHtml(formatAgeFromDays(publishAgeDays))} ago</span>`);
+        activityRows.push(`<span class="detail-label">${escapeHtml(l10n('packageDashboard.detail.releaseActivity'))}</span><span>${escapeHtml(l10n('packageDashboard.detail.ago', { age: formatAgeFromDays(publishAgeDays) }))}</span>`);
     }
     const dormancy = buildDormancyStatus(commitAgeDays, publishAgeDays);
     if (dormancy) {
-        activityRows.push(`<span class="detail-label">Dormancy Signal</span><span>${escapeHtml(dormancy)}</span>`);
+        activityRows.push(`<span class="detail-label">${escapeHtml(l10n('packageDashboard.detail.dormancySignal'))}</span><span>${escapeHtml(dormancy)}</span>`);
     }
     /* Maintainer-quality bonus rows — each of `example/`, `test/`, `tool/`,
        `doc/` is a positive component on the health score (NOT a bloat
@@ -1423,28 +1447,28 @@ function buildDetailScoreSection(r: VibrancyResult): string {
     if (r.maintainerQuality) {
         const q = r.maintainerQuality;
         if (q.hasExample) {
-            qualityRows.push('<span class="detail-label">+example</span><span title="Ships a runnable demo">+</span>');
+            qualityRows.push(`<span class="detail-label">${escapeHtml(l10n('packageDashboard.detail.qualityExample'))}</span><span title="${escapeHtml(l10n('packageDashboard.detail.qualityExampleTitle'))}">+</span>`);
         }
         if (q.hasTests) {
-            qualityRows.push('<span class="detail-label">+tests</span><span title="Ships a test suite">+</span>');
+            qualityRows.push(`<span class="detail-label">${escapeHtml(l10n('packageDashboard.detail.qualityTests'))}</span><span title="${escapeHtml(l10n('packageDashboard.detail.qualityTestsTitle'))}">+</span>`);
         }
         if (q.hasTools) {
-            qualityRows.push('<span class="detail-label">+tools</span><span title="Ships maintainer tooling">+</span>');
+            qualityRows.push(`<span class="detail-label">${escapeHtml(l10n('packageDashboard.detail.qualityTools'))}</span><span title="${escapeHtml(l10n('packageDashboard.detail.qualityToolsTitle'))}">+</span>`);
         }
         if (q.hasDocs) {
-            qualityRows.push('<span class="detail-label">+docs</span><span title="Ships extended documentation">+</span>');
+            qualityRows.push(`<span class="detail-label">${escapeHtml(l10n('packageDashboard.detail.qualityDocs'))}</span><span title="${escapeHtml(l10n('packageDashboard.detail.qualityDocsTitle'))}">+</span>`);
         }
     }
     /* The "Overall" numeric row was removed — it was the same info as the
        header grade letter, just shown as a /10. The factor rows below stay
        because they're distinct dimensions, not the same aggregate. */
     return `<div class="detail-section">
-        <h4>Health Score <span class="grade-badge grade-${grade}">${grade}</span></h4>
+        <h4>${escapeHtml(l10n('packageDashboard.detail.healthScore'))} <span class="grade-badge grade-${grade}">${grade}</span></h4>
         <div class="detail-grid">
-            <span class="detail-label">Resolution Velocity</span><span>${fmt(r.resolutionVelocity)}</span>
-            <span class="detail-label">Engagement Level</span><span>${fmt(r.engagementLevel)}</span>
-            <span class="detail-label">Popularity</span><span>${fmt(r.popularity)}</span>
-            <span class="detail-label">Publisher Trust</span><span>${fmt(r.publisherTrust)}</span>
+            <span class="detail-label">${escapeHtml(l10n('packageDashboard.detail.resolutionVelocity'))}</span><span>${fmt(r.resolutionVelocity)}</span>
+            <span class="detail-label">${escapeHtml(l10n('packageDashboard.detail.engagementLevel'))}</span><span>${fmt(r.engagementLevel)}</span>
+            <span class="detail-label">${escapeHtml(l10n('packageDashboard.detail.popularity'))}</span><span>${fmt(r.popularity)}</span>
+            <span class="detail-label">${escapeHtml(l10n('packageDashboard.detail.publisherTrust'))}</span><span>${fmt(r.publisherTrust)}</span>
             ${activityRows.join('')}
             ${qualityRows.join('')}
         </div>
@@ -1472,16 +1496,16 @@ function buildDormancyStatus(
         return null;
     }
     if (commitAgeDays >= 180 && publishAgeDays >= 180) {
-        return 'No commits and no releases in 6+ months';
+        return l10n('packageDashboard.dormancy.noActivity6mo');
     }
     if (commitAgeDays >= 90 && publishAgeDays >= 90) {
-        return 'No commits and no releases in 3+ months';
+        return l10n('packageDashboard.dormancy.noActivity3mo');
     }
     if (commitAgeDays >= 90 && publishAgeDays < 90) {
-        return 'Release active, code inactive (3+ months without commits)';
+        return l10n('packageDashboard.dormancy.releaseActiveCodeInactive');
     }
     if (commitAgeDays < 90 && publishAgeDays >= 90) {
-        return 'Code active, release cadence is slower (3+ months)';
+        return l10n('packageDashboard.dormancy.codeActiveReleaseSlow');
     }
     return null;
 }
@@ -1505,8 +1529,8 @@ function computeActivitySignal(r: VibrancyResult): {
     const grade = scoreToGrade(score);
     const dormancy = buildDormancyStatus(commitAgeDays, publishAgeDays);
     const message = dormancy
-        ? `${dormancy} (activity grade ${grade})`
-        : `Code and release activity is healthy (activity grade ${grade})`;
+        ? l10n('packageDashboard.activity.withDormancy', { dormancy, grade })
+        : l10n('packageDashboard.activity.healthy', { grade });
     return { score, grade, message, sortValue: String(score) };
 }
 
@@ -1514,11 +1538,13 @@ function buildDetailVulnSection(r: VibrancyResult): string {
     const rows = r.vulnerabilities.map(v => {
         const sev = v.severity ? `<span class="vuln-${v.severity}">${severityLabel(v.severity)}</span>` : '';
         const link = v.url ? `<a href="${escapeHtml(v.url)}">${escapeHtml(v.id)}</a>` : escapeHtml(v.id);
-        const fix = v.fixedVersion ? ` \u2192 fix in ${escapeHtml(v.fixedVersion)}` : '';
+        const fix = v.fixedVersion
+            ? ` ${escapeHtml(l10n('packageDashboard.detail.fixInVersion', { version: v.fixedVersion }))}`
+            : '';
         return `<div class="vuln-row">${sev} ${link}: ${escapeHtml(v.summary ?? '')}${fix}</div>`;
     });
     return `<div class="detail-section">
-        <h4>Vulnerabilities (${r.vulnerabilities.length})</h4>
+        <h4>${escapeHtml(l10n('packageDashboard.detail.vulnerabilitiesHeading', { count: String(r.vulnerabilities.length) }))}</h4>
         ${rows.join('\n')}
     </div>`;
 }
@@ -1537,7 +1563,7 @@ function buildDetailFilesSection(
         const rows: string[] = [];
         const path = escapeHtml(u.filePath);
         if (u.exportLine != null) {
-            rows.push(`<div class="file-row"><span class="file-link" data-path="${path}" data-line="${u.exportLine}">${path}:${u.exportLine}</span> (re-export)</div>`);
+            rows.push(`<div class="file-row"><span class="file-link" data-path="${path}" data-line="${u.exportLine}">${path}:${u.exportLine}</span> ${escapeHtml(l10n('packageDashboard.references.reExportSuffix'))}</div>`);
         }
         if (u.importLine != null) {
             rows.push(`<div class="file-row"><span class="file-link" data-path="${path}" data-line="${u.importLine}">${path}:${u.importLine}</span></div>`);
@@ -1548,9 +1574,9 @@ function buildDetailFilesSection(
         return rows;
     }).join('\n');
     const more = active.length > 20
-        ? `<div class="dimmed">... and ${active.length - 20} more</div>` : '';
+        ? `<div class="dimmed">${escapeHtml(l10n('packageDashboard.references.andMore', { count: String(active.length - 20) }))}</div>` : '';
     return `<div class="detail-section">
-        <h4>File References (${active.length}) <span class="ref-link detail-search-link" data-pkg="${name}" title="Search imports">\u{1F50D}</span></h4>
+        <h4>${escapeHtml(l10n('packageDashboard.references.fileReferencesHeading', { count: String(active.length) }))} <span class="ref-link detail-search-link" data-pkg="${name}" title="${escapeHtml(l10n('packageDashboard.references.searchImports'))}">\u{1F50D}</span></h4>
         ${fileList}${more}
     </div>`;
 }
@@ -1560,11 +1586,11 @@ function buildDetailDepsSection(r: VibrancyResult): string {
     const depItems = info.transitives.map(dep => {
         const isShared = info.sharedDeps.includes(dep);
         const cls = isShared ? ' class="dep-shared"' : '';
-        const badge = isShared ? ' <span class="badge-shared-sm">shared</span>' : '';
+        const badge = isShared ? ` <span class="badge-shared-sm">${escapeHtml(l10n('packageDashboard.deps.sharedBadge'))}</span>` : '';
         return `<span${cls}>${escapeHtml(dep)}${badge}</span>`;
     });
     return `<div class="detail-section">
-        <h4>Transitive Dependencies (${info.transitiveCount})</h4>
+        <h4>${escapeHtml(l10n('packageDashboard.deps.transitiveDepsHeading', { count: String(info.transitiveCount) }))}</h4>
         <div class="dep-cloud">${depItems.join(' ')}</div>
     </div>`;
 }
@@ -1572,17 +1598,17 @@ function buildDetailDepsSection(r: VibrancyResult): string {
 function buildDetailLinksSection(r: VibrancyResult): string {
     const name = encodeURIComponent(r.package.name);
     const links: string[] = [
-        `<a href="https://pub.dev/packages/${name}">pub.dev</a>`,
-        `<a href="https://pub.dev/packages/${name}/changelog">changelog</a>`,
-        `<a href="https://pub.dev/packages/${name}/versions">versions</a>`,
+        `<a href="https://pub.dev/packages/${name}">${escapeHtml(l10n('packageDashboard.links.pubDev'))}</a>`,
+        `<a href="https://pub.dev/packages/${name}/changelog">${escapeHtml(l10n('packageDashboard.links.changelog'))}</a>`,
+        `<a href="https://pub.dev/packages/${name}/versions">${escapeHtml(l10n('packageDashboard.links.versions'))}</a>`,
     ];
     const repoUrl = (r.github?.repoUrl ?? r.pubDev?.repositoryUrl)?.replace(/\/+$/, '');
     if (repoUrl) {
-        links.push(`<a href="${escapeHtml(repoUrl)}">repository</a>`);
-        links.push(`<a href="${escapeHtml(repoUrl)}/issues">issues</a>`);
+        links.push(`<a href="${escapeHtml(repoUrl)}">${escapeHtml(l10n('packageDashboard.links.repository'))}</a>`);
+        links.push(`<a href="${escapeHtml(repoUrl)}/issues">${escapeHtml(l10n('packageDashboard.links.issues'))}</a>`);
     }
     return `<div class="detail-section detail-links">
-        <h4>Links</h4>
+        <h4>${escapeHtml(l10n('packageDashboard.links.heading'))}</h4>
         <div class="link-list">${links.join(' \u2022 ')}</div>
     </div>`;
 }

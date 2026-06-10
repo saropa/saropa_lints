@@ -24,6 +24,7 @@ import {
     getKeyboardShortcutsStyles,
 } from '../../views/keyboard-shortcuts';
 import { pluralize } from '../../views/webview-format';
+import { l10n } from '../../i18n/runtime';
 
 /**
  * HTML builder for **side-by-side package comparison** (scores, dimension winners, size, recommendations).
@@ -136,7 +137,9 @@ function getComparisonScript(): string {
                 const name = btn.dataset.package;
                 const version = btn.dataset.version;
                 vscode.postMessage({ type: 'addPackage', name, version });
-                announce('Adding ' + name + ' to project');
+                // Localized announcement template carries a __NAME__ token replaced
+                // with the runtime package name (l10n runs at build time, not in the webview).
+                announce(${JSON.stringify(l10n('comparison.a11y.addingToProject', { name: '__NAME__' }))}.replace('__NAME__', name));
             });
         });
 
@@ -174,41 +177,41 @@ const ROWS: readonly RowDef[] = [
         /* Renamed "Vibrancy Score" → "Vibrancy Grade" and the cell shows the
            letter. The underlying score is still used for winner-ranking in
            comparison-ranker so ordering remains precise. */
-        label: 'Vibrancy Grade',
+        label: l10n('comparison.table.row.vibrancyGrade'),
         dimension: 'Vibrancy Grade',
         extract: p => p.vibrancyScore !== null ? scoreToGrade(p.vibrancyScore) : '—',
     },
     {
-        label: 'Category',
+        label: l10n('comparison.table.row.category'),
         extract: p => formatCategory(p.category),
         className: p => getCategoryClass(p.category),
     },
     {
-        label: 'Latest Version',
+        label: l10n('comparison.table.row.latestVersion'),
         extract: p => escapeHtml(p.latestVersion || '—'),
     },
     {
-        label: 'Published',
+        label: l10n('comparison.table.row.published'),
         extract: p => p.publishedDate ?? '—',
     },
     {
-        label: 'Publisher',
+        label: l10n('comparison.table.row.publisher'),
         extract: p => p.publisher
             ? `<span class="verified">${escapeHtml(p.publisher)} ✓</span>`
-            : '— (unverified)',
+            : l10n('comparison.table.value.unverified'),
     },
     {
-        label: 'Pub Points',
+        label: l10n('comparison.table.row.pubPoints'),
         dimension: 'Pub Points',
         extract: p => p.pubPoints > 0 ? String(p.pubPoints) : '—',
     },
     {
-        label: 'GitHub Stars',
+        label: l10n('comparison.table.row.githubStars'),
         dimension: 'GitHub Stars',
         extract: p => p.stars !== null ? p.stars.toLocaleString() : '—',
     },
     {
-        label: 'Open Issues',
+        label: l10n('comparison.table.row.openIssues'),
         dimension: 'Open Issues',
         extract: p => p.openIssues !== null ? String(p.openIssues) : '—',
     },
@@ -220,7 +223,7 @@ const ROWS: readonly RowDef[] = [
            reported by 100x+ for packages that ship example media. See
            plans/history/2026.05/2026.05.13/
            infra_vibrancy_bloat_uses_tarball_size_not_runtime.md. */
-        label: 'Code Size',
+        label: l10n('comparison.table.row.codeSize'),
         dimension: 'Code Size',
         extract: p => {
             const size = p.codeSizeBytes ?? p.archiveSizeBytes;
@@ -228,23 +231,23 @@ const ROWS: readonly RowDef[] = [
         },
     },
     {
-        label: 'Bloat Rating',
+        label: l10n('comparison.table.row.bloatRating'),
         dimension: 'Bloat Rating',
         extract: p => p.bloatRating !== null ? `${p.bloatRating}/10` : '—',
     },
     {
-        label: 'License',
+        label: l10n('comparison.table.row.license'),
         extract: p => escapeHtml(p.license ?? '—'),
     },
     {
-        label: 'Platforms',
+        label: l10n('comparison.table.row.platforms'),
         extract: p => p.platforms.length > 0
             ? `<span class="platforms">${p.platforms.join(', ')}</span>`
-            : 'All',
+            : l10n('comparison.table.value.allPlatforms'),
     },
     {
-        label: 'In This Project',
-        extract: p => p.inProject ? '✅ Yes' : '❌ No',
+        label: l10n('comparison.table.row.inThisProject'),
+        extract: p => p.inProject ? `✅ ${l10n('comparison.table.value.yes')}` : `❌ ${l10n('comparison.table.value.no')}`,
     },
 ];
 
@@ -252,10 +255,10 @@ function buildHeaderRow(packages: readonly ComparisonData[]): string {
     const cells = packages.map(pkg => {
         const url = `https://pub.dev/packages/${encodeURIComponent(pkg.name)}`;
         const inProjectBadge = pkg.inProject
-            ? '<span class="in-project">In Project</span>'
+            ? `<span class="in-project">${l10n('comparison.table.badge.inProject')}</span>`
             : '';
         const addBtn = !pkg.inProject
-            ? `<br><button class="add-btn" data-package="${escapeHtml(pkg.name)}" data-version="${escapeHtml(pkg.latestVersion)}">Add to Project</button>`
+            ? `<br><button class="add-btn" data-package="${escapeHtml(pkg.name)}" data-version="${escapeHtml(pkg.latestVersion)}">${l10n('comparison.actions.addToProject')}</button>`
             : '';
         return `<th class="pkg-header"><a href="${url}">${escapeHtml(pkg.name)}</a>${inProjectBadge}${addBtn}</th>`;
     }).join('');
@@ -306,15 +309,15 @@ export function buildComparisonHtml(ranked: RankedComparison): string {
 
     const nonce = createWebviewCspNonce();
     const cspWithScript = `default-src 'none'; style-src 'nonce-${nonce}'; script-src 'nonce-${nonce}';`;
-    const docTitle = escapeHtml(buildDocumentTitle('Package Comparison'));
+    const docTitle = escapeHtml(buildDocumentTitle(l10n('comparison.title')));
 
     if (packages.length === 0) {
         // Empty state inherits the same chrome + hero so the page still telegraphs
         // "Saropa Package Comparison" before showing the empty-state message.
         const heroEmpty = buildDashboardHero({
-            title: 'Package Comparison',
+            title: l10n('comparison.title'),
             statusLineHtml: buildStatusLine([
-                { glyph: '📦', label: '0 packages selected', tone: 'warn' },
+                { glyph: '📦', label: l10n('comparison.status.packagesSelected', { count: '0' }), tone: 'warn' },
             ]),
         });
         // §8.16 — every empty state names the next action with a tier-1 CTA.
@@ -331,10 +334,10 @@ export function buildComparisonHtml(ranked: RankedComparison): string {
 </head>
 <body>
     ${heroEmpty}
-    <section class="section empty-state-card" aria-label="No packages">
-        <p class="muted">No packages selected for comparison. Right-click two or more packages in the Package dashboard and choose <strong>Compare</strong>.</p>
+    <section class="section empty-state-card" aria-label="${l10n('comparison.empty.ariaLabel')}">
+        <p class="muted">${l10n('comparison.empty.message', { compare: `<strong>${l10n('comparison.empty.compareWord')}</strong>` })}</p>
         <button type="button" class="btn tier-1" id="openPackageDashboard"
-            title="Open the Saropa Package Dashboard.">Open Package Dashboard</button>
+            title="${l10n('comparison.empty.openDashboardTitle')}">${l10n('comparison.empty.openDashboard')}</button>
     </section>
     <script nonce="${nonce}">(function(){
         const vscode = acquireVsCodeApi();
@@ -350,15 +353,15 @@ export function buildComparisonHtml(ranked: RankedComparison): string {
     // have a winner, and the names of the packages being compared (truncated to keep the line short).
     const dimensionsWithWinners = winners.length;
     const statusLineHtml = buildStatusLine([
-        { glyph: '📦', label: `${packages.length} packages compared` },
-        { label: pluralize(dimensionsWithWinners, { one: '{count} dimension ranked', other: '{count} dimensions ranked' }) },
+        { glyph: '📦', label: l10n('comparison.status.packagesCompared', { count: String(packages.length) }) },
+        { label: pluralize(dimensionsWithWinners, { one: l10n('comparison.status.dimensionsRankedOne'), other: l10n('comparison.status.dimensionsRankedOther') }) },
         {
-            label: packages.map(p => p.name).slice(0, 3).join(' vs ') + (packages.length > 3 ? ` +${packages.length - 3} more` : ''),
+            label: packages.map(p => p.name).slice(0, 3).join(' vs ') + (packages.length > 3 ? ` ${l10n('comparison.status.morePackages', { count: String(packages.length - 3) })}` : ''),
             title: packages.map(p => p.name).join(', '),
         },
     ]);
     const heroHtml = buildDashboardHero({
-        title: 'Package Comparison',
+        title: l10n('comparison.title'),
         statusLineHtml,
         extraToggleHtml: buildKeyboardShortcutsButton(),
     });
@@ -377,7 +380,7 @@ export function buildComparisonHtml(ranked: RankedComparison): string {
     <style nonce="${nonce}">${getComparisonStyles()}${getKeyboardShortcutsStyles()}</style>
 </head>
 <body>
-    <a href="#comparison-table" class="skip-link">Skip to comparison table</a>
+    <a href="#comparison-table" class="skip-link">${l10n('comparison.a11y.skipToTable')}</a>
     <div id="announcer" role="status" aria-live="polite" aria-atomic="true"></div>
     <header>${heroHtml}</header>
     ${kpiRowHtml}
@@ -385,12 +388,12 @@ export function buildComparisonHtml(ranked: RankedComparison): string {
     <main id="comparison-table" tabindex="-1">
         ${buildComparisonTable(packages, winners)}
     </main>
-    <aside aria-label="Recommendation">
+    <aside aria-label="${l10n('comparison.a11y.recommendation')}">
         <div class="recommendation">${recommendation}</div>
     </aside>
     ${buildKeyboardShortcutsOverlay([
-        { key: '?', label: 'Show this shortcut overlay' },
-        { key: 'Esc', label: 'Close the keyboard-shortcut overlay' },
+        { key: '?', label: l10n('comparison.shortcuts.showOverlay') },
+        { key: 'Esc', label: l10n('comparison.shortcuts.closeOverlay') },
     ])}
     <script nonce="${nonce}">${getComparisonScript()}(function(){${getFullWidthToggleScript()}${getKeyboardShortcutsScript()}})();</script>
 </body>
@@ -426,21 +429,21 @@ function buildKpiRow(
     const leaderWins = leader ? leader[1] : 0;
     const totalDimensions = winners.length;
 
-    return `<section class="kpi-row" aria-label="Comparison summary">
-        <div class="kpi-card" title="Package leading by most dimension wins.">
-            <span class="kpi-k">Leading</span>
+    return `<section class="kpi-row" aria-label="${l10n('comparison.kpi.ariaLabel')}">
+        <div class="kpi-card" title="${l10n('comparison.kpi.leadingTitle')}">
+            <span class="kpi-k">${l10n('comparison.kpi.leading')}</span>
             <span class="kpi-v" style="font-size: 1.4em;">${escapeHtml(leaderName)}</span>
-            <span class="kpi-sub">${pluralize(leaderWins, { one: '{count} dimension win', other: '{count} dimension wins' })}</span>
+            <span class="kpi-sub">${pluralize(leaderWins, { one: l10n('comparison.kpi.dimensionWinsOne'), other: l10n('comparison.kpi.dimensionWinsOther') })}</span>
         </div>
-        <div class="kpi-card" title="Number of packages compared side-by-side.">
-            <span class="kpi-k">Packages</span>
+        <div class="kpi-card" title="${l10n('comparison.kpi.packagesTitle')}">
+            <span class="kpi-k">${l10n('comparison.kpi.packages')}</span>
             <span class="kpi-v">${packages.length}</span>
-            <span class="kpi-sub">in comparison</span>
+            <span class="kpi-sub">${l10n('comparison.kpi.inComparison')}</span>
         </div>
-        <div class="kpi-card" title="Number of dimensions where a winner could be ranked.">
-            <span class="kpi-k">Dimensions</span>
+        <div class="kpi-card" title="${l10n('comparison.kpi.dimensionsTitle')}">
+            <span class="kpi-k">${l10n('comparison.kpi.dimensions')}</span>
             <span class="kpi-v">${totalDimensions}</span>
-            <span class="kpi-sub">ranked</span>
+            <span class="kpi-sub">${l10n('comparison.kpi.ranked')}</span>
         </div>
     </section>`;
 }
@@ -454,11 +457,11 @@ function buildKpiRow(
  * strongly enough to deserve primary emphasis on this surface.
  */
 function buildToolbar(): string {
-    return `<section class="toolbar-band" aria-label="Comparison actions">
+    return `<section class="toolbar-band" aria-label="${l10n('comparison.toolbar.ariaLabel')}">
         <div class="toolbar-row">
             <button type="button" class="btn" id="openPkgDashboard"
-                title="Open the Package Dashboard to compare more packages.">
-                <span class="glyph">📦</span>Package Dashboard
+                title="${l10n('comparison.toolbar.packageDashboardTitle')}">
+                <span class="glyph">📦</span>${l10n('comparison.toolbar.packageDashboard')}
             </button>
         </div>
     </section>`;
