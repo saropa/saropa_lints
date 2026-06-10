@@ -1397,6 +1397,47 @@ class _InitializerPurityVisitor extends RecursiveAstVisitor<void> {
     isPure = false;
   }
 
+  // A call whose name is PascalCase is a constructor / class instantiation. In
+  // unresolved AST `ValueNotifier<bool>(false)` parses as a MethodInvocation
+  // named `ValueNotifier`, not an InstanceCreationExpression, so it slips past
+  // `visitInstanceCreationExpression`. Each call allocates a distinct,
+  // identity-sensitive object; merging two same-source allocations into one
+  // local would wire two consumers to the same mutable instance. Reject so
+  // `final a = ValueNotifier<bool>(false); final b = ValueNotifier<bool>(false);`
+  // is never flagged as a redundant recompute.
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    final String name = node.methodName.name;
+    if (name.isNotEmpty) {
+      final int first = name.codeUnitAt(0);
+      // ASCII A-Z: types/constructors are PascalCase, methods are camelCase.
+      if (first >= 0x41 && first <= 0x5A) isPure = false;
+    }
+    super.visitMethodInvocation(node);
+  }
+
+  // `++`/`--` mutate their operand, so an index like `pts[i++]` reads a
+  // different element each evaluation and advances `i`. Reusing the first read
+  // would read the same element twice instead of stepping through. Reject any
+  // increment/decrement in the initializer.
+  @override
+  void visitPostfixExpression(PostfixExpression node) {
+    if (node.operator.type == TokenType.PLUS_PLUS ||
+        node.operator.type == TokenType.MINUS_MINUS) {
+      isPure = false;
+    }
+    super.visitPostfixExpression(node);
+  }
+
+  @override
+  void visitPrefixExpression(PrefixExpression node) {
+    if (node.operator.type == TokenType.PLUS_PLUS ||
+        node.operator.type == TokenType.MINUS_MINUS) {
+      isPure = false;
+    }
+    super.visitPrefixExpression(node);
+  }
+
   @override
   void visitCascadeExpression(CascadeExpression node) {
     isPure = false;

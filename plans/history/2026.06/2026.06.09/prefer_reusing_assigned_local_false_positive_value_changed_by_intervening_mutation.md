@@ -1,6 +1,6 @@
 # BUG: `prefer_reusing_assigned_local` — False positive when collection is mutated between the two reads
 
-**Status: Open**
+**Status: Fixed**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
@@ -288,19 +288,77 @@ include:
 
 ## Changes Made
 
-<!-- Fill in when a fix is written. -->
+Empirical testing against the scan CLI showed only Patterns 2 and 3 actually
+reproduce; **Pattern 1** (`list.length` before/after `list.removeWhere(...)`)
+does NOT fire on the current code — the mutation barrier is already recorded at
+the call-site offset (`node.offset`), so the report's Pattern-1 root-cause
+analysis was incorrect and no change was needed there.
+
+Both real FPs originate in `_InitializerPurityVisitor`, which decides whether a
+local's initializer is safe to reuse. Added three overrides:
+
+- `visitPostfixExpression` / `visitPrefixExpression`: a `++`/`--` in the
+  initializer marks it impure. `pts[i++]` advances `i` and reads a different
+  element each evaluation, so it can never be reused (Pattern 2).
+- `visitMethodInvocation`: a call whose name starts with an ASCII uppercase
+  letter (PascalCase) is a constructor/class instantiation — in unresolved AST
+  `ValueNotifier<bool>(false)` parses as a `MethodInvocation` named
+  `ValueNotifier`, slipping past `visitInstanceCreationExpression`. Each call
+  allocates a distinct identity-sensitive object, so two same-source
+  allocations must never be merged (Pattern 3).
+
+Making the initializer impure removes it from the tracked set entirely, so no
+occurrence is recorded and the FP cannot fire. Existing reusable cases use
+lowercase method names (`Theme.surface.from(context)`,
+`JsonUtils.toStringJson(...)`) and are unaffected.
 
 ---
 
 ## Tests Added
 
-<!-- List new or updated fixture/test files and what they verify. -->
+- `example/lib/unnecessary_code/prefer_reusing_assigned_local_fixture.dart`:
+  added `goodPostIncrementIndex` (`pts[i++]` twice — NO lint) and
+  `goodSeparateAllocations` (`ValueNotifier<bool>(false)` twice — NO lint) with
+  a local `ValueNotifier<T>` mock.
+- Scan CLI verified: the two new GOOD cases are silent; every existing
+  true-positive recompute case still fires.
+
+**Note:** a pre-existing shadowed-closure regression guard
+(`goodShadowedNestedClosure`) fires in the parse-only scan CLI because its
+`_sameBindings` shadow detection needs element resolution the CLI does not
+provide. This is unrelated to and unaffected by this fix (the change touches
+only `++`/`--` and PascalCase-call purity), and the case is correctly silent in
+a resolving analysis server.
 
 ---
 
 ## Commits
 
 <!-- Add commit hashes as fixes land. -->
+
+---
+
+## Finish Report (2026-06-09)
+
+**Scope:** (A) Dart lint rules / analyzer plugin.
+
+**Deep review:** All three additions are suppression-only — they can only make
+an initializer impure (drop it from tracking), never create a new diagnostic.
+The PascalCase heuristic relies on the universal Dart convention (types are
+PascalCase, members camelCase) so it needs no resolution and works in both the
+scan and the analysis server. Rule file, tier, severity, `LintImpact`, and the
+quick fix are unchanged.
+
+**Tests:** `dart test test/rules/code_quality/unnecessary_code_rules_test.dart`
+→ all pass. Scan-CLI behavior verified as above.
+
+**Maintenance:** CHANGELOG `[Unreleased]` Fixed bullet added. README/ROADMAP
+unchanged (false-positive fix).
+
+**Bug archived:** bugs/prefer_reusing_assigned_local_false_positive_value_changed_by_intervening_mutation.md
+→ plans/history/2026.06/2026.06.09/prefer_reusing_assigned_local_false_positive_value_changed_by_intervening_mutation.md
+
+**Finish report appended:** this file.
 
 ---
 
