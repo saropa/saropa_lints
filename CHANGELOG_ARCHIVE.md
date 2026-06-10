@@ -4891,10 +4891,13 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 - **require_deep_link_fallback quick fix**: Wraps handler body with try/catch for fallback handling. No action required.
 
-### Documentation
+<details>
+<summary>Maintenance</summary>
 
 - Updated README.md version badge to 4.5.7
 - Updated example/analysis_options_template.yaml tier counts to match actual rule counts
+
+</details>
 
 ---
 
@@ -4934,28 +4937,27 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
   - Each message now clearly explains the widget/resource context, the consequences of ignoring the rule (e.g., memory leaks, security risks, user confusion, app crashes), and the best practice for remediation.
   - This batch completes the full upgrade of all remaining rules flagged as too short, vague, or generic in previous audits.
 
-### Documentation
+### Fixed
+
+- **require_camera_permission_check**: False positive fixed for `.initialize()` calls on non-camera controllers (e.g., IsarStreamController). The rule now checks the static type to ensure only `CameraController` is flagged. Thanks to user report and test case. No action required.
+
+<details>
+<summary>Maintenance</summary>
 
 - **PERFORMANCE.md**: Updated to reflect current best practices for configuration and performance:
   - The summary table now states that tier set caching and rule filtering cache are "Built-in" (not just v3.0.0).
   - The guide now recommends using the CLI tool for tier selection and config generation, not YAML `tier:` keys.
   - All quick start and troubleshooting sections now match the latest workflow and recommendations from README.md and bin/init.dart.
-
-### Fixed
-
-- **require_camera_permission_check**: False positive fixed for `.initialize()` calls on non-camera controllers (e.g., IsarStreamController). The rule now checks the static type to ensure only `CameraController` is flagged. Thanks to user report and test case. No action required.
 - Added test fixture: to document and prevent regression of this false positive. No action required.
-
-### Added
-
 - **Automated release announcements:**. No action required.
   - Added a GitHub Actions workflow that automatically posts a new Discussion in the Announcements category whenever a new version is published. The announcement includes the relevant section from the CHANGELOG for the released version.
   - See .github/workflows/announce-release.yml for details.
-
 - **Roadmap/issue/discussion tracking improvements:**. No action required.
   - Added 🐙 emoji to the legend in ROADMAP.md and README.md to indicate rules tracked as GitHub issues.
   - Added 💡 emoji to the legend in ROADMAP.md and README.md to indicate planned enhancements tracked as GitHub Discussions.
   - This improves transparency, prioritization, and community contribution for both complex rules and planned enhancements.
+
+</details>
 
 ---
 
@@ -5025,10 +5027,14 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 **We add CLI --no-pager and better YAML handling, rename file length rules, and align custom_lint versions.**
 
-### Package Dependancies
+<details>
+<summary>Maintenance</summary>
 
 - Ensure custom_lint and custom_lint_builder use the same version in pubspec.yaml to avoid compatibility issues. If you downgrade, set both to the same version (e.g., ^0.8.0).
 - Upgraded dev dependencies: test to v1.29.0 and json2yaml to v3.0.1.
+- Migrated rules 4.2.0 and below to CHANGELOG_ARCHIVE.md. No action required.
+
+</details>
 
 ### Changed
 
@@ -5038,8 +5044,6 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
   - YAML parse errors in existing analysis_options.yaml are now caught and reported, with a fallback to a fresh config if needed.
   - Added and improved code comments throughout for clarity and maintainability.
   - Help output now documents the new flag and behaviors.
-
-- Migrated rules 4.2.0 and below to CHANGELOG_ARCHIVE.md. No action required.
 
 #### File Length Rules Renamed (structure_rules.dart)
 
@@ -5852,7 +5856,8 @@ The following 6 rules, previously implemented but not assigned to any tier, are 
 
 This ensures all implemented rules are available through tiered configuration and improves coverage for test and state management best practices.
 
-### Rule Tier Assignment Audit
+<details>
+<summary>Maintenance</summary>
 
 - Ran `scripts/audit_rules.py` to identify all implemented rules not assigned to any tier.
 - Assigned the following rules to the most appropriate tier sets in `lib/src/tiers.dart`:
@@ -5860,13 +5865,12 @@ This ensures all implemented rules are available through tiered configuration an
   - **Professional:** `prefer_copy_with_for_state`
 - All implemented rules are now available through tiered configuration. This ensures no orphaned rules and improves test and state management coverage.
 - Updated changelog to document these assignments and maintain full transparency of tier coverage.
-
-### Tier Set Maintenance
-
 - Commented out unimplemented rules in all tier sets in `lib/src/tiers.dart` to ensure only implemented rules are active per tier.
 - Confirmed all unimplemented rules are tracked in `ROADMAP.md` for future implementation.
 - This change improves roadmap alignment and prevents accidental activation of unimplemented rules.
 - Materially improve the message quality for all Critical rules
+
+</details>
 
 ## [4.1.0]
 
@@ -5968,9 +5972,12 @@ Improved problem messages for 7 critical-impact rules to provide specific conseq
 
 **Result**: Critical impact rules now at 100% DX compliance (40/40 passing).
 
-### Documentation
+<details>
+<summary>Maintenance</summary>
 
 - **PROFESSIONAL_SERVICES.md**: Rewrote professional services documentation with clearer service offerings and contact information
+
+</details>
 
 ---
 
@@ -6171,7 +6178,10 @@ Added comprehensive performance infrastructure to support 1400+ lint rules effic
 
 **Quick fix policy: HACK-comment fixes discouraged; ROADMAP quick-fix plan; audit_rules.py enhancements.**
 
-### Quick Fix Policy Update
+<details>
+<summary>Maintenance</summary>
+
+**Quick Fix Policy Update**
 
 Updated contribution guidelines and roadmap with a plan to achieve 90% quick fix coverage.
 
@@ -6194,9 +6204,11 @@ Added comprehensive plan to [ROADMAP.md](ROADMAP.md#quick-fix-implementation-pla
 
 Safety checklist: no deleting code, no behavior changes, works in edge cases.
 
-### Tooling
+**Tooling**
 
 - **`scripts/audit_rules.py`**: Now displays per-file statistics table with line counts, rule counts, and fix counts for each rule file
+
+</details>
 
 ---
 
@@ -6204,7 +6216,10 @@ Safety checklist: no deleting code, no behavior changes, works in edge cases.
 
 **Audit script v2.0: OWASP stats, tier distribution, orphan detection, DX audit.**
 
-### Audit Script v2.0
+<details>
+<summary>Maintenance</summary>
+
+**Audit Script v2.0**
 
 The `scripts/audit_rules.py` has been completely redesigned with improved readability and comprehensive analysis.
 
@@ -6234,6 +6249,8 @@ python scripts/audit_rules.py --compact    # Skip file table
 python scripts/audit_rules.py --dx-all     # Show all DX issues
 python scripts/audit_rules.py --no-dx      # Skip DX audit
 ```
+
+</details>
 
 ---
 
@@ -6474,9 +6491,12 @@ All rules can be disabled per-file with `// ignore_for_file: rule_name`.
 - **Rule pass tracking**: Records which rules passed on unchanged files to skip redundant analysis.
 - **Impact**: Files that haven't changed between saves can skip re-running passing rules.
 
-### Documentation
+<details>
+<summary>Maintenance</summary>
 
 - **Updated ROADMAP.md**: Added "Future Optimizations" section with Batch AST Visitors and Lazy Rule Instantiation as planned major refactors.
+
+</details>
 
 ---
 

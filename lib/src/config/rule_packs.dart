@@ -90,6 +90,13 @@ const Map<String, RulePackDependencyGate> kRulePackDependencyGates = {
     dependency: 'riverpod',
     constraint: '>=3.0.0',
   ),
+  // go_router 6.0.0 changed the redirect callback signature. The entire
+  // go_router_6 pack (its rule file is go_router_6_rules.dart) is a migration
+  // pack, so the whole pack is gated rather than relocating a single rule.
+  'go_router_6': RulePackDependencyGate(
+    dependency: 'go_router',
+    constraint: '>=6.0.0',
+  ),
 };
 
 /// Packs that require pubspec `environment` SDK constraints (Phase 6).

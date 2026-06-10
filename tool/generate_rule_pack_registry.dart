@@ -58,6 +58,9 @@ const Map<String, Set<String>> kPubspecMarkersByPack = {
   'geolocator': {'geolocator'},
   'get_it': {'get_it'},
   'getx': {'get', 'getx'},
+  // go_router migration pack; the whole pack is gated on go_router >= 6.0.0
+  // (kRulePackDependencyGates), so the versioned pack id needs no relocation.
+  'go_router_6': {'go_router'},
   'graphql': {'graphql'},
   'hive': {'hive', 'hive_flutter'},
   'isar': {'isar', 'isar_flutter_libs'},
@@ -93,6 +96,7 @@ const Map<String, String> kPackUiLabels = {
   'geolocator': 'Geolocator',
   'get_it': 'get_it',
   'getx': 'GetX',
+  'go_router_6': 'go_router 6.x',
   'graphql': 'GraphQL',
   'hive': 'Hive',
   'isar': 'Isar',

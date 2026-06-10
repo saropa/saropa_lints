@@ -222,6 +222,7 @@ const Map<String, Set<String>> kRulePackRuleCodesGenerated = {
     'require_getx_permanent_cleanup',
     'require_getx_worker_dispose',
   },
+  'go_router_6': {'avoid_go_router_legacy_redirect'},
   'graphql': {'avoid_graphql_string_queries'},
   'hive': {
     'avoid_hive_binary_storage',
@@ -437,6 +438,7 @@ const Map<String, Set<String>> kRulePackPubspecMarkersGenerated = {
   'geolocator': {'geolocator'},
   'get_it': {'get_it'},
   'getx': {'get', 'getx'},
+  'go_router_6': {'go_router'},
   'graphql': {'graphql'},
   'hive': {'hive', 'hive_flutter'},
   'isar': {'isar', 'isar_flutter_libs'},

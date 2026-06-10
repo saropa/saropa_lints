@@ -1568,6 +1568,9 @@ _allRuleFactories = <SaropaLintRule Function()>[
   RequireGraphqlErrorHandlingRule.new,
   AvoidLoadingFullPdfInMemoryRule.new,
 
+  // go_router migration rules (go_router_6 pack)
+  AvoidGoRouterLegacyRedirectRule.new,
+
   // GraphQL rules
   AvoidGraphqlStringQueriesRule.new,
 
