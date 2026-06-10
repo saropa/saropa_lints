@@ -83,7 +83,6 @@ _Generated from codebase scan + spot-reading rule sources._
 Every rule below has no quick fix. For each: add a fix producer under `lib/src/fixes/**`, wire it on the rule with `fixGenerators`, add a fixture and test. See **B. Batch workflow** and **2. How quick fixes work** below. Regenerate this list with: `python scripts/list_rules_without_fixes.py`.
 
 #### architecture_rules.dart
-
 - [ ] avoid_business_logic_in_ui
 - [ ] avoid_circular_dependencies
 - [ ] avoid_circular_imports
@@ -96,7 +95,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] prefer_builder_pattern
 
 #### dependency_injection_rules.dart
-
 - [ ] avoid_circular_di_dependencies
 - [ ] avoid_di_in_widgets
 - [ ] avoid_internal_dependency_creation
@@ -112,7 +110,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_typed_di_registration
 
 #### disposal_rules.dart
-
 - [ ] avoid_websocket_memory_leak
 - [ ] dispose_class_fields
 - [ ] prefer_deactivate_for_cleanup
@@ -133,7 +130,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_video_player_controller_dispose
 
 #### lifecycle_rules.dart
-
 - [ ] avoid_work_in_paused_state
 - [ ] require_app_lifecycle_handling
 - [ ] require_conflict_resolution_strategy
@@ -142,9 +138,7 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_resume_state_refresh
 
 #### structure_rules.dart
-
 - [ ] avoid_barrel_files
-- [ ] avoid_classes_with_only_static_members
 - [ ] avoid_global_state
 - [ ] avoid_hardcoded_colors
 - [ ] avoid_importing_entrypoint_exports
@@ -160,7 +154,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] avoid_very_long_length_files
 - [ ] avoid_very_long_length_test_files
 - [ ] limit_max_imports
-- [X] prefer_abstract_final_static_class
 - [ ] prefer_constructors_first
 - [ ] prefer_constructors_over_static_methods
 - [ ] prefer_deferred_imports
@@ -189,11 +182,8 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] prefer_static_method_over_function
 
 #### code_quality_avoid_rules.dart
-
 - [ ] avoid_accessing_collections_by_constant_index
-- [X] avoid_async_call_in_sync_function
 - [ ] avoid_contradictory_expressions
-- [X] avoid_default_tostring
 - [ ] avoid_deprecated_usage
 - [ ] avoid_duplicate_constant_values
 - [ ] avoid_duplicate_string_literals
@@ -208,7 +198,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] avoid_missing_interpolation
 - [ ] avoid_nested_extension_types
 - [ ] avoid_passing_self_as_argument
-- [X] avoid_positional_boolean_parameters
 - [ ] avoid_recursive_calls
 - [ ] avoid_recursive_tostring
 - [ ] avoid_referencing_discarded_variables
@@ -216,11 +205,9 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] avoid_similar_names
 - [ ] avoid_slow_collection_methods
 - [ ] banned_identifier_usage
-- [X] missing_use_result_annotation
 - [ ] use_specific_deprecation
 
 #### code_quality_control_flow_rules.dart
-
 - [ ] avoid_complex_loop_conditions
 - [ ] prefer_specific_cases_first
 - [ ] prefer_switch_expression
@@ -228,7 +215,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] prefer_switch_with_sealed_classes
 
 #### code_quality_prefer_rules.dart
-
 - [ ] pass_correct_accepted_type
 - [ ] pass_optional_argument
 - [ ] prefer_bytes_builder
@@ -247,16 +233,12 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] prefer_visible_for_testing_on_members
 
 #### code_quality_variables_rules.dart
-
 - [ ] avoid_late_final_reassignment
-- [X] avoid_late_for_nullable
 - [ ] avoid_missing_enum_constant_in_map
 - [ ] avoid_parameter_mutation
 - [ ] avoid_parameter_reassignment
 - [ ] avoid_unassigned_fields
 - [ ] avoid_unassigned_late_fields
-- [X] avoid_unnecessary_late_fields
-- [X] avoid_unnecessary_local_late
 - [ ] avoid_unnecessary_nullable_fields
 - [ ] avoid_unnecessary_nullable_parameters
 - [ ] avoid_unnecessary_patterns
@@ -267,13 +249,11 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] match_base_class_default_value
 - [ ] move_variable_closer_to_its_usage
 - [ ] move_variable_outside_iteration
-- [X] prefer_late_final
 - [ ] prefer_late_lazy_initialization
 - [ ] use_existing_destructuring
 - [ ] use_existing_variable
 
 #### complexity_rules.dart
-
 - [ ] avoid_complex_arithmetic_expressions
 - [ ] avoid_complex_conditions
 - [ ] avoid_deep_nesting
@@ -285,7 +265,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] prefer_moving_to_variable
 
 #### freezed_rules.dart
-
 - [ ] avoid_freezed_any_map_issue
 - [ ] avoid_freezed_for_logic_classes
 - [ ] avoid_freezed_invalid_annotation_target
@@ -299,14 +278,12 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_freezed_private_constructor
 
 #### iap_rules.dart
-
 - [ ] avoid_entitlement_without_server
 - [ ] avoid_purchase_in_sandbox_production
 - [ ] prefer_grace_period_handling
 - [ ] require_price_localization
 
 #### config_rules.dart
-
 - [ ] avoid_hardcoded_config
 - [ ] avoid_hardcoded_config_test
 - [ ] avoid_mixed_environments
@@ -319,12 +296,10 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_feature_flag_type_safety
 
 #### platform_rules.dart
-
 - [ ] prefer_platform_widget_adaptive
 - [ ] require_platform_check
 
 #### async_rules.dart
-
 - [ ] avoid_async_in_build
 - [ ] avoid_dialog_context_after_async
 - [ ] avoid_future_in_build
@@ -371,7 +346,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_websocket_message_validation
 
 #### class_constructor_rules.dart
-
 - [ ] avoid_accessing_other_classes_private_members
 - [ ] avoid_declaring_call_method
 - [ ] avoid_field_initializers_in_const_classes
@@ -385,11 +359,7 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] avoid_variable_shadowing
 - [ ] prefer_asserts_in_initializer_lists
 - [ ] prefer_base_class
-- [X] prefer_const_constructor_declarations
-- [X] prefer_const_constructors_in_immutables
 - [ ] prefer_factory_constructor
-- [X] prefer_final_fields
-- [X] prefer_final_fields_always
 - [ ] prefer_interface_class
 - [ ] prefer_non_const_constructors
 - [ ] prefer_private_extension_type_field
@@ -397,7 +367,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_late_access_check
 
 #### context_rules.dart
-
 - [ ] avoid_context_across_async
 - [ ] avoid_context_after_await_in_static
 - [ ] avoid_context_dependency_in_callback
@@ -409,9 +378,7 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] use_closest_build_context
 
 #### documentation_rules.dart
-
 - [ ] avoid_misleading_documentation
-- [X] deprecated_new_in_comment_reference
 - [ ] prefer_correct_throws
 - [ ] require_complex_logic_comments
 - [ ] require_deprecation_message
@@ -423,7 +390,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] verify_documented_parameters_exist
 
 #### naming_style_rules.dart
-
 - [ ] avoid_non_ascii_symbols
 - [ ] match_class_name_pattern
 - [ ] match_getter_setter_field_names
@@ -456,10 +422,8 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] prefer_prefixed_global_constants
 - [ ] prefer_typedef_for_callbacks
 - [ ] prefer_verb_method_names
-- [X] prefer_wildcard_for_unused_param
 
 #### performance_rules.dart
-
 - [ ] avoid_animation_in_large_list
 - [ ] avoid_blocking_database_ui
 - [ ] avoid_blocking_main_thread
@@ -510,7 +474,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_window_close_confirmation
 
 #### state_management_rules.dart
-
 - [ ] avoid_collection_mutating_methods
 - [ ] avoid_global_key_in_build
 - [ ] avoid_setstate_in_large_state_class
@@ -523,7 +486,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_value_notifier_dispose
 
 #### collection_rules.dart
-
 - [ ] avoid_collection_equality_checks
 - [ ] avoid_function_literals_in_foreach_calls
 - [ ] avoid_unreachable_for_loop
@@ -543,11 +505,9 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_key_for_collection
 
 #### equality_rules.dart
-
 - [ ] no_equal_arguments
 
 #### json_datetime_rules.dart
-
 - [ ] avoid_datetime_now_in_tests
 - [ ] avoid_not_encodable_in_to_json
 - [ ] prefer_correct_json_casts
@@ -562,19 +522,16 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_timezone_display
 
 #### money_rules.dart
-
 - [ ] avoid_double_for_money
 - [ ] require_currency_code_with_amount
 
 #### numeric_literal_rules.dart
-
 - [ ] no_magic_number
 - [ ] no_magic_number_in_tests
 - [ ] no_magic_string
 - [ ] no_magic_string_in_tests
 
 #### record_pattern_rules.dart
-
 - [ ] avoid_bottom_type_in_patterns
 - [ ] avoid_bottom_type_in_records
 - [ ] avoid_extensions_on_records
@@ -585,7 +542,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] avoid_nested_records
 - [ ] avoid_one_field_records
 - [ ] avoid_positional_record_field_access
-- [X] avoid_redundant_positional_field_name
 - [ ] avoid_single_field_destructuring
 - [ ] move_records_to_typedefs
 - [ ] prefer_class_destructuring
@@ -593,16 +549,13 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] prefer_simpler_patterns_null_check
 - [ ] prefer_sorted_pattern_fields
 - [ ] prefer_sorted_record_fields
-- [X] prefer_wildcard_pattern
 
 #### type_rules.dart
-
 - [ ] avoid_casting_to_extension_type
 - [ ] avoid_collection_methods_with_unrelated_types
 - [ ] avoid_dynamic_type
 - [ ] avoid_implicitly_nullable_extension_types
 - [ ] avoid_nullable_interpolation
-- [ ] avoid_nullable_parameters_with_default_values
 - [ ] avoid_nullable_tostring
 - [ ] avoid_private_typedef_functions
 - [ ] avoid_shadowing_type_parameters
@@ -611,13 +564,10 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] prefer_explicit_function_type
 - [ ] prefer_inline_function_types
 - [ ] prefer_result_type
-- [ ] prefer_type_over_var
 
 #### type_safety_rules.dart
-
 - [ ] avoid_dynamic_json_access
 - [ ] avoid_dynamic_json_chains
-- [X] avoid_non_null_assertion
 - [ ] avoid_type_casts
 - [ ] avoid_unrelated_type_casts
 - [ ] avoid_unsafe_cast
@@ -633,10 +583,7 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_validator_return_null
 
 #### control_flow_rules.dart
-
-- [ ] avoid_collapsible_if
 - [ ] avoid_constant_switches
-- [X] avoid_double_and_int_checks
 - [ ] avoid_if_with_many_branches
 - [ ] avoid_nested_assignments
 - [ ] avoid_nested_conditional_expressions
@@ -644,18 +591,14 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] avoid_nested_switches
 - [ ] avoid_nested_try
 - [ ] avoid_unnecessary_conditionals
-- [ ] avoid_unnecessary_if
 - [ ] no_equal_conditions
 - [ ] prefer_conditional_expressions
 - [ ] prefer_correct_switch_length
 - [ ] prefer_if_elements_to_conditional_expressions
 - [ ] prefer_no_continue_statement
-- [ ] prefer_null_aware_method_calls
-- [ ] prefer_returning_condition
 - [ ] prefer_when_guard_over_if
 
 #### error_handling_rules.dart
-
 - [ ] avoid_assert_in_production
 - [ ] avoid_catch_all
 - [ ] avoid_exception_in_constructor
@@ -682,12 +625,10 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_permission_permanent_denial_handling
 
 #### exception_rules.dart
-
 - [ ] avoid_non_final_exception_class_fields
 - [ ] avoid_throw_objects_without_tostring
 
 #### bluetooth_hardware_rules.dart
-
 - [ ] avoid_bluetooth_scan_without_timeout
 - [ ] prefer_ble_mtu_negotiation
 - [ ] require_audio_focus_handling
@@ -700,7 +641,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_qr_permission_check
 
 #### image_rules.dart
-
 - [ ] avoid_cached_image_unbounded_list
 - [ ] avoid_cached_image_web
 - [ ] avoid_image_picker_large_files
@@ -726,12 +666,10 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_pdf_loading_indicator
 
 #### media_rules.dart
-
 - [ ] prefer_audio_session_config
 - [ ] prefer_camera_resolution_selection
 
 #### api_network_rules.dart
-
 - [ ] avoid_cached_image_in_build
 - [ ] avoid_hardcoded_api_urls
 - [ ] avoid_over_fetching
@@ -742,7 +680,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] prefer_http_connection_reuse
 - [ ] prefer_stale_while_revalidate
 - [ ] prefer_streaming_response
-- [ ] prefer_timeout_on_requests
 - [ ] require_accept_encoding_header
 - [ ] require_analytics_event_naming
 - [ ] require_api_error_mapping
@@ -764,7 +701,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_permission_denied_handling
 - [ ] require_permission_rationale
 - [ ] require_permission_status_check
-- [ ] require_request_timeout
 - [ ] require_response_caching
 - [ ] require_retry_logic
 - [ ] require_sqflite_migration
@@ -772,11 +708,9 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_ssl_pinning_sensitive
 - [ ] require_typed_api_response
 - [ ] require_url_launcher_error_handling
-- [ ] require_websocket_error_handling
 - [ ] require_websocket_reconnection
 
 #### connectivity_rules.dart
-
 - [ ] avoid_connectivity_equals_internet
 - [ ] prefer_connectivity_debounce
 - [ ] prefer_internet_connection_checker
@@ -785,7 +719,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_connectivity_timeout
 
 #### auto_route_rules.dart
-
 - [ ] avoid_auto_route_context_navigation
 - [ ] avoid_auto_route_keep_history_misuse
 - [ ] prefer_auto_route_path_params_simple
@@ -795,7 +728,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_auto_route_guard_resume
 
 #### bloc_rules.dart
-
 - [ ] avoid_bloc_business_logic_in_ui
 - [ ] avoid_bloc_context_dependency
 - [ ] avoid_bloc_emit_after_close
@@ -851,7 +783,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_initial_state
 
 #### dio_rules.dart
-
 - [ ] avoid_dio_debug_print_production
 - [ ] avoid_dio_form_data_leak
 - [ ] avoid_dio_without_base_url
@@ -868,10 +799,8 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_dio_timeout
 
 #### drift_rules.dart
-
 - [ ] avoid_drift_close_streams_in_tests
 - [ ] avoid_drift_database_on_main_isolate
-- [ ] avoid_drift_enum_index_reorder
 - [ ] avoid_drift_foreign_key_in_migration
 - [ ] avoid_drift_get_single_without_unique
 - [ ] avoid_drift_lazy_database
@@ -902,7 +831,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_drift_stream_cancel
 
 #### equatable_rules.dart
-
 - [ ] avoid_equatable_datetime
 - [ ] avoid_equatable_nested_equality
 - [ ] avoid_mutable_field_in_equatable
@@ -919,17 +847,14 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_extend_equatable
 
 #### firebase_rules.dart
-
 - [ ] avoid_database_in_build
 - [ ] avoid_firebase_realtime_in_build
 - [ ] avoid_firebase_user_data_in_auth
 - [ ] avoid_firestore_in_widget_build
-- [ ] avoid_firestore_unbounded_query
 - [ ] avoid_map_markers_in_build
 - [ ] avoid_secure_storage_on_web
 - [ ] avoid_storing_user_data_in_auth
 - [ ] incorrect_firebase_event_name
-- [ ] incorrect_firebase_parameter_name
 - [ ] prefer_correct_topics
 - [ ] prefer_deep_link_auth
 - [ ] prefer_firebase_auth_persistence
@@ -956,12 +881,9 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_map_idle_callback
 
 #### flame_rules.dart
-
 - [ ] avoid_creating_vector_in_update
-- [X] avoid_redundant_async_on_load
 
 #### flutter_hooks_rules.dart
-
 - [ ] avoid_conditional_hooks
 - [ ] avoid_hooks_outside_build
 - [ ] avoid_misused_hooks
@@ -969,53 +891,22 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] prefer_use_callback
 
 #### geolocator_rules.dart
-
 - [ ] avoid_continuous_location_updates
 - [ ] prefer_geocoding_cache
 - [ ] prefer_geolocation_coarse_location
 - [ ] require_geolocator_battery_awareness
 
 #### get_it_rules.dart
-
 - [ ] avoid_getit_in_build
 - [ ] prefer_injectable_package
 - [ ] require_getit_dispose_registration
 - [ ] require_getit_registration_order
 - [ ] require_getit_reset_in_tests
 
-#### getx_rules.dart
-
-- [ ] always_remove_getx_listener
-- [ ] avoid_get_find_in_build
-- [ ] avoid_getx_build_context_bypass
-- [ ] avoid_getx_context_outside_widget
-- [ ] avoid_getx_dialog_snackbar_in_controller
-- [ ] avoid_getx_global_navigation
-- [ ] avoid_getx_global_state
-- [ ] avoid_getx_rx_inside_build
-- [ ] avoid_getx_rx_nested_obs
-- [ ] avoid_getx_static_context
-- [ ] avoid_getx_static_get
-- [ ] avoid_mutable_rx_variables
-- [ ] avoid_obs_outside_controller
-- [ ] avoid_tight_coupling_with_getx
-- [ ] dispose_getx_fields
-- [ ] prefer_getx_builder
-- [ ] prefer_getx_builder_over_obx
-- [ ] proper_getx_super_calls
-- [ ] require_getx_binding
-- [ ] require_getx_binding_routes
-- [ ] require_getx_controller_dispose
-- [ ] require_getx_lazy_put
-- [ ] require_getx_permanent_cleanup
-- [ ] require_getx_worker_dispose
-
 #### graphql_rules.dart
-
 - [ ] avoid_graphql_string_queries
 
 #### hive_rules.dart
-
 - [ ] avoid_hive_binary_storage
 - [ ] avoid_hive_box_name_collision
 - [ ] avoid_hive_datetime_local
@@ -1042,7 +933,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_type_adapter_registration
 
 #### isar_rules.dart
-
 - [ ] avoid_cached_isar_stream
 - [ ] avoid_isar_clear_in_production
 - [ ] avoid_isar_embedded_large_objects
@@ -1066,7 +956,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_isar_links_load
 
 #### package_specific_rules.dart
-
 - [ ] avoid_app_links_sensitive_params
 - [ ] avoid_image_picker_quick_succession
 - [ ] avoid_openai_key_in_code
@@ -1087,7 +976,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_webview_ssl_error_handling
 
 #### provider_rules.dart
-
 - [ ] avoid_change_notifier_in_widget
 - [ ] avoid_instantiating_in_value_provider
 - [ ] avoid_nested_providers
@@ -1117,13 +1005,11 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_update_should_notify
 
 #### qr_scanner_rules.dart
-
 - [ ] avoid_qr_scanner_always_active
 - [ ] require_qr_content_validation
 - [ ] require_qr_scan_feedback
 
 #### riverpod_rules.dart
-
 - [ ] avoid_circular_provider_deps
 - [ ] avoid_global_riverpod_providers
 - [ ] avoid_listen_in_async
@@ -1138,7 +1024,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] avoid_riverpod_navigation
 - [ ] avoid_riverpod_notifier_in_build
 - [ ] avoid_riverpod_state_mutation
-- [ ] avoid_riverpod_string_provider_name
 - [ ] avoid_unnecessary_consumer_widgets
 - [ ] prefer_consumer_widget
 - [ ] prefer_context_selector
@@ -1164,12 +1049,10 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] use_ref_read_synchronously
 
 #### rxdart_rules.dart
-
 - [ ] avoid_behavior_subject_last_value
 - [ ] prefer_rxdart_for_complex_streams
 
 #### shared_preferences_rules.dart
-
 - [ ] avoid_auth_state_in_prefs
 - [ ] avoid_prefs_for_large_data
 - [ ] avoid_shared_prefs_in_isolate
@@ -1184,31 +1067,26 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_shared_prefs_prefix
 
 #### sqflite_rules.dart
-
 - [ ] avoid_sqflite_type_mismatch
 - [ ] prefer_sqflite_encryption
 - [ ] require_sqflite_index_for_queries
 
 #### supabase_rules.dart
-
 - [ ] avoid_supabase_anon_key_in_code
 - [ ] require_supabase_error_handling
 - [ ] require_supabase_realtime_unsubscribe
 
 #### url_launcher_rules.dart
-
 - [ ] avoid_url_launcher_simulator_tests
 - [ ] prefer_url_launcher_fallback
 - [ ] require_url_launcher_can_launch_check
 
 #### workmanager_rules.dart
-
 - [ ] require_workmanager_constraints
 - [ ] require_workmanager_for_background
 - [ ] require_workmanager_result_return
 
 #### android_rules.dart
-
 - [ ] avoid_android_cleartext_traffic
 - [ ] avoid_android_task_affinity_default
 - [ ] prefer_foreground_service_android
@@ -1218,89 +1096,7 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_android_permission_request
 - [ ] require_backup_exclusion
 
-#### ios_capabilities_permissions_rules.dart
-
-- [ ] require_ios_accessibility_labels
-- [ ] require_ios_accessibility_large_text
-- [ ] require_ios_app_clip_size_limit
-- [ ] require_ios_app_group_capability
-- [ ] require_ios_app_tracking_transparency
-- [ ] require_ios_background_audio_capability
-- [ ] require_ios_background_mode
-- [ ] require_ios_background_refresh_declaration
-- [ ] require_ios_biometric_fallback
-- [ ] require_ios_callkit_integration
-- [ ] require_ios_carplay_setup
-- [ ] require_ios_face_id_usage_description
-- [ ] require_ios_healthkit_authorization
-- [ ] require_ios_live_activities_setup
-- [ ] require_ios_local_notification_permission
-- [ ] require_ios_nfc_capability_check
-- [ ] require_ios_pasteboard_privacy_handling
-- [ ] require_ios_permission_description
-- [ ] require_ios_photo_library_add_usage
-- [ ] require_ios_photo_library_limited_access
-- [ ] require_ios_privacy_manifest
-- [ ] require_ios_promotion_display_support
-- [ ] require_ios_push_notification_capability
-- [ ] require_ios_quick_note_awareness
-- [ ] require_ios_share_sheet_uti_declaration
-- [ ] require_ios_siri_intent_definition
-- [ ] require_ios_voiceover_gesture_compatibility
-- [ ] require_ios_widget_extension_capability
-
-#### ios_platform_lifecycle_rules.dart
-
-- [ ] avoid_ios_13_deprecations
-- [ ] avoid_ios_battery_drain_patterns
-- [ ] avoid_ios_continuous_location_tracking
-- [ ] avoid_ios_debug_code_in_release
-- [ ] avoid_ios_deprecated_uikit
-- [ ] avoid_ios_force_unwrap_in_callbacks
-- [ ] avoid_ios_hardcoded_bundle_id
-- [ ] avoid_ios_hardcoded_device_model
-- [ ] avoid_ios_hardcoded_keyboard_height
-- [ ] avoid_ios_in_app_browser_for_auth
-- [ ] avoid_ios_misleading_push_notifications
-- [ ] avoid_ios_simulator_only_code
-- [ ] avoid_ios_wifi_only_assumption
-- [ ] avoid_long_running_isolates
-- [ ] avoid_notification_spam
-- [ ] prefer_background_sync
-- [ ] prefer_delayed_permission_prompt
-- [ ] prefer_ios_app_intents_framework
-- [ ] prefer_ios_context_menu
-- [ ] prefer_ios_handoff_support
-- [ ] prefer_ios_spotlight_indexing
-- [ ] prefer_ios_storekit2
-- [ ] require_ios_age_rating_consideration
-- [ ] require_ios_app_review_prompt_timing
-- [ ] require_ios_data_protection
-- [ ] require_ios_database_conflict_resolution
-- [ ] require_ios_deployment_target_consistency
-- [ ] require_ios_dynamic_island_safe_zones
-- [ ] require_ios_entitlements
-- [ ] require_ios_focus_mode_awareness
-- [ ] require_ios_icloud_kvstore_limitations
-- [ ] require_ios_keychain_for_credentials
-- [ ] require_ios_keychain_sync_awareness
-- [ ] require_ios_launch_storyboard
-- [ ] require_ios_low_power_mode_handling
-- [ ] require_ios_method_channel_cleanup
-- [ ] require_ios_minimum_version_check
-- [ ] require_ios_multitasking_support
-- [ ] require_ios_orientation_handling
-- [ ] require_ios_receipt_validation
-- [ ] require_ios_review_prompt_frequency
-- [ ] require_ios_scene_delegate_awareness
-- [ ] require_ios_version_check
-- [x] require_notification_for_long_tasks
-- [ ] require_purchase_restoration
-- [ ] require_purchase_verification
-- [ ] require_sync_error_recovery
-
 #### ios_ui_security_rules.dart
-
 - [ ] avoid_ios_hardcoded_status_bar
 - [ ] prefer_cupertino_for_ios
 - [ ] prefer_ios_haptic_feedback
@@ -1312,7 +1108,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_ios_universal_links_domain_matching
 
 #### linux_rules.dart
-
 - [ ] avoid_hardcoded_unix_paths
 - [ ] avoid_sudo_shell_commands
 - [ ] avoid_x11_only_assumptions
@@ -1320,7 +1115,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_linux_font_fallback
 
 #### macos_rules.dart
-
 - [ ] avoid_macos_catalyst_unsupported_apis
 - [ ] avoid_macos_deprecated_security_apis
 - [ ] avoid_macos_full_disk_access
@@ -1338,7 +1132,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_macos_window_size_constraints
 
 #### web_rules.dart
-
 - [ ] avoid_js_rounded_ints
 - [ ] avoid_platform_channel_on_web
 - [ ] avoid_web_only_dependencies
@@ -1350,20 +1143,17 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_web_renderer_awareness
 
 #### windows_rules.dart
-
 - [ ] avoid_forward_slash_path_assumption
 - [ ] avoid_hardcoded_drive_letters
 - [ ] avoid_max_path_risk
 - [ ] require_windows_single_instance_check
 
 #### db_yield_rules.dart
-
 - [ ] avoid_return_await_db
 - [ ] require_yield_after_db_write
 - [ ] suggest_yield_after_db_read
 
 #### file_handling_rules.dart
-
 - [ ] avoid_loading_full_pdf_in_memory
 - [ ] avoid_sqflite_read_all_columns
 - [ ] avoid_sqflite_reserved_words
@@ -1381,7 +1171,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_sqflite_whereargs
 
 #### memory_management_rules.dart
-
 - [ ] avoid_capturing_this_in_callbacks
 - [ ] avoid_expando_circular_references
 - [ ] avoid_large_isolate_communication
@@ -1398,7 +1187,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_image_disposal
 
 #### resource_management_rules.dart
-
 - [ ] avoid_image_picker_without_source
 - [ ] prefer_coarse_location_when_sufficient
 - [ ] prefer_geolocator_accuracy_appropriate
@@ -1416,13 +1204,11 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_websocket_close
 
 #### crypto_rules.dart
-
 - [ ] avoid_deprecated_crypto_algorithms
 - [ ] avoid_hardcoded_encryption_keys
 - [ ] require_secure_key_generation
 
 #### permission_rules.dart
-
 - [ ] avoid_permission_handler_null_safety
 - [ ] avoid_permission_request_loop
 - [ ] prefer_image_cropping
@@ -1432,40 +1218,7 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_location_permission_rationale
 - [ ] require_permission_lifecycle_observer
 
-#### security_auth_storage_rules.dart
-
-- [ ] avoid_auth_in_query_params
-- [ ] avoid_encryption_key_in_memory
-- [ ] avoid_hardcoded_credentials
-- [ ] avoid_jwt_decode_client
-- [ ] avoid_secure_storage_large_data
-- [ ] avoid_sensitive_data_in_clipboard
-- [ ] avoid_storing_passwords
-- [ ] avoid_storing_sensitive_unencrypted
-- [ ] prefer_biometric_protection
-- [ ] prefer_local_auth
-- [ ] prefer_oauth_pkce
-- [ ] prefer_root_detection
-- [ ] prefer_webview_sandbox
-- [ ] prefer_whitelist_validation
-- [ ] require_auth_check
-- [ ] require_biometric_fallback
-- [ ] require_clipboard_paste_validation
-- [ ] require_data_encryption
-- [ ] require_keychain_access
-- [ ] require_logout_cleanup
-- [ ] require_multi_factor
-- [ ] require_secure_password_field
-- [ ] require_secure_storage
-- [ ] require_secure_storage_auth_data
-- [ ] require_secure_storage_error_handling
-- [ ] require_secure_storage_for_auth
-- [ ] require_session_timeout
-- [ ] require_token_refresh
-- [ ] require_webview_user_agent
-
 #### security_network_input_rules.dart
-
 - [ ] avoid_api_key_in_code
 - [ ] avoid_clipboard_sensitive
 - [ ] avoid_dynamic_code_loading
@@ -1502,15 +1255,12 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_webview_error_handling
 
 #### formatting_rules.dart
-
 - [ ] enforce_parameters_ordering
 - [ ] enum_constants_ordering
-- [X] format_comment_style
 - [ ] prefer_member_ordering
 - [ ] prefer_readable_line_length
 
 #### stylistic_additional_rules.dart
-
 - [ ] prefer_absolute_imports
 - [ ] prefer_camel_case_method_names
 - [ ] prefer_concatenation_over_interpolation
@@ -1532,7 +1282,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] prefer_var_over_explicit_type
 
 #### stylistic_control_flow_rules.dart
-
 - [ ] avoid_cascade_notation
 - [ ] prefer_await_over_then
 - [ ] prefer_cascade_assignments
@@ -1554,7 +1303,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] prefer_then_over_await
 
 #### stylistic_error_testing_rules.dart
-
 - [ ] prefer_error_suffix
 - [ ] prefer_exception_suffix
 - [ ] prefer_expect_over_assert_in_tests
@@ -1569,7 +1317,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] prefer_test_name_should_when
 
 #### stylistic_null_collection_rules.dart
-
 - [ ] prefer_addall_over_spread
 - [ ] prefer_collection_if_over_ternary
 - [ ] prefer_explicit_null_assignment
@@ -1583,11 +1330,7 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] prefer_ternary_over_collection_if
 
 #### stylistic_rules.dart
-
-- [X] avoid_escaping_inner_quotes
 - [ ] avoid_explicit_type_declaration
-- [X] avoid_single_cascade_in_expression_statements
-- [X] avoid_types_on_closure_parameters
 - [ ] prefer_adjacent_strings
 - [ ] prefer_all_named_parameters
 - [ ] prefer_arrow_functions
@@ -1600,25 +1343,20 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] prefer_doc_straight_apostrophe
 - [ ] prefer_explicit_null_checks
 - [ ] prefer_explicit_types
-- [X] prefer_expression_body_getters
 - [ ] prefer_fixme_format
 - [ ] prefer_inline_callbacks
 - [ ] prefer_interpolation_to_compose
 - [ ] prefer_one_widget_per_file
 - [ ] prefer_optional_named_params
 - [ ] prefer_optional_positional_params
-- [X] prefer_period_after_doc
 - [ ] prefer_positional_bool_params
 - [ ] prefer_private_underscore_prefix
-- [X] prefer_raw_strings
 - [ ] prefer_relative_imports
 - [ ] prefer_snake_case_files
 - [ ] prefer_todo_format
-- [ ] prefer_trailing_comma_always
 - [ ] prefer_widget_methods_over_classes
 
 #### stylistic_whitespace_constructor_rules.dart
-
 - [ ] prefer_compact_class_members
 - [ ] prefer_compact_declarations
 - [ ] prefer_constructor_assertion
@@ -1633,7 +1371,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] prefer_super_parameters
 
 #### stylistic_widget_rules.dart
-
 - [ ] prefer_borderradius_circular
 - [ ] prefer_clip_r_superellipse
 - [ ] prefer_clip_r_superellipse_clipper
@@ -1649,7 +1386,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] prefer_text_rich_over_richtext
 
 #### debug_rules.dart
-
 - [ ] avoid_unguarded_debug
 - [ ] prefer_commenting_analyzer_ignores
 - [ ] prefer_conditional_logging
@@ -1660,7 +1396,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_structured_logging
 
 #### test_rules.dart
-
 - [ ] avoid_async_callback_in_fake_async
 - [ ] avoid_duplicate_test_assertions
 - [ ] avoid_empty_test_groups
@@ -1698,7 +1433,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_text_input_tests
 
 #### testing_best_practices_rules.dart
-
 - [ ] avoid_find_all
 - [ ] avoid_find_by_text
 - [ ] avoid_flaky_tests
@@ -1735,7 +1469,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_test_setup_teardown
 
 #### accessibility_rules.dart
-
 - [ ] avoid_auto_play_media
 - [ ] avoid_color_only_indicators
 - [ ] avoid_color_only_meaning
@@ -1746,7 +1479,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] avoid_image_buttons_without_tooltip
 - [ ] avoid_merged_semantics_hiding_info
 - [ ] avoid_motion_without_reduce
-- [X] avoid_redundant_semantics
 - [ ] avoid_semantics_exclusion
 - [ ] avoid_semantics_in_animation
 - [ ] avoid_small_touch_targets
@@ -1787,7 +1519,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_text_scale_factor_awareness
 
 #### animation_rules.dart
-
 - [ ] avoid_animation_in_build
 - [ ] avoid_animation_rebuild_waste
 - [ ] avoid_clip_during_animation
@@ -1809,7 +1540,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_vsync_mixin
 
 #### internationalization_rules.dart
-
 - [ ] avoid_hardcoded_app_name
 - [ ] avoid_hardcoded_locale
 - [ ] avoid_hardcoded_locale_strings
@@ -1838,7 +1568,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_rtl_support
 
 #### navigation_rules.dart
-
 - [ ] avoid_circular_redirects
 - [ ] avoid_deep_link_sensitive_params
 - [ ] avoid_go_router_inline_creation
@@ -1879,7 +1608,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_will_pop_scope
 
 #### notification_rules.dart
-
 - [ ] avoid_notification_payload_sensitive
 - [ ] avoid_notification_same_id
 - [ ] avoid_notification_silent_failure
@@ -1891,7 +1619,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_notification_timezone_awareness
 
 #### build_method_rules.dart
-
 - [ ] avoid_analytics_in_build
 - [ ] avoid_canvas_operations_in_build
 - [ ] avoid_dialog_in_build
@@ -1905,7 +1632,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] prefer_single_setstate
 
 #### dialog_snackbar_rules.dart
-
 - [ ] avoid_snackbar_queue_buildup
 - [ ] require_dialog_barrier_dismissible
 - [ ] require_dialog_result_handling
@@ -1913,7 +1639,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_snackbar_duration
 
 #### forms_rules.dart
-
 - [ ] avoid_clearing_form_on_error
 - [ ] avoid_form_in_alert_dialog
 - [ ] avoid_form_validation_on_change
@@ -1942,7 +1667,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_text_overflow_in_row
 
 #### scroll_rules.dart
-
 - [ ] avoid_excessive_bottom_nav_items
 - [ ] avoid_infinite_scroll_duplicate_requests
 - [ ] avoid_listview_children_for_large_lists
@@ -1963,7 +1687,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_tab_controller_length_sync
 
 #### theming_rules.dart
-
 - [ ] avoid_elevation_opacity_in_dark
 - [ ] prefer_dark_mode_colors
 - [ ] prefer_high_contrast_mode
@@ -1972,7 +1695,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_semantic_colors
 
 #### ui_ux_rules.dart
-
 - [ ] avoid_badge_without_meaning
 - [ ] avoid_loading_flash
 - [ ] prefer_adaptive_icons
@@ -1996,7 +1718,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_webview_progress_indicator
 
 #### widget_layout_constraints_rules.dart
-
 - [ ] avoid_absorb_pointer_misuse
 - [ ] avoid_border_all
 - [ ] avoid_builder_index_out_of_bounds
@@ -2018,14 +1739,11 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] avoid_textfield_in_row
 - [ ] avoid_unbounded_constraints
 - [ ] avoid_unconstrained_box_misuse
-- [X] avoid_unconstrained_dialog_column
 - [ ] avoid_unconstrained_images
 - [ ] avoid_wrapping_in_padding
 - [ ] check_for_equals_in_render_object_setters
 - [ ] consistent_update_render_object
 - [ ] prefer_clip_behavior
-- [X] prefer_const_border_radius
-- [X] prefer_const_widgets_in_lists
 - [ ] prefer_correct_edge_insets_constructor
 - [ ] prefer_custom_single_child_layout
 - [ ] prefer_fractional_sizing
@@ -2039,40 +1757,12 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] prefer_sliver_app_bar
 - [ ] prefer_spacing_over_sizedbox
 - [ ] prefer_transform_over_container
-- [X] require_baseline_text_baseline
 - [ ] require_overflow_box_rationale
 
 #### widget_layout_flex_scroll_rules.dart
-
-- [ ] avoid_expanded_as_spacer
-- [ ] avoid_expanded_outside_flex
-- [ ] avoid_flexible_outside_flex
-- [ ] avoid_layout_builder_in_scrollable
-- [ ] avoid_listview_without_item_extent
-- [ ] avoid_nested_scrollables
-- [ ] avoid_scrollable_in_intrinsic
-- [ ] avoid_shrink_wrap_in_lists
-- [ ] avoid_shrink_wrap_in_scroll
-- [ ] avoid_single_child_column_row
-- [ ] avoid_singlechildscrollview_with_column
-- [ ] avoid_spacer_in_wrap
-- [ ] avoid_unbounded_listview_in_column
-- [ ] prefer_expanded_at_call_site
-- [ ] prefer_find_child_index_callback
-- [ ] prefer_flex_for_complex_layout
-- [ ] prefer_keep_alive
-- [ ] prefer_listview_builder
-- [ ] prefer_sliver_list
-- [ ] prefer_sliver_list_delegate
 - [ ] prefer_sliver_prefix
-- [ ] prefer_using_list_view
-- [ ] prefer_wrap_over_overflow
-- [ ] require_physics_for_nested_scroll
-- [ ] require_scroll_controller
-- [ ] require_scroll_physics
 
 #### widget_lifecycle_rules.dart
-
 - [ ] always_remove_listener
 - [ ] avoid_build_context_in_providers
 - [ ] avoid_context_in_initstate_dispose
@@ -2109,7 +1799,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_widgets_binding_callback
 
 #### widget_patterns_avoid_prefer_rules.dart
-
 - [ ] avoid_bool_in_widget_constructors
 - [ ] avoid_catching_generic_exception
 - [ ] avoid_double_tap_submit
@@ -2121,7 +1810,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] avoid_gesture_without_behavior
 - [ ] avoid_hardcoded_asset_paths
 - [ ] avoid_hardcoded_text_styles
-- [ ] avoid_icon_size_override
 - [ ] avoid_image_repeat
 - [ ] avoid_image_without_cache
 - [ ] avoid_incorrect_image_opacity
@@ -2167,7 +1855,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] prefer_widget_private_members
 
 #### widget_patterns_require_rules.dart
-
 - [ ] prefer_overlay_portal_layout_builder
 - [ ] require_animated_builder_child
 - [ ] require_button_loading_state
@@ -2178,17 +1865,13 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_error_widget
 - [ ] require_form_validation
 - [ ] require_hover_states
-- [ ] require_https_over_http
-- [ ] require_image_dimensions
-- [ ] require_image_error_builder
-- [x] require_image_picker_permission_android
+- [ ] require_image_picker_permission_android
 - [ ] require_image_picker_permission_ios
 - [ ] require_locale_for_text
 - [ ] require_long_press_callback
 - [ ] require_orientation_handling
 - [ ] require_permission_manifest_android
 - [ ] require_permission_plist_ios
-- [ ] require_placeholder_for_network
 - [ ] require_refresh_indicator
 - [ ] require_rethrow_preserve_stack
 - [ ] require_safe_area_handling
@@ -2199,10 +1882,8 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] require_url_launcher_schemes_ios
 - [ ] require_webview_navigation_delegate
 - [ ] require_window_size_constraints
-- [ ] require_wss_over_ws
 
 #### widget_patterns_ux_rules.dart
-
 - [ ] avoid_brightness_check_for_theme
 - [ ] prefer_action_button_tooltip
 - [ ] prefer_color_scheme_from_seed
