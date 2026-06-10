@@ -226,10 +226,45 @@ class AvoidMissingEnumConstantInMapRule extends SaropaLintRule {
 
       // Only flag if there are actually missing constants
       final Set<String> missing = allConstants.difference(usedConstants);
-      if (missing.isNotEmpty) {
-        reporter.atNode(node);
-      }
+      if (missing.isEmpty) return;
+
+      // A partial map passed as a named argument alongside a sibling argument
+      // that fixes the same enum to a single value is an intentional scoped
+      // override, not a dispatch table — e.g. `Dismissible(direction:
+      // DismissDirection.up, dismissThresholds: {DismissDirection.up: 0.25})`,
+      // where every other direction can never fire so listing it would be dead
+      // configuration. The framework supplies defaults for the absent keys, so
+      // the silent-null harm the rule guards against cannot occur.
+      if (_hasConstrainingEnumSibling(node, enumElement)) return;
+
+      reporter.atNode(node);
     });
+  }
+
+  /// True when [mapNode] is a named argument and another named argument in the
+  /// same argument list has a value of the same enum type [enumElement] — a
+  /// sibling that constrains which constants are reachable (e.g. `direction:`
+  /// paired with `dismissThresholds:` on `Dismissible`).
+  bool _hasConstrainingEnumSibling(
+    SetOrMapLiteral mapNode,
+    EnumElement enumElement,
+  ) {
+    final AstNode? named = mapNode.parent;
+    if (named is! NamedExpression) return false;
+    final AstNode? argumentList = named.parent;
+    if (argumentList is! ArgumentList) return false;
+
+    for (final Expression arg in argumentList.arguments) {
+      if (identical(arg, named)) continue;
+      if (arg is! NamedExpression) continue;
+
+      final DartType? siblingType = arg.expression.staticType;
+      if (siblingType is InterfaceType &&
+          identical(siblingType.element, enumElement)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /// Resolves the enum element from a map literal's key type.

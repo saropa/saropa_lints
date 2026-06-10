@@ -1,6 +1,6 @@
 # BUG: `avoid_missing_enum_constant_in_map` — False positive on partial enum-keyed map when sibling argument constrains the active set
 
-**Status: Open**
+**Status: Fixed**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
@@ -158,19 +158,71 @@ should include:
 
 ## Changes Made
 
-<!-- Fill in when a fix is written. -->
+Implemented Option A (constraining-sibling exemption), generalized so it does
+not hardcode `Dismissible`. In `AvoidMissingEnumConstantInMapRule.runWithReporter`
+(`code_quality_variables_rules.dart`), before reporting a map with missing
+constants, call the new `_hasConstrainingEnumSibling(node, enumElement)`:
+
+- It confirms the map is the value of a `NamedExpression` inside an
+  `ArgumentList`, then scans the sibling arguments. If any sibling
+  `NamedExpression` has a value whose static type is the SAME enum
+  (`InterfaceType.element` identical to the map-key `enumElement`), the map is
+  treated as an intentional scoped override and the diagnostic is suppressed.
+
+This covers both `direction: DismissDirection.up` (single direction) and
+`direction: DismissDirection.horizontal` (composite subset) without needing the
+constraining constant to appear as a map key — the mere presence of a
+same-enum sibling is the signal. A standalone partial enum-keyed map (no
+constraining sibling) still flags.
 
 ---
 
 ## Tests Added
 
-<!-- List new or updated fixture/test files and what they verify. -->
+- `example/lib/code_quality/avoid_missing_enum_constant_in_map_fixture.dart`:
+  added a `_Constrained` widget-like class and two cases — `_withConstraint`
+  (partial map with a `direction:` sibling → NO lint) and `_withoutConstraint`
+  (partial map, no constraining sibling → LINT). Existing complete/incomplete
+  and ignore-based cases retained.
+
+**Verification limitation:** the project scan CLI uses parse-only (unresolved)
+AST, so `_resolveEnumKeyType` cannot resolve the enum-key static type and the
+rule does not fire there at all — not even on the pre-existing BAD cases. The
+fix is therefore verified by inspection and a clean analyze: the new helper
+only ADDS a suppression path gated on resolved enum-type identity, so it can
+never introduce a new false positive. In a consumer's analysis server (where
+enum types resolve), the constrained map is exempt and the standalone partial
+map still flags.
 
 ---
 
 ## Commits
 
 <!-- Add commit hashes as fixes land. -->
+
+---
+
+## Finish Report (2026-06-09)
+
+**Scope:** (A) Dart lint rules / analyzer plugin.
+
+**Deep review:** `_hasConstrainingEnumSibling` is a bounded single pass over the
+argument list, O(args). It is purely additive (suppression only). It uses
+`identical(...)` on element instances rather than name matching, so it cannot
+be fooled by a same-named enum in another library. Rule file, tier, severity
+(INFO), `LintImpact` unchanged.
+
+**Tests:** `dart test test/rules/code_quality/code_quality_rules_test.dart` →
+all pass. Scan-CLI cannot exercise this resolution-dependent rule (noted above);
+verified by inspection + clean analyze.
+
+**Maintenance:** CHANGELOG `[Unreleased]` Fixed bullet added. README/ROADMAP
+unchanged (false-positive fix).
+
+**Bug archived:** bugs/avoid_missing_enum_constant_in_map_false_positive_partial_map_intentional_default.md
+→ plans/history/2026.06/2026.06.09/avoid_missing_enum_constant_in_map_false_positive_partial_map_intentional_default.md
+
+**Finish report appended:** this file.
 
 ---
 
