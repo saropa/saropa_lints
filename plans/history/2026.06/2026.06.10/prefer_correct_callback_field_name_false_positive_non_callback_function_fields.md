@@ -199,3 +199,46 @@ The fixture for this rule should include:
 - Dart SDK version: 3.12.1 (stable)
 - Triggering project/files: `saropa_dart_utils` —
   `lib/async/rate_limiter_utils.dart:27`, `lib/async/task_scheduler_utils.dart:105`
+
+---
+
+## Finish Report (2026-06-10)
+
+**Scope:** (A) Dart lint rule. One rule modified, its fixture extended, CHANGELOG
++ this bug file updated.
+
+**Change (core logic):** `PreferCorrectCallbackFieldNameRule` in
+`lib/src/rules/core/naming_style_rules.dart` (rule version v5 → v6, message tag
+`{v5}` → `{v6}`).
+
+- Replaced the two inline `isCallback` predicates (field branch + constructor-
+  parameter branch) with a single static `_isEventCallbackType(String)`. It drops
+  the bare `Function` / `void Function` / `=> void` substring triggers and
+  `ValueGetter` (a value provider), keeping only event-callback shapes: any type
+  containing `Callback`, `ValueChanged`, or `ValueSetter`.
+- Added static `_hasNonCallbackNameRole(String)` + a `_nonCallbackNameRoles` set
+  (`builder`, `validator`, `getter`, `setter`, `factory`, `provider`,
+  `predicate`, `comparator`, `selector`); names matching/ending in these are
+  skipped in both branches even when the type is callback-shaped.
+
+Suggestion (3) (user-configurable exemption list) deliberately not implemented —
+adds config plumbing unneeded for the reported cases; deferred until a domain
+provider outside the name-role list actually surfaces.
+
+**Tests:** `test/rules/core/naming_style_rules_test.dart` (instantiation +
+name-list pins) re-run — `+73 All tests passed`. No test pinned this rule's
+message version (the `{v5}` assertion at line 275 belongs to
+`PreferWildcardForUnusedParamRule`, unaffected). Behavior verified with the scan
+CLI against a 7-case reproducer enabling only this rule: exactly 2 diagnostics —
+`tapHandler` (`VoidCallback`) and `changed` (`ValueChanged<int>`); `now`
+(`DateTime Function()?`), `start` (`void Function()`), `builder`, `validator`,
+`onTap` produced none. Fixture
+`example/lib/naming_style/prefer_correct_callback_field_name_fixture.dart`
+extended with all seven cases.
+
+**Files:** `lib/src/rules/core/naming_style_rules.dart`,
+`example/lib/naming_style/prefer_correct_callback_field_name_fixture.dart`,
+`CHANGELOG.md`, this bug file (archived to
+`plans/history/2026.06/2026.06.10/`).
+
+**Outstanding:** none for the reported false positives.

@@ -85,6 +85,7 @@ Adds one-click quick fixes for eight more lint rules, so common simplifications 
 ### Fixed
 
 - **`prefer_correct_callback_field_name` no longer flags non-callback function-typed fields and parameters.** The `on` prefix it asks for is for event handlers, but the rule treated every function type as a callback, so value providers (`DateTime Function()? now`), action thunks (`void Function() start`), and builder/validator members were wrongly told to rename. It now fires only on genuine callback typedefs (`VoidCallback`, `ValueChanged`, `ValueSetter`, anything ending in `Callback`) and skips names whose role is builder/validator/getter/setter/factory/provider/predicate/comparator/selector. Remove any `// ignore:` you added for these. No action required otherwise.
+- **`prefer_trailing_comma_always` no longer demands a comma after a block-formatted collection-literal argument.** When a call's last argument is a multi-line list, set, or map literal (`foo(<int>{ ... })`), `dart format` hugs the bracket to the call paren and adds no trailing comma — so the rule's request was a false positive that `dart format` actively reverses. The argument-list exemption already covered a trailing function-expression callback; it now covers collection literals the same way, matching the SDK `require_trailing_commas` block-formatted-last-argument exemption. Two scalar arguments with no block still require the comma. Remove any `// ignore:` you added for these.
 
 <details>
 <summary>Maintenance</summary>
