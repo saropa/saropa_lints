@@ -9,6 +9,7 @@ import 'package:analyzer/dart/element/type.dart';
 
 import '../../analyzer_metadata_compat_utils.dart';
 import '../../fixes/type/prefer_const_declarations_fix.dart';
+import '../../fixes/type/remove_type_question_fix.dart';
 import '../../fixes/type/prefer_final_locals_fix.dart';
 import '../../fixes/type/remove_null_assertion_fix.dart';
 import '../../fixes/type/replace_unnecessary_type_assertion_fix.dart';
@@ -639,6 +640,12 @@ class AvoidNullableParametersWithDefaultValuesRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveTypeQuestionFix(context: context),
+  ];
 }
 
 /// Warns when calling `.toString()` on a nullable value without null check.

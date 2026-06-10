@@ -64,7 +64,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [Unreleased]
 
-Adds one-click quick fixes for five more lint rules, so common simplifications can be applied straight from the IDE lightbulb instead of by hand. An if/else (or if plus a following return) that returns `true` in one branch and `false` in the other collapses to a direct return of the condition, a nested `if` with no else on either level merges into a single combined condition, an explicit null-check-then-call becomes the null-aware `?.` form, and a class that holds only static members is marked `abstract final` so it can no longer be instantiated. No action required. [log](https://github.com/saropa/saropa_lints/blob/v13.12.5/CHANGELOG.md)
+Adds one-click quick fixes for eight more lint rules, so common simplifications can be applied straight from the IDE lightbulb instead of by hand. An if/else (or if plus a following return) that returns `true` in one branch and `false` in the other collapses to a direct return of the condition, a nested `if` with no else on either level merges into a single combined condition, an explicit null-check-then-call becomes the null-aware `?.` form, and a class that holds only static members is marked `abstract final` so it can no longer be instantiated. Redundant arguments and a redundant nullable `?` are now removable in one click too. Eleven Riverpod and Bloc rules that flag preferences or should-fix patterns (not crashes) drop from error to warning, so they no longer fail a strict build. No action required. [log](https://github.com/saropa/saropa_lints/blob/v13.12.5/CHANGELOG.md)
 
 ### Added
 
@@ -72,12 +72,19 @@ Adds one-click quick fixes for five more lint rules, so common simplifications c
 - **`avoid_collapsible_if` gains a quick fix that merges the nested if into its parent.** `if (a) { if (b) { … } }` becomes `if ((a) && (b)) { … }`, with both conditions parenthesized to preserve precedence. No action required.
 - **`prefer_null_aware_method_calls` gains a quick fix that rewrites the guard with `?.`.** `if (x != null) x.foo();` and `x != null ? x.foo() : null` both become `x?.foo()`, reusing the original receiver and arguments verbatim. No action required.
 - **`avoid_classes_with_only_static_members` gains a quick fix that adds `abstract final` modifiers.** This makes a static-only utility class non-instantiable, matching the existing `prefer_abstract_final_static_class` fix. No action required.
+- **`avoid_icon_size_override` and `avoid_riverpod_string_provider_name` gain a quick fix that removes the flagged named argument.** The `size:` argument on `Icon` and the `name:` argument on a provider are deleted together with their comma so the remaining arguments stay valid. No action required.
+- **`avoid_nullable_parameters_with_default_values` gains a quick fix that removes the redundant `?`.** A parameter with a non-null default does not need a nullable type, so `int? x = 0` becomes `int x = 0`. No action required.
+
+### Changed
+
+- **Eleven Riverpod and Bloc rules downgraded from error to warning severity.** Five Riverpod/Bloc preference rules (`prefer_cubit_for_simple`, `prefer_copy_with_for_state`, `prefer_consumer_widget`, `prefer_select_for_partial`, `prefer_family_for_params`) plus six Bloc should-fix-pattern rules (`avoid_bloc_event_in_constructor`, `require_immutable_bloc_state`, `require_bloc_observer`, `avoid_bloc_event_mutation`, `avoid_bloc_listen_in_build`, `require_error_state`) flag performance, architectural, or known-bad patterns — not broken or crashing code — so error severity over-stated them and could fail a strict build. They now report as warnings. Bloc rules that do break at runtime keep error severity: `require_initial_state` (throws `LateInitializationError`) and `require_bloc_close` (resource leak), as do genuinely-crashing `prefer_*` rules like `prefer_platform_io_conditional` (throws on Flutter web).
 
 <details>
 <summary>Maintenance</summary>
 
 - The rule-pack lockfile resolver can now distinguish direct from transitive dependencies (`isDirectDependency`), parsing the `dependency:` field of `pubspec.lock`. This is the resolver primitive behind the ratified "direct-only suggestions" policy; the suggest UX that consumes it is not yet wired. No behavior change for users.
 - Corrected stale test paths in the plugin-system migration plan so the documented rule-pack verification command (`test/config/rule_packs_*.dart`) actually runs. Plan housekeeping only.
+- Re-keyed the three remaining DX-message audit scripts (`_audit_dx.py`, `_improve_dx_messages.py`, `_audit.py`) from the retired 5-bucket impact taxonomy to the 3-level `error/warning/info` severity model, so their length thresholds and per-severity report tables grade against live values instead of silently defaulting. Internal tooling only; closes SEV-04 of the LintImpact→severity collapse plan.
 
 </details>
 

@@ -8,6 +8,7 @@ import 'package:analyzer/dart/ast/visitor.dart';
 
 import '../../import_utils.dart';
 import '../../saropa_lint_rule.dart';
+import '../../fixes/common/remove_named_argument_fix.dart';
 import '../../fixes/packages/riverpod/comment_out_notifier_assignment_fix.dart';
 import '../../fixes/packages/riverpod/replace_read_with_watch_fix.dart';
 
@@ -1656,7 +1657,9 @@ class PreferConsumerWidgetRule extends SaropaLintRule {
     '[prefer_consumer_widget] Wrapping widgets with Consumer adds unnecessary nesting and boilerplate instead of using ConsumerWidget directly. The extra widget layer causes redundant rebuilds and increases the widget tree depth, leading to harder-to-debug rebuild cascades and degraded rendering performance. {v4}',
     correctionMessage:
         'Extend ConsumerWidget instead of wrapping with Consumer to simplify your widget tree and improve code clarity.',
-    severity: DiagnosticSeverity.ERROR,
+    // SEV-01: Consumer-vs-ConsumerWidget is a rebuild/style preference,
+    // a should-fix WARNING, not a crash/exploit ERROR. Matches impact.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
@@ -1880,6 +1883,12 @@ class AvoidRiverpodStringProviderNameRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveNamedArgumentFix(context: context),
+  ];
 }
 
 /// Warns when ref.read() is used inside a build() method body.
@@ -2180,7 +2189,9 @@ class PreferSelectForPartialRule extends SaropaLintRule {
     '[prefer_select_for_partial] Watching the entire provider when only one field is needed causes unnecessary widget tree rebuilds, wasting memory and CPU cycles and reducing app performance. This makes your UI less efficient and responsive. {v2}',
     correctionMessage:
         'Use ref.watch(provider.select((s) => s.field)) for partial watching to optimize rebuilds and improve performance.',
-    severity: DiagnosticSeverity.ERROR,
+    // SEV-01: select() is a rebuild optimization, a should-fix WARNING,
+    // not a crash/exploit ERROR. Matches the impact getter.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
@@ -2314,7 +2325,9 @@ class PreferFamilyForParamsRule extends SaropaLintRule {
     '[prefer_family_for_params] Not using .family for parameterized providers creates a new provider instance on each call, breaking caching and causing duplicate providers. This leads to wasted resources, memory leaks, and unpredictable app behavior. {v2}',
     correctionMessage:
         'Use Provider.family((ref, param) => ...) and watch with provider(param) to ensure proper caching and a single provider instance per parameter.',
-    severity: DiagnosticSeverity.ERROR,
+    // SEV-01: .family is a caching optimization, a should-fix WARNING,
+    // not a crash/exploit ERROR. Matches the impact getter.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
