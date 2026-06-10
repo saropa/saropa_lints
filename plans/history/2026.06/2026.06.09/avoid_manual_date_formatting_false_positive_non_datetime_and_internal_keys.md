@@ -1,6 +1,6 @@
 # BUG: `avoid_manual_date_formatting` — False Positive on Non-DateTime Integer Fields and Internal Key Strings
 
-**Status: Open**
+**Status: Fixed**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
@@ -254,19 +254,71 @@ should include:
 
 ## Changes Made
 
-<!-- Fill in when a fix is written. -->
+Implemented both suggested fixes in `internationalization_rules.dart`:
+
+1. **`_isDateTimeName(null)` now returns `false`** (was `true`). All three
+   reported FP classes (Case A CalendarEvent, Case B HebrewDate, Case C
+   DateTimeNullable) hinge on the `null → true` fallback firing on
+   unresolved/custom types. Treating an unknown type as non-DateTime removes
+   them. Trade-off accepted per the report: a real `DateTime` whose type fails
+   to resolve is now a false negative, preferable to the FP flood on custom
+   types.
+2. **`_isNonDisplayContext` now walks the ancestor chain** (up to the enclosing
+   named function) for a key-named `VariableDeclaration` or a key-named
+   enclosing `FunctionDeclaration`/`MethodDeclaration`, replacing the
+   direct-parent-only check. Added `_internalKeyTokens`
+   (`key/cache/tag/hash/bucket/identifier/id`) and the `_nameHasKeyToken`
+   helper. This exempts `return '...${d.month}...'` inside `buildEventDedupKey`
+   / `cacheKey(...)` even for a real `DateTime`.
 
 ---
 
 ## Tests Added
 
-<!-- Fill in when a fix is written. -->
+- Rewrote `example/lib/internationalization/avoid_manual_date_formatting_fixture.dart`
+  with `HebrewDate`/`CalendarEvent` custom types, key-builder functions, a
+  map-subscript lookup (all NO lint), and real-`DateTime` display +
+  `toIso8601String().substring` BAD cases.
+- Scan CLI verified: the syntactic `toIso8601String().substring` BAD case
+  fires; every custom-type and internal-key case is silent.
+
+**Verification limitation:** the project scan CLI does not resolve `DateTime`
+member types (target `staticType` is null), so after fix 1 the property-count
+path cannot fire there and the real-`DateTime` display LINT case cannot be
+positively confirmed via the CLI. In a consumer's analysis server (where
+`dart:core` `DateTime` resolves to `"DateTime"`), that case still fires; the
+fixture documents the intended behavior.
 
 ---
 
 ## Commits
 
 <!-- Add commit hashes as fixes land. -->
+
+---
+
+## Finish Report (2026-06-09)
+
+**Scope:** (A) Dart lint rules / analyzer plugin.
+
+**Deep review:** Fix 1 is a one-line polarity change with a clear documented
+trade-off. Fix 2's ancestor walk terminates at the enclosing function boundary
+(returns at the first `FunctionDeclaration`/`MethodDeclaration`, breaks out of
+closures) so it cannot climb into an unrelated outer scope; it only ever adds
+exemptions, never new diagnostics. Rule file, tier, severity (WARNING),
+`LintImpact` unchanged.
+
+**Tests:** `dart test test/rules/ui/internationalization_rules_test.dart` →
+all pass. Scan-CLI behavior verified as above (with the noted resolution
+limitation).
+
+**Maintenance:** CHANGELOG `[Unreleased]` Fixed bullet added. README/ROADMAP
+unchanged (false-positive fix).
+
+**Bug archived:** bugs/avoid_manual_date_formatting_false_positive_non_datetime_and_internal_keys.md
+→ plans/history/2026.06/2026.06.09/avoid_manual_date_formatting_false_positive_non_datetime_and_internal_keys.md
+
+**Finish report appended:** this file.
 
 ---
 
