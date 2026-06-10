@@ -6554,11 +6554,14 @@ This release focuses on **significant performance improvements** for large codeb
 - **One-time parsing**: Pubspec.yaml is parsed once per project, not per file.
 - **Impact**: Eliminates redundant file I/O across 1400+ rules.
 
-### Documentation
+<details>
+<summary>Maintenance</summary>
 
 - **Added performance tips to README**: Guidance on using lower tiers during development for faster iteration.
 - **Tier speed comparison**: Documented the performance impact of each tier level.
 - **Updated CONTRIBUTING.md**: Added rule author guidance for `cost` and `applicableFileTypes` getters.
+
+</details>
 
 ### New Rules
 
@@ -7366,13 +7369,11 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 **Fixes and refinements.**
 
-### Fixed
+<details>
+<summary>Maintenance</summary>
 
 - **CI/CD**: Reverted example project to pure Dart (no Flutter SDK dependency) to fix CI failures caused by `dart pub get` requiring Flutter SDK. No action required.
 - **ROADMAP cleanup**: Removed 72 entries from ROADMAP.md that were already implemented (14 as aliases, 58 as rules). No action required.
-
-### Added
-
 - **flutter_mocks.dart**: Created comprehensive mock Flutter types (~490 lines) for lint rule testing without Flutter SDK. No action required.
   - Core types: `Widget`, `StatelessWidget`, `StatefulWidget`, `State`, `BuildContext`
   - Layout widgets: `Container`, `SizedBox`, `Padding`, `Align`, `Center`, `Column`, `Row`
@@ -7385,10 +7386,12 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
   - Finds near-matches that may need aliases added
   - Features colorful output with Saropa ASCII logo
   - Returns exit code 1 if duplicates found for CI integration
+- Updated 12 fixture files to import `flutter_mocks.dart` instead of Flutter/external packages. No action required.
+
+</details>
 
 ### Changed
 
-- Updated 12 fixture files to import `flutter_mocks.dart` instead of Flutter/external packages. No action required.
 - **prefer_dedicated_media_query_method**: Added alias `prefer_dedicated_media_query_methods`. No action required.
 
 ## [2.3.5]
