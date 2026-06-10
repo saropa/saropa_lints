@@ -120,3 +120,21 @@ void _good239() {
   // or
   if (const DeepCollectionEquality().equals(list1, list2)) {}
 }
+
+// A user model whose class name merely STARTS WITH a collection keyword.
+class MapClusterModel {
+  const MapClusterModel();
+}
+
+// GOOD: comparing two model references — `MapClusterModel` is not a `Map`.
+// The old `getDisplayString().startsWith('Map')` misclassified this as a
+// collection comparison; the resolved-type check does not.
+void _goodModelTypeNamePrefix(MapClusterModel? a, MapClusterModel? b) {
+  if (a != b) {}
+}
+
+// BAD: genuine collection comparison still fires.
+void _badRealCollections(List<int> a, List<int> b) {
+  // expect_lint: avoid_collection_equality_checks
+  if (a == b) {}
+}

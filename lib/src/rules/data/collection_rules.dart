@@ -6,6 +6,7 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/source/line_info.dart';
+import 'package:meta/meta.dart';
 
 import '../../fixes/collection/add_const_to_list_item_fix.dart';
 import '../../fixes/collection/add_for_loop_increment_comment_fix.dart';
@@ -68,11 +69,11 @@ class AvoidCollectionEqualityChecksRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
-  static const Set<String> _collectionTypes = <String>{
-    'List',
-    'Set',
-    'Map',
-    'Iterable',
+  // dart:collection types that have no `isDartCoreX` predicate. Matched by
+  // EXACT name (optionally generic) rather than prefix, so a user model whose
+  // name merely starts with one of these (`QueueItem`, `LinkedListNode`) is not
+  // misclassified.
+  static const Set<String> _namedCollectionTypes = <String>{
     'Queue',
     'LinkedList',
   };
@@ -105,10 +106,25 @@ class AvoidCollectionEqualityChecksRule extends SaropaLintRule {
 
   bool _isCollectionType(DartType? type) {
     if (type == null) return false;
-    final String typeName = type.getDisplayString();
-    return _collectionTypes.any(
-      (String collection) => typeName.startsWith(collection),
-    );
+    // Resolved-element checks, NOT a display-name prefix. The old
+    // `getDisplayString().startsWith('Map'|'List'|'Set'|...)` misclassified any
+    // user model whose class name began with a collection keyword
+    // (`MapClusterModel`, `ListTileData`, `SetupConfig`) as a collection, so a
+    // plain reference comparison of two models was flagged.
+    if (type.isDartCoreList ||
+        type.isDartCoreSet ||
+        type.isDartCoreMap ||
+        type.isDartCoreIterable) {
+      return true;
+    }
+    final String name = type.getDisplayString();
+    final String bare = name.endsWith('?')
+        ? name.substring(0, name.length - 1)
+        : name;
+    for (final String c in _namedCollectionTypes) {
+      if (bare == c || bare.startsWith('$c<')) return true;
+    }
+    return false;
   }
 }
 
@@ -407,10 +423,12 @@ class AvoidUnsafeCollectionMethodsRule extends SaropaLintRule {
         // Get the collection name for guard checking
         final String? collectionName = _collectionNameOf(node.realTarget);
 
-        // Check if guarded by isNotEmpty/length check or early return
+        // Check if guarded by isNotEmpty/length check, early return, or a
+        // bounding enclosing loop.
         if (collectionName != null &&
             (_isGuardedAccess(node, collectionName) ||
-                _isCollectionGuardedByEarlyReturn(node, collectionName))) {
+                _isCollectionGuardedByEarlyReturn(node, collectionName) ||
+                _isGuardedByEnclosingLoop(node, collectionName))) {
           return;
         }
 
@@ -441,15 +459,32 @@ class AvoidUnsafeCollectionMethodsRule extends SaropaLintRule {
 
         final String collectionName = node.prefix.name;
 
-        // Check if guarded by isNotEmpty/length check or early return
+        // Check if guarded by isNotEmpty/length check, early return, or a
+        // bounding enclosing loop.
         if (_isGuardedAccess(node, collectionName) ||
-            _isCollectionGuardedByEarlyReturn(node, collectionName)) {
+            _isCollectionGuardedByEarlyReturn(node, collectionName) ||
+            _isGuardedByEnclosingLoop(node, collectionName)) {
           return;
         }
 
         reporter.atNode(node);
       }
     });
+  }
+
+  /// Exposed for unit tests: whether the `.first`/`.last`/`.single` access on
+  /// [target] (within [node]) is recognized as guaranteed non-empty. Pure
+  /// syntactic guard analysis (no resolved types).
+  @visibleForTesting
+  static bool isAccessGuardedForTesting(AstNode node, Expression target) {
+    final String? name = _collectionNameOf(target);
+    final AvoidUnsafeCollectionMethodsRule rule =
+        AvoidUnsafeCollectionMethodsRule();
+    if (rule._isGuaranteedNonEmpty(target)) return true;
+    if (name == null) return false;
+    return rule._isGuardedAccess(node, name) ||
+        _isCollectionGuardedByEarlyReturn(node, name) ||
+        _isGuardedByEnclosingLoop(node, name);
   }
 
   /// Checks if an expression is guaranteed to be non-empty.
@@ -460,6 +495,16 @@ class AvoidUnsafeCollectionMethodsRule extends SaropaLintRule {
     // Check for .split() result - String.split() always returns at least one element
     if (expr is MethodInvocation && expr.methodName.name == 'split') {
       return true;
+    }
+
+    // H: a local initialized from `x.split(...)` and accessed through the
+    // variable. split() always yields >= 1 element, so `final p = s.split(';');
+    // p.first;` is safe even though the target is a SimpleIdentifier.
+    if (expr is SimpleIdentifier) {
+      final Expression? init = _localInitializerOf(expr);
+      if (init is MethodInvocation && init.methodName.name == 'split') {
+        return true;
+      }
     }
 
     // Check for enum .values property access (e.g., MyEnum.values)
@@ -508,6 +553,22 @@ class AvoidUnsafeCollectionMethodsRule extends SaropaLintRule {
     }
 
     return false;
+  }
+
+  /// The initializer of the local variable [id] refers to, searched in the
+  /// nearest enclosing block. Returns null if not a simple local declaration.
+  Expression? _localInitializerOf(SimpleIdentifier id) {
+    final String name = id.name;
+    final Block? block = id.thisOrAncestorOfType<Block>();
+    if (block == null) return null;
+    for (final Statement stmt in block.statements) {
+      if (stmt is VariableDeclarationStatement) {
+        for (final VariableDeclaration v in stmt.variables.variables) {
+          if (v.name.lexeme == name) return v.initializer;
+        }
+      }
+    }
+    return null;
   }
 
   /// Checks if a PrefixedIdentifier represents a guaranteed non-empty collection.
@@ -829,8 +890,30 @@ String? _collectionNameOf(Expression expr) {
   if (expr is SimpleIdentifier) return expr.name;
   if (expr is PrefixedIdentifier) return expr.toSource();
   if (expr is PropertyAccess) return expr.toSource();
+  // `props[k]!` (PostfixExpression over IndexExpression) and `props[k]`.
+  // Returning their source lets the source-fallback guard checks
+  // (`src.contains('$name.isNotEmpty')`) match an inline `props[k]!.isNotEmpty`
+  // guard instead of disabling all guard evaluation when the name is null.
+  if (expr is PostfixExpression) return expr.toSource();
+  if (expr is IndexExpression) return expr.toSource();
   return null;
 }
+
+/// For a `.keys` / `.values` / `.entries` access, the underlying map name, so a
+/// guard written on the map itself (`if (map.isEmpty) return;`) is recognized
+/// for `map.keys.first`. Returns null when [name] is not such an access.
+String? _underlyingMapName(String name) {
+  for (final String suffix in const <String>['.keys', '.values', '.entries']) {
+    if (name.endsWith(suffix)) {
+      return name.substring(0, name.length - suffix.length);
+    }
+  }
+  return null;
+}
+
+/// Removes null-aware (`?`) and null-assertion (`!`) operators so a target
+/// reached via `x!` (access) and `x?` (guard) compares equal.
+String _stripNullOps(String s) => s.replaceAll('!', '').replaceAll('?', '');
 
 /// Checks if there's an early-return guard before [node] in the same block.
 ///
@@ -839,20 +922,70 @@ String? _collectionNameOf(Expression expr) {
 /// - `if (list.length < N) return;` where N >= 1
 /// - `if (list.length == 0) return;`
 bool _isCollectionGuardedByEarlyReturn(AstNode node, String collectionName) {
-  final Block? block = node.thisOrAncestorOfType<Block>();
-  if (block == null) return false;
+  // Check the access name AND, for `map.keys`/`.values`/`.entries`, the
+  // underlying map name (a guard on the map covers its key/value view).
+  final List<String> names = <String>[collectionName];
+  final String? mapName = _underlyingMapName(collectionName);
+  if (mapName != null) names.add(mapName);
 
-  for (final Statement stmt in block.statements) {
-    // Only check statements before the node
-    if (stmt.offset >= node.offset) break;
-
-    if (stmt is! IfStatement) continue;
-    if (stmt.elseStatement != null) continue;
-    if (!_containsEarlyExit(stmt.thenStatement)) continue;
-
-    if (_isEmptinessCheck(stmt.expression, collectionName)) return true;
+  // D: walk OUTWARD through every ancestor block, not just the nearest. When
+  // the access is nested one block below the guard (`if (x.isEmpty) return;`
+  // then `if (cond) { x.first; }`), the guard lives in the enclosing method
+  // block, invisible to a nearest-block-only scan.
+  AstNode? current = node;
+  while (current != null) {
+    if (current is Block) {
+      for (final Statement stmt in current.statements) {
+        // Only statements before the access, and not the one containing it.
+        if (stmt.offset >= node.offset) break;
+        if (stmt.end > node.offset) continue;
+        if (stmt is! IfStatement) continue;
+        if (stmt.elseStatement != null) continue;
+        if (!_containsEarlyExit(stmt.thenStatement)) continue;
+        for (final String n in names) {
+          if (_isEmptinessCheck(stmt.expression, n)) return true;
+        }
+      }
+    }
+    current = current.parent;
   }
 
+  return false;
+}
+
+/// True when [node] sits inside a `while` / `for` / `do` loop whose condition
+/// keeps the collection non-empty — e.g. `while (map.length > n) { map.keys.first }`
+/// or `while (list.isNotEmpty) { list.first }`. Checks the access name and, for
+/// a `.keys`/`.values`/`.entries` view, the underlying map name.
+bool _isGuardedByEnclosingLoop(AstNode node, String collectionName) {
+  final List<String> names = <String>[collectionName];
+  final String? mapName = _underlyingMapName(collectionName);
+  if (mapName != null) names.add(mapName);
+
+  AstNode? current = node.parent;
+  while (current != null) {
+    Expression? condition;
+    if (current is WhileStatement) {
+      condition = current.condition;
+    } else if (current is DoStatement) {
+      condition = current.condition;
+    } else if (current is ForStatement) {
+      final ForLoopParts parts = current.forLoopParts;
+      if (parts is ForParts) condition = parts.condition;
+    }
+    if (condition != null) {
+      final String src = condition.toSource();
+      for (final String n in names) {
+        // `n.length <comparator>` (bounded above 0 by the loop) or
+        // `n.isNotEmpty` keeps the collection non-empty inside the body.
+        if (RegExp('${RegExp.escape(n)}\\.length\\s*[<>=!]').hasMatch(src) ||
+            src.contains('$n.isNotEmpty')) {
+          return true;
+        }
+      }
+    }
+    current = current.parent;
+  }
   return false;
 }
 
@@ -880,9 +1013,16 @@ bool _isCollectionGuardedByWrapper(AstNode node, String collectionName) {
   return false;
 }
 
-/// Returns true if the statement contains a return or throw.
+/// Returns true if the statement exits the current iteration/scope early:
+/// `return`, `throw`, or — inside a loop body — `continue` / `break`. A
+/// `continue`/`break` only parses inside a loop, so accepting it unconditionally
+/// is safe and recognizes `if (c.length != 1) continue;` guards.
 bool _containsEarlyExit(Statement stmt) {
-  if (stmt is ReturnStatement) return true;
+  if (stmt is ReturnStatement ||
+      stmt is ContinueStatement ||
+      stmt is BreakStatement) {
+    return true;
+  }
   if (stmt is ExpressionStatement && stmt.expression is ThrowExpression) {
     return true;
   }
@@ -894,12 +1034,45 @@ bool _containsEarlyExit(Statement stmt) {
 
 /// Checks if [condition] is an emptiness or length check for [name].
 bool _isEmptinessCheck(Expression condition, String name) {
+  // A: decompose `||` — `x == null || x.isEmpty` (or `... || x.length < 2`)
+  // early-returns when EITHER operand holds, so the remainder is non-empty if
+  // either operand is an emptiness check. The whole `||` source never equals a
+  // bare emptiness expression, so without this the combined guard is missed.
+  if (condition is BinaryExpression &&
+      condition.operator.type == TokenType.BAR_BAR) {
+    return _isEmptinessCheck(condition.leftOperand, name) ||
+        _isEmptinessCheck(condition.rightOperand, name);
+  }
+  // `x?.y.isListNullOrEmpty ?? true` — the real emptiness test is the left
+  // operand of the `??`; `?? true` just defaults a null chain to "empty".
+  if (condition is BinaryExpression &&
+      condition.operator.type == TokenType.QUESTION_QUESTION) {
+    return _isEmptinessCheck(condition.leftOperand, name);
+  }
+
   final String src = condition.toSource();
+  // Compare with null-aware/null-assertion operators stripped so a guard on
+  // `x?.files` matches an access on `x!.files` (the same target reached through
+  // different null handling).
+  final String bareName = _stripNullOps(name);
 
   // list.isEmpty
-  if (src == '$name.isEmpty') return true;
+  if (_stripNullOps(src) == '$bareName.isEmpty') return true;
 
-  // list.length < N, list.length == 0, list.length <= 0
+  // F: extension emptiness predicate — `x.isListNullOrEmpty`, `x.isNullOrEmpty`.
+  // A getter whose name contains Empty on the collection proves emptiness.
+  if (condition is PrefixedIdentifier &&
+      _stripNullOps(condition.prefix.name) == bareName &&
+      condition.identifier.name.contains('Empty')) {
+    return true;
+  }
+  if (condition is PropertyAccess &&
+      _stripNullOps(condition.target?.toSource() ?? '') == bareName &&
+      condition.propertyName.name.contains('Empty')) {
+    return true;
+  }
+
+  // list.length < N, list.length == 0, list.length <= N
   if (condition is BinaryExpression) {
     final Expression left = condition.leftOperand;
     final Expression right = condition.rightOperand;
@@ -915,9 +1088,16 @@ bool _isEmptinessCheck(Expression condition, String name) {
     if (lengthTarget == name && right is IntegerLiteral) {
       final int? value = right.value;
       if (value != null) {
+        // B: any `length < N (N>=1)`, `length <= N (N>=0)`, or `length == 0`
+        // early-return leaves length >= 1 afterward. The old LT_EQ branch only
+        // accepted value == 0, missing the common `length <= 1` form.
         if (op == TokenType.LT && value >= 1) return true;
-        if (op == TokenType.LT_EQ && value == 0) return true;
+        if (op == TokenType.LT_EQ && value >= 0) return true;
         if (op == TokenType.EQ_EQ && value == 0) return true;
+        // `if (c.length != N) continue;` (N>=1) keeps only length == N
+        // iterations, so the body sees a non-empty collection. value 0 is
+        // excluded: `!= 0` would leave length 0 in the body.
+        if (op == TokenType.BANG_EQ && value >= 1) return true;
       }
     }
   }
