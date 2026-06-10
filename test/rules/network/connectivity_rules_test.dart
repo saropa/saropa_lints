@@ -55,28 +55,4 @@ void main() {
       });
     }
   });
-
-  group('Connectivity - Avoidance Rules', () {
-    group('avoid_connectivity_equals_internet', () {
-      test(
-        'treating connectivity status as internet access SHOULD trigger',
-        () {},
-      );
-
-      test('actual reachability check should NOT trigger', () {});
-    });
-  });
-
-  group('Connectivity - Requirement Rules', () {
-    group('require_connectivity_error_handling', () {
-      test('network call without connectivity check SHOULD trigger', () {});
-
-      test('connectivity-aware error handling should NOT trigger', () {});
-    });
-    group('require_connectivity_timeout', () {
-      test('HTTP request without timeout SHOULD trigger', () {});
-
-      test('request with .timeout() should NOT trigger', () {});
-    });
-  });
 }

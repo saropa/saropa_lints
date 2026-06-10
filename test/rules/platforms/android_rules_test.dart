@@ -98,48 +98,4 @@ void main() {
       });
     }
   });
-
-  group('Android - Avoidance Rules', () {
-    group('avoid_android_task_affinity_default', () {
-      test('default task affinity setting SHOULD trigger', () {});
-
-      test('explicit task affinity should NOT trigger', () {});
-    });
-    group('avoid_android_cleartext_traffic', () {
-      test('cleartext HTTP traffic allowed SHOULD trigger', () {});
-
-      test('HTTPS-only traffic should NOT trigger', () {});
-    });
-  });
-
-  group('Android - Requirement Rules', () {
-    group('require_android_permission_request', () {
-      test('missing runtime permission request SHOULD trigger', () {});
-
-      test('proper permission flow should NOT trigger', () {});
-    });
-    group('require_android_12_splash', () {
-      test('missing Android 12 splash screen API SHOULD trigger', () {});
-
-      test('SplashScreen API usage should NOT trigger', () {});
-    });
-    group('require_android_backup_rules', () {
-      test('missing backup rules config SHOULD trigger', () {});
-
-      test('explicit backup rules should NOT trigger', () {});
-    });
-  });
-
-  group('Android - Preference Rules', () {
-    group('prefer_pending_intent_flags', () {
-      test('PendingIntent without flags SHOULD trigger', () {});
-
-      test('immutable/mutable PendingIntent flags should NOT trigger', () {});
-    });
-    group('prefer_foreground_service_android', () {
-      test('background work without foreground service SHOULD trigger', () {});
-
-      test('foreground service for long tasks should NOT trigger', () {});
-    });
-  });
 }

@@ -29,7 +29,10 @@ import 'dart:io';
 import 'package:saropa_lints/src/config/rule_packs.dart' as packs;
 
 import 'rule_pack_audit.dart'
-    show applyCompositeRulePacks, extractFromPackagesDir;
+    show
+        applyCompositeRulePacks,
+        applyRelocatedRulePacks,
+        extractFromPackagesDir;
 
 /// Pub dependency keys for init / extension (match `rulePackDefinitions.ts`).
 const Map<String, Set<String>> kPubspecMarkersByPack = {
@@ -58,6 +61,10 @@ const Map<String, Set<String>> kPubspecMarkersByPack = {
   'provider': {'provider'},
   'qr_scanner': {'mobile_scanner', 'qr_flutter'},
   'riverpod': {'riverpod', 'flutter_riverpod', 'hooks_riverpod'},
+  // Semver-gated companion to `riverpod`: same dependency family, but the
+  // dependency gate (riverpod >= 2.0.0) in kRulePackDependencyGates restricts it
+  // to projects where the Notifier API exists. See kRelocatedRulePackCodes.
+  'riverpod_2': {'riverpod', 'flutter_riverpod', 'hooks_riverpod'},
   'rxdart': {'rxdart'},
   'shared_preferences': {'shared_preferences'},
   'sqflite': {'sqflite'},
@@ -85,6 +92,7 @@ const Map<String, String> kPackUiLabels = {
   'provider': 'Provider',
   'qr_scanner': 'QR / scanner',
   'riverpod': 'Riverpod',
+  'riverpod_2': 'Riverpod 2.x',
   'rxdart': 'RxDart',
   'shared_preferences': 'shared_preferences',
   'sqflite': 'sqflite',
@@ -131,8 +139,8 @@ void main() {
     '${root.path}/lib/src/config/rule_pack_codes_generated.dart',
   );
 
-  final extracted = applyCompositeRulePacks(
-    extractFromPackagesDir(packagesDir),
+  final extracted = applyRelocatedRulePacks(
+    applyCompositeRulePacks(extractFromPackagesDir(packagesDir)),
   );
 
   final sortedPacks = extracted.keys.toList()..sort();

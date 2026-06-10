@@ -33,6 +33,7 @@ from mt_fallback import (
     count_pending_translations,
     describe_engine_availability,
     engine_stats_for,
+    fallback_log,
     load_mt_cache,
     load_provenance,
     low_quality_entries,
@@ -375,6 +376,57 @@ def write_audit_report(
     report_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
+def write_fallback_report(report_path: Path) -> int:
+    """Write the per-string NLLB-fallback report and return its entry count.
+
+    Names every string NLLB could not translate (served by Google, or left
+    English) plus the over-gate inputs it could not split. This is the visibility
+    the silent fallback lacked: a human can act on each — add a dictionary
+    override, reword the source, or accept the Google value — instead of a count.
+    """
+    served = fallback_log()
+    try:
+        import nllb_engine
+        unsplittable = nllb_engine.long_inputs()
+    except ImportError:
+        unsplittable = []
+    if not served and not unsplittable:
+        report_path.parent.mkdir(parents=True, exist_ok=True)
+        report_path.write_text("# NLLB fallback report\n\nNo fallbacks — NLLB translated every string.\n", encoding="utf-8")
+        return 0
+
+    lines = ["# NLLB fallback report", ""]
+    google = [(loc, t) for loc, eng, t in served if eng == "google"]
+    english = [(loc, t) for loc, eng, t in served if eng == "english"]
+    lines.append(f"- Served by Google (NLLB declined): {len(google)}")
+    lines.append(f"- Left English (no engine produced a translation): {len(english)}")
+    lines.append(f"- Over the token gate and unsplittable: {len(unsplittable)}")
+    lines.append("")
+
+    def _block(title: str, rows: list[tuple]) -> None:
+        if not rows:
+            return
+        lines.append(f"## {title} ({len(rows)})")
+        lines.append("")
+        for row in rows:
+            loc = row[0]
+            text = row[-1]
+            preview = text.replace("\n", " ⏎ ")
+            if len(preview) > 160:
+                preview = preview[:157] + "…"
+            extra = f" [{row[1]} tokens]" if len(row) == 3 and isinstance(row[1], int) else ""
+            lines.append(f"- `{loc}`{extra}: {preview}")
+        lines.append("")
+
+    _block("Left English — fix these first", english)
+    _block("Over token gate, unsplittable", unsplittable)
+    _block("Served by Google fallback", google)
+
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    return len(served) + len(unsplittable)
+
+
 def _install_sigint() -> None:
     """First Ctrl-C requests a graceful stop (finish current string, flush cache +
     provenance, exit); a second Ctrl-C restores the default handler for an
@@ -593,8 +645,13 @@ def main() -> int:
     }[mode]
     print(f"[{c('blue', 'i18n')}] mode: {c('cyan', mode_label)}  (Ctrl-C to stop gracefully)", flush=True)
 
-    # Fresh engine tally so the per-locale mix below reflects only this run.
+    # Fresh engine tally + over-gate input log so the report reflects only this run.
     reset_engine_stats()
+    try:
+        import nllb_engine
+        nllb_engine.reset_long_inputs()
+    except ImportError:
+        pass
     stats_by_locale: dict[str, LocaleStats] = {}
     missing_by_locale: dict[str, list[str]] = {}
     interrupted_locale: str | None = None

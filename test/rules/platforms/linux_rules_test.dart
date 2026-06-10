@@ -66,38 +66,4 @@ void main() {
       });
     }
   });
-
-  group('Linux - Avoidance Rules', () {
-    group('avoid_hardcoded_unix_paths', () {
-      test('hardcoded /home/user path SHOULD trigger', () {});
-
-      test('XDG or environment paths should NOT trigger', () {});
-    });
-    group('avoid_x11_only_assumptions', () {
-      test('X11-specific code without Wayland check SHOULD trigger', () {});
-
-      test('display-server agnostic code should NOT trigger', () {});
-    });
-    group('avoid_sudo_shell_commands', () {
-      test('sudo in shell command SHOULD trigger', () {});
-
-      test('non-elevated alternatives should NOT trigger', () {});
-    });
-  });
-
-  group('Linux - Requirement Rules', () {
-    group('require_linux_font_fallback', () {
-      test('single font without fallback SHOULD trigger', () {});
-
-      test('font fallback chain should NOT trigger', () {});
-    });
-  });
-
-  group('Linux - Preference Rules', () {
-    group('prefer_xdg_directory_convention', () {
-      test('custom config path on Linux SHOULD trigger', () {});
-
-      test('XDG Base Directory paths should NOT trigger', () {});
-    });
-  });
 }

@@ -38,12 +38,4 @@ void main() {
       });
     }
   });
-
-  group('GraphQL - Avoidance Rules', () {
-    group('avoid_graphql_string_queries', () {
-      test('raw string GraphQL query SHOULD trigger', () {});
-
-      test('typed GraphQL code generation should NOT trigger', () {});
-    });
-  });
 }

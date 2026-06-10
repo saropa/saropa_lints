@@ -74,49 +74,4 @@ void main() {
       });
     }
   });
-
-  group('Permission - Avoidance Rules', () {
-    group('avoid_permission_handler_null_safety', () {
-      test('nullable permission status unchecked SHOULD trigger', () {});
-
-      test('null-safe permission handling should NOT trigger', () {});
-    });
-  });
-
-  group('Permission - Requirement Rules', () {
-    group('require_location_permission_rationale', () {
-      test('location request without rationale SHOULD trigger', () {});
-
-      test('user-facing rationale should NOT trigger', () {});
-    });
-    group('require_camera_permission_check', () {
-      test('camera access without permission check SHOULD trigger', () {});
-
-      test('permission check before camera should NOT trigger', () {});
-    });
-  });
-
-  group('Permission - Loop Avoidance Rules', () {
-    group('avoid_permission_request_loop', () {
-      test('permission request in a loop SHOULD trigger', () {});
-
-      test(
-        'single permission request with result check should NOT trigger',
-        () {},
-      );
-    });
-  });
-
-  group('Permission - Preference Rules', () {
-    group('prefer_image_cropping', () {
-      test('full-resolution image without crop option SHOULD trigger', () {});
-
-      test('image cropping capability should NOT trigger', () {});
-    });
-    group('prefer_permission_request_in_context', () {
-      test('permission request outside user flow SHOULD trigger', () {});
-
-      test('contextual permission request should NOT trigger', () {});
-    });
-  });
 }

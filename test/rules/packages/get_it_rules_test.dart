@@ -50,25 +50,4 @@ void main() {
       });
     }
   });
-
-  group('GetIt - Avoidance Rules', () {
-    group('avoid_getit_in_build', () {
-      test('GetIt.instance in build method SHOULD trigger', () {});
-
-      test('inject via constructor or context should NOT trigger', () {});
-    });
-  });
-
-  group('GetIt - Requirement Rules', () {
-    group('require_getit_registration_order', () {
-      test('unordered GetIt registrations SHOULD trigger', () {});
-
-      test('dependency-ordered registration should NOT trigger', () {});
-    });
-    group('require_getit_reset_in_tests', () {
-      test('GetIt state leaking between tests SHOULD trigger', () {});
-
-      test('GetIt.instance.reset() in tearDown should NOT trigger', () {});
-    });
-  });
 }

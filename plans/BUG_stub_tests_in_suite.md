@@ -1,262 +1,163 @@
-# BUG: 1,646 stub tests that always pass without testing anything
+# BUG: assertion-free stub tests that always pass without testing anything
 
 **Severity**: High — test suite gives partial false confidence
-**Date**: 2026-03-25 (updated 2026-04-27)
-**Status**: In Progress — guardrails added; conversion ongoing
+**Date**: 2026-03-25 (rebaselined 2026-06-10)
+**Status**: Phase 1 DONE (stubs removed); Phase 2 (real tests) pending
 
-## Execution snapshot
+## Two phases
 
-### Next 3 (ordered)
+The work splits cleanly:
 
-- [ ] **STUB-01 (P0)** Recompute and record current stub baseline using the same scanner used by `stub_test_guard_test.dart`; update this file with timestamped counts.
-- [ ] **STUB-02 (P0)** Convert the next high-risk batch: rules with active bug history and quick fixes in the top 3 highest stub-density files.
-- [ ] **STUB-03 (P1)** Add a repeatable batch report artifact under `plans/history/` with before/after counts and converted rule list.
+- **Phase 1 — remove the stubs everywhere (DONE 2026-06-10).** Empty-body
+  `test`/`testWidgets` (`() {}`) is bad design regardless of replacement: it
+  always passes and asserts nothing. 396 empty-body stubs were deleted, plus
+  255 `group()` blocks that those deletions left empty (651 statements across
+  47 files). Empty-body count is now **0**, hard-gated by
+  [test/integrity/stub_test_guard_test.dart](../test/integrity/stub_test_guard_test.dart)
+  via `scanEmptyBodyStubTests`. Full suite green (5,726 tests).
+- **Phase 2 — write real fixture-backed tests (pending).** Replace the lost
+  coverage with assertions that the rule actually fires (and stays quiet on
+  compliant code), using the resolved-analyzer oracle proven below.
 
-### STUB-02 active target list
+27 assertion-free tests remain and are deliberately KEPT — they are real tests
+the broad heuristic miscounts: "does not throw" tests (the assertion is the
+absence of an exception) and helper-asserted tests (`expectFixtureExists(...)`).
+The empty-body gate does not flag them.
 
-Current high-density conversion order:
+## Phase 2 oracle (built & validated 2026-06-10)
 
-1. `widget_patterns_rules_test.dart`
-2. `code_quality_rules_test.dart`
-3. `ios_rules_test.dart`
+A resolved-analyzer harness runs a single rule in-process against a fixture with
+full type/element resolution (no `custom_lint`, which this package does not use
+— see below). Validated: it fires `avoid_unawaited_future:12`,
+`check_mounted_after_async:12`, `avoid_async_in_build:8`, `avoid_redundant_await:10,12`
+at the exact expected lines. Mechanics: `AnalysisContextCollection.getResolvedUnit`
+→ build a `RuleContext` whose `typeProvider`/`typeSystem`/`libraryElement` come
+from the `ResolvedUnitResult` → `rule.registerNodeProcessors` → set
+`rule.reporter` → walk the resolved unit with `ScanWalker` → flush
+`afterLibrary` callbacks. Run ONE rule at a time (running all comprehensive
+rules triggers an unrelated cross-file rule's whole-project scan).
 
-### Blocked / dependencies
+## Gates (all green)
 
-- Conversion velocity depends on fixture authoring capacity in `example*/lib/` and corresponding test updates.
-- Keep ratchet values aligned whenever stubs are removed; stale ratchet values hide progress.
+Three regression gates in [test/integrity/stub_test_guard_test.dart](../test/integrity/stub_test_guard_test.dart),
+wired into the normal `dart test` run so they execute in CI and in publish
+Step 7:
 
-### Done criteria (migration close-out)
+- **empty-body `test`/`testWidgets` (`() {}`)** — count **0**, hard `isEmpty`
+  gate via `scanEmptyBodyStubTests`. This is the precise "stub" invariant.
+- `expect(true, isTrue)` — **0**.
+- `expect('<literal>', isNotNull)` — **0**.
 
-- No `expect(true, isTrue)` or literal `isNotNull` tautology stubs remain.
-- Stub guard tests ratchet to zero (or a justified temporary cap with owner/date).
-- Converted tests assert trigger and non-trigger behavior with fixture-backed evidence.
+Still TODO (Phase 2 / hardening): a non-overridable gate in `publish.py`'s
+audit phase. Today the guard runs in Step 7's `dart test`, but that step's
+failure can be waved through the interactive "continue despite test failure"
+prompt; the audit phase blocks with an exit code.
 
-## Summary
+### Phase 2 backlog — files that lost stub coverage (count = stubs removed)
 
-35% of the test suite (1,646 of 4,690 `test()` calls across 66 of 155 test files) are stubs that assert a string literal is not null. They always pass regardless of whether the rule they claim to test works, is registered, or even exists.
+These are the files whose empty-body `SHOULD trigger` / `should NOT trigger`
+placeholders were deleted in Phase 1; each is a candidate for real
+fixture-backed tests via the Phase 2 oracle. (Counts are the original stub
+totals per file; regenerate current state with `scanStubTests('.')`.)
 
-```dart
-// This is the pattern — it can NEVER fail
-test('avoid_icon_buttons_without_tooltip SHOULD trigger', () {
-  expect('avoid_icon_buttons_without_tooltip detected', isNotNull);
-});
-```
+| Stubs | File |
+|------:|------|
+| 20 | test/rules/architecture/architecture_rules_test.dart |
+| 20 | test/rules/core/state_management_rules_test.dart |
+| 20 | test/rules/hardware/bluetooth_hardware_rules_test.dart |
+| 18 | test/rules/testing/debug_rules_test.dart |
+| 17 | test/rules/codegen/freezed_rules_test.dart |
+| 16 | test/integrity/false_positive_fixes_test.dart |
+| 16 | test/rules/data/equality_rules_test.dart |
+| 14 | test/rules/packages/auto_route_rules_test.dart |
+| 14 | test/rules/platforms/android_rules_test.dart |
+| 14 | test/rules/ui/notification_rules_test.dart |
+| 12 | test/rules/core/context_rules_test.dart |
+| 12 | test/rules/platforms/web_rules_test.dart |
+| 12 | test/rules/security/permission_rules_test.dart |
+| 12 | test/rules/widget/dialog_snackbar_rules_test.dart |
+| 10 | test/rules/architecture/lifecycle_rules_test.dart |
+| 10 | test/rules/flow/exception_rules_test.dart |
+| 10 | test/rules/flow/return_rules_test.dart |
+| 10 | test/rules/packages/flutter_hooks_rules_test.dart |
+| 10 | test/rules/platforms/linux_rules_test.dart |
+| 10 | test/rules/platforms/windows_rules_test.dart |
+| 10 | test/rules/security/crypto_rules_test.dart |
+| 9 | test/rules/packages/url_launcher_rules_test.dart |
+| 8 | test/rules/commerce/iap_rules_test.dart |
+| 8 | test/rules/resources/db_yield_rules_test.dart |
+| 8 | test/rules/testing/prefer_setup_teardown_test.dart |
+| 8 | test/rules/widget/theming_rules_test.dart |
+| 7 | test/rules/architecture/structure_rules_test.dart |
+| 6 | test/integrity/defensive_coding_test.dart |
+| 6 | test/rules/config/platform_rules_test.dart |
+| 6 | test/rules/media/media_rules_test.dart |
+| 6 | test/rules/network/connectivity_rules_test.dart |
+| 6 | test/rules/packages/geolocator_rules_test.dart |
+| 6 | test/rules/packages/get_it_rules_test.dart |
+| 6 | test/rules/packages/qr_scanner_rules_test.dart |
+| 6 | test/rules/packages/supabase_rules_test.dart |
+| 6 | test/rules/packages/workmanager_rules_test.dart |
+| 5 | test/rules/packages/rxdart_rules_test.dart |
+| 4 | test/rules/data/money_rules_test.dart |
+| 4 | test/rules/packages/flame_rules_test.dart |
+| 3 | test/integrity/rule_relationship_metadata_integrity_test.dart |
+| 3 | test/rules/core/documentation_rules_test.dart |
+| 2 | test/integrity/roadmap_15_rules_test.dart |
+| 2 | test/rules/core/naming_style_rules_test.dart |
+| 2 | test/rules/packages/graphql_rules_test.dart |
+| 2 | test/rules/packages/sqflite_rules_test.dart |
+| 2 | test/rules/resources/file_handling_rules_test.dart |
+| 1 | test/integrity/anti_pattern_detection_test.dart |
+| 1 | test/integrity/saropa_lints_test.dart |
+| 1 | test/rules/architecture/compile_time_syntax_rules_test.dart |
+| 1 | test/rules/flow/error_handling_rules_test.dart |
+| 1 | test/rules/security/security_rules_test.dart |
 
-A second pattern (`expect(true, isTrue)`) previously accounted for 16 additional stubs in `false_positive_fixes_test.dart` and has now been removed.
+Regenerate this list any time with `scanStubTests('.')`.
 
-### Progress Since Discovery
+## Phase 2 oracle — why not `custom_lint`, and the two fallbacks tried
 
-When this bug was filed (2026-03-25), there were 3,530 stubs across 103 files. As of 2026-04-04, 1,884 stubs have been converted to real tests — a 53% reduction. The overall real-test ratio improved from 26% to 65%.
+`custom_lint` is the faithful pipeline, but **this package does not use it** —
+the root pubspec builds directly on `analyzer_plugin`, with no `custom_lint` /
+`custom_lint_builder` dependency. `dart run custom_lint` fails outright, which
+is why [test/scan/fixture_lint_integration_test.dart](../test/scan/fixture_lint_integration_test.dart)
+always takes its `if (fromCustom.isEmpty) return` escape and only asserts the
+native compile-time rules `dart analyze` emits. Adding `custom_lint` would mean
+rewriting all rules onto another framework — off the table.
 
-## Impact
+`ScanRunner` ([lib/src/scan/scan_runner.dart](../lib/src/scan/scan_runner.dart))
+is in-process and fast but **parse-only** (`parseString`, no type/element
+resolution): only 1 of 9 architecture rules fire under it. Useful for syntactic
+rules; blind to semantic/cross-file ones.
 
-- **No regression protection**: A rule could be deleted, deregistered, or broken and every stub "test" would still pass.
-- **False confidence**: `dart test` reports ~4,700 passing tests. Only ~3,044 actually test behavior.
-- **Masked real bugs**: The `avoid_global_state` false-positive bugs went undetected because the tests for that rule were stubs.
+The chosen oracle is the **resolved-analyzer harness** described at the top —
+no new dependency, faithful for syntactic AND semantic rules. (To use ScanRunner
+for syntactic-only checks, note it excludes any `/example` path unless you pass
+`applyExclusionsToFileList: false`.)
 
-## Complete Inventory
+Phase 2 also has to fix a defect class the stubs hid: **fake fixtures**, e.g.
+`avoid_god_class`'s "BAD" class `_bad79_AppManager` is empty — a comment claims
+"20+ fields and 30+ methods" but there are none, so the rule correctly stays
+quiet. Each Phase 2 conversion must verify its fixture actually contains the
+violating pattern.
 
-### Files sorted by stub count (66 files, 1,646 stubs total)
+## Done criteria
 
-| File | Total | Stubs | Real | Stub % |
-|------|-------|-------|------|--------|
-| widget_patterns_rules_test.dart | 108 | 99 | 9 | 91% |
-| code_quality_rules_test.dart | 130 | 98 | 32 | 75% |
-| ios_rules_test.dart | 117 | 88 | 29 | 75% |
-| widget_layout_rules_test.dart | 79 | 73 | 6 | 92% |
-| security_rules_test.dart | 78 | 56 | 22 | 71% |
-| bloc_rules_test.dart | 96 | 48 | 48 | 50% |
-| async_rules_test.dart | 68 | 48 | 20 | 70% |
-| performance_rules_test.dart | 99 | 46 | 53 | 46% |
-| accessibility_rules_test.dart | 82 | 39 | 43 | 47% |
-| riverpod_rules_test.dart | 73 | 38 | 35 | 52% |
-| api_network_rules_test.dart | 78 | 38 | 40 | 48% |
-| navigation_rules_test.dart | 78 | 36 | 42 | 46% |
-| widget_lifecycle_rules_test.dart | 73 | 35 | 38 | 47% |
-| testing_best_practices_rules_test.dart | 72 | 35 | 37 | 48% |
-| structure_rules_test.dart | 87 | 33 | 54 | 37% |
-| test_rules_test.dart | 66 | 32 | 34 | 48% |
-| firebase_rules_test.dart | 73 | 29 | 44 | 39% |
-| control_flow_rules_test.dart | 66 | 28 | 38 | 42% |
-| stylistic_rules_test.dart | 76 | 27 | 49 | 35% |
-| internationalization_rules_test.dart | 55 | 26 | 29 | 47% |
-| forms_rules_test.dart | 54 | 26 | 28 | 48% |
-| false_positive_fixes_test.dart | 158 | 26 | 132 | 16% |
-| provider_rules_test.dart | 49 | 23 | 26 | 46% |
-| naming_style_rules_test.dart | 55 | 23 | 32 | 41% |
-| collection_rules_test.dart | 73 | 23 | 50 | 31% |
-| getx_rules_test.dart | 46 | 22 | 24 | 47% |
-| stylistic_additional_rules_test.dart | 51 | 21 | 30 | 41% |
-| isar_rules_test.dart | 44 | 21 | 23 | 47% |
-| image_rules_test.dart | 44 | 21 | 23 | 47% |
-| ui_ux_rules_test.dart | 44 | 20 | 24 | 45% |
-| hive_rules_test.dart | 42 | 20 | 22 | 47% |
-| error_handling_rules_test.dart | 67 | 20 | 47 | 29% |
-| record_pattern_rules_test.dart | 40 | 19 | 21 | 47% |
-| package_specific_rules_test.dart | 40 | 19 | 21 | 47% |
-| animation_rules_test.dart | 40 | 19 | 21 | 47% |
-| scroll_rules_test.dart | 36 | 17 | 19 | 47% |
-| disposal_rules_test.dart | 54 | 17 | 37 | 31% |
-| type_safety_rules_test.dart | 34 | 16 | 18 | 47% |
-| stylistic_whitespace_constructor_rules_test.dart | 36 | 15 | 21 | 41% |
-| macos_rules_test.dart | 32 | 15 | 17 | 46% |
-| file_handling_rules_test.dart | 34 | 15 | 19 | 44% |
-| dependency_injection_rules_test.dart | 32 | 15 | 17 | 46% |
-| type_rules_test.dart | 45 | 14 | 31 | 31% |
-| stylistic_null_collection_rules_test.dart | 30 | 14 | 16 | 46% |
-| stylistic_error_testing_rules_test.dart | 32 | 14 | 18 | 43% |
-| resource_management_rules_test.dart | 30 | 14 | 16 | 46% |
-| formatting_rules_test.dart | 50 | 14 | 36 | 28% |
-| dio_rules_test.dart | 30 | 14 | 16 | 46% |
-| class_constructor_rules_test.dart | 30 | 14 | 16 | 46% |
-| unnecessary_code_rules_test.dart | 30 | 13 | 17 | 43% |
-| stylistic_widget_rules_test.dart | 28 | 13 | 15 | 46% |
-| json_datetime_rules_test.dart | 28 | 13 | 15 | 46% |
-| equatable_rules_test.dart | 28 | 13 | 15 | 46% |
-| shared_preferences_rules_test.dart | 26 | 12 | 14 | 46% |
-| complexity_rules_test.dart | 42 | 12 | 30 | 28% |
-| stylistic_control_flow_rules_test.dart | 41 | 11 | 30 | 26% |
-| numeric_literal_rules_test.dart | 30 | 11 | 19 | 36% |
-| memory_management_rules_test.dart | 36 | 11 | 25 | 30% |
-| build_method_rules_test.dart | 24 | 11 | 13 | 45% |
-| state_management_rules_test.dart | 22 | 10 | 12 | 45% |
-| bluetooth_hardware_rules_test.dart | 22 | 10 | 12 | 45% |
-| false_positive_prevention_test.dart | 31 | 9 | 22 | 29% |
-| auto_route_rules_test.dart | 26 | 8 | 18 | 30% |
-| url_launcher_rules_test.dart | 11 | 3 | 8 | 27% |
-| rxdart_rules_test.dart | 7 | 2 | 5 | 28% |
-| migration_rules_test.dart | 95 | 1 | 94 | 1% |
+- [x] Empty-body stub count = **0**, hard-gated.
+- [ ] Each removed stub's intended coverage is restored by a fixture-backed
+      assertion (trigger + non-trigger) under the resolved-analyzer oracle.
+- [ ] A **non-overridable** stub gate runs in `publish.py`'s audit phase
+      (blocking exit code), not only in the wave-through-able Step 7 `dart test`.
 
-### Files with zero stubs (89 clean files)
+## History
 
-These files contain only real tests and should be used as reference for the pattern to follow:
-
-- analysis_options_rule_packs_test.dart
-- analyzer_metadata_compat_utils_test.dart
-- android_rules_test.dart
-- anti_pattern_detection_test.dart
-- architecture_rules_test.dart
-- avoid_deprecated_usage_crash_test.dart
-- avoid_implicit_animation_dispose_cast_rule_test.dart
-- code_line_counting_test.dart
-- comment_utils_test.dart
-- compile_time_syntax_rules_test.dart
-- conditional_import_utils_test.dart
-- config_rules_test.dart
-- connectivity_rules_test.dart
-- context_rules_test.dart
-- crypto_rules_test.dart
-- dart_sdk_34_deprecation_rules_test.dart
-- dart_sdk_3_removal_rules_test.dart
-- db_yield_rules_test.dart
-- debug_rules_test.dart
-- defensive_coding_test.dart
-- dialog_snackbar_rules_test.dart
-- documentation_rules_test.dart
-- drift_rules_test.dart
-- element_identifier_utils_test.dart
-- equality_rules_test.dart
-- exception_rules_test.dart
-- fixture_lint_integration_test.dart
-- flame_rules_test.dart
-- flutter_deprecation_migration_rules_test.dart
-- flutter_hooks_rules_test.dart
-- flutter_migration_widget_detection_test.dart
-- flutter_migration_widget_rules_test.dart
-- flutter_test_window_deprecation_utils_test.dart
-- freezed_rules_test.dart
-- geolocator_rules_test.dart
-- get_it_rules_test.dart
-- graphql_rules_test.dart
-- handle_throwing_invocations_metadata_crash_test.dart
-- iap_rules_test.dart
-- ignore_utils_test.dart
-- image_filter_quality_detection_test.dart
-- image_filter_quality_migration_rules_test.dart
-- import_graph_tracker_perf_test.dart
-- import_graph_tracker_test.dart
-- info_plist_utils_test.dart
-- lifecycle_rules_test.dart
-- linux_rules_test.dart
-- listview_extent_metadata_rules_test.dart
-- media_rules_test.dart
-- money_rules_test.dart
-- notification_rules_test.dart
-- opt_in_registration_test.dart
-- permission_rules_test.dart
-- plan_additional_rules_21_30_test.dart
-- plan_additional_rules_31_40_test.dart
-- platform_rules_test.dart
-- prefer_overflow_bar_over_button_bar_rule_test.dart
-- prefer_setup_teardown_test.dart
-- progress_tracker_dedup_test.dart
-- project_info_root_uri_test.dart
-- pubspec_lock_resolver_test.dart
-- qr_scanner_rules_test.dart
-- report_consolidator_test.dart
-- require_data_encryption_pin_pattern_test.dart
-- require_error_case_tests_test.dart
-- return_rules_test.dart
-- roadmap_15_rules_test.dart
-- roadmap_detail_12_rules_test.dart
-- roadmap_detail_9_rules_test.dart
-- roadmap_detail_rules_test.dart
-- rule_pack_registry_test.dart
-- rule_packs_config_test.dart
-- rule_packs_pubspec_markers_test.dart
-- rule_packs_semver_test.dart
-- rule_quick_fix_presence_test.dart
-- saropa_lints_test.dart
-- saropa_plugin_registration_test.dart
-- scan_cli_args_test.dart
-- scan_runner_test.dart
-- security_rule_metadata_test.dart
-- sqflite_rules_test.dart
-- supabase_rules_test.dart
-- theming_rules_test.dart
-- violation_export_test.dart
-- violation_parser_test.dart
-- web_rules_test.dart
-- window_postmessage_scheduling_args_test.dart
-- windows_rules_test.dart
-- workmanager_rules_test.dart
-
-## Recommended Approach
-
-Replacing the remaining 1,646 stubs is a medium-scale effort. Prioritize by:
-
-1. **Essential-tier rules first** — these run on every project and must work.
-2. **Rules with known bugs** — `avoid_global_state` has open bug reports and stub tests.
-3. **Rules with quick fixes** — quick fixes can silently break; test coverage is more critical.
-4. **Highest stub-count files** — batch replacements in widget_patterns_rules, code_quality_rules, ios_rules, etc.
-
-Each stub replacement requires:
-- A fixture file in the appropriate `example*/lib/` directory (or extending an existing one)
-- Assertions against actual rule analysis output (violation count, rule name, line number)
-- Both positive (SHOULD trigger) and negative (should NOT trigger) cases
-
-## Execution Plan (updated 2026-04-27)
-
-### Phase 0 — Add anti-regression gates (done/in progress)
-
-- [x] Remove `expect(true, isTrue)` stubs from `false_positive_fixes_test.dart`.
-- [x] Add `test/stub_test_guard_test.dart` to fail CI if any new `expect(true, isTrue)` stubs are added.
-- [x] Add a ratcheting guard for `expect('<literal>', isNotNull)` so the count cannot increase while migration continues.
-
-### Phase 1 — High-risk conversion batches
-
-1. Convert stubs in files with active bug history first (`avoid_global_state`, `require_deep_link_fallback`, etc.).
-2. Convert stubs for rules with quick fixes.
-3. Batch by highest stub-density files (`widget_patterns_rules_test.dart`, `code_quality_rules_test.dart`, `ios_rules_test.dart`, `widget_layout_rules_test.dart`).
-
-#### Completed batch (2026-04-27)
-
-- `test/widget_patterns_rules_test.dart`: removed the stub-only behavior section and retained real checks (rule metadata + fixture existence).
-- `test/code_quality_rules_test.dart`: removed the stub-only behavior section and retained real checks (rule metadata + fixture existence).
-- Ratchet baseline lowered from `3561` → `3458` → `3349` literal `expect('<literal>', isNotNull)` assertions.
-
-### Definition of Done
-
-- No tautological `expect(true, isTrue)` tests.
-- No tautological `expect('<literal>', isNotNull)` tests.
-- Converted tests assert real lint behavior (trigger + non-trigger) with fixture-backed scenarios.
+- 2026-03-25: filed at 3,530 regex-literal stubs / 103 files.
+- 2026-04-04 → 04-27: regex-literal stubs driven to 0; `expect(true, isTrue)`
+  guard + literal-`isNotNull` ratchet added.
+- 2026-06-10: rebaselined onto the AST definition (423 assertion-free / 51
+  files). **Phase 1**: deleted 396 empty-body stubs + 255 orphaned `group()`
+  blocks (651 statements, 47 files); switched the guard to a hard empty-body=0
+  gate (`scanEmptyBodyStubTests`); kept 27 legitimate assertion-free tests;
+  full suite green (5,726). Built & validated the Phase 2 resolved-analyzer
+  oracle.

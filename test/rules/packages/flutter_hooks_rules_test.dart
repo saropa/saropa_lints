@@ -68,35 +68,4 @@ void main() {
       });
     }
   });
-
-  group('Flutter Hooks - Avoidance Rules', () {
-    group('avoid_hooks_outside_build', () {
-      test('hook called outside build SHOULD trigger', () {});
-
-      test('hooks inside build method only should NOT trigger', () {});
-    });
-    group('avoid_conditional_hooks', () {
-      test('hook inside if/else SHOULD trigger', () {});
-
-      test('unconditional hook calls should NOT trigger', () {});
-    });
-    group('avoid_unnecessary_hook_widgets', () {
-      test('HookWidget with no hooks SHOULD trigger', () {});
-
-      test('regular StatelessWidget should NOT trigger', () {});
-    });
-    group('avoid_misused_hooks', () {
-      test('hook with wrong lifecycle semantics SHOULD trigger', () {});
-
-      test('correct hook usage should NOT trigger', () {});
-    });
-  });
-
-  group('Flutter Hooks - Preference Rules', () {
-    group('prefer_use_callback', () {
-      test('inline callback in hook SHOULD trigger', () {});
-
-      test('useCallback for stable reference should NOT trigger', () {});
-    });
-  });
 }

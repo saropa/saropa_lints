@@ -102,7 +102,7 @@
     "status": {
       "lastRunPrefix": "Son çalıştırma",
       "lastRunUnknown": "Son çalıştırma bilinmiyor",
-      "noTimestampTitle": "İhlaller.json'da zaman damgası yok",
+      "noTimestampTitle": "violations.json'da zaman damgası yok",
       "findingsAfterFilterTitle": "Devre dışı bırakılan kural filtresinden sonraki toplam bulgular",
       "findingOne": "{count} bulgu",
       "findingOther": "{count} bulgu",
@@ -165,7 +165,7 @@
       "clearRecentButton": "Temizlemek",
       "recentFiltersListAria": "Son filtreler",
       "runAnalysisTitle": "Saropa Lints analizini çalıştırın",
-      "refreshViolationsTitle": "İhlaller.json dosyasını diskten yeniden yükleyin",
+      "refreshViolationsTitle": "violations.json dosyasını diskten yeniden yükleyin",
       "severityGroupAria": "Önem derecesi filtresi",
       "severityLabel": "Şiddet",
       "impactGroupAria": "Darbe filtresi",
@@ -199,11 +199,11 @@
       "openCodeHealth": "Açık Kod Sağlığı",
       "openLintsConfig": "Lints Yapılandırmasını Aç",
       "reloadFromDisk": "Diskten yeniden yükle",
-      "reloadFromDiskTitle": "Analiz aracını yeniden çalıştırmadan kontrol panelini son ihlaller.json dosyasından yeniden oluşturun.",
+      "reloadFromDiskTitle": "Analiz aracını yeniden çalıştırmadan kontrol panelini son violations.json dosyasından yeniden oluşturun.",
       "reEnableDisabledRules": "Devre dışı bırakılan kuralları yeniden etkinleştirin…",
-      "reEnableDisabledRulesTitle": "analyze_options_custom.yaml'de halihazırda devre dışı bırakılmış olan kuralların hızlı seçimini açın ve seçilenleri yeniden etkinleştirin.",
+      "reEnableDisabledRulesTitle": "analysis_options_custom.yaml'de halihazırda devre dışı bırakılmış olan kuralların hızlı seçimini açın ve seçilenleri yeniden etkinleştirin.",
       "reEnableNoneTitle": "Şu anda devre dışı bırakılmış kural yok",
-      "reEnableNoneMessage": "Şu anda analyze_options_custom.yaml aracılığıyla hiçbir kural devre dışı bırakılmadı.",
+      "reEnableNoneMessage": "Şu anda analysis_options_custom.yaml aracılığıyla hiçbir kural devre dışı bırakılmadı.",
       "reEnableQuickPickTitle": "Devre dışı bırakılan kuralları yeniden etkinleştirin",
       "reEnableQuickPickPlaceholder": "Yeniden etkinleştirmek için bir veya daha fazla kural seçin",
       "menuGroupExport": "İhracat",
@@ -219,10 +219,10 @@
       "sectionAria": "Sayıya göre en önemli kurallar",
       "hideTitle": "Yalnızca benim için gizle — çalışma alanı düzeyinde, Clear Bastırmalar aracılığıyla geri döndürülebilir",
       "hideButton": "Saklamak",
-      "disableTitle": "Projenin tamamı için devre dışı bırakın — analyze_options_custom.yaml yazar ve analizi yeniden çalıştırır",
+      "disableTitle": "Projenin tamamı için devre dışı bırakın — analysis_options_custom.yaml yazar ve analizi yeniden çalıştırır",
       "disableButton": "Devre dışı bırakmak",
       "workspaceOnlyShort": "yalnızca çalışma alanı",
-      "projectConfigShort": "proje yapılandırması (analyse_options_custom.yaml yazar)",
+      "projectConfigShort": "proje yapılandırması (analysis_options_custom.yaml yazar)",
       "topRulesOne": "En iyi {count} kuralı",
       "topRulesOther": "En önemli {count} kuralları",
       "colRank": "#",
@@ -349,7 +349,7 @@
       "bulkSelectedTpl": "{n} seçildi"
     },
     "emptyState": {
-      "hintAfterMessage": "İhlaller.json oluşturmak için bir Saropa Lints analizi çalıştırın, ardından Burayı Yenile'yi kullanın veya bu kontrol panelini yeniden açın.",
+      "hintAfterMessage": "violations.json oluşturmak için bir Saropa Lints analizi çalıştırın, ardından Burayı Yenile'yi kullanın veya bu kontrol panelini yeniden açın.",
       "refreshDisk": "Diskten yenile"
     },
     "shortcuts": {
@@ -366,7 +366,7 @@
       "analyzerTodosOn": "+{count} analizör YAPILACAKLAR",
       "analyzerTodosPromo": "+? analizci YAPILACAKLAR — göster",
       "scannerPromo": "TODO/HACK tarayıcısını etkinleştir",
-      "tooltipLive": "VS Kod Sorunları panelinden canlı yayın. Analiz tamamlandıkça güncellenir. Gizlemek için tıklayın.",
+      "tooltipLive": "VS Code Sorunları panelinden canlı yayın. Analiz tamamlandıkça güncellenir. Gizlemek için tıklayın.",
       "tooltipScanner": "Saropa dosya sistemi tarayıcısı — kaynaktaki açık TODO/HACK işaretçilerini sayar.",
       "tooltipPromoClickToOn": "Etkinleştirmek için tıklayın"
     }
@@ -389,7 +389,7 @@
     "hintNoPerRule": "Bu dışa aktarmada kural başına sorun sayısı yoktur. Güncel bir Saropa Lints eklentisi ile yeniden analiz edin.",
     "hintBuildFailed": "Bu dışa aktarmadan önceliklendirme oluşturulamadı. Yeni bir analiz yapın.",
     "summaryVolume": "Kural triyajı (hacim / düzeltilmesi gereken / biçimsel)",
-    "hintSameAsTree": "Triyaj etkinlik çubuğu ağacıyla aynı gruplandırma: Sorunları filtreleyin veya \"analiz_seçenekleri_özel.yaml\" bölümünde kuralları devre dışı bırakın/etkinleştirin. Büyük gruplar onay isteyebilir."
+    "hintSameAsTree": "Triyaj etkinlik çubuğu ağacıyla aynı gruplandırma: Sorunları filtreleyin veya \"analysis_options_custom.yaml\" bölümünde kuralları devre dışı bırakın/etkinleştirin. Büyük gruplar onay isteyebilir."
   },
   "kbdOverlay": {
     "toggleTitle": "Klavye kısayollarını göster (?)",
@@ -454,7 +454,7 @@
       "singleUse": "Tek kullanımlık",
       "vulnerable": "Hassas",
       "overrides": "Geçersiz kılmalar",
-      "caveatLine1": "*Kod boyutları mevcut olmadığında pub.dev arşiv boyutuna geri dönen kod boyutları (lib + bildirilen varlıklar) gösterilir. dev_dependencing'leri (build_runner, lints, saropa_lints vb.) hariç tutar; bunlar hiçbir zaman APK / IPA / web paketine gönderilmez. Ağaç sallandıktan sonra gerçek uygulama boyutu daha küçük olacaktır.",
+      "caveatLine1": "*Kod boyutları mevcut olmadığında pub.dev arşiv boyutuna geri dönen kod boyutları (lib + bildirilen varlıklar) gösterilir. dev_dependencies'leri (build_runner, lints, saropa_lints vb.) hariç tutar; bunlar hiçbir zaman APK / IPA / web paketine gönderilmez. Ağaç sallandıktan sonra gerçek uygulama boyutu daha küçük olacaktır.",
       "caveatLine2": "Etkinlik eşikleri: 90d = eski, 180d = hareketsiz (taahhüt + sürüm zaman çizelgeleri)."
     },
     "breakdown": {
@@ -480,7 +480,7 @@
     },
     "sections": {
       "sizeDistribution": "Boyut Dağılımı",
-      "sizeDistributionCaption": "dev_dependencing'leri hariç tutar; hiçbir zaman APK / IPA / web paketine gönderilmezler.",
+      "sizeDistributionCaption": "dev_dependencies'leri hariç tutar; hiçbir zaman APK / IPA / web paketine gönderilmezler.",
       "filters": "Filtreler",
       "packages": "Paketler"
     },
@@ -532,7 +532,7 @@
       },
       "version": {
         "label": "Sürüm",
-        "tooltip": "Pubspec.lock'tan yüklenen sürüm"
+        "tooltip": "pubspec.lock'tan yüklenen sürüm"
       },
       "score": {
         "label": "Kategori",
@@ -584,7 +584,7 @@
       },
       "license": {
         "label": "Lisans",
-        "tooltip": "Pub.dev'den SPDX lisans tanımlayıcısı"
+        "tooltip": "pub.dev'den SPDX lisans tanımlayıcısı"
       },
       "update": {
         "label": "Güncelleme",
@@ -596,7 +596,7 @@
       },
       "description": {
         "label": "Tanım",
-        "tooltip": "Pub.dev'den paket açıklaması"
+        "tooltip": "pub.dev'den paket açıklaması"
       }
     },
     "cells": {
@@ -820,7 +820,7 @@
       "detailHeading": "Bu işlev neden {score} puanını aldı?",
       "detailNoIssues": "Bu satırda bayrak yok; puan, yukarıdaki sütun değerlerine göre belirlenir (kullanım, kapsam, karmaşıklık, yaş, belgeler).",
       "suppressLabel": "Dosyada bastır",
-      "suppressTooltip": "Bu dosyaya `// görmezden_for_dosya: code_health:<flag>` yazar, böylece gelecekteki taramalar dosyanın tamamı için bu bayrağı bırakır."
+      "suppressTooltip": "Bu dosyaya `// ignore_for_file: code_health:<flag>` yazar, böylece gelecekteki taramalar dosyanın tamamı için bu bayrağı bırakır."
     },
     "flag": {
       "unused": {
@@ -884,7 +884,7 @@
     }
   },
   "suppressionsStrip": {
-    "noData": "Henüz ihlal yok.json — bastırma anlık görüntüsünü doldurmak için analiz çalıştırın.",
+    "noData": "Henüz ihlal violations.json — bastırma anlık görüntüsünü doldurmak için analiz çalıştırın.",
     "zeroTotal": "En son dışa aktarmada 0 analizör engellemesi.",
     "noKindBreakdown": "Bu ihracatta tür ayrımı yok.",
     "title": "Bastırmalar (dışa aktarma)",
@@ -893,7 +893,7 @@
   },
   "configMirrors": {
     "noFileRisk": "Dosya başına risk dökümü yok (kapsam dahilinde ihlal yok).",
-    "suppressionNote": "İhlaller.json özetiyle eşleşir, canlı kenar çubuğu bastırma geçişleri değil.",
+    "suppressionNote": "violations.json özetiyle eşleşir, canlı kenar çubuğu bastırma geçişleri değil.",
     "noSuppression": "Bu dışa aktarmada gizleme toplamı yok (eski analizör veya sıfır gizleme).",
     "owaspSignal": "Bu dışa aktarımdaki {count} ihlal OWASP mobil/web eşlemesini içerir — tam matris ve dışa aktarım için Güvenlik Duruşu'nu açın.",
     "summarySuppressions": "Bastırmalar (anlık görüntüyü dışa aktarma)",

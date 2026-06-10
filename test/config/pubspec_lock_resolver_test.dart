@@ -22,6 +22,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.19.1"
+  drift:
+    dependency: "direct main"
+    description:
+      name: drift
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.20.0"
   foo_bar:
     dependency: direct
     description:
@@ -43,6 +50,37 @@ void main() {
 
     test('returns empty when packages section missing', () {
       expect(parsePubspecLockPackageVersions('name: x\n'), isEmpty);
+    });
+  });
+
+  group('parsePubspecLockDependencyKinds', () {
+    test('distinguishes direct, quoted direct main, and transitive', () {
+      final m = parsePubspecLockDependencyKinds(_sampleLock);
+      expect(m['collection'], 'transitive');
+      expect(m['drift'], 'direct main');
+      expect(m['foo_bar'], 'direct');
+    });
+
+    test('returns empty when packages section missing', () {
+      expect(parsePubspecLockDependencyKinds('name: x\n'), isEmpty);
+    });
+  });
+
+  group('isDirectDependency', () {
+    test('true for direct, false for transitive, null for unknown', () {
+      final dir = Directory.systemTemp.createTempSync('saropa_lock_test');
+      try {
+        File(p.join(dir.path, 'pubspec.lock')).writeAsStringSync(_sampleLock);
+        clearPubspecLockResolverCacheForTests();
+        expect(isDirectDependency(dir.path, 'drift'), isTrue);
+        expect(isDirectDependency(dir.path, 'foo_bar'), isTrue);
+        expect(isDirectDependency(dir.path, 'collection'), isFalse);
+        // Absent package: unknown, callers treat null as not-direct (§7.3).
+        expect(isDirectDependency(dir.path, 'not_present'), isNull);
+      } finally {
+        clearPubspecLockResolverCacheForTests();
+        dir.deleteSync(recursive: true);
+      }
     });
   });
 

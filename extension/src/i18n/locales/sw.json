@@ -74,7 +74,7 @@
     "pick": {
       "title": "Lugha ya UI ya Saropa Lints",
       "placeholder": "Chagua lugha ya utepe na dashibodi",
-      "auto": "Otomatiki (fuata lugha ya onyesho ya Msimbo wa VS)"
+      "auto": "Otomatiki (fuata lugha ya onyesho ya VS Code)"
     },
     "reloadPrompt": "Lugha imewekwa {locale}. Pakia upya dirisha ili kusasisha utepe na lebo za amri.",
     "reloadNow": "Pakia upya sasa",
@@ -102,7 +102,7 @@
     "status": {
       "lastRunPrefix": "Mbio za mwisho",
       "lastRunUnknown": "Mbio za mwisho hazijulikani",
-      "noTimestampTitle": "Hakuna muhuri wa muda kwenye ukiukaji.json",
+      "noTimestampTitle": "Hakuna muhuri wa muda kwenye violations.json",
       "findingsAfterFilterTitle": "Jumla ya matokeo baada ya kichujio cha kanuni kizimwa",
       "findingOne": "matokeo {count}",
       "findingOther": "matokeo {count}",
@@ -165,7 +165,7 @@
       "clearRecentButton": "Wazi",
       "recentFiltersListAria": "Vichungi vya hivi majuzi",
       "runAnalysisTitle": "Fanya uchambuzi wa Saropa Lints",
-      "refreshViolationsTitle": "Pakia upya ukiukaji.json kutoka kwa diski",
+      "refreshViolationsTitle": "Pakia upya violations.json kutoka kwa diski",
       "severityGroupAria": "Kichujio cha ukali",
       "severityLabel": "Ukali",
       "impactGroupAria": "Kichujio cha athari",
@@ -199,7 +199,7 @@
       "openCodeHealth": "Fungua Kanuni ya Afya",
       "openLintsConfig": "Fungua Usanidi wa Lints",
       "reloadFromDisk": "Pakia upya kutoka kwa diski",
-      "reloadFromDiskTitle": "Toa tena dashibodi kutoka kwa ukiukaji wa mwisho.json bila kuendesha tena kichanganuzi.",
+      "reloadFromDiskTitle": "Toa tena dashibodi kutoka kwa ukiukaji wa violations.json bila kuendesha tena kichanganuzi.",
       "reEnableDisabledRules": "Washa tena sheria zilizozimwa...",
       "reEnableDisabledRulesTitle": "Fungua chaguo la haraka la sheria ambazo kwa sasa zimezimwa katika analysis_options_custom.yaml na uwashe tena zilizochaguliwa.",
       "reEnableNoneTitle": "Hakuna sheria ambazo zimezimwa kwa sasa",
@@ -320,7 +320,7 @@
       "severityHides": "ukali {count} uliofichwa",
       "impactHides": "athari {count} zilizofichwa",
       "activeHides": "Ngozi zinazotumika: {counts}.",
-      "viewHidesFooter": "Maficho haya hupunguza orodha ya Masuala/dashibodi pekee; hazijaandikwa kwa `ukiukaji.json`.",
+      "viewHidesFooter": "Maficho haya hupunguza orodha ya Masuala/dashibodi pekee; hazijaandikwa kwa `violations.json`.",
       "clearViewHides": "Futa maficho yote ya kutazama",
       "foldersSample": "Folda (sampuli)",
       "filesSample": "Faili / globu (sampuli)",
@@ -349,7 +349,7 @@
       "bulkSelectedTpl": "{n} zimechaguliwa"
     },
     "emptyState": {
-      "hintAfterMessage": "Fanya uchanganuzi wa Saropa Lints ili kuzalisha ukiukaji.json, kisha utumie Onyesha upya hapa au ufungue tena dashibodi hii.",
+      "hintAfterMessage": "Fanya uchanganuzi wa Saropa Lints ili kuzalisha violations.json, kisha utumie Onyesha upya hapa au ufungue tena dashibodi hii.",
       "refreshDisk": "Onyesha upya kutoka kwa diski"
     },
     "shortcuts": {
@@ -366,7 +366,7 @@
       "analyzerTodosOn": "+{count} TODO za kichanganuzi",
       "analyzerTodosPromo": "+? analyzer TODOs - onyesha",
       "scannerPromo": "Washa kichanganuzi cha TODO/HACK",
-      "tooltipLive": "Moja kwa moja kutoka kwa paneli ya Matatizo ya Msimbo wa VS. Inasasisha uchambuzi unapokamilika. Bofya ili kuficha.",
+      "tooltipLive": "Moja kwa moja kutoka kwa paneli ya Matatizo ya VS Code. Inasasisha uchambuzi unapokamilika. Bofya ili kuficha.",
       "tooltipScanner": "Kichanganuzi cha mfumo wa faili cha Saropa - huhesabu alama za TODO/HACK katika chanzo.",
       "tooltipPromoClickToOn": "Bofya ili kuwezesha"
     }
@@ -383,7 +383,7 @@
     "zeroIssueRules": "sheria {count} zisizo na matatizo — zimewezeshwa kiotomatiki kwenye kiwango.",
     "disabledOverrides": "sheria {count} zimezimwa kwa kubatilisha katika `analysis_options_custom.yaml`.",
     "summaryRuleTriage": "Uteuzi wa kanuni",
-    "hintNoViolations": "Bado hakuna `ripoti/.saropa_lints/violations.json`. Fanya uchambuzi, kisha uonyeshe upya kichupo hiki.",
+    "hintNoViolations": "Bado hakuna `reports/.saropa_lints/violations.json`. Fanya uchambuzi, kisha uonyeshe upya kichupo hiki.",
     "hintUnreadable": "Hakuna ukiukaji unaoweza kusomeka. Endesha uchambuzi wa Saropa Lints kwanza.",
     "hintStale": "Data ya majaribio inaweza kuwa imepitwa na wakati (usafirishaji ni {age} nzee). Rudia uchanganuzi wa vikundi vya sasa.",
     "hintNoPerRule": "Uhamishaji huu hauna hesabu za suala la kila kanuni. Changanua upya ukitumia programu-jalizi ya sasa ya Saropa Lints.",
@@ -884,7 +884,7 @@
     }
   },
   "suppressionsStrip": {
-    "noData": "Bado hakuna ukiukaji.json - fanya uchanganuzi ili kujaza muhtasari wa ukandamizaji.",
+    "noData": "Bado hakuna violations.json - fanya uchanganuzi ili kujaza muhtasari wa ukandamizaji.",
     "zeroTotal": "0 ukandamizaji wa kichanganuzi katika usafirishaji wa hivi punde.",
     "noKindBreakdown": "Hakuna uchanganuzi wa aina fulani katika usafirishaji huu.",
     "title": "Vizuizi (kuuza nje)",
@@ -893,7 +893,7 @@
   },
   "configMirrors": {
     "noFileRisk": "Hakuna uchanganuzi wa hatari kwa kila faili (hakuna ukiukaji katika wigo).",
-    "suppressionNote": "Inalingana na muhtasari wa ukiukaji.json, si vigeuzaji vya ukandamizaji wa upau wa moja kwa moja.",
+    "suppressionNote": "Inalingana na muhtasari wa violations.json, si vigeuzaji vya ukandamizaji wa upau wa moja kwa moja.",
     "noSuppression": "Hakuna jumla ya ukandamizaji katika usafirishaji huu (kichanganuzi cha zamani au ukandamizaji sifuri).",
     "owaspSignal": "ukiukaji {count} katika usafirishaji huu umebeba ramani ya simu/wavuti ya OWASP — fungua Mkao wa Usalama kwa matrix kamili na usafirishaji.",
     "summarySuppressions": "Ukandamizaji (hamisha picha ndogo)",

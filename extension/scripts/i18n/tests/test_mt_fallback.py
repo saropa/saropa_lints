@@ -58,6 +58,26 @@ class TestShieldRoundTrip(unittest.TestCase):
         self.assertIn("{target}", masked)
         self.assertEqual(mt.unshield_placeholders(masked, holders), "Saropa needs {target}")
 
+    def test_multiword_product_name_shielded_as_unit(self) -> None:
+        # "Saropa Lints" must be masked whole — neither half visible to MT — so the
+        # engine cannot translate the "Lints" word (the 300+ "Saropa Fusseln /
+        # Pelusas / 糸くず" regressions came from only "Saropa" being shielded).
+        # The longest-first ordering also has to win: bare "Saropa" must NOT mask
+        # the "Saropa" inside the phrase and strand a raw "Lints".
+        masked, holders = mt.shield_placeholders("About Saropa Lints today")
+        self.assertNotIn("Saropa", masked)
+        self.assertNotIn("Lints", masked)
+        self.assertEqual(
+            mt.unshield_placeholders(masked, holders), "About Saropa Lints today"
+        )
+
+    def test_tool_brand_names_shielded(self) -> None:
+        # Tool/proper-noun brands that MT had been transliterating ("VS Kodu",
+        # "पब.डेव", "オワスプ") must round-trip verbatim.
+        for src in ("Open on pub.dev", "follow VS Code display", "OWASP signal"):
+            masked, holders = mt.shield_placeholders(src)
+            self.assertEqual(mt.unshield_placeholders(masked, holders), src)
+
 
 class TestSentinelIntegrity(unittest.TestCase):
     def test_intact_when_all_present(self) -> None:

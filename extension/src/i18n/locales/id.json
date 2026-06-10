@@ -102,7 +102,7 @@
     "status": {
       "lastRunPrefix": "Lari terakhir",
       "lastRunUnknown": "Terakhir dijalankan tidak diketahui",
-      "noTimestampTitle": "Tidak ada stempel waktu pada pelanggaran.json",
+      "noTimestampTitle": "Tidak ada stempel waktu pada violations.json",
       "findingsAfterFilterTitle": "Total temuan setelah filter aturan dinonaktifkan",
       "findingOne": "{count} temuan",
       "findingOther": "{count} temuan",
@@ -165,7 +165,7 @@
       "clearRecentButton": "Jernih",
       "recentFiltersListAria": "Filter terbaru",
       "runAnalysisTitle": "Jalankan analisis Saropa Lints",
-      "refreshViolationsTitle": "Muat ulang pelanggaran.json dari disk",
+      "refreshViolationsTitle": "Muat ulang violations.json dari disk",
       "severityGroupAria": "Filter tingkat keparahan",
       "severityLabel": "Kerasnya",
       "impactGroupAria": "Filter dampak",
@@ -199,7 +199,7 @@
       "openCodeHealth": "Buka Kode Kesehatan",
       "openLintsConfig": "Buka Konfigurasi Lints",
       "reloadFromDisk": "Muat ulang dari disk",
-      "reloadFromDiskTitle": "Render ulang dasbor dari pelanggaran terakhir.json tanpa menjalankan kembali penganalisis.",
+      "reloadFromDiskTitle": "Render ulang dasbor dari pelanggaran violations.json tanpa menjalankan kembali penganalisis.",
       "reEnableDisabledRules": "Aktifkan kembali aturan yang dinonaktifkan…",
       "reEnableDisabledRulesTitle": "Buka aturan pilihan cepat yang saat ini dinonaktifkan di analysis_options_custom.yaml dan aktifkan kembali aturan yang dipilih.",
       "reEnableNoneTitle": "Tidak ada aturan yang saat ini dinonaktifkan",
@@ -349,7 +349,7 @@
       "bulkSelectedTpl": "{n} dipilih"
     },
     "emptyState": {
-      "hintAfterMessage": "Jalankan analisis Saropa Lints untuk menghasilkan pelanggaran.json, lalu gunakan Refresh di sini atau buka kembali dasbor ini.",
+      "hintAfterMessage": "Jalankan analisis Saropa Lints untuk menghasilkan violations.json, lalu gunakan Refresh di sini atau buka kembali dasbor ini.",
       "refreshDisk": "Segarkan dari disk"
     },
     "shortcuts": {
@@ -389,7 +389,7 @@
     "hintNoPerRule": "Ekspor ini tidak memiliki jumlah masalah per aturan. Analisis ulang dengan plugin Saropa Lints saat ini.",
     "hintBuildFailed": "Tidak dapat membuat triase dari ekspor ini. Jalankan analisis baru.",
     "summaryVolume": "Triase aturan (volume / harus diperbaiki / gaya)",
-    "hintSameAsTree": "Pengelompokan yang sama seperti pohon bilah aktivitas Triase: memfilter Masalah, atau menonaktifkan/mengaktifkan aturan di `analisis_options_custom.yaml`. Kelompok besar mungkin meminta konfirmasi."
+    "hintSameAsTree": "Pengelompokan yang sama seperti pohon bilah aktivitas Triase: memfilter Masalah, atau menonaktifkan/mengaktifkan aturan di `analysis_options_custom.yaml`. Kelompok besar mungkin meminta konfirmasi."
   },
   "kbdOverlay": {
     "toggleTitle": "Tampilkan pintasan keyboard (?)",
@@ -820,7 +820,7 @@
       "detailHeading": "Mengapa fungsi ini mendapat skor {score}",
       "detailNoIssues": "Tidak ada tanda pada baris ini — skor ditentukan oleh nilai kolom di atas (penggunaan, cakupan, kompleksitas, usia, dokumentasi).",
       "suppressLabel": "Tekan dalam file",
-      "suppressTooltip": "Menulis `// abaikan_for_file: code_health:<flag>` ke dalam file ini sehingga pemindaian selanjutnya menghilangkan tanda ini untuk keseluruhan file."
+      "suppressTooltip": "Menulis `// ignore_for_file: code_health:<flag>` ke dalam file ini sehingga pemindaian selanjutnya menghilangkan tanda ini untuk keseluruhan file."
     },
     "flag": {
       "unused": {
@@ -884,7 +884,7 @@
     }
   },
   "suppressionsStrip": {
-    "noData": "Belum ada pelanggaran.json — jalankan analisis untuk mengisi snapshot penekanan.",
+    "noData": "Belum ada violations.json — jalankan analisis untuk mengisi snapshot penekanan.",
     "zeroTotal": "0 penindasan penganalisis dalam ekspor terbaru.",
     "noKindBreakdown": "Tidak ada pengelompokan berdasarkan jenis dalam ekspor ini.",
     "title": "Penindasan (ekspor)",
@@ -893,7 +893,7 @@
   },
   "configMirrors": {
     "noFileRisk": "Tidak ada perincian risiko per file (tidak ada pelanggaran dalam cakupan).",
-    "suppressionNote": "Cocok dengan ringkasan pelanggaran.json, bukan tombol matikan penekanan sidebar langsung.",
+    "suppressionNote": "Cocok dengan ringkasan violations.json, bukan tombol matikan penekanan sidebar langsung.",
     "noSuppression": "Tidak ada agregat penekanan dalam ekspor ini (penganalisis lama atau tanpa penekanan).",
     "owaspSignal": "{count} pelanggaran dalam ekspor ini membawa pemetaan mobile/web OWASP — buka Postur Keamanan untuk matriks penuh dan ekspor.",
     "summarySuppressions": "Penindasan (ekspor cuplikan)",

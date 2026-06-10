@@ -201,9 +201,9 @@
       "reloadFromDisk": "โหลดซ้ำจากดิสก์",
       "reloadFromDiskTitle": "แสดงผลแดชบอร์ดอีกครั้งจากการละเมิด json ครั้งล่าสุดโดยไม่ต้องเรียกใช้ตัววิเคราะห์อีกครั้ง",
       "reEnableDisabledRules": "เปิดใช้งานกฎที่ปิดใช้งานอีกครั้ง...",
-      "reEnableDisabledRulesTitle": "เปิดกฎที่เลือกอย่างรวดเร็วที่ปิดใช้งานอยู่ใน analytics_options_custom.yaml และเปิดใช้งานกฎที่เลือกอีกครั้ง",
+      "reEnableDisabledRulesTitle": "เปิดกฎที่เลือกอย่างรวดเร็วที่ปิดใช้งานอยู่ใน analysis_options_custom.yaml และเปิดใช้งานกฎที่เลือกอีกครั้ง",
       "reEnableNoneTitle": "ไม่มีกฎที่ถูกปิดใช้งานในขณะนี้",
-      "reEnableNoneMessage": "ขณะนี้ไม่มีกฎใดถูกปิดใช้งานผ่าน analytics_options_custom.yaml",
+      "reEnableNoneMessage": "ขณะนี้ไม่มีกฎใดถูกปิดใช้งานผ่าน analysis_options_custom.yaml",
       "reEnableQuickPickTitle": "เปิดใช้งานกฎที่ปิดใช้งานอีกครั้ง",
       "reEnableQuickPickPlaceholder": "เลือกกฎอย่างน้อย 1 ข้อเพื่อเปิดใช้งานอีกครั้ง",
       "menuGroupExport": "ส่งออก",
@@ -222,7 +222,7 @@
       "disableTitle": "ปิดใช้งานสำหรับทั้งโปรเจ็กต์ — เขียน analysis_options_custom.yaml และดำเนินการวิเคราะห์อีกครั้ง",
       "disableButton": "ปิดการใช้งาน",
       "workspaceOnlyShort": "พื้นที่ทำงานเท่านั้น",
-      "projectConfigShort": "การกำหนดค่าโครงการ (เขียน analyse_options_custom.yaml)",
+      "projectConfigShort": "การกำหนดค่าโครงการ (เขียน analysis_options_custom.yaml)",
       "topRulesOne": "กฎ {count} ยอดนิยม",
       "topRulesOther": "กฎยอดนิยม {count}",
       "colRank": "#",
@@ -820,7 +820,7 @@
       "detailHeading": "เหตุใดฟังก์ชันนี้จึงได้คะแนน {score}",
       "detailNoIssues": "ไม่มีแฟล็กในแถวนี้ — คะแนนขับเคลื่อนโดยค่าคอลัมน์ด้านบน (การใช้งาน ความครอบคลุม ความซับซ้อน อายุ เอกสารประกอบ)",
       "suppressLabel": "ระงับในไฟล์",
-      "suppressTooltip": "เขียน `//ign_for_file: code_health:<flag>` ลงในไฟล์นี้ ดังนั้นการสแกนในอนาคตจะปล่อยแฟล็กนี้สำหรับทั้งไฟล์"
+      "suppressTooltip": "เขียน `// ignore_for_file: code_health:<flag>` ลงในไฟล์นี้ ดังนั้นการสแกนในอนาคตจะปล่อยแฟล็กนี้สำหรับทั้งไฟล์"
     },
     "flag": {
       "unused": {

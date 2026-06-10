@@ -584,14 +584,6 @@ void main() {
     });
 
     group('avoid_unnecessary_nullable_return_type', () {
-      test('avoid_unnecessary_nullable_return_type SHOULD trigger', () {
-        // Pattern that should be avoided: avoid unnecessary nullable return type
-      });
-
-      test('avoid_unnecessary_nullable_return_type should NOT trigger', () {
-        // Avoidance pattern not present
-      });
-
       test('expression body false positives covered in fixture', () {
         // Fixture covers: ternary with null, map lookup, nullable
         // passthrough, and nullable method return — all must NOT
@@ -614,26 +606,6 @@ void main() {
 
   group('Structure - General Rules', () {
     group('uri_does_not_exist', () {
-      test('import of non-existent relative file SHOULD trigger', () {
-        // import 'missing_file.dart' when file doesn't exist
-      });
-
-      test('import of existing file should NOT trigger', () {
-        // import 'existing_file.dart' when file exists
-      });
-
-      test('package: imports should NOT trigger (false positive)', () {
-        // package: URIs are resolved by the package system, not filesystem
-      });
-
-      test('dart: imports should NOT trigger (false positive)', () {
-        // dart: URIs are SDK libraries
-      });
-
-      test('part directives also checked', () {
-        // Rule checks imports, exports, AND part directives
-      });
-
       test('ruleType is bug', () {
         final rule = UriDoesNotExistRule();
         expect(rule.ruleType, isNotNull);

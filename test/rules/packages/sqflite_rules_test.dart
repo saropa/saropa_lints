@@ -42,12 +42,4 @@ void main() {
       });
     }
   });
-
-  group('Sqflite - Avoidance Rules', () {
-    group('avoid_sqflite_type_mismatch', () {
-      test('wrong column type in sqflite query SHOULD trigger', () {});
-
-      test('matching Dart type to SQLite column should NOT trigger', () {});
-    });
-  });
 }

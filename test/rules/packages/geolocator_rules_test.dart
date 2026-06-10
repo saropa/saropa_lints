@@ -68,31 +68,4 @@ void main() {
       });
     }
   });
-
-  group('Geolocator - Avoidance Rules', () {
-    group('avoid_continuous_location_updates', () {
-      test('always-on location stream SHOULD trigger', () {});
-
-      test('on-demand location updates should NOT trigger', () {});
-    });
-  });
-
-  group('Geolocator - Requirement Rules', () {
-    group('require_geolocator_battery_awareness', () {
-      test(
-        'continuous GPS without battery consideration SHOULD trigger',
-        () {},
-      );
-
-      test('battery-aware location strategy should NOT trigger', () {});
-    });
-  });
-
-  group('Geolocator - Preference Rules', () {
-    group('prefer_geocoding_cache', () {
-      test('repeated geocoding for same location SHOULD trigger', () {});
-
-      test('cached geocoding results should NOT trigger', () {});
-    });
-  });
 }

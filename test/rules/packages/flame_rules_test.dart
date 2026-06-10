@@ -45,17 +45,4 @@ void main() {
       });
     }
   });
-
-  group('Flame Engine - Avoidance Rules', () {
-    group('avoid_creating_vector_in_update', () {
-      test('Vector2 allocation in update loop SHOULD trigger', () {});
-
-      test('reusable vector outside update should NOT trigger', () {});
-    });
-    group('avoid_redundant_async_on_load', () {
-      test('async onLoad with no await SHOULD trigger', () {});
-
-      test('sync onLoad when possible should NOT trigger', () {});
-    });
-  });
 }

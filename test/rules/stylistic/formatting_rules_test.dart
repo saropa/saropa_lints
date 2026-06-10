@@ -241,8 +241,6 @@ void main() {
         expect(rule.fixGenerators, isNotEmpty);
       });
     });
-
-    group('prefer_member_ordering', () {});
   });
 
   group('Formatting - General Rules', () {
@@ -252,8 +250,6 @@ void main() {
         expect(rule.fixGenerators, isNotEmpty);
       });
     });
-
-    group('format_comment_style', () {});
 
     group('require_ignore_comment_spacing', () {
       test('fixture has bad example with expect_lint marker', () {
@@ -279,10 +275,6 @@ void main() {
         },
       );
     });
-
-    group('enforce_parameters_ordering', () {});
-
-    group('enum_constants_ordering', () {});
   });
 
   // Stub-only behavior tests were removed from this file. Keep metadata,

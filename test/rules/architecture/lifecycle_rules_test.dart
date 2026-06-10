@@ -91,38 +91,4 @@ void main() {
       });
     }
   });
-
-  group('Lifecycle - Avoidance Rules', () {
-    group('avoid_work_in_paused_state', () {
-      test('computation during AppLifecycleState.paused SHOULD trigger', () {});
-
-      test('pausing work when app paused should NOT trigger', () {});
-    });
-  });
-
-  group('Lifecycle - Requirement Rules', () {
-    group('require_resume_state_refresh', () {
-      test('no state refresh on resume SHOULD trigger', () {});
-
-      test(
-        'data refresh on AppLifecycleState.resumed should NOT trigger',
-        () {},
-      );
-    });
-    group('require_did_update_widget_check', () {
-      test('didUpdateWidget without comparison SHOULD trigger', () {});
-
-      test('property comparison in didUpdateWidget should NOT trigger', () {});
-    });
-    group('require_late_initialization_in_init_state', () {
-      test('late field init outside initState SHOULD trigger', () {});
-
-      test('initialization in initState should NOT trigger', () {});
-    });
-    group('require_app_lifecycle_handling', () {
-      test('missing WidgetsBindingObserver SHOULD trigger', () {});
-
-      test('lifecycle state handling should NOT trigger', () {});
-    });
-  });
 }

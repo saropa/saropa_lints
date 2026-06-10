@@ -489,13 +489,4 @@ void main() {
   });
 
   // Rules that require logging, rethrow, or typed handling when failures occur.
-  group('Error Handling - Requirement Rules', () {
-    group('require_app_startup_error_handling', () {
-      test('main() without crash reporting dependency should NOT trigger '
-          '(regression)', () {
-        // Apps without firebase_crashlytics/sentry_flutter/etc. should
-        // not be forced to add runZonedGuarded with no reporting target
-      });
-    });
-  });
 }

@@ -155,13 +155,6 @@ void main() {
     // "info + prefer_* ⇒ must be stylistic" no longer holds.
     // Skipped pending a redesign that uses an explicit "opinionated" signal
     // independent of impact tier — see plan/COLLAPSE_LINT_IMPACT_TO_SEVERITY.md.
-    test(
-      'opinionated prefer_* rules must be in stylisticRules',
-      () {},
-      skip:
-          'Pending redesign post LintImpact 5→3 collapse '
-          '(plan/COLLAPSE_LINT_IMPACT_TO_SEVERITY.md, 2026-05-03).',
-    );
   });
 
   group('Package Rule Set Validation', () {

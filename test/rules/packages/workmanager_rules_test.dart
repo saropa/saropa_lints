@@ -54,22 +54,4 @@ void main() {
       });
     }
   });
-
-  group('WorkManager - Requirement Rules', () {
-    group('require_workmanager_constraints', () {
-      test('background task without constraints SHOULD trigger', () {});
-
-      test('network/battery constraints should NOT trigger', () {});
-    });
-    group('require_workmanager_result_return', () {
-      test('workmanager callback without result SHOULD trigger', () {});
-
-      test('explicit Result return should NOT trigger', () {});
-    });
-    group('require_workmanager_for_background', () {
-      test('Timer for background work SHOULD trigger', () {});
-
-      test('Workmanager for reliable background should NOT trigger', () {});
-    });
-  });
 }

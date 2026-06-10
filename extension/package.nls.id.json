@@ -8,7 +8,7 @@
   "views.status.name": "Status",
   "views.settings.name": "Pengaturan",
   "views.help.name": "Membantu",
-  "viewsWelcome.banner.contents": "**Saropa Lint**\n\n2100+ aturan lint Dart dan Flutter untuk keamanan, aksesibilitas, dan performa.\n\nMemerlukan proyek Dart atau Flutter.\n\nBuka folder yang berisi `pubspec.yaml` untuk memulai.\n\n[Pelajari lebih lanjut secara online](https://pub.dev/packages/saropa_lints)\n[Jelajahi Semua Perintah](perintah:saropaLints.showCommandCatalog)\n[Tentang Saropa Lints](perintah:saropaLints.showAbout)\n[Memulai](perintah:saropaLints.openWalkthrough)",
+  "viewsWelcome.banner.contents": "**Saropa Lints**\n\n2100+ aturan lint Dart dan Flutter untuk keamanan, aksesibilitas, dan performa.\n\nMemerlukan proyek Dart atau Flutter.\n\nBuka folder yang berisi `pubspec.yaml` untuk memulai.\n\n[Pelajari lebih lanjut secara online](https://pub.dev/packages/saropa_lints)\n[Jelajahi Semua Perintah](perintah:saropaLints.showCommandCatalog)\n[Tentang Saropa Lints](perintah:saropaLints.showAbout)\n[Memulai](perintah:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: Menyiapkan Proyek (pubspec + config)",
   "command.disable.title": "Saropa Lints: Matikan Integrasi Lint",
   "command.runAnalysis.title": "Saropa Lints: Analisis Jalankan",
@@ -166,13 +166,13 @@
   "command.driftAdvisor.enableIntegration.title": "Drift Advisor: Aktifkan Integrasi",
   "command.driftAdvisor.disableIntegration.title": "Drift Advisor: Nonaktifkan Integrasi",
   "command.showCommandCatalog.title": "Saropa Lints: Telusuri Semua Perintah",
-  "config.property.enabled.markdownDescription": "Saat **aktif** (default), Saropa Lints menjalankan pemeriksaan peningkatan dan memperlakukan ruang kerja seperti menggunakan integrasi Saropa lint. Matikan **mati** untuk menjeda pemberitahuan integrasi dan skor bilah status tanpa menyembunyikan opsi bilah sisi—gunakan **Saropa Lints: Siapkan Proyek** saat Anda perlu menambahkan `saropa_lints` ke pubspec dan tulis `analisis_options`.",
+  "config.property.enabled.markdownDescription": "Saat **aktif** (default), Saropa Lints menjalankan pemeriksaan peningkatan dan memperlakukan ruang kerja seperti menggunakan integrasi Saropa lint. Matikan **mati** untuk menjeda pemberitahuan integrasi dan skor bilah status tanpa menyembunyikan opsi bilah sisi—gunakan **Saropa Lints: Siapkan Proyek** saat Anda perlu menambahkan `saropa_lints` ke pubspec dan tulis `analysis_options`.",
   "config.property.tier.description": "Tingkat default saat mengaktifkan atau menginisialisasi ulang.",
   "config.property.runAnalysisAfterConfigChange.description": "Jalankan analisis dart setelah init atau perubahan konfigurasi saat diaktifkan.",
   "config.property.runAnalysisAfterDependencyChange.description": "Jalankan kembali analisis dart secara otomatis ketika pubspec.lock berubah (setelah pub get / pub upgrade). Menggunakan debounce 10 detik untuk menggabungkan resolusi ketergantungan yang cepat.",
   "config.property.uiLanguage.description": "Bahasa UI untuk sidebar dan dasbor Saropa. Gunakan 'otomatis' untuk mengikuti bahasa tampilan VS Code. Pemilih bahasa sidebar menyimpan nilai ini ke pengaturan Pengguna sehingga dapat diterapkan di setiap ruang kerja.",
   "config.property.runAnalysisOpenEditorsOnly.description": "Jika benar, Saropa Lints menjalankan analisis dart hanya untuk file Dart yang saat ini dibuka di VS Code (workspace.textDocuments) di bawah root proyek yang terdeteksi.",
-  "config.property.regressionNudge.enabled.markdownDescription": "Saat **on** (default), tampilkan toast satu kali setiap kali skor kesehatan melewati tepi pita (90, 80, 70, 60, 50). Pengingat untuk band tertentu hanya dipersenjatai kembali setelah skor pulih dengan jelas di atas band tersebut, sehingga skor yang berosilasi di sekitar tepi tidak lagi menghasilkan popup berulang. Matikan **mati** untuk membungkam proses regresi sepenuhnya sambil mempertahankan semua perilaku Lint Saropa lainnya.",
+  "config.property.regressionNudge.enabled.markdownDescription": "Saat **on** (default), tampilkan toast satu kali setiap kali skor kesehatan melewati tepi pita (90, 80, 70, 60, 50). Pengingat untuk band tertentu hanya dipersenjatai kembali setelah skor pulih dengan jelas di atas band tersebut, sehingga skor yang berosilasi di sekitar tepi tidak lagi menghasilkan popup berulang. Matikan **mati** untuk membungkam proses regresi sepenuhnya sambil mempertahankan semua perilaku Saropa Lints lainnya.",
   "config.property.inlineAnnotations.description": "Tampilkan pesan pelanggaran di akhir baris yang terpengaruh (gaya Lensa Kesalahan).",
   "config.property.issuesPageSize.description": "Jumlah maksimum pelanggaran yang ditampilkan per file dalam temuan yang dikelompokkan (Dasbor Temuan / daftar internal). Sisanya ditampilkan sebagai \"dan N lagi...\".",
   "config.property.violationsGroupBy.description": "Pengelompokan default untuk temuan lint (Dasbor Temuan/daftar yang dikelompokkan). \"dampak\" mencantumkan Kritis dan Tinggi terlebih dahulu; gunakan bilah alat dasbor untuk mengubah sementara.",
@@ -303,5 +303,5 @@
   "command.toggleIncludeAnalyzerTodosInDashboard.title": "Saropa Lints: Alihkan Tampilkan TODO Penganalisis di Dasbor",
   "command.toggleTodosAndHacksScanner.title": "Saropa Lints: Alihkan Pemindai Ruang Kerja TODO/HACK",
   "config.property.includeOtherAnalyzerFindingsInDashboard.description": "Tampilkan pil tambahan di Dasbor Temuan dengan jumlah temuan penganalisis non-saropa pada file .dart (lint Dart SDK bawaan ditambah plugin custom_lint pihak ketiga seperti riverpod_lint). Hanya tampilan — tidak pernah memengaruhi skor kesehatan, kartu KPI, atau daftar pelanggaran.",
-  "config.property.includeAnalyzerTodosInDashboard.description": "Tampilkan pil tambahan di Dasbor Temuan dengan jumlah diagnostik TODO sisi penganalisis (`kode: \"todo\"`) pada file .dart. Independen dari pemindai TODO/HACK sistem file saropa. Hanya tampilan."
+  "config.property.includeAnalyzerTodosInDashboard.description": "Tampilkan pil tambahan di Dasbor Temuan dengan jumlah diagnostik TODO sisi penganalisis (`code: \"todo\"`) pada file .dart. Independen dari pemindai TODO/HACK sistem file saropa. Hanya tampilan."
 }

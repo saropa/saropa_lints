@@ -352,7 +352,6 @@ const Map<String, Set<String>> kRulePackRuleCodesGenerated = {
     'prefer_context_selector',
     'prefer_family_for_params',
     'prefer_immutable_provider_arguments',
-    'prefer_notifier_over_state',
     'prefer_ref_watch_over_read',
     'prefer_riverpod_auto_dispose',
     'prefer_riverpod_code_gen',
@@ -372,6 +371,7 @@ const Map<String, Set<String>> kRulePackRuleCodesGenerated = {
     'use_ref_and_state_synchronously',
     'use_ref_read_synchronously',
   },
+  'riverpod_2': {'prefer_notifier_over_state'},
   'rxdart': {
     'avoid_behavior_subject_last_value',
     'prefer_rxdart_for_complex_streams',
@@ -439,6 +439,7 @@ const Map<String, Set<String>> kRulePackPubspecMarkersGenerated = {
   'provider': {'provider'},
   'qr_scanner': {'mobile_scanner', 'qr_flutter'},
   'riverpod': {'flutter_riverpod', 'hooks_riverpod', 'riverpod'},
+  'riverpod_2': {'flutter_riverpod', 'hooks_riverpod', 'riverpod'},
   'rxdart': {'rxdart'},
   'shared_preferences': {'shared_preferences'},
   'sqflite': {'sqflite'},

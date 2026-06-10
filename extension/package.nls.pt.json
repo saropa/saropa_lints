@@ -69,7 +69,7 @@
   "command.hideImpact.title": "Ocultar este impacto",
   "command.copyPath.title": "Copiar caminho",
   "command.copyMessage.title": "Copiar mensagem",
-  "command.toggleSidebarSection.title": "Saropa Linnts: Alternar seção da barra de atividades",
+  "command.toggleSidebarSection.title": "Saropa Lints: Alternar seção da barra de atividades",
   "command.issues.copyAsJson.title": "Copiar violações como JSON",
   "command.summary.copyAsJson.title": "Copiar resumo como JSON",
   "command.securityPosture.copyAsJson.title": "Copie a postura de segurança como JSON",
@@ -166,7 +166,7 @@
   "command.driftAdvisor.enableIntegration.title": "Drift Advisor: Habilitar integração",
   "command.driftAdvisor.disableIntegration.title": "Drift Advisor: Desativar integração",
   "command.showCommandCatalog.title": "Saropa Lints: navegue por todos os comandos",
-  "config.property.enabled.markdownDescription": "Quando **ativado** (padrão), o Saropa Lints executa verificações de atualização e trata o espaço de trabalho como se estivesse usando a integração do Saropa lint. Desligue **desative** para pausar as notificações de integração e a pontuação da barra de status sem ocultar as opções da barra lateral. Use **Saropa Lints: Configurar projeto** quando precisar adicionar `saropa_lints` ao pubspec e escrever `análise_options`.",
+  "config.property.enabled.markdownDescription": "Quando **ativado** (padrão), o Saropa Lints executa verificações de atualização e trata o espaço de trabalho como se estivesse usando a integração do Saropa lint. Desligue **desative** para pausar as notificações de integração e a pontuação da barra de status sem ocultar as opções da barra lateral. Use **Saropa Lints: Configurar projeto** quando precisar adicionar `saropa_lints` ao pubspec e escrever `analysis_options`.",
   "config.property.tier.description": "Camada padrão ao ativar ou reinicializar.",
   "config.property.runAnalysisAfterConfigChange.description": "Execute dart analyze após init ou alteração de configuração quando ativado.",
   "config.property.runAnalysisAfterDependencyChange.description": "Execute novamente a análise do dart automaticamente quando pubspec.lock for alterado (após pub get/pub upgrade). Usa um debounce de 10 segundos para unir resoluções rápidas de dependência.",
@@ -303,5 +303,5 @@
   "command.toggleIncludeAnalyzerTodosInDashboard.title": "Saropa Lints: Alternar Mostrar tarefas do analisador no painel",
   "command.toggleTodosAndHacksScanner.title": "Saropa Lints: Alternar scanner de espaço de trabalho TODO/HACK",
   "config.property.includeOtherAnalyzerFindingsInDashboard.description": "Mostre uma pílula suplementar no painel de descobertas com a contagem de descobertas do analisador não saropa em arquivos .dart (lints Dart SDK integrados mais quaisquer plug-ins custom_lint de terceiros, como riverpod_lint). Somente exibição — nunca afeta a pontuação de integridade, os cartões de KPI ou a lista de violações.",
-  "config.property.includeAnalyzerTodosInDashboard.description": "Mostre um comprimido suplementar no Painel de Descobertas com a contagem de diagnósticos TODO do lado do analisador (`código: \"todo\"`) em arquivos .dart. Independente do scanner TODO/HACK do sistema de arquivos saropa. Somente exibição."
+  "config.property.includeAnalyzerTodosInDashboard.description": "Mostre um comprimido suplementar no Painel de Descobertas com a contagem de diagnósticos TODO do lado do analisador (`code: \"todo\"`) em arquivos .dart. Independente do scanner TODO/HACK do sistema de arquivos saropa. Somente exibição."
 }

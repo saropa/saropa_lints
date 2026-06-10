@@ -54,25 +54,4 @@ void main() {
       });
     }
   });
-
-  group('QR Scanner - Avoidance Rules', () {
-    group('avoid_qr_scanner_always_active', () {
-      test('scanner active when not visible SHOULD trigger', () {});
-
-      test('scanner lifecycle management should NOT trigger', () {});
-    });
-  });
-
-  group('QR Scanner - Requirement Rules', () {
-    group('require_qr_scan_feedback', () {
-      test('QR scan without user feedback SHOULD trigger', () {});
-
-      test('haptic/visual scan feedback should NOT trigger', () {});
-    });
-    group('require_qr_content_validation', () {
-      test('QR data used without validation SHOULD trigger', () {});
-
-      test('content validation before use should NOT trigger', () {});
-    });
-  });
 }

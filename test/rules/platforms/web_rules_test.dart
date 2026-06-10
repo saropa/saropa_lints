@@ -91,32 +91,6 @@ void main() {
     }
   });
 
-  group('Web - Avoidance Rules', () {
-    group('avoid_platform_channel_on_web', () {
-      test('Platform channel call on web SHOULD trigger', () {});
-
-      test('web-compatible alternatives should NOT trigger', () {});
-    });
-    group('avoid_web_only_dependencies', () {
-      test('web-only package in shared code SHOULD trigger', () {});
-
-      test('platform-agnostic dependencies should NOT trigger', () {});
-    });
-  });
-
-  group('Web - Requirement Rules', () {
-    group('require_cors_handling', () {
-      test('HTTP request without CORS config SHOULD trigger', () {});
-
-      test('CORS headers/proxy setup should NOT trigger', () {});
-    });
-    group('require_web_renderer_awareness', () {
-      test('rendering code without renderer check SHOULD trigger', () {});
-
-      test('renderer-aware rendering should NOT trigger', () {});
-    });
-  });
-
   group('Web - Preference Rules', () {
     group('prefer_js_interop_over_dart_js', () {
       test(
@@ -159,16 +133,6 @@ void main() {
           );
         }
       });
-    });
-    group('prefer_deferred_loading_web', () {
-      test('eager import of large web module SHOULD trigger', () {});
-
-      test('deferred import for web should NOT trigger', () {});
-    });
-    group('prefer_url_strategy_for_web', () {
-      test('hash-based URL routing on web SHOULD trigger', () {});
-
-      test('path URL strategy should NOT trigger', () {});
     });
     group('prefer_schedule_microtask_over_window_postmessage', () {
       test('problemMessage cites skwasm / postMessage cost', () {

@@ -112,60 +112,6 @@ void main() {
           );
         },
       );
-
-      test('Freezed-only serialization should NOT trigger', () {});
-    });
-    group('avoid_freezed_for_logic_classes', () {
-      test('Freezed on class with business logic SHOULD trigger', () {});
-
-      test('Freezed only for data classes should NOT trigger', () {});
-    });
-  });
-
-  group('Freezed - Requirement Rules', () {
-    group('require_freezed_arrow_syntax', () {
-      test('verbose Freezed factory syntax SHOULD trigger', () {});
-
-      test('arrow syntax for simple factories should NOT trigger', () {});
-    });
-    group('require_freezed_private_constructor', () {
-      test('public Freezed constructor SHOULD trigger', () {});
-
-      test('private underscore constructor should NOT trigger', () {});
-    });
-    group('require_freezed_explicit_json', () {
-      test('missing fromJson/toJson on Freezed SHOULD trigger', () {});
-
-      test('explicit JSON methods should NOT trigger', () {});
-    });
-    group('require_freezed_json_converter', () {
-      test('raw type in Freezed JSON SHOULD trigger', () {});
-
-      test('JsonConverter for custom types should NOT trigger', () {});
-    });
-    group('require_freezed_lint_package', () {
-      test(
-        'freezed_annotation import without freezed_lint SHOULD trigger',
-        () {},
-      );
-
-      test(
-        'both freezed_annotation and freezed_lint imported should NOT trigger',
-        () {},
-      );
-    });
-  });
-
-  group('Freezed - Preference Rules', () {
-    group('prefer_freezed_default_values', () {
-      test('no defaults on Freezed fields SHOULD trigger', () {});
-
-      test('default value annotations should NOT trigger', () {});
-    });
-    group('prefer_freezed_for_data_classes', () {
-      test('manual data class without Freezed SHOULD trigger', () {});
-
-      test('Freezed for immutable data should NOT trigger', () {});
     });
   });
 }

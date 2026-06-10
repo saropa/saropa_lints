@@ -66,35 +66,4 @@ void main() {
       });
     }
   });
-
-  group('Windows - Avoidance Rules', () {
-    group('avoid_hardcoded_drive_letters', () {
-      test('hardcoded C:\ path SHOULD trigger', () {});
-
-      test('environment-based paths should NOT trigger', () {});
-    });
-    group('avoid_forward_slash_path_assumption', () {
-      test('forward slash in Windows path SHOULD trigger', () {});
-
-      test('Platform.pathSeparator should NOT trigger', () {});
-    });
-    group('avoid_case_sensitive_path_comparison', () {
-      test('case-sensitive path compare on Windows SHOULD trigger', () {});
-
-      test('case-insensitive comparison should NOT trigger', () {});
-    });
-    group('avoid_max_path_risk', () {
-      test('path potentially exceeding MAX_PATH SHOULD trigger', () {});
-
-      test('short path or extended path prefix should NOT trigger', () {});
-    });
-  });
-
-  group('Windows - Requirement Rules', () {
-    group('require_windows_single_instance_check', () {
-      test('app without single-instance mutex SHOULD trigger', () {});
-
-      test('single-instance check should NOT trigger', () {});
-    });
-  });
 }
