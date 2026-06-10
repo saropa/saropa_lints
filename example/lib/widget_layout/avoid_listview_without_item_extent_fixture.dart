@@ -191,3 +191,46 @@ Widget goodInlineNonScrollingListViewSeparated() {
     separatorBuilder: (BuildContext c, int i) => Divider(),
   );
 }
+
+// OK: shrinkWrap: true WITHOUT explicit NeverScrollableScrollPhysics — eager
+// layout already happens, so itemExtent's lazy benefit is unobtainable. The
+// `&& neverScrollablePhysics` conjunct used to over-narrow this and fire here.
+Widget goodShrinkWrapDefaultPhysics(List<String> rows) {
+  return ListView.builder(
+    shrinkWrap: true,
+    itemCount: rows.length,
+    itemBuilder: (BuildContext c, int i) => Text(rows[i]),
+  );
+}
+
+// OK: item widget is self-sizing (ListTile with optional subtitle = 1 vs 2
+// lines). No constant itemExtent is correct, so the diagnostic is unactionable.
+Widget goodSelfSizingListTile(List<String> rows) {
+  return ListView.builder(
+    itemCount: rows.length,
+    itemBuilder: (BuildContext c, int i) => ListTile(
+      title: Text(rows[i]),
+      subtitle: i.isEven ? Text('sub') : null,
+    ),
+  );
+}
+
+// OK: item widget is an ExpansionTile (height changes on expand).
+Widget goodSelfSizingExpansionTile(List<String> rows) {
+  return ListView.builder(
+    itemCount: rows.length,
+    itemBuilder: (BuildContext c, int i) =>
+        ExpansionTile(title: Text(rows[i])),
+  );
+}
+
+// BAD: plain scrolling list, fixed-height rows, no extent param — a genuine
+// true positive that the self-sizing/shrinkWrap relaxations must NOT regress.
+// expect_lint: avoid_listview_without_item_extent
+Widget badFixedHeightRowsNoExtent(List<String> rows) {
+  return ListView.builder(
+    itemCount: rows.length,
+    itemBuilder: (BuildContext c, int i) =>
+        SizedBox(height: 56, child: Text(rows[i])),
+  );
+}
