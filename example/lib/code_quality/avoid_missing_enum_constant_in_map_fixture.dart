@@ -153,3 +153,29 @@ final _stringMap = <String, int>{
 
 // GOOD: Empty map
 final _emptyMap = <_Color, String>{};
+
+// A widget-like class whose `direction` argument constrains which `_Color`
+// keys can ever fire at runtime, mirroring Dismissible.direction paired with
+// dismissThresholds.
+class _Constrained {
+  _Constrained({this.direction, this.thresholds});
+  final _Color? direction;
+  final Map<_Color, double>? thresholds;
+}
+
+// GOOD: partial map, but the sibling `direction:` fixes the active _Color
+// subset, so omitting the unreachable keys is intentional. No lint.
+final _withConstraint = _Constrained(
+  direction: _Color.red,
+  thresholds: <_Color, double>{
+    _Color.red: 0.25,
+  },
+);
+
+// BAD: partial map with NO constraining sibling argument — still flags.
+// expect_lint: avoid_missing_enum_constant_in_map
+final _withoutConstraint = _Constrained(
+  thresholds: <_Color, double>{
+    _Color.red: 0.25,
+  },
+);
