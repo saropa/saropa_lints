@@ -1,6 +1,8 @@
 // ignore_for_file: unused_local_variable, unused_element
 // Test fixture for avoid_parameter_mutation rule
 
+import 'dart:typed_data';
+
 class User {
   String name;
   int age;
@@ -67,10 +69,10 @@ void testParameterMutation() {
     items.remove('item');
   }
 
-  // BAD: Map mutation - index assignment
+  // GOOD: Map index assignment is the fill/output pattern (a caller passes the
+  // map in to be populated) — symmetric with the .add/.addAll exemption.
   void updateMap(Map<String, int> map) {
-    // expect_lint: avoid_parameter_mutation
-    map['key'] = 42;
+    map['key'] = 42; // No lint - output collection fill
   }
 
   // BAD: Map mutation - clear
@@ -105,6 +107,30 @@ void testParameterMutation() {
     items
       ..add('a')
       ..add('b');
+  }
+
+  // BAD: Cascade field assignment on a DTO parameter — real caller corruption.
+  void cascadeFieldMutation(User user) {
+    // expect_lint: avoid_parameter_mutation
+    user
+      ..name = 'changed'
+      ..age = 30;
+  }
+
+  // GOOD: index assignment into a List parameter is the fill-buffer/output
+  // pattern — the caller allocates the buffer and passes it in to be populated,
+  // symmetric with the exempted .add/.addAll case. (Real-world trigger: a
+  // generated polygon table filling a pre-sized buffer by index.)
+  void fillList(List<String> p) {
+    p[0] = 'a'; // No lint - fill-buffer / output pattern
+    p[1] = 'b'; // No lint
+    p[2] = 'c'; // No lint
+  }
+
+  // GOOD: index assignment into a typed-data list parameter — same fill pattern.
+  void fillBytes(Uint8List buffer) {
+    buffer[0] = 1; // No lint - typed-data output collection
+    buffer[1] = 2; // No lint
   }
 
   // GOOD: Create copy with spread
