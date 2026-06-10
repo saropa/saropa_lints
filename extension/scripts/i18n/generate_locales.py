@@ -25,7 +25,9 @@ if sys.stderr.encoding != "utf-8":
 from dictionaries import TRANSLATIONS
 from json_io import read_json, write_json
 from mt_fallback import (
+    active_engine_name,
     count_pending_translations,
+    describe_engine_availability,
     load_mt_cache,
     prefetch_machine_translations,
     save_mt_cache,
@@ -306,6 +308,10 @@ def main() -> int:
     package_en = read_json(package_en_path)
     runtime_en = read_json(runtime_en_path)
 
+    # Announce the active MT engine up front so a silent Google downgrade (NLLB
+    # model not installed) is visible before a multi-hour run starts.
+    print(f"[{c('blue', 'i18n')}] {describe_engine_availability()}", flush=True)
+
     mt_cache = load_mt_cache()
     unique_en: set[str] = set()
     collect_unique_strings(package_en, unique_en)
@@ -327,7 +333,9 @@ def main() -> int:
             if pending == 0:
                 phase = c("gray", "all cached, mapping…")
             else:
-                phase = c("gray", f"translating {pending} new strings via Google…")
+                engine = active_engine_name(locale)
+                engine_label = {"nllb": "NLLB", "google": "Google"}.get(engine or "", "MT")
+                phase = c("gray", f"translating {pending} new strings via {engine_label}…")
             print(f"[{c('blue', 'i18n')}] {c('cyan', locale)}: {phase}", flush=True)
 
             prefetch_machine_translations(

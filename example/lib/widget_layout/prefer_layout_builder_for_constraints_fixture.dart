@@ -115,6 +115,19 @@ class BadInstanceBuildContextHelper extends StatelessWidget {
   Widget build(BuildContext context) => SizedBox(height: _readHeight(context));
 }
 
+// BAD: window width assigned to a `width:` NAMED argument — this IS widget
+// sizing, which LayoutBuilder should drive. Contrast OkBreakpointHelper below,
+// where the same value is passed POSITIONALLY to a breakpoint helper (no lint).
+class BadDirectSizing extends StatelessWidget {
+  const BadDirectSizing({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // expect_lint: prefer_layout_builder_for_constraints
+    return SizedBox(width: MediaQuery.sizeOf(context).width);
+  }
+}
+
 // GOOD: intentional screen-relative sizing (not replaceable by LayoutBuilder)
 class OkScreenFraction extends StatelessWidget {
   const OkScreenFraction({super.key});
@@ -252,18 +265,6 @@ class OkBreakpointHelper extends StatelessWidget {
       MediaQuery.sizeOf(context).width,
     );
     return Text('wide: $isWide');
-  }
-}
-
-// BAD: window width assigned to a `width:` NAMED argument — this IS widget
-// sizing, which LayoutBuilder should drive.
-class BadDirectSizing extends StatelessWidget {
-  const BadDirectSizing({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    // expect_lint: prefer_layout_builder_for_constraints
-    return SizedBox(width: MediaQuery.sizeOf(context).width);
   }
 }
 

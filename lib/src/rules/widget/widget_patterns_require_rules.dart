@@ -1205,8 +1205,8 @@ class RequireErrorWidgetRule extends SaropaLintRule {
   /// false-positives.
   static ({FormalParameterList? params, FunctionBody body})?
   _findNamedExecutableBody(AstNode anyNode, String name) {
-    final CompilationUnit? unit =
-        anyNode.thisOrAncestorOfType<CompilationUnit>();
+    final CompilationUnit? unit = anyNode
+        .thisOrAncestorOfType<CompilationUnit>();
     if (unit == null) return null;
     final _NamedExecutableFinder finder = _NamedExecutableFinder(name);
     unit.visitChildren(finder);

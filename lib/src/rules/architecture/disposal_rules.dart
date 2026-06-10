@@ -7,6 +7,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/visitor.dart';
 
 import '../../saropa_lint_rule.dart';
 import '../../target_matcher_utils.dart';
@@ -2410,14 +2411,18 @@ class PreferDisposeBeforeNewInstanceRule extends SaropaLintRule {
     return null;
   }
 
-  /// True when [block] disposes [localName] anywhere in its source, including
+  /// True when [block] disposes [localName] anywhere in its body, including
   /// inside a callback closure (`addPostFrameCallback((_) => old.dispose())`).
+  ///
+  /// Walks the AST rather than `block.toSource().contains(...)`: substring
+  /// matching on source text is the project's #1 false-positive source — it
+  /// would also match `something.old.dispose()` for localName `old`, and is
+  /// fragile against reformatting. The visitor matches the exact receiver
+  /// identifier across plain, null-aware, and cascade dispose forms.
   bool _blockDisposesLocal(Block block, String localName) {
-    final String source = block.toSource();
-    return source.contains('$localName.dispose()') ||
-        source.contains('$localName?.dispose()') ||
-        source.contains('$localName..dispose()') ||
-        source.contains('$localName?..dispose()');
+    final _LocalDisposeVisitor visitor = _LocalDisposeVisitor(localName);
+    block.accept(visitor);
+    return visitor.found;
   }
 
   Block? _findEnclosingBlock(AstNode node) {
@@ -2668,4 +2673,29 @@ class PreferDeactivateForCleanupRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {}
+}
+
+/// Finds `dispose()` invocations whose receiver is a specific local variable.
+///
+/// Covers `x.dispose()`, `x?.dispose()`, `x..dispose()`, and `x?..dispose()`:
+/// [MethodInvocation.realTarget] resolves the cascade receiver, so all four
+/// forms reduce to "is the receiver the SimpleIdentifier we are looking for".
+/// Replaces a `source.contains('$name.dispose()')` check that matched longer
+/// identifiers (`something.old.dispose()`) and broke on reformatting.
+class _LocalDisposeVisitor extends RecursiveAstVisitor<void> {
+  _LocalDisposeVisitor(this.localName);
+
+  final String localName;
+  bool found = false;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    if (node.methodName.name == 'dispose') {
+      final Expression? target = node.realTarget;
+      if (target is SimpleIdentifier && target.name == localName) {
+        found = true;
+      }
+    }
+    super.visitMethodInvocation(node);
+  }
 }

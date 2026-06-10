@@ -428,7 +428,8 @@ class NoEqualArgumentsRule extends SaropaLintRule {
       // square Size/Offset needs both components equal. Flagging these forced
       // meaningless ignores on every such call site.
       final String? calleeName = _calleeName(node.parent);
-      if (calleeName != null && _equalArgIdiomaticCallees.contains(calleeName)) {
+      if (calleeName != null &&
+          _equalArgIdiomaticCallees.contains(calleeName)) {
         return;
       }
 
