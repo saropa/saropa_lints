@@ -13,37 +13,15 @@ Treat this file as two layers:
 1. **Execution layer**: the next batch to implement now.
 2. **Inventory layer**: the full missing-fixes list used as a source queue.
 
-### Next 3 (ordered)
+### Next up
 
-- [x] **QF-01 (P0)** Re-run `python scripts/list_rules_without_fixes.py` and stamp a fresh baseline date/count at the top of this plan. (**2026-05-08:** 1698 rules / 109 files; report `reports/20260508/…_list_rules_without_fixes.log`.)
-- [x] **QF-02 (P0)** Execute Batch 14 focused on deterministic AST-local fixes in the highest-yield files. (Verified 2026-05-08: fix wiring present for `avoid_duplicate_exports`, `avoid_duplicate_named_imports`, and `prefer_trailing_underscore_for_unused`; `dart test test/scan/rule_quick_fix_presence_test.dart` passed.)
-- [x] **QF-03 (P1)** Write a batch artifact to `plans/history/` with rule list, tests added, and missing-fix delta. (`plans/history/2026.05/2026.05.08/quick_fix_batch_14_verification.md`.)
-- [x] **QF-04 (P0)** Batch 16 done (2026-06-10): +4 fixes — `avoid_unnecessary_if` + `prefer_returning_condition` (shared `ReturnConditionFix`), `avoid_collapsible_if` (`CollapseNestedIfFix`), `avoid_classes_with_only_static_members` (reuse `AddAbstractFinalFix`). Presence test +4 (192 pass), `dart analyze --fatal-infos` clean, audit 1701 → 1697.
-- [ ] **QF-05 (P0)** Batch 17+: continue from inventory. Next candidates already scoped: `prefer_null_aware_method_calls` (if/ternary → `?.`), more reuse of `AddAbstractFinalFix` (`prefer_static_class`?), `code_quality_avoid` deletions.
+- [ ] **QF-NEXT (P0)** Pick the next slice of deterministic missing-fix rules from **Part 1** (still-missing inventory), wire producers + `rule_quick_fix_presence_test.dart`, rerun the audit, and record the net delta. The "Remove…"-correction deletion cluster (named-argument / redundant-token rules) is the highest-yield remaining seam.
 
-### Batch 15 candidate slice (done 2026-05-08)
-
-- `avoid_redundant_semantics` → unwrap redundant `Semantics` (keep labeled `Image` child).
-- `require_baseline_text_baseline` → insert `textBaseline: TextBaseline.alphabetic`.
-- `avoid_unconstrained_dialog_column` → insert `mainAxisSize: MainAxisSize.min`.
-
-### Batch 14 candidate slice
-
-Start with three deterministic fixes that are narrow and testable:
-
-- `avoid_duplicate_exports` -> delete duplicate `ExportDirective`.
-- `avoid_duplicate_named_imports` -> delete duplicate `ImportDirective`.
-- `prefer_trailing_underscore_for_unused` -> rename unused closure param to trailing-underscore form.
-
-Batch 14 is considered complete when all three have fix producers, fixtures, and fix application tests.
-
-### Batch 15 verification
-
-See `plans/history/2026.05/2026.05.08/quick_fix_batch_15_verification.md`.
+Completed batch records live in `plans/history/<yyyy.mm>/<yyyy.mm.dd>/` (e.g. `2026.06.10/quick_fix_batches_16_18.md`); they are intentionally not kept in this active plan.
 
 ### Batch acceptance contract
 
-For every new fix in Batch 14+:
+For every new fix:
 
 - Rule wiring added (`fixGenerators`)
 - Fixture + fix application test added
@@ -56,21 +34,7 @@ For every new fix in Batch 14+:
 
 ## What’s left to do
 
-### Broad summary
-
-- **Batches 1–13 are done.** Batch 13 (2026-05-04) added 10 quick fixes across stylistic, formatting, widget-layout, and flame package rules — see **H8. Batch 13** below for the list.
-- **What’s actually left:** (1) one-time pre-flight and post-batch audits if you haven’t run them, (2) one optional fix in the “Batch 6” area, (3) re-run the full audit and record numbers, (4) **future batches (Batch 14+)** — add more quick fixes by choosing rules from Part 1 and following the batch workflow.
-
-So: **no remaining work inside Batches 1–13.** Remaining work is housekeeping (audits), the optional Batch 6 fix, and planning/doing **Batch 14+** using Part 1.
-
-### Detail: actionable items
-
-| Priority         | What                                                                                                                                                                                                                                                                                                                                                                                                  | Where in doc               |
-| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
-| **One-time**     | Run `python scripts/publish.py` (audit-only); record fix count and “files needing quick fixes”. Confirm `dart analyze --fatal-infos` and `dart test` pass. Optionally create a branch for quick-fix work.                                                                                                                                                                                             | **A. Pre-flight**          |
-| **Optional**     | Add a second fix for `avoid_synchronous_file_io`: when the call is inside an async function, also insert `await` at the call site (multi-edit).                                                                                                                                                                                                                                                       | **H. Batch 6**             |
-| **Ongoing**      | Run full audit again; record new fix count and worst-offending files.                                                                                                                                                                                                                                                                                                                                 | **I. After Batch 6**       |
-| **Next batches** | Add **Batch 14+** by picking more rules from **Part 1**. Many Section-3 EASY candidates are now wired via Batches 12–13; remaining easy candidates cluster in `firebase_rules`, `drift_rules`, `widget_patterns_require_rules`, and the iOS sub-files (section 4). For each new fix: follow **B. Batch workflow** (add fix producer → wire to rule → fixture → test → format/analyze/test → re-run audit). | **Part 1** + **B** + **I** |
+Remaining work is the long tail of rules that still lack a quick fix — see the **Part 1** inventory (still-missing only; completed rules are pruned). For each new batch follow **B. Batch workflow** (add fix producer → wire `fixGenerators` → fixture → presence test → `dart format` / `dart analyze --fatal-infos` / `dart test` → re-run the audit and record the delta). High-yield seams remaining: the "Remove…"-correction deletion cluster, plus `firebase_rules`, `drift_rules`, `widget_patterns_require_rules`, and the iOS sub-files.
 
 ---
 
@@ -2031,154 +1995,3 @@ Execution work follows **Part 2 (Checklist)** below.
   - [ ] `dart test`
 - [ ] Re-run `python scripts/publish.py` (audit-only) and confirm fix count increased.
 
-### C. Batch 1 — `structure_rules.dart` (EASY, deterministic)
-
-**File:** `lib/src/rules/structure_rules.dart` (51 rules, 4 fixes)
-
-**Exit criteria:** All 4 fixes have fixtures + tests and audit count increases by 4.
-
-### D. Batch 2 — `bloc_rules.dart` + `performance_rules.dart` (EASY)
-
-**Exit criteria:** +2 fixes, fixtures/tests present, audit count increases by 2.
-
-### E. Batch 3 — naming + type (EASY, high impact)
-
-**Exit criteria:** +3 fixes, fixtures/tests present, audit count increases by 3.
-
-### F. Batch 4 — `code_quality_avoid_rules.dart` (EASY candidates)
-
-**File:** `lib/src/rules/code_quality_avoid_rules.dart` (44 rules, 0 fixes)
-
-**Exit criteria:** +2 to +3 fixes, fixtures/tests present, audit increases accordingly.
-
-### G. Batch 5 — `unnecessary_code_rules.dart` (fill remaining gaps)
-
-**Exit criteria:** +N fixes with tests, audit increases.
-
-### H. Batch 6 — Performance sync I/O (MEDIUM)
-
-- [ ] Fix 2 (optional): also add `await` when legal (multi-edit)
-
-**Exit criteria:** +1 or +2 fixes, fixtures/tests present, audit increases.
-
-### H2. Batch 7 — Control flow, code quality, collection (EASY)
-
-**Exit criteria:** +5 fixes, fixtures/tests present, audit increases.
-
-### H3. Batch 8 — Control flow (more) + exception (EASY)
-
-**Exit criteria:** +3 fixes, tests present, audit increases.
-
-### H4. Batch 9 — Return (EASY)
-
-**Exit criteria:** +1 fix.
-
-### H5. Batch 10 — Control flow, equality, return, error handling, async (EASY)
-
-**Exit criteria:** +10 fixes (9 rules; one rule has 2 fix generators), fixtures/tests present, audit increases.
-
-### H6. Batch 11 — Collection, formatting, code quality, return, complexity (EASY)
-
-**Exit criteria:** +13 fixes, tests in collection/formatting/code_quality/return/complexity test files, audit increases.
-
-### H7. Batch 12 — record_pattern, naming_style, type_safety, class_constructor, control_flow, documentation (EASY + MEDIUM) — DONE
-
-**+10 fixes (9 new producers, 1 reuse):**
-
-- `avoid_redundant_positional_field_name` — `RemoveRedundantPositionalFieldNameFix`
-- `prefer_wildcard_pattern` — `PreferWildcardPatternFix`
-- `prefer_wildcard_for_unused_param` — `PreferWildcardForUnusedParamFix`
-- `avoid_non_null_assertion` — reuses `RemoveNullAssertionFix`
-- `prefer_const_constructor_declarations` — `PreferConstConstructorDeclarationsFix`
-- `prefer_const_constructors_in_immutables` — reuses `PreferConstConstructorDeclarationsFix`
-- `prefer_final_fields` and `prefer_final_fields_always` — `PreferFinalFieldsFix`
-- `avoid_double_and_int_checks` — `PreferIsNumOverIntDoubleFix`
-- `deprecated_new_in_comment_reference` — `DeprecatedNewInCommentReferenceFix`
-
-All 10 wired, `rule_quick_fix_presence_test.dart` updated (+10 entries), fixtures created/verified. `dart analyze --fatal-infos` clean; targeted test files green.
-
-### H8. Batch 13 — stylistic, formatting, widget-layout, flame package (EASY) — DONE
-
-**Date:** 2026-05-04. **+10 fixes (9 new producers, 1 reuse):**
-
-- `prefer_raw_strings` — `PreferRawStringsFix` (insert `r` before `SimpleStringLiteral`).
-- `prefer_period_after_doc` — `PreferPeriodAfterDocFix` (append `.` to last doc-comment token; uses `diagnosticOffset/Length` because the rule reports at a `Token`).
-- `format_comment_style` — reuses existing `CapitalizeCommentFix` (rule today only flags lowercase-start, so capitalization is the meaningful correction).
-- `prefer_const_border_radius` — `PreferConstBorderRadiusFix` (prefix `const ` to `BorderRadius.circular(...)`; rule already verified caller is not in const context).
-- `prefer_const_widgets_in_lists` — `PreferConstWidgetsInListsFix` (prefix `const ` to a widget `ListLiteral`; rule already verified all elements are const-capable).
-- `avoid_redundant_async_on_load` — `RemoveRedundantAsyncOnLoadFix` (delete the `async` keyword + trailing whitespace from a Flame `onLoad()` body that contains no `await`).
-- `avoid_single_cascade_in_expression_statements` — `ReplaceSingleCascadeWithDotFix` (delete one of the two dots in `..` so a single-section cascade used as a statement becomes a direct call).
-- `avoid_escaping_inner_quotes` — `SwapStringDelimiterFix` (rewrite the `SimpleStringLiteral` with the opposite delimiter and drop the now-unnecessary backslash escapes; handles single, double, and triple-quoted strings).
-- `avoid_types_on_closure_parameters` — `RemoveClosureParameterTypeFix` (delete the type annotation up to the parameter name so `(int x)` becomes `(x)`).
-- `prefer_expression_body_getters` — `ConvertToExpressionBodyGetterFix` (replace `{ return EXPR; }` with `=> EXPR;` for single-return-block getters).
-
-All 10 wired in their rule files; `test/scan/rule_quick_fix_presence_test.dart` updated with 10 new `hasFix(...)` entries plus two new imports (`flame_rules.dart`, `widget_layout_constraints_rules.dart`). `dart analyze --fatal-infos` clean on all new + modified files. `dart test test/scan/rule_quick_fix_presence_test.dart` passes (185 tests). Audit count went from 1708 to 1698 unfixed rules (Δ = −10).
-
-### H9. Batch 16 — control flow + structure (EASY/MEDIUM) — DONE
-
-**Date:** 2026-06-10. **+4 fixes (2 new producers, 1 reuse covering 3 rules):**
-
-- `avoid_unnecessary_if` and `prefer_returning_condition` — `ReturnConditionFix` (`lib/src/fixes/control_flow/return_condition_fix.dart`). Both report at the `IfStatement`; the producer reconstructs `return <cond>;` (then-branch returns `true`) or `return !(<cond>);` (then-branch returns `false`), wrapping the condition in parens on negation. For the no-else `avoid_unnecessary_if` shape it also consumes the following sibling `return <opposite-bool>;`.
-- `avoid_collapsible_if` — `CollapseNestedIfFix` (`lib/src/fixes/control_flow/collapse_nested_if_fix.dart`). Merges `if (a) { if (b) { body } }` into `if ((a) && (b)) body`, parenthesizing both conditions so a low-precedence operator can't bind incorrectly against the inserted `&&`.
-- `avoid_classes_with_only_static_members` — reuses `AddAbstractFinalFix` (rule reports at the class name token; the fix walks up to the `ClassDeclaration` and inserts `abstract final `, same idiom as `prefer_abstract_final_static_class`).
-
-All 4 wired; `test/scan/rule_quick_fix_presence_test.dart` +4 (192 pass). `dart analyze --fatal-infos` clean. Existing example fixtures already cover all four rules. Audit 1701 → 1697 (Δ = −4).
-
-### H10. Batch 17 — null-aware call rewrite (MEDIUM) — DONE
-
-**Date:** 2026-06-10. **+1 fix:**
-
-- `prefer_null_aware_method_calls` — `PreferNullAwareCallFix` (`lib/src/fixes/control_flow/prefer_null_aware_call_fix.dart`). Handles both reported shapes: `if (x != null) { x.foo(args); }` → `x?.foo(args);` and `x != null ? x.foo() : null` → `x?.foo()`. Inserts `?` before the receiver's `.` token, reusing the original source for receiver/member/args verbatim. Ternary is matched before the enclosing `if` so a guard ternary nested inside an `if` resolves to the correct node.
-
-Wired; presence test +1 (193 pass). `dart analyze --fatal-infos` clean. Existing fixture `example/lib/control_flow/prefer_null_aware_method_calls_fixture.dart` covers it. Audit 1697 → 1696 (Δ = −1). Cumulative this session: 1701 → 1696 (−5 across 5 rules).
-
-### H11. Batch 18 — deletion fixes: named-argument + redundant nullable (EASY) — DONE
-
-**Date:** 2026-06-10. **+3 fixes (2 new producers, 1 reused across 2 rules):**
-
-- `avoid_icon_size_override` and `avoid_riverpod_string_provider_name` — `RemoveNamedArgumentFix` (`lib/src/fixes/common/remove_named_argument_fix.dart`). Both rules report at the `NamedExpression`. Deletes the argument plus its separating comma (trailing comma preferred, else leading) so the surviving argument list stays valid; `dart format` tidies residual whitespace.
-- `avoid_nullable_parameters_with_default_values` — `RemoveTypeQuestionFix` (`lib/src/fixes/type/remove_type_question_fix.dart`). Rule reports at the parameter `TypeAnnotation`; deletes the single trailing `?` char (uniform across named/generic/function/record forms), guarded by a check that the annotation really ends in `?`.
-
-Wired; presence test +3 (196 pass) — added imports for `widget_patterns_avoid_prefer_rules.dart` and `riverpod_rules.dart`. New + modified files `dart analyze --fatal-infos` clean (4 pre-existing `unnecessary_null_comparison`/`dead_code` warnings at `type_rules.dart:391`/`2378` predate this work and are unrelated). Fixtures already cover all three rules. Audit 1696 → 1693 (Δ = −3). Cumulative this session: 1701 → 1693 (−8 across 8 rules).
-
-### I. After Batch 6
-
-- [ ] Run full audit and record:
-  - [ ] new fix count / coverage %
-  - [ ] updated worst offending files list
-- [ ] Add Batch 7+ for iOS, security, widget patterns/layout based on updated audit deltas.
-
----
-
-## Finish Report (2026-06-10)
-
-**Scope (LINTER variant, A):** Dart analyzer-plugin quick fixes. Added 3 new fix producers wired to 5 rules (Batches 16–17). No `extension/` changes.
-
-**Files changed:**
-
-- NEW `lib/src/fixes/control_flow/return_condition_fix.dart` — `ReturnConditionFix`.
-- NEW `lib/src/fixes/control_flow/collapse_nested_if_fix.dart` — `CollapseNestedIfFix`.
-- NEW `lib/src/fixes/control_flow/prefer_null_aware_call_fix.dart` — `PreferNullAwareCallFix`.
-- MOD `lib/src/rules/flow/control_flow_rules.dart` — 3 fix imports + `fixGenerators` on `AvoidUnnecessaryIfRule`, `PreferReturningConditionRule`, `AvoidCollapsibleIfRule`, `PreferNullAwareMethodCallsRule`.
-- MOD `lib/src/rules/architecture/structure_rules.dart` — `fixGenerators` on `AvoidClassesWithOnlyStaticMembersRule` (reuses `AddAbstractFinalFix`).
-- MOD `test/scan/rule_quick_fix_presence_test.dart` — +5 presence entries.
-- MOD `CHANGELOG.md` — `[Unreleased]` Added section.
-
-**Core logic:**
-
-- `ReturnConditionFix`: both rules report at the `IfStatement`. Reconstructs `return <cond>;` when the then-branch returns `true`, `return !(<cond>);` when it returns `false` (parens guard precedence). For the no-else `avoid_unnecessary_if` shape it extends the replacement span to consume the following sibling `return <opposite-bool>;`.
-- `CollapseNestedIfFix`: merges `if (a) { if (b) { body } }` → `if ((a) && (b)) body`; both conditions parenthesized so a low-precedence operator can't bind incorrectly against the inserted `&&`.
-- `PreferNullAwareCallFix`: handles `if (x != null) x.foo();` and `x != null ? x.foo() : null` → `x?.foo()`. Inserts `?` before the receiver's `.` token, reusing original source for receiver/member/args. Ternary is resolved before the enclosing `if` so a guard ternary nested in an `if` targets the right node.
-
-**Validation:**
-
-- `dart analyze --fatal-infos` on all changed files: clean (No issues found).
-- `dart test test/scan/rule_quick_fix_presence_test.dart`: 193 pass (+5).
-- `dart test test/rules/flow/control_flow_rules_test.dart test/rules/architecture/structure_rules_test.dart test/integrity/`: 569 pass, no regressions.
-- `dart test test/rules/code_quality/code_quality_rules_test.dart`: 208 pass.
-- Test audit (Section 4A): grepped test/ for all 5 rule names + fix class names; only-added `fixGenerators` means no existing assertion invalidated; all referencing tests pass.
-- Audit delta: 1701 → 1696 unfixed rules (−5). Existing `example/` fixtures cover all 5 rules.
-
-**Outstanding:** This is an ongoing program — 1696 rules still lack fixes. Plan stays active; next candidates scoped in QF-05.
-
-**No bug archive** — task did not close a `bugs/*.md` file.
