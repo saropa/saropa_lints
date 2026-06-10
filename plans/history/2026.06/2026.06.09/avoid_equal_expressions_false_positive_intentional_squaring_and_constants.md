@@ -1,6 +1,6 @@
 # BUG: `avoid_equal_expressions` — Intentional Squaring and Binary-Unit Constants
 
-**Status: Open**
+**Status: Fixed**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
@@ -217,19 +217,58 @@ behavior would not be caught by `dart test` until a downstream project reports i
 
 ## Changes Made
 
-<!-- Fill in when a fix is written. -->
+No rule logic change required. The rule's `flaggableOps` set (v6, shipped in
+13.12.2) already excludes `TokenType.STAR` and all arithmetic operators, so the
+false positive cannot occur at the current plugin version — Hypothesis A/B
+(stale or intermediate plugin version) was correct. Verified by scanning the
+fixture: only the four comparison/logical cases flag; every arithmetic case is
+clean.
+
+Added regression fixtures so a future widening of `flaggableOps` that
+re-included an arithmetic token would be caught by the fixture sweep rather
+than by a downstream report.
 
 ---
 
 ## Tests Added
 
-<!-- List new or updated fixture/test files and what they verify. -->
+- `example/lib/equality/avoid_equal_expressions_fixture.dart`: added compound
+  arithmetic NO-lint cases `dx * dx + dy * dy` (Euclidean distance squared) and
+  `(a * a + b * b) / 2` (sum of squares), alongside the existing
+  `1024 * 1024`, `60 * 60`, `byteCount * byteCount`, `1 << 1`,
+  `byteCount + byteCount` cases. The four BAD comparison/logical cases
+  (`==`, `>`, `&&`, `||`) are retained.
+- Scan CLI verified: `avoid_equal_expressions` fires on lines 116/118/120/122
+  only; no arithmetic line flags.
 
 ---
 
 ## Commits
 
 <!-- Add commit hashes as fixes land. -->
+
+---
+
+## Finish Report (2026-06-09)
+
+**Scope:** (A) Dart lint rules / analyzer plugin (fixtures only).
+
+**Deep review:** Confirmed the live rule source is already correct (arithmetic
+excluded at v6). No code change; the workarounds in Saropa Contacts are stale
+and can be removed there. Added fixtures as a regression backstop because CI
+does not run fixtures and the prior gap let an intermediate-version regression
+ship undetected.
+
+**Tests:** Scan CLI behavior verified as above. No unit-test change (the
+instantiation pin is unaffected).
+
+**Maintenance:** CHANGELOG `[Unreleased]` Maintenance block notes the added
+regression fixtures. README/ROADMAP unchanged.
+
+**Bug archived:** bugs/avoid_equal_expressions_false_positive_intentional_squaring_and_constants.md
+→ plans/history/2026.06/2026.06.09/avoid_equal_expressions_false_positive_intentional_squaring_and_constants.md
+
+**Finish report appended:** this file.
 
 ---
 

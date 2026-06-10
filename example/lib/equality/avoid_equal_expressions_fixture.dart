@@ -136,4 +136,13 @@ void _good345() {
   final int square = byteCount * byteCount; // x * x is a square
   final int shifted = 1 << 1;
   final int sum = byteCount + byteCount; // doubling
+
+  // Compound arithmetic: each inner `*` has identical operands but is a
+  // correct geometry formula, not a copy-paste bug. None of these flag.
+  final int dx = byteCount;
+  final int dy = byteCount;
+  final int distSq = dx * dx + dy * dy; // Euclidean distance squared
+  final int a = byteCount;
+  final int b = byteCount;
+  final double rms = (a * a + b * b) / 2; // sum of squares
 }
