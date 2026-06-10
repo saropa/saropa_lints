@@ -2917,6 +2917,7 @@ const Set<String> comprehensiveOnlyRules = <String>{
   // invariant.
   'avoid_dio_error',
   'avoid_bloc_map_event_to_state',
+  'avoid_riverpod_state_notifier',
   'prefer_provider_extensions',
   'prefer_redirecting_superclass_constructor',
   'prefer_image_filter_quality_medium',

@@ -60,11 +60,28 @@ them per plan — link here.
 8. **Verify.** `dart run tool/rule_pack_audit.dart` exit 0; `dart analyze
    --fatal-infos` clean.
 
-**Gate-direction note:** a migration rule is gated on the **new** version range.
-Rationale: once a project is *on* the version that removed/deprecated the old
-API, any remaining old-API usage is a real migration debt to flag. A project
-still on the old version should NOT see the rule (their API is valid there). This
-matches `dio_5` (flag `DioError` only when `dio >=5.0.0`).
+**Gate-direction note — two archetypes (key insight from P1 research):** the
+right gate direction depends on **whether the old API still compiles on the new
+version.**
+
+- **Post-upgrade cleanup (`>=` gate).** Old API is *deprecated but still
+  compiles*. The analyzer is silent, so the lint is the only nudge. Gate on the
+  **new** major; flag lingering old-API usage. Matches `dio_5` (flag `DioError`
+  only when `dio >=5.0.0`), `riverpod_2`, and P1's `share_plus_11`,
+  `sensors_plus_4`, `flutter_svg_2`. **Highest value** — this is the gap the
+  compiler does NOT already cover.
+- **Pre-upgrade readiness (`<` gate).** Old API is *removed* in the new major, so
+  on the new version it does not compile and `dart analyze` already errors — a
+  `>=` pack would find nothing. Gate on the **old** major instead; flag current
+  (valid) code that will break on the bump, as opt-in upgrade prep. Used by P1's
+  `google_sign_in_7`, `webview_flutter_4`, `connectivity_plus_6`. **Medium
+  value**, and depends on a maintainer decision to support `<` gates (a new
+  archetype — all shipped gates are `>=`). See
+  [plan_migration_google_sign_in.md §5](plan_migration_google_sign_in.md#5-open-decision-needs-maintainer-call).
+
+**Corollary for ranking:** "removed in vN" reads like a big migration but is
+*weaker* lint territory than "deprecated in vN," because the compiler already
+forces removed-API migrations. Weight deprecated-but-compiling APIs highest.
 
 ---
 
@@ -108,22 +125,32 @@ and is intentionally omitted.)
 
 ---
 
-## 4. Priority tranche
+## 4. Priority tranche (re-ranked after P1 research)
 
-**P1 (clear, mechanical, high-blast-radius migrations — build first):**
-`google_sign_in_7`, `share_plus_11`, `connectivity_plus_6`, `sensors_plus_4`,
-`flutter_svg_2`, `webview_flutter_4`.
+**Selection criterion (3 tests):** a migration pack earns its keep when the old
+API is (a) **statically detectable** (a named symbol / constructor / method, not
+a behavioral change), (b) **mechanically fixable** (deterministic rewrite), and
+— the decisive one — (c) **still compiles** on the relevant gate version (else
+the compiler already does the job; see §2 gate-direction note).
 
-**P2:** `audioplayers_6`, `app_links_6`, `file_picker_8`, `mobile_scanner_7`.
+**Tier A — deprecated-but-compiles, mechanical fix (post-upgrade `>=`, highest value):**
+`share_plus_11` ✅ plan, `sensors_plus_4` ✅ plan, `flutter_svg_2` ✅ plan.
+These are where saropa_lints uniquely adds value over `dart analyze`.
+
+**Tier B — removed API, pre-upgrade `<` gate (medium value, needs gate-archetype sign-off):**
+`google_sign_in_7` ✅ plan, `connectivity_plus_6` ✅ plan, `webview_flutter_4` ✅ plan.
+
+**P2 (research pending):** `audioplayers_6` (deprecated `AudioCache`/`play` — likely
+Tier A), `app_links_6`, `file_picker_8`, `mobile_scanner_7`.
 
 **P3 / lower:** `local_auth_2`, `image_picker`, `flutter_bloc_9`, `supabase_2`,
 `geolocator_14`, `firebase_modular`.
 
-Selection criterion (why P1 ⟶ P3): a migration pack earns its keep when the old
-API is (a) **statically detectable** (a named symbol / constructor / method, not
-a behavioral change), and (b) **mechanically fixable** (the new form is a
-deterministic rewrite). `google_sign_in` and `share_plus` score highest on both;
-behavioral-only changes (e.g. permission semantics) score low and are deprioritized.
+**Note on the driving app:** the contacts app is already on the *new* major for
+every Tier A/B package and has no lingering old-API call sites (greped:
+no `Share.*`, no `accelerometerEvents`, no `SvgPicture(color:)`). So these packs
+serve the **broader saropa_lints user base**, not contacts itself — the contacts
+pubspec functioned purely as a high-signal candidate inventory.
 
 ---
 
@@ -133,6 +160,9 @@ behavioral-only changes (e.g. permission semantics) score low and are deprioriti
 - [x] Coverage map + ranked candidates (this doc)
 - [x] Recipe extracted (§2)
 - [x] Exemplar plan researched + written: [`share_plus`](plan_migration_share_plus.md)
-- [ ] P1 plans: `google_sign_in`, `connectivity_plus`, `sensors_plus`, `flutter_svg`, `webview_flutter`
+- [x] P1 plans (all researched + written):
+  - [Tier A] [`sensors_plus`](plan_migration_sensors_plus.md), [`flutter_svg`](plan_migration_flutter_svg.md), [`share_plus`](plan_migration_share_plus.md)
+  - [Tier B] [`google_sign_in`](plan_migration_google_sign_in.md), [`connectivity_plus`](plan_migration_connectivity_plus.md), [`webview_flutter`](plan_migration_webview_flutter.md)
+- [ ] Maintainer decision: support `<` (pre-upgrade) gate archetype? (gates Tier B)
 - [ ] P2 / P3 plans
 - [ ] Implement packs (separate work, per plan)

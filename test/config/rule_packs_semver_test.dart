@@ -76,6 +76,19 @@ void main() {
       expect(packPassesDependencyGate('bloc_8', {'bloc': '7.2.1'}), isFalse);
       expect(packPassesDependencyGate('bloc_8', null), isFalse);
     });
+
+    // riverpod_3 gates the StateNotifier legacy migration on riverpod 3.0.
+    test('riverpod_3 passes on riverpod >=3.0.0, fails on 2.x', () {
+      expect(
+        packPassesDependencyGate('riverpod_3', {'riverpod': '3.0.0'}),
+        isTrue,
+      );
+      expect(
+        packPassesDependencyGate('riverpod_3', {'riverpod': '2.5.1'}),
+        isFalse,
+      );
+      expect(packPassesDependencyGate('riverpod_3', null), isFalse);
+    });
   });
 
   group('riverpod_2 ownership', () {
@@ -106,6 +119,17 @@ void main() {
       expect(
         ruleCodesForPack('bloc'),
         isNot(contains('avoid_bloc_map_event_to_state')),
+      );
+    });
+
+    test('avoid_riverpod_state_notifier is in riverpod_3, not riverpod', () {
+      expect(
+        ruleCodesForPack('riverpod_3'),
+        contains('avoid_riverpod_state_notifier'),
+      );
+      expect(
+        ruleCodesForPack('riverpod'),
+        isNot(contains('avoid_riverpod_state_notifier')),
       );
     });
   });

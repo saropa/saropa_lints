@@ -73,6 +73,11 @@ kRelocatedRulePackCodes = {
   'avoid_dio_error': (fromPack: 'dio', toPack: 'dio_5'),
   // bloc 8.0 removed mapEventToState → on<Event>; gated to the bloc_8 pack.
   'avoid_bloc_map_event_to_state': (fromPack: 'bloc', toPack: 'bloc_8'),
+  // riverpod 3.0 deprecated StateNotifier(Provider); gated to riverpod_3.
+  'avoid_riverpod_state_notifier': (
+    fromPack: 'riverpod',
+    toPack: 'riverpod_3',
+  ),
 };
 
 /// Returns a new map with [kRelocatedRulePackCodes] applied: each code is

@@ -27,6 +27,11 @@ void main() {
       () => AvoidRefReadInsideBuildRule(),
     );
     testRule(
+      'AvoidRiverpodStateNotifierRule',
+      'avoid_riverpod_state_notifier',
+      () => AvoidRiverpodStateNotifierRule(),
+    );
+    testRule(
       'AvoidRefWatchOutsideBuildRule',
       'avoid_ref_watch_outside_build',
       () => AvoidRefWatchOutsideBuildRule(),

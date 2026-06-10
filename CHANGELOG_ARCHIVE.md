@@ -4193,6 +4193,15 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 - Renamed report files from `_saropa_full.log` / `_saropa_summary.md` to `_saropa_lint_report_full.log` / `_saropa_lint_report_summary.log` for clearer identification and consistent `.log` extension. No action required.
 
+<details>
+<summary>Maintenance</summary>
+
+- **Audit report filenames include project name**: Exported audit reports now include the project name from `pubspec.yaml` in the filename (e.g. `20260202_090730_saropa_lints_full_audit.md` instead of `20260202_090730_full_audit.md`). Applies to both full audit and DX audit reports. No action required.
+- **DX audit per-tier breakdown**: The DX Message Quality report now includes a "By tier" section showing passing/total counts and percentages for each tier (Essential, Recommended, Professional, Comprehensive, Insanity, Stylistic), color-coded to match the tier distribution display. No action required.
+- **DX audit grouping**: Length-based issue categories no longer fragment by exact character count. Rules that are "too short" or have a "correction too short" are now grouped into single buckets per threshold instead of one bucket per distinct length. No action required.
+
+</details>
+
 ---
 
 ## [4.9.10]
@@ -4241,13 +4250,18 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 - **Quick fixes for 8 rules across 5 files**: Added one-click fixes for `require_deprecation_message` (replace `@deprecated` with `@Deprecated`), `avoid_bluetooth_scan_without_timeout` (add scan timeout parameter), `require_geolocator_error_handling` (wrap in try-catch), `avoid_touch_only_gestures` (add `onLongPress` callback),. No action required.
 
-- **Shared `WrapInTryCatchFix` utility**: Extracted common try-catch wrapping fix to `ignore_fixes.dart` for reuse across rules that require error handling (PDF, SQLite, geolocation, etc.). No action required.
-
 ### Improved
 
 - **DX message quality for code_quality_rules**: Expanded `problemMessage` and `correctionMessage` text for all 87 rules with DX issues in `code_quality_rules.dart`. Removes "Avoid" prefixes, fixes vague language, explains consequences, and brings messages above minimum length thresholds.
 
 - **DX message quality for control_flow_rules**: Expanded `problemMessage` and `correctionMessage` text for all 28 rules with DX issues in `control_flow_rules.dart`. Removes "Avoid" prefixes, explains consequences of control flow anti-patterns, and meets minimum message length thresholds.
+
+<details>
+<summary>Maintenance</summary>
+
+- **Shared `WrapInTryCatchFix` utility**: Extracted common try-catch wrapping fix to `ignore_fixes.dart` for reuse across rules that require error handling (PDF, SQLite, geolocation, etc.). No action required.
+
+</details>
 
 ---
 
@@ -4378,7 +4392,12 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 ### Changed
 
 - **DX message quality improvements for 25 medium/low priority rules**: Improved lint message clarity by replacing vague language with specific, actionable problem descriptions. Changes include: (1) Replaced "better performance" with quantified impacts (e.g. No action required.
+<details>
+<summary>Maintenance</summary>
+
 - **Audit report organization improved**: Refactored audit scripts to reduce repetition and improve report readability. No action required.
+
+</details>
 
 ---
 
@@ -4392,9 +4411,15 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 ### Changed
 
+- **DX message quality improvements for 24 critical/high impact rules**: Achieved 100% pass rate (293/293 high, 61/61 critical) for developer experience message quality audit. No action required.
+
+<details>
+<summary>Maintenance</summary>
+
 - **Widget rules refactored into 3 focused files**: Split the 18,953-line `flutter_widget_rules.dart` into three thematic categories for improved maintainability and discoverability: `widget_lifecycle_rules.dart` (34 rules for State management, dispose, setState patterns), `widget_layout_rules. No action required.
 - **README badges upgraded**: Replaced static badges with dynamic, auto-updating badges organized into logical groups (CI/CD, pub.dev metrics, GitHub activity, technical info). Added popularity, likes, stars, forks, last commit, issues count, Dart SDK version, and Flutter platform badges with appropriate logos. No action required.
-- **DX message quality improvements for 24 critical/high impact rules**: Achieved 100% pass rate (293/293 high, 61/61 critical) for developer experience message quality audit. No action required.
+
+</details>
 
 ---
 
@@ -4467,27 +4492,24 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 **We add test coverage and file health reports, improve DX messages for 58 rules, and fix doc references and the publish script.**
 
-### Added
+### Changed
+
+- **Improved DX messages for 58 high-impact rules**: Expanded `problemMessage` and `correctionMessage` text across `navigation_rules`, `notification_rules`, `package_specific_rules`, `performance_rules`, `platform_rules`, `qr_scanner_rules`, `resource_management_rules`, `riverpod_rules`, `scroll_rules`, `security_rules`, and. No action required.
+
+<details>
+<summary>Maintenance</summary>
 
 - **Test coverage top offenders report**: The publish workflow's test coverage summary now lists the 10 worst categories ranked by untested rule count, color-coded by severity. No action required.
 - **File health top offenders**: The "Files needing quick fixes" audit section now lists the top 5 worst files sorted by fix coverage, showing fixes/rules and percentage. No action required.
 - **Doc reference auto-fix in publish pipeline**: The `--fix-docs` flag and Step 6 analysis now detect and auto-fix unresolvable `[reference]` patterns in DartDoc comments (OWASP codes, file names, snake_case rule names) alongside the existing angle bracket fixer. No action required.
-
-### Changed
-
-- **Improved DX messages for 58 high-impact rules**: Expanded `problemMessage` and `correctionMessage` text across `navigation_rules`, `notification_rules`, `package_specific_rules`, `performance_rules`, `platform_rules`, `qr_scanner_rules`, `resource_management_rules`, `riverpod_rules`, `scroll_rules`, `security_rules`, and. No action required.
 - **DX audit: relaxed vague language check for low-impact rules**: The `_audit_dx.py` scoring module no longer penalises advisory phrasing ("consider", "prefer", etc.) in low-impact rules, since suggestive language is appropriate for rules that are informational by nature. No action required.
-
-### Fixed
-
 - **20 unresolved doc reference warnings**: Escaped non-symbol references in DartDoc comments (OWASP codes, rule names, Flutter widget names, file names) that `dart doc` could not resolve, eliminating all documentation generation warnings. No action required.
 - **Publish script commit step**: "No changes to commit" message now shows as success (green) instead of warning (yellow), since it is not an error condition. No action required.
 - **Publish script Step 9**: Suppressed spurious Windows `nul` path warning in pre-publish validation output. No action required.
 - **ROADMAP near-match false positives**: `_test` variant rules are now excluded from near-match detection, matching the existing duplicate exclusion logic. No action required.
-
-### Removed
-
 - **`doc/flutter_widget_rules_full_table.md`**: Obsolete split-plan document that was no longer referenced. No action required.
+
+</details>
 
 ## [4.8.3]
 
@@ -4506,14 +4528,20 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 - **9 GetX rules unhidden**: Removed `hide` directives in `all_rules.dart` that blocked GetX rules from export. No action required.
 - **3 opinionated rules registered**: `prefer_early_return`, `prefer_mutable_collections`, and `prefer_record_over_equatable` moved from dead code to stylistic tier. No action required.
 - **`format_comment_style` moved to insanity tier**: Previously in professional tier, now correctly placed as documentation pedantry. No action required.
-- **Pre-publish audit script bugs fixed**: `_code\s*=` regex now matches variant field names (`_codeField`, `_codeMethod`), eliminating phantom rule false positives. Opinionated prefer\_\* detection uses class-scoped search instead of backward search, preventing cross-class name resolution errors. No action required.
 
 ### Changed
 
 - **Improved DX message quality for 25 critical/high-impact lint rules**: Expanded problem messages to clearly explain the detected issue, its real-world consequence, and the user impact. Expanded correction messages with specific, actionable fix guidance. No action required.
+
+<details>
+<summary>Maintenance</summary>
+
+- **Pre-publish audit script bugs fixed**: `_code\s*=` regex now matches variant field names (`_codeField`, `_codeMethod`), eliminating phantom rule false positives. Opinionated prefer\_\* detection uses class-scoped search instead of backward search, preventing cross-class name resolution errors. No action required.
 - **Critical DX pass rate**: 98.3% → 100% (60/60 rules passing). No action required.
 - **High DX pass rate**: 34.8% → 42.7% (+23 additional rules passing). No action required.
 - **Audit scripts refactored**: `_audit.py` split into `_audit_checks.py` (extraction/display) and `_audit_dx.py` (DX quality analysis) for maintainability. No action required.
+
+</details>
 
 ## [4.8.2]
 
@@ -4521,7 +4549,6 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 - **`require_https_only_test` rule**: New test-file variant of `require_https_only` at INFO severity (Professional tier). The production rule now skips test files, and the test variant covers them independently so teams can disable HTTP URL linting in tests without affecting production enforcement. No action required.
 - **`avoid_hardcoded_config_test` rule**: New test-file variant of `avoid_hardcoded_config` at INFO severity (Professional tier). Hardcoded URLs and keys in test files are typically test fixture data; this rule surfaces them at reduced severity for awareness without blocking. No action required.
-- **`require_deep_link_fallback` test fixture**: Added coverage for lazy-loading getters that use utility class methods (e.g., `_uri ??= UrlUtils.getSecureUri(url)`) to prevent false positives. No action required.
 
 ### Changed
 
@@ -4537,7 +4564,6 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
   - `avoid_inferrable_type_arguments` → `prefer_inferred_type_arguments`
   - Old names preserved as `configAliases` for backwards compatibility.
 - **Conflicting member-ordering rules moved to stylistic tier**: `prefer_static_members_first`, `prefer_instance_members_first`, `prefer_public_members_first`, `prefer_private_members_first` now require explicit opt-in since they conflict in pairs. No action required.
-- **Tier assignment: single source of truth**: `tiers.dart` is now the sole authority for rule tier assignments. Removed the `RuleTier get tier` getter from `SaropaLintRule` and the legacy two-phase fallback in . The init script now reads tier assignments exclusively from `tiers.dart` sets. No action required.
 - **Unified CLI entry point**: Added as a dispatcher supporting `init`, `baseline`, and `impact-report` subcommands. No action required.
 - **Progress tracking improvements**: `ProgressTracker` now derives project root from the first analyzed file path instead of using `.` (which fails in plugin mode). Shows enabled rule count instead of misleading file percentage. No action required.
 
@@ -4554,6 +4580,14 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 - **`avoid_long_running_isolates` false positive on `Isolate.run`**: `Isolate.run()` is now correctly classified as short-lived (like `compute()`), not as a persistent isolate like `Isolate.spawn()`. Context window expanded from 200 to 500 chars. Added fire-and-forget and never-block awareness keywords. No action required.
 - **`require_immutable_bloc_state` false positives on non-BLoC classes**: Skip indirect Flutter State subclasses (`PopupMenuItemState`, `FormFieldState`, `AnimatedWidgetBaseState`, `ScrollableState`, `RefreshIndicatorState`) and `StatefulWidget`/`StatelessWidget` subclasses using "State" as a domain term. No action required.
 - **`require_cache_key_determinism` false positive on metadata parameters**: Common metadata parameter names (`createdAt`, `updatedAt`, `timestamp`, `expiresAt`, `ttl`, etc.) are now excluded from determinism checks. Diagnostics now report at the specific offending argument instead of the entire variable declaration. No action required.
+
+<details>
+<summary>Maintenance</summary>
+
+- **`require_deep_link_fallback` test fixture**: Added coverage for lazy-loading getters that use utility class methods (e.g., `_uri ??= UrlUtils.getSecureUri(url)`) to prevent false positives. No action required.
+- **Tier assignment: single source of truth**: `tiers.dart` is now the sole authority for rule tier assignments. Removed the `RuleTier get tier` getter from `SaropaLintRule` and the legacy two-phase fallback in . The init script now reads tier assignments exclusively from `tiers.dart` sets. No action required.
+
+</details>
 
 ---
 
