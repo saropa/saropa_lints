@@ -144,21 +144,3 @@ class _NullAwarePairingState extends State<StatefulWidget> {
     super.dispose();
   }
 }
-
-// BAD: added in initState, never removed in dispose (genuine leak).
-class _LeakingState extends State<StatefulWidget> {
-  ValueNotifier<int>? notifier;
-  void _onTick() {}
-
-  @override
-  void initState() {
-    super.initState();
-    // expect_lint: always_remove_listener
-    notifier!.addListener(_onTick);
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-}

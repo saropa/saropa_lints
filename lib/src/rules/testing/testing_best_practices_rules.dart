@@ -3679,7 +3679,7 @@ class RequireDialogTestsRule extends SaropaLintRule {
       // launches, demanding a meaningless pumpAndSettle. A genuine dialog API
       // is either a known launcher OR a "*Dialog*" call that returns an
       // awaitable (Future/void) — a String/int/bool getter never shows a dialog.
-      final String methodName = node.methodName.name;
+      final String invokedName = node.methodName.name;
       const Set<String> dialogLaunchers = <String>{
         'showDialog',
         'showGeneralDialog',
@@ -3689,8 +3689,8 @@ class RequireDialogTestsRule extends SaropaLintRule {
         'showCupertinoDialog',
         'showCupertinoModalPopup',
       };
-      if (!dialogLaunchers.contains(methodName)) {
-        if (!methodName.contains('Dialog')) return;
+      if (!dialogLaunchers.contains(invokedName)) {
+        if (!invokedName.contains('Dialog')) return;
         // A "*Dialog*" call is a real dialog launch only when its return type is
         // a CONFIRMED awaitable (Future/void). A String/int/bool getter such as
         // the l10n `emergencyDirectoryDialogHeader(...)` is not. Unresolved
