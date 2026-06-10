@@ -8,6 +8,7 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:meta/meta.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 
@@ -1849,6 +1850,15 @@ class AvoidExcessiveRebuildsAnimationRule extends SaropaLintRule {
     body.accept(visitor);
     return visitor.widgetCount;
   }
+
+  /// Exposed for unit tests: counts the HOISTABLE (no animation-value read)
+  /// widgets in a builder body. Pure-AST, verifiable on `parseString` ASTs.
+  @visibleForTesting
+  static int hoistableWidgetCountForTesting(FunctionBody body) {
+    final _WidgetCountVisitor visitor = _WidgetCountVisitor();
+    body.accept(visitor);
+    return visitor.widgetCount;
+  }
 }
 
 /// `AnimatedBuilder` uses `animation:`; `ListenableBuilder` uses `listenable:`
@@ -1940,10 +1950,57 @@ class _WidgetCountVisitor extends RecursiveAstVisitor<void> {
   @override
   void visitInstanceCreationExpression(InstanceCreationExpression node) {
     final String typeName = node.constructorName.type.name.lexeme;
-    if (_knownWidgets.contains(typeName)) {
+    // Count only widgets whose subtree does NOT read an animation value. A
+    // widget that transitively contains a `.value` read is REQUIRED scaffolding
+    // around an animated leaf — e.g. `Text(style: TextStyle(fontSize:
+    // 14 * a.value))` nested inside Container/Stack/Column — and cannot move to
+    // `child:`. Counting only the genuinely-static (hoistable) widgets clears
+    // the leaf-layout-read false positive while keeping the true positive: a
+    // large static subtree wrapped by `Opacity(opacity: a.value, child: ...)`,
+    // where the static subtree reads no `.value` and so is still counted.
+    if (_knownWidgets.contains(typeName) &&
+        !_subtreeReadsAnimationValue(node)) {
       widgetCount++;
     }
     super.visitInstanceCreationExpression(node);
+  }
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    // Unresolved ASTs (scan CLI / parseString) parse a constructor call
+    // `Container(...)` as a MethodInvocation; an uppercase, un-targeted callee
+    // is a widget construction. The resolved analyzer rewrites these to
+    // InstanceCreationExpression (handled above), so there is no double count.
+    if (node.realTarget == null &&
+        _knownWidgets.contains(node.methodName.name) &&
+        !_subtreeReadsAnimationValue(node)) {
+      widgetCount++;
+    }
+    super.visitMethodInvocation(node);
+  }
+
+  static bool _subtreeReadsAnimationValue(AstNode node) {
+    final _AnimationValueReadVisitor visitor = _AnimationValueReadVisitor();
+    node.accept(visitor);
+    return visitor.found;
+  }
+}
+
+/// Detects a `.value` read (`anim.value`, `controller.value`) anywhere in a
+/// subtree — the signal that an animated value is consumed at that node.
+class _AnimationValueReadVisitor extends RecursiveAstVisitor<void> {
+  bool found = false;
+
+  @override
+  void visitPropertyAccess(PropertyAccess node) {
+    if (node.propertyName.name == 'value') found = true;
+    super.visitPropertyAccess(node);
+  }
+
+  @override
+  void visitPrefixedIdentifier(PrefixedIdentifier node) {
+    if (node.identifier.name == 'value') found = true;
+    super.visitPrefixedIdentifier(node);
   }
 }
 

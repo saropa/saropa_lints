@@ -1,6 +1,6 @@
 # BUG: `avoid_unawaited_future` — Fires on `StreamController.close()` / `StreamSubscription.cancel()` cleanup outside the narrow lifecycle/onDone whitelist
 
-**Status: Open**
+**Status: Fixed**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
@@ -199,3 +199,7 @@ The fixture at `example*/lib/core/avoid_unawaited_future_fixture.dart` should in
 - Dart SDK version: >=3.9.0 <4.0.0 (per pubspec environment constraint)
 - analyzer: >=9.0.0 <13.0.0
 - Triggering project/file: `d:\src\contacts` — `lib/utils/activity/activity_queue.dart:73`, `lib/components/user/user_profile_avatar.dart:139`, `lib/service/youtube_api/youtube_player_service.dart:31`
+
+## Finish Report (2026-06-10)
+
+Fixed in WS-6 via the report's robust option: a `close()`/`cancel()` in a synchronous void cleanup context (void method, hand-named teardown method, or a sync callback closure such as onCancel) is exempt — awaiting is impossible there. Covers all three patterns regardless of target type. Verified by `test/rules/core/avoid_unawaited_future_ws6_test.dart` (5 cases).

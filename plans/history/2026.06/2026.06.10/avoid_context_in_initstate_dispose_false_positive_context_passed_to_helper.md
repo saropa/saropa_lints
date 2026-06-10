@@ -1,6 +1,6 @@
 # BUG: `avoid_context_in_initstate_dispose` — false positive when `context` is passed to a helper that performs no inherited-widget lookup
 
-**Status: Open**
+**Status: Fixed**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
@@ -172,3 +172,7 @@ The fixture at `example*/lib/widget/avoid_context_in_initstate_dispose_fixture.d
 - analyzer version: `12.1.0`
 - custom_lint version: n/a — saropa_lints is a native analysis_server plugin (top-level `plugins:` block)
 - Triggering project/file: `d:/src/contacts/lib/utils/system/shared_avatar_overlay.dart:68`
+
+## Finish Report (2026-06-10)
+
+Fixed in WS-3. `_ContextUsageVisitor` now reports `context` only when it performs an inherited-widget / render-tree lookup: receiver of an inherited accessor (watch/read/select/dependOnInheritedWidgetOfExactType/findAncestor*/findRenderObject/...), argument to a `.of`/`.maybeOf` accessor (Theme.of, MediaQuery.of, ...), or a render-tree property read (context.size/owner). A bare `context` forwarded to an ordinary helper (resolveColor(context)) or captured into a variable is no longer flagged. Verified by `widget_lifecycle_ws3_test.dart` (7 cases: helper-forward & bare-capture safe; Theme.of/maybeOf/read/size unsafe; addPostFrameCallback safe). Fixture extended.

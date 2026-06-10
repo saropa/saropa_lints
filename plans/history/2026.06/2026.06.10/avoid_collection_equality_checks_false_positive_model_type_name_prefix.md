@@ -1,6 +1,6 @@
 # BUG: `avoid_collection_equality_checks` — Fires on a model whose type name starts with "Map"/"List"/"Set"
 
-**Status: Open**
+**Status: Fixed**
 
 Created: 2026-06-10
 Rule: `avoid_collection_equality_checks`
@@ -133,3 +133,7 @@ The fixture at `example*/lib/data/avoid_collection_equality_checks_fixture.dart`
 - Dart SDK version: >=3.10.7 <4.0.0
 - custom_lint version: native analyzer plugin (analysis_server_plugin), not custom_lint
 - Triggering project/file: `D:\src\contacts\lib\components\map\map_info_widget.dart:48`
+
+## Finish Report (2026-06-10)
+
+Fixed in WS-2. `_isCollectionType` now uses resolved predicates (`isDartCoreList`/`isDartCoreSet`/`isDartCoreMap`/`isDartCoreIterable`) plus an EXACT (optionally generic) name match for `Queue`/`LinkedList`, instead of `getDisplayString().startsWith(...)`. A user model like `MapClusterModel` is no longer misclassified as a Map. This rule needs resolved staticTypes, so it is inert in the parseString-based scan CLI; verified by logic + the resolved IDE plugin and a fixture (`MapClusterModel != MapClusterModel` no lint; `List<int> == List<int>` lint).

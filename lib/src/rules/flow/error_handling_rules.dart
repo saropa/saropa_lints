@@ -88,19 +88,41 @@ class AvoidSwallowingExceptionsRule extends SaropaLintRule {
       if (exceptionParam == null) return;
 
       final String exceptionName = exceptionParam.name.lexeme;
-      bool exceptionUsed = false;
 
+      // `_` (and `__`, `___`) is Dart's non-binding wildcard: a deliberate
+      // "discard this exception object" marker that CANNOT be referenced.
+      // Treating its forced non-use as swallowing flags the idiomatic
+      // deliberate-ignore catch (`} on FooException catch (_) { log(); return
+      // fallback; }`). The empty-body swallow is still reported above.
+      if (RegExp(r'^_+$').hasMatch(exceptionName)) return;
+
+      bool exceptionUsed = false;
       body.visitChildren(
         _IdentifierUsageVisitor(exceptionName, () {
           exceptionUsed = true;
         }),
       );
+      if (exceptionUsed) return;
 
-      if (!exceptionUsed) {
-        reporter.atNode(node);
-      }
+      // A named-but-unused exception variable is not "swallowed" when the body
+      // logs or rethrows — the rule's own correction message accepts "log,
+      // rethrow, or handle with a recovery action", and require_catch_logging
+      // already owns the no-logging concern (avoid double-flagging).
+      if (_bodyLogsOrRethrows(body.toSource())) return;
+
+      reporter.atNode(node);
     });
   }
+
+  static final RegExp _handledPattern = RegExp(
+    r'\brethrow\b|\bthrow\b|'
+    r'\b(log|logger|logError|debug|debugPrint|debugException|print|'
+    r'breadcrumb|recordError|reportError)\b',
+    caseSensitive: false,
+  );
+
+  static bool _bodyLogsOrRethrows(String bodySource) =>
+      _handledPattern.hasMatch(bodySource);
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [

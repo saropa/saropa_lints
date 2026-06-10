@@ -1,6 +1,6 @@
 # BUG: `avoid_listview_without_item_extent` — Fires on `ListView.builder` whose item widget has intrinsically variable height (subtitle / expansion), where `itemExtent` is impossible to set correctly
 
-**Status: Open**
+**Status: Fixed**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
@@ -212,3 +212,7 @@ The fixture at `example*/lib/widget/avoid_listview_without_item_extent_fixture.d
 - Flutter: >=3.44.0
 - custom_lint version: n/a — saropa_lints runs as a native analyzer plugin (`analysis_server_plugin`), not via custom_lint
 - Triggering project/file: `d:/src/contacts` — 8 of the 15 flagged `ListView.builder` sites
+
+## Finish Report (2026-06-10)
+
+Fixed in WS-4. Before reporting, the rule now inspects the `itemBuilder` return: when it builds (or branches to) a self-sizing item widget — ListTile/CheckboxListTile/RadioListTile/SwitchListTile/ExpansionTile/ExpansionPanel(List), or a project wrapper matching `*ListTile`/`*Expansion*`/`*Expandable` (CommonListTile, CommonPanelExpandable) — the diagnostic is suppressed, since no constant itemExtent is correct. Fixed-height rows (e.g. SizedBox(height: 56, ...)) still fire. Verified by the WS-4 unit test (ListTile/ExpansionTile/CommonListTile/CommonPanelExpandable exempt; SizedBox + plain Text flagged) and an end-to-end scan.

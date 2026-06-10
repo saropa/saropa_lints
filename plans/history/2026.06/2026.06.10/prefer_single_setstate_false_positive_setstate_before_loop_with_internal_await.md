@@ -1,6 +1,6 @@
 # BUG: `prefer_single_setstate` — false positive: setState before a loop merges with setState inside the loop after an in-loop `await`
 
-**Status: Open**
+**Status: Fixed**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
@@ -254,3 +254,7 @@ mutually-exclusive-branch or top-level-`await` cases that the v13.12.2 fixes
 project pins the plugin at the pre-fix `13.12.1`. Bumping that pin to `>=13.12.2`
 clears them. They are NOT covered by this bug — only the loop-await pattern above
 survives in current source.
+
+## Finish Report (2026-06-10)
+
+Fixed in WS-6 via the report's minimal Defect-1 fix: `_SegmentVisitor` now defers for/while/do/for-element loop BODIES as their own execution scope (mirroring the existing if/switch/try deferral). A setState inside a loop body that runs after an in-loop await can no longer merge with a setState outside the loop; two consecutive setState calls in one iteration still merge. Verified by `test/rules/widget/prefer_single_setstate_ws6_test.dart` (5 cases).

@@ -1,6 +1,6 @@
 # BUG: `avoid_excessive_rebuilds_animation` — Fires when the builder reads an animated *layout* property (font size) at a leaf, where rebuilding the surrounding subtree is mandatory
 
-**Status: Open**
+**Status: Fixed**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
@@ -210,3 +210,7 @@ A minimal first step (option 1) already clears the reported real-world FPs.
 - Flutter: >=3.44.0
 - custom_lint version: n/a — native analyzer plugin (`analysis_server_plugin`)
 - Triggering project/file: `d:/src/contacts` — 2 of 3 flagged sites are FPs (the third is a true positive)
+
+## Finish Report (2026-06-10)
+
+Fixed in WS-6 via the report's option 2: `_WidgetCountVisitor` now counts only HOISTABLE widgets — those whose subtree reads no animation `.value`. A leaf layout read (fontSize: a.value) makes its required wrapper scaffold non-hoistable (FP cleared), while a large static subtree under `Opacity(opacity: a.value, child: ...)` stays counted (TP preserved). The visitor also handles the unresolved MethodInvocation constructor shape. Verified by `test/rules/ui/avoid_excessive_rebuilds_animation_ws6_test.dart`.

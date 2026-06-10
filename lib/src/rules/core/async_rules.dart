@@ -1,6 +1,7 @@
 // ignore_for_file: depend_on_referenced_packages, deprecated_member_use
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:meta/meta.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
@@ -3354,11 +3355,65 @@ class AvoidUnawaitedFutureRule extends SaropaLintRule {
       return true;
     }
 
+    // close()/cancel() cleanup in a synchronous void context (a void method, a
+    // hand-named teardown, or a void callback closure like onCancel): awaiting
+    // is impossible there, so the fire-and-forget is intentional cleanup, not a
+    // lost-error risk the caller can act on.
+    if (_isSyncVoidCleanup(expr, node)) {
+      return true;
+    }
+
     // .catchError()/.ignore() means errors are already handled
     if (_hasCatchErrorOrIgnore(expr)) {
       return true;
     }
 
+    return false;
+  }
+
+  /// True for a `close()`/`cancel()` call in a synchronous cleanup context where
+  /// awaiting is impossible: a `void`-returning method, a hand-named teardown
+  /// method (dispose/close/teardown/deactivate), or a synchronous callback
+  /// closure (e.g. `StreamController.onCancel = () { sub.cancel(); }`). Covers
+  /// `_queue.close()` in `dispose()`, `sub.cancel()` in `onCancel`, and
+  /// `controller?.close()` in a hand-named `disposeController()` — none of which
+  /// the narrower lifecycle/onDone whitelists recognized.
+  /// Exposed for unit tests: the sync-void-cleanup exemption. Pure-AST,
+  /// verifiable on `parseString` ASTs.
+  @visibleForTesting
+  static bool isSyncVoidCleanupForTesting(
+    MethodInvocation expr,
+    ExpressionStatement node,
+  ) => AvoidUnawaitedFutureRule()._isSyncVoidCleanup(expr, node);
+
+  bool _isSyncVoidCleanup(MethodInvocation expr, ExpressionStatement node) {
+    final String method = expr.methodName.name;
+    if (method != 'close' && method != 'cancel') return false;
+
+    final FunctionBody? body = node.thisOrAncestorOfType<FunctionBody>();
+    if (body == null || body.isAsynchronous) return false;
+    return _isVoidCleanupContext(body);
+  }
+
+  bool _isVoidCleanupContext(FunctionBody body) {
+    final AstNode? parent = body.parent;
+    if (parent is MethodDeclaration) {
+      if (parent.returnType?.toSource() == 'void') return true;
+      final String name = parent.name.lexeme.toLowerCase();
+      return name.contains('dispose') ||
+          name.contains('close') ||
+          name.contains('teardown') ||
+          name.contains('deactivate');
+    }
+    if (parent is FunctionDeclaration) {
+      return parent.functionExpression.body == body &&
+          parent.returnType?.toSource() == 'void';
+    }
+    // A synchronous callback closure (onCancel/onListen/onPause/onResume, or any
+    // void Function()): awaiting is impossible inside it.
+    if (parent is FunctionExpression) {
+      return true;
+    }
     return false;
   }
 

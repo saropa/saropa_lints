@@ -1,6 +1,6 @@
 # BUG: `always_remove_listener` — false positive when add/remove targets differ only by null-aware operator (`!` vs `?`)
 
-**Status: Open**
+**Status: Fixed**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
@@ -190,3 +190,7 @@ The fixture at `example*/lib/widget/always_remove_listener_fixture.dart` should 
 - analyzer version: `12.1.0`
 - custom_lint version: n/a — saropa_lints is a native analysis_server plugin (top-level `plugins:` block)
 - Triggering project/file: `d:/src/contacts/lib/utils/system/shared_avatar_overlay.dart:82`
+
+## Finish Report (2026-06-10)
+
+Fixed in WS-3. Both `_AddListenerFinder` and `_RemoveListenerFinder` now normalize the receiver and callback source via `_normalizeListenerToken`, stripping a single trailing `!`/`?`, so `field!.addListener(cb)` (initState) and `field?.removeListener(cb)` (dispose) compare equal. Verified by `test/rules/widget/widget_lifecycle_ws3_test.dart` (normalize equal for !/?, distinct fields stay distinct) and existing always_remove_listener tests still pass. Fixture extended with a null-aware-pairing GOOD case and a genuine-leak BAD case.

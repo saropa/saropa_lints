@@ -1,6 +1,6 @@
 # BUG: `prefer_value_listenable_builder` — flags async-loaded counts, FutureBuilder re-fetch keys, transient locks, and notifier-diff caches as "simple single-value state"
 
-**Status: Open**
+**Status: Fixed**
 
 Created: 2026-06-09
 Rule: `prefer_value_listenable_builder`
@@ -277,3 +277,7 @@ The existing `_bad790*` cases must stay `expect_lint`; the new `_good790Async*`,
   - `lib/components/user/backup_restore/backup_retention_toggle.dart:36` (category 5 — `late bool _isEnabled` Drift-pref mirror)
   - `lib/components/country/timezone/timezone_section.dart:101` (category 6 — `String _displayedTime` notifier-diff cache)
   - `lib/components/contact/detail_panels/email/email_panel.dart:70` (category 3 — `bool _isReordering` reorder lock; raw `setState` clears it, real state flows through FutureBuilder/StreamBuilder + `setStateSafe`)
+
+## Finish Report (2026-06-10)
+
+Fixed in WS-6 for categories 1, 2, 4, and 6 (the report's primary buckets) via Hypotheses A+B+C: bail when the State holds a Future/Stream field (B), assigns its field in an async setState (A), or manually wires a Listenable via .addListener (C). Verified by scan against the real contacts sites: contact_coach_screen (cat 1), character_birthday_section / audit_panel_import_review (cat 2), and timezone_section (cat 6) no longer fire. REMAINING (not fixed, by design): category 3 (transient in-flight lock, e.g. language_picker_dialog:123) and category 5 (persisted-pref mirror) — the report itself flags these as structurally indistinguishable from a single-value display State and needing an explicit product decision, so they are left firing rather than risk suppressing genuine positives.

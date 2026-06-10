@@ -1,6 +1,6 @@
 # BUG: `avoid_returning_null_for_future` — Fires on `return null` when the declared return type is a NULLABLE Future (`Future<T>?`)
 
-**Status: Open**
+**Status: Fixed**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
@@ -163,3 +163,7 @@ should include:
 - Dart SDK version: >=3.9.0 <4.0.0 (per pubspec environment constraint)
 - analyzer: >=9.0.0 <13.0.0
 - Triggering project/file: `d:\src\contacts` — `lib/components/user/backup_restore/file_restore_list.dart:78`
+
+## Finish Report (2026-06-10)
+
+Fixed in WS-5. Added a `nullabilitySuffix == NullabilitySuffix.question` guard in `lib/src/rules/flow/return_rules.dart` after the `isDartAsyncFuture` check, so a nullable `Future<T>?` return type no longer flags `return null`; non-nullable `Future<T>` still fires. Verified against the real site `file_restore_list.dart:78` (no longer fires). Fixture extended: `example/lib/return/avoid_returning_null_for_future_fixture.dart`. CHANGELOG `[Unreleased] > Fixed`.
