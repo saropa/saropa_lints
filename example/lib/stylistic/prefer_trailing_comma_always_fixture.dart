@@ -157,6 +157,29 @@ void _goodNamedCallback() {
   });
 }
 
+// Sole set-literal argument, block-formatted — no comma wanted (false positive fix)
+void _goodSoleSetLiteralArg(Iterable<DateTime> holidays) {
+  Set<DateTime>.unmodifiable(<DateTime>{
+    for (final DateTime h in holidays) h,
+  });
+}
+
+// Sole list-literal argument, block-formatted — no comma wanted (false positive fix)
+void _goodSoleListLiteralArg() {
+  _oneArg(<int>[
+    1,
+    2,
+  ]);
+}
+
+// Named collection-literal last argument — no comma wanted (false positive fix)
+void _goodNamedListLiteralArg() {
+  _namedList(values: <int>[
+    1,
+    2,
+  ]);
+}
+
 // Already has trailing comma — compliant
 void _goodTrailingCommaPresent() {
   _threeArgs(
@@ -174,3 +197,5 @@ void _goodSingleLine() {
 // Helpers
 void _threeArgs(String a, String b, String c) {}
 void _namedCallback({required String Function(int) builder}) {}
+void _oneArg(List<int> values) {}
+void _namedList({required List<int> values}) {}

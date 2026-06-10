@@ -57,6 +57,7 @@ import { fetchIssues } from './driftAdvisor/client';
 import { mapIssuesToLocations } from './driftAdvisor/mapper';
 import { DriftAdvisorTreeProvider } from './driftAdvisor/driftAdvisorTree';
 import { RulePacksWebviewProvider } from './rulePacks/rulePacksWebviewProvider';
+import { maybeOfferUpgradePacks } from './rulePacks/upgradePackNudge';
 import {
   openRuleExplainPanelForViolation,
   openRuleExplainPanel,
@@ -794,10 +795,18 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     const depWatcher = vscode.workspace.createFileSystemWatcher('**/pubspec.lock');
     depWatcher.onDidChange(triggerAnalysisAfterDependencyChange);
     depWatcher.onDidCreate(triggerAnalysisAfterDependencyChange);
+    // A resolved-version change (after `pub upgrade`) may bring the project into
+    // range of a semver-gated migration pack; offer to enable the upgrade lints.
+    depWatcher.onDidChange(() => void maybeOfferUpgradePacks(context));
+    depWatcher.onDidCreate(() => void maybeOfferUpgradePacks(context));
     context.subscriptions.push(depWatcher, {
       dispose: () => { if (depChangeTimer) clearTimeout(depChangeTimer); },
     });
   }
+
+  // Offer applicable migration packs once on activation (deferred so it never
+  // blocks startup); subsequent offers fire from the pubspec.lock watcher above.
+  setTimeout(() => void maybeOfferUpgradePacks(context), 4_000);
 
   syncRuleMetadataFromViolations(root ? readViolations(root) : null);
 
