@@ -168,6 +168,15 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
     ],
   },
   {
+    id: 'dio_5',
+    label: 'Dio 5.x',
+    matchPubNames: ['dio'],
+    ruleCodes: [
+      'avoid_dio_error',
+    ],
+    dependencyGate: { package: 'dio', constraint: '>=5.0.0' },
+  },
+  {
     id: 'drift',
     label: 'Drift',
     matchPubNames: ['drift', 'drift_dev'],

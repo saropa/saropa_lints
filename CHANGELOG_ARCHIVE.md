@@ -2777,11 +2777,13 @@ In this release we add 55 new lint rules (deprecation, security, structure, Fire
 - **Unimplemented rule references:** Removed four rules from the plugin registry, tiers, analysis_options_template, and roadmap fixture that were never implemented: `avoid_equals_and_hash_code_on_mutable_classes`, `avoid_implementing_value_types`, `avoid_null_checks_in_equality_operators`, `avoid_redundant_argument_values`. No action required.
 - **require_yield_after_db_write:** Suppress when write is last statement, when next statement is `return`, when inside `compute()`/`Isolate.run()`, and when file is in test directory. Recognize `Future.microtask`, `Future.delayed(Duration.zero)`, and `SchedulerBinding.instance.endOfFrame` as valid yields. No action required.
 - **verify_documented_parameters_exist:** Whitelist built-in types and literals (`[String]`, `[int]`, `[null]`, etc.) to avoid false positives on valid doc references. No action required.
+
 ### Changed
 
 - **Firebase reauth rule:** Reauth is now compared by source offset (earliest reauth in method) so order is correct regardless of visit order. No action required.
 - **Firebase token rule:** Stored detection now includes VariableDeclaration initializer (e.g. `final t = await user.getIdToken()`). No action required.
 - **Performance:** Firebase Auth rules set requiredPatterns for earlier file skip when content does not match. No action required.
+
 ### Added
 
 - 55 new lint rules. No action required.
@@ -3076,6 +3078,7 @@ In this release we upgrade to analyzer 9 and Dart SDK 3.10+, and add 21 Drift (S
 ### Removed
 
 - `avoid_ignore_trailing_comment` rule, `MoveTrailingCommentFix` quick fix, and `trailingCommentOnIgnore` regex — the native Dart analyzer handles ignore directive trailing comments correctly, making this rule produce false positives. No action required.
+
 ### Changed
 
 - All CLI tools (, ) now use `dart analyze` instead of `dart run custom_lint`. No action required.
@@ -3105,7 +3108,6 @@ In this release we upgrade to analyzer 9 and Dart SDK 3.10+, and add 21 Drift (S
 
 ### Fixed
 
-- Publish report: test coverage "Overall" percentage now caps per-category fixture counts at rule counts, preventing excess fixtures from masking gaps. No action required.
 - `prefer_static_class`: no longer fires on `abstract final class` declarations (regression from beta.15 fix). No action required.
 - `avoid_hardcoded_locale`: skip locale-pattern strings inside collection literals (Set, List, Map lookup data). Intent: flag locale passed to formatting APIs; locale strings as lookup data are exempt. No action required.
 - `avoid_datetime_comparison_without_precision`: skip comparisons against compile-time constants (e.g., epoch sentinel checks). No action required.
@@ -3117,6 +3119,13 @@ In this release we upgrade to analyzer 9 and Dart SDK 3.10+, and add 21 Drift (S
 ### Changed
 
 - `avoid_high_cyclomatic_complexity`: raise threshold from 10 to 15 to align with industry standards (SonarQube, ESLint). No action required.
+
+<details>
+<summary>Maintenance</summary>
+
+- Publish report: test coverage "Overall" percentage now caps per-category fixture counts at rule counts, preventing excess fixtures from masking gaps. No action required.
+
+</details>
 
 ---
 
@@ -3206,15 +3215,21 @@ In this release we upgrade to analyzer 9 and Dart SDK 3.10+, and add 21 Drift (S
 
 ### Publishing
 
-- Publish audit: consolidated quality checks into a single pass/warn/fail list instead of separate subsections per check
-- Publish audit: US English spelling check displayed as a simple bullet instead of a standalone subsection
-- Publish audit: bug reports grouped by status (done, in progress, unsolved) with scaled bars per group
-- Publish audit: test coverage columns dynamically aligned to longest category name
 - Init: "what's new" summary now shows all items (no `+N more` or section truncation) — only individual lines are truncated at 78 chars
 - Init: tier default changed from `comprehensive` to `essential` for fresh setups; re-runs default to the previously selected tier
 - Init: stale config version warning now tells the user how to fix it (`re-run "dart run saropa_lints" to update`)
 - Init: stylistic walkthrough shows per-rule progress counter (`4/120 — 3%`) and `[quick fix]` indicator for rules with IDE auto-fixes
 - Init: stylistic walkthrough rule descriptions rendered in default terminal color instead of dim gray for readability
+
+<details>
+<summary>Maintenance</summary>
+
+- Publish audit: consolidated quality checks into a single pass/warn/fail list instead of separate subsections per check
+- Publish audit: US English spelling check displayed as a simple bullet instead of a standalone subsection
+- Publish audit: bug reports grouped by status (done, in progress, unsolved) with scaled bars per group
+- Publish audit: test coverage columns dynamically aligned to longest category name
+
+</details>
 
 ---
 
@@ -3260,10 +3275,13 @@ In this release we upgrade to analyzer 9 and Dart SDK 3.10+, and add 21 Drift (S
 - `avoid_string_concatenation_l10n`: skip numeric-only interpolated strings (e.g. `'$a / $b'`) that contain no translatable word content. No action required.
 - `avoid_unmarked_public_class`: skip classes where all constructors are private (extension already prevented). No action required.
 
-### Package Publishing Changes
+<details>
+<summary>Maintenance</summary>
 
 - Publish audit: added 3 new blocking checks — `flutterStylisticRules` subset validation, `packageRuleSets` tier consistency, `exampleBad`/`exampleGood` pairing
 - Publish audit: doc comment auto-fix (angle brackets, references) now runs during audit step instead of only during analysis step
+
+</details>
 
 ---
 
@@ -3274,9 +3292,15 @@ In this release we upgrade to analyzer 9 and Dart SDK 3.10+, and add 21 Drift (S
 ### Changed
 
 - CLI defaults to `init` command when run without arguments (`dart run saropa_lints` now equivalent to `dart run saropa_lints init`). No action required.
+
+<details>
+<summary>Maintenance</summary>
+
 - Publish script: `dart format` now targets specific top-level paths, excluding `example*/` directories upfront instead of tolerating exit-code 65 after the fact. No action required.
 - Publish script: roadmap summary now includes color-coded bug report breakdown (unsolved/categorized/resolved) from sibling `saropa_dart_utils/bugs/` directory. No action required.
 - Deferred `avoid_misused_hooks` rule removed from ROADMAP_DEFERRED (hook rules vary by context — not viable as static lint). No action required.
+
+</details>
 
 ---
 
@@ -3293,8 +3317,6 @@ In this release we upgrade to analyzer 9 and Dart SDK 3.10+, and add 21 Drift (S
 - `dart analyze` exit codes 1-2 (issues found) no longer reported as "failed" — only exit code 3+ (analyzer error) is treated as failure. No action required.
 - Progress bar stuck at ~83% — recalibration threshold no longer inflates expected file count when discovery overcounts. No action required.
 - Progress bar now shows 100% completion before the summary box. No action required.
-- Publish script: restored post-publish version bump (pubspec + `[Unreleased]` section) — accidentally removed in v4.9.17 refactor. No action required.
-- Publish script: optional `_offer_custom_lint` prompt no longer blocks success status or timing summary on interrupt. No action required.
 
 ### Changed
 
@@ -3304,6 +3326,14 @@ In this release we upgrade to analyzer 9 and Dart SDK 3.10+, and add 21 Drift (S
 - Old report files in `reports/` root are automatically migrated to `reports/YYYYMMDD/` date subfolders during init. No action required.
 - Stream drain and exit code now awaited together via `Future.wait` to prevent interleaved output. No action required.
 - Persistent cache files (`rule_version_cache.json`, export directories) moved from `reports/` root to `reports/_cache/` subfolder. No action required.
+
+<details>
+<summary>Maintenance</summary>
+
+- Publish script: restored post-publish version bump (pubspec + `[Unreleased]` section) — accidentally removed in v4.9.17 refactor. No action required.
+- Publish script: optional `_offer_custom_lint` prompt no longer blocks success status or timing summary on interrupt. No action required.
+
+</details>
 
 ---
 
@@ -3363,7 +3393,12 @@ In this release we upgrade to analyzer 9 and Dart SDK 3.10+, and add 21 Drift (S
 ### Fixed
 
 - `.pubignore` pattern `test/` was excluding from published package — anchored to `/test/` so only the root test directory is excluded; this caused `dart run saropa_lints:init` to fail with a missing import error for `replace_expect_with_expect_later_fix.dart`. No action required.
+<details>
+<summary>Maintenance</summary>
+
 - Publish script `dart format` step failed on fixture files using future language features (extension types, digit separators, non-ASCII identifiers) — now tolerates exit code 65 when all unparseable files are in example fixture directories. No action required.
+
+</details>
 
 ---
 
@@ -3374,21 +3409,20 @@ In this release we upgrade to analyzer 9 and Dart SDK 3.10+, and add 21 Drift (S
 ### Added
 
 - Quick fix for `require_subscription_status_check` — inserts TODO reminder to verify subscription status in build methods. No action required.
+<details>
+<summary>Maintenance</summary>
+
 - `getLineIndent()` utility on `SaropaFixProducer` base class for consistent indentation in fix output. No action required.
-
-### Changed
-
 - Moved generated export folders (`dart_code_exports/`, `dart_sdk_exports/`, `flutter_sdk_exports/`) and report caches from `scripts/` to `reports/` — scripts now write output to the gitignored `reports/` directory, keeping `scripts/` clean. No action required.
 - Filled TODO placeholders in 745 fixture files across all example directories — core and async fixtures now have real bad/good triggering code; widget, package, and platform fixtures have NOTE placeholders documenting rule requirements. No action required.
 - Expanded ROADMAP task backlog with 138 detailed implementation specs. No action required.
 - Deduplicated `_getIndent` from 5 fix files into shared `SaropaFixProducer.getLineIndent()`. No action required.
-
-### Fixed
-
 - Audit script `get_rules_with_corrections()` now handles variable-referenced rule names (e.g. `LintCode(_name, ...)`) — previously undercounted correction messages by 1 (`no_empty_block`). No action required.
 - OWASP M2 coverage now correctly reported as 10/10 — audit scanner regex updated to match both single-line and dart-formatted multiline `OwaspMapping` getters; `avoid_dynamic_code_loading` and `avoid_unverified_native_library` (M2), `avoid_hardcoded_signing_config` (M7), and `avoid_sudo_shell_commands` (M1) were previously invisible to the scanner. No action required.
 - Completed test fixtures for `avoid_unverified_native_library` and `avoid_sudo_shell_commands` (previously empty stubs). No action required.
 - Removed 4 dead references to unimplemented rule classes from registration and tier files (`require_ios_platform_check`, `avoid_ios_background_fetch_abuse`, `require_method_channel_error_handling`, `require_universal_link_validation`) — tracked as `bugs/todo_001` through `todo_004`. No action required.
+
+</details>
 
 ---
 
@@ -3408,21 +3442,20 @@ In this release we upgrade to analyzer 9 and Dart SDK 3.10+, and add 21 Drift (S
 - V4 migration no longer imports all rule settings as overrides — only settings that differ from the selected v5 tier defaults are preserved, preventing mass rule disablement. No action required.
 - Init script scans and auto-fixes broken ignore comments — detects trailing explanations (`// ignore: rule // reason` or `// ignore: rule - reason`) that silently break suppression, and moves the text to the line above. No action required.
 - Quick fix support for 108 rules via native `SaropaFixProducer` system — enables IDE lightbulb fixes and `dart fix --apply`. No action required.
+<details>
+<summary>Maintenance</summary>
+
 - 3 reusable fix base classes: `InsertTextFix`, `ReplaceNodeFix`, `DeleteNodeFix` in. No action required.
 - 108 individual fix implementation files in , all with real implementations (zero TODO placeholders). No action required.
 - Test coverage for all 95 rule categories (Phase 1-3): every category now has a dedicated file with fixture verification and semantic test stubs. No action required.
 - 506 missing fixture stubs across all example directories (Phase 1-4). No action required.
 - 12 new package fixture directories: flutter_hooks, workmanager, supabase, qr_scanner, get_it, geolocator, flame, sqflite, graphql, firebase, riverpod, url_launcher. No action required.
-
-### Changed
-
 - PERFORMANCE.md rewritten for v5 native plugin architecture — replaced all custom_lint references with `dart analyze`, updated rule counts, documented lazy rule instantiation and compile-time constant tier sets, added rule deferral info. No action required.
-
-### Fixed
-
 - Test fixture paths for bloc, firebase, riverpod, provider, and url_launcher now point to individual category directories instead of shared `packages/` directory. No action required.
 - Platform fixture paths reorganized from shared `platforms/` directory to per-platform directories (`ios/`, `macos/`, `android/`, `web/`, `linux/`, `windows/`) — fixes 0% coverage report for all platform categories. No action required.
 - Coverage script fallback search for fixture files in subdirectories, with prefix-match anchoring and OS error handling. No action required.
+
+</details>
 
 ---
 
@@ -3430,11 +3463,14 @@ In this release we upgrade to analyzer 9 and Dart SDK 3.10+, and add 21 Drift (S
 
 **We fix publish dry-run and CI checks.**
 
-### Fixed
+<details>
+<summary>Maintenance</summary>
 
 - Untrack a stray gitignored editor-config file — was tracked despite the gitignore rule, causing `dart pub publish --dry-run` to exit 65 (warning). No action required.
 - Publish workflow dry-run step now tolerates warnings (exit 65) but still fails on errors (exit 66). No action required.
 - Publish script now waits for GitHub Actions workflow to complete and reports real success/failure — previously printed "PUBLISHED" immediately without checking CI status. No action required.
+
+</details>
 
 ---
 
@@ -3445,7 +3481,12 @@ In this release we upgrade to analyzer 9 and Dart SDK 3.10+, and add 21 Drift (S
 ### Fixed
 
 - Add `analyzer` as explicit dependency — `dart pub publish` rejected transitive-only imports, causing silent publish failure. No action required.
+<details>
+<summary>Maintenance</summary>
+
 - Remove `|| [ $? -eq 65 ]` from publish workflow — was silently swallowing publish failures. No action required.
+
+</details>
 
 ---
 
@@ -3453,10 +3494,13 @@ In this release we upgrade to analyzer 9 and Dart SDK 3.10+, and add 21 Drift (S
 
 **We update the publish script for the v5 LintCode format and pre-release versions.**
 
-### Fixed
+<details>
+<summary>Maintenance</summary>
 
 - Publish script regex patterns updated for v5 positional `LintCode` constructor — tier integrity, audit checks, OWASP coverage, prefix validation, and correction message stats now match both v5 positional and v4 named parameter formats. No action required.
 - Publish script version utilities now support pre-release versions (`5.0.0-beta.1` → `5.0.0-beta.2`) — version parsing, comparison, pubspec read/write, changelog extraction, and input validation all handle `-suffix.N` format. No action required.
+
+</details>
 
 ---
 
@@ -3605,13 +3649,15 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 ### Fixed
 
 - **`require_websocket_reconnection` false positive** (v4): Rule no longer fires on `WebSocket` and `WebSocketChannel` class definitions themselves; only classes that use WebSocket connections are checked. No action required.
+<details>
+<summary>Maintenance</summary>
+
 - **Cross-rule noise in fixture files**: Added `ignore_for_file` directives to 8 example fixtures to suppress unrelated rule violations (e.g. `avoid_print_in_release` in `avoid_variable_shadowing_fixture.dart`). No action required.
-
-### Tests Disabled
-
 - **`super_formal_parameter_without_associated_positional`**: Disabled pending further investigation.
 - **`const_constructor_with_non_const_super`**: Disabled pending further investigation.
 - **`implicit_super_initializer_missing_arguments`**: Disabled pending further investigation.
+
+</details>
 
 ---
 

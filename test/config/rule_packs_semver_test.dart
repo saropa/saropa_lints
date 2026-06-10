@@ -60,6 +60,14 @@ void main() {
       expect(packPassesDependencyGate('riverpod_2', null), isFalse);
       expect(packPassesDependencyGate('riverpod_2', {}), isFalse);
     });
+
+    // dio_5 gates avoid_dio_error on the DioError→DioException rename (dio 5.0).
+    test('dio_5 passes on dio >=5.0.0, fails on 4.x and without lock', () {
+      expect(packPassesDependencyGate('dio_5', {'dio': '5.0.0'}), isTrue);
+      expect(packPassesDependencyGate('dio_5', {'dio': '5.4.3'}), isTrue);
+      expect(packPassesDependencyGate('dio_5', {'dio': '4.0.6'}), isFalse);
+      expect(packPassesDependencyGate('dio_5', null), isFalse);
+    });
   });
 
   group('riverpod_2 ownership', () {
@@ -75,6 +83,11 @@ void main() {
         ruleCodesForPack('riverpod'),
         isNot(contains('prefer_notifier_over_state')),
       );
+    });
+
+    test('avoid_dio_error is in dio_5, not dio', () {
+      expect(ruleCodesForPack('dio_5'), contains('avoid_dio_error'));
+      expect(ruleCodesForPack('dio'), isNot(contains('avoid_dio_error')));
     });
   });
 

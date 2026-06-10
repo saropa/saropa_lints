@@ -9,6 +9,7 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 
+import '../../fixes/common/replace_node_fix.dart';
 import '../../import_utils.dart';
 import '../../saropa_lint_rule.dart';
 
@@ -1119,4 +1120,94 @@ class PreferDioTransformerRule extends SaropaLintRule {
       reporter.atNode(node);
     });
   }
+}
+
+/// Flags the `DioError` type, removed in dio 5.0.0 in favor of `DioException`.
+///
+/// Since: v13.13.0 | Rule version: v1
+///
+/// dio 5.0 renamed `DioError` to `DioException` (the old name was a deprecated
+/// typedef in early 5.x and was later removed). Code still referencing
+/// `DioError` fails to compile against current dio. This rule is gated to the
+/// `dio_5` rule pack (dio >= 5.0.0) so projects pinned to dio 4.x — where
+/// `DioError` is still the correct type — never see it.
+///
+/// **BAD:**
+/// ```dart
+/// try {
+///   await dio.get('/x');
+/// } on DioError catch (e) {        // removed type
+///   handle(e);
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// try {
+///   await dio.get('/x');
+/// } on DioException catch (e) {     // dio 5.0+
+///   handle(e);
+/// }
+/// ```
+class AvoidDioErrorRule extends SaropaLintRule {
+  AvoidDioErrorRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.warning;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  // Perf: skip files that never mention the removed symbol before walking types.
+  @override
+  Set<String>? get requiredPatterns => const <String>{'DioError'};
+
+  static const LintCode _code = LintCode(
+    'avoid_dio_error',
+    '[avoid_dio_error] DioError was removed in dio 5.0.0 and replaced by DioException. Code that still names DioError (as a catch-clause type, variable type, or type argument) will not compile against dio 5.x. The rename was mechanical: DioException carries the same request, response, type, and error fields. This rule only runs in the dio_5 rule pack (dio >= 5.0.0); projects on dio 4.x keep using DioError. {v1}',
+    correctionMessage:
+        'Replace DioError with DioException. The fields and error-handling shape are unchanged, so existing catch logic continues to work.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        _ReplaceDioErrorFix(context: context),
+  ];
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addNamedType((NamedType node) {
+      if (node.name.lexeme != 'DioError') return;
+      // Only flag DioError in files that use dio, so an unrelated user-defined
+      // DioError elsewhere is not mistaken for the removed package type.
+      if (!fileImportsPackage(node, PackageImports.dio)) return;
+      reporter.atNode(node);
+    });
+  }
+}
+
+/// Quick fix for [AvoidDioErrorRule]: rewrite `DioError` as `DioException`.
+class _ReplaceDioErrorFix extends ReplaceNodeFix {
+  _ReplaceDioErrorFix({required super.context});
+
+  @override
+  FixKind get fixKind => FixKind(
+    'saropa.fix.replaceDioError',
+    80,
+    'Replace DioError with DioException',
+  );
+
+  @override
+  String computeReplacement(AstNode node) => 'DioException';
 }

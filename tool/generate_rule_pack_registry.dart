@@ -39,6 +39,8 @@ const Map<String, Set<String>> kPubspecMarkersByPack = {
   'auto_route': {'auto_route'},
   'bloc': {'bloc', 'flutter_bloc', 'hydrated_bloc'},
   'dio': {'dio'},
+  // Semver-gated companion to `dio` (gate dio >= 5.0.0 in kRulePackDependencyGates).
+  'dio_5': {'dio'},
   'drift': {'drift', 'drift_dev'},
   'equatable': {'equatable'},
   'firebase': {
@@ -77,6 +79,7 @@ const Map<String, String> kPackUiLabels = {
   'auto_route': 'Auto Route',
   'bloc': 'Bloc',
   'dio': 'Dio',
+  'dio_5': 'Dio 5.x',
   'drift': 'Drift',
   'equatable': 'Equatable',
   'firebase': 'Firebase',

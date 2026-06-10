@@ -23,6 +23,7 @@ void main() {
       'require_dio_timeout',
       () => RequireDioTimeoutRule(),
     );
+    testRule('AvoidDioErrorRule', 'avoid_dio_error', () => AvoidDioErrorRule());
     testRule(
       'RequireDioErrorHandlingRule',
       'require_dio_error_handling',

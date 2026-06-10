@@ -2912,6 +2912,9 @@ const Set<String> comprehensiveOnlyRules = <String>{
   'prefer_void_callback',
   'prefer_symbol_over_key',
   'prefer_notifier_over_state',
+  // Pack-gated migration (dio_5); stripped from tier enables unless the dio_5
+  // rule pack is enabled. Tier slot satisfies the one-tier-per-rule invariant.
+  'avoid_dio_error',
   'prefer_provider_extensions',
   'prefer_redirecting_superclass_constructor',
   'prefer_image_filter_quality_medium',

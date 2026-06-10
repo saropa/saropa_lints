@@ -85,6 +85,7 @@ const Map<String, Set<String>> kRulePackRuleCodesGenerated = {
     'require_dio_ssl_pinning',
     'require_dio_timeout',
   },
+  'dio_5': {'avoid_dio_error'},
   'drift': {
     'avoid_drift_close_streams_in_tests',
     'avoid_drift_database_on_main_isolate',
@@ -417,6 +418,7 @@ const Map<String, Set<String>> kRulePackPubspecMarkersGenerated = {
   'auto_route': {'auto_route'},
   'bloc': {'bloc', 'flutter_bloc', 'hydrated_bloc'},
   'dio': {'dio'},
+  'dio_5': {'dio'},
   'drift': {'drift', 'drift_dev'},
   'equatable': {'equatable'},
   'firebase': {
