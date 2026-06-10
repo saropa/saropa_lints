@@ -68,10 +68,10 @@ class RuleMessage:
         msg = self.problem_message.lower()
         content = re.sub(r"^\[[a-z0-9_]+\]\s*", "", self.problem_message)
 
-        # --- Vague language (-20, skip for low-impact) ---
-        # Low-impact rules are advisory by nature, so suggestive
+        # --- Vague language (-20, skip for info-level) ---
+        # Info-level rules are advisory by nature, so suggestive
         # phrasing like "consider" is appropriate and not penalised.
-        if self.impact != "low":
+        if self.impact != "info":
             vague_patterns = [
                 ("should be", "Vague 'should be' - state consequence"),
                 ("should have", "Vague 'should have' - state consequence"),
@@ -93,7 +93,7 @@ class RuleMessage:
                     self.dx_score -= 20
                     break
 
-        # --- Consequence check (-30 for critical/high) ---
+        # --- Consequence check (-30 for error/warning) ---
         consequence_indicators = [
             "leak", "memory", "gc", "garbage", "retain", "hold",
             "crash", "error", "exception", "fail", "throw", "break",
@@ -107,12 +107,12 @@ class RuleMessage:
             "user", "screen reader", "accessibility", "colorblind",
         ]
         has_consequence = any(w in msg for w in consequence_indicators)
-        if not has_consequence and self.impact in ("critical", "high"):
+        if not has_consequence and self.impact in ("error", "warning"):
             self.dx_issues.append("Missing consequence (why it matters)")
             self.dx_score -= 30
 
         # --- Specific type check (-15 for generic terms) ---
-        if self.impact in ("critical", "high"):
+        if self.impact in ("error", "warning"):
             if "controller" in msg:
                 specific = [
                     "animation", "text", "scroll", "page", "tab",
@@ -156,13 +156,13 @@ class RuleMessage:
             self.dx_score -= 10
 
         # --- Message length (-25/-15/-10) ---
-        if len(content) < 180 and self.impact in ("critical", "high"):
+        if len(content) < 180 and self.impact == "error":
             self.dx_issues.append("Too short - min 180 chars")
             self.dx_score -= 25
-        elif len(content) < 150 and self.impact == "medium":
+        elif len(content) < 150 and self.impact == "warning":
             self.dx_issues.append("Very short - min 150 chars")
             self.dx_score -= 15
-        elif len(content) < 100 and self.impact in ("low", "opinionated"):
+        elif len(content) < 100 and self.impact == "info":
             self.dx_issues.append("Too short - min 100 chars for stylistic")
             self.dx_score -= 10
 
@@ -172,7 +172,7 @@ class RuleMessage:
             if self.correction_message
             else 0
         )
-        if self.impact == "critical":
+        if self.impact == "error":
             if corr_len < 100:
                 self.dx_issues.append(
                     "Correction too short - min 100 chars"
@@ -186,7 +186,7 @@ class RuleMessage:
                 self.dx_score -= 5
 
         # --- AI copilot compat (-15/-10) ---
-        if self.impact in ("critical", "high"):
+        if self.impact in ("error", "warning"):
             if "dispose" in self.name and "dispose" not in msg:
                 self.dx_issues.append("Disposal rule missing 'dispose'")
                 self.dx_score -= 15
@@ -291,9 +291,11 @@ def extract_rule_messages(rules_dir: Path) -> list[RuleMessage]:
             )
             class_body = content[start:end]
 
-            # Find impact for this class (default to medium)
+            # Find impact for this class. Default mirrors the base
+            # SaropaLintRule.impact getter (LintImpact.warning) for
+            # classes that don't override it.
             impact_match = impact_pattern.search(class_body)
-            impact = impact_match.group(1) if impact_match else "medium"
+            impact = impact_match.group(1) if impact_match else "warning"
 
             # Find all LintCode definitions in this class
             for match in lint_code_pattern.finditer(class_body):
@@ -423,12 +425,10 @@ def print_dx_audit_report(
             per-impact section.
     """
     all_by_impact: dict[str, list[RuleMessage]] = {
-        "critical": [], "high": [], "medium": [], "low": [],
-        "opinionated": [],
+        "error": [], "warning": [], "info": [],
     }
     needs_work_by_impact: dict[str, list[RuleMessage]] = {
-        "critical": [], "high": [], "medium": [], "low": [],
-        "opinionated": [],
+        "error": [], "warning": [], "info": [],
     }
 
     for m in messages:
@@ -437,10 +437,10 @@ def print_dx_audit_report(
             if m.dx_issues:
                 needs_work_by_impact[m.impact].append(m)
 
-    # Collect ALL rules needing work, across all impact levels
+    # Collect ALL rules needing work, across all severity levels
     needs_work = [m for m in messages if m.dx_issues]
     impact_priority = {
-        "critical": 0, "high": 1, "medium": 2, "low": 3, "opinionated": 4,
+        "error": 0, "warning": 1, "info": 2,
     }
     needs_work.sort(
         key=lambda m: (impact_priority.get(m.impact, 99), m.dx_score)
@@ -454,14 +454,12 @@ def print_dx_audit_report(
     print_subheader(f"DX Message Quality ({total_needs_work} total issues)")
 
     impact_colors = {
-        "critical": Color.RED,
-        "high": Color.YELLOW,
-        "medium": Color.WHITE,
-        "low": Color.DIM,
-        "opinionated": Color.BLUE,
+        "error": Color.RED,
+        "warning": Color.YELLOW,
+        "info": Color.DIM,
     }
 
-    for impact in ["critical", "high", "medium", "low", "opinionated"]:
+    for impact in ["error", "warning", "info"]:
         total = len(all_by_impact[impact])
         issues = len(needs_work_by_impact[impact])
         passing = total - issues
@@ -508,12 +506,10 @@ def print_dx_audit_report(
             worst_impact = min(
                 rules, key=lambda r: impact_priority.get(r.impact, 99)
             ).impact
-            if worst_impact == "critical":
+            if worst_impact == "error":
                 impact_color = Color.RED
-            elif worst_impact == "high":
+            elif worst_impact == "warning":
                 impact_color = Color.YELLOW
-            elif worst_impact == "medium":
-                impact_color = Color.WHITE
             else:
                 impact_color = Color.DIM
 
@@ -555,10 +551,10 @@ def export_dx_report(
     needs_work = [
         m
         for m in messages
-        if m.impact in ("critical", "high") and m.dx_issues
+        if m.impact in ("error", "warning") and m.dx_issues
     ]
     impact_order = {
-        "critical": 0, "high": 1, "medium": 2, "low": 3, "opinionated": 4,
+        "error": 0, "warning": 1, "info": 2,
     }
     needs_work.sort(
         key=lambda m: (m.dx_score, impact_order.get(m.impact, 5))
@@ -582,11 +578,11 @@ def export_dx_report(
     lines.append("")
     lines.append("## Summary")
     lines.append("")
-    critical_count = sum(1 for m in needs_work if m.impact == "critical")
-    high_count = sum(1 for m in needs_work if m.impact == "high")
+    error_count = sum(1 for m in needs_work if m.impact == "error")
+    warning_count = sum(1 for m in needs_work if m.impact == "warning")
     lines.append(f"- **Total rules needing work:** {len(needs_work)}")
-    lines.append(f"- **Critical impact:** {critical_count}")
-    lines.append(f"- **High impact:** {high_count}")
+    lines.append(f"- **Error severity:** {error_count}")
+    lines.append(f"- **Warning severity:** {warning_count}")
     lines.append(f"- **Files affected:** {len(by_file)}")
     lines.append("")
 
