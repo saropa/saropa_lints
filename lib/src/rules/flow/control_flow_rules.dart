@@ -4,8 +4,10 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 
 import '../../saropa_lint_rule.dart';
+import '../../fixes/control_flow/collapse_nested_if_fix.dart';
 import '../../fixes/control_flow/comment_out_unnecessary_continue_fix.dart';
 import '../../fixes/control_flow/invert_operator_fix.dart';
+import '../../fixes/control_flow/prefer_null_aware_call_fix.dart';
 import '../../fixes/control_flow/remove_constant_assert_fix.dart';
 import '../../fixes/control_flow/remove_double_negation_fix.dart';
 import '../../fixes/control_flow/replace_assignment_with_comparison_fix.dart';
@@ -14,6 +16,7 @@ import '../../fixes/control_flow/simplify_de_morgan_fix.dart';
 import '../../fixes/control_flow/prefer_is_num_over_int_double_fix.dart';
 import '../../fixes/control_flow/prefer_returning_conditionals_fix.dart';
 import '../../fixes/control_flow/remove_redundant_else_fix.dart';
+import '../../fixes/control_flow/return_condition_fix.dart';
 import '../../fixes/control_flow/remove_unconditional_break_fix.dart';
 import '../../fixes/control_flow/replace_with_then_branch_fix.dart';
 import '../../fixes/control_flow/simplify_boolean_literal_fix.dart';
@@ -196,6 +199,12 @@ class AvoidCollapsibleIfRule extends SaropaLintRule {
       reporter.atNode(node);
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        CollapseNestedIfFix(context: context),
+  ];
 }
 
 /// Warns when boolean literals are used in logical expressions.
@@ -1581,6 +1590,12 @@ class AvoidUnnecessaryIfRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReturnConditionFix(context: context),
+  ];
 }
 
 /// Warns when the same condition appears multiple times in an if-else chain.
@@ -2129,6 +2144,12 @@ class PreferReturningConditionRule extends SaropaLintRule {
 
     return null;
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReturnConditionFix(context: context),
+  ];
 }
 
 /// Warns when a switch case uses a nested if statement that could be a when guard.
@@ -2621,6 +2642,12 @@ class PreferNullAwareMethodCallsRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        PreferNullAwareCallFix(context: context),
+  ];
 }
 
 // =============================================================================
