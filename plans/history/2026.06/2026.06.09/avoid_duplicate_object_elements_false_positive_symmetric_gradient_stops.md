@@ -1,6 +1,6 @@
 # BUG: `avoid_duplicate_object_elements` — False positive on symmetric gradient / animation color list
 
-**Status: Open**
+**Status: Fixed**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
@@ -180,19 +180,59 @@ The fixture at `example*/lib/data/avoid_duplicate_object_elements_fixture.dart` 
 
 ## Changes Made
 
-<!-- Fill in when a fix is written. -->
+Implemented Option B (parameter exemption) in `collection_rules.dart`:
+
+- The `addListLiteral` visitor now skips a list bound to a `colors:` or
+  `stops:` named argument before running `_checkForDuplicateObjects`. Added
+  `_positionSensitiveSequenceParams` (`{colors, stops}`) and the helper
+  `_isPositionSensitiveSequenceList(ListLiteral)` which checks the parent
+  `NamedExpression` label.
+
+Option A (adjacency) was rejected: the report's own fixtures require
+`[myObj, other, myObj]` and `[true, false, true]` to still LINT even though
+they are non-adjacent bookends, so adjacency alone could not distinguish them
+from the gradient case — only the `colors:`/`stops:` parameter context does.
 
 ---
 
 ## Tests Added
 
-<!-- List new or updated fixture/test files and what they verify. -->
+- `example/lib/collection/avoid_duplicate_object_elements_fixture.dart`: added
+  a `_goodGradient` function with `LinearGradient(colors: [base, hi, base])`
+  and `RadialGradient(colors: [accent, fade, accent])` — both NO lint. Existing
+  BAD cases (`[myObj, otherObj, myObj]`, `[true, false, true]`,
+  `[null, value, null]`) retained.
+- Verified via scan CLI: the three ordinary-collection bookend duplicates still
+  flag (lines 114-116); the gradient `colors:` lists do not.
 
 ---
 
 ## Commits
 
 <!-- Add commit hashes as fixes land. -->
+
+---
+
+## Finish Report (2026-06-09)
+
+**Scope:** (A) Dart lint rules / analyzer plugin.
+
+**Deep review:** The exemption is a single parent-node label check, O(1), no
+traversal. Scoped to `colors`/`stops` (gradient/animation sequence params) to
+keep false negatives minimal — broader names like `values`/`items` were
+deliberately excluded to avoid hiding real duplicate bugs. Rule file, tier,
+severity, `LintImpact` unchanged.
+
+**Tests:** `dart test test/rules/data/collection_rules_test.dart` → all pass.
+Scan-CLI behavior verified as above.
+
+**Maintenance:** CHANGELOG `[Unreleased]` updated. README rule count unchanged.
+ROADMAP unchanged (false-positive fix).
+
+**Bug archived:** bugs/avoid_duplicate_object_elements_false_positive_symmetric_gradient_stops.md
+→ plans/history/2026.06/2026.06.09/avoid_duplicate_object_elements_false_positive_symmetric_gradient_stops.md
+
+**Finish report appended:** this file.
 
 ---
 

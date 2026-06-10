@@ -2281,6 +2281,13 @@ class AvoidDuplicateObjectElementsRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addListLiteral((ListLiteral node) {
+      // A list bound to a position-sensitive sequence parameter (gradient
+      // `colors:`/`stops:`) routinely repeats an element on purpose — a
+      // symmetric shimmer ramp is `[base, highlight, base]`, and the bookend
+      // repetition is required by the visual shape, not a copy-paste error.
+      // Flagging it forced ignores on every symmetric gradient.
+      if (_isPositionSensitiveSequenceList(node)) return;
+
       _checkForDuplicateObjects(node.elements, reporter, code);
     });
 
@@ -2290,6 +2297,22 @@ class AvoidDuplicateObjectElementsRule extends SaropaLintRule {
       }
     });
   }
+}
+
+/// Named parameters whose list values are ordered, position-sensitive
+/// sequences where deliberate repetition (e.g. a symmetric gradient ramp or a
+/// matched color/stop pair) is idiomatic rather than a duplicate-object bug.
+const Set<String> _positionSensitiveSequenceParams = <String>{
+  'colors',
+  'stops',
+};
+
+/// True when [node] is the value of a `colors:`/`stops:` named argument, where
+/// a repeated entry is part of the intended ordered sequence.
+bool _isPositionSensitiveSequenceList(ListLiteral node) {
+  final AstNode? parent = node.parent;
+  if (parent is! NamedExpression) return false;
+  return _positionSensitiveSequenceParams.contains(parent.name.label.name);
 }
 
 /// Suggests const constructor calls in list literals when possible.
