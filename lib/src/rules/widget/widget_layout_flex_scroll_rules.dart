@@ -10,7 +10,9 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
+import 'package:meta/meta.dart';
 
 import '../../saropa_lint_rule.dart';
 import '../../fixes/widget_layout/add_automatic_keep_alive_client_mixin_fix.dart';
@@ -597,64 +599,172 @@ class AvoidListViewWithoutItemExtentRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    // Resolved analysis (the IDE plugin) parses `ListView.builder(...)` as an
+    // InstanceCreationExpression. Unresolved analysis (the scan CLI / tests,
+    // which use parseString) parses the SAME source as a MethodInvocation —
+    // the instance-creation rewrite only happens during resolution. Handle both
+    // so the rule fires identically in either context; in resolved mode the
+    // MethodInvocation hook never sees the constructor, so there is no double
+    // report.
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String typeName = node.constructorName.type.name.lexeme;
-      final String? constructorName = node.constructorName.name?.name;
-
-      // ListView.separated deliberately omitted: its constructor does not
-      // accept itemExtent/prototypeItem/itemExtentBuilder (an extent would
-      // apply to items AND separators, which never share one), so firing on
-      // .separated produced an unfixable diagnostic. See archived bug
-      // avoid_listview_without_item_extent_false_positive_listview_separated_unfixable.md.
-      if (typeName == 'ListView' && constructorName == 'builder') {
-        bool hasItemExtent = false;
-        bool hasPrototypeItem = false;
-        bool hasItemExtentBuilder = false;
-        bool shrinkWrapTrue = false;
-        bool neverScrollablePhysics = false;
-
-        for (final Expression arg in node.argumentList.arguments) {
-          if (arg is NamedExpression) {
-            final String name = arg.name.label.name;
-            if (name == 'itemExtent') hasItemExtent = true;
-            if (name == 'prototypeItem') hasPrototypeItem = true;
-            if (name == 'itemExtentBuilder') hasItemExtentBuilder = true;
-            if (name == 'shrinkWrap') {
-              final Expression v = arg.expression;
-              if (v is BooleanLiteral && v.value) shrinkWrapTrue = true;
-            }
-            if (name == 'physics') {
-              // Inline non-scrolling list pattern uses
-              // `physics: const NeverScrollableScrollPhysics()` (sometimes
-              // without `const`). Structural match: peel a leading const
-              // expression to reach the InstanceCreationExpression.
-              Expression v = arg.expression;
-              if (v is ParenthesizedExpression) v = v.expression;
-              if (v is InstanceCreationExpression &&
-                  v.constructorName.type.name.lexeme ==
-                      'NeverScrollableScrollPhysics') {
-                neverScrollablePhysics = true;
-              }
-            }
-          }
-        }
-
-        // Skip inline-non-scrolling lists: shrinkWrap forces eager layout of
-        // every child, so itemExtent's lazy-extent benefit is impossible and
-        // forcing a constant extent here clips variable-height rows. See
-        // plans/history/2026.06/2026.06.01/avoid_listview_without_item_extent_false_positive_shrinkwrap_never_scrollable_inline_list.md.
-        final bool isInlineNonScrolling =
-            shrinkWrapTrue && neverScrollablePhysics;
-
-        if (!hasItemExtent &&
-            !hasPrototypeItem &&
-            !hasItemExtentBuilder &&
-            !isInlineNonScrolling) {
-          reporter.atNode(node.constructorName, code);
-        }
+      if (_shouldReportParts(
+        node.constructorName.type.name.lexeme,
+        node.constructorName.name?.name,
+        node.argumentList,
+      )) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+    context.addMethodInvocation((MethodInvocation node) {
+      final Expression? target = node.realTarget;
+      if (target is! SimpleIdentifier) return;
+      if (_shouldReportParts(
+        target.name,
+        node.methodName.name,
+        node.argumentList,
+      )) {
+        reporter.atNode(node.methodName, code);
       }
     });
   }
+
+  /// Exposed for unit tests: the report decision from the unresolved
+  /// `ListView.builder(...)` MethodInvocation shape (what parseString produces).
+  @visibleForTesting
+  static bool shouldReportForTesting(MethodInvocation node) {
+    final Expression? target = node.realTarget;
+    if (target is! SimpleIdentifier) return false;
+    return _shouldReportParts(
+      target.name,
+      node.methodName.name,
+      node.argumentList,
+    );
+  }
+
+  /// Self-sizing item widgets for which no constant `itemExtent` can exist
+  /// (optional subtitle = 1 vs 2 lines, expand/collapse changes height).
+  static const Set<String> _selfSizingItemWidgets = <String>{
+    'ListTile',
+    'CheckboxListTile',
+    'RadioListTile',
+    'SwitchListTile',
+    'AboutListTile',
+    'ExpansionTile',
+    'ExpansionPanel',
+    'ExpansionPanelList',
+  };
+
+  static bool _shouldReportParts(
+    String typeName,
+    String? constructorName,
+    ArgumentList argumentList,
+  ) {
+    // ListView.separated deliberately omitted: its constructor does not accept
+    // itemExtent/prototypeItem/itemExtentBuilder (an extent would apply to items
+    // AND separators, which never share one), so firing on .separated produced
+    // an unfixable diagnostic.
+    if (typeName != 'ListView' || constructorName != 'builder') return false;
+
+    bool hasItemExtent = false;
+    bool hasPrototypeItem = false;
+    bool hasItemExtentBuilder = false;
+    bool shrinkWrapTrue = false;
+    Expression? itemBuilder;
+
+    for (final Expression arg in argumentList.arguments) {
+      if (arg is! NamedExpression) continue;
+      final String name = arg.name.label.name;
+      if (name == 'itemExtent') hasItemExtent = true;
+      if (name == 'prototypeItem') hasPrototypeItem = true;
+      if (name == 'itemExtentBuilder') hasItemExtentBuilder = true;
+      if (name == 'itemBuilder') itemBuilder = arg.expression;
+      if (name == 'shrinkWrap') {
+        final Expression v = arg.expression;
+        if (v is BooleanLiteral && v.value) shrinkWrapTrue = true;
+      }
+    }
+
+    // shrinkWrap forces eager layout of every child REGARDLESS of physics, so
+    // itemExtent's lazy-extent benefit is unobtainable. The earlier
+    // `&& neverScrollablePhysics` over-narrowed this — a shrink-wrapped list
+    // with default physics pays the same eager cost. (NeverScrollableScrollPhysics
+    // is now sufficient-but-not-required; it is implied by shrinkWrap here.)
+    if (shrinkWrapTrue) return false;
+
+    // The item widget is self-sizing (ListTile with optional subtitle,
+    // ExpansionTile, a Common*ListTile/PanelExpandable wrapper, …): there is no
+    // correct constant extent, so the diagnostic would be unactionable.
+    if (_buildsSelfSizingItem(itemBuilder)) return false;
+
+    return !hasItemExtent && !hasPrototypeItem && !hasItemExtentBuilder;
+  }
+
+  /// True when [itemBuilder] returns (or trivially branches to) a self-sizing
+  /// item widget, for which no constant `itemExtent` is correct.
+  static bool _buildsSelfSizingItem(Expression? itemBuilder) {
+    if (itemBuilder is! FunctionExpression) return false;
+    final FunctionBody body = itemBuilder.body;
+    if (body is ExpressionFunctionBody) {
+      return _expressionBuildsSelfSizing(body.expression);
+    }
+    if (body is BlockFunctionBody) {
+      final _ReturnExpressionFinder finder = _ReturnExpressionFinder();
+      body.block.accept(finder);
+      return finder.returnedExpressions.any(_expressionBuildsSelfSizing);
+    }
+    return false;
+  }
+
+  static bool _expressionBuildsSelfSizing(Expression expr) {
+    if (expr is InstanceCreationExpression) {
+      return _isSelfSizingTypeName(expr.constructorName.type.name.lexeme);
+    }
+    // Unresolved ASTs parse a constructor call `ListTile(...)` as a
+    // MethodInvocation. A leading-uppercase, un-targeted callee is a
+    // constructor-style widget build (not a helper like `buildRow()`), so apply
+    // the same self-sizing test.
+    if (expr is MethodInvocation && expr.realTarget == null) {
+      final String n = expr.methodName.name;
+      if (n.isNotEmpty &&
+          n[0] == n[0].toUpperCase() &&
+          n[0] != n[0].toLowerCase()) {
+        return _isSelfSizingTypeName(n);
+      }
+    }
+    // `r.subtitle == null ? OneLine(...) : TwoLine(...)` — either branch.
+    if (expr is ConditionalExpression) {
+      return _expressionBuildsSelfSizing(expr.thenExpression) ||
+          _expressionBuildsSelfSizing(expr.elseExpression);
+    }
+    return false;
+  }
+
+  static bool _isSelfSizingTypeName(String name) {
+    if (_selfSizingItemWidgets.contains(name)) return true;
+    // Project wrappers around self-sizing tiles/panels stay variable-height:
+    // `CommonListTile` (optional subtitle), `CommonPanelExpandable` (expands).
+    return name.endsWith('ListTile') ||
+        name.contains('Expansion') ||
+        name.endsWith('Expandable');
+  }
+}
+
+/// Collects the expressions returned by a block function body (used to inspect
+/// what an `itemBuilder` produces).
+class _ReturnExpressionFinder extends RecursiveAstVisitor<void> {
+  final List<Expression> returnedExpressions = <Expression>[];
+
+  @override
+  void visitReturnStatement(ReturnStatement node) {
+    final Expression? value = node.expression;
+    if (value != null) returnedExpressions.add(value);
+    super.visitReturnStatement(node);
+  }
+
+  // Do not descend into nested closures — their returns are not the
+  // itemBuilder's return.
+  @override
+  void visitFunctionExpression(FunctionExpression node) {}
 }
 
 /// Future rule: avoid-mediaquery-in-build
