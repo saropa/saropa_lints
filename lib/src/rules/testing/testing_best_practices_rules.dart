@@ -3099,8 +3099,9 @@ class PreferSetupTeardownRule extends SaropaLintRule {
       // (different groups seed different data) are not extractable to a
       // file-level setUp(). Raise the duplicate threshold so per-group arrange
       // does not trip, while 4+ identical setups in one group still report.
-      final bool fileHasSetUp = RegExp(r'\bsetUp(All)?\s*\(')
-          .hasMatch(unit.toSource());
+      final bool fileHasSetUp = RegExp(
+        r'\bsetUp(All)?\s*\(',
+      ).hasMatch(unit.toSource());
       final int threshold = fileHasSetUp ? 4 : 3;
 
       for (final scopeTests in grouped.values) {
@@ -3179,8 +3180,7 @@ class PreferSetupTeardownRule extends SaropaLintRule {
   /// The name of the callback's first parameter (the WidgetTester in a
   /// testWidgets callback), or null for a no-arg `test()` callback.
   String? _firstCallbackParamName(FunctionExpression callback) {
-    final NodeList<FormalParameter>? params =
-        callback.parameters?.parameters;
+    final NodeList<FormalParameter>? params = callback.parameters?.parameters;
     if (params == null || params.isEmpty) return null;
     return params.first.name?.lexeme;
   }
@@ -3188,10 +3188,7 @@ class PreferSetupTeardownRule extends SaropaLintRule {
   /// True when one of the leading setup statements (the same ones
   /// [_buildSetupSignature] would use) references [param] as a receiver
   /// (`param.something`).
-  bool _signatureReferencesParam(
-    NodeList<Statement> statements,
-    String param,
-  ) {
+  bool _signatureReferencesParam(NodeList<Statement> statements, String param) {
     final RegExp receiver = RegExp('\\b${RegExp.escape(param)}\\s*\\.');
     int bodyCount = 0;
     for (final Statement s in statements) {

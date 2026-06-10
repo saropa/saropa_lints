@@ -35,6 +35,7 @@ from mt_fallback import (
     engine_stats_for,
     load_mt_cache,
     load_provenance,
+    low_quality_entries,
     prefetch_machine_translations,
     provenance_of,
     prune_all,
@@ -91,13 +92,15 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--mode",
-        choices=["gaps", "upgrade", "all"],
+        choices=["gaps", "upgrade", "all", "audit"],
         default=None,
         help=(
             "What to translate: 'gaps' = only untranslated strings; 'upgrade' = "
             "gaps PLUS re-translate low-quality (Google/English) strings to NLLB; "
-            "'all' = force re-translate everything except manual overrides. Omit "
-            "on a terminal to choose from a menu; defaults to 'gaps' non-interactively."
+            "'all' = force re-translate everything except manual overrides; "
+            "'audit' = translate nothing, only write the gaps + low-quality report "
+            "to file. Omit on a terminal to choose from a menu (which also offers "
+            "an abort option); defaults to 'gaps' non-interactively."
         ),
     )
     # Key-management subcommands — operate on the cache + provenance files only,
@@ -271,12 +274,48 @@ def _append_paste_ready_section(lines: list[str], missing_by_locale: dict[str, l
         lines.append("")
 
 
+def _append_low_quality_section(
+    lines: list[str], low_quality_by_locale: dict[str, list[str]]
+) -> None:
+    """List cached entries that rank below NLLB (Google/English/legacy provenance)
+    and would be re-translated by mode `[2] upgrade`. A locale whose primary engine
+    is not NLLB has nothing better to upgrade to, so it never appears here."""
+    lines.append("## Low-quality translations (upgrade candidates)")
+    lines.append("")
+    affected = {k: v for k, v in low_quality_by_locale.items() if v}
+    if not affected:
+        lines.append("- None — no cached entry ranks below NLLB for the requested locales.")
+        lines.append("")
+        return
+    lines.append(
+        "These came from the Google/English/legacy engines and would be "
+        "re-translated via NLLB by mode `[2] upgrade`. Each row is a source "
+        "string still served by a sub-NLLB translation."
+    )
+    lines.append("")
+    for locale, entries in affected.items():
+        lines.append(f"### `{locale}` — {len(entries)} low-quality")
+        lines.append("")
+        for src in entries[:500]:
+            preview = src.replace("\n", "\\n")
+            lines.append(f"- `{preview}`")
+        if len(entries) > 500:
+            lines.append(f"- ... and {len(entries) - 500} more")
+        lines.append("")
+
+
 def write_audit_report(
     stats_by_locale: dict[str, LocaleStats],
     missing_by_locale: dict[str, list[str]],
     report_path: Path,
+    low_quality_by_locale: dict[str, list[str]] | None = None,
 ) -> None:
-    """Write the full audit (counts + every missing string + actionable stubs) to a markdown file."""
+    """Write the full audit (counts + every missing string + actionable stubs) to a markdown file.
+
+    When *low_quality_by_locale* is supplied (audit-only mode), an extra section
+    lists the sub-NLLB cached entries an 'upgrade' run would re-translate. Regular
+    translation runs pass None and omit that section.
+    """
     lines: list[str] = []
     lines.append("# i18n Translation Audit")
     lines.append("")
@@ -299,6 +338,11 @@ def write_audit_report(
     lines.append("- **Missing**: source needs translation but came back identical (no dictionary entry, MT off or failed).")
     lines.append("- **Coverage**: `Translated / (Total - Skipped)`.")
     lines.append("")
+
+    # Low-quality block sits before the missing-strings early-return so it is
+    # emitted even when every locale is gap-free (an upgrade can still be due).
+    if low_quality_by_locale is not None:
+        _append_low_quality_section(lines, low_quality_by_locale)
 
     affected = {k: v for k, v in missing_by_locale.items() if v}
     if not affected:
@@ -360,11 +404,14 @@ def _choose_mode(args_mode: str | None) -> str:
     print("  [1] Close gaps only (translate untranslated strings)  [default]")
     print("  [2] Close gaps + upgrade low-quality (re-translate Google/English -> NLLB)")
     print("  [3] Re-translate everything (force; keeps manual overrides)")
+    print("  [4] Audit only — write gaps + low-quality report to file, translate nothing")
+    print("  [a] Abort — exit now, translate nothing, change no files")
     try:
-        raw = input("  Choose [1/2/3]: ").strip()
+        raw = input("  Choose [1/2/3/4/a]: ").strip().lower()
     except (EOFError, KeyboardInterrupt):
-        raw = ""
-    return {"2": "upgrade", "3": "all"}.get(raw, "gaps")
+        # Treat an EOF/Ctrl-C at the prompt as an abort, not a silent default run.
+        raw = "a"
+    return {"2": "upgrade", "3": "all", "4": "audit", "a": "abort"}.get(raw, "gaps")
 
 
 def _source_strings(root: Path) -> list[str]:
@@ -415,6 +462,83 @@ def _run_key_command(args: argparse.Namespace, root: Path) -> int:
     return 0
 
 
+def _run_audit(
+    locales: list[str],
+    sorted_unique: list[str],
+    mt_cache: dict[str, str],
+    root: Path,
+    *,
+    fail_on_missing: bool = False,
+) -> int:
+    """Audit-only path: report translation gaps and low-quality (upgrade) entries
+    WITHOUT translating, pruning, or writing any locale file. Reads the curated
+    dictionaries + existing MT cache only — zero network calls — so it is safe to
+    run anytime to preview what a gaps/upgrade run would change.
+
+    With *fail_on_missing* (the publish pipeline's coverage gate) the exit code is
+    non-zero when any gap remains, so the gate can prompt the operator without the
+    audit ever translating anything itself.
+    """
+    print(
+        f"[{c('blue', 'i18n')}] mode: {c('cyan', 'audit only')} "
+        "(no translation, no files changed)",
+        flush=True,
+    )
+    stats_by_locale: dict[str, LocaleStats] = {}
+    missing_by_locale: dict[str, list[str]] = {}
+    low_quality_by_locale: dict[str, list[str]] = {}
+    for locale in locales:
+        dict_table = TRANSLATIONS.get(locale, {})
+        # Build the mapping from dictionary + cache ONLY (never machine_translate),
+        # so the audit makes no network calls. compute_stats then reads a gap as
+        # "output still equals the English source".
+        mapping: dict[str, str] = {}
+        for src in sorted_unique:
+            if src and src in dict_table:
+                mapping[src] = dict_table[src]
+                continue
+            value, _prov = cache_lookup(mt_cache, locale, src)
+            mapping[src] = value if value is not None else src
+        stats, missing = compute_stats(mapping, dict_table)
+        stats_by_locale[locale] = stats
+        missing_by_locale[locale] = missing
+        low_quality_by_locale[locale] = low_quality_entries(
+            mt_cache, locale, sorted_unique, dict_table
+        )
+        lq = len(low_quality_by_locale[locale])
+        miss_tag = (
+            c("green", "ok") if stats.missing == 0 else c("yellow", f"{stats.missing} missing")
+        )
+        lq_tag = c("gray", "0 low-quality") if lq == 0 else c("yellow", f"{lq} low-quality")
+        print(f"[{c('blue', 'i18n')}] {c('cyan', locale)}: {miss_tag}, {lq_tag}", flush=True)
+
+    print_summary(stats_by_locale)
+    print_missing_samples(missing_by_locale)
+    report_path = root / "reports" / "i18n_translation_audit.md"
+    write_audit_report(stats_by_locale, missing_by_locale, report_path, low_quality_by_locale)
+    total_missing = sum(s.missing for s in stats_by_locale.values())
+    total_lq = sum(len(v) for v in low_quality_by_locale.values())
+    print()
+    print(c("bold", f"  Audit log ({total_missing} gaps, {total_lq} low-quality):"))
+    print(f"    {c('blue', str(report_path))}")
+    print(c("gray", "    Sections: low-quality -> cross-locale rollup -> paste-ready stubs -> per-locale lists."))
+
+    # Coverage gate (publish only): a non-zero exit lets the caller prompt the
+    # operator. The audit still translated nothing — closing the gap is a
+    # separate, explicit translation run or a dictionaries.py edit.
+    if fail_on_missing and total_missing > 0:
+        print()
+        print(
+            c("red", f"  Coverage gate FAILED: {total_missing} missing translation(s) "
+                     "across locales. This audit translated nothing — add curated "
+                     "entries to dictionaries.py (or run the translator separately) "
+                     "and re-audit."),
+            file=sys.stderr,
+        )
+        return 1
+    return 0
+
+
 def main() -> int:
     args = parse_args()
 
@@ -434,11 +558,31 @@ def main() -> int:
     load_provenance()
     mode = _choose_mode(args.mode)
 
+    if mode == "abort":
+        # Interactive escape hatch ([a] at the menu): nothing translated, no cache
+        # pruned, no locale file rewritten. Exit 0 — an abort is not a failure.
+        print(c("yellow", "  Aborted — nothing translated, no files changed."))
+        return 0
+
     package_en_path = root / "package.nls.json"
     runtime_en_path = root / "src" / "i18n" / "locales" / "en.json"
 
     package_en = read_json(package_en_path)
     runtime_en = read_json(runtime_en_path)
+
+    mt_cache = load_mt_cache()
+    unique_en: set[str] = set()
+    collect_unique_strings(package_en, unique_en)
+    collect_unique_strings(runtime_en, unique_en)
+    sorted_unique = sorted(unique_en)
+
+    if mode == "audit":
+        # Read-only path: report gaps + low-quality entries to file and exit
+        # before any MT engine is touched. Honors --fail-on-missing so the publish
+        # coverage gate can run an audit (never a translation) and still gate.
+        return _run_audit(
+            locales, sorted_unique, mt_cache, root, fail_on_missing=args.fail_on_missing
+        )
 
     # Announce the active MT engine up front so a silent Google downgrade (NLLB
     # model not installed) is visible before a multi-hour run starts.
@@ -451,12 +595,6 @@ def main() -> int:
 
     # Fresh engine tally so the per-locale mix below reflects only this run.
     reset_engine_stats()
-    mt_cache = load_mt_cache()
-    unique_en: set[str] = set()
-    collect_unique_strings(package_en, unique_en)
-    collect_unique_strings(runtime_en, unique_en)
-
-    sorted_unique = sorted(unique_en)
     stats_by_locale: dict[str, LocaleStats] = {}
     missing_by_locale: dict[str, list[str]] = {}
     interrupted_locale: str | None = None

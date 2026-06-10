@@ -47,16 +47,18 @@ void main() {
       );
     });
 
-    test('itemBuilder returns ListTile (optional subtitle = variable height)',
-        () {
-      expect(
-        reports(
-          'ListView.builder(itemCount: 3, itemBuilder: (c, i) => '
-          'ListTile(title: Text("t"), subtitle: i.isEven ? Text("s") : null))',
-        ),
-        isFalse,
-      );
-    });
+    test(
+      'itemBuilder returns ListTile (optional subtitle = variable height)',
+      () {
+        expect(
+          reports(
+            'ListView.builder(itemCount: 3, itemBuilder: (c, i) => '
+            'ListTile(title: Text("t"), subtitle: i.isEven ? Text("s") : null))',
+          ),
+          isFalse,
+        );
+      },
+    );
 
     test('itemBuilder returns ExpansionTile', () {
       expect(
@@ -138,7 +140,9 @@ class _ListViewFinder extends RecursiveAstVisitor<void> {
   @override
   void visitMethodInvocation(MethodInvocation node) {
     final Expression? target = node.realTarget;
-    if (found == null && target is SimpleIdentifier && target.name == 'ListView') {
+    if (found == null &&
+        target is SimpleIdentifier &&
+        target.name == 'ListView') {
       found = node;
     }
     super.visitMethodInvocation(node);

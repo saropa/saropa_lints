@@ -99,6 +99,24 @@ class TestPruneModes(_Base):
             removed = mt.prune_low_quality(cache, "de", ["Beta"], {})
         self.assertEqual(removed, 0)
 
+    def test_low_quality_entries_lists_without_removing(self) -> None:
+        # Audit counterpart to prune_low_quality: same selection (Beta google +
+        # Gamma english), but the cache must be left intact for the report-only path.
+        cache = self._seed()
+        found = mt.low_quality_entries(cache, "de", self.TEXTS, {})
+        self.assertEqual(sorted(found), ["Beta", "Gamma"])
+        # Nothing removed: every seeded entry still resolves, including the LQ ones.
+        for text in self.TEXTS:
+            self.assertIsNotNone(mt.cache_lookup(cache, "de", text)[0])
+
+    def test_low_quality_entries_empty_when_google_primary(self) -> None:
+        # No NLLB -> nothing to upgrade to -> audit reports no candidates.
+        cache = {mt._cache_key("de", "Beta", "nllb"): "G"}
+        mt._provenance[mt._cache_key("de", "Beta", "nllb")] = "google"
+        with mock.patch.object(mt, "_nllb_active_for", return_value=False):
+            found = mt.low_quality_entries(cache, "de", ["Beta"], {})
+        self.assertEqual(found, [])
+
 
 class TestKeyManagement(_Base):
     def test_set_lookup_unset(self) -> None:
