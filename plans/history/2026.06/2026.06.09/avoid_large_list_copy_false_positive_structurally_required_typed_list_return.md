@@ -1,6 +1,6 @@
 # BUG: `avoid_large_list_copy` — Fires on `.toList()` Inside Switch Arms and Other Structurally-Required Contexts Not Covered by `_isToListRequired`
 
-**Status: Open**
+**Status: Fixed**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
@@ -206,19 +206,74 @@ The fixture at `example*/lib/core/performance_rules_fixture.dart` (or equivalent
 
 ## Changes Made
 
-<!-- Fill in when a fix is written. -->
+Extended the wrapper-climbing loop in `_isToListRequired`
+(`performance_rules.dart`). The report's suggested fix was incomplete — it
+added only `SwitchExpressionCase`, but unwrapping that lands on
+`SwitchExpression`, which is also unhandled and would still `break` into a false
+positive. The implemented fix unwraps all three transparent nodes:
+
+- `SwitchExpressionCase` — the arm wrapper
+- `SwitchExpression` — its parent, so the climb reaches the enclosing
+  `ExpressionFunctionBody`/`ReturnStatement`
+- `RecordLiteral` — a `.toList()` at a `List<T>` record position flows to the
+  enclosing return/assignment
+
+Also added a post-loop `if (parent is YieldStatement) return true;` so a
+`.toList()` yielded from a `sync*`/`async*` generator (List element type) is
+treated as required, matching `ReturnStatement`.
+
+Classic `SwitchCase` was intentionally NOT added: a classic switch body holds
+statements, and `return x.toList();` inside a case is already exempt via the
+existing `ReturnStatement` check.
 
 ---
 
 ## Tests Added
 
-<!-- List new or updated fixture/test files and what they verify. -->
+- `example/lib/performance/avoid_large_list_copy_fixture.dart`: added four NO-lint
+  cases — switch-expression arm in a `List<int>` getter (`_good794n`), switch in
+  a `return` (`_good794o`), returned record field (`_good794p`), and a `sync*`
+  `yield` (`_good794q`).
+- Scan CLI verified: the only `avoid_large_list_copy` hit is the existing
+  discarded-`.toList()` BAD case; all four new structurally-required cases are
+  clean.
 
 ---
 
 ## Commits
 
 <!-- Add commit hashes as fixes land. -->
+
+---
+
+## Finish Report (2026-06-09)
+
+**Scope:** (A) Dart lint rules / analyzer plugin.
+
+**Deep review:** The change is additive to an existing allowlist climb; the
+loop still terminates (each iteration moves `parent` up one level). No new
+recursion. Scoped to nodes that are genuinely transparent w.r.t. the List
+requirement. `RecordLiteral`/`YieldStatement` exemptions accept a small
+false-negative risk (a record field or yield typed `Iterable<T>` would be
+exempted) in exchange for removing the FP flood — the safe direction for a
+copy-avoidance INFO rule. Rule file, tier, severity (INFO), `LintImpact`
+unchanged.
+
+Noted but out of scope: the `List.from(...)` branch (untouched by this fix)
+does not fire in the scan CLI; that is a pre-existing, separate behavior in the
+`InstanceCreationExpression` visitor, unrelated to the reported `.toList()`
+switch-arm symptom.
+
+**Tests:** `dart test test/rules/core/performance_rules_test.dart` → all pass.
+Scan-CLI behavior verified as above.
+
+**Maintenance:** CHANGELOG `[Unreleased]` Fixed bullet added. README/ROADMAP
+unchanged (false-positive fix).
+
+**Bug archived:** bugs/avoid_large_list_copy_false_positive_structurally_required_typed_list_return.md
+→ plans/history/2026.06/2026.06.09/avoid_large_list_copy_false_positive_structurally_required_typed_list_return.md
+
+**Finish report appended:** this file.
 
 ---
 
