@@ -209,3 +209,29 @@ void _good794m() {
     largeList.map((e) => e * 2).toList(),
   ];
 }
+
+// GOOD: .toList() in a switch-expression arm inside a List<T> getter. The arm
+// value flows to the ExpressionFunctionBody, which requires a List.
+List<int> _good794n(int category) => switch (category) {
+  0 => largeList.where((e) => e > 0).toList(),
+  1 => largeList.map((e) => e * 2).toList(),
+  _ => const <int>[],
+};
+
+// GOOD: switch expression in a `return` with List<T> return type.
+List<int> _good794o(int category) {
+  return switch (category) {
+    0 => largeList.map((e) => e + 1).toList(),
+    _ => const <int>[],
+  };
+}
+
+// GOOD: .toList() at a List<T> position inside a returned record literal.
+(List<int>, String) _good794p() {
+  return (largeList.map((e) => e).toList(), 'ok');
+}
+
+// GOOD: .toList() yielded from a sync* generator with List<int> element type.
+Iterable<List<int>> _good794q() sync* {
+  yield largeList.map((e) => e * 3).toList();
+}

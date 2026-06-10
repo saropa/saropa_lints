@@ -2207,9 +2207,23 @@ class AvoidLargeListCopyRule extends SaropaLintRule {
       // its parent is the ArgumentList, where a concrete List is required.
       // Without unwrapping NamedExpression the .toList() is judged against the
       // wrapper and fires a false positive on every `children:`-style call.
+      //
+      // A switch-expression arm and the switch expression itself are likewise
+      // transparent: in `List<T> get k => switch (x) { A => i.map().toList() }`
+      // the arm value flows to the ExpressionFunctionBody/ReturnStatement that
+      // demands a List. Both SwitchExpressionCase and its SwitchExpression
+      // parent must be unwrapped — stopping at either judges the .toList()
+      // against a node that matches no case below and fires a false positive on
+      // every arm (one getter in a downstream project produced ~62 such hits).
+      // A record literal is transparent for the same reason: a `.toList()` at a
+      // `List<T>` position in `(i.map().toList(), 'x')` flows to the enclosing
+      // return/assignment.
       if (parent is ParenthesizedExpression ||
           parent is ConditionalExpression ||
-          parent is NamedExpression) {
+          parent is NamedExpression ||
+          parent is SwitchExpressionCase ||
+          parent is SwitchExpression ||
+          parent is RecordLiteral) {
         current = parent;
         parent = parent.parent;
         continue;
@@ -2220,6 +2234,11 @@ class AvoidLargeListCopyRule extends SaropaLintRule {
     // .toList() result is returned — function contract requires List
     if (parent is ReturnStatement) return true;
     if (parent is ExpressionFunctionBody) return true;
+
+    // .toList() is yielded from a sync*/async* generator. When the generator's
+    // element type is List<T> the yielded value must be a concrete List, so the
+    // copy is structurally required, not avoidable.
+    if (parent is YieldStatement) return true;
 
     // .toList() result is assigned to a variable
     if (parent is VariableDeclaration) return true;
