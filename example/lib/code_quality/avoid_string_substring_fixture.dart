@@ -165,3 +165,41 @@ String? _goodArithmeticGuard(String text, int offset) {
   if (digitStart >= semiIndex) return null;
   return text.substring(digitStart, semiIndex);
 }
+
+// GOOD: else-branch of an indexOf ternary — the safe slice is normally the
+// else branch (the then handles "not found").
+String _goodElseBranchTernary(String local) {
+  final int i = local.indexOf('+');
+  return i < 0 ? local : local.substring(0, i);
+}
+
+// GOOD: emptiness guard proves length >= 1 for substring(1) / substring(0, 1).
+String _goodIsEmptyTernary(String t) => t.isEmpty ? t : t.substring(1);
+
+// GOOD: startsWith early-exit proves the prefix length is present.
+String? _goodStartsWithEarlyExit(String fragment) {
+  if (!fragment.startsWith('p/')) return null;
+  return fragment.substring(2);
+}
+
+// GOOD: substring arg is a property access (prefix.length) — the receiver
+// guard (startsWith) still recognizes the bound.
+String? _goodPropertyAccessArg(String value, String prefix) {
+  if (!value.startsWith(prefix)) return null;
+  return value.substring(prefix.length);
+}
+
+// GOOD: regex format guard guarantees a minimum length before the slice.
+int? _goodRegexGuard(String key, RegExp pattern) {
+  if (!pattern.hasMatch(key)) return null;
+  return int.tryParse(key.substring(0, 2));
+}
+
+// GOOD: post-loop slice — the preceding while bounded `i` against length.
+String _goodPostLoopSlice(String source, int start) {
+  int i = start;
+  while (i < source.length) {
+    i++;
+  }
+  return source.substring(start, i);
+}

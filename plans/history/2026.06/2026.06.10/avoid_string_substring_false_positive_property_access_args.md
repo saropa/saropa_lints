@@ -1,6 +1,6 @@
 # BUG: `avoid_string_substring` — Guard heuristics go inert when a substring argument is a property/index access (`x.length`, `match.start`, `m.i!`, `split[0]`)
 
-**Status: Open**
+**Status: Fixed**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
@@ -208,3 +208,7 @@ should include:
 - Dart SDK version: >=3.9.0 <4.0.0 (per pubspec environment constraint)
 - analyzer: >=9.0.0 <13.0.0
 - Triggering project/file: `d:\src\contacts` — `lib/database/file_backup/backup_blob_codec.dart:64`, `lib/utils/contact/contact_sharing_utils.dart:63`, `lib/utils/contact/matching/contact_merged_view.dart:217`, `lib/utils/contact/signature/signature_block_splitter.dart:47`, `lib/utils/zxcvbn/src/zxcvbn_matching.dart:247`, `:493`, `:494`, `:495`
+
+## Finish Report (2026-06-10)
+
+Fixed in WS-1. `_collectIdentifierNames` now descends into `PostfixExpression` (`m.i!`), `PrefixedIdentifier` (`prefix.length` — collects both prefix and property), `PropertyAccess` (`match.start`), and `IndexExpression` (`split[0]`), so argument-based guards are no longer silently disabled by an empty arg-name set. Verified by the guard unit test (prefix.length arg after startsWith; match.start arg after null guard).

@@ -1,6 +1,6 @@
 # BUG: `avoid_string_substring` — `isEmpty`/`isNotEmpty` and `startsWith` early-exit on the receiver are not recognized as length guards
 
-**Status: Open**
+**Status: Fixed**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
@@ -204,3 +204,7 @@ The fixture should include:
 - Dart SDK version: >=3.9.0 <4.0.0
 - analyzer: >=9.0.0 <13.0.0
 - Triggering project/file: `d:\src\contacts` — `lib/data/quotes/connection_prompts/connection_prompt_model.dart:39`, `lib/utils/system/avatar_fly_overlay.dart:156`, `lib/utils/contact/web/messaging_handle_url_parser.dart:125`, `lib/utils/import/csv_parser_utils.dart:97`, `lib/models/system/public_holiday/public_holiday_name.dart:37`, `lib/service/youtube_api/youtube_url_parsing_utils.dart:265`
+
+## Finish Report (2026-06-10)
+
+Fixed in WS-1. `_conditionGuardsLength` now recognizes `isEmpty`/`isNotEmpty` (proves length>=1 for substring(1)/substring(0,1)). `_hasPrecedingEarlyExitGuard` now also consults `_conditionGuardsLength` (and a new regex-guard check) against the receiver and no longer short-circuits on an empty arg-name set, so a receiver-level `startsWith`/`isEmpty` early-exit guards a literal-index slice. Verified by the guard unit test (isEmpty/isNotEmpty ternary, startsWith early-exit, isEmpty early-return).

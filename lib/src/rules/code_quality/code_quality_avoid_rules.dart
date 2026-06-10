@@ -16,6 +16,7 @@ import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
+import 'package:meta/meta.dart';
 
 import '../../analyzer_metadata_compat_utils.dart';
 import '../../literal_context_utils.dart';
@@ -1017,6 +1018,15 @@ class AvoidSubstringRule extends SaropaLintRule {
     });
   }
 
+  /// Exposed for unit tests: the pure-AST bounds-guard check used by [run].
+  /// It operates entirely on syntax (`toSource` / AST shape) with no resolved
+  /// type binding, so it is verifiable on unresolved `parseString` ASTs — the
+  /// only place this rule's guard logic can be exercised, since the scan CLI
+  /// and most test harnesses do not populate `staticType`.
+  @visibleForTesting
+  static bool guardsBoundsForTesting(MethodInvocation substringCall) =>
+      _isGuardedByLengthCheck(substringCall);
+
   /// True when [substringCall] is guarded by a bounds check — either a
   /// receiver-specific check (startsWith/endsWith/length) in an enclosing
   /// if/ternary, a loop condition that bounds a substring argument, or a
@@ -1036,15 +1046,23 @@ class AvoidSubstringRule extends SaropaLintRule {
     AstNode? prev = substringCall;
     AstNode? current = substringCall.parent;
     while (current != null) {
-      if (current is IfStatement && _isInThen(current, prev)) {
-        // Receiver-based guard (startsWith/endsWith/length on receiver)
-        // OR argument-based guard (condition references a substring arg).
+      if (current is IfStatement &&
+          (_isInThen(current, prev) ||
+              _nodeWithin(current.expression, substringCall))) {
+        // Substring is in the then-branch OR evaluated inside the `if`
+        // CONDITION itself (e.g. `if (i > 0 && r.hasMatch(s.substring(0, i)))`).
+        // Either way the condition's receiver/arg checks bound it.
         if (_conditionGuardsLength(current.expression, receiverSource) ||
             _conditionInvolvesArgs(current.expression, argNames)) {
           return true;
         }
       } else if (current is ConditionalExpression &&
-          current.thenExpression == prev) {
+          (current.thenExpression == prev ||
+              current.elseExpression == prev)) {
+        // Accept BOTH branches. For an indexOf-derived index the safe slice is
+        // normally the ELSE branch (`i < 0 ? s : s.substring(0, i)`): the then
+        // handles "not found". The arg/receiver checks are polarity-agnostic —
+        // a condition mentioning the bounding variable proves intent either way.
         if (_conditionGuardsLength(current.condition, receiverSource) ||
             _conditionInvolvesArgs(current.condition, argNames)) {
           return true;
@@ -1058,10 +1076,19 @@ class AvoidSubstringRule extends SaropaLintRule {
         // for (...; end >= offset + 3; ...) — condition bounds the body.
         if (_forConditionInvolvesArgs(current, argNames)) return true;
       } else if (current is Block) {
-        // Preceding if-return/break/continue/throw that checks substring
-        // args — covers indexOf-derived bounds checks like
-        // `if (semiIndex == -1) return null;` before `substring(0, semiIndex)`.
-        if (_hasPrecedingEarlyExitGuard(current, prev!, argNames)) {
+        // Preceding if-return/break/continue/throw that checks the substring
+        // args OR proves the receiver length/format (startsWith / isEmpty /
+        // regex hasMatch) — covers `if (semiIndex == -1) return;` before
+        // `substring(0, semiIndex)` and `if (!s.startsWith('p/')) return;`
+        // before `s.substring(2)`. Also a preceding loop whose condition
+        // bounded a slice index against the receiver length (post-loop slice).
+        if (_hasPrecedingEarlyExitGuard(
+              current,
+              prev!,
+              argNames,
+              receiverSource,
+            ) ||
+            _hasPrecedingLoopBound(current, prev, argNames, receiverSource)) {
           return true;
         }
       } else if (current is FunctionBody) {
@@ -1091,6 +1118,15 @@ class AvoidSubstringRule extends SaropaLintRule {
       '${RegExp.escape(receiverSource)}\\.(startsWith|endsWith)\\(',
     );
     if (guardCheck.hasMatch(source)) {
+      return true;
+    }
+    // Emptiness guard: `s.isEmpty` / `s.isNotEmpty` proves `length >= 1` in the
+    // appropriate branch, which is sufficient for the common `substring(1)` /
+    // `substring(0, 1)` idioms (e.g. `s.isEmpty ? s : s.substring(1)`).
+    final emptinessCheck = RegExp(
+      '${RegExp.escape(receiverSource)}\\.(isEmpty|isNotEmpty)\\b',
+    );
+    if (emptinessCheck.hasMatch(source)) {
       return true;
     }
     // Explicit length comparison: `s.length >= N`, `s.length > N`,
@@ -1140,16 +1176,82 @@ class AvoidSubstringRule extends SaropaLintRule {
     Block block,
     AstNode childStmt,
     Set<String> argNames,
+    String receiverSource,
   ) {
-    if (argNames.isEmpty) return false;
+    // No `argNames.isEmpty` short-circuit: a receiver-level guard
+    // (`if (s.isEmpty) return;`, `if (!s.startsWith('p/')) return;`,
+    // `if (!pattern.hasMatch(s)) return;`) proves the bound even when the
+    // substring index is a literal (empty arg-name set).
     for (final stmt in block.statements) {
       // Only check statements BEFORE the one containing the substring.
       if (identical(stmt, childStmt)) break;
       if (stmt is! IfStatement) continue;
       if (!_containsEarlyExit(stmt.thenStatement)) continue;
-      if (_conditionInvolvesArgs(stmt.expression, argNames)) return true;
+      final Expression cond = stmt.expression;
+      if (_conditionInvolvesArgs(cond, argNames) ||
+          _conditionGuardsLength(cond, receiverSource) ||
+          _conditionHasRegexGuard(cond, receiverSource)) {
+        return true;
+      }
     }
     return false;
+  }
+
+  /// True when [block] contains a preceding loop (`while` / `for` / `do`) whose
+  /// condition bounds a substring argument against the receiver's `.length`.
+  /// Covers post-loop slices like
+  ///   `while (i < source.length && ...) i++; return source.substring(start, i);`
+  /// where `i` was bounded to `<= source.length` by the loop it followed.
+  static bool _hasPrecedingLoopBound(
+    Block block,
+    AstNode childStmt,
+    Set<String> argNames,
+    String receiverSource,
+  ) {
+    if (argNames.isEmpty) return false;
+    for (final stmt in block.statements) {
+      if (identical(stmt, childStmt)) break;
+      Expression? condition;
+      if (stmt is WhileStatement) {
+        condition = stmt.condition;
+      } else if (stmt is DoStatement) {
+        condition = stmt.condition;
+      } else if (stmt is ForStatement) {
+        final ForLoopParts parts = stmt.forLoopParts;
+        if (parts is ForParts) condition = parts.condition;
+      }
+      if (condition == null) continue;
+      final bool boundsReceiverLength = RegExp(
+        '${RegExp.escape(receiverSource)}\\.length',
+      ).hasMatch(condition.toSource());
+      if (boundsReceiverLength &&
+          _conditionInvolvesArgs(condition, argNames)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /// True when [condition] applies a regex format guard to the substring
+  /// [receiverSource] — `pattern.hasMatch(receiver)`. A passing regex
+  /// (e.g. `^\d{4}$`) validates the receiver's format and, with it, a minimum
+  /// length, so a slice gated behind `if (!pattern.hasMatch(key)) return;` is
+  /// in-bounds even though the rule cannot parse the pattern itself.
+  static bool _conditionHasRegexGuard(
+    Expression condition,
+    String receiverSource,
+  ) {
+    final String source = condition.toSource();
+    return RegExp(
+      '\\.hasMatch\\(\\s*${RegExp.escape(receiverSource)}\\s*\\)',
+    ).hasMatch(source);
+  }
+
+  /// True when [node] lies textually within [ancestor] (offset containment).
+  /// Used to detect a substring evaluated inside an `if` condition rather than
+  /// its then-branch.
+  static bool _nodeWithin(AstNode ancestor, AstNode node) {
+    return ancestor.offset <= node.offset && node.end <= ancestor.end;
   }
 
   /// True when [stmt] contains a return, break, continue, or throw —
@@ -1194,6 +1296,25 @@ class AvoidSubstringRule extends SaropaLintRule {
       _collectIdentifierNames(expr.operand, names);
     } else if (expr is ParenthesizedExpression) {
       _collectIdentifierNames(expr.expression, names);
+    } else if (expr is PostfixExpression) {
+      // `m.i!` — unwrap the null-assertion to reach the target.
+      _collectIdentifierNames(expr.operand, names);
+    } else if (expr is PrefixedIdentifier) {
+      // `prefix.length`, `match.start` — collect BOTH the prefix and the
+      // property so a guard referencing either is recognized. Without this the
+      // arg-name set is empty and EVERY argument-based guard short-circuits to
+      // false, re-flagging provably in-bounds slices (this project's most
+      // common avoid_string_substring false-positive class).
+      names.add(expr.prefix.name);
+      names.add(expr.identifier.name);
+    } else if (expr is PropertyAccess) {
+      // `m.i`, `obj.field.length`
+      final Expression? target = expr.target;
+      if (target != null) _collectIdentifierNames(target, names);
+      names.add(expr.propertyName.name);
+    } else if (expr is IndexExpression) {
+      // `split[0]` — the receiver name (`split`) is what a guard would mention.
+      _collectIdentifierNames(expr.realTarget, names);
     }
   }
 

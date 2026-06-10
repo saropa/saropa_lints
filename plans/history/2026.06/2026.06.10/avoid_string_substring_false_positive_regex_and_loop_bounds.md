@@ -1,6 +1,6 @@
 # BUG: `avoid_string_substring` — regex-`hasMatch` format guards and loop-index slices flagged as out-of-bounds
 
-**Status: Open**
+**Status: Fixed**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
@@ -190,3 +190,7 @@ The fixture should include:
 - Dart SDK version: >=3.9.0 <4.0.0
 - analyzer: >=9.0.0 <13.0.0
 - Triggering project/file: `d:\src\contacts` — `lib/service/wikimedia/wikimedia_date_key_utils.dart:62`, `:76`, `lib/components/primitive/json/common_colored_json.dart:137`, `:202`, `:214`, `lib/database/file_backup/import/vcard_import_utils.dart:963`, `lib/utils/zxcvbn/src/zxcvbn_scoring.dart:212`
+
+## Finish Report (2026-06-10)
+
+Fixed in WS-1 for Cases 1 and 2. Case 1 (regex format guard): `_conditionHasRegexGuard` recognizes an early-exit `if (!pattern.hasMatch(receiver)) return;`. Case 2 (post-loop slice): `_hasPrecedingLoopBound` treats a slice as guarded when a preceding while/for/do sibling bound a substring arg against the receiver `.length`. Case 3 (cross-function invariant) is intentionally NOT fixed — the `FunctionBody` short-circuit is kept for soundness and those remain true positives by the rule definition, exactly as the report recommends. Verified by the guard unit test (regex early-exit, post-loop while).
