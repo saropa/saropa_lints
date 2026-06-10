@@ -63,6 +63,20 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 -->
 
+## [Unreleased]
+
+### Added (Extension)
+
+- **The Package Dashboard toolbar adds a "Save Upgrade Report" button next to "Save".** It writes the same per-package JSON as "Save" but filtered to only packages with an available update, to `reports/YYYYMMDD/..._pubspec_upgrade.json`, giving you a focused upgrade worklist. No action required.
+
+<details>
+<summary>Maintenance</summary>
+
+- The extension package now excludes `scripts/**` (build-time i18n/MT tooling) from the published `.vsix`. Those scripts are never loaded at runtime — runtime locales ship from `src/i18n/locales` via the esbuild bundle — and shipping them leaked the machine-translation cache, whose high-entropy translated strings tripped Open VSX's secret scanner and blocked publication. No behavior change.
+- The publish script now checks for `VSCE_PAT` before the Marketplace publish step and prompts with token-creation guidance when it is missing, mirroring the existing Open VSX handling. A missing or expired Marketplace token previously failed with an opaque `vsce` error and only a generic "PAT expired?" guess. No behavior change.
+
+</details>
+
 ## [13.12.3]
 
 ### Added

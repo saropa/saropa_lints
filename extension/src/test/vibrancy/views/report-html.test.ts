@@ -533,6 +533,13 @@ describe('report: toolbar', () => {
         assert.ok(html.includes('id="open-other"'));
         assert.ok(html.includes('Open Project'));
     });
+
+    it('should include save and save-upgrade buttons', () => {
+        const html = buildReportHtml(opts([]));
+        assert.ok(html.includes('id="save-all"'));
+        assert.ok(html.includes('id="save-upgrade"'));
+        assert.ok(html.includes('Save Upgrade Report'));
+    });
 });
 
 describe('report: description on package name', () => {
