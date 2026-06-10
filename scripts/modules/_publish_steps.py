@@ -43,6 +43,7 @@ from scripts.modules._pubdev_lint import (
     fix_doc_references,
 )
 from scripts.modules._version_changelog import (
+    check_changelog_overview,
     get_version_from_pubspec,
     validate_changelog_version,
 )
@@ -1482,6 +1483,48 @@ def run_analyze_to_log(project_dir: Path) -> bool:
     return _run_dart_analyze_core(project_dir)
 
 
+def _gate_changelog_overview(project_dir: Path, version: str) -> bool:
+    """Loop-check the Overview intro + [log] link; prompt retry/ignore/abort.
+
+    The expected resolution is editing CHANGELOG.md and re-checking, so the
+    prompt defaults to retry (empty input or 'r' re-reads the file). 'ignore'
+    proceeds with the known-bad section; 'abort' stops the publish.
+
+    Returns:
+        True to continue publishing, False to abort.
+    """
+    changelog_path = project_dir / "CHANGELOG.md"
+    while True:
+        problems = check_changelog_overview(changelog_path, version)
+        if not problems:
+            print_success(
+                f"CHANGELOG [{version}] has an Overview intro and a "
+                f"matching [log] link."
+            )
+            return True
+        for problem in problems:
+            print_warning(problem)
+        choice = (
+            input(
+                "  Overview/log-link check failed. "
+                "[R]etry / [i]gnore / [a]bort? [R] "
+            )
+            .strip()
+            .lower()
+        )
+        if choice.startswith("i"):
+            print_warning(
+                f"Ignoring CHANGELOG Overview problems for [{version}]."
+            )
+            return True
+        if choice.startswith("a"):
+            print_error("Publish aborted at CHANGELOG Overview check.")
+            return False
+        # Empty input or anything starting with 'r' retries: re-read the file
+        # so a fix the author just saved is picked up on the next pass.
+        print_info("Re-checking CHANGELOG.md...")
+
+
 def validate_changelog(
     project_dir: Path, version: str
 ) -> tuple[bool, str]:
@@ -1494,6 +1537,12 @@ def validate_changelog(
         return False, ""
 
     print_success(f"Found version {version} in CHANGELOG.md")
+
+    # Gate on the Overview intro + version-pinned [log] link before the
+    # release notes are accepted. Default-to-retry so the author can fix
+    # CHANGELOG.md in place and re-check without losing the publish run.
+    if not _gate_changelog_overview(project_dir, version):
+        return False, ""
 
     if not release_notes:
         response = (

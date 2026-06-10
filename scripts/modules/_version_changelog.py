@@ -204,6 +204,80 @@ def validate_changelog_version(
     return match.group(1).strip() if match else ""
 
 
+def _extract_changelog_section_body(
+    content: str, version: str
+) -> str | None:
+    """Return the raw body of the ``## [version]`` section, or None if absent.
+
+    Body = everything between the heading line and the next ``## [X.Y.Z]``
+    heading (or EOF). Unlike ``validate_changelog_version`` this does NOT
+    strip, because the Overview check needs to see the prose that sits
+    before the first ``### `` sub-heading exactly as authored.
+    """
+    pattern = (
+        rf"(?s)##\s*\[?{re.escape(version)}\]?[^\n]*\n"
+        rf"(.*?)(?=##\s*\[?{_VERSION_RE}|$)"
+    )
+    match = re.search(pattern, content)
+    return match.group(1) if match else None
+
+
+def check_changelog_overview(
+    changelog_path: Path, version: str
+) -> list[str]:
+    """Validate the ``[version]`` section's Overview intro and ``[log]`` link.
+
+    Every released section opens with a user-facing Overview paragraph that
+    ends in a ``[log](.../vX.Y.Z/CHANGELOG.md)`` link pinned to THIS version's
+    git tag (see CHANGELOG.md MAINTENANCE NOTES). A missing intro ships a
+    release with no human-readable summary; a stale/wrong version in the link
+    points readers at the wrong tag snapshot.
+
+    Returns:
+        A list of human-readable problems; an empty list means the section is
+        valid. ``version`` is the proposed publish version — the link must
+        carry ``v{version}``, not ``main`` or any prior tag.
+    """
+    if not changelog_path.exists():
+        return ["CHANGELOG.md not found."]
+    content = changelog_path.read_text(encoding="utf-8")
+    body = _extract_changelog_section_body(content, version)
+    if body is None:
+        return [f"No [{version}] section found in CHANGELOG.md."]
+
+    # Overview = the prose before the first ### sub-heading. Drop a leading
+    # `---` separator line that can sit between the heading and the body.
+    intro = body.split("\n###", 1)[0]
+    intro = re.sub(r"^\s*-{3,}\s*$", "", intro, flags=re.MULTILINE).strip()
+
+    expected_link = (
+        f"[log](https://github.com/saropa/saropa_lints/blob/"
+        f"v{version}/CHANGELOG.md)"
+    )
+    log_match = re.search(r"\[log\]\(([^)]+)\)", intro)
+    # Prose remaining once the link is removed — distinguishes "intro missing"
+    # from "link present but no summary text".
+    intro_prose = re.sub(r"\[log\]\([^)]*\)", "", intro).strip()
+
+    problems: list[str] = []
+    if not intro_prose:
+        problems.append(
+            f"The [{version}] section has no Overview intro paragraph "
+            "(a 2-4 sentence user-facing summary above the ### bullets)."
+        )
+    if log_match is None:
+        problems.append(
+            f"The [{version}] Overview has no [log](...) link. "
+            f"End it with: {expected_link}"
+        )
+    elif f"/blob/v{version}/" not in log_match.group(1):
+        problems.append(
+            f"The [{version}] [log] link does not point at tag v{version}. "
+            f"Found: {log_match.group(0)} -- expected: {expected_link}"
+        )
+    return problems
+
+
 def display_changelog(project_dir: Path) -> str | None:
     """Display a summary of the latest changelog entry.
 
