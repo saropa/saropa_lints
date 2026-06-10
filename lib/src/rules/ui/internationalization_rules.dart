@@ -1638,12 +1638,30 @@ class AvoidManualDateFormattingRule extends SaropaLintRule {
     return count;
   }
 
-  /// Returns true if [typeName] is DateTime (or unknown).
+  /// Internal-identifier name tokens. A variable or enclosing function whose
+  /// name contains one of these builds a key/cache/hash/id — locale formatting
+  /// does not apply, so a date-like interpolation there is not display copy.
+  static const Set<String> _internalKeyTokens = <String>{
+    'key',
+    'cache',
+    'tag',
+    'hash',
+    'bucket',
+    'identifier',
+    'id',
+  };
+
+  /// Returns true only if [typeName] is a concrete DateTime.
   ///
-  /// Unknown types (null) are treated as potentially DateTime to avoid
-  /// false negatives when static type information is unavailable.
+  /// An unknown type (null) is treated as NON-DateTime. The rule's correction
+  /// tells the user to add locale formatting — wrong advice for the many
+  /// project-specific date-like types (`HebrewDate`, `DateTimeNullable`, custom
+  /// calendar structs) whose `.month`/`.day` getters share names with
+  /// [_dateProperties]. Preferring a missed DateTime (when type info is
+  /// unavailable) over a flood of false positives on custom types is the
+  /// correct trade-off for a WARNING-level i18n rule.
   static bool _isDateTimeName(String? typeName) {
-    if (typeName == null) return true;
+    if (typeName == null) return false;
     return typeName == 'DateTime' || typeName == 'DateTime?';
   }
 
@@ -1654,19 +1672,6 @@ class AvoidManualDateFormattingRule extends SaropaLintRule {
 
     // Used as a map subscript: map['${d.year}-${d.month}']
     if (parent is IndexExpression && parent.index == node) return true;
-
-    // Assigned to a variable with an internal-use name
-    if (parent is VariableDeclaration) {
-      final varName = parent.name.lexeme.toLowerCase();
-      if (varName.contains('key') ||
-          varName.contains('cache') ||
-          varName.contains('tag') ||
-          varName.contains('hash') ||
-          varName.contains('bucket') ||
-          varName.contains('identifier')) {
-        return true;
-      }
-    }
 
     // Passed as argument to map lookup/mutation methods
     if (parent is ArgumentList) {
@@ -1682,7 +1687,44 @@ class AvoidManualDateFormattingRule extends SaropaLintRule {
       }
     }
 
+    // Internal-key context that is not the direct initializer of a key-named
+    // local: the interpolation may be returned from a key-builder function,
+    // assigned to a key-named field, or nested inside one. Walk the ancestor
+    // chain up to the enclosing named function and exempt when a key-named
+    // VariableDeclaration or a key-named enclosing function/method is found.
+    // Without this, `return '$label|${d.month}|${d.day}'` inside
+    // `buildEventDedupKey` / `cacheKey(...)` is treated as display copy.
+    AstNode? ancestor = node.parent;
+    while (ancestor != null) {
+      if (ancestor is VariableDeclaration &&
+          _nameHasKeyToken(ancestor.name.lexeme)) {
+        return true;
+      }
+      // The enclosing named function is the boundary: check its name, then
+      // stop — a key token on some outer method does not make this
+      // interpolation a key.
+      if (ancestor is FunctionDeclaration) {
+        return _nameHasKeyToken(ancestor.name.lexeme);
+      }
+      if (ancestor is MethodDeclaration) {
+        return _nameHasKeyToken(ancestor.name.lexeme);
+      }
+      // A closure (FunctionExpression not owned by a FunctionDeclaration) is
+      // also a boundary — do not climb out of it into an unrelated outer scope.
+      if (ancestor is FunctionExpression &&
+          ancestor.parent is! FunctionDeclaration) {
+        break;
+      }
+      ancestor = ancestor.parent;
+    }
+
     return false;
+  }
+
+  /// True when [name] (case-insensitive) contains an internal-key token.
+  static bool _nameHasKeyToken(String name) {
+    final lower = name.toLowerCase();
+    return _internalKeyTokens.any(lower.contains);
   }
 }
 
