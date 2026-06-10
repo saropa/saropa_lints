@@ -422,6 +422,16 @@ class NoEqualArgumentsRule extends SaropaLintRule {
       final List<Expression> args = node.arguments.toList();
       if (args.length < 2) return;
 
+      // Constructors/factories where equal positional arguments are
+      // semantically required, not a copy-paste bug: a neutral gray needs
+      // R==G==B, a point-anchor rect needs left==right and top==bottom, a
+      // square Size/Offset needs both components equal. Flagging these forced
+      // meaningless ignores on every such call site.
+      final String? calleeName = _calleeName(node.parent);
+      if (calleeName != null && _equalArgIdiomaticCallees.contains(calleeName)) {
+        return;
+      }
+
       // Check positional arguments for duplicates
       final Set<String> seen = <String>{};
       for (final Expression arg in args) {
@@ -448,6 +458,30 @@ class NoEqualArgumentsRule extends SaropaLintRule {
         }
       }
     });
+  }
+
+  /// Constructors/factories where repeating a positional argument is the
+  /// documented idiom rather than a copy-paste error.
+  static const Set<String> _equalArgIdiomaticCallees = <String>{
+    'fromRGBO', // Color.fromRGBO(r, g, b, opacity) — grayscale: r==g==b
+    'fromARGB', // Color.fromARGB(a, r, g, b)        — grayscale: r==g==b
+    'fromLTRB', // RelativeRect/Rect.fromLTRB        — point anchor: l==r, t==b
+    'Size', // Size(w, h)                        — square: w==h
+    'Offset', // Offset(dx, dy)                    — diagonal: dx==dy
+  };
+
+  /// Resolves the callee name of an argument list's parent call, covering both
+  /// the parse-only form (`Color.fromRGBO(...)` parses as a [MethodInvocation])
+  /// and the resolved/`const` form (an [InstanceCreationExpression]).
+  static String? _calleeName(AstNode? parent) {
+    if (parent is MethodInvocation) {
+      return parent.methodName.name;
+    }
+    if (parent is InstanceCreationExpression) {
+      final ConstructorName ctor = parent.constructorName;
+      return ctor.name?.name ?? ctor.type.name.lexeme;
+    }
+    return null;
   }
 }
 

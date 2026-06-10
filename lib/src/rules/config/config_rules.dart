@@ -317,13 +317,20 @@ class AvoidMixedEnvironmentsRule extends SaropaLintRule {
     severity: DiagnosticSeverity.ERROR,
   );
 
+  // Word-boundary lookarounds on [A-Za-z] so each token must stand alone,
+  // not appear as a substring of a larger identifier. A bare `\b` does NOT
+  // work here: `_` is a word character, so `\brelease\b` still matches
+  // `release_notes`. The [A-Za-z] lookaround treats `_`, digits, and string
+  // delimiters as separators — `release_notes`/`prerelease` no longer match
+  // `release`, and `latest`/`greatest` no longer match `test`, while
+  // `apiUrlProd`, `prodApiKey`, `debug_mode`, and `isRelease` still do.
   static final RegExp _prodPattern = RegExp(
-    r'(prod|production|live|release)',
+    r'(?<![A-Za-z])(prod|production|live|release)(?![A-Za-z])',
     caseSensitive: false,
   );
 
   static final RegExp _devPattern = RegExp(
-    r'(dev|development|debug|staging|test|local|localhost)',
+    r'(?<![A-Za-z])(dev|development|debug|staging|test|local|localhost)(?![A-Za-z])',
     caseSensitive: false,
   );
 
