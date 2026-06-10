@@ -136,7 +136,30 @@ String badCapturedSameElement(Wrapper wrapper) {
   return read();
 }
 
+// GOOD: post-increment index reads a different element each time and advances
+// the index — reusing the first read would read the same element twice.
+void goodPostIncrementIndex(List<Object> pts, int i) {
+  final Object a = pts[i++];
+  final Object b = pts[i++];
+  use(a);
+  use(b);
+}
+
+// GOOD: each ValueNotifier<bool>(false) allocates a distinct object; reusing
+// one for two listeners would wire them to the same mutable state.
+void goodSeparateAllocations() {
+  final isLoading = ValueNotifier<bool>(false);
+  final isVisible = ValueNotifier<bool>(false);
+  use(isLoading);
+  use(isVisible);
+}
+
 // --- Mock helpers so the fixture parses standalone. ---
+
+class ValueNotifier<T> {
+  ValueNotifier(this.value);
+  T value;
+}
 
 class Wrapper {
   String get label => 'label';
