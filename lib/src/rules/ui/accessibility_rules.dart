@@ -1456,7 +1456,8 @@ class AvoidHiddenInteractiveRule extends SaropaLintRule {
     '[avoid_hidden_interactive] This interactive element uses excludeFromSemantics, making it completely inaccessible to screen readers and users with assistive technologies. Excluding interactive child elements from the semantics tree prevents users with disabilities from discovering or activating key actions, which fails accessibility standards and can break critical workflows. {v3}',
     correctionMessage:
         'Remove excludeFromSemantics from interactive elements, or wrap them in a Semantics parent with a descriptive label to ensure accessibility. Audit your build methods for excludeFromSemantics usage and refactor to provide proper semantic information. Refer to Flutter accessibility documentation for guidance.',
-    severity: DiagnosticSeverity.ERROR,
+    // SEV-01 (downgraded from ERROR): accessibility (should-fix), not a crash.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _interactiveWidgets = <String>{

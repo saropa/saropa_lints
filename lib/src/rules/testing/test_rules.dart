@@ -3290,7 +3290,8 @@ class RequireTestWidgetPumpRule extends SaropaLintRule {
     '[require_test_widget_pump] After simulating a tap or text entry in a widget test, failing to call pump() or pumpAndSettle() means the widget tree will not rebuild, so your test may pass even though the user experience is broken. Always process pending build events to ensure your test reflects real app behavior. {v3}',
     correctionMessage:
         'After calling tester.tap() or tester.enterText(), always call await tester.pump() or await tester.pumpAndSettle() to process UI changes and verify correct behavior.',
-    severity: DiagnosticSeverity.ERROR,
+    // SEV-01 (downgraded from ERROR): test-quality issue, not production breakage.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Widget interaction methods that require pump after.

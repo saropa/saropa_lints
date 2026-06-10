@@ -71,7 +71,8 @@ class RequireVsyncMixinRule extends SaropaLintRule {
     '[require_vsync_mixin] AnimationController is missing a vsync parameter. Without vsync, animations run without frame synchronization, causing visual tearing, wasted CPU cycles, and degraded user experience. This can lead to janky motion and battery drain, especially on mobile devices. Always provide vsync: this and mix in SingleTickerProviderStateMixin to ensure smooth, efficient animations and proper animation controller lifecycle management. {v4}',
     correctionMessage:
         'Add vsync: this and mix in SingleTickerProviderStateMixin to synchronize animation frames with the display refresh rate, preventing unnecessary CPU and memory usage.',
-    severity: DiagnosticSeverity.ERROR,
+    // SEV-01 (downgraded from ERROR): animation perf/UX, not a crash.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override

@@ -71,7 +71,8 @@ class RequireUnknownRouteHandlerRule extends SaropaLintRule {
     '[require_unknown_route_handler] MaterialApp or CupertinoApp defines routes or onGenerateRoute but does not provide an onUnknownRoute handler. When a user navigates to an undefined route path via deep link, push notification, or programmatic navigation, the app throws an unhandled exception and crashes instead of showing a helpful error screen. {v4}',
     correctionMessage:
         'Add an onUnknownRoute callback to MaterialApp that returns a route to a user-friendly 404 error page when navigation targets an undefined route path.',
-    severity: DiagnosticSeverity.ERROR,
+    // SEV-01 (downgraded from ERROR): robustness fallback, crash only on an undefined route.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
@@ -923,7 +924,8 @@ class RequireDeepLinkFallbackRule extends SaropaLintRule {
     '[require_deep_link_fallback] Deep link handler navigates to content without verifying the target exists or is accessible. When a deep link references deleted, restricted, or invalid content, the app either crashes with a null reference error or displays a blank screen. Users tapping expired links in emails, notifications, or shared messages encounter a broken experience. {v9}',
     correctionMessage:
         'Add a fallback route or error screen that displays a user-friendly message when deep-linked content is missing, deleted, or inaccessible, with an option to navigate home.',
-    severity: DiagnosticSeverity.ERROR,
+    // SEV-01 (downgraded from ERROR): robustness fallback, crash only on a bad deep link.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static final List<RegExp> _deepLinkMethodPatterns = [
@@ -2808,7 +2810,8 @@ class RequireGoRouterFallbackRouteRule extends SaropaLintRule {
     '[require_go_router_fallback_route] GoRouter configuration without errorBuilder or errorPageBuilder has no fallback for unmatched routes. When users navigate to a non-existent path via deep link, push notification, or typo, the router throws an unhandled exception that crashes the app instead of showing a helpful error page. {v2}',
     correctionMessage:
         'Add errorBuilder: (context, state) => NotFoundPage() or errorPageBuilder to display a user-friendly error screen when navigation targets an undefined route.',
-    severity: DiagnosticSeverity.ERROR,
+    // SEV-01 (downgraded from ERROR): robustness fallback, crash only on an unmatched route.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
@@ -2989,7 +2992,8 @@ class AvoidNavigatorContextIssueRule extends SaropaLintRule {
         'navigation can fail if widget is not in tree. {v2}',
     correctionMessage:
         'Use the BuildContext parameter directly instead of currentContext.',
-    severity: DiagnosticSeverity.ERROR,
+    // SEV-01 (downgraded from ERROR): conditional navigation failure, not certain breakage.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static final RegExp _currentContextPattern = RegExp(r'\.currentContext\b');

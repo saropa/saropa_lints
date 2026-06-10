@@ -665,7 +665,8 @@ class AvoidPrintInReleaseRule extends SaropaLintRule {
     '[avoid_print_in_release] Using print() in production exposes debug information to end users, can leak sensitive data, and negatively impacts performance. Print statements are not optimized for release builds and may clutter logs, making it harder to diagnose real issues. This can also violate privacy policies and app store guidelines. {v3}',
     correctionMessage:
         'Wrap print() calls in if (kDebugMode) or use a logging framework with configurable log levels. Remove or refactor print statements before release to ensure only intentional logging is present.',
-    severity: DiagnosticSeverity.ERROR,
+    // SEV-01 (downgraded from ERROR): debug-hygiene/perf, not a crash/exploit.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override

@@ -15,6 +15,7 @@ Copyright: (c) 2025-2026 Saropa
 from __future__ import annotations
 
 import re
+import subprocess
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
@@ -61,6 +62,7 @@ from scripts.modules._duplicated_messages import (
 from scripts.modules._utils import (
     Color,
     get_project_dir,
+    get_shell_mode,
     print_colored,
     print_error,
     print_header,
@@ -103,6 +105,7 @@ class AuditResult:
     tier_integrity_passed: bool = True
     contains_audit_over_baseline: bool = False
     analysis_passed: bool = True
+    stub_guard_passed: bool = True
 
     @property
     def has_blocking_issues(self) -> bool:
@@ -114,6 +117,7 @@ class AuditResult:
         - Rules missing ``[rule_name]`` prefix in problemMessage
         - Any rule file exceeds .contains() baseline (CI would fail)
         - dart analyze --fatal-infos failed (run during audit)
+        - Stub-test guard failed (empty-body / tautology stubs present)
         """
         return bool(
             not self.tier_integrity_passed
@@ -123,6 +127,7 @@ class AuditResult:
             or self.rules_missing_prefix
             or self.contains_audit_over_baseline
             or not self.analysis_passed
+            or not self.stub_guard_passed
         )
 
 
@@ -378,6 +383,57 @@ _FAIL = "fail"
 
 # Type alias: (status, message, detail_lines)
 _Check = tuple[str, str, list[str]]
+
+
+# Canonical stub gate: the Dart test owns the detection logic
+# (scanEmptyBodyStubTests + the two literal-tautology regex guards). Running it
+# here makes the gate BLOCKING in the audit (exit code 11), so a reintroduced
+# stub cannot be waved through the interactive "continue despite test failure"
+# prompt in publish Step 7. Reusing the test keeps a single source of truth
+# rather than reimplementing AST stub detection in Python.
+_STUB_GUARD_TEST = "test/integrity/stub_test_guard_test.dart"
+
+
+def run_stub_guard_check(project_dir: Path) -> _Check:
+    """Run the stub-test guard and return a blocking pass/fail check.
+
+    A non-zero exit (stub present) or a missing test file is a FAIL so the
+    gate cannot silently pass when the harness is absent.
+    """
+    guard_path = project_dir / _STUB_GUARD_TEST
+    if not guard_path.exists():
+        return (
+            _FAIL,
+            f"Stub guard missing: {_STUB_GUARD_TEST}",
+            ["Cannot verify the test suite is free of always-pass stubs."],
+        )
+    try:
+        result = subprocess.run(
+            ["dart", "test", _STUB_GUARD_TEST],
+            cwd=project_dir,
+            capture_output=True,
+            text=True,
+            shell=get_shell_mode(),
+        )
+    except OSError as e:
+        return (
+            _FAIL,
+            "Stub guard could not run (dart test invocation failed)",
+            [str(e)],
+        )
+    if result.returncode == 0:
+        return (_PASS, "No always-pass stub tests (empty-body / tautology)", [])
+    # Surface the failing-test lines so the operator sees which stubs reappeared.
+    detail = [
+        line.strip()
+        for line in (result.stdout + result.stderr).splitlines()
+        if "stub" in line.lower() or "Expected" in line or "Found" in line
+    ][:12]
+    return (
+        _FAIL,
+        "Stub-test guard failed — always-pass stub tests present",
+        detail or ["See `dart test {0}` output.".format(_STUB_GUARD_TEST)],
+    )
 
 
 def _print_quality_checks(checks: list[_Check]) -> None:
@@ -716,6 +772,11 @@ def run_full_audit(
             [],
         ))
 
+    # Stub-test guard (BLOCKING): no always-pass stub tests in the suite.
+    stub_guard_check = run_stub_guard_check(project_dir)
+    checks.append(stub_guard_check)
+    stub_guard_passed = stub_guard_check[0] != _FAIL
+
     if extra_checks:
         checks.extend(extra_checks)
 
@@ -799,4 +860,5 @@ def run_full_audit(
         rules_missing_prefix=rules_missing_prefix,
         tier_integrity_passed=tier_integrity_passed,
         contains_audit_over_baseline=bool(over_baseline),
+        stub_guard_passed=stub_guard_passed,
     )

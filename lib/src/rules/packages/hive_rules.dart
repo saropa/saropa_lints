@@ -2004,7 +2004,8 @@ class RequireHiveWebSubdirectoryRule extends SaropaLintRule {
         'Pass a unique subdirectory name to Hive.initFlutter(), e.g., '
         "Hive.initFlutter('my_app_data'). Use your app's package name or a "
         'unique identifier to avoid storage conflicts.',
-    severity: DiagnosticSeverity.ERROR,
+    // SEV-01 (downgraded from ERROR): conditional web-only namespace footgun, should-configure.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override

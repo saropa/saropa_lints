@@ -354,7 +354,8 @@ class AvoidGeolocatorBackgroundWithoutConfigRule extends SaropaLintRule {
     '[avoid_geolocator_background_without_config] Geolocator.getPositionStream is used but platform config is missing background location entries (iOS UIBackgroundModes location and/or Android ACCESS_BACKGROUND_LOCATION). Updates may stop when the app is backgrounded. {v1}',
     correctionMessage:
         'Declare UIBackgroundModes location in Info.plist and ACCESS_BACKGROUND_LOCATION in AndroidManifest when background streams are required.',
-    severity: DiagnosticSeverity.ERROR,
+    // SEV-01 (downgraded from ERROR): deployment-config issue, updates degrade not crash.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override

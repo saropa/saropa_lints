@@ -701,7 +701,8 @@ class RequireErrorBoundaryRule extends SaropaLintRule {
     '[require_error_boundary] Top-level MaterialApp or CupertinoApp is missing an error boundary in its build tree. Without a dedicated error handler, uncaught exceptions will crash the entire application, leaving users with a blank or frozen screen and no recovery path. All production apps must provide a visible fallback UI for unexpected errors. {v2}',
     correctionMessage:
         'Add a builder parameter to your MaterialApp or CupertinoApp that wraps the child tree in an ErrorBoundary. Example: builder: (context, child) => ErrorBoundary(child: child!).',
-    severity: DiagnosticSeverity.ERROR,
+    // SEV-01 (downgraded from ERROR): robustness pattern (catch-all), crash only on an uncaught exception.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
@@ -1771,7 +1772,8 @@ class RequireCacheKeyDeterminismRule extends SaropaLintRule {
     '[require_cache_key_determinism] Cache key uses non-deterministic values (e.g., DateTime.now, Random, hashCode, or UUID). This causes cache misses, duplicated resources, and unpredictable behavior. Cache keys must uniquely and consistently identify the same resource for the same input. Using unstable values breaks cache integrity and wastes memory. {v4}',
     correctionMessage:
         'Construct cache keys only from stable, deterministic values such as unique IDs, query parameters, or content hashes. Never use timestamps, random numbers, or object hashCodes. Example: cacheKey = "user_\$userId" or hash(queryParams).',
-    severity: DiagnosticSeverity.ERROR,
+    // SEV-01 (downgraded from ERROR): cache-correctness bug, not a crash/exploit.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Regex patterns that indicate non-deterministic values.

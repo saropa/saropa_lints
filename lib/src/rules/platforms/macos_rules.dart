@@ -1341,7 +1341,8 @@ class RequireMacosEntitlementsRule extends SaropaLintRule {
     correctionMessage:
         'Add the required entitlement to macos/Runner/Release.entitlements '
         'and macos/Runner/DebugProfile.entitlements.',
-    severity: DiagnosticSeverity.ERROR,
+    // SEV-01 (downgraded from ERROR): config-detection heuristic; deployment concern.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override

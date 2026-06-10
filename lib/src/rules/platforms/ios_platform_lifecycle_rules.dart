@@ -2946,7 +2946,8 @@ class RequirePurchaseRestorationRule extends SaropaLintRule {
     correctionMessage:
         'Add a "Restore Purchases" button that calls '
         'InAppPurchase.instance.restorePurchases().',
-    severity: DiagnosticSeverity.ERROR,
+    // SEV-01 (downgraded from ERROR): App Store policy, not a crash/exploit.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override

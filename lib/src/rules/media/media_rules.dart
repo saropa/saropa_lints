@@ -283,7 +283,8 @@ class AvoidAudioInBackgroundWithoutConfigRule extends SaropaLintRule {
     '[avoid_audio_in_background_without_config] Audio playback stack detected but platform config is missing background audio entries (iOS UIBackgroundModes audio and/or Android FOREGROUND_SERVICE). Playback can stop or fail review. {v1}',
     correctionMessage:
         'Add UIBackgroundModes audio in ios/Runner/Info.plist and FOREGROUND_SERVICE entries in AndroidManifest.xml per platform docs.',
-    severity: DiagnosticSeverity.ERROR,
+    // SEV-01 (downgraded from ERROR): deployment-config issue, not a crash.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override

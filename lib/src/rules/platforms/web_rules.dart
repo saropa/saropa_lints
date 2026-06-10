@@ -175,7 +175,8 @@ class RequireCorsHandlingRule extends SaropaLintRule {
     '[require_cors_handling] HTTP calls from a Flutter web app fail silently without proper CORS headers from the server. The browser blocks cross-origin requests by default, causing network errors that prevent data loading, authentication, and API communication. Users see blank screens or broken functionality with no clear error message. {v3}',
     correctionMessage:
         'Configure the server to return Access-Control-Allow-Origin headers for your app domain, or route requests through a CORS proxy during development.',
-    severity: DiagnosticSeverity.ERROR,
+    // SEV-01 (downgraded from ERROR): server-side CORS (client heuristic); functional not a crash.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static final RegExp _httpTargetPattern = RegExp(

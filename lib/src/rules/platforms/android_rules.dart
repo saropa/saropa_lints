@@ -44,7 +44,8 @@ class RequireAndroidManifestEntriesRule extends SaropaLintRule {
     '[require_android_manifest_entries] Android permission-gated API is used but AndroidManifest.xml is missing the required <uses-permission> entry. This causes runtime denials on device. {v1}',
     correctionMessage:
         'Add the required android.permission.* entry to AndroidManifest.xml.',
-    severity: DiagnosticSeverity.ERROR,
+    // SEV-01 (downgraded from ERROR): config-detection heuristic; missing permission denies, not crashes.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Map<String, String> _apiToPermission = <String, String>{
@@ -939,7 +940,8 @@ class RequireNotificationIconKeptRule extends SaropaLintRule {
     '[require_notification_icon_kept] Notification SDK import detected but ProGuard rules do not appear to keep notification drawable resources. Stripped icons break status-bar notifications after shrinking. {v1}',
     correctionMessage:
         'Add -keep rules for notification drawables (or resource keeps) in android/app/proguard-rules.pro.',
-    severity: DiagnosticSeverity.ERROR,
+    // SEV-01 (downgraded from ERROR): build-config (ProGuard) issue, not a crash.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _notificationImports = <String>{

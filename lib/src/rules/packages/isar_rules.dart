@@ -960,7 +960,8 @@ class RequireIsarLinksLoadRule extends SaropaLintRule {
     '[require_isar_links_load] Accessing IsarLinks without calling load() first will return incorrect or empty results. This leads to subtle data bugs, such as missing related records, and can break app features that depend on linked data. {v1}',
     correctionMessage:
         'Call await links.load() or links.loadSync() before accessing IsarLinks properties to ensure data is loaded and accurate.',
-    severity: DiagnosticSeverity.ERROR,
+    // SEV-01 (downgraded from ERROR): incorrect/empty results (functional bug), not corruption/crash.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _accessMethods = {

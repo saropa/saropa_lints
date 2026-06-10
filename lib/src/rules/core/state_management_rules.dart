@@ -969,7 +969,8 @@ class AvoidGlobalKeyInBuildRule extends SaropaLintRule {
     '[avoid_global_key_in_build] Creating a GlobalKey inside the build() method causes it to be recreated on every rebuild, which results in lost widget state, broken references, and unpredictable UI behavior. This can cause your app to lose user input or fail to maintain state across rebuilds. {v4}',
     correctionMessage:
         'Create the GlobalKey as a class field (not inside build) to preserve widget state and ensure consistent behavior.',
-    severity: DiagnosticSeverity.ERROR,
+    // SEV-01 (downgraded from ERROR): lost state/UI bug, not a crash/exploit.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override

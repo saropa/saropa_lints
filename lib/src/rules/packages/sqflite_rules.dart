@@ -68,7 +68,8 @@ class AvoidSqfliteTypeMismatchRule extends SaropaLintRule {
         'Booleans are stored as INTEGER (0/1), DateTime as TEXT/INTEGER. {v2}',
     correctionMessage:
         'Convert types explicitly: bool = row["col"] == 1; DateTime = DateTime.parse(row["col"]).',
-    severity: DiagnosticSeverity.ERROR,
+    // SEV-01 (downgraded from ERROR): heuristic type-mismatch ("may not match"), subtle bug not a crash.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Column names that suggest boolean values
