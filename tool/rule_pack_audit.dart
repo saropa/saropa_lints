@@ -71,6 +71,8 @@ kRelocatedRulePackCodes = {
   'prefer_notifier_over_state': (fromPack: 'riverpod', toPack: 'riverpod_2'),
   // dio 5.0 removed DioError → DioException; gated to the dio_5 pack.
   'avoid_dio_error': (fromPack: 'dio', toPack: 'dio_5'),
+  // bloc 8.0 removed mapEventToState → on<Event>; gated to the bloc_8 pack.
+  'avoid_bloc_map_event_to_state': (fromPack: 'bloc', toPack: 'bloc_8'),
 };
 
 /// Returns a new map with [kRelocatedRulePackCodes] applied: each code is

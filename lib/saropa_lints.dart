@@ -799,6 +799,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   RequireMountedCheckRule.new,
   AvoidWatchInCallbacksRule.new,
   AvoidBlocEventInConstructorRule.new,
+  AvoidBlocMapEventToStateRule.new,
   PreferBlocExtensionsRule.new,
   RequireUpdateShouldNotifyRule.new,
   AvoidGlobalRiverpodProvidersRule.new,

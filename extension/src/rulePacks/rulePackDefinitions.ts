@@ -101,6 +101,15 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
     ],
   },
   {
+    id: 'bloc_8',
+    label: 'Bloc 8.x',
+    matchPubNames: ['bloc', 'flutter_bloc', 'hydrated_bloc'],
+    ruleCodes: [
+      'avoid_bloc_map_event_to_state',
+    ],
+    dependencyGate: { package: 'bloc', constraint: '>=8.0.0' },
+  },
+  {
     id: 'collection_compat',
     label: 'collection_compat',
     matchPubNames: ['collection'],

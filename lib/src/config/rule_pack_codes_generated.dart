@@ -69,6 +69,7 @@ const Map<String, Set<String>> kRulePackRuleCodesGenerated = {
     'require_immutable_bloc_state',
     'require_initial_state',
   },
+  'bloc_8': {'avoid_bloc_map_event_to_state'},
   'dio': {
     'avoid_dio_debug_print_production',
     'avoid_dio_form_data_leak',
@@ -417,6 +418,7 @@ const Map<String, Set<String>> kRulePackRuleCodesGenerated = {
 const Map<String, Set<String>> kRulePackPubspecMarkersGenerated = {
   'auto_route': {'auto_route'},
   'bloc': {'bloc', 'flutter_bloc', 'hydrated_bloc'},
+  'bloc_8': {'bloc', 'flutter_bloc', 'hydrated_bloc'},
   'dio': {'dio'},
   'dio_5': {'dio'},
   'drift': {'drift', 'drift_dev'},

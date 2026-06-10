@@ -3665,12 +3665,10 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 **We add a US English spelling check in publish, split the example into sub-packages, and fix fixtures and false positives.**
 
-### Added
+<details>
+<summary>Maintenance</summary>
 
 - **US English spelling check** in publish pipeline: New `_us_spelling.py` module with ~90+ UK-to-US spelling pairs scans all source files for British English and blocks publish until fixed. Integrated as a blocking pre-publish audit step. No action required.
-
-### Changed
-
 - **Split example project into 6 sub-packages**: Resolves Out of Memory crash during custom_lint analysis of 1,542 fixture files. Fixtures are now split across `example_core/`, `example_async/`, `example_widgets/`, `example_style/`, `example_packages/`, and `example_platforms/`, each independently analyzable within memory limits. No action required.
 - **Fixture imports use package imports**: All fixtures now import `flutter_mocks.dart` via `package:saropa_lints_example/flutter_mocks.dart` instead of relative paths. No action required.
 - **New convenience script**: runs analysis across all sub-packages. No action required.
@@ -3679,17 +3677,19 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 - **TODO/FIXME/HACK suppression**: All example `analysis_options.yaml` files suppress `todo`, `fixme`, and `hack` diagnostics. No action required.
 - **Removed version numbers from fixture filenames**: 16 fixture files and 1 test file renamed to remove hard-coded version suffixes (e.g., `stylistic_v270_fixture.dart` → `stylistic_fixture.dart`). No action required.
 - **Stripped version references from comments**: Removed `(from vX.Y.Z)` and `added in vX.Y.Z` from ~22 section headers and comments across fixture files. No action required.
+- **British spellings corrected**: Fixed UK spellings to US English in `prefer_fields_before_methods` correction message, `db_yield_rules` comment, and several CHANGELOG entries. No action required.
+- **TODO audit path separator**: Fixed hardcoded backslash in TODO log grouping to use `os.sep` for cross-platform compatibility. No action required.
+- **Unfulfilled `expect_lint` errors**: Enabled `avoid_nested_assignments`, `avoid_variable_shadowing`, and `verify_documented_parameters_exist` in example `analysis_options.yaml` so fixture `expect_lint` annotations are satisfied. No action required.
+
+</details>
 
 ### Fixed
 
-- **British spellings corrected**: Fixed UK spellings to US English in `prefer_fields_before_methods` correction message, `db_yield_rules` comment, and several CHANGELOG entries. No action required.
-- **TODO audit path separator**: Fixed hardcoded backslash in TODO log grouping to use `os.sep` for cross-platform compatibility. No action required.
 - **`prefer_no_commented_out_code` false positives** (v5): Prose labels like `OK:`, `BAD:`, `GOOD:`, `LINT:` no longer falsely flagged as code. Removed colon from code detection pattern and added `expect_lint:` to special markers. No action required.
 - **`prefer_capitalized_comment_start` false positive** (v4): Continuation comments on consecutive lines no longer flagged for lowercase start. No action required.
 - **`prefer_explicit_type_arguments` false positives** (v6): Empty collections (`[]`, `{}`) with types inferred from context (return type, variable declaration) are no longer flagged. No action required.
 - **`avoid_variable_shadowing` config name mismatch**: Fixed `avoid_shadowing` → `avoid_variable_shadowing` in `custom_lint.yaml` and `analysis_options_template.yaml` to match the actual rule name. No action required.
 - **`verify_documented_parameters_exist` offset bug** (v3): Rule reported lints at wrong source offset when non-doc-comment lines (e.g. `// expect_lint:`) appeared between `///` doc comment lines. Fixed by iterating per-token instead of using joined string offset. No action required.
-- **Unfulfilled `expect_lint` errors**: Enabled `avoid_nested_assignments`, `avoid_variable_shadowing`, and `verify_documented_parameters_exist` in example `analysis_options.yaml` so fixture `expect_lint` annotations are satisfied. No action required.
 
 ---
 
@@ -3697,20 +3697,23 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 **We add unit test coverage for 10 rule categories, JSON violation export, and a new Firebase index rule.**
 
-### Changed
+<details>
+<summary>Maintenance</summary>
 
 - **Roadmap summary bars inverted**: Bars now show completion (0 remaining = full green bar) instead of remaining count, making progress more intuitive. No action required.
 - **DX Message Quality label padding**: Widened impact label column from 10 to 12 chars so "Opinionated" aligns correctly. No action required.
 - **Removed duplicate `_make_progress_bar`**: Consolidated with identical `_make_bar` function in rule metrics. No action required.
+- **Unit test coverage for 10 rule categories** (1256 tests): Behavior documentation tests for `widget_patterns` (101 rules), `code_quality` (100 rules), `ios` (89 rules), `widget_layout` (73 rules), `security` (53 rules), `async` (46 rules), `bloc` (52 rules), `riverpod` (37 rules), `provider` (27 rules), and `firebase` (25 rules) —. No action required.
+- **Unit test coverage metric** in publish workflow: New `display_unit_test_coverage` report shows per-category test file status alongside the existing fixture coverage metric. No action required.
+- **`toRelativePath` shared utility**: Extracted from duplicated path normalization logic in the report pipeline. No action required.
+
+</details>
 
 ### Added
 
-- **Unit test coverage for 10 rule categories** (1256 tests): Behavior documentation tests for `widget_patterns` (101 rules), `code_quality` (100 rules), `ios` (89 rules), `widget_layout` (73 rules), `security` (53 rules), `async` (46 rules), `bloc` (52 rules), `riverpod` (37 rules), `provider` (27 rules), and `firebase` (25 rules) —. No action required.
-- **Unit test coverage metric** in publish workflow: New `display_unit_test_coverage` report shows per-category test file status alongside the existing fixture coverage metric. No action required.
 - **Structured JSON violation export** (`reports/.saropa_lints/violations.json`): Machine-readable export of all lint violations written alongside the markdown report after each analysis run. Enables Saropa Log Capture to cross-reference runtime errors with static analysis findings. Schema v1. No action required.
 - **`VIOLATION_EXPORT_API.md`**: Exhaustive API reference for the structured JSON export schema — field types, sort order, OWASP ID tables, consumer notes, and full examples. No action required.
 - **`correction` field on `ViolationRecord`**: Carries `LintCode.correctionMessage` through the batch pipeline into both the markdown report and JSON export. No action required.
-- **`toRelativePath` shared utility**: Extracted from duplicated path normalization logic in the report pipeline. No action required.
 - **New Essential rule**: `require_firebase_composite_index` (ERROR) — detects Firebase Realtime Database queries using `orderByChild` with filter methods that need a `.indexOn` rule in database security rules. No action required.
 
 ---
@@ -3746,9 +3749,13 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
   - `require_feature_flag_type_safety`: `isEnabled()` moved to target-filtered set; `notification.isEnabled()` no longer triggers
 - **Double-fire note**: `avoid_synchronous_file_io` (Professional) is now also covered by `avoid_blocking_main_thread` (Essential) which adds isolate detection. No action required.
 
-- **Rule versioning**: Added `{vN}` version suffixes and `Since: vX.Y.Z` DartDoc provenance to all rules. No action required.
+<details>
+<summary>Maintenance</summary>
 
+- **Rule versioning**: Added `{vN}` version suffixes and `Since: vX.Y.Z` DartDoc provenance to all rules. No action required.
 - **Publish script enhancements**: Auto-sync README/ROADMAP rule counts, roadmap header sync, GitHub issue tracking. No action required.
+
+</details>
 
 ---
 
@@ -3774,17 +3781,19 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 - **Report: analysis configuration header**: Reports now include tier, enabled rules, platforms, packages, user exclusions, and verbatim `analysis_options_custom.yaml` content. No action required.
 
-- **Publish gate: `[rule_name]` prefix required in all problemMessage strings**: The publish script now blocks release if any rule's `problemMessage` does not start with `[rule_name]`. All 15 previously non-compliant rules have been updated. No action required.
-
-- **CI guard: `.contains()` anti-pattern detection test**: New test scans all rule files for 9 dangerous `String.contains()` patterns (e.g. `methodName.contains(`, `toSource().contains(`) and fails CI if new violations are introduced. Per-file baseline counts track the 1,100+ existing instances; baselines tighten as violations are removed. No action required.
-
-- **Shared utility: `target_matcher_utils.dart`**: Four functions (`extractTargetName`, `isExactTarget`, `isFieldCleanedUp`, `hasChainedMethod`) that replace the most common `.contains()` anti-patterns with exact-match and AST-based detection. No action required.
-
-- **False-positive regression tests**: 7 new test cases in `false_positive_fixes_test.dart` covering the patterns that caused the most real-world false positives (location timeout, navigator match, context access, HTTP status, scroll controller dispose). No action required.
-
 - **Report: import graph priority scoring**: New FILE IMPORTANCE section ranks every analyzed file by a combined score of fan-in (how many files import it) and architectural layer weight. New FIX PRIORITY section sorts all violations by `impact * (importance + 1) * layer_weight` so the developer sees what to fix first. No action required.
 
 - **Report: multi-isolate batch consolidation**: Reports now merge data from all isolate restarts within a session instead of losing earlier analysis data. Each isolate writes a batch file; the final report consolidates all batches into one combined report. No action required.
+
+<details>
+<summary>Maintenance</summary>
+
+- **Publish gate: `[rule_name]` prefix required in all problemMessage strings**: The publish script now blocks release if any rule's `problemMessage` does not start with `[rule_name]`. All 15 previously non-compliant rules have been updated. No action required.
+- **CI guard: `.contains()` anti-pattern detection test**: New test scans all rule files for 9 dangerous `String.contains()` patterns (e.g. `methodName.contains(`, `toSource().contains(`) and fails CI if new violations are introduced. Per-file baseline counts track the 1,100+ existing instances; baselines tighten as violations are removed. No action required.
+- **Shared utility: `target_matcher_utils.dart`**: Four functions (`extractTargetName`, `isExactTarget`, `isFieldCleanedUp`, `hasChainedMethod`) that replace the most common `.contains()` anti-patterns with exact-match and AST-based detection. No action required.
+- **False-positive regression tests**: 7 new test cases in `false_positive_fixes_test.dart` covering the patterns that caused the most real-world false positives (location timeout, navigator match, context access, HTTP status, scroll controller dispose). No action required.
+
+</details>
 
 ---
 
@@ -3834,11 +3843,13 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 - **Analysis report captures all violations**: The debounce timer's write-once guard caused reports to contain only the first batch of violations when analysis gaps exceeded 3 seconds. Reports now overwrite on each debounce cycle so the final output reflects the complete analysis. No action required.
 
-### Added
+<details>
+<summary>Maintenance</summary>
 
 - **Regression tests for violation parser**: Added 16 tests covering `parseViolations()` and the `Violation` model to guard against future `custom_lint` output format changes (see PR #84 / PR #90). No action required.
-
 - **Updated PR #84 review document**: Corrected merge status (PR #84 was closed in favor of PR #90), added timeline, risk table, and regression test reference. No action required.
+
+</details>
 
 ---
 
@@ -3876,9 +3887,12 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 **We centralize violation-parsing logic (PR #84).**
 
-### Changed
+<details>
+<summary>Maintenance</summary>
 
 - Centralized the duplicated violation-parsing logic from the `baseline` and `impact_report` tools. This resolves a structural issue highlighted by the regex fix in PR #84 and makes future updates more robust. (Thanks [@icealive](https://github.com/icealive!)). No action required.
+
+</details>
 
 ---
 
@@ -3904,7 +3918,12 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 ### Added
 
 - **New rule `verify_documented_parameters_exist`** (Professional, WARNING): Detects when dartdoc `[paramName]` references parameters that do not exist in the function signature. Complements the existing `require_parameter_documentation` rule which checks the inverse direction. No action required.
+<details>
+<summary>Maintenance</summary>
+
 - **Added Documentation Rules section to ROADMAP** (section 1.63): Lists all 9 documentation rules including the new `verify_documented_parameters_exist`. No action required.
+
+</details>
 
 ---
 
@@ -3937,13 +3956,19 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 - **Improved diagnostic messages on 503 rules across 76 files**: Expanded short `problemMessage` and `correctionMessage` strings using DartDoc context, fixed vague language ("consider" to direct commands, "should be" to "must be"), and appended category-specific consequences and testing advice. All 503 rules now fully pass DX quality thresholds.
 - **Rewrote DX messages on 24 rules to pass all quality checks**: Replaced generic boilerplate with rule-specific explanations (18 rules), fixed passive voice to active (3 rules: `require_freezed_explicit_json`, `prefer_on_field_submitted`, `prefer_intl_name`), removed escaped single quotes that broke audit regex parsing (2 rules. No action required.
-- **Publish script defers version prompt until after analysis**: The `publish_to_pubdev.py` script no longer asks for the publish version upfront. Audits, prerequisites, tests, formatting, and static analysis all run first; the version prompt now appears at Step 8 only after all analysis passes. No action required.
 
 - **`prefer_expanded_at_call_site` severity upgraded to ERROR**: Bumped from WARNING to ERROR and impact from medium to critical — returning Expanded/Flexible/Spacer from `build()` causes the same class of runtime crash (ParentDataWidget error) as `avoid_expanded_outside_flex`. Moved from recommended tier to essential tier. No action required.
 - **`prefer_expanded_at_call_site` now detects `Spacer`**: Added `Spacer` to the detection set alongside `Expanded` and `Flexible`. Returning `Spacer` from `build()` has the same crash risk since it wraps `Expanded` internally. No action required.
 - **`avoid_expanded_outside_flex` now detects `Spacer`**: Same `Spacer` gap fixed in the sibling rule. No action required.
 - **`prefer_expanded_at_call_site` quick fix now unwraps**: Replaced the `// HACK` comment insertion with a proper code transformation that extracts the `child` argument and returns it directly. Not offered for `Spacer` (no child to extract). No action required.
 - **`avoid_expanded_outside_flex` improved diagnostic messages**: Expanded `problemMessage` to explain the FlexParentData/RenderFlex mechanism and the indirect `build()` return case. Expanded `correctionMessage` with actionable guidance for reusable widgets. Added "Why This Crashes" dartdoc section explaining the ParentDataWidget error. No action required.
+
+<details>
+<summary>Maintenance</summary>
+
+- **Publish script defers version prompt until after analysis**: The `publish_to_pubdev.py` script no longer asks for the publish version upfront. Audits, prerequisites, tests, formatting, and static analysis all run first; the version prompt now appears at Step 8 only after all analysis passes. No action required.
+
+</details>
 
 ---
 
@@ -4002,13 +4027,16 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 - **README: Added platform and package configuration documentation**: Expanded the platform configuration section with a table showing rule counts and examples for all 6 platforms (iOS, Android, macOS, Web, Windows, Linux), shared platform groups (Apple, Desktop), and how shared rules are handled. No action required.
 
-### Package Publishing
+<details>
+<summary>Maintenance</summary>
 
 - **Publish script: version prompt with timeout**: Script now prompts for the publish version (pre-filled with pubspec value, 30s timeout) allowing major/minor bumps without manual pubspec edits
 - **Publish script: [Unreleased] renamed to version before publishing**: The `[Unreleased]` section in CHANGELOG.md is automatically renamed to the publish version at the start of the workflow
 - **Publish script: duplicate version detection**: Publishing fails immediately if the git tag or GitHub release already exists, instead of continuing silently
 - **Publish script: GitHub release failure is now a blocker**: Script exits on release creation failure instead of warning and continuing to post-publish steps
 - **Publish script: removed automatic post-publish version bump**: The script no longer commits an unpublished version number to the repository after publishing
+
+</details>
 
 ---
 
@@ -4020,13 +4048,9 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 - **New rules: `require_yield_between_db_awaits`, `avoid_return_await_db`**: Two database/IO yield rules that detect missing `yieldToUI()` calls after heavy DB or file I/O awaits. Prevents UI jank caused by blocking the main thread with consecutive database operations. Both rules include quick fixes that insert `await DelayUtils. No action required.
 
-- **Extracted package rules into dedicated files**: Bloc rules (52) to `bloc_rules.dart`, Provider rules (26) to `provider_rules.dart`, Dio rules (14) to `dio_rules.dart`, SharedPreferences rules (10) to `shared_preferences_rules.dart`, GetIt rules (3) to `get_it_rules.dart`. Also Riverpod rules (37) expanded in `riverpod_rules. No action required.
-
 ### Changed
 
 - **Moved ~40 opinionated rules from tier sets to stylistic tier**: Rules with no performance or correctness benefit — code style preferences, formatting, ordering, and naming conventions — are now in `stylisticRules` instead of their original tier sets (recommended, professional, comprehensive, insanity). No action required.
-
-- **Audit report now includes DX Message Quality section**: The full audit markdown report (`reports/*_full_audit.md`) now exports the complete DX quality analysis — summary tables by impact level and tier, issues grouped by type, and a searchable per-rule failing table with tier, impact, score, and specific issues. No action required.
 
 - **Improved DX message quality for 28 lint rules**: Rewrote `problemMessage` and `correctionMessage` for rules whose messages started with imperative "Avoid" phrasing or were under 200 characters. Messages now use declarative statements that describe what was detected, explain the specific consequence, and provide concrete fix guidance. No action required.
 
@@ -4051,6 +4075,14 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 ### Removed
 
 - **3 duplicate rules removed**: `require_prefs_key_constants` (duplicate of `require_shared_prefs_key_constants`), `require_equatable_immutable` (duplicate of `avoid_mutable_field_in_equatable`), `avoid_equatable_mutable_collections` (duplicate of `prefer_unmodifiable_collections`). Removed from rule files, `_allRuleFactories`, tiers, and analysis options. No action required.
+
+<details>
+<summary>Maintenance</summary>
+
+- **Extracted package rules into dedicated files**: Bloc rules (52) to `bloc_rules.dart`, Provider rules (26) to `provider_rules.dart`, Dio rules (14) to `dio_rules.dart`, SharedPreferences rules (10) to `shared_preferences_rules.dart`, GetIt rules (3) to `get_it_rules.dart`. Also Riverpod rules (37) expanded in `riverpod_rules. No action required.
+- **Audit report now includes DX Message Quality section**: The full audit markdown report (`reports/*_full_audit.md`) now exports the complete DX quality analysis — summary tables by impact level and tier, issues grouped by type, and a searchable per-rule failing table with tier, impact, score, and specific issues. No action required.
+
+</details>
 
 ### Archive
 
@@ -4115,13 +4147,18 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 ### Changed
 
-- **DX audit now enforces message length on opinionated rules**: The `_audit_dx.py` scoring previously skipped all length checks for `LintImpact.opinionated` rules (stylistic tier), allowing 30-50 character messages to score 100%. Added 100-character minimum threshold (-10 penalty). No action required.
-
 - **Improved problemMessage for ~98 stylistic rules**: Expanded short problem messages (many under 50 characters) to include rationale and consequences, matching the quality bar already enforced on critical/high/medium rules. Each message now explains what was detected AND why it matters, giving users enough context to evaluate whether to enable the rule. No action required.
 
 - **`init` CLI now outputs ANSI colors on Windows**: The `dart run saropa_lints:init` command previously produced monocolor output on Windows terminals because the color detection was too conservative. Now enables Virtual Terminal Processing via the Windows API (`SetConsoleMode`) at startup, uses `stdout. No action required.
 
 - **Aligned DiagnosticSeverity with actual risk across ~28 rules**: Audited all 1,681 rules for severity-vs-impact mismatches. Upgraded 9 crash-path rules from INFO to ERROR (permission failures, missing error boundaries, unhandled navigation results). No action required.
+
+<details>
+<summary>Maintenance</summary>
+
+- **DX audit now enforces message length on opinionated rules**: The `_audit_dx.py` scoring previously skipped all length checks for `LintImpact.opinionated` rules (stylistic tier), allowing 30-50 character messages to score 100%. Added 100-character minimum threshold (-10 penalty). No action required.
+
+</details>
 
 ---
 
@@ -4148,13 +4185,7 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 ### Changed
 
-- **Audit report filenames include project name**: Exported audit reports now include the project name from `pubspec.yaml` in the filename (e.g. `20260202_090730_saropa_lints_full_audit.md` instead of `20260202_090730_full_audit.md`). Applies to both full audit and DX audit reports. No action required.
-
-- **DX audit per-tier breakdown**: The DX Message Quality report now includes a "By tier" section showing passing/total counts and percentages for each tier (Essential, Recommended, Professional, Comprehensive, Insanity, Stylistic), color-coded to match the tier distribution display. No action required.
-
 - **DX message quality improvements (27 rules)**: Improved problem and correction messages to pass DX audit checks. Essential tier now 159/159 (100%), Stylistic tier 134/134 (100%). Eliminated all "should have" (3), passive voice (2), and "better" (1) violations. No action required.
-
-- **DX audit grouping**: Length-based issue categories no longer fragment by exact character count. Rules that are "too short" or have a "correction too short" are now grouped into single buckets per threshold instead of one bucket per distinct length. No action required.
 
 - **`analysis_options_custom.yaml` now includes a STYLISTIC RULES section**: All opinionated/stylistic rules are listed by category between PLATFORM SETTINGS and RULE OVERRIDES, with descriptions read from rule metadata. Users can toggle individual rules (`true`/`false`) to opt in without the `--stylistic` flag. No action required.
 

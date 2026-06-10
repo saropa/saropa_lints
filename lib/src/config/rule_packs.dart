@@ -79,6 +79,10 @@ const Map<String, RulePackDependencyGate> kRulePackDependencyGates = {
   // flags the removed type; it is relocated out of the base `dio` pack so a
   // dio 4.x project (where DioError is still valid) never sees it.
   'dio_5': RulePackDependencyGate(dependency: 'dio', constraint: '>=5.0.0'),
+  // bloc 8.0.0 removed the `mapEventToState` override in favor of `on<Event>`
+  // handlers. avoid_bloc_map_event_to_state is relocated out of the base `bloc`
+  // pack so bloc 7.x projects (where the override is valid) never see it.
+  'bloc_8': RulePackDependencyGate(dependency: 'bloc', constraint: '>=8.0.0'),
 };
 
 /// Packs that require pubspec `environment` SDK constraints (Phase 6).

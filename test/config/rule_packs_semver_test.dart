@@ -68,6 +68,14 @@ void main() {
       expect(packPassesDependencyGate('dio_5', {'dio': '4.0.6'}), isFalse);
       expect(packPassesDependencyGate('dio_5', null), isFalse);
     });
+
+    // bloc_8 gates avoid_bloc_map_event_to_state on the mapEventToState removal.
+    test('bloc_8 passes on bloc >=8.0.0, fails on 7.x and without lock', () {
+      expect(packPassesDependencyGate('bloc_8', {'bloc': '8.0.0'}), isTrue);
+      expect(packPassesDependencyGate('bloc_8', {'bloc': '8.1.4'}), isTrue);
+      expect(packPassesDependencyGate('bloc_8', {'bloc': '7.2.1'}), isFalse);
+      expect(packPassesDependencyGate('bloc_8', null), isFalse);
+    });
   });
 
   group('riverpod_2 ownership', () {
@@ -88,6 +96,17 @@ void main() {
     test('avoid_dio_error is in dio_5, not dio', () {
       expect(ruleCodesForPack('dio_5'), contains('avoid_dio_error'));
       expect(ruleCodesForPack('dio'), isNot(contains('avoid_dio_error')));
+    });
+
+    test('avoid_bloc_map_event_to_state is in bloc_8, not bloc', () {
+      expect(
+        ruleCodesForPack('bloc_8'),
+        contains('avoid_bloc_map_event_to_state'),
+      );
+      expect(
+        ruleCodesForPack('bloc'),
+        isNot(contains('avoid_bloc_map_event_to_state')),
+      );
     });
   });
 

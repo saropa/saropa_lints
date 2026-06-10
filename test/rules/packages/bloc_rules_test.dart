@@ -28,6 +28,11 @@ void main() {
       () => AvoidBlocEventInConstructorRule(),
     );
     testRule(
+      'AvoidBlocMapEventToStateRule',
+      'avoid_bloc_map_event_to_state',
+      () => AvoidBlocMapEventToStateRule(),
+    );
+    testRule(
       'RequireBlocCloseRule',
       'require_bloc_close',
       () => RequireBlocCloseRule(),
