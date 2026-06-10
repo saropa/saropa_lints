@@ -12,7 +12,7 @@
 
 ### Next 3 (ordered)
 
-- [ ] **DOC-01 (P0)** Create a current top-25 backfill queue from `_code_comment_metrics.py` and commit it under `plans/history/` with date stamp.
+- [x] **DOC-01 (P0)** Create a current top-25 backfill queue from `_code_comment_metrics.py` and commit it under `plans/history/` with date stamp. → [history/2026.06/2026.06.10/comment_coverage_backfill_queue.md](history/2026.06/2026.06.10/comment_coverage_backfill_queue.md) (2026-06-10).
 - [ ] **DOC-02 (P0)** Complete one focused backfill batch (10 files) to full Part 2 depth, including locals/branches/loops documentation coverage.
 - [ ] **DOC-03 (P1)** Add a lightweight verification checklist script/report so each batch captures evidence beyond raw density.
 
