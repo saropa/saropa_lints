@@ -204,3 +204,63 @@ void _badVariableNameFalseNegative() {
     },
   );
 }
+
+// GOOD: builder is a method tear-off whose body handles snapshot.hasError.
+// The old substring check fired on every tear-off; the new check resolves
+// the referenced method and inspects its body.
+class _GoodTearOffState extends State<StatefulWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<int>(future: null, builder: _buildContent);
+  }
+
+  Widget _buildContent(BuildContext context, AsyncSnapshot<int> snapshot) {
+    if (snapshot.hasError) {
+      return Text('error');
+    }
+    return Text('${snapshot.data}');
+  }
+}
+
+// GOOD: StreamBuilder with a static tear-off whose body handles hasError.
+class _GoodStaticTearOffState extends State<StatefulWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<int>(stream: null, builder: _staticBuild);
+  }
+
+  static Widget _staticBuild(
+    BuildContext context,
+    AsyncSnapshot<int> snapshot,
+  ) {
+    if (snapshot.hasError) {
+      return Text('error');
+    }
+    return Text('${snapshot.data}');
+  }
+}
+
+// BAD: tear-off whose body does NOT handle hasError — must still fire.
+class _BadTearOffState extends State<StatefulWidget> {
+  @override
+  Widget build(BuildContext context) {
+    // expect_lint: require_error_widget
+    return FutureBuilder<int>(future: null, builder: _buildNoError);
+  }
+
+  Widget _buildNoError(BuildContext context, AsyncSnapshot<int> snapshot) {
+    return Text('${snapshot.data}');
+  }
+}
+
+// GOOD: tear-off that is not declared locally (cross-library) — suppress
+// rather than guarantee a false positive.
+class _ExternalTearOffState extends State<StatefulWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<int>(
+      future: null,
+      builder: externalBuilderFromElsewhere,
+    );
+  }
+}

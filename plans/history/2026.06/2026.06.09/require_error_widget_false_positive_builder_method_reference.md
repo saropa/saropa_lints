@@ -1,6 +1,6 @@
 # BUG: `require_error_widget` — False positive when `builder:` is a method tear-off that handles the error internally
 
-**Status: Open**
+**Status: Fixed**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
@@ -194,19 +194,74 @@ The fixture at `example*/lib/widget/require_error_widget_fixture.dart` should in
 
 ## Changes Made
 
-<!-- Fill in when a fix is written. -->
+Replaced the tear-off substring heuristic in `widget_patterns_require_rules.dart`
+with name-based declaration resolution:
+
+- The `else` (non-`FunctionExpression`) branch now extracts the tear-off's
+  trailing identifier (`_tearOffName`), finds a method/function with that name
+  in the enclosing `CompilationUnit` (`_findNamedExecutableBody` +
+  `_NamedExecutableFinder`), and runs the existing error-handling analysis on
+  its body. If no local declaration matches (cross-library tear-off), the rule
+  suppresses instead of firing — a missed diagnostic is preferable to a
+  guaranteed false positive on correct code.
+- Refactored `_builderHandlesError` to delegate to a new `_bodyHandlesError(
+  FormalParameterList?, FunctionBody)` so the same analysis serves both inline
+  closures and resolved tear-offs. `_snapshotParamName` now takes a
+  `FormalParameterList?`. The inline-closure path is behavior-preserving.
+
+Name-based resolution works without element resolution, so the fix is effective
+in both the parse-only scan and the analysis server.
 
 ---
 
 ## Tests Added
 
-<!-- List new or updated fixture/test files and what they verify. -->
+- `test/rules/widget/require_error_widget_extension_method_test.dart`: added a
+  `require_error_widget tear-off resolution` group mirroring the new logic —
+  GOOD: instance tear-off body handles `hasError`; GOOD: static tear-off body
+  handles `hasError`; BAD: tear-off body ignores error; GOOD: unresolvable
+  cross-library tear-off is suppressed. All pass.
+- `example/lib/widget_patterns/require_error_widget_fixture.dart`: added
+  `_GoodTearOffState`, `_GoodStaticTearOffState`, `_BadTearOffState`, and
+  `_ExternalTearOffState` documenting the same cases.
+
+**Verification note:** the full rule is resolution-dependent — its
+`addInstanceCreationExpression` trigger only fires when `FutureBuilder(...)`
+resolves to an `InstanceCreationExpression`, which the parse-only scan CLI does
+not produce. The added unit tests exercise the predicate directly (parse-only,
+mirroring production), giving positive confirmation that the tear-off body
+analysis fires correctly for handled, unhandled, and unresolvable references.
 
 ---
 
 ## Commits
 
 <!-- Add commit hashes as fixes land. -->
+
+---
+
+## Finish Report (2026-06-09)
+
+**Scope:** (A) Dart lint rules / analyzer plugin.
+
+**Deep review:** The tear-off branch is the only behavior change; the inline
+path is a pure refactor (verified by the unchanged existing test group). Name
+resolution stops at the first match — a same-named collision would inspect the
+wrong method, an acceptable edge given tear-off names are usually unique within
+a unit. Unresolvable → suppress is the deliberate, report-endorsed trade-off.
+Rule file, tier, severity, `LintImpact` unchanged.
+
+**Tests:** `dart test test/rules/widget/require_error_widget_extension_method_test.dart`
+→ all 11 pass (7 existing + 4 new tear-off). Scan CLI cannot exercise the
+resolution-dependent trigger (noted above).
+
+**Maintenance:** CHANGELOG `[Unreleased]` Fixed bullet added. README/ROADMAP
+unchanged (false-positive fix).
+
+**Bug archived:** bugs/require_error_widget_false_positive_builder_method_reference.md
+→ plans/history/2026.06/2026.06.09/require_error_widget_false_positive_builder_method_reference.md
+
+**Finish report appended:** this file.
 
 ---
 

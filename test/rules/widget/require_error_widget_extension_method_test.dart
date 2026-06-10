@@ -158,6 +158,118 @@ void main() {
       expect(builderHandlesError(builder), isTrue);
     });
   });
+
+  // Bug: bugs/require_error_widget_false_positive_builder_method_reference.md
+  //
+  // When `builder:` is a method tear-off, the rule resolves the referenced
+  // declaration BY NAME within the compilation unit and runs the same
+  // error-handling analysis on its body. Unresolvable tear-offs are suppressed
+  // (treated as handled) rather than reported. These tests mirror
+  // `RequireErrorWidgetRule._findNamedExecutableBody` + `_bodyHandlesError`.
+
+  String? snapshotFromParams(FormalParameterList? params) {
+    if (params == null) return null;
+    final list = params.parameters;
+    if (list.length < 2) return null;
+    final second = list[1];
+    final inner = second is DefaultFormalParameter ? second.parameter : second;
+    if (inner is SimpleFormalParameter) return inner.name?.lexeme;
+    return null;
+  }
+
+  bool tearOffHandlesError(String source, String name) {
+    final unit = parseString(content: source, throwIfDiagnostics: false).unit;
+    final finder = _NamedBodyFinder(name);
+    unit.visitChildren(finder);
+    final found = finder.result;
+    // Unresolvable tear-off — production suppresses (no false positive).
+    if (found == null) return true;
+    final v = _Visitor(snapshotFromParams(found.params));
+    found.body.visitChildren(v);
+    return v.handlesError;
+  }
+
+  group('require_error_widget tear-off resolution', () {
+    test('GOOD: tear-off method body handles hasError', () {
+      expect(
+        tearOffHandlesError('''
+          class S {
+            build() => FutureBuilder(builder: _buildContent);
+            Widget _buildContent(ctx, snapshot) {
+              if (snapshot.hasError) return ErrorView();
+              return Text(snapshot.data.toString());
+            }
+          }
+        ''', '_buildContent'),
+        isTrue,
+      );
+    });
+
+    test('GOOD: static tear-off method body handles hasError', () {
+      expect(
+        tearOffHandlesError('''
+          class S {
+            build() => StreamBuilder(builder: _staticBuild);
+            static Widget _staticBuild(ctx, snapshot) {
+              if (snapshot.hasError) return ErrorView();
+              return Text(snapshot.data.toString());
+            }
+          }
+        ''', '_staticBuild'),
+        isTrue,
+      );
+    });
+
+    test('BAD: tear-off method body ignores error', () {
+      expect(
+        tearOffHandlesError('''
+          class S {
+            build() => FutureBuilder(builder: _no);
+            Widget _no(ctx, snapshot) => Text(snapshot.data.toString());
+          }
+        ''', '_no'),
+        isFalse,
+      );
+    });
+
+    test('GOOD: unresolvable cross-library tear-off is suppressed', () {
+      expect(
+        tearOffHandlesError('''
+          class S {
+            build() => FutureBuilder(builder: externalThing);
+          }
+        ''', 'externalThing'),
+        isTrue,
+      );
+    });
+  });
+}
+
+/// Mirrors `RequireErrorWidgetRule._findNamedExecutableBody`: finds the first
+/// method/function named [targetName] and captures its params and body.
+class _NamedBodyFinder extends RecursiveAstVisitor<void> {
+  _NamedBodyFinder(this.targetName);
+  final String targetName;
+  ({FormalParameterList? params, FunctionBody body})? result;
+
+  @override
+  void visitMethodDeclaration(MethodDeclaration node) {
+    if (result == null && node.name.lexeme == targetName) {
+      result = (params: node.parameters, body: node.body);
+    }
+    super.visitMethodDeclaration(node);
+  }
+
+  @override
+  void visitFunctionDeclaration(FunctionDeclaration node) {
+    if (result == null && node.name.lexeme == targetName) {
+      result = (
+        params: node.functionExpression.parameters,
+        body: node.functionExpression.body,
+      );
+    }
+    super.visitFunctionDeclaration(node);
+  }
 }
 
 class _Visitor extends RecursiveAstVisitor<void> {

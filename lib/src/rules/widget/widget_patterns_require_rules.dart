@@ -1135,13 +1135,20 @@ class RequireErrorWidgetRule extends SaropaLintRule {
               reporter.atNode(node.constructorName, code);
             }
           } else {
-            // Non-inline builder (method tear-off, identifier reference,
-            // etc.). We cannot see the body, so fall back to the original
-            // source-substring heuristic to preserve prior behavior on
-            // those shapes.
-            final String builderSource = expr.toSource();
-            if (!builderSource.contains('hasError') &&
-                !builderSource.contains('.error')) {
+            // Method tear-off / identifier reference (`builder: _buildContent`).
+            // The old code fell back to `expr.toSource().contains('hasError')`,
+            // which is just the identifier name — so it ALWAYS fired, even when
+            // the referenced method fully handles `snapshot.hasError`. Resolve
+            // the referenced declaration by name within the compilation unit and
+            // inspect its body with the same analysis used for inline builders.
+            // If it cannot be located (cross-library tear-off), suppress rather
+            // than emit a guaranteed false positive on correct code.
+            // See: bugs/require_error_widget_false_positive_builder_method_reference.md
+            final String? name = _tearOffName(expr);
+            final ({FormalParameterList? params, FunctionBody body})? resolved =
+                name == null ? null : _findNamedExecutableBody(node, name);
+            if (resolved == null) return;
+            if (!_bodyHandlesError(resolved.params, resolved.body)) {
               reporter.atNode(node.constructorName, code);
             }
           }
@@ -1167,10 +1174,43 @@ class RequireErrorWidgetRule extends SaropaLintRule {
   ///    (e.g. `handleError(...)`, `reportErrorIfAny()` called without a
   ///    target prefix)
   static bool _builderHandlesError(FunctionExpression builder) {
-    final String? snapshotName = _snapshotParamName(builder);
+    return _bodyHandlesError(builder.parameters, builder.body);
+  }
+
+  /// Runs the error-handling analysis over an arbitrary builder body — used for
+  /// both inline closures and resolved method tear-offs.
+  static bool _bodyHandlesError(
+    FormalParameterList? params,
+    FunctionBody body,
+  ) {
+    final String? snapshotName = _snapshotParamName(params);
     final _ErrorHandlingVisitor visitor = _ErrorHandlingVisitor(snapshotName);
-    builder.body.visitChildren(visitor);
+    body.visitChildren(visitor);
     return visitor.handlesError;
+  }
+
+  /// The trailing identifier of a `builder:` tear-off (`_buildContent`,
+  /// `this._build`, `SomeClass.build`), or null for shapes we cannot name.
+  static String? _tearOffName(Expression expr) {
+    if (expr is SimpleIdentifier) return expr.name;
+    if (expr is PrefixedIdentifier) return expr.identifier.name;
+    if (expr is PropertyAccess) return expr.propertyName.name;
+    return null;
+  }
+
+  /// Finds a method/function named [name] within the enclosing compilation unit
+  /// and returns its parameter list and body. Name-based so it works without
+  /// element resolution; returns null when no local declaration matches (e.g. a
+  /// cross-library tear-off), in which case the caller suppresses rather than
+  /// false-positives.
+  static ({FormalParameterList? params, FunctionBody body})?
+  _findNamedExecutableBody(AstNode anyNode, String name) {
+    final CompilationUnit? unit =
+        anyNode.thisOrAncestorOfType<CompilationUnit>();
+    if (unit == null) return null;
+    final _NamedExecutableFinder finder = _NamedExecutableFinder(name);
+    unit.visitChildren(finder);
+    return finder.result;
   }
 
   /// Returns the name of the snapshot parameter — the second positional
@@ -1178,8 +1218,7 @@ class RequireErrorWidgetRule extends SaropaLintRule {
   /// `(BuildContext context, AsyncSnapshot<T> snapshot) => ...`.
   /// Returns null when the shape doesn't match (still safe — the visitor
   /// then only matches patterns 1 and 3 above).
-  static String? _snapshotParamName(FunctionExpression builder) {
-    final FormalParameterList? params = builder.parameters;
+  static String? _snapshotParamName(FormalParameterList? params) {
     if (params == null) return null;
     final NodeList<FormalParameter> list = params.parameters;
     if (list.length < 2) return null;
@@ -1193,6 +1232,35 @@ class RequireErrorWidgetRule extends SaropaLintRule {
       return inner.name?.lexeme;
     }
     return null;
+  }
+}
+
+/// Finds the first method/function declaration named [targetName] in a subtree
+/// and captures its parameter list and body, so a `builder:` method tear-off
+/// can be analyzed for error handling the same way an inline closure is.
+class _NamedExecutableFinder extends RecursiveAstVisitor<void> {
+  _NamedExecutableFinder(this.targetName);
+
+  final String targetName;
+  ({FormalParameterList? params, FunctionBody body})? result;
+
+  @override
+  void visitMethodDeclaration(MethodDeclaration node) {
+    if (result == null && node.name.lexeme == targetName) {
+      result = (params: node.parameters, body: node.body);
+    }
+    super.visitMethodDeclaration(node);
+  }
+
+  @override
+  void visitFunctionDeclaration(FunctionDeclaration node) {
+    if (result == null && node.name.lexeme == targetName) {
+      result = (
+        params: node.functionExpression.parameters,
+        body: node.functionExpression.body,
+      );
+    }
+    super.visitFunctionDeclaration(node);
   }
 }
 
