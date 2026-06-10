@@ -79,7 +79,7 @@ const Set<String> _scrollableTypes = <String>{
 /// here once instead of being copied per widget/parent pair (which is exactly
 /// the near-duplicate sprawl these rules are meant to replace).
 abstract class _CompoundPerformanceRule extends SaropaLintRule {
-  _CompoundPerformanceRule(super.code);
+  _CompoundPerformanceRule(LintCode code) : super(code: code);
 
   /// Type names of the costly child widget(s) this rule flags.
   Set<String> get costlyWidgets;
@@ -105,14 +105,35 @@ abstract class _CompoundPerformanceRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    // The same widget construction is an InstanceCreationExpression under a
+    // resolved tree (IDE / `dart analyze`) but a target-less MethodInvocation
+    // under an unresolved tree (the `scan` CLI uses `parseString`). The two
+    // forms never occur for the same node simultaneously, so registering both
+    // makes the rule behave identically in every host without double-reporting.
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String? name = _constructionTypeName(node);
-      if (name == null || !costlyWidgets.contains(name)) return;
-
-      if (_enclosingWidgetOfType(node, problematicParents) != null) {
-        reporter.atNode(node);
-      }
+      if (name != null) _reportIfNested(reporter, node, name);
     });
+
+    context.addMethodInvocation((MethodInvocation node) {
+      // A widget constructor in an unresolved tree parses as `Foo(...)` with no
+      // target; a genuine `obj.method()` call has a target and is not a widget.
+      if (node.target != null) return;
+      _reportIfNested(reporter, node, node.methodName.name);
+    });
+  }
+
+  /// Reports [node] when [widgetName] is one of the costly widgets and it sits
+  /// inside one of the [problematicParents].
+  void _reportIfNested(
+    SaropaDiagnosticReporter reporter,
+    AstNode node,
+    String widgetName,
+  ) {
+    if (!costlyWidgets.contains(widgetName)) return;
+    if (_enclosingWidgetOfType(node, problematicParents) != null) {
+      reporter.atNode(node);
+    }
   }
 }
 

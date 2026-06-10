@@ -920,6 +920,15 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_json_encode_in_build',
   'avoid_canvas_operations_in_build',
 
+  // Compound (context-aware) performance — expensive widget inside a costly
+  // parent. High signal: requires both the widget and the problematic ancestor.
+  'avoid_opacity_in_animated_builder',
+  'avoid_opacity_in_scrollable',
+  'avoid_backdrop_filter_in_scrollable',
+  'avoid_shader_mask_in_scrollable',
+  'avoid_image_filter_in_scrollable',
+  'avoid_clip_path_in_animated_builder',
+
   // Scroll and List Performance
   'avoid_shrinkwrap_in_scrollview',
   'avoid_nested_scrollables_conflict',

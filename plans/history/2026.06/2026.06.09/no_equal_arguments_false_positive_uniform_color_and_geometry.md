@@ -1,6 +1,6 @@
 # BUG: `no_equal_arguments` — False Positive on Intentional Equal Args in Color and Geometry Constructors
 
-**Status: Open**
+**Status: Fixed**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
@@ -182,19 +182,58 @@ The fixture at `example*/lib/data/no_equal_arguments_fixture.dart` should includ
 
 ## Changes Made
 
-<!-- Fill in when a fix is written. -->
+Implemented the callee-allowlist fix (Hypothesis A/B) in `equality_rules.dart`:
+
+- Added `_equalArgIdiomaticCallees` = `{fromRGBO, fromARGB, fromLTRB, Size,
+  Offset}` and the `_calleeName(AstNode?)` helper. Before the duplicate-arg
+  loop, `runWithReporter` resolves the parent call's callee name and returns
+  early when it is in the allowlist.
+- `_calleeName` covers both AST shapes: the parse-only form where
+  `Color.fromRGBO(...)`/`Size(...)` parse as `MethodInvocation` (uses
+  `methodName.name`) and the resolved/`const` form as
+  `InstanceCreationExpression` (uses `constructorName.name?.name ??
+  constructorName.type.name.lexeme`).
 
 ---
 
 ## Tests Added
 
-<!-- Fill in when a fix is written. -->
+- `example/lib/equality/no_equal_arguments_fixture.dart`: added `_goodIdiomatic`
+  (Color.fromRGBO/fromARGB, RelativeRect.fromLTRB, Size, Offset with repeated
+  identifiers — NO lint) and `_badIdentifier` (`setPosition(value, value)` —
+  LINT). Existing `compare(value, value)` BAD case retained.
+- Scan CLI verified: `no_equal_arguments` fires only on the two
+  non-allowlisted self-arg calls; every idiomatic constructor is clean.
 
 ---
 
 ## Commits
 
 <!-- Add commit hashes as fixes land. -->
+
+---
+
+## Finish Report (2026-06-09)
+
+**Scope:** (A) Dart lint rules / analyzer plugin.
+
+**Deep review:** The allowlist is a single set membership check, O(1), no
+traversal. It is purely additive (suppression only) and scoped to five
+well-known geometry/color constructors where equal positional args are the
+documented idiom. The dual-shape `_calleeName` ensures the exemption works in
+both the parse-only scan and the resolved analysis server. Rule file, tier,
+severity (WARNING), `LintImpact` unchanged.
+
+**Tests:** `dart test test/rules/data/equality_rules_test.dart` → all pass.
+Scan-CLI behavior verified as above.
+
+**Maintenance:** CHANGELOG `[Unreleased]` Fixed bullet added. README/ROADMAP
+unchanged (false-positive fix).
+
+**Bug archived:** bugs/no_equal_arguments_false_positive_uniform_color_and_geometry.md
+→ plans/history/2026.06/2026.06.09/no_equal_arguments_false_positive_uniform_color_and_geometry.md
+
+**Finish report appended:** this file.
 
 ---
 

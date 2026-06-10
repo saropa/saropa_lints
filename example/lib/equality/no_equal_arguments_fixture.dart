@@ -115,3 +115,19 @@ void _bad350(int value, int other) {
 void _good350(int value, int other) {
   compare(value, other); // Different arguments
 }
+
+// GOOD: equal args are semantically required by these constructors.
+void _goodIdiomatic(int gray, double x, double y, double d) {
+  Color.fromRGBO(gray, gray, gray, 1.0); // grayscale R==G==B
+  Color.fromARGB(255, gray, gray, gray); // grayscale R==G==B
+  RelativeRect.fromLTRB(x, y, x, y); // point anchor l==r, t==b
+  Size(d, d); // square w==h
+  Offset(d, d); // diagonal dx==dy
+}
+
+// BAD: non-allowlisted callee with a repeated identifier — still a copy-paste
+// smell.
+// expect_lint: no_equal_arguments
+void _badIdentifier(int value) {
+  setPosition(value, value);
+}
