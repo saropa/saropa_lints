@@ -209,4 +209,30 @@ describe('report-webview message handling', () => {
         assert.ok(writtenFiles[0].path.endsWith('pubspec_vibrancy.json'));
         assert.ok(messageMock.infos.some(msg => msg.includes('Saved report JSON')));
     });
+
+    it('saves upgrade report json to a distinct upgrade-suffixed file', async () => {
+        const rootUri = vscode.Uri.file('D:/workspace');
+        mockWorkspaceFolders.value = [{ uri: rootUri }];
+
+        const writtenFiles: Array<{ path: string; size: number }> = [];
+        (vscode.workspace as any).fs.createDirectory = async () => { /* no-op */ };
+        (vscode.workspace as any).fs.writeFile = async (uri: { fsPath: string }, bytes: Uint8Array) => {
+            writtenFiles.push({ path: uri.fsPath, size: bytes.length });
+        };
+
+        VibrancyReportPanel.createOrShow(makeOptions());
+        // The webview already filters to outdated rows; the panel just writes
+        // whatever it receives under the upgrade filename, so passing a single
+        // outdated row is enough to pin the distinct suffix.
+        createdPanels[0].fireMessage({
+            type: 'saveUpgradeReportJson',
+            data: [{ name: 'http', update: { status: 'major', latestVersion: '2.0.0' } }],
+        });
+
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        assert.ok(writtenFiles.length > 0);
+        assert.ok(writtenFiles[0].path.endsWith('pubspec_upgrade.json'));
+        assert.ok(messageMock.infos.some(msg => msg.includes('Saved report JSON')));
+    });
 });

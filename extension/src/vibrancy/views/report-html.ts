@@ -624,6 +624,13 @@ function buildToolbar(options: ReportOptions): string {
         `<button id="copy-all" class="toolbar-btn" title="${escapeHtml(l10n(`${tb}.copyAllTitle`))}">&#128203; ${escapeHtml(l10n(`${tb}.copyAllLabel`))}</button>`;
     const saveBtn =
         `<button id="save-all" class="toolbar-btn" title="${escapeHtml(l10n(`${tb}.saveAllTitle`))}">&#128190; ${escapeHtml(l10n(`${tb}.saveAllLabel`))}</button>`;
+    // Saves the same per-package JSON shape as "Save", but filtered to only
+    // packages with an available update (update.status present and not
+    // 'up-to-date'/'unknown' — the same outdated test the modernization
+    // filter uses at report-script.ts). Gives users a focused upgrade
+    // worklist without the noise of already-current dependencies.
+    const saveUpgradeBtn =
+        `<button id="save-upgrade" class="toolbar-btn" title="${escapeHtml(l10n(`${tb}.saveUpgradeTitle`))}">&#128190; ${escapeHtml(l10n(`${tb}.saveUpgradeLabel`))}</button>`;
     // hidden by default — the script flips it on as soon as any sort/filter/
     // footprint state diverges from defaults. Markup-level hide means a slow
     // or failed script still keeps the button out of sight on a pristine view,
@@ -695,6 +702,7 @@ function buildToolbar(options: ReportOptions): string {
         ${resetViewBtn}
         ${copyAllBtn}
         ${saveBtn}
+        ${saveUpgradeBtn}
         ${pubspecBtn}
     </div>
     <div id="active-filters" class="active-filters" hidden>

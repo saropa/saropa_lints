@@ -491,6 +491,8 @@
       "copyAllLabel": "Copy",
       "saveAllTitle": "Save report JSON to reports/YYYYMMDD/...",
       "saveAllLabel": "Save",
+      "saveUpgradeTitle": "Save a report of only packages with an available update to reports/YYYYMMDD/...",
+      "saveUpgradeLabel": "Save Upgrade Report",
       "resetViewTitle": "Reset filters, sort, and saved view state",
       "resetViewLabel": "Reset view",
       "rescanTitle": "Rescan packages — clears the pub.dev cache and re-fetches versions",

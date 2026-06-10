@@ -136,7 +136,11 @@ export class VibrancyReportPanel {
         }
 
         else if (msg.type === 'saveReportJson' && Array.isArray(msg.data)) {
-            await this._saveReportJson(msg.data);
+            await this._saveReportJson(msg.data, 'pubspec_vibrancy');
+        }
+
+        else if (msg.type === 'saveUpgradeReportJson' && Array.isArray(msg.data)) {
+            await this._saveReportJson(msg.data, 'pubspec_upgrade');
         }
     }
 
@@ -162,7 +166,10 @@ export class VibrancyReportPanel {
         }
     }
 
-    private async _saveReportJson(rows: unknown[]): Promise<void> {
+    private async _saveReportJson(
+        rows: unknown[],
+        nameSuffix: string,
+    ): Promise<void> {
         try {
             const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
             if (!workspaceFolder) { return; }
@@ -179,7 +186,7 @@ export class VibrancyReportPanel {
             await vscode.workspace.fs.createDirectory(dir);
             const file = vscode.Uri.joinPath(
                 dir,
-                `${ymd}_${timestamp}pubspec_vibrancy.json`,
+                `${ymd}_${timestamp}${nameSuffix}.json`,
             );
             const content = JSON.stringify(rows, null, 2);
             await vscode.workspace.fs.writeFile(

@@ -760,6 +760,32 @@ export function getReportScript(): string {
             });
         }
 
+        /* ---- Save upgrade-only report ---- */
+        /* Same per-package JSON as "Save", filtered to packages with an
+           available update. The outdated test mirrors the modernization
+           filter (hasUpdates above): a record counts as outdated when its
+           update.status is present and neither 'up-to-date' nor 'unknown'. */
+        var saveUpgradeBtn = document.getElementById('save-upgrade');
+        if (saveUpgradeBtn) {
+            var saveUpgradeLabel = saveUpgradeBtn.innerHTML;
+            saveUpgradeBtn.addEventListener('click', function() {
+                if (saveUpgradeBtn.disabled) { return; }
+                saveUpgradeBtn.disabled = true;
+                var outdated = Object.keys(packageData).map(function(k) {
+                    return packageData[k];
+                }).filter(function(d) {
+                    var status = d && d.update && d.update.status;
+                    return !!status && status !== 'up-to-date' && status !== 'unknown';
+                });
+                vscode.postMessage({ type: 'saveUpgradeReportJson', data: outdated });
+                saveUpgradeBtn.innerHTML = '\\u23F3 Saving...';
+                setTimeout(function() {
+                    saveUpgradeBtn.disabled = false;
+                    saveUpgradeBtn.innerHTML = saveUpgradeLabel;
+                }, 2000);
+            });
+        }
+
         var ageMax = document.getElementById('age-max');
         var ageLabel = document.getElementById('age-max-label');
         if (ageMax) {
