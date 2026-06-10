@@ -2052,8 +2052,6 @@ In this release we fix a few rules (use_existing_variable, require_debouncer_can
 
 • **Quick fixes (Batches 12+):** Added 28+ quick fixes across 28 rules. No new lint rules or tier changes. Fixes include: `avoid_assigning_to_static_field` (DeleteStaticFieldAssignmentFix), `avoid_wildcard_cases_with_enums` / `avoid_wildcard_cases_with_sealed_classes` / `require_exhaustive_sealed_switch` (RemoveWildcardOrDefaultCaseFix), `avoid_duplicate_initializers` (DeleteDuplicateInitializerFix), `avoid_duplicate_patterns` (RemoveDuplicatePatternCaseFix), `avoid_throw_in_finally` (DeleteThrowInFinallyFix), `avoid_duplicate_cascades` (RemoveDuplicateCascadeSectionFix), `avoid_empty_build_when` (RemoveEmptyBuildWhenFix), `avoid_unnecessary_futures` (AvoidRedundantAsyncFix), `avoid_misused_set_literals` (AddSetOrMapTypeArgumentFix), `no_equal_nested_conditions` (FlattenRedundantNestedConditionFix), `avoid_unused_assignment` (RemoveUnusedAssignmentFix), `prefer_any_or_every` (ReplaceWhereIsEmptyWithAnyFix), `avoid_asset_manifest_json` (ReplaceAssetManifestJsonFix), `prefer_null_aware_spread` (SimplifyRedundantNullAwareSpreadFix, ReplaceConditionalSpreadWithNullAwareFix), `prefer_use_prefix` (AddUsePrefixFix), `avoid_passing_default_values` (RemoveDefaultValueArgumentFix), `prefer_enums_by_name` (ReplaceFirstWhereWithByNameFix), `prefer_test_matchers` (ReplaceExpectLengthEqualsZeroWithIsEmptyFix, ReplaceExpectContainsIsTrueWithContainsFix). `AvoidRedundantAsyncFix` now resolves body from function name token for `avoid_unnecessary_futures`. Fixed `replace_expect_contains_is_true_with_contains_fix` to avoid `dart:collection` (use `isEmpty`/`first`). See `bugs/QUICK_FIX_PLAN.md`.
 
-• **Quick-fix presence tests:** Dedicated file `test/rule_quick_fix_presence_test.dart` with 100 unit tests asserting each listed rule has at least one quick fix (`fixGenerators` non-empty), plus one inverse test that a rule without fixes ([AvoidNonFinalExceptionClassFieldsRule]) has empty `fixGenerators`. Replaces duplicate rule entries with distinct rules (e.g. `AvoidEmptyBuildWhenRule`, `AvoidUnnecessaryFuturesRule`, `AvoidUnnecessaryNullableReturnTypeRule`, `AvoidThrowInCatchBlockRule`, `PreferPublicExceptionClassesRule`). Additional fix-presence assertions remain in code_quality_rules_test, complexity_rules_test, and structure_rules_test where relevant.
-
 ### Fixed
 
 • **require_debouncer_cancel** — False positive when a `State` subclass (e.g. with `WidgetsBindingObserver` mixin) already had `_debounce?.cancel()` in `dispose()`. The rule now checks every `dispose` method in the class (not only the first) and uses both body source and full method source for cleanup detection, so cancel-in-dispose is reliably found. Added `isFieldCleanedUpInSource` in `target_matcher_utils.dart` and a regression fixture + tests.
@@ -2067,6 +2065,14 @@ In this release we fix a few rules (use_existing_variable, require_debouncer_can
 • `prefer_geolocation_coarse_location` — Now fully implemented (was stub). Warns when `Geolocator.getCurrentPosition` or `getPositionStream` use `LocationAccuracy.best` or `.high`; suggests `.low` or `.balanced` for battery and privacy. Config alias: `prefer_geolocator_coarse_location`.
 
 • `prefer_const_constructor_declarations` — Prefer declaring constructors as `const` when the class has only final fields (plain classes; @immutable and Widget subclasses remain covered by `prefer_const_constructors_in_immutables`). INFO, comprehensive tier.
+
+<details>
+<summary>Maintenance</summary>
+
+• **Publish script (Step 6 & 7):** Step 6 (analysis) now runs `dart test --chain-stack-traces` after `dart analyze`, piping output to `reports/YYYYMMDD/YYYYMMDD_HHMMSS_chain_stack_traces.log` and checking for failure lines so test failures surface early. Step 7 on failure runs the same command (no retry prompt) and reports the log path and error lines. Shared `_dart_test_env()` for test temp dir; spinner shown during the test run.
+• **Quick-fix presence tests:** Dedicated file `test/rule_quick_fix_presence_test.dart` with 100 unit tests asserting each listed rule has at least one quick fix (`fixGenerators` non-empty), plus one inverse test that a rule without fixes ([AvoidNonFinalExceptionClassFieldsRule]) has empty `fixGenerators`. Replaces duplicate rule entries with distinct rules (e.g. `AvoidEmptyBuildWhenRule`, `AvoidUnnecessaryFuturesRule`, `AvoidUnnecessaryNullableReturnTypeRule`, `AvoidThrowInCatchBlockRule`, `PreferPublicExceptionClassesRule`). Additional fix-presence assertions remain in code_quality_rules_test, complexity_rules_test, and structure_rules_test where relevant.
+
+</details>
 
 ---
 
@@ -2086,13 +2092,7 @@ We focus on eating our own dog food: new rules for API validation, accessibility
 
 - **New stylistic rules (blank-line formatting):** `prefer_blank_line_before_else` — require a blank line before `else` / `else if` clauses. `prefer_blank_line_after_loop` — require a blank line after a for/while loop before the next statement. Both are INFO severity, stylistic tier, with quick fix (Add blank line). No action required.
 
-- **History integration (Phase 2 issues, migration, not_viable/drift):** Integrated 21 `bugs/history` files. Migration guide moved to `doc/guides/migration_v4_to_v5.md` (v4→v5 custom_lint to native plugin); `doc/README.md` now links to it. Drift rules deemed not viable summarized in `bugs/not_viable_drift_rules.md`. No action required.
-
-- **Quick fixes and tests:** `avoid_bloc_event_in_constructor` — fixtures and quick-fix tests (do not dispatch BLoC events in constructor). `prefer_const_widgets` — fixtures and quick-fix tests. `prefer_capitalized_comment_start`, `prefer_const_declarations`, `prefer_final_locals` — quick-fix tests and type fixtures with real BAD/GOOD. No action required.
-
 - **Ten additional quick fixes (Batches 6–9):** `avoid_synchronous_file_io` — ReplaceSyncFileIoFix (sync → async method name). `avoid_constant_assert_conditions` — RemoveConstantAssertFix. `avoid_duplicate_switch_case_conditions` — RemoveDuplicateSwitchCaseFix. `avoid_redundant_else` — RemoveRedundantElseFix. No action required.
-
-- **Defensive coding and robustness:** Parameter validation, null/empty handling, and error handling across core utilities and baseline/config. No behavioral change for valid inputs. No action required.
 
 - **New rules (INFO severity; professional or recommended tier):**. No action required.
   - `prefer_semantics_sort` — Suggests sortKey on Semantics for correct screen reader order in complex layouts.
@@ -2203,11 +2203,10 @@ We focus on eating our own dog food: new rules for API validation, accessibility
 
 - **Duplicate rules (positional boolean parameters):** `avoid_positional_boolean_parameters` and `prefer_named_bool_params` reported the same issue and produced two diagnostics per positional bool. Removed `prefer_named_bool_params` from the default tier so only `avoid_positional_boolean_parameters` runs by default. No action required.
 
-### Maintenance
+<details>
+<summary>Maintenance</summary>
 
 - **Rules layout:** Reorganized `lib/src/rules/` into subfolders to reduce root file count. Category rule files now live under `architecture/`, `code_quality/`, `codegen/`, `commerce/`, `config/`, `core/`, `data/`, `flow/`, `hardware/`, `media/`, `network/`, `resources/`, `security/`, `stylistic/`, `testing/`, `ui/`, and `widget/`. `packages/` and `platforms/` unchanged. Barrel export in `all_rules.dart` and `CODEBASE_INDEX.md` updated. No rule logic or tier changes.
-
-### Documentation
 
 - **History integration (false_positives 37–61):** Integrated 25 bugs/history false_positive files into documentation and tests. Rules/history covered: `avoid_path_traversal` (private helper receiving platform path), `avoid_positioned_outside_stack` (builder callbacks, AssignmentExpression/build root), `avoid_ref_in_build_body` (callbacks inside build), `avoid_ref_watch_outside_build` (Riverpod provider bodies), `avoid_similar_names` (short names, time units), `avoid_single_child_column_row` (IfElement/ForElement), `avoid_static_state` (cached RegExp/immutable static), `avoid_stream_subscription_in_field` (listen as argument to collection.add), `avoid_string_concatenation_l10n` (numeric-only interpolation), `avoid_unbounded_listview_in_column` (overlay callbacks), `avoid_unmarked_public_class` (static utility classes with private constructors), `avoid_unnecessary_nullable_return_type` (conditional null branches, expression bodies, map operator, nullable delegation), `avoid_unnecessary_setstate` (closure callbacks), `avoid_unnecessary_to_list` / `avoid_large_list_copy` (required by return type), `avoid_unused_assignment` (conditional reassignment, definite assignment if/else, loop reassignment), `avoid_url_launcher_simulator_tests` (no launcher usage), `avoid_variable_shadowing` (non-overlapping loop scopes), `check_mounted_after_async` (guard clause, early-return). Fixes already in rule implementations and CHANGELOG_ARCHIVE; added FP test groups and checklist marks. Checklist since removed.
 
@@ -2218,6 +2217,11 @@ We focus on eating our own dog food: new rules for API validation, accessibility
 - **History integration (rule_bugs 8–22):** Integrated 15 bugs/history rule_bug files. Covered: `detect_unsorted_imports` (resolved — prefer_sorted_imports, prefer_import_group_comments), `duplicate_rules_async_without_await` (avoid_redundant_async vs prefer_async_only_when_awaiting), `function_always_returns_null_generator_guard_ineffective` (return-type guard Stream/Iterable), `no_magic_number_string_in_tests_severity_miscalibration`, `prefer_catch_over_on_reverse_rule` (flag only on Object catch), `prefer_expanded_at_call_site` (documentation/gaps), `prefer_static_class_regression_on_abstract_final_class` (skip abstract classes), `quick_fixes_not_appearing_in_vscode` (fixed — native plugin migration), `report_avoid_deprecated_usage_analyzer_api_crash` (6.0.10 — staticElement/element), `report_avoid_deprecated_usage_metadataimpl_not_iterable_crash` (6.1.1 — metadata compat), `report_duplicate_paths_deduplication` (path normalization), `report_session_management`, `require_minimum_contrast_ignore_suppression` (IgnoreUtils), `require_yield_between_db_awaits_read_vs_write` (read vs write), `violation_deduplication` (ImpactTracker same-file re-analysis), `yield description and quickfix`. Checklist since removed.
 
 - **History integration (issues, migration, not_viable/drift, framework_upgrade):** Integrated 25 bugs/history files. Issues (9): require_pagination_for_large_lists, prefer_sliverfillremaining_for_empty, require_rtl_layout_support, require_stepper_state_management, avoid_infinite_scroll_duplicate_requests (duplicate issue numbers archived; rules already implemented). Migration (5): v4→v5 migration guide (canonical in doc/guides/migration_v4_to_v5.md); 003/007/008 (Flutter deprecations, not implemented). Not_viable/drift (8): avoid_drift_client_default_for_timestamps, avoid_drift_custom_constraint_without_not_null, avoid_drift_downgrade, avoid_drift_multiple_auto_increment, prefer_drift_modular_generation, require_drift_build_runner, require_drift_table_column_trailing_parens, require_drift_wal_mode (documented as not viable). Not_viable/framework_upgrade (3): 001/002/004 (Flutter framework candidates, not implemented). Files deleted per checklist.
+- **History integration (Phase 2 issues, migration, not_viable/drift):** Integrated 21 `bugs/history` files. Migration guide moved to `doc/guides/migration_v4_to_v5.md` (v4→v5 custom_lint to native plugin); `doc/README.md` now links to it. Drift rules deemed not viable summarized in `bugs/not_viable_drift_rules.md`. No action required.
+- **Quick fixes and tests:** `avoid_bloc_event_in_constructor` — fixtures and quick-fix tests (do not dispatch BLoC events in constructor). `prefer_const_widgets` — fixtures and quick-fix tests. `prefer_capitalized_comment_start`, `prefer_const_declarations`, `prefer_final_locals` — quick-fix tests and type fixtures with real BAD/GOOD. No action required.
+- **Defensive coding and robustness:** Parameter validation, null/empty handling, and error handling across core utilities and baseline/config. No behavioral change for valid inputs. No action required.
+
+</details>
 
 ---
 
@@ -2229,19 +2233,20 @@ In this release we remove 18 quick fixes that only inserted a TODO (project poli
 
 - **Insert-TODO quick fixes:** Removed 18 quick fixes that only inserted a `// TODO: ...` comment at the violation (no real code change). They added no value over the lint. Prohibition documented in `bugs/QUICK_FIX_PLAN.md`. No action required.
 
-### Documentation
-
-- **History integration (false_positives 11–20):** Rule DartDoc **Exempt** blocks and CHANGELOG_ARCHIVE intent notes for: `avoid_ignoring_return_values` (property setter), `avoid_ios_hardcoded_device_model` (word boundary), `avoid_manual_date_formatting` (map/cache keys), `avoid_medium_length_files` (code-only count, abstract final exempt), `avoid_missing_enum_constant_in_map` (complete maps), `avoid_money_arithmetic_on_double` (word boundary), `avoid_nested_assignments` (for-loop update, arrow body), `avoid_non_ascii_symbols` (invisible/confusable only). False-positive test groups and fixture coverage (e.g. `avoid_nested_assignments` arrow body) added. Checklist since removed.
-
-- **No stub fixtures:** Policy and docs now prohibit stub test fixtures (files with `// expect_lint` and placeholder BAD/GOOD code when the rule does not run or report on that code). Fixtures may only be added when the rule is implemented and the fixture is validated. Updated: `bugs/UNIT_TEST_COVERAGE.md` (policy + §6.3) and `CONTRIBUTING.md` (§8 and Testing checklist).
-
 ### Fixed
 
 - **avoid_long_parameter_list false positive:** No longer reports on methods or functions named `copyWith` or on any declaration whose parameters are all optional (no required positional or required named). These patterns are self-documenting and do not match the rule's intent. No action required.
 
 - **handle_throwing_invocations plugin crash:** On analyzer versions where `Element.metadata` is a wrapper (e.g. `MetadataImpl`) rather than an `Iterable`, the rule no longer crashes with "MetadataImpl is not a subtype of Iterable". `_hasThrowsAnnotation` now uses `readElementAnnotationsFromMetadata` from . Regression test: . No action required.
 
+<details>
+<summary>Maintenance</summary>
+
+- **History integration (false_positives 11–20):** Rule DartDoc **Exempt** blocks and CHANGELOG_ARCHIVE intent notes for: `avoid_ignoring_return_values` (property setter), `avoid_ios_hardcoded_device_model` (word boundary), `avoid_manual_date_formatting` (map/cache keys), `avoid_medium_length_files` (code-only count, abstract final exempt), `avoid_missing_enum_constant_in_map` (complete maps), `avoid_money_arithmetic_on_double` (word boundary), `avoid_nested_assignments` (for-loop update, arrow body), `avoid_non_ascii_symbols` (invisible/confusable only). False-positive test groups and fixture coverage (e.g. `avoid_nested_assignments` arrow body) added. Checklist since removed.
+- **No stub fixtures:** Policy and docs now prohibit stub test fixtures (files with `// expect_lint` and placeholder BAD/GOOD code when the rule does not run or report on that code). Fixtures may only be added when the rule is implemented and the fixture is validated. Updated: `bugs/UNIT_TEST_COVERAGE.md` (policy + §6.3) and `CONTRIBUTING.md` (§8 and Testing checklist).
 - **CI workflow:** Checkout now uses the exact commit (`github.sha`) on push events instead of the branch ref to avoid races; test job uses the same checkout configuration as the analyze job for consistency. No action required.
+
+</details>
 
 ---
 
