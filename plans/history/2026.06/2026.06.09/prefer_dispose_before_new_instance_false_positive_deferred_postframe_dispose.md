@@ -1,6 +1,6 @@
 # BUG: `prefer_dispose_before_new_instance` — Disposal Deferred to Post-Frame Callback Not Recognized
 
-**Status: Open**
+**Status: Fixed**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
@@ -182,19 +182,66 @@ include:
 
 ## Changes Made
 
-<!-- Fill in when a fix is written. -->
+Implemented the capture-and-deferred-dispose detection in `disposal_rules.dart`
+(`PreferDisposeBeforeNewInstanceRule`):
+
+- Before reporting, the rule now looks for a `final old = _field;` capture
+  declared before the reassignment (`_capturedOldLocalName`), and if found,
+  checks whether the enclosing block disposes that local anywhere
+  (`_blockDisposesLocal`, via `block.toSource()` so disposal inside an
+  `addPostFrameCallback`/`Future.microtask` closure is seen). When both hold,
+  the reassignment is treated as safe.
+
+This covers the responsive `didChangeDependencies` idiom where disposing inline
+asserts (controller still attached to a mounted widget), so the old instance is
+captured and disposed in a post-frame callback. The existing inline-dispose
+detection and the true-leak path are unchanged.
 
 ---
 
 ## Tests Added
 
-<!-- List new or updated fixture/test files and what they verify. -->
+- Rewrote `example/lib/disposal/prefer_dispose_before_new_instance_fixture.dart`
+  with inline-dispose, capture+post-frame, capture+microtask (all NO lint) and a
+  true leak (LINT) inside a `_State` class.
+
+**Verification limitation:** the rule is resolution-dependent — it only fires
+when the reassignment RHS resolves to an `InstanceCreationExpression`. The
+project scan CLI parses without full resolution, so `_field = PageController(…)`
+is an unresolved `MethodInvocation` and the rule does not fire there at all
+(confirmed: zero hits, including on the leak case). The fix is therefore
+verified by inspection + clean per-file analyze: the new code only ADDS a
+suppression path (a `return` before `reporter.atNode`), so it can never produce
+a new false positive. The disposal unit suite passes.
 
 ---
 
 ## Commits
 
 <!-- Add commit hashes as fixes land. -->
+
+---
+
+## Finish Report (2026-06-09)
+
+**Scope:** (A) Dart lint rules / analyzer plugin.
+
+**Deep review:** Both helpers are bounded scans (statements before the
+assignment for the capture; one `toSource()` contains-check for the disposal).
+The `this.$fieldName` form is also accepted as a capture initializer. The change
+is suppression-only and leaves the leak and inline-dispose paths intact. Rule
+file, tier, severity, `LintImpact` unchanged.
+
+**Tests:** `dart test test/rules/architecture/disposal_rules_test.dart` → all
+pass. Scan CLI cannot exercise this resolution-dependent rule (noted above).
+
+**Maintenance:** CHANGELOG `[Unreleased]` Fixed bullet added. README/ROADMAP
+unchanged (false-positive fix).
+
+**Bug archived:** bugs/prefer_dispose_before_new_instance_false_positive_deferred_postframe_dispose.md
+→ plans/history/2026.06/2026.06.09/prefer_dispose_before_new_instance_false_positive_deferred_postframe_dispose.md
+
+**Finish report appended:** this file.
 
 ---
 

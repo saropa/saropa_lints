@@ -2361,10 +2361,63 @@ class PreferDisposeBeforeNewInstanceRule extends SaropaLintRule {
         fieldName,
       );
 
-      if (!hasDisposeBeforeAssignment) {
-        reporter.atNode(node);
+      if (hasDisposeBeforeAssignment) return;
+
+      // Deferred-disposal idiom: the old instance is captured into a local
+      // (`final old = _field;`) before the reassignment, then disposed later —
+      // often inside an addPostFrameCallback/microtask closure, because
+      // disposing inline asserts while the controller is still attached to a
+      // mounted widget. The disposal is on the captured local (`old`), not the
+      // field, and may appear AFTER the assignment, so neither offset nor the
+      // field-name scan above can see it. Detect the capture + any disposal of
+      // that local anywhere in the block (toSource reaches into closures).
+      final String? capturedOld = _capturedOldLocalName(
+        enclosingBlock,
+        node,
+        fieldName,
+      );
+      if (capturedOld != null &&
+          _blockDisposesLocal(enclosingBlock, capturedOld)) {
+        return;
       }
+
+      reporter.atNode(node);
     });
+  }
+
+  /// Returns the name of a local that captured the field's previous value in a
+  /// `final old = _field;` declaration before [assignment], or null if none.
+  String? _capturedOldLocalName(
+    Block block,
+    AssignmentExpression assignment,
+    String fieldName,
+  ) {
+    final int assignmentOffset = assignment.offset;
+    for (final Statement statement in block.statements) {
+      if (statement.offset >= assignmentOffset) break;
+      if (statement is! VariableDeclarationStatement) continue;
+      for (final VariableDeclaration v in statement.variables.variables) {
+        final Expression? init = v.initializer;
+        // The initializer is exactly the field (`final old = _field;` or
+        // `final old = this._field;`).
+        if (init != null &&
+            (init.toSource() == fieldName ||
+                init.toSource() == 'this.$fieldName')) {
+          return v.name.lexeme;
+        }
+      }
+    }
+    return null;
+  }
+
+  /// True when [block] disposes [localName] anywhere in its source, including
+  /// inside a callback closure (`addPostFrameCallback((_) => old.dispose())`).
+  bool _blockDisposesLocal(Block block, String localName) {
+    final String source = block.toSource();
+    return source.contains('$localName.dispose()') ||
+        source.contains('$localName?.dispose()') ||
+        source.contains('$localName..dispose()') ||
+        source.contains('$localName?..dispose()');
   }
 
   Block? _findEnclosingBlock(AstNode node) {
