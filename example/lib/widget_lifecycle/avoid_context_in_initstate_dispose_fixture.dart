@@ -117,3 +117,29 @@ class _GoodClass1334 {
   // Compliant version — see rule docs
   void goodMethod() {}
 }
+
+// GOOD: context forwarded to a helper that performs no inherited lookup —
+// registers no dependency and reads no unmounted tree, so it is safe.
+class _ForwardContextState extends State<StatefulWidget> {
+  late Object _seed;
+
+  @override
+  void initState() {
+    super.initState();
+    _seed = _resolve(context);
+  }
+
+  Object _resolve(BuildContext c) => 0;
+}
+
+// BAD: Theme.of(context) in initState is a genuine inherited-widget lookup.
+class _ThemeLookupState extends State<StatefulWidget> {
+  late Object _theme;
+
+  @override
+  void initState() {
+    super.initState();
+    // expect_lint: avoid_context_in_initstate_dispose
+    _theme = Theme.of(context);
+  }
+}

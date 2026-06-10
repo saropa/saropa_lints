@@ -125,3 +125,40 @@ void dispose() {
   controller.removeListener(_onChanged);
 // super.dispose();
 }
+
+// GOOD: the SAME listenable reached via `field!` (add) and `field?` (remove) —
+// the idiomatic null-aware pairing must match, so no leak is reported.
+class _NullAwarePairingState extends State<StatefulWidget> {
+  ValueNotifier<int>? notifier;
+  void _onTick() {}
+
+  @override
+  void initState() {
+    super.initState();
+    notifier!.addListener(_onTick);
+  }
+
+  @override
+  void dispose() {
+    notifier?.removeListener(_onTick);
+    super.dispose();
+  }
+}
+
+// BAD: added in initState, never removed in dispose (genuine leak).
+class _LeakingState extends State<StatefulWidget> {
+  ValueNotifier<int>? notifier;
+  void _onTick() {}
+
+  @override
+  void initState() {
+    super.initState();
+    // expect_lint: always_remove_listener
+    notifier!.addListener(_onTick);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+}
