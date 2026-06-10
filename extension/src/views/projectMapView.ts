@@ -87,6 +87,8 @@ function runScan(
         root,
         '--complexity',
         '--git',
+        // Per-feature performance gravity panel (compound widget patterns).
+        '--performance',
         '--format',
         'html',
         '--output-dir',
