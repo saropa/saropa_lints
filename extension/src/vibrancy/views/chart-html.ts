@@ -65,7 +65,7 @@ export function buildChartSection(results: VibrancyResult[]): string {
     const toggleHtml = hasShared
         ? `<label class="chart-toggle">
                <input type="checkbox" id="exclude-shared" />
-               Exclude shared
+               ${escapeHtml(l10n('chart.toggle.excludeShared'))}
            </label>`
         : '';
 
@@ -90,7 +90,7 @@ export function buildChartSection(results: VibrancyResult[]): string {
         <div class="chart-tooltip" id="chart-tooltip"></div>
         <div class="chart-filter-indicator" id="chart-filter-indicator" style="display:none">
             <span class="filter-text"></span>
-            <button class="clear-filter-btn" id="clear-chart-filter">&times; Clear</button>
+            <button class="clear-filter-btn" id="clear-chart-filter">&times; ${escapeHtml(l10n('chart.filter.clear'))}</button>
         </div>
     </details>`;
 }
@@ -177,9 +177,16 @@ function prepareChartData(
     // "Other (N packages)" bucket — small direct deps only
     if (otherDirect.length > 0) {
         const otherBytes = otherDirect.reduce((s, p) => s + p.sizeBytes, 0);
-        const noun = otherDirect.length === 1 ? 'package' : 'packages';
+        // Singular/plural noun is resolved through l10n so translators control
+        // both forms; the chosen form is passed as {noun} into the bucket label.
+        const noun = otherDirect.length === 1
+            ? l10n('chart.noun.package')
+            : l10n('chart.noun.packages');
         segments.push({
-            name: `Other (${otherDirect.length} ${noun})`,
+            name: l10n('chart.bucket.other', {
+                count: String(otherDirect.length),
+                noun: noun,
+            }),
             sizeBytes: otherBytes,
             percentage: (otherBytes / totalBytes) * 100,
             colorIndex: OTHER_COLOR_INDEX,
@@ -195,7 +202,9 @@ function prepareChartData(
     if (uniqueTransitivePool.length > 0) {
         const uBytes = uniqueTransitivePool.reduce((s, p) => s + p.sizeBytes, 0);
         segments.push({
-            name: `Unique transitives (${uniqueTransitivePool.length})`,
+            name: l10n('chart.bucket.uniqueTransitives', {
+                count: String(uniqueTransitivePool.length),
+            }),
             sizeBytes: uBytes,
             percentage: (uBytes / totalBytes) * 100,
             colorIndex: UNIQUE_TRANSITIVE_COLOR_INDEX,
@@ -211,7 +220,9 @@ function prepareChartData(
     if (sharedTransitivePool.length > 0) {
         const sBytes = sharedTransitivePool.reduce((s, p) => s + p.sizeBytes, 0);
         segments.push({
-            name: `Shared transitives (${sharedTransitivePool.length})`,
+            name: l10n('chart.bucket.sharedTransitives', {
+                count: String(sharedTransitivePool.length),
+            }),
             sizeBytes: sBytes,
             percentage: (sBytes / totalBytes) * 100,
             colorIndex: SHARED_TRANSITIVE_COLOR_INDEX,

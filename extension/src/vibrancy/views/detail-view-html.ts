@@ -7,6 +7,7 @@ import { formatRelativeTime } from '../scoring/time-formatter';
 import { escapeHtml, resolveRepoUrl } from './html-utils';
 import { getDetailStyles } from './detail-view-styles';
 import { getDetailScript } from './detail-view-script';
+import { l10n } from '../../i18n/runtime';
 
 /**
  * Assembles **sidebar package detail** HTML: placeholder when `result` is null, otherwise full panel
@@ -33,7 +34,7 @@ function buildPlaceholderHtml(): string {
 <body class="placeholder">
     <div class="empty-state">
         <div class="icon">📦</div>
-        <p>Select a package to see details</p>
+        <p>${l10n('detailView.empty.selectPackage')}</p>
     </div>
 </body>
 </html>`;
@@ -94,7 +95,7 @@ function buildVersionSection(r: VibrancyResult): string {
 
     if (r.pubDev?.publishedDate) {
         const date = r.pubDev.publishedDate.split('T')[0];
-        parts.push(`<div class="detail-row muted">Published: ${date}</div>`);
+        parts.push(`<div class="detail-row muted">${l10n('detailView.version.published', { date })}</div>`);
     }
 
     if (r.license) {
@@ -112,18 +113,20 @@ function buildVersionSection(r: VibrancyResult): string {
        infra_vibrancy_bloat_uses_tarball_size_not_runtime.md. */
     const detailSizeBytes = r.codeSizeBytes ?? r.archiveSizeBytes;
     if (detailSizeBytes !== null) {
-        const label = r.codeSizeBytes !== null ? 'Code Size' : 'Archive';
-        parts.push(`<div class="detail-row muted">${label}: ${formatSizeMB(detailSizeBytes)}</div>`);
+        const label = r.codeSizeBytes !== null
+            ? l10n('detailView.version.codeSize')
+            : l10n('detailView.version.archive');
+        parts.push(`<div class="detail-row muted">${l10n('detailView.version.sizeLabel', { label, size: formatSizeMB(detailSizeBytes) })}</div>`);
     }
 
     if (r.replacementComplexity) {
         const rc = r.replacementComplexity;
         const m = rc.metrics;
-        parts.push(`<div class="detail-row muted">Source: ${m.libCodeLines.toLocaleString('en-US')} code · ${m.libCommentLines.toLocaleString('en-US')} comments · ${m.libFileCount} files</div>`);
-        parts.push(`<div class="detail-row">Replace: <span class="${rc.level}">${escapeHtml(rc.summary)}</span></div>`);
+        parts.push(`<div class="detail-row muted">${l10n('detailView.version.source', { code: m.libCodeLines.toLocaleString('en-US'), comments: m.libCommentLines.toLocaleString('en-US'), files: String(m.libFileCount) })}</div>`);
+        parts.push(`<div class="detail-row">${l10n('detailView.version.replace', { summary: `<span class="${rc.level}">${escapeHtml(rc.summary)}</span>` })}</div>`);
     }
 
-    return buildSection('📦 VERSION', parts);
+    return buildSection(`📦 ${l10n('detailView.section.version')}`, parts);
 }
 
 function buildUpdateSection(r: VibrancyResult): string {
@@ -138,19 +141,19 @@ function buildUpdateSection(r: VibrancyResult): string {
     parts.push(`<div class="update-header">${statusLabel}</div>`);
 
     const buttons: string[] = [];
-    buttons.push(`<button class="action-btn" data-action="upgrade" data-package="${escapeHtml(r.package.name)}">Upgrade</button>`);
+    buttons.push(`<button class="action-btn" data-action="upgrade" data-package="${escapeHtml(r.package.name)}">${l10n('detailView.update.upgrade')}</button>`);
 
     if (r.updateInfo.changelog?.entries.length) {
-        buttons.push(`<button class="action-btn secondary" data-action="changelog" data-package="${escapeHtml(r.package.name)}">Changelog</button>`);
+        buttons.push(`<button class="action-btn secondary" data-action="changelog" data-package="${escapeHtml(r.package.name)}">${l10n('detailView.update.changelog')}</button>`);
     }
 
     parts.push(`<div class="button-row">${buttons.join('')}</div>`);
 
     if (r.blocker) {
-        parts.push(`<div class="blocker-info">⚠️ Blocked by ${escapeHtml(r.blocker.blockerPackage)}</div>`);
+        parts.push(`<div class="blocker-info">⚠️ ${l10n('detailView.update.blockedBy', { package: escapeHtml(r.blocker.blockerPackage) })}</div>`);
     }
 
-    return buildSection('⬆️ UPDATE', parts);
+    return buildSection(`⬆️ ${l10n('detailView.section.update')}`, parts);
 }
 
 function buildSuggestionSection(r: VibrancyResult): string {
@@ -164,9 +167,9 @@ function buildSuggestionSection(r: VibrancyResult): string {
         );
         if (displayReplacement) {
             if (isReplacementPackageName(displayReplacement)) {
-                suggestions.push(`Consider migrating to ${escapeHtml(displayReplacement)}.`);
+                suggestions.push(l10n('detailView.suggestion.migrateTo', { package: escapeHtml(displayReplacement) }));
             } else {
-                suggestions.push(`Consider: ${escapeHtml(displayReplacement)}.`);
+                suggestions.push(l10n('detailView.suggestion.consider', { text: escapeHtml(displayReplacement) }));
             }
         }
     }
@@ -180,11 +183,11 @@ function buildSuggestionSection(r: VibrancyResult): string {
             .slice(0, 3)
             .map(a => escapeHtml(a.name))
             .join(', ');
-        suggestions.push(`Alternatives: ${altNames}`);
+        suggestions.push(l10n('detailView.suggestion.alternatives', { names: altNames }));
     }
 
     if (r.isUnused) {
-        suggestions.push('This package appears to be unused — consider removing it.');
+        suggestions.push(l10n('detailView.suggestion.unused'));
     }
 
     if (suggestions.length === 0) {
@@ -192,7 +195,7 @@ function buildSuggestionSection(r: VibrancyResult): string {
     }
 
     const parts = suggestions.map(s => `<div class="suggestion-text">${s}</div>`);
-    return buildSection('💡 SUGGESTION', parts);
+    return buildSection(`💡 ${l10n('detailView.section.suggestion')}`, parts);
 }
 
 function buildCommunitySection(r: VibrancyResult): string {
@@ -208,30 +211,30 @@ function buildCommunitySection(r: VibrancyResult): string {
             metrics.push(`❤️ ${formatNumber(r.likes)}`);
         }
         const issueCount = gh.trueOpenIssues ?? gh.openIssues;
-        metrics.push(`📋 ${issueCount} issues`);
+        metrics.push(`📋 ${l10n('detailView.community.issues', { count: String(issueCount) })}`);
         if (gh.openPullRequests !== undefined) {
-            metrics.push(`🔀 ${gh.openPullRequests} PRs`);
+            metrics.push(`🔀 ${l10n('detailView.community.prs', { count: String(gh.openPullRequests) })}`);
         }
         parts.push(`<div class="detail-row">${metrics.join('  ')}</div>`);
 
         const activity = gh.closedIssuesLast90d + gh.mergedPrsLast90d;
         if (activity > 0) {
-            parts.push(`<div class="detail-row muted">90d: ${gh.closedIssuesLast90d} issues closed, ${gh.mergedPrsLast90d} PRs merged</div>`);
+            parts.push(`<div class="detail-row muted">${l10n('detailView.community.activity90d', { closed: String(gh.closedIssuesLast90d), merged: String(gh.mergedPrsLast90d) })}</div>`);
         }
         if (gh.daysSinceLastCommit !== undefined) {
             commitAgeDays = gh.daysSinceLastCommit;
-            parts.push(`<div class="detail-row muted">Last commit: ${formatRelativeTime(gh.daysSinceLastCommit)}</div>`);
+            parts.push(`<div class="detail-row muted">${l10n('detailView.community.lastCommit', { time: formatRelativeTime(gh.daysSinceLastCommit) })}</div>`);
         }
         if (gh.isArchived) {
-            parts.push(`<div class="detail-row warning">🗄️ Repository is archived</div>`);
+            parts.push(`<div class="detail-row warning">🗄️ ${l10n('detailView.community.archived')}</div>`);
         }
     }
 
     if (r.pubDev?.pubPoints !== undefined) {
-        parts.push(`<div class="detail-row">${r.pubDev.pubPoints}/160 pub points</div>`);
+        parts.push(`<div class="detail-row">${l10n('detailView.community.pubPoints', { points: String(r.pubDev.pubPoints) })}</div>`);
     }
     if (publishAgeDays !== undefined) {
-        parts.push(`<div class="detail-row muted">Latest release: ${formatAgeFromDays(publishAgeDays)} ago</div>`);
+        parts.push(`<div class="detail-row muted">${l10n('detailView.community.latestRelease', { age: formatAgeFromDays(publishAgeDays) })}</div>`);
     }
     const dormancy = buildDormancyStatus(commitAgeDays, publishAgeDays);
     if (dormancy) {
@@ -239,7 +242,7 @@ function buildCommunitySection(r: VibrancyResult): string {
     }
 
     if (r.reverseDependencyCount !== null && r.reverseDependencyCount > 0) {
-        parts.push(`<div class="detail-row">📦 ${r.reverseDependencyCount.toLocaleString('en-US')} dependents</div>`);
+        parts.push(`<div class="detail-row">📦 ${l10n('detailView.community.dependents', { count: r.reverseDependencyCount.toLocaleString('en-US') })}</div>`);
     }
 
     if (r.verifiedPublisher && r.pubDev?.publisher) {
@@ -250,7 +253,7 @@ function buildCommunitySection(r: VibrancyResult): string {
         return '';
     }
 
-    return buildSection('📊 COMMUNITY', parts);
+    return buildSection(`📊 ${l10n('detailView.section.community')}`, parts);
 }
 
 function daysSinceIsoDate(isoDate: string | null | undefined): number | undefined {
@@ -274,16 +277,16 @@ function buildDormancyStatus(
         return null;
     }
     if (commitAgeDays >= 180 && publishAgeDays >= 180) {
-        return 'No commits and no releases in 6+ months';
+        return l10n('detailView.dormancy.noActivity6mo');
     }
     if (commitAgeDays >= 90 && publishAgeDays >= 90) {
-        return 'No commits and no releases in 3+ months';
+        return l10n('detailView.dormancy.noActivity3mo');
     }
     if (commitAgeDays >= 90 && publishAgeDays < 90) {
-        return 'Release active, code inactive (3+ months without commits)';
+        return l10n('detailView.dormancy.codeInactive');
     }
     if (commitAgeDays < 90 && publishAgeDays >= 90) {
-        return 'Code active, release cadence is slower (3+ months)';
+        return l10n('detailView.dormancy.releaseSlower');
     }
     return null;
 }
@@ -302,10 +305,10 @@ function buildDependenciesSection(r: VibrancyResult): string {
 
     // Total count with flagged indicator
     const flaggedNote = ti.flaggedCount > 0
-        ? ` <span class="warning">(${ti.flaggedCount} flagged)</span>` : '';
+        ? ` <span class="warning">${l10n('detailView.dependencies.flagged', { count: String(ti.flaggedCount) })}</span>` : '';
     parts.push(
         `<div class="detail-row">`
-        + `${ti.transitiveCount} transitive packages${flaggedNote}`
+        + `${l10n('detailView.dependencies.transitiveCount', { count: String(ti.transitiveCount) })}${flaggedNote}`
         + `</div>`,
     );
 
@@ -324,7 +327,7 @@ function buildDependenciesSection(r: VibrancyResult): string {
         );
         parts.push(
             `<div class="detail-row">`
-            + `🆕 ${uniqueCount} unique · 🔗 ${sharedCount} shared (${sharedPct}%)`
+            + `🆕 ${l10n('detailView.dependencies.unique', { count: String(uniqueCount) })} · 🔗 ${l10n('detailView.dependencies.shared', { count: String(sharedCount), pct: String(sharedPct) })}`
             + `</div>`,
         );
 
@@ -332,15 +335,15 @@ function buildDependenciesSection(r: VibrancyResult): string {
         const top = ti.sharedDeps.slice(0, 5);
         const sharedNames = top.map(d => escapeHtml(d)).join(', ');
         const overflow = ti.sharedDeps.length > 5
-            ? ` +${ti.sharedDeps.length - 5} more` : '';
+            ? ` ${l10n('detailView.dependencies.moreOverflow', { count: String(ti.sharedDeps.length - 5) })}` : '';
         parts.push(
             `<div class="detail-row muted">`
-            + `Shared: ${sharedNames}${overflow}`
+            + `${l10n('detailView.dependencies.sharedList', { names: sharedNames })}${overflow}`
             + `</div>`,
         );
     }
 
-    return buildSection('📊 DEPENDENCIES', parts);
+    return buildSection(`📊 ${l10n('detailView.section.dependencies')}`, parts);
 }
 
 function buildAlertsSection(r: VibrancyResult): string {
@@ -363,7 +366,7 @@ function buildAlertsSection(r: VibrancyResult): string {
         return '';
     }
 
-    return buildSection('🚨 ALERTS', alerts);
+    return buildSection(`🚨 ${l10n('detailView.section.alerts')}`, alerts);
 }
 
 function buildPlatformsSection(r: VibrancyResult): string {
@@ -378,9 +381,9 @@ function buildPlatformsSection(r: VibrancyResult): string {
         text += `, +${remaining}`;
     }
 
-    const wasmBadge = r.wasmReady ? ' 🌐 WASM' : '';
+    const wasmBadge = r.wasmReady ? ` 🌐 ${l10n('detailView.platforms.wasm')}` : '';
 
-    return buildSection('📱 PLATFORMS', [
+    return buildSection(`📱 ${l10n('detailView.section.platforms')}`, [
         `<div class="detail-row">${escapeHtml(text)}${wasmBadge}</div>`,
     ]);
 }
@@ -393,19 +396,19 @@ function buildLinksSection(r: VibrancyResult): string {
     // "View Full Details" opens the full editor-area detail panel
     links.push(
         `<button class="action-btn" data-action="fullDetails" `
-        + `data-package="${escapeHtml(r.package.name)}">View Full Details</button>`,
+        + `data-package="${escapeHtml(r.package.name)}">${l10n('detailView.links.viewFullDetails')}</button>`,
     );
 
     const docUrl = `https://pub.dev/documentation/${encodeURIComponent(r.package.name)}/latest/`;
 
     // All links styled as underlined hyperlinks for discoverability
-    links.push(sidebarLink(pubUrl, 'pub.dev'));
-    links.push(sidebarLink(docUrl, 'Documentation'));
-    links.push(sidebarLink(`${pubUrl}/changelog`, 'Changelog'));
+    links.push(sidebarLink(pubUrl, l10n('detailView.links.pubDev')));
+    links.push(sidebarLink(docUrl, l10n('detailView.links.documentation')));
+    links.push(sidebarLink(`${pubUrl}/changelog`, l10n('detailView.links.changelog')));
     if (repoUrl) {
-        links.push(sidebarLink(repoUrl, 'Repository'));
-        links.push(sidebarLink(`${repoUrl}/issues`, 'Issues'));
-        links.push(sidebarLink(`${repoUrl}/issues/new`, 'Report Issue'));
+        links.push(sidebarLink(repoUrl, l10n('detailView.links.repository')));
+        links.push(sidebarLink(`${repoUrl}/issues`, l10n('detailView.links.issues')));
+        links.push(sidebarLink(`${repoUrl}/issues/new`, l10n('detailView.links.reportIssue')));
     }
 
     return `<div class="links-section">${links.join('')}</div>`;
@@ -419,7 +422,7 @@ function sidebarLink(url: string, label: string): string {
 /** Show package logo from README in the sidebar header (lazy-loaded). */
 function buildSidebarLogo(r: VibrancyResult): string {
     if (!r.readme?.logoUrl) { return ''; }
-    return `<img class="sidebar-logo" src="${escapeHtml(r.readme.logoUrl)}" alt="${escapeHtml(r.package.name)} logo" />`;
+    return `<img class="sidebar-logo" src="${escapeHtml(r.readme.logoUrl)}" alt="${escapeHtml(l10n('detailView.logoAlt', { packageName: r.package.name }))}" />`;
 }
 
 /** Truncated description with "read more" link to pub.dev. */
@@ -435,7 +438,7 @@ function buildSidebarDescription(r: VibrancyResult): string {
 
     const slice = desc.substring(0, maxLen);
     const truncated = slice.replace(/\s+\S*$/, '') || slice;
-    return `<div class="sidebar-description">${escapeHtml(truncated)}&hellip; <a href="${escapeHtml(pubUrl)}" data-url="${escapeHtml(pubUrl)}" class="link">more</a></div>`;
+    return `<div class="sidebar-description">${escapeHtml(truncated)}&hellip; <a href="${escapeHtml(pubUrl)}" data-url="${escapeHtml(pubUrl)}" class="link">${l10n('detailView.readMore')}</a></div>`;
 }
 
 /** Topic pill badges linking to pub.dev topic search. */
@@ -461,7 +464,7 @@ function buildDirectDependenciesSection(r: VibrancyResult): string {
         return `<a href="${escapeHtml(url)}" data-url="${escapeHtml(url)}" class="sidebar-dep-chip">${escapeHtml(name)}</a>`;
     }).join(' ');
 
-    return buildSection('📦 DIRECT DEPS', [`<div class="sidebar-dep-list">${chips}</div>`]);
+    return buildSection(`📦 ${l10n('detailView.section.directDeps')}`, [`<div class="sidebar-dep-list">${chips}</div>`]);
 }
 
 /** README image gallery (up to 3 images, sidebar-sized). */
@@ -477,11 +480,11 @@ function buildSidebarImagesSection(r: VibrancyResult): string {
 
     const items = galleryImages.map(url =>
         `<a href="${escapeHtml(url)}" data-url="${escapeHtml(url)}">`
-        + `<img src="${escapeHtml(url)}" alt="README image" loading="lazy" />`
+        + `<img src="${escapeHtml(url)}" alt="${escapeHtml(l10n('detailView.readmeImageAlt'))}" loading="lazy" />`
         + `</a>`,
     ).join('');
 
-    return buildSection('🖼️ README IMAGES', [`<div class="sidebar-gallery">${items}</div>`]);
+    return buildSection(`🖼️ ${l10n('detailView.section.readmeImages')}`, [`<div class="sidebar-gallery">${items}</div>`]);
 }
 
 function buildSection(title: string, parts: string[]): string {

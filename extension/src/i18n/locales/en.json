@@ -1,4 +1,134 @@
 {
+  "packageDetail": {
+    "section": {
+      "version": "VERSION",
+      "community": "COMMUNITY",
+      "dependencies": "DEPENDENCIES",
+      "alerts": "ALERTS",
+      "platforms": "PLATFORMS",
+      "suggestions": "SUGGESTIONS",
+      "readmeImages": "README IMAGES"
+    },
+    "header": {
+      "logoAlt": "{name} logo",
+      "grade": "Grade {grade}",
+      "licenseTitle": "License",
+      "published": "Published {date}"
+    },
+    "partialBanner": {
+      "partReadme": "README and logo",
+      "partGap": "version-gap PRs and issues",
+      "partReverseDeps": "reverse dependency count",
+      "listTwo": "{first} and {second}",
+      "listMany": "{head}, and {last}",
+      "message": "Some sections couldn't load: {list}.",
+      "retry": "Retry",
+      "retryTitle": "Retry the failed fetches."
+    },
+    "description": {
+      "readMore": "read more"
+    },
+    "version": {
+      "constraint": "Constraint",
+      "latest": "Latest",
+      "prerelease": "Prerelease",
+      "published": "Published",
+      "update": "Update",
+      "blockedBy": "Blocked by",
+      "codeSize": "Code Size",
+      "archiveSize": "Archive Size",
+      "bloat": "({rating}/10 bloat)",
+      "onDisk": "On Disk",
+      "upgrade": "Upgrade",
+      "viewChangelog": "View Changelog"
+    },
+    "community": {
+      "stars": "Stars",
+      "likes": "Likes",
+      "report": "Report",
+      "openIssues": "Open Issues",
+      "openPrs": "Open PRs",
+      "activity": "Activity (90d)",
+      "activityValue": "{closed} issues closed, {merged} PRs merged",
+      "noActivity": "No recent activity",
+      "lastCommit": "Last Commit",
+      "pubPoints": "Pub Points",
+      "verified": "(verified)",
+      "publisher": "Publisher",
+      "flagged": "({count} flagged)",
+      "transitiveDeps": "Transitive Deps",
+      "footprintBreakdown": "{unique} unique &middot; +{shared} shared = {total} total",
+      "footprintTooltip": "Own {own} + unique transitives {unique} + shared transitives {shared}. Removing this dep saves {saved} (shared deps stay pulled in by others).",
+      "trueFootprint": "True Footprint",
+      "packagesCount": "{count} packages",
+      "dependents": "Dependents"
+    },
+    "fileUsages": {
+      "commentedOut": "Commented-out references:",
+      "fileCount": "{count} files",
+      "exportNoteTitle": "At least one usage is an export directive",
+      "publicApiSurface": "public API surface",
+      "header": "FILE USAGES ({label})",
+      "commentedReexportTitle": "Commented-out re-export",
+      "reexportTitle": "Re-exported — part of this library’s public API",
+      "reexportBadge": "re-export"
+    },
+    "alerts": {
+      "archived": "ARCHIVED — repository is read-only",
+      "knownIssue": "Known Issue: {reason}",
+      "unused": "Unused — no imports detected",
+      "fix": "— fix: {version}"
+    },
+    "versionGap": {
+      "versionTitle": "Version Gap",
+      "overrideTitle": "Override Gap",
+      "noDates": "Could not determine version dates for this package.",
+      "noItems": "No PRs or issues found between these versions.",
+      "prsMerged": "PRs merged",
+      "issuesClosed": "Issues closed",
+      "searchLabel": "Search PRs and issues",
+      "searchPlaceholder": "Search PRs and issues...",
+      "filterAria": "Filter by category",
+      "filterAll": "All",
+      "filterUnreviewed": "Unreviewed",
+      "filterPrs": "PRs",
+      "filterIssues": "Issues",
+      "typePr": "PR",
+      "typeIssue": "Issue",
+      "reviewReviewed": "Reviewed",
+      "reviewApplicable": "Applicable",
+      "reviewNotApplicable": "N/A",
+      "notesPlaceholder": "Notes...",
+      "colType": "Type",
+      "colTitle": "Title",
+      "colAuthor": "Author",
+      "colReview": "Review",
+      "summaryFooter": "{triaged} of {total} triaged | {applicable} applicable | {notApplicable} N/A | {unreviewed} remaining",
+      "truncated": "Results truncated to {limit} items."
+    },
+    "platforms": {
+      "wasm": "WASM"
+    },
+    "images": {
+      "alt": "README image"
+    },
+    "links": {
+      "viewOnPubDev": "View on pub.dev",
+      "documentation": "Documentation",
+      "changelog": "Changelog",
+      "versions": "Versions",
+      "repository": "Repository",
+      "openIssues": "Open Issues",
+      "reportIssue": "Report Issue"
+    },
+    "a11y": {
+      "skipToDetails": "Skip to package details"
+    },
+    "shortcuts": {
+      "showOverlay": "Show this shortcut overlay",
+      "closeOverlay": "Close the keyboard-shortcut overlay"
+    }
+  },
   "toolbar": {
     "runAnalysis": "Run analysis",
     "rescan": "Rescan",
@@ -602,7 +732,21 @@
       }
     },
     "cells": {
-      "noGithub": "No GitHub repository found"
+      "noGithub": "No GitHub repository found",
+      "devBadge": "dev",
+      "transitiveBadge": "transitive",
+      "publishDateUnavailable": "Publish date not available from pub.dev",
+      "activityGradeUnavailable": "Activity grade unavailable (missing commit or release data)",
+      "activityFallback": "Activity based on recent commits and releases",
+      "likesUnavailable": "pub.dev likes not available",
+      "likesCount": "{count} pub.dev likes",
+      "downloadsUnavailable": "pub.dev 30-day downloads not available",
+      "downloadsCount": "{count} downloads in the last 30 days",
+      "sizeUnavailable": "Size not available from pub.dev",
+      "noVulnerabilities": "No known vulnerabilities",
+      "licenseUnspecified": "License not specified on pub.dev",
+      "unusedBadge": "Unused",
+      "packageInUse": "Package is in use"
     },
     "row": {
       "expandDetails": "Expand details",
@@ -616,6 +760,91 @@
       "escapeSearch": "Clear focused search; second Esc collapses all expanded rows",
       "historyBack": "Go back through the package navigation history",
       "showOverlay": "Show this shortcut overlay"
+    },
+    "versionTooltip": {
+      "installed": "Installed: {version} ({date})",
+      "latest": "Latest: {version}",
+      "created": "Created: {date}",
+      "constraint": "Constraint: {constraint}"
+    },
+    "healthTooltip": {
+      "grade": "Grade: {grade}",
+      "resolutionVelocity": "Resolution Velocity: {value}",
+      "engagementLevel": "Engagement Level: {value}",
+      "popularity": "Popularity: {value}",
+      "publisherTrust": "Publisher Trust: {value}",
+      "codeCommits": "Code commits: {age} ago",
+      "latestRelease": "Latest release: {age} ago",
+      "activitySignal": "Activity signal: {signal}"
+    },
+    "size": {
+      "codeSize": "Code size: {size}",
+      "archiveSize": "Archive size: {size}",
+      "onDisk": "On disk: {size}",
+      "withUniqueTransitives": "With unique transitives: {size}",
+      "withSharedTransitives": "With shared transitives: {size}",
+      "openFolder": "Open local package folder"
+    },
+    "references": {
+      "noImports": "No source file imports detected",
+      "reExportLine": "{location} (re-export)",
+      "reExportSuffix": "(re-export)",
+      "publicApiSurface": "Public API surface — at least one usage is a re-export.",
+      "reExportedBadge": "Re-exported",
+      "openFileReferences": "Open file references",
+      "searchImports": "Search imports",
+      "fileReferencesHeading": "File References ({count})",
+      "andMore": "... and {count} more"
+    },
+    "deps": {
+      "noTransitives": "No transitive dependencies",
+      "showTransitives": "Show transitive dependencies",
+      "tooltipDep": "• {dep}",
+      "tooltipDepShared": "• {dep} (shared)",
+      "tooltipHeader": "{total} transitive deps",
+      "tooltipHeaderShared": "{total} transitive deps ({shared} shared)",
+      "sharedBadgeTitle": "{count} shared with other packages",
+      "sharedBadge": "shared",
+      "transitiveDepsHeading": "Transitive Dependencies ({count})"
+    },
+    "dormancy": {
+      "noActivity6mo": "No commits and no releases in 6+ months",
+      "noActivity3mo": "No commits and no releases in 3+ months",
+      "releaseActiveCodeInactive": "Release active, code inactive (3+ months without commits)",
+      "codeActiveReleaseSlow": "Code active, release cadence is slower (3+ months)"
+    },
+    "activity": {
+      "withDormancy": "{dormancy} (activity grade {grade})",
+      "healthy": "Code and release activity is healthy (activity grade {grade})"
+    },
+    "detail": {
+      "codeCommitActivity": "Code Commit Activity",
+      "releaseActivity": "Release Activity",
+      "dormancySignal": "Dormancy Signal",
+      "ago": "{age} ago",
+      "qualityExample": "+example",
+      "qualityExampleTitle": "Ships a runnable demo",
+      "qualityTests": "+tests",
+      "qualityTestsTitle": "Ships a test suite",
+      "qualityTools": "+tools",
+      "qualityToolsTitle": "Ships maintainer tooling",
+      "qualityDocs": "+docs",
+      "qualityDocsTitle": "Ships extended documentation",
+      "healthScore": "Health Score",
+      "resolutionVelocity": "Resolution Velocity",
+      "engagementLevel": "Engagement Level",
+      "popularity": "Popularity",
+      "publisherTrust": "Publisher Trust",
+      "fixInVersion": "→ fix in {version}",
+      "vulnerabilitiesHeading": "Vulnerabilities ({count})"
+    },
+    "links": {
+      "heading": "Links",
+      "pubDev": "pub.dev",
+      "changelog": "changelog",
+      "versions": "versions",
+      "repository": "repository",
+      "issues": "issues"
     }
   },
   "commandCatalog": {
@@ -726,8 +955,12 @@
         "functions": "Functions",
         "problems": "Problems found"
       },
-      "counters": { "aria": "Live scan counters" },
-      "controls": { "aria": "Scan controls" },
+      "counters": {
+        "aria": "Live scan counters"
+      },
+      "controls": {
+        "aria": "Scan controls"
+      },
       "btn": {
         "pause": "Pause",
         "resume": "Resume",
@@ -821,13 +1054,41 @@
       "suppressTooltip": "Writes `// ignore_for_file: code_health:<flag>` into this file so future scans drop this flag for the whole file."
     },
     "flag": {
-      "unused": { "label": "unused", "evidence": "0 callers", "rule": "Flagged when no other file references this function name." },
-      "uncovered": { "label": "uncovered", "evidence": "{pct}% tests", "rule": "Flagged when LCOV reports 0% line coverage." },
-      "complex": { "label": "complex", "evidence": "CC {cc}", "rule": "Flagged when cyclomatic complexity exceeds 10." },
-      "undocumented": { "label": "undocumented", "evidence": "CC {cc}, no doc", "rule": "Flagged when a complex function (CC > 10) has no doc comment." },
-      "test_drift": { "label": "test drift", "evidence": "tests lag the function", "rule": "Flagged when the newest linked test file is meaningfully older than the function's source file." },
-      "stub_tested": { "label": "stub-tested", "evidence": "thin asserts", "rule": "Flagged when a linked test exists but barely asserts anything." },
-      "suspicious_coverage": { "label": "suspicious coverage", "evidence": "{pct}% with no test", "rule": "Flagged when LCOV reports high coverage but no test references the function." }
+      "unused": {
+        "label": "unused",
+        "evidence": "0 callers",
+        "rule": "Flagged when no other file references this function name."
+      },
+      "uncovered": {
+        "label": "uncovered",
+        "evidence": "{pct}% tests",
+        "rule": "Flagged when LCOV reports 0% line coverage."
+      },
+      "complex": {
+        "label": "complex",
+        "evidence": "CC {cc}",
+        "rule": "Flagged when cyclomatic complexity exceeds 10."
+      },
+      "undocumented": {
+        "label": "undocumented",
+        "evidence": "CC {cc}, no doc",
+        "rule": "Flagged when a complex function (CC > 10) has no doc comment."
+      },
+      "test_drift": {
+        "label": "test drift",
+        "evidence": "tests lag the function",
+        "rule": "Flagged when the newest linked test file is meaningfully older than the function's source file."
+      },
+      "stub_tested": {
+        "label": "stub-tested",
+        "evidence": "thin asserts",
+        "rule": "Flagged when a linked test exists but barely asserts anything."
+      },
+      "suspicious_coverage": {
+        "label": "suspicious coverage",
+        "evidence": "{pct}% with no test",
+        "rule": "Flagged when LCOV reports high coverage but no test references the function."
+      }
     },
     "shortcuts": {
       "focusFilter": "Focus the row filter",
@@ -906,5 +1167,169 @@
     "showIssues": "Show issues",
     "violationTooltip": "{count} violation(s) across {ruleCount} rule(s). Click to show in Issues.",
     "noViolationsTooltip": "No violations mapped to this category."
+  },
+  "comparison": {
+    "title": "Package Comparison",
+    "actions": {
+      "addToProject": "Add to Project"
+    },
+    "table": {
+      "row": {
+        "vibrancyGrade": "Vibrancy Grade",
+        "category": "Category",
+        "latestVersion": "Latest Version",
+        "published": "Published",
+        "publisher": "Publisher",
+        "pubPoints": "Pub Points",
+        "githubStars": "GitHub Stars",
+        "openIssues": "Open Issues",
+        "codeSize": "Code Size",
+        "bloatRating": "Bloat Rating",
+        "license": "License",
+        "platforms": "Platforms",
+        "inThisProject": "In This Project"
+      },
+      "value": {
+        "unverified": "— (unverified)",
+        "allPlatforms": "All",
+        "yes": "Yes",
+        "no": "No"
+      },
+      "badge": {
+        "inProject": "In Project"
+      }
+    },
+    "status": {
+      "packagesSelected": "{count} packages selected",
+      "packagesCompared": "{count} packages compared",
+      "dimensionsRankedOne": "{count} dimension ranked",
+      "dimensionsRankedOther": "{count} dimensions ranked",
+      "morePackages": "+{count} more"
+    },
+    "empty": {
+      "ariaLabel": "No packages",
+      "message": "No packages selected for comparison. Right-click two or more packages in the Package dashboard and choose {compare}.",
+      "compareWord": "Compare",
+      "openDashboard": "Open Package Dashboard",
+      "openDashboardTitle": "Open the Saropa Package Dashboard."
+    },
+    "a11y": {
+      "skipToTable": "Skip to comparison table",
+      "recommendation": "Recommendation",
+      "addingToProject": "Adding {name} to project"
+    },
+    "shortcuts": {
+      "showOverlay": "Show this shortcut overlay",
+      "closeOverlay": "Close the keyboard-shortcut overlay"
+    },
+    "kpi": {
+      "ariaLabel": "Comparison summary",
+      "leading": "Leading",
+      "leadingTitle": "Package leading by most dimension wins.",
+      "dimensionWinsOne": "{count} dimension win",
+      "dimensionWinsOther": "{count} dimension wins",
+      "packages": "Packages",
+      "packagesTitle": "Number of packages compared side-by-side.",
+      "inComparison": "in comparison",
+      "dimensions": "Dimensions",
+      "dimensionsTitle": "Number of dimensions where a winner could be ranked.",
+      "ranked": "ranked"
+    },
+    "toolbar": {
+      "ariaLabel": "Comparison actions",
+      "packageDashboard": "Package Dashboard",
+      "packageDashboardTitle": "Open the Package Dashboard to compare more packages."
+    }
+  },
+  "detailView": {
+    "empty": {
+      "selectPackage": "Select a package to see details"
+    },
+    "section": {
+      "version": "VERSION",
+      "update": "UPDATE",
+      "suggestion": "SUGGESTION",
+      "community": "COMMUNITY",
+      "dependencies": "DEPENDENCIES",
+      "alerts": "ALERTS",
+      "platforms": "PLATFORMS",
+      "directDeps": "DIRECT DEPS",
+      "readmeImages": "README IMAGES"
+    },
+    "version": {
+      "published": "Published: {date}",
+      "codeSize": "Code Size",
+      "archive": "Archive",
+      "sizeLabel": "{label}: {size}",
+      "source": "Source: {code} code · {comments} comments · {files} files",
+      "replace": "Replace: {summary}"
+    },
+    "update": {
+      "upgrade": "Upgrade",
+      "changelog": "Changelog",
+      "blockedBy": "Blocked by {package}"
+    },
+    "suggestion": {
+      "migrateTo": "Consider migrating to {package}.",
+      "consider": "Consider: {text}.",
+      "alternatives": "Alternatives: {names}",
+      "unused": "This package appears to be unused — consider removing it."
+    },
+    "community": {
+      "issues": "{count} issues",
+      "prs": "{count} PRs",
+      "activity90d": "90d: {closed} issues closed, {merged} PRs merged",
+      "lastCommit": "Last commit: {time}",
+      "archived": "Repository is archived",
+      "pubPoints": "{points}/160 pub points",
+      "latestRelease": "Latest release: {age} ago",
+      "dependents": "{count} dependents"
+    },
+    "dormancy": {
+      "noActivity6mo": "No commits and no releases in 6+ months",
+      "noActivity3mo": "No commits and no releases in 3+ months",
+      "codeInactive": "Release active, code inactive (3+ months without commits)",
+      "releaseSlower": "Code active, release cadence is slower (3+ months)"
+    },
+    "dependencies": {
+      "flagged": "({count} flagged)",
+      "transitiveCount": "{count} transitive packages",
+      "unique": "{count} unique",
+      "shared": "{count} shared ({pct}%)",
+      "moreOverflow": "+{count} more",
+      "sharedList": "Shared: {names}"
+    },
+    "platforms": {
+      "wasm": "WASM"
+    },
+    "links": {
+      "viewFullDetails": "View Full Details",
+      "pubDev": "pub.dev",
+      "documentation": "Documentation",
+      "changelog": "Changelog",
+      "repository": "Repository",
+      "issues": "Issues",
+      "reportIssue": "Report Issue"
+    },
+    "logoAlt": "{packageName} logo",
+    "readMore": "more",
+    "readmeImageAlt": "README image"
+  },
+  "chart": {
+    "toggle": {
+      "excludeShared": "Exclude shared"
+    },
+    "filter": {
+      "clear": "Clear"
+    },
+    "bucket": {
+      "other": "Other ({count} {noun})",
+      "uniqueTransitives": "Unique transitives ({count})",
+      "sharedTransitives": "Shared transitives ({count})"
+    },
+    "noun": {
+      "package": "package",
+      "packages": "packages"
+    }
   }
 }

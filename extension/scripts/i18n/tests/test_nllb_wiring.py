@@ -118,5 +118,91 @@ class TestPrefetchWarmsPrimaryKey(unittest.TestCase):
         self.assertEqual(nf.call_count, 1)
 
 
+class TestNllbMask(unittest.TestCase):
+    """The NLLB-specific __PH__ placeholder mask (distinct from the Google ZZ shield)."""
+
+    def test_mask_round_trips_tokens_and_brand(self) -> None:
+        masked, originals = mt._nllb_mask("Saropa shows {count} of {total}")
+        self.assertNotIn("{count}", masked)
+        self.assertNotIn("Saropa", masked)  # brand shielded too
+        self.assertIn("__PH0__", masked)
+        self.assertEqual(mt._nllb_unmask(masked, originals), "Saropa shows {count} of {total}")
+
+    def test_marks_intact_detects_a_dropped_marker(self) -> None:
+        masked, originals = mt._nllb_mask("a {x} b {y}")
+        self.assertTrue(mt._nllb_marks_intact(masked, len(originals)))
+        damaged = masked.replace("__PH0__", "", 1)
+        self.assertFalse(mt._nllb_marks_intact(damaged, len(originals)))
+
+
+class TestNllbFetch(unittest.TestCase):
+    """_nllb_fetch must reject any result where NLLB altered a placeholder marker,
+    so the caller falls back to Google rather than shipping a corrupted string."""
+
+    @staticmethod
+    def _patch(fn):
+        import nllb_engine
+        return mock.patch.object(nllb_engine, "nllb_translate", side_effect=fn)
+
+    def test_success_when_markers_survive(self) -> None:
+        def fake(masked, locale):  # markers intact, words "translated"
+            return masked.replace("Show", "Montrer").replace(" of ", " de ").replace("packages", "paquets")
+        with self._patch(fake):
+            out = mt._nllb_fetch("fr", "Show {count} of {total} packages")
+        self.assertEqual(out, "Montrer {count} de {total} paquets")
+
+    def test_reject_when_marker_mangled(self) -> None:
+        def fake(masked, locale):  # NLLB translated a placeholder marker away
+            return masked.replace("__PH0__", "le nombre")
+        with self._patch(fake):
+            self.assertIsNone(mt._nllb_fetch("fr", "Show {count} of {total} packages"))
+
+    def test_reject_on_echo(self) -> None:
+        with self._patch(lambda masked, locale: None):  # engine returned nothing
+            self.assertIsNone(mt._nllb_fetch("fr", "Stars"))
+
+
+class TestEngineStats(unittest.TestCase):
+    """The per-run engine tally — the visibility that makes a silent NLLB->Google
+    fallback observable instead of hidden."""
+
+    def setUp(self) -> None:
+        mt.reset_engine_stats()
+        self._env = mock.patch.object(mt, "_mt_env_enabled", return_value=True)
+        self._env.start()
+
+    def tearDown(self) -> None:
+        self._env.stop()
+        mt.reset_engine_stats()
+
+    def test_records_each_engine(self) -> None:
+        cache: dict[str, str] = {}
+        with mock.patch.object(mt, "_nllb_fetch", return_value="N"), \
+                mock.patch.object(mt, "_google_fetch"):
+            mt._translate_one("de", "A", cache=cache, primary="nllb")  # -> nllb
+        with mock.patch.object(mt, "_nllb_fetch", return_value=None), \
+                mock.patch.object(mt, "_google_fetch", return_value="G"):
+            mt._translate_one("de", "B", cache=cache, primary="nllb")  # -> google
+        with mock.patch.object(mt, "_nllb_fetch", return_value=None), \
+                mock.patch.object(mt, "_google_fetch", return_value=None):
+            mt._translate_one("de", "C", cache=cache, primary="nllb")  # -> english
+        with mock.patch.object(mt, "_nllb_fetch", return_value="N"), \
+                mock.patch.object(mt, "_google_fetch"):
+            mt._translate_one("de", "A", cache=cache, primary="nllb")  # -> cached
+        stats = mt.engine_stats_for("de")
+        self.assertEqual((stats.get("nllb"), stats.get("google"), stats.get("english"), stats.get("cached")),
+                         (1, 1, 1, 1))
+
+    def test_echo_attributed_to_english_not_engine(self) -> None:
+        cache: dict[str, str] = {}
+        # Google "succeeds" but echoes the source — must count as english, not google.
+        with mock.patch.object(mt, "_nllb_fetch", return_value=None), \
+                mock.patch.object(mt, "_google_fetch", return_value="Echo"):
+            mt._translate_one("de", "Echo", cache=cache, primary="nllb")
+        stats = mt.engine_stats_for("de")
+        self.assertEqual(stats.get("english"), 1)
+        self.assertIsNone(stats.get("google"))
+
+
 if __name__ == "__main__":
     unittest.main()

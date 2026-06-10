@@ -16,6 +16,7 @@ import { worstSeverity, severityEmoji, severityLabel } from '../scoring/vuln-cla
 import { formatRelativeTime } from '../scoring/time-formatter';
 import { formatPrereleaseTag } from '../scoring/prerelease-classifier';
 import { createWebviewCspNonce, escapeHtml, resolveRepoUrl } from './html-utils';
+import { l10n } from '../../i18n/runtime';
 import { getPackageDetailStyles } from './package-detail-styles';
 import { getPillButtonStyles } from './pill-button-styles';
 import { getPackageDetailScript } from './package-detail-script';
@@ -71,8 +72,8 @@ export function buildPackageDetailHtml(
         buildFileUsagesSection(result),
         buildDependenciesSection(result),
         buildAlertsSection(result),
-        buildVersionGapSection(result.versionGap, 'Version Gap', reviews, reviewSummary),
-        buildVersionGapSection(result.overrideGap, 'Override Gap', reviews, reviewSummary),
+        buildVersionGapSection(result.versionGap, l10n('packageDetail.versionGap.versionTitle'), reviews, reviewSummary),
+        buildVersionGapSection(result.overrideGap, l10n('packageDetail.versionGap.overrideTitle'), reviews, reviewSummary),
         buildPlatformsSection(result),
         buildSuggestionsSection(result),
         buildImagesSection(result),
@@ -89,20 +90,23 @@ export function buildPackageDetailHtml(
  */
 function buildPartialFetchBanner(errors: PackageDetailFetchErrors): string {
     const failed: string[] = [];
-    if (errors.readme) { failed.push('README and logo'); }
-    if (errors.gap) { failed.push('version-gap PRs and issues'); }
-    if (errors.reverseDeps) { failed.push('reverse dependency count'); }
+    if (errors.readme) { failed.push(l10n('packageDetail.partialBanner.partReadme')); }
+    if (errors.gap) { failed.push(l10n('packageDetail.partialBanner.partGap')); }
+    if (errors.reverseDeps) { failed.push(l10n('packageDetail.partialBanner.partReverseDeps')); }
     if (failed.length === 0) { return ''; }
     const list = failed.length === 1
         ? failed[0]
         : failed.length === 2
-            ? `${failed[0]} and ${failed[1]}`
-            : failed.slice(0, -1).join(', ') + ', and ' + failed[failed.length - 1];
+            ? l10n('packageDetail.partialBanner.listTwo', { first: failed[0], second: failed[1] })
+            : l10n('packageDetail.partialBanner.listMany', {
+                head: failed.slice(0, -1).join(', '),
+                last: failed[failed.length - 1],
+            });
     return `<div class="partial-banner" role="status" aria-live="polite">
         <span class="glyph" aria-hidden="true">⚠</span>
-        <span class="partial-msg">Some sections couldn't load: ${escapeHtml(list)}.</span>
+        <span class="partial-msg">${escapeHtml(l10n('packageDetail.partialBanner.message', { list }))}</span>
         <button type="button" class="btn tier-2" id="retry-fetches"
-            title="Retry the failed fetches.">Retry</button>
+            title="${l10n('packageDetail.partialBanner.retryTitle')}">${l10n('packageDetail.partialBanner.retry')}</button>
     </div>`;
 }
 
@@ -118,17 +122,17 @@ function buildHeader(r: VibrancyResult): string {
     // Logo (when available) takes the gauge slot in the hero band — it's the visual focal
     // anchor for a single-package view and parallels how the package dashboard uses a gauge.
     const logoHtml = r.readme?.logoUrl
-        ? `<div class="hero-gauge package-logo-frame"><img class="package-logo" src="${escapeHtml(r.readme.logoUrl)}" alt="${escapeHtml(r.package.name)} logo" /></div>`
+        ? `<div class="hero-gauge package-logo-frame"><img class="package-logo" src="${escapeHtml(r.readme.logoUrl)}" alt="${escapeHtml(l10n('packageDetail.header.logoAlt', { name: r.package.name }))}" /></div>`
         : '';
 
     // Status line carries the package's identity facts: vibrancy grade, version, license,
     // category. These were buried below the title in the old layout and now sit on the same
     // line as the title where the user expects to see them at a glance (guideline §4.1).
     const statusLineHtml = buildStatusLine([
-        { glyph: '🏆', label: `Grade ${grade}`, title: cat, tone: gradeTone(grade) },
+        { glyph: '🏆', label: l10n('packageDetail.header.grade', { grade }), title: cat, tone: gradeTone(grade) },
         { label: `v${r.package.version}` },
-        ...(license ? [{ label: license, title: 'License' }] : []),
-        ...(r.pubDev?.publishedDate ? [{ label: `Published ${r.pubDev.publishedDate.split('T')[0]}` }] : []),
+        ...(license ? [{ label: license, title: l10n('packageDetail.header.licenseTitle') }] : []),
+        ...(r.pubDev?.publishedDate ? [{ label: l10n('packageDetail.header.published', { date: r.pubDev.publishedDate.split('T')[0] }) }] : []),
     ]);
     // §8.1 — pass the bare package name; the helper prepends "Saropa ". The
     // previous "Package: ${name}" title double-noun'd the heading
@@ -173,7 +177,7 @@ function buildDescriptionSection(r: VibrancyResult): string {
     // exists (e.g. a single long URL), falls back to the hard maxLen cut.
     const slice = desc.substring(0, maxLen);
     const truncated = slice.replace(/\s+\S*$/, '') || slice;
-    return `<div class="description-text">${escapeHtml(truncated)}&hellip; ${actionLink(pubUrl, 'read more')}</div>`;
+    return `<div class="description-text">${escapeHtml(truncated)}&hellip; ${actionLink(pubUrl, l10n('packageDetail.description.readMore'))}</div>`;
 }
 
 function buildTopicsSection(r: VibrancyResult): string {
@@ -191,20 +195,20 @@ function buildTopicsSection(r: VibrancyResult): string {
 function buildVersionSection(r: VibrancyResult): string {
     const rows: string[] = [];
 
-    rows.push(row('Constraint', escapeHtml(r.package.constraint)));
+    rows.push(row(l10n('packageDetail.version.constraint'), escapeHtml(r.package.constraint)));
     if (r.pubDev) {
-        rows.push(row('Latest', escapeHtml(r.pubDev.latestVersion)));
+        rows.push(row(l10n('packageDetail.version.latest'), escapeHtml(r.pubDev.latestVersion)));
         if (r.latestPrerelease) {
             const tag = formatPrereleaseTag(r.prereleaseTag);
-            rows.push(row('Prerelease', `${escapeHtml(r.latestPrerelease)} (${escapeHtml(tag)})`));
+            rows.push(row(l10n('packageDetail.version.prerelease'), `${escapeHtml(r.latestPrerelease)} (${escapeHtml(tag)})`));
         }
-        rows.push(row('Published', escapeHtml(r.pubDev.publishedDate.split('T')[0])));
+        rows.push(row(l10n('packageDetail.version.published'), escapeHtml(r.pubDev.publishedDate.split('T')[0])));
     }
     if (r.updateInfo && r.updateInfo.updateStatus !== 'up-to-date') {
-        rows.push(row('Update',
+        rows.push(row(l10n('packageDetail.version.update'),
             `${escapeHtml(r.updateInfo.currentVersion)} &rarr; ${escapeHtml(r.updateInfo.latestVersion)} (${escapeHtml(r.updateInfo.updateStatus)})`));
         if (r.blocker) {
-            rows.push(row('Blocked by', `<strong>${escapeHtml(r.blocker.blockerPackage)}</strong>`));
+            rows.push(row(l10n('packageDetail.version.blockedBy'), `<strong>${escapeHtml(r.blocker.blockerPackage)}</strong>`));
         }
     }
     /* Prefer code size — what the package contributes to a built app.
@@ -215,15 +219,15 @@ function buildVersionSection(r: VibrancyResult): string {
     const sizeBytes = r.codeSizeBytes ?? r.archiveSizeBytes;
     if (sizeBytes !== null) {
         const sizeMB = formatSizeMB(sizeBytes);
-        const bloat = r.bloatRating !== null ? ` (${r.bloatRating}/10 bloat)` : '';
-        const label = r.codeSizeBytes !== null ? 'Code Size' : 'Archive Size';
+        const bloat = r.bloatRating !== null ? ` ${l10n('packageDetail.version.bloat', { rating: String(r.bloatRating) })}` : '';
+        const label = r.codeSizeBytes !== null ? l10n('packageDetail.version.codeSize') : l10n('packageDetail.version.archiveSize');
         rows.push(row(label, `${sizeMB}${bloat}`));
         /* When on-disk total differs materially from code size, surface it
            as a secondary row so the asymmetry (e.g. 40 KB code / 20 MB on
            disk for packages that ship example media) is visible. */
         if (r.codeSizeBytes !== null && r.archiveSizeBytes !== null
             && r.archiveSizeBytes !== r.codeSizeBytes) {
-            rows.push(row('On Disk', formatSizeMB(r.archiveSizeBytes)));
+            rows.push(row(l10n('packageDetail.version.onDisk'), formatSizeMB(r.archiveSizeBytes)));
         }
     }
 
@@ -232,17 +236,17 @@ function buildVersionSection(r: VibrancyResult): string {
         buttons.push(
             `<button class="action-btn" data-action="upgrade" `
             + `data-name="${escapeHtml(r.package.name)}" `
-            + `data-version="${escapeHtml(r.updateInfo.latestVersion)}">Upgrade</button>`,
+            + `data-version="${escapeHtml(r.updateInfo.latestVersion)}">${l10n('packageDetail.version.upgrade')}</button>`,
         );
     }
     const changelogUrl = `https://pub.dev/packages/${encodeURIComponent(r.package.name)}/changelog`;
     // Styled as a secondary button (not an <a>) to match the Upgrade button visually
     buttons.push(
         `<button class="action-btn secondary" data-action="openUrl" `
-        + `data-url="${escapeHtml(changelogUrl)}">View Changelog</button>`,
+        + `data-url="${escapeHtml(changelogUrl)}">${l10n('packageDetail.version.viewChangelog')}</button>`,
     );
 
-    return section('VERSION', `
+    return section(l10n('packageDetail.section.version'), `
         <table class="metrics-table"><tbody>${rows.join('')}</tbody></table>
         <div>${buttons.join('')}</div>
     `);
@@ -255,43 +259,46 @@ function buildCommunitySection(r: VibrancyResult): string {
     if (r.github) {
         const gh = r.github;
         const repoUrl = resolveRepoUrl(gh.repoUrl, r.pubDev?.repositoryUrl);
-        rows.push(row('Stars', `${gh.stars}`));
+        rows.push(row(l10n('packageDetail.community.stars'), `${gh.stars}`));
         if (r.likes !== null) {
-            rows.push(row('Likes', `${r.likes}`));
+            rows.push(row(l10n('packageDetail.community.likes'), `${r.likes}`));
         }
         const issues = gh.trueOpenIssues ?? gh.openIssues;
         // Make issue/PR counts clickable links to the GitHub pages
         const issueLink = repoUrl
-            ? `${actionLink(`${repoUrl}/issues`, `${issues}`)} · ${actionLink(`${repoUrl}/issues/new`, 'Report')}`
+            ? `${actionLink(`${repoUrl}/issues`, `${issues}`)} · ${actionLink(`${repoUrl}/issues/new`, l10n('packageDetail.community.report'))}`
             : `${issues}`;
-        rows.push(row('Open Issues', issueLink));
+        rows.push(row(l10n('packageDetail.community.openIssues'), issueLink));
         if (gh.openPullRequests !== undefined) {
             const prLink = repoUrl
                 ? actionLink(`${repoUrl}/pulls`, `${gh.openPullRequests}`)
                 : `${gh.openPullRequests}`;
-            rows.push(row('Open PRs', prLink));
+            rows.push(row(l10n('packageDetail.community.openPrs'), prLink));
         }
         const activity = gh.closedIssuesLast90d + gh.mergedPrsLast90d;
-        rows.push(row('Activity (90d)',
+        rows.push(row(l10n('packageDetail.community.activity'),
             activity > 0
-                ? `${gh.closedIssuesLast90d} issues closed, ${gh.mergedPrsLast90d} PRs merged`
-                : 'No recent activity'));
+                ? l10n('packageDetail.community.activityValue', {
+                    closed: String(gh.closedIssuesLast90d),
+                    merged: String(gh.mergedPrsLast90d),
+                })
+                : l10n('packageDetail.community.noActivity')));
         if (gh.daysSinceLastCommit !== undefined) {
-            rows.push(row('Last Commit', formatRelativeTime(gh.daysSinceLastCommit)));
+            rows.push(row(l10n('packageDetail.community.lastCommit'), formatRelativeTime(gh.daysSinceLastCommit)));
         }
     }
 
     if (r.pubDev) {
-        rows.push(row('Pub Points', `${r.pubDev.pubPoints}`));
+        rows.push(row(l10n('packageDetail.community.pubPoints'), `${r.pubDev.pubPoints}`));
         if (r.pubDev.publisher) {
-            const badge = r.verifiedPublisher ? ' (verified)' : '';
-            rows.push(row('Publisher', `${escapeHtml(r.pubDev.publisher)}${badge}`));
+            const badge = r.verifiedPublisher ? ` ${l10n('packageDetail.community.verified')}` : '';
+            rows.push(row(l10n('packageDetail.community.publisher'), `${escapeHtml(r.pubDev.publisher)}${badge}`));
         }
     }
     if (r.transitiveInfo && r.transitiveInfo.transitiveCount > 0) {
         const flagged = r.transitiveInfo.flaggedCount > 0
-            ? ` (${r.transitiveInfo.flaggedCount} flagged)` : '';
-        rows.push(row('Transitive Deps', `${r.transitiveInfo.transitiveCount}${flagged}`));
+            ? ` ${l10n('packageDetail.community.flagged', { count: String(r.transitiveInfo.flaggedCount) })}` : '';
+        rows.push(row(l10n('packageDetail.community.transitiveDeps'), `${r.transitiveInfo.transitiveCount}${flagged}`));
 
         // True footprint: own code (or archive fallback) + transitives this
         // dep pulls in. Distinguish unique (eliminated by removing this dep)
@@ -311,12 +318,20 @@ function buildCommunitySection(r: VibrancyResult): string {
             const ifRemoved = own + unique;
             const total = own + unique + shared;
             const breakdown = shared > 0
-                ? `${formatSizeMB(ifRemoved)} unique &middot; +${formatSizeMB(shared)} shared = ${formatSizeMB(total)} total`
+                ? l10n('packageDetail.community.footprintBreakdown', {
+                    unique: formatSizeMB(ifRemoved),
+                    shared: formatSizeMB(shared),
+                    total: formatSizeMB(total),
+                })
                 : `${formatSizeMB(total)}`;
             rows.push(row(
-                'True Footprint',
-                `<span title="Own ${formatSizeMB(own)} + unique transitives ${formatSizeMB(unique)} + shared transitives ${formatSizeMB(shared)}. `
-                + `Removing this dep saves ${formatSizeMB(ifRemoved)} (shared deps stay pulled in by others).">`
+                l10n('packageDetail.community.trueFootprint'),
+                `<span title="${escapeHtml(l10n('packageDetail.community.footprintTooltip', {
+                    own: formatSizeMB(own),
+                    unique: formatSizeMB(unique),
+                    shared: formatSizeMB(shared),
+                    saved: formatSizeMB(ifRemoved),
+                }))}">`
                 + `${breakdown}</span>`,
             ));
         }
@@ -324,10 +339,10 @@ function buildCommunitySection(r: VibrancyResult): string {
     if (r.reverseDependencyCount !== null && r.reverseDependencyCount > 0) {
         // Link to pub.dev search for packages depending on this one
         const depSearchUrl = `https://pub.dev/packages?q=dependency%3A${encodeURIComponent(r.package.name)}`;
-        rows.push(row('Dependents', `${actionLink(depSearchUrl, `${r.reverseDependencyCount.toLocaleString('en-US')} packages`)}`));
+        rows.push(row(l10n('packageDetail.community.dependents'), `${actionLink(depSearchUrl, l10n('packageDetail.community.packagesCount', { count: r.reverseDependencyCount.toLocaleString('en-US') }))}`));
     }
 
-    return section('COMMUNITY', `<table class="metrics-table"><tbody>${rows.join('')}</tbody></table>`);
+    return section(l10n('packageDetail.section.community'), `<table class="metrics-table"><tbody>${rows.join('')}</tbody></table>`);
 }
 
 function buildFileUsagesSection(r: VibrancyResult): string {
@@ -344,20 +359,20 @@ function buildFileUsagesSection(r: VibrancyResult): string {
         items.push(...renderFileUsageLinks(u, /* isCommentedBlock */ false));
     }
     if (commented.length > 0) {
-        items.push(`<div class="file-usage-commented">Commented-out references:</div>`);
+        items.push(`<div class="file-usage-commented">${escapeHtml(l10n('packageDetail.fileUsages.commentedOut'))}</div>`);
         for (const u of commented) {
             items.push(...renderFileUsageLinks(u, /* isCommentedBlock */ true));
         }
     }
 
     const count = active.length;
-    const label = count === 1 ? '1 file' : `${count} files`;
+    const label = l10n('packageDetail.fileUsages.fileCount', { count: String(count) });
     // Headline note when ANY active usage is an export — surfaces the public-
     // API status without requiring the reader to scan the file list.
     const reexportNote = active.some(u => u.isExport)
-        ? ' <span class="reexport-note" title="At least one usage is an export directive">&middot; public API surface</span>'
+        ? ` <span class="reexport-note" title="${l10n('packageDetail.fileUsages.exportNoteTitle')}">&middot; ${l10n('packageDetail.fileUsages.publicApiSurface')}</span>`
         : '';
-    return section(`FILE USAGES (${label})${reexportNote}`, items.join(''));
+    return section(l10n('packageDetail.fileUsages.header', { label }) + reexportNote, items.join(''));
 }
 
 /**
@@ -371,8 +386,8 @@ function buildFileUsagesSection(r: VibrancyResult): string {
 function renderFileUsageLinks(u: PackageUsage, isCommentedBlock: boolean): string[] {
     const itemClass = isCommentedBlock ? 'file-usage-item commented' : 'file-usage-item';
     const badgeTitle = isCommentedBlock
-        ? 'Commented-out re-export'
-        : 'Re-exported \u2014 part of this library\u2019s public API';
+        ? l10n('packageDetail.fileUsages.commentedReexportTitle')
+        : l10n('packageDetail.fileUsages.reexportTitle');
     const path = escapeHtml(u.filePath);
     const rows: string[] = [];
 
@@ -402,7 +417,7 @@ function buildUsageLink(
 ): string {
     const display = escapeHtml(`${rawPath}:${line}`);
     const reexportBadge = showBadge
-        ? ` <span class="file-usage-reexport" title="${badgeTitle}">re-export</span>`
+        ? ` <span class="file-usage-reexport" title="${escapeHtml(badgeTitle)}">${l10n('packageDetail.fileUsages.reexportBadge')}</span>`
         : '';
     return `<div class="${itemClass}">`
         + `<a href="#" data-action="openFile" data-path="${escapedPath}" data-line="${line}">${display}</a>`
@@ -419,20 +434,20 @@ function buildDependenciesSection(r: VibrancyResult): string {
         return `<a href="#" class="dep-chip" data-action="openUrl" data-url="${escapeHtml(url)}">${escapeHtml(name)}</a>`;
     }).join(' ');
 
-    return section('DEPENDENCIES', `<div class="dep-list">${chips}</div>`);
+    return section(l10n('packageDetail.section.dependencies'), `<div class="dep-list">${chips}</div>`);
 }
 
 function buildAlertsSection(r: VibrancyResult): string {
     const items: string[] = [];
 
     if (r.github?.isArchived) {
-        items.push(alertItem('ARCHIVED — repository is read-only', 'critical'));
+        items.push(alertItem(escapeHtml(l10n('packageDetail.alerts.archived')), 'critical'));
     }
     if (r.knownIssue?.reason) {
-        items.push(alertItem(`Known Issue: ${r.knownIssue.reason}`, 'critical'));
+        items.push(alertItem(escapeHtml(l10n('packageDetail.alerts.knownIssue', { reason: r.knownIssue.reason })), 'critical'));
     }
     if (r.isUnused) {
-        items.push(alertItem('Unused — no imports detected', 'info'));
+        items.push(alertItem(escapeHtml(l10n('packageDetail.alerts.unused')), 'info'));
     }
 
     // Flagged issues
@@ -450,7 +465,7 @@ function buildAlertsSection(r: VibrancyResult): string {
     // Vulnerabilities
     for (const vuln of r.vulnerabilities) {
         const icon = severityEmoji(vuln.severity);
-        const fixInfo = vuln.fixedVersion ? ` — fix: ${escapeHtml(vuln.fixedVersion)}` : '';
+        const fixInfo = vuln.fixedVersion ? ` ${escapeHtml(l10n('packageDetail.alerts.fix', { version: vuln.fixedVersion }))}` : '';
         items.push(alertItem(
             `${icon} <a href="#" data-action="openUrl" data-url="${escapeHtml(vuln.url)}">`
             + `${escapeHtml(vuln.id)}</a>: `
@@ -461,7 +476,7 @@ function buildAlertsSection(r: VibrancyResult): string {
     }
 
     if (items.length === 0) { return ''; }
-    return section('ALERTS', items.join(''));
+    return section(l10n('packageDetail.section.alerts'), items.join(''));
 }
 
 function buildVersionGapSection(
@@ -473,12 +488,12 @@ function buildVersionGapSection(
     if (!gap) { return ''; }
     if (gap.items.length === 0 && !gap.fromDate) {
         // Could not determine version dates — show empty message
-        return section(`${label} (${escapeHtml(gap.currentVersion)} → ${escapeHtml(gap.latestVersion)})`,
-            '<div class="loading-spinner">Could not determine version dates for this package.</div>');
+        return section(buildVersionGapTitle(label, gap),
+            `<div class="loading-spinner">${escapeHtml(l10n('packageDetail.versionGap.noDates'))}</div>`);
     }
     if (gap.items.length === 0) {
-        return section(`${label} (${escapeHtml(gap.currentVersion)} → ${escapeHtml(gap.latestVersion)})`,
-            '<div class="loading-spinner">No PRs or issues found between these versions.</div>');
+        return section(buildVersionGapTitle(label, gap),
+            `<div class="loading-spinner">${escapeHtml(l10n('packageDetail.versionGap.noItems'))}</div>`);
     }
 
     // Unique prefix per section so IDs don't collide when both gaps render
@@ -493,11 +508,11 @@ function buildVersionGapSection(
         <div class="gap-summary">
             <div class="gap-card">
                 <div class="count">${prCount}</div>
-                <div class="label">PRs merged</div>
+                <div class="label">${l10n('packageDetail.versionGap.prsMerged')}</div>
             </div>
             <div class="gap-card">
                 <div class="count">${issueCount}</div>
-                <div class="label">Issues closed</div>
+                <div class="label">${l10n('packageDetail.versionGap.issuesClosed')}</div>
             </div>
         </div>
     `;
@@ -510,13 +525,13 @@ function buildVersionGapSection(
     // default.
     const toolbar = `
         <div class="gap-toolbar" data-section="${sectionId}">
-            <label class="sr-only" for="gap-search-${sectionId}">Search PRs and issues</label>
-            <input type="text" id="gap-search-${sectionId}" class="gap-search" placeholder="Search PRs and issues...">
-            <span class="seg" role="radiogroup" aria-label="Filter by category">
-                <button class="filter-btn active" role="radio" aria-checked="true" data-filter="all">All</button>
-                <button class="filter-btn" role="radio" aria-checked="false" data-filter="unreviewed">Unreviewed</button>
-                <button class="filter-btn" role="radio" aria-checked="false" data-filter="prs">PRs</button>
-                <button class="filter-btn" role="radio" aria-checked="false" data-filter="issues">Issues</button>
+            <label class="sr-only" for="gap-search-${sectionId}">${l10n('packageDetail.versionGap.searchLabel')}</label>
+            <input type="text" id="gap-search-${sectionId}" class="gap-search" placeholder="${l10n('packageDetail.versionGap.searchPlaceholder')}">
+            <span class="seg" role="radiogroup" aria-label="${l10n('packageDetail.versionGap.filterAria')}">
+                <button class="filter-btn active" role="radio" aria-checked="true" data-filter="all">${l10n('packageDetail.versionGap.filterAll')}</button>
+                <button class="filter-btn" role="radio" aria-checked="false" data-filter="unreviewed">${l10n('packageDetail.versionGap.filterUnreviewed')}</button>
+                <button class="filter-btn" role="radio" aria-checked="false" data-filter="prs">${l10n('packageDetail.versionGap.filterPrs')}</button>
+                <button class="filter-btn" role="radio" aria-checked="false" data-filter="issues">${l10n('packageDetail.versionGap.filterIssues')}</button>
             </span>
         </div>
     `;
@@ -526,7 +541,7 @@ function buildVersionGapSection(
         const status = review?.status ?? 'unreviewed';
         const notes = review?.notes ?? '';
         const typeClass = item.type === 'pr' ? 'type-pr' : 'type-issue';
-        const typeLabel = item.type === 'pr' ? 'PR' : 'Issue';
+        const typeLabel = item.type === 'pr' ? l10n('packageDetail.versionGap.typePr') : l10n('packageDetail.versionGap.typeIssue');
         const searchText = [
             `#${item.number}`, item.title, item.author,
             ...item.labels, typeLabel, status,
@@ -552,12 +567,12 @@ function buildVersionGapSection(
                 <td>
                     <select class="review-select" value="${status}">
                         <option value="unreviewed"${status === 'unreviewed' ? ' selected' : ''}>—</option>
-                        <option value="reviewed"${status === 'reviewed' ? ' selected' : ''}>Reviewed</option>
-                        <option value="applicable"${status === 'applicable' ? ' selected' : ''}>Applicable</option>
-                        <option value="not-applicable"${status === 'not-applicable' ? ' selected' : ''}>N/A</option>
+                        <option value="reviewed"${status === 'reviewed' ? ' selected' : ''}>${l10n('packageDetail.versionGap.reviewReviewed')}</option>
+                        <option value="applicable"${status === 'applicable' ? ' selected' : ''}>${l10n('packageDetail.versionGap.reviewApplicable')}</option>
+                        <option value="not-applicable"${status === 'not-applicable' ? ' selected' : ''}>${l10n('packageDetail.versionGap.reviewNotApplicable')}</option>
                     </select>
                     <input class="notes-input" type="text"
-                           placeholder="Notes..."
+                           placeholder="${l10n('packageDetail.versionGap.notesPlaceholder')}"
                            value="${escapeHtml(notes)}">
                 </td>
             </tr>
@@ -569,10 +584,10 @@ function buildVersionGapSection(
             <thead>
                 <tr>
                     <th data-col="number">#<span class="sort-arrow"></span></th>
-                    <th data-col="type">Type<span class="sort-arrow"></span></th>
-                    <th data-col="title">Title<span class="sort-arrow"></span></th>
-                    <th data-col="author">Author<span class="sort-arrow"></span></th>
-                    <th>Review</th>
+                    <th data-col="type">${l10n('packageDetail.versionGap.colType')}<span class="sort-arrow"></span></th>
+                    <th data-col="title">${l10n('packageDetail.versionGap.colTitle')}<span class="sort-arrow"></span></th>
+                    <th data-col="author">${l10n('packageDetail.versionGap.colAuthor')}<span class="sort-arrow"></span></th>
+                    <th>${l10n('packageDetail.versionGap.colReview')}</th>
                 </tr>
             </thead>
             <tbody>${tableRows}</tbody>
@@ -580,25 +595,38 @@ function buildVersionGapSection(
     `;
 
     const footerText = summary
-        ? `${summary.triaged} of ${summary.total} triaged | `
-            + `${summary.applicable} applicable | `
-            + `${summary.notApplicable} N/A | `
-            + `${summary.unreviewed} remaining`
+        ? l10n('packageDetail.versionGap.summaryFooter', {
+            triaged: String(summary.triaged),
+            total: String(summary.total),
+            applicable: String(summary.applicable),
+            notApplicable: String(summary.notApplicable),
+            unreviewed: String(summary.unreviewed),
+        })
         : '';
     const footer = `<div class="gap-footer review-summary">${footerText}</div>`;
 
     const truncatedNote = gap.truncated
-        ? `<div class="gap-footer"><em>Results truncated to 100 items.</em></div>` : '';
+        ? `<div class="gap-footer"><em>${escapeHtml(l10n('packageDetail.versionGap.truncated', { limit: '100' }))}</em></div>` : '';
 
-    const title = `${label} (${escapeHtml(gap.currentVersion)} → ${escapeHtml(gap.latestVersion)})`;
+    const title = buildVersionGapTitle(label, gap);
     return section(title, summaryCards + toolbar + table + footer + truncatedNote);
+}
+
+/**
+ * Section title for a version-gap block: the localized label plus the
+ * current→latest version range. The arrow is a glyph (not a word), so only
+ * the surrounding versions interpolate; the label is already localized by
+ * the caller.
+ */
+function buildVersionGapTitle(label: string, gap: VersionGapResult): string {
+    return `${label} (${escapeHtml(gap.currentVersion)} → ${escapeHtml(gap.latestVersion)})`;
 }
 
 function buildPlatformsSection(r: VibrancyResult): string {
     if (!r.platforms?.length) { return ''; }
     const platforms = r.platforms.map(p => escapeHtml(p)).join(', ');
-    const wasm = r.wasmReady ? ' &middot; WASM' : '';
-    return section('PLATFORMS', `<div>${platforms}${wasm}</div>`);
+    const wasm = r.wasmReady ? ` &middot; ${l10n('packageDetail.platforms.wasm')}` : '';
+    return section(l10n('packageDetail.section.platforms'), `<div>${platforms}${wasm}</div>`);
 }
 
 function buildSuggestionsSection(r: VibrancyResult): string {
@@ -611,7 +639,7 @@ function buildSuggestionsSection(r: VibrancyResult): string {
             <a href="#" data-action="openUrl" data-url="${escapeHtml(url)}">${escapeHtml(alt.name)}</a>${gradeText}
         </div>`;
     }).join('');
-    return section('SUGGESTIONS', items);
+    return section(l10n('packageDetail.section.suggestions'), items);
 }
 
 function buildImagesSection(r: VibrancyResult): string {
@@ -626,11 +654,11 @@ function buildImagesSection(r: VibrancyResult): string {
 
     const items = galleryImages.map(url =>
         `<a href="#" data-action="openUrl" data-url="${escapeHtml(url)}">`
-        + `<img src="${escapeHtml(url)}" alt="README image" loading="lazy" />`
+        + `<img src="${escapeHtml(url)}" alt="${escapeHtml(l10n('packageDetail.images.alt'))}" loading="lazy" />`
         + `</a>`,
     ).join('');
 
-    return section('README IMAGES', `<div class="image-gallery">${items}</div>`);
+    return section(l10n('packageDetail.section.readmeImages'), `<div class="image-gallery">${items}</div>`);
 }
 
 function buildLinksRow(r: VibrancyResult): string {
@@ -638,14 +666,14 @@ function buildLinksRow(r: VibrancyResult): string {
     const docUrl = `https://pub.dev/documentation/${encodeURIComponent(r.package.name)}/latest/`;
     const repoUrl = resolveRepoUrl(r.github?.repoUrl, r.pubDev?.repositoryUrl);
     const links: string[] = [];
-    links.push(actionLink(pubUrl, 'View on pub.dev'));
-    links.push(actionLink(docUrl, 'Documentation'));
-    links.push(actionLink(`${pubUrl}/changelog`, 'Changelog'));
-    links.push(actionLink(`${pubUrl}/versions`, 'Versions'));
+    links.push(actionLink(pubUrl, l10n('packageDetail.links.viewOnPubDev')));
+    links.push(actionLink(docUrl, l10n('packageDetail.links.documentation')));
+    links.push(actionLink(`${pubUrl}/changelog`, l10n('packageDetail.links.changelog')));
+    links.push(actionLink(`${pubUrl}/versions`, l10n('packageDetail.links.versions')));
     if (repoUrl) {
-        links.push(actionLink(repoUrl, 'Repository'));
-        links.push(actionLink(`${repoUrl}/issues`, 'Open Issues'));
-        links.push(actionLink(`${repoUrl}/issues/new`, 'Report Issue'));
+        links.push(actionLink(repoUrl, l10n('packageDetail.links.repository')));
+        links.push(actionLink(`${repoUrl}/issues`, l10n('packageDetail.links.openIssues')));
+        links.push(actionLink(`${repoUrl}/issues/new`, l10n('packageDetail.links.reportIssue')));
     }
     return `<div class="links-row">${links.join(' &middot; ')}</div>`;
 }
@@ -701,14 +729,14 @@ function wrapHtml(title: string, body: string): string {
     <style nonce="${nonce}">${getDashboardChromeStyles()}${getPillButtonStyles()}${getPackageDetailStyles()}${getKeyboardShortcutsStyles()}</style>
 </head>
 <body>
-    <a href="#package-detail-main" class="skip-link">Skip to package details</a>
+    <a href="#package-detail-main" class="skip-link">${l10n('packageDetail.a11y.skipToDetails')}</a>
     <div id="announcer" role="status" aria-live="polite" aria-atomic="true"></div>
     <main id="package-detail-main" tabindex="-1">
     ${body}
     </main>
     ${buildKeyboardShortcutsOverlay([
-        { key: '?', label: 'Show this shortcut overlay' },
-        { key: 'Esc', label: 'Close the keyboard-shortcut overlay' },
+        { key: '?', label: l10n('packageDetail.shortcuts.showOverlay') },
+        { key: 'Esc', label: l10n('packageDetail.shortcuts.closeOverlay') },
     ])}
     <script nonce="${nonce}">
         ${getPackageDetailScript()}
