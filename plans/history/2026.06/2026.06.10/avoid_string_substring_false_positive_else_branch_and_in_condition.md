@@ -1,6 +1,6 @@
 # BUG: `avoid_string_substring` — guard not recognized when the substring is in the ELSE branch of an `indexOf` ternary, or inside the `if` CONDITION itself
 
-**Status: Open**
+**Status: Fixed**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
@@ -201,3 +201,7 @@ The fixture should include:
 - Dart SDK version: >=3.9.0 <4.0.0
 - analyzer: >=9.0.0 <13.0.0
 - Triggering project/file: `d:\src\contacts` — `lib/utils/contact/matching/contact_match_normalizers.dart:225`, `lib/utils/contact/matching/contact_merged_view.dart:182`, `lib/utils/system/main_error_handling.dart:162`, `lib/database/file_backup/import/vcard_import_utils.dart:169`
+
+## Finish Report (2026-06-10)
+
+Fixed in WS-1. `_isGuardedByLengthCheck` now accepts the ELSE-expression of a `ConditionalExpression` (polarity-agnostic, matching how the heuristic already treats arg/receiver mentions) and detects a substring evaluated inside an `if` CONDITION via offset-containment (`_nodeWithin`). Verified by `test/rules/code_quality/avoid_string_substring_guard_test.dart` (else `< 0`, else `== -1`, in-condition cases all return guarded=true; an unrelated-flag ternary still returns guarded=false).

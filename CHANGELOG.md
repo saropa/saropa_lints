@@ -67,8 +67,9 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ### Fixed
 
+- **`avoid_string_substring` recognizes more bounds guards and no longer flags provably in-bounds slices.** It now accepts the else-branch of an `indexOf` ternary, a substring evaluated inside an `if` condition, `isEmpty`/`isNotEmpty` guards, `startsWith`/`isEmpty`/regex early-exit returns, property/index substring arguments (`prefix.length`, `match.start`, `split[0]`), and post-loop slices bounded by a preceding loop. No action required.
 - **`avoid_returning_null_for_future` no longer flags `return null` from a function declared to return a nullable Future (`Future<T>?`).** A nullable Future explicitly permits null, so the return is type-correct; only non-nullable `Future<T>` is still flagged. No action required.
-- **`avoid_ios_hardcoded_device_model` only fires when code branches on a device name (`==`/`!=` or a switch case).** Device names appearing as data — list elements, string-cleanup arguments, messages — are no longer flagged. No action required.
+- **`avoid_ios_hardcoded_device_model` no longer flags device names that appear as data.** A device model in a list/set/map literal (e.g. an email-signature noise-filter corpus) is exempt, while a genuine `== 'iPhone 14'` comparison or `model.contains('iPod touch')` check still fires. No action required.
 - **`require_dialog_tests` no longer flags calls that merely contain "Dialog" in their name.** A localization string getter such as `emergencyDirectoryDialogHeader(...)` is not a dialog launch; the rule now matches known dialog launchers or `*Dialog*` calls that return an awaitable. No action required.
 - **`require_error_identification` no longer flags non-color ternaries that select a log-severity enum or text label.** It now requires a branch to be `Color`-typed, so a `DebugLevels.Error` selection is not mistaken for an error-color cue. No action required.
 - **`avoid_unbounded_cache_growth` recognizes `removeWhere` / `removeRange` / `clear` as eviction.** A cache pruned with these idiomatic operations is no longer reported as unbounded. No action required.
@@ -208,6 +209,8 @@ False-positive fixes for the `avoid_large_list_copy` and `prefer_single_setstate
 
 ## [13.11.10]
 
+False-positive fixes for the `require_file_exists_check`, `avoid_parameter_mutation`, `require_intl_date_format_locale`, and `prefer_value_listenable_builder` rules. No action required unless you added a project-local ignore for the patterns below. [log](https://github.com/saropa/saropa_lints/blob/v13.11.10/CHANGELOG.md)
+
 ### Fixed
 
 - **`require_file_exists_check` no longer fires when the read is guarded by the synchronous `existsSync()` check.** Only the async `exists()` form was recognized, so the common `file.existsSync() ? await file.readAsBytes() : null` pattern was wrongly flagged — the guard is now also detected in `if` conditions, ternary conditions, and preceding statements. Remove any project-local `// ignore: require_file_exists_check` added on `existsSync()`-guarded reads.
@@ -216,6 +219,8 @@ False-positive fixes for the `avoid_large_list_copy` and `prefer_single_setstate
 - **`prefer_value_listenable_builder` no longer fires when the single state field is a `Future`/`Stream` cache backing a `FutureBuilder`/`StreamBuilder`.** That field uses `setState` to invalidate-and-re-fetch (e.g. `_future = null`), which `ValueListenableBuilder` cannot express, so the suggestion was inapplicable — remove any project-local `// ignore: prefer_value_listenable_builder` added on such async-cache states.
 
 ## [13.11.9]
+
+A false-positive fix for the `avoid_nullable_interpolation` rule. No action required unless you added a project-local ignore for the patterns below. [log](https://github.com/saropa/saropa_lints/blob/v13.11.9/CHANGELOG.md)
 
 ### Fixed
 
