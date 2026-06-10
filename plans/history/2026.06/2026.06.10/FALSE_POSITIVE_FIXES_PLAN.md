@@ -66,3 +66,26 @@ New `example_*` dirs go in `analysis_options.yaml` exclude.
 2. WS-1 (substring family).
 3. WS-3, WS-4, small WS-6 items.
 4. WS-2 `avoid_unsafe_collection_methods`, WS-6 `prefer_value_listenable_builder`/`prefer_single_setstate` (riskiest, isolated).
+
+## Finish Report (2026-06-10)
+
+
+
+**Scope:** (A) Dart lint rules / analyzer plugin + `example/` fixtures + Dart `test/`.
+
+All 23 false-positive reports filed 2026-06-09/10 are addressed across 6 commits on `main`:
+
+- `b74c4d83` WS-5: avoid_returning_null_for_future, avoid_ios_hardcoded_device_model, require_dialog_tests, require_error_identification, avoid_unbounded_cache_growth (avoid_mixed_environments confirmed already fixed upstream).
+- `3fef498b` WS-1: avoid_string_substring (4 reports — guard-recognition cluster).
+- `03e80f2a` WS-3: always_remove_listener, avoid_context_in_initstate_dispose.
+- `0c84d099` WS-4: avoid_listview_without_item_extent (2 reports).
+- `bf3e0179` WS-2: avoid_collection_equality_checks, avoid_unsafe_collection_methods (8 guard patterns).
+- `e7975dd7` (+ `9bbefffc` integrity/fixture fixup) WS-6: avoid_string_concatenation_loop, avoid_swallowing_exceptions, avoid_unawaited_future, avoid_excessive_rebuilds_animation, prefer_setup_teardown, prefer_single_setstate, prefer_value_listenable_builder.
+
+**Verification approach (key finding):** the scan CLI (`ScanRunner`) and `parseString`-based tests do NOT resolve types or rewrite constructor calls to `InstanceCreationExpression`, so type-gated and InstanceCreation-gated rules are inert there. Pure-AST guard logic was verified with new `parseString` unit tests via `@visibleForTesting` accessors (avoid_string_substring, widget-lifecycle, avoid_listview, avoid_unsafe_collection_methods, prefer_single_setstate, avoid_excessive_rebuilds_animation, avoid_unawaited_future); AST/source rules via the scan CLI; resolution-dependent rules against the real `d:/src/contacts` FP sites. As a bonus, avoid_listview_without_item_extent and avoid_excessive_rebuilds_animation now also handle the unresolved MethodInvocation constructor shape, so they fire in the scan CLI where they previously could not.
+
+**Full suite:** `dart test test/rules/ test/integrity/` → 5362 pass, 1 skipped. All changed rule files `dart analyze` clean (the only 2 warnings are a pre-existing `ExtensionType.primaryConstructor` dead-code issue in an unrelated rule, surfaced by analyzer drift — not introduced by this work).
+
+**Documented residual (not a hidden gap):** prefer_value_listenable_builder clears categories 1/2/4/6; categories 3 (transient in-flight lock) and 5 (persisted-pref mirror) remain by design — the bug report itself flags them as structurally indistinguishable from single-value display state, so suppressing them would risk killing genuine positives. Recorded in that bug's archived finish report; surfaced to the user as a follow-up decision.
+
+**Bugs archived:** all 22 reports → `plans/history/2026.06/2026.06.10/` (avoid_mixed_environments was already at `2026.06.09/`), each with an appended `## Finish Report`.
