@@ -92,6 +92,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 <summary>Maintenance</summary>
 
 - Added regression fixtures for `avoid_equal_expressions` covering compound arithmetic with identical operands (`dx * dx + dy * dy`, `(a * a + b * b) / 2`). The rule already excludes arithmetic operators (fixed in 13.12.2); these cases guard against a future regression. No behavior change.
+- The extension localization tooling can now use Meta NLLB-200-3.3B (local, offline) as the primary machine-translation engine, with Google Translate as the per-string fallback — substantially higher quality on low-resource languages where the free web engine produces near-gibberish. It activates automatically when the model is on disk (reusing a download shared with other Saropa tooling) and falls back to Google otherwise; `SAROPA_SKIP_NLLB=1` forces Google-only and `nllb_engine.py --setup` downloads the model. No shipped locale strings change until the locales are regenerated and committed. No behavior change for the lint package.
 
 </details>
 

@@ -563,9 +563,12 @@ class AvoidParameterMutationRule extends SaropaLintRule {
 
 /// Visitor that detects mutations of parameter objects.
 ///
-/// Checks for field assignments, index assignments, and cascade assignments.
-/// Collection method calls (add, addAll, etc.) are intentionally skipped —
-/// they represent the standard accumulator/output pattern in Dart.
+/// Checks for field assignments and cascade field assignments. Index assignment
+/// (`param[i] = x`) is flagged only on non-collection parameters; index
+/// assignment into a List / typed-data / Map parameter is the fill-buffer /
+/// output pattern and is exempt. Collection method calls (add, addAll, etc.) are
+/// intentionally skipped — they represent the standard accumulator/output
+/// pattern in Dart.
 class _ParameterMutationVisitor extends RecursiveAstVisitor<void> {
   _ParameterMutationVisitor(this.paramTypeNames, this.reporter, this.code);
 
@@ -594,11 +597,19 @@ class _ParameterMutationVisitor extends RecursiveAstVisitor<void> {
       }
     }
 
-    // Check for param[index] = value pattern
+    // param[index] = value. Index assignment into a List / typed-data / Map
+    // parameter is the fill-buffer/output pattern — the caller allocates a
+    // buffer (e.g. List.filled) and passes it in solely to be populated, so
+    // there is no shared caller state to corrupt. That is the same intent as the
+    // .add/.addAll method exemption above, so it must be treated symmetrically
+    // and NOT flagged. Index assignment through a non-collection parameter (a
+    // custom DTO with operator[]=) is still real caller mutation, so it stays
+    // flagged.
     if (left is IndexExpression) {
       final Expression? target = left.target;
       if (target is SimpleIdentifier &&
-          _isMutableParameter(target.name, target.staticType)) {
+          _isMutableParameter(target.name, target.staticType) &&
+          !_isOutputCollectionParameter(target.name, target.staticType)) {
         reporter.atNode(node);
       }
     }
@@ -641,6 +652,22 @@ class _ParameterMutationVisitor extends RecursiveAstVisitor<void> {
     if (_isMutationByDesignType(staticType)) return false;
     return true;
   }
+
+  /// True when [name] is a parameter whose declared/static type is an indexable
+  /// output collection (`List` / typed-data list / `Map`), so `param[index] =
+  /// value` is the fill-buffer/output pattern rather than caller-data
+  /// corruption. Uses the declared type name (works under the syntax-only scan,
+  /// where staticType is unavailable) and, when types are resolved, the
+  /// supertype chain — so typed-data lists (which implement `List`) and custom
+  /// List/Map subclasses are recognized too.
+  bool _isOutputCollectionParameter(String name, DartType? staticType) {
+    final String? declaredType = paramTypeNames[name];
+    if (declaredType != null &&
+        _outputCollectionTypeNames.contains(declaredType)) {
+      return true;
+    }
+    return _isOutputCollectionType(staticType);
+  }
 }
 
 /// Type names whose mutation IS the designed contract — a caller passes one in
@@ -668,6 +695,48 @@ bool _isMutationByDesignType(DartType? type) {
   if (_mutationByDesignTypeNames.contains(type.element.name)) return true;
   return type.allSupertypes.any(
     (InterfaceType t) => _mutationByDesignTypeNames.contains(t.element.name),
+  );
+}
+
+/// Indexable collection types whose index assignment (`param[i] = x` /
+/// `param[k] = v`) is the fill-buffer / output pattern, not caller-data
+/// corruption. A caller that allocates a List/typed-data buffer (or a Map) and
+/// passes it in for the callee to populate is using the parameter as an
+/// out-parameter — there is no shared caller state to corrupt. This mirrors the
+/// accumulator/output exemption the visitor already applies to `.add`/`.addAll`
+/// collection method calls; index assignment is the same intent expressed
+/// differently, so it is treated symmetrically. (Field/cascade-field assignment
+/// — the real DTO-corruption case — is still flagged.)
+const Set<String> _outputCollectionTypeNames = <String>{
+  'List',
+  'Map',
+  'Uint8List',
+  'Uint8ClampedList',
+  'Uint16List',
+  'Uint32List',
+  'Uint64List',
+  'Int8List',
+  'Int16List',
+  'Int32List',
+  'Int64List',
+  'Float32List',
+  'Float64List',
+  'Int32x4List',
+  'Float32x4List',
+  'Float64x2List',
+};
+
+/// True when [type] is, or implements/extends, an indexable output collection
+/// (`List` / typed-data list / `Map`).
+///
+/// Walks the supertype chain so typed-data lists (which implement `List<int>` /
+/// `List<double>`) and custom List/Map subclasses are recognized, not just the
+/// exact names — mirroring [_isMutationByDesignType].
+bool _isOutputCollectionType(DartType? type) {
+  if (type is! InterfaceType) return false;
+  if (_outputCollectionTypeNames.contains(type.element.name)) return true;
+  return type.allSupertypes.any(
+    (InterfaceType t) => _outputCollectionTypeNames.contains(t.element.name),
   );
 }
 
