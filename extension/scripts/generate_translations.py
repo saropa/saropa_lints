@@ -5,7 +5,16 @@ Sets up the environment and invokes generate_locales.py with the correct
 Python interpreter. Eliminates shell-specific env var syntax differences
 between PowerShell, cmd, and bash.
 
-Requires: pip install deep-translator
+Translation engine: when the local Meta NLLB-200-3.3B model is available it is
+used as the PRIMARY engine (much higher quality, especially for low-resource
+languages), with Google Translate as the per-string fallback. Otherwise Google
+Translate is used alone. The startup banner from generate_locales.py states
+which engine is active.
+
+Requires: pip install deep-translator (Google fallback). For NLLB quality, run
+``py -3 extension/scripts/i18n/nllb_engine.py --setup`` once to download the
+~7 GB model (reused automatically if it was already downloaded for the contacts
+project). Set ``SAROPA_SKIP_NLLB=1`` to force Google-only.
 
 Usage (from repo root):
     py -3 extension/scripts/generate_translations.py                    # all locales

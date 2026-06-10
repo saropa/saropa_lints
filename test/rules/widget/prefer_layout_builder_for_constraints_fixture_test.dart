@@ -32,7 +32,7 @@ void main() {
       );
     });
 
-    test('BAD fixture declares eight expect_lint markers', () {
+    test('BAD fixture declares nine expect_lint markers', () {
       final file = File('example/lib/widget_layout/${ruleName}_fixture.dart');
       expect(file.existsSync(), isTrue);
       final content = file.readAsStringSync();
@@ -41,11 +41,12 @@ void main() {
           .length;
       expect(
         markerCount,
-        equals(8),
+        equals(9),
         reason:
             'Constrained width, width+height, sizeOf width, two width operands, '
-            'AnimatedBuilder builder callback, and instance-helper '
-            'taking BuildContext (preserves 2026-04-28 behavior)',
+            'AnimatedBuilder builder callback, instance-helper taking '
+            'BuildContext (preserves 2026-04-28 behavior), and window width '
+            'assigned to a named width: argument (BadDirectSizing)',
       );
     });
 

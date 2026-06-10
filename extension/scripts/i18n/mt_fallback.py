@@ -99,10 +99,15 @@ def save_mt_cache(cache: dict[str, str]) -> None:
     _CACHE_PATH.write_text(json.dumps(cache, ensure_ascii=False, indent=0) + "\n", encoding="utf-8")
 
 
-def _cache_key(locale: str, text: str) -> str:
+def _cache_key(locale: str, text: str, engine: str = "google") -> str:
     # Bump prefix when MT pipeline changes (invalidate stale cache entries).
     h = hashlib.sha256(f"v2|{locale}\n{text}".encode("utf-8")).hexdigest()
-    return f"{locale}:{h}"
+    # Google/legacy entries keep the bare ``locale:hash`` form so the existing
+    # cache stays valid after the NLLB engine landed; other engines namespace by
+    # name so NLLB and Google translations for the same string coexist. When
+    # NLLB becomes available for a locale its keys are empty, so the run
+    # naturally re-translates via NLLB instead of serving stale Google output.
+    return f"{locale}:{h}" if engine == "google" else f"{engine}:{locale}:{h}"
 
 
 # Word-boundary patterns for brand terms (no letter on either side) so "Saropa"
@@ -299,10 +304,14 @@ def _accept(text: str, candidate: str) -> bool:
     )
 
 
-def _fetch_translation(gt: object, text: str) -> str | None:
+def _fetch_translation(translate_fn, text: str) -> str | None:
     """Translate *text* preserving every ``{token}`` and brand term, or give up.
 
-    Two stages, because Google handles shielded tokens inconsistently:
+    Engine-agnostic: *translate_fn* takes a (possibly shielded) string and
+    returns the engine's raw output or ``None``. Google and NLLB both plug in
+    here so the shield / validate / echo handling stays identical across engines.
+
+    Two stages, because engines handle shielded tokens inconsistently:
       1. Shield placeholders + brand with ASCII sentinels, translate, and accept
          only if every sentinel round-tripped EXACTLY (``_sentinels_intact``) and
          the unshielded result has no residue and changed the text.
@@ -316,7 +325,7 @@ def _fetch_translation(gt: object, text: str) -> str | None:
     """
     masked, holders = shield_placeholders(text)
     n = len(holders)
-    shielded = _translate_with_retry(gt, masked)
+    shielded = translate_fn(masked)
     echoed_clean: str | None = None
     if shielded is not None and shielded.strip() and _sentinels_intact(shielded, n):
         restored = unshield_placeholders(shielded, holders)
@@ -330,7 +339,7 @@ def _fetch_translation(gt: object, text: str) -> str | None:
     # Raw-brace fallback (brand still shielded).
     brand_masked, brand_holders = _shield_brand_only(text)
     if _PLACEHOLDER_FULL.search(text) or brand_holders:
-        raw = _translate_with_retry(gt, brand_masked)
+        raw = translate_fn(brand_masked)
         if raw is not None and raw.strip() and _sentinels_intact(raw, len(brand_holders)):
             cand = unshield_placeholders(raw, brand_holders)
             if _accept(text, cand):
@@ -339,41 +348,153 @@ def _fetch_translation(gt: object, text: str) -> str | None:
     return echoed_clean
 
 
-def machine_translate(text: str, locale: str, *, cache: dict[str, str]) -> str:
-    """Translate *text* from English to *locale*; update *cache* in memory."""
-    if locale == "en" or should_skip_machine_translate(text):
-        return text
+def _nllb_active_for(locale: str) -> bool:
+    """True when the locally-cached NLLB model should be the primary engine here.
+
+    NLLB-200-3.3B is dramatically higher quality than Google Translate on
+    low-resource languages, so when its model is downloaded AND the locale maps
+    to a FLORES-200 code, it becomes the primary engine and Google drops to a
+    per-string fallback. ``SAROPA_SKIP_NLLB=1`` forces Google-only. The model
+    probe is cheap (cached per session) and never downloads or loads here.
+    """
+    if os.environ.get("SAROPA_SKIP_NLLB", "").strip() == "1":
+        return False
+    try:
+        import nllb_engine  # local sibling module (extension/scripts/i18n)
+    except ImportError:
+        return False
+    if nllb_engine.nllb_lang_code(locale) is None:
+        return False
+    return nllb_engine.nllb_model_available()
+
+
+def _primary_engine(locale: str) -> str | None:
+    """Primary MT engine for *locale*: ``"nllb"`` when its model is available,
+    else ``"google"``, else ``None`` (no engine can handle the locale)."""
+    if locale == "en":
+        return None
+    if _nllb_active_for(locale):
+        return "nllb"
+    if LOCALE_TO_GOOGLE.get(locale):
+        return "google"
+    return None
+
+
+def active_engine_name(locale: str) -> str | None:
+    """Public name of the primary engine for *locale* (``"nllb"`` / ``"google"`` /
+    ``None``), for callers that want to log which engine a run will use."""
+    return _primary_engine(locale)
+
+
+def describe_engine_availability() -> str:
+    """One-line human summary of which MT engine the run will use — for the
+    startup banner. Makes a silent Google downgrade impossible to miss: if the
+    NLLB model isn't downloaded, the line says so and names the setup command.
+    """
+    if os.environ.get("SAROPA_SKIP_NLLB", "").strip() == "1":
+        return "NLLB disabled (SAROPA_SKIP_NLLB=1) — using Google Translate."
+    try:
+        import nllb_engine
+    except ImportError:
+        return "NLLB engine module not found — using Google Translate."
+    if nllb_engine.nllb_model_available():
+        return "NLLB-200-3.3B available — primary engine (Google fallback per string)."
+    return (
+        "NLLB model not downloaded — using Google Translate. For higher quality run "
+        "'py -3 extension/scripts/i18n/nllb_engine.py --setup' (or point "
+        "SAROPA_NLLB_MODEL_DIR at an existing meta_nllb dir)."
+    )
+
+
+def _google_fetch(locale: str, text: str) -> str | None:
+    """Translate via Google (deep-translator), preserving placeholders + brand.
+
+    Returns a clean translation, an echoed-clean source, or ``None``. Sleeps the
+    free-tier pacing gap only after an accepted result so we never throttle on a
+    failed call.
+    """
     google_lang = LOCALE_TO_GOOGLE.get(locale)
     if not google_lang:
-        return text
+        return None
+    try:
+        from deep_translator import GoogleTranslator  # type: ignore[import-untyped]
+    except ImportError:
+        return None
+    gt = GoogleTranslator(source="en", target=google_lang)
+    out = _fetch_translation(lambda m: _translate_with_retry(gt, m), text)
+    if isinstance(out, str) and out.strip():
+        time.sleep(_MT_REQUEST_GAP_SEC)
+    return out
 
-    ck = _cache_key(locale, text)
-    cached = cache.get(ck)
+
+def _nllb_fetch(locale: str, text: str) -> str | None:
+    """Translate via the local NLLB model, preserving placeholders + brand.
+
+    Returns ``None`` (so the caller falls back to Google) whenever NLLB cannot
+    translate the string — INCLUDING the echo case, because an NLLB echo means
+    "no real translation happened", not "leave this as English". Letting echoes
+    fall through to Google is what keeps NLLB-primary from silently shipping
+    English for strings NLLB happened to bounce.
+    """
+    try:
+        import nllb_engine  # local sibling module
+    except ImportError:
+        return None
+    out = _fetch_translation(lambda m: nllb_engine.nllb_translate(m, locale), text)
+    if isinstance(out, str) and out.strip() and out != text:
+        return out
+    return None
+
+
+def _translate_one(locale: str, text: str, *, cache: dict[str, str], primary: str) -> str:
+    """Translate one string under *primary* (NLLB or Google) with Google fallback.
+
+    Caches the served value under the PRIMARY engine's key — even when Google
+    produced it as a fallback. The key means "the best translation we serve for
+    this string in this locale", so a re-run hits the cache instead of repeating
+    a slow NLLB call that already bounced this input. Returns the served string,
+    or English unchanged when no engine produced anything usable.
+    """
+    key = _cache_key(locale, text, primary)
+    cached = cache.get(key)
     # Self-heal: serve the cache only when the entry is clean. Poisoned entries
     # (placeholder loss, leaked sentinel residue, transliterated brand) are
-    # re-fetched with the current engine instead of shipped. Without this the old
-    # noncharacter/PUA-shield corruption and brand transliteration would survive
-    # in the cache forever.
+    # re-fetched instead of shipped.
     if cached is not None and _cache_value_is_clean(text, cached):
         return cached
 
     if not _mt_env_enabled():
-        # No network allowed; a poisoned cache entry can't be healed, so fall back
+        # MT off this run; a poisoned/absent entry can't be healed, so fall back
         # to English (the coverage gate flags it) rather than ship garbage.
         return text
 
-    try:
-        from deep_translator import GoogleTranslator  # type: ignore[import-untyped]
-    except ImportError:
-        return text
+    if primary == "nllb":
+        out = _nllb_fetch(locale, text)
+        if out is None:
+            out = _google_fetch(locale, text)
+    else:
+        out = _google_fetch(locale, text)
 
-    gt = GoogleTranslator(source="en", target=google_lang)
-    out = _fetch_translation(gt, text)
     if isinstance(out, str) and out.strip():
-        cache[ck] = out
-        time.sleep(_MT_REQUEST_GAP_SEC)
+        cache[key] = out
         return out
     return text
+
+
+def machine_translate(text: str, locale: str, *, cache: dict[str, str]) -> str:
+    """Translate *text* from English to *locale*; update *cache* in memory.
+
+    Uses the locally-cached NLLB model as the primary engine when available
+    (much higher quality), falling back to Google per string. Cache entries are
+    keyed by the primary engine, so a Google-only cache from a prior run is
+    transparently upgraded once the NLLB model is installed.
+    """
+    if locale == "en" or should_skip_machine_translate(text):
+        return text
+    primary = _primary_engine(locale)
+    if primary is None:
+        return text
+    return _translate_one(locale, text, cache=cache, primary=primary)
 
 
 # Pace Google free tier (~5 req/s); ``prefetch`` does one call per string with this gap.
@@ -390,12 +511,17 @@ def _iter_pending_texts(
     """Yield strings that would require a fresh MT network call.
 
     Shared by ``count_pending_translations`` and ``prefetch_machine_translations``
-    so both apply identical filter rules — keep them in lockstep here.
+    so both apply identical filter rules — keep them in lockstep here. Pending is
+    measured against the locale's PRIMARY engine key (NLLB when available, else
+    Google), so switching a locale to NLLB correctly re-surfaces every string.
     """
+    primary = _primary_engine(locale)
+    if primary is None:
+        return
     for text in texts:
         if not text or text in dict_table or should_skip_machine_translate(text):
             continue
-        cached = cache.get(_cache_key(locale, text))
+        cached = cache.get(_cache_key(locale, text, primary))
         # Re-fetch when absent OR when the cached entry is poisoned (placeholder
         # loss, leaked sentinel residue, transliterated brand). Skipping poisoned
         # entries here would leave them broken because prefetch never revisits them.
@@ -411,10 +537,10 @@ def count_pending_translations(
     cache: dict[str, str],
     dict_table: dict[str, str],
 ) -> int:
-    """How many strings prefetch would hit the network for. 0 when MT is disabled."""
+    """How many strings prefetch would translate. 0 when MT is disabled."""
     if locale == "en" or not _mt_env_enabled():
         return 0
-    if not LOCALE_TO_GOOGLE.get(locale):
+    if _primary_engine(locale) is None:
         return 0
     return sum(1 for _ in _iter_pending_texts(locale, texts, cache=cache, dict_table=dict_table))
 
@@ -433,26 +559,19 @@ def prefetch_machine_translations(
     """
     if locale == "en" or not _mt_env_enabled():
         return
-    google_lang = LOCALE_TO_GOOGLE.get(locale)
-    if not google_lang:
-        return
-    try:
-        from deep_translator import GoogleTranslator  # type: ignore[import-untyped]
-    except ImportError:
+    primary = _primary_engine(locale)
+    if primary is None:
         return
 
     pending = list(_iter_pending_texts(locale, texts, cache=cache, dict_table=dict_table))
     if not pending:
         return
 
-    gt = GoogleTranslator(source="en", target=google_lang)
     for src in pending:
-        # Shared fetch path: PUA-shield with raw-brace fallback, same as
-        # machine_translate, so cached results are identical regardless of which
-        # entry point warmed them. _translate_with_retry re-raises
-        # KeyboardInterrupt for the caller to save the partial cache.
-        out = _fetch_translation(gt, src)
-        if isinstance(out, str) and out.strip():
-            cache[_cache_key(locale, src)] = out
-        time.sleep(_MT_REQUEST_GAP_SEC)
+        # Shared fetch path: NLLB-primary (when available) then Google fallback,
+        # warming the same primary-engine cache key machine_translate reads, so
+        # results are identical regardless of which entry point warmed them.
+        # _translate_with_retry re-raises KeyboardInterrupt for the caller to
+        # save the partial cache; the Google pacing gap lives in _google_fetch.
+        _translate_one(locale, src, cache=cache, primary=primary)
 

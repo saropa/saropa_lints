@@ -354,8 +354,10 @@ class AvoidMixedEnvironmentsRule extends SaropaLintRule {
   // environment keywords only match whole words: `apiUrlProd` → [api, url,
   // prod], `release_notes` → [release, notes], `latest` → [latest].
   static List<String> _wordTokens(String input) {
-    final String withBreaks =
-        input.replaceAllMapped(_camelBoundary, (Match m) => '${m[1]} ${m[2]}');
+    final String withBreaks = input.replaceAllMapped(
+      _camelBoundary,
+      (Match m) => '${m[1]} ${m[2]}',
+    );
     return withBreaks
         .toLowerCase()
         .split(_nonLetterRun)

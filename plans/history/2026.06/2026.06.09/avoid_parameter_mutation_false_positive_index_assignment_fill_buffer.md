@@ -1,6 +1,6 @@
 # BUG: `avoid_parameter_mutation` — fires on index-assignment fill-buffer / out-parameter pattern
 
-**Status: Open**
+**Status: Fixed**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
@@ -203,3 +203,57 @@ include:
   buffer allocated by `_buildPolygons()`).
 - Downstream disposition: file-level `// ignore_for_file: avoid_parameter_mutation`
   added with rationale (generated file; symptom only). Links back to this report.
+
+---
+
+## Finish Report (2026-06-09)
+
+Implemented Hypothesis A (the suggested fix) — the index-assignment branch now
+carries a symmetric output-collection exemption mirroring the existing
+`.add`/`.addAll` method exemption.
+
+### Changes
+
+- `lib/src/rules/code_quality/code_quality_variables_rules.dart`
+  - `_ParameterMutationVisitor.visitAssignmentExpression` — the `IndexExpression`
+    branch now also requires `!_isOutputCollectionParameter(...)` before
+    reporting, so `param[i] = x` on a collection parameter is no longer flagged.
+  - Added `_ParameterMutationVisitor._isOutputCollectionParameter` (name- and
+    supertype-based, matching the syntax-only scan path used by
+    `_isMutableParameter`).
+  - Added top-level `_outputCollectionTypeNames` set (`List`, `Map`, and the
+    typed-data list types) and `_isOutputCollectionType` supertype-walk helper,
+    mirroring `_mutationByDesignTypeNames` / `_isMutationByDesignType`.
+  - Updated the visitor class doc to state index assignment is flagged only on
+    non-collection parameters.
+- `example/lib/code_quality/avoid_parameter_mutation_fixture.dart`
+  - Map index-assignment case flipped from expect-lint to GOOD (now exempt).
+  - Added GOOD fill-buffer cases: `List` index assignment, `Uint8List` index
+    assignment.
+  - Added BAD case: cascade-field assignment on a DTO parameter
+    (`user..name = …..age = …`).
+- `CHANGELOG.md` — `[Unreleased] › Fixed` bullet.
+
+### Verification
+
+- `dart analyze` on the changed rule file: clean ("No issues found!").
+- `dart test … -n AvoidParameterMutationRule`: passed (instantiation pin).
+- Scan CLI (`dart run saropa_lints scan … --tier comprehensive`) on a reproducer
+  containing all five shapes: exactly 2 diagnostics, both on the DTO cases (field
+  assignment and cascade-field assignment). Zero diagnostics on `List`,
+  `Uint8List`, and `Map` index assignment — the FP class is gone while the real
+  DTO-corruption target still fires.
+
+### Map decision
+
+Map index assignment (`m[k] = v`) is exempted alongside `List`/typed-data, per
+the report's recommendation — it is symmetric with the already-exempt `.add` /
+`.addAll` collection-method mutations, so flagging only the index form was
+internally inconsistent.
+
+### Downstream
+
+The generated-file `// ignore_for_file: avoid_parameter_mutation` in Saropa
+Contacts (`_polygon_data.dart`) can be removed once this ships; it is now
+redundant. (No cross-project edit made here — Saropa Contacts is a separate
+repo.)
