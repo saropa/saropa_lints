@@ -14,61 +14,7 @@ library;
 import 'package:analyzer/dart/ast/ast.dart';
 
 import '../../saropa_lint_rule.dart';
-
-/// Resolves the simple type name of a widget construction.
-///
-/// Uses the resolved element name when the analyzer has resolved the tree
-/// (IDE / `dart analyze`), and falls back to the syntactic identifier
-/// (`type.name.lexeme`) when the tree is unresolved (the `scan` CLI parses
-/// with `parseString`, which produces no element model). Without the fallback
-/// these rules would silently no-op under the scan CLI.
-String? _constructionTypeName(InstanceCreationExpression node) =>
-    node.constructorName.type.element?.name ??
-    node.constructorName.type.name.lexeme;
-
-/// Walks ancestors of [node] looking for a widget whose type is in
-/// [parentTypes]; returns the matched type name, or null if none is found.
-///
-/// Handles both forms a parent widget can take in the AST:
-/// - [InstanceCreationExpression] — `ListView(...)` and named constructors
-///   like `ListView.builder(...)` (resolved trees), where the type name is
-///   `ListView`.
-/// - [MethodInvocation] — `ListView.builder(...)` under an *unresolved* tree
-///   parses as a method invocation on target `ListView`; a bare `Foo(...)`
-///   parses as a method named `Foo`. Both are checked so the rules behave
-///   identically in the IDE and in the scan CLI.
-String? _enclosingWidgetOfType(AstNode node, Set<String> parentTypes) {
-  AstNode? current = node.parent;
-  while (current != null) {
-    if (current is InstanceCreationExpression) {
-      final String? name = _constructionTypeName(current);
-      if (name != null && parentTypes.contains(name)) {
-        return name;
-      }
-    } else if (current is MethodInvocation) {
-      final Expression? target = current.target;
-      // `ListView.builder(...)` — the scrollable is the target identifier.
-      if (target is SimpleIdentifier && parentTypes.contains(target.name)) {
-        return target.name;
-      }
-      // `ListView(...)` parsed without resolution — the method name is the type.
-      if (parentTypes.contains(current.methodName.name)) {
-        return current.methodName.name;
-      }
-    }
-    current = current.parent;
-  }
-  return null;
-}
-
-/// Flutter scrollable widgets that lazily build/scroll their children, making
-/// any per-child offscreen-layer or filter cost recur on every visible item.
-const Set<String> _scrollableTypes = <String>{
-  'ListView',
-  'GridView',
-  'CustomScrollView',
-  'PageView',
-};
+import 'compound_performance_patterns.dart';
 
 /// Shared base for "expensive widget inside a costly parent" rules.
 ///
@@ -111,7 +57,7 @@ abstract class _CompoundPerformanceRule extends SaropaLintRule {
     // forms never occur for the same node simultaneously, so registering both
     // makes the rule behave identically in every host without double-reporting.
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String? name = _constructionTypeName(node);
+      final String? name = widgetConstructionName(node);
       if (name != null) _reportIfNested(reporter, node, name);
     });
 
@@ -131,7 +77,7 @@ abstract class _CompoundPerformanceRule extends SaropaLintRule {
     String widgetName,
   ) {
     if (!costlyWidgets.contains(widgetName)) return;
-    if (_enclosingWidgetOfType(node, problematicParents) != null) {
+    if (enclosingWidgetOfType(node, problematicParents) != null) {
       reporter.atNode(node);
     }
   }
@@ -182,7 +128,7 @@ class AvoidOpacityInAnimatedBuilderRule extends _CompoundPerformanceRule {
   Set<String> get costlyWidgets => const {'Opacity'};
 
   @override
-  Set<String> get problematicParents => const {'AnimatedBuilder'};
+  Set<String> get problematicParents => kAnimatedRebuilders;
 }
 
 /// Flags `Opacity` creating a per-item offscreen layer inside a scrollable.
@@ -226,7 +172,7 @@ class AvoidOpacityInScrollableRule extends _CompoundPerformanceRule {
   Set<String> get costlyWidgets => const {'Opacity'};
 
   @override
-  Set<String> get problematicParents => _scrollableTypes;
+  Set<String> get problematicParents => kScrollableWidgets;
 }
 
 /// Flags `BackdropFilter` inside a scrollable — a severe GPU hazard.
@@ -269,7 +215,7 @@ class AvoidBackdropFilterInScrollableRule extends _CompoundPerformanceRule {
   Set<String> get costlyWidgets => const {'BackdropFilter'};
 
   @override
-  Set<String> get problematicParents => _scrollableTypes;
+  Set<String> get problematicParents => kScrollableWidgets;
 }
 
 /// Flags `ShaderMask` (which triggers `saveLayer`) inside a scrollable.
@@ -306,7 +252,7 @@ class AvoidShaderMaskInScrollableRule extends _CompoundPerformanceRule {
   Set<String> get costlyWidgets => const {'ShaderMask'};
 
   @override
-  Set<String> get problematicParents => _scrollableTypes;
+  Set<String> get problematicParents => kScrollableWidgets;
 }
 
 /// Flags `ImageFiltered` / `ColorFiltered` inside a scrollable.
@@ -343,7 +289,7 @@ class AvoidImageFilterInScrollableRule extends _CompoundPerformanceRule {
   Set<String> get costlyWidgets => const {'ImageFiltered', 'ColorFiltered'};
 
   @override
-  Set<String> get problematicParents => _scrollableTypes;
+  Set<String> get problematicParents => kScrollableWidgets;
 }
 
 /// Flags `ClipPath` re-rasterized every frame inside `AnimatedBuilder`.
@@ -386,5 +332,5 @@ class AvoidClipPathInAnimatedBuilderRule extends _CompoundPerformanceRule {
   Set<String> get costlyWidgets => const {'ClipPath'};
 
   @override
-  Set<String> get problematicParents => const {'AnimatedBuilder'};
+  Set<String> get problematicParents => kAnimatedRebuilders;
 }

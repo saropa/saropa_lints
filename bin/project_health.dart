@@ -36,6 +36,7 @@ import 'package:saropa_lints/src/cli/project_health/health_html_reporter.dart';
 import 'package:saropa_lints/src/cli/project_health/health_model.dart';
 import 'package:saropa_lints/src/cli/project_health/health_summary.dart';
 import 'package:saropa_lints/src/cli/project_health/hotspot_ranking.dart';
+import 'package:saropa_lints/src/cli/project_health/perf_gravity.dart';
 import 'package:saropa_lints/src/cli/project_health/size_scanner.dart';
 
 Future<void> main(List<String> args) async {
@@ -94,6 +95,10 @@ Future<void> main(List<String> args) async {
   final cacheIn = cli.cache ? loadComplexityCache(cachePath) : null;
   final cacheSink = cli.cache ? <String, CacheEntry>{} : null;
 
+  // Per-feature performance gravity rollup (opt-in via --performance). Owned
+  // here so it outlives runSizeScan, which returns only the size aggregate.
+  final perfAgg = cli.performance ? PerfGravityAggregator() : null;
+
   final shard = File(p.join(outputDir, 'files.ndjson')).openWrite();
   final agg = await runSizeScan(
     SizeScanOptions(
@@ -101,6 +106,8 @@ Future<void> main(List<String> args) async {
       excludeGlobs: excludes,
       topN: cli.top,
       withComplexity: cli.complexity,
+      withPerformance: cli.performance,
+      perfAggregator: perfAgg,
       unusedFiles: unusedFiles,
       deadSymbols: deadSymbols,
       coverage: coverage,
@@ -145,6 +152,7 @@ Future<void> main(List<String> args) async {
     if (cli.coverage) 'coverage',
     if (cli.git) 'git',
     if (cli.assets) 'assets',
+    if (cli.performance) 'performance',
   ];
   if (cli.format == 'json') {
     final report = buildHealthReport(
@@ -166,6 +174,11 @@ Future<void> main(List<String> args) async {
     }
     if (cycleCuts != null) {
       report['cycleCuts'] = [for (final c in cycleCuts) c.toJson()];
+    }
+    if (perfAgg != null) {
+      report['featureGravity'] = [
+        for (final f in perfAgg.features()) f.toJson(),
+      ];
     }
     report['summary'] = execSummary;
     if (whatIf != null) report['whatIf'] = whatIf;
@@ -194,6 +207,7 @@ Future<void> main(List<String> args) async {
       rankHotspots(agg),
       projectPath: cli.path,
       generatedAt: DateTime.now(),
+      featureGravity: perfAgg?.features() ?? const [],
     );
     final out = File(p.join(outputDir, 'index.html'))..writeAsStringSync(html);
     print('HTML report: ${out.path}');
@@ -202,6 +216,16 @@ Future<void> main(List<String> args) async {
     if (whatIf != null) print('What-if: $whatIf');
     print('');
     _printText(agg, outputDir);
+    if (perfAgg != null && perfAgg.hasFindings) {
+      print('');
+      print('Performance gravity (per feature, worst first):');
+      for (final f in perfAgg.features().take(15)) {
+        print(
+          '  ${'${f.score}%'.padLeft(4)}  ${f.band.name.toUpperCase().padRight(8)}  '
+          '${f.feature.padRight(24)}  ${f.patternCount} pattern(s)',
+        );
+      }
+    }
     if (assets != null && assets.isNotEmpty) {
       print('');
       print('Dead assets (verify before deleting):');
@@ -314,6 +338,7 @@ typedef _CliArgs = ({
   bool history,
   bool cycles,
   bool cache,
+  bool performance,
 });
 
 _CliArgs _parseArgs(List<String> args) {
@@ -338,6 +363,7 @@ _CliArgs _parseArgs(List<String> args) {
   var history = false;
   var cycles = false;
   var cache = false;
+  var performance = false;
   for (var i = 0; i < args.length; i++) {
     final arg = args[i];
     if (arg == '--path' && i + 1 < args.length) {
@@ -383,6 +409,8 @@ _CliArgs _parseArgs(List<String> args) {
       cycles = true;
     } else if (arg == '--cache') {
       cache = true;
+    } else if (arg == '--performance') {
+      performance = true;
     }
   }
   return (
@@ -407,6 +435,7 @@ _CliArgs _parseArgs(List<String> args) {
     history: history,
     cycles: cycles,
     cache: cache,
+    performance: performance,
   );
 }
 
@@ -502,6 +531,7 @@ Options:
   --history            Health trajectory across recent git tags (time-machine)
   --cycles             Import cycles + suggested cut per cycle (builds the graph)
   --cache              Reuse cached parse for unchanged files (faster rescans)
+  --performance        Per-feature performance gravity (compound widget patterns)
   -h, --help           Show this help
 ''');
 }

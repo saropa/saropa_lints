@@ -34,6 +34,8 @@ class FileHealth {
     this.busFactorPct,
     this.fanIn,
     this.fanOut,
+    this.perfWeight = 0,
+    this.perfPatternCount = 0,
   });
 
   /// Project-relative, posix-separated path (stable across OSes for the report).
@@ -98,6 +100,14 @@ class FileHealth {
   /// Efferent coupling: how many files this one imports, or null.
   final int? fanOut;
 
+  /// Summed compound-performance pattern weight in this file (0 when the
+  /// performance section did not run or the file has no such patterns). Drives
+  /// the per-feature gravity rollup; see `perf_gravity.dart`.
+  final int perfWeight;
+
+  /// Count of compound-performance patterns detected in this file.
+  final int perfPatternCount;
+
   /// Instability `Ce/(Ca+Ce)` (0 stable, 1 unstable), or null when coupling
   /// data is absent.
   double? get instability {
@@ -136,6 +146,8 @@ class FileHealth {
     if (fanOut != null) 'fanOut': fanOut,
     if (instability != null)
       'instability': double.parse(instability!.toStringAsFixed(4)),
+    if (perfWeight > 0) 'perfWeight': perfWeight,
+    if (perfPatternCount > 0) 'perfPatternCount': perfPatternCount,
   };
 }
 

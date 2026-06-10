@@ -314,6 +314,13 @@ String renderHealthDocument(String json) =>
       <th>Fire</th><th>File</th><th>LOC</th><th>Cognitive</th><th>Maint.</th><th>Churn</th><th>Why</th>
     </tr></thead><tbody></tbody></table>
   </div></details>
+
+<details class="panel" open id="gravityPanel"><summary>Performance gravity — features carrying the most performance risk</summary>
+  <div class="pbody">
+    <table id="gravity"><thead><tr>
+      <th>Gravity</th><th>Level</th><th>Feature</th><th>Patterns</th><th>Files</th>
+    </tr></thead><tbody></tbody></table>
+  </div></details>
 </div>
 <script>
 const DATA = $json;
@@ -558,6 +565,37 @@ tb.addEventListener("click", function(e){
 ths.forEach(function(th, idx){
   th.addEventListener("click", function(){ sortKey = keys[idx]; render(); });
 });
+
+// Performance gravity table. Already sorted worst-first by the Dart side; the
+// panel hides entirely when no feature carries a compound pattern (no false
+// "all clear" table). Color keys the level so the eye lands on CRITICAL first.
+(function(){
+  const gravity = DATA.featureGravity || [];
+  const panel = document.getElementById("gravityPanel");
+  if (!gravity.length){ if (panel) panel.style.display = "none"; return; }
+  const colors = { low: "#16a34a", medium: "#d97706", high: "#ea580c", critical: "#dc2626" };
+  const gb = document.querySelector("#gravity tbody");
+  gravity.forEach(function(f){
+    const tr = document.createElement("tr");
+    const color = colors[f.level] || muted;
+    const cells = [
+      ["n", f.gravityScore + "%"],
+      ["why", f.level.toUpperCase()],
+      ["path", f.feature],
+      ["n", f.patternCount],
+      ["n", f.fileCount]
+    ];
+    cells.forEach(function(c, i){
+      const td = document.createElement("td");
+      td.className = c[0];
+      td.textContent = c[1];
+      // Tint the gravity % and level cells by band.
+      if (i < 2){ td.style.color = color; td.style.fontWeight = "600"; }
+      tr.appendChild(td);
+    });
+    gb.appendChild(tr);
+  });
+})();
 </script>
 </body>
 </html>

@@ -13,13 +13,19 @@ import 'folder_tree.dart';
 import 'health_aggregator.dart';
 import 'health_html_template.dart';
 import 'hotspot_ranking.dart';
+import 'perf_gravity.dart';
 
 /// Builds the full HTML document string from a populated [agg] and ranked [spots].
+///
+/// [featureGravity] is the per-feature performance rollup (empty unless the
+/// `--performance` section ran); when non-empty the document renders a
+/// "Performance gravity" panel.
 String buildHealthHtml(
   HealthAggregator agg,
   List<Hotspot> spots, {
   required String projectPath,
   required DateTime generatedAt,
+  List<FeatureGravity> featureGravity = const [],
 }) {
   final data = <String, Object?>{
     'projectPath': projectPath,
@@ -55,6 +61,8 @@ String buildHealthHtml(
           'reasons': s.reasons,
         },
     ],
+    // Per-feature performance gravity (empty array → panel hides itself).
+    'featureGravity': [for (final f in featureGravity) f.toJson()],
   };
   return renderHealthDocument(jsonEncode(data));
 }

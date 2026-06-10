@@ -23,6 +23,7 @@ import 'health_model.dart';
 import 'line_metrics.dart';
 import 'maintainability_index.dart';
 import 'metrics_model.dart';
+import 'perf_gravity.dart';
 
 /// Directory names whose subtrees never count toward project size (build
 /// artifacts, VCS internals, tool caches) — they are not source the developer
@@ -45,6 +46,8 @@ class SizeScanOptions {
     this.topN = 25,
     this.onRow,
     this.withComplexity = false,
+    this.withPerformance = false,
+    this.perfAggregator,
     this.unusedFiles,
     this.deadSymbols,
     this.coverage,
@@ -67,6 +70,15 @@ class SizeScanOptions {
   /// When true, also compute per-file complexity + Maintainability Index
   /// (one extra parse per file; opt-in so the size-only scan stays fast).
   final bool withComplexity;
+
+  /// When true, scan each file for compound performance patterns and fold the
+  /// result into [perfAggregator]. Reuses the complexity parse when that ran,
+  /// otherwise parses once for this pass; opt-in so size-only stays fast.
+  final bool withPerformance;
+
+  /// Per-feature gravity rollup the performance pass fills (caller owns it so
+  /// it survives past [runSizeScan], which returns only the size aggregate).
+  final PerfGravityAggregator? perfAggregator;
 
   // Optional overlays precomputed before the walk and attached per file. Each is
   // keyed by project-relative posix path. Null = that section did not run.
@@ -121,6 +133,9 @@ Future<FileHealth?> _measure(File file, String rel, SizeScanOptions o) async {
     // Reuse the cached parse when content is unchanged; otherwise parse and
     // record it. Size/LOC above is always fresh, so it can never go stale.
     _FileMetrics? metrics;
+    // Compound-performance scan result; stays empty unless --performance ran.
+    PerfFileScan perf = PerfFileScan.empty;
+    final bool wantPerf = o.withPerformance;
     if (o.withComplexity) {
       final hash = stableHash(content);
       final cached = o.complexityCache?[rel];
@@ -132,8 +147,17 @@ Future<FileHealth?> _measure(File file, String rel, SizeScanOptions o) async {
           cached.maintainabilityRaw,
           cached.docCoverage,
         );
+        // Complexity came from cache (no parse). Perf has no cache, so when it
+        // is requested we parse once just for it.
+        if (wantPerf) perf = _perfScanOf(content);
       } else {
-        metrics = _metricsOf(content, counts);
+        final parsed = _parseMetrics(
+          content,
+          counts,
+          withPerformance: wantPerf,
+        );
+        metrics = parsed.metrics;
+        perf = parsed.perf;
         o.cacheSink?[rel] = CacheEntry(
           hash: hash,
           complexity: metrics.complexity,
@@ -142,7 +166,10 @@ Future<FileHealth?> _measure(File file, String rel, SizeScanOptions o) async {
           docCoverage: metrics.docCoverage,
         );
       }
+    } else if (wantPerf) {
+      perf = _perfScanOf(content);
     }
+    if (wantPerf) o.perfAggregator?.add(rel, perf);
     final git = o.gitSignals?[rel];
     final coupling = o.coupling?[rel];
     return FileHealth(
@@ -164,6 +191,8 @@ Future<FileHealth?> _measure(File file, String rel, SizeScanOptions o) async {
       busFactorPct: git?.busFactorPct,
       fanIn: coupling?.fanIn,
       fanOut: coupling?.fanOut,
+      perfWeight: perf.weight,
+      perfPatternCount: perf.patternCount,
     );
   } on FileSystemException {
     return null; // unreadable / vanished mid-walk; skip rather than abort
@@ -185,7 +214,14 @@ class _FileMetrics {
   final double? docCoverage;
 }
 
-_FileMetrics _metricsOf(String content, LineCounts counts) {
+/// Parses the unit ONCE and derives complexity metrics, plus the compound
+/// performance scan when [withPerformance] is set — so enabling both sections
+/// does not parse the file twice.
+({_FileMetrics metrics, PerfFileScan perf}) _parseMetrics(
+  String content,
+  LineCounts counts, {
+  required bool withPerformance,
+}) {
   final unit = parseString(content: content, throwIfDiagnostics: false).unit;
   final complexity = FileComplexity.from(
     scanComplexityUnit(unit),
@@ -197,13 +233,22 @@ _FileMetrics _metricsOf(String content, LineCounts counts) {
     loc: counts.total,
     commentRatio: counts.total == 0 ? 0 : counts.comment / counts.total,
   );
-  return _FileMetrics(
-    complexity,
-    maintainabilityIndex(inputs),
-    maintainabilityIndexRaw(inputs),
-    docCoverageOf(unit),
+  return (
+    metrics: _FileMetrics(
+      complexity,
+      maintainabilityIndex(inputs),
+      maintainabilityIndexRaw(inputs),
+      docCoverageOf(unit),
+    ),
+    perf: withPerformance ? scanPerfGravity(unit) : PerfFileScan.empty,
   );
 }
+
+/// Parses the unit solely for the compound-performance scan (used when the
+/// complexity section did not parse — size-only or a complexity cache hit).
+PerfFileScan _perfScanOf(String content) => scanPerfGravity(
+  parseString(content: content, throwIfDiagnostics: false).unit,
+);
 
 bool _hasExcludedSegment(String relPosix) {
   for (final seg in relPosix.split('/')) {
