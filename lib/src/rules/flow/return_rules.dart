@@ -2,6 +2,7 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
+import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
 
 import '../../saropa_lint_rule.dart';
@@ -670,6 +671,14 @@ class AvoidReturningNullForFutureRule extends SaropaLintRule {
       final DartType? returnType = getReturnTypeFromBody(body);
       if (returnType == null) return;
       if (!returnType.isDartAsyncFuture) return;
+
+      // A nullable Future return type (`Future<T>?`) explicitly permits null:
+      // the caller must null-check before awaiting (e.g. FutureBuilder.future
+      // accepts Future<T>? and renders its initial state for a null future), so
+      // `return null` is type-correct and cannot produce a runtime null error.
+      // isDartAsyncFuture is true for both Future<T> and Future<T>?, so without
+      // this guard the idiomatic nullable-future early-return is a false positive.
+      if (returnType.nullabilitySuffix == NullabilitySuffix.question) return;
 
       reporter.atNode(node);
     });

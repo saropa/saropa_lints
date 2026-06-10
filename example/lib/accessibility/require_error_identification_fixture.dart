@@ -131,3 +131,15 @@ void _good17() {
     ],
   );
 }
+
+// GOOD: a log-severity ternary selects ENUM values, not colors. `DebugLevels.error`
+// matches the `.error` regex but its staticType is the enum, not Color, so the
+// Color-type gate drops it. Should NOT trigger.
+enum DebugLevels { warning, error }
+
+DebugLevels _goodEnumSeverity(Object? error) =>
+    error == null ? DebugLevels.warning : DebugLevels.error;
+
+// GOOD: branches are String labels — the label text itself is the non-color cue.
+// Should NOT trigger.
+String _goodStringLabel(bool isError) => isError ? '[Error]' : '[OK]';

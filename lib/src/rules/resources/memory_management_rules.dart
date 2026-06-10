@@ -873,12 +873,19 @@ class AvoidUnboundedCacheGrowthRule extends SaropaLintRule {
       // Check for size limiting patterns
       // Note: Use word boundaries to avoid false matches (e.g., Uint8List contains 'limit')
       // Note: Don't use 'bounded' - it matches 'unbounded' in expect_lint comments
+      // `.remove(` does NOT match `.removeWhere(` / `.removeRange(` (the `remove`
+      // is followed by `where`/`range`, not `(`), so a cache pruned with the
+      // idiomatic Map.removeWhere / List.removeRange / .clear() eviction was
+      // wrongly read as unbounded. classSource is already lowercased.
       final bool hasSizeLimit =
           classSource.contains('maxsize') ||
           classSource.contains('max_size') ||
           classSource.contains('capacity') ||
           _hasLimitPattern(classSource) ||
           classSource.contains('.remove(') ||
+          classSource.contains('.removewhere(') ||
+          classSource.contains('.removerange(') ||
+          classSource.contains('.clear(') ||
           classSource.contains('evict') ||
           classSource.contains('lru');
 
