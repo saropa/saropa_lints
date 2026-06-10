@@ -317,22 +317,54 @@ class AvoidMixedEnvironmentsRule extends SaropaLintRule {
     severity: DiagnosticSeverity.ERROR,
   );
 
-  // Word-boundary lookarounds on [A-Za-z] so each token must stand alone,
-  // not appear as a substring of a larger identifier. A bare `\b` does NOT
-  // work here: `_` is a word character, so `\brelease\b` still matches
-  // `release_notes`. The [A-Za-z] lookaround treats `_`, digits, and string
-  // delimiters as separators — `release_notes`/`prerelease` no longer match
-  // `release`, and `latest`/`greatest` no longer match `test`, while
-  // `apiUrlProd`, `prodApiKey`, `debug_mode`, and `isRelease` still do.
-  static final RegExp _prodPattern = RegExp(
-    r'(?<![A-Za-z])(prod|production|live|release)(?![A-Za-z])',
-    caseSensitive: false,
-  );
+  // Environment keywords are matched as WHOLE WORDS, never as substrings.
+  // A plain `contains`/unanchored-regex match flags `release_notes` (release),
+  // `latest` (test), `developer` (dev), `delivery` (live), `locale` (local) —
+  // all extremely common English fragments — producing false "mixed
+  // environment" reports on classes that have nothing to do with env
+  // separation. A `\b`/`[A-Za-z]`-lookaround regex also fails: `\b` treats `_`
+  // as a word char (so `release_notes` still matches), and `[A-Za-z]`
+  // lookarounds miss camelCase humps (so `apiUrlProd`/`debugFlag` stop
+  // matching). The robust signal is tokenizing the identifier into words —
+  // splitting on non-letters AND camelCase humps — and testing exact equality.
+  static const Set<String> _prodTokens = <String>{
+    'prod',
+    'production',
+    'live',
+    'release',
+  };
 
-  static final RegExp _devPattern = RegExp(
-    r'(?<![A-Za-z])(dev|development|debug|staging|test|local|localhost)(?![A-Za-z])',
-    caseSensitive: false,
-  );
+  static const Set<String> _devTokens = <String>{
+    'dev',
+    'development',
+    'debug',
+    'staging',
+    'test',
+    'local',
+    'localhost',
+  };
+
+  // lower/digit→Upper boundary so camelCase splits into separate words.
+  static final RegExp _camelBoundary = RegExp(r'([a-z0-9])([A-Z])');
+
+  // Run of non-letters (underscores, digits, slashes, dots, quotes, …).
+  static final RegExp _nonLetterRun = RegExp(r'[^a-z]+');
+
+  // Splits an identifier or source fragment into lowercase word tokens so
+  // environment keywords only match whole words: `apiUrlProd` → [api, url,
+  // prod], `release_notes` → [release, notes], `latest` → [latest].
+  static List<String> _wordTokens(String input) {
+    final String withBreaks =
+        input.replaceAllMapped(_camelBoundary, (Match m) => '${m[1]} ${m[2]}');
+    return withBreaks
+        .toLowerCase()
+        .split(_nonLetterRun)
+        .where((String token) => token.isNotEmpty)
+        .toList();
+  }
+
+  static bool _containsAny(String input, Set<String> keywords) =>
+      _wordTokens(input).any(keywords.contains);
 
   @override
   void runWithReporter(
@@ -370,8 +402,8 @@ class AvoidMixedEnvironmentsRule extends SaropaLintRule {
 
             // Check for production indicators (skip if properly conditional)
             if (!isProperlyConditional &&
-                (_prodPattern.hasMatch(source) ||
-                    _prodPattern.hasMatch(varName))) {
+                (_containsAny(source, _prodTokens) ||
+                    _containsAny(varName, _prodTokens))) {
               if (!hasProdIndicator) {
                 hasProdIndicator = true;
                 firstProdMember = member;
@@ -380,8 +412,8 @@ class AvoidMixedEnvironmentsRule extends SaropaLintRule {
 
             // Check for development indicators (skip if properly conditional)
             if (!isProperlyConditional &&
-                (_devPattern.hasMatch(source) ||
-                    _devPattern.hasMatch(varName))) {
+                (_containsAny(source, _devTokens) ||
+                    _containsAny(varName, _devTokens))) {
               hasDevIndicator = true;
             }
           }

@@ -1,6 +1,6 @@
 # BUG: `avoid_mixed_environments` — false positive on substring matches of "release" / "test" in unrelated identifiers
 
-**Status: Open**
+**Status: Fixed**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
@@ -179,3 +179,88 @@ NO-lint cases proving substrings are not treated as environment tokens:
 
 - saropa_lints version: 13.12.2
 - Triggering project/file: `saropa` (Contacts) — `lib/data/release_notes/release_notes_config.dart:40`
+
+---
+
+## Fix Applied (2026-06-09)
+
+The suggested `(?<![A-Za-z])…(?![A-Za-z])` regex was NOT used — it is wrong
+on two counts, both confirmed against the fixture via the scan CLI:
+
+1. It does **not** fix `release_notes`: `_` is not `[A-Za-z]`, so the
+   lookarounds treat it as a separator and `release` still matches as a
+   standalone token.
+2. It **breaks** true detection: `[A-Za-z]` lookarounds do not see camelCase
+   humps, so `apiUrlProd` ("Prod" preceded by "l") and `debugFlag` ("debug"
+   followed by "F") stop matching — the `apiUrlProd` + `debugFlag` positive
+   case produced no diagnostic.
+
+Implemented fix: replaced the two unanchored regexes with whole-word
+tokenization in `lib/src/rules/config/config_rules.dart`. `_wordTokens`
+splits identifiers/source on non-letters **and** camelCase humps
+(`apiUrlProd` → `[api, url, prod]`, `release_notes` → `[release, notes]`,
+`latest` → `[latest]`), then env keywords are matched by exact set
+membership (`_prodTokens` / `_devTokens`).
+
+Verified with the scan CLI against the fixture: the only diagnostic is the
+intended positive case (`MixedEnvironmentConfig`); `ReleaseNotesConfig`,
+`AppVersionConfig`, and `ContactSettings` are clean.
+
+Fixture: `example/lib/config/avoid_mixed_environments_fixture.dart` (4 cases
+added). Unit test (`test/rules/config/config_rules_test.dart`) and
+`dart analyze` pass.
+
+---
+
+## Finish Report (2026-06-09)
+
+**Scope:** (A) Dart lint rule — `avoid_mixed_environments` in
+`lib/src/rules/config/config_rules.dart`.
+
+**Deep review (linter integrity):**
+- Rule stays in its correct file (`config/config_rules.dart`); no new rule,
+  so `all_rules.dart` / `tiers.dart` / `LintImpact` are untouched — detection
+  logic only.
+- No new heuristic class introduced — tokenization narrows the existing
+  keyword match, it does not broaden scope.
+- `_wordTokens` is a pure, allocation-light static helper (two precompiled
+  static `RegExp`s, no per-call compilation). Runs only inside the existing
+  `addClassDeclaration` walk already gated by `requiresClassDeclaration` and
+  the `config`/`environment`/`settings` class-name filter, so the cost
+  profile is unchanged. `RuleCost.medium` still correct.
+- No quick fix added — the rule reports a structural mix; there is no single
+  safe automated edit (separating environments is a manual refactor).
+
+**Tests:**
+- Audited: grepped `test/` for `_prodPattern`, `_devPattern`, `_prodTokens`,
+  `_devTokens`, `_wordTokens`, `avoid_mixed_environments`,
+  `AvoidMixedEnvironments`. Only `test/rules/config/config_rules_test.dart`
+  matches, and only on the rule name + problem-message prefix — neither
+  assertion is affected by the detection change. The removed private
+  `_prodPattern`/`_devPattern` fields are not referenced by any test.
+- Ran `dart test test/rules/config/config_rules_test.dart` → all 27 passed.
+- Behavior verified by the scan CLI (unit tests here are instantiation pins,
+  not behavior checks): copied the fixture into a non-excluded dir and ran
+  `dart run saropa_lints scan … --tier comprehensive --format json`. Exactly
+  one `avoid_mixed_environments` diagnostic — on the `apiUrlProd` +
+  `debugFlag` positive case — and none on the three substring NO-LINT classes.
+
+**Maintenance:**
+- CHANGELOG `[Unreleased] → Fixed`: added entry for the substring fix.
+- ROADMAP: no change — rule already shipped (v4), only detection refined.
+- README: verified — no rule/doc count change.
+- Bug archived: `bugs/avoid_mixed_environments_false_positive_substring_match_release_latest.md`
+  → `plans/history/2026.06/2026.06.09/…` with `Status: Fixed`.
+
+**Diff summary (core logic):** `AvoidMixedEnvironmentsRule` — two unanchored
+`RegExp`s (`_prodPattern`, `_devPattern`) replaced by `const Set<String>`
+keyword sets (`_prodTokens`, `_devTokens`) plus `_wordTokens` (splits on
+camelCase humps then non-letter runs) and `_containsAny`. The two match sites
+in `runWithReporter` switched from `pattern.hasMatch(x)` to
+`_containsAny(x, tokens)`. No signature, tier, severity, or impact change.
+
+**Outstanding:** none. The bug's "Consider also" suggestion (stop scanning
+string-literal *contents* so an asset path containing `release` never sets a
+prod indicator) was intentionally not pursued — it is out of the reported
+symptom's scope, and tokenization already clears the reported case because no
+dev token co-occurs. Left as a documented future hardening, not a regression.
