@@ -32,7 +32,9 @@ import 'package:saropa_lints/src/rules/widget/image_filter_quality_migration_rul
 import 'package:saropa_lints/src/rules/widget/widget_layout_constraints_rules.dart';
 import 'package:saropa_lints/src/rules/ui/accessibility_rules.dart';
 import 'package:saropa_lints/src/rules/widget/widget_layout_flex_scroll_rules.dart';
+import 'package:saropa_lints/src/rules/widget/widget_patterns_avoid_prefer_rules.dart';
 import 'package:saropa_lints/src/rules/widget/widget_patterns_require_rules.dart';
+import 'package:saropa_lints/src/rules/packages/riverpod_rules.dart';
 import 'package:test/test.dart';
 
 /// Unit tests that assert quick-fix registration for rules that provide fixes.
@@ -588,6 +590,17 @@ void main() {
     hasFix(
       'PreferNullAwareMethodCallsRule',
       () => PreferNullAwareMethodCallsRule(),
+    );
+
+    // Batch 18 — deletion fixes (named-argument + redundant nullable `?`).
+    hasFix('AvoidIconSizeOverrideRule', () => AvoidIconSizeOverrideRule());
+    hasFix(
+      'AvoidRiverpodStringProviderNameRule',
+      () => AvoidRiverpodStringProviderNameRule(),
+    );
+    hasFix(
+      'AvoidNullableParametersWithDefaultValuesRule',
+      () => AvoidNullableParametersWithDefaultValuesRule(),
     );
   });
 }

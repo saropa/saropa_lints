@@ -2,7 +2,7 @@
 
 **Goal:** Increase quick fix coverage by implementing fixes in priority order, with fixtures + tests, and validating via the audit script.
 
-**Current state:** Run `python scripts/list_rules_without_fixes.py` for an up-to-date list — the script prints a one-line **`Quick-fix audit: …`** summary to stdout plus writes the grouped log under `reports/<yyyymmdd>/`. Baseline stamped **2026-06-10:** **1697** rules lack fix producers across **110** rule files (down from 1701 after Batch 16; the file/rule counts grew vs. the 2026-05-08 baseline of 1698 because new rules were added in the interim).
+**Current state:** Run `python scripts/list_rules_without_fixes.py` for an up-to-date list — the script prints a one-line **`Quick-fix audit: …`** summary to stdout plus writes the grouped log under `reports/<yyyymmdd>/`. Baseline stamped **2026-06-10:** **1693** rules lack fix producers across **110** rule files (down from 1701 after Batches 16–18; the file/rule counts grew vs. the 2026-05-08 baseline of 1698 because new rules were added in the interim).
 
 ## Execution snapshot
 
@@ -2450,6 +2450,15 @@ All 4 wired; `test/scan/rule_quick_fix_presence_test.dart` +4 (192 pass). `dart 
 - `prefer_null_aware_method_calls` — `PreferNullAwareCallFix` (`lib/src/fixes/control_flow/prefer_null_aware_call_fix.dart`). Handles both reported shapes: `if (x != null) { x.foo(args); }` → `x?.foo(args);` and `x != null ? x.foo() : null` → `x?.foo()`. Inserts `?` before the receiver's `.` token, reusing the original source for receiver/member/args verbatim. Ternary is matched before the enclosing `if` so a guard ternary nested inside an `if` resolves to the correct node.
 
 Wired; presence test +1 (193 pass). `dart analyze --fatal-infos` clean. Existing fixture `example/lib/control_flow/prefer_null_aware_method_calls_fixture.dart` covers it. Audit 1697 → 1696 (Δ = −1). Cumulative this session: 1701 → 1696 (−5 across 5 rules).
+
+### H11. Batch 18 — deletion fixes: named-argument + redundant nullable (EASY) — DONE
+
+**Date:** 2026-06-10. **+3 fixes (2 new producers, 1 reused across 2 rules):**
+
+- `avoid_icon_size_override` and `avoid_riverpod_string_provider_name` — `RemoveNamedArgumentFix` (`lib/src/fixes/common/remove_named_argument_fix.dart`). Both rules report at the `NamedExpression`. Deletes the argument plus its separating comma (trailing comma preferred, else leading) so the surviving argument list stays valid; `dart format` tidies residual whitespace.
+- `avoid_nullable_parameters_with_default_values` — `RemoveTypeQuestionFix` (`lib/src/fixes/type/remove_type_question_fix.dart`). Rule reports at the parameter `TypeAnnotation`; deletes the single trailing `?` char (uniform across named/generic/function/record forms), guarded by a check that the annotation really ends in `?`.
+
+Wired; presence test +3 (196 pass) — added imports for `widget_patterns_avoid_prefer_rules.dart` and `riverpod_rules.dart`. New + modified files `dart analyze --fatal-infos` clean (4 pre-existing `unnecessary_null_comparison`/`dead_code` warnings at `type_rules.dart:391`/`2378` predate this work and are unrelated). Fixtures already cover all three rules. Audit 1696 → 1693 (Δ = −3). Cumulative this session: 1701 → 1693 (−8 across 8 rules).
 
 ### I. After Batch 6
 

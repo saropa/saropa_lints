@@ -15,6 +15,7 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
 
 import '../../saropa_lint_rule.dart';
+import '../../fixes/common/remove_named_argument_fix.dart';
 import '../../fixes/widget_patterns/comment_out_print_fix.dart';
 import '../../fixes/widget_patterns/replace_empty_text_with_sized_box_fix.dart';
 import '../../fixes/widget_patterns/replace_font_weight_number_fix.dart';
@@ -2836,6 +2837,12 @@ class AvoidIconSizeOverrideRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveNamedArgumentFix(context: context),
+  ];
 }
 
 /// Warns when GestureDetector is used with only onTap.
