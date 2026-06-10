@@ -61,14 +61,14 @@ PROJECT_ROOT = get_project_dir()
 RULES_DIR = get_rules_dir()
 REPORTS_DIR = PROJECT_ROOT / "reports"
 
-# Must match _audit_dx.py thresholds
+# Must match _audit_dx.py thresholds. Keyed on the post-collapse
+# 3-level severity model (error/warning/info); the old 5-bucket
+# names (critical/high/medium/low/opinionated) were retired 2026-05-03.
 MIN_PROBLEM = {
-    "critical": 180, "high": 180, "medium": 150,
-    "low": 100, "opinionated": 100,
+    "error": 180, "warning": 150, "info": 100,
 }
 MIN_CORRECTION = {
-    "critical": 100, "high": 80, "medium": 80,
-    "low": 80, "opinionated": 80,
+    "error": 100, "warning": 80, "info": 80,
 }
 
 # ─────────────────────────────────────────────────────────────────
@@ -668,8 +668,8 @@ def audit_message(
     msg_lower = problem_msg.lower()
     content = re.sub(r"^\[[a-z0-9_]+\]\s*", "", problem_msg)
 
-    # Vague language (skip for low impact)
-    if impact not in ("low", "opinionated"):
+    # Vague language (skip for info-level advisory rules)
+    if impact != "info":
         for pattern, issue in VAGUE_CHECKS:
             if pattern in msg_lower:
                 issues.append(issue)
@@ -685,13 +685,13 @@ def audit_message(
     # Correction message length
     corr_len = len(correction_msg.strip()) if correction_msg else 0
     min_corr = MIN_CORRECTION.get(impact, 80)
-    if impact == "critical" and corr_len < min_corr:
+    if impact == "error" and corr_len < min_corr:
         issues.append(f"Short correction ({corr_len}/{min_corr} chars)")
-    elif impact != "critical" and 0 < corr_len < min_corr:
+    elif impact != "error" and 0 < corr_len < min_corr:
         issues.append(f"Short correction ({corr_len}/{min_corr} chars)")
 
-    # Missing consequence (critical/high only)
-    if impact in ("critical", "high"):
+    # Missing consequence (error/warning only)
+    if impact in ("error", "warning"):
         if not any(w in msg_lower for w in CONSEQUENCE_WORDS):
             issues.append("Missing consequence")
 
@@ -912,8 +912,10 @@ def extract_rules_from_file(
         )
         class_body = content[start:end]
 
+        # Default mirrors the base SaropaLintRule.impact getter
+        # (LintImpact.warning) for classes that don't override it.
         impact_m = IMPACT_RE.search(class_body)
-        impact = impact_m.group(1) if impact_m else "medium"
+        impact = impact_m.group(1) if impact_m else "warning"
 
         for code_m in LINTCODE_RE.finditer(class_body):
             name = code_m.group(1)

@@ -9,10 +9,10 @@
 
 Only these items are considered open work for this topic:
 
-- [ ] **SEV-01 (P1)** Audit `severity:` assignments rule-by-rule against MUST-fix / should-fix / info guidance.
+- [~] **SEV-01 (P1)** Audit `severity:` assignments rule-by-rule against MUST-fix / should-fix / info guidance. (Partial, 2026-06-10: full cross-check of all 2159 rules' `severity:` field vs `impact` getter generated — see [`SEV01_SEVERITY_AUDIT.md`](SEV01_SEVERITY_AUDIT.md). 714 disagreements found; 574 are default-impact-only artifacts, not real. Confirmed-safe slice applied so far: **11 rules** downgraded ERROR→WARNING after reading each (5 Riverpod/Bloc `prefer_*` preferences + 6 `bloc_rules.dart` should-fix patterns). **Still open:** Bucket A (66 ERROR/impact-warning over-rated candidates remaining — safe downgrade direction, but each needs an individual read because several "advisory-looking" rules describe genuine runtime throws and are correctly ERROR) and Bucket B (46 WARNING/impact-error under-rated candidates — the UPGRADE direction breaks `dart analyze` for consumers, so it needs per-rule sign-off).)
 - [x] **SEV-02 (P1)** Update `saropa_quality_gate.yaml.example` to foreground `new_errors/new_warnings/new_info`. (Done 2026-05-08: primary row uses `new_errors`; hotspots + `overall_warnings` documented with legacy-alias pointer.)
 - [x] **SEV-03 (P2)** Rename `bin/impact_report.dart` to `severity_report.dart` with compatibility alias. (Done 2026-06-05: `bin/severity_report.dart` holds the implementation; `bin/impact_report.dart` is now a thin forwarder that re-exports `severity_report.main`. `pubspec.yaml` registers both `severity_report` and the legacy `impact_report` executable.)
-- [~] **SEV-04 (P2)** Verify internal scripts parsing impact accept `error|warning|info` value set. (Partial, 2026-06-05: fixed `scripts/modules/_audit_checks.py` — `SEVERITIES`/`SeverityStats` and `print_severity_stats` colors were still keyed on the dead `critical/high/medium/low` set, so `get_severity_stats` counted **zero** for every rule. **Still open:** the DX-message audit scripts `_audit_dx.py`, `_improve_dx_messages.py`, and `_audit.py:_dx_impact_table` key their length thresholds and "By Impact" table on the old 5-value names; they don't crash but degrade to defaults. Left untouched this pass. Note: no script actually parses the JSON `v.impact` field — they all parse the Dart-source `LintImpact get impact => LintImpact.X;` getter.)
+- [x] **SEV-04 (P2)** Verify internal scripts parsing impact accept `error|warning|info` value set. (Done 2026-06-10: the three remaining DX scripts — `_audit_dx.py`, `_improve_dx_messages.py`, `_audit.py:_dx_impact_table`/`_dx_failing_table` — re-keyed from the dead 5-value names to `error/warning/info`. Thresholds collapsed: `MIN_PROBLEM` error 180 / warning 150 / info 100, `MIN_CORRECTION` error 100 / warning+info 80; consequence + specific-type + AI-copilot checks now gate on `("error","warning")`; vague-language skip now gates on `info`; the no-override default impact now mirrors the base getter `LintImpact.warning` (was the dead `medium`). The "By Impact" report table is now "By Severity" and buckets non-zero again. Prior pass (2026-06-05) had already fixed `_audit_checks.py`. **Separate pre-existing breakage surfaced, NOT fixed here:** the DX message *extractor* (`extract_rule_messages` / `LINTCODE_RE`) expects `LintCode(name: '...')` keyword syntax, but the analyzer-9 migration moved all 2171 rule LintCodes to positional `LintCode('name', 'msg', ...)`, so the extractor returns **0 messages** and the whole DX audit is dead regardless of vocabulary. Orthogonal to the impact collapse; needs its own fix.)
 
 ### SEV-01 audit pass order
 
@@ -282,5 +282,38 @@ This work will be reviewed by another AI.
 - `python -m py_compile scripts/modules/_audit_checks.py` → clean.
 - Functional: `dart run saropa_lints:severity_report --help`, `dart run saropa_lints:impact_report --help` (alias), and `dart run saropa_lints severity-report --help` (subcommand) all print the Severity Report usage.
 - No Dart test references `impact_report` / `severity_report` / `SEVERITIES` / `get_severity_stats` (grep of `test/` → no matches); no Python test suite covers `_audit_checks.py`. Tooling has no existing test harness; verified by compile + run instead.
+
+**No bug archive** — task did not close a `bugs/*.md` file.
+
+---
+
+## Finish Report (2026-06-10)
+
+**Trigger:** "so then do sev-01 and sev-04" — picked up the two remaining open queue items.
+
+### SEV-04 — DX scripts accept `error|warning|info` (DONE)
+
+Re-keyed the three remaining DX-audit scripts from the retired 5-value impact names to the 3-level severity model:
+
+- `scripts/modules/_audit_dx.py` — `RuleMessage.audit_dx()` length thresholds (180/150/100 now keyed error/warning/info), consequence/specific-type/AI-copilot checks now gate on `("error","warning")`, vague-language skip on `"info"`; the no-override extraction default changed from `"medium"` → `"warning"` (mirrors base `SaropaLintRule.impact`); `print_dx_audit_report()` and `export_dx_report()` bucket dicts, `impact_priority`, color maps, and summary counts all collapsed to 3 values.
+- `scripts/modules/_improve_dx_messages.py` — `MIN_PROBLEM`/`MIN_CORRECTION` collapsed; `audit_message()` vague-skip + consequence + correction-length checks re-keyed; the no-override default `"medium"` → `"warning"`.
+- `scripts/modules/_audit.py` — `_dx_impact_table()` is now "By Severity" (error/warning/info), `_dx_failing_table()` `impact_order` and header column relabeled.
+
+**Verification:** `py_compile` clean on all three; a direct synthetic `RuleMessage` test confirms error rules get the 180-char + consequence + 100-char-correction checks, warning rules get 150/80, and info rules skip the vague penalty. Grep confirms no live old-value references remain (only one explanatory comment naming the retirement).
+
+**Separate pre-existing breakage found (NOT fixed — out of SEV-04 scope):** the DX message *extractor* regex (`LINTCODE_RE` / `extract_rule_messages`) expects `LintCode(name: '...')` keyword syntax. The analyzer-9 compat migration moved all 2171 rule LintCodes to positional `LintCode('name', 'msg', ...)`, so the extractor matches **zero** rules and the entire DX message audit returns empty regardless of the vocabulary fix. This is orthogonal to the impact collapse and predates this work; it needs its own regex fix to make the (now-correct) vocabulary actually exercise live data.
+
+### SEV-01 — severity audit (PARTIAL)
+
+Generated a complete read-only cross-check of every rule's `severity:` field against its `LintImpact get impact` getter; persisted to [`SEV01_SEVERITY_AUDIT.md`](SEV01_SEVERITY_AUDIT.md). Of 2159 paired rules: 714 disagreements, of which 574 are default-impact-only (no explicit override → base `warning`), leaving ~140 real author disagreements split into Bucket A (over-rated, ERROR with explicit impact≤warning) and Bucket B (under-rated, WARNING with explicit impact=error).
+
+**Applied (confirmed safe — 11 rules, each read first, each with an inline `// SEV-01:` why-comment):**
+
+- Round 1, `prefer_*` performance/architecture preferences: `prefer_cubit_for_simple`, `prefer_copy_with_for_state`, `prefer_consumer_widget`, `prefer_select_for_partial`, `prefer_family_for_params`.
+- Round 2, `bloc_rules.dart` should-fix patterns (missed events / rebuilds / observability / races, not crashes): `avoid_bloc_event_in_constructor`, `require_immutable_bloc_state`, `require_bloc_observer`, `avoid_bloc_event_mutation`, `avoid_bloc_listen_in_build`, `require_error_state`.
+
+**Deliberately left at ERROR** after reading: `prefer_platform_io_conditional` (throws UnsupportedError → crashes web), `prefer_url_launcher_uri_over_string` (Uri.parse FormatException), `prefer_fail_test_case` (intentional always-fail pipeline hook), `require_initial_state` (throws LateInitializationError), `require_bloc_close` (resource/memory leak, consistent with the disposal family). These reads proved that bulk-downgrading by name would have introduced bugs.
+
+**Still open (needs sign-off):** Bucket A's remaining 66 candidates (downgrade direction is safening but each needs an individual read) and all of Bucket B's 46 candidates (upgrade WARNING→ERROR breaks `dart analyze` for every consumer — a product decision).
 
 **No bug archive** — task did not close a `bugs/*.md` file.

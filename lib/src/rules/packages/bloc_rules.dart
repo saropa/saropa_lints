@@ -60,7 +60,9 @@ class AvoidBlocEventInConstructorRule extends SaropaLintRule {
     '[avoid_bloc_event_in_constructor] Adding a BLoC event in the constructor runs it before listeners are attached, causing missed state updates and unpredictable app behavior. This can result in lost events, bugs that are hard to trace, and inconsistent UI state. {v5}',
     correctionMessage:
         'Dispatch initial events from the widget that creates the BLoC, not from the BLoC constructor, to ensure all listeners are attached and receive the event.',
-    severity: DiagnosticSeverity.ERROR,
+    // SEV-01: missed/lost events are a known-bad pattern (should-fix),
+    // not a crash/exploit. WARNING matches the impact getter.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
@@ -336,7 +338,9 @@ class RequireImmutableBlocStateRule extends SaropaLintRule {
     '[require_immutable_bloc_state] If your BLoC state is mutable, it causes unpredictable UI updates, breaks state comparison, and leads to missed widget rebuilds. This results in subtle bugs, inconsistent UI, and hard-to-maintain code. {v5}',
     correctionMessage:
         'Add the @immutable annotation or extend Equatable to ensure your BLoC state is immutable and supports proper equality comparisons. This guarantees reliable UI updates and easier debugging.',
-    severity: DiagnosticSeverity.ERROR,
+    // SEV-01: mutable state causes missed rebuilds (should-fix pattern),
+    // not a crash/exploit. WARNING matches the impact getter.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
@@ -470,7 +474,9 @@ class PreferCubitForSimpleRule extends SaropaLintRule {
     '[prefer_cubit_for_simple] Using Bloc for simple state management with few events adds unnecessary boilerplate, indirection, and makes code harder to maintain. This can slow down development and introduce avoidable complexity. {v3}',
     correctionMessage:
         'Use Cubit for straightforward state management. Reserve Bloc for cases with complex event handling or multiple event types.',
-    severity: DiagnosticSeverity.ERROR,
+    // SEV-01: Bloc-vs-Cubit is an architectural preference (boilerplate),
+    // not a broken/crashing must-fix. WARNING matches the impact getter.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   // Cached regex for performance
@@ -650,7 +656,9 @@ class RequireBlocObserverRule extends SaropaLintRule {
     '[require_bloc_observer] Without a BlocObserver, state transitions and errors are invisible, making it extremely difficult to debug production issues, track bugs, or monitor app health. This can lead to undetected failures and poor user experience. {v3}',
     correctionMessage:
         'Add Bloc.observer = AppBlocObserver() in main() to enable centralized logging and error handling for all Blocs and Cubits.',
-    severity: DiagnosticSeverity.ERROR,
+    // SEV-01: missing observability is a debuggability suggestion, not a
+    // crash/exploit. WARNING matches the impact getter.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static final RegExp _blocProviderRegex = RegExp(r'\bBlocProvider\b');
@@ -737,7 +745,9 @@ class AvoidBlocEventMutationRule extends SaropaLintRule {
     '[avoid_bloc_event_mutation] If BLoC events are mutable, they can be modified during processing, causing race conditions, unpredictable state changes, and hard-to-debug bugs. This breaks the contract of event immutability and can destabilize your app. {v3}',
     correctionMessage:
         'Make all event fields final and use a const constructor to ensure events are immutable and safe to use in BLoC.',
-    severity: DiagnosticSeverity.ERROR,
+    // SEV-01: mutable events risk races (should-fix pattern), not a
+    // guaranteed crash/exploit. WARNING matches the impact getter.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
@@ -800,7 +810,9 @@ class PreferCopyWithForStateRule extends SaropaLintRule {
     '[prefer_copy_with_for_state] Directly modifying BLoC state breaks immutability, leading to unpredictable UI updates, missed rebuilds, and subtle bugs that surface only in production. The BLoC pattern relies on immutable state transitions to guarantee that every emit triggers a rebuild; mutating fields in place silently bypasses this contract. {v4}',
     correctionMessage:
         'Use state.copyWith(field: value) to create a new immutable state object and trigger proper UI updates.',
-    severity: DiagnosticSeverity.ERROR,
+    // SEV-01: in-place state mutation is a known-bad pattern (missed
+    // rebuilds), a should-fix WARNING, not a crash/exploit ERROR.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
@@ -869,7 +881,9 @@ class AvoidBlocListenInBuildRule extends SaropaLintRule {
     '[avoid_bloc_listen_in_build] Using BlocProvider.of in build() with listen:true causes the widget to rebuild on every state change, leading to performance issues and unpredictable UI updates. This can make your app less efficient and harder to maintain. {v3}',
     correctionMessage:
         'Use BlocBuilder for reactive UI updates, or context.read() for one-time access to the bloc, to avoid unnecessary rebuilds and improve performance.',
-    severity: DiagnosticSeverity.ERROR,
+    // SEV-01: excess rebuilds are a performance issue (should-fix), not a
+    // crash/exploit. WARNING matches the impact getter.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
@@ -1039,7 +1053,9 @@ class RequireErrorStateRule extends SaropaLintRule {
     '[require_error_state] If your BLoC state hierarchy does not include an error state, failures will be unhandled, leading to crashes or missing error UI. This makes your app less robust and harder to debug. {v3}',
     correctionMessage:
         'Add an Error state class (e.g., UserError) to your BLoC state hierarchy to handle failures gracefully and display error messages to users.',
-    severity: DiagnosticSeverity.ERROR,
+    // SEV-01: a missing error-state class is incomplete error handling
+    // (should-fix architecture), not broken code. WARNING matches impact.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override

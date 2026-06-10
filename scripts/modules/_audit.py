@@ -132,17 +132,22 @@ class AuditResult:
 
 
 def _dx_impact_table(messages: list[RuleMessage]) -> list[str]:
-    """Build DX summary-by-impact markdown table."""
-    impacts = ["critical", "high", "medium", "low", "opinionated"]
+    """Build DX summary-by-severity markdown table.
+
+    Keyed on the post-collapse 3-level severity model (error/warning/
+    info); the old 5-bucket impact names were retired 2026-05-03 and
+    rule sources now only emit those three values.
+    """
+    impacts = ["error", "warning", "info"]
     by_impact: dict[str, list[RuleMessage]] = {i: [] for i in impacts}
     for m in messages:
         if m.impact in by_impact:
             by_impact[m.impact].append(m)
 
     lines = [
-        "### By Impact\n",
-        "| Impact | Passing | Total | Rate |",
-        "|--------|---------|-------|------|",
+        "### By Severity\n",
+        "| Severity | Passing | Total | Rate |",
+        "|----------|---------|-------|------|",
     ]
     for impact in impacts:
         total = len(by_impact[impact])
@@ -214,7 +219,7 @@ def _dx_failing_table(
     messages: list[RuleMessage],
     tier_rules: dict[str, set[str]],
 ) -> list[str]:
-    """Build per-rule failing table sorted by tier then impact."""
+    """Build per-rule failing table sorted by tier then severity."""
     rule_to_tier: dict[str, str] = {}
     for tier, rules in tier_rules.items():
         for rule in rules:
@@ -225,8 +230,7 @@ def _dx_failing_table(
         return []
 
     impact_order = {
-        "critical": 0, "high": 1, "medium": 2,
-        "low": 3, "opinionated": 4,
+        "error": 0, "warning": 1, "info": 2,
     }
     tier_order = {t: i for i, t in enumerate(TIERS)}
     failing.sort(key=lambda m: (
@@ -237,8 +241,8 @@ def _dx_failing_table(
 
     lines = [
         "### Failing Rules\n",
-        "| Rule | Tier | Impact | Score | Issues |",
-        "|------|------|--------|-------|--------|",
+        "| Rule | Tier | Severity | Score | Issues |",
+        "|------|------|----------|-------|--------|",
     ]
     for m in failing:
         tier = rule_to_tier.get(m.name, "unassigned")
