@@ -120,11 +120,48 @@ class AvoidDebugPrintRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addMethodInvocation((MethodInvocation node) {
-      if (node.methodName.name == 'debugPrint') {
-        reporter.atNode(node);
-      }
+      if (node.methodName.name != 'debugPrint') return;
+
+      // The correction tells callers to route through structured logging
+      // (debug() / debugException() / breadcrumb()). Those primitives are
+      // themselves implemented on top of debugPrint — the terminal sink. A
+      // debugPrint inside the sink's own body cannot route through itself
+      // without recursing, so flagging it is circular. Exempt enclosing
+      // debug*/_debug*/breadcrumb functions, matching the sibling
+      // avoid_unguarded_debug rule's logging-helper exemption.
+      if (isInsideLoggingSink(node)) return;
+
+      reporter.atNode(node);
     });
   }
+}
+
+/// Returns true when [node] is inside a logging-primitive implementation —
+/// a function/method named `debug*`, `_debug*`, `breadcrumb`, or `_breadcrumb`.
+///
+/// These are the terminal sinks that the debug/print rules redirect callers to.
+/// Their bodies must call `debugPrint`/`print` directly (routing back through
+/// the sink would recurse), so the rules must not flag those sites.
+bool isInsideLoggingSink(AstNode node) {
+  AstNode? current = node.parent;
+  while (current != null) {
+    String? name;
+    if (current is MethodDeclaration) {
+      name = current.name.lexeme;
+    } else if (current is FunctionDeclaration) {
+      name = current.name.lexeme;
+    }
+    if (name != null) {
+      if (name.startsWith('debug') ||
+          name.startsWith('_debug') ||
+          name == 'breadcrumb' ||
+          name == '_breadcrumb') {
+        return true;
+      }
+    }
+    current = current.parent;
+  }
+  return false;
 }
 
 /// Warns when `debugPrint()` calls are not guarded by a debug check.

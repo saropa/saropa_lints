@@ -23,4 +23,14 @@ void _good() {
   }
 }
 
+// GOOD: catch block inside debugException — the logging sink's last-resort
+// fallback. Structured logging has already failed; print is the only option.
+void debugException(Object error, StackTrace stack) {
+  try {
+    doSomething();
+  } on Object catch (e) {
+    debugPrint('debugException itself threw: $e');
+  }
+}
+
 void main() {}
