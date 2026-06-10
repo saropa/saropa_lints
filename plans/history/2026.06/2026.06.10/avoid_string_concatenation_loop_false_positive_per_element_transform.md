@@ -1,6 +1,6 @@
 # BUG: `avoid_string_concatenation_loop` — Fires on per-element string composition (no accumulator)
 
-**Status: Open**
+**Status: Fixed**
 
 Created: 2026-06-10
 Rule: `avoid_string_concatenation_loop`
@@ -138,3 +138,7 @@ The `+=` branch should likewise confirm the target is loop-invariant in declarat
 - Dart SDK version: >=3.10.7 <4.0.0
 - custom_lint version: native analyzer plugin (analysis_server_plugin), not custom_lint
 - Triggering project/file: `search_query_part.dart:106`, `bluesky_post_item_extensions.dart:145`
+
+## Finish Report (2026-06-10)
+
+Fixed in WS-6. The bare `+` branch now only reports when the BinaryExpression is the RHS of an `s = s + x` (or `s = x + s`) assignment whose target is one of the operands (a genuine accumulator). Per-element transforms (.map, fresh local, RegExp arg) have no such assignment and are not flagged. Pure-AST; verified via scan (FP `.map` not flagged, accumulator TP flagged).

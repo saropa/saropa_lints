@@ -1,6 +1,6 @@
 # BUG: `avoid_swallowing_exceptions` — Fires on `catch (_)` wildcard even when the body logs
 
-**Status: Open**
+**Status: Fixed**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
@@ -188,3 +188,7 @@ should include:
 - Dart SDK version: >=3.9.0 <4.0.0 (per pubspec environment constraint)
 - analyzer: >=9.0.0 <13.0.0
 - Triggering project/file: `d:\src\contacts` — `lib/utils/user/native_permissions/location_permission.dart:126`
+
+## Finish Report (2026-06-10)
+
+Fixed in WS-6. Skip the wildcard `_`/`__` exception parameter (a deliberate discard that cannot be referenced); for a named-but-unused parameter, suppress when the body logs or rethrows. Empty catch still flagged. Pure-AST; verified via scan (catch(_) with logging not flagged; catch(e){doUnrelated();} flagged).

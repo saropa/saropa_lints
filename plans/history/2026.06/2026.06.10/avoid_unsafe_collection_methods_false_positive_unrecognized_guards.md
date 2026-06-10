@@ -1,6 +1,6 @@
 # BUG: `avoid_unsafe_collection_methods` — Misses seven common non-emptiness guard shapes (combined `|| isEmpty`, `continue`/nested-block early return, `length <= 1`, `Map.keys`/`Map.values` after `Map`-level / `while`-loop guard, extension `isListNullOrEmpty`, index-expression target, split-result-via-variable)
 
-**Status: Open**
+**Status: Fixed**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
@@ -306,3 +306,7 @@ Plus a `// LINT` control: an unguarded `someList.last` / `uri.pathSegments.last`
 - Dart SDK version: 3.12.1 (stable)
 - analysis_server_plugin: ^0.3.4 (native analyzer plugin; not custom_lint)
 - Triggering project/files: `D:\src\contacts` — 18 files, 24 false-positive sites (see verdict table above); 1 true positive (`remote_locale_cache_meta.dart:210`) correctly flagged.
+
+## Finish Report (2026-06-10)
+
+Fixed in WS-2: all eight patterns. A: `_isEmptinessCheck` decomposes `||` (and `?? true`). B: broadened length floors (`length <= N`, `length != N` with N>=1). C: `_containsEarlyExit` accepts `continue`/`break`. D: `_isCollectionGuardedByEarlyReturn` walks ALL ancestor blocks. E: `.keys`/`.values`/`.entries` unify with the underlying map name, and a new `_isGuardedByEnclosingLoop` recognizes `while/for/do` conditions. F: extension `*Empty`/`NullOrEmpty` getters, with null-op-normalized name comparison so `result?.files` (guard) matches `result!.files` (access). G: `_collectionNameOf` handles IndexExpression/PostfixExpression (`props[k]!`). H: `split()` resolved through an enclosing-block local. The guard logic is pure-AST; verified by `test/rules/data/avoid_unsafe_collection_methods_ws2_test.dart` (13 cases: all 8 patterns + chained Pattern 6 + 2 unguarded controls). Existing collection tests (69) still pass.

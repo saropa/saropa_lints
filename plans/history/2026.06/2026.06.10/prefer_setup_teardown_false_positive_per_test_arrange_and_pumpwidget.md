@@ -1,6 +1,6 @@
 # BUG: `prefer_setup_teardown` — Flags per-test arrange/`pumpWidget` that cannot move to `setUp()`
 
-**Status: Open**
+**Status: Fixed**
 
 Created: 2026-06-10
 Rule: `prefer_setup_teardown`
@@ -165,3 +165,7 @@ The first change alone removes the entire `testWidgets`/`pumpWidget` class of fa
 - Dart SDK version: >=3.10.7 <4.0.0
 - custom_lint version: native analyzer plugin (analysis_server_plugin), not custom_lint
 - Triggering project/files: `common_flip_card_test.dart:84`, `google_crashlytics_utils_init_test.dart:85`
+
+## Finish Report (2026-06-10)
+
+Fixed in WS-6. Pattern 1: a test whose leading setup statements reference the testWidgets WidgetTester parameter (tester.pumpWidget/pump/tap/...) has no hoistable signature (setUp has no tester). Pattern 2: when the file declares a real setUp()/setUpAll(), the duplicate threshold is raised from 3 to 4 so per-group arrange does not trip. Pure-AST; verified via scan (testWidgets group not flagged; hoistable test() group flagged).

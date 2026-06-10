@@ -1,6 +1,6 @@
 # BUG: `avoid_unbounded_cache_growth` — `removeWhere` eviction not recognized as a size limit
 
-**Status: Open**
+**Status: Fixed**
 
 Created: 2026-06-10
 Rule: `avoid_unbounded_cache_growth`
@@ -134,3 +134,7 @@ A robust fix walks the class members for a `MethodInvocation` whose `methodName`
 - Dart SDK version: >=3.10.7 <4.0.0
 - custom_lint version: native analyzer plugin (analysis_server_plugin), not custom_lint
 - Triggering project/file: `D:\src\contacts\lib\utils\event\astronomical\astronomical_cache.dart:90`
+
+## Finish Report (2026-06-10)
+
+Fixed in WS-5. Broadened the eviction-detection substrings in `memory_management_rules.dart` to include `.removewhere(`, `.removerange(`, and `.clear(` alongside `.remove(` (classSource is lowercased). A cache pruned with `removeWhere`/`removeRange`/`clear` is no longer reported as unbounded. Verified: real site `astronomical_cache.dart:90` now clean; a cache with no eviction still fires (/d/tmp). Fixture extended: `example/lib/memory_management/avoid_unbounded_cache_growth_fixture.dart`.

@@ -7,6 +7,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:meta/meta.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 
 import '../../saropa_lint_rule.dart';
@@ -842,6 +843,14 @@ class PreferSingleSetStateRule extends SaropaLintRule {
       }
     });
   }
+
+  /// Exposed for unit tests: the mergeable-setState scan for one method [body].
+  /// Pure-AST segment analysis (no resolved types), verifiable on `parseString`
+  /// ASTs. Returns non-null when two setState calls would be reported as
+  /// mergeable.
+  @visibleForTesting
+  static MethodInvocation? findMergeableSetStateForTesting(AstNode body) =>
+      _findMergeableSetState(body);
 }
 
 /// Returns the first setState call that shares a synchronous straight-line
@@ -973,6 +982,35 @@ class _SegmentVisitor extends RecursiveAstVisitor<void> {
     for (final SwitchMember member in node.members) {
       defer(member);
     }
+  }
+
+  @override
+  void visitForStatement(ForStatement node) {
+    // The loop body runs an indeterminate number of times and commonly awaits
+    // per iteration: a setState inside it lands in a different frame from any
+    // setState OUTSIDE the loop, so it must not merge with them. Scan the body
+    // as its own scope (two consecutive setState calls inside one iteration,
+    // with no await between them, still merge there).
+    node.forLoopParts.accept(this);
+    defer(node.body);
+  }
+
+  @override
+  void visitWhileStatement(WhileStatement node) {
+    node.condition.accept(this);
+    defer(node.body);
+  }
+
+  @override
+  void visitDoStatement(DoStatement node) {
+    node.condition.accept(this);
+    defer(node.body);
+  }
+
+  @override
+  void visitForElement(ForElement node) {
+    // Collection-for inside a build list — same reasoning as a loop statement.
+    defer(node.body);
   }
 
   @override

@@ -1255,6 +1255,22 @@ class AvoidStringConcatenationLoopRule extends SaropaLintRule {
       // Check if we're inside a loop
       if (!_isInsideLoop(node)) return;
 
+      // Only flag a genuine accumulator: `s = s + x` (or `s = x + s`) where the
+      // assignment target is one of the `+` operands and is read back each
+      // iteration. A per-element transform — `.map((e) => e + suffix)`, a fresh
+      // per-iteration local, a `RegExp(r'\s*' + escaped)` argument — produces a
+      // NEW string each pass (O(n) total, StringBuffer inapplicable), not the
+      // O(n^2) accumulation this rule targets, and has no such accumulator.
+      final AstNode? parent = node.parent;
+      if (parent is! AssignmentExpression) return;
+      if (parent.rightHandSide != node) return;
+      if (parent.operator.type != TokenType.EQ) return;
+      final String targetSource = parent.leftHandSide.toSource();
+      if (targetSource != node.leftOperand.toSource() &&
+          targetSource != node.rightOperand.toSource()) {
+        return;
+      }
+
       // Check if operands look like strings
       final String source = node.toSource();
       if (_looksLikeStringOperation(source)) {
@@ -1477,8 +1493,12 @@ class PreferValueListenableBuilderRule extends SaropaLintRule {
       // must intersect against real field names rather than closure locals.
       final Set<String> finalFieldNames = <String>{};
       final Set<String> nonFinalFieldNames = <String>{};
+      bool hasAsyncBuilderField = false;
       for (final ClassMember member in node.bodyMembers) {
         if (member is FieldDeclaration && !member.isStatic) {
+          if (_isAsyncBuilderCacheType(member.fields.type)) {
+            hasAsyncBuilderField = true;
+          }
           final Set<String> target = member.fields.isFinal
               ? finalFieldNames
               : nonFinalFieldNames;
@@ -1488,16 +1508,41 @@ class PreferValueListenableBuilderRule extends SaropaLintRule {
         }
       }
 
+      // Hypothesis B: a State that declares ANY Future/Stream field is a
+      // FutureBuilder/StreamBuilder host. Its primary rebuild driver is the
+      // async builder, and the lone non-final scalar is almost always a
+      // companion (page count, re-fetch key, in-flight lock), never the single
+      // synchronous display value the rule targets. Bail, mirroring the
+      // mutatesFinalField / hasBareSetState guards below.
+      if (hasAsyncBuilderField) return;
+
+      // Hypothesis C: a State that manually wires an external Listenable
+      // (`widget.x.addListener(...)`) is driven by that listenable, not the
+      // scalar — and it usually listens manually PRECISELY because a
+      // ValueListenableBuilder cannot express the diff-suppression it needs
+      // (e.g. a per-minute clock that drops 59 of 60 ticks). The suggested
+      // refactor would make it strictly worse, so bail.
+      if (node.toSource().contains('.addListener(')) return;
+
       // Second pass: walk every method body to count setState calls, detect
       // in-place mutation of a `final` collection, and collect the names of
       // non-final fields *reassigned* inside a setState callback.
       int setStateCallCount = 0;
       bool mutatesFinalField = false;
       bool hasBareSetState = false;
+      bool hasAsyncSetState = false;
       final Set<String> fieldsAssignedInSetState = <String>{};
 
       for (final ClassMember member in node.bodyMembers) {
         if (member is MethodDeclaration) {
+          // Hypothesis A: a setState inside an `async` method body assigns an
+          // ASYNC-LOADED value (e.g. `setState(() => _dbCount = await ...)` in
+          // an async initState helper). A ValueNotifier cannot remove the async
+          // load, so the suggested refactor does not apply.
+          if (member.body.isAsynchronous &&
+              member.body.toSource().contains('setState')) {
+            hasAsyncSetState = true;
+          }
           member.body.visitChildren(
             _SetStateCounterVisitor(
               () => setStateCallCount++,
@@ -1571,10 +1616,11 @@ class PreferValueListenableBuilderRule extends SaropaLintRule {
       }
 
       // Suggest ValueListenableBuilder if state is very simple
-      // (1 field with few setState calls)
+      // (1 field with few setState calls) and not async-loaded.
       if (stateFieldCount == 1 &&
           setStateCallCount >= 1 &&
-          setStateCallCount <= 3) {
+          setStateCallCount <= 3 &&
+          !hasAsyncSetState) {
         reporter.atToken(node.nameToken, code);
       }
     });

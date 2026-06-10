@@ -1,6 +1,6 @@
 # BUG: `require_error_identification` — Fires on a non-color enum/label ternary (`DebugLevels.Error`)
 
-**Status: Open**
+**Status: Fixed**
 
 Created: 2026-06-10
 Rule: `require_error_identification`
@@ -133,3 +133,7 @@ In the `addConditionalExpression` body:
 - Dart SDK version: >=3.10.7 <4.0.0
 - custom_lint version: native analyzer plugin (analysis_server_plugin), not custom_lint
 - Triggering project/file: `D:\src\contacts\lib\components\primitive\error\common_error_section.dart:49`
+
+## Finish Report (2026-06-10)
+
+Fixed in WS-5. Added a mandatory Color-staticType gate after the existing error-color regex: at least one ternary branch must be `Color`-typed (display name `Color` or `*Color`, nullable-aware). A `DebugLevels.Error` enum value or a String label is dropped. Kept the regex as the branch heuristic to avoid regressing `Colors.red` detection. Verified: real site `common_error_section.dart:49` now clean; `Colors.red` ternaries still fire. Fixture extended: `example/lib/accessibility/require_error_identification_fixture.dart`.

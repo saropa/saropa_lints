@@ -1,6 +1,6 @@
 # BUG: `avoid_listview_without_item_extent` — FP-skip too narrow: fires on bounded / shrink-wrapped lists that omit an explicit `NeverScrollableScrollPhysics`
 
-**Status: Open**
+**Status: Fixed**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
@@ -215,3 +215,7 @@ because their items are `CommonPanelExpandable`; either fix suppresses them.)
 - Flutter: >=3.44.0
 - custom_lint version: n/a — native analyzer plugin (`analysis_server_plugin`)
 - Triggering project/file: `d:/src/contacts` — 6 flagged sites of this shape
+
+## Finish Report (2026-06-10)
+
+Fixed in WS-4. The inline-non-scrolling exemption is now `shrinkWrapTrue` alone (the `&& neverScrollablePhysics` conjunct is dropped) — shrinkWrap forces eager layout regardless of physics, the exact rationale the existing comment relied on. Also refactored the rule to handle the unresolved MethodInvocation shape of `ListView.builder(...)` in addition to the resolved InstanceCreationExpression, so it now fires in the scan CLI (it was previously inert there) and is unit-testable. Verified by `test/rules/widget/avoid_listview_without_item_extent_ws4_test.dart` and an end-to-end scan (shrinkWrap list NOT flagged; plain fixed-height list flagged).

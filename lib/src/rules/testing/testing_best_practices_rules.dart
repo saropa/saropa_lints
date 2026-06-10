@@ -3094,9 +3094,18 @@ class PreferSetupTeardownRule extends SaropaLintRule {
         (grouped[group] ??= []).add(testCall);
       }
 
+      // Pattern 2: when the file already declares a real setUp()/tearDown() for
+      // the genuinely-shared fixture, three tests sharing a per-GROUP arrange
+      // (different groups seed different data) are not extractable to a
+      // file-level setUp(). Raise the duplicate threshold so per-group arrange
+      // does not trip, while 4+ identical setups in one group still report.
+      final bool fileHasSetUp = RegExp(r'\bsetUp(All)?\s*\(')
+          .hasMatch(unit.toSource());
+      final int threshold = fileHasSetUp ? 4 : 3;
+
       for (final scopeTests in grouped.values) {
-        if (scopeTests.length < 3) continue;
-        if (_reportDuplicateSetup(scopeTests, reporter)) return;
+        if (scopeTests.length < threshold) continue;
+        if (_reportDuplicateSetup(scopeTests, reporter, threshold)) return;
       }
     });
   }
@@ -3118,6 +3127,7 @@ class PreferSetupTeardownRule extends SaropaLintRule {
   bool _reportDuplicateSetup(
     List<MethodInvocation> testCalls,
     SaropaDiagnosticReporter reporter,
+    int threshold,
   ) {
     final Map<String, int> counts = {};
 
@@ -3128,7 +3138,7 @@ class PreferSetupTeardownRule extends SaropaLintRule {
     }
 
     for (final entry in counts.entries) {
-      if (entry.value < 3) continue;
+      if (entry.value < threshold) continue;
 
       // Report on the first test with this duplicated setup
       for (final testCall in testCalls) {
@@ -3152,7 +3162,46 @@ class PreferSetupTeardownRule extends SaropaLintRule {
     final statements = body.block.statements;
     if (statements.isEmpty) return null;
 
+    // Pattern 1: a testWidgets callback receives a WidgetTester. Setup bound to
+    // it (`tester.pumpWidget`/`pump`/`pumpAndSettle`/`tap`/…) cannot move to
+    // setUp(), which has no tester — so such a test has no hoistable signature.
+    // Every testWidgets pumps a widget, so this clears the whole pumpWidget
+    // false-positive class.
+    final String? testerParam = _firstCallbackParamName(callback);
+    if (testerParam != null &&
+        _signatureReferencesParam(statements, testerParam)) {
+      return null;
+    }
+
     return _buildSetupSignature(statements);
+  }
+
+  /// The name of the callback's first parameter (the WidgetTester in a
+  /// testWidgets callback), or null for a no-arg `test()` callback.
+  String? _firstCallbackParamName(FunctionExpression callback) {
+    final NodeList<FormalParameter>? params =
+        callback.parameters?.parameters;
+    if (params == null || params.isEmpty) return null;
+    return params.first.name?.lexeme;
+  }
+
+  /// True when one of the leading setup statements (the same ones
+  /// [_buildSetupSignature] would use) references [param] as a receiver
+  /// (`param.something`).
+  bool _signatureReferencesParam(
+    NodeList<Statement> statements,
+    String param,
+  ) {
+    final RegExp receiver = RegExp('\\b${RegExp.escape(param)}\\s*\\.');
+    int bodyCount = 0;
+    for (final Statement s in statements) {
+      if (_isSimpleLocalInit(s)) continue;
+      if (_isAssertionCall(s)) continue;
+      if (receiver.hasMatch(s.toSource())) return true;
+      bodyCount++;
+      if (bodyCount >= 2) break;
+    }
+    return false;
   }
 
   /// Builds a normalized signature from the first 1-2 non-assertion statements

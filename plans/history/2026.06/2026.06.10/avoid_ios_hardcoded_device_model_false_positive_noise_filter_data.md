@@ -1,6 +1,6 @@
 # BUG: `avoid_ios_hardcoded_device_model` — Fires on device-name DATA (email-signature noise list), not a runtime device check
 
-**Status: Open**
+**Status: Fixed**
 
 Created: 2026-06-10
 Rule: `avoid_ios_hardcoded_device_model`
@@ -126,3 +126,7 @@ Literals that are elements of a `ListLiteral`/`SetOrMapLiteral` field, or argume
 - Dart SDK version: >=3.10.7 <4.0.0
 - custom_lint version: native analyzer plugin (analysis_server_plugin), not custom_lint
 - Triggering project/file: `D:\src\contacts\lib\utils\contact\signature\signature_noise_filter.dart:12-14`
+
+## Finish Report (2026-06-10)
+
+Fixed in WS-5. Chosen approach DIVERGES from the report's suggested `==`/switch-only gate: that would have regressed the existing `deviceModel.contains('iPod touch')` true positive documented in the fixture. Instead, `_isDataLiteralElement` exempts string literals that are elements of a `ListLiteral`/`SetOrMapLiteral`/`MapLiteralEntry` (the reported FP is a const list of email-signature taglines). Comparisons and `.contains()` device checks still fire. Verified: real site `signature_noise_filter.dart` now clean; `==` and `.contains()` cases still fire (/d/tmp). Fixture extended: `example/lib/ios/avoid_ios_hardcoded_device_model_fixture.dart`.

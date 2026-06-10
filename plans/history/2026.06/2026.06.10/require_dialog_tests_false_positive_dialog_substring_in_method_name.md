@@ -1,6 +1,6 @@
 # BUG: `require_dialog_tests` — Fires on any method name containing "Dialog" (l10n getter, not a dialog)
 
-**Status: Open**
+**Status: Fixed**
 
 Created: 2026-06-10
 Rule: `require_dialog_tests`
@@ -133,3 +133,7 @@ Combining the two (allowlist OR `Future`-returning + name contains "Dialog") rem
 - Dart SDK version: >=3.10.7 <4.0.0
 - custom_lint version: native analyzer plugin (analysis_server_plugin), not custom_lint
 - Triggering project/file: `D:\src\contacts\test\lib\l10n\localization_test.dart:229`
+
+## Finish Report (2026-06-10)
+
+Fixed in WS-5. Replaced the bare `name.contains('Dialog')` with: a known-launcher allowlist (`showDialog`, `showGeneralDialog`, `showAdaptiveDialog`, `showDialogCommon`, `showModalBottomSheet`, `showCupertinoDialog`, `showCupertinoModalPopup`) OR a `*Dialog*` call whose static return type is a CONFIRMED awaitable (Future/void). Unresolved (null) type is treated as not-a-launch (real launchers are caught by name). Verified: real site `localization_test.dart:229` now clean. Fixture extended: `example/lib/testing_best_practices/require_dialog_tests_fixture.dart`.
