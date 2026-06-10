@@ -102,25 +102,12 @@ void main() {
         final rule = AvoidReturningCascadesRule();
         expect(rule.fixGenerators, isNotEmpty);
       });
-
-      test('returning cascade expression SHOULD trigger', () {});
-
-      test('separate variable for cascades should NOT trigger', () {});
     });
     group('avoid_returning_void', () {
       test('rule offers quick fix (remove return from void expression)', () {
         final rule = AvoidReturningVoidRule();
         expect(rule.fixGenerators, isNotEmpty);
       });
-
-      test('explicit return of void expression SHOULD trigger', () {});
-
-      test('void function without return should NOT trigger', () {});
-    });
-    group('avoid_unnecessary_return', () {
-      test('return at end of void function SHOULD trigger', () {});
-
-      test('implicit void return should NOT trigger', () {});
     });
     group('avoid_returning_this', () {
       test('rule offers quick fix (replace return this with return)', () {
@@ -143,20 +130,11 @@ void main() {
   });
 
   group('Return - Preference Rules', () {
-    group('prefer_immediate_return', () {
-      test('variable assigned then immediately returned SHOULD trigger', () {});
-
-      test('direct return of expression should NOT trigger', () {});
-    });
     group('prefer_returning_shorthands', () {
       test('rule offers quick fix (convert to expression body)', () {
         final rule = PreferReturningShorthandsRule();
         expect(rule.fixGenerators, isNotEmpty);
       });
-
-      test('single-expression body with return SHOULD trigger', () {});
-
-      test('arrow function syntax should NOT trigger', () {});
     });
   });
 }

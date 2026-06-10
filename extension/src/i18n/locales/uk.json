@@ -74,7 +74,7 @@
     "pick": {
       "title": "Мова інтерфейсу користувача Saropa Lints",
       "placeholder": "Виберіть мову для бічної панелі та інформаційних панелей",
-      "auto": "Автоматично (дотримуйтеся мови відображення коду VS)"
+      "auto": "Автоматично (дотримуйтеся мови відображення VS Code)"
     },
     "reloadPrompt": "Мова встановлена ​​на {locale}. Перезавантажте вікно, щоб оновити бічну панель і мітки команд.",
     "reloadNow": "Перезавантажте зараз",
@@ -102,7 +102,7 @@
     "status": {
       "lastRunPrefix": "Останній запуск",
       "lastRunUnknown": "Останній запуск невідомий",
-      "noTimestampTitle": "Немає мітки часу на порушеннях.json",
+      "noTimestampTitle": "Немає мітки часу на violations.json",
       "findingsAfterFilterTitle": "Загальна кількість результатів після вимкнення фільтра правил",
       "findingOne": "{count} знахідка",
       "findingOther": "{count} знахідок",
@@ -165,7 +165,7 @@
       "clearRecentButton": "ясно",
       "recentFiltersListAria": "Останні фільтри",
       "runAnalysisTitle": "Запустіть аналіз Saropa Lints",
-      "refreshViolationsTitle": "Перезавантажте порушення.json з диска",
+      "refreshViolationsTitle": "Перезавантажте violations.json з диска",
       "severityGroupAria": "Фільтр серйозності",
       "severityLabel": "Суворість",
       "impactGroupAria": "Ударний фільтр",
@@ -199,9 +199,9 @@
       "openCodeHealth": "Відкрити Code Health",
       "openLintsConfig": "Відкрийте конфігурацію Lints",
       "reloadFromDisk": "Перезавантажити з диска",
-      "reloadFromDiskTitle": "Повторно візуалізуйте інформаційну панель із останнього порушення.json без повторного запуску аналізатора.",
+      "reloadFromDiskTitle": "Повторно візуалізуйте інформаційну панель із останнього violations.json без повторного запуску аналізатора.",
       "reEnableDisabledRules": "Повторно ввімкнути вимкнені правила…",
-      "reEnableDisabledRulesTitle": "Відкрийте швидкий вибір правил, наразі вимкнених у analy_options_custom.yaml, і повторно ввімкніть вибрані.",
+      "reEnableDisabledRulesTitle": "Відкрийте швидкий вибір правил, наразі вимкнених у analysis_options_custom.yaml, і повторно ввімкніть вибрані.",
       "reEnableNoneTitle": "Наразі немає вимкнених правил",
       "reEnableNoneMessage": "Наразі жодне правило не вимкнено через analysis_options_custom.yaml.",
       "reEnableQuickPickTitle": "Знову ввімкніть вимкнені правила",
@@ -349,7 +349,7 @@
       "bulkSelectedTpl": "{n} вибрано"
     },
     "emptyState": {
-      "hintAfterMessage": "Запустіть аналіз Saropa Lints, щоб згенерувати порушення.json, а потім скористайтеся «Оновити» тут або знову відкрийте цю інформаційну панель.",
+      "hintAfterMessage": "Запустіть аналіз Saropa Lints, щоб згенерувати violations.json, а потім скористайтеся «Оновити» тут або знову відкрийте цю інформаційну панель.",
       "refreshDisk": "Оновити з диска"
     },
     "shortcuts": {
@@ -366,7 +366,7 @@
       "analyzerTodosOn": "+{count} TODO аналізатора",
       "analyzerTodosPromo": "+? аналізатор TODOs — показати",
       "scannerPromo": "Увімкнути сканер TODO/HACK",
-      "tooltipLive": "Наживо з панелі проблем коду VS. Оновлення після завершення аналізу. Натисніть, щоб приховати.",
+      "tooltipLive": "Наживо з панелі проблем VS Code. Оновлення після завершення аналізу. Натисніть, щоб приховати.",
       "tooltipScanner": "Сканер файлової системи Saropa — підраховує відкриті маркери TODO/HACK у джерелі.",
       "tooltipPromoClickToOn": "Натисніть, щоб увімкнути"
     }
@@ -884,7 +884,7 @@
     }
   },
   "suppressionsStrip": {
-    "noData": "Поки немає порушень.json — запустіть аналіз, щоб заповнити знімок придушення.",
+    "noData": "Поки немає violations.json — запустіть аналіз, щоб заповнити знімок придушення.",
     "zeroTotal": "0 придушень аналізатора в останньому експорті.",
     "noKindBreakdown": "У цьому експорті немає розподілу за видами.",
     "title": "Придушення (експорт)",
@@ -893,7 +893,7 @@
   },
   "configMirrors": {
     "noFileRisk": "Немає розподілу ризиків по файлах (немає порушень у сфері).",
-    "suppressionNote": "Збігається з підсумком.json, а не з живими перемикачами блокування бічної панелі.",
+    "suppressionNote": "Збігається з violations.json, а не з живими перемикачами блокування бічної панелі.",
     "noSuppression": "У цьому експорті відсутній агрегат придушення (старіший аналізатор або нульові придушення).",
     "owaspSignal": "{count} порушень у цьому експорті містять мапінг OWASP для мобільних/веб — відкрийте Позицію безпеки для повної матриці та експорту.",
     "summarySuppressions": "Придушення (експорт знімка)",

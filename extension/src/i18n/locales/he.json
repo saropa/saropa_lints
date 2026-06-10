@@ -74,7 +74,7 @@
     "pick": {
       "title": "שפת ממשק המשתמש של Saropa Lints",
       "placeholder": "בחר שפה עבור סרגל הצד ולוחות המחוונים",
-      "auto": "אוטומטי (עקוב אחר שפת התצוגה של קוד VS)"
+      "auto": "אוטומטי (עקוב אחר שפת התצוגה של VS Code)"
     },
     "reloadPrompt": "השפה מוגדרת ל-{locale}. טען מחדש את החלון כדי לעדכן תוויות סרגל צד ותוויות פקודות.",
     "reloadNow": "טען מחדש עכשיו",
@@ -199,9 +199,9 @@
       "openCodeHealth": "פתיחת תקינות קוד",
       "openLintsConfig": "פתח את תצורת Lints",
       "reloadFromDisk": "טען מחדש מהדיסק",
-      "reloadFromDiskTitle": "עבד מחדש את לוח המחוונים מה-violations.json האחרון מבלי להפעיל מחדש את הנתח.",
+      "reloadFromDiskTitle": "עבד מחדש את לוח המחוונים violations.json האחרון מבלי להפעיל מחדש את הנתח.",
       "reEnableDisabledRules": "הפעל מחדש כללים מושבתים...",
-      "reEnableDisabledRulesTitle": "פתח בחירה מהירה של כללים המושבתים כעת ב-analys_options_custom.yaml והפעל מחדש את אלה שנבחרו.",
+      "reEnableDisabledRulesTitle": "פתח בחירה מהירה של כללים המושבתים כעת analysis_options_custom.yaml והפעל מחדש את אלה שנבחרו.",
       "reEnableNoneTitle": "אין כללים מושבתים כרגע",
       "reEnableNoneMessage": "אין כללים מושבתים כעת באמצעות analysis_options_custom.yaml.",
       "reEnableQuickPickTitle": "הפעל מחדש כללים מושבתים",
@@ -219,10 +219,10 @@
       "sectionAria": "כללים מובילים לפי ספירה",
       "hideTitle": "הסתר עבורי בלבד - ברמת סביבת העבודה, הפיך באמצעות Clear Suppressions",
       "hideButton": "לְהַסתִיר",
-      "disableTitle": "השבת עבור כל הפרויקט - כותב analyze_options_custom.yaml ומריץ מחדש את הניתוח",
+      "disableTitle": "השבת עבור כל הפרויקט - כותב analysis_options_custom.yaml ומריץ מחדש את הניתוח",
       "disableButton": "השבת",
       "workspaceOnlyShort": "סביבת עבודה בלבד",
-      "projectConfigShort": "תצורת הפרויקט (כותב analyze_options_custom.yaml)",
+      "projectConfigShort": "תצורת הפרויקט (כותב analysis_options_custom.yaml)",
       "topRulesOne": "כלל {count} העליון",
       "topRulesOther": "כללי {count} המובילים",
       "colRank": "#",

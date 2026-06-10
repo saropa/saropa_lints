@@ -32,27 +32,4 @@ void main() {
       expect(rule.code.correctionMessage, isNotNull);
     });
   });
-
-  group('avoid_behavior_subject_last_value', () {
-    test('SHOULD trigger on .value inside isClosed true-branch', () {
-      // Detection: PropertyAccess for .value on a BehaviorSubject target,
-      // inside the then-branch of if (subject.isClosed)
-    });
-
-    test('SHOULD trigger on .value inside isClosed == true branch', () {
-      // Detection: Same check with explicit == true comparison
-    });
-
-    test('should NOT trigger on .value when NOT closed', () {
-      // False positive prevention: !subject.isClosed guards properly
-    });
-
-    test('should NOT trigger on .value outside isClosed check', () {
-      // False positive prevention: no isClosed context
-    });
-
-    test('should NOT trigger on .value in else-branch of isClosed', () {
-      // False positive prevention: else-branch means subject is open
-    });
-  });
 }

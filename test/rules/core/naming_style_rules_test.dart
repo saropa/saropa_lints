@@ -267,14 +267,6 @@ void main() {
     });
 
     group('prefer_wildcard_for_unused_param', () {
-      test('prefer_wildcard_for_unused_param SHOULD trigger', () {
-        // Rule fires on unused positional params
-      });
-
-      test('prefer_wildcard_for_unused_param should NOT trigger', () {
-        // Preferred pattern used correctly (wildcard params)
-      });
-
       test('should NOT trigger on named parameters (v5 fix)', () {
         // Named params cannot use _ prefix in Dart (compiler error).
         // Verifies false-positive fix from v5.

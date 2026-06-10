@@ -408,8 +408,6 @@ void main() {
 
   group('Injection Prevention Rules', () {
     group('avoid_redirect_injection', () {
-      test('redirect URL without domain validation SHOULD trigger', () {});
-
       test(
         'fixture has exactly 3 BAD cases with expect_lint (unvalidated redirect should trigger)',
         () {

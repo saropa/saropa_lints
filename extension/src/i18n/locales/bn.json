@@ -17,7 +17,7 @@
     "noMatchMessage": "বর্তমান ফিল্টারগুলির সাথে কোনো সারি মেলে না৷",
     "noMatchCta": "ফিল্টার রিসেট করুন",
     "noProjectTitle": "কোন কর্মক্ষেত্র খোলা নেই",
-    "noProjectMessage": "ফলাফলগুলি দেখতে একটি ফ্লাটার বা ডার্ট প্রকল্প খুলুন।",
+    "noProjectMessage": "ফলাফলগুলি দেখতে একটি Flutter বা Dart প্রকল্প খুলুন।",
     "noProjectCta": "ফোল্ডার খুলুন",
     "noDataTitle": "এখনো কোনো তথ্য নেই",
     "noDataMessage": "এই ড্যাশবোর্ডটি পূরণ করতে একটি স্ক্যান চালান৷",
@@ -74,7 +74,7 @@
     "pick": {
       "title": "Saropa Lints UI ভাষা",
       "placeholder": "সাইডবার এবং ড্যাশবোর্ডের জন্য ভাষা বেছে নিন",
-      "auto": "স্বয়ংক্রিয় (ভিএস কোড প্রদর্শন ভাষা অনুসরণ করুন)"
+      "auto": "স্বয়ংক্রিয় (VS Code প্রদর্শন ভাষা অনুসরণ করুন)"
     },
     "reloadPrompt": "ভাষা {locale} এ সেট করা হয়েছে। সাইডবার এবং কমান্ড লেবেল আপডেট করতে উইন্ডোটি পুনরায় লোড করুন।",
     "reloadNow": "এখন রিলোড করুন",
@@ -164,7 +164,7 @@
       "clearRecentTitle": "সমস্ত সাম্প্রতিক ফিল্টার সাফ করুন",
       "clearRecentButton": "পরিষ্কার",
       "recentFiltersListAria": "সাম্প্রতিক ফিল্টার",
-      "runAnalysisTitle": "Saropa লিন্ট বিশ্লেষণ চালান",
+      "runAnalysisTitle": "Saropa Lints বিশ্লেষণ চালান",
       "refreshViolationsTitle": "ডিস্ক থেকে violations.json পুনরায় লোড করুন",
       "severityGroupAria": "তীব্রতা ফিল্টার",
       "severityLabel": "তীব্রতা",
@@ -366,7 +366,7 @@
       "analyzerTodosOn": "+{count} বিশ্লেষক TODOs",
       "analyzerTodosPromo": "+? বিশ্লেষক TODOs — দেখান",
       "scannerPromo": "TODO/HACK স্ক্যানার সক্ষম করুন",
-      "tooltipLive": "ভিএস কোড সমস্যা প্যানেল থেকে লাইভ। বিশ্লেষণ সম্পূর্ণ হওয়ার সাথে সাথে আপডেটগুলি। লুকাতে ক্লিক করুন.",
+      "tooltipLive": "VS Code সমস্যা প্যানেল থেকে লাইভ। বিশ্লেষণ সম্পূর্ণ হওয়ার সাথে সাথে আপডেটগুলি। লুকাতে ক্লিক করুন.",
       "tooltipScanner": "Saropa ফাইল-সিস্টেম স্ক্যানার — উৎসে খোলা TODO/HACK মার্কার গণনা করে।",
       "tooltipPromoClickToOn": "সক্রিয় করতে ক্লিক করুন"
     }
@@ -383,8 +383,8 @@
     "zeroIssueRules": "শূন্য ইস্যু সহ {count} রুল — টিয়ারে স্বয়ংক্রিয়ভাবে সক্ষম।",
     "disabledOverrides": "`analysis_options_custom.yaml` এ ওভাররাইড দ্বারা {count} রুল অক্ষম করা হয়েছে।",
     "summaryRuleTriage": "রুল triage",
-    "hintNoViolations": "এখনো কোনো `report/.saropa_lints/violations.json` নেই। বিশ্লেষণ চালান, তারপর এই ট্যাবটি রিফ্রেশ করুন৷",
-    "hintUnreadable": "কোন পঠনযোগ্য লঙ্ঘন রপ্তানি. প্রথমে Saropa লিন্টস বিশ্লেষণ চালান।",
+    "hintNoViolations": "এখনো কোনো `reports/.saropa_lints/violations.json` নেই। বিশ্লেষণ চালান, তারপর এই ট্যাবটি রিফ্রেশ করুন৷",
+    "hintUnreadable": "কোন পঠনযোগ্য লঙ্ঘন রপ্তানি. প্রথমে Saropa Lints বিশ্লেষণ চালান।",
     "hintStale": "ট্রাইজ ডেটা পুরানো হতে পারে (রপ্তানি {age} পুরানো)। বর্তমান গোষ্ঠীর জন্য বিশ্লেষণ পুনরায় চালান।",
     "hintNoPerRule": "এই রপ্তানির নিয়ম অনুযায়ী কোনো সমস্যা নেই। একটি বর্তমান Saropa Lints প্লাগইন দিয়ে পুনরায় বিশ্লেষণ করুন।",
     "hintBuildFailed": "এই রপ্তানি থেকে triage নির্মাণ করা যায়নি. একটি নতুন বিশ্লেষণ চালান.",
@@ -400,7 +400,7 @@
   },
   "wideReport": {
     "openWorkspaceFirst": "প্রথমে একটি ওয়ার্কস্পেস ফোল্ডার খুলুন।",
-    "noReportYet": "এখনও কোন লঙ্ঘন রিপোর্ট. প্রথমে Saropa লিন্টস বিশ্লেষণ চালান।",
+    "noReportYet": "এখনও কোন লঙ্ঘন রিপোর্ট. প্রথমে Saropa Lints বিশ্লেষণ চালান।",
     "clipboardCopyFailed": "ক্লিপবোর্ডে অনুলিপি করা যায়নি।",
     "copiedViolationsJson": "JSON হিসাবে {count} লঙ্ঘন(গুলি) কপি করা হয়েছে।",
     "copiedOneViolationJson": "JSON হিসেবে ১টি লঙ্ঘন কপি করা হয়েছে।",
@@ -700,7 +700,7 @@
   "codeHealth": {
     "documentTitle": "Saropa কোড স্বাস্থ্য ড্যাশবোর্ড",
     "skipToTable": "ফাংশন টেবিল এড়িয়ে যান",
-    "openWorkspaceFirst": "প্রথমে একটি ডার্ট/ফ্লটার ওয়ার্কস্পেস খুলুন।",
+    "openWorkspaceFirst": "প্রথমে একটি Dart/Flutter ওয়ার্কস্পেস খুলুন।",
     "scanningTitle": "কোড স্বাস্থ্য: স্ক্যানিং ফাংশন...",
     "scan": {
       "title": "প্রকল্পের স্বাস্থ্য স্ক্যান করা হচ্ছে",

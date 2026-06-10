@@ -102,7 +102,7 @@
     "status": {
       "lastRunPrefix": "Letzter Lauf",
       "lastRunUnknown": "Letzter Lauf unbekannt",
-      "noTimestampTitle": "Kein Zeitstempel in der Datei „violences.json“.",
+      "noTimestampTitle": "Kein Zeitstempel in der Datei violations.json“.",
       "findingsAfterFilterTitle": "Gesamtergebnisse nach dem Filter für deaktivierte Regeln",
       "findingOne": "{count} Fund",
       "findingOther": "{count} Funde",
@@ -165,7 +165,7 @@
       "clearRecentButton": "Klar",
       "recentFiltersListAria": "Aktuelle Filter",
       "runAnalysisTitle": "Führen Sie die Saropa Lints-Analyse durch",
-      "refreshViolationsTitle": "Laden Sie „violences.json“ neu von der Festplatte",
+      "refreshViolationsTitle": "Laden Sie violations.json“ neu von der Festplatte",
       "severityGroupAria": "Schweregradfilter",
       "severityLabel": "Schwere",
       "impactGroupAria": "Schlagfilter",
@@ -199,11 +199,11 @@
       "openCodeHealth": "Code Health öffnen",
       "openLintsConfig": "Öffnen Sie die Lints-Konfiguration",
       "reloadFromDisk": "Von der Festplatte neu laden",
-      "reloadFromDiskTitle": "Rendern Sie das Dashboard aus der Datei „Last Violations.json“ erneut, ohne den Analysator erneut auszuführen.",
+      "reloadFromDiskTitle": "Rendern Sie das Dashboard aus der Datei „Last violations.json“ erneut, ohne den Analysator erneut auszuführen.",
       "reEnableDisabledRules": "Deaktivierte Regeln wieder aktivieren…",
-      "reEnableDisabledRulesTitle": "Öffnen Sie eine Schnellauswahl der derzeit deaktivierten Regeln in Analysis_options_custom.yaml und aktivieren Sie die ausgewählten wieder.",
+      "reEnableDisabledRulesTitle": "Öffnen Sie eine Schnellauswahl der derzeit deaktivierten Regeln in analysis_options_custom.yaml und aktivieren Sie die ausgewählten wieder.",
       "reEnableNoneTitle": "Derzeit sind keine Regeln deaktiviert",
-      "reEnableNoneMessage": "Über Analysis_options_custom.yaml sind derzeit keine Regeln deaktiviert.",
+      "reEnableNoneMessage": "Über analysis_options_custom.yaml sind derzeit keine Regeln deaktiviert.",
       "reEnableQuickPickTitle": "Deaktivierte Regeln wieder aktivieren",
       "reEnableQuickPickPlaceholder": "Wählen Sie eine oder mehrere Regeln aus, die Sie erneut aktivieren möchten",
       "menuGroupExport": "Export",
@@ -219,10 +219,10 @@
       "sectionAria": "Top-Regeln nach Anzahl",
       "hideTitle": "Nur für mich ausblenden – auf Arbeitsbereichsebene, umkehrbar über Unterdrückungen löschen",
       "hideButton": "Verstecken",
-      "disableTitle": "Für das gesamte Projekt deaktivieren – schreibt Analysis_options_custom.yaml und führt die Analyse erneut aus",
+      "disableTitle": "Für das gesamte Projekt deaktivieren – schreibt analysis_options_custom.yaml und führt die Analyse erneut aus",
       "disableButton": "Deaktivieren",
       "workspaceOnlyShort": "Nur Arbeitsbereich",
-      "projectConfigShort": "Projektkonfiguration (schreibt Analysis_options_custom.yaml)",
+      "projectConfigShort": "Projektkonfiguration (schreibt analysis_options_custom.yaml)",
       "topRulesOne": "Top-{count}-Regel",
       "topRulesOther": "Top {count}-Regeln",
       "colRank": "#",
@@ -307,7 +307,7 @@
       "viewHidesHeading": "Die Problemansicht wird ausgeblendet",
       "viewHidesMetaActive": "aktiv",
       "viewHidesMetaNone": "keiner",
-      "noneInExport": "Keine Analyseunterdrückung im aktuellen „violations.json“-Export. Führen Sie die Analyse aus, nachdem Sie Ignorierungen oder Baselines zum Auffüllen bearbeitet haben.",
+      "noneInExport": "Keine Analyseunterdrückung im aktuellen violations.json“-Export. Führen Sie die Analyse aus, nachdem Sie Ignorierungen oder Baselines zum Auffüllen bearbeitet haben.",
       "totalRow": "Gesamt – Filter löschen und Ergebnisse öffnen",
       "byRule": "Nach Regel ({count})",
       "byFile": "Nach Datei ({count})",
@@ -320,7 +320,7 @@
       "severityHides": "{count} Schweregrad(e) ausgeblendet",
       "impactHides": "{count} Auswirkung(en) ausgeblendet",
       "activeHides": "Aktive Verstecke: {counts}.",
-      "viewHidesFooter": "Diese Blenden verkleinern nur die Liste der Probleme/Dashboards. Sie werden nicht in „violations.json“ geschrieben.",
+      "viewHidesFooter": "Diese Blenden verkleinern nur die Liste der Probleme/Dashboards. Sie werden nicht in violations.json“ geschrieben.",
       "clearViewHides": "Alle ausgeblendeten Ansichten löschen",
       "foldersSample": "Ordner (Beispiel)",
       "filesSample": "Dateien/Globs (Beispiel)",
@@ -349,7 +349,7 @@
       "bulkSelectedTpl": "{n} ausgewählt"
     },
     "emptyState": {
-      "hintAfterMessage": "Führen Sie eine Saropa-Lints-Analyse durch, um „violences.json“ zu generieren, und verwenden Sie dann „Hier aktualisieren“ oder öffnen Sie dieses Dashboard erneut.",
+      "hintAfterMessage": "Führen Sie eine Saropa-Lints-Analyse durch, um violations.json“ zu generieren, und verwenden Sie dann „Hier aktualisieren“ oder öffnen Sie dieses Dashboard erneut.",
       "refreshDisk": "Von der Festplatte aktualisieren"
     },
     "shortcuts": {
@@ -389,7 +389,7 @@
     "hintNoPerRule": "Bei diesem Export gibt es keine Problemanzahl pro Regel. Analysieren Sie erneut mit einem aktuellen Saropa Lints-Plugin.",
     "hintBuildFailed": "Aus diesem Export konnte keine Triage erstellt werden. Führen Sie eine neue Analyse durch.",
     "summaryVolume": "Regeltriage (Volumen/Must-Fix/Stil)",
-    "hintSameAsTree": "Gleiche Gruppierung wie in der Triage-Aktivitätsleistenstruktur: Probleme filtern oder Regeln in „analysis_options_custom.yaml“ deaktivieren/aktivieren. Große Gruppen können um eine Bestätigung bitten."
+    "hintSameAsTree": "Gleiche Gruppierung wie in der Triage-Aktivitätsleistenstruktur: Probleme filtern oder Regeln in analysis_options_custom.yaml“ deaktivieren/aktivieren. Große Gruppen können um eine Bestätigung bitten."
   },
   "kbdOverlay": {
     "toggleTitle": "Tastaturkürzel anzeigen (?)",
@@ -884,7 +884,7 @@
     }
   },
   "suppressionsStrip": {
-    "noData": "Noch keine „violations.json“ – führen Sie die Analyse aus, um den Unterdrückungs-Snapshot zu füllen.",
+    "noData": "Noch keine violations.json“ – führen Sie die Analyse aus, um den Unterdrückungs-Snapshot zu füllen.",
     "zeroTotal": "0 Analysatorunterdrückungen im letzten Export.",
     "noKindBreakdown": "In diesem Export gibt es keine Aufschlüsselung nach Art.",
     "title": "Unterdrückungen (Export)",
@@ -893,7 +893,7 @@
   },
   "configMirrors": {
     "noFileRisk": "Keine Risikoaufschlüsselung pro Datei (keine Verstöße im Umfang).",
-    "suppressionNote": "Entspricht der Zusammenfassung von crimes.json, nicht der Live-Umschaltung der Seitenleistenunterdrückung.",
+    "suppressionNote": "Entspricht der Zusammenfassung von violations.json, nicht der Live-Umschaltung der Seitenleistenunterdrückung.",
     "noSuppression": "Kein Unterdrückungsaggregat in diesem Export (älterer Analysator oder keine Unterdrückung).",
     "owaspSignal": "{count} Verstoß/Verstöße in diesem Export enthalten OWASP Mobile/Web-Zuordnung — öffnen Sie Security Posture für die vollständige Matrix und den Export.",
     "summarySuppressions": "Unterdrückungen (Snapshot exportieren)",

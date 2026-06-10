@@ -1,11 +1,37 @@
 import 'dart:io';
 
+import 'package:saropa_lints/src/cli/project_health/stub_density.dart';
 import 'package:test/test.dart';
 
 /// Guards against re-introducing tautological tests that do not validate
 /// behavior and always pass.
 void main() {
   group('Stub test guard', () {
+    // Hard zero gate on the unambiguous stub shape: a `test`/`testWidgets` with
+    // an empty block body (`() {}`). 396 of these were removed 2026-06-10 (see
+    // plans/BUG_stub_tests_in_suite.md). This is intentionally NARROWER than
+    // scanStubTests' "no assertion call" heuristic, which legitimately flags
+    // helper-asserted and "does not throw" tests — gating that broader metric
+    // to zero would force-delete real tests. Empty-body has no such ambiguity.
+    test('no empty-body test/testWidgets stubs remain', () {
+      final offenders = scanEmptyBodyStubTests('.');
+      final total = offenders.values.fold<int>(0, (sum, count) => sum + count);
+      final preview =
+          (offenders.entries.toList()
+                ..sort((a, b) => b.value.compareTo(a.value)))
+              .take(20)
+              .map((e) => '- ${e.key}: ${e.value}')
+              .join('\n');
+      expect(
+        offenders,
+        isEmpty,
+        reason:
+            'Found $total empty-body stub test(s) across ${offenders.length} '
+            'files. An empty test body always passes and asserts nothing — '
+            'give it a real expect/assert or delete it.\n$preview',
+      );
+    });
+
     test('no expect(true, isTrue) stubs remain', () {
       final offenders = _collectFileCounts(
         RegExp(r'expect\(\s*true\s*,\s*isTrue\s*\)'),

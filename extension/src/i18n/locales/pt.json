@@ -102,7 +102,7 @@
     "status": {
       "lastRunPrefix": "Última execução",
       "lastRunUnknown": "Última execução desconhecida",
-      "noTimestampTitle": "Sem carimbo de data/hora em violações.json",
+      "noTimestampTitle": "Sem carimbo de data/hora em violations.json",
       "findingsAfterFilterTitle": "Total de descobertas após filtro de regra desabilitada",
       "findingOne": "{count} descoberta",
       "findingOther": "{count} descobertas",
@@ -165,7 +165,7 @@
       "clearRecentButton": "Claro",
       "recentFiltersListAria": "Filtros recentes",
       "runAnalysisTitle": "Execute a análise de Saropa Lints",
-      "refreshViolationsTitle": "Recarregar violações.json do disco",
+      "refreshViolationsTitle": "Recarregar violations.json do disco",
       "severityGroupAria": "Filtro de gravidade",
       "severityLabel": "Gravidade",
       "impactGroupAria": "Filtro de impacto",
@@ -201,9 +201,9 @@
       "reloadFromDisk": "Recarregar do disco",
       "reloadFromDiskTitle": "Renderize novamente o painel do último violations.json sem executar novamente o analisador.",
       "reEnableDisabledRules": "Reativar regras desativadas…",
-      "reEnableDisabledRulesTitle": "Abra uma seleção rápida de regras atualmente desativadas em analyze_options_custom.yaml e reative as escolhidas.",
+      "reEnableDisabledRulesTitle": "Abra uma seleção rápida de regras atualmente desativadas em analysis_options_custom.yaml e reative as escolhidas.",
       "reEnableNoneTitle": "Nenhuma regra desativada no momento",
-      "reEnableNoneMessage": "Nenhuma regra está desativada no momento por meio de analyze_options_custom.yaml.",
+      "reEnableNoneMessage": "Nenhuma regra está desativada no momento por meio de analysis_options_custom.yaml.",
       "reEnableQuickPickTitle": "Reativar regras desativadas",
       "reEnableQuickPickPlaceholder": "Selecione uma ou mais regras para reativar",
       "menuGroupExport": "Exportar",
@@ -219,10 +219,10 @@
       "sectionAria": "Principais regras por contagem",
       "hideTitle": "Ocultar apenas para mim – no nível do espaço de trabalho, reversível por meio de supressões claras",
       "hideButton": "Esconder",
-      "disableTitle": "Desativar para todo o projeto – grava analyze_options_custom.yaml e executa novamente a análise",
+      "disableTitle": "Desativar para todo o projeto – grava analysis_options_custom.yaml e executa novamente a análise",
       "disableButton": "Desativar",
       "workspaceOnlyShort": "apenas espaço de trabalho",
-      "projectConfigShort": "configuração do projeto (grava analyze_options_custom.yaml)",
+      "projectConfigShort": "configuração do projeto (grava analysis_options_custom.yaml)",
       "topRulesOne": "Regra {count} superior",
       "topRulesOther": "Principais regras {count}",
       "colRank": "#",
@@ -349,7 +349,7 @@
       "bulkSelectedTpl": "{n} selecionados"
     },
     "emptyState": {
-      "hintAfterMessage": "Execute uma análise Saropa Lints para gerar violações.json e, em seguida, use Atualizar aqui ou reabra este painel.",
+      "hintAfterMessage": "Execute uma análise Saropa Lints para gerar violations.json e, em seguida, use Atualizar aqui ou reabra este painel.",
       "refreshDisk": "Atualizar do disco"
     },
     "shortcuts": {
@@ -389,7 +389,7 @@
     "hintNoPerRule": "Esta exportação não tem contagens de problemas por regra. Analise novamente com um plugin Saropa Lints atual.",
     "hintBuildFailed": "Não foi possível criar a triagem desta exportação. Execute uma nova análise.",
     "summaryVolume": "Triagem de regras (volume / correção obrigatória / estilística)",
-    "hintSameAsTree": "O mesmo agrupamento da árvore da barra de atividades de triagem: filtrar problemas ou desabilitar/habilitar regras em `análise_options_custom.yaml`. Grupos grandes podem solicitar confirmação."
+    "hintSameAsTree": "O mesmo agrupamento da árvore da barra de atividades de triagem: filtrar problemas ou desabilitar/habilitar regras em `analysis_options_custom.yaml`. Grupos grandes podem solicitar confirmação."
   },
   "kbdOverlay": {
     "toggleTitle": "Mostrar atalhos de teclado (?)",
@@ -893,7 +893,7 @@
   },
   "configMirrors": {
     "noFileRisk": "Nenhuma análise de risco por arquivo (sem violações no escopo).",
-    "suppressionNote": "Corresponde ao resumo de violações.json, não aos alternadores de supressão da barra lateral ao vivo.",
+    "suppressionNote": "Corresponde ao resumo de violations.json, não aos alternadores de supressão da barra lateral ao vivo.",
     "noSuppression": "Nenhuma supressão agregada nesta exportação (analisador mais antigo ou zero supressões).",
     "owaspSignal": "{count} violação(ões) nesta exportação carregam mapeamento móvel/web da OWASP — abra a Postura de Segurança para ver a matriz completa e exportar.",
     "summarySuppressions": "Supressões (exportar instantâneo)",

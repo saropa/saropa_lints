@@ -74,8 +74,11 @@ _error_logged: bool = False
 # Set True after the first interactive decline so the download prompt fires at
 # most once per session, not once per untranslated string.
 _user_declined: bool = False
-# Set True after the first over-length skip so the diagnostic prints once.
-_long_input_skip_logged: bool = False
+# Every input that was past the token gate AND could not be split (sentence then
+# clause) — i.e. the strings NLLB genuinely could not handle. Recorded in full
+# (locale, token count, source) so the run report names each one instead of
+# hiding all but the first behind a once-only log. Cleared via reset_long_inputs.
+_long_inputs: list[tuple[str, int, str]] = []
 # Configured model directory — resolved lazily on first use.
 _model_dir: str | None = None
 
@@ -204,6 +207,25 @@ def _diag(msg: str) -> None:
     """
     sys.stderr.write(msg.rstrip("\n") + "\n")
     sys.stderr.flush()
+
+
+def _record_long_input(locale: str, src_len: int, text: str) -> None:
+    """Note a string NLLB could not handle (over the gate, unsplittable)."""
+    _long_inputs.append((locale, src_len, text))
+    _diag(
+        f"[nllb] {locale}: {src_len} tokens, unsplittable — reporting (not silently "
+        f"dropped): {text[:60].replace(chr(10), ' ')!r}",
+    )
+
+
+def long_inputs() -> list[tuple[str, int, str]]:
+    """The (locale, token count, source) of every over-gate unsplittable input."""
+    return list(_long_inputs)
+
+
+def reset_long_inputs() -> None:
+    """Clear the over-gate input log. Call once at the start of a run."""
+    _long_inputs.clear()
 
 
 # ---------------------------------------------------------------------------
@@ -755,6 +777,74 @@ def _translate_via_sentences(text: str, target: str) -> str | None:
     return joined
 
 
+# Clause boundaries for a single sentence that is still over the per-call token
+# gate. Ordered strongest-first: paragraph/line breaks (markdown link blocks and
+# bullet lists), then dash/semicolon/colon/comma clauses. The clause patterns
+# require trailing whitespace so a URL ("https://…") or dotted version ("1.2.3")
+# — which have no space after their ':' / ',' — is never split mid-token. Each
+# pattern captures the separator so re.split keeps it; whitespace-only pieces are
+# preserved verbatim on rejoin, making an empty translation byte-identical.
+_PHRASE_PATTERNS = (
+    r"(\n+)",
+    r"((?<=[—–])\s+)",
+    r"((?<=[;:])\s+)",
+    r"((?<=,)\s+)",
+)
+
+
+def _split_into_phrases(text: str) -> list[str]:
+    """Split one over-long sentence on the strongest clause boundary present.
+
+    Returns the re.split parts (content interleaved with captured separators) at
+    the first boundary that yields 2+ non-blank pieces, else ``[text]`` so the
+    caller stops recursing and reports the input instead of looping.
+    """
+    for pat in _PHRASE_PATTERNS:
+        parts = re.split(pat, text)
+        if sum(1 for p in parts if p.strip()) > 1:
+            return parts
+    return [text]
+
+
+def _translate_via_phrases(text: str, target: str) -> str | None:
+    """Translate a single over-long sentence clause-by-clause and rejoin.
+
+    The path for an input past the length gate that ``_split_into_sentences``
+    could not break (one long sentence, a comma list, a markdown link block).
+    Each clause routes back through ``nllb_translate`` so the gate + timeout apply
+    per clause and a still-long clause splits again; whitespace/separator pieces
+    pass through untouched. Returns ``None`` (caller reports + falls back) when no
+    boundary exists or nothing translated. Tradeoff: a clause carries less context
+    than a whole sentence, so prose may translate slightly less fluently than the
+    list/parenthetical inputs this mainly targets.
+    """
+    parts = _split_into_phrases(text)
+    if sum(1 for p in parts if p.strip()) <= 1:
+        return None
+
+    out_parts: list[str] = []
+    any_translated = False
+    for part in parts:
+        if not part.strip():
+            out_parts.append(part)  # separator / whitespace — keep verbatim
+            continue
+        core = part.rstrip()
+        trailing_ws = part[len(core):]
+        translated_one = nllb_translate(core, target)
+        if translated_one is not None and translated_one.strip().lower() != core.strip().lower():
+            out_parts.append(translated_one + trailing_ws)
+            any_translated = True
+        else:
+            out_parts.append(part)
+
+    if not any_translated:
+        return None
+    joined = "".join(out_parts).strip()
+    if joined.lower() == text.strip().lower():
+        return None
+    return joined
+
+
 def nllb_translate(text: str, locale: str) -> str | None:
     """Translate *text* (English) into *locale* via NLLB. None to fall back.
 
@@ -763,7 +853,7 @@ def nllb_translate(text: str, locale: str) -> str | None:
     can't load, the input exceeds the length gate and won't split, the call
     times out, or the model echoes the source unchanged.
     """
-    global _long_input_skip_logged, _error_logged  # noqa: PLW0603
+    global _error_logged  # noqa: PLW0603
 
     if os.environ.get("SAROPA_SKIP_NLLB", "").strip() == "1":
         return None
@@ -806,18 +896,19 @@ def nllb_translate(text: str, locale: str) -> str | None:
         except ValueError:
             max_src = _DEFAULT_MAX_SOURCE_TOKENS
         if max_src > 0 and src_len > max_src:
-            # Too long for one call; try the sentence split, else give up so
-            # Google (or the coverage gate) handles it.
+            # Too long for one call. Break it down: first on sentence boundaries,
+            # then (for a single long sentence / comma list / link block) on clause
+            # boundaries, so NLLB keeps the work instead of dropping to Google.
             split_result = _translate_via_sentences(plain, locale)
             if split_result is not None:
                 return split_result
-            if not _long_input_skip_logged:
-                _diag(
-                    f"[nllb] input over {max_src} source tokens won't split "
-                    f"(first seen: {src_len} tokens, target={locale!r}); falling back. "
-                    "Set SAROPA_NLLB_MAX_INPUT_TOKENS=0 to disable the gate.",
-                )
-                _long_input_skip_logged = True
+            phrase_result = _translate_via_phrases(plain, locale)
+            if phrase_result is not None:
+                return phrase_result
+            # Genuinely unsplittable atom over the gate: record EVERY occurrence
+            # (not just the first) so the run report names every string NLLB could
+            # not handle, instead of hiding all but one behind a once-only log.
+            _record_long_input(locale, src_len, plain)
             return None
 
         # max_decoding_length scales with input (3x, floor 20, cap 256) to allow

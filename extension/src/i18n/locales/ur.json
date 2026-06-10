@@ -366,7 +366,7 @@
       "analyzerTodosOn": "+{count} تجزیہ کار TODOs",
       "analyzerTodosPromo": "+؟ تجزیہ کار TODOs — دکھائیں۔",
       "scannerPromo": "TODO/HACK سکینر کو فعال کریں۔",
-      "tooltipLive": "VS کوڈ کے مسائل کے پینل سے لائیو۔ تجزیہ مکمل ہونے پر اپ ڈیٹس۔ چھپانے کے لیے کلک کریں۔",
+      "tooltipLive": "VS Code کے مسائل کے پینل سے لائیو۔ تجزیہ مکمل ہونے پر اپ ڈیٹس۔ چھپانے کے لیے کلک کریں۔",
       "tooltipScanner": "Saropa فائل سسٹم اسکینر - ذریعہ میں کھلے TODO/HACK مارکر کو شمار کرتا ہے۔",
       "tooltipPromoClickToOn": "فعال کرنے کے لیے کلک کریں۔"
     }
@@ -700,7 +700,7 @@
   "codeHealth": {
     "documentTitle": "Saropa کوڈ ہیلتھ ڈیش بورڈ",
     "skipToTable": "فنکشنز ٹیبل پر جائیں۔",
-    "openWorkspaceFirst": "پہلے ڈارٹ/فلٹر ورک اسپیس کھولیں۔",
+    "openWorkspaceFirst": "پہلے Dart/Flutter ورک اسپیس کھولیں۔",
     "scanningTitle": "کوڈ ہیلتھ: اسکیننگ کے افعال…",
     "scan": {
       "title": "سکیننگ پروجیکٹ ہیلتھ",
@@ -743,7 +743,7 @@
       "version": {
         "engine": "انجن",
         "detecting": "پتہ لگا رہا ہے…",
-        "legacy": "میراث - کوئی براہ راست پیش رفت نہیں ہے (اس پروجیکٹ کے سروپا_لنٹ اس سے پہلے ہیں)"
+        "legacy": "میراث - کوئی براہ راست پیش رفت نہیں ہے (اس پروجیکٹ کے saropa_lints اس سے پہلے ہیں)"
       }
     },
     "runReportFirst": "رپورٹ کو دوبارہ چلائیں، پھر JSON کاپی کریں۔",

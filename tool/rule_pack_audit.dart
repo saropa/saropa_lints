@@ -57,6 +57,43 @@ Map<String, Set<String>> applyCompositeRulePacks(
   return result;
 }
 
+/// Rules RELOCATED out of their file-derived pack into a semver-gated pack.
+///
+/// A version-gated migration must NOT ship in the ungated base pack, or the
+/// gate is meaningless: enabling the base pack would re-add the rule regardless
+/// of version. Example: `Notifier` / `NotifierProvider` only exist in
+/// riverpod >= 2.0.0, so `prefer_notifier_over_state` belongs only in the gated
+/// `riverpod_2` pack — a riverpod 1.x project must never be told to adopt an API
+/// that does not exist there. Unlike [kCompositeRulePackIds] (which adds a code
+/// to extra packs), this MOVES the code so the source pack no longer owns it.
+const Map<String, ({String fromPack, String toPack})> kRelocatedRulePackCodes =
+    {
+      'prefer_notifier_over_state': (
+        fromPack: 'riverpod',
+        toPack: 'riverpod_2',
+      ),
+    };
+
+/// Returns a new map with [kRelocatedRulePackCodes] applied: each code is
+/// removed from its `fromPack` and added to its `toPack`.
+///
+/// Both the generator and the audit run this after [applyCompositeRulePacks] so
+/// the generated registry and the consistency check agree on ownership.
+Map<String, Set<String>> applyRelocatedRulePacks(
+  Map<String, Set<String>> extracted,
+) {
+  final result = {
+    for (final entry in extracted.entries)
+      entry.key: Set<String>.from(entry.value),
+  };
+  for (final entry in kRelocatedRulePackCodes.entries) {
+    final code = entry.key;
+    result[entry.value.fromPack]?.remove(code);
+    result.putIfAbsent(entry.value.toPack, () => <String>{}).add(code);
+  }
+  return result;
+}
+
 /// `{stem}_rules.dart` → pack id (e.g. dio_rules → dio).
 String packIdForStem(String stem) {
   if (stem == 'package_specific_rules') return 'package_specific';
@@ -95,8 +132,8 @@ void main(List<String> args) {
     return;
   }
 
-  final extracted = applyCompositeRulePacks(
-    extractFromPackagesDir(packagesDir),
+  final extracted = applyRelocatedRulePacks(
+    applyCompositeRulePacks(extractFromPackagesDir(packagesDir)),
   );
   final sortedPacks = extracted.keys.toList()..sort();
 

@@ -91,55 +91,10 @@ void main() {
   });
 
   group('Equality - Avoidance Rules', () {
-    group('avoid_equal_expressions', () {
-      test('identical expressions on both sides of == SHOULD trigger', () {});
-
-      test('meaningful comparisons should NOT trigger', () {});
-    });
-    group('avoid_negations_in_equality_checks', () {
-      test('!(a == b) instead of a != b SHOULD trigger', () {});
-
-      test('direct != operator should NOT trigger', () {});
-    });
     group('avoid_self_assignment', () {
       test('rule offers quick fix (remove self-assignment statement)', () {
         final rule = AvoidSelfAssignmentRule();
         expect(rule.fixGenerators, isNotEmpty);
-      });
-
-      test('x = x assignment SHOULD trigger', () {});
-
-      test('no self-assignment should NOT trigger', () {});
-    });
-    group('avoid_self_compare', () {
-      test('x == x comparison SHOULD trigger', () {});
-
-      test('meaningful comparison target should NOT trigger', () {});
-    });
-    group('avoid_unnecessary_compare_to', () {
-      test('compareTo(x) == 0 instead of == SHOULD trigger', () {});
-
-      test('direct equality operator should NOT trigger', () {});
-    });
-    group('no_equal_arguments', () {
-      test('same argument on both sides of operator SHOULD trigger', () {});
-
-      test('distinct arguments should NOT trigger', () {});
-    });
-    group('avoid_datetime_comparison_without_precision', () {
-      test('DateTime == without millisecond handling SHOULD trigger', () {});
-
-      test('precision-aware DateTime comparison should NOT trigger', () {});
-
-      test(
-        'comparison against static const should NOT trigger (regression)',
-        () {
-          // e.g., dt == DateConstants.unixEpochDate — intentional exact check
-        },
-      );
-
-      test('comparison against const constructor should NOT trigger', () {
-        // e.g., dt == const DateTime(1970)
       });
     });
   });

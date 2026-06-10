@@ -75,43 +75,4 @@ void main() {
       });
     }
   });
-
-  group('Dialog & SnackBar - Avoidance Rules', () {
-    group('avoid_snackbar_queue_buildup', () {
-      test('rapid SnackBar calls without clearing SHOULD trigger', () {});
-
-      test('SnackBar queue management should NOT trigger', () {});
-    });
-  });
-
-  group('Dialog & SnackBar - Requirement Rules', () {
-    group('require_snackbar_duration', () {
-      test('SnackBar without duration SHOULD trigger', () {});
-
-      test('explicit SnackBar duration should NOT trigger', () {});
-    });
-    group('require_dialog_barrier_dismissible', () {
-      test('dialog without barrierDismissible SHOULD trigger', () {});
-
-      test('explicit dismissibility should NOT trigger', () {});
-    });
-    group('require_dialog_result_handling', () {
-      test('showDialog without awaiting result SHOULD trigger', () {});
-
-      test('dialog result handling should NOT trigger', () {});
-    });
-    group('require_snackbar_action_for_undo', () {
-      test('destructive action without undo SnackBar SHOULD trigger', () {});
-
-      test('undo action in SnackBar should NOT trigger', () {});
-    });
-  });
-
-  group('Dialog & SnackBar - Preference Rules', () {
-    group('prefer_adaptive_dialog', () {
-      test('platform-specific dialog SHOULD trigger', () {});
-
-      test('adaptive dialog widget should NOT trigger', () {});
-    });
-  });
 }

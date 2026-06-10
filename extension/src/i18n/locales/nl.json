@@ -102,7 +102,7 @@
     "status": {
       "lastRunPrefix": "Laatste run",
       "lastRunUnknown": "Laatste run onbekend",
-      "noTimestampTitle": "Geen tijdstempel op schendings.json",
+      "noTimestampTitle": "Geen tijdstempel op violations.json",
       "findingsAfterFilterTitle": "Totaal aantal bevindingen na uitgeschakeld regelfilter",
       "findingOne": "{count} bevinding",
       "findingOther": "{count} bevindingen",
@@ -165,7 +165,7 @@
       "clearRecentButton": "Duidelijk",
       "recentFiltersListAria": "Recente filters",
       "runAnalysisTitle": "Voer de Saropa Lints-analyse uit",
-      "refreshViolationsTitle": "Laad schendings.json opnieuw vanaf schijf",
+      "refreshViolationsTitle": "Laad violations.json opnieuw vanaf schijf",
       "severityGroupAria": "Ernstfilter",
       "severityLabel": "Ernst",
       "impactGroupAria": "Impactfilter",
@@ -199,11 +199,11 @@
       "openCodeHealth": "Open Code Gezondheid",
       "openLintsConfig": "Open Lints-configuratie",
       "reloadFromDisk": "Herladen vanaf schijf",
-      "reloadFromDiskTitle": "Geef het dashboard opnieuw weer vanaf de laatste schendingen.json zonder de analyser opnieuw uit te voeren.",
+      "reloadFromDiskTitle": "Geef het dashboard opnieuw weer vanaf de laatste violations.json zonder de analyser opnieuw uit te voeren.",
       "reEnableDisabledRules": "Uitgeschakelde regels opnieuw inschakelen…",
-      "reEnableDisabledRulesTitle": "Open een snelle selectie van regels die momenteel zijn uitgeschakeld in analyse_options_custom.yaml en schakel de gekozen regels opnieuw in.",
+      "reEnableDisabledRulesTitle": "Open een snelle selectie van regels die momenteel zijn uitgeschakeld in analysis_options_custom.yaml en schakel de gekozen regels opnieuw in.",
       "reEnableNoneTitle": "Er zijn momenteel geen regels uitgeschakeld",
-      "reEnableNoneMessage": "Er zijn momenteel geen regels uitgeschakeld via analyse_options_custom.yaml.",
+      "reEnableNoneMessage": "Er zijn momenteel geen regels uitgeschakeld via analysis_options_custom.yaml.",
       "reEnableQuickPickTitle": "Schakel uitgeschakelde regels opnieuw in",
       "reEnableQuickPickPlaceholder": "Selecteer een of meer regels die u opnieuw wilt inschakelen",
       "menuGroupExport": "Exporteren",
@@ -219,10 +219,10 @@
       "sectionAria": "Topregels per aantal",
       "hideTitle": "Alleen voor mij verbergen: op werkruimteniveau, omkeerbaar via Clear Suppressions",
       "hideButton": "Verbergen",
-      "disableTitle": "Uitschakelen voor het hele project: schrijft analyse_options_custom.yaml en voert de analyse opnieuw uit",
+      "disableTitle": "Uitschakelen voor het hele project: schrijft analysis_options_custom.yaml en voert de analyse opnieuw uit",
       "disableButton": "Uitzetten",
       "workspaceOnlyShort": "alleen werkruimte",
-      "projectConfigShort": "projectconfiguratie (schrijft analyse_options_custom.yaml)",
+      "projectConfigShort": "projectconfiguratie (schrijft analysis_options_custom.yaml)",
       "topRulesOne": "Top {count} regel",
       "topRulesOther": "Belangrijkste {count}-regels",
       "colRank": "#",
@@ -349,7 +349,7 @@
       "bulkSelectedTpl": "{n} geselecteerd"
     },
     "emptyState": {
-      "hintAfterMessage": "Voer een Saropa Lints-analyse uit om schendings.json te genereren en gebruik vervolgens hier Vernieuwen of open dit dashboard opnieuw.",
+      "hintAfterMessage": "Voer een Saropa Lints-analyse uit om violations.json te genereren en gebruik vervolgens hier Vernieuwen of open dit dashboard opnieuw.",
       "refreshDisk": "Vernieuwen vanaf schijf"
     },
     "shortcuts": {
@@ -820,7 +820,7 @@
       "detailHeading": "Waarom deze functie {score} scoorde",
       "detailNoIssues": "Geen vlaggen in deze rij: de score wordt bepaald door de bovenstaande kolomwaarden (gebruik, dekking, complexiteit, leeftijd, documentatie).",
       "suppressLabel": "Onderdrukken in bestand",
-      "suppressTooltip": "Schrijft `// negeer_for_file: code_health:<flag>` in dit bestand, zodat toekomstige scans deze vlag voor het hele bestand verwijderen."
+      "suppressTooltip": "Schrijft `// ignore_for_file: code_health:<flag>` in dit bestand, zodat toekomstige scans deze vlag voor het hele bestand verwijderen."
     },
     "flag": {
       "unused": {
@@ -884,7 +884,7 @@
     }
   },
   "suppressionsStrip": {
-    "noData": "Nog geen schendings.json: voer een analyse uit om de momentopname van de onderdrukking in te vullen.",
+    "noData": "Nog geen violations.json: voer een analyse uit om de momentopname van de onderdrukking in te vullen.",
     "zeroTotal": "0 analysatoronderdrukkingen in de laatste export.",
     "noKindBreakdown": "Geen uitsplitsing naar soort in deze export.",
     "title": "Onderdrukkingen (exporteren)",
@@ -893,7 +893,7 @@
   },
   "configMirrors": {
     "noFileRisk": "Geen risicoanalyse per bestand (geen schendingen in reikwijdte).",
-    "suppressionNote": "Komt overeen met de samenvatting van schendingen.json, niet met live zijbalkonderdrukkingsschakelaars.",
+    "suppressionNote": "Komt overeen met de samenvatting van violations.json, niet met live zijbalkonderdrukkingsschakelaars.",
     "noSuppression": "Geen onderdrukkingsaggregaat in deze export (oudere analysator of nulonderdrukkingen).",
     "owaspSignal": "{count} overtreding(en) in deze export bevatten OWASP mobiele/web mapping — open Security Posture voor de volledige matrix en export.",
     "summarySuppressions": "Onderdrukkingen (momentopname exporteren)",

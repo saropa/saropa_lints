@@ -42,6 +42,21 @@ Some packs only merge when a dependency’s **resolved** version in
 is absent, those packs do **not** add rules (conservative). Ungated packs
 behave as before.
 
+Current semver-gated packs:
+
+- **`collection_compat`** — gated on `collection >= 1.19.0`.
+- **`riverpod_2`** — gated on `riverpod >= 2.0.0`. Holds `prefer_notifier_over_state`,
+  which recommends migrating `StateProvider` to `NotifierProvider`. That target
+  API only exists in Riverpod 2.x, so the rule is **moved out** of the base
+  `riverpod` pack into `riverpod_2` — a Riverpod 1.x project never sees a
+  recommendation it cannot follow. (`flutter_riverpod` / `hooks_riverpod` 2.x both
+  resolve `riverpod` 2.x in the lockfile, so the core-package gate covers them.)
+
+When a version-gated rule would otherwise live in an ungated package pack, it is
+relocated via `kRelocatedRulePackCodes` (in `tool/rule_pack_audit.dart`) so the
+gate is authoritative — both the registry generator and the audit apply the same
+relocation.
+
 ## SDK-gated packs (pubspec `environment`)
 
 Some packs are gated by SDK constraints in `pubspec.yaml` `environment:`:

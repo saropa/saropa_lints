@@ -66,6 +66,15 @@ const Map<String, RulePackDependencyGate> kRulePackDependencyGates = {
     dependency: 'collection',
     constraint: '>=1.19.0',
   ),
+  // The Notifier / NotifierProvider API (the migration target of
+  // prefer_notifier_over_state) only exists in riverpod >= 2.0.0. flutter_riverpod
+  // and hooks_riverpod 2.x both resolve riverpod 2.x in the lockfile, so gating on
+  // the core `riverpod` version covers every riverpod flavor. On riverpod 1.x the
+  // rule is suppressed because its recommended replacement is unavailable.
+  'riverpod_2': RulePackDependencyGate(
+    dependency: 'riverpod',
+    constraint: '>=2.0.0',
+  ),
 };
 
 /// Packs that require pubspec `environment` SDK constraints (Phase 6).

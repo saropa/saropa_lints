@@ -102,7 +102,7 @@
     "status": {
       "lastRunPrefix": "Ultima corsa",
       "lastRunUnknown": "Ultima corsa sconosciuta",
-      "noTimestampTitle": "Nessun timestamp su violazioni.json",
+      "noTimestampTitle": "Nessun timestamp su violations.json",
       "findingsAfterFilterTitle": "Risultati totali dopo il filtro con regola disabilitata",
       "findingOne": "{count} risultato",
       "findingOther": "{count} risultati",
@@ -165,7 +165,7 @@
       "clearRecentButton": "Chiaro",
       "recentFiltersListAria": "Filtri recenti",
       "runAnalysisTitle": "Eseguire l'analisi Saropa Lints",
-      "refreshViolationsTitle": "Ricarica violazioni.json dal disco",
+      "refreshViolationsTitle": "Ricarica violations.json dal disco",
       "severityGroupAria": "Filtro gravità",
       "severityLabel": "Gravità",
       "impactGroupAria": "Filtro d'impatto",
@@ -199,7 +199,7 @@
       "openCodeHealth": "Apri integrità del codice",
       "openLintsConfig": "Apri la configurazione dei lint",
       "reloadFromDisk": "Ricarica dal disco",
-      "reloadFromDiskTitle": "Eseguire nuovamente il rendering del dashboard dall'ultimo violazioni.json senza eseguire nuovamente l'analizzatore.",
+      "reloadFromDiskTitle": "Eseguire nuovamente il rendering del dashboard dall'ultimo violations.json senza eseguire nuovamente l'analizzatore.",
       "reEnableDisabledRules": "Riattiva le regole disabilitate...",
       "reEnableDisabledRulesTitle": "Apri una selezione rapida di regole attualmente disabilitate in analysis_options_custom.yaml e riattiva quelle scelte.",
       "reEnableNoneTitle": "Nessuna regola attualmente disabilitata",
@@ -349,7 +349,7 @@
       "bulkSelectedTpl": "{n} selezionati"
     },
     "emptyState": {
-      "hintAfterMessage": "Esegui un'analisi Saropa Lints per generare violazioni.json, quindi utilizza Aggiorna qui o riapri questa dashboard.",
+      "hintAfterMessage": "Esegui un'analisi Saropa Lints per generare violations.json, quindi utilizza Aggiorna qui o riapri questa dashboard.",
       "refreshDisk": "Aggiorna da disco"
     },
     "shortcuts": {
@@ -884,7 +884,7 @@
     }
   },
   "suppressionsStrip": {
-    "noData": "Ancora nessun violazioni.json: esegui l'analisi per popolare lo snapshot di soppressione.",
+    "noData": "Ancora nessun violations.json: esegui l'analisi per popolare lo snapshot di soppressione.",
     "zeroTotal": "0 soppressioni dell'analizzatore nell'ultima esportazione.",
     "noKindBreakdown": "Nessuna ripartizione per tipologia in questa esportazione.",
     "title": "Soppressioni (esportazione)",
@@ -893,7 +893,7 @@
   },
   "configMirrors": {
     "noFileRisk": "Nessuna suddivisione del rischio per file (nessuna violazione nell'ambito).",
-    "suppressionNote": "Corrisponde al riepilogo di violazioni.json, non agli attivatori/disattivatori di soppressione della barra laterale live.",
+    "suppressionNote": "Corrisponde al riepilogo di violations.json, non agli attivatori/disattivatori di soppressione della barra laterale live.",
     "noSuppression": "Nessun aggregato di soppressione in questa esportazione (analizzatore precedente o soppressioni pari a zero).",
     "owaspSignal": "{count} violazioni in questa esportazione includono la mappatura OWASP mobile/web — apri Security Posture per la matrice completa e l'esportazione.",
     "summarySuppressions": "Eliminazioni (esportazione istantanea)",

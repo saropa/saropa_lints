@@ -72,33 +72,4 @@ void main() {
       });
     }
   });
-
-  group('Theming - Avoidance Rules', () {
-    group('avoid_elevation_opacity_in_dark', () {
-      test('fixed elevation/opacity in dark theme SHOULD trigger', () {});
-
-      test('theme-aware elevation should NOT trigger', () {});
-    });
-  });
-
-  group('Theming - Requirement Rules', () {
-    group('require_dark_mode_testing', () {
-      test('no dark mode test coverage SHOULD trigger', () {});
-
-      test('dark mode variant tests should NOT trigger', () {});
-    });
-    group('require_semantic_colors', () {
-      test('hardcoded color value SHOULD trigger', () {});
-
-      test('semantic color from theme should NOT trigger', () {});
-    });
-  });
-
-  group('Theming - Preference Rules', () {
-    group('prefer_theme_extensions', () {
-      test('custom theme data outside ThemeExtension SHOULD trigger', () {});
-
-      test('ThemeExtension for custom theming should NOT trigger', () {});
-    });
-  });
 }

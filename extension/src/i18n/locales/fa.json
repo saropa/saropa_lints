@@ -17,7 +17,7 @@
     "noMatchMessage": "هیچ ردیفی با فیلترهای فعلی مطابقت ندارد.",
     "noMatchCta": "بازنشانی فیلترها",
     "noProjectTitle": "هیچ فضای کاری باز نیست",
-    "noProjectMessage": "برای مشاهده یافته‌ها، پروژه فلاتر یا دارت را باز کنید.",
+    "noProjectMessage": "برای مشاهده یافته‌ها، پروژه Flutter یا Dart را باز کنید.",
     "noProjectCta": "پوشه را باز کنید",
     "noDataTitle": "هنوز هیچ داده ای وجود ندارد",
     "noDataMessage": "برای پر کردن این داشبورد اسکن را اجرا کنید.",
@@ -74,7 +74,7 @@
     "pick": {
       "title": "زبان رابط کاربری Saropa Lints",
       "placeholder": "زبان را برای نوار کناری و داشبورد انتخاب کنید",
-      "auto": "خودکار (از زبان نمایش کد VS پیروی کنید)"
+      "auto": "خودکار (از زبان نمایش VS Code پیروی کنید)"
     },
     "reloadPrompt": "زبان روی {locale} تنظیم شده است. برای به‌روزرسانی نوار کناری و برچسب‌های فرمان، پنجره را دوباره بارگیری کنید.",
     "reloadNow": "اکنون بارگیری مجدد",
@@ -102,7 +102,7 @@
     "status": {
       "lastRunPrefix": "آخرین اجرا",
       "lastRunUnknown": "آخرین اجرا ناشناخته",
-      "noTimestampTitle": "هیچ مُهر زمانی در موارد نقض.json وجود ندارد",
+      "noTimestampTitle": "هیچ مُهر زمانی در موارد violations.json وجود ندارد",
       "findingsAfterFilterTitle": "کل یافته‌ها پس از فیلتر قانون غیرفعال",
       "findingOne": "{count} یافته",
       "findingOther": "{count} یافته",
@@ -165,7 +165,7 @@
       "clearRecentButton": "پاک کردن",
       "recentFiltersListAria": "فیلترهای اخیر",
       "runAnalysisTitle": "تجزیه و تحلیل Saropa Lints را اجرا کنید",
-      "refreshViolationsTitle": "بارگیری مجدد نقض.json از دیسک",
+      "refreshViolationsTitle": "بارگیری مجدد violations.json از دیسک",
       "severityGroupAria": "فیلتر شدت",
       "severityLabel": "شدت",
       "impactGroupAria": "فیلتر ضربه",
@@ -199,9 +199,9 @@
       "openCodeHealth": "باز کردن سلامت کد",
       "openLintsConfig": "Lints Config را باز کنید",
       "reloadFromDisk": "بارگیری مجدد از دیسک",
-      "reloadFromDiskTitle": "داشبورد را از آخرین موارد نقض.json بدون اجرای مجدد آنالیزور رندر کنید.",
+      "reloadFromDiskTitle": "داشبورد را از آخرین موارد violations.json بدون اجرای مجدد آنالیزور رندر کنید.",
       "reEnableDisabledRules": "دوباره فعال کردن قوانین غیرفعال…",
-      "reEnableDisabledRulesTitle": "یک انتخاب سریع از قوانینی که در حال حاضر غیرفعال شده اند را در analyzy_options_custom.yaml باز کنید و موارد انتخابی را دوباره فعال کنید.",
+      "reEnableDisabledRulesTitle": "یک انتخاب سریع از قوانینی که در حال حاضر غیرفعال شده اند را در analysis_options_custom.yaml باز کنید و موارد انتخابی را دوباره فعال کنید.",
       "reEnableNoneTitle": "هیچ قانونی در حال حاضر غیرفعال نیست",
       "reEnableNoneMessage": "در حال حاضر هیچ قانونی از طریق analysis_options_custom.yaml غیرفعال نشده است.",
       "reEnableQuickPickTitle": "قوانین غیرفعال را دوباره فعال کنید",
@@ -307,7 +307,7 @@
       "viewHidesHeading": "نمایش مسائل پنهان می شود",
       "viewHidesMetaActive": "فعال",
       "viewHidesMetaNone": "هیچ کدام",
-      "noneInExport": "در صادرات «violations.json» کنونی هیچ تحلیلگر سرکوبگر وجود ندارد. تجزیه و تحلیل را پس از ویرایش نادیده گرفته یا خطوط پایه برای پر کردن اجرا کنید.",
+      "noneInExport": "در صادرات violations.json» کنونی هیچ تحلیلگر سرکوبگر وجود ندارد. تجزیه و تحلیل را پس از ویرایش نادیده گرفته یا خطوط پایه برای پر کردن اجرا کنید.",
       "totalRow": "مجموع - فیلترها را پاک کنید و یافته‌ها را باز کنید",
       "byRule": "طبق قانون ({count})",
       "byFile": "بر اساس فایل ({count})",
@@ -349,7 +349,7 @@
       "bulkSelectedTpl": "{n} مورد انتخاب شد"
     },
     "emptyState": {
-      "hintAfterMessage": "یک تجزیه و تحلیل Saropa Lints را برای ایجاد نقض.json اجرا کنید، سپس از Refresh در اینجا استفاده کنید یا این داشبورد را دوباره باز کنید.",
+      "hintAfterMessage": "یک تجزیه و تحلیل Saropa Lints را برای ایجاد violations.json اجرا کنید، سپس از Refresh در اینجا استفاده کنید یا این داشبورد را دوباره باز کنید.",
       "refreshDisk": "بازخوانی از دیسک"
     },
     "shortcuts": {
@@ -389,7 +389,7 @@
     "hintNoPerRule": "این صادرات هیچ مشکلی بر اساس قانون ندارد. با افزونه Saropa Lints فعلی، دوباره آنالیز کنید.",
     "hintBuildFailed": "نمی‌توان از این صادرات تریاژ ساخت. یک تحلیل تازه انجام دهید.",
     "summaryVolume": "تریاژ قانون (حجم / باید اصلاح شود / سبک)",
-    "hintSameAsTree": "گروه بندی مشابه درخت نوار فعالیت Triage: مشکلات را فیلتر کنید یا قوانین را در «analysis_options_custom.yaml» غیرفعال/فعال کنید. گروه های بزرگ ممکن است درخواست تایید کنند."
+    "hintSameAsTree": "گروه بندی مشابه درخت نوار فعالیت Triage: مشکلات را فیلتر کنید یا قوانین را در analysis_options_custom.yaml» غیرفعال/فعال کنید. گروه های بزرگ ممکن است درخواست تایید کنند."
   },
   "kbdOverlay": {
     "toggleTitle": "نمایش میانبرهای صفحه کلید (؟)",
@@ -893,7 +893,7 @@
   },
   "configMirrors": {
     "noFileRisk": "بدون تجزیه ریسک در هر فایل (بدون نقض در محدوده).",
-    "suppressionNote": "خلاصه موارد منطبق بر موارد نقض.json، نه کلیدهای سرکوب نوار کناری زنده.",
+    "suppressionNote": "خلاصه موارد منطبق بر موارد violations.json، نه کلیدهای سرکوب نوار کناری زنده.",
     "noSuppression": "بدون تجمع سرکوب در این صادرات (آنالیزور قدیمی تر یا سرکوب صفر).",
     "owaspSignal": "{count} نقض در این خروجی شامل نگاشت موبایل/وب OWASP است — برای مشاهده ماتریس کامل و صدور آن Security Posture را باز کنید.",
     "summarySuppressions": "سرکوب ها (صادرات عکس فوری)",

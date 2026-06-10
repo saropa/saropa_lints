@@ -1,14 +1,14 @@
 {
-  "extension.displayName": "Peluches Saropa",
+  "extension.displayName": "Saropa Lints",
   "extension.description": "Plus de 2 100 règles Dart/Flutter avec analyse visuelle, ainsi que Package Vibrancy pour l'évaluation de l'état des dépendances, l'analyse des vulnérabilités et la planification des mises à niveau.",
-  "views.container.title": "Peluches Saropa",
-  "views.banner.name": "Peluches Saropa",
+  "views.container.title": "Saropa Lints",
+  "views.banner.name": "Saropa Lints",
   "views.editorDashboards.name": "Tableaux de bord editeur",
   "views.actions.name": "Actions",
   "views.status.name": "Etat",
   "views.settings.name": "Parametres",
   "views.help.name": "Aide",
-  "viewsWelcome.banner.contents": "** Peluches Saropa **\n\nPlus de 2 100 règles de charpie Dart et Flutter pour la sécurité, l'accessibilité et les performances.\n\nNécessite un projet Dart ou Flutter.\n\nOuvrez un dossier contenant un « pubspec.yaml » pour commencer.\n\n[En savoir plus en ligne](https://pub.dev/packages/saropa_lints)\n[Parcourir toutes les commandes](commande:saropaLints.showCommandCatalog)\n[À propos de Saropa Lints](commande:saropaLints.showAbout)\n[Mise en route](commande :saropaLints.openWalkthrough)",
+  "viewsWelcome.banner.contents": "** Saropa Lints **\n\nPlus de 2 100 règles de charpie Dart et Flutter pour la sécurité, l'accessibilité et les performances.\n\nNécessite un projet Dart ou Flutter.\n\nOuvrez un dossier contenant un « pubspec.yaml » pour commencer.\n\n[En savoir plus en ligne](https://pub.dev/packages/saropa_lints)\n[Parcourir toutes les commandes](commande:saropaLints.showCommandCatalog)\n[À propos de Saropa Lints](commande:saropaLints.showAbout)\n[Mise en route](commande :saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints : Configurer le projet (pubspec + config)",
   "command.disable.title": "Saropa Lints : Désactiver l'intégration des lints",
   "command.runAnalysis.title": "Saropa Lints : Exécuter l'analyse",
@@ -93,7 +93,7 @@
   "command.exportOwaspReport.title": "Saropa Lints : Exporter le rapport de conformité OWASP",
   "command.setGroupBy.title": "Regrouper par…",
   "command.openWalkthrough.title": "Saropa Lints : Pour commencer",
-  "command.showAbout.title": "À propos des peluches Saropa",
+  "command.showAbout.title": "À propos de Saropa Lints",
   "command.openHelpHub.title": "Saropa Lints : Aide",
   "command.openPubDevSaropaLints.title": "Saropa Lints : paquet ouvert sur pub.dev",
   "command.createSaropaInstructions.title": "Créer des instructions Saropa Lints pour les agents IA",
@@ -278,7 +278,7 @@
   "config.property.packageVibrancy.vulnSeverityThreshold.enumDescription.2": "Afficher les vulnérabilités élevées et critiques (CVSS 7.0+)",
   "config.property.packageVibrancy.vulnSeverityThreshold.enumDescription.3": "Afficher moyen, élevé et critique (CVSS 4.0+)",
   "config.property.packageVibrancy.vulnSeverityThreshold.enumDescription.4": "Afficher toutes les vulnérabilités",
-  "walkthrough.gettingStarted.title": "Premiers pas avec les peluches Saropa",
+  "walkthrough.gettingStarted.title": "Premiers pas avec Saropa Lints",
   "walkthrough.gettingStarted.description": "Score de santé, tableau de bord des résultats, matrice de sécurité, triage et tendances : barre d'activité et onglets d'édition pleine largeur.",
   "walkthrough.step.walkthrough.healthScore.title": "Score de santé",
   "walkthrough.step.walkthrough.healthScore.description": "La qualité de votre projet en un coup d'œil : un **score de 0 à 100** dans la barre d'état et dans la vue Vue d'ensemble.\n\nVert (80+), jaune (50-79), rouge (<50). Les erreurs pénalisent lourdement.\n\n[Exécuter l'analyse](commande:saropaLints.runAnalysis) · [Configurer le projet](commande:saropaLints.enable)",
@@ -303,5 +303,5 @@
   "command.toggleIncludeAnalyzerTodosInDashboard.title": "Saropa Lints : activer l'option Afficher les tâches TODO de l'analyseur sur le tableau de bord",
   "command.toggleTodosAndHacksScanner.title": "Saropa Lints : basculer le scanner d'espace de travail TODO/HACK",
   "config.property.includeOtherAnalyzerFindingsInDashboard.description": "Affichez une pilule supplémentaire sur le tableau de bord des résultats avec le nombre de résultats de l'analyseur non saropa sur les fichiers .dart (lints du SDK Dart intégrés ainsi que tous les plugins custom_lint tiers tels que riverpod_lint). Affichage uniquement : n'affecte jamais le score d'intégrité, les cartes KPI ou la liste des violations.",
-  "config.property.includeAnalyzerTodosInDashboard.description": "Affichez une pilule supplémentaire sur le tableau de bord des résultats avec le nombre de diagnostics TODO côté analyseur (`code : \"todo\"`) sur les fichiers .dart. Indépendant du scanner TODO/HACK du système de fichiers Saropa. Affichage uniquement."
+  "config.property.includeAnalyzerTodosInDashboard.description": "Affichez une pilule supplémentaire sur le tableau de bord des résultats avec le nombre de diagnostics TODO côté analyseur (`code: \"todo\"`) sur les fichiers .dart. Indépendant du scanner TODO/HACK du système de fichiers Saropa. Affichage uniquement."
 }

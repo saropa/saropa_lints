@@ -119,48 +119,4 @@ void main() {
       });
     }
   });
-
-  group('Notification - Avoidance Rules', () {
-    group('avoid_notification_payload_sensitive', () {
-      test('sensitive data in notification payload SHOULD trigger', () {});
-
-      test('sanitized notification data should NOT trigger', () {});
-    });
-    group('avoid_notification_same_id', () {
-      test('reused notification ID SHOULD trigger', () {});
-
-      test('unique notification IDs should NOT trigger', () {});
-    });
-    group('avoid_notification_silent_failure', () {
-      test('swallowed notification error SHOULD trigger', () {});
-
-      test('notification error handling should NOT trigger', () {});
-    });
-  });
-
-  group('Notification - Requirement Rules', () {
-    group('require_notification_channel_android', () {
-      test('notification without Android channel SHOULD trigger', () {});
-
-      test('channel-based notifications should NOT trigger', () {});
-    });
-    group('require_notification_initialize_per_platform', () {
-      test('platform-agnostic notification init SHOULD trigger', () {});
-
-      test('per-platform notification setup should NOT trigger', () {});
-    });
-    group('require_notification_timezone_awareness', () {
-      test('scheduled notification without timezone SHOULD trigger', () {});
-
-      test('timezone-aware scheduling should NOT trigger', () {});
-    });
-  });
-
-  group('Notification - Preference Rules', () {
-    group('prefer_notification_grouping', () {
-      test('many individual notifications SHOULD trigger', () {});
-
-      test('grouped notifications should NOT trigger', () {});
-    });
-  });
 }

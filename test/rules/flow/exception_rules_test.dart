@@ -75,38 +75,11 @@ void main() {
   });
 
   group('Exception - Avoidance Rules', () {
-    group('avoid_non_final_exception_class_fields', () {
-      test('mutable field on exception class SHOULD trigger', () {});
-
-      test('final exception fields should NOT trigger', () {});
-    });
     group('avoid_only_rethrow', () {
       test('rule offers quick fix (remove try-catch that only rethrows)', () {
         final rule = AvoidOnlyRethrowRule();
         expect(rule.fixGenerators, isNotEmpty);
       });
-
-      test('catch block that only rethrows SHOULD trigger', () {});
-
-      test('removing unnecessary try-catch should NOT trigger', () {});
-    });
-    group('avoid_throw_in_catch_block', () {
-      test('throw new exception in catch losing context SHOULD trigger', () {});
-
-      test('rethrow or chained exception should NOT trigger', () {});
-    });
-    group('avoid_throw_objects_without_tostring', () {
-      test('throwing object without toString SHOULD trigger', () {});
-
-      test('exception with meaningful toString should NOT trigger', () {});
-    });
-  });
-
-  group('Exception - Preference Rules', () {
-    group('prefer_public_exception_classes', () {
-      test('private exception class SHOULD trigger', () {});
-
-      test('public exception for API consumers should NOT trigger', () {});
     });
   });
 }

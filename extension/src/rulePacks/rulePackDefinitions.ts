@@ -640,7 +640,6 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
       'prefer_context_selector',
       'prefer_family_for_params',
       'prefer_immutable_provider_arguments',
-      'prefer_notifier_over_state',
       'prefer_ref_watch_over_read',
       'prefer_riverpod_auto_dispose',
       'prefer_riverpod_code_gen',
@@ -660,6 +659,15 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
       'use_ref_and_state_synchronously',
       'use_ref_read_synchronously',
     ],
+  },
+  {
+    id: 'riverpod_2',
+    label: 'Riverpod 2.x',
+    matchPubNames: ['flutter_riverpod', 'hooks_riverpod', 'riverpod'],
+    ruleCodes: [
+      'prefer_notifier_over_state',
+    ],
+    dependencyGate: { package: 'riverpod', constraint: '>=2.0.0' },
   },
   {
     id: 'rxdart',

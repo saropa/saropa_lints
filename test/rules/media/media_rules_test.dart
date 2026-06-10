@@ -59,25 +59,4 @@ void main() {
       });
     }
   });
-
-  group('Media - Avoidance Rules', () {
-    group('avoid_autoplay_audio', () {
-      test('audio playing without user action SHOULD trigger', () {});
-
-      test('user-initiated audio playback should NOT trigger', () {});
-    });
-  });
-
-  group('Media - Preference Rules', () {
-    group('prefer_camera_resolution_selection', () {
-      test('camera at max resolution always SHOULD trigger', () {});
-
-      test('configurable camera resolution should NOT trigger', () {});
-    });
-    group('prefer_audio_session_config', () {
-      test('audio without session configuration SHOULD trigger', () {});
-
-      test('AudioSession category setup should NOT trigger', () {});
-    });
-  });
 }

@@ -54,25 +54,4 @@ void main() {
       });
     }
   });
-
-  group('Supabase - Avoidance Rules', () {
-    group('avoid_supabase_anon_key_in_code', () {
-      test('anon key hardcoded in source SHOULD trigger', () {});
-
-      test('environment variable for Supabase key should NOT trigger', () {});
-    });
-  });
-
-  group('Supabase - Requirement Rules', () {
-    group('require_supabase_error_handling', () {
-      test('Supabase call without error handling SHOULD trigger', () {});
-
-      test('try-catch on Supabase calls should NOT trigger', () {});
-    });
-    group('require_supabase_realtime_unsubscribe', () {
-      test('realtime subscription without unsubscribe SHOULD trigger', () {});
-
-      test('cleanup on dispose should NOT trigger', () {});
-    });
-  });
 }

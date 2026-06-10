@@ -102,7 +102,7 @@
     "status": {
       "lastRunPrefix": "última ejecución",
       "lastRunUnknown": "Última ejecución desconocida",
-      "noTimestampTitle": "Sin marca de tiempo en violaciones.json",
+      "noTimestampTitle": "Sin marca de tiempo en violations.json",
       "findingsAfterFilterTitle": "Resultados totales después del filtro de reglas deshabilitadas",
       "findingOne": "{count} hallazgo",
       "findingOther": "{count} hallazgos",
@@ -165,7 +165,7 @@
       "clearRecentButton": "Claro",
       "recentFiltersListAria": "Filtros recientes",
       "runAnalysisTitle": "Ejecute el análisis de Saropa Lints",
-      "refreshViolationsTitle": "Recargar violaciones.json desde el disco",
+      "refreshViolationsTitle": "Recargar violations.json desde el disco",
       "severityGroupAria": "Filtro de gravedad",
       "severityLabel": "Gravedad",
       "impactGroupAria": "Filtro de impacto",
@@ -199,11 +199,11 @@
       "openCodeHealth": "Salud del código abierto",
       "openLintsConfig": "Abrir configuración de Lints",
       "reloadFromDisk": "Recargar desde el disco",
-      "reloadFromDiskTitle": "Vuelva a representar el panel desde las últimas violaciones.json sin volver a ejecutar el analizador.",
+      "reloadFromDiskTitle": "Vuelva a representar el panel desde las últimas violations.json sin volver a ejecutar el analizador.",
       "reEnableDisabledRules": "Volver a habilitar las reglas deshabilitadas...",
-      "reEnableDisabledRulesTitle": "Abra una selección rápida de reglas actualmente deshabilitadas en análisis_options_custom.yaml y vuelva a habilitar las elegidas.",
+      "reEnableDisabledRulesTitle": "Abra una selección rápida de reglas actualmente deshabilitadas en analysis_options_custom.yaml y vuelva a habilitar las elegidas.",
       "reEnableNoneTitle": "No hay reglas actualmente deshabilitadas",
-      "reEnableNoneMessage": "Actualmente no hay reglas deshabilitadas a través de análisis_options_custom.yaml.",
+      "reEnableNoneMessage": "Actualmente no hay reglas deshabilitadas a través de analysis_options_custom.yaml.",
       "reEnableQuickPickTitle": "Volver a habilitar reglas deshabilitadas",
       "reEnableQuickPickPlaceholder": "Seleccione una o más reglas para volver a habilitarlas",
       "menuGroupExport": "Exportar",
@@ -219,10 +219,10 @@
       "sectionAria": "Reglas principales por recuento",
       "hideTitle": "Ocultar solo para mí: a nivel del espacio de trabajo, reversible mediante Borrar supresiones",
       "hideButton": "Esconder",
-      "disableTitle": "Deshabilitar para todo el proyecto: escribe análisis_opciones_personalizado.yaml y vuelve a ejecutar el análisis",
+      "disableTitle": "Deshabilitar para todo el proyecto: escribe analysis_options_custom.yaml y vuelve a ejecutar el análisis",
       "disableButton": "Desactivar",
       "workspaceOnlyShort": "solo espacio de trabajo",
-      "projectConfigShort": "configuración del proyecto (escribe análisis_opciones_personalizado.yaml)",
+      "projectConfigShort": "configuración del proyecto (escribe analysis_options_custom.yaml)",
       "topRulesOne": "Regla superior {count}",
       "topRulesOther": "Principales reglas {count}",
       "colRank": "#",
@@ -349,7 +349,7 @@
       "bulkSelectedTpl": "{n} seleccionado(s)"
     },
     "emptyState": {
-      "hintAfterMessage": "Ejecute un análisis de Saropa Lints para generar violaciones.json, luego use Actualizar aquí o vuelva a abrir este panel.",
+      "hintAfterMessage": "Ejecute un análisis de Saropa Lints para generar violations.json, luego use Actualizar aquí o vuelva a abrir este panel.",
       "refreshDisk": "Actualizar desde el disco"
     },
     "shortcuts": {
@@ -884,7 +884,7 @@
     }
   },
   "suppressionsStrip": {
-    "noData": "Aún no hay violaciones.json: ejecute el análisis para completar la instantánea de supresión.",
+    "noData": "Aún no hay violations.json: ejecute el análisis para completar la instantánea de supresión.",
     "zeroTotal": "0 supresiones del analizador en la última exportación.",
     "noKindBreakdown": "No hay desglose por tipo en esta exportación.",
     "title": "Supresiones (exportación)",
@@ -893,7 +893,7 @@
   },
   "configMirrors": {
     "noFileRisk": "Sin desglose de riesgos por archivo (sin infracciones en el alcance).",
-    "suppressionNote": "Coincide con el resumen de violaciones.json, no con los conmutadores de supresión de la barra lateral en vivo.",
+    "suppressionNote": "Coincide con el resumen de violations.json, no con los conmutadores de supresión de la barra lateral en vivo.",
     "noSuppression": "No hay agregado de supresión en esta exportación (analizador más antiguo o supresiones cero).",
     "owaspSignal": "{count} infracción/infracciones en esta exportación incluyen mapeo móvil/web de OWASP — abre Postura de Seguridad para la matriz completa y la exportación.",
     "summarySuppressions": "Supresiones (exportar instantánea)",

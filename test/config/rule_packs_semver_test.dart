@@ -38,6 +38,44 @@ void main() {
       expect(packPassesDependencyGate('collection_compat', null), isFalse);
       expect(packPassesDependencyGate('collection_compat', {}), isFalse);
     });
+
+    // riverpod_2 gates prefer_notifier_over_state on the Notifier API, which
+    // only exists in riverpod >= 2.0.0.
+    test('riverpod_2 passes when riverpod satisfies >=2.0.0', () {
+      expect(
+        packPassesDependencyGate('riverpod_2', {'riverpod': '2.0.0'}),
+        isTrue,
+      );
+      expect(
+        packPassesDependencyGate('riverpod_2', {'riverpod': '2.5.1'}),
+        isTrue,
+      );
+    });
+
+    test('riverpod_2 fails on riverpod 1.x and without lock data', () {
+      expect(
+        packPassesDependencyGate('riverpod_2', {'riverpod': '1.0.4'}),
+        isFalse,
+      );
+      expect(packPassesDependencyGate('riverpod_2', null), isFalse);
+      expect(packPassesDependencyGate('riverpod_2', {}), isFalse);
+    });
+  });
+
+  group('riverpod_2 ownership', () {
+    // The gate is only meaningful if the rule is NOT also in the ungated
+    // riverpod pack — otherwise enabling `riverpod` would re-add it regardless
+    // of version. See kRelocatedRulePackCodes in tool/rule_pack_audit.dart.
+    test('prefer_notifier_over_state is in riverpod_2, not riverpod', () {
+      expect(
+        ruleCodesForPack('riverpod_2'),
+        contains('prefer_notifier_over_state'),
+      );
+      expect(
+        ruleCodesForPack('riverpod'),
+        isNot(contains('prefer_notifier_over_state')),
+      );
+    });
   });
 
   group('mergeRulePacksIntoEnabled semver', () {
@@ -75,6 +113,27 @@ void main() {
       final enabled = <String>{};
       mergeRulePacksIntoEnabled(enabled, null, ['collection_compat']);
       expect(enabled, isEmpty);
+    });
+
+    test('riverpod_2 merges prefer_notifier_over_state only on >=2.0.0', () {
+      final oldProject = <String>{};
+      mergeRulePacksIntoEnabled(
+        oldProject,
+        null,
+        ['riverpod_2'],
+        resolvedVersions: {'riverpod': '1.0.4'},
+      );
+      expect(oldProject.contains('prefer_notifier_over_state'), isFalse);
+
+      final newProject = <String>{};
+      final contributed = mergeRulePacksIntoEnabled(
+        newProject,
+        null,
+        ['riverpod_2'],
+        resolvedVersions: {'riverpod': '2.4.0'},
+      );
+      expect(newProject.contains('prefer_notifier_over_state'), isTrue);
+      expect(contributed, contains('prefer_notifier_over_state'));
     });
   });
 }

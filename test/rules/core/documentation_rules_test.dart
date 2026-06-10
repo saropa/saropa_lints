@@ -108,38 +108,6 @@ void main() {
     }
   });
 
-  group('Documentation - Requirement Rules', () {
-    group('verify_documented_parameters_exist', () {
-      test(
-        'built-in type refs [String], [int], [bool] in docs should NOT trigger',
-        () {},
-      );
-    });
-  });
-
-  group('Documentation - Code Block & HTML Rules', () {
-    group('missing_code_block_language_in_doc_comment', () {
-      test(
-        'closing fence should NOT trigger (false positive: closing ``` is not an opening fence)',
-        () {
-          // After an opening ```dart, the closing ``` must not be reported
-        },
-      );
-
-      test(
-        'prose mention of triple backticks should NOT toggle code block state',
-        () {
-          // A doc line like "Example using ```dart blocks:" is prose,
-          // not a real fence — must not falsely toggle inCodeBlock
-        },
-      );
-    });
-
-    group('unintended_html_in_doc_comment', () {});
-
-    group('uri_does_not_exist_in_doc_import', () {});
-  });
-
   // Stub-only behavior tests were removed from this file. Keep rule metadata,
   // fixture verification, and targeted regression assertions.
 }

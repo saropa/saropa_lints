@@ -102,7 +102,7 @@
     "status": {
       "lastRunPrefix": "Ostatni bieg",
       "lastRunUnknown": "Ostatni bieg nieznany",
-      "noTimestampTitle": "Brak sygnatury czasowej w pliku naruszenia.json",
+      "noTimestampTitle": "Brak sygnatury czasowej w pliku violations.json",
       "findingsAfterFilterTitle": "Łączne wyniki po filtrze z wyłączoną regułą",
       "findingOne": "{count} znalezisko",
       "findingOther": "{count} znalezisk",
@@ -165,7 +165,7 @@
       "clearRecentButton": "Jasne",
       "recentFiltersListAria": "Najnowsze filtry",
       "runAnalysisTitle": "Uruchom analizę Saropa Lints",
-      "refreshViolationsTitle": "Załaduj ponownie plik naruszenia.json z dysku",
+      "refreshViolationsTitle": "Załaduj ponownie plik violations.json z dysku",
       "severityGroupAria": "Filtr ważności",
       "severityLabel": "Powaga",
       "impactGroupAria": "Filtr udarowy",
@@ -199,11 +199,11 @@
       "openCodeHealth": "Otwórz kod Zdrowie",
       "openLintsConfig": "Otwórz konfigurację Lints",
       "reloadFromDisk": "Załaduj ponownie z dysku",
-      "reloadFromDiskTitle": "Wyrenderuj ponownie dashboard z ostatnich naruszeń.json bez ponownego uruchamiania analizatora.",
+      "reloadFromDiskTitle": "Wyrenderuj ponownie dashboard z ostatnich violations.json bez ponownego uruchamiania analizatora.",
       "reEnableDisabledRules": "Włącz ponownie wyłączone reguły…",
-      "reEnableDisabledRulesTitle": "Otwórz szybki wybór reguł aktualnie wyłączonych w pliku Analysis_options_custom.yaml i włącz ponownie wybrane.",
+      "reEnableDisabledRulesTitle": "Otwórz szybki wybór reguł aktualnie wyłączonych w pliku analysis_options_custom.yaml i włącz ponownie wybrane.",
       "reEnableNoneTitle": "Żadne reguły nie są obecnie wyłączone",
-      "reEnableNoneMessage": "Żadne reguły nie są obecnie wyłączone w pliku Analysis_options_custom.yaml.",
+      "reEnableNoneMessage": "Żadne reguły nie są obecnie wyłączone w pliku analysis_options_custom.yaml.",
       "reEnableQuickPickTitle": "Włącz ponownie wyłączone reguły",
       "reEnableQuickPickPlaceholder": "Wybierz jedną lub więcej reguł, które chcesz ponownie włączyć",
       "menuGroupExport": "Eksport",
@@ -219,10 +219,10 @@
       "sectionAria": "Najważniejsze zasady według liczby",
       "hideTitle": "Ukryj tylko dla mnie — na poziomie obszaru roboczego, odwracalne poprzez Wyczyść tłumienia",
       "hideButton": "Ukrywać",
-      "disableTitle": "Wyłącz dla całego projektu — zapisuje plik Analysis_options_custom.yaml i ponownie uruchamia analizę",
+      "disableTitle": "Wyłącz dla całego projektu — zapisuje plik analysis_options_custom.yaml i ponownie uruchamia analizę",
       "disableButton": "Wyłączyć",
       "workspaceOnlyShort": "tylko obszar roboczy",
-      "projectConfigShort": "konfiguracja projektu (zapisuje plik Analysis_options_custom.yaml)",
+      "projectConfigShort": "konfiguracja projektu (zapisuje plik analysis_options_custom.yaml)",
       "topRulesOne": "Najważniejsza zasada {count}",
       "topRulesOther": "Najważniejsze zasady {count}",
       "colRank": "#",
@@ -349,7 +349,7 @@
       "bulkSelectedTpl": "{n} zaznaczonych"
     },
     "emptyState": {
-      "hintAfterMessage": "Uruchom analizę Saropa Lints, aby wygenerować plik naruszenia.json, a następnie użyj opcji Odśwież tutaj lub otwórz ponownie ten pulpit nawigacyjny.",
+      "hintAfterMessage": "Uruchom analizę Saropa Lints, aby wygenerować plik violations.json, a następnie użyj opcji Odśwież tutaj lub otwórz ponownie ten pulpit nawigacyjny.",
       "refreshDisk": "Odśwież z dysku"
     },
     "shortcuts": {
@@ -366,7 +366,7 @@
       "analyzerTodosOn": "+{count} analizator TODO",
       "analyzerTodosPromo": "+? analizator TODO — pokaż",
       "scannerPromo": "Włącz skaner TODO/HACK",
-      "tooltipLive": "Na żywo z panelu Problemy z kodem VS. Aktualizuje się po zakończeniu analizy. Kliknij, aby ukryć.",
+      "tooltipLive": "Na żywo z panelu Problemy z VS Code. Aktualizuje się po zakończeniu analizy. Kliknij, aby ukryć.",
       "tooltipScanner": "Skaner systemu plików Saropa — zlicza otwarte znaczniki TODO/HACK w źródle.",
       "tooltipPromoClickToOn": "Kliknij, aby włączyć"
     }
@@ -389,7 +389,7 @@
     "hintNoPerRule": "Ten eksport nie zawiera żadnych liczników problemów dla poszczególnych reguł. Przeanalizuj ponownie, korzystając z aktualnej wtyczki Saropa Lints.",
     "hintBuildFailed": "Nie można utworzyć klasyfikacji na podstawie tego eksportu. Przeprowadź świeżą analizę.",
     "summaryVolume": "Reguła segregacji (objętość / must-fix / stylistyka)",
-    "hintSameAsTree": "Takie samo grupowanie jak w drzewie paska aktywności Triage: filtruj problemy lub wyłączaj/włącz reguły w pliku `analytics_options_custom.yaml`. Duże grupy mogą poprosić o potwierdzenie."
+    "hintSameAsTree": "Takie samo grupowanie jak w drzewie paska aktywności Triage: filtruj problemy lub wyłączaj/włącz reguły w pliku `analysis_options_custom.yaml`. Duże grupy mogą poprosić o potwierdzenie."
   },
   "kbdOverlay": {
     "toggleTitle": "Pokaż skróty klawiaturowe (?)",
@@ -820,7 +820,7 @@
       "detailHeading": "Dlaczego ta funkcja uzyskała ocenę {score}",
       "detailNoIssues": "Brak flag w tym wierszu — wynik zależy od wartości kolumn powyżej (wykorzystanie, zasięg, złożoność, wiek, dokumentacja).",
       "suppressLabel": "Pomiń w pliku",
-      "suppressTooltip": "Zapisuje `// ignorowanie_pliku: code_health:<flaga>` w tym pliku, więc przyszłe skany usuwają tę flagę dla całego pliku."
+      "suppressTooltip": "Zapisuje `// ignore_for_file: code_health:<flag>` w tym pliku, więc przyszłe skany usuwają tę flagę dla całego pliku."
     },
     "flag": {
       "unused": {
@@ -884,7 +884,7 @@
     }
   },
   "suppressionsStrip": {
-    "noData": "Nie ma jeszcze pliku naruszeń.json — uruchom analizę, aby wypełnić migawkę pomijania.",
+    "noData": "Nie ma jeszcze pliku violations.json — uruchom analizę, aby wypełnić migawkę pomijania.",
     "zeroTotal": "0 pominięć analizatora w najnowszym eksporcie.",
     "noKindBreakdown": "W tym eksporcie nie ma podziału według rodzaju.",
     "title": "Tłumienia (eksport)",
@@ -893,7 +893,7 @@
   },
   "configMirrors": {
     "noFileRisk": "Brak podziału ryzyka na plik (brak naruszeń zakresu).",
-    "suppressionNote": "Odpowiada podsumowaniu pliku naruszenia.json, a nie aktywnym przełącznikom pomijania paska bocznego.",
+    "suppressionNote": "Odpowiada podsumowaniu pliku violations.json, a nie aktywnym przełącznikom pomijania paska bocznego.",
     "noSuppression": "Brak agregatu pomijania w tym eksporcie (starszy analizator lub pomijanie zer).",
     "owaspSignal": "{count} naruszeń w tym eksporcie zawiera mapowanie OWASP dla urządzeń mobilnych/sieci Web — otwórz pozycję bezpieczeństwa, aby wyświetlić pełną matrycę i eksport.",
     "summarySuppressions": "Pominięcia (eksport migawki)",

@@ -723,9 +723,27 @@ def engine_stats_for(locale: str) -> dict[str, int]:
     return dict(_engine_stats.get(locale, {}))
 
 
+# Every string NLLB did not produce — served by Google or left English instead.
+# Counts alone (``_engine_stats``) say HOW MANY fell back; this names WHICH ones
+# and to what, so the run report can list them for a human to fix (add a
+# dictionary override, reword the source) rather than shipping a silent Google /
+# English value. Entries: (locale, engine 'google'|'english', source text).
+_fallback_log: list[tuple[str, str, str]] = []
+
+
+def _record_fallback(locale: str, engine: str, text: str) -> None:
+    _fallback_log.append((locale, engine, text))
+
+
+def fallback_log() -> list[tuple[str, str, str]]:
+    """Every (locale, engine, source) NLLB could not translate this run."""
+    return list(_fallback_log)
+
+
 def reset_engine_stats() -> None:
-    """Clear the per-run engine tally. Call once at the start of a run."""
+    """Clear the per-run engine tally and fallback log. Call once per run start."""
     _engine_stats.clear()
+    _fallback_log.clear()
 
 
 def _translate_one(locale: str, text: str, *, cache: dict[str, str], primary: str) -> str:
@@ -776,8 +794,13 @@ def _translate_one(locale: str, text: str, *, cache: dict[str, str], primary: st
         eng = "english" if out == text else used
         _provenance[key] = eng
         _record_engine(locale, eng)
+        # Surface what NLLB could not do: an English echo always, and a Google
+        # result only when NLLB was the primary engine that bounced this string.
+        if eng == "english" or (eng == "google" and primary == "nllb"):
+            _record_fallback(locale, eng, text)
         return out
     _record_engine(locale, "english")
+    _record_fallback(locale, "english", text)
     return text
 
 

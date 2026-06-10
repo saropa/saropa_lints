@@ -137,23 +137,6 @@ void main() {
     }
   });
 
-  group('File Handling - Requirement Rules', () {
-    group('require_file_path_sanitization', () {
-      test('platform path API in function body should NOT trigger '
-          '(regression)', () {
-        // getApplicationDocumentsDirectory in the same function body
-        // indicates the parameter comes from a trusted OS path
-      });
-
-      test('private helper receiving platform path should NOT trigger '
-          '(inter-procedural)', () {
-        // Regression: private method receives dbDir.path from
-        // getApplicationDocumentsDirectory() in the caller. The rule should
-        // trace trust through private method call sites.
-      });
-    });
-  });
-
   // Stub-only behavior tests were removed from this file. Keep rule metadata,
   // fixture verification, and targeted regression assertions.
 }

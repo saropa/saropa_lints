@@ -201,9 +201,9 @@
       "reloadFromDisk": "Recharger depuis le disque",
       "reloadFromDiskTitle": "Restituez le tableau de bord à partir des dernières violations.json sans réexécuter l'analyseur.",
       "reEnableDisabledRules": "Réactiver les règles désactivées…",
-      "reEnableDisabledRulesTitle": "Ouvrez une sélection rapide de règles actuellement désactivées dans Analysis_options_custom.yaml et réactivez celles choisies.",
+      "reEnableDisabledRulesTitle": "Ouvrez une sélection rapide de règles actuellement désactivées dans analysis_options_custom.yaml et réactivez celles choisies.",
       "reEnableNoneTitle": "Aucune règle actuellement désactivée",
-      "reEnableNoneMessage": "Aucune règle n'est actuellement désactivée via Analysis_options_custom.yaml.",
+      "reEnableNoneMessage": "Aucune règle n'est actuellement désactivée via analysis_options_custom.yaml.",
       "reEnableQuickPickTitle": "Réactiver les règles désactivées",
       "reEnableQuickPickPlaceholder": "Sélectionnez une ou plusieurs règles à réactiver",
       "menuGroupExport": "Exporter",
@@ -219,10 +219,10 @@
       "sectionAria": "Principales règles par nombre",
       "hideTitle": "Masquer pour moi uniquement - au niveau de l'espace de travail, réversible via Effacer les suppressions",
       "hideButton": "Cacher",
-      "disableTitle": "Désactiver pour l'ensemble du projet - écrit Analysis_options_custom.yaml et réexécute l'analyse",
+      "disableTitle": "Désactiver pour l'ensemble du projet - écrit analysis_options_custom.yaml et réexécute l'analyse",
       "disableButton": "Désactiver",
       "workspaceOnlyShort": "espace de travail uniquement",
-      "projectConfigShort": "configuration du projet (écrit Analysis_options_custom.yaml)",
+      "projectConfigShort": "configuration du projet (écrit analysis_options_custom.yaml)",
       "topRulesOne": "Règle supérieure {count}",
       "topRulesOther": "Principales règles {count}",
       "colRank": "#",
@@ -366,7 +366,7 @@
       "analyzerTodosOn": "+{count} TODO de l'analyseur",
       "analyzerTodosPromo": "+? TODO de l'analyseur — afficher",
       "scannerPromo": "Activer le scanner TODO/HACK",
-      "tooltipLive": "En direct du panneau Problèmes de code VS. Mises à jour à mesure que l'analyse est terminée. Cliquez pour masquer.",
+      "tooltipLive": "En direct du panneau Problèmes de VS Code. Mises à jour à mesure que l'analyse est terminée. Cliquez pour masquer.",
       "tooltipScanner": "Scanner du système de fichiers Saropa — compte les marqueurs TODO/HACK ouverts dans la source.",
       "tooltipPromoClickToOn": "Cliquez pour activer"
     }
@@ -480,7 +480,7 @@
     },
     "sections": {
       "sizeDistribution": "Répartition des tailles",
-      "sizeDistributionCaption": "Exclut les dépendances dev — elles ne sont jamais expédiées vers le bundle APK/IPA/Web.",
+      "sizeDistributionCaption": "Exclut les dev_dependencies — elles ne sont jamais expédiées vers le bundle APK/IPA/Web.",
       "filters": "Filtres",
       "packages": "Forfaits"
     },
@@ -884,7 +884,7 @@
     }
   },
   "suppressionsStrip": {
-    "noData": "Aucune violation.json pour l'instant : exécutez une analyse pour remplir l'instantané de suppression.",
+    "noData": "Aucune violations.json pour l'instant : exécutez une analyse pour remplir l'instantané de suppression.",
     "zeroTotal": "0 suppression d’analyseur dans la dernière exportation.",
     "noKindBreakdown": "Aucune répartition par type dans cette exportation.",
     "title": "Suppressions (exportation)",

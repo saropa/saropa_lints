@@ -67,14 +67,6 @@ void main() {
     }
   });
 
-  group('In-App Purchase - Avoidance Rules', () {
-    group('avoid_purchase_in_sandbox_production', () {
-      test('sandbox purchase logic in production SHOULD trigger', () {});
-
-      test('environment-aware IAP flow should NOT trigger', () {});
-    });
-  });
-
   group('In-App Purchase - Requirement Rules', () {
     group('require_subscription_status_check', () {
       test('fixture has bad example with expect_lint marker', () {
@@ -148,28 +140,6 @@ void main() {
           );
         }
       });
-    });
-
-    group('require_price_localization', () {
-      test('hardcoded price string SHOULD trigger', () {});
-
-      test('localized price from store should NOT trigger', () {});
-    });
-  });
-
-  group('In-App Purchase - Server Verification Rules', () {
-    group('avoid_entitlement_without_server', () {
-      test('client-only entitlement check SHOULD trigger', () {});
-
-      test('server-verified entitlement should NOT trigger', () {});
-    });
-  });
-
-  group('In-App Purchase - Preference Rules', () {
-    group('prefer_grace_period_handling', () {
-      test('instant access revocation on expiry SHOULD trigger', () {});
-
-      test('grace period for subscription lapse should NOT trigger', () {});
     });
   });
 }

@@ -24,7 +24,7 @@
 
 ### PACK-02 verification slice (active)
 
-- [ ] Run `dart test test/rule_packs_migration_membership_test.dart test/rule_packs_sdk_gates_test.dart test/rule_packs_config_test.dart`.
+- [ ] Run `dart test test/config/rule_packs_migration_membership_test.dart test/config/rule_packs_sdk_gates_test.dart test/config/rule_packs_config_test.dart`.
 - [ ] Record command output summary in this plan (pass/fail + notable deltas).
 - [ ] If any behavior changed, add/update regression tests before close-out.
 
@@ -63,7 +63,7 @@
 | **0** | Lock policy (§7): tier×pack algebra, naming (`rule_packs`), defaults. **Shipped:** ratified v1 defaults in §7. |
 | **1** | **Dart:** pack registry (`pack_id` → rule codes), `config_loader` reads `rule_packs.enabled`, merge into `register`, tests. **No extension yet.** |
 | **2** | **VS Code extension:** pack rows (§10 Phase 2), **target platforms** summary (Appendix C), toggles → `analysis_options.yaml`, YAML merge tests. |
-| **3** | **Resolver:** `pubspec.lock` / versions per project root for semver-gated pack entries. **Shipped:** `pubspec_lock_resolver`, `kRulePackDependencyGates`, `collection_compat` example; transitive-only semver UX deferred. |
+| **3** | **Resolver:** `pubspec.lock` / versions per project root for semver-gated pack entries. **Shipped:** `pubspec_lock_resolver`, `kRulePackDependencyGates`, `collection_compat` example; `isDirectDependency` distinguishes direct vs transitive deps. Direct-only suggest UX (wiring `isDirectDependency` into init/extension) still deferred. |
 | **4** | **CLI `init`:** list applicable packs; optional `--enable-pack`. **Shipped:** `--list-packs`, `--enable-pack` on `dart run saropa_lints:init`; YAML preservation in `generatePluginsYaml`. |
 | **5** | **Bulk** assign rule codes → packs for all `lib/src/rules/packages/*` (script or codegen). **Shipped:** generator + audit in implementation note. |
 | **6** | **SDK / Flutter** packs + map `migration_rules.dart` entries. **Substantially shipped:** SDK-gated packs from pubspec `environment` constraints (`dart_sdk_3_2`, `flutter_sdk_3_7`, `flutter_sdk_3_10`, `flutter_sdk_3_16`, `flutter_sdk_3_19`, `flutter_sdk_3_22`, `flutter_sdk_3_24`, `flutter_sdk_3_28`, `flutter_sdk_3_29`, `flutter_sdk_3_32`, `flutter_sdk_3_35`, `flutter_sdk_3_38`). |
@@ -358,6 +358,9 @@ Same intent as §0; this section is **deliverables + exit criteria** per phase.
 
 - Parse `pubspec.lock` at project root (`findProjectRoot`) for **resolved** versions; cache; tests for path deps / missing lockfile.
 - Pack registry gains optional **semver sub-entries** (e.g. only enable `collection_1_19` migrations when `collection >= 1.19.0`).
+- **Direct vs transitive (§7.3):** `pubspec_lock_resolver` parses the lock `dependency:` field; `isDirectDependency(root, name)` returns true for `direct main` / `direct dev` / `direct overridden` (and legacy bare `direct`), false for `transitive`, null when unknown. Tests in `test/config/pubspec_lock_resolver_test.dart`. **Remaining:** wire `isDirectDependency` into init/extension so auto-suggest defaults to direct-only.
+
+**Implementation note (2026-06-10):** First **real** (non-demo) semver-gated package pack — **`riverpod_2`** gates `prefer_notifier_over_state` on `riverpod >= 2.0.0` (the `NotifierProvider` migration target only exists in Riverpod 2.x). This surfaced and closed an architectural gap: the flat-gate design could previously only gate **standalone** packs (`collection_compat`), because a rule owned by an ungated package pack (`riverpod`) would be re-added regardless of version. New **relocation** mechanism (`kRelocatedRulePackCodes` + `applyRelocatedRulePacks` in `tool/rule_pack_audit.dart`, applied by both the generator and the audit) **moves** a version-gated rule out of its file-derived pack into the gated pack, so the gate is authoritative. Tests: `test/config/rule_packs_semver_test.dart` (gate + ownership). **Still deferred:** per-rule `semver_migrations` sub-entries *within* a package pack (plan §8.1) — relocation handles the whole-pack case; intra-pack sub-gating is the larger remaining feature.
 
 **Exit:** `resolvedVersion('collection')` in tests; semver-gated pack entries work.
 
@@ -403,7 +406,7 @@ Same intent as §0; this section is **deliverables + exit criteria** per phase.
 - `flutter_sdk_3_35` → Flutter migration rules (`prefer_dropdown_initial_value`, `prefer_on_pop_with_result`)
 - `flutter_sdk_3_38` → Flutter migration rules (`avoid_asset_manifest_json`)
 
-Associated tests: `test/rule_packs_sdk_gates_test.dart`, `test/rule_packs_migration_membership_test.dart`. Extension detection now also recognizes SDK packs from `environment.sdk` / `environment.flutter` constraints (`extension/src/rulePacks/rulePackDefinitions.ts`). Config Dashboard quick actions now include one-click enablement for detected SDK packs and detected breaking SDK packs.
+Associated tests: `test/config/rule_packs_sdk_gates_test.dart`, `test/config/rule_packs_migration_membership_test.dart`. Extension detection now also recognizes SDK packs from `environment.sdk` / `environment.flutter` constraints (`extension/src/rulePacks/rulePackDefinitions.ts`). Config Dashboard quick actions now include one-click enablement for detected SDK packs and detected breaking SDK packs.
 
 **Remaining for Phase 6 close-out (small):**
 
@@ -412,13 +415,13 @@ Associated tests: `test/rule_packs_sdk_gates_test.dart`, `test/rule_packs_migrat
 **Phase 6 maintainer sign-off checklist (v1):**
 
 - [x] SDK pack inventory reviewed (`dart_sdk_3_2`, `dart_sdk_3_4`, `flutter_sdk_3_0` … `flutter_sdk_3_38`) and accepted as the v1 baseline (see `rule_packs.dart` + extension registry generator).
-- [x] `test/rule_packs_sdk_gates_test.dart`, `test/rule_packs_migration_membership_test.dart`, and `test/rule_packs_config_test.dart` cover SDK gates, migration membership, and authoritative pack merge (run in CI).
-- [x] No migration rules in SDK/flutter packs are tier-only: `mergeRulePacksIntoEnabled` strips all pack-owned codes (including SDK packs) unless an owning pack is enabled (`test/rule_packs_config_test.dart`).
+- [x] `test/config/rule_packs_sdk_gates_test.dart`, `test/config/rule_packs_migration_membership_test.dart`, and `test/config/rule_packs_config_test.dart` cover SDK gates, migration membership, and authoritative pack merge (run in CI).
+- [x] No migration rules in SDK/flutter packs are tier-only: `mergeRulePacksIntoEnabled` strips all pack-owned codes (including SDK packs) unless an owning pack is enabled (`test/config/rule_packs_config_test.dart`).
 - [ ] Any intentionally deferred splits/granularity changes are captured as follow-up issues (post-v1) — file GitHub issues when deferring further pack splits.
 
 **Phase 6 verification command (copy/paste):**
 
-`dart test test/rule_packs_migration_membership_test.dart test/rule_packs_sdk_gates_test.dart test/rule_packs_config_test.dart`
+`dart test test/config/rule_packs_migration_membership_test.dart test/config/rule_packs_sdk_gates_test.dart test/config/rule_packs_config_test.dart`
 
 **Expected coverage from this command:**
 
