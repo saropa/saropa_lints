@@ -75,6 +75,7 @@ Adds one-click quick fixes for eight more lint rules, so common simplifications 
 - **`avoid_icon_size_override` and `avoid_riverpod_string_provider_name` gain a quick fix that removes the flagged named argument.** The `size:` argument on `Icon` and the `name:` argument on a provider are deleted together with their comma so the remaining arguments stay valid. No action required.
 - **`avoid_nullable_parameters_with_default_values` gains a quick fix that removes the redundant `?`.** A parameter with a non-null default does not need a nullable type, so `int? x = 0` becomes `int x = 0`. No action required.
 - **New `riverpod_2` rule pack gates the Notifier-migration rule on Riverpod 2.x.** `prefer_notifier_over_state` recommends migrating `StateProvider` to `NotifierProvider`, an API that only exists in Riverpod 2.0+. The new pack enables that rule only when `pubspec.lock` resolves `riverpod >= 2.0.0`, so a Riverpod 1.x project is never told to adopt an API it does not have. Enable it with `rule_packs: { enabled: [riverpod_2] }` (the VS Code Rule Packs view lists it when Riverpod 2.x is detected). No action required.
+- **Four more version-gated migration rule packs: `dio_5`, `bloc_8`, `riverpod_3`, `go_router_6`.** Each enables a new rule only when `pubspec.lock` resolves the package to the gated version, so a project on an older major never sees a recommendation it cannot follow: `avoid_dio_error` (`dio >= 5.0.0`) flags the removed `DioError` type with a quick fix to `DioException`; `avoid_bloc_map_event_to_state` (`bloc >= 8.0.0`) flags the removed `mapEventToState` override; `avoid_riverpod_state_notifier` (`riverpod >= 3.0.0`) flags the legacy `StateNotifier` / `StateNotifierProvider`; `avoid_go_router_legacy_redirect` (`go_router >= 6.0.0`) flags the pre-6.0 single-argument `redirect` callback. Enable any with `rule_packs: { enabled: [...] }` (or accept the new VS Code upgrade-pack offer). No action required.
 
 ### Changed
 
@@ -127,6 +128,7 @@ Clears a wide round of false positives across the string, exception-handling, as
 ### Added (Extension)
 
 - **The Package Dashboard toolbar adds a "Save Upgrade Report" button next to "Save".** It writes the same per-package JSON as "Save" but filtered to only packages with an available update, to `reports/YYYYMMDD/..._pubspec_upgrade.json`, giving you a focused upgrade worklist. No action required.
+- **Upgrade-pack nudge: offers to enable matching migration rule packs.** On activation and after each `pubspec.lock` change (e.g. a `pub upgrade`), the extension checks whether your resolved package versions bring a semver-gated migration pack into range (Dio 5.x, Bloc 8.x, Riverpod 2.x/3.x, go_router 6.x) while that pack is off, and offers — once per workspace, per pack — to enable it and run analysis. It reads the lockfile and applies the same gate the analyzer enforces, so a project below the gate version is never prompted. Turn it off with `saropaLints.upgradePackNudge.enabled`. No action required.
 
 ### Changed (Extension)
 
