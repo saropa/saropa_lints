@@ -1,6 +1,6 @@
 # BUG: `no_equal_nested_conditions` — Variable Reassigned Between Outer and Inner Check
 
-**Status: Open**
+**Status: Fixed**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
@@ -186,19 +186,75 @@ The fixture at `example*/lib/code_quality/no_equal_nested_conditions_fixture.dar
 
 ## Changes Made
 
-<!-- Fill in when a fix is written. -->
+Added reassignment tracking to `_NestedConditionChecker`
+(`code_quality_control_flow_rules.dart`):
+
+- The visitor now overrides `visitAssignmentExpression` to record (in source
+  order) the names of variables reassigned within the outer then-branch.
+- `visitIfStatement` only reports when the inner condition matches the outer
+  AND none of the condition's identifiers were reassigned earlier in the
+  branch. A new `_ConditionIdentifierCollector` gathers the identifier names
+  referenced in the condition expression.
+
+Because the visitor walks children in source order, a reassignment recorded
+before an inner `if` is one that executes between the two identical checks.
+A conditional reassignment also counts: if the value MIGHT have changed before
+the inner check, the check is not provably redundant, so suppressing is the
+correct (and safe) direction.
+
+Note: the report's minimal reproducer (sibling early-return guards) does not
+actually trigger this rule — the rule only inspects genuinely nested
+conditions. The real FP is the nested form
+`if (q == null) { q = q?.trim(); if (q == null) … }`, which this fix resolves.
 
 ---
 
 ## Tests Added
 
-<!-- List new or updated fixture/test files and what they verify. -->
+- `example/lib/code_quality/no_equal_nested_conditions_fixture.dart`: added
+  `_goodReassignedNested` (variable reassigned between identical nested checks
+  → NO lint). Existing `_bad193` (identical nested, no reassignment → LINT) and
+  `_good193` (different thresholds → NO lint) retained.
+- Scan CLI verified on a multi-case probe: the reassigned-variable nested check
+  is silent; the genuinely-redundant nested check still flags.
 
 ---
 
 ## Commits
 
 <!-- Add commit hashes as fixes land. -->
+
+---
+
+## Finish Report (2026-06-09)
+
+**Scope:** (A) Dart lint rules / analyzer plugin.
+
+**Deep review:** Tracking is per-outer-if (a fresh `_NestedConditionChecker`
+per `addIfStatement`), so no cross-statement contamination. Source-order
+accumulation within the then-branch gives correct dominance for the linear
+case and errs toward not-flagging for conditional reassignments (a safe FN, not
+an FP). Rule file, tier, severity (WARNING), `LintImpact`, and the existing
+quick fix are unchanged.
+
+**Tests:** per-file `dart analyze` clean; scan-CLI probe verified line-by-line
+(redundant flagged, reassigned suppressed).
+
+**Concurrency note:** during this fix another agent left
+`lib/src/rules/core/compound_performance_rules.dart` in a non-compiling
+intermediate state (undefined `_scrollableTypes`, extracted to an untracked
+`compound_performance_patterns.dart`). That blocks a full-package analyze/test
+and the fixture scan, but is unrelated to this change; this fix was verified via
+a standalone scan before the breakage. Only this task's files were staged for
+the commit.
+
+**Maintenance:** CHANGELOG `[Unreleased]` Fixed bullet added. README/ROADMAP
+unchanged (false-positive fix).
+
+**Bug archived:** bugs/no_equal_nested_conditions_false_positive_variable_reassigned_between_checks.md
+→ plans/history/2026.06/2026.06.09/no_equal_nested_conditions_false_positive_variable_reassigned_between_checks.md
+
+**Finish report appended:** this file.
 
 ---
 
