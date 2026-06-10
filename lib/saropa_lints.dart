@@ -1760,6 +1760,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
 
   // Part 5 - Dio HTTP Client rules
   RequireDioTimeoutRule.new,
+  AvoidDioErrorRule.new,
   RequireDioErrorHandlingRule.new,
   RequireDioInterceptorErrorHandlerRule.new,
   PreferDioCancelTokenRule.new,

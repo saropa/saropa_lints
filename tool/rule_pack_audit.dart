@@ -66,13 +66,12 @@ Map<String, Set<String>> applyCompositeRulePacks(
 /// `riverpod_2` pack — a riverpod 1.x project must never be told to adopt an API
 /// that does not exist there. Unlike [kCompositeRulePackIds] (which adds a code
 /// to extra packs), this MOVES the code so the source pack no longer owns it.
-const Map<String, ({String fromPack, String toPack})> kRelocatedRulePackCodes =
-    {
-      'prefer_notifier_over_state': (
-        fromPack: 'riverpod',
-        toPack: 'riverpod_2',
-      ),
-    };
+const Map<String, ({String fromPack, String toPack})>
+kRelocatedRulePackCodes = {
+  'prefer_notifier_over_state': (fromPack: 'riverpod', toPack: 'riverpod_2'),
+  // dio 5.0 removed DioError → DioException; gated to the dio_5 pack.
+  'avoid_dio_error': (fromPack: 'dio', toPack: 'dio_5'),
+};
 
 /// Returns a new map with [kRelocatedRulePackCodes] applied: each code is
 /// removed from its `fromPack` and added to its `toPack`.

@@ -75,6 +75,10 @@ const Map<String, RulePackDependencyGate> kRulePackDependencyGates = {
     dependency: 'riverpod',
     constraint: '>=2.0.0',
   ),
+  // dio 5.0.0 removed `DioError` in favor of `DioException`. avoid_dio_error
+  // flags the removed type; it is relocated out of the base `dio` pack so a
+  // dio 4.x project (where DioError is still valid) never sees it.
+  'dio_5': RulePackDependencyGate(dependency: 'dio', constraint: '>=5.0.0'),
 };
 
 /// Packs that require pubspec `environment` SDK constraints (Phase 6).
