@@ -105,6 +105,8 @@
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
+typedef ValueChanged<T> = void Function(T value);
+
 // BAD: Should trigger prefer_correct_callback_field_name
 // expect_lint: prefer_correct_callback_field_name
 class _Bad487 {
@@ -116,4 +118,45 @@ class _Bad487 {
 class _Good487 {
   VoidCallback onTap; // Correctly prefixed with 'on'
   _Good487(this.onTap);
+}
+
+// GOOD: action thunk — `void Function()` is not an event callback (v6).
+// `onStart` would imply "called when start happens", inverting the meaning.
+class _GoodActionThunk {
+  final void Function() start;
+  _GoodActionThunk(this.start);
+}
+
+// GOOD: clock-source provider as a constructor param. `DateTime Function()` is a
+// value provider (returns a value), not an event handler; `onNow` is nonsense.
+class _GoodClockProvider {
+  _GoodClockProvider({DateTime Function()? now}) : _now = now ?? DateTime.now;
+  final DateTime Function() _now;
+}
+
+// GOOD: builder name role — exempt even though VoidCallback is callback-shaped.
+// Flutter's `builder`/`itemBuilder` carry no `on` prefix by convention.
+class _GoodBuilder {
+  final VoidCallback builder;
+  _GoodBuilder(this.builder);
+}
+
+// GOOD: validator name role — exempt by convention (FormFieldValidator etc.).
+class _GoodValidator {
+  final VoidCallback validator;
+  _GoodValidator(this.validator);
+}
+
+// BAD: true callback typedef with the wrong name — still flagged (v6).
+// expect_lint: prefer_correct_callback_field_name
+class _BadTapHandler {
+  VoidCallback tapHandler;
+  _BadTapHandler(this.tapHandler);
+}
+
+// BAD: ValueChanged is a genuine event callback; `changed` lacks the `on` prefix.
+// expect_lint: prefer_correct_callback_field_name
+class _BadValueChanged {
+  ValueChanged<int> changed;
+  _BadValueChanged(this.changed);
 }

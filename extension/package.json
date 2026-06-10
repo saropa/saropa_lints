@@ -1143,6 +1143,11 @@
             "default": true,
             "markdownDescription": "%config.property.regressionNudge.enabled.markdownDescription%"
           },
+          "saropaLints.upgradePackNudge.enabled": {
+            "type": "boolean",
+            "default": true,
+            "markdownDescription": "%config.property.upgradePackNudge.enabled.markdownDescription%"
+          },
           "saropaLints.inlineAnnotations": {
             "type": "boolean",
             "default": true,

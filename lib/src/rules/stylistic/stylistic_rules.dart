@@ -1123,9 +1123,15 @@ class PreferTrailingCommaAlwaysRule extends SaropaLintRule {
       if (node.arguments.isEmpty) return;
       if (!_isMultiLine(node)) return;
 
-      // Skip if last argument is a callback — the multi-line span
-      // comes from the function body, not from argument layout.
-      if (_lastArgIsCallback(node.arguments)) return;
+      // Skip if the last argument is block-formatted (a function expression
+      // or a collection literal). dart format hugs such an argument to the
+      // call paren and wants NO trailing comma; the multi-line span comes
+      // from the body/elements, not from argument layout. Demanding a comma
+      // here is a false positive that dart format actively rejects — adding
+      // it would force the argument to re-expand onto its own line. Mirrors
+      // the SDK require_trailing_commas "block-formatted last argument"
+      // exemption.
+      if (_lastArgIsBlockFormatted(node.arguments)) return;
 
       final Token rightParen = node.rightParenthesis;
       final Token? lastToken = node.arguments.last.endToken;
@@ -1187,14 +1193,19 @@ class PreferTrailingCommaAlwaysRule extends SaropaLintRule {
     });
   }
 
-  /// Returns true if the last argument is a function expression (callback).
-  /// Handles both positional and named arguments.
-  bool _lastArgIsCallback(NodeList<Expression> arguments) {
+  /// Returns true when the last argument is one dart format block-formats by
+  /// hugging it to the call paren: a function expression (callback) or a
+  /// collection literal (`[...]` / `{...}`). In both shapes dart format adds
+  /// no trailing comma, so the rule must not demand one. Handles both
+  /// positional and named arguments.
+  bool _lastArgIsBlockFormatted(NodeList<Expression> arguments) {
     final Expression lastArg = arguments.last;
     final Expression expr = lastArg is NamedExpression
         ? lastArg.expression
         : lastArg;
-    return expr is FunctionExpression;
+    return expr is FunctionExpression ||
+        expr is ListLiteral ||
+        expr is SetOrMapLiteral;
   }
 
   bool _isMultiLine(AstNode node) {

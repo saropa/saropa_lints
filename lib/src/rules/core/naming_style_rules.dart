@@ -1298,10 +1298,59 @@ class PreferBooleanPrefixesForParamsRule extends SaropaLintRule {
 
 /// Warns when callback fields don't follow onX naming convention.
 ///
-/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
 ///
 /// **Stylistic rule (opt-in only).** Naming convention with no performance or correctness impact.
 class PreferCorrectCallbackFieldNameRule extends SaropaLintRule {
+  /// Names whose role is to produce/transform a value or perform an action, not
+  /// to handle an event — so the `on` prefix would be semantically wrong even
+  /// when the type is callback-shaped (e.g. a `VoidCallback validator`). The `on`
+  /// prefix convention is reserved for event handlers invoked *when an event
+  /// happens* (`onTap`); builders, validators, getters/setters, factories,
+  /// providers, predicates, comparators and selectors are invoked *to obtain a
+  /// result*. Matched as whole-name or suffix, lowercased (so `itemBuilder`,
+  /// `formValidator` are exempt).
+  static const Set<String> _nonCallbackNameRoles = <String>{
+    'builder',
+    'validator',
+    'getter',
+    'setter',
+    'factory',
+    'provider',
+    'predicate',
+    'comparator',
+    'selector',
+  };
+
+  /// True when [typeStr] is a genuine *event-callback* type.
+  ///
+  /// Why narrowed (v6): the `on` prefix convention applies only to event
+  /// handlers (invoked when an event occurs), not to value providers
+  /// (`T Function()` clock/getter), builders, validators, or imperative action
+  /// thunks. The previous predicate substring-matched bare `Function`, so it
+  /// flagged every function-typed member — `DateTime Function()? now` (a clock
+  /// source) and `void Function() start` (an action thunk) — a whole class of
+  /// false positives. We now trigger only on explicit callback typedefs whose
+  /// name encodes event-handler intent: anything containing `Callback`
+  /// (VoidCallback, GestureTapCallback, AsyncCallback, ...) plus `ValueChanged`
+  /// and `ValueSetter`. Bare `Function` / `void Function`, and `ValueGetter`
+  /// (a value provider, not an event handler), are intentionally excluded.
+  static bool _isEventCallbackType(String typeStr) {
+    return typeStr.contains('Callback') ||
+        typeStr.contains('ValueChanged') ||
+        typeStr.contains('ValueSetter');
+  }
+
+  /// True when [name]'s role is a non-event one ([_nonCallbackNameRoles]), so the
+  /// `on` prefix must not be required even for a callback-shaped type.
+  static bool _hasNonCallbackNameRole(String name) {
+    final String lower = name.toLowerCase();
+    for (final String role in _nonCallbackNameRoles) {
+      if (lower == role || lower.endsWith(role)) return true;
+    }
+    return false;
+  }
+
   PreferCorrectCallbackFieldNameRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
@@ -1325,7 +1374,7 @@ class PreferCorrectCallbackFieldNameRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'prefer_correct_callback_field_name',
-    '[prefer_correct_callback_field_name] Using onXxx naming for callback fields is a Dart API convention. Callback naming does not affect code behavior or performance. Enable via the stylistic tier. {v5}',
+    '[prefer_correct_callback_field_name] Using onXxx naming for callback fields is a Dart API convention. Callback naming does not affect code behavior or performance. Enable via the stylistic tier. {v6}',
     correctionMessage:
         "Rename callback fields to use the 'on' prefix following Flutter convention. For example, callback becomes onCallback and tapHandler becomes onTap.",
     severity: DiagnosticSeverity.INFO,
@@ -1340,24 +1389,19 @@ class PreferCorrectCallbackFieldNameRule extends SaropaLintRule {
       final TypeAnnotation? typeAnnotation = node.fields.type;
       if (typeAnnotation == null) return;
 
-      // Check if this is a callback type (Function or VoidCallback or similar)
+      // Only genuine event-callback types qualify — see _isEventCallbackType for
+      // why bare `Function` no longer counts (avoids flagging clock sources,
+      // builders, and action thunks).
       final String typeStr = typeAnnotation.toSource();
-      final bool isCallback =
-          typeStr.contains('Function') ||
-          typeStr.contains('Callback') ||
-          typeStr.contains('ValueChanged') ||
-          typeStr.contains('ValueGetter') ||
-          typeStr.contains('ValueSetter') ||
-          typeStr.contains('VoidCallback') ||
-          typeStr.contains('GestureTapCallback') ||
-          (typeStr.startsWith('void Function') || typeStr.contains('=> void'));
-
-      if (!isCallback) return;
+      if (!_isEventCallbackType(typeStr)) return;
 
       for (final VariableDeclaration variable in node.fields.variables) {
         final String name = variable.name.lexeme;
         // Skip private fields and fields already prefixed with 'on'
         if (name.startsWith('_')) continue;
+        // Builders/validators/getters/etc. are not event handlers even when the
+        // type is callback-shaped; `on` would invert their meaning.
+        if (_hasNonCallbackNameRole(name)) continue;
         if (name.startsWith('on') && name.length > 2) {
           final String thirdChar = name[2];
           if (thirdChar == thirdChar.toUpperCase()) continue;
@@ -1387,19 +1431,13 @@ class PreferCorrectCallbackFieldNameRule extends SaropaLintRule {
         if (typeAnnotation == null || paramName == null) continue;
 
         final String typeStr = typeAnnotation.toSource();
-        final bool isCallback =
-            typeStr.contains('Function') ||
-            typeStr.contains('Callback') ||
-            typeStr.contains('ValueChanged') ||
-            typeStr.contains('ValueGetter') ||
-            typeStr.contains('ValueSetter') ||
-            typeStr.contains('VoidCallback') ||
-            typeStr.contains('GestureTapCallback');
-
-        if (!isCallback) continue;
+        if (!_isEventCallbackType(typeStr)) continue;
 
         // Skip private params and params already prefixed with 'on'
         if (paramName.startsWith('_')) continue;
+        // Builders/validators/getters/etc. are value providers, not event
+        // handlers — exempt even when callback-shaped.
+        if (_hasNonCallbackNameRole(paramName)) continue;
         if (paramName.startsWith('on') && paramName.length > 2) {
           final String thirdChar = paramName[2];
           if (thirdChar == thirdChar.toUpperCase()) continue;

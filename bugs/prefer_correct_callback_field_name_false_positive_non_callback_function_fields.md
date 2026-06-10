@@ -1,8 +1,32 @@
 # BUG: `prefer_correct_callback_field_name` — fires on non-callback function-typed fields/params (clock source, action thunk)
 
-**Status: Open**
+**Status: Fixed**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
+
+## Resolution (2026-06-10)
+
+Implemented suggestions (1) and (2) in `naming_style_rules.dart`
+(`PreferCorrectCallbackFieldNameRule`, rule version bumped v5 → v6):
+
+- **`_isEventCallbackType(typeStr)`** replaces the inline `isCallback` predicate in
+  both the field branch and the constructor-parameter branch. It drops the bare
+  `Function` / `void Function` / `=> void` substring triggers and `ValueGetter`
+  (a value provider), keeping only genuine event-callback shapes: any type
+  containing `Callback` (VoidCallback, GestureTapCallback, AsyncCallback, …),
+  `ValueChanged`, or `ValueSetter`.
+- **`_hasNonCallbackNameRole(name)`** exempts names that are/ end in
+  `builder`, `validator`, `getter`, `setter`, `factory`, `provider`,
+  `predicate`, `comparator`, `selector` even when the type is callback-shaped.
+
+Suggestion (3) (configurable exemption list) was **not** implemented — it adds
+config plumbing not needed for the reported false positives; left for a future
+change if domain providers beyond the name-role list surface.
+
+Verified with the scan CLI against a reproducer enabling only this rule: `now`
+(`DateTime Function()?`), `start` (`void Function()`), `builder`, `validator`,
+and `onTap` produce **no** diagnostic; `tapHandler` (`VoidCallback`) and
+`changed` (`ValueChanged<int>`) still fire. Fixture updated with all seven cases.
 
 Created: 2026-06-10
 Rule: `prefer_correct_callback_field_name`
