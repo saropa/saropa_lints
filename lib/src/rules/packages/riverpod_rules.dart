@@ -3770,3 +3770,79 @@ class PreferRiverpodKeepAliveRule extends SaropaLintRule {
     });
   }
 }
+
+/// Flags `StateNotifier` / `StateNotifierProvider`, deprecated in riverpod 3.0.
+///
+/// Since: v13.13.0 | Rule version: v1
+///
+/// riverpod 3.0 deprecated the legacy `StateNotifier` / `StateNotifierProvider`
+/// APIs (moved to `package:flutter_riverpod/legacy.dart`) in favor of `Notifier`
+/// / `NotifierProvider` and `AsyncNotifier` / `AsyncNotifierProvider`. New code
+/// on riverpod 3.x should not introduce the legacy types. Gated to the
+/// `riverpod_3` rule pack (riverpod >= 3.0.0) so riverpod 1.x/2.x projects —
+/// where these types are still first-class — never see it.
+///
+/// **BAD:**
+/// ```dart
+/// class CounterNotifier extends StateNotifier<int> {   // legacy in riverpod 3
+///   CounterNotifier() : super(0);
+/// }
+/// final p = StateNotifierProvider<CounterNotifier, int>((ref) => CounterNotifier());
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class CounterNotifier extends Notifier<int> {
+///   @override
+///   int build() => 0;
+/// }
+/// final p = NotifierProvider<CounterNotifier, int>(CounterNotifier.new);
+/// ```
+class AvoidRiverpodStateNotifierRule extends SaropaLintRule {
+  AvoidRiverpodStateNotifierRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.warning;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  // Legacy provider/base-class names this rule flags.
+  static const Set<String> _legacyTypes = <String>{
+    'StateNotifier',
+    'StateNotifierProvider',
+    'AutoDisposeStateNotifierProvider',
+  };
+
+  // Perf: skip files that never mention the legacy symbols.
+  @override
+  Set<String>? get requiredPatterns => const <String>{'StateNotifier'};
+
+  static const LintCode _code = LintCode(
+    'avoid_riverpod_state_notifier',
+    '[avoid_riverpod_state_notifier] StateNotifier and StateNotifierProvider were deprecated in riverpod 3.0.0 and moved to package:flutter_riverpod/legacy.dart. New code on riverpod 3.x should use Notifier/NotifierProvider (synchronous state) or AsyncNotifier/AsyncNotifierProvider (async state), which integrate with code generation and the unified provider lifecycle. This rule only runs in the riverpod_3 rule pack (riverpod >= 3.0.0); riverpod 1.x/2.x projects keep using StateNotifier. {v1}',
+    correctionMessage:
+        'Migrate StateNotifier to Notifier (override build() for initial state) and StateNotifierProvider to NotifierProvider; use AsyncNotifier for asynchronous initialization.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addNamedType((NamedType node) {
+      if (!_legacyTypes.contains(node.name.lexeme)) return;
+      // Only flag in files that use riverpod, so an unrelated user-defined
+      // StateNotifier elsewhere is not mistaken for the riverpod type.
+      if (!fileImportsPackage(node, PackageImports.riverpod)) return;
+      reporter.atNode(node);
+    });
+  }
+}

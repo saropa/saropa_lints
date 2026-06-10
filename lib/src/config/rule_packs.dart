@@ -83,6 +83,13 @@ const Map<String, RulePackDependencyGate> kRulePackDependencyGates = {
   // handlers. avoid_bloc_map_event_to_state is relocated out of the base `bloc`
   // pack so bloc 7.x projects (where the override is valid) never see it.
   'bloc_8': RulePackDependencyGate(dependency: 'bloc', constraint: '>=8.0.0'),
+  // riverpod 3.0.0 deprecated StateNotifier/StateNotifierProvider (moved to
+  // legacy.dart). avoid_riverpod_state_notifier is relocated out of the base
+  // `riverpod` pack so 1.x/2.x projects keep those first-class types.
+  'riverpod_3': RulePackDependencyGate(
+    dependency: 'riverpod',
+    constraint: '>=3.0.0',
+  ),
 };
 
 /// Packs that require pubspec `environment` SDK constraints (Phase 6).

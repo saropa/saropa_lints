@@ -688,6 +688,15 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
     dependencyGate: { package: 'riverpod', constraint: '>=2.0.0' },
   },
   {
+    id: 'riverpod_3',
+    label: 'Riverpod 3.x',
+    matchPubNames: ['flutter_riverpod', 'hooks_riverpod', 'riverpod'],
+    ruleCodes: [
+      'avoid_riverpod_state_notifier',
+    ],
+    dependencyGate: { package: 'riverpod', constraint: '>=3.0.0' },
+  },
+  {
     id: 'rxdart',
     label: 'RxDart',
     matchPubNames: ['rxdart'],

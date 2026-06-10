@@ -69,6 +69,8 @@ const Map<String, Set<String>> kPubspecMarkersByPack = {
   // dependency gate (riverpod >= 2.0.0) in kRulePackDependencyGates restricts it
   // to projects where the Notifier API exists. See kRelocatedRulePackCodes.
   'riverpod_2': {'riverpod', 'flutter_riverpod', 'hooks_riverpod'},
+  // Semver-gated companion (riverpod >= 3.0.0): StateNotifier legacy migration.
+  'riverpod_3': {'riverpod', 'flutter_riverpod', 'hooks_riverpod'},
   'rxdart': {'rxdart'},
   'shared_preferences': {'shared_preferences'},
   'sqflite': {'sqflite'},
@@ -99,6 +101,7 @@ const Map<String, String> kPackUiLabels = {
   'qr_scanner': 'QR / scanner',
   'riverpod': 'Riverpod',
   'riverpod_2': 'Riverpod 2.x',
+  'riverpod_3': 'Riverpod 3.x',
   'rxdart': 'RxDart',
   'shared_preferences': 'shared_preferences',
   'sqflite': 'sqflite',

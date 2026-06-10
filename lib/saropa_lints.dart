@@ -1404,6 +1404,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidCircularProviderDepsRule.new,
   RequireErrorHandlingInAsyncRule.new,
   PreferNotifierOverStateRule.new,
+  AvoidRiverpodStateNotifierRule.new,
   // GetX rules (hidden in all_rules.dart)
   // RequireGetxControllerDisposeRule(),
   // AvoidObsOutsideControllerRule(),

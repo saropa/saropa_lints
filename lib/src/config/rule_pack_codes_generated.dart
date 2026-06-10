@@ -374,6 +374,7 @@ const Map<String, Set<String>> kRulePackRuleCodesGenerated = {
     'use_ref_read_synchronously',
   },
   'riverpod_2': {'prefer_notifier_over_state'},
+  'riverpod_3': {'avoid_riverpod_state_notifier'},
   'rxdart': {
     'avoid_behavior_subject_last_value',
     'prefer_rxdart_for_complex_streams',
@@ -444,6 +445,7 @@ const Map<String, Set<String>> kRulePackPubspecMarkersGenerated = {
   'qr_scanner': {'mobile_scanner', 'qr_flutter'},
   'riverpod': {'flutter_riverpod', 'hooks_riverpod', 'riverpod'},
   'riverpod_2': {'flutter_riverpod', 'hooks_riverpod', 'riverpod'},
+  'riverpod_3': {'flutter_riverpod', 'hooks_riverpod', 'riverpod'},
   'rxdart': {'rxdart'},
   'shared_preferences': {'shared_preferences'},
   'sqflite': {'sqflite'},
