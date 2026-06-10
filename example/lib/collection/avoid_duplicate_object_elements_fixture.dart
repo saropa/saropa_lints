@@ -121,3 +121,16 @@ void _good251() {
   final list = [myObj, otherObj, thirdObj];
   final bools = [true, false];
 }
+
+// GOOD: symmetric gradient ramp — baseColor at both ends is required by the
+// visual shape. `colors:` is a position-sensitive sequence, so bookend
+// repetition is intentional, not a copy-paste error. No lint.
+void _goodGradient() {
+  final shimmer = LinearGradient(
+    colors: [baseColor, highlightColor, baseColor],
+    stops: const [0.0, 0.5, 1.0],
+  );
+  final pulse = RadialGradient(
+    colors: [accentColor, fadeColor, accentColor],
+  );
+}
