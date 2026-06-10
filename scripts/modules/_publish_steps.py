@@ -520,6 +520,11 @@ def run_pre_publish_audits(project_dir: Path) -> tuple[bool, object]:
                 blocking_reasons.append(
                     "dart analyze failed (--fatal-infos); fix issues in report above"
                 )
+            if not getattr(audit_result, "stub_guard_passed", True):
+                blocking_reasons.append(
+                    "Stub-test guard failed: always-pass stub tests present "
+                    "(empty-body or tautology) — see test/integrity/stub_test_guard_test.dart"
+                )
             for reason in blocking_reasons:
                 print_error(f"  • {reason}")
         if spelling_blocks:

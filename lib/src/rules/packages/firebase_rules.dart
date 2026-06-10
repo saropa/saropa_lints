@@ -2537,7 +2537,8 @@ class RequireFirestoreIndexRule extends SaropaLintRule {
         'index. Query will fail at runtime without the required index. {v2}',
     correctionMessage:
         'Create a composite index in Firebase Console or firestore.indexes.json.',
-    severity: DiagnosticSeverity.ERROR,
+    // SEV-01 (downgraded from ERROR): heuristic ("may need"); index-missing is a should-fix, not certain breakage.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
@@ -2687,7 +2688,8 @@ class RequireFirebaseCompositeIndexRule extends SaropaLintRule {
     correctionMessage:
         'Add a .indexOn rule for the ordered child key in your '
         'database.rules.json or Firebase Console security rules.',
-    severity: DiagnosticSeverity.ERROR,
+    // SEV-01 (downgraded from ERROR): performance degradation (heuristic "may lack"), not a crash.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Terminal methods that execute an RTDB query.

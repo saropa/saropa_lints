@@ -1556,7 +1556,8 @@ class AvoidGlobalRiverpodProvidersRule extends SaropaLintRule {
     '[avoid_global_riverpod_providers] Defining providers at the global scope creates implicit dependencies, makes testing difficult, and can cause state to leak between tests or app sessions. This leads to flaky tests, unpredictable bugs, and hard-to-maintain code. {v5}',
     correctionMessage:
         'Define providers inside a ProviderScope or document their scope clearly to ensure test isolation and predictable state management.',
-    severity: DiagnosticSeverity.ERROR,
+    // SEV-01 (downgraded from ERROR): testability/architecture, not a crash.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _providerTypes = <String>{
@@ -1746,7 +1747,8 @@ class RequireAutoDisposeRule extends SaropaLintRule {
     '[require_auto_dispose] Not using autoDispose with Riverpod providers can cause memory leaks, as providers and their resources may remain in memory after they are no longer needed. This can lead to increased memory usage and degraded app performance. {v2}',
     correctionMessage:
         'Use Provider.autoDispose, StateProvider.autoDispose, etc., to ensure providers are disposed when no longer needed and prevent memory leaks.',
-    severity: DiagnosticSeverity.ERROR,
+    // SEV-01 (downgraded from ERROR): provider lifetime/perf recommendation, not a missing-dispose crash.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _providerTypes = <String>{
@@ -1947,7 +1949,8 @@ class AvoidRefInBuildBodyRule extends SaropaLintRule {
     '[avoid_ref_in_build_body] Using ref.read() in build() does not trigger widget rebuilds when the provider changes, leading to stale UI, missed updates, and confusing bugs. This breaks the reactive model of Riverpod and can cause your app to display outdated information. {v5}',
     correctionMessage:
         'Use ref.watch() for reactive updates in build(), or move ref.read() to a callback like onPressed to ensure the UI updates correctly.',
-    severity: DiagnosticSeverity.ERROR,
+    // SEV-01 (downgraded from ERROR): stale-UI bug (no rebuild), not a crash.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override

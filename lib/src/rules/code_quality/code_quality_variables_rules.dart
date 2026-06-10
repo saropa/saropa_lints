@@ -3090,7 +3090,8 @@ class AvoidLateForNullableRule extends SaropaLintRule {
     '[avoid_late_for_nullable] Nullable type declared with late keyword. Since the type already accepts null, the late keyword adds no initialization safety and instead introduces a hidden crash path: accessing the variable before assignment throws LateInitializationError rather than returning null. {v4}',
     correctionMessage:
         'Remove the late keyword and rely on the nullable type (T?) with null checks. The variable will default to null until explicitly assigned, which is safer and more predictable.',
-    severity: DiagnosticSeverity.ERROR,
+    // SEV-01 (downgraded from ERROR): latent footgun (LateInit on misuse), not broken-now code.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override

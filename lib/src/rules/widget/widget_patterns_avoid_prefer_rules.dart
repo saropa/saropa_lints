@@ -2619,7 +2619,8 @@ class AvoidMultipleMaterialAppsRule extends SaropaLintRule {
     '[avoid_multiple_material_apps] Multiple MaterialApp (or CupertinoApp) widgets in the tree create separate Navigator stacks, separate Theme contexts, and independent Locale/MediaQuery scopes. This breaks navigation (pushNamed cannot reach routes in the other app), causes theme inconsistencies, and doubles memory usage for shared resources. {v2}',
     correctionMessage:
         'Keep a single MaterialApp at the root. For sub-navigators, use Navigator widgets or a nested Router instead of adding another MaterialApp.',
-    severity: DiagnosticSeverity.ERROR,
+    // SEV-01 (downgraded from ERROR): structural/navigation bug, not a crash/exploit.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _appWidgets = <String>{

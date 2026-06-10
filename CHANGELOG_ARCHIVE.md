@@ -372,7 +372,6 @@ Package Vibrancy and cross-file analysis get proper extension UI and several new
 - Cross-file CLI now includes a first-pass `watch` mode that re-runs analysis on Dart file changes with configurable debounce and command targeting, so teams can iterate on architecture checks without manually re-running commands after each edit. No action required unless you want to use `watch` with `--command` and optional `--watch-debounce-ms`.
 - Cross-file `watch` mode now prints per-rerun delta summaries (new vs resolved finding sets for `unused-files`, `circular-deps`, `feature-deps`, `dead-imports`, and `unused-symbols`, or per-rerun `import-stats` file/total-import count deltas), so ongoing edits are easier to track than re-reading full output each time. No action required.
 - Cross-file text reporting now includes a feature dependency matrix view alongside adjacency listings, so boundary relationships are easier to scan visually in terminal and CI logs without post-processing. No action required.
-- Added `tool/cross_file_benchmark.dart` to run repeatable cross-file performance benchmarks on synthetic 1000+-file projects, so maintainers can measure analysis throughput and compare optimization changes with a consistent harness. No action required unless you want to run benchmark checks locally or in CI.
 - Cross-file `dead-imports` now understands local file re-exports when determining whether imported symbols are referenced, so barrel-file import patterns are less likely to be misreported as dead imports in the first-pass heuristic. No action required.
 - Cross-file `dead-imports` now treats deferred imports as used when their prefix is used to call `loadLibrary()`, reducing false positives in lazy-loading patterns while semantic resolution work continues. No action required.
 - Package Vibrancy now persists per-package score snapshots in workspace-local history and renders inline sparklines in the report so users can see score direction at a glance without external tracking. No action required.
@@ -418,6 +417,7 @@ Package Vibrancy and cross-file analysis get proper extension UI and several new
 - Added a dedicated Project Vibrancy GitHub Actions workflow that emits a JSON artifact on pull requests that touch Project Vibrancy sources (see workflow `paths:` filters) and on `workflow_dispatch` manual runs, so maintainers can inspect code-health snapshots from CI without running the CLI locally. No action required for package users.
 - Added sidebar UI-state regression checks for Project Vibrancy scope badge/count and persisted filter wiring, so future extension refactors are less likely to silently break the primary filtering flow. No action required for package users.
 - Removed many tautological `isNotNull` expectations on guaranteed-non-null rule metadata strings in package tests (CI already enforces stub integrity), preserving rule instantiation, fixture checks, and substantive assertions such as fix metadata and AST-backed tests. No action required for pub.dev or Marketplace users.
+- Added `tool/cross_file_benchmark.dart` to run repeatable cross-file performance benchmarks on synthetic 1000+-file projects, so maintainers can measure analysis throughput and compare optimization changes with a consistent harness. No action required for pub.dev or Marketplace users.
 
 </details>
 
@@ -494,7 +494,6 @@ This release is a quality pass aimed at precision: fewer accidental matches, few
 ### Fixed
 
 - `require_intl_plural_rules` now treats comparisons to the integer literal **1** only when that digit is not part of a longer numeral, so helpers that branch on values like 12 or 100 (12-hour labels, build bands, and similar) are not misclassified as manual plural logic. No action required.
-- Long-task name matching for the `dbProcessAll…` skip in `require_notification_for_long_tasks` no longer trips the package's own `avoid_string_substring` rule, so `dart analyze --fatal-infos` stays clean for contributors building the package from source. No action required for end users.
 - `avoid_excessive_rebuilds_animation` now only considers `AnimatedBuilder` and `ListenableBuilder` when the listenable resolves to an `Animation` subtype, so `FutureBuilder`, `StreamBuilder`, `ValueListenableBuilder`, and non-animation listenables no longer get a misleading “every frame” warning. No action required.
 - `require_notification_for_long_tasks` now matches long-operation tokens on camelCase boundaries (so names like `ImportAllowed` no longer hit `importAll`), skips `dbProcessAll…` DB helpers, skips the whole file when common in-app progress or notification-plugin strings appear, and splits example fixtures so BAD cases are not suppressed by GOOD escape hatches in the same file. No action required.
 - Rules that read `Info.plist` through the shared helper now re-read when the file’s size or modification time changes, match keys with whitespace-tolerant XML checks, and normalize analyzer `file:` URIs to OS paths, so `require_image_picker_permission_ios` no longer false-positives once `NSCameraUsageDescription` is present. No action required.
@@ -508,6 +507,7 @@ This release is a quality pass aimed at precision: fewer accidental matches, few
 - Archived the closed `require_notification_for_long_tasks` foreground false-positive report under `plans/history/2026.04/2026.04.26/` and removed it from `bugs/`. No action required for package users.
 - Archived the resolved `avoid_excessive_rebuilds_animation` false-positive report under `plans/history/2026.04/2026.04.26/` and removed it from `bugs/`. No action required for package users.
 - Archived the resolved `prefer_layout_builder_for_constraints` false-positive report under `plans/history/2026.04/2026.04.26/` and removed it from `bugs/`. No action required for package users.
+- Long-task name matching for the `dbProcessAll…` skip in `require_notification_for_long_tasks` no longer trips the package's own `avoid_string_substring` rule, so `dart analyze --fatal-infos` stays clean for contributors building the package from source. No action required for end users.
 
 </details>
 
@@ -685,14 +685,11 @@ Path-safety rules ignore clearly safe literal-only helpers and common Dart SDK p
 
 `saropa_lints` itself passes `dart analyze --fatal-infos` again thanks to dogfood-only disables and small plugin fixes; publish script gains a publish-existing-.vsix mode. [log](https://github.com/saropa/saropa_lints/blob/v12.3.2/CHANGELOG.md)
 
-### Fixed
-
-- `dart analyze --fatal-infos` is clean on saropa_lints itself via targeted code fixes plus dogfood-only disables in this repo’s `analysis_options.yaml`, so maintainers can ship without thousands of self-applied rule hits while published consumer behavior is unchanged. No action required for package users.
-
 <details>
 <summary>Maintenance</summary>
 
 - Publish script adds mode 7 to publish the newest packaged `.vsix` without repackaging after `pubspec`/`package.json` post-publish bumps, avoiding version skew when finishing a partial extension release. No action required for package users.
+- `dart analyze --fatal-infos` is clean on saropa_lints itself via targeted code fixes plus dogfood-only disables in this repo’s `analysis_options.yaml`, so maintainers can ship without thousands of self-applied rule hits while published consumer behavior is unchanged. No action required for package users.
 
 </details>
 
@@ -890,13 +887,10 @@ Replacement complexity metric — analyzes local pub cache to estimate feasibili
 
 Fixed VS Code Marketplace publishing blocked by TypeScript 5.9 bug; modularized publish script into focused modules. — [log](https://github.com/saropa/saropa_lints/blob/v10.4.1/CHANGELOG.md)
 
-### Fixed
-
-- **(Extension)** Fixed VS Code Marketplace publishing blocked since v10.2.2 by TypeScript 5.9 bug — `tsc --noEmit` fails with "Unknown compiler option" because TS 5.9's `createOptionNameMap()` reads `option.lowerCaseName` (a property that doesn't exist on any option declaration), building an empty lookup map; pinned TypeScript to `~5.8. No action required.
-
 <details>
 <summary>Maintenance</summary>
 
+- Fixed VS Code Marketplace publishing blocked since v10.2.2 by TypeScript 5.9 bug — `tsc --noEmit` fails with "Unknown compiler option" because TS 5.9's `createOptionNameMap()` reads `option.lowerCaseName` (a property that doesn't exist on any option declaration), building an empty lookup map; pinned TypeScript to `~5.8. No action required.
 - Modularized `scripts/publish.py` (1,246 → 202 lines) into three focused modules: `_publish_workflow.py` (pipeline orchestration), version prompting/sync into `_version_changelog.py`, and store verification into `_extension_publish.py`.
 - Added `scripts/README.md` with architecture diagram, module map, exit codes, and troubleshooting.
 - Added pub.dev publication verification: polls the pub.dev API after publish to confirm the new version is live.
@@ -1187,7 +1181,6 @@ Import graph tracking, scan API, TODOs & Hacks view, and new lint rules. — [lo
 
 ### Added
 
-• **Package** — Performance benchmark: added `test/import_graph_tracker_perf_test.dart` to measure ordering overhead for FILE IMPORTANCE / FIX PRIORITY / PROJECT STRUCTURE sections. Synthetic “200-file chain + 500 violations” took ~60-80ms in unit test (the “<20ms” target still needs optimization).
 • **Extension** — Added setting `saropaLints.runAnalysisOpenEditorsOnly` to run `dart/flutter analyze` only for Dart files currently open in VS Code (faster turnaround during focused work).
 
 • **Extension** — **Drift Advisor integration (optional):** When using a Dart/Drift project and a running Saropa Drift Advisor server, enable `saropaLints.driftAdvisor.integration` in settings. The extension discovers the server (ports 8642–8649 by default via GET /api/health), fetches index suggestions and anomalies (GET /api/issues when supported, else legacy endpoints), maps table/column to Dart file/line via PascalCase/camelCase heuristics, and shows issues in the **Drift Advisor** sidebar view and optionally in the Problems list (source "Saropa Drift Advisor"). Settings: integration, portRange, pollIntervalMs, showInProblems. Commands: Refresh, Open in Browser. No dependency on the Drift Advisor extension at install time. See About Saropa Lints and plan in bugs/history.
@@ -1220,7 +1213,8 @@ Import graph tracking, scan API, TODOs & Hacks view, and new lint rules. — [lo
 
 • **Extension** — **Create Saropa Lints Instructions**: Command (Overview title bar and Command Palette) writes a project-instructions file into the workspace from a bundled template, so contributors get project guidelines (essential files, workflow, prohibitions, principles). Uses async file I/O and a short progress notification.
 
-### Administration
+<details>
+<summary>Maintenance</summary>
 
 • **Scripts** — `publish.py` main workflow refactored into smaller helpers (`_PublishContext`, `_run_audit_step`, `_run_pre_publish_pipeline`, `_run_badge_validation_docs_dryrun`, etc.) to reduce cognitive complexity; behavior unchanged. Extension install/publish prompts centralized in `_prompt_extension_install_and_publish`. Main docstring documents flow for reviewers. `SystemExit` from `exit_with_error()` is caught so `finally` (timer summary) runs and the intended exit code is returned.
 
@@ -1233,6 +1227,9 @@ Import graph tracking, scan API, TODOs & Hacks view, and new lint rules. — [lo
 • **Extension** — Prefer `.at(-n)` for from-end array access in celebration/snapshot logic (lint compliance).
 
 • **Extension** — Code quality: resolve SonarQube/TypeScript findings (node: imports, reduced cognitive complexity, batched subscriptions, replaceAll, positive conditions, extracted celebration/status-bar helpers); behavior unchanged.
+• **Package** — Performance benchmark: added `test/import_graph_tracker_perf_test.dart` to measure ordering overhead for FILE IMPORTANCE / FIX PRIORITY / PROJECT STRUCTURE sections. Synthetic “200-file chain + 500 violations” took ~60-80ms in unit test (the “<20ms” target still needs optimization).
+
+</details>
 
 ---
 
@@ -1272,11 +1269,16 @@ _Headless config writer, cross-file analysis CLI, and a polished Issues view._ �
 
 • **Cross-file analysis CLI** — New `cross_file` executable: `dart run saropa_lints:cross_file <command>` with commands `unused-files`, `circular-deps`, `import-stats`, and `report`. Builds the import graph from `lib/`, reports files with no importers, circular import chains, and graph statistics. Output: text (default), JSON, or HTML via `report --output-dir`. Baseline: `--baseline <file>` and `--update-baseline` to suppress known issues and fail only on new violations. Exit codes 0/1/2. README and [doc/cross_file_ci_example.md](doc/cross_file_ci_example.md) for CI. See [ROADMAP Part 3](ROADMAP.md).
 
-• **Central cache stats** — `CacheStatsAggregator.getStats()` returns a single map aggregating statistics from all project caches (import graph, throttle, speculative, rule batch, baseline, semantic, etc.) for debugging and monitoring.
-
 ### Changed
 
 • **Extension** — Polished Issues view violation context menu with icons for Apply fix / Copy message, a separator between action and hide groups, and clearer suppression behavior (rule vs rule-in-file); extension README documents how to clear and manage suppressions from the toolbar.
+
+<details>
+<summary>Maintenance</summary>
+
+• **Central cache stats** — `CacheStatsAggregator.getStats()` returns a single map aggregating statistics from all project caches (import graph, throttle, speculative, rule batch, baseline, semantic, etc.) for debugging and monitoring.
+
+</details>
 
 ---
 
@@ -1344,17 +1346,20 @@ _Streamlining the Package Vibrancy toolbar._ — [log](https://github.com/saropa
 
 • **Lint rules** — registered `prefer_debugPrint` rule that was implemented but never wired into `_allRuleFactories` or assigned a tier; now active in the Recommended tier
 
-• **Examples** — removed stale `custom_lint` dev dependency from all 6 example projects; `custom_lint ^0.8.0` requires `analyzer ^8.0.0` which conflicts with the v5 native plugin's `analyzer ^9.0.0`
-
-• **ROADMAP** — removed `prefer_semver_version` and `prefer_correct_package_name` from the "Deferred: Pubspec Rules" section; both are already implemented and registered
-
-• **Plugin** — removed dead `PreferConstChildWidgetsRule` commented-out factory entry (class never existed)
-
 ### Removed
 
 • **Extension:** removed the "About Package Vibrancy" info icon and webview panel from the Package Vibrancy sidebar toolbar
 
 • **Package Vibrancy** — removed the cryptic problem-severity summary row (colored dots with bare numbers) from the top of the tree; the Action Items group already communicates problem counts and details
+
+<details>
+<summary>Maintenance</summary>
+
+• **Examples** — removed stale `custom_lint` dev dependency from all 6 example projects; `custom_lint ^0.8.0` requires `analyzer ^8.0.0` which conflicts with the v5 native plugin's `analyzer ^9.0.0`
+• **ROADMAP** — removed `prefer_semver_version` and `prefer_correct_package_name` from the "Deferred: Pubspec Rules" section; both are already implemented and registered
+• **Plugin** — removed dead `PreferConstChildWidgetsRule` commented-out factory entry (class never existed)
+
+</details>
 
 ---
 
@@ -1479,8 +1484,6 @@ About screen, Getting Started walkthrough, and consolidated status bar. — [log
 
 • Version number shown in status bar tooltip for deployment verification
 
-• `precompile` script auto-copies root `ABOUT_SAROPA.md` into extension bundle so the About screen stays in sync with the source of truth
-
 ### Changed
 
 • Consolidated three status bar items into one — shows score + tier (e.g. `Saropa: 72% · recommended`), version in tooltip only
@@ -1493,13 +1496,17 @@ About screen, Getting Started walkthrough, and consolidated status bar. — [log
 
 • "Learn More" button renamed to "Learn more online" to clarify it opens a website
 
-### Administration
+<details>
+<summary>Maintenance</summary>
 
 • **CRITICAL** Fixed extension never reaching VS Code Marketplace after v9.0.2 — `run_extension_package()` used `next(glob("*.vsix"))` which returned the stale 9.0.2 `.vsix` (alphabetically before 9.1.0/9.2.0) instead of the newly created one; now deletes old `.vsix` files before packaging and looks for the expected filename first
 
 • Changed extension Marketplace publish prompt default from No to Yes (`[Y/n]`) — previous default silently skipped publishing with no warning
 
 • Replaced misleading "package already published" error messages with clear descriptions of what actually failed
+• `precompile` script auto-copies root `ABOUT_SAROPA.md` into extension bundle so the About screen stays in sync with the source of truth
+
+</details>
 
 ---
 
@@ -1517,23 +1524,25 @@ Extension reliability and subdirectory project support. — [log](https://github
 
 • Fixed `package_config.json` verification to match exact `"saropa_lints"` instead of substring
 
-• Removed unreachable fallback branch in inline annotations path computation
-
 ### Added
 
 • Subdirectory pubspec detection — projects with `pubspec.yaml` one level deep (e.g. `game/pubspec.yaml`) are now discovered automatically
-
-• Centralized project root discovery (`projectRoot.ts`) with per-session caching
-
-• Workspace folder change listener invalidates cached project root
 
 • Added `workspaceContains:*/pubspec.yaml` activation event
 
 ### Changed
 
-• All 13 source files now use `getProjectRoot()` instead of scattering `workspaceFolders[0]` references
-
 • Line-based YAML insertion preserves original CRLF/LF line endings
+
+<details>
+<summary>Maintenance</summary>
+
+• Centralized project root discovery (`projectRoot.ts`) with per-session caching
+• Workspace folder change listener invalidates cached project root
+• All 13 source files now use `getProjectRoot()` instead of scattering `workspaceFolders[0]` references
+• Removed unreachable fallback branch in inline annotations path computation
+
+</details>
 
 ---
 
@@ -1559,13 +1568,16 @@ Sidebar icon refinement. — [log](https://github.com/saropa/saropa_lints/blob/v
 
 • **Sidebar icon:** Changed activity bar icon from solid fill to wireframe (stroked outline) for consistency with VS Code's icon style.
 
-### Administration
+<details>
+<summary>Maintenance</summary>
 
 • **Open VSX publish:** The publish script now prompts for an OVSX_PAT when the environment variable is missing, with platform-specific setup instructions, instead of silently skipping.
 
 • **Stale plugin-cache repair:** `dart analyze` failures caused by a stale analyzer plugin cache are now detected automatically. The script offers to update `analysis_options.yaml` and clear the cache in one step.
 
 • **Post-publish version sync:** After publishing, `analysis_options.yaml` plugin version is updated to the just-published version so `dart analyze` resolves correctly.
+
+</details>
 
 ---
 
@@ -1641,9 +1653,12 @@ The VS Code extension is now the primary way to use saropa_lints. One-click setu
 
 • Tree view fixes: root folder path prefix, severity/impact suppression timing, tier status bar immediate update.
 
-### Administration
+<details>
+<summary>Maintenance</summary>
 
 • Unified publish script (`scripts/publish.py`) for package and extension; extension version synced with package version.
+
+</details>
 
 ---
 
@@ -1667,7 +1682,8 @@ Init `--target` flag, standalone scan command, and init modularization. — [log
 
 • **Standalone scan command:** `dart run saropa_lints scan [path]` runs lint rules directly against any Dart project without requiring saropa_lints as a dependency. Reads the project's `analysis_options.yaml` (generated by `init`) to determine which rules to run. Results are written to a report file with a compact summary on terminal.
 
-### Changed
+<details>
+<summary>Maintenance</summary>
 
 • **Init tool modularization:** Extracted `bin/init.dart` (4,819 lines) into 21 focused modules under `lib/src/init/`, reducing the entry point to 15 lines. No behavior changes.
 
@@ -1692,6 +1708,8 @@ Init `--target` flag, standalone scan command, and init modularization. — [log
 - `tier_ui.dart` — tier selection UI. No action required.
 - `validation.dart` — post-write config validation. No action required.
 - `whats_new.dart` — release notes display (moved from `bin/`). No action required.
+
+</details>
 
 ### Fixed
 
@@ -1803,7 +1821,12 @@ Fix `prefer_readable_line_length` crash and publish script changelog parsing.
 
 • **`prefer_readable_line_length` crash:** Fixed off-by-one error in `PreferReadableLineLengthRule` that caused `Invalid line number` exception when analyzing files. The loop used 1-based indexing but `LineInfo.getOffsetOfLine()` requires 0-based, crashing on the last line of every file.
 
+<details>
+<summary>Maintenance</summary>
+
 • **Publish script changelog logic:** Fixed regexes in `_version_changelog.py` that expected `---\n##` but the actual format uses `---\n\n##` (blank line after separator). This caused `add_version_section` to silently append entries at the end of the file and `add_unreleased_section` to fail entirely. Recovered 8 orphaned changelog entries.
+
+</details>
 
 ---
 
@@ -1815,7 +1838,12 @@ Remove Flutter SDK constraint that broke CI and fix 56 unresolved dartdoc refere
 
 • **Removed Flutter SDK constraint from pubspec.yaml** that caused CI publish workflow to fail (`dart pub get` requires only the Dart SDK; this is a pure Dart package).
 
+<details>
+<summary>Maintenance</summary>
+
 • **Fixed 56 unresolved dartdoc reference warnings** across rule files.
+
+</details>
 
 ---
 
@@ -1823,9 +1851,12 @@ Remove Flutter SDK constraint that broke CI and fix 56 unresolved dartdoc refere
 
 Publish workflow improvements with retry logic and SDK configuration.
 
-### Changed
+<details>
+<summary>Maintenance</summary>
 
 • **Updated publish workflow** with improved retry logic and SDK configuration.
+
+</details>
 
 ---
 
@@ -1833,9 +1864,12 @@ Publish workflow improvements with retry logic and SDK configuration.
 
 Publish script auto-bumps version on tag conflict; GitHub Actions workflow uses stable Dart SDK.
 
-### Changed
+<details>
+<summary>Maintenance</summary>
 
 • **Publish script and workflow:** GitHub Actions publish workflow now uses the Dart stable SDK (no exact-version lookup), adds a Verify Dart SDK step, and retries `dart pub get` once on failure. When the release tag already exists on the remote, the script auto-bumps the pubspec version and adds a "Release version" CHANGELOG section instead of failing. The script automatically commits and pushes `.github/workflows/publish.yml` when it has uncommitted changes, so no manual git steps are required.
+
+</details>
 
 ---
 
@@ -1929,7 +1963,12 @@ In this release we’re preparing bug fixes and small rule refinements.
 
 • **require_content_type_validation** — No longer reports when a dominating content-type guard returns or throws (not only return) before `jsonDecode`, and when the guard is nested inside an outer if block. Resolves bug_require_api_response_validation_require_content_type_in_validator_impl.
 
+<details>
+<summary>Maintenance</summary>
+
 • **prefer_webview_sandbox** — Internal: removed null assertion in controller root helper; handle nullable `PropertyAccess.target` to satisfy avoid_null_assertion.
+
+</details>
 
 ---
 
@@ -1994,10 +2033,6 @@ This is a version bump for compatibility — the last release that supports anal
 ## [6.2.1]
 
 In this release we fix a few rules (use_existing_variable, require_debouncer_cancel, duplicate bool-param diagnostics), add rules for pagination error recovery and ignore-comment spacing, and ship 28+ new quick fixes. The publish script now runs tests in step 6 and loads analysis_options from the project root.
-
-### Changed
-
-• **Publish script (Step 6 & 7):** Step 6 (analysis) now runs `dart test --chain-stack-traces` after `dart analyze`, piping output to `reports/YYYYMMDD/YYYYMMDD_HHMMSS_chain_stack_traces.log` and checking for failure lines so test failures surface early. Step 7 on failure runs the same command (no retry prompt) and reports the log path and error lines. Shared `_dart_test_env()` for test temp dir; spinner shown during the test run.
 
 ### Added
 

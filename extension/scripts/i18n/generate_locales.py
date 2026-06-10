@@ -761,6 +761,16 @@ def main() -> int:
         print(f"    {c('blue', str(report_path))}")
         print(c("gray", "    Sections: cross-locale rollup -> paste-ready stubs -> per-locale lists."))
 
+        # Per-string NLLB-fallback report: names exactly what NLLB could not do
+        # (Google-served, English-left, unsplittable) so fallbacks are visible and
+        # actionable instead of hidden behind the engine-mix counts.
+        fb_path = root / "reports" / "i18n_nllb_fallbacks.md"
+        fb_count = write_fallback_report(fb_path)
+        if fb_count:
+            print()
+            print(c("bold", f"  NLLB fallback report ({fb_count} string(s) NLLB did not translate):"))
+            print(f"    {c('blue', str(fb_path))}")
+
     if interrupted_locale is not None:
         print()
         print(

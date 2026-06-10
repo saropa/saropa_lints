@@ -619,3 +619,31 @@ Canonical **Flutter embedder / build target** identifiers (align with `flutter c
 ---
 
 _Document status: unified plan (packs + resolver + extension + migrations); Phase 0 locks §7._
+
+---
+
+## Finish Report (2026-06-10)
+
+**Scope (LINTER variant):** (A) Dart analyzer-plugin config + tooling + tests, plus (C) docs. No rule logic changed; this is rule-pack registry / resolver / tooling work.
+
+**Trigger:** user asked "what to build next?" after the prior session's plan-status review; chosen direction was "one real semver pack" — the first non-demo semver-gated package pack, replacing the `collection_compat` placeholder as the only gated entry.
+
+**What shipped (two related slices):**
+
+1. **Direct-vs-transitive resolver primitive (Phase 3, §7.3).** `pubspec_lock_resolver` now parses the lock `dependency:` field: `parsePubspecLockDependencyKinds`, cached `readDependencyKinds`, and `isDirectDependency(root, name)` (true for `direct main`/`direct dev`/`direct overridden`/legacy bare `direct`, false for `transitive`, null when unknown). The suggest UX that would consume it is still deferred (init/extension already gate on `pubspec.yaml`, which is direct-only by nature).
+
+2. **First real semver-gated package pack — `riverpod_2`.** Gates `prefer_notifier_over_state` on `riverpod >= 2.0.0` (the `NotifierProvider` migration target only exists in Riverpod 2.x). This surfaced and closed an architecture gap: the flat-gate design could previously only gate **standalone** packs (`collection_compat`), because a rule owned by an ungated package pack (`riverpod`) would be re-added whenever that pack was enabled. New **relocation** mechanism — `kRelocatedRulePackCodes` + `applyRelocatedRulePacks` in `tool/rule_pack_audit.dart`, applied by BOTH the generator and the audit — MOVES a version-gated rule out of its file-derived pack into the gated pack, so the gate is authoritative.
+
+**Reviewer-AI notes:**
+
+- The relocation is applied in one shared function consumed by both `tool/rule_pack_audit.dart` (consistency check) and `tool/generate_rule_pack_registry.dart` (codegen), so generated registry and audit cannot drift. Generated files (`rule_pack_codes_generated.dart`, `extension/src/rulePacks/rulePackDefinitions.ts`) were regenerated twice (the TS writer reads the compiled registry, so a second `dart run` picks up the relocated pack) and then `dart format`-ed to match the committed convention.
+- `prefer_notifier_over_state` left the `riverpod` pack (39 codes now) and is the sole member of `riverpod_2` — verified by an ownership test, not just the gate test.
+- The rule class itself is unchanged; its tier listings in `tiers.dart` are harmless because `mergeRulePacksIntoEnabled` strips all pack-owned codes from tier enables before re-adding from enabled packs.
+
+**Still deferred (named in the plan, not regressions):** per-rule `semver_migrations` sub-entries *within* a package pack (§8.1). Relocation handles the whole-rule-to-gated-pack case; intra-pack sub-gating is the larger remaining feature and was not needed for this migration. Direct-only suggest UX wiring also remains.
+
+**Verification:** `dart run tool/rule_pack_audit.dart` exit 0 (riverpod=39, riverpod_2=1); all 63 `test/config/` tests pass incl. new `riverpod_2` gate + ownership + merge cases; `test/rules/packages/riverpod_rules_test.dart` passes; `dart analyze --fatal-infos` clean.
+
+**Commit note:** code, tests, generated files, and docs for this work were committed by a concurrent session (bundled into earlier commits on `main`); this finish report is appended and committed separately.
+
+**Plan disposition:** plan stays ACTIVE — this task advanced Phase 3 only; Phase 7 and the deferred sub-gating / suggest-UX items keep the plan open (A-MOVE case 3).

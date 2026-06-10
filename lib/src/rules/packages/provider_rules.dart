@@ -59,7 +59,8 @@ class AvoidWatchInCallbacksRule extends SaropaLintRule {
     '[avoid_watch_in_callbacks] Using watch in callbacks (like onPressed or onTap) creates new subscriptions on every call, leading to memory leaks, redundant widget rebuilds, and degraded app performance. This can cause your app to slow down or even crash over time. {v4}',
     correctionMessage:
         'Use ref.read instead of ref.watch in event handlers and callbacks to avoid creating unnecessary subscriptions and prevent memory leaks.',
-    severity: DiagnosticSeverity.ERROR,
+    // SEV-01 (downgraded from ERROR): performance/subscription churn, not a crash.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
@@ -130,7 +131,8 @@ class RequireUpdateShouldNotifyRule extends SaropaLintRule {
     '[require_update_should_notify] If an InheritedWidget does not override updateShouldNotify, all dependents rebuild on every change, causing unnecessary rebuilds, degraded performance, and battery drain. This can make your app slow and unresponsive. {v5}',
     correctionMessage:
         'Override updateShouldNotify in your InheritedWidget to control when dependents rebuild and optimize app performance.',
-    severity: DiagnosticSeverity.ERROR,
+    // SEV-01 (downgraded from ERROR): rebuild performance, not a crash.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
@@ -225,7 +227,8 @@ class AvoidProviderOfInBuildRule extends SaropaLintRule {
     '[avoid_provider_of_in_build] Using Provider.of in build() causes the widget to rebuild every time the provider changes, which can lead to performance issues and unnecessary UI updates. This can make your app less efficient and harder to maintain. {v3}',
     correctionMessage:
         'Use context.watch() for reactive UI updates, or context.read() in callbacks (like onPressed) to avoid unnecessary rebuilds and improve performance.',
-    severity: DiagnosticSeverity.ERROR,
+    // SEV-01 (downgraded from ERROR): rebuild performance, not a crash.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
@@ -335,7 +338,8 @@ class AvoidProviderRecreateRule extends SaropaLintRule {
     '[avoid_provider_recreate] Creating a Provider inside a frequently rebuilding build() method causes the provider to be recreated, losing its state and causing unexpected behavior. This can result in lost user input, bugs, and degraded app performance. {v3}',
     correctionMessage:
         'Move Provider creation to a parent widget that does not rebuild often to preserve provider state and ensure consistent behavior.',
-    severity: DiagnosticSeverity.ERROR,
+    // SEV-01 (downgraded from ERROR): state-loss bug, not a crash/exploit.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
@@ -442,7 +446,8 @@ class AvoidProviderInWidgetRule extends SaropaLintRule {
     '[avoid_provider_in_widget] Declaring a provider inside a widget class breaks Riverpod\'s global state model, leading to multiple provider instances, lost state, and unpredictable bugs. This can make your app behave inconsistently and is hard to debug. {v2}',
     correctionMessage:
         'Move provider declaration to the file level as a top-level final variable to ensure a single, consistent provider instance.',
-    severity: DiagnosticSeverity.ERROR,
+    // SEV-01 (downgraded from ERROR): state-model bug, not a crash/exploit.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _providerTypes = <String>{

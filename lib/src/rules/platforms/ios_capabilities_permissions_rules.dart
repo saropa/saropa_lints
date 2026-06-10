@@ -41,7 +41,8 @@ class RequireIosInfoPlistEntriesRule extends SaropaLintRule {
     '[require_ios_info_plist_entries] iOS permission-gated API detected but the matching Info.plist usage-description key is missing. Apps can crash or be rejected during App Store review. {v1}',
     correctionMessage:
         'Add the required NS*UsageDescription key(s) to ios/Runner/Info.plist.',
-    severity: DiagnosticSeverity.ERROR,
+    // SEV-01 (downgraded from ERROR): config-detection heuristic; deployment concern.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Map<String, String> _methodToKey = <String, String>{

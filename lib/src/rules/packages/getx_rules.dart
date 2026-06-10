@@ -942,7 +942,8 @@ class AvoidGetFindInBuildRule extends SaropaLintRule {
     '[avoid_get_find_in_build] Calling Get.find() inside the build method is inefficient and can cause unnecessary object creation and performance issues. This leads to wasted memory allocations on every rebuild and makes your app less responsive. {v3}',
     correctionMessage:
         'Use GetBuilder<T> or Obx for reactive updates with GetX, and avoid calling Get.find() in build() to improve performance.',
-    severity: DiagnosticSeverity.ERROR,
+    // SEV-01 (downgraded from ERROR): performance issue, not a crash/exploit.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
