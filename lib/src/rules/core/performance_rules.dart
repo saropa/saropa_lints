@@ -1522,7 +1522,9 @@ class PreferValueListenableBuilderRule extends SaropaLintRule {
       // ValueListenableBuilder cannot express the diff-suppression it needs
       // (e.g. a per-minute clock that drops 59 of 60 ticks). The suggested
       // refactor would make it strictly worse, so bail.
-      if (node.toSource().contains('.addListener(')) return;
+      final _AddListenerDetector listenerDetector = _AddListenerDetector();
+      node.accept(listenerDetector);
+      if (listenerDetector.found) return;
 
       // Second pass: walk every method body to count setState calls, detect
       // in-place mutation of a `final` collection, and collect the names of
@@ -1535,14 +1537,7 @@ class PreferValueListenableBuilderRule extends SaropaLintRule {
 
       for (final ClassMember member in node.bodyMembers) {
         if (member is MethodDeclaration) {
-          // Hypothesis A: a setState inside an `async` method body assigns an
-          // ASYNC-LOADED value (e.g. `setState(() => _dbCount = await ...)` in
-          // an async initState helper). A ValueNotifier cannot remove the async
-          // load, so the suggested refactor does not apply.
-          if (member.body.isAsynchronous &&
-              member.body.toSource().contains('setState')) {
-            hasAsyncSetState = true;
-          }
+          final int setStateBefore = setStateCallCount;
           member.body.visitChildren(
             _SetStateCounterVisitor(
               () => setStateCallCount++,
@@ -1553,6 +1548,14 @@ class PreferValueListenableBuilderRule extends SaropaLintRule {
               () => hasBareSetState = true,
             ),
           );
+          // Hypothesis A: a setState inside an `async` method body assigns an
+          // ASYNC-LOADED value (e.g. `setState(() => _dbCount = await ...)` in
+          // an async initState helper). A ValueNotifier cannot remove the async
+          // load, so the suggested refactor does not apply.
+          if (member.body.isAsynchronous &&
+              setStateCallCount > setStateBefore) {
+            hasAsyncSetState = true;
+          }
         }
       }
 
@@ -1635,6 +1638,19 @@ class PreferValueListenableBuilderRule extends SaropaLintRule {
     if (type is! NamedType) return false;
     final String name = type.name.lexeme;
     return name == 'Future' || name == 'Stream';
+  }
+}
+
+/// Detects whether a class manually wires an external Listenable via
+/// `addListener(...)` — the signal that its rebuilds are listenable-driven, not
+/// scalar-driven (Hypothesis C for prefer_value_listenable_builder).
+class _AddListenerDetector extends RecursiveAstVisitor<void> {
+  bool found = false;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    if (node.methodName.name == 'addListener') found = true;
+    super.visitMethodInvocation(node);
   }
 }
 
