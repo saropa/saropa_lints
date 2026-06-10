@@ -36,4 +36,35 @@ void main() {
       );
     });
   });
+
+  group('emptyBodyStubCountIn', () {
+    // The publish/CI gate keys on this narrower definition, so its boundary
+    // (empty block = stub; any statement = not) must stay pinned.
+    test('empty block body counts as a stub', () {
+      expect(emptyBodyStubCountIn("void main() { test('x', () {}); }"), 1);
+    });
+
+    test('testWidgets with empty body counts as a stub', () {
+      expect(
+        emptyBodyStubCountIn("void main() { testWidgets('x', (t) {}); }"),
+        1,
+      );
+    });
+
+    // A non-empty body is NOT an empty-body stub even when it has no
+    // expect/assert — this is the "does not throw" pattern the broader
+    // stubCountIn flags but the gate must not, so it stays runnable.
+    test('non-empty body without an assertion is not an empty-body stub', () {
+      const src = "void main() { test('x', () { final b = 1; b.toString(); }); }";
+      expect(emptyBodyStubCountIn(src), 0);
+      expect(stubCountIn(src), 1); // contrast: broader heuristic still flags it
+    });
+
+    test('body with only a comment is still an empty block', () {
+      expect(
+        emptyBodyStubCountIn("void main() { test('x', () { /* todo */ }); }"),
+        1,
+      );
+    });
+  });
 }
