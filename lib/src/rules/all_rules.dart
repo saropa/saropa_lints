@@ -37,6 +37,7 @@ export 'config/platform_rules.dart';
 // Core (async, context, naming, state, docs, performance)
 export 'core/async_rules.dart';
 export 'core/class_constructor_rules.dart';
+export 'core/compound_performance_rules.dart';
 export 'core/context_rules.dart';
 export 'core/documentation_rules.dart';
 export 'core/naming_style_rules.dart';
