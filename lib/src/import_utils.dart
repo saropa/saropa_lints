@@ -149,6 +149,12 @@ class PackageImports {
     'package:youtube_player_flutter/',
     'package:youtube_player_iframe/',
   };
+
+  /// http package imports.
+  static const Set<String> http = {'package:http/'};
+
+  /// app_links package imports.
+  static const Set<String> appLinks = {'package:app_links/'};
 }
 
 // =============================================================================

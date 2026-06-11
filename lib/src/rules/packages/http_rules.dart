@@ -57,6 +57,29 @@ const Set<String> _httpTopLevelVerbs = <String>{
   'read',
 };
 
+/// The import prefix used for `package:http/` in this file, or null when http
+/// is imported without a prefix.
+///
+/// The idiomatic import is `import 'package:http/http.dart' as http;`, which
+/// makes a top-level call `http.get(...)` an AST MethodInvocation whose target
+/// is the prefix identifier `http` — NOT a null target. Recognizing the prefix
+/// lets the loop rule match the common prefixed form while still rejecting
+/// instance calls like `someClient.get(...)`.
+String? _httpImportPrefix(AstNode node) {
+  AstNode? current = node;
+  while (current != null && current is! CompilationUnit) {
+    current = current.parent;
+  }
+  if (current is! CompilationUnit) return null;
+  for (final Directive directive in current.directives) {
+    if (directive is ImportDirective &&
+        (directive.uri.stringValue ?? '').startsWith('package:http/')) {
+      return directive.prefix?.name;
+    }
+  }
+  return null;
+}
+
 /// Nearest enclosing function-like body, stopping at the member boundary so a
 /// rule never reasons across an unrelated outer scope.
 FunctionBody? _enclosingMemberBody(AstNode node) {
@@ -315,12 +338,24 @@ class AvoidHttpTopLevelInLoopRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addMethodInvocation((MethodInvocation node) {
-      // Bare top-level call (null target) — distinguishes http.get-as-function
-      // from someClient.get / dio.get. Combined with the import gate this is the
-      // type-safe signal without needing element resolution.
-      if (node.target != null) return;
       if (!_httpTopLevelVerbs.contains(node.methodName.name)) return;
       if (!fileImportsPackage(node, PackageImports.http)) return;
+
+      // A top-level http function is called either bare (null target, the
+      // unprefixed import) or through the http import prefix (`http.get`, the
+      // idiomatic `as http` form whose AST target is the prefix identifier).
+      // The previous null-target-only check missed the prefixed case, so the
+      // rule never fired on real code. Any other target (someClient.get /
+      // dio.get) is an instance call and must not match.
+      final Expression? target = node.target;
+      if (target != null) {
+        final String? prefix = _httpImportPrefix(node);
+        if (prefix == null ||
+            target is! SimpleIdentifier ||
+            target.name != prefix) {
+          return;
+        }
+      }
 
       if (!_insideLoop(node)) return;
 

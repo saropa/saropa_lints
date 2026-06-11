@@ -135,9 +135,13 @@ export 'platforms/web_rules.dart';
 export 'platforms/windows_rules.dart';
 
 // Package-specific rule files
+export 'packages/app_links_rules.dart';
 export 'packages/audioplayers_rules.dart';
 export 'packages/bloc_rules.dart';
+export 'packages/cached_network_image_rules.dart';
 export 'packages/device_calendar_rules.dart';
+export 'packages/http_rules.dart';
+export 'packages/permission_handler_rules.dart';
 export 'packages/flutter_map_rules.dart';
 export 'packages/google_maps_flutter_rules.dart';
 export 'packages/youtube_player_flutter_rules.dart';

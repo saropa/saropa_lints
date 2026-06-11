@@ -2580,6 +2580,28 @@ _allRuleFactories = <SaropaLintRule Function()>[
   YoutubePlayerMuteNotRespectedInParamsRule.new,
   YoutubePlayerAutoFullscreenWithoutPortraitGuardRule.new,
 
+  // cached_network_image rules (cached_network_image_rules.dart)
+  RequireCachedImageProviderDimensionsRule.new,
+  RequireCachedImageProviderErrorListenerRule.new,
+  AvoidInlineCacheManagerConstructionRule.new,
+
+  // permission_handler rules (permission_handler_rules.dart)
+  PermissionHandlerRequestInBuildRule.new,
+  PermissionHandlerLocationAlwaysBeforeWhenInUseRule.new,
+  PermissionHandlerDeprecatedCalendarRule.new,
+  PermissionHandlerStatusWithoutRequestRule.new,
+  PermissionHandlerBatchedRequestPreferredRule.new,
+
+  // http rules (http_rules.dart)
+  RequireHttpPackageClientCloseRule.new,
+  AvoidHttpTopLevelInLoopRule.new,
+  AvoidHttpStringUrlRule.new,
+
+  // app_links rules (app_links_rules.dart)
+  AppLinksListenInBuildRule.new,
+  AppLinksUncaughtStreamErrorRule.new,
+  AppLinksAvoidGetInitialLinkStringRule.new,
+
   // Geocoding rules (geocoding_rules.dart)
   GeocodingUncheckedFirstRule.new,
   GeocodingMissingExceptionHandlerRule.new,

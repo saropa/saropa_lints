@@ -780,6 +780,14 @@ const Set<String> recommendedOnlyRules = <String>{
   'youtube_player_controller_not_closed',
   'youtube_player_convert_url_unchecked',
   'youtube_player_mute_not_respected_in_params',
+  // permission_handler (permission_handler_rules.dart) - crash + factual deprecation
+  'permission_handler_request_in_build',
+  'permission_handler_deprecated_calendar',
+  // http (http_rules.dart) - leak + 1.0 migration break
+  'require_http_package_client_close',
+  'avoid_http_string_url',
+  // app_links (app_links_rules.dart) - rebuild-leak deep-link subscribe
+  'app_links_listen_in_build',
   // Geocoding (geocoding_rules.dart) - crash + migration
   'geocoding_unchecked_first',
   'geocoding_deprecated_locale_param',
@@ -1707,6 +1715,13 @@ const Set<String> professionalOnlyRules = <String>{
   'flutter_map_fallback_url_disables_cache',
   // youtube_player_flutter (youtube_player_flutter_rules.dart)
   'youtube_player_scaffold_deprecated',
+  // cached_network_image (cached_network_image_rules.dart) - provider-form OOM
+  'require_cached_image_provider_dimensions',
+  'avoid_inline_cache_manager_construction',
+  // permission_handler (permission_handler_rules.dart)
+  'permission_handler_location_always_before_when_in_use',
+  // http (http_rules.dart) - per-iteration connection churn
+  'avoid_http_top_level_in_loop',
   // Local Auth (local_auth_rules.dart)
   'local_auth_missing_lockout_handling',
   // Type Safety (moved from Essential - not crash prevention)
@@ -2889,6 +2904,14 @@ const Set<String> comprehensiveOnlyRules = <String>{
   // flutter_map (flutter_map_rules.dart) - deprecation INFO
   'flutter_map_deprecated_tile_size',
   'flutter_map_deprecated_polygon_label_placement',
+  // cached_network_image (cached_network_image_rules.dart)
+  'require_cached_image_provider_error_listener',
+  // permission_handler (permission_handler_rules.dart) - heuristic INFO
+  'permission_handler_status_without_request',
+  'permission_handler_batched_request_preferred',
+  // app_links (app_links_rules.dart) - stream onError + Uri-surface INFO
+  'app_links_uncaught_stream_error',
+  'app_links_avoid_get_initial_link_string',
   // Geocoding (geocoding_rules.dart)
   'geocoding_missing_exception_handler',
   'geocoding_prefer_no_result_found_catch',
@@ -3995,6 +4018,38 @@ const Set<String> youtubePlayerFlutterPackageRules = <String>{
   'youtube_player_auto_fullscreen_without_portrait_guard',
 };
 
+/// Rules specific to the cached_network_image package (provider-form +
+/// inline-cache-manager gaps not covered by the existing widget-form rules).
+const Set<String> cachedNetworkImagePackageRules = <String>{
+  'require_cached_image_provider_dimensions',
+  'require_cached_image_provider_error_listener',
+  'avoid_inline_cache_manager_construction',
+};
+
+/// Rules specific to the permission_handler package (new shapes beyond the
+/// existing require_permission_* family).
+const Set<String> permissionHandlerPackageRules = <String>{
+  'permission_handler_request_in_build',
+  'permission_handler_location_always_before_when_in_use',
+  'permission_handler_deprecated_calendar',
+  'permission_handler_status_without_request',
+  'permission_handler_batched_request_preferred',
+};
+
+/// Rules specific to the http package.
+const Set<String> httpPackageRules = <String>{
+  'require_http_package_client_close',
+  'avoid_http_top_level_in_loop',
+  'avoid_http_string_url',
+};
+
+/// Rules specific to the app_links package.
+const Set<String> appLinksPackageRules = <String>{
+  'app_links_listen_in_build',
+  'app_links_uncaught_stream_error',
+  'app_links_avoid_get_initial_link_string',
+};
+
 /// Rules specific to the geocoding package.
 const Set<String> geocodingPackageRules = <String>{
   'geocoding_unchecked_first',
@@ -4114,6 +4169,10 @@ Map<String, Set<String>> get packageRuleSets => {
   'audioplayers': audioplayersPackageRules,
   'flutter_map': flutterMapPackageRules,
   'youtube_player_flutter': youtubePlayerFlutterPackageRules,
+  'cached_network_image': cachedNetworkImagePackageRules,
+  'permission_handler': permissionHandlerPackageRules,
+  'http': httpPackageRules,
+  'app_links': appLinksPackageRules,
   'flame': flamePackageRules,
 };
 
@@ -4152,6 +4211,10 @@ const List<String> allPackages = <String>[
   'audioplayers',
   'flutter_map',
   'youtube_player_flutter',
+  'cached_network_image',
+  'permission_handler',
+  'http',
+  'app_links',
   'flame',
 ];
 
@@ -4194,6 +4257,10 @@ const Map<String, bool> defaultPackages = <String, bool>{
   'audioplayers': true,
   'flutter_map': true,
   'youtube_player_flutter': true,
+  'cached_network_image': true,
+  'permission_handler': true,
+  'http': true,
+  'app_links': true,
   'flame': true,
 };
 
