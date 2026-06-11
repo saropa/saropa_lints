@@ -139,3 +139,39 @@
 - [Android memory-pressure + retrieveLostData docs (flutter.googlesource.com README)](https://flutter.googlesource.com/mirrors/plugins/+/refs/tags/google_maps_flutter-v2.1.5/packages/image_picker/image_picker/README.md)
 - [LeanCode image_picker best-practices guide](https://leancode.co/glossary/image-picker-in-flutter)
 - [Medium: Flutter Image Picker with Optimisation](https://medium.com/@deepakgrandhi/flutter-image-picker-and-optimisation-55c485892994)
+
+---
+
+## Finish Report (2026-06-11)
+
+**Scope:** (A) Dart lint rules. New file `lib/src/rules/packages/image_picker_rules.dart` + registration + test + 5 fixtures.
+
+### Validation gap caught during implementation (IMPORTANT)
+The plan claimed **"saropa_lints coverage: none (new file)"**. That was wrong. The repo already ships **11** `image_picker_*` rules across `image_rules.dart`, `api_network_rules.dart`, `resource_management_rules.dart`, `package_specific_rules.dart`, and `widget_patterns_require_rules.dart` (e.g. `require_image_picker_result_handling`, `avoid_image_picker_large_files`, `prefer_image_picker_max_dimensions`, `require_image_picker_source_choice`, `avoid_image_picker_without_source`, `require_image_picker_error_handling`). The plan's validation pass missed them because the reviewers grepped for the *proposed* rule names, which differ from the existing names. **3 of 8 proposed rules were exact semantic duplicates and were DROPPED:**
+- `image_picker_unchecked_null_result` — overlaps `require_image_picker_result_handling`.
+- `image_picker_missing_image_quality` / `image_picker_missing_max_dimensions` — overlap `prefer_image_picker_max_dimensions` / size rules.
+
+Also DROPPED per the in-plan validation annotations: `image_picker_unawaited_pick` (subsumed by `avoid_unawaited_future`); the `.first`/`.last` half of the multi-result rule (subsumed by `avoid_unsafe_collection_methods` — kept ONLY the `[index]` delta).
+
+### Shipped: 5 new rules (no overlap with existing coverage)
+| rule | tier | severity | notes |
+|---|---|---|---|
+| `image_picker_missing_retrieve_lost_data` | professional | WARNING | file-scoped Android lost-data recovery |
+| `image_picker_invalid_image_quality` | recommended | ERROR | + quick fix (clamp to 0-100) |
+| `image_picker_camera_source_without_support_check` | professional | WARNING | supportsImageSource/Platform guard heuristic |
+| `image_picker_lost_data_empty_check_missing` | professional | WARNING | LostDataResponse.isEmpty guard |
+| `image_picker_multi_result_unchecked_empty` | recommended | ERROR | `[index]` on multi-pick result |
+
+`RuleType.bug` used throughout (plan said `correctness`, which is not a real enum value).
+
+### Validation
+- `dart analyze lib --fatal-infos` → clean.
+- `dart test test/rules/packages/image_picker_rules_test.dart` → 10/10 pass.
+- `dart test test/integrity/` → pass after fixing a **latent** `defaultPackages` gap: `allPackages` had the 8 newest packages (the prior 7 + image_picker) but `defaultPackages` did not, failing `allPackages matches defaultPackages keys`. Added all 8 with `: true`. This gap predates image_picker and affected the prior 7 commits too.
+- Scan-firing: all 5 rules confirmed firing on the bad fixtures via `ScanRunner` over non-`_fixture` copies (the scan skips `*_fixture.dart`; see memory `reference_verify_rule_behavior_scan_cli`).
+
+### Files
+- NEW `lib/src/rules/packages/image_picker_rules.dart` (5 rules + 1 fix)
+- NEW `test/rules/packages/image_picker_rules_test.dart`
+- NEW `example_packages/lib/image_picker/*_fixture.dart` (5)
+- `lib/src/rules/all_rules.dart`, `lib/saropa_lints.dart`, `lib/src/tiers.dart` (registration + defaultPackages fix), `CHANGELOG.md`

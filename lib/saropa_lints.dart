@@ -2541,6 +2541,14 @@ _allRuleFactories = <SaropaLintRule Function()>[
   InAppReviewMissingStoreListingFallbackRule.new,
   InAppReviewIosStoreListingMissingAppIdRule.new,
 
+  // Image Picker rules (image_picker_rules.dart) - new-coverage only; the repo
+  // already ships result/source/large-file/max-dimension image_picker rules.
+  ImagePickerMissingRetrieveLostDataRule.new,
+  ImagePickerInvalidImageQualityRule.new,
+  ImagePickerCameraSourceWithoutSupportCheckRule.new,
+  ImagePickerLostDataEmptyCheckMissingRule.new,
+  ImagePickerMultiResultUncheckedEmptyRule.new,
+
   // Geocoding rules (geocoding_rules.dart)
   GeocodingUncheckedFirstRule.new,
   GeocodingMissingExceptionHandlerRule.new,

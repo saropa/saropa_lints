@@ -763,6 +763,9 @@ const Set<String> essentialRules = <String>{
 /// Recommended tier rules - Essential + common mistakes, performance basics.
 /// Catches bugs that don't immediately crash but cause poor UX, sluggish performance.
 const Set<String> recommendedOnlyRules = <String>{
+  // Image Picker (image_picker_rules.dart) - crash prevention
+  'image_picker_invalid_image_quality',
+  'image_picker_multi_result_unchecked_empty',
   // Geocoding (geocoding_rules.dart) - crash + migration
   'geocoding_unchecked_first',
   'geocoding_deprecated_locale_param',
@@ -1675,6 +1678,10 @@ const Set<String> recommendedOnlyRules = <String>{
 /// Professional tier rules - Recommended + architecture, testing, maintainability.
 /// Includes stricter naming conventions for API parameters.
 const Set<String> professionalOnlyRules = <String>{
+  // Image Picker (image_picker_rules.dart)
+  'image_picker_missing_retrieve_lost_data',
+  'image_picker_camera_source_without_support_check',
+  'image_picker_lost_data_empty_check_missing',
   // Local Auth (local_auth_rules.dart)
   'local_auth_missing_lockout_handling',
   // Type Safety (moved from Essential - not crash prevention)
@@ -3903,6 +3910,16 @@ const Set<String> qrScannerPackageRules = <String>{
   'require_qr_permission_check',
 };
 
+/// Rules specific to the image_picker package (new-coverage subset; the repo
+/// also ships require/avoid/prefer_image_picker_* rules elsewhere).
+const Set<String> imagePickerPackageRules = <String>{
+  'image_picker_missing_retrieve_lost_data',
+  'image_picker_invalid_image_quality',
+  'image_picker_camera_source_without_support_check',
+  'image_picker_lost_data_empty_check_missing',
+  'image_picker_multi_result_unchecked_empty',
+};
+
 /// Rules specific to the geocoding package.
 const Set<String> geocodingPackageRules = <String>{
   'geocoding_unchecked_first',
@@ -4017,6 +4034,7 @@ Map<String, Set<String>> get packageRuleSets => {
   'file_picker': filePickerPackageRules,
   'local_auth': localAuthPackageRules,
   'geocoding': geocodingPackageRules,
+  'image_picker': imagePickerPackageRules,
   'flame': flamePackageRules,
 };
 
@@ -4050,6 +4068,7 @@ const List<String> allPackages = <String>[
   'file_picker',
   'local_auth',
   'geocoding',
+  'image_picker',
   'flame',
 ];
 
@@ -4080,6 +4099,14 @@ const Map<String, bool> defaultPackages = <String, bool>{
   'url_launcher': true,
   'geolocator': true,
   'qr_scanner': true,
+  'quick_actions': true,
+  'in_app_review': true,
+  'home_widget': true,
+  'device_calendar': true,
+  'file_picker': true,
+  'local_auth': true,
+  'geocoding': true,
+  'image_picker': true,
   'flame': true,
 };
 
