@@ -1,73 +1,203 @@
 {
+  "packageDetail": {
+    "section": {
+      "version": "Versión de la versión.",
+      "community": "Comunidad Europea, es decir.",
+      "dependencies": "Dependencias de las empresas.",
+      "alerts": "Las alertas son de alarma.",
+      "platforms": "Las plataformas de las plataformas.",
+      "suggestions": "Sugieren sugerencias.",
+      "readmeImages": "Imágenes de README."
+    },
+    "header": {
+      "logoAlt": "{name} logotipo de la línea",
+      "grade": "El grado {grade}.",
+      "licenseTitle": "Licencia de licencia.",
+      "published": "Publicado por el {date}."
+    },
+    "partialBanner": {
+      "partReadme": "README y el logotipo.",
+      "partGap": "version-gap PRs y problemas de las cuestiones.",
+      "partReverseDeps": "Cuenta de dependencia inversa para el recuento.",
+      "listTwo": "{first} y {second} también.",
+      "listMany": "{head}, y el {last}.",
+      "message": "Algunas secciones no pudieron cargarse: {list}.",
+      "retry": "Intentar de nuevo.",
+      "retryTitle": "Vuelve a intentar las búsquedas fallidas."
+    },
+    "description": {
+      "readMore": "Leer más leer más"
+    },
+    "version": {
+      "constraint": "Restricción de restricciones.",
+      "latest": "Las últimas más recientes Últimas.",
+      "prerelease": "El prerrepaso es el pre-lanzamiento.",
+      "published": "Publicado publicado publicó.",
+      "update": "Actualización de actualizaciones.",
+      "blockedBy": "Bloqueado por",
+      "codeSize": "Tamaño del código tamaño de la clave",
+      "archiveSize": "Tamaño del archivo tamaño de archivo.",
+      "bloat": "({rating}/10 hinchazón) Se ha producido una inflamación.",
+      "onDisk": "En el disco en el disco.",
+      "upgrade": "Actualizar actualizaciones.",
+      "viewChangelog": "Ver el registro de cambios."
+    },
+    "community": {
+      "stars": "Las estrellas las estrellas los astros",
+      "likes": "Le gusta a alguien.",
+      "report": "El informe de la Comisión es un informe.",
+      "openIssues": "Cuestiones abiertas.",
+      "openPrs": "Las relaciones públicas abiertas son PRs.",
+      "activity": "Actividad (90d)",
+      "activityValue": "Se cerraron las emisiones {closed}, se fusionaron los PRs {merged}.",
+      "noActivity": "No hay actividad reciente.",
+      "lastCommit": "Último compromiso de la empresa.",
+      "pubPoints": "Pubs Puntos de pubs y bares.",
+      "verified": "(verificado) y se ha verificado.",
+      "publisher": "El editor es el que publica.",
+      "flagged": "({count} marcado) Se ha puesto el botón \"",
+      "transitiveDeps": "Depósitos transitivos en las aguas profundas.",
+      "footprintBreakdown": "{unique} único y en el medio; +{shared} compartido = {total} total.",
+      "footprintTooltip": "Propio {own} + transitivos únicos {unique} + compartidos {shared}. La eliminación de este dep ahorra {saved} (los depósitos compartidos se mantienen en otros).",
+      "trueFootprint": "La huella verdadera es la Huella Verdadera.",
+      "packagesCount": "{count} paquetes",
+      "dependents": "Dependientes de la familia."
+    },
+    "fileUsages": {
+      "commentedOut": "Referencias sin comentarios:",
+      "fileCount": "{count} archivos de archivo para el teléfono móvil.",
+      "exportNoteTitle": "Al menos un uso es una directiva de exportación.",
+      "publicApiSurface": "API de superficie pública para la superficie de las APIs públicas.",
+      "header": "USO DE ARCHIVOS ({label}) El uso de archivos es el que se hace con los datos.",
+      "commentedReexportTitle": "Reexportación con comentarios excluidos.",
+      "reexportTitle": "Reexportado  ⁇  parte de la API pública de esta biblioteca.",
+      "reexportBadge": "reexportación de las exportaciones."
+    },
+    "alerts": {
+      "archived": "ARCHIVADO  ⁇  el repositorio es de solo lectura.",
+      "knownIssue": "Problema conocido: {reason}",
+      "unused": "No utilizado  ⁇  no se detectaron importaciones.",
+      "fix": "⁇  fija: {version} El tiempo de la respuesta es"
+    },
+    "versionGap": {
+      "versionTitle": "Versión de la versión Gap.",
+      "overrideTitle": "Anular el gap de la anulación.",
+      "noDates": "No se pudieron determinar las fechas de versión para este paquete.",
+      "noItems": "No se encontraron PR ni problemas entre estas versiones.",
+      "prsMerged": "PRs se fusionaron y las empresas de publicidad",
+      "issuesClosed": "Cuestiones cerradas.",
+      "searchLabel": "Busca PRs y temas relacionados.",
+      "searchPlaceholder": "Buscar relaciones públicas y temas...",
+      "filterAria": "Filtrar por categoría.",
+      "filterAll": "Todo, todo, todo es verdad.",
+      "filterUnreviewed": "No revisado.",
+      "filterPrs": "PRs es el nombre de un servicio público.",
+      "filterIssues": "Las cuestiones de los problemas.",
+      "typePr": "PR PR PR es el nombre de la persona que se encuentra en una situación similar.",
+      "typeIssue": "El número de la cuestión.",
+      "reviewReviewed": "Se ha revisado.",
+      "reviewApplicable": "Aplicable Se aplica.",
+      "reviewNotApplicable": "No hay N/A",
+      "notesPlaceholder": "Las notas... las notas.",
+      "colType": "El tipo de Tipo el tipo de Tipo",
+      "colTitle": "Título título del título.",
+      "colAuthor": "El autor es el autor Autor Autor.",
+      "colReview": "El análisis de la revisión.",
+      "summaryFooter": "{triaged} de {total} clasificados | {applicable} aplicable | {notApplicable} N/A | {unreviewed} restante",
+      "truncated": "Los resultados truncados a {limit} artículos."
+    },
+    "platforms": {
+      "wasm": "El WASM es el método de la"
+    },
+    "images": {
+      "alt": "README imagen de la imagen en el medio."
+    },
+    "links": {
+      "viewOnPubDev": "Vista en el pub.dev.",
+      "documentation": "Documentación de la documentación La documentación es el conjunto de los documentos que contiene",
+      "changelog": "El Changelog es un registro de cambios.",
+      "versions": "Versiones Las versiones.",
+      "repository": "El repositorio de datos.",
+      "openIssues": "Cuestiones abiertas.",
+      "reportIssue": "Informe de la cuestión del informe."
+    },
+    "a11y": {
+      "skipToDetails": "Saltar a los detalles del paquete."
+    },
+    "shortcuts": {
+      "showOverlay": "Mostrar esta superposición de atajos.",
+      "closeOverlay": "Cierre la superposición de acceso directo del teclado."
+    }
+  },
   "toolbar": {
-    "runAnalysis": "Ejecutar análisis",
-    "rescan": "Volver a escanear",
-    "refresh": "Refrescar",
-    "copyJson": "Copiar JSON",
-    "saveReport": "Guardar informe",
-    "moreActions": "Más acciones",
-    "clearAll": "Borrar todo",
-    "resetView": "Restablecer vista"
+    "runAnalysis": "Ejecutar el análisis de ejecución.",
+    "rescan": "El rescan de nuevo escanear.",
+    "refresh": "Refrescarse y refrescar.",
+    "copyJson": "Copiar el JSON.",
+    "saveReport": "Guardar el informe para guardar.",
+    "moreActions": "Más acciones, más acciones.",
+    "clearAll": "Todo limpio, todo despejado.",
+    "resetView": "La vista de reinicio en la vista de restablecimiento."
   },
   "empty": {
-    "noFindingsTitle": "Sin hallazgos",
-    "noFindingsMessage": "Ejecute análisis para escanear el espacio de trabajo.",
-    "noFindingsCta": "Ejecutar análisis",
-    "noMatchTitle": "No hay coincidencias",
-    "noMatchMessage": "Ninguna fila coincide con los filtros actuales.",
-    "noMatchCta": "Restablecer filtros",
-    "noProjectTitle": "No hay espacio de trabajo abierto",
+    "noFindingsTitle": "No hay hallazgos.",
+    "noFindingsMessage": "Ejecuta análisis para escanear el espacio de trabajo.",
+    "noFindingsCta": "Ejecutar el análisis de ejecución.",
+    "noMatchTitle": "No hay coincidencias.",
+    "noMatchMessage": "No hay filas que coincidan con los filtros actuales.",
+    "noMatchCta": "El restablecimiento de los filtros de ajuste.",
+    "noProjectTitle": "No hay espacio de trabajo abierto.",
     "noProjectMessage": "Abra un proyecto Flutter o Dart para ver los resultados.",
-    "noProjectCta": "Abrir carpeta",
-    "noDataTitle": "Aún no hay datos",
-    "noDataMessage": "Ejecute un análisis para completar este panel.",
-    "noDataCta": "Ejecutar análisis"
+    "noProjectCta": "Abrir la carpeta de archivos Abierto.",
+    "noDataTitle": "Todavía no hay datos.",
+    "noDataMessage": "Ejecuta un escaneo para rellenar este tablero.",
+    "noDataCta": "Ejecutar el análisis de ejecución."
   },
   "loading": {
-    "thinking": "Pensamiento…",
-    "preparing": "Preparante…",
-    "checking": "De cheques…",
-    "fetching": "Atractivo…",
-    "working": "Laboral…",
-    "scanning": "Exploración…",
-    "cancel": "Cancelar",
-    "runningAnalysis": "Análisis en ejecución…",
-    "analysisComplete": "Análisis completo",
-    "refreshingDashboard": "Panel de control actualizado con los últimos hallazgos.",
-    "analysisStartedDetail": "Se inició el análisis. Recopilando diagnósticos...",
-    "analysisFailedDetail": "El análisis falló. Consulte la salida para obtener más detalles."
+    "thinking": "Pensando... en lo que estoy pensando.",
+    "preparing": "Me estoy preparando... para la preparación.",
+    "checking": "Estoy comprobando...",
+    "fetching": "Traer... traerá ... para traer.",
+    "working": "Trabajar... trabajar.",
+    "scanning": "Escaneando ... escaneando.",
+    "cancel": "Cancelar cancelar el pago de la cuenta.",
+    "runningAnalysis": "Ejecutar análisis ... de ejecución.",
+    "analysisComplete": "Análisis completo y completo.",
+    "refreshingDashboard": "Tablero de instrumentos refrescante con los últimos hallazgos.",
+    "analysisStartedDetail": "Se inició el análisis. Recogiendo los diagnósticos ...",
+    "analysisFailedDetail": "El análisis falló. Compruebe la salida para obtener detalles."
   },
   "error": {
-    "genericTitle": "algo salió mal",
-    "retry": "Rever",
-    "reload": "Recargar",
-    "copyDetails": "Copiar detalles",
-    "unreachable": "No se pudo alcanzar {target}",
+    "genericTitle": "Algo salió mal y algo se fue.",
+    "retry": "Intentar de nuevo.",
+    "reload": "Se recarga la carga.",
+    "copyDetails": "Copie los detalles de la copia.",
+    "unreachable": "No se pudo alcanzar {target}.",
     "partialSummary": "{loaded} de {total} {item} cargado(s). {failed} fallaron.",
-    "partialRetry": "Reintentar falló"
+    "partialRetry": "El intento de reinicio falló."
   },
   "offline": {
-    "banner": "Sin conexión: vuelva a conectarse para actualizar.",
-    "cachedFooter": "Mostrando datos almacenados en caché de {when}.",
-    "reconnecting": "Reconectando…"
+    "banner": "Offline  ⁇  reconectarse para actualizar.",
+    "cachedFooter": "Mostrando datos en caché de {when}.",
+    "reconnecting": "Reconectando... la conexión de nuevo."
   },
   "stale": {
-    "statusPill": "Última ejecución exitosa {when}: falló la actualización"
+    "statusPill": "Última ejecución exitosa {when}  ⁇  refrescar no pudo."
   },
   "filter": {
-    "searchPlaceholder": "Buscar…",
-    "clearSearch": "Borrar búsqueda",
-    "activeLabel": "Filtros activos:",
-    "recentLabel": "Reciente ▾",
-    "chipRemove": "Eliminar"
+    "searchPlaceholder": "Buscar... hacer una búsqueda.",
+    "clearSearch": "Borrar búsqueda de la búsquedas.",
+    "activeLabel": "Filtros activos: Se usan para filtrar.",
+    "recentLabel": "Reciente  ⁇  recientes.",
+    "chipRemove": "Remover Eliminar quitar eliminar el removido"
   },
   "a11y": {
-    "toggleFullWidth": "Alternar diseño de ancho completo",
-    "sortBy": "Ordenar por {column}",
-    "expandRow": "Expandir fila",
-    "collapseRow": "Contraer fila",
-    "selectAll": "Seleccionar todas las filas",
-    "keyboardShortcuts": "Atajos de teclado",
+    "toggleFullWidth": "Toggle diseño de ancho completo.",
+    "sortBy": "Ordenado por {column}",
+    "expandRow": "Expanda la fila de las líneas.",
+    "collapseRow": "La fila de colapso se encuentra en la columna.",
+    "selectAll": "Seleccione todas las filas.",
+    "keyboardShortcuts": "Atajos de teclado para el teclado.",
     "announcer": "Las actualizaciones para filtrar y ordenar el estado se anuncian aquí."
   },
   "uiLanguage": {
@@ -76,807 +206,908 @@
       "placeholder": "Elija el idioma de la barra lateral y los paneles",
       "auto": "Automático (seguir el idioma de visualización de VS Code)"
     },
-    "reloadPrompt": "Idioma configurado en {locale}. Vuelva a cargar la ventana para actualizar la barra lateral y las etiquetas de comandos.",
-    "reloadNow": "Recargar ahora",
-    "reloadLater": "Más tarde"
+    "reloadPrompt": "El idioma está establecido en {locale}. Reload la ventana para actualizar las etiquetas de barra lateral y comando.",
+    "reloadNow": "Reload ahora.",
+    "reloadLater": "Más tarde más adelante después."
   },
   "brand": {
     "prefix": "Saropa "
   },
   "findingsDash": {
-    "pageTitle": "Panel de resultados de Saropa",
-    "documentTitle": "Panel de resultados de Saropa",
-    "skipToFindings": "Saltar a los hallazgos",
-    "secondaryAsideLabel": "Diagnóstico secundario",
+    "pageTitle": "Saropa Tablero de resultados del panel de control.",
+    "documentTitle": "Saropa Tablero de resultados del panel de control.",
+    "skipToFindings": "Salta a los hallazgos.",
+    "secondaryAsideLabel": "Diagnóstico secundario: Es el diagnóstico de enfermedades.",
     "hero": {
-      "productTitle": "Panel de resultados",
+      "productTitle": "El panel de resultados del tablero.",
       "gaugeTitle": "Puntuación de salud {score} (grado {grade}). Los errores pesan más.",
       "gaugePending": "…"
     },
     "time": {
-      "justNow": "En este momento",
+      "justNow": "justo ahora, en este momento.",
       "minutesAgo": "hace {min} m",
       "hoursAgo": "hace {hr} h",
       "daysAgo": "hace {day} d"
     },
     "status": {
-      "lastRunPrefix": "última ejecución",
-      "lastRunUnknown": "Última ejecución desconocida",
-      "noTimestampTitle": "Sin marca de tiempo en violations.json",
-      "findingsAfterFilterTitle": "Resultados totales después del filtro de reglas deshabilitadas",
+      "lastRunPrefix": "Última ejecución.",
+      "lastRunUnknown": "Última ejecución desconocida.",
+      "noTimestampTitle": "No hay marca de tiempo en violations.json.",
+      "findingsAfterFilterTitle": "Total de hallazgos después del filtro desactivado-regla.",
       "findingOne": "{count} hallazgo",
       "findingOther": "{count} hallazgos",
-      "todoHackTitle": "Marcadores TODO y HACK encontrados en el espacio de trabajo",
-      "driftOnTitle": "Asesor de deriva conectado: {label}",
-      "driftOnPill": "Deriva en · {count}",
-      "driftOfflineTitle": "Drift Advisor habilitado pero no se encontró ningún servidor",
-      "driftOfflinePill": "Desconectarse",
-      "enabledRulesTitle": "Reglas habilitadas en el nivel actual",
+      "todoHackTitle": "Los marcadores TODO y HACK se encuentran en el espacio de trabajo.",
+      "driftOnTitle": "El asesor de deriva está conectado: {label}",
+      "driftOnPill": "A la deriva en el · {count}",
+      "driftOfflineTitle": "Drift Advisor habilitado pero no se encontró ningún servidor.",
+      "driftOfflinePill": "Drift fuera de línea.",
+      "enabledRulesTitle": "Reglas habilitadas en el nivel actual.",
       "rulesCount": "{count} reglas"
     },
     "groupBy": {
-      "severity": "Gravedad",
-      "file": "Archivo",
-      "impact": "Impacto",
-      "rule": "Regla",
+      "severity": "Gravedad La gravedad es la severidad de las cosas.",
+      "file": "El archivo de archivos es un archivo.",
+      "impact": "El impacto de la acción es el impacto.",
+      "rule": "El artículo de la ley, el reglamento.",
       "owasp": "OWASP",
-      "ruleType": "Tipo de regla",
-      "ruleStatus": "Estado de la regla"
+      "ruleType": "Tipo de regla tipo de regla",
+      "ruleStatus": "El estatus de la regla es el estado."
     },
     "seg": {
-      "toggleSeverityTitle": "Alternar gravedad {v}",
-      "toggleImpactTitle": "Alternar impacto {v}"
+      "toggleSeverityTitle": "Intercambiar {v} severidad de la gravedad.",
+      "toggleImpactTitle": "Toggle {v} impacto de la colisión en el suelo."
     },
     "kpi": {
-      "visibleLabel": "Hallazgos visibles",
-      "allMatched": "todos coinciden",
-      "ofTotal": "de {total} total",
-      "clearFiltersTitle": "Haga clic para borrar todos los filtros",
-      "errorsLabel": "Errores",
-      "errorsSubFix": "debe arreglar",
-      "errorsSubClear": "ninguno - claro",
-      "errorsTitle": "Filtrar los resultados por errores (debe corregirse: roto / fallará / explotable)",
-      "warningsLabel": "Advertencias",
-      "warningsSubBad": "podría fallar o verse mal",
-      "warningsSubClear": "ninguno - claro",
-      "warningsTitle": "Filtrar los resultados por advertencias (podrían fallar o verse mal)",
-      "infoLabel": "Información",
-      "infoSub": "FYI - estilo / sugerencias",
-      "infoSubNone": "ninguno",
-      "infoTitle": "Filtrar resultados por información (para su información: estilo y sugerencias)",
-      "filesLabel": "Archivos afectados",
-      "filesSubAcross": "a lo largo de la exportación",
-      "filesSubNone": "no hay archivos afectados",
-      "filesTitle": "Archivos distintos que contribuyen al menos a un hallazgo",
-      "topRuleLabel": "regla superior",
-      "topRuleTitle": "Filtrar resultados para regla {name}"
+      "visibleLabel": "Los hallazgos visibles son los resultados.",
+      "allMatched": "Todos coincidieron con el mismo resultado.",
+      "ofTotal": "de {total} total del año.",
+      "clearFiltersTitle": "Haga clic para borrar todos los filtros.",
+      "errorsLabel": "Errores de errores en el tiempo.",
+      "errorsSubFix": "Debe arreglarse.",
+      "errorsSubClear": "ninguno  ⁇  claro",
+      "errorsTitle": "Los resultados de los filtros a errores (debe arreglar  ⁇  roto / se estrellará / explotable)",
+      "warningsLabel": "Advertencias y advertencias.",
+      "warningsSubBad": "podría fracasar o verse mal en la imagen.",
+      "warningsSubClear": "ninguno  ⁇  claro",
+      "warningsTitle": "Filtrar los resultados a las advertencias (podría fallar o verse mal)",
+      "infoLabel": "El informe de la Comisión Europea, publicado en el Diario Oficial de las Comunidades Europeas (",
+      "infoSub": "FYI  ⁇  estilo / sugerencias de estilo.",
+      "infoSubNone": "Ninguno ninguno ningunos ninguno.",
+      "infoTitle": "Filtrar los resultados a la información (FYI  ⁇  estilo y sugerencias)",
+      "filesLabel": "Los archivos afectados son los que están en peligro.",
+      "filesSubAcross": "en todo el ciclo de exportación.",
+      "filesSubNone": "No hay archivos afectados.",
+      "filesTitle": "Archivos distintos que contribuyen con al menos un hallazgo.",
+      "topRuleLabel": "La regla más importante es la de reglas.",
+      "topRuleTitle": "Filtrar los resultados para la regla {name}."
     },
     "toolbar": {
-      "ariaFiltersActions": "Filtros y acciones",
-      "groupByFieldTitle": "Agrupar hallazgos por dimensión seleccionada",
-      "groupByLabel": "Agrupar por",
-      "textFilterTitle": "Filtrar resultados por ruta de archivo, regla o texto del mensaje",
+      "ariaFiltersActions": "Filtros y acciones.",
+      "groupByFieldTitle": "Resultados de grupo por dimensión seleccionada.",
+      "groupByLabel": "Grupo por grupo.",
+      "textFilterTitle": "Filtrar los hallazgos por la ruta de archivo, regla o texto del mensaje.",
       "textFilterPlaceholder": "Filtrar por archivo, regla o mensaje...",
-      "textFilterAria": "Filtro de texto",
-      "clearTextFilterTitle": "Borrar filtro de texto",
-      "clearTextFilterAria": "Borrar filtro de texto",
-      "recentFiltersTitle": "Filtros recientes",
-      "clearRecentTitle": "Borrar todos los filtros recientes",
-      "clearRecentButton": "Claro",
-      "recentFiltersListAria": "Filtros recientes",
-      "runAnalysisTitle": "Ejecute el análisis de Saropa Lints",
-      "refreshViolationsTitle": "Recargar violations.json desde el disco",
-      "severityGroupAria": "Filtro de gravedad",
-      "severityLabel": "Gravedad",
-      "impactGroupAria": "Filtro de impacto",
-      "impactLabel": "Impacto",
-      "moreSummary": "Más",
+      "textFilterAria": "El filtro de texto es un filtro.",
+      "clearTextFilterTitle": "El filtro de texto limpio es un filtro que elimina el texto.",
+      "clearTextFilterAria": "El filtro de texto limpio es un filtro que elimina el texto.",
+      "recentFiltersTitle": "Filtros recientes de los filtros.",
+      "clearRecentTitle": "Limpia todos los filtros recientes.",
+      "clearRecentButton": "Claro claro claro claro es su nombre.",
+      "recentFiltersListAria": "Filtros recientes de los filtros.",
+      "runAnalysisTitle": "Ejecuta el análisis Saropa Lints.",
+      "refreshViolationsTitle": "Recargar violations.json desde el disco.",
+      "severityGroupAria": "El filtro de gravedad es el que se utiliza.",
+      "severityLabel": "Gravedad La gravedad es la severidad de las cosas.",
+      "impactGroupAria": "El filtro de impacto es un filtro.",
+      "impactLabel": "El impacto de la acción es el impacto.",
+      "moreSummary": "Más más más más.",
       "moreChevron": "▾",
-      "copyJsonTitle": "Copiar infracciones filtradas como JSON ({count})",
-      "saveReportTitle": "Guarde las infracciones filtradas como JSON en informes/AAAAMMDD/"
+      "copyJsonTitle": "Copia las violaciones filtradas como JSON ({count})",
+      "saveReportTitle": "Guardar las violaciones filtradas como JSON en los informes / YYYYMMDD/."
     },
     "chip": {
       "contains": "contiene \"{q}\"",
-      "severityOff": "gravedad ≠ {v}",
-      "impactOff": "impacto ≠ {v}",
-      "resetAllTitle": "Restablecer todos los filtros",
-      "removeFilterAria": "Quitar filtro"
+      "severityOff": "severidad ≠ {v}",
+      "impactOff": "impacto ≠ {v} y el efecto es",
+      "resetAllTitle": "Reinicie todos los filtros.",
+      "removeFilterAria": "Retire el filtro de la válvula."
     },
     "menuPalette": {
-      "help": "Ayuda",
-      "groupBy": "Agrupar por…",
-      "textFilter": "Filtro de texto…",
-      "severityImpact": "Filtro de gravedad…",
-      "hideRules": "Ocultar reglas…",
-      "ruleMetadata": "Metadatos de reglas",
-      "clearFilters": "Limpiar filtros",
-      "clearSuppressions": "Borrar supresiones",
-      "clearFileFocus": "Borrar el foco del archivo",
-      "matchActiveEditor": "Coincidir con el editor activo",
-      "copyTreeJson": "Copiar árbol JSON",
-      "refreshExtension": "Actualizar extensión",
-      "openPackageDashboard": "Abrir panel de paquete",
-      "openCodeHealth": "Salud del código abierto",
-      "openLintsConfig": "Abrir configuración de Lints",
-      "reloadFromDisk": "Recargar desde el disco",
-      "reloadFromDiskTitle": "Vuelva a representar el panel desde las últimas violations.json sin volver a ejecutar el analizador.",
-      "reEnableDisabledRules": "Volver a habilitar las reglas deshabilitadas...",
-      "reEnableDisabledRulesTitle": "Abra una selección rápida de reglas actualmente deshabilitadas en analysis_options_custom.yaml y vuelva a habilitar las elegidas.",
-      "reEnableNoneTitle": "No hay reglas actualmente deshabilitadas",
+      "help": "Ayuda ayuda ayuda.",
+      "groupBy": "Grupo por... grupo.",
+      "textFilter": "El filtro de texto... el filtro.",
+      "severityImpact": "Filtro de gravedad ...",
+      "hideRules": "Oculta las reglas...",
+      "ruleMetadata": "La regla de los metadatos es la siguiente:",
+      "clearFilters": "Eliminar los filtros de las listas.",
+      "clearSuppressions": "Claras supresiones de las supresiones.",
+      "clearFileFocus": "Despeje el enfoque de archivo.",
+      "matchActiveEditor": "Coincide con el editor activo.",
+      "copyTreeJson": "Copia el árbol JSON de la copia.",
+      "refreshExtension": "La extensión Refresh de la actualización.",
+      "openPackageDashboard": "Abrir el panel de control del paquete.",
+      "openCodeHealth": "Código abierto de salud.",
+      "openLintsConfig": "Configurar las lentes abiertas de Open Lints",
+      "reloadFromDisk": "Reload desde el disco.",
+      "reloadFromDiskTitle": "Re-rendure el tablero desde la última violations.json sin volver a ejecutar el analizador.",
+      "reEnableDisabledRules": "Re-activar las reglas deshabilitadas...",
+      "reEnableDisabledRulesTitle": "Abra una selección rápida de las reglas actualmente deshabilitadas en analysis_options_custom.yaml y vuelva a habilitar las elegidas.",
+      "reEnableNoneTitle": "No hay reglas actualmente deshabilitado.",
       "reEnableNoneMessage": "Actualmente no hay reglas deshabilitadas a través de analysis_options_custom.yaml.",
-      "reEnableQuickPickTitle": "Volver a habilitar reglas deshabilitadas",
-      "reEnableQuickPickPlaceholder": "Seleccione una o más reglas para volver a habilitarlas",
-      "menuGroupExport": "Exportar",
-      "menuGroupFilter": "Filtrar y enfocar",
-      "menuGroupOpen": "Abrir panel",
-      "menuGroupSystem": "Sistema"
+      "reEnableQuickPickTitle": "Re-activar las reglas deshabilitadas.",
+      "reEnableQuickPickPlaceholder": "Seleccione una o más reglas para volver a habilitar.",
+      "menuGroupExport": "Exportación de exportaciones.",
+      "menuGroupFilter": "Filtrar y enfocar.",
+      "menuGroupOpen": "Abra el tablero de instrumentos y abra.",
+      "menuGroupSystem": "El sistema de sistemas es un sistema."
     },
     "progress": {
-      "runningLabel": "Análisis en ejecución…",
-      "runningMeta": "Esto puede llevar un momento en proyectos grandes."
+      "runningLabel": "Ejecutar análisis ... de ejecución.",
+      "runningMeta": "Esto puede tomar un momento en grandes proyectos."
     },
     "topRules": {
-      "sectionAria": "Reglas principales por recuento",
-      "hideTitle": "Ocultar solo para mí: a nivel del espacio de trabajo, reversible mediante Borrar supresiones",
-      "hideButton": "Esconder",
-      "disableTitle": "Deshabilitar para todo el proyecto: escribe analysis_options_custom.yaml y vuelve a ejecutar el análisis",
-      "disableButton": "Desactivar",
-      "workspaceOnlyShort": "solo espacio de trabajo",
-      "projectConfigShort": "configuración del proyecto (escribe analysis_options_custom.yaml)",
-      "topRulesOne": "Regla superior {count}",
-      "topRulesOther": "Principales reglas {count}",
+      "sectionAria": "Las mejores reglas por cuenta.",
+      "hideTitle": "Ocultar para mí sólo  ⁇  a nivel de espacio de trabajo, reversible mediante supresión clara.",
+      "hideButton": "Se ocultan y se esconden.",
+      "disableTitle": "Desactivar para todo el proyecto  ⁇  escribe analysis_options_custom.yaml y vuelve a ejecutar análisis de análisis",
+      "disableButton": "Desactivar deshabilitar el servicio.",
+      "workspaceOnlyShort": "Solo espacio de trabajo.",
+      "projectConfigShort": "config del proyecto (escribe analysis_options_custom.yaml)",
+      "topRulesOne": "La regla de la {count} superior es que",
+      "topRulesOther": "Las reglas de {count} más importantes.",
       "colRank": "#",
-      "colRule": "Regla",
-      "colCount": "Contar",
-      "colSeverity": "Gravedad",
-      "colActionsAria": "Acciones de fila",
-      "filesAffected": "Archivos afectados ({count})"
+      "colRule": "El artículo de la ley, el reglamento.",
+      "colCount": "El conde cuenta el conteo.",
+      "colSeverity": "Gravedad La gravedad es la severidad de las cosas.",
+      "colActionsAria": "Acciones de fila Las acciones en fila.",
+      "filesAffected": "Los archivos afectados ({count})"
     },
     "findings": {
-      "sectionAria": "Recomendaciones",
-      "expandAll": "Expandir todo",
-      "collapseAll": "Contraer todo",
+      "sectionAria": "Los hallazgos de los resultados.",
+      "expandAll": "Expanda todo y extienda todos.",
+      "collapseAll": "Todo se derrumba.",
       "bulkSelected": "{count} seleccionado(s)",
-      "bulkCopy": "Copiar seleccionado como JSON",
-      "selectAllTitle": "Seleccionar todos los hallazgos visibles",
-      "selectAllAria": "Seleccionar todos los hallazgos visibles",
-      "colSeverity": "Gravedad",
-      "colRule": "Regla",
-      "colMessage": "Mensaje",
-      "colLine": "Línea",
-      "colActionsAria": "Acciones de fila",
-      "selectRowAria": "Seleccione esta fila de búsqueda",
-      "copyRowTitle": "Copie este hallazgo como JSON",
+      "bulkCopy": "Copia la selección como JSON.",
+      "selectAllTitle": "Seleccione todos los hallazgos visibles.",
+      "selectAllAria": "Seleccione todos los hallazgos visibles.",
+      "colSeverity": "Gravedad La gravedad es la severidad de las cosas.",
+      "colRule": "El artículo de la ley, el reglamento.",
+      "colMessage": "El mensaje es el mensaje.",
+      "colLine": "Línea Linea La línea",
+      "colActionsAria": "Acciones de fila Las acciones en fila.",
+      "selectRowAria": "Seleccione esta fila de búsqueda para encontrar.",
+      "copyRowTitle": "Copie este hallazgo como JSON.",
       "metaShown": "{filtered} mostrado(s)",
       "metaAfterDisable": "{total} tras filtro de reglas deshabilitadas",
-      "metaSourceCap": "fuente limitada a {max} para el rendimiento",
-      "metaGroupedBy": "agrupados por {mode}",
-      "overflowNote": "Lista de fuentes truncada en {max} para mejorar el rendimiento del renderizado.",
-      "runAgain": "Ejecute el análisis nuevamente",
-      "emptyNoViolations": "No hay infracciones en la última ejecución del análisis.",
-      "emptyNoMatch": "Ninguna infracción coincide con los filtros actuales.",
+      "metaSourceCap": "fuente limitada a {max} para el rendimiento.",
+      "metaGroupedBy": "agrupados por {mode}.",
+      "overflowNote": "Lista de fuentes truncada en {max} para renderizar el rendimiento.",
+      "runAgain": "Ejecuta de nuevo el análisis.",
+      "emptyNoViolations": "No hay violaciones en la última prueba de análisis.",
+      "emptyNoMatch": "Ninguna violación coincide con los filtros actuales.",
       "emptyHintNoData": "Ejecute el análisis para completar `reports/.saropa_lints/violations.json` y luego actualice.",
-      "emptyHintFilters": "Ajuste los filtros o ejecute el análisis nuevamente para ver los resultados.",
-      "reRunAnalysis": "Volver a ejecutar el análisis",
-      "resetFilters": "Restablecer filtros",
+      "emptyHintFilters": "Ajuste los filtros o ejecute el análisis de nuevo para ver las conclusiones.",
+      "reRunAnalysis": "Análisis de re-run análisis.",
+      "resetFilters": "El restablecimiento de los filtros de ajuste.",
       "linePrefix": "L{line}"
     },
     "charts": {
-      "sectionAria": "Mezclar gráficos",
-      "heading": "Mezcla",
-      "metaClickSlice": "haga clic en una porción para filtrar",
-      "severityMix": "Mezcla de gravedad",
-      "impactMix": "Mezcla de impacto",
-      "filterBarTitle": "Filtrar solo a {key}",
+      "sectionAria": "Las tablas de mezclado son gráficas.",
+      "heading": "Se mezclan, se mezclen y se mezcla.",
+      "metaClickSlice": "Haga clic en una rebanada para filtrar.",
+      "severityMix": "Mezcla de gravedad mezclada.",
+      "impactMix": "Mezcla de impacto: mezcla de impactos.",
+      "filterBarTitle": "Filtrar a {key} sólo para el",
       "donutTotal": "total"
     },
     "todoHack": {
-      "sectionAria": "TODOS y HACKS",
-      "headingDisabled": "TODOS Y TRUCOS",
-      "metaDisabled": "escaneo deshabilitado",
-      "scanOff": "El escaneo del espacio de trabajo está desactivado: habilítelo para mostrar marcadores de archivos de proyecto.",
-      "enableScan": "Habilitar escaneo",
-      "heading": "TODOS Y TRUCOS",
+      "sectionAria": "Todo y todo, todos y todos.",
+      "headingDisabled": "Todo y todo es mentira.",
+      "metaDisabled": "escaneo deshabilitado ha sido desactivado.",
+      "scanOff": "Escaneo del espacio de trabajo está desactivado  ⁇  Habilitar para marcar la superficie desde los archivos del proyecto.",
+      "enableScan": "Habilitar el escaneo de barrido.",
+      "heading": "Todo y todo es mentira.",
       "subsectionNone": "{title}: ninguno en el rango de escaneo.",
-      "capNote": "El escaneo alcanzó el límite máximo de archivo; Levante `saropaLints.todosAndHacks.maxFilesToScan` para una cobertura completa.",
-      "notePill": "nota",
-      "todosLabel": "TODO",
-      "hacksLabel": "TRUCOS"
+      "capNote": "El escaneo alcanza el límite máximo de archivos; elevar ∀saropaLints.todosAndHacks.maxFilesToScan̅ para una cobertura completa.",
+      "notePill": "La nota de la nota no es una nota.",
+      "todosLabel": "Todo el mundo es todo.",
+      "hacksLabel": "El hacha es un garrote."
     },
     "drift": {
-      "sectionAria": "Asesor de deriva",
-      "headingOff": "Asesor de deriva",
-      "metaOff": "integración desactivada",
-      "enableBlurb": "Habilite la integración de Drift Advisor para mostrar sugerencias de bases de datos aquí.",
-      "enable": "Permitir",
-      "headingNoServer": "Asesor de deriva",
-      "metaNoServer": "sin servidor",
-      "noServerBlurb": "No se encontró ningún servidor Drift Advisor en los puertos configurados.",
-      "retry": "Rever",
-      "headingConnected": "Asesor de deriva",
-      "metaConnected": "conectado",
-      "noIssues": "Conectado a {label}: sin problemas actuales.",
-      "refresh": "Refrescar",
-      "openBrowser": "Abrir en el navegador",
-      "headingIssues": "Asesor de deriva",
-      "disable": "Deshabilitar el Asesor de deriva"
+      "sectionAria": "Consejero de deriva asesor.",
+      "headingOff": "Consejero de deriva asesor.",
+      "metaOff": "integración fuera de la integración.",
+      "enableBlurb": "Habilitar la integración de Drift Advisor a las sugerencias de base de datos en superficie aquí.",
+      "enable": "Habilitar habilitar para permitir.",
+      "headingNoServer": "Consejero de deriva asesor.",
+      "metaNoServer": "No hay servidor de ningún servidor.",
+      "noServerBlurb": "No se encontró ningún servidor de Drift Advisor en los puertos configurados.",
+      "retry": "Intentar de nuevo.",
+      "headingConnected": "Consejero de deriva asesor.",
+      "metaConnected": "conectado conectado conectado.",
+      "noIssues": "Conectado a {label}  ⁇  no hay problemas actuales.",
+      "refresh": "Refrescarse y refrescar.",
+      "openBrowser": "Abrir en el navegador.",
+      "headingIssues": "Consejero de deriva asesor.",
+      "disable": "Desactiva el asesor de deriva."
     },
     "suppressions": {
-      "sectionAria": "Supresiones",
-      "headingExport": "Supresiones (exportación)",
-      "viewHidesHeading": "Vista de problemas oculta",
-      "viewHidesMetaActive": "activo",
-      "viewHidesMetaNone": "ninguno",
-      "noneInExport": "No hay supresiones del analizador en la exportación actual de `violations.json`. Ejecute el análisis después de editar ignorados o líneas base para completar.",
-      "totalRow": "Total: borrar filtros y abrir Hallazgos",
-      "byRule": "Por regla ({count})",
+      "sectionAria": "Las supresiones de las suposiciones.",
+      "headingExport": "Eliminaciones (exportación) de las solicitudes.",
+      "viewHidesHeading": "Las cuestiones de la vista oculta la vista.",
+      "viewHidesMetaActive": "El activo es el activo activo.",
+      "viewHidesMetaNone": "Ninguno ninguno ningunos ninguno.",
+      "noneInExport": "No hay supresiones de analizador en la exportación actual \"violations.json\". Ejecute el análisis después de editar ignorados o líneas base para completar.",
+      "totalRow": "Total  ⁇  filtros transparentes y hallazgos abiertos.",
+      "byRule": "Por regla general ({count})",
       "byFile": "Por archivo ({count})",
-      "noEntries": "Sin entradas.",
-      "nothingHidden": "No hay nada oculto en la lista de problemas de este espacio de trabajo. Utilice acciones de contexto de árbol para ocultar carpetas, archivos o reglas; persisten en el estado del espacio de trabajo.",
+      "noEntries": "No hay entradas.",
+      "nothingHidden": "Nada está oculto de la lista de problemas en este espacio de trabajo. Utilice acciones de contexto en árbol para ocultar carpetas, archivos o reglas; persisten en el estado del espacio de trabajo.",
       "folderPattern": "{count} carpeta(s)",
       "filePattern": "{count} patrón/patrones de archivo",
       "ruleGlobal": "{count} regla(s) a nivel global",
       "perFileRules": "{count} archivo(s) con ocultación de reglas por archivo",
       "severityHides": "{count} gravedad(es) oculta(s)",
       "impactHides": "{count} impacto(s) oculto(s)",
-      "activeHides": "Ocultaciones activas: {counts}.",
-      "viewHidesFooter": "Estas ocultaciones reducen únicamente la lista de Problemas/panel de control; no están escritos en `violations.json`.",
-      "clearViewHides": "Borrar todas las vistas ocultas",
-      "foldersSample": "Carpetas (muestra)",
-      "filesSample": "Archivos/globs (muestra)",
+      "activeHides": "Cuerpos activos: {counts}. .",
+      "viewHidesFooter": "Estas capas reducen la lista de temas / panel solamente; no están escritos para `violations.json`.",
+      "clearViewHides": "Despejar todas las vistas oculta la vista.",
+      "foldersSample": "Carpetas (muestra) de las carpetas.",
+      "filesSample": "Archivos / globos (muestra)",
       "rulesSample": "Reglas (muestra)",
-      "perFileRulesSample": "Reglas por archivo (muestra)",
-      "unknownKind": "Desconocido"
+      "perFileRulesSample": "Reglas por expediente (muestra)",
+      "unknownKind": "Desconocido Desconocida Desconocidos."
     },
     "script": {
-      "analysisRunning": "Análisis en ejecución…",
-      "analysisComplete": "Análisis completo",
-      "metaRunning": "Esto puede llevar un momento en proyectos grandes.",
-      "metaDone": "Panel de control actualizado con los últimos hallazgos.",
-      "announceSearch": "buscar {q}",
+      "analysisRunning": "Ejecutar análisis ... de ejecución.",
+      "analysisComplete": "Análisis completo y completo.",
+      "metaRunning": "Esto puede tomar un momento en grandes proyectos.",
+      "metaDone": "Tablero de instrumentos refrescante con los últimos hallazgos.",
+      "announceSearch": "búsqueda {q}",
       "announceSeverities": "{n} gravedades",
       "announceImpacts": "{n} impactos",
-      "announceCleared": "Todos los filtros borrados",
-      "announceFiltersPrefix": "Filtros:",
+      "announceCleared": "Todos los filtros limpiados.",
+      "announceFiltersPrefix": "Los filtros: Se usan para filtrar.",
       "bulkSelected": "{n} seleccionado(s)",
-      "analysisStartedDetail": "Se inició el análisis. Recopilando diagnósticos...",
-      "announceStarted": "Análisis iniciado",
-      "announceComplete": "Análisis completo",
-      "announceFailed": "El análisis falló",
-      "analysisFailedDetail": "El análisis falló. Consulte la salida para obtener más detalles.",
-      "removeRecentAria": "Eliminar",
-      "removeRecentTitle": "Eliminar",
+      "analysisStartedDetail": "Se inició el análisis. Recogiendo los diagnósticos ...",
+      "announceStarted": "Se inició el análisis.",
+      "announceComplete": "Análisis completo y completo.",
+      "announceFailed": "El análisis falló.",
+      "analysisFailedDetail": "El análisis falló. Compruebe la salida para obtener detalles.",
+      "removeRecentAria": "Remover Eliminar quitar eliminar el removido",
+      "removeRecentTitle": "Remover Eliminar quitar eliminar el removido",
       "bulkSelectedTpl": "{n} seleccionado(s)"
     },
     "emptyState": {
-      "hintAfterMessage": "Ejecute un análisis de Saropa Lints para generar violations.json, luego use Actualizar aquí o vuelva a abrir este panel.",
-      "refreshDisk": "Actualizar desde el disco"
+      "hintAfterMessage": "Ejecuta un análisis Saropa Lints para generar violations.json, luego usa Refrescar aquí o vuelve a abrir este panel.",
+      "refreshDisk": "Actualizar desde el disco."
     },
     "shortcuts": {
-      "focusTextFilter": "Enfoca el filtro de texto",
-      "clearTextFilter": "Borrar el filtro de texto enfocado",
-      "activateKpi": "Activar tarjeta KPI enfocada o barra de gráfico",
-      "activateKpiSpace": "Activar tarjeta KPI enfocada o barra de gráfico",
-      "showOverlay": "Mostrar esta superposición de acceso directo"
+      "focusTextFilter": "Enfoque el filtro de texto.",
+      "clearTextFilter": "Limpia el filtro de texto enfocado.",
+      "activateKpi": "Activa la tarjeta de KPI enfocada o la barra del gráfico.",
+      "activateKpiSpace": "Activa la tarjeta de KPI enfocada o la barra del gráfico.",
+      "showOverlay": "Mostrar esta superposición de atajos."
     },
-    "unknownAnalyzerKind": "Desconocido",
+    "unknownAnalyzerKind": "Desconocido Desconocida Desconocidos.",
     "supplementary": {
-      "otherAnalyzerOn": "+{count} otros hallazgos del analizador",
-      "otherAnalyzerPromo": "+? otros hallazgos del analizador — mostrar",
-      "analyzerTodosOn": "+{count} analizador TODOs",
-      "analyzerTodosPromo": "+? TODO del analizador - mostrar",
-      "scannerPromo": "Habilitar el escáner TODO/HACK",
-      "tooltipLive": "En vivo desde el panel de Problemas de VS Code. Se actualiza a medida que se completa el análisis. Haga clic para ocultar.",
-      "tooltipScanner": "Escáner del sistema de archivos Saropa: cuenta los marcadores TODO/HACK abiertos en el código fuente.",
-      "tooltipPromoClickToOn": "Haga clic para habilitar"
+      "otherAnalyzerOn": "+{count} otros hallazgos del analizador.",
+      "otherAnalyzerPromo": "+? otros hallazgos del analizador  ⁇  muestran",
+      "analyzerTodosOn": "+{count} analizador TODOs es el más grande.",
+      "analyzerTodosPromo": "+? analizador TODOs  ⁇  muestra el espectáculo.",
+      "scannerPromo": "Habilitar el escáner TODO/HACK para las pruebas de detección.",
+      "tooltipLive": "En vivo desde el panel de problemas VS Code. Actualizaciones a medida que se completa el análisis. Haga clic para ocultar.",
+      "tooltipScanner": "Saropa escáner de sistema de archivos  ⁇  cuenta los marcadores abiertos TODO/HACK en el origen.",
+      "tooltipPromoClickToOn": "Haga clic para habilitar y activar."
     }
   },
   "triageDash": {
-    "showInIssues": "Mostrar en números",
-    "disableRules": "Deshabilitar reglas",
-    "enableRules": "Habilitar reglas",
-    "issues": "Asuntos",
-    "off": "Apagado",
-    "on": "En",
-    "colRule": "Regla",
-    "colIssues": "Asuntos",
+    "showInIssues": "Muestra en las cuestiones.",
+    "disableRules": "Desactivar las reglas de deshabilitación.",
+    "enableRules": "Las reglas de habilitación son las que permiten",
+    "issues": "Las cuestiones de los problemas.",
+    "off": "Fuera fuera fuera.",
+    "on": "En el mismo lugar.",
+    "colRule": "El artículo de la ley, el reglamento.",
+    "colIssues": "Las cuestiones de los problemas.",
     "zeroIssueRules": "{count} reglas con cero problemas — habilitadas automáticamente en el nivel.",
     "disabledOverrides": "{count} reglas deshabilitadas por anulación en `analysis_options_custom.yaml`.",
-    "summaryRuleTriage": "Clasificación de reglas",
-    "hintNoViolations": "Aún no hay `reports/.saropa_lints/violations.json`. Ejecute el análisis y luego actualice esta pestaña.",
-    "hintUnreadable": "No se exportan infracciones legibles. Ejecute primero el análisis de Saropa Lints.",
-    "hintStale": "Los datos de clasificación pueden estar desactualizados (la exportación tiene {age} antigüedad). Vuelva a ejecutar el análisis para los grupos actuales.",
-    "hintNoPerRule": "Esta exportación no tiene recuentos de problemas por regla. Vuelva a analizar con un complemento Saropa Lints actual.",
-    "hintBuildFailed": "No se pudo crear la clasificación a partir de esta exportación. Ejecute un nuevo análisis.",
-    "summaryVolume": "Clasificación de reglas (volumen / corrección obligada / estilística)",
-    "hintSameAsTree": "Misma agrupación que el árbol de la barra de actividades de Triage: filtre Problemas o deshabilite/habilite reglas en `analysis_options_custom.yaml`. Los grupos grandes pueden solicitar confirmación."
+    "summaryRuleTriage": "Regla de clasificación del equipo.",
+    "hintNoViolations": "Aún no hay `informes/.saropa_lints/violations.json`. Ejecute el análisis y luego actualice esta pestaña.",
+    "hintUnreadable": "No hay violaciones legibles export. export. Ejecuta primero el análisis de Saropa Lints.",
+    "hintStale": "Los datos de triaje pueden estar desactualizados (la exportación es {age} vieja). Análisis de re-run para los grupos actuales.",
+    "hintNoPerRule": "Esta exportación no tiene un número de emisiones por regla. Re-analizar con un plugin Saropa Lints actual. el análisis de nuevo",
+    "hintBuildFailed": "No se pudo construir un triaje a partir de esta exportación. Ejecuta un nuevo análisis.",
+    "summaryVolume": "Regla de clasificación (volumen / debe fijarse / estilístico)",
+    "hintSameAsTree": "La misma agrupación que el árbol de barra de actividad Triage: filtrar problemas, o deshabilitar/activar reglas en `analysis_options_custom.yaml゙. Los grupos grandes pueden pedir la confirmación."
   },
   "kbdOverlay": {
     "toggleTitle": "Mostrar atajos de teclado (?)",
-    "toggleAria": "Mostrar atajos de teclado",
-    "dialogTitle": "Atajos de teclado",
-    "closeAria": "Cerrar atajos de teclado",
-    "footer": "Presione Esc o haga clic afuera para cerrar."
+    "toggleAria": "Mostrar atajos de teclado.",
+    "dialogTitle": "Atajos de teclado para el teclado.",
+    "closeAria": "Cierra los atajos de teclado.",
+    "footer": "Presione Esc o haga clic en el exterior para cerrar."
   },
   "wideReport": {
-    "openWorkspaceFirst": "Primero abra una carpeta del espacio de trabajo.",
-    "noReportYet": "Aún no hay informes de violaciones. Ejecute primero el análisis de Saropa Lints.",
-    "clipboardCopyFailed": "No se pudo copiar al portapapeles.",
-    "copiedViolationsJson": "Se copiaron las infracciones {count} como JSON.",
-    "copiedOneViolationJson": "Se copió 1 infracción como JSON.",
-    "driftNotConnected": "El servidor Drift Advisor no está conectado.",
-    "copiedBulkFindings": "Se copiaron los hallazgos seleccionados {count} como JSON.",
+    "openWorkspaceFirst": "Primero abra una carpeta de espacio de trabajo.",
+    "noReportYet": "Todavía no se han reportado violaciones. Ejecuta primero el análisis de Saropa Lints.",
+    "clipboardCopyFailed": "No se pudo copiar a la portapapeles.",
+    "copiedViolationsJson": "Copiado violación {count} (s) como JSON.",
+    "copiedOneViolationJson": "Copiado 1 violación como JSON.",
+    "driftNotConnected": "El servidor de Drift Advisor no está conectado.",
+    "copiedBulkFindings": "Copiado {count} hallazgo seleccionado (s) como JSON.",
     "noMatchingFindingsCopy": "No hay resultados coincidentes para copiar.",
     "couldNotOpenFile": "No se pudo abrir el archivo: {path}",
-    "saveReportNoWorkspace": "Abra una carpeta del espacio de trabajo antes de guardar el informe.",
+    "saveReportNoWorkspace": "Abra una carpeta de espacio de trabajo antes de guardar el informe.",
     "savedFindings": "Hallazgos {count} guardados: {path}",
     "couldNotSaveReportJson": "No se pudo guardar el informe JSON."
   },
   "packageDashboard": {
-    "documentTitle": "Panel de control del paquete Saropa",
-    "heroTitle": "Panel de control del paquete Saropa",
+    "documentTitle": "Saropa Panel de control del paquete",
+    "heroTitle": "Saropa Panel de control del paquete",
     "status": {
       "packagesCount": "{count} paquetes",
       "packagesBreakdown": "{direct} directo, {transitive} transitivo",
-      "gradeLine": "Calificación {grade} · {avg}/100",
+      "gradeLine": "El grado es {grade} · {avg}/100.",
       "flaggedCount": "{count} marcado(s)",
-      "flaggedTitle": "Abandonado o al final de su vida",
-      "lastScanLabel": "Escaneado {when}",
-      "lastScanTitle": "Cuando se obtuvieron los datos de este panel: {timestamp}. Haga clic en Volver a escanear para actualizar.",
+      "flaggedTitle": "Abandonado o al final de su vida útil.",
+      "lastScanLabel": "Escaneado {when}.",
+      "lastScanTitle": "Cuando se obtuvieron los datos de este panel  ⁇  {timestamp}. Haga clic en Volver a escanear para actualizar.",
       "lastScanUnknown": "Escaneado (hora desconocida)",
-      "lastScanUnknownTitle": "Este análisis se ejecutó antes de que el panel rastreara las marcas de tiempo. Haga clic en Volver a escanear para actualizar."
+      "lastScanUnknownTitle": "Este escaneo se ejecutó antes de que el tablero rastreara las marcas de tiempo. Haga clic en Volver a escanear para actualizar."
     },
     "time": {
-      "justNow": "En este momento",
+      "justNow": "justo ahora, en este momento.",
       "minutesAgo": "hace {min} m",
       "hoursAgo": "hace {hr} h",
       "daysAgo": "hace {day} d"
     },
     "scanning": {
-      "heading": "Paquetes de escaneo",
+      "heading": "Paquetes de escaneo para el análisis.",
       "body1": "Saropa está obteniendo metadatos de pub.dev, actividad de GitHub y gráficos de dependencia para cada dependencia directa en este proyecto.",
-      "body2": "Esta página se actualizará automáticamente cuando finalice el escaneo. Puedes cancelar desde la notificación de progreso en la parte inferior derecha.",
-      "versionStamp": "Panel de control del paquete Saropa v{version}"
+      "body2": "Esta página se actualizará automáticamente cuando termine el escaneo. Puede cancelar desde la notificación de progreso en el ángulo inferior derecho.",
+      "versionStamp": "Saropa Panel de control del paquete v{version}"
     },
-    "gaugeTitle": "Calificación del paquete del proyecto: {grade}",
+    "gaugeTitle": "Grado del paquete de proyectos: {grade}",
     "summary": {
-      "packages": "Paquetes",
-      "projectGrade": "Grado del paquete del proyecto",
+      "packages": "Los paquetes de viaje son un conjunto de paquetes.",
+      "projectGrade": "Paquete de Proyecto Grado del paquete de proyectos",
       "totalSize": "Tamaño total*",
-      "gradeTooltip": "Calificación del proyecto {avgGrade}\nPuntuación media: {avgScore}/100\nPaquetes: {pkgCount}\nA:{a} B:{b} C:{c} E:{e} F:{f}",
-      "vibrantTitle": "Vibrante",
-      "stableTitle": "Estable",
-      "outdatedTitle": "Anticuado",
-      "abandonedTitle": "Abandonado",
-      "eolTitle": "Fin de vida",
-      "updates": "Actualizaciones",
-      "unused": "No usado",
-      "singleUse": "De un solo uso",
+      "gradeTooltip": "Grado del proyecto {avgGrade}\nPuntuación media: {avgScore}/100\nPaquetes: {pkgCount}\nA:{a} B:{b} C:{c} E:{e} F:{f}",
+      "vibrantTitle": "Vibrante y vibrante.",
+      "stableTitle": "Está estable, estáble.",
+      "outdatedTitle": "Desactualizado y desactualizado.",
+      "abandonedTitle": "Abandonados y abandonadas.",
+      "eolTitle": "Fin de la vida al final del camino.",
+      "updates": "Actualizaciones de actualizaciones.",
+      "unused": "No utilizado sin uso.",
+      "singleUse": "Un solo uso de un solo uso.",
       "vulnerable": "Vulnerable",
-      "overrides": "Anulaciones",
-      "caveatLine1": "*Se muestran los tamaños de código (lib + activos declarados), recurriendo al tamaño del archivo pub.dev cuando el tamaño del código no está disponible. Excluye dev_dependencies (build_runner, lints, saropa_lints, etc.): nunca se envían al paquete APK/IPA/web. El tamaño real de la aplicación será menor después de sacudir el árbol.",
-      "caveatLine2": "Umbrales de actividad: 90d = obsoleto, 180d = inactivo (cronogramas de confirmación + liberación)."
+      "overrides": "Se anula las prioridades.",
+      "caveatLine1": "*Se muestran tamaños de código (lib + declarados activos), que vuelven al tamaño del archivo pub.dev cuando el tamaño del código no está disponible. Excluye dev_dependencies (build_runner, lints, saropa_lints, etc.)  ⁇  nunca se envían al paquete APK / IPA / web. El tamaño real de la aplicación será más pequeño después del temblor.",
+      "caveatLine2": "Umbral de actividad: 90d = estancado, 180d = latente (horarios de compromiso + liberación)."
     },
     "breakdown": {
-      "title": "¿Por qué calificar {grade}? — Promedio {avgScore}/100 en paquetes {pkgCount}",
-      "hint": "Haga clic para ampliar",
-      "distributionHeading": "Distribución",
-      "signalsHeading": "Señales de riesgo que arrastran la puntuación hacia abajo",
-      "signalFlagged": "{count} marcado (abandonado/fin de vida)",
-      "signalVulnerable": "{count} con vulnerabilidades conocidas",
-      "signalUpdates": "{count} tiene actualizaciones disponibles",
-      "bottomHeading": "Paquetes con la puntuación más baja",
-      "thresholdsHeading": "Cómo se relacionan las puntuaciones con las calificaciones",
-      "thresholdA": "70+ — Vibrante: mantenido activamente, publicado recientemente",
-      "thresholdB": "40–69 — Estable: aún se mantiene pero se desacelera",
-      "thresholdC": "20–39: obsoleto: largos intervalos entre lanzamientos",
-      "thresholdE": "por debajo de 20 — Abandonado: signos de inactividad",
-      "thresholdF": "Discontinuado o archivado en pub.dev (partitura no utilizada)",
-      "filterTooltip": "Filtre la tabla de paquetes solo para esta categoría",
-      "jumpTooltip": "Saltar a {name} en la tabla de paquetes"
+      "title": "¿Por qué calificar {grade}?  ⁇  {avgScore}/100 promedio en todos los paquetes de {pkgCount}.",
+      "hint": "Haga clic para expandir.",
+      "distributionHeading": "Distribución de la distribución.",
+      "signalsHeading": "Señales de riesgo que arrastran la puntuación hacia abajo.",
+      "signalFlagged": "{count} marcado (abandonado / al final de su vida útil)",
+      "signalVulnerable": "{count} con vulnerabilidades conocidas.",
+      "signalUpdates": "{count} tiene actualizaciones disponibles.",
+      "bottomHeading": "Los paquetes con la puntuación más baja son los que obtienen el mejor resultado.",
+      "thresholdsHeading": "Cómo los puntajes se relacionan con las calificaciones.",
+      "thresholdA": "70+  ⁇  Vibrante: mantenido activamente, publicado recientemente.",
+      "thresholdB": "40 ⁇ 69  ⁇  Estable: todavía se mantiene pero desacelera.",
+      "thresholdC": "20 ⁇ 39  ⁇  Anticuado: largas brechas entre lanzamientos.",
+      "thresholdE": "por debajo de 20  ⁇  Abandonado: signos de inactividad.",
+      "thresholdF": "Se suspendió o archivado el pub.dev (puntuación no utilizada)",
+      "filterTooltip": "Filtrar la tabla de paquetes para sólo esta categoría.",
+      "jumpTooltip": "Salta a {name} en la tabla de paquetes."
     },
     "network": {
-      "summary": "Red de dependencia"
+      "summary": "Red de dependencia en red."
     },
     "sections": {
-      "sizeDistribution": "Distribución de tamaño",
-      "sizeDistributionCaption": "Excluye dev_dependencies: nunca se envían al paquete APK/IPA/web.",
-      "filters": "Filtros",
-      "packages": "Paquetes"
+      "sizeDistribution": "Distribución de tamaño Distribuciones del tamaño",
+      "sizeDistributionCaption": "Excluye dev_dependencies  ⁇  nunca se envían al paquete APK / IPA / web.",
+      "filters": "Los filtros de los filtros.",
+      "packages": "Los paquetes de viaje son un conjunto de paquetes."
     },
     "toolbar": {
-      "openPubspecTitle": "Abrir pubspec.yaml",
+      "openPubspecTitle": "Abre el pubspec.yaml.",
       "openPubspecLabel": "pubspec.yaml",
-      "copyAllTitle": "Copiar informe JSON (todas las filas + detalles)",
-      "copyAllLabel": "Copiar",
-      "saveAllTitle": "Guarde el informe JSON en informes/AAAAMMDD/...",
-      "saveAllLabel": "Ahorrar",
-      "resetViewTitle": "Restablecer filtros, ordenar y estado de vista guardado",
-      "resetViewLabel": "Restablecer vista",
-      "rescanTitle": "Volver a analizar paquetes: borra la caché de pub.dev y recupera las versiones.",
-      "rescanLabel": "Volver a escanear",
-      "openOtherTitle": "Abra otro proyecto de pubspec.yaml en una nueva ventana para escanear Vibrancy",
-      "openOtherLabel": "Abrir proyecto…",
-      "footprintGroupAria": "Modo de huella de columna de tamaño",
-      "footprintGroupTitle": "Lo que muestra la columna Tamaño: solo el tamaño del código propio, más transitivos únicos (costo si se eliminan) o más todos los transitivos (máximo teórico). Vuelve al tamaño del archivo cuando el tamaño del código no está disponible.",
-      "footprintLabel": "Huella:",
-      "footprintOwnTitle": "Solo tamaño de código propio (lib + activos declarados); vuelve al tamaño de archivo pub.dev cuando no está disponible",
-      "footprintOwn": "Propio",
-      "footprintUniqueTitle": "Tamaño propio + transitivas utilizadas solo por este departamento (ahorro si lo eliminas)",
-      "footprintUnique": "+ Único",
-      "footprintTotalTitle": "Tamaño propio + todos los transitivos, incluidos los compartidos con otros departamentos",
-      "footprintTotal": "+ Todos",
-      "searchLabel": "Buscar paquetes",
-      "searchPlaceholder": "Buscar paquetes…",
-      "clearSearchTitle": "Borrar búsqueda",
-      "clearSearchAria": "Borrar búsqueda",
-      "ageFilterTitle": "Filtrar por edad de publicación",
-      "publishedAgeLabel": "Edad publicada",
-      "ageMaxAll": "Todo",
-      "presetFilterTitle": "Aplicar ajustes preestablecidos de filtro rápido",
-      "presetLabel": "Programar",
-      "presetNone": "Ninguno",
-      "presetModernization": "Modernización",
-      "presetRiskHotspots": "Puntos críticos de riesgo",
-      "presetCleanup": "Candidatos de limpieza",
-      "presetDirectOnly": "Solo directo",
-      "devToggleTitle": "Incluir dependencias de desarrollo en la tabla y los totales",
-      "includeDev": "incluir desarrollador",
-      "activeFiltersLabel": "Filtros activos:",
-      "clearAllFilters": "Borrar todo"
+      "copyAllTitle": "Copia el informe JSON (todas las filas + detalles)",
+      "copyAllLabel": "Copiar copiar copiado",
+      "saveAllTitle": "Guardar el informe JSON en los informes / A.A.A..MMDD/...",
+      "saveAllLabel": "Salvar y guardar para salvar.",
+      "saveUpgradeTitle": "Guardar un informe de sólo paquetes con una actualización disponible para los informes/AAAAAMMDD/...",
+      "saveUpgradeLabel": "Guardar el informe de actualización.",
+      "resetViewTitle": "Reinicia los filtros, ordena y guarda el estado de vista.",
+      "resetViewLabel": "La vista de reinicio en la vista de restablecimiento.",
+      "rescanTitle": "Reescanear paquetes  ⁇  borra la caché pub.dev y vuelve a buscar las versiones.",
+      "rescanLabel": "El rescan de nuevo escanear.",
+      "openOtherTitle": "Abra otro proyecto de pubspec.yaml en una nueva ventana para el escaneo Vibrancy.",
+      "openOtherLabel": "Proyecto Abierto...",
+      "footprintGroupAria": "Modo de huella en columna tamaño modo de huellas en la columna.",
+      "footprintGroupTitle": "Lo que muestra la columna Tamaño: solo el tamaño del código propio, más los transitivos únicos (costo si se eliminan), o más todos los transitivos (máximo teórico). Se vuelve al tamaño de archivo cuando el tamaño del código no está disponible.",
+      "footprintLabel": "Huella: huella de pie.",
+      "footprintOwnTitle": "Solo tamaño de código propio (lib + declarado activos); vuelve a pub.dev archivo cuando no está disponible.",
+      "footprintOwn": "Su propio dueño, su propia propiedad.",
+      "footprintUniqueTitle": "Tamaño propio + transitivos utilizados solo por este depósito (ahorro si lo quita)",
+      "footprintUnique": "+ Único y único.",
+      "footprintTotalTitle": "Tamaño propio + todos los transitivos, incluidos los compartidos con otros departamentos.",
+      "footprintTotal": "+ Todos y todas.",
+      "searchLabel": "Paquetes de búsqueda en paquetes de buscadores.",
+      "searchPlaceholder": "Busque en los paquetes...",
+      "clearSearchTitle": "Borrar búsqueda de la búsquedas.",
+      "clearSearchAria": "Borrar búsqueda de la búsquedas.",
+      "ageFilterTitle": "Filtrar por edad de publicación.",
+      "publishedAgeLabel": "Edad publicada La edad de publicación.",
+      "ageMaxAll": "Todo, todo, todo es verdad.",
+      "presetFilterTitle": "Aplicar los ajustes preestablecidos de filtro rápido.",
+      "presetLabel": "El preset es el preconfigurado.",
+      "presetNone": "Ninguno de los dos, no.",
+      "presetModernization": "Modernización de la modernización.",
+      "presetRiskHotspots": "Los puntos calientes de riesgo son los lugares donde se encuentran las personas con más riesgos",
+      "presetCleanup": "Candidatos para limpieza de la ciudad.",
+      "presetDirectOnly": "Sólo directo sólo directa.",
+      "devToggleTitle": "Incluir dependencias de dev en tablas y totales.",
+      "includeDev": "Incluye dev.",
+      "activeFiltersLabel": "Filtros activos: Se usan para filtrar.",
+      "clearAllFilters": "Todo limpio, todo despejado."
     },
     "columns": {
       "name": {
-        "label": "Paquete",
-        "tooltip": "Nombre del paquete: haga clic para abrir la entrada pubspec.yaml"
+        "label": "El paquete de la caja",
+        "tooltip": "Nombre del paquete  ⁇  haga clic para abrir la entrada pubspec.yaml."
       },
       "version": {
-        "label": "Versión",
-        "tooltip": "Versión instalada desde pubspec.lock"
+        "label": "La versión de la versión.",
+        "tooltip": "Versión instalada desde pubspec.lock."
       },
       "score": {
-        "label": "Categoría",
-        "tooltip": "Clasificación de vitalidad y puntuación de salud (0 a 10)"
+        "label": "Categoría de categoría La categoría es la clase.",
+        "tooltip": "Clasificación de la vibración y puntuación de salud (0 ⁇ 10)"
       },
       "published": {
-        "label": "Publicado",
-        "tooltip": "Fecha en que se publicó la versión instalada en pub.dev"
+        "label": "Publicado publicado publicó.",
+        "tooltip": "Fecha en que se publicó la versión instalada a pub.dev."
       },
       "activity": {
-        "label": "Actividad",
-        "tooltip": "Calificación de actividad de código y lanzamiento desde confirmación + publicación reciente"
+        "label": "La actividad de la actividad.",
+        "tooltip": "Calificación de la actividad de código y liberación desde el compromiso + publicación reciente."
       },
       "likes": {
-        "label": "Gustos",
-        "tooltip": "Me gusta de pub.dev: haga clic para abrir la página de puntuación del paquete"
+        "label": "Le gusta a alguien.",
+        "tooltip": "pub.dev me gusta  ⁇  haga clic para abrir la página de puntaje del paquete."
       },
       "downloads": {
-        "label": "Descargas",
-        "tooltip": "Descargas de pub.dev en los últimos 30 días: haga clic para abrir la página de puntuación del paquete"
+        "label": "Descargas de las descargas.",
+        "tooltip": "Descargas de pub.dev en los últimos 30 días  ⁇  haga clic para abrir la página del puntaje del paquete."
       },
       "issues": {
-        "label": "Asuntos",
-        "tooltip": "Abrir problemas de GitHub (excluye solicitudes de extracción cuando estén disponibles)"
+        "label": "Las cuestiones de los problemas.",
+        "tooltip": "Abre GitHub problemas (excluye las solicitudes de extracción cuando están disponibles)"
       },
       "prs": {
-        "label": "relaciones públicas",
-        "tooltip": "Abrir solicitudes de extracción de GitHub"
+        "label": "PRs es el nombre de un servicio público.",
+        "tooltip": "Abra las solicitudes de extracción GitHub."
       },
       "size": {
-        "label": "Tamaño",
-        "tooltip": "Tamaño del código (lib + activos declarados); vuelve al tamaño de archivo pub.dev cuando el tamaño del código no está disponible"
+        "label": "El tamaño de la talla.",
+        "tooltip": "Tamaño del código (lib + declarado activos); vuelve a pub.dev tamaño de archivo cuando el tamaño del código no está disponible."
       },
       "deps": {
-        "label": "departamentos",
-        "tooltip": "Dependencias transitivas directas: departamentos compartidos resaltados"
+        "label": "Depósitos de depósito y otras.",
+        "tooltip": "Dependencias transitivas directas  ⁇  Depósitos compartidos resaltados."
       },
       "files": {
-        "label": "Referencias",
-        "tooltip": "Número de archivos fuente que importan este paquete: haga clic para buscar"
+        "label": "Referencias Las referencias son las que hacen referencia.",
+        "tooltip": "Número de archivos fuente que importan este paquete  ⁇  haga clic para buscar."
       },
       "transitives": {
-        "label": "Transitivos",
-        "tooltip": "Número de dependencias transitivas (indirectas) que genera este paquete"
+        "label": "Las transitivas son las que se encuentran en transición.",
+        "tooltip": "Número de dependencias transitivas (indirectas) que este paquete incluye."
       },
       "vulns": {
         "label": "Vuln.",
-        "tooltip": "Vulnerabilidades de seguridad conocidas de las bases de datos OSV y GitHub Advisory"
+        "tooltip": "Vulnerabilidades de seguridad conocidas en las bases de datos OSV y GitHub Advisory."
       },
       "license": {
-        "label": "Licencia",
-        "tooltip": "Identificador de licencia SPDX de pub.dev"
+        "label": "Licencia de licencia.",
+        "tooltip": "SPDX identificador de licencia desde el pub.dev."
       },
       "update": {
-        "label": "Actualizar",
-        "tooltip": "Actualización de versión disponible: mayor, menor o parche"
+        "label": "Actualización de actualizaciones.",
+        "tooltip": "Actualización de la versión disponible: mayor, menor o parche."
       },
       "status": {
-        "label": "Estado",
-        "tooltip": "Estado de uso: si el paquete aparece sin usar en su código"
+        "label": "El estado de la situación.",
+        "tooltip": "Estado de uso: si el paquete aparece sin usar en su código."
       },
       "description": {
-        "label": "Descripción",
+        "label": "Descripción de la descripción La descripción es una descripción.",
         "tooltip": "Descripción del paquete de pub.dev"
       }
     },
     "cells": {
-      "noGithub": "No se encontró ningún repositorio de GitHub"
+      "noGithub": "No se encontró ningún repositorio GitHub.",
+      "devBadge": "El nombre de la empresa es Dev Dev.",
+      "transitiveBadge": "transitivo es el término que se utiliza para designar a los seres humanos.",
+      "publishDateUnavailable": "Fecha de publicación no está disponible desde pub.dev",
+      "activityGradeUnavailable": "Grado de actividad no disponible (falta datos de compromiso o liberación)",
+      "activityFallback": "Actividad basada en compromisos y liberaciones recientes.",
+      "likesUnavailable": "pub.dev Me gusta no está disponible.",
+      "likesCount": "A {count} le gusta el hecho de que a pub.dev le guste.",
+      "downloadsUnavailable": "pub.dev No están disponibles las descargas de 30 días.",
+      "downloadsCount": "Descargas de {count} en los últimos 30 días",
+      "sizeUnavailable": "Tamaño no disponible desde pub.dev",
+      "noVulnerabilities": "No se conocen vulnerabilidades.",
+      "licenseUnspecified": "Licencia no especificada en el pub.dev",
+      "unusedBadge": "No utilizado sin uso.",
+      "packageInUse": "El paquete está en uso."
     },
     "row": {
-      "expandDetails": "Ampliar detalles",
-      "copyRowJson": "Copiar fila como JSON"
+      "expandDetails": "Amplía los detalles de la expansión.",
+      "copyRowJson": "Copia la fila como JSON y luego"
     },
     "shortcuts": {
-      "focusSearch": "Enfoca el campo de búsqueda",
-      "nextRow": "Resalte la siguiente fila del paquete",
-      "prevRow": "Resalte la fila del paquete anterior",
-      "toggleDetail": "Alternar el expansor de detalles del paquete resaltado",
-      "escapeSearch": "Búsqueda clara y enfocada; segundo Esc colapsa todas las filas expandidas",
-      "historyBack": "Regresar al historial de navegación del paquete",
-      "showOverlay": "Mostrar esta superposición de acceso directo"
+      "focusSearch": "Enfoque el campo de búsqueda.",
+      "nextRow": "Resalte la siguiente fila de paquetes.",
+      "prevRow": "Resaltar la fila de paquete anterior en el mismo lugar.",
+      "toggleDetail": "Al cambiar el expandidor de detalles del paquete resaltado, cambie la posición.",
+      "escapeSearch": "Busca clara enfocada; en el segundo Esc se derrumban todas las filas expandidas.",
+      "historyBack": "Vuelve a través del historial de navegación del paquete.",
+      "showOverlay": "Mostrar esta superposición de atajos."
+    },
+    "versionTooltip": {
+      "installed": "Instalado: {version} ({date}) y el equipo está en su lugar.",
+      "latest": "Lo último: {version} El más reciente",
+      "created": "Creado por: {date}",
+      "constraint": "Restricción: {constraint} La restricción es la siguiente:"
+    },
+    "healthTooltip": {
+      "grade": "Grado: {grade} El grado es de _PH0_.",
+      "resolutionVelocity": "Velocidad de resolución: {value}",
+      "engagementLevel": "Nivel de participación: {value}",
+      "popularity": "Popularidad: {value} Su nombre es",
+      "publisherTrust": "La confianza del editor: {value}",
+      "codeCommits": "El código se compromete: {age} hace.",
+      "latestRelease": "Última versión: hace {age} años.",
+      "activitySignal": "Señales de actividad: {signal}"
+    },
+    "size": {
+      "codeSize": "Tamaño del código: {size}",
+      "archiveSize": "Tamaño del archivo: {size}",
+      "onDisk": "En el disco: {size}",
+      "withUniqueTransitives": "Con transitivos únicos: {size}, que es el número de",
+      "withSharedTransitives": "Con transitivos compartidos: {size}",
+      "openFolder": "Abra la carpeta de paquetes locales y las carpetas de paquete."
+    },
+    "references": {
+      "noImports": "No se detectaron importaciones de archivos fuente.",
+      "reExportLine": "{location} (reexportación) Se refiere a las exportaciones.",
+      "reExportSuffix": "(reexportación) y el resto de las exportaciones.",
+      "publicApiSurface": "Superficie de API pública  ⁇  al menos un uso es una reexportación.",
+      "reExportedBadge": "Reexportado re-exportado fue exportado.",
+      "openFileReferences": "Abrir referencias de archivos abiertos.",
+      "searchImports": "Búsqueda de importaciones búsqueda.",
+      "fileReferencesHeading": "Referencias de archivos ({count})",
+      "andMore": "... y más {count}."
+    },
+    "deps": {
+      "noTransitives": "No hay dependencias transitivas.",
+      "showTransitives": "Mostrar las dependencias transitivas.",
+      "tooltipDep": "• El {dep} es el número de",
+      "tooltipDepShared": "• {dep} (compartido) es el número de",
+      "tooltipHeader": "{total} deps transitivos se desvanecen en el tiempo.",
+      "tooltipHeaderShared": "{total} depósitos transitivos ({shared} compartidos) y también",
+      "sharedBadgeTitle": "{count} compartido con otros paquetes.",
+      "sharedBadge": "Compartido compartido compartida compartido.",
+      "transitiveDepsHeading": "Dependencias transitivas ({count})"
+    },
+    "dormancy": {
+      "noActivity6mo": "No hay compromisos y no se liberan en 6+ meses.",
+      "noActivity3mo": "No hay compromisos y no se lanzan en 3+ meses.",
+      "releaseActiveCodeInactive": "Liberación activa, código inactivo (3+ meses sin compromisos)",
+      "codeActiveReleaseSlow": "Código activo, la cadencia de liberación es más lenta (3+ meses)"
+    },
+    "activity": {
+      "withDormancy": "{dormancy} (grado de actividad {grade})",
+      "healthy": "La actividad de código y liberación es saludable (grado de actividad {grade})"
+    },
+    "detail": {
+      "codeCommitActivity": "Código Commit Actividad de la actividad.",
+      "releaseActivity": "Actividad de liberación.",
+      "dormancySignal": "Señales de latencia en la señal.",
+      "ago": "{age} hace un tiempo.",
+      "qualityExample": "+ejemplo ejemplo",
+      "qualityExampleTitle": "Se envía una demo ejecutable.",
+      "qualityTests": "+ Pruebas de pruebas.",
+      "qualityTestsTitle": "Envía una suite de pruebas.",
+      "qualityTools": "+herramientas de herramientas.",
+      "qualityToolsTitle": "Herramientas de mantenimiento para el personal del buque.",
+      "qualityDocs": "+docs es el número de documentos",
+      "qualityDocsTitle": "Los buques extienden la documentación de su documentación.",
+      "healthScore": "Puntuación de salud (Health Score)",
+      "resolutionVelocity": "Velocidad de resolución.",
+      "engagementLevel": "Nivel de compromiso: El nivel de participación es el nivel en que se ha comprometido.",
+      "popularity": "Popularidad La popularidad.",
+      "publisherTrust": "El fideicomiso de los editores es un fideicomizo.",
+      "fixInVersion": "→ fijar en el {version}.",
+      "vulnerabilitiesHeading": "Vulnerabilidades ({count}) Las vulnerabilidades son las que se encuentran en la parte superior de un sistema."
+    },
+    "links": {
+      "heading": "Los enlaces de los vínculos.",
+      "pubDev": "pub.dev",
+      "changelog": "El changelog es el cambio de registro.",
+      "versions": "Las versiones de las versiones.",
+      "repository": "El repositorio de datos es un repositorio.",
+      "issues": "Las cuestiones de los temas."
     }
   },
   "commandCatalog": {
-    "documentTitle": "Catálogo de comando Saropa",
-    "skipLink": "Saltar al catálogo de comandos",
-    "heroTitle": "Catálogo de comando Saropa",
+    "documentTitle": "Saropa Catálogo de comandos del catálogo",
+    "skipLink": "Salta al catálogo de comandos.",
+    "heroTitle": "Saropa Catálogo de comandos del catálogo",
     "status": {
       "commands": "{count} comandos",
       "categories": "{count} categorías",
       "recent": "{count} reciente(s)",
       "internalHidden": "{count} solo menú contextual (oculto)",
-      "wordCommands": "comandos",
-      "wordCategories": "categorias",
-      "wordRecent": "reciente"
+      "wordCommands": "Los comandos de las órdenes.",
+      "wordCategories": "Categorías categorías categoríes categorías",
+      "wordRecent": "reciente, recientes recientes."
     },
     "search": {
-      "placeholder": "Título de búsqueda, descripción o ID de comando...",
-      "ariaLabel": "Comandos de búsqueda",
-      "clearAria": "Borrar búsqueda",
-      "hintLine1": "Coincide con cada comando",
-      "hintStrongTitle": "título",
-      "hintStrongDesc": "descripción",
-      "hintStrongId": "identificación",
-      "hintLine2": "(los tokens de identificación también están espaciados: escriba",
-      "hintLine2kbd": "ejecutar análisis",
-      "hintLine2End": "sin puntos)."
+      "placeholder": "Título de búsqueda, descripción o ID del comando...",
+      "ariaLabel": "Las órdenes de búsqueda son comandos de búsqqueo.",
+      "clearAria": "Borrar búsqueda de la búsquedas.",
+      "hintLine1": "Se corresponde con cada comando de cada uno.",
+      "hintStrongTitle": "Título título del título.",
+      "hintStrongDesc": "Descripción descripción de la descripción",
+      "hintStrongId": "Id id es el número de identificación.",
+      "hintLine2": "(los tokens de identificación están espaciados también  ⁇  tipo",
+      "hintLine2kbd": "Ejecutar análisis de ejecución.",
+      "hintLine2End": "sin puntos).) y el de la letra."
     },
     "toolbar": {
-      "showInternal": "Mostrar comandos del menú contextual",
-      "collapseAll": "Contraer todo"
+      "showInternal": "Mostrar los comandos del menú contextual.",
+      "collapseAll": "Todo se derrumba."
     },
     "recentPopover": {
-      "title": "Búsquedas recientes",
-      "clearTitle": "Borrar todas las búsquedas recientes",
-      "clearButton": "Claro",
-      "listAria": "Búsquedas recientes"
+      "title": "Búsquedas recientes.",
+      "clearTitle": "Limpiar todas las búsquedas recientes.",
+      "clearButton": "Claro claro claro claro es su nombre.",
+      "listAria": "Búsquedas recientes."
     },
     "filterChips": {
-      "ariaRegion": "Filtros activos",
-      "activeLabel": "Filtros activos:",
-      "clearAll": "Borrar todo"
+      "ariaRegion": "Los filtros activos son los que se utilizan para filtrar.",
+      "activeLabel": "Filtros activos: Se usan para filtrar.",
+      "clearAll": "Todo limpio, todo despejado."
     },
     "bands": {
-      "frequentTitle": "Frecuente",
-      "frequentHint": "Más utilizado en tus sesiones",
-      "recentTitle": "Reciente",
-      "recentClear": "Claro",
-      "recentHint": "Haga clic para ejecutar nuevamente · Lo más nuevo primero"
+      "frequentTitle": "Frecuente frecuente con frecuencia.",
+      "frequentHint": "La más utilizada en sus sesiones.",
+      "recentTitle": "Reciente recientes recientes.",
+      "recentClear": "Claro claro claro claro es su nombre.",
+      "recentHint": "Haga clic para ejecutar de nuevo · Lo más reciente primero."
     },
     "noResults": {
-      "message": "Ningún comando coincide con tu búsqueda.",
-      "reset": "Restablecer filtros"
+      "message": "No hay comandos que coincidan con su búsqueda.",
+      "reset": "El restablecimiento de los filtros de ajuste."
     },
     "entry": {
-      "internalBadgeTitle": "Activado solo desde menús contextuales",
-      "internalBadge": "menú",
-      "copyTitle": "Copiar ID de comando ({id})",
-      "copyAria": "Copiar ID de comando"
+      "internalBadgeTitle": "Se activa desde los menús contextuales solamente.",
+      "internalBadge": "El menú es el menú.",
+      "copyTitle": "Copia el id de comando ({id})",
+      "copyAria": "Copia el id de la orden del comando."
     },
-    "categoryJumpTitle": "Saltar a {category}",
+    "categoryJumpTitle": "Salta a {category} para hacer el _PH0_.",
     "shortcuts": {
-      "focusSearch": "Enfoca el campo de búsqueda",
-      "navRows": "Navegar por filas de comandos visibles",
-      "homeEnd": "Saltar a la primera o última fila visible",
-      "enterRun": "Ejecute el comando enfocado",
-      "escClear": "Borrar búsqueda y restablecer filtros",
-      "showOverlay": "Mostrar esta superposición de acceso directo"
+      "focusSearch": "Enfoque el campo de búsqueda.",
+      "navRows": "Navega por las filas de comandos visibles.",
+      "homeEnd": "Salta a la primera o última fila visible.",
+      "enterRun": "Ejecuta el comando enfocado.",
+      "escClear": "Borrar los filtros de búsqueda y restablecimiento.",
+      "showOverlay": "Mostrar esta superposición de atajos."
     },
     "script": {
-      "moreSuffix": "+{count} más",
-      "showLess": "Mostrar menos",
-      "runSingular": "correr",
-      "runPlural": "corre",
-      "recentWord": "reciente",
-      "expandAll": "Expandir todo",
-      "collapseAll": "Contraer todo",
-      "searchChip": "Búsqueda: \"{query}\"",
-      "internalChip": "Mostrar comandos del menú contextual",
-      "removeFilterPrefix": "Quitar filtro",
+      "moreSuffix": "+{count} más y más.",
+      "showLess": "Mostrar menos muestra menos.",
+      "runSingular": "Correr, correr y seguir adelante.",
+      "runPlural": "Correr corre corre corre, hace correr.",
+      "recentWord": "reciente, recientes recientes.",
+      "expandAll": "Expanda todo y extienda todos.",
+      "collapseAll": "Todo se derrumba.",
+      "searchChip": "Búsqueda: \"{query}\" fue la respuesta.",
+      "internalChip": "Mostrar los comandos del menú contextual para mostrar el contenido.",
+      "removeFilterPrefix": "Retire el filtro de la válvula.",
       "matchOne": "{count} coincidencia",
       "matchOther": "{count} coincidencias"
     }
   },
   "codeHealth": {
-    "documentTitle": "Panel de salud del código Saropa",
-    "skipToTable": "Saltar a la tabla de funciones",
-    "openWorkspaceFirst": "Primero abra un espacio de trabajo de Dart/Flutter.",
-    "scanningTitle": "Code Health: funciones de escaneo...",
+    "documentTitle": "Saropa Código de la Tabla de Control de Salud",
+    "skipToTable": "Salta a las funciones de la tabla.",
+    "openWorkspaceFirst": "Abra primero un espacio de trabajo Dart/Flutter.",
+    "scanningTitle": "Código de salud: funciones de escaneo...",
     "scan": {
-      "title": "Escaneando el estado del proyecto",
-      "subtitle": "Leyendo tu código. El panel se completa a medida que el escaneo aprende más.",
-      "waiting": "Iniciando escaneo…",
-      "launching": "Lanzando el escáner…",
-      "collect": "Descubriendo archivos...",
-      "firstRunHint": "La primera ejecución compila el escáner; Los proyectos grandes tardan un momento antes de que aparezcan los archivos.",
-      "paused": "En pausa",
-      "stopped": "Escaneo detenido",
-      "elapsed": "Transcurrido",
+      "title": "Proyecto de escaneo salud del proyecto.",
+      "subtitle": "Leyendo tu código. El tablero de instrumentos se llena a medida que el escaneo aprende más.",
+      "waiting": "Comienzo de la exploración...",
+      "launching": "Lanzamiento del escáner...",
+      "collect": "Descubrir archivos... es un trabajo.",
+      "firstRunHint": "La primera ejecución compila el escáner; los proyectos grandes tardan un momento antes de que aparezcan archivos.",
+      "paused": "Se ha hecho una pausa en Paused.",
+      "stopped": "El escaneo se detuvo.",
+      "elapsed": "Pasó el tiempo.",
       "phase": {
-        "parse": "Analizando archivos",
-        "history": "Leyendo el historial de git",
-        "blame": "Era del código informático",
-        "usage": "Contando referencias",
-        "score": "Funciones de puntuación"
+        "parse": "Análisis de archivos para el análisis.",
+        "history": "Leyendo la historia git git.",
+        "blame": "Código de la edad del cómputo Edad de los ordenadores",
+        "usage": "Contando las referencias de referencia.",
+        "score": "Las funciones de puntuación son las que marcan la puntuacion."
       },
       "counter": {
-        "files": "Archivos",
-        "functions": "Funciones",
-        "problems": "Problemas encontrados"
+        "files": "Archivos archivos de los archivos.",
+        "functions": "Las funciones Funciones.",
+        "problems": "Problemas encontrados."
       },
       "counters": {
-        "aria": "Contadores de escaneo en vivo"
+        "aria": "Los contadores de escaneo en vivo cuentan con los contadores."
       },
       "controls": {
-        "aria": "Controles de escaneo"
+        "aria": "Escanea los controles de las cámaras."
       },
       "btn": {
-        "pause": "Pausa",
-        "resume": "Reanudar",
-        "restart": "Reanudar",
-        "cancel": "Cancelar"
+        "pause": "Pausa La pausa es una acción que se realiza en el momento de hacer la pausa",
+        "resume": "El currículum resume las",
+        "restart": "Reiniciar el sistema de nuevo.",
+        "cancel": "Cancelar cancelar el pago de la cuenta."
       },
       "preview": {
-        "heading": "Problemas encontrados hasta el momento",
-        "empty": "Aún no se han encontrado problemas..."
+        "heading": "Problemas encontrados hasta ahora.",
+        "empty": "No se han encontrado problemas aún..."
       },
       "version": {
-        "engine": "Motor",
-        "detecting": "detector…",
-        "legacy": "legado: sin progreso en vivo (saropa_lints de este proyecto es anterior)"
+        "engine": "El motor de la máquina, el motor del motor.",
+        "detecting": "Detectando... detectando ... el tiempo.",
+        "legacy": "legado  ⁇  no hay progreso en vivo (el saropa_lints de este proyecto lo precede)"
       }
     },
-    "runReportFirst": "Ejecute el informe nuevamente y luego copie JSON.",
-    "copiedJson": "Code Health JSON copiado al portapapeles.",
+    "runReportFirst": "Ejecute el informe de nuevo, luego copie JSON.",
+    "copiedJson": "Código de Salud JSON copiado al portapapeles.",
     "couldNotOpenFile": "No se pudo abrir el archivo: {path}",
-    "panelTitle": "Panel de salud del código Saropa",
+    "panelTitle": "Saropa Código de la Tabla de Control de Salud",
     "hero": {
-      "title": "Panel de salud del código Saropa",
-      "generated": "Generado",
+      "title": "Saropa Código de la Tabla de Control de Salud",
+      "generated": "Generado generados.",
       "functionOne": "{count} función",
       "functionOther": "{count} funciones",
-      "avgFormat": "promedio {score} ({grade})",
-      "gatesFailing": "puertas fallando",
-      "gatesPassing": "puertas pasando"
+      "avgFormat": "AVG {score} ({grade}) es el promedio de edad.",
+      "gatesFailing": "Puertas que fallan.",
+      "gatesPassing": "Puertas de paso que pasan por las puertas."
     },
     "gauge": {
-      "tooltip": "Puntuación media {rounded} de 100 (nota {grade}).",
-      "ariaLabel": "Puntuación media {rounded} de 100"
+      "tooltip": "La puntuación media {rounded} de 100 (grado {grade}).",
+      "ariaLabel": "El puntaje promedio es {rounded} de 100 puntos."
     },
     "gate": {
-      "fallback": "Los controles de calidad fallaron: revise los umbrales en la configuración de Code Health.",
+      "fallback": "Las puertas de calidad fallaron  ⁇  revisar los umbrales en la configuración del Código Salud.",
       "failingOne": "{count} puerta fallando — revisa los umbrales o copia el JSON para inspeccionar gates.violations.",
       "failingOther": "{count} puertas fallando — revisa los umbrales o copia el JSON para inspeccionar gates.violations.",
-      "openSettingsTitle": "Abra la configuración de Code Health para ajustar los umbrales.",
-      "openSettingsButton": "Abrir configuración de salud del código"
+      "openSettingsTitle": "Abra la configuración de salud del código para ajustar los umbrales.",
+      "openSettingsButton": "Código abierto Configuraciones de salud."
     },
     "kpi": {
       "ariaLabel": "Resumen de salud del código",
-      "allClear": "No hay funciones marcadas en ninguna categoría: todo está claro.",
-      "clickToFilter": "Haga clic para filtrar la tabla por funciones marcadas {flag}.",
-      "noFlagged": "No hay funciones marcadas {flag}.",
-      "unused": "No usado",
-      "unusedSub": "funciones no referenciadas en ninguna parte",
-      "uncovered": "Descubierto",
-      "uncoveredSub": "sin cobertura LCOV",
-      "stubTested": "Probado con trozos",
-      "stubTestedSub": "Las pruebas existen pero afirman poco.",
-      "suspiciousCoverage": "Cobertura sospechosa",
-      "suspiciousCoverageSub": "la cobertura parece fabricada",
-      "testDrift": "Deriva de prueba",
-      "testDriftSub": "las pruebas retrasan la función"
+      "allClear": "No hay funciones marcadas en ninguna categoría  ⁇  todo claro.",
+      "clickToFilter": "Haga clic para filtrar la tabla a las funciones marcadas con {flag}.",
+      "noFlagged": "No hay funciones marcadas con {flag}.",
+      "unused": "No utilizado sin uso.",
+      "unusedSub": "funciones a las que no se hace referencia en ninguna parte.",
+      "uncovered": "Descubierto descubierto.",
+      "uncoveredSub": "No hay cobertura de LCOV.",
+      "stubTested": "Pruebas de tobillo con test.",
+      "stubTestedSub": "Existen pruebas, pero afirman poco.",
+      "suspiciousCoverage": "Cobertura de contenido sospechoso.",
+      "suspiciousCoverageSub": "La cobertura parece fabricada y se ve como una fabricación.",
+      "testDrift": "La deriva de prueba en la prueba.",
+      "testDriftSub": "Las pruebas de retraso la función de la función."
     },
     "toolbar": {
-      "ariaLabel": "Acciones de salud del código",
-      "rescanTitle": "Vuelva a ejecutar el análisis de Code Health y actualice este panel.",
-      "rescan": "Volver a escanear",
-      "copyJsonTitle": "Copie el JSON de Code Health sin formato al portapapeles.",
-      "copyJson": "Copiar JSON",
-      "settingsTitle": "Abra la configuración de Estado del código.",
-      "settingsButton": "Configuración de salud del código",
-      "filterTitle": "Filtre filas por nombre, archivo o bandera.",
-      "filterLabel": "Filtrar filas",
-      "filterPlaceholder": "Filtrar filas…"
+      "ariaLabel": "Código Acciones de salud.",
+      "rescanTitle": "Vuelva a ejecutar el escaneo de la salud del código y actualice este tablero.",
+      "rescan": "El rescan de nuevo escanear.",
+      "copyJsonTitle": "Copie el código JSON de salud sin procesar al portapapeles.",
+      "copyJson": "Copiar el JSON.",
+      "settingsTitle": "Abra la configuración de salud del código.",
+      "settingsButton": "Código Ajustes de salud.",
+      "filterTitle": "Filtrar filas por nombre, archivo o bandera.",
+      "filterLabel": "filas de filtro Las filas del filtro.",
+      "filterPlaceholder": "Las filas de filtro..."
     },
     "table": {
-      "ariaLabel": "Peores funciones por puntuación",
-      "heading": "Peores funciones",
+      "ariaLabel": "Las peores funciones por puntaje.",
+      "heading": "Las peores funciones son las que tienen peor funcionamiento.",
       "topCount": "parte superior {shown} de {total}",
-      "colGrade": "Calificación",
-      "colScore": "Puntaje",
-      "colFunction": "Función",
-      "colFile": "Archivo",
-      "colLine": "Línea",
-      "colUsage": "Uso",
-      "colCoverage": "Cobertura",
-      "colComplexity": "Complejidad",
-      "colFlags": "Banderas",
-      "noMatch": "Ninguna función coincide con los filtros actuales.",
-      "resetFiltersTitle": "Borre la búsqueda y cualquier filtro de bandera activo.",
-      "resetFilters": "Restablecer filtros",
-      "hint": "Mostrando las peores 200 funciones por puntuación. Utilice el campo de búsqueda para limitar aún más.",
-      "expanderAriaCollapsed": "Mostrar detalles del problema",
-      "expanderAriaExpanded": "Ocultar detalles del problema",
-      "detailHeading": "Por qué esta función obtuvo {score}",
-      "detailNoIssues": "No hay indicadores en esta fila: la puntuación depende de los valores de las columnas anteriores (uso, cobertura, complejidad, antigüedad, documentación).",
-      "suppressLabel": "Suprimir en archivo",
-      "suppressTooltip": "Escribe `// ignore_for_file: code_health:<flag>` en este archivo para que análisis futuros eliminen este indicador para todo el archivo."
+      "colGrade": "La calificación de la nota es el grado.",
+      "colScore": "El resultado de la puntuación.",
+      "colFunction": "La función de la función es la función.",
+      "colFile": "El archivo de archivos es un archivo.",
+      "colLine": "Línea Linea La línea",
+      "colUsage": "Uso de la palabra Usage.",
+      "colCoverage": "La cobertura de la cobertura es muy amplia.",
+      "colComplexity": "Complejidad La complejidad.",
+      "colFlags": "Las banderas las banderas.",
+      "noMatch": "No hay funciones que coincidan con los filtros actuales.",
+      "resetFiltersTitle": "Borrar la búsqueda y cualquier filtro de bandera activo.",
+      "resetFilters": "El restablecimiento de los filtros de ajuste.",
+      "hint": "Mostrando las peores 200 funciones por puntaje. Utilice el campo de búsqueda para restringir aún más.",
+      "expanderAriaCollapsed": "Mostrar detalles del problema.",
+      "expanderAriaExpanded": "Ocultar los detalles del problema.",
+      "detailHeading": "Por qué esta función obtuvo {score}.",
+      "detailNoIssues": "Ninguna bandera en esta fila  ⁇  la puntuación está determinada por los valores de las columnas anteriores (uso, cobertura, complejidad, edad, documentación).",
+      "suppressLabel": "Suprimir en el archivo de archivos.",
+      "suppressTooltip": "Escribe `// ignore_for_file: code_health:<flag>` en este archivo para que los escaneos futuros dejen caer esta bandera para todo el archivo."
     },
     "flag": {
       "unused": {
-        "label": "no usado",
-        "evidence": "0 personas que llaman",
-        "rule": "Marcado cuando ningún otro archivo hace referencia a este nombre de función."
+        "label": "No utilizado sin usar.",
+        "evidence": "0 personas que llaman.",
+        "rule": "Marcado cuando ningún otro archivo hace referencia a esta función. nombre de la función."
       },
       "uncovered": {
-        "label": "descubierto",
-        "evidence": "{pct}% pruebas",
-        "rule": "Se marca cuando LCOV informa una cobertura de línea del 0%."
+        "label": "descubierto, descubrió.",
+        "evidence": "{pct}% pruebas de prueba.",
+        "rule": "Se señala cuando LCOV informa una cobertura de línea del 0%."
       },
       "complex": {
-        "label": "complejo",
+        "label": "Complejo complejo compleja compleja.",
         "evidence": "CC {cc}",
-        "rule": "Se marca cuando la complejidad ciclomática supera 10."
+        "rule": "Se señala cuando la complejidad ciclomática supera 10."
       },
       "undocumented": {
-        "label": "indocumentado",
-        "evidence": "CC {cc}, sin documento",
-        "rule": "Se marca cuando una función compleja (CC > 10) no tiene ningún comentario en el documento."
+        "label": "indocumentados sin documentos.",
+        "evidence": "CC {cc}, sin el documento.",
+        "rule": "Marcado cuando una función compleja (CC > 10) no tiene ningún comentario doc."
       },
       "test_drift": {
-        "label": "deriva de prueba",
-        "evidence": "las pruebas retrasan la función",
-        "rule": "Se marca cuando el archivo de prueba vinculado más reciente es significativamente más antiguo que el archivo fuente de la función."
+        "label": "Prueba de deriva en la prueba de deriva.",
+        "evidence": "Las pruebas de retraso la función de la función.",
+        "rule": "Marcado cuando el archivo de prueba vinculado más reciente es significativamente mayor que el archive fuente de la función."
       },
       "stub_tested": {
-        "label": "probado",
-        "evidence": "delgado afirma",
-        "rule": "Se marca cuando existe una prueba vinculada pero apenas afirma nada."
+        "label": "Probado por el test de tope.",
+        "evidence": "Las afirmaciones delgadas afirman.",
+        "rule": "Se señala cuando existe una prueba vinculada pero apenas afirma algo."
       },
       "suspicious_coverage": {
-        "label": "cobertura sospechosa",
-        "evidence": "{pct}% sin prueba",
-        "rule": "Se marca cuando LCOV informa una cobertura alta pero ninguna prueba hace referencia a la función."
+        "label": "cobertura de una señal sospechosa.",
+        "evidence": "{pct}% sin ninguna prueba.",
+        "rule": "Se señala cuando LCOV informa de una alta cobertura pero ninguna prueba hace referencia a la función."
       }
     },
     "shortcuts": {
-      "focusFilter": "Enfocar el filtro de fila",
-      "clearFilter": "Borrar el filtro de fila enfocada",
-      "activateKpi": "Activar tarjeta KPI enfocada",
-      "activateKpiSpace": "Activar tarjeta KPI enfocada",
-      "showOverlay": "Mostrar esta superposición de acceso directo"
+      "focusFilter": "Enfoque el filtro de fila del filtro.",
+      "clearFilter": "Limpia el filtro de la fila enfocada.",
+      "activateKpi": "Activa la tarjeta de KPI enfocada en el foco.",
+      "activateKpiSpace": "Activa la tarjeta de KPI enfocada en el foco.",
+      "showOverlay": "Mostrar esta superposición de atajos."
     },
     "script": {
-      "activeFiltersLabel": "Filtros activos:",
+      "activeFiltersLabel": "Filtros activos: Se usan para filtrar.",
       "searchChip": "búsqueda: \"{q}\"",
-      "flagChip": "bandera: {flag}",
-      "removeAria": "Eliminar {key}",
-      "clearAll": "Borrar todo",
+      "flagChip": "bandera: {flag} El objetivo es",
+      "removeAria": "Eliminar el {key}",
+      "clearAll": "Todo limpio, todo despejado.",
       "rowsVisible": "{visible} de {total} filas visibles",
-      "neverRun": "nunca corras"
+      "neverRun": "Nunca corra, nunca huya."
     },
     "freshness": {
-      "justNow": "En este momento",
+      "justNow": "justo ahora, en este momento.",
       "minutesAgo": "hace {min} m",
       "hoursAgo": "hace {hr} h",
       "daysAgo": "hace {day} d",
@@ -884,57 +1115,221 @@
     }
   },
   "suppressionsStrip": {
-    "noData": "Aún no hay violations.json: ejecute el análisis para completar la instantánea de supresión.",
-    "zeroTotal": "0 supresiones del analizador en la última exportación.",
-    "noKindBreakdown": "No hay desglose por tipo en esta exportación.",
-    "title": "Supresiones (exportación)",
-    "readOnlyNote": "(solo lectura; abra Hallazgos para explorar y actuar).",
-    "openFindings": "Abrir panel de resultados"
+    "noData": "No hay violations.json todavía  ⁇  ejecutar el análisis para rellenar la instantánea de supresión.",
+    "zeroTotal": "0 supresiones de analizadores en la última exportación.",
+    "noKindBreakdown": "No hay desglose por especie en esta exportación.",
+    "title": "Eliminaciones (exportación) de las solicitudes.",
+    "readOnlyNote": "(sólo lectura; abre los hallazgos para navegar y actuar.)",
+    "openFindings": "Abrir el panel de resultados del tablero."
   },
   "configMirrors": {
-    "noFileRisk": "Sin desglose de riesgos por archivo (sin infracciones en el alcance).",
-    "suppressionNote": "Coincide con el resumen de violations.json, no con los conmutadores de supresión de la barra lateral en vivo.",
-    "noSuppression": "No hay agregado de supresión en esta exportación (analizador más antiguo o supresiones cero).",
+    "noFileRisk": "No hay desglose del riesgo por expediente (no hay violaciones en el alcance).",
+    "suppressionNote": "Coincide con el resumen violations.json, no con los interruptores de supresión en la barra lateral.",
+    "noSuppression": "No hay agregado de supresión en esta exportación (analisador más antiguo o cero suprimiciones).",
     "owaspSignal": "{count} infracción/infracciones en esta exportación incluyen mapeo móvil/web de OWASP — abre Postura de Seguridad para la matriz completa y la exportación.",
-    "summarySuppressions": "Supresiones (exportar instantánea)",
+    "summarySuppressions": "Eliminaciones (instantánea de exportación)",
     "summaryOwasp": "Postura de seguridad (señal OWASP)",
-    "summaryFileRisk": "Riesgo de archivos (archivos principales)"
+    "summaryFileRisk": "Riesgo de archivo (archivos superiores) El riesgo del archivo es el mayor"
   },
   "telemetry": {
-    "heroTitle": "Telemetría de reglas relacionadas",
-    "skipToCounters": "Saltar a contadores de telemetría",
-    "lastEvent": "Último evento {relative}",
-    "noEvents": "No se registraron eventos",
+    "heroTitle": "Regla relacionada con la telemetría.",
+    "skipToCounters": "Saltar a los contadores de telemetría.",
+    "lastEvent": "El último evento fue {relative}.",
+    "noEvents": "No se registraron eventos.",
     "totalEventOne": "{count} evento en total",
     "totalEventOther": "{count} eventos en total",
     "noCountersTitle": "No hay contadores para restablecer.",
-    "resetTitle": "Restablecer todos los contadores",
-    "refreshTitle": "Recargar contadores de telemetría desde el disco",
-    "refresh": "Refrescar",
-    "copyTitle": "Copiar instantánea como JSON",
-    "copyJson": "Copiar JSON",
-    "resetCounters": "Restablecer contadores",
-    "countersAria": "Contadores",
-    "countersHeading": "Contadores de eventos",
-    "thEvent": "Evento",
-    "thCount": "Contar",
-    "emptyMessage": "Aún no se han registrado eventos de telemetría: abra una regla desde el Panel de resultados para comenzar a capturar contadores.",
-    "openFindingsTitle": "Abra el Panel de resultados de Saropa.",
-    "openFindings": "Abrir panel de resultados",
-    "lastPropsHeading": "Propiedades del último evento",
-    "copiedJson": "Saropa Lints: copia JSON de telemetría de reglas relacionadas.",
-    "countersReset": "Saropa Lints: se restablecen los contadores de telemetría de reglas relacionadas."
+    "resetTitle": "Reinicie todos los contadores.",
+    "refreshTitle": "Reload contadores de telemetría desde el disco.",
+    "refresh": "Refrescarse y refrescar.",
+    "copyTitle": "Copia la instantánea como JSON.",
+    "copyJson": "Copiar el JSON.",
+    "resetCounters": "Reinicia los contadores de reajuste.",
+    "countersAria": "Contadores de las cuentas.",
+    "countersHeading": "Contadores de eventos para el evento.",
+    "thEvent": "El evento es el acontecimiento.",
+    "thCount": "El conde cuenta el conteo.",
+    "emptyMessage": "Todavía no se han registrado eventos de telemetría  ⁇  abra una regla desde el Panel de resultados para comenzar a capturar contadores.",
+    "openFindingsTitle": "Abra el panel de resultados Saropa.",
+    "openFindings": "Abrir el panel de resultados del tablero.",
+    "lastPropsHeading": "Propiedades del último evento.",
+    "copiedJson": "Saropa Lints: copiado la regla relacionada con la telemetría JSON.",
+    "countersReset": "Saropa Lints: regla relacionada con el restablecimiento de los contadores de telemetría."
   },
   "sidebarLayout": {
-    "summary": "Diseño de la barra de actividades",
-    "hint": "Active o desactive las secciones de la barra de actividades de Saropa aquí (guardadas con el espacio de trabajo, sin salir del panel)."
+    "summary": "Diseño de la barra de actividades.",
+    "hint": "Activa o apaga las secciones de la barra de actividad Saropa aquí (guardadas con el espacio de trabajo, sin salir del tablero)."
   },
   "securityPosture": {
     "issueOne": "{count} problema",
     "issueOther": "{count} problemas",
-    "noIssues": "Sin problemas",
-    "showIssues": "Mostrar problemas",
+    "noIssues": "No hay problemas Ningún problema.",
+    "showIssues": "Mostrar problemas de las cuestiones.",
     "violationTooltip": "{count} infracción/infracciones en {ruleCount} regla(s). Haz clic para mostrar en Problemas.",
-    "noViolationsTooltip": "No se han asignado infracciones a esta categoría."
+    "noViolationsTooltip": "No se han mapeado infracciones en esta categoría."
+  },
+  "comparison": {
+    "title": "Comparación de paquetes comparados.",
+    "actions": {
+      "addToProject": "Añadir a Proyecto de proyecto."
+    },
+    "table": {
+      "row": {
+        "vibrancyGrade": "Grado de Vibración.",
+        "category": "Categoría de categoría La categoría es la clase.",
+        "latestVersion": "Versión más reciente.",
+        "published": "Publicado publicado publicó.",
+        "publisher": "El editor es el que publica.",
+        "pubPoints": "Pubs Puntos de pubs y bares.",
+        "githubStars": "GitHub Estrellas de las estrellas",
+        "openIssues": "Cuestiones abiertas.",
+        "codeSize": "Tamaño del código tamaño de la clave",
+        "bloatRating": "La calificación de la inflamación es Bloat Rating.",
+        "license": "Licencia de licencia.",
+        "platforms": "Plataformas Las plataformas.",
+        "inThisProject": "En este proyecto."
+      },
+      "value": {
+        "unverified": "⁇  (no verificado)",
+        "allPlatforms": "Todo, todo, todo es verdad.",
+        "yes": "Sí, sí, sí. - ¿Qué es eso?",
+        "no": "No, no es así."
+      },
+      "badge": {
+        "inProject": "En proyecto, en el proyecto."
+      }
+    },
+    "status": {
+      "packagesSelected": "{count} paquetes seleccionados de los paquetes elegidos.",
+      "packagesCompared": "{count} compararon los paquetes de la misma manera.",
+      "dimensionsRankedOne": "{count} dimensión clasificada en el rango.",
+      "dimensionsRankedOther": "{count} dimensiones clasificadas por orden de las dimensiones.",
+      "morePackages": "+{count} más y más."
+    },
+    "empty": {
+      "ariaLabel": "Sin paquetes No hay paquetes.",
+      "message": "No se seleccionaron paquetes para la comparación. Haga clic derecho en dos o más paquetes en el panel de control del Paquete y elija {compare}.",
+      "compareWord": "Comparar y comparar.",
+      "openDashboard": "Abra el panel de control del paquete.",
+      "openDashboardTitle": "Abra el panel de control del paquete Saropa."
+    },
+    "a11y": {
+      "skipToTable": "Salta a la tabla de comparación.",
+      "recommendation": "Recomendación de la recomendación.",
+      "addingToProject": "Añadiendo {name} al proyecto."
+    },
+    "shortcuts": {
+      "showOverlay": "Mostrar esta superposición de atajos.",
+      "closeOverlay": "Cierre la superposición de acceso directo del teclado."
+    },
+    "kpi": {
+      "ariaLabel": "Resumen de la comparación resumen de las comparaciones.",
+      "leading": "Dirigir y liderar.",
+      "leadingTitle": "El paquete que lidera por la mayor cantidad de dimensiones gana.",
+      "dimensionWinsOne": "{count} dimensión ganancia de la victoria",
+      "dimensionWinsOther": "La dimensión {count} gana las elecciones.",
+      "packages": "Los paquetes de viaje son un conjunto de paquetes.",
+      "packagesTitle": "Número de paquetes comparados uno al lado del otro.",
+      "inComparison": "en comparación con el de la comparación.",
+      "dimensions": "Las dimensiones las dimensiones.",
+      "dimensionsTitle": "Número de dimensiones en las que un ganador podría ser clasificado.",
+      "ranked": "clasificado en el ranking."
+    },
+    "toolbar": {
+      "ariaLabel": "Las acciones de comparación son las que se llevan a cabo.",
+      "packageDashboard": "Panel de control del paquete.",
+      "packageDashboardTitle": "Abra el Panel de paquetes para comparar más paquetes."
+    }
+  },
+  "detailView": {
+    "empty": {
+      "selectPackage": "Seleccione un paquete para ver los detalles."
+    },
+    "section": {
+      "version": "Versión de la versión.",
+      "update": "Actualización de la información.",
+      "suggestion": "La sugestión es la sugerencia.",
+      "community": "Comunidad Europea, es decir.",
+      "dependencies": "Dependencias de las empresas.",
+      "alerts": "Las alertas son de alarma.",
+      "platforms": "Las plataformas de las plataformas.",
+      "directDeps": "Depósitos directos en depósito.",
+      "readmeImages": "Imágenes de README."
+    },
+    "version": {
+      "published": "Publicado por: {date} Fue publicado en:",
+      "codeSize": "Tamaño del código tamaño de la clave",
+      "archive": "El archivo de archivos es el arquivo.",
+      "sizeLabel": "{label}: El nombre de la persona es {size}.",
+      "source": "Fuente: Código {code} · Comentarios {comments} · Archivos {files}",
+      "replace": "Sustituir por: {summary} En su lugar se encuentra"
+    },
+    "update": {
+      "upgrade": "Actualizar actualizaciones.",
+      "changelog": "El Changelog es un registro de cambios.",
+      "blockedBy": "Bloqueado por {package}"
+    },
+    "suggestion": {
+      "migrateTo": "Considere la posibilidad de migrar a {package}.",
+      "consider": "Considere lo siguiente: {text}.",
+      "alternatives": "Las alternativas: {names}",
+      "unused": "Este paquete parece no haber sido utilizado  ⁇  considere su eliminación."
+    },
+    "community": {
+      "issues": "{count} problemas",
+      "prs": "{count} PRs de las relaciones públicas.",
+      "activity90d": "90d: Se cerraron las emisiones {closed}, se fusionaron los PRs {merged}.",
+      "lastCommit": "Último compromiso: {time} El último compromiso fue el siguiente:",
+      "archived": "El repositorio está archivado.",
+      "pubPoints": "{points}/160 puntos de pubs en el área.",
+      "latestRelease": "Última versión: hace {age} años.",
+      "dependents": "{count} dependientes de las personas a su cargo."
+    },
+    "dormancy": {
+      "noActivity6mo": "No hay compromisos y no se liberan en 6+ meses.",
+      "noActivity3mo": "No hay compromisos y no se lanzan en 3+ meses.",
+      "codeInactive": "Liberación activa, código inactivo (3+ meses sin compromisos)",
+      "releaseSlower": "Código activo, la cadencia de liberación es más lenta (3+ meses)"
+    },
+    "dependencies": {
+      "flagged": "({count} marcado) Se ha puesto el botón \"",
+      "transitiveCount": "{count} paquetes transitivos en el tiempo.",
+      "unique": "{count} único y único.",
+      "shared": "{count} compartido ({pct}%) fue el resultado.",
+      "moreOverflow": "+{count} más y más.",
+      "sharedList": "Compartido: {names} Es el nombre de la página."
+    },
+    "platforms": {
+      "wasm": "El WASM es el método de la"
+    },
+    "links": {
+      "viewFullDetails": "Ver todos los detalles",
+      "pubDev": "pub.dev",
+      "documentation": "Documentación de la documentación La documentación es el conjunto de los documentos que contiene",
+      "changelog": "El Changelog es un registro de cambios.",
+      "repository": "El repositorio de datos.",
+      "issues": "Las cuestiones de los problemas.",
+      "reportIssue": "Informe de la cuestión del informe."
+    },
+    "logoAlt": "{packageName} logotipo de la línea",
+    "readMore": "Más más más más.",
+    "readmeImageAlt": "README imagen de la imagen en el medio."
+  },
+  "chart": {
+    "toggle": {
+      "excludeShared": "Excluir compartido compartido."
+    },
+    "filter": {
+      "clear": "Claro claro claro claro es su nombre."
+    },
+    "bucket": {
+      "other": "Otras ({count} {noun}) no incluidas.",
+      "uniqueTransitives": "Los transitivos únicos ({count}) también se conocen como",
+      "sharedTransitives": "Los transitivos compartidos ({count}) son los que se encuentran en el"
+    },
+    "noun": {
+      "package": "El paquete de paquetes es un paquete.",
+      "packages": "paquetes de embalajes en los que se incluyen"
+    }
   }
 }

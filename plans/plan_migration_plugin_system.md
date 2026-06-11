@@ -649,3 +649,35 @@ _Document status: unified plan (packs + resolver + extension + migrations); Phas
 **Commit note:** code, tests, generated files, and docs for this work were committed by a concurrent session (bundled into earlier commits on `main`); this finish report is appended and committed separately.
 
 **Plan disposition:** plan stays ACTIVE — this task advanced Phase 3 only; Phase 7 and the deferred sub-gating / suggest-UX items keep the plan open (A-MOVE case 3).
+
+---
+
+## Finish Report (2026-06-10) — semver-pack expansion + upgrade-pack nudge
+
+**Reviewed by another AI.**
+
+**Trigger:** user said "i want ALL of this built" in response to a proposed list of additional gated packs + an extension nudge (other gated options: dio 5, bloc 8, riverpod 3, go_router 6; plus platform gates).
+
+**Scope:** (A) Dart lint rules/plugin, (B) VS Code extension, (C) docs.
+
+**Shipped (6 commits on `main`):**
+
+1. **dio_5** — `avoid_dio_error` flags the removed `DioError` type (dio 5.0 → `DioException`) with a quick fix (`ReplaceNodeFix` subclass). `addNamedType` + dio import guard. Gated `dio >= 5.0.0`, relocated out of base `dio`.
+2. **bloc_8** — `avoid_bloc_map_event_to_state` flags the removed `mapEventToState` override (bloc 8.0 → `on<Event>`). `addClassDeclaration` + source regex (member iteration unavailable in this analyzer; mirrors `prefer_cubit_for_simple`). Gated `bloc >= 8.0.0`, relocated out of base `bloc`.
+3. **riverpod_3** — `avoid_riverpod_state_notifier` flags legacy `StateNotifier`/`StateNotifierProvider` (riverpod 3.0 → legacy.dart). `addNamedType` + riverpod import guard. Gated `riverpod >= 3.0.0`, relocated out of base `riverpod`.
+4. **go_router_6** — new file `go_router_6_rules.dart`; `avoid_go_router_legacy_redirect` flags the pre-6.0 single-arg `redirect` closure. Dual `addInstanceCreationExpression` + `addMethodInvocation` (resolved vs unresolved AST). Whole-pack gate `go_router >= 6.0.0` (no relocation; versioned pack id).
+5. **Extension upgrade-pack nudge** — `upgradePackNudge.ts` (vscode wiring) + `upgradePackNudgeLogic.ts` (pure, tested). On activation + each pubspec.lock change, offers once per workspace (workspaceState) to enable any dependency-gated pack whose resolved lock version satisfies the gate. Reads pubspec.lock and applies the same `>=` gate the plugin enforces. Opt-out `saropaLints.upgradePackNudge.enabled` (manifest setting + en nls key).
+6. **Docs** — rule_packs guide, CHANGELOG (Added + Added (Extension)), this plan note.
+
+**Reviewer notes / non-obvious decisions:**
+
+- **Scan harness uses unresolved AST.** Keyword-less `GoRoute(...)` is a `MethodInvocation` there, not `InstanceCreationExpression` (production/custom_lint resolves it). The go_router rule registers BOTH hooks so it works in production and is scan-verifiable; a given call is only ever one node type per mode, so no double-report. The bloc rule's first attempt (`addMethodDeclaration` + `ClassDeclaration.members`) failed to compile/fire here for the same unresolved-AST reason and was switched to the class-declaration + source-regex idiom.
+- **Relocation is authoritative.** Each new rule (except go_router) is moved out of its ungated base pack via `kRelocatedRulePackCodes` so enabling the base pack cannot bypass the version gate. Applied by both the generator and the audit.
+- **Each new rule sits in exactly one core tier** (`comprehensiveOnlyRules`) to satisfy the integrity invariant; pack ownership strips it from tier-derived enables (harmless tier listing).
+- **Platform gates (Appendix C): intentionally NOT built** (user chose "Skip it"). Redundant with the existing platform rule sets (`iosPlatformRules` etc.) + `platforms:` config + `ProjectContext` directory detection; no concrete platform-specific migration to anchor a non-contrived pack.
+
+**Verification:** `dart analyze --fatal-infos` clean; `dart run tool/rule_pack_audit.dart` exit 0; 262 tests across `test/config/` + the four package rule tests + integrity pass; extension `tsc --noEmit` clean; 7 new `upgradePackNudgeLogic` unit tests pass. Each rule's detection confirmed via the scan CLI against its fixture (correct hits, none on the GOOD/migrated form).
+
+**Not done / deferred:** translated `package.nls.<lang>.json` regen for the new setting key is NOT run (standing no-NLLB prohibition; publish `--fail-on-missing` gate will flag, regen is a separate explicit step). Live custom_lint IDE run and Extension-Development-Host nudge flow not exercised (scan CLI + unit tests only). riverpod_3 / bloc_8 / go_router_6 gates are forward-looking for versions a sample project may not yet use.
+
+**Finish report appended:** `plans/plan_migration_plugin_system.md`. Plan stays ACTIVE (advanced the pack catalog; Phase 7 + deferred items keep it open).
