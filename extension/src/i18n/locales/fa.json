@@ -739,7 +739,7 @@
       "activityGradeUnavailable": "درجه فعالیت در دسترس نیست (داده های commit یا release را از دست داده است)",
       "activityFallback": "فعالیت بر اساس تعهدات و انتشار های اخیر",
       "likesUnavailable": "pub.dev لایک ها در دسترس نیستند",
-      "likesCount": "{count} pub.dev لایک می کند",
+      "likesCount": "{count} لایک در pub.dev",
       "downloadsUnavailable": "pub.dev دانلود 30 روزه در دسترس نیست.",
       "downloadsCount": "{count} دانلود ها در 30 روز گذشته",
       "sizeUnavailable": "اندازه در دسترس نیست از pub.dev",

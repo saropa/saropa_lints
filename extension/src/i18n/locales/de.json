@@ -739,7 +739,7 @@
       "activityGradeUnavailable": "Aktivitätsgrad nicht verfügbar (fehlende Commit- oder Release-Daten)",
       "activityFallback": "Aktivitäten basierend auf jüngsten Verpflichtungen und Veröffentlichungen.",
       "likesUnavailable": "pub.dev Likes sind nicht verfügbar.",
-      "likesCount": "{count} pub.dev mag",
+      "likesCount": "{count} pub.dev Likes",
       "downloadsUnavailable": "pub.dev 30-Tage-Downloads sind nicht verfügbar.",
       "downloadsCount": "{count} Downloads in den letzten 30 Tagen",
       "sizeUnavailable": "Größe nicht verfügbar bei pub.dev",

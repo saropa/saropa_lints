@@ -739,7 +739,7 @@
       "activityGradeUnavailable": "مستوى النشاط غير متوفر (بيانات الالتزام أو الإفراج المفقودة)",
       "activityFallback": "النشاط القائم على التزامات وإصدارات حديثة.",
       "likesUnavailable": "pub.dev الإعجابات غير متوفرة",
-      "likesCount": "{count} pub.dev يحب",
+      "likesCount": "{count} إعجاب على pub.dev",
       "downloadsUnavailable": "pub.dev تحميلات 30 يوم غير متوفرة",
       "downloadsCount": "{count} التنزيلات في آخر 30 يوما.",
       "sizeUnavailable": "الحجم غير متوفر من pub.dev",

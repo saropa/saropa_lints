@@ -1,882 +1,1113 @@
 {
+  "packageDetail": {
+    "section": {
+      "version": "VERSION Version ya maandishi.",
+      "community": "Jamii ya watu wa jamii.",
+      "dependencies": "DEPENDENCIES za kutegemea.",
+      "alerts": "ALERT Alerts Tahadhari",
+      "platforms": "Jukwaa la majukwaa ya jukwaa.",
+      "suggestions": "Mapendekezo ya ushauri.",
+      "readmeImages": "README IMAGES Picha za kusoma."
+    },
+    "header": {
+      "logoAlt": "{name} nembo ya alama.",
+      "grade": "Daraja {grade}",
+      "licenseTitle": "Leseni ya leseni.",
+      "published": "Imechapishwa {date}."
+    },
+    "partialBanner": {
+      "partReadme": "README na nembo ya alama.",
+      "partGap": "PRs na masuala ya version-gap PRs.",
+      "partReverseDeps": "hesabu ya utegemezi wa nyuma count.",
+      "listTwo": "{first} na {second}.",
+      "listMany": "{head}, na {last}.",
+      "message": "Baadhi ya sehemu haingeweza kupakia: {list}.",
+      "retry": "Jaribu tena, jaribu tena.",
+      "retryTitle": "Jaribu tena fetches zilizofeli."
+    },
+    "description": {
+      "readMore": "read more zaidi ya mwaka mmoja uliopita"
+    },
+    "version": {
+      "constraint": "Vizuizi vya kizuizi.",
+      "latest": "Latest Karibuni Sana Latest",
+      "prerelease": "Pre-release ya kutolewa mapema.",
+      "published": "Imechapishwa Ilichapishwa Iliyochapishwa.",
+      "update": "Update update update ya mambo.",
+      "blockedBy": "Imefungwa na Blocked by",
+      "codeSize": "Kiwango cha Code Size Code Size",
+      "archiveSize": "Ukubwa wa faili ya kumbukumbu ukubwa.",
+      "bloat": "({rating}/10 uvimbe)",
+      "onDisk": "On disk On Disk Kwenye diski",
+      "upgrade": "Upgrade Kuboresha.",
+      "viewChangelog": "Tazama Changelog"
+    },
+    "community": {
+      "stars": "Stars nyota stars nyota nyota nyota",
+      "likes": "Anapenda anapenda anapendekeza.",
+      "report": "Ripoti ya Utafiti wa Uchunguzi.",
+      "openIssues": "Masuala ya wazi ni maswala yaliyofunguliwa.",
+      "openPrs": "Open PRs ni wazi.",
+      "activity": "Shughuli (90d)",
+      "activityValue": "Masuala ya {closed} yamefungwa, PRs za {merged} zimeunganishwa.",
+      "noActivity": "Hakuna shughuli za hivi karibuni.",
+      "lastCommit": "Last Commitment Kujiweka Wakfu Mwisho",
+      "pubPoints": "Pub Points Maeneo ya Mkahawa.",
+      "verified": "(iliyothibitishwa)",
+      "publisher": "Mchapishaji Publisher Publisher",
+      "flagged": "({count} inaonyeshwa)",
+      "transitiveDeps": "Transitive Deps ni mabonde ya chini.",
+      "footprintBreakdown": "{unique} kipekee &middot; +{shared} pamoja = {total} jumla ya jumla.",
+      "footprintTooltip": "Mwenyewe {own} + kipekee transitives {unique} + pamoja transitifs {shared}. Kuondoa dep hii huokoa {saved} (deps za pamoja hubaki kuondolewa na wengine).",
+      "trueFootprint": "True Footprint - alama ya kweli.",
+      "packagesCount": "vifurushi {count}",
+      "dependents": "Watu walio chini ya uangalizi wako."
+    },
+    "fileUsages": {
+      "commentedOut": "Marejeleo yaliyotajwa:",
+      "fileCount": "{count} faili za faili.",
+      "exportNoteTitle": "Angalau matumizi moja ni maelekezo ya kuuza nje.",
+      "publicApiSurface": "API ya umma uso wa API.",
+      "header": "MATUMIZI YA FILI ({label})",
+      "commentedReexportTitle": "Commented-out re-export ya nje tena.",
+      "reexportTitle": "Imehamishwa tena  ⁇  sehemu ya API ya umma ya maktaba hii.",
+      "reexportBadge": "kuuza nje tena - re-export."
+    },
+    "alerts": {
+      "archived": "ARCHIVED  ⁇  hazina ni ya kusoma tu.",
+      "knownIssue": "Suala linalojulikana: {reason}",
+      "unused": "Haikutumika  ⁇  hakuna uagizaji uliogunduliwa.",
+      "fix": "⁇  fix: {version} zaidi ya mwaka mmoja uliopita"
+    },
+    "versionGap": {
+      "versionTitle": "Toleo la Gap Version Toleo La Pengo.",
+      "overrideTitle": "Override Gap ni kufuta pengo.",
+      "noDates": "Haikuweza kuamua tarehe za toleo kwa kifurushi hiki.",
+      "noItems": "Hakuna PRs au maswala yaliyopatikana kati ya matoleo haya.",
+      "prsMerged": "PRs ilijiunga na kuunganishwa.",
+      "issuesClosed": "Masuala yaliyofungwa yamefungwa.",
+      "searchLabel": "Tafuta PRs na maswala ya utaftaji.",
+      "searchPlaceholder": "Tafuta PRs na masuala ...",
+      "filterAria": "Chuja kwa kategoria Filter by category.",
+      "filterAll": "All All All",
+      "filterUnreviewed": "Unreviewed Hakuna Matata.",
+      "filterPrs": "PRs",
+      "filterIssues": "Masuala masuala maswala.",
+      "typePr": "PR PR PR Kika",
+      "typeIssue": "Suala la suala la suala.",
+      "reviewReviewed": "Imepitishwa upya.",
+      "reviewApplicable": "Inatumika inatumika.",
+      "reviewNotApplicable": "N/A Hakuna / Hapana",
+      "notesPlaceholder": "Maelezo... maelezo.",
+      "colType": "Aina ya aina Aina ya Aina Aina Aina.",
+      "colTitle": "Title Jina la kichwa Title Title.",
+      "colAuthor": "Mwandishi wa kitabu cha mwandishi Author Author Author",
+      "colReview": "Mapitio ya Ukaguzi wa Uhakiki.",
+      "summaryFooter": "{triaged} ya {total} iliyopendekezwa | {applicable} inatumika | {notApplicable} N/A | {unreviewed} iliyobaki",
+      "truncated": "Matokeo yamepunguzwa kwa vitu vya {limit}."
+    },
+    "platforms": {
+      "wasm": "WASM ni njia ya kuongoza."
+    },
+    "images": {
+      "alt": "README picha ya picha."
+    },
+    "links": {
+      "viewOnPubDev": "View on pub.dev maoni",
+      "documentation": "Documentation Uandishi wa hati.",
+      "changelog": "Changelog ya mabadiliko.",
+      "versions": "Versions Toleo la matoleo.",
+      "repository": "Repository ya kumbukumbu.",
+      "openIssues": "Masuala ya wazi ni maswala yaliyofunguliwa.",
+      "reportIssue": "Ripoti ya ripoti suala la suala."
+    },
+    "a11y": {
+      "skipToDetails": "Kuruka kwa maelezo ya kifurushi."
+    },
+    "shortcuts": {
+      "showOverlay": "Onyesha hii njia ya mkato overlay.",
+      "closeOverlay": "Funga overlay ya njia za mkato za kibodi."
+    }
+  },
   "toolbar": {
-    "runAnalysis": "Endesha uchambuzi",
-    "rescan": "Changanua upya",
-    "refresh": "Onyesha upya",
-    "copyJson": "Nakili JSON",
-    "saveReport": "Hifadhi ripoti",
-    "moreActions": "Vitendo zaidi",
-    "clearAll": "Futa zote",
-    "resetView": "Weka upya mwonekano"
+    "runAnalysis": "Run uchambuzi kukimbia.",
+    "rescan": "Rescan upya Scan tena.",
+    "refresh": "Kufanya kazi kwa njia ya burudani.",
+    "copyJson": "Nakili JSON.",
+    "saveReport": "Hifadhi ripoti ya kuhifadhi.",
+    "moreActions": "Vitendo zaidi vitendavyo.",
+    "clearAll": "Fungua kila kitu wazi.",
+    "resetView": "Kuweka upya mtazamo wa kutazama upya."
   },
   "empty": {
-    "noFindingsTitle": "Hakuna matokeo",
-    "noFindingsMessage": "Fanya uchambuzi ili kuchanganua nafasi ya kazi.",
-    "noFindingsCta": "Endesha uchambuzi",
-    "noMatchTitle": "Hakuna zinazolingana",
-    "noMatchMessage": "Hakuna safu mlalo zinazolingana na vichujio vya sasa.",
-    "noMatchCta": "Weka upya vichujio",
-    "noProjectTitle": "Hakuna nafasi ya kazi iliyofunguliwa",
-    "noProjectMessage": "Fungua mradi wa Flutter au Dart ili kuona matokeo.",
-    "noProjectCta": "Fungua folda",
-    "noDataTitle": "Hakuna data bado",
-    "noDataMessage": "Changanua ili ujaze dashibodi hii.",
-    "noDataCta": "Endesha uchambuzi"
+    "noFindingsTitle": "Hakuna matokeo ya utafiti.",
+    "noFindingsMessage": "Endesha uchambuzi ili kuchunguza eneo la kazi.",
+    "noFindingsCta": "Run uchambuzi kukimbia.",
+    "noMatchTitle": "Hakuna mechi za mechi.",
+    "noMatchMessage": "Hakuna safu zinazolingana na filters za sasa.",
+    "noMatchCta": "Kuweka upya vichungi vya kuweka upya.",
+    "noProjectTitle": "Hakuna nafasi ya kazi wazi wazi.",
+    "noProjectMessage": "Fungua mradi wa Flutter au Dart ili uone matokeo.",
+    "noProjectCta": "Fungua folda ya folder Open Folder.",
+    "noDataTitle": "Bado hakuna data.",
+    "noDataMessage": "Endesha skana ili kujaza dashibodi hii.",
+    "noDataCta": "Run uchambuzi kukimbia."
   },
   "loading": {
-    "thinking": "Kufikiri...",
-    "preparing": "Inatayarisha...",
-    "checking": "Inaangalia...",
-    "fetching": "Inaleta...",
-    "working": "Inafanya kazi...",
-    "scanning": "Inachanganua...",
-    "cancel": "Ghairi",
-    "runningAnalysis": "Inaendesha uchambuzi…",
-    "analysisComplete": "Uchambuzi umekamilika",
-    "refreshingDashboard": "Inaonyesha upya dashibodi na matokeo ya hivi punde.",
-    "analysisStartedDetail": "Uchambuzi umeanza. Inakusanya uchunguzi...",
-    "analysisFailedDetail": "Uchambuzi haukufaulu. Angalia pato kwa maelezo."
+    "thinking": "Kufikiria... kufikiri.",
+    "preparing": "Kujiandaa... kujitayarisha.",
+    "checking": "Kuangalia... kuangalia.",
+    "fetching": "Kuleta ... kuleta...",
+    "working": "Kufanya kazi...kufanya kazi.",
+    "scanning": "Kuchunguza... kuchunguza ...",
+    "cancel": "Cancel cancel kufuta",
+    "runningAnalysis": "Kuendesha uchambuzi ... uchambuzaji.",
+    "analysisComplete": "Uchambuzi kamilifu ukamilifu.",
+    "refreshingDashboard": "Dashibodi ya kuburudisha na matokeo ya hivi karibuni.",
+    "analysisStartedDetail": "Uchambuzi ulianza. Kukusanya diagnostics ...",
+    "analysisFailedDetail": "Uchambuzi umeshindwa. Angalia pato kwa maelezo."
   },
   "error": {
-    "genericTitle": "Hitilafu fulani imetokea",
-    "retry": "Jaribu tena",
-    "reload": "Pakia upya",
-    "copyDetails": "Nakili maelezo",
-    "unreachable": "Haikuweza kufikia {target}",
+    "genericTitle": "Kuna kitu kilienda vibaya.",
+    "retry": "Jaribu tena, jaribu tena.",
+    "reload": "Reload upya mzigo.",
+    "copyDetails": "Nakili maelezo ya nakala.",
+    "unreachable": "Haikuweza kufikia {target}.",
     "partialSummary": "{loaded} kati ya {total} {item} zimepakiwa. {failed} zimeshindwa.",
-    "partialRetry": "Imeshindwa kujaribu tena"
+    "partialRetry": "Jaribio la kurudia limeshindwa."
   },
   "offline": {
-    "banner": "Nje ya mtandao - unganisha upya ili uonyeshe upya.",
-    "cachedFooter": "Inaonyesha data iliyohifadhiwa kutoka {when}.",
-    "reconnecting": "Inaunganisha upya..."
+    "banner": "Nje ya mtandao  ⁇  unganisha tena ili kuburudisha.",
+    "cachedFooter": "Inaonyesha data zilizohifadhiwa kutoka kwa {when}.",
+    "reconnecting": "Kuunganisha tena... kuungana tena."
   },
   "stale": {
-    "statusPill": "Uendeshaji uliofaulu wa mwisho {when} - uonyeshaji upya umeshindwa"
+    "statusPill": "Mwisho wa kufanikiwa kukimbia {when}  ⁇  refresh failed failed."
   },
   "filter": {
-    "searchPlaceholder": "Tafuta...",
-    "clearSearch": "Futa utafutaji",
-    "activeLabel": "Vichujio vinavyotumika:",
-    "recentLabel": "Hivi karibuni ▾",
-    "chipRemove": "Ondoa"
+    "searchPlaceholder": "Search... search... utafutaji.",
+    "clearSearch": "Futa utafutaji wa wazi.",
+    "activeLabel": "Vichungi vya kazi: vichujio vyenye nguvu:",
+    "recentLabel": "Hivi karibuni  ⁇  Karibuni.",
+    "chipRemove": "Remove remove Kuondoa"
   },
   "a11y": {
-    "toggleFullWidth": "Geuza mpangilio wa upana kamili",
-    "sortBy": "Panga kwa {column}",
-    "expandRow": "Panua safu mlalo",
-    "collapseRow": "Kunja safu mlalo",
-    "selectAll": "Chagua safu zote",
-    "keyboardShortcuts": "Njia za mkato za kibodi",
-    "announcer": "Masasisho ya kuchuja na kupanga yanatangazwa hapa."
+    "toggleFullWidth": "Toggle full-width layout ya mpangilio wa upana.",
+    "sortBy": "Chagua kwa {column}",
+    "expandRow": "Kuongeza safu ya mstari kupanua.",
+    "collapseRow": "Collapse row mstari wa kuanguka.",
+    "selectAll": "Chagua safu zote chagua mistari yote.",
+    "keyboardShortcuts": "Njia za mkato za kibodi.",
+    "announcer": "Sasisho za hali ya kuchuja na kuchagua zinatangazwa hapa."
   },
   "uiLanguage": {
     "pick": {
-      "title": "Lugha ya UI ya Saropa Lints",
-      "placeholder": "Chagua lugha ya utepe na dashibodi",
-      "auto": "Otomatiki (fuata lugha ya onyesho ya VS Code)"
+      "title": "Saropa Lints Lugha ya UI lugha ya UI.",
+      "placeholder": "Chagua lugha ya ubao wa kando na dashibodi.",
+      "auto": "Auto (kufuata VS Code lugha ya kuonyesha)"
     },
-    "reloadPrompt": "Lugha imewekwa {locale}. Pakia upya dirisha ili kusasisha utepe na lebo za amri.",
-    "reloadNow": "Pakia upya sasa",
-    "reloadLater": "Baadaye"
+    "reloadPrompt": "Lugha iliyowekwa kwa {locale}. Pakia tena dirisha ili kusasisha ubao wa kando na lebo za amri.",
+    "reloadNow": "Reload sasa hivi.",
+    "reloadLater": "Baadaye baadaye baadaye baadaye"
   },
   "brand": {
     "prefix": "Saropa "
   },
   "findingsDash": {
-    "pageTitle": "Dashibodi ya Matokeo ya Saropa",
-    "documentTitle": "Dashibodi ya Matokeo ya Saropa",
-    "skipToFindings": "Ruka hadi kwenye matokeo",
-    "secondaryAsideLabel": "Uchunguzi wa sekondari",
+    "pageTitle": "Saropa Matokeo ya Dashibodi ya Deshibodi.",
+    "documentTitle": "Saropa Matokeo ya Dashibodi ya Deshibodi.",
+    "skipToFindings": "Skip to matokeo ya utafiti.",
+    "secondaryAsideLabel": "Secondary diagnostics ni utambuzi wa sekondari.",
     "hero": {
-      "productTitle": "Dashibodi ya Matokeo",
-      "gaugeTitle": "Alama ya afya {score} (daraja {grade}). Makosa yana uzito mkubwa zaidi.",
+      "productTitle": "Matokeo ya Dashibodi ya Deshibodi.",
+      "gaugeTitle": "Alama ya afya {score} (daraja la {grade}). Makosa hubeba uzito zaidi.",
       "gaugePending": "…"
     },
     "time": {
-      "justNow": "sasa hivi",
+      "justNow": "Hivi sasa hivi tu.",
       "minutesAgo": "dakika {min} zilizopita",
       "hoursAgo": "saa {hr} zilizopita",
       "daysAgo": "siku {day} zilizopita"
     },
     "status": {
-      "lastRunPrefix": "Mbio za mwisho",
-      "lastRunUnknown": "Mbio za mwisho hazijulikani",
-      "noTimestampTitle": "Hakuna muhuri wa muda kwenye violations.json",
-      "findingsAfterFilterTitle": "Jumla ya matokeo baada ya kichujio cha kanuni kizimwa",
+      "lastRunPrefix": "Mwisho wa mwisho, last run.",
+      "lastRunUnknown": "Mwisho wa kukimbia haijulikani.",
+      "noTimestampTitle": "Hakuna timestamp kwenye violations.json.",
+      "findingsAfterFilterTitle": "Jumla ya matokeo baada ya kuzima-sheria filter filter.",
       "findingOne": "matokeo {count}",
       "findingOther": "matokeo {count}",
-      "todoHackTitle": "Alama za TODO na HACK zinapatikana kwenye nafasi ya kazi",
-      "driftOnTitle": "Mshauri wa Drift ameunganishwa: {label}",
-      "driftOnPill": "Elekea · {count}",
-      "driftOfflineTitle": "Mshauri wa Drift amewezeshwa lakini hakuna seva iliyopatikana",
-      "driftOfflinePill": "Drift nje ya mtandao",
-      "enabledRulesTitle": "Sheria zilizowezeshwa katika kiwango cha sasa",
+      "todoHackTitle": "Vipimo vya TODO na HACK vilivyopatikana katika eneo la kazi.",
+      "driftOnTitle": "Drift Mshauri kushikamana: {label}",
+      "driftOnPill": "Drift on · {count} Kuendelea na safari.",
+      "driftOfflineTitle": "Mshauri wa Drift amewezeshwa lakini hakuna seva iliyopatikana.",
+      "driftOfflinePill": "Drift nje ya mtandao.",
+      "enabledRulesTitle": "Sheria zilizowezeshwa katika kiwango cha sasa cha ngazi.",
       "rulesCount": "sheria {count}"
     },
     "groupBy": {
-      "severity": "Ukali",
-      "file": "Faili",
-      "impact": "Athari",
-      "rule": "Kanuni",
+      "severity": "Ugumu wa Hali.",
+      "file": "File ya faili file.",
+      "impact": "Athari za athari ya athari.",
+      "rule": "Kanuni ya Sheria Kanuni za sheria.",
       "owasp": "OWASP",
-      "ruleType": "Aina ya kanuni",
-      "ruleStatus": "Hali ya utawala"
+      "ruleType": "Aina ya sheria aina ya kanuni",
+      "ruleStatus": "Kanuni ya hali ya hadhi."
     },
     "seg": {
-      "toggleSeverityTitle": "Geuza ukali {v}",
-      "toggleImpactTitle": "Geuza athari {v}"
+      "toggleSeverityTitle": "Toggle {v} ukali wa uzito.",
+      "toggleImpactTitle": "Toggle {v} athari ya mgomo wa kugonga."
     },
     "kpi": {
-      "visibleLabel": "Matokeo yanayoonekana",
-      "allMatched": "zote zinalingana",
-      "ofTotal": "jumla ya {total}",
-      "clearFiltersTitle": "Bofya ili kufuta vichujio vyote",
-      "errorsLabel": "Makosa",
-      "errorsSubFix": "lazima kurekebisha",
-      "errorsSubClear": "hakuna - wazi",
-      "errorsTitle": "Chuja matokeo kwa makosa (lazima kurekebisha - iliyovunjika / itaanguka / kunyonywa)",
-      "warningsLabel": "Maonyo",
-      "warningsSubBad": "inaweza kuonekana mbaya au kushindwa",
-      "warningsSubClear": "hakuna - wazi",
-      "warningsTitle": "Chuja matokeo kwa maonyo (inaweza kushindwa au kuonekana mbaya)",
-      "infoLabel": "Habari",
-      "infoSub": "FYI - mtindo / mapendekezo",
-      "infoSubNone": "hakuna",
-      "infoTitle": "Chuja matokeo kwa maelezo (FYI - mtindo na mapendekezo)",
-      "filesLabel": "Faili zilizoathiriwa",
-      "filesSubAcross": "kote nje ya nchi",
-      "filesSubNone": "hakuna faili zilizoathiriwa",
-      "filesTitle": "Faili tofauti zinazochangia angalau utafutaji mmoja",
-      "topRuleLabel": "Kanuni ya juu",
-      "topRuleTitle": "Chuja matokeo ya kutawala {name}"
+      "visibleLabel": "Matokeo yanayoonekana ni matokeo ya utafiti.",
+      "allMatched": "Wote walikuwa sawa na walilingana.",
+      "ofTotal": "ya jumla {total} jumla.",
+      "clearFiltersTitle": "Bonyeza ili kufuta vichungi vyote.",
+      "errorsLabel": "Makosa Makosa makosa Makosa.",
+      "errorsSubFix": "lazima fix must fix",
+      "errorsSubClear": "hakuna  ⁇  wazi",
+      "errorsTitle": "Vichungi vinavyopatikana kwa makosa (lazima urekebishe  ⁇  imevunjika / itaanguka / inaweza kutumiwa)",
+      "warningsLabel": "Maonyo ya onyo Maonyo Onyo.",
+      "warningsSubBad": "inaweza kushindwa au kuonekana vibaya.",
+      "warningsSubClear": "hakuna  ⁇  wazi",
+      "warningsTitle": "Chuja matokeo ya uchunguzi kwa maonyo (yanaweza kushindwa au kuonekana kuwa mabaya)",
+      "infoLabel": "Habari za habari habari habari taarifa.",
+      "infoSub": "FYI  ⁇  style / mapendekezo.",
+      "infoSubNone": "Hakuna, hakuna hata mmoja.",
+      "infoTitle": "Chuja matokeo ya utafiti kwa maelezo (FYI  ⁇  mtindo na mapendekezo)",
+      "filesLabel": "Faili zilizoathiriwa ziliathirika.",
+      "filesSubAcross": "katika sekta ya mauzo nje.",
+      "filesSubNone": "hakuna faili zilizoathiriwa.",
+      "filesTitle": "Faili tofauti zinazosaidia angalau utafutaji mmoja.",
+      "topRuleLabel": "Sheria ya juu zaidi ni sheria ya juu.",
+      "topRuleTitle": "Chuja matokeo ya uchunguzi kwa utawala {name}."
     },
     "toolbar": {
-      "ariaFiltersActions": "Vichujio na vitendo",
-      "groupByFieldTitle": "Matokeo ya kikundi kwa kipimo kilichochaguliwa",
-      "groupByLabel": "Kundi kwa",
-      "textFilterTitle": "Chuja matokeo kwa njia ya faili, sheria, au maandishi ya ujumbe",
-      "textFilterPlaceholder": "Chuja kwa faili, sheria, au ujumbe...",
-      "textFilterAria": "Kichujio cha maandishi",
-      "clearTextFilterTitle": "Futa kichujio cha maandishi",
-      "clearTextFilterAria": "Futa kichujio cha maandishi",
-      "recentFiltersTitle": "Vichungi vya hivi majuzi",
-      "clearRecentTitle": "Futa vichujio vyote vya hivi majuzi",
-      "clearRecentButton": "Wazi",
-      "recentFiltersListAria": "Vichungi vya hivi majuzi",
-      "runAnalysisTitle": "Fanya uchambuzi wa Saropa Lints",
-      "refreshViolationsTitle": "Pakia upya violations.json kutoka kwa diski",
-      "severityGroupAria": "Kichujio cha ukali",
-      "severityLabel": "Ukali",
-      "impactGroupAria": "Kichujio cha athari",
-      "impactLabel": "Athari",
-      "moreSummary": "Zaidi",
+      "ariaFiltersActions": "Vichungi na vitendo vya hatua.",
+      "groupByFieldTitle": "Matokeo ya kikundi kwa vipimo vilivyochaguliwa.",
+      "groupByLabel": "Kikundi kwa kikundi na kundi.",
+      "textFilterTitle": "Chuja matokeo ya utafutaji kwa njia ya faili, sheria au ujumbe wa maandishi.",
+      "textFilterPlaceholder": "Chuja kwa faili, sheria au ujumbe...",
+      "textFilterAria": "Kichujio cha maandishi ni kichujio.",
+      "clearTextFilterTitle": "Futa kichujio cha maandishi wazi.",
+      "clearTextFilterAria": "Futa kichujio cha maandishi wazi.",
+      "recentFiltersTitle": "Vichungi vya hivi karibuni vichujio.",
+      "clearRecentTitle": "Futa vichungi vyote vya hivi karibuni.",
+      "clearRecentButton": "Clear Kiwa Clear Kiwi",
+      "recentFiltersListAria": "Vichungi vya hivi karibuni vichujio.",
+      "runAnalysisTitle": "Endesha uchambuzi wa Saropa Lints.",
+      "refreshViolationsTitle": "Reload violations.json kutoka diski disk.",
+      "severityGroupAria": "Filter ya ukali wa ugumu.",
+      "severityLabel": "Ugumu wa Hali.",
+      "impactGroupAria": "Impact Filter - Msaada wa Uzalishaji",
+      "impactLabel": "Athari za athari ya athari.",
+      "moreSummary": "Zaidi zaidi More More",
       "moreChevron": "▾",
       "copyJsonTitle": "Nakili ukiukaji uliochujwa kama JSON ({count})",
-      "saveReportTitle": "Hifadhi ukiukaji uliochujwa kama JSON kwenye ripoti/YYYYMMDD/"
+      "saveReportTitle": "Hifadhi ukiukaji uliochujwa kama JSON kwa ripoti/YYY YMMDD/"
     },
     "chip": {
       "contains": "ina \"{q}\"",
       "severityOff": "ukali ≠ {v}",
       "impactOff": "athari ≠ {v}",
-      "resetAllTitle": "Weka upya vichujio vyote",
-      "removeFilterAria": "Ondoa kichujio"
+      "resetAllTitle": "Rudisha upya vichungi vyote.",
+      "removeFilterAria": "Ondoa kichujio cha kuondoa."
     },
     "menuPalette": {
-      "help": "Msaada",
-      "groupBy": "Panga kwa...",
-      "textFilter": "Kichujio cha maandishi...",
-      "severityImpact": "Kichujio cha ukali...",
-      "hideRules": "Ficha sheria...",
-      "ruleMetadata": "Kanuni ya metadata",
-      "clearFilters": "Futa vichungi",
-      "clearSuppressions": "Ukandamizaji wazi",
-      "clearFileFocus": "Futa lengo la faili",
-      "matchActiveEditor": "Linganisha kihariri amilifu",
-      "copyTreeJson": "Nakili mti JSON",
-      "refreshExtension": "Onyesha upya kiendelezi",
-      "openPackageDashboard": "Fungua dashibodi ya Kifurushi",
-      "openCodeHealth": "Fungua Kanuni ya Afya",
-      "openLintsConfig": "Fungua Usanidi wa Lints",
-      "reloadFromDisk": "Pakia upya kutoka kwa diski",
-      "reloadFromDiskTitle": "Toa tena dashibodi kutoka kwa ukiukaji wa violations.json bila kuendesha tena kichanganuzi.",
-      "reEnableDisabledRules": "Washa tena sheria zilizozimwa...",
-      "reEnableDisabledRulesTitle": "Fungua chaguo la haraka la sheria ambazo kwa sasa zimezimwa katika analysis_options_custom.yaml na uwashe tena zilizochaguliwa.",
-      "reEnableNoneTitle": "Hakuna sheria ambazo zimezimwa kwa sasa",
-      "reEnableNoneMessage": "Hakuna sheria ambazo zimezimwa kwa sasa kupitia analysis_options_custom.yaml.",
-      "reEnableQuickPickTitle": "Washa tena sheria zilizozimwa",
-      "reEnableQuickPickPlaceholder": "Chagua sheria moja au zaidi ili kuwezesha tena",
-      "menuGroupExport": "Hamisha",
-      "menuGroupFilter": "Chuja & lenga",
-      "menuGroupOpen": "Fungua dashibodi",
-      "menuGroupSystem": "Mfumo"
+      "help": "Msaada wa Kusaidia Msaidizi.",
+      "groupBy": "Kikundi kwa... kikundi na ...",
+      "textFilter": "Kichujio cha maandishi... kichungi cha maandiko.",
+      "severityImpact": "Filter ya ukali...",
+      "hideRules": "Fanya sheria za siri...",
+      "ruleMetadata": "Kanuni ya Metadata.",
+      "clearFilters": "Futa vichungi wazi.",
+      "clearSuppressions": "Kuzuia wazi kukandamiza.",
+      "clearFileFocus": "Futa mwelekeo wa faili wazi.",
+      "matchActiveEditor": "Match active editor kwa matching.",
+      "copyTreeJson": "Copy mti JSON.",
+      "refreshExtension": "Refresh extension ya kutafakari upya.",
+      "openPackageDashboard": "Fungua Dashibodi ya kifurushi cha Package.",
+      "openCodeHealth": "Open Code Afya ya afya.",
+      "openLintsConfig": "Open Lints Config configure kwa ajili ya matumizi.",
+      "reloadFromDisk": "Reload kutoka diski disk.",
+      "reloadFromDiskTitle": "Render tena dashibodi kutoka mwisho violations.json bila kuendesha upya analyzer.",
+      "reEnableDisabledRules": "Re-enable disabled rules... re-enabling disabled rule.... tena kuwezesha sheria zilizozimwa ...",
+      "reEnableDisabledRulesTitle": "Fungua chaguo la haraka la sheria ambazo hazijatumika kwa sasa katika analysis_options_custom.yaml na uache tena zile zilizochaguliwa.",
+      "reEnableNoneTitle": "Hakuna sheria kwa sasa imezimwa.",
+      "reEnableNoneMessage": "Hakuna sheria ambazo kwa sasa zimezimwa kupitia analysis_options_custom.yaml.",
+      "reEnableQuickPickTitle": "Re-Enable Disabled Rules - Kuwezesha tena sheria zilizozimwa.",
+      "reEnableQuickPickPlaceholder": "Chagua moja au zaidi ya sheria ili kuwezesha tena.",
+      "menuGroupExport": "Export export Uuzaji wa nje.",
+      "menuGroupFilter": "Filter & Focus ya",
+      "menuGroupOpen": "Fungua dashibodi ya wazi.",
+      "menuGroupSystem": "System System System Mfumo wa mfumo."
     },
     "progress": {
-      "runningLabel": "Inaendesha uchambuzi…",
+      "runningLabel": "Kuendesha uchambuzi ... uchambuzaji.",
       "runningMeta": "Hii inaweza kuchukua muda kwenye miradi mikubwa."
     },
     "topRules": {
-      "sectionAria": "Sheria za juu kwa kuhesabu",
-      "hideTitle": "Nifiche pekee - kiwango cha nafasi ya kazi, inayoweza kutenduliwa kupitia Ukandamizaji Wazi",
-      "hideButton": "Ficha",
-      "disableTitle": "Zima kwa mradi mzima - anaandika analysis_options_custom.yaml na kufanya uchambuzi upya",
-      "disableButton": "Zima",
-      "workspaceOnlyShort": "nafasi ya kazi pekee",
-      "projectConfigShort": "usanidi wa mradi (anaandika analysis_options_custom.yaml)",
-      "topRulesOne": "Sheria ya juu ya {count}",
-      "topRulesOther": "Sheria kuu za {count}",
+      "sectionAria": "Sheria za juu kwa kuhesabu.",
+      "hideTitle": "Ficha kwangu tu  ⁇  kiwango cha nafasi ya kazi, kinachoweza kubadilishwa kupitia Uondoaji wa wazi.",
+      "hideButton": "Hide hide hide, kujificha.",
+      "disableTitle": "Disable for the whole project  ⁇  writes analysis_options_custom.yaml and re-runs analysis analysis  ⁇  Inafanya kazi tena kwa ajili ya mradi wote",
+      "disableButton": "Disable Disable Kulemaza",
+      "workspaceOnlyShort": "workspace tu nafasi ya kazi.",
+      "projectConfigShort": "config ya mradi (anaandika analysis_options_custom.yaml)",
+      "topRulesOne": "Juu {count} utawala wa sheria.",
+      "topRulesOther": "Juu {count} sheria za juu.",
       "colRank": "#",
-      "colRule": "Kanuni",
-      "colCount": "Hesabu",
-      "colSeverity": "Ukali",
-      "colActionsAria": "Vitendo vya safu",
+      "colRule": "Kanuni ya Sheria Kanuni za sheria.",
+      "colCount": "Count Count kuhesabu hesabu.",
+      "colSeverity": "Ugumu wa Hali.",
+      "colActionsAria": "Hatua za safu Matendo ya safu.",
       "filesAffected": "Faili zilizoathiriwa ({count})"
     },
     "findings": {
-      "sectionAria": "Matokeo",
-      "expandAll": "Panua zote",
-      "collapseAll": "Kunja zote",
+      "sectionAria": "Matokeo ya Uchunguzi.",
+      "expandAll": "Kuongeza wote kupanua yote.",
+      "collapseAll": "Kuanguka wote kuporomoka.",
       "bulkSelected": "{count} zimechaguliwa",
-      "bulkCopy": "Nakili iliyochaguliwa kama JSON",
-      "selectAllTitle": "Chagua matokeo yote yanayoonekana",
-      "selectAllAria": "Chagua matokeo yote yanayoonekana",
-      "colSeverity": "Ukali",
-      "colRule": "Kanuni",
-      "colMessage": "Ujumbe",
-      "colLine": "Mstari",
-      "colActionsAria": "Vitendo vya safu",
-      "selectRowAria": "Chagua safu mlalo hii ya utafutaji",
-      "copyRowTitle": "Nakili utaftaji huu kama JSON",
+      "bulkCopy": "Nakili chaguo lililochaguliwa kama JSON.",
+      "selectAllTitle": "Chagua matokeo yote yanayoonekana.",
+      "selectAllAria": "Chagua matokeo yote yanayoonekana.",
+      "colSeverity": "Ugumu wa Hali.",
+      "colRule": "Kanuni ya Sheria Kanuni za sheria.",
+      "colMessage": "Ujumbe ujumbe ujumbe ujumbe.",
+      "colLine": "Mstari Line Line Line line.",
+      "colActionsAria": "Hatua za safu Matendo ya safu.",
+      "selectRowAria": "Chagua safu hii ya kutafuta chaguo.",
+      "copyRowTitle": "Nakili matokeo haya kama JSON.",
       "metaShown": "{filtered} zimeonyeshwa",
       "metaAfterDisable": "{total} baada ya kichujio cha sheria iliyozimwa",
-      "metaSourceCap": "chanzo kimefungwa {max} kwa utendakazi",
-      "metaGroupedBy": "imeunganishwa na {mode}",
-      "overflowNote": "Orodha ya chanzo imepunguzwa kwa {max} kwa utendakazi.",
-      "runAgain": "Fanya uchambuzi tena",
-      "emptyNoViolations": "Hakuna ukiukaji katika uchanganuzi wa mwisho uliofanywa.",
-      "emptyNoMatch": "Hakuna ukiukaji unaolingana na vichujio vya sasa.",
-      "emptyHintNoData": "Fanya uchanganuzi ili ujaze `reports/.saropa_lints/violations.json`, kisha uonyeshe upya.",
-      "emptyHintFilters": "Rekebisha vichujio au endesha uchanganuzi tena ili kuona matokeo.",
-      "reRunAnalysis": "Rudia uchambuzi",
-      "resetFilters": "Weka upya vichujio",
+      "metaSourceCap": "chanzo kilichowekwa kikomo cha {max} kwa utendaji wa utendaji.",
+      "metaGroupedBy": "iliyowekwa katika vikundi vya {mode}.",
+      "overflowNote": "Orodha ya chanzo imepunguzwa kwa {max} kwa utendaji wa kutoa.",
+      "runAgain": "Endesha uchambuzi tena.",
+      "emptyNoViolations": "Hakuna ukiukaji katika uchambuzi wa mwisho kukimbia.",
+      "emptyNoMatch": "Hakuna ukiukaji unaolingana na vichungi vya sasa.",
+      "emptyHintNoData": "Endesha uchambuzi ili kujaza `ripoti/.saropa_lints/violations.json̅, kisha usasishe.",
+      "emptyHintFilters": "Rekebisha vichungi au endesha uchambuzi tena ili uone matokeo.",
+      "reRunAnalysis": "Uchambuzi wa Re-run uchambuzi.",
+      "resetFilters": "Kuweka upya vichungi vya kuweka upya.",
       "linePrefix": "L{line}"
     },
     "charts": {
-      "sectionAria": "Changanya chati",
-      "heading": "Changanya",
-      "metaClickSlice": "bofya kipande ili kuchuja",
-      "severityMix": "Mchanganyiko wa ukali",
-      "impactMix": "Mchanganyiko wa athari",
-      "filterBarTitle": "Chuja hadi {key} pekee",
-      "donutTotal": "jumla"
+      "sectionAria": "Chati za kuchanganya mchanganyiko.",
+      "heading": "Mixing Mchanganyiko wa mchanganyiko.",
+      "metaClickSlice": "bonyeza kipande cha kuchuja ili uchuje.",
+      "severityMix": "Mchanganyiko wa ukali mchanganyiko.",
+      "impactMix": "Impact mix - Mchanganyiko wa athari.",
+      "filterBarTitle": "Chuja kwa {key} tu.",
+      "donutTotal": "Jumla ya jumla ya jumla."
     },
     "todoHack": {
-      "sectionAria": "TODO na HACKS",
-      "headingDisabled": "TODO & HACKS",
-      "metaDisabled": "skanani imezimwa",
-      "scanOff": "Uchanganuzi wa nafasi ya kazi umezimwa - wezesha kuweka alama kwenye faili za mradi.",
-      "enableScan": "Washa uchanganuzi",
-      "heading": "TODO & HACKS",
+      "sectionAria": "TODOs na HACKS.",
+      "headingDisabled": "TODOs & HACKS zote mbili.",
+      "metaDisabled": "scan disabled imezimwa",
+      "scanOff": "Scan ya eneo la kazi imezimwa  ⁇  kuwezesha alama za uso kutoka kwa faili za mradi.",
+      "enableScan": "Kuwezesha Scan Scan kuwezesha.",
+      "heading": "TODOs & HACKS zote mbili.",
       "subsectionNone": "{title}: hakuna katika masafa ya kuchanganua.",
-      "capNote": "Scan hit max-file cap; pandisha `saropaLints.todosAndHacks.maxFilesToScan` kwa huduma kamili.",
-      "notePill": "kumbuka",
-      "todosLabel": "Mambo ya Kufanya",
+      "capNote": "Scan hit max-file cap; raise ∀saropaLints.todosAndHacks.maxFilesToScan̅ for full coverage.",
+      "notePill": "Kumbuka: Maelezo ya chini.",
+      "todosLabel": "TODOs zote ni za kawaida.",
       "hacksLabel": "Mbinu"
     },
     "drift": {
-      "sectionAria": "Mshauri wa Drift",
-      "headingOff": "Mshauri wa Drift",
-      "metaOff": "ujumuishaji umezimwa",
-      "enableBlurb": "Washa muunganisho wa Mshauri wa Drift ili kutoa mapendekezo ya hifadhidata hapa.",
-      "enable": "Wezesha",
-      "headingNoServer": "Mshauri wa Drift",
-      "metaNoServer": "hakuna seva",
-      "noServerBlurb": "Hakuna seva ya Mshauri wa Drift iliyopatikana kwenye milango iliyosanidiwa.",
-      "retry": "Jaribu tena",
-      "headingConnected": "Mshauri wa Drift",
-      "metaConnected": "kushikamana",
-      "noIssues": "Imeunganishwa kwa {label} - hakuna matatizo ya sasa.",
-      "refresh": "Onyesha upya",
-      "openBrowser": "Fungua katika kivinjari",
-      "headingIssues": "Mshauri wa Drift",
-      "disable": "Zima Mshauri wa Drift"
+      "sectionAria": "Mshauri wa Drift Advisor.",
+      "headingOff": "Mshauri wa Drift Advisor.",
+      "metaOff": "integration off kuunganisha mbali",
+      "enableBlurb": "Kuwezesha ushirikiano wa Mshauri wa Drift kwa mapendekezo ya database hapa.",
+      "enable": "Enable Kuwezesha kuwezesha",
+      "headingNoServer": "Mshauri wa Drift Advisor.",
+      "metaNoServer": "Hakuna server ya seva hakuna.",
+      "noServerBlurb": "Hakuna seva ya Mshauri wa Drift iliyopatikana kwenye bandari zilizowekwa.",
+      "retry": "Jaribu tena, jaribu tena.",
+      "headingConnected": "Mshauri wa Drift Advisor.",
+      "metaConnected": "connected connected imeunganishwa imeunganisha",
+      "noIssues": "Imeunganishwa na {label}  ⁇  hakuna masuala ya sasa.",
+      "refresh": "Kufanya kazi kwa njia ya burudani.",
+      "openBrowser": "Fungua katika kivinjari cha browser.",
+      "headingIssues": "Mshauri wa Drift Advisor.",
+      "disable": "Disable Drift Advisor Mshauri wa Uhamaji."
     },
     "suppressions": {
-      "sectionAria": "Ukandamizaji",
-      "headingExport": "Vizuizi (kuuza nje)",
-      "viewHidesHeading": "Mtazamo wa masuala hujificha",
-      "viewHidesMetaActive": "hai",
-      "viewHidesMetaNone": "hakuna",
+      "sectionAria": "Ukandamizaji wa mawazo.",
+      "headingExport": "Kuondolewa (kuuza nje)",
+      "viewHidesHeading": "Masuala maoni huficha maswala.",
+      "viewHidesMetaActive": "active active kazi ya kufanya.",
+      "viewHidesMetaNone": "Hakuna, hakuna hata mmoja.",
       "noneInExport": "Hakuna ukandamizaji wa kichanganuzi katika uhamishaji wa sasa wa `violations.json`. Fanya uchanganuzi baada ya kuhariri kupuuza au misingi ili kujaza.",
-      "totalRow": "Jumla - futa vichujio na ufungue Matokeo",
-      "byRule": "Kwa kanuni ({count})",
+      "totalRow": "Jumla  ⁇  filters wazi na matokeo ya kufungua.",
+      "byRule": "Kwa sheria ({count})",
       "byFile": "Kwa faili ({count})",
-      "noEntries": "Hakuna maingizo.",
-      "nothingHidden": "Hakuna kilichofichwa kutoka kwa orodha ya Masuala katika nafasi hii ya kazi. Tumia vitendo vya muktadha wa mti kuficha folda, faili au sheria; wanaendelea katika hali ya nafasi ya kazi.",
+      "noEntries": "Hakuna entries.",
+      "nothingHidden": "Hakuna kilichofichwa kutoka kwa orodha ya Masuala katika eneo hili la kazi. Tumia vitendo vya muktadha wa mti kuficha folda, faili au sheria; zinabaki katika hali ya nafasi ya kazi.",
       "folderPattern": "folda {count}",
       "filePattern": "ruwaza za faili {count}",
       "ruleGlobal": "sheria {count} ulimwenguni kote",
       "perFileRules": "faili {count} zilizo na sheria zilizofichwa kwa kila faili",
       "severityHides": "ukali {count} uliofichwa",
       "impactHides": "athari {count} zilizofichwa",
-      "activeHides": "Ngozi zinazotumika: {counts}.",
-      "viewHidesFooter": "Maficho haya hupunguza orodha ya Masuala/dashibodi pekee; hazijaandikwa kwa `violations.json`.",
-      "clearViewHides": "Futa maficho yote ya kutazama",
-      "foldersSample": "Folda (sampuli)",
-      "filesSample": "Faili / globu (sampuli)",
-      "rulesSample": "Sheria (sampuli)",
-      "perFileRulesSample": "Sheria za kila faili (sampuli)",
-      "unknownKind": "Haijulikani"
+      "activeHides": "Ngozi za kazi: {counts}. .",
+      "viewHidesFooter": "Hizi huficha kunyoosha Masuala / orodha dashibodi tu; wao si imeandikwa kwa `violations.json`.",
+      "clearViewHides": "Clear All View hides.",
+      "foldersSample": "Folders (sampuli) folda (sample)",
+      "filesSample": "Faili / globs (mfano)",
+      "rulesSample": "Kanuni (mfano)",
+      "perFileRulesSample": "Sheria za kila faili (mfano)",
+      "unknownKind": "Haijulikani haijulikane haijulikanishi haijulikana"
     },
     "script": {
-      "analysisRunning": "Inaendesha uchambuzi…",
-      "analysisComplete": "Uchambuzi umekamilika",
+      "analysisRunning": "Kuendesha uchambuzi ... uchambuzaji.",
+      "analysisComplete": "Uchambuzi kamilifu ukamilifu.",
       "metaRunning": "Hii inaweza kuchukua muda kwenye miradi mikubwa.",
-      "metaDone": "Inaonyesha upya dashibodi na matokeo ya hivi punde.",
-      "announceSearch": "tafuta {q}",
+      "metaDone": "Dashibodi ya kuburudisha na matokeo ya hivi karibuni.",
+      "announceSearch": "search {q} utafutaji",
       "announceSeverities": "viwango vya ukali {n}",
       "announceImpacts": "athari {n}",
-      "announceCleared": "Vichujio vyote vimefutwa",
-      "announceFiltersPrefix": "Vichujio:",
+      "announceCleared": "Vichungi vyote vimeondolewa.",
+      "announceFiltersPrefix": "Filters: Kifaa cha kuchuja hewa.",
       "bulkSelected": "{n} zimechaguliwa",
-      "analysisStartedDetail": "Uchambuzi umeanza. Inakusanya uchunguzi...",
-      "announceStarted": "Uchambuzi umeanza",
-      "announceComplete": "Uchambuzi umekamilika",
-      "announceFailed": "Uchambuzi haukufaulu",
-      "analysisFailedDetail": "Uchambuzi haukufaulu. Angalia pato kwa maelezo.",
-      "removeRecentAria": "Ondoa",
-      "removeRecentTitle": "Ondoa",
+      "analysisStartedDetail": "Uchambuzi ulianza. Kukusanya diagnostics ...",
+      "announceStarted": "Uchambuzi ulianza kuanza.",
+      "announceComplete": "Uchambuzi kamilifu ukamilifu.",
+      "announceFailed": "Uchambuzi ulishindwa.",
+      "analysisFailedDetail": "Uchambuzi umeshindwa. Angalia pato kwa maelezo.",
+      "removeRecentAria": "Remove remove Kuondoa",
+      "removeRecentTitle": "Remove remove Kuondoa",
       "bulkSelectedTpl": "{n} zimechaguliwa"
     },
     "emptyState": {
-      "hintAfterMessage": "Fanya uchanganuzi wa Saropa Lints ili kuzalisha violations.json, kisha utumie Onyesha upya hapa au ufungue tena dashibodi hii.",
-      "refreshDisk": "Onyesha upya kutoka kwa diski"
+      "hintAfterMessage": "Endesha uchambuzi wa Saropa Lints ili kuzalisha violations.json, kisha utumie Refresh hapa au fungua tena dashibodi hii.",
+      "refreshDisk": "Refresh kutoka diski."
     },
     "shortcuts": {
-      "focusTextFilter": "Lenga kichujio cha maandishi",
-      "clearTextFilter": "Futa kichujio cha maandishi kilicholengwa",
-      "activateKpi": "Washa kadi ya KPI iliyolengwa au upau wa chati",
-      "activateKpiSpace": "Washa kadi ya KPI iliyolengwa au upau wa chati",
-      "showOverlay": "Onyesha wekeleo huu wa njia ya mkato"
+      "focusTextFilter": "Focus text filter yako kwenye focus.",
+      "clearTextFilter": "Futa kichujio cha maandishi kilichozingatia.",
+      "activateKpi": "Kuamsha kadi ya KPI iliyozingatia au bar ya chati ya cheti.",
+      "activateKpiSpace": "Kuamsha kadi ya KPI iliyozingatia au bar ya chati ya cheti.",
+      "showOverlay": "Onyesha hii njia ya mkato overlay."
     },
-    "unknownAnalyzerKind": "Haijulikani",
+    "unknownAnalyzerKind": "Haijulikani haijulikane haijulikanishi haijulikana",
     "supplementary": {
-      "otherAnalyzerOn": "+ {count} matokeo mengine ya kichanganuzi",
-      "otherAnalyzerPromo": "+? matokeo mengine ya analyzer - onyesha",
-      "analyzerTodosOn": "+{count} TODO za kichanganuzi",
-      "analyzerTodosPromo": "+? analyzer TODOs - onyesha",
-      "scannerPromo": "Washa kichanganuzi cha TODO/HACK",
-      "tooltipLive": "Moja kwa moja kutoka kwa paneli ya Matatizo ya VS Code. Inasasisha uchambuzi unapokamilika. Bofya ili kuficha.",
-      "tooltipScanner": "Kichanganuzi cha mfumo wa faili cha Saropa - huhesabu alama za TODO/HACK katika chanzo.",
-      "tooltipPromoClickToOn": "Bofya ili kuwezesha"
+      "otherAnalyzerOn": "+{count} matokeo mengine ya analyzer.",
+      "otherAnalyzerPromo": "+? matokeo mengine ya analyzer  ⁇  show",
+      "analyzerTodosOn": "+{count} analyzer TODOs zote mbili.",
+      "analyzerTodosPromo": "+? analyzer TODOs  ⁇  show show",
+      "scannerPromo": "Kuwezesha TODO / HACK scanner.",
+      "tooltipLive": "Moja kwa moja kutoka VS Code Jopo la Matatizo. Updates kama uchambuzi kukamilika. Bonyeza ili kuficha.",
+      "tooltipScanner": "Saropa filesystem scanner  ⁇  counts open TODO/HACK markers in source. ilitumwa zaidi ya mwaka mmoja uliopita",
+      "tooltipPromoClickToOn": "Bonyeza ili kuwezesha."
     }
   },
   "triageDash": {
-    "showInIssues": "Onyesha katika Masuala",
-    "disableRules": "Lemaza sheria",
-    "enableRules": "Wezesha sheria",
-    "issues": "Masuala",
-    "off": "Imezimwa",
-    "on": "Washa",
-    "colRule": "Kanuni",
-    "colIssues": "Masuala",
+    "showInIssues": "Onyesha Masuala Katika Maswala.",
+    "disableRules": "Disable rules Kuzima sheria.",
+    "enableRules": "Kuwezesha sheria za sheria.",
+    "issues": "Masuala masuala maswala.",
+    "off": "Off off off off mbali mbali",
+    "on": "On on on kwenye kwenye kwenye",
+    "colRule": "Kanuni ya Sheria Kanuni za sheria.",
+    "colIssues": "Masuala masuala maswala.",
     "zeroIssueRules": "sheria {count} zisizo na matatizo — zimewezeshwa kiotomatiki kwenye kiwango.",
     "disabledOverrides": "sheria {count} zimezimwa kwa kubatilisha katika `analysis_options_custom.yaml`.",
-    "summaryRuleTriage": "Uteuzi wa kanuni",
-    "hintNoViolations": "Bado hakuna `reports/.saropa_lints/violations.json`. Fanya uchambuzi, kisha uonyeshe upya kichupo hiki.",
-    "hintUnreadable": "Hakuna ukiukaji unaoweza kusomeka. Endesha uchambuzi wa Saropa Lints kwanza.",
-    "hintStale": "Data ya majaribio inaweza kuwa imepitwa na wakati (usafirishaji ni {age} nzee). Rudia uchanganuzi wa vikundi vya sasa.",
-    "hintNoPerRule": "Uhamishaji huu hauna hesabu za suala la kila kanuni. Changanua upya ukitumia programu-jalizi ya sasa ya Saropa Lints.",
-    "hintBuildFailed": "Haikuweza kuunda utatuzi kutoka kwa uhamishaji huu. Fanya uchambuzi mpya.",
-    "summaryVolume": "Uteuzi wa kanuni (kiasi / lazima-kurekebisha / kimtindo)",
-    "hintSameAsTree": "Upangaji sawa na mti wa Upau wa Kujaribu: Masuala ya kichujio, au zima/wezesha sheria katika `analysis_options_custom.yaml`. Vikundi vikubwa vinaweza kuomba uthibitisho."
+    "summaryRuleTriage": "Sheria ya utaratibu wa upimaji wa triage.",
+    "hintNoViolations": "Hakuna ripoti za uharibifu/.saropa_lints/violations.json bado. Endesha uchambuzi, kisha upya kichupo hiki.",
+    "hintUnreadable": "Hakuna ukiukaji unaoweza kusomwa. export. Fanya uchambuzi wa Saropa Lints kwanza.",
+    "hintStale": "Takwimu za upimaji zinaweza kuwa zimepitwa na wakati (kuuza nje ni {age} zamani). Uchambuzi wa kurudia kwa vikundi vya sasa.",
+    "hintNoPerRule": "Hii mauzo ya nje haina per-sheria suala counts. Chambua tena na programu-jalizi ya sasa Saropa Lints.",
+    "hintBuildFailed": "Haikuweza kujenga utaratibu wa kuchagua kutoka kwa mauzo haya. Fanya uchambuzi mpya.",
+    "summaryVolume": "Sheria triage (kiasi / lazima-kuweka / stylistic)",
+    "hintSameAsTree": "Same makundi kama Triage shughuli-bar mti: Filter Masuala, au Disable/Enable sheria katika `analysis_options_custom.yaml゙. Vikundi vikubwa vinaweza kuomba uthibitisho."
   },
   "kbdOverlay": {
-    "toggleTitle": "Onyesha mikato ya kibodi (?)",
-    "toggleAria": "Onyesha njia za mkato za kibodi",
-    "dialogTitle": "Njia za mkato za kibodi",
-    "closeAria": "Funga mikato ya kibodi",
-    "footer": "Bonyeza Esc au ubofye nje ili kufunga."
+    "toggleTitle": "Onyesha njia za mkato za kibodi (?)",
+    "toggleAria": "Onyesha njia za mkato za kibodi.",
+    "dialogTitle": "Njia za mkato za kibodi.",
+    "closeAria": "Funga njia za mkato za kibodi.",
+    "footer": "Bonyeza Esc au bonyeza nje ili kufunga."
   },
   "wideReport": {
-    "openWorkspaceFirst": "Fungua folda ya nafasi ya kazi kwanza.",
-    "noReportYet": "Bado hakuna ripoti ya ukiukaji. Endesha uchambuzi wa Saropa Lints kwanza.",
-    "clipboardCopyFailed": "Haikuweza kunakili kwenye ubao wa kunakili.",
-    "copiedViolationsJson": "Imenakili ukiukaji wa {count} kama JSON.",
-    "copiedOneViolationJson": "Imenakili ukiukaji 1 kama JSON.",
-    "driftNotConnected": "Seva ya Mshauri wa Drift haijaunganishwa.",
-    "copiedBulkFindings": "Imenakili matokeo {count} yaliyochaguliwa kama JSON.",
+    "openWorkspaceFirst": "Fungua folda ya eneo la kazi kwanza.",
+    "noReportYet": "Hakuna ripoti ya ukiukaji bado. Fanya uchambuzi wa Saropa Lints kwanza.",
+    "clipboardCopyFailed": "Haikuweza kunakili kwenye clipboard.",
+    "copiedViolationsJson": "Nakala {count} ukiukaji (((s) kama JSON.",
+    "copiedOneViolationJson": "Nilinakili ukiukaji 1 kama JSON.",
+    "driftNotConnected": "Drift Mshauri server haijaunganishwa.",
+    "copiedBulkFindings": "Nakala {count} matokeo yaliyochaguliwa (((s) kama JSON.",
     "noMatchingFindingsCopy": "Hakuna matokeo yanayolingana ya kunakili.",
     "couldNotOpenFile": "Haikuweza kufungua faili: {path}",
-    "saveReportNoWorkspace": "Fungua folda ya nafasi ya kazi kabla ya kuhifadhi ripoti.",
-    "savedFindings": "Matokeo {count} yaliyohifadhiwa: {path}",
-    "couldNotSaveReportJson": "Haikuweza kuhifadhi ripoti JSON."
+    "saveReportNoWorkspace": "Fungua folda ya eneo la kazi kabla ya kuhifadhi ripoti.",
+    "savedFindings": "Imehifadhiwa {count} kupata ((s): {path}",
+    "couldNotSaveReportJson": "Haikuweza kuhifadhi ripoti ya JSON."
   },
   "packageDashboard": {
-    "documentTitle": "Dashibodi ya Kifurushi cha Saropa",
-    "heroTitle": "Dashibodi ya Kifurushi cha Saropa",
+    "documentTitle": "Saropa Dashibodi ya Kifurushi cha Package",
+    "heroTitle": "Saropa Dashibodi ya Kifurushi cha Package",
     "status": {
       "packagesCount": "vifurushi {count}",
       "packagesBreakdown": "{direct} ya moja kwa moja, {transitive} badilishi",
       "gradeLine": "Daraja {grade} · {avg}/100",
       "flaggedCount": "{count} zimewekewa alama",
-      "flaggedTitle": "Kuachwa au mwisho wa maisha",
-      "lastScanLabel": "Ilichanganua {when}",
-      "lastScanTitle": "Wakati data hii ya dashibodi ililetwa - {timestamp}. Bofya Changanua upya ili kuonyesha upya.",
-      "lastScanUnknown": "Imechanganuliwa (muda haujulikani)",
-      "lastScanUnknownTitle": "Uchanganuzi huu ulifanyika kabla ya dashibodi kufuatilia mihuri ya muda. Bofya Changanua upya ili kuonyesha upya."
+      "flaggedTitle": "Imetupwa au iko mwisho wa maisha yake.",
+      "lastScanLabel": "Imechunguzwa {when}.",
+      "lastScanTitle": "Wakati data hii ya dashibodi ilipokuja  ⁇  {timestamp}. Bonyeza Scan tena ili kuiboresha.",
+      "lastScanUnknown": "Imechunguzwa (wakati haujulikani)",
+      "lastScanUnknownTitle": "Scan hii iliendeshwa kabla ya dashibodi kufuatilia timestamps. Bonyeza Scan tena ili kuiboresha."
     },
     "time": {
-      "justNow": "sasa hivi",
+      "justNow": "Hivi sasa hivi tu.",
       "minutesAgo": "dakika {min} zilizopita",
       "hoursAgo": "saa {hr} zilizopita",
       "daysAgo": "siku {day} zilizopita"
     },
     "scanning": {
-      "heading": "Inachanganua vifurushi",
-      "body1": "Saropa anachota metadata ya pub.dev, shughuli za GitHub, na grafu za utegemezi kwa kila utegemezi wa moja kwa moja katika mradi huu.",
-      "body2": "Ukurasa huu utaonyeshwa upya kiotomatiki skanning itakapokamilika. Unaweza kughairi kutoka kwa arifa ya maendeleo katika sehemu ya chini kulia.",
-      "versionStamp": "Dashibodi ya Kifurushi cha Saropa v{version}"
+      "heading": "Pakiti za skanning ya pakiti.",
+      "body1": "Saropa inachukua metadata ya pub.dev, shughuli za GitHub na grafu za utegemezi kwa kila utegemee wa moja kwa moja katika mradi huu.",
+      "body2": "Ukurasa huu utafurahisha kiotomatiki wakati skanning imekamilika. Unaweza kughairi kutoka kwa taarifa ya maendeleo katika kona ya chini kulia.",
+      "versionStamp": "Saropa Dashibodi ya Kifurushi cha Package v{version}"
     },
-    "gaugeTitle": "Daraja la Kifurushi cha Mradi: {grade}",
+    "gaugeTitle": "Kiwango cha Pakiti ya Mradi: {grade}",
     "summary": {
-      "packages": "Vifurushi",
-      "projectGrade": "Daraja la Kifurushi cha Mradi",
-      "totalSize": "Jumla ya Ukubwa*",
-      "gradeTooltip": "Kiwango cha mradi {avgGrade}\nAlama ya wastani: {avgScore}/100\nVifurushi: {pkgCount}\nA:{a} B:{b} C:{c} E:{e} F:{f}",
-      "vibrantTitle": "Mahiri",
-      "stableTitle": "Imara",
-      "outdatedTitle": "Imepitwa na wakati",
-      "abandonedTitle": "Kutelekezwa",
-      "eolTitle": "Mwisho wa Maisha",
-      "updates": "Sasisho",
-      "unused": "Isiyotumika",
-      "singleUse": "Matumizi moja",
-      "vulnerable": "Inayo hatarini",
-      "overrides": "Inabatilisha",
-      "caveatLine1": "*Ukubwa wa msimbo umeonyeshwa (lib + mali iliyotangazwa), ikirejea kwenye ukubwa wa kumbukumbu ya pub.dev wakati ukubwa wa msimbo haupatikani. Haijumuishi dev_dependencies (build_runner, lints, saropa_lints, n.k.) - hazisafirishiwi kwa APK / IPA / web bundle. Ukubwa halisi wa programu utakuwa mdogo baada ya mti kutikisika.",
-      "caveatLine2": "Viwango vya shughuli: 90d = vilichakaa, 180d = vimetulia (jitolea + muda wa kutolewa)."
+      "packages": "Pakiti za Package Packages",
+      "projectGrade": "Kiwango cha Pakiti ya Mradi Daraja la Mfuko wa Miradi.",
+      "totalSize": "Ukubwa wa Jumla*",
+      "gradeTooltip": "Mradi wa daraja la {avgGrade}\nAlama ya wastani: {avgScore}/100\nVifurushi: {pkgCount}\nA:{a} B:{b} C:{c} E:{e} F:{f}",
+      "vibrantTitle": "Vibrant hai, yenye nguvu.",
+      "stableTitle": "Stable imara thabiti.",
+      "outdatedTitle": "Imepitwa na wakati imepitwa kwa muda.",
+      "abandonedTitle": "Waliachwa na kuachwa.",
+      "eolTitle": "Mwisho wa Maisha ya Mtu.",
+      "updates": "Updates updates Habari mpya",
+      "unused": "Haitumiwi, haitumiki.",
+      "singleUse": "Matumizi ya mara moja tu.",
+      "vulnerable": "Wenye Ulemavu Ni Wenye Hatari.",
+      "overrides": "Overrides override inazuia.",
+      "caveatLine1": "*Ukubwa wa nambari umeonyeshwa (lib + mali zilizowekwa wazi), kurudi kwa saizi ya kumbukumbu pub.dev wakati ukubwa wa msimbo haupatikani. Haijumuishi dev_dependencies (build_runner, lints, saropa_lints, nk)  ⁇  hawajawahi kusafirisha kwa kifurushi cha APK / IPA / wavuti. Ukubwa halisi wa programu utakuwa mdogo baada ya kutikisa mti.",
+      "caveatLine2": "Vipimo vya shughuli: 90d = stale, 180d = dormant (kuweka + kufungua muda)."
     },
     "breakdown": {
-      "title": "Kwa nini daraja {grade}? - {avgScore}/100 wastani katika vifurushi {pkgCount}",
-      "hint": "Bofya ili kupanua",
-      "distributionHeading": "Usambazaji",
-      "signalsHeading": "Ishara za hatari zinazoburuta alama chini",
-      "signalFlagged": "{count} iliyoalamishwa (iliyotelekezwa / mwisho wa maisha)",
-      "signalVulnerable": "{count} yenye udhaifu unaojulikana",
-      "signalUpdates": "{count} ina visasisho vinavyopatikana",
-      "bottomHeading": "Vifurushi vya alama za chini zaidi",
-      "thresholdsHeading": "Jinsi alama zinavyoelekeza kwenye alama",
-      "thresholdA": "70+ - Inayopendeza: imedumishwa kikamilifu, iliyochapishwa hivi karibuni",
-      "thresholdB": "40-69 - Imara: bado inadumishwa lakini inapunguza kasi",
-      "thresholdC": "20–39 - Imepitwa na wakati: mapengo marefu kati ya matoleo",
-      "thresholdE": "chini ya 20 - Kuachwa: ishara za kutofanya kazi",
-      "thresholdF": "Imesimamishwa au kuhifadhiwa kwenye kumbukumbu kwenye pub.dev (alama haijatumika)",
-      "filterTooltip": "Chuja jedwali la kifurushi kwa kategoria hii pekee",
-      "jumpTooltip": "Rukia {name} katika jedwali la kifurushi"
+      "title": "Kwa nini daraja {grade}? - {avgScore}/100 wastani katika vifurushi vya {pkgCount}",
+      "hint": "Bonyeza ili kupanua.",
+      "distributionHeading": "Usambazaji wa usambazaji.",
+      "signalsHeading": "Ishara za hatari zinazovuta alama chini.",
+      "signalFlagged": "{count} iliyowekwa alama (iliyotoweka / mwisho wa maisha)",
+      "signalVulnerable": "{count} na udhaifu unaojulikana.",
+      "signalUpdates": "{count} kuwa na updates inapatikana.",
+      "bottomHeading": "Vifurushi vyenye alama ya chini kabisa ni vifurushi vya pakiti.",
+      "thresholdsHeading": "Jinsi alama zinavyolingana na maksi.",
+      "thresholdA": "70+  ⁇  Vibrant: inatunzwa kikamilifu, kuchapishwa hivi karibuni.",
+      "thresholdB": "40 ⁇ 69  ⁇  Imara: bado imehifadhiwa lakini inapunguza kasi.",
+      "thresholdC": "20 ⁇ 39  ⁇  Imepitwa na wakati: mapungufu marefu kati ya matoleo.",
+      "thresholdE": "chini ya 20  ⁇  Imeachwa: ishara za kutokuwa na shughuli.",
+      "thresholdF": "Imekomeshwa au kuhifadhiwa kwenye pub.dev (matokeo hayakutumiwa)",
+      "filterTooltip": "Chuja meza ya vifurushi kwa aina hii tu.",
+      "jumpTooltip": "Ruka hadi {name} katika jedwali la kifurushi cha pakiti."
     },
     "network": {
-      "summary": "Mtandao wa Kutegemea"
+      "summary": "Mtandao wa Utegemezi wa Kutegemea Mtandaoni."
     },
     "sections": {
-      "sizeDistribution": "Usambazaji wa ukubwa",
-      "sizeDistributionCaption": "Haijumuishi dev_dependencies - hazisafirishi kwa APK / IPA / mtandao bundle.",
-      "filters": "Vichujio",
-      "packages": "Vifurushi"
+      "sizeDistribution": "Ukubwa Usambazaji wa ukubwa Ugawaji wa saizi.",
+      "sizeDistributionCaption": "Inaondoa dev_dependencies  ⁇  hawajawahi kusafirisha kwa kifurushi cha APK / IPA / wavuti.",
+      "filters": "Filters filters za maji.",
+      "packages": "Pakiti za Package Packages"
     },
     "toolbar": {
-      "openPubspecTitle": "Fungua pubspec.yaml",
+      "openPubspecTitle": "Fungua pubspec.yaml.",
       "openPubspecLabel": "pubspec.yaml",
-      "copyAllTitle": "Nakili ripoti ya JSON (safu mlalo zote + maelezo)",
-      "copyAllLabel": "Nakili",
-      "saveAllTitle": "Hifadhi ripoti ya JSON kwa ripoti/YYYYMMDD/...",
-      "saveAllLabel": "Hifadhi",
-      "resetViewTitle": "Weka upya vichujio, panga na uhifadhi hali ya mwonekano",
-      "resetViewLabel": "Weka upya mwonekano",
-      "rescanTitle": "Changanua tena vifurushi - hufuta akiba ya pub.dev na kuleta matoleo upya",
-      "rescanLabel": "Changanua upya",
-      "openOtherTitle": "Fungua mradi mwingine wa pubspec.yaml katika dirisha jipya la uchanganuzi wa Vibrancy",
-      "openOtherLabel": "Fungua Mradi...",
-      "footprintGroupAria": "Hali ya alama ya safu wima ya ukubwa",
-      "footprintGroupTitle": "Kile ambacho safu wima ya Ukubwa inaonyesha: saizi yako ya msimbo pekee, pamoja na viingilio vya kipekee (gharama ikiondolewa), au pamoja na vipitishio vyote (kiwango cha juu cha kinadharia). Hurudi kwenye ukubwa wa kumbukumbu wakati ukubwa wa msimbo haupatikani.",
-      "footprintLabel": "Nyayo:",
-      "footprintOwnTitle": "Saizi ya nambari yako pekee (lib + mali iliyotangazwa); inarudi kwenye saizi ya kumbukumbu ya pub.dev wakati haipatikani",
-      "footprintOwn": "Miliki",
-      "footprintUniqueTitle": "Saizi yako mwenyewe + vipitishio vinavyotumiwa na eneo hili pekee (akiba ukiiondoa)",
-      "footprintUnique": "+ Kipekee",
-      "footprintTotalTitle": "Saizi yako mwenyewe + mipito yote, ikijumuisha yale yaliyoshirikiwa na vituo vingine",
-      "footprintTotal": "+ Wote",
-      "searchLabel": "Tafuta vifurushi",
-      "searchPlaceholder": "Tafuta vifurushi...",
-      "clearSearchTitle": "Futa utafutaji",
-      "clearSearchAria": "Futa utafutaji",
-      "ageFilterTitle": "Chuja kulingana na umri wa uchapishaji",
-      "publishedAgeLabel": "Umri uliochapishwa",
-      "ageMaxAll": "Wote",
-      "presetFilterTitle": "Tumia mipangilio ya awali ya kichujio",
-      "presetLabel": "Weka mapema",
-      "presetNone": "Hakuna",
-      "presetModernization": "Uboreshaji wa kisasa",
-      "presetRiskHotspots": "Sehemu za hatari",
-      "presetCleanup": "Wagombea wa kusafisha",
-      "presetDirectOnly": "Moja kwa moja pekee",
-      "devToggleTitle": "Jumuisha utegemezi wa dev kwenye jedwali na jumla",
-      "includeDev": "Jumuisha dev",
-      "activeFiltersLabel": "Vichujio vinavyotumika:",
-      "clearAllFilters": "Futa zote"
+      "copyAllTitle": "Nakili ripoti JSON (safu zote + maelezo)",
+      "copyAllLabel": "Nakala nakala nakala.",
+      "saveAllTitle": "Hifadhi ripoti JSON kwa ripoti/YYY YMMDD/...",
+      "saveAllLabel": "Save Sawa Kuokoa",
+      "saveUpgradeTitle": "Hifadhi ripoti ya vifurushi tu na sasisho linalopatikana kwa ripoti/YYY YMMDD/...",
+      "saveUpgradeLabel": "Hifadhi Ripoti ya Upgrade Report.",
+      "resetViewTitle": "Rudisha upya vichungi, chagua na uhifadhi hali ya mtazamo wa kuona.",
+      "resetViewLabel": "Kuweka upya mtazamo wa kutazama upya.",
+      "rescanTitle": "Changanua tena vifurushi - hufuta kashe ya pub.dev na kuleta matoleo tena",
+      "rescanLabel": "Rescan upya Scan tena.",
+      "openOtherTitle": "Fungua mradi mwingine wa pubspec.yaml katika dirisha jipya kwa skana ya Vibrancy.",
+      "openOtherLabel": "Open Project... mradi wa wazi.",
+      "footprintGroupAria": "Ukubwa safu ya nguzo footprint mode.",
+      "footprintGroupTitle": "Kile safu ya ukubwa inaonyesha: ukubwa wa msimbo wako tu, pamoja na transitives kipekee (gharama ikiwa imeondolewa), au pamoja na wote transitifs (theoretical max). Inarudi kwenye ukubwa wa kumbukumbu wakati saizi ya nambari haipatikani.",
+      "footprintLabel": "Footprint: alama ya mguu.",
+      "footprintOwnTitle": "Ukubwa wa nambari ya kibinafsi tu (lib + mali zilizowekwa wazi); inarudi kwa saizi ya kumbukumbu pub.dev wakati haipatikani.",
+      "footprintOwn": "Own Own Own Mwenyewe mwenyewe",
+      "footprintUniqueTitle": "Ukubwa wa kibinafsi + transitives zinazotumiwa tu na idara hii (kuokoa ikiwa utaiondoa)",
+      "footprintUnique": "+ Unique - ya kipekee.",
+      "footprintTotalTitle": "Ukubwa wa kibinafsi + transitives zote, pamoja na zile zinazoshirikiwa na idara zingine.",
+      "footprintTotal": "All + All + Kinda",
+      "searchLabel": "Pakiti za utaftaji wa vifurushi vya utafta.",
+      "searchPlaceholder": "Tafuta vifurushi...tafuta pakiti.",
+      "clearSearchTitle": "Futa utafutaji wa wazi.",
+      "clearSearchAria": "Futa utafutaji wa wazi.",
+      "ageFilterTitle": "Chuja kwa umri kuchapisha filter by publish age",
+      "publishedAgeLabel": "Umri uliochapishwa umri kuchapishwa.",
+      "ageMaxAll": "All All All",
+      "presetFilterTitle": "Tumia presets za kichujio cha haraka.",
+      "presetLabel": "Preset preset presets preset",
+      "presetNone": "Hakuna, hakuna hata mmoja.",
+      "presetModernization": "Usanidi wa kisasa.",
+      "presetRiskHotspots": "Hatari maeneo moto ya hatari.",
+      "presetCleanup": "Wagombea wa kusafisha mabwawa.",
+      "presetDirectOnly": "Moja kwa moja tu Direct only.",
+      "devToggleTitle": "Jumuisha utegemezi wa dev katika meza na jumla.",
+      "includeDev": "Jumuisha dev dev.",
+      "activeFiltersLabel": "Vichungi vya kazi: vichujio vyenye nguvu:",
+      "clearAllFilters": "Fungua kila kitu wazi."
     },
     "columns": {
       "name": {
-        "label": "Kifurushi",
-        "tooltip": "Jina la kifurushi - bofya ili kufungua ingizo la pubspec.yaml"
+        "label": "Pakiti ya Package Package",
+        "tooltip": "Jina la kifurushi  ⁇  bonyeza ili kufungua pubspec.yaml kuingia."
       },
       "version": {
-        "label": "Toleo",
-        "tooltip": "Toleo lililosakinishwa kutoka kwa pubspec.lock"
+        "label": "Toleo toleo tolelo",
+        "tooltip": "Toleo lililowekwa kutoka pubspec.lock."
       },
       "score": {
-        "label": "Kategoria",
-        "tooltip": "Uainishaji wa mtetemo na alama za afya (0–10)"
+        "label": "Aina ya aina ya jamii Jamii Category",
+        "tooltip": "Uainishaji wa nguvu na alama ya afya (0 ⁇ 10)"
       },
       "published": {
-        "label": "Imechapishwa",
-        "tooltip": "Tarehe ambapo toleo lililosakinishwa lilichapishwa kwa pub.dev"
+        "label": "Imechapishwa Ilichapishwa Iliyochapishwa.",
+        "tooltip": "Tarehe toleo la kusanikishwa lilipochapishwa kwa pub.dev."
       },
       "activity": {
-        "label": "Shughuli",
-        "tooltip": "Daraja la shughuli ya msimbo na kutolewa kutoka kwa ahadi + uchapishaji wa hivi karibuni"
+        "label": "Shughuli ya shughuli.",
+        "tooltip": "Kiwango cha shughuli ya kuweka-nambari na kutolewa kutoka kwa kujitolea + kuchapisha hivi karibuni."
       },
       "likes": {
-        "label": "Anapenda",
-        "tooltip": "pub.dev anapenda - bofya ili kufungua ukurasa wa alama za kifurushi"
+        "label": "Anapenda anapenda anapendekeza.",
+        "tooltip": "pub.dev anapenda  ⁇  bonyeza ili kufungua ukurasa wa alama ya kifurushi."
       },
       "downloads": {
-        "label": "Vipakuliwa",
-        "tooltip": "vipakuliwa vya pub.dev katika siku 30 zilizopita - bofya ili kufungua ukurasa wa alama za kifurushi"
+        "label": "Downloads Kupakua",
+        "tooltip": "pub.dev downloads in the last 30 days  ⁇  click to open the package score page. _Pakuzi za PH0 katika siku 30 zilizopita"
       },
       "issues": {
-        "label": "Masuala",
-        "tooltip": "Fungua maswala ya GitHub (haijumuishi maombi ya kuvuta inapopatikana)"
+        "label": "Masuala masuala maswala.",
+        "tooltip": "Masuala ya wazi GitHub (haijumuishi maombi ya kuvuta wakati inapatikana)"
       },
       "prs": {
         "label": "PRs",
-        "tooltip": "Fungua maombi ya kuvuta ya GitHub"
+        "tooltip": "Fungua GitHub ombi la kuvuta."
       },
       "size": {
-        "label": "Ukubwa",
-        "tooltip": "Saizi ya msimbo (lib + mali iliyotangazwa); inarudi kwenye saizi ya kumbukumbu ya pub.dev wakati saizi ya msimbo haipatikani"
+        "label": "Ukubwa wa ukubwa Size Size Size.",
+        "tooltip": "Kiwango cha kificho (lib + declared assets); hurudia kiwango cha pub.dev archive size wakati kiasi cha code hakipatikani."
       },
       "deps": {
         "label": "Vitegemezi",
-        "tooltip": "Utegemezi wa mpito wa moja kwa moja - sehemu zilizoshirikiwa zimeangaziwa"
+        "tooltip": "Utegemezi wa moja kwa moja wa mpito  ⁇  Idara za pamoja zinaangaziwa."
       },
       "files": {
-        "label": "Marejeleo",
-        "tooltip": "Idadi ya faili chanzo zinazoleta kifurushi hiki - bofya ili kutafuta"
+        "label": "Marejeleo References Refa za marejeleo.",
+        "tooltip": "Idadi ya faili za chanzo ambazo huingiza kifurushi hiki  ⁇  bonyeza ili utafute."
       },
       "transitives": {
-        "label": "Mipito",
-        "tooltip": "Idadi ya vitegemezi vya mpito (zisizo za moja kwa moja) kifurushi hiki huvutia"
+        "label": "Transitives ni wale ambao wanaishi kwa muda mfupi.",
+        "tooltip": "Idadi ya transitive (isiyo ya moja kwa moja) dependencies mfuko huu pulls katika."
       },
       "vulns": {
         "label": "Madhaifu",
-        "tooltip": "Athari za kiusalama zinazojulikana kutoka kwa hifadhidata za Ushauri za OSV na GitHub"
+        "tooltip": "Udhaifu unaojulikana wa usalama kutoka kwa hifadhidata za ushauri OSV na GitHub."
       },
       "license": {
-        "label": "Leseni",
-        "tooltip": "Kitambulisho cha leseni ya SPDX kutoka kwa pub.dev"
+        "label": "Leseni ya leseni.",
+        "tooltip": "SPDX kitambulisho cha leseni kutoka kwa pub.dev."
       },
       "update": {
-        "label": "Sasisha",
-        "tooltip": "Sasisho la toleo linalopatikana: kuu, ndogo, au kiraka"
+        "label": "Update update update ya mambo.",
+        "tooltip": "Sasisho la toleo linalopatikana: kubwa, ndogo au patch."
       },
       "status": {
-        "label": "Hali",
-        "tooltip": "Hali ya matumizi: kama kifurushi kinaonekana kutotumika katika msimbo wako"
+        "label": "Hali ya hali ya hali Status Status",
+        "tooltip": "Hali ya matumizi: ikiwa kifurushi kinaonekana kuwa hakijatumika katika nambari yako."
       },
       "description": {
-        "label": "Maelezo",
-        "tooltip": "Maelezo ya kifurushi kutoka kwa pub.dev"
+        "label": "Maelezo ya ufafanuzi MaeleZO MAELEZO",
+        "tooltip": "Maelezo ya kifurushi kutoka kwa pub.dev."
       }
     },
     "cells": {
-      "noGithub": "Hakuna hazina ya GitHub iliyopatikana"
+      "noGithub": "Hakuna hazina ya GitHub iliyopatikana.",
+      "devBadge": "dev dev dev Dev, kwa kweli.",
+      "transitiveBadge": "transitive - mpito, wa kupita.",
+      "publishDateUnavailable": "Tarehe ya kuchapisha haipatikani kutoka pub.dev.",
+      "activityGradeUnavailable": "Hatua ya shughuli haipatikani (data za kuagiza au kutolewa hazipo)",
+      "activityFallback": "Shughuli kulingana na ahadi za hivi karibuni na matoleo.",
+      "likesUnavailable": "pub.dev anapenda haipatikani.",
+      "likesCount": "{count} pub.dev anapenda",
+      "downloadsUnavailable": "pub.dev Hakuna upakuaji wa siku 30 unaopatikana.",
+      "downloadsCount": "{count} downloads katika siku 30 zilizopita.",
+      "sizeUnavailable": "Ukubwa haupatikani kutoka kwa pub.dev.",
+      "noVulnerabilities": "Hakuna udhaifu unaojulikana.",
+      "licenseUnspecified": "Leseni haijaainishwa kwenye pub.dev.",
+      "unusedBadge": "Haitumiwi, haitumiki.",
+      "packageInUse": "Package inatumika."
     },
     "row": {
-      "expandDetails": "Panua maelezo",
-      "copyRowJson": "Nakili safu mlalo kama JSON"
+      "expandDetails": "Kuongeza maelezo ya kina.",
+      "copyRowJson": "Nakili safu kama JSON."
     },
     "shortcuts": {
-      "focusSearch": "Lenga uga wa utafutaji",
-      "nextRow": "Angazia safu mlalo ya kifurushi kinachofuata",
-      "prevRow": "Angazia safu mlalo ya kifurushi kilichotangulia",
-      "toggleDetail": "Geuza kikuza maelezo ya kifurushi kilichoangaziwa",
-      "escapeSearch": "Futa utafutaji uliolenga; pili Esc hukunja safu mlalo zote zilizopanuliwa",
-      "historyBack": "Rudi nyuma kupitia historia ya urambazaji ya kifurushi",
-      "showOverlay": "Onyesha wekeleo huu wa njia ya mkato"
+      "focusSearch": "Kuzingatia uwanja wa utafutaji.",
+      "nextRow": "Onyesha safu ya mfuko unaofuata.",
+      "prevRow": "Onyesha safu ya mfuko wa awali.",
+      "toggleDetail": "Toggle highlighted mfuko wa maelezo ya kina expander.",
+      "escapeSearch": "Tafuta wazi ililenga; pili Esc huanguka safu zote zilizopanuliwa.",
+      "historyBack": "Rudi nyuma kupitia historia ya urambazaji wa kifurushi.",
+      "showOverlay": "Onyesha hii njia ya mkato overlay."
+    },
+    "versionTooltip": {
+      "installed": "Imewekwa: {version} ({date})",
+      "latest": "Latest: {version} zaidi ya mwaka mmoja uliopita",
+      "created": "Imeundwa na: {date}",
+      "constraint": "Vizuizi: {constraint}"
+    },
+    "healthTooltip": {
+      "grade": "Daraja: {grade}",
+      "resolutionVelocity": "Resolution Velocity: {value} Kasi ya azimio:",
+      "engagementLevel": "Kiwango cha Ushirikiano: {value}",
+      "popularity": "Umaarufu: {value}",
+      "publisherTrust": "Publisher Trust: {value} Mwandishi wa Imani:",
+      "codeCommits": "Code commits: {age} ago ilitumwa zaidi ya mwaka mmoja uliopita",
+      "latestRelease": "Toleo la hivi karibuni: {age} iliyopita",
+      "activitySignal": "Ishara ya shughuli: {signal}."
+    },
+    "size": {
+      "codeSize": "Ukubwa wa kificho: {size}",
+      "archiveSize": "Ukubwa wa kumbukumbu: {size}",
+      "onDisk": "Kwenye diski: {size}",
+      "withUniqueTransitives": "Na transitives ya kipekee: {size}.",
+      "withSharedTransitives": "Pamoja na transitives ya pamoja: {size}",
+      "openFolder": "Fungua folda ya pakiti za ndani."
+    },
+    "references": {
+      "noImports": "Hakuna faili chanzo cha uagizaji wa bidhaa zilizochunguzwa.",
+      "reExportLine": "{location} (kuuza nje tena)",
+      "reExportSuffix": "(kuuza nje tena)",
+      "publicApiSurface": "Public API surface  ⁇  at least one use is a re-export. zaidi ya mwaka mmoja uliopita",
+      "reExportedBadge": "Re-exported iliyorudishwa nje.",
+      "openFileReferences": "Fungua marejeleo ya faili za wazi.",
+      "searchImports": "Tafuta uagizaji wa bidhaa za ndani.",
+      "fileReferencesHeading": "Marejeleo ya Faili ({count})",
+      "andMore": "... na {count} zaidi."
+    },
+    "deps": {
+      "noTransitives": "Hakuna utegemezi wa mpito.",
+      "showTransitives": "Onyesha utegemezi wa mpito.",
+      "tooltipDep": "• {dep} _ PH0__ - Kiasi cha juu zaidi.",
+      "tooltipDepShared": "• {dep} (shared) - imegawanywa",
+      "tooltipHeader": "{total} transitive deps deps ya muda mfupi.",
+      "tooltipHeaderShared": "{total} transitive deps ({shared} imeshirikiwa)",
+      "sharedBadgeTitle": "{count} inashirikiwa na vifurushi vingine.",
+      "sharedBadge": "share shared sharinged pamoja na kushirikiana",
+      "transitiveDepsHeading": "Utegemezi wa mpito ({count})"
+    },
+    "dormancy": {
+      "noActivity6mo": "Hakuna ahadi na hakuna kutolewa katika miezi 6+",
+      "noActivity3mo": "Hakuna ahadi na hakuna kutolewa katika miezi 3+",
+      "releaseActiveCodeInactive": "Toleo la kazi, msimbo usio na nguvu (miezi 3+ bila ahadi)",
+      "codeActiveReleaseSlow": "Nambari ya kazi, cadence kutolewa ni polepole (3 + miezi)"
+    },
+    "activity": {
+      "withDormancy": "{dormancy} (daraja la shughuli {grade})",
+      "healthy": "Kazi ya kuweka na kutolewa ni nzuri (darasa la shughuli {grade})"
+    },
+    "detail": {
+      "codeCommitActivity": "Code Commit Activity Shughuli ya Kujiweka Wakfu.",
+      "releaseActivity": "Activity Release Shughuli ya kutolewa.",
+      "dormancySignal": "Ishara ya usingizi wa ishara.",
+      "ago": "{age} iliyopita",
+      "qualityExample": "+mfano mfano mfano",
+      "qualityExampleTitle": "Meli ya demo inayoweza kuendeshwa.",
+      "qualityTests": "+ vipimo vya majaribio.",
+      "qualityTestsTitle": "Inasafirisha seti ya majaribio.",
+      "qualityTools": "+ zana za kazi.",
+      "qualityToolsTitle": "Vifaa vya kudumisha meli za meli.",
+      "qualityDocs": "+docs docs ni nini",
+      "qualityDocsTitle": "Meli ziliongezwa nyaraka za hati.",
+      "healthScore": "Health Score (Kiwango cha Afya)",
+      "resolutionVelocity": "Resolution Velocity Kasi ya azimio",
+      "engagementLevel": "Kiwango cha Ushirikiano Level of Engagement",
+      "popularity": "Utukufu Popularity Umaarufu.",
+      "publisherTrust": "Publisher Trust Mwandishi wa Uaminifu.",
+      "fixInVersion": "→ kurekebisha katika {version}.",
+      "vulnerabilitiesHeading": "Udhaifu ({count})"
+    },
+    "links": {
+      "heading": "Links Viungo viungo.",
+      "pubDev": "pub.dev",
+      "changelog": "Changelog ya mabadiliko.",
+      "versions": "Maelezo ya kurasa za habari version versions versions.",
+      "repository": "kumbukumbu ya hazina repository.",
+      "issues": "masuala ya mambo masuala masuala matatizo masuala"
     }
   },
   "commandCatalog": {
-    "documentTitle": "Katalogi ya Amri ya Saropa",
-    "skipLink": "Ruka hadi kwenye katalogi ya amri",
-    "heroTitle": "Katalogi ya Amri ya Saropa",
+    "documentTitle": "Saropa Katalogi ya Amri ya Kiongozi _ PH0__",
+    "skipLink": "Skip to command catalogue, uhamishe kwenye orodha ya amri.",
+    "heroTitle": "Saropa Katalogi ya Amri ya Kiongozi _ PH0__",
     "status": {
       "commands": "amri {count}",
       "categories": "kategoria {count}",
       "recent": "{count} za hivi karibuni",
       "internalHidden": "menyu muktadha pekee {count} (imefichwa)",
-      "wordCommands": "amri",
-      "wordCategories": "kategoria",
-      "wordRecent": "hivi karibuni"
+      "wordCommands": "amri ya amri amri amri.",
+      "wordCategories": "makundi makundi categories makundi category",
+      "wordRecent": "hivi karibuni recent"
     },
     "search": {
-      "placeholder": "Kichwa cha utafutaji, maelezo au kitambulisho cha amri...",
-      "ariaLabel": "Tafuta amri",
-      "clearAria": "Futa utafutaji",
-      "hintLine1": "Inalingana na kila amri",
-      "hintStrongTitle": "kichwa",
-      "hintStrongDesc": "maelezo",
-      "hintStrongId": "kitambulisho",
-      "hintLine2": "(ishara za kitambulisho zimewekwa kwa nafasi pia - aina",
-      "hintLine2kbd": "endesha uchambuzi",
+      "placeholder": "Tafuta jina la kichwa, maelezo au id ya amri...",
+      "ariaLabel": "Tafuta amri za kuamuru utafute.",
+      "clearAria": "Futa utafutaji wa wazi.",
+      "hintLine1": "Inalingana na kila amri ya amri.",
+      "hintStrongTitle": "title jina la cheo title",
+      "hintStrongDesc": "maelezo ya ufafanuzi wa maelezo Maelezo",
+      "hintStrongId": "Id id id id ya mtu.",
+      "hintLine2": "(id tokens ni spaced pia  ⁇  aina ya ishara.",
+      "hintLine2kbd": "Tumia uchambuzi wa kukimbia.",
       "hintLine2End": "bila nukta)."
     },
     "toolbar": {
-      "showInternal": "Onyesha amri za menyu ya muktadha",
-      "collapseAll": "Kunja zote"
+      "showInternal": "Onyesha amri za menyu ya muktadha.",
+      "collapseAll": "Kuanguka wote kuporomoka."
     },
     "recentPopover": {
-      "title": "Utafutaji wa hivi majuzi",
-      "clearTitle": "Futa utafutaji wote wa hivi majuzi",
-      "clearButton": "Wazi",
-      "listAria": "Utafutaji wa hivi majuzi"
+      "title": "Utafutaji wa hivi karibuni.",
+      "clearTitle": "Futa utafutaji wote wa hivi karibuni.",
+      "clearButton": "Clear Kiwa Clear Kiwi",
+      "listAria": "Utafutaji wa hivi karibuni."
     },
     "filterChips": {
-      "ariaRegion": "Vichujio vinavyotumika",
-      "activeLabel": "Vichujio vinavyotumika:",
-      "clearAll": "Futa zote"
+      "ariaRegion": "Vichungi vya kazi vinavyofanya kazi.",
+      "activeLabel": "Vichungi vya kazi: vichujio vyenye nguvu:",
+      "clearAll": "Fungua kila kitu wazi."
     },
     "bands": {
-      "frequentTitle": "Mara kwa mara",
-      "frequentHint": "Inatumika zaidi katika vipindi vyako",
-      "recentTitle": "Hivi karibuni",
-      "recentClear": "Wazi",
-      "recentHint": "Bofya ili kuendesha tena · Mpya zaidi kwanza"
+      "frequentTitle": "Mara nyingi Frequent",
+      "frequentHint": "Inatumiwa zaidi katika vikao vyako vyote.",
+      "recentTitle": "Hivi karibuni hivi karibuni Karibuni Karibuni.",
+      "recentClear": "Clear Kiwa Clear Kiwi",
+      "recentHint": "Bonyeza ili kuendesha tena · Mpya kwanza mpya."
     },
     "noResults": {
-      "message": "Hakuna amri zinazolingana na utafutaji wako.",
-      "reset": "Weka upya vichujio"
+      "message": "Hakuna amri zinazofanana na utafutaji wako.",
+      "reset": "Kuweka upya vichungi vya kuweka upya."
     },
     "entry": {
-      "internalBadgeTitle": "Imeanzishwa kutoka kwa menyu za muktadha pekee",
-      "internalBadge": "menyu",
-      "copyTitle": "Nakili kitambulisho cha amri ({id})",
-      "copyAria": "Nakili kitambulisho cha amri"
+      "internalBadgeTitle": "Inasababishwa kutoka kwa menyu za muktadha tu.",
+      "internalBadge": "Mto mto mtoo.",
+      "copyTitle": "Nakili id ya amri ({id})",
+      "copyAria": "Nakili id ya amri ya amri."
     },
-    "categoryJumpTitle": "Ruka hadi {category}",
+    "categoryJumpTitle": "Rukia {category} kwa _PH0_.",
     "shortcuts": {
-      "focusSearch": "Lenga uga wa utafutaji",
-      "navRows": "Nenda kwenye safu mlalo za amri zinazoonekana",
-      "homeEnd": "Ruka hadi safu mlalo ya kwanza au ya mwisho inayoonekana",
-      "enterRun": "Endesha amri iliyolengwa",
-      "escClear": "Futa utafutaji na uweke upya vichujio",
-      "showOverlay": "Onyesha wekeleo huu wa njia ya mkato"
+      "focusSearch": "Kuzingatia uwanja wa utafutaji.",
+      "navRows": "Nenda kwenye safu za amri zinazoonekana.",
+      "homeEnd": "Ruka hadi safu ya kwanza au ya mwisho inayoonekana.",
+      "enterRun": "Endesha amri ya kulenga iliyosimamiwa.",
+      "escClear": "Futa utaftaji wazi na uweke upya vichungi vya kutafuta.",
+      "showOverlay": "Onyesha hii njia ya mkato overlay."
     },
     "script": {
-      "moreSuffix": "+ {count} zaidi",
-      "showLess": "Onyesha kidogo",
-      "runSingular": "kukimbia",
-      "runPlural": "anaendesha",
-      "recentWord": "hivi karibuni",
-      "expandAll": "Panua zote",
-      "collapseAll": "Kunja zote",
+      "moreSuffix": "+{count} zaidi zaidi.",
+      "showLess": "Onyesha chini ya kuonyesha kidogo.",
+      "runSingular": "Msaada wa kuendesha gari, kukimbia.",
+      "runPlural": "Anaendesha anaendesha, anaendesha.",
+      "recentWord": "hivi karibuni recent",
+      "expandAll": "Kuongeza wote kupanua yote.",
+      "collapseAll": "Kuanguka wote kuporomoka.",
       "searchChip": "Tafuta: \"{query}\"",
-      "internalChip": "Inaonyesha amri za menyu ya muktadha",
-      "removeFilterPrefix": "Ondoa kichujio",
+      "internalChip": "Kuonyesha amri za menyu ya muktadha.",
+      "removeFilterPrefix": "Ondoa kichujio cha kuondoa.",
       "matchOne": "inayolingana {count}",
       "matchOther": "zinazolingana {count}"
     }
   },
   "codeHealth": {
-    "documentTitle": "Dashibodi ya Afya ya Msimbo wa Saropa",
-    "skipToTable": "Ruka hadi kwenye jedwali la kukokotoa",
-    "openWorkspaceFirst": "Fungua nafasi ya kazi ya Dart/Flutter kwanza.",
-    "scanningTitle": "Kanuni ya Afya: utendakazi wa kuchanganua...",
+    "documentTitle": "Saropa Code Health Dashboard Dashibodi ya Afya.",
+    "skipToTable": "Tembea kwa kazi za meza ya meza.",
+    "openWorkspaceFirst": "Fungua nafasi ya kazi Dart/Flutter kwanza.",
+    "scanningTitle": "Afya ya Nambari: kazi za skanning... utendaji wa skana.",
     "scan": {
-      "title": "Kuchanganua afya ya mradi",
-      "subtitle": "Kusoma nambari yako. Dashibodi hujaza kadiri skanisho inavyojifunza zaidi.",
-      "waiting": "Inaanza kuchanganua...",
-      "launching": "Inazindua kichanganuzi...",
-      "collect": "Inagundua faili...",
-      "firstRunHint": "Kukimbia kwanza kunakusanya skana; miradi mikubwa huchukua muda kabla ya faili kuonekana.",
-      "paused": "Imesitishwa",
-      "stopped": "Uchanganuzi umesimamishwa",
-      "elapsed": "Iliyopita",
+      "title": "Scan ya mradi wa afya ya afya.",
+      "subtitle": "Kusoma code yako. Dashibodi hujaza wakati skana inapojifunza zaidi.",
+      "waiting": "Kuanza Scan...",
+      "launching": "Kuzindua skanner ...",
+      "collect": "Kugundua faili... kugundua faili ...",
+      "firstRunHint": "Mchakato wa kwanza huandaa skana; miradi mikubwa inachukua muda kabla ya faili kuonekana.",
+      "paused": "Paused Imewekwa kwa muda.",
+      "stopped": "Scan imesimama, scan imeisha.",
+      "elapsed": "Ilitokea kwamba muda uliopita.",
       "phase": {
-        "parse": "Inachanganua faili",
-        "history": "Kusoma historia ya git",
-        "blame": "Umri wa msimbo wa kompyuta",
-        "usage": "Kuhesabu marejeleo",
-        "score": "Utendaji wa bao"
+        "parse": "Kuchambua faili za kuchanganua.",
+        "history": "Kusoma historia ya git kusoma.",
+        "blame": "Kompyuta code umri wa kompyuta.",
+        "usage": "Kuhesabu marejeleo ya kuhesabu.",
+        "score": "Kazi za kupima alama."
       },
       "counter": {
-        "files": "Faili",
-        "functions": "Kazi",
-        "problems": "Matatizo yamepatikana"
+        "files": "Files files faili.",
+        "functions": "Kazi kazi Functions",
+        "problems": "Matatizo yaliyopatikana matatizo yaliyoonekana."
       },
       "counters": {
-        "aria": "Kaunta za kuchanganua moja kwa moja"
+        "aria": "Live Scan counters scan counters kwa ajili ya maisha."
       },
       "controls": {
-        "aria": "Vidhibiti vya kuchanganua"
+        "aria": "Scan udhibiti wa skanning."
       },
       "btn": {
-        "pause": "Sitisha",
-        "resume": "Endelea",
-        "restart": "Anzisha upya",
-        "cancel": "Ghairi"
+        "pause": "Pumzika pause pumzika.",
+        "resume": "Endelea tena resume.",
+        "restart": "Anzisha upya tena kwa kuanza upya.",
+        "cancel": "Cancel cancel kufuta"
       },
       "preview": {
-        "heading": "Matatizo yaliyopatikana hadi sasa",
-        "empty": "Bado hakuna matatizo yaliyopatikana..."
+        "heading": "Matatizo yaliyopatikana hadi sasa.",
+        "empty": "Hakuna matatizo yaliyopatikana bado..."
       },
       "version": {
-        "engine": "Injini",
-        "detecting": "inagundua...",
-        "legacy": "legacy — hakuna maendeleo ya moja kwa moja (saropa_lints ya mradi huu imetangulia)"
+        "engine": "Engine Engine Engine engine engine engine.",
+        "detecting": "kugundua... kugundua ...",
+        "legacy": "urithi - hakuna maendeleo ya moja kwa moja (saropa_lints ya mradi huu imetangulia)"
       }
     },
-    "runReportFirst": "Tekeleza ripoti tena, kisha unakili JSON.",
-    "copiedJson": "Code Health JSON imenakiliwa kwenye ubao wa kunakili.",
+    "runReportFirst": "Endesha ripoti tena, kisha nakala JSON.",
+    "copiedJson": "Code Health JSON iliyonakiliwa kwenye clipboard.",
     "couldNotOpenFile": "Haikuweza kufungua faili: {path}",
-    "panelTitle": "Dashibodi ya Afya ya Msimbo wa Saropa",
+    "panelTitle": "Saropa Code Health Dashboard Dashibodi ya Afya.",
     "hero": {
-      "title": "Dashibodi ya Afya ya Msimbo wa Saropa",
-      "generated": "Imetolewa",
+      "title": "Saropa Code Health Dashboard Dashibodi ya Afya.",
+      "generated": "inayopendelewa Generated",
       "functionOne": "chaguo la kukokotoa {count}",
       "functionOther": "chaguo za kukokotoa {count}",
-      "avgFormat": "wastani {score} ({grade})",
-      "gatesFailing": "milango kushindwa",
-      "gatesPassing": "milango kupita"
+      "avgFormat": "avg {score} ({grade}) ya mwezi.",
+      "gatesFailing": "milango kushindwa kufeli.",
+      "gatesPassing": "milango kupita kupitia kupitisha."
     },
     "gauge": {
-      "tooltip": "Alama ya wastani {rounded} ya 100 (daraja {grade}).",
-      "ariaLabel": "Alama ya wastani {rounded} ya 100"
+      "tooltip": "Alama ya wastani {rounded} ya 100 (darasa {grade}).",
+      "ariaLabel": "Wastani wa alama {rounded} ya 100 kwa kila mmoja."
     },
     "gate": {
-      "fallback": "Milango ya ubora imeshindwa - kagua vizingiti katika mipangilio ya Kanuni ya Afya.",
+      "fallback": "Quality gates failed  ⁇  review thresholds in Code Health settings. - Vipimo vya ubora vimeshindwa",
       "failingOne": "lango {count} linaloshindwa — kagua viwango, au nakili JSON ili kukagua gates.violations.",
       "failingOther": "malango {count} yanayoshindwa — kagua viwango, au nakili JSON ili kukagua gates.violations.",
-      "openSettingsTitle": "Fungua mipangilio ya Kanuni ya Afya ili kurekebisha vizingiti.",
-      "openSettingsButton": "Fungua mipangilio ya Kanuni ya Afya"
+      "openSettingsTitle": "Fungua mipangilio ya Afya ya Nambari ili kurekebisha vizingiti.",
+      "openSettingsButton": "Open Code Mazingira ya afya Mipangilio ya Afya."
     },
     "kpi": {
-      "ariaLabel": "Muhtasari wa kanuni za afya",
-      "allClear": "Hakuna vitendaji vilivyoalamishwa katika kategoria yoyote - zote ziko wazi.",
-      "clickToFilter": "Bofya ili kuchuja jedwali kwa vitendakazi vilivyoalamishwa {flag}.",
-      "noFlagged": "Hakuna chaguo za kukokotoa zilizoalamishwa {flag}.",
-      "unused": "Isiyotumika",
-      "unusedSub": "kazi zilizorejelewa popote",
-      "uncovered": "Imefichuliwa",
-      "uncoveredSub": "hakuna chanjo ya LCOV",
-      "stubTested": "Kujaribiwa kwa stub",
-      "stubTestedSub": "vipimo vipo lakini vinadai kidogo",
-      "suspiciousCoverage": "Chanjo ya kutiliwa shaka",
-      "suspiciousCoverageSub": "chanjo inaonekana kutengenezwa",
-      "testDrift": "Mtihani wa kuteleza",
-      "testDriftSub": "vipimo huchelewesha utendaji"
+      "ariaLabel": "Muhtasari wa afya ya msimbo wa jumla.",
+      "allClear": "Hakuna kazi zilizowekwa bendera katika kategoria yoyote  ⁇  yote ni wazi.",
+      "clickToFilter": "Bonyeza kuchuja meza kwa kazi zilizowekwa alama {flag}.",
+      "noFlagged": "Hakuna kazi zilizowekwa alama {flag}. .",
+      "unused": "Haitumiwi, haitumiki.",
+      "unusedSub": "kazi zilizotajwa mahali pengine popote.",
+      "uncovered": "Uncovered uncovered, waziwazi.",
+      "uncoveredSub": "hakuna chanjo ya LCOV.",
+      "stubTested": "Stub-upimewa na kupimwa.",
+      "stubTestedSub": "majaribio zipo lakini wanadai kidogo sana.",
+      "suspiciousCoverage": "Ufikiaji wa chanjo ya tuhuma.",
+      "suspiciousCoverageSub": "chanjo inaonekana fabricated kutafakari.",
+      "testDrift": "Jaribio la drift ya majaribio.",
+      "testDriftSub": "majaribio lag kazi ya kazi nyuma."
     },
     "toolbar": {
-      "ariaLabel": "Vitendo vya Afya ya Kanuni",
-      "rescanTitle": "Tekeleza upya Uchanganuzi wa Kanuni ya Afya na uonyeshe upya dashibodi hii.",
-      "rescan": "Changanua upya",
-      "copyJsonTitle": "Nakili Msimbo ghafi wa Health JSON kwenye ubao wa kunakili.",
-      "copyJson": "Nakili JSON",
-      "settingsTitle": "Fungua mipangilio ya Kanuni ya Afya.",
-      "settingsButton": "Mipangilio ya Kanuni ya Afya",
-      "filterTitle": "Chuja safu mlalo kwa jina, faili au bendera.",
-      "filterLabel": "Chuja safu",
-      "filterPlaceholder": "Chuja safu mlalo..."
+      "ariaLabel": "Kanuni Hatua za kiafya Vitendo vya afya.",
+      "rescanTitle": "Endesha tena Scan ya Afya ya Nambari na usasishe dashibodi hii.",
+      "rescan": "Rescan upya Scan tena.",
+      "copyJsonTitle": "Nakili JSON ya Afya ya Kanuni mbichi kwenye ubao wa kuingizwa.",
+      "copyJson": "Nakili JSON.",
+      "settingsTitle": "Fungua mipangilio ya Afya ya Nambari.",
+      "settingsButton": "Nambari Mazingira ya afya Mipangilio ya Afya.",
+      "filterTitle": "Chuja safu kwa jina, faili au bendera.",
+      "filterLabel": "Safu za chujio safu.",
+      "filterPlaceholder": "Safu za chujio... safu ya kichujio."
     },
     "table": {
-      "ariaLabel": "Utendaji mbaya zaidi kwa alama",
-      "heading": "Kazi mbaya zaidi",
-      "topCount": "{shown} ya juu ya {total}",
-      "colGrade": "Daraja",
-      "colScore": "Alama",
-      "colFunction": "Kazi",
-      "colFile": "Faili",
-      "colLine": "Mstari",
-      "colUsage": "Matumizi",
-      "colCoverage": "Chanjo",
-      "colComplexity": "Utata",
-      "colFlags": "Bendera",
-      "noMatch": "Hakuna chaguo za kukokotoa zinazolingana na vichujio vya sasa.",
-      "resetFiltersTitle": "Futa utafutaji na kichujio chochote cha bendera kinachotumika.",
-      "resetFilters": "Weka upya vichujio",
-      "hint": "Inaonyesha utendaji mbaya zaidi 200 kwa alama. Tumia sehemu ya utafutaji ili kupunguza zaidi.",
-      "expanderAriaCollapsed": "Onyesha maelezo ya suala",
-      "expanderAriaExpanded": "Ficha maelezo ya suala",
-      "detailHeading": "Kwa nini kazi hii ilifunga {score}",
-      "detailNoIssues": "Hakuna alama kwenye safu mlalo hii - alama inaendeshwa na thamani za safu wima zilizo hapo juu (matumizi, chanjo, utata, umri, uwekaji kumbukumbu).",
-      "suppressLabel": "Bonyeza kwenye faili",
-      "suppressTooltip": "Huandika `// ignore_for_file: code_health:<flag>` kwenye faili hii ili utafutaji wa siku zijazo udondoshe bendera hii kwa faili nzima."
+      "ariaLabel": "Kazi mbaya zaidi kwa alama ya alama.",
+      "heading": "Kazi mbaya zaidi ni kazi.",
+      "topCount": "juu {shown} ya {total}.",
+      "colGrade": "Grade grade daraja daraja.",
+      "colScore": "Skor ya alama alama.",
+      "colFunction": "Kazi kazi function function.",
+      "colFile": "File ya faili file.",
+      "colLine": "Mstari Line Line Line line.",
+      "colUsage": "Matumizi Usage Usage",
+      "colCoverage": "Coverage ya Utoaji wa Habari.",
+      "colComplexity": "Utata wa utata.",
+      "colFlags": "Bendera za nchi hizo ni bendera ya taifa.",
+      "noMatch": "Hakuna kazi zinazolingana na vichungi vya sasa.",
+      "resetFiltersTitle": "Futa utaftaji na kichujio chochote cha bendera kilicho hai.",
+      "resetFilters": "Kuweka upya vichungi vya kuweka upya.",
+      "hint": "Inaonyesha kazi mbaya zaidi 200 kwa alama. Tumia uwanja wa utaftaji kupunguza zaidi.",
+      "expanderAriaCollapsed": "Onyesha maelezo ya suala la kuonyesha.",
+      "expanderAriaExpanded": "Ficha maelezo ya suala la siri.",
+      "detailHeading": "Kwa nini kazi hii ilipata alama ya {score}",
+      "detailNoIssues": "Hakuna bendera kwenye safu hii  ⁇  alama inategemea maadili ya safu hapo juu (matumizi, chanjo, ugumu, umri, nyaraka).",
+      "suppressLabel": "Ondoa katika faili ya faili.",
+      "suppressTooltip": "Anaandika `// ignore_for_file: code_health:<flag>` katika faili hii ili skanning za baadaye ziondoe bendera hii kwa faili nzima."
     },
     "flag": {
       "unused": {
-        "label": "isiyotumika",
-        "evidence": "0 wapigaji",
-        "rule": "Imeripotiwa wakati hakuna faili nyingine inayorejelea jina la chaguo hili la kukokotoa."
+        "label": "haikutumika, haijatumiwa.",
+        "evidence": "0 wapigiaji simu.",
+        "rule": "Imewekwa alama wakati hakuna faili nyingine inayorejelea jina hili la kazi."
       },
       "uncovered": {
-        "label": "kufunuliwa",
+        "label": "uncovered wazi kufunikwa",
         "evidence": "Vipimo vya {pct}%.",
-        "rule": "Imeripotiwa wakati LCOV inaripoti 0% ya huduma ya laini."
+        "rule": "Imewekwa alama wakati LCOV inaripoti chanjo ya mstari wa 0%."
       },
       "complex": {
-        "label": "changamano",
+        "label": "Complex complex complex ngumu sana.",
         "evidence": "CC {cc}",
-        "rule": "Imeripotiwa wakati utata wa cyclomatic unazidi 10."
+        "rule": "Inaonyeshwa wakati utata wa cyclomatic unazidi 10."
       },
       "undocumented": {
-        "label": "isiyo na hati",
-        "evidence": "CC {cc}, hakuna hati",
-        "rule": "Imealamishwa wakati kitendakazi changamano (CC > 10) hakina maoni ya hati."
+        "label": "wasio na hati, wasiokuwa na hati.",
+        "evidence": "CC {cc}, hakuna dokta.",
+        "rule": "Imewekwa alama wakati kazi ngumu (CC > 10) haina maoni ya doc."
       },
       "test_drift": {
-        "label": "mtihani drift",
-        "evidence": "vipimo huchelewesha utendaji",
-        "rule": "Imealamishwa wakati faili mpya ya majaribio iliyounganishwa ni ya zamani zaidi kuliko faili ya chanzo cha chaguo hili."
+        "label": "Jaribio la drift ya majaribio",
+        "evidence": "majaribio lag kazi ya kazi nyuma.",
+        "rule": "Imewekwa alama wakati faili mpya zaidi ya jaribio iliyounganishwa ni ya zamani sana kuliko faili chanzo cha kazi."
       },
       "stub_tested": {
-        "label": "iliyojaribiwa stub",
-        "evidence": "madai nyembamba",
-        "rule": "Imeripotiwa wakati jaribio lililounganishwa lipo lakini haidai chochote."
+        "label": "Imethibitishwa kwa majaribio ya stub-tested.",
+        "evidence": "thin asserts inaonyesha wazi.",
+        "rule": "Imewekwa alama wakati mtihani uliounganishwa upo lakini hauthibitishi chochote."
       },
       "suspicious_coverage": {
-        "label": "chanjo ya tuhuma",
-        "evidence": "{pct}% bila mtihani",
-        "rule": "Imeripotiwa wakati LCOV inaripoti huduma ya juu lakini hakuna marejeleo ya jaribio la kukokotoa."
+        "label": "chanjo ya habari inayoshukiwa.",
+        "evidence": "{pct}% bila mtihani wowote.",
+        "rule": "Imewekwa alama wakati LCOV inaripoti chanjo kubwa lakini hakuna jaribio linalorejelea kazi."
       }
     },
     "shortcuts": {
-      "focusFilter": "Lenga kichujio cha safu mlalo",
-      "clearFilter": "Futa kichujio cha safu mlalo kilicholengwa",
-      "activateKpi": "Washa kadi ya KPI iliyolengwa",
-      "activateKpiSpace": "Washa kadi ya KPI iliyolengwa",
-      "showOverlay": "Onyesha wekeleo huu wa njia ya mkato"
+      "focusFilter": "Focus filter ya safu.",
+      "clearFilter": "Futa kichujio cha safu ya kulenga.",
+      "activateKpi": "Kuamsha kadi ya KPI iliyozingatia.",
+      "activateKpiSpace": "Kuamsha kadi ya KPI iliyozingatia.",
+      "showOverlay": "Onyesha hii njia ya mkato overlay."
     },
     "script": {
-      "activeFiltersLabel": "Vichujio vinavyotumika:",
+      "activeFiltersLabel": "Vichungi vya kazi: vichujio vyenye nguvu:",
       "searchChip": "tafuta: \"{q}\"",
       "flagChip": "bendera: {flag}",
-      "removeAria": "Ondoa {key}",
-      "clearAll": "Futa zote",
+      "removeAria": "Ondoa {key}.",
+      "clearAll": "Fungua kila kitu wazi.",
       "rowsVisible": "safu mlalo {visible} kati ya {total} zinaonekana",
-      "neverRun": "kamwe kukimbia"
+      "neverRun": "Kamwe usimkimbie, kamwe ukimbie."
     },
     "freshness": {
-      "justNow": "sasa hivi",
+      "justNow": "Hivi sasa hivi tu.",
       "minutesAgo": "dakika {min} zilizopita",
       "hoursAgo": "saa {hr} zilizopita",
       "daysAgo": "siku {day} zilizopita",
@@ -884,57 +1115,221 @@
     }
   },
   "suppressionsStrip": {
-    "noData": "Bado hakuna violations.json - fanya uchanganuzi ili kujaza muhtasari wa ukandamizaji.",
-    "zeroTotal": "0 ukandamizaji wa kichanganuzi katika usafirishaji wa hivi punde.",
-    "noKindBreakdown": "Hakuna uchanganuzi wa aina fulani katika usafirishaji huu.",
-    "title": "Vizuizi (kuuza nje)",
-    "readOnlyNote": "(soma pekee; fungua Matokeo ili kuvinjari na kutenda.)",
-    "openFindings": "Fungua Dashibodi ya Matokeo"
+    "noData": "Hakuna violations.json bado  ⁇  kukimbia uchambuzi kujaza ukandamizaji picha.",
+    "zeroTotal": "0 kuondokana na analyzer katika mauzo ya nje ya hivi karibuni.",
+    "noKindBreakdown": "Hakuna mgawanyiko wa aina katika usafirishaji huu.",
+    "title": "Kuondolewa (kuuza nje)",
+    "readOnlyNote": "(kusoma tu; fungua Matokeo ya kuvinjari na kutenda.)",
+    "openFindings": "Fungua Dashibodi ya Matokeo ya Utaftaji."
   },
   "configMirrors": {
-    "noFileRisk": "Hakuna uchanganuzi wa hatari kwa kila faili (hakuna ukiukaji katika wigo).",
-    "suppressionNote": "Inalingana na muhtasari wa violations.json, si vigeuzaji vya ukandamizaji wa upau wa moja kwa moja.",
-    "noSuppression": "Hakuna jumla ya ukandamizaji katika usafirishaji huu (kichanganuzi cha zamani au ukandamizaji sifuri).",
+    "noFileRisk": "Hakuna mgawanyiko wa hatari kwa kila faili (hakuna ukiukaji katika wigo).",
+    "suppressionNote": "Mechi violations.json muhtasari, si kuishi sidebar kukandamiza toggles.",
+    "noSuppression": "Hakuna kiwanja cha kukandamiza katika usafirishaji huu (kibadilishaji cha zamani au ukandamizaji wa sifuri).",
     "owaspSignal": "ukiukaji {count} katika usafirishaji huu umebeba ramani ya simu/wavuti ya OWASP — fungua Mkao wa Usalama kwa matrix kamili na usafirishaji.",
-    "summarySuppressions": "Ukandamizaji (hamisha picha ndogo)",
+    "summarySuppressions": "Kuondoa (picha ya haraka ya kuuza nje)",
     "summaryOwasp": "Mkao wa usalama (ishara ya OWASP)",
     "summaryFileRisk": "Hatari ya faili (faili za juu)"
   },
   "telemetry": {
     "heroTitle": "Telemetria ya Sheria Inayohusiana",
-    "skipToCounters": "Ruka hadi kaunta za telemetry",
+    "skipToCounters": "Skip kwa counters telemetry.",
     "lastEvent": "Tukio la mwisho {relative}",
-    "noEvents": "Hakuna matukio yaliyorekodiwa",
+    "noEvents": "Hakuna matukio yaliyorekodiwa.",
     "totalEventOne": "jumla ya tukio {count}",
     "totalEventOther": "jumla ya matukio {count}",
-    "noCountersTitle": "Hakuna vihesabio vya kuweka upya.",
-    "resetTitle": "Weka upya vihesabio vyote",
-    "refreshTitle": "Pakia upya vihesabio vya telemetry kutoka kwa diski",
-    "refresh": "Onyesha upya",
-    "copyTitle": "Nakili muhtasari kama JSON",
-    "copyJson": "Nakili JSON",
-    "resetCounters": "Weka upya vihesabio",
+    "noCountersTitle": "Hakuna counters za kuweka upya.",
+    "resetTitle": "Rudisha tena kaunta zote.",
+    "refreshTitle": "Reload telemetry counters kutoka diski disk.",
+    "refresh": "Kufanya kazi kwa njia ya burudani.",
+    "copyTitle": "Nakili picha ya papo hapo kama JSON.",
+    "copyJson": "Nakili JSON.",
+    "resetCounters": "Kuweka upya counters counter.",
     "countersAria": "Kaunta",
-    "countersHeading": "Kaunta za matukio",
-    "thEvent": "Tukio",
-    "thCount": "Hesabu",
-    "emptyMessage": "Bado hakuna matukio ya telemetry yaliyorekodiwa - fungua sheria kutoka kwa Dashibodi ya Matokeo ili kuanza kunasa vihesabio.",
+    "countersHeading": "Kaunta za tukio counters.",
+    "thEvent": "Tukio Tukio tukio Tukio Tukio Tukiko",
+    "thCount": "Count Count kuhesabu hesabu.",
+    "emptyMessage": "Hakuna matukio ya telemetry yaliyorekodiwa bado  ⁇  fungua sheria kutoka kwa Dashibodi ya Matokeo ili kuanza kukamata kaunta.",
     "openFindingsTitle": "Fungua Dashibodi ya Matokeo ya Saropa.",
-    "openFindings": "Fungua Dashibodi ya Matokeo",
-    "lastPropsHeading": "Sifa za tukio la mwisho",
-    "copiedJson": "Saropa Lints: sheria inayohusiana imenakiliwa telemetry JSON.",
-    "countersReset": "Saropa Lints: kanuni zinazohusiana na kaunta za telemetry zimewekwa upya."
+    "openFindings": "Fungua Dashibodi ya Matokeo ya Utaftaji.",
+    "lastPropsHeading": "Mali ya tukio la mwisho mali.",
+    "copiedJson": "Saropa Lints: kunakiliwa sheria zinazohusiana telemetry JSON.",
+    "countersReset": "Saropa Lints: kuhusiana na sheria telemetry counters reset."
   },
   "sidebarLayout": {
-    "summary": "Mpangilio wa upau wa shughuli",
-    "hint": "Washa au zima sehemu za upau wa shughuli za Saropa hapa (zimehifadhiwa na nafasi ya kazi, bila kuondoka kwenye dashibodi)."
+    "summary": "Mpangilio wa mpangilio wa bar ya shughuli.",
+    "hint": "Weka sehemu za Saropa kwenye au mbali ya upau wa shughuli hapa (imehifadhiwa na eneo la kazi, bila kuacha dashibodi)."
   },
   "securityPosture": {
     "issueOne": "tatizo {count}",
     "issueOther": "matatizo {count}",
-    "noIssues": "Hakuna masuala",
-    "showIssues": "Onyesha masuala",
+    "noIssues": "Hakuna masuala No issues.",
+    "showIssues": "Onyesha masuala ya kuonyesha.",
     "violationTooltip": "ukiukaji {count} katika sheria {ruleCount}. Bofya ili kuonyesha katika Matatizo.",
-    "noViolationsTooltip": "Hakuna ukiukaji uliowekwa kwenye kategoria hii."
+    "noViolationsTooltip": "Hakuna ukiukaji uliorodheshwa katika jamii hii."
+  },
+  "comparison": {
+    "title": "Ulinganisho wa Kifurushi cha Pakiti.",
+    "actions": {
+      "addToProject": "Ongeza kwenye Mradi wa Mradi."
+    },
+    "table": {
+      "row": {
+        "vibrancyGrade": "Viwango vya Vibrancy Grade.",
+        "category": "Aina ya aina ya jamii Jamii Category",
+        "latestVersion": "Latest Version Toleo la karibuni",
+        "published": "Imechapishwa Ilichapishwa Iliyochapishwa.",
+        "publisher": "Mchapishaji Publisher Publisher",
+        "pubPoints": "Pub Points Maeneo ya Mkahawa.",
+        "githubStars": "GitHub Nyota za nyota.",
+        "openIssues": "Masuala ya wazi ni maswala yaliyofunguliwa.",
+        "codeSize": "Kiwango cha Code Size Code Size",
+        "bloatRating": "Bloat Rating ya kiwango cha juu.",
+        "license": "Leseni ya leseni.",
+        "platforms": "Majukwaa ya Jukwaa la Jukwa a.",
+        "inThisProject": "Katika Mradi huu, katika mradi huu."
+      },
+      "value": {
+        "unverified": "⁇  (haijathibitishwa)",
+        "allPlatforms": "All All All",
+        "yes": "Yes, yes, yes - Kinda.",
+        "no": "Hapana, hapana, hakuna kitu kama hicho."
+      },
+      "badge": {
+        "inProject": "Katika Mradi wa In Project."
+      }
+    },
+    "status": {
+      "packagesSelected": "{count} vifurushi vilivyochaguliwa vimechaguliwa.",
+      "packagesCompared": "{count} vifurushi vya kulinganisha vililinganishwa.",
+      "dimensionsRankedOne": "{count} mwelekeo wa kipimo kilichohesabiwa.",
+      "dimensionsRankedOther": "{count} vipimo vilivyowekwa katika nafasi ya ukubwa.",
+      "morePackages": "+{count} zaidi zaidi."
+    },
+    "empty": {
+      "ariaLabel": "Hakuna vifurushi No packages",
+      "message": "Hakuna vifurushi vilivyochaguliwa kwa kulinganisha. Bonyeza kulia kwenye vifurushi viwili au zaidi katika dashibodi ya Kifurushi na uchague {compare}.",
+      "compareWord": "Linganisha Compare Linganishe.",
+      "openDashboard": "Fungua Dashibodi ya Kifurushi cha Package Dashboard.",
+      "openDashboardTitle": "Fungua dashibodi ya Saropa Package."
+    },
+    "a11y": {
+      "skipToTable": "Skip to meza ya kulinganisha.",
+      "recommendation": "Mapendekezo ya mapendekezo Ushauri.",
+      "addingToProject": "Kuongeza {name} kwa mradi wa mradi."
+    },
+    "shortcuts": {
+      "showOverlay": "Onyesha hii njia ya mkato overlay.",
+      "closeOverlay": "Funga overlay ya njia za mkato za kibodi."
+    },
+    "kpi": {
+      "ariaLabel": "Muhtasari wa kulinganisha kwa kulinganishwa.",
+      "leading": "Kuongoza kuongoza inayoongoza.",
+      "leadingTitle": "Package inayoongoza kwa vipimo vingi inashinda.",
+      "dimensionWinsOne": "{count} kipimo cha kushinda ushindi.",
+      "dimensionWinsOther": "{count} dimension wins. zaidi ya mwaka mmoja uliopita",
+      "packages": "Pakiti za Package Packages",
+      "packagesTitle": "Idadi ya vifurushi ikilinganishwa side by side.",
+      "inComparison": "kwa kulinganisha katika kulinganishwa.",
+      "dimensions": "Vipimo vipimo vipimaji.",
+      "dimensionsTitle": "Idadi ya vipimo ambapo mshindi anaweza kuwekwa.",
+      "ranked": "ranked katika nafasi ya juu."
+    },
+    "toolbar": {
+      "ariaLabel": "Ulinganisho wa vitendo vya kulinganisha.",
+      "packageDashboard": "Dashibodi ya Package Dashboard.",
+      "packageDashboardTitle": "Fungua Dashibodi ya Kifurushi ili kulinganisha vifurushi zaidi."
+    }
+  },
+  "detailView": {
+    "empty": {
+      "selectPackage": "Chagua kifurushi ili uone maelezo ya kina."
+    },
+    "section": {
+      "version": "VERSION Version ya maandishi.",
+      "update": "UPDATE update ya mambo.",
+      "suggestion": "Ushauri wa KUSUDI.",
+      "community": "Jamii ya watu wa jamii.",
+      "dependencies": "DEPENDENCIES za kutegemea.",
+      "alerts": "ALERT Alerts Tahadhari",
+      "platforms": "Jukwaa la majukwaa ya jukwaa.",
+      "directDeps": "DIRECT DEPOSTS WAKATI wa kuwekeza.",
+      "readmeImages": "README IMAGES Picha za kusoma."
+    },
+    "version": {
+      "published": "Imechapishwa na: {date}",
+      "codeSize": "Kiwango cha Code Size Code Size",
+      "archive": "Archive Archives - Mto",
+      "sizeLabel": "{label}: {size}",
+      "source": "Chanzo: msimbo wa {code} · maoni ya {comments} · faili za {files}",
+      "replace": "Replace: {summary} Kuondoa"
+    },
+    "update": {
+      "upgrade": "Upgrade Kuboresha.",
+      "changelog": "Changelog ya mabadiliko.",
+      "blockedBy": "Imezuiwa na {package}."
+    },
+    "suggestion": {
+      "migrateTo": "Fikiria kuhamia kwa {package}.",
+      "consider": "Fikiria: {text}. .",
+      "alternatives": "Njia mbadala: {names}.",
+      "unused": "Kifurushi hiki kinaonekana kuwa hakijatumika  ⁇  fikiria kuondoa."
+    },
+    "community": {
+      "issues": "matatizo {count}",
+      "prs": "{count} PRs za _PH0_.",
+      "activity90d": "90d: masuala ya {closed} yamefungwa, PRs za {merged} zimeunganishwa.",
+      "lastCommit": "Last commit: {time} Mwisho kujitoa:",
+      "archived": "Repository ni kumbukumbu zilizohifadhiwa.",
+      "pubPoints": "{points}/160 pub pointi za baa.",
+      "latestRelease": "Toleo la hivi karibuni: {age} iliyopita",
+      "dependents": "{count} watu wanaotegemea."
+    },
+    "dormancy": {
+      "noActivity6mo": "Hakuna ahadi na hakuna kutolewa katika miezi 6+",
+      "noActivity3mo": "Hakuna ahadi na hakuna kutolewa katika miezi 3+",
+      "codeInactive": "Toleo la kazi, msimbo usio na nguvu (miezi 3+ bila ahadi)",
+      "releaseSlower": "Nambari ya kazi, cadence kutolewa ni polepole (3 + miezi)"
+    },
+    "dependencies": {
+      "flagged": "({count} inaonyeshwa)",
+      "transitiveCount": "{count} vifurushi vya mpito.",
+      "unique": "{count} kipekee ya pekee.",
+      "shared": "{count} kushiriki ({pct}%)",
+      "moreOverflow": "+{count} zaidi zaidi.",
+      "sharedList": "Kushirikiana: {names}"
+    },
+    "platforms": {
+      "wasm": "WASM ni njia ya kuongoza."
+    },
+    "links": {
+      "viewFullDetails": "Tazama Maelezo Kamili Angalia MaeleZO.",
+      "pubDev": "pub.dev",
+      "documentation": "Documentation Uandishi wa hati.",
+      "changelog": "Changelog ya mabadiliko.",
+      "repository": "Repository ya kumbukumbu.",
+      "issues": "Masuala masuala maswala.",
+      "reportIssue": "Ripoti ya ripoti suala la suala."
+    },
+    "logoAlt": "{packageName} nembo ya alama.",
+    "readMore": "zaidi more zaidi more",
+    "readmeImageAlt": "README picha ya picha."
+  },
+  "chart": {
+    "toggle": {
+      "excludeShared": "Excluse shared pamoja na kushiriki."
+    },
+    "filter": {
+      "clear": "Clear Kiwa Clear Kiwi"
+    },
+    "bucket": {
+      "other": "Nyingine ({count} {noun})",
+      "uniqueTransitives": "Vipindi vya kipekee ({count})",
+      "sharedTransitives": "Transitives za pamoja ({count})"
+    },
+    "noun": {
+      "package": "Package ya package package.",
+      "packages": "pakiti za vifurushi vya bidhaa."
+    }
   }
 }

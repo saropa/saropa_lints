@@ -452,6 +452,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "{count} match": "{count} Treffer",
         "{count} matches": "{count} Treffer",
         "{count} packages": "{count} Pakete",
+        # MT rendered the social-media noun "likes" as the verb "mag"; German keeps "Likes" as a loanword noun.
+        "{count} pub.dev likes": "{count} pub.dev Likes",
         "{count} recent": "{count} kürzlich",
         "{count} rule(s) globally": "{count} Regel(n) global",
         "{count} rules": "{count} Regeln",
@@ -903,6 +905,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "{count} match": "{count} تطابق",
         "{count} matches": "{count} تطابقات",
         "{count} packages": "{count} حزم",
+        # MT rendered the social-media noun "likes" as the verb "يحب" (he likes); the noun is "إعجاب".
+        "{count} pub.dev likes": "{count} إعجاب على pub.dev",
         "{count} recent": "{count} حديث",
         "{count} rule(s) globally": "{count} قاعدة (قواعد) عالميًا",
         "{count} rules": "{count} قواعد",
@@ -940,6 +944,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "{count} categories": "{count} श्रेणियाँ",
         "{count} commands": "{count} कमांड",
         "{count} context-menu only (hidden)": "{count} केवल संदर्भ-मेनू (छिपा हुआ)",
+        # MT returned this identical to English; curated to match the sibling Bengali phrasing (Latin numeral "30").
+        "{count} downloads in the last 30 days": "पिछले 30 दिनों में {count} डाउनलोड",
         "{count} file pattern(s)": "{count} फ़ाइल पैटर्न",
         "{count} file(s) with per-file rule hides": "{count} फ़ाइलें प्रति-फ़ाइल नियम छिपाने के साथ",
         "{count} finding": "{count} परिणाम",
@@ -1084,6 +1090,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "{count} match": "{count} تطابق",
         "{count} matches": "{count} تطابق",
         "{count} packages": "{count} بسته",
+        # MT rendered the social-media noun "likes" as the verb phrase "لایک می کند" (does a like); the noun loanword is "لایک".
+        "{count} pub.dev likes": "{count} لایک در pub.dev",
         "{count} recent": "{count} اخیر",
         "{count} rule(s) globally": "{count} قانون به صورت سراسری",
         "{count} rules": "{count} قانون",
@@ -1193,6 +1201,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "{direct} direct, {transitive} transitive": "{direct} direct, {transitive} transitive",
         "{filtered} shown": "{filtered} ang ipinakita",
         "{hr}h ago": "{hr}o nakalipas",
+        # Both sides are placeholders; only the ": " separator is literal, which is identical in Filipino. Curated passthrough so the gate sees an entry.
+        "{label}: {size}": "{label}: {size}",
         "{loaded} of {total} {item} loaded. {failed} failed.": "{loaded} ng {total} {item} ay nai-load. {failed} ang nabigo.",
         "{min}m ago": "{min}m nakalipas",
         "{n} impacts": "{n} na impact",
@@ -1200,6 +1210,7 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "{n} severities": "{n} na severity",
         "{title}: none in scan range.": "{title}: wala sa saklaw ng scan.",
         "{total} after disabled-rule filter": "{total} pagkatapos ng disabled-rule filter",
+        "{total} transitive deps ({shared} shared)": "{total} na transitive deps ({shared} na shared)",
         "{visible} of {total} rows visible": "{visible} sa {total} na row ang nakikita",
         "{wk}w ago": "{wk}l nakalipas",
         "▾": "▾",
@@ -1427,6 +1438,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "{direct} direct, {transitive} transitive": "{direct} ya moja kwa moja, {transitive} badilishi",
         "{filtered} shown": "{filtered} zimeonyeshwa",
         "{hr}h ago": "saa {hr} zilizopita",
+        # Both sides are placeholders; only the ": " separator is literal, which is identical in Swahili. Curated passthrough so the gate sees an entry.
+        "{label}: {size}": "{label}: {size}",
         "{loaded} of {total} {item} loaded. {failed} failed.": "{loaded} kati ya {total} {item} zimepakiwa. {failed} zimeshindwa.",
         "{min}m ago": "dakika {min} zilizopita",
         "{n} impacts": "athari {n}",
