@@ -155,3 +155,62 @@ Document all 5 entries in `ROADMAP.md` under a new `### in_app_review` subsectio
 - [Apple: RequestReviewAction](https://developer.apple.com/documentation/storekit/requestreviewaction) — SwiftUI API reference (quota confirmed)
 - [Google: Google Play In-App Reviews API](https://developer.android.com/guide/playcore/in-app-review) — quota guidance, "do not use a button" rule, silent discard on quota exceeded
 - [Code With Andrea: Flutter in-app review prompt](https://codewithandrea.com/articles/flutter-in-app-review-prompt/) — FP-reduction patterns, `isAvailable` guard necessity, engagement-threshold guidance
+
+---
+
+## Finish Report (2026-06-11)
+
+**Scope:** (A) Dart lint rules. All 5 proposed rules implemented; both validation
+callouts resolved.
+
+### Validation fixes applied
+
+- `in_app_review_missing_availability_check` — reworked from the planned
+  **source-substring** scan to **element-based** detection: it collects
+  `MethodInvocation`s in the enclosing member and looks for an `isAvailable()`
+  call whose receiver resolves (static type) to `InAppReview`. No bare-name or
+  `toSource().contains` match.
+- `in_app_review_ios_store_listing_missing_app_id` — the planned speculative
+  iOS-target detection is replaced with the concrete probe `geolocator_rules`
+  already uses: `ProjectContext.getProjectInfo(...).isFlutterProject` +
+  `Directory('$root/ios'|'$root/macos').existsSync()`. No INFO downgrade needed —
+  the Apple-only FP class is eliminated, so the rule ships at WARNING.
+
+### Delivered
+
+| Rule | Severity | Detection |
+|---|---|---|
+| `in_app_review_missing_availability_check` | WARNING | `requestReview()` on a resolved `InAppReview` receiver with no `isAvailable()` call in the enclosing member. |
+| `in_app_review_button_callback_request` | WARNING | `requestReview()` whose nearest enclosing `FunctionExpression` is a `NamedExpression` callback (`onPressed`/`onTap`/…). |
+| `in_app_review_request_in_init_state` | WARNING | `requestReview()` inside a method named `initState` whose class's `allSupertypes` include `State`. |
+| `in_app_review_missing_store_listing_fallback` | INFO | class with a button-bound `requestReview()` and no `openStoreListing()` anywhere. |
+| `in_app_review_ios_store_listing_missing_app_id` | WARNING | `openStoreListing()` with `appStoreId` omitted/`null` on an iOS/macOS-targeting project. |
+
+All use `RuleType.bug` (4) / `RuleType.codeSmell` (the INFO fallback rule), keyed
+by `fileImportsPackage(PackageImports.inAppReview)` and resolved receiver type
+`InAppReview` — never bare-name. `RuleType.correctness` from the plan does not
+exist; corrected. Comprehensive tier.
+
+### Files
+
+- NEW `lib/src/rules/packages/in_app_review_rules.dart` (5 rules).
+- `lib/src/import_utils.dart` — `PackageImports.inAppReview`.
+- `lib/src/rules/all_rules.dart` — export.
+- `lib/saropa_lints.dart` — 5 factories.
+- `lib/src/tiers.dart` — 5 names in `comprehensiveOnlyRules`; new `inAppReviewPackageRules`; `packageRuleSets` + `allPackages` entries.
+- NEW `test/rules/packages/in_app_review_rules_test.dart` (10 tests pass).
+- NEW `example_packages/lib/in_app_review/*_fixture.dart` (5 fixtures, BAD+GOOD).
+- `CHANGELOG.md` — extended the `[Unreleased]` overview + Added bullet.
+
+### Verification
+
+- `dart analyze --fatal-infos` → No issues found.
+- `dart test …/in_app_review_rules_test.dart` → 10/10. Integrity (registration) pass.
+
+### Not yet verified
+
+- Positive scan-firing: all 5 rules key on the resolved `InAppReview` type, so
+  (like quick_actions' init-contract rules) they fire only in a project that
+  actually depends on `in_app_review`. Logic verified by review; not positively
+  triggered in a local mock (the mock type name collides with the package import
+  the file-gate needs). No fix-application test (rules are report-only).

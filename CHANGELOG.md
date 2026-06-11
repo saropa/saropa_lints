@@ -64,11 +64,12 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [Unreleased]
 
-Adds five lint rules for the quick_actions package (app shortcuts). They catch shortcuts that silently do nothing on a cold-start tap — registering shortcut items before initializing the handler, or never initializing it at all — and invalid ShortcutItem fields: an empty `type`, an empty visible title, or a Flutter `assets/` path used where a native icon resource name is required. The empty-`type` rule ships a one-click fix. No action required.
+Adds lint rules for two more packages — quick_actions (app shortcuts) and in_app_review. The quick_actions rules catch shortcuts that silently do nothing on a cold-start tap and invalid ShortcutItem fields (with a one-click fix for an empty type). The in_app_review rules enforce the documented review-prompt contract — check availability first, never prompt from a button or on first launch — and require the App Store id when opening the store on Apple targets. No action required.
 
 ### Added
 
 - **Five `quick_actions` rules for the app-shortcut initialization contract and ShortcutItem fields.** `quick_actions_set_before_initialize` and `quick_actions_missing_initialize` flag shortcuts that register before, or without, the `initialize(handler)` call that opens the cold-start callback channel — the common cause of a shortcut that opens the app but takes no action. `quick_actions_empty_shortcut_type` (with a quick fix), `quick_actions_empty_localized_title`, and `quick_actions_flutter_asset_icon` flag invalid `ShortcutItem` arguments that render a dead, blank, or icon-less shortcut. All five run only in files that import `quick_actions` and live in the Professional tier. No action required.
+- **Five `in_app_review` rules for the review-prompt contract.** `in_app_review_missing_availability_check` flags `requestReview()` with no `isAvailable()` guard; `in_app_review_button_callback_request` and `in_app_review_request_in_init_state` flag prompting from a button tap or in `initState` (both burn the once-a-year quota with no result, against store guidelines); `in_app_review_missing_store_listing_fallback` (INFO) notes a rate button with no `openStoreListing()` escape hatch; `in_app_review_ios_store_listing_missing_app_id` flags `openStoreListing()` without an `appStoreId` on projects that target iOS or macOS. All five run only in files that import `in_app_review` and live in the Comprehensive tier. No action required.
 
 ## [13.12.5]
 

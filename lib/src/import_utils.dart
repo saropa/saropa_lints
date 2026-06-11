@@ -115,6 +115,9 @@ class PackageImports {
 
   /// Quick Actions (app shortcuts) package imports.
   static const Set<String> quickActions = {'package:quick_actions/'};
+
+  /// In-App Review package imports.
+  static const Set<String> inAppReview = {'package:in_app_review/'};
 }
 
 // =============================================================================

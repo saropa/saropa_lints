@@ -2841,6 +2841,12 @@ const Set<String> professionalOnlyRules = <String>{
 /// Comprehensive tier rules - stricter patterns, optimization hints, edge cases.
 /// Helpful but not critical. For quality-obsessed teams.
 const Set<String> comprehensiveOnlyRules = <String>{
+  // In-App Review (in_app_review_rules.dart)
+  'in_app_review_missing_availability_check',
+  'in_app_review_button_callback_request',
+  'in_app_review_request_in_init_state',
+  'in_app_review_missing_store_listing_fallback',
+  'in_app_review_ios_store_listing_missing_app_id',
   // Code style / Web (roadmap detail requirements)
   'avoid_js_rounded_ints',
   'avoid_private_typedef_functions',
@@ -3857,6 +3863,15 @@ const Set<String> qrScannerPackageRules = <String>{
   'require_qr_permission_check',
 };
 
+/// Rules specific to the in_app_review package.
+const Set<String> inAppReviewPackageRules = <String>{
+  'in_app_review_missing_availability_check',
+  'in_app_review_button_callback_request',
+  'in_app_review_request_in_init_state',
+  'in_app_review_missing_store_listing_fallback',
+  'in_app_review_ios_store_listing_missing_app_id',
+};
+
 /// Rules specific to the quick_actions (app shortcuts) package.
 const Set<String> quickActionsPackageRules = <String>{
   'quick_actions_set_before_initialize',
@@ -3904,6 +3919,7 @@ Map<String, Set<String>> get packageRuleSets => {
   'geolocator': geolocatorPackageRules,
   'qr_scanner': qrScannerPackageRules,
   'quick_actions': quickActionsPackageRules,
+  'in_app_review': inAppReviewPackageRules,
   'flame': flamePackageRules,
 };
 
@@ -3931,6 +3947,7 @@ const List<String> allPackages = <String>[
   'geolocator',
   'qr_scanner',
   'quick_actions',
+  'in_app_review',
   'flame',
 ];
 

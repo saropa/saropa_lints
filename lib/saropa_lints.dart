@@ -2534,6 +2534,13 @@ _allRuleFactories = <SaropaLintRule Function()>[
   QuickActionsEmptyLocalizedTitleRule.new,
   QuickActionsFlutterAssetIconRule.new,
 
+  // In-App Review rules (in_app_review_rules.dart)
+  InAppReviewMissingAvailabilityCheckRule.new,
+  InAppReviewButtonCallbackRequestRule.new,
+  InAppReviewRequestInInitStateRule.new,
+  InAppReviewMissingStoreListingFallbackRule.new,
+  InAppReviewIosStoreListingMissingAppIdRule.new,
+
   // Permission rules (permission_rules.dart)
   RequireLocationPermissionRationaleRule.new,
   RequireCameraPermissionCheckRule.new,
