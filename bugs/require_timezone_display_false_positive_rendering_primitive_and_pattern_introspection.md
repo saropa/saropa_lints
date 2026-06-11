@@ -1,0 +1,181 @@
+# BUG: `require_timezone_display` — fires on `.pattern`-only introspection and on seconds-only formats
+
+**Status: Open**
+
+<!-- Status values: Open → Investigating → Fix Ready → Closed -->
+
+Created: 2026-06-11
+Rule: `require_timezone_display`
+File: `lib/src/rules/data/json_datetime_rules.dart` (line ~1594)
+Severity: False positive
+Rule version: v1 | Since: v4.14.0
+
+---
+
+## Summary
+
+`require_timezone_display` is a pure syntactic heuristic: it fires on any
+`DateFormat` whose format string contains a `[Hhms]` char (or whose named
+constructor is in `_timeOnlyConstructors`) and lacks a `[zZvOxX]` char. It never
+checks whether the formatter is actually used to display a value, nor whether the
+matched component can carry cross-timezone ambiguity. This produces false
+positives on two mechanically-provable classes of correct code, plus on
+reusable clock-rendering library primitives where the caller — not the formatter —
+owns the timezone-display decision.
+
+---
+
+## Attribution Evidence
+
+```bash
+# Positive — rule IS defined here
+grep -rn "'require_timezone_display'" lib/src/rules/
+# lib/src/rules/data/json_datetime_rules.dart:1610:    'require_timezone_display',
+```
+
+**Emitter registration:** `lib/src/rules/data/json_datetime_rules.dart:1610`
+**Rule class:** `RequireTimezoneDisplayRule` — `lib/src/rules/data/json_datetime_rules.dart:1594`
+**Diagnostic `source` / `owner` as seen in Problems panel:** `dart` / `_generated_diagnostic_collection_name_#1`
+
+---
+
+## Reproducer
+
+```dart
+import 'package:intl/intl.dart';
+
+// CASE 1 — .pattern introspection, never .format()ed.
+// The DateFormat is constructed only to read its pattern string for locale-hour
+// detection. Nothing is ever displayed, so the rule's harm rationale ("users
+// misinterpret a displayed time") cannot occur.
+bool localeUses24Hour(String? locale) =>
+    DateFormat.jm(locale).pattern?.contains('H') ?? false; // LINT — should be OK
+
+// CASE 2 — seconds-only format.
+// Timezone offsets are never finer than minutes (e.g. +05:30, +05:45, +12:45),
+// so the seconds field is identical in every timezone. A timezone indicator on a
+// seconds-only render is meaningless.
+String renderSeconds(DateTime d, String? locale) =>
+    DateFormat('ss', locale).format(d); // LINT — should be OK
+
+// CASE 3 — reusable clock-rendering primitive in a utility library.
+// The library's job is to produce a locale clock ("3:30 PM" / "15:30"); the
+// timezone-display decision belongs to the caller's display context.
+String clock(DateTime d, String? locale) =>
+    DateFormat.jm(locale).format(d); // LINT — arguably OK in a formatter library
+```
+
+**Frequency:** Always (cases 1 and 2 are deterministic).
+
+Real triggering source — `saropa_dart_utils`:
+- `lib/datetime/date_time_intl_time_display_extensions.dart:25` — case 1 (`DateFormat.jm(locale).pattern?.contains('H')`)
+- `lib/datetime/date_time_intl_display_render.dart:60` — case 2 (`DateFormat('ss', locale)`)
+- `lib/datetime/date_time_intl_time_display_extensions.dart:55-59` — case 3 (`jms`/`jm`/`Hms`/`Hm`/`'h:mm'` rendered for display)
+
+---
+
+## Expected vs Actual
+
+| | Behavior |
+|---|---|
+| **Expected** | No diagnostic for cases 1 and 2 (provably cannot mislead); case 3 is a library-design boundary |
+| **Actual** | `[require_timezone_display]` reported on every `DateFormat` with a `[Hhms]` char and no tz char |
+
+---
+
+## Root Cause
+
+`runWithReporter` (lines 1649-1690) checks only the syntactic shape of the
+`DateFormat` constructor:
+
+```dart
+if (_timePattern.hasMatch(formatString) &&        // _timePattern = RegExp(r'[Hhms]')
+    !_timezonePattern.hasMatch(formatString)) {   // _timezonePattern = RegExp(r'[zZvOxX]')
+  reporter.atNode(node);
+}
+```
+
+and, for named constructors, fires whenever the name is in `_timeOnlyConstructors`
+without consulting how the result is used.
+
+### Case 1 — `.pattern` introspection (definitive defect)
+
+The rule reports on the `InstanceCreationExpression` regardless of whether
+`.format(...)` is ever invoked. When the `DateFormat`'s only consumer is
+`.pattern` (a `String?` getter used here for locale-hour detection), no value is
+ever rendered, so the diagnostic's premise is structurally impossible.
+
+### Case 2 — seconds-only format (definitive defect)
+
+`_timePattern` matches a lone `s`. But timezone offsets are always whole-minute
+(or coarser); the seconds field is invariant across all zones. A format whose
+*only* time component is `s` (no `H`/`h`/`m`) can never be misread across zones,
+so requiring a timezone pattern is incorrect.
+
+### Case 3 — rendering-primitive library (design boundary)
+
+The heuristic targets app display code. In a reusable formatter library, the
+formatter is the primitive and the caller owns the display context. This is the
+weaker class — reasonable people can want the rule here — but it is worth a
+documented carve-out (e.g. a config option or a `// formatter library` allowance).
+
+---
+
+## Suggested Fix
+
+1. **Seconds-only (case 2):** require at least one of `H`, `h`, or `m` in the
+   format string before reporting — change the gate so a format whose only
+   time char is `s` does not match. The seconds field carries no cross-timezone
+   ambiguity.
+
+2. **`.pattern`-only use (case 1):** when the `DateFormat` instance's result
+   flows only to the `.pattern` getter (and never to a `.format*` invocation),
+   skip the report. A conservative version: if the `InstanceCreationExpression`'s
+   immediate parent is a `PropertyAccess`/`PrefixedIdentifier` selecting
+   `pattern`, do not report. This covers the common locale-hour-detection idiom
+   without full data-flow analysis.
+
+3. **Rendering-primitive (case 3):** consider a rule option to suppress inside
+   files whose purpose is formatting (or document `// ignore_for_file` as the
+   sanctioned escape). Lower priority than 1 and 2.
+
+---
+
+## Fixture Gap
+
+The fixture at `example/lib/json_datetime/require_timezone_display_fixture.dart`
+currently covers only: `DateFormat('yyyy-MM-dd HH:mm')`, `DateFormat.Hm()`,
+`DateFormat('yyyy-MM-dd HH:mm z')`, `DateFormat('yyyy-MM-dd')`, `DateFormat.jmz()`.
+It should add:
+
+1. **`DateFormat.jm(locale).pattern`** read for introspection, never formatted — expect NO lint (case 1)
+2. **`DateFormat('ss')`** seconds-only format — expect NO lint (case 2)
+3. **`DateFormat('mm:ss')`** minute+second — expect LINT (minutes ARE timezone-variant; guards against over-correcting fix 1)
+4. **`DateFormat('s')`** single seconds char — expect NO lint (case 2 boundary)
+
+---
+
+## Changes Made
+
+<!-- Fill in when a fix is written. -->
+
+---
+
+## Tests Added
+
+<!-- Fill in when a fix is written. -->
+
+---
+
+## Commits
+
+<!-- Add commit hashes as fixes land. -->
+
+---
+
+## Environment
+
+- saropa_lints version: (consumed by saropa_dart_utils dev dependency)
+- Dart SDK version: as configured in saropa_dart_utils
+- custom_lint version: as configured in saropa_dart_utils
+- Triggering project/file: `saropa_dart_utils` — `lib/datetime/date_time_intl_time_display_extensions.dart`, `lib/datetime/date_time_intl_display_render.dart`
