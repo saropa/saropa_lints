@@ -1,6 +1,6 @@
 # BUG: `prefer_trailing_comma_always` — fires on a block-formatted collection-literal sole argument that `dart format` leaves comma-free
 
-**Status: Open**
+**Status: Fixed**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
@@ -171,3 +171,37 @@ Each "NO lint" case must also be verified stable under `dart format` (0 changes)
 - Dart SDK version: 3.12.1 (stable)
 - Triggering project/file: `saropa_dart_utils` — `lib/datetime/business_calendar_utils.dart:27-29`
 - `dart format --output=show --show=changed lib/datetime/business_calendar_utils.dart` → `0 changed`
+
+---
+
+## Finish Report (2026-06-10)
+
+Fixed as suggested. In `lib/src/rules/stylistic/stylistic_rules.dart`:
+
+- Renamed the argument-list exemption helper `_lastArgIsCallback` → `_lastArgIsBlockFormatted`
+  (single call site, line ~1128) and broadened it to return true when the unwrapped last
+  argument (positional or named) is a `FunctionExpression`, `ListLiteral`, **or**
+  `SetOrMapLiteral` — the three shapes `dart format` block-formats by hugging the bracket to
+  the call paren. The skip comment now states the false-positive class.
+
+Note: the `addListLiteral` / `addSetOrMapLiteral` branches were left as-is. They guard their
+own `FunctionExpression`-last-element case but do not need the collection-literal broadening —
+a collection literal nested as the *last element* of another collection is not the
+block-formatted-argument shape this bug is about.
+
+### Verification (scan CLI, rule explicitly enabled via `diagnostics:` config)
+
+| Case | Result |
+|---|---|
+| Sole set-literal arg `Set.unmodifiable(<DateTime>{ ... })` | NO lint ✓ |
+| Sole list-literal arg `oneArg(<int>[ ... ])` | NO lint ✓ |
+| Named collection arg `namedList(values: <int>[ ... ])` | NO lint ✓ |
+| Two scalar args, multi-line, no block (regression guard) | LINT ✓ |
+
+`dart analyze` on the rule file and fixture: **No issues found**.
+
+### Fixture
+
+Added three "NO lint" cases (sole set, sole list, named list) to
+`example/lib/stylistic/prefer_trailing_comma_always_fixture.dart`, plus `_oneArg` /
+`_namedList` helpers. Existing BAD multi-line-args case remains the regression guard.
