@@ -131,3 +131,51 @@ class _good474_UserCache {
     return entry.value;
   }
 }
+
+// GOOD: Bounded LRU/LFU cache with no TTL. capacity + eviction cap memory, so
+// the out-of-memory premise does not apply and the missing TTL is a deliberate
+// design choice (freshness is the caller's concern). Must NOT lint.
+class _good474_LruLfuCache<K, V> {
+  _good474_LruLfuCache(this.capacity);
+
+  final int capacity;
+  final Map<K, _Entry474<V>> _entries = {};
+  int _tick = 0;
+
+  void put(K key, V value) {
+    if (_entries.length >= capacity) _evict(); // bounded eviction
+    _entries[key] = _Entry474<V>(value, ++_tick);
+  }
+
+  void _evict() {
+    // Removes the lowest-frequency / least-recently-used entry.
+  }
+}
+
+// Helper for the bounded cache above. Name has no cache/memo token, so the
+// rule never inspects it.
+class _Entry474<V> {
+  _Entry474(this.value, this.recency);
+  V value;
+  int recency;
+}
+
+// GOOD: Bounded cache via a maxSize constant + eviction. Must NOT lint.
+class _good474_MaxSizeCache {
+  final Map<String, int> _store = {};
+  static const int maxSize = 100;
+
+  void add(String key, int value) {
+    if (_store.length >= maxSize) _store.remove(_store.keys.first);
+    _store[key] = value;
+  }
+}
+
+// GOOD: toMap() return type contains `Map<`, but there is no Map storage
+// field. A whole-source substring scan would wrongly read the return type as
+// cache storage; field-based detection must NOT lint.
+class _good474_SerializableCache {
+  final int id = 0;
+
+  Map<String, dynamic> toMap() => {'id': id};
+}

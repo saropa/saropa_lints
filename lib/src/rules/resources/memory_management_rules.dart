@@ -668,14 +668,82 @@ class AvoidLargeIsolateCommunicationRule extends SaropaLintRule {
 // Caching Best Practices (from v4.1.7)
 // =============================================================================
 
+/// Matches "limit" as a whole word (boundary-aware) so substrings like the
+/// "limit" inside `Uint8List` do not read as a size cap. Shared by the two
+/// cache rules via [_cacheSourceIsBounded] so their detection cannot drift.
+final RegExp _cacheLimitPattern = RegExp(
+  r'(?:^|[^a-z])limit(?:[^a-z]|$)|'
+  r'[a-z]limit\b|'
+  r'\blimit[A-Z]',
+  caseSensitive: false,
+);
+
+/// Returns true when the lowercased [classSource] shows the cache caps its own
+/// size — an explicit capacity / max-size constant, an eviction policy
+/// (LRU/LFU, `evict`), or a pruning call (`.remove(`, `.removeWhere(`,
+/// `.removeRange(`, `.clear(`).
+///
+/// A bounded cache cannot grow without limit, so it is neither an
+/// unbounded-growth risk ([AvoidUnboundedCacheGrowthRule]) nor a target for the
+/// out-of-memory half of [RequireCacheExpirationRule]'s argument. Both rules
+/// gate on this single helper so they stay consistent: unbounded growth is the
+/// former's concern, and a deliberately TTL-less but size-bounded LRU/LFU cache
+/// (e.g. Guava `maximumSize` without `expireAfter`) is a correct design that
+/// neither rule should flag.
+///
+/// `.remove(` deliberately does NOT match `.removeWhere(` / `.removeRange(`
+/// (the `remove` is followed by `where`/`range`, not `(`), so those eviction
+/// idioms are listed explicitly. [classSource] is expected already lowercased.
+bool _cacheSourceIsBounded(String classSource) =>
+    classSource.contains('maxsize') ||
+    classSource.contains('max_size') ||
+    classSource.contains('capacity') ||
+    _cacheLimitPattern.hasMatch(classSource) ||
+    classSource.contains('.remove(') ||
+    classSource.contains('.removewhere(') ||
+    classSource.contains('.removerange(') ||
+    classSource.contains('.clear(') ||
+    classSource.contains('evict') ||
+    classSource.contains('lru') ||
+    classSource.contains('lfu');
+
+/// Returns true when [node] declares a Map (or untyped `= {}`) *field* that
+/// reads as cache storage.
+///
+/// Inspects field declarations only, so a `toMap()` / `fromMap()`
+/// serialization method whose return type contains `Map<` does not count as
+/// cache storage — a whole-source `contains('map<')` scan wrongly does. Shared
+/// by [RequireCacheExpirationRule] and [AvoidUnboundedCacheGrowthRule].
+bool _hasMapCacheField(ClassDeclaration node) {
+  for (final ClassMember member in node.bodyMembers) {
+    if (member is FieldDeclaration) {
+      final String fieldSource = member.toSource().toLowerCase();
+      // A typed Map field, or a bare `= {}` initializer (map/set literal).
+      if (fieldSource.contains('map<') || fieldSource.contains('= {}')) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 /// Warns when cache implementations lack expiration logic.
 ///
-/// Since: v4.1.8 | Updated: v4.13.0 | Rule version: v2
+/// Since: v4.1.8 | Updated: v13.12.6 | Rule version: v3
 ///
 /// `[HEURISTIC]` - Detects cache-like classes without TTL/expiration.
 ///
 /// Caches without TTL serve stale data indefinitely. Implement expiration
 /// to ensure data freshness.
+///
+/// **Exclusions:**
+/// - Size-bounded caches (capacity / maxSize constant, or LRU/LFU eviction)
+///   are skipped via [_cacheSourceIsBounded]. A bounded cache caps its own
+///   memory by eviction, so the out-of-memory half of this rule does not
+///   apply, and a deliberately TTL-less but bounded cache is a valid design
+///   (e.g. Guava `maximumSize` without `expireAfter`). Unbounded growth is
+///   [AvoidUnboundedCacheGrowthRule]'s concern, so firing here too would be
+///   redundant and wrong.
 ///
 /// **BAD:**
 /// ```dart
@@ -718,7 +786,7 @@ class RequireCacheExpirationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'require_cache_expiration',
-    '[require_cache_expiration] Cache implementation lacks expiration logic. Caches without TTL serve stale data indefinitely. Implement expiration to ensure data freshness. Unreleased memory grows over time, increasing garbage collection pressure and risking out-of-memory crashes. {v2}',
+    '[require_cache_expiration] Cache implementation lacks expiration logic. Caches without TTL serve stale data indefinitely. Implement expiration to ensure data freshness. Unreleased memory grows over time, increasing garbage collection pressure and risking out-of-memory crashes. {v3}',
     correctionMessage:
         'Add TTL/expiration to prevent serving stale data indefinitely. Use the DevTools memory profiler to verify the leak is resolved after the fix.',
     severity: DiagnosticSeverity.WARNING,
@@ -748,10 +816,17 @@ class RequireCacheExpirationRule extends SaropaLintRule {
           classSource.contains('isvalid') ||
           classSource.contains('isstale');
 
-      // Check for Map used as cache storage
-      final bool hasMapCache = classSource.contains('map<');
+      // Map used as cache storage — inspect *field* declarations, not the
+      // whole source, so a `toMap()` return type does not read as storage.
+      final bool hasMapCache = _hasMapCacheField(node);
 
-      if (hasMapCache && !hasExpiration) {
+      // A size-bounded cache (capacity / maxSize / LRU/LFU eviction) caps its
+      // own memory, so the out-of-memory premise of this rule does not apply
+      // and unbounded growth is AvoidUnboundedCacheGrowthRule's job. A
+      // deliberately TTL-less but bounded cache is a valid design; only flag a
+      // genuinely unbounded, TTL-less Map cache that can serve stale data
+      // while also growing without limit.
+      if (hasMapCache && !hasExpiration && !_cacheSourceIsBounded(classSource)) {
         reporter.atNode(node);
       }
     });
@@ -760,7 +835,7 @@ class RequireCacheExpirationRule extends SaropaLintRule {
 
 /// Warns when caches can grow without bounds.
 ///
-/// Since: v4.1.8 | Updated: v4.13.0 | Rule version: v4
+/// Since: v4.1.8 | Updated: v13.12.6 | Rule version: v4
 ///
 /// `[HEURISTIC]` - Detects Map-based caches without size limits.
 ///
@@ -770,7 +845,8 @@ class RequireCacheExpirationRule extends SaropaLintRule {
 /// **Detection:**
 /// - Class name contains "cache" or "memo"
 /// - Class has Map field declarations (not just `toMap()` return types)
-/// - No size-limiting patterns detected (maxSize, capacity, limit, evict, lru)
+/// - No size-limiting patterns detected (maxSize, capacity, limit, evict,
+///   lru/lfu, or prune calls) — see [_cacheSourceIsBounded]
 ///
 /// **Exclusions:**
 /// - Database models with `@collection` (Isar), `@HiveType` (Hive),
@@ -822,14 +898,6 @@ class AvoidUnboundedCacheGrowthRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
-  /// Pattern to detect "limit" as a word boundary (not in "Uint8List").
-  static final RegExp _limitPattern = RegExp(
-    r'(?:^|[^a-z])limit(?:[^a-z]|$)|'
-    r'[a-z]limit\b|'
-    r'\blimit[A-Z]',
-    caseSensitive: false,
-  );
-
   /// Pattern to detect mutation method signatures.
   static final RegExp _mutationMethodPattern = RegExp(
     r'void\s+(add|put|set|cache|store|save|insert)\s*\(',
@@ -870,24 +938,10 @@ class AvoidUnboundedCacheGrowthRule extends SaropaLintRule {
         return;
       }
 
-      // Check for size limiting patterns
-      // Note: Use word boundaries to avoid false matches (e.g., Uint8List contains 'limit')
-      // Note: Don't use 'bounded' - it matches 'unbounded' in expect_lint comments
-      // `.remove(` does NOT match `.removeWhere(` / `.removeRange(` (the `remove`
-      // is followed by `where`/`range`, not `(`), so a cache pruned with the
-      // idiomatic Map.removeWhere / List.removeRange / .clear() eviction was
-      // wrongly read as unbounded. classSource is already lowercased.
-      final bool hasSizeLimit =
-          classSource.contains('maxsize') ||
-          classSource.contains('max_size') ||
-          classSource.contains('capacity') ||
-          _hasLimitPattern(classSource) ||
-          classSource.contains('.remove(') ||
-          classSource.contains('.removewhere(') ||
-          classSource.contains('.removerange(') ||
-          classSource.contains('.clear(') ||
-          classSource.contains('evict') ||
-          classSource.contains('lru');
+      // Size-limit detection (capacity / maxSize / LRU/LFU eviction / prune
+      // calls) is shared with RequireCacheExpirationRule via the top-level
+      // _cacheSourceIsBounded helper so the two rules cannot drift apart.
+      final bool hasSizeLimit = _cacheSourceIsBounded(classSource);
 
       // Check for Map field declarations (not method return types)
       final bool hasMapCacheField = _hasMapCacheField(node);
@@ -908,25 +962,6 @@ class AvoidUnboundedCacheGrowthRule extends SaropaLintRule {
 
       reporter.atNode(node);
     });
-  }
-
-  /// Checks for "limit" as a word boundary pattern to avoid false matches
-  /// like "Uint8List" which contains "limit" as a substring.
-  bool _hasLimitPattern(String source) => _limitPattern.hasMatch(source);
-
-  /// Checks if the class has a Map field that appears to be cache storage.
-  /// Excludes toMap/fromMap serialization methods.
-  bool _hasMapCacheField(ClassDeclaration node) {
-    for (final ClassMember member in node.bodyMembers) {
-      if (member is FieldDeclaration) {
-        final String fieldSource = member.toSource().toLowerCase();
-        // Check for Map field declarations
-        if (fieldSource.contains('map<') || fieldSource.contains('= {}')) {
-          return true;
-        }
-      }
-    }
-    return false;
   }
 
   /// Checks if all Map fields in the class use enum keys.

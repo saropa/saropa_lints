@@ -1,6 +1,6 @@
 # BUG: `require_cache_expiration` — fires on bounded LRU/LFU cache that needs no TTL
 
-**Status: Open**
+**Status: Fixed**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
@@ -8,7 +8,7 @@ Created: 2026-06-11
 Rule: `require_cache_expiration`
 File: `lib/src/rules/resources/memory_management_rules.dart` (class line ~704, code line 719, logic lines 732-757)
 Severity: False positive
-Rule version: v2 | Since: v4.1.8 | Updated: v4.13.0
+Rule version: v2 → v3 | Since: v4.1.8 | Updated: v13.12.6
 
 ---
 
@@ -208,13 +208,53 @@ The fixture for `require_cache_expiration` should include:
 
 ## Changes Made
 
-<!-- Fill in when a fix is written. -->
+Both hypotheses addressed in `lib/src/rules/resources/memory_management_rules.dart`.
+
+**Hypothesis A — bounded-eviction exclusion (primary).** Extracted the
+size-limit detection that previously lived inside `AvoidUnboundedCacheGrowthRule`
+into a shared top-level helper `_cacheSourceIsBounded(String classSource)` (with
+the boundary-aware `_cacheLimitPattern`). It returns true for `capacity` /
+`maxsize` / `max_size`, the `limit` word, `evict`, `lru`, **`lfu`**, and the
+prune calls `.remove(` / `.removeWhere(` / `.removeRange(` / `.clear(`.
+- `RequireCacheExpirationRule` now reports only when
+  `hasMapCache && !hasExpiration && !_cacheSourceIsBounded(classSource)`, so a
+  size-bounded TTL-less cache no longer lints.
+- `AvoidUnboundedCacheGrowthRule` now calls the same helper instead of its own
+  inline `hasSizeLimit`; its old `_limitPattern` / `_hasLimitPattern` were
+  removed. The two rules can no longer drift apart. `lfu` is newly recognized by
+  both (was `lru`-only) — a strict additive widening of the bounded set, so it
+  can only remove false positives.
+
+**Hypothesis B — brittle `map<` substring (secondary).** Extracted
+`_hasMapCacheField(ClassDeclaration)` (formerly an instance method on the sibling
+rule) to a shared top-level helper that inspects field declarations only.
+`RequireCacheExpirationRule` now uses it instead of
+`classSource.contains('map<')`, so a `toMap()` / `fromMap()` return type whose
+source contains `Map<` is no longer mistaken for cache storage.
+
+Doc comments and `{vN}` tags bumped (`require_cache_expiration` v2 → v3; both
+rules' `Updated:` → v13.12.6).
 
 ---
 
 ## Tests Added
 
-<!-- List new or updated fixture/test files and what they verify. -->
+Fixtures in `example/lib/memory_management/require_cache_expiration_fixture.dart`:
+
+1. `_good474_LruLfuCache` — bounded LRU/LFU cache (`capacity` + `_evict()`), Map
+   storage, no TTL → expect NO lint.
+2. `_good474_MaxSizeCache` — bounded via `maxSize` + `.remove()` eviction →
+   expect NO lint.
+3. `_good474_SerializableCache` — `toMap()` return type contains `Map<` but no
+   Map storage field → expect NO lint (guards Hypothesis B).
+4. Existing `_bad474_UserCache` (unbounded, no TTL) → still LINT (true positive).
+5. Existing `_good474_UserCache` (`Duration ttl`) → still NO lint.
+
+Verified with the scan CLI on an equivalent out-of-`example` copy
+(`example*/` is excluded from analysis, so fixtures don't run there): with
+`--tier comprehensive`, `require_cache_expiration` and
+`avoid_unbounded_cache_growth` each fire only on the unbounded `UserCache` and on
+none of the three bounded / `toMap()` cases.
 
 ---
 
@@ -231,3 +271,66 @@ The fixture for `require_cache_expiration` should include:
 - custom_lint version: transitive via saropa_lints
 - Triggering project/file: `saropa_dart_utils` → `lib/collections/lru_lfu_cache_utils.dart` (class `LruLfuCacheUtils`)
 - Note: rule tag `{v2}` matches between installed plugin and this source tree, so the FP is current (not a stale-version artifact).
+
+---
+
+## Finish Report (2026-06-11)
+
+
+
+**Scope:** (A) Dart lint rules / analyzer plugin.
+
+### Deep review
+- **Logic & safety:** No recursion / async / race surface — the rules are
+  synchronous AST visitors. The new helpers are pure functions over a lowercased
+  string / a node's field list. `_cacheSourceIsBounded` short-circuits on the
+  cheapest substring checks before the one regex.
+- **Architecture & adherence:** Removed duplication — size-limit detection and
+  Map-field detection now live in single shared top-level helpers
+  (`_cacheSourceIsBounded`, `_cacheLimitPattern`, `_hasMapCacheField`) used by
+  both `RequireCacheExpirationRule` and `AvoidUnboundedCacheGrowthRule`, so the
+  two cache rules cannot drift. Both keep `SaropaLintRule` / `runWithReporter`
+  conventions, `LintImpact.warning`, `RuleType.codeSmell`, `RuleCost.medium`.
+- **Linter integrity:** Rules already registered (no new rule); tier assignments
+  unchanged; message `{vN}` tags bumped (`require_cache_expiration` v2→v3) and
+  `Updated:` doc tags set to v13.12.6. Heuristic widened only in the
+  false-positive-removing direction (added `lfu` + field-based Map detection).
+- **Performance:** One extra regex evaluation per cache-named class; negligible,
+  and gated behind the cheap name + substring checks.
+
+### Testing
+- Audited `test/rules/resources/memory_management_rules_test.dart`: it pins rule
+  instantiation (`code.lowerCaseName`, `problemMessage` contains
+  `[require_cache_expiration]` / `[avoid_unbounded_cache_growth]`) and fixture
+  existence. The message edit only changed the trailing `{v2}`→`{v3}` tag, which
+  no assertion pins; the removed symbols (`_limitPattern`, `_hasLimitPattern`,
+  the instance `_hasMapCacheField`) are private and unreferenced by tests. Ran
+  `dart test test/rules/resources/memory_management_rules_test.dart` → **all 26
+  passed**.
+- Behavior verified with the scan CLI (fixtures live under `example*/`, excluded
+  from analysis, so they don't self-run): an equivalent file scanned with
+  `--tier comprehensive` shows `require_cache_expiration` and
+  `avoid_unbounded_cache_growth` firing **only** on the unbounded `UserCache`,
+  and on none of the bounded `LruLfuCache`, the `maxSize` cache, or the
+  `toMap()`-only class.
+- `dart analyze` on the changed rule file: **no issues**.
+
+### Changes
+- `lib/src/rules/resources/memory_management_rules.dart`:
+  - Added top-level `_cacheLimitPattern` + `_cacheSourceIsBounded()` (capacity /
+    maxSize / limit-word / evict / lru / **lfu** / prune-call markers).
+  - Added top-level `_hasMapCacheField()` (field-only Map detection; ignores
+    `toMap()` return types).
+  - `RequireCacheExpirationRule`: now skips bounded caches and uses field-based
+    Map detection instead of a whole-source `map<` scan; message `{v3}`.
+  - `AvoidUnboundedCacheGrowthRule`: now calls the shared helpers; removed dead
+    `_limitPattern` / `_hasLimitPattern` and its instance `_hasMapCacheField`.
+- `example/lib/memory_management/require_cache_expiration_fixture.dart`: added
+  `_good474_LruLfuCache`, `_Entry474`, `_good474_MaxSizeCache`,
+  `_good474_SerializableCache`.
+- `CHANGELOG.md`: `### Fixed` entry under `[Unreleased]`.
+
+### Outstanding
+None. Fix complete and verified.
+
+Finish report appended: plans/history/2026.06/2026.06.11/require_cache_expiration_false_positive_bounded_lru_lfu_cache.md (after archival rename below).
