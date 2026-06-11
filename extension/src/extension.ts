@@ -42,6 +42,8 @@ import { SummaryTreeProvider } from './views/summaryTree';
 import { SuppressionsTreeProvider } from './views/suppressionsTree';
 import { ConfigTreeProvider } from './views/configTree';
 import { SuggestionsTreeProvider } from './views/suggestionsTree';
+import { ConfigSuggestionsTreeProvider } from './views/configSuggestionsTree';
+import { readRulePacksEnabled, writeRulePacksEnabled } from './rulePacks/rulePackYaml';
 import { SecurityPostureTreeProvider } from './views/securityPostureTree';
 import { FileRiskTreeProvider } from './views/fileRiskTree';
 import { TodosAndHacksTreeProvider } from './views/todosAndHacksTree';
@@ -523,6 +525,52 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   const securityProvider = new SecurityPostureTreeProvider();
   const fileRiskProvider = new FileRiskTreeProvider(context.workspaceState);
 
+  // Dedicated, always-registered Suggestions view created via createTreeView (not
+  // registerTreeDataProvider) so we can set a numeric .badge on it — that badge is
+  // what surfaces the config-action count on the activity-bar icon, making the
+  // otherwise-hidden init step and unused-but-applicable rule packs visible
+  // without the user opening anything first.
+  const configSuggestionsProvider = new ConfigSuggestionsTreeProvider();
+  const configSuggestionsView = vscode.window.createTreeView(
+    'saropaLints.suggestions',
+    { treeDataProvider: configSuggestionsProvider },
+  );
+  context.subscriptions.push(configSuggestionsView);
+
+  const updateConfigSuggestionsBadge = (): void => {
+    const count = configSuggestionsProvider.count();
+    // Clearing the badge (undefined) when count is 0 hides the number entirely,
+    // so a fully-configured project shows no nagging "0".
+    configSuggestionsView.badge =
+      count > 0
+        ? {
+            value: count,
+            tooltip: l10n('configSuggestions.badgeTooltip', {
+              count: String(count),
+            }),
+          }
+        : undefined;
+  };
+
+  const refreshConfigSuggestions = (): void => {
+    configSuggestionsProvider.refresh();
+    updateConfigSuggestionsBadge();
+  };
+  refreshConfigSuggestions();
+
+  // The badge tracks config/dependency files, not violations: enabling a pack,
+  // running init, or editing analysis_options must re-count immediately. A light
+  // watcher keeps the count live even when no analysis has run.
+  {
+    const configWatcher = vscode.workspace.createFileSystemWatcher(
+      '**/{analysis_options.yaml,analysis_options_custom.yaml,pubspec.yaml}',
+    );
+    configWatcher.onDidChange(refreshConfigSuggestions);
+    configWatcher.onDidCreate(refreshConfigSuggestions);
+    configWatcher.onDidDelete(refreshConfigSuggestions);
+    context.subscriptions.push(configWatcher);
+  }
+
   context.subscriptions.push(
     vscode.workspace.onDidChangeConfiguration((e) => {
       if (
@@ -622,6 +670,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     suppressionsProvider.refresh();
     configProvider.refresh();
     suggestionsProvider.refresh();
+    refreshConfigSuggestions();
     securityProvider.refresh();
     fileRiskProvider.refresh();
     rulePacksWebviewProvider.refresh();
@@ -1046,6 +1095,37 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         refreshAll();
         updateAllStatusBars();
         updateContext(getConfig().get<boolean>('enabled', true) ?? true, issuesProvider.hasViolations());
+      }
+    }),
+    // One-click enable of a rule pack straight from a Suggestions item. Writes
+    // the pack into analysis_options.yaml, refreshes the badge, and confirms with
+    // a toast naming the pack — so the user sees the exact thing that changed.
+    vscode.commands.registerCommand('saropaLints.enableRulePack', async (packId?: unknown) => {
+      const id = typeof packId === 'string' ? packId : '';
+      const root = getProjectRoot();
+      if (!id || !root) return;
+      const enabled = readRulePacksEnabled(root);
+      if (enabled.includes(id)) {
+        refreshConfigSuggestions();
+        return;
+      }
+      const ok = writeRulePacksEnabled(root, [...enabled, id].sort());
+      if (!ok) {
+        void vscode.window.showErrorMessage(
+          l10n('configSuggestions.enableFailed', { pack: id }),
+        );
+        return;
+      }
+      refreshConfigSuggestions();
+      void vscode.window.showInformationMessage(
+        l10n('configSuggestions.enabledToast', { pack: id }),
+      );
+      // Re-analyze so the newly-enabled pack's rules surface immediately, matching
+      // the post-config-change behavior of the init command.
+      const runAfter = getConfig().get<boolean>('runAnalysisAfterConfigChange', true) ?? true;
+      if (runAfter) {
+        await runAnalysisCommand(context);
+        refreshAll();
       }
     }),
     vscode.commands.registerCommand('saropaLints.emitCompositePluginScaffold', async () => {

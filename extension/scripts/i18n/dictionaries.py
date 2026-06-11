@@ -7,6 +7,9 @@ from typing import Dict
 # cspell:disable
 TRANSLATIONS: Dict[str, Dict[str, str]] = {
     "nl": {
+        # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
+        "• {dep}": "• {dep}",
+        "{label}: {size}": "{label}: {size}",
         # Curated passthroughs: MT returns these identical (cognate / brand-prefixed title / abbreviation) for this locale; English is the correct rendering. Keeps the coverage gate honest without shipping garbage.
         "CC {cc}": "CC {cc}",
         "complex": "complex",
@@ -146,6 +149,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "fr": {
+        # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
+        "• {dep}": "• {dep}",
         # Curated passthroughs: MT returns these identical (cognate / brand-prefixed title / abbreviation) for this locale; English is the correct rendering. Keeps the coverage gate honest without shipping garbage.
         "CC {cc}": "CC {cc}",
         "Distribution": "Distribution",
@@ -286,6 +291,14 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
     "ur": {
         # Curated passthrough: Urdu MT echoes this command title unchanged; English (with the Saropa brand) is the correct rendering.
         "CC {cc}": "CC {cc}",
+        # Manual: MT left this English; "downloads in the last 30 days" rendered in Urdu.
+        "{count} downloads in the last 30 days": "پچھلے 30 دنوں میں {count} ڈاؤن لوڈز",
+        # Manual: MT hallucinated trailing clauses ("کے ساتھ ڈیپازٹ ہوتا ہے") and PH artifacts; these are short technical tooltips.
+        "• {dep}": "• {dep}",
+        "• {dep} (shared)": "• {dep} (مشترکہ)",
+        "{total} transitive deps": "{total} ٹرانزیٹو ڈیپس",
+        "{total} transitive deps ({shared} shared)": "{total} ٹرانزیٹو ڈیپس ({shared} مشترکہ)",
+        "{label}: {size}": "{label}: {size}",
         "Saropa Lints: Open Lints Config": "Saropa Lints: Open Lints Config",
         "Search": "تلاش",
         "Search Packages": "تلاش",
@@ -406,6 +419,9 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "de": {
+        # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
+        "• {dep}": "• {dep}",
+        "{label}: {size}": "{label}: {size}",
         # Curated passthroughs: MT returns these identical (cognate / brand-prefixed title / abbreviation) for this locale; English is the correct rendering. Keeps the coverage gate honest without shipping garbage.
         "CC {cc}": "CC {cc}",
         "Export": "Export",
@@ -481,6 +497,9 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "es": {
+        # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
+        "• {dep}": "• {dep}",
+        "{label}: {size}": "{label}: {size}",
         # Curated passthrough: "CC" is the universal abbreviation for Cyclomatic Complexity in code metrics; keeping it untranslated preserves recognition.
         "CC {cc}": "CC {cc}",
         "Search": "Buscar",
@@ -539,6 +558,9 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "it": {
+        # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
+        "• {dep}": "• {dep}",
+        "{label}: {size}": "{label}: {size}",
         "Search": "Cerca",
         "Saropa Lints UI language": "Lingua interfaccia Saropa Lints",
         "Choose language for sidebar and dashboards": "Scegli la lingua per barra laterale e dashboard",
@@ -599,6 +621,9 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "{count} function": "{count} funzione",
     },
     "pt": {
+        # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
+        "• {dep}": "• {dep}",
+        "{label}: {size}": "{label}: {size}",
         # Curated passthrough: "CC" is the universal abbreviation for Cyclomatic Complexity in code metrics; keeping it untranslated preserves recognition.
         "CC {cc}": "CC {cc}",
         "Search": "Pesquisar",
@@ -661,6 +686,9 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "ru": {
+        # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
+        "• {dep}": "• {dep}",
+        "{label}: {size}": "{label}: {size}",
         "Search": "Поиск",
         "Saropa Lints UI language": "Язык интерфейса Saropa Lints",
         "Choose language for sidebar and dashboards": "Выберите язык боковой панели и панелей",
@@ -713,6 +741,9 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "ja": {
+        # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
+        "• {dep}": "• {dep}",
+        "{label}: {size}": "{label}: {size}",
         # Curated passthrough: "CC" is the universal abbreviation for Cyclomatic Complexity in code metrics; keeping it untranslated preserves recognition.
         "CC {cc}": "CC {cc}",
         "Search": "検索",
@@ -767,6 +798,9 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "ko": {
+        # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
+        "• {dep}": "• {dep}",
+        "{label}: {size}": "{label}: {size}",
         # Curated passthrough: "CC" is the universal abbreviation for Cyclomatic Complexity in code metrics; keeping it untranslated preserves recognition.
         "CC {cc}": "CC {cc}",
         "Search": "검색",
@@ -822,8 +856,13 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "zh": {
+        # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
+        "• {dep}": "• {dep}",
+        "{label}: {size}": "{label}: {size}",
         # Curated passthrough: "CC" is the universal abbreviation for Cyclomatic Complexity in code metrics; keeping it untranslated preserves recognition.
         "CC {cc}": "CC {cc}",
+        # Manual: MT left this English; rendered in Simplified Chinese.
+        "{count} downloads in the last 30 days": "过去 30 天内 {count} 次下载",
         "Search": "搜索",
         "Saropa Lints UI language": "Saropa Lints 界面语言",
         "Choose language for sidebar and dashboards": "选择侧边栏和仪表板的语言",
@@ -877,6 +916,9 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "ar": {
+        # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
+        "• {dep}": "• {dep}",
+        "{label}: {size}": "{label}: {size}",
         # Curated passthrough: "CC" is the universal abbreviation for Cyclomatic Complexity in code metrics; keeping it untranslated preserves recognition.
         "CC {cc}": "CC {cc}",
         "Search": "بحث",
@@ -934,6 +976,14 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "hi": {
+        # Manual: pin the Hindi rendering so a dictionary regen cannot revert it to English.
+        "{count} downloads in the last 30 days": "पिछले 30 दिनों में {count} डाउनलोड",
+        # Manual: MT hallucinated trailing clauses ("का अर्थ है _", "पारगमन अवसाद") and PH artifacts; these are short technical tooltips.
+        "• {dep}": "• {dep}",
+        "• {dep} (shared)": "• {dep} (साझा)",
+        "{total} transitive deps": "{total} ट्रांज़िटिव डिपेंडेंसी",
+        "{total} transitive deps ({shared} shared)": "{total} ट्रांज़िटिव डिपेंडेंसी ({shared} साझा)",
+        "{label}: {size}": "{label}: {size}",
         "Search": "खोज",
         "Saropa Lints UI language": "Saropa Lints UI भाषा",
         "Choose language for sidebar and dashboards": "साइडबार और डैशबोर्ड के लिए भाषा चुनें",
@@ -989,6 +1039,9 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "bn": {
+        # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
+        "• {dep}": "• {dep}",
+        "{label}: {size}": "{label}: {size}",
         # Curated passthrough: "CC" is the universal abbreviation for Cyclomatic Complexity in code metrics; keeping it untranslated preserves recognition.
         "CC {cc}": "CC {cc}",
         "#": "#",
@@ -1047,6 +1100,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "fa": {
+        # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
+        "{label}: {size}": "{label}: {size}",
         "#": "#",
         # Curated passthrough: bullet glyph + bare {dep} placeholder has no translatable content; the sibling tooltipDepShared carries the only translatable word "(shared)".
         "• {dep}": "• {dep}",
@@ -1121,6 +1176,13 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
     "fil": {
         # Curated passthroughs: MT returns these identical (cognate / brand-prefixed title / abbreviation) for this locale; English is the correct rendering. Keeps the coverage gate honest without shipping garbage.
         "CC {cc}": "CC {cc}",
+        # Curated passthrough: format-only string (two placeholders + colon) has no translatable words.
+        "{label}: {size}": "{label}: {size}",
+        # Manual: MT hallucinated trailing clauses ("ang iyong katawan", doubled "deps deps") on these short technical tooltips.
+        "• {dep}": "• {dep}",
+        "• {dep} (shared)": "• {dep} (pinagbahagi)",
+        "{total} transitive deps": "{total} na transitive deps",
+        "{total} transitive deps ({shared} shared)": "{total} na transitive deps ({shared} na shared)",
         "stub-tested": "stub-tested",
         "Drift on · {count}": "Drift on · {count}",
         "avg {score} ({grade})": "avg {score} ({grade})",
@@ -1202,7 +1264,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "{filtered} shown": "{filtered} ang ipinakita",
         "{hr}h ago": "{hr}o nakalipas",
         # Both sides are placeholders; only the ": " separator is literal, which is identical in Filipino. Curated passthrough so the gate sees an entry.
-        "{label}: {size}": "{label}: {size}",
         "{loaded} of {total} {item} loaded. {failed} failed.": "{loaded} ng {total} {item} ay nai-load. {failed} ang nabigo.",
         "{min}m ago": "{min}m nakalipas",
         "{n} impacts": "{n} na impact",
@@ -1216,6 +1277,9 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "he": {
+        # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
+        "• {dep}": "• {dep}",
+        "{label}: {size}": "{label}: {size}",
         # Curated passthrough: "CC" is the universal abbreviation for Cyclomatic Complexity in code metrics; keeping it untranslated preserves recognition.
         "CC {cc}": "CC {cc}",
         "#": "#",
@@ -1275,6 +1339,9 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "id": {
+        # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
+        "• {dep}": "• {dep}",
+        "{label}: {size}": "{label}: {size}",
         # Curated passthrough: "CC" is the universal abbreviation for Cyclomatic Complexity in code metrics; keeping it untranslated preserves recognition.
         "CC {cc}": "CC {cc}",
         "#": "#",
@@ -1331,6 +1398,9 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "pl": {
+        # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
+        "• {dep}": "• {dep}",
+        "{label}: {size}": "{label}: {size}",
         # Curated passthroughs: MT returns these identical (cognate / brand-prefixed title / abbreviation) for this locale; English is the correct rendering. Keeps the coverage gate honest without shipping garbage.
         "System": "System",
         "#": "#",
@@ -1389,6 +1459,14 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
     "sw": {
         # Curated passthrough: "CC" is the universal abbreviation for Cyclomatic Complexity in code metrics; keeping it untranslated preserves recognition.
         "CC {cc}": "CC {cc}",
+        # Curated passthrough: format-only string (two placeholders + colon) has no translatable words.
+        "{label}: {size}": "{label}: {size}",
+        # Manual: MT hallucinated trailing clauses ("Kiasi cha juu zaidi", doubled "deps deps") and left "downloads"/"(shared)" English.
+        "• {dep}": "• {dep}",
+        "• {dep} (shared)": "• {dep} (imeshirikiwa)",
+        "{total} transitive deps": "{total} transitive deps",
+        "{total} transitive deps ({shared} shared)": "{total} transitive deps ({shared} imeshirikiwa)",
+        "{count} downloads in the last 30 days": "{count} vipakuzi katika siku 30 zilizopita",
         "#": "#",
         "Counters": "Kaunta",
         "Deps": "Vitegemezi",
@@ -1439,7 +1517,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "{filtered} shown": "{filtered} zimeonyeshwa",
         "{hr}h ago": "saa {hr} zilizopita",
         # Both sides are placeholders; only the ": " separator is literal, which is identical in Swahili. Curated passthrough so the gate sees an entry.
-        "{label}: {size}": "{label}: {size}",
         "{loaded} of {total} {item} loaded. {failed} failed.": "{loaded} kati ya {total} {item} zimepakiwa. {failed} zimeshindwa.",
         "{min}m ago": "dakika {min} zilizopita",
         "{n} impacts": "athari {n}",
@@ -1452,6 +1529,9 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "th": {
+        # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
+        "• {dep}": "• {dep}",
+        "{label}: {size}": "{label}: {size}",
         "#": "#",
         "OWASP": "OWASP",
         "Saropa Lints: Focus Package Vibrancy Tree": "Saropa Lints: โฟกัสทรีความมีชีวิตชีวาของแพ็กเกจ",
@@ -1502,6 +1582,9 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "tr": {
+        # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
+        "• {dep}": "• {dep}",
+        "{label}: {size}": "{label}: {size}",
         # Curated passthrough: "CC" is the universal abbreviation for Cyclomatic Complexity in code metrics; keeping it untranslated preserves recognition.
         "CC {cc}": "CC {cc}",
         "#": "#",
@@ -1555,6 +1638,9 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "uk": {
+        # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
+        "• {dep}": "• {dep}",
+        "{label}: {size}": "{label}: {size}",
         # Curated passthrough: "CC" is the universal abbreviation for Cyclomatic Complexity in code metrics; keeping it untranslated preserves recognition.
         "CC {cc}": "CC {cc}",
         "#": "#",
@@ -1612,8 +1698,12 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "vi": {
+        # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
+        "{label}: {size}": "{label}: {size}",
         # Curated passthrough: "CC" is the universal abbreviation for Cyclomatic Complexity in code metrics; keeping it untranslated preserves recognition.
         "CC {cc}": "CC {cc}",
+        # Curated passthrough: bullet glyph plus a single placeholder (dependency name) has no translatable words.
+        "• {dep}": "• {dep}",
         "#": "#",
         "Deps": "Phụ thuộc",
         "OWASP": "OWASP",

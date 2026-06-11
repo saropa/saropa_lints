@@ -799,9 +799,9 @@
     "deps": {
       "noTransitives": "Walang transitive dependency.",
       "showTransitives": "Ipakita ang mga transitive dependency.",
-      "tooltipDep": "• {dep} ang iyong katawan.",
+      "tooltipDep": "• {dep}",
       "tooltipDepShared": "• {dep} (pinagbahagi)",
-      "tooltipHeader": "{total} transitive deps deps ang mga ito ay",
+      "tooltipHeader": "{total} na transitive deps",
       "tooltipHeaderShared": "{total} na transitive deps ({shared} na shared)",
       "sharedBadgeTitle": "{count} ibinahagi sa iba pang mga pakete.",
       "sharedBadge": "Ibinahagi ang ibinahaging mga bahagi ng pagbabahagi.",

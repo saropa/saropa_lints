@@ -1,882 +1,1113 @@
 {
+  "packageDetail": {
+    "section": {
+      "version": "VERSION การออกแบบ",
+      "community": "สมาคม ชุมชน",
+      "dependencies": "การติดตามการใช้งาน",
+      "alerts": "การเตือน Alert",
+      "platforms": "แพลตฟอร์ม (Platforms) การใช้งาน",
+      "suggestions": "ข้อเสนอแนะ การให้คําแนะนํา",
+      "readmeImages": "README IMAGES ภาพถ่ายจากหนังสือ"
+    },
+    "header": {
+      "logoAlt": "{name} โลโก้",
+      "grade": "เกรด {grade}",
+      "licenseTitle": "ใบอนุญาต License",
+      "published": "ประกาศผล {date}"
+    },
+    "partialBanner": {
+      "partReadme": "README และโลโก้",
+      "partGap": "version-gap PRs และประเด็นต่างๆ",
+      "partReverseDeps": "การนับจํานวนการย้อนกลับความพึ่งพา",
+      "listTwo": "{first} และ {second}",
+      "listMany": "{head} และ {last}",
+      "message": "บางส่วนไม่สามารถโหลด: {list}.",
+      "retry": "Retry รีเทรนท์",
+      "retryTitle": "ลองเอาไปอีกทีที่พลาด"
+    },
+    "description": {
+      "readMore": "อ่านต่ออ่านต่อ"
+    },
+    "version": {
+      "constraint": "การจํากัด Constraint",
+      "latest": "ใหม่ล่าสุด Latest",
+      "prerelease": "การออกอากาศก่อนการปล่อย",
+      "published": "พิมพ์ ออกไป ประกาศ",
+      "update": "Update อัพเดทอัปเดต",
+      "blockedBy": "Blocked โดย บล็อกโดย",
+      "codeSize": "ขนาดโค้ด Code Size ขนาดรหัส",
+      "archiveSize": "ขนาดอาร์คิฟ ไซส์",
+      "bloat": "({rating}/10 บู๊บ)",
+      "onDisk": "ใน Disk On หน่วยงาน",
+      "upgrade": "อัพเกรดอัปเดรด Upgrade",
+      "viewChangelog": "View Changelog รายการเปลี่ยนแปลง"
+    },
+    "community": {
+      "stars": "ดาวดวงดาว ธารา",
+      "likes": "ชอบชอบ ความนิยม",
+      "report": "รายงาน การทําความเข้าใจ",
+      "openIssues": "Open Issues ปัญหาที่เปิด",
+      "openPrs": "เปิด PRs",
+      "activity": "กิจกรรม (90d)",
+      "activityValue": "{closed} เรื่องปิด, {merged} PRs รวมกัน",
+      "noActivity": "ไม่มีกิจกรรมล่าสุด",
+      "lastCommit": "การลงทุนครั้งสุดท้าย",
+      "pubPoints": "ปับ พบ จุด",
+      "verified": "(ตรวจสอบ)",
+      "publisher": "ผู้จัดพิมพ์ สํานักพิมป์",
+      "flagged": "({count} ตรา)",
+      "transitiveDeps": "ทรัพย์สินทองคําแปร (Transitive Deps)",
+      "footprintBreakdown": "{unique} เฉพาะ &middot; +{shared} แบ่ง = {total} รวม",
+      "footprintTooltip": "_{own} ของตัวเอง + ทรานซิทฟิคส์เฉพาะตัว {unique} + ทรอนซิทเฟคส์ร่วมกัน {shared}. การลบ dep นี้จะช่วยประหยัด {saved} (dep แบ่งปันอยู่ถูกลากโดยคนอื่น).",
+      "trueFootprint": "True Footprint รอยเท้าที่แท้จริง",
+      "packagesCount": "{count} แพ็กเกจ",
+      "dependents": "คนที่อยู่ภายใต้การดูแล"
+    },
+    "fileUsages": {
+      "commentedOut": "คําอ้างอิงที่แสดงความเห็น:",
+      "fileCount": "{count} ไฟล์ไฟล์",
+      "exportNoteTitle": "อย่างน้อยการใช้งานหนึ่งคือคําสั่งส่งออก",
+      "publicApiSurface": "พื้นผิว API สาธารณะ",
+      "header": "การใช้ไฟล์ ({label})",
+      "commentedReexportTitle": "การส่งออกใหม่ Commented-out",
+      "reexportTitle": "การส่งออกใหม่  ⁇  ส่วนหนึ่งของห้องสมุดนี้ API ประชาชน",
+      "reexportBadge": "การส่งออกใหม่ - re-export"
+    },
+    "alerts": {
+      "archived": "ARCHIVED  ⁇  Repository เป็นการอ่านเท่านั้น",
+      "knownIssue": "ปัญหาที่ทราบ: {reason}",
+      "unused": "ไม่ใช้งาน  ⁇  ไม่มีการตรวจพบสินค้านําเข้า",
+      "fix": "⁇  แก้ไข: {version}"
+    },
+    "versionGap": {
+      "versionTitle": "ช่องว่าง เวอร์ชั่น Gap Version",
+      "overrideTitle": "ยกเลิกการใช้งาน Gap Gap",
+      "noDates": "ไม่สามารถกําหนดวันที่ฉบับสําหรับแพ็กเกจนี้ได้",
+      "noItems": "ไม่พบ PR หรือปัญหาใด ๆ ระหว่างเวอร์ชั่นเหล่านี้",
+      "prsMerged": "PRs ผสมเข้าด้วยกัน",
+      "issuesClosed": "ประเด็นปิด ปิดประเด็น",
+      "searchLabel": "ค้นหา PRs และประเด็น",
+      "searchPlaceholder": "ค้นหา PRs และประเด็น ...",
+      "filterAria": "สกรองตามหมวดหมู่ filter ตามประเภท",
+      "filterAll": "ทั้งหมด ทุกอย่าง",
+      "filterUnreviewed": "ไม่ผ่านการรีวิว Unreviewed",
+      "filterPrs": "PRs สายการค้า",
+      "filterIssues": "ปัญหาประเด็น Issues",
+      "typePr": "PR PR PR ปรุงเทพมหานคร",
+      "typeIssue": "ฉบับประเด็น Issue",
+      "reviewReviewed": "รีวิวโดย Reviewed",
+      "reviewApplicable": "การใช้งาน Applicable",
+      "reviewNotApplicable": "N/A ไม่เห็น",
+      "notesPlaceholder": "หมายเหตุ ...",
+      "colType": "ประเภท Type แบบประเภทนี้นํา",
+      "colTitle": "ชื่อ หมวดหมู่",
+      "colAuthor": "ผู้เขียน Author Author บันทึก",
+      "colReview": "การตรวจสอบ Review Review",
+      "summaryFooter": "{triaged} ของ {total} คัดแยก | {applicable} ใช้ได้ | {notApplicable} ไม่มีข้อมูล | {unreviewed} เหลืออยู่ครับ",
+      "truncated": "ผลลัพธ์ถูกตัดทอนเป็นรายการ {limit}"
+    },
+    "platforms": {
+      "wasm": "WASM (วิสม) เป็นการใช้"
+    },
+    "images": {
+      "alt": "README รูปภาพของ Readme"
+    },
+    "links": {
+      "viewOnPubDev": "วิวที่ pub.dev",
+      "documentation": "การเอกสาร หลักฐาน",
+      "changelog": "Changelog รายการเปลี่ยนแปลง",
+      "versions": "เวอร์ชั่น รุ่น",
+      "repository": "รวมข้อมูล Repository",
+      "openIssues": "Open Issues ปัญหาที่เปิด",
+      "reportIssue": "รายงาน เรื่องประเด็น"
+    },
+    "a11y": {
+      "skipToDetails": "ลอยข้ามไปยังรายละเอียดของแพ็คเกจ"
+    },
+    "shortcuts": {
+      "showOverlay": "แสดงการ overlay ทางลัดนี้",
+      "closeOverlay": "ปิดการ overlay ทางลัดคีย์บอร์ด"
+    }
+  },
   "toolbar": {
-    "runAnalysis": "ดำเนินการวิเคราะห์",
-    "rescan": "สแกนอีกครั้ง",
-    "refresh": "รีเฟรช",
-    "copyJson": "คัดลอก JSON",
-    "saveReport": "บันทึกรายงาน",
-    "moreActions": "การดำเนินการเพิ่มเติม",
-    "clearAll": "เคลียร์ทั้งหมด",
-    "resetView": "รีเซ็ตมุมมอง"
+    "runAnalysis": "วิ่งวิเคราะห์ Run Analysis การวัด",
+    "rescan": "Rescan รีสแกน",
+    "refresh": "สะดวกสบาย Refresh",
+    "copyJson": "สําเนา JSON",
+    "saveReport": "Save Report การบันทึกรายงาน",
+    "moreActions": "การกระทํามากขึ้น กิจกรรมเพิ่มเติม",
+    "clearAll": "เคลียร์ทุกที่",
+    "resetView": "การดูการรีเซ็ต view reset"
   },
   "empty": {
-    "noFindingsTitle": "ไม่มีการค้นพบ",
-    "noFindingsMessage": "เรียกใช้การวิเคราะห์เพื่อสแกนพื้นที่ทำงาน",
-    "noFindingsCta": "ดำเนินการวิเคราะห์",
-    "noMatchTitle": "ไม่มีการแข่งขัน",
-    "noMatchMessage": "ไม่มีแถวที่ตรงกับตัวกรองปัจจุบัน",
-    "noMatchCta": "รีเซ็ตตัวกรอง",
-    "noProjectTitle": "ไม่มีพื้นที่ทำงานเปิดอยู่",
-    "noProjectMessage": "เปิดโปรเจ็กต์ Flutter หรือ Dart เพื่อดูผลการวิจัย",
-    "noProjectCta": "เปิดโฟลเดอร์",
-    "noDataTitle": "ยังไม่มีข้อมูล",
-    "noDataMessage": "เรียกใช้การสแกนเพื่อเติมแดชบอร์ดนี้",
-    "noDataCta": "ดำเนินการวิเคราะห์"
+    "noFindingsTitle": "ไม่มีการพบเห็นใด ๆ",
+    "noFindingsMessage": "วิ่งวิเคราะห์เพื่อสแกนพื้นที่ทํางาน",
+    "noFindingsCta": "วิ่งวิเคราะห์ Run Analysis การวัด",
+    "noMatchTitle": "ไม่มีการตรงกัน",
+    "noMatchMessage": "ไม่มีแถวใด ๆ ที่ตรงกับกรองปัจจุบัน",
+    "noMatchCta": "การตั้งค่าฟิลเตอร์ Reset",
+    "noProjectTitle": "ไม่มีพื้นที่ทํางานเปิด เปิด",
+    "noProjectMessage": "เปิดโครงการ Flutter หรือ Dart เพื่อดูผลการค้นพบ",
+    "noProjectCta": "เปิด folder โฟลเดอร์",
+    "noDataTitle": "ยังไม่มีข้อมูลเลยครับ",
+    "noDataMessage": "วิ่งสแกนเพื่อประกอบดัชบอร์ดนี้",
+    "noDataCta": "วิ่งวิเคราะห์ Run Analysis การวัด"
   },
   "loading": {
-    "thinking": "กำลังคิด...",
-    "preparing": "กำลังเตรียม...",
-    "checking": "กำลังตรวจสอบ...",
-    "fetching": "กำลังดึงข้อมูล...",
-    "working": "การทำงาน…",
-    "scanning": "กำลังสแกน…",
-    "cancel": "ยกเลิก",
-    "runningAnalysis": "กำลังวิเคราะห์...",
-    "analysisComplete": "การวิเคราะห์เสร็จสมบูรณ์",
-    "refreshingDashboard": "แดชบอร์ดรีเฟรชพร้อมข้อค้นพบล่าสุด",
-    "analysisStartedDetail": "การวิเคราะห์เริ่มต้นขึ้น กำลังรวบรวมการวินิจฉัย...",
-    "analysisFailedDetail": "การวิเคราะห์ล้มเหลว ตรวจสอบผลลัพธ์เพื่อดูรายละเอียด"
+    "thinking": "คิด...คิดอยู่",
+    "preparing": "เตรียม ... เตรียมนํา",
+    "checking": "เช็ค...เช็ก",
+    "fetching": "การเอา ...",
+    "working": "ทํางาน ...ทํางาน",
+    "scanning": "สแกน...สแกน",
+    "cancel": "ยกเลิก Cancel เลิก",
+    "runningAnalysis": "การวัดผลการวิเคราะห์ ...",
+    "analysisComplete": "การวิเคราะห์ ครบถ้วน วิเคราะห ลงทะเบียน",
+    "refreshingDashboard": "แดชบอร์ดที่สดใสด้วยผลการค้นพบล่าสุด",
+    "analysisStartedDetail": "การวิเคราะห์เริ่มต้น. รวบรวมการตรวจสอบ ...",
+    "analysisFailedDetail": "การวิเคราะห์ล้มเหลว. เช็ค Output เพื่อรายละเอียด"
   },
   "error": {
-    "genericTitle": "มีบางอย่างผิดพลาด",
-    "retry": "ลองอีกครั้ง",
-    "reload": "โหลดซ้ำ",
-    "copyDetails": "คัดลอกรายละเอียด",
-    "unreachable": "ไม่สามารถเข้าถึง {target}",
+    "genericTitle": "บางอย่างผิดพลาดไป",
+    "retry": "Retry รีเทรนท์",
+    "reload": "โหลดใหม่ รีโหลด",
+    "copyDetails": "สําเนารายละเอียดของ Copy Details",
+    "unreachable": "ไม่สามารถเข้าถึง {target} ได้",
     "partialSummary": "โหลด {item} {loaded} จาก {total} รายการ ล้มเหลว {failed} รายการ",
-    "partialRetry": "ลองอีกครั้งล้มเหลว"
+    "partialRetry": "การทดลองอีกครั้งล้มเหลว"
   },
   "offline": {
-    "banner": "ออฟไลน์ — เชื่อมต่อใหม่เพื่อรีเฟรช",
-    "cachedFooter": "กำลังแสดงข้อมูลที่แคชจาก {when}",
-    "reconnecting": "กำลังเชื่อมต่อใหม่..."
+    "banner": "Offline  ⁇  ติดต่อใหม่เพื่ออัพเดท",
+    "cachedFooter": "แสดงข้อมูลที่เก็บไว้ในแคชจาก {when}.",
+    "reconnecting": "การต่อสายใหม่ ..."
   },
   "stale": {
-    "statusPill": "การรันสำเร็จครั้งล่าสุด {when} — การรีเฟรชล้มเหลว"
+    "statusPill": "การทํางานที่สําเร็จล่าสุด {when}  ⁇  refresh ไม่ประสบความสําเร็จ"
   },
   "filter": {
-    "searchPlaceholder": "ค้นหา…",
-    "clearSearch": "ล้างการค้นหา",
-    "activeLabel": "ตัวกรองที่ใช้งานอยู่:",
-    "recentLabel": "ล่าสุด ▾",
-    "chipRemove": "ลบ"
+    "searchPlaceholder": "ค้นหา ...",
+    "clearSearch": "คลิก Clear Search เพื่อค้นหา",
+    "activeLabel": "การกรองที่ทํางาน: Active Filter",
+    "recentLabel": "ล่าสุด  ⁇",
+    "chipRemove": "Remove remove ถอดออก"
   },
   "a11y": {
-    "toggleFullWidth": "สลับเค้าโครงแบบเต็มความกว้าง",
-    "sortBy": "จัดเรียงตาม {column}",
-    "expandRow": "ขยายแถว",
-    "collapseRow": "ยุบแถว",
-    "selectAll": "เลือกแถวทั้งหมด",
-    "keyboardShortcuts": "แป้นพิมพ์ลัด",
-    "announcer": "มีการประกาศการอัปเดตสถานะตัวกรองและเรียงลำดับที่นี่"
+    "toggleFullWidth": "Toggle layout ความกว้างเต็ม",
+    "sortBy": "เรียงตาม {column}",
+    "expandRow": "ขยายแถว Expand Row (ขยายแถบ)",
+    "collapseRow": "รายการ Collapse Row (แถวที่ล้มละลาย)",
+    "selectAll": "เลือกทุกแถว",
+    "keyboardShortcuts": "คีย์บอร์ดทางลัด Keyboard Shortcuts",
+    "announcer": "อัพเดทการกรองและจัดเรียงสถานะถูกประกาศที่นี่"
   },
   "uiLanguage": {
     "pick": {
-      "title": "ภาษา UI ของ Saropa Lints",
-      "placeholder": "เลือกภาษาสำหรับแถบด้านข้างและแดชบอร์ด",
-      "auto": "อัตโนมัติ (ตามภาษาที่แสดง VS Code)"
+      "title": "Saropa Lints ภาษา UI ของ UI",
+      "placeholder": "เลือกภาษาสําหรับซิดบาร์และดัสช็อบ",
+      "auto": "Auto (ตามภาษาแสดงของ VS Code)"
     },
-    "reloadPrompt": "ตั้งค่าภาษาเป็น {locale} โหลดหน้าต่างซ้ำเพื่ออัปเดตแถบด้านข้างและป้ายกำกับคำสั่ง",
+    "reloadPrompt": "การตั้งภาษาเป็น {locale}. รีโลดหน้าต่างเพื่ออัพเดทซิดบาร์และเลเบลคําสั่ง",
     "reloadNow": "โหลดใหม่ตอนนี้",
-    "reloadLater": "ภายหลัง"
+    "reloadLater": "ภายหลัง ต่อไป ล่าสุด"
   },
   "brand": {
     "prefix": "Saropa "
   },
   "findingsDash": {
-    "pageTitle": "แดชบอร์ดการค้นพบของ Saropa",
-    "documentTitle": "แดชบอร์ดการค้นพบของ Saropa",
-    "skipToFindings": "ข้ามไปยังข้อค้นพบ",
-    "secondaryAsideLabel": "การวินิจฉัยทุติยภูมิ",
+    "pageTitle": "Saropa ผลการค้นพบ แดชบอร์ด",
+    "documentTitle": "Saropa ผลการค้นพบ แดชบอร์ด",
+    "skipToFindings": "ลอยข้ามไปยังการค้นพบ",
+    "secondaryAsideLabel": "การวินิจฉัยรอง (Secondary Diagnostics)",
     "hero": {
-      "productTitle": "แดชบอร์ดผลการสืบค้น",
-      "gaugeTitle": "คะแนนสุขภาพ {score} (เกรด {grade}) ข้อผิดพลาดมีน้ำหนักมากที่สุด",
+      "productTitle": "ผลการค้นพบ แดชบอร์ด",
+      "gaugeTitle": "คะแนนสุขภาพ {score} (เกรด {grade}). ความผิดพลาดหนักที่สุด",
       "gaugePending": "…"
     },
     "time": {
-      "justNow": "แค่ตอนนี้",
+      "justNow": "เพิ่งตอนนี้",
       "minutesAgo": "{min} นาทีที่แล้ว",
       "hoursAgo": "{hr} ชม. ที่แล้ว",
       "daysAgo": "{day} วันที่แล้ว"
     },
     "status": {
-      "lastRunPrefix": "วิ่งครั้งสุดท้าย",
-      "lastRunUnknown": "ไม่ทราบการดำเนินการครั้งล่าสุด",
-      "noTimestampTitle": "ไม่มีการประทับเวลาในการละเมิด json",
-      "findingsAfterFilterTitle": "ผลการสืบค้นทั้งหมดหลังจากตัวกรองกฎที่ถูกปิดใช้งาน",
+      "lastRunPrefix": "รอบสุดท้าย ล่าสุด",
+      "lastRunUnknown": "การทํางานล่าสุด ไม่ทราบ",
+      "noTimestampTitle": "ไม่มีการประทับเวลาบน violations.json",
+      "findingsAfterFilterTitle": "ผลการค้นพบทั้งหมดหลังจากกรอง disabled-rule filter",
       "findingOne": "{count} รายการที่พบ",
       "findingOther": "{count} รายการที่พบ",
-      "todoHackTitle": "พบเครื่องหมาย TODO และ HACK ในพื้นที่ทำงาน",
-      "driftOnTitle": "เชื่อมต่อที่ปรึกษาดริฟท์: {label}",
-      "driftOnPill": "ล่องลอยไป · {count}",
-      "driftOfflineTitle": "เปิดใช้งาน Drift Advisor แล้ว แต่ไม่พบเซิร์ฟเวอร์",
-      "driftOfflinePill": "ดริฟท์ออฟไลน์",
-      "enabledRulesTitle": "กฎที่เปิดใช้งานในระดับปัจจุบัน",
+      "todoHackTitle": "ตรา TODO และ HACK ที่พบในพื้นที่ทํางาน",
+      "driftOnTitle": "Drift Advisor เชื่อมต่อ: {label} _ สายการบิน",
+      "driftOnPill": "ล่องลอยไปตาม · {count}",
+      "driftOfflineTitle": "Drift Advisor ได้รับการเปิดใช้งาน แต่ไม่พบเซอร์เวอร์",
+      "driftOfflinePill": "Drift ออฟไลน์ ไม่ติดต่อ",
+      "enabledRulesTitle": "กฎที่เปิดใช้ในระดับปัจจุบัน",
       "rulesCount": "{count} กฎ"
     },
     "groupBy": {
-      "severity": "ความรุนแรง",
-      "file": "ไฟล์",
-      "impact": "ผลกระทบ",
-      "rule": "กฎ",
+      "severity": "ความรุนแรง Severity",
+      "file": "File รายการ",
+      "impact": "ผลการตรวจสอบ Impact",
+      "rule": "กฎหมาย สังกัด",
       "owasp": "OWASP",
-      "ruleType": "ประเภทกฎ",
-      "ruleStatus": "สถานะกฎ"
+      "ruleType": "รูปแบบกฎ กฎประเภท",
+      "ruleStatus": "รูปแบบ Rule สถานะ"
     },
     "seg": {
-      "toggleSeverityTitle": "สลับความรุนแรง {v}",
-      "toggleImpactTitle": "สลับผลกระทบ {v}"
+      "toggleSeverityTitle": "Toggle {v} ความรุนแรง",
+      "toggleImpactTitle": "Toggle {v} การกระแทกที่เกิดจากแรงชนิด"
     },
     "kpi": {
-      "visibleLabel": "การค้นพบที่มองเห็นได้",
-      "allMatched": "ตรงกันทั้งหมด",
-      "ofTotal": "จากทั้งหมด {total}",
-      "clearFiltersTitle": "คลิกเพื่อล้างตัวกรองทั้งหมด",
-      "errorsLabel": "ข้อผิดพลาด",
-      "errorsSubFix": "ต้องแก้ไข",
-      "errorsSubClear": "ไม่มี — ชัดเจน",
-      "errorsTitle": "กรองการค้นพบข้อผิดพลาด (ต้องแก้ไข - ใช้งานไม่ได้ / จะขัดข้อง / สามารถหาประโยชน์ได้)",
-      "warningsLabel": "คำเตือน",
-      "warningsSubBad": "อาจล้มเหลวหรือดูแย่",
-      "warningsSubClear": "ไม่มี — ชัดเจน",
-      "warningsTitle": "กรองผลการสืบค้นไปยังคำเตือน (อาจล้มเหลวหรือดูแย่)",
-      "infoLabel": "ข้อมูล",
-      "infoSub": "FYI — สไตล์/ข้อเสนอแนะ",
-      "infoSubNone": "ไม่มี",
-      "infoTitle": "กรองสิ่งที่ค้นพบเป็นข้อมูล (FYI — สไตล์และคำแนะนำ)",
+      "visibleLabel": "ค้นพบที่เห็นได้ชัด",
+      "allMatched": "ทุกอย่างตรงกันหมดครับ",
+      "ofTotal": "ของ {total} รวมทั้งหมด",
+      "clearFiltersTitle": "คลิกเพื่อลบทุก filter",
+      "errorsLabel": "ความผิดพลาด Errors ข้อผิดพลาด",
+      "errorsSubFix": "ต้องแก้ไขต้องแก้",
+      "errorsSubClear": "ไม่มี  ⁇  ชัดเจน",
+      "errorsTitle": "การกรองการพบความผิดพลาด (ต้องแก้ไข  ⁇  ทุบ / จะชน / ใช้ประโยชน์)",
+      "warningsLabel": "คําเตือน การตักเตือน",
+      "warningsSubBad": "อาจล้มเหลว หรือดูไม่ดี",
+      "warningsSubClear": "ไม่มี  ⁇  ชัดเจน",
+      "warningsTitle": "การกรองการค้นพบเพื่อเตือน (อาจล้มเหลวหรือดูไม่ดี)",
+      "infoLabel": "ข้อมูลข้อมูล ข้อมูล",
+      "infoSub": "FYI  ⁇  สไตล์ / ข้อเสนอแนะ",
+      "infoSubNone": "ไม่มีไม่มี ไม่มี",
+      "infoTitle": "การกรองผลการค้นพบเพื่อให้มีข้อมูล (สําหรับความรู้ของคุณ:  ⁇  สไตล์และข้อเสนอแนะ)",
       "filesLabel": "ไฟล์ที่ได้รับผลกระทบ",
-      "filesSubAcross": "ทั่วทั้งการส่งออก",
-      "filesSubNone": "ไม่มีไฟล์ที่ได้รับผลกระทบ",
-      "filesTitle": "ไฟล์ที่แตกต่างกันซึ่งมีส่วนช่วยในการค้นพบอย่างน้อยหนึ่งครั้ง",
-      "topRuleLabel": "กฎยอดนิยม",
-      "topRuleTitle": "กรองสิ่งที่ค้นพบเพื่อควบคุม {name}"
+      "filesSubAcross": "ทั่วทั้งการส่งออก การส่งออก",
+      "filesSubNone": "ไม่มีไฟล์ใด ๆ ที่ได้รับผลกระทบ",
+      "filesTitle": "ไฟล์ที่แตกต่างกัน ที่มีส่วนร่วมอย่างน้อย 1 การค้นพบ",
+      "topRuleLabel": "กฎสูงสุดของกฎ",
+      "topRuleTitle": "การกรองผลการค้นพบเพื่อใช้กฎ {name}"
     },
     "toolbar": {
-      "ariaFiltersActions": "ตัวกรองและการดำเนินการ",
-      "groupByFieldTitle": "จัดกลุ่มการค้นพบตามมิติข้อมูลที่เลือก",
-      "groupByLabel": "จัดกลุ่มตาม",
-      "textFilterTitle": "กรองการค้นหาตามเส้นทางไฟล์ กฎ หรือข้อความ",
-      "textFilterPlaceholder": "กรองตามไฟล์ กฎ หรือข้อความ...",
-      "textFilterAria": "ตัวกรองข้อความ",
-      "clearTextFilterTitle": "ล้างตัวกรองข้อความ",
-      "clearTextFilterAria": "ล้างตัวกรองข้อความ",
-      "recentFiltersTitle": "ตัวกรองล่าสุด",
-      "clearRecentTitle": "ล้างตัวกรองล่าสุดทั้งหมด",
-      "clearRecentButton": "ชัดเจน",
-      "recentFiltersListAria": "ตัวกรองล่าสุด",
-      "runAnalysisTitle": "เรียกใช้การวิเคราะห์ Saropa Lints",
-      "refreshViolationsTitle": "โหลดการละเมิด json จากดิสก์",
-      "severityGroupAria": "ตัวกรองความรุนแรง",
-      "severityLabel": "ความรุนแรง",
-      "impactGroupAria": "ตัวกรองผลกระทบ",
-      "impactLabel": "ผลกระทบ",
-      "moreSummary": "มากกว่า",
+      "ariaFiltersActions": "ฟิลเตอร์และการกระทํา",
+      "groupByFieldTitle": "ผลการค้นพบของกลุ่มตามมิติที่เลือก",
+      "groupByLabel": "กลุ่มโดยกลุ่ม โดย Group",
+      "textFilterTitle": "การกรองข้อมูลตามทางเดินไฟล์ กฎ หรือข้อความ",
+      "textFilterPlaceholder": "กรองโดยไฟล์, กฎ หรือข้อความ...",
+      "textFilterAria": "การกรองข้อความ Text filter",
+      "clearTextFilterTitle": "คลิก Clear Text Filter เพื่อดูดข้อความ",
+      "clearTextFilterAria": "คลิก Clear Text Filter เพื่อดูดข้อความ",
+      "recentFiltersTitle": "Recent filter สูตรกรองล่าสุด",
+      "clearRecentTitle": "ทําความสะอาดทุกกรองที่ผ่านมา",
+      "clearRecentButton": "Clear สะอาด",
+      "recentFiltersListAria": "Recent filter สูตรกรองล่าสุด",
+      "runAnalysisTitle": "วิ่ง Saropa Lints การวิเคราะห์การวิเคาระ",
+      "refreshViolationsTitle": "รีโหลด violations.json จากไดสก์",
+      "severityGroupAria": "ฟิลเตอร์ความรุนแรง (Severity Filter)",
+      "severityLabel": "ความรุนแรง Severity",
+      "impactGroupAria": "สูตรกรองกระแทก Impact Filter",
+      "impactLabel": "ผลการตรวจสอบ Impact",
+      "moreSummary": "More More มากยิ่งขึ้น",
       "moreChevron": "▾",
-      "copyJsonTitle": "คัดลอกการละเมิดที่กรองแล้วเป็น JSON ({count})",
-      "saveReportTitle": "บันทึกการละเมิดที่กรองแล้วเป็น JSON ไปยังรายงาน/YYYYMMDD/"
+      "copyJsonTitle": "สําเนาความผิดที่กรองไว้เป็น JSON ({count})",
+      "saveReportTitle": "เก็บการละเมิดที่กรองไว้เป็น JSON ไปยังรายงาน / YYYYMMDD /"
     },
     "chip": {
-      "contains": "มี \"{q}\"",
+      "contains": "มี \"{q}\" ในตัว",
       "severityOff": "ความรุนแรง ≠ {v}",
       "impactOff": "ผลกระทบ ≠ {v}",
-      "resetAllTitle": "รีเซ็ตตัวกรองทั้งหมด",
-      "removeFilterAria": "ลบตัวกรอง"
+      "resetAllTitle": "กําหนดการรีเซ็ตทุกฟิลเตอร์",
+      "removeFilterAria": "ถอดกรอง filter ออก"
     },
     "menuPalette": {
-      "help": "ช่วย",
-      "groupBy": "จัดกลุ่มตาม...",
-      "textFilter": "ตัวกรองข้อความ...",
-      "severityImpact": "ตัวกรองความรุนแรง...",
-      "hideRules": "ซ่อนกฎ...",
-      "ruleMetadata": "ข้อมูลเมตาของกฎ",
-      "clearFilters": "ล้างตัวกรอง",
-      "clearSuppressions": "การปราบปรามที่ชัดเจน",
-      "clearFileFocus": "ล้างโฟกัสไฟล์",
-      "matchActiveEditor": "จับคู่ตัวแก้ไขที่ใช้งานอยู่",
-      "copyTreeJson": "คัดลอกแผนผัง JSON",
-      "refreshExtension": "รีเฟรชส่วนขยาย",
-      "openPackageDashboard": "เปิดแดชบอร์ดแพ็คเกจ",
-      "openCodeHealth": "เปิดรหัสสุขภาพ",
-      "openLintsConfig": "เปิดการกำหนดค่า Lints",
-      "reloadFromDisk": "โหลดซ้ำจากดิสก์",
-      "reloadFromDiskTitle": "แสดงผลแดชบอร์ดอีกครั้งจากการละเมิด json ครั้งล่าสุดโดยไม่ต้องเรียกใช้ตัววิเคราะห์อีกครั้ง",
-      "reEnableDisabledRules": "เปิดใช้งานกฎที่ปิดใช้งานอีกครั้ง...",
-      "reEnableDisabledRulesTitle": "เปิดกฎที่เลือกอย่างรวดเร็วที่ปิดใช้งานอยู่ใน analysis_options_custom.yaml และเปิดใช้งานกฎที่เลือกอีกครั้ง",
-      "reEnableNoneTitle": "ไม่มีกฎที่ถูกปิดใช้งานในขณะนี้",
-      "reEnableNoneMessage": "ขณะนี้ไม่มีกฎใดถูกปิดใช้งานผ่าน analysis_options_custom.yaml",
-      "reEnableQuickPickTitle": "เปิดใช้งานกฎที่ปิดใช้งานอีกครั้ง",
-      "reEnableQuickPickPlaceholder": "เลือกกฎอย่างน้อย 1 ข้อเพื่อเปิดใช้งานอีกครั้ง",
-      "menuGroupExport": "ส่งออก",
-      "menuGroupFilter": "กรองและโฟกัส",
-      "menuGroupOpen": "เปิดแดชบอร์ด",
-      "menuGroupSystem": "ระบบ"
+      "help": "ช่วยเหลือ สนับสนุน",
+      "groupBy": "กลุ่มโดย ... โดย...",
+      "textFilter": "การกรองข้อความ ... สารวัด",
+      "severityImpact": "ฟิลเตอร์ความรุนแรง ...",
+      "hideRules": "ปิดกติกา...",
+      "ruleMetadata": "กฎ Metadata ของข้อกําหนดการ",
+      "clearFilters": "กรอง Clear Filters (กรองความสะอาด)",
+      "clearSuppressions": "การยับยั้งที่ชัดเจน",
+      "clearFileFocus": "Clear file focus ไฟล์โฟกัสชัดเจน",
+      "matchActiveEditor": "คู่มือการแข่งขัน Active Editor",
+      "copyTreeJson": "ต้นไม้สําเนา JSON",
+      "refreshExtension": "ขยาย Refresh Extension การอัพเดทใหม่",
+      "openPackageDashboard": "เปิด แดชบอร์ด Package ดัชเบิร์น",
+      "openCodeHealth": "Open Code สุขภาพสุขภาพ",
+      "openLintsConfig": "เปิด Lints การตั้งค่า",
+      "reloadFromDisk": "โหลดใหม่จากแผ่นดิสก์",
+      "reloadFromDiskTitle": "ทําการแสดงภาพ dashboard จาก violations.json ที่ผ่านมา โดยไม่ต้องเปิดตัวเครื่องวิเคราะห์ใหม่",
+      "reEnableDisabledRules": "Re-enable disabled rules... กฎการใช้งานที่เสียไป",
+      "reEnableDisabledRulesTitle": "เปิดการเลือกรวดเร็วของกฎที่ปัจจุบันถูกปิดใน analysis_options_custom.yaml และเปิดให้ใช้ใหม่กับกฏที่ถูกเลือก",
+      "reEnableNoneTitle": "ไม่มีกฎใด ๆ ปัจจุบันพิการ",
+      "reEnableNoneMessage": "ปัจจุบันไม่มีกฎใด ๆ ที่ถูกปิดการใช้งานผ่าน analysis_options_custom.yaml.",
+      "reEnableQuickPickTitle": "Re-enable disabled rules กฎกติกาที่ถูกปิดการใช้งาน",
+      "reEnableQuickPickPlaceholder": "เลือกกฎหนึ่งหรือมากกว่ากฏที่จะเปิดใช้งานใหม่",
+      "menuGroupExport": "การส่งออก Export ส่งออก",
+      "menuGroupFilter": "การกรอง & โฟกัส",
+      "menuGroupOpen": "เปิด Dashboard แล้วเปิด",
+      "menuGroupSystem": "ระบบ System System ระบบ"
     },
     "progress": {
-      "runningLabel": "กำลังวิเคราะห์...",
-      "runningMeta": "การดำเนินการนี้อาจใช้เวลาสักครู่สำหรับโครงการขนาดใหญ่"
+      "runningLabel": "การวัดผลการวิเคราะห์ ...",
+      "runningMeta": "นี่อาจใช้เวลาสักครู่ในโครงการใหญ่ ๆ"
     },
     "topRules": {
-      "sectionAria": "กฎยอดนิยมตามจำนวน",
-      "hideTitle": "ซ่อนสำหรับฉันเท่านั้น — ระดับพื้นที่ทำงาน สามารถย้อนกลับได้ผ่านการล้างการระงับ",
-      "hideButton": "ซ่อน",
-      "disableTitle": "ปิดใช้งานสำหรับทั้งโปรเจ็กต์ — เขียน analysis_options_custom.yaml และดำเนินการวิเคราะห์อีกครั้ง",
-      "disableButton": "ปิดการใช้งาน",
-      "workspaceOnlyShort": "พื้นที่ทำงานเท่านั้น",
-      "projectConfigShort": "การกำหนดค่าโครงการ (เขียน analysis_options_custom.yaml)",
-      "topRulesOne": "กฎ {count} ยอดนิยม",
-      "topRulesOther": "กฎยอดนิยม {count}",
+      "sectionAria": "กฎเกณฑ์สูงสุดตามจํานวน",
+      "hideTitle": "ซ่อนสําหรับฉันเพียงระดับพื้นที่ทํางาน, สามารถกลับได้ผ่าน Clear Suppressions",
+      "hideButton": "ซ่อนซ่อน หนี",
+      "disableTitle": "Disable for the whole project  ⁇  เขียน analysis_options_custom.yaml และทํางานการวิเคราะห์อีกครั้ง",
+      "disableButton": "Disable ปิดการใช้งาน",
+      "workspaceOnlyShort": "เพียง workspace เท่านั้น",
+      "projectConfigShort": "โครงการ config (เขียน analysis_options_custom.yaml)",
+      "topRulesOne": "สูงสุด {count} กฎการปกครอง",
+      "topRulesOther": "กฎ {count} ที่ดีที่สุด",
       "colRank": "#",
-      "colRule": "กฎ",
-      "colCount": "นับ",
-      "colSeverity": "ความรุนแรง",
-      "colActionsAria": "การกระทำของแถว",
+      "colRule": "กฎหมาย สังกัด",
+      "colCount": "นับนับ นับ นิยม",
+      "colSeverity": "ความรุนแรง Severity",
+      "colActionsAria": "การกระทํา Row actions กิจกรรมแถว",
       "filesAffected": "ไฟล์ที่ได้รับผลกระทบ ({count})"
     },
     "findings": {
-      "sectionAria": "ผลการวิจัย",
-      "expandAll": "ขยายทั้งหมด",
-      "collapseAll": "ยุบทั้งหมด",
+      "sectionAria": "ผลการค้นพบ รายงาน",
+      "expandAll": "ขยายทั้งหมด Expand all",
+      "collapseAll": "พังหมดไปหมด",
       "bulkSelected": "เลือกแล้ว {count} รายการ",
-      "bulkCopy": "คัดลอกที่เลือกเป็น JSON",
-      "selectAllTitle": "เลือกการค้นพบที่มองเห็นได้ทั้งหมด",
-      "selectAllAria": "เลือกการค้นพบที่มองเห็นได้ทั้งหมด",
-      "colSeverity": "ความรุนแรง",
-      "colRule": "กฎ",
-      "colMessage": "ข้อความ",
-      "colLine": "เส้น",
-      "colActionsAria": "การกระทำของแถว",
+      "bulkCopy": "สําเนาที่เลือกเป็น JSON",
+      "selectAllTitle": "เลือกผลการค้นพบที่เห็นได้ทั้งหมด",
+      "selectAllAria": "เลือกผลการค้นพบที่เห็นได้ทั้งหมด",
+      "colSeverity": "ความรุนแรง Severity",
+      "colRule": "กฎหมาย สังกัด",
+      "colMessage": "ข้อความข้อความ Message",
+      "colLine": "สาย เส้น เส้น",
+      "colActionsAria": "การกระทํา Row actions กิจกรรมแถว",
       "selectRowAria": "เลือกแถวการค้นหานี้",
-      "copyRowTitle": "คัดลอกการค้นพบนี้เป็น JSON",
+      "copyRowTitle": "สําเนาการค้นพบนี้เป็น JSON",
       "metaShown": "แสดง {filtered} รายการ",
       "metaAfterDisable": "{total} หลังตัวกรองกฎที่ปิดใช้งาน",
-      "metaSourceCap": "แหล่งที่มาต่อยอดที่ {max} เพื่อประสิทธิภาพ",
-      "metaGroupedBy": "จัดกลุ่มตาม {mode}",
-      "overflowNote": "รายการแหล่งที่มาถูกตัดทอนที่ {max} เพื่อประสิทธิภาพในการเรนเดอร์",
-      "runAgain": "เรียกใช้การวิเคราะห์อีกครั้ง",
-      "emptyNoViolations": "ไม่มีการละเมิดในการวิเคราะห์ครั้งล่าสุด",
-      "emptyNoMatch": "ไม่มีการละเมิดที่ตรงกับตัวกรองปัจจุบัน",
-      "emptyHintNoData": "เรียกใช้การวิเคราะห์เพื่อเติมข้อมูล `reports/.saropa_lints/violations.json` จากนั้นรีเฟรช",
-      "emptyHintFilters": "ปรับตัวกรองหรือทำการวิเคราะห์อีกครั้งเพื่อดูผลการวิจัย",
-      "reRunAnalysis": "ดำเนินการวิเคราะห์อีกครั้ง",
-      "resetFilters": "รีเซ็ตตัวกรอง",
+      "metaSourceCap": "แหล่งที่กําหนดขั้นต่ําอยู่ที่ {max} สําหรับการทํางาน",
+      "metaGroupedBy": "รวมเป็นกลุ่มโดย {mode}",
+      "overflowNote": "รายการแหล่งที่ตัดขั้นตอนใน {max} สําหรับผลิตภัณฑ์ในการแสดงภาพ.",
+      "runAgain": "วิ่งการวิเคราะห์อีกครั้ง",
+      "emptyNoViolations": "ไม่มีการละเมิดใน run การวิเคราะห์ล่าสุด.",
+      "emptyNoMatch": "ไม่มีการละเมิดใด ๆ ที่ตรงกับกรองปัจจุบัน",
+      "emptyHintNoData": "วิ่งการวิเคราะห์เพื่อเติมเต็ม ≪รายงาน≫/.saropa_lints/violations.json`, แล้ว refresh.",
+      "emptyHintFilters": "ปรับกรองหรือดําเนินการวิเคราะห์อีกครั้งเพื่อดูผลการค้นพบ",
+      "reRunAnalysis": "การวิเคราะห์ Re-run Analysis (การทดลองใหม่)",
+      "resetFilters": "การตั้งค่าฟิลเตอร์ Reset",
       "linePrefix": "L{line}"
     },
     "charts": {
-      "sectionAria": "แผนภูมิผสม",
-      "heading": "ผสม",
-      "metaClickSlice": "คลิกชิ้นเพื่อกรอง",
-      "severityMix": "ความรุนแรงผสม",
-      "impactMix": "ผลกระทบผสม",
-      "filterBarTitle": "กรองเป็น {key} เท่านั้น",
-      "donutTotal": "ทั้งหมด"
+      "sectionAria": "Mix chart ผสมการแสดงผล",
+      "heading": "Mix Mix ผสมกัน",
+      "metaClickSlice": "คลิกชิ้นส่วนเพื่อกรอง",
+      "severityMix": "การผสมความรุนแรง",
+      "impactMix": "ผสมผสานผลสัมฤทธิ์ Impact Mix",
+      "filterBarTitle": "การกรองที่ {key} เท่านั้น",
+      "donutTotal": "รายการรวมทั้งสิ้น"
     },
     "todoHack": {
-      "sectionAria": "สิ่งที่ต้องทำและแฮ็ก",
-      "headingDisabled": "สิ่งที่ต้องทำและแฮ็ก",
-      "metaDisabled": "สแกนถูกปิดใช้งาน",
-      "scanOff": "การสแกนพื้นที่ทำงานปิดอยู่ — เปิดใช้งานเพื่อแสดงเครื่องหมายจากไฟล์โครงการ",
-      "enableScan": "เปิดใช้งานการสแกน",
-      "heading": "สิ่งที่ต้องทำและแฮ็ก",
+      "sectionAria": "ทอดอส และ ฮัคซ์",
+      "headingDisabled": "TODOs & HACKS โทโดส และ ฮักส์",
+      "metaDisabled": "scan disabled การสแกนพิการ",
+      "scanOff": "การสแกนพื้นที่ทํางานถูกปิด  ⁇  สามารถที่จะใช้เครื่องหมายผิวจากไฟล์โครงการ",
+      "enableScan": "Enable scan enable การสแกนเปิดใช้งาน",
+      "heading": "TODOs & HACKS โทโดส และ ฮักส์",
       "subsectionNone": "{title}: ไม่มีในช่วงการสแกน",
-      "capNote": "สแกนไฟล์สูงสุดสูงสุด เพิ่ม `saropaLints.todosAndHacks.maxFilesToScan` เพื่อความครอบคลุมทั้งหมด",
-      "notePill": "บันทึก",
-      "todosLabel": "สิ่งที่ต้องทำ",
-      "hacksLabel": "แฮ็ก"
+      "capNote": "สแกนตีแคปไฟล์สูงสุด; เพิ่ม ≪saropaLints.todosAndHacks.maxFilesToScan≫ เพื่อการครอบคลุมอย่างเต็มที่",
+      "notePill": "หมายเหตุ ข้อความข้อตกลง",
+      "todosLabel": "TODOs ทอดอส",
+      "hacksLabel": "HACKS ตะกอก"
     },
     "drift": {
-      "sectionAria": "ที่ปรึกษาดริฟท์",
-      "headingOff": "ที่ปรึกษาดริฟท์",
-      "metaOff": "ปิดการรวมระบบ",
-      "enableBlurb": "เปิดใช้งานการรวม Drift Advisor เพื่อแสดงคำแนะนำฐานข้อมูลที่นี่",
-      "enable": "เปิดใช้งาน",
-      "headingNoServer": "ที่ปรึกษาดริฟท์",
-      "metaNoServer": "ไม่มีเซิร์ฟเวอร์",
-      "noServerBlurb": "ไม่พบเซิร์ฟเวอร์ Drift Advisor บนพอร์ตที่กำหนดค่า",
-      "retry": "ลองอีกครั้ง",
-      "headingConnected": "ที่ปรึกษาดริฟท์",
-      "metaConnected": "เชื่อมต่อแล้ว",
-      "noIssues": "เชื่อมต่อกับ {label} แล้ว — ไม่มีปัญหาในปัจจุบัน",
-      "refresh": "รีเฟรช",
-      "openBrowser": "เปิดในเบราว์เซอร์",
-      "headingIssues": "ที่ปรึกษาดริฟท์",
-      "disable": "ปิดการใช้งานที่ปรึกษาดริฟท์"
+      "sectionAria": "Drift Advisor ที่ปรึกษาด้านการลอย",
+      "headingOff": "Drift Advisor ที่ปรึกษาด้านการลอย",
+      "metaOff": "การรวมตัว off integration ออกจากการบูรณาการ",
+      "enableBlurb": "เปิดให้ Drift Advisor รวมกับข้อมูลบนพื้นผิวจาก database ที่นี่",
+      "enable": "Enable enable เปิดให้ใช้ได้",
+      "headingNoServer": "Drift Advisor ที่ปรึกษาด้านการลอย",
+      "metaNoServer": "ไม่มีเซอร์เวอร์ ไม่มีเซิร์ฟเวอร์",
+      "noServerBlurb": "ไม่พบ Drift Advisor server บนพอร์ตที่กําหนดไว้",
+      "retry": "Retry รีเทรนท์",
+      "headingConnected": "Drift Advisor ที่ปรึกษาด้านการลอย",
+      "metaConnected": "สะดวกต่อเนื่อง",
+      "noIssues": "เชื่อมต่อกับ {label}  ⁇  ไม่มีปัญหาปัจจุบัน.",
+      "refresh": "สะดวกสบาย Refresh",
+      "openBrowser": "เปิดใน browser ใน Browser",
+      "headingIssues": "Drift Advisor ที่ปรึกษาด้านการลอย",
+      "disable": "Disable Drift Advisor แนะนําการเคลื่อนไหว"
     },
     "suppressions": {
-      "sectionAria": "การปราบปราม",
-      "headingExport": "การปราบปราม (ส่งออก)",
-      "viewHidesHeading": "ปัญหามุมมองซ่อนอยู่",
-      "viewHidesMetaActive": "คล่องแคล่ว",
-      "viewHidesMetaNone": "ไม่มี",
-      "noneInExport": "ไม่มีการระงับตัววิเคราะห์ในการส่งออก `violations.json` ในปัจจุบัน เรียกใช้การวิเคราะห์หลังจากแก้ไขการละเว้นหรือเส้นพื้นฐานที่จะเติมข้อมูล",
-      "totalRow": "รวม — ล้างตัวกรองและเปิดผลการสืบค้น",
-      "byRule": "ตามกฎ ({count})",
-      "byFile": "ตามไฟล์ ({count})",
-      "noEntries": "ไม่มีรายการ",
-      "nothingHidden": "ไม่มีสิ่งใดถูกซ่อนจากรายการปัญหาในพื้นที่ทำงานนี้ ใช้การดำเนินการตามบริบทแบบต้นไม้เพื่อซ่อนโฟลเดอร์ ไฟล์ หรือกฎ พวกเขายังคงอยู่ในสถานะพื้นที่ทำงาน",
+      "sectionAria": "การกดความอ่อนแอ ความรู้สึก",
+      "headingExport": "การลบ (การส่งออก)",
+      "viewHidesHeading": "Issues view ซ่อนการดู",
+      "viewHidesMetaActive": "การทํางานที่มีความสามารถ Active",
+      "viewHidesMetaNone": "ไม่มีไม่มี ไม่มี",
+      "noneInExport": "ไม่มีการกดตัววิเคราะห์ในปัจจุบัน `violations.json` ส่งออก. วิ่งการวิเคราะห์หลังจากแก้ไขไม่สนใจหรือเบสไลน์ที่จะประกอบ.",
+      "totalRow": "รวม  ⁇  ไฟล์ครีเออร์ใส และ เปิด พบ",
+      "byRule": "โดยกฎ ({count})",
+      "byFile": "โดยไฟล์ ({count})",
+      "noEntries": "ไม่มีรายการใดๆ",
+      "nothingHidden": "ไม่มีอะไรที่ซ่อนจากรายการ Issues ในพื้นที่ทํางานนี้ ใช้ tree context actions เพื่อซ่อนโฟลเดอร์ ไฟล์ หรือ กฎต่างๆ ซึ่งมันจะยังคงอยู่ในสภาวะ workspace",
       "folderPattern": "{count} โฟลเดอร์",
       "filePattern": "{count} รูปแบบไฟล์",
       "ruleGlobal": "{count} กฎทั่วโลก",
       "perFileRules": "{count} ไฟล์ที่มีการซ่อนกฎต่อไฟล์",
       "severityHides": "การซ่อนความรุนแรง {count} รายการ",
       "impactHides": "การซ่อนผลกระทบ {count} รายการ",
-      "activeHides": "การซ่อนที่ใช้งานอยู่: {counts}",
-      "viewHidesFooter": "การซ่อนเหล่านี้จะย่อขนาดรายการปัญหา / แดชบอร์ดเท่านั้น พวกเขาไม่ได้เขียนถึง `violations.json`",
-      "clearViewHides": "ล้างการซ่อนมุมมองทั้งหมด",
+      "activeHides": "ผิวหนังที่ทํางาน: {counts}.",
+      "viewHidesFooter": "การปกปิดเหล่านี้จะทําให้รายการ Issues / dashboard หนาลงเท่านั้น; มันไม่ได้เขียนให้กับ `violations.json`.",
+      "clearViewHides": "Clear All View ซ่อนการมองเห็น",
       "foldersSample": "โฟลเดอร์ (ตัวอย่าง)",
       "filesSample": "ไฟล์ / globs (ตัวอย่าง)",
       "rulesSample": "กฎ (ตัวอย่าง)",
-      "perFileRulesSample": "กฎต่อไฟล์ (ตัวอย่าง)",
-      "unknownKind": "ไม่ทราบ"
+      "perFileRulesSample": "กฎระเบียบรายกรณี (ตัวอย่าง)",
+      "unknownKind": "ไม่ทราบ ไม่ทราบ"
     },
     "script": {
-      "analysisRunning": "กำลังวิเคราะห์...",
-      "analysisComplete": "การวิเคราะห์เสร็จสมบูรณ์",
-      "metaRunning": "การดำเนินการนี้อาจใช้เวลาสักครู่สำหรับโครงการขนาดใหญ่",
-      "metaDone": "แดชบอร์ดรีเฟรชพร้อมข้อค้นพบล่าสุด",
-      "announceSearch": "ค้นหา {q}",
+      "analysisRunning": "การวัดผลการวิเคราะห์ ...",
+      "analysisComplete": "การวิเคราะห์ ครบถ้วน วิเคราะห ลงทะเบียน",
+      "metaRunning": "นี่อาจใช้เวลาสักครู่ในโครงการใหญ่ ๆ",
+      "metaDone": "แดชบอร์ดที่สดใสด้วยผลการค้นพบล่าสุด",
+      "announceSearch": "การค้นหา {q}",
       "announceSeverities": "ความรุนแรง {n} ระดับ",
       "announceImpacts": "ผลกระทบ {n} รายการ",
-      "announceCleared": "ล้างตัวกรองทั้งหมดแล้ว",
-      "announceFiltersPrefix": "ตัวกรอง:",
+      "announceCleared": "ทุกกรองที่ผ่านการเคลียร์",
+      "announceFiltersPrefix": "สกรอง:",
       "bulkSelected": "เลือกแล้ว {n} รายการ",
-      "analysisStartedDetail": "การวิเคราะห์เริ่มต้นขึ้น กำลังรวบรวมการวินิจฉัย...",
-      "announceStarted": "การวิเคราะห์เริ่มต้นขึ้น",
-      "announceComplete": "การวิเคราะห์เสร็จสมบูรณ์",
+      "analysisStartedDetail": "การวิเคราะห์เริ่มต้น. รวบรวมการตรวจสอบ ...",
+      "announceStarted": "การวิเคราะห์เริ่มต้นการวิเคาระ",
+      "announceComplete": "การวิเคราะห์ ครบถ้วน วิเคราะห ลงทะเบียน",
       "announceFailed": "การวิเคราะห์ล้มเหลว",
-      "analysisFailedDetail": "การวิเคราะห์ล้มเหลว ตรวจสอบผลลัพธ์เพื่อดูรายละเอียด",
-      "removeRecentAria": "ลบ",
-      "removeRecentTitle": "ลบ",
+      "analysisFailedDetail": "การวิเคราะห์ล้มเหลว. เช็ค Output เพื่อรายละเอียด",
+      "removeRecentAria": "Remove remove ถอดออก",
+      "removeRecentTitle": "Remove remove ถอดออก",
       "bulkSelectedTpl": "เลือกแล้ว {n} รายการ"
     },
     "emptyState": {
-      "hintAfterMessage": "เรียกใช้การวิเคราะห์ Saropa Lints เพื่อสร้างการละเมิด json จากนั้นใช้รีเฟรชที่นี่หรือเปิดแดชบอร์ดนี้อีกครั้ง",
-      "refreshDisk": "รีเฟรชจากดิสก์"
+      "hintAfterMessage": "วิ่ง Saropa Lints การวิเคราะห์เพื่อสร้าง violations.json, จากนั้นใช้ Refresh ที่นี่หรือเปิด ዳชบอร์ดนี้อีกครั้ง.",
+      "refreshDisk": "อัพเดทใหม่จากดิสก์"
     },
     "shortcuts": {
-      "focusTextFilter": "โฟกัสตัวกรองข้อความ",
-      "clearTextFilter": "ล้างตัวกรองข้อความที่โฟกัส",
-      "activateKpi": "เปิดใช้งานการ์ด KPI ที่เน้นหรือแถบแผนภูมิ",
-      "activateKpiSpace": "เปิดใช้งานการ์ด KPI ที่เน้นหรือแถบแผนภูมิ",
-      "showOverlay": "แสดงการซ้อนทับทางลัดนี้"
+      "focusTextFilter": "สนใจกรองข้อความ",
+      "clearTextFilter": "ทําความสะอาดกรองข้อความที่เน้นชัด",
+      "activateKpi": "การ์ด KPI หรือ Chart Bar ที่มีจุดมุ่งเน้นให้ทํางาน",
+      "activateKpiSpace": "การ์ด KPI หรือ Chart Bar ที่มีจุดมุ่งเน้นให้ทํางาน",
+      "showOverlay": "แสดงการ overlay ทางลัดนี้"
     },
-    "unknownAnalyzerKind": "ไม่ทราบ",
+    "unknownAnalyzerKind": "ไม่ทราบ ไม่ทราบ",
     "supplementary": {
-      "otherAnalyzerOn": "+{count} ผลการวิจัยอื่นๆ ของเครื่องวิเคราะห์",
-      "otherAnalyzerPromo": "+? ผลการวิเคราะห์อื่นๆ — แสดง",
-      "analyzerTodosOn": "+{count} เครื่องวิเคราะห์ TODO",
-      "analyzerTodosPromo": "+? TODO วิเคราะห์ — แสดง",
-      "scannerPromo": "เปิดใช้งานเครื่องสแกน TODO/HACK",
-      "tooltipLive": "ถ่ายทอดสดจากแผง VS Code Problems อัปเดตเมื่อการวิเคราะห์เสร็จสิ้น คลิกเพื่อซ่อน",
-      "tooltipScanner": "เครื่องสแกนระบบไฟล์ Saropa — นับเครื่องหมาย TODO/HACK ที่เปิดอยู่ในแหล่งที่มา",
-      "tooltipPromoClickToOn": "คลิกเพื่อเปิดใช้งาน"
+      "otherAnalyzerOn": "+{count} ผลการวิเคราะห์ของเครื่องวัดอื่น ๆ",
+      "otherAnalyzerPromo": "+? รายการผลการวิเคราะห์อื่น ๆ  ⁇  แสดง",
+      "analyzerTodosOn": "+{count} เครื่องวิเคราะห์ TODOs",
+      "analyzerTodosPromo": "+? analyzer TODOs  ⁇  แสดงการวิเคราะห์",
+      "scannerPromo": "เปิดให้ใช้งาน TODO / HACK สแกนเนอร์",
+      "tooltipLive": "สายสดจาก VS Code ปัญหาแพนเนล. อัพเดทเมื่อการวิเคราะห์เสร็จสิ้น. คลิกเพื่อซ่อน",
+      "tooltipScanner": "Saropa เครื่องสแกนระบบไฟล์  ⁇  นับเครื่องหมาย TODO/HACK ที่เปิดในแหล่ง",
+      "tooltipPromoClickToOn": "คลิกเพื่อเปิดใช้งาน enable"
     }
   },
   "triageDash": {
-    "showInIssues": "แสดงในประเด็น",
-    "disableRules": "ปิดการใช้งานกฎ",
-    "enableRules": "เปิดใช้งานกฎ",
-    "issues": "ปัญหา",
-    "off": "ปิด",
-    "on": "บน",
-    "colRule": "กฎ",
-    "colIssues": "ปัญหา",
+    "showInIssues": "แสดงในประเด็นต่างๆ",
+    "disableRules": "Disable rules กฎการปิดใช้งาน",
+    "enableRules": "กฎหมาย Enable (กฎให้เป็นไป)",
+    "issues": "ปัญหาประเด็น Issues",
+    "off": "Off Off Off ออกไปออก ไป",
+    "on": "ในขณะที่ในขณะที่",
+    "colRule": "กฎหมาย สังกัด",
+    "colIssues": "ปัญหาประเด็น Issues",
     "zeroIssueRules": "{count} กฎที่ไม่มีปัญหา — เปิดใช้งานอัตโนมัติในระดับชั้น.",
     "disabledOverrides": "{count} กฎถูกปิดใช้งานโดยการลบล้างใน `analysis_options_custom.yaml`.",
-    "summaryRuleTriage": "กฎเกณฑ์การคัดเลือก",
-    "hintNoViolations": "ยังไม่มี `reports/.saropa_lints/violations.json` เรียกใช้การวิเคราะห์ จากนั้นรีเฟรชแท็บนี้",
-    "hintUnreadable": "ไม่มีการส่งออกการละเมิดที่สามารถอ่านได้ เรียกใช้การวิเคราะห์ Saropa Lints ก่อน",
-    "hintStale": "ข้อมูล Triage อาจล้าสมัย (การส่งออกคือ {age} เก่า) ดำเนินการวิเคราะห์ซ้ำสำหรับกลุ่มปัจจุบัน",
-    "hintNoPerRule": "การส่งออกนี้ไม่มีปัญหาต่อกฎ วิเคราะห์อีกครั้งด้วยปลั๊กอิน Saropa Lints ปัจจุบัน",
-    "hintBuildFailed": "ไม่สามารถสร้าง triage จากการส่งออกนี้ได้ ทำการวิเคราะห์ใหม่",
-    "summaryVolume": "การคัดแยกกฎ (ปริมาณ / ต้องแก้ไข / โวหาร)",
-    "hintSameAsTree": "การจัดกลุ่มเดียวกันกับแผนผังแถบกิจกรรม Triage: กรองปัญหา หรือปิดใช้งาน/เปิดใช้งานกฎใน `analysis_options_custom.yaml` กลุ่มใหญ่อาจขอคำยืนยัน"
+    "summaryRuleTriage": "กฎการคัดเลือกกรอบ",
+    "hintNoViolations": "ยังไม่มีรายงานใด ๆ / .saropa_lints/violations.json อยู่นี่ รีบวินิจฉัย แล้ว Refresh แท็บนี้",
+    "hintUnreadable": "ไม่มีการละเมิดที่อ่านได้ ส่งออก.ส่งออก. วิ่ง Saropa Lints การวิเคราะห์แรก.",
+    "hintStale": "ข้อมูลการคัดเลือกอาจล้าสมัย (ส่งออกเป็น {age} เก่า). การวิเคราะห์การทํางานซ้ําสําหรับกลุ่มปัจจุบัน.",
+    "hintNoPerRule": "การส่งออกนี้ไม่มีการนับจํานวนประกาศตามกฎหมาย วิเคราะห์ใหม่ด้วยโปรแกรม Saropa Lints ปัจจุบัน.",
+    "hintBuildFailed": "ไม่สามารถสร้างการคัดเลือกจากสินค้าส่งออกนี้ได้ ทําการวิเคราะห์ใหม่ๆ",
+    "summaryVolume": "การจัดลําดับกติกา (ปริมาณ / ต้องแก้ไข / สไตลิสติก)",
+    "hintSameAsTree": "การจัดกลุ่มเดียวกันกับต้นไม้การทํางานของ Triage: ปกรอง Issues หรือปิด /เปิดกฎใน `analysis_options_custom.yaml゙. กลุ่มใหญ่อาจขอรับรอง"
   },
   "kbdOverlay": {
-    "toggleTitle": "แสดงแป้นพิมพ์ลัด (?)",
-    "toggleAria": "แสดงแป้นพิมพ์ลัด",
-    "dialogTitle": "แป้นพิมพ์ลัด",
-    "closeAria": "ปิดแป้นพิมพ์ลัด",
-    "footer": "กด Esc หรือคลิกด้านนอกเพื่อปิด"
+    "toggleTitle": "แสดงทางลัดคีย์บอร์ด (?)",
+    "toggleAria": "แสดงทางลัดคีย์บอร์ด",
+    "dialogTitle": "คีย์บอร์ดทางลัด Keyboard Shortcuts",
+    "closeAria": "ปิดทางลัดคีย์บอร์ด",
+    "footer": "กด Esc หรือคลิกนอกเพื่อปิด"
   },
   "wideReport": {
-    "openWorkspaceFirst": "เปิดโฟลเดอร์พื้นที่ทำงานก่อน",
-    "noReportYet": "ยังไม่มีรายงานการละเมิด เรียกใช้การวิเคราะห์ Saropa Lints ก่อน",
-    "clipboardCopyFailed": "ไม่สามารถคัดลอกไปยังคลิปบอร์ดได้",
-    "copiedViolationsJson": "คัดลอกการละเมิด {count} รายการเป็น JSON",
-    "copiedOneViolationJson": "คัดลอกการละเมิด 1 รายการเป็น JSON",
-    "driftNotConnected": "ไม่ได้เชื่อมต่อเซิร์ฟเวอร์ Drift Advisor",
-    "copiedBulkFindings": "คัดลอกผลการสืบค้นที่เลือก {count} รายการเป็น JSON",
-    "noMatchingFindingsCopy": "ไม่มีผลการสืบค้นที่ตรงกันที่จะคัดลอก",
+    "openWorkspaceFirst": "เปิดโฟลเดอร์ workspace ก่อน",
+    "noReportYet": "ยังไม่มีรายงานการละเมิดใด ๆ วิ่ง Saropa Lints การวิเคราะห์แรก.",
+    "clipboardCopyFailed": "ไม่สามารถสําเนาไปยัง clipboard.",
+    "copiedViolationsJson": "สําเนา {count} การละเมิด (((s) เป็น JSON.",
+    "copiedOneViolationJson": "สําเนา 1 การละเมิดเป็น JSON.",
+    "driftNotConnected": "Drift Advisor เซอร์เวอร์ไม่เชื่อมต่อ",
+    "copiedBulkFindings": "สําเนา {count} การค้นหาที่เลือก (((s) เป็น JSON.",
+    "noMatchingFindingsCopy": "ไม่มีการพบที่ตรงกันที่จะสําเนา.",
     "couldNotOpenFile": "ไม่สามารถเปิดไฟล์: {path}",
-    "saveReportNoWorkspace": "เปิดโฟลเดอร์พื้นที่ทำงานก่อนที่จะบันทึกรายงาน",
-    "savedFindings": "บันทึกการค้นหา {count}: {path}",
-    "couldNotSaveReportJson": "ไม่สามารถบันทึกรายงาน JSON"
+    "saveReportNoWorkspace": "เปิดโฟลเดอร์ workspace ก่อนที่จะบันทึกรายงาน",
+    "savedFindings": "การค้นพบ {count} ที่บันทึกไว้: {path}",
+    "couldNotSaveReportJson": "ไม่สามารถบันทึกรายงาน JSON ได้"
   },
   "packageDashboard": {
-    "documentTitle": "แดชบอร์ดแพ็คเกจ Saropa",
-    "heroTitle": "แดชบอร์ดแพ็คเกจ Saropa",
+    "documentTitle": "Saropa แดชบอร์ดแพคเกจ",
+    "heroTitle": "Saropa แดชบอร์ดแพคเกจ",
     "status": {
       "packagesCount": "{count} แพ็กเกจ",
       "packagesBreakdown": "ทางตรง {direct}, ทางอ้อม {transitive}",
-      "gradeLine": "เกรด {grade} · {avg}/100",
+      "gradeLine": "เกรด {grade} · {avg}/100 สูงสุด",
       "flaggedCount": "ตั้งค่าสถานะ {count} รายการ",
-      "flaggedTitle": "ละทิ้งหรือสิ้นชีวิต",
-      "lastScanLabel": "สแกน {when} แล้ว",
-      "lastScanTitle": "เมื่อดึงข้อมูลแดชบอร์ดนี้ — {timestamp} คลิกสแกนซ้ำเพื่อรีเฟรช",
-      "lastScanUnknown": "สแกนแล้ว (ไม่ทราบเวลา)",
-      "lastScanUnknownTitle": "การสแกนนี้ทำงานก่อนที่แดชบอร์ดจะติดตามการประทับเวลา คลิกสแกนซ้ำเพื่อรีเฟรช"
+      "flaggedTitle": "ทิ้งทิ้งหรือสิ้นอายุการใช้งาน",
+      "lastScanLabel": "สแกน {when} ได้",
+      "lastScanTitle": "เมื่อข้อมูลดัชบอร์ดนี้ถูกนํามา  ⁇  {timestamp}. คลิก Rescan เพื่ออัพเดทใหม่",
+      "lastScanUnknown": "สแกน (เวลาไม่ทราบ)",
+      "lastScanUnknownTitle": "การสแกนนี้ทํางานก่อนหน้าที่ดัชบอร์ดจะติดตามตราเวลา. คลิก Rescan เพื่ออัพเดทใหม่"
     },
     "time": {
-      "justNow": "แค่ตอนนี้",
+      "justNow": "เพิ่งตอนนี้",
       "minutesAgo": "{min} นาทีที่แล้ว",
       "hoursAgo": "{hr} ชม. ที่แล้ว",
       "daysAgo": "{day} วันที่แล้ว"
     },
     "scanning": {
-      "heading": "กำลังสแกนแพ็คเกจ",
-      "body1": "Saropa กำลังดึงข้อมูลเมตาของ pub.dev กิจกรรม GitHub และกราฟการขึ้นต่อกันสำหรับการขึ้นต่อกันโดยตรงทุกครั้งในโปรเจ็กต์นี้",
-      "body2": "หน้านี้จะรีเฟรชโดยอัตโนมัติเมื่อการสแกนเสร็จสิ้น คุณสามารถยกเลิกได้จากการแจ้งเตือนความคืบหน้าที่ด้านล่างขวา",
-      "versionStamp": "แดชบอร์ดแพ็คเกจ Saropa v{version}"
+      "heading": "แพ็คเกจสแกนเนอร์",
+      "body1": "Saropa กําลังหา metadata ของ pub.dev กิจกรรมของ GitHub และกราฟความพึ่งพาสําหรับทุกๆ ความพึ่งพากันโดยตรงในโครงการนี้",
+      "body2": "หน้านี้จะอัพเดทใหม่โดยอัตโนมัติเมื่อการสแกนเสร็จสิ้น คุณสามารถยกเลิกได้จากแจ้งความก้าวหน้าที่ด้านล่างขวา",
+      "versionStamp": "Saropa แดชบอร์ดแพคเกจ v{version}"
     },
-    "gaugeTitle": "เกรดแพ็คเกจโครงการ: {grade}",
+    "gaugeTitle": "กลุ่มงานโครงการ เกรด: {grade}",
     "summary": {
-      "packages": "แพ็คเกจ",
-      "projectGrade": "เกรดแพ็คเกจโครงการ",
+      "packages": "แพ็คเกจ Packages สินค้า",
+      "projectGrade": "Project Package Grade ระดับของแพ็คเกจโครงการ",
       "totalSize": "ขนาดรวม*",
-      "gradeTooltip": "เกรดโครงการ {avgGrade}\nคะแนนเฉลี่ย: {avgScore}/100\nแพ็คเกจ: {pkgCount}\nก:{a} B:{b} ค:{c} จ:{e} ฉ:{f}",
-      "vibrantTitle": "มีชีวิตชีวา",
-      "stableTitle": "มั่นคง",
-      "outdatedTitle": "ล้าสมัย",
-      "abandonedTitle": "ถูกทอดทิ้ง",
-      "eolTitle": "จุดจบของชีวิต",
-      "updates": "อัพเดท",
-      "unused": "ไม่ได้ใช้",
-      "singleUse": "ใช้ครั้งเดียว",
-      "vulnerable": "เปราะบาง",
-      "overrides": "แทนที่",
-      "caveatLine1": "*ขนาดโค้ดที่แสดง (lib + เนื้อหาที่ประกาศ) จะกลับไปเป็นขนาดไฟล์เก็บถาวร pub.dev เมื่อขนาดโค้ดไม่พร้อมใช้งาน ไม่รวม dev_dependencies (build_runner, lints, saropa_lints ฯลฯ) — โดยจะไม่จัดส่งไปยัง APK / IPA / web Bundle ขนาดแอปจริงจะเล็กลงหลังจากการเขย่าต้นไม้",
-      "caveatLine2": "เกณฑ์กิจกรรม: 90d = เก่า, 180d = อยู่เฉยๆ (กระทำ + ไทม์ไลน์การเผยแพร่)"
+      "gradeTooltip": "เกรดโครงการ {avgGrade}\nคะแนนเฉลี่ย: {avgScore}/100\nแพ็คเกจ: {pkgCount}\nA:{a} B:{b} C:{c} E:{e} F:{f}",
+      "vibrantTitle": "สร้างความสดชื่น",
+      "stableTitle": "สถานะ ราคาคงที่",
+      "outdatedTitle": "อายุเกินกว่าเดิม Outdated",
+      "abandonedTitle": "ทิ้งทิ้ง ถูกทอดทิ้ง",
+      "eolTitle": "การสิ้นสุดชีวิตของผู้ป่วย",
+      "updates": "อัพเดทอัปเดต Updates การปรับปรุง",
+      "unused": "ไม่ใช้งาน ยังไม่ถูกนํามาใช้",
+      "singleUse": "การใช้งานครั้งเดียว ใช้เพียงครั้งเดียว",
+      "vulnerable": "แรงเปราะบาง (Vulnerable)",
+      "overrides": "การยกเลิกการใช้งาน Overrides",
+      "caveatLine1": "* ขนาดโค้ดที่แสดง (lib + declared assets) โดยจะกลับไปที่ขนาดอาร์คิฟ pub.dev เมื่อไม่มีรุ่นโค้ตให้เลือก ไม่รวม dev_dependencies (build_runner, lints, saropa_lints ฯลฯ) พวกเขาไม่เคยส่งไปยัง APK / IPA / web bundle. ขนาด app ที่แท้จริงจะเล็กกว่าหลังจากการสั่นต้นไม้",
+      "caveatLine2": "ขีดขั้นตอนการดําเนินงาน: 90d = หมดอายุ, 180d = หงาย (กําหนดเวลาในการทํา + การปล่อย)."
     },
     "breakdown": {
-      "title": "ทำไมต้องเกรด {grade}? — เฉลี่ย {avgScore}/100 จากแพ็คเกจ {pkgCount}",
-      "hint": "คลิกเพื่อขยาย",
-      "distributionHeading": "การกระจาย",
-      "signalsHeading": "สัญญาณความเสี่ยงลากคะแนนลง",
-      "signalFlagged": "{count} ถูกตั้งค่าสถานะ (ละทิ้ง / สิ้นสุดอายุการใช้งาน)",
-      "signalVulnerable": "{count} ที่มีช่องโหว่ที่ทราบ",
-      "signalUpdates": "{count} มีการอัปเดต",
-      "bottomHeading": "แพ็คเกจที่มีคะแนนต่ำสุด",
-      "thresholdsHeading": "คะแนนเทียบเคียงกับเกรดอย่างไร",
-      "thresholdA": "70+ — มีชีวิตชีวา: ได้รับการดูแลอย่างแข็งขัน เผยแพร่เมื่อเร็วๆ นี้",
-      "thresholdB": "40–69 — เสถียร: ยังคงรักษาไว้แต่ชะลอตัว",
-      "thresholdC": "20–39 — ล้าสมัย: มีช่องว่างยาวระหว่างการเปิดตัว",
-      "thresholdE": "ต่ำกว่า 20 — ถูกทอดทิ้ง: สัญญาณของการไม่ใช้งาน",
-      "thresholdF": "ยกเลิกหรือเก็บถาวรบน pub.dev (ไม่ได้ใช้คะแนน)",
-      "filterTooltip": "กรองตารางแพ็กเกจให้เหลือเพียงหมวดหมู่นี้",
-      "jumpTooltip": "ข้ามไปที่ {name} ในตารางแพ็คเกจ"
+      "title": "ทําไมคะแนน {grade}?  ⁇  {avgScore}/100 ค่าเฉลี่ยในแพ็คเกจของ {pkgCount}",
+      "hint": "คลิกเพื่อขยาย ขยาย",
+      "distributionHeading": "การกระจายสินค้า Distribution",
+      "signalsHeading": "สัญญาณความเสี่ยง ลากคะแนนลง",
+      "signalFlagged": "{count} ติดเครื่องหมาย (ถูกทิ้ง / หมดอายุ)",
+      "signalVulnerable": "{count} กับความเปราะบางที่ทราบกัน",
+      "signalUpdates": "{count} มีอัพเดทที่พร้อมใช้งาน",
+      "bottomHeading": "แพ็คเกจที่มีคะแนนต่ําสุด",
+      "thresholdsHeading": "วิธีการที่คะแนนจะโยงไปยังเกรด",
+      "thresholdA": "70+  ⁇  มีชีวิตชีวา: รักษารักษาอย่างเป็นกิจกรรม, พิมพ์ล่าสุด",
+      "thresholdB": "40 ⁇ 69  ⁇  สถานะ: ยังคงรักษาอยู่ แต่ช้าลง",
+      "thresholdC": "20 ⁇ 39  ⁇  เก่าแก่: มีช่องว่างที่นานระหว่างการปล่อย",
+      "thresholdE": "ต่ํากว่า 20  ⁇  ทิ้งทิ้ง: สัญญาณของการไม่ทํางาน",
+      "thresholdF": "หยุดการดําเนินงานหรือเก็บอาร์คิฟในวันที่ pub.dev (คะแนนไม่ใช้)",
+      "filterTooltip": "สกรองตารางแพ็กเกจให้เพียงประเภทนี้",
+      "jumpTooltip": "กระโดดไปยัง {name} ในตารางแพ็คเก็จ"
     },
     "network": {
-      "summary": "เครือข่ายการพึ่งพา"
+      "summary": "เครือข่ายความพึ่งพา (Dependency Network)"
     },
     "sections": {
-      "sizeDistribution": "การกระจายขนาด",
-      "sizeDistributionCaption": "ไม่รวม dev_dependencies — โดยจะไม่จัดส่งไปยัง APK / IPA / web Bundle",
-      "filters": "ตัวกรอง",
-      "packages": "แพ็คเกจ"
+      "sizeDistribution": "ขนาด การกระจายตัวขนาด",
+      "sizeDistributionCaption": "ไม่รวม dev_dependencies  ⁇  พวกเขาไม่เคยส่งไปยัง APK / IPA / web bundle.",
+      "filters": "ฟิลเตอร์ สกรอง",
+      "packages": "แพ็คเกจ Packages สินค้า"
     },
     "toolbar": {
       "openPubspecTitle": "เปิด pubspec.yaml",
       "openPubspecLabel": "pubspec.yaml",
-      "copyAllTitle": "คัดลอกรายงาน JSON (ทุกแถว + รายละเอียด)",
-      "copyAllLabel": "สำเนา",
-      "saveAllTitle": "บันทึกรายงาน JSON ไปยังรายงาน/YYYYMMDD/...",
-      "saveAllLabel": "บันทึก",
-      "resetViewTitle": "รีเซ็ตตัวกรอง จัดเรียง และสถานะมุมมองที่บันทึกไว้",
-      "resetViewLabel": "รีเซ็ตมุมมอง",
-      "rescanTitle": "สแกนแพ็คเกจอีกครั้ง — ล้างแคช pub.dev และดึงข้อมูลเวอร์ชันอีกครั้ง",
-      "rescanLabel": "สแกนอีกครั้ง",
-      "openOtherTitle": "เปิดโปรเจ็กต์อื่นของ pubspec.yaml ในหน้าต่างใหม่สำหรับการสแกน Vibrancy",
-      "openOtherLabel": "เปิดโครงการ...",
-      "footprintGroupAria": "โหมดรอยเท้าคอลัมน์ขนาด",
-      "footprintGroupTitle": "สิ่งที่คอลัมน์ขนาดแสดง: ขนาดโค้ดของตัวเองเท่านั้น บวกสกรรมกริยาที่ไม่ซ้ำกัน (ต้นทุนหากลบออก) หรือบวกสกรรมกริยาทั้งหมด (สูงสุดทางทฤษฎี) ย้อนกลับไปที่ขนาดไฟล์เก็บถาวรเมื่อขนาดโค้ดไม่พร้อมใช้งาน",
-      "footprintLabel": "รอยเท้า:",
-      "footprintOwnTitle": "ขนาดรหัสของตัวเองเท่านั้น (lib + สินทรัพย์ที่ประกาศ) กลับไปเป็นขนาดไฟล์เก็บถาวร pub.dev เมื่อไม่พร้อมใช้งาน",
-      "footprintOwn": "เป็นเจ้าของ",
-      "footprintUniqueTitle": "ขนาดของตัวเอง + สกรรมกริยาที่ใช้โดย dep นี้เท่านั้น (ประหยัดถ้าคุณลบออก)",
-      "footprintUnique": "+ ไม่ซ้ำใคร",
-      "footprintTotalTitle": "ขนาดของตัวเอง + สกรรมกริยาทั้งหมด รวมถึงขนาดที่ใช้ร่วมกันกับ deps อื่น ๆ",
-      "footprintTotal": "+ ทั้งหมด",
-      "searchLabel": "ค้นหาแพ็คเกจ",
-      "searchPlaceholder": "ค้นหาแพ็คเกจ...",
-      "clearSearchTitle": "ล้างการค้นหา",
-      "clearSearchAria": "ล้างการค้นหา",
-      "ageFilterTitle": "กรองตามอายุการเผยแพร่",
+      "copyAllTitle": "สําเนารายงาน JSON (ทุกแถว + รายละเอียด)",
+      "copyAllLabel": "สําเนาสําเนา Copy",
+      "saveAllTitle": "เก็บรายงาน JSON เป็น รายงาน / YYYYMMDD / ...",
+      "saveAllLabel": "Save Save การรักษา",
+      "saveUpgradeTitle": "เก็บรายงานของแพ็คเกจเท่านั้น พร้อมกับการอัพเดทที่พร้อมสําหรับรายงาน/YYY YMMDD/...",
+      "saveUpgradeLabel": "เก็บรายงานการอัพเกรด Save Upgrade Report",
+      "resetViewTitle": "กําหนดฟิลเตอร์ใหม่, เรียงลําดับ และบันทึกภาพแสดงสถานะ",
+      "resetViewLabel": "การดูการรีเซ็ต view reset",
+      "rescanTitle": "Rescan แพคเกจ  ⁇  ทําความสะอาด pub.dev cache และนํารุ่นมาใหม่",
+      "rescanLabel": "Rescan รีสแกน",
+      "openOtherTitle": "เปิดโครงการของ pubspec.yaml อีกรายในหน้าต่างใหม่สําหรับสแกน Vibrancy",
+      "openOtherLabel": "โครงการเปิด ...",
+      "footprintGroupAria": "ขนาด คอลัมน์ โหมดรอยเท้า",
+      "footprintGroupTitle": "สิ่งที่คอลัมน์ Size แสดง: ขนาดโค้ดของตัวเองเท่านั้น บวกค่าผ่านเฉพาะ (ราคาถ้าถอดออก) หรือบวกค่าข้ามทั้งหมด (เทอริตี้สูงสุด). กลับไปที่ขนาดอาร์คิฟเมื่อไม่สามารถใช้งาน Code Size ได้",
+      "footprintLabel": "รอยเท้า: Footprint",
+      "footprintOwnTitle": "ขนาดโค้ดของตัวเองเท่านั้น (lib + declared assets) กลับมาเป็นขนาด pub.dev เมื่อไม่มีข้อมูล",
+      "footprintOwn": "Own Own เจ้าของตัวเอง",
+      "footprintUniqueTitle": "ขนาดของตัวเอง + ทรานซิทฟี ที่ใช้โดยสํานักงานนี้เท่านั้น (ประหยัดถ้าคุณลบมัน)",
+      "footprintUnique": "+ เอกลักษณ์พิเศษ",
+      "footprintTotalTitle": "ขนาดของตนเอง + ทรัพยากรผ่านทั้งหมด รวมถึงทรัพย์สินที่แบ่งปันกับหน่วยงานอื่น ๆ",
+      "footprintTotal": "+ ทั้งหมด + ทุกคน",
+      "searchLabel": "แพ็คเกจค้นหา ค้นหา",
+      "searchPlaceholder": "ค้นหาแพ็คเกจ ...",
+      "clearSearchTitle": "คลิก Clear Search เพื่อค้นหา",
+      "clearSearchAria": "คลิก Clear Search เพื่อค้นหา",
+      "ageFilterTitle": "สกรองตามอายุการตีพิมพ์ ปรับปรุง",
       "publishedAgeLabel": "อายุที่ตีพิมพ์",
-      "ageMaxAll": "ทั้งหมด",
-      "presetFilterTitle": "ใช้การตั้งค่าตัวกรองล่วงหน้าอย่างรวดเร็ว",
-      "presetLabel": "ที่ตั้งไว้ล่วงหน้า",
-      "presetNone": "ไม่มี",
-      "presetModernization": "ความทันสมัย",
-      "presetRiskHotspots": "จุดเสี่ยง",
-      "presetCleanup": "ผู้สมัครทำความสะอาด",
-      "presetDirectOnly": "โดยตรงเท่านั้น",
-      "devToggleTitle": "รวมการพึ่งพาการพัฒนาในตารางและผลรวม",
-      "includeDev": "รวมผู้พัฒนา",
-      "activeFiltersLabel": "ตัวกรองที่ใช้งานอยู่:",
-      "clearAllFilters": "เคลียร์ทั้งหมด"
+      "ageMaxAll": "ทั้งหมด ทุกอย่าง",
+      "presetFilterTitle": "ใช้การตั้งค่ากรองที่กําหนดไว apply quick filter presets",
+      "presetLabel": "Preset ปรับปรุงก่อน",
+      "presetNone": "ไม่มี ไม่ มี",
+      "presetModernization": "การปรับปรุงใหม่ (Modernization)",
+      "presetRiskHotspots": "จุดร้อนของความเสี่ยง (risk hotspots)",
+      "presetCleanup": "คัดเลือกผู้สมัครทําความสะอาด",
+      "presetDirectOnly": "โดยตรงเท่านั้น Direct only",
+      "devToggleTitle": "รวมการพึ่งพา dev ในตารางและยอดรวม",
+      "includeDev": "รวม dev dev",
+      "activeFiltersLabel": "การกรองที่ทํางาน: Active Filter",
+      "clearAllFilters": "เคลียร์ทุกที่"
     },
     "columns": {
       "name": {
-        "label": "บรรจุุภัณฑ์",
-        "tooltip": "ชื่อแพ็คเกจ — คลิกเพื่อเปิดรายการ pubspec.yaml"
+        "label": "แพ็คเกจ Package สินค้า",
+        "tooltip": "ชื่อแพ็คเกจ  ⁇  คลิกเพื่อเปิด pubspec.yaml ข้อความ"
       },
       "version": {
-        "label": "เวอร์ชัน",
-        "tooltip": "เวอร์ชันที่ติดตั้งจาก pubspec.lock"
+        "label": "Version ฉบับฉบับ",
+        "tooltip": "เวอร์ชั่นที่ติดตั้งจาก pubspec.lock"
       },
       "score": {
-        "label": "หมวดหมู่",
-        "tooltip": "การจำแนกความสั่นสะเทือนและคะแนนสุขภาพ (0–10)"
+        "label": "ประเภท Category หมวดหมู่",
+        "tooltip": "การจัดลําดับความสดชื่นและคะแนนสุขภาพ (0 ⁇ 10)"
       },
       "published": {
-        "label": "ที่ตีพิมพ์",
-        "tooltip": "วันที่เผยแพร่เวอร์ชันที่ติดตั้งไปยัง pub.dev"
+        "label": "พิมพ์ ออกไป ประกาศ",
+        "tooltip": "วันที่เวอร์ชั่นติดตั้งถูกตีพิมพ์ เป็น pub.dev"
       },
       "activity": {
-        "label": "กิจกรรม",
-        "tooltip": "ระดับกิจกรรมการเขียนโค้ดและการเผยแพร่จากการกระทำ + การเผยแพร่ความใหม่"
+        "label": "กิจกรรม Activity การดําเนินงาน",
+        "tooltip": "คะแนนกิจกรรมการเขียนโค้ดและปล่อยจาก commit + publish recency"
       },
       "likes": {
-        "label": "ชอบ",
-        "tooltip": "ไลค์ pub.dev — คลิกเพื่อเปิดหน้าคะแนนแพ็คเกจ"
+        "label": "ชอบชอบ ความนิยม",
+        "tooltip": "pub.dev likes  ⁇  คลิกเพื่อเปิดหน้าคะแนนแพ็คเก็ต"
       },
       "downloads": {
-        "label": "ดาวน์โหลด",
-        "tooltip": "ดาวน์โหลด pub.dev ในช่วง 30 วันที่ผ่านมา — คลิกเพื่อเปิดหน้าคะแนนแพ็คเกจ"
+        "label": "การดาวน์โหลด",
+        "tooltip": "pub.dev การดาวน์โหลดใน 30 วันที่ผ่านมา  ⁇  คลิกเพื่อเปิดหน้าคะแนนแพ็คเกจ"
       },
       "issues": {
-        "label": "ปัญหา",
-        "tooltip": "เปิดปัญหา GitHub (ไม่รวมคำขอดึงเมื่อมี)"
+        "label": "ปัญหาประเด็น Issues",
+        "tooltip": "เปิดประเด็น GitHub (ไม่รวมการขอถอนเมื่อมี)"
       },
       "prs": {
-        "label": "ประชาสัมพันธ์",
-        "tooltip": "เปิดคำขอดึง GitHub"
+        "label": "PRs สายการค้า",
+        "tooltip": "เปิด GitHub pull request การเรียกใช้งาน"
       },
       "size": {
-        "label": "ขนาด",
-        "tooltip": "ขนาดรหัส (lib + สินทรัพย์ที่ประกาศ); ย้อนกลับไปที่ขนาดไฟล์เก็บถาวร pub.dev เมื่อขนาดโค้ดไม่พร้อมใช้งาน"
+        "label": "ขนาด Size หน่วยงาน",
+        "tooltip": "ขนาดโค้ด (lib + declared assets); กลับไปที่ขนาด pub.dev ของอาร์คิฟเมื่อไม่สามารถหาขนาดโค้ตได้"
       },
       "deps": {
-        "label": "เดปส์",
-        "tooltip": "การพึ่งพาสกรรมกริยาโดยตรง - ไฮไลต์ deps ที่ใช้ร่วมกัน"
+        "label": "Deps เดปส์ ดีพี",
+        "tooltip": "การพึ่งพาทางแปรเปลี่ยนโดยตรง  ⁇  แบ่งปัน deps ส่อง"
       },
       "files": {
-        "label": "อ้างอิง",
-        "tooltip": "จำนวนไฟล์ต้นฉบับที่นำเข้าแพ็คเกจนี้ — คลิกเพื่อค้นหา"
+        "label": "อ้างอิง References ข้อความอ้างอี้",
+        "tooltip": "จํานวนไฟล์ที่มา ที่นําเข้าแพ็กเกจนี้  ⁇  คลิกเพื่อค้นหา"
       },
       "transitives": {
-        "label": "สกรรมกริยา",
-        "tooltip": "จำนวนการพึ่งพาสกรรมกริยา (ทางอ้อม) ที่แพ็คเกจนี้ดึงเข้ามา"
+        "label": "Transitive ทรานซิทวิฟส์",
+        "tooltip": "จํานวนการพึ่งพาแบบข้าม (อ้อม) ที่แพ็กเกจนี้ดึงเข้ามา"
       },
       "vulns": {
-        "label": "วัลส์",
-        "tooltip": "ช่องโหว่ด้านความปลอดภัยที่ทราบจากฐานข้อมูล OSV และ GitHub Advisory"
+        "label": "Vulns วูลนส์",
+        "tooltip": "ความเปราะบางทางด้านความปลอดภัยที่รู้จักจาก OSV และ GitHub ฐานข้อมูลที่ปรึกษา"
       },
       "license": {
-        "label": "ใบอนุญาต",
-        "tooltip": "ตัวระบุใบอนุญาต SPDX จาก pub.dev"
+        "label": "ใบอนุญาต License",
+        "tooltip": "SPDX ตัวชี้ใบอนุญาตจาก pub.dev"
       },
       "update": {
-        "label": "อัปเดต",
-        "tooltip": "การอัปเดตเวอร์ชันที่มี: หลัก รอง หรือแพทช์"
+        "label": "Update อัพเดทอัปเดต",
+        "tooltip": "การอัพเดทเวอร์ชั่นที่มีอยู่: หลัก, น้อยหรือแพตช์"
       },
       "status": {
-        "label": "สถานะ",
-        "tooltip": "สถานะการใช้งาน: ว่าแพ็คเกจปรากฏว่าไม่ได้ใช้ในรหัสของคุณหรือไม่"
+        "label": "สถานะ Status ฐานะ",
+        "tooltip": "สถานะการใช้งาน: ว่าแพ็คเกจจะปรากฏในรหัสของคุณไม่ถูกใช้หรือไม่"
       },
       "description": {
-        "label": "คำอธิบาย",
-        "tooltip": "คำอธิบายแพ็คเกจจาก pub.dev"
+        "label": "รายละเอียด Description การอธิบาย",
+        "tooltip": "คําอธิบายของแพ็คเกจจาก pub.dev"
       }
     },
     "cells": {
-      "noGithub": "ไม่พบที่เก็บ GitHub"
+      "noGithub": "ไม่พบคลัง GitHub",
+      "devBadge": "dev dev dev หนังสือ",
+      "transitiveBadge": "ทันติ (transitive) เป็นการเปลี่ยนแปลง",
+      "publishDateUnavailable": "วันที่ตีพิมพ์ไม่พร้อมจาก pub.dev",
+      "activityGradeUnavailable": "ระดับกิจกรรมไม่พร้อมใช้งาน (ข้อมูลการ commit หรือ release หายไป)",
+      "activityFallback": "กิจกรรมที่พัฒนาจากความมุ่งมั่นและการปล่อยข้อมูลล่าสุด",
+      "likesUnavailable": "pub.dev ชอบไม่พร้อมใช้งาน",
+      "likesCount": "{count} pub.dev ชอบชอบ",
+      "downloadsUnavailable": "pub.dev การดาวน์โหลด 30 วันไม่พร้อม",
+      "downloadsCount": "การดาวน์โหลด {count} ใน 30 วันที่ผ่านมา",
+      "sizeUnavailable": "ขนาดไม่พร้อมจาก pub.dev",
+      "noVulnerabilities": "ไม่มีความเปราะบางทางการทํางานที่รู้จัก",
+      "licenseUnspecified": "ใบอนุญาตที่ไม่ได้กําหนดไว้ใน pub.dev",
+      "unusedBadge": "ไม่ใช้งาน ยังไม่ถูกนํามาใช้",
+      "packageInUse": "แพ็คเกจกําลังใช้งาน"
     },
     "row": {
-      "expandDetails": "ขยายรายละเอียด",
+      "expandDetails": "ขยายรายละเอียด รายละคร",
       "copyRowJson": "คัดลอกแถวเป็น JSON"
     },
     "shortcuts": {
-      "focusSearch": "เน้นช่องค้นหา",
-      "nextRow": "เน้นแถวแพ็คเกจถัดไป",
-      "prevRow": "เน้นแถวแพ็คเกจก่อนหน้า",
-      "toggleDetail": "สลับตัวขยายรายละเอียดแพ็กเกจที่ไฮไลต์",
-      "escapeSearch": "ล้างการค้นหาที่มุ่งเน้น Esc ที่สองยุบแถวที่ขยายทั้งหมด",
-      "historyBack": "ย้อนกลับไปดูประวัติการนำทางแพ็คเกจ",
-      "showOverlay": "แสดงการซ้อนทับทางลัดนี้"
+      "focusSearch": "จุดจ่อสนามค้นหา",
+      "nextRow": "จัดการ Highlight แถวของแพ็คเกจต่อไป",
+      "prevRow": "จัดการ Highlight แถวที่บรรจุสินค้าก่อนหน้านี้",
+      "toggleDetail": "เปลี่ยนการเปิดตัวขยายรายละเอียดแพคเกจที่ได้รับการระบุ",
+      "escapeSearch": "ค้นหาที่เน้นชัด; Esc ครั้งที่สองล้มลงทุกแถวขยาย",
+      "historyBack": "กลับไปดูประวัติการเดินเรือของแพ็คเกจ",
+      "showOverlay": "แสดงการ overlay ทางลัดนี้"
+    },
+    "versionTooltip": {
+      "installed": "ติดตั้ง: {version} ({date})",
+      "latest": "ล่าสุด: {version}",
+      "created": "สร้างโดย: {date}",
+      "constraint": "ข้อจํากัด: {constraint}"
+    },
+    "healthTooltip": {
+      "grade": "เกรด: {grade}",
+      "resolutionVelocity": "ความเร็วการแก้ไข: {value}",
+      "engagementLevel": "ระดับการรับผิดชอบ: {value}",
+      "popularity": "ความนิยม: {value}",
+      "publisherTrust": "ผู้ประกาศ: {value}",
+      "codeCommits": "รหัส commits: {age} ที่ผ่านมา",
+      "latestRelease": "การปล่อยล่าสุด: {age} ที่ผ่านมา",
+      "activitySignal": "สัญญาณกิจกรรม: {signal}"
+    },
+    "size": {
+      "codeSize": "ขนาดโค้ด: {size}",
+      "archiveSize": "ขนาดอาร์คิฟ: {size}",
+      "onDisk": "บนแผ่นดิสก์: {size}",
+      "withUniqueTransitives": "ด้วยทรานซิทีฟที่ไม่เหมือนกัน: {size}",
+      "withSharedTransitives": "ด้วยการแบ่งปันทรานซิทีฟ: {size}",
+      "openFolder": "เปิดโฟลเดอร์แพคเกจในท้องถิ่น (local"
+    },
+    "references": {
+      "noImports": "ไม่พบข้อมูลการนําเข้าจาก source file",
+      "reExportLine": "{location} (การส่งออกใหม่)",
+      "reExportSuffix": "(การส่งออกใหม่)",
+      "publicApiSurface": "Public API surface  ⁇  อย่างน้อยการใช้งานหนึ่งคือ การส่งออกใหม่",
+      "reExportedBadge": "นําออกใหม่นํากลับ",
+      "openFileReferences": "เปิดอ้างอิงไฟล์ Open File",
+      "searchImports": "ค้นหา การนําเข้า",
+      "fileReferencesHeading": "แฟ้มอ้างอิง ({count})",
+      "andMore": "...และ {count} มากขึ้น"
+    },
+    "deps": {
+      "noTransitives": "ไม่มีการพึ่งพาแบบผ่าน (transitive dependencies)",
+      "showTransitives": "แสดงความพึ่งพาแบบแปรแปลง (transitive dependencies)",
+      "tooltipDep": "• {dep}",
+      "tooltipDepShared": "• {dep} (แบ่งปัน)",
+      "tooltipHeader": "{total} การพึ่งพาทางอ้อม",
+      "tooltipHeaderShared": "{total} การพึ่งพาทางอ้อม ({shared} ที่ใช้ร่วมกัน)",
+      "sharedBadgeTitle": "{count} แบ่งปันกับแพ็คเกจอื่น ๆ",
+      "sharedBadge": "แบ่งปันร่วมกัน shared ลงทุน",
+      "transitiveDepsHeading": "การพึ่งพาแบบผ่าน ({count})"
+    },
+    "dormancy": {
+      "noActivity6mo": "ไม่มีการทําความมั่นใจและไม่มีการปล่อยใน 6+ เดือน",
+      "noActivity3mo": "ไม่มีการทําความมั่นใจและไม่มีการปล่อยใน 3+ เดือน",
+      "releaseActiveCodeInactive": "การปล่อยเป็นกิจกรรม, รหัสไม่ทํางาน (3+ เดือนโดยไม่มีการกระทํา)",
+      "codeActiveReleaseSlow": "รหัสทํางาน, การปล่อยเรียงช้ากว่า (3+ เดือน)"
+    },
+    "activity": {
+      "withDormancy": "{dormancy} (เกรดกิจกรรม {grade})",
+      "healthy": "กิจกรรมการรหัสและปล่อยเป็นสุขภาพดี (ระดับกิจกรรม {grade})"
+    },
+    "detail": {
+      "codeCommitActivity": "กฎหมาย Commit กิจกรรม",
+      "releaseActivity": "กิจกรรมการปล่อย Release Activity การปล่อย",
+      "dormancySignal": "สัญญาณ Dormancy การนอนหลับ",
+      "ago": "{age} เมื่อ หลาย วัน ที่ ผ่าน มา",
+      "qualityExample": "+ตัวอย่าง ตัวอย่าง",
+      "qualityExampleTitle": "ส่งร่อง Demo ที่สามารถใช้ได้",
+      "qualityTests": "+ทดสอบ ทดลอง",
+      "qualityTestsTitle": "ส่งชุดทดสอบแบบซุઇટ",
+      "qualityTools": "+เครื่องมือ tools เครื่องมือ",
+      "qualityToolsTitle": "เครื่องมือบํารุงรักษาเรือ - อุปกรณ์งาน",
+      "qualityDocs": "+docs เอกสาร",
+      "qualityDocsTitle": "เรือขยายเอกสารการจัดส่ง",
+      "healthScore": "Health Score คะแนนสุขภาพ",
+      "resolutionVelocity": "ความเร็วการแก้ไข Resolution Velocity",
+      "engagementLevel": "ระดับการรับผิดชอบ (Engagement Level)",
+      "popularity": "ความนิยม Popularity ความนิ ยม",
+      "publisherTrust": "ผู้ประกาศ Trust Trust",
+      "fixInVersion": "→ ติดตั้งใน {version}",
+      "vulnerabilitiesHeading": "ความเปราะบางทางการทํางาน ({count})"
+    },
+    "links": {
+      "heading": "ลิงค์ลิงก์ Link",
+      "pubDev": "pub.dev",
+      "changelog": "changelog รายการที่เปลี่ยน",
+      "versions": "การออกแบบ: รุ่น ภาพถ่าย",
+      "repository": "รวมข้อมูลของ Repository",
+      "issues": "สถานการณ์ การจัดการปัญหา"
     }
   },
   "commandCatalog": {
-    "documentTitle": "แคตตาล็อกคำสั่ง Saropa",
-    "skipLink": "ข้ามไปที่แค็ตตาล็อกคำสั่ง",
-    "heroTitle": "แคตตาล็อกคำสั่ง Saropa",
+    "documentTitle": "Saropa คาทอล็อกบัญชาการ",
+    "skipLink": "Skip to command catalog สก๊อปไปยังการสั่งซื้อ",
+    "heroTitle": "Saropa คาทอล็อกบัญชาการ",
     "status": {
       "commands": "{count} คำสั่ง",
       "categories": "{count} หมวดหมู่",
       "recent": "ล่าสุด {count} รายการ",
       "internalHidden": "{count} เมนูบริบทเท่านั้น (ซ่อนอยู่)",
-      "wordCommands": "คำสั่ง",
-      "wordCategories": "หมวดหมู่",
-      "wordRecent": "ล่าสุด"
+      "wordCommands": "สั่งสั่งการ คําสั่ง",
+      "wordCategories": "หมวดหมู่ ประเภท Categories",
+      "wordRecent": "ล่าสุด ล่า ๆ"
     },
     "search": {
-      "placeholder": "ค้นหาชื่อ คำอธิบาย หรือรหัสคำสั่ง...",
-      "ariaLabel": "คำสั่งค้นหา",
-      "clearAria": "ล้างการค้นหา",
-      "hintLine1": "ตรงกับแต่ละคำสั่ง",
-      "hintStrongTitle": "ชื่อ",
-      "hintStrongDesc": "คำอธิบาย",
-      "hintStrongId": "รหัส",
-      "hintLine2": "(โทเค็น ID มีการเว้นระยะห่างด้วย — type",
-      "hintLine2kbd": "ดำเนินการวิเคราะห์",
+      "placeholder": "ชื่อค้นหา, คําอธิบาย หรือ ID การสั่งการ...",
+      "ariaLabel": "คําสั่งค้นหา สั่งใช้",
+      "clearAria": "คลิก Clear Search เพื่อค้นหา",
+      "hintLine1": "ตรงกับคําสั่งของแต่ละคอมมานด์",
+      "hintStrongTitle": "ชื่อ: หมวดหมู่",
+      "hintStrongDesc": "คําอธิบาย Description รายละเอียด",
+      "hintStrongId": "id id id ทดลองเล่น",
+      "hintLine2": "(ตัวกระทู้ id มีช่องว่างเกินไป  ⁇  ประเภท",
+      "hintLine2kbd": "Run Analysis การวิเคราะห์การวิ่ง",
       "hintLine2End": "โดยไม่มีจุด)"
     },
     "toolbar": {
-      "showInternal": "แสดงคำสั่งเมนูบริบท",
-      "collapseAll": "ยุบทั้งหมด"
+      "showInternal": "แสดงคําสั่งเมนูประโยค",
+      "collapseAll": "พังหมดไปหมด"
     },
     "recentPopover": {
       "title": "การค้นหาล่าสุด",
-      "clearTitle": "ล้างการค้นหาล่าสุดทั้งหมด",
-      "clearButton": "ชัดเจน",
+      "clearTitle": "ทําความสะอาดการค้นหาล่าสุดทั้งหมด",
+      "clearButton": "Clear สะอาด",
       "listAria": "การค้นหาล่าสุด"
     },
     "filterChips": {
-      "ariaRegion": "ตัวกรองที่ใช้งานอยู่",
-      "activeLabel": "ตัวกรองที่ใช้งานอยู่:",
-      "clearAll": "เคลียร์ทั้งหมด"
+      "ariaRegion": "การกรอง Active Filter ที่ใช้ได้",
+      "activeLabel": "การกรองที่ทํางาน: Active Filter",
+      "clearAll": "เคลียร์ทุกที่"
     },
     "bands": {
-      "frequentTitle": "บ่อย",
-      "frequentHint": "ใช้มากที่สุดในเซสชันของคุณ",
-      "recentTitle": "ล่าสุด",
-      "recentClear": "ชัดเจน",
-      "recentHint": "คลิกเพื่อเรียกใช้อีกครั้ง · ใหม่ล่าสุดก่อน"
+      "frequentTitle": "รายละเอียด: นาน ๆ",
+      "frequentHint": "ที่ใช้มากที่สุดในทุกครั้งในการเข้าร่วมการประชุมของคุณ",
+      "recentTitle": "ล่าสุด ล่า ๆ",
+      "recentClear": "Clear สะอาด",
+      "recentHint": "คลิกเพื่อเปิดใหม่ · ล่าสุดก่อน"
     },
     "noResults": {
-      "message": "ไม่มีคำสั่งที่ตรงกับการค้นหาของคุณ",
-      "reset": "รีเซ็ตตัวกรอง"
+      "message": "ไม่มีคําสั่งใด ๆ ที่ตรงกับการค้นหาของคุณ",
+      "reset": "การตั้งค่าฟิลเตอร์ Reset"
     },
     "entry": {
-      "internalBadgeTitle": "ทริกเกอร์จากเมนูบริบทเท่านั้น",
-      "internalBadge": "เมนู",
-      "copyTitle": "คัดลอกรหัสคำสั่ง ({id})",
-      "copyAria": "คัดลอกรหัสคำสั่ง"
+      "internalBadgeTitle": "กระตุ้นจากเมนูประโยคเท่านั้น",
+      "internalBadge": "เมนูเมนู menu",
+      "copyTitle": "สําเนาไอดีคําสั่ง ({id})",
+      "copyAria": "สําเนา command id ของคําสั่ง"
     },
-    "categoryJumpTitle": "ข้ามไปที่ {category}",
+    "categoryJumpTitle": "กระโดดไปยัง {category}",
     "shortcuts": {
-      "focusSearch": "เน้นช่องค้นหา",
-      "navRows": "นำทางแถวคำสั่งที่มองเห็นได้",
-      "homeEnd": "ข้ามไปยังแถวแรกหรือแถวสุดท้ายที่มองเห็นได้",
-      "enterRun": "รันคำสั่งที่เน้น",
-      "escClear": "ล้างการค้นหาและรีเซ็ตตัวกรอง",
-      "showOverlay": "แสดงการซ้อนทับทางลัดนี้"
+      "focusSearch": "จุดจ่อสนามค้นหา",
+      "navRows": "การเดินทางตามแถวคําสั่งที่เห็นได้ชัด",
+      "homeEnd": "กระโดดไปยังแถวแรกหรือแถวสุดท้ายที่เห็นได้",
+      "enterRun": "Run คําสั่งที่เน้นการทํางาน",
+      "escClear": "กวาดล้างการค้นหาและรีเซ็ตฟิลเตอร์",
+      "showOverlay": "แสดงการ overlay ทางลัดนี้"
     },
     "script": {
-      "moreSuffix": "+{count} เพิ่มเติม",
-      "showLess": "แสดงน้อยลง",
-      "runSingular": "วิ่ง",
-      "runPlural": "วิ่ง",
-      "recentWord": "ล่าสุด",
-      "expandAll": "ขยายทั้งหมด",
-      "collapseAll": "ยุบทั้งหมด",
-      "searchChip": "ค้นหา: \"{query}\"",
-      "internalChip": "การแสดงคำสั่งเมนูบริบท",
-      "removeFilterPrefix": "ลบตัวกรอง",
+      "moreSuffix": "+{count} มากขึ้น",
+      "showLess": "แสดงน้อยกว่า Show less",
+      "runSingular": "วิ่งวิ่งวัด",
+      "runPlural": "รีวิว วิ่ง วิ่ง",
+      "recentWord": "ล่าสุด ล่า ๆ",
+      "expandAll": "ขยายทั้งหมด Expand all",
+      "collapseAll": "พังหมดไปหมด",
+      "searchChip": "คําค้น: \"{query}\"",
+      "internalChip": "แสดงคําสั่งเมนูประจําบท (Context Menu)",
+      "removeFilterPrefix": "ถอดกรอง filter ออก",
       "matchOne": "ตรงกัน {count} รายการ",
       "matchOther": "ตรงกัน {count} รายการ"
     }
   },
   "codeHealth": {
-    "documentTitle": "แดชบอร์ดสุขภาพ Saropa Code",
-    "skipToTable": "ข้ามไปที่ตารางฟังก์ชัน",
-    "openWorkspaceFirst": "เปิดพื้นที่ทำงาน Dart/Flutter ก่อน",
-    "scanningTitle": "ความสมบูรณ์ของโค้ด: ฟังก์ชั่นการสแกน...",
+    "documentTitle": "Saropa รหัส แดชบอร์ดสุขภาพ",
+    "skipToTable": "ลอยข้ามไปยัง Functions Table ไปก่อน",
+    "openWorkspaceFirst": "เปิดพื้นที่ทํางาน Dart/Flutter ก่อน",
+    "scanningTitle": "รหัสสุขภาพ: การสแกนฟังก์ชัน ...",
     "scan": {
-      "title": "กำลังสแกนความสมบูรณ์ของโปรเจ็กต์",
-      "subtitle": "กำลังอ่านรหัสของคุณ แดชบอร์ดจะกรอกข้อมูลเมื่อการสแกนเรียนรู้เพิ่มเติม",
-      "waiting": "กำลังเริ่มการสแกน...",
-      "launching": "กำลังเปิดเครื่องสแกน...",
-      "collect": "กำลังค้นพบไฟล์...",
-      "firstRunHint": "การทำงานครั้งแรกจะรวบรวมสแกนเนอร์ โปรเจ็กต์ขนาดใหญ่จะใช้เวลาสักครู่ก่อนที่ไฟล์จะปรากฏขึ้น",
-      "paused": "หยุดชั่วคราว",
-      "stopped": "การสแกนหยุดลง",
-      "elapsed": "ผ่านไปแล้ว",
+      "title": "โครงการสแกนสุขภาพของโครงงาน สะอาด",
+      "subtitle": "อ่านรหัสของคุณครับ แดชบอร์ดจะเติมเต็มเมื่อการสแกนเรียนรู้มากขึ้น",
+      "waiting": "เริ่มสแกน...",
+      "launching": "การเปิดตัวสแกนเนอร์ ...",
+      "collect": "การค้นพบไฟล์ ...",
+      "firstRunHint": "การทํางานครั้งแรกจะรวบรวมสแกนเนอร์; โครงการใหญ่ใช้เวลาสักพักก่อนที่ไฟล์จะปรากฏ.",
+      "paused": "หยุดพัก / Paused สงบ",
+      "stopped": "สแกนหยุดสก๊านแล้ว",
+      "elapsed": "ผ่านไป สิ้นสุด",
       "phase": {
-        "parse": "กำลังแยกวิเคราะห์ไฟล์",
-        "history": "การอ่านประวัติคอมไพล์",
-        "blame": "อายุรหัสคอมพิวเตอร์",
-        "usage": "การนับการอ้างอิง",
-        "score": "ฟังก์ชั่นการให้คะแนน"
+        "parse": "การพาร์ซไฟล์ Parsing ไฟล์",
+        "history": "อ่าน git ประวัติศาสตร์ Git",
+        "blame": "คอมพิวเตอร์ รหัสอายุ อายุ",
+        "usage": "นับอ้างอิงการอ้างถึง",
+        "score": "การให้คะแนนฟังก์ชันการทําคะแนນ"
       },
       "counter": {
-        "files": "ไฟล์",
-        "functions": "ฟังก์ชั่น",
-        "problems": "พบปัญหา"
+        "files": "ไฟล์ไฟล์ File",
+        "functions": "การทํางาน Functions ฟังก์ชัน",
+        "problems": "ปัญหาที่พบ ปัญหาการค้นหา"
       },
       "counters": {
-        "aria": "เคาน์เตอร์สแกนสด"
+        "aria": "Live scan นับตัวเลขการสแกน"
       },
       "controls": {
-        "aria": "ควบคุมการสแกน"
+        "aria": "สแกนการควบคุมสแกน"
       },
       "btn": {
-        "pause": "หยุดชั่วคราว",
-        "resume": "ประวัติย่อ",
-        "restart": "รีสตาร์ท",
-        "cancel": "ยกเลิก"
+        "pause": "Pause หยุดพัก",
+        "resume": "Resume เรียนต่อ",
+        "restart": "Restart การเริ่มต้นใหม่",
+        "cancel": "ยกเลิก Cancel เลิก"
       },
       "preview": {
         "heading": "ปัญหาที่พบจนถึงตอนนี้",
-        "empty": "ยังไม่พบปัญหา…"
+        "empty": "ยังไม่พบปัญหาอะไรเลย ..."
       },
       "version": {
-        "engine": "เครื่องยนต์",
-        "detecting": "กำลังตรวจจับ...",
+        "engine": "เครื่องยนต์ Engine Engine มอเตอร์",
+        "detecting": "การตรวจจับ ...",
         "legacy": "มรดก — ไม่มีความคืบหน้าสด (saropa_lints ของโปรเจ็กต์นี้มีมาก่อน)"
       }
     },
-    "runReportFirst": "เรียกใช้รายงานอีกครั้ง จากนั้นคัดลอก JSON",
-    "copiedJson": "คัดลอก Code Health JSON ไปยังคลิปบอร์ดแล้ว",
+    "runReportFirst": "รีบทํางานรายงานอีกครั้ง แล้วคัดลอก JSON.",
+    "copiedJson": "รหัสสุขภาพ JSON สําเนาไปยัง clipboard.",
     "couldNotOpenFile": "ไม่สามารถเปิดไฟล์: {path}",
-    "panelTitle": "แดชบอร์ดสุขภาพ Saropa Code",
+    "panelTitle": "Saropa รหัส แดชบอร์ดสุขภาพ",
     "hero": {
-      "title": "แดชบอร์ดสุขภาพ Saropa Code",
-      "generated": "สร้างขึ้น",
+      "title": "Saropa รหัส แดชบอร์ดสุขภาพ",
+      "generated": "สร้างขึ้น Generated",
       "functionOne": "{count} ฟังก์ชัน",
       "functionOther": "{count} ฟังก์ชัน",
-      "avgFormat": "เฉลี่ย {score} ({grade})",
+      "avgFormat": "avg {score} ({grade}) เป็นการตรวจหา",
       "gatesFailing": "ประตูล้มเหลว",
-      "gatesPassing": "ประตูผ่านไป"
+      "gatesPassing": "ประตูผ่านไป ผ่านมา"
     },
     "gauge": {
-      "tooltip": "คะแนนเฉลี่ย {rounded} ของ 100 (เกรด {grade})",
-      "ariaLabel": "คะแนนเฉลี่ย {rounded} เท่ากับ 100"
+      "tooltip": "คะแนนเฉลี่ย {rounded} ของ 100 (เกรด {grade}).",
+      "ariaLabel": "คะแนนเฉลี่ย {rounded} ของ 100"
     },
     "gate": {
-      "fallback": "ประตูคุณภาพล้มเหลว — ตรวจสอบเกณฑ์ในการตั้งค่าความสมบูรณ์ของโค้ด",
+      "fallback": "ประตูคุณภาพล้มเหลว  ⁇  การทบทวนขอบเขตในการตั้งค่า Code Health.",
       "failingOne": "{count} เกตล้มเหลว — ตรวจสอบเกณฑ์ หรือคัดลอก JSON เพื่อตรวจสอบ gates.violations.",
       "failingOther": "{count} เกตล้มเหลว — ตรวจสอบเกณฑ์ หรือคัดลอก JSON เพื่อตรวจสอบ gates.violations.",
-      "openSettingsTitle": "เปิดการตั้งค่าความสมบูรณ์ของโค้ดเพื่อปรับเกณฑ์",
-      "openSettingsButton": "เปิดการตั้งค่าสุขภาพโค้ด"
+      "openSettingsTitle": "เปิด Code Health settings เพื่อปรับขีดขั้นต่ํา",
+      "openSettingsButton": "Open Code การตั้งค่าสุขภาพ"
     },
     "kpi": {
-      "ariaLabel": "สรุปสุขภาพโค้ด",
-      "allClear": "ไม่มีฟังก์ชันที่ถูกตั้งค่าสถานะในทุกหมวดหมู่ — ทั้งหมดชัดเจน",
-      "clickToFilter": "คลิกเพื่อกรองตารางตามฟังก์ชันที่ตั้งค่าสถานะ {flag}",
-      "noFlagged": "ไม่มีฟังก์ชันที่ตั้งค่าสถานะ {flag}",
-      "unused": "ไม่ได้ใช้",
-      "unusedSub": "ฟังก์ชั่นไม่มีการอ้างอิงที่ไหนเลย",
-      "uncovered": "ถูกเปิดเผย",
-      "uncoveredSub": "ไม่มีความคุ้มครอง LCOV",
-      "stubTested": "ผ่านการทดสอบต้นขั้ว",
-      "stubTestedSub": "มีการทดสอบแต่ยืนยันเพียงเล็กน้อย",
-      "suspiciousCoverage": "ความคุ้มครองที่น่าสงสัย",
-      "suspiciousCoverageSub": "ความคุ้มครองดูเหมือนถูกประดิษฐ์ขึ้น",
-      "testDrift": "ทดสอบดริฟท์",
-      "testDriftSub": "การทดสอบทำให้ฟังก์ชันล่าช้า"
+      "ariaLabel": "รหัส สรุปสุขภาพ",
+      "allClear": "ไม่มีฟังก์ชันที่ติดป้ายกํากับในทุกประเภท  ⁇  สะอาดทั้งหมด.",
+      "clickToFilter": "คลิกเพื่อกรองตารางไปยังฟังก์ชันที่ติดป้าย {flag}.",
+      "noFlagged": "ไม่มีฟังก์ชันที่ติดป้าย {flag}.",
+      "unused": "ไม่ใช้งาน ยังไม่ถูกนํามาใช้",
+      "unusedSub": "ฟังก์ชันที่ไม่ได้อ้างอิงในที่ไหน",
+      "uncovered": "เปิดเผยไม่ปิดบัง",
+      "uncoveredSub": "ไม่มีการครอบคลุม LCOV",
+      "stubTested": "การทดสอบ Stub-tested",
+      "stubTestedSub": "การทดสอบมีอยู่ แต่ยืนยันน้อย",
+      "suspiciousCoverage": "รายงานข่าวน่าสงสัย",
+      "suspiciousCoverageSub": "รายงานการคุ้มครอง ดูเหมือนถูกสร้างขึ้น",
+      "testDrift": "การทดสอบ drift drift ทดลอง",
+      "testDriftSub": "การทดสอบ lag ฟังก์ชันการทํางาน"
     },
     "toolbar": {
-      "ariaLabel": "การดำเนินการด้านสุขภาพโค้ด",
-      "rescanTitle": "เรียกใช้การสแกนความสมบูรณ์ของโค้ดอีกครั้งและรีเฟรชแดชบอร์ดนี้",
-      "rescan": "สแกนอีกครั้ง",
-      "copyJsonTitle": "คัดลอก Code Health JSON แบบดิบไปยังคลิปบอร์ด",
-      "copyJson": "คัดลอก JSON",
-      "settingsTitle": "เปิดการตั้งค่าความสมบูรณ์ของรหัส",
-      "settingsButton": "การตั้งค่าสุขภาพโค้ด",
-      "filterTitle": "กรองแถวตามชื่อ ไฟล์ หรือแฟล็ก",
-      "filterLabel": "กรองแถว",
-      "filterPlaceholder": "กรองแถว..."
+      "ariaLabel": "กฎหมาย การกระทําสุขภาพ",
+      "rescanTitle": "รีรันการสแกน Code Health และอัพเดทดัชบอร์ดนี้",
+      "rescan": "Rescan รีสแกน",
+      "copyJsonTitle": "สําเนา Code Health JSON แดงไปยังคลิปบอร์ด",
+      "copyJson": "สําเนา JSON",
+      "settingsTitle": "เปิดการตั้งค่าสุขภาพ Code Health.",
+      "settingsButton": "รหัส การตั้งค่าสุขภาพ สถานที่รักษาพยาบาล",
+      "filterTitle": "การกรองแถวตามชื่อ, ไฟล์หรือธง.",
+      "filterLabel": "กําหนดเส้น filter",
+      "filterPlaceholder": "แถวกรอง ..."
     },
     "table": {
-      "ariaLabel": "ฟังก์ชั่นแย่ที่สุดตามคะแนน",
-      "heading": "ฟังก์ชั่นที่แย่ที่สุด",
-      "topCount": "ด้านบน {shown} จาก {total}",
-      "colGrade": "ระดับ",
-      "colScore": "คะแนน",
-      "colFunction": "การทำงาน",
-      "colFile": "ไฟล์",
-      "colLine": "เส้น",
-      "colUsage": "การใช้งาน",
-      "colCoverage": "ความคุ้มครอง",
-      "colComplexity": "ความซับซ้อน",
-      "colFlags": "ธง",
-      "noMatch": "ไม่มีฟังก์ชันที่ตรงกับตัวกรองปัจจุบัน",
-      "resetFiltersTitle": "ล้างการค้นหาและตัวกรองสถานะที่ใช้งานอยู่",
-      "resetFilters": "รีเซ็ตตัวกรอง",
-      "hint": "แสดงฟังก์ชันที่แย่ที่สุด 200 ฟังก์ชันตามคะแนน ใช้ช่องค้นหาเพื่อจำกัดให้แคบลง",
-      "expanderAriaCollapsed": "แสดงรายละเอียดปัญหา",
-      "expanderAriaExpanded": "ซ่อนรายละเอียดปัญหา",
-      "detailHeading": "เหตุใดฟังก์ชันนี้จึงได้คะแนน {score}",
-      "detailNoIssues": "ไม่มีแฟล็กในแถวนี้ — คะแนนขับเคลื่อนโดยค่าคอลัมน์ด้านบน (การใช้งาน ความครอบคลุม ความซับซ้อน อายุ เอกสารประกอบ)",
-      "suppressLabel": "ระงับในไฟล์",
-      "suppressTooltip": "เขียน `// ignore_for_file: code_health:<flag>` ลงในไฟล์นี้ ดังนั้นการสแกนในอนาคตจะปล่อยแฟล็กนี้สำหรับทั้งไฟล์"
+      "ariaLabel": "งานที่แย่ที่สุดตามคะแนน",
+      "heading": "การทํางานที่แย่ที่สุด",
+      "topCount": "top {shown} ของ {total}",
+      "colGrade": "เกรด ปริญญา",
+      "colScore": "สกอร์คะแนน ผลบอล",
+      "colFunction": "Function การทํางาน Function งาน",
+      "colFile": "File รายการ",
+      "colLine": "สาย เส้น เส้น",
+      "colUsage": "การใช้งาน Usage Usage",
+      "colCoverage": "Coverage coverage การครอบคลุม",
+      "colComplexity": "ความซับซ้อน ความยุ่งยาก",
+      "colFlags": "ฟันธง ธง",
+      "noMatch": "ไม่มีฟังก์ชันใด ๆ ที่ตรงกับกรองปัจจุบัน",
+      "resetFiltersTitle": "ทําความสะอาดการค้นหาและกรองธงที่กําลังทํางานใด ๆ.",
+      "resetFilters": "การตั้งค่าฟิลเตอร์ Reset",
+      "hint": "แสดง 200 ฟังก์ชันที่แย่ที่สุดตามคะแนน ใช้กรอบการค้นหาเพื่อระงับขั้นต่ําเพิ่มเติม.",
+      "expanderAriaCollapsed": "แสดงรายละเอียดประเด็น Show issue details",
+      "expanderAriaExpanded": "Hide issue details ซ่อนรายละเอียดประเด็น",
+      "detailHeading": "ทําไมฟังก์ชันนี้ได้คะแนน {score}",
+      "detailNoIssues": "ไม่มีธงในแถวนี้  ⁇  คะแนนถูกผลักดันโดยค่าคอลัมน์ด้านบน (การใช้งาน, การครอบคลุม, ความซับซ้อน, อายุ, เอกสาร)",
+      "suppressLabel": "Suppress ในไฟล์",
+      "suppressTooltip": "เขียน `// ignore_for_file: code_health:<flag>` เข้าไปในไฟล์นี้ เพื่อให้การสแกนภายหลังจะทิ้งฟันธงนี้สําหรับไฟล์ทั้งหมด"
     },
     "flag": {
       "unused": {
-        "label": "ไม่ได้ใช้",
+        "label": "ไม่ใช้งาน ยังไม่ถูกนํามาใช้",
         "evidence": "0 ผู้โทร",
-        "rule": "ติดธงเมื่อไม่มีไฟล์อื่นอ้างอิงถึงชื่อฟังก์ชันนี้"
+        "rule": "ตราที่แสดงเมื่อไม่มีไฟล์อื่นอ้างอิง function name นี้."
       },
       "uncovered": {
-        "label": "ถูกเปิดเผย",
-        "evidence": "การทดสอบ {pct}%",
-        "rule": "ติดธงเมื่อ LCOV รายงานความครอบคลุมของบรรทัด 0%"
+        "label": "เปิดเผย ไม่ปกคลุม",
+        "evidence": "{pct}% การทดสอบการตรวจ",
+        "rule": "ตราที่ระบุเมื่อ LCOV รายงาน 0% การครอบคลุมสาย."
       },
       "complex": {
-        "label": "ซับซ้อน",
-        "evidence": "ซีซี {cc}",
-        "rule": "ตั้งค่าสถานะเมื่อความซับซ้อนของไซโคลมาติกเกิน 10"
+        "label": "สถานที่ทับซ้อน ที่มีความยุ่งยาก",
+        "evidence": "CC {cc} _ สายการบิน",
+        "rule": "มีเครื่องหมายเมื่อความซับซ้อนของ cyclomatic มากกว่า 10"
       },
       "undocumented": {
-        "label": "ไม่มีเอกสาร",
+        "label": "คนที่ไม่มีเอกสาร",
         "evidence": "CC {cc} ไม่มีเอกสาร",
-        "rule": "ติดธงเมื่อฟังก์ชันที่ซับซ้อน (CC > 10) ไม่มีความคิดเห็นเกี่ยวกับเอกสาร"
+        "rule": "ตราเมื่อฟังก์ชันที่ซับซ้อน (CC > 10) ไม่มีการอธิบาย doc."
       },
       "test_drift": {
-        "label": "ทดสอบดริฟท์",
-        "evidence": "การทดสอบทำให้ฟังก์ชันล่าช้า",
-        "rule": "ติดธงเมื่อไฟล์ทดสอบที่เชื่อมโยงใหม่ล่าสุดเก่ากว่าไฟล์ต้นฉบับของฟังก์ชัน"
+        "label": "การทดสอบ drift test ทดลองการลอย",
+        "evidence": "การทดสอบ lag ฟังก์ชันการทํางาน",
+        "rule": "ตราเมื่อไฟล์ทดสอบที่เชื่อมโยงใหม่ที่สุดมีอายุมากกว่า ไฟล์แหล่งของฟังก์ชัน"
       },
       "stub_tested": {
-        "label": "ผ่านการทดสอบต้นขั้ว",
-        "evidence": "การยืนยันแบบบาง",
-        "rule": "ติดธงเมื่อมีการทดสอบที่เชื่อมโยงแต่แทบจะไม่ยืนยันอะไรเลย"
+        "label": "การทดสอบ Stub-Tested",
+        "evidence": "ผิวบาง ยืนยัน",
+        "rule": "ตราเมื่อการทดสอบที่เชื่อมโยงมีอยู่ แต่แทบจะไม่ยืนยันอะไร"
       },
       "suspicious_coverage": {
-        "label": "ความคุ้มครองที่น่าสงสัย",
+        "label": "การครอบคลุมที่น่าสงสัย",
         "evidence": "{pct}% โดยไม่มีการทดสอบ",
-        "rule": "ติดธงเมื่อ LCOV รายงานความครอบคลุมสูง แต่ไม่มีการทดสอบที่อ้างอิงถึงฟังก์ชัน"
+        "rule": "ตราประกอบเมื่อ LCOV รายงานความครอบคลุมสูง แต่ไม่มีการทดสอบอ้างอิงฟังก์ชัน"
       }
     },
     "shortcuts": {
-      "focusFilter": "โฟกัสตัวกรองแถว",
-      "clearFilter": "ล้างตัวกรองแถวที่โฟกัส",
-      "activateKpi": "เปิดใช้งานการ์ด KPI ที่มุ่งเน้น",
-      "activateKpiSpace": "เปิดใช้งานการ์ด KPI ที่มุ่งเน้น",
-      "showOverlay": "แสดงการซ้อนทับทางลัดนี้"
+      "focusFilter": "ส่งฟอกัสกรองแถว",
+      "clearFilter": "ทําความสะอาดกรองแถวที่โฟกัส",
+      "activateKpi": "การ์ด KPI ที่มีจุดมุ่งเน้นให้ทํางาน",
+      "activateKpiSpace": "การ์ด KPI ที่มีจุดมุ่งเน้นให้ทํางาน",
+      "showOverlay": "แสดงการ overlay ทางลัดนี้"
     },
     "script": {
-      "activeFiltersLabel": "ตัวกรองที่ใช้งานอยู่:",
+      "activeFiltersLabel": "การกรองที่ทํางาน: Active Filter",
       "searchChip": "ค้นหา: \"{q}\"",
-      "flagChip": "ธง: {flag}",
-      "removeAria": "ลบ {key}",
-      "clearAll": "เคลียร์ทั้งหมด",
+      "flagChip": "ฟันธง: {flag}",
+      "removeAria": "ลบ {key} ออกไป",
+      "clearAll": "เคลียร์ทุกที่",
       "rowsVisible": "มองเห็น {visible} จาก {total} แถว",
-      "neverRun": "ไม่เคยวิ่ง"
+      "neverRun": "ไม่เคย วิ่งวิ่ง หนีไป"
     },
     "freshness": {
-      "justNow": "แค่ตอนนี้",
+      "justNow": "เพิ่งตอนนี้",
       "minutesAgo": "{min} นาทีที่แล้ว",
       "hoursAgo": "{hr} ชม. ที่แล้ว",
       "daysAgo": "{day} วันที่แล้ว",
@@ -884,57 +1115,221 @@
     }
   },
   "suppressionsStrip": {
-    "noData": "ยังไม่มีการละเมิด json — เรียกใช้การวิเคราะห์เพื่อเติมข้อมูลสแน็ปช็อตการระงับ",
-    "zeroTotal": "0 การระงับตัววิเคราะห์ในการส่งออกล่าสุด",
-    "noKindBreakdown": "ไม่มีการแยกย่อยในการส่งออกนี้",
-    "title": "การปราบปราม (ส่งออก)",
-    "readOnlyNote": "(อ่านอย่างเดียว เปิดผลการสืบค้นเพื่อเรียกดูและดำเนินการ)",
-    "openFindings": "เปิดแดชบอร์ดผลการสืบค้น"
+    "noData": "No violations.json yet  ⁇  รีบวินิจฉัยเพื่อเติมภาพถ่ายการกด.",
+    "zeroTotal": "0 การยับยั้งเครื่องวิเคราะห์ในการส่งออกล่าสุด.",
+    "noKindBreakdown": "ไม่มีการแบ่งแยกตามประเภทในการส่งออกนี้",
+    "title": "การลบ (การส่งออก)",
+    "readOnlyNote": "(อ่านเท่านั้น; เปิด Findings เพื่อดูและกระทํา)",
+    "openFindings": "เปิดผลการค้นพบ Dashboard"
   },
   "configMirrors": {
-    "noFileRisk": "ไม่มีการแยกย่อยความเสี่ยงต่อไฟล์ (ไม่มีการละเมิดในขอบเขต)",
-    "suppressionNote": "ตรงกับสรุปการละเมิด json ไม่ใช่การสลับการระงับแถบด้านข้างแบบสด",
-    "noSuppression": "ไม่มีการรวมการระงับในการส่งออกนี้ (ตัววิเคราะห์รุ่นเก่าหรือการระงับเป็นศูนย์)",
+    "noFileRisk": "ไม่มีการแยกรายละเอียดความเสี่ยงต่อไฟล์ (ไม่มีการกระทําผิดในขอบเขต)",
+    "suppressionNote": "คู่สมการ violations.json สรุป, ไม่ใช้งานสด sidebar การกด toggles.",
+    "noSuppression": "ไม่มี aggregate การกดในการส่งออกนี้ (ผู้วิเคราะห์เก่าหรือการกดศูนย์).",
     "owaspSignal": "การละเมิด {count} รายการในการส่งออกนี้มีการแมป OWASP บนมือถือ/เว็บ — เปิดสถานะความปลอดภัยสำหรับเมทริกซ์เต็มรูปแบบและการส่งออก",
-    "summarySuppressions": "การระงับ (ภาพรวมการส่งออก)",
-    "summaryOwasp": "มาตรการรักษาความปลอดภัย (สัญญาณ OWASP)",
-    "summaryFileRisk": "ความเสี่ยงของไฟล์ (ไฟล์บนสุด)"
+    "summarySuppressions": "การลบ (ภาพฉบับการส่งออก)",
+    "summaryOwasp": "การรักษาความปลอดภัย (สัญญาณOWASP)",
+    "summaryFileRisk": "รายการความเสี่ยง (top files)"
   },
   "telemetry": {
-    "heroTitle": "กฎเกณฑ์ที่เกี่ยวข้อง",
-    "skipToCounters": "ข้ามไปที่เคาน์เตอร์โทรมาตร",
-    "lastEvent": "งานล่าสุด {relative}",
-    "noEvents": "ไม่มีการบันทึกเหตุการณ์",
+    "heroTitle": "กฎที่เกี่ยวข้อง Telemetry",
+    "skipToCounters": "เปลี่ยนไปยังตัววัด telemetry",
+    "lastEvent": "เหตุการณ์ล่าสุด {relative}",
+    "noEvents": "ไม่มีเหตุการณ์ที่บันทึกไว้",
     "totalEventOne": "เหตุการณ์ทั้งหมด {count} รายการ",
     "totalEventOther": "เหตุการณ์ทั้งหมด {count} รายการ",
-    "noCountersTitle": "ไม่มีตัวนับที่จะรีเซ็ต",
-    "resetTitle": "รีเซ็ตตัวนับทั้งหมด",
-    "refreshTitle": "โหลดตัวนับการวัดและส่งข้อมูลทางไกลจากดิสก์",
-    "refresh": "รีเฟรช",
-    "copyTitle": "คัดลอกสแนปชอตเป็น JSON",
-    "copyJson": "คัดลอก JSON",
-    "resetCounters": "รีเซ็ตตัวนับ",
-    "countersAria": "เคาน์เตอร์",
-    "countersHeading": "เคาน์เตอร์กิจกรรม",
-    "thEvent": "เหตุการณ์",
-    "thCount": "นับ",
-    "emptyMessage": "ยังไม่มีการบันทึกเหตุการณ์การวัดและส่งข้อมูลทางไกล — เปิดกฎจากแดชบอร์ดผลการสืบค้นเพื่อเริ่มการจับตัวนับ",
-    "openFindingsTitle": "เปิดแดชบอร์ดผลการสืบค้นของ Saropa",
-    "openFindings": "เปิดแดชบอร์ดผลการสืบค้น",
-    "lastPropsHeading": "คุณสมบัติเหตุการณ์ล่าสุด",
-    "copiedJson": "Saropa Lints: คัดลอก JSON การวัดและส่งข้อมูลทางไกลของกฎที่เกี่ยวข้องแล้ว",
-    "countersReset": "Saropa Lints: รีเซ็ตตัวนับการวัดและส่งข้อมูลทางไกลของกฎที่เกี่ยวข้อง"
+    "noCountersTitle": "ไม่มีตัววัดที่จะรีเซ็ต",
+    "resetTitle": "กําหนดการรีเซ็ตเครื่องหมายทั้งหมด",
+    "refreshTitle": "รีโหลดตัววัด telemetry จากแผ่นจอ",
+    "refresh": "สะดวกสบาย Refresh",
+    "copyTitle": "สําเนาภาพฉบับเป็น JSON",
+    "copyJson": "สําเนา JSON",
+    "resetCounters": "การตั้งค่าคอนเตอร์รีเซ็ต",
+    "countersAria": "เครื่องต้านทาน Counters",
+    "countersHeading": "เครื่องนับเหตุการณ์ Event Counter",
+    "thEvent": "การจัดงาน Event",
+    "thCount": "นับนับ นับ นิยม",
+    "emptyMessage": "ยังไม่มีเหตุการณ์ telemetry ที่บันทึกไว้เลย  ⁇  เปิดกฎจาก Findings Dashboard เพื่อเริ่มจับตัวเลข",
+    "openFindingsTitle": "เปิด Saropa Findings Dashboard. _ พบการค้นพบของ PH0__",
+    "openFindings": "เปิดผลการค้นพบ Dashboard",
+    "lastPropsHeading": "คุณสมบัติของเหตุการณ์ล่าสุด",
+    "copiedJson": "Saropa Lints: สําเนากฎที่เกี่ยวข้องกับการวัดระยะไกล JSON.",
+    "countersReset": "Saropa Lints: กฎที่เกี่ยวข้อง การตั้งค่าคอนเตอร์ telemetry."
   },
   "sidebarLayout": {
-    "summary": "เค้าโครงแถบกิจกรรม",
-    "hint": "เปิดหรือปิดส่วนแถบกิจกรรม Saropa ที่นี่ (บันทึกพร้อมกับพื้นที่ทำงานโดยไม่ต้องออกจากแดชบอร์ด)"
+    "summary": "การวางแผน Activity Bar ลาย layout ของบาร์กิจกรรม",
+    "hint": "เปิดหรือปิดส่วน Saropa activity-bar ที่นี่ (บันทึกไว้กับ workspace โดยไม่ต้องออกจากดัชบอร์ด)"
   },
   "securityPosture": {
     "issueOne": "{count} ปัญหา",
     "issueOther": "{count} ปัญหา",
-    "noIssues": "ไม่มีปัญหา",
-    "showIssues": "แสดงประเด็นต่างๆ",
+    "noIssues": "ไม่มีประเด็นใดๆ",
+    "showIssues": "แสดงปัญหา Show issues ส่งรายการ",
     "violationTooltip": "การละเมิด {count} รายการใน {ruleCount} กฎ คลิกเพื่อแสดงในปัญหา",
-    "noViolationsTooltip": "ไม่มีการละเมิดที่แมปกับหมวดหมู่นี้"
+    "noViolationsTooltip": "ไม่มีการละเมิดที่พิมพ์ไปยังหมวดหมู่นี้."
+  },
+  "comparison": {
+    "title": "เปรียบเทียบแพ็คเกจ",
+    "actions": {
+      "addToProject": "เพิ่มเติมในโครงการ Add to Project"
+    },
+    "table": {
+      "row": {
+        "vibrancyGrade": "ระดับความสดชื่น Vibrancy Grade",
+        "category": "ประเภท Category หมวดหมู่",
+        "latestVersion": "รุ่นล่าสุด ใหม่ที่สุด",
+        "published": "พิมพ์ ออกไป ประกาศ",
+        "publisher": "ผู้จัดพิมพ์ สํานักพิมป์",
+        "pubPoints": "ปับ พบ จุด",
+        "githubStars": "GitHub ดาวดาวดวง",
+        "openIssues": "Open Issues ปัญหาที่เปิด",
+        "codeSize": "ขนาดโค้ด Code Size ขนาดรหัส",
+        "bloatRating": "อัตราการประเมิน Bloat",
+        "license": "ใบอนุญาต License",
+        "platforms": "แพลตฟอร์ม Platforms เว็บไซต์",
+        "inThisProject": "ในโครงการนี้ In This Project"
+      },
+      "value": {
+        "unverified": "⁇  (ไม่ถูกตรวจสอบ)",
+        "allPlatforms": "ทั้งหมด ทุกอย่าง",
+        "yes": "ใช่ครับ ครับ จริงๆ",
+        "no": "ไม่ๆๆๆ ครับ"
+      },
+      "badge": {
+        "inProject": "ในโครงการ In Project"
+      }
+    },
+    "status": {
+      "packagesSelected": "{count} แพคเกจที่เลือก",
+      "packagesCompared": "{count} แพ็คเกจเปรียบเทียบ",
+      "dimensionsRankedOne": "จัดอันดับมิติ {count}",
+      "dimensionsRankedOther": "{count} ขนาดเรียงลําดับตามระดับ",
+      "morePackages": "+{count} มากขึ้น"
+    },
+    "empty": {
+      "ariaLabel": "ไม่มีแพ็คเกจ ไม่มีพัสดุ",
+      "message": "ไม่มีแพ็คเกจที่เลือกเพื่อการเปรียบเทียบ คลิกขวา 2 แพ็คเกจหรือมากกว่าในแพคเกจ ดัชบอร์ด และเลือก {compare}.",
+      "compareWord": "เปรียบเทียบ Compare",
+      "openDashboard": "เปิด แดชบอร์ด Package Dashboard โดยเปิด",
+      "openDashboardTitle": "เปิด แดชบอร์ดแพคเกจ Saropa"
+    },
+    "a11y": {
+      "skipToTable": "ลอยข้ามไปยังตารางเปรียบเทียบ",
+      "recommendation": "คําแนะนํา แนะนํา",
+      "addingToProject": "การเพิ่ม {name} ให้กับโครงการ"
+    },
+    "shortcuts": {
+      "showOverlay": "แสดงการ overlay ทางลัดนี้",
+      "closeOverlay": "ปิดการ overlay ทางลัดคีย์บอร์ด"
+    },
+    "kpi": {
+      "ariaLabel": "สรุปการเปรียบเทียบ",
+      "leading": "การนําไปสู่การนํา",
+      "leadingTitle": "แพ็คเกจนําโดยส่วนใหญ่ของมิติ wins.",
+      "dimensionWinsOne": "{count} มิติชนะ win",
+      "dimensionWinsOther": "มิติ {count} ชนะ",
+      "packages": "แพ็คเกจ Packages สินค้า",
+      "packagesTitle": "จํานวนของแพ็คเกจเปรียบเทียบ side by side.",
+      "inComparison": "ในส่วนของการเปรียบเทียบ",
+      "dimensions": "ขนาด มิติ",
+      "dimensionsTitle": "จํานวนมิติที่ผู้ชนะสามารถจัดอันดับได้",
+      "ranked": "ราคาถูกๆ สูงสุด"
+    },
+    "toolbar": {
+      "ariaLabel": "การกระทําการเปรียบเทียบ",
+      "packageDashboard": "แพคเกจดัชบอร์ด (Package Dashboard) เป็น",
+      "packageDashboardTitle": "เปิด แดชบอร์ดแพคเกจ เพื่อเปรียบเทียบแพ็คเกจเพิ่มเติม"
+    }
+  },
+  "detailView": {
+    "empty": {
+      "selectPackage": "เลือกแพ็คเก็ตเพื่อดูรายละเอียด"
+    },
+    "section": {
+      "version": "VERSION การออกแบบ",
+      "update": "อัพเดท UPDATE การอัปเดต",
+      "suggestion": "การเสนอแนะ SUGGESTION",
+      "community": "สมาคม ชุมชน",
+      "dependencies": "การติดตามการใช้งาน",
+      "alerts": "การเตือน Alert",
+      "platforms": "แพลตฟอร์ม (Platforms) การใช้งาน",
+      "directDeps": "การฝากเงินโดยตรง (Direct Deposits)",
+      "readmeImages": "README IMAGES ภาพถ่ายจากหนังสือ"
+    },
+    "version": {
+      "published": "ประกาศโดย: {date}",
+      "codeSize": "ขนาดโค้ด Code Size ขนาดรหัส",
+      "archive": "อาร์คิฟอาริเวท Archives",
+      "sizeLabel": "{label}: {size}",
+      "source": "ที่มา: รหัส {code} · ความคิดเห็น {comments} · ไฟล์ {files}",
+      "replace": "เปลี่ยน: {summary}"
+    },
+    "update": {
+      "upgrade": "อัพเกรดอัปเดรด Upgrade",
+      "changelog": "Changelog รายการเปลี่ยนแปลง",
+      "blockedBy": "ป้องกันโดย {package}"
+    },
+    "suggestion": {
+      "migrateTo": "พิจารณาการย้ายไปยัง {package}.",
+      "consider": "พิจารณา: {text}.",
+      "alternatives": "ตัวเลือก: {names}",
+      "unused": "แพ็คเกจนี้ดูเหมือนจะไม่ถูกใช้ - พิจารณาการถอดมัน"
+    },
+    "community": {
+      "issues": "{count} ปัญหา",
+      "prs": "{count} PRs ของคนรัก",
+      "activity90d": "90d: ปิดประเด็น {closed}, สังกัดการรวมตัวของ {merged} PRs",
+      "lastCommit": "การลงทุนครั้งสุดท้าย: {time}",
+      "archived": "Repository เป็นการอาร์คิฟ",
+      "pubPoints": "{points}/160 จุดพับจุด",
+      "latestRelease": "การปล่อยล่าสุด: {age} ที่ผ่านมา",
+      "dependents": "{count} ผู้ต้องใช้"
+    },
+    "dormancy": {
+      "noActivity6mo": "ไม่มีการทําความมั่นใจและไม่มีการปล่อยใน 6+ เดือน",
+      "noActivity3mo": "ไม่มีการทําความมั่นใจและไม่มีการปล่อยใน 3+ เดือน",
+      "codeInactive": "การปล่อยเป็นกิจกรรม, รหัสไม่ทํางาน (3+ เดือนโดยไม่มีการกระทํา)",
+      "releaseSlower": "รหัสทํางาน, การปล่อยเรียงช้ากว่า (3+ เดือน)"
+    },
+    "dependencies": {
+      "flagged": "({count} ตรา)",
+      "transitiveCount": "{count} แพคเกจขั้นข้าม",
+      "unique": "{count} เอกลักษณ์เฉพาะอย่างยิ่ง",
+      "shared": "{count} แบ่งปัน ({pct}%)",
+      "moreOverflow": "+{count} มากขึ้น",
+      "sharedList": "แบ่งปัน: {names}"
+    },
+    "platforms": {
+      "wasm": "WASM (วิสม) เป็นการใช้"
+    },
+    "links": {
+      "viewFullDetails": "ดูรายละเอียดเต็ม ภาพรวม",
+      "pubDev": "pub.dev",
+      "documentation": "การเอกสาร หลักฐาน",
+      "changelog": "Changelog รายการเปลี่ยนแปลง",
+      "repository": "รวมข้อมูล Repository",
+      "issues": "ปัญหาประเด็น Issues",
+      "reportIssue": "รายงาน เรื่องประเด็น"
+    },
+    "logoAlt": "{packageName} โลโก้",
+    "readMore": "มากกว่า>หวย หุ้น",
+    "readmeImageAlt": "README รูปภาพของ Readme"
+  },
+  "chart": {
+    "toggle": {
+      "excludeShared": "Exclude shared แบ่งปันการใช้งาน"
+    },
+    "filter": {
+      "clear": "Clear สะอาด"
+    },
+    "bucket": {
+      "other": "อื่นๆ ({count} {noun})",
+      "uniqueTransitives": "ธาตุผ่านเฉพาะ ({count})",
+      "sharedTransitives": "การแบ่งปันทรานซิติฟ ({count})"
+    },
+    "noun": {
+      "package": "แพ็คเกจ Package package ซองประกอบด้วย",
+      "packages": "สินค้าของแพ็คเกจ"
+    }
   }
 }

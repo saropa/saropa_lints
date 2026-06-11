@@ -741,7 +741,7 @@
       "likesUnavailable": "pub.dev لایک ها در دسترس نیستند",
       "likesCount": "{count} لایک در pub.dev",
       "downloadsUnavailable": "pub.dev دانلود 30 روزه در دسترس نیست.",
-      "downloadsCount": "{count} دانلود ها در 30 روز گذشته",
+      "downloadsCount": "{count} دانلود در 30 روز گذشته",
       "sizeUnavailable": "اندازه در دسترس نیست از pub.dev",
       "noVulnerabilities": "هیچ آسیب پذیری شناخته شده ای وجود ندارد.",
       "licenseUnspecified": "مجوز مشخص نشده در pub.dev",
@@ -801,8 +801,8 @@
       "showTransitives": "وابستگی های انتقالی را نشان دهید.",
       "tooltipDep": "• {dep}",
       "tooltipDepShared": "• {dep} (مشترک)",
-      "tooltipHeader": "{total} deps انتقالی",
-      "tooltipHeaderShared": "عمق انتقالی {total} ({shared} مشترک)",
+      "tooltipHeader": "{total} وابستگی‌های انتقالی",
+      "tooltipHeaderShared": "{total} وابستگی‌های انتقالی ({shared} مشترک)",
       "sharedBadgeTitle": "{count} با سایر بسته ها به اشتراک گذاشته شده است.",
       "sharedBadge": "اشتراک گذاری مشترک به اشتراک گذاشته شده است",
       "transitiveDepsHeading": "وابستگی های انتقالی ({count})"
@@ -1260,7 +1260,7 @@
       "published": "منتشر شده توسط: {date}",
       "codeSize": "کد سایز اندازه کد",
       "archive": "آرشیو بایگانی",
-      "sizeLabel": "{label}: {size} _پایگاه خبری",
+      "sizeLabel": "{label}: {size}",
       "source": "منبع: کد {code} · نظرات {comments} · فایل های {files}",
       "replace": "جایگزین: {summary}"
     },

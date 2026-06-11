@@ -161,3 +161,51 @@ Never match on bare class name strings (e.g. `contains('TileLayer')`) — that w
 - [What's New in v8.2 — flutter_map docs](https://docs.fleaflet.dev/getting-started/new-in-v8) — `tileDimension`, `PolygonLabelPlacementCalculator` deprecation
 - [GitHub issue #1892 — MapController lifecycle not synced](https://github.com/fleaflet/flutter_map/issues/1892) — MapController disposal lifecycle bugs
 - [GitHub issue #1292 — User-Agent header](https://github.com/fleaflet/flutter_map/issues/1292) — OSM tile policy, `userAgentPackageName` rationale
+
+---
+
+## Finish Report (2026-06-11)
+
+### Validation reconciliation
+
+Grepped the whole `lib/src/rules/` tree for `flutter_map`, `MapController`, `ChangeNotifier`, and `require_change_notifier_dispose` before writing any rule.
+
+**Existing coverage found:**
+- `require_field_dispose` (widget_lifecycle_rules.dart) lists `MapController` in its `_neverDisposeTypes` set. The repo deliberately treats `MapController` as a controller that does NOT require manual disposal because flutter_map manages its lifecycle through the `FlutterMap` widget.
+
+**Dropped:**
+- `flutter_map_undisposed_controller` — DROPPED. The plan flagged this as a CONDITIONAL DROP. `MapController` is explicitly curated into `_neverDisposeTypes` in `require_field_dispose`. Adding an undisposed-controller rule would directly contradict that existing decision and produce conflicting guidance for the same type. (No separate `require_change_notifier_dispose` rule walks the supertype chain to MapController either — the curated never-dispose list is the single source of truth.)
+
+All other 6 proposed rules are genuinely new (flutter_map had zero dedicated rule coverage) and not subsumed by a generic rule. Detection is constructor-name + `fileImportsPackage(PackageImports.flutterMap)` gated; no string-`contains` type matching.
+
+### Kept rules
+
+| rule_name | class | tier | severity | fix |
+|---|---|---|---|---|
+| `flutter_map_missing_user_agent` | FlutterMapMissingUserAgentRule | recommended | WARNING | no |
+| `flutter_map_legacy_map_options_center` | FlutterMapLegacyMapOptionsCenterRule | professional | WARNING | yes (label rename) |
+| `flutter_map_fallback_url_disables_cache` | FlutterMapFallbackUrlDisablesCacheRule | professional | INFO | no |
+| `flutter_map_deprecated_tile_size` | FlutterMapDeprecatedTileSizeRule | comprehensive | INFO | yes (label rename + double→int) |
+| `flutter_map_deprecated_polygon_label_placement` | FlutterMapDeprecatedPolygonLabelPlacementRule | comprehensive | INFO | no |
+| `flutter_map_missing_error_tile_callback` | FlutterMapMissingErrorTileCallbackRule | pedantic | INFO | no |
+
+### Tier reasoning
+
+- `flutter_map_missing_user_agent` → **recommended**: WARNING with real production impact (OSM blocks unidentified traffic → tiles fail). Promoted from the plan's comprehensive suggestion because a blocked map is a crash-class user-facing failure, fitting the "ERROR/correctness → recommended" guidance even at WARNING severity.
+- `flutter_map_legacy_map_options_center` → **professional**: WARNING migration guard for a v6 compile break.
+- `flutter_map_fallback_url_disables_cache` → **professional**: INFO silent perf footgun worth surfacing in a stricter-than-default tier.
+- `flutter_map_deprecated_tile_size` → **comprehensive**: INFO pure deprecation.
+- `flutter_map_deprecated_polygon_label_placement` → **comprehensive**: INFO deprecation.
+- `flutter_map_missing_error_tile_callback` → **pedantic**: INFO best-practice that fires on the majority of real TileLayer uses (thin guard); pedantic is the correct opt-in home per the plan's GUARD-NEEDED validation note.
+
+### Notes on the polygon fix
+
+The plan self-flagged the v8.2 `PolygonLabelPlacementCalculator` constructor names as speculative/unverified. Rather than ship an unverified rename fix, `flutter_map_deprecated_polygon_label_placement` ships detection-only (no quick fix). The dartdoc/correction message names the replacement API direction without asserting exact constructor names.
+
+### Files written (non-shared)
+
+- `lib/src/rules/packages/flutter_map_rules.dart` — 6 rule classes + 2 ReplaceNodeFix subclasses.
+- `example_packages/lib/flutter_map/*_fixture.dart` — 6 fixtures (one per kept rule).
+- `test/rules/packages/flutter_map_rules_test.dart` — 6 instantiation pins + 6 fixture-existence checks.
+
+`dart analyze` on the rules file reports only the 6 expected `PackageImports.flutterMap` undefined-getter errors (resolved at merge); no other issues.

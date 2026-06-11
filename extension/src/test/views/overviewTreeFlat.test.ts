@@ -90,12 +90,16 @@ describe('Saropa Lints sidebar — multi-panel section providers', () => {
     sinon.restore();
   });
 
-  it('package.json declares exactly the six section views in the saropaLints container', () => {
+  it('package.json declares the six section views plus the standalone Suggestions view', () => {
     const pkg = loadPackageJson();
     const views = pkg.contributes.views.saropaLints;
     const ids = views.map((v) => v.id).sort();
-    const expected = Object.values(SECTION_VIEW_IDS).sort();
-    assert.deepStrictEqual(ids, expected, 'view IDs in package.json must match SECTION_VIEW_IDS exactly');
+    // The container holds the section views (managed by sectionedSidebar) plus
+    // the standalone config-Suggestions view. Suggestions is NOT a section: it is
+    // created via createTreeView so it can carry a .badge counter, so it lives
+    // outside SECTION_VIEW_IDS by design.
+    const expected = [...Object.values(SECTION_VIEW_IDS), 'saropaLints.suggestions'].sort();
+    assert.deepStrictEqual(ids, expected, 'container = section views + Suggestions');
   });
 
   it('the legacy single saropaLints.overview view is no longer registered', () => {

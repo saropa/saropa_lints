@@ -176,3 +176,39 @@
 - [Issue #1489: PlayerMode.lowLatency and setReleaseMode don't work together](https://github.com/bluefireteam/audioplayers/issues/1489)
 - [Issue #490: iOS Fatal Error with PlayerMode.LOW_LATENCY](https://github.com/bluefireteam/audioplayers/issues/490)
 - [cancel_subscriptions — dart.dev linter rules](https://dart.dev/tools/linter-rules/cancel_subscriptions)
+
+
+---
+
+## Finish Report (2026-06-11)
+
+## audioplayers rules — validation reconciliation and final state
+
+### Prior state discovered
+The rules file `lib/src/rules/packages/audioplayers_rules.dart`, all 6 fixtures under `example_packages/lib/audioplayers/`, were already present from an in-progress attempt. Only the test file was missing. I created `test/rules/packages/audioplayers_rules_test.dart` (instantiation pins + fixture-existence checks mirroring `geocoding_rules_test.dart`). No rule logic or fixtures were modified — they already match the live `geocoding_rules.dart` / `image_picker_rules.dart` conventions (`SaropaLintRule`, `runWithReporter`, `fileImportsPackage(node, PackageImports.audioplayers)`, `ReplaceNodeFix` for the one quick fix).
+
+### Reconciliation against existing coverage (grepped `lib/src/rules/` before keeping anything)
+The plan proposed 9 rules. Three were dropped as duplicates of shipped rules:
+
+| Dropped proposal | Subsumed by | Note |
+|---|---|---|
+| `audioplayers_player_not_disposed` | `require_media_player_dispose` (disposal_rules.dart:85-96) | Its `_mediaControllerTypePatterns` already includes `\bAudioPlayer\b`. The plan's KEEP note cited only the generic `require_dispose_implementation`; it overlooked the dedicated media-player rule. |
+| `audioplayers_direct_audio_cache_construction` | `require_media_player_dispose` lists `\bAudioCache\b` | The plan also flagged the AudioCache library URI as unverified/infeasible. Dropped rather than guess a URI. |
+| `audioplayers_stream_subscription_not_canceled` | `require_stream_subscription_cancel` (disposal_rules.dart:1147) + `avoid_unassigned_stream_subscriptions` (async_rules.dart:552) | Matches the plan's own DROP annotation. |
+
+`AudioPool` is genuinely uncovered — no existing disposal rule lists it — so `audioplayers_pool_not_disposed` was kept.
+
+### Kept rules and tier assignments (6)
+
+| rule | type | severity | tier | fix | rationale |
+|---|---|---|---|---|---|
+| `audioplayers_pool_not_disposed` | bug | WARNING | comprehensive | no | Heuristic field/dispose match (same-class), conservative; comprehensive keeps it opt-in for stricter consumers. |
+| `audioplayers_low_latency_with_stream_listen` | bug | WARNING | recommended | no | Real dead-code bug (events never fire in lowLatency); tightly scoped to same member body, low FP — earns recommended. |
+| `audioplayers_low_latency_with_seek` | bug | WARNING | recommended | no | `seek()` is a silent no-op in lowLatency; same same-body guard, low FP. |
+| `audioplayers_release_mode_loop_with_complete_listener` | codeSmell | INFO | professional | no | Listener never fires under loop, but a logging-only listener is a mild FP — INFO + professional reflects the softer signal. |
+| `audioplayers_url_source_in_asset_context` | bug | WARNING | recommended | yes | Literal `assets/` path in `UrlSource` is unambiguously wrong; mechanical fix swaps to `AssetSource` and strips the prefix. |
+| `audioplayers_hardcoded_volume_above_one` | bug | WARNING | recommended | no | Numeric literal >1.0 to a 0.0-1.0 volume API is unambiguously wrong (literals only). |
+
+### Verification
+`dart analyze lib/src/rules/packages/audioplayers_rules.dart` reports only the expected 6 `undefined_getter` errors for `PackageImports.audioplayers` (one per rule's import gate), resolved by the shared-file merge. No syntax errors, no other diagnostics. Shared files (import_utils.dart, all_rules.dart, saropa_lints.dart, tiers.dart, CHANGELOG.md) were not touched, per scope.
+

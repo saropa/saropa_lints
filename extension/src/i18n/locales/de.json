@@ -799,10 +799,10 @@
     "deps": {
       "noTransitives": "Keine transitiven Abhängigkeiten.",
       "showTransitives": "Zeigen Sie transitive Abhängigkeiten.",
-      "tooltipDep": "• {dep} ist ein",
+      "tooltipDep": "• {dep}",
       "tooltipDepShared": "• {dep} (gemeinsam)",
-      "tooltipHeader": "{total} transitive Abhängigkeiten.",
-      "tooltipHeaderShared": "{total} transitive Deps ({shared} gemeinsam genutzt)",
+      "tooltipHeader": "{total} transitive Abhängigkeiten",
+      "tooltipHeaderShared": "{total} transitive Abhängigkeiten ({shared} gemeinsam)",
       "sharedBadgeTitle": "{count} wird mit anderen Paketen geteilt.",
       "sharedBadge": "Gemeinsam geteiltes Shared Shared wurde.",
       "transitiveDepsHeading": "Transitive Abhängigkeiten ({count})"
@@ -1260,7 +1260,7 @@
       "published": "Veröffentlicht von: {date}",
       "codeSize": "Code Größe Codegröße",
       "archive": "Archiv-Archiv - Das ist das Archive.",
-      "sizeLabel": "{label}: {size} ist ein _PH0_.",
+      "sizeLabel": "{label}: {size}",
       "source": "Quelle: {code}-Code · {comments}-Kommentare · {files}-Dateien",
       "replace": "Ersetzen Sie: {summary}"
     },

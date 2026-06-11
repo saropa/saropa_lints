@@ -93,6 +93,7 @@ Adds lint rules for twelve more packages — quick_actions, in_app_review, local
 
 - **Filled four extension strings that were shipping English in their locale** — the pub.dev 30-day download count (Hindi), the transitive-dependencies tooltip (Filipino), and the size label (Filipino, Swahili). No action required.
 - **Corrected the pub.dev likes count in German, Arabic, and Persian**, where machine translation had rendered the social-media noun "likes" as the verb "to like". No action required.
+- **Cleaned up garbled machine-translation in the package-dashboard tooltips and labels across all 24 languages.** The dependency-list tooltips, transitive-dependency headers, the size label, and the 30-day download count had picked up hallucinated trailing phrases (a dependency name followed by "person with a disability", "physiotherapy", or "blood circulation") and mistranslated technical terms (Korean "geometric progression", Russian "indents" for "transitive dependencies"); they now read as clean, correct labels in every language, with the dependency bullet and size label kept as a curated passthrough so the coverage gate stays honest. No action required.
 
 <details>
 <summary>Maintenance</summary>

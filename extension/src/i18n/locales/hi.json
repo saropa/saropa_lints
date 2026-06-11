@@ -799,10 +799,10 @@
     "deps": {
       "noTransitives": "कोई पारगमन निर्भरता नहीं।",
       "showTransitives": "पारगमन निर्भरता दिखाएँ।",
-      "tooltipDep": "• {dep} _ PH0__ का प्रयोग किया जाता है।",
+      "tooltipDep": "• {dep}",
       "tooltipDepShared": "• {dep} (साझा)",
-      "tooltipHeader": "{total} पारगमन अवसाद",
-      "tooltipHeaderShared": "{total} सकर्मक डिपो ({shared} साझा)",
+      "tooltipHeader": "{total} ट्रांज़िटिव डिपेंडेंसी",
+      "tooltipHeaderShared": "{total} ट्रांज़िटिव डिपेंडेंसी ({shared} साझा)",
       "sharedBadgeTitle": "{count} अन्य पैकेजों के साथ साझा किया गया।",
       "sharedBadge": "साझा किया गया साझा किया हुआ साझा किया",
       "transitiveDepsHeading": "पारगमन निर्भरता ({count})"
@@ -1260,7 +1260,7 @@
       "published": "प्रकाशितः {date}",
       "codeSize": "कोड आकार, कोड का आकार",
       "archive": "अभिलेखागार संग्रह",
-      "sizeLabel": "{label}: {size} का अर्थ है _",
+      "sizeLabel": "{label}: {size}",
       "source": "स्रोत: {code} कोड · {comments} टिप्पणियाँ · {files} फ़ाइलें",
       "replace": "प्रतिस्थापित करेंः {summary}"
     },

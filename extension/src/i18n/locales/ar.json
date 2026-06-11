@@ -741,7 +741,7 @@
       "likesUnavailable": "pub.dev الإعجابات غير متوفرة",
       "likesCount": "{count} إعجاب على pub.dev",
       "downloadsUnavailable": "pub.dev تحميلات 30 يوم غير متوفرة",
-      "downloadsCount": "{count} التنزيلات في آخر 30 يوما.",
+      "downloadsCount": "{count} تنزيل في آخر 30 يومًا",
       "sizeUnavailable": "الحجم غير متوفر من pub.dev",
       "noVulnerabilities": "لا يوجد نقاط ضعف معروفة.",
       "licenseUnspecified": "ترخيص غير محدد في pub.dev",
@@ -799,10 +799,10 @@
     "deps": {
       "noTransitives": "لا توجد تعتمدات انتقالية.",
       "showTransitives": "أظهر التبعيات الانتقالية.",
-      "tooltipDep": "• {dep} _ PH0__ = الحالة المرضية.",
+      "tooltipDep": "• {dep}",
       "tooltipDepShared": "• {dep} (مشتركة)",
-      "tooltipHeader": "{total} النزول العابر deps.",
-      "tooltipHeaderShared": "عمليات الإنزال المتعدية {total} (مشاركة {shared})",
+      "tooltipHeader": "{total} تبعيات متعدية",
+      "tooltipHeaderShared": "{total} تبعيات متعدية ({shared} مشتركة)",
       "sharedBadgeTitle": "{count} المشتركة مع حزم أخرى من الحزم.",
       "sharedBadge": "المشتركة مشترك مشتركة.",
       "transitiveDepsHeading": "التبعيات الانتقالية ({count})"
@@ -1260,7 +1260,7 @@
       "published": "نشرت: {date}",
       "codeSize": "حجم الرمز: حجم الكود.",
       "archive": "أرشيف الأرشيف",
-      "sizeLabel": "{label}: {size} هي الوسيلة التي تمكن من تحديد المرحلة.",
+      "sizeLabel": "{label}: {size}",
       "source": "المصدر: كود {code} · تعليقات {comments} · ملفات {files}",
       "replace": "استبدال: {summary}"
     },

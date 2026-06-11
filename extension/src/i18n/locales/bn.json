@@ -799,10 +799,10 @@
     "deps": {
       "noTransitives": "কোন ট্রানজিটিভ নির্ভরতা নেই।",
       "showTransitives": "ট্রানজিটিভ নির্ভরতা দেখাও।",
-      "tooltipDep": "• {dep} _ PH0__ এর মাধ্যমে",
+      "tooltipDep": "• {dep}",
       "tooltipDepShared": "• {dep} (ভাগ করা)",
       "tooltipHeader": "{total} ট্রানজিটিভ ডিপস",
-      "tooltipHeaderShared": "{total} ট্রানজিটিভ ডেপস ({shared} শেয়ার করা হয়েছে)",
+      "tooltipHeaderShared": "{total} ট্রানজিটিভ ডিপস ({shared} শেয়ার করা)",
       "sharedBadgeTitle": "{count} অন্যান্য প্যাকেজের সাথে ভাগ করা হয়।",
       "sharedBadge": "শেয়ার করা ভাগ করে নেওয়া ভাগ করে নেওয়ার জন্য।",
       "transitiveDepsHeading": "ট্রানজিটিভ ডিপেনডেন্সি ({count})"
@@ -1260,7 +1260,7 @@
       "published": "প্রকাশিতঃ {date}",
       "codeSize": "কোডের আকার, কোড সাইজ",
       "archive": "আর্কাইভ ফাইল সংরক্ষণাগার",
-      "sizeLabel": "{label}: {size} এর সাথে সম্পর্কিত।",
+      "sizeLabel": "{label}: {size}",
       "source": "উত্স: {code} কোড · {comments} মন্তব্য · {files} ফাইল",
       "replace": "প্রতিস্থাপন করুনঃ {summary}"
     },

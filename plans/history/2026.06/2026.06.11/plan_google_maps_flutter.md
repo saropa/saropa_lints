@@ -153,3 +153,50 @@ New file `lib/src/rules/packages/google_maps_flutter_rules.dart`; register all r
 - [150,000 markers performance analysis — confirms Set rebuild cost (Medium, Nov 2025)](https://medium.com/@eraprimax/boosting-flutter-google-maps-performance-from-500-to-150-000-markers-with-partial-rendering-23ba15b15a3e)
 - [google_maps_flutter pub.dev package page — bounded widget requirement](https://pub.dev/packages/google_maps_flutter)
 - [google_map.dart source — cloudMapId @Deprecated annotation verified](https://github.com/flutter/packages/blob/main/packages/google_maps_flutter/google_maps_flutter/lib/src/google_map.dart)
+
+
+---
+
+## Finish Report (2026-06-11)
+
+## google_maps_flutter rules — validation reconciliation
+
+Before writing, grepped `lib/src/rules/` for `google_maps_flutter` / `GoogleMap` / `GoogleMapController`. There is no existing `google_maps_flutter_rules.dart`, but two existing files carry load-bearing knowledge about the package:
+
+- **`widget/widget_lifecycle_rules.dart:1368-1373`** — `GoogleMapController` is listed in a `_neverDisposeTypes` set, with a documented comment that the plugin manages its lifecycle and it must NOT be flagged for missing disposal.
+- **`packages/firebase_rules.dart`** — only `GoogleMap(...)` examples in dartdoc; no rule logic. Not coverage.
+
+### Proposals dropped (3 of 9)
+
+| Proposed rule | Why dropped |
+|---|---|
+| `google_maps_controller_not_disposed` | Contradicts shipped policy — `widget_lifecycle_rules.dart` `_neverDisposeTypes` deliberately classifies `GoogleMapController` as never-dispose. The plan's VALIDATION note only checked `require_dispose_implementation`'s narrower list and missed this. A rule flagging this disposal would conflict head-on with a rule that says never flag it. |
+| `google_maps_completer_not_completed_on_dispose` | Same conflict — the controller drained from the `Completer<GoogleMapController>` is the same never-dispose type. |
+| `google_maps_missing_initial_camera_position` | Redundant with the analyzer: `initialCameraPosition` is `required`, so omission is already a compile error (`missing_required_argument`). Plan's own VALIDATION marks it LOW VALUE. |
+
+### Rules kept (6)
+
+| rule_name | tier | severity | fix | rationale |
+|---|---|---|---|---|
+| `google_maps_animate_camera_in_build` | recommended | ERROR | — | Crash/correctness: `animateCamera`/`moveCamera` in `build()` queues per-frame platform calls → jank + possible PlatformException. ERROR crash class → recommended. |
+| `google_maps_cloud_map_id_deprecated` | recommended | WARNING | yes | Migration with a mechanical, safe label rename (`cloudMapId:` → `mapId:`); near-zero FP, so recommended despite WARNING. |
+| `google_maps_markers_rebuilt_in_build` | professional | WARNING | — | Performance best-practice: per-frame `Set<Marker/Polyline/Polygon/Circle>` literal forces an O(n) value-equality diff each frame. Best-practice WARNING → professional. |
+| `google_maps_set_map_style_deprecated` | professional | WARNING | — | Migration (deprecated 2.6.0); report-only because the replacement `style:` lives on a `GoogleMap` that may be in another file. In-rule version gate omitted per the plan note (route version gating through pack dependency gates). |
+| `google_maps_bitmap_descriptor_in_build` | professional | WARNING | — | Performance: `BitmapDescriptor.fromAssetImage`/`fromBytes` in `build()` re-decodes the icon and flickers. Best-practice WARNING → professional. |
+| `google_maps_unknown_map_id_error_unchecked` | comprehensive | INFO | — | Heuristic/INFO: unguarded info-window calls throw `UnknownMapObjectIDError` since 2.0; an outer guard may exist, so INFO → comprehensive. |
+
+### Detection notes
+
+- All six gate on `fileImportsPackage(node, PackageImports.googleMapsFlutter)` (constant added during merge).
+- `build()` narrowing checks the method is named `build` AND takes a `BuildContext` param, stopping at any non-method function boundary so closures/event handlers (the GOOD path) are not matched.
+- Method-call rules (`setMapStyle`, info-window, camera) require a receiver (`realTarget != null`) to avoid bare-name collisions with unrelated helpers.
+- `markers_rebuilt` skips `isMap`, `const`, and untyped set literals; matches only `<Marker|Polyline|Polygon|Circle>{...}` typed literals.
+- `cloudMapId` fix (`_RenameCloudMapIdFix extends ReplaceNodeFix`) preserves the value source and only rewrites the label.
+
+### Files written
+
+- `lib/src/rules/packages/google_maps_flutter_rules.dart` (6 rules + 1 fix)
+- `example_packages/lib/google_maps_flutter/<rule>_fixture.dart` (6 fixtures, each with `bad()` + near-miss `good()`)
+- `test/rules/packages/google_maps_flutter_rules_test.dart` (6 instantiation pins + 6 fixture-existence checks)
+
+`dart analyze` on the rules file reports only the 6 expected `PackageImports.googleMapsFlutter` undefined-getter errors (resolved at merge); no other diagnostics. Shared files (import_utils, all_rules, saropa_lints, tiers, CHANGELOG) untouched per instructions.

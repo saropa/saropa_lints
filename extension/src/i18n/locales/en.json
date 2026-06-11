@@ -1,4 +1,17 @@
 {
+  "configSuggestions": {
+    "badgeTooltip": "Saropa Lints — {count} config suggestion(s)",
+    "initMissing": {
+      "title": "Set up Saropa Lints (run init)",
+      "detail": "saropa_lints is in pubspec but no analyzer config is wired up yet"
+    },
+    "packAvailable": {
+      "title": "Enable the {pack} rule pack",
+      "detail": "{count} rules for a package in your pubspec"
+    },
+    "enabledToast": "Enabled the {pack} rule pack in analysis_options.yaml",
+    "enableFailed": "Could not enable the {pack} rule pack — open the Rule Packs dashboard to enable it"
+  },
   "packageDetail": {
     "section": {
       "version": "VERSION",

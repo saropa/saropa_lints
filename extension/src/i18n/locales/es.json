@@ -741,7 +741,7 @@
       "likesUnavailable": "pub.dev Me gusta no está disponible.",
       "likesCount": "A {count} le gusta el hecho de que a pub.dev le guste.",
       "downloadsUnavailable": "pub.dev No están disponibles las descargas de 30 días.",
-      "downloadsCount": "Descargas de {count} en los últimos 30 días",
+      "downloadsCount": "{count} descargas en los últimos 30 días",
       "sizeUnavailable": "Tamaño no disponible desde pub.dev",
       "noVulnerabilities": "No se conocen vulnerabilidades.",
       "licenseUnspecified": "Licencia no especificada en el pub.dev",
@@ -799,10 +799,10 @@
     "deps": {
       "noTransitives": "No hay dependencias transitivas.",
       "showTransitives": "Mostrar las dependencias transitivas.",
-      "tooltipDep": "• El {dep} es el número de",
-      "tooltipDepShared": "• {dep} (compartido) es el número de",
-      "tooltipHeader": "{total} deps transitivos se desvanecen en el tiempo.",
-      "tooltipHeaderShared": "{total} depósitos transitivos ({shared} compartidos) y también",
+      "tooltipDep": "• {dep}",
+      "tooltipDepShared": "• {dep} (compartido)",
+      "tooltipHeader": "{total} dependencias transitivas",
+      "tooltipHeaderShared": "{total} dependencias transitivas ({shared} compartidas)",
       "sharedBadgeTitle": "{count} compartido con otros paquetes.",
       "sharedBadge": "Compartido compartido compartida compartido.",
       "transitiveDepsHeading": "Dependencias transitivas ({count})"
@@ -1260,7 +1260,7 @@
       "published": "Publicado por: {date} Fue publicado en:",
       "codeSize": "Tamaño del código tamaño de la clave",
       "archive": "El archivo de archivos es el arquivo.",
-      "sizeLabel": "{label}: El nombre de la persona es {size}.",
+      "sizeLabel": "{label}: {size}",
       "source": "Fuente: Código {code} · Comentarios {comments} · Archivos {files}",
       "replace": "Sustituir por: {summary} En su lugar se encuentra"
     },

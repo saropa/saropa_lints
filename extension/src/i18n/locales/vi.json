@@ -1,882 +1,1113 @@
 {
+  "packageDetail": {
+    "section": {
+      "version": "VERSION phiên bản",
+      "community": "Cộng đồng cộng đồng - Community",
+      "dependencies": "DEPENDENCIES là các khoản phụ thuộc.",
+      "alerts": "Cảnh báo cảnh báo",
+      "platforms": "Nền tảng nền tảng platforms",
+      "suggestions": "Đề xuất đề nghị",
+      "readmeImages": "README IMAGES (Ảnh chụp hình ảnh)"
+    },
+    "header": {
+      "logoAlt": "{name} logo của PH0",
+      "grade": "Lớp {grade}",
+      "licenseTitle": "Giấy phép License",
+      "published": "Được xuất bản {date}"
+    },
+    "partialBanner": {
+      "partReadme": "README và logo.",
+      "partGap": "PRs và các vấn đề về version-gap.",
+      "partReverseDeps": "Số lượng phụ thuộc ngược (reverse dependence count)",
+      "listTwo": "{first} và {second}",
+      "listMany": "{head}, và {last}.",
+      "message": "Một số phần không thể tải: {list}. . ph0__ .",
+      "retry": "Retry retry thử lại",
+      "retryTitle": "Hãy thử lại các fetch thất bại."
+    },
+    "description": {
+      "readMore": "read more đọc thêm"
+    },
+    "version": {
+      "constraint": "Constraint là một hạn chế.",
+      "latest": "Mới nhất mới nhất Latest Latest",
+      "prerelease": "Prerelease - Tiếp tục phát hành",
+      "published": "Được xuất bản Published Phát hành Published",
+      "update": "Update update updates là gì",
+      "blockedBy": "Blocked by: bị chặn bởi",
+      "codeSize": "Kích thước mã Code Size",
+      "archiveSize": "Kích thước tập tin Archive Size",
+      "bloat": "({rating}/10 sưng)",
+      "onDisk": "Trong Disk On Disk",
+      "upgrade": "Nâng cấp nâng cấp Upgrade",
+      "viewChangelog": "Xem Changelog"
+    },
+    "community": {
+      "stars": "Ngôi sao Các ngôi sao Những vì sao",
+      "likes": "Thích thích thích thích",
+      "report": "Báo cáo báo cáo báo chí",
+      "openIssues": "Các vấn đề mở",
+      "openPrs": "Open PRs (công việc công khai)",
+      "activity": "Hoạt động (90d)",
+      "activityValue": "{closed} vấn đề đóng cửa, {merged} PRs sáp nhập.",
+      "noActivity": "Không có hoạt động gần đây",
+      "lastCommit": "Last Commitment (Tạm dịch: Cam kết cuối cùng)",
+      "pubPoints": "Pub Points Điểm quán rượu",
+      "verified": "(được xác minh)",
+      "publisher": "Nhà xuất bản Publisher",
+      "flagged": "({count} được gắn cờ)",
+      "transitiveDeps": "Các mỏ chuyển tiếp (transitive)",
+      "footprintBreakdown": "{unique} duy nhất &middot; +{shared} chia sẻ = {total} tổng số",
+      "footprintTooltip": "Sở hữu {own} + các chuyển tiếp độc đáo {unique} + các chuyển tiếp chung {shared}. Việc xóa dep này sẽ tiết kiệm được {saved} (các dep được chia sẻ sẽ được người khác kéo vào).",
+      "trueFootprint": "True Footprint (Dấu chân thật)",
+      "packagesCount": "{count} gói",
+      "dependents": "Người phụ thuộc."
+    },
+    "fileUsages": {
+      "commentedOut": "Các tài liệu tham khảo được bình luận:",
+      "fileCount": "{count} tập tin tệp",
+      "exportNoteTitle": "Ít nhất một cách sử dụng là chỉ thị xuất khẩu.",
+      "publicApiSurface": "API bề mặt công cộng của API",
+      "header": "FILE USages ({label}) - Sử dụng tập tin",
+      "commentedReexportTitle": "Commented-out tái xuất khẩu",
+      "reexportTitle": "Được tái xuất khẩu  ⁇ là một phần của API công khai thư viện này.",
+      "reexportBadge": "tái xuất khẩu - re-export"
+    },
+    "alerts": {
+      "archived": "ARCHIVED  ⁇   ⁇ kho lưu trữ chỉ đọc là read-only.",
+      "knownIssue": "Vấn đề được biết đến: {reason} là Phương pháp",
+      "unused": "Không sử dụng  ⁇ không phát hiện ra bất kỳ nhập khẩu nào.",
+      "fix": "⁇  Đồ chơi điện tử fix: sửa chữa {version} là Phương pháp"
+    },
+    "versionGap": {
+      "versionTitle": "Phiên bản Gap Gap Version",
+      "overrideTitle": "Bỏ qua Gap Gap",
+      "noDates": "Không thể xác định ngày phiên bản cho gói này.",
+      "noItems": "Không có PRs hoặc các vấn đề được tìm thấy giữa những phiên bản này.",
+      "prsMerged": "PRs sáp nhập với nhau.",
+      "issuesClosed": "Các vấn đề đã đóng cửa.",
+      "searchLabel": "Tìm kiếm PRs và các vấn đề.",
+      "searchPlaceholder": "Tìm kiếm PRs và các vấn đề ...",
+      "filterAria": "Lưu trữ các bộ lọc theo loại.",
+      "filterAll": "Tất cả tất cả, tất cả.",
+      "filterUnreviewed": "Không được xem xét lại",
+      "filterPrs": "PRs là những người có quan hệ công chúng.",
+      "filterIssues": "Các vấn đề về các vấn đề",
+      "typePr": "PR PR PR ĐHĐ",
+      "typeIssue": "Vấn đề vấn đề Issue",
+      "reviewReviewed": "Xem lại được xem xét.",
+      "reviewApplicable": "Có thể áp dụng được",
+      "reviewNotApplicable": "N/A Không có",
+      "notesPlaceholder": "Ghi chú... ghi chép.",
+      "colType": "Loại loại Type Type",
+      "colTitle": "Tiêu đề Tên Đề án",
+      "colAuthor": "Tác giả tác giả Author Author",
+      "colReview": "Xem xét Review Review xem xét",
+      "summaryFooter": "{triaged} của {total} được phân loại | {applicable} áp dụng | {notApplicable} Không áp dụng | {unreviewed} còn lại",
+      "truncated": "Kết quả bị cắt ngắn thành các mục {limit}."
+    },
+    "platforms": {
+      "wasm": "WASM là một loại mã hóa."
+    },
+    "images": {
+      "alt": "Readme hình ảnh README"
+    },
+    "links": {
+      "viewOnPubDev": "Xem trên pub.dev",
+      "documentation": "Tài liệu tài liệu Documentation",
+      "changelog": "Changelog thay đổi",
+      "versions": "Phiên bản Versions",
+      "repository": "Repository (thư viện)",
+      "openIssues": "Các vấn đề mở",
+      "reportIssue": "Báo cáo báo cáo vấn đề"
+    },
+    "a11y": {
+      "skipToDetails": "Bỏ qua chi tiết gói hàng."
+    },
+    "shortcuts": {
+      "showOverlay": "Hiển thị lớp phủ phím tắt này.",
+      "closeOverlay": "Đóng cửa lớp phủ phím tắt-phím bấm chuột."
+    }
+  },
   "toolbar": {
-    "runAnalysis": "Chạy phân tích",
-    "rescan": "Quét lại",
-    "refresh": "Làm cho khỏe lại",
+    "runAnalysis": "Chạy phân tích chạy.",
+    "rescan": "Rescan lại quét lại.",
+    "refresh": "Thức mới và làm mới",
     "copyJson": "Sao chép JSON",
-    "saveReport": "Lưu báo cáo",
-    "moreActions": "Thêm hành động",
-    "clearAll": "Xóa tất cả",
-    "resetView": "Đặt lại chế độ xem"
+    "saveReport": "Lưu báo cáo Save report",
+    "moreActions": "Nhiều hành động hơn.",
+    "clearAll": "Tất cả mọi thứ đều sạch sẽ.",
+    "resetView": "Reset view xem thiết lập lại"
   },
   "empty": {
-    "noFindingsTitle": "Không có phát hiện nào",
+    "noFindingsTitle": "Không có phát hiện nào.",
     "noFindingsMessage": "Chạy phân tích để quét không gian làm việc.",
-    "noFindingsCta": "Chạy phân tích",
-    "noMatchTitle": "Không có kết quả phù hợp",
+    "noFindingsCta": "Chạy phân tích chạy.",
+    "noMatchTitle": "Không có kết quả khớp.",
     "noMatchMessage": "Không có hàng nào khớp với bộ lọc hiện tại.",
-    "noMatchCta": "Đặt lại bộ lọc",
-    "noProjectTitle": "Không có không gian làm việc mở",
-    "noProjectMessage": "Mở dự án Flutter hoặc Dart để xem kết quả.",
-    "noProjectCta": "Mở thư mục",
-    "noDataTitle": "Chưa có dữ liệu",
-    "noDataMessage": "Chạy quét để điền vào bảng thông tin này.",
-    "noDataCta": "Chạy phân tích"
+    "noMatchCta": "Reset bộ lọc của các bộ lọc.",
+    "noProjectTitle": "Không có không gian làm việc mở cửa.",
+    "noProjectMessage": "Mở một dự án Flutter hoặc Dart để xem kết quả.",
+    "noProjectCta": "Mở thư mục mở folder folder",
+    "noDataTitle": "Chưa có dữ liệu nào cả.",
+    "noDataMessage": "Chạy quét để lấp đầy bảng điều khiển này.",
+    "noDataCta": "Chạy phân tích chạy."
   },
   "loading": {
-    "thinking": "Đang suy nghĩ…",
-    "preparing": "Chuẩn bị…",
-    "checking": "Đang kiểm tra…",
-    "fetching": "Đang tìm nạp…",
-    "working": "Đang làm việc…",
-    "scanning": "Đang quét…",
-    "cancel": "Hủy bỏ",
-    "runningAnalysis": "Đang chạy phân tích…",
-    "analysisComplete": "Phân tích hoàn tất",
-    "refreshingDashboard": "Làm mới bảng điều khiển với những phát hiện mới nhất.",
-    "analysisStartedDetail": "Phân tích bắt đầu. Đang thu thập chẩn đoán…",
+    "thinking": "Suy nghĩ... suy nghĩ.",
+    "preparing": "Chuẩn bị... chuẩn bị.",
+    "checking": "Kiểm tra... kiểm tra.",
+    "fetching": "Lấy... lấy...",
+    "working": "Làm việc... làm việc.",
+    "scanning": "Quét... quét...",
+    "cancel": "Hủy bỏ hủy bỏ",
+    "runningAnalysis": "Chạy phân tích...",
+    "analysisComplete": "Phân tích hoàn thành, phân tích hoàn tất.",
+    "refreshingDashboard": "Bảng điều khiển làm mới với những phát hiện mới nhất.",
+    "analysisStartedDetail": "Phân tích bắt đầu. Thu thập chẩn đoán...",
     "analysisFailedDetail": "Phân tích không thành công. Kiểm tra đầu ra để biết chi tiết."
   },
   "error": {
-    "genericTitle": "Đã xảy ra lỗi",
-    "retry": "Thử lại",
-    "reload": "Tải lại",
-    "copyDetails": "Sao chép chi tiết",
-    "unreachable": "Không thể đạt tới {target}",
+    "genericTitle": "Có điều gì đó đã sai trái.",
+    "retry": "Retry retry thử lại",
+    "reload": "Reload tải lại",
+    "copyDetails": "Sao chép chi tiết.",
+    "unreachable": "Không thể đạt được {target}",
     "partialSummary": "đã tải {loaded}/{total} {item}. {failed} thất bại.",
-    "partialRetry": "Thử lại không thành công"
+    "partialRetry": "Retry failed Re-try đã thất bại."
   },
   "offline": {
-    "banner": "Ngoại tuyến - kết nối lại để làm mới.",
-    "cachedFooter": "Hiển thị dữ liệu được lưu trong bộ nhớ đệm từ {when}.",
-    "reconnecting": "Đang kết nối lại…"
+    "banner": "Offline  ⁇  Không trực tuyến reconnect to refresh. tái kết nối để làm mới.",
+    "cachedFooter": "Hiển thị dữ liệu được lưu trữ bộ nhớ cache từ {when}.",
+    "reconnecting": "Kết nối lại... kết nối lại."
   },
   "stale": {
-    "statusPill": "Lần chạy thành công cuối cùng {when} — làm mới không thành công"
+    "statusPill": "Lần chạy thành công cuối cùng {when}  ⁇ refresh không thành công."
   },
   "filter": {
-    "searchPlaceholder": "Tìm kiếm…",
-    "clearSearch": "Xóa tìm kiếm",
+    "searchPlaceholder": "Tìm kiếm... tìm kiếm...",
+    "clearSearch": "Clear search tìm kiếm rõ ràng.",
     "activeLabel": "Bộ lọc hoạt động:",
-    "recentLabel": "Gần đây ▾",
-    "chipRemove": "Di dời"
+    "recentLabel": "Gần đây  ⁇  Recent",
+    "chipRemove": "Remove remove loại bỏ"
   },
   "a11y": {
-    "toggleFullWidth": "Chuyển đổi bố cục toàn chiều rộng",
-    "sortBy": "Sắp xếp theo {column}",
-    "expandRow": "Mở rộng hàng",
-    "collapseRow": "Thu gọn hàng",
-    "selectAll": "Chọn tất cả các hàng",
-    "keyboardShortcuts": "Phím tắt",
-    "announcer": "Các cập nhật về trạng thái lọc và sắp xếp được thông báo tại đây."
+    "toggleFullWidth": "Toggle toàn bộ chiều rộng bố cục.",
+    "sortBy": "Sort by {column} Xếp theo _PH0_",
+    "expandRow": "Expand row row mở rộng hàng",
+    "collapseRow": "Dòng sụp đổ hàng rào.",
+    "selectAll": "Chọn tất cả các hàng.",
+    "keyboardShortcuts": "Phím tắt của phím",
+    "announcer": "Các bản cập nhật về bộ lọc và trạng thái sắp xếp được công bố ở đây."
   },
   "uiLanguage": {
     "pick": {
-      "title": "Ngôn ngữ giao diện người dùng Saropa Lints",
-      "placeholder": "Chọn ngôn ngữ cho thanh bên và trang tổng quan",
-      "auto": "Tự động (tuân theo ngôn ngữ hiển thị VS Code)"
+      "title": "Saropa Lints Ngôn ngữ UI",
+      "placeholder": "Chọn ngôn ngữ cho thanh bên và bảng điều khiển.",
+      "auto": "Tự động (theo ngôn ngữ hiển thị VS Code)"
     },
     "reloadPrompt": "Ngôn ngữ được đặt thành {locale}. Tải lại cửa sổ để cập nhật thanh bên và nhãn lệnh.",
-    "reloadNow": "Tải lại ngay bây giờ",
-    "reloadLater": "Sau đó"
+    "reloadNow": "Nạp lại bây giờ.",
+    "reloadLater": "Sau này sau đó sau này sau này"
   },
   "brand": {
     "prefix": "Saropa "
   },
   "findingsDash": {
-    "pageTitle": "Bảng điều khiển phát hiện Saropa",
-    "documentTitle": "Bảng điều khiển phát hiện Saropa",
-    "skipToFindings": "Chuyển đến phần phát hiện",
-    "secondaryAsideLabel": "Chẩn đoán thứ cấp",
+    "pageTitle": "Saropa Bảng điều khiển kết quả",
+    "documentTitle": "Saropa Bảng điều khiển kết quả",
+    "skipToFindings": "Bước sang phát hiện.",
+    "secondaryAsideLabel": "Chẩn đoán thứ cấp Secondary diagnostics",
     "hero": {
-      "productTitle": "Trang tổng quan về phát hiện",
-      "gaugeTitle": "Điểm sức khỏe {score} (cấp {grade}). Lỗi nặng nề nhất.",
+      "productTitle": "Kết quả của bảng điều khiển kết luận",
+      "gaugeTitle": "Điểm số sức khỏe {score} (lớp {grade}). Sai lầm nặng nhất.",
       "gaugePending": "…"
     },
     "time": {
-      "justNow": "ngay bây giờ",
+      "justNow": "Chỉ mới bây giờ.",
       "minutesAgo": "{min} phút trước",
       "hoursAgo": "{hr} giờ trước",
       "daysAgo": "{day} ngày trước"
     },
     "status": {
-      "lastRunPrefix": "Lần chạy cuối cùng",
-      "lastRunUnknown": "Lần chạy cuối cùng không xác định",
-      "noTimestampTitle": "Không có dấu thời gian trên vi violations.json",
-      "findingsAfterFilterTitle": "Tổng số phát hiện sau bộ lọc quy tắc bị vô hiệu hóa",
+      "lastRunPrefix": "Lần cuối cùng chạy, lần cuối.",
+      "lastRunUnknown": "Chạy cuối cùng không rõ.",
+      "noTimestampTitle": "Không có dấu thời gian trên violations.json.",
+      "findingsAfterFilterTitle": "Tổng số phát hiện sau khi lọc rule-disabled.",
       "findingOne": "{count} phát hiện",
       "findingOther": "{count} phát hiện",
-      "todoHackTitle": "Đã tìm thấy dấu TODO và HACK trong không gian làm việc",
-      "driftOnTitle": "Drift Advisor đã kết nối: {label}",
-      "driftOnPill": "Trôi đi · {count}",
-      "driftOfflineTitle": "Đã bật Drift Advisor nhưng không tìm thấy máy chủ",
-      "driftOfflinePill": "Trôi nhé",
-      "enabledRulesTitle": "Quy tắc đã bật ở cấp hiện tại",
+      "todoHackTitle": "Các dấu TODO và HACK được tìm thấy trong không gian làm việc.",
+      "driftOnTitle": "Drift Advisor kết nối: {label} là Phương pháp",
+      "driftOnPill": "Drift on · {count} Đánh trôi trên",
+      "driftOfflineTitle": "Drift Advisor được kích hoạt nhưng không tìm thấy máy chủ nào.",
+      "driftOfflinePill": "Drift offline không trực tuyến",
+      "enabledRulesTitle": "Các quy tắc được kích hoạt trong cấp hiện tại.",
       "rulesCount": "{count} quy tắc"
     },
     "groupBy": {
       "severity": "Mức độ nghiêm trọng",
-      "file": "Tài liệu",
-      "impact": "Sự va chạm",
-      "rule": "Luật lệ",
+      "file": "File file file file File File",
+      "impact": "Tác động tác động Impact impact",
+      "rule": "Quy tắc của quy định",
       "owasp": "OWASP",
-      "ruleType": "Loại quy tắc",
-      "ruleStatus": "Trạng thái quy tắc"
+      "ruleType": "Loại quy tắc loại luật",
+      "ruleStatus": "Quy tắc về tình trạng của quy định"
     },
     "seg": {
-      "toggleSeverityTitle": "Chuyển đổi mức độ nghiêm trọng của {v}",
-      "toggleImpactTitle": "Chuyển đổi tác động {v}"
+      "toggleSeverityTitle": "Toggle {v} mức độ nghiêm trọng",
+      "toggleImpactTitle": "Toggle {v} tác động va chạm"
     },
     "kpi": {
-      "visibleLabel": "Những phát hiện có thể nhìn thấy",
-      "allMatched": "tất cả đều khớp",
-      "ofTotal": "tổng cộng là {total}",
-      "clearFiltersTitle": "Nhấp để xóa tất cả bộ lọc",
-      "errorsLabel": "Lỗi",
-      "errorsSubFix": "phải sửa",
-      "errorsSubClear": "không - rõ ràng",
-      "errorsTitle": "Lọc các phát hiện thành lỗi (phải sửa - bị hỏng / sẽ gặp sự cố / có thể khai thác được)",
-      "warningsLabel": "Cảnh báo",
-      "warningsSubBad": "có thể thất bại hoặc trông tệ",
-      "warningsSubClear": "không - rõ ràng",
-      "warningsTitle": "Lọc các phát hiện thành cảnh báo (có thể thất bại hoặc trông tệ)",
-      "infoLabel": "Thông tin",
-      "infoSub": "FYI — phong cách / gợi ý",
-      "infoSubNone": "không có",
-      "infoTitle": "Lọc các phát hiện thành thông tin (FYI - phong cách và đề xuất)",
-      "filesLabel": "Các tập tin bị ảnh hưởng",
-      "filesSubAcross": "xuyên suốt quá trình xuất khẩu",
-      "filesSubNone": "không có tập tin nào bị ảnh hưởng",
-      "filesTitle": "Các tệp riêng biệt đóng góp ít nhất một phát hiện",
-      "topRuleLabel": "Quy tắc hàng đầu",
-      "topRuleTitle": "Lọc kết quả để quy tắc {name}"
+      "visibleLabel": "Những phát hiện rõ ràng là những phát hiện có thể nhìn thấy được.",
+      "allMatched": "Tất cả đều khớp với nhau.",
+      "ofTotal": "của tổng số {total}",
+      "clearFiltersTitle": "Nhấp vào để xóa tất cả các bộ lọc.",
+      "errorsLabel": "Lỗi lỗi sai lầm",
+      "errorsSubFix": "phải fix fix",
+      "errorsSubClear": "none  ⁇  không có Clear clear rõ ràng",
+      "errorsTitle": "Chọn lọc những phát hiện cho lỗi (phải sửa  ⁇ broken / will crash / exploitable) và có thể sử dụng được.",
+      "warningsLabel": "Cảnh báo cảnh báo",
+      "warningsSubBad": "có thể thất bại hoặc trông xấu.",
+      "warningsSubClear": "none  ⁇  không có Clear clear rõ ràng",
+      "warningsTitle": "Bộ lọc kết quả cho các cảnh báo (có thể thất bại hoặc trông xấu)",
+      "infoLabel": "Thông tin thông tin thông báo thông tin",
+      "infoSub": "FYI  ⁇ : phong cách / đề xuất",
+      "infoSubNone": "Không có, không có, chẳng có.",
+      "infoTitle": "Bộ lọc kết quả cho thông tin (FYI  ⁇ ) phong cách và đề xuất)",
+      "filesLabel": "Các tập tin bị ảnh hưởng.",
+      "filesSubAcross": "trên toàn bộ ngành xuất khẩu.",
+      "filesSubNone": "Không có tệp nào bị ảnh hưởng.",
+      "filesTitle": "Các tập tin riêng biệt đóng góp ít nhất một phát hiện.",
+      "topRuleLabel": "Quy tắc hàng đầu là luật lệ.",
+      "topRuleTitle": "Chọn lọc kết quả để quy tắc {name}."
     },
     "toolbar": {
-      "ariaFiltersActions": "Bộ lọc và hành động",
-      "groupByFieldTitle": "Nhóm phát hiện theo thứ nguyên đã chọn",
-      "groupByLabel": "Nhóm theo",
-      "textFilterTitle": "Lọc kết quả theo đường dẫn tệp, quy tắc hoặc văn bản tin nhắn",
-      "textFilterPlaceholder": "Lọc theo tệp, quy tắc hoặc tin nhắn…",
-      "textFilterAria": "Bộ lọc văn bản",
-      "clearTextFilterTitle": "Xóa bộ lọc văn bản",
-      "clearTextFilterAria": "Xóa bộ lọc văn bản",
+      "ariaFiltersActions": "Bộ lọc và hành động.",
+      "groupByFieldTitle": "Kết quả nhóm theo chiều kích được chọn.",
+      "groupByLabel": "Nhóm theo nhóm",
+      "textFilterTitle": "Bộ lọc kết quả tìm thấy theo đường dẫn tệp, quy tắc hoặc văn bản thông điệp.",
+      "textFilterPlaceholder": "Lọc theo tệp, quy tắc hoặc thông điệp ...",
+      "textFilterAria": "Bộ lọc văn bản text filter",
+      "clearTextFilterTitle": "Clear text filter là bộ lọc văn bản rõ ràng.",
+      "clearTextFilterAria": "Clear text filter là bộ lọc văn bản rõ ràng.",
       "recentFiltersTitle": "Bộ lọc gần đây",
       "clearRecentTitle": "Xóa tất cả các bộ lọc gần đây",
-      "clearRecentButton": "Thông thoáng",
+      "clearRecentButton": "Clear (văn) - Rõ ràng, rõ ràng",
       "recentFiltersListAria": "Bộ lọc gần đây",
       "runAnalysisTitle": "Chạy phân tích Saropa Lints",
-      "refreshViolationsTitle": "Tải lại vi violations.json từ đĩa",
-      "severityGroupAria": "Bộ lọc mức độ nghiêm trọng",
+      "refreshViolationsTitle": "Tải lại violations.json từ đĩa.",
+      "severityGroupAria": "Bộ lọc độ nghiêm trọng",
       "severityLabel": "Mức độ nghiêm trọng",
-      "impactGroupAria": "Bộ lọc tác động",
-      "impactLabel": "Sự va chạm",
-      "moreSummary": "Hơn",
+      "impactGroupAria": "Bộ lọc va chạm (Impact Filter)",
+      "impactLabel": "Tác động tác động Impact impact",
+      "moreSummary": "More More More Nhiều hơn",
       "moreChevron": "▾",
-      "copyJsonTitle": "Sao chép các vi phạm đã lọc dưới dạng JSON ({count})",
-      "saveReportTitle": "Lưu các vi phạm đã lọc dưới dạng JSON vào báo cáo/YYYYMMDD/"
+      "copyJsonTitle": "Sao chép các vi phạm được lọc dưới dạng JSON ({count})",
+      "saveReportTitle": "Lưu các vi phạm được lọc dưới dạng JSON vào báo cáo/YYY YMMDD/"
     },
     "chip": {
       "contains": "chứa \"{q}\"",
       "severityOff": "mức độ nghiêm trọng ≠ {v}",
       "impactOff": "tác động ≠ {v}",
-      "resetAllTitle": "Đặt lại tất cả bộ lọc",
-      "removeFilterAria": "Xóa bộ lọc"
+      "resetAllTitle": "Đặt lại tất cả các bộ lọc.",
+      "removeFilterAria": "Loại bỏ bộ lọc lọc"
     },
     "menuPalette": {
-      "help": "Giúp đỡ",
-      "groupBy": "Nhóm theo…",
-      "textFilter": "Bộ lọc văn bản…",
-      "severityImpact": "Bộ lọc mức độ nghiêm trọng…",
-      "hideRules": "Ẩn quy tắc…",
-      "ruleMetadata": "Siêu dữ liệu quy tắc",
-      "clearFilters": "Xóa bộ lọc",
-      "clearSuppressions": "Ngăn chặn rõ ràng",
-      "clearFileFocus": "Xóa tiêu điểm tập tin",
-      "matchActiveEditor": "So khớp trình soạn thảo đang hoạt động",
-      "copyTreeJson": "Sao chép cây JSON",
-      "refreshExtension": "Làm mới tiện ích mở rộng",
-      "openPackageDashboard": "Mở bảng thông tin Gói",
-      "openCodeHealth": "Sức khỏe mã mở",
-      "openLintsConfig": "Mở cấu hình Lint",
-      "reloadFromDisk": "Tải lại từ đĩa",
-      "reloadFromDiskTitle": "Kết xuất lại trang tổng quan từ vi violations.json gần đây nhất mà không chạy lại trình phân tích.",
-      "reEnableDisabledRules": "Kích hoạt lại các quy tắc đã bị vô hiệu hóa…",
-      "reEnableDisabledRulesTitle": "Mở phần chọn nhanh các quy tắc hiện bị vô hiệu hóa trong analysis_options_custom.yaml và bật lại các quy tắc đã chọn.",
-      "reEnableNoneTitle": "Hiện không có quy tắc nào bị vô hiệu hóa",
-      "reEnableNoneMessage": "Hiện không có quy tắc nào bị vô hiệu hóa thông qua analysis_options_custom.yaml.",
-      "reEnableQuickPickTitle": "Kích hoạt lại các quy tắc đã bị vô hiệu hóa",
-      "reEnableQuickPickPlaceholder": "Chọn một hoặc nhiều quy tắc để kích hoạt lại",
-      "menuGroupExport": "Xuất khẩu",
-      "menuGroupFilter": "Lọc và lấy nét",
-      "menuGroupOpen": "Mở trang tổng quan",
-      "menuGroupSystem": "Hệ thống"
+      "help": "Giúp đỡ giúp đỡ",
+      "groupBy": "Nhóm theo... nhóm.",
+      "textFilter": "Bộ lọc văn bản... bộ lọc văn hóa.",
+      "severityImpact": "Bộ lọc mức độ nghiêm trọng...",
+      "hideRules": "Giấu quy tắc... ẩn luật lệ.",
+      "ruleMetadata": "Quy tắc về siêu dữ liệu",
+      "clearFilters": "Clear filter: Làm sạch bộ lọc.",
+      "clearSuppressions": "Chống rõ ràng sự ức chế.",
+      "clearFileFocus": "Clear file focus: xóa tập trung vào tệp.",
+      "matchActiveEditor": "Kết hợp với trình soạn thảo hoạt động.",
+      "copyTreeJson": "Copy tree JSON là một dạng copy.",
+      "refreshExtension": "Phần mở rộng Refresh được bổ sung.",
+      "openPackageDashboard": "Mở bảng điều khiển gói mở",
+      "openCodeHealth": "Open Code Health là một nguồn mở về sức khỏe.",
+      "openLintsConfig": "Open Lints Config config có thể sử dụng.",
+      "reloadFromDisk": "Tải lại từ đĩa.",
+      "reloadFromDiskTitle": "Lại tạo lại bảng điều khiển từ lần violations.json cuối cùng mà không cần chạy lại máy phân tích.",
+      "reEnableDisabledRules": "Re-enable disabled rules... re-enabling disabled rule ... Đổi bật lại các quy tắc đã bị",
+      "reEnableDisabledRulesTitle": "Mở một lựa chọn nhanh các quy tắc hiện đang bị vô hiệu hóa trong analysis_options_custom.yaml và kích hoạt lại những người được chọn.",
+      "reEnableNoneTitle": "No rules currently disabled Không có quy tắc hiện tại bị vô hiệu hóa.",
+      "reEnableNoneMessage": "Hiện tại không có quy tắc nào bị vô hiệu hóa qua analysis_options_custom.yaml.",
+      "reEnableQuickPickTitle": "Re-enable disabled rules: Khởi động lại các quy tắc bị vô hiệu hóa.",
+      "reEnableQuickPickPlaceholder": "Chọn một hoặc nhiều quy tắc để kích hoạt lại.",
+      "menuGroupExport": "Xuất khẩu xuất khẩu",
+      "menuGroupFilter": "Filter & focus (chuyển hình và tập trung)",
+      "menuGroupOpen": "Mở bảng điều khiển mở.",
+      "menuGroupSystem": "Hệ thống hệ thống System System"
     },
     "progress": {
-      "runningLabel": "Đang chạy phân tích…",
-      "runningMeta": "Điều này có thể mất một chút thời gian đối với các dự án lớn."
+      "runningLabel": "Chạy phân tích...",
+      "runningMeta": "Điều này có thể mất một thời gian trên các dự án lớn."
     },
     "topRules": {
-      "sectionAria": "Các quy tắc hàng đầu theo số lượng",
-      "hideTitle": "Chỉ ẩn đối với tôi — cấp độ không gian làm việc, có thể đảo ngược thông qua Xóa ngăn chặn",
-      "hideButton": "Trốn",
-      "disableTitle": "Vô hiệu hóa toàn bộ dự án - ghi analysis_options_custom.yaml và chạy lại phân tích",
-      "disableButton": "Vô hiệu hóa",
-      "workspaceOnlyShort": "chỉ không gian làm việc",
-      "projectConfigShort": "cấu hình dự án (viết analysis_options_custom.yaml)",
-      "topRulesOne": "Quy tắc {count} hàng đầu",
-      "topRulesOther": "Các quy tắc {count} hàng đầu",
+      "sectionAria": "Các quy tắc hàng đầu theo số lượng.",
+      "hideTitle": "Chỉ giấu cho tôi  ⁇ cấp không gian làm việc, có thể đảo ngược thông qua Clear Suppressions.",
+      "hideButton": "Hide hide ẩn nấp",
+      "disableTitle": "Disable for the whole project  ⁇  Khóa hoạt động cho toàn bộ dự án viết analysis_options_custom.yaml và chạy lại phân tích",
+      "disableButton": "Disable vô hiệu hóa",
+      "workspaceOnlyShort": "Chỉ có workspace (không gian làm việc)",
+      "projectConfigShort": "project config (đặt analysis_options_custom.yaml)",
+      "topRulesOne": "Top {count} quy tắc",
+      "topRulesOther": "Top {count} quy tắc",
       "colRank": "#",
-      "colRule": "Luật lệ",
-      "colCount": "Đếm",
+      "colRule": "Quy tắc của quy định",
+      "colCount": "Count Count Count đếm đếm",
       "colSeverity": "Mức độ nghiêm trọng",
-      "colActionsAria": "Hành động hàng",
-      "filesAffected": "Các tệp bị ảnh hưởng ({count})"
+      "colActionsAria": "Các hành động hàng Row actions",
+      "filesAffected": "Các tập tin bị ảnh hưởng ({count})"
     },
     "findings": {
-      "sectionAria": "Những phát hiện",
-      "expandAll": "Mở rộng tất cả",
-      "collapseAll": "Thu gọn tất cả",
+      "sectionAria": "Những phát hiện của các nhà nghiên cứu",
+      "expandAll": "Expand all mở rộng tất cả",
+      "collapseAll": "Tất cả đều sụp đổ.",
       "bulkSelected": "đã chọn {count}",
-      "bulkCopy": "Bản sao được chọn dưới dạng JSON",
-      "selectAllTitle": "Chọn tất cả các phát hiện có thể nhìn thấy",
-      "selectAllAria": "Chọn tất cả các phát hiện có thể nhìn thấy",
+      "bulkCopy": "Sao chép được chọn như là JSON.",
+      "selectAllTitle": "Chọn tất cả các phát hiện có thể nhìn thấy.",
+      "selectAllAria": "Chọn tất cả các phát hiện có thể nhìn thấy.",
       "colSeverity": "Mức độ nghiêm trọng",
-      "colRule": "Luật lệ",
-      "colMessage": "Tin nhắn",
-      "colLine": "Đường kẻ",
-      "colActionsAria": "Hành động hàng",
-      "selectRowAria": "Chọn hàng tìm kiếm này",
-      "copyRowTitle": "Sao chép kết quả này dưới dạng JSON",
+      "colRule": "Quy tắc của quy định",
+      "colMessage": "Thông điệp Tin nhắn Gửi tin",
+      "colLine": "Dòng Đường Đường",
+      "colActionsAria": "Các hành động hàng Row actions",
+      "selectRowAria": "Chọn hàng tìm kiếm này.",
+      "copyRowTitle": "Sao chép kết quả này dưới dạng JSON.",
       "metaShown": "hiển thị {filtered}",
       "metaAfterDisable": "{total} sau khi lọc quy tắc bị vô hiệu hóa",
-      "metaSourceCap": "nguồn được giới hạn ở {max} cho hiệu suất",
-      "metaGroupedBy": "được nhóm theo {mode}",
-      "overflowNote": "Danh sách nguồn bị cắt bớt ở {max} để đảm bảo hiệu suất kết xuất.",
-      "runAgain": "Chạy lại phân tích",
-      "emptyNoViolations": "Không có vi phạm trong lần chạy phân tích cuối cùng.",
-      "emptyNoMatch": "Không có vi phạm nào phù hợp với các bộ lọc hiện tại.",
-      "emptyHintNoData": "Chạy phân tích để điền `reports/.saropa_lints/violations.json`, sau đó làm mới.",
-      "emptyHintFilters": "Điều chỉnh bộ lọc hoặc chạy lại phân tích để xem kết quả.",
-      "reRunAnalysis": "Chạy lại phân tích",
-      "resetFilters": "Đặt lại bộ lọc",
+      "metaSourceCap": "nguồn giới hạn ở {max} cho hiệu suất hoạt động.",
+      "metaGroupedBy": "được nhóm bởi {mode}.",
+      "overflowNote": "Danh sách nguồn được cắt ngắn ở {max} để hiệu suất hiển thị.",
+      "runAgain": "Chạy phân tích một lần nữa.",
+      "emptyNoViolations": "Không có vi phạm trong phân tích cuối cùng chạy.",
+      "emptyNoMatch": "Không có vi phạm nào phù hợp với bộ lọc hiện tại.",
+      "emptyHintNoData": "Chạy phân tích để điền vào `reports/.saropa_lints/violations.json`, sau đó làm mới .",
+      "emptyHintFilters": "Điều chỉnh bộ lọc hoặc chạy phân tích một lần nữa để xem kết quả.",
+      "reRunAnalysis": "Phân tích Re-run Analysis",
+      "resetFilters": "Reset bộ lọc của các bộ lọc.",
       "linePrefix": "L{line}"
     },
     "charts": {
-      "sectionAria": "Trộn biểu đồ",
-      "heading": "Trộn",
-      "metaClickSlice": "bấm vào một lát để lọc",
-      "severityMix": "Hỗn hợp mức độ nghiêm trọng",
-      "impactMix": "Hỗn hợp tác động",
-      "filterBarTitle": "Chỉ lọc tới {key}",
-      "donutTotal": "tổng cộng"
+      "sectionAria": "Mix chart là bảng kết hợp các biểu đồ.",
+      "heading": "Mix Mix Mix, trộn lẫn.",
+      "metaClickSlice": "click vào một slice để lọc.",
+      "severityMix": "Sự pha trộn mức độ nghiêm trọng.",
+      "impactMix": "Sự pha trộn tác động của sự hỗn hợp tác động.",
+      "filterBarTitle": "Bộ lọc chỉ cho {key}",
+      "donutTotal": "Tổng số tiền mặt của họ là:"
     },
     "todoHack": {
-      "sectionAria": "TODO và HACK",
-      "headingDisabled": "TODO & HACK",
-      "metaDisabled": "quét bị vô hiệu hóa",
-      "scanOff": "Quét không gian làm việc bị tắt — bật tính năng đánh dấu bề mặt từ các tệp dự án.",
-      "enableScan": "Bật quét",
-      "heading": "TODO & HACK",
+      "sectionAria": "TODO và HACKS.",
+      "headingDisabled": "TODOs & HACKS (tạm dịch: Tất cả mọi thứ và tất cả những gì không phải",
+      "metaDisabled": "scan disabled vô hiệu hóa quét.",
+      "scanOff": "Quét không gian làm việc đã tắt  ⁇ cho phép đánh dấu bề mặt từ các tệp dự án.",
+      "enableScan": "Enable scan scan enable enable scan cho phép quét quét",
+      "heading": "TODOs & HACKS (tạm dịch: Tất cả mọi thứ và tất cả những gì không phải",
       "subsectionNone": "{title}: không có trong phạm vi quét.",
-      "capNote": "Quét đạt giới hạn tệp tối đa; nâng cao `saropaLints.todosAndHacks.maxFilesToScan` để có được mức độ bao phủ đầy đủ.",
-      "notePill": "ghi chú",
-      "todosLabel": "TODO",
-      "hacksLabel": "HACK"
+      "capNote": "Scan hit max-file cap; (Quét trúng nắp tệp tối đa); nâng ∀saropaLints.todosAndHacks.maxFilesToScan̅ lên để có được sự bao phủ đầy đủ.",
+      "notePill": "Chú ý chú ý chú thích chú ý",
+      "todosLabel": "TODOs là tất cả mọi thứ.",
+      "hacksLabel": "HACKS Đ ⁇ I CÁC."
     },
     "drift": {
-      "sectionAria": "Cố vấn trôi dạt",
-      "headingOff": "Cố vấn trôi dạt",
-      "metaOff": "tắt tích hợp",
-      "enableBlurb": "Kích hoạt tính năng tích hợp Drift Advisor để hiển thị các đề xuất cơ sở dữ liệu tại đây.",
-      "enable": "Cho phép",
-      "headingNoServer": "Cố vấn trôi dạt",
-      "metaNoServer": "không có máy chủ",
-      "noServerBlurb": "Không tìm thấy máy chủ Drift Advisor trên các cổng đã định cấu hình.",
-      "retry": "Thử lại",
-      "headingConnected": "Cố vấn trôi dạt",
-      "metaConnected": "đã kết nối",
-      "noIssues": "Đã kết nối với {label} — hiện tại không có vấn đề gì.",
-      "refresh": "Làm cho khỏe lại",
-      "openBrowser": "Mở trong trình duyệt",
-      "headingIssues": "Cố vấn trôi dạt",
-      "disable": "Tắt cố vấn trôi dạt"
+      "sectionAria": "Drift Advisor - Cố vấn xoay quanh",
+      "headingOff": "Drift Advisor - Cố vấn xoay quanh",
+      "metaOff": "integration off hội nhập off hội tụ",
+      "enableBlurb": "Chạy việc tích hợp Drift Advisor với các đề xuất cơ sở dữ liệu bề mặt ở đây.",
+      "enable": "Enable enable enable cho phép",
+      "headingNoServer": "Drift Advisor - Cố vấn xoay quanh",
+      "metaNoServer": "Không có máy chủ server nào cả.",
+      "noServerBlurb": "Không tìm thấy máy chủ Drift Advisor trên các cổng được cấu hình.",
+      "retry": "Retry retry thử lại",
+      "headingConnected": "Drift Advisor - Cố vấn xoay quanh",
+      "metaConnected": "connected được kết nối với nhau.",
+      "noIssues": "Kết nối với {label}  ⁇ không có vấn đề hiện tại.",
+      "refresh": "Thức mới và làm mới",
+      "openBrowser": "Mở trong trình duyệt.",
+      "headingIssues": "Drift Advisor - Cố vấn xoay quanh",
+      "disable": "Disable Drift Advisor - Ngăn chặn tư vấn trôi dạt"
     },
     "suppressions": {
-      "sectionAria": "Sự đàn áp",
-      "headingExport": "Sự đàn áp (xuất khẩu)",
-      "viewHidesHeading": "Ẩn chế độ xem vấn đề",
-      "viewHidesMetaActive": "tích cực",
-      "viewHidesMetaNone": "không có",
-      "noneInExport": "Không có bộ phân tích nào bị chặn trong quá trình xuất `violations.json` hiện tại. Chạy phân tích sau khi chỉnh sửa bỏ qua hoặc đường cơ sở để điền.",
-      "totalRow": "Tổng cộng — xóa bộ lọc và mở Kết quả",
+      "sectionAria": "Sự đàn áp sự ám ảnh",
+      "headingExport": "Suppressions (export) - xóa bỏ",
+      "viewHidesHeading": "Issue view ẩn dấu các vấn đề",
+      "viewHidesMetaActive": "Active active hoạt động tích cực",
+      "viewHidesMetaNone": "Không có, không có, chẳng có.",
+      "noneInExport": "Không có sự ngăn chặn nào của máy phân tích trong quá trình xuất `violations.json` hiện tại. Chạy phân tích sau khi chỉnh sửa bỏ qua hoặc đường cơ sở để điền.",
+      "totalRow": "Tổng  ⁇ lọc rõ ràng và mở Findings.",
       "byRule": "Theo quy tắc ({count})",
       "byFile": "Theo tập tin ({count})",
-      "noEntries": "Không có mục nào.",
-      "nothingHidden": "Không có gì ẩn khỏi danh sách Sự cố trong không gian làm việc này. Sử dụng các hành động ngữ cảnh dạng cây để ẩn các thư mục, tệp hoặc quy tắc; chúng vẫn tồn tại trong trạng thái không gian làm việc.",
+      "noEntries": "Không có mục nhập.",
+      "nothingHidden": "Không có gì ẩn khỏi danh sách Vấn đề trong không gian làm việc này. Sử dụng các hành động ngữ cảnh cây để ẩn thư mục, tệp hoặc quy tắc; Chúng tồn tại trong trạng thái không gian làm việc.",
       "folderPattern": "{count} thư mục",
       "filePattern": "{count} mẫu tệp",
       "ruleGlobal": "{count} quy tắc toàn cầu",
       "perFileRules": "{count} tệp có ẩn quy tắc theo tệp",
       "severityHides": "{count} ẩn mức độ nghiêm trọng",
       "impactHides": "{count} ẩn tác động",
-      "activeHides": "Ẩn hoạt động: {counts}.",
-      "viewHidesFooter": "Những phần ẩn này chỉ thu nhỏ danh sách Sự cố / bảng thông tin; chúng không được ghi vào `violations.json`.",
-      "clearViewHides": "Xóa tất cả chế độ xem ẩn",
+      "activeHides": "Da hoạt động: da hoạt động {counts}. . ph0__ .",
+      "viewHidesFooter": "Những lớp vỏ này chỉ thu nhỏ danh sách Issue / dashboard; chúng không được viết cho `violations.json`.",
+      "clearViewHides": "Clear all view hides (Xóa tất cả các dạng xem ẩn)",
       "foldersSample": "Thư mục (mẫu)",
-      "filesSample": "Tệp/quả cầu (mẫu)",
+      "filesSample": "File / globs (mẫu)",
       "rulesSample": "Quy tắc (mẫu)",
-      "perFileRulesSample": "Quy tắc cho mỗi tệp (mẫu)",
-      "unknownKind": "Không xác định"
+      "perFileRulesSample": "Quy tắc cho từng hồ sơ (trình mẫu)",
+      "unknownKind": "Không biết không rõ Unknown"
     },
     "script": {
-      "analysisRunning": "Đang chạy phân tích…",
-      "analysisComplete": "Phân tích hoàn tất",
-      "metaRunning": "Điều này có thể mất một chút thời gian đối với các dự án lớn.",
-      "metaDone": "Làm mới bảng điều khiển với những phát hiện mới nhất.",
+      "analysisRunning": "Chạy phân tích...",
+      "analysisComplete": "Phân tích hoàn thành, phân tích hoàn tất.",
+      "metaRunning": "Điều này có thể mất một thời gian trên các dự án lớn.",
+      "metaDone": "Bảng điều khiển làm mới với những phát hiện mới nhất.",
       "announceSearch": "tìm kiếm {q}",
       "announceSeverities": "{n} mức độ nghiêm trọng",
       "announceImpacts": "{n} tác động",
-      "announceCleared": "Đã xóa tất cả bộ lọc",
+      "announceCleared": "Tất cả các bộ lọc được làm sạch.",
       "announceFiltersPrefix": "Bộ lọc:",
       "bulkSelected": "đã chọn {n}",
-      "analysisStartedDetail": "Phân tích bắt đầu. Đang thu thập chẩn đoán…",
-      "announceStarted": "Đã bắt đầu phân tích",
-      "announceComplete": "Phân tích hoàn tất",
-      "announceFailed": "Phân tích không thành công",
+      "analysisStartedDetail": "Phân tích bắt đầu. Thu thập chẩn đoán...",
+      "announceStarted": "Phân tích bắt đầu, phân tích bắt tay.",
+      "announceComplete": "Phân tích hoàn thành, phân tích hoàn tất.",
+      "announceFailed": "Phân tích không thành công.",
       "analysisFailedDetail": "Phân tích không thành công. Kiểm tra đầu ra để biết chi tiết.",
-      "removeRecentAria": "Di dời",
-      "removeRecentTitle": "Di dời",
+      "removeRecentAria": "Remove remove loại bỏ",
+      "removeRecentTitle": "Remove remove loại bỏ",
       "bulkSelectedTpl": "đã chọn {n}"
     },
     "emptyState": {
-      "hintAfterMessage": "Chạy phân tích Saropa Lints để tạo vi violations.json, sau đó sử dụng Làm mới tại đây hoặc mở lại trang tổng quan này.",
-      "refreshDisk": "Làm mới từ đĩa"
+      "hintAfterMessage": "Chạy phân tích Saropa Lints để tạo ra violations.json, sau đó sử dụng Refresh here hoặc mở lại bảng điều khiển này.",
+      "refreshDisk": "Refresh từ đĩa."
     },
     "shortcuts": {
-      "focusTextFilter": "Tập trung vào bộ lọc văn bản",
-      "clearTextFilter": "Xóa bộ lọc văn bản tập trung",
-      "activateKpi": "Kích hoạt thẻ KPI hoặc thanh biểu đồ tập trung",
-      "activateKpiSpace": "Kích hoạt thẻ KPI hoặc thanh biểu đồ tập trung",
-      "showOverlay": "Hiển thị lớp phủ phím tắt này"
+      "focusTextFilter": "Tập trung vào bộ lọc văn bản.",
+      "clearTextFilter": "Xóa bộ lọc văn bản tập trung.",
+      "activateKpi": "Kích hoạt thẻ KPI tập trung hoặc thanh biểu đồ.",
+      "activateKpiSpace": "Kích hoạt thẻ KPI tập trung hoặc thanh biểu đồ.",
+      "showOverlay": "Hiển thị lớp phủ phím tắt này."
     },
-    "unknownAnalyzerKind": "Không xác định",
+    "unknownAnalyzerKind": "Không biết không rõ Unknown",
     "supplementary": {
-      "otherAnalyzerOn": "+{count} kết quả phân tích khác",
-      "otherAnalyzerPromo": "+? kết quả phân tích khác - hiển thị",
-      "analyzerTodosOn": "+{count} phân tích TODO",
-      "analyzerTodosPromo": "+? TODO phân tích — hiển thị",
-      "scannerPromo": "Kích hoạt trình quét TODO/HACK",
-      "tooltipLive": "Trực tiếp từ bảng điều khiển Vấn đề về VS Code. Cập nhật khi phân tích hoàn tất. Bấm để ẩn.",
-      "tooltipScanner": "Trình quét hệ thống tệp Saropa - đếm các điểm đánh dấu TODO/HACK mở trong nguồn.",
-      "tooltipPromoClickToOn": "Bấm để kích hoạt"
+      "otherAnalyzerOn": "+{count} các phát hiện của máy phân tích khác",
+      "otherAnalyzerPromo": "+? các phát hiện khác của máy phân tích  ⁇ Chương trình Show show",
+      "analyzerTodosOn": "+{count} máy phân tích TODOs",
+      "analyzerTodosPromo": "+? analyzer TODOs  ⁇ Chương trình Show show",
+      "scannerPromo": "Chạy TODO/HACK cho máy quét.",
+      "tooltipLive": "Tiếp tục trực tiếp từ bảng VS Code Problems. Cập nhật khi phân tích hoàn thành. Nhấp vào để ẩn.",
+      "tooltipScanner": "Saropa máy quét hệ thống tệp  ⁇ đếm các dấu TODO/HACK mở trong nguồn.",
+      "tooltipPromoClickToOn": "Nhấp vào để kích hoạt."
     }
   },
   "triageDash": {
-    "showInIssues": "Hiển thị trong Vấn đề",
-    "disableRules": "Vô hiệu hóa quy tắc",
-    "enableRules": "Bật quy tắc",
-    "issues": "Vấn đề",
-    "off": "Tắt",
-    "on": "TRÊN",
-    "colRule": "Luật lệ",
-    "colIssues": "Vấn đề",
+    "showInIssues": "Hãy thể hiện trong các vấn đề.",
+    "disableRules": "Disable rules vô hiệu hóa các quy tắc",
+    "enableRules": "Các quy tắc cho phép",
+    "issues": "Các vấn đề về các vấn đề",
+    "off": "Off off off off, đi ra ngoài.",
+    "on": "Trên, trên, trên",
+    "colRule": "Quy tắc của quy định",
+    "colIssues": "Các vấn đề về các vấn đề",
     "zeroIssueRules": "{count} quy tắc không có vấn đề — tự động bật trong cấp độ.",
     "disabledOverrides": "{count} quy tắc bị vô hiệu hóa do ghi đè trong `analysis_options_custom.yaml`.",
-    "summaryRuleTriage": "Phân loại quy tắc",
-    "hintNoViolations": "Chưa có `reports/.saropa_lints/violations.json`. Chạy phân tích, sau đó làm mới tab này.",
-    "hintUnreadable": "Không xuất vi phạm có thể đọc được. Chạy phân tích Saropa Lints trước.",
-    "hintStale": "Dữ liệu phân loại có thể đã lỗi thời (xuất là {age} cũ). Chạy lại phân tích cho các nhóm hiện tại.",
-    "hintNoPerRule": "Việc xuất này không có số vấn đề theo quy tắc. Phân tích lại bằng plugin Saropa Lints hiện tại.",
-    "hintBuildFailed": "Không thể tạo phân loại từ lần xuất này. Chạy một phân tích mới.",
-    "summaryVolume": "Phân loại quy tắc (khối lượng/phải sửa/kiểu cách)",
-    "hintSameAsTree": "Cùng nhóm với cây thanh hoạt động Triage: lọc Sự cố hoặc tắt/bật quy tắc trong `analysis_options_custom.yaml`. Các nhóm lớn có thể yêu cầu xác nhận."
+    "summaryRuleTriage": "Quy tắc Triage Triages",
+    "hintNoViolations": "Chưa có báo cáo nào về .saropa_lints/violations.json. Chạy phân tích, sau đó làm mới tab này.",
+    "hintUnreadable": "Không có vi phạm đọc được xuất khẩu. xuất khẩu . Đầu tiên chạy phân tích Saropa Lints.",
+    "hintStale": "Dữ liệu phân loại có thể đã lỗi thời (viết xuất là {age} cũ). Phân tích tái chạy cho các nhóm hiện tại.",
+    "hintNoPerRule": "Xuất khẩu này không có số lượng phát hành theo quy tắc. Phân tích lại với một plugin Saropa Lints hiện tại.",
+    "hintBuildFailed": "Không thể xây dựng phân loại từ xuất khẩu này. Chạy một phân tích mới.",
+    "summaryVolume": "Quy tắc phân loại (khối lượng / phải sửa chữa / phong cách)",
+    "hintSameAsTree": "Cùng nhóm như cây thanh hoạt động Triage: filter Issues, hoặc disable/enable rules trong `analysis_options_custom.yaml゙n. Các nhóm lớn có thể yêu cầu xác nhận."
   },
   "kbdOverlay": {
     "toggleTitle": "Hiển thị phím tắt (?)",
-    "toggleAria": "Hiển thị phím tắt",
-    "dialogTitle": "Phím tắt",
-    "closeAria": "Đóng phím tắt",
-    "footer": "Nhấn Esc hoặc click ra ngoài để đóng."
+    "toggleAria": "Hiển thị phím tắt bàn phím",
+    "dialogTitle": "Phím tắt của phím",
+    "closeAria": "Đóng phím tắt của phím.",
+    "footer": "Nhấn Esc hoặc nhấp bên ngoài để đóng."
   },
   "wideReport": {
-    "openWorkspaceFirst": "Trước tiên hãy mở một thư mục không gian làm việc.",
-    "noReportYet": "Chưa có báo cáo vi phạm. Chạy phân tích Saropa Lints trước.",
+    "openWorkspaceFirst": "Đầu tiên, hãy mở một thư mục workspace.",
+    "noReportYet": "Chưa có báo cáo vi phạm nào. Đầu tiên chạy phân tích Saropa Lints.",
     "clipboardCopyFailed": "Không thể sao chép vào clipboard.",
-    "copiedViolationsJson": "Đã sao chép (các) vi phạm {count} dưới dạng JSON.",
-    "copiedOneViolationJson": "Đã sao chép 1 vi phạm dưới dạng JSON.",
-    "driftNotConnected": "Máy chủ Drift Advisor chưa được kết nối.",
-    "copiedBulkFindings": "Đã sao chép {count} kết quả đã chọn dưới dạng JSON.",
+    "copiedViolationsJson": "Sao chép {count} vi phạm (s) như JSON.",
+    "copiedOneViolationJson": "Sao chép 1 vi phạm dưới dạng JSON.",
+    "driftNotConnected": "Máy chủ Drift Advisor không được kết nối.",
+    "copiedBulkFindings": "Sao chép {count} tìm kiếm được chọn (s) dưới dạng JSON.",
     "noMatchingFindingsCopy": "Không có kết quả phù hợp để sao chép.",
-    "couldNotOpenFile": "Không thể mở tập tin: {path}",
-    "saveReportNoWorkspace": "Mở thư mục không gian làm việc trước khi lưu báo cáo.",
-    "savedFindings": "Đã lưu {count} kết quả: {path}",
-    "couldNotSaveReportJson": "Không thể lưu JSON báo cáo."
+    "couldNotOpenFile": "Không thể mở tệp: {path} là Phương pháp",
+    "saveReportNoWorkspace": "Mở một thư mục workspace trước khi lưu báo cáo.",
+    "savedFindings": "Lưu trữ {count} phát hiện: {path} là một loại tế bào có thể",
+    "couldNotSaveReportJson": "Không thể lưu báo cáo JSON."
   },
   "packageDashboard": {
-    "documentTitle": "Bảng điều khiển gói Saropa",
-    "heroTitle": "Bảng điều khiển gói Saropa",
+    "documentTitle": "Saropa Bảng điều khiển gói",
+    "heroTitle": "Saropa Bảng điều khiển gói",
     "status": {
       "packagesCount": "{count} gói",
       "packagesBreakdown": "{direct} trực tiếp, {transitive} bắc cầu",
-      "gradeLine": "Cấp {grade} · {avg}/100",
+      "gradeLine": "Lớp {grade} · {avg}/100",
       "flaggedCount": "{count} đã gắn cờ",
       "flaggedTitle": "Bị bỏ rơi hoặc cuối đời",
-      "lastScanLabel": "Đã quét {when}",
-      "lastScanTitle": "Khi dữ liệu bảng điều khiển này được tìm nạp - {timestamp}. Nhấp vào Quét lại để làm mới.",
-      "lastScanUnknown": "Đã quét (không rõ thời gian)",
-      "lastScanUnknownTitle": "Quá trình quét này diễn ra trước dấu thời gian được theo dõi trên trang tổng quan. Nhấp vào Quét lại để làm mới."
+      "lastScanLabel": "Quét {when} được quét.",
+      "lastScanTitle": "Khi nào dữ liệu bảng điều khiển này được lấy  ⁇ {timestamp}. . ph0__ . Nhấp vào Rescan để làm mới.",
+      "lastScanUnknown": "Quét (không biết thời gian)",
+      "lastScanUnknownTitle": "Quét này chạy trước khi bảng điều khiển theo dõi dấu thời gian. Nhấp vào Rescan để làm mới."
     },
     "time": {
-      "justNow": "ngay bây giờ",
+      "justNow": "Chỉ mới bây giờ.",
       "minutesAgo": "{min} phút trước",
       "hoursAgo": "{hr} giờ trước",
       "daysAgo": "{day} ngày trước"
     },
     "scanning": {
-      "heading": "Gói quét",
-      "body1": "Saropa đang tìm nạp siêu dữ liệu pub.dev, hoạt động GitHub và biểu đồ phụ thuộc cho mọi phụ thuộc trực tiếp trong dự án này.",
-      "body2": "Trang này sẽ tự động làm mới khi quá trình quét kết thúc. Bạn có thể hủy thông báo tiến độ ở phía dưới bên phải.",
-      "versionStamp": "Bảng điều khiển gói Saropa v{version}"
+      "heading": "Các gói quét các gói quẹt.",
+      "body1": "Saropa đang lấy siêu dữ liệu pub.dev, hoạt động GitHub và biểu đồ phụ thuộc cho mọi sự phụ thuộc trực tiếp trong dự án này.",
+      "body2": "Trang này sẽ tự động làm mới khi quét xong. Bạn có thể hủy thông báo tiến độ ở phía dưới bên phải.",
+      "versionStamp": "Saropa Bảng điều khiển gói v{version}"
     },
-    "gaugeTitle": "Cấp gói dự án: {grade}",
+    "gaugeTitle": "Gói dự án: Lớp học: {grade} là Phương pháp",
     "summary": {
-      "packages": "Gói",
-      "projectGrade": "Lớp gói dự án",
+      "packages": "Gói hàng gói",
+      "projectGrade": "Project Package Grade (Phần xếp hạng của gói dự án)",
       "totalSize": "Tổng kích thước*",
       "gradeTooltip": "Cấp dự án {avgGrade}\nĐiểm trung bình: {avgScore}/100\nGói: {pkgCount}\nA:{a} B:{b} C:{c} E:{e} F:{f}",
-      "vibrantTitle": "Sống động",
-      "stableTitle": "Ổn định",
-      "outdatedTitle": "lỗi thời",
-      "abandonedTitle": "Bị bỏ rơi",
-      "eolTitle": "Cuối đời",
-      "updates": "Cập nhật",
-      "unused": "Chưa sử dụng",
-      "singleUse": "Sử dụng một lần",
-      "vulnerable": "Dễ bị tổn thương",
-      "overrides": "Ghi đè",
-      "caveatLine1": "*Kích thước mã được hiển thị (lib + nội dung được khai báo), quay trở lại kích thước lưu trữ pub.dev khi không có kích thước mã. Không bao gồm dev_dependencies (build_runner, lints, saropa_lints, v.v.) — chúng không bao giờ gửi đến gói APK / IPA / web. Kích thước ứng dụng thực tế sẽ nhỏ hơn sau khi cây rung.",
-      "caveatLine2": "Ngưỡng hoạt động: 90d = cũ, 180d = không hoạt động (cam kết + mốc thời gian phát hành)."
+      "vibrantTitle": "Sức sống sôi động, rực rỡ.",
+      "stableTitle": "Căn cứ ổn định.",
+      "outdatedTitle": "Outdated Không còn thời gian",
+      "abandonedTitle": "Bị bỏ rơi, bị bỏ rơi",
+      "eolTitle": "Kết thúc cuộc sống của người bệnh",
+      "updates": "Cập nhật cập nhật Updates",
+      "unused": "Không được sử dụng, chưa dùng đến.",
+      "singleUse": "Một lần sử dụng duy nhất.",
+      "vulnerable": "Thường bị tổn thương (Vulnerable)",
+      "overrides": "Bỏ qua các lệnh thay thế",
+      "caveatLine1": "*Kích thước mã được hiển thị (lib + declared assets), quay trở lại kích cỡ kho lưu trữ pub.dev khi không có sẵn kích cự code. Không bao gồm dev_dependencies (build_runner, lints, saropa_lints,...)  ⁇ Họ không bao giờ gửi đến gói APK / IPA / web. Kích thước ứng dụng thực tế sẽ nhỏ hơn sau khi cây lắc.",
+      "caveatLine2": "Mức ngưỡng hoạt động: 90d = stale, 180d = dormant (commit + release timelines)."
     },
     "breakdown": {
-      "title": "Tại sao lại xếp hạng {grade}? — {avgScore}/100 trung bình trên các gói {pkgCount}",
-      "hint": "Bấm để mở rộng",
-      "distributionHeading": "Phân bổ",
-      "signalsHeading": "Tín hiệu rủi ro kéo điểm xuống",
-      "signalFlagged": "{count} được gắn cờ (bị bỏ rơi / hết tuổi thọ)",
-      "signalVulnerable": "{count} với các lỗ hổng đã biết",
-      "signalUpdates": "{count} có sẵn các bản cập nhật",
-      "bottomHeading": "Gói có điểm thấp nhất",
-      "thresholdsHeading": "Cách ánh xạ điểm đến các lớp",
-      "thresholdA": "70+ — Sống động: được duy trì tích cực, được xuất bản gần đây",
-      "thresholdB": "40–69 — Ổn định: vẫn được duy trì nhưng chậm lại",
-      "thresholdC": "20–39 — Đã lỗi thời: khoảng cách dài giữa các bản phát hành",
-      "thresholdE": "dưới 20 — Bị bỏ rơi: có dấu hiệu không hoạt động",
-      "thresholdF": "Đã ngừng hoặc được lưu trữ trên pub.dev (điểm không được sử dụng)",
-      "filterTooltip": "Lọc bảng gói chỉ theo danh mục này",
-      "jumpTooltip": "Chuyển tới {name} trong bảng gói"
+      "title": "Tại sao lại xếp hạng {grade}?  ⁇ {avgScore}/100 trung bình trên các gói {pkgCount}",
+      "hint": "Nhấp để mở rộng.",
+      "distributionHeading": "Phân phối phân phối",
+      "signalsHeading": "Các tín hiệu rủi ro kéo điểm số xuống.",
+      "signalFlagged": "{count} được đánh dấu (bỏ rơi / hết hạn sử dụng)",
+      "signalVulnerable": "{count} với các lỗ hổng được biết đến.",
+      "signalUpdates": "{count} có cập nhật sẵn.",
+      "bottomHeading": "Các gói có điểm số thấp nhất là các gói có kết quả thấp nhất.",
+      "thresholdsHeading": "Làm thế nào điểm số bản đồ để các lớp học.",
+      "thresholdA": "70+  ⁇ Vibrant: Sức sống mạnh mẽ tích cực duy trì, xuất bản gần đây được công bố.",
+      "thresholdB": "40 ⁇ 69  ⁇   ⁇ Căn cứ: ổn định vẫn duy trì nhưng chậm lại.",
+      "thresholdC": "20 ⁇ 39  ⁇   ⁇ Đã lỗi thời: khoảng cách dài giữa các bản phát hành.",
+      "thresholdE": "dưới 20  ⁇ Bị bỏ rơi: dấu hiệu của sự không hoạt động.",
+      "thresholdF": "Ngừng hoặc lưu trữ vào ngày pub.dev (điểm số không được sử dụng)",
+      "filterTooltip": "Lọc bảng gói chỉ cho loại này.",
+      "jumpTooltip": "Chơi đến {name} trong bảng gói hàng."
     },
     "network": {
-      "summary": "Mạng phụ thuộc"
+      "summary": "Mạng lưới phụ thuộc (dependence network)"
     },
     "sections": {
-      "sizeDistribution": "Phân bố kích thước",
-      "sizeDistributionCaption": "Không bao gồm dev_dependencies — chúng không bao giờ gửi tới gói APK / IPA / web.",
-      "filters": "Bộ lọc",
-      "packages": "Gói"
+      "sizeDistribution": "Phân phối kích thước, phân bố kích cỡ",
+      "sizeDistributionCaption": "Không bao gồm dev_dependencies  ⁇ Họ không bao giờ gửi đến gói APK / IPA / web.",
+      "filters": "Filters Bộ lọc",
+      "packages": "Gói hàng gói"
     },
     "toolbar": {
-      "openPubspecTitle": "Mở pubspec.yaml",
+      "openPubspecTitle": "Mở pubspec.yaml ra.",
       "openPubspecLabel": "pubspec.yaml",
       "copyAllTitle": "Sao chép báo cáo JSON (tất cả các hàng + chi tiết)",
-      "copyAllLabel": "Sao chép",
-      "saveAllTitle": "Lưu JSON báo cáo vào báo cáo/YYYYMMDD/...",
-      "saveAllLabel": "Cứu",
-      "resetViewTitle": "Đặt lại bộ lọc, sắp xếp và trạng thái xem đã lưu",
-      "resetViewLabel": "Đặt lại chế độ xem",
-      "rescanTitle": "Quét lại các gói - xóa bộ đệm pub.dev và tìm nạp lại các phiên bản",
-      "rescanLabel": "Quét lại",
-      "openOtherTitle": "Mở một dự án khác của pubspec.yaml trong cửa sổ mới để quét Vibrancy",
-      "openOtherLabel": "Mở dự án…",
-      "footprintGroupAria": "Chế độ dấu chân cột kích thước",
-      "footprintGroupTitle": "Cột Kích thước hiển thị: chỉ kích thước mã riêng, cộng với các chuyển tiếp duy nhất (chi phí nếu bị loại bỏ) hoặc cộng với tất cả các chuyển tiếp (tối đa theo lý thuyết). Quay trở lại kích thước lưu trữ khi kích thước mã không có sẵn.",
-      "footprintLabel": "Dấu chân:",
-      "footprintOwnTitle": "Chỉ kích thước mã riêng (lib + nội dung được khai báo); quay trở lại kích thước lưu trữ pub.dev khi không có sẵn",
-      "footprintOwn": "Sở hữu",
-      "footprintUniqueTitle": "Kích thước riêng + chuyển tiếp chỉ được sử dụng bởi bộ phận này (tiết kiệm nếu bạn loại bỏ nó)",
-      "footprintUnique": "+ Độc đáo",
-      "footprintTotalTitle": "Kích thước riêng + tất cả các chuyển tiếp, bao gồm cả những kích thước được chia sẻ với những người phụ trách khác",
-      "footprintTotal": "+ Tất cả",
-      "searchLabel": "Tìm kiếm gói",
-      "searchPlaceholder": "Tìm kiếm gói…",
-      "clearSearchTitle": "Xóa tìm kiếm",
-      "clearSearchAria": "Xóa tìm kiếm",
-      "ageFilterTitle": "Lọc theo độ tuổi xuất bản",
-      "publishedAgeLabel": "Tuổi xuất bản",
-      "ageMaxAll": "Tất cả",
-      "presetFilterTitle": "Áp dụng cài đặt trước bộ lọc nhanh",
-      "presetLabel": "cài sẵn",
-      "presetNone": "Không có",
-      "presetModernization": "Hiện đại hóa",
-      "presetRiskHotspots": "Điểm nóng rủi ro",
-      "presetCleanup": "Ứng cử viên dọn dẹp",
-      "presetDirectOnly": "Chỉ trực tiếp",
-      "devToggleTitle": "Bao gồm các phần phụ thuộc của nhà phát triển trong bảng và tổng số",
-      "includeDev": "Bao gồm nhà phát triển",
+      "copyAllLabel": "Copy copy copy sao chép",
+      "saveAllTitle": "Lưu báo cáo JSON vào reports/YYY YMMDD/...",
+      "saveAllLabel": "Save Save Save Giữ",
+      "saveUpgradeTitle": "Lưu một báo cáo chỉ bao gồm các gói với bản cập nhật có sẵn cho các báo cáo/YYY YMMDD/...",
+      "saveUpgradeLabel": "Lưu báo cáo nâng cấp",
+      "resetViewTitle": "Đặt lại bộ lọc, sắp xếp và lưu trạng thái xem.",
+      "resetViewLabel": "Reset view xem thiết lập lại",
+      "rescanTitle": "Các gói tái quét  ⁇ xóa bộ nhớ cache pub.dev và lấy lại các phiên bản.",
+      "rescanLabel": "Rescan lại quét lại.",
+      "openOtherTitle": "Mở dự án của một pubspec.yaml khác trong cửa sổ mới để quét Vibrancy.",
+      "openOtherLabel": "Dự án mở... dự án mở",
+      "footprintGroupAria": "Chế độ Size column footprint (phương thức dấu chân theo cột kích thước).",
+      "footprintGroupTitle": "Điều mà cột Size hiển thị: chỉ có kích thước mã riêng, cộng với các chuyển tiếp duy nhất (chi phí nếu được loại bỏ), hoặc cộng với tất cả các chuyển động (tiền tối đa lý thuyết). Lại trở lại kích thước lưu trữ khi không có sẵn kích thước mã.",
+      "footprintLabel": "Footprint: dấu chân",
+      "footprintOwnTitle": "Chỉ có kích thước mã riêng (lib + tài sản được khai báo); sẽ quay trở lại kích thước kho lưu trữ pub.dev khi không có sẵn.",
+      "footprintOwn": "Own Own Own là một cái tên",
+      "footprintUniqueTitle": "Kích thước riêng + các chất chuyển tiếp chỉ được sử dụng bởi bộ phận này (tiết kiệm nếu bạn loại bỏ nó)",
+      "footprintUnique": "+ Độc đáo, độc nhất",
+      "footprintTotalTitle": "Kích thước riêng + tất cả các bộ phận chuyển tiếp, bao gồm những bộ phận được chia sẻ với các phòng ban khác.",
+      "footprintTotal": "+ Tất cả + All",
+      "searchLabel": "Các gói tìm kiếm bao gồm các gói tìm",
+      "searchPlaceholder": "Tìm các gói hàng...",
+      "clearSearchTitle": "Clear search tìm kiếm rõ ràng.",
+      "clearSearchAria": "Clear search tìm kiếm rõ ràng.",
+      "ageFilterTitle": "Filter by publish age: Chọn lọc theo độ tuổi xuất bản",
+      "publishedAgeLabel": "Tuổi xuất bản:",
+      "ageMaxAll": "Tất cả tất cả, tất cả.",
+      "presetFilterTitle": "Áp dụng các cài đặt trước bộ lọc nhanh (quick filter presets).",
+      "presetLabel": "Preset preset là thiết lập trước.",
+      "presetNone": "Không có, không có, chẳng có.",
+      "presetModernization": "Hiện đại hóa hiện đại hoá",
+      "presetRiskHotspots": "Các điểm nóng rủi ro là những điểm nguy hiểm.",
+      "presetCleanup": "Các ứng cử viên làm sạch",
+      "presetDirectOnly": "Chỉ trực tiếp chỉ trực tiếp",
+      "devToggleTitle": "Bao gồm các phụ thuộc dev trong bảng và tổng số.",
+      "includeDev": "Bao gồm dev dev.",
       "activeFiltersLabel": "Bộ lọc hoạt động:",
-      "clearAllFilters": "Xóa tất cả"
+      "clearAllFilters": "Tất cả mọi thứ đều sạch sẽ."
     },
     "columns": {
       "name": {
-        "label": "Bưu kiện",
-        "tooltip": "Tên gói - nhấp để mở mục pubspec.yaml"
+        "label": "Gói gói hàng là bao gồm các sản phẩm",
+        "tooltip": "Tên bao bì  ⁇ click để mở mục pubspec.yaml"
       },
       "version": {
-        "label": "Phiên bản",
+        "label": "Phiên bản Version Version",
         "tooltip": "Phiên bản được cài đặt từ pubspec.lock"
       },
       "score": {
-        "label": "Loại",
-        "tooltip": "Phân loại độ rung và điểm sức khỏe (0–10)"
+        "label": "Category: Phân loại",
+        "tooltip": "Phân loại độ sôi động và điểm số sức khỏe (0 ⁇ 10)"
       },
       "published": {
-        "label": "Đã xuất bản",
-        "tooltip": "Ngày phiên bản đã cài đặt được xuất bản lên pub.dev"
+        "label": "Được xuất bản Published Phát hành Published",
+        "tooltip": "Ngày phiên bản được cài đặt đã được xuất bản là pub.dev."
       },
       "activity": {
-        "label": "Hoạt động",
-        "tooltip": "Cấp độ hoạt động mã hóa và phát hành từ cam kết + lần xuất bản gần đây"
+        "label": "Hoạt động hoạt động Activity",
+        "tooltip": "Code-and-release activity grade từ commit + publish recency (tạm dịch: cam kết và xuất bản gần đây)"
       },
       "likes": {
-        "label": "Lượt thích",
-        "tooltip": "lượt thích của pub.dev — nhấp để mở trang điểm gói"
+        "label": "Thích thích thích thích",
+        "tooltip": "pub.dev thích  ⁇ click để mở trang điểm số gói."
       },
       "downloads": {
-        "label": "Tải xuống",
-        "tooltip": "Số lượt tải xuống pub.dev trong 30 ngày qua — nhấp để mở trang điểm gói"
+        "label": "Downloads (Tải xuống)",
+        "tooltip": "pub.dev tải về trong 30 ngày qua  ⁇ click để mở trang điểm số gói."
       },
       "issues": {
-        "label": "Vấn đề",
-        "tooltip": "Các vấn đề về GitHub mở (không bao gồm các yêu cầu kéo khi có sẵn)"
+        "label": "Các vấn đề về các vấn đề",
+        "tooltip": "Mở các vấn đề GitHub (không bao gồm yêu cầu kéo khi có sẵn)"
       },
       "prs": {
-        "label": "PR",
-        "tooltip": "Mở yêu cầu kéo GitHub"
+        "label": "PRs là những người có quan hệ công chúng.",
+        "tooltip": "Mở GitHub pull request để kéo các yêu cầu."
       },
       "size": {
-        "label": "Kích cỡ",
-        "tooltip": "Kích thước mã (lib + tài sản được khai báo); quay trở lại kích thước lưu trữ pub.dev khi kích thước mã không có sẵn"
+        "label": "Kích thước Size Size Đường ngực",
+        "tooltip": "Kích thước mã (lib + tài sản khai báo); sẽ quay trở lại kích thước kho lưu trữ pub.dev khi không có sẵn kích thước mã."
       },
       "deps": {
         "label": "Phụ thuộc",
-        "tooltip": "Các phần phụ thuộc bắc cầu trực tiếp — phần phụ trợ được chia sẻ được đánh dấu"
+        "tooltip": "Các phụ thuộc trực tiếp chuyển động  ⁇ Các bộ phận chia sẻ được nhấn mạnh"
       },
       "files": {
-        "label": "Tài liệu tham khảo",
-        "tooltip": "Số lượng tệp nguồn nhập gói này - nhấp để tìm kiếm"
+        "label": "References Tham khảo tham chiếu",
+        "tooltip": "Số lượng các tệp nguồn nhập gói này  ⁇ click để tìm kiếm."
       },
       "transitives": {
-        "label": "chuyển tiếp",
-        "tooltip": "Số lượng phụ thuộc bắc cầu (gián tiếp) mà gói này đưa vào"
+        "label": "Transitives là những thứ chuyển tiếp.",
+        "tooltip": "Số lượng các phụ thuộc chuyển tiếp (không trực tiếp) mà gói này kéo vào."
       },
       "vulns": {
-        "label": "lỗ đít",
-        "tooltip": "Các lỗ hổng bảo mật đã biết từ cơ sở dữ liệu Tư vấn OSV và GitHub"
+        "label": "Vulns Vulns (vùng đất)",
+        "tooltip": "Các lỗ hổng bảo mật được biết đến từ OSV và GitHub Cơ sở dữ liệu tư vấn."
       },
       "license": {
-        "label": "Giấy phép",
-        "tooltip": "Mã nhận dạng giấy phép SPDX từ pub.dev"
+        "label": "Giấy phép License",
+        "tooltip": "SPDX mã nhận dạng giấy phép từ pub.dev"
       },
       "update": {
-        "label": "Cập nhật",
-        "tooltip": "Cập nhật phiên bản có sẵn: chính, phụ hoặc bản vá"
+        "label": "Update update updates là gì",
+        "tooltip": "Cập nhật phiên bản có sẵn: lớn, nhỏ hoặc là một mảng."
       },
       "status": {
-        "label": "Trạng thái",
-        "tooltip": "Trạng thái sử dụng: gói có vẻ như chưa được sử dụng trong mã của bạn hay không"
+        "label": "Tình trạng Status Status",
+        "tooltip": "Tình trạng sử dụng: Usage status liệu gói hàng có xuất hiện chưa được sử dụng trong mã của bạn hay không."
       },
       "description": {
-        "label": "Sự miêu tả",
-        "tooltip": "Mô tả gói từ pub.dev"
+        "label": "Mô tả mô tả Description Description",
+        "tooltip": "Mô tả bao bì từ pub.dev"
       }
     },
     "cells": {
-      "noGithub": "Không tìm thấy kho lưu trữ GitHub"
+      "noGithub": "Không tìm thấy kho lưu trữ GitHub.",
+      "devBadge": "Dev Dev Dev là một người",
+      "transitiveBadge": "transitive trân trọng transitive",
+      "publishDateUnavailable": "Ngày xuất bản không có sẵn từ pub.dev",
+      "activityGradeUnavailable": "Không có cấp độ hoạt động (không có dữ liệu cam kết hoặc phát hành)",
+      "activityFallback": "Hoạt động dựa trên các cam kết và phát hành gần đây.",
+      "likesUnavailable": "pub.dev thích không có sẵn",
+      "likesCount": "{count} pub.dev thích",
+      "downloadsUnavailable": "pub.dev Tải xuống 30 ngày không có sẵn.",
+      "downloadsCount": "{count} tải về trong 30 ngày qua",
+      "sizeUnavailable": "Kích thước không có sẵn từ pub.dev",
+      "noVulnerabilities": "Không có lỗ hổng được biết đến.",
+      "licenseUnspecified": "Giấy phép không được chỉ định trên pub.dev",
+      "unusedBadge": "Không được sử dụng, chưa dùng đến.",
+      "packageInUse": "Gói đang được sử dụng."
     },
     "row": {
-      "expandDetails": "Mở rộng chi tiết",
-      "copyRowJson": "Sao chép hàng dưới dạng JSON"
+      "expandDetails": "Mở rộng chi tiết chi tiết.",
+      "copyRowJson": "Sao chép hàng như JSON."
     },
     "shortcuts": {
-      "focusSearch": "Tập trung vào trường tìm kiếm",
-      "nextRow": "Đánh dấu hàng gói tiếp theo",
-      "prevRow": "Đánh dấu hàng gói trước đó",
-      "toggleDetail": "Chuyển đổi trình mở rộng chi tiết gói được đánh dấu",
-      "escapeSearch": "Tìm kiếm tập trung rõ ràng; Esc thứ hai thu gọn tất cả các hàng được mở rộng",
-      "historyBack": "Quay lại lịch sử điều hướng gói",
-      "showOverlay": "Hiển thị lớp phủ phím tắt này"
+      "focusSearch": "Tập trung vào trường tìm kiếm.",
+      "nextRow": "Đánh dấu hàng gói tiếp theo.",
+      "prevRow": "Đánh dấu hàng gói trước đó.",
+      "toggleDetail": "Bước chuyển đổi các chi tiết gói được đánh dấu mở rộng.",
+      "escapeSearch": "Tìm kiếm rõ ràng tập trung; tìm kiếm giây Esc sụp đổ tất cả các hàng mở rộng.",
+      "historyBack": "Quay trở lại thông qua lịch sử điều hướng gói.",
+      "showOverlay": "Hiển thị lớp phủ phím tắt này."
+    },
+    "versionTooltip": {
+      "installed": "Được lắp đặt: {version} ({date}) là một dạng của",
+      "latest": "Mới nhất: Gần đây nhất {version} là Phương pháp",
+      "created": "Được tạo ra bởi: {date} là Phương pháp",
+      "constraint": "Constraint: hạn chế {constraint} là Phương pháp"
+    },
+    "healthTooltip": {
+      "grade": "Lớp học: {grade} là Phương pháp",
+      "resolutionVelocity": "Tốc độ phân giải: Resolution Velocity {value} là Phương pháp",
+      "engagementLevel": "Mức độ tham gia: {value} là Phương pháp",
+      "popularity": "Popularity: Nhất danh {value} là Phương pháp",
+      "publisherTrust": "Publisher Trust: Nhà xuất bản tin tưởng {value} là Phương pháp",
+      "codeCommits": "Code commits: Mã cam kết: {age} trước đây.",
+      "latestRelease": "Bản phát hành mới nhất: {age} trước đây.",
+      "activitySignal": "Tín hiệu hoạt động: tín hiệu hoạt tính {signal} là Phương pháp"
+    },
+    "size": {
+      "codeSize": "Kích thước mã: kích cỡ của mã. {size} là Phương pháp",
+      "archiveSize": "Kích thước tập tin: {size} là Phương pháp",
+      "onDisk": "Trên đĩa: On disk {size} là Phương pháp",
+      "withUniqueTransitives": "Với các transitives độc đáo: {size} là Phương pháp",
+      "withSharedTransitives": "Với các phương tiện chuyển tiếp được chia sẻ: {size} là Phương pháp",
+      "openFolder": "Mở thư mục gói cước địa phương mở."
+    },
+    "references": {
+      "noImports": "Không có hồ sơ nguồn nhập khẩu được phát hiện.",
+      "reExportLine": "{location} (tái xuất)",
+      "reExportSuffix": "(tái xuất)",
+      "publicApiSurface": "Bề mặt API công khai  ⁇ ít nhất một lần sử dụng là tái xuất khẩu.",
+      "reExportedBadge": "Được tái xuất khẩu, được tái xuất cảng.",
+      "openFileReferences": "Mở tài liệu tham khảo tập tin mở.",
+      "searchImports": "Tìm kiếm nhập khẩu, tìm kiếm hàng hóa.",
+      "fileReferencesHeading": "File References ({count}) - Hướng dẫn tập tin",
+      "andMore": "... và {count} nhiều hơn nữa."
+    },
+    "deps": {
+      "noTransitives": "Không có sự phụ thuộc chuyển tiếp.",
+      "showTransitives": "Hiển thị các phụ thuộc chuyển tiếp.",
+      "tooltipDep": "• {dep}",
+      "tooltipDepShared": "• {dep} (chia sẻ)",
+      "tooltipHeader": "{total} phụ thuộc bắc cầu",
+      "tooltipHeaderShared": "{total} phụ thuộc bắc cầu ({shared} được chia sẻ)",
+      "sharedBadgeTitle": "{count} được chia sẻ với các gói khác.",
+      "sharedBadge": "chia sẻ chung được chia sẻ.",
+      "transitiveDepsHeading": "Transitive Dependencies ({count}) - Các phụ thuộc chuyển tiếp"
+    },
+    "dormancy": {
+      "noActivity6mo": "Không có cam kết và không phát hành trong 6 tháng trở lên.",
+      "noActivity3mo": "Không có cam kết và không phát hành trong 3 tháng +.",
+      "releaseActiveCodeInactive": "Release active, code inactive (3+ tháng không commit)",
+      "codeActiveReleaseSlow": "Mã hoạt động, nhịp phát hành chậm hơn (3+ tháng)"
+    },
+    "activity": {
+      "withDormancy": "{dormancy} (lớp hoạt động là {grade})",
+      "healthy": "Code và hoạt động giải phóng là lành mạnh (sức năng cấp {grade})"
+    },
+    "detail": {
+      "codeCommitActivity": "Code Commit Activity - code commit hoạt động cam kết",
+      "releaseActivity": "Hoạt động phát hành Release Activity",
+      "dormancySignal": "Tín hiệu ngủ yên (dormancy signal)",
+      "ago": "{age} trước đây.",
+      "qualityExample": "+ ví dụ example",
+      "qualityExampleTitle": "Tàu một bản demo chạy được.",
+      "qualityTests": "+thử nghiệm, kiểm tra",
+      "qualityTestsTitle": "Gửi một bộ thử nghiệm.",
+      "qualityTools": "+các công cụ",
+      "qualityToolsTitle": "Công cụ bảo trì tàu hạm",
+      "qualityDocs": "+docs docs",
+      "qualityDocsTitle": "Tàu mở rộng tài liệu tài liệu",
+      "healthScore": "Điểm số sức khỏe (Health Score)",
+      "resolutionVelocity": "Tốc độ phân giải Resolution Velocity",
+      "engagementLevel": "Mức độ tham gia (Engagement Level)",
+      "popularity": "Popularity Sự nổi tiếng",
+      "publisherTrust": "Publisher Trust là một tổ chức tin tưởng của nhà xuất bản.",
+      "fixInVersion": "→ fix trong {version}",
+      "vulnerabilitiesHeading": "Các lỗ hổng ({count})"
+    },
+    "links": {
+      "heading": "Links Liên kết",
+      "pubDev": "pub.dev",
+      "changelog": "Changelog thay đổi",
+      "versions": "Phiên bản phiên bản version versions",
+      "repository": "kho lưu trữ dữ liệu.",
+      "issues": "Các vấn đề liên quan đến các vấn đề"
     }
   },
   "commandCatalog": {
-    "documentTitle": "Danh mục lệnh Saropa",
-    "skipLink": "Chuyển đến danh mục lệnh",
-    "heroTitle": "Danh mục lệnh Saropa",
+    "documentTitle": "Saropa Danh mục lệnh Command Catalogue",
+    "skipLink": "Skip to command catalogue: Chuyển sang danh mục lệnh",
+    "heroTitle": "Saropa Danh mục lệnh Command Catalogue",
     "status": {
       "commands": "{count} lệnh",
       "categories": "{count} danh mục",
       "recent": "{count} mục gần đây",
       "internalHidden": "chỉ {count} menu ngữ cảnh (đã ẩn)",
-      "wordCommands": "lệnh",
-      "wordCategories": "Thể loại",
-      "wordRecent": "gần đây"
+      "wordCommands": "Lệnh lệnh ra lệnh.",
+      "wordCategories": "Các loại: Categories Category categories",
+      "wordRecent": "Gần đây gần đây mới đây"
     },
     "search": {
-      "placeholder": "Tìm kiếm tiêu đề, mô tả hoặc id lệnh…",
-      "ariaLabel": "Lệnh tìm kiếm",
-      "clearAria": "Xóa tìm kiếm",
-      "hintLine1": "Phù hợp với từng lệnh",
-      "hintStrongTitle": "tiêu đề",
-      "hintStrongDesc": "Sự miêu tả",
-      "hintStrongId": "nhận dạng",
-      "hintLine2": "(mã thông báo id cũng được đặt cách nhau - gõ",
-      "hintLine2kbd": "chạy phân tích",
+      "placeholder": "Tìm kiếm tiêu đề, mô tả hoặc id lệnh ...",
+      "ariaLabel": "Tìm kiếm lệnh tìm kiếm",
+      "clearAria": "Clear search tìm kiếm rõ ràng.",
+      "hintLine1": "Khớp với mỗi lệnh của các chỉ huy.",
+      "hintStrongTitle": "Tiêu đề: Title tiêu đề title",
+      "hintStrongDesc": "Mô tả mô tả mô hình",
+      "hintStrongId": "Id id id id",
+      "hintLine2": "(các thẻ id cũng có khoảng cách  ⁇ loại hình type type type",
+      "hintLine2kbd": "Run Analysis - Phân tích chạy",
       "hintLine2End": "không có dấu chấm)."
     },
     "toolbar": {
-      "showInternal": "Hiển thị các lệnh menu ngữ cảnh",
-      "collapseAll": "Thu gọn tất cả"
+      "showInternal": "Hiển thị các lệnh menu ngữ cảnh.",
+      "collapseAll": "Tất cả đều sụp đổ."
     },
     "recentPopover": {
       "title": "Tìm kiếm gần đây",
-      "clearTitle": "Xóa tất cả tìm kiếm gần đây",
-      "clearButton": "Thông thoáng",
+      "clearTitle": "Xóa tất cả các tìm kiếm gần đây",
+      "clearButton": "Clear (văn) - Rõ ràng, rõ ràng",
       "listAria": "Tìm kiếm gần đây"
     },
     "filterChips": {
-      "ariaRegion": "Bộ lọc hoạt động",
+      "ariaRegion": "Các bộ lọc hoạt động",
       "activeLabel": "Bộ lọc hoạt động:",
-      "clearAll": "Xóa tất cả"
+      "clearAll": "Tất cả mọi thứ đều sạch sẽ."
     },
     "bands": {
-      "frequentTitle": "Thường xuyên",
-      "frequentHint": "Được sử dụng nhiều nhất trong các phiên của bạn",
-      "recentTitle": "Gần đây",
-      "recentClear": "Thông thoáng",
-      "recentHint": "Bấm để chạy lại · Mới nhất xếp trước"
+      "frequentTitle": "Thường xuyên thường xuyên",
+      "frequentHint": "Được sử dụng nhiều nhất trong các phiên của bạn.",
+      "recentTitle": "Gần đây gần đây Recent Recent",
+      "recentClear": "Clear (văn) - Rõ ràng, rõ ràng",
+      "recentHint": "Nhấp vào để chạy lại · Mới nhất trước tiên mới nhất"
     },
     "noResults": {
-      "message": "Không có lệnh nào phù hợp với tìm kiếm của bạn.",
-      "reset": "Đặt lại bộ lọc"
+      "message": "Không có lệnh nào khớp với tìm kiếm của bạn.",
+      "reset": "Reset bộ lọc của các bộ lọc."
     },
     "entry": {
-      "internalBadgeTitle": "Chỉ được kích hoạt từ menu ngữ cảnh",
-      "internalBadge": "thực đơn",
+      "internalBadgeTitle": "Chỉ được kích hoạt từ các menu ngữ cảnh.",
+      "internalBadge": "Menu menu menu menu cho các bạn",
       "copyTitle": "Sao chép id lệnh ({id})",
-      "copyAria": "Sao chép id lệnh"
+      "copyAria": "Sao chép id lệnh."
     },
-    "categoryJumpTitle": "Chuyển tới {category}",
+    "categoryJumpTitle": "Nhảy đến {category}",
     "shortcuts": {
-      "focusSearch": "Tập trung vào trường tìm kiếm",
-      "navRows": "Điều hướng các hàng lệnh hiển thị",
-      "homeEnd": "Chuyển đến hàng hiển thị đầu tiên hoặc cuối cùng",
-      "enterRun": "Chạy lệnh tập trung",
-      "escClear": "Xóa bộ lọc tìm kiếm và đặt lại",
-      "showOverlay": "Hiển thị lớp phủ phím tắt này"
+      "focusSearch": "Tập trung vào trường tìm kiếm.",
+      "navRows": "Điều hướng các dòng lệnh có thể nhìn thấy.",
+      "homeEnd": "Nhảy đến hàng đầu tiên hoặc cuối cùng có thể nhìn thấy.",
+      "enterRun": "Chạy lệnh tập trung.",
+      "escClear": "Xóa các bộ lọc tìm kiếm và đặt lại.",
+      "showOverlay": "Hiển thị lớp phủ phím tắt này."
     },
     "script": {
-      "moreSuffix": "+{count} thêm",
-      "showLess": "Hiển thị ít hơn",
-      "runSingular": "chạy",
-      "runPlural": "chạy",
-      "recentWord": "gần đây",
-      "expandAll": "Mở rộng tất cả",
-      "collapseAll": "Thu gọn tất cả",
-      "searchChip": "Tìm kiếm: \"{query}\"",
-      "internalChip": "Hiển thị các lệnh menu ngữ cảnh",
-      "removeFilterPrefix": "Xóa bộ lọc",
+      "moreSuffix": "+{count} nhiều hơn",
+      "showLess": "Show less - Hiển thị ít hơn",
+      "runSingular": "Chạy, chạy, chạy.",
+      "runPlural": "Chạy chạy, chạy đi.",
+      "recentWord": "Gần đây gần đây mới đây",
+      "expandAll": "Expand all mở rộng tất cả",
+      "collapseAll": "Tất cả đều sụp đổ.",
+      "searchChip": "Tìm kiếm: Search: \"{query}\"",
+      "internalChip": "Hiển thị các lệnh menu ngữ cảnh.",
+      "removeFilterPrefix": "Loại bỏ bộ lọc lọc",
       "matchOne": "{count} kết quả phù hợp",
       "matchOther": "{count} kết quả phù hợp"
     }
   },
   "codeHealth": {
-    "documentTitle": "Bảng điều khiển sức khỏe mã Saropa",
-    "skipToTable": "Chuyển đến bảng chức năng",
-    "openWorkspaceFirst": "Trước tiên hãy mở không gian làm việc Dart/Flutter.",
-    "scanningTitle": "Tình trạng mã: chức năng quét…",
+    "documentTitle": "Saropa Mã Dashboard Sức khỏe",
+    "skipToTable": "Bỏ qua các chức năng bảng biểu.",
+    "openWorkspaceFirst": "Mở một Dart/Flutter workspace đầu tiên.",
+    "scanningTitle": "Mã Sức khỏe: Code Health chức năng quét... chức năng scan.",
     "scan": {
-      "title": "Quét tình trạng dự án",
-      "subtitle": "Đọc mã của bạn. Bảng điều khiển sẽ hiển thị khi quá trình quét tìm hiểu thêm.",
-      "waiting": "Đang bắt đầu quét…",
-      "launching": "Đang khởi chạy máy quét…",
-      "collect": "Đang khám phá các tập tin…",
-      "firstRunHint": "Lần chạy đầu tiên biên dịch máy quét; các dự án lớn cần một chút thời gian trước khi các tập tin xuất hiện.",
-      "paused": "Đã tạm dừng",
-      "stopped": "Đã dừng quét",
-      "elapsed": "Đã qua",
+      "title": "Dự án quét sức khỏe của dự án",
+      "subtitle": "Đọc mã của bạn. Bảng điều khiển được lấp đầy khi quét học thêm.",
+      "waiting": "Bắt đầu quét...",
+      "launching": "Bắt đầu phóng máy quét...",
+      "collect": "Khám phá các tập tin...",
+      "firstRunHint": "Chạy đầu tiên biên dịch máy quét; Các dự án lớn mất một chút thời gian trước khi các tệp xuất hiện.",
+      "paused": "Paused Ngừng lại tạm dừng",
+      "stopped": "Quét đã dừng lại.",
+      "elapsed": "Đã trôi qua",
       "phase": {
-        "parse": "Phân tích tập tin",
-        "history": "Đọc lịch sử git",
-        "blame": "Tuổi mã máy tính",
-        "usage": "Đếm tài liệu tham khảo",
-        "score": "Chức năng chấm điểm"
+        "parse": "Phân tích các tập tin phân tích.",
+        "history": "Đọc sách lịch sử Git.",
+        "blame": "Lập trình toán mã tuổi tác",
+        "usage": "Đếm các tham chiếu",
+        "score": "Chức năng ghi điểm (scoring functions)"
       },
       "counter": {
-        "files": "Tập tin",
-        "functions": "Chức năng",
-        "problems": "Đã tìm thấy sự cố"
+        "files": "Các tập tin File Files",
+        "functions": "Các chức năng của các chức năng",
+        "problems": "Vấn đề tìm thấy"
       },
       "counters": {
-        "aria": "Bộ đếm quét trực tiếp"
+        "aria": "Bộ đếm quét trực tiếp của bộ đếm live scan."
       },
       "controls": {
-        "aria": "Điều khiển quét"
+        "aria": "Quét các điều khiển quét."
       },
       "btn": {
-        "pause": "Tạm dừng",
-        "resume": "Bản tóm tắt",
-        "restart": "Khởi động lại",
-        "cancel": "Hủy bỏ"
+        "pause": "Ngừng tạm thời, dừng lại.",
+        "resume": "Resume tiếp tục.",
+        "restart": "Khởi động lại khởi động lại.",
+        "cancel": "Hủy bỏ hủy bỏ"
       },
       "preview": {
-        "heading": "Các vấn đề được tìm thấy cho đến nay",
-        "empty": "Chưa tìm thấy vấn đề gì…"
+        "heading": "Những vấn đề được tìm thấy cho đến nay",
+        "empty": "Chưa tìm thấy vấn đề gì..."
       },
       "version": {
-        "engine": "Động cơ",
-        "detecting": "phát hiện…",
-        "legacy": "di sản - không có tiến triển trực tiếp (saropa_lints của dự án này có trước nó)"
+        "engine": "Động cơ Engine Engine Engine",
+        "detecting": "phát hiện... phát hiện ...",
+        "legacy": "legacy  ⁇  truyền thống không có tiến trình trực tiếp (phần saropa_lints của dự án này trước đó)"
       }
     },
-    "runReportFirst": "Chạy lại báo cáo, sau đó sao chép JSON.",
-    "copiedJson": "Code Health JSON đã được sao chép vào bảng nhớ tạm.",
-    "couldNotOpenFile": "Không thể mở tập tin: {path}",
-    "panelTitle": "Bảng điều khiển sức khỏe mã Saropa",
+    "runReportFirst": "Chạy báo cáo một lần nữa, sau đó sao chép JSON.",
+    "copiedJson": "Code Health JSON được sao chép vào clipboard.",
+    "couldNotOpenFile": "Không thể mở tệp: {path} là Phương pháp",
+    "panelTitle": "Saropa Mã Dashboard Sức khỏe",
     "hero": {
-      "title": "Bảng điều khiển sức khỏe mã Saropa",
-      "generated": "Đã tạo",
+      "title": "Saropa Mã Dashboard Sức khỏe",
+      "generated": "Generated được tạo ra.",
       "functionOne": "{count} hàm",
       "functionOther": "{count} hàm",
       "avgFormat": "trung bình {score} ({grade})",
       "gatesFailing": "cổng thất bại",
-      "gatesPassing": "cổng đi qua"
+      "gatesPassing": "Cổng đi qua vượt qua."
     },
     "gauge": {
-      "tooltip": "Điểm trung bình {rounded} là 100 (lớp {grade}).",
-      "ariaLabel": "Điểm trung bình {rounded} là 100"
+      "tooltip": "Điểm số trung bình {rounded} là 100 (lớp {grade}).",
+      "ariaLabel": "Điểm số trung bình {rounded} 100"
     },
     "gate": {
-      "fallback": "Cổng chất lượng không thành công - xem lại ngưỡng trong cài đặt Tình trạng mã.",
+      "fallback": "Cổng chất lượng thất bại  ⁇ xem xét các ngưỡng trong cài đặt Code Health.",
       "failingOne": "{count} cổng thất bại — xem lại ngưỡng hoặc sao chép JSON để kiểm tra gates.violations.",
       "failingOther": "{count} cổng thất bại — xem lại ngưỡng hoặc sao chép JSON để kiểm tra gates.violations.",
-      "openSettingsTitle": "Mở cài đặt Code Health để điều chỉnh ngưỡng.",
-      "openSettingsButton": "Mở cài đặt Tình trạng mã"
+      "openSettingsTitle": "Mở các cài đặt Code Health để điều chỉnh ngưỡng.",
+      "openSettingsButton": "Mã mở Các thiết lập sức khỏe"
     },
     "kpi": {
-      "ariaLabel": "Tóm tắt tình trạng mã",
-      "allClear": "Không có chức năng nào được gắn cờ trên bất kỳ danh mục nào - tất cả đều rõ ràng.",
-      "clickToFilter": "Bấm để lọc bảng theo các chức năng được gắn cờ {flag}.",
-      "noFlagged": "Không có chức năng nào được gắn cờ {flag}.",
-      "unused": "Chưa sử dụng",
-      "unusedSub": "chức năng được tham chiếu ở đâu",
-      "uncovered": "Khám phá",
-      "uncoveredSub": "không có bảo hiểm LCOV",
-      "stubTested": "Đã thử nghiệm sơ khai",
-      "stubTestedSub": "thử nghiệm tồn tại nhưng khẳng định ít",
-      "suspiciousCoverage": "Tin tức đáng ngờ",
-      "suspiciousCoverageSub": "phạm vi bảo hiểm có vẻ bịa đặt",
-      "testDrift": "Kiểm tra độ trôi",
-      "testDriftSub": "kiểm tra độ trễ của chức năng"
+      "ariaLabel": "Tóm tắt sức khỏe mã số",
+      "allClear": "Không có chức năng được gắn cờ trên bất kỳ loại nào  ⁇ Tất cả sạch sẽ.",
+      "clickToFilter": "Nhấp vào để lọc bảng thành các hàm được gắn cờ {flag}.",
+      "noFlagged": "Không có chức năng nào được đánh dấu {flag}.",
+      "unused": "Không được sử dụng, chưa dùng đến.",
+      "unusedSub": "Các chức năng không được tham chiếu ở bất kỳ nơi nào.",
+      "uncovered": "Không che đậy, không bao phủ.",
+      "uncoveredSub": "không có bảo hiểm LCOV.",
+      "stubTested": "Stub-tested được kiểm tra.",
+      "stubTestedSub": "Các thử nghiệm tồn tại nhưng khẳng định rất ít.",
+      "suspiciousCoverage": "Mở rộng tin tức đáng ngờ",
+      "suspiciousCoverageSub": "bảo hiểm trông như được chế tạo.",
+      "testDrift": "Test drift (thử nghiệm trôi dạt)",
+      "testDriftSub": "Các thử nghiệm lag chức năng của hàm."
     },
     "toolbar": {
-      "ariaLabel": "Mã hành động Sức khỏe",
-      "rescanTitle": "Chạy lại quá trình quét Code Health và làm mới bảng thông tin này.",
-      "rescan": "Quét lại",
-      "copyJsonTitle": "Sao chép Code Health JSON thô vào bảng nhớ tạm.",
+      "ariaLabel": "Bộ luật Các hành động sức khỏe",
+      "rescanTitle": "Chạy lại quét Code Health và làm mới bảng điều khiển này.",
+      "rescan": "Rescan lại quét lại.",
+      "copyJsonTitle": "Sao chép JSON Code Health thô vào clipboard.",
       "copyJson": "Sao chép JSON",
-      "settingsTitle": "Mở cài đặt Mã sức khỏe.",
-      "settingsButton": "Cài đặt tình trạng mã",
-      "filterTitle": "Lọc các hàng theo tên, tệp hoặc cờ.",
-      "filterLabel": "Lọc hàng",
-      "filterPlaceholder": "Lọc hàng…"
+      "settingsTitle": "Mở các cài đặt Code Health.",
+      "settingsButton": "Mã Các thiết lập sức khỏe Chế độ y tế",
+      "filterTitle": "Bộ lọc hàng theo tên, tập tin hoặc cờ.",
+      "filterLabel": "Các hàng lọc là các dòng bộ lọc.",
+      "filterPlaceholder": "Các hàng lọc..."
     },
     "table": {
-      "ariaLabel": "Chức năng tồi tệ nhất theo điểm số",
-      "heading": "Chức năng tệ nhất",
-      "topCount": "{shown} hàng đầu của {total}",
-      "colGrade": "Cấp",
-      "colScore": "Điểm",
-      "colFunction": "Chức năng",
-      "colFile": "Tài liệu",
-      "colLine": "Đường kẻ",
-      "colUsage": "Cách sử dụng",
-      "colCoverage": "Bảo hiểm",
-      "colComplexity": "Độ phức tạp",
-      "colFlags": "Cờ",
-      "noMatch": "Không có chức năng nào phù hợp với bộ lọc hiện tại.",
-      "resetFiltersTitle": "Xóa tìm kiếm và mọi bộ lọc cờ đang hoạt động.",
-      "resetFilters": "Đặt lại bộ lọc",
+      "ariaLabel": "Các chức năng tồi tệ nhất theo điểm số.",
+      "heading": "Các chức năng tồi tệ nhất là các chức năng xấu.",
+      "topCount": "top {shown} của {total}",
+      "colGrade": "Lớp học: Grade grade",
+      "colScore": "Điểm số điểm số",
+      "colFunction": "Chức năng chức năng chức vụ",
+      "colFile": "File file file file File File",
+      "colLine": "Dòng Đường Đường",
+      "colUsage": "Usage Usage Sử dụng",
+      "colCoverage": "Coverage (Cách phủ)",
+      "colComplexity": "Sự phức tạp của sự phức tạp",
+      "colFlags": "Lá cờ Cờ quốc gia",
+      "noMatch": "Không có chức năng nào khớp với bộ lọc hiện tại.",
+      "resetFiltersTitle": "Xóa tìm kiếm và bất kỳ bộ lọc cờ hoạt động nào.",
+      "resetFilters": "Reset bộ lọc của các bộ lọc.",
       "hint": "Hiển thị 200 chức năng tồi tệ nhất theo điểm số. Sử dụng trường tìm kiếm để thu hẹp hơn nữa.",
       "expanderAriaCollapsed": "Hiển thị chi tiết vấn đề",
-      "expanderAriaExpanded": "Ẩn chi tiết vấn đề",
-      "detailHeading": "Tại sao chức năng này đạt điểm {score}",
-      "detailNoIssues": "Không có cờ nào trên hàng này — điểm số được xác định bởi các giá trị cột ở trên (mức sử dụng, mức độ phù hợp, độ phức tạp, độ tuổi, tài liệu).",
-      "suppressLabel": "Ngăn chặn trong tập tin",
-      "suppressTooltip": "Ghi `// ignore_for_file: code_health:<flag>` vào tệp này để các lần quét trong tương lai bỏ cờ này cho toàn bộ tệp."
+      "expanderAriaExpanded": "Hide issue details hide các chi tiết vấn đề",
+      "detailHeading": "Tại sao hàm này có điểm {score}?",
+      "detailNoIssues": "Không có cờ trên hàng này  ⁇ Điểm số được điều khiển bởi các giá trị cột ở trên (sử dụng, phạm vi bảo hiểm, độ phức tạp, tuổi tác, tài liệu).",
+      "suppressLabel": "Suppress in file (tạm dịch: Loại bỏ trong tập tin)",
+      "suppressTooltip": "Viết `// ignore_for_file: code_health:<flag> ` vào tệp này để các quét trong tương lai bỏ cờ này cho toàn bộ tập tin."
     },
     "flag": {
       "unused": {
-        "label": "chưa sử dụng",
-        "evidence": "0 người gọi",
-        "rule": "Được gắn cờ khi không có tệp nào khác tham chiếu đến tên hàm này."
+        "label": "Không được sử dụng, không dùng đến.",
+        "evidence": "0 người gọi.",
+        "rule": "Được đánh dấu khi không có tệp nào khác tham chiếu đến tên hàm này."
       },
       "uncovered": {
-        "label": "chưa được khám phá",
-        "evidence": "Kiểm tra {pct}%",
-        "rule": "Được gắn cờ khi LCOV báo cáo mức độ bao phủ đường dây là 0%."
+        "label": "không che phủ, không bao quát.",
+        "evidence": "{pct}% kiểm tra các bài kiểm tra",
+        "rule": "Được đánh dấu khi LCOV báo cáo 0% đường dây."
       },
       "complex": {
-        "label": "tổ hợp",
+        "label": "phức tạp complex phức hợp complex",
         "evidence": "CC {cc}",
-        "rule": "Được gắn cờ khi độ phức tạp chu kỳ vượt quá 10."
+        "rule": "Được đánh dấu khi độ phức tạp của cyclomatic vượt quá 10."
       },
       "undocumented": {
-        "label": "không có giấy tờ",
-        "evidence": "CC {cc}, không có tài liệu",
-        "rule": "Được gắn cờ khi hàm phức tạp (CC > 10) không có nhận xét tài liệu."
+        "label": "người không có giấy tờ,",
+        "evidence": "CC {cc}, không có doc.",
+        "rule": "Được đánh dấu khi một hàm phức (CC > 10) không có bình luận doc."
       },
       "test_drift": {
-        "label": "thử trôi dạt",
-        "evidence": "kiểm tra độ trễ của chức năng",
-        "rule": "Được gắn cờ khi tệp kiểm tra được liên kết mới nhất cũ hơn đáng kể so với tệp nguồn của hàm."
+        "label": "Drift test drift thử nghiệm trôi dạt",
+        "evidence": "Các thử nghiệm lag chức năng của hàm.",
+        "rule": "Được đánh dấu khi tệp thử nghiệm được liên kết mới nhất có ý nghĩa lâu hơn so với tệp nguồn của hàm."
       },
       "stub_tested": {
-        "label": "thử nghiệm sơ khai",
-        "evidence": "khẳng định mỏng",
-        "rule": "Được gắn cờ khi có một bài kiểm tra được liên kết nhưng hầu như không khẳng định điều gì."
+        "label": "Stub-tested được kiểm tra.",
+        "evidence": "thin asserts khẳng định mỏng",
+        "rule": "Được đánh dấu khi một bài kiểm tra liên kết tồn tại nhưng hầu như không khẳng định bất cứ điều gì."
       },
       "suspicious_coverage": {
-        "label": "tin tức đáng ngờ",
-        "evidence": "{pct}% không có kiểm tra",
-        "rule": "Được gắn cờ khi LCOV báo cáo mức độ phù hợp cao nhưng không có thử nghiệm nào tham chiếu đến chức năng này."
+        "label": "Các tin tức đáng ngờ được đưa ra.",
+        "evidence": "{pct}% không có thử nghiệm.",
+        "rule": "Được đánh dấu khi LCOV báo cáo độ bao phủ cao nhưng không có thử nghiệm nào tham chiếu chức năng."
       }
     },
     "shortcuts": {
-      "focusFilter": "Tập trung vào bộ lọc hàng",
-      "clearFilter": "Xóa bộ lọc hàng tập trung",
-      "activateKpi": "Kích hoạt thẻ KPI tập trung",
-      "activateKpiSpace": "Kích hoạt thẻ KPI tập trung",
-      "showOverlay": "Hiển thị lớp phủ phím tắt này"
+      "focusFilter": "Tập trung vào bộ lọc hàng.",
+      "clearFilter": "Xóa bộ lọc hàng tập trung.",
+      "activateKpi": "Kích hoạt thẻ tập trung vào KPI.",
+      "activateKpiSpace": "Kích hoạt thẻ tập trung vào KPI.",
+      "showOverlay": "Hiển thị lớp phủ phím tắt này."
     },
     "script": {
       "activeFiltersLabel": "Bộ lọc hoạt động:",
-      "searchChip": "tìm kiếm: \"{q}\"",
-      "flagChip": "cờ: {flag}",
+      "searchChip": "tìm kiếm: search: \"{q}\"",
+      "flagChip": "cờ: lá cờ {flag} là Phương pháp",
       "removeAria": "Loại bỏ {key}",
-      "clearAll": "Xóa tất cả",
+      "clearAll": "Tất cả mọi thứ đều sạch sẽ.",
       "rowsVisible": "hiển thị {visible}/{total} hàng",
-      "neverRun": "không bao giờ chạy"
+      "neverRun": "Never run, never run - Không bao giờ chạy"
     },
     "freshness": {
-      "justNow": "ngay bây giờ",
+      "justNow": "Chỉ mới bây giờ.",
       "minutesAgo": "{min} phút trước",
       "hoursAgo": "{hr} giờ trước",
       "daysAgo": "{day} ngày trước",
@@ -884,57 +1115,221 @@
     }
   },
   "suppressionsStrip": {
-    "noData": "Chưa có vi violations.json nào — hãy chạy phân tích để điền vào ảnh chụp nhanh ngăn chặn.",
-    "zeroTotal": "0 lần ngăn chặn máy phân tích trong lần xuất mới nhất.",
-    "noKindBreakdown": "Không có phân tích theo loại trong lần xuất khẩu này.",
-    "title": "Sự đàn áp (xuất khẩu)",
-    "readOnlyNote": "(chỉ đọc; mở Kết quả để duyệt và hành động.)",
-    "openFindings": "Mở bảng điều khiển phát hiện"
+    "noData": "No violations.json yet  ⁇  Không có _PH0_ chưa Chạy phân tích để điền vào ảnh chụp nhanh của sự đàn áp.",
+    "zeroTotal": "0 sự kìm nén phân tích trong xuất khẩu mới nhất.",
+    "noKindBreakdown": "Không phân loại theo hàng hóa trong xuất khẩu này.",
+    "title": "Suppressions (export) - xóa bỏ",
+    "readOnlyNote": "(chỉ đọc; mở các kết quả để duyệt và hành động.)",
+    "openFindings": "Mở bảng điều khiển kết quả tìm kiếm."
   },
   "configMirrors": {
-    "noFileRisk": "Không có phân tích rủi ro trên mỗi tệp (không có vi phạm trong phạm vi).",
-    "suppressionNote": "Khớp với bản tóm tắt vi violations.json, không khớp với nút chuyển đổi loại bỏ thanh bên trực tiếp.",
-    "noSuppression": "Không có tổng hợp loại bỏ nào trong bản xuất này (máy phân tích cũ hơn hoặc loại bỏ bằng 0).",
+    "noFileRisk": "Không phân tích rủi ro theo từng hồ sơ (không có vi phạm trong phạm vi).",
+    "suppressionNote": "Khớp với violations.json tóm tắt, không phải là sidebar trực tiếp. toggles ngăn chặn.",
+    "noSuppression": "Không có tổng hợp ức chế trong xuất khẩu này (cơ phân tích cũ hoặc không bị ức hiếp).",
     "owaspSignal": "{count} vi phạm trong bản xuất này mang ánh xạ di động/web OWASP — mở Tư thế bảo mật để xem ma trận đầy đủ và xuất.",
-    "summarySuppressions": "Loại bỏ (xuất ảnh chụp nhanh)",
-    "summaryOwasp": "Trạng thái bảo mật (tín hiệu OWASP)",
-    "summaryFileRisk": "Rủi ro tệp (tệp hàng đầu)"
+    "summarySuppressions": "Suppressions (export snapshot) - xóa bỏ các thông tin xuất khẩu",
+    "summaryOwasp": "Căn phòng an ninh (tín hiệuOWASP)",
+    "summaryFileRisk": "File risk (top files) - rủi ro tập tin"
   },
   "telemetry": {
-    "heroTitle": "Quy tắc liên quan từ xa",
-    "skipToCounters": "Chuyển đến quầy đo từ xa",
+    "heroTitle": "Quy tắc liên quan Telemetry.",
+    "skipToCounters": "Bước sang các bộ đếm đo từ xa.",
     "lastEvent": "Sự kiện cuối cùng {relative}",
-    "noEvents": "Không có sự kiện nào được ghi lại",
+    "noEvents": "Không có sự kiện nào được ghi lại.",
     "totalEventOne": "tổng số {count} sự kiện",
     "totalEventOther": "tổng số {count} sự kiện",
-    "noCountersTitle": "Không có bộ đếm để thiết lập lại.",
-    "resetTitle": "Đặt lại tất cả các bộ đếm",
-    "refreshTitle": "Tải lại bộ đếm từ xa từ đĩa",
-    "refresh": "Làm cho khỏe lại",
-    "copyTitle": "Sao chép ảnh chụp nhanh dưới dạng JSON",
+    "noCountersTitle": "Không có bộ đếm để đặt lại.",
+    "resetTitle": "Đặt lại tất cả các bộ đếm.",
+    "refreshTitle": "Tải lại bộ đếm viễn thám từ đĩa cứng.",
+    "refresh": "Thức mới và làm mới",
+    "copyTitle": "Sao chép ảnh chụp nhanh dưới dạng JSON.",
     "copyJson": "Sao chép JSON",
-    "resetCounters": "Đặt lại bộ đếm",
-    "countersAria": "quầy",
-    "countersHeading": "Quầy sự kiện",
-    "thEvent": "Sự kiện",
-    "thCount": "Đếm",
-    "emptyMessage": "Chưa có sự kiện đo từ xa nào được ghi lại - hãy mở quy tắc từ Bảng thông tin phát hiện để bắt đầu ghi lại các bộ đếm.",
-    "openFindingsTitle": "Mở Bảng điều khiển phát hiện Saropa.",
-    "openFindings": "Mở bảng điều khiển phát hiện",
-    "lastPropsHeading": "Thuộc tính sự kiện cuối cùng",
-    "copiedJson": "Saropa Lints: sao chép JSON từ xa quy tắc liên quan.",
-    "countersReset": "Saropa Lints: thiết lập lại bộ đếm từ xa theo quy tắc liên quan."
+    "resetCounters": "Đặt lại bộ đếm số",
+    "countersAria": "Bộ đếm số lượng",
+    "countersHeading": "Bộ đếm sự kiện Event Counter",
+    "thEvent": "Sự kiện sự kiện sự việc sự kiện",
+    "thCount": "Count Count Count đếm đếm",
+    "emptyMessage": "Chưa ghi lại sự kiện đo từ xa nào  ⁇ mở một quy tắc từ bảng điều khiển kết quả để bắt đầu ghi lại số đếm.",
+    "openFindingsTitle": "Mở bảng điều khiển Saropa Findings.",
+    "openFindings": "Mở bảng điều khiển kết quả tìm kiếm.",
+    "lastPropsHeading": "Last event properties: thuộc tính của sự kiện cuối cùng.",
+    "copiedJson": "Saropa Lints: là người có thể sao chép liên quan đến quy tắc viễn thám JSON.",
+    "countersReset": "Saropa Lints: là người có thể related rule telemetry counters reset. thiết lập lại bộ đếm viễn thám"
   },
   "sidebarLayout": {
-    "summary": "Bố cục thanh hoạt động",
-    "hint": "Bật hoặc tắt các phần trên thanh hoạt động của Saropa tại đây (được lưu cùng với không gian làm việc mà không cần rời khỏi trang tổng quan)."
+    "summary": "Layout của thanh hoạt động",
+    "hint": "Bật các phần thanh hoạt động Saropa lên hoặc tắt ở đây (được lưu với không gian làm việc, mà không rời khỏi bảng điều khiển)."
   },
   "securityPosture": {
     "issueOne": "{count} vấn đề",
     "issueOther": "{count} vấn đề",
-    "noIssues": "Không có vấn đề gì",
-    "showIssues": "Hiển thị vấn đề",
+    "noIssues": "Không có vấn đề No issues",
+    "showIssues": "Show issues: Hiển thị các vấn đề",
     "violationTooltip": "{count} vi phạm trên {ruleCount} quy tắc. Nhấp để xem trong Vấn đề.",
-    "noViolationsTooltip": "Không có vi phạm nào được ánh xạ tới danh mục này."
+    "noViolationsTooltip": "Không có vi phạm được lập bản đồ cho loại này."
+  },
+  "comparison": {
+    "title": "So sánh gói hàng",
+    "actions": {
+      "addToProject": "Thêm vào dự án Dự án"
+    },
+    "table": {
+      "row": {
+        "vibrancyGrade": "Vibrancy Grade (Lớp độ sôi động)",
+        "category": "Category: Phân loại",
+        "latestVersion": "Phiên bản mới nhất (Last Version)",
+        "published": "Được xuất bản Published Phát hành Published",
+        "publisher": "Nhà xuất bản Publisher",
+        "pubPoints": "Pub Points Điểm quán rượu",
+        "githubStars": "GitHub Ngôi sao",
+        "openIssues": "Các vấn đề mở",
+        "codeSize": "Kích thước mã Code Size",
+        "bloatRating": "Đánh giá Bloat Rating",
+        "license": "Giấy phép License",
+        "platforms": "Nền tảng nền tảng Platforms",
+        "inThisProject": "Trong dự án này,"
+      },
+      "value": {
+        "unverified": "⁇  Đồ chơi điện tử (không được xác minh)",
+        "allPlatforms": "Tất cả tất cả, tất cả.",
+        "yes": "Vâng, vâng, phải.",
+        "no": "Không, không phải là tôi."
+      },
+      "badge": {
+        "inProject": "Trong dự án In Project"
+      }
+    },
+    "status": {
+      "packagesSelected": "{count} gói được chọn đã chọn.",
+      "packagesCompared": "{count} gói so sánh so với các gói khác nhau.",
+      "dimensionsRankedOne": "{count} chiều xếp hạng thứ tự.",
+      "dimensionsRankedOther": "{count} kích thước xếp hạng thứ tự.",
+      "morePackages": "+{count} nhiều hơn"
+    },
+    "empty": {
+      "ariaLabel": "Không có gói hàng No packages",
+      "message": "Không có gói được chọn để so sánh. Nhấp chuột phải vào hai hoặc nhiều gói trong bảng điều khiển Gói và chọn {compare}.",
+      "compareWord": "So sánh so sánh so với so sánh",
+      "openDashboard": "Mở bảng điều khiển gói mở",
+      "openDashboardTitle": "Mở bảng điều khiển Saropa Package."
+    },
+    "a11y": {
+      "skipToTable": "Bước qua bảng so sánh.",
+      "recommendation": "Lời khuyên khuyến nghị Recommendation",
+      "addingToProject": "Thêm {name} vào dự án"
+    },
+    "shortcuts": {
+      "showOverlay": "Hiển thị lớp phủ phím tắt này.",
+      "closeOverlay": "Đóng cửa lớp phủ phím tắt-phím bấm chuột."
+    },
+    "kpi": {
+      "ariaLabel": "Tóm tắt so sánh so sánh",
+      "leading": "Đứng đầu dẫn dắt",
+      "leadingTitle": "Gói dẫn đầu bởi hầu hết các chiều thắng.",
+      "dimensionWinsOne": "{count} chiều win win",
+      "dimensionWinsOther": "{count} chiều thắng.",
+      "packages": "Gói hàng gói",
+      "packagesTitle": "Số lượng gói hàng so sánh song song.",
+      "inComparison": "so sánh trong khi so sánh.",
+      "dimensions": "Kích thước Dimension",
+      "dimensionsTitle": "Số lượng các chiều mà người chiến thắng có thể được xếp hạng.",
+      "ranked": "xếp hạng thứ tự theo thứ hạng."
+    },
+    "toolbar": {
+      "ariaLabel": "Các hành động so sánh tương đương với các hành động.",
+      "packageDashboard": "Package Dashboard là bảng điều khiển của gói.",
+      "packageDashboardTitle": "Mở bảng điều khiển gói để so sánh nhiều gói hơn."
+    }
+  },
+  "detailView": {
+    "empty": {
+      "selectPackage": "Chọn một gói để xem chi tiết."
+    },
+    "section": {
+      "version": "VERSION phiên bản",
+      "update": "UPDATE Đ ⁇ C LÀM CỦA M ⁇ T TƯỜNG",
+      "suggestion": "Đề xuất: Suggestion là gợi ý.",
+      "community": "Cộng đồng cộng đồng - Community",
+      "dependencies": "DEPENDENCIES là các khoản phụ thuộc.",
+      "alerts": "Cảnh báo cảnh báo",
+      "platforms": "Nền tảng nền tảng platforms",
+      "directDeps": "Direct Deposits (DDP) là các quỹ gửi trực tiếp.",
+      "readmeImages": "README IMAGES (Ảnh chụp hình ảnh)"
+    },
+    "version": {
+      "published": "Xuất bản: xuất bản bởi: {date} là Phương pháp",
+      "codeSize": "Kích thước mã Code Size",
+      "archive": "Archive Archives - Bảo tàng",
+      "sizeLabel": "{label}: {size}",
+      "source": "Nguồn: mã {code} · Nhận xét {comments} · Tệp {files}",
+      "replace": "Thay thế: Replace: {summary} là Phương pháp"
+    },
+    "update": {
+      "upgrade": "Nâng cấp nâng cấp Upgrade",
+      "changelog": "Changelog thay đổi",
+      "blockedBy": "Bị chặn bởi {package}"
+    },
+    "suggestion": {
+      "migrateTo": "Hãy xem xét việc di chuyển sang {package}.",
+      "consider": "Xem xét: {text}. . ph0__ .",
+      "alternatives": "Các lựa chọn thay thế: {names} là Phương pháp",
+      "unused": "Gói này dường như chưa được sử dụng  ⁇ xem xét loại bỏ nó."
+    },
+    "community": {
+      "issues": "{count} vấn đề",
+      "prs": "{count} PRs của người dân",
+      "activity90d": "90d: Dòng 90d là khoảng cách giữa các điểm 90d và 90d. {closed} vấn đề đóng cửa, {merged} PRs sáp nhập.",
+      "lastCommit": "Last commit: cam kết cuối cùng {time} là Phương pháp",
+      "archived": "Repository được lưu trữ.",
+      "pubPoints": "{points}/160 điểm quán rượu",
+      "latestRelease": "Bản phát hành mới nhất: {age} trước đây.",
+      "dependents": "{count} người phụ thuộc."
+    },
+    "dormancy": {
+      "noActivity6mo": "Không có cam kết và không phát hành trong 6 tháng trở lên.",
+      "noActivity3mo": "Không có cam kết và không phát hành trong 3 tháng +.",
+      "codeInactive": "Release active, code inactive (3+ tháng không commit)",
+      "releaseSlower": "Mã hoạt động, nhịp phát hành chậm hơn (3+ tháng)"
+    },
+    "dependencies": {
+      "flagged": "({count} được gắn cờ)",
+      "transitiveCount": "{count} gói chuyển tiếp",
+      "unique": "{count} duy nhất, độc đáo",
+      "shared": "{count} chia sẻ ({pct}%)",
+      "moreOverflow": "+{count} nhiều hơn",
+      "sharedList": "Chia sẻ: chia sẻ {names} là Phương pháp"
+    },
+    "platforms": {
+      "wasm": "WASM là một loại mã hóa."
+    },
+    "links": {
+      "viewFullDetails": "Xem toàn bộ chi tiết",
+      "pubDev": "pub.dev",
+      "documentation": "Tài liệu tài liệu Documentation",
+      "changelog": "Changelog thay đổi",
+      "repository": "Repository (thư viện)",
+      "issues": "Các vấn đề về các vấn đề",
+      "reportIssue": "Báo cáo báo cáo vấn đề"
+    },
+    "logoAlt": "{packageName} logo của PH0",
+    "readMore": "Nhiều hơn nhiều hơn nữa",
+    "readmeImageAlt": "Readme hình ảnh README"
+  },
+  "chart": {
+    "toggle": {
+      "excludeShared": "Exclude shared được chia sẻ."
+    },
+    "filter": {
+      "clear": "Clear (văn) - Rõ ràng, rõ ràng"
+    },
+    "bucket": {
+      "other": "Các loại khác ({count} {noun})",
+      "uniqueTransitives": "Các chất chuyển tiếp duy nhất ({count})",
+      "sharedTransitives": "Shared transitives ({count}) - Các loại tài sản chuyển tiếp được chia sẻ"
+    },
+    "noun": {
+      "package": "Gói gói bao bì là một gói gọn.",
+      "packages": "gói hàng, bao bì."
+    }
   }
 }

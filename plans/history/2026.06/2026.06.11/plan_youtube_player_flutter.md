@@ -162,3 +162,60 @@
 - [sarbagyastha/youtube_player_flutter — GitHub](https://github.com/sarbagyastha/youtube_player_flutter)
 - [BUG: YoutubePlayerController used after dispose — GitHub Issue #115](https://github.com/sarbagyastha/youtube_player_flutter/issues/115)
 - [BUG: fullscreen disposing controller — GitHub Issue #524](https://github.com/sarbagyastha/youtube_player_flutter/issues/524)
+
+
+---
+
+## Finish Report (2026-06-11)
+
+## Validation reconciliation (existing-coverage audit)
+
+Grepped the full `lib/src/rules/` tree for `youtube`/`youtube_player` — **no existing youtube_player_flutter coverage** (new file). Then verified each plan-proposed rule against generic rules before writing.
+
+Honored the plan's in-file VALIDATION annotations (added 2026-06-11) and confirmed them independently:
+
+- **DROPPED `youtube_player_subscription_not_canceled`** (plan annotation: DROP/overlap). Confirmed by grep — the StreamSubscription lifecycle is already covered by:
+  - `avoid_stream_subscription_in_field` (`async_rules.dart:2983`)
+  - `require_timer_cancellation` (`widget_lifecycle_rules.dart:1698`; message explicitly names StreamSubscription-in-dispose)
+  - `avoid_undisposed_instances` (`widget_lifecycle_rules.dart:3140`)
+  `controller.listen()` returns a `StreamSubscription` that these flag when stored uncanceled. No unique story lost.
+- **KEPT `youtube_player_controller_not_closed`** (plan annotation: KEEP, verified not redundant). `avoid_undisposed_instances` uses a fixed disposable-type set that excludes `YoutubePlayerController` and looks for `dispose()`; the v10 controller cleanup method is `close()`. Genuinely new.
+
+The other four proposals are package-specific shapes with no generic equivalent (nullable `convertUrlToId`, deprecated `YoutubePlayerScaffold`, autoplay-policy `mute` pairing, `autoFullScreen` orientation guard) and were kept.
+
+## Kept rules and tier assignments
+
+| rule_name | class | tier | severity | fix |
+|---|---|---|---|---|
+| `youtube_player_controller_not_closed` | YoutubePlayerControllerNotClosedRule | recommended | WARNING | no |
+| `youtube_player_convert_url_unchecked` | YoutubePlayerConvertUrlUncheckedRule | recommended | WARNING | no |
+| `youtube_player_mute_not_respected_in_params` | YoutubePlayerMuteNotRespectedInParamsRule | recommended | WARNING | no |
+| `youtube_player_scaffold_deprecated` | YoutubePlayerScaffoldDeprecatedRule | professional | INFO | no |
+| `youtube_player_auto_fullscreen_without_portrait_guard` | YoutubePlayerAutoFullscreenWithoutPortraitGuardRule | pedantic | INFO | no |
+
+**Tier rationale:**
+- Three WARNING correctness/resource-leak rules → `recommended` (real crash/leak risk with low FP: controller-leak narrows to typed fields + close()-in-dispose check; convert-url is same-expression-only; mute-pairing is inline-params-only — all FP-conservative).
+- `youtube_player_scaffold_deprecated` → `professional` (INFO migration hint, deprecated-API only, no FP expected but not crash-level).
+- `youtube_player_auto_fullscreen_without_portrait_guard` → `pedantic` per the plan's GUARD-NEEDED annotation: author-admitted HIGH FP, file-scoped, blind to navigation-observer orientation restoration. Suppression guards on `setPreferredOrientations`/`PopScope`/`WillPopScope` anywhere in the class, but cross-file restoration still produces FPs.
+
+No quick fixes added — all five are report-only per the plan (insertion sites are context-dependent; the scaffold removal needs builder-callback restructuring that cannot be mechanically rewritten).
+
+## Files written (non-shared)
+
+- `lib/src/rules/packages/youtube_player_flutter_rules.dart` — 5 rule classes + library dartdoc naming the complemented coverage.
+- `example_packages/lib/youtube_player_flutter/*_fixture.dart` — one fixture per rule (bad + near-miss good).
+- `test/rules/packages/youtube_player_flutter_rules_test.dart` — instantiation pin + fixture-existence per rule.
+
+`dart analyze` on the rules file is clean except the expected `PackageImports.youtubePlayerFlutter` undefined-getter errors (resolved at merge by adding the import constant). The `ClassDeclaration.bodyMembers` accessor was used (this analyzer build exposes `bodyMembers`, not `members`).
+
+## Merge steps required (shared files — not touched here)
+
+1. Add to `lib/src/import_utils.dart`: `static const Set<String> youtubePlayerFlutter = {'package:youtube_player_flutter/', 'package:youtube_player_iframe/'};` (both URIs — v10 re-exports the controller from `youtube_player_iframe`).
+2. Add the 5 `*.new` factories to `_allRuleFactories` in `lib/saropa_lints.dart`.
+3. Add the 5 rule-name strings to the tier sets in `lib/src/tiers.dart` (3 to `recommendedOnlyRules`, 1 to `professionalOnlyRules`, 1 to `pedanticOnlyRules`).
+4. Export from `all_rules.dart` if the barrel is manual (it auto-exports category files; verify).
+5. CHANGELOG bullet under `[Unreleased]`.
+
+### Scan-verification note (2026-06-11)
+
+4 of 5 rules confirmed firing via the scan harness on keyword-form (`new`) probe copies of the bad fixtures. `youtube_player_mute_not_respected_in_params` gates on the **named** constructor `YoutubePlayerController.fromVideoId`; under the scan's unresolved `parseString`, `new A.b(...)` cannot be split into type + constructor-name, so `constructorName.name` is null and the gate returns early — a scan-only limitation, not a rule defect. In the resolved analyzer plugin (real IDE usage) the named constructor resolves and the rule fires. Verified correct by inspection: gates on controller type + `fromVideoId` + `autoPlay: true` + inline `YoutubePlayerParams` + `mute` not `true` → reports.
