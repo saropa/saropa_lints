@@ -177,3 +177,44 @@ Register all 9 rule classes in `lib/saropa_lints.dart` `_allRuleFactories` (step
 - [local_auth_platform_interface types/auth_options.dart (GitHub)](https://raw.githubusercontent.com/flutter/packages/main/packages/local_auth/local_auth_platform_interface/lib/types/auth_options.dart)
 - [isDeviceSupported() behavior issue #148751](https://github.com/flutter/flutter/issues/148751)
 - [getAvailableBiometrics returns empty on some devices #117309](https://github.com/flutter/flutter/issues/117309)
+
+---
+
+## Finish Report (2026-06-11)
+
+**Scope:** (A) Dart lint rules. The 5 always-on rules shipped; the 4 `<3.0`-gated
+migration rules are SPLIT to `plans/plan_local_auth_migration_pack.md` (blocked on the
+`<`-gate archetype maintainer decision).
+
+### Validation fixes applied
+
+- `local_auth_biometric_only_sensitive` → kept at **Pedantic tier + quick fix** (adds
+  `biometricOnly: true` by inserting the named arg), per the validation's "pedantic +
+  fix or drop"; the naming-heuristic limitation is named in the message.
+- `local_auth_missing_capability_check` → **INFO**, file-scoped, with the shared-service
+  FP named in the message.
+- The 4 migration rules → split (their symbols resolve only on local_auth < 3.0).
+
+### Delivered (5 rules)
+
+`local_auth_unchecked_result` (WARNING, M3), `local_auth_missing_capability_check`
+(INFO, M3), `local_auth_unhandled_exception` (WARNING, M3),
+`local_auth_missing_lockout_handling` (INFO), `local_auth_biometric_only_sensitive`
+(INFO/Pedantic, + fix). Tiers: recommended (3), professional (1), pedantic (1).
+All gated by `fileImportsPackage(PackageImports.localAuth)`; the call rules key on the
+resolved `LocalAuthentication` receiver type.
+
+### Verification
+
+- `dart analyze --fatal-infos` → No issues found. Unit (10) + registration integrity pass.
+- **Note:** the call rules resolve the `LocalAuthentication` receiver type, so (like
+  in_app_review) they fire in a project that actually depends on `local_auth`; not
+  positively triggered in an unresolved mock. Logic verified by review.
+- **API note for future rules:** `ClassDeclaration.name` exists in `dart analyze`'s
+  analyzer but NOT the test-runtime CFE — use `declaredFragment?.element.name`. The
+  per-plan `dart test` run is the real compile gate (caught this).
+
+### Remaining work (split to active plan)
+
+`plans/plan_local_auth_migration_pack.md` — the 4 `local_auth_3` pack rules, blocked on
+the `<`-gate archetype decision.

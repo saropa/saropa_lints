@@ -108,6 +108,9 @@ class PackageImports {
   /// File Picker package imports.
   static const Set<String> filePicker = {'package:file_picker/'};
 
+  /// Local Auth (biometric authentication) package imports.
+  static const Set<String> localAuth = {'package:local_auth/'};
+
   /// Cached Network Image package imports.
   static const Set<String> cachedNetworkImage = {
     'package:cached_network_image/',

@@ -151,6 +151,7 @@ export 'packages/go_router_6_rules.dart';
 export 'packages/graphql_rules.dart';
 export 'packages/hive_rules.dart';
 export 'packages/home_widget_rules.dart';
+export 'packages/local_auth_rules.dart';
 export 'packages/in_app_review_rules.dart';
 export 'packages/isar_rules.dart';
 export 'packages/package_specific_rules.dart';

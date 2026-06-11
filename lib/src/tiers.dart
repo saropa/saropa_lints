@@ -763,6 +763,10 @@ const Set<String> essentialRules = <String>{
 /// Recommended tier rules - Essential + common mistakes, performance basics.
 /// Catches bugs that don't immediately crash but cause poor UX, sluggish performance.
 const Set<String> recommendedOnlyRules = <String>{
+  // Local Auth (local_auth_rules.dart) - security correctness
+  'local_auth_unchecked_result',
+  'local_auth_missing_capability_check',
+  'local_auth_unhandled_exception',
   // Moved from Essential (tier reclassification - no orphans)
   'prefer_semver_version', // pubspec version major.minor.patch - tooling correctness
   'prefer_correct_package_name', // library/package naming - tooling/build
@@ -1668,6 +1672,8 @@ const Set<String> recommendedOnlyRules = <String>{
 /// Professional tier rules - Recommended + architecture, testing, maintainability.
 /// Includes stricter naming conventions for API parameters.
 const Set<String> professionalOnlyRules = <String>{
+  // Local Auth (local_auth_rules.dart)
+  'local_auth_missing_lockout_handling',
   // Type Safety (moved from Essential - not crash prevention)
   'avoid_dynamic_type', // Type safety best practice
   // Error handling
@@ -3045,6 +3051,8 @@ const Set<String> comprehensiveOnlyRules = <String>{
 /// Pedantic tier rules - pedantic, highly opinionated rules.
 /// Rules most teams would find excessive. For greenfield projects.
 const Set<String> pedanticOnlyRules = <String>{
+  // Local Auth (local_auth_rules.dart) - naming-heuristic, high FP
+  'local_auth_biometric_only_sensitive',
   // File length (very strict thresholds - 200 lines for production, 400 for tests)
   'prefer_small_length_files', // 200 line limit
   'prefer_small_length_test_files', // 400 line limit for tests
@@ -3885,6 +3893,15 @@ const Set<String> qrScannerPackageRules = <String>{
   'require_qr_permission_check',
 };
 
+/// Rules specific to the local_auth package (always-on subset).
+const Set<String> localAuthPackageRules = <String>{
+  'local_auth_unchecked_result',
+  'local_auth_missing_capability_check',
+  'local_auth_unhandled_exception',
+  'local_auth_missing_lockout_handling',
+  'local_auth_biometric_only_sensitive',
+};
+
 /// Rules specific to the file_picker package (always-on correctness subset).
 const Set<String> filePickerPackageRules = <String>{
   'file_picker_unchecked_null_result',
@@ -3976,6 +3993,7 @@ Map<String, Set<String>> get packageRuleSets => {
   'home_widget': homeWidgetPackageRules,
   'device_calendar': deviceCalendarPackageRules,
   'file_picker': filePickerPackageRules,
+  'local_auth': localAuthPackageRules,
   'flame': flamePackageRules,
 };
 
@@ -4007,6 +4025,7 @@ const List<String> allPackages = <String>[
   'home_widget',
   'device_calendar',
   'file_picker',
+  'local_auth',
   'flame',
 ];
 

@@ -2541,6 +2541,13 @@ _allRuleFactories = <SaropaLintRule Function()>[
   InAppReviewMissingStoreListingFallbackRule.new,
   InAppReviewIosStoreListingMissingAppIdRule.new,
 
+  // Local Auth rules (local_auth_rules.dart)
+  LocalAuthUncheckedResultRule.new,
+  LocalAuthMissingCapabilityCheckRule.new,
+  LocalAuthUnhandledExceptionRule.new,
+  LocalAuthMissingLockoutHandlingRule.new,
+  LocalAuthBiometricOnlySensitiveRule.new,
+
   // File Picker rules (file_picker_rules.dart)
   FilePickerUncheckedNullResultRule.new,
   FilePickerPathOnWebRule.new,
