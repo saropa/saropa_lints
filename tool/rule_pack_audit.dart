@@ -74,9 +74,64 @@ kRelocatedRulePackCodes = {
   // bloc 8.0 removed mapEventToState → on<Event>; gated to the bloc_8 pack.
   'avoid_bloc_map_event_to_state': (fromPack: 'bloc', toPack: 'bloc_8'),
   // riverpod 3.0 deprecated StateNotifier(Provider); gated to riverpod_3.
-  'avoid_riverpod_state_notifier': (
-    fromPack: 'riverpod',
-    toPack: 'riverpod_3',
+  'avoid_riverpod_state_notifier': (fromPack: 'riverpod', toPack: 'riverpod_3'),
+  // share_plus 11.0 deprecated static Share.* → SharePlus.instance.share.
+  'prefer_shareplus_instance': (
+    fromPack: 'share_plus',
+    toPack: 'share_plus_11',
+  ),
+  // sensors_plus 4.0 deprecated the bare event-stream getters → *EventStream().
+  'prefer_sensors_event_stream': (
+    fromPack: 'sensors_plus',
+    toPack: 'sensors_plus_4',
+  ),
+  // flutter_svg 2.0 deprecated color/colorBlendMode → colorFilter.
+  'prefer_svg_color_filter': (fromPack: 'flutter_svg', toPack: 'flutter_svg_2'),
+  // file_picker 10.0 deprecated allowCompression → compressionQuality.
+  'file_picker_deprecated_allow_compression': (
+    fromPack: 'file_picker',
+    toPack: 'file_picker_10',
+  ),
+  // file_picker 12.0 deprecated withData / withReadStream / allowMultiple.
+  'file_picker_deprecated_with_data': (
+    fromPack: 'file_picker',
+    toPack: 'file_picker_12',
+  ),
+  'file_picker_deprecated_with_read_stream': (
+    fromPack: 'file_picker',
+    toPack: 'file_picker_12',
+  ),
+  'file_picker_deprecated_allow_multiple': (
+    fromPack: 'file_picker',
+    toPack: 'file_picker_12',
+  ),
+  // connectivity_plus 6.0 changed checkConnectivity() to List<ConnectivityResult>.
+  'avoid_pre_v6_single_connectivity_result': (
+    fromPack: 'connectivity_plus',
+    toPack: 'connectivity_plus_6',
+  ),
+  // google_sign_in 7.0 removed the GoogleSignIn() ctor / signIn().
+  'avoid_pre_v7_google_sign_in': (
+    fromPack: 'google_sign_in',
+    toPack: 'google_sign_in_7',
+  ),
+  // local_auth 3.0 removed AuthenticationOptions / useErrorDialogs, renamed
+  // stickyAuth, changed the thrown exception type.
+  'local_auth_deprecated_options_class': (
+    fromPack: 'local_auth',
+    toPack: 'local_auth_3',
+  ),
+  'local_auth_use_error_dialogs_removed': (
+    fromPack: 'local_auth',
+    toPack: 'local_auth_3',
+  ),
+  'local_auth_sticky_auth_renamed': (
+    fromPack: 'local_auth',
+    toPack: 'local_auth_3',
+  ),
+  'local_auth_platform_exception_catch': (
+    fromPack: 'local_auth',
+    toPack: 'local_auth_3',
   ),
 };
 

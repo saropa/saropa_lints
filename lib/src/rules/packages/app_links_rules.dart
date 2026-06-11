@@ -114,8 +114,10 @@ class AppLinksListenInBuildRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  Set<String>? get requiredPatterns =>
-      const <String>{'uriLinkStream', 'stringLinkStream'};
+  Set<String>? get requiredPatterns => const <String>{
+    'uriLinkStream',
+    'stringLinkStream',
+  };
 
   static const LintCode _code = LintCode(
     'app_links_listen_in_build',
@@ -180,8 +182,10 @@ class AppLinksUncaughtStreamErrorRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  Set<String>? get requiredPatterns =>
-      const <String>{'uriLinkStream', 'stringLinkStream'};
+  Set<String>? get requiredPatterns => const <String>{
+    'uriLinkStream',
+    'stringLinkStream',
+  };
 
   static const LintCode _code = LintCode(
     'app_links_uncaught_stream_error',
@@ -204,7 +208,8 @@ class AppLinksUncaughtStreamErrorRule extends SaropaLintRule {
       // A .handleError(...) hop on the immediate receiver already routes errors;
       // only the direct getter-then-listen shape is unhandled.
       final Expression target = node.realTarget!;
-      if (target is MethodInvocation && target.methodName.name == 'handleError') {
+      if (target is MethodInvocation &&
+          target.methodName.name == 'handleError') {
         return;
       }
 
@@ -258,8 +263,10 @@ class AppLinksAvoidGetInitialLinkStringRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  Set<String>? get requiredPatterns =>
-      const <String>{'getInitialLinkString', 'getLatestLinkString'};
+  Set<String>? get requiredPatterns => const <String>{
+    'getInitialLinkString',
+    'getLatestLinkString',
+  };
 
   static const LintCode _code = LintCode(
     'app_links_avoid_get_initial_link_string',

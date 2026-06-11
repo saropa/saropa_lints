@@ -306,6 +306,11 @@ const Set<String> flutterStylisticRules = <String>{
 /// Essential tier rules - Critical rules that prevent crashes, data loss, and security holes.
 /// A single violation causes real harm: app crashes, data exposed, resources never released.
 const Set<String> essentialRules = <String>{
+  // receive_sharing_intent (receive_sharing_intent_rules.dart) - cold-start data loss
+  'rsi_missing_initial_media',
+  // awesome_notifications (awesome_notifications_rules.dart) - runtime-fatal handler defects
+  'awesome_notifications_non_static_listener',
+  'awesome_notifications_handler_wrong_parameter_type',
   // Memory Leaks - Controllers (dispose)
   'require_field_dispose',
   'require_animation_disposal',
@@ -763,6 +768,36 @@ const Set<String> essentialRules = <String>{
 /// Recommended tier rules - Essential + common mistakes, performance basics.
 /// Catches bugs that don't immediately crash but cause poor UX, sluggish performance.
 const Set<String> recommendedOnlyRules = <String>{
+  // receive_sharing_intent (receive_sharing_intent_rules.dart)
+  'rsi_missing_reset_after_initial_media',
+  // sign_in_with_apple (sign_in_with_apple_rules.dart)
+  'apple_sign_in_unhandled_authorization_exception',
+  'apple_sign_in_unhandled_cancel',
+  'apple_sign_in_relying_on_name_email',
+  // lottie (lottie_rules.dart)
+  'lottie_controller_missing_on_loaded',
+  'lottie_network_missing_error_builder',
+  // flutter_animate (flutter_animate_rules.dart)
+  'flutter_animate_unconditional_repeat_in_on_play',
+  'flutter_animate_restart_on_hot_reload_in_release',
+  'flutter_animate_no_key_in_list',
+  'flutter_animate_empty_animate_list',
+  // awesome_notifications (awesome_notifications_rules.dart)
+  'awesome_notifications_missing_pragma_annotation',
+  'awesome_notifications_undeclared_channel_key',
+  'awesome_notifications_create_without_permission_check',
+  'awesome_notifications_negative_notification_id',
+  // share_plus (share_plus_rules.dart)
+  'share_plus_missing_position_origin',
+  'share_plus_empty_share_params',
+  'share_plus_uri_and_text_conflict',
+  // flutter_svg (flutter_svg_rules.dart)
+  'svg_network_missing_error_builder',
+  'svg_string_missing_error_builder',
+  // google_sign_in (google_sign_in_rules.dart) — v7 usage correctness
+  'google_sign_in_missing_exception_handler',
+  'google_sign_in_auth_token_from_authenticate',
+  'google_sign_in_authenticate_before_initialize',
   // Image Picker (image_picker_rules.dart) - crash prevention
   'image_picker_invalid_image_quality',
   'image_picker_multi_result_unchecked_empty',
@@ -1700,6 +1735,21 @@ const Set<String> recommendedOnlyRules = <String>{
 /// Professional tier rules - Recommended + architecture, testing, maintainability.
 /// Includes stricter naming conventions for API parameters.
 const Set<String> professionalOnlyRules = <String>{
+  // sign_in_with_apple (sign_in_with_apple_rules.dart)
+  'apple_sign_in_null_identity_token',
+  // lottie (lottie_rules.dart)
+  'lottie_frame_rate_max_without_render_cache',
+  'lottie_render_cache_raster_large_risk',
+  // flutter_animate (flutter_animate_rules.dart)
+  'flutter_animate_fixed_target_literal',
+  'flutter_animate_auto_play_false_no_driver',
+  // awesome_notifications (awesome_notifications_rules.dart)
+  'awesome_notifications_listeners_before_display',
+  // sensors_plus (sensors_plus_rules.dart)
+  'sensors_plus_no_sampling_period',
+  'sensors_plus_fastest_interval',
+  // google_sign_in (google_sign_in_rules.dart)
+  'google_sign_in_canceled_not_handled',
   // Image Picker (image_picker_rules.dart)
   'image_picker_missing_retrieve_lost_data',
   'image_picker_camera_source_without_support_check',
@@ -2897,6 +2947,41 @@ const Set<String> professionalOnlyRules = <String>{
 /// Comprehensive tier rules - stricter patterns, optimization hints, edge cases.
 /// Helpful but not critical. For quality-obsessed teams.
 const Set<String> comprehensiveOnlyRules = <String>{
+  // receive_sharing_intent (receive_sharing_intent_rules.dart)
+  'rsi_unfiltered_shared_media_type',
+  // sign_in_with_apple (sign_in_with_apple_rules.dart)
+  'apple_sign_in_unchecked_availability',
+  'apple_sign_in_unchecked_credential_state',
+  // lottie (lottie_rules.dart)
+  'lottie_network_missing_background_loading',
+  // share_plus (share_plus_rules.dart) — migration code + INFO correctness
+  'prefer_shareplus_instance',
+  'share_plus_unchecked_result',
+  // sensors_plus (sensors_plus_rules.dart) — migration code + INFO correctness
+  'prefer_sensors_event_stream',
+  'sensors_plus_missing_on_error',
+  // flutter_svg (flutter_svg_rules.dart) — migration code + INFO correctness
+  'prefer_svg_color_filter',
+  'svg_network_missing_placeholder',
+  'svg_missing_semantics_label',
+  // file_picker migration (file_picker_rules.dart) — all relocated to gated packs
+  'file_picker_deprecated_with_data',
+  'file_picker_deprecated_with_read_stream',
+  'file_picker_deprecated_allow_multiple',
+  'file_picker_deprecated_allow_compression',
+  // connectivity_plus (connectivity_plus_rules.dart) — pre-v6 migration + satellite
+  'avoid_pre_v6_single_connectivity_result',
+  'connectivity_satellite_missing',
+  // google_sign_in (google_sign_in_rules.dart) — pre-v7 migration + supports-check
+  'avoid_pre_v7_google_sign_in',
+  'google_sign_in_unchecked_supports_authenticate',
+  // webview_flutter (webview_flutter_rules.dart) — pre-v4 migration
+  'avoid_pre_v4_webview_widget',
+  // local_auth migration (local_auth_rules.dart) — relocated to local_auth_3
+  'local_auth_deprecated_options_class',
+  'local_auth_use_error_dialogs_removed',
+  'local_auth_sticky_auth_renamed',
+  'local_auth_platform_exception_catch',
   // Google Maps Flutter (google_maps_flutter_rules.dart)
   'google_maps_unknown_map_id_error_unchecked',
   // audioplayers (audioplayers_rules.dart)
@@ -4050,6 +4135,53 @@ const Set<String> appLinksPackageRules = <String>{
   'app_links_avoid_get_initial_link_string',
 };
 
+/// Rules specific to the receive_sharing_intent package.
+const Set<String> receiveSharingIntentPackageRules = <String>{
+  'rsi_missing_initial_media',
+  'rsi_missing_reset_after_initial_media',
+  'rsi_unfiltered_shared_media_type',
+};
+
+/// Rules specific to the sign_in_with_apple package.
+const Set<String> signInWithApplePackageRules = <String>{
+  'apple_sign_in_unhandled_authorization_exception',
+  'apple_sign_in_unhandled_cancel',
+  'apple_sign_in_unchecked_availability',
+  'apple_sign_in_null_identity_token',
+  'apple_sign_in_relying_on_name_email',
+  'apple_sign_in_unchecked_credential_state',
+};
+
+/// Rules specific to the lottie package.
+const Set<String> lottiePackageRules = <String>{
+  'lottie_controller_missing_on_loaded',
+  'lottie_network_missing_error_builder',
+  'lottie_frame_rate_max_without_render_cache',
+  'lottie_render_cache_raster_large_risk',
+  'lottie_network_missing_background_loading',
+};
+
+/// Rules specific to the flutter_animate package.
+const Set<String> flutterAnimatePackageRules = <String>{
+  'flutter_animate_unconditional_repeat_in_on_play',
+  'flutter_animate_restart_on_hot_reload_in_release',
+  'flutter_animate_no_key_in_list',
+  'flutter_animate_empty_animate_list',
+  'flutter_animate_fixed_target_literal',
+  'flutter_animate_auto_play_false_no_driver',
+};
+
+/// Rules specific to the awesome_notifications package.
+const Set<String> awesomeNotificationsPackageRules = <String>{
+  'awesome_notifications_non_static_listener',
+  'awesome_notifications_handler_wrong_parameter_type',
+  'awesome_notifications_missing_pragma_annotation',
+  'awesome_notifications_undeclared_channel_key',
+  'awesome_notifications_create_without_permission_check',
+  'awesome_notifications_negative_notification_id',
+  'awesome_notifications_listeners_before_display',
+};
+
 /// Rules specific to the geocoding package.
 const Set<String> geocodingPackageRules = <String>{
   'geocoding_unchecked_first',
@@ -4062,16 +4194,47 @@ const Set<String> geocodingPackageRules = <String>{
   'geocoding_deprecated_locale_param',
 };
 
-/// Rules specific to the local_auth package (always-on subset).
+/// Rules specific to the local_auth package (always-on subset plus the
+/// version-gated 3.0 deprecation codes, which the pack registry relocates into
+/// the local_auth_3 gated pack).
 const Set<String> localAuthPackageRules = <String>{
   'local_auth_unchecked_result',
   'local_auth_missing_capability_check',
   'local_auth_unhandled_exception',
   'local_auth_missing_lockout_handling',
   'local_auth_biometric_only_sensitive',
+  'local_auth_deprecated_options_class',
+  'local_auth_use_error_dialogs_removed',
+  'local_auth_sticky_auth_renamed',
+  'local_auth_platform_exception_catch',
 };
 
-/// Rules specific to the file_picker package (always-on correctness subset).
+/// Rules specific to the connectivity_plus package.
+const Set<String> connectivityPlusPackageRules = <String>{
+  'avoid_pre_v6_single_connectivity_result',
+  'connectivity_satellite_missing',
+};
+
+/// Rules specific to the google_sign_in package (v7 usage correctness; the
+/// pre-v7 migration code relocates into the google_sign_in_7 gated pack).
+const Set<String> googleSignInPackageRules = <String>{
+  'avoid_pre_v7_google_sign_in',
+  'google_sign_in_missing_exception_handler',
+  'google_sign_in_unchecked_supports_authenticate',
+  'google_sign_in_auth_token_from_authenticate',
+  'google_sign_in_canceled_not_handled',
+  'google_sign_in_authenticate_before_initialize',
+};
+
+/// Rules specific to the webview_flutter package (pre-v4 migration; the whole
+/// pack is gated < 4.0.0).
+const Set<String> webviewFlutterPackageRules = <String>{
+  'avoid_pre_v4_webview_widget',
+};
+
+/// Rules specific to the file_picker package (always-on correctness subset
+/// plus the version-gated deprecation codes, which the pack registry relocates
+/// into the file_picker_10 / file_picker_12 gated packs).
 const Set<String> filePickerPackageRules = <String>{
   'file_picker_unchecked_null_result',
   'file_picker_path_on_web',
@@ -4079,6 +4242,36 @@ const Set<String> filePickerPackageRules = <String>{
   'file_picker_extensions_without_custom_type',
   'file_picker_extension_with_dot',
   'file_picker_with_data_large_files',
+  'file_picker_deprecated_with_data',
+  'file_picker_deprecated_with_read_stream',
+  'file_picker_deprecated_allow_multiple',
+  'file_picker_deprecated_allow_compression',
+};
+
+/// Rules specific to the share_plus package.
+const Set<String> sharePlusPackageRules = <String>{
+  'prefer_shareplus_instance',
+  'share_plus_missing_position_origin',
+  'share_plus_unchecked_result',
+  'share_plus_empty_share_params',
+  'share_plus_uri_and_text_conflict',
+};
+
+/// Rules specific to the sensors_plus package.
+const Set<String> sensorsPlusPackageRules = <String>{
+  'prefer_sensors_event_stream',
+  'sensors_plus_no_sampling_period',
+  'sensors_plus_fastest_interval',
+  'sensors_plus_missing_on_error',
+};
+
+/// Rules specific to the flutter_svg package.
+const Set<String> flutterSvgPackageRules = <String>{
+  'prefer_svg_color_filter',
+  'svg_network_missing_error_builder',
+  'svg_network_missing_placeholder',
+  'svg_missing_semantics_label',
+  'svg_string_missing_error_builder',
 };
 
 /// Rules specific to the device_calendar package.
@@ -4173,6 +4366,17 @@ Map<String, Set<String>> get packageRuleSets => {
   'permission_handler': permissionHandlerPackageRules,
   'http': httpPackageRules,
   'app_links': appLinksPackageRules,
+  'receive_sharing_intent': receiveSharingIntentPackageRules,
+  'sign_in_with_apple': signInWithApplePackageRules,
+  'lottie': lottiePackageRules,
+  'flutter_animate': flutterAnimatePackageRules,
+  'awesome_notifications': awesomeNotificationsPackageRules,
+  'share_plus': sharePlusPackageRules,
+  'sensors_plus': sensorsPlusPackageRules,
+  'flutter_svg': flutterSvgPackageRules,
+  'connectivity_plus': connectivityPlusPackageRules,
+  'google_sign_in': googleSignInPackageRules,
+  'webview_flutter': webviewFlutterPackageRules,
   'flame': flamePackageRules,
 };
 
@@ -4215,6 +4419,17 @@ const List<String> allPackages = <String>[
   'permission_handler',
   'http',
   'app_links',
+  'receive_sharing_intent',
+  'sign_in_with_apple',
+  'lottie',
+  'flutter_animate',
+  'awesome_notifications',
+  'share_plus',
+  'sensors_plus',
+  'flutter_svg',
+  'connectivity_plus',
+  'google_sign_in',
+  'webview_flutter',
   'flame',
 ];
 
@@ -4261,6 +4476,17 @@ const Map<String, bool> defaultPackages = <String, bool>{
   'permission_handler': true,
   'http': true,
   'app_links': true,
+  'receive_sharing_intent': true,
+  'sign_in_with_apple': true,
+  'lottie': true,
+  'flutter_animate': true,
+  'awesome_notifications': true,
+  'share_plus': true,
+  'sensors_plus': true,
+  'flutter_svg': true,
+  'connectivity_plus': true,
+  'google_sign_in': true,
+  'webview_flutter': true,
   'flame': true,
 };
 

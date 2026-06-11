@@ -39,6 +39,7 @@
   "command.crossFile.graph.title": "Saropa Lints: Cross-File — Export Import Graph (DOT)",
   "command.crossFile.report.title": "Saropa Lints: Cross-File — Generate HTML Report",
   "command.openViolationsWideReport.title": "Saropa Lints: Open Findings Dashboard",
+  "command.openConsolidatedDashboard.title": "Saropa Lints: Open Dashboard",
   "command.openViolationsWideReport.category": "Saropa",
   "command.revealFindingsDashboard.title": "Saropa Lints: Open Findings Dashboard (preserve filters)",
   "command.focusView.title": "Saropa Lints: Focus Saropa Lints Sidebar",

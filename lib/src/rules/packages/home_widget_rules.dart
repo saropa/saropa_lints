@@ -484,10 +484,10 @@ class HomeWidgetIosMissingAppGroupRule extends SaropaLintRule {
       final List<MethodInvocation> unguarded = scan.invocations
           .where(
             (MethodInvocation inv) =>
-                _isHomeWidgetCall(
-                  inv,
-                  const <String>{'saveWidgetData', 'getWidgetData'},
-                ) &&
+                _isHomeWidgetCall(inv, const <String>{
+                  'saveWidgetData',
+                  'getWidgetData',
+                }) &&
                 !_hasNonNullNamedArg(inv, 'appGroupId'),
           )
           .toList();
@@ -570,10 +570,9 @@ class HomeWidgetWidgetClickedWithoutInitialLaunchRule extends SaropaLintRule {
       if (scan.widgetClickedAccesses.isEmpty) return;
 
       final bool hasInitialLaunch = scan.invocations.any(
-        (MethodInvocation inv) => _isHomeWidgetCall(
-          inv,
-          const <String>{'initiallyLaunchedFromHomeWidget'},
-        ),
+        (MethodInvocation inv) => _isHomeWidgetCall(inv, const <String>{
+          'initiallyLaunchedFromHomeWidget',
+        }),
       );
       if (hasInitialLaunch) return;
 

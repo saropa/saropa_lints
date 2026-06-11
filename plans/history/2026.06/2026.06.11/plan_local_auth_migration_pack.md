@@ -41,3 +41,17 @@ gate archetype — shared blocker with `google_sign_in_7`, `connectivity_plus_6`
 ## Sources
 
 See `plans/history/2026.06/2026.06.11/plan_local_auth.md` § Sources.
+
+---
+
+## Finish Report (2026-06-11)
+
+ Scope (LINTER variant): (A) Dart lint rules / analyzer plugin + (C) docs.
+
+**Shipped.** local_auth_3 (<3) pre-upgrade pack: deprecated_options_class, use_error_dialogs_removed, sticky_auth_renamed (quick fix), platform_exception_catch (quick fix). All 4 relocated out of the base local_auth pack. Unblocked by the <-gate archetype ratification.
+
+Rules marked DROP / defer in the 2026-06-11 VALIDATION notes were intentionally not implemented (duplicates, overlap with existing rules, or feasibility concerns) — that triage is honored, not skipped. Every rule is import-gated via `fileImportsPackage`; migration rules are version-gated via `kRulePackDependencyGates` and relocated out of their base pack via `kRelocatedRulePackCodes` so a project on the old major never sees a rule for an API it lacks.
+
+**Verification.** `dart analyze lib --fatal-infos` clean; `dart run tool/rule_pack_audit.dart` exit 0; full test suite green (1336 tests across test/integrity, test/config, test/rules/packages); registry regenerated twice + `dart format`. Rules authored by parallel subagents then serially registered into the shared files (tiers.dart, saropa_lints.dart, import_utils.dart, all_rules.dart, rule_packs.dart, generator + audit).
+
+**Plan disposition.** Complete — archived to `plans/history/2026.06/2026.06.11/`.

@@ -97,6 +97,77 @@ const Map<String, RulePackDependencyGate> kRulePackDependencyGates = {
     dependency: 'go_router',
     constraint: '>=6.0.0',
   ),
+  // share_plus 11.0.0 deprecated the static Share.* methods in favor of the
+  // instance SharePlus.instance.share(ShareParams(...)) API (still compiles).
+  // prefer_shareplus_instance is relocated out of the base share_plus pack.
+  'share_plus_11': RulePackDependencyGate(
+    dependency: 'share_plus',
+    constraint: '>=11.0.0',
+  ),
+  // sensors_plus 4.0.0 deprecated the bare event-stream getters in favor of the
+  // *EventStream() functions (still compiles). prefer_sensors_event_stream is
+  // relocated out of the base sensors_plus pack.
+  'sensors_plus_4': RulePackDependencyGate(
+    dependency: 'sensors_plus',
+    constraint: '>=4.0.0',
+  ),
+  // flutter_svg 2.0.0 deprecated color/colorBlendMode in favor of colorFilter
+  // (still compiles). prefer_svg_color_filter is relocated out of the base
+  // flutter_svg pack.
+  'flutter_svg_2': RulePackDependencyGate(
+    dependency: 'flutter_svg',
+    constraint: '>=2.0.0',
+  ),
+  // file_picker 10.0.0 deprecated allowCompression in favor of
+  // compressionQuality. Relocated out of the base file_picker pack.
+  'file_picker_10': RulePackDependencyGate(
+    dependency: 'file_picker',
+    constraint: '>=10.0.0',
+  ),
+  // file_picker 12.0.0 deprecated withData / withReadStream / allowMultiple.
+  // Relocated out of the base file_picker pack. The -0 lower bound includes
+  // 12.0.0 pre-release builds.
+  'file_picker_12': RulePackDependencyGate(
+    dependency: 'file_picker',
+    constraint: '>=12.0.0-0',
+  ),
+  // PRE-UPGRADE (`<`) gates — flag valid old-major code that breaks on the bump.
+  // The old API is removed in the new major, so on the new version dart analyze
+  // already errors and a `>=` pack would find nothing. Gate on the OLD major.
+  //
+  // connectivity_plus 6.0.0 changed checkConnectivity()/onConnectivityChanged
+  // to return List<ConnectivityResult>. Flag single-value handling on 5.x.
+  'connectivity_plus_6': RulePackDependencyGate(
+    dependency: 'connectivity_plus',
+    constraint: '<6.0.0',
+  ),
+  // google_sign_in 7.0.0 removed the GoogleSignIn() constructor / signIn().
+  // Flag the removed v6 API on projects still on 6.x.
+  'google_sign_in_7': RulePackDependencyGate(
+    dependency: 'google_sign_in',
+    constraint: '<7.0.0',
+  ),
+  // google_sign_in v7 usage-correctness rules reference APIs that only exist on
+  // v7 (authenticate, GoogleSignInException, ...). Gate the base pack >= 7.0.0
+  // so these never fire on a 6.x project where those symbols do not exist.
+  'google_sign_in': RulePackDependencyGate(
+    dependency: 'google_sign_in',
+    constraint: '>=7.0.0',
+  ),
+  // webview_flutter 4.0.0 removed the monolithic WebView widget. The whole
+  // pack (its single pre-v4 migration rule) is gated < 4.0.0 — flag v3 code
+  // that breaks on the v4 bump.
+  'webview_flutter': RulePackDependencyGate(
+    dependency: 'webview_flutter',
+    constraint: '<4.0.0',
+  ),
+  // local_auth 3.0.0 removed AuthenticationOptions / useErrorDialogs, renamed
+  // stickyAuth, and changed the thrown exception type. Flag 2.x code that
+  // breaks on the 3.0 bump.
+  'local_auth_3': RulePackDependencyGate(
+    dependency: 'local_auth',
+    constraint: '<3.0.0',
+  ),
 };
 
 /// Packs that require pubspec `environment` SDK constraints (Phase 6).

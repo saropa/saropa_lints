@@ -80,6 +80,50 @@ const Map<String, Set<String>> kPubspecMarkersByPack = {
   'supabase': {'supabase', 'supabase_flutter'},
   'url_launcher': {'url_launcher'},
   'workmanager': {'workmanager'},
+  // Backfill: base packs that previously fell through to the empty-set default
+  // (line ~"kPubspecMarkersByPack[pack] ?? {}"). The generator contract requires
+  // one non-empty marker per extracted pack id; each maps 1:1 to its dep name.
+  'app_links': {'app_links'},
+  'audioplayers': {'audioplayers'},
+  'cached_network_image': {'cached_network_image'},
+  'device_calendar': {'device_calendar'},
+  'flutter_map': {'flutter_map'},
+  'geocoding': {'geocoding'},
+  'google_maps_flutter': {'google_maps_flutter'},
+  'home_widget': {'home_widget'},
+  'http': {'http'},
+  'image_picker': {'image_picker'},
+  'in_app_review': {'in_app_review'},
+  'permission_handler': {'permission_handler'},
+  'quick_actions': {'quick_actions'},
+  'youtube_player_flutter': {'youtube_player_flutter', 'youtube_player_iframe'},
+  // New package packs (import-gated) + their version-gated companions.
+  'receive_sharing_intent': {'receive_sharing_intent'},
+  'sign_in_with_apple': {'sign_in_with_apple'},
+  'lottie': {'lottie'},
+  'flutter_animate': {'flutter_animate'},
+  'awesome_notifications': {'awesome_notifications'},
+  'share_plus': {'share_plus'},
+  // Semver-gated companion (gate share_plus >= 11.0.0).
+  'share_plus_11': {'share_plus'},
+  'sensors_plus': {'sensors_plus'},
+  // Semver-gated companion (gate sensors_plus >= 4.0.0).
+  'sensors_plus_4': {'sensors_plus'},
+  'flutter_svg': {'flutter_svg'},
+  // Semver-gated companion (gate flutter_svg >= 2.0.0).
+  'flutter_svg_2': {'flutter_svg'},
+  'file_picker': {'file_picker'},
+  // Semver-gated companions (gate file_picker >= 10.0.0 / >= 12.0.0).
+  'file_picker_10': {'file_picker'},
+  'file_picker_12': {'file_picker'},
+  // Pre-upgrade (`<` gate) and v7-usage (`>=` gate) packs.
+  'connectivity_plus': {'connectivity_plus'},
+  'connectivity_plus_6': {'connectivity_plus'},
+  'google_sign_in': {'google_sign_in'},
+  'google_sign_in_7': {'google_sign_in'},
+  'webview_flutter': {'webview_flutter'},
+  'local_auth': {'local_auth'},
+  'local_auth_3': {'local_auth'},
 };
 
 const Map<String, String> kPackUiLabels = {
@@ -112,6 +156,27 @@ const Map<String, String> kPackUiLabels = {
   'supabase': 'Supabase',
   'url_launcher': 'url_launcher',
   'workmanager': 'workmanager',
+  'receive_sharing_intent': 'Receive Sharing Intent',
+  'sign_in_with_apple': 'Sign in with Apple',
+  'lottie': 'Lottie',
+  'flutter_animate': 'Flutter Animate',
+  'awesome_notifications': 'Awesome Notifications',
+  'share_plus': 'share_plus',
+  'share_plus_11': 'share_plus 11.x',
+  'sensors_plus': 'sensors_plus',
+  'sensors_plus_4': 'sensors_plus 4.x',
+  'flutter_svg': 'flutter_svg',
+  'flutter_svg_2': 'flutter_svg 2.x',
+  'file_picker': 'File Picker',
+  'file_picker_10': 'file_picker 10.x',
+  'file_picker_12': 'file_picker 12.x',
+  'connectivity_plus': 'connectivity_plus',
+  'connectivity_plus_6': 'connectivity_plus 6.x (pre-upgrade)',
+  'google_sign_in': 'Google Sign-In',
+  'google_sign_in_7': 'google_sign_in 7.x (pre-upgrade)',
+  'webview_flutter': 'webview_flutter (pre-upgrade)',
+  'local_auth': 'Local Auth',
+  'local_auth_3': 'local_auth 3.x (pre-upgrade)',
 };
 
 String _uiLabelForPackId(String pack) {

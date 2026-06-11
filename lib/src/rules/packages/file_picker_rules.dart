@@ -57,7 +57,10 @@ bool _isLiteralTrue(Expression? expr) =>
 /// The `allowedExtensions:` list literal of a call, or null when absent / not a
 /// statically-visible list.
 ListLiteral? _allowedExtensionsList(MethodInvocation node) {
-  final Expression? value = _namedArgValue(node.argumentList, 'allowedExtensions');
+  final Expression? value = _namedArgValue(
+    node.argumentList,
+    'allowedExtensions',
+  );
   return value is ListLiteral ? value : null;
 }
 
@@ -305,7 +308,10 @@ class FilePickerCustomTypeMissingExtensionsRule extends SaropaLintRule {
 
       if (!_isFileTypeCustom(_namedArgValue(node.argumentList, 'type'))) return;
 
-      final Expression? ext = _namedArgValue(node.argumentList, 'allowedExtensions');
+      final Expression? ext = _namedArgValue(
+        node.argumentList,
+        'allowedExtensions',
+      );
       final bool missing =
           ext == null || (ext is ListLiteral && ext.elements.isEmpty);
       if (!missing) return;
@@ -370,7 +376,10 @@ class FilePickerExtensionsWithoutCustomTypeRule extends SaropaLintRule {
       if (!_pickerMethods.contains(node.methodName.name)) return;
       if (!fileImportsPackage(node, PackageImports.filePicker)) return;
 
-      final Expression? ext = _namedArgValue(node.argumentList, 'allowedExtensions');
+      final Expression? ext = _namedArgValue(
+        node.argumentList,
+        'allowedExtensions',
+      );
       // Non-empty extension list present.
       if (ext == null) return;
       if (ext is ListLiteral && ext.elements.isEmpty) return;
@@ -484,6 +493,329 @@ class _StripExtensionDotFix extends ReplaceNodeFix {
 }
 
 // =============================================================================
+// file_picker_deprecated_with_data  (version-gated: file_picker >= 12)
+// =============================================================================
+
+/// Flags the deprecated `withData:` named argument on FilePicker calls.
+///
+/// Since: v4.16.0 | Rule version: v1 | Pack: file_picker_12
+///
+/// `withData` was removed in file_picker v12. Call sites must migrate to
+/// `PlatformFile.readAsBytes()` after picking; passing `withData: true` still
+/// compiles on older majors but breaks on v12 and above.
+///
+/// **BAD:**
+/// ```dart
+/// FilePicker.platform.pickFiles(withData: true);
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final result = await FilePicker.platform.pickFiles();
+/// final bytes = await result!.files.single.readAsBytes();
+/// ```
+class FilePickerDeprecatedWithDataRule extends SaropaLintRule {
+  FilePickerDeprecatedWithDataRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.info;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'withData'};
+
+  static const LintCode _code = LintCode(
+    'file_picker_deprecated_with_data',
+    '[file_picker_deprecated_with_data] The withData: named argument on FilePicker.pickFiles() / pickFile() was deprecated and removed in file_picker v12. Passing withData: true loads the entire file into memory eagerly; the recommended migration is to drop the argument and call await platformFile.readAsBytes() on each PlatformFile after picking, giving you explicit control over when the I/O occurs. Remove this argument to prepare for the v12 upgrade. {v1}',
+    correctionMessage:
+        'Remove the withData: argument and read file bytes lazily via await platformFile.readAsBytes() after the pick.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      if (!_pickerMethods.contains(node.methodName.name)) return;
+      if (!fileImportsPackage(node, PackageImports.filePicker)) return;
+
+      // Report on the NamedExpression node so the squiggle sits under the
+      // deprecated argument, not the whole call.
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'withData') {
+          reporter.atNode(arg);
+          return;
+        }
+      }
+    });
+  }
+}
+
+// =============================================================================
+// file_picker_deprecated_with_read_stream  (version-gated: file_picker >= 12)
+// =============================================================================
+
+/// Flags the deprecated `withReadStream:` named argument on FilePicker calls.
+///
+/// Since: v4.16.0 | Rule version: v1 | Pack: file_picker_12
+///
+/// `withReadStream` was removed in file_picker v12. The replacement is
+/// `PlatformFile.readAsByteStream()`, which returns a `Stream<List<int>>`
+/// with the same semantics but no picker-level argument needed.
+///
+/// **BAD:**
+/// ```dart
+/// FilePicker.platform.pickFiles(withReadStream: true);
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final result = await FilePicker.platform.pickFiles();
+/// final stream = result!.files.single.readAsByteStream();
+/// ```
+class FilePickerDeprecatedWithReadStreamRule extends SaropaLintRule {
+  FilePickerDeprecatedWithReadStreamRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.info;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'withReadStream'};
+
+  static const LintCode _code = LintCode(
+    'file_picker_deprecated_with_read_stream',
+    '[file_picker_deprecated_with_read_stream] The withReadStream: named argument on FilePicker.pickFiles() / pickFile() was deprecated and removed in file_picker v12. The v12 replacement is PlatformFile.readAsByteStream(), which returns a Stream<List<int>> with identical streaming semantics but is invoked on the returned PlatformFile rather than as a picker option. Remove this argument and call readAsByteStream() on each PlatformFile after picking to prepare for the v12 upgrade. {v1}',
+    correctionMessage:
+        'Remove the withReadStream: argument and read each file as a stream via platformFile.readAsByteStream() after the pick.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      if (!_pickerMethods.contains(node.methodName.name)) return;
+      if (!fileImportsPackage(node, PackageImports.filePicker)) return;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'withReadStream') {
+          reporter.atNode(arg);
+          return;
+        }
+      }
+    });
+  }
+}
+
+// =============================================================================
+// file_picker_deprecated_allow_multiple  (version-gated: file_picker >= 12)
+// =============================================================================
+
+/// Flags the deprecated `allowMultiple:` named argument on FilePicker calls.
+///
+/// Since: v4.16.0 | Rule version: v1 | Pack: file_picker_12
+///
+/// `allowMultiple` was deprecated in file_picker v12 in favour of the
+/// dedicated `pickFiles()` (multi) vs `pickFile()` (single) API split.
+/// `allowMultiple: false` should migrate to a `pickFile()` call (which also
+/// returns a non-nullable single `PlatformFile`, avoiding the `.first` dance).
+/// `allowMultiple: true` means the existing call was already `pickFiles()`
+/// and the argument can simply be removed.
+///
+/// **BAD:**
+/// ```dart
+/// FilePicker.platform.pickFiles(allowMultiple: true);
+/// FilePicker.platform.pickFiles(allowMultiple: false);
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// FilePicker.platform.pickFiles(); // multiple files — argument removed
+/// FilePicker.platform.pickFile();  // single file  — use dedicated method
+/// ```
+class FilePickerDeprecatedAllowMultipleRule extends SaropaLintRule {
+  FilePickerDeprecatedAllowMultipleRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.info;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'allowMultiple'};
+
+  static const LintCode _code = LintCode(
+    'file_picker_deprecated_allow_multiple',
+    '[file_picker_deprecated_allow_multiple] The allowMultiple: named argument on FilePicker.pickFiles() was deprecated in file_picker v12. The v12 API expresses the distinction through dedicated methods instead: pickFiles() for multi-file selection (remove the allowMultiple: true argument) and the new pickFile() for single-file selection (replace allowMultiple: false with pickFile(), which also returns a non-nullable PlatformFile directly). Report-only — removing the argument changes the return type for the false case, so a mechanical replacement is not safe. {v1}',
+    correctionMessage:
+        'For allowMultiple: true, remove the argument (pickFiles() is multi by default). For allowMultiple: false, migrate the call to pickFile().',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      if (!_pickerMethods.contains(node.methodName.name)) return;
+      if (!fileImportsPackage(node, PackageImports.filePicker)) return;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'allowMultiple') {
+          reporter.atNode(arg);
+          return;
+        }
+      }
+    });
+  }
+}
+
+// =============================================================================
+// file_picker_deprecated_allow_compression  (version-gated: file_picker >= 10)
+// =============================================================================
+
+/// Flags the deprecated `allowCompression:` named argument on FilePicker calls.
+///
+/// Since: v4.16.0 | Rule version: v1 | Pack: file_picker_10
+///
+/// `allowCompression` was replaced by `compressionQuality` (an `int` 0–100)
+/// in file_picker v10. The mechanical mapping is:
+///   `allowCompression: true`  → `compressionQuality: 75`
+///   `allowCompression: false` → `compressionQuality: 0`
+///
+/// A quick fix is offered when the value is a boolean literal; when the value
+/// is a non-literal expression the fix is report-only (the expression must
+/// be manually mapped to a quality value).
+///
+/// **BAD:**
+/// ```dart
+/// FilePicker.platform.pickFiles(allowCompression: true);
+/// FilePicker.platform.pickFiles(allowCompression: false);
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// FilePicker.platform.pickFiles(compressionQuality: 75);  // was true
+/// FilePicker.platform.pickFiles(compressionQuality: 0);   // was false
+/// ```
+class FilePickerDeprecatedAllowCompressionRule extends SaropaLintRule {
+  FilePickerDeprecatedAllowCompressionRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.info;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'allowCompression'};
+
+  static const LintCode _code = LintCode(
+    'file_picker_deprecated_allow_compression',
+    '[file_picker_deprecated_allow_compression] The allowCompression: named argument on FilePicker.pickFiles() / pickFile() was deprecated in file_picker v10 and replaced by compressionQuality: (an int 0–100). The boolean-literal migration is mechanical: allowCompression: true becomes compressionQuality: 75 (the documented default quality) and allowCompression: false becomes compressionQuality: 0 (no compression). A quick fix is available when the value is a boolean literal; when it is a non-literal expression the mapping must be done manually. {v1}',
+    correctionMessage:
+        'Replace allowCompression: true with compressionQuality: 75 and allowCompression: false with compressionQuality: 0.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        _AllowCompressionToQualityFix(context: context),
+  ];
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      if (!_pickerMethods.contains(node.methodName.name)) return;
+      if (!fileImportsPackage(node, PackageImports.filePicker)) return;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression &&
+            arg.name.label.name == 'allowCompression') {
+          reporter.atNode(arg);
+          return;
+        }
+      }
+    });
+  }
+}
+
+/// Quick fix: replace `allowCompression: <bool>` with the `compressionQuality:`
+/// equivalent when the value is a boolean literal.
+///
+/// `allowCompression: true`  → `compressionQuality: 75` (documented default)
+/// `allowCompression: false` → `compressionQuality: 0`  (disable compression)
+///
+/// The fix targets the whole NamedExpression so both the label and the value
+/// are replaced in one atomic edit. When the value is not a boolean literal the
+/// computeReplacement returns the original source unchanged, which means the
+/// fix is silently skipped (ReplaceNodeFix contract).
+class _AllowCompressionToQualityFix extends ReplaceNodeFix {
+  _AllowCompressionToQualityFix({required super.context});
+
+  @override
+  FixKind get fixKind => FixKind(
+    'saropa.fix.allowCompressionToQuality',
+    80,
+    'Replace allowCompression: with compressionQuality:',
+  );
+
+  @override
+  String computeReplacement(AstNode node) {
+    if (node is! NamedExpression) return node.toSource();
+    final Expression value = node.expression;
+    if (value is BooleanLiteral) {
+      // true → quality 75 (the documented default equivalent)
+      // false → quality 0  (disabled compression)
+      final int quality = value.value ? 75 : 0;
+      return 'compressionQuality: $quality';
+    }
+    // Non-literal value: return the original source unchanged so the fix
+    // produces no diff and is not offered by the IDE.
+    return node.toSource();
+  }
+}
+
+// =============================================================================
 // file_picker_with_data_large_files
 // =============================================================================
 
@@ -540,7 +872,8 @@ class FilePickerWithDataLargeFilesRule extends SaropaLintRule {
 
       // Only explicit boolean true on both flags — variables / expressions are
       // not statically decidable and are not flagged.
-      if (!_isLiteralTrue(_namedArgValue(node.argumentList, 'withData'))) return;
+      if (!_isLiteralTrue(_namedArgValue(node.argumentList, 'withData')))
+        return;
       if (!_isLiteralTrue(_namedArgValue(node.argumentList, 'allowMultiple'))) {
         return;
       }

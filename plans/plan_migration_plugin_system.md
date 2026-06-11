@@ -672,9 +672,21 @@ Choose by **whether the old API still compiles on the new version**:
 
 ### Two open decisions (carried from the deleted coverage index)
 
-1. **Support the `<` pre-upgrade gate archetype?** All shipped gates are `>=`. The
-   3 Tier B packs depend on it; the `>=`-only `upgradePackNudge` also doesn't
-   surface `<` packs. Approve both, or drop Tier B.
+1. **Support the `<` pre-upgrade gate archetype? — RESOLVED 2026-06-11: YES, shipped.**
+   `packPassesDependencyGate` already evaluates `<` constraints correctly
+   (`VersionConstraint.parse('<6.0.0').allows(version)` via `pub_semver`), so no
+   gate-engine change was needed — the decision was purely a policy ratification.
+   Five `<`-gated pre-upgrade packs now ship: `connectivity_plus_6` (<6.0.0),
+   `google_sign_in_7` (<7.0.0), `webview_flutter` (<4.0.0, whole-pack gate),
+   `local_auth_3` (<3.0.0), plus the `>=`-gated `google_sign_in` v7-usage pack.
+   This unblocked the four plans that depended on it (`plan_migration_connectivity_plus`,
+   `plan_migration_google_sign_in`, `plan_migration_webview_flutter`,
+   `plan_local_auth_migration_pack`). **Known follow-up (PACK / nudge):** the
+   `>=`-only `upgradePackNudge` does NOT surface `<` packs — a `<`-gated project
+   is on the OLD major, so the nudge's "your resolved version satisfies the gate →
+   enable" logic is inverted for them. A pre-upgrade nudge ("you are on the old
+   major; enable the readiness pack before bumping") is unbuilt and is the natural
+   next step; until then `<` packs are manual-enable only.
 2. **Discoverability for non-upgrade packs.** The nudge targets `>=` upgrade packs
    only; base package packs + the 15 SDK packs are still manual-enable (why the
    contacts app shipped with all SDK packs stripped). A detected-pack nudge or

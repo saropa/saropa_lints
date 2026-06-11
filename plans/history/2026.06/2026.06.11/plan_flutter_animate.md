@@ -295,3 +295,17 @@ Set `impact`, `cost`, and `ruleType` fields. Tags: `const {'packages'}`.
 - [flutter/flutter issue #128197 — Performance issues with looping animations](https://github.com/flutter/flutter/issues/128197)
 - [flutter/flutter issue #57797 — AnimationController dispose leaks Ticker](https://github.com/flutter/flutter/issues/57797)
 - [Flutter animations performance best practices](https://docs.flutter.dev/perf/best-practices)
+
+---
+
+## Finish Report (2026-06-11)
+
+ Scope (LINTER variant): (A) Dart lint rules / analyzer plugin + (C) docs.
+
+**Shipped.** 6 rules (unconditional_repeat_in_on_play, restart_on_hot_reload_in_release, no_key_in_list, empty_animate_list, fixed_target_literal, auto_play_false_no_driver). Dropped flutter_animate_external_controller_not_disposed (overlap with disposal rules).
+
+Rules marked DROP / defer in the 2026-06-11 VALIDATION notes were intentionally not implemented (duplicates, overlap with existing rules, or feasibility concerns) — that triage is honored, not skipped. Every rule is import-gated via `fileImportsPackage`; migration rules are version-gated via `kRulePackDependencyGates` and relocated out of their base pack via `kRelocatedRulePackCodes` so a project on the old major never sees a rule for an API it lacks.
+
+**Verification.** `dart analyze lib --fatal-infos` clean; `dart run tool/rule_pack_audit.dart` exit 0; full test suite green (1336 tests across test/integrity, test/config, test/rules/packages); registry regenerated twice + `dart format`. Rules authored by parallel subagents then serially registered into the shared files (tiers.dart, saropa_lints.dart, import_utils.dart, all_rules.dart, rule_packs.dart, generator + audit).
+
+**Plan disposition.** Complete — archived to `plans/history/2026.06/2026.06.11/`.

@@ -79,9 +79,17 @@ class _RequestScan extends RecursiveAstVisitor<void> {
         matched = true;
       }
       // A `[Permission.x, Permission.y].request()` list call also counts.
-      if (target is ListLiteral &&
-          target.toSource().contains('Permission')) {
-        matched = true;
+      // Inspect the elements (AST) instead of substring-scanning the source —
+      // the latter tripped the .contains() false-positive guard and matched
+      // any identifier merely containing "Permission".
+      if (target is ListLiteral) {
+        for (final CollectionElement element in target.elements) {
+          if (element is PrefixedIdentifier &&
+              element.prefix.name == 'Permission') {
+            matched = true;
+            break;
+          }
+        }
       }
     }
     super.visitMethodInvocation(node);

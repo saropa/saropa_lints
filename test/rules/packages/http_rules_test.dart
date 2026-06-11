@@ -19,13 +19,21 @@ void main() {
       });
     }
 
-    testRule('RequireHttpPackageClientCloseRule',
-        'require_http_package_client_close',
-        () => RequireHttpPackageClientCloseRule());
-    testRule('AvoidHttpTopLevelInLoopRule', 'avoid_http_top_level_in_loop',
-        () => AvoidHttpTopLevelInLoopRule());
-    testRule('AvoidHttpStringUrlRule', 'avoid_http_string_url',
-        () => AvoidHttpStringUrlRule());
+    testRule(
+      'RequireHttpPackageClientCloseRule',
+      'require_http_package_client_close',
+      () => RequireHttpPackageClientCloseRule(),
+    );
+    testRule(
+      'AvoidHttpTopLevelInLoopRule',
+      'avoid_http_top_level_in_loop',
+      () => AvoidHttpTopLevelInLoopRule(),
+    );
+    testRule(
+      'AvoidHttpStringUrlRule',
+      'avoid_http_string_url',
+      () => AvoidHttpStringUrlRule(),
+    );
   });
 
   group('Http Rules - Fixture Verification', () {
@@ -37,9 +45,7 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File(
-          'example_packages/lib/http/${fixture}_fixture.dart',
-        );
+        final file = File('example_packages/lib/http/${fixture}_fixture.dart');
         expect(file.existsSync(), isTrue);
       });
     }

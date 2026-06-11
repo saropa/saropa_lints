@@ -19,14 +19,21 @@ void main() {
       });
     }
 
-    testRule('AppLinksListenInBuildRule', 'app_links_listen_in_build',
-        () => AppLinksListenInBuildRule());
-    testRule('AppLinksUncaughtStreamErrorRule',
-        'app_links_uncaught_stream_error',
-        () => AppLinksUncaughtStreamErrorRule());
-    testRule('AppLinksAvoidGetInitialLinkStringRule',
-        'app_links_avoid_get_initial_link_string',
-        () => AppLinksAvoidGetInitialLinkStringRule());
+    testRule(
+      'AppLinksListenInBuildRule',
+      'app_links_listen_in_build',
+      () => AppLinksListenInBuildRule(),
+    );
+    testRule(
+      'AppLinksUncaughtStreamErrorRule',
+      'app_links_uncaught_stream_error',
+      () => AppLinksUncaughtStreamErrorRule(),
+    );
+    testRule(
+      'AppLinksAvoidGetInitialLinkStringRule',
+      'app_links_avoid_get_initial_link_string',
+      () => AppLinksAvoidGetInitialLinkStringRule(),
+    );
   });
 
   group('App Links Rules - Fixture Verification', () {

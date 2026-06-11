@@ -1,4 +1,24 @@
 {
+  "consolidated": {
+    "kicker": "Security · Quality",
+    "searchPlaceholder": "Filter rules…",
+    "empty": "All clear — no findings",
+    "liveTitle": "Live — updates as you edit",
+    "fetching": "Fetching…",
+    "noOccurrences": "No occurrences",
+    "summaryFindings": "{count} findings",
+    "summaryRules": "{count} rules",
+    "more": "+{count} more",
+    "wordErrors": "errors",
+    "wordWarnings": "warnings",
+    "wordInfo": "info",
+    "wordFiles": "files",
+    "gradeExcellent": "Excellent",
+    "gradeGood": "Good",
+    "gradeFair": "Fair",
+    "gradeWeak": "Weak",
+    "gradeSevere": "Severe"
+  },
   "configSuggestions": {
     "badgeTooltip": "Saropa Lints — {count} config suggestion(s)",
     "initMissing": {

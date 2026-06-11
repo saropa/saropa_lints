@@ -826,7 +826,9 @@ class RequireCacheExpirationRule extends SaropaLintRule {
       // deliberately TTL-less but bounded cache is a valid design; only flag a
       // genuinely unbounded, TTL-less Map cache that can serve stale data
       // while also growing without limit.
-      if (hasMapCache && !hasExpiration && !_cacheSourceIsBounded(classSource)) {
+      if (hasMapCache &&
+          !hasExpiration &&
+          !_cacheSourceIsBounded(classSource)) {
         reporter.atNode(node);
       }
     });

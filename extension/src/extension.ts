@@ -128,6 +128,7 @@ import { createRelatedRuleTelemetry } from './relatedRuleTelemetry';
 import { registerCrossFileCommands } from './cross-file-commands';
 import { registerCopyAsJsonCommands } from './extensionCopyAsJsonCommands';
 import { openViolationsWideReport, refreshFindingsDashboardIfOpen } from './views/violationsWideReportView';
+import { openConsolidatedDashboard } from './views/consolidated/consolidatedView';
 import { pickWorkspaceFolder } from './workspaceFolderPicker';
 import { setCurrentLocale, l10n } from './i18n/runtime';
 import { buildUiLanguageQuickPickItems, type LanguagePickItem } from './i18n/languagePick';
@@ -1253,6 +1254,9 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     }),
     vscode.commands.registerCommand('saropaLints.revealFindingsDashboard', async () => {
       await openViolationsWideReport(context);
+    }),
+    vscode.commands.registerCommand('saropaLints.openConsolidatedDashboard', () => {
+      openConsolidatedDashboard(context);
     }),
     vscode.commands.registerCommand('saropaLints.openProjectVibrancyReport', async () => {
       await openProjectVibrancyReport();

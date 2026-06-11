@@ -183,7 +183,9 @@ class DeviceCalendarMissingPermissionCheckRule extends SaropaLintRule {
       unit.accept(scan);
 
       final List<MethodInvocation> dataCalls = scan.invocations
-          .where((MethodInvocation inv) => _dataOps.contains(inv.methodName.name))
+          .where(
+            (MethodInvocation inv) => _dataOps.contains(inv.methodName.name),
+          )
           .toList();
       if (dataCalls.isEmpty) return;
 
@@ -508,7 +510,9 @@ class DeviceCalendarEventMissingCalendarIdRule extends SaropaLintRule {
       if (!passedToCreate) return;
 
       // A later calendarId setter rescues it — do not flag.
-      final bool setsCalendarId = scan.assignments.any((AssignmentExpression a) {
+      final bool setsCalendarId = scan.assignments.any((
+        AssignmentExpression a,
+      ) {
         final Expression lhs = a.leftHandSide;
         return lhs is PrefixedIdentifier &&
             lhs.prefix.name == varName &&

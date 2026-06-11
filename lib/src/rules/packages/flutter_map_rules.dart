@@ -302,7 +302,8 @@ class FlutterMapLegacyMapOptionsCenterRule extends SaropaLintRule {
       if (!fileImportsPackage(node, PackageImports.flutterMap)) return;
 
       for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && _renames.containsKey(arg.name.label.name)) {
+        if (arg is NamedExpression &&
+            _renames.containsKey(arg.name.label.name)) {
           reporter.atNode(arg);
         }
       }

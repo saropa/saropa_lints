@@ -54,7 +54,11 @@ FunctionBody? _disposeBody(ClassDeclaration cls) {
 }
 
 /// True when [body] invokes `<receiver>.<method>()` for any method in [methods].
-bool _bodyCallsMethodOn(FunctionBody body, String receiver, Set<String> methods) {
+bool _bodyCallsMethodOn(
+  FunctionBody body,
+  String receiver,
+  Set<String> methods,
+) {
   final _MethodCallScan scan = _MethodCallScan(receiver, methods);
   body.accept(scan);
   return scan.matched;
@@ -167,7 +171,8 @@ class YoutubePlayerControllerNotClosedRule extends SaropaLintRule {
     if (_isTestFilePath(context.filePath)) return;
 
     context.addFieldDeclaration((FieldDeclaration node) {
-      if (!fileImportsPackage(node, PackageImports.youtubePlayerFlutter)) return;
+      if (!fileImportsPackage(node, PackageImports.youtubePlayerFlutter))
+        return;
 
       // Only the controller type is relevant; check the declared type, and fall
       // back to the initializer constructor name when the field is `final foo = ...`.
@@ -180,7 +185,8 @@ class YoutubePlayerControllerNotClosedRule extends SaropaLintRule {
       // Collect every controller field name so one dispose() can close several.
       for (final VariableDeclaration v in node.fields.variables) {
         final String fieldName = v.name.lexeme;
-        final bool closed = disposeBody != null &&
+        final bool closed =
+            disposeBody != null &&
             _bodyCallsMethodOn(disposeBody, fieldName, const <String>{'close'});
         if (!closed) reporter.atNode(v);
       }
@@ -266,7 +272,8 @@ class YoutubePlayerConvertUrlUncheckedRule extends SaropaLintRule {
       // Static call: receiver is the controller type name.
       final Expression? target = node.target;
       if (target is! SimpleIdentifier || target.name != _controllerType) return;
-      if (!fileImportsPackage(node, PackageImports.youtubePlayerFlutter)) return;
+      if (!fileImportsPackage(node, PackageImports.youtubePlayerFlutter))
+        return;
 
       final AstNode? parent = node.parent;
 
@@ -349,7 +356,8 @@ class YoutubePlayerScaffoldDeprecatedRule extends SaropaLintRule {
       if (node.constructorName.type.name.lexeme != 'YoutubePlayerScaffold') {
         return;
       }
-      if (!fileImportsPackage(node, PackageImports.youtubePlayerFlutter)) return;
+      if (!fileImportsPackage(node, PackageImports.youtubePlayerFlutter))
+        return;
       reporter.atNode(node.constructorName);
     });
   }
@@ -417,7 +425,8 @@ class YoutubePlayerMuteNotRespectedInParamsRule extends SaropaLintRule {
       // fromVideoId is a named constructor on YoutubePlayerController.
       if (node.constructorName.type.name.lexeme != _controllerType) return;
       if (node.constructorName.name?.name != 'fromVideoId') return;
-      if (!fileImportsPackage(node, PackageImports.youtubePlayerFlutter)) return;
+      if (!fileImportsPackage(node, PackageImports.youtubePlayerFlutter))
+        return;
 
       final Expression? autoPlay = _namedArg(node.argumentList, 'autoPlay');
       if (autoPlay is! BooleanLiteral || !autoPlay.value) return;
@@ -467,7 +476,8 @@ class YoutubePlayerMuteNotRespectedInParamsRule extends SaropaLintRule {
 /// ```dart
 /// YoutubePlayer(controller: c, autoFullScreen: false);
 /// ```
-class YoutubePlayerAutoFullscreenWithoutPortraitGuardRule extends SaropaLintRule {
+class YoutubePlayerAutoFullscreenWithoutPortraitGuardRule
+    extends SaropaLintRule {
   YoutubePlayerAutoFullscreenWithoutPortraitGuardRule() : super(code: _code);
 
   @override
@@ -500,11 +510,14 @@ class YoutubePlayerAutoFullscreenWithoutPortraitGuardRule extends SaropaLintRule
   ) {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
       if (node.constructorName.type.name.lexeme != 'YoutubePlayer') return;
-      if (!fileImportsPackage(node, PackageImports.youtubePlayerFlutter)) return;
+      if (!fileImportsPackage(node, PackageImports.youtubePlayerFlutter))
+        return;
 
       // autoFullScreen: false is explicitly safe; absence relies on the true default.
-      final Expression? autoFullScreen =
-          _namedArg(node.argumentList, 'autoFullScreen');
+      final Expression? autoFullScreen = _namedArg(
+        node.argumentList,
+        'autoFullScreen',
+      );
       if (autoFullScreen is BooleanLiteral && !autoFullScreen.value) return;
 
       final ClassDeclaration? cls = _enclosingClass(node);

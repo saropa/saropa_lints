@@ -22,21 +22,31 @@ void main() {
       });
     }
 
-    testRule('ImagePickerMissingRetrieveLostDataRule',
-        'image_picker_missing_retrieve_lost_data',
-        () => ImagePickerMissingRetrieveLostDataRule());
-    testRule('ImagePickerInvalidImageQualityRule',
-        'image_picker_invalid_image_quality',
-        () => ImagePickerInvalidImageQualityRule());
-    testRule('ImagePickerCameraSourceWithoutSupportCheckRule',
-        'image_picker_camera_source_without_support_check',
-        () => ImagePickerCameraSourceWithoutSupportCheckRule());
-    testRule('ImagePickerLostDataEmptyCheckMissingRule',
-        'image_picker_lost_data_empty_check_missing',
-        () => ImagePickerLostDataEmptyCheckMissingRule());
-    testRule('ImagePickerMultiResultUncheckedEmptyRule',
-        'image_picker_multi_result_unchecked_empty',
-        () => ImagePickerMultiResultUncheckedEmptyRule());
+    testRule(
+      'ImagePickerMissingRetrieveLostDataRule',
+      'image_picker_missing_retrieve_lost_data',
+      () => ImagePickerMissingRetrieveLostDataRule(),
+    );
+    testRule(
+      'ImagePickerInvalidImageQualityRule',
+      'image_picker_invalid_image_quality',
+      () => ImagePickerInvalidImageQualityRule(),
+    );
+    testRule(
+      'ImagePickerCameraSourceWithoutSupportCheckRule',
+      'image_picker_camera_source_without_support_check',
+      () => ImagePickerCameraSourceWithoutSupportCheckRule(),
+    );
+    testRule(
+      'ImagePickerLostDataEmptyCheckMissingRule',
+      'image_picker_lost_data_empty_check_missing',
+      () => ImagePickerLostDataEmptyCheckMissingRule(),
+    );
+    testRule(
+      'ImagePickerMultiResultUncheckedEmptyRule',
+      'image_picker_multi_result_unchecked_empty',
+      () => ImagePickerMultiResultUncheckedEmptyRule(),
+    );
   });
 
   group('ImagePicker Rules - Fixture Verification', () {

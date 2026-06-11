@@ -29,7 +29,10 @@ const Set<String> _pickMethods = <String>{
 };
 
 /// Multi-pick methods returning `List<XFile>` (cancel → empty list).
-const Set<String> _multiMethods = <String>{'pickMultiImage', 'pickMultipleMedia'};
+const Set<String> _multiMethods = <String>{
+  'pickMultiImage',
+  'pickMultipleMedia',
+};
 
 bool _isTestFilePath(String path) {
   final String normalized = path.replaceAll('\\', '/');
@@ -108,12 +111,10 @@ class _MemberScan extends RecursiveAstVisitor<void> {
   }
 
   /// True when an emptiness guard (isEmpty/isNotEmpty/length) is read on [varName].
-  bool hasEmptinessGuard(String varName) =>
-      accessesMember(varName, const <String>{
-        'isEmpty',
-        'isNotEmpty',
-        'length',
-      });
+  bool hasEmptinessGuard(String varName) => accessesMember(
+    varName,
+    const <String>{'isEmpty', 'isNotEmpty', 'length'},
+  );
 }
 
 // =============================================================================
@@ -173,7 +174,10 @@ class ImagePickerMissingRetrieveLostDataRule extends SaropaLintRule {
       unit.accept(scan);
 
       final List<MethodInvocation> picks = scan.invocations
-          .where((MethodInvocation inv) => _pickMethods.contains(inv.methodName.name))
+          .where(
+            (MethodInvocation inv) =>
+                _pickMethods.contains(inv.methodName.name),
+          )
           .toList();
       if (picks.isEmpty) return;
 
@@ -358,7 +362,9 @@ class ImagePickerCameraSourceWithoutSupportCheckRule extends SaropaLintRule {
       if (hasSupportCheck) return;
 
       // A Platform.* reference in the member counts as a platform guard.
-      if (scan.prefixedIds.any((PrefixedIdentifier id) => id.prefix.name == 'Platform')) {
+      if (scan.prefixedIds.any(
+        (PrefixedIdentifier id) => id.prefix.name == 'Platform',
+      )) {
         return;
       }
 
@@ -439,7 +445,10 @@ class ImagePickerLostDataEmptyCheckMissingRule extends SaropaLintRule {
       if (!scan.accessesMember(varName, const <String>{'files', 'exception'})) {
         return;
       }
-      if (scan.accessesMember(varName, const <String>{'isEmpty', 'isNotEmpty'})) {
+      if (scan.accessesMember(varName, const <String>{
+        'isEmpty',
+        'isNotEmpty',
+      })) {
         return;
       }
 
@@ -487,8 +496,10 @@ class ImagePickerMultiResultUncheckedEmptyRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  Set<String>? get requiredPatterns =>
-      const <String>{'pickMultiImage', 'pickMultipleMedia'};
+  Set<String>? get requiredPatterns => const <String>{
+    'pickMultiImage',
+    'pickMultipleMedia',
+  };
 
   static const LintCode _code = LintCode(
     'image_picker_multi_result_unchecked_empty',

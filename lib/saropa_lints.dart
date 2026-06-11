@@ -3149,6 +3149,97 @@ _allRuleFactories = <SaropaLintRule Function()>[
   SubtypeOfDisallowedTypeRule.new,
   UndefinedEnumConstructorRule.new,
   YieldInNonGeneratorRule.new,
+
+  // receive_sharing_intent rules (receive_sharing_intent_rules.dart)
+  ReceiveSharingIntentMissingInitialMediaRule.new,
+  ReceiveSharingIntentMissingResetRule.new,
+  ReceiveSharingIntentUnfilteredTypeRule.new,
+
+  // sign_in_with_apple rules (sign_in_with_apple_rules.dart)
+  AppleSignInUnhandledAuthorizationExceptionRule.new,
+  AppleSignInUnhandledCancelRule.new,
+  AppleSignInUncheckedAvailabilityRule.new,
+  AppleSignInNullIdentityTokenRule.new,
+  AppleSignInRelyingOnNameEmailRule.new,
+  AppleSignInUncheckedCredentialStateRule.new,
+
+  // lottie rules (lottie_rules.dart)
+  LottieControllerMissingOnLoadedRule.new,
+  LottieNetworkMissingErrorBuilderRule.new,
+  LottieFrameRateMaxWithoutRenderCacheRule.new,
+  LottieRenderCacheRasterLargeRiskRule.new,
+  LottieNetworkMissingBackgroundLoadingRule.new,
+
+  // flutter_animate rules (flutter_animate_rules.dart)
+  FlutterAnimateUnconditionalRepeatInOnPlayRule.new,
+  FlutterAnimateRestartOnHotReloadInReleaseRule.new,
+  FlutterAnimateNoKeyInListRule.new,
+  FlutterAnimateEmptyAnimateListRule.new,
+  FlutterAnimateFixedTargetLiteralRule.new,
+  FlutterAnimateAutoPlayFalseNoDriverRule.new,
+
+  // awesome_notifications rules (awesome_notifications_rules.dart)
+  AwesomeNotificationsNonStaticListenerRule.new,
+  AwesomeNotificationsHandlerWrongParameterTypeRule.new,
+  AwesomeNotificationsMissingPragmaAnnotationRule.new,
+  AwesomeNotificationsUndeclaredChannelKeyRule.new,
+  AwesomeNotificationsCreateWithoutPermissionCheckRule.new,
+  AwesomeNotificationsNegativeNotificationIdRule.new,
+  AwesomeNotificationsListenersBeforeDisplayRule.new,
+
+  // share_plus rules (share_plus_rules.dart) — prefer_shareplus_instance is
+  // the version-gated migration code (relocated to share_plus_11).
+  PreferSharePlusInstanceRule.new,
+  SharePlusMissingPositionOriginRule.new,
+  SharePlusUncheckedResultRule.new,
+  SharePlusEmptyShareParamsRule.new,
+  SharePlusUriAndTextConflictRule.new,
+
+  // sensors_plus rules (sensors_plus_rules.dart) — prefer_sensors_event_stream
+  // is the version-gated migration code (relocated to sensors_plus_4).
+  PreferSensorsEventStreamRule.new,
+  SensorsPlusNoSamplingPeriodRule.new,
+  SensorsPlusFastestIntervalRule.new,
+  SensorsPlusMissingOnErrorRule.new,
+
+  // flutter_svg rules (flutter_svg_rules.dart) — prefer_svg_color_filter is the
+  // version-gated migration code (relocated to flutter_svg_2).
+  PreferSvgColorFilterRule.new,
+  SvgNetworkMissingErrorBuilderRule.new,
+  SvgNetworkMissingPlaceholderRule.new,
+  SvgMissingSemanticsLabelRule.new,
+  SvgStringMissingErrorBuilderRule.new,
+
+  // file_picker migration rules (file_picker_rules.dart) — all relocated to
+  // file_picker_10 / file_picker_12 gated packs.
+  FilePickerDeprecatedWithDataRule.new,
+  FilePickerDeprecatedWithReadStreamRule.new,
+  FilePickerDeprecatedAllowMultipleRule.new,
+  FilePickerDeprecatedAllowCompressionRule.new,
+
+  // connectivity_plus rules (connectivity_plus_rules.dart) — migration code
+  // avoid_pre_v6_single_connectivity_result relocated to connectivity_plus_6.
+  AvoidPreV6SingleConnectivityResultRule.new,
+  ConnectivitySatelliteMissingRule.new,
+
+  // google_sign_in rules (google_sign_in_rules.dart) — avoid_pre_v7 migration
+  // relocated to google_sign_in_7 (<7); the 5 usage rules gate on google_sign_in >=7.
+  AvoidPreV7GoogleSignInRule.new,
+  GoogleSignInMissingExceptionHandlerRule.new,
+  GoogleSignInUncheckedSupportsAuthenticateRule.new,
+  GoogleSignInAuthTokenFromAuthenticateRule.new,
+  GoogleSignInCanceledNotHandledRule.new,
+  GoogleSignInAuthenticateBeforeInitializeRule.new,
+
+  // webview_flutter rules (webview_flutter_rules.dart) — the base webview_flutter
+  // pack is whole-gated < 4.0.0 (pre-upgrade), so no relocation is needed.
+  AvoidPreV4WebviewWidgetRule.new,
+
+  // local_auth migration rules (local_auth_rules.dart) — all relocated to local_auth_3.
+  LocalAuthDeprecatedOptionsClassRule.new,
+  LocalAuthUseErrorDialogsRemovedRule.new,
+  LocalAuthStickyAuthRenamedRule.new,
+  LocalAuthPlatformExceptionCatchRule.new,
 ];
 
 // =============================================================================

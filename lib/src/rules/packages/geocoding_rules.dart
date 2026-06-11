@@ -222,8 +222,10 @@ class GeocodingMissingExceptionHandlerRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  Set<String>? get requiredPatterns =>
-      const <String>{'locationFromAddress', 'placemarkFromCoordinates'};
+  Set<String>? get requiredPatterns => const <String>{
+    'locationFromAddress',
+    'placemarkFromCoordinates',
+  };
 
   static const LintCode _code = LintCode(
     'geocoding_missing_exception_handler',
@@ -371,8 +373,10 @@ class GeocodingLocaleSetBeforeCallRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  Set<String>? get requiredPatterns =>
-      const <String>{'locationFromAddress', 'placemarkFromCoordinates'};
+  Set<String>? get requiredPatterns => const <String>{
+    'locationFromAddress',
+    'placemarkFromCoordinates',
+  };
 
   static const LintCode _code = LintCode(
     'geocoding_locale_set_before_call',
@@ -515,8 +519,10 @@ class GeocodingMissingIsPresentCheckRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  Set<String>? get requiredPatterns =>
-      const <String>{'locationFromAddress', 'placemarkFromCoordinates'};
+  Set<String>? get requiredPatterns => const <String>{
+    'locationFromAddress',
+    'placemarkFromCoordinates',
+  };
 
   static const LintCode _code = LintCode(
     'geocoding_missing_is_present_check',
@@ -581,8 +587,10 @@ class GeocodingCallInTextFieldListenerRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  Set<String>? get requiredPatterns =>
-      const <String>{'locationFromAddress', 'placemarkFromCoordinates'};
+  Set<String>? get requiredPatterns => const <String>{
+    'locationFromAddress',
+    'placemarkFromCoordinates',
+  };
 
   static const LintCode _code = LintCode(
     'geocoding_call_in_text_field_listener',
@@ -601,8 +609,8 @@ class GeocodingCallInTextFieldListenerRule extends SaropaLintRule {
       if (!_isGeocodingLookup(node)) return;
       if (!fileImportsPackage(node, PackageImports.geocoding)) return;
 
-      final FunctionExpression? closure =
-          node.thisOrAncestorOfType<FunctionExpression>();
+      final FunctionExpression? closure = node
+          .thisOrAncestorOfType<FunctionExpression>();
       if (closure == null) return;
       if (!_isTextFieldCallback(closure)) return;
 

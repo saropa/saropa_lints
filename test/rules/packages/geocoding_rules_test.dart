@@ -19,29 +19,46 @@ void main() {
       });
     }
 
-    testRule('GeocodingUncheckedFirstRule', 'geocoding_unchecked_first',
-        () => GeocodingUncheckedFirstRule());
-    testRule('GeocodingMissingExceptionHandlerRule',
-        'geocoding_missing_exception_handler',
-        () => GeocodingMissingExceptionHandlerRule());
-    testRule('GeocodingPreferNoResultFoundCatchRule',
-        'geocoding_prefer_no_result_found_catch',
-        () => GeocodingPreferNoResultFoundCatchRule());
-    testRule('GeocodingLocaleSetBeforeCallRule',
-        'geocoding_locale_set_before_call',
-        () => GeocodingLocaleSetBeforeCallRule());
-    testRule('GeocodingConcurrentLocaleRaceRule',
-        'geocoding_concurrent_locale_race',
-        () => GeocodingConcurrentLocaleRaceRule());
-    testRule('GeocodingMissingIsPresentCheckRule',
-        'geocoding_missing_is_present_check',
-        () => GeocodingMissingIsPresentCheckRule());
-    testRule('GeocodingCallInTextFieldListenerRule',
-        'geocoding_call_in_text_field_listener',
-        () => GeocodingCallInTextFieldListenerRule());
-    testRule('GeocodingDeprecatedLocaleParamRule',
-        'geocoding_deprecated_locale_param',
-        () => GeocodingDeprecatedLocaleParamRule());
+    testRule(
+      'GeocodingUncheckedFirstRule',
+      'geocoding_unchecked_first',
+      () => GeocodingUncheckedFirstRule(),
+    );
+    testRule(
+      'GeocodingMissingExceptionHandlerRule',
+      'geocoding_missing_exception_handler',
+      () => GeocodingMissingExceptionHandlerRule(),
+    );
+    testRule(
+      'GeocodingPreferNoResultFoundCatchRule',
+      'geocoding_prefer_no_result_found_catch',
+      () => GeocodingPreferNoResultFoundCatchRule(),
+    );
+    testRule(
+      'GeocodingLocaleSetBeforeCallRule',
+      'geocoding_locale_set_before_call',
+      () => GeocodingLocaleSetBeforeCallRule(),
+    );
+    testRule(
+      'GeocodingConcurrentLocaleRaceRule',
+      'geocoding_concurrent_locale_race',
+      () => GeocodingConcurrentLocaleRaceRule(),
+    );
+    testRule(
+      'GeocodingMissingIsPresentCheckRule',
+      'geocoding_missing_is_present_check',
+      () => GeocodingMissingIsPresentCheckRule(),
+    );
+    testRule(
+      'GeocodingCallInTextFieldListenerRule',
+      'geocoding_call_in_text_field_listener',
+      () => GeocodingCallInTextFieldListenerRule(),
+    );
+    testRule(
+      'GeocodingDeprecatedLocaleParamRule',
+      'geocoding_deprecated_locale_param',
+      () => GeocodingDeprecatedLocaleParamRule(),
+    );
   });
 
   group('Geocoding Rules - Fixture Verification', () {

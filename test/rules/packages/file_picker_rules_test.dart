@@ -49,6 +49,29 @@ void main() {
       'file_picker_with_data_large_files',
       () => FilePickerWithDataLargeFilesRule(),
     );
+
+    // ── version-gated deprecation rules (file_picker_10 / file_picker_12 packs) ──
+
+    testRule(
+      'FilePickerDeprecatedWithDataRule',
+      'file_picker_deprecated_with_data',
+      () => FilePickerDeprecatedWithDataRule(),
+    );
+    testRule(
+      'FilePickerDeprecatedWithReadStreamRule',
+      'file_picker_deprecated_with_read_stream',
+      () => FilePickerDeprecatedWithReadStreamRule(),
+    );
+    testRule(
+      'FilePickerDeprecatedAllowMultipleRule',
+      'file_picker_deprecated_allow_multiple',
+      () => FilePickerDeprecatedAllowMultipleRule(),
+    );
+    testRule(
+      'FilePickerDeprecatedAllowCompressionRule',
+      'file_picker_deprecated_allow_compression',
+      () => FilePickerDeprecatedAllowCompressionRule(),
+    );
   });
 
   group('FilePicker Rules - Fixture Verification', () {
@@ -69,5 +92,12 @@ void main() {
         expect(file.existsSync(), isTrue);
       });
     }
+
+    test('file_picker_migration_fixture exists', () {
+      final file = File(
+        'example_packages/lib/file_picker/file_picker_migration_fixture.dart',
+      );
+      expect(file.existsSync(), isTrue);
+    });
   });
 }

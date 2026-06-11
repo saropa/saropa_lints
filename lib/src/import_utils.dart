@@ -153,8 +153,42 @@ class PackageImports {
   /// http package imports.
   static const Set<String> http = {'package:http/'};
 
+  /// awesome_notifications package imports.
+  static const Set<String> awesomeNotifications = {
+    'package:awesome_notifications/',
+  };
+
   /// app_links package imports.
   static const Set<String> appLinks = {'package:app_links/'};
+
+  /// lottie animation package imports.
+  static const Set<String> lottie = {'package:lottie/'};
+
+  /// receive_sharing_intent package imports.
+  static const Set<String> receiveSharingIntent = {
+    'package:receive_sharing_intent/',
+  };
+
+  /// sign_in_with_apple package imports.
+  static const Set<String> signInWithApple = {'package:sign_in_with_apple/'};
+
+  /// flutter_animate package imports.
+  static const Set<String> flutterAnimate = {'package:flutter_animate/'};
+
+  /// sensors_plus package imports.
+  static const Set<String> sensorsPlus = {'package:sensors_plus/'};
+
+  /// flutter_svg package imports (main re-export + direct barrel).
+  static const Set<String> flutterSvg = {'package:flutter_svg/'};
+
+  /// share_plus package imports.
+  static const Set<String> sharePlus = {'package:share_plus/'};
+
+  /// webview_flutter package imports.
+  static const Set<String> webviewFlutter = {'package:webview_flutter/'};
+
+  /// google_sign_in package imports.
+  static const Set<String> googleSignIn = {'package:google_sign_in/'};
 }
 
 // =============================================================================

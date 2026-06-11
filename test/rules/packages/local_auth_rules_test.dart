@@ -4,7 +4,9 @@ import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/packages/local_auth_rules.dart';
 
-/// Tests for 5 always-on local_auth lint rules.
+/// Tests for local_auth lint rules:
+///   - 5 always-on 3.x correct-usage rules
+///   - 4 version-gated migration rules (pack: local_auth_3, gate: < 3.0.0)
 ///
 /// Test fixtures: example_packages/lib/local_auth/*
 void main() {
@@ -44,6 +46,28 @@ void main() {
       'local_auth_biometric_only_sensitive',
       () => LocalAuthBiometricOnlySensitiveRule(),
     );
+
+    // Migration rules (local_auth_3 pack, gate: local_auth < 3.0.0)
+    testRule(
+      'LocalAuthDeprecatedOptionsClassRule',
+      'local_auth_deprecated_options_class',
+      () => LocalAuthDeprecatedOptionsClassRule(),
+    );
+    testRule(
+      'LocalAuthUseErrorDialogsRemovedRule',
+      'local_auth_use_error_dialogs_removed',
+      () => LocalAuthUseErrorDialogsRemovedRule(),
+    );
+    testRule(
+      'LocalAuthStickyAuthRenamedRule',
+      'local_auth_sticky_auth_renamed',
+      () => LocalAuthStickyAuthRenamedRule(),
+    );
+    testRule(
+      'LocalAuthPlatformExceptionCatchRule',
+      'local_auth_platform_exception_catch',
+      () => LocalAuthPlatformExceptionCatchRule(),
+    );
   });
 
   group('LocalAuth Rules - Fixture Verification', () {
@@ -63,5 +87,12 @@ void main() {
         expect(file.existsSync(), isTrue);
       });
     }
+
+    test('local_auth migration fixture exists', () {
+      final file = File(
+        'example_packages/lib/local_auth/local_auth_migration_fixture.dart',
+      );
+      expect(file.existsSync(), isTrue);
+    });
   });
 }

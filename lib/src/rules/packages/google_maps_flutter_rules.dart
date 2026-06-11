@@ -160,8 +160,9 @@ class GoogleMapsMarkersRebuiltInBuildRule extends SaropaLintRule {
       // matching unrelated sets that merely sit in a build() method.
       final TypeArgumentList? typeArgs = node.typeArguments;
       if (typeArgs == null) return;
-      final NamedType? first =
-          typeArgs.arguments.whereType<NamedType>().firstOrNull;
+      final NamedType? first = typeArgs.arguments
+          .whereType<NamedType>()
+          .firstOrNull;
       if (first == null) return;
       if (!_mapObjectTypes.contains(first.name.lexeme)) return;
 
@@ -212,8 +213,7 @@ class GoogleMapsCloudMapIdDeprecatedRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'google_maps_cloud_map_id_deprecated',
     '[google_maps_cloud_map_id_deprecated] The GoogleMap widget is constructed with the deprecated cloudMapId: argument. cloudMapId was deprecated in the 2.x series in favor of mapId: (the old getter just returns mapId\'s value) and will be removed in a future major version; mixing both in one call is asserted against at runtime. Rename the argument to mapId:. {v1}',
-    correctionMessage:
-        'Rename cloudMapId: to mapId: (the value is unchanged).',
+    correctionMessage: 'Rename cloudMapId: to mapId: (the value is unchanged).',
     severity: DiagnosticSeverity.WARNING,
   );
 
@@ -232,8 +232,10 @@ class GoogleMapsCloudMapIdDeprecatedRule extends SaropaLintRule {
       if (node.constructorName.type.name.lexeme != 'GoogleMap') return;
       if (!fileImportsPackage(node, PackageImports.googleMapsFlutter)) return;
 
-      final NamedExpression? arg =
-          _namedArgExpression(node.argumentList, 'cloudMapId');
+      final NamedExpression? arg = _namedArgExpression(
+        node.argumentList,
+        'cloudMapId',
+      );
       if (arg == null) return;
 
       reporter.atNode(arg);

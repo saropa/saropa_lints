@@ -15,6 +15,7 @@
 
 import { createWebviewCspNonce } from '../vibrancy/views/html-utils';
 import type { Violation } from '../violationsReader';
+import { severityScore, scoreToGrade, gradeColor } from '../healthGrade';
 import { getFindingsEmptyStateStyles, getViolationsDashboardStyles } from './violationsDashboardStyles';
 import type { DashboardSection } from './issuesTreeModel';
 import { VIOLATIONS_GROUP_BY_MODES, type GroupByMode } from './issuesTreeGrouping';
@@ -235,27 +236,6 @@ function formatRelative(iso: string | undefined): string | undefined {
   return l10n('findingsDash.time.daysAgo', { day: String(day) });
 }
 
-/**
- * 0-100 health score derived from severity mix.
- * Errors weigh heaviest; warnings moderate; info marginal. Clamped.
- * The intent is "is this codebase quiet?" not a precise quality metric —
- * paired with the per-severity KPIs that carry the absolute counts.
- */
-function computeHealthScore(severityCounts: Record<string, number>): number {
-  const e = severityCounts.error ?? 0;
-  const w = severityCounts.warning ?? 0;
-  const i = severityCounts.info ?? 0;
-  const penalty = e * 5 + w * 2 + i * 0.5;
-  return Math.max(0, Math.min(100, Math.round(100 - penalty)));
-}
-
-function scoreToGrade(score: number): string {
-  if (score >= 90) return 'A';
-  if (score >= 75) return 'B';
-  if (score >= 60) return 'C';
-  if (score >= 40) return 'D';
-  return 'E';
-}
 
 /**
  * Hero radial gauge — same SVG geometry as the package dashboard's gauge.
@@ -276,9 +256,7 @@ function buildGauge(score: number): string {
   const circumference = 2 * Math.PI * r;
   const arcLength = circumference * 0.75;
   const filled = arcLength * (score / 100);
-  const color = score >= 50
-    ? `hsl(${Math.round(60 + (score - 50) * 1.2)}, 70%, 48%)`
-    : `hsl(${Math.round(score * 1.2)}, 75%, 48%)`;
+  const color = gradeColor(score);
   const grade = scoreToGrade(score);
   return `<div class="hero-gauge" data-pending="false" title="${escapeHtml(l10n('findingsDash.hero.gaugeTitle', { score: String(score), grade }))}">
     <svg viewBox="0 0 88 88">
@@ -361,7 +339,7 @@ function buildStatusLine(input: ViolationsDashboardHtmlInput): string {
 }
 
 function buildHero(input: ViolationsDashboardHtmlInput): string {
-  const score = computeHealthScore(input.severityCounts);
+  const score = severityScore(input.severityCounts);
   const stamp = input.extensionVersion
     ? `<span class="stamp">v${escapeHtml(input.extensionVersion)}</span>`
     : '';

@@ -26,25 +26,36 @@ void main() {
       });
     }
 
-    testRule('AudioplayersPoolNotDisposedRule', 'audioplayers_pool_not_disposed',
-        () => AudioplayersPoolNotDisposedRule());
     testRule(
-        'AudioplayersLowLatencyWithStreamListenRule',
-        'audioplayers_low_latency_with_stream_listen',
-        () => AudioplayersLowLatencyWithStreamListenRule());
-    testRule('AudioplayersLowLatencyWithSeekRule',
-        'audioplayers_low_latency_with_seek',
-        () => AudioplayersLowLatencyWithSeekRule());
+      'AudioplayersPoolNotDisposedRule',
+      'audioplayers_pool_not_disposed',
+      () => AudioplayersPoolNotDisposedRule(),
+    );
     testRule(
-        'AudioplayersReleaseModeLoopWithCompleteListenerRule',
-        'audioplayers_release_mode_loop_with_complete_listener',
-        () => AudioplayersReleaseModeLoopWithCompleteListenerRule());
-    testRule('AudioplayersUrlSourceInAssetContextRule',
-        'audioplayers_url_source_in_asset_context',
-        () => AudioplayersUrlSourceInAssetContextRule());
-    testRule('AudioplayersHardcodedVolumeAboveOneRule',
-        'audioplayers_hardcoded_volume_above_one',
-        () => AudioplayersHardcodedVolumeAboveOneRule());
+      'AudioplayersLowLatencyWithStreamListenRule',
+      'audioplayers_low_latency_with_stream_listen',
+      () => AudioplayersLowLatencyWithStreamListenRule(),
+    );
+    testRule(
+      'AudioplayersLowLatencyWithSeekRule',
+      'audioplayers_low_latency_with_seek',
+      () => AudioplayersLowLatencyWithSeekRule(),
+    );
+    testRule(
+      'AudioplayersReleaseModeLoopWithCompleteListenerRule',
+      'audioplayers_release_mode_loop_with_complete_listener',
+      () => AudioplayersReleaseModeLoopWithCompleteListenerRule(),
+    );
+    testRule(
+      'AudioplayersUrlSourceInAssetContextRule',
+      'audioplayers_url_source_in_asset_context',
+      () => AudioplayersUrlSourceInAssetContextRule(),
+    );
+    testRule(
+      'AudioplayersHardcodedVolumeAboveOneRule',
+      'audioplayers_hardcoded_volume_above_one',
+      () => AudioplayersHardcodedVolumeAboveOneRule(),
+    );
   });
 
   group('Audioplayers Rules - Fixture Verification', () {

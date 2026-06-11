@@ -78,8 +78,9 @@ class RequireCachedImageProviderDimensionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  Set<String>? get requiredPatterns =>
-      const <String>{'CachedNetworkImageProvider'};
+  Set<String>? get requiredPatterns => const <String>{
+    'CachedNetworkImageProvider',
+  };
 
   static const LintCode _code = LintCode(
     'require_cached_image_provider_dimensions',
@@ -150,8 +151,9 @@ class RequireCachedImageProviderErrorListenerRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  Set<String>? get requiredPatterns =>
-      const <String>{'CachedNetworkImageProvider'};
+  Set<String>? get requiredPatterns => const <String>{
+    'CachedNetworkImageProvider',
+  };
 
   static const LintCode _code = LintCode(
     'require_cached_image_provider_error_listener',

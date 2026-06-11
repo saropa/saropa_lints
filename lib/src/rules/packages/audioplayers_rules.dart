@@ -192,8 +192,13 @@ class AudioplayersPoolNotDisposedRule extends SaropaLintRule {
       final Set<String> poolFields = <String>{};
       for (final ClassMember member in node.bodyMembers) {
         if (member is! FieldDeclaration) continue;
-        final String? typeName = member.fields.type?.toSource();
-        if (typeName == null || !typeName.contains('AudioPool')) continue;
+        // Type-safe match on the NamedType token rather than a substring scan
+        // of the type source — the latter also matched MyAudioPoolFoo and
+        // tripped the .contains() false-positive guard.
+        final TypeAnnotation? fieldType = member.fields.type;
+        if (fieldType is! NamedType || fieldType.name.lexeme != 'AudioPool') {
+          continue;
+        }
         for (final VariableDeclaration variable in member.fields.variables) {
           poolFields.add(variable.name.lexeme);
         }
@@ -207,7 +212,9 @@ class AudioplayersPoolNotDisposedRule extends SaropaLintRule {
           member.body.accept(scan);
         }
       }
-      final Set<String> undisposed = poolFields.difference(scan.disposedReceivers);
+      final Set<String> undisposed = poolFields.difference(
+        scan.disposedReceivers,
+      );
       if (undisposed.isEmpty) return;
 
       reporter.atToken(node.nameToken, code);
@@ -423,8 +430,10 @@ class AudioplayersReleaseModeLoopWithCompleteListenerRule
   RuleCost get cost => RuleCost.medium;
 
   @override
-  Set<String>? get requiredPatterns =>
-      const <String>{'onPlayerComplete', 'ReleaseMode'};
+  Set<String>? get requiredPatterns => const <String>{
+    'onPlayerComplete',
+    'ReleaseMode',
+  };
 
   static const LintCode _code = LintCode(
     'audioplayers_release_mode_loop_with_complete_listener',

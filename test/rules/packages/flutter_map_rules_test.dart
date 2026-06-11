@@ -19,23 +19,36 @@ void main() {
       });
     }
 
-    testRule('FlutterMapMissingUserAgentRule', 'flutter_map_missing_user_agent',
-        () => FlutterMapMissingUserAgentRule());
-    testRule('FlutterMapDeprecatedTileSizeRule',
-        'flutter_map_deprecated_tile_size',
-        () => FlutterMapDeprecatedTileSizeRule());
-    testRule('FlutterMapLegacyMapOptionsCenterRule',
-        'flutter_map_legacy_map_options_center',
-        () => FlutterMapLegacyMapOptionsCenterRule());
-    testRule('FlutterMapMissingErrorTileCallbackRule',
-        'flutter_map_missing_error_tile_callback',
-        () => FlutterMapMissingErrorTileCallbackRule());
-    testRule('FlutterMapDeprecatedPolygonLabelPlacementRule',
-        'flutter_map_deprecated_polygon_label_placement',
-        () => FlutterMapDeprecatedPolygonLabelPlacementRule());
-    testRule('FlutterMapFallbackUrlDisablesCacheRule',
-        'flutter_map_fallback_url_disables_cache',
-        () => FlutterMapFallbackUrlDisablesCacheRule());
+    testRule(
+      'FlutterMapMissingUserAgentRule',
+      'flutter_map_missing_user_agent',
+      () => FlutterMapMissingUserAgentRule(),
+    );
+    testRule(
+      'FlutterMapDeprecatedTileSizeRule',
+      'flutter_map_deprecated_tile_size',
+      () => FlutterMapDeprecatedTileSizeRule(),
+    );
+    testRule(
+      'FlutterMapLegacyMapOptionsCenterRule',
+      'flutter_map_legacy_map_options_center',
+      () => FlutterMapLegacyMapOptionsCenterRule(),
+    );
+    testRule(
+      'FlutterMapMissingErrorTileCallbackRule',
+      'flutter_map_missing_error_tile_callback',
+      () => FlutterMapMissingErrorTileCallbackRule(),
+    );
+    testRule(
+      'FlutterMapDeprecatedPolygonLabelPlacementRule',
+      'flutter_map_deprecated_polygon_label_placement',
+      () => FlutterMapDeprecatedPolygonLabelPlacementRule(),
+    );
+    testRule(
+      'FlutterMapFallbackUrlDisablesCacheRule',
+      'flutter_map_fallback_url_disables_cache',
+      () => FlutterMapFallbackUrlDisablesCacheRule(),
+    );
   });
 
   group('flutter_map Rules - Fixture Verification', () {

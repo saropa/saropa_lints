@@ -26,6 +26,29 @@ export interface RulePackDefinition {
 
 export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
   {
+    id: 'app_links',
+    label: 'app_links',
+    matchPubNames: ['app_links'],
+    ruleCodes: [
+      'app_links_avoid_get_initial_link_string',
+      'app_links_listen_in_build',
+      'app_links_uncaught_stream_error',
+    ],
+  },
+  {
+    id: 'audioplayers',
+    label: 'audioplayers',
+    matchPubNames: ['audioplayers'],
+    ruleCodes: [
+      'audioplayers_hardcoded_volume_above_one',
+      'audioplayers_low_latency_with_seek',
+      'audioplayers_low_latency_with_stream_listen',
+      'audioplayers_pool_not_disposed',
+      'audioplayers_release_mode_loop_with_complete_listener',
+      'audioplayers_url_source_in_asset_context',
+    ],
+  },
+  {
     id: 'auto_route',
     label: 'Auto Route',
     matchPubNames: ['auto_route'],
@@ -37,6 +60,20 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
       'require_auto_route_deep_link_config',
       'require_auto_route_full_hierarchy',
       'require_auto_route_guard_resume',
+    ],
+  },
+  {
+    id: 'awesome_notifications',
+    label: 'Awesome Notifications',
+    matchPubNames: ['awesome_notifications'],
+    ruleCodes: [
+      'awesome_notifications_create_without_permission_check',
+      'awesome_notifications_handler_wrong_parameter_type',
+      'awesome_notifications_listeners_before_display',
+      'awesome_notifications_missing_pragma_annotation',
+      'awesome_notifications_negative_notification_id',
+      'awesome_notifications_non_static_listener',
+      'awesome_notifications_undeclared_channel_key',
     ],
   },
   {
@@ -110,6 +147,16 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
     dependencyGate: { package: 'bloc', constraint: '>=8.0.0' },
   },
   {
+    id: 'cached_network_image',
+    label: 'cached_network_image',
+    matchPubNames: ['cached_network_image'],
+    ruleCodes: [
+      'avoid_inline_cache_manager_construction',
+      'require_cached_image_provider_dimensions',
+      'require_cached_image_provider_error_listener',
+    ],
+  },
+  {
     id: 'collection_compat',
     label: 'collection_compat',
     matchPubNames: ['collection'],
@@ -117,6 +164,23 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
       'avoid_collection_methods_with_unrelated_types',
     ],
     dependencyGate: { package: 'collection', constraint: '>=1.19.0' },
+  },
+  {
+    id: 'connectivity_plus',
+    label: 'connectivity_plus',
+    matchPubNames: ['connectivity_plus'],
+    ruleCodes: [
+      'connectivity_satellite_missing',
+    ],
+  },
+  {
+    id: 'connectivity_plus_6',
+    label: 'connectivity_plus 6.x (pre-upgrade)',
+    matchPubNames: ['connectivity_plus'],
+    ruleCodes: [
+      'avoid_pre_v6_single_connectivity_result',
+    ],
+    dependencyGate: { package: 'connectivity_plus', constraint: '<6.0.0' },
   },
   {
     id: 'dart_sdk_3_2',
@@ -154,6 +218,20 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
       'avoid_removed_proxy_annotation',
     ],
     sdkGate: { sdkKey: 'sdk', constraint: '>=3.4.0' },
+  },
+  {
+    id: 'device_calendar',
+    label: 'device_calendar',
+    matchPubNames: ['device_calendar'],
+    ruleCodes: [
+      'device_calendar_event_missing_calendar_id',
+      'device_calendar_event_utc_timezone',
+      'device_calendar_missing_permission_check',
+      'device_calendar_result_data_before_success_check',
+      'device_calendar_retrieve_events_empty_params',
+      'device_calendar_retrieve_events_missing_end_date',
+      'device_calendar_unchecked_result',
+    ],
   },
   {
     id: 'dio',
@@ -246,6 +324,39 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
     ],
   },
   {
+    id: 'file_picker',
+    label: 'File Picker',
+    matchPubNames: ['file_picker'],
+    ruleCodes: [
+      'file_picker_custom_type_missing_extensions',
+      'file_picker_extension_with_dot',
+      'file_picker_extensions_without_custom_type',
+      'file_picker_path_on_web',
+      'file_picker_unchecked_null_result',
+      'file_picker_with_data_large_files',
+    ],
+  },
+  {
+    id: 'file_picker_10',
+    label: 'file_picker 10.x',
+    matchPubNames: ['file_picker'],
+    ruleCodes: [
+      'file_picker_deprecated_allow_compression',
+    ],
+    dependencyGate: { package: 'file_picker', constraint: '>=10.0.0' },
+  },
+  {
+    id: 'file_picker_12',
+    label: 'file_picker 12.x',
+    matchPubNames: ['file_picker'],
+    ruleCodes: [
+      'file_picker_deprecated_allow_multiple',
+      'file_picker_deprecated_with_data',
+      'file_picker_deprecated_with_read_stream',
+    ],
+    dependencyGate: { package: 'file_picker', constraint: '>=12.0.0-0' },
+  },
+  {
     id: 'firebase',
     label: 'Firebase',
     matchPubNames: ['cloud_firestore', 'firebase_analytics', 'firebase_auth', 'firebase_core', 'firebase_messaging', 'firebase_storage'],
@@ -297,6 +408,19 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
     ],
   },
   {
+    id: 'flutter_animate',
+    label: 'Flutter Animate',
+    matchPubNames: ['flutter_animate'],
+    ruleCodes: [
+      'flutter_animate_auto_play_false_no_driver',
+      'flutter_animate_empty_animate_list',
+      'flutter_animate_fixed_target_literal',
+      'flutter_animate_no_key_in_list',
+      'flutter_animate_restart_on_hot_reload_in_release',
+      'flutter_animate_unconditional_repeat_in_on_play',
+    ],
+  },
+  {
     id: 'flutter_hooks',
     label: 'Flutter Hooks',
     matchPubNames: ['flutter_hooks'],
@@ -306,6 +430,19 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
       'avoid_misused_hooks',
       'avoid_unnecessary_hook_widgets',
       'prefer_use_callback',
+    ],
+  },
+  {
+    id: 'flutter_map',
+    label: 'flutter_map',
+    matchPubNames: ['flutter_map'],
+    ruleCodes: [
+      'flutter_map_deprecated_polygon_label_placement',
+      'flutter_map_deprecated_tile_size',
+      'flutter_map_fallback_url_disables_cache',
+      'flutter_map_legacy_map_options_center',
+      'flutter_map_missing_error_tile_callback',
+      'flutter_map_missing_user_agent',
     ],
   },
   {
@@ -436,6 +573,41 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
     sdkGate: { sdkKey: 'flutter', constraint: '>=3.7.0' },
   },
   {
+    id: 'flutter_svg',
+    label: 'flutter_svg',
+    matchPubNames: ['flutter_svg'],
+    ruleCodes: [
+      'svg_missing_semantics_label',
+      'svg_network_missing_error_builder',
+      'svg_network_missing_placeholder',
+      'svg_string_missing_error_builder',
+    ],
+  },
+  {
+    id: 'flutter_svg_2',
+    label: 'flutter_svg 2.x',
+    matchPubNames: ['flutter_svg'],
+    ruleCodes: [
+      'prefer_svg_color_filter',
+    ],
+    dependencyGate: { package: 'flutter_svg', constraint: '>=2.0.0' },
+  },
+  {
+    id: 'geocoding',
+    label: 'geocoding',
+    matchPubNames: ['geocoding'],
+    ruleCodes: [
+      'geocoding_call_in_text_field_listener',
+      'geocoding_concurrent_locale_race',
+      'geocoding_deprecated_locale_param',
+      'geocoding_locale_set_before_call',
+      'geocoding_missing_exception_handler',
+      'geocoding_missing_is_present_check',
+      'geocoding_prefer_no_result_found_catch',
+      'geocoding_unchecked_first',
+    ],
+  },
+  {
     id: 'geolocator',
     label: 'Geolocator',
     matchPubNames: ['geolocator'],
@@ -500,6 +672,41 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
     dependencyGate: { package: 'go_router', constraint: '>=6.0.0' },
   },
   {
+    id: 'google_maps_flutter',
+    label: 'google_maps_flutter',
+    matchPubNames: ['google_maps_flutter'],
+    ruleCodes: [
+      'google_maps_animate_camera_in_build',
+      'google_maps_bitmap_descriptor_in_build',
+      'google_maps_cloud_map_id_deprecated',
+      'google_maps_markers_rebuilt_in_build',
+      'google_maps_set_map_style_deprecated',
+      'google_maps_unknown_map_id_error_unchecked',
+    ],
+  },
+  {
+    id: 'google_sign_in',
+    label: 'Google Sign-In',
+    matchPubNames: ['google_sign_in'],
+    ruleCodes: [
+      'google_sign_in_auth_token_from_authenticate',
+      'google_sign_in_authenticate_before_initialize',
+      'google_sign_in_canceled_not_handled',
+      'google_sign_in_missing_exception_handler',
+      'google_sign_in_unchecked_supports_authenticate',
+    ],
+    dependencyGate: { package: 'google_sign_in', constraint: '>=7.0.0' },
+  },
+  {
+    id: 'google_sign_in_7',
+    label: 'google_sign_in 7.x (pre-upgrade)',
+    matchPubNames: ['google_sign_in'],
+    ruleCodes: [
+      'avoid_pre_v7_google_sign_in',
+    ],
+    dependencyGate: { package: 'google_sign_in', constraint: '<7.0.0' },
+  },
+  {
     id: 'graphql',
     label: 'GraphQL',
     matchPubNames: ['graphql'],
@@ -541,6 +748,53 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
     ],
   },
   {
+    id: 'home_widget',
+    label: 'home_widget',
+    matchPubNames: ['home_widget'],
+    ruleCodes: [
+      'home_widget_callback_missing_pragma',
+      'home_widget_callback_not_top_level',
+      'home_widget_ios_missing_app_group',
+      'home_widget_save_without_update',
+      'home_widget_update_no_name',
+      'home_widget_widget_clicked_without_initial_launch',
+    ],
+  },
+  {
+    id: 'http',
+    label: 'http',
+    matchPubNames: ['http'],
+    ruleCodes: [
+      'avoid_http_string_url',
+      'avoid_http_top_level_in_loop',
+      'require_http_package_client_close',
+    ],
+  },
+  {
+    id: 'image_picker',
+    label: 'image_picker',
+    matchPubNames: ['image_picker'],
+    ruleCodes: [
+      'image_picker_camera_source_without_support_check',
+      'image_picker_invalid_image_quality',
+      'image_picker_lost_data_empty_check_missing',
+      'image_picker_missing_retrieve_lost_data',
+      'image_picker_multi_result_unchecked_empty',
+    ],
+  },
+  {
+    id: 'in_app_review',
+    label: 'in_app_review',
+    matchPubNames: ['in_app_review'],
+    ruleCodes: [
+      'in_app_review_button_callback_request',
+      'in_app_review_ios_store_listing_missing_app_id',
+      'in_app_review_missing_availability_check',
+      'in_app_review_missing_store_listing_fallback',
+      'in_app_review_request_in_init_state',
+    ],
+  },
+  {
     id: 'isar',
     label: 'Isar',
     matchPubNames: ['isar', 'isar_flutter_libs'],
@@ -571,6 +825,42 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
     ],
   },
   {
+    id: 'local_auth',
+    label: 'Local Auth',
+    matchPubNames: ['local_auth'],
+    ruleCodes: [
+      'local_auth_biometric_only_sensitive',
+      'local_auth_missing_capability_check',
+      'local_auth_missing_lockout_handling',
+      'local_auth_unchecked_result',
+      'local_auth_unhandled_exception',
+    ],
+  },
+  {
+    id: 'local_auth_3',
+    label: 'local_auth 3.x (pre-upgrade)',
+    matchPubNames: ['local_auth'],
+    ruleCodes: [
+      'local_auth_deprecated_options_class',
+      'local_auth_platform_exception_catch',
+      'local_auth_sticky_auth_renamed',
+      'local_auth_use_error_dialogs_removed',
+    ],
+    dependencyGate: { package: 'local_auth', constraint: '<3.0.0' },
+  },
+  {
+    id: 'lottie',
+    label: 'Lottie',
+    matchPubNames: ['lottie'],
+    ruleCodes: [
+      'lottie_controller_missing_on_loaded',
+      'lottie_frame_rate_max_without_render_cache',
+      'lottie_network_missing_background_loading',
+      'lottie_network_missing_error_builder',
+      'lottie_render_cache_raster_large_risk',
+    ],
+  },
+  {
     id: 'package_specific',
     label: 'Mixed packages',
     matchPubNames: [],
@@ -594,6 +884,18 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
       'require_svg_error_handler',
       'require_url_launcher_mode',
       'require_webview_ssl_error_handling',
+    ],
+  },
+  {
+    id: 'permission_handler',
+    label: 'permission_handler',
+    matchPubNames: ['permission_handler'],
+    ruleCodes: [
+      'permission_handler_batched_request_preferred',
+      'permission_handler_deprecated_calendar',
+      'permission_handler_location_always_before_when_in_use',
+      'permission_handler_request_in_build',
+      'permission_handler_status_without_request',
     ],
   },
   {
@@ -639,6 +941,28 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
       'avoid_qr_scanner_always_active',
       'require_qr_content_validation',
       'require_qr_scan_feedback',
+    ],
+  },
+  {
+    id: 'quick_actions',
+    label: 'quick_actions',
+    matchPubNames: ['quick_actions'],
+    ruleCodes: [
+      'quick_actions_empty_localized_title',
+      'quick_actions_empty_shortcut_type',
+      'quick_actions_flutter_asset_icon',
+      'quick_actions_missing_initialize',
+      'quick_actions_set_before_initialize',
+    ],
+  },
+  {
+    id: 'receive_sharing_intent',
+    label: 'Receive Sharing Intent',
+    matchPubNames: ['receive_sharing_intent'],
+    ruleCodes: [
+      'rsi_missing_initial_media',
+      'rsi_missing_reset_after_initial_media',
+      'rsi_unfiltered_shared_media_type',
     ],
   },
   {
@@ -715,6 +1039,45 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
     ],
   },
   {
+    id: 'sensors_plus',
+    label: 'sensors_plus',
+    matchPubNames: ['sensors_plus'],
+    ruleCodes: [
+      'sensors_plus_fastest_interval',
+      'sensors_plus_missing_on_error',
+      'sensors_plus_no_sampling_period',
+    ],
+  },
+  {
+    id: 'sensors_plus_4',
+    label: 'sensors_plus 4.x',
+    matchPubNames: ['sensors_plus'],
+    ruleCodes: [
+      'prefer_sensors_event_stream',
+    ],
+    dependencyGate: { package: 'sensors_plus', constraint: '>=4.0.0' },
+  },
+  {
+    id: 'share_plus',
+    label: 'share_plus',
+    matchPubNames: ['share_plus'],
+    ruleCodes: [
+      'share_plus_empty_share_params',
+      'share_plus_missing_position_origin',
+      'share_plus_unchecked_result',
+      'share_plus_uri_and_text_conflict',
+    ],
+  },
+  {
+    id: 'share_plus_11',
+    label: 'share_plus 11.x',
+    matchPubNames: ['share_plus'],
+    ruleCodes: [
+      'prefer_shareplus_instance',
+    ],
+    dependencyGate: { package: 'share_plus', constraint: '>=11.0.0' },
+  },
+  {
     id: 'shared_preferences',
     label: 'shared_preferences',
     matchPubNames: ['shared_preferences'],
@@ -731,6 +1094,19 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
       'require_shared_prefs_key_constants',
       'require_shared_prefs_null_handling',
       'require_shared_prefs_prefix',
+    ],
+  },
+  {
+    id: 'sign_in_with_apple',
+    label: 'Sign in with Apple',
+    matchPubNames: ['sign_in_with_apple'],
+    ruleCodes: [
+      'apple_sign_in_null_identity_token',
+      'apple_sign_in_relying_on_name_email',
+      'apple_sign_in_unchecked_availability',
+      'apple_sign_in_unchecked_credential_state',
+      'apple_sign_in_unhandled_authorization_exception',
+      'apple_sign_in_unhandled_cancel',
     ],
   },
   {
@@ -764,6 +1140,15 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
     ],
   },
   {
+    id: 'webview_flutter',
+    label: 'webview_flutter (pre-upgrade)',
+    matchPubNames: ['webview_flutter'],
+    ruleCodes: [
+      'avoid_pre_v4_webview_widget',
+    ],
+    dependencyGate: { package: 'webview_flutter', constraint: '<4.0.0' },
+  },
+  {
     id: 'workmanager',
     label: 'workmanager',
     matchPubNames: ['workmanager'],
@@ -771,6 +1156,18 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
       'require_workmanager_constraints',
       'require_workmanager_for_background',
       'require_workmanager_result_return',
+    ],
+  },
+  {
+    id: 'youtube_player_flutter',
+    label: 'youtube_player_flutter',
+    matchPubNames: ['youtube_player_flutter', 'youtube_player_iframe'],
+    ruleCodes: [
+      'youtube_player_auto_fullscreen_without_portrait_guard',
+      'youtube_player_controller_not_closed',
+      'youtube_player_convert_url_unchecked',
+      'youtube_player_mute_not_respected_in_params',
+      'youtube_player_scaffold_deprecated',
     ],
   },
 ];

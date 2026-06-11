@@ -171,6 +171,14 @@ export const catalogEntries: readonly CatalogEntry[] = [
     icon: 'warning',
   },
   {
+    command: 'saropaLints.openConsolidatedDashboard',
+    title: 'Open Dashboard',
+    description:
+      'Open the consolidated dashboard: live findings grouped by rule and ranked by severity, with the holistic grade. Reads diagnostics live (zero analysis) and updates as you edit.',
+    category: 'Setup & Configuration',
+    icon: 'dashboard',
+  },
+  {
     command: 'saropaLints.revealFindingsDashboard',
     title: 'Open Findings Dashboard (preserve filters)',
     description:

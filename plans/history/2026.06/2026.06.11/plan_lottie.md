@@ -271,3 +271,17 @@ VALIDATION BLOCKER above) — the import guard alone does not constrain the call
 - [RenderCache class API doc — raster warning text (verified)](https://pub.dev/documentation/lottie/latest/lottie/RenderCache-class.html)
 - [lottie changelog — backgroundLoading and renderCache introduced in v3.0 (verified)](https://pub.dev/packages/lottie/changelog)
 - [flutter/flutter issue #148472 — Android Lottie performance](https://github.com/flutter/flutter/issues/148472)
+
+---
+
+## Finish Report (2026-06-11)
+
+ Scope (LINTER variant): (A) Dart lint rules / analyzer plugin + (C) docs.
+
+**Shipped.** 5 rules (controller_missing_on_loaded, network_missing_error_builder, frame_rate_max_without_render_cache, render_cache_raster_large_risk, network_missing_background_loading). The detection-strategy BLOCKER was resolved: every rule resolves the receiver to the Lottie/LottieBuilder type rather than bare method-name matching.
+
+Rules marked DROP / defer in the 2026-06-11 VALIDATION notes were intentionally not implemented (duplicates, overlap with existing rules, or feasibility concerns) — that triage is honored, not skipped. Every rule is import-gated via `fileImportsPackage`; migration rules are version-gated via `kRulePackDependencyGates` and relocated out of their base pack via `kRelocatedRulePackCodes` so a project on the old major never sees a rule for an API it lacks.
+
+**Verification.** `dart analyze lib --fatal-infos` clean; `dart run tool/rule_pack_audit.dart` exit 0; full test suite green (1336 tests across test/integrity, test/config, test/rules/packages); registry regenerated twice + `dart format`. Rules authored by parallel subagents then serially registered into the shared files (tiers.dart, saropa_lints.dart, import_utils.dart, all_rules.dart, rule_packs.dart, generator + audit).
+
+**Plan disposition.** Complete — archived to `plans/history/2026.06/2026.06.11/`.

@@ -168,3 +168,17 @@ All detection uses:
 - Apple Developer Documentation — nonce field: https://developer.apple.com/documentation/signinwithapplejs/clientconfigi/nonce
 - Firebase docs — Sign in with Apple (nonce pattern): https://firebase.google.com/docs/auth/ios/apple
 - Firebase Flutter docs — social auth (nonce usage): https://firebase.flutter.dev/docs/auth/social/
+
+---
+
+## Finish Report (2026-06-11)
+
+ Scope (LINTER variant): (A) Dart lint rules / analyzer plugin + (C) docs.
+
+**Shipped.** 6 rules (unhandled_authorization_exception, unhandled_cancel, unchecked_availability, null_identity_token, relying_on_name_email, unchecked_credential_state). Dropped apple_sign_in_missing_nonce (exact duplicate). The two de-conflict rules scoped to the assignment-to-non-nullable path (not the ! path) to avoid co-firing with avoid_null_assertion.
+
+Rules marked DROP / defer in the 2026-06-11 VALIDATION notes were intentionally not implemented (duplicates, overlap with existing rules, or feasibility concerns) — that triage is honored, not skipped. Every rule is import-gated via `fileImportsPackage`; migration rules are version-gated via `kRulePackDependencyGates` and relocated out of their base pack via `kRelocatedRulePackCodes` so a project on the old major never sees a rule for an API it lacks.
+
+**Verification.** `dart analyze lib --fatal-infos` clean; `dart run tool/rule_pack_audit.dart` exit 0; full test suite green (1336 tests across test/integrity, test/config, test/rules/packages); registry regenerated twice + `dart format`. Rules authored by parallel subagents then serially registered into the shared files (tiers.dart, saropa_lints.dart, import_utils.dart, all_rules.dart, rule_packs.dart, generator + audit).
+
+**Plan disposition.** Complete — archived to `plans/history/2026.06/2026.06.11/`.

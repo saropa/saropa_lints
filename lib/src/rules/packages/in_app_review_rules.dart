@@ -372,7 +372,9 @@ class InAppReviewMissingStoreListingFallbackRule extends SaropaLintRule {
       node.accept(scan);
 
       final List<MethodInvocation> requestCalls = scan.invocations
-          .where((MethodInvocation inv) => _isInAppReviewCall(inv, 'requestReview'))
+          .where(
+            (MethodInvocation inv) => _isInAppReviewCall(inv, 'requestReview'),
+          )
           .toList();
       if (requestCalls.isEmpty) return;
 
