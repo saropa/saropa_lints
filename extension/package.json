@@ -922,6 +922,10 @@
           "when": "false"
         },
         {
+          "command": "saropaLints.enableRulePack",
+          "when": "false"
+        },
+        {
           "command": "saropaLints.setIssuesFilterByMetadata",
           "when": "saropaLints.isDartProject"
         },

@@ -104,6 +104,14 @@ export const catalogEntries: readonly CatalogEntry[] = [
     icon: 'gear',
   },
   {
+    command: 'saropaLints.enableRulePack',
+    title: 'Enable Rule Pack',
+    description: 'Enable a rule pack for a package in your pubspec, from a Suggestions item.',
+    category: 'Setup & Configuration',
+    icon: 'extensions',
+    internal: true,
+  },
+  {
     command: 'saropaLints.openConfig',
     title: 'Open Analysis Options',
     description: 'Open the analysis_options.yaml file in the editor.',
