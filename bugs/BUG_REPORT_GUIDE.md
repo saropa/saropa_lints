@@ -12,6 +12,10 @@ How to file, investigate, and close bugs in `saropa_lints`.
 - `avoid_memory_intensive_operations_false_positive_non_string_loop_math.md`
 - `avoid_unsafe_cast_false_positive_render_object_parent_data_cast.md`
 
+## Raised Reports (2026-06-11)
+
+- `require_cache_expiration_false_positive_bounded_lru_lfu_cache.md`
+
 ---
 
 ## File Naming
