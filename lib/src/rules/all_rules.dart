@@ -152,6 +152,7 @@ export 'packages/isar_rules.dart';
 export 'packages/package_specific_rules.dart';
 export 'packages/provider_rules.dart';
 export 'packages/qr_scanner_rules.dart';
+export 'packages/quick_actions_rules.dart';
 export 'packages/riverpod_rules.dart';
 export 'packages/shared_preferences_rules.dart';
 export 'packages/sqflite_rules.dart';

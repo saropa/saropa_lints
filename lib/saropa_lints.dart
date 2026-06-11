@@ -2527,6 +2527,13 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidUrlLauncherSimulatorTestsRule.new,
   PreferUrlLauncherFallbackRule.new,
 
+  // QuickActions rules (quick_actions_rules.dart)
+  QuickActionsSetBeforeInitializeRule.new,
+  QuickActionsMissingInitializeRule.new,
+  QuickActionsEmptyShortcutTypeRule.new,
+  QuickActionsEmptyLocalizedTitleRule.new,
+  QuickActionsFlutterAssetIconRule.new,
+
   // Permission rules (permission_rules.dart)
   RequireLocationPermissionRationaleRule.new,
   RequireCameraPermissionCheckRule.new,

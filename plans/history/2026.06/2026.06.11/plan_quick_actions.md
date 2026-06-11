@@ -127,3 +127,57 @@ All five rules use `SaropaLintRule` base class with:
 - [quick_actions official example (flutter/plugins)](https://github.com/flutter/plugins/blob/main/packages/quick_actions/quick_actions/example/lib/main.dart)
 - [iOS cold-start fix PR #3811](https://github.com/flutter/plugins/pull/3811)
 - [iOS cold-start issue #130243](https://github.com/flutter/flutter/issues/130243)
+
+---
+
+## Finish Report (2026-06-11)
+
+**Scope:** (A) Dart lint rules / analyzer plugin. All 5 proposed rules implemented
+(this plan was validated "STRONGEST PLAN — ship as-is"; no rules dropped).
+
+### Delivered
+
+| Rule | Severity | Quick fix | Detection |
+|---|---|---|---|
+| `quick_actions_set_before_initialize` | WARNING | — | per-member AST ordering; `setShortcutItems` offset < preceding `initialize` on a `QuickActions` receiver (resolved static type). Outermost-member-body scan handles `initialize(...).then((_) => setShortcutItems(...))`. |
+| `quick_actions_missing_initialize` | WARNING | — | class-scoped; `setShortcutItems` present, `initialize` absent on any `QuickActions` receiver. Skips `*_test.dart` / `/test/`. |
+| `quick_actions_empty_shortcut_type` | WARNING | ✅ replace `''` → `'action_placeholder'` | `ShortcutItem(type:)` empty StringLiteral. |
+| `quick_actions_empty_localized_title` | WARNING | — | `ShortcutItem(localizedTitle:)` empty StringLiteral. |
+| `quick_actions_flutter_asset_icon` | WARNING | — | `ShortcutItem(icon:)` StringLiteral starting `assets/`. |
+
+All five: `LintImpact.warning`, `RuleType.bug` (the plan said `RuleType.correctness`,
+which does not exist in `rule_metadata.dart`; corrected to `bug`), `tags: {'packages'}`,
+`cost: RuleCost.low`, `requiredPatterns` set for early-exit, and gated by
+`fileImportsPackage(node, PackageImports.quickActions)`. Receiver checks use resolved
+static type (`staticType?.element?.name == 'QuickActions'`), never bare-name match.
+
+### Files
+
+- NEW `lib/src/rules/packages/quick_actions_rules.dart` (5 rules + `_QuickActionsPlaceholderTypeFix`).
+- `lib/src/import_utils.dart` — `PackageImports.quickActions`.
+- `lib/src/rules/all_rules.dart` — export.
+- `lib/saropa_lints.dart` — 5 factories in `_allRuleFactories`.
+- `lib/src/tiers.dart` — 5 names in `professionalOnlyRules`; new `quickActionsPackageRules`; entries in `packageRuleSets` + `allPackages`.
+- NEW `test/rules/packages/quick_actions_rules_test.dart` (instantiation + fixture-existence; 10 tests pass).
+- NEW `example_packages/lib/quick_actions/*_fixture.dart` (5 fixtures, BAD+GOOD).
+- `CHANGELOG.md` — `[Unreleased]` overview + Added bullet.
+
+### Verification
+
+- `dart analyze --fatal-infos` → No issues found (CI mirror).
+- `dart test test/rules/packages/quick_actions_rules_test.dart` → 10/10 pass.
+- Integrity: `saropa_plugin_registration_test.dart` + `anti_pattern_detection_test.dart` pass.
+- Scan CLI (`dart run saropa_lints scan … --tier comprehensive`): the 3 syntactic
+  `ShortcutItem` rules (`empty_shortcut_type`, `empty_localized_title`, `flutter_asset_icon`)
+  fire on the BAD fixture and not on GOOD. The 2 init-contract rules are gated on the
+  resolved `QuickActions` type and could not be positively triggered in a local mock
+  (the mock name collides with the `package:quick_actions/` import the file-gate needs,
+  poisoning resolution). They fire only when the real package type resolves — the
+  intended FP-prevention. Logic verified by review + confirmed not to false-fire on GOOD.
+
+### Not yet verified
+
+- `set_before_initialize` / `missing_initialize` positive firing in a real Flutter
+  project that depends on `quick_actions` (out of scope here — no Flutter app fixture).
+- The quick fix's applied output not exercised by an automated fix test (repo has no
+  fix-application harness for package rules; `computeReplacement` returns `'action_placeholder'`).

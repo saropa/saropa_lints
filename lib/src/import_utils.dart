@@ -112,6 +112,9 @@ class PackageImports {
 
   /// URL Launcher package imports.
   static const Set<String> urlLauncher = {'package:url_launcher/'};
+
+  /// Quick Actions (app shortcuts) package imports.
+  static const Set<String> quickActions = {'package:quick_actions/'};
 }
 
 // =============================================================================

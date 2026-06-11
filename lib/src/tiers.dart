@@ -2055,6 +2055,13 @@ const Set<String> professionalOnlyRules = <String>{
   // QR Scanner (Plan Group I)
   'avoid_qr_scanner_always_active',
 
+  // QuickActions (app shortcuts) - quick_actions_rules.dart
+  'quick_actions_set_before_initialize',
+  'quick_actions_missing_initialize',
+  'quick_actions_empty_shortcut_type',
+  'quick_actions_empty_localized_title',
+  'quick_actions_flutter_asset_icon',
+
   // GraphQL (Plan Group K)
   'avoid_graphql_string_queries', // Type safety - use codegen
   // Image (Plan Group A)
@@ -3850,6 +3857,15 @@ const Set<String> qrScannerPackageRules = <String>{
   'require_qr_permission_check',
 };
 
+/// Rules specific to the quick_actions (app shortcuts) package.
+const Set<String> quickActionsPackageRules = <String>{
+  'quick_actions_set_before_initialize',
+  'quick_actions_missing_initialize',
+  'quick_actions_empty_shortcut_type',
+  'quick_actions_empty_localized_title',
+  'quick_actions_flutter_asset_icon',
+};
+
 /// Rules specific to the Flame game engine package.
 const Set<String> flamePackageRules = <String>{
   'avoid_creating_vector_in_update',
@@ -3887,6 +3903,7 @@ Map<String, Set<String>> get packageRuleSets => {
   'url_launcher': urlLauncherPackageRules,
   'geolocator': geolocatorPackageRules,
   'qr_scanner': qrScannerPackageRules,
+  'quick_actions': quickActionsPackageRules,
   'flame': flamePackageRules,
 };
 
@@ -3913,6 +3930,7 @@ const List<String> allPackages = <String>[
   'url_launcher',
   'geolocator',
   'qr_scanner',
+  'quick_actions',
   'flame',
 ];
 
