@@ -2841,6 +2841,14 @@ const Set<String> professionalOnlyRules = <String>{
 /// Comprehensive tier rules - stricter patterns, optimization hints, edge cases.
 /// Helpful but not critical. For quality-obsessed teams.
 const Set<String> comprehensiveOnlyRules = <String>{
+  // Device Calendar (device_calendar_rules.dart)
+  'device_calendar_missing_permission_check',
+  'device_calendar_unchecked_result',
+  'device_calendar_retrieve_events_empty_params',
+  'device_calendar_retrieve_events_missing_end_date',
+  'device_calendar_event_missing_calendar_id',
+  'device_calendar_event_utc_timezone',
+  'device_calendar_result_data_before_success_check',
   // HomeWidget (home_widget_rules.dart)
   'home_widget_callback_missing_pragma',
   'home_widget_callback_not_top_level',
@@ -3870,6 +3878,17 @@ const Set<String> qrScannerPackageRules = <String>{
   'require_qr_permission_check',
 };
 
+/// Rules specific to the device_calendar package.
+const Set<String> deviceCalendarPackageRules = <String>{
+  'device_calendar_missing_permission_check',
+  'device_calendar_unchecked_result',
+  'device_calendar_retrieve_events_empty_params',
+  'device_calendar_retrieve_events_missing_end_date',
+  'device_calendar_event_missing_calendar_id',
+  'device_calendar_event_utc_timezone',
+  'device_calendar_result_data_before_success_check',
+};
+
 /// Rules specific to the home_widget package.
 const Set<String> homeWidgetPackageRules = <String>{
   'home_widget_callback_missing_pragma',
@@ -3938,6 +3957,7 @@ Map<String, Set<String>> get packageRuleSets => {
   'quick_actions': quickActionsPackageRules,
   'in_app_review': inAppReviewPackageRules,
   'home_widget': homeWidgetPackageRules,
+  'device_calendar': deviceCalendarPackageRules,
   'flame': flamePackageRules,
 };
 
@@ -3967,6 +3987,7 @@ const List<String> allPackages = <String>[
   'quick_actions',
   'in_app_review',
   'home_widget',
+  'device_calendar',
   'flame',
 ];
 

@@ -2541,6 +2541,15 @@ _allRuleFactories = <SaropaLintRule Function()>[
   InAppReviewMissingStoreListingFallbackRule.new,
   InAppReviewIosStoreListingMissingAppIdRule.new,
 
+  // Device Calendar rules (device_calendar_rules.dart)
+  DeviceCalendarMissingPermissionCheckRule.new,
+  DeviceCalendarUncheckedResultRule.new,
+  DeviceCalendarRetrieveEventsEmptyParamsRule.new,
+  DeviceCalendarRetrieveEventsMissingEndDateRule.new,
+  DeviceCalendarEventMissingCalendarIdRule.new,
+  DeviceCalendarEventUtcTimezoneRule.new,
+  DeviceCalendarResultDataBeforeSuccessCheckRule.new,
+
   // HomeWidget rules (home_widget_rules.dart)
   HomeWidgetCallbackMissingPragmaRule.new,
   HomeWidgetCallbackNotTopLevelRule.new,

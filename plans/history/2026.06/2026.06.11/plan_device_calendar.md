@@ -120,3 +120,55 @@
 - [device_calendar_plus — pub.dev (successor package)](https://pub.dev/packages/device_calendar_plus)
 - [device_calendar_plus — GitHub (bullet-to/device_calendar_plus)](https://github.com/bullet-to/device_calendar_plus)
 - [Using Device_Calendar Library in Flutter (ITNEXT article)](https://itnext.io/using-device-calendar-library-in-flutter-to-communicate-with-android-ios-calendar-95b2d8c77b40)
+
+---
+
+## Finish Report (2026-06-11)
+
+**Scope:** (A) Dart lint rules. All 7 rules implemented; 3 validation callouts
+addressed.
+
+### Validation fixes applied
+
+- `device_calendar_missing_permission_check` → **downgraded to INFO** (overlaps the
+  existing iOS-plist `require_ios_permission_*` enforcement) and runs at compilation-
+  unit scope, reporting once at the first data op; message names the helper-file FP.
+- `device_calendar_unchecked_result` → the `Result<void>` assumption is avoided
+  entirely: the rule now flags only the **discarded bare-statement await** of a data
+  op (no return-type reasoning). The stored-but-unchecked case is covered by
+  `..._result_data_before_success_check`.
+- `device_calendar_event_missing_calendar_id` → intra-function flow implemented:
+  inline `createOrUpdateEvent(Event(...))` plus the variable path (`final e = Event(...)`
+  → `createOrUpdateEvent(e)`), with an intervening `e.calendarId = ...` setter
+  rescuing it (no false positive).
+
+### Delivered
+
+`device_calendar_missing_permission_check` (INFO), `device_calendar_unchecked_result`,
+`device_calendar_retrieve_events_empty_params`,
+`device_calendar_retrieve_events_missing_end_date`,
+`device_calendar_event_missing_calendar_id` (ERROR),
+`device_calendar_event_utc_timezone`,
+`device_calendar_result_data_before_success_check`. All gated by
+`fileImportsPackage(PackageImports.deviceCalendar)`; detection is syntactic
+(constructor names + method-name member scans). `RuleType.bug`/`codeSmell`.
+Comprehensive tier. Registered across all five sites.
+
+### Verification
+
+- `dart analyze --fatal-infos` → No issues found. Unit (14) + registration integrity pass.
+- **Scan-verified (6/7 fire):** `missing_permission_check`, `unchecked_result`,
+  `result_data_before_success_check`, `retrieve_events_empty_params`,
+  `retrieve_events_missing_end_date`, `event_missing_calendar_id` all fire on their
+  BAD case (the constructor rules verified with explicit `new`, since an unresolved
+  mock parses a bare `Foo()` as a call, not a constructor).
+
+### Not yet verified
+
+- `device_calendar_event_utc_timezone` — uses the same `InstanceCreationExpression`
+  mechanism as the verified constructor rules, but its **named** constructor
+  `TZDateTime.utc` cannot be triggered in an unresolved mock (the parser reads
+  `TZDateTime.utc` as a prefixed type). It fires in resolved code; not positively
+  scan-verified here.
+- The stored-but-unchecked `Result` case (beyond a `.data` read) is intentionally
+  out of `unchecked_result`'s scope.

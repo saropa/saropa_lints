@@ -136,6 +136,7 @@ export 'platforms/windows_rules.dart';
 
 // Package-specific rule files
 export 'packages/bloc_rules.dart';
+export 'packages/device_calendar_rules.dart';
 export 'packages/dio_rules.dart';
 export 'packages/drift_rules.dart';
 export 'packages/equatable_rules.dart';

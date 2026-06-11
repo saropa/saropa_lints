@@ -121,6 +121,9 @@ class PackageImports {
 
   /// Home Widget (home-screen widgets) package imports.
   static const Set<String> homeWidget = {'package:home_widget/'};
+
+  /// Device Calendar package imports.
+  static const Set<String> deviceCalendar = {'package:device_calendar/'};
 }
 
 // =============================================================================
