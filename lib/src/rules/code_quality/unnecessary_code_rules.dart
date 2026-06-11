@@ -1407,6 +1407,21 @@ class _InitializerPurityVisitor extends RecursiveAstVisitor<void> {
   // is never flagged as a redundant recompute.
   @override
   void visitMethodInvocation(MethodInvocation node) {
+    // A receiver-less call — implicit or explicit `this` — is of unknown
+    // purity. An instance method routinely mutates a field and returns a
+    // different value on each call: a recursive-descent parser's `_term()` /
+    // `_and()` advances a token cursor, so the second call MUST run to consume
+    // the next token. Reusing the first result would skip that side effect and
+    // read a stale value, breaking the parser. The earlier name-shape heuristic
+    // assumed camelCase calls were pure, which is unsound for any user method.
+    // Receiver-qualified calls (`Theme.surface.from(ctx)`,
+    // `JsonUtils.parse(x)`) keep their existing treatment below — those are the
+    // deterministic resolver/static-helper reads the rule is meant to flag.
+    final Expression? target = node.realTarget;
+    if (target == null || target is ThisExpression) {
+      isPure = false;
+      return;
+    }
     final String name = node.methodName.name;
     if (name.isNotEmpty) {
       final int first = name.codeUnitAt(0);
