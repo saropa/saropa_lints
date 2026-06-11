@@ -326,3 +326,45 @@ change status from `Cand P2 — research pending` to `RF + MP (file_picker_10, f
 - [Issue #1987: withData no longer defaults to true on web](https://github.com/miguelpruivo/flutter_file_picker/issues/1987)
 - [Issue #548/#591/#676: File path is null on Web](https://github.com/miguelpruivo/flutter_file_picker/issues/548)
 - [Issue #1658: allowedExtensions support for custom formats](https://github.com/miguelpruivo/flutter_file_picker/issues/1658)
+
+---
+
+## Finish Report (2026-06-11)
+
+**Scope:** (A) Dart lint rules. The 6 always-on correctness/best-practice rules
+shipped; the 4 version-gated `deprecated_*` migration rules are SPLIT into the new
+active plan `plans/plan_file_picker_migration_packs.md` (they need the semver
+rule-pack system, shared with the migration-plan workstream).
+
+### Validation fixes applied
+
+- `file_picker_path_on_web` — marked **experimental** in its doc + message; the
+  `kIsWeb` guard is a best-effort enclosing-`if` AST scan (walks `IfStatement`
+  conditions for a `kIsWeb` identifier — not a source-text `.contains`).
+- The `deprecated_*` version-gate concern — addressed by SPLITTING those 4 rules to
+  the pack-system plan rather than shipping them ungated (which would false-positive
+  on older file_picker majors).
+
+### Delivered (6 rules, Comprehensive tier)
+
+`file_picker_unchecked_null_result`, `file_picker_path_on_web` (experimental),
+`file_picker_custom_type_missing_extensions` (ERROR),
+`file_picker_extensions_without_custom_type`,
+`file_picker_extension_with_dot` (+ dot-stripping quick fix),
+`file_picker_with_data_large_files`. All gated by
+`fileImportsPackage(PackageImports.filePicker)`. `RuleType.bug`/`codeSmell`.
+
+### Verification
+
+- `dart analyze --fatal-infos` → No issues found. Unit (12) + registration integrity pass.
+- **Scan-verified (4/6 fire):** `custom_type_missing_extensions`,
+  `extensions_without_custom_type`, `extension_with_dot`, `with_data_large_files`
+  fire on BAD and stay clean on GOOD (syntactic detection). `unchecked_null_result`
+  and `path_on_web` key on resolved types (`FilePickerResult?` / `PlatformFile`) and
+  fire only in resolved code — verified by review, not positively triggered in an
+  unresolved mock.
+
+### Remaining work (split to active plan)
+
+`plans/plan_file_picker_migration_packs.md` — the 4 `deprecated_*` rules + their
+`file_picker_10` / `file_picker_12` pack wiring.

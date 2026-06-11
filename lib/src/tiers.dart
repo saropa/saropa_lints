@@ -2841,6 +2841,13 @@ const Set<String> professionalOnlyRules = <String>{
 /// Comprehensive tier rules - stricter patterns, optimization hints, edge cases.
 /// Helpful but not critical. For quality-obsessed teams.
 const Set<String> comprehensiveOnlyRules = <String>{
+  // File Picker (file_picker_rules.dart)
+  'file_picker_unchecked_null_result',
+  'file_picker_path_on_web',
+  'file_picker_custom_type_missing_extensions',
+  'file_picker_extensions_without_custom_type',
+  'file_picker_extension_with_dot',
+  'file_picker_with_data_large_files',
   // Device Calendar (device_calendar_rules.dart)
   'device_calendar_missing_permission_check',
   'device_calendar_unchecked_result',
@@ -3878,6 +3885,16 @@ const Set<String> qrScannerPackageRules = <String>{
   'require_qr_permission_check',
 };
 
+/// Rules specific to the file_picker package (always-on correctness subset).
+const Set<String> filePickerPackageRules = <String>{
+  'file_picker_unchecked_null_result',
+  'file_picker_path_on_web',
+  'file_picker_custom_type_missing_extensions',
+  'file_picker_extensions_without_custom_type',
+  'file_picker_extension_with_dot',
+  'file_picker_with_data_large_files',
+};
+
 /// Rules specific to the device_calendar package.
 const Set<String> deviceCalendarPackageRules = <String>{
   'device_calendar_missing_permission_check',
@@ -3958,6 +3975,7 @@ Map<String, Set<String>> get packageRuleSets => {
   'in_app_review': inAppReviewPackageRules,
   'home_widget': homeWidgetPackageRules,
   'device_calendar': deviceCalendarPackageRules,
+  'file_picker': filePickerPackageRules,
   'flame': flamePackageRules,
 };
 
@@ -3988,6 +4006,7 @@ const List<String> allPackages = <String>[
   'in_app_review',
   'home_widget',
   'device_calendar',
+  'file_picker',
   'flame',
 ];
 

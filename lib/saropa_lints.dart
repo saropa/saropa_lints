@@ -2541,6 +2541,14 @@ _allRuleFactories = <SaropaLintRule Function()>[
   InAppReviewMissingStoreListingFallbackRule.new,
   InAppReviewIosStoreListingMissingAppIdRule.new,
 
+  // File Picker rules (file_picker_rules.dart)
+  FilePickerUncheckedNullResultRule.new,
+  FilePickerPathOnWebRule.new,
+  FilePickerCustomTypeMissingExtensionsRule.new,
+  FilePickerExtensionsWithoutCustomTypeRule.new,
+  FilePickerExtensionWithDotRule.new,
+  FilePickerWithDataLargeFilesRule.new,
+
   // Device Calendar rules (device_calendar_rules.dart)
   DeviceCalendarMissingPermissionCheckRule.new,
   DeviceCalendarUncheckedResultRule.new,

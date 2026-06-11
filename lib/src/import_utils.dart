@@ -105,6 +105,9 @@ class PackageImports {
   /// Image Picker package imports.
   static const Set<String> imagePicker = {'package:image_picker/'};
 
+  /// File Picker package imports.
+  static const Set<String> filePicker = {'package:file_picker/'};
+
   /// Cached Network Image package imports.
   static const Set<String> cachedNetworkImage = {
     'package:cached_network_image/',
