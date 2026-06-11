@@ -996,6 +996,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "{count} categories": "{count} ক্যাটাগরি",
         "{count} commands": "{count} কমান্ড",
         "{count} context-menu only (hidden)": "{count} শুধুমাত্র কনটেক্সট-মেনু (লুকানো)",
+        # MT returned this identical to English; curated to match the sibling downloadsUnavailable phrasing ("30 দিন", Latin numeral).
+        "{count} downloads in the last 30 days": "গত 30 দিনে {count} ডাউনলোড",
         "{count} file pattern(s)": "{count} ফাইল প্যাটার্ন",
         "{count} file(s) with per-file rule hides": "{count} ফাইল (প্রতি-ফাইল রুল হাইড সহ)",
         "{count} finding": "{count} ফাইন্ডিং",
@@ -1040,6 +1042,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
     },
     "fa": {
         "#": "#",
+        # Curated passthrough: bullet glyph + bare {dep} placeholder has no translatable content; the sibling tooltipDepShared carries the only translatable word "(shared)".
+        "• {dep}": "• {dep}",
         "Deps": "وابستگی‌ها",
         "Drift Advisor: Refresh": "مشاور انحراف: بروزرسانی",
         "OWASP": "OWASP",
