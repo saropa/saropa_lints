@@ -2841,6 +2841,13 @@ const Set<String> professionalOnlyRules = <String>{
 /// Comprehensive tier rules - stricter patterns, optimization hints, edge cases.
 /// Helpful but not critical. For quality-obsessed teams.
 const Set<String> comprehensiveOnlyRules = <String>{
+  // HomeWidget (home_widget_rules.dart)
+  'home_widget_callback_missing_pragma',
+  'home_widget_callback_not_top_level',
+  'home_widget_save_without_update',
+  'home_widget_update_no_name',
+  'home_widget_ios_missing_app_group',
+  'home_widget_widget_clicked_without_initial_launch',
   // In-App Review (in_app_review_rules.dart)
   'in_app_review_missing_availability_check',
   'in_app_review_button_callback_request',
@@ -3863,6 +3870,16 @@ const Set<String> qrScannerPackageRules = <String>{
   'require_qr_permission_check',
 };
 
+/// Rules specific to the home_widget package.
+const Set<String> homeWidgetPackageRules = <String>{
+  'home_widget_callback_missing_pragma',
+  'home_widget_callback_not_top_level',
+  'home_widget_save_without_update',
+  'home_widget_update_no_name',
+  'home_widget_ios_missing_app_group',
+  'home_widget_widget_clicked_without_initial_launch',
+};
+
 /// Rules specific to the in_app_review package.
 const Set<String> inAppReviewPackageRules = <String>{
   'in_app_review_missing_availability_check',
@@ -3920,6 +3937,7 @@ Map<String, Set<String>> get packageRuleSets => {
   'qr_scanner': qrScannerPackageRules,
   'quick_actions': quickActionsPackageRules,
   'in_app_review': inAppReviewPackageRules,
+  'home_widget': homeWidgetPackageRules,
   'flame': flamePackageRules,
 };
 
@@ -3948,6 +3966,7 @@ const List<String> allPackages = <String>[
   'qr_scanner',
   'quick_actions',
   'in_app_review',
+  'home_widget',
   'flame',
 ];
 

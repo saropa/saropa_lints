@@ -2541,6 +2541,14 @@ _allRuleFactories = <SaropaLintRule Function()>[
   InAppReviewMissingStoreListingFallbackRule.new,
   InAppReviewIosStoreListingMissingAppIdRule.new,
 
+  // HomeWidget rules (home_widget_rules.dart)
+  HomeWidgetCallbackMissingPragmaRule.new,
+  HomeWidgetCallbackNotTopLevelRule.new,
+  HomeWidgetSaveWithoutUpdateRule.new,
+  HomeWidgetUpdateNoNameRule.new,
+  HomeWidgetIosMissingAppGroupRule.new,
+  HomeWidgetWidgetClickedWithoutInitialLaunchRule.new,
+
   // Permission rules (permission_rules.dart)
   RequireLocationPermissionRationaleRule.new,
   RequireCameraPermissionCheckRule.new,

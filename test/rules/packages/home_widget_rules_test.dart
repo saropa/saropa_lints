@@ -1,0 +1,73 @@
+import 'dart:io';
+
+import 'package:test/test.dart';
+
+import 'package:saropa_lints/src/rules/packages/home_widget_rules.dart';
+
+/// Tests for 6 home_widget lint rules.
+///
+/// Test fixtures: example_packages/lib/home_widget/*
+void main() {
+  group('HomeWidget Rules - Rule Instantiation', () {
+    void testRule(String name, String codeName, dynamic Function() create) {
+      test(name, () {
+        final rule = create();
+        expect(rule.code.lowerCaseName, codeName);
+        expect(rule.code.problemMessage, contains('[$codeName]'));
+        expect(rule.code.problemMessage.length, greaterThan(200));
+        expect(rule.code.correctionMessage, isNotNull);
+      });
+    }
+
+    testRule(
+      'HomeWidgetCallbackMissingPragmaRule',
+      'home_widget_callback_missing_pragma',
+      () => HomeWidgetCallbackMissingPragmaRule(),
+    );
+    testRule(
+      'HomeWidgetCallbackNotTopLevelRule',
+      'home_widget_callback_not_top_level',
+      () => HomeWidgetCallbackNotTopLevelRule(),
+    );
+    testRule(
+      'HomeWidgetSaveWithoutUpdateRule',
+      'home_widget_save_without_update',
+      () => HomeWidgetSaveWithoutUpdateRule(),
+    );
+    testRule(
+      'HomeWidgetUpdateNoNameRule',
+      'home_widget_update_no_name',
+      () => HomeWidgetUpdateNoNameRule(),
+    );
+    testRule(
+      'HomeWidgetIosMissingAppGroupRule',
+      'home_widget_ios_missing_app_group',
+      () => HomeWidgetIosMissingAppGroupRule(),
+    );
+    testRule(
+      'HomeWidgetWidgetClickedWithoutInitialLaunchRule',
+      'home_widget_widget_clicked_without_initial_launch',
+      () => HomeWidgetWidgetClickedWithoutInitialLaunchRule(),
+    );
+  });
+
+  group('HomeWidget Rules - Fixture Verification', () {
+    final fixtures = [
+      'home_widget_callback_missing_pragma',
+      'home_widget_callback_not_top_level',
+      'home_widget_save_without_update',
+      'home_widget_update_no_name',
+      'home_widget_ios_missing_app_group',
+      'home_widget_widget_clicked_without_initial_launch',
+    ];
+
+    for (final fixture in fixtures) {
+      test('$fixture fixture exists', () {
+        final file = File(
+          'example_packages/lib/home_widget/${fixture}_fixture.dart',
+        );
+        expect(file.existsSync(), isTrue);
+      });
+    }
+  });
+}

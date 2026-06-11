@@ -171,3 +171,64 @@ The `home_widget_callback_missing_pragma` and `home_widget_callback_not_top_leve
 - [Flutter issue #118608: PluginUtilities.getCallbackHandle and tree-shaking](https://github.com/flutter/flutter/issues/118608)
 - [home_widget GitHub issue #326: Interactivity NOT working on iOS](https://github.com/ABausG/home_widget/issues/326)
 - [home_widget changelog](https://pub.dev/packages/home_widget/changelog)
+
+---
+
+## Finish Report (2026-06-11)
+
+**Scope:** (A) Dart lint rules. All 6 proposed rules implemented; the 4 validation
+callouts addressed.
+
+### Validation fixes applied
+
+- `home_widget_callback_missing_pragma` — the cross-file annotation quick fix is
+  **deferred (report-only)**, as the validation flagged: a correct fix must edit
+  the callback's declaration file via `element.source`, not the call site, which
+  the `ReplaceNodeFix`/`SaropaFixProducer` path does not cleanly support. Detection
+  is scoped to **same-unit** top-level functions (inspects the `FunctionDeclaration`
+  AST metadata); cross-file declarations are skipped to avoid false positives.
+- `home_widget_save_without_update` — uses **member-scoped presence** (any
+  `updateWidget` in the same member clears it) rather than flat source-offset, and
+  the doc/message name the helper-only false-positive class. Full inter-procedural
+  flow analysis is out of scope (documented).
+- `home_widget_ios_missing_app_group` / `..._widget_clicked_without_initial_launch`
+  — class-scoped with the mixin/base-class/cross-class false-positive named in the
+  message; the latter is INFO. Both skip test files.
+
+### Delivered (all WARNING except the last, INFO)
+
+`home_widget_callback_missing_pragma`, `home_widget_callback_not_top_level`,
+`home_widget_save_without_update`, `home_widget_update_no_name`,
+`home_widget_ios_missing_app_group`, `home_widget_widget_clicked_without_initial_launch`.
+All key on static `HomeWidget.<method>(...)` calls (`SimpleIdentifier` receiver
+named `HomeWidget`) gated by `fileImportsPackage(PackageImports.homeWidget)`.
+`RuleType.bug` (5) / `codeSmell` (INFO). Comprehensive tier. No quick fix
+(callback-pragma fix deferred per above).
+
+Rule 2 flags closures + `PrefixedIdentifier`/`PropertyAccess` callbacks — the same
+accepted approximation the shipped firebase notification-handler rule uses; a
+static `Class.method` tear-off may be over-reported (documented).
+
+### Files
+
+- NEW `lib/src/rules/packages/home_widget_rules.dart` (6 rules).
+- `lib/src/import_utils.dart` — `PackageImports.homeWidget`.
+- `lib/src/rules/all_rules.dart`, `lib/saropa_lints.dart`, `lib/src/tiers.dart`
+  (`comprehensiveOnlyRules` + `homeWidgetPackageRules` + `packageRuleSets` + `allPackages`).
+- NEW `test/rules/packages/home_widget_rules_test.dart` (12 tests pass).
+- NEW `example_packages/lib/home_widget/*_fixture.dart` (6 fixtures).
+- `CHANGELOG.md` — `[Unreleased]` Added bullet.
+
+### Verification
+
+- `dart analyze --fatal-infos` → No issues found.
+- Unit + registration integrity tests pass.
+- **Scan-verified (all 6 fire):** detection is syntactic (static `HomeWidget.x`
+  receiver), so a standalone scan triggers every rule on its BAD case while the
+  GOOD forms (annotated callback, save+update pair, named updateWidget) stay clean.
+
+### Not yet verified
+
+- Cross-file `@pragma` detection (callback declared in another file) — intentionally
+  skipped; the report-only rule covers same-file declarations.
+- The deferred cross-file pragma quick fix.

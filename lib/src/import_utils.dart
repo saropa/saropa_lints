@@ -118,6 +118,9 @@ class PackageImports {
 
   /// In-App Review package imports.
   static const Set<String> inAppReview = {'package:in_app_review/'};
+
+  /// Home Widget (home-screen widgets) package imports.
+  static const Set<String> homeWidget = {'package:home_widget/'};
 }
 
 // =============================================================================
