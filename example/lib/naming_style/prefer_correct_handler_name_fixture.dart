@@ -115,3 +115,24 @@ class _BadClass489 {
 class _GoodClass489 {
   void onButtonPressed() {} // Correctly prefixed with 'on'
 }
+
+// GOOD: boolean state getters ending in a handler suffix are state queries,
+// not event handlers — no lint.
+class _GoodStateClass489 {
+  bool _isClosed = false;
+
+  bool get isClosed => _isClosed; // getter + boolean prefix — NO lint
+  bool get hasChanged => false; // boolean prefix — NO lint
+  bool get isCompleted => true; // getter — NO lint
+}
+
+// GOOD: a boolean-predicate METHOD (not a getter) is still a state query.
+class _GoodPredicateClass489 {
+  bool isLoaded() => true; // boolean prefix — NO lint
+}
+
+// BAD: a genuine past-tense event handler still lints (regression guard).
+// expect_lint: prefer_correct_handler_name
+class _BadHandlerClass489 {
+  void itemDeleted() {} // Ends with 'Deleted', no on/handle prefix
+}

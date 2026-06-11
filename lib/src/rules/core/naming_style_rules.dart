@@ -1600,13 +1600,52 @@ class PreferCorrectHandlerNameRule extends SaropaLintRule {
     'Refreshed',
   };
 
+  /// Boolean-predicate prefixes. A name like `isClosed`/`hasChanged` is a state
+  /// query: the trailing suffix is an adjective after the prefix, not a
+  /// past-tense event. Renaming these to `onClosed` would be wrong.
+  static const List<String> _booleanPrefixes = <String>[
+    'is',
+    'has',
+    'can',
+    'should',
+    'will',
+    'did',
+  ];
+
+  /// True when `name` starts with a boolean predicate prefix followed by an
+  /// uppercase letter (e.g. `isClosed`, `hasChanged`) — i.e. it reads as a
+  /// state predicate, not an event handler.
+  static bool _hasBooleanPrefix(String name) {
+    for (final String prefix in _booleanPrefixes) {
+      if (name.length > prefix.length &&
+          name.startsWith(prefix) &&
+          name[prefix.length] == name[prefix.length].toUpperCase() &&
+          name[prefix.length] != name[prefix.length].toLowerCase()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
     context.addMethodDeclaration((MethodDeclaration node) {
+      // A getter returns state; it is never an event handler (no event param).
+      // Consistent with the isGetter guards already used elsewhere in this file.
+      if (node.isGetter) {
+        return;
+      }
+
       final String name = node.name.lexeme;
+
+      // `isClosed`, `hasChanged`, … are state predicates, not handlers: the
+      // suffix is an adjective after a boolean prefix.
+      if (_hasBooleanPrefix(name)) {
+        return;
+      }
 
       // Check if name ends with handler suffix but doesn't start with on
       for (final String suffix in _handlerSuffixes) {
