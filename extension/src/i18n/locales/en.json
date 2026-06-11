@@ -204,7 +204,8 @@
     "pick": {
       "title": "Saropa Lints UI language",
       "placeholder": "Choose language for sidebar and dashboards",
-      "auto": "Auto (follow VS Code display language)"
+      "auto": "Auto (follow VS Code display language)",
+      "coverage": "{pct}% translated — rest shows in English"
     },
     "reloadPrompt": "Language set to {locale}. Reload the window to update sidebar and command labels.",
     "reloadNow": "Reload now",
