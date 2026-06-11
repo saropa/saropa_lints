@@ -306,6 +306,23 @@ def _append_low_quality_section(
         lines.append("")
 
 
+def timestamped_report_path(root: Path, filename: str) -> Path:
+    """Build a datetime-stamped, day-bucketed path under reports/ for an audit output.
+
+    Audit logs MUST be datetime-stamped so successive runs never overwrite each
+    other — each audit stays a durable, attributable record instead of a single
+    mutable file that loses every prior run's findings. Layout matches the repo
+    convention: reports/<YYYYMMDD>/<YYYYMMDD_HHMMSS>_<filename>. Local wall-clock
+    time is used so the stamp reads as the operator's run time, not UTC.
+    """
+    now = datetime.now()
+    day = now.strftime("%Y%m%d")
+    stamp = now.strftime("%Y%m%d_%H%M%S")
+    out_dir = root / "reports" / day
+    out_dir.mkdir(parents=True, exist_ok=True)
+    return out_dir / f"{stamp}_{filename}"
+
+
 def write_audit_report(
     stats_by_locale: dict[str, LocaleStats],
     missing_by_locale: dict[str, list[str]],
@@ -567,7 +584,7 @@ def _run_audit(
 
     print_summary(stats_by_locale)
     print_missing_samples(missing_by_locale)
-    report_path = root / "reports" / "i18n_translation_audit.md"
+    report_path = timestamped_report_path(root, "i18n_translation_audit.md")
     write_audit_report(stats_by_locale, missing_by_locale, report_path, low_quality_by_locale)
     total_missing = sum(s.missing for s in stats_by_locale.values())
     total_lq = sum(len(v) for v in low_quality_by_locale.values())
@@ -855,7 +872,7 @@ def main() -> int:
     if stats_by_locale:
         print_summary(stats_by_locale)
         print_missing_samples(missing_by_locale)
-        report_path = root / "reports" / "i18n_translation_audit.md"
+        report_path = timestamped_report_path(root, "i18n_translation_audit.md")
         write_audit_report(stats_by_locale, missing_by_locale, report_path)
         total_missing = sum(s.missing for s in stats_by_locale.values())
         print()
@@ -867,7 +884,7 @@ def main() -> int:
         # Per-string NLLB-fallback report: names exactly what NLLB could not do
         # (Google-served, English-left, unsplittable) so fallbacks are visible and
         # actionable instead of hidden behind the engine-mix counts.
-        fb_path = root / "reports" / "i18n_nllb_fallbacks.md"
+        fb_path = timestamped_report_path(root, "i18n_nllb_fallbacks.md")
         fb_count = write_fallback_report(fb_path)
         if fb_count:
             print()
