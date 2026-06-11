@@ -55,7 +55,8 @@ void main() {
     // expect/assert — this is the "does not throw" pattern the broader
     // stubCountIn flags but the gate must not, so it stays runnable.
     test('non-empty body without an assertion is not an empty-body stub', () {
-      const src = "void main() { test('x', () { final b = 1; b.toString(); }); }";
+      const src =
+          "void main() { test('x', () { final b = 1; b.toString(); }); }";
       expect(emptyBodyStubCountIn(src), 0);
       expect(stubCountIn(src), 1); // contrast: broader heuristic still flags it
     });

@@ -624,6 +624,64 @@ _Document status: unified plan (packs + resolver + extension + migrations); Phas
 
 ---
 
+## 19. Per-pack migration delivery recipe (full surface)
+
+Reference procedure for adding a version-gated migration pack (derived from the
+shipped `riverpod_2` / `dio_5` / `bloc_8` / `riverpod_3` / `go_router_6` work).
+The per-package `plan_<package>.md` files link here instead of re-deriving it.
+
+1. **Rule(s) + fix** in `lib/src/rules/packages/<package>_rules.dart` (extend
+   `SaropaLintRule`); add a `DartFix` where the old→new transform is mechanical.
+2. **Register**: `MyRule.new` in `lib/saropa_lints.dart` `_allRuleFactories`; rule
+   code in a tier set in `lib/src/tiers.dart`.
+3. **Dependency gate**: `kRulePackDependencyGates` in `lib/src/config/rule_packs.dart`
+   — `'<package>_<major>': RulePackDependencyGate(dependency: '<package>', constraint: '>=X.0.0')`.
+4. **Pack definition**: pack id + dep name(s) + title in `tool/generate_rule_pack_registry.dart`.
+5. **Relocate** the gated code into the gated pack: `kRelocatedRulePackCodes` in
+   `tool/rule_pack_audit.dart` (`fromPack: '<package>'`, `toPack: '<package>_<major>'`).
+   Load-bearing: keeps a project on the *old* version from being told to adopt an
+   API that does not exist there.
+6. **Regenerate** (`dart run tool/generate_rule_pack_registry.dart`, run twice for the
+   TS writer → `rulePackDefinitions.ts`) + `dart format`.
+7. **Extension upgrade-pack nudge**: confirm `upgradePackNudge.ts` /
+   `upgradePackNudgeLogic.ts` surfaces the pack (detect package at gated version +
+   not enabled → toast → write `rule_packs.enabled`). Fires once per pack per
+   workspace; silenceable via `saropaLints.upgradePackNudge.enabled`. A pack that
+   isn't nudged is invisible to tier-only configs.
+8. **Fixtures**: `example_packages/lib/<package>/` (BAD triggers, GOOD does not).
+9. **Tests**: `test/config/` gate/ownership/merge (mirror `rule_packs_semver_test.dart`);
+   `test/rules/packages/<package>_rules_test.dart` detection/fix; nudge-logic test if
+   the pack list changed.
+10. **Docs + l10n**: `doc/guides/rule_packs.md`, `CHANGELOG`, finish report. Any new
+    `package.nls.json` key leaves translated catalogs stale — flag for separate regen;
+    **never run NLLB**; the publish `--fail-on-missing` gate catches it.
+11. **Verify**: `dart run tool/rule_pack_audit.dart` exit 0; `dart analyze --fatal-infos`
+    clean; Dart + TS tests pass; each rule scan-verified against its fixture (resolved-AST
+    rules also want one manual IDE check).
+
+### Gate direction — two archetypes
+
+Choose by **whether the old API still compiles on the new version**:
+
+- **Post-upgrade cleanup (`>=` gate).** Old API deprecated-but-compiles (analyzer
+  silent). Gate on the new major; flag lingering old usage. Highest value
+  (`dio_5`, `bloc_8`, `share_plus_11`, `sensors_plus_4`, `flutter_svg_2`).
+- **Pre-upgrade readiness (`<` gate).** Old API removed (compiler already errors on
+  the new version). Gate on the old major; flag code that will break on the bump
+  (`google_sign_in_7`, `webview_flutter_4`, `connectivity_plus_6`). Medium value.
+
+### Two open decisions (carried from the deleted coverage index)
+
+1. **Support the `<` pre-upgrade gate archetype?** All shipped gates are `>=`. The
+   3 Tier B packs depend on it; the `>=`-only `upgradePackNudge` also doesn't
+   surface `<` packs. Approve both, or drop Tier B.
+2. **Discoverability for non-upgrade packs.** The nudge targets `>=` upgrade packs
+   only; base package packs + the 15 SDK packs are still manual-enable (why the
+   contacts app shipped with all SDK packs stripped). A detected-pack nudge or
+   `auto_enable_matching` is unbuilt and is the higher-leverage fix.
+
+---
+
 ## Finish Report (2026-06-10)
 
 **Scope (LINTER variant):** (A) Dart analyzer-plugin config + tooling + tests, plus (C) docs. No rule logic changed; this is rule-pack registry / resolver / tooling work.
