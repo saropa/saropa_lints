@@ -2549,6 +2549,37 @@ _allRuleFactories = <SaropaLintRule Function()>[
   ImagePickerLostDataEmptyCheckMissingRule.new,
   ImagePickerMultiResultUncheckedEmptyRule.new,
 
+  // Google Maps Flutter rules (google_maps_flutter_rules.dart)
+  GoogleMapsMarkersRebuiltInBuildRule.new,
+  GoogleMapsCloudMapIdDeprecatedRule.new,
+  GoogleMapsSetMapStyleDeprecatedRule.new,
+  GoogleMapsBitmapDescriptorInBuildRule.new,
+  GoogleMapsUnknownMapIdErrorUncheckedRule.new,
+  GoogleMapsAnimateCameraInBuildRule.new,
+
+  // audioplayers rules (audioplayers_rules.dart)
+  AudioplayersPoolNotDisposedRule.new,
+  AudioplayersLowLatencyWithStreamListenRule.new,
+  AudioplayersLowLatencyWithSeekRule.new,
+  AudioplayersReleaseModeLoopWithCompleteListenerRule.new,
+  AudioplayersUrlSourceInAssetContextRule.new,
+  AudioplayersHardcodedVolumeAboveOneRule.new,
+
+  // flutter_map rules (flutter_map_rules.dart)
+  FlutterMapMissingUserAgentRule.new,
+  FlutterMapDeprecatedTileSizeRule.new,
+  FlutterMapLegacyMapOptionsCenterRule.new,
+  FlutterMapMissingErrorTileCallbackRule.new,
+  FlutterMapDeprecatedPolygonLabelPlacementRule.new,
+  FlutterMapFallbackUrlDisablesCacheRule.new,
+
+  // youtube_player_flutter rules (youtube_player_flutter_rules.dart)
+  YoutubePlayerControllerNotClosedRule.new,
+  YoutubePlayerConvertUrlUncheckedRule.new,
+  YoutubePlayerScaffoldDeprecatedRule.new,
+  YoutubePlayerMuteNotRespectedInParamsRule.new,
+  YoutubePlayerAutoFullscreenWithoutPortraitGuardRule.new,
+
   // Geocoding rules (geocoding_rules.dart)
   GeocodingUncheckedFirstRule.new,
   GeocodingMissingExceptionHandlerRule.new,

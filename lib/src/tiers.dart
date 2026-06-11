@@ -766,6 +766,20 @@ const Set<String> recommendedOnlyRules = <String>{
   // Image Picker (image_picker_rules.dart) - crash prevention
   'image_picker_invalid_image_quality',
   'image_picker_multi_result_unchecked_empty',
+  // Google Maps Flutter (google_maps_flutter_rules.dart) - crash + safe migration
+  'google_maps_animate_camera_in_build',
+  'google_maps_cloud_map_id_deprecated',
+  // audioplayers (audioplayers_rules.dart) - dead-listener + invalid-arg bugs
+  'audioplayers_low_latency_with_stream_listen',
+  'audioplayers_low_latency_with_seek',
+  'audioplayers_url_source_in_asset_context',
+  'audioplayers_hardcoded_volume_above_one',
+  // flutter_map (flutter_map_rules.dart) - OSM user-agent block
+  'flutter_map_missing_user_agent',
+  // youtube_player_flutter (youtube_player_flutter_rules.dart) - leak + correctness
+  'youtube_player_controller_not_closed',
+  'youtube_player_convert_url_unchecked',
+  'youtube_player_mute_not_respected_in_params',
   // Geocoding (geocoding_rules.dart) - crash + migration
   'geocoding_unchecked_first',
   'geocoding_deprecated_locale_param',
@@ -1682,6 +1696,17 @@ const Set<String> professionalOnlyRules = <String>{
   'image_picker_missing_retrieve_lost_data',
   'image_picker_camera_source_without_support_check',
   'image_picker_lost_data_empty_check_missing',
+  // Google Maps Flutter (google_maps_flutter_rules.dart) - perf + migration
+  'google_maps_markers_rebuilt_in_build',
+  'google_maps_set_map_style_deprecated',
+  'google_maps_bitmap_descriptor_in_build',
+  // audioplayers (audioplayers_rules.dart)
+  'audioplayers_release_mode_loop_with_complete_listener',
+  // flutter_map (flutter_map_rules.dart)
+  'flutter_map_legacy_map_options_center',
+  'flutter_map_fallback_url_disables_cache',
+  // youtube_player_flutter (youtube_player_flutter_rules.dart)
+  'youtube_player_scaffold_deprecated',
   // Local Auth (local_auth_rules.dart)
   'local_auth_missing_lockout_handling',
   // Type Safety (moved from Essential - not crash prevention)
@@ -2857,6 +2882,13 @@ const Set<String> professionalOnlyRules = <String>{
 /// Comprehensive tier rules - stricter patterns, optimization hints, edge cases.
 /// Helpful but not critical. For quality-obsessed teams.
 const Set<String> comprehensiveOnlyRules = <String>{
+  // Google Maps Flutter (google_maps_flutter_rules.dart)
+  'google_maps_unknown_map_id_error_unchecked',
+  // audioplayers (audioplayers_rules.dart)
+  'audioplayers_pool_not_disposed',
+  // flutter_map (flutter_map_rules.dart) - deprecation INFO
+  'flutter_map_deprecated_tile_size',
+  'flutter_map_deprecated_polygon_label_placement',
   // Geocoding (geocoding_rules.dart)
   'geocoding_missing_exception_handler',
   'geocoding_prefer_no_result_found_catch',
@@ -3068,6 +3100,10 @@ const Set<String> comprehensiveOnlyRules = <String>{
 /// Pedantic tier rules - pedantic, highly opinionated rules.
 /// Rules most teams would find excessive. For greenfield projects.
 const Set<String> pedanticOnlyRules = <String>{
+  // flutter_map (flutter_map_rules.dart) - thin-guard best-practice, opt-in
+  'flutter_map_missing_error_tile_callback',
+  // youtube_player_flutter (youtube_player_flutter_rules.dart) - high-FP heuristic
+  'youtube_player_auto_fullscreen_without_portrait_guard',
   // Local Auth (local_auth_rules.dart) - naming-heuristic, high FP
   'local_auth_biometric_only_sensitive',
   // File length (very strict thresholds - 200 lines for production, 400 for tests)
@@ -3920,6 +3956,45 @@ const Set<String> imagePickerPackageRules = <String>{
   'image_picker_multi_result_unchecked_empty',
 };
 
+/// Rules specific to the google_maps_flutter package.
+const Set<String> googleMapsFlutterPackageRules = <String>{
+  'google_maps_markers_rebuilt_in_build',
+  'google_maps_cloud_map_id_deprecated',
+  'google_maps_set_map_style_deprecated',
+  'google_maps_bitmap_descriptor_in_build',
+  'google_maps_unknown_map_id_error_unchecked',
+  'google_maps_animate_camera_in_build',
+};
+
+/// Rules specific to the audioplayers package.
+const Set<String> audioplayersPackageRules = <String>{
+  'audioplayers_pool_not_disposed',
+  'audioplayers_low_latency_with_stream_listen',
+  'audioplayers_low_latency_with_seek',
+  'audioplayers_release_mode_loop_with_complete_listener',
+  'audioplayers_url_source_in_asset_context',
+  'audioplayers_hardcoded_volume_above_one',
+};
+
+/// Rules specific to the flutter_map package.
+const Set<String> flutterMapPackageRules = <String>{
+  'flutter_map_missing_user_agent',
+  'flutter_map_deprecated_tile_size',
+  'flutter_map_legacy_map_options_center',
+  'flutter_map_missing_error_tile_callback',
+  'flutter_map_deprecated_polygon_label_placement',
+  'flutter_map_fallback_url_disables_cache',
+};
+
+/// Rules specific to the youtube_player_flutter package.
+const Set<String> youtubePlayerFlutterPackageRules = <String>{
+  'youtube_player_controller_not_closed',
+  'youtube_player_convert_url_unchecked',
+  'youtube_player_scaffold_deprecated',
+  'youtube_player_mute_not_respected_in_params',
+  'youtube_player_auto_fullscreen_without_portrait_guard',
+};
+
 /// Rules specific to the geocoding package.
 const Set<String> geocodingPackageRules = <String>{
   'geocoding_unchecked_first',
@@ -4035,6 +4110,10 @@ Map<String, Set<String>> get packageRuleSets => {
   'local_auth': localAuthPackageRules,
   'geocoding': geocodingPackageRules,
   'image_picker': imagePickerPackageRules,
+  'google_maps_flutter': googleMapsFlutterPackageRules,
+  'audioplayers': audioplayersPackageRules,
+  'flutter_map': flutterMapPackageRules,
+  'youtube_player_flutter': youtubePlayerFlutterPackageRules,
   'flame': flamePackageRules,
 };
 
@@ -4069,6 +4148,10 @@ const List<String> allPackages = <String>[
   'local_auth',
   'geocoding',
   'image_picker',
+  'google_maps_flutter',
+  'audioplayers',
+  'flutter_map',
+  'youtube_player_flutter',
   'flame',
 ];
 
@@ -4107,6 +4190,10 @@ const Map<String, bool> defaultPackages = <String, bool>{
   'local_auth': true,
   'geocoding': true,
   'image_picker': true,
+  'google_maps_flutter': true,
+  'audioplayers': true,
+  'flutter_map': true,
+  'youtube_player_flutter': true,
   'flame': true,
 };
 

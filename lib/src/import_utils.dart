@@ -133,6 +133,22 @@ class PackageImports {
 
   /// Device Calendar package imports.
   static const Set<String> deviceCalendar = {'package:device_calendar/'};
+
+  /// Google Maps Flutter package imports.
+  static const Set<String> googleMapsFlutter = {'package:google_maps_flutter/'};
+
+  /// audioplayers package imports.
+  static const Set<String> audioplayers = {'package:audioplayers/'};
+
+  /// flutter_map package imports.
+  static const Set<String> flutterMap = {'package:flutter_map/'};
+
+  /// youtube_player_flutter package imports (v10 re-exports the controller
+  /// from youtube_player_iframe, so both URIs count as importing the package).
+  static const Set<String> youtubePlayerFlutter = {
+    'package:youtube_player_flutter/',
+    'package:youtube_player_iframe/',
+  };
 }
 
 // =============================================================================

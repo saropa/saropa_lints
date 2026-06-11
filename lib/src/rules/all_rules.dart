@@ -135,8 +135,12 @@ export 'platforms/web_rules.dart';
 export 'platforms/windows_rules.dart';
 
 // Package-specific rule files
+export 'packages/audioplayers_rules.dart';
 export 'packages/bloc_rules.dart';
 export 'packages/device_calendar_rules.dart';
+export 'packages/flutter_map_rules.dart';
+export 'packages/google_maps_flutter_rules.dart';
+export 'packages/youtube_player_flutter_rules.dart';
 export 'packages/dio_rules.dart';
 export 'packages/drift_rules.dart';
 export 'packages/equatable_rules.dart';
